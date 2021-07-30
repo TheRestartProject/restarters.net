@@ -1,6 +1,6 @@
 <?php
 
-return array (
+return [
   'about_event_name_header' => 'About :event',
   'rsvp_message' => 'Excellent! You are joining us at this event',
   'rsvp_button' => 'Sorry, I can no longer attend',
@@ -92,4 +92,4 @@ return array (
   'approve_event' => 'Approve Event',
   'field_event_device_images' => 'Add device images here',
   'field_event_device_images_2' => '',
-);
+];

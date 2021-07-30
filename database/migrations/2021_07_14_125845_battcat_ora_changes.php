@@ -12,9 +12,8 @@ class BattcatOraChanges extends Migration
     public function up()
     {
         DB::table('fault_types_batteries')->where('id', '=', 14)->update([
-            'title' => "Unrepairable corrosion or leakage",
+            'title' => 'Unrepairable corrosion or leakage',
         ]);
-
 
         $fault_types = $this->_FaultTypes();
 
@@ -39,32 +38,30 @@ class BattcatOraChanges extends Migration
         }
     }
 
-
-
     protected function _FaultTypes()
     {
         return [
-            "Repairable" => [
-                "Battery is not the main problem",
-                "Clean battery contacts",
-                "Fix connectors or casing",
-                "Fix the charging port",
-                "Replace the charger or charging cable",
-                "Replace with new battery",
-                "Other",
-                "Poor data",
+            'Repairable' => [
+                'Battery is not the main problem',
+                'Clean battery contacts',
+                'Fix connectors or casing',
+                'Fix the charging port',
+                'Replace the charger or charging cable',
+                'Replace with new battery',
+                'Other',
+                'Poor data',
             ],
-            "End of life" => [
-                "Battery is not the main problem",
-                "Battery not readily available",
-                "Built-in or soldered battery, cannot remove",
-                "Charger not readily available",
-                "Damaged while replacing battery",
-                "Difficult to remove battery",
-                "New battery too expensive",
-                "Unrepairable corrosion or leakage",
-                "Other",
-                "Poor data",
+            'End of life' => [
+                'Battery is not the main problem',
+                'Battery not readily available',
+                'Built-in or soldered battery, cannot remove',
+                'Charger not readily available',
+                'Damaged while replacing battery',
+                'Difficult to remove battery',
+                'New battery too expensive',
+                'Unrepairable corrosion or leakage',
+                'Other',
+                'Poor data',
             ],
         ];
     }

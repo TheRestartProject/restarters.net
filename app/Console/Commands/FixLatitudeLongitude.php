@@ -34,9 +34,9 @@ class FixLatitudeLongitude extends Command
 
         foreach ($users as $user) {
             $this->info("User {$user->id} {$user->country}:{$user->location}");
-            $geocoded = $geocoder->geocode($user->location . "," . $user->country);
+            $geocoded = $geocoder->geocode($user->location.','.$user->country);
 
-            if (!empty($geocoded)) {
+            if (! empty($geocoded)) {
                 $this->info("...{$geocoded['latitude']}, {$geocoded['longitude']}");
                 DB::update(DB::raw("UPDATE users SET latitude = {$geocoded['latitude']}, longitude={$geocoded['longitude']} WHERE id = {$user->id};"));
             }

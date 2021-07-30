@@ -2,11 +2,11 @@
 
 namespace App\Listeners;
 
-use App\Events\UserUpdated;
 use App\Events\UserEmailUpdated;
 use App\Events\UserLanguageUpdated;
-use Illuminate\Queue\InteractsWithQueue;
+use App\Events\UserUpdated;
 use Illuminate\Contracts\Queue\ShouldQueue;
+use Illuminate\Queue\InteractsWithQueue;
 
 class SyncUserProperties
 {

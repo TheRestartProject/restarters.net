@@ -1,12 +1,10 @@
 <?php
 
-return array (
+return [
   'unavailable_audits' => 'No changes have been made to this device!',
-  'updated' => 
-  array (
+  'updated' => [
     'metadata' => 'On :audit_created_at, :user_name updated record <strong>:audit_url</strong>',
-    'modified' => 
-    array (
+    'modified' => [
       'event' => '<strong>Event</strong> was modified from "<strong>:old</strong>" to "<strong>:new</strong>"',
       'category' => '<strong>Category</strong> was modified from "<strong>:old</strong>" to "<strong>:new</strong>"',
       'category_creation' => '<strong>Category Creation</strong> was modified from "<strong>:old</strong>" to "<strong>:new</strong>"',
@@ -22,6 +20,6 @@ return array (
       'professional_help' => '<strong>Professional Help</strong> was modified from "<strong>:old</strong>" to "<strong>:new</strong>"',
       'more_time_needed' => '<strong>More time needed</strong> was modified from "<strong>:old</strong>" to "<strong>:new</strong>"',
       'wiki' => '<strong>Wiki</strong> was modified from "<strong>:old</strong>" to "<strong>:new</strong>"',
-    ),
-  ),
-);
+    ],
+  ],
+];

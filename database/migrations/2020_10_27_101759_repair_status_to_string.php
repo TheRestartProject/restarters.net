@@ -1,8 +1,8 @@
 <?php
 
-use Illuminate\Support\Facades\Schema;
-use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Database\Migrations\Migration;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\Schema;
 
 class RepairStatusToString extends Migration
 {
@@ -11,9 +11,10 @@ class RepairStatusToString extends Migration
      *
      * @return void
      */
-    public function up() {
-        DB::unprepared("DROP FUNCTION IF EXISTS `REPAIR_STATUS_TO_STRING`");
-// Might need to set definer
+    public function up()
+    {
+        DB::unprepared('DROP FUNCTION IF EXISTS `REPAIR_STATUS_TO_STRING`');
+        // Might need to set definer
 //        DB::unprepared("CREATE DEFINER='root'@'localhost' FUNCTION `REPAIR_STATUS_TO_STRING`(`id` INT)
         DB::unprepared("CREATE FUNCTION `REPAIR_STATUS_TO_STRING`(`id` INT)
 RETURNS varchar(12) CHARSET utf8
@@ -40,6 +41,6 @@ END
      */
     public function down()
     {
-        DB::unprepared("DROP FUNCTION IF EXISTS `REPAIR_STATUS_TO_STRING`");
+        DB::unprepared('DROP FUNCTION IF EXISTS `REPAIR_STATUS_TO_STRING`');
     }
 }

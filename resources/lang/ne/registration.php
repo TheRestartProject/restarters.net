@@ -1,6 +1,6 @@
 <?php
 
-return array (
+return [
   'age' => 'Geboortejaar',
   'age_help' => 'Om de repair gemeenschap verder te ontwikkelen, hebben we meer inzicht nodig in intergenerationele dynamieken.',
   'age_validation' => 'Geef aub je geboortejaar in.',
@@ -37,4 +37,4 @@ return array (
   'reg-step-4-label1' => '<strong>Persoonlijke gegevens</strong>. Ik ga ermee akkoord dat Restart Project mijn persoonlijke gegevens intern gebruikt om mij in de repair gemeenschap in te schrijven, om de herkomst van repair gegevens te verifiëren en om de ervaring van de vrijwilligers te verbeteren. Ik begrijp dat mijn persoonlijk profiel zichtbaar zal zijn voor andere leden van de repair gemeenschap. Mijn persoonlijke gegevens zullen echter nooit zonder mijn toestemming gedeeld worden met derde partijen. Ik begrijp dat ik op elke moment mijn profiel en persoonlijke gegevens kan verwijderen en toegang heb tot <a href="https://therestartproject.org/data-and-privacy-policy/fixometer/" rel="noopener noreferrer" target="_blank">het privacy beleid van de gemeenschap</a>.',
   'reg-step-4-label2' => '<strong>Repair Gegevens</strong>.  Door repair gegevens in de Fixometer in te geven, geef ik Restart Project een eeuwigdurende rechtenvrije licentie om deze gegevens te gebruiken.   Deze licentie laat Restart Project toe om deze gegevens te verspreiden onder elke open licentie en om niet-persoonlijke gegevens te bewaren, zelfs als ik vraag om mijn persoonlijk profiel van de Fixometer te verwijderen.  (<i>Lees <a href="https://therestartproject.org/fixometer/why-we-collect-repair-data/" rel="noopener noreferrer" target="_blank">hier</a> meer over hoe we repair gegevens gebruiken</i>.)',
   'reg-step-4-label3' => '<strong>Historische Repair Gegevens</strong>. Ik geef aan Restart Project een eeuwigdurende rechtenvrije licentie van alle repair gegevens die ik eerder aan Restart Project verschafte. Deze licentie laat Restart Project toe om deze gegevens te verspreiden onder elke open licentie en om alle niet-persoonlijke gegevens te bewaren, zelfs als ik vraag om mijn persoonlijk profiel van de Fixometer te verwijderen.  (<i>Lees<a href="https://therestartproject.org/fixometer/why-we-collect-repair-data/" rel="noopener noreferrer" target="_blank">hier</a> meer  over hoe we de repair gegevens gebruiken </i>.)',
-);
+];

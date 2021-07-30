@@ -1,6 +1,6 @@
 <?php
 
-return array (
+return [
   'categories' => 'Categorie',
   'skills' => 'Abilità',
   'brand' => 'Marca',
@@ -44,4 +44,4 @@ return array (
   'edit-group-tag' => 'Modifica etichetta gruppo',
   'edit-group-tag-content' => 'Modifica contenuto etichetta gruppo',
   'edit-brand-content' => 'Modifica contenuto dellla marca',
-);
+];

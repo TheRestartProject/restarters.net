@@ -4,11 +4,10 @@ namespace Tests\Feature;
 
 use App\Group;
 use App\Party;
-
 use Carbon\Carbon;
 use DB;
-use Tests\TestCase;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Tests\TestCase;
 
 class GroupStatsTest extends TestCase
 {
@@ -17,10 +16,10 @@ class GroupStatsTest extends TestCase
     public function setUp()
     {
         parent::setUp();
-        DB::statement("SET foreign_key_checks=0");
+        DB::statement('SET foreign_key_checks=0');
         Group::truncate();
         Party::truncate();
-        DB::statement("SET foreign_key_checks=1");
+        DB::statement('SET foreign_key_checks=1');
     }
 
     /** @test */
@@ -38,7 +37,7 @@ class GroupStatsTest extends TestCase
             'unpowered_waste' => 0,
             'repairable_devices' => 0,
             'dead_devices' => 0,
-            'no_weight' => 0
+            'no_weight' => 0,
         ];
         $this->assertEquals($expectedStats, $group->getGroupStats(0.5));
     }
@@ -49,7 +48,7 @@ class GroupStatsTest extends TestCase
         $group = factory(Group::class)->create();
         $event = factory(Party::class)->states('moderated')->create([
             'event_date' => Carbon::yesterday(),
-            'group' => $group->idgroups
+            'group' => $group->idgroups,
         ]);
 
         $expectedStats = [
@@ -62,7 +61,7 @@ class GroupStatsTest extends TestCase
             'repairable_devices' => 0,
             'dead_devices' => 0,
             'no_weight' => 0,
-            'ewaste' => 0
+            'ewaste' => 0,
         ];
         $this->assertEquals($expectedStats, $group->getGroupStats(0.5));
     }

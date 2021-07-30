@@ -5,12 +5,11 @@ namespace Tests\Feature;
 use App\Events\UserRegistered;
 use App\Listeners\DiscourseUserEventSubscriber;
 use App\User;
-
 use DB;
 use Hash;
+use Illuminate\Support\Facades\Event;
 use Mockery;
 use Tests\TestCase;
-use Illuminate\Support\Facades\Event;
 
 class DiscourseAccountCreationTests extends TestCase
 {
@@ -38,7 +37,7 @@ class DiscourseAccountCreationTests extends TestCase
             $mock->shouldReceive('onUserRegistered')->once();
         }));
 
-        $response = $this->post('/user/register/',  $this->userAttributes());
+        $response = $this->post('/user/register/', $this->userAttributes());
 
         $response->assertStatus(302);
         $response->assertRedirect('dashboard');
@@ -50,7 +49,7 @@ class DiscourseAccountCreationTests extends TestCase
         // We might not have Discourse integration enabled, e.g. when running on Circle.  This is a hacky way of
         // checking that.  If we turn off FEATURE__DISCOURSE_INTEGRATION then we get errors when loading the
         // provider, which seem tricky to solve.
-        if (!env('CIRCLECI')) {
+        if (! env('CIRCLECI')) {
             $this->setDiscourseTestEnvironment();
 
             $atts = $this->userAttributes();
@@ -73,7 +72,7 @@ class DiscourseAccountCreationTests extends TestCase
             $json = json_decode($response->getBody()->getContents(), true);
             $this->assertEquals($atts['name'], $json['user']['username']);
         } else {
-            $this->assertTrue((TRUE));
+            $this->assertTrue((true));
         }
     }
 }

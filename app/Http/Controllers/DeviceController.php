@@ -3,7 +3,6 @@
 namespace App\Http\Controllers;
 
 use App\Brands;
-
 use App\Category;
 use App\Cluster;
 use App\Device;
@@ -68,7 +67,7 @@ class DeviceController extends Controller
             'clusters' => $clusters,
             'barriers' => \App\Helpers\FixometerHelper::allBarriers(),
             'brands' => $brands,
-            'item_types' => Device::getItemTypes()
+            'item_types' => Device::getItemTypes(),
         ]);
     }
 
@@ -165,7 +164,7 @@ class DeviceController extends Controller
                     $data['spare_parts'] = 2;
                 }
 
-                $update = array(
+                $update = [
                     'event' => $data['event'],
                     'category' => $data['category'],
                     'category_creation' => $data['category'],
@@ -181,7 +180,7 @@ class DeviceController extends Controller
                     'professional_help' => $professional_help,
                     'do_it_yourself' => $do_it_yourself,
                     'wiki' => $wiki,
-                );
+                ];
 
                 $u = Device::find($id)->update($update);
 
@@ -505,7 +504,7 @@ class DeviceController extends Controller
                 'do_it_yourself' => $professional_help,
                 'professional_help' => $do_it_yourself,
                 'wiki' => $wiki,
-                'estimate' => $estimate
+                'estimate' => $estimate,
             ]);
 
             // Update barriers
@@ -566,7 +565,7 @@ class DeviceController extends Controller
 
                 return response()->json([
                     'success' => true,
-                    'stats' => $stats
+                    'stats' => $stats,
                 ]);
             }
 
@@ -592,12 +591,11 @@ class DeviceController extends Controller
                 $images = $device->getImages();
             }
 
-
             // Return the current set of images for this device so that the client doesn't need to merge.
             return response()->json([
                 'success' => true,
                 'iddevices' => $id,
-                'images' => $images
+                'images' => $images,
             ]);
         } catch (\Exception $e) {
             return 'fail - image could not be uploaded';

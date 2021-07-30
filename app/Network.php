@@ -3,7 +3,6 @@
 namespace App;
 
 use App\Group;
-
 use Illuminate\Database\Eloquent\Model;
 
 class Network extends Model
@@ -45,7 +44,6 @@ class Network extends Model
         return $events->flatten(1);
     }
 
-
     public function logo()
     {
         return $this->hasOne(\App\Xref::class, 'reference', 'id')
@@ -57,8 +55,8 @@ class Network extends Model
     {
         $networkGroupsIds = $this->groups->pluck('idgroups')->toArray();
 
-        return Group::all()->filter(function ($group) use($networkGroupsIds) {
-            return !in_array($group->idgroups, $networkGroupsIds);
+        return Group::all()->filter(function ($group) use ($networkGroupsIds) {
+            return ! in_array($group->idgroups, $networkGroupsIds);
         });
     }
 
@@ -74,7 +72,7 @@ class Network extends Model
             'unpowered_waste' => 0,
             'repairable_devices' => 0,
             'dead_devices' => 0,
-            'no_weight' => 0
+            'no_weight' => 0,
         ];
 
         foreach ($this->groups as $group) {

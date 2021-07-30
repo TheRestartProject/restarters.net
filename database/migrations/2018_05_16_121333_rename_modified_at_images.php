@@ -1,8 +1,8 @@
 <?php
 
-use Illuminate\Support\Facades\Schema;
-use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Database\Migrations\Migration;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\Schema;
 
 class RenameModifiedAtImages extends Migration
 {
@@ -13,9 +13,9 @@ class RenameModifiedAtImages extends Migration
      */
     public function up()
     {
-      Schema::table('images', function (Blueprint $table) {
-          $table->renameColumn('modified_at', 'updated_at');
-      });
+        Schema::table('images', function (Blueprint $table) {
+            $table->renameColumn('modified_at', 'updated_at');
+        });
     }
 
     /**
@@ -25,8 +25,8 @@ class RenameModifiedAtImages extends Migration
      */
     public function down()
     {
-      Schema::table('images', function (Blueprint $table) {
-          $table->renameColumn('updated_at', 'modified_at');
-      });
+        Schema::table('images', function (Blueprint $table) {
+            $table->renameColumn('updated_at', 'modified_at');
+        });
     }
 }

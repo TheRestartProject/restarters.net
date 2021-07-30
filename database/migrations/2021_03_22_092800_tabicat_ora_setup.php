@@ -1,19 +1,19 @@
 <?php
 
-use Illuminate\Support\Facades\Schema;
-use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Database\Migrations\Migration;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\Schema;
 
-class TabicatOraSetup extends Migration {
-
+class TabicatOraSetup extends Migration
+{
     /**
      * Run the migrations.
      *
      * @return void
      */
-    public function up() {
-
-        if (!Schema::hasTable('devices_faults_tablets_ora_opinions')) {
+    public function up()
+    {
+        if (! Schema::hasTable('devices_faults_tablets_ora_opinions')) {
             Schema::create('devices_faults_tablets_ora_opinions', function (Blueprint $table) {
                 $table->increments('id');
                 $table->string('id_ords', 16)->index();
@@ -76,9 +76,9 @@ class TabicatOraSetup extends Migration {
                 $table->collation = 'utf8mb4_unicode_ci';
             });
 
-            $data = base_path() . '/database/data_updates/devices_tabicat_ora.php';
+            $data = base_path().'/database/data_updates/devices_tabicat_ora.php';
             if (file_exists($data)) {
-                include($data);
+                include $data;
                 foreach ($devices_tabicat_ora as $k => $v) {
                     DB::table('devices_tabicat_ora')->insert([
                                                                  'id_ords' => $v['id_ords'],
@@ -99,12 +99,13 @@ class TabicatOraSetup extends Migration {
         }
     }
 
-    protected function _FaultTypes() {
+    protected function _FaultTypes()
+    {
         return [
             1 => [
                 'title' => 'Power/battery',
                 'description' => '',
-                'regex' => 'batter|power|start|boot|switch|charg|plug|bricked'
+                'regex' => 'batter|power|start|boot|switch|charg|plug|bricked',
             ],
             2 => [
                 'title' => 'Screen',
@@ -239,11 +240,11 @@ class TabicatOraSetup extends Migration {
      *
      * @return void
      */
-    public function down() {
+    public function down()
+    {
         Schema::dropIfExists('devices_faults_tablets_ora_adjudicated');
         Schema::dropIfExists('devices_faults_tablets_ora_opinions');
         Schema::dropIfExists('fault_types_tablets');
         Schema::dropIfExists('devices_tabicat_ora');
     }
-
 }

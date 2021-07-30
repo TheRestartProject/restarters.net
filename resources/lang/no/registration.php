@@ -1,6 +1,6 @@
 <?php
 
-return array (
+return [
   'age' => 'Year of birth',
   'age_help' => 'To help spread community repair, we need greater insights into intergenerational dynamics.',
   'age_validation' => 'Please add your year of birth.',
@@ -38,4 +38,4 @@ return array (
   'step-2' => 'Step 2 of 4',
   'step-3' => 'Step 3 of 4',
   'step-4' => 'Step 4 of 4',
-);
+];

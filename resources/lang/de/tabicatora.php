@@ -1,8 +1,7 @@
 <?php
 
-return array (
-  'task' => 
-  array (
+return [
+  'task' => [
     'where_is_the_main_fault' => 'Wo ist der hauptfehler',
     'fetch_another' => 'Ich weiß es nicht, zeig eine andere Reparatur',
     'suggestions' => 'Vorschläge',
@@ -18,9 +17,8 @@ return array (
     'signpost_4' => 'Wir wollen den politischen Entscheidungsträgern sagen, warum Tablets kaputt gehen und wie sie einfacher zu reparieren sind. Community-Reparaturgruppen auf der ganzen Welt haben dazu Daten gesammelt. Sie helfen uns, diese Informationen zu analysieren, indem sie TabiCat ausprobieren.',
     'signpost_5' => 'Vielen Dank an Sie! <a href="https://survey.actionproject.eu/chat/?data=U2FsdGVkX1%207YCj%20CRieUSNsHbebWsbk97sB4QRw%2F%206soz4B9MsCqwSYA2WEWYjmPruZ%20bkR8PKsQbSX5dPmLQ%3D%3D">Bitte nehmen Sie an unserer Umfrage teil</a>',
     'signpost_6' => 'Vielen Dank für Ihre Hilfe! Jeder Fehler, den Sie kategorisieren, macht diese Daten noch nützlicher. <a href="../">Werden Sie doch auch Mitglied unserer Community</a>.',
-  ),
-  'status' => 
-  array (
+  ],
+  'status' => [
     'status' => 'Status',
     'items_opinions' => 'Artikel / meinungen',
     'items_with_split_opinions' => 'Artikel mit geteilten meinungen',
@@ -43,9 +41,8 @@ return array (
     'items_0_opinions' => 'mit 0 Meinungen',
     'task_completed' => 'Du hast alle Einträge gesehen, danke',
     'progress' => 'vollständig',
-  ),
-  'info' => 
-  array (
+  ],
+  'info' => [
     'body-s1-header' => 'Was ist TabiCat?',
     'body-s1-p1' => 'Tablets können frustrierend sein, leicht kaputt gehen und sind oft schwer zu reparieren. Wir wollen verstehen, warum Tablets ausfallen, damit wir Entscheidungsträgern mitteilen können, wie zukünftige Modelle einfacher zu reparieren sind. Reparatur vermeidet Abfall und schont die Ressourcen unseres Planeten.',
     'body-s1-p2' => 'Mit TabiCat können Sie sich an unserer Untersuchung beteiligen. Wir haben Informationen zu über 900 defekten Geräten gesammelt und brauchen Ihre Hilfe, um diese zu kategorisieren.',
@@ -56,14 +53,12 @@ return array (
     'body-s4-header' => 'Noch Fragen?',
     'body-s4-p1' => 'Erfahren Sie mehr, stellen Sie Fragen und geben Sie uns Ihr Feedback, in der <a href=":url" target="_blank">TabiCat-Diskussion</a>.',
     'title' => 'Danke, dass Sie TabiCat ausprobiert haben',
-  ),
-  'branding' => 
-  array (
+  ],
+  'branding' => [
     'powered_by' => 'Unter Verwendung von Daten aus:',
-  ),
+  ],
   'about' => 'Mehr Informationen',
-  'survey' => 
-  array (
+  'survey' => [
     'a1' => 'Starke Ablehnung',
     'a2' => 'Ablehnung',
     'a3' => 'Neutral',
@@ -79,5 +74,5 @@ return array (
     'q4' => 'TabiCat hat meine Ansicht über die Wichtigkeit von Reparaturen verändert',
     'send' => 'Senden',
     'skip' => 'überspringen',
-  ),
-);
+  ],
+];

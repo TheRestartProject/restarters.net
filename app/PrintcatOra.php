@@ -4,11 +4,11 @@ namespace App;
 
 use DB;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Support\Facades\Schema;
 use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\Schema;
 
-class PrintcatOra extends Model {
-
+class PrintcatOra extends Model
+{
     protected $table = 'devices_faults_printers_ora_opinions';
     protected $dateFormat = 'Y-m-d H:i';
     protected $dates = ['created_at', 'updated_at'];
@@ -29,24 +29,27 @@ class PrintcatOra extends Model {
      *
      * @return array
      */
-    public function fetchFault($exclusions = [], $locale = NULL) {
+    public function fetchFault($exclusions = [], $locale = null)
+    {
         $result = [];
-        $records = DB::select("SELECT COUNT(*) as total FROM `devices_printcat_ora`");
+        $records = DB::select('SELECT COUNT(*) as total FROM `devices_printcat_ora`');
         if ($records[0]->total > count($exclusions)) {
             // try once with locale, even if it is NULL
             $sql = $this->_getSQL($exclusions, $locale);
             $result = DB::select($sql);
-            if (!$result) {
+            if (! $result) {
                 // if no user-lang recs left, get one without locale
                 $sql = $this->_getSQL($exclusions);
                 $result = DB::select($sql);
             }
         }
+
         return $result;
     }
 
-    protected function _getSQL($exclusions = [], $locale = NULL) {
-        $sql = "SELECT
+    protected function _getSQL($exclusions = [], $locale = null)
+    {
+        $sql = 'SELECT
 d.`id_ords` as id_ords,
 d.`data_provider` as partner,
 TRIM(d.`brand`) as brand,
@@ -62,16 +65,17 @@ GROUP BY d.`id_ords`
 HAVING opinions_count < 3
 ORDER BY rand()
 LIMIT 1;
-";
+';
         $and = '';
-        if (!empty($exclusions)) {
+        if (! empty($exclusions)) {
             $ids = implode("','", $exclusions);
             $and .= "\nAND d.`id_ords` NOT IN ('$ids')";
         }
-        if (!is_null($locale)) {
+        if (! is_null($locale)) {
             $and .= "\nAND (d.`language` = '$locale')";
         }
         $sql = sprintf($sql, $and);
+
         return $sql;
     }
 
@@ -80,50 +84,49 @@ LIMIT 1;
      *
      * @return array
      */
-    public function fetchFaultTypes() {
-        return DB::select("SELECT * FROM `fault_types_printers`");
+    public function fetchFaultTypes()
+    {
+        return DB::select('SELECT * FROM `fault_types_printers`');
     }
 
     /**
-     *
-     *
      * @return mixed
      */
-    public function fetchStatus($partner = NULL) {
-
+    public function fetchStatus($partner = null)
+    {
         $result = [];
 
-        $result['total_devices'] = DB::select("
+        $result['total_devices'] = DB::select('
 SELECT COUNT(*) AS total
 FROM `devices_printcat_ora` d
-");
+');
 
-        $result['total_opinions_3'] = DB::select("
+        $result['total_opinions_3'] = DB::select('
 SELECT COUNT(DISTINCT o.id_ords) AS total
 FROM devices_faults_printers_ora_opinions o
 WHERE (SELECT COUNT(o2.id_ords) FROM devices_faults_printers_ora_opinions o2 WHERE o2.id_ords = o.id_ords GROUP BY o2.id_ords) = 3
-");
+');
 
-        $result['total_opinions_2'] = DB::select("
+        $result['total_opinions_2'] = DB::select('
 SELECT COUNT(DISTINCT o.id_ords) AS total
 FROM devices_faults_printers_ora_opinions o
 WHERE (SELECT COUNT(o2.id_ords) FROM devices_faults_printers_ora_opinions o2 WHERE o2.id_ords = o.id_ords GROUP BY o2.id_ords) = 2
-");
+');
 
-        $result['total_opinions_1'] = DB::select("
+        $result['total_opinions_1'] = DB::select('
 SELECT COUNT(DISTINCT o.id_ords) AS total
 FROM devices_faults_printers_ora_opinions o
 WHERE (SELECT COUNT(o2.id_ords) FROM devices_faults_printers_ora_opinions o2 WHERE o2.id_ords = o.id_ords GROUP BY o2.id_ords) = 1
-");
+');
 
-        $result['total_opinions_0'] = DB::select("
+        $result['total_opinions_0'] = DB::select('
 SELECT COUNT(d.id_ords) AS total
 FROM devices_printcat_ora d
 LEFT JOIN devices_faults_printers_ora_opinions o ON o.id_ords = d.id_ords
 WHERE o.id_ords IS NULL
-");
+');
 
-        $result['total_recats'] = DB::select("
+        $result['total_recats'] = DB::select('
 SELECT COUNT(*) AS total FROM (
 SELECT
 o.id_ords,
@@ -143,9 +146,9 @@ ANY_VALUE(a.fault_type_id) AS winning_opinion_id,
 3 AS all_crowd_opinions_count
 FROM devices_faults_printers_ora_adjudicated a
 ) AS result
-");
+');
 
-        $result['list_recats'] = DB::select("
+        $result['list_recats'] = DB::select('
 SELECT result.winning_opinion_id, fta.title as winning_opinion, COUNT(*) AS total FROM (
 SELECT
 o.id_ords,
@@ -168,9 +171,9 @@ FROM devices_faults_printers_ora_adjudicated a
 LEFT JOIN fault_types_printers fta ON fta.id = result.winning_opinion_id
 GROUP BY winning_opinion_id
 ORDER BY total DESC
-");
+');
 
-        $result['list_splits'] = DB::select("
+        $result['list_splits'] = DB::select('
 SELECT
 d.id_ords,
 (SELECT o1.fault_type_id FROM devices_faults_printers_ora_opinions o1 WHERE o1.id_ords = o.id_ords GROUP BY o1.fault_type_id ORDER BY COUNT(o1.fault_type_id) DESC LIMIT 1) AS winning_opinion_id,
@@ -187,8 +190,8 @@ WHERE (SELECT a.id_ords FROM devices_faults_printers_ora_adjudicated a WHERE a.i
 GROUP BY d.id_ords
 HAVING
 (all_crowd_opinions_count = 3 AND top_crowd_opinion_percentage < 60)
-");
-        $result['total_splits'] = [json_decode(json_encode(['total' => count($result['list_splits'])]), FALSE)];
+');
+        $result['total_splits'] = [json_decode(json_encode(['total' => count($result['list_splits'])]), false)];
 
         return $result;
     }
@@ -198,9 +201,9 @@ HAVING
      *
      * @return mixed
      */
-    public function updateDevices() {
-
-        DB::statement("CREATE TEMPORARY TABLE IF NOT EXISTS `devices_faults_printers_ora_temporary` AS
+    public function updateDevices()
+    {
+        DB::statement('CREATE TEMPORARY TABLE IF NOT EXISTS `devices_faults_printers_ora_temporary` AS
 SELECT *
 FROM
 (SELECT
@@ -227,16 +230,15 @@ GROUP BY r1.id_ords
 ) AS r2
 ) AS r3
 WHERE r3.winning_opinion_id IS NOT NULL
-");
-        DB::statement("ALTER TABLE `devices_faults_printers_ora_temporary` ADD PRIMARY KEY(`id_ords`);");
+');
+        DB::statement('ALTER TABLE `devices_faults_printers_ora_temporary` ADD PRIMARY KEY(`id_ords`);');
 
-        $result = DB::update("UPDATE devices_printcat_ora d, devices_faults_printers_ora_temporary t
+        $result = DB::update('UPDATE devices_printcat_ora d, devices_faults_printers_ora_temporary t
 SET d.fault_type_id = t.winning_opinion_id
-WHERE d.id_ords = t.id_ords;");
+WHERE d.id_ords = t.id_ords;');
 
-        DB::statement("DROP TEMPORARY TABLE IF EXISTS `devices_faults_printers_ora_temporary`");
+        DB::statement('DROP TEMPORARY TABLE IF EXISTS `devices_faults_printers_ora_temporary`');
 
         return $result;
     }
-
 }

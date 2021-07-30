@@ -6,7 +6,6 @@ use App\Category;
 use App\Device;
 use App\Party;
 use App\User;
-
 use DB;
 use Tests\TestCase;
 

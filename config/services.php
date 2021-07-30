@@ -40,7 +40,6 @@ return [
         ],
     ],
 
-
     'discourse' => [
         // The route's URI that acts as the entrypoint for Discourse to start the SSO process.
         // Used by Discourse to route incoming logins.

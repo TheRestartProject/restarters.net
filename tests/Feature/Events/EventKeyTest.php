@@ -11,18 +11,17 @@ use App\Network;
 use App\Party;
 use App\User;
 use App\UserGroups;
-
-use DB;
 use Carbon\Carbon;
+use DB;
+use HieuLe\WordpressXmlrpcClient\WordpressClient;
+use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Facades\Config;
+use Illuminate\Support\Facades\Notification;
 use Mockery;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Tests\TestCase;
-use HieuLe\WordpressXmlrpcClient\WordpressClient;
-use Illuminate\Support\Facades\Notification;
-use Illuminate\Foundation\Testing\RefreshDatabase;
-use Illuminate\Support\Facades\Config;
 
-class EventByKeyTest extends TestCase
+class EventKeyTest extends TestCase
 {
     public function testGetNoParties()
     {
@@ -54,13 +53,13 @@ class EventByKeyTest extends TestCase
         factory(User::class)->states('Administrator')->create(
             [
                 'api_token' => '1234',
-                'access_group_tag_id' => $tag1->id
+                'access_group_tag_id' => $tag1->id,
             ]
         );
 
         // Get by tag.
         $response = $this->get('/api/1234/events/group-tag/2000-01-01/2030-01-01');
-        $ret = json_decode($response->getContent(), TRUE);
+        $ret = json_decode($response->getContent(), true);
         $this->assertEquals(2, count($ret));
         $this->assertEquals($eventpast->idevents, $ret[0]['id']);
         $this->assertEquals($eventpast->location, $ret[0]['location']['value']);
@@ -68,8 +67,8 @@ class EventByKeyTest extends TestCase
         $this->assertEquals($eventfuture->location, $ret[1]['location']['value']);
 
         // Get same event by id.
-        $response = $this->get('/api/1234/event/' . $eventpast->idevents);
-        $ret = json_decode($response->getContent(), TRUE);
+        $response = $this->get('/api/1234/event/'.$eventpast->idevents);
+        $ret = json_decode($response->getContent(), true);
         $this->assertEquals($eventpast->idevents, $ret['id']);
         $this->assertEquals($eventpast->location, $ret['location']['value']);
 

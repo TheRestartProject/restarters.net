@@ -2,18 +2,16 @@
 
 namespace App\Http\Controllers;
 
+use App\Device;
+use App\Group;
+use App\Helpers\FootprintRatioCalculator;
+use App\Party;
+use App\User;
+use Auth;
+use FixometerHelper;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Validator;
-use Illuminate\Http\Request;
-use App\User;
-use App\Group;
-use App\Party;
-use App\Device;
-
-use App\Helpers\FootprintRatioCalculator;
-
-use FixometerHelper;
-use Auth;
 
 class AdminController extends Controller
 {
@@ -26,8 +24,8 @@ class AdminController extends Controller
         $Device = new Device;
         $weights = $Device->getWeights();
 
-        $this->TotalWeight = $weights[0]->total_weights;//send to view
-        $this->TotalEmission = $weights[0]->total_footprints;//send to view
+        $this->TotalWeight = $weights[0]->total_weights; //send to view
+        $this->TotalEmission = $weights[0]->total_footprints; //send to view
 
         if ($this->TotalWeight != 0) {//send to view
             $this->EmissionRatio = $this->TotalEmission / $this->TotalWeight;
@@ -101,13 +99,13 @@ class AdminController extends Controller
 
         /** co2 counters **/
         $co2_years = $Device->countCO2ByYear();
-        $stats = array();
+        $stats = [];
         foreach ($co2_years as $year) {
             $stats[$year->year] = $year->co2;
         }
 
         $waste_years = $Device->countWasteByYear();
-        $wstats = array();
+        $wstats = [];
         foreach ($waste_years as $year) {
             $wstats[$year->year] = $year->waste;
         }
@@ -117,7 +115,7 @@ class AdminController extends Controller
 
         $wasteThisYear = $Device->countWasteByYear(null, date('Y', time()));
 
-        $clusters = array();
+        $clusters = [];
 
         for ($i = 1; $i <= 4; $i++) {
             $cluster = $Device->countByCluster($i);
@@ -129,8 +127,7 @@ class AdminController extends Controller
             $clusters['all'][$i] = $cluster;
         }
 
-
-        for ($y = date('Y', time()); $y>=2013; $y--) {
+        for ($y = date('Y', time()); $y >= 2013; $y--) {
             for ($i = 1; $i <= 4; $i++) {
                 $cluster = $Device->countByCluster($i, null, $y);
 
@@ -144,7 +141,7 @@ class AdminController extends Controller
         }
 
         // most/least stats for clusters
-        $mostleast = array();
+        $mostleast = [];
         for ($i = 1; $i <= 4; $i++) {
             $mostleast[$i]['most_seen'] = $Device->findMostSeen(null, $i);
             $mostleast[$i]['most_repaired'] = $Device->findMostSeen(1, $i);
@@ -166,7 +163,7 @@ class AdminController extends Controller
         'upcomingparties' => $Party->findNextParties(),
         'allparties' => $allparties,
         'devices' => $devices,
-        'weights' => array(0 => array('total_footprints' => $TotalEmission, 'total_weights' => $TotalWeight)),
+        'weights' => [0 => ['total_footprints' => $TotalEmission, 'total_weights' => $TotalWeight]],
         'device_count_status' => $Device->statusCount(),
         'year_data' => $co2_years,
         'bar_chart_stats' => array_reverse($stats, true),

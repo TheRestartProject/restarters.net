@@ -3,53 +3,53 @@
 namespace App\Http\Controllers;
 
 use App;
-use Auth;
 use App\Device;
-use App\EventsUsers;
+use App\DripEvent;
 use App\Events\PasswordChanged;
 use App\Events\UserLanguageUpdated;
 use App\Events\UserRegistered;
+use App\EventsUsers;
 use App\Group;
-use App\Mail\RegistrationWelcome;
-use App\Network;
-use App\Preferences;
-use App\Permissions;
-use App\UsersPreferences;
-use App\UsersPermissions;
 use App\Http\Controllers\PartyController;
 use App\Invite;
-use App\Party;
-use App\Notifications\ResetPassword;
+use App\Mail\RegistrationWelcome;
+use App\Network;
 use App\Notifications\AdminNewUser;
+use App\Notifications\ResetPassword;
+use App\Party;
+use App\Permissions;
+use App\Preferences;
 use App\Role;
 use App\RolePermissions;
 use App\Skills;
 use App\User;
 use App\UserGroups;
+use App\UsersPermissions;
+use App\UsersPreferences;
 use App\UsersSkills;
 use App\WikiSyncStatus;
+use Auth;
 use Cache;
-use FixometerHelper;
 use FixometerFile;
-use Notification;
-use Lang;
-use LaravelLocalization;
+use FixometerHelper;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Input;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Validator;
-use Illuminate\Http\Request;
 use Intervention\Image\ImageManagerStatic as Image;
-use Illuminate\Support\Facades\Input;
-use App\DripEvent;
+use Lang;
+use LaravelLocalization;
+use Notification;
 
 class UserController extends Controller
 {
-  /**
-  * Show the application dashboard.
-  *
-  * @return \Illuminate\Http\Response
-  */
+    /**
+     * Show the application dashboard.
+     *
+     * @return \Illuminate\Http\Response
+     */
     public function index($id = null)
     {
         if (is_null($id)) {
@@ -57,7 +57,7 @@ class UserController extends Controller
         }
         $user = User::getProfile($id);
 
-      // if(FixometerHelper::hasRole($user, 'Administrator')){
+        // if(FixometerHelper::hasRole($user, 'Administrator')){
         $skill_ids = UsersSkills::where('user', $id)->pluck('skill');
         $skills = Skills::whereIn('id', $skill_ids)->pluck('skill_name')->toArray();
 
@@ -71,9 +71,9 @@ class UserController extends Controller
     {
         if (is_null($id)) {
             $user = Auth::user();
-        } else if (!FixometerHelper::hasRole(Auth::user(), 'Administrator') &&
-            !Auth::user()->isRepairDirectorySuperAdmin() &&
-            !Auth::user()->isRepairDirectoryRegionalAdmin() &&
+        } elseif (! FixometerHelper::hasRole(Auth::user(), 'Administrator') &&
+            ! Auth::user()->isRepairDirectorySuperAdmin() &&
+            ! Auth::user()->isRepairDirectoryRegionalAdmin() &&
             Auth::user()->id !== intval($id)
         ) {
             // We don't have permissions to see any of the tabs on this page, so we shouldn't see the page.
@@ -128,7 +128,7 @@ class UserController extends Controller
 
         return view('user.notifications', [
             'user' => $user,
-            'notifications' => $notifications
+            'notifications' => $notifications,
         ]);
     }
 
@@ -165,13 +165,13 @@ class UserController extends Controller
 
         $user = User::find($id);
 
-        if ( $user->isDripSubscriber() ) {
-          DripEvent::createOrUpdateSubscriber($user, true, auth()->user()->email, request()->input('email'));
+        if ($user->isDripSubscriber()) {
+            DripEvent::createOrUpdateSubscriber($user, true, auth()->user()->email, request()->input('email'));
         }
 
-        if (!empty($user->location)) {
+        if (! empty($user->location)) {
             $geocoded = $geocoder->geocode("{$user->location}, {$user->country}");
-            if (!empty($geocoded)) {
+            if (! empty($geocoded)) {
                 $user->latitude = $geocoded['latitude'];
                 $user->longitude = $geocoded['longitude'];
             } else {
@@ -190,7 +190,6 @@ class UserController extends Controller
 
     public function postProfilePasswordEdit(Request $request)
     {
-
         if ($request->input('id') !== null) {
             $id = $request->input('id');
         } else {
@@ -223,7 +222,7 @@ class UserController extends Controller
     public function postProfileRepairDirectory(Request $request)
     {
         $rules = [
-            'role' => 'required|digits_between:' . Role::REPAIR_DIRECTORY_SUPERADMIN . ',' . Role::REPAIR_DIRECTORY_EDITOR
+            'role' => 'required|digits_between:'.Role::REPAIR_DIRECTORY_SUPERADMIN.','.Role::REPAIR_DIRECTORY_EDITOR,
         ];
 
         $validator = Validator::make($request->all(), $rules);
@@ -237,7 +236,7 @@ class UserController extends Controller
         $user = User::find($id);
 
         // Check that we are allowed to change the role, based on our own role.
-        $this->authorize('changeRepairDirRole', [ Auth::user(), $user, $role ]);
+        $this->authorize('changeRepairDirRole', [Auth::user(), $user, $role]);
 
         $user->update([
             'repairdir_role' => $role,
@@ -276,7 +275,6 @@ class UserController extends Controller
 
     public function postSoftDeleteUser(Request $request)
     {
-
         if ($request->input('id') !== null) {
             $id = $request->input('id');
         } else {
@@ -287,8 +285,8 @@ class UserController extends Controller
         $old_user_name = $user->name;
         $user_id = $user->id;
 
-        if ( $user->isDripSubscriber() ) {
-          $user->drip_subscriber_id = null;
+        if ($user->isDripSubscriber()) {
+            $user->drip_subscriber_id = null;
         }
 
         $user->delete(); // Will be anonymised automatically by event handlers
@@ -302,7 +300,6 @@ class UserController extends Controller
 
     public function postProfilePreferencesEdit(Request $request)
     {
-
         if ($request->input('id') !== null) {
             $id = $request->input('id');
         } else {
@@ -312,8 +309,7 @@ class UserController extends Controller
         $user = User::find($id);
 
         if ($request->input('invites') !== null) :
-            $user->invites = 1;
-        else :
+            $user->invites = 1; else :
             $user->invites = 0;
         endif;
 
@@ -346,20 +342,19 @@ class UserController extends Controller
 
     public function postProfilePictureEdit(Request $request)
     {
-
         if ($request->input('id') !== null) {
             $id = $request->input('id');
         } else {
             $id = Auth::id();
         }
 
-        if (isset($_FILES) && !empty($_FILES)) {
-          // $file = $request->file('profilePhoto');
-          // $path = 'images/' . $file->getClientOriginalName();
-          // $image = Image::make($file)
-          // // ->resize(320, 240)
-          // ->orientate()
-          // ->save($path);
+        if (isset($_FILES) && ! empty($_FILES)) {
+            // $file = $request->file('profilePhoto');
+            // $path = 'images/' . $file->getClientOriginalName();
+            // $image = Image::make($file)
+            // // ->resize(320, 240)
+            // ->orientate()
+            // ->save($path);
 
             $file = new FixometerFile;
             $file->upload('profilePhoto', 'image', $id, env('TBL_USERS'), false, true);
@@ -372,7 +367,6 @@ class UserController extends Controller
 
     public function postAdminEdit(Request $request)
     {
-
         if ($request->input('id') !== null) {
             $user_id = $request->input('id');
         } else {
@@ -381,12 +375,12 @@ class UserController extends Controller
 
         $user = User::find($user_id);
 
-      // Set role for User
+        // Set role for User
         $user->update([
         'role' => $request->input('user_role'),
         ]);
 
-      // Sync relevant pivots
+        // Sync relevant pivots
         $user->groups()->sync($request->input('assigned_groups'));
         $user->preferences()->sync($request->input('preferences'));
         $user->permissions()->sync($request->input('permissions'));
@@ -400,7 +394,7 @@ class UserController extends Controller
 
         $check_password = Hash::check($request->input('password'), $user->password);
 
-        if (!is_null($request->input('new-password')) && !$check_password) {
+        if (! is_null($request->input('new-password')) && ! $check_password) {
             return redirect()
             ->back()
             ->withErrors('Incorrect old password - please try again');
@@ -410,7 +404,7 @@ class UserController extends Controller
         'name' => 'required|max:255',
         'email' => 'required|unique:users,email,'.$user->id.'|max:255',
         'location' => 'max:191',
-        'new-password' => 'confirmed'
+        'new-password' => 'confirmed',
         ])->validate();
 
         $user->name = $request->input('name');
@@ -418,7 +412,7 @@ class UserController extends Controller
         $user->age = $request->input('age');
         $user->gender = $request->input('gender');
         $user->location = $request->input('location');
-        if (!empty($request->input('new-password'))) {
+        if (! empty($request->input('new-password'))) {
             $user->setPassword(Hash::make($request->input('new-password')));
         }
         $user->save();
@@ -434,31 +428,31 @@ class UserController extends Controller
         $Party = new Party;
         $User = new User;
 
-        $weights= $Device->getWeights();
-        $devices= $Device->statusCount();
+        $weights = $Device->getWeights();
+        $devices = $Device->statusCount();
 
         $co2_years = $Device->countCO2ByYear();
-        $stats = array();
+        $stats = [];
         foreach ($co2_years as $year) {
             $stats[$year->year] = $year->co2;
         }
 
         $waste_years = $Device->countWasteByYear();
-        $wstats = array();
+        $wstats = [];
         foreach ($waste_years as $year) {
             $wstats[$year->year] = $year->waste;
         }
 
-        if (strtoupper($_SERVER['REQUEST_METHOD']) == 'POST' && isset($_POST['email']) && !empty($_POST['email'])) {
+        if (strtoupper($_SERVER['REQUEST_METHOD']) == 'POST' && isset($_POST['email']) && ! empty($_POST['email'])) {
             $email = $_POST['email'];
-            if (empty($email) || !filter_var($email, FILTER_VALIDATE_EMAIL)) {
+            if (empty($email) || ! filter_var($email, FILTER_VALIDATE_EMAIL)) {
                 $response['danger'] = 'Please input a <strong>valid</strong> email.';
             } else {
                 $user = $User->where('email', $email)->first();
 
-                if (!empty($user)) {
+                if (! empty($user)) {
                     $id = $user->id;
-                    $data = array();
+                    $data = [];
 
                     // generate recovery code
                     $bytes = 32;
@@ -474,7 +468,7 @@ class UserController extends Controller
                     ]);
 
                     User::find($id)->notify(new ResetPassword([
-                      'url' => env('APP_URL') . "/user/reset?recovery=" . $data['recovery']
+                      'url' => env('APP_URL').'/user/reset?recovery='.$data['recovery'],
                     ]));
 
                     $response['success'] = 'Email Sent! Please check your inbox and follow instructions';
@@ -518,22 +512,22 @@ class UserController extends Controller
         $Party = new Party;
         $User = new User;
 
-        $weights= $Device->getWeights();
-        $devices= $Device->statusCount();
+        $weights = $Device->getWeights();
+        $devices = $Device->statusCount();
 
         $co2_years = $Device->countCO2ByYear();
-        $stats = array();
+        $stats = [];
         foreach ($co2_years as $year) {
             $stats[$year->year] = $year->co2;
         }
 
         $waste_years = $Device->countWasteByYear();
-        $wstats = array();
+        $wstats = [];
         foreach ($waste_years as $year) {
             $wstats[$year->year] = $year->waste;
         }
 
-        if (!isset($_GET['recovery']) || empty($_GET['recovery'])) {
+        if (! isset($_GET['recovery']) || empty($_GET['recovery'])) {
             $valid_code = false;
         } else {
             $recovery = filter_var($_GET['recovery'], FILTER_SANITIZE_STRING);
@@ -546,37 +540,37 @@ class UserController extends Controller
             }
         }
 
-        if (strtoupper($_SERVER['REQUEST_METHOD']) == 'POST' && isset($_POST['password']) && !empty($_POST['password']) && isset($_POST['confirm_password']) && !empty($_POST['confirm_password'])) {
+        if (strtoupper($_SERVER['REQUEST_METHOD']) == 'POST' && isset($_POST['password']) && ! empty($_POST['password']) && isset($_POST['confirm_password']) && ! empty($_POST['confirm_password'])) {
             $recovery = $_POST['recovery'];
-            $pwd      = $_POST['password'];
-            $cpwd     = $_POST['confirm_password'];
-            if (empty($recovery) || !filter_var($recovery, FILTER_SANITIZE_STRING)) {
+            $pwd = $_POST['password'];
+            $cpwd = $_POST['confirm_password'];
+            if (empty($recovery) || ! filter_var($recovery, FILTER_SANITIZE_STRING)) {
                 $response['danger'] = 'Recovery code invalid.';
             } elseif ($pwd !== $cpwd) {
                 $response['danger'] = 'The passwords do not match';
             } else {
                 $user = $User->where('recovery', '=', $recovery)->first();
-                if (!empty($user)) {
-                    $data = array(
-                    'password' => crypt($pwd, '$1$'.strrev(md5(env('APP_KEY'))))
-                    );
+                if (! empty($user)) {
+                    $data = [
+                    'password' => crypt($pwd, '$1$'.strrev(md5(env('APP_KEY')))),
+                    ];
                     $update = $user->update($data);
                     if ($update) {
-                          return redirect('login')->with('success', 'Password updated, please login to continue');
+                        return redirect('login')->with('success', 'Password updated, please login to continue');
                     } else {
-                        $response['danger'] = "Could not update the password.";
+                        $response['danger'] = 'Could not update the password.';
                     }
                 } else {
-                    $response['danger'] = "No account matches the recovery code";
+                    $response['danger'] = 'No account matches the recovery code';
                 }
             }
         }
 
-        if (!isset($recovery)) {
+        if (! isset($recovery)) {
             $recovery = null;
         }
 
-        if (!isset($response)) {
+        if (! isset($response)) {
             $response = null;
         }
 
@@ -602,9 +596,6 @@ class UserController extends Controller
         'email' => $email,
         ]);
     }
-
-
-
 
     public function all()
     {
@@ -647,10 +638,10 @@ class UserController extends Controller
 
         if (FixometerHelper::hasRole($user, 'Administrator')) {
             $User = new User;
-          //Have true as parameter for eloquent collection instead of array
+            //Have true as parameter for eloquent collection instead of array
             $userlist = $User->getUserList(true);
 
-          //do searches
+            //do searches
             if ($request->input('name') !== null) {
                 $userlist = $userlist->where('name', 'like', '%'.$request->input('name').'%');
             }
@@ -712,14 +703,13 @@ class UserController extends Controller
         }
     }
 
-
     // TODO: is this alive?
     // I don't recall admins being able to create users.  But it is in a route.
     public function create()
     {
         $user = Auth::user();
 
-      // Administrators can add users.
+        // Administrators can add users.
         if (FixometerHelper::hasRole($user, 'Administrator')) {
             $Roles = new Role;
             $Roles = $Roles->findAll();
@@ -729,29 +719,29 @@ class UserController extends Controller
 
             $User = new User;
 
-            if ($_SERVER['REQUEST_METHOD'] == 'POST' && !empty($_POST)) {
-                $error = array();
+            if ($_SERVER['REQUEST_METHOD'] == 'POST' && ! empty($_POST)) {
+                $error = [];
 
-              // We got data! Elaborate.
-                $name   =       $_POST['name'];
-                $email  =       $_POST['email'];
-                $role   =       $_POST['role'];
-                if (!isset($_POST['modal'])) {
-                    $groups  =      $_POST['groups'];
+                // We got data! Elaborate.
+                $name = $_POST['name'];
+                $email = $_POST['email'];
+                $role = $_POST['role'];
+                if (! isset($_POST['modal'])) {
+                    $groups = $_POST['groups'];
                 }
 
-              // dbga($group);
+                // dbga($group);
 
                 if (empty($name)) {
                     $error['name'] = 'Please input a name.';
                 }
 
-                if (empty($email) || !filter_var($email, FILTER_VALIDATE_EMAIL)) {
+                if (empty($email) || ! filter_var($email, FILTER_VALIDATE_EMAIL)) {
                     $error['email'] = 'Please input a <strong>valid</strong> email.';
                 }
-              /*
-              if(empty($pwd) || empty($cpwd) || !($pwd === $cpwd)){
-              $error['password'] = 'The password cannot be emtpy and must match with the confirmation field.';
+                /*
+                if(empty($pwd) || empty($cpwd) || !($pwd === $cpwd)){
+                $error['password'] = 'The password cannot be emtpy and must match with the confirmation field.';
             }
             */
                 if (empty($role)) {
@@ -761,7 +751,7 @@ class UserController extends Controller
                 if (empty($group)) {
                     $group = null;
                 }
-                if (!$User->checkEmail($email)) {
+                if (! $User->checkEmail($email)) {
                     $error['email'] = 'This email is already in use in our database. Please use another one.';
                 }
 
@@ -770,53 +760,51 @@ class UserController extends Controller
                     $pwd = bin2hex(openssl_random_pseudo_bytes(8));
 
                     // No errors. We can proceed and create the User.
-                    $data = array(  'name'     => $name,
+                    $data = ['name'     => $name,
                     'email'    => $email,
                     'password' => crypt($pwd, '$1$'.strrev(md5(env('APP_KEY')))),
                     'role'     => $role,
                     'calendar_hash' => str_random(15),
                     //'group'    => $group
-                      );
+                      ];
 
+                    // add password recovery data
+                    $bytes = 32;
+                    $data['recovery'] = substr(bin2hex(openssl_random_pseudo_bytes($bytes)), 0, 24);
+                    // add date timestamp
+                    $data['recovery_expires'] = strftime('%Y-%m-%d %X', time() + (24 * 60 * 60));
 
-                      // add password recovery data
-                      $bytes = 32;
-                      $data['recovery'] = substr(bin2hex(openssl_random_pseudo_bytes($bytes)), 0, 24);
-                      // add date timestamp
-                      $data['recovery_expires'] = strftime('%Y-%m-%d %X', time() + (24 * 60 * 60));
-
-
-                      $idUser = $User->create($data)->id;
+                    $idUser = $User->create($data)->id;
                     if ($idUser) {
-                        if (isset($groups) && !empty($groups)) {
+                        if (isset($groups) && ! empty($groups)) {
                             $Usersgroups = new UserGroups;
                             $Usersgroups->createUsersGroups($idUser, $groups);
                         }
 
-                        if (isset($_FILES) && !empty($_FILES)) {
+                        if (isset($_FILES) && ! empty($_FILES)) {
                             $file = new FixometerFile;
                             $file->upload('profile', 'image', $idUser, env('TBL_USERS'), false, true);
                         }
                     }
                     if ($idUser) {
-                  //Send out email
+                        //Send out email
 
-                  // send email to User
-                  // $message = "<p>Hi,</p>" .
-                  //          "<p>This is an automatic email to let you know that we have just created an account for you on the <strong>" . APPNAME . "</strong>.</p>" .
-                  //          "<p>Please click on this link to set your password: <a href=\"" . env('APP_URL') . "/user/reset/?recovery=" . $data['recovery'] . "\">" . BASE_URL . "/user/reset/?recovery=" . $data['recovery'] . "</a>.</p>" .
-                  //          "<p>If the link doesn't work, please copy and paste it in the address bar of your browser.</p>" .
-                  //          "<p>The link will be active for the next 24 hours.</p>" .
-                  // "<p>If you have any issues, please contact <a href='mailto:" . env('SUPPORT_CONTACT_EMAIL') . "'>" . env('SUPPORT_CONTACT_EMAIL') . "</a>.</p>" .
-                  //          "<p>Thanks for using the " . env('APP_NAME') . "!</p>" .
-                  //          "<p><em>The Restart Project</em></p>";
-                  // $subject = env('APP_NAME') . ": Account created - please set your password";
-                  // $headers = "From: " . env('APP_EMAIL') . "\r\n";
-                  // $headers .= "MIME-Version: 1.0\r\n";
-                  // $headers .= "Content-Type: text/html; charset=ISO-8859-1\r\n";
-                  // $headers .= "Bcc: " . env('SUPPORT_CONTACT_EMAIL') . "\r\n";
-                  //
-                  // $sender = mail($email, $subject, $message, $headers);
+                        // send email to User
+                        // $message = "<p>Hi,</p>" .
+                        //          "<p>This is an automatic email to let you know that we have just created an account for you on the <strong>" . APPNAME . "</strong>.</p>" .
+                        //          "<p>Please click on this link to set your password: <a href=\"" . env('APP_URL') . "/user/reset/?recovery=" . $data['recovery'] . "\">" . BASE_URL . "/user/reset/?recovery=" . $data['recovery'] . "</a>.</p>" .
+                        //          "<p>If the link doesn't work, please copy and paste it in the address bar of your browser.</p>" .
+                        //          "<p>The link will be active for the next 24 hours.</p>" .
+                        // "<p>If you have any issues, please contact <a href='mailto:" . env('SUPPORT_CONTACT_EMAIL') . "'>" . env('SUPPORT_CONTACT_EMAIL') . "</a>.</p>" .
+                        //          "<p>Thanks for using the " . env('APP_NAME') . "!</p>" .
+                        //          "<p><em>The Restart Project</em></p>";
+                        // $subject = env('APP_NAME') . ": Account created - please set your password";
+                        // $headers = "From: " . env('APP_EMAIL') . "\r\n";
+                        // $headers .= "MIME-Version: 1.0\r\n";
+                        // $headers .= "Content-Type: text/html; charset=ISO-8859-1\r\n";
+                        // $headers .= "Bcc: " . env('SUPPORT_CONTACT_EMAIL') . "\r\n";
+                        //
+                        // $sender = mail($email, $subject, $message, $headers);
 
                         $response['success'] = 'User created correctly.  <strong>An email has been sent to the user to ask them to set their password.</strong>';
                     } else {
@@ -826,12 +814,12 @@ class UserController extends Controller
                     $response['danger'] = 'User could <strong>not</strong> be created. Please look at the reported errors, correct them, and try again.';
                 }
 
-                if (!isset($data)) {
-                      $data = null;
+                if (! isset($data)) {
+                    $data = null;
                 }
 
-                if (!isset($_POST['modal'])) {
-                      return view('user.create', [
+                if (! isset($_POST['modal'])) {
+                    return view('user.create', [
                         'title' => 'New User',
                         'user' => $user,
                         'header' => true,
@@ -842,7 +830,7 @@ class UserController extends Controller
                         'originalData' => $data,
                       ]);
                 } else {
-                      return redirect()->back()->with('success', 'User Successfully Created!');
+                    return redirect()->back()->with('success', 'User Successfully Created!');
                 }
             }
 
@@ -858,16 +846,14 @@ class UserController extends Controller
         }
     }
 
-
     public function edit($id, Request $request)
     {
-
         global $fixometer_languages;
 
         $user = Auth::user();
         $User = new User;
 
-      // Administrators can edit users.
+        // Administrators can edit users.
         if (FixometerHelper::hasRole($user, 'Administrator') || FixometerHelper::hasRole($user, 'Host')) {
             $Roles = new Role;
             $Roles = $Roles->findAll();
@@ -877,19 +863,18 @@ class UserController extends Controller
 
             $data = $request->post();
 
-            if (!FixometerHelper::hasRole($User->find($id), 'Administrator')) {
+            if (! FixometerHelper::hasRole($User->find($id), 'Administrator')) {
                 $sent_groups = $data['groups'];
             }
 
             $error = false;
             // check for email in use
             $editingUser = $User->find($id);
-            if ($editingUser->email !== $data['email'] && !$User->checkEmail($data['email'])) {
+            if ($editingUser->email !== $data['email'] && ! $User->checkEmail($data['email'])) {
                 $error['email'] = 'The email you entered is already in use in our database. Please use another one.';
             }
 
-
-            if (!empty($data['new-password'])) {
+            if (! empty($data['new-password'])) {
                 if ($data['new-password'] !== $data['password-confirm']) {
                     $error['password'] = 'The passwords are not identical!';
                 } else {
@@ -904,8 +889,7 @@ class UserController extends Controller
             unset($data['profile']);
             unset($data['id']);
 
-
-            if (!is_array($error)) {
+            if (! is_array($error)) {
                 $u = $User->find($id)->update($data);
 
                 $ug = new UserGroups;
@@ -913,24 +897,24 @@ class UserController extends Controller
                     $ug->createUsersGroups($id, $sent_groups);
                 }
 
-                if (isset($_FILES) && !empty($_FILES)) {
+                if (isset($_FILES) && ! empty($_FILES)) {
                     $file = new FixometerFile;
                     $file->upload('profile', 'image', $id, env('TBL_USERS'), false, true);
                 }
 
-                if (!$u) {
+                if (! $u) {
                     $response['danger'] = 'Something went wrong. Please check the data and try again.';
                 } else {
                     $response['success'] = 'User updated!';
                     if (FixometerHelper::hasRole($user, 'Host')) {
-                          // Use @ for phpunit tests.
-                          @header('Location: /host?action=ue&code=200');
+                        // Use @ for phpunit tests.
+                        @header('Location: /host?action=ue&code=200');
                     }
                 }
 
                 $userdata = User::find($id);
 
-                $usergroups = array();
+                $usergroups = [];
                 $ugroups = $User->getUserGroups($id);
                 foreach ($ugroups as $g) {
                     $usergroups[] = $g->group;
@@ -951,7 +935,7 @@ class UserController extends Controller
             } else {
                 $userdata = User::find($id);
 
-                $usergroups = array();
+                $usergroups = [];
                 $ugroups = $User->getUserGroups($id);
                 foreach ($ugroups as $g) {
                     $usergroups[] = $g->group;
@@ -976,6 +960,7 @@ class UserController extends Controller
     public function logout()
     {
         Auth::logout();
+
         return redirect('/login');
     }
 
@@ -1002,7 +987,7 @@ class UserController extends Controller
         ]);
     }
 
-    public function postRegister(Request $request, $hash = null, App\Helpers\Geocoder $geocoder)
+    public function postRegister(Request $request, $hash, App\Helpers\Geocoder $geocoder)
     {
         if (Auth::check()) { //Existing users don't need all the same rules
             $rules = [
@@ -1037,7 +1022,7 @@ class UserController extends Controller
         $skills = $request->input('skills');
         $timestamp = date('Y-m-d H:i:s');
 
-  // try {
+        // try {
 
         if (Auth::check()) { //Existing users are to update
             $user = User::find(Auth::user()->id);
@@ -1071,9 +1056,9 @@ class UserController extends Controller
         $user->consent_future_data = $timestamp;
 
         // Opted-in to Subscribe to newsletter
-        if ( ! is_null($request->input('newsletter')) && $request->input('newsletter') == 1) {
-          $subscribed = true;
-          $user->newsletter = 1;
+        if (! is_null($request->input('newsletter')) && $request->input('newsletter') == 1) {
+            $subscribed = true;
+            $user->newsletter = 1;
         } else {
             $subscribed = false;
         }
@@ -1082,21 +1067,20 @@ class UserController extends Controller
             $activeRepairNetworkId = session()->get('repair_network');
             $network = Network::find($activeRepairNetworkId);
             if (! is_null($network) && $network->users_push_to_drip) {
-
                 $drip_subscribe_user = DripEvent::createOrUpdateSubscriber($user, $subscribed);
                 $user->drip_subscriber_id = $drip_subscribe_user->id;
             }
         }
 
         // 'invites' refers to receiving notifications about groups or events near the user.
-        if (!is_null($request->input('invites')) && $request->input('invites') == 1) { //Subscribe to invites
+        if (! is_null($request->input('invites')) && $request->input('invites') == 1) { //Subscribe to invites
             $user->invites = 1;
         }
 
         // Now determine lat and long values from location field (if provided)
-        if (!is_null($request->input('city'))) {
+        if (! is_null($request->input('city'))) {
             $geocoded = $geocoder->geocode("{$request->input('city')}, {$request->input('country')}");
-            if (!empty($geocoded)) {
+            if (! empty($geocoded)) {
                 $user->latitude = $geocoded['latitude'];
                 $user->longitude = $geocoded['longitude'];
             }
@@ -1110,30 +1094,30 @@ class UserController extends Controller
 
         $user->save();
 
-  // Notify relevant users
+        // Notify relevant users
         $notify_users = FixometerHelper::usersWhoHavePreference('admin-new-user');
         Notification::send($notify_users, new AdminNewUser([
         'id' => $user->id,
         'name' => $user->name,
         ]));
 
-      // Sync user skills
-        if (!empty($skills)) {
+        // Sync user skills
+        if (! empty($skills)) {
             User::find($user->id)->skillsold()->sync($skills);
         }
 
-      // If this is an invite
-        if (!is_null($hash)) {
+        // If this is an invite
+        if (! is_null($hash)) {
             $acceptance = Invite::where('hash', $hash)->first();
-            if (!empty($acceptance) && $acceptance->type == 'event') {
+            if (! empty($acceptance) && $acceptance->type == 'event') {
                 EventsUsers::create([
                   'user' => $user->id,
                   'event' => $acceptance->record_id,
                   'status' => 1,
                   'role' => 4,
                 ]);
-                    $acceptance->delete();
-            } elseif (!empty($acceptance) && $acceptance->type == 'group') {
+                $acceptance->delete();
+            } elseif (! empty($acceptance) && $acceptance->type == 'group') {
                 UserGroups::create([
                   'user' => $user->id,
                   'group' => $acceptance->record_id,
@@ -1150,7 +1134,7 @@ class UserController extends Controller
                 $firstName = $user->getFirstName();
                 Mail::to($user)->send(new RegistrationWelcome($firstName));
             } catch (\Exception $ex) {
-                Log::error('Failed to send post-registration welcome email: ' . $ex->getMessage());
+                Log::error('Failed to send post-registration welcome email: '.$ex->getMessage());
             }
         }
 
@@ -1175,28 +1159,24 @@ class UserController extends Controller
             $user->save();
         }
 
-        return "true";
+        return 'true';
     }
-
 
     public function postEmail(Request $request)
     {
-
-        if (User::where("email", "=", $request->get('email'))->exists()) {
+        if (User::where('email', '=', $request->get('email'))->exists()) {
             return response()->json(['message' =>  __('auth.email_address_validation')]);
         }
     }
-
 
     public static function getThumbnail(Request $request)
     {
         $user = User::where('mediawiki', $request->input('wiki_username'))->first();
 
-        if ( isset( $user->getProfile($user->id)->path ) && !is_null( $user->getProfile($user->id)->path ) ) {
-
-            $thumbnailPath = config('app.url') . '/uploads/thumbnail_' . $user->getProfile($user->id)->path;
+        if (isset($user->getProfile($user->id)->path) && ! is_null($user->getProfile($user->id)->path)) {
+            $thumbnailPath = config('app.url').'/uploads/thumbnail_'.$user->getProfile($user->id)->path;
         } else {
-            $thumbnailPath = config('app.url') . '/images/placeholder-avatar.png';
+            $thumbnailPath = config('app.url').'/images/placeholder-avatar.png';
         }
 
         return response()->json($thumbnailPath);
@@ -1221,7 +1201,7 @@ class UserController extends Controller
                 $items[Lang::get('networks.general.networks')] = route('networks.index');
 
                 if ($user->hasPermission('verify-translation-access')) {
-                    $items['Translations'] = url("/translations/view/admin");
+                    $items['Translations'] = url('/translations/view/admin');
                 }
 
                 if ($user->hasRole('NetworkCoordinator')) {
@@ -1235,22 +1215,21 @@ class UserController extends Controller
             }
 
             $adminMenu = ['name' => 'Administrator', 'items' => $items];
-            $adminMenu['svg'] = UserController::adminMenuSvg;
+            $adminMenu['svg'] = self::adminMenuSvg;
             $menus['Administrator'] = $adminMenu;
         }
 
         if ($user->hasRole('Administrator') || $user->hasRole('Host')) {
-
             $items = [];
-            if ( $user->hasRole('Administrator')) {
-                $items[Lang::get('general.time_reporting')] = url("/reporting/time-volunteered?a");
+            if ($user->hasRole('Administrator')) {
+                $items[Lang::get('general.time_reporting')] = url('/reporting/time-volunteered?a');
             }
-            $items[Lang::get('general.party_reporting')] = url("/search");
+            $items[Lang::get('general.party_reporting')] = url('/search');
 
             $reportingMenu = [
                 'name' => Lang::get('general.reporting'),
                 'items' => $items,
-                'svg' => UserController::reportingMenuSvg,
+                'svg' => self::reportingMenuSvg,
             ];
 
             $menus['Reporting'] = $reportingMenu;
@@ -1263,7 +1242,7 @@ class UserController extends Controller
                 Lang::get('auth.change_password') => url('/profile/edit/'.$user->id.'#change-password'),
                 Lang::get('general.logout') => url('/logout'),
             ],
-            'svg' => UserController::generalMenuSvg,
+            'svg' => self::generalMenuSvg,
         ];
         $menus['General'] = $generalMenu;
 
