@@ -406,17 +406,17 @@ class ExportController extends Controller
         //country hours completed
         $country_hours_completed = clone $user_events;
         $country_hours_completed = $country_hours_completed->groupBy('users.country')->select('users.country', DB::raw('SUM(TIMEDIFF(end, start)) as event_hours'));
-        $all_country_hours_completed = $country_hours_completed->orderBy('event_hours', 'DSC')->get();
-        $country_hours_completed = $country_hours_completed->orderBy('event_hours', 'DSC')->take(5)->get();
+        $all_country_hours_completed = $country_hours_completed->orderBy('event_hours', 'DESC')->get();
+        $country_hours_completed = $country_hours_completed->orderBy('event_hours', 'DESC')->take(5)->get();
 
         //city hours completed
         $city_hours_completed = clone $user_events;
         $city_hours_completed = $city_hours_completed->groupBy('users.location')->select('users.location', DB::raw('SUM(TIMEDIFF(end, start)) as event_hours'));
-        $all_city_hours_completed = $city_hours_completed->orderBy('event_hours', 'DSC')->get();
-        $city_hours_completed = $city_hours_completed->orderBy('event_hours', 'DSC')->take(5)->get();
+        $all_city_hours_completed = $city_hours_completed->orderBy('event_hours', 'DESC')->get();
+        $city_hours_completed = $city_hours_completed->orderBy('event_hours', 'DESC')->take(5)->get();
 
         //order by users id
-        $user_events = $user_events->orderBy('events.event_date', 'DSC');
+        $user_events = $user_events->orderBy('events.event_date', 'DESC');
 
         //Select all necessary information for table
         $user_events = $user_events->select(

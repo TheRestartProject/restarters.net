@@ -1174,10 +1174,10 @@ function initAutocomplete() {
     $('input[name=sort_column]').on('click', function(e) {
         var $form = $('#device-search');
         var $sort_direction = $form.find('input[name=sort_direction]');
-            if( $sort_direction.val() === 'DSC' ){
+            if( $sort_direction.val() === 'DESC' ){
                 $sort_direction.val('ASC');
             } else {
-                $sort_direction.val('DSC');
+                $sort_direction.val('DESC');
             }
         $form.submit();
     });

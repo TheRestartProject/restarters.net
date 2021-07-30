@@ -11,6 +11,7 @@ $factory->state(App\Category::class, 'Misc', function (Faker $faker) {
         'idcategories' => 46,
         'name' => 'Misc',
         'revision' => 1,
+        'aggregate' => 0,
     ];
 });
 
@@ -19,6 +20,7 @@ $factory->state(App\Category::class, 'Desktop computer', function (Faker $faker)
         'idcategories' => 11,
         'name' => 'Desktop computer',
         'revision' => 1,
+        'aggregate' => 0,
     ];
 });
 
@@ -29,6 +31,7 @@ $factory->state(App\Category::class, 'Mobile', function (Faker $faker) {
         'revision' => 1,
         'footprint' => 1,
         'weight' => 1,
+        'aggregate' => 0,
     ];
 });
 
@@ -39,6 +42,7 @@ $factory->state(App\Category::class, 'Cat1', function (Faker $faker) {
         'revision' => 1,
         'footprint' => 1,
         'weight' => 1,
+        'aggregate' => 0,
     ];
 });
 
@@ -49,6 +53,7 @@ $factory->state(App\Category::class, 'Cat2', function (Faker $faker) {
         'revision' => 1,
         'footprint' => 2,
         'weight' => 2,
+        'aggregate' => 0,
     ];
 });
 
@@ -59,5 +64,6 @@ $factory->state(App\Category::class, 'Cat3', function (Faker $faker) {
         'revision' => 1,
         'footprint' => 3,
         'weight' => 3,
+        'aggregate' => 0,
     ];
 });
