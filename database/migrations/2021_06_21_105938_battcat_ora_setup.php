@@ -13,10 +13,12 @@ class BattcatOraSetup extends Migration
      */
     public function up()
     {
-        if (!Schema::hasTable('devices_faults_printers_ora_opinions')) {
+        if (!Schema::hasTable('devices_faults_printers_ora_opinions'))
+        {
             Schema::create(
                 'devices_faults_batteries_ora_opinions',
-                function (Blueprint $table) {
+                function (Blueprint $table)
+                {
                     $table->increments('id');
                     $table->string('id_ords', 16)->index();
                     $table->unsignedInteger('fault_type_id')->index();
@@ -28,10 +30,14 @@ class BattcatOraSetup extends Migration
                     $table->collation = 'utf8mb4_unicode_ci';
                 }
             );
+        }
 
+        if (!Schema::hasTable('devices_faults_batteries_ora_adjudicated'))
+        {
             Schema::create(
                 'devices_faults_batteries_ora_adjudicated',
-                function (Blueprint $table) {
+                function (Blueprint $table)
+                {
                     $table->increments('id');
                     $table->string('id_ords', 16)->index();
                     $table->unsignedInteger('fault_type_id')->index();
@@ -40,7 +46,10 @@ class BattcatOraSetup extends Migration
                     $table->collation = 'utf8mb4_unicode_ci';
                 }
             );
+        }
 
+        if (!Schema::hasTable('fault_types_batteries'))
+        {
             Schema::create(
                 'fault_types_batteries',
                 function (Blueprint $table) {
