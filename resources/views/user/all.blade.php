@@ -181,7 +181,7 @@
                         data-original-email="{{ $u->email }}"
                         data-copy="{{ $u->email }}"
                         data-content="{{ $u->email }} </br> <b>Click/press to copy</b>">
-                          {{ str_limit($u->email, 15) }}
+                          {{ Str::limit($u->email, 15) }}
                         </span>
                       </td>
                       <td>

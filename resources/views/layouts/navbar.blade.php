@@ -38,21 +38,21 @@
     </a>
     </li>
 
-    <li class="@if(str_contains(url()->current(), route('devices'))) active @endif" style="flex-basis: 100%;">
+    <li class="@if(Str::contains(url()->current(), route('devices'))) active @endif" style="flex-basis: 100%;">
     <a href="{{ route('devices') }}">
         @include('svgs/navigation/drill-icon')
         <span>@lang('general.menu_fixometer')</span>
     </a>
     </li>
 
-    <li class="@if(str_contains(url()->current(), route('events'))) active @endif" style="flex-basis: 100%;">
+    <li class="@if(Str::contains(url()->current(), route('events'))) active @endif" style="flex-basis: 100%;">
     <a href="{{ route('events') }}">
         @include('svgs/navigation/events-icon')
         <span>@lang('general.menu_events')</span>
     </a>
     </li>
 
-    <li class="@if(str_contains(url()->current(), route('groups'))) active @endif" style="flex-basis: 100%;">
+    <li class="@if(Str::contains(url()->current(), route('groups'))) active @endif" style="flex-basis: 100%;">
     <a href="{{ route('groups') }}">
         @include('svgs/navigation/groups-icon')
         <span>@lang('general.menu_groups')</span>
@@ -66,7 +66,7 @@
     </a>
     </li>
 
-    <li class="@if(str_contains(url()->current(), route('workbench')) || str_contains(url()->current(), '/mobifix') || str_contains(url()->current(), '/misccat') || str_contains(url()->current(), '/faultcat') || str_contains(url()->current(), '/printcat')) active @endif" style="flex-basis: 100%;">
+    <li class="@if(Str::contains(url()->current(), route('workbench')) || Str::contains(url()->current(), '/mobifix') || Str::contains(url()->current(), '/misccat') || Str::contains(url()->current(), '/faultcat') || Str::contains(url()->current(), '/printcat')) active @endif" style="flex-basis: 100%;">
         <a href="{{ route('workbench') }}" rel="noopener noreferrer">
             @include('svgs/navigation/workbench-icon')
             <span>@lang('general.menu_workbench')</span>
@@ -100,7 +100,7 @@
           </div><!-- /badge-group -->
       </li>
 
-      <li class="nav-item dropdown @if(str_contains(url()->current(), route('profile'))) active @endif">
+      <li class="nav-item dropdown @if(Str::contains(url()->current(), route('profile'))) active @endif">
           <a id="navbarDropdown" class="nav-link dropdown-toggle" href="#" role="button" data-target="#account-nav" aria-controls="account-nav" data-toggle="collapse" aria-haspopup="true" aria-expanded="false" aria-label="Toggle account navigation" v-pre>
               @if ( $user && isset( $user->getProfile($user->id)->path ) && !is_null( $user->getProfile($user->id)->path ) )
                   <img src="/uploads/thumbnail_{{ $user->getProfile($user->id)->path }}" alt="{{ Auth::user()->name }} Profile Picture" class="avatar">

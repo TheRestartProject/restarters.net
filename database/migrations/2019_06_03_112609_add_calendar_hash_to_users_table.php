@@ -1,5 +1,6 @@
 <?php
 
+use Illuminate\Support\Str;
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
@@ -25,7 +26,7 @@ class AddCalendarHashToUsersTable extends Migration
         foreach ($users as $user) {
             $user = DB::table('users')
           ->where('id', $user->id)
-          ->update(['calendar_hash' => str_random(15)]);
+          ->update(['calendar_hash' => Str::random(15)]);
             usleep(50000);
         }
     }

@@ -2,6 +2,7 @@
 
 namespace App;
 
+use Illuminate\Support\Str;
 use App\Device;
 use App\EventUsers;
 use App\Helpers\FootprintRatioCalculator;
@@ -879,7 +880,7 @@ class Party extends Model implements Auditable
 
     public function getFriendlyLocationAttribute()
     {
-        $short_location = str_limit($this->venue, 30);
+        $short_location = Str::limit($this->venue, 30);
 
         return "{$this->getEventDate('d/m/Y')} / {$short_location}";
     }

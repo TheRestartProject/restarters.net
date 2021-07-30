@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use Illuminate\Support\Str;
 use App;
 use App\Device;
 use App\DripEvent;
@@ -764,7 +765,7 @@ class UserController extends Controller
                     'email'    => $email,
                     'password' => crypt($pwd, '$1$'.strrev(md5(env('APP_KEY')))),
                     'role'     => $role,
-                    'calendar_hash' => str_random(15),
+                    'calendar_hash' => Str::random(15),
                     //'group'    => $group
                       ];
 
@@ -1045,7 +1046,7 @@ class UserController extends Controller
                 'location' => $request->input('city'),
                 'gender' => $request->input('gender'),
                 'age' => $request->input('age'),
-                'calendar_hash' => str_random(15),
+                'calendar_hash' => Str::random(15),
             ]);
         }
 

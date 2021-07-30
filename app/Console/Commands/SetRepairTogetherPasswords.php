@@ -2,6 +2,7 @@
 
 namespace App\Console\Commands;
 
+use Illuminate\Support\Str;
 use App\User;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\Hash;
@@ -36,7 +37,7 @@ class SetRepairTogetherPasswords extends Command
 
         $fp = fopen('file.csv', 'w');
         foreach ($users->get() as $user) {
-            $password = str_random(8);
+            $password = Str::random(8);
 
             // write out the email and password
             $this->info('Writing user: '.$user->email);

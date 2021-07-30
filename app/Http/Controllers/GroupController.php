@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use Illuminate\Support\Arr;
 use App\Device;
 use App\Events\ApproveGroup;
 use App\Events\EditGroup;
@@ -857,7 +858,7 @@ class GroupController extends Controller
                     'next_event' => $event ? $event['event_date'] : null,
                     'all_restarters_count' => $group->all_restarters_count,
                     'all_hosts_count' => $group->all_hosts_count,
-                    'networks' => array_pluck($group->networks, 'id'),
+                    'networks' => Arr::pluck($group->networks, 'id'),
                     'country' => $group->country,
                     'group_tags' => $group->group_tags()->get()->pluck('id'),
                 ];

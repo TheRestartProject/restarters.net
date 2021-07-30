@@ -137,7 +137,7 @@
 
                 <div class="events__description">
                     <h3 class="events__side__heading" id="description">Description:</h3>
-                    <p>{!! str_limit(strip_tags($group->free_text), 160, '...') !!}</p>
+                    <p>{!! Str::limit(strip_tags($group->free_text), 160, '...') !!}</p>
                     @if( strlen($group->free_text) > 160 )
                     <button data-toggle="modal" data-target="#group-description"><span>Read more</span></button>
                     @endif

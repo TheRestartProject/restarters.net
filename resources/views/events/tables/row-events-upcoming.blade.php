@@ -20,7 +20,7 @@
         @if( strlen($event->location) > 80 )
           <span data-toggle="popover" data-content="{{{ $event->location }}}" data-trigger="hover">
         @endif
-        {{ str_limit($event->location, 80, '...') }}
+        {{ Str::limit($event->location, 80, '...') }}
         @if( strlen($event->location) > 80 )
           </span>
         @endif

@@ -2,6 +2,7 @@
 
 namespace App;
 
+use Illuminate\Support\Str;
 use App\Events\DeviceCreatedOrUpdated;
 use DB;
 use Illuminate\Database\Eloquent\Model;
@@ -639,7 +640,7 @@ AND devices.event = events.idevents ';
 
     public function getShortProblem($length = 60)
     {
-        return str_limit($this->problem, $length);
+        return Str::limit($this->problem, $length);
     }
 
     public function getImages()

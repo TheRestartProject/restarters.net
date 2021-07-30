@@ -2,6 +2,7 @@
 
 namespace App;
 
+use Illuminate\Support\Str;
 use App\Events\UserDeleted;
 use App\Events\UserUpdated;
 use App\Network;
@@ -405,7 +406,7 @@ class User extends Authenticatable implements Auditable
             }
 
             if ($slug) {
-                return str_slug($network);
+                return Str::slug($network);
             }
 
             return $network;

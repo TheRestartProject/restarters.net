@@ -72,7 +72,7 @@
                 <h2 id="about-grp">About</h2>
 
                 <div class="events__description">
-                    <p>{!! str_limit(strip_tags($network->description), 160, '...') !!}</p>
+                    <p>{!! Str::limit(strip_tags($network->description), 160, '...') !!}</p>
                     @if( strlen($network->description) > 160 )
                     <button data-toggle="modal" data-target="#group-description"><span>Read more</span></button>
                     @endif

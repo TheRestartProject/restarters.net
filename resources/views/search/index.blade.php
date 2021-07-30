@@ -300,19 +300,19 @@
                       $manufacture_svg = 'svg-car2';
                       $manufacture_label = 'Like manufacturing';
                       $manufacture_eql_to = round($totalCO2 / 6000);
-                      $manufacture_legend = $manufacture_eql_to . ' ' . str_plural('car', $manufacture_eql_to);
+                      $manufacture_legend = $manufacture_eql_to . ' ' . Str::plural('car', $manufacture_eql_to);
                   }
                   else {
                       $consume_svg = 'svg-tv';
                       $consume_label = 'Like watching TV for';
                       $consume_eql_to = ((1 / 0.024) * $totalCO2 ) / 24;
                       $consume_eql_to = number_format(round($consume_eql_to), 0, '.', ',');
-                      $consume_legend = $consume_eql_to . ' ' . str_plural('day', $consume_eql_to);
+                      $consume_legend = $consume_eql_to . ' ' . Str::plural('day', $consume_eql_to);
 
                       $manufacture_svg = 'svg-sofa';
                       $manufacture_label = 'Like manufacturing';
                       $manufacture_eql_to = round($totalCO2 / 100);
-                      $manufacture_legend = $manufacture_eql_to . ' ' . str_plural('sofa', $manufacture_eql_to);
+                      $manufacture_legend = $manufacture_eql_to . ' ' . Str::plural('sofa', $manufacture_eql_to);
                   }
                   ?>
 
