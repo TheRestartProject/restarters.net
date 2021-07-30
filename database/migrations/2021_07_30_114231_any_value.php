@@ -14,7 +14,7 @@ class AnyValue extends Migration
     public function up()
     {
         DB::connection()->getpdo()->exec("DROP FUNCTION IF EXISTS ANY_VALUE;");
-        DB::unprepared('CREATE DEFINER=`root`@`localhost` AGGREGATE FUNCTION `ANY_VALUE`(x LONGBLOB) RETURNS longblob
+        DB::unprepared('CREATE AGGREGATE FUNCTION `ANY_VALUE`(x LONGBLOB) RETURNS longblob
 BEGIN
  LOOP
   FETCH GROUP NEXT ROW;
