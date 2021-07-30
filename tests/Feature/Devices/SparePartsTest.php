@@ -11,7 +11,7 @@ use Tests\TestCase;
 
 class SparePartsTest extends TestCase
 {
-    public function setUp()
+    protected function setUp(): void
     {
         parent::setUp();
 

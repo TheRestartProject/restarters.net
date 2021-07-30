@@ -9,7 +9,7 @@ use Tests\TestCase;
 
 class PrintcatOraTest extends TestCase
 {
-    public function setUp()
+    protected function setUp(): void
     {
         parent::setUp();
         DB::statement('SET foreign_key_checks=0');

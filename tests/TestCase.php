@@ -31,7 +31,7 @@ abstract class TestCase extends BaseTestCase
     private $DOM = null;
     public $lastResponse = null;
 
-    public function setUp()
+    protected function setUp(): void
     {
         parent::setUp();
 

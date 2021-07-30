@@ -12,7 +12,7 @@ class GroupHostTest extends TestCase
 {
     private $idgroups = null;
 
-    public function setUp()
+    protected function setUp(): void
     {
         parent::setUp();
 

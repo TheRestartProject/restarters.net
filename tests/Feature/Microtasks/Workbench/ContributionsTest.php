@@ -20,7 +20,7 @@ class ContributionsTest extends TestCase
     protected $user1;
     protected $user2;
 
-    public function setUp()
+    protected function setUp(): void
     {
         parent::setUp();
         Faultcat::truncate();

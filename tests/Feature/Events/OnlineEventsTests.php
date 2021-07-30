@@ -18,7 +18,7 @@ use Tests\TestCase;
 
 class OnlineEventsTests extends TestCase
 {
-    public function setUp()
+    protected function setUp(): void
     {
         parent::setUp();
 

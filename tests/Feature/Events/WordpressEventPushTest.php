@@ -19,7 +19,7 @@ use Tests\TestCase;
 
 class WordpressEventPushTest extends TestCase
 {
-    public function setUp()
+    protected function setUp(): void
     {
         parent::setUp();
     }
