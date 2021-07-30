@@ -2,7 +2,6 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Support\Str;
 use App;
 use App\Device;
 use App\DripEvent;
@@ -39,6 +38,7 @@ use Illuminate\Support\Facades\Input;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Validator;
+use Illuminate\Support\Str;
 use Intervention\Image\ImageManagerStatic as Image;
 use Lang;
 use LaravelLocalization;

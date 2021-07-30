@@ -2,7 +2,6 @@
 
 namespace App;
 
-use Illuminate\Support\Str;
 use App\Events\UserDeleted;
 use App\Events\UserUpdated;
 use App\Network;
@@ -12,6 +11,7 @@ use DB;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
+use Illuminate\Support\Str;
 use OwenIt\Auditing\Contracts\Auditable;
 
 class WikiSyncStatus

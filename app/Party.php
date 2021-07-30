@@ -2,7 +2,6 @@
 
 namespace App;
 
-use Illuminate\Support\Str;
 use App\Device;
 use App\EventUsers;
 use App\Helpers\FootprintRatioCalculator;
@@ -12,6 +11,7 @@ use DB;
 use FixometerHelper;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use Illuminate\Support\Str;
 use OwenIt\Auditing\Contracts\Auditable;
 
 class Party extends Model implements Auditable

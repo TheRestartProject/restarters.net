@@ -2,7 +2,6 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Support\Arr;
 use App\Device;
 use App\Events\ApproveGroup;
 use App\Events\EditGroup;
@@ -29,6 +28,7 @@ use FixometerFile;
 use FixometerHelper;
 use Illuminate\Database\QueryException;
 use Illuminate\Http\Request;
+use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Log;
 use Notification;
 

@@ -2,10 +2,10 @@
 
 namespace App;
 
-use Illuminate\Support\Str;
 use App\Events\DeviceCreatedOrUpdated;
 use DB;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Str;
 use OwenIt\Auditing\Contracts\Auditable;
 
 class Device extends Model implements Auditable

@@ -2,11 +2,11 @@
 
 namespace App\Console\Commands;
 
-use Illuminate\Support\Str;
 use App\User;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Str;
 
 class SetRepairTogetherPasswords extends Command
 {
