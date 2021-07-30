@@ -215,6 +215,7 @@ class FixometerHelper
                                 ->where('group', $groupId)
                                 ->where('user', $userId)
                                 ->where('role', 3)
+                                ->whereNull('deleted_at')
                                 ->first();
 
         if ( ! empty($user_group_association)) {
@@ -743,44 +744,6 @@ class FixometerHelper
         return $return;
     }
 
-    public static function getLatLongFromCityCountry($town_city = null, $country = null)
-    {
-        $return = array();
-        $query = '';
-
-        // Try and get country long name to improve geocoding.
-        if ( ! is_null($country) && array_key_exists($country, FixometerHelper::getAllCountries())) {
-            $country = FixometerHelper::getAllCountries()[$country];
-        }
-
-        if ( ! is_null($town_city)) {
-            $query .= $town_city;
-        }
-
-        if ( ! is_null($country)) {
-            $query .= ','.$country;
-        }
-
-        $json = file_get_contents('https://maps.google.com/maps/api/geocode/json?address='.urlencode($query).'&sensor=false&key='.env('GOOGLE_API_CONSOLE_KEY'));
-        $json = json_decode($json);
-
-        if (is_object($json) && ! empty($json->{'results'})) {
-            $return[] = $json->{'results'}[0]->{'geometry'}->{'location'}->{'lat'};
-            $return[] = $json->{'results'}[0]->{'geometry'}->{'location'}->{'lng'};
-        }
-
-        // Retrieve country
-        if (isset($json->results[0])) {
-            foreach ($json->results[0]->address_components as $addressComponent) {
-                if (in_array('country', $addressComponent->types)) {
-                    $return[] = $addressComponent->long_name;
-                }
-            }
-        }
-
-        return $return;
-    }
-
     public static function footprintReliability()
     {
         return [
@@ -813,7 +776,8 @@ class FixometerHelper
             $stats = \Cache::get('all_stats');
 
             // We've seen a Sentry problem which I can only see happening if there was invalid data in the cache.
-            if (!array_key_exists('allparties', $stats) ||
+            if (!$stats ||
+                !array_key_exists('allparties', $stats) ||
                 !array_key_exists('co2Total', $stats) ||
                 !array_key_exists('device_count_status', $stats)
             ) {

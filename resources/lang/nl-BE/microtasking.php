@@ -15,8 +15,15 @@ return array (
       'description' => '<p>We zien veel tablets bij repair-activiteiten. Maar waardoor gaan ze kapot en wat zou ze makkelijker herstelbaar kunnen maken? Help ons met TabiCat te vinden wat de meest voorkomende problemen zijn met tablets! </p> <p>De reparatiegegevens in TabiCat komen van over de hele wereld, via partners van de <a target="_blank" style="color:#212529;text-decoration:underline" href="https://openrepair.org">Open Repair Alliance</a>.</p>',
       'get_involved' => 'Doe mee',
       'title' => 'Help Nu! TabiCat',
+      'short_description' => 'Waarom gaan tablets stuk en wat maakt ze moeilijk of niet repareerbaar?',
     ),
     'title' => 'Help Nu! MobiFix',
+    'battcat' => 
+    array (
+      'description' => '<p>In Repair Cafés zien we veel toestellen die problemen hebben met de batterij of accu. Maar wat is de oorzaak van het defect aan de batterijen en wat zou het makkelijker  maken om ze te repareren of te vervangen? Help ons uit te vinden wat de meest voorkomende problemen met batterijen en accu\'s zijn met BattCat! </p> <p>De reparatiegegevens in BattCat komen van over de hele wereld, via partners van de <a target="_blank" style="color:#212529;text-decoration:underline" href= "https://openrepair.org">Open Repair Alliance</a>.</p>',
+      'get_involved' => 'Doe mee',
+      'title' => 'Help Nu! BattCat',
+    ),
   ),
   'discussion' => 
   array (

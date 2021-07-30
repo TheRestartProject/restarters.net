@@ -262,6 +262,7 @@ Route::group(['middleware' => ['auth', 'verifyUserConsent']], function () {
         Route::get('/remove-volunteer/{group_id}/{user_id}', 'GroupController@getRemoveVolunteer');
         Route::get('/nearby/{id}', 'GroupController@volunteersNearby');
         Route::get('/nearbyinvite/{groupId}/{userId}', 'GroupController@inviteNearbyRestarter');
+        Route::get('/delete/{id}', 'GroupController@delete');
     });
 
     //Outbound Controller
@@ -407,4 +408,5 @@ Route::get('/test/check-auth', function () {
 Route::prefix('test')->group(function () {
     Route::get('/', 'TestController@index');
     Route::get('/styles', 'TestController@styles');
+    Route::get('/styles/find', 'TestController@stylesFind');
 });

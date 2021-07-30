@@ -1566,6 +1566,8 @@ jQuery(document).ready(function () {
       if (process.env.NODE_ENV === 'development') {
         return null
       }
+
+      return event
     }
   });
 

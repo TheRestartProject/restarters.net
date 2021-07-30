@@ -6,11 +6,13 @@ use App\Device;
 use App\Events\ApproveGroup;
 use App\Events\EditGroup;
 use App\Events\UserFollowedGroup;
+use App\EventsUsers;
 use App\Group;
 use App\GroupNetwork;
 use App\GroupTags;
 use App\GrouptagsGroups;
 use App\Helpers\FootprintRatioCalculator;
+use App\Helpers\Geocoder;
 use App\Invite;
 use App\Network;
 use App\Notifications\AdminModerationGroup;
@@ -88,10 +90,10 @@ class GroupController extends Controller
         }
 
         return view('group.index', [
-            'your_groups' => $your_groups,
+            'your_groups' => $this->expandGroups($your_groups),
             'your_groups_uniques' => $your_groups_uniques,
-            'groups_near_you' => $groups_near_you,
-            'groups' => $groups,
+            'groups_near_you' => $this->expandGroups($groups_near_you),
+            'groups' => $this->expandGroups($groups),
             'your_area' => $user->location,
             'tab' => $tab,
             'network' => $network,
@@ -120,7 +122,7 @@ class GroupController extends Controller
         return $this->indexVariations('all', $id);
     }
 
-    public function create(Request $request, $networkId = null)
+    public function create(Request $request, $networkId = null, Geocoder $geocoder)
     {
         $idGroup = false;
 
@@ -144,9 +146,9 @@ class GroupController extends Controller
             }
 
             if ( ! empty($location)) {
-                $lat_long = FixometerHelper::getLatLongFromCityCountry($location);
+                $geocoded = $geocoder->geocode($location);
 
-                if ( empty($lat_long) ) {
+                if ( empty($geocoded) ) {
                   $response['danger'] = 'Group could not be created. Address not found.';
                   return view('group.create', [
                       'title' => 'New Group',
@@ -155,9 +157,9 @@ class GroupController extends Controller
                   ]);
                 }
 
-                $latitude = $lat_long[0];
-                $longitude = $lat_long[1];
-                $country = $lat_long[2];
+                $latitude = $geocoded['latitude'];
+                $longitude = $geocoded['longitude'];
+                $country = $geocoded['country'];
             } else {
                 $latitude = null;
                 $longitude = null;
@@ -258,6 +260,29 @@ class GroupController extends Controller
             'gmaps' => true,
             'selectedNetworkId' => $networkId,
         ]);
+    }
+
+    private function expandVolunteers($volunteers) {
+        $ret = [];
+
+        foreach ($volunteers as $volunteer) {
+            $volunteer['volunteer'] = $volunteer->volunteer;
+
+            if ($volunteer['volunteer']) {
+                $volunteer['userSkills'] = $volunteer->volunteer->userSkills->all();
+
+                foreach ($volunteer['userSkills'] as $skill) {
+                    // Force expansion
+                    $skill->skillName->skill_name;
+                }
+
+                $volunteer['fullName'] = $volunteer->name;
+                $volunteer['profilePath'] = '/uploads/thumbnail_' . $volunteer->volunteer->getProfile($volunteer->volunteer->id)->path;
+                $ret[] = $volunteer;
+            }
+        }
+
+        return $ret;
     }
 
     public function view($groupid)
@@ -413,6 +438,7 @@ class GroupController extends Controller
 
         $user_groups = UserGroups::where('user', Auth::user()->id)->count();
         $view_group = Group::find($groupid);
+        $view_group->allConfirmedVolunteers = $this->expandVolunteers($view_group->allConfirmedVolunteers);
 
         $hasPendingInvite = ! empty(UserGroups::where('group', $groupid)
         ->where('user', $user->id)
@@ -581,7 +607,7 @@ class GroupController extends Controller
         return redirect('/group/view/'.$user_group->group)->with('success', 'Excellent! You have joined the group');
     }
 
-    public function edit(Request $request, $id)
+    public function edit(Request $request, $id, Geocoder $geocoder)
     {
         $user = Auth::user();
         $Group = new Group;
@@ -605,9 +631,9 @@ class GroupController extends Controller
             unset($data['image']);
 
             if ( ! empty($data['location'])) {
-                $lat_long = FixometerHelper::getLatLongFromCityCountry($data['location']);
+                $geocoded = $geocoder->geocode($data['location']);
 
-                if ( empty($lat_long) ) {
+                if ( empty($geocoded) ) {
                   $response['danger'] = 'Group could not be saved. Address not found.';
                   $group = Group::find($id);
                   $images = $File->findImages(env('TBL_GROUPS'), $id);
@@ -634,9 +660,9 @@ class GroupController extends Controller
                   ]);
                 }
 
-                $latitude = $lat_long[0];
-                $longitude = $lat_long[1];
-                $country = $lat_long[2];
+                $latitude = $geocoded['latitude'];
+                $longitude = $geocoded['longitude'];
+                $country = $geocoded['country'];
             } else {
                 $latitude = null;
                 $longitude = null;
@@ -772,20 +798,69 @@ class GroupController extends Controller
         ]);
     }
 
-    // TODO: is this alive?
     public function delete($id)
     {
-        if (FixometerHelper::hasRole($this->user, 'Administrator')) {
-            $r = $this->Group->delete($id);
-            if ( ! $r) {
-                $response = 'd:err';
-            } else {
-                $response = 'd:ok';
+        $group = Group::where('idgroups', $id)->first();
+
+        $name = $group->name;
+
+        if (Auth::user()->hasRole('Administrator') && $group->canDelete()) {
+            // We know we can delete the group; if it has any past events they must be empty, so delete all
+            // events (including future).
+            $allEvents = Party::where('events.group', $id)->get();
+
+            foreach ($allEvents as $event) {
+                // Delete any users - these are not cascaded in the DB.
+                $users = EventsUsers::where('event', $event->idevents)->get();
+
+                foreach ($users as $user) {
+                    // Need to force delete to get rid of the row and avoid constraint violations.
+                    $user->forceDelete();
+                }
+
+                $event->forceDelete();
             }
-            header('Location: /group/index/'.$response);
+
+            $r = $group->delete($id);
+
+            if ( ! $r) {
+                return redirect('/user/forbidden');
+            } else {
+                return redirect("/group")->with('success', __('groups.delete_succeeded', [
+                    'name' => $name
+                ]));
+            }
         } else {
-            header('Location: /user/forbidden');
+            return redirect('/user/forbidden');
         }
+    }
+
+    private function expandGroups($groups) {
+        $ret = [];
+
+        if ($groups) {
+            foreach ($groups as $group) {
+                $group_image = $group->groupImage;
+
+                $event = $group->getNextUpcomingEvent();
+
+                $ret[] = [
+                    'idgroups' => $group['idgroups'],
+                    'name' => $group['name'],
+                    'image' => (is_object($group_image) && is_object($group_image->image)) ?
+                        asset('uploads/mid_'.$group_image->image->path) : null,
+                    'location' => rtrim($group['location']),
+                    'next_event' => $event ? $event['event_date'] : null,
+                    'all_restarters_count' => $group->all_restarters_count,
+                    'all_hosts_count' => $group->all_hosts_count,
+                    'networks' => array_pluck($group->networks, 'id'),
+                    'country' => $group->country,
+                    'group_tags' => $group->group_tags()->get()->pluck('id')
+                ];
+            }
+        }
+
+        return $ret;
     }
 
     public static function stats($id, $format = 'row')
@@ -817,6 +892,11 @@ class GroupController extends Controller
             'parties' => 0,
             'co2' => 0,
             'waste' => 0,
+            'ewaste' => 0,
+            'unpowered_waste' => 0,
+            'repairable_devices' => 0,
+            'dead_devices' => 0,
+            'no_weight' => 0,
         ];
 
         // Loop through all groups and increase the values for groupStats
@@ -972,8 +1052,6 @@ class GroupController extends Controller
         return redirect()->back()->with('warning', 'Sorry, you do not have permission to do this');
     }
 
-    // TODO: is this alive?
-    // It's still in the action menu, but I don't believe it has been updated recently.
     public function volunteersNearby($groupid)
     {
         if (isset($_GET['action']) && isset($_GET['code'])) {
