@@ -13,7 +13,7 @@
         <?php endif; ?>
 
         @if(session()->has('response'))
-        @php( FixometerHelper::printResponse(session('response')) )
+        @php( App\Helpers\Fixometer::printResponse(session('response')) )
         @endif
 
         @if (\Session::has('success'))
@@ -37,7 +37,7 @@
 
                 <header>
 
-                    @if( FixometerHelper::hasRole( $user, 'Administrator' ) || ( $is_host_of_group && $user_groups > 1 ) )
+                    @if( App\Helpers\Fixometer::hasRole( $user, 'Administrator' ) || ( $is_host_of_group && $user_groups > 1 ) )
 
                     <h1 class="sr-only">{{{ $group->name }}}</h1>
                     <button class="btn btn-title dropdown-toggle" type="button" id="dropdownTitle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
@@ -45,7 +45,7 @@
                     </button>
                     <div class="dropdown-menu dropdown-menu__titles" aria-labelledby="dropdownTitle">
 
-                        @if( FixometerHelper::hasRole( $user, 'Administrator' ) )
+                        @if( App\Helpers\Fixometer::hasRole( $user, 'Administrator' ) )
 
                         @foreach($grouplist as $g)
                         <a class="dropdown-item" href="{{ url('/group/view') }}/{{ $g->id }}">
@@ -96,7 +96,7 @@
             </div>
             <div class="col-lg-5">
 
-                @if( FixometerHelper::hasRole( $user, 'Administrator' ) || $is_host_of_group )
+                @if( App\Helpers\Fixometer::hasRole( $user, 'Administrator' ) || $is_host_of_group )
                 <div class="button-group button-group__r">
 
                     <div class="dropdown">
@@ -130,7 +130,7 @@
             <div class="col-lg-3">
 
                 <h2 id="about-grp">About
-                    @if( FixometerHelper::hasRole( $user, 'Administrator' ) || $is_host_of_group )
+                    @if( App\Helpers\Fixometer::hasRole( $user, 'Administrator' ) || $is_host_of_group )
                     <sup>(<a href="{{ url('/group/edit/'.$group->idgroups) }}">Edit group</a>)</sup>
                     @endif
                 </h2>

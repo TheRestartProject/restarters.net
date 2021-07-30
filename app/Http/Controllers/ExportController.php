@@ -16,7 +16,7 @@ use App\UserGroups;
 use Auth;
 use DateTime;
 use DB;
-use FixometerHelper;
+use App\Helpers\Fixometer;
 use Illuminate\Http\Request;
 use Response;
 
@@ -276,12 +276,12 @@ class ExportController extends Controller
         $all_group_tags = GroupTags::all();
 
         //Get all applicable groups
-        if (FixometerHelper::hasRole($user, 'Administrator')) {
+        if (Fixometer::hasRole($user, 'Administrator')) {
             $all_groups = Group::all();
-        } elseif (FixometerHelper::hasRole($user, 'Host')) {
+        } elseif (Fixometer::hasRole($user, 'Host')) {
             $host_groups = UserGroups::where('user', $user->id)->where('role', 3)->pluck('group')->toArray();
             $all_groups = Group::whereIn('groups.idgroups', $host_groups);
-        } elseif (FixometerHelper::hasRole($user, 'Restarter')) {
+        } elseif (Fixometer::hasRole($user, 'Restarter')) {
             $all_groups = null;
         }
 
@@ -292,9 +292,9 @@ class ExportController extends Controller
                                 ->join('groups', 'events.group', 'groups.idgroups')
                                   ->whereNotNull('events_users.user');
 
-            if (FixometerHelper::hasRole($user, 'Host')) {
+            if (Fixometer::hasRole($user, 'Host')) {
                 $user_events = $user_events->whereIn('groups.idgroups', $host_groups);
-            } elseif (FixometerHelper::hasRole($user, 'Restarter')) {
+            } elseif (Fixometer::hasRole($user, 'Restarter')) {
                 $user_events = $user_events->where('users.id', $user->id);
             }
         } else {
@@ -311,9 +311,9 @@ class ExportController extends Controller
                                       ->whereNotNull('events_users.user');
             }
 
-            if (FixometerHelper::hasRole($user, 'Host')) {
+            if (Fixometer::hasRole($user, 'Host')) {
                 $user_events = $user_events->whereIn('groups.idgroups', $host_groups);
-            } elseif (FixometerHelper::hasRole($user, 'Restarter')) {
+            } elseif (Fixometer::hasRole($user, 'Restarter')) {
                 $user_events = $user_events->where('users.id', $user->id);
             }
 

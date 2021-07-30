@@ -7,7 +7,7 @@ use App\Group;
 use App\Network;
 use App\Notifications\AdminWordPressEditEventFailure;
 use App\Party;
-use FixometerHelper;
+use App\Helpers\Fixometer;
 use HieuLe\WordpressXmlrpcClient\WordpressClient;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Queue\InteractsWithQueue;
@@ -95,7 +95,7 @@ class CreateWordPressEditEventPost
             }
         } catch (\Exception $e) {
             Log::error('An error occurred during Wordpress event update: '.$e->getMessage());
-            $notify_users = FixometerHelper::usersWhoHavePreference('admin-edit-wordpress-event-failure');
+            $notify_users = Fixometer::usersWhoHavePreference('admin-edit-wordpress-event-failure');
             Notification::send($notify_users, new AdminWordPressEditEventFailure([
                 'event_venue' => $theParty->venue,
                 'event_url' => url('/party/edit/'.$theParty->idevents),

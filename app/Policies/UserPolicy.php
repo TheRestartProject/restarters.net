@@ -4,7 +4,7 @@ namespace App\Policies;
 
 use App\Role;
 use App\User;
-use FixometerHelper;
+use App\Helpers\Fixometer;
 use Illuminate\Auth\Access\HandlesAuthorization;
 
 class UserPolicy
@@ -70,9 +70,9 @@ class UserPolicy
     public function viewAdminMenu(User $user)
     {
         return $user &&
-            (FixometerHelper::hasRole($user, 'Administrator') ||
-              FixometerHelper::hasPermission('verify-translation-access') ||
-              FixometerHelper::hasRole($user, 'NetworkCoordinator') ||
+            (Fixometer::hasRole($user, 'Administrator') ||
+              Fixometer::hasPermission('verify-translation-access') ||
+              Fixometer::hasRole($user, 'NetworkCoordinator') ||
               $this->accessRepairDirectory($user));
     }
 

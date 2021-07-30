@@ -11,7 +11,7 @@ use App\Search;
 use App\User;
 use Auth;
 use DateTime;
-use FixometerHelper;
+use App\Helpers\Fixometer;
 
 class SearchController extends Controller
 {
@@ -43,14 +43,14 @@ class SearchController extends Controller
 
         $allowedParties = [];
         /** Get default data for the search dropdowns **/
-        if (FixometerHelper::hasRole($user, 'Administrator')) {
+        if (Fixometer::hasRole($user, 'Administrator')) {
             $groups = $Groups->findList();
             $parties = $Parties->findAllSearchable();
             foreach ($parties as $i => $party) {
                 $parties[$i]->venue = ! is_null($parties[$i]->venue) ? $parties[$i]->venue : $parties[$i]->location;
                 $allowedParties[] = $party->id;
             }
-        } elseif (FixometerHelper::hasRole($user, 'Host')) {
+        } elseif (Fixometer::hasRole($user, 'Host')) {
             $groups = $Groups->ofThisUser($user->id);
             $groupIds = [];
             foreach ($groups as $i => $group) {

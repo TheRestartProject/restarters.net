@@ -7,7 +7,7 @@ use App\EventsUsers;
 use App\Group;
 use App\Helpers\CachingRssRetriever;
 use App\Helpers\CachingWikiPageRetriever;
-use App\Helpers\FixometerHelper;
+use App\Helpers\Fixometer;
 use App\Party;
 use App\Services\DiscourseService;
 use App\User;
@@ -61,7 +61,7 @@ class DashboardController extends Controller
         }
 
         //Host specific queries
-        if (FixometerHelper::hasRole($user, 'Host') && $in_group) {
+        if (Fixometer::hasRole($user, 'Host') && $in_group) {
             $outdated_groups = Group::join('users_groups', 'groups.idgroups', '=', 'users_groups.group')
                 ->where('users_groups.user', Auth::user()->id)
                 ->where('users_groups.role', 3)
@@ -157,7 +157,7 @@ class DashboardController extends Controller
             ->where('users_groups.user', $user->id)
             ->whereNull('users_groups.deleted_at')
             ->orderBy('groups.name', 'ASC')
-            ->groupBy('groups.idgroups')
+            ->groupBy('groups.idgroups', 'groups.name')
             ->select(['groups.idgroups', 'groups.name'])
             ->take(3)
             ->get();

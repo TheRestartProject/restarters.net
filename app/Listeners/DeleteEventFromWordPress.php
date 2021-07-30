@@ -4,7 +4,7 @@ namespace App\Listeners;
 
 use App\Events\EventDeleted;
 use App\Notifications\DeleteEventFromWordpressFailed;
-use FixometerHelper;
+use App\Helpers\Fixometer;
 use HieuLe\WordpressXmlrpcClient\WordpressClient;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Queue\InteractsWithQueue;
@@ -44,7 +44,7 @@ class DeleteEventFromWordPress
         } catch (\Exception $ex) {
             Log::error('An error occurred during Wordpress event deletion: '.$ex->getMessage());
 
-            $usersToNotify = FixometerHelper::usersWhoHavePreference('delete-event-notification');
+            $usersToNotify = Fixometer::usersWhoHavePreference('delete-event-notification');
 
             Notification::send($usersToNotify, new DeleteEventFromWordpressFailed([
                 'event_venue' => $repairEvent->venue,

@@ -38,23 +38,27 @@ $factory->define(User::class, function (Faker $faker) {
 $factory->state(User::class, 'Restarter', function (Faker $faker) {
     return [
         'role' => Role::RESTARTER,
+        'username' => '',
     ];
 });
 
 $factory->state(User::class, 'Host', function (Faker $faker) {
     return [
         'role' => Role::HOST,
+        'username' => '',
     ];
 });
 
 $factory->state(User::class, 'Administrator', function (Faker $faker) {
     return [
         'role' => Role::ADMINISTRATOR,
+        'username' => '',
     ];
 });
 
 $factory->state(User::class, 'NetworkCoordinator', function (Faker $faker) {
     return [
         'role' => Role::NETWORK_COORDINATOR,
+        'username' => '',
     ];
 });

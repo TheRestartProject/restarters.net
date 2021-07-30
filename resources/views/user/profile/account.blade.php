@@ -82,7 +82,7 @@
     </form>
 </div>
 
-@if (FixometerHelper::hasRole(Auth::user(), 'Administrator'))
+@if (App\Helpers\Fixometer::hasRole(Auth::user(), 'Administrator'))
     <div class="edit-panel">
 
     <div class="form-row">
@@ -103,7 +103,7 @@
             <label for="user_role">@lang('auth.user_role'):</label>
             <select class="form-control" id="user_role" name="user_role">
                 <option value="" selected>Choose role</option>
-                @foreach (FixometerHelper::allRoles() as $r)
+                @foreach (App\Helpers\Fixometer::allRoles() as $r)
                 @if (isset($user->role) && $r->idroles == $user->role)
                     <option value="{{ $r->idroles }}" selected>{{ $r->role }}</option>
                 @else

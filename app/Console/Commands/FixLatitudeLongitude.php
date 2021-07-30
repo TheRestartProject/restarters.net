@@ -2,7 +2,7 @@
 
 namespace App\Console\Commands;
 
-use App\Helpers\FixometerHelper;
+use App\Helpers\Fixometer;
 use App\Helpers\Geocoder;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\DB;

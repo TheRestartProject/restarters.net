@@ -18,7 +18,7 @@
           <h4>Edit role</h4>
           <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Donec sed odio dui.</p>
           @if(isset($response))
-            @php( FixometerHelper::printResponse($response) )
+            @php( App\Helpers\Fixometer::printResponse($response) )
           @endif
           <form action="/role/edit/<?php echo $formId; ?>" method="post">
             @csrf

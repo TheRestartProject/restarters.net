@@ -6,7 +6,7 @@ use App\Role;
 use App\RolePermissions;
 use App\User;
 use Auth;
-use FixometerHelper;
+use App\Helpers\Fixometer;
 use Illuminate\Http\Request;
 
 class RoleController extends Controller
@@ -16,7 +16,7 @@ class RoleController extends Controller
     {
         $user = User::find(Auth::id());
 
-        if (FixometerHelper::hasRole($user, 'Administrator')) {
+        if (Fixometer::hasRole($user, 'Administrator')) {
             //Send user to roles page
             // $this->set('title', 'Roles');
             // $this->set('roleList', $this->Role->findAll());
@@ -34,7 +34,7 @@ class RoleController extends Controller
     {
         $user = Auth::user();
 
-        if (FixometerHelper::hasRole($user, 'Administrator')) {
+        if (Fixometer::hasRole($user, 'Administrator')) {
             $role = Role::where('idroles', $id)->first();
 
             if ($_SERVER['REQUEST_METHOD'] == 'POST' && ! empty($_POST)) {

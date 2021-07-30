@@ -222,7 +222,7 @@ return [
         'URL' => Illuminate\Support\Facades\URL::class,
         'Validator' => Illuminate\Support\Facades\Validator::class,
         'View' => Illuminate\Support\Facades\View::class,
-        'FixometerHelper' => App\Helpers\FixometerHelper::class,
+        'FixometerHelper' => App\Helpers\Fixometer::class,
         'Honeypot' => Msurguy\Honeypot\HoneypotFacade::class,
         'Image' => Intervention\Image\Facades\Image::class,
         'LaravelLocalization' => Mcamara\LaravelLocalization\Facades\LaravelLocalization::class,

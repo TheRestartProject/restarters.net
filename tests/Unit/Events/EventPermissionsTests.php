@@ -7,7 +7,7 @@ use App\Network;
 use App\Party;
 use App\User;
 use DB;
-use FixometerHelper;
+use App\Helpers\Fixometer;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Foundation\Testing\WithFaker;
 use Tests\TestCase;
@@ -50,15 +50,15 @@ class EventPermissionsTests extends TestCase
 
         // assert
         $this->actingAs($admin);
-        $this->assertTrue(FixometerHelper::userHasEditPartyPermission($event->idevents));
+        $this->assertTrue(Fixometer::userHasEditPartyPermission($event->idevents));
 
         // assert
         $this->actingAs($coordinator);
-        $this->assertFalse(FixometerHelper::userHasEditPartyPermission($event->idevents));
+        $this->assertFalse(Fixometer::userHasEditPartyPermission($event->idevents));
 
         // assert
         $this->actingAs($host);
-        $this->assertFalse(FixometerHelper::userHasEditPartyPermission($event->idevents));
+        $this->assertFalse(Fixometer::userHasEditPartyPermission($event->idevents));
     }
 
     /** @test */
@@ -79,13 +79,13 @@ class EventPermissionsTests extends TestCase
 
         // assert
         $this->actingAs($coordinator1);
-        $this->assertTrue(FixometerHelper::userHasEditPartyPermission($event->idevents));
+        $this->assertTrue(Fixometer::userHasEditPartyPermission($event->idevents));
 
         $this->actingAs($coordinator2);
-        $this->assertFalse(FixometerHelper::userHasEditPartyPermission($event->idevents));
+        $this->assertFalse(Fixometer::userHasEditPartyPermission($event->idevents));
 
         $this->actingAs($host);
-        $this->assertFalse(FixometerHelper::userHasEditPartyPermission($event->idevents));
+        $this->assertFalse(Fixometer::userHasEditPartyPermission($event->idevents));
     }
 
     /** @test */
@@ -105,6 +105,6 @@ class EventPermissionsTests extends TestCase
 
         // assert
         $this->actingAs($host);
-        $this->assertTrue(FixometerHelper::userHasEditPartyPermission($event->idevents));
+        $this->assertTrue(Fixometer::userHasEditPartyPermission($event->idevents));
     }
 }

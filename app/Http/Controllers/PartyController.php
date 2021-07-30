@@ -34,7 +34,7 @@ use Auth;
 use DateTime;
 use DB;
 use FixometerFile;
-use FixometerHelper;
+use App\Helpers\Fixometer;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
 use Lang;
@@ -85,14 +85,14 @@ class PartyController extends Controller
 
         $thisone['isVolunteer'] = $event->isVolunteer();
         $thisone['requiresModeration'] = $event->requiresModerationByAdmin();
-        $thisone['canModerate'] = Auth::user() && (FixometerHelper::hasRole(Auth::user(), 'Administrator') || FixometerHelper::hasRole(Auth::user(), 'NetworkCoordinator'));
+        $thisone['canModerate'] = Auth::user() && (Fixometer::hasRole(Auth::user(), 'Administrator') || Fixometer::hasRole(Auth::user(), 'NetworkCoordinator'));
 
         return $thisone;
     }
 
     public function index($group_id = null)
     {
-        if (FixometerHelper::hasRole(Auth::user(), 'Administrator')) {
+        if (Fixometer::hasRole(Auth::user(), 'Administrator')) {
             $moderate_events = Party::RequiresModeration()->get();
         } else {
             $moderate_events = null;
@@ -141,7 +141,7 @@ class PartyController extends Controller
         //Looks to see whether user has a group already, if they do, they can create events
         $user_groups = UserGroups::where('user', Auth::user()->id)->count();
 
-        $is_host_of_group = FixometerHelper::userHasEditGroupPermission($group_id, Auth::user()->id);
+        $is_host_of_group = Fixometer::userHasEditGroupPermission($group_id, Auth::user()->id);
         $isCoordinatorForGroup = $group && Auth::user()->isCoordinatorForGroup($group);
 
         return view('events.index', [
@@ -210,7 +210,7 @@ class PartyController extends Controller
         $userInChargeOfMultipleGroups = $user->hasRole('Administrator') || count($groupsUserIsInChargeOf) > 1;
 
         // Show an error page if they are a restarter or a host with no groups
-        if (FixometerHelper::hasRole(Auth::user(), 'Restarter') || (count($groupsUserIsInChargeOf) == 0 && FixometerHelper::hasRole(Auth::user(), 'Host'))) {
+        if (Fixometer::hasRole(Auth::user(), 'Restarter') || (count($groupsUserIsInChargeOf) == 0 && Fixometer::hasRole(Auth::user(), 'Host'))) {
             return view('events.cantcreate');
         }
 
@@ -276,10 +276,10 @@ class PartyController extends Controller
             // formatting dates for the DB
             $event_date = date('Y-m-d', strtotime($event_date));
 
-            if (! FixometerHelper::verify($event_date)) {
+            if (! Fixometer::verify($event_date)) {
                 $error['event_date'] = 'We must have a starting date and time.';
             }
-            if (! FixometerHelper::verify($start)) {
+            if (! Fixometer::verify($start)) {
                 $error['name'] = 'We must have a starting date and time.';
             }
 
@@ -308,7 +308,7 @@ class PartyController extends Controller
                     // 'volunteers'    => $volunteers,
                     'user_id' => $user_id,
                     'created_at' => date('Y-m-d H:i:s'),
-                    'shareable_code' => FixometerHelper::generateUniqueShareableCode(\App\Party::class, 'shareable_code'),
+                    'shareable_code' => Fixometer::generateUniqueShareableCode(\App\Party::class, 'shareable_code'),
                     'online' => $online,
                 ];
 
@@ -325,7 +325,7 @@ class PartyController extends Controller
                     Party::find($idParty)->increment('volunteers');
 
                     // Notify relevant users
-                    $usersToNotify = FixometerHelper::usersWhoHavePreference('admin-moderate-event');
+                    $usersToNotify = Fixometer::usersWhoHavePreference('admin-moderate-event');
                     foreach ($party->associatedNetworkCoordinators() as $coordinator) {
                         $usersToNotify->push($coordinator);
                     }
@@ -337,7 +337,7 @@ class PartyController extends Controller
                     /** let's create the image attachment! **/
                     if (isset($_FILES) && ! empty($_FILES) && is_array($_FILES['file']['name'])) {
                         $File = new FixometerFile;
-                        $files = FixometerHelper::rearrange($_FILES['file']);
+                        $files = Fixometer::rearrange($_FILES['file']);
                         foreach ($files as $upload) {
                             $File->upload($upload, 'image', $idParty, env('TBL_EVENTS'));
                         }
@@ -415,7 +415,7 @@ class PartyController extends Controller
     {
         $user = Auth::user();
 
-        if (! FixometerHelper::userHasEditPartyPermission($id, $user->id)) {
+        if (! Fixometer::userHasEditPartyPermission($id, $user->id)) {
             return redirect('/user/forbidden');
         }
 
@@ -447,7 +447,7 @@ class PartyController extends Controller
             unset($data['id']);
 
             // formatting dates for the DB
-            $data['event_date'] = FixometerHelper::dbDateNoTime($data['event_date']);
+            $data['event_date'] = Fixometer::dbDateNoTime($data['event_date']);
 
             if (! empty($data['location'])) {
                 $results = $this->geocoder->geocode($data['location']);
@@ -545,7 +545,7 @@ class PartyController extends Controller
                     $Party->createUserList($id, $users);
                 }
             }
-            if (FixometerHelper::hasRole($user, 'Host')) {
+            if (Fixometer::hasRole($user, 'Host')) {
                 header('Location: /host?action=pe&code=200');
             }
 
@@ -614,7 +614,7 @@ class PartyController extends Controller
     {
         $user = Auth::user();
 
-        if (! FixometerHelper::userHasEditPartyPermission($id, $user->id)) {
+        if (! Fixometer::userHasEditPartyPermission($id, $user->id)) {
             return redirect('/user/forbidden');
         }
 
@@ -692,7 +692,7 @@ class PartyController extends Controller
         $attendees = EventsUsers::where('event', $id)->where('status', 'like', '1');
         $attended = clone $attendees->get();
 
-        if (count($attended) > 5 && $event->hasFinished() && ! Auth::guest() && ! FixometerHelper::hasRole(Auth::user(), 'Restarter')) {
+        if (count($attended) > 5 && $event->hasFinished() && ! Auth::guest() && ! Fixometer::hasRole(Auth::user(), 'Restarter')) {
             $attended_summary = clone $attendees->take(5)->get();
         } else {
             $attended_summary = clone $attendees->take(6)->get();
@@ -701,7 +701,7 @@ class PartyController extends Controller
         $invites = EventsUsers::where('event', $id)->where('status', '!=', 1);
         $invited = clone $invites->get();
 
-        if (count($invited) > 5 && ! $event->hasFinished() && ! Auth::guest() && ! FixometerHelper::hasRole(Auth::user(), 'Restarter')) {
+        if (count($invited) > 5 && ! $event->hasFinished() && ! Auth::guest() && ! Fixometer::hasRole(Auth::user(), 'Restarter')) {
             $invited_summary = clone $invites->take(5)->get();
         } else {
             $invited_summary = clone $invites->take(6)->get();
@@ -961,7 +961,7 @@ class PartyController extends Controller
             'success' => false,
         ];
 
-        if ((FixometerHelper::hasRole(Auth::user(), 'Host') && FixometerHelper::userHasEditPartyPermission($event_id, Auth::user()->id)) || FixometerHelper::hasRole(Auth::user(), 'Administrator')) {
+        if ((Fixometer::hasRole(Auth::user(), 'Host') && Fixometer::userHasEditPartyPermission($event_id, Auth::user()->id)) || Fixometer::hasRole(Auth::user(), 'Administrator')) {
             Party::find($event_id)->update([
                 'pax' => $quantity,
             ]);
@@ -983,7 +983,7 @@ class PartyController extends Controller
             'success' => false,
         ];
 
-        if ((FixometerHelper::hasRole(Auth::user(), 'Host') && FixometerHelper::userHasEditPartyPermission($event_id, Auth::user()->id)) || FixometerHelper::hasRole(Auth::user(), 'Administrator')) {
+        if ((Fixometer::hasRole(Auth::user(), 'Host') && Fixometer::userHasEditPartyPermission($event_id, Auth::user()->id)) || Fixometer::hasRole(Auth::user(), 'Administrator')) {
             Party::find($event_id)->update([
                 'volunteers' => $quantity,
             ]);
@@ -1006,7 +1006,7 @@ class PartyController extends Controller
         ];
 
         //Has current logged in user got permission to remove volunteer
-        if ((FixometerHelper::hasRole(Auth::user(), 'Host') && FixometerHelper::userHasEditPartyPermission($event_id, Auth::user()->id)) || FixometerHelper::hasRole(Auth::user(), 'Administrator')) {
+        if ((Fixometer::hasRole(Auth::user(), 'Host') && Fixometer::userHasEditPartyPermission($event_id, Auth::user()->id)) || Fixometer::hasRole(Auth::user(), 'Administrator')) {
             //Let's get the user before we delete them
             $volunteer = EventsUsers::where('user', $user_id)->where('event', $event_id)->first();
 
@@ -1264,7 +1264,7 @@ class PartyController extends Controller
         $user = Auth::user();
 
         $in_event = EventsUsers::where('event', $event_id)->where('user', Auth::user()->id)->first();
-        if (FixometerHelper::hasRole($user, 'Administrator') || is_object($in_event)) {
+        if (Fixometer::hasRole($user, 'Administrator') || is_object($in_event)) {
             $Image = new FixometerFile;
             $Image->deleteImage($id, $path);
 
@@ -1284,7 +1284,7 @@ class PartyController extends Controller
         $event = Party::find($event_id);
 
         // Check that current logged in user is a host of the event or a host of the group
-        if (FixometerHelper::userHasEditPartyPermission($event_id) || FixometerHelper::userIsHostOfGroup($event->group, Auth::user()->id)) {
+        if (Fixometer::userHasEditPartyPermission($event_id) || Fixometer::userIsHostOfGroup($event->group, Auth::user()->id)) {
             $all_restarters = User::join('events_users', 'events_users.user', '=', 'users.id')
             ->where('events_users.status', 1)
             ->where('events_users.role', 4)
@@ -1318,8 +1318,8 @@ class PartyController extends Controller
 
         Log::info("User {$user->id} attempting to delete event {$id}");
 
-        if (! FixometerHelper::userHasEditPartyPermission($id) &&
-            ! FixometerHelper::userIsHostOfGroup($event->group, Auth::user()->id)) {
+        if (! Fixometer::userHasEditPartyPermission($id) &&
+            ! Fixometer::userIsHostOfGroup($event->group, Auth::user()->id)) {
             return redirect()->back()->with('warning', 'You do not have permission to delete this event');
         }
 

@@ -8,7 +8,7 @@ use App\Network;
 use App\Party;
 use App\User;
 use DB;
-use FixometerHelper;
+use App\Helpers\Fixometer;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Foundation\Testing\WithFaker;
 use Tests\TestCase;

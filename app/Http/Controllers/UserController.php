@@ -31,7 +31,7 @@ use App\WikiSyncStatus;
 use Auth;
 use Cache;
 use FixometerFile;
-use FixometerHelper;
+use App\Helpers\Fixometer;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Input;
@@ -58,7 +58,7 @@ class UserController extends Controller
         }
         $user = User::getProfile($id);
 
-        // if(FixometerHelper::hasRole($user, 'Administrator')){
+        // if(Fixometer::hasRole($user, 'Administrator')){
         $skill_ids = UsersSkills::where('user', $id)->pluck('skill');
         $skills = Skills::whereIn('id', $skill_ids)->pluck('skill_name')->toArray();
 
@@ -72,7 +72,7 @@ class UserController extends Controller
     {
         if (is_null($id)) {
             $user = Auth::user();
-        } elseif (! FixometerHelper::hasRole(Auth::user(), 'Administrator') &&
+        } elseif (! Fixometer::hasRole(Auth::user(), 'Administrator') &&
             ! Auth::user()->isRepairDirectorySuperAdmin() &&
             ! Auth::user()->isRepairDirectoryRegionalAdmin() &&
             Auth::user()->id !== intval($id)
@@ -109,7 +109,7 @@ class UserController extends Controller
 
         return view('user.profile-edit', [
             'user' => $user,
-            'skills' => FixometerHelper::allSkills(),
+            'skills' => Fixometer::allSkills(),
             'user_skills' => $user_skills,
             'user_groups' => $user_groups,
             'user_preferences' => $user_preferences,
@@ -332,7 +332,7 @@ class UserController extends Controller
         $skills = $request->input('tags');
         $user->skillsold()->sync($skills);
 
-        $roleBasedOnSkills = FixometerHelper::skillsDetermineRole($skills);
+        $roleBasedOnSkills = Fixometer::skillsDetermineRole($skills);
 
         if ($roleBasedOnSkills == Role::HOST) {
             $user->convertToHost();
@@ -602,7 +602,7 @@ class UserController extends Controller
     {
         $user = User::find(Auth::id());
 
-        if (FixometerHelper::hasRole($user, 'Administrator')) {
+        if (Fixometer::hasRole($user, 'Administrator')) {
             $User = new User;
             $userlist = $User->getUserList(true)->paginate(env('PAGINATE'));
 
@@ -611,7 +611,7 @@ class UserController extends Controller
                 $user['permissions'] = $User->getRolePermissions($user->role);
                 $user['groups'] = $user->groups;
                 $user['lastLogin'] = $user->lastLogin();
-                $user['country'] = FixometerHelper::getCountryFromCountryCode($user->country);
+                $user['country'] = Fixometer::getCountryFromCountryCode($user->country);
 
                 return $user;
             });
@@ -637,7 +637,7 @@ class UserController extends Controller
     {
         $user = User::find(Auth::id());
 
-        if (FixometerHelper::hasRole($user, 'Administrator')) {
+        if (Fixometer::hasRole($user, 'Administrator')) {
             $User = new User;
             //Have true as parameter for eloquent collection instead of array
             $userlist = $User->getUserList(true);
@@ -682,7 +682,7 @@ class UserController extends Controller
                 $user['permissions'] = $User->getRolePermissions($user->role);
                 $user['groups'] = $user->groups;
                 $user['lastLogin'] = $user->lastLogin();
-                $user['country'] = FixometerHelper::getCountryFromCountryCode($user->country);
+                $user['country'] = Fixometer::getCountryFromCountryCode($user->country);
 
                 return $user;
             });
@@ -711,7 +711,7 @@ class UserController extends Controller
         $user = Auth::user();
 
         // Administrators can add users.
-        if (FixometerHelper::hasRole($user, 'Administrator')) {
+        if (Fixometer::hasRole($user, 'Administrator')) {
             $Roles = new Role;
             $Roles = $Roles->findAll();
 
@@ -855,7 +855,7 @@ class UserController extends Controller
         $User = new User;
 
         // Administrators can edit users.
-        if (FixometerHelper::hasRole($user, 'Administrator') || FixometerHelper::hasRole($user, 'Host')) {
+        if (Fixometer::hasRole($user, 'Administrator') || Fixometer::hasRole($user, 'Host')) {
             $Roles = new Role;
             $Roles = $Roles->findAll();
 
@@ -864,7 +864,7 @@ class UserController extends Controller
 
             $data = $request->post();
 
-            if (! FixometerHelper::hasRole($User->find($id), 'Administrator')) {
+            if (! Fixometer::hasRole($User->find($id), 'Administrator')) {
                 $sent_groups = $data['groups'];
             }
 
@@ -907,7 +907,7 @@ class UserController extends Controller
                     $response['danger'] = 'Something went wrong. Please check the data and try again.';
                 } else {
                     $response['success'] = 'User updated!';
-                    if (FixometerHelper::hasRole($user, 'Host')) {
+                    if (Fixometer::hasRole($user, 'Host')) {
                         // Use @ for phpunit tests.
                         @header('Location: /host?action=ue&code=200');
                     }
@@ -971,7 +971,7 @@ class UserController extends Controller
             return redirect('dashboard');
         }
 
-        $stats = FixometerHelper::loginRegisterStats();
+        $stats = Fixometer::loginRegisterStats();
         $deviceCount = array_key_exists(0, $stats['device_count_status']) ? $stats['device_count_status'][0]->counter : 0;
 
         $activeRepairNetworkId = session()->get('repair_network');
@@ -979,7 +979,7 @@ class UserController extends Controller
         $showNewsletterSignup = $network->shortname == 'restarters';
 
         return view('auth.register-new', [
-            'skills' => FixometerHelper::allSkills(),
+            'skills' => Fixometer::allSkills(),
             'co2Total' => $stats['co2Total'][0]->total_footprints,
             'wasteTotal' => $stats['co2Total'][0]->total_weights,
             'partiesCount' => count($stats['allparties']),
@@ -988,8 +988,10 @@ class UserController extends Controller
         ]);
     }
 
-    public function postRegister(Request $request, $hash, App\Helpers\Geocoder $geocoder)
+    public function postRegister(Request $request, $hash = null)
     {
+        $geocoder = new \App\Helpers\Geocoder();
+
         if (Auth::check()) { //Existing users don't need all the same rules
             $rules = [
             'age'                 => 'required',
@@ -1033,7 +1035,7 @@ class UserController extends Controller
             $user->age = $request->input('age');
             $user->consent_past_data = $timestamp;
         } else {
-            $role = FixometerHelper::skillsDetermineRole($skills);
+            $role = Fixometer::skillsDetermineRole($skills);
 
             $user = User::create([
                 'name' => $request->input('name'),
@@ -1047,6 +1049,7 @@ class UserController extends Controller
                 'gender' => $request->input('gender'),
                 'age' => $request->input('age'),
                 'calendar_hash' => Str::random(15),
+                'username' => '',
             ]);
         }
 
@@ -1096,7 +1099,7 @@ class UserController extends Controller
         $user->save();
 
         // Notify relevant users
-        $notify_users = FixometerHelper::usersWhoHavePreference('admin-new-user');
+        $notify_users = Fixometer::usersWhoHavePreference('admin-new-user');
         Notification::send($notify_users, new AdminNewUser([
         'id' => $user->id,
         'name' => $user->name,

@@ -8,7 +8,7 @@ use App\Helpers\FootprintRatioCalculator;
 use App\Party;
 use App\User;
 use Auth;
-use FixometerHelper;
+use App\Helpers\Fixometer;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Validator;

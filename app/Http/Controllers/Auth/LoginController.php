@@ -5,7 +5,7 @@ namespace App\Http\Controllers\Auth;
 use App\Device;
 use App\Http\Controllers\Controller;
 use App\Party;
-use FixometerHelper;
+use App\Helpers\Fixometer;
 use Illuminate\Foundation\Auth\AuthenticatesUsers;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -101,7 +101,7 @@ class LoginController extends Controller
      */
     public function showLoginForm()
     {
-        $stats = FixometerHelper::loginRegisterStats();
+        $stats = Fixometer::loginRegisterStats();
 
         $deviceCount = array_key_exists(0, $stats['device_count_status']) ? $stats['device_count_status'][0]->counter : 0;
 

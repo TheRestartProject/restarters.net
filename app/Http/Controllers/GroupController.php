@@ -25,7 +25,7 @@ use App\UserGroups;
 use Auth;
 use DB;
 use FixometerFile;
-use FixometerHelper;
+use App\Helpers\Fixometer;
 use Illuminate\Database\QueryException;
 use Illuminate\Http\Request;
 use Illuminate\Support\Arr;
@@ -124,14 +124,16 @@ class GroupController extends Controller
         return $this->indexVariations('all', $id);
     }
 
-    public function create(Request $request, $networkId, Geocoder $geocoder)
+    public function create(Request $request, $networkId = null)
     {
+        $geocoder = new \App\Helpers\Geocoder();
+
         $idGroup = false;
 
         $user = User::find(Auth::id());
 
         // Only administrators can add groups
-        if (FixometerHelper::hasRole($user, 'Restarter')) {
+        if (Fixometer::hasRole($user, 'Restarter')) {
             return redirect('/user/forbidden');
         }
 
@@ -178,7 +180,7 @@ class GroupController extends Controller
                     'longitude' => $longitude,
                     'country' => $country,
                     'free_text' => $text,
-                    'shareable_code' => FixometerHelper::generateUniqueShareableCode(\App\Group::class, 'shareable_code'),
+                    'shareable_code' => Fixometer::generateUniqueShareableCode(\App\Group::class, 'shareable_code'),
                 ];
 
                 try {
@@ -203,7 +205,7 @@ class GroupController extends Controller
                                            ]);
 
                         // Notify relevant admins
-                        $notify_admins = FixometerHelper::usersWhoHavePreference('admin-moderate-group');
+                        $notify_admins = Fixometer::usersWhoHavePreference('admin-moderate-group');
                         Notification::send($notify_admins, new AdminModerationGroup([
                                                                                         'group_name' => $name,
                                                                                         'group_url' => url('/group/edit/'.$idGroup),
@@ -437,7 +439,7 @@ class GroupController extends Controller
             ->orWhereNull('status');
         })->first());
 
-        $is_host_of_group = FixometerHelper::userHasEditGroupPermission($groupid, $user->id);
+        $is_host_of_group = Fixometer::userHasEditGroupPermission($groupid, $user->id);
         $isCoordinatorForGroup = $user->isCoordinatorForGroup($group);
 
         $user_groups = UserGroups::where('user', Auth::user()->id)->count();
@@ -618,10 +620,10 @@ class GroupController extends Controller
         $File = new FixometerFile;
 
         $group = Group::find($id);
-        $is_host_of_group = FixometerHelper::userHasEditGroupPermission($id, $user->id);
+        $is_host_of_group = Fixometer::userHasEditGroupPermission($id, $user->id);
         $isCoordinatorForGroup = $user->isCoordinatorForGroup($group);
 
-        if (! FixometerHelper::hasRole($user, 'Administrator') && ! $is_host_of_group && ! $isCoordinatorForGroup) {
+        if (! Fixometer::hasRole($user, 'Administrator') && ! $is_host_of_group && ! $isCoordinatorForGroup) {
             abort(403);
         }
 
@@ -702,7 +704,7 @@ class GroupController extends Controller
 
             $u = Group::findOrFail($id)->update($update);
 
-            if (FixometerHelper::hasRole($user, 'Administrator')) {
+            if (Fixometer::hasRole($user, 'Administrator')) {
                 if (! empty($_POST['group_tags'])) {
                     $Group->find($id)->group_tags()->sync($_POST['group_tags']);
                 } else {
@@ -723,7 +725,7 @@ class GroupController extends Controller
                 $response['success'] = 'Group updated!';
 
                 if (isset($_FILES['file']) && ! empty($_FILES['file']) && $_FILES['file']['error'] != 4) {
-                    $existing_image = FixometerHelper::hasImage($id, 'groups', true);
+                    $existing_image = Fixometer::hasImage($id, 'groups', true);
                     if (! empty($existing_image)) {
                         // TODO This case looks like it's worth considering.
                         //$Group = new Group;
@@ -733,7 +735,7 @@ class GroupController extends Controller
                     $group_avatar = $file->upload('file', 'image', $id, env('TBL_GROUPS'), false, true);
                     $group_avatar = env('UPLOADS_URL').'mid_'.$group_avatar;
                 } else {
-                    $existing_image = FixometerHelper::hasImage($id, 'groups', true);
+                    $existing_image = Fixometer::hasImage($id, 'groups', true);
                     if (! empty($existing_image)) {
                         $group_avatar = env('UPLOADS_URL').'mid_'.$existing_image[0]->path;
                     } else {
@@ -985,7 +987,7 @@ class GroupController extends Controller
     {
         try {
             if (isset($_FILES) && ! empty($_FILES)) {
-                $existing_image = FixometerHelper::hasImage($id, 'groups', true);
+                $existing_image = Fixometer::hasImage($id, 'groups', true);
                 if (! empty($existing_image)) {
                     $Group->removeImage($id, $existing_image[0]);
                 }
@@ -1003,8 +1005,8 @@ class GroupController extends Controller
     {
         $user = Auth::user();
 
-        $is_host_of_group = FixometerHelper::userHasEditGroupPermission($group_id, $user->id);
-        if (FixometerHelper::hasRole($user, 'Administrator') || $is_host_of_group) {
+        $is_host_of_group = Fixometer::userHasEditGroupPermission($group_id, $user->id);
+        if (Fixometer::hasRole($user, 'Administrator') || $is_host_of_group) {
             $Image = new FixometerFile;
             $Image->deleteImage($id, $path);
 
@@ -1023,7 +1025,7 @@ class GroupController extends Controller
         $group = Group::find($group_id);
         $loggedInUser = Auth::user();
 
-        if (($loggedInUser->hasRole('Host') && FixometerHelper::userIsHostOfGroup($group_id, $loggedInUser->id)) ||
+        if (($loggedInUser->hasRole('Host') && Fixometer::userIsHostOfGroup($group_id, $loggedInUser->id)) ||
             $loggedInUser->isCoordinatorForGroup($group) ||
             $loggedInUser->hasRole('Administrator')) {
             $user = User::find($user_id);
@@ -1039,7 +1041,7 @@ class GroupController extends Controller
     public function getRemoveVolunteer($group_id, $user_id, Request $request)
     {
         //Has current logged in user got permission to remove volunteer
-        if ((FixometerHelper::hasRole(Auth::user(), 'Host') && FixometerHelper::userIsHostOfGroup($group_id, Auth::id())) || FixometerHelper::hasRole(Auth::user(), 'Administrator')) {
+        if ((Fixometer::hasRole(Auth::user(), 'Host') && Fixometer::userIsHostOfGroup($group_id, Auth::id())) || Fixometer::hasRole(Auth::user(), 'Administrator')) {
             // Retrieve user
             $user = User::find($user_id);
 
@@ -1220,7 +1222,7 @@ class GroupController extends Controller
                                   ->orWhereNull('status');
                             })->first());
 
-        $is_host_of_group = FixometerHelper::userHasEditGroupPermission($groupid, $user->id);
+        $is_host_of_group = Fixometer::userHasEditGroupPermission($groupid, $user->id);
 
         $user_groups = UserGroups::where('user', Auth::user()->id)->count();
         $view_group = Group::find($groupid);
@@ -1499,7 +1501,7 @@ class GroupController extends Controller
         $exclude_parties = [];
         if (! empty($date_from) && ! empty($date_to)) {
             foreach ($group->parties as $party) {
-                if (! FixometerHelper::validateBetweenDates($party->event_date, $date_from, $date_to)) {
+                if (! Fixometer::validateBetweenDates($party->event_date, $date_from, $date_to)) {
                     $exclude_parties[] = $party->idevents;
                 }
             }

@@ -7,7 +7,7 @@ use App\GrouptagsGroups;
 use App\Party;
 use App\User;
 use Carbon\Carbon;
-use FixometerHelper;
+use App\Helpers\Fixometer;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
 

@@ -5,7 +5,7 @@ namespace App\Http\Controllers;
 use App\Skills;
 use App\UsersSkills;
 use Auth;
-use FixometerHelper;
+use App\Helpers\Fixometer;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Redirect;
 
@@ -13,7 +13,7 @@ class SkillsController extends Controller
 {
     public function index()
     {
-        if (! FixometerHelper::hasRole(Auth::user(), 'Administrator')) {
+        if (! Fixometer::hasRole(Auth::user(), 'Administrator')) {
             return redirect('/user/forbidden');
         }
 
@@ -27,7 +27,7 @@ class SkillsController extends Controller
 
     public function getCreateSkill()
     {
-        if (! FixometerHelper::hasRole(Auth::user(), 'Administrator')) {
+        if (! Fixometer::hasRole(Auth::user(), 'Administrator')) {
             return redirect('/user/forbidden');
         }
 
@@ -38,7 +38,7 @@ class SkillsController extends Controller
 
     public function postCreateSkill(Request $request)
     {
-        if (! FixometerHelper::hasRole(Auth::user(), 'Administrator')) {
+        if (! Fixometer::hasRole(Auth::user(), 'Administrator')) {
             return redirect('/user/forbidden');
         }
 
@@ -53,7 +53,7 @@ class SkillsController extends Controller
 
     public function getEditSkill($id)
     {
-        if (! FixometerHelper::hasRole(Auth::user(), 'Administrator')) {
+        if (! Fixometer::hasRole(Auth::user(), 'Administrator')) {
             return redirect('/user/forbidden');
         }
 
@@ -67,7 +67,7 @@ class SkillsController extends Controller
 
     public function postEditSkill($id, Request $request)
     {
-        if (! FixometerHelper::hasRole(Auth::user(), 'Administrator')) {
+        if (! Fixometer::hasRole(Auth::user(), 'Administrator')) {
             return redirect('/user/forbidden');
         }
 
@@ -84,7 +84,7 @@ class SkillsController extends Controller
     {
 
       // Are you an admin?
-        if (! FixometerHelper::hasRole(Auth::user(), 'Administrator')) {
+        if (! Fixometer::hasRole(Auth::user(), 'Administrator')) {
             return redirect('/user/forbidden');
         }
 

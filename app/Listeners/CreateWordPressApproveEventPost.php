@@ -7,7 +7,7 @@ use App\Group;
 use App\Network;
 use App\Notifications\AdminWordPressCreateEventFailure;
 use App\Party;
-use FixometerHelper;
+use App\Helpers\Fixometer;
 use HieuLe\WordpressXmlrpcClient\WordpressClient;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Queue\InteractsWithQueue;
@@ -94,7 +94,7 @@ class CreateWordPressApproveEventPost
             }
         } catch (\Exception $e) {
             Log::error('An error occurred during Wordpress event creation: '.$e->getMessage());
-            $notify_users = FixometerHelper::usersWhoHavePreference('admin-approve-wordpress-event-failure');
+            $notify_users = Fixometer::usersWhoHavePreference('admin-approve-wordpress-event-failure');
             Notification::send($notify_users, new AdminWordPressCreateEventFailure([
                 'event_venue' => $theParty->venue,
                 'event_url' => url('/party/edit/'.$theParty->idevents),

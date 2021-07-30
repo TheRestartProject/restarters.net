@@ -7,7 +7,7 @@ use App\Notifications\NotifyAdminNoDevices as Mail;
 use App\Party;
 use App\User;
 use Carbon\Carbon;
-use FixometerHelper;
+use App\Helpers\Fixometer;
 use Illuminate\Console\Scheduling\Schedule;
 use Illuminate\Foundation\Console\Kernel as ConsoleKernel;
 use Notification;
@@ -38,7 +38,7 @@ class Kernel extends ConsoleKernel
                 ->get();
 
             foreach ($parties as $party) {
-                $all_admins = FixometerHelper::usersWhoHavePreference('admin-no-devices');
+                $all_admins = Fixometer::usersWhoHavePreference('admin-no-devices');
                 Notification::send($all_admins, new Mail([
                 'event_venue' => $party->venue,
                 'event_url' => url('/party/edit/'.$party->idevents),

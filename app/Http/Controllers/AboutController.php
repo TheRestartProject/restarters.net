@@ -5,7 +5,7 @@ namespace App\Http\Controllers;
 use App\Device;
 use App\Http\Controllers\Controller;
 use App\Party;
-use FixometerHelper;
+use App\Helpers\Fixometer;
 use Illuminate\Foundation\Auth\AuthenticatesUsers;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -25,7 +25,7 @@ class AboutController extends Controller
 
     public function index()
     {
-        $stats = FixometerHelper::loginRegisterStats();
+        $stats = Fixometer::loginRegisterStats();
 
         $slides = [];
 

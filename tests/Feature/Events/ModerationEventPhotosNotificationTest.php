@@ -4,7 +4,7 @@ namespace Tests\Feature;
 
 use App\EventsUsers;
 use App\Group;
-use App\Helpers\FixometerHelper;
+use App\Helpers\Fixometer;
 use App\Notifications\AdminModerationEvent;
 use App\Notifications\AdminModerationEventPhotos;
 use App\Party;

@@ -8,7 +8,7 @@ use App\Helpers\FootprintRatioCalculator;
 use Auth;
 use Carbon\Carbon;
 use DB;
-use FixometerHelper;
+use App\Helpers\Fixometer;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Support\Str;
@@ -825,7 +825,7 @@ class Party extends Model implements Auditable
 
     public function VisuallyHighlight()
     {
-        if ($this->requiresModerationByAdmin() && FixometerHelper::hasRole(auth()->user(), 'Administrator')) {
+        if ($this->requiresModerationByAdmin() && Fixometer::hasRole(auth()->user(), 'Administrator')) {
             return 'cell-warning-heading';
         } elseif ($this->isUpcoming() || $this->isInProgress()) {
             if (! $this->isVolunteer()) {

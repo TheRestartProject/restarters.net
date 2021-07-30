@@ -4,7 +4,7 @@ namespace App\Services;
 
 use App\User;
 use Cookie;
-use FixometerHelper;
+use App\Helpers\Fixometer;
 use Illuminate\Http\Resources\Json\JsonResource;
 use Lang;
 

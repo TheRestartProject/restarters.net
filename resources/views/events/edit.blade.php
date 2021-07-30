@@ -25,7 +25,7 @@
     <div class="row justify-content-center">
       <div class="col-lg-12">
         @if(isset($response))
-          @php( FixometerHelper::printResponse($response, false) )
+          @php( App\Helpers\Fixometer::printResponse($response, false) )
         @endif
 
         <ul class="nav nav-tabs">
@@ -35,7 +35,7 @@
           <li class="nav-item">
             <a class="nav-link" data-toggle="tab" href="#photos">@lang('events.event_photos')</a>
           </li>
-          @if( $audits && FixometerHelper::hasRole(Auth::user(), 'Administrator') )
+          @if( $audits && App\Helpers\Fixometer::hasRole(Auth::user(), 'Administrator') )
           <li class="nav-item">
             <a class="nav-link" data-toggle="tab" href="#log">@lang('events.event_log')</a>
           </li>
@@ -86,7 +86,7 @@
                       <div class="form-control form-control__select">
                         <select name="group" id="event_group" class="field field select2" required>
                           <option></option>
-                          <?php $isAdmin = FixometerHelper::hasRole($user, 'Administrator'); ?>
+                          <?php $isAdmin = App\Helpers\Fixometer::hasRole($user, 'Administrator'); ?>
                           @foreach($allGroups as $group)
                               @if( $isAdmin || $user_groups->pluck('idgroups')->contains($group->idgroups) )
                               <option value="<?php echo $group->idgroups; ?>" <?php echo($group->idgroups == $formdata->group ? 'selected' : ''); ?>><?php echo $group->name; ?></option>
@@ -162,7 +162,7 @@
                       </div>
                     </div>
 
-                    @if( FixometerHelper::userCanApproveEvent($formdata->id) && is_null($formdata->wordpress_post_id) )
+                    @if( App\Helpers\Fixometer::userCanApproveEvent($formdata->id) && is_null($formdata->wordpress_post_id) )
                     <div class="form-group">
                       <div class="row">
                         <div class="col-lg-7">
@@ -239,7 +239,7 @@
 
           </div>
 
-          @if( $audits && FixometerHelper::hasRole(Auth::user(), 'Administrator') )
+          @if( $audits && App\Helpers\Fixometer::hasRole(Auth::user(), 'Administrator') )
             <div class="tab-pane" id="log">
 
               <div class="row">

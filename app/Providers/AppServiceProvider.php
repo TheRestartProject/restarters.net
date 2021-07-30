@@ -7,7 +7,7 @@ use App\Helpers\Geocoder;
 use App\Party;
 use Auth;
 use Cache;
-use FixometerHelper;
+use App\Helpers\Fixometer;
 use Illuminate\Support\ServiceProvider;
 use OwenIt\Auditing\Models\Audit;
 use Schema;

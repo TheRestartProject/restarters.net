@@ -4,7 +4,7 @@ namespace App\Http\Controllers;
 
 use App\GroupTags;
 use Auth;
-use FixometerHelper;
+use App\Helpers\Fixometer;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Redirect;
 
@@ -12,7 +12,7 @@ class GroupTagsController extends Controller
 {
     public function index()
     {
-        if (! FixometerHelper::hasRole(Auth::user(), 'Administrator')) {
+        if (! Fixometer::hasRole(Auth::user(), 'Administrator')) {
             return redirect('/user/forbidden');
         }
 
@@ -26,7 +26,7 @@ class GroupTagsController extends Controller
 
     public function getCreateTag()
     {
-        if (! FixometerHelper::hasRole(Auth::user(), 'Administrator')) {
+        if (! Fixometer::hasRole(Auth::user(), 'Administrator')) {
             return redirect('/user/forbidden');
         }
 
@@ -37,7 +37,7 @@ class GroupTagsController extends Controller
 
     public function postCreateTag(Request $request)
     {
-        if (! FixometerHelper::hasRole(Auth::user(), 'Administrator')) {
+        if (! Fixometer::hasRole(Auth::user(), 'Administrator')) {
             return redirect('/user/forbidden');
         }
 
@@ -54,7 +54,7 @@ class GroupTagsController extends Controller
 
     public function getEditTag($id)
     {
-        if (! FixometerHelper::hasRole(Auth::user(), 'Administrator')) {
+        if (! Fixometer::hasRole(Auth::user(), 'Administrator')) {
             return redirect('/user/forbidden');
         }
 
@@ -68,7 +68,7 @@ class GroupTagsController extends Controller
 
     public function postEditTag($id, Request $request)
     {
-        if (! FixometerHelper::hasRole(Auth::user(), 'Administrator')) {
+        if (! Fixometer::hasRole(Auth::user(), 'Administrator')) {
             return redirect('/user/forbidden');
         }
 
@@ -85,7 +85,7 @@ class GroupTagsController extends Controller
 
     public function getDeleteTag($id)
     {
-        if (! FixometerHelper::hasRole(Auth::user(), 'Administrator')) {
+        if (! Fixometer::hasRole(Auth::user(), 'Administrator')) {
             return redirect('/user/forbidden');
         }
 

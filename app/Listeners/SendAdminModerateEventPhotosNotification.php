@@ -3,7 +3,7 @@
 namespace App\Listeners;
 
 use App\Events\EventImagesUploaded;
-use App\Helpers\FixometerHelper;
+use App\Helpers\Fixometer;
 use App\Notifications\AdminModerationEventPhotos;
 use App\Party;
 use App\User;
@@ -41,7 +41,7 @@ class SendAdminModerateEventPhotosNotification
         $this->event = $event;
         $this->party = $event->party;
 
-        FixometerHelper::usersWhoHavePreference('admin-moderate-event-photos')->each(function (User $user) {
+        Fixometer::usersWhoHavePreference('admin-moderate-event-photos')->each(function (User $user) {
             if ($this->shouldSendNotification($user)) {
                 Notification::send($user, new AdminModerationEventPhotos([
                     'event_id' => $this->party->idevents,

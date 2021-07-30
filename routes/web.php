@@ -349,7 +349,7 @@ Route::get('/party/invite/{code}', 'PartyController@confirmCodeInvite');
 Route::get('/group/invite/{code}', 'GroupController@confirmCodeInvite');
 
 Route::get('/media-wiki', function () {
-    if (FixometerHelper::hasRole(Auth::user(), 'Administrator')) {
+    if (Fixometer::hasRole(Auth::user(), 'Administrator')) {
         return view('mediawiki.index');
     }
 

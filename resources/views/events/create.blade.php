@@ -26,7 +26,7 @@
       <div class="col-lg-12">
 
         @if(isset($response))
-          @php( FixometerHelper::printResponse($response) )
+          @php( App\Helpers\Fixometer::printResponse($response) )
         @endif
 
         <div class="edit-panel">
@@ -73,7 +73,7 @@
                     <select name="group" id="event_group" class="field field select2" required>
                       <option></option>
 
-                      @if( FixometerHelper::hasRole($user, 'Administrator') )
+                      @if( App\Helpers\Fixometer::hasRole($user, 'Administrator') )
 
                         @foreach($allGroups as $group)
                           @if( $group->idgroups == $selected_group_id )

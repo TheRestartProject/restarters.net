@@ -12,7 +12,7 @@
             <div class="row">
                 <div class="col-md-12">
                     @if(isset($response))
-                      @php( FixometerHelper::printResponse($response) )
+                      @php( App\Helpers\Fixometer::printResponse($response) )
                     @endif
 
                     <form action="/user/create" method="post" enctype="multipart/form-data">

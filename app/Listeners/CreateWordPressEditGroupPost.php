@@ -5,7 +5,7 @@ namespace App\Listeners;
 use App\Events\EditGroup;
 use App\Group;
 use App\Notifications\AdminWordPressEditGroupFailure;
-use FixometerHelper;
+use App\Helpers\Fixometer;
 use HieuLe\WordpressXmlrpcClient\WordpressClient;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Queue\InteractsWithQueue;
@@ -86,7 +86,7 @@ class CreateWordPressEditGroupPost
             }
         } catch (\Exception $e) {
             Log::error('An error occurred during Wordpress group editing: '.$e->getMessage());
-            $notify_users = FixometerHelper::usersWhoHavePreference('admin-edit-wordpress-group-failure');
+            $notify_users = Fixometer::usersWhoHavePreference('admin-edit-wordpress-group-failure');
             Notification::send($notify_users, new AdminWordPressEditGroupFailure([
             'group_name' => $group->name,
             'group_url' => url('/group/edit/'.$group->idgroups),

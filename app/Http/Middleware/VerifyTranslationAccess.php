@@ -5,7 +5,7 @@ namespace App\Http\Middleware;
 use App\User;
 use Auth;
 use Closure;
-use FixometerHelper;
+use App\Helpers\Fixometer;
 
 class VerifyTranslationAccess
 {

@@ -26,7 +26,7 @@
         @endif
       </td>
     @endif
-    @if( is_null($event->wordpress_post_id) ) @if( FixometerHelper::hasRole(Auth::user(), 'Administrator') )
+    @if( is_null($event->wordpress_post_id) ) @if( App\Helpers\Fixometer::hasRole(Auth::user(), 'Administrator') )
         <td class="cell-moderation" colspan="8">Event requires <a href="/party/edit/{{ $event->idevents }}">moderation</a> by an admin</td>
     @else
     <td class="cell-moderation d-none d-sm-table-cell" colspan="8">@lang('partials.event_requires_moderation_by_an_admin')</td>

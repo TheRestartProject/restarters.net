@@ -5,7 +5,7 @@ namespace App\Http\Controllers;
 use App\Device;
 use App\DeviceUrl;
 use Auth;
-use FixometerHelper;
+use App\Helpers\Fixometer;
 use Illuminate\Http\Request;
 
 class DeviceUrlController extends Controller
@@ -43,7 +43,7 @@ class DeviceUrlController extends Controller
         $device = Device::find($request->input('device_id'));
 
         // Check we have the permission
-        if (FixometerHelper::hasRole(Auth::user(), 'Administrator') || FixometerHelper::userHasEditPartyPermission($device->event, Auth::user()->id)) {
+        if (Fixometer::hasRole(Auth::user(), 'Administrator') || Fixometer::userHasEditPartyPermission($device->event, Auth::user()->id)) {
             // Create URL
             $create = DeviceUrl::create([
             'device_id' => $request->input('device_id'),
@@ -99,7 +99,7 @@ class DeviceUrlController extends Controller
     {
 
         // Check we have the permission
-        if (FixometerHelper::hasRole(Auth::user(), 'Administrator') || FixometerHelper::userHasEditPartyPermission($deviceUrl->device->event, Auth::user()->id)) {
+        if (Fixometer::hasRole(Auth::user(), 'Administrator') || Fixometer::userHasEditPartyPermission($deviceUrl->device->event, Auth::user()->id)) {
             // Create URL
             $update = DeviceUrl::find($deviceUrl->id)->update([
               'url' => $request->input('url'),
@@ -129,7 +129,7 @@ class DeviceUrlController extends Controller
     {
 
         // Check we have the permission
-        if (FixometerHelper::hasRole(Auth::user(), 'Administrator') || FixometerHelper::userHasEditPartyPermission($deviceUrl->device->event, Auth::user()->id)) {
+        if (Fixometer::hasRole(Auth::user(), 'Administrator') || Fixometer::userHasEditPartyPermission($deviceUrl->device->event, Auth::user()->id)) {
             // Delete URL
             $device = DeviceUrl::where('id', $deviceUrl->id)->delete();
             if ($device) {
