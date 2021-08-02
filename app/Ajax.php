@@ -6,5 +6,5 @@ use Illuminate\Database\Eloquent\Model;
 
 class Ajax extends Model
 {
-    #code
+    //code
 }

@@ -1,24 +1,25 @@
 <?php
 
-use Illuminate\Support\Facades\Schema;
-use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Database\Migrations\Migration;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\Schema;
 
-class AddAgeCountryToDevicesFaultsOpinionsTable extends Migration {
-
+class AddAgeCountryToDevicesFaultsOpinionsTable extends Migration
+{
     /**
      * Run the migrations.
      *
      * @return void
      */
-    public function up() {
+    public function up()
+    {
         if (Schema::hasTable('devices_faults_opinions')) {
-            if (!Schema::hasColumn('devices_faults_opinions', 'age')) {
+            if (! Schema::hasColumn('devices_faults_opinions', 'age')) {
                 Schema::table('devices_faults_opinions', function (Blueprint $table) {
                     $table->string('age', 8);
                 });
             }
-            if (!Schema::hasColumn('devices_faults_opinions', 'country')) {
+            if (! Schema::hasColumn('devices_faults_opinions', 'country')) {
                 Schema::table('devices_faults_opinions', function (Blueprint $table) {
                     $table->string('country', 8);
                 });
@@ -43,11 +44,11 @@ class AddAgeCountryToDevicesFaultsOpinionsTable extends Migration {
      *
      * @return void
      */
-    public function down() {
+    public function down()
+    {
         Schema::table('devices_faults_opinions', function (Blueprint $table) {
             $table->dropColumn('age');
             $table->dropColumn('country');
         });
     }
-
 }

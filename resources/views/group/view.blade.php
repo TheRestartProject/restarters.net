@@ -13,7 +13,7 @@
       <?php endif; ?>
 
       @if(session()->has('response'))
-        @php( FixometerHelper::printResponse(session('response')) )
+        @php( App\Helpers\Fixometer::printResponse(session('response')) )
       @endif
 
       @if (\Session::has('success'))
@@ -40,8 +40,8 @@
               $group_image->image->path;
           }
 
-          $can_edit_group = FixometerHelper::hasRole( $user, 'Administrator') || $isCoordinatorForGroup || $is_host_of_group;
-          $can_see_delete = FixometerHelper::hasRole( $user, 'Administrator');
+          $can_edit_group = App\Helpers\Fixometer::hasRole( $user, 'Administrator') || $isCoordinatorForGroup || $is_host_of_group;
+          $can_see_delete = App\Helpers\Fixometer::hasRole( $user, 'Administrator');
           $can_perform_delete = $can_see_delete && $group->canDelete();
 
           $expanded_events = [];
@@ -61,12 +61,12 @@
 
               $thisone['isVolunteer'] = $event->isVolunteer();
               $thisone['requiresModeration'] = $event->requiresModerationByAdmin();
-              $thisone['canModerate'] = Auth::user() && (FixometerHelper::hasRole(Auth::user(), 'Administrator') || FixometerHelper::hasRole(Auth::user(), 'NetworkCoordinator'));
+              $thisone['canModerate'] = Auth::user() && (App\Helpers\Fixometer::hasRole(Auth::user(), 'Administrator') || App\Helpers\Fixometer::hasRole(Auth::user(), 'NetworkCoordinator'));
 
               $expanded_events[] = $thisone;
           }
 
-          $showCalendar = Auth::check() && (($group && $group->isVolunteer()) || FixometerHelper::hasRole( Auth::user(), 'Administrator'));
+          $showCalendar = Auth::check() && (($group && $group->isVolunteer()) || App\Helpers\Fixometer::hasRole( Auth::user(), 'Administrator'));
 
           $device_stats = [
               'fixed' => isset($group_device_count_status[0]) ? (int)$group_device_count_status[0]->counter : 0,

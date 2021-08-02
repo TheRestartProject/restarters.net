@@ -22,8 +22,8 @@
 
       <?php
         $all_groups = $groups;
-        $can_create = FixometerHelper::hasRole(Auth::user(), 'Administrator') || FixometerHelper::hasRole(Auth::user(), 'Host');
-        $show_tags = FixometerHelper::hasRole(Auth::user(), 'Administrator');
+        $can_create = App\Helpers\Fixometer::hasRole(Auth::user(), 'Administrator') || App\Helpers\Fixometer::hasRole(Auth::user(), 'Host');
+        $show_tags = App\Helpers\Fixometer::hasRole(Auth::user(), 'Administrator');
 
         $user = Auth::user();
         $myid = $user ? $user->id : null;

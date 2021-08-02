@@ -1,6 +1,6 @@
 <?php
 
-return array (
+return [
   'group' => 'Repair Café',
   'groups' => 'Repair Cafés',
   'all_groups' => 'Tous les Repair Cafés',
@@ -189,4 +189,4 @@ return array (
   'delete_group_confirm' => 'Veuillez confirmer que vous voulez supprimer :name',
   'delete_succeeded' => 'Repair Café <strong>:name</strong> a été supprimé.',
   'duplicate' => 'Ce nom (:name) existe déjà.  Si c\'est le vôtre, veuillez vous rendre dans la page Repair Cafés, utiliser le menu et l\'éditer.',
-);
+];

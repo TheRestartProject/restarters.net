@@ -1,6 +1,6 @@
 <?php
 
-return array (
+return [
   'field_event_name_helper' => 'Name of the venue or neighbourhood',
   'field_venue_helper' => 'I.e. the place where the fixing happens!',
   'create_event' => 'Create event',
@@ -201,5 +201,5 @@ return array (
   'search_country_placeholder' => 'Country...',
   'search_start_placeholder' => 'From...',
   'search_end_placeholder' => 'To...',
-  'invite_when_approved' => 'You can only invite volunteers when this event has been approved'
-);
+  'invite_when_approved' => 'You can only invite volunteers when this event has been approved',
+];

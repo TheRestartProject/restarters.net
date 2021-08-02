@@ -1,8 +1,7 @@
 <?php
 
-return array (
-  'cta' => 
-  array (
+return [
+  'cta' => [
     'header' => 'Thank you for your help!',
     'body-s1-p1' => 'Each item you\'re seeing was brought to a repair event to be fixed rather than thrown away.',
     'body-s1-p2' => 'What do we do with this data?',
@@ -17,5 +16,5 @@ return array (
     'body-whois-trp' => 'is a member of the Open Repair Alliance and made this app. You can join our community to learn more about community repair events and repair data by signing up below.',
     'btn-signup' => 'Sign up',
     'btn-notnow' => 'Not now',
-  ),
-);
+  ],
+];

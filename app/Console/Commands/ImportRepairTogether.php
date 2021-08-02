@@ -4,12 +4,11 @@ namespace App\Console\Commands;
 
 use App\Group;
 use App\GroupTags;
-use App\Helpers\FixometerHelper;
+use App\Helpers\Fixometer;
 use App\Network;
 use App\Role;
 use App\User;
 use App\UserGroups;
-
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\DB;
 use League\Csv\Reader;
@@ -45,12 +44,12 @@ class ImportRepairTogether extends Command
 
         $this->restartersNetwork = Network::find($restartersNetworkId);
         if (is_null($this->restartersNetwork)) {
-            throw new \Exception("Could not find Restarters network in the database.");
+            throw new \Exception('Could not find Restarters network in the database.');
         }
 
         $this->repairTogetherNetwork = Network::find($repairTogetherNetworkId);
         if (is_null($this->repairTogetherNetwork)) {
-            throw new \Exception("Could not find Repair Together network in the database.");
+            throw new \Exception('Could not find Repair Together network in the database.');
         }
 
         $this->assignExistingGroupsToRestartNetwork();
@@ -62,10 +61,9 @@ class ImportRepairTogether extends Command
     public function assignExistingGroupsToRestartNetwork()
     {
         $groupIds = Group::all()->pluck('idgroups');
-        foreach ($groupIds as $groupId)
-        {
+        foreach ($groupIds as $groupId) {
             DB::table('group_network')->insert([
-                ['group_id' => $groupId, 'network_id' => $this->restartersNetwork->id]
+                ['group_id' => $groupId, 'network_id' => $this->restartersNetwork->id],
             ]);
         }
     }
@@ -119,7 +117,7 @@ class ImportRepairTogether extends Command
                 'longitude' => $longitude,
                 'country' => $country,
                 'free_text' => $free_text,
-                'shareable_code' => FixometerHelper::generateUniqueShareableCode(\App\Group::class, 'shareable_code'),
+                'shareable_code' => Fixometer::generateUniqueShareableCode(\App\Group::class, 'shareable_code'),
                 //'network_id' => $repairTogetherNetworkId,
                 'external_id' => $external_id,
             ];

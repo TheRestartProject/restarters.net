@@ -1,6 +1,6 @@
 <?php
 
-return array (
+return [
   'getting_started_text' => 'Repair&Share gebruikt het Restarters platform voor gegevensuitwisseling tussen Repair Café\'s. Ga onmiddellijk naar:',
   'getting_started_header' => 'Welkom!',
   'join_discussion' => 'Neem deel aan een gesprek',
@@ -11,4 +11,4 @@ return array (
   'add_skills' => 'Voeg je competenties toe',
   'discussion_header' => 'Discussieforum',
   'devices_logged' => 'Bijgehouden toestellen',
-);
+];

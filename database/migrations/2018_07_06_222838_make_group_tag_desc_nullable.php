@@ -1,8 +1,8 @@
 <?php
 
-use Illuminate\Support\Facades\Schema;
-use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Database\Migrations\Migration;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\Schema;
 
 class MakeGroupTagDescNullable extends Migration
 {
@@ -13,9 +13,9 @@ class MakeGroupTagDescNullable extends Migration
      */
     public function up()
     {
-      Schema::table('group_tags', function (Blueprint $table) {
-          $table->text('description')->nullable()->change();
-      });
+        Schema::table('group_tags', function (Blueprint $table) {
+            $table->text('description')->nullable()->change();
+        });
     }
 
     /**
@@ -25,8 +25,8 @@ class MakeGroupTagDescNullable extends Migration
      */
     public function down()
     {
-      Schema::table('group_tags', function (Blueprint $table) {
-          $table->string('description')->nullable(false)->change();
-      });
+        Schema::table('group_tags', function (Blueprint $table) {
+            $table->string('description')->nullable(false)->change();
+        });
     }
 }

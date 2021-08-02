@@ -1,6 +1,6 @@
 <?php
 
-return array (
+return [
   'devices_logged' => 'Appareils enregistrés',
   'getting_started_header' => 'Pour commencer',
   'getting_started_text' => 'Bienvenue dans l\'espace communautaire des Restarters. Voici quelques actions pour vous aider à démarrer:',
@@ -52,4 +52,4 @@ return array (
   'add_data_add' => 'Ajouter',
   'add_data_heading' => 'Ajouter des données',
   'interested_details' => '<p>Toute personne intéressée et ayant quelques compétences en matière d\'organisation peut lancer un Repair Café. Consultez notre <a href="https://talk.restarters.net/t/how-to-run-a-repair-event-the-restart-party-kit/324">kit de planification d\'événements</a> ou consultez nos <a href="https://talk.restarters.net/c/community-repair/school">ressources pour les écoles</a>.</p><p>Une fois que vous êtes prêt à lancer un groupe, il suffit d\'en créer un sur la page <a href="/groupe">Groupes</a>.  Et si vous avez besoin d\'aide, il suffit de demander sur le forum, <a href="https://talk.restarters.net/c/community-repair/5">Talk</a>.',
-);
+];

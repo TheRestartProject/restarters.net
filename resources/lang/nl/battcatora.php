@@ -1,8 +1,7 @@
 <?php
 
-return array (
-  'task' => 
-  array (
+return [
+  'task' => [
     'subtitle' => 'Een vrijwilliger probeerde dit toestel te repareren in een Repair Café en schreef deze beschrijving.',
     'question-endoflife' => 'Waardoor kon dit toestel niet worden gerepareerd?',
     'question-repairable' => 'Wat is de volgende stap om dit toetel te repareren?',
@@ -31,9 +30,8 @@ return array (
     'step1-extra' => 'Een vrijwilliger probeerde dit toestel te repareren in een Repair Café en schreef deze beschrijving.',
     'step2-extra' => 'Selecteer de optie die het beste past bij het hierboven beschreven probleem.',
     'title' => 'BattCat: accu problemen categoriseren',
-  ),
-  'status' => 
-  array (
+  ],
+  'status' => [
     'brand' => 'Merk',
     'items_0_opinions' => 'met 0 meningen',
     'items_1_opinion' => 'met 1 mening',
@@ -50,9 +48,8 @@ return array (
     'task_completed' => 'Je hebt ze allemaal gezien, bedankt',
     'total' => 'Totaal',
     'winning_opinion' => 'Winnende mening',
-  ),
-  'info' => 
-  array (
+  ],
+  'info' => [
     'body-s1-header' => 'Wat is BattCat?',
     'body-s1-p1' => 'We willen beter begrijpen hoe batterijen en accu\'s apparaten defect kunnen maken. Zo kunnen we beleidsmakers vertellen wat er nodig is om toekomstige modellen beter herstelbaar te maken. Repareren zorgt dat we minder afval hebben en minder grondstoffen verbruiken.',
     'body-s1-p2' => 'Met BattCat kunt u deelnemen aan ons onderzoek. We hebben informatie verzameld over meer dan 1000 kapotte apparaten en we hebben uw hulp nodig om ze te categoriseren.',
@@ -63,21 +60,19 @@ return array (
     'body-s4-header' => 'Nog vragen?',
     'body-s4-p1' => 'Kom meer te weten, stel vragen en geef ons uw feedback, in <a href=":url" target="_blank">de BattCat discussie</a>.',
     'title' => 'Bedankt om BattCat te proberen',
-  ),
-  'branding' => 
-  array (
+  ],
+  'branding' => [
     'powered_by' => 'Gebruik van gegevens van:',
-  ),
+  ],
   'about' => 'Meer informatie',
-  'survey' => 
-  array (
+  'survey' => [
     'a1' => 'Sterk mee oneens',
     'a2' => 'Oneens',
     'a3' => 'Neutraal',
     'a4' => 'Mee eens',
     'a5' => 'Sterk mee eens',
     'footer' => 'Als u op een van deze knoppen drukt, keert u terug naar BattCat',
-    'header1' => 'Bedankt om ons te helpen begrijpen waarom tabletten kapot gaan.',
+    'header1' => 'Bedankt!',
     'header2' => 'We plannen al toekomstige quests, net als deze. Om de volgende nog beter te maken, hebben we een paar korte vragen voor je.',
     'invalid' => 'Maak een keuze uit elk van de vragen',
     'q1' => 'BattCat heeft mijn interesse in repareren vergroot',
@@ -86,5 +81,5 @@ return array (
     'q4' => 'BattCat heeft mijn kijk op het belang van reparatie veranderd',
     'send' => 'Verzenden',
     'skip' => 'Overslaan',
-  ),
-);
+  ],
+];

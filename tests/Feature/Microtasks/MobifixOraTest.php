@@ -4,32 +4,33 @@ namespace Tests\Feature;
 
 use App\MobifixOra;
 use DB;
-use Tests\TestCase;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Foundation\Testing\WithoutMiddleware;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Str;
+use Tests\TestCase;
 
-class MobifixOraTest extends TestCase {
-
-    public function setUp() {
+class MobifixOraTest extends TestCase
+{
+    protected function setUp(): void
+    {
         parent::setUp();
-        DB::statement("SET foreign_key_checks=0");
+        DB::statement('SET foreign_key_checks=0');
         MobifixOra::truncate();
         DB::table('devices_mobifix_ora')->truncate();
         DB::table('devices_faults_mobiles_ora_adjudicated')->truncate();
     }
 
     /** @test */
-    public function fetch_mobifixora_record() {
-
+    public function fetch_mobifixora_record()
+    {
         $data = $this->_setup_devices();
         $MobifixOra = new MobifixOra;
 
         $result = $MobifixOra->fetchFault();
         $this->assertTrue(is_array($result), 'fetch_mobifixora_record: result is not array');
         $this->assertEquals(1, count($result), 'fetch_mobifixora_record: wrong result count');
-        $this->assertGreaterThan(0, !is_null($result[0]->id_ords), 'fetch_mobifixora_record: id_ords is null');
+        $this->assertGreaterThan(0, ! is_null($result[0]->id_ords), 'fetch_mobifixora_record: id_ords is null');
 
         // leave only 1 record
         $exclude = [];
@@ -40,7 +41,7 @@ class MobifixOraTest extends TestCase {
         $result = $MobifixOra->fetchFault($exclude);
         $this->assertTrue(is_array($result), 'fetch_mobifixora_record: result is not array');
         $this->assertEquals(1, count($result), 'fetch_mobifixora_record: wrong result count');
-        $this->assertGreaterThan(0, !is_null($result[0]->id_ords), 'fetch_mobifixora_record: id_ords is null');
+        $this->assertGreaterThan(0, ! is_null($result[0]->id_ords), 'fetch_mobifixora_record: id_ords is null');
         $this->assertEquals($include, $result[0]->id_ords, 'fetch_mobifixora_record: wrong value');
 
         // exclude all records for one partner
@@ -55,8 +56,8 @@ class MobifixOraTest extends TestCase {
     }
 
     /** @test */
-    public function fetch_mobifixora_page() {
-
+    public function fetch_mobifixora_page()
+    {
         $data = $this->_setup_devices();
         $this->withSession([]);
         $this->_bypass_cta();
@@ -72,56 +73,55 @@ class MobifixOraTest extends TestCase {
         $response = $this->get('/mobifixora');
         $response->assertSessionHas('mobifixora.exclusions');
         $response->assertRedirect();
-        $response->assertRedirect(url()->current() . '/status');
+        $response->assertRedirect(url()->current().'/status');
     }
 
     /** @test */
-    public function fetch_mobifixora_status() {
-
+    public function fetch_mobifixora_status()
+    {
         $data = $this->_setup_devices();
         $opinions = $this->_setup_opinions($data);
         $MobifixOra = new MobifixOra;
         $result = $MobifixOra->fetchStatus();
         $this->assertTrue(is_array($result));
         foreach ($opinions['status'] as $k => $v) {
-            $this->assertTrue(isset($result, $k), 'fetch_mobifixora_status: missing key - ' . $k);
-            if (!is_array($v)) {
-                $this->assertEquals($v, $result[$k][0]->total, 'fetch_mobifixora_status: wrong ' . $k);
+            $this->assertTrue(isset($result, $k), 'fetch_mobifixora_status: missing key - '.$k);
+            if (! is_array($v)) {
+                $this->assertEquals($v, $result[$k][0]->total, 'fetch_mobifixora_status: wrong '.$k);
             } else {
-                $this->assertTrue(is_array($result[$k]), 'fetch_mobifixora_status: not array - ' . $k);
+                $this->assertTrue(is_array($result[$k]), 'fetch_mobifixora_status: not array - '.$k);
                 foreach ($v[0] as $key => $val) {
-                    $this->assertTrue(property_exists($result[$k][0], $key), 'fetch_mobifixora_status #' . $k . ': missing key - ' . $key);
-                    $this->assertEquals($val, $result[$k][0]->{$key}, 'fetch_mobifixora_status #' . $k . ': wrong ' . $key);
+                    $this->assertTrue(property_exists($result[$k][0], $key), 'fetch_mobifixora_status #'.$k.': missing key - '.$key);
+                    $this->assertEquals($val, $result[$k][0]->{$key}, 'fetch_mobifixora_status #'.$k.': wrong '.$key);
                 }
             }
         }
     }
 
     /** @test */
-    public function update_mobifixora_devices() {
-
+    public function update_mobifixora_devices()
+    {
         $data = $this->_setup_devices();
         $opinions = $this->_setup_opinions($data);
         $MobifixOra = new MobifixOra;
-        $before = DB::select("SELECT id_ords, fault_type_id FROM devices_mobifix_ora");
+        $before = DB::select('SELECT id_ords, fault_type_id FROM devices_mobifix_ora');
         foreach ($before as $k => $v) {
-            $this->assertEquals($v->fault_type_id, 0, 'update_mobifixora_devices: initial fault_type not 0: ' . $v->fault_type_id);
-        }        
+            $this->assertEquals($v->fault_type_id, 0, 'update_mobifixora_devices: initial fault_type not 0: '.$v->fault_type_id);
+        }
         $updated = $MobifixOra->updateDevices();
-        $after = DB::select("SELECT id_ords, fault_type_id FROM devices_mobifix_ora");
-        $this->assertEquals($updated, count($opinions['updates']), 'update_mobifixora_devices: wrong number of records updated: ' . $updated);
+        $after = DB::select('SELECT id_ords, fault_type_id FROM devices_mobifix_ora');
+        $this->assertEquals($updated, count($opinions['updates']), 'update_mobifixora_devices: wrong number of records updated: '.$updated);
         foreach ($after as $k => $v) {
             if (isset($opinions['updates'][$v->id_ords])) {
-                $this->assertEquals($v->fault_type_id, $opinions['updates'][$v->id_ords], 'update_mobifixora_devices: updated fault_type is wrong: ' . $v->id_ords . ' => ' . $v->fault_type_id);
+                $this->assertEquals($v->fault_type_id, $opinions['updates'][$v->id_ords], 'update_mobifixora_devices: updated fault_type is wrong: '.$v->id_ords.' => '.$v->fault_type_id);
             } else {
-                $this->assertEquals($v->fault_type_id, 0, 'update_mobifixora_devices: fault_type should still be 0: ' . $v->fault_type_id);
+                $this->assertEquals($v->fault_type_id, 0, 'update_mobifixora_devices: fault_type should still be 0: '.$v->fault_type_id);
             }
         }
-        
     }
 
-    protected function _setup_devices() {
-
+    protected function _setup_devices()
+    {
         $data = [
             [
                 'id' => 'anstiftung_1647',
@@ -180,7 +180,7 @@ class MobifixOraTest extends TestCase {
                 'date' => '2019-02-23',
                 'problem' => 'defekt',
                 'translation' => 'malfunction',
-                'language' => 'de'
+                'language' => 'de',
             ],
             [
                 'id' => 'repaircafe_8389',
@@ -239,7 +239,7 @@ class MobifixOraTest extends TestCase {
                 'date' => '2018-07-21',
                 'problem' => 'broken screen ~ poorly maintained',
                 'translation' => 'broken screen ~ poorly maintained',
-                'language' => 'en'],
+                'language' => 'en', ],
         ];
         foreach ($data as $k => $v) {
             DB::table('devices_mobifix_ora')->insert([
@@ -262,6 +262,7 @@ class MobifixOraTest extends TestCase {
                 'id_ords' => $v['id'],
             ]);
         }
+
         return $data;
     }
 
@@ -274,8 +275,8 @@ class MobifixOraTest extends TestCase {
      *
      * @return array
      */
-    protected function _setup_opinions($data) {
-
+    protected function _setup_opinions($data)
+    {
         $opinions = [];
 
         $updates = [];
@@ -301,7 +302,7 @@ class MobifixOraTest extends TestCase {
         $opinions[$data[3]['id']][] = $this->_insert_opinion($data[3]['id'], 2);
         $opinions[$data[3]['id']][] = $this->_insert_opinion($data[3]['id'], 25);
         $opinions[$data[3]['id']][] = $this->_insert_opinion($data[3]['id'], 26);
-        DB::update("INSERT INTO devices_faults_mobiles_ora_adjudicated SET id_ords = '" . $data[3]['id'] . "', fault_type_id=2");
+        DB::update("INSERT INTO devices_faults_mobiles_ora_adjudicated SET id_ords = '".$data[3]['id']."', fault_type_id=2");
         $updates[$data[3]['id']] = 2;
 
         // $devs[4] : 2 opinions with majority : recat
@@ -338,6 +339,7 @@ class MobifixOraTest extends TestCase {
                 ],
             ],
         ];
+
         return [
             'status' => $status,
             'opinions' => $opinions,
@@ -345,7 +347,8 @@ class MobifixOraTest extends TestCase {
         ];
     }
 
-    protected function _insert_opinion($id_ords, $fault_type_id) {
+    protected function _insert_opinion($id_ords, $fault_type_id)
+    {
         $insert = [
             'id_ords' => $id_ords,
             'fault_type_id' => $fault_type_id,
@@ -354,13 +357,14 @@ class MobifixOraTest extends TestCase {
         $this->assertDatabaseHas('devices_faults_mobiles_ora_opinions', [
             'id_ords' => $id_ords,
         ]);
+
         return $insert;
     }
 
-    protected function _bypass_cta() {
+    protected function _bypass_cta()
+    {
         $this->app['session']->put('microtask.cta', 1);
         $this->app['session']->put('microtask.clicks', 5);
         $this->app['session']->put('microtask.sesh', \Carbon\Carbon::now()->timestamp);
     }
-
 }

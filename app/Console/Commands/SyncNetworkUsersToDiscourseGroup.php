@@ -4,7 +4,6 @@ namespace App\Console\Commands;
 
 use App\Network;
 use App\User;
-
 use Illuminate\Console\Command;
 
 class SyncNetworkUsersToDiscourseGroup extends Command
@@ -84,8 +83,8 @@ class SyncNetworkUsersToDiscourseGroup extends Command
             'name' => $user->name,
             'add_groups' => $groupName,
         ];
-        $sso_payload = base64_encode( http_build_query( $sso_params ) );
-        $sig = hash_hmac( 'sha256', $sso_payload, $sso_secret );
+        $sso_payload = base64_encode(http_build_query($sso_params));
+        $sig = hash_hmac('sha256', $sso_payload, $sso_secret);
 
         $response = $this->discourseClient->request(
             'POST',
@@ -102,7 +101,7 @@ class SyncNetworkUsersToDiscourseGroup extends Command
             $this->error($response->getReasonPhrase());
         }
 
-        if ( ! $response->getStatusCode() === 200) {
+        if (! $response->getStatusCode() === 200) {
             $this->error('Could not sync '.$user->id.' to Discourse: '.$response->getReasonPhrase());
         }
     }

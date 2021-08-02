@@ -1,6 +1,6 @@
 <?php
 
-return array (
+return [
   'about_group_name_header' => 'Over :group',
   'add_groups' => 'Een groep toevoegen',
   'add_groups_content' => 'Vertel ons wat meer over je groep. Zo kunnen we pagina voor je aanmaken en je helpen om vrijwilligers en deelnemers te bereiken.',
@@ -77,4 +77,4 @@ return array (
   'town-city-placeholder' => 'Bv Parijs, Londen, Brussel',
   'type_email_addresses_message' => 'Typ hier de e-mailadressen van de mensen die je wilt uitnodigen om lid te worden van je groep. Zet een tab of komma achter elk e-mailadres.',
   'helptext_area' => 'Tonen op de homepagina van Restart Project',
-);
+];

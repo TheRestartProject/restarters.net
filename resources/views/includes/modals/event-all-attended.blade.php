@@ -25,7 +25,7 @@
               <th></th>
               <th scope="col">@lang('events.table_restarter_column')</th>
               <th scope="col">@lang('events.table_skills_column')</th>
-              @if ( ( FixometerHelper::hasRole(Auth::user(), 'Host') && FixometerHelper::userHasEditPartyPermission($formdata->id, Auth::user()->id) ) || FixometerHelper::hasRole(Auth::user(), 'Administrator'))
+              @if ( ( App\Helpers\Fixometer::hasRole(Auth::user(), 'Host') && App\Helpers\Fixometer::userHasEditPartyPermission($formdata->id, Auth::user()->id) ) || App\Helpers\Fixometer::hasRole(Auth::user(), 'Administrator'))
                 <th></th>
               @endif
             </tr>

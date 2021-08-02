@@ -4,22 +4,20 @@ namespace Tests\Unit;
 
 use App\Role;
 use App\User;
-
 use DB;
-use Tests\TestCase;
-use Illuminate\Foundation\Testing\WithFaker;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Foundation\Testing\WithFaker;
+use Tests\TestCase;
 
 class UserRolesTest extends TestCase
 {
-    public function setUp()
+    protected function setUp(): void
     {
         parent::setUp();
-        DB::statement("SET foreign_key_checks=0");
+        DB::statement('SET foreign_key_checks=0');
         User::truncate();
-        DB::statement("SET foreign_key_checks=1");
+        DB::statement('SET foreign_key_checks=1');
     }
-
 
     /** @test */
     public function user_can_have_network_coordinator_role()
@@ -29,7 +27,6 @@ class UserRolesTest extends TestCase
 
         $user->role = Role::NETWORK_COORDINATOR;
         $user->save();
-
 
         // assert
         $this->assertTrue($user->hasRole('NetworkCoordinator'));

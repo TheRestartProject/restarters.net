@@ -1,6 +1,6 @@
 <?php
 
-return array (
+return [
   'alert_uptodate' => 'Bedankt! Je bent up to date',
   'alert_uptodate_text' => 'Je hoeft momenteel niets te doen. Als dat wel zo is, laten we het je weten.',
   'change_photo' => 'Foto veranderen',
@@ -62,4 +62,4 @@ return array (
   'your_repair_skills' => 'Je competenties',
   'side_attention' => 'Dit vraagt je aandacht',
   'calendar_feed_help_url' => '/t/fixometer-how-to-subscribe-to-a-calendar',
-);
+];

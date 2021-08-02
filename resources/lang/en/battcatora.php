@@ -1,8 +1,7 @@
 <?php
 
-return array (
-  'task' => 
-  array (
+return [
+  'task' => [
     'subtitle' => 'A volunteer tried to fix this device at a community repair event and wrote this description.',
     'question-endoflife' => 'What prevented this device from being repaired?',
     'question-repairable' => 'What are the next steps?',
@@ -31,9 +30,8 @@ return array (
     'progress_title' => 'Our progress',
     'progress_subtitle' => 'The percentage of devices we have classified so far',
     'title' => 'BattCat: categorise battery problems',
-  ),
-  'status' => 
-  array (
+  ],
+  'status' => [
     'brand' => 'Brand',
     'items_0_opinions' => 'with 0 opinions',
     'items_1_opinion' => 'with 1 opinion',
@@ -50,9 +48,8 @@ return array (
     'task_completed' => 'You\'ve seen them all, thanks',
     'total' => 'Total',
     'winning_opinion' => 'Winning opinion',
-  ),
-  'info' => 
-  array (
+  ],
+  'info' => [
     'body-s1-header' => 'What is BattCat?',
     'body-s1-p1' => 'We want to understand how batteries can cause devices fail so that we can tell policymakers how future models can be made easier to repair. Repair reduces waste and lessens the strain on our planet’s resources.',
     'body-s1-p2' => 'With BattCat, you can join our investigation. We’ve collected information on over 1,000 broken devices and we need your help to categorise them.',
@@ -63,21 +60,19 @@ return array (
     'body-s4-header' => 'More questions?',
     'body-s4-p1' => 'Find out more, and give us your feedback, in the <a href=":url" target="_blank">BattCat discussion</a>.',
     'title' => 'Thank you for trying BattCat',
-  ),
-  'branding' => 
-  array (
+  ],
+  'branding' => [
     'powered_by' => 'Powered by data from:',
-  ),
+  ],
   'about' => 'About',
-  'survey' => 
-  array (
+  'survey' => [
     'a1' => 'Strongly disagree',
     'a2' => 'Disagree',
     'a3' => 'Neutral',
     'a4' => 'Agree',
     'a5' => 'Strongly agree',
     'footer' => 'Pressing either button will take you back to BattCat',
-    'header1' => 'Thank you for helping us learn why tablets break.',
+    'header1' => 'Thank you!',
     'header2' => 'We are already planning future quests, just like this one. To make the next one even better, we have some quick questions for you.',
     'invalid' => 'Please answer all of the questions',
     'q1' => 'BattCat has increased my interest in repairing',
@@ -86,5 +81,5 @@ return array (
     'q4' => 'BattCat has changed my view of the importance of repair',
     'send' => 'Send',
     'skip' => 'Skip',
-  ),
-);
+  ],
+];

@@ -7,7 +7,6 @@ use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Support\Facades\Log;
 
-
 class AddUserToDiscourseGroup
 {
     /**
@@ -28,7 +27,7 @@ class AddUserToDiscourseGroup
      */
     public function handle(UserFollowedGroup $event)
     {
-        if ( ! config('restarters.features.discourse_integration')) {
+        if (! config('restarters.features.discourse_integration')) {
             return;
         }
 
@@ -43,13 +42,12 @@ class AddUserToDiscourseGroup
                     $discourseGroups[] = $network->discourse_group;
                 }
             }
-            $discourseGroupsCommaSeparated = implode(",", $discourseGroups);
+            $discourseGroupsCommaSeparated = implode(',', $discourseGroups);
 
             $client = app('discourse-client');
 
             // see https://meta.discourse.org/t/sync-sso-user-data-with-the-sync-sso-route/84398 for details on the sync_sso route.
             $sso_secret = config('discourse-api.sso_secret');
-
 
             // We have to send all these details, even if they are not
             // being updated, as otherwise they are blanked in the Discourse
@@ -61,12 +59,12 @@ class AddUserToDiscourseGroup
                 'name' => $user->name,
                 'add_groups' => $discourseGroupsCommaSeparated,
             ];
-            $sso_payload = base64_encode( http_build_query( $sso_params ) );
-            $sig = hash_hmac( 'sha256', $sso_payload, $sso_secret );
+            $sso_payload = base64_encode(http_build_query($sso_params));
+            $sig = hash_hmac('sha256', $sso_payload, $sso_secret);
 
             $endpoint = '/admin/users/sync_sso';
 
-            Log::info('Syncing: ' . json_encode($sso_params));
+            Log::info('Syncing: '.json_encode($sso_params));
             $response = $client->request(
                 'POST',
                 $endpoint,
@@ -78,10 +76,10 @@ class AddUserToDiscourseGroup
                 ]
             );
 
-            Log::info('Response status: ' . $response->getStatusCode());
-            Log::info('Response body: ' . $response->getBody());
+            Log::info('Response status: '.$response->getStatusCode());
+            Log::info('Response body: '.$response->getBody());
 
-            if ( ! $response->getStatusCode() === 200) {
+            if (! $response->getStatusCode() === 200) {
                 Log::error('Could not sync user\'s ('.$user->id.') groups to Discourse: '.$response->getReasonPhrase());
             }
         } catch (\Exception $ex) {
