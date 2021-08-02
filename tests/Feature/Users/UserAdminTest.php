@@ -13,12 +13,39 @@ use Illuminate\Foundation\Testing\RefreshDatabase;
 
 class UserAdminTest extends TestCase
 {
-    public function testUsersPage() {
+    public function provider()
+    {
+        return [
+            [
+                'Administrator', TRUE
+            ],
+            [
+                'NetworkCoordinator', FALSE
+            ],
+            [
+                'Host', FALSE
+            ],
+            [
+                'Restarter', FALSE
+            ],
+        ];
+    }
+
+    /**
+     *@dataProvider provider
+     */
+    public function testUsersPage($cansee) {
         // Fetch the list of all users and check that we're in it.
         $admin = factory(User::class)->states('Administrator')->create();
         $this->actingAs($admin);
+
         $response = $this->get('/user/all');
-        $response->assertSee('Create new user');
-        $response->assertSee($admin->name);
+
+        if ($cansee) {
+            $response->assertSee('Create new user');
+            $response->assertSee($admin->name);
+        } else {
+            $response->assertDontSee('Create new user');
+        }
     }
 }
