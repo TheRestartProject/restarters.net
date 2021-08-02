@@ -1,8 +1,8 @@
 <?php
 
-use Illuminate\Support\Facades\Schema;
-use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Database\Migrations\Migration;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\Schema;
 
 class InitialiseFixometerDb extends Migration
 {
@@ -15,12 +15,12 @@ class InitialiseFixometerDb extends Migration
     {
 
         //Settings
-         DB::statement('SET SQL_MODE = "NO_AUTO_VALUE_ON_ZERO";');
-         DB::statement('SET time_zone = "+00:00";');
-        
-         //Create Tables
-           //Categories
-           DB::statement('CREATE TABLE IF NOT EXISTS `categories` (
+        DB::statement('SET SQL_MODE = "NO_AUTO_VALUE_ON_ZERO";');
+        DB::statement('SET time_zone = "+00:00";');
+
+        //Create Tables
+        //Categories
+        DB::statement('CREATE TABLE IF NOT EXISTS `categories` (
                            `idcategories` int(11) NOT NULL,
                            `name` varchar(255) NOT NULL,
                            `weight` float DEFAULT NULL,
@@ -34,25 +34,25 @@ class InitialiseFixometerDb extends Migration
                            `cluster` int(11) DEFAULT NULL
                          ) ENGINE=InnoDB DEFAULT CHARSET=utf8;'
            );
-        
-           //Category Revisions
-           DB::statement('CREATE TABLE IF NOT EXISTS `category_revisions` (
+
+        //Category Revisions
+        DB::statement('CREATE TABLE IF NOT EXISTS `category_revisions` (
                            `idcategory_revisions` int(11) NOT NULL,
                            `revision` varchar(255) NOT NULL,
                            `created_at` timestamp NULL DEFAULT NULL,
                            `modified_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
                          ) ENGINE=InnoDB DEFAULT CHARSET=utf8;'
            );
-        
-           //Clusters
-           DB::statement('CREATE TABLE IF NOT EXISTS `clusters` (
+
+        //Clusters
+        DB::statement('CREATE TABLE IF NOT EXISTS `clusters` (
                            `idclusters` int(11) NOT NULL,
                            `name` varchar(255) NOT NULL
                          ) ENGINE=InnoDB DEFAULT CHARSET=utf8;'
            );
-        
-           //Devices
-           DB::statement('CREATE TABLE IF NOT EXISTS `devices` (
+
+        //Devices
+        DB::statement('CREATE TABLE IF NOT EXISTS `devices` (
                            `iddevices` int(11) NOT NULL,
                            `event` int(11) NOT NULL,
                            `category` int(11) NOT NULL,
@@ -71,9 +71,9 @@ class InitialiseFixometerDb extends Migration
                            `modified_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
                          ) ENGINE=InnoDB DEFAULT CHARSET=utf8;'
            );
-        
-           //Events
-           DB::statement('CREATE TABLE IF NOT EXISTS `events` (
+
+        //Events
+        DB::statement('CREATE TABLE IF NOT EXISTS `events` (
                            `idevents` int(11) NOT NULL,
                            `group` int(11) NOT NULL,
                            `event_date` date NOT NULL DEFAULT "1970-01-01",
@@ -91,17 +91,17 @@ class InitialiseFixometerDb extends Migration
                            `modified_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
                          ) ENGINE=InnoDB DEFAULT CHARSET=utf8;'
            );
-        
-           //Event Users
-           DB::statement('CREATE TABLE IF NOT EXISTS `events_users` (
+
+        //Event Users
+        DB::statement('CREATE TABLE IF NOT EXISTS `events_users` (
                            `idevents_users` int(11) NOT NULL,
                            `event` int(11) NOT NULL,
                            `user` int(11) NOT NULL
                          ) ENGINE=InnoDB DEFAULT CHARSET=utf8;'
            );
-        
-           //Groups
-           DB::statement('CREATE TABLE IF NOT EXISTS `groups` (
+
+        //Groups
+        DB::statement('CREATE TABLE IF NOT EXISTS `groups` (
                            `idgroups` int(11) NOT NULL,
                            `name` varchar(255) NOT NULL,
                            `location` varchar(255) DEFAULT NULL,
@@ -115,9 +115,9 @@ class InitialiseFixometerDb extends Migration
                            `modified_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
                          ) ENGINE=InnoDB DEFAULT CHARSET=utf8;'
            );
-        
-           //Images
-           DB::statement('CREATE TABLE IF NOT EXISTS `images` (
+
+        //Images
+        DB::statement('CREATE TABLE IF NOT EXISTS `images` (
                            `idimages` int(11) NOT NULL,
                            `path` varchar(255) NOT NULL,
                            `alt_text` text,
@@ -127,9 +127,9 @@ class InitialiseFixometerDb extends Migration
                            `modified_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
                          ) ENGINE=InnoDB DEFAULT CHARSET=utf8;'
            );
-        
-           //Links
-           DB::statement('CREATE TABLE IF NOT EXISTS `links` (
+
+        //Links
+        DB::statement('CREATE TABLE IF NOT EXISTS `links` (
                            `idlinks` int(11) NOT NULL,
                            `title` varchar(255) DEFAULT NULL,
                            `url` varchar(255) NOT NULL,
@@ -137,31 +137,31 @@ class InitialiseFixometerDb extends Migration
                            `modified_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
                          ) ENGINE=InnoDB DEFAULT CHARSET=utf8;'
            );
-        
-           //Permissions
-           DB::statement('CREATE TABLE IF NOT EXISTS `permissions` (
+
+        //Permissions
+        DB::statement('CREATE TABLE IF NOT EXISTS `permissions` (
                            `idpermissions` int(11) NOT NULL,
                            `permission` varchar(150) NOT NULL COMMENT "Manage Users; Manage Restart Party; Manage devices"
                          ) ENGINE=InnoDB DEFAULT CHARSET=utf8;'
            );
-        
-           //Roles
-           DB::statement('CREATE TABLE IF NOT EXISTS `roles` (
+
+        //Roles
+        DB::statement('CREATE TABLE IF NOT EXISTS `roles` (
                            `idroles` int(11) NOT NULL,
                            `role` varchar(45) NOT NULL COMMENT "Needed to assign blocks of permissions to groups of users. 1 = Admin; 2 = Hosts; 3 = Volunteer"
                          ) ENGINE=InnoDB DEFAULT CHARSET=utf8;'
            );
-        
-           //Roles Permissions
-           DB::statement('CREATE TABLE IF NOT EXISTS `roles_permissions` (
+
+        //Roles Permissions
+        DB::statement('CREATE TABLE IF NOT EXISTS `roles_permissions` (
                            `idroles_permissions` int(11) NOT NULL,
                            `role` int(11) NOT NULL,
                            `permission` int(11) NOT NULL
                          ) ENGINE=InnoDB DEFAULT CHARSET=utf8;'
            );
-        
-           //Sessions
-           DB::statement('CREATE TABLE IF NOT EXISTS `sessions` (
+
+        //Sessions
+        DB::statement('CREATE TABLE IF NOT EXISTS `sessions` (
                            `idsessions` int(11) NOT NULL,
                            `session` varchar(255) NOT NULL,
                            `user` int(11) NOT NULL,
@@ -169,9 +169,9 @@ class InitialiseFixometerDb extends Migration
                            `modified_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
                          ) ENGINE=InnoDB DEFAULT CHARSET=utf8;'
            );
-        
-           //Users
-           DB::statement('CREATE TABLE IF NOT EXISTS `users` (
+
+        //Users
+        DB::statement('CREATE TABLE IF NOT EXISTS `users` (
                            `idusers` int(11) NOT NULL,
                            `email` varchar(255) NOT NULL,
                            `password` varchar(60) NOT NULL,
@@ -181,23 +181,23 @@ class InitialiseFixometerDb extends Migration
                            `modified_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
                          ) ENGINE=InnoDB DEFAULT CHARSET=utf8;'
            );
-        
-           //User Groups
-           DB::statement('CREATE TABLE IF NOT EXISTS `users_groups` (
+
+        //User Groups
+        DB::statement('CREATE TABLE IF NOT EXISTS `users_groups` (
                            `idusers_groups` int(11) NOT NULL,
                            `user` int(11) NOT NULL,
                            `group` int(11) NOT NULL
                          ) ENGINE=InnoDB DEFAULT CHARSET=utf8;'
            );
-        
-           //Waste Emission Ratio
-           // DB::statement('CREATE TABLE IF NOT EXISTS `view_waste_emission_ratio` (
-           //                 `Ratio` double(21,4)
-           //               );'
-           // );
-        
-           //XREF
-           DB::statement('CREATE TABLE IF NOT EXISTS `xref` (
+
+        //Waste Emission Ratio
+        // DB::statement('CREATE TABLE IF NOT EXISTS `view_waste_emission_ratio` (
+        //                 `Ratio` double(21,4)
+        //               );'
+        // );
+
+        //XREF
+        DB::statement('CREATE TABLE IF NOT EXISTS `xref` (
                            `idxref` int(11) NOT NULL,
                            `object` int(11) NOT NULL,
                            `object_type` int(11) NOT NULL,
@@ -205,295 +205,295 @@ class InitialiseFixometerDb extends Migration
                            `reference_type` int(11) NOT NULL
                          ) ENGINE=InnoDB DEFAULT CHARSET=utf8;'
            );
-        
-           //Drop table
-           DB::statement('DROP VIEW IF EXISTS `view_waste_emission_ratio`;');
-        
-         //EO Table Creation
-        
-         //Add DB User
-         DB::statement('CREATE VIEW `view_waste_emission_ratio` AS select (round((sum(`categories`.`footprint`) * 0.5),0) / round(sum(`categories`.`weight`),0)) AS `Ratio` from (`devices` join `categories` on((`categories`.`idcategories` = `devices`.`category`))) where (`devices`.`repair_status` = 1);'
+
+        //Drop table
+        DB::statement('DROP VIEW IF EXISTS `view_waste_emission_ratio`;');
+
+        //EO Table Creation
+
+        //Add DB User
+        DB::statement('CREATE VIEW `view_waste_emission_ratio` AS select (round((sum(`categories`.`footprint`) * 0.5),0) / round(sum(`categories`.`weight`),0)) AS `Ratio` from (`devices` join `categories` on((`categories`.`idcategories` = `devices`.`category`))) where (`devices`.`repair_status` = 1);'
          );
-        
-         //Alter Tables
-        
-           //Add
-        
-             //Categories
-             DB::statement('ALTER TABLE `categories`
+
+        //Alter Tables
+
+        //Add
+
+        //Categories
+        DB::statement('ALTER TABLE `categories`
                              ADD PRIMARY KEY (`idcategories`),
                              ADD KEY `idxCategoryRevisions` (`revision`),
                              ADD KEY `idxCategoryCluster` (`cluster`);'
              );
-        
-             //Category Revisions
-             DB::statement('ALTER TABLE `category_revisions`
+
+        //Category Revisions
+        DB::statement('ALTER TABLE `category_revisions`
                              ADD PRIMARY KEY (`idcategory_revisions`);'
              );
-        
-             //Clusters
-             DB::statement('ALTER TABLE `clusters`
+
+        //Clusters
+        DB::statement('ALTER TABLE `clusters`
                              ADD PRIMARY KEY (`idclusters`);'
              );
-        
-             //Devices
-             DB::statement('ALTER TABLE `devices`
+
+        //Devices
+        DB::statement('ALTER TABLE `devices`
                              ADD PRIMARY KEY (`iddevices`),
                              ADD KEY `idxDeviceEvent` (`event`),
                              ADD KEY `idxDeviceCategory` (`category`),
                              ADD KEY `idxDeviceCategoryCreation` (`category_creation`),
                              ADD KEY `idxDeviceUser` (`repaired_by`);'
              );
-        
-             //Events
-             DB::statement('ALTER TABLE `events`
+
+        //Events
+        DB::statement('ALTER TABLE `events`
                              ADD PRIMARY KEY (`idevents`),
                              ADD KEY `idxEventsGroups` (`group`);'
              );
-        
-             //Event Users
-             DB::statement('ALTER TABLE `events_users`
+
+        //Event Users
+        DB::statement('ALTER TABLE `events_users`
                              ADD PRIMARY KEY (`idevents_users`),
                              ADD KEY `idxEventsUsersEvent` (`event`),
                              ADD KEY `idxEventsUsersUser` (`user`);'
              );
-        
-             //Groups
-             DB::statement('ALTER TABLE `groups`
+
+        //Groups
+        DB::statement('ALTER TABLE `groups`
                              ADD PRIMARY KEY (`idgroups`),
                              ADD UNIQUE KEY `name_UNIQUE` (`name`);'
              );
-        
-             //Images
-             DB::statement('ALTER TABLE `images`
+
+        //Images
+        DB::statement('ALTER TABLE `images`
                              ADD PRIMARY KEY (`idimages`);'
              );
-        
-             //Links
-             DB::statement('ALTER TABLE `links`
+
+        //Links
+        DB::statement('ALTER TABLE `links`
                              ADD PRIMARY KEY (`idlinks`);'
              );
-        
-             //Permissions
-             DB::statement('ALTER TABLE `permissions`
+
+        //Permissions
+        DB::statement('ALTER TABLE `permissions`
                              ADD PRIMARY KEY (`idpermissions`);'
              );
-        
-             //Roles
-             DB::statement('ALTER TABLE `roles`
+
+        //Roles
+        DB::statement('ALTER TABLE `roles`
                              ADD PRIMARY KEY (`idroles`);'
              );
-        
-             //Roles Permissions
-             DB::statement('ALTER TABLE `roles_permissions`
+
+        //Roles Permissions
+        DB::statement('ALTER TABLE `roles_permissions`
                              ADD PRIMARY KEY (`idroles_permissions`),
                              ADD KEY `idxRolePermissionRole` (`role`),
                              ADD KEY `idxRolePermissionPermission` (`permission`);'
              );
-        
-             //Sessions
-             DB::statement('ALTER TABLE `sessions`
+
+        //Sessions
+        DB::statement('ALTER TABLE `sessions`
                              ADD PRIMARY KEY (`idsessions`),
                              ADD UNIQUE KEY `session_UNIQUE` (`session`),
                              ADD KEY `idxSessionsUsers` (`user`);'
              );
-        
-             //Users
-             DB::statement('ALTER TABLE `users`
+
+        //Users
+        DB::statement('ALTER TABLE `users`
                              ADD PRIMARY KEY (`idusers`),
                              ADD UNIQUE KEY `email_UNIQUE` (`email`),
                              ADD KEY `idxUserRole` (`role`);'
              );
-        
-             //User Groups
-             DB::statement('ALTER TABLE `users_groups`
+
+        //User Groups
+        DB::statement('ALTER TABLE `users_groups`
                              ADD PRIMARY KEY (`idusers_groups`),
                              ADD KEY `idxUserUsers` (`user`),
                              ADD KEY `idxGroupGroups` (`group`);'
              );
-        
-             //XREF
-             DB::statement('ALTER TABLE `xref`
+
+        //XREF
+        DB::statement('ALTER TABLE `xref`
                              ADD PRIMARY KEY (`idxref`),
                              ADD KEY `idxObject` (`object`),
                              ADD KEY `idxObjectType` (`object_type`),
                              ADD KEY `idxReference` (`reference`),
                              ADD KEY `idxReferenceType` (`reference_type`);'
              );
-        
-           //EO Add
-        
-           //Modify
-        
-             //Categories
-             DB::statement('ALTER TABLE `categories`
+
+        //EO Add
+
+        //Modify
+
+        //Categories
+        DB::statement('ALTER TABLE `categories`
                              MODIFY `idcategories` int(11) NOT NULL AUTO_INCREMENT;'
              );
-        
-             //Category Revisions
-             DB::statement('ALTER TABLE `category_revisions`
+
+        //Category Revisions
+        DB::statement('ALTER TABLE `category_revisions`
                              MODIFY `idcategory_revisions` int(11) NOT NULL AUTO_INCREMENT;'
              );
-        
-             //Clusters
-             DB::statement('ALTER TABLE `clusters`
+
+        //Clusters
+        DB::statement('ALTER TABLE `clusters`
                              MODIFY `idclusters` int(11) NOT NULL AUTO_INCREMENT;'
              );
-        
-             //Devices
-             DB::statement('ALTER TABLE `devices`
+
+        //Devices
+        DB::statement('ALTER TABLE `devices`
                              MODIFY `iddevices` int(11) NOT NULL AUTO_INCREMENT;'
              );
-        
-             //Events
-             DB::statement('ALTER TABLE `events`
+
+        //Events
+        DB::statement('ALTER TABLE `events`
                              MODIFY `idevents` int(11) NOT NULL AUTO_INCREMENT;'
              );
-        
-             //Event Users
-             DB::statement('ALTER TABLE `events_users`
+
+        //Event Users
+        DB::statement('ALTER TABLE `events_users`
                              MODIFY `idevents_users` int(11) NOT NULL AUTO_INCREMENT;'
              );
-        
-             //Groups
-             DB::statement('ALTER TABLE `groups`
+
+        //Groups
+        DB::statement('ALTER TABLE `groups`
                              MODIFY `idgroups` int(11) NOT NULL AUTO_INCREMENT;'
              );
-        
-             //Images
-             DB::statement('ALTER TABLE `images`
+
+        //Images
+        DB::statement('ALTER TABLE `images`
                              MODIFY `idimages` int(11) NOT NULL AUTO_INCREMENT;'
              );
-        
-             //Links
-             DB::statement('ALTER TABLE `links`
+
+        //Links
+        DB::statement('ALTER TABLE `links`
                              MODIFY `idlinks` int(11) NOT NULL AUTO_INCREMENT;'
              );
-        
-             //Permissions
-             DB::statement('ALTER TABLE `permissions`
+
+        //Permissions
+        DB::statement('ALTER TABLE `permissions`
                              MODIFY `idpermissions` int(11) NOT NULL AUTO_INCREMENT;'
              );
-        
-             //Roles
-             DB::statement('ALTER TABLE `roles`
+
+        //Roles
+        DB::statement('ALTER TABLE `roles`
                              MODIFY `idroles` int(11) NOT NULL AUTO_INCREMENT;'
              );
-        
-             //Roles Permissions
-             DB::statement('ALTER TABLE `roles_permissions`
+
+        //Roles Permissions
+        DB::statement('ALTER TABLE `roles_permissions`
                              MODIFY `idroles_permissions` int(11) NOT NULL AUTO_INCREMENT;'
              );
-        
-             //Sessions
-             DB::statement('ALTER TABLE `sessions`
+
+        //Sessions
+        DB::statement('ALTER TABLE `sessions`
                              MODIFY `idsessions` int(11) NOT NULL AUTO_INCREMENT;'
              );
-        
-             //Users
-             DB::statement('ALTER TABLE `users`
+
+        //Users
+        DB::statement('ALTER TABLE `users`
                              MODIFY `idusers` int(11) NOT NULL AUTO_INCREMENT;'
              );
-        
-             //User Groups
-             DB::statement('ALTER TABLE `users_groups`
+
+        //User Groups
+        DB::statement('ALTER TABLE `users_groups`
                              MODIFY `idusers_groups` int(11) NOT NULL AUTO_INCREMENT;'
              );
-        
-             //XREF
-             DB::statement('ALTER TABLE `xref`
+
+        //XREF
+        DB::statement('ALTER TABLE `xref`
                              MODIFY `idxref` int(11) NOT NULL AUTO_INCREMENT;'
              );
-        
-           //EO Modify
-        
-           //Foreign Keys
-        
-             //Categories
-             DB::statement('ALTER TABLE `categories`
+
+        //EO Modify
+
+        //Foreign Keys
+
+        //Categories
+        DB::statement('ALTER TABLE `categories`
                              ADD CONSTRAINT `fkCategoryCluster` FOREIGN KEY (`cluster`) REFERENCES `clusters` (`idclusters`) ON DELETE NO ACTION ON UPDATE NO ACTION,
                              ADD CONSTRAINT `fkCategoryRevisions` FOREIGN KEY (`revision`) REFERENCES `category_revisions` (`idcategory_revisions`) ON DELETE NO ACTION ON UPDATE NO ACTION;'
              );
-        
-             //Devices
-             DB::statement('ALTER TABLE `devices`
+
+        //Devices
+        DB::statement('ALTER TABLE `devices`
                              ADD CONSTRAINT `fkDeviceCategory` FOREIGN KEY (`category`) REFERENCES `categories` (`idcategories`) ON DELETE NO ACTION ON UPDATE NO ACTION,
                              ADD CONSTRAINT `fkDeviceCategoryCreation` FOREIGN KEY (`category_creation`) REFERENCES `categories` (`idcategories`) ON DELETE NO ACTION ON UPDATE NO ACTION,
                              ADD CONSTRAINT `fkDeviceEvent` FOREIGN KEY (`event`) REFERENCES `events` (`idevents`) ON DELETE NO ACTION ON UPDATE NO ACTION,
                              ADD CONSTRAINT `fkDeviceUser` FOREIGN KEY (`repaired_by`) REFERENCES `users` (`idusers`) ON DELETE NO ACTION ON UPDATE NO ACTION;'
              );
-        
-             //Events
-             DB::statement('ALTER TABLE `events`
+
+        //Events
+        DB::statement('ALTER TABLE `events`
                              ADD CONSTRAINT `fkEventsGroups` FOREIGN KEY (`group`) REFERENCES `groups` (`idgroups`) ON DELETE NO ACTION ON UPDATE NO ACTION;'
              );
-        
-             //Event Users
-             DB::statement('ALTER TABLE `events_users`
+
+        //Event Users
+        DB::statement('ALTER TABLE `events_users`
                              ADD CONSTRAINT `fkEventsUsersEvent` FOREIGN KEY (`event`) REFERENCES `events` (`idevents`) ON DELETE NO ACTION ON UPDATE NO ACTION,
                              ADD CONSTRAINT `fkEventsUsersUser` FOREIGN KEY (`user`) REFERENCES `users` (`idusers`) ON DELETE NO ACTION ON UPDATE NO ACTION;'
              );
-        
-             //Role Permissions
-             DB::statement('ALTER TABLE `roles_permissions`
+
+        //Role Permissions
+        DB::statement('ALTER TABLE `roles_permissions`
                              ADD CONSTRAINT `fkRolePermissionPermission` FOREIGN KEY (`permission`) REFERENCES `permissions` (`idpermissions`) ON DELETE NO ACTION ON UPDATE NO ACTION,
                              ADD CONSTRAINT `fkRolePermissionRole` FOREIGN KEY (`role`) REFERENCES `roles` (`idroles`) ON DELETE NO ACTION ON UPDATE NO ACTION;'
              );
-        
-             //Sessions
-             DB::statement('ALTER TABLE `sessions`
+
+        //Sessions
+        DB::statement('ALTER TABLE `sessions`
                              ADD CONSTRAINT `fkSessionsUsers` FOREIGN KEY (`user`) REFERENCES `users` (`idusers`) ON DELETE NO ACTION ON UPDATE NO ACTION;'
              );
-        
-             //Users
-             DB::statement('ALTER TABLE `users`
+
+        //Users
+        DB::statement('ALTER TABLE `users`
                              ADD CONSTRAINT `fkUserRole` FOREIGN KEY (`role`) REFERENCES `roles` (`idroles`) ON DELETE NO ACTION ON UPDATE NO ACTION;'
              );
-        
-             //User Groups
-             DB::statement('ALTER TABLE `users_groups`
+
+        //User Groups
+        DB::statement('ALTER TABLE `users_groups`
                              ADD CONSTRAINT `fkGroupGroups` FOREIGN KEY (`group`) REFERENCES `groups` (`idgroups`) ON DELETE CASCADE ON UPDATE NO ACTION,
                              ADD CONSTRAINT `fkUserUsers` FOREIGN KEY (`user`) REFERENCES `users` (`idusers`) ON DELETE CASCADE ON UPDATE NO ACTION;'
              );
-        
-           //EO Foreign Keys
-        
-         //EO Alter Tables
-        
-         //Insert Into Tables
-        
-           //Category Revisions
-           DB::statement('INSERT INTO `category_revisions` (`idcategory_revisions`, `revision`, `created_at`, `modified_at`) VALUES
+
+        //EO Foreign Keys
+
+        //EO Alter Tables
+
+        //Insert Into Tables
+
+        //Category Revisions
+        DB::statement('INSERT INTO `category_revisions` (`idcategory_revisions`, `revision`, `created_at`, `modified_at`) VALUES
                            (1, "First Revision", NULL, "2015-05-19 08:15:03");'
            );
-        
-           //Clusters
-           DB::statement('INSERT INTO `clusters` (`idclusters`, `name`) VALUES
+
+        //Clusters
+        DB::statement('INSERT INTO `clusters` (`idclusters`, `name`) VALUES
                            (1, "Computers and Home Office"),
                            (2, "Electronic Gadgets"),
                            (3, "Home Entertainment"),
                            (4, "Kitchen and Household Items");'
            );
-        
-           //Permissions
-           DB::statement('INSERT INTO `permissions` (`idpermissions`, `permission`) VALUES
+
+        //Permissions
+        DB::statement('INSERT INTO `permissions` (`idpermissions`, `permission`) VALUES
                            (1, "Create User"),
                            (2, "Edit User"),
                            (3, "Delete User"),
                            (4, "Create Party");'
            );
-        
-           //Roles
-           DB::statement('INSERT INTO `roles` (`idroles`, `role`) VALUES
+
+        //Roles
+        DB::statement('INSERT INTO `roles` (`idroles`, `role`) VALUES
                            (1, "Root"),
                            (2, "Administrator"),
                            (3, "Host"),
                            (4, "Restarter"),
                            (5, "Guest");'
            );
-        
-           //Categories
-           DB::statement('INSERT INTO `categories` (`idcategories`, `name`, `weight`, `footprint`, `footprint_reliability`, `lifecycle`, `lifecycle_reliability`, `extendend_lifecycle`, `extendend_lifecycle_reliability`, `revision`, `cluster`) VALUES
+
+        //Categories
+        DB::statement('INSERT INTO `categories` (`idcategories`, `name`, `weight`, `footprint`, `footprint_reliability`, `lifecycle`, `lifecycle_reliability`, `extendend_lifecycle`, `extendend_lifecycle_reliability`, `revision`, `cluster`) VALUES
                            (11, "Desktop computer", 9.15, 398.4, 5, NULL, NULL, NULL, NULL, 1, 1),
                            (12, "Flat screen 15-17\"", 2.7, 72.4, 2, NULL, NULL, NULL, NULL, 1, 1),
                            (13, "Flat screen 19-20\"", 3.72, 102.93, 5, NULL, NULL, NULL, NULL, 1, 1),
@@ -533,7 +533,6 @@ class InitialiseFixometerDb extends Migration
            );
 
         //EO Insert Into Tables
-
     }
 
     /**

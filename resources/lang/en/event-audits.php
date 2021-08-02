@@ -1,12 +1,10 @@
 <?php
 
-return array (
+return [
   'unavailable_audits' => 'No changes have been made to this event!',
-  'created' => 
-  array (
+  'created' => [
     'metadata' => 'On :audit_created_at, :user_name created record <strong>:audit_url</strong>',
-    'modified' => 
-    array (
+    'modified' => [
       'group' => '<strong>Event Group ID</strong> set as "<strong>:new</strong>"',
       'event_date' => '<strong>Event Date</strong> set as "<strong>:new</strong>"',
       'start' => '<strong>Event Start Time</strong> set as "<strong>:new</strong>"',
@@ -21,13 +19,11 @@ return array (
       'hours' => '<strong>Event Hours</strong> set as "<strong>:new</strong>"',
       'idevents' => '<strong>Event ID</strong> set as "<strong>:new</strong>"',
       'wordpress_post_id' => '<strong>Wordpress post ID</strong> set as "<strong>:new</strong>"',
-    ),
-  ),
-  'updated' => 
-  array (
+    ],
+  ],
+  'updated' => [
     'metadata' => 'On :audit_created_at, :user_name updated record <strong>:audit_url</strong>',
-    'modified' => 
-    array (
+    'modified' => [
       'group' => '<strong>Event Group ID</strong> was modified from "<strong>:old</strong>" to "<strong>:new</strong>"',
       'event_date' => '<strong>Event Date</strong> was modified from "<strong>:old</strong>" to "<strong>:new</strong>"',
       'start' => '<strong>Event Start Time</strong> was modified from "<strong>:old</strong>" to "<strong>:new</strong>"',
@@ -42,6 +38,6 @@ return array (
       'hours' => '<strong>Event Hours</strong> was modified from "<strong>:old</strong>" to "<strong>:new</strong>"',
       'wordpress_post_id' => '<strong>Wordpress post ID</strong> was modified from "<strong>:old</strong>" to "<strong>:new</strong>"',
       'devices_updated_at' => '<strong>Event Devices Updated At</strong> was modified from "<strong>:old</strong>" to "<strong>:new</strong>"',
-    ),
-  ),
-);
+    ],
+  ],
+];

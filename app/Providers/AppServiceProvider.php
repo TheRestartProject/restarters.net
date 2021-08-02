@@ -3,15 +3,14 @@
 namespace App\Providers;
 
 use App\EventsUsers;
-
+use App\Helpers\Geocoder;
 use App\Party;
 use Auth;
 use Cache;
-use App\Helpers\Geocoder;
-use FixometerHelper;
+use App\Helpers\Fixometer;
 use Illuminate\Support\ServiceProvider;
+use OwenIt\Auditing\Models\Audit;
 use Schema;
-use \OwenIt\Auditing\Models\Audit;
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -40,8 +39,8 @@ class AppServiceProvider extends ServiceProvider
         view()->composer('layouts.header', function ($view) {
             if (Auth::check()) {
                 if (Cache::has('talk_notification_'.Auth::user()->username)) {
-                    $total_talk_notifications = Cache::get('talk_notification_' . Auth::user()->username);
-                } else if ( ! config('restarters.features.discourse_integration')) {
+                    $total_talk_notifications = Cache::get('talk_notification_'.Auth::user()->username);
+                } elseif (! config('restarters.features.discourse_integration')) {
                     // If we don't have Discourse integration, we will still render the badge, but always have no
                     // notifications.
                     $total_talk_notifications = 0;
@@ -57,7 +56,7 @@ class AppServiceProvider extends ServiceProvider
                                 $total_talk_notifications++;
                             }
                         }
-                        Cache::put('talk_notification_'.Auth::user()->username, $total_talk_notifications, 10);
+                        Cache::put('talk_notification_'.Auth::user()->username, $total_talk_notifications, 600);
                     } else {
                         $total_talk_notifications = null;
                     }

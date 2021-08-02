@@ -4,22 +4,21 @@ namespace Tests\Feature;
 
 use App\EventsUsers;
 use App\Group;
+use App\Helpers\Geocoder;
 use App\Network;
+use App\Notifications\NotifyRestartersOfNewEvent;
 use App\Party;
 use App\User;
 use App\UserGroups;
-use App\Helpers\Geocoder;
-use App\Notifications\NotifyRestartersOfNewEvent;
-
-use DB;
 use Carbon\Carbon;
-use Tests\TestCase;
-use Illuminate\Support\Facades\Notification;
+use DB;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Facades\Notification;
+use Tests\TestCase;
 
 class OnlineEventsTests extends TestCase
 {
-    public function setUp()
+    protected function setUp(): void
     {
         parent::setUp();
 

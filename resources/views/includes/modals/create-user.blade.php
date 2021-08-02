@@ -28,7 +28,7 @@
               <label for="inputRole">User role:</label>
               <select class="form-control" id="inputRole" name="role">
                 <option value="" selected>Choose role</option>
-                @foreach (FixometerHelper::allRoles() as $role)
+                @foreach (App\Helpers\Fixometer::allRoles() as $role)
                   <option value="{{ $role->idroles }}">{{ $role->role }}</option>
                 @endforeach
               </select>

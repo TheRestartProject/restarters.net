@@ -3,16 +3,15 @@
 namespace Tests\Feature;
 
 use App\Group;
+use App\Helpers\Geocoder;
 use App\Network;
 use App\Notifications\AdminModerationEvent;
+use App\Notifications\NotifyRestartersOfNewEvent;
 use App\Party;
 use App\User;
-use App\Helpers\Geocoder;
-use App\Notifications\NotifyRestartersOfNewEvent;
-
 use DB;
-use Tests\TestCase;
 use Illuminate\Support\Facades\Notification;
+use Tests\TestCase;
 
 class GeocoderMock extends Geocoder
 {
@@ -31,7 +30,7 @@ class GeocoderMock extends Geocoder
 
 class CreateEventTest extends TestCase
 {
-    public function setUp()
+    protected function setUp(): void
     {
         parent::setUp();
 
@@ -83,12 +82,12 @@ class CreateEventTest extends TestCase
         $this->assertDatabaseHas('events', $eventAttributes);
 
         // Check that we can view the event, and that it shows the creation success message.
-        $this->get('/party/view/' . Party::latest()->first()->idevents)->
+        $this->get('/party/view/'.Party::latest()->first()->idevents)->
             assertSee($eventAttributes['venue'])->
             assertSee(__('events.created_success_message'));
 
         // Now check whether the event shows/doesn't show correctly for different user roles.
-        list ($role, $seeEvent, $canModerate) = $data;
+        list($role, $seeEvent, $canModerate) = $data;
 
         if ($role != 'Host') {
             // Need to act as someone else.
@@ -96,7 +95,7 @@ class CreateEventTest extends TestCase
         }
 
         // Check both the group page, and the top-level events page.
-        foreach (['/group/view/' . $group->idgroups, '/party'] as $url) {
+        foreach (['/group/view/'.$group->idgroups, '/party'] as $url) {
             $response = $this->get($url);
 
             if ($seeEvent) {
@@ -110,33 +109,30 @@ class CreateEventTest extends TestCase
                     $response->assertSee('canModerate&quot;:false');
                 }
             } else {
-                $key = $url == '/party' ? ':initial-events' : ':events';
-                $this->assertVueProperties($response, [
-                    [
-                        $key => '[]'
-                    ]
-                ]);
+                $response->assertSee('requiresModeration&quot;:true');
             }
         }
     }
 
-    public function roles() {
+    public function roles()
+    {
         return [
             // Hosts can see but not moderate.
-            [ [ 'Host', TRUE, FALSE ] ],
+            [['Host', true, false]],
 
             // Nobody else can see the event in the list of events.
             //
             // Administrators and NetworkCoordinators arguably should be able to, but that's the current function.
             // They will see it in the lists of events to moderate, but that's not what we are testing here.
-            [ [ 'Restarter', FALSE, FALSE  ] ],
-            [ [ 'Administrator', FALSE, FALSE  ] ],
-            [ [ 'NetworkCoordinator', FALSE, FALSE  ] ]
+            [['Restarter', false, false]],
+            [['Administrator', false, false]],
+            [['NetworkCoordinator', false, false]],
         ];
     }
 
     /** @test */
-    public function a_host_can_duplicate_an_event() {
+    public function a_host_can_duplicate_an_event()
+    {
         $this->withoutExceptionHandling();
 
         // arrange
@@ -151,11 +147,11 @@ class CreateEventTest extends TestCase
         $party = factory(Party::class)->create([
            'group' => $group->idgroups,
            'latitude'=>'1',
-           'longitude'=>'1'
+           'longitude'=>'1',
        ]);
 
         // Duplicate it - should bring up the page to add a new event, with some info from the first one.
-        $response = $this->get('/party/duplicate/' . $party->idevents);
+        $response = $this->get('/party/duplicate/'.$party->idevents);
         $response->assertSee(__('events.add_new_event'));
         $response->assertSee($party->description);
     }
@@ -210,7 +206,7 @@ class CreateEventTest extends TestCase
         $group->makeMemberAHost($host);
         $group->addVolunteer($restarter);
 
-        $eventData = factory(Party::class)->raw(['group' => $group->idgroups, 'event_date' => '2030-01-01', 'latitude'=>'1', 'longitude'=>'1' ]);
+        $eventData = factory(Party::class)->raw(['group' => $group->idgroups, 'event_date' => '2030-01-01', 'latitude'=>'1', 'longitude'=>'1']);
 
         // act
         $response = $this->post('/party/create/', $eventData);
@@ -316,11 +312,11 @@ class CreateEventTest extends TestCase
         // Remove the host from the event
         $this->post('/party/remove-volunteer/', [
             'user_id' => $host->id,
-            'event_id' => $party->idevents
+            'event_id' => $party->idevents,
         ])->assertStatus(200);
 
         // Assert that we see the host in the list of volunteers to add to the event.
-        $this->get('/party/view/' . $party->idevents)->assertSeeInOrder(['Group member', '<option value="' . $host->id . '">', '</div>']);
+        $this->get('/party/view/'.$party->idevents)->assertSeeInOrder(['Group member', '<option value="'.$host->id.'">', '</div>']);
 
         // Assert we can add them back in.
 

@@ -1,6 +1,6 @@
 <?php
 
-return array (
+return [
   'biography' => 'Biografie',
   'change_photo' => 'Foto vervangen',
   'delete_account' => 'Account verwijderen',
@@ -13,4 +13,4 @@ return array (
   'panel_title_2' => 'E-mails en meldingen',
   'profile_picture' => 'Profielfoto',
   'skills' => 'Competenties',
-);
+];

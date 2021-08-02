@@ -2,8 +2,8 @@
 
 namespace App\Services;
 
-use Illuminate\Support\Facades\Log;
 use Auth;
+use Illuminate\Support\Facades\Log;
 
 class DiscourseService
 {
@@ -14,16 +14,16 @@ class DiscourseService
         try {
             $client = app('discourse-client');
 
-            $endpoint = $tag ? "/tag/{$tag}/l/latest.json" : "/latest.json";
+            $endpoint = $tag ? "/tag/{$tag}/l/latest.json" : '/latest.json';
             $response = $client->request('GET', $endpoint);
             $discourseResult = json_decode($response->getBody());
 
             $topics = $discourseResult->topic_list->topics;
-            if (!empty($numberOfTopics)) {
+            if (! empty($numberOfTopics)) {
                 $topics = array_slice($topics, 0, $numberOfTopics, true);
             }
 
-            $endpoint = "/site.json";
+            $endpoint = '/site.json';
             $response = $client->request('GET', $endpoint);
             $discourseResult = json_decode($response->getBody());
             $categories = $discourseResult->categories;
@@ -36,7 +36,7 @@ class DiscourseService
                 }
             }
         } catch (\Exception $ex) {
-            Log::error("Error retrieving discussion topics" . $ex->getMessage());
+            Log::error('Error retrieving discussion topics'.$ex->getMessage());
         }
 
         return $topics;
@@ -70,7 +70,7 @@ class DiscourseService
                 $this->avoidRateLimiting();
             }
         } catch (\Exception $ex) {
-            Log::error("Error retrieving users by badge: " . $ex->getMessage());
+            Log::error('Error retrieving users by badge: '.$ex->getMessage());
         }
 
         return $externalUserIds;
@@ -84,35 +84,35 @@ class DiscourseService
         sleep(1);
     }
 
-
-    public function addUserToPrivateMessage($threadid, $addBy, $addUser) {
+    public function addUserToPrivateMessage($threadid, $addBy, $addUser)
+    {
         Log::info("Add user to private message $threadid, $addBy, $addUser");
 
         $client = app('discourse-client', [
-            'username' => $addBy
+            'username' => $addBy,
         ]);
 
         $params = [
             'user' => $addUser,
-            'custom_message' => __('events.discourse_invite')
+            'custom_message' => __('events.discourse_invite'),
         ];
 
         $endpoint = "/t/$threadid/invite";
 
-        Log::info('Adding to private message: ' . json_encode($params));
+        Log::info('Adding to private message: '.json_encode($params));
         $response = $client->request(
             'POST',
             $endpoint,
             [
-                'form_params' => $params
+                'form_params' => $params,
             ]
         );
 
-        Log::info('Response status: ' . $response->getStatusCode());
-        Log::info('Response body: ' . $response->getBody());
+        Log::info('Response status: '.$response->getStatusCode());
+        Log::info('Response body: '.$response->getBody());
 
-        if ( ! $response->getStatusCode() === 200) {
-            Log::error("Could not add to private message ($threadid, $addBy, $addUser:" . $response->getReasonPhrase());
+        if (! $response->getStatusCode() === 200) {
+            Log::error("Could not add to private message ($threadid, $addBy, $addUser:".$response->getReasonPhrase());
         }
     }
 }

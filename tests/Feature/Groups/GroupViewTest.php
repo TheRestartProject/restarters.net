@@ -5,12 +5,14 @@ namespace Tests\Feature\Groups;
 use App\Device;
 use App\Party;
 use App\Role;
-use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Carbon\Carbon;
+use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Tests\TestCase;
 
-class GroupViewTest extends TestCase {
-    public function testBasic() {
+class GroupViewTest extends TestCase
+{
+    public function testBasic()
+    {
         // Check we can create a group and view it.
         $this->loginAsTestUser(Role::ADMINISTRATOR);
         $id = $this->createGroup();
@@ -25,17 +27,19 @@ class GroupViewTest extends TestCase {
                 ':can-perform-delete' => 'true',
                 ':top-devices' => '[]',
                 ':events' => '[]',
-            ]
+            ],
         ]);
     }
 
-    public function testInvalidGroup() {
+    public function testInvalidGroup()
+    {
         $this->loginAsTestUser(Role::RESTARTER);
         $this->expectException(NotFoundHttpException::class);
-        $this->get("/group/view/undefined");
+        $this->get('/group/view/undefined');
     }
 
-    public function testCanDelete() {
+    public function testCanDelete()
+    {
         $this->loginAsTestUser(Role::ADMINISTRATOR);
         $id = $this->createGroup();
         $this->assertNotNull($id);
@@ -43,7 +47,7 @@ class GroupViewTest extends TestCase {
         // Create a past event
         $event = factory(Party::class)->states('moderated')->create([
                                                                         'event_date' => Carbon::yesterday(),
-                                                                        'group' => $id
+                                                                        'group' => $id,
                                                                     ]);
 
         // Groups are deletable unless they have an event with a device.
@@ -53,7 +57,7 @@ class GroupViewTest extends TestCase {
                 ':idgroups' => $id,
                 ':can-see-delete' => 'true',
                 ':can-perform-delete' => 'true',
-            ]
+            ],
         ]);
 
         $response = $this->post('/device/create', factory(Device::class)->raw([
@@ -66,7 +70,7 @@ class GroupViewTest extends TestCase {
                 ':idgroups' => $id,
                 ':can-see-delete' => 'true',
                 ':can-perform-delete' => 'false',
-            ]
+            ],
         ]);
 
         // Only administrators can delete.
@@ -79,7 +83,7 @@ class GroupViewTest extends TestCase {
                     ':idgroups' => $id,
                     ':can-see-delete' => 'false',
                     ':can-perform-delete' => 'false',
-                ]
+                ],
             ]);
         }
     }

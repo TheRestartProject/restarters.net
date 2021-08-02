@@ -4,10 +4,9 @@ namespace Tests\Feature;
 
 use App\Category;
 use App\Device;
-
 use DB;
-use Tests\TestCase;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Tests\TestCase;
 
 class DeviceStatsTest extends TestCase
 {

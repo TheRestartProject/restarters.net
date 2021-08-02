@@ -4,21 +4,20 @@ namespace Tests\Feature;
 
 use App\Events\UserUpdated;
 use App\User;
-
-use DB;
 use Carbon\Carbon;
-use Tests\TestCase;
-use Illuminate\Support\Facades\Event;
+use DB;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Facades\Event;
+use Tests\TestCase;
 
 class EditProfileTests extends TestCase
 {
-    public function setUp()
+    protected function setUp(): void
     {
         parent::setUp();
-        DB::statement("SET foreign_key_checks=0");
+        DB::statement('SET foreign_key_checks=0');
         User::truncate();
-        DB::statement("SET foreign_key_checks=1");
+        DB::statement('SET foreign_key_checks=1');
     }
 
     /** @test */
@@ -65,7 +64,8 @@ class EditProfileTests extends TestCase
 
     /** test */
     // Check that we can have three digit lat/lngs.
-    public function test_three_digit_lat_lng() {
+    public function test_three_digit_lat_lng()
+    {
         $this->withoutExceptionHandling();
 
         $user = factory(User::class)->create();
@@ -80,5 +80,37 @@ class EditProfileTests extends TestCase
         $user = User::where('id', $userId)->first();
         $this->assertEquals(123.456, $user->latitude);
         $this->assertEquals(132.654, $user->longitude);
+    }
+
+    /** test */
+    // Check that we can update the location.
+    public function test_location_update()
+    {
+        $user = factory(User::class)->create();
+        $this->actingAs($user);
+
+        $this->post('/profile/edit-info', [
+            'name' => $user->name,
+            'email' => $user->email,
+            'age' => $user->age,
+            'country' => 'GBR',
+            'townCity' => 'London',
+        ]);
+
+        $user = $user->fresh();
+        $this->assertEquals(51.5073509, $user->latitude);
+        $this->assertEquals(-0.1277583, $user->longitude);
+
+        $this->post('/profile/edit-info', [
+            'name' => $user->name,
+            'email' => $user->email,
+            'age' => $user->age,
+            'country' => 'GBR',
+            'townCity' => 'zzzzzzz',
+        ]);
+
+        $user = $user->fresh();
+        $this->assertNull($user->latitude);
+        $this->assertNull($user->longitude);
     }
 }

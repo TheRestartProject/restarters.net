@@ -2,58 +2,60 @@
 
 namespace Tests\Feature;
 
-use App\Device;
 use App\Category;
+use App\Device;
 use App\Group;
 use App\Party;
 use DB;
-use Tests\TestCase;
-use Illuminate\Foundation\Testing\WithFaker;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Foundation\Testing\WithFaker;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Str;
+use Tests\TestCase;
 
 /**
  * Miscellaneous routines for checking stuff
  * Do not run in suite as some are designed to fail
  */
-class ExampleTest extends TestCase {
-
-    public function setUp() {
+class ExampleTest extends TestCase
+{
+    protected function setUp(): void
+    {
         parent::setUp();
-        DB::statement("SET foreign_key_checks=0");
+        DB::statement('SET foreign_key_checks=0');
         Party::truncate();
         Group::truncate();
-        Device::truncate();        
+        Device::truncate();
     }
 
     /** @test */
-    public function test_sql_not_in() {
+    public function test_sql_not_in()
+    {
         // testing execution time with enormous "NOT IN" expression
         DB::table('groups')->insert([
             'name' => Str::random(40),
         ]);
         DB::table('events')->insert([
             'group' => 1,
-        ]);        
-        for ($i=1;$i<=1000;$i++) {
+        ]);
+        for ($i = 1; $i <= 1000; $i++) {
             DB::table('devices')->insert([
                 'event' => 1,
-                'category' => rand(1,46),
+                'category' => rand(1, 46),
                 'problem' => Str::random(40),
-                'repair_status' => rand(1,3),
+                'repair_status' => rand(1, 3),
             ]);
         }
-        $x = array_keys(array_fill(1,1000,0));
+        $x = array_keys(array_fill(1, 1000, 0));
         shuffle($x);
-        $t = rand(1,999);
+        $t = rand(1, 999);
         logger($t);
-        $r = str_replace("$t,", '', join(',', $x));
-        $sql = "SELECT iddevices FROM devices WHERE iddevices NOT IN ($r) ORDER BY rand() LIMIT 1";        
+        $r = str_replace("$t,", '', implode(',', $x));
+        $sql = "SELECT iddevices FROM devices WHERE iddevices NOT IN ($r) ORDER BY rand() LIMIT 1";
         logger($sql);
-        for ($i=1;$i<=10;$i++) {            
+        for ($i = 1; $i <= 10; $i++) {
             $foo = DB::select($sql); // (0.03 seconds)
-            logger(print_r($foo,1));
+            logger(print_r($foo, 1));
         }
     }
 
@@ -66,77 +68,77 @@ class ExampleTest extends TestCase {
      */
 
     /** @test */
-    public function create_table_1() {
-
+    public function create_table_1()
+    {
         $data = $this->_setup_data();
 
-        $sql = "SELECT
+        $sql = 'SELECT
 d.iddevices,
 d.repair_status
 FROM devices d
 GROUP BY d.iddevices
 HAVING
 (repair_status = 1)
-";
+';
         $result = DB::select($sql);
 
         logger(print_r($result, 1));
 
         $this->assertTrue(is_array($result));
 
-        DB::statement("DROP TABLE IF EXISTS `test_temporary`");
+        DB::statement('DROP TABLE IF EXISTS `test_temporary`');
 
         DB::statement("CREATE TABLE IF NOT EXISTS `test_temporary` AS $sql");
 
-        DB::statement("ALTER TABLE `test_temporary` ADD PRIMARY KEY(`iddevices`);");
+        DB::statement('ALTER TABLE `test_temporary` ADD PRIMARY KEY(`iddevices`);');
 
-        $result = DB::select("SELECT * FROM `test_temporary`");
+        $result = DB::select('SELECT * FROM `test_temporary`');
 
         logger(print_r($result, 1));
         $this->assertTrue(is_array($result));
 
-        DB::statement("DROP TABLE IF EXISTS `test_temporary`");
+        DB::statement('DROP TABLE IF EXISTS `test_temporary`');
     }
 
     /** @test */
-    public function create_table_1a() {
-
+    public function create_table_1a()
+    {
         $data = $this->_setup_data();
 
-        $sql = "SELECT
+        $sql = 'SELECT
 d.iddevices,
 d.repair_status
 FROM devices d
 GROUP BY d.iddevices
 HAVING
 (repair_status = 1)
-";
+';
         $result = DB::select($sql);
 
         logger(print_r($result, 1));
 
         $this->assertTrue(is_array($result));
 
-        DB::statement("DROP TABLE IF EXISTS `test_temporary`");
+        DB::statement('DROP TABLE IF EXISTS `test_temporary`');
 
         DB::statement("CREATE TABLE IF NOT EXISTS `test_temporary` AS ($sql)");
 
-        DB::statement("ALTER TABLE `test_temporary` ADD PRIMARY KEY(`iddevices`);");
+        DB::statement('ALTER TABLE `test_temporary` ADD PRIMARY KEY(`iddevices`);');
 
-        $result = DB::select("SELECT * FROM `test_temporary`");
+        $result = DB::select('SELECT * FROM `test_temporary`');
 
         logger(print_r($result, 1));
         $this->assertTrue(is_array($result));
 
-        DB::statement("DROP TABLE IF EXISTS `test_temporary`");
+        DB::statement('DROP TABLE IF EXISTS `test_temporary`');
     }
 
     /** @test */
-    public function create_table_2() {
-
+    public function create_table_2()
+    {
         $data = $this->_setup_data();
 
-        $sql = "SELECT
+        $sql = 'SELECT
 d.iddevices,
 d.repair_status
 FROM devices d
@@ -151,34 +153,34 @@ FROM devices d
 GROUP BY d.iddevices
 HAVING
 (repair_status = 2)
-";
+';
         $result = DB::select($sql);
 
         logger(print_r($result, 1));
 
         $this->assertTrue(is_array($result));
 
-        DB::statement("DROP TABLE IF EXISTS `test_temporary`");
+        DB::statement('DROP TABLE IF EXISTS `test_temporary`');
 
         DB::statement("CREATE TABLE IF NOT EXISTS `test_temporary` AS $sql");
 
-        DB::statement("ALTER TABLE `test_temporary` ADD PRIMARY KEY(`iddevices`);");
+        DB::statement('ALTER TABLE `test_temporary` ADD PRIMARY KEY(`iddevices`);');
 
-        $result = DB::select("SELECT * FROM `test_temporary`");
+        $result = DB::select('SELECT * FROM `test_temporary`');
 
         logger(print_r($result, 1));
 
         $this->assertTrue(is_array($result));
 
-        DB::statement("DROP TABLE IF EXISTS `test_temporary`");
+        DB::statement('DROP TABLE IF EXISTS `test_temporary`');
     }
 
     /** @test */
-    public function create_table_2a() {
-
+    public function create_table_2a()
+    {
         $data = $this->_setup_data();
 
-        $sql = "SELECT
+        $sql = 'SELECT
 d.iddevices,
 d.repair_status
 FROM devices d
@@ -193,34 +195,34 @@ FROM devices d
 GROUP BY d.iddevices
 HAVING
 (repair_status = 2)
-";
+';
         $result = DB::select($sql);
 
         logger(print_r($result, 1));
 
         $this->assertTrue(is_array($result));
 
-        DB::statement("DROP TABLE IF EXISTS `test_temporary`");
+        DB::statement('DROP TABLE IF EXISTS `test_temporary`');
 
         DB::statement("CREATE TABLE IF NOT EXISTS `test_temporary` AS ($sql)");
 
-        DB::statement("ALTER TABLE `test_temporary` ADD PRIMARY KEY(`iddevices`);");
+        DB::statement('ALTER TABLE `test_temporary` ADD PRIMARY KEY(`iddevices`);');
 
-        $result = DB::select("SELECT * FROM `test_temporary`");
+        $result = DB::select('SELECT * FROM `test_temporary`');
 
         logger(print_r($result, 1));
 
         $this->assertTrue(is_array($result));
 
-        DB::statement("DROP TABLE IF EXISTS `test_temporary`");
+        DB::statement('DROP TABLE IF EXISTS `test_temporary`');
     }
 
     /** @test */
-    public function create_table_3() {
-
+    public function create_table_3()
+    {
         $data = $this->_setup_data();
 
-        $sql = "
+        $sql = '
 SELECT
 r2.iddevices,
 r2.repair_status
@@ -241,34 +243,34 @@ HAVING
 GROUP BY r2.iddevices
 HAVING
 (r2.repair_status < 2)
-";
+';
         $result = DB::select($sql);
 
         logger(print_r($result, 1));
 
         $this->assertTrue(is_array($result));
 
-        DB::statement("DROP TABLE IF EXISTS `test_temporary`");
+        DB::statement('DROP TABLE IF EXISTS `test_temporary`');
 
         DB::statement("CREATE TABLE IF NOT EXISTS `test_temporary` AS $sql");
 
-        DB::statement("ALTER TABLE `test_temporary` ADD PRIMARY KEY(`iddevices`);");
+        DB::statement('ALTER TABLE `test_temporary` ADD PRIMARY KEY(`iddevices`);');
 
-        $result = DB::select("SELECT * FROM `test_temporary`");
+        $result = DB::select('SELECT * FROM `test_temporary`');
 
         logger(print_r($result, 1));
 
         $this->assertTrue(is_array($result));
 
-        DB::statement("DROP TABLE IF EXISTS `test_temporary`");
+        DB::statement('DROP TABLE IF EXISTS `test_temporary`');
     }
 
     /** @test */
-    public function create_table_3a() {
-
+    public function create_table_3a()
+    {
         $data = $this->_setup_data();
 
-        $sql = "
+        $sql = '
 SELECT
 r2.iddevices,
 r2.repair_status
@@ -289,33 +291,33 @@ HAVING
 GROUP BY r2.iddevices
 HAVING
 (r2.repair_status < 2)
-";
+';
         $result = DB::select($sql);
 
         logger(print_r($result, 1));
 
         $this->assertTrue(is_array($result));
 
-        DB::statement("DROP TABLE IF EXISTS `test_temporary`");
+        DB::statement('DROP TABLE IF EXISTS `test_temporary`');
 
         DB::statement("CREATE TABLE IF NOT EXISTS `test_temporary` AS ($sql)");
 
-        DB::statement("ALTER TABLE `test_temporary` ADD PRIMARY KEY(`iddevices`);");
+        DB::statement('ALTER TABLE `test_temporary` ADD PRIMARY KEY(`iddevices`);');
 
-        $result = DB::select("SELECT * FROM `test_temporary`");
+        $result = DB::select('SELECT * FROM `test_temporary`');
 
         logger(print_r($result, 1));
 
         $this->assertTrue(is_array($result));
 
-        DB::statement("DROP TABLE IF EXISTS `test_temporary`");
+        DB::statement('DROP TABLE IF EXISTS `test_temporary`');
     }
 
     /**
-     *
      * @return array
      */
-    protected function _setup_data() {
+    protected function _setup_data()
+    {
         $cats = [
             'desktop' => 11,
             'laptop large' => 15,
@@ -332,14 +334,15 @@ HAVING
         }
     }
 
-    protected function _insert_device($cat, $problem, $repair_status) {
+    protected function _insert_device($cat, $problem, $repair_status)
+    {
         $device = factory(Device::class, 1)->states($cat)->create(
                 [
                     'problem' => $problem,
-                    'repair_status' => $repair_status
+                    'repair_status' => $repair_status,
                 ]
         );
+
         return $device->toArray()[0];
     }
-
 }

@@ -22,9 +22,9 @@
         "hieu-le/wordpress-xmlrpc-client": "~2.0",
         "intervention/image": "^2.4",
         "jenssegers/agent": "^2.6",
-        "laravel/framework": "5.7.*",
+        "laravel/framework": "5.8.*",
         "laravel/tinker": "^1.0",
-        "laravelcollective/html": "5.7.*",
+        "laravelcollective/html": "5.8.*",
         "laravelista/lumen-vendor-publish": "^2.1",
         "league/csv": "^9.1",
         "mariuzzo/laravel-js-localization": "^1.6",
@@ -40,17 +40,18 @@
         "wouternl/laravel-drip": "^1.1"
     },
     "require-dev": {
-        "php-coveralls/php-coveralls": "^2.4",
         "barryvdh/laravel-debugbar": "^3.1",
-        "laravel/dusk": "^4.0",
-        "mockery/mockery": "^1.2",
-        "nunomaduro/collision": "^2.0",
-        "phpunit/phpunit": "^7.0",
-        "squizlabs/php_codesniffer": "^3.3",
-        "symfony/dom-crawler": "^5.2",
-        "fzaninotto/faker": "^1.4",
         "beyondcode/laravel-dump-server": "^1.0",
-        "filp/whoops": "^2.0"
+        "caseyamcl/guzzle_retry_middleware": "^2.6",
+        "filp/whoops": "^2.0",
+        "fzaninotto/faker": "^1.4",
+        "laravel/dusk": "^5.0",
+        "mockery/mockery": "^1.2",
+        "nunomaduro/collision": "^3.0",
+        "php-coveralls/php-coveralls": "^2.4",
+        "phpunit/phpunit": "^7.5",
+        "squizlabs/php_codesniffer": "^3.3",
+        "symfony/dom-crawler": "^5.2"
     },
     "autoload": {
         "files": [
@@ -85,7 +86,7 @@
         "post-autoload-dump": [
             "Illuminate\\Foundation\\ComposerScripts::postAutoloadDump",
             "@php artisan package:discover --ansi",
-	    "./scripts/patch-addwiki"
+            "./scripts/patch-addwiki"
         ]
     },
     "config": {

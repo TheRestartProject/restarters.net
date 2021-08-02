@@ -2,13 +2,12 @@
 
 namespace App\Http\Middleware;
 
-use \Illuminate\Http\Request;
 use App\User;
 use Closure;
+use Illuminate\Http\Request;
 
 class checkAPIAccess
 {
-
     /**
      * [handle description]
      * Handle an incoming API Key Request.
@@ -32,7 +31,7 @@ class checkAPIAccess
         $check_apitoken_exists = User::where('api_token', $request->api_token)
         ->exists();
 
-        if ( ! $check_apitoken_exists) {
+        if (! $check_apitoken_exists) {
             return abort(404, 'Invalid api token.');
         }
 

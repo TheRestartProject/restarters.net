@@ -1,6 +1,6 @@
 <?php
 
-return array (
+return [
   'brand' => 'Merk',
   'brand-name' => 'Merknaam',
   'brand_modal_title' => 'Voeg een merk toe',
@@ -44,4 +44,4 @@ return array (
   'tag-name' => 'Label naam',
   'tags_modal_title' => 'Nieuw label toevoegen',
   'weight' => 'Gewicht (kg)',
-);
+];

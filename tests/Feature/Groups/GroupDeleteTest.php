@@ -6,8 +6,10 @@ use App\Group;
 use App\Role;
 use Tests\TestCase;
 
-class GroupDeleteTest extends TestCase {
-    public function testDelete() {
+class GroupDeleteTest extends TestCase
+{
+    public function testDelete()
+    {
         $this->loginAsTestUser(Role::ADMINISTRATOR);
         $id = $this->createGroup();
         $this->assertNotNull($id);
@@ -27,12 +29,13 @@ class GroupDeleteTest extends TestCase {
         $this->actingAs($user);
         $this->followingRedirects();
         $response = $this->get("/group/delete/$id");
-        $this->assertContains( __('groups.delete_succeeded', [
-            'name' => $name
+        $this->assertContains(__('groups.delete_succeeded', [
+            'name' => $name,
         ]), $response->getContent());
     }
 
-    public function testCanDeleteWithEmptyEvent() {
+    public function testCanDeleteWithEmptyEvent()
+    {
         $this->loginAsTestUser(Role::ADMINISTRATOR);
         $id = $this->createGroup();
         $this->assertNotNull($id);
@@ -46,12 +49,13 @@ class GroupDeleteTest extends TestCase {
         $this->actingAs($user);
         $this->followingRedirects();
         $response = $this->get("/group/delete/$id");
-        $this->assertContains( __('groups.delete_succeeded', [
-            'name' => $name
+        $this->assertContains(__('groups.delete_succeeded', [
+            'name' => $name,
         ]), $response->getContent());
     }
 
-    public function testCantDeleteWithDevice() {
+    public function testCantDeleteWithDevice()
+    {
         $this->loginAsTestUser(Role::ADMINISTRATOR);
         $id = $this->createGroup();
         $this->assertNotNull($id);

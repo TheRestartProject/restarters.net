@@ -1,9 +1,8 @@
 <?php
 
-return array (
+return [
   'about' => 'About',
-  'task' => 
-  array (
+  'task' => [
     'where_is_the_main_fault' => 'Where is the main fault',
     'fetch_another' => 'I don\'t know, fetch another repair',
     'suggestions' => 'Suggestions',
@@ -12,9 +11,8 @@ return array (
     'source' => 'Source',
     'strapline' => 'Simply read the information about the broken printer and select the type of fault described from the list underneath.',
     'learn_more' => 'Learn more',
-  ),
-  'status' => 
-  array (
+  ],
+  'status' => [
     'status' => 'Status',
     'items_opinions' => 'Items / opinions',
     'items_split_opinions' => 'Items with split opinions',
@@ -30,13 +28,11 @@ return array (
     'number_of_records' => 'Number of records',
     'winning_opinion' => 'Winning opinion',
     'task_completed' => 'You\'ve seen them all, thanks',
-  ),
-  'branding' => 
-  array (
+  ],
+  'branding' => [
     'powered_by' => 'Powered by data from:',
-  ),
-  'info' => 
-  array (
+  ],
+  'info' => [
     'title' => 'Thank you for trying PrintCat',
     'body-s1-header' => 'What is PrintCat?',
     'body-s1-p1' => 'Printers can be frustrating, easy to break and hard to fix. We want to understand why printers fail so that we can tell policymakers how future models can be made easier to repair. Repair reduces waste and lessens the strain on our planet’s resources.',
@@ -47,5 +43,5 @@ return array (
     'body-s3-p1' => 'PrintCat uses information from the <a href=":url" target="_blank">Open Repair Alliance</a>, which collects data about broken devices that real people around the world have tried to fix at community events, such as Repair Cafés and Restart Parties.',
     'body-s4-header' => 'More questions?',
     'body-s4-p1' => 'Find out more, and give us your feedback, in the <a href=":url" target="_blank">PrintCat discussion</a>.',
-  ),
-);
+  ],
+];

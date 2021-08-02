@@ -1,8 +1,8 @@
 <?php
 
-use Illuminate\Support\Facades\Schema;
-use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Database\Migrations\Migration;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\Schema;
 
 class BattcatOraSetup extends Migration
 {
@@ -13,7 +13,6 @@ class BattcatOraSetup extends Migration
      */
     public function up()
     {
-
         Schema::create('devices_faults_batteries_ora_opinions', function (Blueprint $table) {
             $table->increments('id');
             $table->string('id_ords', 16)->index();
@@ -85,9 +84,9 @@ class BattcatOraSetup extends Migration
             $table->collation = 'utf8mb4_unicode_ci';
         });
 
-        $data = base_path() . '/database/data_updates/devices_battcat_ora.php';
+        $data = base_path().'/database/data_updates/devices_battcat_ora.php';
         if (file_exists($data)) {
-            include($data);
+            include $data;
             foreach ($devices_battcat_ora as $k => $v) {
                 DB::table('devices_battcat_ora')->insert([
                     'id_ords' => $v['id'],
@@ -112,27 +111,27 @@ class BattcatOraSetup extends Migration
     protected function _FaultTypes()
     {
         return [
-            "Repairable" => [
-                "title" => "Clean battery contacts",
-                "Fix connectors or casing",
-                "Fix the charging port",
-                "Replace with new battery",
-                "Replace the charger or charging cable",
-                "Battery is not the main problem",
-                "Other",
-                "Poor data",
+            'Repairable' => [
+                'title' => 'Clean battery contacts',
+                'Fix connectors or casing',
+                'Fix the charging port',
+                'Replace with new battery',
+                'Replace the charger or charging cable',
+                'Battery is not the main problem',
+                'Other',
+                'Poor data',
             ],
-            "End of life" => [
-                "Battery not readily available",
-                "Built-in or soldered battery, cannot remove",
-                "Charger not readily available",
-                "Damaged while replacing battery",
-                "Difficult to remove battery",
-                "Irrepairable corrosion, leakage, bulging",
-                "New battery too expensive",
-                "Battery is not the main problem",
-                "Other",
-                "Poor data",
+            'End of life' => [
+                'Battery not readily available',
+                'Built-in or soldered battery, cannot remove',
+                'Charger not readily available',
+                'Damaged while replacing battery',
+                'Difficult to remove battery',
+                'Irrepairable corrosion, leakage, bulging',
+                'New battery too expensive',
+                'Battery is not the main problem',
+                'Other',
+                'Poor data',
             ],
         ];
     }

@@ -2,8 +2,8 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Http\Request;
 use Cookie;
+use Illuminate\Http\Request;
 
 class InformationAlertCookieController extends Controller
 {
@@ -13,11 +13,11 @@ class InformationAlertCookieController extends Controller
 
     public function __construct()
     {
-      $this->minute = 1440; // 1 day
+        $this->minute = 1440; // 1 day
 
-      // $this->minutes = $this->minute * 7; // 7 days
+        // $this->minutes = $this->minute * 7; // 7 days
 
-      $this->minutes = $this->minute * 30; // 30 days
+        $this->minutes = $this->minute * 30; // 30 days
 
       // $this->minutes = $this->minute * 365; // 1 year
     }
@@ -30,18 +30,18 @@ class InformationAlertCookieController extends Controller
      */
     public function __invoke(Request $request)
     {
-      if ( ! $request->has('dismissable_id') ) {
-        return response()->json(false);
-      }
+        if (! $request->has('dismissable_id')) {
+            return response()->json(false);
+        }
 
-      if ( Cookie::get('information-alert-dismissed-'.$request->input('dismissable_id')) ) {
-        Cookie::queue(
+        if (Cookie::get('information-alert-dismissed-'.$request->input('dismissable_id'))) {
+            Cookie::queue(
             Cookie::forget('information-alert-dismissed-'.$request->input('dismissable_id'))
         );
-      }
+        }
 
-      Cookie::queue('information-alert-dismissed-'.$request->input('dismissable_id'), true, $this->minutes);
+        Cookie::queue('information-alert-dismissed-'.$request->input('dismissable_id'), true, $this->minutes);
 
-      return response()->json(true);
+        return response()->json(true);
     }
 }

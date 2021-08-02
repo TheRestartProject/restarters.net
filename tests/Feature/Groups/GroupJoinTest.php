@@ -8,7 +8,8 @@ use App\Role;
 use App\User;
 use Tests\TestCase;
 
-class GroupJoinTest extends TestCase {
+class GroupJoinTest extends TestCase
+{
     public function testJoin()
     {
         $this->withoutExceptionHandling();
@@ -26,8 +27,8 @@ class GroupJoinTest extends TestCase {
         // Should redirect to the dashboard.
         $this->assertVueProperties($response, [
             [
-                'VueComponent' => 'dashboardpage'
-            ]
+                'VueComponent' => 'dashboardpage',
+            ],
         ]);
 
         // Try again.

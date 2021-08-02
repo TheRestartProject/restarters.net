@@ -1,6 +1,6 @@
 <?php
 
-return array (
+return [
   'community_news' => 'Nouveautés de la communauté',
   'community_news_text' => 'Les dernières nouvelles de notre blog communautaire ‐ nous sommes constamment à la recherche de sujets, envoyez vos idées à <a href="mailto:janet@therestartproject.org">janet@therestartproject.org</a>',
   'see_more_posts' => 'Lire d’autres articles',
@@ -87,4 +87,4 @@ return array (
   'event_requires_moderation_by_an_admin' => 'L\'événement nécessite l\'approbation d\'un administrateur',
   'save' => 'Save device',
   'powered_only' => '(calculated from powered items only)',
-);
+];

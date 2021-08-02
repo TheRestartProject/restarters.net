@@ -1,8 +1,7 @@
 <?php
 
-return array (
-  'cta' => 
-  array (
+return [
+  'cta' => [
     'body-s1-p1' => 'Cada artículo que ves se llevó a un evento de reparación para repararlo en lugar de desecharlo.',
     'body-s1-p2' => '¿Qué hacemos con estos datos?',
     'body-s2-header' => 'Compartimos la habilidad para reparar',
@@ -17,5 +16,5 @@ return array (
     'header' => '¡Gracias por tu ayuda!',
     'btn-signup' => 'Regístrate',
     'btn-notnow' => 'Ahora no',
-  ),
-);
+  ],
+];

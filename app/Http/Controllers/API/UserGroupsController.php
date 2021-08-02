@@ -3,11 +3,10 @@
 namespace App\Http\Controllers\API;
 
 use App\Group;
+use App\Http\Controllers\Controller;
 use App\Role;
 use App\User;
 use App\UserGroups;
-use App\Http\Controllers\Controller;
-
 use Auth;
 use Illuminate\Http\Request;
 
@@ -23,7 +22,7 @@ class UserGroupsController extends Controller
     public static function changes(Request $request)
     {
         $authenticatedUser = Auth::user();
-        if ( ! $authenticatedUser->hasRole('Administrator')) {
+        if (! $authenticatedUser->hasRole('Administrator')) {
             return abort(403, 'The authenticated user is not authorized to access this resource');
         }
 
@@ -34,7 +33,7 @@ class UserGroupsController extends Controller
         $userGroupChanges = [];
         foreach ($userGroupAudits as $audit) {
             $userGroupAssociation = UserGroups::withTrashed()->find($audit->auditable_id);
-            if ( ! is_null($userGroupAssociation) && $userGroupAssociation->isConfirmed()) {
+            if (! is_null($userGroupAssociation) && $userGroupAssociation->isConfirmed()) {
                 $user = $userGroupAssociation->volunteer;
                 $group = Group::find($userGroupAssociation->group);
                 if ($user->changesShouldPushToZapier() && $group->changesShouldPushToZapier()) {
@@ -50,7 +49,7 @@ class UserGroupsController extends Controller
     {
         $query = \OwenIt\Auditing\Models\Audit::where('auditable_type', \App\UserGroups::class);
 
-        if (!is_null($dateFrom)) {
+        if (! is_null($dateFrom)) {
             $query->where('created_at', '>=', $dateFrom);
         }
 
@@ -64,17 +63,17 @@ class UserGroupsController extends Controller
     {
         $auditCreatedAtAsString = $audit->created_at->toDateTimeString();
 
-        $userGroupAssociation->makeHidden(['role', 'status','user','group','deleted_at']);
+        $userGroupAssociation->makeHidden(['role', 'status', 'user', 'group', 'deleted_at']);
         $userGroupChange = $userGroupAssociation->toArray();
 
-        $userGroupChange['id'] = md5($userGroupAssociation->id . $auditCreatedAtAsString);
+        $userGroupChange['id'] = md5($userGroupAssociation->id.$auditCreatedAtAsString);
         $userGroupChange['change_type'] = $audit->event;
         $userGroupChange['change_occurred_at'] = $auditCreatedAtAsString;
 
         $userGroupChange['user_id'] = $userGroupAssociation->user;
         $userGroupChange['user_email'] = User::find($userGroupAssociation->user)->email;
         $role = Role::find($userGroupAssociation->role);
-        if ( ! is_null($role)) {
+        if (! is_null($role)) {
             $userGroupChange['role'] = $role->role;
         } else {
             $userGroupChange['role'] = 'Unknown';
@@ -99,7 +98,7 @@ class UserGroupsController extends Controller
     public function leave(Request $request, $id)
     {
         $authenticatedUser = Auth::user();
-        if (!$authenticatedUser) {
+        if (! $authenticatedUser) {
             return abort(403, 'Not logged in');
         }
 
@@ -108,16 +107,16 @@ class UserGroupsController extends Controller
             ->where('status', 1)
             ->first();
 
-        if (!$member) {
-            abort(404, "Not a member");
+        if (! $member) {
+            abort(404, 'Not a member');
         }
 
         $member->delete();
 
         $group = Group::where('idgroups', $id)->first();
-         
+
         return response()->json([
-            'success' => TRUE,
+            'success' => true,
             'all_restarters_count' => $group->all_restarters_count,
             'all_hosts_count' => $group->all_hosts_count,
         ], 200);

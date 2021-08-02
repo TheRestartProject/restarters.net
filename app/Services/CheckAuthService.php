@@ -4,7 +4,7 @@ namespace App\Services;
 
 use App\User;
 use Cookie;
-use FixometerHelper;
+use App\Helpers\Fixometer;
 use Illuminate\Http\Resources\Json\JsonResource;
 use Lang;
 
@@ -16,7 +16,7 @@ class CheckAuthService extends JsonResource
     private $menu;
 
     /**
-     * @var boolean
+     * @var bool
      */
     private $authenticated = null;
 
@@ -31,12 +31,12 @@ class CheckAuthService extends JsonResource
     private $edit_profile_link = '';
 
     /**
-     * @var boolean
+     * @var bool
      */
     private $is_admin = null;
 
     /**
-     * @var boolean
+     * @var bool
      */
     private $is_host = null;
 
@@ -67,7 +67,7 @@ class CheckAuthService extends JsonResource
     {
         $this->user = User::where('email', $email)->first();
 
-        if ( ! $this->user) {
+        if (! $this->user) {
             return false;
         }
 
@@ -88,11 +88,11 @@ class CheckAuthService extends JsonResource
     }
 
     /**
-      * Transform the resource into an array.
-      *
-      * @param  \Illuminate\Http\Request  $request
-      * @return array
-      */
+     * Transform the resource into an array.
+     *
+     * @param  \Illuminate\Http\Request  $request
+     * @return array
+     */
     public function toArray($request)
     {
         return [
