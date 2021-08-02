@@ -6,6 +6,7 @@ use App\User;
 use DB;
 use Hash;
 use Mockery;
+use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Tests\TestCase;
 
 class AccountCreationTest extends TestCase
@@ -90,5 +91,24 @@ class AccountCreationTest extends TestCase
 
         $response->assertStatus(302);
         $response->assertRedirect('dashboard');
+    }
+
+    public function testValidEmail() {
+
+        // Check with a registered email.
+        $restarter = factory(User::class)->state('Restarter')->create();
+        $response = $this->post('user/register/check-valid-email', [
+            'email' => $restarter->email
+        ]);
+
+        $this->assertEquals([
+                                'message' => __('auth.email_address_validation'),
+                            ], json_decode($response->getContent(), true));
+
+        $response = $this->post('user/register/check-valid-email', [
+            'email' => 'test@invalid.com'
+        ]);
+
+        $this->assertNull(json_decode($response->getContent(), true));
     }
 }
