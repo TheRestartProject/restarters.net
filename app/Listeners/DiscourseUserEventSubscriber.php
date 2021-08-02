@@ -5,7 +5,6 @@ namespace App\Listeners;
 use App\Events\UserEmailUpdated;
 use App\Events\UserLanguageUpdated;
 use App\Events\UserRegistered;
-
 use Illuminate\Support\Facades\Log;
 
 class DiscourseUserEventSubscriber
@@ -23,7 +22,7 @@ class DiscourseUserEventSubscriber
         $user = $event->user;
 
         // Only sync if the email actually changed.
-        if ( ! $user->isDirty('email')) {
+        if (! $user->isDirty('email')) {
             return;
         }
 
@@ -39,7 +38,7 @@ class DiscourseUserEventSubscriber
         $user = $event->user;
 
         // Only sync if the language actually changed.
-        if ( ! $user->isDirty('language')) {
+        if (! $user->isDirty('language')) {
             return;
         }
 
@@ -50,7 +49,7 @@ class DiscourseUserEventSubscriber
                 $endpoint
             );
 
-            if ( $response->getStatusCode() !== 200) {
+            if ($response->getStatusCode() !== 200) {
                 Log::error('Could not sync '.$user->id.' language to Discourse: '.$response->getReasonPhrase());
             }
 
@@ -104,8 +103,8 @@ class DiscourseUserEventSubscriber
             'username' => $user->username,
             'name' => $user->name,
         ];
-        $sso_payload = base64_encode( http_build_query( $sso_params ) );
-        $sig = hash_hmac( 'sha256', $sso_payload, $sso_secret );
+        $sso_payload = base64_encode(http_build_query($sso_params));
+        $sig = hash_hmac('sha256', $sso_payload, $sso_secret);
 
         $response = $this->discourseClient->request(
             'POST',
@@ -118,8 +117,10 @@ class DiscourseUserEventSubscriber
             ]
         );
 
-        if ( ! $response->getStatusCode() === 200) {
-            Log::error('Could not sync '.$user->id.' to Discourse: '.$response->getReasonPhrase());
+        if ($response->getStatusCode() !== 200) {
+            Log::error('Could not sync user '.$user->id.' to Discourse: '.$response->getReasonPhrase());
+        } else {
+            Log::debug('Sync '.$user->id.' to Discourse OK');
         }
     }
 

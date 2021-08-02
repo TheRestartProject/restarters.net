@@ -1,8 +1,8 @@
 <?php
 
-use Illuminate\Support\Facades\Schema;
-use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Database\Migrations\Migration;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\Schema;
 
 class AddNewFieldsUsers extends Migration
 {
@@ -13,15 +13,15 @@ class AddNewFieldsUsers extends Migration
      */
     public function up()
     {
-      Schema::table('users', function (Blueprint $table) {
-          $table->string('country')->nullable();
-          $table->tinyInteger('newsletter')->default(0);
-          $table->tinyInteger('invites')->default(0);
-          $table->string('biography')->nullable();
-          $table->timestamp('consent')->nullable();
-          $table->integer('lat')->nullable();
-          $table->integer('lon')->nullable();
-      });
+        Schema::table('users', function (Blueprint $table) {
+            $table->string('country')->nullable();
+            $table->tinyInteger('newsletter')->default(0);
+            $table->tinyInteger('invites')->default(0);
+            $table->string('biography')->nullable();
+            $table->timestamp('consent')->nullable();
+            $table->integer('lat')->nullable();
+            $table->integer('lon')->nullable();
+        });
     }
 
     /**
@@ -31,14 +31,14 @@ class AddNewFieldsUsers extends Migration
      */
     public function down()
     {
-      Schema::table('users', function (Blueprint $table) {
-          $table->dropColumn('country');
-          $table->dropColumn('newsletter');
-          $table->dropColumn('invites');
-          $table->dropColumn('biography');
-          $table->dropColumn('consent');
-          $table->dropColumn('lat');
-          $table->dropColumn('lon');
-      });
+        Schema::table('users', function (Blueprint $table) {
+            $table->dropColumn('country');
+            $table->dropColumn('newsletter');
+            $table->dropColumn('invites');
+            $table->dropColumn('biography');
+            $table->dropColumn('consent');
+            $table->dropColumn('lat');
+            $table->dropColumn('lon');
+        });
     }
 }

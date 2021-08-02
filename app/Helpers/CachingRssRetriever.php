@@ -29,8 +29,8 @@ class CachingRssRetriever
 
             foreach ($xml->channel->item as $xml_item) {
                 $newsItem = new \stdClass;
-                $newsItem->link = (string)($xml_item->link);
-                $newsItem->title = (string)($xml_item->title);
+                $newsItem->link = (string) ($xml_item->link);
+                $newsItem->title = (string) ($xml_item->title);
                 $news_feed[$i] = $newsItem;
 
                 $i += 1;
@@ -39,7 +39,7 @@ class CachingRssRetriever
                 }
             }
 
-            Cache::put($this->cacheKey, $news_feed, 60);
+            Cache::put($this->cacheKey, $news_feed, 3600);
         } catch (\Exception $ex) {
         }
 

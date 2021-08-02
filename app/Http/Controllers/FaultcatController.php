@@ -2,21 +2,21 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Http\Request;
-use Auth;
 use App\Faultcat;
 use App\MicrotaskDemographics;
+use Auth;
+use Illuminate\Http\Request;
 use Session;
 
-class FaultcatController extends Controller {
-
+class FaultcatController extends Controller
+{
     /**
      * Fetch / post random fault.
      *
      * @return \Illuminate\Http\Response
      */
-    public function index(Request $request) {
-
+    public function index(Request $request)
+    {
         return redirect()->action('FaultcatController@status')->withSuccess('done');
 
         if (Auth::check()) {
@@ -33,12 +33,12 @@ class FaultcatController extends Controller {
         $user->country = $request->session()->get('faultcat.country', null);
         $user->age = $request->session()->get('faultcat.age', null);
 
-        if (!$user->id && ($user->clicks % 4 == 0) && (!$user->country || !$user->age)) {
+        if (! $user->id && ($user->clicks % 4 == 0) && (! $user->country || ! $user->age)) {
             return redirect()->action('FaultcatController@demographics');
         }
 
-        if ($request->isMethod('post') && !empty($_POST)) {
-            if (isset($_POST['iddevices']) && !isset($_POST['fetch'])) {
+        if ($request->isMethod('post') && ! empty($_POST)) {
+            if (isset($_POST['iddevices']) && ! isset($_POST['fetch'])) {
                 $data = array_filter($_POST);
                 if (isset($_POST['country'])) {
                     $request->session()->put('faultcat.country', $data['country']);
@@ -59,7 +59,7 @@ class FaultcatController extends Controller {
                     'session_id' => session()->getId(),
                 ];
                 $success = $Faultcat->create($insert);
-                if (!$success) {
+                if (! $success) {
                     logger(print_r($insert, 1));
                     logger('FaultCat error on insert.');
                 }
@@ -79,7 +79,8 @@ class FaultcatController extends Controller {
         ]);
     }
 
-    public function demographics(Request $request) {
+    public function demographics(Request $request)
+    {
         if (Auth::check()) {
             $user = Auth::user();
         } else {
@@ -96,7 +97,8 @@ class FaultcatController extends Controller {
     /**
      * Store demographic information from anonymous users.
      */
-    public function storeDemographics(Request $request) {
+    public function storeDemographics(Request $request)
+    {
         $validatedData = $request->validate([
             'age' => 'required',
             'country' => 'required',
@@ -125,7 +127,8 @@ class FaultcatController extends Controller {
         return redirect()->action('FaultcatController@index');
     }
 
-    public function status(Request $request) {
+    public function status(Request $request)
+    {
         if (Auth::check()) {
             $user = Auth::user();
         } else {
@@ -134,10 +137,10 @@ class FaultcatController extends Controller {
 
         $Faultcat = new Faultcat;
         $data = $Faultcat->fetchStatus();
+
         return view('faultcat.status', [
             'status' => $data,
             'user' => $user,
         ]);
     }
-
 }

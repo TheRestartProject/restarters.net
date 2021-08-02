@@ -7,7 +7,6 @@ use Illuminate\Database\Eloquent\Model;
 
 class BattcatOra extends Model
 {
-
     protected $table = 'devices_faults_batteries_ora_opinions';
     protected $dateFormat = 'Y-m-d H:i';
     protected $dates = ['created_at', 'updated_at'];
@@ -30,26 +29,27 @@ class BattcatOra extends Model
      *
      * @return array
      */
-    public function fetchFault($exclusions = [], $locale = NULL)
+    public function fetchFault($exclusions = [], $locale = null)
     {
         $result = [];
-        $records = DB::select("SELECT COUNT(*) as total FROM `devices_battcat_ora`");
+        $records = DB::select('SELECT COUNT(*) as total FROM `devices_battcat_ora`');
         if ($records[0]->total > count($exclusions)) {
             // try once with locale, even if it is NULL
             $sql = $this->_getSQL($exclusions, $locale);
             $result = DB::select($sql);
-            if (!$result) {
+            if (! $result) {
                 // if no user-lang recs left, get one without locale
                 $sql = $this->_getSQL($exclusions);
                 $result = DB::select($sql);
             }
         }
+
         return $result;
     }
 
-    protected function _getSQL($exclusions = [], $locale = NULL)
+    protected function _getSQL($exclusions = [], $locale = null)
     {
-        $sql = "SELECT
+        $sql = 'SELECT
 d.`id_ords` as `id_ords`,
 d.`data_provider` as `partner`,
 d.`product_category` as `product_category`,
@@ -68,16 +68,17 @@ HAVING (`opinions` = 2 AND `faults` = 2)
 OR (`opinions` < 2)
 ORDER BY rand()
 LIMIT 1;
-";
+';
         $and = '';
-        if (!empty($exclusions)) {
+        if (! empty($exclusions)) {
             $ids = implode("','", $exclusions);
             $and .= "\nAND d.`id_ords` NOT IN ('$ids')";
         }
-        if (!is_null($locale)) {
+        if (! is_null($locale)) {
             $and .= "\nAND (d.`language` = '$locale')";
         }
         $sql = sprintf($sql, $and);
+
         return $sql;
     }
 
@@ -89,18 +90,16 @@ LIMIT 1;
     public function fetchFaultTypes($repair_status)
     {
         $sql = "SELECT * FROM `fault_types_batteries` WHERE `repair_status` = '$repair_status'";
+
         return DB::select($sql);
     }
 
-     /**
-     *
-     *
+    /**
      * @return array
      */
     public function fetchProgress()
     {
-
-        $result = DB::select("
+        $result = DB::select('
 SELECT
 ROUND((r2.opinions/r2.batteries)*100,1) as total
 FROM (
@@ -123,57 +122,55 @@ OR
 (all_crowd_opinions_count = 3 AND top_crowd_opinion_percentage < 60 AND adjudicated_opinion_id IS NOT NULL)
 ) AS r1
 ) AS r2
-");
-    return $result;
+');
+
+        return $result;
     }
 
     /**
-     *
-     *
      * @return array
      */
     public function fetchStatus()
     {
-
         $result = [];
 
-        $result['total_devices'] = DB::select("
+        $result['total_devices'] = DB::select('
 SELECT COUNT(DISTINCT d.id_ords) AS total
 FROM `devices_battcat_ora` d
-");
+');
 
-        $result['total_opinions'] = DB::select("
+        $result['total_opinions'] = DB::select('
 SELECT COUNT(*) AS total
 FROM devices_faults_batteries_ora_opinions o
-");
+');
 
         $result['progress'] = $this->fetchProgress();
 
 //         $result['progress'] = DB::select("
-// SELECT
-// ROUND((r2.opinions/r2.batteries)*100) as total
-// FROM (
-// SELECT
-// COUNT(*) AS opinions,
-// (SELECT COUNT(*) FROM devices_battcat_ora) as batteries
-// FROM (
-// SELECT
-// o.id_ords,
-// (SELECT o1.fault_type_id FROM devices_faults_batteries_ora_opinions o1 WHERE o1.id_ords = o.id_ords GROUP BY o1.fault_type_id ORDER BY COUNT(o1.fault_type_id) DESC LIMIT 1) AS winning_opinion_id,
-// ROUND((SELECT COUNT(o3.fault_type_id) as top_crowd_opinion_count FROM devices_faults_batteries_ora_opinions o3 WHERE o3.id_ords = o.id_ords GROUP BY o3.fault_type_id ORDER BY top_crowd_opinion_count DESC LIMIT 1) /
-// (SELECT COUNT(o4.fault_type_id) as all_votes FROM devices_faults_batteries_ora_opinions o4 WHERE o4.id_ords = o.id_ords) * 100) AS top_crowd_opinion_percentage,
-// COUNT(o.fault_type_id) AS all_crowd_opinions_count
-// FROM devices_faults_batteries_ora_opinions o
-// GROUP BY o.id_ords
-// HAVING
-// (all_crowd_opinions_count > 1 AND top_crowd_opinion_percentage > 60)
-// OR
-// (all_crowd_opinions_count = 3 AND top_crowd_opinion_percentage < 60)
-// ) AS r1
-// ) AS r2
-// ");
+        // SELECT
+        // ROUND((r2.opinions/r2.batteries)*100) as total
+        // FROM (
+        // SELECT
+        // COUNT(*) AS opinions,
+        // (SELECT COUNT(*) FROM devices_battcat_ora) as batteries
+        // FROM (
+        // SELECT
+        // o.id_ords,
+        // (SELECT o1.fault_type_id FROM devices_faults_batteries_ora_opinions o1 WHERE o1.id_ords = o.id_ords GROUP BY o1.fault_type_id ORDER BY COUNT(o1.fault_type_id) DESC LIMIT 1) AS winning_opinion_id,
+        // ROUND((SELECT COUNT(o3.fault_type_id) as top_crowd_opinion_count FROM devices_faults_batteries_ora_opinions o3 WHERE o3.id_ords = o.id_ords GROUP BY o3.fault_type_id ORDER BY top_crowd_opinion_count DESC LIMIT 1) /
+        // (SELECT COUNT(o4.fault_type_id) as all_votes FROM devices_faults_batteries_ora_opinions o4 WHERE o4.id_ords = o.id_ords) * 100) AS top_crowd_opinion_percentage,
+        // COUNT(o.fault_type_id) AS all_crowd_opinions_count
+        // FROM devices_faults_batteries_ora_opinions o
+        // GROUP BY o.id_ords
+        // HAVING
+        // (all_crowd_opinions_count > 1 AND top_crowd_opinion_percentage > 60)
+        // OR
+        // (all_crowd_opinions_count = 3 AND top_crowd_opinion_percentage < 60)
+        // ) AS r1
+        // ) AS r2
+        // ");
 
-        $result['total_recats'] = DB::select("
+        $result['total_recats'] = DB::select('
 SELECT COUNT(*) AS total FROM (
 SELECT
 o.id_ords,
@@ -193,9 +190,9 @@ ANY_VALUE(a.fault_type_id) AS winning_opinion_id,
 3 AS all_crowd_opinions_count
 FROM devices_faults_batteries_ora_adjudicated a
 ) AS result
-");
+');
 
-        $result['list_recats'] = DB::select("
+        $result['list_recats'] = DB::select('
 SELECT
 result.winning_opinion_id,
 fta.title as winning_opinion,
@@ -227,7 +224,7 @@ JOIN devices_battcat_ora d ON d.id_ords = a.id_ords
 JOIN fault_types_batteries fta ON fta.id = result.winning_opinion_id
 GROUP BY result.repair_status, result.winning_opinion_id
 ORDER BY total DESC
-");
+');
 
         return $result;
     }
@@ -239,8 +236,7 @@ ORDER BY total DESC
      */
     public function updateDevices()
     {
-
-        DB::statement("CREATE TEMPORARY TABLE IF NOT EXISTS `devices_faults_batteries_ora_temporary` AS
+        DB::statement('CREATE TEMPORARY TABLE IF NOT EXISTS `devices_faults_batteries_ora_temporary` AS
 SELECT *
 FROM
 (SELECT
@@ -267,14 +263,14 @@ GROUP BY r1.id_ords
 ) AS r2
 ) AS r3
 WHERE r3.winning_opinion_id IS NOT NULL
-");
-        DB::statement("ALTER TABLE `devices_faults_batteries_ora_temporary` ADD PRIMARY KEY(`id_ords`);");
+');
+        DB::statement('ALTER TABLE `devices_faults_batteries_ora_temporary` ADD PRIMARY KEY(`id_ords`);');
 
-        $result = DB::update("UPDATE devices_battcat_ora d, devices_faults_batteries_ora_temporary t
+        $result = DB::update('UPDATE devices_battcat_ora d, devices_faults_batteries_ora_temporary t
 SET d.fault_type_id = t.winning_opinion_id
-WHERE d.id_ords = t.id_ords;");
+WHERE d.id_ords = t.id_ords;');
 
-        DB::statement("DROP TEMPORARY TABLE IF EXISTS `devices_faults_batteries_ora_temporary`");
+        DB::statement('DROP TEMPORARY TABLE IF EXISTS `devices_faults_batteries_ora_temporary`');
 
         return $result;
     }

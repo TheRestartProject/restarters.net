@@ -8,7 +8,7 @@
             <h1><?php echo $title; ?></h1>
 
             @if(isset($response))
-              @php( FixometerHelper::printResponse($response) )
+              @php( App\Helpers\Fixometer::printResponse($response) )
             @endif
 
             <form class="" method="post" action="/role/edit/<?php echo $formId; ?>">

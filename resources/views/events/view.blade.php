@@ -32,7 +32,7 @@
             <div class="row">
               <div class="col-md-8 col-lg-9 d-flex flex-column align-content-center">@lang('events.pending_rsvp_message')</div>
               <div class="col-md-4 col-lg-3 d-flex flex-column align-content-center">
-                <a href="/party/accept-invite/{{{ $is_attending->event }}}/{{{ $is_attending->status }}}" class="btn btn-info">@lang('events.pending_rsvp_button')</a>
+                <a href="/party/accept-invite/{{{ $is_attending->event }}}/{{{ $is_attending->status }}}" class="btn btn-primary">@lang('events.pending_rsvp_button')</a>
               </div>
             </div>
 
@@ -103,7 +103,7 @@
             $group_image->image->path;
           }
 
-          $can_edit_event = ( Auth::check() && ( FixometerHelper::hasRole(Auth::user(), 'Administrator') || FixometerHelper::userHasEditPartyPermission($event->idevents, Auth::user()->id) ) );
+          $can_edit_event = ( Auth::check() && ( App\Helpers\Fixometer::hasRole(Auth::user(), 'Administrator') || App\Helpers\Fixometer::userHasEditPartyPermission($event->idevents, Auth::user()->id) ) );
           $is_attending = is_object($is_attending) && $is_attending->status == 1;
 
           $discourseThread = $is_attending ? (env('DISCOURSE_URL') . '/t/' . $event->discourse_thread) : null;
@@ -176,7 +176,7 @@
             :stats="{{ json_encode($stats, JSON_INVALID_UTF8_IGNORE) }}"
             :clusters="{{ json_encode($expanded_clusters, JSON_INVALID_UTF8_IGNORE) }}"
             :brands="{{ json_encode($expanded_brands, JSON_INVALID_UTF8_IGNORE) }}"
-            :barrier-list="{{ json_encode(FixometerHelper::allBarriers(), JSON_INVALID_UTF8_IGNORE) }}"
+            :barrier-list="{{ json_encode(App\Helpers\Fixometer::allBarriers(), JSON_INVALID_UTF8_IGNORE) }}"
             :item-types="{{ json_encode($item_types, JSON_INVALID_UTF8_IGNORE) }}"
           />
         </div>

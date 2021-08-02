@@ -1,6 +1,6 @@
 <?php
 
-return array (
+return [
   'getting_started_header' => 'Getting Started',
   'getting_started_text' => 'Welcome to the Restarters community space.  Here are a few actions to get you started:',
   'add_avatar' => 'Add an avatar',
@@ -11,4 +11,4 @@ return array (
   'visit_wiki' => 'Visit the wiki',
   'discussion_header' => 'Discussion Forum',
   'join_discussion' => 'Join the discussion',
-);
+];

@@ -76,7 +76,7 @@
         <span />
       </template>
       <template slot="cell(actions)" slot-scope="data" v-bind:upcoming="upcoming">
-        <GroupEventsScrollTableActions :idevents="data.item.actions.idevents" />
+        <GroupEventsScrollTableActions :idevents="data.item.actions.idevents" class="actionsHeight" />
       </template>
 
       <template slot="head(participants_count)">
@@ -457,5 +457,9 @@ export default {
 
 .minHeight {
   min-height: 330px;
+}
+
+.actionsHeight {
+  height: unset !important;
 }
 </style>

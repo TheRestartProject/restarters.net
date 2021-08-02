@@ -1,6 +1,6 @@
 <?php
 
-return array (
+return [
   'top_item1' => 'Événements',
   'top_item2' => 'Réparations',
   'top_item3' => 'Repair Cafés',
@@ -66,4 +66,4 @@ return array (
   'menu_events' => 'Événements',
   'menu_groups' => 'Repair Cafés',
   'menu_workbench' => 'Atelier',
-);
+];

@@ -1,6 +1,6 @@
 <?php
 
-return array (
+return [
   'failed' => 'Ces références ne correspondent pas à notre base de données',
   'throttle' => 'Trop de tentatives de connexion. S\'il vous plaît réessayer dans :seconds secondes.',
   'email_address' => 'Adresse e-mail',
@@ -31,4 +31,4 @@ return array (
   'assigned_groups' => 'Attribués aux Repair Cafés',
   'save_user' => 'Sauver utilisateur',
   'login_before_using_shareable_link' => 'Pour compléter votre invitation, veuillez créer un compte ci-dessous, ou si vous avez déjà un compte <a href=":login_url">connectez-vous</a>.',
-);
+];

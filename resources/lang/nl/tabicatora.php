@@ -1,8 +1,7 @@
 <?php
 
-return array (
-  'task' => 
-  array (
+return [
+  'task' => [
     'where_is_the_main_fault' => 'Waar is de belangrijkste fout',
     'fetch_another' => 'Ik weet het niet, haal nog een reparatie',
     'suggestions' => 'Suggesties',
@@ -19,9 +18,8 @@ return array (
 makkerlijker herstelbaar kunnen worden. Repair groepen over de hele wereld hebben deze informatie ingevoerd. Door TabiCat te gebruiken, helpt u ons ze te analyseren."',
     'signpost_5' => 'Bedankt! <a href="https://survey.actionproject.eu/chat/?data=U2FsdGVkX1%207YCj%20CRieUSNsHbebWsbk97sB4QRw%2F%206soz4B9MsCqwSYA2WEWYjmPruZ%20bkR8PKsQbSX5dPmLQ%3D%3D">Vul onze enquête in</a>',
     'signpost_6' => 'Bedankt voor uw hulp! Elke fout die u categoriseert maakt de gegevens nuttiger. <a href="../">Waarom wordt u ook geen lid van onze community</a>?',
-  ),
-  'status' => 
-  array (
+  ],
+  'status' => [
     'status' => 'Status',
     'items_opinions' => 'Items / meningen',
     'items_split_opinions' => 'Items met verschillende meningen',
@@ -42,13 +40,11 @@ makkerlijker herstelbaar kunnen worden. Repair groepen over de hele wereld hebbe
     'with_1_opinion' => 'met 1 mening',
     'with_2_opinions' => 'met 2 meningen',
     'with_3_opinions' => 'met 3 meningen',
-  ),
-  'branding' => 
-  array (
+  ],
+  'branding' => [
     'powered_by' => 'Gebruik van gegevens van:',
-  ),
-  'info' => 
-  array (
+  ],
+  'info' => [
     'body-s1-header' => 'Wat is TabiCat?',
     'body-s1-p1' => 'Tablets kunnen frustrerend zijn: ze gaan makkelijk stuk en zijn moeilijk te repareren. Wij willen begrijpen waarom tablets stuk gaan, zodat we beleidsmakers kunnen vertellen hoe toekomstige modellen zo kunnen worden gemaakt dat ze beter herstelbaar zijn. Repareren vermindert afval en legt minder beslag op de grondstoffen van onze planeet.',
     'body-s1-p2' => 'Met TabiCat kunt u deelnemen aan ons onderzoek. We hebben informatie verzameld over meer dan 900 kapotte apparaten en we hebben uw hulp nodig om ze te categoriseren.',
@@ -59,10 +55,9 @@ makkerlijker herstelbaar kunnen worden. Repair groepen over de hele wereld hebbe
     'body-s4-header' => 'Nog vragen?',
     'body-s4-p1' => 'Kom meer te weten, stel vragen en geef ons uw feedback, in <a href=":url" target="_blank">de TabiCat discussie</a>.',
     'title' => 'Bedankt om TabiCat te proberen',
-  ),
+  ],
   'about' => 'Meer informatie',
-  'survey' => 
-  array (
+  'survey' => [
     'a1' => 'Sterk mee oneens',
     'a2' => 'Oneens',
     'a3' => 'Neutraal',
@@ -78,5 +73,5 @@ makkerlijker herstelbaar kunnen worden. Repair groepen over de hele wereld hebbe
     'q4' => 'TabiCat heeft mijn kijk op het belang van reparatie veranderd',
     'send' => 'Verzenden',
     'skip' => 'Overslaan',
-  ),
-);
+  ],
+];

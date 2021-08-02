@@ -2,33 +2,30 @@
 
 namespace App;
 
-use Illuminate\Database\Eloquent\Model;
-
 use DB;
+use Illuminate\Database\Eloquent\Model;
 
 class Session extends Model
 {
-
     protected $table = 'sessions';
 
-  /**
-   * The attributes that are mass assignable.
-   *
-   * @var array
-   */
+    /**
+     * The attributes that are mass assignable.
+     *
+     * @var array
+     */
     protected $fillable = [];
 
-  /**
-   * The attributes that should be hidden for arrays.
-   *
-   * @var array
-   */
+    /**
+     * The attributes that should be hidden for arrays.
+     *
+     * @var array
+     */
     protected $hidden = [];
 
-  //Table Relations
+    //Table Relations
 
-
-  // Setters
+    // Setters
     public static function createSession($user)
     {
         $session = '$1'.md5(substr(time(), -8));
@@ -37,7 +34,7 @@ class Session extends Model
         try {
             DB::insert(
                 DB::raw('INSERT INTO `sessions`(`session`, `user`, created_at) VALUES (:session, :user, :tm)'),
-                array('session' => $session, 'user' => $user, 'tm' => $created_at)
+                ['session' => $session, 'user' => $user, 'tm' => $created_at]
             );
         } catch (\Illuminate\Database\QueryException $e) {
             return false;
@@ -51,22 +48,22 @@ class Session extends Model
         $sql = 'UPDATE `sessions` SET `session` = :session WHERE `user` = :user';
 
         try {
-            DB::update(DB::raw($sql), array('session' => $sessionToken, 'user' => $user));
+            DB::update(DB::raw($sql), ['session' => $sessionToken, 'user' => $user]);
 
             unset($_SESSION[env('APP_NAME')]);
-            $_SESSION[env('APP_NAME')][env('APP_KEY')] = $sessionToken;//was $_SESSION[APPNAME][SESSIONKEY] will need a config file for SESSIONKEY
-                                                                   //SESSIONKEY was defined as `define('SESSIONKEY', md5(APPKEY));`
+            $_SESSION[env('APP_NAME')][env('APP_KEY')] = $sessionToken; //was $_SESSION[APPNAME][SESSIONKEY] will need a config file for SESSIONKEY
+            //SESSIONKEY was defined as `define('SESSIONKEY', md5(APPKEY));`
             return true;
         } catch (\Illuminate\Database\QueryException $e) {
             dd($e);
         }
     }
 
-  //Getters
+    //Getters
     protected function getSession()
     {
-        $session = $_SESSION[env('APP_NAME')][env('APP_KEY')];//was $_SESSION[APPNAME][SESSIONKEY] will need a config file for SESSIONKEY
-                                                            //SESSIONKEY was defined as `define('SESSIONKEY', md5(APPKEY));`
+        $session = $_SESSION[env('APP_NAME')][env('APP_KEY')]; //was $_SESSION[APPNAME][SESSIONKEY] will need a config file for SESSIONKEY
+        //SESSIONKEY was defined as `define('SESSIONKEY', md5(APPKEY));`
 
         $sql = 'SELECT users.idusers AS id, users.name, users.email, roles.role, xi.path FROM users
                   INNER JOIN roles ON roles.idroles = users.role
@@ -82,12 +79,13 @@ class Session extends Model
               WHERE sessions.session = :session';
 
         try {
-            $objectUser = DB::select(DB::raw($sql), array('session' => $session));
+            $objectUser = DB::select(DB::raw($sql), ['session' => $session]);
 
             if (is_object($objectUser)) {
                 $User = new User;
                 $objectUser->permissions = $User->getRolePermissions($objectUser->role);
             }
+
             return $objectUser;
         } catch (\Illuminate\Database\QueryException $e) {
             dd($e);

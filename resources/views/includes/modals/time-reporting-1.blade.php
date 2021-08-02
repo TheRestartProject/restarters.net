@@ -28,7 +28,7 @@
                           @foreach($all_country_hours_completed as $country_hours)
                             <tr>
                               @if(!is_null($country_hours->country))
-                                <td>{{ FixometerHelper::getCountryFromCountryCode($country_hours->country) }}</td>
+                                <td>{{ App\Helpers\Fixometer::getCountryFromCountryCode($country_hours->country) }}</td>
                               @else
                                 <td>N/A</td>
                               @endif

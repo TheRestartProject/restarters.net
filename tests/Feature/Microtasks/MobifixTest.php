@@ -2,29 +2,30 @@
 
 namespace Tests\Feature;
 
-use App\Device;
 use App\Category;
+use App\Device;
 use App\Mobifix;
 use DB;
-use Tests\TestCase;
-use Illuminate\Foundation\Testing\WithFaker;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Foundation\Testing\WithFaker;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Str;
+use Tests\TestCase;
 
-class MobifixTest extends TestCase {
-
-    public function setUp() {
+class MobifixTest extends TestCase
+{
+    protected function setUp(): void
+    {
         parent::setUp();
-        DB::statement("SET foreign_key_checks=0");
+        DB::statement('SET foreign_key_checks=0');
         Device::truncate();
         Mobifix::truncate();
         DB::table('devices_faults_mobiles_adjudicated')->truncate();
     }
 
     /** @test */
-    public function fetch_mobifix_record() {
-
+    public function fetch_mobifix_record()
+    {
         $data = $this->_setup_data();
         $Mobifix = new Mobifix;
 
@@ -39,29 +40,29 @@ class MobifixTest extends TestCase {
     }
 
     /** @test */
-    public function fetch_mobifix_status() {
-
+    public function fetch_mobifix_status()
+    {
         $data = $this->_setup_data();
 
         $Mobifix = new Mobifix;
         $result = $Mobifix->fetchStatus();
         $this->assertTrue(is_array($result));
         foreach ($data['status'] as $k => $v) {
-            $this->assertTrue(array_key_exists($k, $result), 'fetch_mobifix_status: missing key - ' . $k);
-            if (!is_array($v)) {
-                $this->assertEquals($v, $result[$k][0]->total, 'fetch_mobifix_status: wrong ' . $k);
+            $this->assertTrue(array_key_exists($k, $result), 'fetch_mobifix_status: missing key - '.$k);
+            if (! is_array($v)) {
+                $this->assertEquals($v, $result[$k][0]->total, 'fetch_mobifix_status: wrong '.$k);
             } else {
                 foreach ($v[0] as $key => $val) {
-                    $this->assertTrue(property_exists($result[$k][0], $key), 'fetch_mobifix_status: missing key - ' . $key);
-                    $this->assertEquals($val, $result[$k][0]->{$key}, 'fetch_mobifix_status: wrong ' . $key);
+                    $this->assertTrue(property_exists($result[$k][0], $key), 'fetch_mobifix_status: missing key - '.$key);
+                    $this->assertEquals($val, $result[$k][0]->{$key}, 'fetch_mobifix_status: wrong '.$key);
                 }
             }
         }
     }
 
     /** @test */
-    public function update_mobifix_devices() {
-
+    public function update_mobifix_devices()
+    {
         $this->_setup_data();
 
         $Mobifix = new Mobifix;
@@ -82,8 +83,8 @@ class MobifixTest extends TestCase {
     }
 
     /** @test */
-    public function update_mobifix_empty_problem() {
-
+    public function update_mobifix_empty_problem()
+    {
         $this->_setup_data();
 
         $Mobifix = new Mobifix;
@@ -110,7 +111,8 @@ class MobifixTest extends TestCase {
      *
      * @return array
      */
-    protected function _setup_data() {
+    protected function _setup_data()
+    {
         $cats_in = [
             'mobile' => 25,
         ];
@@ -199,7 +201,7 @@ class MobifixTest extends TestCase {
                     'fault_type' => 'fault_type_3',
                 ]
         );
-        DB::update("INSERT INTO devices_faults_mobiles_adjudicated SET iddevices = " . $devs[3] . ", fault_type='fault_type_1'");
+        DB::update('INSERT INTO devices_faults_mobiles_adjudicated SET iddevices = '.$devs[3].", fault_type='fault_type_1'");
 
         // iddevices = 5 : 2 opinions with majority : recat
         factory(Mobifix::class, 2)->create(
@@ -251,6 +253,7 @@ class MobifixTest extends TestCase {
                 ],
             ],
         ];
+
         return [
             'categories_include' => $cats_in,
             'categories_exclude' => $cats_ex,
@@ -260,7 +263,8 @@ class MobifixTest extends TestCase {
         ];
     }
 
-    protected function _insert_mobifix_device($cat, $id, $problem, $fault_type = '') {
+    protected function _insert_mobifix_device($cat, $id, $problem, $fault_type = '')
+    {
         $device = factory(Device::class, 1)->states($cat)->create(
                 [
                     'problem' => $problem,
@@ -274,7 +278,7 @@ class MobifixTest extends TestCase {
             'fault_type' => $fault_type,
             'repair_status' => 1,
         ]);
+
         return $device->toArray()[0];
     }
-
 }

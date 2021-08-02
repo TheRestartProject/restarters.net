@@ -1,6 +1,6 @@
 <?php
 
-return array (
+return [
   'group' => 'Groupe',
   'groups' => 'Groupes',
   'all_groups' => 'Tous les groupes',
@@ -93,4 +93,4 @@ return array (
   'upcoming_none_planned' => 'Aucun prévu',
   'created_at' => 'créé',
   'create_groups_mobile' => 'créer',
-);
+];

@@ -2,15 +2,14 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Http\Request;
-use Auth;
 use App;
 use App\BattcatOra;
 use App\MicrotaskSurvey;
+use Auth;
+use Illuminate\Http\Request;
 
 class BattcatOraController extends Controller
 {
-
     protected $Model;
 
     /**
@@ -29,7 +28,7 @@ class BattcatOraController extends Controller
             $user = $this->_anon();
         }
         // if survey is being submitted
-        $thankyou = FALSE;
+        $thankyou = false;
         if ($request->has('task-survey')) {
             $inputs = $request->all();
             unset($inputs['_token']);
@@ -44,7 +43,7 @@ class BattcatOraController extends Controller
             ];
             $MicrotaskSurvey = new MicrotaskSurvey;
             $success = $MicrotaskSurvey->create($insert);
-            if (!$success) {
+            if (! $success) {
                 logger('MicrotaskSurvey error on insert.');
                 logger(print_r($insert, 1));
             }
@@ -54,7 +53,7 @@ class BattcatOraController extends Controller
         $this->Model = new BattcatOra;
         // if opinion is being submitted
         if ($request->has('id-ords')) {
-            if (!(is_numeric($request->input('fault-type-id')) && $request->input('fault-type-id') > 0)) {
+            if (! (is_numeric($request->input('fault-type-id')) && $request->input('fault-type-id') > 0)) {
                 return redirect()->back()->withErrors(['Oops, there was an error, please try again, sorry! If this error persists please contact The Restart Project.']);
             }
             $insert = [
@@ -66,7 +65,7 @@ class BattcatOraController extends Controller
             ];
             $this->Model = new BattcatOra;
             $success = $this->Model->create($insert);
-            if (!$success) {
+            if (! $success) {
                 logger('BattCat error on insert.');
                 logger(print_r($insert, 1));
             }
@@ -81,11 +80,12 @@ class BattcatOraController extends Controller
             }
         }
         $fault = $this->_fetchRecord($request);
-        if (!$fault) {
+        if (! $fault) {
             return redirect()->action('BattcatOraController@status')->withSuccess('done');
         }
         $progress = $this->Model->fetchProgress()[0]->total;
         $fault->faulttypes = $this->Model->fetchFaultTypes($fault->repair_status);
+
         return view('battcatora.index', [
             'title' => 'BattCat',
             'fault' => $fault,
@@ -112,6 +112,7 @@ class BattcatOraController extends Controller
         }
         $this->Model = new BattcatOra;
         $data = $this->Model->fetchStatus();
+
         return view('battcatora.status', [
             'title' => 'BattCat',
             'status' => $data,
@@ -168,7 +169,8 @@ class BattcatOraController extends Controller
      */
     public function survey(Request $request)
     {
-        $request->session()->put('battcatora.redirect_to_survey', TRUE);
+        $request->session()->put('battcatora.redirect_to_survey', true);
+
         return $this->index($request);
     }
 
@@ -177,12 +179,13 @@ class BattcatOraController extends Controller
      *
      * @param Illuminate\Http\Request $request
      *
-     * @return integer
+     * @return int
      */
     protected function _getSubmits($request)
     {
         $submits = $request->session()->get('battcatora.submits', 0);
         $request->session()->put('battcatora.submits', ++$submits);
+
         return $submits;
     }
 
@@ -196,6 +199,7 @@ class BattcatOraController extends Controller
         $user = new \stdClass();
         $user->id = 0;
         $user->name = 'Guest';
+
         return $user;
     }
 
@@ -219,7 +223,7 @@ class BattcatOraController extends Controller
     protected function _fetchRecord(Request $request)
     {
         // $request->session()->flush();
-        $result = FALSE;
+        $result = false;
         $exclusions = $request->session()->get('battcatora.exclusions', []);
         $this->Model = new BattcatOra;
         $locale = $this->_getUserLocale();
@@ -228,6 +232,7 @@ class BattcatOraController extends Controller
             $result = $fault[0];
             $request->session()->push('battcatora.exclusions', $result->id_ords);
         }
+
         return $result;
     }
 }

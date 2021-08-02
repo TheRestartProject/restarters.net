@@ -20,6 +20,9 @@
           {{ __('groups.join_group_button') }}
         </b-btn>
         <!-- We can't RSVP if the event is starting soon. -->
+        <b-btn variant="primary" :href="event.invitation" :disabled="startingSoon" v-else-if="event.invitation">
+          {{ __('events.RSVP') }}
+        </b-btn>
         <b-btn variant="primary" :href="'/party/join/' + idevents" :disabled="startingSoon" v-else>
           {{ __('events.RSVP') }}
         </b-btn>

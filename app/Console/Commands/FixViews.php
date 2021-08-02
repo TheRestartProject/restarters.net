@@ -2,9 +2,8 @@
 
 namespace App\Console\Commands;
 
-use Illuminate\Console\Command;
-
 use DB;
+use Illuminate\Console\Command;
 
 class FixViews extends Command
 {
@@ -31,17 +30,18 @@ class FixViews extends Command
     {
         if (env('APP_ENV') !== 'local') {
             $this->error('This command is only designed to be run during local development.');
+
             return;
         }
 
         $results = DB::select(DB::raw('
-SELECT table_name as viewName, CONCAT("ALTER DEFINER=`'. env('DB_USERNAME') . '`@`' . env('DB_HOST') . '` VIEW `",table_name,"` AS ", view_definition,";") as alter_statement
+SELECT table_name as viewName, CONCAT("ALTER DEFINER=`'.env('DB_USERNAME').'`@`'.env('DB_HOST').'` VIEW `",table_name,"` AS ", view_definition,";") as alter_statement
 FROM information_schema.views
-WHERE table_schema="' . env('DB_DATABASE') . '"'));
+WHERE table_schema="'.env('DB_DATABASE').'"'));
 
         foreach ($results as $result) {
             DB::unprepared(DB::raw($result->alter_statement));
-            $this->info('Fixed ' . $result->viewName);
+            $this->info('Fixed '.$result->viewName);
         }
     }
 }

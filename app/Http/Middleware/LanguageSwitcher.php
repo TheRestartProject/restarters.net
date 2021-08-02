@@ -6,8 +6,8 @@ use App;
 use Auth;
 use Closure;
 use Illuminate\Support\Facades\Config;
-use LaravelLocalization;
 use Jenssegers\Agent\Agent;
+use LaravelLocalization;
 
 class LanguageSwitcher
 {
@@ -27,7 +27,7 @@ class LanguageSwitcher
             if (in_array($locale, LaravelLocalization::getSupportedLanguagesKeys())) {
                 $this->setLocale($locale);
             }
-        } else if (session('locale')) {
+        } elseif (session('locale')) {
             // Otherwise, check if locale session already exists.
             // If it does, continue to maintian that locale.
             App::setLocale(session('locale'));
@@ -37,11 +37,11 @@ class LanguageSwitcher
             // Check if anything provided by the browser.
             $agent = new Agent();
 
-          // Check to see whether any default languages exist on browser
-            if (!empty($agent->languages())) {
-              // Loop through all languages until we hit a match
+            // Check to see whether any default languages exist on browser
+            if (! empty($agent->languages())) {
+                // Loop through all languages until we hit a match
                 foreach ($agent->languages() as $locale) {
-                  // Check to see what supported languages there are before committing
+                    // Check to see what supported languages there are before committing
                     if (in_array($locale, LaravelLocalization::getSupportedLanguagesKeys())) {
                         $this->setLocale($locale);
                         // Break loop and continue with next request
@@ -50,6 +50,7 @@ class LanguageSwitcher
                 }
             }
         }
+
         return $next($request);
     }
 
@@ -65,15 +66,12 @@ class LanguageSwitcher
         LaravelLocalization::setLocale($locale);
 
         // Set in database
-        if (!Auth::guest()) {
+        if (! Auth::guest()) {
             Auth::user()->update([
-                'language' => $locale
+                'language' => $locale,
             ]);
         }
     }
-
-
-
 
     // $language = $agent->languages(); // Browser language
     //

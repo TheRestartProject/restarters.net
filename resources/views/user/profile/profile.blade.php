@@ -27,7 +27,7 @@
             <div class="form-control form-control__select">
                 <select id="country" name="country" required aria-required="true" class="field select2">
                     <option value=""></option>
-                    @foreach (FixometerHelper::getAllCountries() as $key => $value)
+                    @foreach (App\Helpers\Fixometer::getAllCountries() as $key => $value)
                         @if ($user->country == $key)
                         <option value="{{ $key }}" selected>{{ $value }}</option>
                         @else
@@ -55,7 +55,7 @@
             <label for="age">@lang('registration.age'):</label>
             <div class="form-control form-control__select">
                 <select id="age" name="age" required aria-required="true" class="field select2">
-                    @foreach(FixometerHelper::allAges() as $age)
+                    @foreach(App\Helpers\Fixometer::allAges() as $age)
                     @if ( $user->age == $age )
                         <option value="{{ $age }}" selected>{{ $age }}</option>
                     @else
@@ -107,7 +107,7 @@
             <label for="tags[]">@lang('general.your_repair_skills'):</label>
             <div class="form-control form-control__select">
             <select id="tags" name="tags[]" class="select2-tags" multiple>
-                @foreach( FixometerHelper::skillCategories() as $key => $skill_category )
+                @foreach( App\Helpers\Fixometer::skillCategories() as $key => $skill_category )
                     <optgroup label="@lang($skill_category)">
                     @foreach ($skills[$key] as $skill)
                         @if ( !empty($user_skills) && in_array($skill->id, $user_skills))

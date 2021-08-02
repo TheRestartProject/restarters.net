@@ -1,6 +1,6 @@
 <?php
 
-return array (
+return [
   'search-all-time-volunteered' => 'Search time volunteered',
   'by_users' => 'By volunteer',
   'by_location' => 'By location',
@@ -42,4 +42,4 @@ return array (
   'event_name' => 'Event',
   'restart_group' => 'Group',
   'export_csv' => 'Export to CSV',
-);
+];

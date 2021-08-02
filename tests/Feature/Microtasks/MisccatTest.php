@@ -2,21 +2,22 @@
 
 namespace Tests\Feature;
 
+use App\Category;
 use App\Device;
 use App\Group;
-use App\Category;
 use App\Misccat;
 use DB;
-use Tests\TestCase;
-use Illuminate\Foundation\Testing\WithFaker;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Foundation\Testing\WithFaker;
 use Illuminate\Support\Facades\Log;
+use Tests\TestCase;
 
-class MisccatTest extends TestCase {
-
-    public function setUp() {
+class MisccatTest extends TestCase
+{
+    protected function setUp(): void
+    {
         parent::setUp();
-        DB::statement("SET foreign_key_checks=0");
+        DB::statement('SET foreign_key_checks=0');
         Group::truncate();
         Device::truncate();
         Category::truncate();
@@ -25,8 +26,8 @@ class MisccatTest extends TestCase {
     }
 
     /** @test */
-    public function fetch_misccat_record() {
-
+    public function fetch_misccat_record()
+    {
         $devices = 5;
         $this->_insert_misccat_devices($devices);
 
@@ -37,10 +38,10 @@ class MisccatTest extends TestCase {
             $this->assertTrue(is_array($result));
             $this->assertEquals(count($result), 1);
             $this->assertGreaterThan(0, $result[0]->iddevices);
-            $iddevices[$result[0]->iddevices] ++;
+            $iddevices[$result[0]->iddevices]++;
         }
         for ($i = 1; $i < $devices; $i++) {
-            $this->assertGreaterThan(0, $iddevices[$i], 'fetch_misccat_record: 0 fetched for iddevices=' . $i);
+            $this->assertGreaterThan(0, $iddevices[$i], 'fetch_misccat_record: 0 fetched for iddevices='.$i);
         }
 
         $misccat = factory(Misccat::class, 3)->states('misc')->create([
@@ -54,13 +55,13 @@ class MisccatTest extends TestCase {
             $this->assertTrue(is_array($result));
             $this->assertEquals(count($result), 1);
             $this->assertGreaterThan(0, $result[0]->iddevices);
-            $iddevices[$result[0]->iddevices] ++;
+            $iddevices[$result[0]->iddevices]++;
         }
         $this->assertEquals($iddevices[3], 0, 'fetch_misccat_record: records fetched for iddevices=3');
     }
 
-    protected function _insert_misccat_devices($num) {
-
+    protected function _insert_misccat_devices($num)
+    {
         $device = factory(Device::class, $num)->states('misccat')->create();
         for ($i = 1; $i <= $num; $i++) {
             $this->assertDatabaseHas('devices', [
@@ -72,8 +73,8 @@ class MisccatTest extends TestCase {
     }
 
     /** @test */
-    public function fetch_misccat_status() {
-
+    public function fetch_misccat_status()
+    {
         $this->_setup_data();
 
         $Misccat = new Misccat;
@@ -123,13 +124,13 @@ class MisccatTest extends TestCase {
 
         $this->assertEquals($result['list_splits'][0]->iddevices, 6, 'fetch_misccat_status: wrong iddevices for list_splits[0]');
         $this->assertEquals($result['list_splits'][0]->code, '3', 'fetch_misccat_status: wrong code for list_splits[0]');
-        $this->assertEquals($result['list_splits'][0]->adjudication, NULL, 'fetch_misccat_status: wrong adjudication for list_splits[0]');
+        $this->assertEquals($result['list_splits'][0]->adjudication, null, 'fetch_misccat_status: wrong adjudication for list_splits[0]');
         $this->assertEquals($result['list_splits'][0]->opinions, 'Cat1,Cat2,Cat3', 'fetch_misccat_status: wrong opinions for list_splits[0]');
     }
 
     /** @test */
-    public function update_misccat_devices() {
-
+    public function update_misccat_devices()
+    {
         $this->_setup_data();
 
         $Misccat = new Misccat;
@@ -148,17 +149,18 @@ class MisccatTest extends TestCase {
         ]);
     }
 
-    protected function _setup_data() {
+    protected function _setup_data()
+    {
         $data = $this->_get_setup_data();
         foreach ($data as $case => $elems) {
             foreach ($elems as $tablename => $records) {
                 foreach ($records as $record) {
                     if ($tablename == 'devices') {
                         factory(Device::class, 1)->create($record);
-                    } else if ($tablename == 'devices_misc_opinions') {
+                    } elseif ($tablename == 'devices_misc_opinions') {
                         factory(Misccat::class, 1)->create($record);
-                    } else if ($tablename == 'devices_misc_adjudicated') {
-                        DB::update("INSERT INTO devices_misc_adjudicated SET iddevices = " . $record['iddevices'] . ", category = '" . $record['category'] . "'");
+                    } elseif ($tablename == 'devices_misc_adjudicated') {
+                        DB::update('INSERT INTO devices_misc_adjudicated SET iddevices = '.$record['iddevices'].", category = '".$record['category']."'");
                     }
                     $this->assertDatabaseHas($tablename, $record);
                 }
@@ -166,14 +168,13 @@ class MisccatTest extends TestCase {
         }
     }
 
-    protected function _get_setup_data() {
-
+    protected function _get_setup_data()
+    {
         $iddevices = 0;
         $result = [];
 
         $result['-2'] = [
-            'devices' =>
-            [
+            'devices' => [
                 [
                     'iddevices' => ++$iddevices,
                     'category' => 25,
@@ -185,8 +186,8 @@ class MisccatTest extends TestCase {
             'devices_misc_adjudicated' => [],
         ];
 
-//WHEN -1 THEN 'Category has been updated from Misc, thanks!'
-// 1 device record = "Mobile", 2 misccat records = "Mobile"
+        //WHEN -1 THEN 'Category has been updated from Misc, thanks!'
+        // 1 device record = "Mobile", 2 misccat records = "Mobile"
 
         $result['-1'] = [
             'devices' => [
@@ -195,7 +196,7 @@ class MisccatTest extends TestCase {
                     'category' => 25,
                     'category_creation' => 46,
                     'repair_status' => 1,
-                ]
+                ],
             ],
             'devices_misc_opinions' => [
                 [
@@ -205,13 +206,13 @@ class MisccatTest extends TestCase {
                 [
                     'iddevices' => $iddevices,
                     'category' => 'Mobile',
-                ]
+                ],
             ],
             'devices_misc_adjudicated' => [],
         ];
 
-//WHEN 0 THEN 'Is Misc and has no opinions'
-// 1 device record = "Misc", 0 misccat records
+        //WHEN 0 THEN 'Is Misc and has no opinions'
+        // 1 device record = "Misc", 0 misccat records
         $result['0'] = [
             'devices' => [
                 [
@@ -225,8 +226,8 @@ class MisccatTest extends TestCase {
             'devices_misc_adjudicated' => [],
         ];
 
-//WHEN 1 THEN 'Is Misc and has only one opinion'
-// 1 device record = "Misc", 1 misccat record = "Cat1"
+        //WHEN 1 THEN 'Is Misc and has only one opinion'
+        // 1 device record = "Misc", 1 misccat record = "Cat1"
         $result['1'] = [
             'devices' => [
                 [
@@ -240,13 +241,13 @@ class MisccatTest extends TestCase {
                 [
                     'iddevices' => $iddevices,
                     'category' => 'Cat1',
-                ]
+                ],
             ],
             'devices_misc_adjudicated' => [],
         ];
 
-//WHEN 2 THEN 'Is Misc and needs just one more opinion'
-// 1 device record = "Misc", 2 misccat records = "Cat1"/"Cat2"
+        //WHEN 2 THEN 'Is Misc and needs just one more opinion'
+        // 1 device record = "Misc", 2 misccat records = "Cat1"/"Cat2"
         $result['2'] = [
             'devices' => [
                 [
@@ -269,8 +270,8 @@ class MisccatTest extends TestCase {
             'devices_misc_adjudicated' => [],
         ];
 
-//WHEN 3 THEN 'Is Misc and opinions are split, adjudication needed'
-// 1 device record = "Misc", 3 misccat records = "Cat1"/"Cat2"/"Cat3"
+        //WHEN 3 THEN 'Is Misc and opinions are split, adjudication needed'
+        // 1 device record = "Misc", 3 misccat records = "Cat1"/"Cat2"/"Cat3"
         $result['3'] = [
             'devices' => [
                 [
@@ -297,11 +298,11 @@ class MisccatTest extends TestCase {
             'devices_misc_adjudicated' => [],
         ];
 
-//WHEN 4 THEN 'Is Misc and majority opinions agree it should remain as Misc, thanks!'
-// 3 device records in total
-// 1 device record = "Misc", 3 misccat records = "Misc"
-// 1 device record = "Misc", 2 misccat records = "Misc", 1 misccat records = "Cat1"
-// 1 device record = "Misc", 3 misccat records = "Cat1"/"Cat2"/"Misc", 1 adjudication record = "Misc"
+        //WHEN 4 THEN 'Is Misc and majority opinions agree it should remain as Misc, thanks!'
+        // 3 device records in total
+        // 1 device record = "Misc", 3 misccat records = "Misc"
+        // 1 device record = "Misc", 2 misccat records = "Misc", 1 misccat records = "Cat1"
+        // 1 device record = "Misc", 3 misccat records = "Cat1"/"Cat2"/"Misc", 1 adjudication record = "Misc"
         $result['4']['devices'] = [];
         $result['4']['devices_misc_opinions'] = [];
         $result['4']['devices_misc_adjudicated'] = [];
@@ -367,14 +368,13 @@ class MisccatTest extends TestCase {
             'category' => 'Misc',
         ];
 
-//WHEN 5 THEN 'Is Misc and majority opinions say not Misc so it will be updated soon, thanks!'
-// 2 device records in total
-// 1 device record = "Misc", 3 misccat records = "Cat1"
-// 1 device record = "Misc", 3 misccat records = "Cat1"/"Cat2"/"Misc", 1 adjudication record = "Cat1"
+        //WHEN 5 THEN 'Is Misc and majority opinions say not Misc so it will be updated soon, thanks!'
+        // 2 device records in total
+        // 1 device record = "Misc", 3 misccat records = "Cat1"
+        // 1 device record = "Misc", 3 misccat records = "Cat1"/"Cat2"/"Misc", 1 adjudication record = "Cat1"
         $result['5']['devices'] = [];
         $result['5']['devices_misc_opinions'] = [];
         $result['5']['devices_misc_adjudicated'] = [];
-
 
         $result['5']['devices'][] = [
             'iddevices' => ++$iddevices,
@@ -422,5 +422,4 @@ class MisccatTest extends TestCase {
 
         return $result;
     }
-
 }

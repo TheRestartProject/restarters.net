@@ -2,8 +2,8 @@
 
 namespace App\Http\Middleware;
 
-use Auth;
 use App\User;
+use Auth;
 use Closure;
 
 class VerifyUserConsent

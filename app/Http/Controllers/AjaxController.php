@@ -2,24 +2,21 @@
 
 namespace App\Http\Controllers;
 
+use App\User;
+use Auth;
+use FixometerFile;
+use App\Helpers\Fixometer;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Validator;
-use Illuminate\Http\Request;
-use App\User;
-
-use FixometerHelper;
-use FixometerFile;
-use Auth;
 
 class AjaxController extends Controller
 {
-  /** this class exposes JSON objects  **/
-
-
+    /** this class exposes JSON objects  **/
     public function restarters_in_group()
     {
         if (isset($_GET['group']) && is_numeric($_GET['group'])) {
-            $group = (integer)$_GET['group'];
+            $group = (int) $_GET['group'];
 
             $Users = new User;
             $restarters = $Users->inGroup($group);
@@ -31,7 +28,7 @@ class AjaxController extends Controller
     public function restarters()
     {
         $Auth = new Auth($url);
-        if (!$Auth->isLoggedIn()) {
+        if (! $Auth->isLoggedIn()) {
             header('Location: /user/login');
         } else {
             $user = $Auth->getProfile();
@@ -39,11 +36,11 @@ class AjaxController extends Controller
             $this->set('user', $user);
 
             $Users = new User;
-            $restarters = $Users->find(array('idroles' => 4));
+            $restarters = $Users->find(['idroles' => 4]);
 
             $response = '';
             foreach ($restarters as $c) {
-                $response .= '<option value="' . $c->idusers . '">' .  $c->name . '</option>';
+                $response .= '<option value="'.$c->idusers.'">'.$c->name.'</option>';
             }
 
             echo $response;
@@ -63,13 +60,15 @@ class AjaxController extends Controller
         if (isset($_GET['id']) && is_numeric($_GET['id'])) {
             $party = $_GET['id'];
         } else {
-            echo json_encode(array('code'=>500, 'status'=>'danger', 'message' => 'Missing Parameter.'));
+            echo json_encode(['code'=>500, 'status'=>'danger', 'message' => 'Missing Parameter.']);
+
             return false;
         }
 
         $Party = new Party;
         $party = $Party->findOne($party);
         echo json_encode($party);
+
         return true;
     }
 
@@ -81,9 +80,9 @@ class AjaxController extends Controller
         $response = '';
 
         foreach ($categories as $cluster) {
-            $response .= '<optgroup label="' . $cluster->name . '">';
+            $response .= '<optgroup label="'.$cluster->name.'">';
             foreach ($cluster->categories as $c) {
-                $response .= '<option value="' . $c->idcategories . '">' .  $c->name . '</option>';
+                $response .= '<option value="'.$c->idcategories.'">'.$c->name.'</option>';
             }
             $response .= '</optgroup>';
         }
@@ -94,7 +93,7 @@ class AjaxController extends Controller
     public function delete_device_image()
     {
         $Auth = new Auth($url);
-        if (!$Auth->isLoggedIn()) {
+        if (! $Auth->isLoggedIn()) {
             header('Location: /user/login');
         } else {
             $user = $Auth->getProfile();

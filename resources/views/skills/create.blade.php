@@ -20,7 +20,7 @@
             <label for="category">Category:</label>
             <select id="category" name="category" class="form-control" data-live-search="true">
                 <option></option>
-                @foreach( FixometerHelper::skillCategories() as $key => $category )
+                @foreach( App\Helpers\Fixometer::skillCategories() as $key => $category )
                   <option value="{{{ $key }}}">{{{ $category }}}</option>
                 @endforeach
             </select>

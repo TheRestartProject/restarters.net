@@ -29,7 +29,7 @@
       <div class="col-lg-12">
 
         @if(isset($response))
-        @php( FixometerHelper::printResponse($response) )
+        @php( App\Helpers\Fixometer::printResponse($response) )
         @endif
         @if (\Session::has('error'))
           <div class="alert alert-danger">
@@ -41,7 +41,7 @@
           <li class="nav-item">
             <a class="nav-link active" data-toggle="tab" href="#details">Group details</a>
           </li>
-          @if( $audits && FixometerHelper::hasRole(Auth::user(), 'Administrator') )
+          @if( $audits && App\Helpers\Fixometer::hasRole(Auth::user(), 'Administrator') )
               <li class="nav-item">
                 <a class="nav-link" data-toggle="tab" href="#log">Group log</a>
               </li>
@@ -233,7 +233,7 @@
 
   </div>
 
-  @if( $audits && FixometerHelper::hasRole(Auth::user(), 'Administrator') )
+  @if( $audits && App\Helpers\Fixometer::hasRole(Auth::user(), 'Administrator') )
 
       <div class="tab-pane" id="log">
 

@@ -1,18 +1,18 @@
 <?php
 
-use Illuminate\Support\Facades\Schema;
-use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Database\Migrations\Migration;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\Schema;
 
-class CreateMisccatTables extends Migration {
-
+class CreateMisccatTables extends Migration
+{
     /**
      * Run the migrations.
      *
      * @return void
      */
-    public function up() {
-
+    public function up()
+    {
         Schema::create('devices_misc_opinions', function (Blueprint $table) {
             $table->increments('id');
             $table->integer('iddevices')->index();
@@ -35,7 +35,6 @@ class CreateMisccatTables extends Migration {
             $table->charset = 'utf8mb4';
             $table->collation = 'utf8mb4_unicode_ci';
         });
-
     }
 
     /**
@@ -43,10 +42,9 @@ class CreateMisccatTables extends Migration {
      *
      * @return void
      */
-    public function down() {
+    public function down()
+    {
         Schema::dropIfExists('devices_misc_opinions');
         Schema::dropIfExists('devices_misc_adjudicated');
-
     }
-
 }

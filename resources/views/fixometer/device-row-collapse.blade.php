@@ -8,28 +8,28 @@
             <span class="btn-state-2">@lang('devices.close_record')</span>
         </button>
     </td>
-    <td class="category" @if( !FixometerHelper::checkColumn('category', $user_preferences) ) style="display: none;" @endif>
+    <td class="category" @if( !App\Helpers\Fixometer::checkColumn('category', $user_preferences) ) style="display: none;" @endif>
         {{{ $device->deviceCategory->name }}}
     </td>
     @if ($powered)
-    <td class="brand" @if( !FixometerHelper::checkColumn('brand', $user_preferences) ) style="display: none;" @endif>
+    <td class="brand" @if( !App\Helpers\Fixometer::checkColumn('brand', $user_preferences) ) style="display: none;" @endif>
         {{{ $device->brand }}}
     </td>
-    <td class="model" @if( !FixometerHelper::checkColumn('model', $user_preferences) ) style="display: none;" @endif>
+    <td class="model" @if( !App\Helpers\Fixometer::checkColumn('model', $user_preferences) ) style="display: none;" @endif>
         {{{ $device->model }}}
     </td>
     @else
-    <td class="item_type" @if( !FixometerHelper::checkColumn('item_type', $user_preferences) ) style="display: none;" @endif>
+    <td class="item_type" @if( !App\Helpers\Fixometer::checkColumn('item_type', $user_preferences) ) style="display: none;" @endif>
         {{{ $device->item_type }}}
     </td>
     @endif
-    <td class="problem" @if( !FixometerHelper::checkColumn('problem', $user_preferences) ) style="display: none;" @endif>
+    <td class="problem" @if( !App\Helpers\Fixometer::checkColumn('problem', $user_preferences) ) style="display: none;" @endif>
         {{{ $device->getShortProblem() }}}
     </td>
-    <td class="group_name" @if( !FixometerHelper::checkColumn('group_name', $user_preferences) ) style="display: none;" @endif>
+    <td class="group_name" @if( !App\Helpers\Fixometer::checkColumn('group_name', $user_preferences) ) style="display: none;" @endif>
         {{{ $device->deviceEvent->theGroup->name }}}
     </td>
-    <td class="event_date" @if( !FixometerHelper::checkColumn('event_date', $user_preferences) ) style="display: none;" @endif>
+    <td class="event_date" @if( !App\Helpers\Fixometer::checkColumn('event_date', $user_preferences) ) style="display: none;" @endif>
         {{{ $device->deviceEvent->getEventDate() }}}
     </td>
     @include('partials/device-status', ['status' => $device->repair_status])

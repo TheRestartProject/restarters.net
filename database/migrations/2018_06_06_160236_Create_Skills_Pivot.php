@@ -1,8 +1,8 @@
 <?php
 
-use Illuminate\Support\Facades\Schema;
-use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Database\Migrations\Migration;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\Schema;
 
 class CreateSkillsPivot extends Migration
 {
@@ -13,14 +13,14 @@ class CreateSkillsPivot extends Migration
      */
     public function up()
     {
-      Schema::create('users_skills', function (Blueprint $table) {
-          $table->increments('id');
-          $table->integer('skill');
-          $table->integer('user');
-      });
-      Schema::table('users', function (Blueprint $table) {
-          $table->dropColumn('skills');
-      });
+        Schema::create('users_skills', function (Blueprint $table) {
+            $table->increments('id');
+            $table->integer('skill');
+            $table->integer('user');
+        });
+        Schema::table('users', function (Blueprint $table) {
+            $table->dropColumn('skills');
+        });
     }
 
     /**
@@ -30,9 +30,9 @@ class CreateSkillsPivot extends Migration
      */
     public function down()
     {
-      Schema::dropIfExists('users_skills');
-      Schema::table('users', function (Blueprint $table) {
-          $table->string('skills');
-      });
+        Schema::dropIfExists('users_skills');
+        Schema::table('users', function (Blueprint $table) {
+            $table->string('skills');
+        });
     }
 }

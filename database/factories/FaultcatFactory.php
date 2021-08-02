@@ -40,4 +40,3 @@ $factory->state(App\Device::class, 'tablet', function (Faker $faker) {
         'category_creation' => 26,
     ];
 });
-

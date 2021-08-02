@@ -3,22 +3,20 @@
 namespace Tests\Unit;
 
 use App\User;
-
 use DB;
-use Tests\TestCase;
-use Illuminate\Foundation\Testing\WithFaker;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Foundation\Testing\WithFaker;
+use Tests\TestCase;
 
-class UsernameGenerationTest extends TestCase
+class UsernameGeneratorTest extends TestCase
 {
-    public function setUp()
+    protected function setUp(): void
     {
         parent::setUp();
-        DB::statement("SET foreign_key_checks=0");
+        DB::statement('SET foreign_key_checks=0');
         User::truncate();
-        DB::statement("SET foreign_key_checks=1");
+        DB::statement('SET foreign_key_checks=1');
     }
-
 
     /** @test */
     public function name_is_single_name()
@@ -28,9 +26,8 @@ class UsernameGenerationTest extends TestCase
 
         $user->generateAndSetUsername();
 
-        $this->assertEquals("Philip", $user->username);
+        $this->assertEquals('Philip', $user->username);
     }
-
 
     /** @test */
     public function name_is_first_and_last_name()
@@ -40,7 +37,7 @@ class UsernameGenerationTest extends TestCase
 
         $user->generateAndSetUsername();
 
-        $this->assertEquals("Philip_Fry", $user->username);
+        $this->assertEquals('Philip_Fry', $user->username);
     }
 
     /** @test */
@@ -51,7 +48,7 @@ class UsernameGenerationTest extends TestCase
 
         $user->generateAndSetUsername();
 
-        $this->assertEquals("Philip_J._Fry", $user->username);
+        $this->assertEquals('Philip_J._Fry', $user->username);
     }
 
     /** @test */
@@ -62,7 +59,7 @@ class UsernameGenerationTest extends TestCase
 
         $user->generateAndSetUsername();
 
-        $this->assertEquals("Brixton_Repair_Cafe", $user->username);
+        $this->assertEquals('Brixton_Repair_Cafe', $user->username);
     }
 
     /** @test */
@@ -73,7 +70,7 @@ class UsernameGenerationTest extends TestCase
 
         $user->generateAndSetUsername();
 
-        $this->assertEquals("Philip_J_Fry", $user->username);
+        $this->assertEquals('Philip_J_Fry', $user->username);
     }
 
     /** @test */
@@ -88,7 +85,7 @@ class UsernameGenerationTest extends TestCase
         $user2->name = 'Philip J Fry';
         $user2->generateAndSetUsername();
 
-        $this->assertEquals("Philip_J_Fry_".$user2->id, $user2->username);
+        $this->assertEquals('Philip_J_Fry_'.$user2->id, $user2->username);
     }
 
     // if name is empty?
