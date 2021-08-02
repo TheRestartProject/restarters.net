@@ -13,6 +13,9 @@ class AccountCreationTest extends TestCase
 {
     public function testRegister()
     {
+        $response = $this->get('/user/register');
+        $response->assertSee(__('registration.reg-step-1-heading'), $response->getContent());
+
         $userAttributes = $this->userAttributes();
         $response = $this->post('/user/register/', $userAttributes);
 
