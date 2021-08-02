@@ -6,6 +6,8 @@ use App\Group;
 use App\Party;
 use Carbon\Carbon;
 use DB;
+use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
+use Tests\TestCase;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
 
@@ -64,5 +66,11 @@ class GroupStatsTest extends TestCase
             'ewaste' => 0,
         ];
         $this->assertEquals($expectedStats, $group->getGroupStats(0.5));
+    }
+
+    /** @test */
+    public function stats_for_invalid_group() {
+        $this->expectException(NotFoundHttpException::class);
+        $response = $this->get("/group/stats/37/mini");
     }
 }
