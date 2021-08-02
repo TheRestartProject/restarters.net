@@ -1627,7 +1627,8 @@ jQuery(document).ready(function () {
 
         'eventtimerangepicker': require('./components/EventTimeRangePicker.vue'),
         'eventdatepicker': require('./components/EventDatePicker.vue'),
-        'venueaddress': require('./components/VenueAddress.vue')
+        'venueaddress': require('./components/VenueAddress.vue'),
+        'richtexteditor': require('./components/RichTextEditor.vue')
       }
     })
   })
