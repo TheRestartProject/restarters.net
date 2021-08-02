@@ -78,6 +78,13 @@ class PartyController extends Controller
         $thisone['attending'] = Auth::user() && $event->isBeingAttendedBy(Auth::user()->id);
         $thisone['allinvitedcount'] = $event->allInvited->count();
 
+        // We might have been invited; if so we should include the invitation link.
+        $is_attending = EventsUsers::where('event', $event->idevents)->where('user', Auth::user()->id)->first();
+
+        if ($is_attending && $is_attending->status !== 1) {
+            $thisone['invitation'] = "/party/accept-invite/{$event->idevents}/{$is_attending->status}";
+        }
+
         // TODO LATER Consider whether these stats should be in the event or passed into the store.
         $thisone['stats'] = $event->getEventStats($emissionRatio);
         $thisone['participants_count'] = $event->participants;

@@ -32,7 +32,7 @@
             <div class="row">
               <div class="col-md-8 col-lg-9 d-flex flex-column align-content-center">@lang('events.pending_rsvp_message')</div>
               <div class="col-md-4 col-lg-3 d-flex flex-column align-content-center">
-                <a href="/party/accept-invite/{{{ $is_attending->event }}}/{{{ $is_attending->status }}}" class="btn btn-info">@lang('events.pending_rsvp_button')</a>
+                <a href="/party/accept-invite/{{{ $is_attending->event }}}/{{{ $is_attending->status }}}" class="btn btn-primary">@lang('events.pending_rsvp_button')</a>
               </div>
             </div>
 
