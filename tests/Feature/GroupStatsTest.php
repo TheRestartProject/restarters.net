@@ -8,8 +8,6 @@ use Carbon\Carbon;
 use DB;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Tests\TestCase;
-use Illuminate\Foundation\Testing\RefreshDatabase;
-use Tests\TestCase;
 
 class GroupStatsTest extends TestCase
 {
