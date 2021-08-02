@@ -2,10 +2,9 @@
 
 namespace App\Providers;
 
+use HieuLe\WordpressXmlrpcClient\WordpressClient;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\ServiceProvider;
-
-use HieuLe\WordpressXmlrpcClient\WordpressClient;
 
 class WordpressServiceProvider extends ServiceProvider
 {
@@ -33,7 +32,7 @@ class WordpressServiceProvider extends ServiceProvider
 
                 return $wpClient;
             } catch (\Exception $ex) {
-                Log::error("Failed to instantiate Wordpress API classes: " . $ex->getMessage());
+                Log::error('Failed to instantiate Wordpress API classes: '.$ex->getMessage());
             }
         });
     }

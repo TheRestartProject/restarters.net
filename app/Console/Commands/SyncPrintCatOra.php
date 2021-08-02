@@ -2,11 +2,11 @@
 
 namespace App\Console\Commands;
 
-use Illuminate\Console\Command;
 use App\PrintcatOra;
+use Illuminate\Console\Command;
 
-class SyncPrintCatOra extends Command {
-
+class SyncPrintCatOra extends Command
+{
     /**
      * The name and signature of the console command.
      *
@@ -26,15 +26,15 @@ class SyncPrintCatOra extends Command {
      *
      * @return mixed
      */
-    public function handle() {
+    public function handle()
+    {
         $this->info('Updating devices_printcat_ora with winning fault types');
         $PrintcatOra = new PrintcatOra;
         $result = $PrintcatOra->updateDevices();
         if ($result) {
-            $this->info($result . ' rows updated');
+            $this->info($result.' rows updated');
         } else {
             $this->info('0 rows updated');
         }
     }
-
 }

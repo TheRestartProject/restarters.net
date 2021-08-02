@@ -47,20 +47,20 @@ class LanguageSync extends Command
         // in hand to log in to mediawiki.
         //
         // So we go directly in via the database.  This will also handle any pre-existing users.
-        if (!env('WIKI_DB')) {
-            $this->error("Wiki integration not enabled");
+        if (! env('WIKI_DB')) {
+            $this->error('Wiki integration not enabled');
         } else {
-            $dsn = "mysql:host=localhost;port=3306;dbname=" . env('WIKI_DB') . ";charset=utf8";
+            $dsn = 'mysql:host=localhost;port=3306;dbname='.env('WIKI_DB').';charset=utf8';
             $mwdb = new \PDO($dsn, env('WIKI_DB_USER'), env('WIKI_DB_PASSWORD'), [
-                \PDO::MYSQL_ATTR_INIT_COMMAND => "SET NAMES utf8mb4 COLLATE utf8mb4_unicode_ci",
-                \PDO::ATTR_DEFAULT_FETCH_MODE => \PDO::FETCH_ASSOC
+                \PDO::MYSQL_ATTR_INIT_COMMAND => 'SET NAMES utf8mb4 COLLATE utf8mb4_unicode_ci',
+                \PDO::ATTR_DEFAULT_FETCH_MODE => \PDO::FETCH_ASSOC,
             ]);
 
             $users = User::all();
 
             foreach ($users as $user) {
                 if ($user->mediawiki) {
-                    $mwusers = $mwdb->query("SELECT user_id FROM mw_user WHERE user_name LIKE " . $mwdb->quote($user->mediawiki));
+                    $mwusers = $mwdb->query('SELECT user_id FROM mw_user WHERE user_name LIKE '.$mwdb->quote($user->mediawiki));
 
                     foreach ($mwusers as $mwuser) {
                         // Mediawiki doesn't have fr-BE so just going with main locale.
@@ -70,20 +70,20 @@ class LanguageSync extends Command
                         // entry already exists.  This also allows us to reduce the update ops for performance.
                         $props = $mwdb->query("SELECT * FROM mw_user_properties WHERE up_user = {$mwuser['user_id']} AND up_property = 'language';");
 
-                        $existing = FALSE;
+                        $existing = false;
 
                         foreach ($props as $prop) {
-                            $existing = TRUE;
+                            $existing = true;
 
                             if (strcmp($prop['up_value'], $locale)) {
                                 $this->info("Update preference $locale for {$user->mediawiki} ");
-                                $mwdb->exec("UPDATE mw_user_properties SET up_value = " . $mwdb->quote($locale) . " WHERE up_user = {$mwuser['user_id']} AND up_property = 'language';");
+                                $mwdb->exec('UPDATE mw_user_properties SET up_value = '.$mwdb->quote($locale)." WHERE up_user = {$mwuser['user_id']} AND up_property = 'language';");
                             }
                         }
 
-                        if (!$existing) {
+                        if (! $existing) {
                             $this->info("Add language preference $locale for {$user->mediawiki} ");
-                            $mwdb->exec("INSERT INTO mw_user_properties (up_user, up_property, up_value) VALUES ({$mwuser['user_id']}, 'language', " . $mwdb->quote($locale) . ");");
+                            $mwdb->exec("INSERT INTO mw_user_properties (up_user, up_property, up_value) VALUES ({$mwuser['user_id']}, 'language', ".$mwdb->quote($locale).');');
                         }
                     }
                 }

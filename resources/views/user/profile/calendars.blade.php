@@ -27,7 +27,7 @@
         </div>
     @endforeach
 
-    @if (FixometerHelper::hasRole(Auth::user(), 'Administrator'))
+    @if (App\Helpers\Fixometer::hasRole(Auth::user(), 'Administrator'))
         <h5 class="mb-3">@include('partials.svg-icons.admin-cog-icon') <span class="span-vertically-align-middle">@lang('profile.calendars.all_events')</span></h5>
 
         <div class="input-group mb-4">

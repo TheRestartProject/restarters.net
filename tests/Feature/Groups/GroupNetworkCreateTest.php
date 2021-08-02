@@ -10,19 +10,19 @@ use App\Network;
 use App\Party;
 use App\User;
 use App\UserGroups;
-
-use DB;
 use Carbon\Carbon;
-use Mockery;
-use Tests\TestCase;
+use DB;
 use HieuLe\WordpressXmlrpcClient\WordpressClient;
-use Illuminate\Support\Facades\Notification;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Config;
+use Illuminate\Support\Facades\Notification;
+use Mockery;
+use Tests\TestCase;
 
 class GroupNetworkCreateTest extends TestCase
 {
     // New group is created as part of the network represented by the current domain.
+
     /** @test */
     public function given_specific_domain_when_group_created_then_it_is_created_as_part_of_corresponding_network()
     {

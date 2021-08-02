@@ -3,7 +3,6 @@
 namespace App\Http\Controllers;
 
 use App\Brands;
-
 use App\Category;
 use App\Cluster;
 use App\Device;
@@ -20,7 +19,7 @@ use App\User;
 use App\UserGroups;
 use Auth;
 use FixometerFile;
-use FixometerHelper;
+use App\Helpers\Fixometer;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
@@ -66,9 +65,9 @@ class DeviceController extends Controller
             'most_recent_finished_event' => $most_recent_finished_event,
             'impact_data' => $global_impact_data,
             'clusters' => $clusters,
-            'barriers' => \App\Helpers\FixometerHelper::allBarriers(),
+            'barriers' => \App\Helpers\Fixometer::allBarriers(),
             'brands' => $brands,
-            'item_types' => Device::getItemTypes()
+            'item_types' => Device::getItemTypes(),
         ]);
     }
 
@@ -81,7 +80,7 @@ class DeviceController extends Controller
 
         $user = Auth::user();
 
-        if (FixometerHelper::hasRole($user, 'Administrator') || ! empty($is_attending)) {
+        if (Fixometer::hasRole($user, 'Administrator') || ! empty($is_attending)) {
             if ($_SERVER['REQUEST_METHOD'] == 'POST' && ! empty($_POST) && filter_var($id, FILTER_VALIDATE_INT)) {
                 $data = $_POST;
                 // remove the extra "files" field that Summernote generates -
@@ -165,7 +164,7 @@ class DeviceController extends Controller
                     $data['spare_parts'] = 2;
                 }
 
-                $update = array(
+                $update = [
                     'event' => $data['event'],
                     'category' => $data['category'],
                     'category_creation' => $data['category'],
@@ -181,7 +180,7 @@ class DeviceController extends Controller
                     'professional_help' => $professional_help,
                     'do_it_yourself' => $do_it_yourself,
                     'wiki' => $wiki,
-                );
+                ];
 
                 $u = Device::find($id)->update($update);
 
@@ -360,7 +359,7 @@ class DeviceController extends Controller
             // If the number of devices exceeds set amount then show the following message
             $deviceMiscCount = DB::table('devices')->where('category', 46)->where('event', $event_id)->count();
             if ($deviceMiscCount == env('DEVICE_ABNORMAL_MISC_COUNT', 5)) {
-                $notify_users = FixometerHelper::usersWhoHavePreference('admin-abnormal-devices');
+                $notify_users = Fixometer::usersWhoHavePreference('admin-abnormal-devices');
                 Notification::send($notify_users, new AdminAbnormalDevices([
                     'event_venue' => $event->getEventName(),
                     'event_url' => url('/party/edit/'.$event_id),
@@ -420,7 +419,7 @@ class DeviceController extends Controller
             $repair_details = 0;
         }
 
-        if (FixometerHelper::userHasEditEventsDevicesPermission($event_id)) {
+        if (Fixometer::userHasEditEventsDevicesPermission($event_id)) {
             if ($repair_details == 1) {
                 $more_time_needed = 1;
             } else {
@@ -505,7 +504,7 @@ class DeviceController extends Controller
                 'do_it_yourself' => $professional_help,
                 'professional_help' => $do_it_yourself,
                 'wiki' => $wiki,
-                'estimate' => $estimate
+                'estimate' => $estimate,
             ]);
 
             // Update barriers
@@ -555,7 +554,7 @@ class DeviceController extends Controller
         $device = Device::find($id);
         $eventId = $device->event;
 
-        if (FixometerHelper::hasRole($user, 'Administrator') || FixometerHelper::userHasEditPartyPermission($eventId, $user->id)) {
+        if (Fixometer::hasRole($user, 'Administrator') || Fixometer::userHasEditPartyPermission($eventId, $user->id)) {
             $device->delete();
 
             if ($request->ajax()) {
@@ -566,7 +565,7 @@ class DeviceController extends Controller
 
                 return response()->json([
                     'success' => true,
-                    'stats' => $stats
+                    'stats' => $stats,
                 ]);
             }
 
@@ -592,12 +591,11 @@ class DeviceController extends Controller
                 $images = $device->getImages();
             }
 
-
             // Return the current set of images for this device so that the client doesn't need to merge.
             return response()->json([
                 'success' => true,
                 'iddevices' => $id,
-                'images' => $images
+                'images' => $images,
             ]);
         } catch (\Exception $e) {
             return 'fail - image could not be uploaded';
@@ -610,7 +608,7 @@ class DeviceController extends Controller
 
         $event_id = Device::find($device_id)->event;
         $in_event = EventsUsers::where('event', $event_id)->where('user', Auth::user()->id)->first();
-        if (FixometerHelper::hasRole($user, 'Administrator') || is_object($in_event)) {
+        if (Fixometer::hasRole($user, 'Administrator') || is_object($in_event)) {
             $Image = new FixometerFile;
             $Image->deleteImage($id, basename($path));
 

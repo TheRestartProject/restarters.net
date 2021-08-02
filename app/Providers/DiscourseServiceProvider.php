@@ -2,12 +2,11 @@
 
 namespace App\Providers;
 
-use GuzzleHttp\Client;
-use Illuminate\Support\ServiceProvider;
 use Auth;
+use GuzzleHttp\Client;
 use GuzzleHttp\HandlerStack;
 use GuzzleRetry\GuzzleRetryMiddleware;
-
+use Illuminate\Support\ServiceProvider;
 
 class DiscourseServiceProvider extends ServiceProvider
 {
@@ -39,7 +38,7 @@ class DiscourseServiceProvider extends ServiceProvider
                     'Api-Username' => $parameters['username'] ?? config('discourse-api.api_username'),
                 ],
                 'http_errors' => false,
-                'handler' => $stack
+                'handler' => $stack,
             ]);
         });
 
@@ -53,7 +52,7 @@ class DiscourseServiceProvider extends ServiceProvider
                                       'User-Agent' => 'restarters/1.0',
                                   ],
                                   'http_errors' => false,
-                                  'handler' => $stack
+                                  'handler' => $stack,
                               ]);
         });
     }

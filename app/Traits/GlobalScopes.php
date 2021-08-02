@@ -2,8 +2,8 @@
 
 namespace App\Traits;
 
-use DB;
 use Carbon\Carbon;
+use DB;
 
 trait GlobalScopes
 {
@@ -31,8 +31,8 @@ trait GlobalScopes
         $longitude = auth()->user()->longitude;
 
         if (! is_null($coordinates)) {
-          $latitude = $coordinates['latitude'];
-          $longitude = $coordinates['longitude'];
+            $latitude = $coordinates['latitude'];
+            $longitude = $coordinates['longitude'];
         }
 
         return $query->select(DB::raw('`'.$this->getTable().'`.*, ( 6371 * acos( cos( radians('.$latitude.') ) * cos( radians( '.$this->getTable().'.latitude ) ) * cos( radians( '.$this->getTable().'.longitude ) - radians('.$longitude.') ) + sin( radians('.$latitude.') ) * sin( radians( '.$this->getTable().'.latitude ) ) ) ) AS distance'))

@@ -1,24 +1,24 @@
 <?php
 
-use Illuminate\Support\Facades\Schema;
-use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Database\Migrations\Migration;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\Schema;
 
-class FaultcatRefactor extends Migration {
-
+class FaultcatRefactor extends Migration
+{
     /**
      * Run the migrations.
-     * 
-     * Includes missed migrations for tables 
+     *
+     * Includes missed migrations for tables
      * `devices_faults` and `devices_faults_opinions`.
      *
      * @return void
      */
-    public function up() {
-
+    public function up()
+    {
         if (Schema::hasTable('devices_faults')) {
-            Schema::rename('devices_faults', 'devices_faults_events');                        
-            DB::statement("ALTER TABLE devices_faults_events CONVERT TO CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci");
+            Schema::rename('devices_faults', 'devices_faults_events');
+            DB::statement('ALTER TABLE devices_faults_events CONVERT TO CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci');
             Schema::table('devices_faults_events', function (Blueprint $table) {
                 $table->string('fault_type', 64)->change();
             });
@@ -34,10 +34,10 @@ class FaultcatRefactor extends Migration {
                 $table->string('new_fault_type_odd', 24)->index();
                 $table->charset = 'utf8mb4';
                 $table->collation = 'utf8mb4_unicode_ci';
-            });            
+            });
         }
-        
-        if (Schema::hasTable('devices_faults_opinions')) {            
+
+        if (Schema::hasTable('devices_faults_opinions')) {
             if (Schema::hasColumn('devices_faults_opinions', 'age')) {
                 Schema::table('devices_faults_opinions', function (Blueprint $table) {
                     $table->dropColumn('age');
@@ -47,8 +47,8 @@ class FaultcatRefactor extends Migration {
                 Schema::table('devices_faults_opinions', function (Blueprint $table) {
                     $table->dropColumn('country');
                 });
-            }            
-            DB::statement("ALTER TABLE devices_faults_opinions CONVERT TO CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci");
+            }
+            DB::statement('ALTER TABLE devices_faults_opinions CONVERT TO CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci');
         } else {
             Schema::create('devices_faults_opinions', function (Blueprint $table) {
                 $table->increments('id');
@@ -79,12 +79,13 @@ class FaultcatRefactor extends Migration {
 
     /**
      * Reverse the migrations.
-     * 
+     *
      * DO NOT DROP `devices_faults` or `devices_faults_opinions`.
      *
      * @return void
      */
-    public function down() {
+    public function down()
+    {
         Schema::dropIfExists('devices_faults_adjudicated');
 
         Schema::rename('devices_faults_events', 'devices_faults');
@@ -93,12 +94,11 @@ class FaultcatRefactor extends Migration {
             $table->string('fault_type', 32)->change();
         });
 
-        DB::statement("ALTER TABLE devices_faults CONVERT TO CHARACTER SET utf8 COLLATE utf8_general_ci");
-        DB::statement("ALTER TABLE devices_faults_opinions CONVERT TO CHARACTER SET utf8 COLLATE utf8_unicode_ci");
+        DB::statement('ALTER TABLE devices_faults CONVERT TO CHARACTER SET utf8 COLLATE utf8_general_ci');
+        DB::statement('ALTER TABLE devices_faults_opinions CONVERT TO CHARACTER SET utf8 COLLATE utf8_unicode_ci');
 
         Schema::table('devices', function (Blueprint $table) {
             $table->dropColumn('fault_type');
         });
     }
-
 }

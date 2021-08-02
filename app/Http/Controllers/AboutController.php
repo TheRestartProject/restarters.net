@@ -3,9 +3,9 @@
 namespace App\Http\Controllers;
 
 use App\Device;
-use App\Party;
 use App\Http\Controllers\Controller;
-use FixometerHelper;
+use App\Party;
+use App\Helpers\Fixometer;
 use Illuminate\Foundation\Auth\AuthenticatesUsers;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -25,33 +25,33 @@ class AboutController extends Controller
 
     public function index()
     {
-        $stats = FixometerHelper::loginRegisterStats();
+        $stats = Fixometer::loginRegisterStats();
 
         $slides = [];
 
         $slides[] = [
             'image' => '01--learn',
-            'text' => 'Learn how to organise and volunteer at events'
+            'text' => 'Learn how to organise and volunteer at events',
         ];
         $slides[] = [
             'image' => '02--tech-help',
-            'text' => 'Get technical help, on tools, safety and risk'
+            'text' => 'Get technical help, on tools, safety and risk',
         ];
         $slides[] = [
             'image' => '03--manage-events',
-            'text' => 'Announce an event, find people'
+            'text' => 'Announce an event, find people',
         ];
         $slides[] = [
             'image' => '04--host-event',
-            'text' => 'Host an event and share skills'
+            'text' => 'Host an event and share skills',
         ];
         $slides[] = [
             'image' => '05--log-repairs',
-            'text' => 'Log the repairs, to reveal impact and help future repairers'
+            'text' => 'Log the repairs, to reveal impact and help future repairers',
         ];
         $slides[] = [
             'image' => '06--bring-down-barriers',
-            'text' => 'Bring down the barriers to repair'
+            'text' => 'Bring down the barriers to repair',
         ];
 
         $deviceCount = array_key_exists(0, $stats['device_count_status']) ? $stats['device_count_status'][0]->counter : 0;

@@ -1,6 +1,6 @@
 <?php
 
-return array (
+return [
   'skills' => 'Skills',
   'my_skills' => 'My skills',
   'biography' => 'Biography',
@@ -22,8 +22,7 @@ return array (
   'profile' => 'Profile',
   'account' => 'Account',
   'email_preferences' => 'Email preferences',
-  'calendars' => 
-  array (
+  'calendars' => [
     'title' => 'Calendars',
     'explainer' => 'You can now keep track of events using your personal calendar application by subscribing to the calendar feeds below. You can subscribe to as many calendars as you like.',
     'find_out_more' => 'Find out more',
@@ -32,7 +31,7 @@ return array (
     'group_calendars' => 'Group calendars',
     'all_events' => 'All events (admin only)',
     'events_by_area' => 'Events by area',
-  ),
+  ],
   'name' => 'Name',
   'country' => 'Country',
   'email_address' => 'Email address',
@@ -44,4 +43,4 @@ return array (
   'repair_dir_editor' => 'Editor',
   'repair_dir_regional_admin' => 'Regional Admin',
   'repair_dir_superadmin' => 'SuperAdmin',
-);
+];

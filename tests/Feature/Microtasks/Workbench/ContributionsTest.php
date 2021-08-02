@@ -2,27 +2,25 @@
 
 namespace Tests\Feature\Microtasks\Workbench;
 
+use App\BattcatOra;
 use App\Faultcat;
 use App\Misccat;
 use App\Mobifix;
 use App\MobifixOra;
 use App\PrintcatOra;
 use App\TabicatOra;
-use App\BattcatOra;
 use App\User;
-
 use DB;
 use Hash;
 use Mockery;
 use Tests\TestCase;
-
 
 class ContributionsTest extends TestCase
 {
     protected $user1;
     protected $user2;
 
-    public function setUp()
+    protected function setUp(): void
     {
         parent::setUp();
         Faultcat::truncate();
@@ -75,8 +73,8 @@ class ContributionsTest extends TestCase
         $this->assertVueProperties($response, [
             [
                 ':current-user-quests' => 0,
-                ':current-user-contributions' => 0
-            ]
+                ':current-user-contributions' => 0,
+            ],
         ]);
     }
 
@@ -85,12 +83,11 @@ class ContributionsTest extends TestCase
         $this->actingAs($this->userWithContributions);
         $response = $this->get('/workbench');
 
-
         $this->assertVueProperties($response, [
             [
                 ':current-user-quests' => 3,
-                ':current-user-contributions' => 3
-            ]
+                ':current-user-contributions' => 3,
+            ],
         ]);
     }
 
@@ -102,8 +99,8 @@ class ContributionsTest extends TestCase
         $this->assertVueProperties($response, [
             [
                 ':current-user-quests' => 1,
-                ':current-user-contributions' => 2
-            ]
+                ':current-user-contributions' => 2,
+            ],
         ]);
     }
 
@@ -114,8 +111,8 @@ class ContributionsTest extends TestCase
         $this->assertVueProperties($response, [
             [
                 ':current-user-quests' => 0,
-                ':current-user-contributions' => 0
-            ]
+                ':current-user-contributions' => 0,
+            ],
         ]);
     }
 
@@ -126,8 +123,8 @@ class ContributionsTest extends TestCase
         $this->assertVueProperties($response, [
             [
                 ':total-quests' => 7,
-                ':total-contributions' => 5
-            ]
+                ':total-contributions' => 5,
+            ],
         ]);
     }
 }

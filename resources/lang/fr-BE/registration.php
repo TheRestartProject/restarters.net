@@ -1,6 +1,6 @@
 <?php
 
-return array (
+return [
   'age' => 'Année de naissance',
   'age_help' => 'Pour développer la réparation communautaire, nous avons besoin de mieux comprendre la dynamique intergénérationnelle.',
   'age_validation' => 'Veuillez taper votre année de naissance.',
@@ -39,4 +39,4 @@ dont nous utilisons les données de réparation <a href="https://therestartproje
   'step-3' => 'Étape 3 sur 4',
   'step-4' => 'Étape 4 sur 4',
   'reg-step-3-2b' => 'Après votre enregistrement, vous recevrez quelques e-mails. Vous pouvez aussi opter pour d\'autres moyens de communication ci-dessous.',
-);
+];

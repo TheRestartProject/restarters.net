@@ -1,6 +1,6 @@
 <?php
 
-return array (
+return [
   'top_item1' => 'Events',
   'top_item2' => 'Devices',
   'top_item3' => 'Groups',
@@ -62,4 +62,4 @@ return array (
   'wiki_url' => 'https://wiki.restarters.net',
   'please_select' => 'Please select',
   'calendar_feed_help_url' => '/t/fixometer-how-to-subscribe-to-a-calendar',
-);
+];

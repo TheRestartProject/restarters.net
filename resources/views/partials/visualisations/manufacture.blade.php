@@ -1,6 +1,6 @@
 <aside class="widget widget__2">
     <h2>{{{ $title }}}</h2>
-    <p title="{{{ $co2 }}} kg of CO2">{{{ $equal_to }}} {{{ str_plural($measure, $equal_to) }}}</p>
+    <p title="{{{ $co2 }}} kg of CO2">{{{ $equal_to }}} {{{ Str::plural($measure, $equal_to) }}}</p>
     <br>
     <div class="row row-compressed">
 
@@ -10,9 +10,9 @@
 
           <div class="col-4 flex-column widget__item">
             @if( $item <= $equal_to )
-              @include('partials.visualisations.'.str_slug($measure).'-svg')
+              @include('partials.visualisations.'.Str::slug($measure).'-svg')
             @else
-              @include('partials.visualisations.'.str_slug($measure).'-overlay-svg')
+              @include('partials.visualisations.'.Str::slug($measure).'-overlay-svg')
             @endif
           </div>
 

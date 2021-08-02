@@ -28,7 +28,7 @@
       <a class="btn btn-primary" href="/group/join/{{ $group->idgroups }}" id="join-group">@lang('groups.follow_group')</a>
     @endif
   </td>
-  @if(  !is_null($groups) && FixometerHelper::hasRole(Auth::user(), 'Administrator'))
+  @if(  !is_null($groups) && App\Helpers\Fixometer::hasRole(Auth::user(), 'Administrator'))
       <td colspan="1">
           {{ \Carbon\Carbon::parse($group->created_at)->diffForHumans() }}
       </td>
