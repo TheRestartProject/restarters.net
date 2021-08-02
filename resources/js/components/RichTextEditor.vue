@@ -50,7 +50,7 @@ export default {
             [{ 'indent': '-1'}, { 'indent': '+1' }],
             [{ 'align': [] }],
             ['link'],
-            [{ 'header': 4 }],
+            [{ 'header': '4' }],
           ]
         }
       }
@@ -64,7 +64,13 @@ export default {
 }
 </script>
 <style scoped lang="scss">
-.editor {
-  height: 300px;
+/deep/ .ql-editor,  /deep/ .ql-container {
+  min-height: 300px !important;
+  max-height: 300px !important;
+  height: 300px !important;
+}
+
+/deep/ .ql-header::before {
+  content: 'H4'
 }
 </style>

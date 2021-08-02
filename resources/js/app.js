@@ -392,25 +392,7 @@ function initAutocomplete() {
 
   function groupsMap() {
     if (jQuery('.field-geolocate').length > 0 ) {
-
       initAutocomplete();
-
-      // var map, places, infoWindow;
-      // var markers = [];
-      // var autocomplete;
-      // var countryRestrict = { 'country': 'uk' };
-      // var MARKER_PATH = 'https://developers.google.com/maps/documentation/javascript/images/marker_green';
-      // var hostnameRegexp = new RegExp('^https?://.+?/');
-
-      // map = new google.maps.Map(document.getElementById('map-plugin'), {
-      //     zoom: countries['uk'].zoom,
-      //     center: countries['uk'].center,
-      //     mapTypeControl: false,
-      //     panControl: false,
-      //     zoomControl: false,
-      //     streetViewControl: false
-      // });
-
     }
   }
 

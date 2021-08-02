@@ -81,12 +81,10 @@
                 <div class="form-group">
                   <label for="grp_about">@lang('groups.groups_about_group'):</label>
                   <div class="vue">
-                    <RichTextEditor name="description" initial-value="{!! $formdata->free_text !!}" />
+                    <RichTextEditor name="free_text" initial-value="{{ addslashes($formdata->free_text) }}" />
                   </div>
                 </div>
               </div>
-
-              <input type="hidden" name="free_text" id="free_text" value="{{ $formdata->free_text }}">
 
               <div class="col-lg-6">
                 <div class="form-group">
