@@ -80,7 +80,9 @@
 
                 <div class="form-group">
                   <label for="grp_about">@lang('groups.groups_about_group'):</label>
-                  <textarea class="form-control rte" rows="6" name="description" id="description">{{ $formdata->free_text }}</textarea>
+                  <div class="vue">
+                    <RichTextEditor name="description" initial-value="{!! $formdata->free_text !!}" />
+                  </div>
                 </div>
               </div>
 

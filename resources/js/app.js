@@ -9,7 +9,6 @@ require('./bootstrap-tokenfield.min');
 require('./bootstrap-sortable.js');
 require('select2');
 require('slick-carousel');
-require('summernote');
 require('ekko-lightbox');
 require('bootstrap4-datetimepicker');
 require('./misc/notifications');
@@ -460,36 +459,6 @@ function initAutocomplete() {
     }
   }
 
-  function textEditor() {
-
-    if (jQuery('.rte').length > 0){
-      jQuery('.rte').summernote({
-        height: 300,
-        toolbar: [
-          ['cleaner', ['cleaner']], // The Button
-          ['style', ['style', 'bold', 'italic', 'underline', 'clear']],
-          ['para', ['ul', 'ol', 'paragraph']],
-          ['insert', ['link', 'hr']],
-          ['misc', ['codeview']]
-        ],
-        cleaner: {
-          notTime: 2400, // Time to display Notifications.
-          action: 'paste', // both|button|paste 'button' only cleans via toolbar button, 'paste' only clean when pasting content, both does both options.
-          newline: '<br />', // Summernote's default is to use '<p><br></p>'
-          notStyle: 'position:absolute;top:0;left:0;right:0', // Position of Notification
-          icon: '<i class="note-icon"><span class="fa fa-paintbrush"></span></i>',
-          keepHtml: true, // Allow the tags in keepOnlyTags
-          keepOnlyTags: ['<p>', '<br>', '<ul>', '<li>', '<b>', '<strong>', '<i>', '<a>', '<h1>', '<h2>', '<h3>', '<h4>', '<h5>', '<h6>'],
-          keepClasses: false, // Remove Classes
-          badTags: ['style', 'script', 'applet', 'embed', 'noframes', 'noscript', 'html'], // Remove full tags with contents
-          badAttributes: ['style', 'start'] // Remove attributes from remaining tags
-        }
-      });
-    }
-
-
-  }
-
   function updateParticipants() {
 
     var quantity = $('#participants_qty').val();
@@ -899,7 +868,6 @@ function initAutocomplete() {
   registration();
   onboarding();
   //initTokenfields();
-  textEditor();
   numericInputs();
   eventsMap();
   truncate();
@@ -1431,10 +1399,6 @@ function initAutocomplete() {
           }
         });
       }
-    });
-
-    $('#description').on('summernote.change', function(e) {
-      $('#free_text').val($('#description').summernote('code'));
     });
 
     $("#registeremail").blur(function() {

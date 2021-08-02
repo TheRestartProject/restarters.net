@@ -37,7 +37,7 @@ export default {
           htmlEditButton: {},
           clipboard: {
             allowed: {
-              tags: ['a', 'b', 'strong', 'u', 's', 'i', 'p', 'br', 'ul', 'ol', 'li', 'span'],
+              tags: ['a', 'b', 'strong', 'u', 's', 'i', 'p', 'br', 'ul', 'ol', 'li', 'span', 'h4'],
               attributes: ['href', 'rel', 'target', 'class']
             },
             keepSelection: true,
@@ -49,7 +49,8 @@ export default {
             [{ 'list': 'ordered'}, { 'list': 'bullet' }],
             [{ 'indent': '-1'}, { 'indent': '+1' }],
             [{ 'align': [] }],
-            ['link']
+            ['link'],
+            [{ 'header': 4 }],
           ]
         }
       }

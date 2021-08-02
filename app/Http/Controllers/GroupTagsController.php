@@ -27,18 +27,6 @@ class GroupTagsController extends Controller
         ]);
     }
 
-    public function getCreateTag()
-    {
-
-        if (!FixometerHelper::hasRole(Auth::user(), 'Administrator')) {
-            return redirect('/user/forbidden');
-        }
-
-        return view('tags.create', [
-        'title' => 'Add Group Tag',
-        ]);
-    }
-
     public function postCreateTag(Request $request)
     {
 

@@ -28,18 +28,6 @@ class SkillsController extends Controller
         ]);
     }
 
-    public function getCreateSkill()
-    {
-
-        if (!FixometerHelper::hasRole(Auth::user(), 'Administrator')) {
-            return redirect('/user/forbidden');
-        }
-
-        return view('skills.create', [
-        'title' => 'Add Skill',
-        ]);
-    }
-
     public function postCreateSkill(Request $request)
     {
 
