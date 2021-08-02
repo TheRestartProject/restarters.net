@@ -47,4 +47,20 @@ class EditLanguageSettingsTests extends TestCase
         // assert
         Event::assertDispatched(UserLanguageUpdated::class);
     }
+
+    /** @test */
+    // Added these to try (and fail) to reproduce a Sentry error.
+    public function user_sets_language() {
+        $this->loginAsTestUser();
+
+        $this->followingRedirects();
+        $response = $this->from('/')->get('/set-lang/en');
+        $response->assertSuccessful();
+        $this->assertEquals('en', session('locale'));
+
+        $this->followingRedirects();
+        $response = $this->from('/')->get('/set-lang/zz');
+        $response->assertSuccessful();
+        $this->assertEquals('zz', session('locale'));
+    }
 }

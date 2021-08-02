@@ -397,8 +397,6 @@ Route::get('markAsRead/{id?}', function ($id = NULL) {
 
 Route::get('/set-lang/{locale}', 'LocaleController@setLang');
 
-Route::get('/set-lang/{locale}', 'LocaleController@setLang');
-
 Route::post('/set-cookie', 'InformationAlertCookieController');
 
 Route::get('/test/check-auth', function () {
