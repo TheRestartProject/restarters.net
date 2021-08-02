@@ -5,8 +5,7 @@ namespace App\Listeners;
 use App\Events\ApproveGroup;
 use App\Group;
 use App\Notifications\AdminWordPressCreateGroupFailure;
-use FixometerHelper;
-
+use App\Helpers\Fixometer;
 use HieuLe\WordpressXmlrpcClient\WordpressClient;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Queue\InteractsWithQueue;
@@ -38,13 +37,14 @@ class CreateWordPressApproveGroupPost
 
         $group = Group::find($id);
 
-        if (!empty($group)) {
-            Log::error("Group not found");
+        if (! empty($group)) {
+            Log::error('Group not found');
         }
 
-        if ( ! $group->eventsShouldPushToWordpress()) {
+        if (! $group->eventsShouldPushToWordpress()) {
             $group->update(['wordpress_post_id' => '99999']);
-            Log::info("Approved - but groups in this network are not published to WordPress");
+            Log::info('Approved - but groups in this network are not published to WordPress');
+
             return;
         }
 
@@ -64,21 +64,21 @@ class CreateWordPressApproveGroupPost
                     ['key' => 'group_longitude', 'value' => $group->longitude],
                 ];
 
-                $content = array(
+                $content = [
                     'post_type' => 'group',
                     'post_title' => $group->name,
                     'post_content' => $group->free_text,
-                    'custom_fields' => $custom_fields
-                );
+                    'custom_fields' => $custom_fields,
+                ];
 
                 $wpid = $this->wpClient->newPost($group->name, $data['free_text'], $content);
 
                 $group->update(['wordpress_post_id' => $wpid]);
             }
         } catch (\Exception $e) {
-            Log::error("An error occurred during Wordpress group creation: " . $e->getMessage());
+            Log::error('An error occurred during Wordpress group creation: '.$e->getMessage());
 
-            $notify_users = FixometerHelper::usersWhoHavePreference('admin-approve-wordpress-group-failure');
+            $notify_users = Fixometer::usersWhoHavePreference('admin-approve-wordpress-group-failure');
             Notification::send($notify_users, new AdminWordPressCreateGroupFailure([
             'group_name' => $group->name,
             'group_url' => url('/group/edit/'.$group->idgroups),

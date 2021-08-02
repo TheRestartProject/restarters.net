@@ -1,6 +1,6 @@
 <?php
 
-return array (
+return [
   'devices' => 'Appareils',
   'edit_devices' => 'Editer l\'appareil',
   'edit_devices_details' => 'Editer les détails de l\'appareil',
@@ -123,4 +123,4 @@ return array (
   'tooltip_type_unpowered' => 'Ajoutez autant d\'informations que possible sur le type d\'appareil (ex: "divan" "Jeans Denim")',
   'unknown_brand' => 'Vous créez une nouvelle marque. Etes-vous sûr(e) qu\'une marque existante ne convient pas?',
   'unknown_item_type' => 'Vous créez un nouveau type d\'appareil. Etes-vous sûr(e) qu\'un type d\'appareil existant ne convient pas?',
-);
+];

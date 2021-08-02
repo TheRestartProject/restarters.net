@@ -1,8 +1,8 @@
 <?php
 
-use Illuminate\Support\Facades\Schema;
-use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Database\Migrations\Migration;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\Schema;
 
 class CreatePreferencesTable extends Migration
 {
@@ -13,7 +13,6 @@ class CreatePreferencesTable extends Migration
      */
     public function up()
     {
-
         Schema::create('preferences', function (Blueprint $table) {
             $table->increments('id');
             $table->string('name');
@@ -21,21 +20,18 @@ class CreatePreferencesTable extends Migration
         });
 
         Schema::create('users_preferences', function (Blueprint $table) {
-
             $table->increments('id');
             $table->integer('user_id')->unsigned();
             $table->integer('preference_id')->unsigned();
             $table->foreign('preference_id')->references('id')->on('preferences');
             $table->timestamps();
             $table->softDeletes();
-
         });
 
         DB::table('preferences')->insert([
           'name' => 'Repair Directory',
-          'purpose' => 'Show and hide the item in the main drop down menu'
+          'purpose' => 'Show and hide the item in the main drop down menu',
         ]);
-
     }
 
     /**

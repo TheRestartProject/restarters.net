@@ -1,8 +1,8 @@
 <?php
 
-use Illuminate\Support\Facades\Schema;
-use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Database\Migrations\Migration;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\Schema;
 
 class AddStatusRoleUserEvents extends Migration
 {
@@ -13,10 +13,10 @@ class AddStatusRoleUserEvents extends Migration
      */
     public function up()
     {
-      Schema::table('events_users', function (Blueprint $table) {
-          $table->string('status', 50)->nullable();
-          $table->tinyInteger('role')->default(3);
-      });
+        Schema::table('events_users', function (Blueprint $table) {
+            $table->string('status', 50)->nullable();
+            $table->tinyInteger('role')->default(3);
+        });
     }
 
     /**
@@ -26,9 +26,9 @@ class AddStatusRoleUserEvents extends Migration
      */
     public function down()
     {
-      Schema::table('events_users', function (Blueprint $table) {
-          $table->dropColumn('status');
-          $table->dropColumn('role');
-      });
+        Schema::table('events_users', function (Blueprint $table) {
+            $table->dropColumn('status');
+            $table->dropColumn('role');
+        });
     }
 }

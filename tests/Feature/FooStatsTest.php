@@ -28,7 +28,7 @@ class FooStatsTest extends TestCase
     private $_id_misc_powered;
     private $_id_misc_unpowered;
 
-    public function setUp()
+    protected function setUp(): void
     {
         parent::setUp();
         $Device = new Device;

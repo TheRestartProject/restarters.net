@@ -1,8 +1,7 @@
 <?php
 
-return array (
-  'task' => 
-  array (
+return [
+  'task' => [
     'where_is_the_main_fault' => 'Qual è il guasto principale?',
     'fetch_another' => 'Non lo so, vai a prendere un\'altra riparazione',
     'suggestions' => 'Suggerimenti',
@@ -19,9 +18,8 @@ return array (
 registrato queste informazioni, e provando TabiCat, ci stai aiutando ad analizzarle."',
     'signpost_5' => 'Grazie! Per favore, <a href="https://survey.actionproject.eu/chat/?data=U2FsdGVkX1%207YCj%20CRieUSNsHbebWsbk97sB4QRw%2F%206soz4B9MsCqwSYA2WEWYjmPruZ%20bkR8PKsQbSX5dPmLQ%3D%3D">partecipa al nostro sondaggio</a>',
     'signpost_6' => 'Grazie per il tuo aiuto! Ogni difetto che classifichi rende questi dati più utili. Perché non ti <a href="../">unisci anche tu alla nostra comunità</a>?',
-  ),
-  'status' => 
-  array (
+  ],
+  'status' => [
     'status' => 'Stato',
     'items_opinions' => 'Articoli / opinioni',
     'items_with_split_opinions' => 'Articoli con opinioni divise',
@@ -44,14 +42,12 @@ registrato queste informazioni, e provando TabiCat, ci stai aiutando ad analizza
     'items_0_opinions' => 'con 0 opinioni',
     'task_completed' => 'Li hai visti tutti, grazie',
     'progress' => 'completo',
-  ),
+  ],
   'about' => 'Più informazioni',
-  'branding' => 
-  array (
+  'branding' => [
     'powered_by' => 'Utilizzando i dati di:',
-  ),
-  'info' => 
-  array (
+  ],
+  'info' => [
     'body-s1-header' => 'Cos\'è TabiCat?',
     'body-s1-p1' => 'I tablet possono rompersi facilmente ed essere difficili da riparare. Vogliamo capire perché i tablet si guastano, per poter dire ai legislatori come rendere i modelli futuri più facili da riparare. Riparare riduce i rifiuti e diminuisce la pressione sulle risorse del nostro pianeta.',
     'body-s1-p2' => 'Con TabiCat, puoi unirti alla nostra indagine. Abbiamo raccolto informazioni su oltre 900 dispositivi rotti e abbiamo bisogno del tuo aiuto per classificarli.',
@@ -62,9 +58,8 @@ registrato queste informazioni, e provando TabiCat, ci stai aiutando ad analizza
     'body-s4-header' => 'Hai altre domande?',
     'body-s4-p1' => 'Scopri di più, fai domande e dacci il tuo feedback nella <a href=":url" target="_blank">conversazione su TabiCat</a>.',
     'title' => 'Grazie per aver provato TabiCat',
-  ),
-  'survey' => 
-  array (
+  ],
+  'survey' => [
     'a1' => 'Fortemente in disaccordo',
     'a2' => 'In disaccordo',
     'a3' => 'Neutro',
@@ -80,5 +75,5 @@ registrato queste informazioni, e provando TabiCat, ci stai aiutando ad analizza
     'q4' => 'TabiCat ha cambiato la mia visione dell\'importanza della riparazione',
     'send' => 'Invia',
     'skip' => 'Salta',
-  ),
-);
+  ],
+];

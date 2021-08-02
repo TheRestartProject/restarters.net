@@ -88,7 +88,7 @@ class JoinEvent extends Notification implements ShouldQueue
                       ->line('');
 
                 // Add message from sender if they left one
-                if ( ! is_null($this->arr['message'])) {
+                if (! is_null($this->arr['message'])) {
                     $mail->line('"'.nl2br($this->arr['message']).'"')
                          ->line('');
                 }
@@ -109,7 +109,7 @@ class JoinEvent extends Notification implements ShouldQueue
                   ->line('');
 
             // Add message from sender if they left one
-            if ( ! is_null($this->arr['message'])) {
+            if (! is_null($this->arr['message'])) {
                 $mail->line('')
                      ->line('"'.nl2br($this->arr['message']).'"');
             }

@@ -16,9 +16,10 @@ class DeviceStatsTest extends TestCase
     private $_id_misc_powered;
     private $_id_misc_unpowered;
 
-    public function setUp()
+    protected function setUp(): void
     {
         parent::setUp();
+
         $Device = new Device;
         $this->_displacementFactor = $Device->displacement;
         $this->_id_misc_powered = env('MISC_CATEGORY_ID_POWERED');

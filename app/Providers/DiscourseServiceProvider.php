@@ -2,9 +2,11 @@
 
 namespace App\Providers;
 
-use GuzzleHttp\Client;
-use Illuminate\Support\ServiceProvider;
 use Auth;
+use GuzzleHttp\Client;
+use GuzzleHttp\HandlerStack;
+use GuzzleRetry\GuzzleRetryMiddleware;
+use Illuminate\Support\ServiceProvider;
 
 class DiscourseServiceProvider extends ServiceProvider
 {
@@ -22,7 +24,12 @@ class DiscourseServiceProvider extends ServiceProvider
             return;
         }
 
+        // We use the retry middleware to work around Discourse throttling requests.  This is necessary for UT and
+        // could be necessary live under load.
         $this->app->bind('discourse-client', function ($app, $parameters) {
+            $stack = HandlerStack::create();
+            $stack->push(GuzzleRetryMiddleware::factory());
+
             return new Client([
                 'base_uri' => config('discourse-api.base_url'),
                 'headers' => [
@@ -31,16 +38,21 @@ class DiscourseServiceProvider extends ServiceProvider
                     'Api-Username' => $parameters['username'] ?? config('discourse-api.api_username'),
                 ],
                 'http_errors' => false,
+                'handler' => $stack,
             ]);
         });
 
         $this->app->bind('discourse-client-anonymous', function ($app, $parameters) {
+            $stack = HandlerStack::create();
+            $stack->push(GuzzleRetryMiddleware::factory());
+
             return new Client([
                                   'base_uri' => config('discourse-api.base_url'),
                                   'headers' => [
                                       'User-Agent' => 'restarters/1.0',
                                   ],
                                   'http_errors' => false,
+                                  'handler' => $stack,
                               ]);
         });
     }

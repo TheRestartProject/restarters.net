@@ -53,7 +53,7 @@
                 <label for="manual_invite_box">@lang('events.manual_invite_box'):</label>
                 <input type="text" id="manual_invite_box" name="manual_invite_box" class="tokenfield form-control" autocomplete="off">
               </div>
-              @if( FixometerHelper::userHasEditPartyPermission($formdata->id, Auth::user()->id) || FixometerHelper::hasRole(Auth::user(), 'Administrator') )
+              @if( App\Helpers\Fixometer::userHasEditPartyPermission($formdata->id, Auth::user()->id) || App\Helpers\Fixometer::hasRole(Auth::user(), 'Administrator') )
                 <div class="form-check">
                   <label class="form-check-label" for="invites_to_volunteers">
                     <input type="checkbox" name="invite_group" class="form-check-input" id="invites_to_volunteers" value="1">

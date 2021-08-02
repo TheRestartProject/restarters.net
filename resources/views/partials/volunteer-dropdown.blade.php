@@ -1,4 +1,4 @@
-@if (isset($group_id) && (FixometerHelper::userIsHostOfGroup($group_id, Auth::id()) || FixometerHelper::hasRole(Auth::user(), 'Administrator')))
+@if (isset($group_id) && (App\Helpers\Fixometer::userIsHostOfGroup($group_id, Auth::id()) || App\Helpers\Fixometer::hasRole(Auth::user(), 'Administrator')))
   <div class="btn-group d-block btn-group-volunteers">
     <button class="dropdown-toggle float-right" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
       Edit Volunteer

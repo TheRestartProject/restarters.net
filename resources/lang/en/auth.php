@@ -1,6 +1,6 @@
 <?php
 
-return array (
+return [
   'email_address_validation' => 'An account with this email address already exists. Have you tried logging in?',
   'login' => 'Login',
   'delete_account' => 'Delete account',
@@ -32,4 +32,4 @@ this is a permanent action.',
   'assigned_groups' => 'Assigned to groups',
   'save_user' => 'Save user',
   'login_before_using_shareable_link' => 'To complete your invitation please create an account below, or if you already have an account <a href=":login_url">login here</a>.',
-);
+];

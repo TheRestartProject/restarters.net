@@ -10,19 +10,18 @@ use App\Network;
 use App\Party;
 use App\User;
 use App\UserGroups;
-
-use DB;
 use Carbon\Carbon;
-use Mockery;
-use Tests\TestCase;
+use DB;
 use HieuLe\WordpressXmlrpcClient\WordpressClient;
-use Illuminate\Support\Facades\Notification;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Config;
+use Illuminate\Support\Facades\Notification;
+use Mockery;
+use Tests\TestCase;
 
 class ZapierNetworkTests extends TestCase
 {
-    public function setUp()
+    protected function setUp(): void
     {
         parent::setUp();
 
@@ -31,7 +30,7 @@ class ZapierNetworkTests extends TestCase
         // See: https://github.com/owen-it/laravel-auditing/issues/520
         // Config::set('audit.console', true);
 
-        DB::statement("SET foreign_key_checks=0");
+        DB::statement('SET foreign_key_checks=0');
         User::truncate();
         Group::truncate();
         Party::truncate();
@@ -39,10 +38,11 @@ class ZapierNetworkTests extends TestCase
         UserGroups::truncate();
         DB::statement('delete from audits');
         GroupNetwork::truncate();
-        DB::statement("SET foreign_key_checks=1");
+        DB::statement('SET foreign_key_checks=1');
     }
 
     //         When a new group is created that is in the Restart network, it IS included in the Restart Zapier trigger
+
     /** @test */
     public function given_restart_network_when_new_group_created_included_in_trigger()
     {
@@ -71,8 +71,8 @@ class ZapierNetworkTests extends TestCase
         $response->assertSee($group->name);
     }
 
-
     //     When a new group is created that is in Repair Together network, it is not included in the Restart Zapier trigger
+
     /** @test */
     public function given_nonrestart_network_when_new_group_created_not_included_in_trigger()
     {
@@ -102,6 +102,7 @@ class ZapierNetworkTests extends TestCase
     }
 
     //         When a new user is created that is in the Restart network, it IS included in the Restart Zapier trigger
+
     /** @test */
     public function given_restart_network_when_new_user_created_then_included_in_trigger()
     {
@@ -129,6 +130,7 @@ class ZapierNetworkTests extends TestCase
     }
 
     // When a new user is created that is in the Repair Together network, it is not included in the Restart Zapier trigger
+
     /** @test */
     public function given_nonrestart_network_when_new_user_created_then_not_included_in_trigger()
     {
@@ -156,6 +158,7 @@ class ZapierNetworkTests extends TestCase
     }
 
     // When a new user/group association is created for a user in the Restart network joining a group in the Restart network, it IS included in the Restart Zapier trigger
+
     /** @test */
     public function given_restart_group_and_restart_user_when_user_joins_group_then_included_in_trigger()
     {
@@ -186,6 +189,7 @@ class ZapierNetworkTests extends TestCase
     }
 
     // When a new user/group association is created and either the user or the group is not in the Restart network, it isn't included in the Restart Zapier trigger
+
     /** @test */
     public function given_nonrestart_group_or_nonrestart_user_when_user_joins_group_then_not_included_in_trigger()
     {

@@ -6,13 +6,12 @@ use App\Category;
 use App\Device;
 use App\Party;
 use App\User;
-
 use DB;
 use Tests\TestCase;
 
 class SparePartsTest extends TestCase
 {
-    public function setUp()
+    protected function setUp(): void
     {
         parent::setUp();
 

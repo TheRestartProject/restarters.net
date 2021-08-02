@@ -1,8 +1,7 @@
 <?php
 
-return array (
-  'task' => 
-  array (
+return [
+  'task' => [
     'subtitle' => 'Ein Freiwilliger hat versucht, dieses Gerät bei einer Reparaturveranstaltung zu reparieren und diese Beschreibung verfasst.',
     'question-endoflife' => 'Was hat die Reparatur dieses Gerätes verhindert?',
     'question-repairable' => 'Was sind die nächsten Schritte zur Reparatur?',
@@ -31,9 +30,8 @@ return array (
     'step1-extra' => 'Ein Freiwilliger hat versucht, dieses Gerät bei einer Reparaturveranstaltung zu reparieren und diese Beschreibung verfasst.',
     'step2-extra' => 'Wählen Sie die Option, die am besten zu dem oben beschriebenen Problem passt.',
     'title' => 'BattCat: Akkuprobleme kategorisieren',
-  ),
-  'status' => 
-  array (
+  ],
+  'status' => [
     'brand' => 'Marke',
     'items_0_opinions' => 'mit 0 Meinungen',
     'items_1_opinion' => 'mit 1 Meinung',
@@ -50,9 +48,8 @@ return array (
     'task_completed' => 'Du hast alle Einträge gesehen, danke',
     'total' => 'Gesamt',
     'winning_opinion' => 'Gewinnende meinung',
-  ),
-  'info' => 
-  array (
+  ],
+  'info' => [
     'body-s1-header' => 'Was ist BattCat?',
     'body-s1-p1' => 'Wir wollen verstehen, wie Batterien und Akkus dazu beitragen, dass Geräte versagen. Damit möchten wir der Politik sagen, wie zukünftige Modelle leichter reparierbar gemacht werden können. Reparatur vermeidet Abfall und schont die Ressourcen unseres Planeten.',
     'body-s1-p2' => 'Mit BattCat können Sie sich an unserer Untersuchung beteiligen. Wir haben Informationen zu über 1000 defekten Geräten gesammelt und brauchen Ihre Hilfe, um diese zu kategorisieren.',
@@ -63,21 +60,19 @@ return array (
     'body-s4-header' => 'Noch Fragen?',
     'body-s4-p1' => 'Erfahren Sie mehr, stellen Sie Fragen und geben Sie uns Ihr Feedback, in der <a href=":url" target="_blank">BattCat-Diskussion</a>.',
     'title' => 'Danke, dass Sie BattCat ausprobiert haben',
-  ),
-  'branding' => 
-  array (
+  ],
+  'branding' => [
     'powered_by' => 'Unter Verwendung von Daten aus:',
-  ),
+  ],
   'about' => 'Mehr Informationen',
-  'survey' => 
-  array (
+  'survey' => [
     'a1' => 'Starke Ablehnung',
     'a2' => 'Ablehnung',
     'a3' => 'Neutral',
     'a4' => 'Zustimmung',
     'a5' => 'Starke Zustimmung',
     'footer' => 'Wenn Sie eine der beiden Tasten drücken, gelangen Sie zurück zu BattCat',
-    'header1' => 'Vielen Dank, dass Sie uns geholfen haben, herauszufinden, warum Tablets kaputt gehen.',
+    'header1' => 'Vielen Dank!',
     'header2' => 'Wir planen bereits weitere zukünftige Quests wie diese. Um die nächsten noch besser zu machen, haben wir ein paar kurze Fragen für Sie.',
     'invalid' => 'Bitte wählen Sie aus jeder der Fragen',
     'q1' => 'BattCat hat mein Interesse am Reparieren gesteigert',
@@ -86,5 +81,5 @@ return array (
     'q4' => 'BattCat hat meine Ansicht über die Wichtigkeit von Reparaturen verändert',
     'send' => 'Senden',
     'skip' => 'überspringen',
-  ),
-);
+  ],
+];

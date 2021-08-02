@@ -1,8 +1,8 @@
 <?php
 
-use Illuminate\Support\Facades\Schema;
-use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Database\Migrations\Migration;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\Schema;
 
 class AddEventDeletionNotificationPreference extends Migration
 {
@@ -15,7 +15,7 @@ class AddEventDeletionNotificationPreference extends Migration
     {
         DB::table('preferences')->insert([
             'name' => 'Event deletion notification',
-            'purpose' => NULL,
+            'purpose' => null,
             'slug' => 'delete-event-notification',
         ]);
     }

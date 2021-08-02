@@ -4,7 +4,7 @@ namespace App\Console\Commands;
 
 use App\Group;
 use App\Party;
-use FixometerHelper;
+use App\Helpers\Fixometer;
 use Illuminate\Console\Command;
 
 class PopulateUniqueCodeToEventsAndGroups extends Command
@@ -34,7 +34,7 @@ class PopulateUniqueCodeToEventsAndGroups extends Command
                     ->get();
 
         foreach ($groups as $group) {
-            $unique_shareable_code = FixometerHelper::generateUniqueShareableCode(\App\Group::class, 'shareable_code');
+            $unique_shareable_code = Fixometer::generateUniqueShareableCode(\App\Group::class, 'shareable_code');
 
             if (isset($unique_shareable_code) && ! empty($unique_shareable_code)) {
                 Group::where('idgroups', $group->idgroups)->update([
@@ -46,7 +46,7 @@ class PopulateUniqueCodeToEventsAndGroups extends Command
                     ->get();
 
         foreach ($events as $event) {
-            $unique_shareable_code = FixometerHelper::generateUniqueShareableCode(\App\Party::class, 'shareable_code');
+            $unique_shareable_code = Fixometer::generateUniqueShareableCode(\App\Party::class, 'shareable_code');
 
             if (isset($unique_shareable_code) && ! empty($unique_shareable_code)) {
                 $update = Party::where('idevents', $event->idevents)->update([

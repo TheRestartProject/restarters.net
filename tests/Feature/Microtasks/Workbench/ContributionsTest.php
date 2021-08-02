@@ -2,27 +2,25 @@
 
 namespace Tests\Feature\Microtasks\Workbench;
 
+use App\BattcatOra;
 use App\Faultcat;
 use App\Misccat;
 use App\Mobifix;
 use App\MobifixOra;
 use App\PrintcatOra;
 use App\TabicatOra;
-use App\BattcatOra;
 use App\User;
-
 use DB;
 use Hash;
 use Mockery;
 use Tests\TestCase;
-
 
 class ContributionsTest extends TestCase
 {
     protected $user1;
     protected $user2;
 
-    public function setUp()
+    protected function setUp(): void
     {
         parent::setUp();
         Faultcat::truncate();
@@ -72,9 +70,12 @@ class ContributionsTest extends TestCase
         $this->actingAs($this->userNoContributions);
         $response = $this->get('/workbench');
 
-        $props = $this->getVueProperties($response)[0];
-        $this->assertEquals(0, $props[':current-user-quests']);
-        $this->assertEquals(0, $props[':current-user-contributions']);
+        $this->assertVueProperties($response, [
+            [
+                ':current-user-quests' => 0,
+                ':current-user-contributions' => 0,
+            ],
+        ]);
     }
 
     public function testLoggedInSomeContributions()
@@ -82,9 +83,12 @@ class ContributionsTest extends TestCase
         $this->actingAs($this->userWithContributions);
         $response = $this->get('/workbench');
 
-        $props = $this->getVueProperties($response)[0];
-        $this->assertEquals(3, $props[':current-user-quests']);
-        $this->assertEquals(3, $props[':current-user-contributions']);
+        $this->assertVueProperties($response, [
+            [
+                ':current-user-quests' => 3,
+                ':current-user-contributions' => 3,
+            ],
+        ]);
     }
 
     public function testLoggedInMultipleContributionsOneQuest()
@@ -92,26 +96,35 @@ class ContributionsTest extends TestCase
         $this->actingAs($this->anotherUserWithContributions);
         $response = $this->get('/workbench');
 
-        $props = $this->getVueProperties($response)[0];
-        $this->assertEquals(1, $props[':current-user-quests']);
-        $this->assertEquals(2, $props[':current-user-contributions']);
+        $this->assertVueProperties($response, [
+            [
+                ':current-user-quests' => 1,
+                ':current-user-contributions' => 2,
+            ],
+        ]);
     }
 
     public function testLoggedOut()
     {
         $response = $this->get('/workbench');
 
-        $props = $this->getVueProperties($response)[0];
-        $this->assertEquals(0, $props[':current-user-quests']);
-        $this->assertEquals(0, $props[':current-user-contributions']);
+        $this->assertVueProperties($response, [
+            [
+                ':current-user-quests' => 0,
+                ':current-user-contributions' => 0,
+            ],
+        ]);
     }
 
     public function testTotals()
     {
         $response = $this->get('/workbench');
 
-        $props = $this->getVueProperties($response)[0];
-        $this->assertEquals(7, $props[':total-quests']);
-        $this->assertEquals(5, $props[':total-contributions']);
+        $this->assertVueProperties($response, [
+            [
+                ':total-quests' => 7,
+                ':total-contributions' => 5,
+            ],
+        ]);
     }
 }

@@ -21,13 +21,13 @@ class AcceptUserInvites
     {
         // Check if there are existing Groups/Events Shareable Invites for the
         // Current User
-        if ( ! empty($request->session()->get('groups') || ! empty($request->session()->get('events')))) {
+        if (! empty($request->session()->get('groups') || ! empty($request->session()->get('events')))) {
             $request->session()->put('invites-feedback');
         } else {
             $request->session()->forget('invites-feedback');
         }
 
-        if ( ! empty($request->session()->get('groups'))) {
+        if (! empty($request->session()->get('groups'))) {
             foreach ($request->session()->get('groups') as $hashs) {
                 foreach ($hashs as $hash) {
                     $acceptance = Invite::where('hash', $hash)->firstOrFail();
@@ -57,7 +57,7 @@ class AcceptUserInvites
             }
         }
 
-        if ( ! empty($request->session()->get('events'))) {
+        if (! empty($request->session()->get('events'))) {
             foreach ($request->session()->get('events') as $hashs) {
                 foreach ($hashs as $hash) {
                     $acceptance = Invite::where('hash', $hash)->firstOrFail();

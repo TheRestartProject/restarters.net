@@ -1,6 +1,6 @@
 <?php
 
-return array (
+return [
   'message_example_text' => '<add a custom message here if required>',
   'headline_stats_dropdown' => 'Headline stats',
   'co2_equivalence_visualisation_dropdown' => 'CO<sub>2</sub> equivalence visualisation',
@@ -75,6 +75,7 @@ return array (
   'edit_group' => 'Edit group',
   'edit_group_save_changes' => 'Save changes',
   'edit_group_text' => 'Go ahead and change or improve your group\'s profile.',
+  'delete_group' => 'Delete group',
   'groups_location_small' => 'I.e the place where the fixing happens!',
   'group_image' => 'Group image',
   'tag-1' => 'Tag 1',
@@ -188,4 +189,4 @@ return array (
   'delete_group' => 'Delete group',
   'delete_group_confirm' => 'Please confirm that you want to delete :name.',
   'delete_succeeded' => 'Group <strong>:name</strong> has been deleted.',
-);
+];

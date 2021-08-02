@@ -10,16 +10,18 @@ use Mockery;
 use Symfony\Component\DomCrawler\Crawler;
 use Tests\TestCase;
 
-class LoginTest extends TestCase {
-    public function testLogin() {
+class LoginTest extends TestCase
+{
+    public function testLogin()
+    {
         $restarter = factory(User::class)->state('Restarter')->create([
-            'password' => Hash::make('passw0rd')
+            'password' => Hash::make('passw0rd'),
                                                                       ]);
 
         // We've seen a Sentry problem which I can only see happening if there was invalid data in the cache.
         // Force that to happen to trigger code in loginRegisterStats which is resilient to it.
         \Cache::put('all_stats', [
-            'device_count_status' => NULL
+            'device_count_status' => null,
         ], 120);
 
         $response = $this->get('/login');
@@ -27,19 +29,19 @@ class LoginTest extends TestCase {
 
         $crawler = new Crawler($response->getContent());
 
-        $tokens = $crawler->filter("input[name=_token]")->each(function (Crawler $node, $i) {
+        $tokens = $crawler->filter('input[name=_token]')->each(function (Crawler $node, $i) {
             return $node;
         });
 
         $tokenValue = $tokens[0]->attr('value');
 
-        $names = $crawler->filter("input[name=my_name]")->each(function (Crawler $node, $i) {
+        $names = $crawler->filter('input[name=my_name]')->each(function (Crawler $node, $i) {
             return $node;
         });
 
         $nameValue = $names[0]->attr('value');
 
-        $times = $crawler->filter("input[name=my_time]")->each(function (Crawler $node, $i) {
+        $times = $crawler->filter('input[name=my_time]')->each(function (Crawler $node, $i) {
             return $node;
         });
 
@@ -50,7 +52,7 @@ class LoginTest extends TestCase {
             'my_name' => $nameValue,
             'my_time' => $timeValue,
             'email' => $restarter->email,
-            'password' => 'passw0rd'
+            'password' => 'passw0rd',
         ]);
 
         // Should redirect to dashboard.

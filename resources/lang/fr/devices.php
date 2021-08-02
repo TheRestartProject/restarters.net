@@ -1,6 +1,6 @@
 <?php
 
-return array (
+return [
   'devices' => 'Appareils',
   'edit_devices' => 'Editer l\'appareil',
   'edit_devices_details' => 'Editer les détails de l\'appareil',
@@ -64,4 +64,4 @@ return array (
   'suitable_help' => 'Montrer les réparations où les commentaires ont été marqués comme utiles pour des futures tentatives de réparations',
   'uploaded_photos' => 'Photos téléchargées',
   'useful_repair_info' => 'Source d\'information',
-);
+];

@@ -1,6 +1,6 @@
 <?php
 
-return array (
+return [
   'about_event_name_header' => 'A propos :event',
   'rsvp_message' => 'Super! Vous nous rejoignez pour cet événement',
   'rsvp_button' => 'Désolé, je ne peux plus participer',
@@ -201,4 +201,4 @@ return array (
   'search_start_placeholder' => 'À...',
   'search_title_placeholder' => 'Recherche un titre...',
   'talk_thread' => 'Voir la conversation de l\'événement',
-);
+];

@@ -1,6 +1,6 @@
 <template>
   <div v-if="event">
-    <EventHeading :idevents="idevents" :canedit="canedit" :in-group="inGroup" :attending="attending" />
+    <EventHeading :idevents="idevents" :canedit="canedit" :in-group="inGroup" :is-attending="isAttending" />
     <div class="layout">
       <div>
         <EventDetails class="pr-md-3" :idevents="idevents" :hosts="hosts" :calendar-links="calendarLinks" :is-attending="isAttending" :discourse-thread="discourseThread" />
@@ -66,11 +66,6 @@ export default {
     },
     discourseThread: {
       type: String,
-      required: false,
-      default: null
-    },
-    attending: {
-      type: Object,
       required: false,
       default: null
     },

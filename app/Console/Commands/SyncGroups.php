@@ -50,26 +50,25 @@ class SyncGroups extends Command
     {
         $groups = Group::whereNotNull('wordpress_post_id')->where('wordpress_post_id', '<>', 99999)->get();
 
-        foreach ($groups as $group)
-        {
+        foreach ($groups as $group) {
             try {
-                $custom_fields = array(
-                    array('key' => 'group_city', 'value' => $group->area),
-                    array('key' => 'group_country', 'value' => $group->country),
-                    array('key' => 'group_website', 'value' => $group->website),
-                    array('key' => 'group_hash', 'value' => $group->idgroups),
-                    array('key' => 'group_latitude', 'value' => $group->latitude),
-                    array('key' => 'group_longitude', 'value' => $group->longitude),
-                );
+                $custom_fields = [
+                    ['key' => 'group_city', 'value' => $group->area],
+                    ['key' => 'group_country', 'value' => $group->country],
+                    ['key' => 'group_website', 'value' => $group->website],
+                    ['key' => 'group_hash', 'value' => $group->idgroups],
+                    ['key' => 'group_latitude', 'value' => $group->latitude],
+                    ['key' => 'group_longitude', 'value' => $group->longitude],
+                ];
 
-                $content = array(
+                $content = [
                     'post_type' => 'group',
                     'post_title' => $group->name,
                     'post_content' => $group->free_text,
-                    'custom_fields' => $custom_fields
-                );
+                    'custom_fields' => $custom_fields,
+                ];
 
-                if (!empty($group->wordpress_post_id)) {
+                if (! empty($group->wordpress_post_id)) {
                     // We need to remap all custom fields because they all get unique IDs across all posts, so they don't get mixed up.
                     $existingPost = $this->wordpressClient->getPost($group->wordpress_post_id);
 
@@ -84,7 +83,7 @@ class SyncGroups extends Command
                     $content['custom_fields'] = $custom_fields;
                     $this->wordpressClient->editPost($group->wordpress_post_id, $content);
 
-                    $this->info('Synced '.$group->name.' (idgroups = '.$group->idgroups.', wordpress_post_id = ' . $group->wordpress_post_id . ')');
+                    $this->info('Synced '.$group->name.' (idgroups = '.$group->idgroups.', wordpress_post_id = '.$group->wordpress_post_id.')');
                 } else {
                     $wpid = $this->wordpressClient->newPost($group->name, $group->free_text, $content);
                     $group->wordpress_post_id = $wpid;

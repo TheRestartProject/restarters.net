@@ -1,62 +1,53 @@
 <?php
 
-return array (
-  'cta' => 
-  array (
+return [
+  'cta' => [
     'description' => 'Nous voyons beaucoup de smartphones lors d\'événements de réparation. Mais pourquoi cassent-ils si vite et qu\'est-ce qui pourrait les rendre plus facile à réparer? Aidez-nous à déterminer les problèmes les plus fréquents que l\'on peut rencontrer avec les smartphones avec MobiFix',
     'get_involved' => 'Participer',
     'title' => 'Aider maintenant! MobiFix',
-    'mobifix' => 
-    array (
+    'mobifix' => [
       'description' => '<p>Nous voyons beaucoup de smartphones lors d\'événements de réparation. Mais pourquoi cassent-ils si vite et qu\'est-ce qui pourrait les rendre plus facile à réparer? Aidez-nous à déterminer les problèmes les plus fréquents que l\'on peut rencontrer avec les smartphones avec MobiFix!</p>',
       'get_involved' => 'S\'impliquer',
       'title' => 'Aider maintenant! MobiFix',
-    ),
-    'mobifixora' => 
-    array (
+    ],
+    'mobifixora' => [
       'get_involved' => 'S\'impliquer',
       'title' => 'Aidez maintenant! MobiFix:ORA',
       'description' => '<p>Nous voyons beaucoup de smartphones lors d\'événements de réparation. Mais pourquoi cassent-ils si vite et qu\'est-ce qui pourrait les rendre plus facile à réparer? Aidez-nous à déterminer les problèmes les plus fréquents que l\'on peut rencontrer avec les smartphones avec MobiFix:ORA! </p> <p>Les données de réparation de MobiFix:ORA viennent du monde entier, via des partenaires de l\' <a target="_blank" style="color:#212529;text-decoration:underline" href=“:url”>Open Repair Alliance</a>.</p>',
-    ),
-    'tabicat' => 
-    array (
+    ],
+    'tabicat' => [
       'title' => 'Aider maintenant! TabiCat',
       'get_involved' => 'Participer',
       'description' => '<p>Nous voyons beaucoup de tablettes lors des Repair Café. Mais qu\'est-ce qui les fait tomber en panne et qu\'est-ce qui pourrait les rendre plus faciles à réparer? Aidez-nous à comprendre les problèmes les plus courants que nous rencontrons avec les tablettes grâce à TabiCat!</p> <p>Les données de réparation dans TabiCat proviennent du monde entier, via les partenaires de l\'<a target="_blank" style="color:#212529;text-decoration:underline" href="https://openrepair.org">Open Repair Alliance</a>.</p>',
       'short_description' => 'Pourquoi les tablettes échouent-elles, et quels sont les obstacles à leur réparation ?',
-    ),
-    'printcat' => 
-    array (
+    ],
+    'printcat' => [
       'description' => '<p>Nous voyons beaucoup d\'imprimantes dans les Repair Cafés. Mais qu\'est-ce qui les fait tomber en panne et qu\'est-ce qui pourrait les rendre plus faciles à réparer? Aidez-nous à déterminer les problèmes les plus courants que nous rencontrons avec les imprimantes grâce à PrintCat!</p> <p>Les données de réparation dans PrintCat proviennent du monde entier, via des partenaires de la <a target="_blank" style="color:#212529;text-decoration:underline" href="https://openrepair.org">Open Repair Alliance</a>.</p>',
       'get_involved' => 'Participer',
       'title' => 'Aider maintenant! PrintCat',
       'short_description' => 'Aidez-nous à déterminer les problèmes les plus courants que nous rencontrons avec les imprimantes.',
-    ),
-    'battcat' => 
-    array (
+    ],
+    'battcat' => [
       'description' => '<p>Nous voyons beaucoup d\'appareils cassés, lors des événements de réparation communautaires, qui ont un problème de batterie. Mais qu\'est-ce qui cause la défaillance des batteries et qu\'est-ce qui pourrait les rendre plus faciles à réparer ou à remplacer ? Aidez-nous à comprendre les problèmes les plus courants que nous rencontrons avec les batteries grâce à BattCat !</p> <p>Les données de réparation dans BattCat proviennent du monde entier, via les partenaires de l\' <a target="_blank" style="color:#212529;text-decoration:underline" href="https://openrepair.org">Open Repair Alliance</a>.</p>',
       'get_involved' => 'Participer',
       'title' => 'Aider maintenant! BattCat',
-    ),
-  ),
-  'discussion' => 
-  array (
+    ],
+  ],
+  'discussion' => [
     'number_of_comments' => 'Nombre de commentaires',
     'see_all' => 'Voir tout',
     'title' => 'Que se passe-t-il?',
     'topic_created_at' => 'Sujet créé',
-  ),
-  'news' => 
-  array (
+  ],
+  'news' => [
     'title' => 'Lire nos récents succès',
     'content' => 'Grâce à notre quête MobiFix, des volontaires du monde entier nous ont aidés à analyser les données de l\'Open Repair Alliance sur les smartphones.
                     <ul>
                         <li><a href="https://openrepair.org/open-data/insights/mobiles" target="_blank" onclick="window.ga(\'send\', \'event\', \'microtasking\', \'news-click\', \'mobifix-openrepair-insights\')">Lisez l\'analyse</a> telle qu\'elle a été préparée pour un document d\'orientation sur la durée de vie des smartphones, et téléchargez vous-même les résultats!</li>
                     </ul>',
-  ),
+  ],
   'title' => 'Atelier de données',
-  'volunteering' => 
-  array (
+  'volunteering' => [
     'all_volunteer_contributions' => 'Total des apports des volontaires',
     'join' => 'Rejoindre',
     'my_contributions' => 'Mes contributions',
@@ -71,5 +62,5 @@ return array (
     'my_quests' => ':value recherches',
     'open_quests' => 'Tâches ouvertes',
     'try_quest' => 'Essayez :questname',
-  ),
-);
+  ],
+];

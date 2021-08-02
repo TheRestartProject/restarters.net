@@ -2,30 +2,29 @@
 
 namespace Tests\Feature;
 
-use App\Listeners\LogInToWiki;
 use App\Listeners\ChangeWikiPassword;
+use App\Listeners\LogInToWiki;
 use App\User;
 use App\WikiSyncStatus;
-
-use DB;
 use Carbon\Carbon;
-use Tests\TestCase;
+use DB;
 use Illuminate\Foundation\Testing\RefreshDatabase;
-use Msurguy\Honeypot\HoneypotFacade as Honeypot;
-use Mockery;
 use Illuminate\Foundation\Testing\WithoutMiddleware;
 use Mediawiki\Api\Service\UserCreator;
+use Mockery;
+use Msurguy\Honeypot\HoneypotFacade as Honeypot;
+use Tests\TestCase;
 
 class WikiLoginTests extends TestCase
 {
     //use WithoutMiddleware;
 
-    public function setUp()
+    protected function setUp(): void
     {
         parent::setUp();
-        DB::statement("SET foreign_key_checks=0");
+        DB::statement('SET foreign_key_checks=0');
         User::truncate();
-        DB::statement("SET foreign_key_checks=1");
+        DB::statement('SET foreign_key_checks=1');
     }
 
     /** @test */
@@ -99,7 +98,6 @@ class WikiLoginTests extends TestCase
         $this->assertEquals('', $user->mediawiki);
         $this->assertEquals(WikiSyncStatus::Created, $user->wiki_sync_status);
     }
-
 
     /** @test */
     public function if_wiki_user_changes_password()

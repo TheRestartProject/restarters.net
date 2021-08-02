@@ -1,19 +1,19 @@
 <?php
 
-use Illuminate\Support\Facades\Schema;
-use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Database\Migrations\Migration;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\Schema;
 
-class PrintcatOraSetup extends Migration {
-
+class PrintcatOraSetup extends Migration
+{
     /**
      * Run the migrations.
      *
      * @return void
      */
-    public function up() {
-
-        if (!Schema::hasTable('devices_faults_printers_ora_opinions')) {
+    public function up()
+    {
+        if (! Schema::hasTable('devices_faults_printers_ora_opinions')) {
             Schema::create('devices_faults_printers_ora_opinions', function (Blueprint $table) {
                 $table->increments('id');
                 $table->string('id_ords', 16)->index();
@@ -76,9 +76,9 @@ class PrintcatOraSetup extends Migration {
                 $table->collation = 'utf8mb4_unicode_ci';
             });
 
-            $data = base_path() . '/database/data_updates/devices_printcat_ora.php';
+            $data = base_path().'/database/data_updates/devices_printcat_ora.php';
             if (file_exists($data)) {
-                include($data);
+                include $data;
                 foreach ($devices_printcat_ora as $k => $v) {
                     DB::table('devices_printcat_ora')->insert([
                                                                   'id_ords' => $v['id_ords'],
@@ -99,122 +99,123 @@ class PrintcatOraSetup extends Migration {
         }
     }
 
-    protected function _FaultTypes() {
+    protected function _FaultTypes()
+    {
         return [
             1 => [
-                "title" => "Card reader",
-                "description" => "",
-                "regex" => "card|sim|socket"
+                'title' => 'Card reader',
+                'description' => '',
+                'regex' => 'card|sim|socket',
             ],
             2 => [
-                "title" => "Configuration",
-                "description" => "Advice, set up, tutoring...",
-                "regex" => "advi[cs]e|help|config|setting|install|program|support|internet|wi-?fi"
+                'title' => 'Configuration',
+                'description' => 'Advice, set up, tutoring...',
+                'regex' => 'advi[cs]e|help|config|setting|install|program|support|internet|wi-?fi',
             ],
             3 => [
-                "title" => "Control buttons",
-                "description" => "",
-                "regex" => "button|switch"
+                'title' => 'Control buttons',
+                'description' => '',
+                'regex' => 'button|switch',
             ],
             4 => [
-                "title" => "Display panel",
-                "description" => "LCD/LED screen problem",
-                "regex" => "screen|display|glass|lcd"
+                'title' => 'Display panel',
+                'description' => 'LCD/LED screen problem',
+                'regex' => 'screen|display|glass|lcd',
             ],
             5 => [
-                "title" => "External damage",
-                "description" => "Damage to the housing",
-                "regex" => "case|shell|frame|hous|chass| cover"
+                'title' => 'External damage',
+                'description' => 'Damage to the housing',
+                'regex' => 'case|shell|frame|hous|chass| cover',
             ],
             6 => [
-                "title" => "Imaging unit/drum",
-                "description" => "",
-                "regex" => "scan|drum"
+                'title' => 'Imaging unit/drum',
+                'description' => '',
+                'regex' => 'scan|drum',
             ],
             7 => [
-                "title" => "Ink cartridge",
-                "description" => "",
-                "regex" => "ink|cartridge|leak"
+                'title' => 'Ink cartridge',
+                'description' => '',
+                'regex' => 'ink|cartridge|leak',
             ],
             8 => [
-                "title" => "Internal damage",
-                "description" => "Problem with mechanisms such as gears",
-                "regex" => "noise|rattle|loud|gear|clank|contact|circuit|solder"
+                'title' => 'Internal damage',
+                'description' => 'Problem with mechanisms such as gears',
+                'regex' => 'noise|rattle|loud|gear|clank|contact|circuit|solder',
             ],
             9 => [
-                "title" => "Paper feed",
-                "description" => "Won't feed paper ",
-                "regex" => "paper|feed|stuck|tray|carriage|transport|load"
+                'title' => 'Paper feed',
+                'description' => "Won't feed paper ",
+                'regex' => 'paper|feed|stuck|tray|carriage|transport|load',
             ],
             10 => [
-                "title" => "Paper output",
-                "description" => "Paper jammed, creased, skewed...",
-                "regex" => "paper|jam|stuck|output|crease"
+                'title' => 'Paper output',
+                'description' => 'Paper jammed, creased, skewed...',
+                'regex' => 'paper|jam|stuck|output|crease',
             ],
             11 => [
-                "title" => "Power supply/connectors",
-                "description" => "",
-                "regex" => "power|start|boot|switch|charg|plug|cable|socket|current"
+                'title' => 'Power supply/connectors',
+                'description' => '',
+                'regex' => 'power|start|boot|switch|charg|plug|cable|socket|current',
             ],
             12 => [
-                "title" => "Print quality",
-                "description" => "Blurry, stripes, faded...",
-                "regex" => "blur|fuz|stripe|lines|streak|unclear|smear|quality|colou?r|gr[ea]y"
+                'title' => 'Print quality',
+                'description' => 'Blurry, stripes, faded...',
+                'regex' => 'blur|fuz|stripe|lines|streak|unclear|smear|quality|colou?r|gr[ea]y',
             ],
             13 => [
-                "title" => "Printhead cleaning",
-                "description" => "",
-                "regex" => "dirt|clean|nozzle|block|clog|maintenance|pollut"
+                'title' => 'Printhead cleaning',
+                'description' => '',
+                'regex' => 'dirt|clean|nozzle|block|clog|maintenance|pollut',
             ],
             14 => [
-                "title" => "Printhead failure",
-                "description" => "",
-                "regex" => "head"
+                'title' => 'Printhead failure',
+                'description' => '',
+                'regex' => 'head',
             ],
             15 => [
-                "title" => "Scanner",
-                "description" => "",
-                "regex" => "scan"
+                'title' => 'Scanner',
+                'description' => '',
+                'regex' => 'scan',
             ],
             16 => [
-                "title" => "Software issue/update",
-                "description" => "Driver, app, update etc.",
-                "regex" => "software|crash|app|install|update|driver|program|error|version"
+                'title' => 'Software issue/update',
+                'description' => 'Driver, app, update etc.',
+                'regex' => 'software|crash|app|install|update|driver|program|error|version',
             ],
             17 => [
-                "title" => "Toner",
-                "description" => "",
-                "regex" => "toner|laser"
+                'title' => 'Toner',
+                'description' => '',
+                'regex' => 'toner|laser',
             ],
             18 => [
-                "title" => "USB port/cable",
-                "description" => "Broken, loose, dirty...",
-                "regex" => "cable|connector|port|usb"
+                'title' => 'USB port/cable',
+                'description' => 'Broken, loose, dirty...',
+                'regex' => 'cable|connector|port|usb',
             ],
             19 => [
-                "title" => "Vendor lock-in",
-                "description" => "Features disabled",
-                "regex" => "lock|subscription|vendor|manufact"
+                'title' => 'Vendor lock-in',
+                'description' => 'Features disabled',
+                'regex' => 'lock|subscription|vendor|manufact',
             ],
             20 => [
-                "title" => "Waste toner/ink box",
-                "description" => "",
-                "regex" => "toner|waste"
+                'title' => 'Waste toner/ink box',
+                'description' => '',
+                'regex' => 'toner|waste',
             ],
             21 => [
-                "title" => "WiFi",
-                "description" => "Not connecting...",
-                "regex" => "wi-?fi|wireless|bluetooth"
+                'title' => 'WiFi',
+                'description' => 'Not connecting...',
+                'regex' => 'wi-?fi|wireless|bluetooth',
             ],
             22 => [
-                "title" => "Other",
-                "description" => "Main fault is known but there is no option for it",
-                "regex" => ""
+                'title' => 'Other',
+                'description' => 'Main fault is known but there is no option for it',
+                'regex' => '',
             ],
             23 => [
-                "title" => "Unknown",
-                "description" => "Not enough info to determine the main fault",
-                "regex" => ""
+                'title' => 'Unknown',
+                'description' => 'Not enough info to determine the main fault',
+                'regex' => '',
             ],
         ];
     }
@@ -224,11 +225,11 @@ class PrintcatOraSetup extends Migration {
      *
      * @return void
      */
-    public function down() {
+    public function down()
+    {
         Schema::dropIfExists('devices_faults_printers_ora_adjudicated');
         Schema::dropIfExists('devices_faults_printers_ora_opinions');
         Schema::dropIfExists('fault_types_printers');
         Schema::dropIfExists('devices_printcat_ora');
     }
-
 }

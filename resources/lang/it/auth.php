@@ -1,6 +1,6 @@
 <?php
 
-return array (
+return [
   'failed' => 'Queste credenziali non combaciano con i nostri dati.',
   'throttle' => 'Troppi tentativi di accesso. Per favore riprova in :seconds secondi.',
   'email_address' => 'Indirizzo email',
@@ -33,4 +33,4 @@ le tue preferenze email per la nostra piattaforma di discussione',
   'assigned_groups' => 'Gruppi assegnati',
   'save_user' => 'Salva utente',
   'login_before_using_shareable_link' => 'Per completare il tuo invito per favore crea un account qui sotto, o se hai già un account <a href=":login_url">fai login qui</a>.',
-);
+];

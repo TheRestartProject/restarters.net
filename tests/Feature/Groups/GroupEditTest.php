@@ -5,11 +5,10 @@ namespace Tests\Feature;
 use App\Group;
 use App\GroupTags;
 use App\User;
-
-use DB;
 use Carbon\Carbon;
-use Tests\TestCase;
+use DB;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Tests\TestCase;
 
 class GroupEditTest extends TestCase
 {
@@ -33,7 +32,7 @@ class GroupEditTest extends TestCase
             'location' => 'London',
             'name' => 'Test',
             'website' => 'https://therestartproject.org',
-            'free_text' => 'HQ'
+            'free_text' => 'HQ',
         ]);
 
         $this->assertContains('Group updated!', $response->getContent());
@@ -62,7 +61,7 @@ class GroupEditTest extends TestCase
             'location' => 'zzzzzzzzzzzzz1234',
             'name' => 'Test',
             'website' => 'https://therestartproject.org',
-            'free_text' => 'HQ'
+            'free_text' => 'HQ',
         ]);
 
         $this->assertContains('Group could not be saved. Address not found', $response->getContent());
