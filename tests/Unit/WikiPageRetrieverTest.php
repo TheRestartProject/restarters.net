@@ -2,17 +2,16 @@
 
 namespace Tests\Unit;
 
-use Tests\TestCase;
+use App\Helpers\CachingWikiPageRetriever;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Cache;
-
-use App\Helpers\CachingWikiPageRetriever;
+use Tests\TestCase;
 
 class WikiPageRetrieverTest extends TestCase
 {
     public function testOneResult()
     {
-        $apiEndpointBase = env('WIKI_URL') . '/api.php';
+        $apiEndpointBase = env('WIKI_URL').'/api.php';
         $wikiPageRetriever = new CachingWikiPageRetriever($apiEndpointBase);
 
         $result = $wikiPageRetriever->getRandomWikiPages(1);
@@ -22,7 +21,7 @@ class WikiPageRetrieverTest extends TestCase
 
     public function testFiveResults()
     {
-        $apiEndpointBase = env('WIKI_URL') . '/api.php';
+        $apiEndpointBase = env('WIKI_URL').'/api.php';
         $wikiPageRetriever = new CachingWikiPageRetriever($apiEndpointBase);
 
         $result = $wikiPageRetriever->getRandomWikiPages(5);
@@ -48,4 +47,3 @@ class WikiPageRetrieverTest extends TestCase
         $result = $wikiPageRetriever->getRandomWikiPages(5);
     }*/
 }
-

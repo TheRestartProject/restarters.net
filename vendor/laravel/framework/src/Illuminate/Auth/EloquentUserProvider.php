@@ -66,7 +66,7 @@ class EloquentUserProvider implements UserProvider
         $model = $model->where($model->getAuthIdentifierName(), $identifier)->first();
 
         if (! $model) {
-            return null;
+            return;
         }
 
         $rememberToken = $model->getRememberToken();
@@ -77,7 +77,7 @@ class EloquentUserProvider implements UserProvider
     /**
      * Update the "remember me" token for the given user in storage.
      *
-     * @param  \Illuminate\Contracts\Auth\Authenticatable  $user
+     * @param  \Illuminate\Contracts\Auth\Authenticatable|\Illuminate\Database\Eloquent\Model  $user
      * @param  string  $token
      * @return void
      */

@@ -3,21 +3,19 @@
 namespace Tests\Feature;
 
 use App\User;
-
-use DB;
 use Carbon\Carbon;
-use Tests\TestCase;
+use DB;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Tests\TestCase;
 
 class ViewUsersTest extends TestCase
 {
-    public function setUp()
+    protected function setUp(): void
     {
         parent::setUp();
-        DB::statement("SET foreign_key_checks=0");
+        DB::statement('SET foreign_key_checks=0');
         User::truncate();
-        DB::statement("SET foreign_key_checks=1");
-
+        DB::statement('SET foreign_key_checks=1');
 
         // Given we're logged in as an admin
         $admin = factory(User::class)->states('Administrator')->create();
@@ -56,7 +54,7 @@ class ViewUsersTest extends TestCase
         // Given we have a user who has just logged in
         $lastLogin = new \Carbon\Carbon();
         $user = factory(User::class)->create([
-            'updated_at' => $lastLogin
+            'updated_at' => $lastLogin,
         ]);
 
         // When we visit the list of users
@@ -72,11 +70,11 @@ class ViewUsersTest extends TestCase
         // Given we have a user who has just logged in
         $lastLogin = new \Carbon\Carbon();
         $user = factory(User::class)->create([
-            'updated_at' => $lastLogin
+            'updated_at' => $lastLogin,
         ]);
 
         // When we visit the list of users and filter by that user
-        $response = $this->get('/user/all/search?name=' . $user->name);
+        $response = $this->get('/user/all/search?name='.$user->name);
 
         // Then we should see the last login date for that user
         $response->assertSeeText($lastLogin->diffForHumans(null, true));

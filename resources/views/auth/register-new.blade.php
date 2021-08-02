@@ -36,7 +36,7 @@
             <p class="registration__status">@lang('registration.step-1')</p>
 
             <legend id="step-1-form-label">@lang('registration.reg-step-1-1')</legend>
-            @foreach( FixometerHelper::skillCategories() as $key => $skill_category )
+            @foreach( App\Helpers\Fixometer::skillCategories() as $key => $skill_category )
               <br>
               <h5>@lang($skill_category)</h5>
               <div class="row row-compressed">
@@ -96,7 +96,7 @@
                                 <label for="age">@lang('registration.age'):<sup>*</sup></label>
                                 <div class="form-control form-control__select">
                                     <select id="age" name="age" required aria-required="true" class="field select2">
-                                        @foreach(FixometerHelper::allAges() as $age)
+                                        @foreach(App\Helpers\Fixometer::allAges() as $age)
                                           <option @if( old('age') == $age ) selected @endif value="{{ $age }}">{{ $age }}</option>
                                         @endforeach
                                     </select>
@@ -111,7 +111,7 @@
                                 <div class="form-control form-control__select">
                                     <select id="country" name="country" required aria-required="true" class="field select2">
                                         <option value=""></option>
-                                        @foreach (FixometerHelper::getAllCountries() as $country_code => $country_name)
+                                        @foreach (App\Helpers\Fixometer::getAllCountries() as $country_code => $country_name)
                                           <option value="{{ $country_code }}" @if( old('country') == $country_code ) selected @endif>{{ $country_name }}</option>
                                         @endforeach
                                     </select>

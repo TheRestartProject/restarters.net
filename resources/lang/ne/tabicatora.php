@@ -1,5 +1,5 @@
 <?php
 
-return array (
+return [
   'Where is the main fault?' => 'Where is the main fault?',
-);
+];

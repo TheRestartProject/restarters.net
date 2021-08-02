@@ -6,16 +6,15 @@ use App\Category;
 use App\Device;
 use App\Group;
 use App\Party;
-
 use DB;
-use Tests\TestCase;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Tests\TestCase;
 
 class EventStatsTest extends TestCase
 {
     //use RefreshDatabase;
 
-    public function setUp()
+    protected function setUp(): void
     {
         parent::setUp();
     }

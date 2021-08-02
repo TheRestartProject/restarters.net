@@ -29,7 +29,7 @@ class MediawikiApi implements MediawikiApiInterface, LoggerAwareInterface {
 	/**
 	 * @var ClientInterface|null Should be accessed through getClient
 	 */
-	private $client = null;
+	private $client;
 
 	/**
 	 * @var bool|string
@@ -97,12 +97,12 @@ class MediawikiApi implements MediawikiApiInterface, LoggerAwareInterface {
 		if ( $link->length === 0 ) {
 			// Format libxml errors for display.
 			$libXmlErrorStr = array_reduce( $libXmlErrors, function ( $prevErr, $err ) {
-				return $prevErr . ', ' . $err->message . ' (line '.$err->line . ')';
+				return $prevErr . ', ' . $err->message . ' (line ' . $err->line . ')';
 			} );
 			if ( $libXmlErrorStr ) {
-				$libXmlErrorStr = "In addition, libxml had the following errors: $libXmlErrorStr";
+				$libXmlErrorStr = sprintf( 'In addition, libxml had the following errors: %s', $libXmlErrorStr );
 			}
-			throw new RsdException( "Unable to find RSD URL in page: $url $libXmlErrorStr" );
+			throw new RsdException( sprintf( 'Unable to find RSD URL in page: %s %s', $url, $libXmlErrorStr ) );
 		}
 		$rsdUrl = $link->item( 0 )->attributes->getnamedItem( 'href' )->nodeValue;
 
@@ -187,7 +187,9 @@ class MediawikiApi implements MediawikiApiInterface, LoggerAwareInterface {
 		);
 
 		return $promise->then( function ( ResponseInterface $response ) {
-			return call_user_func( [ $this, 'decodeResponse' ], $response );
+			return call_user_func( function ( ResponseInterface $response ) {
+				return $this->decodeResponse( $response );
+			}, $response );
 		} );
 	}
 
@@ -208,7 +210,9 @@ class MediawikiApi implements MediawikiApiInterface, LoggerAwareInterface {
 		);
 
 		return $promise->then( function ( ResponseInterface $response ) {
-			return call_user_func( [ $this, 'decodeResponse' ], $response );
+			return call_user_func( function ( ResponseInterface $response ) {
+				return $this->decodeResponse( $response );
+			}, $response );
 		} );
 	}
 
@@ -348,20 +352,53 @@ class MediawikiApi implements MediawikiApiInterface, LoggerAwareInterface {
 	}
 
 	/**
-	 * @param $result
+	 * @param array $result
 	 */
 	private function logWarnings( $result ) {
-		if ( is_array( $result ) && array_key_exists( 'warnings', $result ) ) {
-			foreach ( $result['warnings'] as $module => $warningData ) {
-				// Accomodate both formatversion=2 and old-style API results
-				$logPrefix = $module . ': ';
-				if ( isset( $warningData['*'] ) ) {
-					$this->logger->warning( $logPrefix . $warningData['*'], [ 'data' => $warningData ] );
-				} else {
-					$this->logger->warning( $logPrefix . $warningData['warnings'], [ 'data' => $warningData ] );
+		if ( is_array( $result ) ) {
+			// Let's see if there is 'warnings' key on the first level of the array...
+			if ( $this->logWarning( $result ) ) {
+				return;
+			}
+
+			// ...if no then go one level deeper and check there for it.
+			foreach ( $result as $value ) {
+				if ( !is_array( $value ) ) {
+					continue;
 				}
+
+				$this->logWarning( $value );
 			}
 		}
+	}
+
+	/**
+	 * @param array $array Array response to look for warning in.
+	 *
+	 * @return bool Whether any warning has been logged or not.
+	 */
+	protected function logWarning( $array ) {
+		$found = false;
+
+		if ( !array_key_exists( 'warnings', $array ) ) {
+			return false;
+		}
+
+		foreach ( $array['warnings'] as $module => $warningData ) {
+			// Accommodate both formatversion=2 and old-style API results
+			$logPrefix = $module . ': ';
+			if ( isset( $warningData['*'] ) ) {
+				$this->logger->warning( $logPrefix . $warningData['*'], [ 'data' => $warningData ] );
+			} elseif ( isset( $warningData['warnings'] ) ) {
+				$this->logger->warning( $logPrefix . $warningData['warnings'], [ 'data' => $warningData ] );
+			} else {
+				$this->logger->warning( $logPrefix, [ 'data' => $warningData ] );
+			}
+
+			$found = true;
+		}
+
+		return $found;
 	}
 
 	/**
@@ -426,7 +463,7 @@ class MediawikiApi implements MediawikiApiInterface, LoggerAwareInterface {
 			'lgpassword' => $apiUser->getPassword(),
 		];
 
-		if ( !is_null( $apiUser->getDomain() ) ) {
+		if ( $apiUser->getDomain() !== null ) {
 			$params['lgdomain'] = $apiUser->getDomain();
 		}
 		return $params;
@@ -456,7 +493,9 @@ class MediawikiApi implements MediawikiApiInterface, LoggerAwareInterface {
 	 */
 	public function logout() {
 		$this->logger->log( LogLevel::DEBUG, 'Logging out' );
-		$result = $this->postRequest( new SimpleRequest( 'logout' ) );
+		$result = $this->postRequest( new SimpleRequest( 'logout', [
+			'token' => $this->getToken()
+		] ) );
 		if ( $result === [] ) {
 			$this->isLoggedIn = false;
 			$this->clearTokens();
@@ -489,13 +528,13 @@ class MediawikiApi implements MediawikiApiInterface, LoggerAwareInterface {
 	 * @return string
 	 */
 	public function getVersion() {
-		if ( !isset( $this->version ) ) {
+		if ( $this->version === null ) {
 			$result = $this->getRequest( new SimpleRequest( 'query', [
 				'meta' => 'siteinfo',
 				'continue' => '',
 			] ) );
 			preg_match(
-				'/\d+(?:\.\d+)+/',
+				'#\d+(?:\.\d+)+#',
 				$result['query']['general']['generator'],
 				$versionParts
 			);

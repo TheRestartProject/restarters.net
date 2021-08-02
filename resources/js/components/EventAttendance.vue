@@ -70,7 +70,7 @@
                   {{ __('events.invited_none') }}
                 </p>
                 <hr />
-                <div v-if="upcoming" class="d-flex justify-content-between">
+                <div v-if="upcoming && approved" class="d-flex justify-content-between">
                   <a data-toggle="modal" data-target="#event-invite-to" href="#" class="ml-2">
                     <img class="icon" src="/images/add-icon.svg" />
                     {{ __('events.invite_to_join') }}

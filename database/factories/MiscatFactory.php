@@ -3,7 +3,7 @@
 use Faker\Generator as Faker;
 
 $factory->define(App\Misccat::class, function (Faker $faker) {
-     return [];
+    return [];
 });
 
 $factory->state(App\Misccat::class, 'misc', function (Faker $faker) {
@@ -35,4 +35,3 @@ $factory->state(App\Misccat::class, 'cat3', function (Faker $faker) {
         'category' => 'cat3',
     ];
 });
-

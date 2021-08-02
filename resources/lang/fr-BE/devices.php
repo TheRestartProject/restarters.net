@@ -1,6 +1,6 @@
 <?php
 
-return array (
+return [
   'devices' => 'Appareils',
   'edit_devices' => 'Editer l\'appareil',
   'edit_devices_details' => 'Editer les détails de l\'appareil',
@@ -116,4 +116,11 @@ return array (
   'search_assessment_comments' => 'Evaluation',
   'table_intro' => 'Cliquez sur la ligne pour plus de détails.  Cliquez sur l\'en-tête d\'une colonne pour trier par cette colonne - cliquez à nouveau pour inverser l\'ordre de tri.',
   'tooltip_type' => 'Ajoutez autant d\'informations que possible sur le type d\'objet (ex: "Jeans Denim", ou "divan")',
-);
+  'add_data_event' => 'Veuillez sélectionner un événement',
+  'add_data_group' => 'Veuillez sélectionner un groupe',
+  'item_type' => 'Qu\'est-ce que c\'est?',
+  'tooltip_type_powered' => 'Quel type d\'appareil est-ce? (ex: "blender", "drone")',
+  'tooltip_type_unpowered' => 'Ajoutez autant d\'informations que possible sur le type d\'appareil (ex: "divan" "Jeans Denim")',
+  'unknown_brand' => 'Vous créez une nouvelle marque. Etes-vous sûr(e) qu\'une marque existante ne convient pas?',
+  'unknown_item_type' => 'Vous créez un nouveau type d\'appareil. Etes-vous sûr(e) qu\'un type d\'appareil existant ne convient pas?',
+];

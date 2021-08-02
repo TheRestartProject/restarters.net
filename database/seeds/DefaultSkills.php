@@ -11,7 +11,6 @@ class DefaultSkills extends Seeder
      */
     public function run()
     {
-
         DB::table('skills')->truncate();
 
         $data = [
@@ -31,6 +30,5 @@ class DefaultSkills extends Seeder
         ];
 
         DB::table('skills')->insert($data);
-
     }
 }

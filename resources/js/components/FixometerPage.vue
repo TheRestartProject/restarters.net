@@ -175,7 +175,7 @@
       </CollapsibleSection>
       <CollapsibleSection collapsed :count="unpowered_total" heading-level="h6" count-class="small">
         <template slot="title">
-          {{ __('devices.title_powered') }}
+          {{ __('devices.title_unpowered') }}
         </template>
         <template slot="title-right">
           <div class="small mt-2">

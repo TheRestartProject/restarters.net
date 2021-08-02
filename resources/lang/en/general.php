@@ -1,6 +1,6 @@
 <?php
 
-return array (
+return [
   'reporting' => 'Reporting',
   'general' => 'General',
   'menu_tools' => 'Community Tools',
@@ -66,4 +66,4 @@ return array (
   'menu_events' => 'Events',
   'menu_groups' => 'Groups',
   'menu_workbench' => 'Workbench',
-);
+];

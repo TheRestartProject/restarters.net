@@ -3,16 +3,15 @@
 namespace Tests\Feature;
 
 use App\Group;
+use App\Helpers\Geocoder;
 use App\Network;
 use App\Notifications\AdminModerationEvent;
+use App\Notifications\NotifyRestartersOfNewEvent;
 use App\Party;
 use App\User;
-use App\Helpers\Geocoder;
-use App\Notifications\NotifyRestartersOfNewEvent;
-
 use DB;
-use Tests\TestCase;
 use Illuminate\Support\Facades\Notification;
+use Tests\TestCase;
 
 class GeocoderMock extends Geocoder
 {
@@ -31,7 +30,7 @@ class GeocoderMock extends Geocoder
 
 class CreateEventTest extends TestCase
 {
-    public function setUp()
+    protected function setUp(): void
     {
         parent::setUp();
 
@@ -52,9 +51,87 @@ class CreateEventTest extends TestCase
         $response->assertSee('You need to be a host of a group in order to create a new event listing');
     }
 
+    /**
+     * @test
+     * @dataProvider roles
+     */
+    public function a_host_with_a_group_can_create_an_event($data)
+    {
+        $this->withoutExceptionHandling();
+
+        // arrange
+        $host = factory(User::class)->states('Host')->create();
+        $this->actingAs($host);
+
+        $group = factory(Group::class)->create();
+        $group->addVolunteer($host);
+        $group->makeMemberAHost($host);
+
+        // Fetch the event create page.
+        $response = $this->get('/party/create');
+        $this->get('/party/create')->assertStatus(200);
+
+        // Create a party for the specific group.
+        $eventAttributes = factory(Party::class)->raw();
+        $eventAttributes['group'] = $group->idgroups;
+
+        // We want an upcoming event so that we can check it appears in various places.
+        $eventAttributes['event_date'] = date('Y-m-d', strtotime('tomorrow'));
+
+        $this->post('/party/create/', $eventAttributes);
+        $this->assertDatabaseHas('events', $eventAttributes);
+
+        // Check that we can view the event, and that it shows the creation success message.
+        $this->get('/party/view/'.Party::latest()->first()->idevents)->
+            assertSee($eventAttributes['venue'])->
+            assertSee(__('events.created_success_message'));
+
+        // Now check whether the event shows/doesn't show correctly for different user roles.
+        list($role, $seeEvent, $canModerate) = $data;
+
+        if ($role != 'Host') {
+            // Need to act as someone else.
+            $this->actingAs(factory(User::class)->states($role)->create());
+        }
+
+        // Check both the group page, and the top-level events page.
+        foreach (['/group/view/'.$group->idgroups, '/party'] as $url) {
+            $response = $this->get($url);
+
+            if ($seeEvent) {
+                // We should be able to see this upcoming event in the Vue properties.  We don't have a neat way
+                // of examining properties yet, so just look for the string.
+                $response->assertSee('requiresModeration&quot;:true');
+
+                if ($canModerate) {
+                    $response->assertSee('canModerate&quot;:true');
+                } else {
+                    $response->assertSee('canModerate&quot;:false');
+                }
+            } else {
+                $response->assertSee('requiresModeration&quot;:true');
+            }
+        }
+    }
+
+    public function roles()
+    {
+        return [
+            // Hosts can see but not moderate.
+            [['Host', true, false]],
+
+            // Nobody else can see the event in the list of events.
+            //
+            // Administrators and NetworkCoordinators arguably should be able to, but that's the current function.
+            // They will see it in the lists of events to moderate, but that's not what we are testing here.
+            [['Restarter', false, false]],
+            [['Administrator', false, false]],
+            [['NetworkCoordinator', false, false]],
+        ];
+    }
 
     /** @test */
-    public function a_host_with_a_group_can_create_an_event()
+    public function a_host_can_duplicate_an_event()
     {
         $this->withoutExceptionHandling();
 
@@ -67,17 +144,17 @@ class CreateEventTest extends TestCase
         $group->makeMemberAHost($host);
 
         // act
-        $response = $this->get('/party/create');
-        $this->get('/party/create')->assertStatus(200);
+        $party = factory(Party::class)->create([
+           'group' => $group->idgroups,
+           'latitude'=>'1',
+           'longitude'=>'1',
+       ]);
 
-        $eventAttributes = factory(Party::class)->raw();
-        $response = $this->post('/party/create/', $eventAttributes);
-
-        // assert
-        $this->get('/party/view/' . Party::latest()->first()->idevents)->assertSee($eventAttributes['venue']);
-        $this->assertDatabaseHas('events', $eventAttributes);
+        // Duplicate it - should bring up the page to add a new event, with some info from the first one.
+        $response = $this->get('/party/duplicate/'.$party->idevents);
+        $response->assertSee(__('events.add_new_event'));
+        $response->assertSee($party->description);
     }
-
 
     /** @test */
     public function emails_sent_when_created()
@@ -129,7 +206,7 @@ class CreateEventTest extends TestCase
         $group->makeMemberAHost($host);
         $group->addVolunteer($restarter);
 
-        $eventData = factory(Party::class)->raw(['group' => $group->idgroups, 'event_date' => '2030-01-01', 'latitude'=>'1', 'longitude'=>'1' ]);
+        $eventData = factory(Party::class)->raw(['group' => $group->idgroups, 'event_date' => '2030-01-01', 'latitude'=>'1', 'longitude'=>'1']);
 
         // act
         $response = $this->post('/party/create/', $eventData);
@@ -235,11 +312,11 @@ class CreateEventTest extends TestCase
         // Remove the host from the event
         $this->post('/party/remove-volunteer/', [
             'user_id' => $host->id,
-            'event_id' => $party->idevents
+            'event_id' => $party->idevents,
         ])->assertStatus(200);
 
         // Assert that we see the host in the list of volunteers to add to the event.
-        $this->get('/party/view/' . $party->idevents)->assertSeeInOrder(['Group member', '<option value="' . $host->id . '">', '</div>']);
+        $this->get('/party/view/'.$party->idevents)->assertSeeInOrder(['Group member', '<option value="'.$host->id.'">', '</div>']);
 
         // Assert we can add them back in.
 

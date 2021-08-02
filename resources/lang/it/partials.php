@@ -1,6 +1,6 @@
 <?php
 
-return array (
+return [
   'community_news' => 'Novita\' nella community',
   'community_news_text' => 'Le ultime novità dal nostro blog della community: siamo sempre alla ricerca di post per gli ospiti, inviamo idee a <a href="mailto:janet@therestartproject.org"> janet@therestartproject.org </a>',
   'see_more_posts' => 'Vedi piu\' post',
@@ -93,4 +93,4 @@ admin',
   'solution_text2' => 'Interesting case study to share?',
   'quantity' => 'Quantity',
   'cancel' => 'Cancel',
-);
+];

@@ -47,7 +47,7 @@
                 <label for="category">Category:</label>
                 <select id="category" name="category" class="form-control" data-live-search="true">
                     <option></option>
-                    @foreach( FixometerHelper::skillCategories() as $key => $category )
+                    @foreach( App\Helpers\Fixometer::skillCategories() as $key => $category )
                       @if( $skill->category == $key )
                         <option selected value="{{{ $key }}}">{{{ $category }}}</option>
                       @else

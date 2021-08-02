@@ -1,6 +1,6 @@
 <?php
 
-return array (
+return [
   'top_item1' => 'Events',
   'top_item2' => 'Devices',
   'top_item3' => 'Groups',
@@ -61,4 +61,4 @@ return array (
   'discourse_url' => 'https://talk.restarters.net',
   'wiki_url' => 'https://wiki.restarters.net',
   'please_select' => 'Please select',
-);
+];

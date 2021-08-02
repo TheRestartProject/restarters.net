@@ -3,7 +3,7 @@
 namespace App\Listeners;
 
 use App\Events\EventImagesUploaded;
-use App\Helpers\FixometerHelper;
+use App\Helpers\Fixometer;
 use App\Notifications\AdminModerationEventPhotos;
 use App\Party;
 use App\User;
@@ -24,7 +24,7 @@ class SendAdminModerateEventPhotosNotification
     const IGNORE_SELF = true;
 
     /**
-     * @var EventImagesUploaded $event
+     * @var EventImagesUploaded
      */
     protected $event;
 
@@ -41,12 +41,12 @@ class SendAdminModerateEventPhotosNotification
         $this->event = $event;
         $this->party = $event->party;
 
-        FixometerHelper::usersWhoHavePreference('admin-moderate-event-photos')->each(function (User $user) {
+        Fixometer::usersWhoHavePreference('admin-moderate-event-photos')->each(function (User $user) {
             if ($this->shouldSendNotification($user)) {
                 Notification::send($user, new AdminModerationEventPhotos([
                     'event_id' => $this->party->idevents,
                     'event_venue' => $this->party->venue,
-                    'event_url' => url('/party/view/' . $this->party->idevents),
+                    'event_url' => url('/party/view/'.$this->party->idevents),
                 ]));
             }
         });
@@ -69,7 +69,7 @@ class SendAdminModerateEventPhotosNotification
         foreach ($notifications as $sent) {
             $data = json_decode($sent->data);
 
-            if (!empty($data->event_id) && $data->event_id == $this->party->idevents) {
+            if (! empty($data->event_id) && $data->event_id == $this->party->idevents) {
                 return false; // User just received a notification
             }
         }

@@ -1,4 +1,4 @@
-<div class="card {{ $notification->read_at ? 'status-is-read' : 'status-read' }} {{{ FixometerHelper::notificationClasses($notification->type) }}}">
+<div class="card {{ $notification->read_at ? 'status-is-read' : 'status-read' }} {{{ App\Helpers\Fixometer::notificationClasses($notification->type) }}}">
     <div class="card-body">
         <h5 class="card-title mb-1">
             @if (!empty($notification->data['title']))

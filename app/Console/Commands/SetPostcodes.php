@@ -44,19 +44,18 @@ class SetPostcodes extends Command
         $geocoder = new Geocoder();
 
         foreach ($groups as $group) {
-            $this->info("Check group ". $group->id . " " . $group->name . " postcode " . $group->postcode);
+            $this->info('Check group '.$group->id.' '.$group->name.' postcode '.$group->postcode);
 
-            if (!$group->postcode) {
+            if (! $group->postcode) {
                 if ($group->latitude || $group->longitude) {
                     $this->info("...no postcode, geocode {$group->latitude}, {$group->longitude}");
                     $results = $geocoder->reverseGeocode($group->latitude, $group->longitude);
                     $found = false;
 
                     if ($results->address_components) {
-
                         foreach ($results->address_components as $field) {
                             if ($field->types && $field->types[0] == 'postal_code') {
-                                $this->info("...found postcode " . $field->long_name);
+                                $this->info('...found postcode '.$field->long_name);
                                 $found = true;
                                 $g = Group::find($group->id);
                                 $g->postcode = $field->long_name;
@@ -65,11 +64,11 @@ class SetPostcodes extends Command
                         }
                     }
 
-                    if (!$found) {
-                        $this->error($group->id . " " . $group->name . " couldn't geocode");
+                    if (! $found) {
+                        $this->error($group->id.' '.$group->name." couldn't geocode");
                     }
                 } else {
-                    $this->error($group->id . " " . $group->name . " has no lat/lng");
+                    $this->error($group->id.' '.$group->name.' has no lat/lng');
                 }
             }
         }

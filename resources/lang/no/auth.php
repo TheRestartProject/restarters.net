@@ -1,6 +1,6 @@
 <?php
 
-return array (
+return [
   'failed' => 'These credentials do not match our records.',
   'throttle' => 'Too many login attempts. Please try again in :seconds seconds.',
   'email_address' => 'Email address',
@@ -31,4 +31,4 @@ this is a permanent action.',
   'user_role' => 'User role',
   'assigned_groups' => 'Assigned to groups',
   'save_user' => 'Save user',
-);
+];

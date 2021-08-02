@@ -1,6 +1,6 @@
 <?php
 
-return array (
+return [
   'field_device_images' => 'Add device images here',
   'field_device_images_2' => 'Choose compelling images that show off your work',
   'useful_repair_urls_helper' => 'Enter URL here',
@@ -110,7 +110,7 @@ return array (
   'spare_parts' => 'Spare parts',
   'images_on_edit' => 'Currently images can only be added by editing an item after it has been added.',
   'latest_data' => 'Latest Data',
-  'table_intro' => 'Click row for details.  Click a column head to sort by that column - click again to reverse sort order.',
+  'table_intro' => 'Press the ‘i’ icons for details.  Click a column head to sort by that column - click again to reverse sort order.',
   'assessment' => 'Assessment',
   'item_and_repair_info' => 'Item & Repair Info',
   'search_assessment_comments' => 'Assessment',
@@ -123,4 +123,4 @@ return array (
   'tooltip_type_unpowered' => 'Add as much information about the type of item here as you can (e.g. \'Sofa\' or \'Denim jeans\')',
   'unknown_item_type' => 'You\'re creating a new item type. Are you sure an existing item type is not suitable?',
   'unknown_brand' => 'You\'re creating a new brand. Are you sure an existing brand is not suitable?',
-);
+];

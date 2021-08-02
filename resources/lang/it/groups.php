@@ -1,6 +1,6 @@
 <?php
 
-return array (
+return [
   'group' => 'Gruppo',
   'groups' => 'Gruppi',
   'all_groups' => 'Tutti i gruppi',
@@ -92,4 +92,4 @@ return array (
   'type_shareable_link_message' => 'Condividi il link sopra per invitare le persone a unirsi a questo gruppo. Se una persona con cui condividi il collegamento non ha ancora un account, le verrà richiesto di registrarsi.',
   'upcoming_none_planned' => 'Nessuno pianificato',
   'groups_upcoming_event' => 'Prossimo evento',
-);
+];

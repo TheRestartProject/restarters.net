@@ -1,6 +1,6 @@
 <?php
 
-return array (
+return [
   'devices' => 'Dispositivo',
   'edit_devices' => 'Modifica dispositivo',
   'edit_devices_details' => 'Modifica informazioni del dispositivo',
@@ -69,4 +69,4 @@ return array (
   'age_approx' => 'years - approximate, if known',
   'repair_source' => 'Source of repair information',
   'repair_url' => 'URL for repair information',
-);
+];

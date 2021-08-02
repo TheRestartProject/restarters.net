@@ -4,11 +4,11 @@ namespace App;
 
 use DB;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Support\Facades\Schema;
 use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\Schema;
 
-class Mobifix extends Model {
-
+class Mobifix extends Model
+{
     protected $table = 'devices_faults_mobiles_opinions';
     protected $dateFormat = 'Y-m-d H:i';
     protected $dates = ['created_at', 'updated_at'];
@@ -29,7 +29,8 @@ class Mobifix extends Model {
      *
      * @return array
      */
-    public function fetchFault() {
+    public function fetchFault()
+    {
         return DB::select("SELECT
 d.`iddevices` as iddevices,
 TRIM(d.`brand`) as brand,
@@ -50,49 +51,47 @@ LIMIT 1;"
     }
 
     /**
-     *
-     *
      * @return mixed
      */
-    public function fetchStatus() {
-
+    public function fetchStatus()
+    {
         $result = [];
 
-        $result['total_devices'] = DB::select("
+        $result['total_devices'] = DB::select('
 SELECT COUNT(DISTINCT d.iddevices) AS total
 FROM devices d
 WHERE d.category = 25
 AND LENGTH(TRIM(d.problem)) > 0
-");
+');
 
-        $result['total_opinions_3'] = DB::select("
+        $result['total_opinions_3'] = DB::select('
 SELECT COUNT(DISTINCT o.iddevices) AS total
 FROM devices_faults_mobiles_opinions o
 WHERE (SELECT COUNT(o2.iddevices) FROM devices_faults_mobiles_opinions o2 WHERE o2.iddevices = o.iddevices GROUP BY o2.iddevices) = 3
-");
+');
 
-        $result['total_opinions_2'] = DB::select("
+        $result['total_opinions_2'] = DB::select('
 SELECT COUNT(DISTINCT o.iddevices) AS total
 FROM devices_faults_mobiles_opinions o
 WHERE (SELECT COUNT(o2.iddevices) FROM devices_faults_mobiles_opinions o2 WHERE o2.iddevices = o.iddevices GROUP BY o2.iddevices) = 2
-");
+');
 
-        $result['total_opinions_1'] = DB::select("
+        $result['total_opinions_1'] = DB::select('
 SELECT COUNT(DISTINCT o.iddevices) AS total
 FROM devices_faults_mobiles_opinions o
 WHERE (SELECT COUNT(o2.iddevices) FROM devices_faults_mobiles_opinions o2 WHERE o2.iddevices = o.iddevices GROUP BY o2.iddevices) = 1
-");
+');
 
-        $result['total_opinions_0'] = DB::select("
+        $result['total_opinions_0'] = DB::select('
 SELECT COUNT(d.iddevices) AS total
 FROM devices d
 LEFT JOIN devices_faults_mobiles_opinions o ON o.iddevices = d.iddevices
 WHERE d.category = 25
 AND LENGTH(TRIM(d.problem)) > 0
 AND o.iddevices IS NULL
-");
+');
 
-$result['total_recats'] = DB::select("
+        $result['total_recats'] = DB::select("
 SELECT COUNT(DISTINCT results.iddevices) as total FROM
 (SELECT
 o.iddevices,
@@ -113,7 +112,6 @@ a.fault_type AS winning_opinion,
 FROM devices_faults_mobiles_adjudicated a
 ) AS results;
 ");
-
 
         $result['list_recats'] = DB::select("
 SELECT results.winning_opinion, COUNT(*) AS total FROM
@@ -159,7 +157,8 @@ HAVING
 (all_crowd_opinions_count = 3 AND top_crowd_opinion_percentage < 60)
 ");
 
-        $result['total_splits'] = [json_decode(json_encode(['total' => count($result['list_splits'])]), FALSE)];
+        $result['total_splits'] = [json_decode(json_encode(['total' => count($result['list_splits'])]), false)];
+
         return $result;
     }
 
@@ -168,8 +167,8 @@ HAVING
      *
      * @return mixed
      */
-    public function updateDevices() {
-
+    public function updateDevices()
+    {
         DB::statement("CREATE TEMPORARY TABLE IF NOT EXISTS `devices_faults_mobiles_temporary` AS
 SELECT
 o.iddevices,
@@ -189,13 +188,13 @@ a.fault_type AS winning_opinion,
 'adj' AS all_crowd_opinions_count
 FROM devices_faults_mobiles_adjudicated a
 ");
-        DB::statement("ALTER TABLE `devices_faults_mobiles_temporary` ADD PRIMARY KEY(`iddevices`);");
+        DB::statement('ALTER TABLE `devices_faults_mobiles_temporary` ADD PRIMARY KEY(`iddevices`);');
 
-        $result = DB::update("UPDATE devices d, `devices_faults_mobiles_temporary` t
+        $result = DB::update('UPDATE devices d, `devices_faults_mobiles_temporary` t
 SET d.fault_type = t.winning_opinion
-WHERE d.iddevices = t.iddevices;");
+WHERE d.iddevices = t.iddevices;');
 
-        DB::statement("DROP TEMPORARY TABLE IF EXISTS `devices_faults_mobiles_temporary`");
+        DB::statement('DROP TEMPORARY TABLE IF EXISTS `devices_faults_mobiles_temporary`');
 
         return $result;
     }
@@ -205,13 +204,12 @@ WHERE d.iddevices = t.iddevices;");
      *
      * @return mixed
      */
-    public function updateDevicesWithEmptyProblem() {
-
+    public function updateDevicesWithEmptyProblem()
+    {
         return DB::update("UPDATE devices d
 SET d.fault_type = 'Unknown'
 WHERE d.category = 25
 AND LENGTH(d.problem) = 0
 ");
     }
-
 }

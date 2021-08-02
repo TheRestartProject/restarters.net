@@ -2,31 +2,31 @@
 
 namespace Tests\Feature;
 
-use App\EventsUsers;
 use App\Events\EventDeleted;
-use App\Listeners\DeleteEventFromWordPress;
+use App\EventsUsers;
 use App\Group;
+use App\Helpers\Geocoder;
+use App\Listeners\DeleteEventFromWordPress;
 use App\Network;
 use App\Notifications\DeleteEventFromWordpressFailed;
+use App\Notifications\NotifyRestartersOfNewEvent;
 use App\Party;
 use App\Preferences;
 use App\User;
 use App\UserGroups;
-use App\Helpers\Geocoder;
-use App\Notifications\NotifyRestartersOfNewEvent;
-
-use DB;
 use Carbon\Carbon;
+use DB;
 use HieuLe\WordpressXmlrpcClient\WordpressClient;
-use Mockery;
-use Tests\TestCase;
+use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\Notification;
-use Illuminate\Foundation\Testing\RefreshDatabase;
+use Mockery;
+use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
+use Tests\TestCase;
 
 class DeleteEventTests extends TestCase
 {
-    public function setUp()
+    protected function setUp(): void
     {
         parent::setUp();
     }
@@ -38,7 +38,9 @@ class DeleteEventTests extends TestCase
         Event::fake();
 
         // arrange
-        $admin = factory(User::class)->states('Administrator')->create();
+        $admin = factory(User::class)->states('Administrator')->create([
+                                                                           'api_token' => '1234',
+                                                                       ]);
         $this->actingAs($admin);
 
         $event = factory(Party::class)->create();
@@ -51,6 +53,16 @@ class DeleteEventTests extends TestCase
         $response->assertRedirect('/party/');
         $this->assertSoftDeleted('events', ['idevents' => $event['idevents']]);
         Event::assertDispatched(\App\Events\EventDeleted::class);
+
+        // Check that viewing the stats for a deleted event behaves gracefully.
+        $response = $this->get("/api/party/{$event->idevents}/stats?api_token=1234");
+        $this->assertEquals([
+                         'message' => "Invalid party id {$event['idevents']}",
+                     ], json_decode($response->getContent(), true));
+
+        // Check that getting the outbound info behaves gracefully.
+        $this->expectException(NotFoundHttpException::class);
+        $this->get("/outbound/info/party/{$event->idevents}");
     }
 
     /** @test */
@@ -64,7 +76,7 @@ class DeleteEventTests extends TestCase
         }));
 
         $network = factory(Network::class)->create([
-            'events_push_to_wordpress' => true
+            'events_push_to_wordpress' => true,
         ]);
         $group = factory(Group::class)->create();
         $network->addGroup($group);
@@ -76,7 +88,6 @@ class DeleteEventTests extends TestCase
         $handler = app(DeleteEventFromWordPress::class);
         $handler->handle(new EventDeleted($event));
     }
-
 
     /** @test */
     public function given_wordpress_deletion_failure()
@@ -94,7 +105,7 @@ class DeleteEventTests extends TestCase
         }));
 
         $network = factory(Network::class)->create([
-            'events_push_to_wordpress' => true
+            'events_push_to_wordpress' => true,
         ]);
         $group = factory(Group::class)->create();
         $network->addGroup($group);

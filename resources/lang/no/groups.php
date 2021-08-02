@@ -1,6 +1,6 @@
 <?php
 
-return array (
+return [
   'group' => 'Group',
   'groups' => 'Groups',
   'all_groups' => 'All groups',
@@ -74,4 +74,4 @@ return array (
   'tag-6' => 'Tag 6',
   'tag-7' => 'Tag 7',
   'tag-8' => 'Tag 8',
-);
+];

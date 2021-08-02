@@ -2,16 +2,15 @@
 
 namespace Tests\Feature;
 
+use App\EventsUsers;
+use App\Group;
+use App\Notifications\EventRepairs;
 use App\Party;
 use App\User;
-use App\Group;
-use Tests\TestCase;
-use App\EventsUsers;
-use App\Notifications\EventRepairs;
-use Illuminate\Support\Facades\Notification;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Foundation\Testing\WithoutMiddleware;
-
+use Illuminate\Support\Facades\Notification;
+use Tests\TestCase;
 
 class EventRequestReviewEmailTest extends TestCase
 {
@@ -35,7 +34,7 @@ class EventRequestReviewEmailTest extends TestCase
      */
     protected $event;
 
-    public function setUp()
+    protected function setUp(): void
     {
         parent::setUp();
     }
@@ -49,7 +48,7 @@ class EventRequestReviewEmailTest extends TestCase
 
         $response = $this
             ->actingAs($this->admin)
-            ->get('/party/contribution/' . $this->event->getKey());
+            ->get('/party/contribution/'.$this->event->getKey());
         $response->assertRedirect();
 
         Notification::assertSentTo(
@@ -63,7 +62,7 @@ class EventRequestReviewEmailTest extends TestCase
         $this->group = factory(Group::class)->create();
         $this->volunteer = factory(User::class)->create();
         $this->event = factory(Party::class)->create([
-            'group' => $this->group->getKey()
+            'group' => $this->group->getKey(),
         ]);
 
         $this->group->addVolunteer($this->volunteer);

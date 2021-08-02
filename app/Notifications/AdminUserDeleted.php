@@ -63,7 +63,7 @@ class AdminUserDeleted extends Notification implements ShouldQueue
     {
         return [
             'title' => 'User has deleted their account:',
-            'name' => $this->arr['name']
+            'name' => $this->arr['name'],
         ];
     }
 }

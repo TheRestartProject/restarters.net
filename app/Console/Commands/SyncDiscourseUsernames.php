@@ -76,7 +76,7 @@ class SyncDiscourseUsernames extends Command
             foreach ($usersFromDiscourse as $discourseUser) {
                 $user = User::where('email', $discourseUser->email)->first();
 
-                if ( ! is_null($user)) {
+                if (! is_null($user)) {
                     $usersFoundInRestarters++;
 
                     if ($user->username == $discourseUser->username) {
@@ -108,7 +108,7 @@ class SyncDiscourseUsernames extends Command
 
     protected function retrieveDiscourseUsersJson($apiPage)
     {
-        $endpoint = 'https://talk.restarters.net/admin/users/list/all.json?show_emails=true&page='.$apiPage.'&api_key='.$this->discourseApiKey.'&api_username='.$this->discourseApiUser;
+        $endpoint = env('DISCOURSE_URL').'/admin/users/list/all.json?show_emails=true&page='.$apiPage.'&api_key='.$this->discourseApiKey.'&api_username='.$this->discourseApiUser;
 
         return file_get_contents($endpoint);
     }

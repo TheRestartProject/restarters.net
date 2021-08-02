@@ -2,8 +2,8 @@
 
 namespace App\Policies;
 
-use App\User;
 use App\Network;
+use App\User;
 use Illuminate\Auth\Access\HandlesAuthorization;
 
 class NetworkPolicy
@@ -69,7 +69,6 @@ class NetworkPolicy
             return true;
         }
     }
-
 
     /**
      * Determine whether the user can delete the network.

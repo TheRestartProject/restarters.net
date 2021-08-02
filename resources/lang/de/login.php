@@ -1,6 +1,6 @@
 <?php
 
-return array (
+return [
   'whatis' => 'German Welcome to the Restarters community',
   'whatis_content' => '<p>This is a place to grow the community electronics repair movement. The world needs more fixing and more fixing skills to be shared.</p><p>Join in if you would like to:</p><ul>
                                 <li>Learn electronics repair with others</li>
@@ -16,4 +16,4 @@ return array (
   'stat_4' => 'Events held',
   'lead' => 'Welcome to our Restarter community',
   'login_title' => 'Sign in',
-);
+];

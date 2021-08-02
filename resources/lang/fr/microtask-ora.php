@@ -1,8 +1,7 @@
 <?php
 
-return array (
-  'cta' => 
-  array (
+return [
+  'cta' => [
     'body-s1-p1' => 'Chaque appareil que vous voyez a été apporté à un événement de réparation pour être réparé plutôt que jeté.',
     'body-s1-p2' => 'Que faisons-nous avec ces données?',
     'body-s2-header' => 'Partager les compétences de réparation',
@@ -17,5 +16,5 @@ return array (
     'btn-notnow' => 'Pas maintenant',
     'btn-signup' => 'Enregistrer',
     'header' => 'Merci pour votre aide!',
-  ),
-);
+  ],
+];

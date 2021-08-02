@@ -1,8 +1,8 @@
 <?php
 
-use Illuminate\Support\Facades\Schema;
-use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Database\Migrations\Migration;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\Schema;
 
 class MediaWikiUsername extends Migration
 {
@@ -13,12 +13,12 @@ class MediaWikiUsername extends Migration
      */
     public function up()
     {
-      Schema::table('users', function (Blueprint $table) {
-          $table->string('mediawiki')->default(null)->nullable()->change();
-      });
+        Schema::table('users', function (Blueprint $table) {
+            $table->string('mediawiki')->default(null)->nullable()->change();
+        });
 
-      DB::table('users')->where('mediawiki', 0)->update([
-        'mediawiki' => null
+        DB::table('users')->where('mediawiki', 0)->update([
+        'mediawiki' => null,
       ]);
     }
 
@@ -29,8 +29,8 @@ class MediaWikiUsername extends Migration
      */
     public function down()
     {
-      Schema::table('users', function (Blueprint $table) {
-          $table->integer('mediawiki')->default(0)->change();
-      });
+        Schema::table('users', function (Blueprint $table) {
+            $table->integer('mediawiki')->default(0)->change();
+        });
     }
 }

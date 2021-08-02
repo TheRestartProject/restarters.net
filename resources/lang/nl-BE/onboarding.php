@@ -1,6 +1,6 @@
 <?php
 
-return array (
+return [
   'finishing_action' => 'Naar het dashboard',
   'next' => 'Volgende',
   'previous' => 'Vorige',
@@ -10,4 +10,4 @@ return array (
   'slide2_heading' => 'Jouw toegangspoort naar de herstellersgemeenschap',
   'slide3_content' => '<p>Jouw startpunt is het <strong>dashboard</strong></p><p>Het dashboard geeft je een overzicht van de recentste activiteiten in de gemeenschap en snelle toegang tot de meest gebruikte acties.</p><p>Een goede plek om te starten is de rubriek <strong>Welkom!</strong></p>',
   'slide3_heading' => 'Daar gaan we!',
-);
+];

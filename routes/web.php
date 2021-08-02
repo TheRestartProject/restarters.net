@@ -53,7 +53,6 @@ Route::get('/party/view/{id}', 'PartyController@view');
 // so we allow anonymous access.
 Route::get('/export/devices', 'ExportController@devices');
 
-
 // Calendar routes do not require authentication.
 // (You would not be able to subscribe from a calendar application if they did.)
 Route::prefix('calendar')->group(function () {
@@ -150,6 +149,19 @@ Route::prefix('printcat')->group(function () {
     Route::get('/status', 'PrintcatOraController@status');
 });
 
+Route::prefix('BattCat')->group(function () {
+    Route::get('/', 'BattcatOraController@index');
+    Route::post('/', 'BattcatOraController@index');
+    Route::get('/survey', 'BattcatOraController@survey');
+    Route::get('/status', 'BattcatOraController@status');
+});
+Route::prefix('battcat')->group(function () {
+    Route::get('/', 'BattcatOraController@index');
+    Route::post('/', 'BattcatOraController@index');
+    Route::get('/survey', 'BattcatOraController@survey');
+    Route::get('/status', 'BattcatOraController@status');
+});
+
 Route::group(['middleware' => ['auth', 'verifyUserConsent']], function () {
     Route::get('/', 'HomeController@index')->name('home');
 
@@ -209,7 +221,7 @@ Route::group(['middleware' => ['auth', 'verifyUserConsent']], function () {
 
     // TODO: the rest of these to be redirected properly.
     Route::prefix('device')->group(function () {
-        Route::get('/', function() {
+        Route::get('/', function () {
             return redirect('/fixometer');
         });
         Route::get('/search', 'DeviceController@search');
@@ -249,6 +261,7 @@ Route::group(['middleware' => ['auth', 'verifyUserConsent']], function () {
         Route::get('/remove-volunteer/{group_id}/{user_id}', 'GroupController@getRemoveVolunteer');
         Route::get('/nearby/{id}', 'GroupController@volunteersNearby');
         Route::get('/nearbyinvite/{groupId}/{userId}', 'GroupController@inviteNearbyRestarter');
+        Route::get('/delete/{id}', 'GroupController@delete');
     });
 
     //Outbound Controller
@@ -330,14 +343,13 @@ Route::group(['middleware' => ['auth', 'verifyUserConsent']], function () {
     Route::get('/export/time-volunteered', 'ExportController@exportTimeVolunteered');
     Route::get('/reporting/time-volunteered', 'ExportController@getTimeVolunteered');
     Route::get('/reporting/time-volunteered/{search}', 'ExportController@getTimeVolunteered');
-
 });
 
 Route::get('/party/invite/{code}', 'PartyController@confirmCodeInvite');
 Route::get('/group/invite/{code}', 'GroupController@confirmCodeInvite');
 
 Route::get('/media-wiki', function () {
-    if (FixometerHelper::hasRole(Auth::user(), 'Administrator')) {
+    if (Fixometer::hasRole(Auth::user(), 'Administrator')) {
         return view('mediawiki.index');
     }
 
@@ -369,7 +381,7 @@ Route::get('/party/stats/{id}/wide', function ($id) {
     return App\Http\Controllers\PartyController::stats($id);
 });
 
-Route::get('markAsRead/{id?}', function ($id = NULL) {
+Route::get('markAsRead/{id?}', function ($id = null) {
     $notifications = auth()->user()->unReadNotifications;
 
     if ($id) {
@@ -389,4 +401,10 @@ Route::post('/set-cookie', 'InformationAlertCookieController');
 
 Route::get('/test/check-auth', function () {
     return new \App\Services\CheckAuthService;
+});
+
+Route::prefix('test')->group(function () {
+    Route::get('/', 'TestController@index');
+    Route::get('/styles', 'TestController@styles');
+    Route::get('/styles/find', 'TestController@stylesFind');
 });
