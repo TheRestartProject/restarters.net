@@ -15,20 +15,20 @@ use App\Helpers\Fixometer;
 
 class SearchController extends Controller
 {
-    public $TotalWeight;
-    public $TotalEmission;
-    public $EmissionRatio;
+    // public $TotalWeight;
+    // public $TotalEmission;
+    // public $EmissionRatio;
 
     public function __construct()
     {
-        $Device = new Device;
-        $weights = $Device->getWeights();
+        // $Device = new Device;
+        // $weights = $Device->getWeights();
 
-        $this->TotalWeight = $weights[0]->total_weights;
-        $this->TotalEmission = $weights[0]->total_footprints;
+        // $this->TotalWeight = $weights[0]->total_weights;
+        // $this->TotalEmission = $weights[0]->total_footprints;
 
-        $footprintRatioCalculator = new FootprintRatioCalculator();
-        $this->EmissionRatio = $footprintRatioCalculator->calculateRatio();
+        // $footprintRatioCalculator = new FootprintRatioCalculator();
+        // $this->EmissionRatio = $footprintRatioCalculator->calculateRatio();
     }
 
     public function index($response = null)
@@ -119,6 +119,9 @@ class SearchController extends Controller
                 $totalCO2 = 0;
                 $totalWeight = 0;
 
+                $footprintRatioCalculator = new FootprintRatioCalculator();
+                $emissionRatio = $footprintRatioCalculator->calculateRatio();
+
                 foreach ($PartyList as $party) {
                     $partyIds[] = $party->idevents;
 
@@ -136,7 +139,7 @@ class SearchController extends Controller
                             case 1:
                                 $party->fixed_devices++;
 
-                                $party->co2 += $device->co2Diverted($this->EmissionRatio, $Device->displacement);
+                                $party->co2 += $device->co2Diverted($emissionRatio, $Device->displacement);
 
                                 $party->ewaste += $device->ewasteDiverted();
 
