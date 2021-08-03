@@ -2,6 +2,8 @@
 
 namespace Tests\Feature;
 
+use App\Group;
+use App\Party;
 use App\Device;
 use App\DeviceBarrier;
 use App\Category;
@@ -16,11 +18,6 @@ use Tests\TestCase;
  * WHICH WILL IMPACT ON SEVERAL FUNCTIONS AND QUERIES
  *
  * SOME RESULTS ARE FUDGED TO PREVENT CI BORKAGE
- * SEE "ERROR?" COMMENTS FOR KNOWN/POSSIBLE CODING ISSUES
- *
- * SHOULD POWERED MISC WEIGHT COUNT TOWARDS WASTE AND CO2 STATS?
- * SHOULD UNPOWERED MISC WEIGHT COUNT TOWARDS WASTE AND CO2 STATS?
- *
  */
 class FooStatsTest extends TestCase
 {
@@ -394,6 +391,242 @@ class FooStatsTest extends TestCase
         }
     }
 
+    /** @test */
+    public function group_stats_with_only_unpowered_devices_with_unpowered_weights()
+    {
+        $this->_setupCategoriesWithUnpoweredWeights();
+
+        // #1 add an unpowered non-misc device
+        $device = factory(Device::class)->states('fixed')->create([
+            'category' => 5,
+            'category_creation' => 5,
+            'event' => 1,
+        ]);
+        $emissionRatio = $this->_getEmissionRatio();
+        // CO2 estimates don't include unpowered items. yet.
+        $expect = [
+            'co2' => 0,
+            'ewaste' => 0,
+            'unpowered_waste' => 5,
+            'fixed_devices' => 1,
+            'fixed_powered' => 0,
+            'fixed_unpowered' => 1,
+            'repairable_devices' => 0,
+            'dead_devices' => 0,
+            'no_weight' => 0,
+            'devices_powered' => 0,
+            'devices_unpowered' => 1,
+        ];
+        $result = $device->deviceEvent->getEventStats($emissionRatio);
+        $this->assertIsArray($result);
+        foreach ($expect as $k => $v) {
+            $this->assertArrayHasKey($k, $result, "Missing array key $k");
+            $this->assertEquals($v, $result[$k], "Wrong value for $k => $v");
+        }
+
+        // #2 add an unpowered misc device without estimate
+        $device = factory(Device::class)->states('fixed')->create([
+            'category' => $this->_id_misc_unpowered,
+            'category_creation' => $this->_id_misc_unpowered,
+            'event' => 1,
+        ]);
+        $emissionRatio = $this->_getEmissionRatio();
+        // CO2 estimates don't include unpowered items. yet.
+        $expect = [
+            'co2' => 0,
+            'ewaste' => 0,
+            'unpowered_waste' => 5,
+            'fixed_devices' => 2,
+            'fixed_powered' => 0,
+            'fixed_unpowered' => 2,
+            'repairable_devices' => 0,
+            'dead_devices' => 0,
+            'no_weight' => 1,
+            'devices_powered' => 0,
+            'devices_unpowered' => 2,
+        ];
+        $result = $device->deviceEvent->getEventStats($emissionRatio);
+        $this->assertIsArray($result);
+        foreach ($expect as $k => $v) {
+            $this->assertArrayHasKey($k, $result, "Missing array key $k");
+            $this->assertEquals($v, $result[$k], "Wrong value for $k => $v");
+        }
+
+        // #3 add an unpowered misc device with estimate
+        $device = factory(Device::class)->states('fixed')->create([
+            'category' => $this->_id_misc_unpowered,
+            'category_creation' => $this->_id_misc_unpowered,
+            'event' => 1,
+            'estimate' => 9,
+        ]);
+        $emissionRatio = $this->_getEmissionRatio();
+        // CO2 estimates don't include unpowered items. yet.
+        $expect = [
+            'co2' => 0,
+            'ewaste' => 0,
+            'unpowered_waste' => 14,
+            'fixed_devices' => 3,
+            'fixed_powered' => 0,
+            'fixed_unpowered' => 3,
+            'repairable_devices' => 0,
+            'dead_devices' => 0,
+            'no_weight' => 1,
+            'devices_powered' => 0,
+            'devices_unpowered' => 3,
+        ];
+        $result = $device->deviceEvent->getEventStats($emissionRatio);
+        $this->assertIsArray($result);
+        foreach ($expect as $k => $v) {
+            $this->assertArrayHasKey($k, $result, "Missing array key $k");
+            $this->assertEquals($v, $result[$k], "Wrong value for $k => $v");
+        }
+
+        // #4 add an unpowered misc device not "Fixed"
+        $device = factory(Device::class)->states('repairable')->create([
+            'category' => $this->_id_misc_unpowered,
+            'category_creation' => $this->_id_misc_unpowered,
+            'event' => 1,
+        ]);
+        $emissionRatio = $this->_getEmissionRatio();
+        // CO2 estimates don't include unpowered items. yet.
+        $expect = [
+            'co2' => 0,
+            'ewaste' => 0,
+            'unpowered_waste' => 14,
+            'fixed_devices' => 3,
+            'fixed_powered' => 0,
+            'fixed_unpowered' => 3,
+            'repairable_devices' => 1,
+            'dead_devices' => 0,
+            'no_weight' => 1,
+            'devices_powered' => 0,
+            'devices_unpowered' => 4,
+        ];
+        $result = $device->deviceEvent->getEventStats($emissionRatio);
+        $this->assertIsArray($result);
+        foreach ($expect as $k => $v) {
+            $this->assertArrayHasKey($k, $result, "Missing array key $k");
+            $this->assertEquals($v, $result[$k], "Wrong value for $k => $v");
+        }
+    }
+
+    /** @test */
+    public function group_stats_with_both_powered_and_unpowered_devices_and_unpowered_weights()
+    {
+        $this->_setupCategoriesWithUnpoweredWeights();
+
+        $displacement = $this->_getDisplacementFactor();
+
+        // #1 add a powered non-misc device
+        $device = factory(Device::class)->states('fixed')->create([
+            'category' => 4,
+            'category_creation' => 4,
+            'event' => 1,
+        ]);
+        $emissionRatio = $this->_getEmissionRatio();
+        $expect = [
+            'co2' => 14.4 * $displacement,
+            'ewaste' => 4,
+            'unpowered_waste' => 0,
+            'fixed_devices' => 1,
+            'fixed_powered' => 1,
+            'fixed_unpowered' => 0,
+            'repairable_devices' => 0,
+            'dead_devices' => 0,
+            'no_weight' => 0,
+            'devices_powered' => 1,
+            'devices_unpowered' => 0,
+        ];
+        $result = $device->deviceEvent->getEventStats($emissionRatio);
+        $this->assertIsArray($result);
+        foreach ($expect as $k => $v) {
+            $this->assertArrayHasKey($k, $result, "Missing array key $k");
+            $this->assertEquals($v, $result[$k], "Wrong value for $k => $v");
+        }
+
+        // #2 add a powered misc device without estimate
+        $device = factory(Device::class)->states('fixed')->create([
+            'category' => $this->_id_misc_powered,
+            'category_creation' => $this->_id_misc_powered,
+            'event' => 1,
+        ]);
+        $emissionRatio = $this->_getEmissionRatio();
+        $expect = [
+            'co2' => 14.4 * $displacement,
+            'ewaste' => 4,
+            'unpowered_waste' => 0,
+            'fixed_devices' => 2,
+            'fixed_powered' => 2,
+            'fixed_unpowered' => 0,
+            'repairable_devices' => 0,
+            'dead_devices' => 0,
+            'no_weight' => 1,
+            'devices_powered' => 2,
+            'devices_unpowered' => 0,
+        ];
+        $result = $device->deviceEvent->getEventStats($emissionRatio);
+        $this->assertIsArray($result);
+        foreach ($expect as $k => $v) {
+            $this->assertArrayHasKey($k, $result, "Missing array key $k");
+            $this->assertEquals($v, $result[$k], "Wrong value for $k => $v");
+        }
+
+        // #3 add an unpowered non-misc device
+        $device = factory(Device::class)->states('fixed')->create([
+            'category' => 5,
+            'category_creation' => 5,
+            'event' => 1,
+        ]);
+        $emissionRatio = $this->_getEmissionRatio();
+        // CO2 estimates don't include unpowered items. yet.
+        $expect = [
+            'co2' => 14.4 * $displacement,
+            'ewaste' => 4,
+            'unpowered_waste' => 5,
+            'fixed_devices' => 3,
+            'fixed_powered' => 2,
+            'fixed_unpowered' => 1,
+            'repairable_devices' => 0,
+            'dead_devices' => 0,
+            'no_weight' => 1,
+            'devices_powered' => 2,
+            'devices_unpowered' => 1,
+        ];
+        $result = $device->deviceEvent->getEventStats($emissionRatio);
+        $this->assertIsArray($result);
+        foreach ($expect as $k => $v) {
+            $this->assertArrayHasKey($k, $result, "Missing array key $k");
+            $this->assertEquals($v, $result[$k], "Wrong value for $k => $v");
+        }
+
+        // #4 add an unpowered misc device without estimate
+        $device = factory(Device::class)->states('fixed')->create([
+            'category' => $this->_id_misc_unpowered,
+            'category_creation' => $this->_id_misc_unpowered,
+            'event' => 1,
+        ]);
+        $emissionRatio = $this->_getEmissionRatio();
+        // CO2 estimates don't include unpowered items. yet.
+        $expect = [
+            'co2' => 14.4 * $displacement,
+            'ewaste' => 4,
+            'unpowered_waste' => 5,
+            'fixed_devices' => 4,
+            'fixed_powered' => 2,
+            'fixed_unpowered' => 2,
+            'repairable_devices' => 0,
+            'dead_devices' => 0,
+            'no_weight' => 2,
+            'devices_powered' => 2,
+            'devices_unpowered' => 2,
+        ];
+        $result = $device->deviceEvent->getEventStats($emissionRatio);
+        $this->assertIsArray($result);
+        foreach ($expect as $k => $v) {
+            $this->assertArrayHasKey($k, $result, "Missing array key $k");
+            $this->assertEquals($v, $result[$k], "Wrong value for $k => $v");
+        }
+    }
 
     /** WEIGHTS */
 
@@ -664,14 +897,14 @@ class FooStatsTest extends TestCase
             'category_creation' => 5,
             'event' => 1,
         ]);
-        $e = round(LcaStatsHelper::calculateEmissionRatioPowered(),1);
-        $expect = round((14.4) / (4),1);
-        $this->assertEquals($expect, round($e,1));
-        $u = round(LcaStatsHelper::calculateEmissionRatioUnpowered(),1);
+        $e = round(LcaStatsHelper::calculateEmissionRatioPowered(), 1);
+        $expect = round((14.4) / (4), 1);
+        $this->assertEquals($expect, round($e, 1));
+        $u = round(LcaStatsHelper::calculateEmissionRatioUnpowered(), 1);
         $expect = 0;
         $this->assertEquals($expect, $u);
-        $b = round(LcaStatsHelper::calculateEmissionRatio(),1);
-        $expect = round((14.4) / (4),1);
+        $b = round(LcaStatsHelper::calculateEmissionRatio(), 1);
+        $expect = round((14.4) / (4), 1);
         $this->assertEquals($expect, $b);
 
 
@@ -686,16 +919,15 @@ class FooStatsTest extends TestCase
             'category_creation' => 5,
             'event' => 1,
         ]);
-        $e = round(LcaStatsHelper::calculateEmissionRatioPowered(),1);
-        $expect = round((14.4) / (4),1);
-        $this->assertEquals($expect, round($e,1));
-        $u = round(LcaStatsHelper::calculateEmissionRatioUnpowered(),1);
-        $expect = round((15.5) / (5),1);
+        $e = round(LcaStatsHelper::calculateEmissionRatioPowered(), 1);
+        $expect = round((14.4) / (4), 1);
+        $this->assertEquals($expect, round($e, 1));
+        $u = round(LcaStatsHelper::calculateEmissionRatioUnpowered(), 1);
+        $expect = round((15.5) / (5), 1);
         $this->assertEquals($expect, $u);
-        $b = round(LcaStatsHelper::calculateEmissionRatio(),1);
-        $expect = round((14.4+15.5) / (4+5),1);
+        $b = round(LcaStatsHelper::calculateEmissionRatio(), 1);
+        $expect = round((14.4 + 15.5) / (4 + 5), 1);
         $this->assertEquals($expect, $b);
-
     }
 
     /**
@@ -779,13 +1011,13 @@ class FooStatsTest extends TestCase
     public function all_calcs_without_unpowered_weights()
     {
         $this->_setupCategoriesWithoutUnpoweredWeights();
-        $p = str_repeat('*',36);
+        $p = str_repeat('*', 36);
         $expected = [
-        'weight_powered' => 0,
-        'weight_unpowered' => 0,
-        'misc_powered' => 0,
-        'misc_unpowered' => 0,
-        'misc_estimates' => 0,
+            'weight_powered' => 0,
+            'weight_unpowered' => 0,
+            'misc_powered' => 0,
+            'misc_unpowered' => 0,
+            'misc_estimates' => 0,
         ];
         logger("\n$p #1 ADD A SINGLE POWERED NON-MISC DEVICE $p");
         // category->weight=4, category->footprint=14.4, device->estimate=0
@@ -794,12 +1026,15 @@ class FooStatsTest extends TestCase
 
         logger("\n$p #2 ADD A POWERED MISC DEVICE WITHOUT ESTIMATE ***");
         // category->weight=1, category->footprint=0, device->estimate=0
-        $expected['misc_powered'] += 1; $expected['weight_powered'] += 1;
+        $expected['misc_powered'] += 1;
+        $expected['weight_powered'] += 1;
         $this->_all_calcs_insert_device($this->_id_misc_powered, $expected); // misc cat weight counts or not?
 
         logger("\n$p #3 ADD A POWERED MISC DEVICE WITH ESTIMATE ***");
         // category->weight=1, category->footprint=0, device->estimate=8
-        $expected['misc_powered'] += 1; $expected['weight_powered'] += 8; $expected['misc_estimates'] += 1;
+        $expected['misc_powered'] += 1;
+        $expected['weight_powered'] += 8;
+        $expected['misc_estimates'] += 1;
         $this->_all_calcs_insert_device($this->_id_misc_powered, $expected, 8);
 
         logger("\n$p #4 ADD AN UNPOWERED NON-MISC DEVICE ***");
@@ -813,13 +1048,15 @@ class FooStatsTest extends TestCase
 
         logger("\n$p #6 ADD AN UNPOWERED MISC DEVICE WITH ESTIMATE ***");
         // category->weight=0, category->footprint=0, device->estimate=6
-        $expected['misc_unpowered'] += 1; $expected['weight_unpowered'] += 6; $expected['misc_estimates'] += 1;
+        $expected['misc_unpowered'] += 1;
+        $expected['weight_unpowered'] += 6;
+        $expected['misc_estimates'] += 1;
         $this->_all_calcs_insert_device($this->_id_misc_unpowered, $expected, 6);
 
         $this->assertTrue(TRUE);
     }
 
-    private function _all_calcs_insert_device($category, $expect, $estimate=0)
+    private function _all_calcs_insert_device($category, $expect, $estimate = 0)
     {
         $device = factory(Device::class)->states('fixed')->create([
             'event' => 1,
@@ -877,7 +1114,6 @@ class FooStatsTest extends TestCase
         logger("=== Device->countCO2ByYear() ===");
         $result = $device->countCO2ByYear(1);
         logger("\tco2 => " . $result[0]->co2);
-
     }
 
     private function _getEmissionRatio()
