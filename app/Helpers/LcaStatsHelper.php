@@ -8,7 +8,8 @@ use DB;
 class LcaStatsHelper
 {
 
-    public static function unpoweredEmissionRatio() {
+    public static function getEmissionRatioUnpowered()
+    {
         return 73.35740514;
     }
 
@@ -17,35 +18,19 @@ class LcaStatsHelper
         return 0.5;
     }
 
-/**
- * Calculates the average footprint per kilo of fixed devices.
- *
- * Calculated by looking at all of the fixed, non-misc devices in the database,
- * and dividing the total footprint of these devices by the total weight of these
- * devices.
- *
- * Categories table must hold 0 weight and footprint values for Misc categories.
- *
- * This ratio of CO2 to kilo of device is then used to estimate the footprint of
- * miscellaneous devices that are recorded in the DB.
- */
-    public static function calculateEmissionRatio()
-    {
-        $result = DB::select(DB::raw("
-SELECT SUM(c.footprint) / SUM(COALESCE(c.weight, 0.0)) AS ratio
-FROM devices d
-JOIN categories c ON c.idcategories = d.category
-AND d.repair_status = 1
-"));
-        return $result[0]->ratio;
-    }
-
-/**
- * Calculates the average footprint per kilo of fixed devices for powered categories only.
- * UNCONFIRMED IF THIS WILL BE NECESSARY. NOTE THAT:
- * calculateEmissionRatioPowered() + calculateEmissionRatioUnpowered() != calculateEmissionRatio()
- */
-    public static function calculateEmissionRatioPowered()
+    /**
+     * Calculates the average footprint per kilo of fixed devices.
+     *
+     * Calculated by looking at all of the fixed, non-misc devices in the database,
+     * and dividing the total footprint of these devices by the total weight of these
+     * devices.
+     *
+     * Categories table must hold 0 value for weight and footprint for Misc categories.
+     *
+     * This ratio of CO2 to kilo of device is then used to estimate the footprint of
+     * miscellaneous devices that are recorded in the DB.
+     */
+    public static function getEmissionRatioPowered()
     {
         $result = DB::select(DB::raw("
 SELECT SUM(c.footprint) / SUM(COALESCE(c.weight, 0.0)) AS ratio
@@ -53,23 +38,6 @@ FROM devices d
 JOIN categories c ON c.idcategories = d.category
 AND d.repair_status = 1
 AND c.powered = 1
-"));
-        return $result[0]->ratio;
-    }
-
-/**
- * Calculates the average footprint per kilo of fixed devices for unpowered categories only.
- * UNCONFIRMED IF THIS WILL BE NECESSARY. NOTE THAT:
- * calculateEmissionRatioPowered() + calculateEmissionRatioUnpowered() != calculateEmissionRatio()
- */
-    public static function calculateEmissionRatioUnpowered()
-    {
-        $result = DB::select(DB::raw("
-SELECT SUM(c.footprint) / SUM(COALESCE(c.weight, 0.0)) AS ratio
-FROM devices d
-JOIN categories c ON c.idcategories = d.category
-AND d.repair_status = 1
-AND c.powered = 0
 "));
         return $result[0]->ratio;
     }
@@ -104,8 +72,8 @@ FROM devices, categories, events,
 WHERE devices.category = categories.idcategories and devices.repair_status = 1
 AND devices.event = events.idevents ';
 
-        $eRatio = LcaStatsHelper::calculateEmissionRatioPowered();
-        $uRatio = LcaStatsHelper::calculateEmissionRatioUnpowered();
+        $eRatio = LcaStatsHelper::getEmissionRatioPowered();
+        $uRatio = LcaStatsHelper::getEmissionRatioUnpowered();
         $displacement = LcaStatsHelper::getDisplacementFactor();
         $params = ['displacement' => $displacement, 'eRatio' => $eRatio, 'uRatio' => $uRatio];
 
@@ -117,21 +85,5 @@ AND devices.event = events.idevents ';
         }
 
         return DB::select(DB::raw($sql), $params);
-    }
-
-    /**
-     * Copied from Device model, not sure where this is used yet.
-     */
-    public static function getCounts()
-    {
-        return DB::select(DB::raw('SELECT
-                    COUNT(`category`) AS `catcount`,
-                    ROUND(SUM(`weight`), 2) AS `catcount_weight`,
-                    `name`
-                FROM `devices` `d`
-                INNER JOIN `categories` `c` ON `c`.`idcategories` = `d`.`category`
-                WHERE `d`.`repair_status` = 1
-                GROUP BY `category`
-                ORDER BY `catcount` DESC'));
     }
 }

@@ -34,46 +34,4 @@ and `categories`.`idcategories` NOT IN ($mp,$mu)
         return $result[0]->emission_ratio;
     }
 
-//     public function calculateRatioPowered()
-//     {
-//         $result = DB::select(DB::raw("
-// SELECT @ratio as `emission_ratio`
-// FROM (
-// SELECT @ratio := SUM(`categories`.`footprint`) / SUM(`categories`.`weight` + 0.0)
-// FROM `devices`, `categories`
-// WHERE `categories`.`idcategories` = `devices`.`category`
-// AND `devices`.`repair_status` = 1
-// AND `categories`.`powered` = 1
-// ) inner_tbl"));
-//         return $result[0]->emission_ratio;
-//     }
-
-//     public function calculateRatioUnpowered()
-//     {
-//         $result = DB::select(DB::raw("
-// SELECT @ratio as `emission_ratio`
-// FROM (
-// SELECT @ratio := SUM(`categories`.`footprint` + 0.0) / SUM(`categories`.`weight` + 0.0)
-// FROM `devices`, `categories`
-// WHERE `categories`.`idcategories` = `devices`.`category`
-// AND `devices`.`repair_status` = 1
-// AND `categories`.`powered` = 0
-// ) inner_tbl"));
-//         return $result[0]->emission_ratio;
-//     }
-
-//     public function calculateRatioBoth()
-//     {
-//         $result = DB::select(DB::raw("
-// SELECT @ratio as `emission_ratio`
-// FROM (
-// SELECT @ratio := SUM(`categories`.`footprint` + 0.0) / SUM(`categories`.`weight` + 0.0)
-// FROM `devices`, `categories`
-// WHERE `categories`.`idcategories` = `devices`.`category`
-// AND `devices`.`repair_status` = 1
-// ) inner_tbl"));
-//         return $result[0]->emission_ratio;
-//     }
-
-
 }
