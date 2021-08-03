@@ -61,8 +61,21 @@ class Category extends Model
         }
     }
 
+    /**
+     * @ToDo : check referencs to isMisc().
+     */
     public function isMisc()
     {
-        return $this->idcategories == env('MISC_CATEGORY_ID');
+        return ($this->idcategories == env('MISC_CATEGORY_ID_POWERED') || $this->idcategories == env('MISC_CATEGORY_ID_UNPOWERED'));
+    }
+
+    public function isMiscPowered()
+    {
+        return $this->idcategories == env('MISC_CATEGORY_ID_POWERED');
+    }
+
+    public function isMiscUnpowered()
+    {
+        return $this->idcategories == env('MISC_CATEGORY_ID_UNPOWERED');
     }
 }

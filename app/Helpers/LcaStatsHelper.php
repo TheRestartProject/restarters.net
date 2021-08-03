@@ -8,6 +8,10 @@ use DB;
 class LcaStatsHelper
 {
 
+    public static function unpoweredEmissionRatio() {
+        return 73.35740514;
+    }
+
     public static function getDisplacementFactor()
     {
         return 0.5;
