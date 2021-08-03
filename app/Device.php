@@ -144,32 +144,6 @@ AND devices.event = events.idevents ';
         return DB::select(DB::raw($sql), $params);
     }
 
-    /** REDUNDANT? */
-    public function getPartyWeights($party)
-    {
-        return DB::select(DB::raw('SELECT
-                ROUND(SUM(`weight`), 0) + ROUND(SUM(`estimate`), 0) AS `total_weights`,
-                ROUND(SUM(`footprint`) * '.$this->displacement.', 0) + (ROUND(SUM(`estimate`) * (SELECT * FROM `view_waste_emission_ratio`), 0))  AS `total_footprints`
-            FROM `'.$this->table.'` AS `d`
-            INNER JOIN `categories` AS `c` ON  `d`.`category` = `c`.`idcategories`
-            INNER JOIN `events` AS `e` ON  `d`.`event` = `e`.`idevents`
-            WHERE `d`.`repair_status` = 1 AND `c`.`idcategories` != 46 AND `e`.`idevents` = :id'), ['id' => $party]);
-    }
-
-    /** REDUNDANT? */
-    public function getCounts()
-    {
-        return DB::select(DB::raw('SELECT
-                    COUNT(`category`) AS `catcount`,
-                    ROUND(SUM(`weight`), 2) AS `catcount_weight`,
-                    `name`
-                FROM `'.$this->table.'` AS `d`
-                INNER JOIN `categories` AS `c` ON `c`.`idcategories` = `d`.`category`
-                WHERE `d`.`repair_status` = 1
-                GROUP BY `category`
-                ORDER BY `catcount` DESC'));
-    }
-
     public function getByYears($repair_status)
     {
         return DB::select(DB::raw('SELECT
@@ -299,78 +273,6 @@ AND devices.event = events.idevents ';
             }
 
             return DB::select(DB::raw($sql), ['cluster' => $cluster]);
-        } catch (\Illuminate\Database\QueryException $e) {
-            dd($e);
-        }
-    }
-    /** REDUNDANT */
-    public function countCO2ByYear($group = null, $year = null)
-    {
-        $sql = 'SELECT
-                    (ROUND(SUM(`c`.`footprint`), 0) * '.$this->displacement.') + ( CASE WHEN `d`.`category` = 46 THEN IFNULL(ROUND(SUM(`estimate`) * (SELECT * FROM `view_waste_emission_ratio`), 0),0) ELSE 0 END) AS `co2`,
-                    YEAR(`e`.`event_date`) AS `year`
-                FROM `'.$this->table.'` AS `d`
-                INNER JOIN `events` AS `e`
-                    ON `d`.`event` = `e`.`idevents`
-                INNER JOIN `categories` AS `c`
-                    ON `d`.`category` = `c`.`idcategories`
-                WHERE `d`.`repair_status` = 1 ';
-
-        if (! is_null($group)) {
-            $sql .= ' AND `e`.`group` = :group ';
-        }
-        if (! is_null($year)) {
-            $sql .= ' AND YEAR(`e`.`event_date`) = :year ';
-        }
-        $sql .= ' GROUP BY `year`
-                ORDER BY `year` DESC'; // was grouped by category too at some point
-
-        try {
-            if (! is_null($group) && is_numeric($group) && is_null($year)) {
-                return DB::select(DB::raw($sql), ['group' => $group]);
-            } elseif (! is_null($year) && is_numeric($year) && is_null($group)) {
-                return DB::select(DB::raw($sql), ['year' => $year]);
-            } elseif (! is_null($year) && is_numeric($year) && ! is_null($group) && is_numeric($group)) {
-                return DB::select(DB::raw($sql), ['year' => $year, 'group' => $group]);
-            }
-
-            return DB::select(DB::raw($sql));
-        } catch (\Illuminate\Database\QueryException $e) {
-            dd($e);
-        }
-    }
-    /** REDUNDANT */
-    public function countWasteByYear($group = null, $year = null)
-    {
-        $sql = 'SELECT
-                    ROUND(SUM(`c`.`weight`), 0) + IFNULL( ROUND(SUM(`d`.`estimate`), 0), 0) AS `waste`,
-                    YEAR(`e`.`event_date`) AS `year`
-                FROM `'.$this->table.'` AS `d`
-                INNER JOIN `events` AS `e`
-                    ON `d`.`event` = `e`.`idevents`
-                INNER JOIN `categories` AS `c`
-                    ON `d`.`category` = `c`.`idcategories`
-                WHERE `d`.`repair_status` = 1 ';
-
-        if (! is_null($group)) {
-            $sql .= ' AND `e`.`group` = :group ';
-        }
-        if (! is_null($year)) {
-            $sql .= ' AND YEAR(`e`.`event_date`) = :year ';
-        }
-        $sql .= ' GROUP BY `year`
-                ORDER BY `year` DESC';
-
-        try {
-            if (! is_null($group) && is_numeric($group) && is_null($year)) {
-                return DB::select(DB::raw($sql), ['group' => $group]);
-            } elseif (! is_null($year) && is_numeric($year) && is_null($group)) {
-                return DB::select(DB::raw($sql), ['year' => $year]);
-            } elseif (! is_null($year) && is_numeric($year) && ! is_null($group) && is_numeric($group)) {
-                return DB::select(DB::raw($sql), ['year' => $year, 'group' => $group]);
-            }
-
-            return DB::select(DB::raw($sql));
         } catch (\Illuminate\Database\QueryException $e) {
             dd($e);
         }

@@ -801,87 +801,6 @@ class FooStatsTest extends TestCase
     }
 
     /**
-     * No test for Device::getPartyWeights().
-     * The SQL will return NULL values.
-     * APPEARS TO BE A REDUNDANT METHOD.
-     */
-
-    /**
-     * Device::countCO2ByYear() is REDUNDANT
-     * Tests query in Device::countCO2ByYear() without unpowered lca data.
-     * Note: it selects from a view that contains SQL that is duplicated in the footprint helper getRatio() query.
-     * Note: countCO2ByYear() rounds the result to 0 places.
-     */
-    public function co2_by_year_without_unpowered_weights()
-    {
-        $this->_setupCategoriesWithoutUnpoweredWeights();
-
-        // #1 add a single powered non-misc device
-        $device = factory(Device::class)->states('fixed')->create([
-            'category' => 4,
-            'category_creation' => 4,
-            'event' => 1,
-        ]);
-        $expect = [
-            'co2' => round(14.4 * $this->_displacementFactor),
-        ];
-        $result = $device->countCO2ByYear(1);
-        $this->assertIsArray($result);
-        $this->assertEquals(1, count($result));
-        foreach ($expect as $k => $v) {
-            $this->assertEquals($v, round($result[0]->{$k}, 2), "Wrong value for $k => $v");
-        }
-
-        // #2 add a powered misc device
-        $device = factory(Device::class)->states('fixed')->create([
-            'category' => $this->_id_misc_powered,
-            'category_creation' => $this->_id_misc_powered,
-            'event' => 1,
-        ]);
-        $expect = [
-            'co2' => round(14.4 * $this->_displacementFactor),
-        ];
-        $result = $device->countCO2ByYear(1);
-        $this->assertIsArray($result);
-        $this->assertEquals(1, count($result));
-        foreach ($expect as $k => $v) {
-            $this->assertEquals($v, round($result[0]->{$k}, 2), "Wrong value for $k => $v");
-        }
-
-        // #3 add an unpowered non-misc device
-        $device = factory(Device::class)->states('fixed')->create([
-            'category' => 5,
-            'category_creation' => 5,
-            'event' => 1,
-        ]);
-        $expect = [
-            'co2' => round(14.4 * $this->_displacementFactor),
-        ];
-        $result = $device->countCO2ByYear(1);
-        $this->assertIsArray($result);
-        $this->assertEquals(1, count($result));
-        foreach ($expect as $k => $v) {
-            $this->assertEquals($v, round($result[0]->{$k}, 2), "Wrong value for $k => $v");
-        }
-
-        // #4 add an unpowered misc device
-        $device = factory(Device::class)->states('fixed')->create([
-            'category' => $this->_id_misc_unpowered,
-            'category_creation' => $this->_id_misc_unpowered,
-            'event' => 1,
-        ]);
-        $expect = [
-            'co2' => round(14.4 * $this->_displacementFactor),
-        ];
-        $result = $device->countCO2ByYear(1);
-        $this->assertIsArray($result);
-        $this->assertEquals(1, count($result));
-        foreach ($expect as $k => $v) {
-            $this->assertEquals($v, round($result[0]->{$k}, 2), "Wrong value for $k => $v");
-        }
-    }
-
-    /**
      */
     /** @test */
     public function lcastats_helper_calculate_ratio()
@@ -928,80 +847,6 @@ class FooStatsTest extends TestCase
         $b = round(LcaStatsHelper::calculateEmissionRatio(), 1);
         $expect = round((14.4 + 15.5) / (4 + 5), 1);
         $this->assertEquals($expect, $b);
-    }
-
-    /**
-     * Device::countWasteByYear() is REDUNDANT
-     * Tests query in Device::countWasteByYear() without unpowered lca data.
-     */
-    /** @test */
-    public function waste_by_year_without_unpowered_weights()
-    {
-        $this->_setupCategoriesWithoutUnpoweredWeights();
-
-        // #1 add a powered non-misc device
-        $device = factory(Device::class)->states('fixed')->create([
-            'category' => 4,
-            'category_creation' => 4,
-            'event' => 1,
-        ]);
-        $expect = [
-            'waste' => 4,
-        ];
-        $result = $device->countWasteByYear(1);
-        $this->assertIsArray($result);
-        $this->assertEquals(1, count($result));
-        foreach ($expect as $k => $v) {
-            $this->assertEquals($v, round($result[0]->{$k}, 2), "Wrong value for $k => $v");
-        }
-
-        // #2 add a powered misc device
-        $device = factory(Device::class)->states('fixed')->create([
-            'category' => $this->_id_misc_powered,
-            'category_creation' => $this->_id_misc_powered,
-            'event' => 1,
-        ]);
-        $expect = [
-            'waste' => 4,
-        ];
-        $result = $device->countWasteByYear(1);
-        $this->assertIsArray($result);
-        $this->assertEquals(1, count($result));
-        foreach ($expect as $k => $v) {
-            $this->assertEquals($v, round($result[0]->{$k}, 2), "Wrong value for $k => $v");
-        }
-
-        // #3 add an unpowered non-misc device
-        $device = factory(Device::class)->states('fixed')->create([
-            'category' => 5,
-            'category_creation' => 5,
-            'event' => 1,
-        ]);
-        $expect = [
-            'waste' => 4,
-        ];
-        $result = $device->countWasteByYear(1);
-        $this->assertIsArray($result);
-        $this->assertEquals(1, count($result));
-        foreach ($expect as $k => $v) {
-            $this->assertEquals($v, round($result[0]->{$k}, 2), "Wrong value for $k => $v");
-        }
-
-        // #4 add an unpowered misc device
-        $device = factory(Device::class)->states('fixed')->create([
-            'category' => $this->_id_misc_unpowered,
-            'category_creation' => $this->_id_misc_unpowered,
-            'event' => 1,
-        ]);
-        $expect = [
-            'waste' => 4,
-        ];
-        $result = $device->countWasteByYear(1);
-        $this->assertIsArray($result);
-        $this->assertEquals(1, count($result));
-        foreach ($expect as $k => $v) {
-            $this->assertEquals($v, round($result[0]->{$k}, 2), "Wrong value for $k => $v");
-        }
     }
 
 
@@ -1107,13 +952,6 @@ class FooStatsTest extends TestCase
         logger("\tfixed_powered => " . $result['fixed_powered']);
         logger("\tfixed_unpowered => " . $result['fixed_unpowered']);
 
-        logger("=== Device->countWasteByYear() ===");
-        $result = $device->countWasteByYear(1);
-        logger("\twaste => " . $result[0]->waste);
-
-        logger("=== Device->countCO2ByYear() ===");
-        $result = $device->countCO2ByYear(1);
-        logger("\tco2 => " . $result[0]->co2);
     }
 
     private function _getEmissionRatio()
