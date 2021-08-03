@@ -46,20 +46,12 @@ class PartyController extends Controller
     protected $geocoder;
     protected $discourseService;
 
-    // public $TotalWeight;
-    // public $TotalEmission;
-    public $EmissionRatio;
+    public $emissionRatio;
 
     public function __construct(Geocoder $geocoder, DiscourseService $discourseService)
     {
-        // $Device = new Device;
-        // $weights = $Device->getWeights();
-
-        // $this->TotalWeight = $weights[0]->total_weights;
-        // $this->TotalEmission = $weights[0]->total_footprints;
-
         $footprintRatioCalculator = new FootprintRatioCalculator();
-        $this->EmissionRatio = $footprintRatioCalculator->calculateRatio();
+        $this->emissionRatio = $footprintRatioCalculator->calculateRatio();
 
         $this->geocoder = $geocoder;
         $this->discourseService = $discourseService;
@@ -158,7 +150,7 @@ class PartyController extends Controller
             'upcoming_events_in_area' => $upcoming_events_in_area,
             'upcoming_events_all' => $upcoming_events_all,
             'user_groups' => $user_groups,
-            'EmissionRatio' => $this->EmissionRatio,
+            'emission_ratio' => $this->emissionRatio,
             'is_host_of_group' => $is_host_of_group,
             'isCoordinatorForGroup' => $isCoordinatorForGroup,
             'group' => $group,
@@ -174,7 +166,7 @@ class PartyController extends Controller
         return view('events.all-past', [
           'past_events' => $past_events,
           'past_events_count' => $past_events_count,
-          'EmissionRatio' => $this->EmissionRatio,
+          'emission_ratio' => $this->emissionRatio,
         ]);
     }
 
@@ -729,7 +721,7 @@ class PartyController extends Controller
             'gmaps' => true,
             'images' => $images,
             'event' => $event,
-            'stats' => $event->getEventStats($this->EmissionRatio),
+            'stats' => $event->getEventStats($this->emissionRatio),
             'formdata' => $party,
             'attended_summary' => $attended_summary,
             'attended' => $attended,
@@ -1409,26 +1401,23 @@ class PartyController extends Controller
             return abort(404, 'No Events found.');
         }
 
-        // Get Emission Ratio
-        $footprintRatioCalculator = new FootprintRatioCalculator();
-        $emissionRatio = $footprintRatioCalculator->calculateRatio();
-
         $groups = Group::join('grouptags_groups', 'grouptags_groups.group', '=', 'groups.idgroups')
          ->where('group_tag', $user->access_group_tag_id)->get();
 
         $groups_array = collect([]);
         foreach ($groups as $group) {
+            $gstats = $group->getGroupStats($this->emissionRatio);
             $groups_array->push([
                'id' => $group->idgroups,
                'name' => $group->name,
                'description' => $group->free_text,
                'image_url' => $group->groupImagePath(),
                'volunteers' => $group->volunteers,
-               'participants' => $group->getGroupStats($emissionRatio)['pax'],
-               'hours_volunteered' => $group->getGroupStats($emissionRatio)['hours'],
-               'parties_thrown' => $group->getGroupStats($emissionRatio)['parties'],
-               'waste_prevented' => $group->getGroupStats($emissionRatio)['waste'],
-               'co2_emissions_prevented' => $group->getGroupStats($emissionRatio)['co2'],
+               'participants' => $gstats['pax'],
+               'hours_volunteered' => $gstats['hours'],
+               'parties_thrown' => $gstats['parties'],
+               'waste_prevented' => $gstats['waste'],
+               'co2_emissions_prevented' => $gstats['co2'],
            ]);
         }
 
@@ -1437,7 +1426,7 @@ class PartyController extends Controller
             $group = $groups_array->filter(function ($group) use ($party) {
                 return $group['id'] == $party->group;
             })->first();
-
+            $estats = $party->getEventStats($this->emissionRatio);
             // Push Party to Collection
             $collection->push([
              'id' => $party->idevents,
@@ -1455,12 +1444,12 @@ class PartyController extends Controller
              'user' => $party_user = collect(),
              'impact' => [
                  'participants' => $party->pax,
-                 'volunteers' => $party->getEventStats($emissionRatio)['volunteers'],
-                 'waste_prevented' => $party->getEventStats($emissionRatio)['ewaste'],
-                 'co2_emissions_prevented' => $party->getEventStats($emissionRatio)['co2'],
-                 'devices_fixed' => $party->getEventStats($emissionRatio)['fixed_devices'],
-                 'devices_repairable' => $party->getEventStats($emissionRatio)['repairable_devices'],
-                 'devices_dead' => $party->getEventStats($emissionRatio)['dead_devices'],
+                 'volunteers' => $estats['volunteers'],
+                 'waste_prevented' => $estats['ewaste'],
+                 'co2_emissions_prevented' => $estats['co2'],
+                 'devices_fixed' => $estats['fixed_devices'],
+                 'devices_repairable' => $estats['repairable_devices'],
+                 'devices_dead' => $estats['dead_devices'],
              ],
              'widgets' => [
                  'headline_stats' => url("/party/stats/{$party->idevents}/wide"),
@@ -1498,10 +1487,8 @@ class PartyController extends Controller
             return abort(404, 'Invalid Event ID.');
         }
 
-        // Get Emission Ratio
-        $footprintRatioCalculator = new FootprintRatioCalculator();
-        $emissionRatio = ApiController::getEmissionRatio();
-
+        $estats = $party->getEventStats($this->emissionRatio);
+        $gstats = $party->theGroup->getGroupStats($this->emissionRatio);
         // New Collection Instance
         $collection = collect([
             'id' => $party->idevents,
@@ -1511,11 +1498,11 @@ class PartyController extends Controller
                 'description' => $party->theGroup->free_text,
                 'image_url' => $party->theGroup->groupImagePath(),
                 'volunteers' => $party->theGroup->volunteers,
-                'participants' => $party->theGroup->getGroupStats($emissionRatio)['pax'],
-                'hours_volunteered' => $party->theGroup->getGroupStats($emissionRatio)['hours'],
-                'parties_thrown' => $party->theGroup->getGroupStats($emissionRatio)['parties'],
-                'waste_prevented' => $party->theGroup->getGroupStats($emissionRatio)['waste'],
-                'co2_emissions_prevented' => $party->theGroup->getGroupStats($emissionRatio)['co2'],
+                'participants' => $gstats['pax'],
+                'hours_volunteered' => $gstats['hours'],
+                'parties_thrown' => $gstats['parties'],
+                'waste_prevented' => $gstats['waste'],
+                'co2_emissions_prevented' => $gstats['co2'],
             ],
             'event_date' => $party->event_date,
             'start_time' => $party->start,
@@ -1532,12 +1519,12 @@ class PartyController extends Controller
             'user' => $party_user = collect(),
             'impact' => [
                 'participants' => $party->pax,
-                'volunteers' => $party->getEventStats($emissionRatio)['volunteers'],
-                'waste_prevented' => $party->getEventStats($emissionRatio)['ewaste'],
-                'co2_emissions_prevented' => $party->getEventStats($emissionRatio)['co2'],
-                'devices_fixed' => $party->getEventStats($emissionRatio)['fixed_devices'],
-                'devices_repairable' => $party->getEventStats($emissionRatio)['repairable_devices'],
-                'devices_dead' => $party->getEventStats($emissionRatio)['dead_devices'],
+                'volunteers' => $estats['volunteers'],
+                'waste_prevented' => $estats['ewaste'],
+                'co2_emissions_prevented' => $estats['co2'],
+                'devices_fixed' => $estats['fixed_devices'],
+                'devices_repairable' => $estats['repairable_devices'],
+                'devices_dead' => $estats['dead_devices'],
             ],
             'widgets' => [
                 'headline_stats' => url("/party/stats/{$party->idevents}/wide"),

@@ -34,17 +34,6 @@ use Notification;
 
 class GroupController extends Controller
 {
-    public function __construct()
-    {
-        $Device = new Device;
-        $weights = $Device->getWeights();
-
-        $this->TotalWeight = $weights[0]->total_weights;
-        $this->TotalEmission = $weights[0]->total_footprints;
-        $footprintRatioCalculator = new FootprintRatioCalculator();
-        $this->EmissionRatio = $footprintRatioCalculator->calculateRatio();
-    }
-
     private function indexVariations($tab, $network)
     {
         //Get current logged in user
@@ -359,31 +348,19 @@ class GroupController extends Controller
             return abort(404, 'Invalid group.');
         }
 
-        $groupStats = $group->getGroupStats($this->EmissionRatio);
+
         $allPastEvents = Party::pastEvents()
         ->with('devices.deviceCategory')
         ->where('events.group', $group->idgroups)
         ->get();
 
-        $weights = $Device->getWeights($group->idgroups);
+        $footprintRatioCalculator = new FootprintRatioCalculator();
+        $emissionRatio = $footprintRatioCalculator->calculateRatio();
+        $groupWeight = $Device->getWeights($group->idgroups);
+
+        $groupStats = $group->getGroupStats($emissionRatio);
 
         $Device->ofThisGroup($group->idgroups);
-
-        // more stats...
-
-        /** co2 counters **/
-        $co2_years = $Device->countCO2ByYear($group->idgroups);
-        $stats = [];
-        foreach ($co2_years as $year) {
-            $stats[$year->year] = $year->co2;
-        }
-
-        $waste_years = $Device->countWasteByYear($group->idgroups);
-
-        $wstats = [];
-        foreach ($waste_years as $year) {
-            $wstats[$year->year] = $year->waste;
-        }
 
         $clusters = [];
 
@@ -463,7 +440,7 @@ class GroupController extends Controller
             'userGroups' => $groups,
             'pax' => $groupStats['pax'],
             'hours' => $groupStats['hours'],
-            'weights' => $weights,
+            'weights' => $groupWeight,
             'group' => $group,
             'groupCo2' => $groupStats['co2'],
             'groupWaste' => $groupStats['waste'],
@@ -473,19 +450,13 @@ class GroupController extends Controller
             'devices' => $Device->ofThisGroup($group->idgroups),
             'device_count_status' => $Device->statusCount(),
             'group_device_count_status' => $Device->statusCount($group->idgroups),
-            'year_data' => $co2_years,
-            'bar_chart_stats' => array_reverse($stats, true),
-            'waste_year_data' => $waste_years,
-            'waste_bar_chart_stats' => array_reverse($wstats, true),
-            'co2Total' => $Party->TotalEmission,
-            'wasteTotal' => $this->TotalWeight,
+            'emission_ratio' => $emissionRatio,
             'clusters' => $clusters,
             'mostleast' => $mostleast,
             'top' => $Device->findMostSeen(1, null, $group->idgroups),
             'user' => $user,
             'upcoming_events' => $upcoming_events,
             'past_events' => $past_events,
-            'EmissionRatio' => $this->EmissionRatio,
             'in_group' => $in_group,
             'is_host_of_group' => $is_host_of_group,
             'isCoordinatorForGroup' => $isCoordinatorForGroup,
@@ -1138,33 +1109,10 @@ class GroupController extends Controller
             $restarters_nearby = null;
         }
 
-        $groupStats = $group->getGroupStats($this->EmissionRatio);
         $allPastEvents = Party::pastEvents()
                      ->with('devices.deviceCategory')
                      ->where('events.group', $group->idgroups)
                      ->get();
-
-        $weights = $Device->getWeights($group->idgroups);
-
-        // more stats...
-
-        /** co2 counters **/
-        $co2_years = $Device->countCO2ByYear($group->idgroups);
-        $stats = [];
-        foreach ($co2_years as $year) {
-            $stats[$year->year] = $year->co2;
-        }
-
-        $waste_years = $Device->countWasteByYear($group->idgroups);
-
-        $wstats = [];
-        foreach ($waste_years as $year) {
-            $wstats[$year->year] = $year->waste;
-        }
-
-        $co2ThisYear = $Device->countCO2ByYear(null, date('Y', time()));
-
-        $wasteThisYear = $Device->countWasteByYear(null, date('Y', time()));
 
         $clusters = [];
 
@@ -1189,14 +1137,6 @@ class GroupController extends Controller
                 $cluster['total'] = $total;
                 $clusters[$y][$i] = $cluster;
             }
-        }
-
-        // most/least stats for clusters
-        $mostleast = [];
-        for ($i = 1; $i <= 4; $i++) {
-            $mostleast[$i]['most_seen'] = $Device->findMostSeen(null, $i, $group->idgroups);
-            $mostleast[$i]['most_repaired'] = $Device->findMostSeen(1, $i, $group->idgroups);
-            $mostleast[$i]['least_repaired'] = $Device->findMostSeen(3, $i, $group->idgroups);
         }
 
         if (! isset($response)) {
@@ -1237,38 +1177,17 @@ class GroupController extends Controller
         return view('group.nearby', [ //host.index
             'title' => 'Host Dashboard',
             'has_pending_invite' => $hasPendingInvite,
-            'showbadges' => true,
-            'charts' => false,
             'response' => $response,
             'grouplist' => $Group->findList(),
             'userGroups' => $groups,
-            'pax' => $groupStats['pax'],
-            'hours' => $groupStats['hours'],
-            'weights' => $weights,
             'group' => $group,
-            'groupCo2' => $groupStats['co2'],
-            'groupWaste' => $groupStats['waste'],
             'profile' => $User->getProfile($user->id),
             'upcomingparties' => $Party->findNextParties($group->idgroups),
             'allparties' => $allPastEvents,
             'devices' => $Device->ofThisGroup($group->idgroups),
-            'device_count_status' => $Device->statusCount(),
-            'group_device_count_status' => $Device->statusCount($group->idgroups),
-            'year_data' => $co2_years,
-            'bar_chart_stats' => array_reverse($stats, true),
-            'waste_year_data' => $waste_years,
-            'waste_bar_chart_stats' => array_reverse($wstats, true),
-            'co2Total' => $Party->TotalEmission,
-            'co2ThisYear' => $co2ThisYear[0]->co2,
-            'wasteTotal' => $this->TotalWeight,
-            'wasteThisYear' => $wasteThisYear[0]->waste,
-            'clusters' => $clusters,
-            'mostleast' => $mostleast,
-            'top' => $Device->findMostSeen(1, null, $group->idgroups),
             'user' => $user,
             'upcoming_events' => $upcoming_events,
             'past_events' => $past_events,
-            'EmissionRatio' => $Party->EmissionRatio,
             'in_group' => $in_group,
             'is_host_of_group' => $is_host_of_group,
             'user_groups' => $user_groups,
@@ -1401,6 +1320,7 @@ class GroupController extends Controller
         foreach ($group_tags_groups as $group_tags_group) {
             $group = $group_tags_group->theGroup;
             if (! empty($group)) {
+                $stats = $group->getGroupStats($emissionRatio);
                 $collection->push([
                     'id' => $group->idgroups,
                     'name' => $group->name,
@@ -1419,11 +1339,11 @@ class GroupController extends Controller
                     'upcoming_parties' => $upcoming_parties_collection = collect([]),
                     'past_parties' => $past_parties_collection = collect([]),
                     'impact' => [
-                        'volunteers' => $group->getGroupStats($emissionRatio)['pax'],
-                        'hours_volunteered' => $group->getGroupStats($emissionRatio)['hours'],
-                        'parties_thrown' => $group->getGroupStats($emissionRatio)['parties'],
-                        'waste_prevented' => $group->getGroupStats($emissionRatio)['waste'],
-                        'co2_emissions_prevented' => $group->getGroupStats($emissionRatio)['co2'],
+                        'volunteers' => $stats['pax'],
+                        'hours_volunteered' => $stats['hours'],
+                        'parties_thrown' => $stats['parties'],
+                        'waste_prevented' => $stats['waste'],
+                        'co2_emissions_prevented' => $stats['co2'],
                     ],
                     'widgets' => [
                         'headline_stats' => url("/group/stats/{$group->idgroups}"),
@@ -1511,6 +1431,7 @@ class GroupController extends Controller
         $footprintRatioCalculator = new FootprintRatioCalculator();
         $emissionRatio = $footprintRatioCalculator->calculateRatio();
 
+        $stats = $group->getGroupStats($emissionRatio);
         // New Collection Instance
         $collection = collect([
             'id' => $group->idgroups,
@@ -1529,11 +1450,11 @@ class GroupController extends Controller
             'upcoming_parties' => $upcoming_parties_collection = collect([]),
             'past_parties' => $past_parties_collection = collect([]),
             'impact' => [
-                'volunteers' => $group->getGroupStats($emissionRatio)['pax'],
-                'hours_volunteered' => $group->getGroupStats($emissionRatio)['hours'],
-                'parties_thrown' => $group->getGroupStats($emissionRatio)['parties'],
-                'waste_prevented' => $group->getGroupStats($emissionRatio)['waste'],
-                'co2_emissions_prevented' => $group->getGroupStats($emissionRatio)['co2'],
+                'volunteers' => $stats['pax'],
+                'hours_volunteered' => $stats['hours'],
+                'parties_thrown' => $stats['parties'],
+                'waste_prevented' => $stats['waste'],
+                'co2_emissions_prevented' => $stats['co2'],
             ],
             'widgets' => [
                 'headline_stats' => url("/group/stats/{$group->idgroups}"),

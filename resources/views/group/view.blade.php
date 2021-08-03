@@ -46,16 +46,13 @@
 
           $expanded_events = [];
 
-          $footprintRatioCalculator = new App\Helpers\FootprintRatioCalculator();
-          $emissionRatio = $footprintRatioCalculator->calculateRatio();
-
           foreach (array_merge($upcoming_events->all(), $past_events->all()) as $event) {
               $thisone = $event->getAttributes();
               $thisone['attending'] = Auth::user() && $event->isBeingAttendedBy(Auth::user()->id);
               $thisone['allinvitedcount'] = $event->allInvited->count();
 
               // TODO LATER Consider whether these stats should be in the event or passed into the store.
-              $thisone['stats'] = $event->getEventStats($emissionRatio);
+              $thisone['stats'] = $event->getEventStats($emission_ratio);
               $thisone['participants_count'] = $event->participants;
               $thisone['volunteers_count'] = $event->allConfirmedVolunteers->count();
 
