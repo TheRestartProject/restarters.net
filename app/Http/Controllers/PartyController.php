@@ -46,17 +46,17 @@ class PartyController extends Controller
     protected $geocoder;
     protected $discourseService;
 
-    public $TotalWeight;
-    public $TotalEmission;
+    // public $TotalWeight;
+    // public $TotalEmission;
     public $EmissionRatio;
 
     public function __construct(Geocoder $geocoder, DiscourseService $discourseService)
     {
-        $Device = new Device;
-        $weights = $Device->getWeights();
+        // $Device = new Device;
+        // $weights = $Device->getWeights();
 
-        $this->TotalWeight = $weights[0]->total_weights;
-        $this->TotalEmission = $weights[0]->total_footprints;
+        // $this->TotalWeight = $weights[0]->total_weights;
+        // $this->TotalEmission = $weights[0]->total_footprints;
 
         $footprintRatioCalculator = new FootprintRatioCalculator();
         $this->EmissionRatio = $footprintRatioCalculator->calculateRatio();
@@ -429,10 +429,6 @@ class PartyController extends Controller
         $Groups = new Group;
         $File = new FixometerFile;
         $Party = new Party;
-        $Device = new Device;
-
-        $co2Total = $Device->getWeights();
-        $device_count_status = $Device->statusCount();
 
         $groupsUserIsInChargeOf = $user->groupsInChargeOf();
         $userInChargeOfMultipleGroups = $user->hasRole('Administrator') || count($groupsUserIsInChargeOf) > 1;
@@ -473,9 +469,6 @@ class PartyController extends Controller
                       'remotePost' => null,
                       'grouplist' => $Groups->findList(),
                       'user' => Auth::user(),
-                      'co2Total' => $co2Total[0]->total_footprints,
-                      'wasteTotal' => $co2Total[0]->total_weights,
-                      'device_count_status' => $device_count_status,
                       'user_groups' => $groupsUserIsInChargeOf,
                       'userInChargeOfMultipleGroups' => $userInChargeOfMultipleGroups,
                       'audits' => $audits,
