@@ -421,28 +421,12 @@ class UserController extends Controller
         return redirect()->back()->with('success', 'Profile updated');
     }
 
+    /**
+     * @ToDo : test and delete commented
+     */
     public function recover()
     {
-
-      //To display Stats
-        $Device = new Device;
-        $Party = new Party;
         $User = new User;
-
-        $weights = $Device->getWeights();
-        $devices = $Device->statusCount();
-
-        $co2_years = $Device->countCO2ByYear();
-        $stats = [];
-        foreach ($co2_years as $year) {
-            $stats[$year->year] = $year->co2;
-        }
-
-        $waste_years = $Device->countWasteByYear();
-        $wstats = [];
-        foreach ($waste_years as $year) {
-            $wstats[$year->year] = $year->waste;
-        }
 
         if (strtoupper($_SERVER['REQUEST_METHOD']) == 'POST' && isset($_POST['email']) && ! empty($_POST['email'])) {
             $email = $_POST['email'];
@@ -479,54 +463,19 @@ class UserController extends Controller
             }
 
             return view('auth.forgot-password', [//user.recover
-            'weights' => $weights,
-            'devices' => $devices,
-            'nextparties' => $Party->findNextParties(),
-            'allparties' => $Party->findAll(),
-            'year_data' => $co2_years,
-            'bar_chart_stats' => array_reverse($stats, true),
-            'waste_year_data' => $waste_years,
-            'waste_bar_chart_stats' => array_reverse($wstats, true),
             'title' => 'Account recovery',
             'response' => $response,
             ]);
         }
 
         return view('auth.forgot-password', [//user.recover
-        'weights' => $weights,
-        'devices' => $devices,
-        'nextparties' => $Party->findNextParties(),
-        'allparties' => $Party->findAll(),
-        'year_data' => $co2_years,
-        'bar_chart_stats' => array_reverse($stats, true),
-        'waste_year_data' => $waste_years,
-        'waste_bar_chart_stats' => array_reverse($wstats, true),
         'title' => 'Account recovery',
         ]);
     }
 
     public function reset()
     {
-
-      //To display Stats
-        $Device = new Device;
-        $Party = new Party;
         $User = new User;
-
-        $weights = $Device->getWeights();
-        $devices = $Device->statusCount();
-
-        $co2_years = $Device->countCO2ByYear();
-        $stats = [];
-        foreach ($co2_years as $year) {
-            $stats[$year->year] = $year->co2;
-        }
-
-        $waste_years = $Device->countWasteByYear();
-        $wstats = [];
-        foreach ($waste_years as $year) {
-            $wstats[$year->year] = $year->waste;
-        }
 
         if (! isset($_GET['recovery']) || empty($_GET['recovery'])) {
             $valid_code = false;
@@ -582,14 +531,6 @@ class UserController extends Controller
         }
 
         return view('auth.reset-password', [//user.reset
-        'weights' => $weights,
-        'devices' => $devices,
-        'nextparties' => $Party->findNextParties(),
-        'allparties' => $Party->findAll(),
-        'year_data' => $co2_years,
-        'bar_chart_stats' => array_reverse($stats, true),
-        'waste_year_data' => $waste_years,
-        'waste_bar_chart_stats' => array_reverse($wstats, true),
         'title' => 'Account recovery',
         'recovery' => $recovery,
         'valid_code' => $valid_code,
