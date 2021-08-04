@@ -37,7 +37,7 @@ class LcaStatsTest extends TestCase
     }
 
     /** @test */
-    public function get_ratioUnpowered()
+    public function get_ratio_unpowered()
     {
         $result = LcaStats::getEmissionRatioUnpowered();
         $this->assertEquals($this->_ratioUnpowered, $result);
