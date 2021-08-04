@@ -14,6 +14,17 @@
           </div>
       @endif
 
+      <div class="vue">
+        <EventAddEditPage
+            csrf="{{ csrf_token() }}"
+            @if( App\Helpers\Fixometer::hasRole($user, 'Administrator') )
+            :groups="{{ json_encode($allGroups, JSON_INVALID_UTF8_IGNORE) }}"
+            @else
+            :groups="{{ json_encode($user_groups, JSON_INVALID_UTF8_IGNORE) }}"
+            @endif
+        />
+      </div>
+
       <div class="row">
           <div class="col">
               <h1 class="mb-30 mr-30">
@@ -136,7 +147,7 @@
                         <label for="field_event_time">@lang('events.field_event_time'):</label>
                         @if ($agent->browser() == 'Safari' && $agent->isDesktop())
                             <div class="vue">
-                              <EventTimeRangePicker starttimeinit=" {{ old('start') }} " endtimeinit=" {{ old('end') }} " />
+                              <EventTimeRangePicker start=" {{ old('start') }} " end=" {{ old('end') }} " />
                             </div>
                             @if($errors->has('start')) 
                                 <p class="text-danger">{{ $errors->first('start') }}</p>
@@ -198,9 +209,3 @@
 @section('scripts')
 @include('includes/gmap')
 @endsection
-<script>
-import RichTextEditor from '../../js/components/RichTextEditor'
-export default {
-  components: {RichTextEditor}
-}
-</script>

@@ -73,4 +73,8 @@ export default {
 /deep/ .ql-header::before {
   content: 'H4'
 }
+
+/deep/ .ql-header {
+  white-space: nowrap;
+}
 </style>

@@ -1,8 +1,8 @@
 <template>
     <div class="d-flex">
-        <b-form-timepicker class="start-time" v-model="startTime" placeholder="--:--" @input="changeEndTime" />
+        <b-form-timepicker class="start-time mr-1" v-model="startTime" placeholder="--:--" @input="changeEndTime" hide-header />
         <input type="hidden" name="start" :value="startTime" />
-        <b-form-timepicker class="end-time" v-model="endTime" placeholder="--:--" />
+        <b-form-timepicker class="ml-1 end-time" v-model="endTime" placeholder="--:--" hide-header />
         <input type="hidden" name="end" :value="endTime" />
     </div>
 </template>
@@ -23,6 +23,14 @@ export default {
     return {
       startTime: this.starttimeinit,
       endTime: this.endtimeinit
+    }
+  },
+  watch: {
+    startTime(newVal) {
+      this.$emit('update:start', newVal)
+    },
+    endTime(newVal) {
+      this.$emit('update:end', newVal)
     }
   },
   methods: {
@@ -46,6 +54,9 @@ export default {
 
 <style scoped lang="scss">
 .b-form-timepicker {
+    margin: 0px;
+    max-height: 42px;
+
     &.form-control {
         padding: 0 10px;
     }
@@ -62,8 +73,9 @@ export default {
 /deep/ .start-time label,
 /deep/ .end-time label {
     padding: 0.5rem 0 !important;
-    border: 0;
     margin:0;
+    border-width: 0px !important;
+    border-radius: 0;
 }
 
 /deep/ .start-time .btn,
@@ -71,6 +83,7 @@ export default {
     padding: 0.5rem !important;
     border: 0;
     margin: 0;
+    min-width: unset !important;
 }
 
 /deep/ output {

@@ -1563,6 +1563,7 @@ jQuery(document).ready(function () {
       store: store,
       components: {
         'dashboardpage': require('./components/DashboardPage.vue'),
+        'eventaddeditpage': require('./components/EventAddEditPage.vue'),
         'eventpage': require('./components/EventPage.vue'),
         'fixometerpage': require('./components/FixometerPage.vue'),
         'groupspage': require('./components/GroupsPage.vue'),

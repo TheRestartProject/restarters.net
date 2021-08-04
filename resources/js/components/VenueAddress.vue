@@ -51,7 +51,8 @@ export default {
   props: {
     value: {
       type: String,
-      required: true
+      required: false,
+      default: null
     },
     error: {
       type: String,
@@ -144,6 +145,7 @@ export default {
       this.currentValue = placeResultData.formatted_address
       this.lat = addressData.latitude
       this.lng = addressData.longitude
+      this.$emit('update:value', this.currentValue)
 
       // The formatted address returned can be slightly different from the value displayed.  Force them to be
       // the same so that we can disable the Use group button.
