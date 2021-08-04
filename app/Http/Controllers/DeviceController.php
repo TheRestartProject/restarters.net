@@ -83,7 +83,8 @@ class DeviceController extends Controller
         if (Fixometer::hasRole($user, 'Administrator') || ! empty($is_attending)) {
             if ($_SERVER['REQUEST_METHOD'] == 'POST' && ! empty($_POST) && filter_var($id, FILTER_VALIDATE_INT)) {
                 $data = $_POST;
-                // remove the extra "files" field that Summernote generates -
+
+                // Remove some inputs.  Probably these aren't present any more, but it does no harm to ensure that.
                 unset($data['files']);
                 unset($data['users']);
 
