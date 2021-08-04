@@ -876,6 +876,10 @@ class GroupController extends Controller
         $emissionRatio = $footprintRatioCalculator->calculateRatio();
 
         $group = Group::where('idgroups', $id)->first();
+        if (!$group) {
+            return abort(404, 'Invalid group id');
+        }
+
         $groupStats = $group->getGroupStats($emissionRatio);
 
         $groupStats['format'] = $format;
