@@ -3,59 +3,63 @@
     <h1>{{ __('events.add_new_event') }}</h1>
     <b-card no-body class="box">
       <b-card-body class="p-4">
-        <div class="layout">
-          <div class="d-flex flex-wrap event-name">
-            <b-form-group class="flex-grow-1 pr-4">
-              <label for="event_name" class="moveright">{{ __('events.field_event_name') }}:</label>
-              <b-input type="text" id="event_name" name="venue" required :placeholder="__('events.field_event_name_helper')" />
+        <b-form action="/party/create" method="post">
+          <input type="hidden" name="_token" :value="CSRF" />
+          <div class="layout">
+            <div class="d-flex flex-wrap event-name">
+              <b-form-group class="flex-grow-1 pr-4">
+                <label for="event_name" class="moveright">{{ __('events.field_event_name') }}:</label>
+                <b-input type="text" id="event_name" name="venue" :placeholder="__('events.field_event_name_helper')" />
+              </b-form-group>
+              <div class="align-self-center online d-flex">
+                <label for="online">{{ __('events.online_event_question') }}</label>
+                <b-form-checkbox id="online" name="online" class="ml-2" v-model="eventOnline" />
+              </div>
+            </div>
+            <div class="event-group">
+              <b-form-group>
+                <label for="event_group" class="moveright">{{ __('events.field_event_group') }}:</label>
+                <multiselect
+                    v-model="groupValue"
+                    :options="groupOptions"
+                    track-by="idgroups"
+                    label="name"
+                    :allow-empty="false"
+                    deselectLabel=""
+                    :placeholder="__('partials.please_choose')"
+                />
+                <input type="hidden" name="group" :value="idgroups" />
+              </b-form-group>
+            </div>
+            <div class="form-group event-description">
+              <b-form-group>
+                <label for="event_desc" class="moveright">{{ __('events.field_event_desc') }}:</label>
+                <RichTextEditor name="free_text" class="moveright" />
+              </b-form-group>
+            </div>
+            <div class="event-date">
+              <label for="event_date">{{ __('events.field_event_date') }}:</label>
+              <EventDatePicker :date.sync="eventDate" class="p-0" />
+            </div>
+            <b-form-group class="event-time">
+              <label>{{ __('events.field_event_time') }}:</label>
+              <EventTimeRangePicker class="movedown" :start.sync="eventStart" :end.sync="eventEnd" />
             </b-form-group>
-            <div class="align-self-center online d-flex">
-              <label for="online">{{ __('events.online_event_question') }}</label>
-              <b-form-checkbox id="online" name="online" class="ml-2" />
+            <div class="event-address">
+              <VenueAddress :all-groups="groups" :value.sync="address" :selected-group="idgroups" :online="eventOnline" />
+            </div>
+            <div class="event-create button-group row">
+              <div class="offset-lg-3 col-lg-7 d-flex align-items-right justify-content-end text-right">
+                {{ __('events.before_submit_text') }}
+              </div>
+              <div class="col-lg-2 d-flex align-items-center justify-content-end">
+                <b-btn variant="primary" @click="create" class="break" type="submit">
+                  {{ __('events.create_event')}}
+                </b-btn>
+              </div>
             </div>
           </div>
-          <div class="event-group">
-            <b-form-group>
-              <label for="event_group" class="moveright">{{ __('events.field_event_group') }}:</label>
-              <multiselect
-                  v-model="groupValue"
-                  :options="groupOptions"
-                  track-by="idgroups"
-                  label="name"
-                  :allow-empty="false"
-                  deselectLabel=""
-                  :placeholder="__('partials.please_choose')"
-              />
-            </b-form-group>
-          </div>
-          <div class="form-group event-description">
-            <b-form-group>
-              <label for="event_desc" class="moveright">{{ __('events.field_event_desc') }}:</label>
-              <RichTextEditor name="free_text" class="moveright" />
-            </b-form-group>
-          </div>
-          <div class="event-date">
-            <label for="event_date">{{ __('events.field_event_date') }}:</label>
-            <EventDatePicker :date.sync="eventDate" class="p-0" />
-          </div>
-          <b-form-group class="event-time">
-            <label>{{ __('events.field_event_time') }}:</label>
-            <EventTimeRangePicker class="movedown" :start.sync="eventStart" :end.sync="eventEnd" />
-          </b-form-group>
-          <div class="event-address">
-            <VenueAddress :all-groups="groups" :value.sync="address" />
-          </div>
-          <div class="event-create button-group row">
-            <div class="offset-lg-3 col-lg-7 d-flex align-items-right justify-content-end text-right">
-              {{ __('events.before_submit_text') }}
-            </div>
-            <div class="col-lg-2 d-flex align-items-center justify-content-end">
-              <b-btn variant="primary" @click="create" class="break">
-                {{ __('events.create_event')}}
-              </b-btn>
-            </div>
-          </div>
-        </div>
+        </b-form>
       </b-card-body>
     </b-card>
   </div>
@@ -93,6 +97,7 @@ export default {
       eventDate: null,
       eventStart: null,
       eventEnd: null,
+      eventOnline: false,
       address: null
     }
   },
@@ -105,6 +110,12 @@ export default {
         return a.name.localeCompare(b.name)
       }) : []
     },
+    CSRF() {
+      return this.$store.getters['auth/CSRF']
+    },
+    idgroups() {
+      return this.groupValue ? this.groupValue.idgroups : null
+    }
   },
   mounted() {
     // Data is passed from the blade template to us via props.  We put it in the store for all components to use,
@@ -117,11 +128,6 @@ export default {
     this.$store.dispatch('groups/setList', {
       groups: Object.values(groups)
     })
-  },
-  methods: {
-    create() {
-
-    }
   }
 }
 </script>
@@ -186,6 +192,10 @@ export default {
   .event-address {
     grid-row: 6 / 7;
     grid-column: 1 / 2;
+
+    /deep/ .btn {
+      font-size: 16px;
+    }
 
     @include media-breakpoint-up(lg) {
       grid-row: 3 / 4;

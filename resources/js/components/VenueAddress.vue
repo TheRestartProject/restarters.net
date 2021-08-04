@@ -64,6 +64,16 @@ export default {
       required: false,
       default: null
     },
+    selectedGroup: {
+      type: Number,
+      required: false,
+      default: null
+    },
+    online: {
+      type: Boolean,
+      required: false,
+      default: false
+    }
   },
   components: {
     VueGoogleAutocomplete
@@ -73,8 +83,6 @@ export default {
       currentValue: null,
       location: null,
       timer: null,
-      online: false,
-      idgroups: null,
       lat: null,
       lng: null
     }
@@ -82,9 +90,9 @@ export default {
   computed: {
     group() {
       let ret = null
-      if (this.idgroups) {
+      if (this.selectedGroup) {
         this.groups.forEach(g => {
-          if (parseInt(this.idgroups) === parseInt(g.idgroups)) {
+          if (parseInt(this.selectedGroup) === parseInt(g.idgroups)) {
             ret = g
           }
         })
@@ -135,7 +143,6 @@ export default {
   mounted() {
     this.currentValue = this.value
     this.$refs.autocomplete.update(this.currentValue)
-    this.checkOtherInputs()
   },
   beforeDestroy () {
     clearTimeout(this.timer)
@@ -157,13 +164,6 @@ export default {
       this.$refs.autocomplete.update(this.groupLocation)
       this.lat = this.groupLat
       this.lng = this.groupLng
-    },
-    checkOtherInputs() {
-      // This is a workaround until the whole form is converted to Vue.
-      this.online = document.getElementById('online').checked
-      this.idgroups = document.getElementById('event_group').value
-
-      this.timer = setTimeout(this.checkOtherInputs, 200)
     }
   }
 }
