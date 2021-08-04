@@ -5,7 +5,7 @@ namespace App\Providers;
 use Auth;
 use GuzzleHttp\Client;
 use GuzzleHttp\HandlerStack;
-//use GuzzleRetry\GuzzleRetryMiddleware;
+use GuzzleRetry\GuzzleRetryMiddleware;
 use Illuminate\Support\ServiceProvider;
 
 class DiscourseServiceProvider extends ServiceProvider
@@ -28,7 +28,7 @@ class DiscourseServiceProvider extends ServiceProvider
         // could be necessary live under load.
         $this->app->bind('discourse-client', function ($app, $parameters) {
             $stack = HandlerStack::create();
-//            $stack->push(GuzzleRetryMiddleware::factory());
+            $stack->push(GuzzleRetryMiddleware::factory());
 
             return new Client([
                 'base_uri' => config('discourse-api.base_url'),
@@ -44,7 +44,7 @@ class DiscourseServiceProvider extends ServiceProvider
 
         $this->app->bind('discourse-client-anonymous', function ($app, $parameters) {
             $stack = HandlerStack::create();
-//            $stack->push(GuzzleRetryMiddleware::factory());
+            $stack->push(GuzzleRetryMiddleware::factory());
 
             return new Client([
                                   'base_uri' => config('discourse-api.base_url'),
