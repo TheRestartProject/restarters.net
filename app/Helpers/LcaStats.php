@@ -5,7 +5,7 @@ namespace App\Helpers;
 use DB;
 
 
-class LcaStatsHelper
+class LcaStats
 {
 
     public static function getEmissionRatioUnpowered()
@@ -72,9 +72,9 @@ FROM devices, categories, events,
 WHERE devices.category = categories.idcategories and devices.repair_status = 1
 AND devices.event = events.idevents ';
 
-        $eRatio = LcaStatsHelper::getEmissionRatioPowered();
-        $uRatio = LcaStatsHelper::getEmissionRatioUnpowered();
-        $displacement = LcaStatsHelper::getDisplacementFactor();
+        $eRatio = LcaStats::getEmissionRatioPowered();
+        $uRatio = LcaStats::getEmissionRatioUnpowered();
+        $displacement = LcaStats::getDisplacementFactor();
         $params = ['displacement' => $displacement, 'eRatio' => $eRatio, 'uRatio' => $uRatio];
 
         if (!is_null($group) && is_numeric($group)) {

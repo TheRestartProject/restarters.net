@@ -7,7 +7,7 @@ use App\Party;
 use App\Device;
 use App\DeviceBarrier;
 use App\Category;
-use App\Helpers\LcaStatsHelper;
+use App\Helpers\LcaStats;
 
 use DB;
 use Tests\TestCase;
@@ -735,7 +735,7 @@ class FooStatsTest extends TestCase
             'powered_footprint' => 14.4 * $this->_displacementFactor,
             'unpowered_footprint' => 0,
         ];
-        $result = LcaStatsHelper::getWeights();
+        $result = LcaStats::getWeights();
         $this->assertIsArray($result);
         $this->assertEquals(1, count($result));
         foreach ($expect as $k => $v) {
@@ -754,7 +754,7 @@ class FooStatsTest extends TestCase
             'powered_footprint' => 14.4 * $this->_displacementFactor,
             'unpowered_footprint' => 0,
         ];
-        $result = LcaStatsHelper::getWeights();
+        $result = LcaStats::getWeights();
         $this->assertIsArray($result);
         $this->assertEquals(1, count($result));
         foreach ($expect as $k => $v) {
@@ -773,7 +773,7 @@ class FooStatsTest extends TestCase
             'powered_footprint' => 14.4 * $this->_displacementFactor,
             'unpowered_footprint' => 15.5 * $this->_displacementFactor,
         ];
-        $result = LcaStatsHelper::getWeights();
+        $result = LcaStats::getWeights();
         $this->assertIsArray($result);
         $this->assertEquals(1, count($result));
         foreach ($expect as $k => $v) {
@@ -792,7 +792,7 @@ class FooStatsTest extends TestCase
             'powered_footprint' => 14.4 * $this->_displacementFactor,
             'unpowered_footprint' => 15.5 * $this->_displacementFactor,
         ];
-        $result = LcaStatsHelper::getWeights();
+        $result = LcaStats::getWeights();
         $this->assertIsArray($result);
         $this->assertEquals(1, count($result));
         foreach ($expect as $k => $v) {
@@ -816,10 +816,10 @@ class FooStatsTest extends TestCase
             'category_creation' => 5,
             'event' => 1,
         ]);
-        $e = round(LcaStatsHelper::getEmissionRatioPowered(), 1);
+        $e = round(LcaStats::getEmissionRatioPowered(), 1);
         $expect = round((14.4) / (4), 1);
         $this->assertEquals($expect, round($e, 1));
-        // $u = round(LcaStatsHelper::getEmissionRatioUnpowered(), 1);
+        // $u = round(LcaStats::getEmissionRatioUnpowered(), 1);
         // $expect = 0;
         // $this->assertEquals($expect, $u);
 
@@ -835,10 +835,10 @@ class FooStatsTest extends TestCase
             'category_creation' => 5,
             'event' => 1,
         ]);
-        $e = round(LcaStatsHelper::getEmissionRatioPowered(), 1);
+        $e = round(LcaStats::getEmissionRatioPowered(), 1);
         $expect = round((14.4) / (4), 1);
         $this->assertEquals($expect, round($e, 1));
-        // $u = round(LcaStatsHelper::getEmissionRatioUnpowered(), 1);
+        // $u = round(LcaStats::getEmissionRatioUnpowered(), 1);
         // $expect = round((15.5) / (5), 1);
         // $this->assertEquals($expect, $u);
     }
@@ -950,7 +950,7 @@ class FooStatsTest extends TestCase
 
     private function _getEmissionRatio()
     {
-        return LcaStatsHelper::getEmissionRatioPowered();
+        return LcaStats::getEmissionRatioPowered();
     }
 
     private function _getDisplacementFactor()
