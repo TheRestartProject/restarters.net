@@ -3,19 +3,17 @@
 namespace App\Helpers;
 
 use DB;
-
-
 class LcaStats
 {
 
     public static function getEmissionRatioUnpowered()
     {
-        return 73.35740514;
+        return env('UNPOWERED_EMISSION_RATIO');
     }
 
     public static function getDisplacementFactor()
     {
-        return 0.5;
+        return env('DISPLACEMENT_VALUE');
     }
 
     /**
@@ -33,7 +31,8 @@ class LcaStats
     public static function getEmissionRatioPowered()
     {
         $result = DB::select(DB::raw("
-SELECT SUM(c.footprint) / SUM(COALESCE(c.weight, 0.0)) AS ratio
+SELECT
+SUM(COALESCE(c.footprint, 0.0)) / SUM(COALESCE(c.weight, 0.0)) AS ratio
 FROM devices d
 JOIN categories c ON c.idcategories = d.category
 AND d.repair_status = 1
@@ -52,25 +51,23 @@ AND c.powered = 1
      * PENDING confirmation of assumptions.
      * SEE tests/Feature/FooStatsTest::get_weights_new().
      * */
-    public static function getWeights($group = null)
+    public static function getWasteStats($group = null)
     {
-        $sql =
-            'SELECT
-
-sum(case when (categories.weight = 0) then (devices.estimate + 0.0) else categories.weight end) as total_weights,
-sum(case when (categories.powered = 1) then (case when (categories.weight = 0) then (devices.estimate + 0.0) else categories.weight end) else 0 end) as powered_waste,
-sum(case when (categories.powered = 0) then (case when (categories.weight = 0) then (devices.estimate + 0.0) else categories.weight end) else 0 end) as unpowered_waste,
-sum(case when (categories.powered = 1) then (case when (categories.weight = 0) then (devices.estimate + 0.0) * @eRatio else categories.footprint * @displacement end) else 0 end) as powered_footprint,
-sum(case when (categories.powered = 0) then (case when (categories.weight = 0) then (devices.estimate + 0.0) * @uRatio else categories.footprint * @displacement end) else 0 end) as unpowered_footprint
-
-FROM devices, categories, events,
-
-(select @displacement := :displacement) inner_tbl_displacement,
-(select @eRatio := :eRatio) inner_tbl_eratio,
-(select @uRatio := :uRatio) inner_tbl_uratio
-
-WHERE devices.category = categories.idcategories and devices.repair_status = 1
-AND devices.event = events.idevents ';
+        $sql ="
+SELECT
+sum(case when (c.weight = 0) then (d.estimate + 0.0) else c.weight end) as total_weight,
+sum(case when (c.powered = 1) then (case when (c.weight = 0) then (d.estimate + 0.0) else c.weight end) else 0 end) as powered_waste,
+sum(case when (c.powered = 0) then (case when (c.weight = 0) then (d.estimate + 0.0) else c.weight end) else 0 end) as unpowered_waste,
+sum(case when (c.powered = 1) then (case when (c.weight = 0) then (d.estimate + 0.0) * @eRatio else c.footprint * @displacement end) else 0 end) as powered_footprint,
+sum(case when (c.powered = 0) then (case when (c.weight = 0) then (d.estimate + 0.0) * @uRatio else c.footprint * @displacement end) else 0 end) as unpowered_footprint
+FROM devices d, categories c, events e,
+(select @displacement := :displacement) dp,
+(select @eRatio := :eRatio) er,
+(select @uRatio := :uRatio) ur
+WHERE d.category = c.idcategories
+AND d.event = e.idevents
+AND d.repair_status = 1
+";
 
         $eRatio = LcaStats::getEmissionRatioPowered();
         $uRatio = LcaStats::getEmissionRatioUnpowered();
@@ -78,8 +75,8 @@ AND devices.event = events.idevents ';
         $params = ['displacement' => $displacement, 'eRatio' => $eRatio, 'uRatio' => $uRatio];
 
         if (!is_null($group) && is_numeric($group)) {
-            $sql .= ' AND events.group = :group ';
-            $params['group'] = $group;
+            $sql .= ' AND e.`group` = :groupid';
+            $params['groupid'] = $group;
 
             return DB::select(DB::raw($sql), $params);
         }

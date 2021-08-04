@@ -66,6 +66,7 @@
                     <label for="category_cluster">@lang('admin.category_cluster'):</label>
                     <div class="form-control form-control__select">
                         <select name="category_cluster" id="category_cluster" class="field field select2">
+                          <!-- REDUNDANT   -->
                           <!-- @foreach(App\Helpers\Fixometer::categoryCluster() as $key => $value)
                             <option value="{{ $key }}" {{ $key == $category->cluster ? 'selected' : ''}} >{{ $value }}</option>
                           @endforeach -->

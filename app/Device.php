@@ -438,7 +438,7 @@ AND devices.event = events.idevents ';
         $footprint = 0;
 
         if ($this->isFixed()) {
-            if ($this->deviceCategory->isMisc()) {
+            if ($this->deviceCategory->isMiscPowered()) {
                 if (is_numeric($this->estimate)) {
                     $footprint = $this->estimate * $emissionRatio;
                 }
@@ -455,7 +455,7 @@ AND devices.event = events.idevents ';
         $ewasteDiverted = 0;
 
         if ($this->isFixed()) {
-            if ($this->deviceCategory->isMisc()) {
+            if ($this->deviceCategory->isMiscPowered()) {
                 if (is_numeric($this->estimate)) {
                     $ewasteDiverted = $this->estimate;
                 }

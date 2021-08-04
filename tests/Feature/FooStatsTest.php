@@ -7,7 +7,6 @@ use App\Party;
 use App\Device;
 use App\DeviceBarrier;
 use App\Category;
-use App\Helpers\LcaStats;
 
 use DB;
 use Tests\TestCase;
@@ -24,12 +23,13 @@ class FooStatsTest extends TestCase
     private $_displacementFactor;
     private $_id_misc_powered;
     private $_id_misc_unpowered;
+    private $_ratio_unpowered;
 
     protected function setUp(): void
     {
         parent::setUp();
-        $Device = new Device;
-        $this->_displacementFactor = $Device->displacement;
+        $this->_displacementFactor = env('DISPLACEMENT_VALUE');
+        $this->_ratio_unpowered = env('UNPOWERED_EMISSION_RATIO');
         $this->_id_misc_powered = env('MISC_CATEGORY_ID_POWERED');
         $this->_id_misc_unpowered = env('MISC_CATEGORY_ID_UNPOWERED');
     }
@@ -713,138 +713,6 @@ class FooStatsTest extends TestCase
     }
 
     /**
-     * Tests proposed changes to query in Device::getWeightsNew().
-     * Note that the getWeights query contains a sub query that is duplicated in the footprint helper getRatio() query.
-     */
-    /** @test */
-    public function get_weights_new()
-    {
-        $this->_setupCategoriesWithUnpoweredWeights();
-
-        DB::statement("UPDATE categories SET weight=0, footprint=0 WHERE idcategories IN (46,50)");
-
-        // #1 add a single powered non-misc device
-        $device = factory(Device::class)->states('fixed')->create([
-            'category' => 4,
-            'category_creation' => 4,
-        ]);
-        $expect = [
-            'total_weights' => 4,
-            'powered_waste' => 4,
-            'unpowered_waste' => 0,
-            'powered_footprint' => 14.4 * $this->_displacementFactor,
-            'unpowered_footprint' => 0,
-        ];
-        $result = LcaStats::getWeights();
-        $this->assertIsArray($result);
-        $this->assertEquals(1, count($result));
-        foreach ($expect as $k => $v) {
-            $this->assertEquals($v, round($result[0]->{$k}, 2), "Wrong value for $k => $v");
-        }
-
-        // #2 add a powered misc device
-        $device = factory(Device::class)->states('fixed')->create([
-            'category' => $this->_id_misc_powered,
-            'category_creation' => $this->_id_misc_powered,
-        ]);
-        $expect = [
-            'total_weights' => 4,
-            'powered_waste' => 4,
-            'unpowered_waste' => 0,
-            'powered_footprint' => 14.4 * $this->_displacementFactor,
-            'unpowered_footprint' => 0,
-        ];
-        $result = LcaStats::getWeights();
-        $this->assertIsArray($result);
-        $this->assertEquals(1, count($result));
-        foreach ($expect as $k => $v) {
-            $this->assertEquals($v, round($result[0]->{$k}, 2), "Wrong value for $k => $v");
-        }
-
-        // #3 add an unpowered non-misc device
-        $device = factory(Device::class)->states('fixed')->create([
-            'category' => 5,
-            'category_creation' => 5,
-        ]);
-        $expect = [
-            'total_weights' => 9,
-            'powered_waste' => 4,
-            'unpowered_waste' => 5,
-            'powered_footprint' => 14.4 * $this->_displacementFactor,
-            'unpowered_footprint' => 15.5 * $this->_displacementFactor,
-        ];
-        $result = LcaStats::getWeights();
-        $this->assertIsArray($result);
-        $this->assertEquals(1, count($result));
-        foreach ($expect as $k => $v) {
-            $this->assertEquals($v, round($result[0]->{$k}, 2), "Wrong value for $k => $v");
-        }
-
-        // #4 add an unpowered misc device
-        $device = factory(Device::class)->states('fixed')->create([
-            'category' => $this->_id_misc_unpowered,
-            'category_creation' => $this->_id_misc_unpowered,
-        ]);
-        $expect = [
-            'total_weights' => 9,
-            'powered_waste' => 4,
-            'unpowered_waste' => 5,
-            'powered_footprint' => 14.4 * $this->_displacementFactor,
-            'unpowered_footprint' => 15.5 * $this->_displacementFactor,
-        ];
-        $result = LcaStats::getWeights();
-        $this->assertIsArray($result);
-        $this->assertEquals(1, count($result));
-        foreach ($expect as $k => $v) {
-            $this->assertEquals($v, round($result[0]->{$k}, 2), "Wrong value for $k => $v");
-        }
-    }
-
-    /**
-     */
-    /** @test */
-    public function lcastats_helper_calculate_ratio()
-    {
-        $this->_setupCategoriesWithoutUnpoweredWeights();
-        factory(Device::class)->states('fixed')->create([
-            'category' => 4,
-            'category_creation' => 4,
-            'event' => 1,
-        ]);
-        factory(Device::class)->states('fixed')->create([
-            'category' => 5,
-            'category_creation' => 5,
-            'event' => 1,
-        ]);
-        $e = round(LcaStats::getEmissionRatioPowered(), 1);
-        $expect = round((14.4) / (4), 1);
-        $this->assertEquals($expect, round($e, 1));
-        // $u = round(LcaStats::getEmissionRatioUnpowered(), 1);
-        // $expect = 0;
-        // $this->assertEquals($expect, $u);
-
-
-        $this->_setupCategoriesWithUnpoweredWeights();
-        factory(Device::class)->states('fixed')->create([
-            'category' => 4,
-            'category_creation' => 4,
-            'event' => 1,
-        ]);
-        factory(Device::class)->states('fixed')->create([
-            'category' => 5,
-            'category_creation' => 5,
-            'event' => 1,
-        ]);
-        $e = round(LcaStats::getEmissionRatioPowered(), 1);
-        $expect = round((14.4) / (4), 1);
-        $this->assertEquals($expect, round($e, 1));
-        // $u = round(LcaStats::getEmissionRatioUnpowered(), 1);
-        // $expect = round((15.5) / (5), 1);
-        // $this->assertEquals($expect, $u);
-    }
-
-
-    /**
      * Not so much a test as a debugging routine.
      */
     public function all_calcs_without_unpowered_weights()
@@ -950,7 +818,7 @@ class FooStatsTest extends TestCase
 
     private function _getEmissionRatio()
     {
-        return LcaStats::getEmissionRatioPowered();
+        return $this->_ratio_unpowered;
     }
 
     private function _getDisplacementFactor()

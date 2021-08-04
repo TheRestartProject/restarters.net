@@ -740,6 +740,9 @@ class Fixometer
         return $return;
     }
 
+    /**
+     * REDUNDANT
+     */
     public static function footprintReliability()
     {
         return [
@@ -752,6 +755,9 @@ class Fixometer
         ];
     }
 
+    /**
+     * REDUNDANT
+     */
     public static function categoryCluster()
     {
         return [
@@ -760,6 +766,16 @@ class Fixometer
             '3' => 'Home Office',
             '4' => 'Test',
         ];
+    }
+
+    public static function getMiscIdPowered()
+    {
+        return env('MISC_CATEGORY_ID_POWERED');
+    }
+
+    public static function getMiscIdUnpowered()
+    {
+        return env('MISC_CATEGORY_ID_UNPOWERED');
     }
 
     public static function loginRegisterStats()
