@@ -7,7 +7,7 @@ use DB;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Str;
 use OwenIt\Auditing\Contracts\Auditable;
-use App\Helpers\FootprintRatioCalculator;
+use App\Helpers\LcaStats;
 
 class Device extends Model implements Auditable
 {
@@ -24,7 +24,6 @@ class Device extends Model implements Auditable
 
     use \OwenIt\Auditing\Auditable;
     protected $table = 'devices';
-    public $displacement = 0.5;
     protected $primaryKey = 'iddevices';
     /**
      * The attributes that are mass assignable.
@@ -63,6 +62,11 @@ class Device extends Model implements Auditable
     // Setters
 
     //Getters
+
+    public function getDisplacementFactor() {
+        return LcaStats::getDisplacementFactor();
+    }
+
     public function getList($params = null)
     {
         //Tested!
@@ -130,9 +134,10 @@ FROM devices, categories, events,
 WHERE devices.category = categories.idcategories and devices.repair_status = 1
 AND devices.event = events.idevents ';
 
+        $displacement = $this->getDisplacementFactor();
         // Using two named parameters for displacement due to restriction of Laravel/MySQL.
         // see e.g.: https://github.com/laravel/framework/issues/12715
-        $params = ['displacement' => $this->displacement, 'displacement1' => $this->displacement];
+        $params = ['displacement' => $displacement, 'displacement1' => $displacement];
 
         if (! is_null($group) && is_numeric($group)) {
             $sql .= ' AND events.group = :group ';
@@ -144,6 +149,7 @@ AND devices.event = events.idevents ';
         return DB::select(DB::raw($sql), $params);
     }
 
+    /** REDUNDANT */
     public function getByYears($repair_status)
     {
         return DB::select(DB::raw('SELECT

@@ -244,8 +244,8 @@ class ApiController extends Controller
                 ),
                 DB::raw(
                     "sum(case when (devices.category = 46) then (devices.estimate + 0.0) *
-                     (select (sum(`categories`.`footprint`) * {$d->displacement}) / sum(`categories`.`weight` + 0.0) from `devices`, `categories` where `categories`.`idcategories` = `devices`.`category` and `devices`.`repair_status` = 1 and categories.idcategories != 46) 
-                     else (categories.footprint * {$d->displacement}) end) as `total_footprints`"
+                     (select (sum(`categories`.`footprint`) * {$d->getDisplacementFactor()}) / sum(`categories`.`weight` + 0.0) from `devices`, `categories` where `categories`.`idcategories` = `devices`.`category` and `devices`.`repair_status` = 1 and categories.idcategories != 46)
+                     else (categories.footprint * {$d->getDisplacementFactor()}) end) as `total_footprints`"
                 )
             )->join('events', 'events.idevents', '=', 'devices.event')
                 ->join('groups', 'events.group', '=', 'groups.idgroups')

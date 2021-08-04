@@ -139,7 +139,7 @@ class SearchController extends Controller
                             case 1:
                                 $party->fixed_devices++;
 
-                                $party->co2 += $device->co2Diverted($emissionRatio, $Device->displacement);
+                                $party->co2 += $device->co2Diverted($emissionRatio, $Device->getDisplacementFactor());
 
                                 $party->ewaste += $device->ewasteDiverted();
 

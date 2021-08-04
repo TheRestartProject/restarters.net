@@ -181,7 +181,7 @@ class ExportController extends Controller
                 foreach ($party->devices as $device) {
                     switch ($device->repair_status) {
                         case 1:
-                            $party->co2 += $device->co2Diverted($emissionRatio, $Device->displacement);
+                            $party->co2 += $device->co2Diverted($emissionRatio, $Device->getDisplacementFactor());
                             $party->fixed_devices++;
                             $party->weight += $device->ewasteDiverted();
 

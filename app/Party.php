@@ -653,7 +653,7 @@ class Party extends Model implements Auditable
                     $devices_powered++;
 
                     if ($device->isFixed()) {
-                        $co2Diverted += $device->co2Diverted($emissionRatio, $Device->displacement);
+                        $co2Diverted += $device->co2Diverted($emissionRatio, $Device->getDisplacementFactor());
                         $ewasteDiverted += $device->ewasteDiverted();
                         $fixed_powered++;
                     }
