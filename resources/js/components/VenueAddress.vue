@@ -27,6 +27,7 @@
       </div>
     </b-col>
     <b-col lg="5">
+<!--      TODO Map doesn't show on first load of event edit page.-->
       <l-map
           ref="map"
           :zoom="11"

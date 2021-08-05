@@ -1,6 +1,11 @@
 <template>
     <div>
-        <b-form-datepicker class="datepicker" v-model="value" hide-header :class="{ hasError: hasError }" />
+        <b-form-datepicker
+            v-model="value"
+            hide-header
+            :class="{ hasError: hasError, datepicker: true }"
+            :date-format-options="{ weekday: 'short', day: 'numeric', month: 'short', year: 'numeric' }"
+         />
         <input type="hidden" name="event_date" :value="value" />
     </div>
 </template>
@@ -25,6 +30,7 @@ export default {
   },
   watch: {
     value(newVal) {
+      console.log("New date", newVal)
       this.$emit('update:date', newVal)
     }
   }
