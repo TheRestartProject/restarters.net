@@ -151,6 +151,7 @@ class CreateEventTest extends TestCase
        ]);
 
         // Duplicate it - should bring up the page to add a new event, with some info from the first one.
+        // TODO This test will fail until we've done event duplication.
         $response = $this->get('/party/duplicate/'.$party->idevents);
         $response->assertSee(__('events.add_new_event'));
         $response->assertSee($party->description);
