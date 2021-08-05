@@ -3,7 +3,7 @@
     <h1>{{ __('events.add_new_event') }}</h1>
     <b-card no-body class="box mt-4">
       <b-card-body class="p-4">
-        <EventAddEdit :duplicate-from="duplicateFrom" :initial-event="initialEvent" :groups="groups" />
+        <EventAddEdit :duplicate-from="duplicateFrom" :initial-event="initialEvent" :groups="groups" :csrf="csrf" />
       </b-card-body>
     </b-card>
   </div>
