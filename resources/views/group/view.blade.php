@@ -52,7 +52,7 @@
               $thisone['allinvitedcount'] = $event->allInvited->count();
 
               // TODO LATER Consider whether these stats should be in the event or passed into the store.
-              $thisone['stats'] = $event->getEventStats($emission_ratio);
+              $thisone['stats'] = $event->getEventStats();
               $thisone['participants_count'] = $event->participants;
               $thisone['volunteers_count'] = $event->allConfirmedVolunteers->count();
 
@@ -148,13 +148,12 @@
       <div class="vue-placeholder vue-placeholder-large">
           <div class="vue-placeholder-content">@lang('partials.loading')...</div>
       </div>
-
       <div class="vue">
           <GroupPage
               csrf="{{ csrf_token() }}"
               :idgroups="{{ $group->idgroups }}"
               :initial-group="{{ $group }}"
-              :group-stats="{{ json_encode($group->getGroupStats((new App\Helpers\FootprintRatioCalculator())->calculateRatio()), JSON_INVALID_UTF8_IGNORE) }}"
+              :group-stats="{{ json_encode($group_stats, JSON_INVALID_UTF8_IGNORE) }}"
               :device-stats="{{ json_encode($device_stats, JSON_INVALID_UTF8_IGNORE) }}"
               :cluster-stats="{{ json_encode($cluster_stats, JSON_INVALID_UTF8_IGNORE) }}"
               :top-devices="{{ json_encode($top, JSON_INVALID_UTF8_IGNORE) }}"

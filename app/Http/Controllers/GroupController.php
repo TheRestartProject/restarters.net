@@ -355,11 +355,6 @@ class GroupController extends Controller
         ->get();
 
 
-        $emissionRatio = LcaStats::getEmissionRatioPowered();
-        $groupWeight = $Device->getWeights($group->idgroups);
-
-        $groupStats = $group->getGroupStats($emissionRatio);
-
         $Device->ofThisGroup($group->idgroups);
 
         $clusters = [];
@@ -430,6 +425,9 @@ class GroupController extends Controller
             ->whereNotNull('status');
         })->first());
 
+        $emissionRatio = LcaStats::getEmissionRatioPowered();
+        $groupStats = $group->getGroupStats($emissionRatio);
+
         return view('group.view', [ //host.index
             'title' => 'Host Dashboard',
             'has_pending_invite' => $hasPendingInvite,
@@ -438,18 +436,14 @@ class GroupController extends Controller
             'response' => $response,
             'grouplist' => $Group->findList(),
             'userGroups' => $groups,
-            'pax' => $groupStats['pax'],
-            'hours' => $groupStats['hours'],
-            'weights' => $groupWeight,
             'group' => $group,
-            'groupCo2' => $groupStats['co2'],
-            'groupWaste' => $groupStats['waste'],
             'profile' => $User->getProfile($user->id),
             'upcomingparties' => $Party->findNextParties($group->idgroups),
             'allparties' => $allPastEvents,
             'devices' => $Device->ofThisGroup($group->idgroups),
             'device_count_status' => $Device->statusCount(),
             'group_device_count_status' => $Device->statusCount($group->idgroups),
+            'group_stats' => $groupStats,
             'emission_ratio' => $emissionRatio,
             'clusters' => $clusters,
             'mostleast' => $mostleast,
