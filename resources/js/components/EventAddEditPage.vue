@@ -12,8 +12,6 @@
 import EventAddEdit from './EventAddEdit'
 import auth from '../mixins/auth'
 
-// TODO Native inputs for date/time
-
 export default {
   components: {EventAddEdit},
   mixins: [ auth ],
