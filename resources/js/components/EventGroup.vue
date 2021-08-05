@@ -9,7 +9,7 @@
         :allow-empty="false"
         deselectLabel=""
         :placeholder="__('partials.please_choose')"
-        :class="{ hasError: v.$error }"
+        :class="{ hasError: hasError }"
     />
     <input type="hidden" name="group" :value="currentIdGroups" />
   </b-form-group>
@@ -17,14 +17,15 @@
 <script>
 export default {
   props: {
-    idgroups: {
+    value: {
       type: Number,
       required: false,
       default: null
     },
-    v: {
-      type: Object,
-      required: true
+    hasError: {
+      type: Boolean,
+      required: false,
+      default: false
     }
   },
   data () {
@@ -45,12 +46,15 @@ export default {
       }) : []
     },
   },
-  mounted() {
-    if (this.idgroups) {
-      this.currentGroupValue = this.groups.find(g => g.idgroups === this.idgroups)
-    }
-  },
   watch: {
+    value: {
+      handler: function(newVal) {
+        if (newVal) {
+          this.currentGroupValue = this.groups.find(g => g.idgroups === newVal)
+        }
+      },
+      immediate: true
+    },
     currentIdGroups(newVal) {
       this.$emit('update:value', newVal)
     },

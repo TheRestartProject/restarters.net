@@ -1,20 +1,20 @@
 <template>
     <div class="d-flex">
-        <b-form-timepicker class="start-time mr-1" v-model="startTime" placeholder="--:--" @input="changeEndTime" hide-header :class="{ hasError: hasError }" />
-        <input type="hidden" name="start" :value="startTime" />
-        <b-form-timepicker class="ml-1 end-time" v-model="endTime" placeholder="--:--" hide-header :class="{ hasError: hasError }" />
-        <input type="hidden" name="end" :value="endTime" />
+        <b-form-timepicker class="start-time mr-1" v-model="currentStartTime" placeholder="--:--" @input="changeEndTime" hide-header :class="{ hasError: hasError }" />
+        <input type="hidden" name="start" :value="currentStartTime" />
+        <b-form-timepicker class="ml-1 end-time" v-model="currentEndTime" placeholder="--:--" hide-header :class="{ hasError: hasError }" />
+        <input type="hidden" name="end" :value="currentEndTime" />
     </div>
 </template>
 
 <script>
 export default {
   props: {
-    starttimeinit: {
+    start: {
       required: false,
       type: String
     },
-    endtimeinit: {
+    end: {
       required: false,
       type: String
     },
@@ -26,15 +26,27 @@ export default {
   },
   data() {
     return {
-      startTime: this.starttimeinit,
-      endTime: this.endtimeinit
+      currentStartTime: null,
+      currentEndTime: null
     }
   },
   watch: {
-    startTime(newVal) {
+    start: {
+      handler(newVal) {
+        this.currentStartTime = newVal
+      },
+      immediate: true
+    },
+    end: {
+      handler(newVal) {
+        this.currentEndTime = newVal
+      },
+      immediate: true
+    },
+    currentStartTime(newVal) {
       this.$emit('update:start', newVal)
     },
-    endTime(newVal) {
+    currentEndTime(newVal) {
       this.$emit('update:end', newVal)
     }
   },
@@ -52,7 +64,7 @@ export default {
 
       var mins = timeParts[1];
 
-      this.endTime = hours+':'+mins
+      this.currentEndTime = hours+':'+mins
     }
   }
 }

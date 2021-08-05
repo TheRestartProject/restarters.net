@@ -92,7 +92,11 @@ export default {
       timer: null,
       lat: null,
       lng: null,
-      suppressEmit: false
+
+      // When we create this component we may (when duplicating events) pass in lat/lng/value.  The setting of
+      // the value will trigger a call to clearLatLng, and we don't want to emit null values and trample over the
+      // ones we started with.
+      suppressEmit: true
     }
   },
   computed: {

@@ -16,7 +16,7 @@
             <EventGroup
                 class="event-group"
                 :value.sync="idgroups"
-                :v="this.$v.idgroups"
+                :has-error="$v.idgroups.$error"
                 ref="eventGroup"
             />
             <div class="form-group event-description">
@@ -91,7 +91,6 @@ import EventGroup from './EventGroup'
 import { required, minLength } from 'vuelidate/lib/validators'
 import validationHelpers from '../mixins/validationHelpers'
 
-// TODO Set initial values for duplicate event
 // TODO Native inputs for date/time
 
 function geocodeable() {
@@ -102,7 +101,7 @@ export default {
   components: {EventGroup, EventVenue, VenueAddress, EventTimeRangePicker, EventDatePicker, RichTextEditor},
   mixins: [event, auth, validationHelpers],
   props: {
-    initialEvent: {
+    duplicateFrom: {
       type: Object,
       required: false,
       default: null
@@ -176,9 +175,19 @@ export default {
       groups: this.groups
     })
 
-    this.initialEvent.idevents = this.idevents
-    this.$store.dispatch('events/set', this.initialEvent)
-
+    if (this.duplicateFrom) {
+      // We are duplicating.
+      console.log(this.duplicateFrom)
+      this.idgroups = this.duplicateFrom.group
+      this.eventVenue = this.duplicateFrom.venue
+      this.eventAddress = this.duplicateFrom.location
+      this.free_text = this.duplicateFrom.free_text
+      this.eventStart = this.duplicateFrom.start
+      this.eventEnd = this.duplicateFrom.end
+      this.eventOnline = this.duplicateFrom.online ? true : false
+      this.lat = this.duplicateFrom.latitude
+      this.lng = this.duplicateFrom.longitude
+    }
   },
   methods: {
     submit (e) {
