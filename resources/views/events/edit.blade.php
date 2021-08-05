@@ -103,7 +103,7 @@
                   <div class="form-group">
                     <label for="event_desc">@lang('events.field_event_desc'):</label>
                     <div class="vue">
-                      <RichTextEditor name="free_text" initial-value="{{ addslashes($formdata->free_text) }}" />
+                      <RichTextEditor name="free_text" value="{{ addslashes($formdata->free_text) }}" />
                     </div>
                   </div>
                 </div>

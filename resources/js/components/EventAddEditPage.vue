@@ -5,36 +5,14 @@
       <b-card-body class="p-4">
         <b-form action="/party/create" method="post">
           <input type="hidden" name="_token" :value="CSRF" />
+
           <div class="layout">
-            <div class="d-flex flex-wrap event-name">
-              <b-form-group class="flex-grow-1 pr-4">
-                <label for="event_name" class="moveright">{{ __('events.field_event_name') }}:</label>
-                <b-input type="text" id="event_name" name="venue" :placeholder="__('events.field_event_name_helper')" />
-              </b-form-group>
-              <div class="align-self-center online d-flex">
-                <label for="online">{{ __('events.online_event_question') }}</label>
-                <b-form-checkbox id="online" name="online" class="ml-2" v-model="eventOnline" />
-              </div>
-            </div>
-            <div class="event-group">
-              <b-form-group>
-                <label for="event_group" class="moveright">{{ __('events.field_event_group') }}:</label>
-                <multiselect
-                    v-model="groupValue"
-                    :options="groupOptions"
-                    track-by="idgroups"
-                    label="name"
-                    :allow-empty="false"
-                    deselectLabel=""
-                    :placeholder="__('partials.please_choose')"
-                />
-                <input type="hidden" name="group" :value="idgroups" />
-              </b-form-group>
-            </div>
+            <EventVenue class="flex-grow-1 pr-4 event-venue" :venue.sync="eventVenue" :online.sync="eventOnline" />
+            <EventGroup class="event-group" :value.sync="idgroups" />
             <div class="form-group event-description">
               <b-form-group>
                 <label for="event_desc" class="moveright">{{ __('events.field_event_desc') }}:</label>
-                <RichTextEditor name="free_text" class="moveright" />
+                <RichTextEditor name="free_text" class="moveright" :value.sync="eventDescription"/>
               </b-form-group>
             </div>
             <div class="event-date">
@@ -45,15 +23,13 @@
               <label>{{ __('events.field_event_time') }}:</label>
               <EventTimeRangePicker class="movedown" :start.sync="eventStart" :end.sync="eventEnd" />
             </b-form-group>
-            <div class="event-address">
-              <VenueAddress :all-groups="groups" :value.sync="address" :selected-group="idgroups" :online="eventOnline" />
-            </div>
+            <VenueAddress :all-groups="groups" :value.sync="eventAddress" :selected-group="idgroups" :online="eventOnline" class="event-address" />
             <div class="event-create button-group row">
               <div class="offset-lg-3 col-lg-7 d-flex align-items-right justify-content-end text-right">
                 {{ __('events.before_submit_text') }}
               </div>
               <div class="col-lg-2 d-flex align-items-center justify-content-end">
-                <b-btn variant="primary" @click="create" class="break" type="submit">
+                <b-btn variant="primary" class="break" type="submit">
                   {{ __('events.create_event')}}
                 </b-btn>
               </div>
@@ -62,6 +38,7 @@
         </b-form>
       </b-card-body>
     </b-card>
+    Data: {{ $data }}
   </div>
 </template>
 <script>
@@ -71,13 +48,15 @@ import RichTextEditor from './RichTextEditor'
 import EventDatePicker from './EventDatePicker'
 import EventTimeRangePicker from './EventTimeRangePicker'
 import VenueAddress from './VenueAddress'
+import EventVenue from './EventVenue'
+import EventGroup from './EventGroup'
 
 // TODO Set initial values for duplicate event
-// TODO Actually create using AJAX
 // TODO Vuelidate
+// TODO Native inputs for date/time
 
 export default {
-  components: {VenueAddress, EventTimeRangePicker, EventDatePicker, RichTextEditor},
+  components: {EventGroup, EventVenue, VenueAddress, EventTimeRangePicker, EventDatePicker, RichTextEditor},
   mixins: [ event, auth ],
   props: {
     initialEvent: {
@@ -93,29 +72,23 @@ export default {
   },
   data () {
     return {
-      groupValue: null,
+      idgroups: null,
+      eventVenue: null,
+      eventDescription: null,
       eventDate: null,
       eventStart: null,
       eventEnd: null,
       eventOnline: false,
-      address: null
+      eventAddress: null
     }
   },
   computed: {
-    groups() {
-      return this.$store.getters['groups/list']
-    },
-    groupOptions() {
-      return this.groups ? this.groups.sort((a, b) => {
-        return a.name.localeCompare(b.name)
-      }) : []
-    },
     CSRF() {
       return this.$store.getters['auth/CSRF']
     },
-    idgroups() {
-      return this.groupValue ? this.groupValue.idgroups : null
-    }
+    groups() {
+      return this.$store.getters['groups/list']
+    },
   },
   mounted() {
     // Data is passed from the blade template to us via props.  We put it in the store for all components to use,
@@ -154,7 +127,7 @@ export default {
     grid-template-columns: 2fr 1fr 1fr;
   }
 
-  .event-name {
+  .event-venue {
     grid-row: 1 / 2;
     grid-column: 1 / 2;
   }

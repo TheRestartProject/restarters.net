@@ -23,7 +23,7 @@ export default {
       type: String,
       required: true
     },
-    initialValue: {
+    value: {
       type: String,
       required: false,
       default: null
@@ -31,7 +31,7 @@ export default {
   },
   data: function() {
     return {
-      value: null,
+      currentValue: null,
       editorOptions: {
         modules: {
           htmlEditButton: {},
@@ -57,9 +57,12 @@ export default {
     }
   },
   mounted() {
-    this.value = this.initialValue
+    this.currentValue = this.initialValue
   },
-  methods: {
+  watch: {
+    currentValue(newVal) {
+      this.$emit('update:value', newVal)
+    }
   }
 }
 </script>
