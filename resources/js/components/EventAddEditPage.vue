@@ -21,7 +21,7 @@
             />
             <div class="form-group event-description">
               <b-form-group>
-                <label for="event_desc" class="moveright">{{ __('events.field_event_desc') }}:</label>
+                <label for="event_desc">{{ __('events.field_event_desc') }}:</label>
                 <RichTextEditor
                     id="event_desc"
                     name="free_text"
@@ -51,7 +51,7 @@
                   ref="eventStart"/>
             </b-form-group>
             <!-- TODO The address component is indented slightly, and shouldn't be.-->
-            <!-- TODO Error message -->
+            <!-- TODO Error message about choosing something and the next level up if required -->
             <VenueAddress
                 :all-groups="allGroups"
                 :value.sync="eventAddress"
@@ -95,7 +95,6 @@ import validationHelpers from '../mixins/validationHelpers'
 // TODO Native inputs for date/time
 
 function geocodeable() {
-  console.log("Geocodable?", this)
   return this.lat !== null && this.lng !== null
 }
 
