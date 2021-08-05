@@ -112,7 +112,6 @@ import { required, minLength } from 'vuelidate/lib/validators'
 import validationHelpers from '../mixins/validationHelpers'
 
 // TODO Native inputs for date/time
-// TODO Moderation
 
 function geocodeable() {
   return this.lat !== null && this.lng !== null
