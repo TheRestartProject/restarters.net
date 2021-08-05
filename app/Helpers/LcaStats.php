@@ -3,6 +3,7 @@
 namespace App\Helpers;
 
 use DB;
+
 class LcaStats
 {
 
@@ -30,7 +31,10 @@ class LcaStats
      */
     public static function getEmissionRatioPowered()
     {
-        $result = DB::select(DB::raw("
+        if ($cache = LcaStats::getStatsCache('emission_ratio_powered')) {
+            return $cache;
+        }
+        $value = DB::select(DB::raw("
 SELECT
 SUM(COALESCE(c.footprint, 0.0)) / SUM(COALESCE(c.weight, 0.0)) AS ratio
 FROM devices d
@@ -38,7 +42,8 @@ JOIN categories c ON c.idcategories = d.category
 AND d.repair_status = 1
 AND c.powered = 1
 "));
-        return $result[0]->ratio;
+        LcaStats::putStatsCache('emission_ratio_powered', $value[0]->ratio);
+        return $value[0]->ratio;
     }
 
     /**
@@ -53,7 +58,7 @@ AND c.powered = 1
      * */
     public static function getWasteStats($group = null)
     {
-        $sql ="
+        $sql = "
 SELECT
 sum(case when (c.weight = 0) then (d.estimate + 0.0) else c.weight end) as total_weight,
 sum(case when (c.powered = 1) then (case when (c.weight = 0) then (d.estimate + 0.0) else c.weight end) else 0 end) as powered_waste,
@@ -82,5 +87,22 @@ AND d.repair_status = 1
         }
 
         return DB::select(DB::raw($sql), $params);
+    }
+
+    public static function getStatsCache($key)
+    {
+        $statsKey = "lcastats_$key";
+        if ($cache = \Cache::get($statsKey)) {
+            return $cache;
+        }
+        return FALSE;
+    }
+
+    public static function putStatsCache($key, $data)
+    {
+        $statsKey = "lcastats_$key";
+        \Cache::forget($statsKey);
+        \Cache::put($statsKey, $data, 300);
+        return (\Cache::has($statsKey));
     }
 }
