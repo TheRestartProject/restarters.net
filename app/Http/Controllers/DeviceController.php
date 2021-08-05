@@ -11,7 +11,7 @@ use App\DeviceUrl;
 use App\Events\DeviceCreatedOrUpdated;
 use App\EventsUsers;
 use App\Group;
-use App\Helpers\FootprintRatioCalculator;
+use App\Helpers\LcaStats;
 use App\Notifications\AdminAbnormalDevices;
 use App\Notifications\ReviewNotes;
 use App\Party;
@@ -254,6 +254,7 @@ class DeviceController extends Controller
         }
     }
 
+    /** @ToDo Test */
     public function ajaxCreate(Request $request)
     {
         $rules = [
@@ -386,13 +387,12 @@ class DeviceController extends Controller
         $return['success'] = true;
         $return['devices'] = $device;
 
-        $footprintRatioCalculator = new FootprintRatioCalculator();
-        $emissionRatio = $footprintRatioCalculator->calculateRatio();
-        $return['stats'] = $event->getEventStats($emissionRatio);
+        $return['stats'] = $event->getEventStats();
 
         return response()->json($return);
     }
 
+    /** @ToDo Test */
     public function ajaxEdit(Request $request, $id)
     {
         $category = $request->input('category');
@@ -517,10 +517,8 @@ class DeviceController extends Controller
             $event = Party::find($event_id);
             event(new DeviceCreatedOrUpdated($Device));
 
-            $footprintRatioCalculator = new FootprintRatioCalculator();
-            $emissionRatio = $footprintRatioCalculator->calculateRatio();
 
-            $stats = $event->getEventStats($emissionRatio);
+            $stats = $event->getEventStats();
             $data['stats'] = $stats;
             $data['success'] = 'Device updated!';
 
@@ -547,6 +545,7 @@ class DeviceController extends Controller
         }
     }
 
+    /** @ToDo Test */
     public function delete(Request $request, $id)
     {
         $user = Auth::user();
@@ -558,10 +557,9 @@ class DeviceController extends Controller
             $device->delete();
 
             if ($request->ajax()) {
-                $footprintRatioCalculator = new FootprintRatioCalculator();
-                $emissionRatio = $footprintRatioCalculator->calculateRatio();
+
                 $event = Party::find($eventId);
-                $stats = $event->getEventStats($emissionRatio);
+                $stats = $event->getEventStats();
 
                 return response()->json([
                     'success' => true,

@@ -13,7 +13,7 @@ use App\Events\EventDeleted;
 use App\Events\EventImagesUploaded;
 use App\EventsUsers;
 use App\Group;
-use App\Helpers\FootprintRatioCalculator;
+use App\Helpers\LcaStats;
 use App\Helpers\Geocoder;
 use App\Host;
 use App\Invite;
@@ -50,14 +50,15 @@ class PartyController extends Controller
 
     public function __construct(Geocoder $geocoder, DiscourseService $discourseService)
     {
-        $footprintRatioCalculator = new FootprintRatioCalculator();
-        $this->emissionRatio = $footprintRatioCalculator->calculateRatio();
+
+        $this->emissionRatio = LcaStats::getEmissionRatioPowered();
 
         $this->geocoder = $geocoder;
         $this->discourseService = $discourseService;
     }
 
-    public static function expandEvent($event, $group, $emissionRatio)
+    /** @ToDo Test */
+    public static function expandEvent($event, $group)
     {
         $thisone = $event->getAttributes();
 
@@ -78,7 +79,7 @@ class PartyController extends Controller
         }
 
         // TODO LATER Consider whether these stats should be in the event or passed into the store.
-        $thisone['stats'] = $event->getEventStats($emissionRatio);
+        $thisone['stats'] = $event->getEventStats();
         $thisone['participants_count'] = $event->participants;
         $thisone['volunteers_count'] = $event->allConfirmedVolunteers->count();
 
@@ -711,11 +712,19 @@ class PartyController extends Controller
             $group_volunteers = null;
         }
 
+        if ($event->isInProgress() || $event->hasFinished()) {
+            $stats = $event->getEventStats();
+        } else {
+            $stats = [
+              'force_object' => TRUE
+            ];
+        }
+
         return view('events.view', [
             'gmaps' => true,
             'images' => $images,
             'event' => $event,
-            'stats' => $event->getEventStats($this->emissionRatio),
+            'stats' => $stats,
             'formdata' => $party,
             'attended_summary' => $attended_summary,
             'attended' => $attended,
@@ -859,12 +868,10 @@ class PartyController extends Controller
 
     public static function stats($id, $class = null)
     {
-        $footprintRatioCalculator = new FootprintRatioCalculator();
-        $emissionRatio = $footprintRatioCalculator->calculateRatio();
 
         $event = Party::where('idevents', $id)->first();
 
-        $eventStats = $event->getEventStats($emissionRatio);
+        $eventStats = $event->getEventStats();
 
         $eventStats['co2'] = number_format(round($eventStats['co2']), 0, '.', ',');
 
@@ -1420,7 +1427,7 @@ class PartyController extends Controller
             $group = $groups_array->filter(function ($group) use ($party) {
                 return $group['id'] == $party->group;
             })->first();
-            $estats = $party->getEventStats($this->emissionRatio);
+            $estats = $party->getEventStats();
             // Push Party to Collection
             $collection->push([
              'id' => $party->idevents,
@@ -1481,7 +1488,7 @@ class PartyController extends Controller
             return abort(404, 'Invalid Event ID.');
         }
 
-        $estats = $party->getEventStats($this->emissionRatio);
+        $estats = $party->getEventStats();
         $gstats = $party->theGroup->getGroupStats($this->emissionRatio);
         // New Collection Instance
         $collection = collect([

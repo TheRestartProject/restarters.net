@@ -11,7 +11,7 @@ use App\Group;
 use App\GroupNetwork;
 use App\GroupTags;
 use App\GrouptagsGroups;
-use App\Helpers\FootprintRatioCalculator;
+use App\Helpers\LcaStats;
 use App\Helpers\Geocoder;
 use App\Invite;
 use App\Network;
@@ -354,8 +354,8 @@ class GroupController extends Controller
         ->where('events.group', $group->idgroups)
         ->get();
 
-        $footprintRatioCalculator = new FootprintRatioCalculator();
-        $emissionRatio = $footprintRatioCalculator->calculateRatio();
+
+        $emissionRatio = LcaStats::getEmissionRatioPowered();
         $groupWeight = $Device->getWeights($group->idgroups);
 
         $groupStats = $group->getGroupStats($emissionRatio);
@@ -843,8 +843,8 @@ class GroupController extends Controller
 
     public static function stats($id, $format = 'row')
     {
-        $footprintRatioCalculator = new FootprintRatioCalculator();
-        $emissionRatio = $footprintRatioCalculator->calculateRatio();
+
+        $emissionRatio = LcaStats::getEmissionRatioPowered();
 
         $group = Group::where('idgroups', $id)->first();
         $groupStats = $group->getGroupStats($emissionRatio);
@@ -856,8 +856,8 @@ class GroupController extends Controller
 
     public static function statsByGroupTag($group_tag_id, $format = 'row')
     {
-        $footprintRatioCalculator = new FootprintRatioCalculator();
-        $emissionRatio = $footprintRatioCalculator->calculateRatio();
+
+        $emissionRatio = LcaStats::getEmissionRatioPowered();
 
         $groups = Group::join('grouptags_groups', 'grouptags_groups.group', '=', 'groups.idgroups')
             ->where('grouptags_groups.group_tag', $group_tag_id)
@@ -1299,8 +1299,8 @@ class GroupController extends Controller
         $user = User::where('api_token', $api_token)->first();
 
         // Get Emission Ratio
-        $footprintRatioCalculator = new FootprintRatioCalculator();
-        $emissionRatio = $footprintRatioCalculator->calculateRatio();
+
+        $emissionRatio = LcaStats::getEmissionRatioPowered();
 
         if (empty($user->groupTag) || is_null($user->groupTag)) {
             return abort(404, 'No groups tags found.');
@@ -1428,8 +1428,8 @@ class GroupController extends Controller
         }
 
         // Get Emission Ratio
-        $footprintRatioCalculator = new FootprintRatioCalculator();
-        $emissionRatio = $footprintRatioCalculator->calculateRatio();
+
+        $emissionRatio = LcaStats::getEmissionRatioPowered();
 
         $stats = $group->getGroupStats($emissionRatio);
         // New Collection Instance

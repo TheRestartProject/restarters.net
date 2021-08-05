@@ -3,7 +3,7 @@
 namespace App\Http\Controllers\API;
 
 use App\Group;
-use App\Helpers\FootprintRatioCalculator;
+use App\Helpers\LcaStats;
 use App\Http\Controllers\Controller;
 use Auth;
 use Illuminate\Http\Request;
@@ -61,8 +61,8 @@ class GroupController extends Controller
     {
         $authenticatedUser = Auth::user();
 
-        $footprintRatioCalculator = new FootprintRatioCalculator();
-        $emissionRatio = $footprintRatioCalculator->calculateRatio();
+
+        $emissionRatio = LcaStats::getEmissionRatioPowered();
 
         $groups = [];
 

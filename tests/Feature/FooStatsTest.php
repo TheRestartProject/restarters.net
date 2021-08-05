@@ -36,7 +36,7 @@ class FooStatsTest extends TestCase
 
     /** EVENTS */
 
-    /** @test */
+    /** REFACTOR AND MOVE TO EventStatsTest */
     public function event_stats_with_only_powered_devices_with_unpowered_weights()
     {
         $this->_setupCategoriesWithUnpoweredWeights();

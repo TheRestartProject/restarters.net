@@ -3,7 +3,7 @@
 namespace App\Http\Controllers\API;
 
 use App\Group;
-use App\Helpers\FootprintRatioCalculator;
+use App\Helpers\LcaStats;
 use App\Http\Controllers\Controller;
 use App\Party;
 use Auth;
@@ -11,6 +11,7 @@ use Illuminate\Http\Request;
 
 class EventController extends Controller
 {
+    /** ToDo Test */
     public function getEventsByUsersNetworks(Request $request, $date_from = null, $date_to = null)
     {
         $authenticatedUser = Auth::user();
@@ -44,8 +45,7 @@ class EventController extends Controller
         }
 
         // Get Emission Ratio
-        $footprintRatioCalculator = new FootprintRatioCalculator();
-        $emissionRatio = $footprintRatioCalculator->calculateRatio();
+        $emissionRatio = LcaStats::getEmissionRatioPowered();
 
         $groups_array = collect([]);
         foreach ($groups as $group) {
@@ -72,7 +72,7 @@ class EventController extends Controller
                 return $group['id'] == $party->group;
             })->first();
 
-            $eventStats = $party->getEventStats($emissionRatio);
+            $eventStats = $party->getEventStats();
             // Push Party to Collection
             $collection->push([
              'id' => $party->idevents,

@@ -5,7 +5,7 @@ namespace App\Http\Controllers;
 use App\Device;
 use App\Group;
 use App\GroupTags;
-use App\Helpers\FootprintRatioCalculator;
+use App\Helpers\LcaStats;
 use App\Party;
 use App\Search;
 use App\User;
@@ -27,8 +27,8 @@ class SearchController extends Controller
         // $this->TotalWeight = $weights[0]->total_weights;
         // $this->TotalEmission = $weights[0]->total_footprints;
 
-        // $footprintRatioCalculator = new FootprintRatioCalculator();
-        // $this->EmissionRatio = $footprintRatioCalculator->calculateRatio();
+        //
+        // $this->EmissionRatio = LcaStats::getEmissionRatioPowered();
     }
 
     public function index($response = null)
@@ -119,8 +119,8 @@ class SearchController extends Controller
                 $totalCO2 = 0;
                 $totalWeight = 0;
 
-                $footprintRatioCalculator = new FootprintRatioCalculator();
-                $emissionRatio = $footprintRatioCalculator->calculateRatio();
+
+                $emissionRatio = LcaStats::getEmissionRatioPowered();
 
                 foreach ($PartyList as $party) {
                     $partyIds[] = $party->idevents;

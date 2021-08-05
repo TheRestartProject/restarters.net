@@ -110,14 +110,6 @@
 
           $collected_images = [];
 
-          $stats = [
-              'force_object' => TRUE
-          ];
-
-          if ($event->isInProgress() || $event->hasFinished()) {
-            $stats = $event->getEventStats((new App\Helpers\FootprintRatioCalculator())->calculateRatio());
-          }
-
           if( !empty($images) ) {
               foreach ($images as $image) {
                 $collected_images[] = $image;

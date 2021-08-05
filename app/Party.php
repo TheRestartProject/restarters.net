@@ -4,11 +4,11 @@ namespace App;
 
 use App\Device;
 use App\EventUsers;
-use App\Helpers\FootprintRatioCalculator;
 use Auth;
 use Carbon\Carbon;
 use DB;
 use App\Helpers\Fixometer;
+use App\Helpers\LcaStats;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Support\Str;
@@ -631,9 +631,12 @@ class Party extends Model implements Auditable
         return false;
     }
 
-    public function getEventStats($emissionRatio)
+    /** @ToDo Test */
+    public function getEventStats()
     {
         $Device = new Device;
+        $displacementFactor = $Device->getDisplacementFactor();
+        $emissionRatio = LcaStats::getEmissionRatioPowered();
 
         $co2Diverted = 0;
         $ewasteDiverted = 0;
@@ -653,7 +656,7 @@ class Party extends Model implements Auditable
                     $devices_powered++;
 
                     if ($device->isFixed()) {
-                        $co2Diverted += $device->co2Diverted($emissionRatio, $Device->getDisplacementFactor());
+                        $co2Diverted += $device->co2Diverted($emissionRatio, $displacementFactor);
                         $ewasteDiverted += $device->ewasteDiverted();
                         $fixed_powered++;
                     }
@@ -858,12 +861,10 @@ class Party extends Model implements Auditable
         return $query->whereRaw("CONCAT(`event_date`, ' ', `end`) < '{$now}'");
     }
 
+    /** @ToDo Test */
     public function getWastePreventedAttribute()
     {
-        $footprintRatioCalculator = new FootprintRatioCalculator();
-        $emissionRatio = $footprintRatioCalculator->calculateRatio();
-
-        return round($this->getEventStats($emissionRatio)['ewaste'], 2);
+        return round($this->getEventStats()['ewaste'], 2);
     }
 
     public function scopeWithAll($query)

@@ -4,7 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Device;
 use App\Group;
-use App\Helpers\FootprintRatioCalculator;
+use App\Helpers\LcaStats;
 use App\Party;
 use Request;
 
@@ -27,8 +27,6 @@ class OutboundController extends Controller
             $id = filter_var($id, FILTER_SANITIZE_NUMBER_INT);
 
             // Calculators
-            $footprintRatioCalculator = new FootprintRatioCalculator();
-            $EmissionRatio = $footprintRatioCalculator->calculateRatio();
 
             // Get the data by type
             if (strtolower($type) == 'party') {
@@ -38,7 +36,7 @@ class OutboundController extends Controller
                     abort(404);
                 }
 
-                $eventStats = $event->getEventStats($EmissionRatio);
+                $eventStats = $event->getEventStats();
                 $co2 = $eventStats['co2'];
             } elseif (strtolower($type) == 'group') {
                 $group = Group::find($id);
@@ -46,6 +44,8 @@ class OutboundController extends Controller
                 if (! $group) {
                     abort(404);
                 }
+
+                $EmissionRatio = LcaStats::getEmissionRatioPowered();
 
                 $groupStats = $group->getGroupStats($EmissionRatio);
                 $co2 = $groupStats['co2'];
