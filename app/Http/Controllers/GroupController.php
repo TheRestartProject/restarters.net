@@ -11,7 +11,6 @@ use App\Group;
 use App\GroupNetwork;
 use App\GroupTags;
 use App\GrouptagsGroups;
-use App\Helpers\LcaStats;
 use App\Helpers\Geocoder;
 use App\Invite;
 use App\Network;
@@ -26,6 +25,7 @@ use Auth;
 use DB;
 use FixometerFile;
 use App\Helpers\Fixometer;
+use App\Helpers\LcaStats;
 use Illuminate\Database\QueryException;
 use Illuminate\Http\Request;
 use Illuminate\Support\Arr;
@@ -425,8 +425,7 @@ class GroupController extends Controller
             ->whereNotNull('status');
         })->first());
 
-        $emissionRatio = LcaStats::getEmissionRatioPowered();
-        $groupStats = $group->getGroupStats($emissionRatio);
+        $groupStats = $group->getGroupStats();
 
         return view('group.view', [ //host.index
             'title' => 'Host Dashboard',
@@ -444,7 +443,7 @@ class GroupController extends Controller
             'device_count_status' => $Device->statusCount(),
             'group_device_count_status' => $Device->statusCount($group->idgroups),
             'group_stats' => $groupStats,
-            'emission_ratio' => $emissionRatio,
+            'emission_ratio' => LcaStats::getEmissionRatioPowered(),
             'clusters' => $clusters,
             'mostleast' => $mostleast,
             'top' => $Device->findMostSeen(1, null, $group->idgroups),
@@ -837,11 +836,8 @@ class GroupController extends Controller
 
     public static function stats($id, $format = 'row')
     {
-
-        $emissionRatio = LcaStats::getEmissionRatioPowered();
-
         $group = Group::where('idgroups', $id)->first();
-        $groupStats = $group->getGroupStats($emissionRatio);
+        $groupStats = $group->getGroupStats();
 
         $groupStats['format'] = $format;
 
@@ -850,8 +846,6 @@ class GroupController extends Controller
 
     public static function statsByGroupTag($group_tag_id, $format = 'row')
     {
-
-        $emissionRatio = LcaStats::getEmissionRatioPowered();
 
         $groups = Group::join('grouptags_groups', 'grouptags_groups.group', '=', 'groups.idgroups')
             ->where('grouptags_groups.group_tag', $group_tag_id)
@@ -874,7 +868,7 @@ class GroupController extends Controller
         // Loop through all groups and increase the values for groupStats
         foreach ($groups as $group) {
             // Get stats for this particular group
-            $single_group_stats = $group->getGroupStats($emissionRatio);
+            $single_group_stats = $group->getGroupStats();
 
             // Loop through the stats whilst adding the new value to the existing value
             foreach ($single_group_stats as $key => $value) {
@@ -1292,10 +1286,6 @@ class GroupController extends Controller
         // Find User by Access Key
         $user = User::where('api_token', $api_token)->first();
 
-        // Get Emission Ratio
-
-        $emissionRatio = LcaStats::getEmissionRatioPowered();
-
         if (empty($user->groupTag) || is_null($user->groupTag)) {
             return abort(404, 'No groups tags found.');
         }
@@ -1314,7 +1304,7 @@ class GroupController extends Controller
         foreach ($group_tags_groups as $group_tags_group) {
             $group = $group_tags_group->theGroup;
             if (! empty($group)) {
-                $stats = $group->getGroupStats($emissionRatio);
+                $stats = $group->getGroupStats();
                 $collection->push([
                     'id' => $group->idgroups,
                     'name' => $group->name,
@@ -1421,11 +1411,7 @@ class GroupController extends Controller
             }
         }
 
-        // Get Emission Ratio
-
-        $emissionRatio = LcaStats::getEmissionRatioPowered();
-
-        $stats = $group->getGroupStats($emissionRatio);
+        $stats = $group->getGroupStats();
         // New Collection Instance
         $collection = collect([
             'id' => $group->idgroups,
