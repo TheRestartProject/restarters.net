@@ -9,6 +9,7 @@
         :allow-empty="false"
         deselectLabel=""
         :placeholder="__('partials.please_choose')"
+        :class="{ hasError: v.$error }"
     />
     <input type="hidden" name="group" :value="currentIdGroups" />
   </b-form-group>
@@ -21,6 +22,10 @@ export default {
       required: false,
       default: null
     },
+    v: {
+      type: Object,
+      required: true
+    }
   },
   data () {
     return {
@@ -52,3 +57,34 @@ export default {
   }
 }
 </script>
+<style scoped lang="scss">
+@import 'resources/global/css/_variables';
+@import '~bootstrap/scss/functions';
+@import '~bootstrap/scss/variables';
+@import '~bootstrap/scss/mixins/_breakpoints';
+
+/deep/ .hasError {
+  &.multiselect {
+    border: 1px solid $brand-danger !important;
+  }
+  .multiselect__tags {
+    border: 1px solid $brand-danger !important;
+  }
+}
+
+/deep/ .multiselect {
+  border: 1px solid $black !important;
+  font-family: "Open Sans", "sans-serif" !important;
+
+  outline: 3px;
+  margin: 2px;
+  margin-right: 3px;
+  width: calc(100% - 4px) !important;
+
+  &.multiselect--active {
+    border: 3px solid $black !important;
+    outline: 0px !important;
+    margin: 0px !important;
+  }
+}
+</style>

@@ -1,8 +1,8 @@
 <template>
     <div class="d-flex">
-        <b-form-timepicker class="start-time mr-1" v-model="startTime" placeholder="--:--" @input="changeEndTime" hide-header />
+        <b-form-timepicker class="start-time mr-1" v-model="startTime" placeholder="--:--" @input="changeEndTime" hide-header :class="{ hasError: hasError }" />
         <input type="hidden" name="start" :value="startTime" />
-        <b-form-timepicker class="ml-1 end-time" v-model="endTime" placeholder="--:--" hide-header />
+        <b-form-timepicker class="ml-1 end-time" v-model="endTime" placeholder="--:--" hide-header :class="{ hasError: hasError }" />
         <input type="hidden" name="end" :value="endTime" />
     </div>
 </template>
@@ -17,6 +17,11 @@ export default {
     endtimeinit: {
       required: false,
       type: String
+    },
+    hasError: {
+      type: Boolean,
+      required: false,
+      default: false
     }
   },
   data() {
@@ -35,6 +40,7 @@ export default {
   },
   methods: {
     changeEndTime: function (startTime) {
+      // TODO This lets us have an end time before the start time.
       // Replicating existing functionality.
       // When start time changes, change end time to 3 hours hence.
       let timeParts = startTime.split(':');

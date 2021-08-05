@@ -3,17 +3,19 @@
     <b-col md="7">
       <div class="form-group">
         <label :for="$id('address-autocomplete')">{{ __('events.field_event_venue') }}:</label>
+<!--        TODO Moves on focus-->
         <vue-google-autocomplete
             :id="$id('address-autocomplete')"
             name="location"
             classname="form-control"
             :placeholder="__('events.field_venue_placeholder')"
             @placechanged="placeChanged"
+            @inputChange="clearLatLng"
             aria-describedby="locationHelpBlock"
             types="geocode"
             ref="autocomplete"
-        >
-        </vue-google-autocomplete>
+            :class="{ hasError: hasError }"
+        />
         <p class="text-danger" v-if="error">{{ error }}</p>
 
         <small id="locationHelpBlock" class="form-text text-muted">
@@ -59,6 +61,11 @@ export default {
       required: false,
       default: null
     },
+    hasError: {
+      type: Boolean,
+      required: false,
+      default: false
+    },
     allGroups: {
       type: Array,
       required: false,
@@ -84,7 +91,8 @@ export default {
       location: null,
       timer: null,
       lat: null,
-      lng: null
+      lng: null,
+      suppressEmit: false
     }
   },
   computed: {
@@ -150,15 +158,40 @@ export default {
   methods: {
     placeChanged(addressData, placeResultData) {
       this.currentValue = placeResultData.formatted_address
-      this.lat = addressData.latitude
-      this.lng = addressData.longitude
-      this.$emit('update:value', this.currentValue)
 
-      // The formatted address returned can be slightly different from the value displayed.  Force them to be
-      // the same so that we can disable the Use group button.
+      // Ensure the next clearLatLng handler doesn't reset values.
+      this.suppressEmit = true
+
       this.$nextTick(() => {
+        // The formatted address returned can be slightly different from the value displayed.  Force them to be
+        // the same so that we can disable the Use group button.
         this.$refs.autocomplete.update(this.currentValue)
+
+        // Emit new lat/lng values.
+        this.lat = addressData.latitude
+        this.lng = addressData.longitude
+        this.emit()
       })
+    },
+    clearLatLng() {
+      // The input has changed.  Clear the lat/lng so that the parent knows we currently have an address which
+      // is not geocodeable.  If we subsequently select a valid place from the drop-down list, then we'll call
+      // placeChanged about and emit valid values.
+      //
+      // The suppressEmit jiggery-pokery is because both callbacks are made when we type and select a valid
+      // address.
+      if (!this.suppressEmit) {
+        this.lat = null
+        this.lng = null
+        this.emit()
+      }
+
+      this.suppressEmit = false
+    },
+    emit() {
+      this.$emit('update:value', this.currentValue)
+      this.$emit('update:lat', this.lat)
+      this.$emit('update:lng', this.lng)
     },
     useGroup() {
       this.$refs.autocomplete.update(this.groupLocation)

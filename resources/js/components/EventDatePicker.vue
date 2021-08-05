@@ -1,6 +1,6 @@
 <template>
     <div>
-        <b-form-datepicker class="datepicker" v-model="value" hide-header></b-form-datepicker>
+        <b-form-datepicker class="datepicker" v-model="value" hide-header :class="{ hasError: hasError }" />
         <input type="hidden" name="event_date" :value="value" />
     </div>
 </template>
@@ -11,6 +11,11 @@ export default {
     date : {
       required: false,
       type: String
+    },
+    hasError: {
+      type: Boolean,
+      required: false,
+      default: false
     }
   },
   data() {

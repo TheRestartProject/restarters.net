@@ -1,36 +1,75 @@
 <template>
   <div>
     <h1>{{ __('events.add_new_event') }}</h1>
-    <b-card no-body class="box">
+    <b-card no-body class="box mt-4">
       <b-card-body class="p-4">
         <b-form action="/party/create" method="post">
-          <input type="hidden" name="_token" :value="CSRF" />
+          <input type="hidden" name="_token" :value="CSRF"/>
 
           <div class="layout">
-            <EventVenue class="flex-grow-1 pr-4 event-venue" :venue.sync="eventVenue" :online.sync="eventOnline" />
-            <EventGroup class="event-group" :value.sync="idgroups" />
+            <EventVenue
+                class="flex-grow-1 pr-4 event-venue"
+                :venue.sync="eventVenue"
+                :online.sync="eventOnline"
+                :has-error="$v.eventVenue.$error"
+                ref="eventVenue"/>
+            <EventGroup
+                class="event-group"
+                :value.sync="idgroups"
+                :v="this.$v.idgroups"
+                ref="eventGroup"
+            />
             <div class="form-group event-description">
               <b-form-group>
                 <label for="event_desc" class="moveright">{{ __('events.field_event_desc') }}:</label>
-                <RichTextEditor name="free_text" class="moveright" :value.sync="eventDescription"/>
+                <RichTextEditor
+                    id="event_desc"
+                    name="free_text"
+                    class="moveright"
+                    :value.sync="free_text"
+                    :has-error="$v.free_text.$error"
+                    ref="free_text"/>
               </b-form-group>
             </div>
             <div class="event-date">
               <label for="event_date">{{ __('events.field_event_date') }}:</label>
-              <EventDatePicker :date.sync="eventDate" class="p-0" />
+              <EventDatePicker
+                  id="event_date"
+                  class="p-0"
+                  :date.sync="eventDate"
+                  :has-error="$v.eventDate.$error"
+                  ref="eventDate"/>
             </div>
-            <b-form-group class="event-time">
-              <label>{{ __('events.field_event_time') }}:</label>
-              <EventTimeRangePicker class="movedown" :start.sync="eventStart" :end.sync="eventEnd" />
+            <b-form-group class="event-time mt-3 mt-lg-0">
+              <label for="event_time">{{ __('events.field_event_time') }}:</label>
+              <EventTimeRangePicker
+                  id="event_time"
+                  class="movedown"
+                  :start.sync="eventStart"
+                  :end.sync="eventEnd"
+                  :has-error="$v.eventStart.$error || $v.eventEnd.$error"
+                  ref="eventStart"/>
             </b-form-group>
-            <VenueAddress :all-groups="groups" :value.sync="eventAddress" :selected-group="idgroups" :online="eventOnline" class="event-address" />
+            <!-- TODO The address component is indented slightly, and shouldn't be.-->
+            <!-- TODO Error message -->
+            <VenueAddress
+                :all-groups="allGroups"
+                :value.sync="eventAddress"
+                :lat.sync="lat"
+                :lng.sync="lng"
+                :selected-group="idgroups"
+                :online="eventOnline"
+                class="event-address"
+                :has-error="$v.eventAddress.$error"
+                ref="eventAddress"
+            />
             <div class="event-create button-group row">
               <div class="offset-lg-3 col-lg-7 d-flex align-items-right justify-content-end text-right">
                 {{ __('events.before_submit_text') }}
               </div>
-              <div class="col-lg-2 d-flex align-items-center justify-content-end">
-                <b-btn variant="primary" class="break" type="submit">
-                  {{ __('events.create_event')}}
+              <div class="col-lg-2 d-flex align-items-center justify-content-end mt-2 mt-lg-0">
+                <b-btn variant="primary" class="break" type="submit" @click="submit">
+                  {{ __('events.create_event') }}
                 </b-btn>
               </div>
             </div>
@@ -38,7 +77,6 @@
         </b-form>
       </b-card-body>
     </b-card>
-    Data: {{ $data }}
   </div>
 </template>
 <script>
@@ -50,14 +88,20 @@ import EventTimeRangePicker from './EventTimeRangePicker'
 import VenueAddress from './VenueAddress'
 import EventVenue from './EventVenue'
 import EventGroup from './EventGroup'
+import { required, minLength } from 'vuelidate/lib/validators'
+import validationHelpers from '../mixins/validationHelpers'
 
 // TODO Set initial values for duplicate event
-// TODO Vuelidate
 // TODO Native inputs for date/time
+
+function geocodeable() {
+  console.log("Geocodable?", this)
+  return this.lat !== null && this.lng !== null
+}
 
 export default {
   components: {EventGroup, EventVenue, VenueAddress, EventTimeRangePicker, EventDatePicker, RichTextEditor},
-  mixins: [ event, auth ],
+  mixins: [event, auth, validationHelpers],
   props: {
     initialEvent: {
       type: Object,
@@ -69,38 +113,89 @@ export default {
       required: false,
       default: null
     },
+    groups: {
+      type: Array,
+      required: true
+    }
   },
   data () {
     return {
       idgroups: null,
       eventVenue: null,
-      eventDescription: null,
+      free_text: null,
       eventDate: null,
       eventStart: null,
       eventEnd: null,
       eventOnline: false,
-      eventAddress: null
+      eventAddress: null,
+      lat: null,
+      lng: null
+    }
+  },
+  validations: {
+    // TODO Any min/max lengths?
+    // We use vuelidate to validate the inputs.  If necessary we pass the relevant validation down to a child component,
+    // which is responsible for setting the hasError class.
+    //
+    // These need to match PartyController::create.
+    idgroups: {
+      required
+    },
+    eventVenue: {
+      required,
+    },
+    free_text: {
+      required
+    },
+    eventDate: {
+      required
+    },
+    eventStart: {
+      required
+    },
+    eventEnd: {
+      required
+    },
+    eventAddress: {
+      geocodeable
     }
   },
   computed: {
-    CSRF() {
+    CSRF () {
       return this.$store.getters['auth/CSRF']
     },
-    groups() {
+    allGroups () {
       return this.$store.getters['groups/list']
     },
   },
-  mounted() {
+  created() {
     // Data is passed from the blade template to us via props.  We put it in the store for all components to use,
     // and so that as/when it changes then reactivity updates all the views.
     //
     // Further down the line this may change so that the data is obtained via an AJAX call and perhaps SSR.
+    this.$store.dispatch('groups/setList', {
+      groups: this.groups
+    })
+
     this.initialEvent.idevents = this.idevents
     this.$store.dispatch('events/set', this.initialEvent)
 
-    this.$store.dispatch('groups/setList', {
-      groups: Object.values(groups)
-    })
+  },
+  methods: {
+    submit (e) {
+      // Events are created via form submission - we don't yet have an API call to do this over AJAX.  Therefore
+      // this page and the subcomponents have form inputs with suitable names.
+      //
+      // Check the form is valid.
+      this.$v.$touch()
+
+      if (this.$v.$invalid) {
+        // It's not - prevent the submit.
+        e.preventDefault()
+
+        this.validationFocusFirstError()
+      }
+    }
   }
 }
 </script>
@@ -204,43 +299,15 @@ export default {
   border: 2px solid $black !important;
 }
 
-/deep/ .multiselect {
-  border: 1px solid $black !important;
-  font-family: "Open Sans", "sans-serif" !important;
-
-  outline: 3px;
-  margin: 2px;
-  margin-right: 3px;
-  width: calc(100% - 4px) !important;
-
-  &.multiselect--active {
-    border: 3px solid $black !important;
-    outline: 0px !important;
-    margin: 0px !important;
-  }
-}
-
-/deep/ .ql-toolbar {
-  border-top: 2px solid $black !important;
-  border-left: 2px solid $black !important;
-  border-right: 2px solid $black !important;
-}
-
-/deep/ .ql-container {
-  border-bottom: 2px solid $black !important;
-  border-left: 2px solid $black !important;
-  border-right: 2px solid $black !important;
-}
-
-/deep/ .ql-container.ql-snow {
-  border: unset;
-}
-
 .moveright {
   margin-left: 2px;
 }
 
 .movedown {
   margin-top: 2px;
+}
+
+/deep/ .hasError, /deep/ .card .form-control.hasError:focus {
+  border: 2px solid $brand-danger !important;
 }
 </style>

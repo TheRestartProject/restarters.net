@@ -31,6 +31,9 @@ import 'vue-multiselect/dist/vue-multiselect.min.css'
 import * as Sentry from "@sentry/vue";
 import { Integrations } from "@sentry/tracing";
 
+import Vuelidate from 'vuelidate'
+Vue.use(Vuelidate)
+
 // Without this, the default map marker doesn't appear in production.  Fairly well-known problem.
 // eslint-disable-next-line
 delete L.Icon.Default.prototype._getIconUrl
