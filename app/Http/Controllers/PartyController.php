@@ -13,7 +13,7 @@ use App\Events\EventDeleted;
 use App\Events\EventImagesUploaded;
 use App\EventsUsers;
 use App\Group;
-use App\Helpers\LcaStats;
+use App\Helpers\FootprintRatioCalculator;
 use App\Helpers\Geocoder;
 use App\Host;
 use App\Invite;
@@ -51,13 +51,13 @@ class PartyController extends Controller
     public function __construct(Geocoder $geocoder, DiscourseService $discourseService)
     {
 
-        $this->emissionRatio = LcaStats::getEmissionRatioPowered();
+        $this->emissionRatio = FootprintRatioCalculator::calculateRatio();
 
         $this->geocoder = $geocoder;
         $this->discourseService = $discourseService;
     }
 
-    /** @ToDo Test */
+
     public static function expandEvent($event, $group)
     {
         $thisone = $event->getAttributes();
@@ -1407,7 +1407,7 @@ class PartyController extends Controller
 
         $groups_array = collect([]);
         foreach ($groups as $group) {
-            $gstats = $group->getGroupStats($this->emissionRatio);
+            $gstats = $group->getGroupStats();
             $groups_array->push([
                'id' => $group->idgroups,
                'name' => $group->name,
@@ -1488,8 +1488,8 @@ class PartyController extends Controller
             return abort(404, 'Invalid Event ID.');
         }
 
-        $estats = $party->getEventStats();
-        $gstats = $party->theGroup->getGroupStats($this->emissionRatio);
+        $estats = $party->getEventStats($this->emissionRatio);
+        $gstats = $party->theGroup->getGroupStats();
         // New Collection Instance
         $collection = collect([
             'id' => $party->idevents,

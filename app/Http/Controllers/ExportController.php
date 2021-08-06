@@ -7,7 +7,7 @@ use App\EventsUsers;
 use App\Group;
 use App\GroupTags;
 use App\GrouptagsGroups;
-use App\Helpers\LcaStats;
+use App\Helpers\FootprintRatioCalculator;
 use App\Search;
 use App\UserGroups;
 use Auth;
@@ -158,7 +158,7 @@ class ExportController extends Controller
             $totalCO2 = 0;
 
 
-            $emissionRatio = LcaStats::getEmissionRatioPowered();
+            $emissionRatio = FootprintRatioCalculator::calculateRatio();
 
             foreach ($PartyList as $i => $party) {
                 if ($party->device_count == 0) {

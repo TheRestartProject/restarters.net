@@ -11,7 +11,7 @@ use App\DeviceUrl;
 use App\Events\DeviceCreatedOrUpdated;
 use App\EventsUsers;
 use App\Group;
-use App\Helpers\LcaStats;
+use App\Helpers\FootprintRatioCalculator;
 use App\Notifications\AdminAbnormalDevices;
 use App\Notifications\ReviewNotes;
 use App\Party;
@@ -254,7 +254,7 @@ class DeviceController extends Controller
         }
     }
 
-    /** @ToDo Test */
+
     public function ajaxCreate(Request $request)
     {
         $rules = [
@@ -392,7 +392,7 @@ class DeviceController extends Controller
         return response()->json($return);
     }
 
-    /** @ToDo Test */
+
     public function ajaxEdit(Request $request, $id)
     {
         $category = $request->input('category');
@@ -545,7 +545,7 @@ class DeviceController extends Controller
         }
     }
 
-    /** @ToDo Test */
+
     public function delete(Request $request, $id)
     {
         $user = Auth::user();

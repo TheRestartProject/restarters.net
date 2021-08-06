@@ -25,7 +25,7 @@ use Auth;
 use DB;
 use FixometerFile;
 use App\Helpers\Fixometer;
-use App\Helpers\LcaStats;
+use App\Helpers\FootprintRatioCalculator;
 use Illuminate\Database\QueryException;
 use Illuminate\Http\Request;
 use Illuminate\Support\Arr;
@@ -443,7 +443,7 @@ class GroupController extends Controller
             'device_count_status' => $Device->statusCount(),
             'group_device_count_status' => $Device->statusCount($group->idgroups),
             'group_stats' => $groupStats,
-            'emission_ratio' => LcaStats::getEmissionRatioPowered(),
+            'emission_ratio' => FootprintRatioCalculator::calculateRatio(),
             'clusters' => $clusters,
             'mostleast' => $mostleast,
             'top' => $Device->findMostSeen(1, null, $group->idgroups),

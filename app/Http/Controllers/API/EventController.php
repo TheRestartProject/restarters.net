@@ -3,7 +3,7 @@
 namespace App\Http\Controllers\API;
 
 use App\Group;
-use App\Helpers\LcaStats;
+use App\Helpers\FootprintRatioCalculator;
 use App\Http\Controllers\Controller;
 use App\Party;
 use Auth;
@@ -45,7 +45,7 @@ class EventController extends Controller
         }
 
         // Get Emission Ratio
-        $emissionRatio = LcaStats::getEmissionRatioPowered();
+        $emissionRatio = FootprintRatioCalculator::calculateRatio();
 
         $groups_array = collect([]);
         foreach ($groups as $group) {

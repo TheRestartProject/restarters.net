@@ -7,7 +7,7 @@ use DB;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Str;
 use OwenIt\Auditing\Contracts\Auditable;
-use App\Helpers\LcaStats;
+use App\Helpers\FootprintRatioCalculator;
 
 class Device extends Model implements Auditable
 {
@@ -24,6 +24,7 @@ class Device extends Model implements Auditable
 
     use \OwenIt\Auditing\Auditable;
     protected $table = 'devices';
+    public $displacement = 0.5;
     protected $primaryKey = 'iddevices';
     /**
      * The attributes that are mass assignable.
@@ -63,8 +64,8 @@ class Device extends Model implements Auditable
 
     //Getters
 
-    public function getDisplacementFactor() {
-        return LcaStats::getDisplacementFactor();
+    public static function getDisplacementFactor() {
+        return env('DISPLACEMENT_VALUE');
     }
 
     public function getList($params = null)
@@ -113,7 +114,7 @@ class Device extends Model implements Auditable
         return DB::select(DB::raw($sql));
     }
 
-    /** MOVING TO LcaStatsHelper */
+    /** MOVING TO FootprintRatioCalculator::calculateRatio()Helper */
     public function getWeights($group = null)
     {
         $sql =

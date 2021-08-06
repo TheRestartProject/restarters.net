@@ -8,7 +8,6 @@ use Auth;
 use Carbon\Carbon;
 use DB;
 use App\Helpers\Fixometer;
-use App\Helpers\LcaStats;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Support\Str;
@@ -631,12 +630,12 @@ class Party extends Model implements Auditable
         return false;
     }
 
-    /** @ToDo Test */
-    public function getEventStats()
+    public function getEventStats($emissionRatio = NULL)
     {
-        $Device = new Device;
-        $displacementFactor = $Device->getDisplacementFactor();
-        $emissionRatio = LcaStats::getEmissionRatioPowered();
+        $displacementFactor = \App\Device::getDisplacementFactor();
+        if (is_null($emissionRatio)) {
+            $emissionRatio = \App\Helpers\FootprintRatioCalculator::calculateRatio();
+        }
 
         $co2Diverted = 0;
         $ewasteDiverted = 0;
@@ -861,7 +860,7 @@ class Party extends Model implements Auditable
         return $query->whereRaw("CONCAT(`event_date`, ' ', `end`) < '{$now}'");
     }
 
-    /** @ToDo Test */
+
     public function getWastePreventedAttribute()
     {
         return round($this->getEventStats()['ewaste'], 2);

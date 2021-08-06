@@ -4,7 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Device;
 use App\Group;
-use App\Helpers\LcaStats;
+use App\Helpers\FootprintRatioCalculator;
 use App\Party;
 use App\User;
 use Auth;
@@ -51,7 +51,7 @@ class ApiController extends Controller
             ->json($result, 200);
     }
 
-    /** @ToDo Test */
+
     public static function partyStats($partyId)
     {
         $event = Party::where('idevents', $partyId)->first();
@@ -98,9 +98,7 @@ class ApiController extends Controller
 
     public static function getEmissionRatio()
     {
-
-
-        return LcaStats::getEmissionRatioPowered();
+        return FootprintRatioCalculator::calculateRatio();
     }
 
     public static function getEventsByGroupTag($group_tag_id)

@@ -2,7 +2,6 @@
 
 namespace App;
 
-use App\Helpers\LcaStats;
 use App\Network;
 use DB;
 use Illuminate\Database\Eloquent\Collection;
@@ -240,7 +239,7 @@ class Group extends Model implements Auditable
         return rtrim($this->location);
     }
 
-    /** @ToDo Test */
+
     public function canDelete()
     {
         // Groups are deletable unless they have an event with a device.
@@ -261,18 +260,19 @@ class Group extends Model implements Auditable
         return $ret;
     }
 
-    /** @ToDo Test */
+
     public function getGroupStats()
     {
         $allPastEvents = Party::pastEvents()
                         ->where('events.group', $this->idgroups)
                         ->get();
 
-        $groupStats = [];
+        $emissionRatio = \App\Helpers\FootprintRatioCalculator::calculateRatio();
 
+        $groupStats = [];
         // Rollup all events stats into stats for this group.
         foreach ($allPastEvents as $event) {
-            $eventStats = $event->getEventStats();
+            $eventStats = $event->getEventStats($emissionRatio);
 
             foreach ($eventStats as $statKey => $statValue) {
                 if (! array_key_exists($statKey, $groupStats)) {

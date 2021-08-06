@@ -3,7 +3,7 @@
 namespace App\Http\Controllers\API;
 
 use App\Group;
-use App\Helpers\LcaStats;
+use App\Helpers\FootprintRatioCalculator;
 use App\Http\Controllers\Controller;
 use App\Network;
 use Auth;
@@ -18,7 +18,7 @@ class NetworkController extends Controller
         }
 
 
-        $emissionRatio = LcaStats::getEmissionRatioPowered();
+        $emissionRatio = FootprintRatioCalculator::calculateRatio();
 
         return response()->json($network->stats($emissionRatio));
     }

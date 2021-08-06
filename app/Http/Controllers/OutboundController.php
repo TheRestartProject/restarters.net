@@ -4,7 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Device;
 use App\Group;
-use App\Helpers\LcaStats;
+use App\Helpers\FootprintRatioCalculator;
 use App\Party;
 use Request;
 
@@ -45,7 +45,7 @@ class OutboundController extends Controller
                     abort(404);
                 }
 
-                $EmissionRatio = LcaStats::getEmissionRatioPowered();
+                $EmissionRatio = FootprintRatioCalculator::calculateRatio();
 
                 $groupStats = $group->getGroupStats($EmissionRatio);
                 $co2 = $groupStats['co2'];
