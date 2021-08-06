@@ -6,7 +6,6 @@ use App\Audits;
 use App\Brands;
 use App\Category;
 use App\Device;
-use App\DeviceBarrier;
 use App\EventsUsers;
 use App\Group;
 use App\GroupNetwork;
@@ -44,7 +43,6 @@ abstract class TestCase extends BaseTestCase
         EventsUsers::truncate();
         Party::truncate();
         UserGroups::truncate();
-        DeviceBarrier::truncate();
         Device::truncate();
         GroupNetwork::truncate();
         Category::truncate();
@@ -66,19 +64,13 @@ abstract class TestCase extends BaseTestCase
 
         // We don't yet have a Discourse test environment.
         config(['restarters.features.discourse_integration' => false]);
-        // powered categories
+
         factory(Category::class, 1)->states('Cat1')->create();
         factory(Category::class, 1)->states('Cat2')->create();
         factory(Category::class, 1)->states('Cat3')->create();
         factory(Category::class, 1)->states('Mobile')->create();
         factory(Category::class, 1)->states('Misc')->create();
         factory(Category::class, 1)->states('Desktop computer')->create();
-        // unpowered categories
-        factory(Category::class, 1)->states('MiscU')->create();
-        factory(Category::class, 1)->states('Cat4')->create();
-        factory(Category::class, 1)->states('Cat5')->create();
-        factory(Category::class, 1)->states('Cat6')->create();
-
     }
 
     public function userAttributes()
