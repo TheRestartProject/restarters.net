@@ -4,6 +4,7 @@ namespace OwenIt\Auditing;
 
 use Illuminate\Database\Eloquent\Relations\MorphMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\App;
 use Illuminate\Support\Facades\Config;
 use OwenIt\Auditing\Contracts\AttributeEncoder;
@@ -45,7 +46,7 @@ trait Auditable
      */
     public static function bootAuditable()
     {
-        if (static::isAuditingEnabled()) {
+        if (!self::$auditingDisabled && static::isAuditingEnabled()) {
             static::observe(new AuditableObserver());
         }
     }
@@ -93,7 +94,7 @@ trait Auditable
         }
 
         // Valid attributes are all those that made it out of the exclusion array
-        $attributes = array_except($this->attributes, $this->excludedAttributes);
+        $attributes = Arr::except($this->attributes, $this->excludedAttributes);
 
         foreach ($attributes as $attribute => $value) {
             // Apart from null, non scalar values will be excluded
@@ -152,8 +153,8 @@ trait Auditable
 
         foreach ($this->getDirty() as $attribute => $value) {
             if ($this->isAttributeAuditable($attribute)) {
-                $old[$attribute] = array_get($this->original, $attribute);
-                $new[$attribute] = array_get($this->attributes, $attribute);
+                $old[$attribute] = Arr::get($this->original, $attribute);
+                $new[$attribute] = Arr::get($this->attributes, $attribute);
             }
         }
 
@@ -283,8 +284,8 @@ trait Auditable
             'event'              => $this->auditEvent,
             'auditable_id'       => $this->getKey(),
             'auditable_type'     => $this->getMorphClass(),
-            $morphPrefix.'_id'   => $user ? $user->getAuthIdentifier() : null,
-            $morphPrefix.'_type' => $user ? $user->getMorphClass() : null,
+            $morphPrefix . '_id'   => $user ? $user->getAuthIdentifier() : null,
+            $morphPrefix . '_type' => $user ? $user->getMorphClass() : null,
             'url'                => $this->resolveUrl(),
             'ip_address'         => $this->resolveIpAddress(),
             'user_agent'         => $this->resolveUserAgent(),
@@ -487,7 +488,7 @@ trait Auditable
             return Config::get('audit.console', false);
         }
 
-        return true;
+        return Config::get('audit.enabled', true);
     }
 
     /**
