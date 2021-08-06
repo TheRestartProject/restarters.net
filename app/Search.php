@@ -76,13 +76,12 @@ class Search extends Model
 
     public function findMostSeen($parties, $status = 1, $cluster = null)
     {
-        $m1 = env('MISC_CATEGORY_ID_POWERED');
-        $m0 = env('MISC_CATEGORY_ID_UNPOWERED');
+        $m1 = env('MISC_CATEGORY_ID');
         $parties = implode(', ', $parties);
         $sql = "SELECT COUNT(`d`.`category`) AS `counter`, `c`.`name` FROM `devices` AS `d`
                 INNER JOIN `events` AS `e` ON `d`.`event` = `e`.`idevents`
                 INNER JOIN `categories` AS `c` ON `d`.`category` = `c`.`idcategories`
-                WHERE 1=1 and `c`.`idcategories` NOT IN ($m1,$m0)
+                WHERE 1=1 and `c`.`idcategories` NOT IN ($m1)
                 AND `d`.`event` IN ($parties)";
         if (! is_null($status) && is_numeric($status)) {
             $sql .= " AND `d`.`repair_status` = :status ";

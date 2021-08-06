@@ -18,20 +18,16 @@ class FootprintRatioCalculator
 {
     public function calculateRatio()
     {
-        $mp = env('MISC_CATEGORY_ID_POWERED');
-        $mu = env('MISC_CATEGORY_ID_UNPOWERED');
-        $rs = env('DEVICE_FIXED');
-        $result = DB::select(DB::raw("
+        // TODO: parameterise repair_status value and id for misc category using env values.
+        $result = DB::select(DB::raw('
 select @ratio as `emission_ratio`
 from
 (select @ratio := sum(`categories`.`footprint`) / sum(`categories`.`weight` + 0.0)
 from `devices`, `categories`
-where `categories`.`idcategories` = `devices`.`category`
-and `devices`.`repair_status` = $rs
-and `categories`.`idcategories` NOT IN ($mp,$mu)
-) inner_tbl"));
+where
+ `categories`.`idcategories` = `devices`.`category` and `devices`.`repair_status` = 1 and categories.idcategories != 46
+) inner_tbl'));
 
         return $result[0]->emission_ratio;
     }
-
 }

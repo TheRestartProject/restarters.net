@@ -291,7 +291,7 @@ AND devices.event = events.idevents ';
                     ON `d`.`event` = `e`.`idevents`
                 INNER JOIN `categories` AS `c`
                     ON `d`.`category` = `c`.`idcategories`
-                WHERE 1=1 and `c`.`powered` = 1 AND `c`.`idcategories` <> '.env('MISC_CATEGORY_ID_POWERED');
+                WHERE 1=1 and `c`.`powered` = 1 AND `c`.`idcategories` <> '.env('MISC_CATEGORY_ID');
 
         if (! is_null($status) && is_numeric($status)) {
             $sql .= ' AND `d`.`repair_status` = :status ';
@@ -444,7 +444,7 @@ AND devices.event = events.idevents ';
         $footprint = 0;
 
         if ($this->isFixed()) {
-            if ($this->deviceCategory->isMiscPowered()) {
+            if ($this->deviceCategory->isMisc()) {
                 if (is_numeric($this->estimate)) {
                     $footprint = $this->estimate * $emissionRatio;
                 }
@@ -461,7 +461,7 @@ AND devices.event = events.idevents ';
         $ewasteDiverted = 0;
 
         if ($this->isFixed()) {
-            if ($this->deviceCategory->isMiscPowered()) {
+            if ($this->deviceCategory->isMisc()) {
                 if (is_numeric($this->estimate)) {
                     $ewasteDiverted = $this->estimate;
                 }

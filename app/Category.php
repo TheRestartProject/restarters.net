@@ -62,13 +62,8 @@ class Category extends Model
         }
     }
 
-    public function isMiscPowered()
+    public function isMisc()
     {
-        return $this->idcategories == Fixometer::getMiscIdPowered();
-    }
-
-    public function isMiscUnpowered()
-    {
-        return $this->idcategories == Fixometer::getMiscIdUnpowered();
+        return $this->idcategories == 46;
     }
 }
