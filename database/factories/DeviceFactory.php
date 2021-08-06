@@ -15,8 +15,9 @@ $factory->define(App\Device::class, function (Faker $faker, $attributes) {
 
 $factory->state(App\Device::class, 'misc', function (Faker $faker) {
     return [
-        'category' => env('MISC_CATEGORY_ID_POWERED'),
-        'category_creation' => env('MISC_CATEGORY_ID_POWERED'),
+        'category' => 46,
+        'category_creation' => 46,
+        'problem' => '',
     ];
 });
 
@@ -55,18 +56,10 @@ $factory->state(App\Device::class, 'end', function (Faker $faker) {
     ];
 });
 
-$factory->state(App\Device::class, 'unknown', function (Faker $faker) {
-    return [
-        'category' => 111,
-        'category_creation' => 111,
-        'repair_status' => 0,
-    ];
-});
-
 $factory->state(App\Device::class, 'misccat', function (Faker $faker) {
     return [
-        'category' => env('MISC_CATEGORY_ID_POWERED'),
-        'category_creation' => env('MISC_CATEGORY_ID_POWERED'),
-        'problem' => $faker->sentence(6, TRUE)
+        'category' => 46,
+        'category_creation' => 46,
+        'problem' => $faker->sentence(6, true),
     ];
 });
