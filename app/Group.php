@@ -261,8 +261,12 @@ class Group extends Model implements Auditable
     }
 
 
-    public function getGroupStats()
+    public function getGroupStats($emissionRatio = NULL)
     {
+        if (is_null($emissionRatio)) {
+            $emissionRatio = \App\Helpers\FootprintRatioCalculator::calculateRatio();
+        }
+
         $allPastEvents = Party::pastEvents()
                         ->where('events.group', $this->idgroups)
                         ->get();

@@ -3,7 +3,6 @@
 namespace App\Http\Controllers\API;
 
 use App\Group;
-use App\Helpers\FootprintRatioCalculator;
 use App\Http\Controllers\Controller;
 use Auth;
 use Illuminate\Http\Request;
@@ -61,9 +60,6 @@ class GroupController extends Controller
     {
         $authenticatedUser = Auth::user();
 
-
-        $emissionRatio = FootprintRatioCalculator::calculateRatio();
-
         $groups = [];
 
         foreach ($authenticatedUser->networks as $network) {
@@ -76,7 +72,7 @@ class GroupController extends Controller
         $collection = collect([]);
 
         foreach ($groups as $group) {
-            $groupStats = $group->getGroupStats($emissionRatio);
+            $groupStats = $group->getGroupStats();
             $collection->push([
                 'id' => $group->idgroups,
                 'name' => $group->name,

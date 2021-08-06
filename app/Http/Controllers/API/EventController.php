@@ -45,11 +45,11 @@ class EventController extends Controller
         }
 
         // Get Emission Ratio
-        $emissionRatio = FootprintRatioCalculator::calculateRatio();
+        // $emissionRatio = FootprintRatioCalculator::calculateRatio();
 
         $groups_array = collect([]);
         foreach ($groups as $group) {
-            $groupStats = $group->getGroupStats($emissionRatio);
+            $groupStats = $group->getGroupStats();
             $groups_array->push([
                'id' => $group->idgroups,
                'name' => $group->name,
