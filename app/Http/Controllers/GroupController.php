@@ -25,7 +25,6 @@ use Auth;
 use DB;
 use FixometerFile;
 use App\Helpers\Fixometer;
-use App\Helpers\FootprintRatioCalculator;
 use Illuminate\Database\QueryException;
 use Illuminate\Http\Request;
 use Illuminate\Support\Arr;
@@ -427,6 +426,25 @@ class GroupController extends Controller
 
         $groupStats = $group->getGroupStats();
 
+        $expanded_events = [];
+
+        foreach (array_merge($upcoming_events->all(), $past_events->all()) as $event) {
+            $thisone = $event->getAttributes();
+            $thisone['attending'] = Auth::user() && $event->isBeingAttendedBy(Auth::user()->id);
+            $thisone['allinvitedcount'] = $event->allInvited->count();
+
+            // TODO LATER Consider whether these stats should be in the event or passed into the store.
+            $thisone['stats'] = $event->getEventStats();
+            $thisone['participants_count'] = $event->participants;
+            $thisone['volunteers_count'] = $event->allConfirmedVolunteers->count();
+
+            $thisone['isVolunteer'] = $event->isVolunteer();
+            $thisone['requiresModeration'] = $event->requiresModerationByAdmin();
+            $thisone['canModerate'] = Auth::user() && (\App\Helpers\Fixometer::hasRole(Auth::user(), 'Administrator') || \App\Helpers\Fixometer::hasRole(Auth::user(), 'NetworkCoordinator'));
+
+            $expanded_events[] = $thisone;
+        }
+
         return view('group.view', [ //host.index
             'title' => 'Host Dashboard',
             'has_pending_invite' => $hasPendingInvite,
@@ -443,7 +461,7 @@ class GroupController extends Controller
             'device_count_status' => $Device->statusCount(),
             'group_device_count_status' => $Device->statusCount($group->idgroups),
             'group_stats' => $groupStats,
-            'emission_ratio' => FootprintRatioCalculator::calculateRatio(),
+            'expanded_events' => $expanded_events,
             'clusters' => $clusters,
             'mostleast' => $mostleast,
             'top' => $Device->findMostSeen(1, null, $group->idgroups),
