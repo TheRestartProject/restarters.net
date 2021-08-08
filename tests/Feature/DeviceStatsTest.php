@@ -93,7 +93,7 @@ class DeviceStatsTest extends TestCase
         $this->assertEquals($expect, $result);
 
         $result = $device->unpoweredWasteDiverted();
-        $expect = 4; // !! ERROR: SHOULD BE 0 !!
+        $expect = 0;
         $this->assertEquals($expect, $result);
 
         $emissionRatio = $Calculator->calculateRatio();
@@ -137,7 +137,7 @@ class DeviceStatsTest extends TestCase
         $this->assertEquals($expect, $result);
 
         $result = $device->unpoweredWasteDiverted();
-        $expect = 0;
+        $expect = 0; // category 5 has no weight
         $this->assertEquals($expect, $result);
 
         $emissionRatio = $Calculator->calculateRatio();
@@ -205,7 +205,7 @@ class DeviceStatsTest extends TestCase
         $this->assertEquals($expect, $result);
 
         $result = $device->unpoweredWasteDiverted();
-        $expect = 1.6; // !! ERROR: SHOULD BE 0 !!
+        $expect = 0;
         $this->assertEquals($expect, $result);
 
         $emissionRatio = $Calculator->calculateRatio();
