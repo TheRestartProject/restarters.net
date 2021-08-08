@@ -15,7 +15,7 @@ class CalculateStats extends Command
      *
      * @var string
      */
-    protected $signature = 'calcstats:event {--eventid=0} {--eventdate=} {--lcaversion=} {--ratios=}';
+    protected $signature = 'calcstats:event {--eventid=0} {--eventdate=} {--lcaversion=} {--ratios}';
 
     /**
      * The console command description.
@@ -27,7 +27,7 @@ class CalculateStats extends Command
         {--eventid=0 : event ID | 0 for ALL by eventdate}
         {--eventdate= : yyyy-mm-dd ~ if eventid=0 then events up to and including this date, ignored if eventid>0}
         {--lcaversion= : LCA version no.}
-        {--ratios= : ignore other options, just print historic emission ratios}
+        {--ratios : ignore other options, just print historic emission ratios}
 
         * EXPERIMENTAL!
         * Inserts only, like an audit table.
@@ -78,7 +78,7 @@ class CalculateStats extends Command
             if ($idevents > 0) {
                 $Party = new Party;
                 $event = $Party->findOrFail($idevents);
-                $stats = $this->_compile($event, $version);
+                $stats = $this->_compile($event, $version, $this->_emissionRatio);
                 if ($stats['fixed_devices'] > 0) {
                     $this->_toFile([$stats], $version, $idevents);
                 } else {
@@ -89,14 +89,49 @@ class CalculateStats extends Command
                     $eventdate = date('Y-m-d', time());
                 }
                 $parties = Party::where([['events.event_date', '<=', $eventdate], ['events.event_date', '>', '2000-01-01']])->get();
+                $result = [];
                 foreach ($parties as $event) {
-                    $istats = $this->_compile($event, $version);
-                    if ($istats['fixed_devices'] > 0) {
-                        $stats[] = $istats;
+                    $device = Device::select('created_at')
+                        ->where('event', $event->idevents)
+                        ->orderBy('created_at', 'desc')
+                        ->limit(1)
+                        ->first();
+                    if ($device->created_at) {
+                        $statsNow = $event->getEventStats($this->_emissionRatio);
+                        if ($statsNow['fixed_devices'] > 0) {
+                            $stats = [
+                                'version' => $version,
+                                'idevents' => $event->idevents,
+                                'idgroups' => $event->group,
+                                'event_date' => $event->event_date,
+                                'displacement' => $this->_displacement,
+                                'fixed_powered' => $statsNow['fixed_powered'],
+                                'fixed_unpowered' => $statsNow['fixed_unpowered'],
+                                'ratio_now' => $this->_emissionRatio,
+                                'ratio_now_date' => date('Y-m-d'),
+                                'co2_now' => $statsNow['co2'],
+                                'ewaste_now' => $statsNow['ewaste'],
+                                'unpowered_waste_now' => $statsNow['unpowered_waste'],
+                            ];
+
+                            $emission_ratio = $this->_calculateRatio(substr($device->created_at, 0, 10));
+                            $statsThen = $event->getEventStats($emission_ratio);
+                            $stats += [
+                                'ratio_then' => $emission_ratio,
+                                'ratio_then_date' => substr($device->created_at, 0, 10),
+                                'co2_then' => $statsThen['co2'],
+                                'ewaste_then' => $statsThen['ewaste'],
+                                'unpowered_waste_then' => $statsThen['unpowered_waste'],
+                                'stats_compiled' => date('Y-m-d'),
+                            ];
+                            $result[] = $stats;
+                            if ($statsNow['co2'] !== $statsThen['co2']) {
+                                logger(print_r($stats, 1));
+                            }
+                        }
                     }
                 }
-                // $this->_toDbTable($stats);
-                $this->_toFile($stats, $version, $idevents, $eventdate);
+                $this->_toFile($result, $version, $idevents, $eventdate);
             }
         } catch (\Exception $e) {
             print_r("\n\tERROR: " . $e->getMessage() . "\n\n");
@@ -109,7 +144,7 @@ class CalculateStats extends Command
      *
      * @return array $eventStats
      */
-    private function _compile($event, $version)
+    private function _compile($event, $version, $emission_ratio)
     {
         try {
             $eventStats = [
@@ -117,12 +152,12 @@ class CalculateStats extends Command
                 'idgroups' => $event->group,
                 'event_date' => $event->event_date,
                 'version' => $version,
-                'ratio' => $this->_emissionRatio,
+                'ratio' => $emission_ratio,
                 'displacement' => $this->_displacement,
                 'created_at' => date('Y-m-d H:i:s'),
                 'updated_at' => date('Y-m-d H:i:s'),
             ];
-            $stats = $event->getEventStats($this->_emissionRatio);
+            $stats = $event->getEventStats($emission_ratio);
             // 'participants' often returns NULL
             foreach ($stats as $k => $v) {
                 if (is_null($v)) {
@@ -156,16 +191,28 @@ ORDER BY e.`event_date` ASC
      */
     private function _historicRatios()
     {
-        $parties = Party::select('events.event_date')->where([['events.event_date', '>', '2013-06-08']])->distinct()->orderBy('events.event_date', 'asc')->get();
+        $parties = Party::select('idevents', 'event_date')
+            ->where('event_date', '>', '2013-06-08')
+            ->distinct()->orderBy('event_date', 'asc')
+            ->get();
         foreach ($parties as $k => $event) {
-            $ratios[$k]['event_date'] = $event->event_date;
-            $ratios[$k]['emission_ratio'] = $this->_calculateRatio($event->event_date);
+            $device = Device::select('created_at')
+                ->where('event', $event->idevents)
+                ->orderBy('created_at', 'desc')
+                ->limit(1)
+                ->first();
+            if ($device->created_at) {
+                $ratios[$k]['idevents'] = $event->idevents;
+                $ratios[$k]['event_date'] = $event->event_date;
+                $ratios[$k]['devices_date'] = substr($device->created_at, 0, 10);
+                $ratios[$k]['emission_ratio'] = $this->_calculateRatio(substr($device->created_at, 0, 10));
+            }
         }
         $file = storage_path() . "/logs/stats_emission_ratio_history.csv";
         file_put_contents($file, $this->_strPutCsv($ratios));
     }
 
-    private function _calculateRatio($event_date)
+    private function _calculateRatio($date)
     {
         $result = DB::select(DB::raw("
 SELECT sum(`c`.`footprint`) / sum(`c`.`weight` + 0.0) AS ratio
@@ -173,7 +220,7 @@ FROM `devices` d
 JOIN `categories` c ON  `c`.`idcategories` = `d`.`category`
 JOIN `events` e ON  `e`.`idevents` = `d`.`event`
 WHERE `d`.`repair_status` = 1
-AND `e`.`event_date` <= '$event_date'
+AND `d`.`created_at` <= '$date'
 AND `c`.`idcategories` != 46
 "));
         return $result[0]->ratio;
