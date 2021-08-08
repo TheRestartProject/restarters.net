@@ -114,7 +114,6 @@ class Device extends Model implements Auditable
         return DB::select(DB::raw($sql));
     }
 
-    /** MOVING TO FootprintRatioCalculator::calculateRatio()Helper */
     public function getWeights($group = null)
     {
         $sql =
@@ -135,10 +134,9 @@ FROM devices, categories, events,
 WHERE devices.category = categories.idcategories and devices.repair_status = 1
 AND devices.event = events.idevents ';
 
-        $displacement = $this->getDisplacementFactor();
         // Using two named parameters for displacement due to restriction of Laravel/MySQL.
         // see e.g.: https://github.com/laravel/framework/issues/12715
-        $params = ['displacement' => $displacement, 'displacement1' => $displacement];
+        $params = ['displacement' => $this->displacement, 'displacement1' => $this->displacement];
 
         if (! is_null($group) && is_numeric($group)) {
             $sql .= ' AND events.group = :group ';
@@ -148,19 +146,6 @@ AND devices.event = events.idevents ';
         }
 
         return DB::select(DB::raw($sql), $params);
-    }
-
-    /** REDUNDANT */
-    public function getByYears($repair_status)
-    {
-        return DB::select(DB::raw('SELECT
-                    COUNT(`iddevices`) AS `total_devices`,
-                    YEAR(`event_date`) AS `event_year`
-                FROM `'.$this->table.'` AS `d`
-                INNER JOIN `events` AS `e` ON `e`.`idevents` = `d`.`event`
-                WHERE `d`.`repair_status` = :rp
-                GROUP BY `event_year`
-                ORDER BY `event_year` ASC'), ['rp' => $repair_status]);
     }
 
     public function ofThisUser($id)
