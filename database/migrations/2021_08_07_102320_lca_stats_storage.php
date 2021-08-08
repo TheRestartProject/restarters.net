@@ -16,6 +16,8 @@ class LcaStatsStorage extends Migration
         Schema::create('stats_events', function (Blueprint $table) {
             $table->increments('id');
             $table->unsignedInteger('idevents')->index('idevents');
+            $table->unsignedInteger('idgroups')->index('idgroups');
+            $table->date('event_date')->index('event_date');
             $table->unsignedInteger('version')->index('version');
             $table->float('displacement', 4, 2);
             $table->float('ratio', 24, 16);
