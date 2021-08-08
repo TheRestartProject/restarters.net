@@ -4,6 +4,7 @@ namespace App\Console\Commands;
 
 use Illuminate\Console\Command;
 use App\Helpers\FootprintRatioCalculator;
+use Carbon\Carbon;
 use App\Party;
 use App\Device;
 use DB;
@@ -85,8 +86,9 @@ class CalculateStats extends Command
                     print_r("\n\tNO STATS FOR EVENT: " . $idevents . "\n\n");
                 }
             } else {
+                $now = Carbon::now()->toDateString();
                 if (!$eventdate or !preg_match('/20[0-9]{2}-[0-1][0-9]-[0-3][0-9]/', $eventdate)) {
-                    $eventdate = date('Y-m-d', time());
+                    $eventdate = $now;
                 }
                 $parties = Party::where([['events.event_date', '<=', $eventdate], ['events.event_date', '>', '2000-01-01']])->get();
                 $result = [];
@@ -108,26 +110,26 @@ class CalculateStats extends Command
                                 'fixed_powered' => $statsNow['fixed_powered'],
                                 'fixed_unpowered' => $statsNow['fixed_unpowered'],
                                 'ratio_now' => $this->_emissionRatio,
-                                'ratio_now_date' => date('Y-m-d'),
+                                'ratio_now_date' => $now,
                                 'co2_now' => $statsNow['co2'],
                                 'ewaste_now' => $statsNow['ewaste'],
                                 'unpowered_waste_now' => $statsNow['unpowered_waste'],
                             ];
-
-                            $emission_ratio = $this->_calculateRatio(substr($device->created_at, 0, 10));
+                            $created_at = date('Y-m-d', strtotime($device->created_at));
+                            $emission_ratio = $this->_calculateRatio($created_at);
                             $statsThen = $event->getEventStats($emission_ratio);
                             $stats += [
                                 'ratio_then' => $emission_ratio,
-                                'ratio_then_date' => substr($device->created_at, 0, 10),
+                                'ratio_then_date' => $created_at,
                                 'co2_then' => $statsThen['co2'],
                                 'ewaste_then' => $statsThen['ewaste'],
                                 'unpowered_waste_then' => $statsThen['unpowered_waste'],
-                                'stats_compiled' => date('Y-m-d'),
+                                'stats_compiled' => $now,
                             ];
                             $result[] = $stats;
-                            if ($statsNow['co2'] !== $statsThen['co2']) {
-                                logger(print_r($stats, 1));
-                            }
+                            // if ($statsNow['co2'] !== $statsThen['co2']) {
+                                // logger(print_r($stats, 1));
+                            // }
                         }
                     }
                 }
@@ -202,10 +204,11 @@ ORDER BY e.`event_date` ASC
                 ->limit(1)
                 ->first();
             if ($device->created_at) {
+                $created_at = date('Y-m-d', strtotime($device->created_at));
                 $ratios[$k]['idevents'] = $event->idevents;
                 $ratios[$k]['event_date'] = $event->event_date;
-                $ratios[$k]['devices_date'] = substr($device->created_at, 0, 10);
-                $ratios[$k]['emission_ratio'] = $this->_calculateRatio(substr($device->created_at, 0, 10));
+                $ratios[$k]['devices_date'] = $created_at;
+                $ratios[$k]['emission_ratio'] = $this->_calculateRatio($created_at);
             }
         }
         $file = storage_path() . "/logs/stats_emission_ratio_history.csv";
