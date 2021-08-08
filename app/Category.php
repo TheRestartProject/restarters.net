@@ -66,4 +66,24 @@ class Category extends Model
     {
         return $this->idcategories == 46;
     }
+
+    public function isMiscPowered()
+    {
+        return $this->idcategories == 46;
+    }
+
+    public function isMiscUnpowered()
+    {
+        return $this->idcategories == 50;
+    }
+
+    public function isPowered()
+    {
+        return $this->powered == 1;
+    }
+
+    public function isUnpowered()
+    {
+        return $this->powered == 0;
+    }
 }
