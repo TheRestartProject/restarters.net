@@ -42,7 +42,7 @@ export default {
           htmlEditButton: {},
           clipboard: {
             allowed: {
-              tags: ['a', 'b', 'strong', 'u', 's', 'i', 'p', 'br', 'ul', 'ol', 'li', 'span', 'h4'],
+              tags: ['a', 'b', 'strong', 'u', 's', 'i', 'p', 'br', 'ul', 'ol', 'li', 'span', 'h4', 'h5', 'h6'],
               attributes: ['href', 'rel', 'target', 'class']
             },
             keepSelection: true,
@@ -52,10 +52,12 @@ export default {
           toolbar: [
             ['bold', 'italic', 'underline'],
             [{ 'list': 'ordered'}, { 'list': 'bullet' }],
-            [{ 'indent': '-1'}, { 'indent': '+1' }],
-            [{ 'align': [] }],
             ['link'],
-            [{ 'header': '4' }],
+            [
+              { 'header': '4' },
+              { 'header': '5' },
+              { 'header': '6' }
+            ],
           ]
         }
       }
@@ -83,8 +85,16 @@ export default {
   height: 300px !important;
 }
 
-/deep/ .ql-header::before {
+/deep/ .ql-header[value="4"]::before {
   content: 'H4'
+}
+
+/deep/ .ql-header[value="5"]::before {
+  content: 'H5'
+}
+
+/deep/ .ql-header[value="6"]::before {
+  content: 'H6'
 }
 
 /deep/ .ql-header {
