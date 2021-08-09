@@ -138,11 +138,12 @@ class DiscourseService
                 $users = $discourseResult->members;
 
                 if ($users && count($users)) {
+                    error_log("Got " . count($users) . " from $endpoint, currently " . count($allUsers));
                     foreach ($users as $user) {
 
                         $endpoint = "/admin/users/{$user->id}.json";
-                        $response = $client->request('GET', $endpoint);
                         do {
+                            $response = $client->request('GET', $endpoint);
                             $discourseResult = json_decode($response->getBody());
                             $limited = property_exists($discourseResult, 'error_type') && $discourseResult->error_type == 'rate_limit';
                             if ($limited) {

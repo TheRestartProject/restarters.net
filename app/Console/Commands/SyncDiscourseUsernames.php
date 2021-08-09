@@ -67,10 +67,9 @@ class SyncDiscourseUsernames extends Command
         $discourseUserCount = count($usersFromDiscourse);
 
         foreach ($usersFromDiscourse as $discourseUser) {
-            error_log("Look at " . var_export($discourseUser, TRUE));
             if (property_exists($discourseUser, 'email')) {
-                error_log("Find uer {$discourseUser->email}");
-                $user = User::where('email', $discourseUser->email)->first();
+                error_log("Find user {$discourseUser->external_email}");
+                $user = User::where('email', $discourseUser->external_email)->first();
 
                 if (! is_null($user)) {
                     $usersFoundInRestarters++;
