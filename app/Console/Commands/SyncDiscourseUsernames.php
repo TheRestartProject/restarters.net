@@ -69,7 +69,7 @@ class SyncDiscourseUsernames extends Command
         foreach ($usersFromDiscourse as $discourseUser) {
             if (property_exists($discourseUser, 'single_sign_on_record') &&
                 property_exists($discourseUser->single_sign_on_record, 'external_email')) {
-                error_log("Find user {$discourseUser->single_sign_on_record->external_email}");
+                $this->info("Find user {$discourseUser->single_sign_on_record->external_email}");
                 $user = User::where('email', $discourseUser->single_sign_on_record->external_email)->first();
 
                 if (! is_null($user)) {
@@ -94,7 +94,6 @@ class SyncDiscourseUsernames extends Command
 
         $this->info('');
         $this->info('Users found in Discourse: '.$discourseUserCount);
-        error_log("Found in Discourse $discourseUserCount, $updatedUsers");
         $this->info('Found user count: '.$usersFoundInRestarters);
         $this->info('Updated users: '.$updatedUsers);
     }

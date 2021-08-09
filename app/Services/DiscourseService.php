@@ -142,6 +142,7 @@ class DiscourseService
 
                 if (!$limited) {
                     $users = $discourseResult->members;
+                    $this->info('...process ' . count($users));
 
                     if ($users && count($users)) {
                         foreach ($users as $user) {
@@ -155,12 +156,15 @@ class DiscourseService
                                     sleep(1);
                                 } else {
                                     $allUsers[] = $discourseResult;
+                                    $this->info('...got ' . count($allUsers) . " so far");
                                 }
                             } while ($limited);
                         }
                     }
 
                     $offset += 50;
+                } else {
+                    $this->info('...rate limited, sleep');
                 }
             } while ($limited || count($users));
         } catch (\Exception $ex) {
