@@ -115,4 +115,46 @@ class DiscourseService
             Log::error("Could not add to private message ($threadid, $addBy, $addUser:".$response->getReasonPhrase());
         }
     }
+
+    public function getAllUsers() {
+        // As per https://meta.discourse.org/t/how-do-i-get-a-list-of-all-users-from-the-api/24261/9 we can
+        // clunkily get a list of all users by looking for the trust_level_0 group, then fetch each
+        // one to get the email.
+        $allUsers = [];
+
+        try {
+            $client = app('discourse-client');
+
+            $offset = 0;
+            do {
+                $endpoint = "groups/trust_level_0/members.json?limit=50&offset=$offset";
+                $response = $client->request('GET', $endpoint);
+                if ($response->getStatusCode() == 404) {
+                    Log::error("{$endpoint} not found");
+                    throw new \Exception("{$endpoint} not found");
+                }
+                $discourseResult = json_decode($response->getBody());
+
+                $users = $discourseResult->members;
+
+                if ($users && count($users)) {
+                    foreach ($users as $user) {
+
+                        $endpoint = "/admin/users/{$user->id}.json";
+                        $response = $client->request('GET', $endpoint);
+                        $discourseResult = json_decode($response->getBody());
+                        $allUsers[] = $discourseResult;
+                        error_log("Got so far " . count($allUsers));
+                    }
+                }
+
+                $offset += 50;
+            } while (count($users));
+        } catch (\Exception $ex) {
+            Log::error('Error retrieving all users: '.$ex->getMessage());
+        }
+
+        error_log("Returning " . var_export($allUsers, TRUE));
+        return $allUsers;
+    }
 }
