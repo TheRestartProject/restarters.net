@@ -156,7 +156,7 @@ class DiscourseService
                                     sleep(1);
                                 } else {
                                     $allUsers[] = $discourseResult;
-                                    $this->info('...got ' . count($allUsers) . " so far");
+                                    Log::info('...got ' . count($allUsers) . " so far");
                                 }
                             } while ($limited);
                         }
