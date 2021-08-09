@@ -142,7 +142,7 @@ class DiscourseService
 
                 if (!$limited) {
                     $users = $discourseResult->members;
-                    $this->info('...process ' . count($users));
+                    Log::info('...process ' . count($users));
 
                     if ($users && count($users)) {
                         foreach ($users as $user) {
@@ -164,7 +164,7 @@ class DiscourseService
 
                     $offset += 50;
                 } else {
-                    $this->info('...rate limited, sleep');
+                    Log::info('...rate limited, sleep');
                 }
             } while ($limited || count($users));
         } catch (\Exception $ex) {
