@@ -67,8 +67,9 @@ class SyncDiscourseUsernames extends Command
         $discourseUserCount = count($usersFromDiscourse);
 
         foreach ($usersFromDiscourse as $discourseUser) {
-            if (property_exists($discourseUser, 'email')) {
-                error_log("Find user {$discourseUser->external_email}");
+            if (property_exists($discourseUser, 'single_sign_on_record') &&
+                property_exists($discourseUser->single_sign_on_record, 'external_email')) {
+                error_log("Find user {$discourseUser->single_sign_on_record->external_email}");
                 $user = User::where('email', $discourseUser->external_email)->first();
 
                 if (! is_null($user)) {
