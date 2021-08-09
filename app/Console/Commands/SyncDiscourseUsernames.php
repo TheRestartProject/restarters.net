@@ -60,7 +60,6 @@ class SyncDiscourseUsernames extends Command
      */
     public function handle()
     {
-        $discourseUserCount = 0;
         $usersFoundInRestarters = 0;
         $updatedUsers = 0;
 

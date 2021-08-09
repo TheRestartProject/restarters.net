@@ -142,9 +142,11 @@ class DiscourseService
 
                         $endpoint = "/admin/users/{$user->id}.json";
                         $response = $client->request('GET', $endpoint);
-                        $discourseResult = json_decode($response->getBody());
+                        do {
+                            $discourseResult = json_decode($response->getBody());
+                        } while (property_exists($discourseResult, 'error_type') && $discourseResult->error_type == 'rate_limit');
+
                         $allUsers[] = $discourseResult;
-                        error_log("Got so far " . count($allUsers));
                     }
                 }
 
@@ -154,7 +156,6 @@ class DiscourseService
             Log::error('Error retrieving all users: '.$ex->getMessage());
         }
 
-        error_log("Returning " . var_export($allUsers, TRUE));
         return $allUsers;
     }
 }
