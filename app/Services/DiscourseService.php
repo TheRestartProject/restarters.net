@@ -144,7 +144,12 @@ class DiscourseService
                         $response = $client->request('GET', $endpoint);
                         do {
                             $discourseResult = json_decode($response->getBody());
-                        } while (property_exists($discourseResult, 'error_type') && $discourseResult->error_type == 'rate_limit');
+                            $limited = property_exists($discourseResult, 'error_type') && $discourseResult->error_type == 'rate_limit';
+                            if ($limited) {
+                                error_log("Limited, sleep");
+                                sleep(1);
+                            }
+                        } while ($limited);
 
                         $allUsers[] = $discourseResult;
                     }
