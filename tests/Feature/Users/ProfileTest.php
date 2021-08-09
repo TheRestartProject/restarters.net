@@ -10,6 +10,7 @@ use Illuminate\Auth\AuthenticationException;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Event;
 use Illuminate\Validation\UnauthorizedException;
+use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Tests\TestCase;
 
 class ProfileTest extends TestCase
@@ -119,5 +120,10 @@ class ProfileTest extends TestCase
         $response = $this->post('/user/edit/'.$user1->id, $editdata);
 
         $response->assertSee('The passwords are not identical!');
+    }
+
+    public function testBadMediaWikiId() {
+        $this->expectException(NotFoundHttpException::class);
+        $this->get('/user/thumbnail?wiki_username=invalid');
     }
 }
