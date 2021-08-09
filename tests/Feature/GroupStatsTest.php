@@ -25,9 +25,14 @@ class GroupStatsTest extends TestCase
             'waste' => 0,
             'ewaste' => 0,
             'unpowered_waste' => 0,
+            'fixed_devices' => 0,
+            'fixed_powered' => 0,
+            'fixed_unpowered' => 0,
             'repairable_devices' => 0,
             'dead_devices' => 0,
             'no_weight' => 0,
+            'devices_powered' => 0,
+            'devices_unpowered' => 0,
         ];
         $this->assertEquals($expectedStats, $group->getGroupStats(0.5));
     }
@@ -47,11 +52,16 @@ class GroupStatsTest extends TestCase
             'parties' => 1,
             'co2' => 0,
             'waste' => 0,
+            'ewaste' => 0,
             'unpowered_waste' => 0,
+            'fixed_devices' => 0,
+            'fixed_powered' => 0,
+            'fixed_unpowered' => 0,
             'repairable_devices' => 0,
             'dead_devices' => 0,
             'no_weight' => 0,
-            'ewaste' => 0,
+            'devices_powered' => 0,
+            'devices_unpowered' => 0,
         ];
         $this->assertEquals($expectedStats, $group->getGroupStats(0.5));
     }
@@ -279,7 +289,7 @@ class GroupStatsTest extends TestCase
             'footprint' => 0,
         ]);
         factory(Category::class)->create([
-            'idcategories' => 7,
+            'idcategories' => 5,
             'revision' => 1,
             'name' => 'unpowered non-misc A',
             'powered' => 0,
@@ -379,7 +389,6 @@ class GroupStatsTest extends TestCase
         $expect['no_weight'] += 1;
         $expect['devices_unpowered'] += 1;
         $result = $device->deviceEvent->theGroup->getGroupStats();
-        logger(print_r($result, 1));
         $this->assertIsArray($result);
         $this->assertEquals(15, count($result));
         foreach ($expect as $k => $v) {
@@ -580,7 +589,7 @@ class GroupStatsTest extends TestCase
         $expect['devices_powered'] += 1;
         $expect['ewaste'] += 1.9;
         $expect['waste'] += 1.9;
-        $expect['co2'] = ((1.9 * $emissionRatio) * $displacementFactor) + (16.6 * $displacementFactor);
+        $expect['co2'] = round(((1.9 * $emissionRatio) * $displacementFactor) + (16.6 * $displacementFactor),2);
         $result = $device->deviceEvent->theGroup->getGroupStats();
         $this->assertIsArray($result);
         $this->assertEquals(15, count($result));
