@@ -262,6 +262,7 @@ class CreateEventTest extends TestCase
         $this->withoutExceptionHandling();
 
         $admin = factory(User::class)->state('Administrator')->create();
+        $admin->addPreference('admin-moderate-event');
         $this->actingAs($admin);
         // arrange
         Notification::fake();
@@ -277,9 +278,12 @@ class CreateEventTest extends TestCase
         // act
         $response = $this->post('/party/create/', $eventData);
 
-        // assert
-        Notification::assertSentTo(
-            [$coordinator], AdminModerationEvent::class
+        // assert that the notification was sent to both the network coordinator, and the admin, and only once.
+        Notification::assertSentToTimes(
+            $coordinator, AdminModerationEvent::class, 1
+        );
+        Notification::assertSentToTimes(
+            $admin, AdminModerationEvent::class, 1
         );
     }
 

@@ -336,7 +336,7 @@ class PartyController extends Controller
                     foreach ($party->associatedNetworkCoordinators() as $coordinator) {
                         $usersToNotify->push($coordinator);
                     }
-                    Notification::send($usersToNotify, new AdminModerationEvent([
+                    Notification::send($usersToNotify->unique(), new AdminModerationEvent([
                         'event_venue' => Party::find($idParty)->venue,
                         'event_url' => url('/party/edit/'.$idParty),
                     ]));
