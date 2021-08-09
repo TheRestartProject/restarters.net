@@ -70,7 +70,7 @@ class SyncDiscourseUsernames extends Command
             if (property_exists($discourseUser, 'single_sign_on_record') &&
                 property_exists($discourseUser->single_sign_on_record, 'external_email')) {
                 error_log("Find user {$discourseUser->single_sign_on_record->external_email}");
-                $user = User::where('email', $discourseUser->external_email)->first();
+                $user = User::where('email', $discourseUser->single_sign_on_record->external_email)->first();
 
                 if (! is_null($user)) {
                     $usersFoundInRestarters++;
