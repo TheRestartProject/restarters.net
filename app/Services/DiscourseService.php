@@ -139,27 +139,30 @@ class DiscourseService
 
                 // We seem to get rate-limited in a way that the 429 retrying doesn't cover, so spot that here.
                 $limited = property_exists($discourseResult, 'error_type') && $discourseResult->error_type == 'rate_limit';
-                $users = $discourseResult->members;
 
-                if ($users && count($users)) {
-                    foreach ($users as $user) {
+                if (!$limited) {
+                    $users = $discourseResult->members;
 
-                        $endpoint = "/admin/users/{$user->id}.json";
-                        do {
-                            $response = $client->request('GET', $endpoint);
-                            $discourseResult = json_decode($response->getBody());
-                            $limited = property_exists($discourseResult, 'error_type') && $discourseResult->error_type == 'rate_limit';
-                            if ($limited) {
-                                sleep(1);
-                            } else {
-                                $allUsers[] = $discourseResult;
-                            }
-                        } while ($limited);
+                    if ($users && count($users)) {
+                        foreach ($users as $user) {
+
+                            $endpoint = "/admin/users/{$user->id}.json";
+                            do {
+                                $response = $client->request('GET', $endpoint);
+                                $discourseResult = json_decode($response->getBody());
+                                $limited = property_exists($discourseResult, 'error_type') && $discourseResult->error_type == 'rate_limit';
+                                if ($limited) {
+                                    sleep(1);
+                                } else {
+                                    $allUsers[] = $discourseResult;
+                                }
+                            } while ($limited);
+                        }
                     }
-                }
 
-                $offset += 50;
-            } while (!$limited || count($users));
+                    $offset += 50;
+                }
+            } while ($limited || count($users));
         } catch (\Exception $ex) {
             Log::error('Error retrieving all users: '.$ex->getMessage());
         }
