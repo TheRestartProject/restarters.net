@@ -120,6 +120,8 @@ class DiscourseService
         // As per https://meta.discourse.org/t/how-do-i-get-a-list-of-all-users-from-the-api/24261/9 we can
         // clunkily get a list of all users by looking for the trust_level_0 group, then fetch each
         // one to get the email.
+        //
+        // This
         $allUsers = [];
 
         try {
@@ -135,6 +137,8 @@ class DiscourseService
                 }
                 $discourseResult = json_decode($response->getBody());
 
+                // We seem to get rate-limited in a way that the 429 retrying doesn't cover, so spot that here.
+                $limited = property_exists($discourseResult, 'error_type') && $discourseResult->error_type == 'rate_limit';
                 $users = $discourseResult->members;
 
                 if ($users && count($users)) {
@@ -147,17 +151,18 @@ class DiscourseService
                             $discourseResult = json_decode($response->getBody());
                             $limited = property_exists($discourseResult, 'error_type') && $discourseResult->error_type == 'rate_limit';
                             if ($limited) {
-                                error_log("Limited, sleep");
                                 sleep(1);
                             }
                         } while ($limited);
 
-                        $allUsers[] = $discourseResult;
+                        if ($discourseResult) {
+                            $allUsers[] = $discourseResult;
+                        }
                     }
                 }
 
                 $offset += 50;
-            } while (count($users));
+            } while (!$limited || count($users));
         } catch (\Exception $ex) {
             Log::error('Error retrieving all users: '.$ex->getMessage());
         }
