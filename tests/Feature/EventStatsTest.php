@@ -110,9 +110,8 @@ class EventStatsTest extends TestCase
         \App\DeviceBarrier::truncate();
         DB::statement("SET foreign_key_checks=1");
 
-        $event = factory(\App\Party::class)->create();
-        $idevents = $event->idevents;
         $Calculator = new \App\Helpers\FootprintRatioCalculator;
+        $idevents = 1;
 
         // #1 add a single powered non-misc device
         $device = factory(Device::class)->states('fixed')->create([
@@ -120,6 +119,7 @@ class EventStatsTest extends TestCase
             'category_creation' => 4,
             'event' => $idevents,
         ]);
+        $this->assertEquals($idevents, $device->deviceEvent->idevents);
         $expect = [
             'co2' => (14.4 * $displacementFactor),
             'ewaste' => 4,
@@ -133,9 +133,7 @@ class EventStatsTest extends TestCase
             'devices_powered' => 1,
             'devices_unpowered' => 0,
         ];
-        $emissionRatio = round($Calculator->calculateRatio(), 2);
-        $result = $event->getEventStats($emissionRatio);
-        logger(print_r($result, 1));
+        $result = $device->deviceEvent->getEventStats();
         $this->assertIsArray($result);
         $this->assertEquals(14, count($result));
         foreach ($expect as $k => $v) {
@@ -148,14 +146,12 @@ class EventStatsTest extends TestCase
             'category_creation' => $id_misc_powered,
             'event' => $idevents,
         ]);
-        $event = $event->findOrFail($idevents);
-        $emissionRatio = round($Calculator->calculateRatio(), 2);
+        $this->assertEquals($idevents, $device->deviceEvent->idevents);
         $expect['fixed_devices'] += 1;
         $expect['fixed_powered'] += 1;
         $expect['no_weight'] += 1;
         $expect['devices_powered'] += 1;
-        $result = $event->getEventStats($emissionRatio);
-        logger(print_r($result, 1));
+        $result = $device->deviceEvent->getEventStats();
         $this->assertIsArray($result);
         $this->assertEquals(14, count($result));
         foreach ($expect as $k => $v) {
@@ -168,14 +164,12 @@ class EventStatsTest extends TestCase
             'category_creation' => 5,
             'event' => $idevents,
         ]);
-        $event = $event->findOrFail($idevents);
-        $emissionRatio = round($Calculator->calculateRatio(), 2);
+        $this->assertEquals($idevents, $device->deviceEvent->idevents);
         $expect['fixed_devices'] += 1;
         $expect['fixed_unpowered'] += 1;
         $expect['no_weight'] += 1;
         $expect['devices_unpowered'] += 1;
-        $result = $event->getEventStats($emissionRatio);
-        logger(print_r($result, 1));
+        $result = $device->deviceEvent->getEventStats();
         $this->assertIsArray($result);
         $this->assertEquals(14, count($result));
         foreach ($expect as $k => $v) {
@@ -188,14 +182,12 @@ class EventStatsTest extends TestCase
             'category_creation' => $id_misc_unpowered,
             'event' => $idevents,
         ]);
-        $event = $event->findOrFail($idevents);
-        $emissionRatio = round($Calculator->calculateRatio(), 2);
+        $this->assertEquals($idevents, $device->deviceEvent->idevents);
         $expect['fixed_devices'] += 1;
         $expect['fixed_unpowered'] += 1;
         $expect['no_weight'] += 1;
         $expect['devices_unpowered'] += 1;
-        $result = $event->getEventStats($emissionRatio);
-        logger(print_r($result, 1));
+        $result = $device->deviceEvent->getEventStats();
         $this->assertIsArray($result);
         $this->assertEquals(14, count($result));
         foreach ($expect as $k => $v) {
@@ -209,14 +201,12 @@ class EventStatsTest extends TestCase
             'event' => $idevents,
             'estimate' => 1.5,
         ]);
-        $event = $event->findOrFail($idevents);
-        $emissionRatio = round($Calculator->calculateRatio(), 2);
+        $this->assertEquals($idevents, $device->deviceEvent->idevents);
         $expect['unpowered_waste'] += 1.5;
         $expect['fixed_devices'] += 1;
         $expect['fixed_unpowered'] += 1;
         $expect['devices_unpowered'] += 1;
-        $result = $event->getEventStats($emissionRatio);
-        logger(print_r($result, 1));
+        $result = $device->deviceEvent->getEventStats();
         $this->assertIsArray($result);
         $this->assertEquals(14, count($result));
         foreach ($expect as $k => $v) {
@@ -230,15 +220,14 @@ class EventStatsTest extends TestCase
             'event' => $idevents,
             'estimate' => 1.6,
         ]);
-        $event = $event->findOrFail($idevents);
+        $this->assertEquals($idevents, $device->deviceEvent->idevents);
         $emissionRatio = round($Calculator->calculateRatio(), 2);
         $expect['fixed_devices'] += 1;
         $expect['fixed_powered'] += 1;
         $expect['devices_powered'] += 1;
         $expect['ewaste'] += 1.6;
         $expect['co2'] = ((1.6 * $emissionRatio) * $displacementFactor) + (14.4 * $displacementFactor);
-        $result = $event->getEventStats($emissionRatio);
-        logger(print_r($result, 1));
+        $result = $device->deviceEvent->getEventStats();
         $this->assertIsArray($result);
         $this->assertEquals(14, count($result));
         foreach ($expect as $k => $v) {
@@ -258,7 +247,7 @@ sum of footprints IS NOT multiplied by displacement factor
 uses Device->co2Diverted($emissionRatio, $Device->displacement)
 where $emissionRatio param provided by FootprintRatioCalculator->calculateRatio()
 ');
-        logger('getEventStats() for idevents=' . $event->idevents);
+        logger('getEventStats() for idevents=' . $idevents);
         logger(print_r($result, 1));
 
         logger('
