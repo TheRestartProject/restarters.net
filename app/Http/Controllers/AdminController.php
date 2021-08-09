@@ -8,9 +8,9 @@ class AdminController extends Controller
 {
     public static function stats($section = 1, $paragraph_only = false)
     {
-        if ($section = 1) {
+        if ($section == 1) {
             $stats = AdminController::getStats1();
-        } elseif ($section = 2) {
+        } elseif ($section == 2) {
             $stats = AdminController::getStats2();
         }
         $stats['section'] = $section;
