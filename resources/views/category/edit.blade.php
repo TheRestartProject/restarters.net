@@ -61,7 +61,7 @@
                         </select>
                     </div>
                 </div>
-                <?php //dd($categories); ?>
+                <?php //dd($categories);?>
                 <div class="form-group">
                     <label for="category_cluster">@lang('admin.category_cluster'):</label>
                     <div class="form-control form-control__select">
@@ -72,8 +72,8 @@
                           @endforeach -->
 
                           @if(isset($categories))
-                            <?php foreach($categories as $cluster){ ?>
-                            <option value="<?php echo $cluster->idclusters; ?>"<?php echo ($cluster->idclusters == $category->cluster ? ' selected' : ''); ?>><?php echo $cluster->name; ?></option>
+                            <?php foreach ($categories as $cluster) { ?>
+                            <option value="<?php echo $cluster->idclusters; ?>"<?php echo $cluster->idclusters == $category->cluster ? ' selected' : ''; ?>><?php echo $cluster->name; ?></option>
                             <?php } ?>
                           @endif
                         </select>

@@ -5,13 +5,13 @@ namespace App\Http\Controllers;
 use App\Device;
 use App\Group;
 use App\GroupTags;
+use App\Helpers\Fixometer;
 use App\Helpers\FootprintRatioCalculator;
 use App\Party;
 use App\Search;
 use App\User;
 use Auth;
 use DateTime;
-use App\Helpers\Fixometer;
 
 class SearchController extends Controller
 {
@@ -42,7 +42,7 @@ class SearchController extends Controller
         $user = User::find(Auth::id());
 
         $allowedParties = [];
-        /** Get default data for the search dropdowns **/
+        /* Get default data for the search dropdowns **/
         if (Fixometer::hasRole($user, 'Administrator')) {
             $groups = $Groups->findList();
             $parties = $Parties->findAllSearchable();
@@ -79,7 +79,7 @@ class SearchController extends Controller
             $fromTimeStamp = null;
             $group_tags = null;
 
-            /** collect params **/
+            /* collect params **/
             if (isset($_GET['groups'])) {
                 $searched_groups = filter_var_array($_GET['groups'], FILTER_SANITIZE_NUMBER_INT);
             }
@@ -118,7 +118,6 @@ class SearchController extends Controller
                 $hours_volunteered = 0;
                 $totalCO2 = 0;
                 $totalWeight = 0;
-
 
                 $emissionRatio = FootprintRatioCalculator::calculateRatio();
 

@@ -51,7 +51,6 @@ class ApiController extends Controller
             ->json($result, 200);
     }
 
-
     public static function partyStats($partyId)
     {
         $event = Party::where('idevents', $partyId)->first();
@@ -131,7 +130,7 @@ class ApiController extends Controller
     }
 
     /**
-     * List/search devices
+     * List/search devices.
      *
      * @param  Request  $request
      * @return Response

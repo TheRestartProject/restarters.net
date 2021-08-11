@@ -13,6 +13,7 @@ use App\Events\EventDeleted;
 use App\Events\EventImagesUploaded;
 use App\EventsUsers;
 use App\Group;
+use App\Helpers\Fixometer;
 use App\Helpers\FootprintRatioCalculator;
 use App\Helpers\Geocoder;
 use App\Host;
@@ -34,7 +35,6 @@ use Auth;
 use DateTime;
 use DB;
 use FixometerFile;
-use App\Helpers\Fixometer;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
 use Lang;
@@ -50,13 +50,11 @@ class PartyController extends Controller
 
     public function __construct(Geocoder $geocoder, DiscourseService $discourseService)
     {
-
         $this->emissionRatio = FootprintRatioCalculator::calculateRatio();
 
         $this->geocoder = $geocoder;
         $this->discourseService = $discourseService;
     }
-
 
     public static function expandEvent($event, $group)
     {
@@ -334,7 +332,7 @@ class PartyController extends Controller
                         'event_url' => url('/party/edit/'.$idParty),
                     ]));
 
-                    /** let's create the image attachment! **/
+                    /* let's create the image attachment! **/
                     if (isset($_FILES) && ! empty($_FILES) && is_array($_FILES['file']['name'])) {
                         $File = new FixometerFile;
                         $files = Fixometer::rearrange($_FILES['file']);
@@ -716,7 +714,7 @@ class PartyController extends Controller
             $stats = $event->getEventStats();
         } else {
             $stats = [
-              'force_object' => TRUE
+              'force_object' => true,
             ];
         }
 
@@ -742,7 +740,7 @@ class PartyController extends Controller
     }
 
     /**
-     * Method to take an event object and return add to calendar links
+     * Method to take an event object and return add to calendar links.
      * @author Dean Appleton-Claydon
      * @date   2019-03-12
      * @param  object can use any Party eloquent query object
@@ -868,7 +866,6 @@ class PartyController extends Controller
 
     public static function stats($id, $class = null)
     {
-
         $event = Party::where('idevents', $id)->first();
 
         $eventStats = $event->getEventStats();
@@ -1331,7 +1328,7 @@ class PartyController extends Controller
     }
 
     /**
-     * [confirmCodeInvite description]
+     * [confirmCodeInvite description].
      *
      * @author Christopher Kelker - @date 2019-03-25
      * @editor  Christopher Kelker
@@ -1368,7 +1365,7 @@ class PartyController extends Controller
     /**
      * [getEventsByKey description]
      * Get all Events where a User has an API KEY that exists,
-     * and that User has Group Tags associated with it
+     * and that User has Group Tags associated with it.
      *
      * @author  Christopher Kelker
      * @version 1.0.0
@@ -1472,7 +1469,7 @@ class PartyController extends Controller
      * [getEventByKeyAndId description]
      * Get Past Event using Route Model Binding,
      * If Event is not found, throw 404 error,
-     * Else return the Event's JSON data
+     * Else return the Event's JSON data.
      *
      * @author  Christopher Kelker
      * @version 1.0.0

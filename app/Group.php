@@ -88,7 +88,7 @@ class Group extends Model implements Auditable
                     `g`.`postcode` AS `postcode`,
                     `g`.`frequency` AS `frequency`,
                     GROUP_CONCAT(`u`.`name` ORDER BY `u`.`name` ASC SEPARATOR ", "  )  AS `user_list`
-                FROM `' . $this->table . '` AS `g`
+                FROM `'.$this->table.'` AS `g`
                 LEFT JOIN `users_groups` AS `ug` ON `g`.`idgroups` = `ug`.`group`
                 LEFT JOIN `users` AS `u` ON `ug`.`user` = `u`.`id`
                 GROUP BY `g`.`idgroups`
@@ -109,7 +109,7 @@ class Group extends Model implements Auditable
                 `g`.`postcode` AS `postcode`,
                 `xi`.`path` AS `path`
 
-            FROM `' . $this->table . '` AS `g`
+            FROM `'.$this->table.'` AS `g`
 
             LEFT JOIN (
                 SELECT * FROM `images`
@@ -132,21 +132,21 @@ class Group extends Model implements Auditable
     {
         //Took out GROUP BY `images`.`path` NB:Error message -> 'fixometer_laravel.images.idimages' isn't in GROUP BY
         try {
-            $group = DB::select(DB::raw('SELECT * FROM `' . $this->table . '` AS `g`
+            $group = DB::select(DB::raw('SELECT * FROM `'.$this->table.'` AS `g`
                 LEFT JOIN (
                     SELECT * FROM `images`
                         INNER JOIN `xref` ON `xref`.`object` = `images`.`idimages`
                         WHERE `xref`.`object_type` = 5
-                        AND `xref`.`reference_type` = ' . env('TBL_GROUPS') . '
+                        AND `xref`.`reference_type` = '.env('TBL_GROUPS').'
                         GROUP BY `images`.`path`
                 ) AS `xi`
                 ON `xi`.`reference` = `g`.`idgroups`
-                WHERE `id' . $this->table . '` = :id'), ['id' => $id]);
+                WHERE `id'.$this->table.'` = :id'), ['id' => $id]);
         } catch (\Illuminate\Database\QueryException $e) {
             dd($e);
         }
 
-        if (!empty($group)) {
+        if (! empty($group)) {
             return $group[0];
         }
     }
@@ -156,7 +156,7 @@ class Group extends Model implements Auditable
         return DB::select(DB::raw('SELECT *,
                     `g`.`name` AS `groupname`,
                     `u`.`name` AS `hostname`
-                FROM `' . $this->table . '` AS `g`
+                FROM `'.$this->table.'` AS `g`
                 INNER JOIN `users_groups` AS `ug`
                     ON `ug`.`group` = `g`.`idgroups`
                 INNER JOIN `users` AS `u`
@@ -165,7 +165,7 @@ class Group extends Model implements Auditable
                     SELECT * FROM `images`
                         INNER JOIN `xref` ON `xref`.`object` = `images`.`idimages`
                         WHERE `xref`.`object_type` = 5
-                        AND `xref`.`reference_type` = ' . env('TBL_USERS') . '
+                        AND `xref`.`reference_type` = '.env('TBL_USERS').'
                         GROUP BY `images`.`path`
                 ) AS `xi`
                 ON `xi`.`reference` = `u`.`id`
@@ -176,7 +176,7 @@ class Group extends Model implements Auditable
 
     public function ofThisUser($id)
     {
-        return DB::select(DB::raw('SELECT * FROM `' . $this->table . '` AS `g`
+        return DB::select(DB::raw('SELECT * FROM `'.$this->table.'` AS `g`
                 INNER JOIN `users_groups` AS `ug`
                     ON `ug`.`group` = `g`.`idgroups`
 
@@ -184,7 +184,7 @@ class Group extends Model implements Auditable
                     SELECT * FROM `images`
                         INNER JOIN `xref` ON `xref`.`object` = `images`.`idimages`
                         WHERE `xref`.`object_type` = 5
-                        AND `xref`.`reference_type` = ' . env('TBL_GROUPS') . '
+                        AND `xref`.`reference_type` = '.env('TBL_GROUPS').'
                         GROUP BY `images`.`path`
                 ) AS `xi`
                 ON `xi`.`reference` = `g`.`idgroups`
@@ -239,7 +239,6 @@ class Group extends Model implements Auditable
         return rtrim($this->location);
     }
 
-
     public function canDelete()
     {
         // Groups are deletable unless they have an event with a device.
@@ -249,7 +248,6 @@ class Group extends Model implements Auditable
             ->get();
 
         foreach ($allEvents as $event) {
-
             $stats = $event->getEventStats();
 
             if ($stats['devices_powered'] || $stats['devices_unpowered']) {
@@ -260,8 +258,7 @@ class Group extends Model implements Auditable
         return $ret;
     }
 
-
-    public function getGroupStats($emissionRatio = NULL)
+    public function getGroupStats($emissionRatio = null)
     {
         if (is_null($emissionRatio)) {
             $emissionRatio = \App\Helpers\FootprintRatioCalculator::calculateRatio();
@@ -277,7 +274,7 @@ class Group extends Model implements Auditable
             $eventStats = $event->getEventStats($emissionRatio);
 
             foreach ($eventStats as $statKey => $statValue) {
-                if (!array_key_exists($statKey, $groupStats)) {
+                if (! array_key_exists($statKey, $groupStats)) {
                     $groupStats[$statKey] = 0;
                 }
                 $groupStats[$statKey] += $statValue;
@@ -330,7 +327,7 @@ class Group extends Model implements Auditable
      */
     public function makeMemberAHost($groupMember)
     {
-        if (!$this->allVolunteers()->pluck('user')->contains($groupMember->id)) {
+        if (! $this->allVolunteers()->pluck('user')->contains($groupMember->id)) {
             throw new \Exception('Volunteer is not currently in this group.  Only existing group members can be made hosts.');
         }
 
@@ -345,7 +342,7 @@ class Group extends Model implements Auditable
 
     public function getShareableLinkAttribute()
     {
-        if (!empty($this->shareable_code)) {
+        if (! empty($this->shareable_code)) {
             return url("group/invite/{$this->shareable_code}");
         }
 
@@ -385,7 +382,7 @@ class Group extends Model implements Auditable
     {
         $from = date('Y-m-d');
 
-        if (!empty($exclude_parties)) {
+        if (! empty($exclude_parties)) {
             return $this->parties()
                 ->where('event_date', '>=', $from)
                 ->whereNotIn('idevents', $exclude_parties)
@@ -398,7 +395,7 @@ class Group extends Model implements Auditable
     /**
      * [pastParties description]
      * All Past Parties where between the Start Parties Date
-     * is yesterday or a month earlier
+     * is yesterday or a month earlier.
      *
      * @author Christopher Kelker - @date 2019-03-21
      * @editor  Christopher Kelker
@@ -407,7 +404,7 @@ class Group extends Model implements Auditable
      */
     public function pastParties($exclude_parties = [])
     {
-        if (!empty($exclude_parties)) {
+        if (! empty($exclude_parties)) {
             return $this->parties()
                 ->where('event_date', '<', date('Y-m-d'))
                 ->whereNotIn('idevents', $exclude_parties)
@@ -419,7 +416,7 @@ class Group extends Model implements Auditable
 
     /**
      * [totalPartiesHours description]
-     * Total Group Parties Hours
+     * Total Group Parties Hours.
      *
      * @author Christopher Kelker - @date 2019-03-21
      * @editor  Christopher Kelker
@@ -440,7 +437,7 @@ class Group extends Model implements Auditable
     public function groupImagePath()
     {
         if (is_object($this->groupImage) && is_object($this->groupImage->image)) {
-            return asset('/uploads/mid_' . $this->groupImage->image->path);
+            return asset('/uploads/mid_'.$this->groupImage->image->path);
         }
 
         return url('/uploads/mid_1474993329ef38d3a4b9478841cc2346f8e131842fdcfd073b307.jpg');
@@ -453,7 +450,7 @@ class Group extends Model implements Auditable
             ->whereDate('event_date', '>=', date('Y-m-d'))
             ->orderBy('event_date', 'asc');
 
-        if (!$event->count()) {
+        if (! $event->count()) {
             return null;
         }
 
@@ -476,7 +473,7 @@ class Group extends Model implements Auditable
 
     public function getApprovedAttribute()
     {
-        return !is_null($this->wordpress_post_id);
+        return ! is_null($this->wordpress_post_id);
     }
 
     public function networks()
