@@ -853,6 +853,10 @@ class GroupController extends Controller
     public static function stats($id, $format = 'row')
     {
         $group = Group::where('idgroups', $id)->first();
+        if (!$group) {
+            return abort(404, 'Invalid group id');
+        }
+
         $groupStats = $group->getGroupStats();
 
         $groupStats['format'] = $format;
