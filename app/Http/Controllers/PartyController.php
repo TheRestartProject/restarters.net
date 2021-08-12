@@ -46,12 +46,8 @@ class PartyController extends Controller
     protected $geocoder;
     protected $discourseService;
 
-    public $emissionRatio;
-
     public function __construct(Geocoder $geocoder, DiscourseService $discourseService)
     {
-        $this->emissionRatio = FootprintRatioCalculator::calculateRatio();
-
         $this->geocoder = $geocoder;
         $this->discourseService = $discourseService;
     }
@@ -142,6 +138,28 @@ class PartyController extends Controller
         $is_host_of_group = Fixometer::userHasEditGroupPermission($group_id, Auth::user()->id);
         $isCoordinatorForGroup = $group && Auth::user()->isCoordinatorForGroup($group);
 
+        $expanded_events = [];
+
+        foreach (array_merge($upcoming_events->all(), $past_events->all()) as $event) {
+            $expanded_events[] = \App\Http\Controllers\PartyController::expandEvent($event, $group);
+        }
+
+        if ($upcoming_events_in_area) {
+          foreach ($upcoming_events_in_area as $event) {
+              $e = \App\Http\Controllers\PartyController::expandEvent($event, $group);
+              $e['nearby'] = TRUE;
+              $expanded_events[] = $e;
+          }
+        }
+
+        if ($upcoming_events_all) {
+          foreach ($upcoming_events_all as $event) {
+              $e = \App\Http\Controllers\PartyController::expandEvent($event, $group);
+              $e['all'] = TRUE;
+              $expanded_events[] = $e;
+          }
+        }
+
         return view('events.index', [
             'moderate_events' => $moderate_events,
             'upcoming_events' => $upcoming_events,
@@ -149,7 +167,7 @@ class PartyController extends Controller
             'upcoming_events_in_area' => $upcoming_events_in_area,
             'upcoming_events_all' => $upcoming_events_all,
             'user_groups' => $user_groups,
-            'emission_ratio' => $this->emissionRatio,
+            'expanded_events' => $expanded_events,
             'is_host_of_group' => $is_host_of_group,
             'isCoordinatorForGroup' => $isCoordinatorForGroup,
             'group' => $group,
@@ -165,7 +183,6 @@ class PartyController extends Controller
         return view('events.all-past', [
           'past_events' => $past_events,
           'past_events_count' => $past_events_count,
-          'emission_ratio' => $this->emissionRatio,
         ]);
     }
 
@@ -1485,7 +1502,7 @@ class PartyController extends Controller
             return abort(404, 'Invalid Event ID.');
         }
 
-        $estats = $party->getEventStats($this->emissionRatio);
+        $estats = $party->getEventStats();
         $gstats = $party->theGroup->getGroupStats();
         // New Collection Instance
         $collection = collect([

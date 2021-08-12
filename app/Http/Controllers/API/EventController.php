@@ -44,9 +44,6 @@ class EventController extends Controller
             return abort(404, 'No Events found.');
         }
 
-        // Get Emission Ratio
-        // $emissionRatio = FootprintRatioCalculator::calculateRatio();
-
         $groups_array = collect([]);
         foreach ($groups as $group) {
             $groupStats = $group->getGroupStats();

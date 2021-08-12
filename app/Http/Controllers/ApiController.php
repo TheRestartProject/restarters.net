@@ -80,10 +80,8 @@ class ApiController extends Controller
 
     public static function groupStats($groupId)
     {
-        $emissionRatio = self::getEmissionRatio();
-
         $group = Group::where('idgroups', $groupId)->first();
-        $groupStats = $group->getGroupStats($emissionRatio);
+        $groupStats = $group->getGroupStats();
 
         return response()
             ->json([
@@ -93,11 +91,6 @@ class ApiController extends Controller
                 'kg_co2_diverted' => round($groupStats['co2']),
                 'kg_waste_diverted' => round($groupStats['waste']),
             ], 200);
-    }
-
-    public static function getEmissionRatio()
-    {
-        return FootprintRatioCalculator::calculateRatio();
     }
 
     public static function getEventsByGroupTag($group_tag_id)
