@@ -1118,6 +1118,10 @@ class UserController extends Controller
     {
         $user = User::where('mediawiki', $request->input('wiki_username'))->first();
 
+        if (!$user) {
+            abort('404', 'Wiki user not found');
+        }
+
         if (isset($user->getProfile($user->id)->path) && ! is_null($user->getProfile($user->id)->path)) {
             $thumbnailPath = config('app.url').'/uploads/thumbnail_'.$user->getProfile($user->id)->path;
         } else {
@@ -1131,9 +1135,13 @@ class UserController extends Controller
     {
         $user = User::where('mediawiki', $request->input('wiki_username'))->first();
 
+        if (!$user) {
+            abort('404', 'Wiki user not found');
+        }
+
         $menus = [];
 
-        if ($user->hasRole('Administrator') || $user->hasPermission('verify-translation-access') || $user->hasRole('NetworkCoordinator')) {
+        if (($user->hasRole('Administrator') || $user->hasPermission('verify-translation-access') || $user->hasRole('NetworkCoordinator'))) {
             $items = [];
 
             if ($user->hasRole('Administrator')) {
