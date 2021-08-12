@@ -4,16 +4,13 @@ namespace App\Listeners;
 
 use App\Events\PasswordChanged;
 use App\WikiSyncStatus;
-
-use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Http\Request;
+use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Support\Facades\Log;
-
+use Mediawiki\Api\ApiUser;
 use Mediawiki\Api\FluentRequest;
 use Mediawiki\Api\MediawikiApi;
-use Mediawiki\Api\ApiUser;
-
 
 class ChangeWikiPassword
 {
@@ -38,11 +35,12 @@ class ChangeWikiPassword
         $user = $event->user;
 
         if ($user->wiki_sync_status !== WikiSyncStatus::Created) {
-            Log::info("No wiki account for '". $user->username."' - not attempting to change password");
+            Log::info("No wiki account for '".$user->username."' - not attempting to change password");
+
             return;
         }
 
-        try{
+        try {
             $api = MediawikiApi::newFromApiEndpoint(env('WIKI_URL').'/api.php');
             $api->login(new ApiUser($user->mediawiki, $this->request->input('current-password')));
             $token = $api->getToken('csrf');
@@ -55,7 +53,7 @@ class ChangeWikiPassword
                                    ->setParam('changeauthtoken', $token);
             $api->postRequest($changePasswordRequest);
         } catch (\Exception $ex) {
-            Log::error("Failed to changed password for user '" . $user->mediawiki . "' in mediawiki: " . $ex->getMessage());
+            Log::error("Failed to changed password for user '".$user->mediawiki."' in mediawiki: ".$ex->getMessage());
         }
     }
 }

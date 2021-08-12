@@ -1,8 +1,8 @@
 <?php
 
-use Illuminate\Support\Facades\Schema;
-use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Database\Migrations\Migration;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\Schema;
 
 class AuditIssue extends Migration
 {
@@ -14,10 +14,10 @@ class AuditIssue extends Migration
     public function up()
     {
         Schema::table('audits', function (Blueprint $table) {
-            $table->string('old_values','4294967295')->change();
+            $table->string('old_values', '4294967295')->change();
         });
         Schema::table('audits', function (Blueprint $table) {
-            $table->string('new_values','4294967295')->change();
+            $table->string('new_values', '4294967295')->change();
         });
     }
 
@@ -29,10 +29,10 @@ class AuditIssue extends Migration
     public function down()
     {
         Schema::table('audits', function (Blueprint $table) {
-            $table->string('old_values','16777215')->change();
+            $table->string('old_values', '16777215')->change();
         });
         Schema::table('audits', function (Blueprint $table) {
-            $table->string('new_values','16777215')->change();
+            $table->string('new_values', '16777215')->change();
         });
     }
 }

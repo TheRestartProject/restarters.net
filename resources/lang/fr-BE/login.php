@@ -1,6 +1,6 @@
 <?php
 
-return array (
+return [
   'whatis' => 'Bienvenue dans la communauté des Restarters',
   'whatis_content' => '<p>C’est LA place où se développe le mouvement de réparation communautaire des appareils électroniques. Le monde a besoin de plus d’initiatives de réparations, et de plus de partages de compétences:</p><p>Inscrivez‐vous si vous souhaitez :</p><ul>
                                 <li>Apprendre à réparer des appareils électroniques avec d\'autres passionnés</li>
@@ -18,4 +18,4 @@ return array (
   'login_title' => 'Connexion',
   'join_title' => 'Rejoindre Restarters',
   'join_title_short' => 'Rejoindre',
-);
+];

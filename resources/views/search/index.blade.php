@@ -103,7 +103,7 @@
                       <input type="date" name="to-date" id="to_date" class="field form-control" <?php if(isset($_GET['to-date']) && !empty($_GET['to-date'])){ echo ' value="' . $_GET['to-date'] . '"'; } ?>>
                   </div>
 
-                  @if (FixometerHelper::hasRole($user, 'Administrator'))
+                  @if (App\Helpers\Fixometer::hasRole($user, 'Administrator'))
                   <div class="form-group">
                       <label for="tags">@lang('groups.group_tag2'):</label>
                       <div class="form-control form-control__select">
@@ -300,19 +300,19 @@
                       $manufacture_svg = 'svg-car2';
                       $manufacture_label = 'Like manufacturing';
                       $manufacture_eql_to = round($totalCO2 / 6000);
-                      $manufacture_legend = $manufacture_eql_to . ' ' . str_plural('car', $manufacture_eql_to);
+                      $manufacture_legend = $manufacture_eql_to . ' ' . Str::plural('car', $manufacture_eql_to);
                   }
                   else {
                       $consume_svg = 'svg-tv';
                       $consume_label = 'Like watching TV for';
                       $consume_eql_to = ((1 / 0.024) * $totalCO2 ) / 24;
                       $consume_eql_to = number_format(round($consume_eql_to), 0, '.', ',');
-                      $consume_legend = $consume_eql_to . ' ' . str_plural('day', $consume_eql_to);
+                      $consume_legend = $consume_eql_to . ' ' . Str::plural('day', $consume_eql_to);
 
                       $manufacture_svg = 'svg-sofa';
                       $manufacture_label = 'Like manufacturing';
                       $manufacture_eql_to = round($totalCO2 / 100);
-                      $manufacture_legend = $manufacture_eql_to . ' ' . str_plural('sofa', $manufacture_eql_to);
+                      $manufacture_legend = $manufacture_eql_to . ' ' . Str::plural('sofa', $manufacture_eql_to);
                   }
                   ?>
 
@@ -429,7 +429,7 @@
             @if(isset($response))
             <div class="row">
                 <div class="col-md-12">
-                    <?php FixometerHelper::printResponse($response);  ?>
+                    <?php App\Helpers\Fixometer::printResponse($response);  ?>
                 </div>
             </div>
             @endif

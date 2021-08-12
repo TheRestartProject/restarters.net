@@ -13,7 +13,7 @@
                 <div class="col-md-12">
 
                     @if(isset($response))
-                      @php( FixometerHelper::printResponse($response))
+                      @php( App\Helpers\Fixometer::printResponse($response))
                     @endif
 
                     <div class="alert alert-warning">
@@ -50,7 +50,7 @@
 
 
 
-                                @if(FixometerHelper::hasRole($user, 'Administrator'))
+                                @if(App\Helpers\Fixometer::hasRole($user, 'Administrator'))
                                 <div class="form-group <?php if(isset($error) && isset($error['role']) && !empty($error['role'])) { echo "has-error"; } ?>">
 
                                     <label for="role">User Role:</label>
@@ -66,7 +66,7 @@
                             </div>
                             <div class="col-md-6">
 
-                                @if (FixometerHelper::featureIsEnabled(env('FEATURE__LANGUAGE_SWITCHER')))
+                                @if (App\Helpers\Fixometer::featureIsEnabled(env('FEATURE__LANGUAGE_SWITCHER')))
                                 <div class="form-group">
                                   <label for="language">Language preference:</label>
                                   <select id="language" name="language"  class="form-control selectpicker">
@@ -83,7 +83,7 @@
                                 </div>
 
 
-                                <?php $groupclass = (FixometerHelper::hasRole($user, 'Administrator') ? 'show' : 'hidden'); ?>
+                                <?php $groupclass = (App\Helpers\Fixometer::hasRole($user, 'Administrator') ? 'show' : 'hidden'); ?>
                                 <div class="form-group <?php echo $groupclass; ?> <?php if(isset($error) && isset($error['group']) && !empty($error['group'])) { echo "has-error"; } ?>">
                                     <label for="group">Group(s):</label>
 

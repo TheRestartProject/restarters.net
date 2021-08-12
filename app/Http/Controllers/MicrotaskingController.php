@@ -2,14 +2,14 @@
 
 namespace App\Http\Controllers;
 
+use App\BattcatOra;
 use App\Faultcat;
 use App\Misccat;
 use App\Mobifix;
 use App\MobifixOra;
 use App\PrintcatOra;
-use App\TabicatOra;
-
 use App\Services\DiscourseService;
+use App\TabicatOra;
 use Auth;
 use DB;
 use Illuminate\Http\Request;
@@ -27,7 +27,8 @@ class MicrotaskingController extends Controller
             new Mobifix,
             new MobifixOra,
             new PrintcatOra,
-            new TabicatOra
+            new TabicatOra,
+            new BattcatOra,
         ];
     }
 
@@ -53,7 +54,7 @@ class MicrotaskingController extends Controller
             'currentUserQuests' => $currentUserQuests,
             'currentUserContributions' => $currentUserContributions,
             'topics' => $discourseService->getDiscussionTopics($tag, 5),
-            'seeAllTopicsLink' => env('DISCOURSE_URL') . "/tag/{$tag}/l/latest",
+            'seeAllTopicsLink' => env('DISCOURSE_URL')."/tag/{$tag}/l/latest",
             'activeQuest' => $activeQuest,
         ]);
     }
@@ -73,7 +74,7 @@ class MicrotaskingController extends Controller
 
         return [
             'quests' => $userQuests,
-            'contributions' => $userContributions
+            'contributions' => $userContributions,
         ];
     }
 
@@ -89,7 +90,7 @@ class MicrotaskingController extends Controller
 
         return [
             'quests' => $totalQuests,
-            'contributions' => $totalContributions
+            'contributions' => $totalContributions,
         ];
     }
 }

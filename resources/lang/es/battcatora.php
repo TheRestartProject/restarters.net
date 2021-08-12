@@ -1,8 +1,7 @@
 <?php
 
-return array (
-  'task' => 
-  array (
+return [
+  'task' => [
     'subtitle' => 'Un voluntario intentó arreglar este dispositivo en un evento de reparación y escribió esta descripción.',
     'question-endoflife' => '¿Qué ha impedido la reparación de este dispositivo?',
     'question-repairable' => '¿Cuál es el siguiente paso para reparar este dispositivo?',
@@ -31,9 +30,8 @@ return array (
     'step1-extra' => 'Un voluntario intentó arreglar este dispositivo en un evento de reparación y escribió esta descripción.',
     'step2-extra' => 'Seleccione la opción que mejor se ajuste al problema descrito.',
     'title' => 'BattCat: clasificar los problemas de las baterías',
-  ),
-  'status' => 
-  array (
+  ],
+  'status' => [
     'brand' => 'Marca',
     'items_0_opinions' => 'con 0 opiniones',
     'items_1_opinion' => 'con 1 opinión',
@@ -50,9 +48,8 @@ return array (
     'task_completed' => 'Ya los has visto todos, gracias',
     'total' => 'Total',
     'winning_opinion' => 'Opinión mayoritaria',
-  ),
-  'info' => 
-  array (
+  ],
+  'info' => [
     'body-s1-header' => '¿Qué es BattCat?',
     'body-s1-p1' => 'Queremos entender cómo las baterías pueden provocar fallos en los dispositivos para para poder informar a los legisladores de cómo hacerlos más fáciles de reparar. La reparación reduce el desperdicio y disminuye nuestro impacto en el planeta.',
     'body-s1-p2' => 'Con BattCat, puede unirse a nuestra investigación. Hemos recopilado información sobre más de 1000 dispositivos averiados y necesitamos su ayuda para clasificarlos.',
@@ -63,21 +60,19 @@ return array (
     'body-s4-header' => '¿Tienes más preguntas?',
     'body-s4-p1' => 'Obtenga más información y envíenos sus preguntas o comentarios en <a href=":url" target="_blank">el post sobre BattCat</a>.',
     'title' => 'Gracias por usar BattCat',
-  ),
-  'branding' => 
-  array (
+  ],
+  'branding' => [
     'powered_by' => 'Utilizando datos de:',
-  ),
+  ],
   'about' => 'Más información',
-  'survey' => 
-  array (
+  'survey' => [
     'a1' => 'Muy en desacuerdo',
     'a2' => 'En desacuerdo',
     'a3' => 'Neutral',
     'a4' => 'De acuerdo',
     'a5' => 'Muy de acuerdo',
     'footer' => 'Pulsando cualquiera de los dos botones volveras a BattCat',
-    'header1' => 'Gracias por ayudarnos a saber por qué se rompen las tabletas.',
+    'header1' => '¡Gracias!',
     'header2' => 'Estamos planeando futuras encuestas, como ésta. Para que la próxima sea aún mejor, tenemos algunas preguntas breves.',
     'invalid' => 'Por favor, elige una respuesta para cada una de las preguntas',
     'q1' => 'BattCat ha aumentado mi interés por la reparación',
@@ -86,5 +81,5 @@ return array (
     'q4' => 'BattCat ha cambiado mi opinión sobre la importancia de la reparación',
     'send' => 'Enviar',
     'skip' => 'Cerrar',
-  ),
-);
+  ],
+];

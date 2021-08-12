@@ -1,11 +1,11 @@
 <?php
 
-use Illuminate\Support\Facades\Schema;
-use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Database\Migrations\Migration;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\Schema;
 
-class AlterTableCharsets extends Migration {
-
+class AlterTableCharsets extends Migration
+{
     private $charset = 'utf8mb4';
     private $collate = 'utf8mb4_unicode_ci';
 
@@ -26,7 +26,7 @@ class AlterTableCharsets extends Migration {
 
         $this->_report('DAT21_', '_b');
 
-        Log::info('== SEE ' . storage_path() . '/logs/DAT21*.log FOR RESULTS ===');
+        Log::info('== SEE '.storage_path().'/logs/DAT21*.log FOR RESULTS ===');
         Log::info('END MIGRATE AlterTableCharsets');
     }
 
@@ -41,10 +41,10 @@ class AlterTableCharsets extends Migration {
         foreach ($tables as $table) {
             $collate = $table['TABLE_COLLATION'];
             $name = $table['TABLE_NAME'];
-            if ($collate <> $this->collate) {
+            if ($collate != $this->collate) {
                 if ($collate == 'latin1_swedish_ci') {
                     $charset = 'latin1';
-                } else if ($collate == 'utf8_general_ci') {
+                } elseif ($collate == 'utf8_general_ci') {
                     $charset = 'utf8';
                 }
                 DB::statement("ALTER TABLE `$name` CONVERT TO CHARACTER SET $charset COLLATE $collate");
@@ -72,7 +72,7 @@ class AlterTableCharsets extends Migration {
         try {
             $tables = $this->_tableCharsets();
             foreach ($tables as $table) {
-                if ($table['TABLE_COLLATION'] <> $this->collate) {
+                if ($table['TABLE_COLLATION'] != $this->collate) {
                     $name = $table['TABLE_NAME'];
                     Log::info("ALTER TABLE `$name` CONVERT TO CHARACTER SET $this->charset COLLATE $this->collate");
                     DB::statement("ALTER TABLE `$name` CONVERT TO CHARACTER SET $this->charset COLLATE $this->collate");
@@ -83,7 +83,8 @@ class AlterTableCharsets extends Migration {
         }
     }
 
-    private function _dataTables() {
+    private function _dataTables()
+    {
         return [
             'groups' => [
                 'key' => 'idgroups',
@@ -126,7 +127,7 @@ class AlterTableCharsets extends Migration {
                     'name',
                     'username',
                     'location',
-                    'mediawiki'
+                    'mediawiki',
                 ],
             ],
         ];
@@ -137,7 +138,8 @@ class AlterTableCharsets extends Migration {
      *
      * @return void
      */
-    private function _report($prefix = '', $suffix = '') {
+    private function _report($prefix = '', $suffix = '')
+    {
         $tables = $this->_dataTables();
         $format = 'SELECT
  o.`%3$s` AS `id`,
@@ -154,13 +156,14 @@ class AlterTableCharsets extends Migration {
                 foreach ($result as $v) {
                     $log[$v->id] = $v->val;
                 }
-                $filename = $prefix . $table . '_' . $field . $suffix;
-                file_put_contents(storage_path() . "/logs/$filename.log", print_r($log, 1));
+                $filename = $prefix.$table.'_'.$field.$suffix;
+                file_put_contents(storage_path()."/logs/$filename.log", print_r($log, 1));
             }
         }
     }
 
-    private function _tableCharsets() {
+    private function _tableCharsets()
+    {
         return [
             ['TABLE_NAME' => 'users_preferences', 'TABLE_COLLATION' => 'latin1_swedish_ci'],
             ['TABLE_NAME' => 'jobs', 'TABLE_COLLATION' => 'latin1_swedish_ci'],
@@ -213,12 +216,11 @@ class AlterTableCharsets extends Migration {
             ['TABLE_NAME' => 'links', 'TABLE_COLLATION' => 'utf8_general_ci'],
             ['TABLE_NAME' => 'categories', 'TABLE_COLLATION' => 'utf8_general_ci'],
             ['TABLE_NAME' => 'permissions', 'TABLE_COLLATION' => 'utf8_general_ci'],
-                /** unused tables / no migration 
+        /** unused tables / no migration
                   ['TABLE_NAME' => 'fault_types', 'TABLE_COLLATION' => 'utf8_general_ci'],
                   ['TABLE_NAME' => 'brands_models', 'TABLE_COLLATION' => 'utf8_general_ci'],
                   ['TABLE_NAME' => 'devices_models', 'TABLE_COLLATION' => 'utf8_unicode_ci']
-                 * */
+         * */
         ];
     }
-
 }

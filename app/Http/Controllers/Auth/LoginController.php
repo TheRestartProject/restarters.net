@@ -3,9 +3,9 @@
 namespace App\Http\Controllers\Auth;
 
 use App\Device;
-use App\Party;
 use App\Http\Controllers\Controller;
-use FixometerHelper;
+use App\Party;
+use App\Helpers\Fixometer;
 use Illuminate\Foundation\Auth\AuthenticatesUsers;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -53,7 +53,6 @@ class LoginController extends Controller
      */
     public function login(Request $request)
     {
-
         $this->validateLogin($request);
 
         // If the class is using the ThrottlesLogins trait, we can automatically throttle
@@ -91,7 +90,7 @@ class LoginController extends Controller
             $this->username() => 'required|email',
             'password' => 'required|string',
             'my_name'   => 'honeypot',
-            'my_time'   => 'required|honeytime:1'
+            'my_time'   => 'required|honeytime:1',
         ]);
     }
 
@@ -102,7 +101,7 @@ class LoginController extends Controller
      */
     public function showLoginForm()
     {
-        $stats = FixometerHelper::loginRegisterStats();
+        $stats = Fixometer::loginRegisterStats();
 
         $deviceCount = array_key_exists(0, $stats['device_count_status']) ? $stats['device_count_status'][0]->counter : 0;
 

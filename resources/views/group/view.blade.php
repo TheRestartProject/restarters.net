@@ -13,7 +13,7 @@
       <?php endif; ?>
 
       @if(session()->has('response'))
-        @php( FixometerHelper::printResponse(session('response')) )
+        @php( App\Helpers\Fixometer::printResponse(session('response')) )
       @endif
 
       @if (\Session::has('success'))
@@ -40,32 +40,9 @@
               $group_image->image->path;
           }
 
-          $can_edit_group = FixometerHelper::hasRole( $user, 'Administrator') || $isCoordinatorForGroup || $is_host_of_group;
-
-          function expandVolunteer($volunteers) {
-              $ret = [];
-
-              foreach ($volunteers as $volunteer) {
-                  $volunteer['volunteer'] = $volunteer->volunteer;
-
-                  if ($volunteer['volunteer']) {
-                      $volunteer['userSkills'] = $volunteer->volunteer->userSkills->all();
-
-                      foreach ($volunteer['userSkills'] as $skill) {
-                          // Force expansion
-                          $skill->skillName->skill_name;
-                      }
-
-                      $volunteer['fullName'] = $volunteer->name;
-                      $volunteer['profilePath'] = '/uploads/thumbnail_' . $volunteer->volunteer->getProfile($volunteer->volunteer->id)->path;
-                      $ret[] = $volunteer;
-                  }
-              }
-
-              return $ret;
-          }
-
-          $expanded_volunteers = expandVolunteer($view_group->allConfirmedVolunteers);
+          $can_edit_group = App\Helpers\Fixometer::hasRole( $user, 'Administrator') || $isCoordinatorForGroup || $is_host_of_group;
+          $can_see_delete = App\Helpers\Fixometer::hasRole( $user, 'Administrator');
+          $can_perform_delete = $can_see_delete && $group->canDelete();
 
           $expanded_events = [];
 
@@ -84,12 +61,12 @@
 
               $thisone['isVolunteer'] = $event->isVolunteer();
               $thisone['requiresModeration'] = $event->requiresModerationByAdmin();
-              $thisone['canModerate'] = Auth::user() && (FixometerHelper::hasRole(Auth::user(), 'Administrator') || FixometerHelper::hasRole(Auth::user(), 'NetworkCoordinator'));
+              $thisone['canModerate'] = Auth::user() && (App\Helpers\Fixometer::hasRole(Auth::user(), 'Administrator') || App\Helpers\Fixometer::hasRole(Auth::user(), 'NetworkCoordinator'));
 
               $expanded_events[] = $thisone;
           }
 
-          $showCalendar = Auth::check() && (($group && $group->isVolunteer()) || FixometerHelper::hasRole( Auth::user(), 'Administrator'));
+          $showCalendar = Auth::check() && (($group && $group->isVolunteer()) || App\Helpers\Fixometer::hasRole( Auth::user(), 'Administrator'));
 
           $device_stats = [
               'fixed' => isset($group_device_count_status[0]) ? (int)$group_device_count_status[0]->counter : 0,
@@ -185,13 +162,14 @@
               :cluster-stats="{{ json_encode($cluster_stats, JSON_INVALID_UTF8_IGNORE) }}"
               :top-devices="{{ json_encode($top, JSON_INVALID_UTF8_IGNORE) }}"
               :events="{{ json_encode($expanded_events, JSON_INVALID_UTF8_IGNORE) }}"
-              :volunteers="{{ json_encode($expanded_volunteers, JSON_INVALID_UTF8_IGNORE) }}"
+              :volunteers="{{ json_encode($view_group->allConfirmedVolunteers, JSON_INVALID_UTF8_IGNORE) }}"
               :canedit="{{ $can_edit_group ? 'true' : 'false' }}"
+              :can-see-delete="{{ $can_see_delete ? 'true' : 'false' }}"
+              :can-perform-delete="{{ $can_perform_delete ? 'true' : 'false' }}"
               calendar-copy-url="{{ $showCalendar ? url("/calendar/group/{$group->idgroups}") : '' }}"
               calendar-edit-url="{{ $showCalendar ? url("/profile/edit/{$user->id}#list-calendar-links") : '' }}"
               :ingroup="{{ $in_group ? 'true' : 'false' }}"
               api-token="{{ $api_token }}"
-              :canedit="{{ $can_edit_group ? 'true' : 'false' }}"
           />
       </div>
   </div>

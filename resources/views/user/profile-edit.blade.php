@@ -33,7 +33,7 @@
     <div class="row justify-content-center">
       <div class="col-lg-4 offset-lg-sidebar">
         <div class="list-group" id="list-tab" role="tablist">
-          @if (FixometerHelper::hasRole(Auth::user(), 'Administrator') || Auth::id() == $user->id)
+          @if (App\Helpers\Fixometer::hasRole(Auth::user(), 'Administrator') || Auth::id() == $user->id)
           <a class="list-group-item list-group-item-action active" id="list-profile-list" data-toggle="list" href="#list-profile" role="tab" aria-controls="profile">@lang('profile.profile')</a>
           <a class="list-group-item list-group-item-action" id="list-account-list" data-toggle="list" href="#list-account" role="tab" aria-controls="account">@lang('profile.account')</a>
 
@@ -51,7 +51,7 @@
 
         <div class="tab-content" id="nav-tabContent">
 
-          @if (FixometerHelper::hasRole(Auth::user(), 'Administrator') || Auth::id() == $user->id)
+          @if (App\Helpers\Fixometer::hasRole(Auth::user(), 'Administrator') || Auth::id() == $user->id)
           <div class="tab-pane fade show active" id="list-profile" role="tabpanel" aria-labelledby="list-profile-list">
               @include('user.profile.profile')
           </div>

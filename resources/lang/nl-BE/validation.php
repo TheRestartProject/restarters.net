@@ -1,6 +1,6 @@
 <?php
 
-return array (
+return [
   'accepted' => ':attribute moet goedgekeurd zijn.',
   'active_url' => ':attribute is geen geldige URL.',
   'after' => ':attribute moet een datum na :date zijn',
@@ -11,22 +11,19 @@ return array (
   'array' => ':attribute moet een reeks zijn.',
   'before' => ':attribute moet een datum voor :date zijn.',
   'before_or_equal' => ':attribute moet een datum voor of gelijk aan :date zijn.',
-  'between' => 
-  array (
+  'between' => [
     'array' => ':attribute moet tussen de :min en :max items bevatten.',
     'file' => ':attribute moet tussen de :min en :max kilobytes zijn.',
     'numeric' => ':attribute moet tussen :min en :max zijn.',
     'string' => ':attribute moet tussen de :min en :max tekens zijn.',
-  ),
+  ],
   'boolean' => 'Het veld :attribute moet waar of niet waar zijn.',
   'confirmed' => 'De bevestiging van :attribute komt niet overeen.',
-  'custom' => 
-  array (
-    'attribute-name' => 
-    array (
+  'custom' => [
+    'attribute-name' => [
       'rule-name' => 'Aangepaste boodschap',
-    ),
-  ),
+    ],
+  ],
   'date' => ':attribute is geen geldige datum.',
   'date_format' => ':attribute komt niet overeen met het formaat :format.',
   'different' => ':attribute en :other moeten verschillend zijn.',
@@ -38,20 +35,18 @@ return array (
   'exists' => 'Geslecteerd :attribute is ongeldig.',
   'file' => ':attribute moet een bestand zijn.',
   'filled' => 'Het veld :attribute moet een waarde hebben.',
-  'gt' => 
-  array (
+  'gt' => [
     'array' => ':attribute moet meer dan :value items bevatten.',
     'file' => ':attribute moet groter zijn dan :value kilobytes.',
     'numeric' => ':attribute moet groter zijn dan :value.',
     'string' => ':attribute moet meer dan :value tekens tellen.',
-  ),
-  'gte' => 
-  array (
+  ],
+  'gte' => [
     'array' => ':attribute moet :value of meer items zijn.',
     'file' => ':attribute moet groter of gelijk aan :value kilobytes zijn.',
     'numeric' => ':attribute moet groter of gelijk aan :value zijn.',
     'string' => 'Het aantal tekens van :attribute moet groter of gelijk aan :value zijn.',
-  ),
+  ],
   'image' => ':attribute moet een afbeelding zijn.',
   'in' => 'Gelescteerd :attribute is ongeldig.',
   'integer' => ':attribute moet een geheel getal zijn.',
@@ -60,36 +55,32 @@ return array (
   'ipv4' => ':attribute moet een geldig IPv4 adres zijn.',
   'ipv6' => ':attribute moet een geldig IPv6 adres zijn.',
   'json' => ':attribute moet een geldige JSON string zijn.',
-  'lt' => 
-  array (
+  'lt' => [
     'array' => ':attribute moet minder dan :value items bevatten.',
     'file' => ':attribute moet kleiner dan :value kilobytes zijn.',
     'numeric' => ':attribute moet minder zijn dan :value.',
     'string' => ':attribute moet minder dan :values tekens tellen.',
-  ),
-  'lte' => 
-  array (
+  ],
+  'lte' => [
     'array' => ':attribute mag niet meer dan :value items bevatten.',
     'file' => ':attribute moet kleiner of gelijk zijn aan :value kilobytes.',
     'numeric' => ':attribute moet kleiner dan of gelijk zijn aan :value.',
     'string' => ':attribute moet minder of evenveel tekens tellen als :value.',
-  ),
-  'max' => 
-  array (
+  ],
+  'max' => [
     'array' => ':attribute mag niet meer dan :max items bevatten.',
     'file' => ':attribute mag niet groter zijn dan :max kilobytes.',
     'numeric' => ':attribute mag niet groter zijn dan :value.',
     'string' => ':attribute mag niet meer dan :max tekens tellen.',
-  ),
+  ],
   'mimes' => ':attribute moet één van volgende documentstypes zijn: :values.',
   'mimetypes' => ':attribute moet één van volgende documentstypes zijn: :values.',
-  'min' => 
-  array (
+  'min' => [
     'array' => ':attribute moet minstens :min items bevatten.',
     'file' => ':attribute moet minstens :min kilobytes zijn.',
     'numeric' => ':attribute moet minstens :min zijn.',
     'string' => ':attribute moet minstens :min tekens tellen.',
-  ),
+  ],
   'not_in' => 'Geselecteerd :attribute is ongeldig.',
   'not_regex' => 'Het format van :attribute is ongeldig.',
   'numeric' => ':attribute moet een getal zijn.',
@@ -102,16 +93,15 @@ return array (
   'required_without_all' => 'Het veld :attribute is verplicht als geen van de :values aanwezig zijn.',
   'required_with_all' => 'Het veld :attribute is verplicht als :values aanwezig zijn.',
   'same' => ':attribute en :other moeten overeenkomen.',
-  'size' => 
-  array (
+  'size' => [
     'array' => ':attribute moet :size items bevatten.',
     'file' => ':attribute moet :size kilobytes zijn.',
     'numeric' => ':attribute moet :size zijn.',
     'string' => ':attribute moet :size tekens tellen.',
-  ),
+  ],
   'string' => ':attribute moet een string zijn.',
   'timezone' => ':attribute moet een geldige zone zijn.',
   'unique' => ':attribute is al in gebruik.',
   'uploaded' => 'Upload van :attribute is mislukt.',
   'url' => 'Het format van :attribute is ongeldig.',
-);
+];

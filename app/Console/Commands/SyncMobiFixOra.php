@@ -2,11 +2,11 @@
 
 namespace App\Console\Commands;
 
-use Illuminate\Console\Command;
 use App\MobifixOra;
+use Illuminate\Console\Command;
 
-class SyncMobiFixOra extends Command {
-
+class SyncMobiFixOra extends Command
+{
     /**
      * The name and signature of the console command.
      *
@@ -26,15 +26,15 @@ class SyncMobiFixOra extends Command {
      *
      * @return mixed
      */
-    public function handle() {
+    public function handle()
+    {
         $this->info('Updating devices_mobifix_ora with winning fault types');
         $MobifixOra = new MobifixOra;
         $result = $MobifixOra->updateDevices();
         if ($result) {
-            $this->info($result . ' rows updated');
+            $this->info($result.' rows updated');
         } else {
             $this->info('0 rows updated');
         }
     }
-
 }

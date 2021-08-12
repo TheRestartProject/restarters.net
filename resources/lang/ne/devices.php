@@ -1,6 +1,6 @@
 <?php
 
-return array (
+return [
   'by_date' => 'Op datum',
   'age' => 'Leeftijd',
   'brand' => 'Merk',
@@ -56,4 +56,4 @@ return array (
   'useful_repair_urls_explanation' => 'Nuttige URL',
   'useful_repair_urls_helper' => 'Geef de URL hier in',
   'various' => 'Verschillende',
-);
+];

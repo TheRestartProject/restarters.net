@@ -3,7 +3,7 @@
 return [
 
     'features' => [
-        'discourse_integration' => env('FEATURE__DISCOURSE_INTEGRATION', true)
+        'discourse_integration' => env('FEATURE__DISCOURSE_INTEGRATION', true),
     ],
 
     'wiki' => [

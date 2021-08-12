@@ -138,7 +138,7 @@
                                 <input type="hidden" id="id-ords" name="id-ords" value="{{ $fault->id_ords }}">
                                 <input type="hidden" id="fault-type-id" name="fault-type-id" value="">
                                 <p class="confirm hide">
-                                    <button class="btn-md btn-primary" id="change">@lang('battcatora.task.go_with') "<span id="fault-type-new" data-fid=""></span>"</button>
+                                    <button class="btn-md btn-primary" id="change">@lang('battcatora.task.go_with') "<span id="fault-type-new" data-fid=""></span>" &rarr;</button>
                                 </p>
                                 <div class="options mb-3">
                                     <div class="buttons">
@@ -152,7 +152,7 @@
                     </form>
                     <div>
                         <button type="submit" name="fetch" id="fetch" class="btn btn-primary">
-                            <span class="">@lang('battcatora.task.fetch_another')</span>
+                            <span class="">@lang('battcatora.task.fetch_another') &rarr;</span>
                         </button>
                     </div>
                 </div>

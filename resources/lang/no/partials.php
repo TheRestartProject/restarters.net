@@ -1,6 +1,6 @@
 <?php
 
-return array (
+return [
   'community_news' => 'Community news',
   'community_news_text' => 'The latest from our community blog - we are always looking for guest posts, send ideas to <a href="mailto:janet@therestartproject.org">janet@therestartproject.org</a>',
   'see_more_posts' => 'See more posts',
@@ -89,4 +89,4 @@ return array (
   'solution_text2' => 'Interesting case study to share?',
   'quantity' => 'Quantity',
   'cancel' => 'Cancel',
-);
+];

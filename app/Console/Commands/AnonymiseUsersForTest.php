@@ -3,7 +3,6 @@
 namespace App\Console\Commands;
 
 use App\User;
-
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\Hash;
 
@@ -32,6 +31,7 @@ class AnonymiseUsersForTest extends Command
     {
         if (env('APP_ENV') !== 'local') {
             $this->error('This command is only designed to be run during local development.');
+
             return;
         }
 
@@ -41,7 +41,7 @@ class AnonymiseUsersForTest extends Command
         $faker = \Faker\Factory::create();
 
         foreach ($users as $user) {
-            echo "\nAnonymising #" . $user->id;
+            echo "\nAnonymising #".$user->id;
             $user->name = $faker->name;
             $user->email = $faker->unique()->safeEmail;
             $user->biography = $faker->text;

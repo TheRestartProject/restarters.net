@@ -2,10 +2,10 @@
 
 namespace Tests\Feature;
 
-use App\User;
-use Tests\TestCase;
 use App\Notifications\AdminUserDeleted;
+use App\User;
 use Illuminate\Support\Facades\Notification;
+use Tests\TestCase;
 
 class UserDeletedNotificationTest extends TestCase
 {

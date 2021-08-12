@@ -1,8 +1,7 @@
 <?php
 
-return array (
-  'task' => 
-  array (
+return [
+  'task' => [
     'where_is_the_main_fault' => 'Où se trouve le principal défaut?',
     'fetch_another' => 'Je ne sais pas, chercher une autre réparation',
     'suggestions' => 'Suggestions',
@@ -11,9 +10,8 @@ return array (
     'source' => 'La source',
     'learn_more' => 'Plus d\'informations',
     'strapline' => 'Il vous suffit de lire les informations relatives à l’imprimante en panne et de sélectionner le type de panne décrite dans la liste située en dessous.',
-  ),
-  'status' => 
-  array (
+  ],
+  'status' => [
     'status' => 'Statut',
     'items_opinions' => 'Articles / opinions',
     'items_split_opinions' => 'Articles avec des opinions divergentes',
@@ -29,9 +27,8 @@ return array (
     'number_of_records' => 'Nombre d\'enregistrements',
     'winning_opinion' => 'Opinion gagnante',
     'task_completed' => 'Vous les avez tous vus, mercis',
-  ),
-  'info' => 
-  array (
+  ],
+  'info' => [
     'body-s1-header' => 'Qu’est-ce que PrintCat?',
     'body-s1-p1' => 'Les imprimantes peuvent être frustrantes, faciles à casser et difficiles à réparer. Nous voulons comprendre pourquoi les imprimantes tombent en panne afin de pouvoir indiquer aux décideurs politiques comment les futurs modèles peuvent être plus faciles à réparer. La réparation réduit les déchets et diminue la pression sur les ressources de notre planète.',
     'body-s1-p2' => 'Avec PrintCat, vous pouvez participer à notre enquête. Nous avons recueilli des informations sur plus de 800 imprimantes en panne et nous avons besoin de votre aide pour les classer.',
@@ -42,10 +39,9 @@ return array (
     'body-s4-header' => 'Vous avez d’autres questions?',
     'body-s4-p1' => 'Pour en savoir plus, posez nous des questions et faites nous part de <a href=":url" target="_blank">vos commentaires dans le forum PrintCat</a>.',
     'title' => 'Merci d’avoir essayé PrintCat',
-  ),
-  'branding' => 
-  array (
+  ],
+  'branding' => [
     'powered_by' => 'Utilisation de données provenant de:',
-  ),
+  ],
   'about' => 'Plus d\'informations',
-);
+];

@@ -1,6 +1,6 @@
 <?php
 
-return array (
+return [
   'reg-step-1-heading' => 'What skills would you like to share with others?',
   'town-city-placeholder' => 'E.g. Paris, London, Brussels',
   'reg-step-3-label1' => 'I would like to receive The Restart Project monthly newsletter',
@@ -38,4 +38,4 @@ return array (
   'step-2' => 'Step 2 of 4',
   'step-3' => 'Step 3 of 4',
   'step-4' => 'Step 4 of 4',
-);
+];

@@ -1,6 +1,6 @@
 <?php
 
-return array (
+return [
   'devices_logged' => 'Appareils enregistrés',
   'getting_started_header' => 'Pour commencer',
   'getting_started_text' => 'Bienvenue dans l\'espace communautaire des Restarters. Voici quelques actions pour vous aider à démarrer:',
@@ -27,4 +27,4 @@ return array (
   'networks_you_coordinate' => 'Voici le réseau que vous coordonnez :',
   'title' => 'Tableau de bord',
   'your_networks' => 'Vos réseaux',
-);
+];
