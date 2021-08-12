@@ -74,10 +74,7 @@
         {{-- END Events to Moderate (Admin Only) --}}
 
       <?php
-      $expanded_events = [];
 
-      $footprintRatioCalculator = new App\Helpers\FootprintRatioCalculator();
-      $emissionRatio = $footprintRatioCalculator->calculateRatio();
       $can_edit_group = Auth::user() && $group && (App\Helpers\Fixometer::hasRole( Auth::user(), 'Administrator') || $isCoordinatorForGroup || $is_host_of_group);
       $showCalendar = Auth::check() && (!$group || ($group && $group->isVolunteer()) || App\Helpers\Fixometer::hasRole( Auth::user(), 'Administrator'));
       $calendar_copy_url = '';
@@ -91,28 +88,6 @@
               $calendar_copy_url = url("/calendar/user/" . Auth::user()->calendar_hash);
               $calendar_edit_url = url("/profile/edit/" . Auth::user()->id . "#list-calendar-links");
           }
-      }
-
-      $expanded_events = [];
-
-      foreach (array_merge($upcoming_events->all(), $past_events->all()) as $event) {
-          $expanded_events[] = \App\Http\Controllers\PartyController::expandEvent($event, $group, $emissionRatio);
-      }
-
-      if ($upcoming_events_in_area) {
-        foreach ($upcoming_events_in_area as $event) {
-            $e = \App\Http\Controllers\PartyController::expandEvent($event, $group, $emissionRatio);
-            $e['nearby'] = TRUE;
-            $expanded_events[] = $e;
-        }
-      }
-
-      if ($upcoming_events_all) {
-        foreach ($upcoming_events_all as $event) {
-            $e = \App\Http\Controllers\PartyController::expandEvent($event, $group, $emissionRatio);
-            $e['all'] = TRUE;
-            $expanded_events[] = $e;
-        }
       }
 
       ?>

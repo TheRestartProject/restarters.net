@@ -60,7 +60,7 @@ class Network extends Model
         });
     }
 
-    public function stats($emissionRatio)
+    public function stats()
     {
         $stats = [
             'pax' => 0,
@@ -70,11 +70,17 @@ class Network extends Model
             'waste' => 0,
             'ewaste' => 0,
             'unpowered_waste' => 0,
+            'fixed_devices' => 0,
+            'fixed_powered' => 0,
+            'fixed_unpowered' => 0,
             'repairable_devices' => 0,
             'dead_devices' => 0,
             'no_weight' => 0,
+            'devices_powered' => 0,
+            'devices_unpowered' => 0,
         ];
 
+        $emissionRatio = \App\Helpers\FootprintRatioCalculator::calculateRatio();
         foreach ($this->groups as $group) {
             $singleGroupStats = $group->getGroupStats($emissionRatio);
 
