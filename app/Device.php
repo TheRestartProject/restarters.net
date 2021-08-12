@@ -465,12 +465,8 @@ AND devices.event = events.idevents ';
         $wasteDiverted = 0;
 
         if ($this->isFixed() && $this->deviceCategory->isUnpowered()) {
-            if ($this->deviceCategory->isMiscUnpowered()) {
-                if (is_numeric($this->estimate)) {
-                    $wasteDiverted = $this->estimate;
-                }
-            } else {
-                $wasteDiverted = (float) $this->deviceCategory->weight;
+            if (is_numeric($this->estimate)) {
+                $wasteDiverted = $this->estimate;
             }
         }
 
