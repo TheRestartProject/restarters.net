@@ -8,6 +8,7 @@ use App\Group;
 use App\Party;
 use Carbon\Carbon;
 use DB;
+use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Tests\TestCase;
 
 class GroupStatsTest extends TestCase
@@ -67,7 +68,6 @@ class GroupStatsTest extends TestCase
     }
 
     /** @test */
-<<<<<<< HEAD
     public function a_group_with_mixed_devices_has_correct_stats()
     {
         $displacementFactor = 0.5;
@@ -597,10 +597,11 @@ class GroupStatsTest extends TestCase
         foreach ($expect as $k => $v) {
             $this->assertEquals($v, round($result[$k], 2), "Wrong value for $k => $v");
         }
-=======
-    public function stats_for_invalid_group() {
+    }
+
+    public function stats_for_invalid_group()
+    {
         $this->expectException(NotFoundHttpException::class);
         $response = $this->get("/group/stats/37/mini");
->>>>>>> develop
     }
 }
