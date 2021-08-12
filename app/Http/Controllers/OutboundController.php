@@ -11,7 +11,7 @@ use Request;
 class OutboundController extends Controller
 {
     /** type can be either party or group
-     * id is id of group or party to display
+     * id is id of group or party to display.
      * */
     public static function info($type, $id, $format = 'fixometer', $return = 'view')
     {

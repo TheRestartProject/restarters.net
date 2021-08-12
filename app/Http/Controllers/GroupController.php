@@ -11,6 +11,7 @@ use App\Group;
 use App\GroupNetwork;
 use App\GroupTags;
 use App\GrouptagsGroups;
+use App\Helpers\Fixometer;
 use App\Helpers\Geocoder;
 use App\Invite;
 use App\Network;
@@ -24,7 +25,6 @@ use App\UserGroups;
 use Auth;
 use DB;
 use FixometerFile;
-use App\Helpers\Fixometer;
 use Illuminate\Database\QueryException;
 use Illuminate\Http\Request;
 use Illuminate\Support\Arr;
@@ -347,12 +347,10 @@ class GroupController extends Controller
             return abort(404, 'Invalid group.');
         }
 
-
         $allPastEvents = Party::pastEvents()
         ->with('devices.deviceCategory')
         ->where('events.group', $group->idgroups)
         ->get();
-
 
         $Device->ofThisGroup($group->idgroups);
 
@@ -864,7 +862,6 @@ class GroupController extends Controller
 
     public static function statsByGroupTag($group_tag_id, $format = 'row')
     {
-
         $groups = Group::join('grouptags_groups', 'grouptags_groups.group', '=', 'groups.idgroups')
             ->where('grouptags_groups.group_tag', $group_tag_id)
               ->select('groups.*')
@@ -1257,7 +1254,7 @@ class GroupController extends Controller
     }
 
     /**
-     * [confirmCodeInvite description]
+     * [confirmCodeInvite description].
      *
      * @author Christopher Kelker - @date 2019-03-25
      * @editor  Christopher Kelker
@@ -1295,7 +1292,7 @@ class GroupController extends Controller
      * [getGroupsByKey description]
      * Find Groups from User Access Key,
      * If the Groups are not found, through 404 error,
-     * Else return the Groups JSON data
+     * Else return the Groups JSON data.
      *
      * @author Christopher Kelker - @date 2019-03-26
      * @editor  Christopher Kelker
@@ -1403,7 +1400,7 @@ class GroupController extends Controller
      * [getGroupByKeyAndId description]
      * Find Group from User Access Key and Group ID,
      * If the Group is not found, through 404 error,
-     * Else return the Group JSON data
+     * Else return the Group JSON data.
      *
      * @author Christopher Kelker - @date 2019-03-26
      * @editor  Christopher Kelker

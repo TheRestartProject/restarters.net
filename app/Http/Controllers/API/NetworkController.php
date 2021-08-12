@@ -13,6 +13,7 @@ class NetworkController extends Controller
         if (! Auth::user()->can('view', $network)) {
             abort(403, 'You do not have access to this network');
         }
+
         return response()->json($network->stats());
     }
 }

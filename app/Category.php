@@ -2,9 +2,9 @@
 
 namespace App;
 
+use App\Helpers\Fixometer;
 use DB;
 use Illuminate\Database\Eloquent\Model;
-use App\Helpers\Fixometer;
 
 class Category extends Model
 {

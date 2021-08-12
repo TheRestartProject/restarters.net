@@ -7,13 +7,13 @@ use App\EventsUsers;
 use App\Group;
 use App\GroupTags;
 use App\GrouptagsGroups;
+use App\Helpers\Fixometer;
 use App\Helpers\FootprintRatioCalculator;
 use App\Search;
 use App\UserGroups;
 use Auth;
 use DateTime;
 use DB;
-use App\Helpers\Fixometer;
 use Illuminate\Http\Request;
 use Response;
 
@@ -104,7 +104,7 @@ class ExportController extends Controller
 
     /**
      * Folder /public must be writable.
-     * Example URL: http://restarters.test/export/parties?fltr=1&groups[]=1
+     * Example URL: http://restarters.test/export/parties?fltr=1&groups[]=1.
      */
     public function parties()
     {
@@ -118,7 +118,7 @@ class ExportController extends Controller
             $fromTimeStamp = null;
             $group_tags = null;
 
-            /** collect params **/
+            /* collect params **/
             if (isset($_GET['groups'])) {
                 $searched_groups = filter_var_array($_GET['groups'], FILTER_SANITIZE_NUMBER_INT);
             }
@@ -156,7 +156,6 @@ class ExportController extends Controller
             $participants = 0;
             $hours_volunteered = 0;
             $totalCO2 = 0;
-
 
             $emissionRatio = FootprintRatioCalculator::calculateRatio();
 

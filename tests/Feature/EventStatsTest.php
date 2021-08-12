@@ -10,7 +10,6 @@ use Tests\TestCase;
 
 class EventStatsTest extends TestCase
 {
-
     /** @test */
     public function an_event_with_no_devices_has_no_co2()
     {
@@ -70,9 +69,9 @@ class EventStatsTest extends TestCase
         $id_misc_powered = 46;
         $id_misc_unpowered = 50;
 
-        DB::statement("SET foreign_key_checks=0");
+        DB::statement('SET foreign_key_checks=0');
         Category::truncate();
-        DB::statement("SET foreign_key_checks=1");
+        DB::statement('SET foreign_key_checks=1');
         factory(Category::class)->create([
             'idcategories' => 4,
             'revision' => 1,
@@ -105,10 +104,10 @@ class EventStatsTest extends TestCase
             'weight' => 0,
             'footprint' => 0,
         ]);
-        DB::statement("SET foreign_key_checks=0");
+        DB::statement('SET foreign_key_checks=0');
         Device::truncate();
         \App\DeviceBarrier::truncate();
-        DB::statement("SET foreign_key_checks=1");
+        DB::statement('SET foreign_key_checks=1');
 
         $Calculator = new \App\Helpers\FootprintRatioCalculator;
         $idevents = 1;
@@ -247,7 +246,7 @@ sum of footprints IS NOT multiplied by displacement factor
 uses Device->co2Diverted($emissionRatio, $Device->displacement)
 where $emissionRatio param provided by FootprintRatioCalculator->calculateRatio()
 ');
-        logger('getEventStats() for idevents=' . $idevents);
+        logger('getEventStats() for idevents='.$idevents);
         logger(print_r($result, 1));
 
         logger('

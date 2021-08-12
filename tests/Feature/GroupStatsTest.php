@@ -2,11 +2,11 @@
 
 namespace Tests\Feature;
 
-use App\Group;
-use Carbon\Carbon;
 use App\Category;
 use App\Device;
+use App\Group;
 use App\Party;
+use Carbon\Carbon;
 use DB;
 use Tests\TestCase;
 
@@ -73,9 +73,9 @@ class GroupStatsTest extends TestCase
         $id_misc_powered = 46;
         $id_misc_unpowered = 50;
 
-        DB::statement("SET foreign_key_checks=0");
+        DB::statement('SET foreign_key_checks=0');
         Category::truncate();
-        DB::statement("SET foreign_key_checks=1");
+        DB::statement('SET foreign_key_checks=1');
         factory(Category::class)->create([
             'idcategories' => 4,
             'revision' => 1,
@@ -108,10 +108,10 @@ class GroupStatsTest extends TestCase
             'weight' => 0,
             'footprint' => 0,
         ]);
-        DB::statement("SET foreign_key_checks=0");
+        DB::statement('SET foreign_key_checks=0');
         Device::truncate();
         \App\DeviceBarrier::truncate();
-        DB::statement("SET foreign_key_checks=1");
+        DB::statement('SET foreign_key_checks=1');
 
         $Calculator = new \App\Helpers\FootprintRatioCalculator;
 
@@ -261,9 +261,9 @@ class GroupStatsTest extends TestCase
         $id_misc_powered = 46;
         $id_misc_unpowered = 50;
 
-        DB::statement("SET foreign_key_checks=0");
+        DB::statement('SET foreign_key_checks=0');
         Category::truncate();
-        DB::statement("SET foreign_key_checks=1");
+        DB::statement('SET foreign_key_checks=1');
         factory(Category::class)->create([
             'idcategories' => 4,
             'revision' => 1,
@@ -312,10 +312,10 @@ class GroupStatsTest extends TestCase
             'weight' => 0,
             'footprint' => 0,
         ]);
-        DB::statement("SET foreign_key_checks=0");
+        DB::statement('SET foreign_key_checks=0');
         Device::truncate();
         \App\DeviceBarrier::truncate();
-        DB::statement("SET foreign_key_checks=1");
+        DB::statement('SET foreign_key_checks=1');
 
         $Calculator = new \App\Helpers\FootprintRatioCalculator;
 
@@ -589,7 +589,7 @@ class GroupStatsTest extends TestCase
         $expect['devices_powered'] += 1;
         $expect['ewaste'] += 1.9;
         $expect['waste'] += 1.9;
-        $expect['co2'] = round(((1.9 * $emissionRatio) * $displacementFactor) + (16.6 * $displacementFactor),2);
+        $expect['co2'] = round(((1.9 * $emissionRatio) * $displacementFactor) + (16.6 * $displacementFactor), 2);
         $result = $device->deviceEvent->theGroup->getGroupStats();
         $this->assertIsArray($result);
         $this->assertEquals(15, count($result));

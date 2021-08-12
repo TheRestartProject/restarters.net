@@ -65,32 +65,32 @@
         <?php
           // We need to expand a lot of event information to pass to the client.  In due course this will be replaced
           // by an API call to get the event details, and/or server-side rendering.
-          $expandVolunteerEvent = function($volunteers) {
-            $ret = [];
+          $expandVolunteerEvent = function ($volunteers) {
+              $ret = [];
 
-            foreach ($volunteers as $volunteer) {
-              // We might not be able to fetch a volunteer if they're deleted.
-              if ($volunteer->volunteer) {
-                $volunteer['volunteer'] = $volunteer->volunteer;
-                $volunteer['userSkills'] = [];
-                $volunteer['profilePath'] = '/uploads/thumbnail_placeholder.png';
+              foreach ($volunteers as $volunteer) {
+                  // We might not be able to fetch a volunteer if they're deleted.
+                  if ($volunteer->volunteer) {
+                      $volunteer['volunteer'] = $volunteer->volunteer;
+                      $volunteer['userSkills'] = [];
+                      $volunteer['profilePath'] = '/uploads/thumbnail_placeholder.png';
 
-                if (!empty($volunteer->volunteer)) {
-                    $volunteer['userSkills'] = $volunteer->volunteer->userSkills->all();
-                    $volunteer['profilePath'] = '/uploads/thumbnail_' . $volunteer->volunteer->getProfile($volunteer->volunteer->id)->path;
-                }
+                      if (! empty($volunteer->volunteer)) {
+                          $volunteer['userSkills'] = $volunteer->volunteer->userSkills->all();
+                          $volunteer['profilePath'] = '/uploads/thumbnail_'.$volunteer->volunteer->getProfile($volunteer->volunteer->id)->path;
+                      }
 
-                foreach ($volunteer['userSkills'] as $skill) {
-                  // Force expansion
-                  $skill->skillName->skill_name;
-                }
+                      foreach ($volunteer['userSkills'] as $skill) {
+                          // Force expansion
+                          $skill->skillName->skill_name;
+                      }
 
-                $volunteer['fullName'] = $volunteer->getFullName();
-                $ret[] = $volunteer;
+                      $volunteer['fullName'] = $volunteer->getFullName();
+                      $ret[] = $volunteer;
+                  }
               }
-            }
 
-            return $ret;
+              return $ret;
           };
 
           $expanded_attended = $expandVolunteerEvent($attended);
@@ -100,52 +100,52 @@
           // Trigger expansion of group.
           $group_image = $event->theGroup->groupImage;
           if (is_object($group_image) && is_object($group_image->image)) {
-            $group_image->image->path;
+              $group_image->image->path;
           }
 
-          $can_edit_event = ( Auth::check() && ( App\Helpers\Fixometer::hasRole(Auth::user(), 'Administrator') || App\Helpers\Fixometer::userHasEditPartyPermission($event->idevents, Auth::user()->id) ) );
+          $can_edit_event = (Auth::check() && (App\Helpers\Fixometer::hasRole(Auth::user(), 'Administrator') || App\Helpers\Fixometer::userHasEditPartyPermission($event->idevents, Auth::user()->id)));
           $is_attending = is_object($is_attending) && $is_attending->status == 1;
 
-          $discourseThread = $is_attending ? (env('DISCOURSE_URL') . '/t/' . $event->discourse_thread) : null;
+          $discourseThread = $is_attending ? (env('DISCOURSE_URL').'/t/'.$event->discourse_thread) : null;
 
           $collected_images = [];
 
-          if( !empty($images) ) {
+          if (! empty($images)) {
               foreach ($images as $image) {
-                $collected_images[] = $image;
+                  $collected_images[] = $image;
               }
           }
 
           $expanded_devices = [];
 
           foreach ($event->devices as $device) {
-            $device->category = $device->deviceCategory;
-            $device->shortProblem = $device->getShortProblem();
-            $device->urls;
+              $device->category = $device->deviceCategory;
+              $device->shortProblem = $device->getShortProblem();
+              $device->urls;
 
-            $barriers = [];
+              $barriers = [];
 
-            foreach ($device->barriers as $barrier) {
-              $barriers[] = $barrier->id;
-            }
+              foreach ($device->barriers as $barrier) {
+                  $barriers[] = $barrier->id;
+              }
 
-            $device->barrier = $barriers;
-            $device->images = $device->getImages();
-            $expanded_devices[] = $device;
+              $device->barrier = $barriers;
+              $device->images = $device->getImages();
+              $expanded_devices[] = $device;
           }
 
           $expanded_clusters = [];
 
           foreach ($clusters as $cluster) {
-            $cluster->categories;
-            $expanded_clusters[] = $cluster;
+              $cluster->categories;
+              $expanded_clusters[] = $cluster;
           }
 
           $expanded_brands = [];
 
           foreach ($brands as $brand) {
-            $brand->brand_name;
-            $expanded_brands[] = $brand;
+              $brand->brand_name;
+              $expanded_brands[] = $brand;
           }
 
           $event->approved = $event->wordpress_post_id !== null;

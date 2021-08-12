@@ -36,14 +36,13 @@ class DeviceStatsTest extends TestCase
     /** @test */
     public function a_fixed_device_has_correct_stats()
     {
-
         $displacementFactor = 0.5;
         $id_misc_powered = 46;
         $id_misc_unpowered = 50;
 
-        DB::statement("SET foreign_key_checks=0");
+        DB::statement('SET foreign_key_checks=0');
         Category::truncate();
-        DB::statement("SET foreign_key_checks=1");
+        DB::statement('SET foreign_key_checks=1');
         factory(Category::class)->create([
             'idcategories' => 4,
             'revision' => 1,
@@ -80,10 +79,10 @@ class DeviceStatsTest extends TestCase
         $Calculator = new \App\Helpers\FootprintRatioCalculator;
 
         // #1 add a single powered non-misc device
-        DB::statement("SET foreign_key_checks=0");
+        DB::statement('SET foreign_key_checks=0');
         Device::truncate();
         \App\DeviceBarrier::truncate();
-        DB::statement("SET foreign_key_checks=1");
+        DB::statement('SET foreign_key_checks=1');
         $device = factory(Device::class)->states('fixed')->create([
             'category' => 4,
             'category_creation' => 4,
@@ -102,10 +101,10 @@ class DeviceStatsTest extends TestCase
         $this->assertEquals($expect, $result);
 
         // #2 add a powered misc device
-        DB::statement("SET foreign_key_checks=0");
+        DB::statement('SET foreign_key_checks=0');
         Device::truncate();
         \App\DeviceBarrier::truncate();
-        DB::statement("SET foreign_key_checks=1");
+        DB::statement('SET foreign_key_checks=1');
         $device = factory(Device::class)->states('fixed')->create([
             'category' => $id_misc_powered,
             'category_creation' => $id_misc_powered,
@@ -124,10 +123,10 @@ class DeviceStatsTest extends TestCase
         $this->assertEquals($expect, $result);
 
         // #3 add an unpowered non-misc device
-        DB::statement("SET foreign_key_checks=0");
+        DB::statement('SET foreign_key_checks=0');
         Device::truncate();
         \App\DeviceBarrier::truncate();
-        DB::statement("SET foreign_key_checks=1");
+        DB::statement('SET foreign_key_checks=1');
         $device = factory(Device::class)->states('fixed')->create([
             'category' => 5,
             'category_creation' => 5,
@@ -146,10 +145,10 @@ class DeviceStatsTest extends TestCase
         $this->assertEquals($expect, $result);
 
         // #4 add an unpowered misc device
-        DB::statement("SET foreign_key_checks=0");
+        DB::statement('SET foreign_key_checks=0');
         Device::truncate();
         \App\DeviceBarrier::truncate();
-        DB::statement("SET foreign_key_checks=1");
+        DB::statement('SET foreign_key_checks=1');
         $device = factory(Device::class)->states('fixed')->create([
             'category' => $id_misc_unpowered,
             'category_creation' => $id_misc_unpowered,
@@ -168,10 +167,10 @@ class DeviceStatsTest extends TestCase
         $this->assertEquals($expect, $result);
 
         // #5 add an unpowered misc device with estimate
-        DB::statement("SET foreign_key_checks=0");
+        DB::statement('SET foreign_key_checks=0');
         Device::truncate();
         \App\DeviceBarrier::truncate();
-        DB::statement("SET foreign_key_checks=1");
+        DB::statement('SET foreign_key_checks=1');
         $device = factory(Device::class)->states('fixed')->create([
             'category' => $id_misc_unpowered,
             'category_creation' => $id_misc_unpowered,
@@ -191,10 +190,10 @@ class DeviceStatsTest extends TestCase
         $this->assertEquals($expect, $result);
 
         // #6 add a powered misc device with estimate
-        DB::statement("SET foreign_key_checks=0");
+        DB::statement('SET foreign_key_checks=0');
         Device::truncate();
         \App\DeviceBarrier::truncate();
-        DB::statement("SET foreign_key_checks=1");
+        DB::statement('SET foreign_key_checks=1');
         $device = factory(Device::class)->states('fixed')->create([
             'category' => $id_misc_powered,
             'category_creation' => $id_misc_powered,
@@ -215,6 +214,7 @@ class DeviceStatsTest extends TestCase
     }
 
     /** Device->GetWeights() */
+
     /** @test */
     public function a_set_of_mixed_devices_have_correct_stats()
     {
@@ -222,9 +222,9 @@ class DeviceStatsTest extends TestCase
         $id_misc_powered = 46;
         $id_misc_unpowered = 50;
 
-        DB::statement("SET foreign_key_checks=0");
+        DB::statement('SET foreign_key_checks=0');
         Category::truncate();
-        DB::statement("SET foreign_key_checks=1");
+        DB::statement('SET foreign_key_checks=1');
         factory(Category::class)->create([
             'idcategories' => 4,
             'revision' => 1,
@@ -257,10 +257,10 @@ class DeviceStatsTest extends TestCase
             'weight' => 0,
             'footprint' => 0,
         ]);
-        DB::statement("SET foreign_key_checks=0");
+        DB::statement('SET foreign_key_checks=0');
         Device::truncate();
         \App\DeviceBarrier::truncate();
-        DB::statement("SET foreign_key_checks=1");
+        DB::statement('SET foreign_key_checks=1');
 
         $event = factory(\App\Party::class)->create();
 
@@ -361,7 +361,7 @@ class DeviceStatsTest extends TestCase
 select @ratio := ((sum(`categories`.`footprint`) * :displacement1) / sum(`categories`.`weight` + 0.0)) from `devices`, `categories` where `categories`.`idcategories` = `devices`.`category` and `devices`.`repair_status` = 1 and categories.idcategories != 46
 uses own ratio calculation where sum of footprints IS multiplied by displacement factor');
         logger("emissionRatio calculated by Device->getWeights()=$emissionRatio");
-        logger('Device->getWeights() for idevents=' . $event->idevents);
+        logger('Device->getWeights() for idevents='.$event->idevents);
         logger(print_r($result, 1));
         logger('
 CALLED IN
