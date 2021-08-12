@@ -47,7 +47,7 @@ Compiled version of the specs is available at: https://therestartproject.github.
 
 The first version of the tool (2015) was the core Fixometer engine. This was
 made possible with modest funding from the Innovation in Waste Prevention Fund,
-Defra-funded and administered by WRAP. Subsequent development has been financed
+Defra-funded and administered by WRAP.  Subsequent development has been financed
 by the Shuttleworth Foundation, and by Nesta and the Department for Digital,
 Culture, Media & Sport.
 
