@@ -153,19 +153,20 @@ class DiscourseService
                             $response = $client->request('GET', $endpoint);
                             $discourseResult = json_decode($response->getBody());
 
-                            if (!$discourseResult)
-                            {
-                                throw new \Exception("Get of $endpoint failed");
+                            if (!$discourseResult) {
+                                Log::debug("Get failed on {$user->id}");
+                                sleep(1);
+//                                throw new \Exception("Get of $endpoint failed");
                             } else {
                                 $limited = property_exists(
                                         $discourseResult,
                                         'error_type'
                                     ) && $discourseResult->error_type == 'rate_limit';
-                                if ($limited)
-                                {
+
+                                if ($limited) {
+                                    Log::debug("Limited on {$user->id}");
                                     sleep(1);
-                                } else
-                                {
+                                } else {
                                     $allUsers[] = $discourseResult;
                                     Log::debug('...got ' . count($allUsers) . " so far");
                                 }
