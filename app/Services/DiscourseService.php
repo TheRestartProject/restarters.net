@@ -147,17 +147,28 @@ class DiscourseService
 
                 if ($users && count($users)) {
                     foreach ($users as $user) {
-
                         $endpoint = "/admin/users/{$user->id}.json";
                         do {
+                            Log::debug("Get user {$user->id}");
                             $response = $client->request('GET', $endpoint);
                             $discourseResult = json_decode($response->getBody());
-                            $limited = property_exists($discourseResult, 'error_type') && $discourseResult->error_type == 'rate_limit';
-                            if ($limited) {
-                                sleep(1);
+
+                            if (!$discourseResult)
+                            {
+                                throw new \Exception("Get of $endpoint failed");
                             } else {
-                                $allUsers[] = $discourseResult;
-                                Log::debug('...got ' . count($allUsers) . " so far");
+                                $limited = property_exists(
+                                        $discourseResult,
+                                        'error_type'
+                                    ) && $discourseResult->error_type == 'rate_limit';
+                                if ($limited)
+                                {
+                                    sleep(1);
+                                } else
+                                {
+                                    $allUsers[] = $discourseResult;
+                                    Log::debug('...got ' . count($allUsers) . " so far");
+                                }
                             }
                         } while ($limited);
                     }
