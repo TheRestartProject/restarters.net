@@ -1,7 +1,7 @@
 {
     "_readme": [
         "This file locks the dependencies of your project to a known state",
-        "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
+        "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
     "content-hash": "04a640c2bfa243476b8a449740aeb2ed",
@@ -5052,16 +5052,16 @@
         },
         {
             "name": "stichoza/google-translate-php",
-            "version": "v4.1.4",
+            "version": "v4.1.5",
             "source": {
                 "type": "git",
                 "url": "https://github.com/Stichoza/google-translate-php.git",
-                "reference": "9e4808cf6f3f1e89f06e2129c46f58eeca658428"
+                "reference": "85039e0af473e58cc9f42d58e36d9d534a6a6431"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/Stichoza/google-translate-php/zipball/9e4808cf6f3f1e89f06e2129c46f58eeca658428",
-                "reference": "9e4808cf6f3f1e89f06e2129c46f58eeca658428",
+                "url": "https://api.github.com/repos/Stichoza/google-translate-php/zipball/85039e0af473e58cc9f42d58e36d9d534a6a6431",
+                "reference": "85039e0af473e58cc9f42d58e36d9d534a6a6431",
                 "shasum": ""
             },
             "require": {
@@ -5097,7 +5097,7 @@
                 "translate",
                 "translator"
             ],
-            "time": "2021-01-26T22:19:49+00:00"
+            "time": "2021-08-05T11:03:52+00:00"
         },
         {
             "name": "swiftmailer/swiftmailer",

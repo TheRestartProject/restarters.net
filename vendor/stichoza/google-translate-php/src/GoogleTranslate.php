@@ -52,7 +52,7 @@ class GoogleTranslate
      * @var array URL Parameters
      */
     protected $urlParams = [
-        'client'   => 'webapp',
+        'client'   => 'gtx',
         'hl'       => 'en',
         'dt'       => [
             't',   // Translate
@@ -147,6 +147,18 @@ class GoogleTranslate
     public function setUrl(string $url): self
     {
         $this->url = $url;
+        return $this;
+    }
+
+    /**
+     * Set Google Translate client param (webapp, gtx, etc.)
+     *
+     * @param string $client Google Translate client param (webapp, gtx, etc.)
+     * @return GoogleTranslate
+     */
+    public function setClient(string $client): self
+    {
+        $this->urlParams['client'] = $client;
         return $this;
     }
 

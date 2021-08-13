@@ -3,48 +3,22 @@
 namespace App\Http\Controllers;
 
 use App\Device;
-use App\DeviceList;
 use App\EventsUsers;
 use App\Group;
 use App\GroupTags;
 use App\GrouptagsGroups;
+use App\Helpers\Fixometer;
 use App\Helpers\FootprintRatioCalculator;
-use App\Party;
 use App\Search;
-use App\User;
 use App\UserGroups;
 use Auth;
 use DateTime;
 use DB;
-use App\Helpers\Fixometer;
 use Illuminate\Http\Request;
 use Response;
 
 class ExportController extends Controller
 {
-    public $TotalWeight;
-    public $TotalEmission;
-    public $EmissionRatio;
-
-    public function __construct()
-    {
-        //($model, $controller, $action)
-        //     parent::__construct($model, $controller, $action);
-
-        $Device = new Device;
-        $weights = $Device->getWeights();
-
-        if (isset($weights[0]) && ! empty($weights[0])) {
-            $this->TotalWeight = $weights[0]->total_weights;
-            $this->TotalEmission = $weights[0]->total_footprints;
-        } else {
-            $this->TotalWeight = null;
-            $this->TotalEmission = null;
-        }
-        $footprintRatioCalculator = new FootprintRatioCalculator();
-        $this->EmissionRatio = $footprintRatioCalculator->calculateRatio();
-    }
-
     public function devices(Request $request)
     {
         // To not display column if the referring URL is therestartproject.org
@@ -128,6 +102,10 @@ class ExportController extends Controller
         return Response::download($filename, 'devices.csv', $headers);
     }
 
+    /**
+     * Folder /public must be writable.
+     * Example URL: http://restarters.test/export/parties?fltr=1&groups[]=1.
+     */
     public function parties()
     {
         $Device = new Device;
@@ -140,7 +118,7 @@ class ExportController extends Controller
             $fromTimeStamp = null;
             $group_tags = null;
 
-            /** collect params **/
+            /* collect params **/
             if (isset($_GET['groups'])) {
                 $searched_groups = filter_var_array($_GET['groups'], FILTER_SANITIZE_NUMBER_INT);
             }
@@ -179,6 +157,8 @@ class ExportController extends Controller
             $hours_volunteered = 0;
             $totalCO2 = 0;
 
+            $emissionRatio = FootprintRatioCalculator::calculateRatio();
+
             foreach ($PartyList as $i => $party) {
                 if ($party->device_count == 0) {
                     $need_attention++;
@@ -200,7 +180,7 @@ class ExportController extends Controller
                 foreach ($party->devices as $device) {
                     switch ($device->repair_status) {
                         case 1:
-                            $party->co2 += $device->co2Diverted($this->EmissionRatio, $Device->displacement);
+                            $party->co2 += $device->co2Diverted($emissionRatio, $Device->getDisplacementFactor());
                             $party->fixed_devices++;
                             $party->weight += $device->ewasteDiverted();
 

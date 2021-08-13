@@ -11,6 +11,7 @@ use App\DeviceUrl;
 use App\Events\DeviceCreatedOrUpdated;
 use App\EventsUsers;
 use App\Group;
+use App\Helpers\Fixometer;
 use App\Helpers\FootprintRatioCalculator;
 use App\Notifications\AdminAbnormalDevices;
 use App\Notifications\ReviewNotes;
@@ -19,7 +20,6 @@ use App\User;
 use App\UserGroups;
 use Auth;
 use FixometerFile;
-use App\Helpers\Fixometer;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
@@ -196,7 +196,7 @@ class DeviceController extends Controller
                 } else {
                     $response['success'] = 'Device updated!';
 
-                    /** let's create the image attachment! **/
+                    /* let's create the image attachment! **/
                     if (isset($_FILES) && ! empty($_FILES['files']['name'])) {
                         $file = new FixometerFile;
                         $file->upload('devicePhoto', 'image', $id, env('TBL_DEVICES'), true);
@@ -386,9 +386,7 @@ class DeviceController extends Controller
         $return['success'] = true;
         $return['devices'] = $device;
 
-        $footprintRatioCalculator = new FootprintRatioCalculator();
-        $emissionRatio = $footprintRatioCalculator->calculateRatio();
-        $return['stats'] = $event->getEventStats($emissionRatio);
+        $return['stats'] = $event->getEventStats();
 
         return response()->json($return);
     }
@@ -517,10 +515,7 @@ class DeviceController extends Controller
             $event = Party::find($event_id);
             event(new DeviceCreatedOrUpdated($Device));
 
-            $footprintRatioCalculator = new FootprintRatioCalculator();
-            $emissionRatio = $footprintRatioCalculator->calculateRatio();
-
-            $stats = $event->getEventStats($emissionRatio);
+            $stats = $event->getEventStats();
             $data['stats'] = $stats;
             $data['success'] = 'Device updated!';
 
@@ -558,10 +553,8 @@ class DeviceController extends Controller
             $device->delete();
 
             if ($request->ajax()) {
-                $footprintRatioCalculator = new FootprintRatioCalculator();
-                $emissionRatio = $footprintRatioCalculator->calculateRatio();
                 $event = Party::find($eventId);
-                $stats = $event->getEventStats($emissionRatio);
+                $stats = $event->getEventStats();
 
                 return response()->json([
                     'success' => true,

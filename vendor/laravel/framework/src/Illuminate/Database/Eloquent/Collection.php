@@ -17,7 +17,7 @@ class Collection extends BaseCollection implements QueueableCollection
      *
      * @param  mixed  $key
      * @param  mixed  $default
-     * @return \Illuminate\Database\Eloquent\Model|static
+     * @return \Illuminate\Database\Eloquent\Model|static|null
      */
     public function find($key, $default = null)
     {
@@ -185,19 +185,6 @@ class Collection extends BaseCollection implements QueueableCollection
             ->each(function ($models, $className) use ($relations) {
                 static::make($models)->load($relations[$className] ?? []);
             });
-
-        return $this;
-    }
-
-    /**
-     * Add an item to the collection.
-     *
-     * @param  mixed  $item
-     * @return $this
-     */
-    public function add($item)
-    {
-        $this->items[] = $item;
 
         return $this;
     }
@@ -504,6 +491,19 @@ class Collection extends BaseCollection implements QueueableCollection
     public function pad($size, $value)
     {
         return $this->toBase()->pad($size, $value);
+    }
+
+    /**
+     * Get the comparison function to detect duplicates.
+     *
+     * @param  bool  $strict
+     * @return \Closure
+     */
+    protected function duplicateComparator($strict)
+    {
+        return function ($a, $b) {
+            return $a->is($b);
+        };
     }
 
     /**
