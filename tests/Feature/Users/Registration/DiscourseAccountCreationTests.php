@@ -75,4 +75,14 @@ class DiscourseAccountCreationTests extends TestCase
             $this->assertTrue((true));
         }
     }
+
+    /** @test */
+    public function user_sync() {
+        if (! env('CIRCLECI')) {
+            $this->artisan('sync:discourseusernames')
+                ->assertExitCode(0);
+        } else {
+            $this->assertTrue((true));
+        }
+    }
 }

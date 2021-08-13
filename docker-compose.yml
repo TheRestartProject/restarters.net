@@ -21,11 +21,11 @@
 # Run docker-compose logs to check for any obvious errors from docker-compose.
 #
 # Once Discourse is up then:
-# - Log in to http://restarters.docker:8003 using someuser/mustbetencharacters
+# - Log in to http://www.example.com:8003 using someuser/mustbetencharacters
 # - Go to http://www.example.com:8003/admin/api/keys/new and create an API key for all users with all scope.
 #   Put it in .env as DISCOURSE_APIKEY.
 # - Go to http://www.example.com:8003/admin/site_settings/category/login?filter= and
-#   - set the discourse connect url to http://localhost:8001/discourse/sso
+#   - set the discourse connect url to http://www.example.com:8001/discourse/sso
 #   - enable discourse connect
 #   - enable discourse connect provider
 #   - set the discourse connect secret to mustbetencharacters (should match DISCOURSE_SECRET in .env).

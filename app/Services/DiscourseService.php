@@ -115,4 +115,62 @@ class DiscourseService
             Log::error("Could not add to private message ($threadid, $addBy, $addUser:".$response->getReasonPhrase());
         }
     }
+
+    public function getAllUsers() {
+        // As per https://meta.discourse.org/t/how-do-i-get-a-list-of-all-users-from-the-api/24261/9 we can
+        // clunkily get a list of all users by looking for the trust_level_0 group, then fetch each
+        // one to get the email.
+        //
+        // This
+        $allUsers = [];
+
+        try {
+            $client = app('discourse-client');
+
+            $offset = 0;
+            do {
+                $endpoint = "groups/trust_level_0/members.json?limit=50&offset=$offset";
+                $response = $client->request('GET', $endpoint);
+                if ($response->getStatusCode() == 404) {
+                    Log::error("{$endpoint} not found");
+                    throw new \Exception("{$endpoint} not found");
+                }
+                $discourseResult = json_decode($response->getBody());
+
+                // We seem to get rate-limited in a way that the 429 retrying doesn't cover, so spot that here.
+                $limited = property_exists($discourseResult, 'error_type') && $discourseResult->error_type == 'rate_limit';
+
+                if (!$limited) {
+                    $users = $discourseResult->members;
+                    Log::info('...process ' . count($users));
+
+                    if ($users && count($users)) {
+                        foreach ($users as $user) {
+
+                            $endpoint = "/admin/users/{$user->id}.json";
+                            do {
+                                $response = $client->request('GET', $endpoint);
+                                $discourseResult = json_decode($response->getBody());
+                                $limited = property_exists($discourseResult, 'error_type') && $discourseResult->error_type == 'rate_limit';
+                                if ($limited) {
+                                    sleep(1);
+                                } else {
+                                    $allUsers[] = $discourseResult;
+                                    Log::info('...got ' . count($allUsers) . " so far");
+                                }
+                            } while ($limited);
+                        }
+                    }
+
+                    $offset += 50;
+                } else {
+                    Log::info('...rate limited, sleep');
+                }
+            } while ($limited || count($users));
+        } catch (\Exception $ex) {
+            Log::error('Error retrieving all users: '.$ex->getMessage());
+        }
+
+        return $allUsers;
+    }
 }
