@@ -3,6 +3,7 @@
 namespace App;
 
 use App\Events\DeviceCreatedOrUpdated;
+use App\Helpers\FootprintRatioCalculator;
 use DB;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Str;
@@ -62,6 +63,12 @@ class Device extends Model implements Auditable
     // Setters
 
     //Getters
+
+    public static function getDisplacementFactor()
+    {
+        return env('DISPLACEMENT_VALUE');
+    }
+
     public function getList($params = null)
     {
         //Tested!
@@ -111,7 +118,7 @@ class Device extends Model implements Auditable
     public function getWeights($group = null)
     {
         $sql =
-        'SELECT
+            'SELECT
 
 sum(case when (devices.category = 46) then (devices.estimate + 0.0) else categories.weight end) as `total_weights`,
 sum(case when (categories.powered = 1) then (case when (devices.category = 46) then (devices.estimate + 0.0) else categories.weight end) else 0 end) as ewaste,
@@ -140,42 +147,6 @@ AND devices.event = events.idevents ';
         }
 
         return DB::select(DB::raw($sql), $params);
-    }
-
-    public function getPartyWeights($party)
-    {
-        return DB::select(DB::raw('SELECT
-                ROUND(SUM(`weight`), 0) + ROUND(SUM(`estimate`), 0) AS `total_weights`,
-                ROUND(SUM(`footprint`) * '.$this->displacement.', 0) + (ROUND(SUM(`estimate`) * (SELECT * FROM `view_waste_emission_ratio`), 0))  AS `total_footprints`
-            FROM `'.$this->table.'` AS `d`
-            INNER JOIN `categories` AS `c` ON  `d`.`category` = `c`.`idcategories`
-            INNER JOIN `events` AS `e` ON  `d`.`event` = `e`.`idevents`
-            WHERE `d`.`repair_status` = 1 AND `c`.`idcategories` != 46 AND `e`.`idevents` = :id'), ['id' => $party]);
-    }
-
-    public function getCounts()
-    {
-        return DB::select(DB::raw('SELECT
-                    COUNT(`category`) AS `catcount`,
-                    ROUND(SUM(`weight`), 2) AS `catcount_weight`,
-                    `name`
-                FROM `'.$this->table.'` AS `d`
-                INNER JOIN `categories` AS `c` ON `c`.`idcategories` = `d`.`category`
-                WHERE `d`.`repair_status` = 1
-                GROUP BY `category`
-                ORDER BY `catcount` DESC'));
-    }
-
-    public function getByYears($repair_status)
-    {
-        return DB::select(DB::raw('SELECT
-                    COUNT(`iddevices`) AS `total_devices`,
-                    YEAR(`event_date`) AS `event_year`
-                FROM `'.$this->table.'` AS `d`
-                INNER JOIN `events` AS `e` ON `e`.`idevents` = `d`.`event`
-                WHERE `d`.`repair_status` = :rp
-                GROUP BY `event_year`
-                ORDER BY `event_year` ASC'), ['rp' => $repair_status]);
     }
 
     public function ofThisUser($id)
@@ -300,78 +271,6 @@ AND devices.event = events.idevents ';
         }
     }
 
-    public function countCO2ByYear($group = null, $year = null)
-    {
-        $sql = 'SELECT
-                    (ROUND(SUM(`c`.`footprint`), 0) * '.$this->displacement.') + ( CASE WHEN `d`.`category` = 46 THEN IFNULL(ROUND(SUM(`estimate`) * (SELECT * FROM `view_waste_emission_ratio`), 0),0) ELSE 0 END) AS `co2`,
-                    YEAR(`e`.`event_date`) AS `year`
-                FROM `'.$this->table.'` AS `d`
-                INNER JOIN `events` AS `e`
-                    ON `d`.`event` = `e`.`idevents`
-                INNER JOIN `categories` AS `c`
-                    ON `d`.`category` = `c`.`idcategories`
-                WHERE `d`.`repair_status` = 1 ';
-
-        if (! is_null($group)) {
-            $sql .= ' AND `e`.`group` = :group ';
-        }
-        if (! is_null($year)) {
-            $sql .= ' AND YEAR(`e`.`event_date`) = :year ';
-        }
-        $sql .= ' GROUP BY `year`
-                ORDER BY `year` DESC'; // was grouped by category too at some point
-
-        try {
-            if (! is_null($group) && is_numeric($group) && is_null($year)) {
-                return DB::select(DB::raw($sql), ['group' => $group]);
-            } elseif (! is_null($year) && is_numeric($year) && is_null($group)) {
-                return DB::select(DB::raw($sql), ['year' => $year]);
-            } elseif (! is_null($year) && is_numeric($year) && ! is_null($group) && is_numeric($group)) {
-                return DB::select(DB::raw($sql), ['year' => $year, 'group' => $group]);
-            }
-
-            return DB::select(DB::raw($sql));
-        } catch (\Illuminate\Database\QueryException $e) {
-            dd($e);
-        }
-    }
-
-    public function countWasteByYear($group = null, $year = null)
-    {
-        $sql = 'SELECT
-                    ROUND(SUM(`c`.`weight`), 0) + IFNULL( ROUND(SUM(`d`.`estimate`), 0), 0) AS `waste`,
-                    YEAR(`e`.`event_date`) AS `year`
-                FROM `'.$this->table.'` AS `d`
-                INNER JOIN `events` AS `e`
-                    ON `d`.`event` = `e`.`idevents`
-                INNER JOIN `categories` AS `c`
-                    ON `d`.`category` = `c`.`idcategories`
-                WHERE `d`.`repair_status` = 1 ';
-
-        if (! is_null($group)) {
-            $sql .= ' AND `e`.`group` = :group ';
-        }
-        if (! is_null($year)) {
-            $sql .= ' AND YEAR(`e`.`event_date`) = :year ';
-        }
-        $sql .= ' GROUP BY `year`
-                ORDER BY `year` DESC';
-
-        try {
-            if (! is_null($group) && is_numeric($group) && is_null($year)) {
-                return DB::select(DB::raw($sql), ['group' => $group]);
-            } elseif (! is_null($year) && is_numeric($year) && is_null($group)) {
-                return DB::select(DB::raw($sql), ['year' => $year]);
-            } elseif (! is_null($year) && is_numeric($year) && ! is_null($group) && is_numeric($group)) {
-                return DB::select(DB::raw($sql), ['year' => $year, 'group' => $group]);
-            }
-
-            return DB::select(DB::raw($sql));
-        } catch (\Illuminate\Database\QueryException $e) {
-            dd($e);
-        }
-    }
-
     public function findMostSeen($status = null, $cluster = null, $group = null)
     {
         $sql = 'SELECT COUNT(`d`.`category`) AS `counter`, `c`.`name` FROM `'.$this->table.'` AS `d`
@@ -467,6 +366,7 @@ AND devices.event = events.idevents ';
         return DB::select(DB::raw($sql));
     }
 
+    /** REDUNDANT? */
     public function guesstimates()
     {
         //Tested
@@ -531,8 +431,8 @@ AND devices.event = events.idevents ';
     {
         $footprint = 0;
 
-        if ($this->isFixed()) {
-            if ($this->deviceCategory->isMisc()) {
+        if ($this->isFixed() && $this->deviceCategory->isPowered()) {
+            if ($this->deviceCategory->isMiscPowered()) {
                 if (is_numeric($this->estimate)) {
                     $footprint = $this->estimate * $emissionRatio;
                 }
@@ -548,8 +448,8 @@ AND devices.event = events.idevents ';
     {
         $ewasteDiverted = 0;
 
-        if ($this->isFixed()) {
-            if ($this->deviceCategory->isMisc()) {
+        if ($this->isFixed() && $this->deviceCategory->isPowered()) {
+            if ($this->deviceCategory->isMiscPowered()) {
                 if (is_numeric($this->estimate)) {
                     $ewasteDiverted = $this->estimate;
                 }
@@ -565,11 +465,9 @@ AND devices.event = events.idevents ';
     {
         $wasteDiverted = 0;
 
-        if ($this->isFixed()) {
+        if ($this->isFixed() && $this->deviceCategory->isUnpowered()) {
             if (is_numeric($this->estimate)) {
                 $wasteDiverted = $this->estimate;
-            } else {
-                $wasteDiverted = (float) $this->deviceCategory->weight;
             }
         }
 

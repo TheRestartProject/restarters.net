@@ -226,7 +226,7 @@ class CreateEventTest extends TestCase
     }
 
     /** @test */
-    public function emails_not_sent_when_past_event_approved()
+    public function emails_not_sent_to_volunteers_when_past_event_approved()
     {
         $this->withoutExceptionHandling();
 
@@ -253,7 +253,9 @@ class CreateEventTest extends TestCase
         $response = $this->post('/party/edit/'.$event->idevents, $eventData);
 
         // assert
-        Notification::assertNothingSent();
+        Notification::assertNotSentTo(
+            [$restarter], NotifyRestartersOfNewEvent::class
+        );
     }
 
     /** @test */

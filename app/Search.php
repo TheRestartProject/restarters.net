@@ -76,23 +76,20 @@ class Search extends Model
 
     public function findMostSeen($parties, $status = 1, $cluster = null)
     {
-        $sql = 'SELECT COUNT(`d`.`category`) AS `counter`, `c`.`name` FROM `devices` AS `d`
-                INNER JOIN `events` AS `e`
-                    ON `d`.`event` = `e`.`idevents`
-                INNER JOIN `categories` AS `c`
-                    ON `d`.`category` = `c`.`idcategories`
-                WHERE 1=1 and `c`.`idcategories` <> '.env('MISC_CATEGORY_ID');
-        $sql .= ' AND `d`.`event` IN ('.implode(', ', $parties).')';
-
+        $m1 = env('MISC_CATEGORY_ID');
+        $parties = implode(', ', $parties);
+        $sql = "SELECT COUNT(`d`.`category`) AS `counter`, `c`.`name` FROM `devices` AS `d`
+                INNER JOIN `events` AS `e` ON `d`.`event` = `e`.`idevents`
+                INNER JOIN `categories` AS `c` ON `d`.`category` = `c`.`idcategories`
+                WHERE 1=1 and `c`.`idcategories` NOT IN ($m1)
+                AND `d`.`event` IN ($parties)";
         if (! is_null($status) && is_numeric($status)) {
             $sql .= ' AND `d`.`repair_status` = :status ';
         }
         if (! is_null($cluster) && is_numeric($cluster)) {
             $sql .= ' AND `c`.`cluster` = :cluster ';
         }
-
-        $sql .= ' GROUP BY `d`.`category`
-                ORDER BY `counter` DESC';
+        $sql .= ' GROUP BY `d`.`category` ORDER BY `counter` DESC';
         $sql .= (! is_null($cluster) ? '  LIMIT 1' : '');
 
         try {

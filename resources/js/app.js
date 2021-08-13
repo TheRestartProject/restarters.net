@@ -1413,28 +1413,6 @@ function initAutocomplete() {
       }
     });
 
-    // If event has attended or invited people then user cannot delete the event
-    $("#deleteEvent").click(function (e) {
-      if($(this).attr('data-count-attended') > 0 || $(this).attr('data-count-invited') > 0 || $(this).attr('data-count-volunteers') > 0) {
-        return confirm('Are you sure you want to delete this event?');
-
-        var id = $(this).attr('data-party-id');
-
-        $.ajax({
-          headers: {
-            'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
-          },
-          type:'POST',
-          url:'/party/delete/'+id,
-          data: {
-            "id" : id,
-          },
-          dataType : 'json',
-        });
-
-      }
-    });
-
     // Set min height so the language menu sits just under the overall height of the browser window
     $('body > .container:not(.container-nav)').css('min-height', ( $(window).height() - $('nav.navbar').height() ) +'px');
 
