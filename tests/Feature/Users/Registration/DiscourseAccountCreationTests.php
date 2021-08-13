@@ -8,6 +8,7 @@ use App\User;
 use DB;
 use Hash;
 use Illuminate\Support\Facades\Event;
+use Illuminate\Support\Facades\Log;
 use Mockery;
 use Tests\TestCase;
 
@@ -78,7 +79,11 @@ class DiscourseAccountCreationTests extends TestCase
 
     /** @test */
     public function user_sync() {
+        $this->withExceptionHandling();
+
         if (! env('CIRCLECI')) {
+            Log::shouldReceive('info')
+                ->with('Failed to Save Venue');
             $this->artisan('sync:discourseusernames')
                 ->assertExitCode(0);
         } else {

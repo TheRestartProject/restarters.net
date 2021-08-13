@@ -124,52 +124,50 @@ class DiscourseService
         // This
         $allUsers = [];
 
-        try {
-            $client = app('discourse-client');
+        // Don't catch any exceptions, because we want the failure to ripple up rather than return a truncated list
+        // with apparent success.
+        $client = app('discourse-client');
+        $offset = 0;
 
-            $offset = 0;
-            do {
-                $endpoint = "groups/trust_level_0/members.json?limit=50&offset=$offset";
-                $response = $client->request('GET', $endpoint);
-                if ($response->getStatusCode() == 404) {
-                    Log::error("{$endpoint} not found");
-                    throw new \Exception("{$endpoint} not found");
-                }
-                $discourseResult = json_decode($response->getBody());
+        do {
+            $endpoint = "groups/trust_level_0/members.json?limit=50&offset=$offset";
+            $response = $client->request('GET', $endpoint);
+            if ($response->getStatusCode() == 404) {
+                Log::error("{$endpoint} not found");
+                throw new \Exception("{$endpoint} not found");
+            }
+            $discourseResult = json_decode($response->getBody());
 
-                // We seem to get rate-limited in a way that the 429 retrying doesn't cover, so spot that here.
-                $limited = property_exists($discourseResult, 'error_type') && $discourseResult->error_type == 'rate_limit';
+            // We seem to get rate-limited in a way that the 429 retrying doesn't cover, so spot that here.
+            $limited = property_exists($discourseResult, 'error_type') && $discourseResult->error_type == 'rate_limit';
 
-                if (!$limited) {
-                    $users = $discourseResult->members;
-                    Log::info('...process ' . count($users));
+            if (!$limited) {
+                $users = $discourseResult->members;
+                Log::info('...process ' . count($users));
 
-                    if ($users && count($users)) {
-                        foreach ($users as $user) {
+                if ($users && count($users)) {
+                    foreach ($users as $user) {
 
-                            $endpoint = "/admin/users/{$user->id}.json";
-                            do {
-                                $response = $client->request('GET', $endpoint);
-                                $discourseResult = json_decode($response->getBody());
-                                $limited = property_exists($discourseResult, 'error_type') && $discourseResult->error_type == 'rate_limit';
-                                if ($limited) {
-                                    sleep(1);
-                                } else {
-                                    $allUsers[] = $discourseResult;
-                                    Log::info('...got ' . count($allUsers) . " so far");
-                                }
-                            } while ($limited);
-                        }
+                        $endpoint = "/admin/users/{$user->id}.json";
+                        do {
+                            $response = $client->request('GET', $endpoint);
+                            $discourseResult = json_decode($response->getBody());
+                            $limited = property_exists($discourseResult, 'error_type') && $discourseResult->error_type == 'rate_limit';
+                            if ($limited) {
+                                sleep(1);
+                            } else {
+                                $allUsers[] = $discourseResult;
+                                Log::debug('...got ' . count($allUsers) . " so far");
+                            }
+                        } while ($limited);
                     }
-
-                    $offset += 50;
-                } else {
-                    Log::info('...rate limited, sleep');
                 }
-            } while ($limited || count($users));
-        } catch (\Exception $ex) {
-            Log::error('Error retrieving all users: '.$ex->getMessage());
-        }
+
+                $offset += 50;
+            } else {
+                Log::debug('...rate limited, sleep');
+            }
+        } while ($limited || count($users));
 
         return $allUsers;
     }
