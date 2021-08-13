@@ -154,8 +154,10 @@ class DiscourseService
                             $discourseResult = json_decode($response->getBody());
 
                             if (!$discourseResult) {
+                                # This also seems to happen as a transient error.
                                 Log::debug("Get failed on {$user->id}");
                                 sleep(1);
+                                $limited = TRUE;
 //                                throw new \Exception("Get of $endpoint failed");
                             } else {
                                 $limited = property_exists(
