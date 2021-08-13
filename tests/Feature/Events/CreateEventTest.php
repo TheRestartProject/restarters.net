@@ -262,26 +262,32 @@ class CreateEventTest extends TestCase
     public function emails_sent_to_coordinators_when_event_created()
     {
         $this->withoutExceptionHandling();
-
-        $admin = factory(User::class)->state('Administrator')->create();
-        $this->actingAs($admin);
-        // arrange
         Notification::fake();
 
         $network = factory(Network::class)->create();
         $group = factory(Group::class)->create();
-        $coordinator = factory(User::class)->state('NetworkCoordinator')->create();
         $network->addGroup($group);
+
+        // Make an admin who is also a network controller.
+        $admin = factory(User::class)->state('Administrator')->create();
+        $admin->addPreference('admin-moderate-event');
+        $network->addCoordinator($admin);
+
+        // Make a separate network controller.
+        $coordinator = factory(User::class)->state('NetworkCoordinator')->create();
         $network->addCoordinator($coordinator);
 
         $eventData = factory(Party::class)->raw(['group' => $group->idgroups]);
 
-        // act
+        $this->actingAs($admin);
         $response = $this->post('/party/create/', $eventData);
 
-        // assert
-        Notification::assertSentTo(
-            [$coordinator], AdminModerationEvent::class
+        // assert that the notification was sent to both the network coordinator, and the admin, and only once to each.
+        Notification::assertSentToTimes(
+            $coordinator, AdminModerationEvent::class, 1
+        );
+        Notification::assertSentToTimes(
+            $admin, AdminModerationEvent::class, 1
         );
     }
 
