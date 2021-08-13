@@ -47,8 +47,6 @@
             :has-error="$v.eventStart.$error || $v.eventEnd.$error"
             ref="eventStart"/>
       </b-form-group>
-      <!-- TODO The address component is indented slightly, and shouldn't be.-->
-      <!-- TODO Error message about choosing something and the next level up if required -->
       <VenueAddress
           :all-groups="allGroups"
           :value.sync="eventAddress"
@@ -111,8 +109,6 @@ import EventGroup from './EventGroup'
 import { required, minLength } from 'vuelidate/lib/validators'
 import validationHelpers from '../mixins/validationHelpers'
 
-// TODO Native inputs for date/time
-
 function geocodeable() {
   return this.lat !== null && this.lng !== null
 }
@@ -157,7 +153,6 @@ export default {
     }
   },
   validations: {
-    // TODO Any min/max lengths?
     // We use vuelidate to validate the inputs.  If necessary we pass the relevant validation down to a child component,
     // which is responsible for setting the hasError class.
     //

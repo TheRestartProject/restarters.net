@@ -1,12 +1,12 @@
 <template>
     <div>
-        <b-form-datepicker
-            v-model="value"
-            hide-header
-            :class="{ hasError: hasError, datepicker: true }"
-            :date-format-options="{ weekday: 'short', day: 'numeric', month: 'short', year: 'numeric' }"
-         />
-        <input type="hidden" name="event_date" :value="value" />
+      <b-form-datepicker
+          v-model="value"
+          hide-header
+          :class="{ hasError: hasError, datepicker: true, 'd-none': true, 'd-lg-flex': true }"
+          :date-format-options="{ weekday: 'short', day: 'numeric', month: 'short', year: 'numeric' }"
+      />
+      <b-input size="lg" type="date" name="event_date" v-model="value" class="d-block d-lg-none focusfix" />
     </div>
 </template>
 
@@ -63,4 +63,19 @@ export default {
       min-width: unset !important;
     }
 }
+
+/deep/ .d-none {
+  display: none !important;
+}
+
+/deep/ .d-lg-flex {
+  display: flex !important;
+}
+
+/deep/ .focusfix:focus {
+  margin-top: 2px;
+  margin-left: 1px;
+  margin-bottom: 1px;
+}
+
 </style>

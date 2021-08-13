@@ -1,12 +1,15 @@
 <template>
-    <div class="d-flex">
-        <b-form-timepicker class="start-time mr-1" v-model="currentStartTime" placeholder="--:--" @input="changeEndTime" hide-header :class="{ hasError: hasError }" />
-        <input type="hidden" name="start" :value="currentStartTime" />
-        <b-form-timepicker class="ml-1 end-time" v-model="currentEndTime" placeholder="--:--" hide-header :class="{ hasError: hasError }" />
-        <input type="hidden" name="end" :value="currentEndTime" />
+  <div>
+    <div class="d-none d-lg-flex">
+      <b-form-timepicker class="start-time mr-1" v-model="currentStartTime" placeholder="--:--" @input="changeEndTime" hide-header :class="{ hasError: hasError }" />
+      <b-form-timepicker class="ml-1 end-time" v-model="currentEndTime" placeholder="--:--" hide-header :class="{ hasError: hasError }" />
     </div>
+    <div class="d-flex d-lg-none">
+      <b-input size="lg" type="time" name="start" v-model="currentStartTime" :class="{ hasError: hasError, 'mr-1': true, focusfix: true }" />
+      <b-input size="lg" type="time" name="end" v-model="currentEndTime"  :class="{ hasError: hasError, 'ml-1': true, focusfix: true }" />
+    </div>
+  </div>
 </template>
-
 <script>
 export default {
   props: {
@@ -114,4 +117,10 @@ export default {
     border: 0;
     padding: 0 10px;
 }
+
+.focusfix:focus {
+    margin-top: 2px;
+    margin-left: 1px !important;
+}
+
 </style>

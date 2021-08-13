@@ -14,11 +14,12 @@
             aria-describedby="locationHelpBlock"
             types="geocode"
             ref="autocomplete"
-            :class="{ hasError: hasError }"
+            :class="{ hasError: hasError, 'm-0': true }"
         />
-        <p class="text-danger" v-if="error">{{ error }}</p>
-
-        <small id="locationHelpBlock" class="form-text text-muted">
+        <small id="locationHelpBlock" class="form-text text-danger" v-if="hasError">
+          {{ __('events.address_error') }}
+        </small>
+        <small id="locationHelpBlock" class="form-text text-muted" v-else>
           {{ __('events.field_venue_helper') }}
         </small>
         <b-btn variant="primary" size="sm" v-if="groupLocation && !online" @click="useGroup" class="mt-2" :disabled="currentValue === groupLocation">
@@ -53,11 +54,6 @@ export default {
   mixins: [ map ],
   props: {
     value: {
-      type: String,
-      required: false,
-      default: null
-    },
-    error: {
       type: String,
       required: false,
       default: null
