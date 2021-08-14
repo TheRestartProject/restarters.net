@@ -9,7 +9,12 @@ class LcaStats
 
     public static function getEmissionRatioUnpowered()
     {
-        return env('UNPOWERED_EMISSION_RATIO');
+        return env('EMISSION_RATIO_UNPOWERED');
+    }
+
+    public static function getEmissionRatioPowered()
+    {
+        return env('EMISSION_RATIO_POWERED');
     }
 
     public static function getDisplacementFactor()
@@ -20,91 +25,75 @@ class LcaStats
     /**
      * Calculates the average footprint per kilo of fixed devices.
      *
-     * Calculated by looking at all of the fixed, non-misc devices in the database,
-     * and dividing the total footprint of these devices by the total weight of these
-     * devices.
+     * Calculated by looking at all of the fixed devices in the database,
+     * and dividing the total footprint of their categories by the total weight of their
+     * categories.
      *
-     * Categories table must hold 0 value for weight and footprint for Misc categories.
+     * Misc categories should not be included therefore they must
+     * weight and footprint = 0.
      *
      * This ratio of CO2 to kilo of device is then used to estimate the footprint of
-     * miscellaneous devices that are recorded in the DB.
+     * Misc devices that are recorded in the DB.
      */
-    public static function getEmissionRatioPowered()
+    public static function getEmissionRatioPoweredXX()
     {
-        if ($cache = LcaStats::getStatsCache('emission_ratio_powered')) {
-            return $cache;
-        }
         $value = DB::select(DB::raw("
 SELECT
-SUM(COALESCE(c.footprint, 0.0)) / SUM(COALESCE(c.weight, 0.0)) AS ratio
+SUM(COALESCE(c.footprint, 0) / SUM(COALESCE(c.weight, 0)) AS ratio
 FROM devices d
 JOIN categories c ON c.idcategories = d.category
 AND d.repair_status = 1
 AND c.powered = 1
 "));
-// caching maybe not necessary any more
-// now that calls to calc have been rationalised
-        LcaStats::putStatsCache('emission_ratio_powered', $value[0]->ratio);
         return $value[0]->ratio;
     }
 
     /**
-     * Proposed changes to getWeights().
+     * Proposed replacement for Device->getWeights().
      * Adds calculation for unpowered categories with lca data.
      * Misc weight/footprint values = 0 in categories table.
-     * Removal of hard-coded Misc ids.
+     * Removal of hard-coded Misc ID.
      * Separate emission calculations for powered/unpowered devices.
-     * Assuming emission ratio calculated separately.
      * PENDING confirmation of assumptions.
-     * SEE tests/Feature/FooStatsTest::get_weights_new().
      * */
     public static function getWasteStats($group = null)
     {
         $sql = "
 SELECT
-sum(case when (c.weight = 0) then (d.estimate + 0.0) else c.weight end) as total_weight,
-sum(case when (c.powered = 1) then (case when (c.weight = 0) then (d.estimate + 0.0) else c.weight end) else 0 end) as powered_waste,
-sum(case when (c.powered = 0) then (case when (c.weight = 0) then (d.estimate + 0.0) else c.weight end) else 0 end) as unpowered_waste,
-sum(case when (c.powered = 1) then (case when (c.weight = 0) then (d.estimate + 0.0) * @eRatio else c.footprint * @displacement end) else 0 end) as powered_footprint,
-sum(case when (c.powered = 0) then (case when (c.weight = 0) then (d.estimate + 0.0) * @uRatio else c.footprint * @displacement end) else 0 end) as unpowered_footprint
+CASE WHEN (c.weight = 0) THEN COALESCE(d.estimate,0) ELSE c.weight END AS device_weights,
+CASE WHEN (c.powered = 1) THEN (CASE WHEN (c.weight = 0) THEN COALESCE(d.estimate,0) ELSE c.weight end) ELSE 0 END  AS powered_device_weights,
+CASE WHEN (c.powered = 0) THEN (CASE WHEN (c.weight = 0) THEN COALESCE(d.estimate,0) ELSE c.weight end) ELSE 0 END AS unpowered_device_weights,
+CASE WHEN (c.powered = 1) THEN (CASE WHEN (c.weight = 0) THEN (COALESCE(d.estimate,0) * @eRatio) ELSE c.footprint END) ELSE 0 END AS powered_footprints,
+CASE WHEN (c.powered = 0) THEN (CASE WHEN (c.weight = 0) THEN (COALESCE(d.estimate,0) * @uRatio) ELSE c.footprint END) ELSE 0 END AS unpowered_footprints
 FROM devices d, categories c, events e,
-(select @displacement := :displacement) dp,
-(select @eRatio := :eRatio) er,
-(select @uRatio := :uRatio) ur
+(SELECT @eRatio := :eRatio) er,
+(SELECT @uRatio := :uRatio) ur
 WHERE d.category = c.idcategories
 AND d.event = e.idevents
 AND d.repair_status = 1
 ";
-
-        $eRatio = LcaStats::getEmissionRatioPowered();
-        $uRatio = LcaStats::getEmissionRatioUnpowered();
-        $displacement = LcaStats::getDisplacementFactor();
-        $params = ['displacement' => $displacement, 'eRatio' => $eRatio, 'uRatio' => $uRatio];
-
+        $params = [
+            'displacement' => LcaStats::getDisplacementFactor(),
+            'eRatio' => LcaStats::getEmissionRatioPowered(),
+            'uRatio' => LcaStats::getEmissionRatioUnpowered()
+        ];
         if (!is_null($group) && is_numeric($group)) {
             $sql .= ' AND e.`group` = :groupid';
             $params['groupid'] = $group;
-
-            return DB::select(DB::raw($sql), $params);
         }
 
+        $sql = "
+SELECT
+SUM(t1.device_weights) AS total_weight,
+SUM(t1.powered_device_weights) AS powered_waste,
+SUM(t1.unpowered_device_weights) AS unpowered_waste,
+SUM(t1.powered_footprints) * @displacement AS powered_footprint,
+SUM(t1.unpowered_footprints) * @displacement AS unpowered_footprint
+FROM (
+$sql
+) t1,
+(SELECT @displacement := :displacement) dp
+";
         return DB::select(DB::raw($sql), $params);
-    }
-
-    public static function getStatsCache($key)
-    {
-        $statsKey = "lcastats_$key";
-        if ($cache = \Cache::get($statsKey)) {
-            return $cache;
-        }
-        return FALSE;
-    }
-
-    public static function putStatsCache($key, $data)
-    {
-        $statsKey = "lcastats_$key";
-        \Cache::forget($statsKey);
-        \Cache::put($statsKey, $data, 300);
-        return (\Cache::has($statsKey));
     }
 }

@@ -57,7 +57,7 @@
                       <label for="event_co2_stats_embed">@lang('events.embed_code_header'):</label>
                       <input type="text" class="form-control field" id="event_co2_stats_embed" value='<iframe src="{{{ env('APP_URL') }}}/outbound/info/party/{{{ $formdata->id }}}/manufacture" frameborder="0" width="700" height="850"></iframe>'>
                   </div>
-                  @if( round($stats['co2']) > 900 )
+                  @if( round($stats['powered_co2']) > 900 )
                     <small class="after-offset">@lang('visualisation.message_manufacture_high')</small>
                   @else
                     <small class="after-offset">@lang('visualisation.message_manufacture_low')</small>
@@ -71,7 +71,7 @@
                       <label for="event_co2_stats_embed">@lang('events.embed_code_header'):</label>
                       <input type="text" class="form-control field" id="event_co2_stats_embed" value='<iframe src="{{{ env('APP_URL') }}}/outbound/info/party/{{{ $formdata->id }}}/consume" frameborder="0" width="700" height="850"></iframe>'>
                   </div>
-                  @if( round($stats['co2']) > 6000 )
+                  @if( round($stats['powered_co2']) > 6000 )
                     <small class="after-offset">@lang('visualisation.message_consume_high')</small>
                   @else
                     <small class="after-offset">@lang('visualisation.message_consume_low')</small>

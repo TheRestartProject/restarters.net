@@ -106,8 +106,8 @@ class LoginController extends Controller
         $deviceCount = array_key_exists(0, $stats['device_count_status']) ? $stats['device_count_status'][0]->counter : 0;
 
         return view('auth.login', [
-          'co2Total' => $stats['co2Total'][0]->total_footprints,
-          'wasteTotal' => $stats['co2Total'][0]->total_weights,
+          'co2Total' => round($stats[0]->powered_footprint + $stats[0]->unpowered_footprint),
+          'wasteTotal' => $stats['co2Total'][0]->total_weight,
           'partiesCount' => count($stats['allparties']),
           'deviceCount' => $deviceCount,
         ]);

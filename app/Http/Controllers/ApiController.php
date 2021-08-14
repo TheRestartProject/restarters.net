@@ -29,16 +29,16 @@ class ApiController extends Controller
             $hours_volunteered += $party->hoursVolunteered();
         }
 
-        $co2Total = $Device->getWeights();
+        $co2Total = \App\Helpers\LcaStats::getWasteStats();
 
         $result['participants'] = $participants;
         $result['hours_volunteered'] = $hours_volunteered;
         $fixed = $Device->statusCount();
         $result['items_fixed'] = count($fixed) ? $fixed[0]->counter : 0;
-        $result['weights'] = round($co2Total[0]->total_weights);
-        $result['ewaste'] = round($co2Total[0]->ewaste);
+        $result['weights'] = round($co2Total[0]->total_weight);
+        $result['powered_waste'] = round($co2Total[0]->powered_waste);
         $result['unpowered_waste'] = round($co2Total[0]->unpowered_waste);
-        $result['emissions'] = round($co2Total[0]->total_footprints);
+        $result['emissions'] = round($co2Total[0]->powered_footprint + $co2Total[0]->unpowered_footprint);
 
         $devices = new Device;
         $result['fixed_powered'] = $devices->fixedPoweredCount();
@@ -65,8 +65,8 @@ class ApiController extends Controller
         return response()
             ->json(
                 [
-                'kg_co2_diverted' => round($eventStats['co2']),
-                'kg_waste_diverted' => round($eventStats['ewaste']),
+                'kg_co2_diverted' => round($eventStats['powered_co2']),
+                'kg_waste_diverted' => round($eventStats['powered_waste']),
                 'num_fixed_devices' => $eventStats['fixed_devices'],
                 'num_repairable_devices' => $eventStats['repairable_devices'],
                 'num_dead_devices' => $eventStats['dead_devices'],
@@ -84,10 +84,10 @@ class ApiController extends Controller
 
         return response()
             ->json([
-                'num_participants' => $groupStats['pax'],
-                'num_hours_volunteered' => $groupStats['hours'],
+                'num_participants' => $groupStats['participants'],
+                'num_hours_volunteered' => $groupStats['hours_volunteered'],
                 'num_parties' => $groupStats['parties'],
-                'kg_co2_diverted' => round($groupStats['co2']),
+                'kg_co2_diverted' => round($groupStats['powered_co2']),
                 'kg_waste_diverted' => round($groupStats['waste']),
             ], 200);
     }
@@ -233,7 +233,7 @@ class ApiController extends Controller
                 DB::raw(
                     "sum(case when (devices.category = 46) then (devices.estimate + 0.0) *
                      (select (sum(`categories`.`footprint`) * {$d->getDisplacementFactor()}) / sum(`categories`.`weight` + 0.0) from `devices`, `categories` where `categories`.`idcategories` = `devices`.`category` and `devices`.`repair_status` = 1 and categories.idcategories != 46)
-                     else (categories.footprint * {$d->getDisplacementFactor()}) end) as `total_footprints`"
+                     else (categories.footprint * {$d->getDisplacementFactor()}) end) as `total_footprint`"
                 )
             )->join('events', 'events.idevents', '=', 'devices.event')
                 ->join('groups', 'events.group', '=', 'groups.idgroups')
@@ -242,7 +242,7 @@ class ApiController extends Controller
                 ->first();
 
             $weight = round($counts->ewaste + $counts->unpowered_waste);
-            $co2 = round($counts->total_footprints);
+            $co2 = round($counts->total_footprint);
         }
 
         return response()->json([

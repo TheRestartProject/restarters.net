@@ -258,6 +258,12 @@ class Group extends Model implements Auditable
         return $ret;
     }
 
+    public static function getGroupStatsArrayKeys()
+    {
+        return \App\Party::getEventStatsArrayKeys() + ['parties' => 0,'waste' => 0,];
+    }
+
+
     public function getGroupStats($emissionRatio = null)
     {
         if (is_null($emissionRatio)) {
@@ -268,38 +274,20 @@ class Group extends Model implements Auditable
             ->where('events.group', $this->idgroups)
             ->get();
 
-        $groupStats = [];
+        $result = \App\Party::getEventStatsArrayKeys();
+
         // Rollup all events stats into stats for this group.
         foreach ($allPastEvents as $event) {
             $eventStats = $event->getEventStats($emissionRatio);
 
             foreach ($eventStats as $statKey => $statValue) {
-                if (! array_key_exists($statKey, $groupStats)) {
-                    $groupStats[$statKey] = 0;
-                }
-                $groupStats[$statKey] += $statValue;
+                $result[$statKey] += $statValue;
             }
         }
 
-        // Keeping the specific subset of stats returned for now,
-        // with existing names.
-        return [
-            'pax' => $groupStats['participants'] ?? 0,
-            'hours' => $groupStats['hours_volunteered'] ?? 0,
-            'parties' => count($allPastEvents),
-            'co2' => $groupStats['co2'] ?? 0,
-            'ewaste' => $groupStats['ewaste'] ?? 0,
-            'unpowered_waste' => $groupStats['unpowered_waste'] ?? 0,
-            'waste' => ($groupStats['ewaste'] ?? 0) + ($groupStats['unpowered_waste'] ?? 0),
-            'fixed_devices' => $groupStats['fixed_devices'] ?? 0,
-            'fixed_powered' => $groupStats['fixed_powered'] ?? 0,
-            'fixed_unpowered' => $groupStats['fixed_unpowered'] ?? 0,
-            'repairable_devices' => $groupStats['repairable_devices'] ?? 0,
-            'dead_devices' => $groupStats['dead_devices'] ?? 0,
-            'no_weight' => $groupStats['no_weight'] ?? 0,
-            'devices_powered' => $groupStats['devices_powered'] ?? 0,
-            'devices_unpowered' => $groupStats['devices_unpowered'] ?? 0,
-        ];
+        $result['waste'] = $result['powered_waste'] + $result['unpowered_waste'];
+        $result['parties'] = count($allPastEvents);
+        return $result;
     }
 
     /**

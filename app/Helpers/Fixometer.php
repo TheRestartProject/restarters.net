@@ -25,15 +25,15 @@ class Fixometer
         if ($range) {
             return [
                 '' => 'N/A',
-                (intval(date('Y')) - 20).'-'.(intval(date('Y')) - 16) => '16-20',
-                (intval(date('Y')) - 30).'-'.(intval(date('Y')) - 21) => '21-30',
-                (intval(date('Y')) - 40).'-'.(intval(date('Y')) - 31) => '31-40',
-                (intval(date('Y')) - 50).'-'.(intval(date('Y')) - 41) => '41-50',
-                (intval(date('Y')) - 60).'-'.(intval(date('Y')) - 51) => '51-60',
-                (intval(date('Y')) - 70).'-'.(intval(date('Y')) - 61) => '61-70',
-                (intval(date('Y')) - 80).'-'.(intval(date('Y')) - 71) => '71-80',
-                (intval(date('Y')) - 90).'-'.(intval(date('Y')) - 81) => '81-90',
-                (intval(date('Y')) - 100).'-'.(intval(date('Y')) - 91) => '91-100',
+                (intval(date('Y')) - 20) . '-' . (intval(date('Y')) - 16) => '16-20',
+                (intval(date('Y')) - 30) . '-' . (intval(date('Y')) - 21) => '21-30',
+                (intval(date('Y')) - 40) . '-' . (intval(date('Y')) - 31) => '31-40',
+                (intval(date('Y')) - 50) . '-' . (intval(date('Y')) - 41) => '41-50',
+                (intval(date('Y')) - 60) . '-' . (intval(date('Y')) - 51) => '51-60',
+                (intval(date('Y')) - 70) . '-' . (intval(date('Y')) - 61) => '61-70',
+                (intval(date('Y')) - 80) . '-' . (intval(date('Y')) - 71) => '71-80',
+                (intval(date('Y')) - 90) . '-' . (intval(date('Y')) - 81) => '81-90',
+                (intval(date('Y')) - 100) . '-' . (intval(date('Y')) - 91) => '91-100',
             ];
         }
         $ages = ['' => ''];
@@ -196,8 +196,8 @@ class Fixometer
         }
 
         $userIsHostOfAGroup = UserGroups::where('user', Auth::user()->id)
-                            ->where('role', 3)
-                            ->count() > 0;
+            ->where('role', 3)
+            ->count() > 0;
 
         if ($userIsHostOfAGroup) {
             return true;
@@ -209,13 +209,13 @@ class Fixometer
     public static function userIsHostOfGroup($groupId, $userId)
     {
         $user_group_association = DB::table('users_groups')
-                                ->where('group', $groupId)
-                                ->where('user', $userId)
-                                ->where('role', 3)
-                                ->whereNull('deleted_at')
-                                ->first();
+            ->where('group', $groupId)
+            ->where('user', $userId)
+            ->where('role', 3)
+            ->whereNull('deleted_at')
+            ->first();
 
-        if (! empty($user_group_association)) {
+        if (!empty($user_group_association)) {
             return true;
         }
 
@@ -252,13 +252,13 @@ class Fixometer
                     $icon = '';
                     break;
             }
-            echo '<div class="alert alert-'.$type;
+            echo '<div class="alert alert-' . $type;
             if ($dismissible) {
                 echo '  alert-dismissible';
             }
             echo '" role="alert">
                   <!--<button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button>-->
-                  <i class="fa fa-'.$icon.'"></i> '.$text.'
+                  <i class="fa fa-' . $icon . '"></i> ' . $text . '
 
               </div>';
         }
@@ -270,32 +270,32 @@ class Fixometer
      * */
     public static function verify($var, $strict = false, $type = 'string')
     {
-        if (! isset($var) || empty($var) || is_null($var)) {
+        if (!isset($var) || empty($var) || is_null($var)) {
             return false;
         }
         if ($strict) {
             switch ($type) {
-                    case 'number':
-                        if (is_numeric($var)) {
-                            return true;
-                        }
-
-                        break;
-                    case 'string':
+                case 'number':
+                    if (is_numeric($var)) {
                         return true;
+                    }
 
-                      break;
-                    case 'array':
-                        if (is_array($var)) {
-                            return true;
-                        }
+                    break;
+                case 'string':
+                    return true;
 
-                        break;
-                    default:
-                        return false;
+                    break;
+                case 'array':
+                    if (is_array($var)) {
+                        return true;
+                    }
 
-                      break;
-                }
+                    break;
+                default:
+                    return false;
+
+                    break;
+            }
         } else {
             return true;
         }
@@ -310,8 +310,8 @@ class Fixometer
 
     public static function translate($key)
     {
-        $translation = __(App::getLocale().'.'.$key);
-        if (strpos($translation, App::getLocale().'.') !== false) {
+        $translation = __(App::getLocale() . '.' . $key);
+        if (strpos($translation, App::getLocale() . '.') !== false) {
             return $key;
         }
 
@@ -430,7 +430,7 @@ class Fixometer
             DB::delete(DB::raw($sql), ['image' => $image->idimages]);
 
             /** delete image from disk **/
-            unlink($_SERVER['DOCUMENT_ROOT'].'/uploads/'.$image->path);
+            unlink($_SERVER['DOCUMENT_ROOT'] . '/uploads/' . $image->path);
         }
     }
 
@@ -707,12 +707,12 @@ class Fixometer
 
     public static function checkDistance($object, $user)
     {
-        $url = 'https://maps.googleapis.com/maps/api/distancematrix/json?units=imperial&origins='.$object->latitude.','.$object->longitude.'&destinations='.$user->latitude.','.$user->longitude;
+        $url = 'https://maps.googleapis.com/maps/api/distancematrix/json?units=imperial&origins=' . $object->latitude . ',' . $object->longitude . '&destinations=' . $user->latitude . ',' . $user->longitude;
 
         $json = file_get_contents($url);
         $json = json_decode($json);
 
-        if (is_object($json) && ! empty($json->{'rows'})) {
+        if (is_object($json) && !empty($json->{'rows'})) {
             try {
                 $distance = str_replace(' mi', '', $json->{'rows'}[0]->{'elements'}[0]->{'distance'}->{'text'});
                 $distance = floatval(str_replace(',', '', $distance));
@@ -772,10 +772,11 @@ class Fixometer
             $stats = \Cache::get('all_stats');
 
             // We've seen a Sentry problem which I can only see happening if there was invalid data in the cache.
-            if (! $stats ||
-                ! array_key_exists('allparties', $stats) ||
-                ! array_key_exists('co2Total', $stats) ||
-                ! array_key_exists('device_count_status', $stats)
+            if (
+                !$stats ||
+                !array_key_exists('allparties', $stats) ||
+                !array_key_exists('co2Total', $stats) ||
+                !array_key_exists('device_count_status', $stats)
             ) {
                 $stats = [];
             }
@@ -783,7 +784,7 @@ class Fixometer
 
         if ($stats == []) {
             $stats['allparties'] = $Party->ofThisGroup('admin', true, false);
-            $stats['co2Total'] = $Device->getWeights();
+            $stats['co2Total'] = \App\Helpers\LcaStats::getWasteStats();
             $stats['device_count_status'] = $Device->statusCount();
             \Cache::put('all_stats', $stats, 7200);
         }
@@ -793,10 +794,10 @@ class Fixometer
 
     public static function userHasEditGroupPermission($group_id, $user_id, $role = 3)
     {
-        return ! empty(\App\UserGroups::where('group', $group_id)
-                                  ->where('user', $user_id)
-                                    ->where('role', $role)
-                                      ->first());
+        return !empty(\App\UserGroups::where('group', $group_id)
+            ->where('user', $user_id)
+            ->where('role', $role)
+            ->first());
     }
 
     public static function buildSortQuery($columnName)
@@ -814,7 +815,7 @@ class Fixometer
 
         $existing = Request::except(['sort', 'sortdir']);
 
-        return http_build_query($existing).'&sort='.$columnName.'&sortdir='.$newSortDir;
+        return http_build_query($existing) . '&sort=' . $columnName . '&sortdir=' . $newSortDir;
     }
 
     /*
@@ -844,16 +845,16 @@ class Fixometer
     public static function hasPreference($slug)
     {
 
-      // Check if guest
+        // Check if guest
         if (Auth::guest()) {
             return false;
         }
 
         // Check if preference exists
         $has_preference = UsersPreferences::join('preferences', 'preferences.id', '=', 'users_preferences.preference_id')
-                                      ->where('users_preferences.user_id', Auth::user()->id)
-                                        ->where('preferences.slug', $slug)
-                                          ->first();
+            ->where('users_preferences.user_id', Auth::user()->id)
+            ->where('preferences.slug', $slug)
+            ->first();
 
         // Does user have it?
         if (empty($has_preference)) {
@@ -867,16 +868,16 @@ class Fixometer
     public static function hasPermission($slug)
     {
 
-      // Check if guest
+        // Check if guest
         if (Auth::guest()) {
             return false;
         }
 
         // Check if Permission Exists
         $has_permission = UsersPermissions::join('permissions', 'permissions.idpermissions', '=', 'users_permissions.permission_id')
-                                      ->where('users_permissions.user_id', Auth::user()->id)
-                                        ->where('permissions.slug', $slug)
-                                          ->first();
+            ->where('users_permissions.user_id', Auth::user()->id)
+            ->where('permissions.slug', $slug)
+            ->first();
 
         // Does user have it?
         if (empty($has_permission)) {
@@ -895,10 +896,10 @@ class Fixometer
     public static function usersWhoHavePreference($slug)
     {
         return User::join('users_preferences', 'users_preferences.user_id', '=', 'users.id')
-                      ->join('preferences', 'preferences.id', '=', 'users_preferences.preference_id')
-                        ->where('preferences.slug', $slug)
-                          ->select('users.*')
-                            ->get();
+            ->join('preferences', 'preferences.id', '=', 'users_preferences.preference_id')
+            ->where('preferences.slug', $slug)
+            ->select('users.*')
+            ->get();
     }
 
     public static function notificationClasses($modal)
@@ -986,7 +987,7 @@ class Fixometer
      */
     public static function checkColumn($column, $user_preferences)
     {
-        if (! is_null($user_preferences) && is_array($user_preferences)) {
+        if (!is_null($user_preferences) && is_array($user_preferences)) {
             if (in_array($column, $user_preferences)) {
                 return true;
             }

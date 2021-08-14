@@ -43,11 +43,11 @@
 
                     <div class="detail">
                         <h4>CO<sub>2</sub> Emission prevented</h4>
-                        <span id="co2-prevented-value" class="big-number"><?php echo number_format($weights[0]->total_footprints, 0, '-', ','); ?> kg</span>
+                        <span id="co2-prevented-value" class="big-number"><?php echo number_format($weights[0]->total_footprint, 0, '-', ','); ?> kg</span>
                     </div>
                     <div class="detail">
                         <h4>Waste prevented</h4>
-                        <span id="waste-prevented-value" class="big-number"><?php echo number_format($weights[0]->total_weights, 0, '-', ','); ?> kg</span>
+                        <span id="waste-prevented-value" class="big-number"><?php echo number_format($weights[0]->total_weight, 0, '-', ','); ?> kg</span>
                     </div>
 
 

@@ -106,8 +106,8 @@
 
       @if ( $event->checkForMissingData()['devices_count'] != 0  )
         @php( $stats = $event->getEventStats() )
-        <td class="d-none d-sm-table-cell cell-figure">{{{ number_format(round($stats['ewaste']), 0) }}}<small>kg<small></td>
-        <td class="d-none d-sm-table-cell cell-figure">{{{ number_format(round($stats['co2']), 0) }}}<small>kg<small></td>
+        <td class="d-none d-sm-table-cell cell-figure">{{{ number_format(round($stats['powered_waste']), 0) }}}<small>kg<small></td>
+        <td class="d-none d-sm-table-cell cell-figure">{{{ number_format(round($stats['powered_co2']), 0) }}}<small>kg<small></td>
         <td class="d-none d-sm-table-cell cell-figure">{{{ $stats['fixed_devices'] }}}</td>
         <td class="d-none d-sm-table-cell cell-figure">{{{ $stats['repairable_devices'] }}}</td>
         <td class="d-none d-sm-table-cell cell-figure">{{{ $stats['dead_devices'] }}}</td>

@@ -54,11 +54,11 @@ class EventController extends Controller
                'description' => $group->free_text,
                'image_url' => $group->groupImagePath(),
                'volunteers' => $group->volunteers,
-               'participants' => $groupStats['pax'],
-               'hours_volunteered' => $groupStats['hours'],
+               'participants' => $groupStats['participants'],
+               'hours_volunteered' => $groupStats['hours_volunteered'],
                'parties_thrown' => $groupStats['parties'],
                'waste_prevented' => $groupStats['waste'],
-               'co2_emissions_prevented' => $groupStats['co2'],
+               'co2_emissions_prevented' => $groupStats['powered_co2'],
            ]);
         }
 
@@ -91,8 +91,8 @@ class EventController extends Controller
              'impact' => [
                  'participants' => $party->pax,
                  'volunteers' => $eventStats['volunteers'],
-                 'waste_prevented' => $eventStats['ewaste'],
-                 'co2_emissions_prevented' => $eventStats['co2'],
+                 'waste_prevented' => $eventStats['powered_waste'],
+                 'co2_emissions_prevented' => $eventStats['powered_co2'],
                  'devices_fixed' => $eventStats['fixed_devices'],
                  'devices_repairable' => $eventStats['repairable_devices'],
                  'devices_dead' => $eventStats['dead_devices'],

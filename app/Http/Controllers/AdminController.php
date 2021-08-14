@@ -66,12 +66,11 @@ class AdminController extends Controller
 
     public static function getStats2()
     {
-        $Device = new Device;
-        $co2Total = $Device->getWeights();
+        $co2Total = \App\Helpers\LcaStats::getWasteStats();
 
         return [
-            'co2Total' => $co2Total[0]->total_footprints,
-            'wasteTotal' => $co2Total[0]->total_weights,
+            'co2Total' => $co2Total[0]->total_footprint,
+            'wasteTotal' => $co2Total[0]->total_weight,
         ];
     }
 }

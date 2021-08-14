@@ -72,13 +72,13 @@ class Device extends Model implements Auditable
         //Tested!
         $sql = 'SELECT * FROM `view_devices_list`';
 
-        if (! is_null($params)) {
+        if (!is_null($params)) {
             $sql .= ' WHERE 1=1 AND ';
 
             $params = array_filter($params);
             foreach ($params as $field => $value) {
                 if ($field == 'brand' || $field == 'model' || $field == 'problem') {
-                    $params[$field] = '%'.strtolower($value).'%';
+                    $params[$field] = '%' . strtolower($value) . '%';
                 } elseif ($field == 'event_date') {
                     $params[$field] = implode(' AND ', $value);
                 }
@@ -88,12 +88,12 @@ class Device extends Model implements Auditable
 
             foreach ($params as $f => $v) {
                 if ($f == 'event_date') {
-                    $clauses[] = 'event_date BETWEEN '.$v;
+                    $clauses[] = 'event_date BETWEEN ' . $v;
                 }
                 if ($f == 'category' || $f == 'group') {
-                    $clauses[] = 'id'.$f.' IN ('.$v.')';
+                    $clauses[] = 'id' . $f . ' IN (' . $v . ')';
                 } elseif ($f == 'brand' || $f == 'model' || $f == 'problem') {
-                    $clauses[] = $f.' LIKE :'.$f;
+                    $clauses[] = $f . ' LIKE :' . $f;
                 }
             }
 
@@ -102,7 +102,7 @@ class Device extends Model implements Auditable
 
         $sql .= ' ORDER BY `sorter` DESC';
 
-        if (! empty($params) && array_key_exists('event_date', $params)) {
+        if (!empty($params) && array_key_exists('event_date', $params)) {
             unset($params['event_date']);
         }
 
@@ -113,56 +113,21 @@ class Device extends Model implements Auditable
         return DB::select(DB::raw($sql));
     }
 
-    public function getWeights($group = null)
-    {
-        $sql =
-            'SELECT
-
-sum(case when (devices.category = 46) then (devices.estimate + 0.0) else categories.weight end) as `total_weights`,
-sum(case when (categories.powered = 1) then (case when (devices.category = 46) then (devices.estimate + 0.0) else categories.weight end) else 0 end) as ewaste,
-sum(case when (categories.powered = 0) then devices.estimate + 0.0 else 0 end) as unpowered_waste,
-sum(case when (devices.category = 46) then (devices.estimate + 0.0) * @ratio else (categories.footprint * @displacement) end) as `total_footprints`
-
-FROM devices, categories, events,
-
-(select @displacement := :displacement) inner_tbl_displacement,
-
-(select @ratio := ((sum(`categories`.`footprint`) * :displacement1) / sum(`categories`.`weight` + 0.0)) from `devices`, `categories` where `categories`.`idcategories` = `devices`.`category` and `devices`.`repair_status` = 1 and categories.idcategories != 46
-) inner_tbl_ratio
-
-WHERE devices.category = categories.idcategories and devices.repair_status = 1
-AND devices.event = events.idevents ';
-
-        $displacement = $this->getDisplacementFactor();
-        // Using two named parameters for displacement due to restriction of Laravel/MySQL.
-        // see e.g.: https://github.com/laravel/framework/issues/12715
-        $params = ['displacement' => $displacement, 'displacement1' => $displacement];
-
-        if (! is_null($group) && is_numeric($group)) {
-            $sql .= ' AND events.group = :group ';
-            $params['group'] = $group;
-
-            return DB::select(DB::raw($sql), $params);
-        }
-
-        return DB::select(DB::raw($sql), $params);
-    }
-
     public function ofThisUser($id)
     {
         //Tested
-        return DB::select(DB::raw('SELECT * FROM `'.$this->table.'` WHERE `repaired_by` = :id'), ['id' => $id]);
+        return DB::select(DB::raw('SELECT * FROM `' . $this->table . '` WHERE `repaired_by` = :id'), ['id' => $id]);
     }
 
     public function ofThisEvent($event)
     {
         //Tested
-        return DB::select(DB::raw('SELECT * FROM `'.$this->table.'` AS `d`
+        return DB::select(DB::raw('SELECT * FROM `' . $this->table . '` AS `d`
                 INNER JOIN `categories` AS `c` ON `c`.`idcategories` = `d`.`category`
                 LEFT JOIN (
                   SELECT * FROM xref
                     INNER JOIN images ON images.idimages = xref.object
-                    WHERE object_type = '.env('TBL_IMAGES').' AND reference_type = '.env('TBL_DEVICES').'
+                    WHERE object_type = ' . env('TBL_IMAGES') . ' AND reference_type = ' . env('TBL_DEVICES') . '
                   ) AS i ON i.reference = d.iddevices
 
                 WHERE `event` = :event'), ['event' => $event]);
@@ -171,7 +136,7 @@ AND devices.event = events.idevents ';
     public function ofThisGroup($group)
     {
         //Tested
-        return DB::select(DB::raw('SELECT * FROM `'.$this->table.'` AS `d`
+        return DB::select(DB::raw('SELECT * FROM `' . $this->table . '` AS `d`
                 INNER JOIN `categories` AS `c` ON `c`.`idcategories` = `d`.`category`
                 INNER JOIN `events` AS `e` ON `e`.`idevents` = `d`.`event`
                 WHERE `group` = :group'), ['group' => $group]);
@@ -180,7 +145,7 @@ AND devices.event = events.idevents ';
     public function ofAllGroups()
     {
         //Tested
-        return DB::select(DB::raw('SELECT * FROM `'.$this->table.'` AS `d`
+        return DB::select(DB::raw('SELECT * FROM `' . $this->table . '` AS `d`
                 INNER JOIN `categories` AS `c` ON `c`.`idcategories` = `d`.`category`
                 INNER JOIN `events` AS `e` ON `e`.`idevents` = `d`.`event`'));
     }
@@ -188,31 +153,31 @@ AND devices.event = events.idevents ';
     public function statusCount($g = null, $year = null)
     {
         $sql = 'SELECT COUNT(*) AS `counter`, `d`.`repair_status` AS `status`, `d`.`event`
-                FROM `'.$this->table.'` AS `d`';
-        if ((! is_null($g) && is_numeric($g)) || (! is_null($year) && is_numeric($year))) {
+                FROM `' . $this->table . '` AS `d`';
+        if ((!is_null($g) && is_numeric($g)) || (!is_null($year) && is_numeric($year))) {
             $sql .= ' INNER JOIN `events` AS `e` ON `e`.`idevents` = `d`.`event` ';
         }
 
         $sql .= ' WHERE `repair_status` > 0 ';
 
-        if (! is_null($g) && is_numeric($g)) {
+        if (!is_null($g) && is_numeric($g)) {
             $sql .= ' AND `group` = :g ';
         }
-        if (! is_null($year) && is_numeric($year)) {
+        if (!is_null($year) && is_numeric($year)) {
             $sql .= ' AND YEAR(`event_date`) = :year ';
         }
 
         $sql .= ' GROUP BY `status`';
 
-        if (! is_null($year) && is_numeric($year)) {
+        if (!is_null($year) && is_numeric($year)) {
             $sql .= ', `event`';
         }
 
-        if (! is_null($g) && is_numeric($g) && is_null($year)) {
+        if (!is_null($g) && is_numeric($g) && is_null($year)) {
             return DB::select(DB::raw($sql), ['g' => $g]);
-        } elseif (! is_null($year) && is_numeric($year) && is_null($g)) {
+        } elseif (!is_null($year) && is_numeric($year) && is_null($g)) {
             return DB::select(DB::raw($sql), ['year' => $year]);
-        } elseif (! is_null($year) && is_numeric($year) && ! is_null($g) && is_numeric($g)) {
+        } elseif (!is_null($year) && is_numeric($year) && !is_null($g) && is_numeric($g)) {
             return DB::select(DB::raw($sql), ['year' => $year, 'g' => $g]);
         }
 
@@ -222,13 +187,13 @@ AND devices.event = events.idevents ';
     public function partyStatusCount($event)
     {
         $sql = 'SELECT COUNT(*) AS `counter`, `d`.`repair_status` AS `status`, `d`.`event`
-                FROM `'.$this->table.'` AS `d`';
+                FROM `' . $this->table . '` AS `d`';
 
         $sql .= ' WHERE `repair_status` > 0 ';
 
         $sql .= ' GROUP BY `status`';
 
-        if (! is_null($event) && is_numeric($event)) {
+        if (!is_null($event) && is_numeric($event)) {
             $sql .= ' AND `event` = :event ';
         }
 
@@ -237,17 +202,17 @@ AND devices.event = events.idevents ';
 
     public function countByCluster($cluster, $group = null, $year = null)
     {
-        $sql = 'SELECT COUNT(*) AS `counter`, `repair_status` FROM `'.$this->table.'` AS `d`
+        $sql = 'SELECT COUNT(*) AS `counter`, `repair_status` FROM `' . $this->table . '` AS `d`
                 INNER JOIN `events` AS `e`
                     ON `d`.`event` = `e`.`idevents`
                 INNER JOIN `categories` AS `c`
                     ON `d`.`category` = `c`.`idcategories`
                 WHERE `c`.`cluster` = :cluster AND `d`.`repair_status` > 0 ';
 
-        if (! is_null($group)) {
+        if (!is_null($group)) {
             $sql .= ' AND `e`.`group` = :group ';
         }
-        if (! is_null($year)) {
+        if (!is_null($year)) {
             $sql .= ' AND YEAR(`e`.`event_date`) = :year ';
         }
 
@@ -256,11 +221,11 @@ AND devices.event = events.idevents ';
                 ';
 
         try {
-            if (! is_null($group) && is_numeric($group) && is_null($year)) {
+            if (!is_null($group) && is_numeric($group) && is_null($year)) {
                 return DB::select(DB::raw($sql), ['group' => $group, 'cluster' => $cluster]);
-            } elseif (! is_null($year) && is_numeric($year) && is_null($group)) {
+            } elseif (!is_null($year) && is_numeric($year) && is_null($group)) {
                 return DB::select(DB::raw($sql), ['year' => $year, 'cluster' => $cluster]);
-            } elseif (! is_null($year) && is_numeric($year) && ! is_null($group) && is_numeric($group)) {
+            } elseif (!is_null($year) && is_numeric($year) && !is_null($group) && is_numeric($group)) {
                 return DB::select(DB::raw($sql), ['year' => $year, 'group' => $group, 'cluster' => $cluster]);
             }
 
@@ -272,35 +237,35 @@ AND devices.event = events.idevents ';
 
     public function findMostSeen($status = null, $cluster = null, $group = null)
     {
-        $sql = 'SELECT COUNT(`d`.`category`) AS `counter`, `c`.`name` FROM `'.$this->table.'` AS `d`
+        $sql = 'SELECT COUNT(`d`.`category`) AS `counter`, `c`.`name` FROM `' . $this->table . '` AS `d`
                 INNER JOIN `events` AS `e`
                     ON `d`.`event` = `e`.`idevents`
                 INNER JOIN `categories` AS `c`
                     ON `d`.`category` = `c`.`idcategories`
-                WHERE 1=1 and `c`.`powered` = 1 AND `c`.`idcategories` <> '.env('MISC_CATEGORY_ID_POWERED');
+                WHERE 1=1 and `c`.`powered` = 1 AND `c`.`idcategories` <> ' . env('MISC_CATEGORY_ID_POWERED');
 
-        if (! is_null($status) && is_numeric($status)) {
+        if (!is_null($status) && is_numeric($status)) {
             $sql .= ' AND `d`.`repair_status` = :status ';
         }
-        if (! is_null($cluster) && is_numeric($cluster)) {
+        if (!is_null($cluster) && is_numeric($cluster)) {
             $sql .= ' AND `c`.`cluster` = :cluster ';
         }
-        if (! is_null($group) && is_numeric($group)) {
+        if (!is_null($group) && is_numeric($group)) {
             $sql .= ' AND `e`.`group` = :group ';
         }
 
         $sql .= ' GROUP BY `d`.`category`
                  ORDER BY `counter` DESC';
 
-        $sql .= (! is_null($cluster) ? '  LIMIT 1' : '');
+        $sql .= (!is_null($cluster) ? '  LIMIT 1' : '');
 
-        if (! is_null($cluster) && is_numeric($cluster)) {
+        if (!is_null($cluster) && is_numeric($cluster)) {
             try {
-                if (! is_null($group) && is_numeric($group) && is_null($status)) {
+                if (!is_null($group) && is_numeric($group) && is_null($status)) {
                     return DB::select(DB::raw($sql), ['group' => $group, 'cluster' => $cluster]);
-                } elseif (! is_null($status) && is_numeric($status) && is_null($group)) {
+                } elseif (!is_null($status) && is_numeric($status) && is_null($group)) {
                     return DB::select(DB::raw($sql), ['status' => $status, 'cluster' => $cluster]);
-                } elseif (! is_null($status) && is_numeric($status) && ! is_null($group) && is_numeric($group)) {
+                } elseif (!is_null($status) && is_numeric($status) && !is_null($group) && is_numeric($group)) {
                     return DB::select(DB::raw($sql), ['status' => $status, 'group' => $group, 'cluster' => $cluster]);
                 }
 
@@ -310,11 +275,11 @@ AND devices.event = events.idevents ';
             }
         } else {
             try {
-                if (! is_null($group) && is_numeric($group) && is_null($status)) {
+                if (!is_null($group) && is_numeric($group) && is_null($status)) {
                     return DB::select(DB::raw($sql), ['group' => $group]);
-                } elseif (! is_null($status) && is_numeric($status) && is_null($group)) {
+                } elseif (!is_null($status) && is_numeric($status) && is_null($group)) {
                     return DB::select(DB::raw($sql), ['status' => $status]);
-                } elseif (! is_null($status) && is_numeric($status) && ! is_null($group) && is_numeric($group)) {
+                } elseif (!is_null($status) && is_numeric($status) && !is_null($group) && is_numeric($group)) {
                     return DB::select(DB::raw($sql), ['status' => $status, 'group' => $group]);
                 }
 
@@ -333,7 +298,7 @@ AND devices.event = events.idevents ';
                         categories.name AS category_name,
                         clusters.name AS cluster_name,
                         ROUND( (COUNT(repair_status) * 100 / total_devices), 1) AS success_rate ';
-        if (! is_null($cluster)) {
+        if (!is_null($cluster)) {
             $sql .= ', clusters.idclusters AS cluster ';
         }
 
@@ -350,15 +315,15 @@ AND devices.event = events.idevents ';
 
         $sql .= 'WHERE
                         repair_status = 1 AND
-                        total_devices > '.$threshold.' ';
+                        total_devices > ' . $threshold . ' ';
 
-        if (! is_null($cluster)) {
+        if (!is_null($cluster)) {
             $sql .= ' AND cluster = :cluster ';
         }
         $sql .= 'GROUP BY devices.category
-                    ORDER BY cluster ASC, success_rate '.$direction.' LIMIT 1';
+                    ORDER BY cluster ASC, success_rate ' . $direction . ' LIMIT 1';
 
-        if (! is_null($cluster)) {
+        if (!is_null($cluster)) {
             return DB::select(DB::raw($sql), ['cluster' => $cluster]);
         }
 
@@ -368,7 +333,7 @@ AND devices.event = events.idevents ';
     public function guesstimates()
     {
         //Tested
-        return DB::select(DB::raw('SELECT COUNT(*) AS guesstimates FROM `'.$this->table.'` WHERE `category` = 46'));
+        return DB::select(DB::raw('SELECT COUNT(*) AS guesstimates FROM `' . $this->table . '` WHERE `category` = 46'));
     }
 
     public function export()
@@ -425,11 +390,11 @@ AND devices.event = events.idevents ';
         return $this->belongsToMany(\App\Barrier::class, 'devices_barriers', 'device_id', 'barrier_id');
     }
 
-    public function co2Diverted($emissionRatio, $displacementFactor)
+    public function eCO2Diverted($emissionRatio, $displacementFactor)
     {
         $footprint = 0;
 
-        if ($this->isFixed() && $this->deviceCategory->isPowered()) {
+        if ($this->isFixed()) {
             if ($this->deviceCategory->isMiscPowered()) {
                 if (is_numeric($this->estimate)) {
                     $footprint = $this->estimate * $emissionRatio;
@@ -442,7 +407,24 @@ AND devices.event = events.idevents ';
         return $footprint * $displacementFactor;
     }
 
-    public function ewasteDiverted()
+    public function uCO2Diverted($emissionRatio, $displacementFactor)
+    {
+        $footprint = 0;
+
+        if ($this->isFixed()) {
+            if ($this->deviceCategory->isMiscUnpowered()) {
+                if (is_numeric($this->estimate)) {
+                    $footprint = $this->estimate * $emissionRatio;
+                }
+            } else {
+                $footprint = (float) $this->deviceCategory->footprint;
+            }
+        }
+
+        return $footprint * $displacementFactor;
+    }
+
+    public function eWasteDiverted()
     {
         $ewasteDiverted = 0;
 
@@ -459,7 +441,7 @@ AND devices.event = events.idevents ';
         return $ewasteDiverted;
     }
 
-    public function unpoweredWasteDiverted()
+    public function uWasteDiverted()
     {
         $wasteDiverted = 0;
 
@@ -467,9 +449,9 @@ AND devices.event = events.idevents ';
             if ($this->deviceCategory->isMiscUnpowered()) {
                 if (is_numeric($this->estimate)) {
                     $wasteDiverted = $this->estimate;
-                } else {
-                    $wasteDiverted = (float) $this->deviceCategory->weight;
                 }
+            } else {
+                $wasteDiverted = (float) $this->deviceCategory->weight;
             }
         }
 
@@ -483,7 +465,7 @@ AND devices.event = events.idevents ';
 
     public function getProblem()
     {
-        if (! empty($this->problem)) {
+        if (!empty($this->problem)) {
             return $this->problem;
         }
 
@@ -520,7 +502,7 @@ AND devices.event = events.idevents ';
     {
         if ($this->parts_provider == 2) {
             return trans('partials.yes_third_party');
-        } elseif ($this->spare_parts == 1 && ! is_null($this->parts_provider)) {
+        } elseif ($this->spare_parts == 1 && !is_null($this->parts_provider)) {
             return trans('partials.yes_manufacturer');
         } elseif ($this->spare_parts == 2) {
             return trans('partials.no');
@@ -531,7 +513,7 @@ AND devices.event = events.idevents ';
 
     public function getAge()
     {
-        if (! empty($this->age)) {
+        if (!empty($this->age)) {
             return $this->age;
         }
 

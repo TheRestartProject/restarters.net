@@ -58,8 +58,8 @@ class AboutController extends Controller
 
         return view('features.index', [
             'slides' => $slides,
-            'co2Total' => $stats['co2Total'][0]->total_footprints,
-            'wasteTotal' => $stats['co2Total'][0]->total_weights,
+            'co2Total' => $stats['co2Total'][0]->total_footprint,
+            'wasteTotal' => $stats['co2Total'][0]->total_weight,
             'partiesCount' => count($stats['allparties']),
             'deviceCount' => $deviceCount,
         ]);

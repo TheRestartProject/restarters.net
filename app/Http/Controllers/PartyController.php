@@ -886,7 +886,7 @@ class PartyController extends Controller
 
         $eventStats = $event->getEventStats();
 
-        $eventStats['co2'] = number_format(round($eventStats['co2']), 0, '.', ',');
+        $eventStats['powered_co2'] = number_format(round($eventStats['powered_co2']), 0, '.', ',');
 
         if (! is_null($class)) {
             return view('party.stats', [
@@ -1427,11 +1427,11 @@ class PartyController extends Controller
                'description' => $group->free_text,
                'image_url' => $group->groupImagePath(),
                'volunteers' => $group->volunteers,
-               'participants' => $gstats['pax'],
-               'hours_volunteered' => $gstats['hours'],
+               'participants' => $gstats['participants'],
+               'hours_volunteered' => $gstats['hours_volunteered'],
                'parties_thrown' => $gstats['parties'],
                'waste_prevented' => $gstats['waste'],
-               'co2_emissions_prevented' => $gstats['co2'],
+               'co2_emissions_prevented' => $gstats['powered_co2'],
            ]);
         }
 
@@ -1459,8 +1459,8 @@ class PartyController extends Controller
              'impact' => [
                  'participants' => $party->pax,
                  'volunteers' => $estats['volunteers'],
-                 'waste_prevented' => $estats['ewaste'],
-                 'co2_emissions_prevented' => $estats['co2'],
+                 'waste_prevented' => $estats['powered_waste'],
+                 'co2_emissions_prevented' => $estats['powered_co2'],
                  'devices_fixed' => $estats['fixed_devices'],
                  'devices_repairable' => $estats['repairable_devices'],
                  'devices_dead' => $estats['dead_devices'],
@@ -1512,11 +1512,11 @@ class PartyController extends Controller
                 'description' => $party->theGroup->free_text,
                 'image_url' => $party->theGroup->groupImagePath(),
                 'volunteers' => $party->theGroup->volunteers,
-                'participants' => $gstats['pax'],
-                'hours_volunteered' => $gstats['hours'],
+                'participants' => $gstats['participants'],
+                'hours_volunteered' => $gstats['hours_volunteered'],
                 'parties_thrown' => $gstats['parties'],
                 'waste_prevented' => $gstats['waste'],
-                'co2_emissions_prevented' => $gstats['co2'],
+                'co2_emissions_prevented' => $gstats['powered_co2'],
             ],
             'event_date' => $party->event_date,
             'start_time' => $party->start,
@@ -1534,8 +1534,8 @@ class PartyController extends Controller
             'impact' => [
                 'participants' => $party->pax,
                 'volunteers' => $estats['volunteers'],
-                'waste_prevented' => $estats['ewaste'],
-                'co2_emissions_prevented' => $estats['co2'],
+                'waste_prevented' => $estats['powered_waste'],
+                'co2_emissions_prevented' => $estats['powered_co2'],
                 'devices_fixed' => $estats['fixed_devices'],
                 'devices_repairable' => $estats['repairable_devices'],
                 'devices_dead' => $estats['dead_devices'],
