@@ -775,7 +775,7 @@ class Fixometer
             if (
                 !$stats ||
                 !array_key_exists('allparties', $stats) ||
-                !array_key_exists('co2Total', $stats) ||
+                !array_key_exists('waste_stats', $stats) ||
                 !array_key_exists('device_count_status', $stats)
             ) {
                 $stats = [];
@@ -784,7 +784,7 @@ class Fixometer
 
         if ($stats == []) {
             $stats['allparties'] = $Party->ofThisGroup('admin', true, false);
-            $stats['co2Total'] = \App\Helpers\LcaStats::getWasteStats();
+            $stats['waste_stats'] = \App\Helpers\LcaStats::getWasteStats();
             $stats['device_count_status'] = $Device->statusCount();
             \Cache::put('all_stats', $stats, 7200);
         }
