@@ -80,7 +80,7 @@ class Network extends Model
             'devices_unpowered' => 0,
         ];
 
-        $emissionRatio = \App\Helpers\FootprintRatioCalculator::calculateRatio();
+        $emissionRatio = \App\Helpers\LcaStats::getEmissionRatioPowered();
         foreach ($this->groups as $group) {
             $singleGroupStats = $group->getGroupStats($emissionRatio);
 

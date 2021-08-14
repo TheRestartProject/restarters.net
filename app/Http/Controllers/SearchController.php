@@ -6,7 +6,6 @@ use App\Device;
 use App\Group;
 use App\GroupTags;
 use App\Helpers\Fixometer;
-use App\Helpers\FootprintRatioCalculator;
 use App\Party;
 use App\Search;
 use App\User;
@@ -15,22 +14,6 @@ use DateTime;
 
 class SearchController extends Controller
 {
-    // public $TotalWeight;
-    // public $TotalEmission;
-    // public $EmissionRatio;
-
-    public function __construct()
-    {
-        // $Device = new Device;
-        // $weights = $Device->getWeights();
-
-        // $this->TotalWeight = $weights[0]->total_weights;
-        // $this->TotalEmission = $weights[0]->total_footprints;
-
-        //
-        // $this->EmissionRatio = FootprintRatioCalculator::calculateRatio();
-    }
-
     public function index($response = null)
     {
         /** Init all needed classes **/
@@ -119,7 +102,7 @@ class SearchController extends Controller
                 $totalCO2 = 0;
                 $totalWeight = 0;
 
-                $emissionRatio = FootprintRatioCalculator::calculateRatio();
+                $emissionRatio = \App\Helpers\LcaStats::getEmissionRatioPowered();
 
                 foreach ($PartyList as $party) {
                     $partyIds[] = $party->idevents;

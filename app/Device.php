@@ -3,7 +3,6 @@
 namespace App;
 
 use App\Events\DeviceCreatedOrUpdated;
-use App\Helpers\FootprintRatioCalculator;
 use DB;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Str;
@@ -24,7 +23,6 @@ class Device extends Model implements Auditable
 
     use \OwenIt\Auditing\Auditable;
     protected $table = 'devices';
-    public $displacement = 0.5;
     protected $primaryKey = 'iddevices';
     /**
      * The attributes that are mass assignable.
@@ -66,7 +64,7 @@ class Device extends Model implements Auditable
 
     public static function getDisplacementFactor()
     {
-        return env('DISPLACEMENT_VALUE');
+        return \App\Helpers\LcaStats::getDisplacementFactor();
     }
 
     public function getList($params = null)
@@ -135,9 +133,10 @@ FROM devices, categories, events,
 WHERE devices.category = categories.idcategories and devices.repair_status = 1
 AND devices.event = events.idevents ';
 
+        $displacement = $this->getDisplacementFactor();
         // Using two named parameters for displacement due to restriction of Laravel/MySQL.
         // see e.g.: https://github.com/laravel/framework/issues/12715
-        $params = ['displacement' => $this->displacement, 'displacement1' => $this->displacement];
+        $params = ['displacement' => $displacement, 'displacement1' => $displacement];
 
         if (! is_null($group) && is_numeric($group)) {
             $sql .= ' AND events.group = :group ';
@@ -278,7 +277,7 @@ AND devices.event = events.idevents ';
                     ON `d`.`event` = `e`.`idevents`
                 INNER JOIN `categories` AS `c`
                     ON `d`.`category` = `c`.`idcategories`
-                WHERE 1=1 and `c`.`powered` = 1 AND `c`.`idcategories` <> '.env('MISC_CATEGORY_ID');
+                WHERE 1=1 and `c`.`powered` = 1 AND `c`.`idcategories` <> '.env('MISC_CATEGORY_ID_POWERED');
 
         if (! is_null($status) && is_numeric($status)) {
             $sql .= ' AND `d`.`repair_status` = :status ';
@@ -365,7 +364,6 @@ AND devices.event = events.idevents ';
 
         return DB::select(DB::raw($sql));
     }
-
     /** REDUNDANT? */
     public function guesstimates()
     {
@@ -466,8 +464,12 @@ AND devices.event = events.idevents ';
         $wasteDiverted = 0;
 
         if ($this->isFixed() && $this->deviceCategory->isUnpowered()) {
-            if (is_numeric($this->estimate)) {
-                $wasteDiverted = $this->estimate;
+            if ($this->deviceCategory->isMiscUnpowered()) {
+                if (is_numeric($this->estimate)) {
+                    $wasteDiverted = $this->estimate;
+                } else {
+                    $wasteDiverted = (float) $this->deviceCategory->weight;
+                }
             }
         }
 

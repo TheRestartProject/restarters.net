@@ -634,7 +634,7 @@ class Party extends Model implements Auditable
     {
         $displacementFactor = \App\Device::getDisplacementFactor();
         if (is_null($emissionRatio)) {
-            $emissionRatio = \App\Helpers\FootprintRatioCalculator::calculateRatio();
+            $emissionRatio = \App\Helpers\LcaStats::getEmissionRatioPowered();
         }
 
         $co2Diverted = 0;

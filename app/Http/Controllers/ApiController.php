@@ -4,7 +4,6 @@ namespace App\Http\Controllers;
 
 use App\Device;
 use App\Group;
-use App\Helpers\FootprintRatioCalculator;
 use App\Party;
 use App\User;
 use Auth;

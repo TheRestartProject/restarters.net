@@ -261,7 +261,7 @@ class Group extends Model implements Auditable
     public function getGroupStats($emissionRatio = null)
     {
         if (is_null($emissionRatio)) {
-            $emissionRatio = \App\Helpers\FootprintRatioCalculator::calculateRatio();
+            $emissionRatio = \App\Helpers\LcaStats::getEmissionRatioPowered();
         }
 
         $allPastEvents = Party::pastEvents()

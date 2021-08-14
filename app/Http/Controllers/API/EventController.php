@@ -3,7 +3,6 @@
 namespace App\Http\Controllers\API;
 
 use App\Group;
-use App\Helpers\FootprintRatioCalculator;
 use App\Http\Controllers\Controller;
 use App\Party;
 use Auth;

@@ -8,7 +8,6 @@ use App\Group;
 use App\GroupTags;
 use App\GrouptagsGroups;
 use App\Helpers\Fixometer;
-use App\Helpers\FootprintRatioCalculator;
 use App\Search;
 use App\UserGroups;
 use Auth;
@@ -157,7 +156,7 @@ class ExportController extends Controller
             $hours_volunteered = 0;
             $totalCO2 = 0;
 
-            $emissionRatio = FootprintRatioCalculator::calculateRatio();
+            $emissionRatio = \App\Helpers\LcaStats::getEmissionRatioPowered();
 
             foreach ($PartyList as $i => $party) {
                 if ($party->device_count == 0) {

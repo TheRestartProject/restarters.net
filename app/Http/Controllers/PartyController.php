@@ -14,7 +14,6 @@ use App\Events\EventImagesUploaded;
 use App\EventsUsers;
 use App\Group;
 use App\Helpers\Fixometer;
-use App\Helpers\FootprintRatioCalculator;
 use App\Helpers\Geocoder;
 use App\Host;
 use App\Invite;
