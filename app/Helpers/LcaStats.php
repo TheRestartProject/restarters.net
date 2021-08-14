@@ -29,21 +29,36 @@ class LcaStats
      * and dividing the total footprint of their categories by the total weight of their
      * categories.
      *
-     * Misc categories should not be included therefore they must
-     * weight and footprint = 0.
+     * Misc categories should not be included therefore
+     * weight and footprint = they must have 0 values.
      *
      * This ratio of CO2 to kilo of device is then used to estimate the footprint of
      * Misc devices that are recorded in the DB.
      */
-    public static function getEmissionRatioPoweredXX()
+    public static function calculatetEmissionRatioPowered()
     {
         $value = DB::select(DB::raw("
 SELECT
-SUM(COALESCE(c.footprint, 0) / SUM(COALESCE(c.weight, 0)) AS ratio
+SUM(c.footprint) / SUM(c.weight) AS ratio
 FROM devices d
 JOIN categories c ON c.idcategories = d.category
+WHERE c.powered = 1
 AND d.repair_status = 1
-AND c.powered = 1
+AND d.category <> 46
+"));
+        return $value[0]->ratio;
+    }
+
+    public static function calculatetEmissionRatioUnpowered()
+    {
+        $value = DB::select(DB::raw("
+SELECT
+SUM(c.footprint) / SUM(c.weight) AS ratio
+FROM devices d
+JOIN categories c ON c.idcategories = d.category
+WHERE c.powered = 0
+AND d.repair_status = 1
+AND d.category <> 50
 "));
         return $value[0]->ratio;
     }

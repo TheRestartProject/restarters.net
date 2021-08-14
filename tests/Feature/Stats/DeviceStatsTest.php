@@ -121,7 +121,7 @@ class DeviceStatsTest extends StatsTestCase
             'repair_status' => 0,
         ]);
         $result = $device->eWasteDiverted();
-        $this->assertEquals(0, $result, "ewasteDiverted = 0");
+        $this->assertEquals(0, $result);
     }
 
     /** @test */
@@ -132,7 +132,7 @@ class DeviceStatsTest extends StatsTestCase
             'category_creation' => $this->_idUnpoweredMisc,
         ]);
         $result = $device->uWasteDiverted();
-        $this->assertEquals(0, $result, "uWasteDiverted = 0");
+        $this->assertEquals(0, $result);
     }
 
     /** @test */
@@ -144,7 +144,7 @@ class DeviceStatsTest extends StatsTestCase
             'estimate' => 456
         ]);
         $result = $device->uWasteDiverted();
-        $this->assertEquals(456, $result, "uWasteDiverted = 456");
+        $this->assertEquals(456, $result);
     }
 
     /** @test */
@@ -155,7 +155,7 @@ class DeviceStatsTest extends StatsTestCase
             'category_creation' => $this->_idUnpoweredNonMisc,
         ]);
         $result = $device->uWasteDiverted();
-        $this->assertEquals(5, $result, "uWasteDiverted = 5");
+        $this->assertEquals(5, $result);
     }
 
     /** CO2 TESTS */
@@ -178,15 +178,14 @@ class DeviceStatsTest extends StatsTestCase
         ]);
 
         $emissionRatio =  $this->_ratioPowered();
-        $displacement = $this->_displacementFactor;
 
-        $result = $device1->uCO2Diverted($emissionRatio, $displacement);
+        $result = $device1->uCO2Diverted($emissionRatio, $this->_displacementFactor);
         $this->assertEquals(0, $result);
 
-        $result = $device2->uCO2Diverted($emissionRatio, $displacement);
+        $result = $device2->uCO2Diverted($emissionRatio, $this->_displacementFactor);
         $this->assertEquals(0, $result);
 
-        $result = $device3->uCO2Diverted($emissionRatio, $displacement);
+        $result = $device3->uCO2Diverted($emissionRatio, $this->_displacementFactor);
         $this->assertEquals(0, $result);
     }
 
@@ -198,8 +197,7 @@ class DeviceStatsTest extends StatsTestCase
             'category_creation' => $this->_idPoweredMisc,
         ]);
         $emissionRatio =  $this->_ratioPowered();
-        $displacement = $this->_displacementFactor;
-        $result = $device->eCO2Diverted($emissionRatio, $displacement);
+        $result = $device->eCO2Diverted($emissionRatio, $this->_displacementFactor);
         $this->assertEquals(0, $result);
     }
 
@@ -212,9 +210,8 @@ class DeviceStatsTest extends StatsTestCase
             'estimate' => 123,
         ]);
         $emissionRatio =  $this->_ratioPowered();
-        $displacement = $this->_displacementFactor;
         $expect = (123 * $emissionRatio) * $this->_displacementFactor;
-        $result = $device->eCO2Diverted($emissionRatio, $displacement);
+        $result = $device->eCO2Diverted($emissionRatio, $this->_displacementFactor);
         $this->assertEquals($expect, $result);
     }
 
@@ -226,9 +223,8 @@ class DeviceStatsTest extends StatsTestCase
             'category_creation' => $this->_idPoweredNonMisc,
         ]);
         $emissionRatio =  $this->_ratioPowered();
-        $displacement = $this->_displacementFactor;
-        $expect = 14.4 * $displacement;
-        $result = $device->eCO2Diverted($emissionRatio, $displacement);
+        $expect = 14.4 * $this->_displacementFactor;
+        $result = $device->eCO2Diverted($emissionRatio, $this->_displacementFactor);
         $this->assertEquals($expect, $result);
     }
 
@@ -240,8 +236,7 @@ class DeviceStatsTest extends StatsTestCase
             'category_creation' => $this->_idUnpoweredMisc,
         ]);
         $emissionRatio =  $this->_ratioPowered();
-        $displacement = $this->_displacementFactor;
-        $result = $device->uCO2Diverted($emissionRatio, $displacement);
+        $result = $device->uCO2Diverted($emissionRatio, $this->_displacementFactor);
         $this->assertEquals(0, $result);
     }
 
@@ -254,9 +249,8 @@ class DeviceStatsTest extends StatsTestCase
             'estimate' => 456,
         ]);
         $emissionRatio =  $this->_ratioPowered();
-        $displacement = $this->_displacementFactor;
         $expect = (456 * $emissionRatio) * $this->_displacementFactor;
-        $result = $device->uCO2Diverted($emissionRatio, $displacement);
+        $result = $device->uCO2Diverted($emissionRatio, $this->_displacementFactor);
         $this->assertEquals($expect, $result);
     }
 
@@ -268,10 +262,8 @@ class DeviceStatsTest extends StatsTestCase
             'category_creation' => $this->_idUnpoweredNonMisc,
         ]);
         $emissionRatio =  $this->_ratioPowered();
-        $displacement = $this->_displacementFactor;
-        $expect = 15.5 * $displacement;
-        $result = $device->uCO2Diverted($emissionRatio, $displacement);
+        $expect = 15.5 * $this->_displacementFactor;
+        $result = $device->uCO2Diverted($emissionRatio, $this->_displacementFactor);
         $this->assertEquals($expect, $result);
     }
-
 }
