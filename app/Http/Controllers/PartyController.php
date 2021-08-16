@@ -501,7 +501,7 @@ class PartyController extends Controller
                 'online' => $request->has('online'),
                 'group' => $data['group'],
                 'venue' => $data['venue'],
-                'link' => array_key_exists('link', $data) ?? $data['link'],
+                'link' => $request->has('link') ? $data['link'] : null,
                 'location' => $data['location'],
                 'latitude' => $latitude,
                 'longitude' => $longitude,
