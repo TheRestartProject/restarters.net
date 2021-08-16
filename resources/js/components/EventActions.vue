@@ -11,7 +11,7 @@
         <b-dropdown-item @click="confirmDelete" v-if="candelete">
           {{ __('events.delete_event') }}
         </b-dropdown-item>
-        <b-dropdown-item @click="confirmDelete" v-else-if="canedit" disabled>
+        <b-dropdown-item @click="confirmDelete" v-else-if="isAdmin" disabled>
           {{ __('events.delete_event') }}
         </b-dropdown-item>
         <div v-if="finished">
@@ -54,7 +54,7 @@
         </div>
       </div>
     </b-dropdown>
-    <ConfirmModal @confirm="confirmedDelete" ref="confirmdelete" />
+    <ConfirmModal @confirm="confirmedDelete" :message="__('events.confirm_delete')" ref="confirmdelete" />
   </div>
 </template>
 <script>
@@ -83,6 +83,10 @@ export default {
       type: Boolean,
       required: false,
       default: false
+    },
+    isAdmin: {
+      type: Boolean,
+      required: true
     },
     inGroup: {
       type: Boolean,
