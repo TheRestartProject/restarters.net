@@ -226,6 +226,11 @@ export default {
       this.eventDate = new Date(this.initialEvent.event_date * 1000).toISOString().slice(0, 10)
     }
 
+    // If only one group, default to that.
+    if (this.groups && this.groups.length === 1) {
+      this.idgroups = this.groups[0].idgroups
+    }
+
     // Normally we pass the CSRF into the top-level page component.  But this component is used both from a
     // top-level page (event create) and within a more complex page structure (event edit).  So we get the CSRF
     // here.  Because we have overridden the create() method of the mixin we need to put the code in here.

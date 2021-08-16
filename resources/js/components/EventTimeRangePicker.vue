@@ -2,7 +2,7 @@
   <div>
     <div class="d-none d-lg-flex">
       <b-form-timepicker class="start-time mr-1" v-model="currentStartTime" placeholder="--:--" @input="changeEndTime" hide-header :class="{ hasError: hasError }" />
-      <b-form-timepicker class="ml-1 end-time" v-model="currentEndTime" placeholder="--:--" hide-header :class="{ hasError: hasError }" />
+      <b-form-timepicker :key="bump" class="ml-1 end-time" v-model="currentEndTime" placeholder="--:--" hide-header :class="{ hasError: hasError }" />
     </div>
     <div class="d-flex d-lg-none">
       <b-input size="lg" type="time" name="start" v-model="currentStartTime" :class="{ hasError: hasError, 'mr-1': true, focusfix: true }" />
@@ -30,7 +30,8 @@ export default {
   data() {
     return {
       currentStartTime: null,
-      currentEndTime: null
+      currentEndTime: null,
+      bump: 0
     }
   },
   watch: {
@@ -41,8 +42,16 @@ export default {
       immediate: true
     },
     end: {
-      handler(newVal) {
-        this.currentEndTime = newVal
+      handler(newVal, oldVal) {
+        if (newVal >= this.currentStartTime) {
+          this.currentEndTime = newVal
+        } else {
+          // We prevent end times before start times.  This is slightly clunky - we can't seem to update the
+          // value in timepicker while it's open, so trigger a re-render by changing the key..
+          this.$emit('update:end', oldVal)
+          this.currentEndTime = this.currentStartTime
+          this.bump++
+        }
       },
       immediate: true
     },
@@ -55,8 +64,6 @@ export default {
   },
   methods: {
     changeEndTime: function (startTime) {
-      // TODO This lets us have an end time before the start time.
-      // Replicating existing functionality.
       // When start time changes, change end time to 3 hours hence.
       let timeParts = startTime.split(':');
       var hours = (parseInt(timeParts[0]) + 3).toString();
