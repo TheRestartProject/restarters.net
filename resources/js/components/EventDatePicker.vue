@@ -39,6 +39,9 @@ export default {
 
 <style scoped lang="scss">
 @import 'resources/global/css/_variables';
+@import '~bootstrap/scss/functions';
+@import '~bootstrap/scss/variables';
+@import '~bootstrap/scss/mixins/_breakpoints';
 
 /deep/ .datepicker {
     margin: 0px;
@@ -69,7 +72,9 @@ export default {
 }
 
 /deep/ .d-lg-flex {
-  display: flex !important;
+  @include media-breakpoint-up(lg) {
+    display: flex !important;
+  }
 }
 
 /deep/ .focusfix:focus {
