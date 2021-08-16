@@ -104,6 +104,7 @@
           }
 
           $can_edit_event = (Auth::check() && (App\Helpers\Fixometer::hasRole(Auth::user(), 'Administrator') || App\Helpers\Fixometer::userHasEditPartyPermission($event->idevents, Auth::user()->id)));
+          $can_delete_event = Auth::check() && App\Helpers\Fixometer::hasRole(Auth::user(), 'Administrator') && $event->canDelete();
           $is_attending = is_object($is_attending) && $is_attending->status == 1;
 
           $discourseThread = $is_attending ? (env('DISCOURSE_URL').'/t/'.$event->discourse_thread) : null;
@@ -159,6 +160,7 @@
             :is-attending="{{ $is_attending ? 'true' : 'false' }}"
             discourse-thread="{{ $discourseThread }}"
             :canedit="{{ $can_edit_event ? 'true' : 'false' }}"
+            :candelete="{{ $can_delete_event ? 'true' : 'false' }}"
             :in-group="{{ Auth::user() && Auth::user()->isInGroup($event->theGroup->idgroups) ? 'true' : 'false' }}"
             :hosts="{{ json_encode($expanded_hosts, JSON_INVALID_UTF8_IGNORE) }}"
             :calendar-links="{{ json_encode($calendar_links != [] ? $calendar_links : null, JSON_INVALID_UTF8_IGNORE) }}"

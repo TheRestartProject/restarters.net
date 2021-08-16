@@ -8,7 +8,10 @@
         <b-dropdown-item :href="'/party/duplicate/' + idevents">
           {{ __('events.duplicate_event') }}
         </b-dropdown-item>
-        <b-dropdown-item @click="confirmDelete" v-if="!inProgress && !finished">
+        <b-dropdown-item @click="confirmDelete" v-if="candelete">
+          {{ __('events.delete_event') }}
+        </b-dropdown-item>
+        <b-dropdown-item @click="confirmDelete" v-else-if="canedit" disabled>
           {{ __('events.delete_event') }}
         </b-dropdown-item>
         <div v-if="finished">
@@ -67,6 +70,11 @@ export default {
       required: true
     },
     canedit: {
+      type: Boolean,
+      required: false,
+      default: false
+    },
+    candelete: {
       type: Boolean,
       required: false,
       default: false

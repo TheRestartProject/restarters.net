@@ -2,7 +2,7 @@
   <div>
     <div class="d-flex justify-content-between mb-3">
       <h1 class="d-block d-md-none">{{ __('events.events') }}</h1>
-      <EventActions :idevents="idevents" :canedit="canedit" :in-group="inGroup" :is-attending="isAttending" class="d-block d-md-none" />
+      <EventActions :idevents="idevents" :canedit="canedit" :candelete="candelete" :in-group="inGroup" :is-attending="isAttending" class="d-block d-md-none" />
     </div>
     <div class="border-top-very-thick border-bottom-thin mb-3">
       <div class="layout mt-4 mb-3 mb-md-3">
@@ -55,6 +55,11 @@ export default {
       required: true
     },
     canedit: {
+      type: Boolean,
+      required: false,
+      default: false
+    },
+    candelete: {
       type: Boolean,
       required: false,
       default: false

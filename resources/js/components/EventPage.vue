@@ -1,6 +1,6 @@
 <template>
   <div v-if="event">
-    <EventHeading :idevents="idevents" :canedit="canedit" :in-group="inGroup" :is-attending="isAttending" />
+    <EventHeading :idevents="idevents" :canedit="canedit" :candelete="candelete" :in-group="inGroup" :is-attending="isAttending" />
     <div class="layout">
       <div>
         <EventDetails class="pr-md-3" :idevents="idevents" :hosts="hosts" :calendar-links="calendarLinks" :is-attending="isAttending" :discourse-thread="discourseThread" />
@@ -55,6 +55,11 @@ export default {
       default: function () { return [] }
     },
     canedit: {
+      type: Boolean,
+      required: false,
+      default: false
+    },
+    candelete: {
       type: Boolean,
       required: false,
       default: false
