@@ -30,6 +30,15 @@ class AccountCreationTest extends TestCase
         $this->assertEquals(-0.1277583, $user->longitude);
     }
 
+    public function testWorkbenchThenRegister() {
+        $this->get('/workbench');
+        $userAttributes = $this->userAttributes();
+        $response = $this->post('/user/register/', $userAttributes);
+
+        $response->assertStatus(302);
+        $response->assertRedirect('workbench');
+    }
+
     public function testRegisterInvalidAddress()
     {
         $userAttributes = $this->userAttributes();
