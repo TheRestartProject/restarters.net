@@ -3,6 +3,7 @@
 return [
   'field_event_name_helper' => 'Name of the venue or neighbourhood',
   'field_venue_helper' => 'I.e. the place where the fixing happens!',
+  'field_event_link_helper' => 'Link for online events',
   'create_event' => 'Create event',
   'warning_volunteers_message' => 'Please note that the number of volunteers does not match the attendance record.  Do you need to add or remove volunteers?',
   'events_title_admin' => 'Events to moderate',
@@ -93,6 +94,7 @@ return [
   'field_event_county' => 'County/State',
   'field_event_zip' => 'Post/Zip code',
   'field_event_country' => 'Country',
+  'field_event_link' => 'Event link',
   'field_add_image' => 'Add images',
   'before_submit_text' => 'Once confirmed by our community lead, your event will be made public on The Restart Project homepage.',
   'reporting' => 'Event Reporting',

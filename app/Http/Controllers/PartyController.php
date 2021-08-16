@@ -501,6 +501,7 @@ class PartyController extends Controller
                 'online' => $request->has('online'),
                 'group' => $data['group'],
                 'venue' => $data['venue'],
+                'link' => $data['link'],
                 'location' => $data['location'],
                 'latitude' => $latitude,
                 'longitude' => $longitude,
@@ -568,6 +569,7 @@ class PartyController extends Controller
             $party = $Party->findThis($id)[0];
 
             $audits = Party::findOrFail($id)->audits;
+            error_log("URL?" . $party->link);
 
             return view('events.edit', [ //party.edit
                 'response' => $response,

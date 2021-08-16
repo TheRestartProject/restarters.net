@@ -61,6 +61,14 @@
           </ExternalLink>
         </div>
       </div>
+      <div class="border-top-thin d-flex pt-1 pb-1" v-if="event.link">
+        <div class="mr-2">
+          <b-img-lazy src="/icons/link_ico.svg" class="icon" />
+        </div>
+        <div>
+          <ExternalLink :href="event.link" target="_blank" rel="noopener noreferrer" class="truncate">{{ event.link }}</ExternalLink>
+        </div>
+      </div>
       <l-map
           ref="map"
           :zoom="16"
@@ -131,5 +139,13 @@ h2 {
 
 ::v-deep .linkdrop button[aria-expanded="true"] {
   padding: 5px;
+}
+
+.truncate {
+  text-overflow: ellipsis;
+  width: 400px;
+  display: block;
+  white-space: nowrap;
+  overflow: hidden;
 }
 </style>
