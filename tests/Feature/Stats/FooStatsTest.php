@@ -12,16 +12,14 @@ use Tests\TestCase;
 
 /**
  * NOT SO MUCH A TEST
- * AS A MEANS OF DETERMINING
- * EMISSION RATIOS
- * GIVEN RANDOM DATASETS
- * BASED ON FIXOMETER DEVICES DATA
+ * AS A MEANS OF DETERMINING EMISSION RATIOS
+ * GIVEN DATASETS BASED ON FIXOMETER DEVICES DATA
  * SEE LARAVEL.LOG FOR OUTPUT
  */
 class FooStatsTest extends TestCase
 {
-    private $_records = 5000;
-    private $_iterations = 15;
+    private $_records = 10000;
+    private $_iterations = 1;
     private $_data = [];
 
     protected function setUp(): void
@@ -45,65 +43,23 @@ class FooStatsTest extends TestCase
         logger("**** ITERATIONS: $this->_iterations ****");
         for ($i = 1; $i <= $this->_iterations; $i++) {
             $this->_clearDeviceRecords();
-            $this->_insertDevicesPowered($this->_records);
-            $this->_insertDevicesUnpowered($this->_records);
-            $this->_logDevices();
+            $this->_insertDevicesDistrib($this->_records, 'powered');
+            $this->_insertDevicesDistrib($this->_records, 'unpowered');
             $result = \App\Helpers\LcaStats::calculatetEmissionRatioPowered();
             $results['powered'][] = $result;
             $result = \App\Helpers\LcaStats::calculatetEmissionRatioUnpowered();
             $results['unpowered'][] = $result;
         }
         logger("**** POWERED EMISSION RATIO ****");
-        // $expect = env('EMISSION_RATIO_POWERED');
         sort($results['powered']);
-        logger(print_r($results['powered'],1));
-        $mean_powered = $this->_findMean($results['powered'], count($results['powered']));
-        logger("MEAN: $mean_powered");
+        logger($results['powered'][0]);
 
         logger("**** UNPOWERED EMISSION RATIO ****");
-        // $expect = env('EMISSION_RATIO_UNPOWERED');
         sort($results['unpowered']);
-        logger(print_r($results['unpowered'],1));
-        $mean_unpowered = $this->_findMean($results['unpowered'], count($results['unpowered']));
-        logger("MEAN: $mean_unpowered");
+        logger($results['unpowered'][0]);
         logger("**** DATA ****");
         logger(print_r($this->_data,1));
     }
-
-    private function _logDevices()
-    {
-        $query = "SELECT c.`name` as category, COUNT(*) as records FROM devices d JOIN categories c ON c.idcategories = d.category GROUP BY d.category";
-        $result = DB::select(DB::raw($query));
-        if (empty($this->_data)) {
-            foreach ($result as $v) {
-                $this->_data[$v->category]= [];
-            }
-        }
-        foreach ($result as $v) {
-            $this->_data[$v->category][] = $v->records;
-        }
-    }
-
-    private function _findMean(&$a, $n)
-    {
-        $sum = 0;
-        for ($i = 0; $i < $n; $i++)
-            $sum += $a[$i];
-
-        return (float)$sum /
-            (float)$n;
-    }
-
-    private function _findMedian(&$a, $n)
-    {
-        sort($a);
-        if ($n % 2 != 0)
-            return (float)$a[$n / 2];
-
-        return (float)($a[($n - 1) / 2] +
-            $a[$n / 2]) / 2.0;
-    }
-
 
     private function _clearDeviceRecords()
     {
@@ -112,56 +68,72 @@ class FooStatsTest extends TestCase
         DB::statement("SET foreign_key_checks=1");
     }
 
-    private function _insertDevicesPowered($number, $misc = null)
+    private function _insertDevicesDistrib($number, $type)
     {
+        $distrib = $this->_getCategoryDistribution();
         $st = "INSERT INTO `devices` (`iddevices`, `event`, `category`, `category_creation`, `estimate`, `repair_status`, `problem`, `created_at`) VALUES ";
-        if (!$misc) {
+        foreach ($distrib[$type] as $cat => $dist) {
+            $n = round(($number * $dist[1])/100);
+            $this->_data[$cat]['name'] = $dist[0];
+            $this->_data[$cat][$type . '_total'] = $number;
+            $this->_data[$cat]['records'] = $n;
+            $this->_data[$cat]['percent'] = $dist[1];
             $sql = $st;
-            for ($i = 0; $i < $number; $i++) {
-                $sql .= "\n(NULL, '1', FLOOR(46 + RAND()*(10 - 46 + 1)), 46, NULL, '1', '', DATE_SUB(CURRENT_TIMESTAMP, INTERVAL FLOOR(3660 + RAND()*(1 - 3660 + 1)) DAY)),";
-            }
-            DB::statement(DB::raw(rtrim($sql, ',')));
-        } else {
-            // Powered Misc with estimate >= 1 -- Fixo ranges from 0.02 to 20 with a handful of outliers > 20
-            $sql = $st;
-            for ($i = 0; $i < $number / 2; $i++) {
-                $sql .= "\n(NULL, '1', 46, 46, ROUND(FLOOR(20 + RAND()*(1 - 20 + 1)) + RAND(),3), '1', '', DATE_SUB(CURRENT_TIMESTAMP, INTERVAL FLOOR(3660 + RAND()*(1 - 3660 + 1)) DAY)),";
-            }
-            DB::statement(DB::raw(rtrim($sql, ',')));
-
-            // Powered Misc with estimate < 1 -- Fixo ranges from 0.02 to 20 with a handful of outliers > 20
-            $sql = $st;
-            for ($i = 0; $i < $number / 2; $i++) {
-                $sql .= "\n(NULL, '1', 46, 46, ROUND(RAND(),3), '1', '', DATE_SUB(CURRENT_TIMESTAMP, INTERVAL FLOOR(3660 + RAND()*(1 - 3660 + 1)) DAY)),";
+            for ($i = 0; $i < $n; $i++) {
+                $sql .= "\n(NULL, '1', $cat, $cat, NULL, '1', '', DATE_SUB(CURRENT_TIMESTAMP, INTERVAL FLOOR(3660 + RAND()*(1 - 3660 + 1)) DAY)),";
             }
             DB::statement(DB::raw(rtrim($sql, ',')));
         }
     }
 
-    private function _insertDevicesUnpowered($number, $misc = null)
+    private function _getCategoryDistribution()
     {
-        $st = "INSERT INTO `devices` (`iddevices`, `event`, `category`, `category_creation`, `estimate`, `repair_status`, `problem`, `created_at`) VALUES ";
-        if (!$misc) {
-            $sql = $st;
-            for ($i = 0; $i < $number; $i++) {
-                $sql .= "\n(NULL, '1', FLOOR(50 + RAND()*(45 - 49 + 1)), 50, NULL, '1', '', DATE_SUB(CURRENT_TIMESTAMP, INTERVAL FLOOR(3660 + RAND()*(1 - 3660 + 1)) DAY)),";
-            }
-            DB::statement(DB::raw(rtrim($sql, ',')));
-        } else {
-            // Unpowered Misc with estimate >= 1 -- Fixo ranges from 0.02 to 7
-            $sql = $st;
-            for ($i = 0; $i < $number / 2; $i++) {
-                $sql .= "\n(NULL, '1', 50, 50, ROUND(FLOOR(7 + RAND()*(1 - 7 + 1)) + RAND(),3), '1', '', DATE_SUB(CURRENT_TIMESTAMP, INTERVAL FLOOR(3660 + RAND()*(1 - 3660 + 1)) DAY)),";
-            }
-            DB::statement(DB::raw(rtrim($sql, ',')));
+        // category,records,percent
+        $result['unpowered'] = [
+            49 => ['Clothing/textile',73.8019],
+            48 => ['Bicycle',18.5304],
+            47 => ['Furniture',7.6677],
+        ];
 
-            // Unpowered Misc with estimate < 1 -- Fixo ranges from 0.02 to 7
-            $sql = $st;
-            for ($i = 0; $i < $number / 2; $i++) {
-                $sql .= "\n(NULL, '1', 50, 50, ROUND(RAND(),3), '1', '', DATE_SUB(CURRENT_TIMESTAMP, INTERVAL FLOOR(3660 + RAND()*(1 - 3660 + 1)) DAY)),";
-            }
-            DB::statement(DB::raw(rtrim($sql, ',')));
-        }
+        $result['powered'] = [
+            16 => ['Laptop medium',14.7751],
+            42 => ['Small kitchen item',9.9842],
+            25 => ['Mobile',9.0820],
+            40 => ['Lamp',9.0820],
+            32 => ['Portable radio',5.6077],
+            30 => ['Hi-Fi separates',4.5959],
+            45 => ['Vacuum',4.4374],
+            41 => ['Power tool',4.1083],
+            26 => ['Tablet',3.4378],
+            24 => ['Headphones',3.3281],
+            38 => ['Hair & Beauty item',3.1086],
+            44 => ['Toy',2.9867],
+            34 => ['TV and gaming-related accessories',2.5235],
+            43 => ['Toaster',2.4503],
+            19 => ['PC Accessory',2.2797],
+            36 => ['Decorative or safety lights',2.2553],
+            11 => ['Desktop computer',1.8286],
+            29 => ['Hi-Fi integrated',1.8042],
+            20 => ['Printer/scanner',1.5970],
+            23 => ['Handheld entertainment device',1.5848],
+            39 => ['Kettle',1.5604],
+            37 => ['Fan',1.2800],
+            17 => ['Laptop small',1.0728],
+            15 => ['Laptop large',1.0484],
+            31 => ['Musical instrument',0.9143],
+            18 => ['Paper shredder',0.8290],
+            21 => ['Digital Compact Camera',0.6949],
+            35 => ['Aircon/Dehumidifier',0.4511],
+            33 => ['Projector',0.3170],
+            28 => ['Flat screen 32-37"',0.2316],
+            22 => ['DLSR / Video Camera',0.2194],
+            27 => ['Flat screen 26-30"',0.1829],
+            12 => ['Flat screen 15-17"',0.1585],
+            13 => ['Flat screen 19-20"',0.1097],
+            14 => ['Flat screen 22-24"',0.0731],
+
+        ];
+        return $result;
     }
 
     private function _setupCategories()
@@ -209,5 +181,91 @@ class FooStatsTest extends TestCase
 (50, 'Misc', 0, 0, 0, NULL, NULL, NULL, NULL, NULL, 1, 5, 1)";
 
         DB::statement(DB::raw($sql));
+    }
+
+    private function _logDevices()
+    {
+        $query = "SELECT c.`name` as category, COUNT(*) as records FROM devices d JOIN categories c ON c.idcategories = d.category GROUP BY d.category";
+        $result = DB::select(DB::raw($query));
+        if (empty($this->_data)) {
+            foreach ($result as $v) {
+                $this->_data[$v->category] = [];
+            }
+        }
+        foreach ($result as $v) {
+            $this->_data[$v->category][] = $v->records;
+        }
+    }
+
+    private function _findMean(&$a, $n)
+    {
+        $sum = 0;
+        for ($i = 0; $i < $n; $i++)
+            $sum += $a[$i];
+
+        return (float)$sum /
+            (float)$n;
+    }
+
+    private function _findMedian(&$a, $n)
+    {
+        sort($a);
+        if ($n % 2 != 0)
+            return (float)$a[$n / 2];
+
+        return (float)($a[($n - 1) / 2] +
+            $a[$n / 2]) / 2.0;
+    }
+
+    private function _insertDevicesPoweredRandom($number, $misc = null)
+    {
+        $st = "INSERT INTO `devices` (`iddevices`, `event`, `category`, `category_creation`, `estimate`, `repair_status`, `problem`, `created_at`) VALUES ";
+        if (!$misc) {
+            $sql = $st;
+            for ($i = 0; $i < $number; $i++) {
+                $sql .= "\n(NULL, '1', FLOOR(46 + RAND()*(10 - 46 + 1)), 46, NULL, '1', '', DATE_SUB(CURRENT_TIMESTAMP, INTERVAL FLOOR(3660 + RAND()*(1 - 3660 + 1)) DAY)),";
+            }
+            DB::statement(DB::raw(rtrim($sql, ',')));
+        } else {
+            // Powered Misc with estimate >= 1 -- Fixo ranges from 0.02 to 20 with a handful of outliers > 20
+            $sql = $st;
+            for ($i = 0; $i < $number / 2; $i++) {
+                $sql .= "\n(NULL, '1', 46, 46, ROUND(FLOOR(20 + RAND()*(1 - 20 + 1)) + RAND(),3), '1', '', DATE_SUB(CURRENT_TIMESTAMP, INTERVAL FLOOR(3660 + RAND()*(1 - 3660 + 1)) DAY)),";
+            }
+            DB::statement(DB::raw(rtrim($sql, ',')));
+
+            // Powered Misc with estimate < 1 -- Fixo ranges from 0.02 to 20 with a handful of outliers > 20
+            $sql = $st;
+            for ($i = 0; $i < $number / 2; $i++) {
+                $sql .= "\n(NULL, '1', 46, 46, ROUND(RAND(),3), '1', '', DATE_SUB(CURRENT_TIMESTAMP, INTERVAL FLOOR(3660 + RAND()*(1 - 3660 + 1)) DAY)),";
+            }
+            DB::statement(DB::raw(rtrim($sql, ',')));
+        }
+    }
+
+    private function _insertDevicesUnpoweredRandom($number, $misc = null)
+    {
+        $st = "INSERT INTO `devices` (`iddevices`, `event`, `category`, `category_creation`, `estimate`, `repair_status`, `problem`, `created_at`) VALUES ";
+        if (!$misc) {
+            $sql = $st;
+            for ($i = 0; $i < $number; $i++) {
+                $sql .= "\n(NULL, '1', FLOOR(50 + RAND()*(45 - 49 + 1)), 50, NULL, '1', '', DATE_SUB(CURRENT_TIMESTAMP, INTERVAL FLOOR(3660 + RAND()*(1 - 3660 + 1)) DAY)),";
+            }
+            DB::statement(DB::raw(rtrim($sql, ',')));
+        } else {
+            // Unpowered Misc with estimate >= 1 -- Fixo ranges from 0.02 to 7
+            $sql = $st;
+            for ($i = 0; $i < $number / 2; $i++) {
+                $sql .= "\n(NULL, '1', 50, 50, ROUND(FLOOR(7 + RAND()*(1 - 7 + 1)) + RAND(),3), '1', '', DATE_SUB(CURRENT_TIMESTAMP, INTERVAL FLOOR(3660 + RAND()*(1 - 3660 + 1)) DAY)),";
+            }
+            DB::statement(DB::raw(rtrim($sql, ',')));
+
+            // Unpowered Misc with estimate < 1 -- Fixo ranges from 0.02 to 7
+            $sql = $st;
+            for ($i = 0; $i < $number / 2; $i++) {
+                $sql .= "\n(NULL, '1', 50, 50, ROUND(RAND(),3), '1', '', DATE_SUB(CURRENT_TIMESTAMP, INTERVAL FLOOR(3660 + RAND()*(1 - 3660 + 1)) DAY)),";
+            }
+            DB::statement(DB::raw(rtrim($sql, ',')));
+        }
     }
 }
