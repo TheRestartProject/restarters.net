@@ -1,7 +1,7 @@
 <template>
   <div>
     <VueEditor class="editor" v-model="value" :editor-options="editorOptions" />
-    <input type="hidden" v-model="value" :name="name" />
+    <input type="hidden" v-model="valueCorrected" :name="name" />
   </div>
 </template>
 <script>
@@ -32,6 +32,7 @@ export default {
   data: function() {
     return {
       value: null,
+      valueCorrected: null,
       editorOptions: {
         modules: {
           htmlEditButton: {},
@@ -58,8 +59,21 @@ export default {
       }
     }
   },
+  watch: {
+    value(newVal) {
+      console.log("Correct", newVal)
+      // We have an odd problem on Linux where we get <p><br>.
+      if (newVal) {
+        newVal = newVal.replace('<p><br>', '<p>');
+        console.log("Corrected", newVal)
+      }
+
+      this.valueCorrected = newVal
+    }
+  },
   mounted() {
     this.value = this.initialValue
+    this.valueCorrected = this.initialValue
   },
   methods: {
   }
