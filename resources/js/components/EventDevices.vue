@@ -17,11 +17,11 @@
                 <div class="d-flex">
                   <div class="mr-3 lower">
                     <b-img src="/images/trash_brand.svg" class="icon" />
-                    {{ Math.round(stats.waste) }} kg
+                    {{ Math.round(stats.powered_waste) }} kg
                   </div>
                   <div class="mr-1 lower">
                     <b-img src="/images/co2_brand.svg" class="icon" />
-                    {{ Math.round(stats.co2) }} kg
+                    {{ Math.round(stats.powered_co2) }} kg
                   </div>
                 </div>
               </div>
@@ -39,10 +39,17 @@
                 <div>
                   <b>{{ __('devices.title_unpowered') }}</b> ({{ unpowered.length }})
                 </div>
-                <div class="lower">
-                  <b-img src="/images/trash_brand.svg" class="icon" />
-                  {{ Math.round(stats.waste) }} kg
+                <div class="d-flex">
+                  <div class="mr-3 lower">
+                    <b-img src="/images/trash_brand.svg" class="icon" />
+                    {{ Math.round(stats.unpowered_waste) }} kg
+                  </div>
+                  <div class="mr-1 lower">
+                    <b-img src="/images/co2_brand.svg" class="icon" />
+                    {{ Math.round(stats.unpowered_co2) }} kg
+                  </div>
                 </div>
+
               </div>
             </template>
             <p v-html="__('devices.description_unpowered')" />
@@ -67,11 +74,11 @@
             <div class="d-flex text-brand small">
               <div class="ml-2 mr-1 pt-1 lower align-self-center">
                 <b-img src="/images/trash_brand.svg" class="icon" />
-                {{ Math.round(stats.waste) }}
+                {{ Math.round(stats.powered_waste) }}
               </div>
               <div class="ml-1 mr-1 lower pt-1 small align-self-center">
                 <b-img src="/images/co2_brand.svg" class="icon" />
-                {{ Math.round(stats.co2) }}
+                {{ Math.round(stats.powered_co2) }}
               </div>
             </div>
           </template>
@@ -96,7 +103,11 @@
             <div class="d-flex text-brand small">
               <div class="ml-2 mr-1 pt-1 lower align-self-center">
                 <b-img src="/images/trash_brand.svg" class="icon" />
-                {{ Math.round(stats.unpoweredwaste) }}
+                {{ Math.round(stats.unpowered_waste) }}
+              </div>
+              <div class="ml-1 mr-1 lower pt-1 small align-self-center">
+                <b-img src="/images/co2_brand.svg" class="icon" />
+                {{ Math.round(stats.unpowered_co2) }}
               </div>
             </div>
           </template>

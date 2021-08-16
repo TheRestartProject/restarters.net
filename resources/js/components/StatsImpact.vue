@@ -15,7 +15,7 @@
           </div>
         </div>
       </div>
-      <StatsValue :count="stats.powered_co2" icon="cloud_empty" size="lg" title="partials.co2" subtitle="partials.powered_only" :description="equivalent_consumer(stats.co2)" unit="kg" class="impact-co2" />
+      <StatsValue :count="stats.co2" icon="cloud_empty" size="lg" title="partials.co2" :description="equivalent_consumer(stats.co2)" unit="kg" class="impact-co2" />
     </div>
   </div>
 </template>
