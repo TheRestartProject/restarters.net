@@ -15,6 +15,28 @@ use Tests\TestCase;
  * AS A MEANS OF DETERMINING EMISSION RATIOS
  * GIVEN DATASETS BASED ON FIXOMETER DEVICES DATA
  * SEE LARAVEL.LOG FOR OUTPUT
+ *
+ *
+ * Query for finding group events with both
+ * powered and powered items
+SELECT
+g.idgroups,
+e.idevents,
+e.wordpress_post_id
+FROM (
+SELECT
+d.event
+FROM devices d
+JOIN categories c ON c.idcategories = d.category
+WHERE d.event > 2100
+AND d.repair_status = 1
+GROUP BY d.event
+HAVING COUNT(DISTINCT c.powered) = 2
+) t1
+JOIN events e ON e.idevents = t1.`event`
+JOIN groups g ON g.idgroups = e.`group`
+WHERE e.wordpress_post_id IS NOT NULL
+ *
  */
 class FooStatsTest extends TestCase
 {

@@ -260,7 +260,7 @@ class Group extends Model implements Auditable
 
     public static function getGroupStatsArrayKeys()
     {
-        return \App\Party::getEventStatsArrayKeys() + ['parties' => 0,'waste' => 0,];
+        return \App\Party::getEventStatsArrayKeys() + ['parties' => 0];
     }
 
 

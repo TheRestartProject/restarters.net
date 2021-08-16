@@ -5,12 +5,12 @@
   <div id="group-main-stats">
       <div class="col">
           <h5>participants</h5>
-          <span class="largetext"><?php echo $pax; ?></span>
+          <span class="largetext"><?php echo $participants; ?></span>
       </div>
 
       <div class="col">
           <h5>hours volunteered</h5>
-          <span class="largetext"><?php echo $hours; ?></span>
+          <span class="largetext"><?php echo $hours_volunteered; ?></span>
       </div>
 
       <div class="col">
