@@ -34,7 +34,7 @@ class OutboundController extends Controller
                 }
 
                 $eventStats = $event->getEventStats();
-                $co2 = $eventStats['powered_co2'];
+                $co2 = $eventStats['co2'];
             } elseif (strtolower($type) == 'group') {
                 $group = Group::find($id);
 
@@ -42,7 +42,7 @@ class OutboundController extends Controller
                     abort(404);
                 }
                 $groupStats = $group->getGroupStats();
-                $co2 = $groupStats['powered_co2'];
+                $co2 = $groupStats['co2'];
             } elseif (strtolower($type) == 'group-tag') {
                 $groups = Group::join('grouptags_groups', 'grouptags_groups.group', '=', 'groups.idgroups')
                   ->where('grouptags_groups.group_tag', $id)
@@ -52,7 +52,7 @@ class OutboundController extends Controller
                 $emissionRatio = \App\Helpers\LcaStats::getEmissionRatioPowered();
                 foreach ($groups as $group) {
                     $groupStats = $group->getGroupStats($emissionRatio);
-                    $co2 += $groupStats['powered_co2'];
+                    $co2 += $groupStats['co2'];
                 }
             }
 

@@ -886,7 +886,7 @@ class PartyController extends Controller
 
         $eventStats = $event->getEventStats();
 
-        $eventStats['powered_co2'] = number_format(round($eventStats['powered_co2']), 0, '.', ',');
+        $eventStats['co2'] = number_format(round($eventStats['co2']), 0, '.', ',');
 
         if (! is_null($class)) {
             return view('party.stats', [
