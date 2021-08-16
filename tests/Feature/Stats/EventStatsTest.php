@@ -32,6 +32,8 @@ class EventStatsTest extends StatsTestCase
         $expect = \App\Party::getEventStatsArrayKeys();
         $expect['powered_co2'] = 14.4 * $this->_displacementFactor;
         $expect['powered_waste'] = 4;
+        $expect['co2'] += $expect['powered_co2'];
+        $expect['waste'] += $expect['powered_waste'];
         $expect['fixed_devices']++;
         $expect['fixed_powered']++;
         $expect['devices_powered']++;
@@ -71,6 +73,8 @@ class EventStatsTest extends StatsTestCase
         $expect['devices_unpowered']++;
         $expect['unpowered_co2'] = 15.5 * $this->_displacementFactor;
         $expect['unpowered_waste'] = 5;
+        $expect['co2'] = $expect['powered_co2'] + $expect['unpowered_co2'];
+        $expect['waste'] = $expect['powered_waste'] + $expect['unpowered_waste'];
         $result = $device->deviceEvent->getEventStats();
         $this->assertIsArray($result);
         foreach ($expect as $k => $v) {
@@ -107,6 +111,8 @@ class EventStatsTest extends StatsTestCase
         $expect['devices_powered']++;
         $expect['powered_co2'] = (14.4 + (123 * $this->_ratioPowered())) * $this->_displacementFactor;
         $expect['powered_waste'] += 123;
+        $expect['co2'] = $expect['powered_co2'] + $expect['unpowered_co2'];
+        $expect['waste'] = $expect['powered_waste'] + $expect['unpowered_waste'];
         $result = $device->deviceEvent->getEventStats();
         $this->assertIsArray($result);
         foreach ($expect as $k => $v) {
@@ -126,6 +132,8 @@ class EventStatsTest extends StatsTestCase
         $expect['devices_unpowered']++;
         $expect['unpowered_co2'] = (15.5 + (456 * $this->_ratioUnpowered)) * $this->_displacementFactor;
         $expect['unpowered_waste'] += 456;
+        $expect['co2'] = $expect['powered_co2'] + $expect['unpowered_co2'];
+        $expect['waste'] = $expect['powered_waste'] + $expect['unpowered_waste'];
         $result = $device->deviceEvent->getEventStats();
         $this->assertIsArray($result);
         foreach ($expect as $k => $v) {

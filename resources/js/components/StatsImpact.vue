@@ -7,7 +7,7 @@
       </span>
     </h2>
     <div class="impact-container">
-      <StatsValue :count="stats.ewaste + stats.unpowered_waste" icon="trash" size="md" title="partials.waste_prevented" unit="kg" class="impact-waste" />
+      <StatsValue :count="stats.waste" icon="trash" size="md" title="partials.waste_prevented" unit="kg" class="impact-waste" />
       <div v-if="notincluded" class="d-flex justify-content-end">
         <div class="impact-notincluded">
           <div class="impact-notincluded-content p-1">
@@ -15,7 +15,7 @@
           </div>
         </div>
       </div>
-      <StatsValue :count="stats.co2" icon="cloud_empty" size="lg" title="partials.co2" subtitle="partials.powered_only" :description="equivalent_consumer(stats.co2)" unit="kg" class="impact-co2" />
+      <StatsValue :count="stats.powered_co2" icon="cloud_empty" size="lg" title="partials.co2" subtitle="partials.powered_only" :description="equivalent_consumer(stats.co2)" unit="kg" class="impact-co2" />
     </div>
   </div>
 </template>

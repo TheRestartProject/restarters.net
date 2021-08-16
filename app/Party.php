@@ -637,6 +637,8 @@ class Party extends Model implements Auditable
             'powered_waste' => 0,
             'unpowered_co2' => 0,
             'unpowered_waste' => 0,
+            'waste' => 0,
+            'co2' => 0,
             'fixed_devices' => 0,
             'fixed_powered' => 0,
             'fixed_unpowered' => 0,
@@ -711,6 +713,8 @@ class Party extends Model implements Auditable
                 }
             }
 
+            $result['co2'] = $result['powered_co2'] + $result['unpowered_co2'];
+            $result['waste'] = $result['powered_waste'] + $result['unpowered_waste'];
             $result['participants'] = $this->pax ?? 0;
             $result['volunteers'] = $this->volunteers ?? 0;
             $result['hours_volunteered'] = $this->hoursVolunteered();

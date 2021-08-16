@@ -97,19 +97,19 @@
         <GroupEventsScrollTableNumber :value="data.item.volunteers_count.volunteers_count" />
       </template>
 
-      <template slot="head(ewaste)">
+      <template slot="head(waste)">
         <div class="hidecell text-center">
           <b-img class="icon mt-3" src="/images/trash.svg" :title="__('groups.waste_prevented')" />
         </div>
       </template>
-      <template slot="cell(ewaste)" slot-scope="data" v-bind="stats">
-        <div v-if="noDevices(data.item.ewaste)" class="d-none d-md-block">
+      <template slot="cell(waste)" slot-scope="data" v-bind="stats">
+        <div v-if="noDevices(data.item.waste)" class="d-none d-md-block">
           {{ __('partials.no_devices_added') }}
-          <a :href="'/party/view/' + data.item.ewaste.idevents">
+          <a :href="'/party/view/' + data.item.waste.idevents">
             {{ __('partials.add_a_device') }}
           </a>
         </div>
-        <GroupEventsScrollTableNumber v-else :value="Math.round(stats(data.item.ewaste).ewaste)" units="kg" />
+        <GroupEventsScrollTableNumber v-else :value="Math.round(stats(data.item.waste).waste)" units="kg" />
       </template>
 
       <template slot="head(co2)">
@@ -219,7 +219,7 @@ export default {
           { key: 'actions', label: 'Actions', },
           { key: 'participants_count', label: 'Participants', sortable: true, tdClass: this.dangerIfZero},
           { key: 'volunteers_count', label: 'Volunteers', sortable: true, tdClass: this.dangerIfOne},
-          { key: 'ewaste', label: 'ewaste', sortable: true, tdClass: this.noDevicesError},
+          { key: 'waste', label: 'waste', sortable: true, tdClass: this.noDevicesError},
           { key: 'co2', label: 'co2', sortable: true},
           { key: 'fixed_devices', label: 'Fixed Devices', sortable: true},
           { key: 'repairable_devices', label: 'Repairable Devices', sortable: true},
@@ -246,7 +246,7 @@ export default {
             actions: e,
             participants_count: e,
             volunteers_count: e,
-            ewaste: e,
+            waste: e,
             co2: e,
             fixed_devices: e,
             repairable_devices: e,
@@ -314,7 +314,7 @@ export default {
           return atitle.toLowerCase().localeCompare(btitle.toLowerCase())
         case 'participants_count':
         case 'volunteers_count':
-        case 'ewaste':
+        case 'waste':
         case 'co2':
         case 'fixed_devices':
         case 'repairable_devices':

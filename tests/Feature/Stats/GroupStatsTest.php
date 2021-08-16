@@ -54,6 +54,8 @@ class GroupStatsTest extends StatsTestCase
         $expect['waste'] = 4;
         $expect['powered_co2'] = 14.4 * $this->_displacementFactor;
         $expect['powered_waste'] = 4;
+        $expect['co2'] = $expect['powered_co2'] + $expect['unpowered_co2'];
+        $expect['waste'] = $expect['powered_waste'] + $expect['unpowered_waste'];
         $expect['fixed_devices']++;
         $expect['fixed_powered']++;
         $expect['devices_powered']++;
@@ -90,7 +92,8 @@ class GroupStatsTest extends StatsTestCase
         ]);
         $expect['unpowered_co2'] = 15.5 * $this->_displacementFactor;
         $expect['unpowered_waste'] = 5;
-        $expect['waste'] = 9;
+        $expect['co2'] = $expect['powered_co2'] + $expect['unpowered_co2'];
+        $expect['waste'] = $expect['powered_waste'] + $expect['unpowered_waste'];
         $expect['fixed_devices']++;
         $expect['fixed_unpowered']++;
         $expect['devices_unpowered']++;
@@ -130,7 +133,8 @@ class GroupStatsTest extends StatsTestCase
         $expect['devices_powered']++;
         $expect['powered_co2'] = (14.4 + (123 * $this->_ratioPowered())) * $this->_displacementFactor;
         $expect['powered_waste'] += 123;
-        $expect['waste'] += 123;
+        $expect['co2'] = $expect['powered_co2'] + $expect['unpowered_co2'];
+        $expect['waste'] = $expect['powered_waste'] + $expect['unpowered_waste'];
         $result = $group->getGroupStats();
         $this->assertIsArray($result);
         foreach ($expect as $k => $v) {
@@ -150,7 +154,8 @@ class GroupStatsTest extends StatsTestCase
         $expect['devices_unpowered']++;
         $expect['unpowered_co2'] = (15.5 + (456 * $this->_ratioUnpowered)) * $this->_displacementFactor;
         $expect['unpowered_waste'] += 456;
-        $expect['waste'] += 456;
+        $expect['co2'] = $expect['powered_co2'] + $expect['unpowered_co2'];
+        $expect['waste'] = $expect['powered_waste'] + $expect['unpowered_waste'];
         $result = $group->getGroupStats();
         $this->assertIsArray($result);
         foreach ($expect as $k => $v) {
@@ -229,6 +234,7 @@ class GroupStatsTest extends StatsTestCase
         $expect['powered_waste'] = 4 + 123;
         $expect['unpowered_co2'] = (15.5 + (456 * $this->_ratioUnpowered)) * $this->_displacementFactor;
         $expect['unpowered_waste'] = 5 + 456;
+        $expect['co2'] = $expect['powered_co2'] + $expect['unpowered_co2'];
         $expect['waste'] = $expect['powered_waste'] + $expect['unpowered_waste'];
 
         $result = $group1->getGroupStats();
@@ -283,9 +289,10 @@ class GroupStatsTest extends StatsTestCase
         $expect['unpowered_no_weight'] = 0;
         $expect['powered_waste'] = 4 + 11;
         $expect['unpowered_waste'] = 22;
-        $expect['waste'] = $expect['powered_waste'] + $expect['unpowered_waste'];
         $expect['powered_co2'] = (14.4 + (11 * $this->_ratioPowered())) * $this->_displacementFactor;
         $expect['unpowered_co2'] = (22 * $this->_ratioUnpowered) * $this->_displacementFactor;
+        $expect['co2'] = $expect['powered_co2'] + $expect['unpowered_co2'];
+        $expect['waste'] = $expect['powered_waste'] + $expect['unpowered_waste'];
         $result = $group2->getGroupStats();
         $this->assertIsArray($result);
         foreach ($expect as $k => $v) {

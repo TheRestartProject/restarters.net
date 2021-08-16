@@ -285,7 +285,6 @@ class Group extends Model implements Auditable
             }
         }
 
-        $result['waste'] = $result['powered_waste'] + $result['unpowered_waste'];
         $result['parties'] = count($allPastEvents);
         return $result;
     }
