@@ -19,6 +19,7 @@
         "filp/whoops": "^2.9",
         "fzaninotto/faker": "1.9.2",
         "guzzlehttp/guzzle": "^6.3",
+        "caseyamcl/guzzle_retry_middleware": "^2.6",
         "hieu-le/wordpress-xmlrpc-client": "~2.0",
         "intervention/image": "^2.4",
         "jenssegers/agent": "^2.6",
@@ -42,7 +43,6 @@
     "require-dev": {
         "barryvdh/laravel-debugbar": "^3.1",
         "beyondcode/laravel-dump-server": "^1.0",
-        "caseyamcl/guzzle_retry_middleware": "^2.6",
         "filp/whoops": "^2.0",
         "fzaninotto/faker": "^1.4",
         "laravel/dusk": "^4.0",
