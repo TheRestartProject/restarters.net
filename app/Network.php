@@ -3,7 +3,6 @@
 namespace App;
 
 use App\Group;
-
 use Illuminate\Database\Eloquent\Model;
 
 class Network extends Model
@@ -45,7 +44,6 @@ class Network extends Model
         return $events->flatten(1);
     }
 
-
     public function logo()
     {
         return $this->hasOne(\App\Xref::class, 'reference', 'id')
@@ -57,12 +55,12 @@ class Network extends Model
     {
         $networkGroupsIds = $this->groups->pluck('idgroups')->toArray();
 
-        return Group::all()->filter(function ($group) use($networkGroupsIds) {
-            return !in_array($group->idgroups, $networkGroupsIds);
+        return Group::all()->filter(function ($group) use ($networkGroupsIds) {
+            return ! in_array($group->idgroups, $networkGroupsIds);
         });
     }
 
-    public function stats($emissionRatio)
+    public function stats()
     {
         $stats = [
             'pax' => 0,
@@ -72,11 +70,17 @@ class Network extends Model
             'waste' => 0,
             'ewaste' => 0,
             'unpowered_waste' => 0,
+            'fixed_devices' => 0,
+            'fixed_powered' => 0,
+            'fixed_unpowered' => 0,
             'repairable_devices' => 0,
             'dead_devices' => 0,
-            'no_weight' => 0
+            'no_weight' => 0,
+            'devices_powered' => 0,
+            'devices_unpowered' => 0,
         ];
 
+        $emissionRatio = \App\Helpers\FootprintRatioCalculator::calculateRatio();
         foreach ($this->groups as $group) {
             $singleGroupStats = $group->getGroupStats($emissionRatio);
 

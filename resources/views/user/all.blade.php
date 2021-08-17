@@ -31,7 +31,7 @@
     </div>
 
     @if(isset($response))
-      @php( FixometerHelper::printResponse($response) )
+      @php( App\Helpers\Fixometer::printResponse($response) )
     @endif
 
     <div class="row justify-content-center">
@@ -80,7 +80,7 @@
                 <div class="form-control form-control__select">
                     <select id="country" name="country" class="field select2">
                         <option value=""></option>
-                        @foreach (FixometerHelper::getAllCountries() as $country_code => $country_name)
+                        @foreach (App\Helpers\Fixometer::getAllCountries() as $country_code => $country_name)
                           @if (isset($country) && $country_code == $country)
                             <option value="{{ $country_code }}" selected>{{ $country_name }}</option>
                           @else
@@ -96,7 +96,7 @@
                 <label for="role">Role:</label>
                 <select class="form-control" id="inputRole" name="role">
                   <option value="" selected>Choose role</option>
-                  @foreach (FixometerHelper::allRoles() as $r)
+                  @foreach (App\Helpers\Fixometer::allRoles() as $r)
                     @if (isset($role) && $r->idroles == $role)
                       <option value="{{ $r->idroles }}" selected>{{ $r->role }}</option>
                     @else
@@ -111,7 +111,7 @@
                 <label for="permission">Permission:</label>
                 <div class="form-control form-control__select">
                 <select id="permissions" name="permissions[]" class="form-control select2-tags" multiple data-live-search="true" title="Choose permissions...">
-                      @foreach (FixometerHelper::allPermissions() as $p)
+                      @foreach (App\Helpers\Fixometer::allPermissions() as $p)
                         @if (isset($permissions) && in_array($p->idpermissions, $permissions))
                           <option value="{{ $p->idpermissions }}" selected>{{ $p->permission }}</option>
                         @else
@@ -134,14 +134,14 @@
           <table class="table table-striped">
             <thead>
               <tr>
-                <th><a href="/user/all/search?{{ FixometerHelper::buildSortQuery('users.name') }}">Name</a></th>
+                <th><a href="/user/all/search?{{ App\Helpers\Fixometer::buildSortQuery('users.name') }}">Name</a></th>
                 <th class="d-none d-sm-table-cell">Email address</th>
-                <th class=""><a href="/user/all/search?{{ FixometerHelper::buildSortQuery('users.role') }}">Role</a></th>
-                <th class="d-none d-sm-table-cell"><a href="/user/all/search?{{ FixometerHelper::buildSortQuery('users.location') }}">Location</a></th>
-                <th class="d-none d-sm-table-cell"><a href="/user/all/search?{{ FixometerHelper::buildSortQuery('users.country') }}">Country</a></th>
+                <th class=""><a href="/user/all/search?{{ App\Helpers\Fixometer::buildSortQuery('users.role') }}">Role</a></th>
+                <th class="d-none d-sm-table-cell"><a href="/user/all/search?{{ App\Helpers\Fixometer::buildSortQuery('users.location') }}">Location</a></th>
+                <th class="d-none d-sm-table-cell"><a href="/user/all/search?{{ App\Helpers\Fixometer::buildSortQuery('users.country') }}">Country</a></th>
                 <th class="d-none d-sm-table-cell">Groups</th>
-                <th class="d-none d-sm-table-cell" width="90"><a href="/user/all/search?{{ FixometerHelper::buildSortQuery('users.created_at') }}">Joined</a></th>
-                <th class="d-none d-sm-table-cell" width="90"><a href="/user/all/search?{{ FixometerHelper::buildSortQuery('users.updated_at') }}">Last login</a></th>
+                <th class="d-none d-sm-table-cell" width="90"><a href="/user/all/search?{{ App\Helpers\Fixometer::buildSortQuery('users.created_at') }}">Joined</a></th>
+                <th class="d-none d-sm-table-cell" width="90"><a href="/user/all/search?{{ App\Helpers\Fixometer::buildSortQuery('users.updated_at') }}">Last login</a></th>
               </tr>
             </thead>
             <tbody>
@@ -165,7 +165,7 @@
                   <tr>
                       <td>
 
-                          @if(FixometerHelper::hasRole($user, 'Administrator'))
+                          @if(App\Helpers\Fixometer::hasRole($user, 'Administrator'))
                           <a href="/user/edit/<?php echo $u->id; ?>"><?php echo $u->name; ?></a>
                           @else
                           <?php echo $u->name; ?>
@@ -181,7 +181,7 @@
                         data-original-email="{{ $u->email }}"
                         data-copy="{{ $u->email }}"
                         data-content="{{ $u->email }} </br> <b>Click/press to copy</b>">
-                          {{ str_limit($u->email, 15) }}
+                          {{ Str::limit($u->email, 15) }}
                         </span>
                       </td>
                       <td>

@@ -2,7 +2,7 @@
 
     <div class="dashboard__block__content dashboard__block__content--table">
         <h4>@lang('partials.your_recent_events')</h4>
-        @if ( FixometerHelper::hasRole(Auth::user(), 'Restarter') )
+        @if ( App\Helpers\Fixometer::hasRole(Auth::user(), 'Restarter') )
           <p>@lang('partials.your_recent_events_txt1')</p>
         @else
           <p>@lang('partials.your_recent_events_txt2')</p>

@@ -55,24 +55,25 @@
                     <label for="reliability">@lang('admin.reliability'):</label>
                     <div class="form-control form-control__select">
                         <select name="reliability" id="reliability" class="field field select2">
-                          @foreach(FixometerHelper::footprintReliability() as $key => $value)
+                          @foreach(App\Helpers\Fixometer::footprintReliability() as $key => $value)
                             <option value="{{ $key }}" {{ $key == $category->footprint_reliability ? 'selected' : ''}} >{{ $value }}</option>
                           @endforeach
                         </select>
                     </div>
                 </div>
-                <?php //dd($categories); ?>
+                <?php //dd($categories);?>
                 <div class="form-group">
                     <label for="category_cluster">@lang('admin.category_cluster'):</label>
                     <div class="form-control form-control__select">
                         <select name="category_cluster" id="category_cluster" class="field field select2">
-                          <!-- @foreach(FixometerHelper::categoryCluster() as $key => $value)
+                          <!-- REDUNDANT   -->
+                          <!-- @foreach(App\Helpers\Fixometer::categoryCluster() as $key => $value)
                             <option value="{{ $key }}" {{ $key == $category->cluster ? 'selected' : ''}} >{{ $value }}</option>
                           @endforeach -->
 
                           @if(isset($categories))
-                            <?php foreach($categories as $cluster){ ?>
-                            <option value="<?php echo $cluster->idclusters; ?>"<?php echo ($cluster->idclusters == $category->cluster ? ' selected' : ''); ?>><?php echo $cluster->name; ?></option>
+                            <?php foreach ($categories as $cluster) { ?>
+                            <option value="<?php echo $cluster->idclusters; ?>"<?php echo $cluster->idclusters == $category->cluster ? ' selected' : ''; ?>><?php echo $cluster->name; ?></option>
                             <?php } ?>
                           @endif
                         </select>

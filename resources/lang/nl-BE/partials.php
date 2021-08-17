@@ -1,6 +1,6 @@
 <?php
 
-return array (
+return [
   1 => 'Hoe een groep opmaken',
   2 => 'how_to_set_up_a_group_text',
   3 => 'Eens je de eerste stappen om een groep te maken hebt uitgevoerd, kunnen we er hier een aanmaken voor jou.',
@@ -91,4 +91,4 @@ return array (
   'solution_text2' => 'Interesting case study to share?',
   'quantity' => 'Quantity',
   'cancel' => 'Cancel',
-);
+];

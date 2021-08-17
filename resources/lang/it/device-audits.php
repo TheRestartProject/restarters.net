@@ -1,12 +1,10 @@
 <?php
 
-return array (
+return [
   'unavailable_audits' => 'Nessuna modifica è stata fatta a questo dispositivo!',
-  'updated' => 
-  array (
+  'updated' => [
     'metadata' => 'On :audit_created_at, :user_name updated record <strong>:audit_url</strong>',
-    'modified' => 
-    array (
+    'modified' => [
       'event' => '<strong>Evento</strong> modificato da  "<strong>:old</strong>" a "<strong>:new</strong>"',
       'category' => '<strong>Categoria</strong> modificata da "<strong>:old</strong>" a "<strong>:new</strong>"',
       'category_creation' => '<strong>Creazione Categoria</strong> modificata da "<strong>:old</strong>" a "<strong>:new</strong>"',
@@ -24,13 +22,11 @@ return array (
       'professional_help' => '<strong>Supporto professionale </strong> modificato da "<strong>:old</strong>" a "<strong>:new</strong>"',
       'more_time_needed' => '<strong>Tempo insufficiente More time </strong> modificato da "<strong>:old</strong>" a "<strong>:new</strong>"',
       'wiki' => '<strong>Wiki</strong>  modificato da "<strong>:old</strong>" a "<strong>:new</strong>"',
-    ),
-  ),
-  'created' => 
-  array (
+    ],
+  ],
+  'created' => [
     'metadata' => 'On :audit_created_at, :user_name created record <strong>:audit_url</strong>',
-    'modified' => 
-    array (
+    'modified' => [
       'age' => '<strong>Età</strong> impostata a "<strong>:new</strong>"',
       'brand' => '<strong>Marca</strong> impostata a "<strong>:new</strong>"',
       'category' => '<strong>Categoria</strong> impostata a "<strong>:new</strong>"',
@@ -47,6 +43,6 @@ return array (
       'repair_status' => '<strong>Stato della riparazione Status</strong> impostato a "<strong>:new</strong>"',
       'spare_parts' => '<strong>Parti di ricambio</strong> impostato a "<strong>:new</strong>"',
       'wiki' => '<strong>Wiki</strong> impostato a "<strong>:new</strong>"',
-    ),
-  ),
-);
+    ],
+  ],
+];

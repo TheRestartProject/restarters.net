@@ -1,8 +1,8 @@
 <?php
 
-use Illuminate\Support\Facades\Schema;
-use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Database\Migrations\Migration;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\Schema;
 
 class SoftDeletePermissions extends Migration
 {
@@ -14,7 +14,7 @@ class SoftDeletePermissions extends Migration
     public function up()
     {
         Schema::table('permissions', function (Blueprint $table) {
-          $table->softDeletes();
+            $table->softDeletes();
         });
 
         DB::table('permissions')->where('idpermissions', '<=', 4)->update([
@@ -30,7 +30,7 @@ class SoftDeletePermissions extends Migration
     public function down()
     {
         Schema::table('permissions', function (Blueprint $table) {
-          $table->dropColumn('deleted_at');
+            $table->dropColumn('deleted_at');
         });
     }
 }

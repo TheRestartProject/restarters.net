@@ -4,11 +4,11 @@ namespace App;
 
 use DB;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Support\Facades\Schema;
 use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\Schema;
 
-class Misccat extends Model {
-
+class Misccat extends Model
+{
     protected $table = 'devices_misc_opinions';
     protected $dateFormat = 'Y-m-d H:i';
     protected $dates = ['created_at', 'updated_at'];
@@ -24,16 +24,17 @@ class Misccat extends Model {
     /**
      * Fetch a single random computer device record that has less than 3
      * existing opinions and a "Misc" category.
-     * 
+     *
      * Not the most efficient query
-     * 
-     * The list of excluded iddevices is because those records have 
+     *
+     * The list of excluded iddevices is because those records have
      * useless problem text:
      * "Like all data in Y1, this data is an estimate based on participation"
-     * 
+     *
      * @return array
      */
-    public function fetchMisc() {
+    public function fetchMisc()
+    {
         return DB::select("
 SELECT
 d.`iddevices` as iddevices,
@@ -56,12 +57,10 @@ LIMIT 1;"
     }
 
     /**
-     * 
-     *
      * @return mixed
      */
-    public function fetchStatus() {
-
+    public function fetchStatus()
+    {
         $result = [];
 
         $status_query = "
@@ -90,7 +89,6 @@ LEFT OUTER JOIN devices_misc_adjudicated a ON a.iddevices = d.iddevices
 GROUP BY d.iddevices";
 
         try {
-
             $result['status'] = DB::select("
 SELECT COUNT(*) as total,
 `code`,
@@ -112,7 +110,6 @@ GROUP BY `code`
         }
 
         try {
-
             $result['list_recats'] = DB::select("
 SELECT
 COUNT(d.iddevices) as items,
@@ -132,31 +129,27 @@ ORDER BY items DESC, top_opinion ASC
         }
 
         try {
-
             $result['list_splits'] = DB::select("$status_query HAVING `code` = 3");
         } catch (Exception $exc) {
             echo $exc->getMessage();
         }
 
-
-        $result['total_eee'] = DB::select("
+        $result['total_eee'] = DB::select('
 SELECT COUNT(DISTINCT o.iddevices) AS total
 FROM devices_misc_opinions o
 WHERE o.eee = 1
-");
-        $result['total_non_eee'] = DB::select("
+');
+        $result['total_non_eee'] = DB::select('
 SELECT COUNT(DISTINCT o.iddevices) AS total
 FROM devices_misc_opinions o
 WHERE o.eee = 0
-");
+');
 
-        $result['total_not_sure'] = DB::select("
+        $result['total_not_sure'] = DB::select('
 SELECT COUNT(DISTINCT o.iddevices) AS total
 FROM devices_misc_opinions o
 WHERE o.eee = 2
-");
-
-
+');
 
         return $result;
     }
@@ -167,8 +160,8 @@ WHERE o.eee = 2
      *
      * @return mixed
      */
-    public function updateDevices() {
-
+    public function updateDevices()
+    {
         DB::statement("CREATE TEMPORARY TABLE IF NOT EXISTS `devices_misc_temporary` AS (
 SELECT
 d.iddevices,
@@ -192,19 +185,18 @@ AND (winning_opinion != 'Misc')
 )
 ORDER BY NULL);");
 
-        DB::statement("ALTER TABLE `devices_misc_temporary` ADD PRIMARY KEY(`iddevices`);");
+        DB::statement('ALTER TABLE `devices_misc_temporary` ADD PRIMARY KEY(`iddevices`);');
 
-        DB::update("UPDATE devices_misc_temporary t, categories c 
+        DB::update('UPDATE devices_misc_temporary t, categories c 
 SET t.idcategories = c.idcategories
-WHERE t.winning_opinion = c.`name`;");
+WHERE t.winning_opinion = c.`name`;');
 
-        $result = DB::update("UPDATE devices d, devices_misc_temporary t 
+        $result = DB::update('UPDATE devices d, devices_misc_temporary t 
 SET d.category = t.idcategories
-WHERE d.iddevices = t.iddevices AND t.idcategories > 0;");
+WHERE d.iddevices = t.iddevices AND t.idcategories > 0;');
 
-        DB::statement("DROP TEMPORARY TABLE IF EXISTS `devices_misc_temporary`;");
+        DB::statement('DROP TEMPORARY TABLE IF EXISTS `devices_misc_temporary`;');
 
         return $result;
     }
-
 }

@@ -7,8 +7,10 @@ use Hash;
 use Mockery;
 use Tests\TestCase;
 
-class BasicTest extends TestCase {
-    public function testPageLoads() {
+class BasicTest extends TestCase
+{
+    public function testPageLoads()
+    {
         // Test the dashboard page loads.  Most of the work is done inside Vue, so a basic test is just that the
         // Vue component exists.
         $this->loginAsTestUser();
@@ -25,11 +27,11 @@ class BasicTest extends TestCase {
                 ':upcoming-events' => '[]',
                 ':past-events' => 'null',
                 ':topics' => '[]',
-                'see-all-topics-link' => env('DISCOURSE_URL') . '/latest',
+                'see-all-topics-link' => env('DISCOURSE_URL').'/latest',
                 ':is-logged-in' => 'true',
                 'discourse-base-url' => env('DISCOURSE_URL'),
                 ':new-groups' => '0',
-            ]
+            ],
         ]);
     }
 }

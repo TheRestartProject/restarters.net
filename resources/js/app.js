@@ -1124,10 +1124,10 @@ function initAutocomplete() {
     $('input[name=sort_column]').on('click', function(e) {
         var $form = $('#device-search');
         var $sort_direction = $form.find('input[name=sort_direction]');
-            if( $sort_direction.val() === 'DSC' ){
+            if( $sort_direction.val() === 'DESC' ){
                 $sort_direction.val('ASC');
             } else {
-                $sort_direction.val('DSC');
+                $sort_direction.val('DESC');
             }
         $form.submit();
     });
@@ -1405,28 +1405,6 @@ function initAutocomplete() {
           error: function(){
             $('.invalid-feedback').hide();
           }
-        });
-
-      }
-    });
-
-    // If event has attended or invited people then user cannot delete the event
-    $("#deleteEvent").click(function (e) {
-      if($(this).attr('data-count-attended') > 0 || $(this).attr('data-count-invited') > 0 || $(this).attr('data-count-volunteers') > 0) {
-        return confirm('Are you sure you want to delete this event?');
-
-        var id = $(this).attr('data-party-id');
-
-        $.ajax({
-          headers: {
-            'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
-          },
-          type:'POST',
-          url:'/party/delete/'+id,
-          data: {
-            "id" : id,
-          },
-          dataType : 'json',
         });
 
       }

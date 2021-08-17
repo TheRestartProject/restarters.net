@@ -16,7 +16,7 @@ use DB;
  */
 class FootprintRatioCalculator
 {
-    public function calculateRatio()
+    public static function calculateRatio()
     {
         // TODO: parameterise repair_status value and id for misc category using env values.
         $result = DB::select(DB::raw('

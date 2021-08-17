@@ -1,6 +1,6 @@
 <?php
 
-return array (
+return [
   'getting_started_header' => 'Per incominciare',
   'getting_started_text' => 'Benvenuto nello spazio della comunità dei Restarters. Ecco alcune azioni per iniziare:',
   'add_avatar' => 'Aggiungi un avatar',
@@ -24,4 +24,4 @@ return array (
   'join_group_link_restarter' => 'Trova un gruppo',
   'join_group_restarter' => 'Segui un gruppo di riparazione',
   'log_devices' => 'Registra dispositivi',
-);
+];

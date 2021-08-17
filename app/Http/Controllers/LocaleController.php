@@ -19,9 +19,9 @@ class LocaleController extends Controller
         LaravelLocalization::setLocale($locale);
 
         // Set in database
-        if (!Auth::guest()) {
+        if (! Auth::guest()) {
             Auth::user()->update([
-            'language' => $locale
+            'language' => $locale,
             ]);
         }
 

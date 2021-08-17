@@ -46,7 +46,7 @@
 
 
 
-      @if( FixometerHelper::hasRole(Auth::user(), 'Administrator') || FixometerHelper::hasRole(Auth::user(), 'NetworkCoordinator') )
+      @if( App\Helpers\Fixometer::hasRole(Auth::user(), 'Administrator') || App\Helpers\Fixometer::hasRole(Auth::user(), 'NetworkCoordinator') )
         <td class="d-none d-sm-table-cell cell-warning text-center">Event requires <a href="/party/edit/{{ $event->idevents }}">moderation</a></td>
       @else
         <td class="d-none d-sm-table-cell cell-warning text-center">@lang('partials.event_requires_moderation_by_an_admin')</td>
@@ -105,7 +105,7 @@
     @elseif( $event->hasFinished() )
 
       @if ( $event->checkForMissingData()['devices_count'] != 0  )
-        @php( $stats = $event->getEventStats($EmissionRatio) )
+        @php( $stats = $event->getEventStats() )
         <td class="d-none d-sm-table-cell cell-figure">{{{ number_format(round($stats['ewaste']), 0) }}}<small>kg<small></td>
         <td class="d-none d-sm-table-cell cell-figure">{{{ number_format(round($stats['co2']), 0) }}}<small>kg<small></td>
         <td class="d-none d-sm-table-cell cell-figure">{{{ $stats['fixed_devices'] }}}</td>

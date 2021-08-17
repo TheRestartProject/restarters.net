@@ -1,10 +1,9 @@
 <?php
 
 use App\Cluster;
-
-use Illuminate\Support\Facades\Schema;
-use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Database\Migrations\Migration;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\Schema;
 
 class SupportNonPoweredItems extends Migration
 {
@@ -25,7 +24,6 @@ class SupportNonPoweredItems extends Migration
             // ‘Powered’ column set to true for all existing categories.
             $table->boolean('powered')->after('name')->default(true);
         });
-
 
         // New non-powered categories added to categories table, ‘powered’ set to false, cluster set to ‘non-powered’.
         $nonPoweredClusterId = Cluster::where('name', 'Non-Powered Items')->first()->idclusters;

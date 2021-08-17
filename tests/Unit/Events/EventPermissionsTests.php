@@ -6,19 +6,18 @@ use App\Group;
 use App\Network;
 use App\Party;
 use App\User;
-use FixometerHelper;
-
 use DB;
-use Tests\TestCase;
-use Illuminate\Foundation\Testing\WithFaker;
+use App\Helpers\Fixometer;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Foundation\Testing\WithFaker;
+use Tests\TestCase;
 
 class EventPermissionsTests extends TestCase
 {
-    public function setUp()
+    protected function setUp(): void
     {
         parent::setUp();
-        DB::statement("SET foreign_key_checks=0");
+        DB::statement('SET foreign_key_checks=0');
         User::truncate();
         Group::truncate();
         Network::truncate();
@@ -26,13 +25,14 @@ class EventPermissionsTests extends TestCase
         DB::delete('delete from users_groups');
         DB::delete('delete from group_network');
         DB::delete('delete from user_network');
-        DB::statement("SET foreign_key_checks=1");
+        DB::statement('SET foreign_key_checks=1');
     }
 
     // edit event permissions
     // Admins - can edit all events
     // Network Coords - can edit all events from groups in their network
     // Hosts - can edit all events in their groups
+
     /** @test */
     public function it_can_check_if_admin_can_edit_all()
     {
@@ -50,15 +50,15 @@ class EventPermissionsTests extends TestCase
 
         // assert
         $this->actingAs($admin);
-        $this->assertTrue(FixometerHelper::userHasEditPartyPermission($event->idevents));
+        $this->assertTrue(Fixometer::userHasEditPartyPermission($event->idevents));
 
         // assert
         $this->actingAs($coordinator);
-        $this->assertFalse(FixometerHelper::userHasEditPartyPermission($event->idevents));
+        $this->assertFalse(Fixometer::userHasEditPartyPermission($event->idevents));
 
         // assert
         $this->actingAs($host);
-        $this->assertFalse(FixometerHelper::userHasEditPartyPermission($event->idevents));
+        $this->assertFalse(Fixometer::userHasEditPartyPermission($event->idevents));
     }
 
     /** @test */
@@ -79,13 +79,13 @@ class EventPermissionsTests extends TestCase
 
         // assert
         $this->actingAs($coordinator1);
-        $this->assertTrue(FixometerHelper::userHasEditPartyPermission($event->idevents));
+        $this->assertTrue(Fixometer::userHasEditPartyPermission($event->idevents));
 
         $this->actingAs($coordinator2);
-        $this->assertFalse(FixometerHelper::userHasEditPartyPermission($event->idevents));
+        $this->assertFalse(Fixometer::userHasEditPartyPermission($event->idevents));
 
         $this->actingAs($host);
-        $this->assertFalse(FixometerHelper::userHasEditPartyPermission($event->idevents));
+        $this->assertFalse(Fixometer::userHasEditPartyPermission($event->idevents));
     }
 
     /** @test */
@@ -105,6 +105,6 @@ class EventPermissionsTests extends TestCase
 
         // assert
         $this->actingAs($host);
-        $this->assertTrue(FixometerHelper::userHasEditPartyPermission($event->idevents));
+        $this->assertTrue(Fixometer::userHasEditPartyPermission($event->idevents));
     }
 }

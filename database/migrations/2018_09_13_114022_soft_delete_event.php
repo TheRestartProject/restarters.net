@@ -1,8 +1,8 @@
 <?php
 
-use Illuminate\Support\Facades\Schema;
-use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Database\Migrations\Migration;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\Schema;
 
 class SoftDeleteEvent extends Migration
 {
@@ -13,9 +13,9 @@ class SoftDeleteEvent extends Migration
      */
     public function up()
     {
-      Schema::table('events', function (Blueprint $table) {
-          $table->softDeletes();
-      });
+        Schema::table('events', function (Blueprint $table) {
+            $table->softDeletes();
+        });
     }
 
     /**
@@ -25,8 +25,8 @@ class SoftDeleteEvent extends Migration
      */
     public function down()
     {
-      Schema::table('events', function (Blueprint $table) {
-          $table->dropColumn('deleted_at');
-      });
+        Schema::table('events', function (Blueprint $table) {
+            $table->dropColumn('deleted_at');
+        });
     }
 }

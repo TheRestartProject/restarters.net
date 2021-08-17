@@ -2,13 +2,12 @@
 
 namespace App;
 
-use Illuminate\Database\Eloquent\Model;
-
+use App\Helpers\Fixometer;
 use DB;
+use Illuminate\Database\Eloquent\Model;
 
 class Category extends Model
 {
-
     protected $table = 'categories';
     private $revision = 1;
     protected $primaryKey = 'idcategories';
@@ -29,15 +28,13 @@ class Category extends Model
 
     //Table Relations
 
-
     // Setters
-
 
     //Getters
     public function findAll()
     {
         try {
-            return DB::select(DB::raw('SELECT * FROM `' . $this->table . '` WHERE `revision` = :rev'), array('rev' => $this->revision));
+            return DB::select(DB::raw('SELECT * FROM `'.$this->table.'` WHERE `revision` = :rev'), ['rev' => $this->revision]);
         } catch (\Illuminate\Database\QueryException $e) {
             return false;
         }
@@ -47,10 +44,10 @@ class Category extends Model
     {
         $clusters = DB::select(DB::raw('SELECT * FROM clusters ORDER BY idclusters ASC'));
 
-        $sql = 'SELECT * FROM `' . $this->table . '` WHERE `revision` = :rev AND `cluster` = :cluster ORDER BY `idcategories` ASC';
+        $sql = 'SELECT * FROM `'.$this->table.'` WHERE `revision` = :rev AND `cluster` = :cluster ORDER BY `idcategories` ASC';
 
         foreach ($clusters as $k => $cluster) {
-            $clusters[$k]->categories = DB::select(DB::raw($sql), array('rev' => $this->revision, 'cluster' => $cluster->idclusters));
+            $clusters[$k]->categories = DB::select(DB::raw($sql), ['rev' => $this->revision, 'cluster' => $cluster->idclusters]);
         }
 
         return $clusters;
@@ -59,7 +56,7 @@ class Category extends Model
     public function findAllByRevision($rev)
     {
         try {
-            DB::select(DB::raw('SELECT * FROM `' . $this->table . '` WHERE `revision` = :rev'), array('rev' => $rev));
+            DB::select(DB::raw('SELECT * FROM `'.$this->table.'` WHERE `revision` = :rev'), ['rev' => $rev]);
         } catch (\Illuminate\Database\QueryException $e) {
             return false;
         }
@@ -67,6 +64,26 @@ class Category extends Model
 
     public function isMisc()
     {
-        return $this->idcategories == env('MISC_CATEGORY_ID');
+        return $this->idcategories == 46;
+    }
+
+    public function isMiscPowered()
+    {
+        return $this->idcategories == 46;
+    }
+
+    public function isMiscUnpowered()
+    {
+        return $this->idcategories == 50;
+    }
+
+    public function isPowered()
+    {
+        return $this->powered == 1;
+    }
+
+    public function isUnpowered()
+    {
+        return $this->powered == 0;
     }
 }

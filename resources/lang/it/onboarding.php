@@ -1,6 +1,6 @@
 <?php
 
-return array (
+return [
   'slide1_heading' => 'Benvenuto!',
   'slide1_content' => '<p> Grazie per far parte del nostro spazio comunitario. </p> <p> E <strong> grazie </strong> per essere un beta tester! Con il tuo feedback possiamo aiutare a migliorare la piattaforma per tutti. </p>',
   'slide2_heading' => 'La tua porta d\'ingresso per la riparazione comunitaria',
@@ -10,4 +10,4 @@ return array (
   'finishing_action' => 'Al pannello di controllo',
   'previous' => 'Precedente',
   'next' => 'Prossimo',
-);
+];

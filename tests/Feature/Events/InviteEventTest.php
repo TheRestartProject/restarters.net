@@ -36,7 +36,7 @@ class InviteEventTest extends TestCase
             'group_name' => $group->name,
             'event_id' => $event->idevents,
             'manual_invite_box' => $user->email,
-            'message_to_restarters' => 'Join us, but not in a creepy zombie way'
+            'message_to_restarters' => 'Join us, but not in a creepy zombie way',
         ]);
 
         $response->assertSessionHas('success');
@@ -47,7 +47,7 @@ class InviteEventTest extends TestCase
         $this->assertDatabaseHas('events_users', [
             'user' => $user->id,
             'event' => $event->idevents,
-            'role' => 4
+            'role' => 4,
         ]);
 
         // Admin approves the event.
@@ -74,10 +74,11 @@ class InviteEventTest extends TestCase
         preg_match('/href="(\/party\/accept-invite.*?)"/', $response->getContent(), $matches);
         $invitation = $matches[1];
 
-        // ...but shouldn't show up in the list of events as we have not yet accepted.
+        // ...should show up in the list of events with an invitation as we have not yet accepted.
         $response = $this->get('/party');
         $events = $this->getVueProperties($response)[0][':initial-events'];
         $this->assertNotFalse(strpos($events, '"attending":false'));
+        $this->assertNotFalse(strpos($events, '"invitation"'));
 
         // Now accept the invitation.
         $response = $this->get($invitation);

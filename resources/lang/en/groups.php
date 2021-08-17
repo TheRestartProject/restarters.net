@@ -1,6 +1,6 @@
 <?php
 
-return array (
+return [
   'message_example_text' => '<add a custom message here if required>',
   'headline_stats_dropdown' => 'Headline stats',
   'co2_equivalence_visualisation_dropdown' => 'CO<sub>2</sub> equivalence visualisation',
@@ -189,4 +189,4 @@ return array (
   'delete_group' => 'Delete group',
   'delete_group_confirm' => 'Please confirm that you want to delete :name.',
   'delete_succeeded' => 'Group <strong>:name</strong> has been deleted.',
-);
+];

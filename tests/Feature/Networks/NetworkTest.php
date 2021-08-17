@@ -3,25 +3,24 @@
 namespace Tests\Feature;
 
 use App\Group;
+use App\Helpers\RepairNetworkService;
 use App\Network;
 use App\Role;
 use App\User;
-use App\Helpers\RepairNetworkService;
-
-use DB;
 use Carbon\Carbon;
-use Tests\TestCase;
+use DB;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Tests\TestCase;
 
 class NetworkTest extends TestCase
 {
-    public function setUp()
+    protected function setUp(): void
     {
         parent::setUp();
-        DB::statement("SET foreign_key_checks=0");
+        DB::statement('SET foreign_key_checks=0');
         Network::truncate();
         DB::delete('delete from user_network');
-        DB::statement("SET foreign_key_checks=1");
+        DB::statement('SET foreign_key_checks=1');
 
         $this->networkService = new RepairNetworkService();
     }
@@ -141,7 +140,8 @@ class NetworkTest extends TestCase
     }
 
     /** @test */
-    public function network_stats_can_be_queried() {
+    public function network_stats_can_be_queried()
+    {
         $network = factory(Network::class)->create();
         $coordinator = factory(User::class)->states('NetworkCoordinator')->create([
                                                                                       'api_token' => '1234',
@@ -157,8 +157,8 @@ class NetworkTest extends TestCase
         $this->actingAs($coordinator);
 
         $response = $this->get("/api/networks/{$network->id}/stats?api_token=1234");
-        $stats = json_decode($response->getContent(), TRUE);
-        $this->assertEquals($stats, [
+        $stats = json_decode($response->getContent(), true);
+        $expectedStats = [
             'pax' => 0,
             'hours' => 0,
             'parties' => 0,
@@ -166,9 +166,15 @@ class NetworkTest extends TestCase
             'waste' => 0,
             'ewaste' => 0,
             'unpowered_waste' => 0,
+            'fixed_devices' => 0,
+            'fixed_powered' => 0,
+            'fixed_unpowered' => 0,
             'repairable_devices' => 0,
             'dead_devices' => 0,
-            'no_weight' => 0
-        ]);
+            'no_weight' => 0,
+            'devices_powered' => 0,
+            'devices_unpowered' => 0,
+        ];
+        $this->assertEquals($expectedStats, $stats);
     }
 }

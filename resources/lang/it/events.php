@@ -1,6 +1,6 @@
 <?php
 
-return array (
+return [
   'about_event_name_header' => 'Informazioni evento',
   'rsvp_message' => 'Eccellente! Ti stai unendo a noi a questo evento',
   'rsvp_button' => 'Spiacente, non posso attendere oltre',
@@ -109,4 +109,4 @@ return array (
   'see_all_upcoming' => 'Vedi tutti gli eventi futuri',
   'online_event' => 'EVENTO ONLINE',
   'online_event_search' => 'Online?',
-);
+];

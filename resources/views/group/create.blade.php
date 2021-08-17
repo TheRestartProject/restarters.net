@@ -28,7 +28,7 @@
       <div class="col-lg-12">
 
         @if(isset($response))
-          @php( FixometerHelper::printResponse($response) )
+          @php( App\Helpers\Fixometer::printResponse($response) )
         @endif
 
         <div class="edit-panel">

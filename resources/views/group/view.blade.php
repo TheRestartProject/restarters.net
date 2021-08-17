@@ -6,14 +6,14 @@
 <section class="events group-view">
   <div class="container">
 
-      <?php if( isset($_GET['message']) && $_GET['message'] == 'invite' ): ?>
+      <?php if (isset($_GET['message']) && $_GET['message'] == 'invite'): ?>
         <div class="alert alert-info" role="alert">
           Thank you, your invitation has been sent
         </div>
       <?php endif; ?>
 
       @if(session()->has('response'))
-        @php( FixometerHelper::printResponse(session('response')) )
+        @php( App\Helpers\Fixometer::printResponse(session('response')) )
       @endif
 
       @if (\Session::has('success'))
@@ -40,57 +40,35 @@
               $group_image->image->path;
           }
 
-          $can_edit_group = FixometerHelper::hasRole( $user, 'Administrator') || $isCoordinatorForGroup || $is_host_of_group;
-          $can_see_delete = FixometerHelper::hasRole( $user, 'Administrator');
+          $can_edit_group = App\Helpers\Fixometer::hasRole($user, 'Administrator') || $isCoordinatorForGroup || $is_host_of_group;
+          $can_see_delete = App\Helpers\Fixometer::hasRole($user, 'Administrator');
           $can_perform_delete = $can_see_delete && $group->canDelete();
 
-          $expanded_events = [];
-
-          $footprintRatioCalculator = new App\Helpers\FootprintRatioCalculator();
-          $emissionRatio = $footprintRatioCalculator->calculateRatio();
-
-          foreach (array_merge($upcoming_events->all(), $past_events->all()) as $event) {
-              $thisone = $event->getAttributes();
-              $thisone['attending'] = Auth::user() && $event->isBeingAttendedBy(Auth::user()->id);
-              $thisone['allinvitedcount'] = $event->allInvited->count();
-
-              // TODO LATER Consider whether these stats should be in the event or passed into the store.
-              $thisone['stats'] = $event->getEventStats($emissionRatio);
-              $thisone['participants_count'] = $event->participants;
-              $thisone['volunteers_count'] = $event->allConfirmedVolunteers->count();
-
-              $thisone['isVolunteer'] = $event->isVolunteer();
-              $thisone['requiresModeration'] = $event->requiresModerationByAdmin();
-              $thisone['canModerate'] = Auth::user() && (FixometerHelper::hasRole(Auth::user(), 'Administrator') || FixometerHelper::hasRole(Auth::user(), 'NetworkCoordinator'));
-
-              $expanded_events[] = $thisone;
-          }
-
-          $showCalendar = Auth::check() && (($group && $group->isVolunteer()) || FixometerHelper::hasRole( Auth::user(), 'Administrator'));
+          $showCalendar = Auth::check() && (($group && $group->isVolunteer()) || App\Helpers\Fixometer::hasRole(Auth::user(), 'Administrator'));
 
           $device_stats = [
-              'fixed' => isset($group_device_count_status[0]) ? (int)$group_device_count_status[0]->counter : 0,
-              'repairable' => isset($group_device_count_status[1]) ? (int)$group_device_count_status[1]->counter : 0,
-              'dead' => isset($group_device_count_status[2]) ? (int)$group_device_count_status[2]->counter : 0
+              'fixed' => isset($group_device_count_status[0]) ? (int) $group_device_count_status[0]->counter : 0,
+              'repairable' => isset($group_device_count_status[1]) ? (int) $group_device_count_status[1]->counter : 0,
+              'dead' => isset($group_device_count_status[2]) ? (int) $group_device_count_status[2]->counter : 0,
             ];
 
           $category_clusters = [
             1 => 'Computers and Home Office',
             2 => 'Electronic Gadgets',
             3 => 'Home Entertainment',
-            4 => 'Kitchen and Household Items'
+            4 => 'Kitchen and Household Items',
           ];
 
           $cluster_stats = [];
 
-          foreach( $category_clusters as $key => $category_cluster ) {
-              $fixed = isset($clusters['all'][$key][0]) ? (int)$clusters['all'][$key][0]->counter : 0;
-              $repairable = isset($clusters['all'][$key][1]) ? (int)$clusters['all'][$key][1]->counter : 0;
-              $dead = isset($clusters['all'][$key][2]) ? (int)$clusters['all'][$key][2]->counter : 0;
+          foreach ($category_clusters as $key => $category_cluster) {
+              $fixed = isset($clusters['all'][$key][0]) ? (int) $clusters['all'][$key][0]->counter : 0;
+              $repairable = isset($clusters['all'][$key][1]) ? (int) $clusters['all'][$key][1]->counter : 0;
+              $dead = isset($clusters['all'][$key][2]) ? (int) $clusters['all'][$key][2]->counter : 0;
               $total = $clusters['all'][$key]['total'] ? $clusters['all'][$key]['total'] : 0;
 
               //Seen and repaired stats
-              if ( isset( $mostleast[$key]['most_seen'][0] ) ) {
+              if (isset($mostleast[$key]['most_seen'][0])) {
                   $most_seen = $mostleast[$key]['most_seen'][0]->name;
                   $most_seen_type = $mostleast[$key]['most_seen'][0]->counter;
               } else {
@@ -98,7 +76,7 @@
                   $most_seen_type = 0;
               }
 
-              if ( isset( $mostleast[$key]['most_repaired'][0] ) ) {
+              if (isset($mostleast[$key]['most_repaired'][0])) {
                   $most_repaired = $mostleast[$key]['most_repaired'][0]->name;
                   $most_repaired_type = $mostleast[$key]['most_repaired'][0]->counter;
               } else {
@@ -106,7 +84,7 @@
                   $most_repaired_type = 0;
               }
 
-              if ( isset( $mostleast[$key]['least_repaired'][0] ) ) {
+              if (isset($mostleast[$key]['least_repaired'][0])) {
                   $least_repaired = $mostleast[$key]['least_repaired'][0]->name;
                   $least_repaired_type = $mostleast[$key]['least_repaired'][0]->counter;
               } else {
@@ -121,16 +99,16 @@
                   'total' => $total,
                   'most_seen' => [
                       'name' => $most_seen,
-                      'count' => $most_seen_type
+                      'count' => $most_seen_type,
                     ],
                   'most_repaired' => [
                       'name' => $most_repaired,
-                      'count' => $most_repaired_type
+                      'count' => $most_repaired_type,
                   ],
                   'least_repaired' => [
                       'name' => $least_repaired,
-                      'count' => $least_repaired_type
-                  ]
+                      'count' => $least_repaired_type,
+                  ],
               ];
           }
 
@@ -151,13 +129,12 @@
       <div class="vue-placeholder vue-placeholder-large">
           <div class="vue-placeholder-content">@lang('partials.loading')...</div>
       </div>
-
       <div class="vue">
           <GroupPage
               csrf="{{ csrf_token() }}"
               :idgroups="{{ $group->idgroups }}"
               :initial-group="{{ $group }}"
-              :group-stats="{{ json_encode($group->getGroupStats((new App\Helpers\FootprintRatioCalculator())->calculateRatio()), JSON_INVALID_UTF8_IGNORE) }}"
+              :group-stats="{{ json_encode($group_stats, JSON_INVALID_UTF8_IGNORE) }}"
               :device-stats="{{ json_encode($device_stats, JSON_INVALID_UTF8_IGNORE) }}"
               :cluster-stats="{{ json_encode($cluster_stats, JSON_INVALID_UTF8_IGNORE) }}"
               :top-devices="{{ json_encode($top, JSON_INVALID_UTF8_IGNORE) }}"

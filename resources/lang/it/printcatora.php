@@ -1,8 +1,7 @@
 <?php
 
-return array (
-  'task' => 
-  array (
+return [
+  'task' => [
     'where_is_the_main_fault' => 'Qual è il guasto principale?',
     'fetch_another' => 'Non lo so, mostrami un\'altra riparazione',
     'suggestions' => 'Suggerimenti',
@@ -11,9 +10,8 @@ return array (
     'source' => 'Fonte',
     'learn_more' => 'Più informazioni',
     'strapline' => 'Basta leggere le informazioni sulla stampante rotta e selezionare il tipo di guasto descritto dalla lista sottostante.',
-  ),
-  'status' => 
-  array (
+  ],
+  'status' => [
     'status' => 'Stato',
     'items_opinions' => 'Articoli / opinioni',
     'items_split_opinions' => 'Articoli con opinioni divise',
@@ -29,14 +27,12 @@ return array (
     'number_of_records' => 'Numero di voci',
     'winning_opinion' => 'Opinione vincente',
     'task_completed' => 'Li hai visti tutti, grazie',
-  ),
+  ],
   'about' => 'Più informazioni',
-  'branding' => 
-  array (
+  'branding' => [
     'powered_by' => 'Utilizzando i dati di:',
-  ),
-  'info' => 
-  array (
+  ],
+  'info' => [
     'body-s1-header' => 'Cos\'è PrintCat?',
     'body-s1-p1' => 'Le stampanti possono essere frustranti, facili da rompere e difficili da riparare. Vogliamo capire perché le stampanti si guastano, così possiamo dire ai legislatori come i modelli futuri possono essere resi più facili da riparare. La riparazione riduce i rifiuti e diminuisce la pressione sulle risorse del nostro pianeta.',
     'body-s1-p2' => 'Con PrintCat, puoi unirti alla nostra indagine. Abbiamo raccolto informazioni su oltre 800 stampanti rotte e abbiamo bisogno del tuo aiuto per classificarle.',
@@ -47,5 +43,5 @@ return array (
     'body-s4-header' => 'Altre domande?',
     'body-s4-p1' => 'Scopri di più, fai domande e dacci il tuo feedback nella <a href=":url" target="_blank">conversazione su PrintCat</a>.',
     'title' => 'Grazie per aver provato PrintCat',
-  ),
-);
+  ],
+];

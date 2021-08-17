@@ -11,16 +11,15 @@ use App\Network;
 use App\Party;
 use App\User;
 use App\UserGroups;
-
-use DB;
 use Carbon\Carbon;
+use DB;
+use HieuLe\WordpressXmlrpcClient\WordpressClient;
+use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Facades\Config;
+use Illuminate\Support\Facades\Notification;
 use Mockery;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Tests\TestCase;
-use HieuLe\WordpressXmlrpcClient\WordpressClient;
-use Illuminate\Support\Facades\Notification;
-use Illuminate\Foundation\Testing\RefreshDatabase;
-use Illuminate\Support\Facades\Config;
 
 class GroupByKeyTest extends TestCase
 {
@@ -42,7 +41,7 @@ class GroupByKeyTest extends TestCase
         factory(User::class)->states('Administrator')->create(
             [
                 'api_token' => '1234',
-                'access_group_tag_id' => $tag1->id
+                'access_group_tag_id' => $tag1->id,
             ]
         );
 
@@ -69,13 +68,13 @@ class GroupByKeyTest extends TestCase
         factory(User::class)->states('Administrator')->create(
             [
                 'api_token' => '1234',
-                'access_group_tag_id' => $tag1->id
+                'access_group_tag_id' => $tag1->id,
             ]
         );
 
         // Get by tag.
         $response = $this->get('/api/1234/groups/group-tag/');
-        $ret = json_decode($response->getContent(), TRUE);
+        $ret = json_decode($response->getContent(), true);
         $this->assertEquals(1, count($ret));
         $this->assertEquals($group->idgroups, $ret[0]['id']);
         $this->assertEquals($group->name, $ret[0]['name']);
@@ -85,8 +84,8 @@ class GroupByKeyTest extends TestCase
         $this->assertEquals($eventpast->idevents, $ret[0]['past_parties'][0]['event_id']);
 
         // Get same group by id.
-        $response = $this->get('/api/1234/group/' . $group->idgroups . "/2000-01-01/2030-01-01");
-        $ret = json_decode($response->getContent(), TRUE);
+        $response = $this->get('/api/1234/group/'.$group->idgroups.'/2000-01-01/2030-01-01');
+        $ret = json_decode($response->getContent(), true);
         $this->assertEquals($group->idgroups, $ret['id']);
         $this->assertEquals($group->name, $ret['name']);
         $this->assertEquals(1, count($ret['upcoming_parties']));
@@ -95,13 +94,13 @@ class GroupByKeyTest extends TestCase
         $this->assertEquals($eventpast->idevents, $ret['past_parties'][0]['event_id']);
 
         // Get stats
-        $response = $this->get('/api/group-tag/stats/' . $group->idgroups);
-        $stats = json_decode($response->getContent(), TRUE);
+        $response = $this->get('/api/group-tag/stats/'.$group->idgroups);
+        $stats = json_decode($response->getContent(), true);
         $this->assertEquals(1, $stats['parties']);
 
         // Get but exclude by date
-        $response = $this->get('/api/1234/group/' . $group->idgroups . "/2000-01-02/2029-12-31");
-        $ret = json_decode($response->getContent(), TRUE);
+        $response = $this->get('/api/1234/group/'.$group->idgroups.'/2000-01-02/2029-12-31');
+        $ret = json_decode($response->getContent(), true);
         $this->assertEquals($group->idgroups, $ret['id']);
         $this->assertEquals($group->name, $ret['name']);
         $this->assertEquals(0, count($ret['upcoming_parties']));

@@ -2,9 +2,9 @@
 
 namespace App\Console\Commands;
 
-use Illuminate\Console\Command;
 use App\Faultcat;
 use App\Mobifix;
+use Illuminate\Console\Command;
 
 class SyncFaultTypes extends Command
 {
@@ -36,13 +36,13 @@ class SyncFaultTypes extends Command
                 $Faultcat = new Faultcat;
                 $result = $Faultcat->updateDevices();
                 if ($result) {
-                    $this->info($result . ' rows updated with fault_type');
+                    $this->info($result.' rows updated with fault_type');
                 } else {
                     $this->info('0 rows updated with fault_type');
                 }
                 $result = $Faultcat->updateDevicesWithEmptyProblem();
                 if ($result) {
-                    $this->info($result . ' rows updated with Unknown');
+                    $this->info($result.' rows updated with Unknown');
                 } else {
                     $this->info('0 rows updated with Unknown');
                 }
@@ -52,20 +52,19 @@ class SyncFaultTypes extends Command
                 $Mobifix = new Mobifix;
                 $result = $Mobifix->updateDevices();
                 if ($result) {
-                    $this->info($result . ' rows updated with fault_type');
+                    $this->info($result.' rows updated with fault_type');
                 } else {
                     $this->info('0 rows updated with fault_type');
                 }
                 $result = $Mobifix->updateDevicesWithEmptyProblem();
                 if ($result) {
-                    $this->info($result . ' rows updated with Unknown');
+                    $this->info($result.' rows updated with Unknown');
                 } else {
                     $this->info('0 rows updated with Unknown');
                 }
                 break;
             default:
-                $this->info('Unknown category ' . $type);
+                $this->info('Unknown category '.$type);
         }
-
     }
 }

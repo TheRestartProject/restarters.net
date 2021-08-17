@@ -3,56 +3,51 @@
 namespace App\Http\Controllers\API;
 
 use App\Group;
-use App\Party;
 use App\Helpers\FootprintRatioCalculator;
 use App\Http\Controllers\Controller;
-
+use App\Party;
 use Auth;
 use Illuminate\Http\Request;
 
 class EventController extends Controller
 {
+    /** ToDo Test */
     public function getEventsByUsersNetworks(Request $request, $date_from = null, $date_to = null)
-     {
-         $authenticatedUser = Auth::user();
+    {
+        $authenticatedUser = Auth::user();
 
-         $groups = [];
-         foreach ($authenticatedUser->networks as $network) {
-             foreach ($network->groups as $group) {
-                 $groups[] = $group;
-             }
-         }
-         $parties = Party::join('groups', 'groups.idgroups', '=', 'events.group')
+        $groups = [];
+        foreach ($authenticatedUser->networks as $network) {
+            foreach ($network->groups as $group) {
+                $groups[] = $group;
+            }
+        }
+        $parties = Party::join('groups', 'groups.idgroups', '=', 'events.group')
                   ->join('group_network', 'group_network.group_id', '=', 'groups.idgroups')
                   ->join('networks', 'networks.id', '=', 'group_network.network_id')
                   ->join('user_network', 'networks.id', '=', 'user_network.network_id')
                   ->join('users', 'users.id', '=', 'user_network.user_id');
 
-         if ( ! empty($date_from) && ! empty($date_to)) {
-           $parties = $parties->where('events.event_date', '>=', date('Y-m-d', strtotime($date_from)))
+        if (! empty($date_from) && ! empty($date_to)) {
+            $parties = $parties->where('events.event_date', '>=', date('Y-m-d', strtotime($date_from)))
            ->where('events.event_date', '<=', date('Y-m-d', strtotime($date_to)));
-         }
+        }
 
-         $parties = $parties->where([
+        $parties = $parties->where([
              ['users.api_token', $authenticatedUser->api_token],
          ])
          ->select('events.*')
          ->get();
 
-         // If no parties are found, through 404 error
-         if (empty($parties)) {
-           return abort(404, 'No Events found.');
-         }
+        // If no parties are found, through 404 error
+        if (empty($parties)) {
+            return abort(404, 'No Events found.');
+        }
 
-         // Get Emission Ratio
-         $footprintRatioCalculator = new FootprintRatioCalculator();
-         $emissionRatio = $footprintRatioCalculator->calculateRatio();
-
-
-         $groups_array = collect([]);
-         foreach ($groups as $group) {
-             $groupStats = $group->getGroupStats($emissionRatio);
-           $groups_array->push([
+        $groups_array = collect([]);
+        foreach ($groups as $group) {
+            $groupStats = $group->getGroupStats();
+            $groups_array->push([
                'id' => $group->idgroups,
                'name' => $group->name,
                'area' => $group->area,
@@ -66,18 +61,17 @@ class EventController extends Controller
                'waste_prevented' => $groupStats['waste'],
                'co2_emissions_prevented' => $groupStats['co2'],
            ]);
-         }
+        }
 
-         $collection = collect([]);
-         foreach ($parties as $key => $party) {
+        $collection = collect([]);
+        foreach ($parties as $key => $party) {
+            $group = $groups_array->filter(function ($group) use ($party) {
+                return $group['id'] == $party->group;
+            })->first();
 
-           $group = $groups_array->filter(function ($group) use($party) {
-             return $group['id'] == $party->group;
-           })->first();
-
-           $eventStats = $party->getEventStats($emissionRatio);
-           // Push Party to Collection
-           $collection->push([
+            $eventStats = $party->getEventStats();
+            // Push Party to Collection
+            $collection->push([
              'id' => $party->idevents,
              'group' => [$group],
              'area' => $group['area'],
@@ -110,15 +104,15 @@ class EventController extends Controller
              ],
              'hours_volunteered' => $party->hoursVolunteered(),
              'created_at' => new \Carbon\Carbon($party->created_at),
-             'updated_at' => new \Carbon\Carbon($party->max_updated_at_devices_updated_at)
+             'updated_at' => new \Carbon\Carbon($party->max_updated_at_devices_updated_at),
            ]);
 
-           if ( ! empty($party->owner)) {
-             $party_user->put('id', $party->owner->id);
-             $party_user->put('name', $party->owner->name);
-           }
-         }
+            if (! empty($party->owner)) {
+                $party_user->put('id', $party->owner->id);
+                $party_user->put('name', $party->owner->name);
+            }
+        }
 
-         return $collection;
-     }
+        return $collection;
+    }
 }
