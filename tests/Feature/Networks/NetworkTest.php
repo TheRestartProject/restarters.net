@@ -123,6 +123,7 @@ class NetworkTest extends TestCase
         $this->assertEquals($group->idgroups, $groups[0]['id']);
         $this->assertEquals($group->name, $groups[0]['name']);
 
+        // Check that the event is listed.
         $this->assertEquals(1, count($groups[0]['past_parties']));
         $this->assertEquals($event->idevents, $groups[0]['past_parties'][0]['event_id']);
         $this->assertEquals($event->free_text, $groups[0]['past_parties'][0]['description']);
@@ -139,6 +140,14 @@ class NetworkTest extends TestCase
         $response = $this->get('/api/groups/network?api_token=1234&bbox=' . urlencode('51.5,-0.13,51.505,-0.12'));
         $groups = json_decode($response->getContent(), TRUE);
         $this->assertEquals(0, count($groups));
+
+        // Check the event shows in the events network API call.
+        $response = $this->get('/api/events/network?api_token=1234');
+        $events = json_decode($response->getContent(), TRUE);
+        $this->assertEquals(1, count($events));
+        $this->assertEquals($event->idevents, $events[0]['id']);
+        $this->assertEquals($event->free_text, $events[0]['description']);
+        $this->assertEquals(1, $events[0]['online']);
     }
 
     /** @test */
