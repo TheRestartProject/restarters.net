@@ -93,13 +93,41 @@ class NetworkTest extends TestCase
         $admin = factory(User::class)->states('Administrator')->create();
         $this->actingAs($admin);
 
-        $group = factory(Group::class)->create();
+        $group = factory(Group::class)->create([
+           'latitude' => 51.5074,
+           'longitude' => -0.1278
+        ]);
         $network = factory(Network::class)->create();
 
         $this->networkService->addGroupToNetwork($admin, $group, $network);
 
         $this->assertTrue($network->containsGroup($group));
         $this->assertTrue($group->isMemberOf($network));
+
+        // Check the group shows up in the list of groups for this network.
+        $coordinator = factory(User::class)->states('NetworkCoordinator')->create([
+                                                                                      'api_token' => '1234',
+        ]);
+        $network->addCoordinator($coordinator);
+        $this->actingAs($coordinator);
+
+        $response = $this->get('/api/groups/network?api_token=1234');
+        $groups = json_decode($response->getContent(), TRUE);
+        $this->assertEquals(1, count($groups));
+        $this->assertEquals($group->idgroups, $groups[0]['id']);
+        $this->assertEquals($group->name, $groups[0]['name']);
+
+        // Get again with a bounding box which the group is inside.
+        $response = $this->get('/api/groups/network?api_token=1234&bbox=' . urlencode('51.5,-0.13,51.51,-0.12'));
+        $groups = json_decode($response->getContent(), TRUE);
+        $this->assertEquals(1, count($groups));
+        $this->assertEquals($group->idgroups, $groups[0]['id']);
+        $this->assertEquals($group->name, $groups[0]['name']);
+
+        // Get again with a bounding box which the group is outside.
+        $response = $this->get('/api/groups/network?api_token=1234&bbox=' . urlencode('51.5,-0.13,51.505,-0.12'));
+        $groups = json_decode($response->getContent(), TRUE);
+        $this->assertEquals(0, count($groups));
     }
 
     /** @test */
