@@ -61,7 +61,7 @@
                             <b-td class="text-center">{{ __('microtasking.volunteering.my_quests', { value: currentUserQuests }) }}</b-td>
                         </template>
                         <template v-else>
-                            <b-td class="text-center" colspan="2"><a class="btn btn-primary" href="/about">{{ __('microtasking.volunteering.join') }}</a></b-td>
+                            <b-td class="text-center" colspan="2"><a class="btn btn-primary" href="/user/register">{{ __('microtasking.volunteering.join') }}</a></b-td>
                         </template>
                     </b-tr>
                 </b-tbody>

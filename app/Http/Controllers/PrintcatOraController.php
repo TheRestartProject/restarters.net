@@ -22,6 +22,11 @@ class PrintcatOraController extends Controller
      */
     public function index(Request $request)
     {
+        // We record that we have visited this page, so that if we subsequently sign up, we can redirect back to it.
+        // This is an intentionally partial solution to the problem of redirecting after we log in.
+        $request->session()->put('redirectTime', time());
+        $request->session()->put('redirectTo', $request->path());
+
         $partner = $request->input('partner', null);
         if (Auth::check()) {
             $user = Auth::user();
