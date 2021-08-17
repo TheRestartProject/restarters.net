@@ -80,6 +80,8 @@ class EventController extends Controller
              'start_time' => $party->start,
              'end_time' => $party->end,
              'name' => $party->venue,
+             'link' => $party->link,
+             'online' => $party->online,
              'location' => [
                  'value' => $party->location,
                  'latitude' => $party->latitude,

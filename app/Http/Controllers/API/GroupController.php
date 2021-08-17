@@ -131,6 +131,9 @@ class GroupController extends Controller
                                                            'start_time' => $event->start,
                                                            'end_time' => $event->end,
                                                            'name' => $event->venue,
+                                                           'link' => $event->link,
+                                                           'online' => $event->online,
+                                                           'description' => $event->free_text,
                                                            'location' => [
                                                                'value' => $event->location,
                                                                'latitude' => $event->latitude,
@@ -148,6 +151,9 @@ class GroupController extends Controller
                                                        'start_time' => $event->start,
                                                        'end_time' => $event->end,
                                                        'name' => $event->venue,
+                                                       'link' => $event->link,
+                                                       'online' => $event->online,
+                                                       'description' => $event->free_text,
                                                        'location' => [
                                                            'value' => $event->location,
                                                            'latitude' => $event->latitude,

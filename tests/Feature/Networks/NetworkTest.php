@@ -5,6 +5,7 @@ namespace Tests\Feature;
 use App\Group;
 use App\Helpers\RepairNetworkService;
 use App\Network;
+use App\Party;
 use App\Role;
 use App\User;
 use Carbon\Carbon;
@@ -104,6 +105,11 @@ class NetworkTest extends TestCase
         $this->assertTrue($network->containsGroup($group));
         $this->assertTrue($group->isMemberOf($network));
 
+        $event = factory(Party::class)->create([
+            'group' => $group->idgroups,
+            'online' => 1
+        ]);
+
         // Check the group shows up in the list of groups for this network.
         $coordinator = factory(User::class)->states('NetworkCoordinator')->create([
                                                                                       'api_token' => '1234',
@@ -116,6 +122,11 @@ class NetworkTest extends TestCase
         $this->assertEquals(1, count($groups));
         $this->assertEquals($group->idgroups, $groups[0]['id']);
         $this->assertEquals($group->name, $groups[0]['name']);
+
+        $this->assertEquals(1, count($groups[0]['past_parties']));
+        $this->assertEquals($event->idevents, $groups[0]['past_parties'][0]['event_id']);
+        $this->assertEquals($event->free_text, $groups[0]['past_parties'][0]['description']);
+        $this->assertEquals(1, $groups[0]['past_parties'][0]['online']);
 
         // Get again with a bounding box which the group is inside.
         $response = $this->get('/api/groups/network?api_token=1234&bbox=' . urlencode('51.5,-0.13,51.51,-0.12'));
