@@ -421,16 +421,14 @@ class UserController extends Controller
         return redirect()->back()->with('success', 'Profile updated');
     }
 
-    /**
-     * @ToDo : test and delete commented
-     */
-    public function recover()
+    public function recover(Request $request)
     {
         $User = new User;
 
-        if (strtoupper($_SERVER['REQUEST_METHOD']) == 'POST' && isset($_POST['email']) && ! empty($_POST['email'])) {
-            $email = $_POST['email'];
-            if (empty($email) || ! filter_var($email, FILTER_VALIDATE_EMAIL)) {
+        if ($request->getMethod() == 'POST' && $request->has('email')) {
+            $email = $request->get('email');
+
+            if (!$email || ! filter_var($email, FILTER_VALIDATE_EMAIL)) {
                 $response['danger'] = 'Please input a <strong>valid</strong> email.';
             } else {
                 $user = $User->where('email', $email)->first();
@@ -448,8 +446,8 @@ class UserController extends Controller
 
                     // update record
                     $user->update([
-                    'recovery' => $data['recovery'],
-                    'recovery_expires' => $data['recovery_expires'],
+                        'recovery' => $data['recovery'],
+                        'recovery_expires' => $data['recovery_expires'],
                     ]);
 
                     User::find($id)->notify(new ResetPassword([
@@ -462,25 +460,25 @@ class UserController extends Controller
                 }
             }
 
-            return view('auth.forgot-password', [//user.recover
-            'title' => 'Account recovery',
-            'response' => $response,
+            return view('auth.forgot-password', [
+                'title' => 'Account recovery',
+                'response' => $response,
             ]);
         }
 
-        return view('auth.forgot-password', [//user.recover
-        'title' => 'Account recovery',
+        return view('auth.forgot-password', [
+            'title' => 'Account recovery',
         ]);
     }
 
-    public function reset()
+    public function reset(Request $request)
     {
         $User = new User;
 
-        if (! isset($_GET['recovery']) || empty($_GET['recovery'])) {
+        if (!$request->has('recovery') || !$request->get('recovery')) {
             $valid_code = false;
         } else {
-            $recovery = filter_var($_GET['recovery'], FILTER_SANITIZE_STRING);
+            $recovery = filter_var($request->get('recovery'), FILTER_SANITIZE_STRING);
             $user = $User->where('recovery', '=', $recovery)->first();
 
             if (is_object($user) && strtotime($user->recovery_expires) > time()) {
@@ -490,10 +488,16 @@ class UserController extends Controller
             }
         }
 
-        if (strtoupper($_SERVER['REQUEST_METHOD']) == 'POST' && isset($_POST['password']) && ! empty($_POST['password']) && isset($_POST['confirm_password']) && ! empty($_POST['confirm_password'])) {
-            $recovery = $_POST['recovery'];
-            $pwd = $_POST['password'];
-            $cpwd = $_POST['confirm_password'];
+        if ($request->getMethod() == 'POST' &&
+            $request->has('recovery') &&
+            $request->has('password') &&
+            $request->get('password') &&
+            $request->has('confirm_password') &&
+            $request->get('confirm_password')) {
+            $recovery = $request->post('recovery');
+            $pwd = $request->post('password');
+            $cpwd = $request->post('confirm_password');
+
             if (empty($recovery) || ! filter_var($recovery, FILTER_SANITIZE_STRING)) {
                 $response['danger'] = 'Recovery code invalid.';
             } elseif ($pwd !== $cpwd) {
@@ -502,10 +506,12 @@ class UserController extends Controller
                 $user = $User->where('recovery', '=', $recovery)->first();
                 if (! empty($user)) {
                     $data = [
-                    'password' => crypt($pwd, '$1$'.strrev(md5(env('APP_KEY')))),
+                        'password' => Hash::make($pwd),
                     ];
                     $update = $user->update($data);
                     if ($update) {
+                        event(new PasswordChanged($user));
+
                         return redirect('login')->with('success', 'Password updated, please login to continue');
                     } else {
                         $response['danger'] = 'Could not update the password.';
@@ -530,12 +536,12 @@ class UserController extends Controller
             $email = null;
         }
 
-        return view('auth.reset-password', [//user.reset
-        'title' => 'Account recovery',
-        'recovery' => $recovery,
-        'valid_code' => $valid_code,
-        'response' => $response,
-        'email' => $email,
+        return view('auth.reset-password', [
+            'title' => 'Account recovery',
+            'recovery' => $recovery,
+            'valid_code' => $valid_code,
+            'response' => $response,
+            'email' => $email,
         ]);
     }
 
