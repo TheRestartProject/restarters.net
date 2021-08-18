@@ -390,6 +390,9 @@ class Device extends Model implements Auditable
         return $this->belongsToMany(\App\Barrier::class, 'devices_barriers', 'device_id', 'barrier_id');
     }
 
+    /**
+     * Powered estimate only takes precedence over category weight when Misc.
+     */
     public function eCO2Diverted($emissionRatio, $displacementFactor)
     {
         $footprint = 0;
@@ -407,15 +410,16 @@ class Device extends Model implements Auditable
         return $footprint * $displacementFactor;
     }
 
+    /**
+     * Unpowered estimate always takes precedence over category weight.
+     */
     public function uCO2Diverted($emissionRatio, $displacementFactor)
     {
         $footprint = 0;
 
         if ($this->isFixed()) {
-            if ($this->deviceCategory->isMiscUnpowered()) {
-                if (is_numeric($this->estimate)) {
-                    $footprint = $this->estimate * $emissionRatio;
-                }
+            if (is_numeric($this->estimate)) {
+                $footprint = $this->estimate * $emissionRatio;
             } else {
                 $footprint = (float) $this->deviceCategory->footprint;
             }
@@ -424,6 +428,9 @@ class Device extends Model implements Auditable
         return $footprint * $displacementFactor;
     }
 
+    /**
+     * Powered estimate only takes precedence over category weight when Misc.
+     */
     public function eWasteDiverted()
     {
         $ewasteDiverted = 0;
@@ -441,15 +448,16 @@ class Device extends Model implements Auditable
         return $ewasteDiverted;
     }
 
+    /**
+     * Unpowered estimate always takes precedence over category weight.
+     */
     public function uWasteDiverted()
     {
         $wasteDiverted = 0;
 
         if ($this->isFixed() && $this->deviceCategory->isUnpowered()) {
-            if ($this->deviceCategory->isMiscUnpowered()) {
-                if (is_numeric($this->estimate)) {
-                    $wasteDiverted = $this->estimate;
-                }
+            if (is_numeric($this->estimate)) {
+                $wasteDiverted = $this->estimate;
             } else {
                 $wasteDiverted = (float) $this->deviceCategory->weight;
             }

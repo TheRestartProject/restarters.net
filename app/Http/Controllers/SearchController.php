@@ -102,7 +102,9 @@ class SearchController extends Controller
                 $totalCO2 = 0;
                 $totalWeight = 0;
 
-                $emissionRatio = \App\Helpers\LcaStats::getEmissionRatioPowered();
+                $eRatio = \App\Helpers\LcaStats::getEmissionRatioPowered();
+                $uRatio = \App\Helpers\LcaStats::getEmissionRatioUnpowered();
+                $displacementFactor = \App\Helpers\LcaStats::getDisplacementFactor();
 
                 foreach ($PartyList as $party) {
                     $partyIds[] = $party->idevents;
@@ -121,9 +123,13 @@ class SearchController extends Controller
                             case 1:
                                 $party->fixed_devices++;
 
-                                $party->co2 += $device->co2Diverted($emissionRatio, $Device->getDisplacementFactor());
+                                $party->co2_powered += $device->eCo2Diverted($eRatio, $displacementFactor);
+                                $party->co2_unpowered += $device->uCo2Diverted($uRatio, $displacementFactor);
+                                $party->co2 += $party->co2_powered + $party->co2_unpowered;
 
-                                $party->ewaste += $device->ewasteDiverted();
+                                $party->weight_powered += $device->eWasteDiverted();
+                                $party->weight_unpowered += $device->uWasteDiverted();
+                                $party->weight += $party->weight_powered + $party->weight_unpowered;
 
                                 break;
                             case 2:

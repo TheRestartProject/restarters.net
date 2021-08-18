@@ -126,13 +126,13 @@ class GroupStatsTest extends StatsTestCase
             'category' => $this->_idPoweredMisc,
             'category_creation' => $this->_idPoweredMisc,
             'event' => $event->idevents,
-            'estimate' => 123,
+            'estimate' => 1.23,
         ]);
         $expect['fixed_devices']++;
         $expect['fixed_powered']++;
         $expect['devices_powered']++;
-        $expect['powered_co2'] = (14.4 + (123 * $this->_ratioPowered())) * $this->_displacementFactor;
-        $expect['powered_waste'] += 123;
+        $expect['powered_co2'] = (14.4 + (1.23 * $this->_ratioPowered)) * $this->_displacementFactor;
+        $expect['powered_waste'] += 1.23;
         $expect['co2'] = $expect['powered_co2'] + $expect['unpowered_co2'];
         $expect['waste'] = $expect['powered_waste'] + $expect['unpowered_waste'];
         $result = $group->getGroupStats();
@@ -147,13 +147,34 @@ class GroupStatsTest extends StatsTestCase
             'category' => $this->_idUnpoweredMisc,
             'category_creation' => $this->_idUnpoweredMisc,
             'event' => $event->idevents,
-            'estimate' => 456,
+            'estimate' => 4.56,
         ]);
         $expect['fixed_devices']++;
         $expect['fixed_unpowered']++;
         $expect['devices_unpowered']++;
-        $expect['unpowered_co2'] = (15.5 + (456 * $this->_ratioUnpowered)) * $this->_displacementFactor;
-        $expect['unpowered_waste'] += 456;
+        $expect['unpowered_co2'] = (15.5 + (4.56 * $this->_ratioUnpowered)) * $this->_displacementFactor;
+        $expect['unpowered_waste'] += 4.56;
+        $expect['co2'] = $expect['powered_co2'] + $expect['unpowered_co2'];
+        $expect['waste'] = $expect['powered_waste'] + $expect['unpowered_waste'];
+        $result = $group->getGroupStats();
+        $this->assertIsArray($result);
+        foreach ($expect as $k => $v) {
+            $this->assertArrayHasKey($k, $result, "Missing array key $k");
+            $this->assertEquals($v, $result[$k], "Wrong value for $k => $v");
+        }
+
+        // #7 add an unpowered non-misc device with estimate
+        $device = factory(Device::class)->states('fixed')->create([
+            'category' => $this->_idUnpoweredMisc,
+            'category_creation' => $this->_idUnpoweredMisc,
+            'event' => 1,
+            'estimate' => 7.89,
+        ]);
+        $expect['fixed_devices']++;
+        $expect['fixed_unpowered']++;
+        $expect['devices_unpowered']++;
+        $expect['unpowered_co2'] = (15.5 + ((4.56 + 7.89) * $this->_ratioUnpowered)) * $this->_displacementFactor;
+        $expect['unpowered_waste'] += 7.89;
         $expect['co2'] = $expect['powered_co2'] + $expect['unpowered_co2'];
         $expect['waste'] = $expect['powered_waste'] + $expect['unpowered_waste'];
         $result = $group->getGroupStats();
@@ -230,7 +251,7 @@ class GroupStatsTest extends StatsTestCase
         $expect['devices_unpowered'] = 3;
         $expect['powered_no_weight'] = 1;
         $expect['unpowered_no_weight'] = 1;
-        $expect['powered_co2'] = (14.4 + (123 * $this->_ratioPowered())) * $this->_displacementFactor;
+        $expect['powered_co2'] = (14.4 + (123 * $this->_ratioPowered)) * $this->_displacementFactor;
         $expect['powered_waste'] = 4 + 123;
         $expect['unpowered_co2'] = (15.5 + (456 * $this->_ratioUnpowered)) * $this->_displacementFactor;
         $expect['unpowered_waste'] = 5 + 456;
@@ -266,7 +287,7 @@ class GroupStatsTest extends StatsTestCase
             'category' => $this->_idPoweredMisc,
             'category_creation' => $this->_idPoweredMisc,
             'event' => $event2->idevents,
-            'estimate' => 11,
+            'estimate' => 1.23,
         ]);
 
         // #3 add an unpowered misc device with estimate
@@ -274,23 +295,31 @@ class GroupStatsTest extends StatsTestCase
             'category' => $this->_idUnpoweredMisc,
             'category_creation' => $this->_idUnpoweredMisc,
             'event' => $event3->idevents,
-            'estimate' => 22,
+            'estimate' => 4.56,
+        ]);
+
+        // #7 add an unpowered non-misc device with estimate
+        $device = factory(Device::class)->states('fixed')->create([
+            'category' => $this->_idUnpoweredMisc,
+            'category_creation' => $this->_idUnpoweredMisc,
+            'event' => $event3->idevents,
+            'estimate' => 7.89,
         ]);
 
         $expect = \App\Group::getGroupStatsArrayKeys();
         $expect['parties'] = 2;
         $expect['hours_volunteered'] = 42;
-        $expect['fixed_devices'] = 3;
+        $expect['fixed_devices'] = 4;
         $expect['fixed_powered'] = 2;
-        $expect['fixed_unpowered'] = 1;
+        $expect['fixed_unpowered'] = 2;
         $expect['devices_powered'] = 2;
-        $expect['devices_unpowered'] = 1;
+        $expect['devices_unpowered'] = 2;
         $expect['powered_no_weight'] = 0;
         $expect['unpowered_no_weight'] = 0;
-        $expect['powered_waste'] = 4 + 11;
-        $expect['unpowered_waste'] = 22;
-        $expect['powered_co2'] = (14.4 + (11 * $this->_ratioPowered())) * $this->_displacementFactor;
-        $expect['unpowered_co2'] = (22 * $this->_ratioUnpowered) * $this->_displacementFactor;
+        $expect['powered_waste'] = 4 + 1.23;
+        $expect['unpowered_waste'] = 4.56 + 7.89;
+        $expect['powered_co2'] = (14.4 + (1.23 * $this->_ratioPowered)) * $this->_displacementFactor;
+        $expect['unpowered_co2'] = ((4.56 + 7.89) * $this->_ratioUnpowered) * $this->_displacementFactor;
         $expect['co2'] = $expect['powered_co2'] + $expect['unpowered_co2'];
         $expect['waste'] = $expect['powered_waste'] + $expect['unpowered_waste'];
         $result = $group2->getGroupStats();

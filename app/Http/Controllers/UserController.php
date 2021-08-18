@@ -922,7 +922,7 @@ class UserController extends Controller
         return view('auth.register-new', [
             'skills' => Fixometer::allSkills(),
             'co2Total' => $stats['waste_stats'][0]->powered_footprint + $stats['waste_stats'][0]->unpowered_footprint,
-            'wasteTotal' => $stats['waste_stats'][0]->total_weight,
+            'wasteTotal' => $stats['waste_stats'][0]->powered_waste + $stats['waste_stats'][0]->unpowered_waste,
             'partiesCount' => count($stats['allparties']),
             'deviceCount' => $deviceCount,
             'showNewsletterSignup' => $showNewsletterSignup,

@@ -66,11 +66,10 @@ class AdminController extends Controller
 
     public static function getStats2()
     {
-        $co2Total = \App\Helpers\LcaStats::getWasteStats();
-
+        $stats = \App\Helpers\LcaStats::getWasteStats();
         return [
-            'co2Total' => $co2Total[0]->total_footprint,
-            'wasteTotal' => $co2Total[0]->total_weight,
+            'co2Total' => $stats[0]->powered_footprint + $stats[0]->unpowered_footprint,
+            'wasteTotal' => $stats[0]->powered_waste + $stats[0]->unpowered_waste,
         ];
     }
 }

@@ -30,10 +30,6 @@ class StatsTestCase extends TestCase
         $this->_idUnpoweredNonMisc = 5;
     }
 
-    protected function _ratioPowered() {
-        return LcaStats::getEmissionRatioPowered();
-    }
-
     protected function _setupCategoriesWithUnpoweredWeights()
     {
         DB::statement("SET foreign_key_checks=0");

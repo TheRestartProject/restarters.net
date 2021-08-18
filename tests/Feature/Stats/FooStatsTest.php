@@ -55,12 +55,14 @@ class FooStatsTest extends TestCase
         Category::truncate();
         DB::statement("SET foreign_key_checks=1");
 
-        $this->_setupCategories();
         $this->event = factory(Party::class)->create();
     }
 
+    /** @test */
     public function emission_ratios()
     {
+        $this->_setupCategoriesWithUnpoweredLca();
+        // $this->_setupCategoriesWithAllNewLca();
         $results = ['powered' => [], 'unpowered' => []];
         logger("**** ITERATIONS: $this->_iterations ****");
         for ($i = 1; $i <= $this->_iterations; $i++) {
@@ -158,7 +160,7 @@ class FooStatsTest extends TestCase
         return $result;
     }
 
-    private function _setupCategories()
+    private function _setupCategoriesWithUnpoweredLca()
     {
         $sql = "INSERT INTO `categories` (`idcategories`, `name`, `powered`, `weight`, `footprint`, `footprint_reliability`, `lifecycle`, `lifecycle_reliability`, `extendend_lifecycle`, `extendend_lifecycle_reliability`, `revision`, `cluster`, `aggregate`) VALUES
 (11, 'Desktop computer', 1, 9.15, 398.4, 5, NULL, NULL, NULL, NULL, 1, 1, 0),
@@ -203,6 +205,60 @@ class FooStatsTest extends TestCase
 (50, 'Misc', 0, 0, 0, NULL, NULL, NULL, NULL, NULL, 1, 5, 1)";
 
         DB::statement(DB::raw($sql));
+    }
+
+    private function _setupCategoriesWithAllNewLca()
+    {
+        $sql = "INSERT INTO `categories` (`idcategories`, `name`, `powered`, `weight`, `footprint`, `footprint_reliability`, `lifecycle`, `lifecycle_reliability`, `extendend_lifecycle`, `extendend_lifecycle_reliability`, `revision`, `cluster`, `aggregate`) VALUES
+(6, 'Games console', 1, 3.22, 140.67, 0, 0, NULL, NULL, NULL, 1, 1, 0),
+(7, 'Watch/clock', 1, 1.30, 28.29, 0, 0, NULL, NULL, NULL, 1, 1, 0),
+(8, 'Sewing machine', 1, 8.60, 35.00, 0, 0, NULL, NULL, NULL, 1, 1, 0),
+(9, 'Iron', 1, 1.17, 11.00, 0, 0, NULL, NULL, NULL, 1, 1, 0),
+(10, 'Coffee maker', 1, 1.28, 17.50, 0, 0, NULL, NULL, NULL, 1, 1, 0),
+(11, 'Desktop computer', 1, 6.69, 414.17, 5, 12, NULL, NULL, NULL, 1, 1, 0),
+(12, 'Flat screen 15-17\"', 1, 3.15, 262.56, 2, NULL, NULL, NULL, NULL, 1, 1, 0),
+(13, 'Flat screen 19-20\"', 1, 3.66, 304.88, 5, NULL, NULL, NULL, NULL, 1, 1, 0),
+(14, 'Flat screen 22-24\"', 1, 5.23, 343.49, 5, NULL, NULL, NULL, NULL, 1, 1, 0),
+(15, 'Laptop large', 1, 2.53, 414.7, 5, NULL, NULL, NULL, NULL, 1, 1, 0),
+(16, 'Laptop medium', 1, 1.83, 265.32, 5, NULL, NULL, NULL, NULL, 1, 1, 0),
+(17, 'Laptop small', 1, 1.39, 221.15, 4, NULL, NULL, NULL, NULL, 1, 1, 0),
+(18, 'Paper shredder', 1, 3.8, 59.5, 2, NULL, NULL, NULL, NULL, 1, 1, 0),
+(19, 'PC Accessory', 1, 0.44, 15.94, 4, NULL, NULL, NULL, NULL, 1, 1, 1),
+(20, 'Printer/scanner', 1, 12.47, 100.69, 4, NULL, NULL, NULL, NULL, 1, 1, 0),
+(21, 'Digital Compact Camera', 1, 0.48, 29.73, 4, NULL, NULL, NULL, NULL, 1, 2, 0),
+(22, 'DLSR / Video Camera', 1, 0.59, 16.03, 4, NULL, NULL, NULL, NULL, 1, 2, 0),
+(23, 'Handheld entertainment device', 1, 0.14, 22.71, 4, NULL, NULL, NULL, NULL, 1, 2, 1),
+(24, 'Headphones', 1, 0.4, 3, 3, NULL, NULL, NULL, NULL, 1, 2, 0),
+(25, 'Mobile', 1, 0.15, 50.51, 4, NULL, NULL, NULL, NULL, 1, 2, 0),
+(26, 'Tablet', 1, 0.77, 114.49, 5, NULL, NULL, NULL, NULL, 1, 2, 0),
+(27, 'Flat screen 26-30\"', 1, 10.6, 284.25, 1, NULL, NULL, NULL, NULL, 1, 3, 0),
+(28, 'Flat screen 32-37\"', 1, 18.7, 349.58, 3, NULL, NULL, NULL, NULL, 1, 3, 0),
+(29, 'Hi-Fi integrated', 1, 8.95, 186.5, 3, NULL, NULL, NULL, NULL, 1, 3, 1),
+(30, 'Hi-Fi separates', 1, 8.72, 123.86, 4, NULL, NULL, NULL, NULL, 1, 3, 1),
+(31, 'Musical instrument', 1, 17.7, 109.5, 3, NULL, NULL, NULL, NULL, 1, 3, 1),
+(32, 'Portable radio', 1, 2.06, 54.65, 2, NULL, NULL, NULL, NULL, 1, 3, 0),
+(33, 'Projector', 1, 2.68, 57.58, 4, NULL, NULL, NULL, NULL, 1, 3, 0),
+(34, 'TV and gaming-related accessories', 1, 1.99, 51.33, 4, NULL, NULL, NULL, NULL, 1, 3, 1),
+(35, 'Aircon/Dehumidifier', 1, 7.6, 99.41, 2, NULL, NULL, NULL, NULL, 1, 4, 0),
+(36, 'Decorative or safety lights', 1, 0.46, 14.72, 4, NULL, NULL, NULL, NULL, 1, 4, 1),
+(37, 'Fan', 1, 3.9, 15.6, 2, NULL, NULL, NULL, NULL, 1, 4, 0),
+(38, 'Hair & Beauty item', 1, 0.67, 10.28, 4, NULL, NULL, NULL, NULL, 1, 4, 1),
+(39, 'Kettle', 1, 1.25, 44.32, 4, NULL, NULL, NULL, NULL, 1, 4, 0),
+(40, 'Lamp', 1, 2.68, 14.96, 2, NULL, NULL, NULL, NULL, 1, 4, 0),
+(41, 'Power tool', 1, 1.65, 26.65, 3, NULL, NULL, NULL, NULL, 1, 4, 1),
+(42, 'Small kitchen item', 1, 2.95, 30.9, 4, NULL, NULL, NULL, NULL, 1, 4, 1),
+(43, 'Toaster', 1, 1.47, 8.13, 2, NULL, NULL, NULL, NULL, 1, 4, 0),
+(44, 'Toy', 1, 0.93, 10.4, 4, NULL, NULL, NULL, NULL, 1, 4, 1),
+(45, 'Vacuum', 1, 6.8, 36.01, 4, NULL, NULL, NULL, NULL, 1, 4, 0),
+(46, 'Misc', 1, 0, 0, NULL, NULL, NULL, NULL, NULL, 1, NULL, 1),
+(47, 'Furniture', 0, 29.81, 67.13, NULL, NULL, NULL, NULL, NULL, 1, 5, 0),
+(48, 'Bicycle', 0, 15.1, 149.6, NULL, NULL, NULL, NULL, NULL, 1, 5, 0),
+(49, 'Clothing/textile', 0, 0.75, 20.32, NULL, NULL, NULL, NULL, NULL, 1, 5, 0),
+(50, 'Misc', 0, 0, 0, NULL, NULL, NULL, NULL, NULL, 1, 5, 1)
+(51, 'Hand tool', 0, 0.93, 4.67, 0, 0, NULL, NULL, NULL, 1, 1, 0),
+(52, 'Jewellery', 0, 0.06, 59.19, 0, 0, NULL, NULL, NULL, 1, 1, 0)";
+
+    DB::statement(DB::raw($sql));
     }
 
     private function _logDevices()

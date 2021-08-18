@@ -104,13 +104,13 @@ class EventStatsTest extends StatsTestCase
             'category' => $this->_idPoweredMisc,
             'category_creation' => $this->_idPoweredMisc,
             'event' => 1,
-            'estimate' => 123,
+            'estimate' => 1.23,
         ]);
         $expect['fixed_devices']++;
         $expect['fixed_powered']++;
         $expect['devices_powered']++;
-        $expect['powered_co2'] = (14.4 + (123 * $this->_ratioPowered())) * $this->_displacementFactor;
-        $expect['powered_waste'] += 123;
+        $expect['powered_co2'] = (14.4 + (1.23 * $this->_ratioPowered)) * $this->_displacementFactor;
+        $expect['powered_waste'] += 1.23;
         $expect['co2'] = $expect['powered_co2'] + $expect['unpowered_co2'];
         $expect['waste'] = $expect['powered_waste'] + $expect['unpowered_waste'];
         $result = $device->deviceEvent->getEventStats();
@@ -120,18 +120,39 @@ class EventStatsTest extends StatsTestCase
             $this->assertEquals($v, $result[$k], "Wrong value for $k => $v");
         }
 
-        // #6 add a powered misc device with estimate
+        // #6 add an unpowered misc device with estimate
         $device = factory(Device::class)->states('fixed')->create([
             'category' => $this->_idUnpoweredMisc,
             'category_creation' => $this->_idUnpoweredMisc,
             'event' => 1,
-            'estimate' => 456,
+            'estimate' => 4.56,
         ]);
         $expect['fixed_devices']++;
         $expect['fixed_unpowered']++;
         $expect['devices_unpowered']++;
-        $expect['unpowered_co2'] = (15.5 + (456 * $this->_ratioUnpowered)) * $this->_displacementFactor;
-        $expect['unpowered_waste'] += 456;
+        $expect['unpowered_co2'] = (15.5 + (4.56 * $this->_ratioUnpowered)) * $this->_displacementFactor;
+        $expect['unpowered_waste'] += 4.56;
+        $expect['co2'] = $expect['powered_co2'] + $expect['unpowered_co2'];
+        $expect['waste'] = $expect['powered_waste'] + $expect['unpowered_waste'];
+        $result = $device->deviceEvent->getEventStats();
+        $this->assertIsArray($result);
+        foreach ($expect as $k => $v) {
+            $this->assertArrayHasKey($k, $result, "Missing array key $k");
+            $this->assertEquals($v, $result[$k], "Wrong value for $k => $v");
+        }
+
+        // #7 add an unpowered non-misc device with estimate
+        $device = factory(Device::class)->states('fixed')->create([
+            'category' => $this->_idUnpoweredMisc,
+            'category_creation' => $this->_idUnpoweredMisc,
+            'event' => 1,
+            'estimate' => 7.89,
+        ]);
+        $expect['fixed_devices']++;
+        $expect['fixed_unpowered']++;
+        $expect['devices_unpowered']++;
+        $expect['unpowered_co2'] = (15.5 + ((4.56 + 7.89) * $this->_ratioUnpowered)) * $this->_displacementFactor;
+        $expect['unpowered_waste'] += 7.89;
         $expect['co2'] = $expect['powered_co2'] + $expect['unpowered_co2'];
         $expect['waste'] = $expect['powered_waste'] + $expect['unpowered_waste'];
         $result = $device->deviceEvent->getEventStats();

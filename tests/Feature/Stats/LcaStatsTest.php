@@ -35,22 +35,8 @@ class LcaStatsTest extends StatsTestCase
     /** @test */
     public function get_ratio_powered()
     {
-        $this->_setupCategoriesWithUnpoweredWeights();
-        factory(Device::class)->states('fixed')->create([
-            'category' => $this->_idPoweredNonMisc,
-            'category_creation' => $this->_idPoweredNonMisc,
-            'event' => 1,
-        ]);
-        factory(Device::class)->states('fixed')->create([
-            'category' => $this->_idUnpoweredNonMisc,
-            'category_creation' => $this->_idUnpoweredNonMisc,
-            'event' => 1,
-        ]);
         $result = LcaStats::getEmissionRatioPowered();
-        $expect = $this->_ratioPowered;
-        $this->assertEquals($expect, $result);
-        // $expect = round((14.4) / (4), 1);
-        // $this->assertEquals($expect, round($result, 1));
+        $this->assertEquals($this->_ratioPowered, $result);
     }
 
     /** @test */
@@ -66,7 +52,6 @@ class LcaStatsTest extends StatsTestCase
             'category_creation' => $this->_idPoweredNonMisc,
         ]);
         $expect = [
-            'total_weight' => 4,
             'powered_waste' => 4,
             'unpowered_waste' => 0,
             'powered_footprint' => 14.4 * $this->_displacementFactor,
@@ -85,7 +70,6 @@ class LcaStatsTest extends StatsTestCase
             'category_creation' => $this->_idPoweredMisc,
         ]);
         $expect = [
-            'total_weight' => 4,
             'powered_waste' => 4,
             'unpowered_waste' => 0,
             'powered_footprint' => 14.4 * $this->_displacementFactor,
@@ -104,7 +88,6 @@ class LcaStatsTest extends StatsTestCase
             'category_creation' => $this->_idUnpoweredNonMisc,
         ]);
         $expect = [
-            'total_weight' => 9,
             'powered_waste' => 4,
             'unpowered_waste' => 5,
             'powered_footprint' => 14.4 * $this->_displacementFactor,
@@ -117,13 +100,12 @@ class LcaStatsTest extends StatsTestCase
             $this->assertEquals($v, round($result[0]->{$k}, 2), "Wrong value for $k => $v");
         }
 
-        // #4 add an unpowered misc device
+        // #4 add an unpowered misc device without estimate
         factory(Device::class)->states('fixed')->create([
             'category' => $this->_idUnpoweredMisc,
             'category_creation' => $this->_idUnpoweredMisc,
         ]);
         $expect = [
-            'total_weight' => 9,
             'powered_waste' => 4,
             'unpowered_waste' => 5,
             'powered_footprint' => 14.4 * $this->_displacementFactor,
@@ -142,7 +124,6 @@ class LcaStatsTest extends StatsTestCase
             'category_creation' => $this->_idPoweredNonMisc,
         ]);
         $expect = [
-            'total_weight' => 13,
             'powered_waste' => 8,
             'unpowered_waste' => 5,
             'powered_footprint' => (14.4 * 2) * $this->_displacementFactor,
@@ -155,17 +136,36 @@ class LcaStatsTest extends StatsTestCase
             $this->assertEquals($v, round($result[0]->{$k}, 2), "Wrong value for $k => $v");
         }
 
-        // #6 add another unpowered non-misc device
+        // #6 add a powered misc device with estimate
+        factory(Device::class)->states('fixed')->create([
+            'category' => $this->_idPoweredMisc,
+            'category_creation' => $this->_idPoweredMisc,
+            'estimate' => 1.23,
+        ]);
+        $expect = [
+            'powered_waste' => 8 + 1.23,
+            'unpowered_waste' => 5,
+            'powered_footprint' => round(((14.4 * 2) + (1.23 * $this->_ratioPowered)) * $this->_displacementFactor, 2),
+            'unpowered_footprint' => 15.5 * $this->_displacementFactor,
+        ];
+        $result = LcaStats::getWasteStats();
+        $this->assertIsArray($result);
+        $this->assertEquals(1, count($result));
+        foreach ($expect as $k => $v) {
+            $this->assertEquals($v, round($result[0]->{$k}, 2), "Wrong value for $k => $v");
+        }
+
+        // #6 add an unpowered non-misc device with estimate
         factory(Device::class)->states('fixed')->create([
             'category' => $this->_idUnpoweredNonMisc,
             'category_creation' => $this->_idUnpoweredNonMisc,
+            'estimate' => 4.56,
         ]);
         $expect = [
-            'total_weight' => 18,
-            'powered_waste' => 8,
-            'unpowered_waste' => 10,
-            'powered_footprint' => (14.4 * 2) * $this->_displacementFactor,
-            'unpowered_footprint' => (15.5 * 2) * $this->_displacementFactor,
+            'powered_waste' => 8 + 1.23,
+            'unpowered_waste' => 5 + 4.56,
+            'powered_footprint' => round(((14.4 * 2) + (1.23 * $this->_ratioPowered)) * $this->_displacementFactor, 2),
+            'unpowered_footprint' => round((15.5 + (4.56 * $this->_ratioUnpowered)) * $this->_displacementFactor, 2),
         ];
         $result = LcaStats::getWasteStats();
         $this->assertIsArray($result);
@@ -191,7 +191,6 @@ class LcaStatsTest extends StatsTestCase
             'event' => 1,
         ]);
         $expect = [
-            'total_weight' => 4,
             'powered_waste' => 4,
             'unpowered_waste' => 0,
             'powered_footprint' => 14.4 * $this->_displacementFactor,
@@ -211,7 +210,6 @@ class LcaStatsTest extends StatsTestCase
             'event' => 1,
         ]);
         $expect = [
-            'total_weight' => 4,
             'powered_waste' => 4,
             'unpowered_waste' => 0,
             'powered_footprint' => 14.4 * $this->_displacementFactor,
@@ -231,7 +229,6 @@ class LcaStatsTest extends StatsTestCase
             'event' => 1,
         ]);
         $expect = [
-            'total_weight' => 9,
             'powered_waste' => 4,
             'unpowered_waste' => 5,
             'powered_footprint' => 14.4 * $this->_displacementFactor,
@@ -251,7 +248,6 @@ class LcaStatsTest extends StatsTestCase
             'event' => 1,
         ]);
         $expect = [
-            'total_weight' => 9,
             'powered_waste' => 4,
             'unpowered_waste' => 5,
             'powered_footprint' => 14.4 * $this->_displacementFactor,
@@ -263,7 +259,45 @@ class LcaStatsTest extends StatsTestCase
         foreach ($expect as $k => $v) {
             $this->assertEquals($v, round($result[0]->{$k}, 2), "Wrong value for $k => $v");
         }
+
+        // #5 add a powered misc device with estimate
+        $device = factory(Device::class)->states('fixed')->create([
+            'category' => $this->_idPoweredMisc,
+            'category_creation' => $this->_idPoweredMisc,
+            'event' => 1,
+            'estimate' => 1.23,
+        ]);
+        $expect = [
+            'powered_waste' => 4 + 1.23,
+            'unpowered_waste' => 5,
+            'powered_footprint' => round((14.4 + (1.23 * $this->_ratioPowered)) * $this->_displacementFactor, 2),
+            'unpowered_footprint' => 15.5 * $this->_displacementFactor,
+        ];
+        $result = LcaStats::getWasteStats($group);
+        $this->assertIsArray($result);
+        $this->assertEquals(1, count($result));
+        foreach ($expect as $k => $v) {
+            $this->assertEquals($v, round($result[0]->{$k}, 2), "Wrong value for $k => $v");
+        }
+
+        // #6 add a powered misc device with estimate
+        $device = factory(Device::class)->states('fixed')->create([
+            'category' => $this->_idUnpoweredMisc,
+            'category_creation' => $this->_idUnpoweredMisc,
+            'event' => 1,
+            'estimate' => 4.56,
+        ]);
+        $expect = [
+            'powered_waste' => 4 + 1.23,
+            'unpowered_waste' => 5 + 4.56,
+            'powered_footprint' => round((14.4 + (1.23 * $this->_ratioPowered)) * $this->_displacementFactor, 2),
+            'unpowered_footprint' => round((15.5 + (4.56 * $this->_ratioUnpowered)) * $this->_displacementFactor, 2),
+        ];
+        $result = LcaStats::getWasteStats($group);
+        $this->assertIsArray($result);
+        $this->assertEquals(1, count($result));
+        foreach ($expect as $k => $v) {
+            $this->assertEquals($v, round($result[0]->{$k}, 2), "Wrong value for $k => $v");
+        }
     }
-
-
 }

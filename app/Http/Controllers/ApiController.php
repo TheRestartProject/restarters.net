@@ -29,16 +29,16 @@ class ApiController extends Controller
             $hours_volunteered += $party->hoursVolunteered();
         }
 
-        $co2Total = \App\Helpers\LcaStats::getWasteStats();
-
         $result['participants'] = $participants;
         $result['hours_volunteered'] = $hours_volunteered;
         $fixed = $Device->statusCount();
         $result['items_fixed'] = count($fixed) ? $fixed[0]->counter : 0;
-        $result['weights'] = round($co2Total[0]->total_weight);
-        $result['powered_waste'] = round($co2Total[0]->powered_waste);
-        $result['unpowered_waste'] = round($co2Total[0]->unpowered_waste);
-        $result['emissions'] = round($co2Total[0]->powered_footprint + $co2Total[0]->unpowered_footprint);
+
+        $stats = \App\Helpers\LcaStats::getWasteStats();
+        $result['powered_waste'] = $stats[0]->powered_waste;
+        $result['unpowered_waste'] = $stats[0]->unpowered_waste;
+        $result['total_waste'] = $stats[0]->powered_waste + $stats[0]->unpowered_waste;
+        $result['emissions'] = $stats[0]->powered_footprint + $stats[0]->unpowered_footprint;
 
         $devices = new Device;
         $result['fixed_powered'] = $devices->fixedPoweredCount();
@@ -54,10 +54,10 @@ class ApiController extends Controller
     {
         $event = Party::where('idevents', $partyId)->first();
 
-        if (! $event) {
+        if (!$event) {
             return response()->json([
                 'message' => "Invalid party id $partyId",
-                                    ], 404);
+            ], 404);
         }
 
         $eventStats = $event->getEventStats();
@@ -65,13 +65,13 @@ class ApiController extends Controller
         return response()
             ->json(
                 [
-                'kg_co2_diverted' => round($eventStats['powered_co2']),
-                'kg_waste_diverted' => round($eventStats['powered_waste']),
-                'num_fixed_devices' => $eventStats['fixed_devices'],
-                'num_repairable_devices' => $eventStats['repairable_devices'],
-                'num_dead_devices' => $eventStats['dead_devices'],
-                'num_participants' => $eventStats['participants'],
-                'num_volunteers' => $eventStats['volunteers'],
+                    'kg_co2_diverted' => $eventStats['powered_co2'] + $eventStats['unpowered_co2'],
+                    'kg_waste_diverted' => $eventStats['powered_waste'] + $eventStats['unpowered_waste'],
+                    'num_fixed_devices' => $eventStats['fixed_devices'],
+                    'num_repairable_devices' => $eventStats['repairable_devices'],
+                    'num_dead_devices' => $eventStats['dead_devices'],
+                    'num_participants' => $eventStats['participants'],
+                    'num_volunteers' => $eventStats['volunteers'],
                 ],
                 200
             );
@@ -87,18 +87,22 @@ class ApiController extends Controller
                 'num_participants' => $groupStats['participants'],
                 'num_hours_volunteered' => $groupStats['hours_volunteered'],
                 'num_parties' => $groupStats['parties'],
-                'kg_co2_diverted' => round($groupStats['powered_co2']),
-                'kg_waste_diverted' => round($groupStats['waste']),
+                'kg_powered_co2_diverted' => $groupStats['powered_co2'],
+                'kg_unpowered_co2_diverted' => $groupStats['unpowered_co2'],
+                'kg_powered_waste_diverted' => $groupStats['powered_waste'],
+                'kg_unpowered_waste_diverted' => $groupStats['unpowered_waste'],
+                'kg_co2_diverted' => $groupStats['powered_co2'] + $groupStats['unpowered_co2'],
+                'kg_waste_diverted' => $groupStats['powered_waste'] + $groupStats['unpowered_waste'],
             ], 200);
     }
 
     public static function getEventsByGroupTag($group_tag_id)
     {
         $events = Party::join('groups', 'groups.idgroups', '=', 'events.group')
-                ->join('grouptags_groups', 'grouptags_groups.group', '=', 'groups.idgroups')
-                  ->where('grouptags_groups.group_tag', $group_tag_id)
-                    ->select('events.*', 'groups.area')
-                      ->get();
+            ->join('grouptags_groups', 'grouptags_groups.group', '=', 'groups.idgroups')
+            ->where('grouptags_groups.group_tag', $group_tag_id)
+            ->select('events.*', 'groups.area')
+            ->get();
 
         return response()->json($events, 200);
     }
@@ -115,13 +119,16 @@ class ApiController extends Controller
     public static function getUserList()
     {
         $users = User::whereNull('deleted_at')
-               ->orderBy('created_at', 'desc')
-               ->get();
+            ->orderBy('created_at', 'desc')
+            ->get();
 
         return response()->json($users);
     }
 
     /**
+     *
+     * REDUNDANT???
+     *
      * List/search devices.
      *
      * @param  Request  $request
@@ -152,19 +159,19 @@ class ApiController extends Controller
         }
 
         if ($brand) {
-            $wheres[] = ['devices.brand', 'LIKE', '%'.$brand.'%'];
+            $wheres[] = ['devices.brand', 'LIKE', '%' . $brand . '%'];
         }
 
         if ($model) {
-            $wheres[] = ['devices.model', 'LIKE', '%'.$model.'%'];
+            $wheres[] = ['devices.model', 'LIKE', '%' . $model . '%'];
         }
 
         if ($item_type) {
-            $wheres[] = ['devices.item_type', 'LIKE', '%'.$item_type.'%'];
+            $wheres[] = ['devices.item_type', 'LIKE', '%' . $item_type . '%'];
         }
 
         if ($comments) {
-            $wheres[] = ['devices.problem', 'LIKE', '%'.$comments.'%'];
+            $wheres[] = ['devices.problem', 'LIKE', '%' . $comments . '%'];
         }
 
         if ($wiki) {
@@ -176,7 +183,7 @@ class ApiController extends Controller
         }
 
         if ($group) {
-            $wheres[] = ['groups.name', 'LIKE', '%'.$group.'%'];
+            $wheres[] = ['groups.name', 'LIKE', '%' . $group . '%'];
         }
 
         if ($from_date) {
@@ -189,18 +196,18 @@ class ApiController extends Controller
 
         // Get the items we want for this page.
         $query = Device::with(['deviceEvent.theGroup', 'deviceCategory', 'barriers'])
-        ->join('events', 'events.idevents', '=', 'devices.event')
-        ->join('groups', 'events.group', '=', 'groups.idgroups')
-        ->join('categories', 'devices.category', '=', 'categories.idcategories')
-        ->where($wheres)
-        ->orderBy($sortBy, $sortDesc);
+            ->join('events', 'events.idevents', '=', 'devices.event')
+            ->join('groups', 'events.group', '=', 'groups.idgroups')
+            ->join('categories', 'devices.category', '=', 'categories.idcategories')
+            ->where($wheres)
+            ->orderBy($sortBy, $sortDesc);
 
         // Get total info across all pages.
         $count = $query->count();
 
         $items = $query->skip(($page - 1) * $size)
-        ->take($size)
-        ->get();
+            ->take($size)
+            ->get();
 
         foreach ($items as &$item) {
             $item['shortProblem'] = $item->getShortProblem();
