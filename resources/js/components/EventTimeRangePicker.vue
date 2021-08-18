@@ -1,6 +1,54 @@
 <template>
-  <div class="d-flex">
-    <b-input-group>
+  <div>
+    <div class="d-none d-lg-flex">
+      <b-input-group>
+        <b-form-input
+            size="lg"
+            type="text"
+            name="start"
+            v-model="currentStartTime"
+            :class="{ hasError: hasError, 'mr-1': true, focusfix: true }"
+            placeholder="--:--"
+        />
+        <b-input-group-append>
+          <b-form-timepicker
+              class="d-none d-lg-block start-time"
+              v-model="currentPickerStartTime"
+              @input="changeEndTime"
+              hide-header
+              :class="{ hasError: hasError }"
+              button-only
+              button-variant="white"
+              size="sm"
+              minutes-step="5"
+              dropleft />
+        </b-input-group-append>
+      </b-input-group>
+      <b-input-group>
+        <b-form-input
+            size="lg"
+            type="text"
+            name="end"
+            v-model="currentEndTime"
+            :class="{ hasError: hasError, 'ml-1': true, focusfix: true }"
+            placeholder="--:--"
+        />
+        <b-input-group-append>
+          <b-form-timepicker
+              :key="bump"
+              class="d-none d-lg-block end-time btn-white"
+              v-model="currentPickerEndTime"
+              hide-header
+              :class="{ hasError: hasError }"
+              button-only
+              button-variant="white"
+              size="sm"
+              minutes-step="5"
+              dropleft />
+        </b-input-group-append>
+      </b-input-group>
+    </div>
+    <div class="d-flex d-lg-none">
       <b-form-input
           size="lg"
           type="text"
@@ -9,43 +57,15 @@
           :class="{ hasError: hasError, 'mr-1': true, focusfix: true }"
           placeholder="--:--"
       />
-      <b-input-group-append>
-        <b-form-timepicker
-            class="d-none d-lg-block start-time"
-            v-model="currentPickerStartTime"
-            @input="changeEndTime"
-            hide-header
-            :class="{ hasError: hasError }"
-            button-only
-            button-variant="white"
-            size="sm"
-            minutes-step="5"
-            dropleft />
-      </b-input-group-append>
-    </b-input-group>
-    <b-input-group>
       <b-form-input
           size="lg"
-          type="text"
+          type="time"
           name="end"
           v-model="currentEndTime"
           :class="{ hasError: hasError, 'ml-1': true, focusfix: true }"
           placeholder="--:--"
       />
-      <b-input-group-append>
-        <b-form-timepicker
-            :key="bump"
-            class="d-none d-lg-block end-time btn-white"
-            v-model="currentPickerEndTime"
-            hide-header
-            :class="{ hasError: hasError }"
-            button-only
-            button-variant="white"
-            size="sm"
-            minutes-step="5"
-            dropleft />
-      </b-input-group-append>
-    </b-input-group>
+    </div>
   </div>
 </template>
 <script>
