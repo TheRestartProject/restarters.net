@@ -97,4 +97,16 @@ export default {
 /deep/ .ql-header[value="6"]::before {
   content: 'H6'
 }
+
+/deep/ .ql-snow .ql-editor {
+  h4 {
+    font-size: 1.5rem;
+  }
+  h5 {
+    font-size: 1.25rem;
+  }
+  h6 {
+    font-size: 1rem;
+  }
+}
 </style>
