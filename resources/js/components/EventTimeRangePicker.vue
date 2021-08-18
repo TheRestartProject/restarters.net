@@ -51,7 +51,7 @@
     <div class="d-flex d-lg-none">
       <b-form-input
           size="lg"
-          type="text"
+          type="time"
           name="start"
           v-model="currentStartTime"
           :class="{ hasError: hasError, 'mr-1': true, focusfix: true }"
