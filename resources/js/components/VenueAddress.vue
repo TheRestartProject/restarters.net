@@ -3,32 +3,31 @@
     <b-col md="7">
       <div class="form-group">
         <label :for="$id('address-autocomplete')">{{ __('events.field_event_venue') }}:</label>
-<!--        TODO Moves on focus-->
         <vue-google-autocomplete
             :id="$id('address-autocomplete')"
             name="location"
             classname="form-control"
             :placeholder="__('events.field_venue_placeholder')"
             @placechanged="placeChanged"
-            @inputChange="clearLatLng"
             aria-describedby="locationHelpBlock"
             types="geocode"
             ref="autocomplete"
             :class="{ hasError: hasError, 'm-0': true }"
         />
-        <small id="locationHelpBlock" class="form-text text-danger" v-if="hasError">
-          {{ __('events.address_error') }}
-        </small>
-        <small id="locationHelpBlock" class="form-text text-muted" v-else>
+        <small id="locationHelpBlock">
+          <span class="form-text text-danger" v-if="hasError">
+            {{ __('events.address_error') }}
+          </span>
+          <span v-else>
           {{ __('events.field_venue_helper') }}
+          </span>
         </small>
-        <b-btn variant="primary" size="sm" v-if="groupLocation && !online" @click="useGroup" class="mt-2" :disabled="currentValue === groupLocation">
+        <b-btn variant="primary" size="sm" v-if="groupLocation && !online" @click="useGroup" class="mt-2">
           {{ __('events.field_venue_use_group') }}
         </b-btn>
       </div>
     </b-col>
     <b-col lg="5">
-<!--      TODO Map doesn't show on first load of event edit page.-->
       <l-map
           ref="map"
           :zoom="11"
@@ -55,6 +54,16 @@ export default {
   props: {
     value: {
       type: String,
+      required: false,
+      default: null
+    },
+    lat: {
+      type: Number,
+      required: false,
+      default: null
+    },
+    lng: {
+      type: Number,
       required: false,
       default: null
     },
@@ -87,13 +96,6 @@ export default {
       currentValue: null,
       location: null,
       timer: null,
-      lat: null,
-      lng: null,
-
-      // When we create this component we may (when duplicating events) pass in lat/lng/value.  The setting of
-      // the value will trigger a call to clearLatLng, and we don't want to emit null values and trample over the
-      // ones we started with.
-      suppressEmit: true
     }
   },
   computed: {
@@ -159,45 +161,14 @@ export default {
   methods: {
     placeChanged(addressData, placeResultData) {
       this.currentValue = placeResultData.formatted_address
-
-      // Ensure the next clearLatLng handler doesn't reset values.
-      this.suppressEmit = true
-
-      this.$nextTick(() => {
-        // The formatted address returned can be slightly different from the value displayed.  Force them to be
-        // the same so that we can disable the Use group button.
-        this.$refs.autocomplete.update(this.currentValue)
-
-        // Emit new lat/lng values.
-        this.lat = addressData.latitude
-        this.lng = addressData.longitude
-        this.emit()
-      })
-    },
-    clearLatLng() {
-      // The input has changed.  Clear the lat/lng so that the parent knows we currently have an address which
-      // is not geocodeable.  If we subsequently select a valid place from the drop-down list, then we'll call
-      // placeChanged about and emit valid values.
-      //
-      // The suppressEmit jiggery-pokery is because both callbacks are made when we type and select a valid
-      // address.
-      if (!this.suppressEmit) {
-        this.lat = null
-        this.lng = null
-        this.emit()
-      }
-
-      this.suppressEmit = false
-    },
-    emit() {
       this.$emit('update:value', this.currentValue)
-      this.$emit('update:lat', this.lat)
-      this.$emit('update:lng', this.lng)
+      this.$emit('update:lat', addressData.latitude)
+      this.$emit('update:lng', addressData.longitude)
     },
     useGroup() {
       this.$refs.autocomplete.update(this.groupLocation)
-      this.lat = this.groupLat
-      this.lng = this.groupLng
+      this.$emit('update:lat', this.groupLat)
+      this.$emit('update:lng', this.groupLng)
     }
   }
 }

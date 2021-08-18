@@ -77,15 +77,17 @@ export default {
   watch: {
     start: {
       handler (newVal) {
-        this.currentStartTime = newVal
-        this.changeEndTime(newVal)
+        if (newVal) {
+          this.currentStartTime = newVal.substring(0, 5)
+          this.changeEndTime(newVal)
+        }
       },
       immediate: true
     },
     end: {
       handler (newVal, oldVal) {
         if (newVal >= this.currentStartTime) {
-          this.currentEndTime = newVal
+          this.currentEndTime = newVal.substring(0, 5)
         } else {
           // We prevent end times before start times.  This is slightly clunky - we can't seem to update the
           // value in timepicker while it's open, so trigger a re-render by changing the key.
