@@ -164,6 +164,9 @@ export default {
 </script>
 
 <style scoped lang="scss">
+@import '~bootstrap/scss/functions';
+@import '~bootstrap/scss/variables';
+@import '~bootstrap/scss/mixins/_breakpoints';
 .b-form-timepicker {
   margin: 0px;
   max-height: 42px;
@@ -221,8 +224,10 @@ export default {
 }
 
 /deep/ input {
-  min-width: 6rem !important;
-  max-width: 6rem !important;
+  @include media-breakpoint-up(lg) {
+    min-width: 6rem !important;
+    max-width: 6rem !important;
+  }
 }
 
 /deep/ .input-group-append {
