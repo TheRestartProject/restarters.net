@@ -94,7 +94,7 @@ AND d.category <> 46
     {
         $value = DB::select(DB::raw("
 SELECT
-SUM(c.footprint) / SUM(c.weight) AS ratio
+SUM(c.footprint) / SUM(IF(COALESCE(d.estimate,0) + 0.00 = 0, c.weight, d.estimate + 0.00)) AS ratio
 FROM devices d
 JOIN categories c ON c.idcategories = d.category
 WHERE c.powered = 0
