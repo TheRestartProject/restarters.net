@@ -9,7 +9,7 @@ dependencies:
 jobs:
   build:
     docker:
-      - image: cimg/php:7.4-node-browsers
+      - image: cimg/php:7.4-node
         name: restarters.test
         environment:
           - DB_CONNECTION: mysql
