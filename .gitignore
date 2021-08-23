@@ -1,8 +1,4 @@
 /node_modules
-/public/css
-/public/fonts/vendor
-/public/global
-/public/js
 /public/storage
 /public/uploads
 /public/devices.csv
@@ -21,3 +17,9 @@ temp_db.sql
 restarters-anonymised.sql
 /.idea
 .dir-locals.el
+# The following should be ignored in all branches except production.
+/public/mix-manifest.json
+/public/css
+/public/fonts/vendor
+/public/global
+/public/js
