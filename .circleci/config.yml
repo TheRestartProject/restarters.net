@@ -53,4 +53,5 @@ jobs:
       # Run the Playwright tests.
       - run: npx playwright install
       - run: npx playwright install-deps
-      - run: npx playwright test --browser=all
+      - run: npm install -D @playwright/test
+      - run: npx playwright test
