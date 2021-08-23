@@ -32,6 +32,7 @@ jobs:
       - checkout
       - run: sudo apt update
       - run: sudo apt install openssl zip unzip git libxml2-dev libzip-dev zlib1g-dev libcurl4-openssl-dev iputils-ping default-mysql-client vim libpng-dev libgmp-dev libjpeg-turbo8-dev
+      - run: sudo apt-get install php7.4-xmlrpc
 #      - run: sudo docker-php-ext-configure gd --with-jpeg
 #      - run: sudo docker-php-ext-install zip pdo pdo_mysql xmlrpc curl gd zip
       - run: cp .env.example .env
