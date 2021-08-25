@@ -4,10 +4,9 @@ const { devices } = require('@playwright/test');
 
 /** @type {import('@playwright/test').PlaywrightTestConfig} */
 const config = {
-  // Our tests are flaky for reasons we don't understand, so retry a lot.
   // Generate trace if a test fails; can be viewed using something like:
   // npx playwright show-trace test-results/group-Can-create-group-Desktop-Chromium-retry1/trace.zip
-  retries: 10,
+  retries: 1,
   use: {
     trace: 'on-first-retry',
   },
