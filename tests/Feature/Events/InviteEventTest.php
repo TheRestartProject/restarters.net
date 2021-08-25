@@ -71,6 +71,7 @@ class InviteEventTest extends TestCase
         // We should see that we have been invited.
         $response = $this->get('/party/view/' . $event->idevents);
         $response->assertSee('You&#039;ve been invited to join an event');
+        error_log($response->getContent());
         preg_match('/href="(\/party\/accept-invite.*?)"/', $response->getContent(), $matches);
         $invitation = $matches[1];
 

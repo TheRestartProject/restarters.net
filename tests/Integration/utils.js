@@ -6,32 +6,15 @@ const login = async function(page, baseURL, email = 'jane@bloggs.net', password 
   await page.goto(baseURL)
   await expect(page.locator('legend')).toHaveText('Sign in')
 
+  await page.waitForSelector('#fp_email')
   await page.fill('#fp_email', email)
   await page.fill('#password', password)
-  console.log("Click submit");
 
   // Wait until the dashboard page loads.
   await Promise.all([
     page.click('button[type=submit]'),
-    page.waitForNavigation({
-      url: '/dashboard',
-      waitUntil: 'networkidle'
-    }),
+    page.waitForNavigation(),
   ]);
-
-  // await page.waitForNavigation(30000, '/dashboard')
-  console.log("Loaded dashboard page")
-
-  // Check we loaded the dashboard page.
-  const yourgroups = await page.waitForSelector('.yourgroups')
-  const content = await page.content()
-
-  if (page.url('http://localhost:8000/login')) {
-    // console.log("Loaded login" , await page.content())
-  }
-
-  // Save logged in state - useful for debug or speeding up login.
-  // await page.context().storageState({ path: 'loggedin.json' });
 
   return page
 }
@@ -41,12 +24,7 @@ exports.login = login
 exports.createGroup = async function(page, baseURL) {
   // Go to groups page
   console.log("Load groups page")
-  await Promise.all([
-    page.click('a[href="http://localhost:8000/group"]'),
-    page.waitForNavigation({
-      waitUntil: 'networkidle'
-    }),
-  ]);
+  await page.click('a[href="http://localhost:8000/group"]'),
 
   // Click on add a new group button
   console.log("Click on create button")
@@ -62,12 +40,7 @@ exports.createGroup = async function(page, baseURL) {
   // Always say London for geocoding.
   await page.fill('#autocomplete', 'London')
 
-  await Promise.all([
-    page.click('button[type=submit]'),
-    page.waitForNavigation({
-      waitUntil: 'networkidle'
-    }),
-  ]);
+  await page.click('button[type=submit]')
 
   // Get redirected to Edit form which should have details section.
   await expect(page.locator('#details'))
