@@ -12,7 +12,7 @@ const login = async function(page, baseURL, email = 'jane@bloggs.net', password 
 
   // TODO This wait shouldn't be necessary - timeouts are bad, event-driven is good, and navigation after form
   // submission is supposed to Just Work (TM).  I've banged my head against this a lot, though, so let's go with it for now.
-  await page.waitForTimeout(1000)
+  await page.waitForTimeout(5000)
 
   // Wait until the dashboard page loads.
   await Promise.all([
@@ -30,7 +30,6 @@ exports.createGroup = async function(page, baseURL) {
   await page.goto('/group')
 
   // Click on add a new group button
-  console.log("Click on create button")
   await page.click('a[href="/group/create"]')
   // await page.goto(baseURL + '/group/create')
 
