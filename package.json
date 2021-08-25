@@ -17,6 +17,7 @@
         "browser-sync": "^2.26.7",
         "browser-sync-webpack-plugin": "2.0.1",
         "cross-env": "^5.2.0",
+        "faker": "^5.5.3",
         "jquery": "3.4.1",
         "laravel-mix": "^2.0",
         "laravel-mix-bundle-analyzer": "^1.0.5",

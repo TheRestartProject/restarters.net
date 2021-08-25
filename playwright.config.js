@@ -4,6 +4,7 @@ const { devices } = require('@playwright/test');
 
 /** @type {import('@playwright/test').PlaywrightTestConfig} */
 const config = {
+  retries: 3,  // We see some test flakiness which we haven't got to the bottom of.
   projects: [
     {
       name: 'Desktop Chromium',
