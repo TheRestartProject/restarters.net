@@ -11,6 +11,7 @@ const login = async function(page, baseURL, email = 'jane@bloggs.net', password 
   await page.fill('#password', password)
 
   await page.click('button[type=submit]')
+  await page.waitForSelector('section.dashboard')
 
   return page
 }
