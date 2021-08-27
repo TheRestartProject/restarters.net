@@ -15,6 +15,11 @@ const login = async function(page, baseURL, email = 'jane@bloggs.net', password 
   await page.waitForTimeout(5000)
 
   // Wait until the dashboard page loads.
+  page.on('request', request =>
+    console.log('>>', request.method(), request.url()));
+  page.on('response', response =>
+    console.log('<<', response.status(), response.url()));
+
   await Promise.all([
     page.click('button[type=submit]'),
     page.waitForNavigation(),
