@@ -10,20 +10,7 @@ const login = async function(page, baseURL, email = 'jane@bloggs.net', password 
   await page.fill('#fp_email', email)
   await page.fill('#password', password)
 
-  // TODO This wait shouldn't be necessary - timeouts are bad, event-driven is good, and navigation after form
-  // submission is supposed to Just Work (TM).  I've banged my head against this a lot, though, so let's go with it for now.
-  await page.waitForTimeout(5000)
-
-  // Wait until the dashboard page loads.
-  page.on('request', request =>
-    console.log('>>', request.method(), request.url()));
-  page.on('response', response =>
-    console.log('<<', response.status(), response.url()));
-
-  await Promise.all([
-    page.click('button[type=submit]'),
-    page.waitForNavigation(),
-  ]);
+  await page.click('button[type=submit]')
 
   return page
 }
