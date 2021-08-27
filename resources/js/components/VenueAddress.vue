@@ -158,10 +158,18 @@ export default {
     },
     checkOtherInputs() {
       // This is a workaround until the whole form is converted to Vue.
-      this.online = document.getElementById('online').checked
-      this.idgroups = document.getElementById('event_group').value
+      const online = document.getElementById('online')
+      const idgroups = document.getElementById('event_group')
 
-      this.timer = setTimeout(this.checkOtherInputs, 200)
+      if (online && idgroups) {
+        this.online = online.checked
+        this.idgroups = idgroups.value
+
+        this.timer = setTimeout(this.checkOtherInputs, 200)
+      } else {
+        // This can happen as a timing window when you navigate away from the page and the DOM is destroyed.
+        this.timer = null
+      }
     }
   }
 }
