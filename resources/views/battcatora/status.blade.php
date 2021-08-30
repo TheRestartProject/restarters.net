@@ -42,9 +42,11 @@
                 <a id="btn-info-open" data-toggle="modal" data-target="#battcatoraInfoModal" class="btn btn-primary ml-2">
                     @lang('battcatora.about')
                 </a>
+                @if (!$complete && !$closed)
                 <a class="btn btn-primary" href="{{ '/battcat' }}">
                     @lang('microtasking.cta.battcat.get_involved')
                 </a>
+                @endif
             </div>
         </div>
         @if(session()->has('success'))
@@ -52,7 +54,25 @@
             @lang('battcatora.status.task_completed')!
         </div>
         @endif
-        @if (isset($status) && !$complete)
+        @if ($closed)
+            <div class="row panel px-1 py-3 mb-4 mx-1 mx-sm-0 quest-closed">
+                <div class="col text-left">
+                    <h4>This quest is closed</h4>
+                    <p>
+                        This quest is now closed.  Thank you for your interest!
+                    </p>
+
+                    <p>
+                        Why not read more about our findings, or find out more on our data work in the Workbench.
+                    </p>
+                    <ul>
+                        <li><a href="https://talk.restarters.net/t/help-us-make-the-case-for-user-replaceable-batteries-with-battcat/5216">Read more about BattCat</a></li>
+                        <li><a href="https://restarters.net/workbench">Vist the Workbench</a></li>
+                    </ul>
+                </div>
+            </div>
+        @endif
+        @if (isset($status) && !$complete && !$closed)
         <div class="row problem panel p-2 mb-4 mx-1 mx-sm-0 justify-content-center">
             <div class="col">
                 <div class="row justify-content-center">
@@ -67,6 +87,7 @@
                 </div>
             </div>
         </div>
+        @endif
         <div class="row problem panel p-2 mb-4 mx-1 mx-sm-0 justify-content-center">
             <div class="col text-smaller">
                 <div class="row justify-content-center">
@@ -106,7 +127,6 @@
                 </div>
             </div>
         </div>
-        @endif
     </div>
     <div id="ora-partnership" class="mt-8 mb-4">
         <hr />
