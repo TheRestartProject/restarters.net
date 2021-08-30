@@ -50,17 +50,17 @@
         @if ($closed)
             <div class="row panel px-1 py-3 mb-4 mx-1 mx-sm-0 quest-closed">
                 <div class="col text-left">
-                    <h4>This quest is closed</h4>
+                    <h4>@lang('microtask-ora.quest-closed.header')</h4>
                     <p>
-                        This quest is now closed.  Thank you for your interest!
+                        @lang('microtask-ora.quest-closed.message-1')
                     </p>
 
                     <p>
-                        Why not read more about our findings, or find out more on our data work in the Workbench.
+                        @lang('microtask-ora.quest-closed.message-2')
                     </p>
                     <ul>
-                        <li><a href="https://talk.restarters.net/t/why-do-printers-break-join-the-printcat-investigation/4664">Read more about PrintCat</a></li>
-                        <li><a href="https://restarters.net/workbench">Vist the Workbench</a></li>
+                        <li><a href="https://talk.restarters.net/t/why-do-printers-break-join-the-printcat-investigation/4664">@lang('microtask-ora.quest-closed.read-more', ['quest' => 'PrintCat'])</a></li>
+                        <li><a href="https://restarters.net/workbench">@lang('microtask-ora.quest-closed.visit-workbench')</a></li>
                     </ul>
                 </div>
             </div>
