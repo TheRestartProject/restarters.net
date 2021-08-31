@@ -55,25 +55,10 @@ class PrintcatOraTest extends TestCase
     }
 
     /** @test */
-    public function fetch_printcatora_page()
+    public function printcat_should_redirect_to_status_page()
     {
-        $fault_types = $this->_setup_fault_types();
-        $data = $this->_setup_devices();
-        $this->withSession([]);
-        $this->_bypass_cta();
-        for ($i = 1; $i <= count($data); $i++) {
-            // Illuminate\Foundation\Testing\TestResponse
-            $response = $this->get('/printcat');
-            $seshids = $this->app['session']->get('printcatora.exclusions');
-            $this->assertTrue(is_array($seshids), 'printcatora.exclusions not an array');
-            $this->assertEquals($i, count($seshids), 'printcatora.exclusions wrong length');
-            $response->assertSuccessful();
-            $response->assertViewIs('printcatora.index');
-        }
-        // No more records for this user
+        // PrintCat is closed - should redirect to status page.
         $response = $this->get('/printcat');
-        $response->assertSessionHas('printcatora.exclusions');
-        $response->assertRedirect();
         $response->assertRedirect(url()->current().'/status');
     }
 
