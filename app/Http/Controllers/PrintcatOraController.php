@@ -22,6 +22,9 @@ class PrintcatOraController extends Controller
      */
     public function index(Request $request)
     {
+        // PrintCat is now closed.
+        return redirect()->action('PrintcatOraController@status');
+
         $partner = $request->input('partner', null);
         if (Auth::check()) {
             $user = Auth::user();
@@ -116,6 +119,7 @@ class PrintcatOraController extends Controller
             'status' => $data,
             'user' => $user,
             'complete' => $complete,
+            'closed' => true,
             'partner' => $request->input('partner', null),
         ]);
     }
