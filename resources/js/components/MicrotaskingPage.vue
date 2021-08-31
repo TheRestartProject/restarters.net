@@ -12,6 +12,7 @@
     <div id="layout">
         <MicrotaskingCallToAction
           id="cta"
+          v-if="showCta"
           :active-quest="activeQuest"
         />
         <MicrotaskingVolunteering
@@ -83,6 +84,11 @@ export default {
       required: true
     }
   },
+  computed: {
+    showCta() {
+      return false
+    },
+  }
 }
 </script>
 

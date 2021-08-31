@@ -12,7 +12,7 @@ return [
   'volunteering' => [
     'title' => 'Volunteer from anywhere',
     'content' => '<p>We collect data at community events.  But the raw data needs your help to become strong evidence for better products.  With your help, we can change the system.</p>
-<p>This is an easy way to make a difference, whether or not you can join us at our repair events.  Join us, and contribute as little or as much time and brain-power you can.  Most of the tasks here are OK for non-technical people.  And we\'re always here to help.',
+<p>This is an easy way to make a difference, whether or not you can join us at our repair events.  Join us, and contribute as little or as much time and brain-power you can.  Most of the tasks here are OK for non-technical people.  And we\'re always here to help.</p><p><strong>There are currently no open quests.</strong>  In the meantime, why not join the discussion on repair data below, and find out more about <a href="">our work with repair data</a>.</p>',
     'number_of_tasks' => 'Number of tasks',
     'number_of_quests' => 'Number of quests',
     'all_volunteer_contributions' => 'Total volunteer contributions',
