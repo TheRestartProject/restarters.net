@@ -44,7 +44,7 @@
 
                   <div class="form-group">
                       <label for="tag-description">@lang('admin.description'):</label>
-                      <textarea class="form-control rte" rows="6" name="tag-description" id="tag-description">{{ $tag->description }}</textarea>
+                      <textarea class="form-control" rows="6" name="tag-description" id="tag-description">{{ $tag->description }}</textarea>
                   </div>
 
               </div>
