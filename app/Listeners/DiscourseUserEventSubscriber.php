@@ -14,6 +14,10 @@ class DiscourseUserEventSubscriber
     public function __construct()
     {
         // NGM: preferable to switch to https://github.com/pnoeric/discourse-api-php ?
+        if (! config('restarters.features.discourse_integration')) {
+            return;
+        }
+
         $this->discourseClient = app('discourse-client');
     }
 

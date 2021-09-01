@@ -15,7 +15,6 @@ class OurSentryLogging extends ServiceProvider
      */
     public function register()
     {
-        error_log("Our logging register");
     }
 
     /**
