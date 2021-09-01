@@ -1,0 +1,10 @@
+var Options = {
+  props: {
+    options: {
+      type: Object,
+      default: function () { return ({}); }
+    }
+  }
+};
+
+export default Options;
