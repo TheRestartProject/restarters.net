@@ -90,7 +90,6 @@
           }
       }
 
-<<<<<<< HEAD
       $expanded_events = [];
 
       foreach (array_merge($upcoming_events->all(), $past_events->all()) as $event) {
@@ -113,8 +112,6 @@
           }
       }
 
-=======
->>>>>>> master
       ?>
 
     <div class="vue-placeholder vue-placeholder-large">
