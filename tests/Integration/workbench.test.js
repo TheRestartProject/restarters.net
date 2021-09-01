@@ -6,6 +6,6 @@ test('Workbench page loads', async ({ page, baseURL }) => {
 
   // Wait for Vue to render and create element with id layout.
   const layout = page.locator('#layout')
-  await expect(layout).toHaveText(/Help Now!/);
+  await expect(layout).toHaveText(/Volunteer from anywhere/);
 });
 
