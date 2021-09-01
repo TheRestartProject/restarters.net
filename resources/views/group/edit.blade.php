@@ -80,11 +80,11 @@
 
                 <div class="form-group">
                   <label for="grp_about">@lang('groups.groups_about_group'):</label>
-                  <textarea class="form-control rte" rows="6" name="description" id="description">{{ $formdata->free_text }}</textarea>
+                  <div class="vue">
+                    <RichTextEditor name="free_text" :initial-value="{{ json_encode($formdata->free_text, JSON_INVALID_UTF8_IGNORE) }}" />
+                  </div>
                 </div>
               </div>
-
-              <input type="hidden" name="free_text" id="free_text" value="{{ $formdata->free_text }}">
 
               <div class="col-lg-6">
                 <div class="form-group">

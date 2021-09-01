@@ -612,7 +612,7 @@ class GroupController extends Controller
         if ($request->isMethod('post') && ! empty($request->post())) {
             $data = $request->post();
 
-            // remove the extra "files" field that Summernote generates -
+            // Remove some inputs.  Probably these aren't present any more, but it does no harm to ensure that.
             unset($data['files']);
             unset($data['image']);
 

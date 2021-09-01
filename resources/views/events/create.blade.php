@@ -105,10 +105,10 @@
 
               <div class="form-group">
                 <label for="event_desc">@lang('events.field_event_desc'):</label>
-                <textarea class="rte" name="description" id="description">{!! old('free_text') !!}</textarea>
+                <div class="vue">
+                  <RichTextEditor name="free_text" :initial-value="{{ json_encode(old('free_text'), JSON_INVALID_UTF8_IGNORE) }}" />
+                </div>
               </div>
-
-              <input type="hidden" name="free_text" id="free_text" value="{{ old('free_text') }}">
             </div>
             <div class="col-lg-6">
               <div class="form-group">
@@ -198,3 +198,9 @@
 @section('scripts')
 @include('includes/gmap')
 @endsection
+<script>
+import RichTextEditor from '../../js/components/RichTextEditor'
+export default {
+  components: {RichTextEditor}
+}
+</script>

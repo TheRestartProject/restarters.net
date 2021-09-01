@@ -57,15 +57,11 @@
 
                 <div class="form-group">
                   <label for="grp_about">@lang('groups.groups_about_group'):</label>
-                  <!-- <div id="description" class="rte"></div>
-                  <noscript> -->
-                    <textarea class="form-control rte" rows="6" name="description" id="description"></textarea>
-                  <!-- </noscript> -->
+                  <div class="vue">
+                    <RichTextEditor name="free_text" class="mb-2" />
+                  </div>
                 </div>
               </div>
-
-              <input type="hidden" name="free_text" id="free_text" value="">
-
 
               <div class="col-lg-6">
 

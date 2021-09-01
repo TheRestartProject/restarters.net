@@ -1,0 +1,7 @@
+{
+  "patches": {
+    "addwiki/mediawiki-api-base": {
+      "Make getClient public": "patches/mediawiki-api-base.patch"
+    }
+  }
+}
