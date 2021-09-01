@@ -1,7 +1,7 @@
-import identity from '../../../utils/identity'
-import startCase from '../../../utils/startcase'
+import { identity } from '../../../utils/identity'
 import { isArray, isFunction, isObject, isString } from '../../../utils/inspect'
 import { clone, keys } from '../../../utils/object'
+import { startCase } from '../../../utils/string'
 import { IGNORED_FIELD_KEYS } from './constants'
 
 // Private function to massage field entry into common object format
@@ -9,24 +9,24 @@ const processField = (key, value) => {
   let field = null
   if (isString(value)) {
     // Label shortcut
-    field = { key: key, label: value }
+    field = { key, label: value }
   } else if (isFunction(value)) {
     // Formatter shortcut
-    field = { key: key, formatter: value }
+    field = { key, formatter: value }
   } else if (isObject(value)) {
     field = clone(value)
     field.key = field.key || key
   } else if (value !== false) {
     // Fallback to just key
     /* istanbul ignore next */
-    field = { key: key }
+    field = { key }
   }
   return field
 }
 
 // We normalize fields into an array of objects
 // [ { key:..., label:..., ...}, {...}, ..., {..}]
-const normalizeFields = (origFields, items) => {
+export const normalizeFields = (origFields, items) => {
   const fields = []
 
   if (isArray(origFields)) {
@@ -69,5 +69,3 @@ const normalizeFields = (origFields, items) => {
     return false
   })
 }
-
-export default normalizeFields

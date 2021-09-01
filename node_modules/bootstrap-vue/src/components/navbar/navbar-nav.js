@@ -1,26 +1,33 @@
-import { mergeData } from 'vue-functional-data-merge'
-import Vue from '../../utils/vue'
-import { pluckProps } from '../../utils/props'
+import { Vue, mergeData } from '../../vue'
+import { NAME_NAVBAR_NAV } from '../../constants/components'
+import { pick } from '../../utils/object'
+import { makePropsConfigurable } from '../../utils/props'
 import { props as BNavProps } from '../nav/nav'
 
-// -- Constants --
-
-export const props = pluckProps(['tag', 'fill', 'justified', 'align', 'small'], BNavProps)
-
-// -- Utils --
+// --- Helper methods ---
 
 const computeJustifyContent = value => {
-  // Normalize value
   value = value === 'left' ? 'start' : value === 'right' ? 'end' : value
   return `justify-content-${value}`
 }
 
+// --- Props ---
+
+export const props = makePropsConfigurable(
+  pick(BNavProps, ['tag', 'fill', 'justified', 'align', 'small']),
+  NAME_NAVBAR_NAV
+)
+
+// --- Main component ---
+
 // @vue/component
 export const BNavbarNav = /*#__PURE__*/ Vue.extend({
-  name: 'BNavbarNav',
+  name: NAME_NAVBAR_NAV,
   functional: true,
   props,
   render(h, { props, data, children }) {
+    const { align } = props
+
     return h(
       props.tag,
       mergeData(data, {
@@ -28,7 +35,7 @@ export const BNavbarNav = /*#__PURE__*/ Vue.extend({
         class: {
           'nav-fill': props.fill,
           'nav-justified': props.justified,
-          [computeJustifyContent(props.align)]: props.align,
+          [computeJustifyContent(align)]: align,
           small: props.small
         }
       }),

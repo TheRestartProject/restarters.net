@@ -37,7 +37,9 @@ var Hub = /** @class */ (function () {
         /** Is a {@link Layer}[] containing the client and scope */
         this._stack = [{}];
         this.getStackTop().scope = scope;
-        this.bindClient(client);
+        if (client) {
+            this.bindClient(client);
+        }
     }
     /**
      * @inheritDoc
@@ -112,7 +114,7 @@ var Hub = /** @class */ (function () {
     Hub.prototype.captureException = function (exception, hint) {
         var eventId = (this._lastEventId = uuid4());
         var finalHint = hint;
-        // If there's no explicit hint provided, mimick the same thing that would happen
+        // If there's no explicit hint provided, mimic the same thing that would happen
         // in the minimal itself to create a consistent behavior.
         // We don't do this in the client, as it's the lowest level API, and doing this,
         // would prevent user from having full control over direct calls.
@@ -138,7 +140,7 @@ var Hub = /** @class */ (function () {
     Hub.prototype.captureMessage = function (message, level, hint) {
         var eventId = (this._lastEventId = uuid4());
         var finalHint = hint;
-        // If there's no explicit hint provided, mimick the same thing that would happen
+        // If there's no explicit hint provided, mimic the same thing that would happen
         // in the minimal itself to create a consistent behavior.
         // We don't do this in the client, as it's the lowest level API, and doing this,
         // would prevent user from having full control over direct calls.

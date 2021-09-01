@@ -1,8 +1,10 @@
+import { Vue } from '../vue'
+import { EVENT_OPTIONS_NO_CAPTURE } from '../constants/events'
 import { contains } from '../utils/dom'
-import { EVENT_OPTIONS_NO_CAPTURE, eventOn, eventOff } from '../utils/events'
+import { eventOn, eventOff } from '../utils/events'
 
 // @vue/component
-export default {
+export const clickOutMixin = Vue.extend({
   data() {
     return {
       listenForClickOut: false
@@ -49,7 +51,7 @@ export default {
       )
     }
   },
-  beforeDestroy() /* istanbul ignore next */ {
+  beforeDestroy() {
     eventOff(
       this.clickOutElement,
       this.clickOutEventName,
@@ -58,13 +60,13 @@ export default {
     )
   },
   methods: {
-    isClickOut(evt) {
-      return !contains(this.$el, evt.target)
+    isClickOut(event) {
+      return !contains(this.$el, event.target)
     },
-    _clickOutHandler(evt) {
-      if (this.clickOutHandler && this.isClickOut(evt)) {
-        this.clickOutHandler(evt)
+    _clickOutHandler(event) {
+      if (this.clickOutHandler && this.isClickOut(event)) {
+        this.clickOutHandler(event)
       }
     }
   }
-}
+})

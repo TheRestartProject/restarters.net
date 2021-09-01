@@ -1,18 +1,15 @@
-import { mergeData } from 'vue-functional-data-merge'
-import Vue from '../../utils/vue'
-import KeyCodes from '../../utils/key-codes'
+import { Vue, mergeData } from '../../vue'
+import { NAME_BUTTON } from '../../constants/components'
+import { CODE_ENTER, CODE_SPACE } from '../../constants/key-codes'
+import { PROP_TYPE_BOOLEAN, PROP_TYPE_STRING } from '../../constants/props'
 import { concat } from '../../utils/array'
-import { getComponentConfig } from '../../utils/config'
 import { addClass, isTag, removeClass } from '../../utils/dom'
+import { stopEvent } from '../../utils/events'
 import { isBoolean, isEvent, isFunction } from '../../utils/inspect'
-import { omit } from '../../utils/object'
-import { pluckProps } from '../../utils/props'
+import { omit, sortKeys } from '../../utils/object'
+import { makeProp, makePropsConfigurable, pluckProps } from '../../utils/props'
 import { isLink as isLinkStrict } from '../../utils/router'
 import { BLink, props as BLinkProps } from '../link/link'
-
-// --- Constants ---
-
-const NAME = 'BButton'
 
 // --- Props ---
 
@@ -20,58 +17,33 @@ const linkProps = omit(BLinkProps, ['event', 'routerTag'])
 delete linkProps.href.default
 delete linkProps.to.default
 
-const btnProps = {
-  block: {
-    type: Boolean,
-    default: false
-  },
-  disabled: {
-    type: Boolean,
-    default: false
-  },
-  size: {
-    type: String,
-    default: () => getComponentConfig(NAME, 'size')
-  },
-  variant: {
-    type: String,
-    default: () => getComponentConfig(NAME, 'variant')
-  },
-  type: {
-    type: String,
-    default: 'button'
-  },
-  tag: {
-    type: String,
-    default: 'button'
-  },
-  pill: {
-    type: Boolean,
-    default: false
-  },
-  squared: {
-    type: Boolean,
-    default: false
-  },
-  pressed: {
+export const props = makePropsConfigurable(
+  sortKeys({
+    ...linkProps,
+    block: makeProp(PROP_TYPE_BOOLEAN, false),
+    disabled: makeProp(PROP_TYPE_BOOLEAN, false),
+    pill: makeProp(PROP_TYPE_BOOLEAN, false),
     // Tri-state: `true`, `false` or `null`
     // => On, off, not a toggle
-    type: Boolean,
-    default: null
-  }
-}
-
-export const props = { ...btnProps, ...linkProps }
+    pressed: makeProp(PROP_TYPE_BOOLEAN, null),
+    size: makeProp(PROP_TYPE_STRING),
+    squared: makeProp(PROP_TYPE_BOOLEAN, false),
+    tag: makeProp(PROP_TYPE_STRING, 'button'),
+    type: makeProp(PROP_TYPE_STRING, 'button'),
+    variant: makeProp(PROP_TYPE_STRING, 'secondary')
+  }),
+  NAME_BUTTON
+)
 
 // --- Helper methods ---
 
 // Focus handler for toggle buttons
 // Needs class of 'focus' when focused
-const handleFocus = evt => {
-  if (evt.type === 'focusin') {
-    addClass(evt.target, 'focus')
-  } else if (evt.type === 'focusout') {
-    removeClass(evt.target, 'focus')
+const handleFocus = event => {
+  if (event.type === 'focusin') {
+    addClass(event.target, 'focus')
+  } else if (event.type === 'focusout') {
+    removeClass(event.target, 'focus')
   }
 }
 
@@ -90,7 +62,7 @@ const isNonStandardTag = props => !isLink(props) && !isButton(props)
 
 // Compute required classes (non static classes)
 const computeClass = props => [
-  `btn-${props.variant || getComponentConfig(NAME, 'variant')}`,
+  `btn-${props.variant || 'secondary'}`,
   {
     [`btn-${props.size}`]: props.size,
     'btn-block': props.block,
@@ -141,9 +113,10 @@ const computeAttrs = (props, data) => {
 }
 
 // --- Main component ---
+
 // @vue/component
 export const BButton = /*#__PURE__*/ Vue.extend({
-  name: NAME,
+  name: NAME_BUTTON,
   functional: true,
   props,
   render(h, { props, data, listeners, children }) {
@@ -152,26 +125,25 @@ export const BButton = /*#__PURE__*/ Vue.extend({
     const nonStandardTag = isNonStandardTag(props)
     const hashLink = link && props.href === '#'
     const on = {
-      keydown(evt) {
+      keydown(event) {
         // When the link is a `href="#"` or a non-standard tag (has `role="button"`),
-        // we add a keydown handlers for SPACE/ENTER
+        // we add a keydown handlers for CODE_SPACE/CODE_ENTER
         /* istanbul ignore next */
         if (props.disabled || !(nonStandardTag || hashLink)) {
           return
         }
-        const { keyCode } = evt
-        // Add SPACE handler for `href="#"` and ENTER handler for non-standard tags
-        if (keyCode === KeyCodes.SPACE || (keyCode === KeyCodes.ENTER && nonStandardTag)) {
-          const target = evt.currentTarget || evt.target
-          evt.preventDefault()
+        const { keyCode } = event
+        // Add CODE_SPACE handler for `href="#"` and CODE_ENTER handler for non-standard tags
+        if (keyCode === CODE_SPACE || (keyCode === CODE_ENTER && nonStandardTag)) {
+          const target = event.currentTarget || event.target
+          stopEvent(event, { propagation: false })
           target.click()
         }
       },
-      click(evt) {
+      click(event) {
         /* istanbul ignore if: blink/button disabled should handle this */
-        if (props.disabled && isEvent(evt)) {
-          evt.stopPropagation()
-          evt.preventDefault()
+        if (props.disabled && isEvent(event)) {
+          stopEvent(event)
         } else if (toggle && listeners && listeners['update:pressed']) {
           // Send `.sync` updates to any "pressed" prop (if `.sync` listeners)
           // `concat()` will normalize the value to an array without

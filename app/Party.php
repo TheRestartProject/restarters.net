@@ -4,11 +4,10 @@ namespace App;
 
 use App\Device;
 use App\EventUsers;
-use App\Helpers\FootprintRatioCalculator;
+use App\Helpers\Fixometer;
 use Auth;
 use Carbon\Carbon;
 use DB;
-use App\Helpers\Fixometer;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Support\Str;
@@ -143,7 +142,7 @@ class Party extends Model implements Auditable
 
     public function createUserList($party, $users)
     {
-        /** reset user list **/
+        /* reset user list **/
         if (! self::deleteUserList($party)) {
             return false;
         }
@@ -379,7 +378,7 @@ class Party extends Model implements Auditable
     }
 
     /**
-     * Laravel specific code
+     * Laravel specific code.
      */
     public function scopeUpcomingEvents($query)
     {
@@ -410,7 +409,7 @@ class Party extends Model implements Auditable
 
     /**
      * [scopeUpcomingEventsInUserArea description]
-     * All upcoming events (greater than today) by a User's Location
+     * All upcoming events (greater than today) by a User's Location.
      * @author Christopher Kelker
      * @date   2019-05-30T10:15:36+010
      * @param  [type]                  $query
@@ -573,7 +572,7 @@ class Party extends Model implements Auditable
      * If the event is not of today = false
      * If the event is in progress = false
      * If the event has finished = false
-     * If the event is of today, is not in progress and has not finished = true
+     * If the event is of today, is not in progress and has not finished = true.
      * @author Christopher Kelker
      * @date   2019-06-13T15:48:05+010
      * @return bool
@@ -631,9 +630,12 @@ class Party extends Model implements Auditable
         return false;
     }
 
-    public function getEventStats($emissionRatio)
+    public function getEventStats($emissionRatio = null)
     {
-        $Device = new Device;
+        $displacementFactor = \App\Device::getDisplacementFactor();
+        if (is_null($emissionRatio)) {
+            $emissionRatio = \App\Helpers\FootprintRatioCalculator::calculateRatio();
+        }
 
         $co2Diverted = 0;
         $ewasteDiverted = 0;
@@ -653,7 +655,7 @@ class Party extends Model implements Auditable
                     $devices_powered++;
 
                     if ($device->isFixed()) {
-                        $co2Diverted += $device->co2Diverted($emissionRatio, $Device->displacement);
+                        $co2Diverted += $device->co2Diverted($emissionRatio, $displacementFactor);
                         $ewasteDiverted += $device->ewasteDiverted();
                         $fixed_powered++;
                     }
@@ -762,15 +764,15 @@ class Party extends Model implements Auditable
     public function isBeingAttendedBy($userId)
     {
         return EventsUsers::where([
-            [ 'event', '=', $this->idevents ],
-            [ 'user', '=', $userId ],
-            [ 'status', '=', 1]
+            ['event', '=', $this->idevents],
+            ['user', '=', $userId],
+            ['status', '=', 1],
         ])->exists();
     }
 
     /**
      * [users description]
-     * All Event Users
+     * All Event Users.
      *
      * @author Christopher Kelker - @date 2019-03-21
      * @editor  Christopher Kelker
@@ -784,7 +786,7 @@ class Party extends Model implements Auditable
 
     /**
      * [owner description]
-     * Party Owner/Creator
+     * Party Owner/Creator.
      *
      * @author Christopher Kelker - @date 2019-03-21
      * @editor  Christopher Kelker
@@ -860,10 +862,7 @@ class Party extends Model implements Auditable
 
     public function getWastePreventedAttribute()
     {
-        $footprintRatioCalculator = new FootprintRatioCalculator();
-        $emissionRatio = $footprintRatioCalculator->calculateRatio();
-
-        return round($this->getEventStats($emissionRatio)['ewaste'], 2);
+        return round($this->getEventStats()['ewaste'], 2);
     }
 
     public function scopeWithAll($query)
@@ -908,5 +907,10 @@ class Party extends Model implements Auditable
     public function getMaxUpdatedAtDevicesUpdatedAtAttribute()
     {
         return strtotime($this->updated_at) > strtotime($this->devices_updated_at) ? $this->updated_at : $this->devices_updated_at;
+    }
+
+    public function canDelete() {
+        $stats = $this->getEventStats();
+        return $stats['devices_powered'] == 0 && $stats['devices_unpowered'] == 0;
     }
 }

@@ -1,15 +1,20 @@
-import Vue from '../../utils/vue'
-import identity from '../../utils/identity'
+import { Vue, mergeData } from '../../vue'
+import { NAME_IMG } from '../../constants/components'
+import {
+  PROP_TYPE_ARRAY_STRING,
+  PROP_TYPE_BOOLEAN,
+  PROP_TYPE_BOOLEAN_STRING,
+  PROP_TYPE_NUMBER_STRING,
+  PROP_TYPE_STRING
+} from '../../constants/props'
 import { concat } from '../../utils/array'
-import { getComponentConfig } from '../../utils/config'
+import { identity } from '../../utils/identity'
 import { isString } from '../../utils/inspect'
 import { toInteger } from '../../utils/number'
+import { makeProp, makePropsConfigurable } from '../../utils/props'
 import { toString } from '../../utils/string'
-import { mergeData } from 'vue-functional-data-merge'
 
 // --- Constants --
-
-const NAME = 'BImg'
 
 // Blank image with fill template
 const BLANK_TEMPLATE =
@@ -18,83 +23,6 @@ const BLANK_TEMPLATE =
   'viewBox="0 0 %{w} %{h}" preserveAspectRatio="none">' +
   '<rect width="100%" height="100%" style="fill:%{f};"></rect>' +
   '</svg>'
-
-export const props = {
-  src: {
-    type: String
-    // default: null
-  },
-  srcset: {
-    type: [String, Array]
-    // default: null
-  },
-  sizes: {
-    type: [String, Array]
-    // default: null
-  },
-  alt: {
-    type: String,
-    default: null
-  },
-  width: {
-    type: [Number, String]
-    // default: null
-  },
-  height: {
-    type: [Number, String]
-    // default: null
-  },
-  block: {
-    type: Boolean,
-    default: false
-  },
-  fluid: {
-    type: Boolean,
-    default: false
-  },
-  fluidGrow: {
-    // Gives fluid images class `w-100` to make them grow to fit container
-    type: Boolean,
-    default: false
-  },
-  rounded: {
-    // rounded can be:
-    //   false: no rounding of corners
-    //   true: slightly rounded corners
-    //   'top': top corners rounded
-    //   'right': right corners rounded
-    //   'bottom': bottom corners rounded
-    //   'left': left corners rounded
-    //   'circle': circle/oval
-    //   '0': force rounding off
-    type: [Boolean, String],
-    default: false
-  },
-  thumbnail: {
-    type: Boolean,
-    default: false
-  },
-  left: {
-    type: Boolean,
-    default: false
-  },
-  right: {
-    type: Boolean,
-    default: false
-  },
-  center: {
-    type: Boolean,
-    default: false
-  },
-  blank: {
-    type: Boolean,
-    default: false
-  },
-  blankColor: {
-    type: String,
-    default: () => getComponentConfig(NAME, 'blankColor')
-  }
-}
 
 // --- Helper methods ---
 
@@ -107,23 +35,59 @@ const makeBlankImgSrc = (width, height, color) => {
   return `data:image/svg+xml;charset=UTF-8,${src}`
 }
 
+// --- Props ---
+
+export const props = makePropsConfigurable(
+  {
+    alt: makeProp(PROP_TYPE_STRING),
+    blank: makeProp(PROP_TYPE_BOOLEAN, false),
+    blankColor: makeProp(PROP_TYPE_STRING, 'transparent'),
+    block: makeProp(PROP_TYPE_BOOLEAN, false),
+    center: makeProp(PROP_TYPE_BOOLEAN, false),
+    fluid: makeProp(PROP_TYPE_BOOLEAN, false),
+    // Gives fluid images class `w-100` to make them grow to fit container
+    fluidGrow: makeProp(PROP_TYPE_BOOLEAN, false),
+    height: makeProp(PROP_TYPE_NUMBER_STRING),
+    left: makeProp(PROP_TYPE_BOOLEAN, false),
+    right: makeProp(PROP_TYPE_BOOLEAN, false),
+    // Possible values:
+    //   `false`: no rounding of corners
+    //   `true`: slightly rounded corners
+    //   'top': top corners rounded
+    //   'right': right corners rounded
+    //   'bottom': bottom corners rounded
+    //   'left': left corners rounded
+    //   'circle': circle/oval
+    //   '0': force rounding off
+    rounded: makeProp(PROP_TYPE_BOOLEAN_STRING, false),
+    sizes: makeProp(PROP_TYPE_ARRAY_STRING),
+    src: makeProp(PROP_TYPE_STRING),
+    srcset: makeProp(PROP_TYPE_ARRAY_STRING),
+    thumbnail: makeProp(PROP_TYPE_BOOLEAN, false),
+    width: makeProp(PROP_TYPE_NUMBER_STRING)
+  },
+  NAME_IMG
+)
+
+// --- Main component ---
+
 // @vue/component
 export const BImg = /*#__PURE__*/ Vue.extend({
-  name: NAME,
+  name: NAME_IMG,
   functional: true,
   props,
   render(h, { props, data }) {
-    let src = props.src
+    let { alt, src, block, fluidGrow, rounded } = props
     let width = toInteger(props.width) || null
     let height = toInteger(props.height) || null
     let align = null
-    let block = props.block
     let srcset = concat(props.srcset)
       .filter(identity)
       .join(',')
     let sizes = concat(props.sizes)
       .filter(identity)
       .join(',')
+
     if (props.blank) {
       if (!height && width) {
         height = width
@@ -148,12 +112,13 @@ export const BImg = /*#__PURE__*/ Vue.extend({
       align = 'mx-auto'
       block = true
     }
+
     return h(
       'img',
       mergeData(data, {
         attrs: {
-          src: src,
-          alt: props.alt,
+          src,
+          alt,
           width: width ? toString(width) : null,
           height: height ? toString(height) : null,
           srcset: srcset || null,
@@ -161,10 +126,10 @@ export const BImg = /*#__PURE__*/ Vue.extend({
         },
         class: {
           'img-thumbnail': props.thumbnail,
-          'img-fluid': props.fluid || props.fluidGrow,
-          'w-100': props.fluidGrow,
-          rounded: props.rounded === '' || props.rounded === true,
-          [`rounded-${props.rounded}`]: isString(props.rounded) && props.rounded !== '',
+          'img-fluid': props.fluid || fluidGrow,
+          'w-100': fluidGrow,
+          rounded: rounded === '' || rounded === true,
+          [`rounded-${rounded}`]: isString(rounded) && rounded !== '',
           [align]: align,
           'd-block': block
         }

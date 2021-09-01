@@ -71,14 +71,23 @@ For disabling specific dates or setting minimum and maximum date limits, refer t
 ```html
 <template>
   <div>
-    <b-form-group label="Select calendar interactive state">
-      <b-form-radio-group v-model="state" aria-controls="ex-disabled-readonly">
+    <b-form-group label="Select calendar interactive state" v-slot="{ ariaDescribedby }">
+      <b-form-radio-group
+        v-model="state"
+        :aria-describedby="ariaDescribedby"
+        aria-controls="ex-disabled-readonly"
+      >
         <b-form-radio value="disabled">Disabled</b-form-radio>
         <b-form-radio value="readonly">Readonly</b-form-radio>
         <b-form-radio value="normal">Normal</b-form-radio>
       </b-form-radio-group>
     </b-form-group>
-    <b-calendar id="ex-disabled-readonly" :disabled="disabled" :readonly="readonly"></b-calendar>
+
+    <b-calendar
+      id="ex-disabled-readonly"
+      :disabled="disabled"
+      :readonly="readonly"
+    ></b-calendar>
   </div>
 </template>
 
@@ -200,9 +209,16 @@ default. To specify a different theme color to use for today's date, use the `to
 
 To disable highlighting of today's date altogether, set the `no-highlight-today` prop.
 
+The navigation buttons default to the `'secondary'` theme variant. You can change this via the
+`nav-button-variant` prop.
+
 ```html
 <template>
-  <b-calendar selected-variant="success" today-variant="info"></b-calendar>
+  <b-calendar
+    selected-variant="success"
+    today-variant="info"
+    nav-button-variant="primary"
+  ></b-calendar>
 </template>
 
 <!-- b-calendar-variants.vue -->

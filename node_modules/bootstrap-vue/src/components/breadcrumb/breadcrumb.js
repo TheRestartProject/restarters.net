@@ -1,38 +1,46 @@
-import Vue from '../../utils/vue'
-import { mergeData } from 'vue-functional-data-merge'
+import { Vue, mergeData } from '../../vue'
+import { NAME_BREADCRUMB } from '../../constants/components'
+import { PROP_TYPE_ARRAY } from '../../constants/props'
 import { isArray, isObject } from '../../utils/inspect'
+import { makeProp, makePropsConfigurable } from '../../utils/props'
 import { toString } from '../../utils/string'
 import { BBreadcrumbItem } from './breadcrumb-item'
 
-export const props = {
-  items: {
-    type: Array,
-    default: null
-  }
-}
+// --- Props ---
+
+export const props = makePropsConfigurable(
+  {
+    items: makeProp(PROP_TYPE_ARRAY)
+  },
+  NAME_BREADCRUMB
+)
+
+// --- Main component ---
 
 // @vue/component
 export const BBreadcrumb = /*#__PURE__*/ Vue.extend({
-  name: 'BBreadcrumb',
+  name: NAME_BREADCRUMB,
   functional: true,
   props,
   render(h, { props, data, children }) {
+    const { items } = props
+
+    // Build child nodes from items, if given
     let childNodes = children
-    // Build child nodes from items if given.
-    if (isArray(props.items)) {
+    if (isArray(items)) {
       let activeDefined = false
-      childNodes = props.items.map((item, idx) => {
+      childNodes = items.map((item, idx) => {
         if (!isObject(item)) {
           item = { text: toString(item) }
         }
-        // Copy the value here so we can normalize it.
-        let active = item.active
+        // Copy the value here so we can normalize it
+        let { active } = item
         if (active) {
           activeDefined = true
         }
+        // Auto-detect active by position in list
         if (!active && !activeDefined) {
-          // Auto-detect active by position in list.
-          active = idx + 1 === props.items.length
+          active = idx + 1 === items.length
         }
 
         return h(BBreadcrumbItem, { props: { ...item, active } })

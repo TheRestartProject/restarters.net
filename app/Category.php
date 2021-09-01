@@ -2,6 +2,7 @@
 
 namespace App;
 
+use App\Helpers\Fixometer;
 use DB;
 use Illuminate\Database\Eloquent\Model;
 
@@ -63,6 +64,26 @@ class Category extends Model
 
     public function isMisc()
     {
-        return $this->idcategories == env('MISC_CATEGORY_ID');
+        return $this->idcategories == 46;
+    }
+
+    public function isMiscPowered()
+    {
+        return $this->idcategories == 46;
+    }
+
+    public function isMiscUnpowered()
+    {
+        return $this->idcategories == 50;
+    }
+
+    public function isPowered()
+    {
+        return $this->powered == 1;
+    }
+
+    public function isUnpowered()
+    {
+        return $this->powered == 0;
     }
 }

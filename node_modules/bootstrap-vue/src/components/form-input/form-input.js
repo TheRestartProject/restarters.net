@@ -1,15 +1,21 @@
-import Vue from '../../utils/vue'
+import { Vue } from '../../vue'
+import { NAME_FORM_INPUT } from '../../constants/components'
+import { PROP_TYPE_BOOLEAN, PROP_TYPE_NUMBER_STRING, PROP_TYPE_STRING } from '../../constants/props'
 import { arrayIncludes } from '../../utils/array'
 import { attemptBlur } from '../../utils/dom'
-import { eventOn, eventOff, eventOnOff } from '../../utils/events'
-import formMixin from '../../mixins/form'
-import formSelectionMixin from '../../mixins/form-selection'
-import formSizeMixin from '../../mixins/form-size'
-import formStateMixin from '../../mixins/form-state'
-import formTextMixin from '../../mixins/form-text'
-import formValidityMixin from '../../mixins/form-validity'
-import idMixin from '../../mixins/id'
-import listenersMixin from '../../mixins/listeners'
+import { eventOn, eventOff, eventOnOff, stopEvent } from '../../utils/events'
+import { sortKeys } from '../../utils/object'
+import { makeProp, makePropsConfigurable } from '../../utils/props'
+import { formControlMixin, props as formControlProps } from '../../mixins/form-control'
+import { formSelectionMixin } from '../../mixins/form-selection'
+import { formSizeMixin, props as formSizeProps } from '../../mixins/form-size'
+import { formStateMixin, props as formStateProps } from '../../mixins/form-state'
+import { formTextMixin, props as formTextProps } from '../../mixins/form-text'
+import { formValidityMixin } from '../../mixins/form-validity'
+import { idMixin, props as idProps } from '../../mixins/id'
+import { listenersMixin } from '../../mixins/listeners'
+
+// --- Constants ---
 
 // Valid supported input types
 const TYPES = [
@@ -30,62 +36,58 @@ const TYPES = [
   'week'
 ]
 
+// --- Props ---
+
+export const props = makePropsConfigurable(
+  sortKeys({
+    ...idProps,
+    ...formControlProps,
+    ...formSizeProps,
+    ...formStateProps,
+    ...formTextProps,
+    list: makeProp(PROP_TYPE_STRING),
+    max: makeProp(PROP_TYPE_NUMBER_STRING),
+    min: makeProp(PROP_TYPE_NUMBER_STRING),
+    // Disable mousewheel to prevent wheel from changing values (i.e. number/date)
+    noWheel: makeProp(PROP_TYPE_BOOLEAN, false),
+    step: makeProp(PROP_TYPE_NUMBER_STRING),
+    type: makeProp(PROP_TYPE_STRING, 'text', type => {
+      return arrayIncludes(TYPES, type)
+    })
+  }),
+  NAME_FORM_INPUT
+)
+
+// --- Main component ---
+
 // @vue/component
 export const BFormInput = /*#__PURE__*/ Vue.extend({
-  name: 'BFormInput',
+  name: NAME_FORM_INPUT,
   // Mixin order is important!
   mixins: [
     listenersMixin,
     idMixin,
-    formMixin,
+    formControlMixin,
     formSizeMixin,
     formStateMixin,
     formTextMixin,
     formSelectionMixin,
     formValidityMixin
   ],
-  props: {
-    // `value` prop is defined in form-text mixin
-    type: {
-      type: String,
-      default: 'text',
-      validator: type => arrayIncludes(TYPES, type)
-    },
-    noWheel: {
-      // Disable mousewheel to prevent wheel from
-      // changing values (i.e. number/date)
-      type: Boolean,
-      default: false
-    },
-    min: {
-      type: [String, Number]
-      // default: null
-    },
-    max: {
-      type: [String, Number]
-      // default: null
-    },
-    step: {
-      type: [String, Number]
-      // default: null
-    },
-    list: {
-      type: String
-      // default: null
-    }
-  },
+  props,
   computed: {
     localType() {
       // We only allow certain types
-      return arrayIncludes(TYPES, this.type) ? this.type : 'text'
+      const { type } = this
+      return arrayIncludes(TYPES, type) ? type : 'text'
     },
     computedAttrs() {
-      const { localType: type, disabled, placeholder, required, min, max, step } = this
+      const { localType: type, name, form, disabled, placeholder, required, min, max, step } = this
 
       return {
         id: this.safeId(),
-        name: this.name || null,
-        form: this.form || null,
+        name,
+        form,
         type,
         disabled,
         placeholder,
@@ -110,8 +112,8 @@ export const BFormInput = /*#__PURE__*/ Vue.extend({
     }
   },
   watch: {
-    noWheel(newVal) {
-      this.setWheelStopper(newVal)
+    noWheel(newValue) {
+      this.setWheelStopper(newValue)
     }
   },
   mounted() {
@@ -149,18 +151,18 @@ export const BFormInput = /*#__PURE__*/ Vue.extend({
     onWheelBlur() {
       eventOff(document, 'wheel', this.stopWheel)
     },
-    stopWheel(evt) {
-      evt.preventDefault()
+    stopWheel(event) {
+      stopEvent(event, { propagation: false })
       attemptBlur(this.$el)
     }
   },
   render(h) {
     return h('input', {
-      ref: 'input',
       class: this.computedClass,
       attrs: this.computedAttrs,
       domProps: { value: this.localValue },
-      on: this.computedListeners
+      on: this.computedListeners,
+      ref: 'input'
     })
   }
 })

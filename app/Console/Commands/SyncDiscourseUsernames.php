@@ -2,6 +2,7 @@
 
 namespace App\Console\Commands;
 
+use App\Services\DiscourseService;
 use App\User;
 use Illuminate\Console\Command;
 
@@ -23,15 +24,17 @@ class SyncDiscourseUsernames extends Command
 
     private $discourseApiKey;
     private $discourseApiUser;
+    private $discourseService;
 
     /**
      * Create a new command instance.
      *
      * @return void
      */
-    public function __construct()
+    public function __construct(DiscourseService $discourseService)
     {
         parent::__construct();
+        $this->discourseService = $discourseService;
 
         $discourseApiKey = env('DISCOURSE_APIKEY');
         $discourseApiUser = env('DISCOURSE_APIUSER');
@@ -57,24 +60,17 @@ class SyncDiscourseUsernames extends Command
      */
     public function handle()
     {
-        $discourseUserCount = 0;
         $usersFoundInRestarters = 0;
         $updatedUsers = 0;
 
-        $resultsPage = 1;
-        while (true) {
-            $this->line('');
-            $this->info('Results page '.$resultsPage);
-            $this->line('');
+        $usersFromDiscourse = $this->discourseService->getAllUsers();
+        $discourseUserCount = count($usersFromDiscourse);
 
-            $rawJson = $this->retrieveDiscourseUsersJson($resultsPage);
-            $usersFromDiscourse = json_decode($rawJson);
-
-            $pagedResultsCount = count($usersFromDiscourse);
-            $discourseUserCount += $pagedResultsCount;
-
-            foreach ($usersFromDiscourse as $discourseUser) {
-                $user = User::where('email', $discourseUser->email)->first();
+        foreach ($usersFromDiscourse as $discourseUser) {
+            if (property_exists($discourseUser, 'single_sign_on_record') &&
+                $discourseUser->single_sign_on_record &&
+                property_exists($discourseUser->single_sign_on_record, 'external_email')) {
+                $user = User::where('email', $discourseUser->single_sign_on_record->external_email)->first();
 
                 if (! is_null($user)) {
                     $usersFoundInRestarters++;
@@ -91,25 +87,14 @@ class SyncDiscourseUsernames extends Command
                 } else {
                     $this->error($discourseUser->username.' not found in Restarters DB');
                 }
+            } else {
+                $this::line('SKIPPING: '.$discourseUser->username.' (no email address)');
             }
-
-            if ($pagedResultsCount < 100) {
-                break;
-            }
-
-            $resultsPage++;
         }
 
         $this->info('');
         $this->info('Users found in Discourse: '.$discourseUserCount);
         $this->info('Found user count: '.$usersFoundInRestarters);
         $this->info('Updated users: '.$updatedUsers);
-    }
-
-    protected function retrieveDiscourseUsersJson($apiPage)
-    {
-        $endpoint = env('DISCOURSE_URL').'/admin/users/list/all.json?show_emails=true&page='.$apiPage.'&api_key='.$this->discourseApiKey.'&api_username='.$this->discourseApiUser;
-
-        return file_get_contents($endpoint);
     }
 }

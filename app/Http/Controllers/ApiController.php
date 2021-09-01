@@ -53,8 +53,6 @@ class ApiController extends Controller
 
     public static function partyStats($partyId)
     {
-        $emissionRatio = self::getEmissionRatio();
-
         $event = Party::where('idevents', $partyId)->first();
 
         if (! $event) {
@@ -63,7 +61,7 @@ class ApiController extends Controller
                                     ], 404);
         }
 
-        $eventStats = $event->getEventStats($emissionRatio);
+        $eventStats = $event->getEventStats();
 
         return response()
             ->json(
@@ -82,10 +80,8 @@ class ApiController extends Controller
 
     public static function groupStats($groupId)
     {
-        $emissionRatio = self::getEmissionRatio();
-
         $group = Group::where('idgroups', $groupId)->first();
-        $groupStats = $group->getGroupStats($emissionRatio);
+        $groupStats = $group->getGroupStats();
 
         return response()
             ->json([
@@ -95,13 +91,6 @@ class ApiController extends Controller
                 'kg_co2_diverted' => round($groupStats['co2']),
                 'kg_waste_diverted' => round($groupStats['waste']),
             ], 200);
-    }
-
-    public static function getEmissionRatio()
-    {
-        $footprintRatioCalculator = new FootprintRatioCalculator();
-
-        return $footprintRatioCalculator->calculateRatio();
     }
 
     public static function getEventsByGroupTag($group_tag_id)
@@ -134,7 +123,7 @@ class ApiController extends Controller
     }
 
     /**
-     * List/search devices
+     * List/search devices.
      *
      * @param  Request  $request
      * @return Response
@@ -244,8 +233,8 @@ class ApiController extends Controller
                 ),
                 DB::raw(
                     "sum(case when (devices.category = 46) then (devices.estimate + 0.0) *
-                     (select (sum(`categories`.`footprint`) * {$d->displacement}) / sum(`categories`.`weight` + 0.0) from `devices`, `categories` where `categories`.`idcategories` = `devices`.`category` and `devices`.`repair_status` = 1 and categories.idcategories != 46) 
-                     else (categories.footprint * {$d->displacement}) end) as `total_footprints`"
+                     (select (sum(`categories`.`footprint`) * {$d->getDisplacementFactor()}) / sum(`categories`.`weight` + 0.0) from `devices`, `categories` where `categories`.`idcategories` = `devices`.`category` and `devices`.`repair_status` = 1 and categories.idcategories != 46)
+                     else (categories.footprint * {$d->getDisplacementFactor()}) end) as `total_footprints`"
                 )
             )->join('events', 'events.idevents', '=', 'devices.event')
                 ->join('groups', 'events.group', '=', 'groups.idgroups')

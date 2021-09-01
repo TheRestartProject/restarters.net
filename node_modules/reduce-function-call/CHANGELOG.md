@@ -1,3 +1,7 @@
+# 1.0.3 - 2019-09-12
+
+- Bump `balanced-match` dependency version to 1.0.0
+
 # 1.0.2 - 2016-11-28
 
 - Bump `balanced-match` dependency version

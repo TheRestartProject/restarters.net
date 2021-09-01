@@ -9,7 +9,6 @@ require('./bootstrap-tokenfield.min');
 require('./bootstrap-sortable.js');
 require('select2');
 require('slick-carousel');
-require('summernote');
 require('ekko-lightbox');
 require('bootstrap4-datetimepicker');
 require('./misc/notifications');
@@ -393,25 +392,7 @@ function initAutocomplete() {
 
   function groupsMap() {
     if (jQuery('.field-geolocate').length > 0 ) {
-
       initAutocomplete();
-
-      // var map, places, infoWindow;
-      // var markers = [];
-      // var autocomplete;
-      // var countryRestrict = { 'country': 'uk' };
-      // var MARKER_PATH = 'https://developers.google.com/maps/documentation/javascript/images/marker_green';
-      // var hostnameRegexp = new RegExp('^https?://.+?/');
-
-      // map = new google.maps.Map(document.getElementById('map-plugin'), {
-      //     zoom: countries['uk'].zoom,
-      //     center: countries['uk'].center,
-      //     mapTypeControl: false,
-      //     panControl: false,
-      //     zoomControl: false,
-      //     streetViewControl: false
-      // });
-
     }
   }
 
@@ -458,36 +439,6 @@ function initAutocomplete() {
           L.marker([latitude, longitude], {icon:icon}).addTo(map);
       }
     }
-  }
-
-  function textEditor() {
-
-    if (jQuery('.rte').length > 0){
-      jQuery('.rte').summernote({
-        height: 300,
-        toolbar: [
-          ['cleaner', ['cleaner']], // The Button
-          ['style', ['style', 'bold', 'italic', 'underline', 'clear']],
-          ['para', ['ul', 'ol', 'paragraph']],
-          ['insert', ['link', 'hr']],
-          ['misc', ['codeview']]
-        ],
-        cleaner: {
-          notTime: 2400, // Time to display Notifications.
-          action: 'paste', // both|button|paste 'button' only cleans via toolbar button, 'paste' only clean when pasting content, both does both options.
-          newline: '<br />', // Summernote's default is to use '<p><br></p>'
-          notStyle: 'position:absolute;top:0;left:0;right:0', // Position of Notification
-          icon: '<i class="note-icon"><span class="fa fa-paintbrush"></span></i>',
-          keepHtml: true, // Allow the tags in keepOnlyTags
-          keepOnlyTags: ['<p>', '<br>', '<ul>', '<li>', '<b>', '<strong>', '<i>', '<a>', '<h1>', '<h2>', '<h3>', '<h4>', '<h5>', '<h6>'],
-          keepClasses: false, // Remove Classes
-          badTags: ['style', 'script', 'applet', 'embed', 'noframes', 'noscript', 'html'], // Remove full tags with contents
-          badAttributes: ['style', 'start'] // Remove attributes from remaining tags
-        }
-      });
-    }
-
-
   }
 
   function updateParticipants() {
@@ -899,7 +850,6 @@ function initAutocomplete() {
   registration();
   onboarding();
   //initTokenfields();
-  textEditor();
   numericInputs();
   eventsMap();
   truncate();
@@ -1433,10 +1383,6 @@ function initAutocomplete() {
       }
     });
 
-    $('#description').on('summernote.change', function(e) {
-      $('#free_text').val($('#description').summernote('code'));
-    });
-
     $("#registeremail").blur(function() {
 
       if ( $(this).val().length > 0 ){
@@ -1459,28 +1405,6 @@ function initAutocomplete() {
           error: function(){
             $('.invalid-feedback').hide();
           }
-        });
-
-      }
-    });
-
-    // If event has attended or invited people then user cannot delete the event
-    $("#deleteEvent").click(function (e) {
-      if($(this).attr('data-count-attended') > 0 || $(this).attr('data-count-invited') > 0 || $(this).attr('data-count-volunteers') > 0) {
-        return confirm('Are you sure you want to delete this event?');
-
-        var id = $(this).attr('data-party-id');
-
-        $.ajax({
-          headers: {
-            'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
-          },
-          type:'POST',
-          url:'/party/delete/'+id,
-          data: {
-            "id" : id,
-          },
-          dataType : 'json',
         });
 
       }
@@ -1627,7 +1551,8 @@ jQuery(document).ready(function () {
 
         'eventtimerangepicker': require('./components/EventTimeRangePicker.vue'),
         'eventdatepicker': require('./components/EventDatePicker.vue'),
-        'venueaddress': require('./components/VenueAddress.vue')
+        'venueaddress': require('./components/VenueAddress.vue'),
+        'richtexteditor': require('./components/RichTextEditor.vue')
       }
     })
   })

@@ -22,6 +22,9 @@ class TabicatOraController extends Controller
      */
     public function index(Request $request)
     {
+        // TabiCat is now closed.
+        return redirect()->action('TabicatOraController@status');
+
         if (Auth::check()) {
             $user = Auth::user();
         } else {
@@ -143,6 +146,7 @@ class TabicatOraController extends Controller
             'status' => $data,
             'user' => $user,
             'complete' => ($data['progress'][0]->total == 100),
+            'closed' => true,
         ]);
     }
 

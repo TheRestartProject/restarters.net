@@ -74,10 +74,7 @@
         {{-- END Events to Moderate (Admin Only) --}}
 
       <?php
-      $expanded_events = [];
 
-      $footprintRatioCalculator = new App\Helpers\FootprintRatioCalculator();
-      $emissionRatio = $footprintRatioCalculator->calculateRatio();
       $can_edit_group = Auth::user() && $group && (App\Helpers\Fixometer::hasRole( Auth::user(), 'Administrator') || $isCoordinatorForGroup || $is_host_of_group);
       $showCalendar = Auth::check() && (!$group || ($group && $group->isVolunteer()) || App\Helpers\Fixometer::hasRole( Auth::user(), 'Administrator'));
       $calendar_copy_url = '';
@@ -93,6 +90,7 @@
           }
       }
 
+<<<<<<< HEAD
       $expanded_events = [];
 
       foreach (array_merge($upcoming_events->all(), $past_events->all()) as $event) {
@@ -115,6 +113,8 @@
           }
       }
 
+=======
+>>>>>>> master
       ?>
 
     <div class="vue-placeholder vue-placeholder-large">

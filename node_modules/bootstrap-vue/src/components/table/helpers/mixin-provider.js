@@ -1,40 +1,43 @@
-import looseEqual from '../../../utils/loose-equal'
+import { Vue } from '../../../vue'
+import { NAME_TABLE } from '../../../constants/components'
+import { EVENT_NAME_REFRESH, EVENT_NAME_REFRESHED } from '../../../constants/events'
+import {
+  PROP_TYPE_ARRAY_FUNCTION,
+  PROP_TYPE_BOOLEAN,
+  PROP_TYPE_STRING
+} from '../../../constants/props'
+import { getRootActionEventName, getRootEventName } from '../../../utils/events'
 import { isArray, isFunction, isPromise } from '../../../utils/inspect'
+import { looseEqual } from '../../../utils/loose-equal'
 import { clone } from '../../../utils/object'
+import { makeProp } from '../../../utils/props'
 import { warn } from '../../../utils/warn'
-import listenOnRootMixin from '../../../mixins/listen-on-root'
+import { listenOnRootMixin } from '../../../mixins/listen-on-root'
 
-export default {
+// --- Constants ---
+
+const ROOT_EVENT_NAME_REFRESHED = getRootEventName(NAME_TABLE, EVENT_NAME_REFRESHED)
+const ROOT_ACTION_EVENT_NAME_REFRESH = getRootActionEventName(NAME_TABLE, EVENT_NAME_REFRESH)
+
+// --- Props ---
+
+export const props = {
+  // Passed to the context object
+  // Not used by `<b-table>` directly
+  apiUrl: makeProp(PROP_TYPE_STRING),
+  // Adds in 'Function' support
+  items: makeProp(PROP_TYPE_ARRAY_FUNCTION, []),
+  noProviderFiltering: makeProp(PROP_TYPE_BOOLEAN, false),
+  noProviderPaging: makeProp(PROP_TYPE_BOOLEAN, false),
+  noProviderSorting: makeProp(PROP_TYPE_BOOLEAN, false)
+}
+
+// --- Mixin ---
+
+// @vue/component
+export const providerMixin = Vue.extend({
   mixins: [listenOnRootMixin],
-  props: {
-    // Prop override(s)
-    items: {
-      // Adds in 'Function' support
-      type: [Array, Function],
-      /* istanbul ignore next */
-      default() /* istanbul ignore next */ {
-        return []
-      }
-    },
-    // Additional props
-    noProviderPaging: {
-      type: Boolean,
-      default: false
-    },
-    noProviderSorting: {
-      type: Boolean,
-      default: false
-    },
-    noProviderFiltering: {
-      type: Boolean,
-      default: false
-    },
-    apiUrl: {
-      // Passthrough prop. Passed to the context object. Not used by b-table directly
-      type: String,
-      default: ''
-    }
-  },
+  props,
   computed: {
     hasProvider() {
       return isFunction(this.items)
@@ -69,15 +72,15 @@ export default {
   },
   watch: {
     // Provider update triggering
-    items(newVal) {
+    items(newValue) {
       // If a new provider has been specified, trigger an update
-      if (this.hasProvider || isFunction(newVal)) {
+      if (this.hasProvider || isFunction(newValue)) {
         this.$nextTick(this._providerUpdate)
       }
     },
-    providerTriggerContext(newVal, oldVal) {
+    providerTriggerContext(newValue, oldValue) {
       // Trigger the provider to update as the relevant context values have changed.
-      if (!looseEqual(newVal, oldVal)) {
+      if (!looseEqual(newValue, oldValue)) {
         this.$nextTick(this._providerUpdate)
       }
     }
@@ -89,7 +92,7 @@ export default {
       this._providerUpdate()
     }
     // Listen for global messages to tell us to force refresh the table
-    this.listenOnRoot('bv::refresh::table', id => {
+    this.listenOnRoot(ROOT_ACTION_EVENT_NAME_REFRESH, id => {
       if (id === this.id || id === this) {
         this.refresh()
       }
@@ -97,13 +100,15 @@ export default {
   },
   methods: {
     refresh() {
+      const { items, refresh } = this
+
       // Public Method: Force a refresh of the provider function
-      this.$off('refreshed', this.refresh)
+      this.$off(EVENT_NAME_REFRESHED, refresh)
       if (this.computedBusy) {
         // Can't force an update when forced busy by user (busy prop === true)
         if (this.localBusy && this.hasProvider) {
           // But if provider running (localBusy), re-schedule refresh once `refreshed` emitted
-          this.$on('refreshed', this.refresh)
+          this.$on(EVENT_NAME_REFRESHED, refresh)
         }
       } else {
         this.clearSelected()
@@ -111,7 +116,7 @@ export default {
           this.$nextTick(this._providerUpdate)
         } else {
           /* istanbul ignore next */
-          this.localItems = isArray(this.items) ? this.items.slice() : []
+          this.localItems = isArray(items) ? items.slice() : []
         }
       }
     },
@@ -119,10 +124,10 @@ export default {
     _providerSetLocal(items) {
       this.localItems = isArray(items) ? items.slice() : []
       this.localBusy = false
-      this.$emit('refreshed')
+      this.$emit(EVENT_NAME_REFRESHED)
       // New root emit
       if (this.id) {
-        this.emitOnRoot('bv::table::refreshed', this.id)
+        this.emitOnRoot(ROOT_EVENT_NAME_REFRESHED, this.id)
       }
     },
     _providerUpdate() {
@@ -164,7 +169,7 @@ export default {
               /* istanbul ignore next */
               warn(
                 "Provider function didn't request callback and did not return a promise or data.",
-                'BTable'
+                NAME_TABLE
               )
               this.localBusy = false
             }
@@ -172,11 +177,11 @@ export default {
         } catch (e) /* istanbul ignore next */ {
           // Provider function borked on us, so we spew out a warning
           // and clear the busy state
-          warn(`Provider function error [${e.name}] ${e.message}.`, 'BTable')
+          warn(`Provider function error [${e.name}] ${e.message}.`, NAME_TABLE)
           this.localBusy = false
-          this.$off('refreshed', this.refresh)
+          this.$off(EVENT_NAME_REFRESHED, this.refresh)
         }
       })
     }
   }
-}
+})

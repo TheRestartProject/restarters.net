@@ -158,7 +158,7 @@ class NetworkTest extends TestCase
 
         $response = $this->get("/api/networks/{$network->id}/stats?api_token=1234");
         $stats = json_decode($response->getContent(), true);
-        $this->assertEquals($stats, [
+        $expectedStats = [
             'pax' => 0,
             'hours' => 0,
             'parties' => 0,
@@ -166,9 +166,15 @@ class NetworkTest extends TestCase
             'waste' => 0,
             'ewaste' => 0,
             'unpowered_waste' => 0,
+            'fixed_devices' => 0,
+            'fixed_powered' => 0,
+            'fixed_unpowered' => 0,
             'repairable_devices' => 0,
             'dead_devices' => 0,
             'no_weight' => 0,
-        ]);
+            'devices_powered' => 0,
+            'devices_unpowered' => 0,
+        ];
+        $this->assertEquals($expectedStats, $stats);
     }
 }

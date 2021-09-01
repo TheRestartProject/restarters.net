@@ -1,75 +1,56 @@
-import Vue from '../../utils/vue'
-import { mergeData } from 'vue-functional-data-merge'
+import { Vue, mergeData } from '../../vue'
+import { NAME_NAV } from '../../constants/components'
+import { PROP_TYPE_BOOLEAN, PROP_TYPE_STRING } from '../../constants/props'
+import { makeProp, makePropsConfigurable } from '../../utils/props'
 
-// -- Constants --
-
-export const props = {
-  tag: {
-    type: String,
-    default: 'ul'
-  },
-  fill: {
-    type: Boolean,
-    default: false
-  },
-  justified: {
-    type: Boolean,
-    default: false
-  },
-  align: {
-    type: String
-    // default: null
-  },
-  tabs: {
-    type: Boolean,
-    default: false
-  },
-  pills: {
-    type: Boolean,
-    default: false
-  },
-  vertical: {
-    type: Boolean,
-    default: false
-  },
-  small: {
-    type: Boolean,
-    default: false
-  },
-  cardHeader: {
-    // Set to true if placing in a card header
-    type: Boolean,
-    default: false
-  }
-}
-
-// -- Utils --
+// --- Helper methods ---
 
 const computeJustifyContent = value => {
-  // Normalize value
   value = value === 'left' ? 'start' : value === 'right' ? 'end' : value
   return `justify-content-${value}`
 }
 
+// --- Props ---
+
+export const props = makePropsConfigurable(
+  {
+    align: makeProp(PROP_TYPE_STRING),
+    // Set to `true` if placing in a card header
+    cardHeader: makeProp(PROP_TYPE_BOOLEAN, false),
+    fill: makeProp(PROP_TYPE_BOOLEAN, false),
+    justified: makeProp(PROP_TYPE_BOOLEAN, false),
+    pills: makeProp(PROP_TYPE_BOOLEAN, false),
+    small: makeProp(PROP_TYPE_BOOLEAN, false),
+    tabs: makeProp(PROP_TYPE_BOOLEAN, false),
+    tag: makeProp(PROP_TYPE_STRING, 'ul'),
+    vertical: makeProp(PROP_TYPE_BOOLEAN, false)
+  },
+  NAME_NAV
+)
+
+// --- Main component ---
+
 // @vue/component
 export const BNav = /*#__PURE__*/ Vue.extend({
-  name: 'BNav',
+  name: NAME_NAV,
   functional: true,
   props,
   render(h, { props, data, children }) {
+    const { tabs, pills, vertical, align, cardHeader } = props
+
     return h(
       props.tag,
       mergeData(data, {
         staticClass: 'nav',
         class: {
-          'nav-tabs': props.tabs,
-          'nav-pills': props.pills && !props.tabs,
-          'card-header-tabs': !props.vertical && props.cardHeader && props.tabs,
-          'card-header-pills': !props.vertical && props.cardHeader && props.pills && !props.tabs,
-          'flex-column': props.vertical,
-          'nav-fill': !props.vertical && props.fill,
-          'nav-justified': !props.vertical && props.justified,
-          [computeJustifyContent(props.align)]: !props.vertical && props.align,
+          'nav-tabs': tabs,
+          'nav-pills': pills && !tabs,
+          'card-header-tabs': !vertical && cardHeader && tabs,
+          'card-header-pills': !vertical && cardHeader && pills && !tabs,
+          'flex-column': vertical,
+          'nav-fill': !vertical && props.fill,
+          'nav-justified': !vertical && props.justified,
+          [computeJustifyContent(align)]: !vertical && align,
           small: props.small
         }
       }),

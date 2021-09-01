@@ -5,30 +5,30 @@ namespace App\Http\Controllers;
 use App\Device;
 use App\Group;
 use App\GroupTags;
+use App\Helpers\Fixometer;
 use App\Helpers\FootprintRatioCalculator;
 use App\Party;
 use App\Search;
 use App\User;
 use Auth;
 use DateTime;
-use App\Helpers\Fixometer;
 
 class SearchController extends Controller
 {
-    public $TotalWeight;
-    public $TotalEmission;
-    public $EmissionRatio;
+    // public $TotalWeight;
+    // public $TotalEmission;
+    // public $EmissionRatio;
 
     public function __construct()
     {
-        $Device = new Device;
-        $weights = $Device->getWeights();
+        // $Device = new Device;
+        // $weights = $Device->getWeights();
 
-        $this->TotalWeight = $weights[0]->total_weights;
-        $this->TotalEmission = $weights[0]->total_footprints;
+        // $this->TotalWeight = $weights[0]->total_weights;
+        // $this->TotalEmission = $weights[0]->total_footprints;
 
-        $footprintRatioCalculator = new FootprintRatioCalculator();
-        $this->EmissionRatio = $footprintRatioCalculator->calculateRatio();
+        //
+        // $this->EmissionRatio = FootprintRatioCalculator::calculateRatio();
     }
 
     public function index($response = null)
@@ -42,7 +42,7 @@ class SearchController extends Controller
         $user = User::find(Auth::id());
 
         $allowedParties = [];
-        /** Get default data for the search dropdowns **/
+        /* Get default data for the search dropdowns **/
         if (Fixometer::hasRole($user, 'Administrator')) {
             $groups = $Groups->findList();
             $parties = $Parties->findAllSearchable();
@@ -79,7 +79,7 @@ class SearchController extends Controller
             $fromTimeStamp = null;
             $group_tags = null;
 
-            /** collect params **/
+            /* collect params **/
             if (isset($_GET['groups'])) {
                 $searched_groups = filter_var_array($_GET['groups'], FILTER_SANITIZE_NUMBER_INT);
             }
@@ -119,6 +119,8 @@ class SearchController extends Controller
                 $totalCO2 = 0;
                 $totalWeight = 0;
 
+                $emissionRatio = FootprintRatioCalculator::calculateRatio();
+
                 foreach ($PartyList as $party) {
                     $partyIds[] = $party->idevents;
 
@@ -136,7 +138,7 @@ class SearchController extends Controller
                             case 1:
                                 $party->fixed_devices++;
 
-                                $party->co2 += $device->co2Diverted($this->EmissionRatio, $Device->displacement);
+                                $party->co2 += $device->co2Diverted($emissionRatio, $Device->getDisplacementFactor());
 
                                 $party->ewaste += $device->ewasteDiverted();
 

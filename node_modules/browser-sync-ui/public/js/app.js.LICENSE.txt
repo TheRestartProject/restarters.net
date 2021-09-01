@@ -1,0 +1,7 @@
+/*! https://mths.be/utf8js v2.1.2 by @mathias */
+
+/**
+ * @license AngularJS v1.8.2
+ * (c) 2010-2020 Google LLC. http://angularjs.org
+ * License: MIT
+ */

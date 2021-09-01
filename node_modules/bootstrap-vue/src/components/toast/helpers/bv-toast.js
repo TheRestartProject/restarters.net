@@ -2,9 +2,18 @@
  * Plugin for adding `$bvToast` property to all Vue instances
  */
 
+import { NAME_TOAST, NAME_TOASTER, NAME_TOAST_POP } from '../../../constants/components'
+import {
+  EVENT_NAME_DESTROYED,
+  EVENT_NAME_HIDDEN,
+  EVENT_NAME_HIDE,
+  EVENT_NAME_SHOW,
+  HOOK_EVENT_NAME_DESTROYED
+} from '../../../constants/events'
 import { concat } from '../../../utils/array'
 import { getComponentConfig } from '../../../utils/config'
 import { requestAF } from '../../../utils/dom'
+import { getRootEventName, getRootActionEventName } from '../../../utils/events'
 import { isUndefined, isString } from '../../../utils/inspect'
 import {
   assign,
@@ -36,7 +45,7 @@ const propsToSlots = {
   title: 'toast-title'
 }
 
-// --- Utility methods ---
+// --- Helper methods ---
 
 // Method to filter only recognized props that are not undefined
 const filterOptions = options => {
@@ -53,40 +62,40 @@ const plugin = Vue => {
   // Create a private sub-component constructor that
   // extends BToast and self-destructs after hidden
   // @vue/component
-  const BToastPop = Vue.extend({
-    name: 'BToastPop',
+  const BVToastPop = Vue.extend({
+    name: NAME_TOAST_POP,
     extends: BToast,
     destroyed() {
       // Make sure we not in document any more
-      if (this.$el && this.$el.parentNode) {
-        this.$el.parentNode.removeChild(this.$el)
+      const { $el } = this
+      if ($el && $el.parentNode) {
+        $el.parentNode.removeChild($el)
       }
     },
     mounted() {
-      const self = this
       // Self destruct handler
       const handleDestroy = () => {
         // Ensure the toast has been force hidden
-        self.localShow = false
-        self.doRender = false
-        self.$nextTick(() => {
-          self.$nextTick(() => {
+        this.localShow = false
+        this.doRender = false
+        this.$nextTick(() => {
+          this.$nextTick(() => {
             // In a `requestAF()` to release control back to application
             // and to allow the portal-target time to remove the content
             requestAF(() => {
-              self.$destroy()
+              this.$destroy()
             })
           })
         })
       }
       // Self destruct if parent destroyed
-      this.$parent.$once('hook:destroyed', handleDestroy)
+      this.$parent.$once(HOOK_EVENT_NAME_DESTROYED, handleDestroy)
       // Self destruct after hidden
-      this.$once('hidden', handleDestroy)
+      this.$once(EVENT_NAME_HIDDEN, handleDestroy)
       // Self destruct when toaster is destroyed
-      this.listenOnRoot('bv::toaster::destroyed', toaster => {
+      this.listenOnRoot(getRootEventName(NAME_TOASTER, EVENT_NAME_DESTROYED), toaster => {
         /* istanbul ignore next: hard to test */
-        if (toaster === self.toaster) {
+        if (toaster === this.toaster) {
           handleDestroy()
         }
       })
@@ -99,13 +108,13 @@ const plugin = Vue => {
       /* istanbul ignore next */
       return
     }
-    // Create an instance of `BToastPop` component
-    const toast = new BToastPop({
+    // Create an instance of `BVToastPop` component
+    const toast = new BVToastPop({
       // We set parent as the local VM so these toasts can emit events on the
       // app `$root`, and it ensures `BToast` is destroyed when parent is destroyed
       parent: $parent,
       propsData: {
-        ...filterOptions(getComponentConfig('BToast') || {}),
+        ...filterOptions(getComponentConfig(NAME_TOAST)),
         // Add in (filtered) user supplied props
         ...omit(props, keys(propsToSlots)),
         // Props that can't be overridden
@@ -157,13 +166,13 @@ const plugin = Vue => {
     // shows a `<b-toast>` component with the specified ID
     show(id) {
       if (id) {
-        this._root.$emit('bv::show::toast', id)
+        this._root.$emit(getRootActionEventName(NAME_TOAST, EVENT_NAME_SHOW), id)
       }
     }
 
     // Hide a toast with specified ID, or if not ID all toasts
     hide(id = null) {
-      this._root.$emit('bv::hide::toast', id)
+      this._root.$emit(getRootActionEventName(NAME_TOAST, EVENT_NAME_HIDE), id)
     }
   }
 
@@ -183,7 +192,7 @@ const plugin = Vue => {
       get() {
         /* istanbul ignore next */
         if (!this || !this[PROP_NAME_PRIV]) {
-          warn(`"${PROP_NAME}" must be accessed from a Vue instance "this" context.`, 'BToast')
+          warn(`"${PROP_NAME}" must be accessed from a Vue instance "this" context.`, NAME_TOAST)
         }
         return this[PROP_NAME_PRIV]
       }

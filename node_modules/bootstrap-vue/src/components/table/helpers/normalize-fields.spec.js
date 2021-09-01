@@ -1,4 +1,4 @@
-import normalizeFields from './normalize-fields'
+import { normalizeFields } from './normalize-fields'
 
 describe('table/helpers/normalize-fields', () => {
   it('uses first row of items when fields are not defined and items passed', async () => {
@@ -64,7 +64,7 @@ describe('table/helpers/normalize-fields', () => {
     const formatter = value => value
     const arr1 = [{ foo: formatter }]
 
-    expect(normalizeFields(arr1, [])).toEqual([{ key: 'foo', label: 'Foo', formatter: formatter }])
+    expect(normalizeFields(arr1, [])).toEqual([{ key: 'foo', label: 'Foo', formatter }])
   })
 
   it('handles when "key: false" shortcut', async () => {

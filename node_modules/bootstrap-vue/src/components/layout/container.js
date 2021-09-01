@@ -1,32 +1,37 @@
-import Vue from '../../utils/vue'
-import { mergeData } from 'vue-functional-data-merge'
+import { Vue, mergeData } from '../../vue'
+import { NAME_CONTAINER } from '../../constants/components'
+import { PROP_TYPE_BOOLEAN_STRING, PROP_TYPE_STRING } from '../../constants/props'
+import { makeProp, makePropsConfigurable } from '../../utils/props'
 
-export const props = {
-  tag: {
-    type: String,
-    default: 'div'
-  },
-  fluid: {
+// --- Props ---
+
+export const props = makePropsConfigurable(
+  {
     // String breakpoint name new in Bootstrap v4.4.x
-    type: [Boolean, String],
-    default: false
-  }
-}
+    fluid: makeProp(PROP_TYPE_BOOLEAN_STRING, false),
+    tag: makeProp(PROP_TYPE_STRING, 'div')
+  },
+  NAME_CONTAINER
+)
+
+// --- Main component ---
 
 // @vue/component
 export const BContainer = /*#__PURE__*/ Vue.extend({
-  name: 'BContainer',
+  name: NAME_CONTAINER,
   functional: true,
   props,
   render(h, { props, data, children }) {
+    const { fluid } = props
+
     return h(
       props.tag,
       mergeData(data, {
         class: {
-          container: !(props.fluid || props.fluid === ''),
-          'container-fluid': props.fluid === true || props.fluid === '',
+          container: !(fluid || fluid === ''),
+          'container-fluid': fluid === true || fluid === '',
           // Bootstrap v4.4+ responsive containers
-          [`container-${props.fluid}`]: props.fluid && props.fluid !== true
+          [`container-${fluid}`]: fluid && fluid !== true
         }
       }),
       children

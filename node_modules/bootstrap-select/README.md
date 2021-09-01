@@ -46,24 +46,24 @@ Bootstrap-select requires jQuery v1.9.1+, Bootstrap’s dropdown.js component, a
 
 Several quick start options are available:
 
-- [Download the latest release.](https://github.com/snapappointments/bootstrap-select/archive/v1.13.17.zip)
+- [Download the latest release.](https://github.com/snapappointments/bootstrap-select/archive/v1.13.18.zip)
 - Clone the repo: `git clone https://github.com/snapappointments/bootstrap-select.git`
 - Install with [npm](https://www.npmjs.com/package/bootstrap-select): `npm install bootstrap-select`
-- Install with [yarn](https://yarn.pm/bootstrap-select): `yarn add bootstrap-select`
-- Install with [Composer](https://getcomposer.org): `composer require snapappointments/bootstrap-select`
+- Install with [yarn](https://yarnpkg.com/package/bootstrap-select): `yarn add bootstrap-select`
+- Install with [Composer](https://packagist.org/packages/snapappointments/bootstrap-select): `composer require snapappointments/bootstrap-select`
 - Install with [NuGet](https://www.nuget.org/packages/bootstrap-select): `Install-Package bootstrap-select`
 - Install with [Bower](https://bower.io): `bower install bootstrap-select`
 - Install via CDN ([cdnjs](https://cdnjs.com/libraries/bootstrap-select) or [jsDelivr](https://www.jsdelivr.com/package/npm/bootstrap-select)):
 
 ```html
 <!-- Latest compiled and minified CSS -->
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-select@1.13.17/dist/css/bootstrap-select.min.css">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-select@1.13.18/dist/css/bootstrap-select.min.css">
 
 <!-- Latest compiled and minified JavaScript -->
-<script src="https://cdn.jsdelivr.net/npm/bootstrap-select@1.13.17/dist/js/bootstrap-select.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap-select@1.13.18/dist/js/bootstrap-select.min.js"></script>
 
 <!-- (Optional) Latest compiled and minified JavaScript translation files -->
-<script src="https://cdn.jsdelivr.net/npm/bootstrap-select@1.13.17/dist/js/i18n/defaults-*.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap-select@1.13.18/dist/js/i18n/defaults-*.min.js"></script>
 ```
 > The CDN is updated after the release is made public, which means that there is a delay between the publishing of a release and its availability on the CDN.
 

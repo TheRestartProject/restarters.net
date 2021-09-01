@@ -1,6 +1,6 @@
 /**!
  * @fileOverview Kickass library to create and place poppers near their reference elements.
- * @version 1.14.4
+ * @version 1.16.1
  * @license
  * Copyright (c) 2016 Federico Zivolo and contributors
  *
@@ -34,7 +34,8 @@ function getStyleComputedProperty(element, property) {
     return [];
   }
   // NOTE: 1 DOM access here
-  const css = getComputedStyle(element, null);
+  const window = element.ownerDocument.defaultView;
+  const css = window.getComputedStyle(element, null);
   return property ? css[property] : css;
 }
 
@@ -82,7 +83,18 @@ function getScrollParent(element) {
   return getScrollParent(getParentNode(element));
 }
 
-var isBrowser = typeof window !== 'undefined' && typeof document !== 'undefined';
+/**
+ * Returns the reference node of the reference object, or the reference object itself.
+ * @method
+ * @memberof Popper.Utils
+ * @param {Element|Object} reference - the reference element (the popper will be relative to this)
+ * @returns {Element} parent
+ */
+function getReferenceNode(reference) {
+  return reference && reference.referenceNode ? reference.referenceNode : reference;
+}
+
+var isBrowser = typeof window !== 'undefined' && typeof document !== 'undefined' && typeof navigator !== 'undefined';
 
 const isIE11 = isBrowser && !!(window.MSInputMethodContext && document.documentMode);
 const isIE10 = isBrowser && /MSIE 10/.test(navigator.userAgent);
@@ -119,7 +131,7 @@ function getOffsetParent(element) {
   const noOffsetParent = isIE(10) ? document.body : null;
 
   // NOTE: 1 DOM access here
-  let offsetParent = element.offsetParent;
+  let offsetParent = element.offsetParent || null;
   // Skip hidden elements which don't have an offsetParent
   while (offsetParent === noOffsetParent && element.nextElementSibling) {
     offsetParent = (element = element.nextElementSibling).offsetParent;
@@ -131,9 +143,9 @@ function getOffsetParent(element) {
     return element ? element.ownerDocument.documentElement : document.documentElement;
   }
 
-  // .offsetParent will return the closest TD or TABLE in case
+  // .offsetParent will return the closest TH, TD or TABLE in case
   // no offsetParent is present, I hate this job...
-  if (['TD', 'TABLE'].indexOf(offsetParent.nodeName) !== -1 && getStyleComputedProperty(offsetParent, 'position') === 'static') {
+  if (['TH', 'TD', 'TABLE'].indexOf(offsetParent.nodeName) !== -1 && getStyleComputedProperty(offsetParent, 'position') === 'static') {
     return getOffsetParent(offsetParent);
   }
 
@@ -261,7 +273,7 @@ function getBordersSize(styles, axis) {
   const sideA = axis === 'x' ? 'Left' : 'Top';
   const sideB = sideA === 'Left' ? 'Right' : 'Bottom';
 
-  return parseFloat(styles[`border${sideA}Width`], 10) + parseFloat(styles[`border${sideB}Width`], 10);
+  return parseFloat(styles[`border${sideA}Width`]) + parseFloat(styles[`border${sideB}Width`]);
 }
 
 function getSize(axis, body, html, computedStyle) {
@@ -343,8 +355,8 @@ function getBoundingClientRect(element) {
 
   // subtract scrollbar size from sizes
   const sizes = element.nodeName === 'HTML' ? getWindowSizes(element.ownerDocument) : {};
-  const width = sizes.width || element.clientWidth || result.right - result.left;
-  const height = sizes.height || element.clientHeight || result.bottom - result.top;
+  const width = sizes.width || element.clientWidth || result.width;
+  const height = sizes.height || element.clientHeight || result.height;
 
   let horizScrollbar = element.offsetWidth - width;
   let vertScrollbar = element.offsetHeight - height;
@@ -371,8 +383,8 @@ function getOffsetRectRelativeToArbitraryNode(children, parent, fixedPosition = 
   const scrollParent = getScrollParent(children);
 
   const styles = getStyleComputedProperty(parent);
-  const borderTopWidth = parseFloat(styles.borderTopWidth, 10);
-  const borderLeftWidth = parseFloat(styles.borderLeftWidth, 10);
+  const borderTopWidth = parseFloat(styles.borderTopWidth);
+  const borderLeftWidth = parseFloat(styles.borderLeftWidth);
 
   // In cases where the parent is fixed, we must ignore negative scroll in offset calc
   if (fixedPosition && isHTML) {
@@ -393,8 +405,8 @@ function getOffsetRectRelativeToArbitraryNode(children, parent, fixedPosition = 
   // differently when margins are applied to it. The margins are included in
   // the box of the documentElement, in the other cases not.
   if (!isIE10 && isHTML) {
-    const marginTop = parseFloat(styles.marginTop, 10);
-    const marginLeft = parseFloat(styles.marginLeft, 10);
+    const marginTop = parseFloat(styles.marginTop);
+    const marginLeft = parseFloat(styles.marginLeft);
 
     offsets.top -= borderTopWidth - marginTop;
     offsets.bottom -= borderTopWidth - marginTop;
@@ -448,7 +460,11 @@ function isFixed(element) {
   if (getStyleComputedProperty(element, 'position') === 'fixed') {
     return true;
   }
-  return isFixed(getParentNode(element));
+  const parentNode = getParentNode(element);
+  if (!parentNode) {
+    return false;
+  }
+  return isFixed(parentNode);
 }
 
 /**
@@ -486,7 +502,7 @@ function getBoundaries(popper, reference, padding, boundariesElement, fixedPosit
   // NOTE: 1 DOM access here
 
   let boundaries = { top: 0, left: 0 };
-  const offsetParent = fixedPosition ? getFixedPositionOffsetParent(popper) : findCommonOffsetParent(popper, reference);
+  const offsetParent = fixedPosition ? getFixedPositionOffsetParent(popper) : findCommonOffsetParent(popper, getReferenceNode(reference));
 
   // Handle viewport case
   if (boundariesElement === 'viewport') {
@@ -585,14 +601,15 @@ function computeAutoPlacement(placement, refRect, popper, reference, boundariesE
   return computedPlacement + (variation ? `-${variation}` : '');
 }
 
-const longerTimeoutBrowsers = ['Edge', 'Trident', 'Firefox'];
-let timeoutDuration = 0;
-for (let i = 0; i < longerTimeoutBrowsers.length; i += 1) {
-  if (isBrowser && navigator.userAgent.indexOf(longerTimeoutBrowsers[i]) >= 0) {
-    timeoutDuration = 1;
-    break;
+const timeoutDuration = function () {
+  const longerTimeoutBrowsers = ['Edge', 'Trident', 'Firefox'];
+  for (let i = 0; i < longerTimeoutBrowsers.length; i += 1) {
+    if (isBrowser && navigator.userAgent.indexOf(longerTimeoutBrowsers[i]) >= 0) {
+      return 1;
+    }
   }
-}
+  return 0;
+}();
 
 function microtaskDebounce(fn) {
   let called = false;
@@ -711,9 +728,10 @@ function getOffsetRect(element) {
  * @returns {Object} object containing width and height properties
  */
 function getOuterSizes(element) {
-  const styles = getComputedStyle(element);
-  const x = parseFloat(styles.marginTop) + parseFloat(styles.marginBottom);
-  const y = parseFloat(styles.marginLeft) + parseFloat(styles.marginRight);
+  const window = element.ownerDocument.defaultView;
+  const styles = window.getComputedStyle(element);
+  const x = parseFloat(styles.marginTop || 0) + parseFloat(styles.marginBottom || 0);
+  const y = parseFloat(styles.marginLeft || 0) + parseFloat(styles.marginRight || 0);
   const result = {
     width: element.offsetWidth + y,
     height: element.offsetHeight + x
@@ -783,7 +801,7 @@ function getPopperOffsets(popper, referenceOffsets, placement) {
  * @returns {Object} An object containing the offsets which will be applied to the popper
  */
 function getReferenceOffsets(state, popper, reference, fixedPosition = null) {
-  const commonOffsetParent = fixedPosition ? getFixedPositionOffsetParent(popper) : findCommonOffsetParent(popper, reference);
+  const commonOffsetParent = fixedPosition ? getFixedPositionOffsetParent(popper) : findCommonOffsetParent(popper, getReferenceNode(reference));
   return getOffsetRectRelativeToArbitraryNode(reference, commonOffsetParent, fixedPosition);
 }
 

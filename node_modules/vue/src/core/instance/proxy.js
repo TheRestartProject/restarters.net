@@ -9,7 +9,7 @@ if (process.env.NODE_ENV !== 'production') {
   const allowedGlobals = makeMap(
     'Infinity,undefined,NaN,isFinite,isNaN,' +
     'parseFloat,parseInt,decodeURI,decodeURIComponent,encodeURI,encodeURIComponent,' +
-    'Math,Number,Date,Array,Object,Boolean,String,RegExp,Map,Set,JSON,Intl,' +
+    'Math,Number,Date,Array,Object,Boolean,String,RegExp,Map,Set,JSON,Intl,BigInt,' +
     'require' // for Webpack/Browserify
   )
 
@@ -20,6 +20,16 @@ if (process.env.NODE_ENV !== 'production') {
       'either in the data option, or for class-based components, by ' +
       'initializing the property. ' +
       'See: https://vuejs.org/v2/guide/reactivity.html#Declaring-Reactive-Properties.',
+      target
+    )
+  }
+
+  const warnReservedPrefix = (target, key) => {
+    warn(
+      `Property "${key}" must be accessed with "$data.${key}" because ` +
+      'properties starting with "$" or "_" are not proxied in the Vue instance to ' +
+      'prevent conflicts with Vue internals. ' +
+      'See: https://vuejs.org/v2/api/#data',
       target
     )
   }
@@ -45,9 +55,11 @@ if (process.env.NODE_ENV !== 'production') {
   const hasHandler = {
     has (target, key) {
       const has = key in target
-      const isAllowed = allowedGlobals(key) || key.charAt(0) === '_'
+      const isAllowed = allowedGlobals(key) ||
+        (typeof key === 'string' && key.charAt(0) === '_' && !(key in target.$data))
       if (!has && !isAllowed) {
-        warnNonPresent(target, key)
+        if (key in target.$data) warnReservedPrefix(target, key)
+        else warnNonPresent(target, key)
       }
       return has || !isAllowed
     }
@@ -56,7 +68,8 @@ if (process.env.NODE_ENV !== 'production') {
   const getHandler = {
     get (target, key) {
       if (typeof key === 'string' && !(key in target)) {
-        warnNonPresent(target, key)
+        if (key in target.$data) warnReservedPrefix(target, key)
+        else warnNonPresent(target, key)
       }
       return target[key]
     }

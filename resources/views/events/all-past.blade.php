@@ -34,7 +34,7 @@
                             <tbody>
                                 @if( !$past_events->isEmpty() )
                                 @foreach ($past_events as $event)
-                                @include('partials.tables.row-events', ['invite' => false, 'EmissionRatio' => $EmissionRatio])
+                                @include('partials.tables.row-events', ['invite' => false])
                                 @endforeach
                                 @else
                                 <tr>

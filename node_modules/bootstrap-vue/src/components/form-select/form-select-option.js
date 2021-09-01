@@ -1,26 +1,28 @@
-import Vue from '../../utils/vue'
-import { mergeData } from 'vue-functional-data-merge'
+import { Vue, mergeData } from '../../vue'
+import { NAME_FORM_SELECT_OPTION } from '../../constants/components'
+import { PROP_TYPE_ANY, PROP_TYPE_BOOLEAN } from '../../constants/props'
+import { makeProp, makePropsConfigurable } from '../../utils/props'
 
-const NAME = 'BFormSelectOption'
+// --- Props ---
 
-export const props = {
-  value: {
-    // type: [String, Number, Boolean, Object],
-    required: true
+export const props = makePropsConfigurable(
+  {
+    disabled: makeProp(PROP_TYPE_BOOLEAN, false),
+    value: makeProp(PROP_TYPE_ANY, undefined, true) // Required
   },
-  disabled: {
-    type: Boolean,
-    default: false
-  }
-}
+  NAME_FORM_SELECT_OPTION
+)
+
+// --- Main component ---
 
 // @vue/component
 export const BFormSelectOption = /*#__PURE__*/ Vue.extend({
-  name: NAME,
+  name: NAME_FORM_SELECT_OPTION,
   functional: true,
   props,
   render(h, { props, data, children }) {
     const { value, disabled } = props
+
     return h(
       'option',
       mergeData(data, {

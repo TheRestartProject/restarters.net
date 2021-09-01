@@ -6,7 +6,6 @@ $vendorDir = dirname(dirname(__FILE__));
 $baseDir = dirname($vendorDir);
 
 return array(
-    'UpdateHelper\\' => array($vendorDir . '/kylekatarnls/update-helper/src'),
     'Sentry\\Laravel\\' => array($vendorDir . '/sentry/sentry-laravel/src'),
     'Parsedown' => array($vendorDir . '/erusev/parsedown'),
     'Msurguy\\Honeypot\\' => array($vendorDir . '/msurguy/honeypot/src'),

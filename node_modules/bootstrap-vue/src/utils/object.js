@@ -1,4 +1,4 @@
-import { isArray } from './array'
+import { isObject } from './inspect'
 
 // --- Static ---
 
@@ -23,65 +23,46 @@ export const toString = obj => Object.prototype.toString.call(obj)
 
 // --- Utilities ---
 
-/**
- * Quick object check - this is primarily used to tell
- * Objects from primitive values when we know the value
- * is a JSON-compliant type.
- * Note object could be a complex type like array, date, etc.
- */
-export const isObject = obj => obj !== null && typeof obj === 'object'
-
-/**
- * Strict object type check. Only returns true
- * for plain JavaScript objects.
- */
-export const isPlainObject = obj => Object.prototype.toString.call(obj) === '[object Object]'
-
-/**
- * Shallow copy an object. If the passed in object
- * is null or undefined, returns an empty object
- */
+// Shallow copy an object
 export const clone = obj => ({ ...obj })
 
-/**
- * Return a shallow copy of object with the specified properties only
- * @link https://gist.github.com/bisubus/2da8af7e801ffd813fab7ac221aa7afc
- */
+// Return a shallow copy of object with the specified properties only
+// See: https://gist.github.com/bisubus/2da8af7e801ffd813fab7ac221aa7afc
 export const pick = (obj, props) =>
   keys(obj)
     .filter(key => props.indexOf(key) !== -1)
     .reduce((result, key) => ({ ...result, [key]: obj[key] }), {})
 
-/**
- * Return a shallow copy of object with the specified properties omitted
- * @link https://gist.github.com/bisubus/2da8af7e801ffd813fab7ac221aa7afc
- */
+// Return a shallow copy of object with the specified properties omitted
+// See: https://gist.github.com/bisubus/2da8af7e801ffd813fab7ac221aa7afc
 export const omit = (obj, props) =>
   keys(obj)
     .filter(key => props.indexOf(key) === -1)
     .reduce((result, key) => ({ ...result, [key]: obj[key] }), {})
 
-/**
- * Convenience method to create a read-only descriptor
- */
-export const readonlyDescriptor = () => ({ enumerable: true, configurable: false, writable: false })
-
-/**
- * Deep-freezes and object, making it immutable / read-only.
- * Returns the same object passed-in, but frozen.
- * Freezes inner object/array/values first.
- * https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object/freeze
- * Note: this method will not work for property values using Symbol() as a key
- */
-export const deepFreeze = obj => {
-  // Retrieve the property names defined on object/array
-  // Note: `keys` will ignore properties that are keyed by a `Symbol()`
-  const props = keys(obj)
-  // Iterate over each prop and recursively freeze it
-  props.forEach(prop => {
-    const value = obj[prop]
-    // If value is a plain object or array, we deepFreeze it
-    obj[prop] = value && (isPlainObject(value) || isArray(value)) ? deepFreeze(value) : value
-  })
-  return freeze(obj)
+// Merges two object deeply together
+// See: https://gist.github.com/Salakar/1d7137de9cb8b704e48a
+export const mergeDeep = (target, source) => {
+  if (isObject(target) && isObject(source)) {
+    keys(source).forEach(key => {
+      if (isObject(source[key])) {
+        if (!target[key] || !isObject(target[key])) {
+          target[key] = source[key]
+        }
+        mergeDeep(target[key], source[key])
+      } else {
+        assign(target, { [key]: source[key] })
+      }
+    })
+  }
+  return target
 }
+
+// Returns a shallow copy of the object with keys in sorted order
+export const sortKeys = obj =>
+  keys(obj)
+    .sort()
+    .reduce((result, key) => ({ ...result, [key]: obj[key] }), {})
+
+// Convenience method to create a read-only descriptor
+export const readonlyDescriptor = () => ({ enumerable: true, configurable: false, writable: false })

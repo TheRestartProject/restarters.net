@@ -12,7 +12,7 @@ export var Status;
     Status["RateLimit"] = "rate_limit";
     /** The event could not be processed. */
     Status["Invalid"] = "invalid";
-    /** A server-side error ocurred during submission. */
+    /** A server-side error occurred during submission. */
     Status["Failed"] = "failed";
 })(Status || (Status = {}));
 // eslint-disable-next-line @typescript-eslint/no-namespace, import/export

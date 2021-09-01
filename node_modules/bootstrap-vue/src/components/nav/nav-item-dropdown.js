@@ -1,34 +1,47 @@
-import Vue from '../../utils/vue'
+import { Vue } from '../../vue'
+import { NAME_NAV_ITEM_DROPDOWN } from '../../constants/components'
+import { SLOT_NAME_BUTTON_CONTENT, SLOT_NAME_DEFAULT, SLOT_NAME_TEXT } from '../../constants/slots'
 import { htmlOrText } from '../../utils/html'
-import { pluckProps } from '../../utils/props'
-import dropdownMixin from '../../mixins/dropdown'
-import idMixin from '../../mixins/id'
-import normalizeSlotMixin from '../../mixins/normalize-slot'
+import { keys, pick, sortKeys } from '../../utils/object'
+import { makePropsConfigurable } from '../../utils/props'
+import { dropdownMixin, props as dropdownProps } from '../../mixins/dropdown'
+import { idMixin, props as idProps } from '../../mixins/id'
+import { normalizeSlotMixin } from '../../mixins/normalize-slot'
 import { props as BDropdownProps } from '../dropdown/dropdown'
 import { BLink } from '../link/link'
 
 // --- Props ---
-export const props = pluckProps(
-  ['text', 'html', 'menuClass', 'toggleClass', 'noCaret', 'role', 'lazy'],
-  BDropdownProps
+
+export const props = makePropsConfigurable(
+  sortKeys({
+    ...idProps,
+    ...pick(BDropdownProps, [
+      ...keys(dropdownProps),
+      'html',
+      'lazy',
+      'menuClass',
+      'noCaret',
+      'role',
+      'text',
+      'toggleClass'
+    ])
+  }),
+  NAME_NAV_ITEM_DROPDOWN
 )
 
 // --- Main component ---
+
 // @vue/component
 export const BNavItemDropdown = /*#__PURE__*/ Vue.extend({
-  name: 'BNavItemDropdown',
+  name: NAME_NAV_ITEM_DROPDOWN,
   mixins: [idMixin, dropdownMixin, normalizeSlotMixin],
   props,
   computed: {
     toggleId() {
       return this.safeId('_BV_toggle_')
     },
-    isNav() {
-      // Signal to dropdown mixin that we are in a navbar
-      return true
-    },
     dropdownClasses() {
-      return [this.directionClass, { show: this.visible }]
+      return [this.directionClass, this.boundaryClass, { show: this.visible }]
     },
     menuClasses() {
       return [
@@ -44,7 +57,7 @@ export const BNavItemDropdown = /*#__PURE__*/ Vue.extend({
     }
   },
   render(h) {
-    const { toggleId, visible } = this
+    const { toggleId, visible, hide } = this
 
     const $toggle = h(
       BLink,
@@ -70,7 +83,7 @@ export const BNavItemDropdown = /*#__PURE__*/ Vue.extend({
       },
       [
         // TODO: The `text` slot is deprecated in favor of the `button-content` slot
-        this.normalizeSlot(['button-content', 'text']) ||
+        this.normalizeSlot([SLOT_NAME_BUTTON_CONTENT, SLOT_NAME_TEXT]) ||
           h('span', { domProps: htmlOrText(this.html, this.text) })
       ]
     )
@@ -89,7 +102,7 @@ export const BNavItemDropdown = /*#__PURE__*/ Vue.extend({
         },
         ref: 'menu'
       },
-      !this.lazy || visible ? this.normalizeSlot('default', { hide: this.hide }) : [h()]
+      !this.lazy || visible ? this.normalizeSlot(SLOT_NAME_DEFAULT, { hide }) : [h()]
     )
 
     return h(

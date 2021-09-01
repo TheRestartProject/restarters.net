@@ -1,26 +1,31 @@
-import Vue from '../../utils/vue'
-import { mergeData } from 'vue-functional-data-merge'
+import { Vue, mergeData } from '../../vue'
+import { NAME_DROPDOWN_DIVIDER } from '../../constants/components'
+import { PROP_TYPE_STRING } from '../../constants/props'
+import { makeProp, makePropsConfigurable } from '../../utils/props'
+import { omit } from '../../utils/object'
 
-export const props = {
-  tag: {
-    type: String,
-    default: 'hr'
-  }
-}
+// --- Props ---
+
+export const props = makePropsConfigurable(
+  {
+    tag: makeProp(PROP_TYPE_STRING, 'hr')
+  },
+  NAME_DROPDOWN_DIVIDER
+)
+
+// --- Main component ---
 
 // @vue/component
 export const BDropdownDivider = /*#__PURE__*/ Vue.extend({
-  name: 'BDropdownDivider',
+  name: NAME_DROPDOWN_DIVIDER,
   functional: true,
   props,
   render(h, { props, data }) {
-    const $attrs = data.attrs || {}
-    data.attrs = {}
-    return h('li', mergeData(data, { attrs: { role: 'presentation' } }), [
+    return h('li', mergeData(omit(data, ['attrs']), { attrs: { role: 'presentation' } }), [
       h(props.tag, {
         staticClass: 'dropdown-divider',
         attrs: {
-          ...$attrs,
+          ...(data.attrs || {}),
           role: 'separator',
           'aria-orientation': 'horizontal'
         },

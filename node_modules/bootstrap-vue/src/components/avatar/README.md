@@ -236,7 +236,7 @@ When set to `true` (or the empty string `''`), it uses the Bootstrap default of 
 
 ```html
 <template>
-  <div style="font-size: 2rem;">
+  <div>
     <b-avatar rounded="sm"></b-avatar>
     <b-avatar rounded></b-avatar>
     <b-avatar rounded="lg"></b-avatar>
@@ -354,7 +354,7 @@ The `to` prop can either be a string path, or a `Location` object. The `to` prop
 
 ## Badge avatars
 
-<span class="badge badge-info small">2.12.0+<span>
+<span class="badge badge-info small">2.12.0+</span>
 
 Easily add a badge to your avatar via the `badge` prop or `'badge'` slot, and the badge variant can
 be set via the `badge-variant` prop. The badge will scale with the size of the avatar.
@@ -381,11 +381,11 @@ Add textual content to the badge by supplying a string to the `badge` prop, or u
 
 ```html
 <template>
-  <div style="font-size: 2rem">
+  <div>
     <b-avatar badge="BV"></b-avatar>
     <b-avatar badge="7" variant="primary" badge-variant="dark"></b-avatar>
     <b-avatar badge-variant="info" src="https://placekitten.com/300/300">
-      <template v-slot:badge><b-icon icon="star-fill"></b-icon></template>
+      <template #badge><b-icon icon="star-fill"></b-icon></template>
     </b-avatar>
   </div>
 </template>
@@ -552,7 +552,7 @@ between `0` and `1`, where `0` means no overlap and `1` means 100% overlap.
 
 Use the `aria-label` prop to provide an accessible, screen reader friendly, label for your avatar.
 If you have a badge, it is recommended to add inforation to your aria-label regarding the badge
-purpose or content (i.g. `'3 messages'`, `'online'`, etc)).
+purpose or content (i.g. `'3 messages'`, `'online'`, etc.).
 
 While the `click` event is emitted regardless if the `button`, `href`, or `to` props are set, it is
 highly recommended to use the `button` prop when the click event should trigger an action (or use

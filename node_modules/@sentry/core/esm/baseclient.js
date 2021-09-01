@@ -150,7 +150,7 @@ var BaseClient = /** @class */ (function () {
      * Sets up the integrations
      */
     BaseClient.prototype.setupIntegrations = function () {
-        if (this._isEnabled()) {
+        if (this._isEnabled() && !this._integrations.initialized) {
             this._integrations = setupIntegrations(this._options);
         }
     };

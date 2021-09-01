@@ -26,7 +26,8 @@ var LinkedErrors = /** @class */ (function () {
         addGlobalEventProcessor(function (event, hint) {
             var self = getCurrentHub().getIntegration(LinkedErrors);
             if (self) {
-                return self._handler(event, hint);
+                var handler = self._handler && self._handler.bind(self);
+                return typeof handler === 'function' ? handler(event, hint) : event;
             }
             return event;
         });

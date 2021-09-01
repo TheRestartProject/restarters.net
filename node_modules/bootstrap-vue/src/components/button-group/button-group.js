@@ -1,31 +1,28 @@
-import Vue from '../../utils/vue'
-import { mergeData } from 'vue-functional-data-merge'
-import { getComponentConfig } from '../../utils/config'
+import { Vue, mergeData } from '../../vue'
+import { NAME_BUTTON_GROUP } from '../../constants/components'
+import { PROP_TYPE_BOOLEAN, PROP_TYPE_STRING } from '../../constants/props'
+import { pick, sortKeys } from '../../utils/object'
+import { makeProp, makePropsConfigurable } from '../../utils/props'
+import { props as buttonProps } from '../button/button'
 
-const NAME = 'BButtonGroup'
+// --- Props ---
 
-export const props = {
-  vertical: {
-    type: Boolean,
-    default: false
-  },
-  size: {
-    type: String,
-    default: () => getComponentConfig('BButton', 'size')
-  },
-  tag: {
-    type: String,
-    default: 'div'
-  },
-  ariaRole: {
-    type: String,
-    default: 'group'
-  }
-}
+export const props = makePropsConfigurable(
+  sortKeys({
+    ...pick(buttonProps, ['size']),
+    ariaRole: makeProp(PROP_TYPE_STRING, 'group'),
+    size: makeProp(PROP_TYPE_STRING),
+    tag: makeProp(PROP_TYPE_STRING, 'div'),
+    vertical: makeProp(PROP_TYPE_BOOLEAN, false)
+  }),
+  NAME_BUTTON_GROUP
+)
+
+// --- Main component ---
 
 // @vue/component
 export const BButtonGroup = /*#__PURE__*/ Vue.extend({
-  name: NAME,
+  name: NAME_BUTTON_GROUP,
   functional: true,
   props,
   render(h, { props, data, children }) {

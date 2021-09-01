@@ -8,15 +8,16 @@ use Illuminate\Contracts\Config\Repository as Config;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Controller;
 use Illuminate\Support\Collection;
+use Illuminate\Support\Str;
 
 /**
  * Class SsoController
  *
  * Controller to process the Discourse SSO request.  There is a good bit of logic in here that almost feels like too
  * much for a controller, but given that this is the only thing that this controller is doing, I am not going to break
- * it out into some service class.
+ * it out into a service class.
  *
- * @package Spinen\Discourse
+ * @package Spinen\Discourse\Controllers
  */
 class SsoController extends Controller
 {
@@ -107,6 +108,7 @@ class SsoController extends Controller
      * @param Request $request
      *
      * @return mixed
+     * @throws 403
      */
     public function login(Request $request)
     {
@@ -131,7 +133,7 @@ class SsoController extends Controller
             $this->buildExtraParameters()
         );
 
-        return redirect(str_finish($this->config->get('url'), '/').'session/sso_login?'.$query);
+        return redirect(Str::finish($this->config->get('url'), '/').'session/sso_login?'.$query);
     }
 
     /**
@@ -150,7 +152,7 @@ class SsoController extends Controller
      *
      * If a string is passed in, then get it from the user object, otherwise, return what was given
      *
-     * @param string $property
+     * @param mixed $property
      * @return mixed
      */
     public function parseUserValue($property)

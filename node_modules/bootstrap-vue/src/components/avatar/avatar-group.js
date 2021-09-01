@@ -1,50 +1,45 @@
-import Vue from '../../utils/vue'
-import normalizeSlotMixin from '../../mixins/normalize-slot'
+import { Vue } from '../../vue'
+import { NAME_AVATAR_GROUP } from '../../constants/components'
+import {
+  PROP_TYPE_BOOLEAN,
+  PROP_TYPE_BOOLEAN_STRING,
+  PROP_TYPE_NUMBER_STRING,
+  PROP_TYPE_STRING
+} from '../../constants/props'
 import { mathMax, mathMin } from '../../utils/math'
 import { toFloat } from '../../utils/number'
+import { makeProp, makePropsConfigurable } from '../../utils/props'
+import { normalizeSlotMixin } from '../../mixins/normalize-slot'
 import { computeSize } from './avatar'
 
-// --- Constants ---
-const NAME = 'BAvatarGroup'
+// --- Props ---
+
+export const props = makePropsConfigurable(
+  {
+    overlap: makeProp(PROP_TYPE_NUMBER_STRING, 0.3),
+    // Child avatars will prefer this prop (if set) over their own
+    rounded: makeProp(PROP_TYPE_BOOLEAN_STRING, false),
+    // Child avatars will always use this over their own size
+    size: makeProp(PROP_TYPE_STRING),
+    // Child avatars will prefer this prop (if set) over their own
+    square: makeProp(PROP_TYPE_BOOLEAN, false),
+    tag: makeProp(PROP_TYPE_STRING, 'div'),
+    // Child avatars will prefer this variant over their own
+    variant: makeProp(PROP_TYPE_STRING)
+  },
+  NAME_AVATAR_GROUP
+)
 
 // --- Main component ---
+
 // @vue/component
 export const BAvatarGroup = /*#__PURE__*/ Vue.extend({
-  name: NAME,
+  name: NAME_AVATAR_GROUP,
   mixins: [normalizeSlotMixin],
   provide() {
     return { bvAvatarGroup: this }
   },
-  props: {
-    variant: {
-      // Child avatars will prefer this variant over their own
-      type: String,
-      default: null
-    },
-    size: {
-      // Child avatars will always use this over their own size
-      type: String,
-      default: null
-    },
-    overlap: {
-      type: [Number, String],
-      default: 0.3
-    },
-    square: {
-      // Child avatars will prefer this prop (if set) over their own
-      type: Boolean,
-      default: false
-    },
-    rounded: {
-      // Child avatars will prefer this prop (if set) over their own
-      type: [Boolean, String],
-      default: false
-    },
-    tag: {
-      type: String,
-      default: 'div'
-    }
-  },
+  props,
   computed: {
     computedSize() {
       return computeSize(this.size)
@@ -59,10 +54,22 @@ export const BAvatarGroup = /*#__PURE__*/ Vue.extend({
     }
   },
   render(h) {
-    const $inner = h('div', { staticClass: 'b-avatar-group-inner', style: this.paddingStyle }, [
-      this.normalizeSlot('default')
-    ])
+    const $inner = h(
+      'div',
+      {
+        staticClass: 'b-avatar-group-inner',
+        style: this.paddingStyle
+      },
+      this.normalizeSlot()
+    )
 
-    return h(this.tag, { staticClass: 'b-avatar-group', attrs: { role: 'group' } }, [$inner])
+    return h(
+      this.tag,
+      {
+        staticClass: 'b-avatar-group',
+        attrs: { role: 'group' }
+      },
+      [$inner]
+    )
   }
 })

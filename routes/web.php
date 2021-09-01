@@ -315,7 +315,6 @@ Route::group(['middleware' => ['auth', 'verifyUserConsent']], function () {
     //Skills Controller
     Route::prefix('skills')->group(function () {
         Route::get('/', 'SkillsController@index')->name('skills');
-        Route::get('/create', 'SkillsController@getCreateSkill');
         Route::post('/create', 'SkillsController@postCreateSkill');
         Route::get('/edit/{id}', 'SkillsController@getEditSkill');
         Route::post('/edit/{id}', 'SkillsController@postEditSkill');
@@ -325,7 +324,6 @@ Route::group(['middleware' => ['auth', 'verifyUserConsent']], function () {
     //GroupTags Controller
     Route::prefix('tags')->group(function () {
         Route::get('/', 'GroupTagsController@index')->name('tags');
-        Route::get('/create', 'GroupTagsController@getCreateTag');
         Route::post('/create', 'GroupTagsController@postCreateTag');
         Route::get('/edit/{id}', 'GroupTagsController@getEditTag');
         Route::post('/edit/{id}', 'GroupTagsController@postEditTag');
@@ -392,8 +390,6 @@ Route::get('markAsRead/{id?}', function ($id = null) {
 
     return redirect()->back();
 })->name('markAsRead');
-
-Route::get('/set-lang/{locale}', 'LocaleController@setLang');
 
 Route::get('/set-lang/{locale}', 'LocaleController@setLang');
 

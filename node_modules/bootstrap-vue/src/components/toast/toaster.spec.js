@@ -1,6 +1,6 @@
+import { PortalTarget } from 'portal-vue'
 import { mount } from '@vue/test-utils'
 import { createContainer, waitNT, waitRAF } from '../../../tests/utils'
-import { PortalTarget } from 'portal-vue'
 import { BToaster } from './toaster'
 
 describe('b-toaster', () => {
@@ -18,9 +18,9 @@ describe('b-toaster', () => {
 
     expect(wrapper.element.tagName).toBe('DIV')
     expect(wrapper.attributes('id')).toBe('foo')
-    expect(wrapper.attributes('aria-live')).not.toBeDefined()
-    expect(wrapper.attributes('aria-atomic')).not.toBeDefined()
-    expect(wrapper.attributes('role')).not.toBeDefined()
+    expect(wrapper.attributes('aria-live')).toBeUndefined()
+    expect(wrapper.attributes('aria-atomic')).toBeUndefined()
+    expect(wrapper.attributes('role')).toBeUndefined()
     expect(wrapper.classes()).toContain('b-toaster')
     expect(wrapper.classes()).toContain('foo')
     expect(wrapper.classes().length).toBe(2)

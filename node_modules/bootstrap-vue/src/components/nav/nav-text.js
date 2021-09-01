@@ -1,11 +1,15 @@
-import Vue from '../../utils/vue'
-import { mergeData } from 'vue-functional-data-merge'
+import { Vue, mergeData } from '../../vue'
+import { NAME_NAV_TEXT } from '../../constants/components'
+
+// --- Props ---
 
 export const props = {}
 
+// --- Main component ---
+
 // @vue/component
 export const BNavText = /*#__PURE__*/ Vue.extend({
-  name: 'BNavText',
+  name: NAME_NAV_TEXT,
   functional: true,
   props,
   render(h, { data, children }) {

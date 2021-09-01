@@ -26,9 +26,9 @@ Anything else between the opening and closing tags will be rendered at the botto
 ```html
 <div>
   <b-jumbotron>
-    <template v-slot:header>BootstrapVue</template>
+    <template #header>BootstrapVue</template>
 
-    <template v-slot:lead>
+    <template #lead>
       This is a simple hero unit, a simple jumbotron-style component for calling extra attention to
       featured content or information.
     </template>
@@ -80,16 +80,16 @@ other appropriate element by setting the `tag` prop to the desired element tag n
 ## Variants
 
 Control the overall background variant with the `bg-variant` prop ( set to `info`, `danger`,
-`warning`, `light`, `dark`, etc), the border variant with the `border-variant` prop, and the text
+`warning`, `light`, `dark`, etc.), the border variant with the `border-variant` prop, and the text
 variant with `text-variant` prop. All three props default to `null`, which will instruct the
 jumbotron to use the default styling.
 
 ```html
 <div>
   <b-jumbotron bg-variant="info" text-variant="white" border-variant="dark">
-    <template v-slot:header>BootstrapVue</template>
+    <template #header>BootstrapVue</template>
 
-    <template v-slot:lead>
+    <template #lead>
       This is a simple hero unit, a simple jumbotron-style component for calling extra attention to
       featured content or information.
     </template>

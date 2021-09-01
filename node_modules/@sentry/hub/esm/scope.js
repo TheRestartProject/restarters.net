@@ -11,7 +11,7 @@ var MAX_BREADCRUMBS = 100;
  */
 var Scope = /** @class */ (function () {
     function Scope() {
-        /** Flag if notifiying is happening. */
+        /** Flag if notifying is happening. */
         this._notifyingListeners = false;
         /** Callback for client to receive scope changes. */
         this._scopeListeners = [];
@@ -319,7 +319,7 @@ var Scope = /** @class */ (function () {
      * Note that breadcrumbs will be added by the client.
      * Also if the event has already breadcrumbs on it, we do not merge them.
      * @param event Event
-     * @param hint May contain additional informartion about the original exception.
+     * @param hint May contain additional information about the original exception.
      * @hidden
      */
     Scope.prototype.applyToEvent = function (event, hint) {
@@ -344,7 +344,7 @@ var Scope = /** @class */ (function () {
         }
         // We want to set the trace context for normal events only if there isn't already
         // a trace context on the event. There is a product feature in place where we link
-        // errors with transaction and it relys on that.
+        // errors with transaction and it relies on that.
         if (this._span) {
             event.contexts = __assign({ trace: this._span.getTraceContext() }, event.contexts);
             var transactionName = (_a = this._span.transaction) === null || _a === void 0 ? void 0 : _a.name;
@@ -423,7 +423,7 @@ var Scope = /** @class */ (function () {
 }());
 export { Scope };
 /**
- * Retruns the global event processors.
+ * Returns the global event processors.
  */
 function getGlobalEventProcessors() {
     /* eslint-disable @typescript-eslint/no-explicit-any, @typescript-eslint/no-unsafe-member-access  */

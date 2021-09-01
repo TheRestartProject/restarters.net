@@ -38,7 +38,7 @@
       <!-- Slides with img slot -->
       <!-- Note the classes .d-block and .img-fluid to prevent browser default image alignment -->
       <b-carousel-slide>
-        <template v-slot:img>
+        <template #img>
           <img
             class="d-block img-fluid w-100"
             width="1024"
@@ -126,7 +126,7 @@ swipe (on touch enabled devices, if not disabled).
 
 When the users mouse hovers the carousel it will automatically pause, and will automatically restart
 when the mouse leaves the carousel. To disable this feature, set the `no-hover-pause` prop on
-<b-carousel>`.
+`<b-carousel>`.
 
 ## Controls and indicators
 

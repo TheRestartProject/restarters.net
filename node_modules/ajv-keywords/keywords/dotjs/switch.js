@@ -28,7 +28,7 @@ module.exports = function generate_switch(it, $keyword, $ruleType) {
         out += ' if (!' + ($ifPassed) + ') { ';
         $closingBraces += '}';
       }
-      if ($sch.if && it.util.schemaHasRules($sch.if, it.RULES.all)) {
+      if ($sch.if && (it.opts.strictKeywords ? typeof $sch.if == 'object' && Object.keys($sch.if).length > 0 : it.util.schemaHasRules($sch.if, it.RULES.all))) {
         out += ' var ' + ($errs) + ' = errors;   ';
         var $wasComposite = it.compositeRule;
         it.compositeRule = $it.compositeRule = true;
@@ -60,7 +60,8 @@ module.exports = function generate_switch(it, $keyword, $ruleType) {
             }
             var __err = out;
             out = $$outStack.pop();
-            if (!it.compositeRule && $breakOnError) { /* istanbul ignore if */
+            if (!it.compositeRule && $breakOnError) {
+              /* istanbul ignore if */
               if (it.async) {
                 out += ' throw new ValidationError([' + (__err) + ']); ';
               } else {
@@ -100,7 +101,8 @@ module.exports = function generate_switch(it, $keyword, $ruleType) {
             }
             var __err = out;
             out = $$outStack.pop();
-            if (!it.compositeRule && $breakOnError) { /* istanbul ignore if */
+            if (!it.compositeRule && $breakOnError) {
+              /* istanbul ignore if */
               if (it.async) {
                 out += ' throw new ValidationError([' + (__err) + ']); ';
               } else {
@@ -122,7 +124,6 @@ module.exports = function generate_switch(it, $keyword, $ruleType) {
       $shouldContinue = $sch.continue
     }
   }
-  out += '' + ($closingBraces) + 'var ' + ($valid) + ' = ' + ($nextValid) + '; ';
-  out = it.util.cleanUpCode(out);
+  out += '' + ($closingBraces) + 'var ' + ($valid) + ' = ' + ($nextValid) + ';';
   return out;
 }
