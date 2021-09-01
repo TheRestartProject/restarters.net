@@ -30,7 +30,7 @@ exports.createGroup = async function(page, baseURL) {
   await page.fill('#grp_name', faker.company.companyName())
 
   // Type into the RTE
-  await page.fill('.note-editable', faker.lorem.sentence())
+  await page.fill('.ql-editor', faker.lorem.sentence())
 
   // Always say London for geocoding.
   await page.fill('#autocomplete', 'London')
