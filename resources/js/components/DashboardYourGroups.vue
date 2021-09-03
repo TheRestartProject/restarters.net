@@ -122,7 +122,10 @@ export default {
       })
     },
     events() {
-      return this.$store.getters['events/getByGroup'](null).filter(e => e.upcoming)
+      return this.$store.getters['events/getByGroup'](null).filter(e => e.upcoming).sort((a, b) => {
+        // Sort soonest first.
+        return Date.parse(a.event_date + ' ' + a.start) - Date.parse(b.event_date + ' ' + b.start)
+      })
     },
     translatedNewlyAdded() {
       return this.$lang.choice('dashboard.newly_added', this.newGroups, {
