@@ -22,7 +22,7 @@ class BasicTest extends TestCase
                 ':all-groups' => '[]',
                 ':your-groups' => '[]',
                 ':nearby-groups' => '[]',
-                'your-area' => '',
+                'your-area' => 'London',
                 ':can-create' => 'false',
                 ':user-id' => '1',
                 'tab' => 'mine',
