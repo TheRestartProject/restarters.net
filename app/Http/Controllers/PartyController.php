@@ -1171,14 +1171,14 @@ class PartyController extends Controller
         $event_id = $request->input('event');
         $volunteer_email_address = $request->input('volunteer_email_address');
 
-        // Retrieve name if one exists, if no name exists and user is null as well. This volunteer is anonymous
+        // Retrieve name if one exists.  If no name exists and user is null as well then this volunteer is anonymous.
         if ($request->has('full_name')) {
             $full_name = $request->input('full_name');
         } else {
             $full_name = null;
         }
 
-        // User is null, this volunteer is either anonymous or no user exists
+        // User is null, this volunteer is either anonymous or no user exists.
         if ($request->has('user') && $request->input('user') !== 'not-registered') {
             $user = $request->input('user');
         } else {
