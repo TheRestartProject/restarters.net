@@ -49,3 +49,12 @@ export default {
   }
 }
 </script>
+<style scoped lang="scss">
+input {
+  margin: 2px !important;
+
+  &:focus {
+    margin: 2px !important;
+  }
+}
+</style>

@@ -2,6 +2,7 @@
 
 namespace Tests\Feature;
 
+use App\Role;
 use App\User;
 use DB;
 use Hash;
@@ -113,5 +114,21 @@ class AccountCreationTest extends TestCase
         ]);
 
         $this->assertNull(json_decode($response->getContent(), true));
+    }
+
+    public function testAdminCreate() {
+        $this->loginAsTestUser(Role::ADMINISTRATOR);
+
+        $userAttributes = $this->userAttributes();
+        $response = $this->post('/user/create', [
+            'name' => $userAttributes['name'],
+            'email' => $userAttributes['email'],
+            'role' => Role::RESTARTER,
+        ]);
+
+        $response->assertSee('User created correctly');
+        $this->assertDatabaseHas('users', [
+            'email' => $userAttributes['email'],
+        ]);
     }
 }

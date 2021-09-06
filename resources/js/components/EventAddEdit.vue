@@ -5,7 +5,7 @@
 
     <div class="layout">
       <EventVenue
-          class="flex-grow-1 pr-4 event-venue"
+          class="flex-grow-1 event-venue"
           :venue.sync="eventVenue"
           :online.sync="eventOnline"
           :has-error="$v.eventVenue.$error"
@@ -112,12 +112,14 @@ import VenueAddress from './VenueAddress'
 import EventVenue from './EventVenue'
 import EventGroup from './EventGroup'
 import EventLink from './EventLink'
-import { required, minLength, url } from 'vuelidate/lib/validators'
+import { required, minLength, url, helpers } from 'vuelidate/lib/validators'
 import validationHelpers from '../mixins/validationHelpers'
 
-function geocodeable() {
+function geocodeableValidation() {
   return this.lat !== null && this.lng !== null
 }
+
+const timeValidator = helpers.regex('timeValidator', /^([0-1]?[0-9]|2[0-3]):[0-5][0-9]$/)
 
 export default {
   components: {EventGroup, EventVenue, EventLink, VenueAddress, EventTimeRangePicker, EventDatePicker, RichTextEditor},
@@ -177,13 +179,15 @@ export default {
       required
     },
     eventStart: {
-      required
+      required,
+      timeValidator
     },
     eventEnd: {
-      required
+      required,
+      timeValidator
     },
     eventAddress: {
-      geocodeable
+      geocodeableValidation
     },
     eventLink: {
       url
@@ -263,6 +267,7 @@ export default {
 
       if (this.$v.$invalid) {
         // It's not - prevent the submit.
+        console.log("Not valid", this.$v)
         e.preventDefault()
 
         this.validationFocusFirstError()
@@ -291,7 +296,7 @@ export default {
   grid-template-columns: 1fr;
 
   @include media-breakpoint-up(lg) {
-    grid-template-columns: 2fr 1fr 1fr;
+    grid-template-columns: 2fr 1.5fr 1fr;
   }
 
   .event-venue {
@@ -404,9 +409,14 @@ export default {
 
 /deep/ .hasError, /deep/ .card .form-control.hasError:focus {
   border: 2px solid $brand-danger !important;
+  margin: 0px !important;
 }
 
 .notice {
   font-size: 15px;
+}
+
+/deep/ .ql-toolbar button {
+  width: 30px !important;
 }
 </style>

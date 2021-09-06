@@ -90,25 +90,10 @@ class BattcatOraTest extends TestCase
     }
 
     /** @test */
-    public function fetch_battcatora_page()
+    public function battcatora_should_redirect_to_status_page()
     {
-        $fault_types = $this->_setup_fault_types();
-        $data = $this->_setup_devices();
-        $this->withSession([]);
-        $this->_bypass_cta();
-        for ($i = 1; $i <= count($data); $i++) {
-            // Illuminate\Foundation\Testing\TestResponse
-            $response = $this->get('/battcat');
-            $seshids = $this->app['session']->get('battcatora.exclusions');
-            $this->assertTrue(is_array($seshids), 'battcatora.exclusions not an array');
-            $this->assertEquals($i, count($seshids), 'battcatora.exclusions wrong length');
-            $response->assertSuccessful();
-            $response->assertViewIs('battcatora.index');
-        }
-        // No more records for this user
+        // BattCat is closed - should redirect to status page.
         $response = $this->get('/battcat');
-        $response->assertSessionHas('battcatora.exclusions');
-        $response->assertRedirect();
         $response->assertRedirect(url()->current().'/status');
     }
 
