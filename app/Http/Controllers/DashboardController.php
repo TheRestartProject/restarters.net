@@ -72,7 +72,8 @@ class DashboardController extends Controller
             $all_groups = null;
         }
 
-        $new_groups = 0;
+        $new_groups = [];
+
         //Get events nearest (or not) to you
         if (! is_null($user->latitude) && ! is_null($user->longitude)) { //Should the user have location info
             $upcoming_events = Party::with('theGroup')->select(

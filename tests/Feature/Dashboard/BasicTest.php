@@ -30,7 +30,7 @@ class BasicTest extends TestCase
                 'see-all-topics-link' => env('DISCOURSE_URL').'/latest',
                 ':is-logged-in' => 'true',
                 'discourse-base-url' => env('DISCOURSE_URL'),
-                ':new-groups' => '0',
+                ':new-groups' => '[]',
             ],
         ]);
     }
