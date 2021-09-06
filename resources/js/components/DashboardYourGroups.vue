@@ -145,7 +145,7 @@ h3 {
 }
 
 /deep/ a {
-  color: #0394a6;
+  color: $brand-blue;
   text-decoration: underline;
 }
 
