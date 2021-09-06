@@ -43,6 +43,7 @@
 
     <div class="input-group input-group-select2 mb-3">
         <select class="form-control select2-with-input-group" id="inputGroupSelect02">
+        @php($first_option=null)
         @foreach ($all_group_areas as $area)
             @if($loop->first)
             @php( $first_option = $area )
@@ -50,7 +51,9 @@
             <option value="{{ $area }}">{{ $area }}</option>
         @endforeach
         </select>
+        @if ($first_option)
         <input type="text" class="form-control" value="{{ url("/calendar/group-area/{$first_option}") }}">
+        @endif
         <div class="input-group-append">
         <button class="btn btn-normal-padding btn-primary btn-copy-input-text" type="button">@lang('profile.calendars.copy_link')</button>
         </div>
