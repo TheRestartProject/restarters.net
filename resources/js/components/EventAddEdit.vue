@@ -398,4 +398,8 @@ export default {
 .notice {
   font-size: 15px;
 }
+
+/deep/ .ql-toolbar button {
+  width: 30px !important;
+}
 </style>
