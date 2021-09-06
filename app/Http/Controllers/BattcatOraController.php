@@ -22,6 +22,9 @@ class BattcatOraController extends Controller
      */
     public function index(Request $request)
     {
+        // BattCat is now closed.
+        return redirect()->action('BattcatOraController@status');
+
         if (Auth::check()) {
             $user = Auth::user();
         } else {
@@ -119,6 +122,7 @@ class BattcatOraController extends Controller
             'user' => $user,
             'categories' => $this->getCategories(),
             'complete' => ($data['progress'][0]->total == 100),
+            'closed' => true,
         ]);
     }
 

@@ -645,9 +645,7 @@ class UserController extends Controller
         }
     }
 
-    // TODO: is this alive?
-    // I don't recall admins being able to create users.  But it is in a route.
-    public function create()
+    public function create(Request $request)
     {
         $user = Auth::user();
 
@@ -661,15 +659,15 @@ class UserController extends Controller
 
             $User = new User;
 
-            if ($_SERVER['REQUEST_METHOD'] == 'POST' && ! empty($_POST)) {
+            if ($request->getMethod() == 'POST') {
                 $error = [];
 
                 // We got data! Elaborate.
-                $name = $_POST['name'];
-                $email = $_POST['email'];
-                $role = $_POST['role'];
-                if (! isset($_POST['modal'])) {
-                    $groups = $_POST['groups'];
+                $name = $request->get('name');
+                $email = $request->get('email');
+                $role = $request->get('role');
+                if (!$request->has('modal')) {
+                    $groups = $request->get('groups');
                 }
 
                 // dbga($group);
@@ -683,7 +681,7 @@ class UserController extends Controller
                 }
                 /*
                 if(empty($pwd) || empty($cpwd) || !($pwd === $cpwd)){
-                $error['password'] = 'The password cannot be emtpy and must match with the confirmation field.';
+                $error['password'] = 'The password cannot be empty and must match with the confirmation field.';
             }
             */
                 if (empty($role)) {
@@ -748,7 +746,7 @@ class UserController extends Controller
                         //
                         // $sender = mail($email, $subject, $message, $headers);
 
-                        $response['success'] = 'User created correctly.  <strong>An email has been sent to the user to ask them to set their password.</strong>';
+                        $response['success'] = 'User created correctly.  <strong>NB No email has been sent to the user.</strong>';
                     } else {
                         $response['danger'] = 'User could not be created';
                     }

@@ -1,7 +1,7 @@
 <template>
   <div>
-    <VueEditor class="editor" v-model="currentValue" :editor-options="editorOptions" :class="{ editorHasError: hasError }" />
-    <input type="hidden" v-model="currentValue" :name="name" />
+    <VueEditor class="editor" v-model="value" :editor-options="editorOptions" />
+    <input type="hidden" v-model="valueCorrected" :name="name" />
   </div>
 </template>
 <script>
@@ -36,7 +36,8 @@ export default {
   },
   data: function() {
     return {
-      currentValue: null,
+      value: null,
+      valueCorrected: null,
       editorOptions: {
         modules: {
           htmlEditButton: {},
@@ -63,8 +64,21 @@ export default {
       }
     }
   },
+  watch: {
+    value(newVal) {
+      console.log("Correct", newVal)
+      // We have an odd problem on Linux where we get <p><br>.
+      if (newVal) {
+        newVal = newVal.replace('<p><br>', '<p>');
+        console.log("Corrected", newVal)
+      }
+
+      this.valueCorrected = newVal
+    }
+  },
   mounted() {
-    this.currentValue = this.value
+    this.value = this.initialValue
+    this.valueCorrected = this.initialValue
   },
   watch: {
     currentValue(newVal) {
@@ -97,38 +111,15 @@ export default {
   content: 'H6'
 }
 
-/deep/ .ql-header {
-  white-space: nowrap;
-}
-
-.editorHasError {
-  /deep/ .ql-toolbar {
-    border-top: 2px solid $brand-danger !important;
-    border-left: 2px solid $brand-danger !important;
-    border-right: 2px solid $brand-danger !important;
+/deep/ .ql-snow .ql-editor {
+  h4 {
+    font-size: 1.5rem;
   }
-
-  /deep/ .ql-container {
-    border-bottom: 2px solid $brand-danger !important;
-    border-left: 2px solid $brand-danger !important;
-    border-right: 2px solid $brand-danger !important;
+  h5 {
+    font-size: 1.25rem;
+  }
+  h6 {
+    font-size: 1rem;
   }
 }
-
-/deep/ .ql-toolbar {
-  border-top: 2px solid $black !important;
-  border-left: 2px solid $black !important;
-  border-right: 2px solid $black !important;
-}
-
-/deep/ .ql-container {
-  border-bottom: 2px solid $black !important;
-  border-left: 2px solid $black !important;
-  border-right: 2px solid $black !important;
-}
-
-/deep/ .ql-container.ql-snow {
-  border: unset;
-}
-
 </style>
