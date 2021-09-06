@@ -124,27 +124,27 @@ class User extends Authenticatable implements Auditable
      * @param int $numberOfGroups How many groups to return
      * @param string String of minimum creation date
      */
-    public function groupsNearby($numberOfGroups = 10, $createdSince = NULL)
+    public function groupsNearby($numberOfGroups = 10, $createdSince = NULL, $nearby = self::NEARBY_KM)
     {
         if (is_null($this->latitude) || is_null($this->longitude)) {
-            return null;
+            return [];
         }
 
         $groupsNearbyQuery = Group::select(
-            DB::raw('*, ( 6371 * acos( cos( radians('.$this->latitude.') ) * cos( radians( latitude ) ) * cos( radians( longitude ) - radians('.$this->longitude.') ) + sin( radians('.$this->latitude.') ) * sin( radians( latitude ) ) ) ) AS distance')
+            DB::raw('*, ( 6371 * acos( cos( radians('.$this->latitude.') ) * cos( radians( latitude ) ) * cos( radians( longitude ) - radians('.$this->longitude.') ) + sin( radians('.$this->latitude.') ) * sin( radians( latitude ) ) ) ) AS dist')
         )->leftJoin('grouptags_groups', function($join) {
             // Exclude groups tagged as inactive.
             $join->on('group', '=', 'idgroups');
         })->where(function ($q) {
             // Exclude any groups tagged with the special value of 10, which is 'Inactive'.
-            $q->whereNull('grouptags_groups.id')->orWhere('grouptags_groups.id', '!=', 10);
-        })->having('distance', '<=', self::NEARBY_KM);
+            $q->whereNull('grouptags_groups.id')->orWhere('grouptags_groups.group_tag', '!=', GroupTags::INACTIVE);
+        })->having('dist', '<=', $nearby);
 
         if ($createdSince) {
             $groupsNearbyQuery->whereDate('created_at', '>=', date('Y-m-d', strtotime($createdSince)));
         }
 
-        $groups = $groupsNearbyQuery->orderBy('distance', 'ASC')
+        $groups = $groupsNearbyQuery->orderBy('dist', 'ASC')
             ->take($numberOfGroups)
             ->get();
 
@@ -157,6 +157,9 @@ class User extends Authenticatable implements Auditable
                 if (is_object($group_image) && is_object($group_image->image)) {
                     $group_image->image->path;
                 }
+
+                // Store for later retrieval.  This is unusual because the value is not stored in the table.
+                $group->setDistanceAttribute($group->dist);
 
                 $groupsNearby[] = $group;
             }
