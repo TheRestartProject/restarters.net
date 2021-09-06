@@ -24,5 +24,6 @@ export default {
 <style scoped lang="scss">
 .cell-number {
   width: 60px;
+  height: unset !important;
 }
 </style>

@@ -123,4 +123,23 @@
     #ora-partnership img {
         width: 300px;
     }
+
+ div.quest-closed {
+     background-color:#4aaebc !important;
+ }
+
+ .quest-closed li {
+     list-style-type: disc;
+ }
+
+ .quest-closed a {
+     color: #111;
+     text-decoration: underline;
+ }
+
+ .quest-closed a:hover {
+     color: #111;
+     text-decoration: none;
+     font-weight: 600;
+ }
 </style>

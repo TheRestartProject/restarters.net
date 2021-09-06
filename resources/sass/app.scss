@@ -15,13 +15,6 @@
 @import '~tokenfield/lib/scss/tokenfield';
 // @import '~bootstrap-tokenfield/dist/css/bootstrap-tokenfield.css';
 
-// Summernote
-// @import '~summernote/src/less/summernote';
-// @import '~summernote/src/less/summernote-bs4';
-// @import '~summernote/src/less/elements';
-@import '~summernote/dist/summernote';
-@import '~summernote/dist/summernote-bs4';
-
 // Dropzone
 @import '~dropzone/dist/basic';
 @import '~dropzone/dist/dropzone';
@@ -69,7 +62,6 @@
 @import "popover";
 @import "pagination";
 @import "properties";
-@import 'summernote';
 @import 'events';
 @import 'networks';
 @import 'reporting';

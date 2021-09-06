@@ -22,6 +22,9 @@ class PrintcatOraController extends Controller
      */
     public function index(Request $request)
     {
+        // PrintCat is now closed.
+        return redirect()->action('PrintcatOraController@status');
+
         // We record that we have visited this page, so that if we subsequently sign up, we can redirect back to it.
         // This is an intentionally partial solution to the problem of redirecting after we log in.
         $request->session()->put('redirectTime', time());
@@ -121,6 +124,7 @@ class PrintcatOraController extends Controller
             'status' => $data,
             'user' => $user,
             'complete' => $complete,
+            'closed' => true,
             'partner' => $request->input('partner', null),
         ]);
     }
