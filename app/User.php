@@ -138,7 +138,8 @@ class User extends Authenticatable implements Auditable
         })->where(function ($q) {
             // Exclude any groups tagged with the special value of 10, which is 'Inactive'.
             $q->whereNull('grouptags_groups.id')->orWhere('grouptags_groups.group_tag', '!=', GroupTags::INACTIVE);
-        })->having('dist', '<=', $nearby);
+        })->having('dist', '<=', $nearby)
+        ->distinct();
 
         if ($createdSince) {
             $groupsNearbyQuery->whereDate('created_at', '>=', date('Y-m-d', strtotime($createdSince)));
