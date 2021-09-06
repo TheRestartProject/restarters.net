@@ -17,7 +17,6 @@ class Party extends Model implements Auditable
 {
     use SoftDeletes;
     use \OwenIt\Auditing\Auditable;
-    use \App\Traits\GlobalScopes;
 
     protected $table = 'events';
     protected $primaryKey = 'idevents';
@@ -429,8 +428,7 @@ class Party extends Model implements Auditable
           $query->whereNotIn('events.group', $user_group_ids)
         ->whereDate('event_date', '>=', date('Y-m-d'));
       })
-      ->having('distance', '<=', 35) // kilometers (km)
-
+      ->having('distance', '<=', User::NEARBY_KM)
       ->groupBy('events.idevents')
       ->orderBy('events.event_date', 'ASC')
       ->orderBy('events.start', 'ASC')
