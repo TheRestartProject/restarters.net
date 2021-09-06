@@ -167,8 +167,8 @@ export default {
     },
     useGroup() {
       this.$refs.autocomplete.update(this.groupLocation)
-      this.$emit('update:lat', this.groupLat)
-      this.$emit('update:lng', this.groupLng)
+      this.$emit('update:lat', parseFloat(this.groupLat))
+      this.$emit('update:lng', parseFloat(this.groupLng))
     },
     checkOtherInputs() {
       // This is a workaround until the whole form is converted to Vue.
