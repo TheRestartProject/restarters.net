@@ -23,15 +23,10 @@ export default {
       type: String,
       required: true
     },
-    value: {
+    initialValue: {
       type: String,
       required: false,
       default: null
-    },
-    hasError: {
-      type: Boolean,
-      required: false,
-      default: false
     }
   },
   data: function() {
@@ -80,19 +75,11 @@ export default {
     this.value = this.initialValue
     this.valueCorrected = this.initialValue
   },
-  watch: {
-    currentValue(newVal) {
-      this.$emit('update:value', newVal)
-    }
+  methods: {
   }
 }
 </script>
 <style scoped lang="scss">
-@import 'resources/global/css/_variables';
-@import '~bootstrap/scss/functions';
-@import '~bootstrap/scss/variables';
-@import '~bootstrap/scss/mixins/_breakpoints';
-
 /deep/ .ql-editor,  /deep/ .ql-container {
   min-height: 300px !important;
   max-height: 300px !important;
