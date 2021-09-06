@@ -10,6 +10,9 @@
         <h3>{{ __('dashboard.groups_near_you_header') }}</h3>
         <hr />
         <DashboardGroup v-for="group in nearbyGroups" :key="'nearbygroup-' + group.idgroups" :group="group" />
+        <a href="/group/nearby">
+          {{ __('dashboard.see_all_groups_near_you') }}
+        </a>
       </div>
     </div>
     <div v-else class="layout mb-2">
@@ -111,10 +114,6 @@ export default {
   background-size: cover;
   background-position: center;
   background-image: url('/images/no_groups.png');
-}
-
-/deep/ .overlay a {
-  text-decoration: underline;
 }
 
 h3 {

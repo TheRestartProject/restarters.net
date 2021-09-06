@@ -2,6 +2,9 @@
 
 namespace Tests\Feature\Dashboard;
 
+use App\Group;
+use App\Party;
+use App\Role;
 use App\User;
 use DB;
 use Hash;
@@ -63,5 +66,34 @@ class BasicTest extends TestCase
             [ 'Lima', 'PE', -12.0464, -77.04280, 0 ],    // Known location, no nearby group
             [ null, 'PE', null, null, 0 ]                // Unknown location, no nearby group
         ];
+    }
+
+    public function testUpcomingEvents() {
+        // Create a group with a future event, and join it.
+        $this->loginAsTestUser(Role::ADMINISTRATOR);
+        $id = $this->createGroup();
+
+        // Admin approves the event.
+        $event = factory(Party::class)->create([
+           'group' => $id,
+           'event_date' => '2130-01-01',
+           'start' => '12:13',
+           'free_text' => 'A test event'
+       ]);
+
+
+        $eventData = $event->getAttributes();
+        $eventData['wordpress_post_id'] = 100;
+        $eventData['id'] = $event->idevents;
+        $eventData['moderate'] = 'approve';
+        $this->post('/party/edit/' . $event->idevents, $eventData);
+
+        // Get the dashboard
+        $host = factory(User::class)->states('Restarter')->create();
+        $this->actingAs($host);
+        $this->get('/group/join/' . $id);
+
+        $response = $this->get('/dashboard');
+        $response->assertSee('A test event');
     }
 }

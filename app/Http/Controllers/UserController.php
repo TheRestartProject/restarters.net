@@ -1083,13 +1083,23 @@ class UserController extends Controller
 
         event(new UserRegistered($user));
 
+        $redirectTo = 'dashboard';
+
+        if ($request->session()->has('redirectTo') && $request->session()->has('redirectTime')) {
+            if (time() - $request->session()->get('redirectTime') < 3600) {
+                // We have recently visited a page to which we want to return.   This is an intentionally
+                // partial solution to the problem of redirecting after login.
+                $redirectTo = $request->session()->get('redirectTo');
+            }
+        }
+
         if (Auth::check()) { //Existing users are to update
-            return redirect('dashboard');
+            return redirect($redirectTo);
         }
 
         $credentials = $request->only('email', 'password');
         if (Auth::attempt($credentials)) {
-            return redirect()->intended('dashboard');
+            return redirect()->intended($redirectTo);
         }
     }
 

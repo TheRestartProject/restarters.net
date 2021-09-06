@@ -27,6 +27,7 @@ return [
   'your_networks' => 'Your networks',
   'networks_you_coordinate' => 'View the networks that you coordinate.',
   'see_all_groups' => 'see all',
+  'see_all_groups_near_you' => 'See all groups near you →',
   'catch_up' => 'Catch up with your groups by clicking below.',
   'your_groups_heading' => 'Your Groups',
   'groups_heading' => 'Groups',
