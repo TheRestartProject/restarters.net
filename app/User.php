@@ -132,7 +132,13 @@ class User extends Authenticatable implements Auditable
 
         $groupsNearbyQuery = Group::select(
             DB::raw('*, ( 6371 * acos( cos( radians('.$this->latitude.') ) * cos( radians( latitude ) ) * cos( radians( longitude ) - radians('.$this->longitude.') ) + sin( radians('.$this->latitude.') ) * sin( radians( latitude ) ) ) ) AS distance')
-        )->having('distance', '<=', self::NEARBY_KM);
+        )->leftJoin('grouptags_groups', function($join) {
+            // Exclude groups tagged as inactive.
+            $join->on('group', '=', 'idgroups');
+        })->where(function ($q) {
+            // Exclude any groups tagged with the special value of 10, which is 'Inactive'.
+            $q->whereNull('grouptags_groups.id')->orWhere('grouptags_groups.id', '!=', 10);
+        })->having('distance', '<=', self::NEARBY_KM);
 
         if ($createdSince) {
             $groupsNearbyQuery->whereDate('created_at', '>=', date('Y-m-d', strtotime($createdSince)));
