@@ -39,7 +39,7 @@ jobs:
       - run: php artisan key:generate
       - run: php artisan migrate
 
-      - run: wget -O phpunit https://phar.phpunit.de/phpunit-7.phar ; chmod +x phpunit
+      - run: wget -O phpunit -d memory_limit=512M https://phar.phpunit.de/phpunit-7.phar ; chmod +x phpunit
 
       - run: export XDEBUG_MODE=coverage;./phpunit --bootstrap vendor/autoload.php -dxdebug.coverage_enable=1 --coverage-clover tests/clover.xml --configuration ./phpunit.xml
 
