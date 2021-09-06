@@ -144,8 +144,8 @@ h3 {
   font-weight: bold;
 }
 
-a {
-  color: unset;
+/deep/ a {
+  color: #0394a6;
   text-decoration: underline;
 }
 
