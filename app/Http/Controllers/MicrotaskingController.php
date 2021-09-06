@@ -32,7 +32,7 @@ class MicrotaskingController extends Controller
         ];
     }
 
-    public function index(DiscourseService $discourseService)
+    public function index(DiscourseService $discourseService, Request $request)
     {
         if (Auth::check()) {
             $currentUserId = Auth::user()->id;
@@ -47,6 +47,11 @@ class MicrotaskingController extends Controller
 
         $activeQuest = config('restarters.microtasking.active_quest');
         $tag = config('restarters.microtasking.discussion_tag');
+
+        // We record that we have visited this page, so that if we subsequently sign up, we can redirect back to it.
+        // This is an intentionally partial solution to the problem of redirecting after we log in.
+        $request->session()->put('redirectTime', time());
+        $request->session()->put('redirectTo', $request->path());
 
         return view('microtasking.dashboard', [
             'totalQuests' => $this->getTotalContributions()['quests'],
