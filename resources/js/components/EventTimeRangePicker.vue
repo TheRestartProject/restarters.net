@@ -112,9 +112,11 @@ export default {
           } else {
             // We prevent end times before start times.  This is slightly clunky - we can't seem to update the
             // value in timepicker while it's open, so trigger a re-render by changing the key.
-            this.$emit('update:end', oldVal)
             this.currentEndTime = this.currentStartTime
             this.bump++
+            this.$nextTick(() => {
+              this.$emit('update:end', oldVal)
+            })
           }
         }
       },

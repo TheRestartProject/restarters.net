@@ -61,14 +61,15 @@ export default {
   },
   watch: {
     value(newVal) {
-      console.log("Correct", newVal)
       // We have an odd problem on Linux where we get <p><br>.
       if (newVal) {
         newVal = newVal.replace('<p><br>', '<p>');
-        console.log("Corrected", newVal)
       }
 
       this.valueCorrected = newVal
+    },
+    valueCorrected(newVal) {
+      this.$emit('update:value', newVal)
     }
   },
   mounted() {

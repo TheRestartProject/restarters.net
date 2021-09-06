@@ -30,7 +30,6 @@ export default {
   },
   watch: {
     value(newVal) {
-      console.log("New date", newVal)
       this.$emit('update:date', newVal)
     }
   }

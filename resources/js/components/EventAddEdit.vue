@@ -256,6 +256,7 @@ export default {
 
       if (this.$v.$invalid) {
         // It's not - prevent the submit.
+        console.log("Not valid", this.$v)
         e.preventDefault()
 
         this.validationFocusFirstError()
