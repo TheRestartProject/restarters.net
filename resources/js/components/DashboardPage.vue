@@ -8,7 +8,7 @@
     <div class="layout mt-4 mb-4">
       <DashboardBanner class="banner" />
       <div class="yourgroups">
-        <DashboardYourGroups :newGroups="newGroups" :nearbyGroups="nearbyGroups" />
+        <DashboardYourGroups :newGroups="newGroups" :nearbyGroups="nearbyGroups" :location="location" />
       </div>
       <DashboardAddData class="adddata justify-self-end" />
       <DashboardRightSidebar class="sidebar" />
@@ -39,6 +39,10 @@ export default {
       type: Array,
       required: false,
       default: null
+    },
+    location: {
+      type: String,
+      required: true
     },
     nearbyGroups: {
       type: Array,
