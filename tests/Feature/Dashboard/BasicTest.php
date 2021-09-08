@@ -52,11 +52,11 @@ class BasicTest extends TestCase
                 'see-all-topics-link' => env('DISCOURSE_URL').'/latest',
                 ':is-logged-in' => 'true',
                 'discourse-base-url' => env('DISCOURSE_URL'),
-                ':new-groups' => '[]',
             ],
         ]);
 
         $this->assertEquals($nearbyGroupCount, count(json_decode($props[0][':nearby-groups'], TRUE)));
+        $this->assertEquals($nearbyGroupCount, count(json_decode($props[0][':new-groups'], TRUE)));
     }
 
     public function provider() {
