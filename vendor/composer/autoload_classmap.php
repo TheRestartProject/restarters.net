@@ -24,6 +24,7 @@ return array(
     'App\\Console\\Commands\\PopulateUniqueCodeToEventsAndGroups' => $baseDir . '/app/Console/Commands/PopulateUniqueCodeToEventsAndGroups.php',
     'App\\Console\\Commands\\SetPostcodes' => $baseDir . '/app/Console/Commands/SetPostcodes.php',
     'App\\Console\\Commands\\SetRepairTogetherPasswords' => $baseDir . '/app/Console/Commands/SetRepairTogetherPasswords.php',
+    'App\\Console\\Commands\\SyncBattCatOra' => $baseDir . '/app/Console/Commands/SyncBattCatOra.php',
     'App\\Console\\Commands\\SyncDiscourseUsernames' => $baseDir . '/app/Console/Commands/SyncDiscourseUsernames.php',
     'App\\Console\\Commands\\SyncEvents' => $baseDir . '/app/Console/Commands/SyncEvents.php',
     'App\\Console\\Commands\\SyncFaultTypes' => $baseDir . '/app/Console/Commands/SyncFaultTypes.php',

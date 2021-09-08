@@ -757,6 +757,7 @@ class ComposerStaticInitf57f72b7adaf50a29437647288004820
         'App\\Console\\Commands\\PopulateUniqueCodeToEventsAndGroups' => __DIR__ . '/../..' . '/app/Console/Commands/PopulateUniqueCodeToEventsAndGroups.php',
         'App\\Console\\Commands\\SetPostcodes' => __DIR__ . '/../..' . '/app/Console/Commands/SetPostcodes.php',
         'App\\Console\\Commands\\SetRepairTogetherPasswords' => __DIR__ . '/../..' . '/app/Console/Commands/SetRepairTogetherPasswords.php',
+        'App\\Console\\Commands\\SyncBattCatOra' => __DIR__ . '/../..' . '/app/Console/Commands/SyncBattCatOra.php',
         'App\\Console\\Commands\\SyncDiscourseUsernames' => __DIR__ . '/../..' . '/app/Console/Commands/SyncDiscourseUsernames.php',
         'App\\Console\\Commands\\SyncEvents' => __DIR__ . '/../..' . '/app/Console/Commands/SyncEvents.php',
         'App\\Console\\Commands\\SyncFaultTypes' => __DIR__ . '/../..' . '/app/Console/Commands/SyncFaultTypes.php',
