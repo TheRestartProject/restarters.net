@@ -72,7 +72,7 @@
                 </div>
                 <div class="modal-footer justify-content-center">
                     <p class="buttons">                        
-                        <a href="/about" id="btn-join" class="btn btn-md btn-rounded">Join the community</a>
+                        <a href="/user/register" id="btn-join" class="btn btn-md btn-rounded">Join the community</a>
                         <button id="btn-skip" type="button" class="btn btn-md btn-rounded">Not now</button>
 <!--                        <button id="btn-skip" type="button" class="btn btn-md btn-rounded" data-dismiss="modal" aria-label="Not now">
                             <span aria-hidden="true">Not now</span>
@@ -87,7 +87,7 @@
 
             document.getElementById('btn-join').addEventListener('click', function (e) {
                 e.preventDefault();
-                window.open("/about", '_blank');
+                window.open("/user/register", '_blank');
                 document.getElementById('btn-skip').click();
             }, true);
 

@@ -101,6 +101,16 @@ class DashboardController extends Controller
                 ->get();
         }
 
+        $expanded_events = [];
+
+        foreach ($upcoming_events as $event) {
+            $thisone = $event->getAttributes();
+            $thisone['the_group'] = \App\Group::find($event->group);
+            $expanded_events[] = $thisone;
+        }
+
+        $upcoming_events = $expanded_events;
+
         // Look for groups where user ID exists in pivot table.  We have to explicitly test on deleted_at because
         // the normal filtering out of soft deletes won't happen for joins.
         $your_groups = Group::join('users_groups', 'users_groups.group', '=', 'groups.idgroups')
