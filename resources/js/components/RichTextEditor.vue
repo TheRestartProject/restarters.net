@@ -1,7 +1,7 @@
 <template>
   <div>
-    <VueEditor class="editor" v-model="value" :editor-options="editorOptions" />
-    <input type="hidden" v-model="valueCorrected" :name="name" />
+    <VueEditor v-model="currentValue" :editor-options="editorOptions" :class="{ 'editor': true, editorHasError: hasError }" />
+    <input type="hidden" v-model="currentValue" :name="name" />
   </div>
 </template>
 <script>
@@ -23,16 +23,20 @@ export default {
       type: String,
       required: true
     },
-    initialValue: {
+    value: {
       type: String,
       required: false,
       default: null
+    },
+    hasError: {
+      type: Boolean,
+      required: false,
+      default: false
     }
   },
   data: function() {
     return {
-      value: null,
-      valueCorrected: null,
+      currentValue: null,
       editorOptions: {
         modules: {
           htmlEditButton: {},
@@ -60,27 +64,35 @@ export default {
     }
   },
   watch: {
-    value(newVal) {
-      // We have an odd problem on Linux where we get <p><br>.
-      if (newVal) {
-        newVal = newVal.replace('<p><br>', '<p>');
-      }
+    currentValue: {
+      handler(newVal) {
+        // We have an odd problem on Linux where we get <p><br>.
+        if (newVal) {
+          newVal = newVal.replace('<p><br>', '<p>');
+        }
 
-      this.valueCorrected = newVal
+        this.$emit('update:value', newVal)
+      },
+      immediate: true
     },
-    valueCorrected(newVal) {
-      this.$emit('update:value', newVal)
+    value: {
+      handler(newVal) {
+        this.currentValue = newVal
+      },
+      immediate: true
     }
   },
   mounted() {
-    this.value = this.initialValue
-    this.valueCorrected = this.initialValue
-  },
-  methods: {
+    this.currentValue = value
   }
 }
 </script>
 <style scoped lang="scss">
+@import 'resources/global/css/_variables';
+@import '~bootstrap/scss/functions';
+@import '~bootstrap/scss/variables';
+@import '~bootstrap/scss/mixins/_breakpoints';
+
 /deep/ .ql-editor,  /deep/ .ql-container {
   min-height: 300px !important;
   max-height: 300px !important;
@@ -108,6 +120,20 @@ export default {
   }
   h6 {
     font-size: 1rem;
+  }
+}
+
+.editorHasError {
+  /deep/ .ql-toolbar {
+    border-top: 2px solid $brand-danger !important;
+    border-left: 2px solid $brand-danger !important;
+    border-right: 2px solid $brand-danger !important;
+  }
+
+  /deep/ .ql-container {
+    border-bottom: 2px solid $brand-danger !important;
+    border-left: 2px solid $brand-danger !important;
+    border-right: 2px solid $brand-danger !important;
   }
 }
 </style>

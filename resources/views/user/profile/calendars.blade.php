@@ -51,7 +51,7 @@
             <option value="{{ $area }}">{{ $area }}</option>
         @endforeach
         </select>
-        @if ($first_option)
+        @if (!is_null($first_option))
         <input type="text" class="form-control" value="{{ url("/calendar/group-area/{$first_option}") }}">
         @endif
         <div class="input-group-append">

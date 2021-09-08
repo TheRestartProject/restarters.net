@@ -219,7 +219,13 @@ export default {
       groups: this.groups
     })
 
-    let setFrom = this.duplicateFrom || this.initialEvent || null
+    let setFrom = null
+
+    if (this.duplicateFrom) {
+      setFrom = this.duplicateFrom
+    } else if (this.initialEvent) {
+      setFrom = this.initialEvent
+    }
 
     if (setFrom) {
       this.idgroups = setFrom.group
@@ -227,8 +233,8 @@ export default {
       this.eventLink = setFrom.link
       this.eventAddress = setFrom.location
       this.free_text = setFrom.free_text
-      this.eventStart = setFrom.start
-      this.eventEnd = setFrom.end
+      this.eventStart = setFrom.start.substring(0, 5)
+      this.eventEnd = setFrom.end.substring(0, 5)
       this.eventOnline = setFrom.online ? true : false
       this.lat = setFrom.latitude
       this.lng = setFrom.longitude
