@@ -216,8 +216,8 @@ export default {
       this.eventVenue = setFrom.venue
       this.eventAddress = setFrom.location
       this.free_text = setFrom.free_text
-      this.eventStart = setFrom.start
-      this.eventEnd = setFrom.end
+      this.eventStart = setFrom.start.substring(0, 5)
+      this.eventEnd = setFrom.end.substring(0, 5)
       this.eventOnline = setFrom.online ? true : false
       this.lat = setFrom.latitude
       this.lng = setFrom.longitude

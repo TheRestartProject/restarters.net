@@ -125,5 +125,12 @@ export default {
 
 /deep/ .time {
   width: 125px;
+  margin: 1px;
+
+  &:focus {
+    margin: 0px;
+    margin-bottom: 0px;
+    border: 3px solid #222!important;
+  }
 }
 </style>
