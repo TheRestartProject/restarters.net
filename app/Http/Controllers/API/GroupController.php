@@ -131,7 +131,7 @@ class GroupController extends Controller
                                                            'start_time' => $event->start,
                                                            'end_time' => $event->end,
                                                            'name' => $event->venue,
-                                                           'link' => $event->link,
+// TODO Once DOT-1502 is released                                                           'link' => $event->link,
                                                            'online' => $event->online,
                                                            'description' => $event->free_text,
                                                            'location' => [
@@ -151,7 +151,7 @@ class GroupController extends Controller
                                                        'start_time' => $event->start,
                                                        'end_time' => $event->end,
                                                        'name' => $event->venue,
-                                                       'link' => $event->link,
+// TODO Once DOT-1502 is released                                                       'link' => $event->link,
                                                        'online' => $event->online,
                                                        'description' => $event->free_text,
                                                        'location' => [
