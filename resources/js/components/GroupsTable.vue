@@ -310,7 +310,7 @@ export default {
       })
     },
     distance(dist ) {
-      if (dist < 10) {
+      if (dist < 5) {
         return Math.round(dist * 10) / 10
       } else {
         return Math.round(dist)
