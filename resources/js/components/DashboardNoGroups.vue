@@ -1,15 +1,21 @@
 <template>
   <div>
-    <div v-if="nearbyGroups.length" class="layout mb-2">
+    <div v-if="location" class="layout mb-2">
       <div class="pic" />
       <!-- eslint-disable-next-line -->
       <div class="overlay">
-        <div v-html="__('dashboard.no_groups')" class="mt-2 m-md-2" />
+        <div class="mt-2 m-md-2">
+          <div v-html="__('dashboard.no_groups')" v-if="!nearbyGroups.length" />
+          <div v-html="__('dashboard.no_groups_intro')" />
+        </div>
       </div>
-      <div class="groups mt-2 p-0 p-md-2">
+      <div class="groups mt-2 p-0 p-md-2" v-if="nearbyGroups.length">
         <h3>{{ __('dashboard.groups_near_you_header') }}</h3>
         <hr />
         <DashboardGroup v-for="group in nearbyGroups" :key="'nearbygroup-' + group.idgroups" :group="group" />
+        <a href="/group/nearby">
+          {{ __('dashboard.see_all_groups_near_you') }}
+        </a>
       </div>
     </div>
     <div v-else class="layout mb-2">
@@ -31,6 +37,10 @@ import DashboardGroup from './DashboardGroup'
 export default {
   components: {DashboardGroup},
   props: {
+    location: {
+      type: String,
+      required: true
+    },
     nearbyGroups: {
       type: Array,
       required: false,
@@ -107,10 +117,6 @@ export default {
   background-size: cover;
   background-position: center;
   background-image: url('/images/no_groups.png');
-}
-
-/deep/ .overlay a {
-  text-decoration: underline;
 }
 
 h3 {

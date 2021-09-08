@@ -207,17 +207,18 @@ abstract class TestCase extends BaseTestCase
         return $val;
     }
 
-//    private function isJson($string) {
-//        json_decode($string);
-//        return json_last_error() === JSON_ERROR_NONE;
-//    }
-//
+    private function isJson2($string) {
+        // We have our own version because the PHPUnit one returns TRUE for a simple string.
+        json_decode($string);
+        return json_last_error() === JSON_ERROR_NONE;
+    }
+
     private function canonicaliseAndAssertSame($val1, $val2, $name)
     {
         $val1 = $this->canonicalise($val1);
         $val2 = $this->canonicalise($val2);
 
-        if ($this->isJson($val1) && $this->isJson($val2)) {
+        if ($this->isJson2($val1) && $this->isJson2($val2)) {
             // We get nicer mismatch display if we compare the decoded JSON object rather than comparing the
             // string encoding.
             $dec1 = json_decode($val1, true);
@@ -247,6 +248,8 @@ abstract class TestCase extends BaseTestCase
         }
 
         $this->assertTrue($foundSome);
+
+        return $props;
     }
 
     public function setDiscourseTestEnvironment()

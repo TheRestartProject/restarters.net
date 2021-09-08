@@ -96,10 +96,17 @@ class DashboardController extends Controller
             $upcoming_events = Party::with('theGroup')->
             whereDate('event_date', '>=', date('Y-m-d'))
                 ->select('events.*')
-                ->orderBy('event_date', 'ASC')
-                ->take(3)
-                ->get();
+            ->orderBy('event_date', 'ASC')
+            ->get();
+        $expanded_events = [];
+
+        foreach ($upcoming_events as $event) {
+            $thisone = $event->getAttributes();
+            $thisone['the_group'] = \App\Group::find($event->group);
+            $expanded_events[] = $thisone;
         }
+
+        $upcoming_events = $expanded_events;
 
         // Look for groups where user ID exists in pivot table.  We have to explicitly test on deleted_at because
         // the normal filtering out of soft deletes won't happen for joins.
