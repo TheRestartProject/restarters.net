@@ -35,9 +35,11 @@
                    class="btn btn-primary ml-2">
                     @lang('printcatora.about')
                 </a>
+                @if (!$closed)
                 <a class="btn btn-primary" href="{{ '/printcat' . ($partner ? '?partner=$partner' : '') }}">
                     @lang('microtasking.cta.printcat.get_involved')
                 </a>
+                @endif
             </div>
         </div>
         @if(session()->has('success'))
@@ -45,8 +47,26 @@
             @lang('printcatora.status.task_completed')!
         </div>
         @endif
+        @if ($closed)
+            <div class="row panel px-1 py-3 mb-4 mx-1 mx-sm-0 quest-closed">
+                <div class="col text-left">
+                    <h4>@lang('microtask-ora.quest-closed.header')</h4>
+                    <p>
+                        @lang('microtask-ora.quest-closed.message-1')
+                    </p>
+
+                    <p>
+                        @lang('microtask-ora.quest-closed.message-2')
+                    </p>
+                    <ul>
+                        <li><a href="https://talk.restarters.net/t/why-do-printers-break-join-the-printcat-investigation/4664">@lang('microtask-ora.quest-closed.read-more', ['quest' => 'PrintCat'])</a></li>
+                        <li><a href="https://restarters.net/workbench">@lang('microtask-ora.quest-closed.visit-workbench')</a></li>
+                    </ul>
+                </div>
+            </div>
+        @endif
         @if (isset($status))
-        @if (!$complete)
+        @if (!$complete && !$closed)
         <div class="row problem panel p-2 mb-4 mx-1 mx-sm-0 justify-content-center">
             <div class="col">
                 <div class="row justify-content-center">
@@ -121,7 +141,7 @@
             </div>
         </div>
         @endif
-        @if (!$complete)
+        @if (!$complete && !$closed)
         <div class="row problem panel p-2 mb-4 mx-1 mx-sm-0 justify-content-center">
             <div class="col">
                 <div class="row justify-content-center">

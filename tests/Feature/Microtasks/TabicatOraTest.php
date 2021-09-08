@@ -88,25 +88,10 @@ class TabicatOraTest extends TestCase
     }
 
     /** @test */
-    public function fetch_tabicatora_page()
+    public function tabicatora_should_redirect_to_status_page()
     {
-        $fault_types = $this->_setup_fault_types();
-        $data = $this->_setup_devices();
-        $this->withSession([]);
-        $this->_bypass_cta();
-        for ($i = 1; $i <= count($data); $i++) {
-            // Illuminate\Foundation\Testing\TestResponse
-            $response = $this->get('/tabicat');
-            $seshids = $this->app['session']->get('tabicatora.exclusions');
-            $this->assertTrue(is_array($seshids), 'tabicatora.exclusions not an array');
-            $this->assertEquals($i, count($seshids), 'tabicatora.exclusions wrong length');
-            $response->assertSuccessful();
-            $response->assertViewIs('tabicatora.index');
-        }
-        // No more records for this user
+        // TabiCat is closed - should redirect to status page.
         $response = $this->get('/tabicat');
-        $response->assertSessionHas('tabicatora.exclusions');
-        $response->assertRedirect();
         $response->assertRedirect(url()->current().'/status');
     }
 
