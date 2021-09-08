@@ -62,13 +62,11 @@ class GroupController extends Controller
             ->select($group_atts)
             ->get();
 
-        //Make sure we don't show the same groups in nearest to you
-        $your_groups_uniques = $your_groups->pluck('idgroups')->toArray();
-        $groups_near_you = $user->groupsNearby(10);
+        // We pass a high limit to the groups nearby; there is a distance limit which will normally kick in first.
+        $groups_near_you = $user->groupsNearby(1000);
 
         return view('group.index', [
             'your_groups' => $this->expandGroups($your_groups),
-            'your_groups_uniques' => $your_groups_uniques,
             'groups_near_you' => $this->expandGroups($groups_near_you),
             'groups' => $this->expandGroups($groups),
             'your_area' => $user->location,
@@ -830,6 +828,7 @@ class GroupController extends Controller
                     'networks' => Arr::pluck($group->networks, 'id'),
                     'country' => $group->country,
                     'group_tags' => $group->group_tags()->get()->pluck('id'),
+                    'distance' => $group->distance
                 ];
             }
         }
