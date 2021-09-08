@@ -217,7 +217,6 @@ export default {
       setFrom = this.initialEvent
     }
 
-    console.log("Setfrom", setFrom)
     if (setFrom) {
       this.idgroups = setFrom.group
       this.eventVenue = setFrom.venue

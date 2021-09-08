@@ -1,7 +1,7 @@
 <template>
   <div>
-    <VueEditor v-model="value" :editor-options="editorOptions" :class="{ 'editor': true, editorHasError: hasError }" />
-    <input type="hidden" v-model="valueCorrected" :name="name" />
+    <VueEditor v-model="currentValue" :editor-options="editorOptions" :class="{ 'editor': true, editorHasError: hasError }" />
+    <input type="hidden" v-model="currentValue" :name="name" />
   </div>
 </template>
 <script>
@@ -36,8 +36,7 @@ export default {
   },
   data: function() {
     return {
-      value: null,
-      valueCorrected: null,
+      currentValue: null,
       editorOptions: {
         modules: {
           htmlEditButton: {},
@@ -65,22 +64,27 @@ export default {
     }
   },
   watch: {
-    valueCorrected(newVal) {
-      this.$emit('update:value', newVal)
-    },
-    value: {
+    currentValue: {
       handler(newVal) {
         // We have an odd problem on Linux where we get <p><br>.
         if (newVal) {
           newVal = newVal.replace('<p><br>', '<p>');
         }
 
-        this.valueCorrected = newVal
-        this.valueCorrected = newVal
+        this.$emit('update:value', newVal)
+      },
+      immediate: true
+    },
+    value: {
+      handler(newVal) {
+        this.currentValue = newVal
       },
       immediate: true
     }
   },
+  mounted() {
+    this.currentValue = value
+  }
 }
 </script>
 <style scoped lang="scss">
