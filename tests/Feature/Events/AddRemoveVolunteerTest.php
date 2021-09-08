@@ -29,7 +29,7 @@ class AddRemoveVolunteerTest extends TestCase
                                                    'start' => '12:13'
                                                ]);
 
-        $host = factory(User::class)->states('Host')->create();
+        $host = factory(User::class)->states('Administrator')->create();
         $this->actingAs($host);
 
         $restarter = factory(User::class)->states('Restarter')->create();
@@ -47,7 +47,11 @@ class AddRemoveVolunteerTest extends TestCase
         $redirectTo = $response->getTargetUrl();
         $this->assertNotFalse(strpos($redirectTo, '/party/view/' . $event->idevents));
 
-        // TODO Remove them.
+        // Remove them
+        $volunteer = EventsUsers::where('user', $restarter->id)->first();
+        $this->post('/party/remove-volunteer/', [
+            'id' => $volunteer->idevents_users,
+        ])->assertSee('true');
 
         // Add an invited user
         $restarter = factory(User::class)->states('Restarter')->create();
@@ -74,6 +78,11 @@ class AddRemoveVolunteerTest extends TestCase
         $redirectTo = $response->getTargetUrl();
         $this->assertNotFalse(strpos($redirectTo, '/party/view/' . $event->idevents));
 
+        $volunteer = EventsUsers::where('user', $restarter->id)->first();
+        $this->post('/party/remove-volunteer/', [
+            'id' => $volunteer->idevents_users,
+        ])->assertSee('true');
+
         // Add by name only
         $response = $this->post('/party/add-volunteer', [
             'event' => $event->idevents,
@@ -85,6 +94,11 @@ class AddRemoveVolunteerTest extends TestCase
         $redirectTo = $response->getTargetUrl();
         $this->assertNotFalse(strpos($redirectTo, '/party/view/' . $event->idevents));
 
+        $volunteer = EventsUsers::where('full_name', 'Jo Bloggins')->first();
+        $this->post('/party/remove-volunteer/', [
+            'id' => $volunteer->idevents_users,
+        ])->assertSee('true');
+
         // Add anonymous.
         $response = $this->post('/party/add-volunteer', [
             'event' => $event->idevents,
@@ -94,5 +108,10 @@ class AddRemoveVolunteerTest extends TestCase
         $this->assertTrue($response->isRedirection());
         $redirectTo = $response->getTargetUrl();
         $this->assertNotFalse(strpos($redirectTo, '/party/view/' . $event->idevents));
+
+        $volunteer = EventsUsers::where('event', $event->idevents)->whereNull('user')->first();
+        $this->post('/party/remove-volunteer/', [
+            'id' => $volunteer->idevents_users,
+        ])->assertSee('true');
     }
 }

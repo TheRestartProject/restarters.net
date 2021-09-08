@@ -31,8 +31,7 @@ export default {
     },
     async remove({commit, rootGetters}, params) {
       let ret = await axios.post('/party/remove-volunteer', {
-        user_id: params.userId,
-        event_id: params.idevents
+        id: params.id
       }, {
         headers: {
           'X-CSRF-TOKEN': rootGetters['auth/CSRF']

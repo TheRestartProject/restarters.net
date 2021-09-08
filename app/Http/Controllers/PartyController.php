@@ -1005,34 +1005,38 @@ class PartyController extends Controller
 
     public function removeVolunteer(Request $request)
     {
-        $user_id = $request->input('user_id');
-        $event_id = $request->input('event_id');
+        // The id that's passed in is that of the events_users table, because the entry may refer to a user without
+        // an id.
+        $id = $request->input('id');
+        $volunteer = EventsUsers::where('idevents_users', $id)->first();
 
         $return = [
             'success' => false,
         ];
 
-        //Has current logged in user got permission to remove volunteer
-        if ((Fixometer::hasRole(Auth::user(), 'Host') && Fixometer::userHasEditPartyPermission($event_id, Auth::user()->id)) || Fixometer::hasRole(Auth::user(), 'Administrator')) {
-            //Let's get the user before we delete them
-            $volunteer = EventsUsers::where('user', $user_id)->where('event', $event_id)->first();
+        if ($volunteer) {
+            $event_id = $volunteer->event;
 
-            //Let's delete the user
-            $delete_user = EventsUsers::where('user', $user_id)->where('event', $event_id)->delete();
-            if ($delete_user == 1) {
-                //If the user accepted the invitation, we decrement
-                if ($volunteer->status == 1) {
-                    Party::find($event_id)->decrement('volunteers');
+            // Has current logged-in user got permission to remove volunteer?
+            if ((Fixometer::hasRole(Auth::user(), 'Host') && Fixometer::userHasEditPartyPermission($event_id, Auth::user()->id)) || Fixometer::hasRole(Auth::user(), 'Administrator')) {
+                //Let's delete the user
+                $delete_user = $volunteer->delete();
+
+                if ($delete_user == 1) {
+                    //If the user accepted the invitation, we decrement
+                    if ($volunteer->status == 1) {
+                        Party::find($event_id)->decrement('volunteers');
+                    }
+
+                    //Return JSON
+                    $return = [
+                        'success' => true,
+                    ];
                 }
-
-                //Return JSON
-                $return = [
-                    'success' => true,
-                ];
             }
-        }
 
-        return response()->json($return);
+            return response()->json($return);
+        }
     }
 
     public function postSendInvite(Request $request)

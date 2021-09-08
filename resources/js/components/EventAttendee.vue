@@ -103,9 +103,9 @@ export default {
     },
     async remove() {
       try {
+        console.log("Remove", this.attendee)
         await this.$store.dispatch('attendance/remove', {
-          userId: this.attendee.user,
-          idevents: this.attendee.event,
+          id: this.attendee.idevents_users
         })
       } catch (e) {
         this.error = e.message
