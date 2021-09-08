@@ -553,11 +553,8 @@ function initAutocomplete() {
 
   function removeUser() {
 
-    var user_id = jQuery(this).data('remove-volunteer');
-    var event_id = jQuery(this).data('event-id');
-    var type = jQuery(this).data('type');
-    var counter = jQuery('#'+type+'-counter');
-    var current_count = parseInt(counter.text());
+    var id = jQuery(this).data('remove-volunteer');
+    console.log("ID to remove", id)
 
     $.ajax({
       headers: {
@@ -566,15 +563,12 @@ function initAutocomplete() {
       type: 'post',
       url: '/party/remove-volunteer',
       data: {
-        user_id : user_id,
-        event_id : event_id
+        id : id,
       },
       datatype: 'json',
       success: function(json) {
         if( json.success ){
-          jQuery('.volunteer-' + user_id).fadeOut();
-          jQuery('#'+type+'-counter').text();
-          counter.text( current_count - 1 );
+          jQuery('.volunteer-' + id).fadeOut();
         } else {
           alert('Something has gone wrong');
         }

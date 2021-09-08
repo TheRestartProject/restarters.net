@@ -103,7 +103,6 @@ export default {
     },
     async remove() {
       try {
-        console.log("Remove", this.attendee)
         await this.$store.dispatch('attendance/remove', {
           id: this.attendee.idevents_users
         })

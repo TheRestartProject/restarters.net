@@ -17,12 +17,14 @@ export default {
     set(state, params) {
       Vue.set(state.list, params.idevents, params.attendees)
     },
-    remove(state, params) {
-      let newarr = state.list[params.idevents].filter((a) => {
-        return a.user !== params.userId
-      })
+    remove(state, id) {
+      state.list.forEach((list, idevents) => {
+        let newarr = state.list[idevents].filter((a) => {
+          return a.idevents_users !== id
+        })
 
-      Vue.set(state.list, params.idevents, newarr)
+        Vue.set(state.list, idevents, newarr)
+      })
     },
   },
   actions: {
@@ -39,7 +41,7 @@ export default {
       })
 
       if (ret && ret.data && ret.data.success) {
-        commit('remove', params)
+        commit('remove', params.id)
       } else {
         throw new Exception("Server request failed")
       }
