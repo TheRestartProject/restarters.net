@@ -4,7 +4,10 @@
       <div class="pic" />
       <!-- eslint-disable-next-line -->
       <div class="overlay">
-        <div v-html="__('dashboard.no_groups')" class="mt-2 m-md-2" />
+        <div class="mt-2 m-md-2">
+          <div v-html="__('dashboard.no_groups')" v-if="!nearbyGroups.length" />
+          <div v-html="__('dashboard.no_groups_intro')" />
+        </div>
       </div>
       <div class="groups mt-2 p-0 p-md-2" v-if="nearbyGroups.length">
         <h3>{{ __('dashboard.groups_near_you_header') }}</h3>
