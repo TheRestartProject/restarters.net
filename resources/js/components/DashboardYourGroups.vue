@@ -147,8 +147,8 @@ h3 {
   font-weight: bold;
 }
 
-a {
-  color: unset;
+/deep/ a {
+  color: $brand;
   text-decoration: underline;
 }
 
