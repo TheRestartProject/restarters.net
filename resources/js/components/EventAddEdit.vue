@@ -209,8 +209,15 @@ export default {
       groups: this.groups
     })
 
-    let setFrom = this.duplicateFrom || this.initialEvent || null
+    let setFrom = null
 
+    if (this.duplicateFrom) {
+      setFrom = this.duplicateFrom
+    } else if (this.initialEvent) {
+      setFrom = this.initialEvent
+    }
+
+    console.log("Setfrom", setFrom)
     if (setFrom) {
       this.idgroups = setFrom.group
       this.eventVenue = setFrom.venue
