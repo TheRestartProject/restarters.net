@@ -554,7 +554,6 @@ function initAutocomplete() {
   function removeUser() {
 
     var id = jQuery(this).data('remove-volunteer');
-    console.log("ID to remove", id)
 
     $.ajax({
       headers: {
