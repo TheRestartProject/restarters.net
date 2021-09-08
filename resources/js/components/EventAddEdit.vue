@@ -11,7 +11,7 @@
           :has-error="$v.eventVenue.$error"
           ref="eventVenue"/>
       <EventLink
-          class="flex-grow-1 pr-4 event-link"
+          class="flex-grow-1 event-link"
           :link.sync="eventLink"
           :has-error="$v.eventLink.$error"
           ref="eventLink"/>
@@ -307,6 +307,7 @@ export default {
   .event-link {
     grid-row: 2 / 3;
     grid-column: 1 / 2;
+    margin-right: 2px;
   }
 
   .event-group {
