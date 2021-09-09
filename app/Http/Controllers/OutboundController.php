@@ -49,9 +49,8 @@ class OutboundController extends Controller
                     ->select('groups.*')
                       ->get();
                 $co2 = 0;
-                $emissionRatio = \App\Helpers\LcaStats::getEmissionRatioPowered();
                 foreach ($groups as $group) {
-                    $groupStats = $group->getGroupStats($emissionRatio);
+                    $groupStats = $group->getGroupStats();
                     $co2 += $groupStats['co2'];
                 }
             }
