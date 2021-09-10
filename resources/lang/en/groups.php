@@ -165,7 +165,7 @@ return [
   'no_groups_mine' => '<b>If you can\'t see any here yet, why not <a href="/group/nearby">follow your nearest group</a> to hear about their upcoming repair events?</b>',
   'no_groups_nearest_no_location' => '<b><p>You do not currently have a town/city set.  You can set one in <a href="/profile/edit">your profile</a>.</p><p>You can also <a href="/group/all">view all groups</a>.</p></b>',
   'no_groups_nearest_with_location' => '<p>There are no groups within 50 km of your location. You can <a href="/group/all">see all groups here</a>. Or why not start your own? <a href="https://talk.restarters.net/t/how-to-run-a-repair-event-the-restart-party-kit/324">Learn what running your own repair event involves.</a></p>',
-  'nearest_groups'  => 'These the groups that are with 50 km of :location',
+  'nearest_groups'  => 'These are the groups that are within 50 km of :location',
   'nearest_groups_change' => '(change)',
   'group_count' => 'There is <b>:count group</b>.|There are <b>:count groups</b>.',
   'search_name_placeholder' => 'Search name...',
