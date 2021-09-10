@@ -85,8 +85,6 @@ class CreateWordPressApproveEventPost
 
             $theParty->update(['wordpress_post_id' => $wpid]);
         } catch (\Exception $e) {
-            error_log('An error occurred during Wordpress event creation: '.$e->getMessage());
-
             Log::error('An error occurred during Wordpress event creation: '.$e->getMessage());
             $notify_users = Fixometer::usersWhoHavePreference('admin-approve-wordpress-event-failure');
             Notification::send($notify_users, new AdminWordPressCreateEventFailure([

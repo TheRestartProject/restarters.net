@@ -365,18 +365,16 @@ class PartyController extends Controller
                     $networks = $groupObj->networks;
 
                     if ($networks && count($networks)) {
-                        error_log("Has networks");
                         $autoapprove = true;
 
                         foreach ($networks as $network) {
-                            error_log("Check network {$network->id} approve {$network->auto_approve_events}");
                             $autoapprove &= $network->auto_approve_events;
                         }
                     }
 
-                    error_log("Auto-approve $autoapprove");
                     if ($autoapprove) {
                         Log::info('Auto-approve event $idParty');
+                        Party::find($idParty)->approve();
                     }
                 } else {
                     $response['danger'] = 'Party could <strong>not</strong> be created. Something went wrong with the database.';
