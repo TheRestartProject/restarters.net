@@ -44,7 +44,7 @@ class WordpressEventPushTest extends TestCase
         $eventData['latitude'] = '1';
         $eventData['longitude'] = '1';
 
-        event(new ApproveEvent($event, $eventData));
+        event(new ApproveEvent($event));
     }
 
     /** @test */
@@ -66,7 +66,7 @@ class WordpressEventPushTest extends TestCase
         $eventData['latitude'] = '1';
         $eventData['longitude'] = '1';
 
-        event(new ApproveEvent($event, $eventData));
+        event(new ApproveEvent($event));
     }
 
     /** @test */

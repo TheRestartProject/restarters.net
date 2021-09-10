@@ -357,6 +357,27 @@ class PartyController extends Controller
                             $File->upload($upload, 'image', $idParty, env('TBL_EVENTS'));
                         }
                     }
+
+                    // Check whether the event should be auto-approved, if all of the networks it belongs to
+                    // allow it.
+                    $autoapprove = false;
+                    $groupObj = Group::where('idgroups', $group)->first();
+                    $networks = $groupObj->networks;
+
+                    if ($networks && count($networks)) {
+                        error_log("Has networks");
+                        $autoapprove = true;
+
+                        foreach ($networks as $network) {
+                            error_log("Check network {$network->id} approve {$network->auto_approve_events}");
+                            $autoapprove &= $network->auto_approve_events;
+                        }
+                    }
+
+                    error_log("Auto-approve $autoapprove");
+                    if ($autoapprove) {
+                        Log::info('Auto-approve event $idParty');
+                    }
                 } else {
                     $response['danger'] = 'Party could <strong>not</strong> be created. Something went wrong with the database.';
                 }
@@ -516,35 +537,11 @@ class PartyController extends Controller
                 $theParty = $Party->findThis($id)[0];
 
                 // If event has just been approved, email Restarters attached to group, and push to Wordpress.
+                $event = Party::find($id);
+
                 if (isset($data['moderate']) && $data['moderate'] == 'approve') {
-                    // Notify Restarters of relevant Group
-                    $event = Party::find($id);
-                    $group = Group::find($event->group);
-
-                    // Only send notifications if the event is in the future.
-                    // We don't want to send emails to Restarters about past events being added.
-                    if ($event->isUpcoming()) {
-                        // Retrieving all users from the User model whereby they allow you send emails but their role must not include group admins
-                        $group_restarters = User::join('users_groups', 'users_groups.user', '=', 'users.id')
-                                        ->where('users_groups.group', $event->group)
-                                        ->where('users_groups.role', 4)
-                                            ->select('users.*')
-                                            ->get();
-
-                        // If there are restarters against the group
-                        if (! $group_restarters->isEmpty()) {
-                            // Send user a notification and email
-                            Notification::send($group_restarters, new NotifyRestartersOfNewEvent([
-                                'event_venue' => $event->venue,
-                                'event_url' => url('/party/view/'.$event->idevents),
-                                'event_group' => $group->name,
-                            ]));
-                        }
-                    }
-
-                    event(new ApproveEvent($event, $data));
+                    $event->approve();
                 } elseif (! empty($theParty->wordpress_post_id)) {
-                    $event = Party::find($id);
                     event(new EditEvent($event, $data));
                 }
 
