@@ -611,7 +611,12 @@ AND devices.event = events.idevents ';
     public static function getItemTypes()
     {
         // List the item types
-        $types = DB::table('devices')->whereNotNull('item_type')->select('item_type', DB::raw('COUNT(*) as count'))->groupBy('item_type')->orderBy('count', 'desc')->get()->toArray();
+        $types = DB::table('devices')->whereNotNull('item_type')
+            ->select(['item_type', 'categories.name AS categoryname', 'categories.idcategories', 'categories.powered', DB::raw('COUNT(*) as count')])
+            ->join('categories', 'categories.idcategories', '=', 'devices.category')
+            ->groupBy('item_type')
+            ->orderBy('count', 'desc')
+            ->get()->toArray();
 
         return $types;
     }

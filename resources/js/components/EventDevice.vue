@@ -7,20 +7,24 @@
       <div class="br d-flex flex-column botwhite">
         <b-card no-body class="p-3 flex-grow-1 border-0">
           <h3 class="mt-2 mb-4">{{ __('devices.title_items') }}</h3>
-          <DeviceCategorySelect :class="{
+          <DeviceType class="mb-2" :type.sync="currentDevice.item_type"
+                      :icon-variant="add ? 'black' : 'brand'" :item-types="itemTypes" :disabled="disabled"
+                      :suppress-type-warning="suppressTypeWarning" :powered="powered"
+                      :unknown.sync="unknownItemType"
+          />
+          <div class="border-danger">
+            Computed category: {{ computedCategoryName }}, {{ computedPowered }}
+          </div>
+          <DeviceCategorySelect v-if="unknownItemType" :class="{
             'mb-2': true,
             'border-thick': missingCategory
             }" :category.sync="currentDevice.category" :clusters="clusters" :powered="powered"
                                 :icon-variant="add ? 'black' : 'brand'" :disabled="disabled" @changed="categoryChange"/>
-          <DeviceType v-if="!powered || aggregate" class="mb-2" :type.sync="currentDevice.item_type"
-                      :icon-variant="add ? 'black' : 'brand'" :item-types="itemTypes" :disabled="disabled"
-                      :suppress-type-warning="suppressTypeWarning" :powered="powered"/>
-          <div v-if="powered">
-            <DeviceBrand class="mb-2" :brand.sync="currentDevice.brand" :brands="brands" :disabled="disabled"
-                         :suppress-brand-warning="suppressBrandWarning"/>
-            <DeviceModel class="mb-2" :model.sync="currentDevice.model" :icon-variant="add ? 'black' : 'brand'"
-                         :disabled="disabled"/>
-          </div>
+
+          <DeviceBrand class="mb-2" :brand.sync="currentDevice.brand" :brands="brands" :disabled="disabled"
+                       :suppress-brand-warning="suppressBrandWarning"/>
+          <DeviceModel class="mb-2" :model.sync="currentDevice.model" :icon-variant="add ? 'black' : 'brand'"
+                       :disabled="disabled"/>
           <DeviceWeight v-if="showWeight" :weight.sync="currentDevice.estimate" :disabled="disabled"/>
           <DeviceAge :age.sync="currentDevice.age" :disabled="disabled"/>
           <DeviceImages :idevents="idevents" :device="currentDevice" :add="add" :edit="edit" :disabled="disabled"
@@ -179,7 +183,8 @@ export default {
   data () {
     return {
       currentDevice: {},
-      missingCategory: false
+      missingCategory: false,
+      unknownItemType: false
     }
   },
   watch: {
@@ -196,6 +201,50 @@ export default {
     },
     currentCategory () {
       return this.currentDevice ? this.currentDevice.category : null
+    },
+    computedCategory() {
+      let ret = null
+
+      if (this.currentDevice && this.currentDevice.item_type) {
+        // Some item types are the same as category names.
+        this.clusters.forEach((cluster) => {
+          cluster.categories.forEach((c) => {
+            const name = this.$lang.get('strings.' + c.name)
+
+            if (name === this.currentDevice.item_type) {
+              ret = {
+                categoryname: c.name,
+                powered: c.powered
+              }
+            }
+          })
+        })
+
+        if (!ret) {
+          // Now check the item types.
+          this.itemTypes.forEach(t => {
+            if (this.currentDevice.item_type === t.item_type) {
+              ret = t
+            }
+          })
+        }
+      }
+
+      return ret
+    },
+    computedCategoryName() {
+      return this.computedCategory ? this.computedCategory.categoryname : null
+    },
+    computedPowered() {
+      if (this.computedCategory) {
+        if (this.computedCategory.powered) {
+          return 'Powered'
+        } else {
+          return 'Unpowered'
+        }
+      } else {
+        return null
+      }
     },
     aggregate () {
       if (!this.currentCategory) {

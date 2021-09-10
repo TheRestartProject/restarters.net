@@ -5,7 +5,7 @@
       <b-img class="icon clickable" src="/icons/info_ico_black.svg" v-if="iconVariant === 'black'" />
       <b-img class="icon clickable" src="/icons/info_ico_green.svg" v-else />
     </div>
-    <p v-if="!suppressTypeWarning && notASuggestion" class="pl-1 form-text">
+    <p v-if="unknownType" class="pl-1 form-text">
       {{ __('devices.unknown_item_type' )}}
     </p>
   </div>
@@ -67,6 +67,9 @@ export default {
 
       return ret
     },
+    unknownType() {
+      return !this.suppressTypeWarning && this.notASuggestion
+    },
     translatedTooltip() {
       if (this.powered) {
         return this.$lang.get('devices.tooltip_type_powered')
@@ -87,6 +90,9 @@ export default {
     type(newVal) {
       this.currentType = newVal
     },
+    unknownType(newVal) {
+      this.$emit('update:unknown', newVal)
+    }
   },
   methods: {
     input(e) {
