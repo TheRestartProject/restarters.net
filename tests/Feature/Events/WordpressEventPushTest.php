@@ -37,14 +37,14 @@ class WordpressEventPushTest extends TestCase
         ]);
         $group = factory(Group::class)->create();
         $restart->addGroup($group);
-        $event = factory(Party::class)->create(['group' => $group->idgroups]);
+        $event = factory(Party::class)->create([
+            'group' => $group->idgroups,
+            'latitude' => 1,
+            'longitude' => 1,
+            'event_date' => '2100-01-01'
+        ]);
 
-        $eventData = factory(Party::class)->raw();
-        $eventData['moderate'] = 'approve';
-        $eventData['latitude'] = '1';
-        $eventData['longitude'] = '1';
-
-        event(new ApproveEvent($event));
+        $event->approve();
     }
 
     /** @test */
