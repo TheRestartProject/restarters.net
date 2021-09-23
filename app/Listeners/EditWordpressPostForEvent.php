@@ -14,7 +14,7 @@ use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Support\Facades\Log;
 use Notification;
 
-class CreateWordPressEditEventPost
+class EditWordpressPostForEvent
 {
     protected $wpClient;
 
