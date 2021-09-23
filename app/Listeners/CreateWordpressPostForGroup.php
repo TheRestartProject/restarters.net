@@ -12,7 +12,7 @@ use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Support\Facades\Log;
 use Notification;
 
-class CreateWordPressApproveGroupPost
+class CreateWordpressPostForGroup
 {
     /**
      * Create the event listener.
