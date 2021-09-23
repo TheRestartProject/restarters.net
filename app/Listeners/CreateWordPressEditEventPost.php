@@ -80,7 +80,7 @@ class CreateWordPressEditEventPost
                 // we need to remap all custom fields because they all get unique IDs across all posts, so they don't get mixed up.
                 $thePost = $this->wpClient->getPost($theParty->wordpress_post_id);
 
-                if (isset($thPost['custom_fields'])) {
+                if (isset($thePost['custom_fields'])) {
                     foreach ($thePost['custom_fields'] as $field) {
                         foreach ($custom_fields as $k => $set_field) {
                             if ($field['key'] == $set_field['key']) {
