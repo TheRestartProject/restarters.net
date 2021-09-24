@@ -3,7 +3,6 @@
 namespace App;
 
 use App\Events\DeviceCreatedOrUpdated;
-use App\Helpers\FootprintRatioCalculator;
 use DB;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Str;
@@ -117,36 +116,23 @@ class Device extends Model implements Auditable
 
     public function getWeights($group = null)
     {
-        $sql =
-            'SELECT
+        $emissionRatio = \App\Helpers\FootprintRatioCalculator::calculateRatio();
 
+        $sql = "SELECT
 sum(case when (devices.category = 46) then (devices.estimate + 0.0) else categories.weight end) as `total_weights`,
 sum(case when (categories.powered = 1) then (case when (devices.category = 46) then (devices.estimate + 0.0) else categories.weight end) else 0 end) as ewaste,
 sum(case when (categories.powered = 0) then devices.estimate + 0.0 else 0 end) as unpowered_waste,
-sum(case when (devices.category = 46) then (devices.estimate + 0.0) * @ratio else (categories.footprint * @displacement) end) as `total_footprints`
-
-FROM devices, categories, events,
-
-(select @displacement := :displacement) inner_tbl_displacement,
-
-(select @ratio := ((sum(`categories`.`footprint`) * :displacement1) / sum(`categories`.`weight` + 0.0)) from `devices`, `categories` where `categories`.`idcategories` = `devices`.`category` and `devices`.`repair_status` = 1 and categories.idcategories != 46
-) inner_tbl_ratio
-
-WHERE devices.category = categories.idcategories and devices.repair_status = 1
-AND devices.event = events.idevents ';
-
-        // Using two named parameters for displacement due to restriction of Laravel/MySQL.
-        // see e.g.: https://github.com/laravel/framework/issues/12715
-        $params = ['displacement' => $this->displacement, 'displacement1' => $this->displacement];
+sum(case when (devices.category = 46) then (devices.estimate + 0.0) * $emissionRatio else (categories.footprint * $this->displacement) end) as `total_footprints`
+FROM devices, categories, events
+WHERE devices.category = categories.idcategories
+AND devices.repair_status = 1
+AND devices.event = events.idevents";
 
         if (! is_null($group) && is_numeric($group)) {
-            $sql .= ' AND events.group = :group ';
-            $params['group'] = $group;
-
-            return DB::select(DB::raw($sql), $params);
+            $sql .= " AND events.group = $group";
         }
 
-        return DB::select(DB::raw($sql), $params);
+        return DB::select(DB::raw($sql));
     }
 
     public function ofThisUser($id)

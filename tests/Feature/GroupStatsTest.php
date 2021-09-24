@@ -70,9 +70,10 @@ class GroupStatsTest extends TestCase
     /** @test */
     public function a_group_with_mixed_devices_has_correct_stats()
     {
-        $displacementFactor = 0.5;
-        $id_misc_powered = 46;
-        $id_misc_unpowered = 50;
+        $displacement_factor = env('DISPLACEMENT_VALUE');
+        $emission_ratio = env('EMISSION_RATIO_POWERED');
+        $id_misc_powered = env('MISC_CATEGORY_ID_POWERED');
+        $id_misc_unpowered = env('MISC_CATEGORY_ID_UNPOWERED');
 
         DB::statement('SET foreign_key_checks=0');
         Category::truncate();
@@ -114,8 +115,6 @@ class GroupStatsTest extends TestCase
         \App\DeviceBarrier::truncate();
         DB::statement('SET foreign_key_checks=1');
 
-        $Calculator = new \App\Helpers\FootprintRatioCalculator;
-
         $group = factory(Group::class)->create();
         $event = factory(Party::class)->states('moderated')->create([
             'event_date' => Carbon::yesterday(),
@@ -134,7 +133,7 @@ class GroupStatsTest extends TestCase
         $expect = [
             'parties' => 1,
             'waste' => 4,
-            'co2' => (14.4 * $displacementFactor),
+            'co2' => (14.4 * $displacement_factor),
             'ewaste' => 4,
             'unpowered_waste' => 0,
             'fixed_devices' => 1,
@@ -240,13 +239,12 @@ class GroupStatsTest extends TestCase
         ]);
         $this->assertEquals($event->idevents, $device->deviceEvent->idevents);
         $this->assertEquals($group->idgroups, $device->deviceEvent->theGroup->idgroups);
-        $emissionRatio = round($Calculator->calculateRatio(), 2);
         $expect['fixed_devices'] += 1;
         $expect['fixed_powered'] += 1;
         $expect['devices_powered'] += 1;
         $expect['ewaste'] += 1.6;
         $expect['waste'] += 1.6;
-        $expect['co2'] = ((1.6 * $emissionRatio) * $displacementFactor) + (14.4 * $displacementFactor);
+        $expect['co2'] = round(((1.6 * $emission_ratio) * $displacement_factor) + (14.4 * $displacement_factor),2);
         $result = $device->deviceEvent->theGroup->getGroupStats();
         $this->assertIsArray($result);
         $this->assertEquals(15, count($result));
@@ -258,9 +256,10 @@ class GroupStatsTest extends TestCase
     /** @test */
     public function two_groups_with_mixed_devices_have_correct_stats()
     {
-        $displacementFactor = 0.5;
-        $id_misc_powered = 46;
-        $id_misc_unpowered = 50;
+        $displacement_factor = env('DISPLACEMENT_VALUE');
+        $emission_ratio = env('EMISSION_RATIO_POWERED');
+        $id_misc_powered = env('MISC_CATEGORY_ID_POWERED');
+        $id_misc_unpowered = env('MISC_CATEGORY_ID_UNPOWERED');
 
         DB::statement('SET foreign_key_checks=0');
         Category::truncate();
@@ -318,8 +317,6 @@ class GroupStatsTest extends TestCase
         \App\DeviceBarrier::truncate();
         DB::statement('SET foreign_key_checks=1');
 
-        $Calculator = new \App\Helpers\FootprintRatioCalculator;
-
         // GROUP 1
         $group1 = factory(Group::class)->create();
         $event = factory(Party::class)->states('moderated')->create([
@@ -339,7 +336,7 @@ class GroupStatsTest extends TestCase
         $expect = [
             'parties' => 1,
             'waste' => 4,
-            'co2' => (14.4 * $displacementFactor),
+            'co2' => (14.4 * $displacement_factor),
             'ewaste' => 4,
             'unpowered_waste' => 0,
             'fixed_devices' => 1,
@@ -445,13 +442,12 @@ class GroupStatsTest extends TestCase
         ]);
         $this->assertEquals($event->idevents, $device->deviceEvent->idevents);
         $this->assertEquals($group1->idgroups, $device->deviceEvent->theGroup->idgroups);
-        $emissionRatio = round($Calculator->calculateRatio(), 2);
         $expect['fixed_devices'] += 1;
         $expect['fixed_powered'] += 1;
         $expect['devices_powered'] += 1;
         $expect['ewaste'] += 1.6;
         $expect['waste'] += 1.6;
-        $expect['co2'] = ((1.6 * $emissionRatio) * $displacementFactor) + (14.4 * $displacementFactor);
+        $expect['co2'] = round(((1.6 * $emission_ratio) * $displacement_factor) + (14.4 * $displacement_factor),2);
         $result = $device->deviceEvent->theGroup->getGroupStats();
         $this->assertIsArray($result);
         $this->assertEquals(15, count($result));
@@ -478,7 +474,7 @@ class GroupStatsTest extends TestCase
         $expect = [
             'parties' => 1,
             'waste' => 6,
-            'co2' => (16.6 * $displacementFactor),
+            'co2' => (16.6 * $displacement_factor),
             'ewaste' => 6,
             'unpowered_waste' => 0,
             'fixed_devices' => 1,
@@ -584,13 +580,12 @@ class GroupStatsTest extends TestCase
         ]);
         $this->assertEquals($event->idevents, $device->deviceEvent->idevents);
         $this->assertEquals($group2->idgroups, $device->deviceEvent->theGroup->idgroups);
-        $emissionRatio = round($Calculator->calculateRatio(), 2);
         $expect['fixed_devices'] += 1;
         $expect['fixed_powered'] += 1;
         $expect['devices_powered'] += 1;
         $expect['ewaste'] += 1.9;
         $expect['waste'] += 1.9;
-        $expect['co2'] = round(((1.9 * $emissionRatio) * $displacementFactor) + (16.6 * $displacementFactor), 2);
+        $expect['co2'] = round(((1.9 * $emission_ratio) * $displacement_factor) + (16.6 * $displacement_factor), 2);
         $result = $device->deviceEvent->theGroup->getGroupStats();
         $this->assertIsArray($result);
         $this->assertEquals(15, count($result));
