@@ -5,6 +5,7 @@ namespace Tests\Feature;
 use App\Events\ApproveGroup;
 use App\Events\EditGroup;
 use App\Group;
+use App\Network;
 use App\Party;
 use App\User;
 use Carbon\Carbon;
@@ -34,7 +35,12 @@ class WordpressGroupPushTest extends TestCase
             $mock->shouldReceive('newPost')->once();
         }));
 
+        $network = factory(Network::class)->create([
+            'name' => 'Restart',
+            'events_push_to_wordpress' => true,
+        ]);
         $group = factory(Group::class)->create();
+        $network->addGroup($group);
 
         $groupData = factory(Group::class)->raw();
         $groupData['moderate'] = 'approve';
@@ -51,9 +57,14 @@ class WordpressGroupPushTest extends TestCase
             $mock->shouldReceive('editPost')->once();
         }));
 
+        $network = factory(Network::class)->create([
+            'name' => 'Restart',
+            'events_push_to_wordpress' => true,
+        ]);
         $group = factory(Group::class)->create();
         $group->wordpress_post_id = 100;
         $group->save();
+        $network->addGroup($group);
 
         $groupData = factory(Group::class)->raw();
         $groupData['free_text'] = 'Some change';

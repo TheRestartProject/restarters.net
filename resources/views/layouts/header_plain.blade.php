@@ -89,7 +89,7 @@
                 <div id="navbarSupportedContent" class="collapse navbar-collapse">
                     <ul class="navbar-nav ml-auto">
                         <li><a class="nav-link" href="/login">@lang('login.login_title')</a></li>
-                        <li><a class="nav-link" href="/about">@lang('login.join_title')</a></li>
+                        <li><a class="nav-link" href="/user/register">@lang('login.join_title')</a></li>
                     </ul>
                 </div>
 
