@@ -922,4 +922,9 @@ class Party extends Model implements Auditable
     {
         return strtotime($this->updated_at) > strtotime($this->devices_updated_at) ? $this->updated_at : $this->devices_updated_at;
     }
+
+    public function canDelete() {
+        $stats = $this->getEventStats();
+        return $stats['devices_powered'] == 0 && $stats['devices_unpowered'] == 0;
+    }
 }

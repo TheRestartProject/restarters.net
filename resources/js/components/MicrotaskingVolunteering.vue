@@ -8,6 +8,8 @@
             <div v-html="__('microtasking.volunteering.content')" class="content pt-3">
             </div>
             <hr>
+
+            <div v-if="openQuests.length">
             <h2>{{ __('microtasking.volunteering.open_quests') }}</h2>
 
             <div class="open-quests">
@@ -23,6 +25,7 @@
             </div>
 
             <hr>
+            </div>
 
             <b-table-simple sticky-header="50vh" responsive class="pl-0 pr-0 pb-2 mb-2" table-class="m-0 leave-tables-alone">
                 <b-thead class="text-center">
@@ -61,7 +64,7 @@
                             <b-td class="text-center">{{ __('microtasking.volunteering.my_quests', { value: currentUserQuests }) }}</b-td>
                         </template>
                         <template v-else>
-                            <b-td class="text-center" colspan="2"><a class="btn btn-primary" href="/about">{{ __('microtasking.volunteering.join') }}</a></b-td>
+                            <b-td class="text-center" colspan="2"><a class="btn btn-primary" href="/user/register">{{ __('microtasking.volunteering.join') }}</a></b-td>
                         </template>
                     </b-tr>
                 </b-tbody>
@@ -102,20 +105,7 @@ export default {
     openQuests: function () {
       // Note: if we continue with more quests, and open/closed quests,
       // we will likely have a 'quests' table.
-      return [
-        {
-          name: 'TabiCat',
-          emoji: '🐾',
-          slug: 'tabicat',
-          shortintro: this.$lang.get('microtasking.cta.tabicat.short_description')
-        },
-        {
-          name: 'PrintCat',
-          emoji: '🐾',
-          slug: 'printcat',
-          shortintro: this.$lang.get('microtasking.cta.printcat.short_description')
-        }
-      ]
+      return []
     }
   }
 }

@@ -119,36 +119,19 @@ class DashboardController extends Controller
         }
 
         $new_groups = 0;
-        //Get events nearest (or not) to you
-        if (! is_null($user->latitude) && ! is_null($user->longitude)) { //Should the user have location info
-            $upcoming_events = Party::with('theGroup')->select(
-                DB::raw(
-                    '*, ( 6371 * acos( cos( radians('.$user->latitude.') ) * cos( radians( latitude ) ) * cos( radians( longitude ) - radians('.$user->longitude.') ) + sin( radians('.$user->latitude.') ) * sin( radians( latitude ) ) ) ) AS distance'
-                )
-            )
-                ->having('distance', '<=', 40)
-                ->whereDate('event_date', '>=', date('Y-m-d'))
-                ->orderBy('event_date', 'ASC')
-                ->orderBy('start', 'ASC')
-                ->orderBy('distance', 'ASC')
-                ->take(3)
-                ->get();
 
-            // Look for new nearby groups that we're not already a member of.  Eloquent is just getting in the way
-            // here so do a raw query.
-            $new_groups = DB::select(DB::raw('SELECT COUNT(*) AS count FROM groups 
-        LEFT JOIN users_groups ON groups.idgroups = users_groups.group AND users_groups.user = '.intval(Auth::id())."
-        WHERE users_groups.user IS NULL 
-            AND created_at >= '".date('Y-m-d', strtotime('1 month ago'))."'  
-            AND ( 6371 * acos( cos( radians(' . $user->latitude . ') ) * cos( radians( groups.latitude ) ) * cos( radians( groups.longitude ) - radians(' . $user->longitude . ') ) + sin( radians(' . $user->latitude . ') ) * sin( radians( groups.latitude ) ) ) ) < 40"))[0]->count;
-        } else { //Else show them the latest three
-            $upcoming_events = Party::with('theGroup')->
-            whereDate('event_date', '>=', date('Y-m-d'))
-                ->select('events.*')
-                ->orderBy('event_date', 'ASC')
-                ->take(3)
-                ->get();
+        $upcoming_events = Party::upcomingEvents()->where('users_groups.user', Auth::user()->id)
+            ->orderBy('event_date', 'ASC')
+            ->get();
+        $expanded_events = [];
+
+        foreach ($upcoming_events as $event) {
+            $thisone = $event->getAttributes();
+            $thisone['the_group'] = \App\Group::find($event->group);
+            $expanded_events[] = $thisone;
         }
+
+        $upcoming_events = $expanded_events;
 
         // Look for groups where user ID exists in pivot table.  We have to explicitly test on deleted_at because
         // the normal filtering out of soft deletes won't happen for joins.

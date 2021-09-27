@@ -5,8 +5,8 @@
         <div class="datebox d-flex flex-column">
           <span class="day align-top">{{ dayofmonth }}</span>
           <span class="month">
-          {{ month }}
-        </span>
+            {{ month }}
+          </span>
         </div>
       </div>
       <div class="ml-2 align-self-center flex-grow-1">

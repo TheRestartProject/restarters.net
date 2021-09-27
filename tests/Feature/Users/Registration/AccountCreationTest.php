@@ -2,6 +2,7 @@
 
 namespace Tests\Feature;
 
+use App\Role;
 use App\User;
 use DB;
 use Hash;
@@ -28,6 +29,15 @@ class AccountCreationTest extends TestCase
         $user = User::latest()->first();
         $this->assertEquals(51.5073509, $user->latitude);
         $this->assertEquals(-0.1277583, $user->longitude);
+    }
+
+    public function testWorkbenchThenRegister() {
+        $this->get('/workbench');
+        $userAttributes = $this->userAttributes();
+        $response = $this->post('/user/register/', $userAttributes);
+
+        $response->assertStatus(302);
+        $response->assertRedirect('workbench');
     }
 
     public function testRegisterInvalidAddress()
@@ -113,5 +123,21 @@ class AccountCreationTest extends TestCase
         ]);
 
         $this->assertNull(json_decode($response->getContent(), true));
+    }
+
+    public function testAdminCreate() {
+        $this->loginAsTestUser(Role::ADMINISTRATOR);
+
+        $userAttributes = $this->userAttributes();
+        $response = $this->post('/user/create', [
+            'name' => $userAttributes['name'],
+            'email' => $userAttributes['email'],
+            'role' => Role::RESTARTER,
+        ]);
+
+        $response->assertSee('User created correctly');
+        $this->assertDatabaseHas('users', [
+            'email' => $userAttributes['email'],
+        ]);
     }
 }

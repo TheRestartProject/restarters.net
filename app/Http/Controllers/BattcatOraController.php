@@ -22,6 +22,14 @@ class BattcatOraController extends Controller
      */
     public function index(Request $request)
     {
+        // BattCat is now closed.
+        return redirect()->action('BattcatOraController@status');
+
+        // We record that we have visited this page, so that if we subsequently sign up, we can redirect back to it.
+        // This is an intentionally partial solution to the problem of redirecting after we log in.
+        $request->session()->put('redirectTime', time());
+        $request->session()->put('redirectTo', $request->path());
+
         if (Auth::check()) {
             $user = Auth::user();
         } else {
@@ -119,6 +127,7 @@ class BattcatOraController extends Controller
             'user' => $user,
             'categories' => $this->getCategories(),
             'complete' => ($data['progress'][0]->total == 100),
+            'closed' => true,
         ]);
     }
 

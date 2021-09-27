@@ -111,4 +111,23 @@
     .progress-bar {
         background-color: #19A4B9;
     }
+
+    div.quest-closed {
+        background-color:#4aaebc !important;
+    }
+
+    .quest-closed li {
+        list-style-type: disc;
+    }
+
+    .quest-closed a {
+        color: #111;
+        text-decoration: underline;
+    }
+
+    .quest-closed a:hover {
+        color: #111;
+        text-decoration: none;
+        font-weight: 600;
+    }
 </style>

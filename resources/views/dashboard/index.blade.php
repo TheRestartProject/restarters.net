@@ -45,6 +45,7 @@
             host="{{ App\Helpers\Fixometer::hasRole($user, 'Host') ? 'true' : 'false'}}"
             restarter="{{ App\Helpers\Fixometer::hasRole($user, 'Restarter') ? 'true' : 'false'}}"
             network-coordinator="{{ App\Helpers\Fixometer::hasRole($user, 'NetworkCoordinator') ? 'true' : 'false'}}"
+            location="{{ $user->location ?? '' }}"
             :your-groups="{{ json_encode($your_groups, JSON_INVALID_UTF8_IGNORE) }}"
             :nearby-groups="{{ json_encode($groups_near_you, JSON_INVALID_UTF8_IGNORE) }}"
             :upcoming-events="{{ json_encode($upcoming_events, JSON_INVALID_UTF8_IGNORE) }}"
