@@ -32,6 +32,11 @@ class SyncNetworkUsersToDiscourseGroup extends Command
     public function __construct()
     {
         parent::__construct();
+
+        if (! config('restarters.features.discourse_integration')) {
+            return;
+        }
+
         $this->discourseClient = app('discourse-client');
     }
 
@@ -42,6 +47,10 @@ class SyncNetworkUsersToDiscourseGroup extends Command
      */
     public function handle()
     {
+        if (! config('restarters.features.discourse_integration')) {
+            return;
+        }
+
         $networkName = $this->argument('network');
 
         $network = Network::where('shortname', $networkName)->first();
