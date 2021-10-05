@@ -97,7 +97,7 @@
     if (name.charAt(0) == ".") {
       name = name.substr(1);
     }
-    // replace duplicated identifierQuotes with single identifierQuotes
+    // replace doublicated identifierQuotes with single identifierQuotes
     // and remove single identifierQuotes
     var nameParts = name.split(identifierQuote+identifierQuote);
     for (var i = 0; i < nameParts.length; i++)
@@ -109,7 +109,7 @@
     var nameParts = getText(name).split(".");
     for (var i = 0; i < nameParts.length; i++)
       nameParts[i] = identifierQuote +
-        // duplicate identifierQuotes
+        // doublicate identifierQuotes
         nameParts[i].replace(new RegExp(identifierQuote,"g"), identifierQuote+identifierQuote) +
         identifierQuote;
     var escaped = nameParts.join(".");
@@ -187,7 +187,7 @@
   function eachWord(lineText, f) {
     var words = lineText.split(/\s+/)
     for (var i = 0; i < words.length; i++)
-      if (words[i]) f(words[i].replace(/[`,;]/g, ''))
+      if (words[i]) f(words[i].replace(/[,;]/g, ''))
   }
 
   function findTableByAlias(alias, editor) {
@@ -264,7 +264,7 @@
       token.string = token.string.slice(0, cur.ch - token.start);
     }
 
-    if (token.string.match(/^[.`"'\w@][\w$#]*$/g)) {
+    if (token.string.match(/^[.`"\w@]\w*$/)) {
       search = token.string;
       start = token.start;
       end = token.end;
@@ -275,29 +275,24 @@
     if (search.charAt(0) == "." || search.charAt(0) == identifierQuote) {
       start = nameCompletion(cur, token, result, editor);
     } else {
-      var objectOrClass = function(w, className) {
-        if (typeof w === "object") {
-          w.className = className;
-        } else {
-          w = { text: w, className: className };
-        }
-        return w;
-      };
-    addMatches(result, search, defaultTable, function(w) {
-        return objectOrClass(w, "CodeMirror-hint-table CodeMirror-hint-default-table");
-    });
-    addMatches(
-        result,
-        search,
-        tables, function(w) {
-          return objectOrClass(w, "CodeMirror-hint-table");
-        }
-    );
-    if (!disableKeywords)
-      addMatches(result, search, keywords, function(w) {
-          return objectOrClass(w.toUpperCase(), "CodeMirror-hint-keyword");
-      });
-  }
+      addMatches(result, search, defaultTable, function(w) {return {text:w, className: "CodeMirror-hint-table CodeMirror-hint-default-table"};});
+      addMatches(
+          result,
+          search,
+          tables,
+          function(w) {
+              if (typeof w === 'object') {
+                  w.className =  "CodeMirror-hint-table";
+              } else {
+                  w = {text: w, className: "CodeMirror-hint-table"};
+              }
+
+              return w;
+          }
+      );
+      if (!disableKeywords)
+        addMatches(result, search, keywords, function(w) {return {text: w.toUpperCase(), className: "CodeMirror-hint-keyword"};});
+    }
 
     return {list: result, from: Pos(cur.line, start), to: Pos(cur.line, end)};
   });

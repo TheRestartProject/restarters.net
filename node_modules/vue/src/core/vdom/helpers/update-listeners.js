@@ -1,15 +1,7 @@
 /* @flow */
 
-import {
-  warn,
-  invokeWithErrorHandling
-} from 'core/util/index'
-import {
-  cached,
-  isUndef,
-  isTrue,
-  isPlainObject
-} from 'shared/util'
+import { warn } from 'core/util/index'
+import { cached, isUndef, isPlainObject } from 'shared/util'
 
 const normalizeEvent = cached((name: string): {
   name: string,
@@ -33,17 +25,17 @@ const normalizeEvent = cached((name: string): {
   }
 })
 
-export function createFnInvoker (fns: Function | Array<Function>, vm: ?Component): Function {
+export function createFnInvoker (fns: Function | Array<Function>): Function {
   function invoker () {
     const fns = invoker.fns
     if (Array.isArray(fns)) {
       const cloned = fns.slice()
       for (let i = 0; i < cloned.length; i++) {
-        invokeWithErrorHandling(cloned[i], null, arguments, vm, `v-on handler`)
+        cloned[i].apply(null, arguments)
       }
     } else {
       // return handler return value for single handlers
-      return invokeWithErrorHandling(fns, null, arguments, vm, `v-on handler`)
+      return fns.apply(null, arguments)
     }
   }
   invoker.fns = fns
@@ -55,7 +47,6 @@ export function updateListeners (
   oldOn: Object,
   add: Function,
   remove: Function,
-  createOnceHandler: Function,
   vm: Component
 ) {
   let name, def, cur, old, event
@@ -75,12 +66,9 @@ export function updateListeners (
       )
     } else if (isUndef(old)) {
       if (isUndef(cur.fns)) {
-        cur = on[name] = createFnInvoker(cur, vm)
+        cur = on[name] = createFnInvoker(cur)
       }
-      if (isTrue(event.once)) {
-        cur = on[name] = createOnceHandler(event.name, cur, event.capture)
-      }
-      add(event.name, cur, event.capture, event.passive, event.params)
+      add(event.name, cur, event.once, event.capture, event.passive, event.params)
     } else if (cur !== old) {
       old.fns = cur
       on[name] = old

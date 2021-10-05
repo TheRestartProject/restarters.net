@@ -9,7 +9,7 @@
  *    Description:  CodeMirror mode for Asterisk dialplan
  *
  *        Created:  05/17/2012 09:20:25 PM
- *       Revision:  08/05/2019 AstLinux Project: Support block-comments
+ *       Revision:  none
  *
  *         Author:  Stas Kobzar (stas@modulis.ca),
  *        Company:  Modulis.ca Inc.
@@ -67,26 +67,7 @@ CodeMirror.defineMode("asterisk", function() {
     var cur = '';
     var ch = stream.next();
     // comment
-    if (state.blockComment) {
-      if (ch == "-" && stream.match("-;", true)) {
-        state.blockComment = false;
-      } else if (stream.skipTo("--;")) {
-        stream.next();
-        stream.next();
-        stream.next();
-        state.blockComment = false;
-      } else {
-        stream.skipToEnd();
-      }
-      return "comment";
-    }
     if(ch == ";") {
-      if (stream.match("--", true)) {
-        if (!stream.match("-", false)) {  // Except ;--- is not a block comment
-          state.blockComment = true;
-          return "comment";
-        }
-      }
       stream.skipToEnd();
       return "comment";
     }
@@ -143,7 +124,6 @@ CodeMirror.defineMode("asterisk", function() {
   return {
     startState: function() {
       return {
-        blockComment: false,
         extenStart: false,
         extenSame:  false,
         extenInclude: false,
@@ -207,11 +187,7 @@ CodeMirror.defineMode("asterisk", function() {
       }
 
       return null;
-    },
-
-    blockCommentStart: ";--",
-    blockCommentEnd: "--;",
-    lineComment: ";"
+    }
   };
 });
 

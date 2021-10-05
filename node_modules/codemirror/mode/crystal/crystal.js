@@ -164,10 +164,10 @@
         } else {
           if(delim = stream.match(/^%([^\w\s=])/)) {
             delim = delim[1];
-          } else if (stream.match(/^%[a-zA-Z_\u009F-\uFFFF][\w\u009F-\uFFFF]*/)) {
+          } else if (stream.match(/^%[a-zA-Z0-9_\u009F-\uFFFF]*/)) {
             // Macro variables
             return "meta";
-          } else if (stream.eat('%')) {
+          } else {
             // '%' operator
             return "operator";
           }
@@ -194,17 +194,17 @@
       // Numbers
       if (stream.eat("0")) {
         if (stream.eat("x")) {
-          stream.match(/^[0-9a-fA-F_]+/);
+          stream.match(/^[0-9a-fA-F]+/);
         } else if (stream.eat("o")) {
-          stream.match(/^[0-7_]+/);
+          stream.match(/^[0-7]+/);
         } else if (stream.eat("b")) {
-          stream.match(/^[01_]+/);
+          stream.match(/^[01]+/);
         }
         return "number";
       }
 
       if (stream.eat(/^\d/)) {
-        stream.match(/^[\d_]*(?:\.[\d_]+)?(?:[eE][+-]?\d+)?/);
+        stream.match(/^\d*(?:\.\d+)?(?:[eE][+-]?\d+)?/);
         return "number";
       }
 

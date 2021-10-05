@@ -13,7 +13,7 @@ function normalizeKeyName (str: string): string {
   return normalize(str)
 }
 
-function transformNode (el: ASTElement) {
+function transformNode (el: ASTElement, options: CompilerOptions) {
   if (Array.isArray(el.attrsList)) {
     el.attrsList.forEach(attr => {
       if (attr.name && attr.name.match(/\-/)) {
@@ -21,11 +21,6 @@ function transformNode (el: ASTElement) {
         if (el.attrsMap) {
           el.attrsMap[realName] = el.attrsMap[attr.name]
           delete el.attrsMap[attr.name]
-        }
-        if (el.rawAttrsMap && el.rawAttrsMap[attr.name]) {
-          el.rawAttrsMap[realName] = el.rawAttrsMap[attr.name]
-          // $flow-disable-line
-          delete el.rawAttrsMap[attr.name]
         }
         attr.name = realName
       }

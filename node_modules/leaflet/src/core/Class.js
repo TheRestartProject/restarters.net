@@ -35,7 +35,7 @@ Class.extend = function (props) {
 
 	// inherit parent's statics
 	for (var i in this) {
-		if (Object.prototype.hasOwnProperty.call(this, i) && i !== 'prototype' && i !== '__super__') {
+		if (this.hasOwnProperty(i) && i !== 'prototype' && i !== '__super__') {
 			NewClass[i] = this[i];
 		}
 	}

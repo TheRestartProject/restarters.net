@@ -76,10 +76,6 @@ function isSameChild (child: VNode, oldChild: VNode): boolean {
   return oldChild.key === child.key && oldChild.tag === child.tag
 }
 
-const isNotTextNode = (c: VNode) => c.tag || isAsyncPlaceholder(c)
-
-const isVShowDirective = d => d.name === 'show'
-
 export default {
   name: 'transition',
   props: transitionProps,
@@ -92,7 +88,7 @@ export default {
     }
 
     // filter out text nodes (possible whitespaces)
-    children = children.filter(isNotTextNode)
+    children = children.filter((c: VNode) => c.tag || isAsyncPlaceholder(c))
     /* istanbul ignore if */
     if (!children.length) {
       return
@@ -157,7 +153,7 @@ export default {
 
     // mark v-show
     // so that the transition module can hand over the control to the directive
-    if (child.data.directives && child.data.directives.some(isVShowDirective)) {
+    if (child.data.directives && child.data.directives.some(d => d.name === 'show')) {
       child.data.show = true
     }
 

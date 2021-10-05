@@ -42,7 +42,6 @@ export default class RenderStream extends stream.Readable {
     })
 
     this.end = () => {
-      this.emit('beforeEnd')
       // the rendering is finished; we should push out the last of the buffer.
       this.done = true
       this.push(this.buffer)

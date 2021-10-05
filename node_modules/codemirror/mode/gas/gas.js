@@ -302,11 +302,11 @@ CodeMirror.defineMode("gas", function(_config, parserConfig) {
       }
 
       if (ch === '{') {
-        return "bracket";
+        return "braket";
       }
 
       if (ch === '}') {
-        return "bracket";
+        return "braket";
       }
 
       if (/\d/.test(ch)) {

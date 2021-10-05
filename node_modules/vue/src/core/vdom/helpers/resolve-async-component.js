@@ -7,13 +7,10 @@ import {
   isUndef,
   isTrue,
   isObject,
-  hasSymbol,
-  isPromise,
-  remove
+  hasSymbol
 } from 'core/util/index'
 
 import { createEmptyVNode } from 'core/vdom/vnode'
-import { currentRenderingInstance } from 'core/instance/render'
 
 function ensureCtor (comp: any, base) {
   if (
@@ -42,7 +39,8 @@ export function createAsyncPlaceholder (
 
 export function resolveAsyncComponent (
   factory: Function,
-  baseCtor: Class<Component>
+  baseCtor: Class<Component>,
+  context: Component
 ): Class<Component> | void {
   if (isTrue(factory.error) && isDef(factory.errorComp)) {
     return factory.errorComp
@@ -52,39 +50,20 @@ export function resolveAsyncComponent (
     return factory.resolved
   }
 
-  const owner = currentRenderingInstance
-  if (owner && isDef(factory.owners) && factory.owners.indexOf(owner) === -1) {
-    // already pending
-    factory.owners.push(owner)
-  }
-
   if (isTrue(factory.loading) && isDef(factory.loadingComp)) {
     return factory.loadingComp
   }
 
-  if (owner && !isDef(factory.owners)) {
-    const owners = factory.owners = [owner]
+  if (isDef(factory.contexts)) {
+    // already pending
+    factory.contexts.push(context)
+  } else {
+    const contexts = factory.contexts = [context]
     let sync = true
-    let timerLoading = null
-    let timerTimeout = null
 
-    ;(owner: any).$on('hook:destroyed', () => remove(owners, owner))
-
-    const forceRender = (renderCompleted: boolean) => {
-      for (let i = 0, l = owners.length; i < l; i++) {
-        (owners[i]: any).$forceUpdate()
-      }
-
-      if (renderCompleted) {
-        owners.length = 0
-        if (timerLoading !== null) {
-          clearTimeout(timerLoading)
-          timerLoading = null
-        }
-        if (timerTimeout !== null) {
-          clearTimeout(timerTimeout)
-          timerTimeout = null
-        }
+    const forceRender = () => {
+      for (let i = 0, l = contexts.length; i < l; i++) {
+        contexts[i].$forceUpdate()
       }
     }
 
@@ -94,9 +73,7 @@ export function resolveAsyncComponent (
       // invoke callbacks only if this is not a synchronous resolve
       // (async resolves are shimmed as synchronous during SSR)
       if (!sync) {
-        forceRender(true)
-      } else {
-        owners.length = 0
+        forceRender()
       }
     })
 
@@ -107,19 +84,19 @@ export function resolveAsyncComponent (
       )
       if (isDef(factory.errorComp)) {
         factory.error = true
-        forceRender(true)
+        forceRender()
       }
     })
 
     const res = factory(resolve, reject)
 
     if (isObject(res)) {
-      if (isPromise(res)) {
+      if (typeof res.then === 'function') {
         // () => Promise
         if (isUndef(factory.resolved)) {
           res.then(resolve, reject)
         }
-      } else if (isPromise(res.component)) {
+      } else if (isDef(res.component) && typeof res.component.then === 'function') {
         res.component.then(resolve, reject)
 
         if (isDef(res.error)) {
@@ -131,19 +108,17 @@ export function resolveAsyncComponent (
           if (res.delay === 0) {
             factory.loading = true
           } else {
-            timerLoading = setTimeout(() => {
-              timerLoading = null
+            setTimeout(() => {
               if (isUndef(factory.resolved) && isUndef(factory.error)) {
                 factory.loading = true
-                forceRender(false)
+                forceRender()
               }
             }, res.delay || 200)
           }
         }
 
         if (isDef(res.timeout)) {
-          timerTimeout = setTimeout(() => {
-            timerTimeout = null
+          setTimeout(() => {
             if (isUndef(factory.resolved)) {
               reject(
                 process.env.NODE_ENV !== 'production'

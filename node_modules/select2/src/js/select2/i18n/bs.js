@@ -50,9 +50,6 @@ define(function () {
     },
     searching: function () {
       return 'Pretraga…';
-    },
-    removeAllItems: function () {
-      return 'Uklonite sve stavke';
     }
   };
 });

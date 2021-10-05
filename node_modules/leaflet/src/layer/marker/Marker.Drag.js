@@ -107,13 +107,10 @@ export var MarkerDrag = Handler.extend({
 		// Fired when the marker starts moving (because of dragging).
 
 		this._oldLatLng = this._marker.getLatLng();
-
-		// When using ES6 imports it could not be set when `Popup` was not imported as well
-		this._marker.closePopup && this._marker.closePopup();
-
 		this._marker
-			.fire('movestart')
-			.fire('dragstart');
+		    .closePopup()
+		    .fire('movestart')
+		    .fire('dragstart');
 	},
 
 	_onPreDrag: function (e) {

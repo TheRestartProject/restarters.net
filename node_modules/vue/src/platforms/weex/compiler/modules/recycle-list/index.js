@@ -23,10 +23,10 @@ function preTransformNode (el: ASTElement, options: WeexCompilerOptions) {
     currentRecycleList = el
   }
   if (shouldCompile(el, options)) {
-    preTransformVBind(el)
+    preTransformVBind(el, options)
     preTransformVIf(el, options) // also v-else-if and v-else
     preTransformVFor(el, options)
-    preTransformVOnce(el)
+    preTransformVOnce(el, options)
   }
 }
 
@@ -41,12 +41,12 @@ function postTransformNode (el: ASTElement, options: WeexCompilerOptions) {
     // mark child component in parent template
     postTransformComponent(el, options)
     // mark root in child component template
-    postTransformComponentRoot(el)
+    postTransformComponentRoot(el, options)
     // <text>: transform children text into value attr
     if (el.tag === 'text') {
-      postTransformText(el)
+      postTransformText(el, options)
     }
-    postTransformVOn(el)
+    postTransformVOn(el, options)
   }
   if (el === currentRecycleList) {
     currentRecycleList = null

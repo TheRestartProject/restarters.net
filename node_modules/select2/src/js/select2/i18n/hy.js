@@ -33,9 +33,6 @@ define(function () {
     },
     searching: function () {
       return 'Որոնում․․․';
-    },
-    removeAllItems: function () {
-      return 'Հեռացնել բոլոր տարրերը';
     }
   };
 });

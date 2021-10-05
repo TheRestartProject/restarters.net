@@ -72,26 +72,24 @@
     }
   }
 
-  function lastMatchIn(string, regexp, endMargin) {
-    var match, from = 0
-    while (from <= string.length) {
-      regexp.lastIndex = from
+  function lastMatchIn(string, regexp) {
+    var cutOff = 0, match
+    for (;;) {
+      regexp.lastIndex = cutOff
       var newMatch = regexp.exec(string)
-      if (!newMatch) break
-      var end = newMatch.index + newMatch[0].length
-      if (end > string.length - endMargin) break
-      if (!match || end > match.index + match[0].length)
-        match = newMatch
-      from = newMatch.index + 1
+      if (!newMatch) return match
+      match = newMatch
+      cutOff = match.index + (match[0].length || 1)
+      if (cutOff == string.length) return match
     }
-    return match
   }
 
   function searchRegexpBackward(doc, regexp, start) {
     regexp = ensureFlags(regexp, "g")
     for (var line = start.line, ch = start.ch, first = doc.firstLine(); line >= first; line--, ch = -1) {
       var string = doc.getLine(line)
-      var match = lastMatchIn(string, regexp, ch < 0 ? 0 : string.length - ch)
+      if (ch > -1) string = string.slice(0, ch)
+      var match = lastMatchIn(string, regexp)
       if (match)
         return {from: Pos(line, match.index),
                 to: Pos(line, match.index + match[0].length),
@@ -100,17 +98,16 @@
   }
 
   function searchRegexpBackwardMultiline(doc, regexp, start) {
-    if (!maybeMultiline(regexp)) return searchRegexpBackward(doc, regexp, start)
     regexp = ensureFlags(regexp, "gm")
-    var string, chunkSize = 1, endMargin = doc.getLine(start.line).length - start.ch
+    var string, chunk = 1
     for (var line = start.line, first = doc.firstLine(); line >= first;) {
-      for (var i = 0; i < chunkSize && line >= first; i++) {
+      for (var i = 0; i < chunk; i++) {
         var curLine = doc.getLine(line--)
-        string = string == null ? curLine : curLine + "\n" + string
+        string = string == null ? curLine.slice(0, start.ch) : curLine + "\n" + string
       }
-      chunkSize *= 2
+      chunk *= 2
 
-      var match = lastMatchIn(string, regexp, endMargin)
+      var match = lastMatchIn(string, regexp)
       if (match) {
         var before = string.slice(0, match.index).split("\n"), inside = match[0].split("\n")
         var startLine = line + before.length, startCh = before[before.length - 1].length
@@ -240,7 +237,7 @@
       var result = this.matches(reverse, this.doc.clipPos(reverse ? this.pos.from : this.pos.to))
 
       // Implements weird auto-growing behavior on null-matches for
-      // backwards-compatibility with the vim code (unfortunately)
+      // backwards-compatiblity with the vim code (unfortunately)
       while (result && CodeMirror.cmpPos(result.from, result.to) == 0) {
         if (reverse) {
           if (result.from.ch) result.from = Pos(result.from.line, result.from.ch - 1)

@@ -43,10 +43,6 @@ define(function () {
     },
     searching: function () {
       return 'Pyta so…';
-    },
-    removeAllItems: function () {
-      // To DO : in Upper Sorbian.
-      return 'Remove all items';
     }
   };
 });

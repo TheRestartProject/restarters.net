@@ -14,31 +14,26 @@
 
   var Pos = CodeMirror.Pos;
 
-  var matching = {"(": ")>", ")": "(<", "[": "]>", "]": "[<", "{": "}>", "}": "{<", "<": ">>", ">": "<<"};
-
-  function bracketRegex(config) {
-    return config && config.bracketRegex || /[(){}[\]]/
-  }
+  var matching = {"(": ")>", ")": "(<", "[": "]>", "]": "[<", "{": "}>", "}": "{<"};
 
   function findMatchingBracket(cm, where, config) {
     var line = cm.getLineHandle(where.line), pos = where.ch - 1;
     var afterCursor = config && config.afterCursor
     if (afterCursor == null)
       afterCursor = /(^| )cm-fat-cursor($| )/.test(cm.getWrapperElement().className)
-    var re = bracketRegex(config)
 
     // A cursor is defined as between two characters, but in in vim command mode
     // (i.e. not insert mode), the cursor is visually represented as a
     // highlighted box on top of the 2nd character. Otherwise, we allow matches
     // from before or after the cursor.
-    var match = (!afterCursor && pos >= 0 && re.test(line.text.charAt(pos)) && matching[line.text.charAt(pos)]) ||
-        re.test(line.text.charAt(pos + 1)) && matching[line.text.charAt(++pos)];
+    var match = (!afterCursor && pos >= 0 && matching[line.text.charAt(pos)]) ||
+        matching[line.text.charAt(++pos)];
     if (!match) return null;
     var dir = match.charAt(1) == ">" ? 1 : -1;
     if (config && config.strict && (dir > 0) != (pos == where.ch)) return null;
     var style = cm.getTokenTypeAt(Pos(where.line, pos + 1));
 
-    var found = scanForBracket(cm, Pos(where.line, pos + (dir > 0 ? 1 : 0)), dir, style, config);
+    var found = scanForBracket(cm, Pos(where.line, pos + (dir > 0 ? 1 : 0)), dir, style || null, config);
     if (found == null) return null;
     return {from: Pos(where.line, pos), to: found && found.pos,
             match: found && found.ch == match.charAt(0), forward: dir > 0};
@@ -56,7 +51,7 @@
     var maxScanLines = (config && config.maxScanLines) || 1000;
 
     var stack = [];
-    var re = bracketRegex(config)
+    var re = config && config.bracketRegex ? config.bracketRegex : /[(){}[\]]/;
     var lineEnd = dir > 0 ? Math.min(where.line + maxScanLines, cm.lastLine() + 1)
                           : Math.max(cm.firstLine() - 1, where.line - maxScanLines);
     for (var lineNo = where.line; lineNo != lineEnd; lineNo += dir) {
@@ -67,10 +62,9 @@
       if (lineNo == where.line) pos = where.ch - (dir < 0 ? 1 : 0);
       for (; pos != end; pos += dir) {
         var ch = line.charAt(pos);
-        if (re.test(ch) && (style === undefined ||
-                            (cm.getTokenTypeAt(Pos(lineNo, pos + 1)) || "") == (style || ""))) {
+        if (re.test(ch) && (style === undefined || cm.getTokenTypeAt(Pos(lineNo, pos + 1)) == style)) {
           var match = matching[ch];
-          if (match && (match.charAt(1) == ">") == (dir > 0)) stack.push(ch);
+          if ((match.charAt(1) == ">") == (dir > 0)) stack.push(ch);
           else if (!stack.length) return {pos: Pos(lineNo, pos), ch: ch};
           else stack.pop();
         }
@@ -81,12 +75,11 @@
 
   function matchBrackets(cm, autoclear, config) {
     // Disable brace matching in long lines, since it'll cause hugely slow updates
-    var maxHighlightLen = cm.state.matchBrackets.maxHighlightLineLength || 1000,
-      highlightNonMatching = config && config.highlightNonMatching;
+    var maxHighlightLen = cm.state.matchBrackets.maxHighlightLineLength || 1000;
     var marks = [], ranges = cm.listSelections();
     for (var i = 0; i < ranges.length; i++) {
       var match = ranges[i].empty() && findMatchingBracket(cm, ranges[i].head, config);
-      if (match && (match.match || highlightNonMatching !== false) && cm.getLine(match.from.line).length <= maxHighlightLen) {
+      if (match && cm.getLine(match.from.line).length <= maxHighlightLen) {
         var style = match.match ? "CodeMirror-matchingbracket" : "CodeMirror-nonmatchingbracket";
         marks.push(cm.markText(match.from, Pos(match.from.line, match.from.ch + 1), {className: style}));
         if (match.to && cm.getLine(match.to.line).length <= maxHighlightLen)
@@ -96,7 +89,7 @@
 
     if (marks.length) {
       // Kludge to work around the IE bug from issue #1193, where text
-      // input stops going to the textarea whenever this fires.
+      // input stops going to the textare whever this fires.
       if (ie_lt8 && cm.state.focused) cm.focus();
 
       var clear = function() {
@@ -119,25 +112,17 @@
     });
   }
 
-  function clearHighlighted(cm) {
-    if (cm.state.matchBrackets && cm.state.matchBrackets.currentlyHighlighted) {
-      cm.state.matchBrackets.currentlyHighlighted();
-      cm.state.matchBrackets.currentlyHighlighted = null;
-    }
-  }
-
   CodeMirror.defineOption("matchBrackets", false, function(cm, val, old) {
     if (old && old != CodeMirror.Init) {
       cm.off("cursorActivity", doMatchBrackets);
-      cm.off("focus", doMatchBrackets)
-      cm.off("blur", clearHighlighted)
-      clearHighlighted(cm);
+      if (cm.state.matchBrackets && cm.state.matchBrackets.currentlyHighlighted) {
+        cm.state.matchBrackets.currentlyHighlighted();
+        cm.state.matchBrackets.currentlyHighlighted = null;
+      }
     }
     if (val) {
       cm.state.matchBrackets = typeof val == "object" ? val : {};
       cm.on("cursorActivity", doMatchBrackets);
-      cm.on("focus", doMatchBrackets)
-      cm.on("blur", clearHighlighted)
     }
   });
 

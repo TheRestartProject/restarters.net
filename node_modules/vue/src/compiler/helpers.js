@@ -3,13 +3,9 @@
 import { emptyObject } from 'shared/util'
 import { parseFilters } from './parser/filter-parser'
 
-type Range = { start?: number, end?: number };
-
-/* eslint-disable no-unused-vars */
-export function baseWarn (msg: string, range?: Range) {
+export function baseWarn (msg: string) {
   console.error(`[Vue compiler]: ${msg}`)
 }
-/* eslint-enable no-unused-vars */
 
 export function pluckModuleFunction<F: Function> (
   modules: ?Array<Object>,
@@ -20,23 +16,20 @@ export function pluckModuleFunction<F: Function> (
     : []
 }
 
-export function addProp (el: ASTElement, name: string, value: string, range?: Range, dynamic?: boolean) {
-  (el.props || (el.props = [])).push(rangeSetItem({ name, value, dynamic }, range))
+export function addProp (el: ASTElement, name: string, value: string) {
+  (el.props || (el.props = [])).push({ name, value })
   el.plain = false
 }
 
-export function addAttr (el: ASTElement, name: string, value: any, range?: Range, dynamic?: boolean) {
-  const attrs = dynamic
-    ? (el.dynamicAttrs || (el.dynamicAttrs = []))
-    : (el.attrs || (el.attrs = []))
-  attrs.push(rangeSetItem({ name, value, dynamic }, range))
+export function addAttr (el: ASTElement, name: string, value: any) {
+  (el.attrs || (el.attrs = [])).push({ name, value })
   el.plain = false
 }
 
 // add a raw attr (use this in preTransforms)
-export function addRawAttr (el: ASTElement, name: string, value: any, range?: Range) {
+export function addRawAttr (el: ASTElement, name: string, value: any) {
   el.attrsMap[name] = value
-  el.attrsList.push(rangeSetItem({ name, value }, range))
+  el.attrsList.push({ name, value })
 }
 
 export function addDirective (
@@ -45,25 +38,10 @@ export function addDirective (
   rawName: string,
   value: string,
   arg: ?string,
-  isDynamicArg: boolean,
-  modifiers: ?ASTModifiers,
-  range?: Range
+  modifiers: ?ASTModifiers
 ) {
-  (el.directives || (el.directives = [])).push(rangeSetItem({
-    name,
-    rawName,
-    value,
-    arg,
-    isDynamicArg,
-    modifiers
-  }, range))
+  (el.directives || (el.directives = [])).push({ name, rawName, value, arg, modifiers })
   el.plain = false
-}
-
-function prependModifierMarker (symbol: string, name: string, dynamic?: boolean): string {
-  return dynamic
-    ? `_p(${name},"${symbol}")`
-    : symbol + name // mark the event as captured
 }
 
 export function addHandler (
@@ -72,9 +50,7 @@ export function addHandler (
   value: string,
   modifiers: ?ASTModifiers,
   important?: boolean,
-  warn?: ?Function,
-  range?: Range,
-  dynamic?: boolean
+  warn?: Function
 ) {
   modifiers = modifiers || emptyObject
   // warn prevent and passive modifier
@@ -85,42 +61,35 @@ export function addHandler (
   ) {
     warn(
       'passive and prevent can\'t be used together. ' +
-      'Passive handler can\'t prevent default event.',
-      range
+      'Passive handler can\'t prevent default event.'
     )
-  }
-
-  // normalize click.right and click.middle since they don't actually fire
-  // this is technically browser-specific, but at least for now browsers are
-  // the only target envs that have right/middle clicks.
-  if (modifiers.right) {
-    if (dynamic) {
-      name = `(${name})==='click'?'contextmenu':(${name})`
-    } else if (name === 'click') {
-      name = 'contextmenu'
-      delete modifiers.right
-    }
-  } else if (modifiers.middle) {
-    if (dynamic) {
-      name = `(${name})==='click'?'mouseup':(${name})`
-    } else if (name === 'click') {
-      name = 'mouseup'
-    }
   }
 
   // check capture modifier
   if (modifiers.capture) {
     delete modifiers.capture
-    name = prependModifierMarker('!', name, dynamic)
+    name = '!' + name // mark the event as captured
   }
   if (modifiers.once) {
     delete modifiers.once
-    name = prependModifierMarker('~', name, dynamic)
+    name = '~' + name // mark the event as once
   }
   /* istanbul ignore if */
   if (modifiers.passive) {
     delete modifiers.passive
-    name = prependModifierMarker('&', name, dynamic)
+    name = '&' + name // mark the event as passive
+  }
+
+  // normalize click.right and click.middle since they don't actually fire
+  // this is technically browser-specific, but at least for now browsers are
+  // the only target envs that have right/middle clicks.
+  if (name === 'click') {
+    if (modifiers.right) {
+      name = 'contextmenu'
+      delete modifiers.right
+    } else if (modifiers.middle) {
+      name = 'mouseup'
+    }
   }
 
   let events
@@ -131,7 +100,9 @@ export function addHandler (
     events = el.events || (el.events = {})
   }
 
-  const newHandler: any = rangeSetItem({ value: value.trim(), dynamic }, range)
+  const newHandler: any = {
+    value: value.trim()
+  }
   if (modifiers !== emptyObject) {
     newHandler.modifiers = modifiers
   }
@@ -147,15 +118,6 @@ export function addHandler (
   }
 
   el.plain = false
-}
-
-export function getRawBindingAttr (
-  el: ASTElement,
-  name: string
-) {
-  return el.rawAttrsMap[':' + name] ||
-    el.rawAttrsMap['v-bind:' + name] ||
-    el.rawAttrsMap[name]
 }
 
 export function getBindingAttr (
@@ -199,33 +161,4 @@ export function getAndRemoveAttr (
     delete el.attrsMap[name]
   }
   return val
-}
-
-export function getAndRemoveAttrByRegex (
-  el: ASTElement,
-  name: RegExp
-) {
-  const list = el.attrsList
-  for (let i = 0, l = list.length; i < l; i++) {
-    const attr = list[i]
-    if (name.test(attr.name)) {
-      list.splice(i, 1)
-      return attr
-    }
-  }
-}
-
-function rangeSetItem (
-  item: any,
-  range?: { start?: number, end?: number }
-) {
-  if (range) {
-    if (range.start != null) {
-      item.start = range.start
-    }
-    if (range.end != null) {
-      item.end = range.end
-    }
-  }
-  return item
 }

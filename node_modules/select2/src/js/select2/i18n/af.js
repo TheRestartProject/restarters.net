@@ -39,9 +39,6 @@ define(function () {
     },
     searching: function () {
       return 'Besig…';
-    },
-    removeAllItems: function () {
-      return 'Verwyder alle items';
     }
   };
 });

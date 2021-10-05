@@ -13,11 +13,8 @@
 })(function(CodeMirror) {
   "use strict";
 
-  // default search panel location
-  CodeMirror.defineOption("search", {bottom: false});
-
   function dialog(cm, text, shortText, deflt, f) {
-    if (cm.openDialog) cm.openDialog(text, f, {value: deflt, selectValueOnOpen: true, bottom: cm.options.search.bottom});
+    if (cm.openDialog) cm.openDialog(text, f, {value: deflt, selectValueOnOpen: true});
     else f(prompt(shortText, deflt));
   }
 

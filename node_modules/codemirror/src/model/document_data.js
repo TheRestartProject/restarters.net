@@ -94,7 +94,6 @@ export function attachDoc(cm, doc) {
   estimateLineHeights(cm)
   loadMode(cm)
   setDirectionClass(cm)
-  cm.options.direction = doc.direction
   if (!cm.options.lineWrapping) findMaxLine(cm)
   cm.options.mode = doc.modeOption
   regChange(cm)

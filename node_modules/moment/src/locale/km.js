@@ -5,29 +5,28 @@
 import moment from '../moment';
 
 var symbolMap = {
-        1: '១',
-        2: '២',
-        3: '៣',
-        4: '៤',
-        5: '៥',
-        6: '៦',
-        7: '៧',
-        8: '៨',
-        9: '៩',
-        0: '០',
-    },
-    numberMap = {
-        '១': '1',
-        '២': '2',
-        '៣': '3',
-        '៤': '4',
-        '៥': '5',
-        '៦': '6',
-        '៧': '7',
-        '៨': '8',
-        '៩': '9',
-        '០': '0',
-    };
+    '1': '១',
+    '2': '២',
+    '3': '៣',
+    '4': '៤',
+    '5': '៥',
+    '6': '៦',
+    '7': '៧',
+    '8': '៨',
+    '9': '៩',
+    '0': '០'
+}, numberMap = {
+    '១': '1',
+    '២': '2',
+    '៣': '3',
+    '៤': '4',
+    '៥': '5',
+    '៦': '6',
+    '៧': '7',
+    '៨': '8',
+    '៩': '9',
+    '០': '0'
+};
 
 export default moment.defineLocale('km', {
     months: 'មករា_កុម្ភៈ_មីនា_មេសា_ឧសភា_មិថុនា_កក្កដា_សីហា_កញ្ញា_តុលា_វិច្ឆិកា_ធ្នូ'.split(
@@ -46,7 +45,7 @@ export default moment.defineLocale('km', {
         L: 'DD/MM/YYYY',
         LL: 'D MMMM YYYY',
         LLL: 'D MMMM YYYY HH:mm',
-        LLLL: 'dddd, D MMMM YYYY HH:mm',
+        LLLL: 'dddd, D MMMM YYYY HH:mm'
     },
     meridiemParse: /ព្រឹក|ល្ងាច/,
     isPM: function (input) {
@@ -65,7 +64,7 @@ export default moment.defineLocale('km', {
         nextWeek: 'dddd [ម៉ោង] LT',
         lastDay: '[ម្សិលមិញ ម៉ោង] LT',
         lastWeek: 'dddd [សប្តាហ៍មុន] [ម៉ោង] LT',
-        sameElse: 'L',
+        sameElse: 'L'
     },
     relativeTime: {
         future: '%sទៀត',
@@ -81,10 +80,10 @@ export default moment.defineLocale('km', {
         M: 'មួយខែ',
         MM: '%d ខែ',
         y: 'មួយឆ្នាំ',
-        yy: '%d ឆ្នាំ',
+        yy: '%d ឆ្នាំ'
     },
-    dayOfMonthOrdinalParse: /ទី\d{1,2}/,
-    ordinal: 'ទី%d',
+    dayOfMonthOrdinalParse : /ទី\d{1,2}/,
+    ordinal : 'ទី%d',
     preparse: function (string) {
         return string.replace(/[១២៣៤៥៦៧៨៩០]/g, function (match) {
             return numberMap[match];
@@ -97,6 +96,6 @@ export default moment.defineLocale('km', {
     },
     week: {
         dow: 1, // Monday is the first day of the week.
-        doy: 4, // The week that contains Jan 4th is the first week of the year.
-    },
+        doy: 4 // The week that contains Jan 4th is the first week of the year.
+    }
 });

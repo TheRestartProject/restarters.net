@@ -221,10 +221,7 @@ CodeMirror.defineMode("groovy", function(config) {
 
     electricChars: "{}",
     closeBrackets: {triples: "'\""},
-    fold: "brace",
-    blockCommentStart: "/*",
-    blockCommentEnd: "*/",
-    lineComment: "//"
+    fold: "brace"
   };
 });
 

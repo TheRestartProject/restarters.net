@@ -225,11 +225,7 @@ function nodesToSegments (
     } else if (c.type === 2) {
       segments.push({ type: INTERPOLATION, value: c.expression })
     } else if (c.type === 3) {
-      let text = escape(c.text)
-      if (c.isComment) {
-        text = '<!--' + text + '-->'
-      }
-      segments.push({ type: RAW, value: text })
+      segments.push({ type: RAW, value: escape(c.text) })
     }
   }
   return segments

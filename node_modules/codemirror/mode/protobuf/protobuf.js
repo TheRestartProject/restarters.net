@@ -62,10 +62,7 @@
   };
 
   CodeMirror.defineMode("protobuf", function() {
-    return {
-      token: tokenBase,
-      fold: "brace"
-    };
+    return {token: tokenBase};
   });
 
   CodeMirror.defineMIME("text/x-protobuf", "protobuf");

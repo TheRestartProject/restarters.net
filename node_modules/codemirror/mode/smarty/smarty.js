@@ -210,9 +210,9 @@
         state.last = last;
         return style;
       },
-      indent: function(state, text, line) {
+      indent: function(state, text) {
         if (state.tokenize == tokenTop && baseMode.indent)
-          return baseMode.indent(state.base, text, line);
+          return baseMode.indent(state.base, text);
         else
           return CodeMirror.Pass;
       },

@@ -8,6 +8,11 @@ const splitRE = /\r?\n/g
 const replaceRE = /./g
 const isSpecialTag = makeMap('script,style,template', true)
 
+type Attribute = {
+  name: string,
+  value: string
+};
+
 /**
  * Parse a single-file component (*.vue) file into an SFC Descriptor Object.
  */
@@ -19,32 +24,14 @@ export function parseComponent (
     template: null,
     script: null,
     styles: [],
-    customBlocks: [],
-    errors: []
+    customBlocks: []
   }
   let depth = 0
   let currentBlock: ?SFCBlock = null
 
-  let warn = msg => {
-    sfc.errors.push(msg)
-  }
-
-  if (process.env.NODE_ENV !== 'production' && options.outputSourceRange) {
-    warn = (msg, range) => {
-      const data: WarningMessage = { msg }
-      if (range.start != null) {
-        data.start = range.start
-      }
-      if (range.end != null) {
-        data.end = range.end
-      }
-      sfc.errors.push(data)
-    }
-  }
-
   function start (
     tag: string,
-    attrs: Array<ASTAttr>,
+    attrs: Array<Attribute>,
     unary: boolean,
     start: number,
     end: number
@@ -75,7 +62,7 @@ export function parseComponent (
     }
   }
 
-  function checkAttrs (block: SFCBlock, attrs: Array<ASTAttr>) {
+  function checkAttrs (block: SFCBlock, attrs: Array<Attribute>) {
     for (let i = 0; i < attrs.length; i++) {
       const attr = attrs[i]
       if (attr.name === 'lang') {
@@ -93,13 +80,10 @@ export function parseComponent (
     }
   }
 
-  function end (tag: string, start: number) {
+  function end (tag: string, start: number, end: number) {
     if (depth === 1 && currentBlock) {
       currentBlock.end = start
-      let text = content.slice(currentBlock.start, currentBlock.end)
-      if (options.deindent !== false) {
-        text = deindent(text)
-      }
+      let text = deindent(content.slice(currentBlock.start, currentBlock.end))
       // pad content so that linters and pre-processors can output correct
       // line numbers in errors and warnings
       if (currentBlock.type !== 'template' && options.pad) {
@@ -124,10 +108,8 @@ export function parseComponent (
   }
 
   parseHTML(content, {
-    warn,
     start,
-    end,
-    outputSourceRange: options.outputSourceRange
+    end
   })
 
   return sfc

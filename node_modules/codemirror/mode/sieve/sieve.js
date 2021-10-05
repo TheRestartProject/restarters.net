@@ -43,7 +43,7 @@ CodeMirror.defineMode("sieve", function(config) {
     if (ch == "(") {
       state._indent.push("(");
       // add virtual angel wings so that editor behaves...
-      // ...more sane in case of broken brackets
+      // ...more sane incase of broken brackets
       state._indent.push("{");
       return null;
     }

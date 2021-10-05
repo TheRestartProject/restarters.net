@@ -18,10 +18,12 @@ define(function () {
       return 'Lade mehr Ergebnisse…';
     },
     maximumSelected: function (args) {
-      var message = 'Sie können nur ' + args.maximum + ' Element';
+      var message = 'Sie können nur ' + args.maximum + ' Eintr';
 
-      if (args.maximum != 1) {
-        message += 'e';
+      if (args.maximum === 1) {
+        message += 'ag';
+      } else {
+        message += 'äge';
       }
 
       message += ' auswählen';
@@ -33,9 +35,6 @@ define(function () {
     },
     searching: function () {
       return 'Suche…';
-    },
-    removeAllItems: function () {
-      return 'Entferne alle Elemente';
     }
   };
 });

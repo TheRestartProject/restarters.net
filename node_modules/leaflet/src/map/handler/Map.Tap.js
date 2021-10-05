@@ -131,6 +131,6 @@ export var Tap = Handler.extend({
 // @section Handlers
 // @property tap: Handler
 // Mobile touch hacks (quick tap and touch hold) handler.
-if (Browser.touch && (!Browser.pointer || Browser.safari)) {
+if (Browser.touch && !Browser.pointer) {
 	Map.addInitHook('addHandler', 'tap', Tap);
 }

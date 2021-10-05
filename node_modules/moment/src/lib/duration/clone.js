@@ -1,5 +1,6 @@
 import { createDuration } from './create';
 
-export function clone() {
+export function clone () {
     return createDuration(this);
 }
+

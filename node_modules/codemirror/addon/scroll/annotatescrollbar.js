@@ -43,7 +43,7 @@
     cm.on("markerAdded", this.resizeHandler);
     cm.on("markerCleared", this.resizeHandler);
     if (options.listenForChanges !== false)
-      cm.on("changes", this.changeHandler = function() {
+      cm.on("change", this.changeHandler = function() {
         scheduleRedraw(250);
       });
   }
@@ -72,16 +72,10 @@
     var wrapping = cm.getOption("lineWrapping");
     var singleLineH = wrapping && cm.defaultTextHeight() * 1.5;
     var curLine = null, curLineObj = null;
-
     function getY(pos, top) {
       if (curLine != pos.line) {
-        curLine = pos.line
-        curLineObj = cm.getLineHandle(pos.line)
-        var visual = cm.getLineHandleVisualStart(curLineObj)
-        if (visual != curLineObj) {
-          curLine = cm.getLineNumber(visual)
-          curLineObj = visual
-        }
+        curLine = pos.line;
+        curLineObj = cm.getLineHandle(curLine);
       }
       if ((curLineObj.widgets && curLineObj.widgets.length) ||
           (wrapping && curLineObj.height > singleLineH))
@@ -122,7 +116,7 @@
     this.cm.off("refresh", this.resizeHandler);
     this.cm.off("markerAdded", this.resizeHandler);
     this.cm.off("markerCleared", this.resizeHandler);
-    if (this.changeHandler) this.cm.off("changes", this.changeHandler);
+    if (this.changeHandler) this.cm.off("change", this.changeHandler);
     this.div.parentNode.removeChild(this.div);
   };
 });

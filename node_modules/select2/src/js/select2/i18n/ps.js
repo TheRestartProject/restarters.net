@@ -40,9 +40,6 @@ define(function () {
     },
     searching: function () {
       return 'لټول کيږي...';
-    },
-    removeAllItems: function () {
-      return 'ټول توکي لرې کړئ';
     }
   };
 });

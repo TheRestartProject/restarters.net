@@ -1,7 +1,5 @@
 /* @flow */
 
-const whitespaceRE = /\s+/
-
 /**
  * Add class with compatibility for SVG since classList is not supported on
  * SVG elements in IE
@@ -15,7 +13,7 @@ export function addClass (el: HTMLElement, cls: ?string) {
   /* istanbul ignore else */
   if (el.classList) {
     if (cls.indexOf(' ') > -1) {
-      cls.split(whitespaceRE).forEach(c => el.classList.add(c))
+      cls.split(/\s+/).forEach(c => el.classList.add(c))
     } else {
       el.classList.add(cls)
     }
@@ -40,7 +38,7 @@ export function removeClass (el: HTMLElement, cls: ?string) {
   /* istanbul ignore else */
   if (el.classList) {
     if (cls.indexOf(' ') > -1) {
-      cls.split(whitespaceRE).forEach(c => el.classList.remove(c))
+      cls.split(/\s+/).forEach(c => el.classList.remove(c))
     } else {
       el.classList.remove(cls)
     }

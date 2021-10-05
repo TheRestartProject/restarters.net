@@ -1,5 +1,4 @@
 import { Vue } from "./vue";
-import "./umd";
 
 export default Vue;
 
@@ -14,7 +13,6 @@ export {
   ComponentOptions,
   FunctionalComponentOptions,
   RenderContext,
-  PropType,
   PropOptions,
   ComputedOptions,
   WatchHandler,

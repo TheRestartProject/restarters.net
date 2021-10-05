@@ -17,8 +17,7 @@ function transformNode (el: ASTElement, options: CompilerOptions) {
         `class="${staticClass}": ` +
         'Interpolation inside attributes has been removed. ' +
         'Use v-bind or the colon shorthand instead. For example, ' +
-        'instead of <div class="{{ val }}">, use <div :class="val">.',
-        el.rawAttrsMap['class']
+        'instead of <div class="{{ val }}">, use <div :class="val">.'
       )
     }
   }

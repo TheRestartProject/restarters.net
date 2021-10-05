@@ -23,8 +23,7 @@ function transformNode (el: ASTElement, options: CompilerOptions) {
     warn(
       `style="${String(staticStyle)}": ` +
       'Interpolation inside attributes has been deprecated. ' +
-      'Use v-bind or the colon shorthand instead.',
-      el.rawAttrsMap['style']
+      'Use v-bind or the colon shorthand instead.'
     )
   }
   if (!dynamic && styleResult) {

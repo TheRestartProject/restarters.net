@@ -13,29 +13,11 @@ export function createCompilerCreator (baseCompile: Function): Function {
       const finalOptions = Object.create(baseOptions)
       const errors = []
       const tips = []
-
-      let warn = (msg, range, tip) => {
+      finalOptions.warn = (msg, tip) => {
         (tip ? tips : errors).push(msg)
       }
 
       if (options) {
-        if (process.env.NODE_ENV !== 'production' && options.outputSourceRange) {
-          // $flow-disable-line
-          const leadingSpaceLength = template.match(/^\s*/)[0].length
-
-          warn = (msg, range, tip) => {
-            const data: WarningMessage = { msg }
-            if (range) {
-              if (range.start != null) {
-                data.start = range.start + leadingSpaceLength
-              }
-              if (range.end != null) {
-                data.end = range.end + leadingSpaceLength
-              }
-            }
-            (tip ? tips : errors).push(data)
-          }
-        }
         // merge custom modules
         if (options.modules) {
           finalOptions.modules =
@@ -56,11 +38,9 @@ export function createCompilerCreator (baseCompile: Function): Function {
         }
       }
 
-      finalOptions.warn = warn
-
-      const compiled = baseCompile(template.trim(), finalOptions)
+      const compiled = baseCompile(template, finalOptions)
       if (process.env.NODE_ENV !== 'production') {
-        detectErrors(compiled.ast, warn)
+        errors.push.apply(errors, detectErrors(compiled.ast))
       }
       compiled.errors = errors
       compiled.tips = tips

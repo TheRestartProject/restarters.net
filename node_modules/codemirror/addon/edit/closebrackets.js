@@ -11,7 +11,6 @@
 })(function(CodeMirror) {
   var defaults = {
     pairs: "()[]{}''\"\"",
-    closeBefore: ")]}'\":;>",
     triples: "",
     explode: "[]{}"
   };
@@ -87,7 +86,7 @@
     cm.operation(function() {
       var linesep = cm.lineSeparator() || "\n";
       cm.replaceSelection(linesep + linesep, null);
-      moveSel(cm, -1)
+      cm.execCommand("goCharLeft");
       ranges = cm.listSelections();
       for (var i = 0; i < ranges.length; i++) {
         var line = ranges[i].head.line;
@@ -95,17 +94,6 @@
         cm.indentLine(line + 1, null, true);
       }
     });
-  }
-
-  function moveSel(cm, dir) {
-    var newRanges = [], ranges = cm.listSelections(), primary = 0
-    for (var i = 0; i < ranges.length; i++) {
-      var range = ranges[i]
-      if (range.head == cm.getCursor()) primary = i
-      var pos = range.head.ch || dir > 0 ? {line: range.head.line, ch: range.head.ch + dir} : {line: range.head.line - 1}
-      newRanges.push({anchor: pos, head: pos})
-    }
-    cm.setSelections(newRanges, primary)
   }
 
   function contractSelection(sel) {
@@ -121,9 +109,6 @@
     var pairs = getOption(conf, "pairs");
     var pos = pairs.indexOf(ch);
     if (pos == -1) return CodeMirror.Pass;
-
-    var closeBefore = getOption(conf,"closeBefore");
-
     var triples = getOption(conf, "triples");
 
     var identical = pairs.charAt(pos + 1) == ch;
@@ -151,7 +136,7 @@
         var prev = cur.ch == 0 ? " " : cm.getRange(Pos(cur.line, cur.ch - 1), cur)
         if (!CodeMirror.isWordChar(next) && prev != ch && !CodeMirror.isWordChar(prev)) curType = "both";
         else return CodeMirror.Pass;
-      } else if (opening && (next.length === 0 || /\s/.test(next) || closeBefore.indexOf(next) > -1)) {
+      } else if (opening) {
         curType = "both";
       } else {
         return CodeMirror.Pass;
@@ -164,9 +149,10 @@
     var right = pos % 2 ? ch : pairs.charAt(pos + 1);
     cm.operation(function() {
       if (type == "skip") {
-        moveSel(cm, 1)
+        cm.execCommand("goCharRight");
       } else if (type == "skipThree") {
-        moveSel(cm, 3)
+        for (var i = 0; i < 3; i++)
+          cm.execCommand("goCharRight");
       } else if (type == "surround") {
         var sels = cm.getSelections();
         for (var i = 0; i < sels.length; i++)
@@ -179,10 +165,10 @@
       } else if (type == "both") {
         cm.replaceSelection(left + right, null);
         cm.triggerElectric(left + right);
-        moveSel(cm, -1)
+        cm.execCommand("goCharLeft");
       } else if (type == "addFour") {
         cm.replaceSelection(left + left + left + left, "before");
-        moveSel(cm, 1)
+        cm.execCommand("goCharRight");
       }
     });
   }

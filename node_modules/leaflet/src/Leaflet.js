@@ -22,3 +22,6 @@ export * from './layer/index';
 
 // map
 export * from './map/index';
+
+import {freeze} from './core/Util';
+Object.freeze = freeze;

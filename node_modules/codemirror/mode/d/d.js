@@ -182,12 +182,7 @@ CodeMirror.defineMode("d", function(config, parserConfig) {
       else return ctx.indented + (closing ? 0 : indentUnit);
     },
 
-    electricChars: "{}",
-    blockCommentStart: "/*",
-    blockCommentEnd: "*/",
-    blockCommentContinue: " * ",
-    lineComment: "//",
-    fold: "brace"
+    electricChars: "{}"
   };
 });
 

@@ -148,7 +148,6 @@ CodeMirror.defineMode("lua", function(config, parserConfig) {
       return state.basecol + indentUnit * (state.indentDepth - (closing ? 1 : 0));
     },
 
-    electricInput: /^\s*(?:end|until|else|\)|\})$/,
     lineComment: "--",
     blockCommentStart: "--[[",
     blockCommentEnd: "]]"

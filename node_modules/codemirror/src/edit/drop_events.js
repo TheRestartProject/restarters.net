@@ -29,39 +29,28 @@ export function onDrop(e) {
   // and insert it.
   if (files && files.length && window.FileReader && window.File) {
     let n = files.length, text = Array(n), read = 0
-    const markAsReadAndPasteIfAllFilesAreRead = () => {
-      if (++read == n) {
-        operation(cm, () => {
+    let loadFile = (file, i) => {
+      if (cm.options.allowDropFileTypes &&
+          indexOf(cm.options.allowDropFileTypes, file.type) == -1)
+        return
+
+      let reader = new FileReader
+      reader.onload = operation(cm, () => {
+        let content = reader.result
+        if (/[\x00-\x08\x0e-\x1f]{2}/.test(content)) content = ""
+        text[i] = content
+        if (++read == n) {
           pos = clipPos(cm.doc, pos)
           let change = {from: pos, to: pos,
-                        text: cm.doc.splitLines(
-                            text.filter(t => t != null).join(cm.doc.lineSeparator())),
+                        text: cm.doc.splitLines(text.join(cm.doc.lineSeparator())),
                         origin: "paste"}
           makeChange(cm.doc, change)
-          setSelectionReplaceHistory(cm.doc, simpleSelection(clipPos(cm.doc, pos), clipPos(cm.doc, changeEnd(change))))
-        })()
-      }
-    }
-    const readTextFromFile = (file, i) => {
-      if (cm.options.allowDropFileTypes &&
-          indexOf(cm.options.allowDropFileTypes, file.type) == -1) {
-        markAsReadAndPasteIfAllFilesAreRead()
-        return
-      }
-      let reader = new FileReader
-      reader.onerror = () => markAsReadAndPasteIfAllFilesAreRead()
-      reader.onload = () => {
-        let content = reader.result
-        if (/[\x00-\x08\x0e-\x1f]{2}/.test(content)) {
-          markAsReadAndPasteIfAllFilesAreRead()
-          return
+          setSelectionReplaceHistory(cm.doc, simpleSelection(pos, changeEnd(change)))
         }
-        text[i] = content
-        markAsReadAndPasteIfAllFilesAreRead()
-      }
+      })
       reader.readAsText(file)
     }
-    for (let i = 0; i < files.length; i++) readTextFromFile(files[i], i)
+    for (let i = 0; i < n; ++i) loadFile(files[i], i)
   } else { // Normal drop
     // Don't do a replace if the drop happened inside of the selected text.
     if (cm.state.draggingText && cm.doc.sel.contains(pos) > -1) {

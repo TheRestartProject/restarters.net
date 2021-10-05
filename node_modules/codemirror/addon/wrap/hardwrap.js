@@ -29,20 +29,11 @@
     return {from: start, to: end};
   }
 
-  function findBreakPoint(text, column, wrapOn, killTrailingSpace, forceBreak) {
+  function findBreakPoint(text, column, wrapOn, killTrailingSpace) {
     var at = column
     while (at < text.length && text.charAt(at) == " ") at++
     for (; at > 0; --at)
       if (wrapOn.test(text.slice(at - 1, at + 1))) break;
-
-    if (!forceBreak && at <= text.match(/^[ \t]*/)[0].length) {
-      // didn't find a break point before column, in non-forceBreak mode try to
-      // find one after 'column'.
-      for (at = column + 1; at < text.length - 1; ++at) {
-        if (wrapOn.test(text.slice(at - 1, at + 1))) break;
-      }
-    }
-
     for (var first = true;; first = false) {
       var endOfText = at;
       if (killTrailingSpace)
@@ -56,7 +47,6 @@
     from = cm.clipPos(from); to = cm.clipPos(to);
     var column = options.column || 80;
     var wrapOn = options.wrapOn || /\s\S|-[^\.\d]/;
-    var forceBreak = options.forceBreak !== false;
     var killTrailing = options.killTrailingSpace !== false;
     var changes = [], curLine = "", curNo = from.line;
     var lines = cm.getRange(from, to, false);
@@ -78,7 +68,7 @@
       curLine += text;
       if (i) {
         var firstBreak = curLine.length > column && leadingSpace == spaceTrimmed &&
-          findBreakPoint(curLine, column, wrapOn, killTrailing, forceBreak);
+          findBreakPoint(curLine, column, wrapOn, killTrailing);
         // If this isn't broken, or is broken at a different point, remove old break
         if (!firstBreak || firstBreak.from != oldLen || firstBreak.to != oldLen + spaceInserted) {
           changes.push({text: [spaceInserted ? " " : ""],
@@ -90,17 +80,12 @@
         }
       }
       while (curLine.length > column) {
-        var bp = findBreakPoint(curLine, column, wrapOn, killTrailing, forceBreak);
-        if (bp.from != bp.to ||
-            forceBreak && leadingSpace !== curLine.slice(0, bp.to)) {
-          changes.push({text: ["", leadingSpace],
-                        from: Pos(curNo, bp.from),
-                        to: Pos(curNo, bp.to)});
-          curLine = leadingSpace + curLine.slice(bp.to);
-          ++curNo;
-        } else {
-          break;
-        }
+        var bp = findBreakPoint(curLine, column, wrapOn, killTrailing);
+        changes.push({text: ["", leadingSpace],
+                      from: Pos(curNo, bp.from),
+                      to: Pos(curNo, bp.to)});
+        curLine = leadingSpace + curLine.slice(bp.to);
+        ++curNo;
       }
     }
     if (changes.length) cm.operation(function() {

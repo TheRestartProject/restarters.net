@@ -19,6 +19,8 @@ import {
 import type { StringSegment } from './codegen'
 import type { CodegenState } from 'compiler/codegen/index'
 
+type Attr = { name: string; value: string };
+
 const plainStringRE = /^"(?:[^"\\]|\\.)*"$|^'(?:[^'\\]|\\.)*'$/
 
 // let the model AST transform translate v-model into appropriate
@@ -40,14 +42,14 @@ export function applyModelTransform (el: ASTElement, state: CodegenState) {
 }
 
 export function genAttrSegments (
-  attrs: Array<ASTAttr>
+  attrs: Array<Attr>
 ): Array<StringSegment> {
   return attrs.map(({ name, value }) => genAttrSegment(name, value))
 }
 
 export function genDOMPropSegments (
-  props: Array<ASTAttr>,
-  attrs: ?Array<ASTAttr>
+  props: Array<Attr>,
+  attrs: ?Array<Attr>
 ): Array<StringSegment> {
   const segments = []
   props.forEach(({ name, value }) => {
@@ -90,7 +92,7 @@ export function genClassSegments (
   classBinding: ?string
 ): Array<StringSegment> {
   if (staticClass && !classBinding) {
-    return [{ type: RAW, value: ` class="${JSON.parse(staticClass)}"` }]
+    return [{ type: RAW, value: ` class=${staticClass}` }]
   } else {
     return [{
       type: EXPRESSION,

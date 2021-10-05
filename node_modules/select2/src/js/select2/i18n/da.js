@@ -31,9 +31,6 @@ define(function () {
     },
     searching: function () {
       return 'Søger…';
-    },
-    removeAllItems: function () {
-      return 'Fjern alle elementer';
     }
   };
 });

@@ -1,10 +1,5 @@
-var indexOf = function (xs, item) {
-    if (xs.indexOf) return xs.indexOf(item);
-    else for (var i = 0; i < xs.length; i++) {
-        if (xs[i] === item) return i;
-    }
-    return -1;
-};
+var indexOf = require('indexof');
+
 var Object_keys = function (obj) {
     if (Object.keys) return Object.keys(obj)
     else {
@@ -114,11 +109,9 @@ Script.prototype.runInNewContext = function (context) {
     var ctx = Script.createContext(context);
     var res = this.runInContext(ctx);
 
-    if (context) {
-        forEach(Object_keys(ctx), function (key) {
-            context[key] = ctx[key];
-        });
-    }
+    forEach(Object_keys(ctx), function (key) {
+        context[key] = ctx[key];
+    });
 
     return res;
 };
@@ -129,10 +122,6 @@ forEach(Object_keys(Script.prototype), function (name) {
         return s[name].apply(s, [].slice.call(arguments, 1));
     };
 });
-
-exports.isContext = function (context) {
-    return context instanceof Context;
-};
 
 exports.createScript = function (code) {
     return exports.Script(code);

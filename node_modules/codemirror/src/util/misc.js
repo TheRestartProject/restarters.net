@@ -29,28 +29,10 @@ export function countColumn(string, end, tabSize, startIndex, startValue) {
 }
 
 export class Delayed {
-  constructor() {
-    this.id = null
-    this.f = null
-    this.time = 0
-    this.handler = bind(this.onTimeout, this)
-  }
-  onTimeout(self) {
-    self.id = 0
-    if (self.time <= +new Date) {
-      self.f()
-    } else {
-      setTimeout(self.handler, self.time - +new Date)
-    }
-  }
+  constructor() {this.id = null}
   set(ms, f) {
-    this.f = f
-    const time = +new Date + ms
-    if (!this.id || time < this.time) {
-      clearTimeout(this.id)
-      this.id = setTimeout(this.handler, ms)
-      this.time = time
-    }
+    clearTimeout(this.id)
+    this.id = setTimeout(f, ms)
   }
 }
 
@@ -61,7 +43,7 @@ export function indexOf(array, elt) {
 }
 
 // Number of pixels added to scroller and sizer to hide scrollbar
-export let scrollerGap = 50
+export let scrollerGap = 30
 
 // Returned or thrown by various protocols to signal 'I'm not
 // handling this'.

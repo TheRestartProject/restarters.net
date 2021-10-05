@@ -6,9 +6,7 @@ import {
   warn,
   isObject,
   toObject,
-  isReservedAttribute,
-  camelize,
-  hyphenate
+  isReservedAttribute
 } from 'core/util/index'
 
 /**
@@ -45,9 +43,7 @@ export function bindObjectProps (
             ? data.domProps || (data.domProps = {})
             : data.attrs || (data.attrs = {})
         }
-        const camelizedKey = camelize(key)
-        const hyphenatedKey = hyphenate(key)
-        if (!(camelizedKey in hash) && !(hyphenatedKey in hash)) {
+        if (!(key in hash)) {
           hash[key] = value[key]
 
           if (isSync) {

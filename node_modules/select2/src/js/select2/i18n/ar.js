@@ -25,9 +25,6 @@ define(function () {
     },
     searching: function () {
       return 'جاري البحث…';
-    },
-     removeAllItems: function () {
-      return 'قم بإزالة كل العناصر';
     }
   };
 });

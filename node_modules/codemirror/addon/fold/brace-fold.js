@@ -31,16 +31,13 @@ CodeMirror.registerHelper("fold", "brace", function(cm, start) {
     }
   }
 
-  var startBrace = findOpening("{"), startBracket = findOpening("[")
-  var startToken, endToken, startCh
-  if (startBrace != null && (startBracket == null || startBracket > startBrace)) {
-    startCh = startBrace; startToken = "{"; endToken = "}"
-  } else if (startBracket != null) {
-    startCh = startBracket; startToken = "["; endToken = "]"
-  } else {
-    return
+  var startToken = "{", endToken = "}", startCh = findOpening("{");
+  if (startCh == null) {
+    startToken = "[", endToken = "]";
+    startCh = findOpening("[");
   }
 
+  if (startCh == null) return;
   var count = 1, lastLine = cm.lastLine(), end, endCh;
   outer: for (var i = line; i <= lastLine; ++i) {
     var text = cm.getLine(i), pos = i == line ? startCh : 0;
@@ -57,7 +54,7 @@ CodeMirror.registerHelper("fold", "brace", function(cm, start) {
       ++pos;
     }
   }
-  if (end == null || line == end) return;
+  if (end == null || line == end && endCh == startCh) return;
   return {from: CodeMirror.Pos(line, startCh),
           to: CodeMirror.Pos(end, endCh)};
 });

@@ -7,7 +7,6 @@ export default {
     attribution: {
       type: String,
       default: null,
-      custom: true,
     },
     name: {
       type: String,

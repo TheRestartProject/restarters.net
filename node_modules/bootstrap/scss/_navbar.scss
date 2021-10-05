@@ -136,12 +136,8 @@
   height: 1.5em;
   vertical-align: middle;
   content: "";
-  background: 50% / 100% 100% no-repeat;
-}
-
-.navbar-nav-scroll {
-  max-height: $navbar-nav-scroll-max-height;
-  overflow-y: auto;
+  background: no-repeat center center;
+  background-size: 100% 100%;
 }
 
 // Generate series of `.navbar-expand-*` responsive classes for configuring
@@ -201,10 +197,6 @@
           > .container#{breakpoint-infix($size, $container-max-widths)} {
             @extend %container-nesting-#{$breakpoint};
           }
-        }
-
-        .navbar-nav-scroll {
-          overflow: visible;
         }
 
         .navbar-collapse {

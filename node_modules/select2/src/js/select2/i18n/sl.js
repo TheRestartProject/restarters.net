@@ -49,9 +49,6 @@ define(function () {
     },
     searching: function () {
       return 'Iščem…';
-    },
-    removeAllItems: function () {
-      return 'Odstranite vse elemente';
     }
   };
 });

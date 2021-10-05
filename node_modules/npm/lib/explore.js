@@ -23,13 +23,14 @@ function explore (args, cb) {
   var opts = {cwd: cwd, stdio: 'inherit'}
 
   var shellArgs = []
-  if (args.length) {
+  if (args) {
     if (isWindows) {
       var execCmd = escapeExecPath(args.shift())
       var execArgs = [execCmd].concat(args.map(escapeArg))
       opts.windowsVerbatimArguments = true
       shellArgs = ['/d', '/s', '/c'].concat(execArgs)
     } else {
+      shellArgs.unshift('-c')
       shellArgs = ['-c', args.map(escapeArg).join(' ').trim()]
     }
   }

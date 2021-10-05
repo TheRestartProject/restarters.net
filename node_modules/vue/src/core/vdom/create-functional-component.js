@@ -5,7 +5,6 @@ import { createElement } from './create-element'
 import { resolveInject } from '../instance/inject'
 import { normalizeChildren } from '../vdom/helpers/normalize-children'
 import { resolveSlots } from '../instance/render-helpers/resolve-slots'
-import { normalizeScopedSlots } from '../vdom/helpers/normalize-scoped-slots'
 import { installRenderHelpers } from '../instance/render-helpers/index'
 
 import {
@@ -49,22 +48,7 @@ export function FunctionalRenderContext (
   this.parent = parent
   this.listeners = data.on || emptyObject
   this.injections = resolveInject(options.inject, parent)
-  this.slots = () => {
-    if (!this.$slots) {
-      normalizeScopedSlots(
-        data.scopedSlots,
-        this.$slots = resolveSlots(children, parent)
-      )
-    }
-    return this.$slots
-  }
-
-  Object.defineProperty(this, 'scopedSlots', ({
-    enumerable: true,
-    get () {
-      return normalizeScopedSlots(data.scopedSlots, this.slots())
-    }
-  }: any))
+  this.slots = () => resolveSlots(children, parent)
 
   // support for compiled functional template
   if (isCompiled) {
@@ -72,7 +56,7 @@ export function FunctionalRenderContext (
     this.$options = options
     // pre-resolve slots for renderSlot()
     this.$slots = this.slots()
-    this.$scopedSlots = normalizeScopedSlots(data.scopedSlots, this.$slots)
+    this.$scopedSlots = data.scopedSlots || emptyObject
   }
 
   if (options._scopeId) {
@@ -121,27 +105,24 @@ export function createFunctionalComponent (
   const vnode = options.render.call(null, renderContext._c, renderContext)
 
   if (vnode instanceof VNode) {
-    return cloneAndMarkFunctionalResult(vnode, data, renderContext.parent, options, renderContext)
+    return cloneAndMarkFunctionalResult(vnode, data, renderContext.parent, options)
   } else if (Array.isArray(vnode)) {
     const vnodes = normalizeChildren(vnode) || []
     const res = new Array(vnodes.length)
     for (let i = 0; i < vnodes.length; i++) {
-      res[i] = cloneAndMarkFunctionalResult(vnodes[i], data, renderContext.parent, options, renderContext)
+      res[i] = cloneAndMarkFunctionalResult(vnodes[i], data, renderContext.parent, options)
     }
     return res
   }
 }
 
-function cloneAndMarkFunctionalResult (vnode, data, contextVm, options, renderContext) {
+function cloneAndMarkFunctionalResult (vnode, data, contextVm, options) {
   // #7817 clone node before setting fnContext, otherwise if the node is reused
   // (e.g. it was from a cached normal slot) the fnContext causes named slots
   // that should not be matched to match.
   const clone = cloneVNode(vnode)
   clone.fnContext = contextVm
   clone.fnOptions = options
-  if (process.env.NODE_ENV !== 'production') {
-    (clone.devtoolsMeta = clone.devtoolsMeta || {}).renderContext = renderContext
-  }
   if (data.slot) {
     (clone.data || (clone.data = {})).slot = data.slot
   }

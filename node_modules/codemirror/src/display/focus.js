@@ -4,22 +4,19 @@ import { addClass, rmClass } from "../util/dom.js"
 import { signal } from "../util/event.js"
 
 export function ensureFocus(cm) {
-  if (!cm.hasFocus()) {
-    cm.display.input.focus()
-    if (!cm.state.focused) onFocus(cm)
-  }
+  if (!cm.state.focused) { cm.display.input.focus(); onFocus(cm) }
 }
 
 export function delayBlurEvent(cm) {
   cm.state.delayingBlurEvent = true
   setTimeout(() => { if (cm.state.delayingBlurEvent) {
     cm.state.delayingBlurEvent = false
-    if (cm.state.focused) onBlur(cm)
+    onBlur(cm)
   } }, 100)
 }
 
 export function onFocus(cm, e) {
-  if (cm.state.delayingBlurEvent && !cm.state.draggingText) cm.state.delayingBlurEvent = false
+  if (cm.state.delayingBlurEvent) cm.state.delayingBlurEvent = false
 
   if (cm.options.readOnly == "nocursor") return
   if (!cm.state.focused) {

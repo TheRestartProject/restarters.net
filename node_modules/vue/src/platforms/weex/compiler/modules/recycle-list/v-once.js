@@ -11,7 +11,7 @@ function containVOnce (el: ASTElement): boolean {
   return false
 }
 
-export function preTransformVOnce (el: ASTElement) {
+export function preTransformVOnce (el: ASTElement, options: WeexCompilerOptions) {
   if (containVOnce(el)) {
     getAndRemoveAttr(el, 'v-once', true)
     addRawAttr(el, '[[once]]', true)

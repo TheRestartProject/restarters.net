@@ -1,4 +1,4 @@
-/*! tether 1.4.7 */
+/*! tether 1.4.4 */
 
 (function(root, factory) {
   if (typeof define === 'function' && define.amd) {
@@ -35,19 +35,15 @@ function getActualBoundingClientRect(node) {
     rect[k] = boundingRect[k];
   }
 
-  try {
-    if (node.ownerDocument !== document) {
-      var _frameElement = node.ownerDocument.defaultView.frameElement;
-      if (_frameElement) {
-        var frameRect = getActualBoundingClientRect(_frameElement);
-        rect.top += frameRect.top;
-        rect.bottom += frameRect.top;
-        rect.left += frameRect.left;
-        rect.right += frameRect.left;
-      }
+  if (node.ownerDocument !== document) {
+    var _frameElement = node.ownerDocument.defaultView.frameElement;
+    if (_frameElement) {
+      var frameRect = getActualBoundingClientRect(_frameElement);
+      rect.top += frameRect.top;
+      rect.bottom += frameRect.top;
+      rect.left += frameRect.left;
+      rect.right += frameRect.left;
     }
-  } catch (err) {
-    // Ignore "Access is denied" in IE11/Edge
   }
 
   return rect;
@@ -1190,9 +1186,13 @@ var TetherClass = (function (_Evented) {
             xPos = -_pos.right;
           }
 
-          if (typeof window.devicePixelRatio === 'number' && devicePixelRatio % 1 === 0) {
-            xPos = Math.round(xPos * devicePixelRatio) / devicePixelRatio;
-            yPos = Math.round(yPos * devicePixelRatio) / devicePixelRatio;
+          if (window.matchMedia) {
+            // HubSpot/tether#207
+            var retina = window.matchMedia('only screen and (min-resolution: 1.3dppx)').matches || window.matchMedia('only screen and (-webkit-min-device-pixel-ratio: 1.3)').matches;
+            if (!retina) {
+              xPos = Math.round(xPos);
+              yPos = Math.round(yPos);
+            }
           }
 
           css[transformKey] = 'translateX(' + xPos + 'px) translateY(' + yPos + 'px)';
@@ -1252,16 +1252,9 @@ var TetherClass = (function (_Evented) {
             this.options.bodyElement.appendChild(this.element);
           }
         } else {
-          var isFullscreenElement = function isFullscreenElement(e) {
-            var d = e.ownerDocument;
-            var fe = d.fullscreenElement || d.webkitFullscreenElement || d.mozFullScreenElement || d.msFullscreenElement;
-            return fe === e;
-          };
-
           var offsetParentIsBody = true;
-
           var currentNode = this.element.parentNode;
-          while (currentNode && currentNode.nodeType === 1 && currentNode.tagName !== 'BODY' && !isFullscreenElement(currentNode)) {
+          while (currentNode && currentNode.nodeType === 1 && currentNode.tagName !== 'BODY') {
             if (getComputedStyle(currentNode).position !== 'static') {
               offsetParentIsBody = false;
               break;

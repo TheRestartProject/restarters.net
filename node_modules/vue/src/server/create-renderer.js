@@ -23,13 +23,12 @@ export type RenderOptions = {
   directives?: Object;
   isUnaryTag?: Function;
   cache?: RenderCache;
-  template?: string | (content: string, context: any) => string;
+  template?: string;
   inject?: boolean;
   basedir?: string;
   shouldPreload?: Function;
   shouldPrefetch?: Function;
   clientManifest?: ClientManifest;
-  serializer?: Function;
   runInNewContext?: boolean | 'once';
 };
 
@@ -42,8 +41,7 @@ export function createRenderer ({
   cache,
   shouldPreload,
   shouldPrefetch,
-  clientManifest,
-  serializer
+  clientManifest
 }: RenderOptions = {}): Renderer {
   const render = createRenderFunction(modules, directives, isUnaryTag, cache)
   const templateRenderer = new TemplateRenderer({
@@ -51,8 +49,7 @@ export function createRenderer ({
     inject,
     shouldPreload,
     shouldPrefetch,
-    clientManifest,
-    serializer
+    clientManifest
   })
 
   return {
@@ -82,26 +79,11 @@ export function createRenderer ({
       }, cb)
       try {
         render(component, write, context, err => {
-          if (err) {
-            return cb(err)
-          }
-          if (context && context.rendered) {
-            context.rendered(context)
-          }
           if (template) {
-            try {
-              const res = templateRenderer.render(result, context)
-              if (typeof res !== 'string') {
-                // function template returning promise
-                res
-                  .then(html => cb(null, html))
-                  .catch(cb)
-              } else {
-                cb(null, res)
-              }
-            } catch (e) {
-              cb(e)
-            }
+            result = templateRenderer.renderSync(result, context)
+          }
+          if (err) {
+            cb(err)
           } else {
             cb(null, result)
           }
@@ -124,27 +106,13 @@ export function createRenderer ({
         render(component, write, context, done)
       })
       if (!template) {
-        if (context && context.rendered) {
-          const rendered = context.rendered
-          renderStream.once('beforeEnd', () => {
-            rendered(context)
-          })
-        }
         return renderStream
-      } else if (typeof template === 'function') {
-        throw new Error(`function template is only supported in renderToString.`)
       } else {
         const templateStream = templateRenderer.createStream(context)
         renderStream.on('error', err => {
           templateStream.emit('error', err)
         })
         renderStream.pipe(templateStream)
-        if (context && context.rendered) {
-          const rendered = context.rendered
-          renderStream.once('beforeEnd', () => {
-            rendered(context)
-          })
-        }
         return templateStream
       }
     }

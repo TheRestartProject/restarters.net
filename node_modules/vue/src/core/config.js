@@ -28,9 +28,6 @@ export type Config = {
   getTagNamespace: (x?: string) => string | void;
   mustUseProp: (tag: string, type: ?string, name: string) => boolean;
 
-  // private
-  async: boolean;
-
   // legacy
   _lifecycleHooks: Array<string>;
 };
@@ -116,12 +113,6 @@ export default ({
    * Platform-dependent.
    */
   mustUseProp: no,
-
-  /**
-   * Perform updates asynchronously. Intended to be used by Vue Test Utils
-   * This will significantly reduce performance if set to false.
-   */
-  async: true,
 
   /**
    * Exposed for legacy reasons

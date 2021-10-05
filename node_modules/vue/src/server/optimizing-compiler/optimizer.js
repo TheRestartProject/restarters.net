@@ -84,7 +84,6 @@ function optimizeSiblings (el) {
         tag: 'template',
         attrsList: [],
         attrsMap: {},
-        rawAttrsMap: {},
         children: currentOptimizableGroup,
         ssrOptimizability: optimizability.FULL
       })

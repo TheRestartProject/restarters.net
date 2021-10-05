@@ -35,11 +35,19 @@ const OPTS = {
       }
     },
     {
-      resolve: 'gatsby-plugin-google-fonts',
+      resolve: 'gatsby-plugin-prefetch-google-fonts',
       options: {
         fonts: [
-          'Poppins',
-          'Inconsolata'
+          {
+            family: 'Poppins',
+            subsets: ['latin'],
+            variants: ['300', '400', '500']
+          },
+          {
+            family: 'Inconsolata',
+            subsets: ['latin'],
+            variants: ['400', '700']
+          }
         ]
       }
     },
