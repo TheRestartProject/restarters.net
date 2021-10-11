@@ -281,44 +281,6 @@ class GroupController extends Controller
 
     public function view($groupid)
     {
-        if (isset($_GET['action']) && isset($_GET['code'])) {
-            $actn = $_GET['action'];
-            $code = $_GET['code'];
-
-            switch ($actn) {
-                case 'gu':
-                    $response['success'] = 'Group updated.';
-
-                    break;
-                case 'pe':
-                    $response['success'] = 'Party updated.';
-
-                    break;
-                case 'pc':
-                    $response['success'] = 'Party created.';
-
-                    break;
-                case 'ue':
-                    $response['success'] = 'Profile updated.';
-
-                    break;
-                case 'de':
-                    if ($code == 200) {
-                        $response['success'] = 'Party deleted.';
-                    } elseif ($code == 403) {
-                        $response['danger'] = 'Couldn\'t delete the party!';
-                    } elseif ($code == 500) {
-                        $response['warning'] = 'The party has been deleted, but <strong>something went wrong while deleting it from WordPress</strong>. <br /> You\'ll need to do that manually!';
-                    }
-
-                    break;
-
-                default:
-                    $response['danger'] = 'Unexpected arguments';
-                    break;
-            }
-        }
-
         $user = User::find(Auth::id());
 
         //Object Instances
@@ -415,12 +377,13 @@ class GroupController extends Controller
         $view_group = Group::find($groupid);
         $view_group->allConfirmedVolunteers = $this->expandVolunteers($view_group->allConfirmedVolunteers);
 
-        $hasPendingInvite = ! empty(UserGroups::where('group', $groupid)
+        $pendingInvite = UserGroups::where('group', $groupid)
         ->where('user', $user->id)
         ->where(function ($query) {
             $query->where('status', '<>', '1')
             ->whereNotNull('status');
-        })->first());
+        })->first();
+        $hasPendingInvite = !empty($pendingInvite) ? $pendingInvite['status'] : false;
 
         $groupStats = $group->getGroupStats();
 
@@ -1179,12 +1142,13 @@ class GroupController extends Controller
         $user_groups = UserGroups::where('user', Auth::user()->id)->count();
         $view_group = Group::find($groupid);
 
-        $hasPendingInvite = ! empty(UserGroups::where('group', $groupid)
-                                             ->where('user', $user->id)
-                                             ->where(function ($query) {
-                                                 $query->where('status', '<>', '1')
-                                                       ->whereNotNull('status');
-                                             })->first());
+        $pendingInvite = UserGroups::where('group', $groupid)
+            ->where('user', $user->id)
+            ->where(function ($query) {
+                $query->where('status', '<>', '1')
+                    ->whereNotNull('status');
+            })->first();
+        $hasPendingInvite = !empty($pendingInvite) ? $pendingInvite['status'] : false;
 
         return view('group.nearby', [ //host.index
             'title' => 'Host Dashboard',

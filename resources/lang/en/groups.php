@@ -189,4 +189,5 @@ return [
   'delete_group' => 'Delete group',
   'delete_group_confirm' => 'Please confirm that you want to delete :name.',
   'delete_succeeded' => 'Group <strong>:name</strong> has been deleted.',
+  'invitation_pending' => 'You have an invitation to this group.  Please click <a href=":accept">here</a> if you would like to join.'
 ];
