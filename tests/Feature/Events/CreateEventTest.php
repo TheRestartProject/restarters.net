@@ -2,6 +2,7 @@
 
 namespace Tests\Feature;
 
+use App\EventsUsers;
 use App\Group;
 use App\Helpers\Geocoder;
 use App\Network;
@@ -294,10 +295,6 @@ class CreateEventTest extends TestCase
     /** @test */
     public function a_host_can_be_added_later()
     {
-        // Disable discourse integration as this doesn't currently work in a test environment.  We are considering
-        // a better solution.
-        config(['restarters.features.discourse_integration' => false]);
-
         $this->withoutExceptionHandling();
 
         $host = factory(User::class)->states('Host')->create();
@@ -318,16 +315,23 @@ class CreateEventTest extends TestCase
         $party = $group->parties()->latest()->first();
 
         // Remove the host from the event
+        $volunteer = EventsUsers::where('user', $host->id)->first();
         $this->post('/party/remove-volunteer/', [
-            'user_id' => $host->id,
-            'event_id' => $party->idevents,
-        ])->assertStatus(200);
+            'id' => $volunteer->idevents_users,
+        ])->assertSee('true');
 
         // Assert that we see the host in the list of volunteers to add to the event.
         $this->get('/party/view/'.$party->idevents)->assertSeeInOrder(['Group member', '<option value="'.$host->id.'">', '</div>']);
 
         // Assert we can add them back in.
+        $response = $this->post('/party/add-volunteer', [
+            'event' => $party->idevents,
+            'volunteer_email_address' => $host->email,
+            'full_name' => $host->name,
+            'user' => $host->id
+        ]);
 
-        config(['restarters.features.discourse_integration' => true]);
+        $response->assertSessionHas('success');
+        $this->assertTrue($response->isRedirection());
     }
 }
