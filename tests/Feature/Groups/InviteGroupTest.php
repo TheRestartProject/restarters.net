@@ -15,7 +15,7 @@ use DB;
 use Tests\TestCase;
 use Illuminate\Support\Facades\Notification;
 
-class InviteEventTest extends TestCase
+class InviteGroupTest extends TestCase
 {
     public function testInvite() {
         $this->withoutExceptionHandling();
