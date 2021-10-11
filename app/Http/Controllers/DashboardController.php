@@ -60,40 +60,6 @@ class DashboardController extends Controller
             $past_events = null;
         }
 
-        //Host specific queries
-        if (Fixometer::hasRole($user, 'Host') && $in_group) {
-            $outdated_groups = Group::join('users_groups', 'groups.idgroups', '=', 'users_groups.group')
-                ->where('users_groups.user', Auth::user()->id)
-                ->where('users_groups.role', 3)
-                ->whereDate('updated_at', '<=', date('Y-m-d', strtotime('-3 Months')))
-                ->select('groups.*')
-                ->take(3)
-                ->get();
-
-            if (empty($outdated_groups->toArray())) {
-                $outdated_groups = null;
-            }
-
-            if ($in_event) {
-                $active_group_ids = Party::whereIn('idevents', $event_ids)
-                    ->whereDate('event_date', '>', date('Y-m-d'))
-                    ->pluck('events.group')
-                    ->toArray();
-
-                $non_active_group_ids = array_diff($group_ids, $active_group_ids);
-                $inactive_groups = Group::whereIn('idgroups', $non_active_group_ids)
-                    ->take(3)
-                    ->get();
-            }
-
-            if (! isset($inactive_groups) || empty($inactive_groups->toArray())) {
-                $inactive_groups = null;
-            }
-        } else {
-            $outdated_groups = null;
-            $inactive_groups = null;
-        }
-
         $groupsNearYou = null;
 
         if ($in_group) {
@@ -118,9 +84,19 @@ class DashboardController extends Controller
             $all_groups = null;
         }
 
-        $new_groups = 0;
+        // Look for new nearby groups that we're not already a member of. Include ones where we have been
+        // invited.
+        //
+        // Eloquent is just getting in the way here so do a raw query.
+        $new_groups = DB::select(DB::raw("SELECT COUNT(*) AS count FROM groups 
+        LEFT JOIN users_groups ON groups.idgroups = users_groups.group AND users_groups.user = " . intval(Auth::id()) . "
+        WHERE (users_groups.user IS NULL OR users_groups.status != 1) 
+            AND created_at >= '" . date('Y-m-d', strtotime('1 month ago')) . "'  
+            AND ( 6371 * acos( cos( radians(' . $user->latitude . ') ) * cos( radians( groups.latitude ) ) * cos( radians( groups.longitude ) - radians(' . $user->longitude . ') ) + sin( radians(' . $user->latitude . ') ) * sin( radians( groups.latitude ) ) ) ) < 40"))[0]->count;
 
+        // Look for upcoming events.  Only include events for groups we have joined, not just been invited to.
         $upcoming_events = Party::upcomingEvents()->where('users_groups.user', Auth::user()->id)
+            ->where('users_groups.status', 1)
             ->orderBy('event_date', 'ASC')
             ->get();
         $expanded_events = [];
@@ -133,12 +109,13 @@ class DashboardController extends Controller
 
         $upcoming_events = $expanded_events;
 
-        // Look for groups where user ID exists in pivot table.  We have to explicitly test on deleted_at because
+        // Look for groups of which we are a member.  We have to explicitly test on deleted_at because
         // the normal filtering out of soft deletes won't happen for joins.
         $your_groups = Group::join('users_groups', 'users_groups.group', '=', 'groups.idgroups')
             ->leftJoin('events', 'events.group', '=', 'groups.idgroups')
             ->where('users_groups.user', $user->id)
             ->whereNull('users_groups.deleted_at')
+            ->whereNull('users_groups.status')
             ->orderBy('groups.name', 'ASC')
             ->groupBy('groups.idgroups', 'groups.name')
             ->select(['groups.idgroups', 'groups.name'])

@@ -104,7 +104,9 @@ class PartyController extends Controller
 
             $group = Group::find($group_id);
         } else {
+            // Only include events for groups we have joined, not just been invited to.
             $upcoming_events = Party::upcomingEvents()->where('users_groups.user', Auth::user()->id)
+                ->where('users_groups.status', 1)
                 ->get();
 
             $past_events = Party::UsersPastEvents([auth()->id()])->get();
@@ -162,10 +164,7 @@ class PartyController extends Controller
 
         return view('events.index', [
             'moderate_events' => $moderate_events,
-            'upcoming_events' => $upcoming_events,
             'past_events' => $past_events,
-            'upcoming_events_in_area' => $upcoming_events_in_area,
-            'upcoming_events_all' => $upcoming_events_all,
             'user_groups' => $user_groups,
             'expanded_events' => $expanded_events,
             'is_host_of_group' => $is_host_of_group,
