@@ -107,11 +107,12 @@ class UserGroupsController extends Controller
             ->where('status', 1)
             ->first();
 
-        if (! $member) {
-            abort(404, 'Not a member');
+        // If we don't find the membership, it could be because they have never been a member, but it could
+        // also be because they have just left.  We've seen this in Sentry on the live system, perhaps due to
+        // double-clicking or user error.  In this case it's better to return success.
+        if ($member) {
+            $member->delete();
         }
-
-        $member->delete();
 
         $group = Group::where('idgroups', $id)->first();
 
