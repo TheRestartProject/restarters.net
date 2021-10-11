@@ -65,9 +65,10 @@ class EventStatsTest extends TestCase
     /** @test */
     public function an_event_with_mixed_devices_has_correct_stats()
     {
-        $displacementFactor = 0.5;
-        $id_misc_powered = 46;
-        $id_misc_unpowered = 50;
+        $displacement_factor = env('DISPLACEMENT_VALUE');
+        $emission_ratio = env('EMISSION_RATIO_POWERED');
+        $id_misc_powered = env('MISC_CATEGORY_ID_POWERED');
+        $id_misc_unpowered = env('MISC_CATEGORY_ID_UNPOWERED');
 
         DB::statement('SET foreign_key_checks=0');
         Category::truncate();
@@ -109,7 +110,6 @@ class EventStatsTest extends TestCase
         \App\DeviceBarrier::truncate();
         DB::statement('SET foreign_key_checks=1');
 
-        $Calculator = new \App\Helpers\FootprintRatioCalculator;
         $idevents = 1;
 
         // #1 add a single powered non-misc device
@@ -120,7 +120,7 @@ class EventStatsTest extends TestCase
         ]);
         $this->assertEquals($idevents, $device->deviceEvent->idevents);
         $expect = [
-            'co2' => (14.4 * $displacementFactor),
+            'co2' => (14.4 * $displacement_factor),
             'ewaste' => 4,
             'unpowered_waste' => 0,
             'fixed_devices' => 1,
@@ -220,58 +220,16 @@ class EventStatsTest extends TestCase
             'estimate' => 1.6,
         ]);
         $this->assertEquals($idevents, $device->deviceEvent->idevents);
-        $emissionRatio = round($Calculator->calculateRatio(), 2);
         $expect['fixed_devices'] += 1;
         $expect['fixed_powered'] += 1;
         $expect['devices_powered'] += 1;
         $expect['ewaste'] += 1.6;
-        $expect['co2'] = ((1.6 * $emissionRatio) * $displacementFactor) + (14.4 * $displacementFactor);
+        $expect['co2'] = round(((1.6 * $emission_ratio) * $displacement_factor) + (14.4 * $displacement_factor),2);
         $result = $device->deviceEvent->getEventStats();
         $this->assertIsArray($result);
         $this->assertEquals(14, count($result));
         foreach ($expect as $k => $v) {
             $this->assertEquals($v, round($result[$k], 2), "Wrong value for $k => $v");
         }
-
-        logger('=========================== EVENTSTATSTEST DEBUG INFO BEGINS =======================================');
-        logger('
-**** FootprintRatioCalculator->calculateRatio() ****
-select @ratio := sum(`categories`.`footprint`) / sum(`categories`.`weight` + 0.0) from `devices`, `categories` where  `categories`.`idcategories` = `devices`.`category` and `devices`.`repair_status` = 1 and categories.idcategories != 46
-sum of footprints IS NOT multiplied by displacement factor
-');
-        logger("emissionRatio calculated by FootprintRatioCalculator->calculateRatio()=$emissionRatio");
-
-        logger('
-**** Party->getEventStats($emissionRatio) ****
-uses Device->co2Diverted($emissionRatio, $Device->displacement)
-where $emissionRatio param provided by FootprintRatioCalculator->calculateRatio()
-');
-        logger('getEventStats() for idevents='.$idevents);
-        logger(print_r($result, 1));
-
-        logger('
-CALLED IN
-/var/www/html/restarters.dev/app/Group.php
-  254,28:             $stats = $event->getEventStats($emissionRatio);
-  274,33:             $eventStats = $event->getEventStats($emissionRatio);
-/var/www/html/restarters.dev/app/Party.php
-  866,27:         return round($this->getEventStats($emissionRatio)[\'ewaste\'], 2);
-/var/www/html/restarters.dev/app/Http/Controllers/ApiController.php
-  66,29:         $eventStats = $event->getEventStats($emissionRatio);
-/var/www/html/restarters.dev/app/Http/Controllers/DeviceController.php
-  391,34:         $return[\'stats\'] = $event->getEventStats($emissionRatio);
-  523,28:             $stats = $event->getEventStats($emissionRatio);
-  564,32:                 $stats = $event->getEventStats($emissionRatio);
-/var/www/html/restarters.dev/app/Http/Controllers/OutboundController.php
-  41,37:                 $eventStats = $event->getEventStats($EmissionRatio);
-/var/www/html/restarters.dev/app/Http/Controllers/PartyController.php
-  89,35:         $thisone[\'stats\'] = $event->getEventStats($emissionRatio);
-  739,30:             \'stats\' => $event->getEventStats($this->EmissionRatio),
-  888,29:         $eventStats = $event->getEventStats($emissionRatio);
-  1467,53:                  \'co2_emissions_prevented\' => $party->getEventStats($emissionRatio)[\'co2\'],
-/var/www/html/restarters.dev/app/Http/Controllers/API/EventController.php
-  75,33:             $eventStats = $party->getEventStats($emissionRatio);
-');
-        logger('=========================== EVENTSTATSTEST DEBUG INFO ENDS =======================================');
     }
 }
