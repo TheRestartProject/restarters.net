@@ -360,6 +360,10 @@ class User extends Authenticatable implements Auditable
 
     public function existsOnDiscourse()
     {
+        if (! config('restarters.features.discourse_integration')) {
+            return false;
+        }
+
         try {
             $client = app('discourse-client');
             $emailToSearchFor = urlencode(trim($this->email));

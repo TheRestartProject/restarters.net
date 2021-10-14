@@ -31,6 +31,9 @@ import 'vue-multiselect/dist/vue-multiselect.min.css'
 import * as Sentry from "@sentry/vue";
 import { Integrations } from "@sentry/tracing";
 
+import Vuelidate from 'vuelidate'
+Vue.use(Vuelidate)
+
 // Without this, the default map marker doesn't appear in production.  Fairly well-known problem.
 // eslint-disable-next-line
 delete L.Icon.Default.prototype._getIconUrl
@@ -553,11 +556,7 @@ function initAutocomplete() {
 
   function removeUser() {
 
-    var user_id = jQuery(this).data('remove-volunteer');
-    var event_id = jQuery(this).data('event-id');
-    var type = jQuery(this).data('type');
-    var counter = jQuery('#'+type+'-counter');
-    var current_count = parseInt(counter.text());
+    var id = jQuery(this).data('remove-volunteer');
 
     $.ajax({
       headers: {
@@ -566,15 +565,12 @@ function initAutocomplete() {
       type: 'post',
       url: '/party/remove-volunteer',
       data: {
-        user_id : user_id,
-        event_id : event_id
+        id : id,
       },
       datatype: 'json',
       success: function(json) {
         if( json.success ){
-          jQuery('.volunteer-' + user_id).fadeOut();
-          jQuery('#'+type+'-counter').text();
-          counter.text( current_count - 1 );
+          jQuery('.volunteer-' + id).fadeOut();
         } else {
           alert('Something has gone wrong');
         }
@@ -1541,6 +1537,8 @@ jQuery(document).ready(function () {
       store: store,
       components: {
         'dashboardpage': require('./components/DashboardPage.vue'),
+        'eventaddeditpage': require('./components/EventAddEditPage.vue'),
+        'eventaddedit': require('./components/EventAddEdit.vue'),
         'eventpage': require('./components/EventPage.vue'),
         'fixometerpage': require('./components/FixometerPage.vue'),
         'groupspage': require('./components/GroupsPage.vue'),

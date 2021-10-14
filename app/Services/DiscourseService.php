@@ -9,6 +9,10 @@ class DiscourseService
 {
     public function getDiscussionTopics($tag = null, $numberOfTopics = 5)
     {
+        if (! config('restarters.features.discourse_integration')) {
+            return [];
+        }
+
         $topics = [];
 
         try {
@@ -47,6 +51,10 @@ class DiscourseService
 
     public function getUserIdsByBadge($badgeId)
     {
+        if (! config('restarters.features.discourse_integration')) {
+            return [];
+        }
+
         $externalUserIds = [];
 
         try {
@@ -89,6 +97,10 @@ class DiscourseService
 
     public function addUserToPrivateMessage($threadid, $addBy, $addUser)
     {
+        if (! config('restarters.features.discourse_integration')) {
+            return;
+        }
+
         Log::info("Add user to private message $threadid, $addBy, $addUser");
 
         $client = app('discourse-client', [
@@ -120,6 +132,10 @@ class DiscourseService
     }
 
     public function getAllUsers() {
+        if (! config('restarters.features.discourse_integration')) {
+            return [];
+        }
+
         // As per https://meta.discourse.org/t/how-do-i-get-a-list-of-all-users-from-the-api/24261/9 we can
         // clunkily get a list of all users by looking for the trust_level_0 group, then fetch each
         // one to get the email.

@@ -60,6 +60,18 @@ class GroupController extends Controller
     {
         $authenticatedUser = Auth::user();
 
+        $bbox = $minLat = $minLng = $maxLat = $maxLng = null;
+
+        if ($request->has('bbox')) {
+            $bbox = $request->get('bbox');
+            if (preg_match('/(.*?),(.*?),(.*?),(.*)/', $bbox, $matches)) {
+                $minLat = floatval($matches[1]);
+                $minLng = floatval($matches[2]);
+                $maxLat = floatval($matches[3]);
+                $maxLng = floatval($matches[4]);
+            }
+        }
+
         $groups = [];
 
         foreach ($authenticatedUser->networks as $network) {
@@ -72,72 +84,85 @@ class GroupController extends Controller
         $collection = collect([]);
 
         foreach ($groups as $group) {
-            $groupStats = $group->getGroupStats();
-            $collection->push([
-                'id' => $group->idgroups,
-                'name' => $group->name,
-                'location' => [
-                    'value' => $group->location,
-                    'country' => $group->country,
-                    'latitude' => $group->latitude,
-                    'longitude' => $group->longitude,
-                    'area' => $group->area,
-                    'postcode' => $group->postcode,
-                ],
-                'website' => $group->website,
-                'facebook' => $group->facebook,
-                'description' => $group->free_text,
-                'image_url' => $group->groupImagePath(),
-                'upcoming_parties' => $upcoming_parties_collection = collect([]),
-                'past_parties' => $past_parties_collection = collect([]),
-                'impact' => [
-                    'volunteers' => $groupStats['participants'],
-                    'hours_volunteered' => $groupStats['hours_volunteered'],
-                    'parties_thrown' => $groupStats['parties'],
-                    'waste_prevented' => $groupStats['waste'],
-                    'co2_emissions_prevented' => $groupStats['powered_co2'],
-                ],
-                'widgets' => [
-                    'headline_stats' => url("/group/stats/{$group->idgroups}"),
-                    'co2_equivalence_visualisation' => url("/outbound/info/group/{$group->idgroups}/manufacture"),
-                ],
-                'created_at' => new \Carbon\Carbon($group->created_at),
-                'updated_at' => new \Carbon\Carbon($group->max_updated_at_devices_updated_at),
+            // If we have a bounding box, check that the group is within it.
+            if (!$bbox || (
+                $group->latitude !== null && $group->longitude !== null &&
+                $group->latitude >= $minLat && $group->latitude <= $maxLat &&
+                $group->longitude >= $minLng && $group->longitude <= $maxLng
+                )) {
+                $groupStats = $group->getGroupStats();
+                $collection->push([
+                                      'id' => $group->idgroups,
+                                      'name' => $group->name,
+                                      'location' => [
+                                          'value' => $group->location,
+                                          'country' => $group->country,
+                                          'latitude' => $group->latitude,
+                                          'longitude' => $group->longitude,
+                                          'area' => $group->area,
+                                          'postcode' => $group->postcode,
+                                      ],
+                                      'website' => $group->website,
+                                      'facebook' => $group->facebook,
+                                      'description' => $group->free_text,
+                                      'image_url' => $group->groupImagePath(),
+                                      'upcoming_parties' => $upcoming_parties_collection = collect([]),
+                                      'past_parties' => $past_parties_collection = collect([]),
+                                      'impact' => [
+                                        'volunteers' => $groupStats['participants'],
+                                        'hours_volunteered' => $groupStats['hours_volunteered'],
+                                          'parties_thrown' => $groupStats['parties'],
+                                          'waste_prevented' => $groupStats['waste'],
+                                          'co2_emissions_prevented' => $groupStats['powered_co2'],
+                                      ],
+                                      'widgets' => [
+                                          'headline_stats' => url("/group/stats/{$group->idgroups}"),
+                                          'co2_equivalence_visualisation' => url("/outbound/info/group/{$group->idgroups}/manufacture"),
+                                      ],
+                                      'created_at' => new \Carbon\Carbon($group->created_at),
+                                      'updated_at' => new \Carbon\Carbon($group->max_updated_at_devices_updated_at),
 
-              ]);
+                                  ]);
 
-            foreach ($group->upcomingParties() as $event) {
-                $upcoming_parties_collection->push([
-                    'event_id' => $event->idevents,
-                    'event_date' => $event->event_date,
-                    'start_time' => $event->start,
-                    'end_time' => $event->end,
-                    'name' => $event->venue,
-                    'location' => [
-                        'value' => $event->location,
-                        'latitude' => $event->latitude,
-                        'longitude' => $event->longitude,
-                    ],
-                    'created_at' => $event->created_at,
-                    'updated_at' => $event->updated_at,
-                ]);
-            }
+                foreach ($group->upcomingParties() as $event) {
+                    $upcoming_parties_collection->push([
+                                                           'event_id' => $event->idevents,
+                                                           'event_date' => $event->event_date,
+                                                           'start_time' => $event->start,
+                                                           'end_time' => $event->end,
+                                                           'name' => $event->venue,
+// TODO Once DOT-1502 is released                                                           'link' => $event->link,
+                                                           'online' => $event->online,
+                                                           'description' => $event->free_text,
+                                                           'location' => [
+                                                               'value' => $event->location,
+                                                               'latitude' => $event->latitude,
+                                                               'longitude' => $event->longitude,
+                                                           ],
+                                                           'created_at' => $event->created_at,
+                                                           'updated_at' => $event->updated_at,
+                                                       ]);
+                }
 
-            foreach ($group->pastParties() as $key => $event) {
-                $past_parties_collection->push([
-                    'event_id' => $event->idevents,
-                    'event_date' => $event->event_date,
-                    'start_time' => $event->start,
-                    'end_time' => $event->end,
-                    'name' => $event->venue,
-                    'location' => [
-                        'value' => $event->location,
-                        'latitude' => $event->latitude,
-                        'longitude' => $event->longitude,
-                    ],
-                    'created_at' => $event->created_at,
-                    'updated_at' => $event->updated_at,
-                ]);
+                foreach ($group->pastParties() as $key => $event) {
+                    $past_parties_collection->push([
+                                                       'event_id' => $event->idevents,
+                                                       'event_date' => $event->event_date,
+                                                       'start_time' => $event->start,
+                                                       'end_time' => $event->end,
+                                                       'name' => $event->venue,
+// TODO Once DOT-1502 is released                                                       'link' => $event->link,
+                                                       'online' => $event->online,
+                                                       'description' => $event->free_text,
+                                                       'location' => [
+                                                           'value' => $event->location,
+                                                           'latitude' => $event->latitude,
+                                                           'longitude' => $event->longitude,
+                                                       ],
+                                                       'created_at' => $event->created_at,
+                                                       'updated_at' => $event->updated_at,
+                                                   ]);
+                }
             }
         }
 
