@@ -138,6 +138,9 @@ class User extends Authenticatable implements Auditable
             $join->on('group_tag', '=', DB::raw(GroupTags::INACTIVE));
         })->where(function ($q) {
             $q->whereNull('grouptags_groups.id');
+
+            // Only show approved groups.
+            $q->whereNotNull('wordpress_post_id');
         })->having('dist', '<=', $nearby)
             ->groupBy('idgroups');
 
