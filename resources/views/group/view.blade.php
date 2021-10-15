@@ -28,7 +28,7 @@
       @endif
 
       @if ($has_pending_invite)
-          <div>
+          <div class="alert alert-warning">
               {!! __('groups.invitation_pending', [
                 'accept' => '/group/accept-invite/' . $group->idgroups . '/' . $has_pending_invite
               ]) !!}
