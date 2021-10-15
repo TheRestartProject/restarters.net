@@ -129,7 +129,7 @@ export default {
     },
     translatedNewlyAdded() {
       return this.$lang.choice('dashboard.newly_added', this.newGroups, {
-        count: this.newGroups
+        count: this.newGroups.length
       })
     },
   },
