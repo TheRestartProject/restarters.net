@@ -43,7 +43,7 @@
           <b class="text-uppercase d-none d-lg-block">{{ __('groups.groups_title2') }}</b>
         </template>
         <div v-if="nearbyGroups && nearbyGroups.length">
-          <p>
+          <p class="mt-1">
             {{ nearestGroups }}
             <a href="/profile/edit" class="small">{{ __('groups.nearest_groups_change') }}</a>.
           </p>
