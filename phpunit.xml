@@ -12,7 +12,6 @@
         <testsuite name="Feature">
             <directory suffix=".php">./tests/Feature</directory>
             <exclude>./tests/Feature/Admin/Users/WikiLoginTests.php</exclude>
-            <exclude>./tests/Feature/Groups/WordpressGroupPushTest.php</exclude>
             <exclude>./tests/Feature/Microtasks/ExampleTest.php</exclude>
             <exclude>./tests/Feature/Microtasks/FaultcatTest.php</exclude>
             <exclude>./tests/Feature/Microtasks/MisccatTest.php</exclude>

@@ -9,7 +9,7 @@ dependencies:
 jobs:
   build:
     docker:
-      - image: circleci/php:7.4-node-browsers
+      - image: cimg/php:7.4-node
         name: restarters.test
         environment:
           - DB_CONNECTION: mysql
@@ -25,16 +25,33 @@ jobs:
           - MYSQL_DATABASE: restarters_db
           - MYSQL_USER: restarters
           - MYSQL_PASSWORD: s3cr3t
+      - image: mcr.microsoft.com/playwright:focal
+        environment:
+          NODE_ENV: development
     steps:
       - checkout
       - run: sudo apt update
-      - run: sudo apt install openssl zip unzip git libxml2-dev libzip-dev zlib1g-dev libcurl4-openssl-dev iputils-ping default-mysql-client vim libpng-dev libgmp-dev libjpeg62-turbo-dev
-      - run: sudo docker-php-ext-configure gd --with-jpeg
-      - run: sudo docker-php-ext-install zip pdo pdo_mysql xmlrpc curl gd zip
+      - run: sudo apt install openssl zip unzip git libxml2-dev libzip-dev zlib1g-dev libcurl4-openssl-dev iputils-ping default-mysql-client vim libpng-dev libgmp-dev libjpeg-turbo8-dev
+      - run: sudo apt-get install php7.4-xmlrpc php7.4-intl php7.4-xdebug
       - run: cp .env.example .env
+
+      # We don't have Discourse on CircleCI.
+      - run: sed -i 's/FEATURE__DISCOURSE_INTEGRATION=.*$/FEATURE__DISCOURSE_INTEGRATION=false/g' .env
+
+      # Playwright needs the debug bar not to appear
+      - run: sed -i 's/APP_DEBUG=.*$/APP_DEBUG=FALSE/g' .env
+
+      # ...and runs on localhost.
+      - run: sed -i 's/SESSION_DOMAIN=.*$/SESSION_DOMAIN=localhost/g' .env
+
+      # ...and needs honeypot rate-limiting needs to be turned off.
+      - run: sed -i 's/HONEYPOT_DISABLE=.*$/HONEYPOT_DISABLE=TRUE/g' .env
 
       - run: wget https://getcomposer.org/composer-1.phar; rm -rf vendor; php composer-1.phar install
       - run: npm install
+      - run: npx playwright install
+      - run: npx playwright install-deps
+      - run: npm install -D @playwright/test
 
       - run: php artisan key:generate
       - run: php artisan migrate
@@ -45,3 +62,9 @@ jobs:
 
       # Coveralls is pernickety about the location it uploads from existing.
       - run: mkdir build; mkdir build/logs; php vendor/bin/php-coveralls -v -x tests/clover.xml
+
+      # Run the Playwright tests.
+      - run: echo "User::create(['name'=>'Jane Bloggs','email'=>'jane@bloggs.net','password'=>Hash::make('passw0rd'),'role'=>2,'consent_past_data'=>'2021-01-01','consent_future_data'=>'2021-01-01','consent_gdpr'=>'2021-01-01']);" | php artisan tinker
+      - run: export NODE_OPTIONS=--max-old-space-size=8192; npm run prod
+      # Playwright tests failing on CI - disabling for now.
+      # - run: npx playwright test

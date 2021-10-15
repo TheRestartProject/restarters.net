@@ -617,7 +617,6 @@ class PartyController extends Controller
 
         $File = new FixometerFile;
         $Party = new Party;
-        $Device = new Device;
 
         $groupsUserIsInChargeOf = $user->groupsInChargeOf();
         $userInChargeOfMultipleGroups = $user->hasRole('Administrator') || count($groupsUserIsInChargeOf) > 1;
@@ -639,22 +638,14 @@ class PartyController extends Controller
         $party = $Party->findThis($id)[0];
         $remotePost = null;
 
-        // Put the values we want to preserve into the session, to be picked up by the blade template's use of old().
-        $request->session()->put('_old_input.venue', $party->venue);
-        $request->session()->put('_old_input.online', $party->online);
-        $request->session()->put('_old_input.free_text', $party->free_text);
-        $request->session()->put('_old_input.location', $party->location);
-        $request->session()->put('_old_input.start', $party->start);
-        $request->session()->put('_old_input.end', $party->end);
-
         return view('events.create', [
             'title' => 'Duplicate Party',
             'gmaps' => true,
             'allGroups' => $allGroups,
             'user' => Auth::user(),
             'user_groups' => $groupsUserIsInChargeOf,
-            'selected_group_id' => $party->group,
             'userInChargeOfMultipleGroups' => $userInChargeOfMultipleGroups,
+            'duplicateFrom' => $party
         ]);
     }
 
@@ -1000,34 +991,38 @@ class PartyController extends Controller
 
     public function removeVolunteer(Request $request)
     {
-        $user_id = $request->input('user_id');
-        $event_id = $request->input('event_id');
+        // The id that's passed in is that of the events_users table, because the entry may refer to a user without
+        // an id.
+        $id = $request->input('id');
+        $volunteer = EventsUsers::where('idevents_users', $id)->first();
 
         $return = [
             'success' => false,
         ];
 
-        //Has current logged in user got permission to remove volunteer
-        if ((Fixometer::hasRole(Auth::user(), 'Host') && Fixometer::userHasEditPartyPermission($event_id, Auth::user()->id)) || Fixometer::hasRole(Auth::user(), 'Administrator')) {
-            //Let's get the user before we delete them
-            $volunteer = EventsUsers::where('user', $user_id)->where('event', $event_id)->first();
+        if ($volunteer) {
+            $event_id = $volunteer->event;
 
-            //Let's delete the user
-            $delete_user = EventsUsers::where('user', $user_id)->where('event', $event_id)->delete();
-            if ($delete_user == 1) {
-                //If the user accepted the invitation, we decrement
-                if ($volunteer->status == 1) {
-                    Party::find($event_id)->decrement('volunteers');
+            // Has current logged-in user got permission to remove volunteer?
+            if ((Fixometer::hasRole(Auth::user(), 'Host') && Fixometer::userHasEditPartyPermission($event_id, Auth::user()->id)) || Fixometer::hasRole(Auth::user(), 'Administrator')) {
+                //Let's delete the user
+                $delete_user = $volunteer->delete();
+
+                if ($delete_user == 1) {
+                    //If the user accepted the invitation, we decrement
+                    if ($volunteer->status == 1) {
+                        Party::find($event_id)->decrement('volunteers');
+                    }
+
+                    //Return JSON
+                    $return = [
+                        'success' => true,
+                    ];
                 }
-
-                //Return JSON
-                $return = [
-                    'success' => true,
-                ];
             }
-        }
 
-        return response()->json($return);
+            return response()->json($return);
+        }
     }
 
     public function postSendInvite(Request $request)
@@ -1166,14 +1161,14 @@ class PartyController extends Controller
         $event_id = $request->input('event');
         $volunteer_email_address = $request->input('volunteer_email_address');
 
-        // Retrieve name if one exists, if no name exists and user is null as well. This volunteer is anonymous
+        // Retrieve name if one exists.  If no name exists and user is null as well then this volunteer is anonymous.
         if ($request->has('full_name')) {
             $full_name = $request->input('full_name');
         } else {
             $full_name = null;
         }
 
-        // User is null, this volunteer is either anonymous or no user exists
+        // User is null, this volunteer is either anonymous or no user exists.
         if ($request->has('user') && $request->input('user') !== 'not-registered') {
             $user = $request->input('user');
         } else {
