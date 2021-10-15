@@ -13,7 +13,7 @@
     <EventImages :images="images" v-if="images && images.length" />
     <div v-if="inProgress || finished">
       <EventStats :idevents="idevents" />
-      <EventDevices id="devices-section":idevents="idevents" :canedit="isAttending" :devices="devices" :clusters="clusters" :brands="brands" :barrier-list="barrierList" :itemTypes="itemTypes" />
+      <EventDevices id="devices-section":idevents="idevents" :canedit="canedit || isAttending" :devices="devices" :clusters="clusters" :brands="brands" :barrier-list="barrierList" :itemTypes="itemTypes" />
     </div>
   </div>
 </template>
