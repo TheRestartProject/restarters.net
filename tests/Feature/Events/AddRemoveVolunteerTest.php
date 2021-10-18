@@ -15,7 +15,7 @@ use Faker\Generator as Faker;
 use DB;
 use Tests\TestCase;
 use Illuminate\Support\Facades\Notification;
-
+use Symfony\Component\DomCrawler\Crawler;
 
 class AddRemoveVolunteerTest extends TestCase
 {
@@ -113,5 +113,62 @@ class AddRemoveVolunteerTest extends TestCase
         $this->post('/party/remove-volunteer/', [
             'id' => $volunteer->idevents_users,
         ])->assertSee('true');
+    }
+
+    public function testAdminRemoveReaddHost() {
+        $this->withoutExceptionHandling();
+
+        $host = factory(User::class)->states('Administrator')->create([
+          'api_token' => '1234',
+        ]);
+
+        $this->actingAs($host);
+
+        // Create group.
+        $idgroups = $this->createGroup();
+
+        // Host remove themselves.
+        $this->followingRedirects();
+        $response = $this->post('/api/usersgroups/' . $idgroups, [
+            'api_token' => '1234',
+            '_method' => 'delete',
+        ]);
+
+        $ret = json_decode($response->getContent(), true);
+        $this->assertTrue($ret['success']);
+
+        // Admin re-add from user account page.
+        $admin = factory(User::class)->state('Administrator')->create();
+        $this->actingAs($admin);
+
+        $response = $this->get('/user/edit/' . $host->id);
+        $response->assertStatus(200);
+
+        $crawler = new Crawler($response->getContent());
+
+        $tokens = $crawler->filter('input[name=_token]')->each(function (Crawler $node, $i) {
+            return $node;
+        });
+
+        $tokenValue = $tokens[0]->attr('value');
+
+        $response = $this->post('/profile/edit-admin-settings', [
+            '_token' => $tokenValue,
+            'id' => $host->id,
+            'user_role' => 2,
+            'assigned_groups' => [
+                $idgroups
+            ],
+            'preferences' => [
+                3, 12
+            ]
+        ]);
+        $response->assertSessionHas('message');
+        $this->assertTrue($response->isRedirection());
+
+        // Should now see the group.
+        $response = $this->get('/user/edit/' . $host->id);
+        $response->assertStatus(200);
+        $response->assertSee('<option value="1" selected>Test Group0</option>');
     }
 }
