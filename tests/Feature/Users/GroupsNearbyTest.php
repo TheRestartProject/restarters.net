@@ -31,9 +31,11 @@ class GroupsNearbyTest extends TestCase
     public function testOneGroupNearby() {
         $groupAttributes = factory(Group::class)->raw();
         $groupAttributes['name'] = 'Lancaster Fixers';
+        $groupAttributes['wordpress_post_id'] = '99999';
         $group = factory(Group::class)->create([
             'latitude' => -12.0464,
-            'longitude' => -77.0428
+            'longitude' => -77.0428,
+            'wordpress_post_id' => '99999'
         ]);
         $user = factory(User::class)->create([
                                                  'latitude' => -12.0463,
@@ -44,10 +46,25 @@ class GroupsNearbyTest extends TestCase
         $this->assertEquals($group->id, $groups[0]->id);
     }
 
-    public function testCloseButNoCigar() {
+    public function testDontShowUnlessApproved() {
         $group = factory(Group::class)->create([
                                                    'latitude' => -12.0464,
                                                    'longitude' => -77.0428
+                                               ]);
+        $user = factory(User::class)->create([
+                                                 'latitude' => -12.37,
+                                                 'longitude' => -77.37
+                                             ]);
+
+        $groups = $user->groupsNearby();
+        $this->assertEquals(0, count($groups));
+    }
+
+    public function testCloseButNoCigar() {
+        $group = factory(Group::class)->create([
+                                                   'latitude' => -12.0464,
+                                                   'longitude' => -77.0428,
+                                                   'wordpress_post_id' => '99999'
                                                ]);
         $user = factory(User::class)->create([
                                                  'latitude' => -12.37,
@@ -64,22 +81,37 @@ class GroupsNearbyTest extends TestCase
     }
 
     public function testInactive() {
+        // Add a group with a tag.
         $group = factory(Group::class)->create([
                                                    'latitude' => -12.0464,
-                                                   'longitude' => -77.0428
+                                                   'longitude' => -77.0428,
+                                                   'wordpress_post_id' => '99999'
                                                ]);
 
-        $inactive = factory(GroupTags::class)->create([
-            'id' => GroupTags::INACTIVE,
-            'tag_name' => 'Inactive'
-        ]);
+        $active = factory(GroupTags::class)->create([
+                                                          'id' => GroupTags::INACTIVE + 1,
+                                                          'tag_name' => 'Not Inactive'
+                                                      ]);
 
-        $group->addTag($inactive);
+        $group->addTag($active);
 
+        // Should find it nearby.
         $user = factory(User::class)->create([
                                                  'latitude' => -12.0463,
                                                  'longitude' => -77.0427
                                              ]);
+        $groups = $user->groupsNearby();
+        $this->assertEquals(1, count($groups));
+
+        // Make the group inactive.
+        $inactive = factory(GroupTags::class)->create([
+                                                          'id' => GroupTags::INACTIVE,
+                                                          'tag_name' => 'Inactive'
+                                                      ]);
+
+        $group->addTag($inactive);
+
+        // Should no longer show up.
         $groups = $user->groupsNearby();
         $this->assertEquals(0, count($groups));
     }

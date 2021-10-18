@@ -153,7 +153,7 @@ class CreateEventTest extends TestCase
 
         // Duplicate it - should bring up the page to add a new event, with some info from the first one.
         $response = $this->get('/party/duplicate/'.$party->idevents);
-        $response->assertSee(__('events.add_new_event'));
+        $response->assertSee('duplicate-from');
         $response->assertSee($party->description);
     }
 

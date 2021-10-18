@@ -202,4 +202,5 @@ return [
   'search_start_placeholder' => 'From...',
   'search_end_placeholder' => 'To...',
   'invite_when_approved' => 'You can only invite volunteers when this event has been approved',
+  'address_error' => 'The address you entered could not be found.  Please try a more general address, and enter any more specific address details in the event description.'
 ];

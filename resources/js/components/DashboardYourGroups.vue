@@ -128,8 +128,8 @@ export default {
       })
     },
     translatedNewlyAdded() {
-      return this.$lang.choice('dashboard.newly_added', this.newGroups, {
-        count: this.newGroups
+      return this.$lang.choice('dashboard.newly_added', this.newGroups.length, {
+        count: this.newGroups ? this.newGroups.length : 0
       })
     },
   },
