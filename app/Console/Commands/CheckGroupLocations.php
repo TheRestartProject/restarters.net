@@ -1,0 +1,58 @@
+<?php
+
+namespace App\Console\Commands;
+
+use App\Group;
+use Illuminate\Console\Command;
+
+class CheckGroupLocations extends Command
+{
+    /**
+     * The name and signature of the console command.
+     *
+     * @var string
+     */
+    protected $signature = 'check:grouplocations';
+
+    /**
+     * The console command description.
+     *
+     * @var string
+     */
+    protected $description = 'Check that all gtroup locations are geocodeable';
+
+    /**
+     * Create a new command instance.
+     *
+     * @return void
+     */
+    public function __construct()
+    {
+        parent::__construct();
+    }
+
+    /**
+     * Execute the console command.
+     *
+     * @return mixed
+     */
+    public function handle()
+    {
+        $groups = Group::whereNotNull('wordpress_post_id')->get();
+        $geocoder = new \App\Helpers\Geocoder();
+
+        foreach ($groups as $group) {
+            if (!$group->location) {
+                $this->error("Group {$group->idgroups} {$group->name} has no location");
+            } else {
+                $geocoded = $geocoder->geocode($group->location);
+
+                if (empty($geocoded)) {
+                    $this->error("Group {$group->idgroups} {$group->name} location {$group->location} fails to geocode");
+                } else {
+                    #$this->info("Group {$group->idgroups} {$group->name} location {$group->location} geocodes ok");
+                }
+            }
+        }
+    }
+}
