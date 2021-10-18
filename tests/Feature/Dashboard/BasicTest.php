@@ -54,7 +54,6 @@ class BasicTest extends TestCase
                 'location' => "$city",
                 ':your-groups' => '[]',
                 ':upcoming-events' => '[]',
-                ':past-events' => 'null',
                 ':topics' => '[]',
                 'see-all-topics-link' => env('DISCOURSE_URL').'/latest',
                 ':is-logged-in' => 'true',

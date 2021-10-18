@@ -76,13 +76,10 @@ class DashboardController extends Controller
                     $group_image->image->path;
                 }
             }
-
-            // We don't need to show any nearby groups.
-            $groupsNearYou = null;
-        } else {
-            // We don't have any groups.  Find nearby ones to show if we can.
-            $groupsNearYou = $user->groupsNearby(2);
         }
+
+        // Find nearby ones to show if we need to.
+        $groupsNearYou = $user->groupsNearby(2);
 
         return view(
             'dashboard.index',
