@@ -92,81 +92,53 @@ class PartyController extends Controller
             $moderate_events = null;
         }
 
-        // Use this view for showing group only upcoming and past events
         if (! is_null($group_id)) {
-            $upcoming_events = Party::upcomingEvents()
-                ->where('events.group', $group_id)
-                ->get();
-
-            $past_events = Party::pastEvents()
+            // This is the page for a specific group's events.  We want all events for this group.
+            $events = Party::events()
                 ->where('events.group', $group_id)
                 ->get();
 
             $group = Group::find($group_id);
         } else {
-            // Only include events for groups we have joined, not just been invited to.
-            $upcoming_events = Party::upcomingEvents()->where('users_groups.user', Auth::user()->id)
-                ->where('users_groups.status', 1)
-                ->get();
+            // This is a logged-in user's events page.  We want all upcoming events for groups we've are a member
+            // of.
+            $events = Party::usersUpcomingEvents()->get();
 
-            $past_events = Party::UsersPastEvents([auth()->id()])->get();
+            // ...and any past events for our groups or which we've attended.
+            $events = $events->concat(Party::UsersPastEvents()->get());
+
+            if (! is_null(Auth::user()->latitude) && ! is_null(Auth::user()->longitude)) {
+                // We know the location of this user, so we can also get nearby upcoming events.
+                $upcoming_events_in_area = Party::upcomingEventsInUserArea(Auth::user())
+                    ->whereNotIn('idevents', array_pluck($events, 'idevents'))
+                    ->get();
+
+                foreach ($upcoming_events_in_area as $event) {
+                    $e = \App\Http\Controllers\PartyController::expandEvent($event, NULL);
+                    $e['nearby'] = TRUE;
+                    $e['all'] = TRUE;
+                    $events[] = $e;
+                }
+            }
+
+            // ...and any other upcoming events
+            $other_upcoming_events = Party::upcomingEvents()->whereNotIn('idevents', array_pluck($events, 'idevents'))->get();
+
+            foreach ($other_upcoming_events as $event) {
+                $e = \App\Http\Controllers\PartyController::expandEvent($event, NULL);
+                $e['all'] = TRUE;
+                $events[] = $e;
+            }
 
             $group = null;
         }
 
-        // We want the upcoming events in the area, and all upcoming events, irrespective of whether or not we're
-        // looking at a specific group.  We want to exclude any events we have already obtained.
-        $exclude = [];
-
-        foreach ($upcoming_events as $e) {
-            $exclude[] = $e->idevents;
-        }
-
-        foreach ($past_events as $e) {
-            $exclude[] = $e->idevents;
-        }
-
-        if (! is_null(Auth::user()->latitude) && ! is_null(Auth::user()->longitude)) {
-            $upcoming_events_in_area = Party::upcomingEventsInUserArea(Auth::user())->whereNotIn('idevents', $exclude)->get();
-        } else {
-            $upcoming_events_in_area = null;
-        }
-
-        $upcoming_events_all = Party::upcomingEvents()->whereNotIn('idevents', $exclude)->get();
-
-        //Looks to see whether user has a group already, if they do, they can create events
-        $user_groups = UserGroups::where('user', Auth::user()->id)->count();
-
         $is_host_of_group = Fixometer::userHasEditGroupPermission($group_id, Auth::user()->id);
         $isCoordinatorForGroup = $group && Auth::user()->isCoordinatorForGroup($group);
 
-        $expanded_events = [];
-
-        foreach (array_merge($upcoming_events->all(), $past_events->all()) as $event) {
-            $expanded_events[] = \App\Http\Controllers\PartyController::expandEvent($event, $group);
-        }
-
-        if ($upcoming_events_in_area) {
-          foreach ($upcoming_events_in_area as $event) {
-              $e = \App\Http\Controllers\PartyController::expandEvent($event, $group);
-              $e['nearby'] = TRUE;
-              $expanded_events[] = $e;
-          }
-        }
-
-        if ($upcoming_events_all) {
-          foreach ($upcoming_events_all as $event) {
-              $e = \App\Http\Controllers\PartyController::expandEvent($event, $group);
-              $e['all'] = TRUE;
-              $expanded_events[] = $e;
-          }
-        }
-
         return view('events.index', [
             'moderate_events' => $moderate_events,
-            'past_events' => $past_events,
-            'user_groups' => $user_groups,
-            'expanded_events' => $expanded_events,
+            'expanded_events' => $events,
             'is_host_of_group' => $is_host_of_group,
             'isCoordinatorForGroup' => $isCoordinatorForGroup,
             'group' => $group,
