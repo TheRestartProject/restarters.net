@@ -73,7 +73,12 @@
       </div>
       <div class="event-buttons button-group row" v-if="creating">
         <div class="offset-lg-3 col-lg-7 d-flex align-items-right justify-content-end text-right">
-          {{ __('events.before_submit_text') }}
+          <span v-if="autoApprove">
+            {{ __('events.before_submit_text_autoapproved') }}
+          </span>
+          <span v-else>
+            {{ __('events.before_submit_text') }}
+          </span>
         </div>
         <div class="col-lg-2 d-flex align-items-center justify-content-end mt-2 mt-lg-0">
           <b-btn variant="primary" class="break" type="submit" @click="submit">
@@ -83,7 +88,12 @@
       </div>
       <div  class="event-buttons button-group row" v-else>
         <div class="offset-lg-3 col-lg-5 d-flex align-items-right justify-content-end text-right notice">
-          {{ __('events.before_submit_text') }}
+          <span v-if="autoApprove">
+            {{ __('events.before_submit_text_autoapproved') }}
+          </span>
+          <span v-else>
+            {{ __('events.before_submit_text') }}
+          </span>
         </div>
         <div class="col-lg-4 d-flex align-items-center justify-content-end mt-2 mt-lg-0">
           <b-btn :href="'/party/duplicate/' + initialEvent.id" variant="primary" size="md" class="mr-2">
@@ -198,6 +208,12 @@ export default {
     },
     allGroups () {
       return this.$store.getters['groups/list']
+    },
+    group() {
+      return this.allGroups.find(g => g.idgroups === this.idgroups)
+    },
+    autoApprove() {
+      return this.group ? this.group.auto_approve : false
     },
   },
   created() {

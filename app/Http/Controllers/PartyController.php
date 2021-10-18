@@ -220,6 +220,7 @@ class PartyController extends Controller
     public function create(Request $request, $group_id = null)
     {
         $user = Auth::user();
+        $autoapprove = $group_id ? Group::where('idgroups', $group_id)->first()->auto_approve : false;
 
         $groupsUserIsInChargeOf = $user->groupsInChargeOf();
         $userInChargeOfMultipleGroups = $user->hasRole('Administrator') || count($groupsUserIsInChargeOf) > 1;
@@ -262,6 +263,7 @@ class PartyController extends Controller
                             'user' => Auth::user(),
                             'user_groups' => $groupsUserIsInChargeOf,
                             'selected_group_id' => $group_id,
+                            'autoapprove' => $autoapprove
                         ]);
                     }
 
@@ -287,6 +289,10 @@ class PartyController extends Controller
             $location = $request->input('location');
             $group = $request->input('group');
             $user_id = Auth::user()->id;
+
+            // Check whether the event should be auto-approved, if all of the networks it belongs to
+            // allow it.
+            $autoapprove = Group::where('idgroups', $group)->first()->auto_approve;
 
             // formatting dates for the DB
             $event_date = date('Y-m-d', strtotime($event_date));
@@ -358,20 +364,6 @@ class PartyController extends Controller
                         }
                     }
 
-                    // Check whether the event should be auto-approved, if all of the networks it belongs to
-                    // allow it.
-                    $autoapprove = false;
-                    $groupObj = Group::where('idgroups', $group)->first();
-                    $networks = $groupObj->networks;
-
-                    if ($networks && count($networks)) {
-                        $autoapprove = true;
-
-                        foreach ($networks as $network) {
-                            $autoapprove &= $network->auto_approve_events;
-                        }
-                    }
-
                     if ($autoapprove) {
                         Log::info('Auto-approve event $idParty');
                         Party::find($idParty)->approve();
@@ -391,7 +383,8 @@ class PartyController extends Controller
             }
 
             if (is_numeric($idParty)) {
-                return redirect('/party/edit/'.$idParty)->with('success', Lang::get('events.created_success_message'));
+                return redirect('/party/edit/'.$idParty)->with('success', Lang::get($autoapprove ?
+                                    'events.created_success_message_autoapproved' : 'events.created_success_message'));
             }
 
             return view('events.create', [
@@ -405,6 +398,7 @@ class PartyController extends Controller
                 'user_groups' => $groupsUserIsInChargeOf,
                 'selected_group_id' => $group_id,
                 'userInChargeOfMultipleGroups' => $userInChargeOfMultipleGroups,
+                'autoapprove' => $autoapprove
             ]);
         }
 
@@ -416,6 +410,7 @@ class PartyController extends Controller
             'user_groups' => $groupsUserIsInChargeOf,
             'selected_group_id' => $group_id,
             'userInChargeOfMultipleGroups' => $userInChargeOfMultipleGroups,
+            'autoapprove' => $autoapprove
         ]);
     }
 
