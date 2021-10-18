@@ -4,8 +4,6 @@ namespace App;
 
 use DB;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Schema\Blueprint;
-use Illuminate\Support\Facades\Schema;
 
 class PrintcatOra extends Model
 {
@@ -37,7 +35,7 @@ class PrintcatOra extends Model
             // try once with locale, even if it is NULL
             $sql = $this->_getSQL($exclusions, $locale);
             $result = DB::select($sql);
-            if (! $result) {
+            if (!$result) {
                 // if no user-lang recs left, get one without locale
                 $sql = $this->_getSQL($exclusions);
                 $result = DB::select($sql);
@@ -67,11 +65,11 @@ ORDER BY rand()
 LIMIT 1;
 ';
         $and = '';
-        if (! empty($exclusions)) {
+        if (!empty($exclusions)) {
             $ids = implode("','", $exclusions);
             $and .= "\nAND d.`id_ords` NOT IN ('$ids')";
         }
-        if (! is_null($locale)) {
+        if (!is_null($locale)) {
             $and .= "\nAND (d.`language` = '$locale')";
         }
         $sql = sprintf($sql, $and);
@@ -126,28 +124,6 @@ LEFT JOIN devices_faults_printers_ora_opinions o ON o.id_ords = d.id_ords
 WHERE o.id_ords IS NULL
 ');
 
-        $result['total_recats'] = DB::select('
-SELECT COUNT(*) AS total FROM (
-SELECT
-o.id_ords,
-(SELECT o1.fault_type_id FROM devices_faults_printers_ora_opinions o1 WHERE o1.id_ords = o.id_ords GROUP BY o1.fault_type_id ORDER BY COUNT(o1.fault_type_id) DESC LIMIT 1) AS winning_opinion_id,
-ROUND((SELECT COUNT(o3.fault_type_id) as top_crowd_opinion_count FROM devices_faults_printers_ora_opinions o3 WHERE o3.id_ords = o.id_ords GROUP BY o3.fault_type_id ORDER BY top_crowd_opinion_count DESC LIMIT 1) /
-(SELECT COUNT(o4.fault_type_id) as all_votes FROM devices_faults_printers_ora_opinions o4 WHERE o4.id_ords = o.id_ords) * 100) AS top_crowd_opinion_percentage,
-COUNT(o.fault_type_id) AS all_crowd_opinions_count
-FROM devices_faults_printers_ora_opinions o
-GROUP BY o.id_ords
-HAVING
-(all_crowd_opinions_count > 1 AND top_crowd_opinion_percentage > 60)
-UNION
-SELECT
-a.id_ords,
-ANY_VALUE(a.fault_type_id) AS winning_opinion_id,
-100 AS top_crowd_opinion_percentage,
-3 AS all_crowd_opinions_count
-FROM devices_faults_printers_ora_adjudicated a
-) AS result
-');
-
         $result['list_recats'] = DB::select('
 SELECT result.winning_opinion_id, fta.title as winning_opinion, COUNT(*) AS total FROM (
 SELECT
@@ -172,6 +148,12 @@ LEFT JOIN fault_types_printers fta ON fta.id = result.winning_opinion_id
 GROUP BY winning_opinion_id
 ORDER BY total DESC
 ');
+
+        $result['total_recats'] = [new \stdClass()];
+        $result['total_recats'][0]->total = 0;
+        foreach ($result['list_recats'] as $v) {
+            $result['total_recats'][0]->total += $v->total;
+        }
 
         $result['list_splits'] = DB::select('
 SELECT

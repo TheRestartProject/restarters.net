@@ -20,7 +20,7 @@ class DiscourseServiceProvider extends ServiceProvider
      */
     public function register()
     {
-        if (config('restarters.features.discourse_integration') === false) {
+        if (! config('restarters.features.discourse_integration')) {
             return;
         }
 

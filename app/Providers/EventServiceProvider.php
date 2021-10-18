@@ -37,12 +37,12 @@ class EventServiceProvider extends ServiceProvider
         ],
 
         \App\Events\ApproveEvent::class => [
-            \App\Listeners\CreateWordPressApproveEventPost::class,
+            \App\Listeners\CreateWordpressPostForEvent::class,
             \App\Listeners\CreateDiscourseThreadForEvent::class,
         ],
 
         \App\Events\EditEvent::class => [
-            \App\Listeners\CreateWordPressEditEventPost::class,
+            \App\Listeners\EditWordpressPostForEvent::class,
         ],
 
         EventDeleted::class => [
@@ -50,11 +50,11 @@ class EventServiceProvider extends ServiceProvider
         ],
 
         \App\Events\ApproveGroup::class => [
-            \App\Listeners\CreateWordPressApproveGroupPost::class,
+            \App\Listeners\CreateWordpressPostForGroup::class,
         ],
 
         \App\Events\EditGroup::class => [
-            \App\Listeners\CreateWordPressEditGroupPost::class,
+            \App\Listeners\EditWordpressPostForGroup::class,
         ],
 
         \App\Events\PasswordChanged::class => [

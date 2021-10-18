@@ -1,4 +1,4 @@
-<tr class="volunteer volunteer-{{ $volunteer->user }}">
+<tr class="volunteer volunteer-{{ $volunteer->idevents_users }}">
 
   @php( $user = $volunteer->volunteer )
 
@@ -40,7 +40,7 @@
       </td>
     @elseif( $type != 'group' && ( ( App\Helpers\Fixometer::hasRole(Auth::user(), 'Host') && App\Helpers\Fixometer::userHasEditPartyPermission($formdata->id, Auth::user()->id) ) || App\Helpers\Fixometer::hasRole(Auth::user(), 'Administrator') ) )
       <td align="right">
-        <a href="#" class="users-list__remove js-remove" data-remove-volunteer="{{ $volunteer->user }}" data-idevents="{{ $volunteer->event }}" data-type="{{{ $type }}}">@lang('partials.remove_volunteer')</a>
+        <a href="#" class="users-list__remove js-remove" data-remove-volunteer="{{ $volunteer->idevents_users }}" data-type="{{{ $type }}}">@lang('partials.remove_volunteer')</a>
       </td>
     @endif
   @endif

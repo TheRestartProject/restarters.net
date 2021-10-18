@@ -17,12 +17,17 @@ export default {
     set(state, params) {
       Vue.set(state.list, params.idevents, params.attendees)
     },
-    remove(state, params) {
-      let newarr = state.list[params.idevents].filter((a) => {
-        return a.user !== params.userId
-      })
+    remove(state, id) {
+      // The id we are passed is the id in events_users, but the store is indexed by event id.  So we need to
+      // iterate through to find the one to remove.  This is rare and the numbers involved aren't huge, so the
+      // performance is ok.
+      state.list.forEach((list, idevents) => {
+        let newarr = state.list[idevents].filter((a) => {
+          return a.idevents_users !== id
+        })
 
-      Vue.set(state.list, params.idevents, newarr)
+        Vue.set(state.list, idevents, newarr)
+      })
     },
   },
   actions: {
@@ -31,8 +36,7 @@ export default {
     },
     async remove({commit, rootGetters}, params) {
       let ret = await axios.post('/party/remove-volunteer', {
-        user_id: params.userId,
-        event_id: params.idevents
+        id: params.id
       }, {
         headers: {
           'X-CSRF-TOKEN': rootGetters['auth/CSRF']
@@ -40,7 +44,7 @@ export default {
       })
 
       if (ret && ret.data && ret.data.success) {
-        commit('remove', params)
+        commit('remove', params.id)
       } else {
         throw new Exception("Server request failed")
       }

@@ -2,14 +2,10 @@
 
 namespace Tests\Feature;
 
-use App\Category;
 use App\Device;
 use App\Group;
 use App\Party;
 use DB;
-use Illuminate\Foundation\Testing\RefreshDatabase;
-use Illuminate\Foundation\Testing\WithFaker;
-use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Str;
 use Tests\TestCase;
 
@@ -28,8 +24,7 @@ class ExampleTest extends TestCase
         Device::truncate();
     }
 
-    /** @test */
-    public function test_sql_not_in()
+    public function sql_not_in()
     {
         // testing execution time with enormous "NOT IN" expression
         DB::table('groups')->insert([
@@ -49,13 +44,13 @@ class ExampleTest extends TestCase
         $x = array_keys(array_fill(1, 1000, 0));
         shuffle($x);
         $t = rand(1, 999);
-        logger($t);
+        // logger($t);
         $r = str_replace("$t,", '', implode(',', $x));
         $sql = "SELECT iddevices FROM devices WHERE iddevices NOT IN ($r) ORDER BY rand() LIMIT 1";
-        logger($sql);
+        // logger($sql);
         for ($i = 1; $i <= 10; $i++) {
             $foo = DB::select($sql); // (0.03 seconds)
-            logger(print_r($foo, 1));
+            // logger(print_r($foo, 1));
         }
     }
 
@@ -67,7 +62,6 @@ class ExampleTest extends TestCase
      * e.g. see MobifixOra->updateDevices();
      */
 
-    /** @test */
     public function create_table_1()
     {
         $data = $this->_setup_data();
@@ -100,7 +94,6 @@ HAVING
         DB::statement('DROP TABLE IF EXISTS `test_temporary`');
     }
 
-    /** @test */
     public function create_table_1a()
     {
         $data = $this->_setup_data();
@@ -133,7 +126,6 @@ HAVING
         DB::statement('DROP TABLE IF EXISTS `test_temporary`');
     }
 
-    /** @test */
     public function create_table_2()
     {
         $data = $this->_setup_data();
@@ -175,7 +167,6 @@ HAVING
         DB::statement('DROP TABLE IF EXISTS `test_temporary`');
     }
 
-    /** @test */
     public function create_table_2a()
     {
         $data = $this->_setup_data();
@@ -217,7 +208,6 @@ HAVING
         DB::statement('DROP TABLE IF EXISTS `test_temporary`');
     }
 
-    /** @test */
     public function create_table_3()
     {
         $data = $this->_setup_data();
@@ -265,7 +255,6 @@ HAVING
         DB::statement('DROP TABLE IF EXISTS `test_temporary`');
     }
 
-    /** @test */
     public function create_table_3a()
     {
         $data = $this->_setup_data();
@@ -305,8 +294,6 @@ HAVING
         DB::statement('ALTER TABLE `test_temporary` ADD PRIMARY KEY(`iddevices`);');
 
         $result = DB::select('SELECT * FROM `test_temporary`');
-
-        logger(print_r($result, 1));
 
         $this->assertTrue(is_array($result));
 
