@@ -54,7 +54,7 @@
             see-all-topics-link="{{ $seeAllTopicsLink }}"
             :is-logged-in="{{ Auth::check() ? 'true' : 'false'  }}"
             discourse-base-url="{{ env('DISCOURSE_URL') }}"
-            :new-groups="{{ $new_groups }}"
+            :new-groups="{{ json_encode($new_groups, JSON_INVALID_UTF8_IGNORE) }}"
         />
       </div>
     </div>

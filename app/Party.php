@@ -17,7 +17,6 @@ class Party extends Model implements Auditable
 {
     use SoftDeletes;
     use \OwenIt\Auditing\Auditable;
-    use \App\Traits\GlobalScopes;
 
     protected $table = 'events';
     protected $primaryKey = 'idevents';
@@ -422,19 +421,18 @@ class Party extends Model implements Auditable
         $user_group_ids = UserGroups::where('user', $user->id)->pluck('group')->toArray();
 
         return $this
-            ->select(DB::raw('`events`.*, ( 6371 * acos( cos( radians(' . $user->latitude . ') ) * cos( radians( events.latitude ) ) * cos( radians( events.longitude ) - radians(' . $user->longitude . ') ) + sin( radians(' . $user->latitude . ') ) * sin( radians( events.latitude ) ) ) ) AS distance'))
-            ->join('groups', 'groups.idgroups', '=', 'events.group')
-            ->join('users_groups', 'users_groups.group', '=', 'groups.idgroups')
-            ->where(function ($query) use ($user_group_ids) {
-                $query->whereNotIn('events.group', $user_group_ids)
-                    ->whereDate('event_date', '>=', date('Y-m-d'));
-            })
-            ->having('distance', '<=', 35) // kilometers (km)
-
-            ->groupBy('events.idevents')
-            ->orderBy('events.event_date', 'ASC')
-            ->orderBy('events.start', 'ASC')
-            ->orderBy('distance', 'ASC');
+      ->select(DB::raw('`events`.*, ( 6371 * acos( cos( radians('.$user->latitude.') ) * cos( radians( events.latitude ) ) * cos( radians( events.longitude ) - radians('.$user->longitude.') ) + sin( radians('.$user->latitude.') ) * sin( radians( events.latitude ) ) ) ) AS distance'))
+      ->join('groups', 'groups.idgroups', '=', 'events.group')
+      ->join('users_groups', 'users_groups.group', '=', 'groups.idgroups')
+      ->where(function ($query) use ($user_group_ids) {
+          $query->whereNotIn('events.group', $user_group_ids)
+        ->whereDate('event_date', '>=', date('Y-m-d'));
+      })
+      ->having('distance', '<=', User::NEARBY_KM)
+      ->groupBy('events.idevents')
+      ->orderBy('events.event_date', 'ASC')
+      ->orderBy('events.start', 'ASC')
+      ->orderBy('distance', 'ASC');
     }
 
     public function scopeAllUpcomingEvents()
