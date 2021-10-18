@@ -65,20 +65,7 @@ class GroupController extends Controller
 
         //Make sure we don't show the same groups in nearest to you
         $your_groups_uniques = $your_groups->pluck('idgroups')->toArray();
-
-        //Assuming we have valid lat and long values, let's see what is nearest
-        if (! is_null($user->latitude) && ! is_null($user->longitude)) {
-            $groups_near_you = Group::select(DB::raw(implode(',', $group_atts).', ( 6371 * acos( cos( radians('.$user->latitude.') ) * cos( radians( groups.latitude ) ) * cos( radians( groups.longitude ) - radians('.$user->longitude.') ) + sin( radians('.$user->latitude.') ) * sin( radians( groups.latitude ) ) ) ) AS distance'))
-                ->having('distance', '<=', 150)
-                ->join('events', 'events.group', '=', 'groups.idgroups')
-                ->whereNotIn('groups.idgroups', $your_groups_uniques)
-                ->groupBy('groups.idgroups')
-                ->orderBy('distance', 'ASC')
-                ->take(10)
-                ->get();
-        } else {
-            $groups_near_you = null;
-        }
+        $groups_near_you = $user->groupsNearby(10);
 
         return view('group.index', [
             'your_groups' => $this->expandGroups($your_groups),

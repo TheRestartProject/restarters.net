@@ -65,41 +65,55 @@ class DashboardController extends Controller
         if ($in_group) {
             $all_groups = Group::whereIn('idgroups', $group_ids)->get();
         } else {
-            $groups = $user->groupsNearby(150, 2);
-            $groupsNearYou = [];
-
-            if ($groups) {
-                foreach ($groups as $group) {
-                    $group_image = $group->groupImage;
-                    if (is_object($group_image) && is_object($group_image->image)) {
-                        $group_image->image->path;
-                    }
-
-                    $groupsNearYou[] = $group;
-                }
-            }
+            $groupsNearYou = $user->groupsNearby(2);
         }
 
         if (! isset($all_groups) || empty($all_groups->toArray())) {
             $all_groups = null;
         }
 
-        // Look for new nearby groups that we're not already a member of. Include ones where we have been
-        // invited.
-        //
-        // Eloquent is just getting in the way here so do a raw query.
-        $new_groups = DB::select(DB::raw("SELECT COUNT(*) AS count FROM groups 
-        LEFT JOIN users_groups ON groups.idgroups = users_groups.group AND users_groups.user = " . intval(Auth::id()) . "
-        WHERE (users_groups.user IS NULL OR users_groups.status != 1) 
-            AND created_at >= '" . date('Y-m-d', strtotime('1 month ago')) . "'  
-            AND ( 6371 * acos( cos( radians(' . $user->latitude . ') ) * cos( radians( groups.latitude ) ) * cos( radians( groups.longitude ) - radians(' . $user->longitude . ') ) + sin( radians(' . $user->latitude . ') ) * sin( radians( groups.latitude ) ) ) ) < 40"))[0]->count;
+        $new_groups = [];
 
-        // Look for upcoming events.  Only include events for groups we have joined, not just been invited to.
+        // Look for any upcoming events for groups we have joined (not just been invited to), or which .
         $upcoming_events = Party::upcomingEvents()->where('users_groups.user', Auth::user()->id)
             ->where('users_groups.status', 1)
             ->orderBy('event_date', 'ASC')
             ->get();
+
+        if (! is_null($user->latitude) && ! is_null($user->longitude)) {
+            // Look for new nearby groups that we're not already a member of.
+            $new_groups = $user->groupsNearby(3, "1 month ago");
+
+            // Look for nearby events for groups we are not a member of or have been invited to.
+            $nearby_events = Party::upcomingEvents()->where('users_groups.user', Auth::user()->id)
+                ->where('users_groups.status', 1)
+                ->orderBy('event_date', 'ASC')
+                ->get();
+            $upcoming_events = Party::with('theGroup')->select(
+                DB::raw(
+                    '*, ( 6371 * acos( cos( radians('.$user->latitude.') ) * cos( radians( latitude ) ) * cos( radians( longitude ) - radians('.$user->longitude.') ) + sin( radians('.$user->latitude.') ) * sin( radians( latitude ) ) ) ) AS distance'
+                )
+            )
+                ->having('distance', '<=', User::NEARBY_KM)
+                ->whereDate('event_date', '>=', date('Y-m-d'))
+                ->orderBy('event_date', 'ASC')
+                ->orderBy('start', 'ASC')
+                ->orderBy('distance', 'ASC')
+                ->take(3)
+                ->get();
+        }
+
         $expanded_events = [];
+
+        foreach ($upcoming_events as $event) {
+            $thisone = $event->getAttributes();
+            $thisone['the_group'] = \App\Group::find($event->group);
+            $expanded_events[] = $thisone;
+        }
+
+        // TODO nearby and upcoming flag.
+
+        $upcoming_events = $expanded_events;
 
         foreach ($upcoming_events as $event) {
             $thisone = $event->getAttributes();
