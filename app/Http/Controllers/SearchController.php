@@ -19,7 +19,6 @@ class SearchController extends Controller
         /** Init all needed classes **/
         $Groups = new Group;
         $Parties = new Party;
-        $Device = new Device;
         $Search = new Search;
 
         $user = User::find(Auth::id());
@@ -30,7 +29,7 @@ class SearchController extends Controller
             $groups = $Groups->findList();
             $parties = $Parties->findAllSearchable();
             foreach ($parties as $i => $party) {
-                $parties[$i]->venue = ! is_null($parties[$i]->venue) ? $parties[$i]->venue : $parties[$i]->location;
+                $parties[$i]->venue = !is_null($parties[$i]->venue) ? $parties[$i]->venue : $parties[$i]->location;
                 $allowedParties[] = $party->id;
             }
         } elseif (Fixometer::hasRole($user, 'Host')) {
@@ -45,7 +44,7 @@ class SearchController extends Controller
 
             foreach ($parties as $i => $party) {
                 $parties[$i]->id = $party->idevents;
-                $parties[$i]->venue = ! is_null($parties[$i]->venue) ? $parties[$i]->venue : $parties[$i]->location;
+                $parties[$i]->venue = !is_null($parties[$i]->venue) ? $parties[$i]->venue : $parties[$i]->location;
                 $allowedParties[] = $party->idevents;
             }
         }
@@ -55,7 +54,7 @@ class SearchController extends Controller
             $sorted_parties[$party->group_name][] = $party;
         }
 
-        if (isset($_GET['fltr']) && ! empty($_GET['fltr'])) {
+        if (isset($_GET['fltr']) && !empty($_GET['fltr'])) {
             $searched_groups = null;
             $searched_parties = null;
             $toTimeStamp = null;
@@ -71,8 +70,8 @@ class SearchController extends Controller
                 $searched_parties = filter_var_array($_GET['parties'], FILTER_SANITIZE_NUMBER_INT);
             }
 
-            if (isset($_GET['from-date']) && ! empty($_GET['from-date'])) {
-                if (! DateTime::createFromFormat('Y-m-d', $_GET['from-date'])) {
+            if (isset($_GET['from-date']) && !empty($_GET['from-date'])) {
+                if (!DateTime::createFromFormat('Y-m-d', $_GET['from-date'])) {
                     $response['danger'] = 'Invalid "from date"';
                     $fromTimeStamp = null;
                 } else {
@@ -81,8 +80,8 @@ class SearchController extends Controller
                 }
             }
 
-            if (isset($_GET['to-date']) && ! empty($_GET['to-date'])) {
-                if (! DateTime::createFromFormat('Y-m-d', $_GET['to-date'])) {
+            if (isset($_GET['to-date']) && !empty($_GET['to-date'])) {
+                if (!DateTime::createFromFormat('Y-m-d', $_GET['to-date'])) {
                     $response['danger'] = 'Invalid "to date"';
                 } else {
                     $toDate = DateTime::createFromFormat('Y-m-d', $_GET['to-date']);
@@ -97,54 +96,16 @@ class SearchController extends Controller
             $PartyList = $Search->parties($searched_parties, $searched_groups, $fromTimeStamp, $toTimeStamp, $group_tags, $allowedParties);
             if (count($PartyList) > 0) {
                 $partyIds = [];
-                $participants = 0;
-                $hours_volunteered = 0;
-                $totalCO2 = 0;
-                $totalWeight = 0;
 
-                $eRatio = \App\Helpers\LcaStats::getEmissionRatioPowered();
-                $uRatio = \App\Helpers\LcaStats::getEmissionRatioUnpowered();
-                $displacementFactor = \App\Helpers\LcaStats::getDisplacementFactor();
-
+                $stats = Party::getEventStatsArrayKeys();
                 foreach ($PartyList as $party) {
                     $partyIds[] = $party->idevents;
 
-                    $party->co2 = 0;
-                    $party->ewaste = 0;
-                    $party->fixed_devices = 0;
-                    $party->repairable_devices = 0;
-                    $party->dead_devices = 0;
-
-                    $participants += $party->pax;
-                    $hours_volunteered += $party->hoursVolunteered();
-
-                    foreach ($party->devices as $device) {
-                        switch ($device->repair_status) {
-                            case 1:
-                                $party->fixed_devices++;
-
-                                $party->co2_powered += $device->eCo2Diverted($eRatio, $displacementFactor);
-                                $party->co2_unpowered += $device->uCo2Diverted($uRatio, $displacementFactor);
-                                $party->co2 += $party->co2_powered + $party->co2_unpowered;
-
-                                $party->weight_powered += $device->eWasteDiverted();
-                                $party->weight_unpowered += $device->uWasteDiverted();
-                                $party->weight += $party->weight_powered + $party->weight_unpowered;
-
-                                break;
-                            case 2:
-                                $party->repairable_devices++;
-                                break;
-                            case 3:
-                                  $party->dead_devices++;
-                                break;
-                            default:
-                                break;
-                        }
+                    $eventStats = $party->getEventStats();
+                    foreach (array_keys($stats) as $v) {
+                        $party->{$v} = $eventStats[$v];
+                        $stats[$v] += $eventStats[$v];
                     }
-
-                    $totalWeight += $party->ewaste;
-                    $totalCO2 += $party->co2;
                 }
 
                 /** Cluster dataviz **/
@@ -172,66 +133,60 @@ class SearchController extends Controller
             }
         }
 
-        if (! isset($clusters)) {
+        if (!isset($clusters)) {
             $clusters = null;
         }
 
-        if (! isset($mostleast)) {
+        if (!isset($mostleast)) {
             $mostleast = null;
         }
 
-        if (! isset($participants)) {
+        if (!isset($participants)) {
             $participants = null;
         }
 
-        if (! isset($hours_volunteered)) {
+        if (!isset($hours_volunteered)) {
             $hours_volunteered = null;
         }
 
-        if (! isset($totalWeight)) {
+        if (!isset($totalWeight)) {
             $totalWeight = null;
         }
 
-        if (! isset($totalCO2)) {
+        if (!isset($totalCO2)) {
             $totalCO2 = null;
         }
 
-        if (! isset($partyIds)) {
+        if (!isset($partyIds)) {
             return view('search.index', [
-            'charts' => true,
-            'title' => 'Filter Stats',
-            'sorted_parties' => $sorted_parties,
-            'parties' => $parties,
-            'groups' => $groups,
-            'clusters' => $clusters,
-            'mostleast' => $mostleast,
-            'pax' => $participants,
-            'hours' => $hours_volunteered,
-            'totalWeight' => $totalWeight,
-            'totalCO2' => $totalCO2,
-            'response' => $response,
-            'user' => $user,
-            'group_tags' => GroupTags::all(),
+                'charts' => true,
+                'title' => 'Filter Stats',
+                'sorted_parties' => $sorted_parties,
+                'parties' => $parties,
+                'groups' => $groups,
+                'clusters' => $clusters,
+                'mostleast' => $mostleast,
+                'stats' => $stats,
+                'response' => $response,
+                'user' => $user,
+                'group_tags' => GroupTags::all(),
             ]);
         } else {
             return view('search.index', [
-            'charts' => true,
-            'title' => 'Filter Stats',
-            'sorted_parties' => $sorted_parties,
-            'parties' => $parties,
-            'groups' => $groups,
-            'clusters' => $clusters,
-            'mostleast' => $mostleast,
-            'pax' => $participants,
-            'hours' => $hours_volunteered,
-            'totalWeight' => $totalWeight,
-            'totalCO2' => $totalCO2,
-            'device_count_status' => $Search->deviceStatusCount($partyIds),
-            'top' => $Search->findMostSeen($partyIds, 1, null),
-            'PartyList' => $PartyList,
-            'response' => $response,
-            'user' => $user,
-            'group_tags' => GroupTags::all(),
+                'charts' => true,
+                'title' => 'Filter Stats',
+                'sorted_parties' => $sorted_parties,
+                'parties' => $parties,
+                'groups' => $groups,
+                'clusters' => $clusters,
+                'mostleast' => $mostleast,
+                'stats' => $stats,
+                'device_count_status' => $Search->deviceStatusCount($partyIds),
+                'top' => $Search->findMostSeen($partyIds, 1, null),
+                'PartyList' => $PartyList,
+                'response' => $response,
+                'user' => $user,
+                'group_tags' => GroupTags::all(),
             ]);
         }
     }

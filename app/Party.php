@@ -631,25 +631,25 @@ class Party extends Model implements Auditable
     public static function getEventStatsArrayKeys()
     {
         return [
-            'powered_co2' => 0,
-            'powered_waste' => 0,
-            'unpowered_co2' => 0,
-            'unpowered_waste' => 0,
-            'waste' => 0,
-            'co2' => 0,
+            'co2_powered' => 0,
+            'co2_unpowered' => 0,
+            'co2_total' => 0,
+            'waste_powered' => 0,
+            'waste_unpowered' => 0,
+            'waste_total' => 0,
             'fixed_devices' => 0,
             'fixed_powered' => 0,
             'fixed_unpowered' => 0,
             'repairable_devices' => 0,
             'dead_devices' => 0,
             'unknown_repair_status' => 0,
-            'powered_no_weight' => 0,
-            'unpowered_no_weight' => 0,
+            'devices_powered' => 0,
+            'devices_unpowered' => 0,
+            'no_weight_powered' => 0,
+            'no_weight_unpowered' => 0,
             'participants' => 0,
             'volunteers' => 0,
             'hours_volunteered' => 0,
-            'devices_powered' => 0,
-            'devices_unpowered' => 0,
         ];
     }
 
@@ -671,16 +671,16 @@ class Party extends Model implements Auditable
                     $result['devices_powered']++;
 
                     if ($device->isFixed()) {
-                        $result['powered_co2'] += $device->eCO2Diverted($eEmissionRatio, $displacementFactor);
-                        $result['powered_waste'] += $device->eWasteDiverted();
+                        $result['co2_powered'] += $device->eCo2Diverted($eEmissionRatio, $displacementFactor);
+                        $result['waste_powered'] += $device->eWasteDiverted();
                         $result['fixed_powered']++;
                     }
                 } else {
                     $result['devices_unpowered']++;
 
                     if ($device->isFixed()) {
-                        $result['unpowered_co2'] += $device->uCO2Diverted($uEmissionratio, $displacementFactor);
-                        $result['unpowered_waste'] += $device->uWasteDiverted();
+                        $result['co2_unpowered'] += $device->uCo2Diverted($uEmissionratio, $displacementFactor);
+                        $result['waste_unpowered'] += $device->uWasteDiverted();
                         $result['fixed_unpowered']++;
                     }
                 }
@@ -703,16 +703,16 @@ class Party extends Model implements Auditable
                 if ($device->isFixed()) {
                     if (!$device->deviceCategory->weight && !$device->estimate) {
                         if ($device->deviceCategory->isMiscPowered()) {
-                            $result['powered_no_weight']++;
+                            $result['no_weight_powered']++;
                         } else if ($device->deviceCategory->isMiscUnpowered()) {
-                            $result['unpowered_no_weight']++;
+                            $result['no_weight_unpowered']++;
                         }
                     }
                 }
             }
 
-            $result['co2'] = $result['powered_co2'] + $result['unpowered_co2'];
-            $result['waste'] = $result['powered_waste'] + $result['unpowered_waste'];
+            $result['co2_total'] = $result['co2_powered'] + $result['co2_unpowered'];
+            $result['waste_total'] = $result['waste_powered'] + $result['waste_unpowered'];
             $result['participants'] = $this->pax ?? 0;
             $result['volunteers'] = $this->volunteers ?? 0;
             $result['hours_volunteered'] = $this->hoursVolunteered();
@@ -874,7 +874,7 @@ class Party extends Model implements Auditable
 
     public function getWastePreventedAttribute()
     {
-        return round($this->getEventStats()['powered_waste'], 2);
+        return round($this->getEventStats()['waste_powered'], 2);
     }
 
     public function scopeWithAll($query)

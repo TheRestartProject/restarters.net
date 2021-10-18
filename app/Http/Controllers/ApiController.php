@@ -65,8 +65,8 @@ class ApiController extends Controller
         return response()
             ->json(
                 [
-                    'kg_co2_diverted' => $eventStats['powered_co2'] + $eventStats['unpowered_co2'],
-                    'kg_waste_diverted' => $eventStats['powered_waste'] + $eventStats['unpowered_waste'],
+                    'kg_co2_diverted' => $eventStats['co2_powered'] + $eventStats['co2_unpowered'],
+                    'kg_waste_diverted' => $eventStats['waste_powered'] + $eventStats['waste_unpowered'],
                     'num_fixed_devices' => $eventStats['fixed_devices'],
                     'num_repairable_devices' => $eventStats['repairable_devices'],
                     'num_dead_devices' => $eventStats['dead_devices'],
@@ -87,12 +87,12 @@ class ApiController extends Controller
                 'num_participants' => $groupStats['participants'],
                 'num_hours_volunteered' => $groupStats['hours_volunteered'],
                 'num_parties' => $groupStats['parties'],
-                'kg_powered_co2_diverted' => $groupStats['powered_co2'],
-                'kg_unpowered_co2_diverted' => $groupStats['unpowered_co2'],
-                'kg_powered_waste_diverted' => $groupStats['powered_waste'],
-                'kg_unpowered_waste_diverted' => $groupStats['unpowered_waste'],
-                'kg_co2_diverted' => $groupStats['powered_co2'] + $groupStats['unpowered_co2'],
-                'kg_waste_diverted' => $groupStats['powered_waste'] + $groupStats['unpowered_waste'],
+                'kg_powered_co2_diverted' => $groupStats['co2_powered'],
+                'kg_unpowered_co2_diverted' => $groupStats['co2_unpowered'],
+                'kg_powered_waste_diverted' => $groupStats['waste_powered'],
+                'kg_unpowered_waste_diverted' => $groupStats['waste_unpowered'],
+                'kg_co2_diverted' => $groupStats['co2_total'],
+                'kg_waste_diverted' => $groupStats['waste_total'],
             ], 200);
     }
 

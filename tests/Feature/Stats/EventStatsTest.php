@@ -30,10 +30,10 @@ class EventStatsTest extends StatsTestCase
             'event' => 1,
         ]);
         $expect = \App\Party::getEventStatsArrayKeys();
-        $expect['powered_co2'] = 14.4 * $this->_displacementFactor;
-        $expect['powered_waste'] = 4;
-        $expect['co2'] += $expect['powered_co2'];
-        $expect['waste'] += $expect['powered_waste'];
+        $expect['co2_powered'] = 14.4 * $this->_displacementFactor;
+        $expect['waste_powered'] = 4;
+        $expect['co2_total'] += $expect['co2_powered'];
+        $expect['waste_total'] += $expect['waste_powered'];
         $expect['fixed_devices']++;
         $expect['fixed_powered']++;
         $expect['devices_powered']++;
@@ -54,7 +54,7 @@ class EventStatsTest extends StatsTestCase
         $expect['fixed_devices']++;
         $expect['fixed_powered']++;
         $expect['devices_powered']++;
-        $expect['powered_no_weight']++;
+        $expect['no_weight_powered']++;
         $result = $device->deviceEvent->getEventStats();
         $this->assertIsArray($result);
         foreach ($expect as $k => $v) {
@@ -71,10 +71,10 @@ class EventStatsTest extends StatsTestCase
         $expect['fixed_devices']++;
         $expect['fixed_unpowered']++;
         $expect['devices_unpowered']++;
-        $expect['unpowered_co2'] = 15.5 * $this->_displacementFactor;
-        $expect['unpowered_waste'] = 5;
-        $expect['co2'] = $expect['powered_co2'] + $expect['unpowered_co2'];
-        $expect['waste'] = $expect['powered_waste'] + $expect['unpowered_waste'];
+        $expect['co2_unpowered'] = 15.5 * $this->_displacementFactor;
+        $expect['waste_unpowered'] = 5;
+        $expect['co2_total'] = $expect['co2_powered'] + $expect['co2_unpowered'];
+        $expect['waste_total'] = $expect['waste_powered'] + $expect['waste_unpowered'];
         $result = $device->deviceEvent->getEventStats();
         $this->assertIsArray($result);
         foreach ($expect as $k => $v) {
@@ -91,7 +91,7 @@ class EventStatsTest extends StatsTestCase
         $expect['fixed_devices']++;
         $expect['fixed_unpowered']++;
         $expect['devices_unpowered']++;
-        $expect['unpowered_no_weight']++;
+        $expect['no_weight_unpowered']++;
         $result = $device->deviceEvent->getEventStats();
         $this->assertIsArray($result);
         foreach ($expect as $k => $v) {
@@ -109,10 +109,10 @@ class EventStatsTest extends StatsTestCase
         $expect['fixed_devices']++;
         $expect['fixed_powered']++;
         $expect['devices_powered']++;
-        $expect['powered_co2'] = (14.4 + (1.23 * $this->_ratioPowered)) * $this->_displacementFactor;
-        $expect['powered_waste'] += 1.23;
-        $expect['co2'] = $expect['powered_co2'] + $expect['unpowered_co2'];
-        $expect['waste'] = $expect['powered_waste'] + $expect['unpowered_waste'];
+        $expect['co2_powered'] = (14.4 + (1.23 * $this->_ratioPowered)) * $this->_displacementFactor;
+        $expect['waste_powered'] += 1.23;
+        $expect['co2_total'] = $expect['co2_powered'] + $expect['co2_unpowered'];
+        $expect['waste_total'] = $expect['waste_powered'] + $expect['waste_unpowered'];
         $result = $device->deviceEvent->getEventStats();
         $this->assertIsArray($result);
         foreach ($expect as $k => $v) {
@@ -130,10 +130,10 @@ class EventStatsTest extends StatsTestCase
         $expect['fixed_devices']++;
         $expect['fixed_unpowered']++;
         $expect['devices_unpowered']++;
-        $expect['unpowered_co2'] = (15.5 + (4.56 * $this->_ratioUnpowered)) * $this->_displacementFactor;
-        $expect['unpowered_waste'] += 4.56;
-        $expect['co2'] = $expect['powered_co2'] + $expect['unpowered_co2'];
-        $expect['waste'] = $expect['powered_waste'] + $expect['unpowered_waste'];
+        $expect['co2_unpowered'] = (15.5 + (4.56 * $this->_ratioUnpowered)) * $this->_displacementFactor;
+        $expect['waste_unpowered'] += 4.56;
+        $expect['co2_total'] = $expect['co2_powered'] + $expect['co2_unpowered'];
+        $expect['waste_total'] = $expect['waste_powered'] + $expect['waste_unpowered'];
         $result = $device->deviceEvent->getEventStats();
         $this->assertIsArray($result);
         foreach ($expect as $k => $v) {
@@ -151,10 +151,10 @@ class EventStatsTest extends StatsTestCase
         $expect['fixed_devices']++;
         $expect['fixed_unpowered']++;
         $expect['devices_unpowered']++;
-        $expect['unpowered_co2'] = (15.5 + ((4.56 + 7.89) * $this->_ratioUnpowered)) * $this->_displacementFactor;
-        $expect['unpowered_waste'] += 7.89;
-        $expect['co2'] = $expect['powered_co2'] + $expect['unpowered_co2'];
-        $expect['waste'] = $expect['powered_waste'] + $expect['unpowered_waste'];
+        $expect['co2_unpowered'] = (15.5 + ((4.56 + 7.89) * $this->_ratioUnpowered)) * $this->_displacementFactor;
+        $expect['waste_unpowered'] += 7.89;
+        $expect['co2_total'] = $expect['co2_powered'] + $expect['co2_unpowered'];
+        $expect['waste_total'] = $expect['waste_powered'] + $expect['waste_unpowered'];
         $result = $device->deviceEvent->getEventStats();
         $this->assertIsArray($result);
         foreach ($expect as $k => $v) {

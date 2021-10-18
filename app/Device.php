@@ -392,8 +392,10 @@ class Device extends Model implements Auditable
 
     /**
      * Powered estimate only takes precedence over category weight when Misc.
+     *
+     * REDUNDANT?
      */
-    public function eCO2Diverted($emissionRatio, $displacementFactor)
+    public function eCo2Diverted($emissionRatio, $displacementFactor)
     {
         $footprint = 0;
 
@@ -412,8 +414,10 @@ class Device extends Model implements Auditable
 
     /**
      * Unpowered estimate always takes precedence over category weight.
+     *
+     * REDUNDANT?
      */
-    public function uCO2Diverted($emissionRatio, $displacementFactor)
+    public function uCo2Diverted($emissionRatio, $displacementFactor)
     {
         $footprint = 0;
 
@@ -430,6 +434,8 @@ class Device extends Model implements Auditable
 
     /**
      * Powered estimate only takes precedence over category weight when Misc.
+     *
+     * REDUNDANT?
      */
     public function eWasteDiverted()
     {
@@ -450,6 +456,8 @@ class Device extends Model implements Auditable
 
     /**
      * Unpowered estimate always takes precedence over category weight.
+     *
+     * REDUNDANT?
      */
     public function uWasteDiverted()
     {

@@ -57,8 +57,8 @@ class EventController extends Controller
                'participants' => $groupStats['participants'],
                'hours_volunteered' => $groupStats['hours_volunteered'],
                'parties_thrown' => $groupStats['parties'],
-               'waste_prevented' => $groupStats['waste'],
-               'co2_emissions_prevented' => $groupStats['powered_co2'],
+               'waste_prevented' => $groupStats['waste_total'],
+               'co2_emissions_prevented' => $groupStats['co2_total'],
            ]);
         }
 
@@ -93,8 +93,8 @@ class EventController extends Controller
              'impact' => [
                  'participants' => $party->pax,
                  'volunteers' => $eventStats['volunteers'],
-                 'waste_prevented' => $eventStats['powered_waste'],
-                 'co2_emissions_prevented' => $eventStats['powered_co2'],
+                 'waste_prevented' => $eventStats['waste_powered'],
+                 'co2_emissions_prevented' => $eventStats['co2_powered'],
                  'devices_fixed' => $eventStats['fixed_devices'],
                  'devices_repairable' => $eventStats['repairable_devices'],
                  'devices_dead' => $eventStats['dead_devices'],

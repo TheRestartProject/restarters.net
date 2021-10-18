@@ -1323,8 +1323,8 @@ class GroupController extends Controller
                         'volunteers' => $stats['participants'],
                         'hours_volunteered' => $stats['hours_volunteered'],
                         'parties_thrown' => $stats['parties'],
-                        'waste_prevented' => $stats['waste'],
-                        'co2_emissions_prevented' => $stats['powered_co2'],
+                        'waste_prevented' => $stats['waste_total'],
+                        'co2_emissions_prevented' => $stats['co2_total'],
                     ],
                     'widgets' => [
                         'headline_stats' => url("/group/stats/{$group->idgroups}"),
@@ -1430,8 +1430,8 @@ class GroupController extends Controller
                 'volunteers' => $stats['participants'],
                 'hours_volunteered' => $stats['hours_volunteered'],
                 'parties_thrown' => $stats['parties'],
-                'waste_prevented' => $stats['waste'],
-                'co2_emissions_prevented' => $stats['powered_co2'],
+                'waste_prevented' => $stats['waste_total'],
+                'co2_emissions_prevented' => $stats['co2_total'],
             ],
             'widgets' => [
                 'headline_stats' => url("/group/stats/{$group->idgroups}"),

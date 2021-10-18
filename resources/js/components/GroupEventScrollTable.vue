@@ -109,7 +109,7 @@
             {{ __('partials.add_a_device') }}
           </a>
         </div>
-        <GroupEventsScrollTableNumber v-else :value="Math.round(stats(data.item.waste).waste)" units="kg" />
+        <GroupEventsScrollTableNumber v-else :value="Math.round(stats(data.item.waste).waste_total)" units="kg" />
       </template>
 
       <template slot="head(co2)">
@@ -118,7 +118,7 @@
         </div>
       </template>
       <template slot="cell(co2)" slot-scope="data" v-bind="stats">
-        <GroupEventsScrollTableNumber :value="Math.round(stats(data.item.co2).co2)" units="kg" />
+        <GroupEventsScrollTableNumber :value="Math.round(stats(data.item.co2).co2_total)" units="kg" />
       </template>
 
       <template slot="head(fixed_devices)">
