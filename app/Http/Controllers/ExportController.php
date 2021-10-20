@@ -24,12 +24,12 @@ class ExportController extends Controller
         $host = parse_url(\Request::server('HTTP_REFERER'), PHP_URL_HOST);
 
         $all_devices = Device::with([
-                                        'deviceCategory',
-                                        'deviceEvent',
-                                    ])
-        ->join('events', 'events.idevents', '=', 'devices.event')
-        ->join('groups', 'groups.idgroups', '=', 'events.group')
-        ->select('devices.*', 'groups.name AS group_name')->get();
+            'deviceCategory',
+            'deviceEvent',
+        ])
+            ->join('events', 'events.idevents', '=', 'devices.event')
+            ->join('groups', 'groups.idgroups', '=', 'events.group')
+            ->select('devices.*', 'groups.name AS group_name')->get();
 
         // Create CSV
         $filename = 'devices.csv';
@@ -109,7 +109,7 @@ class ExportController extends Controller
     {
         $Search = new Search;
         unset($_GET['url']);
-        if (isset($_GET['fltr']) && ! empty($_GET['fltr'])) {
+        if (isset($_GET['fltr']) && !empty($_GET['fltr'])) {
             $searched_groups = null;
             $searched_parties = null;
             $toTimeStamp = null;
@@ -124,8 +124,8 @@ class ExportController extends Controller
                 $searched_parties = filter_var_array($_GET['parties'], FILTER_SANITIZE_NUMBER_INT);
             }
 
-            if (isset($_GET['from-date']) && ! empty($_GET['from-date'])) {
-                if (! DateTime::createFromFormat('Y-m-d', $_GET['from-date'])) {
+            if (isset($_GET['from-date']) && !empty($_GET['from-date'])) {
+                if (!DateTime::createFromFormat('Y-m-d', $_GET['from-date'])) {
                     $response['danger'] = 'Invalid "from date"';
                     $fromTimeStamp = null;
                 } else {
@@ -134,8 +134,8 @@ class ExportController extends Controller
                 }
             }
 
-            if (isset($_GET['to-date']) && ! empty($_GET['to-date'])) {
-                if (! DateTime::createFromFormat('Y-m-d', $_GET['to-date'])) {
+            if (isset($_GET['to-date']) && !empty($_GET['to-date'])) {
+                if (!DateTime::createFromFormat('Y-m-d', $_GET['to-date'])) {
                     $response['danger'] = 'Invalid "to date"';
                 } else {
                     $toDate = DateTime::createFromFormat('Y-m-d', $_GET['to-date']);
@@ -147,91 +147,39 @@ class ExportController extends Controller
                 $group_tags = $_GET['group_tags'];
             }
 
-            $PartyList = $Search->parties($searched_parties, $searched_groups, $fromTimeStamp, $toTimeStamp, $group_tags);
+            // prepare the column headers
+            $statsKeys = array_keys(\App\Party::getEventStatsArrayKeys());
+            array_walk($statsKeys, function(&$k) {
+                $key = explode('_', $k);
+                array_walk($key, function(&$v) {
+                    $v = str_replace('Waste', 'Weight', str_replace('Co2', 'CO2', ucfirst($v)));
+                });
+                $k = implode(' ' , $key);
+            });
+            $headers = array_merge(['Date','Venue','Group'], $statsKeys);
+
+            // prepare the column values
             $PartyArray = [];
-            $need_attention = 0;
-
-            $participants = 0;
-            $hours_volunteered = 0;
-            $totalCO2 = 0;
-
-            $eRatio = \App\Helpers\LcaStats::getEmissionRatioPowered();
-            $uRatio = \App\Helpers\LcaStats::getEmissionRatioUnpowered();
-            $displacementFactor = \App\Helpers\LcaStats::getDisplacementFactor();
-
+            $PartyList = $Search->parties($searched_parties, $searched_groups, $fromTimeStamp, $toTimeStamp, $group_tags);
             foreach ($PartyList as $i => $party) {
-                if ($party->device_count == 0) {
-                    $need_attention++;
-                }
 
-                $partyIds[] = $party->idevents;
+                $stats = $party->getEventStats();
+                array_walk($stats, function(&$v) {
+                    $v = round($v);
+                });
 
-                $party->co2 = 0;
-                $party->weight = 0;
-                $party->fixed_devices = 0;
-                $party->repairable_devices = 0;
-                $party->dead_devices = 0;
-                $party->guesstimates = false;
-
-                $participants += $party->pax;
-                $party->hours_volunteered = $party->hoursVolunteered();
-                $hours_volunteered += $party->hours_volunteered;
-
-                foreach ($party->devices as $device) {
-                    switch ($device->repair_status) {
-                        case 1:
-                            $party->co2_powered += $device->eCo2Diverted($eRatio, $displacementFactor);
-                            $party->co2_unpowered += $device->uCo2Diverted($uRatio, $displacementFactor);
-                            $party->co2 += $party->co2_powered + $party->co2_unpowered;
-                            $party->fixed_devices++;
-                            $party->weight_powered += $device->eWasteDiverted();
-                            $party->weight_unpowered += $device->uWasteDiverted();
-                            $party->weight += $party->weight_powered + $party->weight_unpowered;
-
-                            break;
-                        case 2:
-                            $party->repairable_devices++;
-
-                            break;
-                        case 3:
-                            $party->dead_devices++;
-                            break;
-                        default:
-                            break;
-                    }
-                    if ($device->category == 46) {
-                        $party->guesstimates = true;
-                    }
-                }
-
-                $totalCO2 += $party->co2;
-
-                $partyName = ! is_null($party->venue) ? $party->venue : $party->location;
-                $groupName = $party->name; // because of the way the join in the query works
                 $PartyArray[$i] = [
-                    date('d/m/Y', strtotime($party->event_date)),
-                    $partyName,
-                    $groupName,
-                    ($party->pax > 0 ? $party->pax : 0),
-                    ($party->volunteers > 0 ? $party->volunteers : 0),
-                    ($party->co2 > 0 ? round($party->co2, 2) : 0),
-                    ($party->weight > 0 ? round($party->weight, 2) : 0),
-                    ($party->fixed_devices > 0 ? $party->fixed_devices : 0),
-                    ($party->repairable_devices > 0 ? $party->repairable_devices : 0),
-                    ($party->dead_devices > 0 ? $party->dead_devices : 0),
-                    ($party->hours_volunteered > 0 ? $party->hours_volunteered : 0),
+                    $party->getEventDate(),
+                    $party->getEventName(),
+                    $party->theGroup()->get()->first()->attributesToArray()['name'],
                 ];
+                $PartyArray[$i] += $stats;
             }
-
-            /** lets format the array **/
-            $columns = [
-                'Date', 'Venue', 'Group', 'Participants', 'Volunteers', 'CO2 (kg)', 'Weight (kg)', 'Fixed', 'Repairable', 'Dead', 'Hours Volunteered',
-            ];
 
             $filename = 'parties.csv';
 
             $file = fopen($filename, 'w+');
-            fputcsv($file, $columns);
+            fputcsv($file, $headers);
 
             foreach ($PartyArray as $d) {
                 fputcsv($file, $d);
@@ -272,9 +220,9 @@ class ExportController extends Controller
         //See whether it is a get search or index page
         if (is_null($search)) {
             $user_events = EventsUsers::join('users', 'events_users.user', 'users.id')
-                             ->join('events', 'events_users.event', 'events.idevents')
-                                ->join('groups', 'events.group', 'groups.idgroups')
-                                  ->whereNotNull('events_users.user');
+                ->join('events', 'events_users.event', 'events.idevents')
+                ->join('groups', 'events.group', 'groups.idgroups')
+                ->whereNotNull('events_users.user');
 
             if (Fixometer::hasRole($user, 'Host')) {
                 $user_events = $user_events->whereIn('groups.idgroups', $host_groups);
@@ -286,13 +234,13 @@ class ExportController extends Controller
             //Anonymous
             if ($request->input('misc') !== null && $request->input('misc') == 1) {
                 $user_events = EventsUsers::leftJoin('users', 'events_users.user', 'users.id')
-                                 ->join('events', 'events_users.event', 'events.idevents')
-                                    ->join('groups', 'events.group', 'groups.idgroups');
+                    ->join('events', 'events_users.event', 'events.idevents')
+                    ->join('groups', 'events.group', 'groups.idgroups');
             } else {
                 $user_events = EventsUsers::join('users', 'events_users.user', 'users.id')
-                                 ->join('events', 'events_users.event', 'events.idevents')
-                                    ->join('groups', 'events.group', 'groups.idgroups')
-                                      ->whereNotNull('events_users.user');
+                    ->join('events', 'events_users.event', 'events.idevents')
+                    ->join('groups', 'events.group', 'groups.idgroups')
+                    ->whereNotNull('events_users.user');
             }
 
             if (Fixometer::hasRole($user, 'Host')) {
@@ -315,7 +263,7 @@ class ExportController extends Controller
             //By users
             //Name
             if ($request->input('name') !== null) {
-                $user_events = $user_events->where('users.name', 'like', '%'.$request->input('name').'%');
+                $user_events = $user_events->where('users.name', 'like', '%' . $request->input('name') . '%');
             }
 
             //Birth year
@@ -325,7 +273,7 @@ class ExportController extends Controller
 
             //Gender
             if ($request->input('gender') !== null) {
-                $user_events = $user_events->where('users.gender', 'like', '%'.$request->input('gender').'%');
+                $user_events = $user_events->where('users.gender', 'like', '%' . $request->input('gender') . '%');
             }
 
             //By date
@@ -334,8 +282,10 @@ class ExportController extends Controller
             } elseif ($request->input('to_date') !== null && $request->input('from_date') == null) {
                 $user_events = $user_events->whereDate('events.event_date', '<', $request->input('to_date'));
             } elseif ($request->input('to_date') !== null && $request->input('from_date') !== null) {
-                $user_events = $user_events->whereBetween('events.event_date', [$request->input('from_date'),
-                    $request->input('to_date'), ]);
+                $user_events = $user_events->whereBetween('events.event_date', [
+                    $request->input('from_date'),
+                    $request->input('to_date'),
+                ]);
             }
 
             //By location
@@ -369,14 +319,14 @@ class ExportController extends Controller
         $average_age = $average_age->distinct('users.id')->pluck('users.age')->toArray();
 
         foreach ($average_age as $key => $value) {
-            if (! is_int(intval($value)) || intval($value) <= 0) {
+            if (!is_int(intval($value)) || intval($value) <= 0) {
                 unset($average_age[$key]);
             } else {
                 $average_age[$key] = intval($value);
             }
         }
 
-        if (! empty($average_age)) {
+        if (!empty($average_age)) {
             $average_age = array_sum($average_age) / count($average_age);
             $average_age = intval(date('Y')) - $average_age;
         } else {
@@ -415,13 +365,13 @@ class ExportController extends Controller
             'groups.name as groupname'
         );
 
-        if (! $export) {
+        if (!$export) {
             $user_events = $user_events->paginate(env('PAGINATE'));
         } else {
             $user_events = $user_events->get();
         }
 
-        if (! $export) {
+        if (!$export) {
             return view('reporting.time-volunteered', [
                 'user' => $user,
                 'user_events' => $user_events,
@@ -466,7 +416,7 @@ class ExportController extends Controller
 
     public function exportTimeVolunteered(Request $request)
     {
-        if (! empty($request->all())) {
+        if (!empty($request->all())) {
             $data = $this->getTimeVolunteered($request, true, true);
         } else {
             $data = $this->getTimeVolunteered($request, null, true);
@@ -491,7 +441,7 @@ class ExportController extends Controller
         fputcsv($file, ['Breakdown by country:']);
         fputcsv($file, $country_headers);
         foreach ($data['country_hours_completed'] as $country_hours) {
-            if (! is_null($country_hours->country)) {
+            if (!is_null($country_hours->country)) {
                 $country = $country_hours->country;
             } else {
                 $country = 'N/A';
@@ -505,7 +455,7 @@ class ExportController extends Controller
         fputcsv($file, ['Breakdown by city:']);
         fputcsv($file, $city_headers);
         foreach ($data['city_hours_completed'] as $city_hours) {
-            if (! is_null($city_hours->location)) {
+            if (!is_null($city_hours->location)) {
                 $city = $city_hours->location;
             } else {
                 $city = 'N/A';
@@ -521,8 +471,10 @@ class ExportController extends Controller
         foreach ($data['user_events'] as $ue) {
             $start_time = new DateTime($ue->start);
             $diff = $start_time->diff(new DateTime($ue->end));
-            fputcsv($file, [$ue->idevents, $diff->h.'.'.sprintf('%02d', $diff->i / 60 * 100),
-                date('d/m/Y', strtotime($ue->event_date)), $ue->groupname, $ue->location, ]);
+            fputcsv($file, [
+                $ue->idevents, $diff->h . '.' . sprintf('%02d', $diff->i / 60 * 100),
+                date('d/m/Y', strtotime($ue->event_date)), $ue->groupname, $ue->location,
+            ]);
         }
         fputcsv($file, []);
 

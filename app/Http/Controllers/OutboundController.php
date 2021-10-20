@@ -34,7 +34,7 @@ class OutboundController extends Controller
                 }
 
                 $eventStats = $event->getEventStats();
-                $co2 = $eventStats['co2_powered'];
+                $co2 = $eventStats['co2_total'];
             } elseif (strtolower($type) == 'group') {
                 $group = Group::find($id);
 
@@ -42,7 +42,7 @@ class OutboundController extends Controller
                     abort(404);
                 }
                 $groupStats = $group->getGroupStats();
-                $co2 = $groupStats['co2_powered'];
+                $co2 = $groupStats['co2_total'];
             } elseif (strtolower($type) == 'group-tag') {
                 $groups = Group::join('grouptags_groups', 'grouptags_groups.group', '=', 'groups.idgroups')
                   ->where('grouptags_groups.group_tag', $id)
@@ -51,7 +51,7 @@ class OutboundController extends Controller
                 $co2 = 0;
                 foreach ($groups as $group) {
                     $groupStats = $group->getGroupStats();
-                    $co2 += $groupStats['co2'];
+                    $co2 += $groupStats['co2_total'];
                 }
             }
 

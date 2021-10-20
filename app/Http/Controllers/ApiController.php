@@ -35,10 +35,12 @@ class ApiController extends Controller
         $result['items_fixed'] = count($fixed) ? $fixed[0]->counter : 0;
 
         $stats = \App\Helpers\LcaStats::getWasteStats();
-        $result['powered_waste'] = $stats[0]->powered_waste;
-        $result['unpowered_waste'] = $stats[0]->unpowered_waste;
-        $result['total_waste'] = $stats[0]->powered_waste + $stats[0]->unpowered_waste;
-        $result['emissions'] = $stats[0]->powered_footprint + $stats[0]->unpowered_footprint;
+        $result['waste_powered'] = $stats[0]->powered_waste;
+        $result['waste_unpowered'] = $stats[0]->unpowered_waste;
+        $result['waste_total'] = $stats[0]->powered_waste + $stats[0]->unpowered_waste;
+        $result['co2_powered'] = $stats[0]->powered_footprint;
+        $result['co2_unpowered'] = $stats[0]->unpowered_footprint;
+        $result['co2_total'] = $stats[0]->powered_footprint + $stats[0]->unpowered_footprint;
 
         $devices = new Device;
         $result['fixed_powered'] = $devices->fixedPoweredCount();

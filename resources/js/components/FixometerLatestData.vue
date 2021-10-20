@@ -24,7 +24,7 @@ export default {
     translatedWastePrevented() {
       return this.$lang.get('devices.group_prevented', {
         idevents: this.latestData.id_events,
-        amount: this.latestData.waste_prevented
+        amount: Math.round(this.latestData.waste_prevented)
       })
     }
   }
