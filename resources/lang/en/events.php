@@ -95,7 +95,7 @@ return [
   'field_event_country' => 'Country',
   'field_add_image' => 'Add images',
   'before_submit_text' => 'Once confirmed by a coordinator, your event will be made public.',
-  'before_submit_text_autoapproved' => 'When you save this event, it will be made public.',
+  'before_submit_text_autoapproved' => 'When you create or save this event, it will be made public.',
   'reporting' => 'Event Reporting',
   'events-filter' => 'Events filter',
   'download-results' => 'Download Results (CSV)',
