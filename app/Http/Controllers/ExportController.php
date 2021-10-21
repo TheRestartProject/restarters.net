@@ -15,7 +15,6 @@ use DB;
 use Response;
 
 use App\Helpers\SearchHelper;
-use App\Party;
 use App\Search;
 use Illuminate\Http\Request;
 
