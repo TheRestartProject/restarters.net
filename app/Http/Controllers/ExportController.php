@@ -8,13 +8,16 @@ use App\Group;
 use App\GroupTags;
 use App\GrouptagsGroups;
 use App\Helpers\Fixometer;
-use App\Search;
 use App\UserGroups;
 use Auth;
 use DateTime;
 use DB;
-use Illuminate\Http\Request;
 use Response;
+
+use App\Helpers\SearchHelper;
+use App\Party;
+use App\Search;
+use Illuminate\Http\Request;
 
 class ExportController extends Controller
 {
@@ -102,100 +105,77 @@ class ExportController extends Controller
     }
 
     /**
-     * Folder /public must be writable.
-     * Example URL: http://restarters.test/export/parties?fltr=1&groups[]=1.
+     * @return \Illuminate\Http\Response
      */
-    public function parties()
+    public function parties(Request $request)
     {
-        $Search = new Search;
-        unset($_GET['url']);
-        if (isset($_GET['fltr']) && !empty($_GET['fltr'])) {
-            $searched_groups = null;
-            $searched_parties = null;
-            $toTimeStamp = null;
-            $fromTimeStamp = null;
-            $group_tags = null;
 
-            /* collect params **/
-            if (isset($_GET['groups'])) {
-                $searched_groups = filter_var_array($_GET['groups'], FILTER_SANITIZE_NUMBER_INT);
-            }
-            if (isset($_GET['parties'])) {
-                $searched_parties = filter_var_array($_GET['parties'], FILTER_SANITIZE_NUMBER_INT);
-            }
+        if ($request->has('fltr') && !empty($request->input('fltr'))) {
 
-            if (isset($_GET['from-date']) && !empty($_GET['from-date'])) {
-                if (!DateTime::createFromFormat('Y-m-d', $_GET['from-date'])) {
-                    $response['danger'] = 'Invalid "from date"';
-                    $fromTimeStamp = null;
-                } else {
-                    $fromDate = DateTime::createFromFormat('Y-m-d', $_GET['from-date']);
-                    $fromTimeStamp = strtotime($fromDate->format('Y-m-d'));
-                }
-            }
+            $dropdowns = SearchHelper::getUserGroupsAndParties();
+            $filters = SearchHelper::getSearchFilters($request);
 
-            if (isset($_GET['to-date']) && !empty($_GET['to-date'])) {
-                if (!DateTime::createFromFormat('Y-m-d', $_GET['to-date'])) {
-                    $response['danger'] = 'Invalid "to date"';
-                } else {
-                    $toDate = DateTime::createFromFormat('Y-m-d', $_GET['to-date']);
-                    $toTimeStamp = strtotime($toDate->format('Y-m-d'));
-                }
-            }
+            $Search = new Search;
+            $PartyList = $Search->parties(
+                $filters['searched_parties'],
+                $filters['searched_groups'],
+                $filters['from_date'],
+                $filters['to_date'],
+                $filters['group_tags'],
+                $dropdowns['allowed_parties']
+            );
 
-            if (isset($_GET['group_tags']) && is_array($_GET['group_tags'])) {
-                $group_tags = $_GET['group_tags'];
-            }
+            if (count($PartyList) > 0) {
 
-            // prepare the column headers
-            $statsKeys = array_keys(\App\Party::getEventStatsArrayKeys());
-            array_walk($statsKeys, function(&$k) {
-                $key = explode('_', $k);
-                array_walk($key, function(&$v) {
-                    $v = str_replace('Waste', 'Weight', str_replace('Co2', 'CO2', ucfirst($v)));
+                // prepare the column headers
+                $statsKeys = array_keys(\App\Party::getEventStatsArrayKeys());
+                array_walk($statsKeys, function (&$k) {
+                    $key = explode('_', $k);
+                    array_walk($key, function (&$v) {
+                        $v = str_replace('Waste', 'Weight', str_replace('Co2', 'CO2', ucfirst($v)));
+                    });
+                    $k = implode(' ', $key);
                 });
-                $k = implode(' ' , $key);
-            });
-            $headers = array_merge(['Date','Venue','Group'], $statsKeys);
+                $headers = array_merge(['Date', 'Venue', 'Group'], $statsKeys);
 
-            // prepare the column values
-            $PartyArray = [];
-            $PartyList = $Search->parties($searched_parties, $searched_groups, $fromTimeStamp, $toTimeStamp, $group_tags);
-            foreach ($PartyList as $i => $party) {
+                // prepare the column values
+                $PartyArray = [];
+                foreach ($PartyList as $i => $party) {
 
-                $stats = $party->getEventStats();
-                array_walk($stats, function(&$v) {
-                    $v = round($v);
-                });
+                    $stats = $party->getEventStats();
+                    array_walk($stats, function (&$v) {
+                        $v = round($v);
+                    });
 
-                $PartyArray[$i] = [
-                    $party->getEventDate(),
-                    $party->getEventName(),
-                    $party->theGroup()->get()->first()->attributesToArray()['name'],
+                    $PartyArray[$i] = [
+                        $party->getEventDate(),
+                        $party->getEventName(),
+                        $party->theGroup()->get()->first()->attributesToArray()['name'],
+                    ];
+                    $PartyArray[$i] += $stats;
+                }
+
+                // write content to file
+                $filename = 'parties.csv';
+
+                $file = fopen($filename, 'w+');
+                fputcsv($file, $headers);
+
+                foreach ($PartyArray as $d) {
+                    fputcsv($file, $d);
+                }
+                fclose($file);
+
+                $headers = [
+                    'Content-Type' => 'text/csv',
                 ];
-                $PartyArray[$i] += $stats;
+
+                return Response::download($filename, $filename, $headers);
             }
-
-            $filename = 'parties.csv';
-
-            $file = fopen($filename, 'w+');
-            fputcsv($file, $headers);
-
-            foreach ($PartyArray as $d) {
-                fputcsv($file, $d);
-            }
-            fclose($file);
-
-            $headers = [
-                'Content-Type' => 'text/csv',
-            ];
-
-            return Response::download($filename, $filename, $headers);
+            // }
         }
-        $data = ['No data to return'];
-
         return view('export.parties', [
-            'data' => $data,
+            'data' => ['No data to return'],
         ]);
     }
 

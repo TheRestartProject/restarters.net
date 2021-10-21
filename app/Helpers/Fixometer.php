@@ -755,11 +755,11 @@ class Fixometer
     public static function categoryCluster()
     {
         return [
-            '1' => 'Computers and Home Office',
-            '2' => 'Computers',
-            '3' => 'Home Office',
-            '4' => 'Test',
-        ];
+            1 => 'Computers and Home Office',
+            2 => 'Electronic Gadgets',
+            3 => 'Home Entertainment',
+            4 => 'Kitchen and Household Items'
+          ];
     }
 
     public static function loginRegisterStats()
