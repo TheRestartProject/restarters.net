@@ -84,12 +84,12 @@ class OutboundController extends Controller
                 if (Request::is('api*')) {
                     return response()->json([
                             'info' => $info,
-                            'co2' => $co2,
+                            'co2' => round($co2),
                         ]);
                 } else {
                     return view('outbound.info', [
                             'info' => $info,
-                            'co2' => $co2,
+                            'co2' => round($co2),
                         ]);
                 }
             } else {
@@ -124,7 +124,7 @@ class OutboundController extends Controller
                 if (Request::is('api*')) {
                     return response()->json([
                             'format'        => $format,
-                            'co2'           => $co2,
+                            'co2'           => round($co2),
                             'title'         => $title,
                             'measure'   => $measure,
                             'equal_to'  => $equal_to,
@@ -132,7 +132,7 @@ class OutboundController extends Controller
                 } else {
                     return view('visualisations', [
                             'format'        => $format,
-                            'co2'           => $co2,
+                            'co2'           => round($co2),
                             'title'         => $title,
                             'measure'   => $measure,
                             'equal_to'  => $equal_to,

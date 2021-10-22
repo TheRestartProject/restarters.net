@@ -112,8 +112,8 @@ class GroupController extends Controller
                                         'volunteers' => $groupStats['participants'],
                                         'hours_volunteered' => $groupStats['hours_volunteered'],
                                           'parties_thrown' => $groupStats['parties'],
-                                          'waste_prevented' => $groupStats['waste_total'],
-                                          'co2_emissions_prevented' => $groupStats['co2_total'],
+                                          'waste_prevented' => round($groupStats['waste_total']),
+                                          'co2_emissions_prevented' => round($groupStats['co2_total']),
                                       ],
                                       'widgets' => [
                                           'headline_stats' => url("/group/stats/{$group->idgroups}"),

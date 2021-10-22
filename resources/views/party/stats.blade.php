@@ -21,7 +21,7 @@
     <div class="stat1">
         <div class="footprint">
             <div style="line-height:10px;margin-bottom:10px;">
-            <span id="co2-diverted-value"><?php echo $party['co2_total']; ?></span>
+            <span id="co2-diverted-value"><?php echo number_format($party['co2_total'], 0); ?></span>
             <span class="subtext">kg of CO<sub>2</sub></span>
             </div>
             <div style="line-height:10px">
