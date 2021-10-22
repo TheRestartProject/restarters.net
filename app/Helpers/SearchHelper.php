@@ -47,7 +47,7 @@ class SearchHelper
         /* Get default data for the search dropdowns **/
         if (Fixometer::hasRole($user, 'Administrator')) {
             $data['groups'] = $Groups->findList();
-            $data['parties '] = $Parties->findAllSearchable();
+            $data['parties'] = $Parties->findAllSearchable();
             foreach ($data['parties'] as $i => $party) {
                 $data['parties'][$i]->venue = is_null($data['parties'][$i]->venue) ? $data['parties'][$i]->location : $data['parties'][$i]->venue;
                 $data['allowed_parties'][] = $party->id;
@@ -56,9 +56,9 @@ class SearchHelper
             $data['groups'] = $Groups->ofThisUser($user->id);
             foreach ($data['groups'] as $i => $group) {
                 $data['groups'][$i]->id = $group->idgroups;
-                $data['group-ids'][] = $group->idgroups;
+                $data['group_ids'][] = $group->idgroups;
             }
-            $data['parties'] = $Parties->ofTheseGroups($data['group-ids'], true);
+            $data['parties'] = $Parties->ofTheseGroups($data['group_ids'], true);
             foreach ($data['parties'] as $i => $party) {
                 $data['parties'][$i]->id = $party->idevents;
                 $data['parties'][$i]->venue = is_null($data['parties'][$i]->venue) ? $data['parties'][$i]->location : $data['parties'][$i]->venue;
