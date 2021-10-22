@@ -136,7 +136,6 @@ class ExportController extends Controller
                     $k = implode(' ', $key);
                 });
                 $headers = array_merge(['Date', 'Venue', 'Group'], $statsKeys);
-
                 // prepare the column values
                 $PartyArray = [];
                 foreach ($PartyList as $i => $party) {
@@ -149,7 +148,7 @@ class ExportController extends Controller
                     $PartyArray[$i] = [
                         $party->getEventDate(),
                         $party->getEventName(),
-                        $party->theGroup()->get()->first()->attributesToArray()['name'],
+                        $party->theGroup->name ? $party->theGroup->name : '?',
                     ];
                     $PartyArray[$i] += $stats;
                 }
