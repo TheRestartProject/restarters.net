@@ -42,7 +42,7 @@ class EditWordpressPostForEvent
         $theParty = Party::find($id);
 
         if (! $theParty->shouldPushToWordpress()) {
-            Log::error('Events for groups in this network are not published');
+            Log::info('Events for groups in this network are not published');
 
             return;
         }

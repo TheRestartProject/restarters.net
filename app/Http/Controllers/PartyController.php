@@ -289,6 +289,7 @@ class PartyController extends Controller
             $location = $request->input('location');
             $group = $request->input('group');
             $user_id = Auth::user()->id;
+            $link = $request->input('link');
 
             // Check whether the event should be auto-approved, if all of the networks it belongs to
             // allow it.
@@ -320,6 +321,7 @@ class PartyController extends Controller
                     'end' => $end,
                     'pax' => $pax,
                     'free_text' => $free_text,
+                    'link' => $link,
                     'venue' => $venue,
                     'location' => $location,
                     'latitude' => $latitude,
@@ -515,6 +517,7 @@ class PartyController extends Controller
                 'online' => $request->has('online'),
                 'group' => $data['group'],
                 'venue' => $data['venue'],
+                'link' => $request->has('link') ? $data['link'] : null,
                 'location' => $data['location'],
                 'latitude' => $latitude,
                 'longitude' => $longitude,

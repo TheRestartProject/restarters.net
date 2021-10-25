@@ -60,69 +60,47 @@ class DashboardController extends Controller
             $past_events = null;
         }
 
-        //Host specific queries
-        if (Fixometer::hasRole($user, 'Host') && $in_group) {
-            $outdated_groups = Group::join('users_groups', 'groups.idgroups', '=', 'users_groups.group')
-                ->where('users_groups.user', Auth::user()->id)
-                ->where('users_groups.role', 3)
-                ->whereDate('updated_at', '<=', date('Y-m-d', strtotime('-3 Months')))
-                ->select('groups.*')
-                ->take(3)
-                ->get();
-
-            if (empty($outdated_groups->toArray())) {
-                $outdated_groups = null;
-            }
-
-            if ($in_event) {
-                $active_group_ids = Party::whereIn('idevents', $event_ids)
-                    ->whereDate('event_date', '>', date('Y-m-d'))
-                    ->pluck('events.group')
-                    ->toArray();
-
-                $non_active_group_ids = array_diff($group_ids, $active_group_ids);
-                $inactive_groups = Group::whereIn('idgroups', $non_active_group_ids)
-                    ->take(3)
-                    ->get();
-            }
-
-            if (! isset($inactive_groups) || empty($inactive_groups->toArray())) {
-                $inactive_groups = null;
-            }
-        } else {
-            $outdated_groups = null;
-            $inactive_groups = null;
-        }
-
         $groupsNearYou = null;
 
         if ($in_group) {
             $all_groups = Group::whereIn('idgroups', $group_ids)->get();
         } else {
-            $groups = $user->groupsNearby(150, 2);
-            $groupsNearYou = [];
-
-            if ($groups) {
-                foreach ($groups as $group) {
-                    $group_image = $group->groupImage;
-                    if (is_object($group_image) && is_object($group_image->image)) {
-                        $group_image->image->path;
-                    }
-
-                    $groupsNearYou[] = $group;
-                }
-            }
+            $groupsNearYou = $user->groupsNearby(2);
         }
 
         if (! isset($all_groups) || empty($all_groups->toArray())) {
             $all_groups = null;
         }
 
-        $new_groups = 0;
+        $new_groups = [];
 
-        $upcoming_events = Party::upcomingEvents()->where('users_groups.user', Auth::user()->id)
-            ->orderBy('event_date', 'ASC')
-            ->get();
+        //Get events nearest (or not) to you
+        if (! is_null($user->latitude) && ! is_null($user->longitude)) { //Should the user have location info
+            $upcoming_events = Party::with('theGroup')->select(
+                DB::raw(
+                    '*, ( 6371 * acos( cos( radians('.$user->latitude.') ) * cos( radians( latitude ) ) * cos( radians( longitude ) - radians('.$user->longitude.') ) + sin( radians('.$user->latitude.') ) * sin( radians( latitude ) ) ) ) AS distance'
+                )
+            )
+                ->having('distance', '<=', User::NEARBY_KM)
+                ->whereDate('event_date', '>=', date('Y-m-d'))
+                ->orderBy('event_date', 'ASC')
+                ->orderBy('start', 'ASC')
+                ->orderBy('distance', 'ASC')
+                ->take(3)
+                ->get();
+
+            // Look for new nearby groups that we're not already a member of.  Eloquent is just getting in the way
+            // here so do a raw query.
+            $new_groups = $user->groupsNearby(3, "1 month ago");
+        } else { //Else show them the latest three
+            $upcoming_events = Party::with('theGroup')->
+            whereDate('event_date', '>=', date('Y-m-d'))
+                ->select('events.*')
+                ->orderBy('event_date', 'ASC')
+                ->take(3)
+                ->get();
+        }
+
         $expanded_events = [];
 
         foreach ($upcoming_events as $event) {

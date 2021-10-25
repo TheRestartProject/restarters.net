@@ -55,7 +55,7 @@
       </template>
       <template slot="cell(location)" slot-scope="data">
         <div class="d-none d-md-block">
-          {{ data.item.location.location }}
+          {{ data.item.location.location }} <span class="text-muted small" v-if="data.item.location.distance">{{ distance(data.item.location.distance )}} km</span>
           <br />
           <span class="small text-muted">{{ data.item.location.country }}</span>
         </div>
@@ -308,6 +308,13 @@ export default {
       this.$store.dispatch('groups/unfollow', {
         idgroups: idgroups
       })
+    },
+    distance(dist ) {
+      if (dist < 5) {
+        return Math.round(dist * 10) / 10
+      } else {
+        return Math.round(dist)
+      }
     }
   }
 }

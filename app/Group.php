@@ -14,6 +14,7 @@ class Group extends Model implements Auditable
 
     protected $table = 'groups';
     protected $primaryKey = 'idgroups';
+
     /**
      * The attributes that are mass assignable.
      *
@@ -38,6 +39,9 @@ class Group extends Model implements Auditable
     ];
 
     protected $appends = ['ShareableLink', 'approved', 'auto_approve'];
+
+    // The distance is not in the groups table; we add it on some queries from the select.
+    private $distance = null;
 
     /**
      * The attributes that should be hidden for arrays.
@@ -533,5 +537,13 @@ class Group extends Model implements Auditable
         }
 
         return $autoapprove;
+    }
+  
+    public function getDistanceAttribute() {
+        return $this->distance;
+    }
+
+    public function setDistanceAttribute($val) {
+        $this->distance = $val;
     }
 }

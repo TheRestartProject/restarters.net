@@ -38,7 +38,7 @@ class EditWordpressPostForGroup
         $group = Group::find($id);
 
         if (! $group->eventsShouldPushToWordpress()) {
-            Log::error('Groups in this network are not published to WordPress');
+            Log::info('Groups in this network are not published to WordPress');
 
             return;
         }

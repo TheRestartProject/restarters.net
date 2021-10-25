@@ -76,6 +76,7 @@ class CreateEventTest extends TestCase
         // Create a party for the specific group.
         $eventAttributes = factory(Party::class)->raw();
         $eventAttributes['group'] = $group->idgroups;
+        $eventAttributes['link'] = 'https://therestartproject.org/';
 
         // We want an upcoming event so that we can check it appears in various places.
         $eventAttributes['event_date'] = date('Y-m-d', strtotime('tomorrow'));

@@ -10,6 +10,11 @@
           :online.sync="eventOnline"
           :has-error="$v.eventVenue.$error"
           ref="eventVenue"/>
+      <EventLink
+          class="flex-grow-1 event-link"
+          :link.sync="eventLink"
+          :has-error="$v.eventLink.$error"
+          ref="eventLink"/>
       <EventGroup
           class="event-group"
           :value.sync="idgroups"
@@ -116,7 +121,8 @@ import EventTimeRangePicker from './EventTimeRangePicker'
 import VenueAddress from './VenueAddress'
 import EventVenue from './EventVenue'
 import EventGroup from './EventGroup'
-import { required, minLength, helpers } from 'vuelidate/lib/validators'
+import EventLink from './EventLink'
+import { required, minLength, url, helpers } from 'vuelidate/lib/validators'
 import validationHelpers from '../mixins/validationHelpers'
 
 function geocodeableValidation() {
@@ -126,7 +132,7 @@ function geocodeableValidation() {
 const timeValidator = helpers.regex('timeValidator', /^([0-1]?[0-9]|2[0-3]):[0-5][0-9]$/)
 
 export default {
-  components: {EventGroup, EventVenue, VenueAddress, EventTimeRangePicker, EventDatePicker, RichTextEditor},
+  components: {EventGroup, EventVenue, EventLink, VenueAddress, EventTimeRangePicker, EventDatePicker, RichTextEditor},
   mixins: [event, auth, validationHelpers],
   props: {
     duplicateFrom: {
@@ -153,6 +159,7 @@ export default {
     return {
       idgroups: null,
       eventVenue: null,
+      eventLink: null,
       free_text: null,
       eventDate: null,
       eventStart: null,
@@ -192,6 +199,9 @@ export default {
     eventAddress: {
       geocodeableValidation
     },
+    eventLink: {
+      url
+    }
   },
   computed: {
     creating() {
@@ -236,6 +246,7 @@ export default {
     if (setFrom) {
       this.idgroups = setFrom.group
       this.eventVenue = setFrom.venue
+      this.eventLink = setFrom.link
       this.eventAddress = setFrom.location
       this.free_text = setFrom.free_text
       this.eventStart = setFrom.start.substring(0, 5)
@@ -315,17 +326,23 @@ export default {
     grid-column: 1 / 2;
   }
 
-  .event-group {
+  .event-link {
     grid-row: 2 / 3;
+    grid-column: 1 / 2;
+    margin-right: 2px;
+  }
+
+  .event-group {
+    grid-row: 3 / 4;
     grid-column: 1 / 2;
   }
 
   .event-description {
-    grid-row: 3 / 4;
+    grid-row: 4 / 5;
     grid-column: 1 / 2;
 
     @include media-breakpoint-up(lg) {
-      grid-row: 3 / 6;
+      grid-row: 4 / 7;
     }
   }
 
@@ -372,7 +389,7 @@ export default {
     }
 
     @include media-breakpoint-up(lg) {
-      grid-row: 4 / 5;
+      grid-row: 5 / 6;
       grid-column: 2 / 4;
     }
   }
@@ -386,7 +403,7 @@ export default {
     }
 
     @include media-breakpoint-up(lg) {
-      grid-row: 6 / 7;
+      grid-row: 7 / 8;
       grid-column: 1 / 4;
     }
   }
