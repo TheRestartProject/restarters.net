@@ -63,13 +63,11 @@ class GroupController extends Controller
             ->select($group_atts)
             ->get();
 
-        //Make sure we don't show the same groups in nearest to you
-        $your_groups_uniques = $your_groups->pluck('idgroups')->toArray();
-        $groups_near_you = $user->groupsNearby(10);
+        // We pass a high limit to the groups nearby; there is a distance limit which will normally kick in first.
+        $groups_near_you = $user->groupsNearby(1000);
 
         return view('group.index', [
             'your_groups' => $this->expandGroups($your_groups),
-            'your_groups_uniques' => $your_groups_uniques,
             'groups_near_you' => $this->expandGroups($groups_near_you),
             'groups' => $this->expandGroups($groups),
             'your_area' => $user->location,
@@ -269,44 +267,6 @@ class GroupController extends Controller
 
     public function view($groupid)
     {
-        if (isset($_GET['action']) && isset($_GET['code'])) {
-            $actn = $_GET['action'];
-            $code = $_GET['code'];
-
-            switch ($actn) {
-                case 'gu':
-                    $response['success'] = 'Group updated.';
-
-                    break;
-                case 'pe':
-                    $response['success'] = 'Party updated.';
-
-                    break;
-                case 'pc':
-                    $response['success'] = 'Party created.';
-
-                    break;
-                case 'ue':
-                    $response['success'] = 'Profile updated.';
-
-                    break;
-                case 'de':
-                    if ($code == 200) {
-                        $response['success'] = 'Party deleted.';
-                    } elseif ($code == 403) {
-                        $response['danger'] = 'Couldn\'t delete the party!';
-                    } elseif ($code == 500) {
-                        $response['warning'] = 'The party has been deleted, but <strong>something went wrong while deleting it from WordPress</strong>. <br /> You\'ll need to do that manually!';
-                    }
-
-                    break;
-
-                default:
-                    $response['danger'] = 'Unexpected arguments';
-                    break;
-            }
-        }
-
         $user = User::find(Auth::id());
 
         //Object Instances
@@ -403,12 +363,13 @@ class GroupController extends Controller
         $view_group = Group::find($groupid);
         $view_group->allConfirmedVolunteers = $this->expandVolunteers($view_group->allConfirmedVolunteers);
 
-        $hasPendingInvite = ! empty(UserGroups::where('group', $groupid)
+        $pendingInvite = UserGroups::where('group', $groupid)
         ->where('user', $user->id)
         ->where(function ($query) {
             $query->where('status', '<>', '1')
             ->whereNotNull('status');
-        })->first());
+        })->first();
+        $hasPendingInvite = !empty($pendingInvite) ? $pendingInvite['status'] : false;
 
         $groupStats = $group->getGroupStats();
 
@@ -831,6 +792,7 @@ class GroupController extends Controller
                     'networks' => Arr::pluck($group->networks, 'id'),
                     'country' => $group->country,
                     'group_tags' => $group->group_tags()->get()->pluck('id'),
+                    'distance' => $group->distance
                 ];
             }
         }
@@ -1167,12 +1129,13 @@ class GroupController extends Controller
         $user_groups = UserGroups::where('user', Auth::user()->id)->count();
         $view_group = Group::find($groupid);
 
-        $hasPendingInvite = ! empty(UserGroups::where('group', $groupid)
-                                             ->where('user', $user->id)
-                                             ->where(function ($query) {
-                                                 $query->where('status', '<>', '1')
-                                                       ->whereNotNull('status');
-                                             })->first());
+        $pendingInvite = UserGroups::where('group', $groupid)
+            ->where('user', $user->id)
+            ->where(function ($query) {
+                $query->where('status', '<>', '1')
+                    ->whereNotNull('status');
+            })->first();
+        $hasPendingInvite = !empty($pendingInvite) ? $pendingInvite['status'] : false;
 
         return view('group.nearby', [ //host.index
             'title' => 'Host Dashboard',

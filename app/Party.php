@@ -40,6 +40,7 @@ class Party extends Model implements Auditable
         'online',
         'discourse_thread',
         'devices_updated_at',
+        'link'
     ];
     protected $hidden = ['created_at', 'updated_at', 'deleted_at', 'frequency', 'group', 'group', 'user_id', 'wordpress_post_id', 'cancelled', 'devices_updated_at'];
 
@@ -56,6 +57,7 @@ class Party extends Model implements Auditable
                     `e`.`start` AS `start`,
                     `e`.`end` AS `end`,
                     `e`.`venue`,
+                    `e`.`link`,
                     `e`.`location`,
                     `e`.`latitude`,
                     `e`.`longitude`,
@@ -82,6 +84,7 @@ class Party extends Model implements Auditable
                     `e`.`start` AS `start`,
                     `e`.`end` AS `end`,
                     `e`.`venue`,
+                    `e`.`link`,
                     `e`.`location`,
                     `e`.`latitude`,
                     `e`.`longitude`,
@@ -109,6 +112,7 @@ class Party extends Model implements Auditable
                     `e`.`start` AS `start`,
                     `e`.`end` AS `end`,
                     `e`.`venue`,
+                    `e`.`link`,
                     `e`.`location`,
                     `e`.`latitude`,
                     `e`.`longitude`,
@@ -163,7 +167,7 @@ class Party extends Model implements Auditable
     public function ofThisUser($id, $only_past = false, $devices = false)
     {
         //Tested
-        $sql = 'SELECT *, `e`.`venue` AS `venue`, `e`.`location` as `location`, UNIX_TIMESTAMP( CONCAT(`e`.`event_date`, " ", `e`.`start`) ) AS `event_timestamp`
+        $sql = 'SELECT *, `e`.`venue` AS `venue`, `e`.`link` AS `link`, `e`.`location` as `location`, UNIX_TIMESTAMP( CONCAT(`e`.`event_date`, " ", `e`.`start`) ) AS `event_timestamp`
                 FROM `'.$this->table.'` AS `e`
                 INNER JOIN `events_users` AS `eu` ON `eu`.`event` = `e`.`idevents`
                 INNER JOIN `groups` as `g` ON `e`.`group` = `g`.`idgroups`
@@ -199,7 +203,7 @@ class Party extends Model implements Auditable
         //Tested
         $sql = 'SELECT
                     *,
-	`e`.`venue` AS `venue`, `e`.`location` as `location`,
+	`e`.`venue` AS `venue`, `e`.`link` AS `link`, `e`.`location` as `location`,
                     `g`.`name` AS group_name,
 
 
@@ -254,7 +258,7 @@ class Party extends Model implements Auditable
         //Tested
         $sql = 'SELECT
                     *,
-	`e`.`venue` AS `venue`, `e`.`location` as `location`,
+	`e`.`venue` AS `venue`, `e`.`link` AS `link`, `e`.`location` as `location`,
                     `g`.`name` AS group_name,
 
 
@@ -320,6 +324,7 @@ class Party extends Model implements Auditable
         $sql = 'SELECT
                     `e`.`idevents`,
                     `e`.`venue`,
+                    `e`.`link`,
                     `e`.`location`,
                     UNIX_TIMESTAMP( CONCAT(`e`.`event_date`, " ", `e`.`start`) ) AS `event_timestamp`,
                     `e`.`event_date` AS `plain_date`,
@@ -359,6 +364,7 @@ class Party extends Model implements Auditable
         return DB::select(DB::raw('SELECT
                     `e`.`idevents`,
                     `e`.`venue`,
+                    `e`.`link`,
                     `e`.`location`,
                     UNIX_TIMESTAMP( CONCAT(`e`.`event_date`, " ", `e`.`start`) ) AS `event_date`,
                     `e`.`start`,

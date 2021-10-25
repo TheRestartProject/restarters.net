@@ -258,6 +258,7 @@ class PartyController extends Controller
             $location = $request->input('location');
             $group = $request->input('group');
             $user_id = Auth::user()->id;
+            $link = $request->input('link');
 
             // formatting dates for the DB
             $event_date = date('Y-m-d', strtotime($event_date));
@@ -285,6 +286,7 @@ class PartyController extends Controller
                     'end' => $end,
                     'pax' => $pax,
                     'free_text' => $free_text,
+                    'link' => $link,
                     'venue' => $venue,
                     'location' => $location,
                     'latitude' => $latitude,
@@ -472,6 +474,7 @@ class PartyController extends Controller
                 'online' => $request->has('online'),
                 'group' => $data['group'],
                 'venue' => $data['venue'],
+                'link' => $request->has('link') ? $data['link'] : null,
                 'location' => $data['location'],
                 'latitude' => $latitude,
                 'longitude' => $longitude,
