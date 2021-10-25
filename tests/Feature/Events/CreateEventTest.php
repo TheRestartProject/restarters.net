@@ -9,6 +9,7 @@ use App\Network;
 use App\Notifications\AdminModerationEvent;
 use App\Notifications\NotifyRestartersOfNewEvent;
 use App\Party;
+use App\Role;
 use App\User;
 use DB;
 use Illuminate\Support\Facades\Notification;
@@ -84,7 +85,8 @@ class CreateEventTest extends TestCase
         $this->assertDatabaseHas('events', $eventAttributes);
 
         // Check that we can view the event, and that it shows the creation success message.
-        $this->get('/party/view/'.Party::latest()->first()->idevents)->
+        $event = Party::latest()->first();
+        $this->get('/party/view/'.$event->idevents)->
             assertSee($eventAttributes['venue'])->
             assertSee(__('events.created_success_message'));
 
@@ -96,24 +98,88 @@ class CreateEventTest extends TestCase
             $this->actingAs(factory(User::class)->states($role)->create());
         }
 
-        // Check both the group page, and the top-level events page.
-        foreach (['/group/view/'.$group->idgroups, '/party'] as $url) {
-            $response = $this->get($url);
+        // Check the group page.
+        $response = $this->get('/group/view/'.$group->idgroups);
 
-            if ($seeEvent) {
-                // We should be able to see this upcoming event in the Vue properties.  We don't have a neat way
-                // of examining properties yet, so just look for the string.
-                $response->assertSee('requiresModeration&quot;:true');
+        $props = $this->assertVueProperties($response, [
+            [
+                ':idgroups' => $group->idgroups,
+            ],
+        ]);
 
-                if ($canModerate) {
-                    $response->assertSee('canModerate&quot;:true');
-                } else {
-                    $response->assertSee('canModerate&quot;:false');
-                }
-            } else {
-                $response->assertSee('requiresModeration&quot;:true');
-            }
+        $events = json_decode($props[0][':events'], TRUE);
+
+        if ($seeEvent) {
+            // We should be able to see this upcoming event in the Vue properties.
+            $this->assertEquals(true, $events[0]['requiresModeration']);
+            $this->assertEquals($canModerate, $events[0]['canModerate']);
+            $this->assertEquals(true, $events[0]['attending']);
+            $this->assertEquals(true, $events[0]['isVolunteer']);
+        } else {
+            $this->assertEquals(true, $events[0]['requiresModeration']);
         }
+
+        // Check the top-level events page.
+        $response = $this->get('/party');
+
+        $props = $this->assertVueProperties($response, [
+            [
+                'heading-level' => 'h2',
+            ],
+        ]);
+
+        $events = json_decode($props[0][':initial-events'], TRUE);
+
+        if ($seeEvent) {
+            // We should be able to see this upcoming event in the Vue properties.
+            $this->assertEquals(true, $events[0]['requiresModeration']);
+            $this->assertEquals($canModerate, $events[0]['canModerate']);
+            $this->assertEquals(true, $events[0]['attending']);
+            $this->assertEquals(true, $events[0]['isVolunteer']);
+        } else {
+            $this->assertEquals(true, $events[0]['requiresModeration']);
+        }
+
+        // Approve the event.
+        $event->wordpress_post_id = 100;
+        $event->save();
+
+        // Check that the event shows for a restarter.
+        $this->loginAsTestUser(Role::RESTARTER);
+
+        $response = $this->get('/party');
+
+        $props = $this->assertVueProperties($response, [
+            [
+                'heading-level' => 'h2',
+            ],
+        ]);
+
+        $events = json_decode($props[0][':initial-events'], TRUE);
+        $this->assertEquals(1, count($events));
+
+        // Should have the 'all' property set because we've not joined the group.
+        $this->assertEquals(true, $events[0]['all']);
+        $this->assertEquals(false, array_key_exists('nearby', $events[0]));
+
+        // Now join the group.
+        $response = $this->get('/group/join/' . $group->idgroups);
+        $this->assertTrue($response->isRedirection());
+
+        $response = $this->get('/party');
+
+        $props = $this->assertVueProperties($response, [
+            [
+                'heading-level' => 'h2',
+            ],
+        ]);
+
+        $events = json_decode($props[0][':initial-events'], TRUE);
+        $this->assertEquals(1, count($events));
+
+        // Should not have 'all' or 'nearby' flag - those go in the "Other events" section.
+        $this->assertEquals(false, array_key_exists('all', $events[0]));
+        $this->assertEquals(false, array_key_exists('nearby', $events[0]));
     }
 
     public function roles()

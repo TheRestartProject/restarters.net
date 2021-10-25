@@ -513,12 +513,12 @@ class Party extends Model implements Auditable
         }
 
         return $query->join('groups', 'groups.idgroups', '=', 'events.group')
-            ->join('users_groups', 'users_groups.group', '=', 'groups.idgroups')
-            ->join('events_users', 'events_users.event', '=', 'events.idevents')
+            ->leftJoin('users_groups', 'users_groups.group', '=', 'groups.idgroups')
+            ->leftJoin('events_users', 'events_users.event', '=', 'events.idevents')
             ->whereNotNull('events.wordpress_post_id')
             ->where('users_groups.status', 1)
             ->whereNull('users_groups.deleted_at')
-            ->whereDate('events.event_date', '<', date('Y-m-d'))
+            ->whereDate('events.event_date', '>=', date('Y-m-d'))
 
             ->where(function ($query) use ($user_ids) {
                 $query->whereIn('users_groups.user', $user_ids)

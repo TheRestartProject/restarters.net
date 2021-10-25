@@ -94,18 +94,25 @@ class PartyController extends Controller
 
         if (! is_null($group_id)) {
             // This is the page for a specific group's events.  We want all events for this group.
-            $events = Party::events()
-                ->where('events.group', $group_id)
-                ->get();
+            foreach (Party::events()->where('events.group', $group_id)->get() as $event) {
+                $e = \App\Http\Controllers\PartyController::expandEvent($event, NULL);
+                $events[] = $e;
+            }
 
             $group = Group::find($group_id);
         } else {
-            // This is a logged-in user's events page.  We want all upcoming events for groups we've are a member
+            // This is a logged-in user's events page.  We want all upcoming events for groups we are a member
             // of.
-            $events = Party::usersUpcomingEvents()->get();
+            foreach (Party::usersUpcomingEvents()->get() as $event) {
+                $e = \App\Http\Controllers\PartyController::expandEvent($event, NULL);
+                $events[] = $e;
+            }
 
             // ...and any past events for our groups or which we've attended.
-            $events = $events->concat(Party::UsersPastEvents()->get());
+            foreach (Party::usersPastEvents()->get() as $event) {
+                $e = \App\Http\Controllers\PartyController::expandEvent($event, NULL);
+                $events[] = $e;
+            }
 
             if (! is_null(Auth::user()->latitude) && ! is_null(Auth::user()->longitude)) {
                 // We know the location of this user, so we can also get nearby upcoming events.
