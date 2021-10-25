@@ -64,6 +64,6 @@ class GroupEditTest extends TestCase
             'free_text' => 'HQ',
         ]);
 
-        $this->assertContains('Group could not be saved. Address not found', $response->getContent());
+        $this->assertContains(__('groups.geocode_failed'), $response->getContent());
     }
 }

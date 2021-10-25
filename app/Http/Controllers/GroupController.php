@@ -126,7 +126,7 @@ class GroupController extends Controller
                 $geocoded = $geocoder->geocode($location);
 
                 if (empty($geocoded)) {
-                    $response['danger'] = 'Group could not be created. Address not found.';
+                    $response['danger'] = __('groups.geocode_failed');
 
                     return view('group.create', [
                       'title' => 'New Group',
@@ -568,7 +568,7 @@ class GroupController extends Controller
                 $geocoded = $geocoder->geocode($data['location']);
 
                 if (empty($geocoded)) {
-                    $response['danger'] = 'Group could not be saved. Address not found.';
+                    $response['danger'] = __('groups.geocode_failed');
                     $group = Group::find($id);
                     $images = $File->findImages(env('TBL_GROUPS'), $id);
                     $tags = GroupTags::all();
