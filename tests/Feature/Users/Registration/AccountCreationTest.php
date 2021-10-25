@@ -27,8 +27,8 @@ class AccountCreationTest extends TestCase
         ]);
 
         $user = User::latest()->first();
-        $this->assertEquals(51.5073509, $user->latitude);
-        $this->assertEquals(-0.1277583, $user->longitude);
+        $this->assertEquals(51.507, round($user->latitude, 3));
+        $this->assertEquals(-0.128, round($user->longitude, 3));
     }
 
     public function testWorkbenchThenRegister() {
