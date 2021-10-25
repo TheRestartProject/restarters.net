@@ -475,7 +475,7 @@ class Party extends Model implements Auditable
      */
     public function scopeUsersPastEvents($query, array $user_ids = null)
     {
-        // if no $user_ids are supplied, the use the current Auth's ID
+        // if no $user_ids are supplied, then use the current Auth's ID
         if (empty($user_ids)) {
             $user_ids[] = auth()->id();
         }
@@ -507,7 +507,7 @@ class Party extends Model implements Auditable
      */
     public function scopeUsersUpcomingEvents($query, array $user_ids = null)
     {
-        // if no $user_ids are supplied, the use the current Auth's ID
+        // if no $user_ids are supplied, then use the current Auth's ID
         if (empty($user_ids)) {
             $user_ids[] = auth()->id();
         }

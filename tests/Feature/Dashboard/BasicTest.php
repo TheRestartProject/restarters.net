@@ -144,6 +144,7 @@ class BasicTest extends TestCase
         $response->assertSessionHas('success');
 
         // Should not show in upcoming as not yet a member, but should show in nearby.
+        $this->get('/logout');
         $this->actingAs($host2);
 
         $response = $this->get('/dashboard');

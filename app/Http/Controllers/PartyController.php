@@ -92,6 +92,8 @@ class PartyController extends Controller
             $moderate_events = null;
         }
 
+        $events = [];
+
         if (! is_null($group_id)) {
             // This is the page for a specific group's events.  We want all events for this group.
             foreach (Party::events()->where('events.group', $group_id)->get() as $event) {
