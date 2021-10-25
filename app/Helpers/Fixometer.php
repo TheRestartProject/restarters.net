@@ -111,6 +111,7 @@ class Fixometer
         if (self::hasRole($user, 'Administrator')) {
             return true;
         }
+
         if (self::hasRole($user, 'NetworkCoordinator')) {
             $group = Party::find($partyId)->theGroup;
             foreach ($group->networks as $network) {
@@ -119,12 +120,41 @@ class Fixometer
                 }
             }
         }
+
         if (self::hasRole($user, 'Host')) {
             $group_id_of_event = Party::where('idevents', $partyId)->value('group');
             if (self::userIsHostOfGroup($group_id_of_event, $userId)) {
                 return true;
             } elseif (empty(DB::table('events_users')->where('event', $partyId)->where('user', $user->id)->first())) {
                 return false;
+            }
+        }
+
+        return false;
+    }
+
+    public static function userHasDeletePartyPermission($partyId, $userId = null)
+    {
+        if (is_null($userId)) {
+            if (empty(Auth::user())) {
+                return false;
+            } else {
+                $userId = Auth::user()->id;
+            }
+        }
+
+        $user = User::find($userId);
+
+        if (self::hasRole($user, 'Administrator')) {
+            return true;
+        }
+
+        if (self::hasRole($user, 'NetworkCoordinator')) {
+            $group = Party::find($partyId)->theGroup;
+            foreach ($group->networks as $network) {
+                if ($network->coordinators->contains($user)) {
+                    return true;
+                }
             }
         }
 
