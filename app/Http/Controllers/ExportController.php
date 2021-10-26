@@ -148,7 +148,7 @@ class ExportController extends Controller
                     $PartyArray[$i] = [
                         $party->getEventDate(),
                         $party->getEventName(),
-                        $party->theGroup->name ? $party->theGroup->name : '?',
+                        $party->theGroup && $party->theGroup->name ? $party->theGroup->name : '?',
                     ];
                     $PartyArray[$i] += $stats;
                 }
