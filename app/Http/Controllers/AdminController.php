@@ -5,6 +5,9 @@ namespace App\Http\Controllers;
 use App\Device;
 use App\Party;
 
+/**
+ * Embedded at https://therestartproject.org/impact
+ */
 class AdminController extends Controller
 {
     public static function stats($section = 1, $paragraph_only = false)
@@ -66,12 +69,11 @@ class AdminController extends Controller
 
     public static function getStats2()
     {
-        $Device = new Device;
-        $co2Total = $Device->getWeights();
-
+        $stats = \App\Helpers\LcaStats::getWasteStats();
+        // preference is for powered only
         return [
-            'co2Total' => $co2Total[0]->total_footprints,
-            'wasteTotal' => $co2Total[0]->total_weights,
+            'co2Total' => $stats[0]->powered_footprint, // + $stats[0]->unpowered_footprint,
+            'wasteTotal' => $stats[0]->powered_waste, // + $stats[0]->unpowered_waste,
         ];
     }
 }

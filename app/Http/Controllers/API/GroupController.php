@@ -109,11 +109,11 @@ class GroupController extends Controller
                                       'upcoming_parties' => $upcoming_parties_collection = collect([]),
                                       'past_parties' => $past_parties_collection = collect([]),
                                       'impact' => [
-                                          'volunteers' => $groupStats['pax'],
-                                          'hours_volunteered' => $groupStats['hours'],
+                                        'volunteers' => $groupStats['participants'],
+                                        'hours_volunteered' => $groupStats['hours_volunteered'],
                                           'parties_thrown' => $groupStats['parties'],
-                                          'waste_prevented' => $groupStats['waste'],
-                                          'co2_emissions_prevented' => $groupStats['co2'],
+                                          'waste_prevented' => round($groupStats['waste_total']),
+                                          'co2_emissions_prevented' => round($groupStats['co2_total']),
                                       ],
                                       'widgets' => [
                                           'headline_stats' => url("/group/stats/{$group->idgroups}"),
