@@ -73,23 +73,22 @@ class ApiController extends Controller
 
         $stats = $event->getEventStats();
 
-        return response()
-            ->json(
-                [
-                    'num_participants' => $stats['participants'],
-                    'num_hours_volunteered' => $stats['hours_volunteered'],
-                    'num_fixed_devices' => $stats['fixed_devices'],
-                    'num_repairable_devices' => $stats['repairable_devices'],
-                    'num_dead_devices' => $stats['dead_devices'],
-                    'kg_powered_co2_diverted' => round($stats['co2_powered']),
-                    'kg_unpowered_co2_diverted' => round($stats['co2_unpowered']),
-                    'kg_powered_waste_diverted' => round($stats['waste_powered']),
-                    'kg_unpowered_waste_diverted' => round($stats['waste_unpowered']),
-                    'kg_co2_diverted' => round($stats['co2_total']),
-                    'kg_waste_diverted' => round($stats['waste_total']),
-                ],
-                200
-            );
+        $result = [
+            'num_participants' => $stats['participants'],
+            'num_volunteers' => $stats['volunteers'],
+            'num_hours_volunteered' => $stats['hours_volunteered'],
+            'num_fixed_devices' => $stats['fixed_devices'],
+            'num_repairable_devices' => $stats['repairable_devices'],
+            'num_dead_devices' => $stats['dead_devices'],
+            'kg_powered_co2_diverted' => round($stats['co2_powered']),
+            'kg_unpowered_co2_diverted' => round($stats['co2_unpowered']),
+            'kg_powered_waste_diverted' => round($stats['waste_powered']),
+            'kg_unpowered_waste_diverted' => round($stats['waste_unpowered']),
+            'kg_co2_diverted' => round($stats['co2_total']),
+            'kg_waste_diverted' => round($stats['waste_total']),
+        ];
+
+        return response()->json($result, 200);
     }
 
     public static function groupStats($groupId)
@@ -97,8 +96,7 @@ class ApiController extends Controller
         $group = Group::where('idgroups', $groupId)->first();
         $stats = $group->getGroupStats();
 
-        return response()
-            ->json([
+        $result = [
                 'num_parties' => $stats['parties'],
                 'num_participants' => $stats['participants'],
                 'num_hours_volunteered' => $stats['hours_volunteered'],
@@ -112,7 +110,9 @@ class ApiController extends Controller
                 'kg_co2_diverted' => round($stats['co2_total']),
                 'kg_waste_diverted' => round($stats['waste_total']),
 
-            ], 200);
+            ];
+
+        return response()->json($result, 200);
     }
 
     public static function getEventsByGroupTag($group_tag_id)
