@@ -48,14 +48,20 @@ class CreateDiscourseThreadForGroup
             // We want to internationalise the message.  Use the languages of any networks that the group
             // is in.
             $text = '';
+            $langs = [];
 
             foreach ($group->networks as $network) {
                 $lang = $network->default_language;
-                $text .= Lang::get('groups.discourse_title',[
-                    'group' => $group->name,
-                    'link' => env('APP_URL') . '/group/view/' . $group->idgroups,
-                    'help' => 'https://talk.restarters.net'
-                ],$lang);
+
+                if (!in_array($lang, $langs)) {
+                    $text .= Lang::get('groups.discourse_title',[
+                        'group' => $group->name,
+                        'link' => env('APP_URL') . '/group/view/' . $group->idgroups,
+                        'help' => 'https://talk.restarters.net'
+                    ],$lang);
+
+                    $langs[] = $lang;
+                }
             }
 
             // We want the host to create the message, so use their username.  The API key should
