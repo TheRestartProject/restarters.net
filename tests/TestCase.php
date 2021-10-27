@@ -112,7 +112,7 @@ abstract class TestCase extends BaseTestCase
             'name' => $name.$this->groupCount++,
             'website' => $website,
             'location' => $location,
-            'free_text' => $text,
+            'free_text' => $text
         ]);
 
         if ($assert) {
@@ -121,6 +121,9 @@ abstract class TestCase extends BaseTestCase
             $this->assertNotFalse(strpos($redirectTo, '/group/edit'));
             $p = strrpos($redirectTo, '/');
             $idgroups = substr($redirectTo, $p + 1);
+            $group = Group::find($idgroups);
+            $group->wordpress_post_id = '99999';
+            $group->save();
         }
 
         return $idgroups;

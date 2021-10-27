@@ -9,14 +9,14 @@
 	<div class="col-md-3 col-sm-3">
 		<div class="text-center box">
 			<h4>Participants</h4>
-			<div class="number"><?php echo $counters['pax']; ?></div>
+			<div class="number"><?php echo $counters['participants']; ?></div>
 			<div class="link">&nbsp;</div>
 		</div>
 	</div>
 	<div class="col-md-3 col-sm-3">
 		<div class="text-center box">
 			<h4>Hours Volunteered</h4>
-			<div class="number"><?php echo $counters['hours']; ?></div>
+			<div class="number"><?php echo $counters['hours_volunteered']; ?></div>
 			<div class="link">&nbsp;</div>
 		</div>
 	</div>

@@ -29,6 +29,9 @@ class User extends Authenticatable implements Auditable
     // Use the Authorizable trait so that we can call can() on a user to evaluation policies.
     use \Illuminate\Foundation\Auth\Access\Authorizable;
 
+    // Radius within which a group has to be for it to be considered nearby.
+    const NEARBY_KM = 50;
+
     protected $table = 'users';
 
     /**
@@ -116,29 +119,57 @@ class User extends Authenticatable implements Auditable
     }
 
     /**
-     * Return a list of repair groups near the user.
+     * Return a list of repair groups near the user that they are not already a member of.
      *
-     * @param int $searchRadiusInMiles How far to search for groups
      * @param int $numberOfGroups How many groups to return
-     * @param array $idsOfGroupsToIgnore Any groups that should be excluded from the result
+     * @param string String of minimum creation date
      */
-    public function groupsNearby($searchRadiusInMiles = 150, $numberOfGroups = 10, $idsOfGroupsToIgnore = null)
+    public function groupsNearby($numberOfGroups = 10, $createdSince = NULL, $nearby = self::NEARBY_KM)
     {
         if (is_null($this->latitude) || is_null($this->longitude)) {
-            return null;
+            return [];
         }
 
         $groupsNearbyQuery = Group::select(
-            DB::raw('*, ( 6371 * acos( cos( radians('.$this->latitude.') ) * cos( radians( latitude ) ) * cos( radians( longitude ) - radians('.$this->longitude.') ) + sin( radians('.$this->latitude.') ) * sin( radians( latitude ) ) ) ) AS distance')
-        )->having('distance', '<=', $searchRadiusInMiles);
+            DB::raw('*, ( 6371 * acos( cos( radians('.$this->latitude.') ) * cos( radians( latitude ) ) * cos( radians( longitude ) - radians('.$this->longitude.') ) + sin( radians('.$this->latitude.') ) * sin( radians( latitude ) ) ) ) AS dist')
+        )->leftJoin('grouptags_groups', function($join) {
+            // Exclude any groups tagged with the special value of 10, which is 'Inactive'.
+            $join->on('group', '=', 'idgroups');
+            $join->on('group_tag', '=', DB::raw(GroupTags::INACTIVE));
+        })->where(function ($q) {
+            $q->whereNull('grouptags_groups.id');
 
-        if (! is_null($idsOfGroupsToIgnore)) {
-            $groupsNearbyQuery->whereNotIn('idgroups', $idsOfGroupsToIgnore);
+            // Only show approved groups.
+            $q->whereNotNull('wordpress_post_id');
+        })->having('dist', '<=', $nearby)
+            ->groupBy('idgroups');
+
+        if ($createdSince) {
+            $groupsNearbyQuery->whereDate('created_at', '>=', date('Y-m-d', strtotime($createdSince)));
         }
 
-        return $groupsNearbyQuery->orderBy('distance', 'ASC')
+        $groups = $groupsNearbyQuery->orderBy('dist', 'ASC')
             ->take($numberOfGroups)
             ->get();
+
+        // Expand the image
+        $groupsNearby = [];
+
+        if ($groups) {
+            foreach ($groups as $group) {
+                $group_image = $group->groupImage;
+                if (is_object($group_image) && is_object($group_image->image)) {
+                    $group_image->image->path;
+                }
+
+                // Store for later retrieval.  This is unusual because the value is not stored in the table.
+                $group->setDistanceAttribute($group->dist);
+
+                $groupsNearby[] = $group;
+            }
+        }
+
+        return $groupsNearby;
     }
 
     public function preferences()

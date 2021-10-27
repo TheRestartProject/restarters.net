@@ -31,6 +31,9 @@ import 'vue-multiselect/dist/vue-multiselect.min.css'
 import * as Sentry from "@sentry/vue";
 import { Integrations } from "@sentry/tracing";
 
+import Vuelidate from 'vuelidate'
+Vue.use(Vuelidate)
+
 // Without this, the default map marker doesn't appear in production.  Fairly well-known problem.
 // eslint-disable-next-line
 delete L.Icon.Default.prototype._getIconUrl
@@ -1326,8 +1329,8 @@ function initAutocomplete() {
   }
 
   function updateEventStats(stats) {
-    $('#waste-insert').html(stats['ewaste']);
-    $('#co2-insert').html(stats['co2']);
+    $('#waste-insert').html(stats['waste_total']);
+    $('#co2-insert').html(stats['co2_total']);
     $('#fixed-insert').html(stats['fixed_devices']);
     $('#repair-insert').html(stats['repairable_devices']);
     $('#dead-insert').html(stats['dead_devices']);
@@ -1344,7 +1347,7 @@ function initAutocomplete() {
         this.value = this.value + "\n";
       }
     });
-    
+
     $('#participants_qty').on('change', function() {
       updateParticipants();
     });
@@ -1534,6 +1537,8 @@ jQuery(document).ready(function () {
       store: store,
       components: {
         'dashboardpage': require('./components/DashboardPage.vue'),
+        'eventaddeditpage': require('./components/EventAddEditPage.vue'),
+        'eventaddedit': require('./components/EventAddEdit.vue'),
         'eventpage': require('./components/EventPage.vue'),
         'fixometerpage': require('./components/FixometerPage.vue'),
         'groupspage': require('./components/GroupsPage.vue'),

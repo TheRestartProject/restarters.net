@@ -14,7 +14,6 @@ use App\Events\EventImagesUploaded;
 use App\EventsUsers;
 use App\Group;
 use App\Helpers\Fixometer;
-use App\Helpers\FootprintRatioCalculator;
 use App\Helpers\Geocoder;
 use App\Host;
 use App\Invite;
@@ -287,6 +286,7 @@ class PartyController extends Controller
             $location = $request->input('location');
             $group = $request->input('group');
             $user_id = Auth::user()->id;
+            $link = $request->input('link');
 
             // formatting dates for the DB
             $event_date = date('Y-m-d', strtotime($event_date));
@@ -314,6 +314,7 @@ class PartyController extends Controller
                     'end' => $end,
                     'pax' => $pax,
                     'free_text' => $free_text,
+                    'link' => $link,
                     'venue' => $venue,
                     'location' => $location,
                     'latitude' => $latitude,
@@ -501,6 +502,7 @@ class PartyController extends Controller
                 'online' => $request->has('online'),
                 'group' => $data['group'],
                 'venue' => $data['venue'],
+                'link' => $request->has('link') ? $data['link'] : null,
                 'location' => $data['location'],
                 'latitude' => $latitude,
                 'longitude' => $longitude,
@@ -622,7 +624,6 @@ class PartyController extends Controller
 
         $File = new FixometerFile;
         $Party = new Party;
-        $Device = new Device;
 
         $groupsUserIsInChargeOf = $user->groupsInChargeOf();
         $userInChargeOfMultipleGroups = $user->hasRole('Administrator') || count($groupsUserIsInChargeOf) > 1;
@@ -644,22 +645,14 @@ class PartyController extends Controller
         $party = $Party->findThis($id)[0];
         $remotePost = null;
 
-        // Put the values we want to preserve into the session, to be picked up by the blade template's use of old().
-        $request->session()->put('_old_input.venue', $party->venue);
-        $request->session()->put('_old_input.online', $party->online);
-        $request->session()->put('_old_input.free_text', $party->free_text);
-        $request->session()->put('_old_input.location', $party->location);
-        $request->session()->put('_old_input.start', $party->start);
-        $request->session()->put('_old_input.end', $party->end);
-
         return view('events.create', [
             'title' => 'Duplicate Party',
             'gmaps' => true,
             'allGroups' => $allGroups,
             'user' => Auth::user(),
             'user_groups' => $groupsUserIsInChargeOf,
-            'selected_group_id' => $party->group,
             'userInChargeOfMultipleGroups' => $userInChargeOfMultipleGroups,
+            'duplicateFrom' => $party
         ]);
     }
 
@@ -886,8 +879,6 @@ class PartyController extends Controller
         $event = Party::where('idevents', $id)->first();
 
         $eventStats = $event->getEventStats();
-
-        $eventStats['co2'] = number_format(round($eventStats['co2']), 0, '.', ',');
 
         if (! is_null($class)) {
             return view('party.stats', [
@@ -1432,11 +1423,11 @@ class PartyController extends Controller
                'description' => $group->free_text,
                'image_url' => $group->groupImagePath(),
                'volunteers' => $group->volunteers,
-               'participants' => $gstats['pax'],
-               'hours_volunteered' => $gstats['hours'],
+               'participants' => $gstats['participants'],
+               'hours_volunteered' => $gstats['hours_volunteered'],
                'parties_thrown' => $gstats['parties'],
-               'waste_prevented' => $gstats['waste'],
-               'co2_emissions_prevented' => $gstats['co2'],
+               'waste_prevented' => $gstats['waste_total'],
+               'co2_emissions_prevented' => $gstats['co2_total'],
            ]);
         }
 
@@ -1464,8 +1455,8 @@ class PartyController extends Controller
              'impact' => [
                  'participants' => $party->pax,
                  'volunteers' => $estats['volunteers'],
-                 'waste_prevented' => $estats['ewaste'],
-                 'co2_emissions_prevented' => $estats['co2'],
+                 'waste_prevented' => $estats['waste_powered'],
+                 'co2_emissions_prevented' => $estats['co2_powered'],
                  'devices_fixed' => $estats['fixed_devices'],
                  'devices_repairable' => $estats['repairable_devices'],
                  'devices_dead' => $estats['dead_devices'],
@@ -1517,11 +1508,11 @@ class PartyController extends Controller
                 'description' => $party->theGroup->free_text,
                 'image_url' => $party->theGroup->groupImagePath(),
                 'volunteers' => $party->theGroup->volunteers,
-                'participants' => $gstats['pax'],
-                'hours_volunteered' => $gstats['hours'],
+                'participants' => $gstats['participants'],
+                'hours_volunteered' => $gstats['hours_volunteered'],
                 'parties_thrown' => $gstats['parties'],
-                'waste_prevented' => $gstats['waste'],
-                'co2_emissions_prevented' => $gstats['co2'],
+                'waste_prevented' => $gstats['waste_total'],
+                'co2_emissions_prevented' => $gstats['co2_total'],
             ],
             'event_date' => $party->event_date,
             'start_time' => $party->start,
@@ -1539,8 +1530,8 @@ class PartyController extends Controller
             'impact' => [
                 'participants' => $party->pax,
                 'volunteers' => $estats['volunteers'],
-                'waste_prevented' => $estats['ewaste'],
-                'co2_emissions_prevented' => $estats['co2'],
+                'waste_prevented' => $estats['waste_total'],
+                'co2_emissions_prevented' => $estats['co2_total'],
                 'devices_fixed' => $estats['fixed_devices'],
                 'devices_repairable' => $estats['repairable_devices'],
                 'devices_dead' => $estats['dead_devices'],

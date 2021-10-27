@@ -75,6 +75,7 @@ class CreateEventTest extends TestCase
         // Create a party for the specific group.
         $eventAttributes = factory(Party::class)->raw();
         $eventAttributes['group'] = $group->idgroups;
+        $eventAttributes['link'] = 'https://therestartproject.org/';
 
         // We want an upcoming event so that we can check it appears in various places.
         $eventAttributes['event_date'] = date('Y-m-d', strtotime('tomorrow'));
@@ -153,7 +154,7 @@ class CreateEventTest extends TestCase
 
         // Duplicate it - should bring up the page to add a new event, with some info from the first one.
         $response = $this->get('/party/duplicate/'.$party->idevents);
-        $response->assertSee(__('events.add_new_event'));
+        $response->assertSee('duplicate-from');
         $response->assertSee($party->description);
     }
 

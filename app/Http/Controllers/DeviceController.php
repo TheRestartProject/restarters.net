@@ -12,7 +12,6 @@ use App\Events\DeviceCreatedOrUpdated;
 use App\EventsUsers;
 use App\Group;
 use App\Helpers\Fixometer;
-use App\Helpers\FootprintRatioCalculator;
 use App\Notifications\AdminAbnormalDevices;
 use App\Notifications\ReviewNotes;
 use App\Party;

@@ -4,9 +4,9 @@
     <div class="items-container">
       <StatsValue :count="stats.parties" icon="coffee" size="md" variant="primary" title="groups.events" class="group-stat-events" />
       <div />
-      <StatsValue :count="stats.pax" icon="participants" size="md" title="groups.participants" class="group-stat-participants" />
+      <StatsValue :count="stats.participants" icon="participants" size="md" title="groups.participants" class="group-stat-participants" />
       <div />
-      <StatsValue :count="stats.hours" icon="clock" size="md" title="groups.hours_volunteered" class="group-stat-hours-volunteered" />
+      <StatsValue :count="stats.hours_volunteered" icon="clock" size="md" title="groups.hours_volunteered" class="group-stat-hours-volunteered" />
     </div>
   </div>
 </template>

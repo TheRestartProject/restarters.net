@@ -51,7 +51,6 @@ class Kernel extends ConsoleKernel
             ->sendOutputTo(storage_path().'/logs/discourse_usernames.log')
             ->emailOutputTo(env('SEND_COMMAND_LOGS_TO'), 'tech@therestartproject.org');
 
-        $schedule->command('faultcat:sync')->daily();
     }
 
     /**
