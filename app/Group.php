@@ -35,7 +35,7 @@ class Group extends Model implements Auditable
         'shareable_code',
         'network_id',
         'external_id',
-        'devices_updated_at',
+        'devices_updated_at'
     ];
 
     protected $appends = ['ShareableLink', 'approved', 'auto_approve'];
@@ -511,29 +511,32 @@ class Group extends Model implements Auditable
         return strtotime($this->updated_at) > strtotime($this->devices_updated_at) ? $this->updated_at : $this->devices_updated_at;
     }
 
-    public function getDistanceAttribute() {
-        return $this->distance;
-    }
-
-    public function setDistanceAttribute($val) {
-        $this->distance = $val;
-    }
-
-    public function getAutoApproveAttribute() {
+    public function getAutoApproveAttribute()
+    {
         // A group's events are auto-approved iff all the networks that the group belongs to are set to auto-approve
         // events.
         $autoapprove = false;
 
         $networks = $this->networks;
 
-        if ($networks && count($networks)) {
+        if ($networks && count($networks))
+        {
             $autoapprove = true;
 
-            foreach ($networks as $network) {
+            foreach ($networks as $network)
+            {
                 $autoapprove &= $network->auto_approve_events;
             }
         }
 
         return $autoapprove;
+    }
+
+    public function getDistanceAttribute() {
+        return $this->distance;
+    }
+
+    public function setDistanceAttribute($val) {
+        $this->distance = $val;
     }
 }
