@@ -2,16 +2,14 @@
 
 namespace App\Listeners;
 
-use App\Events\ApproveEvent;
-use App\Events\UserFollowedGroup;
+use App\Events\ApproveGroup;
 use App\EventsUsers;
 use App\Party;
 use App\User;
-use Illuminate\Contracts\Queue\ShouldQueue;
-use Illuminate\Queue\InteractsWithQueue;
+use App\UserGroups;
 use Illuminate\Support\Facades\Log;
 
-class CreateDiscourseThreadForEvent
+class CreateDiscourseThreadForGroup
 {
     /**
      * Create the event listener.
@@ -26,30 +24,37 @@ class CreateDiscourseThreadForEvent
     /**
      * Handle the event.
      *
-     * @param  ApproveEvent  $event
+     * @param  ApproveGroup  $group
      * @return void
      */
-    public function handle(ApproveEvent $event)
+    public function handle(ApproveGroup $group)
     {
         if (! config('restarters.features.discourse_integration')) {
             return;
         }
 
-        // Get the event.
-        $partyId = $event->party->idevents;
+        // Get the host who created the group.
+        $member = UserGroups::where('group', $group->idgroups)->first();
+        $host = User::find($member->user);
 
-        $theParty = Party::find($partyId);
-
-        // Get the user who created the event.
-        $host = User::find(EventsUsers::where('event', $partyId)->get()[0]->user);
-
-        if (empty($theParty)) {
-            Log::error('Event not found');
-
+        if (empty($host)) {
+            Log::error('Could not find host of group');
             return;
         }
 
         try {
+            // We want to internationalise the message.  Use the languages of any networks that the group
+            // is in.
+            $text = '';
+
+            foreach ($group->networks as $network) {
+                $lang = $network->default_language;
+                $text .= Lang::get('groups.discourse_title',[
+                    'group' => $group->name,
+                    'link' => env('APP_URL') . '/group/view/' . $group->idgroups
+                ],$lang);
+            }
+
             // We want the host to create the message, so use their username.  The API key should
             // allow us to do this - see https://meta.discourse.org/t/how-can-an-api-user-create-posts-as-another-user/45968/3.
             $client = app('discourse-client', [
@@ -58,15 +63,15 @@ class CreateDiscourseThreadForEvent
 
             // See https://meta.discourse.org/t/private-message-send-api/27593/21.
             $params = [
-                'raw' => $theParty->free_text,
-                'title' => $theParty->venue.' '.$theParty->event_date,
+                'raw' => $text,
+                'title' => $group->name,
                 'target_usernames' => $host->username,
                 'archetype' => 'private_message',
             ];
 
             $endpoint = '/posts.json';
 
-            Log::info('Creating event thread: '.json_encode($params));
+            Log::info('Creating group thread: '.json_encode($params));
             $response = $client->request(
                 'POST',
                 $endpoint,
@@ -79,20 +84,20 @@ class CreateDiscourseThreadForEvent
             Log::info('Response body: '.$response->getBody());
 
             if (! $response->getStatusCode() === 200) {
-                Log::error('Could not create event ('.$partyId.') thread: '.$response->getReasonPhrase());
+                Log::error('Could not create group ('.$group->idgroups.') thread: '.$response->getReasonPhrase());
             } else {
-                // We want to save the discourse thread id in the event, so that we can invite people to it later
-                // when they RSVP.
+                // We want to save the discourse thread id in the group, so that we can invite people to it later
+                // when they join.
                 $json = json_decode($response->getBody(), true);
                 if (empty($json['topic_id'])) {
                     throw new \Exception('Topic id not found in create response');
                 }
 
-                $theParty->discourse_thread = $json['topic_id'];
-                $theParty->save();
+                $group->discourse_thread = $json['topic_id'];
+                $group->save();
             }
         } catch (\Exception $ex) {
-            Log::error('Could not create event ('.$partyId.') thread: '.$ex->getMessage());
+            Log::error('Could not create group ('.$group->idgroups.') thread: '.$ex->getMessage());
         }
     }
 }
