@@ -35,10 +35,10 @@ class Group extends Model implements Auditable
         'shareable_code',
         'network_id',
         'external_id',
-        'devices_updated_at',
+        'devices_updated_at'
     ];
 
-    protected $appends = ['ShareableLink', 'approved'];
+    protected $appends = ['ShareableLink', 'approved', 'auto_approve'];
 
     // The distance is not in the groups table; we add it on some queries from the select.
     private $distance = null;
@@ -509,6 +509,27 @@ class Group extends Model implements Auditable
     public function getMaxUpdatedAtDevicesUpdatedAtAttribute()
     {
         return strtotime($this->updated_at) > strtotime($this->devices_updated_at) ? $this->updated_at : $this->devices_updated_at;
+    }
+
+    public function getAutoApproveAttribute()
+    {
+        // A group's events are auto-approved iff all the networks that the group belongs to are set to auto-approve
+        // events.
+        $autoapprove = false;
+
+        $networks = $this->networks;
+
+        if ($networks && count($networks))
+        {
+            $autoapprove = true;
+
+            foreach ($networks as $network)
+            {
+                $autoapprove &= $network->auto_approve_events;
+            }
+        }
+
+        return $autoapprove;
     }
 
     public function getDistanceAttribute() {
