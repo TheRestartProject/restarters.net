@@ -126,6 +126,8 @@
               $api_token = $user->ensureAPIToken();
           }
 
+          $discourseThread = $group->discourse_thread ? (env('DISCOURSE_URL').'/t/'.$group->discourse_thread) : null;
+
           ?>
 
       <div class="vue-placeholder vue-placeholder-large">
@@ -149,6 +151,7 @@
               calendar-edit-url="{{ $showCalendar ? url("/profile/edit/{$user->id}#list-calendar-links") : '' }}"
               :ingroup="{{ $in_group ? 'true' : 'false' }}"
               api-token="{{ $api_token }}"
+              discourse-thread="{{ $discourseThread }}"
           />
       </div>
   </div>

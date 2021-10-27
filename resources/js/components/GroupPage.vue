@@ -1,11 +1,19 @@
 <template>
   <div v-if="group">
     <div class="alert alert-success" v-if="haveLeft" v-html="translatedHaveLeft" />
-    <GroupHeading :idgroups="idgroups" :canedit="canedit" :can-see-delete="canSeeDelete" :can-perform-delete="canPerformDelete" :ingroup="ingroup" @left="haveLeft = true" />
+    <GroupHeading
+        :idgroups="idgroups"
+        :canedit="canedit"
+        :can-see-delete="canSeeDelete"
+        :can-perform-delete="canPerformDelete"
+        :ingroup="ingroup"
+        @left="haveLeft = true"
+
+    />
 
     <div class="d-flex flex-wrap">
       <div class="w-xs-100 w-md-50">
-        <GroupDescription class="pr-md-3" :idgroups="idgroups" />
+        <GroupDescription class="pr-md-3" :idgroups="idgroups" :discourse-thread="discourseThread" />
       </div>
       <div class="w-xs-100 w-md-50">
         <GroupVolunteers class="pl-md-3" :idgroups="idgroups" :canedit="canedit" />
@@ -125,7 +133,12 @@ export default {
     topDevices: {
       type: Array,
       required: true
-    }
+    },
+    discourseThread: {
+      type: String,
+      required: false,
+      default: null
+    },
   },
   data () {
     return {

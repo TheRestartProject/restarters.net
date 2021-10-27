@@ -8,6 +8,7 @@ use App\Party;
 use App\User;
 use App\UserGroups;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Lang;
 
 class CreateDiscourseThreadForGroup
 {
@@ -24,16 +25,17 @@ class CreateDiscourseThreadForGroup
     /**
      * Handle the event.
      *
-     * @param  ApproveGroup  $group
+     * @param  ApproveGroup  $event
      * @return void
      */
-    public function handle(ApproveGroup $group)
+    public function handle(ApproveGroup $event)
     {
         if (! config('restarters.features.discourse_integration')) {
             return;
         }
 
         // Get the host who created the group.
+        $group = $event->group;
         $member = UserGroups::where('group', $group->idgroups)->first();
         $host = User::find($member->user);
 

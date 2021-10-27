@@ -4,10 +4,22 @@
       {{ __('groups.about') }}
     </template>
     <template slot="content">
-      <p v-if="!group.free_text" class="text-muted">
-        {{ __('groups.about_none') }}
-      </p>
-      <read-more v-else :html="group.free_text" class="mt-2" :max-chars="440" :more-str="__('groups.read_more')" :less-str="__('groups.read_less')" />
+      <div class="d-flex flex-column justify-content-between">
+        <div>
+          <p v-if="!group.free_text" class="text-muted">
+            {{ __('groups.about_none') }}
+          </p>
+          <read-more v-else :html="group.free_text" class="mt-2" :max-chars="440" :more-str="__('groups.read_more')" :less-str="__('groups.read_less')" />
+        </div>
+        <div class="d-flex pt-1 pb-1" v-if="discourseThread">
+          <div class="mr-2">
+            <b-img-lazy src="/icons/talk_ico.svg" class="icon" />
+          </div>
+          <div>
+            <a :href="discourseThread">{{ __('groups.talk_thread') }}</a>
+          </div>
+        </div>
+      </div>
     </template>
   </CollapsibleSection>
 </template>
@@ -25,7 +37,12 @@ export default {
     idgroups: {
       type: Number,
       required: true
-    }
+    },
+    discourseThread: {
+      type: String,
+      required: false,
+      default: null
+    },
   },
 }
 </script>
