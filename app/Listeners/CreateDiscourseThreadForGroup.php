@@ -53,7 +53,8 @@ class CreateDiscourseThreadForGroup
                 $lang = $network->default_language;
                 $text .= Lang::get('groups.discourse_title',[
                     'group' => $group->name,
-                    'link' => env('APP_URL') . '/group/view/' . $group->idgroups
+                    'link' => env('APP_URL') . '/group/view/' . $group->idgroups,
+                    'help' => 'https://talk.restarters.net'
                 ],$lang);
             }
 
