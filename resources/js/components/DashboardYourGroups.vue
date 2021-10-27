@@ -8,7 +8,7 @@
           </div>
           <b-img class="height ml-4" src="/images/group_doodle_ico.svg" />
         </div>
-        <a href="/group/nearby" v-if="newGroups" class="added added-md d-none d-md-block pr-3">
+        <a href="/group/nearby" v-if="newGroups && newGroups.length" class="added added-md d-none d-md-block pr-3">
           <b-img src="/images/arrow-right-doodle-white.svg" />
           {{ translatedNewlyAdded }}
         </a>
@@ -128,8 +128,8 @@ export default {
       })
     },
     translatedNewlyAdded() {
-      return this.$lang.choice('dashboard.newly_added', this.newGroups, {
-        count: this.newGroups
+      return this.$lang.choice('dashboard.newly_added', this.newGroups.length, {
+        count: this.newGroups ? this.newGroups.length : 0
       })
     },
   },

@@ -5,12 +5,12 @@
   <div id="group-main-stats">
       <div class="col">
           <h5>participants</h5>
-          <span class="largetext"><?php echo $pax; ?></span>
+          <span class="largetext"><?php echo $participants; ?></span>
       </div>
 
       <div class="col">
           <h5>hours volunteered</h5>
-          <span class="largetext"><?php echo $hours; ?></span>
+          <span class="largetext"><?php echo $hours_volunteered; ?></span>
       </div>
 
       <div class="col">
@@ -21,14 +21,14 @@
       <div class="col">
           <h5>waste prevented</h5>
           <span class="largetext">
-              {{ number_format($waste, 0) }} kg
+              {{ number_format($waste_total, 0) }} kg
           </span>
       </div>
 
       <div class="col">
           <h5>CO<sub>2</sub> emission prevented</h5>
 
-          <span class="largetext">{{ number_format($co2, 0) }} kg</span>
+          <span class="largetext">{{ number_format($co2_total, 0) }} kg</span>
       </div>
 
   </div>
@@ -40,14 +40,14 @@
            <div class="col">
                   <h5>waste prevented</h5>
                   <span class="largetext">
-                      <?php echo $waste; ?> kg
+                      <?php echo $waste_total; ?> kg
                   </span>
               </div>
 
               <div class="col">
                   <h5>CO<sub>2</sub> emission prevented</h5>
 
-                  <span class="largetext"><?php echo $co2; ?> kg</span>
+                  <span class="largetext"><?php echo $co2_total; ?> kg</span>
               </div>
       </div>
       <div class="group-stats-row second-row">
@@ -80,14 +80,14 @@
       <div class="col">
           <h5>waste prevented</h5>
           <span class="largetext">
-              <?php echo $waste; ?> kg
+              <?php echo $waste_total; ?> kg
           </span>
       </div>
 
       <div class="col">
           <h5>CO<sub>2</sub> emission prevented</h5>
 
-          <span class="largetext"><?php echo $co2; ?> kg</span>
+          <span class="largetext"><?php echo $co2_total; ?> kg</span>
       </div>
 
   </div>

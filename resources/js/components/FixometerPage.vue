@@ -57,16 +57,17 @@
           <template slot="title">
             <div class="d-flex justify-content-between">
               <div>
-                <b>{{ __('devices.title_powered') }}</b> ({{ powered_total.toLocaleString() }})
+                <b>{{ __('devices.title_powered') }}</b>
+                ({{ impactData.total_powered.toLocaleString() }})
               </div>
               <div class="d-flex text-brand font-weight-bold">
                 <div class="mr-3 lower">
                   <b-img src="/images/trash_brand.svg" class="icon" />
-                  {{ powered_weight.toLocaleString() }} kg
+                  {{ Math.round(impactData.waste_powered).toLocaleString() }} kg
                 </div>
                 <div class="mr-1 lower">
                   <b-img src="/images/co2_brand.svg" class="icon" />
-                  {{ powered_co2.toLocaleString() }} kg
+                  {{ Math.round(impactData.co2_powered).toLocaleString() }} kg
                 </div>
               </div>
             </div>
@@ -88,20 +89,27 @@
               :group="group"
               :from_date="from_date"
               :to_date="to_date"
-              :total.sync="powered_total"
-              :weight.sync="powered_weight"
-              :co2.sync="powered_co2"
+              :total.sync="impactData.total_powered"
+              :weight.sync="impactData.waste_powered"
+              :co2.sync="impactData.co2_powered"
           />
         </b-tab>
         <b-tab title-item-class="w-50" title-link-class="smallpad" class="pt-2">
           <template slot="title">
             <div class="d-flex justify-content-between">
               <div>
-                <b>{{ __('devices.title_unpowered') }}</b> ({{ unpowered_total.toLocaleString() }})
+                <b>{{ __('devices.title_unpowered') }}</b>
+                ({{ impactData.total_unpowered.toLocaleString() }})
               </div>
-              <div class="lower text-brand font-weight-bold">
-                <b-img src="/images/trash_brand.svg" class="icon" />
-                {{ unpowered_weight.toLocaleString() }} kg
+              <div class="d-flex text-brand font-weight-bold">
+                <div class="mr-3 lower">
+                  <b-img src="/images/trash_brand.svg" class="icon" />
+                  {{ Math.round(impactData.waste_unpowered).toLocaleString() }} kg
+                </div>
+                <div class="mr-1 lower">
+                  <b-img src="/images/co2_brand.svg" class="icon" />
+                  {{ Math.round(impactData.co2_unpowered).toLocaleString() }} kg
+                </div>
               </div>
             </div>
           </template>
@@ -121,15 +129,15 @@
               :group="group"
               :from_date="from_date"
               :to_date="to_date"
-              :total.sync="unpowered_total"
-              :weight.sync="unpowered_weight"
-              :co2.sync="unpowered_co2"
+              :total.sync="impactData.total_unpowered"
+              :weight.sync="impactData.waste_unpowered"
+              :co2.sync="impactData.co2_unpowered"
           />
         </b-tab>
       </b-tabs>
     </div>
     <div class="d-block d-md-none">
-      <CollapsibleSection collapsed :count="powered_total" heading-level="h6" count-class="small">
+      <CollapsibleSection collapsed :count="impactData.total_powered" heading-level="h6" count-class="small">
         <template slot="title">
           {{ __('devices.title_powered') }}
         </template>
@@ -139,13 +147,13 @@
               <div class="mr-3 lower d-flex align-content-center">
                 <b-img src="/images/trash_brand.svg" class="iconsmall" />
                 <span class="mb-1">
-                  {{ powered_weight.toLocaleString() }}
+                  {{ Math.round(impactData.waste_powered).toLocaleString() }}
                 </span>
               </div>
               <div class="mr-1 lower d-flex">
                 <b-img src="/images/co2_brand.svg" class="iconsmall" />
                 <span class="mb-1">
-                  {{ powered_co2.toLocaleString() }}
+                  {{ Math.round(impactData.co2_powered).toLocaleString() }}
                 </span>
               </div>
             </div>
@@ -167,23 +175,29 @@
               :group="group"
               :from_date="from_date"
               :to_date="to_date"
-              :total.sync="powered_total"
-              :weight.sync="powered_weight"
-              :co2.sync="powered_co2"
+              :total.sync="impactData.total_powered"
+              :weight.sync="impactData.waste_powered"
+              :co2.sync="impactData.co2_powered"
           />
         </template>
       </CollapsibleSection>
-      <CollapsibleSection collapsed :count="unpowered_total" heading-level="h6" count-class="small">
+      <CollapsibleSection collapsed :count="impactData.total_unpowered" heading-level="h6" count-class="small">
         <template slot="title">
           {{ __('devices.title_unpowered') }}
         </template>
         <template slot="title-right">
           <div class="small mt-2">
             <div class="d-flex text-brand font-weight-bold small">
-              <div class="mr-1 lower d-flex">
+              <div class="mr-3 lower d-flex align-content-center">
                 <b-img src="/images/trash_brand.svg" class="iconsmall" />
                 <span class="mb-1">
-                  {{ unpowered_weight.toLocaleString() }}
+                  {{ Math.round(impactData.waste_unpowered).toLocaleString() }}
+                </span>
+              </div>
+              <div class="mr-1 lower d-flex">
+                <b-img src="/images/co2_brand.svg" class="iconsmall" />
+                <span class="mb-1">
+                  {{ Math.round(impactData.co2_unpowered).toLocaleString() }}
                 </span>
               </div>
             </div>
@@ -205,9 +219,9 @@
               :group="group"
               :from_date="from_date"
               :to_date="to_date"
-              :total.sync="unpowered_total"
-              :weight.sync="unpowered_weight"
-              :co2.sync="unpowered_co2"
+              :total.sync="impactData.total_unpowered"
+              :weight.sync="impactData.waste_unpowered"
+              :co2.sync="impactData.co2_unpowered"
           />
         </template>
       </CollapsibleSection>
@@ -278,12 +292,6 @@ export default {
       startExpandedItems: false,
       startExpandedEvents: false,
 
-      powered_total: 0,
-      unpowered_total: 0,
-      powered_weight: 0,
-      unpowered_weight: 0,
-      powered_co2: 0,
-      unpowered_co2: 0,
     }
   },
   created() {
