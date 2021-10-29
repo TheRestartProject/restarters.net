@@ -883,7 +883,7 @@ class Party extends Model implements Auditable
 
     public function getWastePreventedAttribute()
     {
-        return round($this->getEventStats()['waste_powered'], 2);
+        return round($this->getEventStats()['waste_total'], 2);
     }
 
     public function scopeWithAll($query)
