@@ -10,7 +10,7 @@ use App\UserGroups;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Lang;
 
-class CreateDiscourseThreadForGroup
+class CreateDiscourseGroupForGroup
 {
     /**
      * Create the event listener.
@@ -64,23 +64,43 @@ class CreateDiscourseThreadForGroup
                 }
             }
 
-            // We want the host to create the message, so use their username.  The API key should
+            // We want the host to create the group, so use their username.  The API key should
             // allow us to do this - see https://meta.discourse.org/t/how-can-an-api-user-create-posts-as-another-user/45968/3.
             $client = app('discourse-client', [
-                'username' => $host->username,
+                'username' => env('DISCOURSE_APIUSER'),
             ]);
 
-            // See https://meta.discourse.org/t/private-message-send-api/27593/21.
+            // Restricted characters allowed in name, and only 25 characters.
+            $name = str_replace(' ', '_', $group->name);
+            $name = preg_replace("/[^A-Za-z0-9_]/", '', $name);
+            $name = substr($name, 0, 25);
+
             $params = [
-                'raw' => $text,
-                'title' => $group->name,
-                'target_usernames' => $host->username,
-                'archetype' => 'private_message',
+                'group' => [
+                    'name' => $name,
+                    'full_name' => $group->name,
+                    'mentionable_level' => 3,
+                    'messageable_level' => 99,
+                    'visibility_level' => 0,
+                    'members_visibility_level' => 0,
+                    'automatic_membership_email_domains' => null,
+                    'automatic_membership_retroactive' => false,
+                    'primary_group' => false,
+                    'flair_url' => $group->groupImagePath(),
+                    'flair_bg_color' => null,
+                    'flair_color' => null,
+                    'bio_raw' => $text,
+                    'public_admission' => true,
+                    'public_exit' => true,
+                    'default_notification_level' => 3,
+                    'publish_read_state' => true,
+                    'owner_usernames' => $host->username
+                ]
             ];
 
-            $endpoint = '/posts.json';
+            $endpoint = '/admin/groups.json';
 
-            Log::info('Creating group thread: '.json_encode($params));
+            Log::info('Creating group : '.json_encode($params));
             $response = $client->request(
                 'POST',
                 $endpoint,
@@ -98,11 +118,11 @@ class CreateDiscourseThreadForGroup
                 // We want to save the discourse thread id in the group, so that we can invite people to it later
                 // when they join.
                 $json = json_decode($response->getBody(), true);
-                if (empty($json['topic_id'])) {
-                    throw new \Exception('Topic id not found in create response');
+                if (empty($json['basic_group'])) {
+                    throw new \Exception('Group not found in create response');
                 }
 
-                $group->discourse_thread = $json['topic_id'];
+                $group->discourse_group = $name;
                 $group->save();
             }
         } catch (\Exception $ex) {

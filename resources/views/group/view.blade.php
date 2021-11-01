@@ -126,7 +126,7 @@
               $api_token = $user->ensureAPIToken();
           }
 
-          $discourseThread = $group->discourse_thread ? (env('DISCOURSE_URL').'/t/'.$group->discourse_thread) : null;
+          $discourseGroup = $group->discourse_group ? (env('DISCOURSE_URL').'/g/'.$group->discourse_group) : null;
 
           ?>
 
@@ -151,7 +151,7 @@
               calendar-edit-url="{{ $showCalendar ? url("/profile/edit/{$user->id}#list-calendar-links") : '' }}"
               :ingroup="{{ $in_group ? 'true' : 'false' }}"
               api-token="{{ $api_token }}"
-              discourse-thread="{{ $discourseThread }}"
+              discourse-group="{{ $discourseGroup }}"
           />
       </div>
   </div>

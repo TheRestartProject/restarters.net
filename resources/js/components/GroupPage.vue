@@ -13,7 +13,7 @@
 
     <div class="d-flex flex-wrap">
       <div class="w-xs-100 w-md-50">
-        <GroupDescription class="pr-md-3" :idgroups="idgroups" :discourse-thread="discourseThread" />
+        <GroupDescription class="pr-md-3" :idgroups="idgroups" :discourse-group="discourseGroup" />
       </div>
       <div class="w-xs-100 w-md-50">
         <GroupVolunteers class="pl-md-3" :idgroups="idgroups" :canedit="canedit" />
@@ -134,7 +134,7 @@ export default {
       type: Array,
       required: true
     },
-    discourseThread: {
+    discourseGroup: {
       type: String,
       required: false,
       default: null

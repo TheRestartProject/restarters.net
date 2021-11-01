@@ -11,12 +11,12 @@
           </p>
           <read-more v-else :html="group.free_text" class="mt-2" :max-chars="440" :more-str="__('groups.read_more')" :less-str="__('groups.read_less')" />
         </div>
-        <div class="d-flex pt-1 pb-1" v-if="discourseThread">
+        <div class="d-flex pt-1 pb-1" v-if="discourseGroup">
           <div class="mr-2">
             <b-img-lazy src="/icons/talk_ico.svg" class="icon" />
           </div>
           <div>
-            <a :href="discourseThread">{{ __('groups.talk_thread') }}</a>
+            <a :href="discourseGroup">{{ __('groups.talk_group') }}</a>
           </div>
         </div>
       </div>
@@ -38,7 +38,7 @@ export default {
       type: Number,
       required: true
     },
-    discourseThread: {
+    discourseGroup: {
       type: String,
       required: false,
       default: null

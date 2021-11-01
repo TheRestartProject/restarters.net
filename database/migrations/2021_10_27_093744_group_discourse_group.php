@@ -4,7 +4,7 @@ use Illuminate\Support\Facades\Schema;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Database\Migrations\Migration;
 
-class GroupDiscourseThread extends Migration
+class GroupDiscourseGroup extends Migration
 {
     /**
      * Run the migrations.
@@ -14,7 +14,7 @@ class GroupDiscourseThread extends Migration
     public function up()
     {
         Schema::table('groups', function (Blueprint $table) {
-            $table->string('discourse_thread', 255)->nullable();
+            $table->string('discourse_group', 255)->nullable();
         });
     }
 
@@ -25,8 +25,8 @@ class GroupDiscourseThread extends Migration
      */
     public function down()
     {
-        Schema::table('events', function (Blueprint $table) {
-            $table->dropColumn('discourse_thread');
+        Schema::table('groups', function (Blueprint $table) {
+            $table->dropColumn('discourse_group');
         });
     }
 }
