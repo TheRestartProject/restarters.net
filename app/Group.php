@@ -61,6 +61,14 @@ class Group extends Model implements Auditable
         static::addGlobalScope('all_restarters_count', function ($builder) {
             $builder->withCount('allRestarters');
         });
+
+        static::addGlobalScope('all_confirmed_hosts_count', function ($builder) {
+            $builder->withCount('allConfirmedHosts');
+        });
+
+        static::addGlobalScope('all_confirmed_restarters_count', function ($builder) {
+            $builder->withCount('allConfirmedRestarters');
+        });
     }
 
     public function addTag($tag)
@@ -204,12 +212,12 @@ class Group extends Model implements Auditable
 
     public function allHosts()
     {
-        return $this->hasMany(\App\UserGroups::class, 'group', 'idgroups')->where('role', 3);
+        return $this->hasMany(\App\UserGroups::class, 'group', 'idgroups')->where('role', Role::HOST);
     }
 
     public function allRestarters()
     {
-        return $this->hasMany(\App\UserGroups::class, 'group', 'idgroups')->where('role', 4);
+        return $this->hasMany(\App\UserGroups::class, 'group', 'idgroups')->where('role', Role::RESTARTER);
     }
 
     public function allVolunteers()
