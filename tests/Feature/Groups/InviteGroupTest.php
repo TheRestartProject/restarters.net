@@ -41,6 +41,19 @@ class InviteGroupTest extends TestCase
         $response = $this->get('/group/view/' . $group->idgroups);
         $response->assertSee('You have an invitation to this group.');
 
+        // Check the counts.
+        $props = $this->assertVueProperties($response, [
+            [
+                ':idgroups' => $group->idgroups
+            ],
+        ]);
+
+        $initialGroup = json_decode($props[0][':initial-group'], TRUE);
+        $this->assertEquals(0, $initialGroup['all_hosts_count']);
+        $this->assertEquals(0, $initialGroup['all_confirmed_hosts_count']);
+        $this->assertEquals(1, $initialGroup['all_restarters_count']);
+        $this->assertEquals(0, $initialGroup['all_confirmed_restarters_count']);
+
         // Now accept the invite.
         preg_match('/href="(\/group\/accept-invite.*?)"/', $response->getContent(), $matches);
         $invitation = $matches[1];
@@ -49,5 +62,19 @@ class InviteGroupTest extends TestCase
         $redirectTo = $response->getTargetUrl();
         $this->assertNotFalse(strpos($redirectTo, '/group/view/' . $group->idgroups));
         $response->assertSessionHas('success');
+
+        // Check the counts have changed.
+        $response = $this->get('/group/view/' . $group->idgroups);
+        $props = $this->assertVueProperties($response, [
+            [
+                ':idgroups' => $group->idgroups
+            ],
+        ]);
+
+        $initialGroup = json_decode($props[0][':initial-group'], TRUE);
+        $this->assertEquals(0, $initialGroup['all_hosts_count']);
+        $this->assertEquals(0, $initialGroup['all_confirmed_hosts_count']);
+        $this->assertEquals(1, $initialGroup['all_restarters_count']);
+        $this->assertEquals(1, $initialGroup['all_confirmed_restarters_count']);
     }
 }

@@ -55,7 +55,8 @@ fi
 
 if [[ $ALL || $BUILD_ASSETS ]]; then
 banner "Building assets"
-export NODE_OPTIONS=--max-old-space-size=8192 npm run prod
+NODE_OPTIONS=--max-old-space-size=8192
+npm run prod
 echo -e "\nDone."
 fi
 
