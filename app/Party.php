@@ -3,11 +3,14 @@
 namespace App;
 
 use App\Device;
+use App\Events\ApproveEvent;
 use App\EventUsers;
 use App\Helpers\Fixometer;
+use App\Notifications\NotifyRestartersOfNewEvent;
 use Auth;
 use Carbon\Carbon;
 use DB;
+use Notification;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Support\Str;
@@ -880,7 +883,7 @@ class Party extends Model implements Auditable
 
     public function getWastePreventedAttribute()
     {
-        return round($this->getEventStats()['waste_powered'], 2);
+        return round($this->getEventStats()['waste_total'], 2);
     }
 
     public function scopeWithAll($query)
@@ -930,5 +933,32 @@ class Party extends Model implements Auditable
     public function canDelete() {
         $stats = $this->getEventStats();
         return $stats['devices_powered'] == 0 && $stats['devices_unpowered'] == 0;
+    }
+
+    public function approve() {
+        $group = Group::find($this->group);
+
+        // Only send notifications if the event is in the future.
+        // We don't want to send emails to Restarters about past events being added.
+        if ($this->isUpcoming()) {
+            // Retrieving all users from the User model whereby they allow you send emails but their role must not include group admins
+            $group_restarters = User::join('users_groups', 'users_groups.user', '=', 'users.id')
+                ->where('users_groups.group', $this->group)
+                ->where('users_groups.role', 4)
+                ->select('users.*')
+                ->get();
+
+            // If there are restarters against the group
+            if (! $group_restarters->isEmpty()) {
+                // Send user a notification and email
+                Notification::send($group_restarters, new NotifyRestartersOfNewEvent([
+                                                                                         'event_venue' => $this->venue,
+                                                                                         'event_url' => url('/party/view/'.$this->idevents),
+                                                                                         'event_group' => $group->name,
+                                                                                     ]));
+            }
+        }
+
+        event(new ApproveEvent($this));
     }
 }

@@ -9,7 +9,7 @@ use Illuminate\Database\Eloquent\Model;
 class Category extends Model
 {
     protected $table = 'categories';
-    private $revision = 1;
+    private $revision = 2;
     protected $primaryKey = 'idcategories';
     public $timestamps = false;
     /**
