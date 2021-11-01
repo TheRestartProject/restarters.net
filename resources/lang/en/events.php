@@ -3,7 +3,6 @@
 return [
   'field_event_name_helper' => 'Name of the venue or neighbourhood',
   'field_venue_helper' => 'I.e. the place where the fixing happens!',
-  'field_event_link_helper' => 'Optional web link',
   'create_event' => 'Create event',
   'warning_volunteers_message' => 'Please note that the number of volunteers does not match the attendance record.  Do you need to add or remove volunteers?',
   'events_title_admin' => 'Events to moderate',
@@ -94,10 +93,8 @@ return [
   'field_event_county' => 'County/State',
   'field_event_zip' => 'Post/Zip code',
   'field_event_country' => 'Country',
-  'field_event_link' => 'Event link',
   'field_add_image' => 'Add images',
   'before_submit_text' => 'Once confirmed by a coordinator, your event will be made public.',
-  'before_submit_text_autoapproved' => 'When you create or save this event, it will be made public.',
   'reporting' => 'Event Reporting',
   'events-filter' => 'Events filter',
   'download-results' => 'Download Results (CSV)',
@@ -173,7 +170,6 @@ return [
   'event_log' => 'Event log',
   'add_new_event' => 'Add new event',
   'created_success_message' => 'Event created!  It will be approved by a coordinator shortly.  You can continue to edit it in the meantime.',
-  'created_success_message_autoapproved' => 'Event created! It is now public.',
   'items_fixed' => 'Items fixed',
   'not_counting' => 'Not counting toward this event\'s environmental impact is|Not counting toward this event\'s environmental impact are',
   'impact_calculation' => '<p><strong>How do we calculate environmental impact?</strong></p>
@@ -209,5 +205,9 @@ return [
   'search_start_placeholder' => 'From...',
   'search_end_placeholder' => 'To...',
   'invite_when_approved' => 'You can only invite volunteers when this event has been approved',
-  'address_error' => 'The address you entered could not be found.  Please try a more general address, and enter any more specific address details in the event description.'
+  'field_event_link_helper' => 'Optional web link',
+  'field_event_link' => 'Event link',
+  'address_error' => 'The address you entered could not be found.  Please try a more general address, and enter any more specific address details in the event description.',
+  'before_submit_text_autoapproved' => 'When you create or save this event, it will be made public.',
+  'created_success_message_autoapproved' => 'Event created! It is now public.',
 ];

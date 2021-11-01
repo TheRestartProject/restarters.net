@@ -201,4 +201,5 @@ return [
   'search_start_placeholder' => 'À...',
   'search_title_placeholder' => 'Recherche un titre...',
   'talk_thread' => 'Voir la conversation de l\'événement',
+  'invite_when_approved' => 'Vous pourrez inviter des bénévoles uniquement quand cet événement aura été approuvé.',
 ];
