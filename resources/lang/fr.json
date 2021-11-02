@@ -43,8 +43,6 @@
     "PC accessory": "Accessoires PC",
     "Printer\/scanner": "Imprimante\/scanner",
     "Digital compact camera": "Appareil photo digital compact",
-    "DLSR \/ Video Camera": "Appareil photo numérique\/Reflex",
-    "DSLR\/video camera": "Appareil photo numérique\/Reflex",
     "Handheld entertainment device": "Appareil de divertissement portable",
     "Mobile": "Téléphone portable",
     "Tablet": "Tablette",
@@ -71,10 +69,6 @@
     "Bicycle": "Vélos",
     "Clothing\/textile": "Vêtements",
     "Misc": "Divers",
-    "Coffee maker": "Coffee maker",
-    "Iron": "Iron",
-    "Hand tool": "Hand tool",
-    "Jewellery": "Jewellery",
     "Power\/battery": "Alimentation\/batterie",
     "Screen": "Écran",
     "Stuck booting": "Coincé démarrage",
@@ -133,6 +127,7 @@
     "Waste toner\/ink box": "Bac de récupération de toner",
     "Poor data": "Données incomplètes",
     "Battery\/charger\/adapter": "Batterie\/chargeur\/adaptateur",
+    "DSLR\/video camera": "Appareil photo numérique\/Reflex",
     "Flat screen": "Ecran plat",
     "Food processor": "Robot de cuisine",
     "Games console": "Console de jeux",
@@ -153,5 +148,9 @@
     "New battery too expensive": "Nouvelle batterie trop chère",
     "Replace the charger or charging cable": "Remplacer le chargeur ou le câble de chargement",
     "Replace with new battery": "Remplacer par une nouvelle batterie",
-    "Unrepairable corrosion or leakage": "Corrosion ou fuite irréparable"
+    "Unrepairable corrosion or leakage": "Corrosion ou fuite irréparable",
+    "Coffee maker": "Coffee maker",
+    "Iron": "Iron",
+    "Hand tool": "Hand tool",
+    "Jewellery": "Jewellery"
 }
