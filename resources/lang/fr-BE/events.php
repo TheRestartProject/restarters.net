@@ -202,4 +202,9 @@ return [
   'search_title_placeholder' => 'Recherche un titre...',
   'talk_thread' => 'Voir la conversation de l\'événement',
   'invite_when_approved' => 'Vous pourrez inviter des bénévoles uniquement quand cet événement aura été approuvé.',
+  'address_error' => 'L\'adresse que vous avez encodé n\'a pas pu être trouvée. Veuillez essayer une adresse plus générale, et encodez les détails plus spécifiques dans la description de l\'événement.',
+  'before_submit_text_autoapproved' => 'Quand vous créez ou sauvez cet événement, il sera rendu public.',
+  'created_success_message_autoapproved' => 'Evénement créé! Il est maintenant public.',
+  'field_event_link' => 'Lien de l\'événement',
+  'field_event_link_helper' => 'Lien web optionnel',
 ];
