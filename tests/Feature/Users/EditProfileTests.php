@@ -102,8 +102,8 @@ class EditProfileTests extends TestCase
         $this->assertEquals(51.507, round($user->latitude, 3));
         $this->assertEquals(-0.128, round($user->longitude, 3));
 
-        $good = Config::set(['GOOGLE_API_CONSOLE_KEY']);
-        config(['GOOGLE_API_CONSOLE_KEY' => 'zzz']);
+        $good = Config::get(['GOOGLE_API_CONSOLE_KEY']);
+        Config::set(['GOOGLE_API_CONSOLE_KEY' => 'zzz']);
 
         $this->post('/profile/edit-info', [
             'name' => $user->name,

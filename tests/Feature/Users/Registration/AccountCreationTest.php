@@ -46,8 +46,8 @@ class AccountCreationTest extends TestCase
         $userAttributes = $this->userAttributes();
 
         // Specify an invalid city and force geocoding to fail by invalidating the Google key.
-        $good = Config::set(['GOOGLE_API_CONSOLE_KEY']);
-        config(['GOOGLE_API_CONSOLE_KEY' => 'zzz']);
+        $good = Config::get(['GOOGLE_API_CONSOLE_KEY']);
+        Config::set(['GOOGLE_API_CONSOLE_KEY' => 'zzz']);
 
         $userAttributes['city'] = 'zzzzzzz';
         $response = $this->post('/user/register/', $userAttributes);
