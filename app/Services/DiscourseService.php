@@ -3,6 +3,7 @@
 namespace App\Services;
 
 use App\Group;
+use App\UserGroups;
 use Auth;
 use Illuminate\Support\Facades\Log;
 
@@ -232,8 +233,8 @@ class DiscourseService
                 if ($group && $group->discourse_group && $group->discourse_group == $discourseGroup['name']) {
                     Log::debug("Restarters group $id, {$group->discourse_group} is Discourse group {$discourseGroup['id']}");
                     $discourseGroupForRestartersGroup[$id] = [
-                        'id' => $discourseGroup['id'],
-                        'name' => $group->discourse_group
+                        'discourseId' => $discourseGroup['id'],
+                        'discourseName' => $group->discourse_group
                     ];
                 }
             }
@@ -241,8 +242,10 @@ class DiscourseService
 
         foreach ($discourseGroupForRestartersGroup as $restartId => $info)
         {
-            $discourseId = $info['id'];
-            $discourseName = $info['name'];
+            $discourseId = $info['discourseId'];
+            $discourseName = $info['discourseName'];
+            $group = Group::find($restartId);
+
             Log::debug("Sync members for $restartId => $discourseId $discourseName");
 
             // TODO The Discourse API accepts up to around 1000 as the limit.  This is plenty for now, but
@@ -270,9 +273,26 @@ class DiscourseService
                 }
 
                 // TODO Check members against Restarters members.
-                $discourseMembers = $discourseResult['members'];
+                $discourseMembers = array_column($discourseResult['members'], 'id');
+                $restartersMembers = UserGroups::where('group', $restartId)->where('status', '=', 1)->pluck('user');
 
-                // Check Restarters members against Discourse
+                Log::debug(count($discourseMembers) . " Discourse members vs " . count($restartersMembers) . " on Restarters");
+                Log::debug("Discourse Members " . json_encode($discourseMembers));
+                Log::debug("Restarter Members " . json_encode($restartersMembers));
+
+                foreach ($discourseMembers as $discourseMember) {
+                    if (!in_array($discourseMember, $restartersMembers)) {
+                        Log::info("Remove Discourse member $discourseMember from $discourseName as no longer a member on Restarters");
+                        // TODO Implement.
+                    }
+                }
+
+                foreach ($restartersMembers as $restartersMember) {
+                    if (!in_array($restartersMember, $discourseMembers)) {
+                        Log::info("Add Restarter user #$restartersMember to Discourse group $discourseName");
+                        // TODO Implement.
+                    }
+                }
             }
         }
     }

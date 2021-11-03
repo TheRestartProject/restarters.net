@@ -40,7 +40,7 @@ class SyncDiscourseGroups extends Command
      */
     public function handle()
     {
-        $this->discourseService->syncUsersToGroups();
+//        error_log("Handle");
 //        $client = app('discourse-client', [
 //            'username' => 'neil',
 //        ]);
@@ -89,5 +89,7 @@ class SyncDiscourseGroups extends Command
 //
 //        error_log('Response status: '.$response->getStatusCode());
 //        error_log('Response body: '.$response->getBody());
+
+        $this->discourseService->syncUsersToGroups();
     }
 }
