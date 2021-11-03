@@ -10,7 +10,7 @@ class Geocoder
 
     public function geocode($location)
     {
-        $json = file_get_contents('https://maps.googleapis.com/maps/api/geocode/json?address='.urlencode($location).'&key='.env('GOOGLE_API_CONSOLE_KEY'));
+        $json = file_get_contents('https://maps.googleapis.com/maps/api/geocode/json?address='.urlencode($location).'&key='.config('GOOGLE_API_CONSOLE_KEY'));
 
         if ($json) {
             $res = json_decode($json);
@@ -40,7 +40,7 @@ class Geocoder
 
     public function reverseGeocode($lat, $lng)
     {
-        $json = file_get_contents("https://maps.googleapis.com/maps/api/geocode/json?latlng=$lat,$lng&key=".env('GOOGLE_API_CONSOLE_KEY'));
+        $json = file_get_contents("https://maps.googleapis.com/maps/api/geocode/json?latlng=$lat,$lng&key=".config('GOOGLE_API_CONSOLE_KEY'));
 
         $decoded = json_decode($json)->results[0];
 
