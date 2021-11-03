@@ -92,7 +92,6 @@ return [
   'choose_barriers' => 'Choose barriers to repair',
   'choose_spare_parts' => 'Spare parts',
   'choose_next_steps' => 'Next steps',
-  'please_choose' => 'Please choose...',
   'add_device_button' => 'Add',
   'item_type' => 'Item Type',
   'add_device_powered' => 'Add Powered Item',
@@ -117,4 +116,5 @@ return [
   'copied_to_clipboard' => 'Copied to clipboard.',
   'total' => 'total',
   'remove' => 'remove',
+  'please_choose' => 'Please choose...',
 ];

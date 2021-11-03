@@ -46,7 +46,7 @@ export default {
       if (ret && ret.data && ret.data.success) {
         commit('remove', params.id)
       } else {
-        throw new Exception("Server request failed")
+        throw "Server request failed"
       }
     }
   },

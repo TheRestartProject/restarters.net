@@ -110,7 +110,7 @@ class GroupController extends Controller
             return redirect('/user/forbidden');
         }
 
-        if ($request->isMethod('post') && ! empty($request->post())) {
+        if ($request->isMethod('post') && !empty($request->post())) {
             $error = [];
 
             $name = $request->input('name');
@@ -122,17 +122,17 @@ class GroupController extends Controller
                 $error['name'] = 'Please input a name.';
             }
 
-            if (! empty($location)) {
+            if (!empty($location)) {
                 $geocoded = $geocoder->geocode($location);
 
                 if (empty($geocoded)) {
                     $response['danger'] = __('groups.geocode_failed');
 
                     return view('group.create', [
-                      'title' => 'New Group',
-                      'gmaps' => true,
-                      'response' => $response,
-                  ]);
+                        'title' => 'New Group',
+                        'gmaps' => true,
+                        'response' => $response,
+                    ]);
                 }
 
                 $latitude = $geocoded['latitude'];
@@ -171,20 +171,20 @@ class GroupController extends Controller
 
                         //Associate current logged in user as a host
                         UserGroups::create([
-                                               'user' => Auth::user()->id,
-                                               'group' => $idGroup,
-                                               'status' => 1,
-                                               'role' => 3,
-                                           ]);
+                            'user' => Auth::user()->id,
+                            'group' => $idGroup,
+                            'status' => 1,
+                            'role' => 3,
+                        ]);
 
                         // Notify relevant admins
                         $notify_admins = Fixometer::usersWhoHavePreference('admin-moderate-group');
                         Notification::send($notify_admins, new AdminModerationGroup([
-                                                                                        'group_name' => $name,
-                                                                                        'group_url' => url('/group/edit/'.$idGroup),
-                                                                                    ]));
+                            'group_name' => $name,
+                            'group_url' => url('/group/edit/' . $idGroup),
+                        ]));
 
-                        if (isset($_FILES) && ! empty($_FILES)) {
+                        if (isset($_FILES) && !empty($_FILES)) {
                             $file = new FixometerFile;
                             $file->upload('file', 'image', $idGroup, env('TBL_GROUPS'), false, true);
                         }
@@ -205,22 +205,22 @@ class GroupController extends Controller
                 $response['danger'] = __('groups.create_failed');
             }
 
-            if (! isset($response)) {
+            if (!isset($response)) {
                 $response = null;
             }
 
-            if (! isset($error)) {
+            if (!isset($error)) {
                 $error = null;
             }
 
-            if (! isset($_POST)) {
+            if (!isset($_POST)) {
                 $udata = null;
             } else {
                 $udata = $_POST;
             }
 
             if (is_numeric($idGroup) && $idGroup !== false) {
-                return redirect('/group/edit/'.$idGroup)->with('response', $response);
+                return redirect('/group/edit/' . $idGroup)->with('response', $response);
             }
 
             return view('group.create', [
@@ -256,7 +256,7 @@ class GroupController extends Controller
                 }
 
                 $volunteer['fullName'] = $volunteer->name;
-                $volunteer['profilePath'] = '/uploads/thumbnail_'.$volunteer->volunteer->getProfile($volunteer->volunteer->id)->path;
+                $volunteer['profilePath'] = '/uploads/thumbnail_' . $volunteer->volunteer->getProfile($volunteer->volunteer->id)->path;
                 $ret[] = $volunteer;
             }
         }
@@ -290,14 +290,14 @@ class GroupController extends Controller
             unset($groups[0]);
         }
 
-        if (! $group) {
+        if (!$group) {
             return abort(404, 'Invalid group.');
         }
 
         $allPastEvents = Party::pastEvents()
-        ->with('devices.deviceCategory')
-        ->where('events.group', $group->idgroups)
-        ->get();
+            ->with('devices.deviceCategory')
+            ->where('events.group', $group->idgroups)
+            ->get();
 
         $Device->ofThisGroup($group->idgroups);
 
@@ -334,26 +334,26 @@ class GroupController extends Controller
             $mostleast[$i]['least_repaired'] = $Device->findMostSeen(3, $i, $group->idgroups);
         }
 
-        if (! isset($response)) {
+        if (!isset($response)) {
             $response = null;
         }
 
         //Event tabs
         $upcoming_events = Party::upcomingEvents()
-        ->where('events.group', $group->idgroups)
-        ->get();
+            ->where('events.group', $group->idgroups)
+            ->get();
 
         $past_events = Party::pastEvents()
-        ->where('events.group', $group->idgroups)
-        ->get();
+            ->where('events.group', $group->idgroups)
+            ->get();
 
         //Checking user for validatity
-        $in_group = ! empty(UserGroups::where('group', $groupid)
-        ->where('user', $user->id)
-        ->where(function ($query) {
-            $query->where('status', '1')
-            ->orWhereNull('status');
-        })->first());
+        $in_group = !empty(UserGroups::where('group', $groupid)
+            ->where('user', $user->id)
+            ->where(function ($query) {
+                $query->where('status', '1')
+                    ->orWhereNull('status');
+            })->first());
 
         $is_host_of_group = Fixometer::userHasEditGroupPermission($groupid, $user->id);
         $isCoordinatorForGroup = $user->isCoordinatorForGroup($group);
@@ -446,14 +446,14 @@ class GroupController extends Controller
             // not already a confirmed member of the group
             if (is_null($user_group) || $user_group->status != '1') {
                 $hash = substr(bin2hex(openssl_random_pseudo_bytes(32)), 0, 24);
-                $url = url('/').'/group/accept-invite/'.$group_id.'/'.$hash;
+                $url = url('/') . '/group/accept-invite/' . $group_id . '/' . $hash;
 
                 // already been invited once, set a new invite hash
-                if (! is_null($user_group)) {
+                if (!is_null($user_group)) {
                     $user_group->update([
                         'status' => $hash,
                     ]);
-                // not associated with the group at all yet
+                    // not associated with the group at all yet
                 } else {
                     UserGroups::create([
                         'user' => $user->id,
@@ -479,10 +479,10 @@ class GroupController extends Controller
         }
 
         // users not on the platform
-        if (! empty($non_users)) {
+        if (!empty($non_users)) {
             foreach ($non_users as $non_user) {
                 $hash = substr(bin2hex(openssl_random_pseudo_bytes(32)), 0, 24);
-                $url = url('/user/register/'.$hash);
+                $url = url('/user/register/' . $hash);
 
                 $invite = Invite::create([
                     'record_id' => $group_id,
@@ -500,11 +500,11 @@ class GroupController extends Controller
             }
         }
 
-        if (! isset($not_sent)) {
+        if (!isset($not_sent)) {
             return redirect()->back()->with('success', 'Invites sent!');
         }
 
-        return redirect()->back()->with('warning', 'Invites sent - apart from these ('.rtrim(implode(', ', $not_sent), ', ').') who have already joined the group, have already been sent an invite, or have not opted in to receive emails');
+        return redirect()->back()->with('warning', 'Invites sent - apart from these (' . rtrim(implode(', ', $not_sent), ', ') . ') who have already joined the group, have already been sent an invite, or have not opted in to receive emails');
     }
 
     public function confirmInvite($group_id, $hash)
@@ -512,7 +512,7 @@ class GroupController extends Controller
         // Find user/group relationship based on the invitation hash.
         $user_group = UserGroups::where('status', $hash)->where('group', $group_id)->first();
         if (empty($user_group)) {
-            return redirect('/group/view/'.intval($group_id))->with('warning', 'Something went wrong - this invite is invalid or has expired');
+            return redirect('/group/view/' . intval($group_id))->with('warning', 'Something went wrong - this invite is invalid or has expired');
         }
 
         // Set user as confirmed member of group.
@@ -525,20 +525,20 @@ class GroupController extends Controller
         $user = User::find($user_group->user);
 
         $group_hosts = User::join('users_groups', 'users_groups.user', '=', 'users.id')
-                        ->where('users_groups.group', $group_id)
-                          ->where('users_groups.role', 3)
-                            ->select('users.*')
-                              ->get();
+            ->where('users_groups.group', $group_id)
+            ->where('users_groups.role', 3)
+            ->select('users.*')
+            ->get();
 
-        if (! empty($group_hosts)) {
+        if (!empty($group_hosts)) {
             Notification::send($group_hosts, new NewGroupMember([
                 'user_name' => $user->name,
                 'group_name' => Group::find($group_id)->name,
-                'group_url' => url('/group/view/'.$group_id),
+                'group_url' => url('/group/view/' . $group_id),
             ]));
         }
 
-        return redirect('/group/view/'.$user_group->group)->with('success', 'Excellent! You have joined the group');
+        return redirect('/group/view/' . $user_group->group)->with('success', 'Excellent! You have joined the group');
     }
 
     public function edit(Request $request, $id, Geocoder $geocoder)
@@ -551,20 +551,20 @@ class GroupController extends Controller
         $is_host_of_group = Fixometer::userHasEditGroupPermission($id, $user->id);
         $isCoordinatorForGroup = $user->isCoordinatorForGroup($group);
 
-        if (! Fixometer::hasRole($user, 'Administrator') && ! $is_host_of_group && ! $isCoordinatorForGroup) {
+        if (!Fixometer::hasRole($user, 'Administrator') && !$is_host_of_group && !$isCoordinatorForGroup) {
             abort(403);
         }
 
         $networks = Network::all();
 
-        if ($request->isMethod('post') && ! empty($request->post())) {
+        if ($request->isMethod('post') && !empty($request->post())) {
             $data = $request->post();
 
             // Remove some inputs.  Probably these aren't present any more, but it does no harm to ensure that.
             unset($data['files']);
             unset($data['image']);
 
-            if (! empty($data['location'])) {
+            if (!empty($data['location'])) {
                 $geocoded = $geocoder->geocode($data['location']);
 
                 if (empty($geocoded)) {
@@ -575,23 +575,23 @@ class GroupController extends Controller
                     $group_tags = GrouptagsGroups::where('group', $id)->pluck('group_tag')->toArray();
                     $group_networks = $group->networks->pluck('id')->toArray();
 
-                    if (! isset($images)) {
+                    if (!isset($images)) {
                         $images = null;
                     }
 
                     return view('group.edit', [
-                      'response' => $response,
-                      'gmaps' => true,
-                      'title' => 'Edit Group '.$group->name,
-                      'formdata' => $group,
-                      'user' => $user,
-                      'images' => $images,
-                      'tags' => $tags,
-                      'group_tags' => $group_tags,
-                      'networks' => $networks,
-                      'group_networks' => $group_networks,
-                      'audits' => $group->audits,
-                  ]);
+                        'response' => $response,
+                        'gmaps' => true,
+                        'title' => 'Edit Group ' . $group->name,
+                        'formdata' => $group,
+                        'user' => $user,
+                        'images' => $images,
+                        'tags' => $tags,
+                        'group_tags' => $group_tags,
+                        'networks' => $networks,
+                        'group_networks' => $group_networks,
+                        'audits' => $group->audits,
+                    ]);
                 }
 
                 $latitude = $geocoded['latitude'];
@@ -633,39 +633,39 @@ class GroupController extends Controller
             $u = Group::findOrFail($id)->update($update);
 
             if (Fixometer::hasRole($user, 'Administrator')) {
-                if (! empty($_POST['group_tags'])) {
+                if (!empty($_POST['group_tags'])) {
                     $Group->find($id)->group_tags()->sync($_POST['group_tags']);
                 } else {
                     $Group->find($id)->group_tags()->sync([]);
                 }
 
-                if (! empty($request->input('group_networks'))) {
+                if (!empty($request->input('group_networks'))) {
                     Group::find($id)->networks()->sync($request->input('group_networks'));
                 } else {
                     Group::find($id)->networks()->sync([]);
                 }
             }
 
-            if (! $u) {
+            if (!$u) {
                 $response['danger'] = 'Something went wrong. Please check the data and try again.';
                 echo $response['danger'];
             } else {
                 $response['success'] = 'Group updated!';
 
-                if (isset($_FILES['file']) && ! empty($_FILES['file']) && $_FILES['file']['error'] != 4) {
+                if (isset($_FILES['file']) && !empty($_FILES['file']) && $_FILES['file']['error'] != 4) {
                     $existing_image = Fixometer::hasImage($id, 'groups', true);
-                    if (! empty($existing_image)) {
+                    if (!empty($existing_image)) {
                         // TODO This case looks like it's worth considering.
                         //$Group = new Group;
-                      //$Group->removeImage($id, $existing_image[0]);
+                        //$Group->removeImage($id, $existing_image[0]);
                     }
                     $file = new FixometerFile;
                     $group_avatar = $file->upload('file', 'image', $id, env('TBL_GROUPS'), false, true);
-                    $group_avatar = env('UPLOADS_URL').'mid_'.$group_avatar;
+                    $group_avatar = env('UPLOADS_URL') . 'mid_' . $group_avatar;
                 } else {
                     $existing_image = Fixometer::hasImage($id, 'groups', true);
-                    if (! empty($existing_image)) {
-                        $group_avatar = env('UPLOADS_URL').'mid_'.$existing_image[0]->path;
+                    if (!empty($existing_image)) {
+                        $group_avatar = env('UPLOADS_URL') . 'mid_' . $existing_image[0]->path;
                     } else {
                         $group_avatar = 'null';
                     }
@@ -682,17 +682,17 @@ class GroupController extends Controller
                     event(new ApproveGroup($group, $data));
 
                     // Notify nearest users.
-                    if (! is_null($latitude) && ! is_null($longitude)) {
+                    if (!is_null($latitude) && !is_null($longitude)) {
                         $restarters_nearby = User::nearbyRestarters($latitude, $longitude, 25)
-                                                ->orderBy('name', 'ASC')
-                                                  ->get();
+                            ->orderBy('name', 'ASC')
+                            ->get();
 
                         Notification::send($restarters_nearby, new NewGroupWithinRadius([
                             'group_name' => $group->name,
-                            'group_url' => url('/group/view/'.$id),
+                            'group_url' => url('/group/view/' . $id),
                         ]));
                     }
-                } elseif (! empty($group->wordpress_post_id)) {
+                } elseif (!empty($group->wordpress_post_id)) {
                     event(new EditGroup($group, $data));
                 }
             }
@@ -700,13 +700,13 @@ class GroupController extends Controller
 
         $group = $Group->findOne($id);
 
-        if (! isset($response)) {
+        if (!isset($response)) {
             $response = null;
         }
 
         $images = $File->findImages(env('TBL_GROUPS'), $id);
 
-        if (! isset($images)) {
+        if (!isset($images)) {
             $images = null;
         }
 
@@ -720,7 +720,7 @@ class GroupController extends Controller
         return view('group.edit', [
             'response' => $response,
             'gmaps' => true,
-            'title' => 'Edit Group '.$group->name,
+            'title' => 'Edit Group ' . $group->name,
             'formdata' => $group,
             'user' => $user,
             'images' => $images,
@@ -757,7 +757,7 @@ class GroupController extends Controller
 
             $r = $group->delete($id);
 
-            if (! $r) {
+            if (!$r) {
                 return redirect('/user/forbidden');
             } else {
                 return redirect('/group')->with('success', __('groups.delete_succeeded', [
@@ -783,11 +783,13 @@ class GroupController extends Controller
                     'idgroups' => $group['idgroups'],
                     'name' => $group['name'],
                     'image' => (is_object($group_image) && is_object($group_image->image)) ?
-                        asset('uploads/mid_'.$group_image->image->path) : null,
+                        asset('uploads/mid_' . $group_image->image->path) : null,
                     'location' => rtrim($group['location']),
                     'next_event' => $event ? $event['event_date'] : null,
                     'all_restarters_count' => $group->all_restarters_count,
                     'all_hosts_count' => $group->all_hosts_count,
+                    'all_confirmed_restarters_count' => $group->all_confirmed_restarters_count,
+                    'all_confirmed_hosts_count' => $group->all_confirmed_hosts_count,
                     'networks' => Arr::pluck($group->networks, 'id'),
                     'country' => $group->country,
                     'group_tags' => $group->group_tags()->get()->pluck('id'),
@@ -817,26 +819,10 @@ class GroupController extends Controller
     {
         $groups = Group::join('grouptags_groups', 'grouptags_groups.group', '=', 'groups.idgroups')
             ->where('grouptags_groups.group_tag', $group_tag_id)
-              ->select('groups.*')
-                ->get();
+            ->select('groups.*')
+            ->get();
 
-        $groupStats = [
-            'pax' => 0,
-            'hours' => 0,
-            'parties' => 0,
-            'co2' => 0,
-            'waste' => 0,
-            'ewaste' => 0,
-            'unpowered_waste' => 0,
-            'fixed_devices' => 0,
-            'fixed_powered' => 0,
-            'fixed_unpowered' => 0,
-            'repairable_devices' => 0,
-            'dead_devices' => 0,
-            'no_weight' => 0,
-            'devices_powered' => 0,
-            'devices_unpowered' => 0,
-        ];
+        $groupStats = \App\Group::getGroupStatsArrayKeys();
 
         // Loop through all groups and increase the values for groupStats
         foreach ($groups as $group) {
@@ -863,9 +849,9 @@ class GroupController extends Controller
     {
         $user_id = Auth::id();
         $alreadyInGroup = UserGroups::where('group', $group_id)
-        ->where('user', $user_id)
-        ->where('status', 1)
-        ->exists();
+            ->where('user', $user_id)
+            ->where('status', 1)
+            ->exists();
 
         if ($alreadyInGroup) {
             $response['warning'] = 'You are already part of this group';
@@ -895,18 +881,18 @@ class GroupController extends Controller
                 $arr = [
                     'user_name' => Auth::user()->name,
                     'group_name' => $group->name,
-                    'group_url' => url('/group/view/'.$group->idgroups),
-                    'preferences' => url('/profile/edit/'.$host->id),
+                    'group_url' => url('/group/view/' . $group->idgroups),
+                    'preferences' => url('/profile/edit/' . $host->id),
                 ];
                 Notification::send($host, new NewGroupMember($arr, $host));
             }
 
             return redirect()
-                    ->back()
-                    ->with('success', __('groups.now_following', [
-                        'name' => $group->name,
-                        'link' => url('/group/view/'.$group->idgroups),
-                    ]));
+                ->back()
+                ->with('success', __('groups.now_following', [
+                    'name' => $group->name,
+                    'link' => url('/group/view/' . $group->idgroups),
+                ]));
         } catch (\Exception $e) {
             $response['danger'] = 'Failed to follow this group';
 
@@ -918,9 +904,9 @@ class GroupController extends Controller
     public function imageUpload(Request $request, $id)
     {
         try {
-            if (isset($_FILES) && ! empty($_FILES)) {
+            if (isset($_FILES) && !empty($_FILES)) {
                 $existing_image = Fixometer::hasImage($id, 'groups', true);
-                if (! empty($existing_image)) {
+                if (!empty($existing_image)) {
                     $Group->removeImage($id, $existing_image[0]);
                 }
                 $file = new FixometerFile;
@@ -959,12 +945,13 @@ class GroupController extends Controller
 
         if (($loggedInUser->hasRole('Host') && Fixometer::userIsHostOfGroup($group_id, $loggedInUser->id)) ||
             $loggedInUser->isCoordinatorForGroup($group) ||
-            $loggedInUser->hasRole('Administrator')) {
+            $loggedInUser->hasRole('Administrator')
+        ) {
             $user = User::find($user_id);
 
             $group->makeMemberAHost($user);
 
-            return redirect()->back()->with('success', 'We have made '.$user->name.' a host for this group');
+            return redirect()->back()->with('success', 'We have made ' . $user->name . ' a host for this group');
         }
 
         return redirect()->back()->with('warning', 'Sorry, you do not have permission to do this');
@@ -980,13 +967,13 @@ class GroupController extends Controller
             //Let's delete the user
             $userGroupAssociation = UserGroups::where('user', $user_id)->where('group', $group_id)->first();
 
-            if (! is_null($userGroupAssociation)) {
+            if (!is_null($userGroupAssociation)) {
                 $userGroupAssociation->delete();
 
-                return redirect()->back()->with('success', 'We have removed '.$user->name.' from this group');
+                return redirect()->back()->with('success', 'We have removed ' . $user->name . ' from this group');
             }
 
-            return redirect()->back()->with('warning', 'We are unable to remove '.$user->name.' from this group');
+            return redirect()->back()->with('warning', 'We are unable to remove ' . $user->name . ' from this group');
         }
 
         return redirect()->back()->with('warning', 'Sorry, you do not have permission to do this');
@@ -1026,9 +1013,9 @@ class GroupController extends Controller
 
                     break;
                 default: {
-                    $response['danger'] = 'Unexpected arguments';
-                    break;
-                }
+                        $response['danger'] = 'Unexpected arguments';
+                        break;
+                    }
             }
         }
 
@@ -1054,26 +1041,26 @@ class GroupController extends Controller
             unset($groups[0]);
         }
 
-        if (! is_null($group->latitude) && ! is_null($group->longitude)) {
+        if (!is_null($group->latitude) && !is_null($group->longitude)) {
             $restarters_nearby = User::nearbyRestarters($group->latitude, $group->longitude, 20)->orderBy('name', 'ASC')->get();
             foreach ($restarters_nearby as $restarter) {
                 $membership = UserGroups::where('user', $restarter->id)->where('group', $groupid)->first();
                 $restarter->notAMember = $membership == null;
-                $restarter->hasPendingInvite = ! empty(UserGroups::where('group', $groupid)
-                                         ->where('user', $restarter->id)
-                                         ->where(function ($query) {
-                                             $query->where('status', '<>', '1')
-                                                 ->whereNotNull('status');
-                                         })->first());
+                $restarter->hasPendingInvite = !empty(UserGroups::where('group', $groupid)
+                    ->where('user', $restarter->id)
+                    ->where(function ($query) {
+                        $query->where('status', '<>', '1')
+                            ->whereNotNull('status');
+                    })->first());
             }
         } else {
             $restarters_nearby = null;
         }
 
         $allPastEvents = Party::pastEvents()
-                     ->with('devices.deviceCategory')
-                     ->where('events.group', $group->idgroups)
-                     ->get();
+            ->with('devices.deviceCategory')
+            ->where('events.group', $group->idgroups)
+            ->get();
 
         $clusters = [];
 
@@ -1100,28 +1087,28 @@ class GroupController extends Controller
             }
         }
 
-        if (! isset($response)) {
+        if (!isset($response)) {
             $response = null;
         }
 
         //Event tabs
         $upcoming_events = Party::upcomingEvents()
-                            ->where('events.group', $group->idgroups)
-                              ->take(5)
-                                ->get();
+            ->where('events.group', $group->idgroups)
+            ->take(5)
+            ->get();
 
         $past_events = Party::pastEvents()
-                            ->where('events.group', $group->idgroups)
-                              ->take(5)
-                                ->get();
+            ->where('events.group', $group->idgroups)
+            ->take(5)
+            ->get();
 
         //Checking user for validatity
-        $in_group = ! empty(UserGroups::where('group', $groupid)
-                          ->where('user', $user->id)
-                            ->where(function ($query) {
-                                $query->where('status', '1')
-                                  ->orWhereNull('status');
-                            })->first());
+        $in_group = !empty(UserGroups::where('group', $groupid)
+            ->where('user', $user->id)
+            ->where(function ($query) {
+                $query->where('status', '1')
+                    ->orWhereNull('status');
+            })->first());
 
         $is_host_of_group = Fixometer::userHasEditGroupPermission($groupid, $user->id);
 
@@ -1167,14 +1154,14 @@ class GroupController extends Controller
         // not already a confirmed member of the group
         if (is_null($user_group) || $user_group->status != '1') {
             $hash = substr(bin2hex(openssl_random_pseudo_bytes(32)), 0, 24);
-            $url = url('/').'/group/accept-invite/'.$groupId.'/'.$hash;
+            $url = url('/') . '/group/accept-invite/' . $groupId . '/' . $hash;
 
             // already been invited once, set a new invite hash
-            if (! is_null($user_group)) {
+            if (!is_null($user_group)) {
                 $user_group->update([
                     'status' => $hash,
                 ]);
-            // not associated with the group at all yet
+                // not associated with the group at all yet
             } else {
                 UserGroups::create([
                     'user' => $userId,
@@ -1198,13 +1185,13 @@ class GroupController extends Controller
                     $not_sent[] = $user->email;
                 }
             } catch (\Exception $ex) {
-                Log::error('An error occurred while sending invitation to nearby Restarter:'.$ex->getMessage());
+                Log::error('An error occurred while sending invitation to nearby Restarter:' . $ex->getMessage());
             }
         } else { // already a confirmed member of the group or been sent an invite
             $not_sent[] = $user->email;
         }
 
-        return redirect('/group/nearby/'.intval($groupId))->with('success', $user->name.' has been invited');
+        return redirect('/group/nearby/' . intval($groupId))->with('success', $user->name . ' has been invited');
     }
 
     /**
@@ -1237,7 +1224,7 @@ class GroupController extends Controller
         ]);
 
         // Push this into a session variable to find by the Group prefix
-        session()->push('groups.'.$code, $hash);
+        session()->push('groups.' . $code, $hash);
 
         return redirect('/user/register')->with('auth-for-invitation', __('auth.login_before_using_shareable_link', ['login_url' => url('/login')]));
     }
@@ -1267,8 +1254,10 @@ class GroupController extends Controller
         $group_tags_groups = $user->groupTag->groupTagGroups;
 
         // If Group is not found, through 404 error
-        if ($user->groupTag->groupTagGroups->isEmpty()
-        || $user->groupTag->groupTagGroups->count() <= 0) {
+        if (
+            $user->groupTag->groupTagGroups->isEmpty()
+            || $user->groupTag->groupTagGroups->count() <= 0
+        ) {
             return abort(404, 'No groups found.');
         }
 
@@ -1277,7 +1266,7 @@ class GroupController extends Controller
 
         foreach ($group_tags_groups as $group_tags_group) {
             $group = $group_tags_group->theGroup;
-            if (! empty($group)) {
+            if (!empty($group)) {
                 $stats = $group->getGroupStats();
                 $collection->push([
                     'id' => $group->idgroups,
@@ -1297,11 +1286,11 @@ class GroupController extends Controller
                     'upcoming_parties' => $upcoming_parties_collection = collect([]),
                     'past_parties' => $past_parties_collection = collect([]),
                     'impact' => [
-                        'volunteers' => $stats['pax'],
-                        'hours_volunteered' => $stats['hours'],
+                        'volunteers' => $stats['participants'],
+                        'hours_volunteered' => $stats['hours_volunteered'],
                         'parties_thrown' => $stats['parties'],
-                        'waste_prevented' => $stats['waste'],
-                        'co2_emissions_prevented' => $stats['co2'],
+                        'waste_prevented' => $stats['waste_total'],
+                        'co2_emissions_prevented' => $stats['co2_total'],
                     ],
                     'widgets' => [
                         'headline_stats' => url("/group/stats/{$group->idgroups}"),
@@ -1368,7 +1357,7 @@ class GroupController extends Controller
     {
         // Get Group from Access Key and Group ID
         $group_tags_group = User::where('api_token', $api_token)->first()
-        ->groupTag->groupTagGroups->where('group', $group->idgroups)->first();
+            ->groupTag->groupTagGroups->where('group', $group->idgroups)->first();
 
         // If Group is not found, through 404 error
         if (empty($group_tags_group)) {
@@ -1377,9 +1366,9 @@ class GroupController extends Controller
 
         // If Event is found but is not the of the date specified
         $exclude_parties = [];
-        if (! empty($date_from) && ! empty($date_to)) {
+        if (!empty($date_from) && !empty($date_to)) {
             foreach ($group->parties as $party) {
-                if (! Fixometer::validateBetweenDates($party->event_date, $date_from, $date_to)) {
+                if (!Fixometer::validateBetweenDates($party->event_date, $date_from, $date_to)) {
                     $exclude_parties[] = $party->idevents;
                 }
             }
@@ -1404,11 +1393,11 @@ class GroupController extends Controller
             'upcoming_parties' => $upcoming_parties_collection = collect([]),
             'past_parties' => $past_parties_collection = collect([]),
             'impact' => [
-                'volunteers' => $stats['pax'],
-                'hours_volunteered' => $stats['hours'],
+                'volunteers' => $stats['participants'],
+                'hours_volunteered' => $stats['hours_volunteered'],
                 'parties_thrown' => $stats['parties'],
-                'waste_prevented' => $stats['waste'],
-                'co2_emissions_prevented' => $stats['co2'],
+                'waste_prevented' => $stats['waste_total'],
+                'co2_emissions_prevented' => $stats['co2_total'],
             ],
             'widgets' => [
                 'headline_stats' => url("/group/stats/{$group->idgroups}"),

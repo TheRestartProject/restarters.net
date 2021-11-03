@@ -67,4 +67,11 @@ return [
   'age_approx' => 'years - approximate, if known',
   'repair_source' => 'Source of repair information',
   'repair_url' => 'URL for repair information',
+  'description_powered' => 'Een elektrisch toestel is alles wat elektriciteit nodig heeft om te werken.',
+  'description_unpowered' => 'Een niet-elektrisch voorwerp is alles wat geen elektriciteit nodig heeft om te werken.',
+  'powered_items' => 'Elektrische toestellen',
+  'title_powered' => 'ELEKTRISCH',
+  'title_repair' => 'Herstelling',
+  'title_unpowered' => 'NIET-ELEKTRISCH',
+  'unpowered_items' => 'Niet-elektrische voorwerpen',
 ];

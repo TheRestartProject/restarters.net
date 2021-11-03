@@ -1,7 +1,7 @@
 {
     "Access issue": "Problema de acceso",
     "Administrator": "Administración",
-    "Aircon\/Dehumidifier": "Aire acondicionado\/deshumidificador",
+    "Aircon\/dehumidifier": "Aire acondicionado\/deshumidificador",
     "All rights reserved.": "Todos los derechos reservados.",
     "Bicycle": "Bicicleta",
     "Bluetooth": "Bluetooth",
@@ -17,11 +17,8 @@
     "Data volunteering": "Ayúdenos a procesar datos",
     "Decorative or safety lights": "Luces decorativas o de seguridad",
     "Desktop computer": "Ordenador de sobremesa",
-    "Digital Compact Camera": "Cámara digital compacta",
     "Digital compact camera": "Cámara digital compacta",
     "Display panel": "Panel de visualización",
-    "DLSR \/ Video Camera": "DSLR \/ Cámara de vídeo",
-    "DSLR\/Video camera": "DSLR \/ Cámara de vídeo",
     "E-Mail Address": "Dirección de correo electrónico",
     "Electronic Gadgets": "Aparatos electrónicos",
     "Electronics safety": "Seguridad electrónica",
@@ -38,7 +35,6 @@
     "Flat screen 32-37\"": "Pantalla plana 32-37",
     "Forgot Your Password?": "¿Olvidaste tu contraseña?",
     "Furniture": "Muebles",
-    "Hair & Beauty item": "Artículos de peluquería y belleza",
     "Hair & beauty item": "Artículos de peluquería y belleza",
     "Handheld entertainment device": "Dispositivo de entretenimiento portatil",
     "Headphone jack": "Toma de auriculares",
@@ -80,7 +76,6 @@
     "Paper output": "Salida de papel",
     "Paper shredder": "Triturador de papel",
     "Password": "Contraseña",
-    "PC Accessory": "Accesorio para PC",
     "PC accessory": "Accesorio para PC",
     "Performance": "Rendimiento",
     "Portable radio": "Radio portátil",
@@ -157,5 +152,9 @@
     "New battery too expensive": "Batería nueva demasiado cara",
     "Replace the charger or charging cable": "Sustituir el cargador o el cable de carga",
     "Replace with new battery": "Sustituir por una batería nueva",
-    "Unrepairable corrosion or leakage": "Corrosión o fugas irreparables"
+    "Unrepairable corrosion or leakage": "Corrosión o fugas irreparables",
+    "Coffee maker": "Coffee maker",
+    "Iron": "Iron",
+    "Hand tool": "Hand tool",
+    "Jewellery": "Jewellery"
 }
