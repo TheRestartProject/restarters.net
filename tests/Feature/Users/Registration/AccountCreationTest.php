@@ -9,6 +9,7 @@ use Hash;
 use Mockery;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Tests\TestCase;
+use Illuminate\Support\Facades\Config;
 
 class AccountCreationTest extends TestCase
 {
@@ -44,9 +45,14 @@ class AccountCreationTest extends TestCase
     {
         $userAttributes = $this->userAttributes();
 
-        // Specify an invalid city
+        // Specify an invalid city and force geocoding to fail by invalidating the Google key.
+        $good = Config::set(['GOOGLE_API_CONSOLE_KEY']);
+        config(['GOOGLE_API_CONSOLE_KEY' => 'zzz']);
+
         $userAttributes['city'] = 'zzzzzzz';
         $response = $this->post('/user/register/', $userAttributes);
+
+        Config::set(['GOOGLE_API_CONSOLE_KEY' => $good]);
 
         $response->assertStatus(302);
         $response->assertRedirect('dashboard');
