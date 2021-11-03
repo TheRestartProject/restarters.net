@@ -2,6 +2,7 @@
 
 namespace App\Services;
 
+use App\User;
 use App\Group;
 use App\UserGroups;
 use Auth;
@@ -287,10 +288,36 @@ class DiscourseService
                     }
                 }
 
+                $toadd = [];
+
                 foreach ($restartersMembers as $restartersMember) {
                     if (!in_array($restartersMember, $discourseMembers)) {
                         Log::info("Add Restarter user #$restartersMember to Discourse group $discourseName");
-                        // TODO Implement.
+
+                        // Find the username (i.e. how they are known on Discourse).
+                        $u = User::find($restartersMember);
+                        $toadd[] = $u->username;
+                    }
+                }
+
+                if (count($toadd)) {
+                    Log::debug("Add " . json_encode(implode(',', $toadd)));
+
+                    $response = $client->request('PUT', "/admin/groups/$discourseId/members.json", [
+                        'form_params' => [
+                            'usernames' => implode(',', $toadd)
+                        ]
+                    ]);
+
+                    Log::info('Response status: ' . $response->getStatusCode());
+                    Log::debug($response->getBody());
+
+                    if ($response->getStatusCode() != 200)
+                    {
+                        Log::error("Failed to add members for {$discourseId} {$discourseName}");
+                        throw new \Exception("Failed to add members for {$discourseId} {$discourseName}");
+                    } else {
+                        $discourseResult = json_decode($response->getBody(), true);
                     }
                 }
             }
