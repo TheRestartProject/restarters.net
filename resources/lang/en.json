@@ -40,8 +40,6 @@
     "PC accessory": "PC accessory",
     "Printer\/scanner": "Printer\/scanner",
     "Digital compact camera": "Digital compact camera",
-    "DLSR \/ Video Camera": "DSLR\/Video Camera",
-    "DSLR\/video camera": "DSLR\/video camera",
     "Handheld entertainment device": "Handheld entertainment device",
     "Mobile": "Mobile",
     "Tablet": "Tablet",
@@ -68,10 +66,6 @@
     "Bicycle": "Bicycle",
     "Clothing\/textile": "Clothing\/textile",
     "Misc": "Misc",
-    "Coffee maker": "Coffee maker",
-    "Iron": "Iron",
-    "Hand tool": "Hand tool",
-    "Jewellery": "Jewellery",
     "Power\/battery": "Power\/battery",
     "Screen": "Screen",
     "Stuck booting": "Stuck booting",
@@ -122,6 +116,7 @@
     "Waste toner\/ink box": "Waste toner\/ink box",
     "Poor data": "Poor data",
     "Battery\/charger\/adapter": "Battery\/charger\/adapter",
+    "DSLR\/video camera": "DSLR\/video camera",
     "Flat screen": "Flat screen",
     "Food processor": "Food processor",
     "Games console": "Games console",
@@ -142,5 +137,9 @@
     "Unrepairable corrosion or leakage": "Unrepairable corrosion or leakage",
     "New battery too expensive": "New battery too expensive",
     "Replace the charger or charging cable": "Replace the charger or charging cable",
-    "Replace with new battery": "Replace with new battery"
+    "Replace with new battery": "Replace with new battery",
+    "Coffee maker": "Coffee maker",
+    "Iron": "Iron",
+    "Hand tool": "Hand tool",
+    "Jewellery": "Jewellery"
 }

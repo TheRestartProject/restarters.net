@@ -10,10 +10,6 @@
     "Changing a fuse": "Cambiar un fusible",
     "Charger": "Cargador",
     "Clothing\/textile": "Ropa\/textil",
-    "Coffee maker": "Coffee maker",
-    "Iron": "Iron",
-    "Hand tool": "Hand tool",
-    "Jewellery": "Jewellery",
     "Computers and Home Office": "Ordenadores y oficina en casa",
     "Configuration": "Configuración",
     "Confirm Password": "Confirmar contraseña",
@@ -23,7 +19,6 @@
     "Desktop computer": "Ordenador de sobremesa",
     "Digital compact camera": "Cámara digital compacta",
     "Display panel": "Panel de visualización",
-    "DLSR \/ Video Camera": "DSLR\/Cámara de vídeo",
     "E-Mail Address": "Dirección de correo electrónico",
     "Electronic Gadgets": "Aparatos electrónicos",
     "Electronics safety": "Seguridad electrónica",
@@ -157,5 +152,9 @@
     "New battery too expensive": "Batería nueva demasiado cara",
     "Replace the charger or charging cable": "Sustituir el cargador o el cable de carga",
     "Replace with new battery": "Sustituir por una batería nueva",
-    "Unrepairable corrosion or leakage": "Corrosión o fugas irreparables"
+    "Unrepairable corrosion or leakage": "Corrosión o fugas irreparables",
+    "Coffee maker": "Coffee maker",
+    "Iron": "Iron",
+    "Hand tool": "Hand tool",
+    "Jewellery": "Jewellery"
 }
