@@ -25,7 +25,7 @@ use Mockery;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Tests\TestCase;
 
-class DeleteEventTests extends TestCase
+class DeleteEventTest extends TestCase
 {
     protected function setUp(): void
     {
@@ -159,10 +159,13 @@ class DeleteEventTests extends TestCase
                 'Administrator', 'Future', FALSE, TRUE
             ],
             [
-                'NetworkCoordinator', 'Past', FALSE, FALSE
+                'NetworkCoordinator', 'Past', FALSE, TRUE
             ],
             [
-                'NetworkCoordinator', 'Future', FALSE, FALSE
+                'NetworkCoordinator', 'Past', TRUE, FALSE
+            ],
+            [
+                'NetworkCoordinator', 'Future', FALSE, TRUE
             ],
             [
                 'Host', 'Past', FALSE, FALSE
@@ -179,12 +182,20 @@ class DeleteEventTests extends TestCase
         ];
     }
 
-    /** @test
-     *  @dataProvider provider
+    /**
+     * @test
+     * @dataProvider provider
      */
     public function candelete_flag($role, $pastFuture, $addDevice, $canDelete) {
         $this->loginAsTestUser(Role::ADMINISTRATOR);
         $id = $this->createGroup();
+        $group = Group::find($id);
+
+        $network = factory(Network::class)->create([
+           'events_push_to_wordpress' => false,
+        ]);
+        $network->addGroup($group);
+
         $this->assertNotNull($id);
         $idevents = $this->createEvent($id, $pastFuture == 'Past' ? 'yesterday' : 'tomorrow');
 
@@ -193,6 +204,11 @@ class DeleteEventTests extends TestCase
         }
 
         $user = factory(User::class)->states($role)->create();
+
+        if ($role == 'NetworkCoordinator') {
+            $network->addCoordinator($user);
+        }
+
         $this->actingAs($user);
 
         $response = $this->get("/party/view/$id");
@@ -202,6 +218,5 @@ class DeleteEventTests extends TestCase
                 ':candelete' => $canDelete ? "true" : "false",
             ],
         ]);
-
     }
 }

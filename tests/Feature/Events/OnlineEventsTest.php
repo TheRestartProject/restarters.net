@@ -16,7 +16,7 @@ use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Notification;
 use Tests\TestCase;
 
-class OnlineEventsTests extends TestCase
+class OnlineEventsTest extends TestCase
 {
     protected function setUp(): void
     {
