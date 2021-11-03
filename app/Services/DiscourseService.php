@@ -2,6 +2,7 @@
 
 namespace App\Services;
 
+use App\Group;
 use Auth;
 use Illuminate\Support\Facades\Log;
 
@@ -203,5 +204,76 @@ class DiscourseService
         } while ($limited || count($users));
 
         return $allUsers;
+    }
+
+    public function syncUsersToGroups($idgroups = NULL) {
+        $ids = $idgroups ? $idgroups : Group::whereNotNull('discourse_group')->pluck('idgroups');
+
+        // Get all Discourse groups.  We need to find the ids matching the group name we store.
+        Log::debug('Get list of Discourse groups');
+        $client = app('discourse-client');
+        $response = $client->request('GET', '/groups.json');
+
+        Log::info('Response status: '.$response->getStatusCode());
+
+        $discourseGroupForRestartersGroup = [];
+
+        if ($response->getStatusCode() != 200 ) {
+            Log::error('Failed to get list of groups from Discourse');
+            throw new \Exception('Failed to get list of groups from Discourse');
+        }
+
+        $discourseResult = json_decode($response->getBody(), TRUE);
+
+        foreach ($discourseResult['groups'] as $discourseGroup) {
+            foreach ($ids as $id) {
+                $group = Group::find($id);
+
+                if ($group && $group->discourse_group && $group->discourse_group == $discourseGroup['name']) {
+                    Log::debug("Restarters group $id, {$group->discourse_group} is Discourse group {$discourseGroup['id']}");
+                    $discourseGroupForRestartersGroup[$id] = [
+                        'id' => $discourseGroup['id'],
+                        'name' => $group->discourse_group
+                    ];
+                }
+            }
+        }
+
+        foreach ($discourseGroupForRestartersGroup as $restartId => $info)
+        {
+            $discourseId = $info['id'];
+            $discourseName = $info['name'];
+            Log::debug("Sync members for $restartId => $discourseId $discourseName");
+
+            // TODO The Discourse API accepts up to around 1000 as the limit.  This is plenty for now, but
+            // we will assert below if it turns out not to be in future.
+            $limit = 1000;
+
+            $response = $client->request('GET', "/groups/$discourseName/members.json?limit=$limit");
+
+            Log::info('Response status: ' . $response->getStatusCode());
+
+            if ($response->getStatusCode() != 200)
+            {
+                Log::error("Failed to get list of members for {$discourseId}");
+                throw new \Exception("Failed to get list of members for {$discourseId}");
+            } else
+            {
+                Log::debug($response->getBody());
+                $discourseResult = json_decode($response->getBody(), true);
+                $total = $discourseResult['meta']['total'];
+                Log::debug("Total $total");
+
+                if ($total > $limit) {
+                    Log::error("Group $discourseId too large at $total");
+                    throw new \Exception("Group $discourseId too large at $total");
+                }
+
+                // TODO Check members against Restarters members.
+                $discourseMembers = $discourseResult['members'];
+
+                // Check Restarters members against Discourse
+            }
+        }
     }
 }
