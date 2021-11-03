@@ -97,16 +97,41 @@ class ViewUsersTest extends TestCase
             'last_login_at' => $dateOfLeastRecentLogin,
         ]);
 
-        // When we visit the list of users and sort it by last login descending
-        $response = $this->get('/user/all/search?sort=last_login_at&sortdir=desc');
+        // Try this a few times because we might be unlucky and hit a second boundary.
+        $found = false;
 
-        // Then the first result is the most recent login
-        $response->assertSeeText($dateOfMostRecentLogin->diffForHumans(null, true));
+        for ($i = 0; $i < 10; $i++) {
+            // When we visit the list of users and sort it by last login descending
+            $response = $this->get('/user/all/search?sort=last_login_at&sortdir=desc');
+            $datestr = $dateOfMostRecentLogin->diffForHumans(null, true);
+
+            if (stripos($response->getContent(), $datestr) !== FALSE) {
+                // Then the first result is the most recent login
+                $found = true;
+                break;
+            }
+        }
+
+        $this->assertTrue($found);
 
         // When we visit the list of users and sort it by last login descending
         $response = $this->get('/user/all/search?sort=last_login_at&sortdir=asc');
 
         // Then the first result is the most recent login
-        $response->assertSeeText($dateOfLeastRecentLogin->diffForHumans(null, true));
+        $found = false;
+
+        for ($i = 0; $i < 10; $i++) {
+            // When we visit the list of users and sort it by last login descending
+            $response = $this->get('/user/all/search?sort=last_login_at&sortdir=asc');
+            $datestr = $dateOfLeastRecentLogin->diffForHumans(null, true);
+
+            if (stripos($response->getContent(), $datestr) !== FALSE) {
+                // Then the first result is the most recent login
+                $found = true;
+                break;
+            }
+        }
+
+        $this->assertTrue($found);
     }
 }

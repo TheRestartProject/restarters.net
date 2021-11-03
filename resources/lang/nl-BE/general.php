@@ -62,4 +62,8 @@ return [
   'your_repair_skills' => 'Je competenties',
   'side_attention' => 'Dit vraagt je aandacht',
   'calendar_feed_help_url' => '/t/fixometer-how-to-subscribe-to-a-calendar',
+  'menu_workbench' => 'Atelier',
+  'menu_events' => 'Activiteiten',
+  'menu_fixometer' => 'Fixometer',
+  'menu_groups' => 'Groepen',
 ];

@@ -18,10 +18,10 @@ return [
     'btn-notnow' => 'Not now',
   ],
   'quest-closed' => [
-      'header' => 'This quest is closed',
-      'message-1' => 'This quest is now closed.  Thank you for your interest!',
-      'message-2' => 'Why not read more about our findings, or find out more on our data work in the Workbench.',
-      'read-more' => 'Read more about :quest',
-      'visit-workbench' => 'Visit the Workbench',
+    'header' => 'This quest is closed',
+    'message-1' => 'This quest is now closed.  Thank you for your interest!',
+    'message-2' => 'Why not read more about our findings, or find out more on our data work in the Workbench.',
+    'read-more' => 'Read more about :quest',
+    'visit-workbench' => 'Visit the Workbench',
   ],
 ];

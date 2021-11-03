@@ -6,6 +6,10 @@ use Illuminate\Database\Eloquent\Model;
 
 class GroupTags extends Model
 {
+    // This is a magic value which is set on the live system, and is used to identify inactive groups.
+    // It's not ideal to have this hardcoded, but the data exists.
+    const INACTIVE = 10;
+
     protected $table = 'group_tags';
     /**
      * The attributes that are mass assignable.

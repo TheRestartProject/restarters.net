@@ -55,15 +55,15 @@
       </template>
       <template slot="cell(location)" slot-scope="data">
         <div class="d-none d-md-block">
-          {{ data.item.location.location }}
+          {{ data.item.location.location }} <span class="text-muted small" v-if="data.item.location.distance">{{ distance(data.item.location.distance )}} km</span>
           <br />
           <span class="small text-muted">{{ data.item.location.country }}</span>
         </div>
       </template>
-      <template slot="head(all_hosts_count)">
+      <template slot="head(all_confirmed_hosts_count)">
         <b-img src="/icons/user_ico.svg" class="mt-3 iconsmall" />
       </template>
-      <template slot="head(all_restarters_count)">
+      <template slot="head(all_confirmed_restarters_count)">
         <b-img src="/icons/volunteer_ico-thick.svg" class="mt-3 icon" />
       </template>
       <template slot="head(next_event)">
@@ -164,8 +164,8 @@ export default {
         { key: 'group_image', label: 'Group Image', tdClass: 'image'},
         { key: 'group_name', label: 'Group Name', sortable: true },
         { key: 'location', label: 'Location', tdClass: "hidecell", thClass: "hidecell" },
-        { key: 'all_hosts_count', label: 'Hosts', sortable: true, tdClass: "hidecell text-center", thClass: "hidecell text-center pl-3" },
-        { key: 'all_restarters_count', label: 'Restarters', sortable: true, tdClass: "hidecell text-center", thClass: "hidecell text-center pl-3" },
+        { key: 'all_confirmed_hosts_count', label: 'Hosts', sortable: true, tdClass: "hidecell text-center", thClass: "hidecell text-center pl-3" },
+        { key: 'all_confirmed_restarters_count', label: 'Restarters', sortable: true, tdClass: "hidecell text-center", thClass: "hidecell text-center pl-3" },
         { key: 'next_event', label: 'Next Event', sortable: true, tdClass: "hidecell event", thClass: "hidecell" },
         { key: 'follow' , label: 'Follow' }
       ],
@@ -229,6 +229,8 @@ export default {
           next_event: g.next_event ? (new moment(g.next_event).format(DATE_FORMAT)) : null,
           all_hosts_count: g.all_hosts_count,
           all_restarters_count: g.all_restarters_count,
+          all_confirmed_hosts_count: g.all_confirmed_hosts_count,
+          all_confirmed_restarters_count: g.all_confirmed_restarters_count,
           follow: !g.ingroup
         }
       })
@@ -308,6 +310,13 @@ export default {
       this.$store.dispatch('groups/unfollow', {
         idgroups: idgroups
       })
+    },
+    distance(dist ) {
+      if (dist < 5) {
+        return Math.round(dist * 10) / 10
+      } else {
+        return Math.round(dist)
+      }
     }
   }
 }

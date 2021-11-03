@@ -48,6 +48,14 @@
           </div>
         </div>
       </div>
+      <div class="border-top-thin d-flex pt-1 pb-1" v-if="event.link">
+        <div class="mr-2">
+          <b-img-lazy src="/icons/link_ico.svg" class="icon" />
+        </div>
+        <div>
+          <ExternalLink :href="event.link" target="_blank" rel="noopener noreferrer" class="truncate">{{ event.link }}</ExternalLink>
+        </div>
+      </div>
       <div class="border-top-thin d-flex pt-1 pb-1" v-if="!event.online && event.location">
         <div class="mr-2">
           <b-img-lazy src="/icons/map_marker_ico.svg" class="icon" />
@@ -56,7 +64,7 @@
           <div>
             {{ event.location}}
           </div>
-          <ExternalLink :href="'https://www.openstreetmap.org/?mlat=' + event.latitude + '&mlon=' + event.longitude + '#map=20/' + event.latitude + '/' + event.longitude" class="text-nowrap">
+          <ExternalLink v-if="event.latitude + event.longitude" :href="'https://www.openstreetmap.org/?mlat=' + event.latitude + '&mlon=' + event.longitude + '#map=20/' + event.latitude + '/' + event.longitude" class="text-nowrap">
             {{ __('events.view_map') }}
           </ExternalLink>
         </div>
@@ -66,7 +74,7 @@
           :zoom="16"
           :center="[event.latitude, event.longitude]"
           :style="'width: 100%; height: 200px'"
-          v-if="!event.online && event.location"
+          v-if="!event.online && event.location && event.latitude + event.longitude"
       >
         <l-tile-layer :url="tiles" :attribution="attribution" />
         <l-marker :lat-lng="[event.latitude, event.longitude]" :interactive="false" />
@@ -131,5 +139,13 @@ h2 {
 
 ::v-deep .linkdrop button[aria-expanded="true"] {
   padding: 5px;
+}
+
+.truncate {
+  text-overflow: ellipsis;
+  width: 400px;
+  display: block;
+  white-space: nowrap;
+  overflow: hidden;
 }
 </style>
