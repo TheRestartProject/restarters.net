@@ -9,6 +9,7 @@ use DB;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Event;
 use Tests\TestCase;
+use Illuminate\Support\Facades\Config;
 
 class EditProfileTests extends TestCase
 {
@@ -101,13 +102,18 @@ class EditProfileTests extends TestCase
         $this->assertEquals(51.507, round($user->latitude, 3));
         $this->assertEquals(-0.128, round($user->longitude, 3));
 
+        $good = Config::get('GOOGLE_API_CONSOLE_KEY');
+        Config::set('GOOGLE_API_CONSOLE_KEY', 'zzz');
+
         $this->post('/profile/edit-info', [
             'name' => $user->name,
             'email' => $user->email,
             'age' => $user->age,
             'country' => 'GBR',
-            'townCity' => 'zzzzzzz',
+            'townCity' => 'ZZZZ',
         ]);
+
+        Config::set('GOOGLE_API_CONSOLE_KEY', $good);
 
         $user = $user->fresh();
         $this->assertNull($user->latitude);
