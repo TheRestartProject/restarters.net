@@ -488,6 +488,8 @@ class Party extends Model implements Auditable
             ->join('events_users', 'events_users.event', '=', 'events.idevents')
             ->whereNotNull('events.wordpress_post_id')
             ->whereDate('events.event_date', '<', date('Y-m-d'))
+            // Not left the group.
+            ->whereNull('users_groups.deleted_at')
 
             ->where(function ($query) use ($user_ids) {
                 $query->whereIn('users_groups.user', $user_ids)
