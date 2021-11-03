@@ -183,6 +183,7 @@ export default {
         }
       })
 
+      console.log("Delete device returned", ret)
       if (ret && ret.data && ret.data.success) {
         commit('remove', params)
 
@@ -194,7 +195,7 @@ export default {
           root: true
         })
       } else {
-        throw new Exception('Server request failed')
+        throw 'Server request failed'
       }
     },
     async addURL ({commit, rootGetters}, params) {
