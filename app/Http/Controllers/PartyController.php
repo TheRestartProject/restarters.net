@@ -922,14 +922,15 @@ class PartyController extends Controller
     {
         $group_user_ids = UserGroups::where('group', Party::find($event_id)->group)
         ->where('user', '!=', Auth::user()->id)
+        ->where('status', '=', 1)
         ->pluck('user')
         ->toArray();
 
-        // Users already associated with the event.
-        // (Not including those invited but not RSVPed)
+        // Users already confirmed as attending the event.
+        //
+        // We don't want to return users who are already invited - we shouldn't be able to invite twice.
         $event_user_ids = EventsUsers::where('event', $event_id)
         ->where('user', '!=', Auth::user()->id)
-        ->where('status', 'like', '1')
         ->pluck('user')
         ->toArray();
 
