@@ -82,7 +82,7 @@ return [
   'stat-7' => 'Afval vermeden',
   'stat-0' => 'Deelnemers',
   'stat-1' => 'Genodigden',
-  'stat-2' => 'Restarters',
+  'stat-2' => 'Vrijwilligers',
   'stat-3' => 'Herstelbare toestellen',
   'stat-4' => 'Onherstelbare toestellen',
   'stat-5' => 'Herstelde toestellen',
@@ -92,4 +92,5 @@ return [
   'warning_volunteers_message' => 'Opgelet, het aantal vrijwilligers komt niet overeen met het aantal deelnemers. Misschien moet je vrijwilligers toevoegen of verwijderen?',
   'type_email_addresses_message' => 'Tip: je kunt hier ook andere e-mailadressen toevoegen. Zet een tab, enter of komma na elke e-mailadres dat je toevoegt.',
   'share_stats_message' => 'Goed gedaan! Tijdens :event_name op :date werden <strong>:number_devices toestellen </strong> gerepareerd. Help ons dit nieuws te verspreiden door je milieu-impact op je eigen website te delen.',
+  'share_event_stats' => 'Statistieken delen',
 ];

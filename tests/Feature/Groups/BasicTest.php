@@ -27,7 +27,7 @@ class BasicTest extends TestCase
                 ':user-id' => '1',
                 'tab' => 'mine',
                 ':network' => 'null',
-                ':networks' => '[{"id":1,"name":"Restarters","description":null,"website":null,"default_language":"en","timezone":"Europe\\/London","created_at":"2021-05-24 12:19:37","updated_at":"2021-05-24 12:19:37","events_push_to_wordpress":0,"include_in_zapier":0,"users_push_to_drip":0,"shortname":"restarters","discourse_group":null}]',
+                ':networks' => '[{"id":1,"name":"Restarters","description":null,"website":null,"default_language":"en","timezone":"Europe\\/London","created_at":"2021-05-24 12:19:37","updated_at":"2021-05-24 12:19:37","events_push_to_wordpress":0,"include_in_zapier":0,"users_push_to_drip":0,"shortname":"restarters","discourse_group":null,"auto_approve_events":0}]',
                 ':show-tags' => 'false',
             ],
         ]);

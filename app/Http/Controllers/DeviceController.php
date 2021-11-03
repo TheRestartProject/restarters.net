@@ -12,7 +12,6 @@ use App\Events\DeviceCreatedOrUpdated;
 use App\EventsUsers;
 use App\Group;
 use App\Helpers\Fixometer;
-use App\Helpers\FootprintRatioCalculator;
 use App\Notifications\AdminAbnormalDevices;
 use App\Notifications\ReviewNotes;
 use App\Party;
@@ -549,8 +548,13 @@ class DeviceController extends Controller
 
         $device = Device::find($id);
         $eventId = $device->event;
+        $is_attending = EventsUsers::where('event', $device->event)->where('user', Auth::id())->first();
+        $is_attending = is_object($is_attending) && $is_attending->status == 1;
 
-        if (Fixometer::hasRole($user, 'Administrator') || Fixometer::userHasEditPartyPermission($eventId, $user->id)) {
+        if (Fixometer::hasRole($user, 'Administrator') ||
+            Fixometer::userHasEditPartyPermission($eventId, $user->id) ||
+            $is_attending
+        ) {
             $device->delete();
 
             if ($request->ajax()) {

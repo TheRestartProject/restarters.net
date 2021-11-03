@@ -2,13 +2,18 @@
   <div>
     <div class="layout">
       <FixometerLatestData :latest-data="latestData" class="latest-data" />
-      <StatsValue :count="impactData.weights" icon="trash" size="md" title="partials.waste_prevented" unit="kg" class="impact-waste" />
-      <StatsValue :count="impactData.emissions"
+      <StatsValue :count="Math.round(impactData.waste_total)"
+                  icon="trash"
+                  size="md"
+                  title="partials.waste_prevented"
+                  unit="kg"
+                  class="impact-waste"
+      />
+      <StatsValue :count="Math.round(impactData.co2_total)"
                   icon="cloud_empty"
                   size="lg"
                   title="partials.co2"
-                  subtitle="partials.powered_only"
-                  :description="equivalent_consumer(impactData.emissions)"
+                  :description="equivalent_consumer(Math.round(impactData.co2_total))"
                   unit="kg"
                   class="impact-co2"
       />
