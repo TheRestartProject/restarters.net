@@ -19,7 +19,7 @@ class GroupCreateTest extends TestCase
 
         // Use an address which will fail to geocode.
         $this->assertNull($this->createGroup('Test Group', 'https://therestartproject.org', 'zzzzzzzzzzz123', 'Some text', false));
-        $this->assertContains(' Address not found.', $this->lastResponse->getContent());
+        $this->assertContains(__('groups.geocode_failed'), $this->lastResponse->getContent());
     }
 
     public function testDuplicate()
