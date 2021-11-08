@@ -79,7 +79,7 @@ class CreateDiscourseGroupForGroup
                 'group' => [
                     'name' => $name,
                     'full_name' => $group->name,
-                    'mentionable_level' => 3,
+                    'mentionable_level' => 4,
                     'messageable_level' => 99,
                     'visibility_level' => 0,
                     'members_visibility_level' => 0,

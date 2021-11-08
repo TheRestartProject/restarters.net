@@ -263,7 +263,6 @@ class DiscourseService
                 throw new \Exception("Failed to get list of members for {$discourseId}");
             } else
             {
-                Log::debug($response->getBody());
                 $discourseResult = json_decode($response->getBody(), true);
                 $total = $discourseResult['meta']['total'];
                 Log::debug("Total $total");
@@ -273,18 +272,40 @@ class DiscourseService
                     throw new \Exception("Group $discourseId too large at $total");
                 }
 
-                // TODO Check members against Restarters members.
-                $discourseMembers = array_column($discourseResult['members'], 'id');
-                $restartersMembers = UserGroups::where('group', $restartId)->where('status', '=', 1)->pluck('user');
+                $discourseMembers = array_column($discourseResult['members'], 'username');
+                Log::debug("Discourse members by name " . json_encode($discourseMembers));
+                $restartersMembersIds = UserGroups::where('group', $restartId)->where('status', '=', 1)->pluck('user')->toArray();
+                $restartersMembers = User::whereIn('id', $restartersMembersIds)->pluck('username')->toArray();
 
                 Log::debug(count($discourseMembers) . " Discourse members vs " . count($restartersMembers) . " on Restarters");
                 Log::debug("Discourse Members " . json_encode($discourseMembers));
                 Log::debug("Restarter Members " . json_encode($restartersMembers));
 
+                $todelete = [];
+
                 foreach ($discourseMembers as $discourseMember) {
                     if (!in_array($discourseMember, $restartersMembers)) {
-                        Log::info("Remove Discourse member $discourseMember from $discourseName as no longer a member on Restarters");
-                        // TODO Implement.
+                        Log::debug("Remove user $discourseMember from Discourse group $discourseName");
+                        $todelete[] = $discourseMember;
+                    }
+                }
+
+                if (count($todelete)) {
+                    Log::info("Remove Discourse members " . json_encode(implode(',', $todelete)) . " from $discourseName as members on Discourse but no longer members on Restarters");
+
+                    $response = $client->request('DELETE', "/admin/groups/$discourseId/members.json", [
+                        'form_params' => [
+                            'usernames' => implode(',', $todelete)
+                        ]
+                    ]);
+
+                    Log::info('Response status: ' . $response->getStatusCode());
+                    Log::debug($response->getBody());
+
+                    if ($response->getStatusCode() != 200)
+                    {
+                        Log::error("Failed to add members for {$discourseId} {$discourseName}");
+                        throw new \Exception("Failed to add members for {$discourseId} {$discourseName}");
                     }
                 }
 
@@ -292,16 +313,13 @@ class DiscourseService
 
                 foreach ($restartersMembers as $restartersMember) {
                     if (!in_array($restartersMember, $discourseMembers)) {
-                        Log::info("Add Restarter user #$restartersMember to Discourse group $discourseName");
-
-                        // Find the username (i.e. how they are known on Discourse).
-                        $u = User::find($restartersMember);
-                        $toadd[] = $u->username;
+                        Log::debug("Add Restarter user $restartersMember to Discourse group $discourseName");
+                        $toadd[] = $restartersMember;
                     }
                 }
 
                 if (count($toadd)) {
-                    Log::debug("Add " . json_encode(implode(',', $toadd)));
+                    Log::info("Add Discourse members " . json_encode(implode(',', $toadd)) . " to $discourseName as members on Restarters but not on Discourse");
 
                     $response = $client->request('PUT', "/admin/groups/$discourseId/members.json", [
                         'form_params' => [
@@ -316,8 +334,6 @@ class DiscourseService
                     {
                         Log::error("Failed to add members for {$discourseId} {$discourseName}");
                         throw new \Exception("Failed to add members for {$discourseId} {$discourseName}");
-                    } else {
-                        $discourseResult = json_decode($response->getBody(), true);
                     }
                 }
             }
