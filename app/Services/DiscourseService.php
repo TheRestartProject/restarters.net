@@ -245,7 +245,6 @@ class DiscourseService
         {
             $discourseId = $info['discourseId'];
             $discourseName = $info['discourseName'];
-            $group = Group::find($restartId);
 
             Log::debug("Sync members for $restartId => $discourseId $discourseName");
 
@@ -273,7 +272,6 @@ class DiscourseService
                 }
 
                 $discourseMembers = array_column($discourseResult['members'], 'username');
-                Log::debug("Discourse members by name " . json_encode($discourseMembers));
                 $restartersMembersIds = UserGroups::where('group', $restartId)->where('status', '=', 1)->pluck('user')->toArray();
                 $restartersMembers = User::whereIn('id', $restartersMembersIds)->pluck('username')->toArray();
 
