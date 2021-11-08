@@ -17,6 +17,7 @@ return array(
     'App\\Cluster' => $baseDir . '/app/Cluster.php',
     'App\\Console\\Commands\\AnonymiseUsersForTest' => $baseDir . '/app/Console/Commands/AnonymiseUsersForTest.php',
     'App\\Console\\Commands\\AssignDataVolunteeringSkill' => $baseDir . '/app/Console/Commands/AssignDataVolunteeringSkill.php',
+    'App\\Console\\Commands\\CheckGroupLocations' => $baseDir . '/app/Console/Commands/CheckGroupLocations.php',
     'App\\Console\\Commands\\FixLatitudeLongitude' => $baseDir . '/app/Console/Commands/FixLatitudeLongitude.php',
     'App\\Console\\Commands\\FixViews' => $baseDir . '/app/Console/Commands/FixViews.php',
     'App\\Console\\Commands\\ImportRepairTogether' => $baseDir . '/app/Console/Commands/ImportRepairTogether.php',

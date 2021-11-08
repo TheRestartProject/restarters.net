@@ -750,6 +750,7 @@ class ComposerStaticInitf57f72b7adaf50a29437647288004820
         'App\\Cluster' => __DIR__ . '/../..' . '/app/Cluster.php',
         'App\\Console\\Commands\\AnonymiseUsersForTest' => __DIR__ . '/../..' . '/app/Console/Commands/AnonymiseUsersForTest.php',
         'App\\Console\\Commands\\AssignDataVolunteeringSkill' => __DIR__ . '/../..' . '/app/Console/Commands/AssignDataVolunteeringSkill.php',
+        'App\\Console\\Commands\\CheckGroupLocations' => __DIR__ . '/../..' . '/app/Console/Commands/CheckGroupLocations.php',
         'App\\Console\\Commands\\FixLatitudeLongitude' => __DIR__ . '/../..' . '/app/Console/Commands/FixLatitudeLongitude.php',
         'App\\Console\\Commands\\FixViews' => __DIR__ . '/../..' . '/app/Console/Commands/FixViews.php',
         'App\\Console\\Commands\\ImportRepairTogether' => __DIR__ . '/../..' . '/app/Console/Commands/ImportRepairTogether.php',

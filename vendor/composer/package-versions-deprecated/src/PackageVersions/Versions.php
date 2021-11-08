@@ -159,7 +159,7 @@ final class Versions
   'vlucas/phpdotenv' => 'v3.6.8@5e679f7616db829358341e2d5cccbd18773bdab8',
   'wouternl/laravel-drip' => '1.2.4@f9d96140ba62f4ddb4df909e20931e897e0edd54',
   'yandex/translate-api' => '1.5.2@c99e69cde3e688fc0f99c4d8a21585226a8e1938',
-  'laravel/laravel' => 'dev-production@87ab0fb128423e80ce93bfd3b3a17e7790533185',
+  'laravel/laravel' => 'dev-production@b7332ebe74fa55b75374a11f30cb2279eff08168',
 );
 
     private function __construct()
