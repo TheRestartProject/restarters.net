@@ -66,8 +66,8 @@ export default {
   watch: {
     currentValue: {
       handler(newVal) {
-        // We have an odd problem on Linux where we get <p><br>.
         if (newVal) {
+          // We have an odd problem on Linux where we get <p><br>.
           newVal = newVal.replace('<p><br>', '<p>');
         }
 
@@ -77,7 +77,9 @@ export default {
     },
     value: {
       handler(newVal) {
-        this.currentValue = newVal
+        // There's an odd problem where divs aren't handled well - see https://github.com/davidroyer/vue2-editor/issues/313.
+        // This is a workaround.
+        this.currentValue = newVal.replace('<div', '<p').replace('/div>', '/p>')
       },
       immediate: true
     }
