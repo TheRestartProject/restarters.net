@@ -6,6 +6,8 @@ use App\Network;
 use DB;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Facades\Lang;
+use Illuminate\Support\Facades\Log;
 use OwenIt\Auditing\Contracts\Auditable;
 
 class Group extends Model implements Auditable
@@ -546,5 +548,101 @@ class Group extends Model implements Auditable
 
     public function setDistanceAttribute($val) {
         $this->distance = $val;
+    }
+    
+    public function createDiscourseGroup() {
+        // Get the host who created the group.
+        $member = UserGroups::where('group', $this->idgroups)->first();
+        $host = User::find($member->user);
+
+        if (empty($host)) {
+            Log::error('Could not find host of group');
+            return;
+        }
+
+        try {
+            // We want to internationalise the message.  Use the languages of any networks that the group
+            // is in.
+            $text = '';
+            $langs = [];
+
+            foreach ($this->networks as $network) {
+                $lang = $network->default_language;
+
+                if (!in_array($lang, $langs)) {
+                    $text .= Lang::get('groups.discourse_title',[
+                        'group' => $this->name,
+                        'link' => env('APP_URL') . '/group/view/' . $this->idgroups,
+                        'help' => 'https://talk.restarters.net'
+                    ],$lang);
+
+                    $langs[] = $lang;
+                }
+            }
+
+            // We want the host to create the group, so use their username.  The API key should
+            // allow us to do this - see https://meta.discourse.org/t/how-can-an-api-user-create-posts-as-another-user/45968/3.
+            $client = app('discourse-client', [
+                'username' => env('DISCOURSE_APIUSER'),
+            ]);
+
+            // Restricted characters allowed in name, and only 25 characters.
+            $name = str_replace(' ', '_', $this->name);
+            $name = preg_replace("/[^A-Za-z0-9_]/", '', $name);
+            $name = substr($name, 0, 25);
+
+            $params = [
+                'group' => [
+                    'name' => $name,
+                    'full_name' => $this->name,
+                    'mentionable_level' => 4,
+                    'messageable_level' => 99,
+                    'visibility_level' => 0,
+                    'members_visibility_level' => 0,
+                    'automatic_membership_email_domains' => null,
+                    'automatic_membership_retroactive' => false,
+                    'primary_group' => false,
+                    'flair_url' => $this->groupImagePath(),
+                    'flair_bg_color' => null,
+                    'flair_color' => null,
+                    'bio_raw' => $text,
+                    'public_admission' => true,
+                    'public_exit' => true,
+                    'default_notification_level' => 3,
+                    'publish_read_state' => true,
+                    'owner_usernames' => $host->username
+                ]
+            ];
+
+            $endpoint = '/admin/groups.json';
+
+            Log::info('Creating group : '.json_encode($params));
+            $response = $client->request(
+                'POST',
+                $endpoint,
+                [
+                    'form_params' => $params,
+                ]
+            );
+
+            Log::info('Response status: '.$response->getStatusCode());
+            Log::info('Response body: '.$response->getBody());
+
+            if (! $response->getStatusCode() === 200) {
+                Log::error('Could not create group ('.$this->idgroups.') thread: '.$response->getReasonPhrase());
+            } else {
+                // We want to save the discourse thread id in the group, so that we can invite people to it later
+                // when they join.
+                $json = json_decode($response->getBody(), true);
+                if (empty($json['basic_group'])) {
+                    throw new \Exception('Group not found in create response');
+                }
+
+                $this->discourse_group = $name;
+                $this->save();
+            }
+        } catch (\Exception $ex) {
+            Log::error('Could not create group ('.$this->idgroups.') thread: '.$ex->getMessage());
+        }
     }
 }

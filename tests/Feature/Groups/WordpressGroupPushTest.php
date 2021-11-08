@@ -5,6 +5,8 @@ namespace Tests\Feature;
 use App\Events\ApproveGroup;
 use App\Events\EditGroup;
 use App\Group;
+use App\Listeners\AddUserToDiscourseGroup;
+use App\Listeners\CreateDiscourseGroupForGroup;
 use App\Network;
 use App\Party;
 use App\User;
@@ -29,10 +31,15 @@ class WordpressGroupPushTest extends TestCase
     }
 
     /** @test */
-    public function groups_pushed_to_wordpress_when_approved()
+    public function group_approved_wordpress_and_discourse()
     {
         $this->instance(WordpressClient::class, Mockery::mock(WordpressClient::class, function ($mock) {
             $mock->shouldReceive('newPost')->once();
+        }));
+
+        // When we approve a Restarters group, we should try to create the Discourse group.
+        $this->instance(CreateDiscourseGroupForGroup::class, Mockery::mock(CreateDiscourseGroupForGroup::class, function ($mock) {
+            $mock->shouldReceive('handle')->once();
         }));
 
         $network = factory(Network::class)->create([
