@@ -606,8 +606,8 @@ class Group extends Model implements Auditable
                     'flair_bg_color' => null,
                     'flair_color' => null,
                     'bio_raw' => $text,
-                    'public_admission' => true,
-                    'public_exit' => true,
+                    'public_admission' => false,
+                    'public_exit' => false,
                     'default_notification_level' => 3,
                     'publish_read_state' => true,
                     'owner_usernames' => $host->username
