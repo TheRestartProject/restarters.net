@@ -26,7 +26,6 @@
         "laravel/framework": "^6.20",
         "laravel/tinker": "^2.5",
         "laravelcollective/html": "^6.2",
-        "laravelista/lumen-vendor-publish": "^2.1",
         "league/csv": "^9.7",
         "mariuzzo/laravel-js-localization": "^1.6",
         "mcamara/laravel-localization": "^1.3",
