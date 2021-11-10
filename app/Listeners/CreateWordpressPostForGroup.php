@@ -4,8 +4,8 @@ namespace App\Listeners;
 
 use App\Events\ApproveGroup;
 use App\Group;
-use App\Notifications\AdminWordPressCreateGroupFailure;
 use App\Helpers\Fixometer;
+use App\Notifications\AdminWordPressCreateGroupFailure;
 use HieuLe\WordpressXmlrpcClient\WordpressClient;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Queue\InteractsWithQueue;

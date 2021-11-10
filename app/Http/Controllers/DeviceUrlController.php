@@ -4,8 +4,8 @@ namespace App\Http\Controllers;
 
 use App\Device;
 use App\DeviceUrl;
-use Auth;
 use App\Helpers\Fixometer;
+use Auth;
 use Illuminate\Http\Request;
 
 class DeviceUrlController extends Controller

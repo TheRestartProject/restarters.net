@@ -3,8 +3,8 @@
 namespace App\Http\Controllers;
 
 use App\Brands;
-use Auth;
 use App\Helpers\Fixometer;
+use Auth;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Redirect;
 

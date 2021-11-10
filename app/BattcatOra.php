@@ -37,7 +37,7 @@ class BattcatOra extends Model
             // try once with locale, even if it is NULL
             $sql = $this->_getSQL($exclusions, $locale);
             $result = DB::select($sql);
-            if (!$result) {
+            if (! $result) {
                 // if no user-lang recs left, get one without locale
                 $sql = $this->_getSQL($exclusions);
                 $result = DB::select($sql);
@@ -70,11 +70,11 @@ ORDER BY rand()
 LIMIT 1;
 ';
         $and = '';
-        if (!empty($exclusions)) {
+        if (! empty($exclusions)) {
             $ids = implode("','", $exclusions);
             $and .= "\nAND d.`id_ords` NOT IN ('$ids')";
         }
-        if (!is_null($locale)) {
+        if (! is_null($locale)) {
             $and .= "\nAND (d.`language` = '$locale')";
         }
         $sql = sprintf($sql, $and);

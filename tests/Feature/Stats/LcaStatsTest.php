@@ -2,17 +2,13 @@
 
 namespace Tests\Feature\Stats;
 
-use DB;
 use App\Device;
 use App\Helpers\LcaStats;
+use DB;
 use Tests\Feature\Stats\StatsTestCase;
 
-/**
- *
- */
 class LcaStatsTest extends StatsTestCase
 {
-
     protected function setUp(): void
     {
         parent::setUp();

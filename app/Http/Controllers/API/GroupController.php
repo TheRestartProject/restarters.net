@@ -85,7 +85,7 @@ class GroupController extends Controller
 
         foreach ($groups as $group) {
             // If we have a bounding box, check that the group is within it.
-            if (!$bbox || (
+            if (! $bbox || (
                 $group->latitude !== null && $group->longitude !== null &&
                 $group->latitude >= $minLat && $group->latitude <= $maxLat &&
                 $group->longitude >= $minLng && $group->longitude <= $maxLng

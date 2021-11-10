@@ -41,7 +41,7 @@ class WordpressEventPushTest extends TestCase
             'group' => $group->idgroups,
             'latitude' => 1,
             'longitude' => 1,
-            'event_date' => '2100-01-01'
+            'event_date' => '2100-01-01',
         ]);
 
         $event->approve();

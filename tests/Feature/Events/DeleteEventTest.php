@@ -57,7 +57,7 @@ class DeleteEventTest extends TestCase
         // Get group stats.
         $this->actingAs($admin);
         $response = $this->get("/api/group/{$group->idgroups}/stats?api_token=1234");
-        $stats = json_decode($response->getContent(), TRUE);
+        $stats = json_decode($response->getContent(), true);
         $this->assertEquals(12, $stats['num_hours_volunteered']);
 
         // Now delete the event.
@@ -68,7 +68,7 @@ class DeleteEventTest extends TestCase
 
         // Group stats should have been updated.
         $response = $this->get("/api/group/{$group->idgroups}/stats?api_token=1234");
-        $stats = json_decode($response->getContent(), TRUE);
+        $stats = json_decode($response->getContent(), true);
         $this->assertEquals(0, $stats['num_hours_volunteered']);
 
         // Check that viewing the stats for a deleted event behaves gracefully.
@@ -150,34 +150,34 @@ class DeleteEventTest extends TestCase
         // - whether the delete flag should show (only for admins and where no devices)
         return [
             [
-                'Administrator', 'Past', FALSE, TRUE
+                'Administrator', 'Past', false, true,
             ],
             [
-                'Administrator', 'Past', TRUE, FALSE
+                'Administrator', 'Past', true, false,
             ],
             [
-                'Administrator', 'Future', FALSE, TRUE
+                'Administrator', 'Future', false, true,
             ],
             [
-                'NetworkCoordinator', 'Past', FALSE, TRUE
+                'NetworkCoordinator', 'Past', false, true,
             ],
             [
-                'NetworkCoordinator', 'Past', TRUE, FALSE
+                'NetworkCoordinator', 'Past', true, false,
             ],
             [
-                'NetworkCoordinator', 'Future', FALSE, TRUE
+                'NetworkCoordinator', 'Future', false, true,
             ],
             [
-                'Host', 'Past', FALSE, FALSE
+                'Host', 'Past', false, false,
             ],
             [
-                'Host', 'Future', FALSE, FALSE
+                'Host', 'Future', false, false,
             ],
             [
-                'Restarter', 'Past', FALSE, FALSE
+                'Restarter', 'Past', false, false,
             ],
             [
-                'Restarter', 'Future', FALSE, FALSE
+                'Restarter', 'Future', false, false,
             ],
         ];
     }
@@ -186,7 +186,8 @@ class DeleteEventTest extends TestCase
      * @test
      * @dataProvider provider
      */
-    public function candelete_flag($role, $pastFuture, $addDevice, $canDelete) {
+    public function candelete_flag($role, $pastFuture, $addDevice, $canDelete)
+    {
         $this->loginAsTestUser(Role::ADMINISTRATOR);
         $id = $this->createGroup();
         $group = Group::find($id);
@@ -215,7 +216,7 @@ class DeleteEventTest extends TestCase
 
         $this->assertVueProperties($response, [
             [
-                ':candelete' => $canDelete ? "true" : "false",
+                ':candelete' => $canDelete ? 'true' : 'false',
             ],
         ]);
     }
