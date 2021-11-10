@@ -195,4 +195,6 @@ return [
   'geocode_failed' => 'The address you entered could not be found. Please try a more general address.',
   'discourse_title' => "This is a discussion group for anyone who follows :group.\n\nFind the group's main page here: :link.\n\nLearn how to use this group here: :help\n\n",
   'talk_group' => 'View group conversation',
+  'talk_group_add_title' => 'Welcome to :group_name',
+  'talk_group_add_body' => 'Thank you for following :group_name! You will now receive notifications when new events are planned and will be added to group messages. <a href="https://talk.restarters.net/t/how-to-communicate-with-your-repair-group/6293">Learn how group messages work and how to change your notification settings</a>.'
 ];

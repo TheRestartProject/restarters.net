@@ -5,9 +5,9 @@ namespace Tests\Feature\Groups;
 use App\Group;
 use App\GroupTags;
 use App\Listeners\AddUserToDiscourseGroup;
-use App\Role;
 use App\User;
 use App\UserGroups;
+use Illuminate\Support\Facades\Notification;
 use Tests\TestCase;
 use Mockery;
 
@@ -15,6 +15,8 @@ class GroupJoinTest extends TestCase
 {
     public function testJoin()
     {
+        Notification::fake();
+
         $this->withoutExceptionHandling();
 
         $group = factory(Group::class)->create();

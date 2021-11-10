@@ -573,7 +573,7 @@ class Group extends Model implements Auditable
                     $text .= Lang::get('groups.discourse_title',[
                         'group' => $this->name,
                         'link' => env('APP_URL') . '/group/view/' . $this->idgroups,
-                        'help' => 'https://talk.restarters.net'
+                        'help' => 'https://talk.restarters.net/t/how-to-communicate-with-your-repair-group/6293'
                     ],$lang);
 
                     $langs[] = $lang;
