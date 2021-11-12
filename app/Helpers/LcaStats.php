@@ -58,6 +58,47 @@ FROM ($t1) t1
     }
 
     /**
+     * Applies filters to stats calculation.
+     * See ApiController::getDevices() for potential use.
+     * See tests/Feature/Stats/LcaStatsTest.php --filter
+     */
+    public static function getWasteStatsFiltered($filters = [])
+    {
+
+        $dF = LcaStats::getDisplacementFactor();
+        $eR = LcaStats::getEmissionRatioPowered();
+        $uR = LcaStats::getEmissionRatioUnpowered();
+
+        $filters[] = ['repair_status', '=', 1];
+
+        // logger(print_r($filters, 1));
+
+        $sub = DB::table('devices')->selectRaw("
+            CASE WHEN (categories.powered = 1) THEN (CASE WHEN (categories.weight = 0) THEN (devices.estimate + 0.00) ELSE categories.weight END) ELSE 0 END  AS powered_device_weights,
+            CASE WHEN (categories.powered = 0) THEN (CASE WHEN (COALESCE(devices.estimate,0) + 0.00 = 0) THEN categories.weight ELSE devices.estimate END) ELSE 0 END AS unpowered_device_weights,
+            CASE WHEN (categories.powered = 1) THEN (CASE WHEN (categories.weight = 0) THEN ((devices.estimate + 0.00) * $eR) ELSE categories.footprint END) ELSE 0 END AS powered_footprints,
+            CASE WHEN (categories.powered = 0) THEN (CASE WHEN (COALESCE(devices.estimate,0) + 0.00 = 0) THEN categories.footprint ELSE ((devices.estimate + 0.00) * $uR) END) ELSE 0 END AS unpowered_footprints
+            ")
+            ->join('categories', 'devices.category', '=', 'categories.idcategories')
+            ->join('events', 'events.idevents', '=', 'devices.event')
+            ->join('groups', 'events.group', '=', 'groups.idgroups')
+            ->where($filters);
+        // logger(print_r($sub->toSql(), 1));
+
+        $qry = DB::table( DB::raw("({$sub->toSql()}) as sub") )->selectRaw("
+            SUM(powered_device_weights) AS powered_waste,
+            SUM(unpowered_device_weights) AS unpowered_waste,
+            SUM(powered_footprints) * $dF AS powered_footprint,
+            SUM(unpowered_footprints) * $dF AS unpowered_footprint"
+        );
+
+        $qry->mergeBindings( $sub );
+
+        $result = $qry->first();
+        return $result;
+    }
+
+    /**
      * DEPRECATED IN PRODUCTION
      *
      * TO BE MOVED SOMEWHERE ELSE
@@ -102,45 +143,5 @@ AND d.repair_status = 1
 AND d.category <> 50
 "));
         return $value[0]->ratio;
-    }
-
-    /**
-     * BORKED ATTEMPT TO APPLY SENT FILTERS TO STATS QUERY
-     * MAY BE REDUNDANT
-     * SEE ApiController::getDevices()
-     */
-    public static function getWasteStatsFiltered($filters = [])
-    {
-        for($i=count($filters)-1;$i>=0;$i--) {
-            if (strstr($filters[$i][0], 'repair_status')) {
-                unset($filters[$i]);
-            }
-        }
-        $filters[] = ['devices.repair_status', '=', 1];
-        $dF = LcaStats::getDisplacementFactor();
-        $eR = LcaStats::getEmissionRatioPowered();
-        $uR = LcaStats::getEmissionRatioUnpowered();
-
-        $t1 = DB::table('devices')->select(
-            DB::raw("
-                    CASE WHEN (categories.powered = 1) THEN (CASE WHEN (categories.weight = 0) THEN (devices.estimate + 0.00) ELSE categories.weight END) ELSE 0 END  AS powered_device_weights,
-                    CASE WHEN (categories.powered = 0) THEN (CASE WHEN (COALESCE(devices.estimate,0) + 0.00 = 0) THEN categories.weight ELSE devices.estimate END) ELSE 0 END AS unpowered_device_weights,
-                    CASE WHEN (categories.powered = 1) THEN (CASE WHEN (categories.weight = 0) THEN ((devices.estimate + 0.00) * $eR) ELSE categories.footprint END) ELSE 0 END AS powered_footprints,
-                    CASE WHEN (categories.powered = 0) THEN (CASE WHEN (COALESCE(devices.estimate,0) + 0.00 = 0) THEN categories.footprint ELSE ((devices.estimate + 0.00) * $uR) END) ELSE 0 END AS unpowered_footprints
-                    ")
-        )
-            ->join('categories', 'devices.category', '=', 'categories.idcategories')
-            ->join('events', 'events.idevents', '=', 'devices.event')
-            ->join('groups', 'events.group', '=', 'groups.idgroups')
-            ->where($filters)
-            ->get();
-
-        $t2 =  DB::table($t1)->select(DB::raw("
-                SUM(powered_device_weights) AS powered_waste,
-                SUM(unpowered_device_weights) AS unpowered_waste,
-                SUM(powered_footprints) * $dF AS powered_footprint,
-                SUM(unpowered_footprints) * $dF AS unpowered_footprint
-            "))->first();
-        logger(print_r($t2, 1));
     }
 }
