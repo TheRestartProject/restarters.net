@@ -2,11 +2,11 @@
 
 namespace Tests\Feature\Stats;
 
-use DB;
+use App\Category;
 use App\Device;
 use App\DeviceBarrier;
-use App\Category;
 use App\Helpers\LcaStats;
+use DB;
 use Tests\TestCase;
 
 class StatsTestCase extends TestCase
@@ -32,9 +32,9 @@ class StatsTestCase extends TestCase
 
     protected function _setupCategoriesWithUnpoweredWeights()
     {
-        DB::statement("SET foreign_key_checks=0");
+        DB::statement('SET foreign_key_checks=0');
         Category::truncate();
-        DB::statement("SET foreign_key_checks=1");
+        DB::statement('SET foreign_key_checks=1');
         factory(Category::class)->create([
             'idcategories' => $this->_idPoweredNonMisc,
             'revision' => 1,
@@ -67,9 +67,9 @@ class StatsTestCase extends TestCase
             'weight' => 0,
             'footprint' => 0,
         ]);
-        DB::statement("SET foreign_key_checks=0");
+        DB::statement('SET foreign_key_checks=0');
         Device::truncate();
         DeviceBarrier::truncate();
-        DB::statement("SET foreign_key_checks=1");
+        DB::statement('SET foreign_key_checks=1');
     }
 }

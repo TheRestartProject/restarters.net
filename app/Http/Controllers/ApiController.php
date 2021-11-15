@@ -65,7 +65,7 @@ class ApiController extends Controller
     {
         $event = Party::where('idevents', $partyId)->first();
 
-        if (!$event) {
+        if (! $event) {
             return response()->json([
                 'message' => "Invalid party id $partyId",
             ], 404);
@@ -145,7 +145,6 @@ class ApiController extends Controller
     }
 
     /**
-     *
      * REDUNDANT???
      *
      * List/search devices.
@@ -178,19 +177,19 @@ class ApiController extends Controller
         }
 
         if ($brand) {
-            $wheres[] = ['devices.brand', 'LIKE', '%' . $brand . '%'];
+            $wheres[] = ['devices.brand', 'LIKE', '%'.$brand.'%'];
         }
 
         if ($model) {
-            $wheres[] = ['devices.model', 'LIKE', '%' . $model . '%'];
+            $wheres[] = ['devices.model', 'LIKE', '%'.$model.'%'];
         }
 
         if ($item_type) {
-            $wheres[] = ['devices.item_type', 'LIKE', '%' . $item_type . '%'];
+            $wheres[] = ['devices.item_type', 'LIKE', '%'.$item_type.'%'];
         }
 
         if ($comments) {
-            $wheres[] = ['devices.problem', 'LIKE', '%' . $comments . '%'];
+            $wheres[] = ['devices.problem', 'LIKE', '%'.$comments.'%'];
         }
 
         if ($wiki) {
@@ -202,7 +201,7 @@ class ApiController extends Controller
         }
 
         if ($group) {
-            $wheres[] = ['groups.name', 'LIKE', '%' . $group . '%'];
+            $wheres[] = ['groups.name', 'LIKE', '%'.$group.'%'];
         }
 
         if ($from_date) {

@@ -7,9 +7,9 @@ use App\User;
 use Carbon\Carbon;
 use DB;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Facades\Config;
 use Illuminate\Support\Facades\Event;
 use Tests\TestCase;
-use Illuminate\Support\Facades\Config;
 
 class EditProfileTests extends TestCase
 {

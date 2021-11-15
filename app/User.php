@@ -124,7 +124,7 @@ class User extends Authenticatable implements Auditable
      * @param int $numberOfGroups How many groups to return
      * @param string String of minimum creation date
      */
-    public function groupsNearby($numberOfGroups = 10, $createdSince = NULL, $nearby = self::NEARBY_KM)
+    public function groupsNearby($numberOfGroups = 10, $createdSince = null, $nearby = self::NEARBY_KM)
     {
         if (is_null($this->latitude) || is_null($this->longitude)) {
             return [];
@@ -132,7 +132,7 @@ class User extends Authenticatable implements Auditable
 
         $groupsNearbyQuery = Group::select(
             DB::raw('*, ( 6371 * acos( cos( radians('.$this->latitude.') ) * cos( radians( latitude ) ) * cos( radians( longitude ) - radians('.$this->longitude.') ) + sin( radians('.$this->latitude.') ) * sin( radians( latitude ) ) ) ) AS dist')
-        )->leftJoin('grouptags_groups', function($join) {
+        )->leftJoin('grouptags_groups', function ($join) {
             // Exclude any groups tagged with the special value of 10, which is 'Inactive'.
             $join->on('group', '=', 'idgroups');
             $join->on('group_tag', '=', DB::raw(GroupTags::INACTIVE));

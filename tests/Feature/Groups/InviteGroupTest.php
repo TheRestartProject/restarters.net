@@ -4,20 +4,20 @@ namespace Tests\Feature;
 
 use App\EventsUsers;
 use App\Group;
+use App\Helpers\Geocoder;
 use App\Network;
 use App\Notifications\AdminModerationEvent;
+use App\Notifications\NotifyRestartersOfNewEvent;
 use App\Party;
 use App\User;
-use App\Helpers\Geocoder;
-use App\Notifications\NotifyRestartersOfNewEvent;
-
 use DB;
-use Tests\TestCase;
 use Illuminate\Support\Facades\Notification;
+use Tests\TestCase;
 
 class InviteGroupTest extends TestCase
 {
-    public function testInvite() {
+    public function testInvite()
+    {
         $this->withoutExceptionHandling();
 
         $group = factory(Group::class)->create();
@@ -38,17 +38,17 @@ class InviteGroupTest extends TestCase
 
         // We should see that we have been invited.
         $this->actingAs($user);
-        $response = $this->get('/group/view/' . $group->idgroups);
+        $response = $this->get('/group/view/'.$group->idgroups);
         $response->assertSee('You have an invitation to this group.');
 
         // Check the counts.
         $props = $this->assertVueProperties($response, [
             [
-                ':idgroups' => $group->idgroups
+                ':idgroups' => $group->idgroups,
             ],
         ]);
 
-        $initialGroup = json_decode($props[0][':initial-group'], TRUE);
+        $initialGroup = json_decode($props[0][':initial-group'], true);
         $this->assertEquals(0, $initialGroup['all_hosts_count']);
         $this->assertEquals(0, $initialGroup['all_confirmed_hosts_count']);
         $this->assertEquals(1, $initialGroup['all_restarters_count']);
@@ -60,18 +60,18 @@ class InviteGroupTest extends TestCase
         $response = $this->get($invitation);
         $this->assertTrue($response->isRedirection());
         $redirectTo = $response->getTargetUrl();
-        $this->assertNotFalse(strpos($redirectTo, '/group/view/' . $group->idgroups));
+        $this->assertNotFalse(strpos($redirectTo, '/group/view/'.$group->idgroups));
         $response->assertSessionHas('success');
 
         // Check the counts have changed.
-        $response = $this->get('/group/view/' . $group->idgroups);
+        $response = $this->get('/group/view/'.$group->idgroups);
         $props = $this->assertVueProperties($response, [
             [
-                ':idgroups' => $group->idgroups
+                ':idgroups' => $group->idgroups,
             ],
         ]);
 
-        $initialGroup = json_decode($props[0][':initial-group'], TRUE);
+        $initialGroup = json_decode($props[0][':initial-group'], true);
         $this->assertEquals(0, $initialGroup['all_hosts_count']);
         $this->assertEquals(0, $initialGroup['all_confirmed_hosts_count']);
         $this->assertEquals(1, $initialGroup['all_restarters_count']);

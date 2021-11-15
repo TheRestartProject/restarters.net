@@ -44,6 +44,7 @@ class GroupNetworkCreateTest extends TestCase
 
         // act
         Config::set('app.url', 'https://repairtogether.restarters.net');
+        \URL::forceRootUrl('https://repairtogether.restarters.net');
         $response = $this->post('/group/create/', $groupAttributes);
 
         // assert

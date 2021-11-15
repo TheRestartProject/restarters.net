@@ -42,7 +42,7 @@ class CheckGroupLocations extends Command
         $geocoder = new \App\Helpers\Geocoder();
 
         foreach ($groups as $group) {
-            if (!$group->location) {
+            if (! $group->location) {
                 $this->error("Group {$group->idgroups} {$group->name} has no location");
             } else {
                 $geocoded = $geocoder->geocode($group->location);
@@ -50,11 +50,11 @@ class CheckGroupLocations extends Command
                 if (empty($geocoded)) {
                     $this->error("Group {$group->idgroups} {$group->name} location {$group->location} fails to geocode");
                 } else {
-                    # Check that the geocoded location matches the current location of the group.
+                    // Check that the geocoded location matches the current location of the group.
                     if (round($group->latitude, 1) != round($geocoded['latitude'], 1) || round($group->longitude, 1) != round($geocoded['longitude'], 1)) {
                         $this->error("Group {$group->idgroups} {$group->name} location {$group->location} geocodes to {$geocoded['latitude']},{$geocoded['longitude']} rather than {$group->latitude},{$group->longitude}");
                     }
-                    #$this->info("Group {$group->idgroups} {$group->name} location {$group->location} geocodes ok");
+                    //$this->info("Group {$group->idgroups} {$group->name} location {$group->location} geocodes ok");
                 }
             }
         }

@@ -3,8 +3,8 @@
 namespace App\Listeners;
 
 use App\Events\EventDeleted;
-use App\Notifications\DeleteEventFromWordpressFailed;
 use App\Helpers\Fixometer;
+use App\Notifications\DeleteEventFromWordpressFailed;
 use HieuLe\WordpressXmlrpcClient\WordpressClient;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Queue\InteractsWithQueue;

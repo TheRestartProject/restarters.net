@@ -25,15 +25,15 @@ class Fixometer
         if ($range) {
             return [
                 '' => 'N/A',
-                (intval(date('Y')) - 20) . '-' . (intval(date('Y')) - 16) => '16-20',
-                (intval(date('Y')) - 30) . '-' . (intval(date('Y')) - 21) => '21-30',
-                (intval(date('Y')) - 40) . '-' . (intval(date('Y')) - 31) => '31-40',
-                (intval(date('Y')) - 50) . '-' . (intval(date('Y')) - 41) => '41-50',
-                (intval(date('Y')) - 60) . '-' . (intval(date('Y')) - 51) => '51-60',
-                (intval(date('Y')) - 70) . '-' . (intval(date('Y')) - 61) => '61-70',
-                (intval(date('Y')) - 80) . '-' . (intval(date('Y')) - 71) => '71-80',
-                (intval(date('Y')) - 90) . '-' . (intval(date('Y')) - 81) => '81-90',
-                (intval(date('Y')) - 100) . '-' . (intval(date('Y')) - 91) => '91-100',
+                (intval(date('Y')) - 20).'-'.(intval(date('Y')) - 16) => '16-20',
+                (intval(date('Y')) - 30).'-'.(intval(date('Y')) - 21) => '21-30',
+                (intval(date('Y')) - 40).'-'.(intval(date('Y')) - 31) => '31-40',
+                (intval(date('Y')) - 50).'-'.(intval(date('Y')) - 41) => '41-50',
+                (intval(date('Y')) - 60).'-'.(intval(date('Y')) - 51) => '51-60',
+                (intval(date('Y')) - 70).'-'.(intval(date('Y')) - 61) => '61-70',
+                (intval(date('Y')) - 80).'-'.(intval(date('Y')) - 71) => '71-80',
+                (intval(date('Y')) - 90).'-'.(intval(date('Y')) - 81) => '81-90',
+                (intval(date('Y')) - 100).'-'.(intval(date('Y')) - 91) => '91-100',
             ];
         }
         $ages = ['' => ''];
@@ -245,7 +245,7 @@ class Fixometer
             ->whereNull('deleted_at')
             ->first();
 
-        if (!empty($user_group_association)) {
+        if (! empty($user_group_association)) {
             return true;
         }
 
@@ -282,13 +282,13 @@ class Fixometer
                     $icon = '';
                     break;
             }
-            echo '<div class="alert alert-' . $type;
+            echo '<div class="alert alert-'.$type;
             if ($dismissible) {
                 echo '  alert-dismissible';
             }
             echo '" role="alert">
                   <!--<button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button>-->
-                  <i class="fa fa-' . $icon . '"></i> ' . $text . '
+                  <i class="fa fa-'.$icon.'"></i> '.$text.'
 
               </div>';
         }
@@ -300,7 +300,7 @@ class Fixometer
      * */
     public static function verify($var, $strict = false, $type = 'string')
     {
-        if (!isset($var) || empty($var) || is_null($var)) {
+        if (! isset($var) || empty($var) || is_null($var)) {
             return false;
         }
         if ($strict) {
@@ -340,8 +340,8 @@ class Fixometer
 
     public static function translate($key)
     {
-        $translation = __(App::getLocale() . '.' . $key);
-        if (strpos($translation, App::getLocale() . '.') !== false) {
+        $translation = __(App::getLocale().'.'.$key);
+        if (strpos($translation, App::getLocale().'.') !== false) {
             return $key;
         }
 
@@ -460,7 +460,7 @@ class Fixometer
             DB::delete(DB::raw($sql), ['image' => $image->idimages]);
 
             /** delete image from disk **/
-            unlink($_SERVER['DOCUMENT_ROOT'] . '/uploads/' . $image->path);
+            unlink($_SERVER['DOCUMENT_ROOT'].'/uploads/'.$image->path);
         }
     }
 
@@ -737,12 +737,12 @@ class Fixometer
 
     public static function checkDistance($object, $user)
     {
-        $url = 'https://maps.googleapis.com/maps/api/distancematrix/json?units=imperial&origins=' . $object->latitude . ',' . $object->longitude . '&destinations=' . $user->latitude . ',' . $user->longitude;
+        $url = 'https://maps.googleapis.com/maps/api/distancematrix/json?units=imperial&origins='.$object->latitude.','.$object->longitude.'&destinations='.$user->latitude.','.$user->longitude;
 
         $json = file_get_contents($url);
         $json = json_decode($json);
 
-        if (is_object($json) && !empty($json->{'rows'})) {
+        if (is_object($json) && ! empty($json->{'rows'})) {
             try {
                 $distance = str_replace(' mi', '', $json->{'rows'}[0]->{'elements'}[0]->{'distance'}->{'text'});
                 $distance = floatval(str_replace(',', '', $distance));
@@ -788,7 +788,7 @@ class Fixometer
             1 => 'Computers and Home Office',
             2 => 'Electronic Gadgets',
             3 => 'Home Entertainment',
-            4 => 'Kitchen and Household Items'
+            4 => 'Kitchen and Household Items',
           ];
     }
 
@@ -803,10 +803,10 @@ class Fixometer
 
             // We've seen a Sentry problem which I can only see happening if there was invalid data in the cache.
             if (
-                !$stats ||
-                !array_key_exists('allparties', $stats) ||
-                !array_key_exists('waste_stats', $stats) ||
-                !array_key_exists('device_count_status', $stats)
+                ! $stats ||
+                ! array_key_exists('allparties', $stats) ||
+                ! array_key_exists('waste_stats', $stats) ||
+                ! array_key_exists('device_count_status', $stats)
             ) {
                 $stats = [];
             }
@@ -824,7 +824,7 @@ class Fixometer
 
     public static function userHasEditGroupPermission($group_id, $user_id, $role = 3)
     {
-        return !empty(\App\UserGroups::where('group', $group_id)
+        return ! empty(\App\UserGroups::where('group', $group_id)
             ->where('user', $user_id)
             ->where('role', $role)
             ->first());
@@ -845,7 +845,7 @@ class Fixometer
 
         $existing = Request::except(['sort', 'sortdir']);
 
-        return http_build_query($existing) . '&sort=' . $columnName . '&sortdir=' . $newSortDir;
+        return http_build_query($existing).'&sort='.$columnName.'&sortdir='.$newSortDir;
     }
 
     /*
@@ -1017,7 +1017,7 @@ class Fixometer
      */
     public static function checkColumn($column, $user_preferences)
     {
-        if (!is_null($user_preferences) && is_array($user_preferences)) {
+        if (! is_null($user_preferences) && is_array($user_preferences)) {
             if (in_array($column, $user_preferences)) {
                 return true;
             }

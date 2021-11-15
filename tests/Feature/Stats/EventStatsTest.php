@@ -6,7 +6,6 @@ use App\Device;
 use App\Party;
 use Tests\Feature\Stats\StatsTestCase;
 
-
 class EventStatsTest extends StatsTestCase
 {
     /** @test */

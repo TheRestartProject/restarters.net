@@ -56,10 +56,10 @@ ORDER BY rand()
 LIMIT 1;
 ";
         $and = '';
-        if (!is_null($partner)) {
+        if (! is_null($partner)) {
             $and .= "\nAND d.`data_provider` = '$partner'";
         }
-        if (!empty($exclusions)) {
+        if (! empty($exclusions)) {
             $ids = implode("','", $exclusions);
             $and .= "\nAND d.`id_ords` NOT IN ('$ids')";
         }
@@ -139,7 +139,6 @@ LEFT JOIN fault_types_mobiles fta ON fta.id = result.winning_opinion_id
 GROUP BY winning_opinion_id
 ORDER BY total DESC
 ');
-
 
         $result['total_recats'] = [new \stdClass()];
         $result['total_recats'][0]->total = 0;
