@@ -44,9 +44,8 @@ jobs:
           - MEDIAWIKI_DATABASE_USER=bn_mediawiki
           - MEDIAWIKI_DATABASE_NAME=bitnami_mediawiki
           - ALLOW_EMPTY_PASSWORD=yes
-        ports:
-          - '80:80'
-          - '443:443'
+          - MEDIAWIKI_EXTERNAL_HTTP_PORT_NUMBER=8080
+          - MEDIAWIKI_HOST:mediawiki
         depends_on:
           - mariadb
     steps:
