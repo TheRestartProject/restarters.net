@@ -17,7 +17,7 @@ Head to our [Discussion Forum]({{ env('DISCOURSE_URL') }}) where you can meet pe
 
 ## Go to a repair event
 
-Check your [dashboard]({{ env('APP_URL') }}/dashboard) to see which events are coming up near you. Why not RSVP to one and come along? These are great chances to meet some fellow Restarters and find out how it all works.
+Check your [dashboard]({{ env('APP_URL') }}{{ RouteServiceProvider::HOME }}) to see which events are coming up near you. Why not RSVP to one and come along? These are great chances to meet some fellow Restarters and find out how it all works.
 
 ## Join or start your own local group
 
