@@ -56,6 +56,8 @@ return [
             'collation' => 'utf8mb4_unicode_ci',
             'prefix' => '',
             'prefix_indexes' => true,
+            // We need strict = 'false' because we have some complex queries which fall foul of Laravel's requirements
+            // for use of GROUP BY.  Note that Laravel Shift will try to set this back TRUE, but don't let it.
             'strict' => false,
             'engine' => null,
             'options' => extension_loaded('pdo_mysql') ? array_filter([
