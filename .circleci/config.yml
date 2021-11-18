@@ -58,6 +58,15 @@ jobs:
       # We don't have Discourse on CircleCI.
       - run: sed -i 's/FEATURE__DISCOURSE_INTEGRATION=.*$/FEATURE__DISCOURSE_INTEGRATION=false/g' .env
 
+      # ...but we do have Mediawiki.
+      - run: sed -i 's/FEATURE__WIKI_INTEGRATION=.*$/FEATURE__DISCOURSE_INTEGRATION=true/g' .env
+      - run: sed -i 's/WIKI_URL=.*$/WIKI_URL=http://mediawiki:8080/g' .env
+      - run: sed -i 's/WIKI_DB=.*$/WIKI_DB=bitnami_mediawiki/g' .env
+      - run: sed -i 's/WIKI_USER=.*$/WIKI_USER=user/g' .env
+      - run: sed -i 's/WIKI_PASSWORD=.*$/WIKI_PASSWORD=bitnami123/g' .env
+      - run: sed -i 's/WIKI_APIUSER=.*$/WIKI_APIUSER=user/g' .env
+      - run: sed -i 's/WIKI_APIPASSWORD=.*$/WIKI_APIPASSWORD=bitnami123/g' .env
+
       # Playwright needs the debug bar not to appear
       - run: sed -i 's/APP_DEBUG=.*$/APP_DEBUG=FALSE/g' .env
 
