@@ -229,6 +229,8 @@ class DiscourseService
         $discourseResult = json_decode($response->getBody(), TRUE);
 
         foreach ($discourseResult['groups'] as $discourseGroup) {
+            $found = false;
+
             foreach ($ids as $id) {
                 $group = Group::find($id);
 
@@ -238,7 +240,13 @@ class DiscourseService
                         'discourseId' => $discourseGroup['id'],
                         'discourseName' => $group->discourse_group
                     ];
+
+                    $false = true;
                 }
+            }
+
+            if (!$found) {
+                Log::info("Discourse group {$discourseGroup['name']} not found on Restarters");
             }
         }
 
@@ -321,12 +329,14 @@ class DiscourseService
                             ]
                         ]);
 
-                        Log::info('Response status: ' . $response->getStatusCode());
+                        Log::debug('Response status: ' . $response->getStatusCode());
                         Log::debug($response->getBody());
 
                         if ($response->getStatusCode() != 200)
                         {
-                            Log::error("Failed to add members for {$discourseId} {$discourseName}");
+                            Log::error("Failed to add member for {$discourseId} {$discourseName}");
+                        } else {
+                            Log::info("Added Restarter user $restartersMember to Discourse group $discourseName");
                         }
                     }
                 }
