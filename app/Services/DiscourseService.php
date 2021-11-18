@@ -210,133 +210,123 @@ class DiscourseService
     }
 
     public function syncUsersToGroups($idgroups = NULL) {
-        $ids = $idgroups ? $idgroups : Group::whereNotNull('discourse_group')->pluck('idgroups');
+        $restartIds = $idgroups ? $idgroups : Group::whereNotNull('discourse_group')->pluck('idgroups');
 
-        // Get all Discourse groups.  We need to find the ids matching the group name we store.
+        // Get all Discourse groups.  We need to find the ids matching the group name we store.  The groups.json
+        // call doesn't return all the groups, so we query each one we know to find the id.
         Log::debug('Get list of Discourse groups');
         $client = app('discourse-client');
-        $response = $client->request('GET', '/groups.json');
 
-        Log::info('Response status: '.$response->getStatusCode());
+        foreach ($restartIds as $restartId) {
+            $group = Group::find($restartId);
+            $discourseName = $group->discourse_group;
+            $response = $client->request('GET', "/g/$discourseName");
 
-        $discourseGroupForRestartersGroup = [];
-
-        if ($response->getStatusCode() != 200 ) {
-            Log::error('Failed to get list of groups from Discourse');
-            throw new \Exception('Failed to get list of groups from Discourse');
-        }
-
-        $discourseResult = json_decode($response->getBody(), TRUE);
-
-        foreach ($discourseResult['groups'] as $discourseGroup) {
-            $found = false;
-
-            foreach ($ids as $id) {
-                $group = Group::find($id);
-
-                if ($group && $group->discourse_group && $group->discourse_group == $discourseGroup['name']) {
-                    Log::debug("Restarters group $id, {$group->discourse_group} is Discourse group {$discourseGroup['id']}");
-                    $discourseGroupForRestartersGroup[$id] = [
-                        'discourseId' => $discourseGroup['id'],
-                        'discourseName' => $group->discourse_group
-                    ];
-
-                    $false = true;
-                }
-            }
-
-            if (!$found) {
-                Log::info("Discourse group {$discourseGroup['name']} not found on Restarters");
-            }
-        }
-
-        foreach ($discourseGroupForRestartersGroup as $restartId => $info)
-        {
-            $discourseId = $info['discourseId'];
-            $discourseName = $info['discourseName'];
-
-            Log::debug("Sync members for $restartId => $discourseId $discourseName");
-
-            // TODO The Discourse API accepts up to around 1000 as the limit.  This is plenty for now, but
-            // we will assert below if it turns out not to be in future.
-            $limit = 1000;
-
-            $response = $client->request('GET', "/groups/$discourseName/members.json?limit=$limit");
-
-            Log::info('Response status: ' . $response->getStatusCode());
-
-            if ($response->getStatusCode() != 200)
-            {
-                Log::error("Failed to get list of members for {$discourseId}");
-                throw new \Exception("Failed to get list of members for {$discourseId}");
-            } else
+            if ($response->getStatusCode() == 200)
             {
                 $discourseResult = json_decode($response->getBody(), true);
-                $total = $discourseResult['meta']['total'];
-                Log::debug("Total $total");
 
-                if ($total > $limit) {
-                    Log::error("Group $discourseId too large at $total");
-                    throw new \Exception("Group $discourseId too large at $total");
-                }
+                $discourseId = $discourseResult['group']['id'];
+                Log::debug("Sync members for Restarters group $restartId, {$group->discourse_group}, Discourse group $discourseId");
 
-                $discourseMembers = array_column($discourseResult['members'], 'username');
-                $restartersMembersIds = UserGroups::where('group', $restartId)->where('status', '=', 1)->pluck('user')->toArray();
-                $restartersMembers = User::whereIn('id', $restartersMembersIds)->pluck('username')->toArray();
+                // TODO The Discourse API accepts up to around 1000 as the limit.  This is plenty for now, but
+                // we will assert below if it turns out not to be in future.
+                $limit = 1000;
 
-                Log::debug(count($discourseMembers) . " Discourse members vs " . count($restartersMembers) . " on Restarters");
-                Log::debug("Discourse Members " . json_encode($discourseMembers));
-                Log::debug("Restarter Members " . json_encode($restartersMembers));
+                $response = $client->request('GET', "/groups/$discourseName/members.json?limit=$limit");
 
-                $todelete = [];
+                Log::info('Response status: ' . $response->getStatusCode());
 
-                foreach ($discourseMembers as $discourseMember) {
-                    if (!in_array($discourseMember, $restartersMembers)) {
-                        Log::debug("Remove user $discourseMember from Discourse group $discourseName");
-                        $todelete[] = $discourseMember;
-                    }
-                }
+                if ($response->getStatusCode() != 200)
+                {
+                    Log::error("Failed to get list of members for {$discourseId}");
+                    throw new \Exception("Failed to get list of members for {$discourseId}");
+                } else
+                {
+                    $discourseResult = json_decode($response->getBody(), true);
+                    $total = $discourseResult['meta']['total'];
+                    Log::debug("Total $total");
 
-                if (count($todelete)) {
-                    Log::info("Remove Discourse members " . json_encode(implode(',', $todelete)) . " from $discourseName as members on Discourse but no longer members on Restarters");
-
-                    $response = $client->request('DELETE', "/admin/groups/$discourseId/members.json", [
-                        'form_params' => [
-                            'usernames' => implode(',', $todelete)
-                        ]
-                    ]);
-
-                    Log::info('Response status: ' . $response->getStatusCode());
-                    Log::debug($response->getBody());
-
-                    if ($response->getStatusCode() != 200)
+                    if ($total > $limit)
                     {
-                        Log::error("Failed to add members for {$discourseId} {$discourseName}");
-                        throw new \Exception("Failed to add members for {$discourseId} {$discourseName}");
+                        Log::error("Group $discourseId too large at $total");
+                        throw new \Exception("Group $discourseId too large at $total");
                     }
-                }
 
-                foreach ($restartersMembers as $restartersMember) {
-                    if (!in_array($restartersMember, $discourseMembers)) {
-                        Log::debug("Add Restarter user $restartersMember to Discourse group $discourseName");
+                    $discourseMembers = array_column($discourseResult['members'], 'username');
+                    $restartersMembersIds = UserGroups::where('group', $restartId)->where('status', '=', 1)->pluck(
+                        'user'
+                    )->toArray();
+                    $restartersMembers = User::whereIn('id', $restartersMembersIds)->pluck('username')->toArray();
 
-                        // We add these one by one, rather than in a single call.  This is because if our Restarters
-                        // usernames don't match the Discourse ones, e.g. due to anonymisation, then the single
-                        // call would fail.
-                        $response = $client->request('PUT', "/admin/groups/$discourseId/members.json", [
+                    Log::debug(
+                        count($discourseMembers) . " Discourse members vs " . count(
+                            $restartersMembers
+                        ) . " on Restarters"
+                    );
+                    Log::debug("Discourse Members " . json_encode($discourseMembers));
+                    Log::debug("Restarter Members " . json_encode($restartersMembers));
+
+                    $todelete = [];
+
+                    foreach ($discourseMembers as $discourseMember)
+                    {
+                        if (!in_array($discourseMember, $restartersMembers))
+                        {
+                            Log::debug("Remove user $discourseMember from Discourse group $discourseName");
+                            $todelete[] = $discourseMember;
+                        }
+                    }
+
+                    if (count($todelete))
+                    {
+                        Log::info(
+                            "Remove Discourse members " . json_encode(
+                                implode(',', $todelete)
+                            ) . " from $discourseName as members on Discourse but no longer members on Restarters"
+                        );
+
+                        $response = $client->request('DELETE', "/admin/groups/$discourseId/members.json", [
                             'form_params' => [
-                                'usernames' => $restartersMember
+                                'usernames' => implode(',', $todelete)
                             ]
                         ]);
 
-                        Log::debug('Response status: ' . $response->getStatusCode());
+                        Log::info('Response status: ' . $response->getStatusCode());
                         Log::debug($response->getBody());
 
                         if ($response->getStatusCode() != 200)
                         {
-                            Log::error("Failed to add member for {$discourseId} {$discourseName}");
-                        } else {
-                            Log::info("Added Restarter user $restartersMember to Discourse group $discourseName");
+                            Log::error("Failed to add members for {$discourseId} {$discourseName}");
+                            throw new \Exception("Failed to add members for {$discourseId} {$discourseName}");
+                        }
+                    }
+
+                    foreach ($restartersMembers as $restartersMember)
+                    {
+                        if (!in_array($restartersMember, $discourseMembers))
+                        {
+                            Log::debug("Add Restarter user $restartersMember to Discourse group $discourseName");
+
+                            // We add these one by one, rather than in a single call.  This is because if our Restarters
+                            // usernames don't match the Discourse ones, e.g. due to anonymisation, then the single
+                            // call would fail.
+                            $response = $client->request('PUT', "/admin/groups/$discourseId/members.json", [
+                                'form_params' => [
+                                    'usernames' => $restartersMember
+                                ]
+                            ]);
+
+                            Log::debug('Response status: ' . $response->getStatusCode());
+                            Log::debug($response->getBody());
+
+                            if ($response->getStatusCode() != 200)
+                            {
+                                Log::error("Failed to add member for {$discourseId} {$discourseName}");
+                            } else
+                            {
+                                Log::info("Added Restarter user $restartersMember to Discourse group $discourseName");
+                            }
                         }
                     }
                 }
