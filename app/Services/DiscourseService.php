@@ -220,7 +220,7 @@ class DiscourseService
         foreach ($restartIds as $restartId) {
             $group = Group::find($restartId);
             $discourseName = $group->discourse_group;
-            $response = $client->request('GET', "/g/$discourseName");
+            $response = $client->request('GET', "/g/$discourseName.json");
 
             if ($response->getStatusCode() == 200)
             {
