@@ -308,31 +308,26 @@ class DiscourseService
                     }
                 }
 
-                $toadd = [];
-
                 foreach ($restartersMembers as $restartersMember) {
                     if (!in_array($restartersMember, $discourseMembers)) {
                         Log::debug("Add Restarter user $restartersMember to Discourse group $discourseName");
-                        $toadd[] = $restartersMember;
-                    }
-                }
 
-                if (count($toadd)) {
-                    Log::info("Add Discourse members " . json_encode(implode(',', $toadd)) . " to $discourseName as members on Restarters but not on Discourse");
+                        // We add these one by one, rather than in a single call.  This is because if our Restarters
+                        // usernames don't match the Discourse ones, e.g. due to anonymisation, then the single
+                        // call would fail.
+                        $response = $client->request('PUT', "/admin/groups/$discourseId/members.json", [
+                            'form_params' => [
+                                'usernames' => $restartersMember
+                            ]
+                        ]);
 
-                    $response = $client->request('PUT', "/admin/groups/$discourseId/members.json", [
-                        'form_params' => [
-                            'usernames' => implode(',', $toadd)
-                        ]
-                    ]);
+                        Log::info('Response status: ' . $response->getStatusCode());
+                        Log::debug($response->getBody());
 
-                    Log::info('Response status: ' . $response->getStatusCode());
-                    Log::debug($response->getBody());
-
-                    if ($response->getStatusCode() != 200)
-                    {
-                        Log::error("Failed to add members for {$discourseId} {$discourseName}");
-                        throw new \Exception("Failed to add members for {$discourseId} {$discourseName}");
+                        if ($response->getStatusCode() != 200)
+                        {
+                            Log::error("Failed to add members for {$discourseId} {$discourseName}");
+                        }
                     }
                 }
             }
