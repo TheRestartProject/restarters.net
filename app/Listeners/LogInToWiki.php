@@ -39,10 +39,10 @@ class LogInToWiki
     {
         $user = $event->user;
 
-        // TODO: for all of this we need to move to restarters.net being the auth provider for Mediawiki.
-        // This is currently a workaround.
+
 
         if ($user->wiki_sync_status == WikiSyncStatus::CreateAtLogin) {
+            Log::info("Need to create " . $user->name);
             $this->createUserInWiki($user, $this->request->input('password'));
         }
 
@@ -70,8 +70,10 @@ class LogInToWiki
     protected function logUserIn($wikiUsername, $password)
     {
         try {
+            Log::info("Log in to wiki $wikiUsername");
             $api = MediawikiApi::newFromApiEndpoint(env('WIKI_URL').'/api.php');
             $api->login(new ApiUser($wikiUsername, $password));
+            Log::info("Logged in to wiki $wikiUsername");
 
             // NGM: it appears that right from the beginning MediawikiApi->getClient access modifier was changed
             // in our vendor folder from private to public in order to access the underlying client for the cookies.
