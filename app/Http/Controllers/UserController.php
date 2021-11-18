@@ -666,7 +666,7 @@ class UserController extends Controller
                 $name = $request->get('name');
                 $email = $request->get('email');
                 $role = $request->get('role');
-                if (!$request->has('modal')) {
+                if (! $request->has('modal')) {
                     $groups = $request->get('groups');
                 }
 
@@ -1126,7 +1126,7 @@ class UserController extends Controller
     {
         $user = User::where('mediawiki', $request->input('wiki_username'))->first();
 
-        if (!$user) {
+        if (! $user) {
             abort('404', 'Wiki user not found');
         }
 
@@ -1143,7 +1143,7 @@ class UserController extends Controller
     {
         $user = User::where('mediawiki', $request->input('wiki_username'))->first();
 
-        if (!$user) {
+        if (! $user) {
             abort('404', 'Wiki user not found');
         }
 

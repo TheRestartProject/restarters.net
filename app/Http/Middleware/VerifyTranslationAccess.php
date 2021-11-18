@@ -2,10 +2,10 @@
 
 namespace App\Http\Middleware;
 
+use App\Helpers\Fixometer;
 use App\User;
 use Auth;
 use Closure;
-use App\Helpers\Fixometer;
 
 class VerifyTranslationAccess
 {

@@ -3,12 +3,12 @@
 namespace Tests\Unit;
 
 use App\Group;
+use App\Helpers\Fixometer;
 use App\Network;
 use App\Party;
 use App\User;
 use Carbon\Carbon;
 use DB;
-use App\Helpers\Fixometer;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Foundation\Testing\WithFaker;
 use Tests\TestCase;

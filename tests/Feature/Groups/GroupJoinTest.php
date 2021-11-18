@@ -54,7 +54,7 @@ class GroupJoinTest extends TestCase
         $this->actingAs($host);
         $userGroupAssociation = UserGroups::where('user', $host->id)
             ->where('group', $group->idgroups)->first();
-        $url = '/api/usersgroups/' . $userGroupAssociation->idusers_groups . "?api_token=1234";
+        $url = '/api/usersgroups/'.$userGroupAssociation->idusers_groups.'?api_token=1234';
         $response = $this->call('DELETE', $url);
         $response->assertSee('"success":true');
 

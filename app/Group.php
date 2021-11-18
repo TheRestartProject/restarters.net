@@ -37,7 +37,7 @@ class Group extends Model implements Auditable
         'shareable_code',
         'network_id',
         'external_id',
-        'devices_updated_at'
+        'devices_updated_at',
     ];
 
     protected $appends = ['ShareableLink', 'approved', 'auto_approve'];
@@ -277,7 +277,6 @@ class Group extends Model implements Auditable
         return \App\Party::getEventStatsArrayKeys() + ['parties' => 0];
     }
 
-
     public function getGroupStats($eEmissionRatio = null, $uEmissionratio = null)
     {
         if (is_null($eEmissionRatio)) {
@@ -303,6 +302,7 @@ class Group extends Model implements Auditable
         }
 
         $result['parties'] = count($allPastEvents);
+
         return $result;
     }
 
@@ -529,12 +529,10 @@ class Group extends Model implements Auditable
 
         $networks = $this->networks;
 
-        if ($networks && count($networks))
-        {
+        if ($networks && count($networks)) {
             $autoapprove = true;
 
-            foreach ($networks as $network)
-            {
+            foreach ($networks as $network) {
                 $autoapprove &= $network->auto_approve_events;
             }
         }
@@ -542,11 +540,13 @@ class Group extends Model implements Auditable
         return $autoapprove;
     }
 
-    public function getDistanceAttribute() {
+    public function getDistanceAttribute()
+    {
         return $this->distance;
     }
 
-    public function setDistanceAttribute($val) {
+    public function setDistanceAttribute($val)
+    {
         $this->distance = $val;
     }
     

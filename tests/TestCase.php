@@ -112,7 +112,7 @@ abstract class TestCase extends BaseTestCase
             'name' => $name.$this->groupCount++,
             'website' => $website,
             'location' => $location,
-            'free_text' => $text
+            'free_text' => $text,
         ]);
 
         if ($assert) {
@@ -210,9 +210,11 @@ abstract class TestCase extends BaseTestCase
         return $val;
     }
 
-    private function isJson2($string) {
+    private function isJson2($string)
+    {
         // We have our own version because the PHPUnit one returns TRUE for a simple string.
         json_decode($string);
+
         return json_last_error() === JSON_ERROR_NONE;
     }
 

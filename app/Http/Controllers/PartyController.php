@@ -140,23 +140,23 @@ class PartyController extends Controller
         $expanded_events = [];
 
         foreach (array_merge($upcoming_events->all(), $past_events->all()) as $event) {
-            $expanded_events[] = \App\Http\Controllers\PartyController::expandEvent($event, $group);
+            $expanded_events[] = self::expandEvent($event, $group);
         }
 
         if ($upcoming_events_in_area) {
-          foreach ($upcoming_events_in_area as $event) {
-              $e = \App\Http\Controllers\PartyController::expandEvent($event, $group);
-              $e['nearby'] = TRUE;
-              $expanded_events[] = $e;
-          }
+            foreach ($upcoming_events_in_area as $event) {
+                $e = self::expandEvent($event, $group);
+                $e['nearby'] = true;
+                $expanded_events[] = $e;
+            }
         }
 
         if ($upcoming_events_all) {
-          foreach ($upcoming_events_all as $event) {
-              $e = \App\Http\Controllers\PartyController::expandEvent($event, $group);
-              $e['all'] = TRUE;
-              $expanded_events[] = $e;
-          }
+            foreach ($upcoming_events_all as $event) {
+                $e = self::expandEvent($event, $group);
+                $e['all'] = true;
+                $expanded_events[] = $e;
+            }
         }
 
         return view('events.index', [
@@ -262,7 +262,7 @@ class PartyController extends Controller
                             'user' => Auth::user(),
                             'user_groups' => $groupsUserIsInChargeOf,
                             'selected_group_id' => $group_id,
-                            'autoapprove' => $autoapprove
+                            'autoapprove' => $autoapprove,
                         ]);
                     }
 
@@ -399,7 +399,7 @@ class PartyController extends Controller
                 'user_groups' => $groupsUserIsInChargeOf,
                 'selected_group_id' => $group_id,
                 'userInChargeOfMultipleGroups' => $userInChargeOfMultipleGroups,
-                'autoapprove' => $autoapprove
+                'autoapprove' => $autoapprove,
             ]);
         }
 
@@ -411,7 +411,7 @@ class PartyController extends Controller
             'user_groups' => $groupsUserIsInChargeOf,
             'selected_group_id' => $group_id,
             'userInChargeOfMultipleGroups' => $userInChargeOfMultipleGroups,
-            'autoapprove' => $autoapprove
+            'autoapprove' => $autoapprove,
         ]);
     }
 
@@ -642,7 +642,7 @@ class PartyController extends Controller
             'user' => Auth::user(),
             'user_groups' => $groupsUserIsInChargeOf,
             'userInChargeOfMultipleGroups' => $userInChargeOfMultipleGroups,
-            'duplicateFrom' => $party
+            'duplicateFrom' => $party,
         ]);
     }
 

@@ -101,7 +101,7 @@ class MisccatTest extends TestCase
 
         $Misccat = new Misccat;
         $result = $Misccat->updateDevices();
-        logger(print_r($result,1));
+        logger(print_r($result, 1));
         $this->assertDatabaseHas('devices', [
             'problem' => 'category should be Cat1',
             'category' => 111,

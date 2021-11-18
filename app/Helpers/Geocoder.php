@@ -8,7 +8,8 @@ class Geocoder
     {
     }
 
-    private function googleKey() {
+    private function googleKey()
+    {
         // We have this so that we can change the key in testing.
         return config('GOOGLE_API_CONSOLE_KEY') ?? env('GOOGLE_API_CONSOLE_KEY');
     }

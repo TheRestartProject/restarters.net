@@ -75,7 +75,8 @@ class DiscourseAccountCreationTests extends TestCase
     }
 
     /** @test */
-    public function user_sync() {
+    public function user_sync()
+    {
         $this->withExceptionHandling();
 
         Log::shouldReceive('info')

@@ -4,10 +4,10 @@ namespace App\Listeners;
 
 use App\Events\EditEvent;
 use App\Group;
+use App\Helpers\Fixometer;
 use App\Network;
 use App\Notifications\AdminWordPressEditEventFailure;
 use App\Party;
-use App\Helpers\Fixometer;
 use HieuLe\WordpressXmlrpcClient\WordpressClient;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Queue\InteractsWithQueue;

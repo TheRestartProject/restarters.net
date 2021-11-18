@@ -134,7 +134,8 @@ class DiscourseService
         }
     }
 
-    public function getAllUsers() {
+    public function getAllUsers()
+    {
         if (! config('restarters.features.discourse_integration')) {
             return [];
         }
@@ -163,9 +164,9 @@ class DiscourseService
             // We seem to get rate-limited in a way that the 429 retrying doesn't cover, so spot that here.
             $limited = property_exists($discourseResult, 'error_type') && $discourseResult->error_type == 'rate_limit';
 
-            if (!$limited) {
+            if (! $limited) {
                 $users = $discourseResult->members;
-                Log::info('...process ' . count($users));
+                Log::info('...process '.count($users));
 
                 if ($users && count($users)) {
                     foreach ($users as $user) {
@@ -175,11 +176,11 @@ class DiscourseService
                             $response = $client->request('GET', $endpoint);
                             $discourseResult = json_decode($response->getBody());
 
-                            if (!$discourseResult) {
-                                # This also seems to happen as a transient error.
+                            if (! $discourseResult) {
+                                // This also seems to happen as a transient error.
                                 Log::debug("Get failed on {$user->id}");
                                 sleep(1);
-                                $limited = TRUE;
+                                $limited = true;
 //                                throw new \Exception("Get of $endpoint failed");
                             } else {
                                 $limited = property_exists(
@@ -192,7 +193,7 @@ class DiscourseService
                                     sleep(1);
                                 } else {
                                     $allUsers[] = $discourseResult;
-                                    Log::debug('...got ' . count($allUsers) . " so far");
+                                    Log::debug('...got '.count($allUsers).' so far');
                                 }
                             }
                         } while ($limited);

@@ -31,8 +31,7 @@ RIGHT JOIN `restarters.test`.categories c2 ON c2.idcategories = c1.idcategories
      */
     public function up()
     {
-
-        DB::statement("SET foreign_key_checks=0");
+        DB::statement('SET foreign_key_checks=0');
         DB::table('categories')->insert([
             'idcategories' => 6,
             'name' => 'Games console',
@@ -87,7 +86,7 @@ RIGHT JOIN `restarters.test`.categories c2 ON c2.idcategories = c1.idcategories
             'revision' => 'Second Revision',
             'created_at' => now(),
         ]);
-        DB::statement("SET foreign_key_checks=1");
+        DB::statement('SET foreign_key_checks=1');
 
         $cats = [
             ['idcategories' => '6', 'weight' => '3.220', 'footprint' => '140.670'],
@@ -136,7 +135,7 @@ RIGHT JOIN `restarters.test`.categories c2 ON c2.idcategories = c1.idcategories
             ['idcategories' => '49', 'weight' => '0.750', 'footprint' => '20.320'],
             ['idcategories' => '50', 'weight' => '0', 'footprint' => '0'],
             ['idcategories' => '51', 'weight' => '0.930', 'footprint' => '4.670'],
-            ['idcategories' => '52', 'weight' => '0.060', 'footprint' => '59.190']
+            ['idcategories' => '52', 'weight' => '0.060', 'footprint' => '59.190'],
         ];
 
         foreach ($cats as $cat) {
@@ -150,8 +149,7 @@ RIGHT JOIN `restarters.test`.categories c2 ON c2.idcategories = c1.idcategories
             'aggregate' => 1,
         ]);
 
-        DB::statement(DB::raw("UPDATE categories SET revision=2"));
-
+        DB::statement(DB::raw('UPDATE categories SET revision=2'));
     }
 
     /**
@@ -161,8 +159,7 @@ RIGHT JOIN `restarters.test`.categories c2 ON c2.idcategories = c1.idcategories
      */
     public function down()
     {
-
-        DB::statement("SET foreign_key_checks=0");
+        DB::statement('SET foreign_key_checks=0');
         DB::table('categories')->where('idcategories', 6)->delete();
         DB::table('categories')->where('idcategories', 7)->delete();
         DB::table('categories')->where('idcategories', 8)->delete();
@@ -171,7 +168,7 @@ RIGHT JOIN `restarters.test`.categories c2 ON c2.idcategories = c1.idcategories
         DB::table('categories')->where('idcategories', 51)->delete();
         DB::table('categories')->where('idcategories', 52)->delete();
         DB::table('category_revisions')->where('idcategory_revisions', 2)->delete();
-        DB::statement("SET foreign_key_checks=1");
+        DB::statement('SET foreign_key_checks=1');
 
         $cats = [
             ['idcategories' => '11', 'weight' => '9.150', 'footprint' => '398.4'],
@@ -209,11 +206,11 @@ RIGHT JOIN `restarters.test`.categories c2 ON c2.idcategories = c1.idcategories
             ['idcategories' => '43', 'weight' => '1.040', 'footprint' => '5'],
             ['idcategories' => '44', 'weight' => '1.270', 'footprint' => '15'],
             ['idcategories' => '45', 'weight' => '7.780', 'footprint' => '41'],
-            ['idcategories' => '46', 'weight' => '1.00', 'footprint' => NULL],
-            ['idcategories' => '47', 'weight' => NULL, 'footprint' => NULL],
-            ['idcategories' => '48', 'weight' => NULL, 'footprint' => NULL],
-            ['idcategories' => '49', 'weight' => NULL, 'footprint' => NULL],
-            ['idcategories' => '50', 'weight' => NULL, 'footprint' => NULL]
+            ['idcategories' => '46', 'weight' => '1.00', 'footprint' => null],
+            ['idcategories' => '47', 'weight' => null, 'footprint' => null],
+            ['idcategories' => '48', 'weight' => null, 'footprint' => null],
+            ['idcategories' => '49', 'weight' => null, 'footprint' => null],
+            ['idcategories' => '50', 'weight' => null, 'footprint' => null],
         ];
 
         foreach ($cats as $cat) {
@@ -227,6 +224,6 @@ RIGHT JOIN `restarters.test`.categories c2 ON c2.idcategories = c1.idcategories
             'aggregate' => 0,
         ]);
 
-        DB::statement(DB::raw("UPDATE categories SET revision=1"));
+        DB::statement(DB::raw('UPDATE categories SET revision=1'));
     }
 }

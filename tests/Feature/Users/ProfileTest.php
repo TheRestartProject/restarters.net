@@ -122,7 +122,8 @@ class ProfileTest extends TestCase
         $response->assertSee('The passwords are not identical!');
     }
 
-    public function testBadMediaWikiId() {
+    public function testBadMediaWikiId()
+    {
         $this->expectException(NotFoundHttpException::class);
         $this->get('/user/thumbnail?wiki_username=invalid');
     }
