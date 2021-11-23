@@ -120,7 +120,7 @@ export default {
     past() {
       return this.reverse.filter(e => {
         const start = new moment(e.event_date + ' ' + e.start)
-        return start.isBefore()
+        return start.isBefore() && !e.nearby && !e.all
       })
     },
     upcoming() {

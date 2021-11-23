@@ -51,11 +51,12 @@ class GroupController extends Controller
         $all_group_tags = GroupTags::all();
         $networks = Network::all();
 
-        // Look for groups where user ID exists in pivot table.  We have to explicitly test on deleted_at because
+        // Look for groups we have joined, not just been invited to.  We have to explicitly test on deleted_at because
         // the normal filtering out of soft deletes won't happen for joins.
         $your_groups = Group::join('users_groups', 'users_groups.group', '=', 'groups.idgroups')
             ->leftJoin('events', 'events.group', '=', 'groups.idgroups')
             ->where('users_groups.user', $user->id)
+            ->where('users_groups.status', 1)
             ->whereNull('users_groups.deleted_at')
             ->orderBy('groups.name', 'ASC')
             ->groupBy('groups.idgroups')

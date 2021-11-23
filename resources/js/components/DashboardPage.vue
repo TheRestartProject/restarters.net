@@ -54,11 +54,6 @@ export default {
       required: false,
       default: null
     },
-    pastEvents: {
-      type: Array,
-      required: false,
-      default: null
-    },
     topics: {
       type: Array,
       required: false,
@@ -109,15 +104,6 @@ export default {
         e.group = e.the_group
         delete e.the_group
         e.upcoming = true
-      })
-    }
-
-    if (this.pastEvents) {
-      this.pastEvents.forEach(e => {
-        events[e.idevents] = e
-        e.group = e.the_group
-        delete e.the_group
-        e.attended = true
       })
     }
 

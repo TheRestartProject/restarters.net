@@ -426,8 +426,9 @@ class Party extends Model implements Auditable
      */
     public function scopeUpcomingEventsInUserArea($query, $user)
     {
-        //Look for groups where user ID exists in pivot table
-        $user_group_ids = UserGroups::where('user', $user->id)->pluck('group')->toArray();
+        // We want to exclude groups which we are a member of, but include ones where we have been invited but
+        // not yet joined.
+        $user_group_ids = UserGroups::where('user', $user->id)->where('status', 1)->pluck('group')->toArray();
 
         return $this
       ->select(DB::raw('`events`.*, ( 6371 * acos( cos( radians('.$user->latitude.') ) * cos( radians( events.latitude ) ) * cos( radians( events.longitude ) - radians('.$user->longitude.') ) + sin( radians('.$user->latitude.') ) * sin( radians( events.latitude ) ) ) ) AS distance'))
@@ -477,7 +478,7 @@ class Party extends Model implements Auditable
      */
     public function scopeUsersPastEvents($query, array $user_ids = null)
     {
-        // if no $user_ids are supplied, the use the current Auth's ID
+        // if no $user_ids are supplied, then use the current Auth's ID
         if (empty($user_ids)) {
             $user_ids[] = auth()->id();
         }
@@ -487,6 +488,42 @@ class Party extends Model implements Auditable
             ->join('events_users', 'events_users.event', '=', 'events.idevents')
             ->whereNotNull('events.wordpress_post_id')
             ->whereDate('events.event_date', '<', date('Y-m-d'))
+            // Not left the group.
+            ->whereNull('users_groups.deleted_at')
+
+            ->where(function ($query) use ($user_ids) {
+                $query->whereIn('users_groups.user', $user_ids)
+                    ->orWhereIn('events_users.user', $user_ids);
+            })
+
+            ->select('events.*')
+            ->groupBy('idevents')
+            ->orderBy('events.event_date', 'DESC');
+    }
+
+    /**
+     * [scopeUsersUpcomingEvents description]
+     *
+     * Get all Upcoming Events from the User or User's groups
+     *
+     * @param  [type]                  $query
+     * @param  [type]                  $user_ids
+     * @return [type]
+     */
+    public function scopeUsersUpcomingEvents($query, array $user_ids = null)
+    {
+        // if no $user_ids are supplied, then use the current Auth's ID
+        if (empty($user_ids)) {
+            $user_ids[] = auth()->id();
+        }
+
+        return $query->join('groups', 'groups.idgroups', '=', 'events.group')
+            ->leftJoin('users_groups', 'users_groups.group', '=', 'groups.idgroups')
+            ->leftJoin('events_users', 'events_users.event', '=', 'events.idevents')
+            ->whereNotNull('events.wordpress_post_id')
+            ->where('users_groups.status', 1)
+            ->whereNull('users_groups.deleted_at')
+            ->whereDate('events.event_date', '>=', date('Y-m-d'))
 
             ->where(function ($query) use ($user_ids) {
                 $query->whereIn('users_groups.user', $user_ids)
