@@ -122,7 +122,7 @@ class PartyController extends Controller
                     ->get();
 
                 foreach ($upcoming_events_in_area as $event) {
-                    $e = \App\Http\Controllers\PartyController::expandEvent($event, NULL);
+                    $e = self::expandEvent($event, NULL);
                     $e['nearby'] = TRUE;
                     $e['all'] = TRUE;
                     $events[] = $e;
@@ -133,7 +133,7 @@ class PartyController extends Controller
             $other_upcoming_events = Party::upcomingEvents()->whereNotIn('idevents', array_pluck($events, 'idevents'))->get();
 
             foreach ($other_upcoming_events as $event) {
-                $e = \App\Http\Controllers\PartyController::expandEvent($event, NULL);
+                $e = self::expandEvent($event, NULL);
                 $e['all'] = TRUE;
                 $events[] = $e;
             }
@@ -242,7 +242,7 @@ class PartyController extends Controller
                             'user' => Auth::user(),
                             'user_groups' => $groupsUserIsInChargeOf,
                             'selected_group_id' => $group_id,
-                            'autoapprove' => $autoapprove
+                            'autoapprove' => $autoapprove,
                         ]);
                     }
 
@@ -379,7 +379,7 @@ class PartyController extends Controller
                 'user_groups' => $groupsUserIsInChargeOf,
                 'selected_group_id' => $group_id,
                 'userInChargeOfMultipleGroups' => $userInChargeOfMultipleGroups,
-                'autoapprove' => $autoapprove
+                'autoapprove' => $autoapprove,
             ]);
         }
 
@@ -391,7 +391,7 @@ class PartyController extends Controller
             'user_groups' => $groupsUserIsInChargeOf,
             'selected_group_id' => $group_id,
             'userInChargeOfMultipleGroups' => $userInChargeOfMultipleGroups,
-            'autoapprove' => $autoapprove
+            'autoapprove' => $autoapprove,
         ]);
     }
 
@@ -622,7 +622,7 @@ class PartyController extends Controller
             'user' => Auth::user(),
             'user_groups' => $groupsUserIsInChargeOf,
             'userInChargeOfMultipleGroups' => $userInChargeOfMultipleGroups,
-            'duplicateFrom' => $party
+            'duplicateFrom' => $party,
         ]);
     }
 
@@ -902,14 +902,15 @@ class PartyController extends Controller
     {
         $group_user_ids = UserGroups::where('group', Party::find($event_id)->group)
         ->where('user', '!=', Auth::user()->id)
+        ->where('status', '=', 1)
         ->pluck('user')
         ->toArray();
 
-        // Users already associated with the event.
-        // (Not including those invited but not RSVPed)
+        // Users already confirmed as attending the event.
+        //
+        // We don't want to return users who are already invited - we shouldn't be able to invite twice.
         $event_user_ids = EventsUsers::where('event', $event_id)
         ->where('user', '!=', Auth::user()->id)
-        ->where('status', 'like', '1')
         ->pluck('user')
         ->toArray();
 

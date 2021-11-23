@@ -192,5 +192,5 @@ return [
   'nearest_groups' => 'These are the groups that are within 50 km of :location',
   'nearest_groups_change' => '(change)',
   'invitation_pending' => 'You have an invitation to this group.  Please click <a href=":accept">here</a> if you would like to join.',
-  'geocode_failed' => 'The address you entered could not be found. Please try a more general address.'
+  'geocode_failed' => 'The address you entered could not be found. Please try a more general address.',
 ];

@@ -1,8 +1,8 @@
 <?php
 
-use Illuminate\Support\Facades\Schema;
-use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Database\Migrations\Migration;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\Schema;
 
 class AutoapproveEvents extends Migration
 {
@@ -13,8 +13,7 @@ class AutoapproveEvents extends Migration
      */
     public function up()
     {
-        Schema::table('networks', function (Blueprint $table)
-        {
+        Schema::table('networks', function (Blueprint $table) {
             $table->boolean('auto_approve_events')->default(false);
         });
 

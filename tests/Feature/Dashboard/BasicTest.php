@@ -35,7 +35,7 @@ class BasicTest extends TestCase
             'location' => $city,
             'country' => $country,
             'latitude' => $lat,
-            'longitude' => $lng
+            'longitude' => $lng,
             ]);
         $user->save();
         $user->refresh();
@@ -61,16 +61,17 @@ class BasicTest extends TestCase
             ],
         ]);
 
-        $this->assertEquals($nearbyGroupCount, count(json_decode($props[0][':nearby-groups'], TRUE)));
-        $this->assertEquals($nearbyGroupCount, count(json_decode($props[0][':new-groups'], TRUE)));
+        $this->assertEquals($nearbyGroupCount, count(json_decode($props[0][':nearby-groups'], true)));
+        $this->assertEquals($nearbyGroupCount, count(json_decode($props[0][':new-groups'], true)));
     }
 
-    public function provider() {
+    public function provider()
+    {
         return [
-            [ 'London', 'GB', 51.5465, -0.10581, 1 ],    // Known location, nearby group
-            [ null, 'GB', null, null, 0 ],               // Unknown location, no nearby group
-            [ 'Lima', 'PE', -12.0464, -77.04280, 0 ],    // Known location, no nearby group
-            [ null, 'PE', null, null, 0 ]                // Unknown location, no nearby group
+            ['London', 'GB', 51.5465, -0.10581, 1],    // Known location, nearby group
+            [null, 'GB', null, null, 0],               // Unknown location, no nearby group
+            ['Lima', 'PE', -12.0464, -77.04280, 0],    // Known location, no nearby group
+            [null, 'PE', null, null, 0],                // Unknown location, no nearby group
         ];
     }
 
@@ -102,7 +103,7 @@ class BasicTest extends TestCase
         $eventData['wordpress_post_id'] = 100;
         $eventData['id'] = $event->idevents;
         $eventData['moderate'] = 'approve';
-        $this->post('/party/edit/' . $event->idevents, $eventData);
+        $this->post('/party/edit/'.$event->idevents, $eventData);
 
         // Should now show as an upcoming event, both on dashboard page and events page.
         $this->actingAs($host);

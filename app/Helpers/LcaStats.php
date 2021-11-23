@@ -6,7 +6,6 @@ use DB;
 
 class LcaStats
 {
-
     public static function getEmissionRatioUnpowered()
     {
         return env('EMISSION_RATIO_UNPOWERED');
@@ -28,9 +27,9 @@ class LcaStats
      */
     public static function getWasteStats($group = null)
     {
-        $dF = LcaStats::getDisplacementFactor();
-        $eR = LcaStats::getEmissionRatioPowered();
-        $uR = LcaStats::getEmissionRatioUnpowered();
+        $dF = self::getDisplacementFactor();
+        $eR = self::getEmissionRatioPowered();
+        $uR = self::getEmissionRatioUnpowered();
 
         $t1 = "
 SELECT
@@ -43,7 +42,7 @@ WHERE d.category = c.idcategories
 AND d.event = e.idevents
 AND d.repair_status = 1
 ";
-        if (!is_null($group) && is_numeric($group)) {
+        if (! is_null($group) && is_numeric($group)) {
             $t1 .= " AND e.`group` = $group";
         }
         $sql = "
@@ -54,6 +53,7 @@ SUM(t1.powered_footprints) * $dF AS powered_footprint,
 SUM(t1.unpowered_footprints) * $dF AS unpowered_footprint
 FROM ($t1) t1
 ";
+
         return DB::select(DB::raw($sql));
     }
 
@@ -78,7 +78,7 @@ FROM ($t1) t1
      */
     public static function calculatetEmissionRatioPowered()
     {
-        $value = DB::select(DB::raw("
+        $value = DB::select(DB::raw('
 SELECT
 SUM(c.footprint) / SUM(c.weight) AS ratio
 FROM devices d
@@ -86,13 +86,14 @@ JOIN categories c ON c.idcategories = d.category
 WHERE c.powered = 1
 AND d.repair_status = 1
 AND d.category <> 46
-"));
+'));
+
         return $value[0]->ratio;
     }
 
     public static function calculatetEmissionRatioUnpowered()
     {
-        $value = DB::select(DB::raw("
+        $value = DB::select(DB::raw('
 SELECT
 SUM(c.footprint) / SUM(IF(COALESCE(d.estimate,0) + 0.00 = 0, c.weight, d.estimate + 0.00)) AS ratio
 FROM devices d
@@ -100,7 +101,8 @@ JOIN categories c ON c.idcategories = d.category
 WHERE c.powered = 0
 AND d.repair_status = 1
 AND d.category <> 50
-"));
+'));
+
         return $value[0]->ratio;
     }
 
@@ -111,15 +113,15 @@ AND d.category <> 50
      */
     public static function getWasteStatsFiltered($filters = [])
     {
-        for($i=count($filters)-1;$i>=0;$i--) {
+        for ($i = count($filters) - 1; $i >= 0; $i--) {
             if (strstr($filters[$i][0], 'repair_status')) {
                 unset($filters[$i]);
             }
         }
         $filters[] = ['devices.repair_status', '=', 1];
-        $dF = LcaStats::getDisplacementFactor();
-        $eR = LcaStats::getEmissionRatioPowered();
-        $uR = LcaStats::getEmissionRatioUnpowered();
+        $dF = self::getDisplacementFactor();
+        $eR = self::getEmissionRatioPowered();
+        $uR = self::getEmissionRatioUnpowered();
 
         $t1 = DB::table('devices')->select(
             DB::raw("
@@ -135,7 +137,7 @@ AND d.category <> 50
             ->where($filters)
             ->get();
 
-        $t2 =  DB::table($t1)->select(DB::raw("
+        $t2 = DB::table($t1)->select(DB::raw("
                 SUM(powered_device_weights) AS powered_waste,
                 SUM(unpowered_device_weights) AS unpowered_waste,
                 SUM(powered_footprints) * $dF AS powered_footprint,

@@ -9,13 +9,11 @@ use Illuminate\Http\Request;
 
 class SearchController extends Controller
 {
-
     /**
      * @return \Illuminate\Http\Response
      */
     public function index(Request $request)
     {
-
         $dropdowns = SearchHelper::getUserGroupsAndParties();
 
         // always need to send these, whatever the outcome
@@ -23,11 +21,11 @@ class SearchController extends Controller
         $params['groups'] = $dropdowns['groups'];
         $params['sorted_parties'] = $dropdowns['sorted_parties'];
 
-        if ($request->has('fltr') && !empty($request->input('fltr'))) {
+        if ($request->has('fltr') && ! empty($request->input('fltr'))) {
             // validate filters
 
             $filters = SearchHelper::getSearchFilters($request);
-            if (!empty($filters['response'])) {
+            if (! empty($filters['response'])) {
                 // validation error - return error message
 
                 $params['response'] = $filters['response'];
@@ -45,7 +43,6 @@ class SearchController extends Controller
                 );
 
                 if (count($PartyList) > 0) {
-
                     $partyIds = [];
 
                     /// waste stats

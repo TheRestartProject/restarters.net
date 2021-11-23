@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Device;
 use App\Group;
 use App\Party;
+use App\Providers\RouteServiceProvider;
 use Auth;
 use Illuminate\Http\Request;
 
@@ -23,7 +24,7 @@ class HomeController extends Controller
     public function index()
     {
         if (Auth::check()) {
-            return redirect('/dashboard');
+            return redirect(RouteServiceProvider::HOME);
         } else {
             return redirect('/user/register');
         }

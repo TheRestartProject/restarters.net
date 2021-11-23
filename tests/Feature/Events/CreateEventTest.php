@@ -396,30 +396,33 @@ class CreateEventTest extends TestCase
             'event' => $party->idevents,
             'volunteer_email_address' => $host->email,
             'full_name' => $host->name,
-            'user' => $host->id
+            'user' => $host->id,
         ]);
 
         $response->assertSessionHas('success');
         $this->assertTrue($response->isRedirection());
     }
 
-    public function provider() {
+    public function provider()
+    {
         return [
             // Check the event has been approved (using the magic value of the WordPress post id used when WordPress is
             // not being used.
-            [ true, 99999 ],
+            [true, 99999],
 
             // Check the event is not auto-approved by mistake.
-            [ false, null]
+            [false, null],
         ];
     }
+
     /**
      * @test
      **@dataProvider provider
      */
-    public function an_event_can_be_auto_approved($autoApprove, $wordpress_post_id) {
+    public function an_event_can_be_auto_approved($autoApprove, $wordpress_post_id)
+    {
         $network = factory(Network::class)->create([
-            'auto_approve_events' => $autoApprove
+            'auto_approve_events' => $autoApprove,
         ]);
 
         $host = factory(User::class)->states('Administrator')->create();

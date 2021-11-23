@@ -6,10 +6,10 @@ use App\Role;
 use App\User;
 use DB;
 use Hash;
+use Illuminate\Support\Facades\Config;
 use Mockery;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Tests\TestCase;
-use Illuminate\Support\Facades\Config;
 
 class AccountCreationTest extends TestCase
 {
@@ -32,7 +32,8 @@ class AccountCreationTest extends TestCase
         $this->assertEquals(-0.128, round($user->longitude, 3));
     }
 
-    public function testWorkbenchThenRegister() {
+    public function testWorkbenchThenRegister()
+    {
         $this->get('/workbench');
         $userAttributes = $this->userAttributes();
         $response = $this->post('/user/register/', $userAttributes);
@@ -112,12 +113,13 @@ class AccountCreationTest extends TestCase
         $response->assertRedirect('dashboard');
     }
 
-    public function testValidEmail() {
+    public function testValidEmail()
+    {
 
         // Check with a registered email.
         $restarter = factory(User::class)->state('Restarter')->create();
         $response = $this->post('user/register/check-valid-email', [
-            'email' => $restarter->email
+            'email' => $restarter->email,
         ]);
 
         $this->assertEquals([
@@ -125,13 +127,14 @@ class AccountCreationTest extends TestCase
                             ], json_decode($response->getContent(), true));
 
         $response = $this->post('user/register/check-valid-email', [
-            'email' => 'test@invalid.com'
+            'email' => 'test@invalid.com',
         ]);
 
         $this->assertNull(json_decode($response->getContent(), true));
     }
 
-    public function testAdminCreate() {
+    public function testAdminCreate()
+    {
         $this->loginAsTestUser(Role::ADMINISTRATOR);
 
         $userAttributes = $this->userAttributes();

@@ -3,9 +3,9 @@
 namespace App\Http\Controllers;
 
 use App\Device;
+use App\Helpers\Fixometer;
 use App\Http\Controllers\Controller;
 use App\Party;
-use App\Helpers\Fixometer;
 use Illuminate\Foundation\Auth\AuthenticatesUsers;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
