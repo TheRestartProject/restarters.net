@@ -118,7 +118,7 @@ class PartyController extends Controller
             if (! is_null(Auth::user()->latitude) && ! is_null(Auth::user()->longitude)) {
                 // We know the location of this user, so we can also get nearby upcoming events.
                 $upcoming_events_in_area = Party::upcomingEventsInUserArea(Auth::user())
-                    ->whereNotIn('idevents', array_pluck($events, 'idevents'))
+                    ->whereNotIn('idevents', Arr::pluck($events, 'idevents'))
                     ->get();
 
                 foreach ($upcoming_events_in_area as $event) {
@@ -130,7 +130,7 @@ class PartyController extends Controller
             }
 
             // ...and any other upcoming events
-            $other_upcoming_events = Party::upcomingEvents()->whereNotIn('idevents', array_pluck($events, 'idevents'))->get();
+            $other_upcoming_events = Party::upcomingEvents()->whereNotIn('idevents', Arr::pluck($events, 'idevents'))->get();
 
             foreach ($other_upcoming_events as $event) {
                 $e = self::expandEvent($event, NULL);
