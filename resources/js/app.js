@@ -1329,8 +1329,8 @@ function initAutocomplete() {
   }
 
   function updateEventStats(stats) {
-    $('#waste-insert').html(stats['ewaste']);
-    $('#co2-insert').html(stats['co2']);
+    $('#waste-insert').html(stats['waste_total']);
+    $('#co2-insert').html(stats['co2_total']);
     $('#fixed-insert').html(stats['fixed_devices']);
     $('#repair-insert').html(stats['repairable_devices']);
     $('#dead-insert').html(stats['dead_devices']);
@@ -1347,7 +1347,7 @@ function initAutocomplete() {
         this.value = this.value + "\n";
       }
     });
-    
+
     $('#participants_qty').on('change', function() {
       updateParticipants();
     });

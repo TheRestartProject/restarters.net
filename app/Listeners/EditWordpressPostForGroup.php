@@ -4,8 +4,8 @@ namespace App\Listeners;
 
 use App\Events\EditGroup;
 use App\Group;
-use App\Notifications\AdminWordPressEditGroupFailure;
 use App\Helpers\Fixometer;
+use App\Notifications\AdminWordPressEditGroupFailure;
 use HieuLe\WordpressXmlrpcClient\WordpressClient;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Queue\InteractsWithQueue;
@@ -38,7 +38,7 @@ class EditWordpressPostForGroup
         $group = Group::find($id);
 
         if (! $group->eventsShouldPushToWordpress()) {
-            Log::error('Groups in this network are not published to WordPress');
+            Log::info('Groups in this network are not published to WordPress');
 
             return;
         }

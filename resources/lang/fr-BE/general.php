@@ -34,7 +34,7 @@ return [
   'signmeup' => 'Enregistrez‐moi!',
   'register-signin' => 'S\'enregistrer/Connexion',
   'introduction_message' => 'Nous sommes une communauté de bénévoles à travers le monde qui aident les gens à réparer leurs appareils électroniques lors d\'événements communautaires. Rejoignez‐nous !',
-  'your_name' => 'Votre nom',
+  'your_name' => 'Prénom & Nom',
   'your_name_validation' => 'Veuillez taper une adresse e-mail valide',
   'repair_skills' => 'Compétences',
   'repair_skills_content' => 'Ceci est facultatif mais nous aiderait à améliorer votre expérience. Quelles compétences souhaitez‐vous partager avec les autres ?',

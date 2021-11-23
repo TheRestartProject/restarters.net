@@ -3,9 +3,9 @@
 namespace App\Http\Controllers;
 
 use App\Device;
+use App\Helpers\Fixometer;
 use App\Http\Controllers\Controller;
 use App\Party;
-use App\Helpers\Fixometer;
 use Illuminate\Foundation\Auth\AuthenticatesUsers;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -58,8 +58,8 @@ class AboutController extends Controller
 
         return view('features.index', [
             'slides' => $slides,
-            'co2Total' => $stats['co2Total'][0]->total_footprints,
-            'wasteTotal' => $stats['co2Total'][0]->total_weights,
+            'co2Total' => $stats['waste_stats'][0]->powered_footprint + $stats['waste_stats'][0]->unpowered_footprint,
+            'wasteTotal' => $stats['waste_stats'][0]->powered_waste + $stats['waste_stats'][0]->unpowered_waste,
             'partiesCount' => count($stats['allparties']),
             'deviceCount' => $deviceCount,
         ]);

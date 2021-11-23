@@ -43,6 +43,10 @@
           <b class="text-uppercase d-none d-lg-block">{{ __('groups.groups_title2') }}</b>
         </template>
         <div v-if="nearbyGroups && nearbyGroups.length">
+          <p class="mt-1">
+            {{ nearestGroups }}
+            <a href="/profile/edit" class="small">{{ __('groups.nearest_groups_change') }}</a>.
+          </p>
           <GroupsTable
               :groups="nearbyGroups"
               class="mt-3"
@@ -167,6 +171,11 @@ export default {
         return g.nearby
       })
     },
+    nearestGroups() {
+      return this.$lang.get('groups.nearest_groups', {
+        location: this.yourArea
+      })
+    }
   },
   watch: {
     currentTab(newVal) {

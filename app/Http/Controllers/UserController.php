@@ -679,7 +679,7 @@ class UserController extends Controller
                 $name = $request->get('name');
                 $email = $request->get('email');
                 $role = $request->get('role');
-                if (!$request->has('modal')) {
+                if (! $request->has('modal')) {
                     $groups = $request->get('groups');
                 }
 
@@ -932,8 +932,8 @@ class UserController extends Controller
 
         return view('auth.register-new', [
             'skills' => Fixometer::allSkills(),
-            'co2Total' => $stats['co2Total'][0]->total_footprints,
-            'wasteTotal' => $stats['co2Total'][0]->total_weights,
+            'co2Total' => $stats['waste_stats'][0]->powered_footprint + $stats['waste_stats'][0]->unpowered_footprint,
+            'wasteTotal' => $stats['waste_stats'][0]->powered_waste + $stats['waste_stats'][0]->unpowered_waste,
             'partiesCount' => count($stats['allparties']),
             'deviceCount' => $deviceCount,
             'showNewsletterSignup' => $showNewsletterSignup,
@@ -1139,7 +1139,7 @@ class UserController extends Controller
     {
         $user = User::where('mediawiki', $request->input('wiki_username'))->first();
 
-        if (!$user) {
+        if (! $user) {
             abort('404', 'Wiki user not found');
         }
 
@@ -1156,7 +1156,7 @@ class UserController extends Controller
     {
         $user = User::where('mediawiki', $request->input('wiki_username'))->first();
 
-        if (!$user) {
+        if (! $user) {
             abort('404', 'Wiki user not found');
         }
 

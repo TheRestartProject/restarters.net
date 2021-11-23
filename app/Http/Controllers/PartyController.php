@@ -14,7 +14,6 @@ use App\Events\EventImagesUploaded;
 use App\EventsUsers;
 use App\Group;
 use App\Helpers\Fixometer;
-use App\Helpers\FootprintRatioCalculator;
 use App\Helpers\Geocoder;
 use App\Host;
 use App\Invite;
@@ -141,23 +140,23 @@ class PartyController extends Controller
         $expanded_events = [];
 
         foreach (array_merge($upcoming_events->all(), $past_events->all()) as $event) {
-            $expanded_events[] = \App\Http\Controllers\PartyController::expandEvent($event, $group);
+            $expanded_events[] = self::expandEvent($event, $group);
         }
 
         if ($upcoming_events_in_area) {
-          foreach ($upcoming_events_in_area as $event) {
-              $e = \App\Http\Controllers\PartyController::expandEvent($event, $group);
-              $e['nearby'] = TRUE;
-              $expanded_events[] = $e;
-          }
+            foreach ($upcoming_events_in_area as $event) {
+                $e = self::expandEvent($event, $group);
+                $e['nearby'] = true;
+                $expanded_events[] = $e;
+            }
         }
 
         if ($upcoming_events_all) {
-          foreach ($upcoming_events_all as $event) {
-              $e = \App\Http\Controllers\PartyController::expandEvent($event, $group);
-              $e['all'] = TRUE;
-              $expanded_events[] = $e;
-          }
+            foreach ($upcoming_events_all as $event) {
+                $e = self::expandEvent($event, $group);
+                $e['all'] = true;
+                $expanded_events[] = $e;
+            }
         }
 
         return view('events.index', [
@@ -220,6 +219,7 @@ class PartyController extends Controller
     public function create(Request $request, $group_id = null)
     {
         $user = Auth::user();
+        $autoapprove = $group_id ? Group::where('idgroups', $group_id)->first()->auto_approve : false;
 
         $groupsUserIsInChargeOf = $user->groupsInChargeOf();
         $userInChargeOfMultipleGroups = $user->hasRole('Administrator') || count($groupsUserIsInChargeOf) > 1;
@@ -262,6 +262,7 @@ class PartyController extends Controller
                             'user' => Auth::user(),
                             'user_groups' => $groupsUserIsInChargeOf,
                             'selected_group_id' => $group_id,
+                            'autoapprove' => $autoapprove,
                         ]);
                     }
 
@@ -287,6 +288,11 @@ class PartyController extends Controller
             $location = $request->input('location');
             $group = $request->input('group');
             $user_id = Auth::user()->id;
+            $link = $request->input('link');
+
+            // Check whether the event should be auto-approved, if all of the networks it belongs to
+            // allow it.
+            $autoapprove = Group::where('idgroups', $group)->first()->auto_approve;
 
             // formatting dates for the DB
             $event_date = date('Y-m-d', strtotime($event_date));
@@ -314,6 +320,7 @@ class PartyController extends Controller
                     'end' => $end,
                     'pax' => $pax,
                     'free_text' => $free_text,
+                    'link' => $link,
                     'venue' => $venue,
                     'location' => $location,
                     'latitude' => $latitude,
@@ -357,6 +364,11 @@ class PartyController extends Controller
                             $File->upload($upload, 'image', $idParty, env('TBL_EVENTS'));
                         }
                     }
+
+                    if ($autoapprove) {
+                        Log::info('Auto-approve event $idParty');
+                        Party::find($idParty)->approve();
+                    }
                 } else {
                     $response['danger'] = 'Party could <strong>not</strong> be created. Something went wrong with the database.';
                 }
@@ -372,7 +384,8 @@ class PartyController extends Controller
             }
 
             if (is_numeric($idParty)) {
-                return redirect('/party/edit/'.$idParty)->with('success', Lang::get('events.created_success_message'));
+                return redirect('/party/edit/'.$idParty)->with('success', Lang::get($autoapprove ?
+                                    'events.created_success_message_autoapproved' : 'events.created_success_message'));
             }
 
             return view('events.create', [
@@ -386,6 +399,7 @@ class PartyController extends Controller
                 'user_groups' => $groupsUserIsInChargeOf,
                 'selected_group_id' => $group_id,
                 'userInChargeOfMultipleGroups' => $userInChargeOfMultipleGroups,
+                'autoapprove' => $autoapprove,
             ]);
         }
 
@@ -397,6 +411,7 @@ class PartyController extends Controller
             'user_groups' => $groupsUserIsInChargeOf,
             'selected_group_id' => $group_id,
             'userInChargeOfMultipleGroups' => $userInChargeOfMultipleGroups,
+            'autoapprove' => $autoapprove,
         ]);
     }
 
@@ -501,6 +516,7 @@ class PartyController extends Controller
                 'online' => $request->has('online'),
                 'group' => $data['group'],
                 'venue' => $data['venue'],
+                'link' => $request->has('link') ? $data['link'] : null,
                 'location' => $data['location'],
                 'latitude' => $latitude,
                 'longitude' => $longitude,
@@ -516,35 +532,11 @@ class PartyController extends Controller
                 $theParty = $Party->findThis($id)[0];
 
                 // If event has just been approved, email Restarters attached to group, and push to Wordpress.
+                $event = Party::find($id);
+
                 if (isset($data['moderate']) && $data['moderate'] == 'approve') {
-                    // Notify Restarters of relevant Group
-                    $event = Party::find($id);
-                    $group = Group::find($event->group);
-
-                    // Only send notifications if the event is in the future.
-                    // We don't want to send emails to Restarters about past events being added.
-                    if ($event->isUpcoming()) {
-                        // Retrieving all users from the User model whereby they allow you send emails but their role must not include group admins
-                        $group_restarters = User::join('users_groups', 'users_groups.user', '=', 'users.id')
-                                        ->where('users_groups.group', $event->group)
-                                        ->where('users_groups.role', 4)
-                                            ->select('users.*')
-                                            ->get();
-
-                        // If there are restarters against the group
-                        if (! $group_restarters->isEmpty()) {
-                            // Send user a notification and email
-                            Notification::send($group_restarters, new NotifyRestartersOfNewEvent([
-                                'event_venue' => $event->venue,
-                                'event_url' => url('/party/view/'.$event->idevents),
-                                'event_group' => $group->name,
-                            ]));
-                        }
-                    }
-
-                    event(new ApproveEvent($event, $data));
+                    $event->approve();
                 } elseif (! empty($theParty->wordpress_post_id)) {
-                    $event = Party::find($id);
                     event(new EditEvent($event, $data));
                 }
 
@@ -650,7 +642,7 @@ class PartyController extends Controller
             'user' => Auth::user(),
             'user_groups' => $groupsUserIsInChargeOf,
             'userInChargeOfMultipleGroups' => $userInChargeOfMultipleGroups,
-            'duplicateFrom' => $party
+            'duplicateFrom' => $party,
         ]);
     }
 
@@ -878,8 +870,6 @@ class PartyController extends Controller
 
         $eventStats = $event->getEventStats();
 
-        $eventStats['co2'] = number_format(round($eventStats['co2']), 0, '.', ',');
-
         if (! is_null($class)) {
             return view('party.stats', [
                 'framed' => true,
@@ -932,14 +922,15 @@ class PartyController extends Controller
     {
         $group_user_ids = UserGroups::where('group', Party::find($event_id)->group)
         ->where('user', '!=', Auth::user()->id)
+        ->where('status', '=', 1)
         ->pluck('user')
         ->toArray();
 
-        // Users already associated with the event.
-        // (Not including those invited but not RSVPed)
+        // Users already confirmed as attending the event.
+        //
+        // We don't want to return users who are already invited - we shouldn't be able to invite twice.
         $event_user_ids = EventsUsers::where('event', $event_id)
         ->where('user', '!=', Auth::user()->id)
-        ->where('status', 'like', '1')
         ->pluck('user')
         ->toArray();
 
@@ -1423,11 +1414,11 @@ class PartyController extends Controller
                'description' => $group->free_text,
                'image_url' => $group->groupImagePath(),
                'volunteers' => $group->volunteers,
-               'participants' => $gstats['pax'],
-               'hours_volunteered' => $gstats['hours'],
+               'participants' => $gstats['participants'],
+               'hours_volunteered' => $gstats['hours_volunteered'],
                'parties_thrown' => $gstats['parties'],
-               'waste_prevented' => $gstats['waste'],
-               'co2_emissions_prevented' => $gstats['co2'],
+               'waste_prevented' => $gstats['waste_total'],
+               'co2_emissions_prevented' => $gstats['co2_total'],
            ]);
         }
 
@@ -1455,8 +1446,8 @@ class PartyController extends Controller
              'impact' => [
                  'participants' => $party->pax,
                  'volunteers' => $estats['volunteers'],
-                 'waste_prevented' => $estats['ewaste'],
-                 'co2_emissions_prevented' => $estats['co2'],
+                 'waste_prevented' => $estats['waste_powered'],
+                 'co2_emissions_prevented' => $estats['co2_powered'],
                  'devices_fixed' => $estats['fixed_devices'],
                  'devices_repairable' => $estats['repairable_devices'],
                  'devices_dead' => $estats['dead_devices'],
@@ -1508,11 +1499,11 @@ class PartyController extends Controller
                 'description' => $party->theGroup->free_text,
                 'image_url' => $party->theGroup->groupImagePath(),
                 'volunteers' => $party->theGroup->volunteers,
-                'participants' => $gstats['pax'],
-                'hours_volunteered' => $gstats['hours'],
+                'participants' => $gstats['participants'],
+                'hours_volunteered' => $gstats['hours_volunteered'],
                 'parties_thrown' => $gstats['parties'],
-                'waste_prevented' => $gstats['waste'],
-                'co2_emissions_prevented' => $gstats['co2'],
+                'waste_prevented' => $gstats['waste_total'],
+                'co2_emissions_prevented' => $gstats['co2_total'],
             ],
             'event_date' => $party->event_date,
             'start_time' => $party->start,
@@ -1530,8 +1521,8 @@ class PartyController extends Controller
             'impact' => [
                 'participants' => $party->pax,
                 'volunteers' => $estats['volunteers'],
-                'waste_prevented' => $estats['ewaste'],
-                'co2_emissions_prevented' => $estats['co2'],
+                'waste_prevented' => $estats['waste_total'],
+                'co2_emissions_prevented' => $estats['co2_total'],
                 'devices_fixed' => $estats['fixed_devices'],
                 'devices_repairable' => $estats['repairable_devices'],
                 'devices_dead' => $estats['dead_devices'],

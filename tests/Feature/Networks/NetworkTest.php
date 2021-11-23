@@ -96,7 +96,7 @@ class NetworkTest extends TestCase
 
         $group = factory(Group::class)->create([
            'latitude' => 51.5074,
-           'longitude' => -0.1278
+           'longitude' => -0.1278,
         ]);
         $network = factory(Network::class)->create();
 
@@ -107,7 +107,7 @@ class NetworkTest extends TestCase
 
         $event = factory(Party::class)->create([
             'group' => $group->idgroups,
-            'online' => 1
+            'online' => 1,
         ]);
 
         // Check the group shows up in the list of groups for this network.
@@ -118,7 +118,7 @@ class NetworkTest extends TestCase
         $this->actingAs($coordinator);
 
         $response = $this->get('/api/groups/network?api_token=1234');
-        $groups = json_decode($response->getContent(), TRUE);
+        $groups = json_decode($response->getContent(), true);
         $this->assertEquals(1, count($groups));
         $this->assertEquals($group->idgroups, $groups[0]['id']);
         $this->assertEquals($group->name, $groups[0]['name']);
@@ -130,20 +130,20 @@ class NetworkTest extends TestCase
         $this->assertEquals(1, $groups[0]['past_parties'][0]['online']);
 
         // Get again with a bounding box which the group is inside.
-        $response = $this->get('/api/groups/network?api_token=1234&bbox=' . urlencode('51.5,-0.13,51.51,-0.12'));
-        $groups = json_decode($response->getContent(), TRUE);
+        $response = $this->get('/api/groups/network?api_token=1234&bbox='.urlencode('51.5,-0.13,51.51,-0.12'));
+        $groups = json_decode($response->getContent(), true);
         $this->assertEquals(1, count($groups));
         $this->assertEquals($group->idgroups, $groups[0]['id']);
         $this->assertEquals($group->name, $groups[0]['name']);
 
         // Get again with a bounding box which the group is outside.
-        $response = $this->get('/api/groups/network?api_token=1234&bbox=' . urlencode('51.5,-0.13,51.505,-0.12'));
-        $groups = json_decode($response->getContent(), TRUE);
+        $response = $this->get('/api/groups/network?api_token=1234&bbox='.urlencode('51.5,-0.13,51.505,-0.12'));
+        $groups = json_decode($response->getContent(), true);
         $this->assertEquals(0, count($groups));
 
         // Check the event shows in the events network API call.
         $response = $this->get('/api/events/network?api_token=1234');
-        $events = json_decode($response->getContent(), TRUE);
+        $events = json_decode($response->getContent(), true);
         $this->assertEquals(1, count($events));
         $this->assertEquals($event->idevents, $events[0]['id']);
         $this->assertEquals($event->free_text, $events[0]['description']);
@@ -206,23 +206,7 @@ class NetworkTest extends TestCase
 
         $response = $this->get("/api/networks/{$network->id}/stats?api_token=1234");
         $stats = json_decode($response->getContent(), true);
-        $expectedStats = [
-            'pax' => 0,
-            'hours' => 0,
-            'parties' => 0,
-            'co2' => 0,
-            'waste' => 0,
-            'ewaste' => 0,
-            'unpowered_waste' => 0,
-            'fixed_devices' => 0,
-            'fixed_powered' => 0,
-            'fixed_unpowered' => 0,
-            'repairable_devices' => 0,
-            'dead_devices' => 0,
-            'no_weight' => 0,
-            'devices_powered' => 0,
-            'devices_unpowered' => 0,
-        ];
+        $expectedStats = \App\Group::getGroupStatsArrayKeys();
         $this->assertEquals($expectedStats, $stats);
     }
 }

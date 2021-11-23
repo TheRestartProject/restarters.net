@@ -91,7 +91,7 @@ class DashboardController extends Controller
 
             // Look for new nearby groups that we're not already a member of.  Eloquent is just getting in the way
             // here so do a raw query.
-            $new_groups = $user->groupsNearby(3, "1 month ago");
+            $new_groups = $user->groupsNearby(3, '1 month ago');
         } else { //Else show them the latest three
             $upcoming_events = Party::with('theGroup')->
             whereDate('event_date', '>=', date('Y-m-d'))

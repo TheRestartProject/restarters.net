@@ -133,7 +133,6 @@ WHERE o.eee = 2
      */
     public function updateDevices()
     {
-
         $t2 = "
 SELECT
 o.iddevices,
@@ -185,7 +184,7 @@ OR
 
         // logger($t1);
         DB::statement("CREATE TEMPORARY TABLE IF NOT EXISTS `devices_misc_temporary` AS $t1;");
-        DB::statement("ALTER TABLE `devices_misc_temporary` ADD PRIMARY KEY(`iddevices`);");
+        DB::statement('ALTER TABLE `devices_misc_temporary` ADD PRIMARY KEY(`iddevices`);');
 
         DB::update('UPDATE devices_misc_temporary t, categories c
 SET t.idcategories = c.idcategories
@@ -195,7 +194,7 @@ WHERE t.winning_opinion = c.`name`;');
 SET d.category = t.idcategories
 WHERE d.iddevices = t.iddevices AND t.idcategories > 0;');
 
-        DB::statement("DROP TEMPORARY TABLE IF EXISTS `devices_misc_temporary`;");
+        DB::statement('DROP TEMPORARY TABLE IF EXISTS `devices_misc_temporary`;');
 
         return $result;
     }

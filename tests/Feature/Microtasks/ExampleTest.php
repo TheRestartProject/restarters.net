@@ -61,7 +61,6 @@ class ExampleTest extends TestCase
      * create_table_3a is intended to fail under MySQL 5.7 but needs more complex query
      * e.g. see MobifixOra->updateDevices();
      */
-
     public function create_table_1()
     {
         $data = $this->_setup_data();

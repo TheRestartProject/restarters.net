@@ -4,29 +4,29 @@ namespace Tests\Feature;
 
 use App\EventsUsers;
 use App\Group;
+use App\Helpers\Geocoder;
 use App\Network;
 use App\Notifications\AdminModerationEvent;
+use App\Notifications\NotifyRestartersOfNewEvent;
 use App\Party;
 use App\User;
-use App\Helpers\Geocoder;
-use App\Notifications\NotifyRestartersOfNewEvent;
-use Faker\Generator as Faker;
-
 use DB;
-use Tests\TestCase;
+use Faker\Generator as Faker;
 use Illuminate\Support\Facades\Notification;
 use Symfony\Component\DomCrawler\Crawler;
+use Tests\TestCase;
 
 class AddRemoveVolunteerTest extends TestCase
 {
-    public function testAddRemove() {
+    public function testAddRemove()
+    {
         $this->withoutExceptionHandling();
 
         $group = factory(Group::class)->create();
         $event = factory(Party::class)->create([
                                                    'group' => $group,
                                                    'event_date' => '2130-01-01',
-                                                   'start' => '12:13'
+                                                   'start' => '12:13',
                                                ]);
 
         $host = factory(User::class)->states('Administrator')->create();
@@ -39,13 +39,13 @@ class AddRemoveVolunteerTest extends TestCase
             'event' => $event->idevents,
             'volunteer_email_address' => $restarter->email,
             'full_name' => $restarter->name,
-            'user' => $restarter->id
+            'user' => $restarter->id,
         ]);
 
         $response->assertSessionHas('success');
         $this->assertTrue($response->isRedirection());
         $redirectTo = $response->getTargetUrl();
-        $this->assertNotFalse(strpos($redirectTo, '/party/view/' . $event->idevents));
+        $this->assertNotFalse(strpos($redirectTo, '/party/view/'.$event->idevents));
 
         // Remove them
         $volunteer = EventsUsers::where('user', $restarter->id)->first();
@@ -63,20 +63,20 @@ class AddRemoveVolunteerTest extends TestCase
         ]);
 
         $response->assertSessionHas('success');
-        $response = $this->get('/party/view/' . $event->idevents);
+        $response = $this->get('/party/view/'.$event->idevents);
         $response->assertSee('Invites Sent!');
 
         $response = $this->post('/party/add-volunteer', [
             'event' => $event->idevents,
             'volunteer_email_address' => $restarter->email,
             'full_name' => $restarter->name,
-            'user' => $restarter->id
+            'user' => $restarter->id,
         ]);
 
         $response->assertSessionHas('success');
         $this->assertTrue($response->isRedirection());
         $redirectTo = $response->getTargetUrl();
-        $this->assertNotFalse(strpos($redirectTo, '/party/view/' . $event->idevents));
+        $this->assertNotFalse(strpos($redirectTo, '/party/view/'.$event->idevents));
 
         $volunteer = EventsUsers::where('user', $restarter->id)->first();
         $this->post('/party/remove-volunteer/', [
@@ -92,7 +92,7 @@ class AddRemoveVolunteerTest extends TestCase
         $response->assertSessionHas('success');
         $this->assertTrue($response->isRedirection());
         $redirectTo = $response->getTargetUrl();
-        $this->assertNotFalse(strpos($redirectTo, '/party/view/' . $event->idevents));
+        $this->assertNotFalse(strpos($redirectTo, '/party/view/'.$event->idevents));
 
         $volunteer = EventsUsers::where('full_name', 'Jo Bloggins')->first();
         $this->post('/party/remove-volunteer/', [
@@ -107,7 +107,7 @@ class AddRemoveVolunteerTest extends TestCase
         $response->assertSessionHas('success');
         $this->assertTrue($response->isRedirection());
         $redirectTo = $response->getTargetUrl();
-        $this->assertNotFalse(strpos($redirectTo, '/party/view/' . $event->idevents));
+        $this->assertNotFalse(strpos($redirectTo, '/party/view/'.$event->idevents));
 
         $volunteer = EventsUsers::where('event', $event->idevents)->whereNull('user')->first();
         $this->post('/party/remove-volunteer/', [

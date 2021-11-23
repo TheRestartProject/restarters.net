@@ -9,7 +9,7 @@ use Illuminate\Database\Eloquent\Model;
 class Category extends Model
 {
     protected $table = 'categories';
-    private $revision = 1;
+    private $revision = 2;
     protected $primaryKey = 'idcategories';
     public $timestamps = false;
     /**
@@ -62,19 +62,14 @@ class Category extends Model
         }
     }
 
-    public function isMisc()
-    {
-        return $this->idcategories == 46;
-    }
-
     public function isMiscPowered()
     {
-        return $this->idcategories == 46;
+        return $this->idcategories == env('MISC_CATEGORY_ID_POWERED');
     }
 
     public function isMiscUnpowered()
     {
-        return $this->idcategories == 50;
+        return $this->idcategories == env('MISC_CATEGORY_ID_UNPOWERED');
     }
 
     public function isPowered()

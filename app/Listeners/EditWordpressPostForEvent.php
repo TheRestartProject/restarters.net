@@ -4,10 +4,10 @@ namespace App\Listeners;
 
 use App\Events\EditEvent;
 use App\Group;
+use App\Helpers\Fixometer;
 use App\Network;
 use App\Notifications\AdminWordPressEditEventFailure;
 use App\Party;
-use App\Helpers\Fixometer;
 use HieuLe\WordpressXmlrpcClient\WordpressClient;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Queue\InteractsWithQueue;
@@ -42,7 +42,7 @@ class EditWordpressPostForEvent
         $theParty = Party::find($id);
 
         if (! $theParty->shouldPushToWordpress()) {
-            Log::error('Events for groups in this network are not published');
+            Log::info('Events for groups in this network are not published');
 
             return;
         }

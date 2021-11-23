@@ -35,7 +35,7 @@ return [
   'profile' => 'Profil',
   'view_profile' => 'Voir profil',
   'view_user_profile' => 'Voir profil d\'utilisateur',
-  'name' => 'Nom',
+  'name' => 'Prénom & Nom',
   'notifications' => 'Notifications',
   'repair_directory' => 'Répertoire de la réparation',
   'repair_dir_editor' => 'Editeur',

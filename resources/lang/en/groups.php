@@ -164,7 +164,7 @@ return [
   'quick_access' => 'Groups you create or follow appear below for quick access.',
   'no_groups_mine' => '<b>If you can\'t see any here yet, why not <a href="/group/nearby">follow your nearest group</a> to hear about their upcoming repair events?</b>',
   'no_groups_nearest_no_location' => '<b><p>You do not currently have a town/city set.  You can set one in <a href="/profile/edit">your profile</a>.</p><p>You can also <a href="/group/all">view all groups</a>.</p></b>',
-  'no_groups_nearest_with_location' => '<b><p>It doesn\'t look like there are any groups listed near you yet.</p><p>Would you like to start or add a group?  Have a look at <a href="https://talk.restarters.net/t/how-to-power-up-community-repair-with-restarters-net/1228/2">our resources</a>.</p></b>',
+  'no_groups_nearest_with_location' => '<p>There are no groups within 50 km of your location. You can <a href="/group/all">see all groups here</a>. Or why not start your own? <a href="https://talk.restarters.net/t/how-to-run-a-repair-event-the-restart-party-kit/324">Learn what running your own repair event involves.</a></p>',
   'group_count' => 'There is <b>:count group</b>.|There are <b>:count groups</b>.',
   'search_name_placeholder' => 'Search name...',
   'search_location_placeholder' => 'Search location...',
@@ -189,4 +189,8 @@ return [
   'delete_group' => 'Delete group',
   'delete_group_confirm' => 'Please confirm that you want to delete :name.',
   'delete_succeeded' => 'Group <strong>:name</strong> has been deleted.',
+  'nearest_groups' => 'These are the groups that are within 50 km of :location',
+  'nearest_groups_change' => '(change)',
+  'invitation_pending' => 'You have an invitation to this group.  Please click <a href=":accept">here</a> if you would like to join.',
+  'geocode_failed' => 'The address you entered could not be found. Please try a more general address.',
 ];

@@ -5,10 +5,10 @@ namespace Tests\Feature;
 use App\Events\UserUpdated;
 use App\User;
 use Carbon\Carbon;
+use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Facades\Event;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Tests\TestCase;
-use Illuminate\Support\Facades\Event;
-use Illuminate\Foundation\Testing\RefreshDatabase;
 
 class MenusTest extends TestCase
 {
@@ -60,7 +60,8 @@ class MenusTest extends TestCase
         $this->assertEquals($present, array_keys($menus));
     }
 
-    public function testLoggedOut() {
+    public function testLoggedOut()
+    {
         $this->expectException(NotFoundHttpException::class);
         $this->get('/user/menus');
     }

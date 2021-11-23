@@ -5,6 +5,7 @@ namespace Tests\Feature;
 use App\EventsUsers;
 use App\Group;
 use App\Helpers\Geocoder;
+use App\Helpers\RepairNetworkService;
 use App\Network;
 use App\Notifications\AdminModerationEvent;
 use App\Notifications\NotifyRestartersOfNewEvent;
@@ -75,6 +76,7 @@ class CreateEventTest extends TestCase
         // Create a party for the specific group.
         $eventAttributes = factory(Party::class)->raw();
         $eventAttributes['group'] = $group->idgroups;
+        $eventAttributes['link'] = 'https://therestartproject.org/';
 
         // We want an upcoming event so that we can check it appears in various places.
         $eventAttributes['event_date'] = date('Y-m-d', strtotime('tomorrow'));
@@ -328,10 +330,49 @@ class CreateEventTest extends TestCase
             'event' => $party->idevents,
             'volunteer_email_address' => $host->email,
             'full_name' => $host->name,
-            'user' => $host->id
+            'user' => $host->id,
         ]);
 
         $response->assertSessionHas('success');
         $this->assertTrue($response->isRedirection());
+    }
+
+    public function provider()
+    {
+        return [
+            // Check the event has been approved (using the magic value of the WordPress post id used when WordPress is
+            // not being used.
+            [true, 99999],
+
+            // Check the event is not auto-approved by mistake.
+            [false, null],
+        ];
+    }
+
+    /**
+     * @test
+     **@dataProvider provider
+     */
+    public function an_event_can_be_auto_approved($autoApprove, $wordpress_post_id)
+    {
+        $network = factory(Network::class)->create([
+            'auto_approve_events' => $autoApprove,
+        ]);
+
+        $host = factory(User::class)->states('Administrator')->create();
+        $this->actingAs($host);
+
+        $group = factory(Group::class)->create();
+        $this->networkService = new RepairNetworkService();
+        $this->networkService->addGroupToNetwork($host, $group, $network);
+        $group->addVolunteer($host);
+        $group->makeMemberAHost($host);
+
+        // Create the event
+        $idevents = $this->createEvent($group->idgroups, '2000-01-01');
+
+        $party = $group->parties()->latest()->first();
+        $this->assertEquals($idevents, $party->idevents);
+        $this->assertEquals($wordpress_post_id, $party->wordpress_post_id);
     }
 }

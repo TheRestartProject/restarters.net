@@ -3,14 +3,17 @@
 namespace App;
 
 use App\Device;
+use App\Events\ApproveEvent;
 use App\EventUsers;
 use App\Helpers\Fixometer;
+use App\Notifications\NotifyRestartersOfNewEvent;
 use Auth;
 use Carbon\Carbon;
 use DB;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Support\Str;
+use Notification;
 use OwenIt\Auditing\Contracts\Auditable;
 
 class Party extends Model implements Auditable
@@ -40,6 +43,7 @@ class Party extends Model implements Auditable
         'online',
         'discourse_thread',
         'devices_updated_at',
+        'link',
     ];
     protected $hidden = ['created_at', 'updated_at', 'deleted_at', 'frequency', 'group', 'group', 'user_id', 'wordpress_post_id', 'cancelled', 'devices_updated_at'];
 
@@ -56,6 +60,7 @@ class Party extends Model implements Auditable
                     `e`.`start` AS `start`,
                     `e`.`end` AS `end`,
                     `e`.`venue`,
+                    `e`.`link`,
                     `e`.`location`,
                     `e`.`latitude`,
                     `e`.`longitude`,
@@ -82,6 +87,7 @@ class Party extends Model implements Auditable
                     `e`.`start` AS `start`,
                     `e`.`end` AS `end`,
                     `e`.`venue`,
+                    `e`.`link`,
                     `e`.`location`,
                     `e`.`latitude`,
                     `e`.`longitude`,
@@ -109,6 +115,7 @@ class Party extends Model implements Auditable
                     `e`.`start` AS `start`,
                     `e`.`end` AS `end`,
                     `e`.`venue`,
+                    `e`.`link`,
                     `e`.`location`,
                     `e`.`latitude`,
                     `e`.`longitude`,
@@ -163,7 +170,7 @@ class Party extends Model implements Auditable
     public function ofThisUser($id, $only_past = false, $devices = false)
     {
         //Tested
-        $sql = 'SELECT *, `e`.`venue` AS `venue`, `e`.`location` as `location`, UNIX_TIMESTAMP( CONCAT(`e`.`event_date`, " ", `e`.`start`) ) AS `event_timestamp`
+        $sql = 'SELECT *, `e`.`venue` AS `venue`, `e`.`link` AS `link`, `e`.`location` as `location`, UNIX_TIMESTAMP( CONCAT(`e`.`event_date`, " ", `e`.`start`) ) AS `event_timestamp`
                 FROM `'.$this->table.'` AS `e`
                 INNER JOIN `events_users` AS `eu` ON `eu`.`event` = `e`.`idevents`
                 INNER JOIN `groups` as `g` ON `e`.`group` = `g`.`idgroups`
@@ -199,7 +206,7 @@ class Party extends Model implements Auditable
         //Tested
         $sql = 'SELECT
                     *,
-	`e`.`venue` AS `venue`, `e`.`location` as `location`,
+	`e`.`venue` AS `venue`, `e`.`link` AS `link`, `e`.`location` as `location`,
                     `g`.`name` AS group_name,
 
 
@@ -254,7 +261,7 @@ class Party extends Model implements Auditable
         //Tested
         $sql = 'SELECT
                     *,
-	`e`.`venue` AS `venue`, `e`.`location` as `location`,
+	`e`.`venue` AS `venue`, `e`.`link` AS `link`, `e`.`location` as `location`,
                     `g`.`name` AS group_name,
 
 
@@ -320,6 +327,7 @@ class Party extends Model implements Auditable
         $sql = 'SELECT
                     `e`.`idevents`,
                     `e`.`venue`,
+                    `e`.`link`,
                     `e`.`location`,
                     UNIX_TIMESTAMP( CONCAT(`e`.`event_date`, " ", `e`.`start`) ) AS `event_timestamp`,
                     `e`.`event_date` AS `plain_date`,
@@ -359,6 +367,7 @@ class Party extends Model implements Auditable
         return DB::select(DB::raw('SELECT
                     `e`.`idevents`,
                     `e`.`venue`,
+                    `e`.`link`,
                     `e`.`location`,
                     UNIX_TIMESTAMP( CONCAT(`e`.`event_date`, " ", `e`.`start`) ) AS `event_date`,
                     `e`.`start`,
@@ -392,10 +401,10 @@ class Party extends Model implements Auditable
             ->leftJoin('users', 'users.id', '=', 'events_users.user')
             ->where(function ($query) {
                 $query
-                  ->whereNotNull('events.wordpress_post_id')
-                  ->orWhere('events_users.role', '=', Role::HOST)
-                  ->orWhere('users_groups.role', '=', Role::HOST)
-                  ->orWhereIn('users.role', [Role::NETWORK_COORDINATOR, Role::ADMINISTRATOR]);
+                    ->whereNotNull('events.wordpress_post_id')
+                    ->orWhere('events_users.role', '=', Role::HOST)
+                    ->orWhere('users_groups.role', '=', Role::HOST)
+                    ->orWhereIn('users.role', [Role::NETWORK_COORDINATOR, Role::ADMINISTRATOR]);
             })
             ->whereDate('event_date', '>=', date('Y-m-d'))
             ->select('events.*')
@@ -438,21 +447,21 @@ class Party extends Model implements Auditable
     public function scopeAllUpcomingEvents()
     {
         return $this->whereRaw('CONCAT(`event_date`, " ", `start`) > CURRENT_TIMESTAMP()')
-                    ->orderByRaw('CONCAT(`event_date`, " ", `start`)');
+            ->orderByRaw('CONCAT(`event_date`, " ", `start`)');
     }
 
     public function scopeRequiresModeration()
     {
         return $this->whereNull('wordpress_post_id')
-                      ->whereDate('event_date', '>=', date('Y-m-d'))
-                        ->orderBy('event_date', 'ASC');
+            ->whereDate('event_date', '>=', date('Y-m-d'))
+            ->orderBy('event_date', 'ASC');
     }
 
     public function scopePastEvents()
     {
         return $this->whereNotNull('wordpress_post_id')
-                      ->whereDate('event_date', '<', date('Y-m-d'))
-                        ->orderBy('event_date', 'DESC');
+            ->whereDate('event_date', '<', date('Y-m-d'))
+            ->orderBy('event_date', 'DESC');
     }
 
     /**
@@ -474,19 +483,19 @@ class Party extends Model implements Auditable
         }
 
         return $query->join('groups', 'groups.idgroups', '=', 'events.group')
-      ->join('users_groups', 'users_groups.group', '=', 'groups.idgroups')
-      ->join('events_users', 'events_users.event', '=', 'events.idevents')
-      ->whereNotNull('events.wordpress_post_id')
-      ->whereDate('events.event_date', '<', date('Y-m-d'))
+            ->join('users_groups', 'users_groups.group', '=', 'groups.idgroups')
+            ->join('events_users', 'events_users.event', '=', 'events.idevents')
+            ->whereNotNull('events.wordpress_post_id')
+            ->whereDate('events.event_date', '<', date('Y-m-d'))
 
-      ->where(function ($query) use ($user_ids) {
-          $query->whereIn('users_groups.user', $user_ids)
-          ->orWhereIn('events_users.user', $user_ids);
-      })
+            ->where(function ($query) use ($user_ids) {
+                $query->whereIn('users_groups.user', $user_ids)
+                    ->orWhereIn('events_users.user', $user_ids);
+            })
 
-      ->select('events.*')
-      ->groupBy('idevents')
-      ->orderBy('events.event_date', 'DESC');
+            ->select('events.*')
+            ->groupBy('idevents')
+            ->orderBy('events.event_date', 'DESC');
     }
 
     public function allDevices()
@@ -502,10 +511,10 @@ class Party extends Model implements Auditable
     public function allConfirmedVolunteers()
     {
         return $this->hasMany(EventsUsers::class, 'event', 'idevents')
-          ->where(function ($query) {
-              $query->where('status', 1)
-                  ->orWhereNull('status');
-          });
+            ->where(function ($query) {
+                $query->where('status', 1)
+                    ->orWhereNull('status');
+            });
     }
 
     public function host()
@@ -628,83 +637,96 @@ class Party extends Model implements Auditable
         return false;
     }
 
-    public function getEventStats($emissionRatio = null)
+    public static function getEventStatsArrayKeys()
+    {
+        return [
+            'co2_powered' => 0,
+            'co2_unpowered' => 0,
+            'co2_total' => 0,
+            'waste_powered' => 0,
+            'waste_unpowered' => 0,
+            'waste_total' => 0,
+            'fixed_devices' => 0,
+            'fixed_powered' => 0,
+            'fixed_unpowered' => 0,
+            'repairable_devices' => 0,
+            'dead_devices' => 0,
+            'unknown_repair_status' => 0,
+            'devices_powered' => 0,
+            'devices_unpowered' => 0,
+            'no_weight_powered' => 0,
+            'no_weight_unpowered' => 0,
+            'participants' => 0,
+            'volunteers' => 0,
+            'hours_volunteered' => 0,
+        ];
+    }
+
+    public function getEventStats($eEmissionRatio = null, $uEmissionratio = null)
     {
         $displacementFactor = \App\Device::getDisplacementFactor();
-        if (is_null($emissionRatio)) {
-            $emissionRatio = \App\Helpers\FootprintRatioCalculator::calculateRatio();
+        if (is_null($eEmissionRatio)) {
+            $eEmissionRatio = \App\Helpers\LcaStats::getEmissionRatioPowered();
+        }
+        if (is_null($uEmissionratio)) {
+            $uEmissionratio = \App\Helpers\LcaStats::getEmissionRatioUnpowered();
         }
 
-        $co2Diverted = 0;
-        $ewasteDiverted = 0;
-        $unpoweredWasteDiverted = 0;
-        $fixed_devices = 0;
-        $fixed_powered = 0;
-        $fixed_unpowered = 0;
-        $repairable_devices = 0;
-        $dead_devices = 0;
-        $no_weight = 0;
-        $devices_powered = 0;
-        $devices_unpowered = 0;
+        $result = self::getEventStatsArrayKeys();
 
         if (! empty($this->allDevices)) {
             foreach ($this->allDevices as $device) {
                 if ($device->deviceCategory->powered) {
-                    $devices_powered++;
+                    $result['devices_powered']++;
 
                     if ($device->isFixed()) {
-                        $co2Diverted += $device->co2Diverted($emissionRatio, $displacementFactor);
-                        $ewasteDiverted += $device->ewasteDiverted();
-                        $fixed_powered++;
+                        $result['co2_powered'] += $device->eCo2Diverted($eEmissionRatio, $displacementFactor);
+                        $result['waste_powered'] += $device->eWasteDiverted();
+                        $result['fixed_powered']++;
                     }
                 } else {
-                    $devices_unpowered++;
+                    $result['devices_unpowered']++;
 
                     if ($device->isFixed()) {
-                        // CO2 estimates don't include unpowered items.
-                        $unpoweredWasteDiverted += $device->unpoweredWasteDiverted();
-                        $fixed_unpowered++;
+                        $result['co2_unpowered'] += $device->uCo2Diverted($uEmissionratio, $displacementFactor);
+                        $result['waste_unpowered'] += $device->uWasteDiverted();
+                        $result['fixed_unpowered']++;
                     }
                 }
 
                 switch ($device->repair_status) {
                     case 1:
-                        $fixed_devices++;
-
+                        $result['fixed_devices']++;
                         break;
                     case 2:
-                        $repairable_devices++;
-
+                        $result['repairable_devices']++;
                         break;
                     case 3:
-                        $dead_devices++;
-
+                        $result['dead_devices']++;
                         break;
                     default:
+                        $result['unknown_repair_status']++;
                         break;
                 }
 
-                if ($device->isFixed() && ($device->category == 46 || ! $device->deviceCategory->weight) && ! $device->estimate) {
-                    $no_weight++;
+                if ($device->isFixed()) {
+                    if (! $device->deviceCategory->weight && ! $device->estimate) {
+                        if ($device->deviceCategory->isMiscPowered()) {
+                            $result['no_weight_powered']++;
+                        } elseif ($device->deviceCategory->isMiscUnpowered()) {
+                            $result['no_weight_unpowered']++;
+                        }
+                    }
                 }
             }
 
-            return [
-                'co2' => $co2Diverted,
-                'ewaste' => $ewasteDiverted,
-                'unpowered_waste' => $unpoweredWasteDiverted,
-                'fixed_devices' => $fixed_devices,
-                'fixed_powered' => $fixed_powered,
-                'fixed_unpowered' => $fixed_unpowered,
-                'repairable_devices' => $repairable_devices,
-                'dead_devices' => $dead_devices,
-                'no_weight' => $no_weight,
-                'participants' => $this->pax,
-                'volunteers' => $this->volunteers,
-                'hours_volunteered' => $this->hoursVolunteered(),
-                'devices_powered' => $devices_powered,
-                'devices_unpowered' => $devices_unpowered,
-            ];
+            $result['co2_total'] = $result['co2_powered'] + $result['co2_unpowered'];
+            $result['waste_total'] = $result['waste_powered'] + $result['waste_unpowered'];
+            $result['participants'] = $this->pax ?? 0;
+            $result['volunteers'] = $this->volunteers ?? 0;
+            $result['hours_volunteered'] = $this->hoursVolunteered();
+
+            return $result;
         }
     }
 
@@ -756,7 +778,7 @@ class Party extends Model implements Auditable
     public function isVolunteer($user_id = null)
     {
         return $this->allConfirmedVolunteers
-        ->contains('user', $user_id ?: auth()->id());
+            ->contains('user', $user_id ?: auth()->id());
     }
 
     public function isBeingAttendedBy($userId)
@@ -808,10 +830,10 @@ class Party extends Model implements Auditable
         $devices_count = $this->allDevices->count();
 
         return [
-        'participants_count' => $participants_count,
-        'volunteers_count' => $volunteers_count,
-        'devices_count' => $devices_count,
-      ];
+            'participants_count' => $participants_count,
+            'volunteers_count' => $volunteers_count,
+            'devices_count' => $devices_count,
+        ];
     }
 
     public function requiresModerationByAdmin()
@@ -834,9 +856,11 @@ class Party extends Model implements Auditable
                 return 'cell-primary-heading';
             }
         } elseif ($this->hasFinished()) {
-            if ($this->checkForMissingData()['participants_count'] == 0 ||
-        $this->checkForMissingData()['volunteers_count'] <= 1 ||
-        $this->checkForMissingData()['devices_count'] == 0) {
+            if (
+                $this->checkForMissingData()['participants_count'] == 0 ||
+                $this->checkForMissingData()['volunteers_count'] <= 1 ||
+                $this->checkForMissingData()['devices_count'] == 0
+            ) {
                 return 'cell-danger-heading';
             }
         } else {
@@ -860,18 +884,18 @@ class Party extends Model implements Auditable
 
     public function getWastePreventedAttribute()
     {
-        return round($this->getEventStats()['ewaste'], 2);
+        return round($this->getEventStats()['waste_total'], 2);
     }
 
     public function scopeWithAll($query)
     {
         return $query->with([
-          'allDevices.deviceCategory',
-          'allInvited',
-          'allConfirmedVolunteers',
-          'host',
-          'theGroup.groupImage.image',
-          'devices.deviceCategory',
+            'allDevices.deviceCategory',
+            'allInvited',
+            'allConfirmedVolunteers',
+            'host',
+            'theGroup.groupImage.image',
+            'devices.deviceCategory',
         ]);
     }
 
@@ -907,8 +931,38 @@ class Party extends Model implements Auditable
         return strtotime($this->updated_at) > strtotime($this->devices_updated_at) ? $this->updated_at : $this->devices_updated_at;
     }
 
-    public function canDelete() {
+    public function canDelete()
+    {
         $stats = $this->getEventStats();
+
         return $stats['devices_powered'] == 0 && $stats['devices_unpowered'] == 0;
+    }
+
+    public function approve()
+    {
+        $group = Group::find($this->group);
+
+        // Only send notifications if the event is in the future.
+        // We don't want to send emails to Restarters about past events being added.
+        if ($this->isUpcoming()) {
+            // Retrieving all users from the User model whereby they allow you send emails but their role must not include group admins
+            $group_restarters = User::join('users_groups', 'users_groups.user', '=', 'users.id')
+                ->where('users_groups.group', $this->group)
+                ->where('users_groups.role', 4)
+                ->select('users.*')
+                ->get();
+
+            // If there are restarters against the group
+            if (! $group_restarters->isEmpty()) {
+                // Send user a notification and email
+                Notification::send($group_restarters, new NotifyRestartersOfNewEvent([
+                                                                                         'event_venue' => $this->venue,
+                                                                                         'event_url' => url('/party/view/'.$this->idevents),
+                                                                                         'event_group' => $group->name,
+                                                                                     ]));
+            }
+        }
+
+        event(new ApproveEvent($this));
     }
 }
