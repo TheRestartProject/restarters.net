@@ -791,7 +791,7 @@ class GroupController extends Controller
                     'all_hosts_count' => $group->all_hosts_count,
                     'all_confirmed_restarters_count' => $group->all_confirmed_restarters_count,
                     'all_confirmed_hosts_count' => $group->all_confirmed_hosts_count,
-                    'networks' => Arr::pluck($group->networks, 'id'),
+                    'networks' => \Illuminate\Support\Arr::pluck($group->networks, 'id'),
                     'country' => $group->country,
                     'group_tags' => $group->group_tags()->get()->pluck('id'),
                     'distance' => $group->distance,
