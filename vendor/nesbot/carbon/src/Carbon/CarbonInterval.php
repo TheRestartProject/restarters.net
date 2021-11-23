@@ -8,6 +8,7 @@
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
+
 namespace Carbon;
 
 use Carbon\Exceptions\BadFluentConstructorException;
@@ -25,6 +26,8 @@ use Carbon\Traits\Mixin;
 use Carbon\Traits\Options;
 use Closure;
 use DateInterval;
+use DateTimeInterface;
+use DateTimeZone;
 use Exception;
 use ReflectionException;
 use ReturnTypeWillChange;
@@ -189,14 +192,14 @@ class CarbonInterval extends DateInterval implements CarbonConverterInterface
     /**
      * Interval spec period designators
      */
-    const PERIOD_PREFIX = 'P';
-    const PERIOD_YEARS = 'Y';
-    const PERIOD_MONTHS = 'M';
-    const PERIOD_DAYS = 'D';
-    const PERIOD_TIME_PREFIX = 'T';
-    const PERIOD_HOURS = 'H';
-    const PERIOD_MINUTES = 'M';
-    const PERIOD_SECONDS = 'S';
+    public const PERIOD_PREFIX = 'P';
+    public const PERIOD_YEARS = 'Y';
+    public const PERIOD_MONTHS = 'M';
+    public const PERIOD_DAYS = 'D';
+    public const PERIOD_TIME_PREFIX = 'T';
+    public const PERIOD_HOURS = 'H';
+    public const PERIOD_MINUTES = 'M';
+    public const PERIOD_SECONDS = 'S';
 
     /**
      * A translator to ... er ... translate stuff
@@ -253,6 +256,22 @@ class CarbonInterval extends DateInterval implements CarbonConverterInterface
     protected $tzName;
 
     /**
+     * Set the instance's timezone from a string or object.
+     *
+     * @param \DateTimeZone|string $tzName
+     *
+     * @return static
+     */
+    public function setTimezone($tzName)
+    {
+        $this->tzName = $tzName;
+
+        return $this;
+    }
+
+    /**
+     * @internal
+     *
      * Set the instance's timezone from a string or object and add/subtract the offset difference.
      *
      * @param \DateTimeZone|string $tzName
@@ -504,10 +523,10 @@ class CarbonInterval extends DateInterval implements CarbonConverterInterface
      * echo Carboninterval::createFromFormat('H:i', '1:30');
      * ```
      *
-     * @param string $format   Format of the $interval input string
-     * @param string $interval Input string to convert into an interval
+     * @param string      $format   Format of the $interval input string
+     * @param string|null $interval Input string to convert into an interval
      *
-     * @throws Exception when the $interval cannot be parsed as an interval.
+     * @throws \Carbon\Exceptions\ParseErrorException when the $interval cannot be parsed as an interval.
      *
      * @return static
      */
@@ -1555,7 +1574,7 @@ class CarbonInterval extends DateInterval implements CarbonConverterInterface
 
         $interval = [];
 
-        $syntax = (int) ($syntax === null ? CarbonInterface::DIFF_ABSOLUTE : $syntax);
+        $syntax = (int) ($syntax ?? CarbonInterface::DIFF_ABSOLUTE);
         $absolute = $syntax === CarbonInterface::DIFF_ABSOLUTE;
         $relativeToNow = $syntax === CarbonInterface::DIFF_RELATIVE_TO_NOW;
         $count = 1;
@@ -1763,12 +1782,20 @@ class CarbonInterval extends DateInterval implements CarbonConverterInterface
     /**
      * Convert the interval to a CarbonPeriod.
      *
-     * @param array ...$params Start date, [end date or recurrences] and optional settings.
+     * @param DateTimeInterface|string|int ...$params Start date, [end date or recurrences] and optional settings.
      *
      * @return CarbonPeriod
      */
     public function toPeriod(...$params)
     {
+        if ($this->tzName) {
+            $tz = \is_string($this->tzName) ? new DateTimeZone($this->tzName) : $this->tzName;
+
+            if ($tz instanceof DateTimeZone) {
+                array_unshift($params, $tz);
+            }
+        }
+
         return CarbonPeriod::create($this, ...$params);
     }
 
@@ -1879,8 +1906,8 @@ class CarbonInterval extends DateInterval implements CarbonConverterInterface
     /**
      * Add given parameters to the current interval.
      *
-     * @param int $years
-     * @param int $months
+     * @param int       $years
+     * @param int       $months
      * @param int|float $weeks
      * @param int|float $days
      * @param int|float $hours
@@ -1909,8 +1936,8 @@ class CarbonInterval extends DateInterval implements CarbonConverterInterface
     /**
      * Add given parameters to the current interval.
      *
-     * @param int $years
-     * @param int $months
+     * @param int       $years
+     * @param int       $months
      * @param int|float $weeks
      * @param int|float $days
      * @param int|float $hours

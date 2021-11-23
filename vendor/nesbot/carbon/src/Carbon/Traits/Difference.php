@@ -8,6 +8,7 @@
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
+
 namespace Carbon\Traits;
 
 use Carbon\Carbon;
@@ -123,8 +124,10 @@ trait Difference
     {
         $other = $this->resolveCarbon($date);
 
-        // Can be removed if https://github.com/derickr/timelib/pull/110
-        // is merged
+        // Work-around for https://bugs.php.net/bug.php?id=81458
+        // It was initially introduced for https://bugs.php.net/bug.php?id=80998
+        // The very specific case of 80998 was fixed in PHP 8.1beta3, but it introduced 81458
+        // So we still need to keep this for now
         // @codeCoverageIgnoreStart
         if (version_compare(PHP_VERSION, '8.1.0-dev', '>=') && $other->tz !== $this->tz) {
             $other = $other->avoidMutation()->tz($this->tz);
@@ -815,7 +818,7 @@ trait Difference
             $syntax['syntax'] = $syntax['syntax'] ?? null;
             $intSyntax = &$syntax['syntax'];
         }
-        $intSyntax = (int) ($intSyntax === null ? static::DIFF_RELATIVE_AUTO : $intSyntax);
+        $intSyntax = (int) ($intSyntax ?? static::DIFF_RELATIVE_AUTO);
         $intSyntax = $intSyntax === static::DIFF_RELATIVE_AUTO && $other === null ? static::DIFF_RELATIVE_TO_NOW : $intSyntax;
 
         $parts = min(7, max(1, (int) $parts));

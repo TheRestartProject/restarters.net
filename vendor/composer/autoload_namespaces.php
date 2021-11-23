@@ -7,7 +7,6 @@ $baseDir = dirname($vendorDir);
 
 return array(
     'Sentry\\Laravel\\' => array($vendorDir . '/sentry/sentry-laravel/src'),
-    'Parsedown' => array($vendorDir . '/erusev/parsedown'),
     'Msurguy\\Honeypot\\' => array($vendorDir . '/msurguy/honeypot/src'),
     'Mcamara\\LaravelLocalization' => array($vendorDir . '/mcamara/laravel-localization/src'),
     'JShrink' => array($vendorDir . '/tedivm/jshrink/src'),

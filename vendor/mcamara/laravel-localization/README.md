@@ -186,7 +186,7 @@ For example, if a user navigates to http://url-to-laravel/test  and `en` is the 
 
 Similar to LocaleSessionRedirect, but it stores value in a cookie instead of a session.
 
-Whenever a locale is present in the url, it will be stored in the session by this middleware.
+Whenever a locale is present in the url, it will be stored in the cookie by this middleware.
 
 In there is no locale present in the url, then this middleware will check the following
 
@@ -217,7 +217,7 @@ aswell as the `hideDefaultLocaleInURL` and [Translated Routes](#translated-route
 
 ```php
     // If current locale is Spanish, it returns `/es/test`
-    <a href="{{ LaravelLocalization::localizeUrl('(/test)') }}">@lang('Follow this link')</a>
+    <a href="{{ LaravelLocalization::localizeUrl('/test') }}">@lang('Follow this link')</a>
 ```
 
 #### Get localized URL for an specific locale
@@ -287,6 +287,13 @@ Return current locale's name as string (English/Spanish/Arabic/ ..etc).
 
 ```php
 {{ LaravelLocalization::getCurrentLocaleName() }}
+```
+
+### Get Current Locale Native Name
+Return current locale's native name as string (English/Español/عربى/ ..etc).
+
+```php
+{{ LaravelLocalization::getCurrentLocaleNative() }}
 ```
 
 ### Get Current Locale Direction
@@ -461,7 +468,18 @@ To cache your routes, use:
 php artisan route:trans:cache
 ```
 
-... instead of the normal `route:cache` command.
+... instead of the normal `route:cache` command. Using `artisan route:cache` will **not** work correctly!
+
+For the route caching solution to work, it is required to make a minor adjustment to your application route provision.
+
+In your App's `RouteServiceProvider`, use the `LoadsTranslatedCachedRoutes` trait:
+
+```php
+<?php
+class RouteServiceProvider extends ServiceProvider
+{
+    use \Mcamara\LaravelLocalization\Traits\LoadsTranslatedCachedRoutes;
+```
 
 
 For more details see [here](CACHING.md).
@@ -489,6 +507,10 @@ will not work. Instead, one has to use
 <button>Logout</button>
 </form>
 ```
+
+
+Another way to solve this is to put http method to config to 'laravellocalization.httpMethodsIgnored' 
+to prevent of processing this type of requests
 
 ### MethodNotAllowedHttpException
 

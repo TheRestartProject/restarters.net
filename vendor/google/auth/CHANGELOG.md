@@ -1,3 +1,13 @@
+## 1.18.0 (08/24/2021)
+
+ *  [feat]: Add support for guzzlehttp/psr7 v2 (#357)
+
+## 1.17.0 (08/17/2021)
+
+ * [fix]: consistently use useSelfSignedJwt method in ServiceAccountJwtAccessCredentials (#351)
+ * [feat]: add loading and executing of default client cert source (#353)
+ * [feat]: add support for proxy-authorization header (#347)
+
 ## 1.16.0 (06/22/2021)
 
  * [feat]: allow ServiceAccountJwtAccessCredentials to sign scopes (#341)
