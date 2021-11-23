@@ -33,6 +33,7 @@ jobs:
       - run: sudo apt update
       - run: sudo apt install openssl zip unzip git libxml2-dev libzip-dev zlib1g-dev libcurl4-openssl-dev iputils-ping default-mysql-client vim libpng-dev libgmp-dev libjpeg-turbo8-dev
       - run: sudo apt-get install php7.4-xmlrpc php7.4-intl php7.4-xdebug php7.4-xmlrpc
+      - run: sudo phpenmod -v 7.4 xmlrpc
       - run: cp .env.example .env
 
       # We don't have Discourse on CircleCI.
