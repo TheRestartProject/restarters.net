@@ -9,7 +9,7 @@ dependencies:
 jobs:
   build:
     docker:
-      - image: cimg/php:7.4-node
+      - image: cimg/php:7.4.11-node
         name: restarters.test
         environment:
           - DB_CONNECTION: mysql
@@ -32,7 +32,7 @@ jobs:
       - checkout
       - run: sudo apt update
       - run: sudo apt install openssl zip unzip git libxml2-dev libzip-dev zlib1g-dev libcurl4-openssl-dev iputils-ping default-mysql-client vim libpng-dev libgmp-dev libjpeg-turbo8-dev
-      - run: sudo apt-get install php7.4-xmlrpc php7.4-intl php7.4-xdebug
+      - run: sudo apt-get install php7.4-xmlrpc php7.4-intl php7.4-xdebug php7.4-xmlrpc php7.4-mbstring php7.4-simplexml php7.4-curl php7.4-zip python
       - run: cp .env.example .env
 
       # We don't have Discourse on CircleCI.
@@ -47,7 +47,7 @@ jobs:
       # ...and needs honeypot rate-limiting needs to be turned off.
       - run: sed -i 's/HONEYPOT_DISABLE=.*$/HONEYPOT_DISABLE=TRUE/g' .env
 
-      - run: wget https://getcomposer.org/composer-1.phar; rm -rf vendor; php composer-1.phar install
+      - run: wget https://getcomposer.org/composer-1.phar; rm -rf vendor; php7.4 composer-1.phar install
       - run: npm install
       - run: npx playwright install
       - run: npx playwright install-deps
@@ -64,7 +64,9 @@ jobs:
       - run: mkdir build; mkdir build/logs; php vendor/bin/php-coveralls -v -x tests/clover.xml
 
       # Run the Playwright tests.
-      - run: echo "User::create(['name'=>'Jane Bloggs','email'=>'jane@bloggs.net','password'=>Hash::make('passw0rd'),'role'=>2,'consent_past_data'=>'2021-01-01','consent_future_data'=>'2021-01-01','consent_gdpr'=>'2021-01-01']);" | php artisan tinker
+      # Ignore the return code from the tinker; the user might exist from the phpunit tests.  If it doesn't and
+      # the create fails, the tests will fail too.
+      - run: echo "App\User::create(['name'=>'Jane Bloggs','email'=>'jane@bloggs.net','password'=>Hash::make('passw0rd'),'role'=>2,'consent_past_data'=>'2021-01-01','consent_future_data'=>'2021-01-01','consent_gdpr'=>'2021-01-01']);" | php artisan tinker || true
       - run: export NODE_OPTIONS=--max-old-space-size=8192;  npm rebuild node-sass; npm run prod
       - run: npx playwright install
       - run: npx playwright test

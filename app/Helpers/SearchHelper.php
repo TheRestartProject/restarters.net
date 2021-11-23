@@ -13,7 +13,6 @@ use Illuminate\Http\Request;
 
 class SearchHelper
 {
-
     public static function getDefaultViewParams()
     {
         return [
@@ -68,6 +67,7 @@ class SearchHelper
         foreach ($data['parties'] as $party) {
             $data['sorted_parties'][$party->group_name][] = $party;
         }
+
         return $data;
     }
 
@@ -95,8 +95,8 @@ class SearchHelper
             $filters['searched_parties'] = filter_var_array($request->input('parties'), FILTER_SANITIZE_NUMBER_INT);
         }
 
-        if ($request->has('from-date') && !empty($request->input('from-date'))) {
-            if (!DateTime::createFromFormat('Y-m-d', $request->input('from-date'))) {
+        if ($request->has('from-date') && ! empty($request->input('from-date'))) {
+            if (! DateTime::createFromFormat('Y-m-d', $request->input('from-date'))) {
                 $filters['response'] = ['danger' => 'Invalid "From" date"'];
             } else {
                 $fromDate = DateTime::createFromFormat('Y-m-d', $request->input('from-date'));
@@ -104,8 +104,8 @@ class SearchHelper
             }
         }
 
-        if ($request->has('to-date') && !empty($request->input('to-date'))) {
-            if (!DateTime::createFromFormat('Y-m-d', $request->input('to-date'))) {
+        if ($request->has('to-date') && ! empty($request->input('to-date'))) {
+            if (! DateTime::createFromFormat('Y-m-d', $request->input('to-date'))) {
                 $filters['response'] = ['danger' => 'Invalid "To" date"'];
             } else {
                 $toDate = DateTime::createFromFormat('Y-m-d', $request->input('to-date'));
@@ -113,9 +113,10 @@ class SearchHelper
             }
         }
 
-        if ($request->has('group_tags') && !empty($request->input('group_tags'))) {
+        if ($request->has('group_tags') && ! empty($request->input('group_tags'))) {
             $filters['group_tags'] = $request->input('group_tags');
         }
+
         return $filters;
     }
 
@@ -124,10 +125,9 @@ class SearchHelper
         foreach ($params as $k => $v) {
             $type = gettype($v);
             if (is_array($v)) {
-                $type .= ' (' . count($v) . ')';
+                $type .= ' ('.count($v).')';
             }
-            logger($k . ' => ' . $type);
+            logger($k.' => '.$type);
         }
     }
-
 }

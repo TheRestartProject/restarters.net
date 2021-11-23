@@ -3,9 +3,9 @@
 namespace App\Http\Controllers;
 
 use App\Category;
+use App\Helpers\Fixometer;
 use App\User;
 use Auth;
-use App\Helpers\Fixometer;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Redirect;
 

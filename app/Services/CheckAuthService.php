@@ -2,9 +2,9 @@
 
 namespace App\Services;
 
+use App\Helpers\Fixometer;
 use App\User;
 use Cookie;
-use App\Helpers\Fixometer;
 use Illuminate\Http\Resources\Json\JsonResource;
 use Lang;
 

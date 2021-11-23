@@ -174,7 +174,7 @@ return [
 	Sentry\Laravel\ServiceProvider::class,
         App\Providers\ScheduleServiceProvider::class,
         Sentry\Laravel\ServiceProvider::class,
-        App\Providers\OurSentryLogging::class
+        App\Providers\OurSentryLogging::class,
     ],
 
     /*

@@ -185,8 +185,6 @@ class GroupStatsTest extends StatsTestCase
         }
     }
 
-
-
     /** @test */
     public function two_groups_with_mixed_devices_have_correct_stats()
     {
@@ -328,6 +326,5 @@ class GroupStatsTest extends StatsTestCase
             $this->assertArrayHasKey($k, $result, "Missing array key $k");
             $this->assertEquals($v, $result[$k], "Wrong value for $k => $v");
         }
-
     }
 }

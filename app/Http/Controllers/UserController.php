@@ -381,8 +381,21 @@ class UserController extends Controller
         'role' => $request->input('user_role'),
         ]);
 
-        // Sync relevant pivots
-        $user->groups()->sync($request->input('assigned_groups'));
+        // The user may have previously been removed from the group, which will mean they have an entry in
+        // users_groups with deleted_at set.  Zap that if present so that sync() then works.  sync() doesn't
+        // handle soft deletes itself.
+        $groups = $request->input('assigned_groups');
+
+        foreach ($groups as $idgroups) {
+            $in_group = UserGroups::where('user', $user_id)->where('group', $idgroups)->withTrashed()->first();
+
+            if ($in_group && $in_group->trashed()) {
+                $in_group->restore();
+            }
+        }
+
+        // Then sync relevant pivots
+        $user->groups()->sync($groups);
         $user->preferences()->sync($request->input('preferences'));
         $user->permissions()->sync($request->input('permissions'));
 
@@ -666,7 +679,7 @@ class UserController extends Controller
                 $name = $request->get('name');
                 $email = $request->get('email');
                 $role = $request->get('role');
-                if (!$request->has('modal')) {
+                if (! $request->has('modal')) {
                     $groups = $request->get('groups');
                 }
 
@@ -1126,7 +1139,7 @@ class UserController extends Controller
     {
         $user = User::where('mediawiki', $request->input('wiki_username'))->first();
 
-        if (!$user) {
+        if (! $user) {
             abort('404', 'Wiki user not found');
         }
 
@@ -1143,7 +1156,7 @@ class UserController extends Controller
     {
         $user = User::where('mediawiki', $request->input('wiki_username'))->first();
 
-        if (!$user) {
+        if (! $user) {
             abort('404', 'Wiki user not found');
         }
 

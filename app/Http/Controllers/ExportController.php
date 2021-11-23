@@ -8,15 +8,14 @@ use App\Group;
 use App\GroupTags;
 use App\GrouptagsGroups;
 use App\Helpers\Fixometer;
+use App\Helpers\SearchHelper;
+use App\Search;
 use App\UserGroups;
 use Auth;
 use DateTime;
 use DB;
-use Response;
-
-use App\Helpers\SearchHelper;
-use App\Search;
 use Illuminate\Http\Request;
+use Response;
 
 class ExportController extends Controller
 {
@@ -108,9 +107,7 @@ class ExportController extends Controller
      */
     public function parties(Request $request)
     {
-
-        if ($request->has('fltr') && !empty($request->input('fltr'))) {
-
+        if ($request->has('fltr') && ! empty($request->input('fltr'))) {
             $dropdowns = SearchHelper::getUserGroupsAndParties();
             $filters = SearchHelper::getSearchFilters($request);
 
@@ -139,7 +136,6 @@ class ExportController extends Controller
                 // prepare the column values
                 $PartyArray = [];
                 foreach ($PartyList as $i => $party) {
-
                     $stats = $party->getEventStats();
                     array_walk($stats, function (&$v) {
                         $v = round($v);
@@ -172,6 +168,7 @@ class ExportController extends Controller
             }
             // }
         }
+
         return view('export.parties', [
             'data' => ['No data to return'],
         ]);
@@ -241,7 +238,7 @@ class ExportController extends Controller
             //By users
             //Name
             if ($request->input('name') !== null) {
-                $user_events = $user_events->where('users.name', 'like', '%' . $request->input('name') . '%');
+                $user_events = $user_events->where('users.name', 'like', '%'.$request->input('name').'%');
             }
 
             //Birth year
@@ -251,7 +248,7 @@ class ExportController extends Controller
 
             //Gender
             if ($request->input('gender') !== null) {
-                $user_events = $user_events->where('users.gender', 'like', '%' . $request->input('gender') . '%');
+                $user_events = $user_events->where('users.gender', 'like', '%'.$request->input('gender').'%');
             }
 
             //By date
@@ -297,14 +294,14 @@ class ExportController extends Controller
         $average_age = $average_age->distinct('users.id')->pluck('users.age')->toArray();
 
         foreach ($average_age as $key => $value) {
-            if (!is_int(intval($value)) || intval($value) <= 0) {
+            if (! is_int(intval($value)) || intval($value) <= 0) {
                 unset($average_age[$key]);
             } else {
                 $average_age[$key] = intval($value);
             }
         }
 
-        if (!empty($average_age)) {
+        if (! empty($average_age)) {
             $average_age = array_sum($average_age) / count($average_age);
             $average_age = intval(date('Y')) - $average_age;
         } else {
@@ -343,13 +340,13 @@ class ExportController extends Controller
             'groups.name as groupname'
         );
 
-        if (!$export) {
+        if (! $export) {
             $user_events = $user_events->paginate(env('PAGINATE'));
         } else {
             $user_events = $user_events->get();
         }
 
-        if (!$export) {
+        if (! $export) {
             return view('reporting.time-volunteered', [
                 'user' => $user,
                 'user_events' => $user_events,
@@ -394,7 +391,7 @@ class ExportController extends Controller
 
     public function exportTimeVolunteered(Request $request)
     {
-        if (!empty($request->all())) {
+        if (! empty($request->all())) {
             $data = $this->getTimeVolunteered($request, true, true);
         } else {
             $data = $this->getTimeVolunteered($request, null, true);
@@ -419,7 +416,7 @@ class ExportController extends Controller
         fputcsv($file, ['Breakdown by country:']);
         fputcsv($file, $country_headers);
         foreach ($data['country_hours_completed'] as $country_hours) {
-            if (!is_null($country_hours->country)) {
+            if (! is_null($country_hours->country)) {
                 $country = $country_hours->country;
             } else {
                 $country = 'N/A';
@@ -433,7 +430,7 @@ class ExportController extends Controller
         fputcsv($file, ['Breakdown by city:']);
         fputcsv($file, $city_headers);
         foreach ($data['city_hours_completed'] as $city_hours) {
-            if (!is_null($city_hours->location)) {
+            if (! is_null($city_hours->location)) {
                 $city = $city_hours->location;
             } else {
                 $city = 'N/A';
@@ -450,7 +447,7 @@ class ExportController extends Controller
             $start_time = new DateTime($ue->start);
             $diff = $start_time->diff(new DateTime($ue->end));
             fputcsv($file, [
-                $ue->idevents, $diff->h . '.' . sprintf('%02d', $diff->i / 60 * 100),
+                $ue->idevents, $diff->h.'.'.sprintf('%02d', $diff->i / 60 * 100),
                 date('d/m/Y', strtotime($ue->event_date)), $ue->groupname, $ue->location,
             ]);
         }

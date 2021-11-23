@@ -56,7 +56,7 @@ class Network extends Model
         $networkGroupsIds = $this->groups->pluck('idgroups')->toArray();
 
         return Group::all()->filter(function ($group) use ($networkGroupsIds) {
-            return !in_array($group->idgroups, $networkGroupsIds);
+            return ! in_array($group->idgroups, $networkGroupsIds);
         });
     }
 

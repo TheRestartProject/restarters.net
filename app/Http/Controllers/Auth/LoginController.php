@@ -3,9 +3,10 @@
 namespace App\Http\Controllers\Auth;
 
 use App\Device;
+use App\Helpers\Fixometer;
 use App\Http\Controllers\Controller;
 use App\Party;
-use App\Helpers\Fixometer;
+use App\Providers\RouteServiceProvider;
 use Illuminate\Foundation\Auth\AuthenticatesUsers;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -32,7 +33,7 @@ class LoginController extends Controller
      *
      * @var string
      */
-    protected $redirectTo = '/dashboard';
+    protected $redirectTo = RouteServiceProvider::HOME;
 
     /**
      * Create a new controller instance.
@@ -87,7 +88,7 @@ class LoginController extends Controller
      */
     protected function validateLogin(Request $request)
     {
-        if (env('HONEYPOT_DISABLE', FALSE)) {
+        if (env('HONEYPOT_DISABLE', false)) {
             // This is used in Playwright testing where we get many requests in a short time.
             // TODO There is probably a better place to put this code.
             app('honeypot')->disable();

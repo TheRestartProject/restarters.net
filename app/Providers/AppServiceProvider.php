@@ -3,11 +3,11 @@
 namespace App\Providers;
 
 use App\EventsUsers;
+use App\Helpers\Fixometer;
 use App\Helpers\Geocoder;
 use App\Party;
 use Auth;
 use Cache;
-use App\Helpers\Fixometer;
 use Illuminate\Support\ServiceProvider;
 use OwenIt\Auditing\Models\Audit;
 use Schema;
