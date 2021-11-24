@@ -53,7 +53,7 @@ class GroupController extends Controller
 
         // Look for groups we have joined, not just been invited to.  We have to explicitly test on deleted_at because
         // the normal filtering out of soft deletes won't happen for joins.
-        $your_groups = Group::join('users_groups', 'users_groups.group', '=', 'groups.idgroups')
+        $your_groups =array_column(Group::join('users_groups', 'users_groups.group', '=', 'groups.idgroups')
             ->leftJoin('events', 'events.group', '=', 'groups.idgroups')
             ->where('users_groups.user', $user->id)
             ->where('users_groups.status', 1)
@@ -61,15 +61,14 @@ class GroupController extends Controller
             ->orderBy('groups.name', 'ASC')
             ->groupBy('groups.idgroups')
             ->select($group_atts)
-            ->get();
+            ->get()
+            ->toArray(), 'idgroups');
 
         // We pass a high limit to the groups nearby; there is a distance limit which will normally kick in first.
-        $groups_near_you = $user->groupsNearby(1000);
+        $groups_near_you = array_column($user->groupsNearby(1000), 'idgroups');
 
         return view('group.index', [
-            'your_groups' => $this->expandGroups($your_groups),
-            'groups_near_you' => $this->expandGroups($groups_near_you),
-            'groups' => $this->expandGroups($groups),
+            'groups' => $this->expandGroups($groups, $your_groups, $groups_near_you),
             'your_area' => $user->location,
             'tab' => $tab,
             'network' => $network,
@@ -770,7 +769,7 @@ class GroupController extends Controller
         }
     }
 
-    private function expandGroups($groups)
+    private function expandGroups($groups, $your_groupids, $nearby_groupids)
     {
         $ret = [];
 
@@ -795,6 +794,8 @@ class GroupController extends Controller
                     'country' => $group->country,
                     'group_tags' => $group->group_tags()->get()->pluck('id'),
                     'distance' => $group->distance,
+                    'following' => in_array($group['idgroups'], $your_groupids),
+                    'nearby' => in_array($group['idgroups'], $nearby_groupids),
                 ];
             }
         }

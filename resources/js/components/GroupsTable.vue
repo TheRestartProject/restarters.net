@@ -83,7 +83,7 @@
         <span />
       </template>
       <template slot="cell(follow)" slot-scope="data">
-        <b-btn variant="primary" class="text-nowrap mr-2" v-if="data.item.follow" :to="'/group/join/' + data.item.idgroups">
+        <b-btn variant="primary" class="text-nowrap mr-2" v-if="data.item.following" :to="'/group/join/' + data.item.idgroups">
           <span class="d-block d-md-none">
             {{ __('groups.join_group_button_mobile') }}
           </span>
@@ -167,7 +167,7 @@ export default {
         { key: 'all_confirmed_hosts_count', label: 'Hosts', sortable: true, tdClass: "hidecell text-center", thClass: "hidecell text-center pl-3" },
         { key: 'all_confirmed_restarters_count', label: 'Restarters', sortable: true, tdClass: "hidecell text-center", thClass: "hidecell text-center pl-3" },
         { key: 'next_event', label: 'Next Event', sortable: true, tdClass: "hidecell event", thClass: "hidecell" },
-        { key: 'follow' , label: 'Follow' }
+        { key: 'following' , label: 'Follow' }
       ],
       searchName: null,
       searchLocation: null,
