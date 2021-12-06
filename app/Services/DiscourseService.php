@@ -229,6 +229,33 @@ class DiscourseService
                 $discourseId = $discourseResult['group']['id'];
                 Log::debug("Sync members for Restarters group $restartId, {$group->discourse_group}, Discourse group $discourseId");
 
+                // Check if the flair_url needs updating.  This keeps the logo in sync with changes on Restarters.
+                Log::debug("Check flair url {$discourseResult['group']['flair_url']} vs {$group->groupImagePath()}");
+
+                if ($group->groupImagePath() && $discourseResult['group']['flair_url'] != $group->groupImagePath()) {
+                    // We need to update it.  To do that, we first have to upload it to Discourse.
+                    Log::debug("Need to update flair_url");
+
+                    // TODO Can't get upload to work.
+
+                    // Now we can update the group to use it.
+//                    $response = $client->request('PUT', "/g/$discourseId.json", [
+//                        'form_params' => [
+//                            'group' => [
+//                                'flair_url' => $group->groupImagePath()
+//                            ]
+//                        ]
+//                    ]);
+//
+//                    Log::debug("Response from flair_url update " . $response->getBody());
+//
+//                    if ($response->getStatusCode() != 200)
+//                    {
+//                        Log::error("Failed to update flair url for {$discourseId}");
+//                        throw new \Exception("Failed to update flair url for {$discourseId}");
+//                    }
+                }
+
                 // TODO The Discourse API accepts up to around 1000 as the limit.  This is plenty for now, but
                 // we will assert below if it turns out not to be in future.
                 $limit = 1000;
