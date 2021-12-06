@@ -35,9 +35,9 @@
 </div>
 @php
 /** select random bkground **/
-$rand = rand(1, 4);
+<!-- $rand = rand(1, 4); -->
 @endphp
-<div class="login-deets bg_<?php echo $rand; ?>">
+<!-- REDUNDANT?? <div class="login-deets bg_<?php echo $rand; ?>">
 
 
   <div class="detail-wrap">
@@ -50,11 +50,11 @@ $rand = rand(1, 4);
 
       <div class="detail">
           <h4>CO<sub>2</sub> Emission prevented</h4>
-          <span class="big-number"><?php echo number_format($weights[0]->total_footprints, 0, '-', ','); ?> kg</span>
+          <span class="big-number"><?php echo number_format($weights[0]->total_footprint, 0, '-', ','); ?> kg</span>
       </div>
       <div class="detail">
           <h4>Waste prevented</h4>
-          <span class="big-number"><?php echo number_format($weights[0]->total_weights, 0, '-', ','); ?> kg</span>
+          <span class="big-number"><?php echo number_format($weights[0]->total_weight, 0, '-', ','); ?> kg</span>
       </div>
 
 
@@ -75,5 +75,5 @@ $rand = rand(1, 4);
         </div>
 
     </div>
-</div>
+</div> -->
 @endsection

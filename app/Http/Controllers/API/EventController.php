@@ -3,7 +3,6 @@
 namespace App\Http\Controllers\API;
 
 use App\Group;
-use App\Helpers\FootprintRatioCalculator;
 use App\Http\Controllers\Controller;
 use App\Party;
 use Auth;
@@ -55,11 +54,11 @@ class EventController extends Controller
                'description' => $group->free_text,
                'image_url' => $group->groupImagePath(),
                'volunteers' => $group->volunteers,
-               'participants' => $groupStats['pax'],
-               'hours_volunteered' => $groupStats['hours'],
+               'participants' => $groupStats['participants'],
+               'hours_volunteered' => $groupStats['hours_volunteered'],
                'parties_thrown' => $groupStats['parties'],
-               'waste_prevented' => $groupStats['waste'],
-               'co2_emissions_prevented' => $groupStats['co2'],
+               'waste_prevented' => $groupStats['waste_total'],
+               'co2_emissions_prevented' => $groupStats['co2_total'],
            ]);
         }
 
@@ -80,6 +79,8 @@ class EventController extends Controller
              'start_time' => $party->start,
              'end_time' => $party->end,
              'name' => $party->venue,
+// TODO Once DOT-1502 is released 'link' => $party->link,
+             'online' => $party->online,
              'location' => [
                  'value' => $party->location,
                  'latitude' => $party->latitude,
@@ -92,8 +93,8 @@ class EventController extends Controller
              'impact' => [
                  'participants' => $party->pax,
                  'volunteers' => $eventStats['volunteers'],
-                 'waste_prevented' => $eventStats['ewaste'],
-                 'co2_emissions_prevented' => $eventStats['co2'],
+                 'waste_prevented' => $eventStats['waste_powered'],
+                 'co2_emissions_prevented' => $eventStats['co2_powered'],
                  'devices_fixed' => $eventStats['fixed_devices'],
                  'devices_repairable' => $eventStats['repairable_devices'],
                  'devices_dead' => $eventStats['dead_devices'],

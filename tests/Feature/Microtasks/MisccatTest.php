@@ -7,9 +7,6 @@ use App\Device;
 use App\Group;
 use App\Misccat;
 use DB;
-use Illuminate\Foundation\Testing\RefreshDatabase;
-use Illuminate\Foundation\Testing\WithFaker;
-use Illuminate\Support\Facades\Log;
 use Tests\TestCase;
 
 class MisccatTest extends TestCase
@@ -80,52 +77,21 @@ class MisccatTest extends TestCase
         $Misccat = new Misccat;
         $result = $Misccat->fetchStatus();
 
-        $this->assertTrue(is_array($result));
-        $this->assertTrue(array_key_exists('status', $result), 'fetch_misccat_status: missing key - status');
-        $this->assertEquals(count($result['status']), 8, 'fetch_misccat_status: result array wrong number of elements');
+        $this->assertEquals(3, count($result['list_recats']), 'fetch_misccat_status: wrong count for list_recats');
 
-        $this->assertEquals($result['status'][0]->code, -2, 'fetch_misccat_status: wrong code');
-        $this->assertEquals($result['status'][0]->total, 1, 'fetch_misccat_status: wrong total');
+        $this->assertEquals(1, $result['list_recats'][0]->items, 'fetch_misccat_status: wrong total for list_recats[0]');
+        $this->assertEquals('Cat1', $result['list_recats'][0]->top_opinion, 'fetch_misccat_status: wrong top_opinion for list_recats[0]');
 
-        $this->assertEquals($result['status'][1]->code, -1, 'fetch_misccat_status: wrong code');
-        $this->assertEquals($result['status'][1]->total, 1, 'fetch_misccat_status: wrong total');
+        $this->assertEquals(1, $result['list_recats'][1]->items, 'fetch_misccat_status: wrong total for list_recats[1]');
+        $this->assertEquals('Cat2', $result['list_recats'][1]->top_opinion, 'fetch_misccat_status: wrong top_opinion for list_recats[1]');
 
-        $this->assertEquals($result['status'][2]->code, 0, 'fetch_misccat_status: wrong code');
-        $this->assertEquals($result['status'][2]->total, 1, 'fetch_misccat_status: wrong total');
+        $this->assertEquals(1, $result['list_recats'][2]->items, 'fetch_misccat_status: wrong total for list_recats[2]');
+        $this->assertEquals('Mobile', $result['list_recats'][2]->top_opinion, 'fetch_misccat_status: wrong top_opinion for list_recats[2]');
 
-        $this->assertEquals($result['status'][3]->code, 1, 'fetch_misccat_status: wrong code');
-        $this->assertEquals($result['status'][3]->total, 1, 'fetch_misccat_status: wrong total');
+        $this->assertEquals(1, count($result['list_splits']), 'fetch_misccat_status: wrong count for list_splits');
 
-        $this->assertEquals($result['status'][4]->code, 2, 'fetch_misccat_status: wrong code');
-        $this->assertEquals($result['status'][4]->total, 1, 'fetch_misccat_status: wrong total');
-
-        $this->assertEquals($result['status'][5]->code, 3, 'fetch_misccat_status: wrong code');
-        $this->assertEquals($result['status'][5]->total, 1, 'fetch_misccat_status: wrong total');
-
-        $this->assertEquals($result['status'][6]->code, 4, 'fetch_misccat_status: wrong code');
-        $this->assertEquals($result['status'][6]->total, 3, 'fetch_misccat_status: wrong total');
-
-        $this->assertEquals($result['status'][7]->code, 5, 'fetch_misccat_status: wrong code');
-        $this->assertEquals($result['status'][7]->total, 2, 'fetch_misccat_status: wrong total');
-
-//        Log::info($result['list_recats']);
-        $this->assertEquals(count($result['list_recats']), 3, 'fetch_misccat_status: wrong count for list_recats');
-
-        $this->assertEquals($result['list_recats'][0]->items, 1, 'fetch_misccat_status: wrong total for list_recats[0]');
-        $this->assertEquals($result['list_recats'][0]->top_opinion, 'Cat1', 'fetch_misccat_status: wrong top_opinion for list_recats[0]');
-
-        $this->assertEquals($result['list_recats'][1]->items, 1, 'fetch_misccat_status: wrong total for list_recats[1]');
-        $this->assertEquals($result['list_recats'][1]->top_opinion, 'Cat2', 'fetch_misccat_status: wrong top_opinion for list_recats[1]');
-
-        $this->assertEquals($result['list_recats'][2]->items, 1, 'fetch_misccat_status: wrong total for list_recats[2]');
-        $this->assertEquals($result['list_recats'][2]->top_opinion, 'Mobile', 'fetch_misccat_status: wrong top_opinion for list_recats[2]');
-
-        $this->assertEquals(count($result['list_splits']), 1, 'fetch_misccat_status: wrong count for list_splits');
-
-        $this->assertEquals($result['list_splits'][0]->iddevices, 6, 'fetch_misccat_status: wrong iddevices for list_splits[0]');
-        $this->assertEquals($result['list_splits'][0]->code, '3', 'fetch_misccat_status: wrong code for list_splits[0]');
-        $this->assertEquals($result['list_splits'][0]->adjudication, null, 'fetch_misccat_status: wrong adjudication for list_splits[0]');
-        $this->assertEquals($result['list_splits'][0]->opinions, 'Cat1,Cat2,Cat3', 'fetch_misccat_status: wrong opinions for list_splits[0]');
+        $this->assertEquals(6, $result['list_splits'][0]->iddevices, 'fetch_misccat_status: wrong iddevices for list_splits[0]');
+        $this->assertEquals('Cat1,Cat2,Cat3', $result['list_splits'][0]->opinions, 'fetch_misccat_status: wrong opinions for list_splits[0]');
     }
 
     /** @test */
@@ -135,6 +101,7 @@ class MisccatTest extends TestCase
 
         $Misccat = new Misccat;
         $result = $Misccat->updateDevices();
+        logger(print_r($result, 1));
         $this->assertDatabaseHas('devices', [
             'problem' => 'category should be Cat1',
             'category' => 111,
@@ -151,8 +118,14 @@ class MisccatTest extends TestCase
 
     protected function _setup_data()
     {
+        factory(Category::class, 1)->states('Misc')->create();
+        factory(Category::class, 1)->states('Mobile')->create();
+        factory(Category::class, 1)->states('Cat1')->create();
+        factory(Category::class, 1)->states('Cat2')->create();
+        factory(Category::class, 1)->states('Cat3')->create();
+
         $data = $this->_get_setup_data();
-        foreach ($data as $case => $elems) {
+        foreach ($data as $elems) {
             foreach ($elems as $tablename => $records) {
                 foreach ($records as $record) {
                     if ($tablename == 'devices') {
@@ -186,7 +159,7 @@ class MisccatTest extends TestCase
             'devices_misc_adjudicated' => [],
         ];
 
-        //WHEN -1 THEN 'Category has been updated from Misc, thanks!'
+        //WHEN -1 THEN 'Category has been updated from Misc'
         // 1 device record = "Mobile", 2 misccat records = "Mobile"
 
         $result['-1'] = [
@@ -246,7 +219,7 @@ class MisccatTest extends TestCase
             'devices_misc_adjudicated' => [],
         ];
 
-        //WHEN 2 THEN 'Is Misc and needs just one more opinion'
+        //WHEN 2 THEN 'Is Misc and needs one more opinion'
         // 1 device record = "Misc", 2 misccat records = "Cat1"/"Cat2"
         $result['2'] = [
             'devices' => [
@@ -298,7 +271,7 @@ class MisccatTest extends TestCase
             'devices_misc_adjudicated' => [],
         ];
 
-        //WHEN 4 THEN 'Is Misc and majority opinions agree it should remain as Misc, thanks!'
+        //WHEN 4 THEN 'Is Misc and majority opinions agree it should remain as Misc'
         // 3 device records in total
         // 1 device record = "Misc", 3 misccat records = "Misc"
         // 1 device record = "Misc", 2 misccat records = "Misc", 1 misccat records = "Cat1"
@@ -368,7 +341,7 @@ class MisccatTest extends TestCase
             'category' => 'Misc',
         ];
 
-        //WHEN 5 THEN 'Is Misc and majority opinions say not Misc so it will be updated soon, thanks!'
+        //WHEN 5 THEN 'Is Misc and majority opinions say not Misc so it will be updated'
         // 2 device records in total
         // 1 device record = "Misc", 3 misccat records = "Cat1"
         // 1 device record = "Misc", 3 misccat records = "Cat1"/"Cat2"/"Misc", 1 adjudication record = "Cat1"

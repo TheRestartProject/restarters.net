@@ -94,7 +94,7 @@ return [
   'field_event_zip' => 'Post/Zip code',
   'field_event_country' => 'Country',
   'field_add_image' => 'Add images',
-  'before_submit_text' => 'Once confirmed by our community lead, your event will be made public on The Restart Project homepage.',
+  'before_submit_text' => 'Once confirmed by a coordinator, your event will be made public.',
   'reporting' => 'Event Reporting',
   'events-filter' => 'Events filter',
   'download-results' => 'Download Results (CSV)',
@@ -172,7 +172,10 @@ return [
   'created_success_message' => 'Event created!  It will be approved by a coordinator shortly.  You can continue to edit it in the meantime.',
   'items_fixed' => 'Items fixed',
   'not_counting' => 'Not counting toward this event\'s environmental impact is|Not counting toward this event\'s environmental impact are',
-  'impact_calculation' => '<b>How do we calculate environmental impact?</b><p>For powered items: We’ve researched the average weight and CO2 footprint of products across a range of categories, from smartphones to hairdryers. When you enter a powered item that you’ve fixed, we use these averages to estimate the impact of that repair based on the category of the item.</p><p>For unpowered items: When you enter an unpowered item that you’ve repaired, we use the item weight you enter yourself. This is because we don’t have reference data for unpowered items yet, which also means we can’t provide a CO2 estimate.</p><p><a href="https://therestartproject.org/faq/" target="_blank" rel="nofollow">Learn more about how we calculate impact here</a></p>',
+  'impact_calculation' => '<p><strong>How do we calculate environmental impact?</strong></p>
+<p>We\'ve researched the average weight and CO<sub>2</sub>e footprint of products across a range of categories, from smartphones to t-shirts. When you enter an item that you\'ve repaired, we use these averages to estimate the impact of that repair based on the category of the item.</p>
+<p>For misc items, we apply a generic CO<sub>2</sub>e to weight ratio to estimate the impact of each successful repair.</p>
+<p><a href="https://talk.restarters.net/t/how-do-we-measure-the-environmental-impact-of-events/6077" target="_blank" rel="nofollow">Learn more about how we calculate impact here</a></p>',
   'delete_event' => 'Delete event',
   'see_all' => 'See all',
   'confirmed_none' => 'There are no confirmed volunteers.',
@@ -202,4 +205,9 @@ return [
   'search_start_placeholder' => 'From...',
   'search_end_placeholder' => 'To...',
   'invite_when_approved' => 'You can only invite volunteers when this event has been approved',
+  'field_event_link_helper' => 'Optional web link',
+  'field_event_link' => 'Event link',
+  'address_error' => 'The address you entered could not be found.  Please try a more general address, and enter any more specific address details in the event description.',
+  'before_submit_text_autoapproved' => 'When you create or save this event, it will be made public.',
+  'created_success_message_autoapproved' => 'Event created! It is now public.',
 ];

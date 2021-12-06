@@ -2,9 +2,9 @@
 
 namespace App\Policies;
 
+use App\Helpers\Fixometer;
 use App\Role;
 use App\User;
-use App\Helpers\Fixometer;
 use Illuminate\Auth\Access\HandlesAuthorization;
 
 class UserPolicy

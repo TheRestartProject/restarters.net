@@ -1,7 +1,7 @@
 <template>
   <div>
-    <VueEditor class="editor" v-model="value" :editor-options="editorOptions" />
-    <input type="hidden" v-model="valueCorrected" :name="name" />
+    <VueEditor v-model="currentValue" :editor-options="editorOptions" :class="{ 'editor': true, editorHasError: hasError }" />
+    <input type="hidden" v-model="currentValue" :name="name" />
   </div>
 </template>
 <script>
@@ -23,16 +23,20 @@ export default {
       type: String,
       required: true
     },
-    initialValue: {
+    value: {
       type: String,
       required: false,
       default: null
+    },
+    hasError: {
+      type: Boolean,
+      required: false,
+      default: false
     }
   },
   data: function() {
     return {
-      value: null,
-      valueCorrected: null,
+      currentValue: null,
       editorOptions: {
         modules: {
           htmlEditButton: {},
@@ -60,26 +64,41 @@ export default {
     }
   },
   watch: {
-    value(newVal) {
-      console.log("Correct", newVal)
-      // We have an odd problem on Linux where we get <p><br>.
-      if (newVal) {
-        newVal = newVal.replace('<p><br>', '<p>');
-        console.log("Corrected", newVal)
-      }
+    currentValue: {
+      handler(newVal) {
+        if (newVal) {
+          // We have an odd problem on Linux where we get <p><br>.
+          newVal = newVal.replace('<p><br>', '<p>');
+        }
 
-      this.valueCorrected = newVal
+        this.$emit('update:value', newVal)
+      },
+      immediate: true
+    },
+    value: {
+      handler(newVal) {
+        if (newVal) {
+          // There's an odd problem where divs aren't handled well - see https://github.com/davidroyer/vue2-editor/issues/313.
+          // This is a workaround.
+          newVal = newVal.replace('<div', '<p').replace('/div>', '/p>')
+        }
+
+        this.currentValue = newVal
+      },
+      immediate: true
     }
   },
   mounted() {
-    this.value = this.initialValue
-    this.valueCorrected = this.initialValue
-  },
-  methods: {
+    this.currentValue = this.value
   }
 }
 </script>
 <style scoped lang="scss">
+@import 'resources/global/css/_variables';
+@import '~bootstrap/scss/functions';
+@import '~bootstrap/scss/variables';
+@import '~bootstrap/scss/mixins/_breakpoints';
+
 /deep/ .ql-editor,  /deep/ .ql-container {
   min-height: 300px !important;
   max-height: 300px !important;
@@ -107,6 +126,20 @@ export default {
   }
   h6 {
     font-size: 1rem;
+  }
+}
+
+.editorHasError {
+  /deep/ .ql-toolbar {
+    border-top: 2px solid $brand-danger !important;
+    border-left: 2px solid $brand-danger !important;
+    border-right: 2px solid $brand-danger !important;
+  }
+
+  /deep/ .ql-container {
+    border-bottom: 2px solid $brand-danger !important;
+    border-left: 2px solid $brand-danger !important;
+    border-right: 2px solid $brand-danger !important;
   }
 }
 </style>

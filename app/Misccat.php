@@ -4,8 +4,6 @@ namespace App;
 
 use DB;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Schema\Blueprint;
-use Illuminate\Support\Facades\Schema;
 
 class Misccat extends Model
 {
@@ -35,7 +33,8 @@ class Misccat extends Model
      */
     public function fetchMisc()
     {
-        return DB::select("
+        return DB::select(
+            "
 SELECT
 d.`iddevices` as iddevices,
 TRIM(c.`name`) as category,
@@ -63,60 +62,14 @@ LIMIT 1;"
     {
         $result = [];
 
-        $status_query = "
-SELECT 
-d.iddevices as `iddevices`,
-TRIM(COALESCE(d.`brand`,'')) as brand,
-TRIM(COALESCE(d.`model`,'')) as model,
-TRIM(d.`problem`) as problem,
-GROUP_CONCAT(o.category ORDER BY o.category ASC) as opinions,
-ANY_VALUE(a.category) as adjudication,            
-CASE 
-WHEN (d.category <> 46 AND COUNT(ANY_VALUE(o.category)) = 0) THEN -2
-WHEN (d.category <> 46 AND COUNT(ANY_VALUE(o.category)) > 0) THEN -1
-WHEN (d.category = 46 AND COUNT(ANY_VALUE(o.category)) = 0) THEN 0
-WHEN (d.category = 46 AND COUNT(ANY_VALUE(o.category)) = 1) THEN 1
-WHEN (d.category = 46 AND COUNT(ANY_VALUE(o.category)) = 2 AND COUNT(DISTINCT ANY_VALUE(o.category)) = 2) THEN 2
-WHEN (d.category = 46 AND (COUNT(DISTINCT ANY_VALUE(o.category)) >= 3) AND ANY_VALUE(a.category) IS NULL) THEN 3
-WHEN (d.category = 46 AND (SUM(IF(ANY_VALUE(o.category) = 'Misc', 1, 0)) > 1 OR ANY_VALUE(a.category) = 'Misc')) THEN 4 
-WHEN (d.category = 46 AND (COUNT(DISTINCT ANY_VALUE(o.category)) >= 3) AND ANY_VALUE(a.category) IS NOT NULL AND ANY_VALUE(a.category) <> 'Misc') THEN 5
-WHEN (d.category = 46 AND (SUM(IF(ANY_VALUE(o.category) <> 'Misc', 1, 0)) > 1)) THEN 5
-ELSE 99
-END as `code`
-FROM devices d
-LEFT OUTER JOIN devices_misc_opinions o ON o.iddevices = d.iddevices
-LEFT OUTER JOIN devices_misc_adjudicated a ON a.iddevices = d.iddevices
-GROUP BY d.iddevices";
-
-        try {
-            $result['status'] = DB::select("
-SELECT COUNT(*) as total,
-`code`,
-CASE `code` 
-WHEN -2 THEN 'Original category was not Misc'
-WHEN -1 THEN 'Category has been updated from Misc, thanks!'
-WHEN 0 THEN 'Is Misc and has no opinions' 
-WHEN 1 THEN 'Is Misc and has only one opinion' 
-WHEN 2 THEN 'Is Misc and needs just one more opinion'
-WHEN 3 THEN 'Is Misc and opinions are split, adjudication needed'
-WHEN 4 THEN 'Is Misc and majority opinions agree it should remain as Misc, thanks!'
-WHEN 5 THEN 'Is Misc and majority opinions say not Misc so it will be updated soon, thanks!'
-ELSE '?'
-END as `status` FROM ($status_query) AS `status_query`
-GROUP BY `code`
-");
-        } catch (Exception $exc) {
-            echo $exc->getMessage();
-        }
-
         try {
             $result['list_recats'] = DB::select("
 SELECT
 COUNT(d.iddevices) as items,
 COALESCE(
 (SELECT a.category FROM devices_misc_adjudicated a WHERE a.iddevices = d.iddevices),
-(SELECT o.category FROM devices_misc_opinions o WHERE o.iddevices = d.iddevices 
-GROUP BY o.category HAVING COUNT(o.category) > 1 
+(SELECT o.category FROM devices_misc_opinions o WHERE o.iddevices = d.iddevices
+GROUP BY o.category HAVING COUNT(o.category) > 1
 ORDER BY COUNT(o.category) DESC LIMIT 1)
 ) AS top_opinion
 FROM devices d
@@ -128,8 +81,26 @@ ORDER BY items DESC, top_opinion ASC
             echo $exc->getMessage();
         }
 
+        $select_splits = "
+SELECT
+o.iddevices as `iddevices`,
+TRIM(COALESCE(d.`brand`,'')) as brand,
+TRIM(COALESCE(d.`model`,'')) as model,
+TRIM(d.`problem`) as problem,
+COUNT(o.category) as opinions_count,
+COUNT(DISTINCT o.category) as opinions_count_distinct,
+IF(COUNT(DISTINCT o.category)=3,
+(SELECT a.category FROM devices_misc_adjudicated a WHERE a.iddevices = o.iddevices),
+GROUP_CONCAT(DISTINCT o.category ORDER BY o.category ASC)) as opinions_distinct,
+GROUP_CONCAT(o.category ORDER BY o.category ASC) as opinions
+FROM devices_misc_opinions o
+JOIN devices d ON d.iddevices = o.iddevices
+GROUP BY o.iddevices
+HAVING opinions_count = 3 AND opinions_distinct IS NULL
+";
+
         try {
-            $result['list_splits'] = DB::select("$status_query HAVING `code` = 3");
+            $result['list_splits'] = DB::select("$select_splits");
         } catch (Exception $exc) {
             echo $exc->getMessage();
         }
@@ -156,42 +127,70 @@ WHERE o.eee = 2
 
     /**
      * Write the winning opinions to `devices`.`category`.
-     * NOTE: need to convert strings to idcategories and handle new categories
+     * NOTE: need to convert strings to idcategories
      *
      * @return mixed
      */
     public function updateDevices()
     {
-        DB::statement("CREATE TEMPORARY TABLE IF NOT EXISTS `devices_misc_temporary` AS (
+        $t2 = "
 SELECT
-d.iddevices,
-COALESCE(ANY_VALUE(a.category),(SELECT o1.category FROM devices_misc_opinions o1 WHERE o1.iddevices = o.iddevices GROUP BY o1.category ORDER BY COUNT(o1.category) DESC LIMIT 1)) AS winning_opinion,
-ANY_VALUE(a.category) AS adjudicated_opinion,
-ROUND((SELECT COUNT(o2.category) as top_crowd_opinion_count FROM devices_misc_opinions o2 WHERE o2.iddevices = o.iddevices GROUP BY o2.category ORDER BY top_crowd_opinion_count DESC LIMIT 1) /
-(SELECT COUNT(o2.category) as all_votes FROM devices_misc_opinions o2 WHERE o2.iddevices = o.iddevices) * 100) AS top_crowd_opinion_percentage,
-COUNT(o.category) AS all_crowd_opinions_count,
-0 AS idcategories
-FROM devices d
-LEFT OUTER JOIN devices_misc_opinions o ON o.iddevices = d.iddevices
-LEFT OUTER JOIN devices_misc_adjudicated a ON a.iddevices = d.iddevices
-WHERE d.category IN (46)
-AND LENGTH(d.problem) > 0
-GROUP BY d.iddevices
-HAVING
-adjudicated_opinion IS NOT NULL
-OR (
-(all_crowd_opinions_count > 1 AND top_crowd_opinion_percentage > 50)
-AND (winning_opinion != 'Misc')
-)
-ORDER BY NULL);");
+o.iddevices,
+COUNT(o.category) as opinions_count,
+COUNT(DISTINCT o.category) as opinions_count_distinct,
+GROUP_CONCAT(DISTINCT o.category ORDER BY o.category ASC) as opinions_distinct,
+GROUP_CONCAT(o.category ORDER BY o.category ASC) as opinions,
+(   SELECT a.category
+        FROM devices_misc_adjudicated a
+        WHERE a.iddevices = o.iddevices
+) as `adjudicated`,
+(
+    SELECT category FROM (
+        SELECT  iddevices, category
+        FROM    (
+                SELECT  @iddevices <> iddevices AS _new,
+                        @iddevices := iddevices AS iddevices,
+                        category, COUNT(*) AS cnt
+                FROM    (
+                        SELECT  @iddevices := ''
+                        ) vars,
+                        devices_misc_opinions
+                GROUP BY
+                iddevices, category
+                ORDER BY
+                category, cnt DESC
+                ) q
+        WHERE   _new
+        ORDER BY iddevices
+        ) t1
+        WHERE t1.iddevices = o.iddevices
+) as top_opinion
+FROM devices_misc_opinions o
+GROUP BY o.iddevices
+";
 
+        $t1 = "
+SELECT t2.*,
+0 as idcategories,
+COALESCE(t2.adjudicated, t2.top_opinion) as winning_opinion
+FROM ($t2) t2
+WHERE
+(t2.opinions_count >= 2 AND t2.opinions_count_distinct = 1)
+OR
+(t2.opinions_count = 3 AND t2.adjudicated IS NOT NULL AND t2.adjudicated <> 'Misc')
+OR
+(t2.opinions_count = 3 AND t2.opinions_count_distinct = 2 AND t2.top_opinion IS NOT NULL AND t2.top_opinion <> 'Misc')
+";
+
+        // logger($t1);
+        DB::statement("CREATE TEMPORARY TABLE IF NOT EXISTS `devices_misc_temporary` AS $t1;");
         DB::statement('ALTER TABLE `devices_misc_temporary` ADD PRIMARY KEY(`iddevices`);');
 
-        DB::update('UPDATE devices_misc_temporary t, categories c 
+        DB::update('UPDATE devices_misc_temporary t, categories c
 SET t.idcategories = c.idcategories
 WHERE t.winning_opinion = c.`name`;');
 
-        $result = DB::update('UPDATE devices d, devices_misc_temporary t 
+        $result = DB::update('UPDATE devices d, devices_misc_temporary t
 SET d.category = t.idcategories
 WHERE d.iddevices = t.iddevices AND t.idcategories > 0;');
 

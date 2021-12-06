@@ -3,11 +3,11 @@
 namespace App\Providers;
 
 use App\EventsUsers;
+use App\Helpers\Fixometer;
 use App\Helpers\Geocoder;
 use App\Party;
 use Auth;
 use Cache;
-use App\Helpers\Fixometer;
 use Illuminate\Support\ServiceProvider;
 use OwenIt\Auditing\Models\Audit;
 use Schema;
@@ -45,20 +45,22 @@ class AppServiceProvider extends ServiceProvider
                     // notifications.
                     $total_talk_notifications = 0;
                 } else {
-                    $client = app('discourse-client');
-                    $response = $client->request('GET', '/notifications.json?username='.Auth::user()->username);
-                    $talk_notifications = json_decode($response->getBody()->getContents(), true);
+                    if (config('restarters.features.discourse_integration')) {
+                        $client = app('discourse-client');
+                        $response = $client->request('GET', '/notifications.json?username='.Auth::user()->username);
+                        $talk_notifications = json_decode($response->getBody()->getContents(), true);
 
-                    if (! empty($talk_notifications) && array_key_exists('notifications', $talk_notifications)) {
-                        $total_talk_notifications = 0;
-                        foreach ($talk_notifications['notifications'] as $notification) {
-                            if ($notification['read'] !== true) {
-                                $total_talk_notifications++;
+                        if (! empty($talk_notifications) && array_key_exists('notifications', $talk_notifications)) {
+                            $total_talk_notifications = 0;
+                            foreach ($talk_notifications['notifications'] as $notification) {
+                                if ($notification['read'] !== true) {
+                                    $total_talk_notifications++;
+                                }
                             }
+                            Cache::put('talk_notification_'.Auth::user()->username, $total_talk_notifications, 600);
+                        } else {
+                            $total_talk_notifications = null;
                         }
-                        Cache::put('talk_notification_'.Auth::user()->username, $total_talk_notifications, 600);
-                    } else {
-                        $total_talk_notifications = null;
                     }
                 }
 

@@ -381,8 +381,21 @@ class UserController extends Controller
         'role' => $request->input('user_role'),
         ]);
 
-        // Sync relevant pivots
-        $user->groups()->sync($request->input('assigned_groups'));
+        // The user may have previously been removed from the group, which will mean they have an entry in
+        // users_groups with deleted_at set.  Zap that if present so that sync() then works.  sync() doesn't
+        // handle soft deletes itself.
+        $groups = $request->input('assigned_groups');
+
+        foreach ($groups as $idgroups) {
+            $in_group = UserGroups::where('user', $user_id)->where('group', $idgroups)->withTrashed()->first();
+
+            if ($in_group && $in_group->trashed()) {
+                $in_group->restore();
+            }
+        }
+
+        // Then sync relevant pivots
+        $user->groups()->sync($groups);
         $user->preferences()->sync($request->input('preferences'));
         $user->permissions()->sync($request->input('permissions'));
 
@@ -672,7 +685,7 @@ class UserController extends Controller
                 $name = $request->get('name');
                 $email = $request->get('email');
                 $role = $request->get('role');
-                if (!$request->has('modal')) {
+                if (! $request->has('modal')) {
                     $groups = $request->get('groups');
                 }
 
@@ -925,8 +938,8 @@ class UserController extends Controller
 
         return view('auth.register-new', [
             'skills' => Fixometer::allSkills(),
-            'co2Total' => $stats['co2Total'][0]->total_footprints,
-            'wasteTotal' => $stats['co2Total'][0]->total_weights,
+            'co2Total' => $stats['waste_stats'][0]->powered_footprint + $stats['waste_stats'][0]->unpowered_footprint,
+            'wasteTotal' => $stats['waste_stats'][0]->powered_waste + $stats['waste_stats'][0]->unpowered_waste,
             'partiesCount' => count($stats['allparties']),
             'deviceCount' => $deviceCount,
             'showNewsletterSignup' => $showNewsletterSignup,
@@ -1089,13 +1102,23 @@ class UserController extends Controller
 
         event(new UserRegistered($user));
 
+        $redirectTo = 'dashboard';
+
+        if ($request->session()->has('redirectTo') && $request->session()->has('redirectTime')) {
+            if (time() - $request->session()->get('redirectTime') < 3600) {
+                // We have recently visited a page to which we want to return.   This is an intentionally
+                // partial solution to the problem of redirecting after login.
+                $redirectTo = $request->session()->get('redirectTo');
+            }
+        }
+
         if (Auth::check()) { //Existing users are to update
-            return redirect('dashboard');
+            return redirect($redirectTo);
         }
 
         $credentials = $request->only('email', 'password');
         if (Auth::attempt($credentials)) {
-            return redirect()->intended('dashboard');
+            return redirect()->intended($redirectTo);
         }
     }
 
@@ -1122,7 +1145,7 @@ class UserController extends Controller
     {
         $user = User::where('mediawiki', $request->input('wiki_username'))->first();
 
-        if (!$user) {
+        if (! $user) {
             abort('404', 'Wiki user not found');
         }
 
@@ -1139,7 +1162,7 @@ class UserController extends Controller
     {
         $user = User::where('mediawiki', $request->input('wiki_username'))->first();
 
-        if (!$user) {
+        if (! $user) {
             abort('404', 'Wiki user not found');
         }
 

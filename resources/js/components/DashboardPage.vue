@@ -8,7 +8,7 @@
     <div class="layout mt-4 mb-4">
       <DashboardBanner class="banner" />
       <div class="yourgroups">
-        <DashboardYourGroups :newGroups="newGroups" :nearbyGroups="nearbyGroups" />
+        <DashboardYourGroups :newGroups="newGroups" :nearbyGroups="nearbyGroups" :location="location" />
       </div>
       <DashboardAddData class="adddata justify-self-end" />
       <DashboardRightSidebar class="sidebar" />
@@ -40,17 +40,16 @@ export default {
       required: false,
       default: null
     },
+    location: {
+      type: String,
+      required: true
+    },
     nearbyGroups: {
       type: Array,
       required: false,
       default: null
     },
     upcomingEvents: {
-      type: Array,
-      required: false,
-      default: null
-    },
-    pastEvents: {
       type: Array,
       required: false,
       default: null
@@ -105,15 +104,6 @@ export default {
         e.group = e.the_group
         delete e.the_group
         e.upcoming = true
-      })
-    }
-
-    if (this.pastEvents) {
-      this.pastEvents.forEach(e => {
-        events[e.idevents] = e
-        e.group = e.the_group
-        delete e.the_group
-        e.attended = true
       })
     }
 

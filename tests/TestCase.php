@@ -95,6 +95,7 @@ abstract class TestCase extends BaseTestCase
     public function loginAsTestUser($role = Role::RESTARTER)
     {
         // This is testing the external interface, whereas actingAs() wouldn't be.
+        Auth::logout();
         $response = $this->post('/user/register/', $this->userAttributes($role));
 
         $response->assertStatus(302);
@@ -121,6 +122,9 @@ abstract class TestCase extends BaseTestCase
             $this->assertNotFalse(strpos($redirectTo, '/group/edit'));
             $p = strrpos($redirectTo, '/');
             $idgroups = substr($redirectTo, $p + 1);
+            $group = Group::find($idgroups);
+            $group->wordpress_post_id = '99999';
+            $group->save();
         }
 
         return $idgroups;
@@ -198,26 +202,30 @@ abstract class TestCase extends BaseTestCase
 
     private function canonicalise($val)
     {
-        // Sinple code to filter out timestamps.
+        // Sinple code to filter out timestamps or other random values.
         if ($val && is_string($val)) {
             $val = preg_replace('/"created_at":".*"/', '"created_at":"TIMESTAMP"', $val);
             $val = preg_replace('/"updated_at":".*"/', '"updated_at":"TIMESTAMP"', $val);
+            $val = preg_replace('/"shareable_code":".*"/', '"shareable_code":"SHARECODE"', $val);
         }
 
         return $val;
     }
 
-//    private function isJson($string) {
-//        json_decode($string);
-//        return json_last_error() === JSON_ERROR_NONE;
-//    }
-//
+    private function isJson2($string)
+    {
+        // We have our own version because the PHPUnit one returns TRUE for a simple string.
+        json_decode($string);
+
+        return json_last_error() === JSON_ERROR_NONE;
+    }
+
     private function canonicaliseAndAssertSame($val1, $val2, $name)
     {
         $val1 = $this->canonicalise($val1);
         $val2 = $this->canonicalise($val2);
 
-        if ($this->isJson($val1) && $this->isJson($val2)) {
+        if ($this->isJson2($val1) && $this->isJson2($val2)) {
             // We get nicer mismatch display if we compare the decoded JSON object rather than comparing the
             // string encoding.
             $dec1 = json_decode($val1, true);
@@ -247,6 +255,8 @@ abstract class TestCase extends BaseTestCase
         }
 
         $this->assertTrue($foundSome);
+
+        return $props;
     }
 
     public function setDiscourseTestEnvironment()

@@ -4,15 +4,15 @@ namespace App\Listeners;
 
 use App\Events\ApproveGroup;
 use App\Group;
-use App\Notifications\AdminWordPressCreateGroupFailure;
 use App\Helpers\Fixometer;
+use App\Notifications\AdminWordPressCreateGroupFailure;
 use HieuLe\WordpressXmlrpcClient\WordpressClient;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Support\Facades\Log;
 use Notification;
 
-class CreateWordPressApproveGroupPost
+class CreateWordpressPostForGroup
 {
     /**
      * Create the event listener.

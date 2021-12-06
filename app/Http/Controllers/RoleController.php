@@ -2,11 +2,11 @@
 
 namespace App\Http\Controllers;
 
+use App\Helpers\Fixometer;
 use App\Role;
 use App\RolePermissions;
 use App\User;
 use Auth;
-use App\Helpers\Fixometer;
 use Illuminate\Http\Request;
 
 class RoleController extends Controller

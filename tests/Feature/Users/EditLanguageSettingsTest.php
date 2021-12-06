@@ -49,7 +49,8 @@ class EditLanguageSettingsTest extends TestCase
 
     /** @test */
     // Added these to try (and fail) to reproduce a Sentry error.
-    public function user_sets_language() {
+    public function user_sets_language()
+    {
         $this->loginAsTestUser();
 
         $this->followingRedirects();

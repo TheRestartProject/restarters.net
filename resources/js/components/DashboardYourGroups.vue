@@ -8,7 +8,7 @@
           </div>
           <b-img class="height ml-4" src="/images/group_doodle_ico.svg" />
         </div>
-        <a href="/group/nearby" v-if="newGroups" class="added added-md d-none d-md-block pr-3">
+        <a href="/group/nearby" v-if="newGroups && newGroups.length" class="added added-md d-none d-md-block pr-3">
           <b-img src="/images/arrow-right-doodle-white.svg" />
           {{ translatedNewlyAdded }}
         </a>
@@ -17,7 +17,7 @@
 
     <template slot="content">
       <div class="content">
-        <DashboardNoGroups v-if="!myGroups || !myGroups.length" :nearby-groups="nearbyGroups" />
+        <DashboardNoGroups v-if="!myGroups || !myGroups.length" :nearby-groups="nearbyGroups" :location="location" />
         <div v-else>
           <a href="/group/nearby" v-if="newGroups" class="added added-xs d-block d-md-none pr-3 pt-3 pb-3 mb-2">
             <b-img src="/images/arrow-right-doodle-white.svg" />
@@ -93,6 +93,10 @@ import DashboardNoGroups from './DashboardNoGroups'
 
 export default {
   props: {
+    location: {
+      type: String,
+      required: true
+    },
     newGroups: {
       type: Number,
       required: true
@@ -118,11 +122,14 @@ export default {
       })
     },
     events() {
-      return this.$store.getters['events/getByGroup'](null).filter(e => e.upcoming)
+      return this.$store.getters['events/getByGroup'](null).filter(e => e.upcoming).sort((a, b) => {
+        // Sort soonest first.
+        return Date.parse(a.event_date + ' ' + a.start) - Date.parse(b.event_date + ' ' + b.start)
+      })
     },
     translatedNewlyAdded() {
-      return this.$lang.choice('dashboard.newly_added', this.newGroups, {
-        count: this.newGroups
+      return this.$lang.choice('dashboard.newly_added', this.newGroups.length, {
+        count: this.newGroups ? this.newGroups.length : 0
       })
     },
   },
@@ -144,8 +151,8 @@ h3 {
   font-weight: bold;
 }
 
-a {
-  color: unset;
+/deep/ a {
+  color: $brand;
   text-decoration: underline;
 }
 

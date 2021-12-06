@@ -4,7 +4,6 @@ namespace App\Http\Controllers;
 
 use App\Device;
 use App\Group;
-use App\Helpers\FootprintRatioCalculator;
 use App\Party;
 use App\User;
 use Auth;
@@ -13,6 +12,9 @@ use Illuminate\Http\Request;
 
 class ApiController extends Controller
 {
+    /**
+     * Embedded at https://therestartproject.org
+     */
     public static function homepage_data()
     {
         $result = [];
@@ -30,22 +32,30 @@ class ApiController extends Controller
             $hours_volunteered += $party->hoursVolunteered();
         }
 
-        $co2Total = $Device->getWeights();
-
         $result['participants'] = $participants;
         $result['hours_volunteered'] = $hours_volunteered;
         $fixed = $Device->statusCount();
         $result['items_fixed'] = count($fixed) ? $fixed[0]->counter : 0;
-        $result['weights'] = round($co2Total[0]->total_weights);
-        $result['ewaste'] = round($co2Total[0]->ewaste);
-        $result['unpowered_waste'] = round($co2Total[0]->unpowered_waste);
-        $result['emissions'] = round($co2Total[0]->total_footprints);
+
+        $stats = \App\Helpers\LcaStats::getWasteStats();
+        $result['waste_powered'] = round($stats[0]->powered_waste);
+        $result['waste_unpowered'] = round($stats[0]->unpowered_waste);
+        $result['waste_total'] = round($stats[0]->powered_waste + $stats[0]->unpowered_waste);
+        $result['co2_powered'] = round($stats[0]->powered_footprint);
+        $result['co2_unpowered'] = round($stats[0]->unpowered_footprint);
+        $result['co2_total'] = round($stats[0]->powered_footprint + $stats[0]->unpowered_footprint);
 
         $devices = new Device;
         $result['fixed_powered'] = $devices->fixedPoweredCount();
         $result['fixed_unpowered'] = $devices->fixedUnpoweredCount();
         $result['total_powered'] = $devices->poweredCount();
         $result['total_unpowered'] = $devices->unpoweredCount();
+
+        // for backward compatibility (don't break therestartproject.org)
+        $result['weights'] = round($result['waste_total']);
+        $result['ewaste'] = round($result['waste_powered']);
+        $result['unpowered_waste'] = round($result['waste_unpowered']);
+        $result['emissions'] = round($result['co2_total']);
 
         return response()
             ->json($result, 200);
@@ -58,48 +68,60 @@ class ApiController extends Controller
         if (! $event) {
             return response()->json([
                 'message' => "Invalid party id $partyId",
-                                    ], 404);
+            ], 404);
         }
 
-        $eventStats = $event->getEventStats();
+        $stats = $event->getEventStats();
 
-        return response()
-            ->json(
-                [
-                'kg_co2_diverted' => round($eventStats['co2']),
-                'kg_waste_diverted' => round($eventStats['ewaste']),
-                'num_fixed_devices' => $eventStats['fixed_devices'],
-                'num_repairable_devices' => $eventStats['repairable_devices'],
-                'num_dead_devices' => $eventStats['dead_devices'],
-                'num_participants' => $eventStats['participants'],
-                'num_volunteers' => $eventStats['volunteers'],
-                ],
-                200
-            );
+        $result = [
+            'num_participants' => $stats['participants'],
+            'num_volunteers' => $stats['volunteers'],
+            'num_hours_volunteered' => $stats['hours_volunteered'],
+            'num_fixed_devices' => $stats['fixed_devices'],
+            'num_repairable_devices' => $stats['repairable_devices'],
+            'num_dead_devices' => $stats['dead_devices'],
+            'kg_powered_co2_diverted' => round($stats['co2_powered']),
+            'kg_unpowered_co2_diverted' => round($stats['co2_unpowered']),
+            'kg_powered_waste_diverted' => round($stats['waste_powered']),
+            'kg_unpowered_waste_diverted' => round($stats['waste_unpowered']),
+            'kg_co2_diverted' => round($stats['co2_total']),
+            'kg_waste_diverted' => round($stats['waste_total']),
+        ];
+
+        return response()->json($result, 200);
     }
 
     public static function groupStats($groupId)
     {
         $group = Group::where('idgroups', $groupId)->first();
-        $groupStats = $group->getGroupStats();
+        $stats = $group->getGroupStats();
 
-        return response()
-            ->json([
-                'num_participants' => $groupStats['pax'],
-                'num_hours_volunteered' => $groupStats['hours'],
-                'num_parties' => $groupStats['parties'],
-                'kg_co2_diverted' => round($groupStats['co2']),
-                'kg_waste_diverted' => round($groupStats['waste']),
-            ], 200);
+        $result = [
+                'num_parties' => $stats['parties'],
+                'num_participants' => $stats['participants'],
+                'num_hours_volunteered' => $stats['hours_volunteered'],
+                'num_fixed_devices' => $stats['fixed_devices'],
+                'num_repairable_devices' => $stats['repairable_devices'],
+                'num_dead_devices' => $stats['dead_devices'],
+                'kg_powered_co2_diverted' => round($stats['co2_powered']),
+                'kg_unpowered_co2_diverted' => round($stats['co2_unpowered']),
+                'kg_powered_waste_diverted' => round($stats['waste_powered']),
+                'kg_unpowered_waste_diverted' => round($stats['waste_unpowered']),
+                'kg_co2_diverted' => round($stats['co2_total']),
+                'kg_waste_diverted' => round($stats['waste_total']),
+
+            ];
+
+        return response()->json($result, 200);
     }
 
     public static function getEventsByGroupTag($group_tag_id)
     {
         $events = Party::join('groups', 'groups.idgroups', '=', 'events.group')
-                ->join('grouptags_groups', 'grouptags_groups.group', '=', 'groups.idgroups')
-                  ->where('grouptags_groups.group_tag', $group_tag_id)
-                    ->select('events.*', 'groups.area')
-                      ->get();
+            ->join('grouptags_groups', 'grouptags_groups.group', '=', 'groups.idgroups')
+            ->where('grouptags_groups.group_tag', $group_tag_id)
+            ->select('events.*', 'groups.area')
+            ->get();
 
         return response()->json($events, 200);
     }
@@ -116,13 +138,15 @@ class ApiController extends Controller
     public static function getUserList()
     {
         $users = User::whereNull('deleted_at')
-               ->orderBy('created_at', 'desc')
-               ->get();
+            ->orderBy('created_at', 'desc')
+            ->get();
 
         return response()->json($users);
     }
 
     /**
+     * REDUNDANT???
+     *
      * List/search devices.
      *
      * @param  Request  $request
@@ -190,18 +214,18 @@ class ApiController extends Controller
 
         // Get the items we want for this page.
         $query = Device::with(['deviceEvent.theGroup', 'deviceCategory', 'barriers'])
-        ->join('events', 'events.idevents', '=', 'devices.event')
-        ->join('groups', 'events.group', '=', 'groups.idgroups')
-        ->join('categories', 'devices.category', '=', 'categories.idcategories')
-        ->where($wheres)
-        ->orderBy($sortBy, $sortDesc);
+            ->join('events', 'events.idevents', '=', 'devices.event')
+            ->join('groups', 'events.group', '=', 'groups.idgroups')
+            ->join('categories', 'devices.category', '=', 'categories.idcategories')
+            ->where($wheres)
+            ->orderBy($sortBy, $sortDesc);
 
         // Get total info across all pages.
         $count = $query->count();
 
         $items = $query->skip(($page - 1) * $size)
-        ->take($size)
-        ->get();
+            ->take($size)
+            ->get();
 
         foreach ($items as &$item) {
             $item['shortProblem'] = $item->getShortProblem();
@@ -234,7 +258,7 @@ class ApiController extends Controller
                 DB::raw(
                     "sum(case when (devices.category = 46) then (devices.estimate + 0.0) *
                      (select (sum(`categories`.`footprint`) * {$d->getDisplacementFactor()}) / sum(`categories`.`weight` + 0.0) from `devices`, `categories` where `categories`.`idcategories` = `devices`.`category` and `devices`.`repair_status` = 1 and categories.idcategories != 46)
-                     else (categories.footprint * {$d->getDisplacementFactor()}) end) as `total_footprints`"
+                     else (categories.footprint * {$d->getDisplacementFactor()}) end) as `total_footprint`"
                 )
             )->join('events', 'events.idevents', '=', 'devices.event')
                 ->join('groups', 'events.group', '=', 'groups.idgroups')
@@ -243,7 +267,7 @@ class ApiController extends Controller
                 ->first();
 
             $weight = round($counts->ewaste + $counts->unpowered_waste);
-            $co2 = round($counts->total_footprints);
+            $co2 = round($counts->total_footprint);
         }
 
         return response()->json([

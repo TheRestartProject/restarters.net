@@ -6,10 +6,10 @@ use App\Events\UserUpdated;
 use App\Role;
 use App\User;
 use Carbon\Carbon;
+use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Facades\Event;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Tests\TestCase;
-use Illuminate\Support\Facades\Event;
-use Illuminate\Foundation\Testing\RefreshDatabase;
 
 class UserAdminTest extends TestCase
 {
@@ -17,16 +17,16 @@ class UserAdminTest extends TestCase
     {
         return [
             [
-                'Administrator', TRUE
+                'Administrator', true,
             ],
             [
-                'NetworkCoordinator', FALSE
+                'NetworkCoordinator', false,
             ],
             [
-                'Host', FALSE
+                'Host', false,
             ],
             [
-                'Restarter', FALSE
+                'Restarter', false,
             ],
         ];
     }
@@ -34,7 +34,8 @@ class UserAdminTest extends TestCase
     /**
      *@dataProvider provider
      */
-    public function testUsersPage($role, $cansee) {
+    public function testUsersPage($role, $cansee)
+    {
         // Fetch the list of all users and check that we're in it.
         $admin = factory(User::class)->states($role)->create();
         $this->actingAs($admin);

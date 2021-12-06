@@ -2,19 +2,19 @@
 
 namespace App\Listeners;
 
-use App\Events\ApproveEvent;
+use App\Events\EditEvent;
 use App\Group;
-use App\Network;
-use App\Notifications\AdminWordPressCreateEventFailure;
-use App\Party;
 use App\Helpers\Fixometer;
+use App\Network;
+use App\Notifications\AdminWordPressEditEventFailure;
+use App\Party;
 use HieuLe\WordpressXmlrpcClient\WordpressClient;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Support\Facades\Log;
 use Notification;
 
-class CreateWordPressApproveEventPost
+class EditWordpressPostForEvent
 {
     protected $wpClient;
 
@@ -31,52 +31,40 @@ class CreateWordPressApproveEventPost
     /**
      * Handle the event.
      *
-     * @param  ApproveEvent  $event
+     * @param  EditEvent  $event
      * @return void
      */
-    public function handle(ApproveEvent $event)
+    public function handle(EditEvent $event)
     {
-        // TODO: why do we receive both the repair event, and the data array?
-        // The data array is just the details of the repair event.
-        // It seems like we only need one.
-        // The 'moderate' flag is perhaps the only data point that should come
-        // through extra?
-        $partyId = $event->party->idevents;
+        $id = $event->party->idevents;
         $data = $event->data;
 
-        $theParty = Party::find($partyId);
-
-        if (empty($theParty)) {
-            Log::error('Event not found');
-
-            return;
-        }
+        $theParty = Party::find($id);
 
         if (! $theParty->shouldPushToWordpress()) {
-            $theParty->update(['wordpress_post_id' => '99999']);
-            Log::info('Approved - but events for groups in this network are not published to WordPress');
+            Log::info('Events for groups in this network are not published');
 
             return;
         }
 
         try {
-            if (isset($data['moderate']) && $data['moderate'] == 'approve') {
+            if (is_numeric($theParty->wordpress_post_id)) {
                 $startTimestamp = strtotime($data['event_date'].' '.$data['start']);
                 $endTimestamp = strtotime($data['event_date'].' '.$data['end']);
 
-                $group = Group::where('idgroups', $data['group'])->first();
+                $group = Group::where('idgroups', $theParty->group)->first();
 
                 $custom_fields = [
                     ['key' => 'party_grouphash', 'value' => $data['group']],
+                    ['key' => 'party_groupcountry', 'value' => $group->country],
+                    ['key' => 'party_groupcity', 'value' => $group->area],
                     ['key' => 'party_venue', 'value' => $data['venue']],
                     ['key' => 'party_location', 'value' => $data['location']],
                     ['key' => 'party_time', 'value' => $data['start'].' - '.$data['end']],
-                    ['key' => 'party_groupcountry', 'value' => $group->country],
-                    ['key' => 'party_groupcity', 'value' => $group->area],
                     ['key' => 'party_date', 'value' => $data['event_date']],
                     ['key' => 'party_timestamp', 'value' => $startTimestamp],
                     ['key' => 'party_timestamp_end', 'value' => $endTimestamp],
-                    ['key' => 'party_stats', 'value' => $partyId],
+                    ['key' => 'party_stats', 'value' => $id],
                     ['key' => 'party_lat', 'value' => $data['latitude']],
                     ['key' => 'party_lon', 'value' => $data['longitude']],
                     ['key' => 'party_online', 'value' => $data['online'] ?? 0],
@@ -84,21 +72,34 @@ class CreateWordPressApproveEventPost
 
                 $content = [
                     'post_type' => 'party',
+                    'post_title' => ! empty($data['venue']) ? $data['venue'] : $data['location'],
+                    'post_content' => $data['free_text'],
                     'custom_fields' => $custom_fields,
                 ];
 
-                $party_name = ! empty($data['venue']) ? $data['venue'] : $data['location'];
-                $wpid = $this->wpClient->newPost($party_name, $data['free_text'], $content);
+                // we need to remap all custom fields because they all get unique IDs across all posts, so they don't get mixed up.
+                $thePost = $this->wpClient->getPost($theParty->wordpress_post_id);
 
-                $theParty->update(['wordpress_post_id' => $wpid]);
+                if (isset($thePost['custom_fields'])) {
+                    foreach ($thePost['custom_fields'] as $field) {
+                        foreach ($custom_fields as $k => $set_field) {
+                            if ($field['key'] == $set_field['key']) {
+                                $custom_fields[$k]['id'] = $field['id'];
+                            }
+                        }
+                    }
+                }
+
+                $content['custom_fields'] = $custom_fields;
+                $this->wpClient->editPost($theParty->wordpress_post_id, $content);
             }
         } catch (\Exception $e) {
-            Log::error('An error occurred during Wordpress event creation: '.$e->getMessage());
-            $notify_users = Fixometer::usersWhoHavePreference('admin-approve-wordpress-event-failure');
-            Notification::send($notify_users, new AdminWordPressCreateEventFailure([
+            Log::error('An error occurred during Wordpress event update: '.$e->getMessage());
+            $notify_users = Fixometer::usersWhoHavePreference('admin-edit-wordpress-event-failure');
+            Notification::send($notify_users, new AdminWordPressEditEventFailure([
                 'event_venue' => $theParty->venue,
                 'event_url' => url('/party/edit/'.$theParty->idevents),
-                ]));
+            ]));
         }
     }
 }
