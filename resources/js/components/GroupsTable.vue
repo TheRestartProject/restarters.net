@@ -79,11 +79,11 @@
           </div>
         </div>
       </template>
-      <template slot="head(follow)">
+      <template slot="head(following)">
         <span />
       </template>
-      <template slot="cell(follow)" slot-scope="data">
-        <b-btn variant="primary" class="text-nowrap mr-2" v-if="data.item.following" :to="'/group/join/' + data.item.idgroups">
+      <template slot="cell(following)" slot-scope="data">
+        <b-btn variant="primary" class="text-nowrap mr-2" v-if="!data.item.following" :to="'/group/join/' + data.item.idgroups">
           <span class="d-block d-md-none">
             {{ __('groups.join_group_button_mobile') }}
           </span>
@@ -231,7 +231,7 @@ export default {
           all_restarters_count: g.all_restarters_count,
           all_confirmed_hosts_count: g.all_confirmed_hosts_count,
           all_confirmed_restarters_count: g.all_confirmed_restarters_count,
-          follow: !g.ingroup
+          following: g.following
         }
       })
     },
