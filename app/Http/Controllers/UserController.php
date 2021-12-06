@@ -721,7 +721,7 @@ class UserController extends Controller
                     // No errors. We can proceed and create the User.
                     $data = ['name'     => $name,
                     'email'    => $email,
-                    'password' => crypt($pwd, '$1$'.strrev(md5(env('APP_KEY')))),
+                    'password' => Hash::make($pwd),
                     'role'     => $role,
                     'calendar_hash' => Str::random(15),
                     //'group'    => $group
