@@ -13,6 +13,14 @@ use Tests\TestCase;
 
 class BasicTest extends TestCase
 {
+    protected function setUp(): void
+    {
+        parent::setUp();
+        $this->loginAsTestUser(Role::ADMINISTRATOR);
+        $this->idgroups = $this->createGroup();
+        $this->get('/logout');
+    }
+
     /**
      *@dataProvider provider
      */
@@ -21,7 +29,6 @@ class BasicTest extends TestCase
         // Test the dashboard page loads and shows a nearby group when relevant.
         $user = factory(User::class)->states('Host')->create();
         $this->actingAs($user);
-        $this->createGroup();
 
         $user = factory(User::class)->states('Restarter')->create();
         $user->update([
@@ -47,7 +54,6 @@ class BasicTest extends TestCase
                 'location' => "$city",
                 ':your-groups' => '[]',
                 ':upcoming-events' => '[]',
-                ':past-events' => 'null',
                 ':topics' => '[]',
                 'see-all-topics-link' => env('DISCOURSE_URL').'/latest',
                 ':is-logged-in' => 'true',
@@ -69,19 +75,29 @@ class BasicTest extends TestCase
         ];
     }
 
-    public function testUpcomingEvents()
-    {
-        // Create a group with a future event, and join it.
+    public function testUpcomingEvents() {
+        $host = factory(User::class)->states('Restarter')->create();
+
+        // Create an event.
         $this->loginAsTestUser(Role::ADMINISTRATOR);
-        $id = $this->createGroup();
+        $event = factory(Party::class)->create([
+                                                   'group' => $this->idgroups,
+                                                   'event_date' => '2130-01-01',
+                                                   'start' => '12:13',
+                                                   'free_text' => 'A test event',
+                                                   'location' => 'London'
+                                               ]);
+
+        // Join the group as a host.
+        $this->actingAs($host);
+        $this->get('/group/join/' . $this->idgroups);
+
+        // Should not show in upcoming as not yet approved.
+        $response = $this->get('/dashboard');
+        $response->assertDontSeeText('A test event');
 
         // Admin approves the event.
-        $event = factory(Party::class)->create([
-           'group' => $id,
-           'event_date' => '2130-01-01',
-           'start' => '12:13',
-           'free_text' => 'A test event',
-       ]);
+        $this->loginAsTestUser(Role::ADMINISTRATOR);
 
         $eventData = $event->getAttributes();
         $eventData['wordpress_post_id'] = 100;
@@ -89,12 +105,67 @@ class BasicTest extends TestCase
         $eventData['moderate'] = 'approve';
         $this->post('/party/edit/'.$event->idevents, $eventData);
 
-        // Get the dashboard
-        $host = factory(User::class)->states('Restarter')->create();
+        // Should now show as an upcoming event, both on dashboard page and events page.
         $this->actingAs($host);
-        $this->get('/group/join/'.$id);
+        $response = $this->get('/dashboard');
+
+        $props = $this->assertVueProperties($response, [
+            [
+                ':is-logged-in' => 'true'
+            ]
+        ]);
+        $upcomingEvents = json_decode($props[0][':upcoming-events'], TRUE);
+        $this->assertEquals($event->idevents, $upcomingEvents[0]['idevents']);
+
+        $response = $this->get('/party');
+
+        $props = $this->assertVueProperties($response, [
+            [
+                ':canedit' => 'false'
+            ]
+        ]);
+        $initialEvents = json_decode($props[0][':initial-events'], TRUE);
+        $this->assertEquals($event->idevents, $initialEvents[0]['idevents']);
+
+        // Invite a second host to the group.
+        $host2 = factory(User::class)->states('Restarter')->create([
+            'location' => 'London',
+            'latitude' => 51.5073509,
+            'longitude' => -0.1277583
+        ]);
+        $this->loginAsTestUser(Role::ADMINISTRATOR);
+
+        $response = $this->post('/group/invite', [
+            'group_name' => 'Test Group',
+            'group_id' => $this->idgroups,
+            'manual_invite_box' => $host2->email,
+            'message_to_restarters' => 'Join us, but not in a creepy zombie way',
+        ]);
+
+        $response->assertSessionHas('success');
+
+        // Should not show in upcoming as not yet a member, but should show in nearby.
+        $this->get('/logout');
+        $this->actingAs($host2);
 
         $response = $this->get('/dashboard');
-        $response->assertSee('A test event');
+        $props = $this->assertVueProperties($response, [
+            [
+                ':is-logged-in' => 'true'
+            ]
+        ]);
+        $upcomingEvents = json_decode($props[0][':upcoming-events'], TRUE);
+        $this->assertEquals(0, count($upcomingEvents));
+
+        $response = $this->get('/party');
+
+        $props = $this->assertVueProperties($response, [
+            [
+                ':canedit' => 'false'
+            ]
+        ]);
+        $initialEvents = json_decode($props[0][':initial-events'], TRUE);
+        $this->assertEquals($event->idevents, $initialEvents[0]['idevents']);
+        $this->assertTrue($initialEvents[0]['nearby']);
     }
 }
