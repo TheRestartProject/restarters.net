@@ -33,7 +33,7 @@
       </template>
       <template slot="content">
         <b-tabs class="ourtabs w-100">
-          <GroupEventsTab active :limit="limit" :events="nearby" :canedit="canedit" :add-group-name="addGroupName" title="groups.nearby" noneMessage="groups.no_other_nearby_events" />
+          <GroupEventsTab active :limit="limit" :events="nearby" :canedit="canedit" :add-group-name="addGroupName" title="groups.nearby" :noneMessage="nearbyNoneMessage" />
           <GroupEventsTab :limit="limit" :events="all" :canedit="canedit" :add-group-name="addGroupName" title="groups.all" noneMessage="groups.no_other_events" filters />
         </b-tabs>
       </template>
@@ -108,7 +108,11 @@ export default {
       type: Boolean,
       required: false,
       default: false
-    }
+    },
+    location: {
+      type: String,
+      required: true
+    },
   },
   computed: {
     events() {
@@ -134,6 +138,15 @@ export default {
     },
     all() {
       return this.events.filter(e => e.all)
+    },
+    nearbyNoneMessage() {
+      if (this.location) {
+        // We have a location, so we can say that there are no other nearby events.
+        return this.$lang.get('groups.no_other_nearby_events')
+      } else {
+        // We don't have a location - nudge to add one.
+        return this.$lang.get('events.no_location')
+      }
     },
     translatedTitle() {
       // If we have a group then we are putting the name elsewhere and just want "events" (force the plural).  Otherwise

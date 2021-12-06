@@ -7,9 +7,8 @@
         </div>
       </div>
     </template>
-    <p v-if="!events.length">
-      {{ translatedNoneMessage }}
-    </p>
+    <!--        eslint-disable-next-line-->
+    <p v-if="!events.length" v-html="translatedNoneMessage" />
     <GroupEventScrollTable v-else :limit="limit" :events="events" :canedit="canedit" :add-group-name="addGroupName" :past="past" :filters="filters" />
   </b-tab>
 </template>
