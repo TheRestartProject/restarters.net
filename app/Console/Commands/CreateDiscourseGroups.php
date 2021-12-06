@@ -38,10 +38,17 @@ class CreateDiscourseGroups extends Command
      */
     public function handle()
     {
-        $groups = Group::whereNotNull('wordpress_post_id')->get();
+        #$groups = Group::whereNotNull('wordpress_post_id')->get();
+        $groups = Group::whereNotNull('wordpress_post_id')->whereIn('idgroups', [8, 91])->get();
 
         foreach ($groups as $group) {
-            $group->createDiscourseGroup();
+            $ret = $group->createDiscourseGroup();
+
+            if ($ret) {
+                $this->info($group->name  . " created");
+            } else {
+                $this->error($group->name  . " create failed");
+            }
         }
     }
 }
