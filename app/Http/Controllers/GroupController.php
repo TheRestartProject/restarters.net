@@ -38,12 +38,8 @@ class GroupController extends Controller
         //Get current logged in user
         $user = Auth::user();
 
-        // We only need some attributes.
-        $group_atts = ['groups.idgroups', 'groups.name', 'groups.location', 'groups.country'];
-
         // Get all groups
         $groups = Group::with(['networks'])
-            ->select($group_atts)
             ->orderBy('name', 'ASC')
             ->get();
 
@@ -60,7 +56,6 @@ class GroupController extends Controller
             ->whereNull('users_groups.deleted_at')
             ->orderBy('groups.name', 'ASC')
             ->groupBy('groups.idgroups')
-            ->select($group_atts)
             ->get()
             ->toArray(), 'idgroups');
 
@@ -781,22 +776,22 @@ class GroupController extends Controller
 
                 // We want to return the distance from our own location.
                 $distance = null;
-                $grouplat = $group['latitude'];
-                $grouplng = $group['longitude'];
+                $grouplat = $group->latitude;
+                $grouplng = $group->longitude;
                 $userlat = Auth::user()->latitude;
                 $userlng = Auth::user()->longitude;
 
-                if ($userlat !== null && $userlng !== null) {
+                if ($grouplat !== null && $grouplng !== null && $userlat !== null && $userlng !== null) {
                     $distance = 6371 * acos( cos(deg2rad($userlat)) * cos(deg2rad($grouplat)) * cos(deg2rad($grouplng) - deg2rad($userlng)) + sin(deg2rad($userlat) ) * sin(deg2rad($grouplat)));
                 }
 
                 $ret[] = [
-                    'idgroups' => $group['idgroups'],
-                    'name' => $group['name'],
+                    'idgroups' => $group->idgroups,
+                    'name' => $group->name,
                     'image' => (is_object($group_image) && is_object($group_image->image)) ?
                         asset('uploads/mid_'.$group_image->image->path) : null,
-                    'location' => rtrim($group['location']),
-                    'next_event' => $event ? $event['event_date'] : null,
+                    'location' => rtrim($group->location),
+                    'next_event' => $event ? $event->event_date : null,
                     'all_restarters_count' => $group->all_restarters_count,
                     'all_hosts_count' => $group->all_hosts_count,
                     'all_confirmed_restarters_count' => $group->all_confirmed_restarters_count,
@@ -805,8 +800,8 @@ class GroupController extends Controller
                     'country' => $group->country,
                     'group_tags' => $group->group_tags()->get()->pluck('id'),
                     'distance' => $distance,
-                    'following' => in_array($group['idgroups'], $your_groupids),
-                    'nearby' => in_array($group['idgroups'], $nearby_groupids),
+                    'following' => in_array($group->idgroups, $your_groupids),
+                    'nearby' => in_array($group->idgroups, $nearby_groupids),
                 ];
             }
         }
