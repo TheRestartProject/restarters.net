@@ -41,7 +41,7 @@ class AccountCreated extends Notification implements ShouldQueue
     {
         return (new MailMessage)
                     ->subject('Account Created')
-                    ->greeting('Hello!')
+                    ->greeting(__('notifications.greeting'))
                     ->line('An account has been created for you on our community space. Click below to continue and set a password.')
                     ->action('Set password', url('/'))
                     ->line('If you think this invitation was not intended for you, please discard this email.');

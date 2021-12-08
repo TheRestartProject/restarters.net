@@ -50,7 +50,7 @@ class RSVPEvent extends Notification implements ShouldQueue
     {
         return (new MailMessage)
                       ->subject($this->arr['user_name'].' has RSVPed to your event')
-                      ->greeting('Hello!')
+                      ->greeting(__('notifications.greeting'))
                       ->line('A volunteer, '.$this->arr['user_name'].', has RSVPed to the \''.$this->arr['event_venue'].'\' event.')
                       ->action('View your event', $this->arr['event_url'])
                       ->line('If you would like to stop receiving these emails, please visit <a href="'.url('/user/edit/'.$notifiable->id).'">your preferences</a> on your account.');

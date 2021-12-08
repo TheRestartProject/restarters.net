@@ -41,7 +41,7 @@ class NewRegister extends Notification implements ShouldQueue
     {
         return (new MailMessage)
                     ->subject('Confirm account')
-                    ->greeting('Hello!')
+                    ->greeting(__('notifications.greeting'))
                     ->line('Thank you for recently registering an account on the Restarter Community Resource. Please click the button below to verify your email address, which will confirm your account.')
                     ->action('Confirm account', url('/'))
                     ->line('If you think this invitation was not intended for you, please discard this email.');

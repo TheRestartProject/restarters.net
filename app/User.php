@@ -13,6 +13,7 @@ use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Illuminate\Support\Str;
 use OwenIt\Auditing\Contracts\Auditable;
+use Illuminate\Contracts\Translation\HasLocalePreference;
 
 class WikiSyncStatus
 {
@@ -21,7 +22,7 @@ class WikiSyncStatus
     const Created = 2;
 }
 
-class User extends Authenticatable implements Auditable
+class User extends Authenticatable implements Auditable, HasLocalePreference
 {
     use Notifiable;
     use SoftDeletes;
@@ -618,6 +619,6 @@ class User extends Authenticatable implements Auditable
      */
     public function preferredLocale()
     {
-        return $this->locale;
+        return $this->language;
     }
 }

@@ -50,7 +50,7 @@ class AdminWordPressCreateEventFailure extends Notification implements ShouldQue
     {
         return (new MailMessage)
                   ->subject('Event WordPress failure')
-                  ->greeting('Hello!')
+                  ->greeting(__('notifications.greeting'))
                   ->line('Event \''.$this->arr['event_venue'].'\' failed to create a WordPress post during admin approval.')
                   ->action('View event', $this->arr['event_url'])
                   ->line('If you would like to stop receiving these emails, please visit <a href="'.url('/user/edit/'.$notifiable->id).'">your preferences</a> on your account.');

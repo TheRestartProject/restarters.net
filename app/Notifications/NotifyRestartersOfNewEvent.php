@@ -50,7 +50,7 @@ class NotifyRestartersOfNewEvent extends Notification implements ShouldQueue
     {
         return (new MailMessage)
                     ->subject('New event for '.$this->arr['event_group'])
-                    ->greeting('Hello!')
+                    ->greeting(__('notifications.greeting'))
                     ->line('There has been a new event added to your group: \''.$this->arr['event_venue'].'\'.')
                     ->action('View event', $this->arr['event_url'])
                     ->line('If you would like to stop receiving these emails, please visit <a href="'.url('/user/edit/'.$notifiable->id).'">your preferences</a> on your account.');

@@ -46,9 +46,14 @@ class AdminModerationEventPhotos extends Notification implements ShouldQueue
      */
     public function toMail($notifiable)
     {
+        // TODO Use of preferredLocale should mean we don't have to explicitly pass the locale.  But that isn't
+        // working.
+        $locale = $notifiable->language;
         return (new MailMessage)
-                      ->subject('New event photos uploaded to event: '.$this->arr['event_venue'])
-                      ->greeting('Hello!')
+                      ->subject(__('notifications.new_event_photos_subject', [
+                          'event' => $this->arr['event_venue']
+                      ], $locale))
+                      ->greeting(__('notifications.greeting', [], $locale))
                       ->line('Photos have been uploaded to an event: \''.$this->arr['event_venue'].'\'.')
                       ->action('View event', $this->arr['event_url'])
                       ->line('These photos might need your moderation, if they haven\'t yet been moderated by another administrator.')

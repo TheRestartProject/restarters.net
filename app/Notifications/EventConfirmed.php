@@ -44,7 +44,7 @@ class EventConfirmed extends Notification implements ShouldQueue
     {
         return (new MailMessage)
                     ->subject('Event Confirmed')
-                    ->greeting('Hello!')
+                    ->greeting(__('notifications.greeting'))
                     ->line('Your event has been confirmed by an admin. This is now publicly available on <a href="'.$this->arr[0].'">'.$this->arr[0].'</a>')
                     ->action('View event', url('/'))
                     ->line('If you would like to stop receiving these emails, please visit <a href="'.$this->arr[1].'">your preferences</a> on your account.');

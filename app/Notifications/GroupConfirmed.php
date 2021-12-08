@@ -47,7 +47,7 @@ class GroupConfirmed extends Notification implements ShouldQueue
         if ($this->user !== null && $this->user->invites == 1) {
             return (new MailMessage)
                   ->subject('Group Confirmed')
-                  ->greeting('Hello!')
+                  ->greeting(__('notifications.greeting'))
                   ->line('Your group \''.$this->arr['group_name'].'\' has been confirmed by an admin.')
                   ->action('View Group', $this->arr['group_url'])
                   ->line('If you would like to stop receiving these emails, please visit <a href="'.$this->arr['preferences'].'">your preferences</a> on your account.');
