@@ -634,8 +634,8 @@ class Group extends Model implements Auditable
                 Log::info('Response status: '.$response->getStatusCode());
                 Log::info('Response body: '.$response->getBody());
 
-                if (! $response->getStatusCode() === 200) {
-                    if ($response->getReasonPhrase() == 'Name has already been taken') {
+                if ($response->getStatusCode() !== 200) {
+                    if (strpos($response->getBody(), 'Name has already been taken') !== false) {
                         // Discourse sometimes seems to have groups stuck in a bad state which are not accessible.
                         // This may be a consequence of testing with multiple Restarters instances against the same
                         // Discourse instance.
@@ -655,7 +655,7 @@ class Group extends Model implements Auditable
                         throw new \Exception('Group not found in create response');
                     }
 
-                    $this->discourse_group = $name;
+                    $this->discourse_group = "$name$unique";
                     $this->save();
                     $success = true;
                 }
