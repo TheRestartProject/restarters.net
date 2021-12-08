@@ -740,25 +740,6 @@ class UserController extends Controller
                         }
                     }
                     if ($idUser) {
-                        //Send out email
-
-                        // send email to User
-                        // $message = "<p>Hi,</p>" .
-                        //          "<p>This is an automatic email to let you know that we have just created an account for you on the <strong>" . APPNAME . "</strong>.</p>" .
-                        //          "<p>Please click on this link to set your password: <a href=\"" . env('APP_URL') . "/user/reset/?recovery=" . $data['recovery'] . "\">" . BASE_URL . "/user/reset/?recovery=" . $data['recovery'] . "</a>.</p>" .
-                        //          "<p>If the link doesn't work, please copy and paste it in the address bar of your browser.</p>" .
-                        //          "<p>The link will be active for the next 24 hours.</p>" .
-                        // "<p>If you have any issues, please contact <a href='mailto:" . env('SUPPORT_CONTACT_EMAIL') . "'>" . env('SUPPORT_CONTACT_EMAIL') . "</a>.</p>" .
-                        //          "<p>Thanks for using the " . env('APP_NAME') . "!</p>" .
-                        //          "<p><em>The Restart Project</em></p>";
-                        // $subject = env('APP_NAME') . ": Account created - please set your password";
-                        // $headers = "From: " . env('APP_EMAIL') . "\r\n";
-                        // $headers .= "MIME-Version: 1.0\r\n";
-                        // $headers .= "Content-Type: text/html; charset=ISO-8859-1\r\n";
-                        // $headers .= "Bcc: " . env('SUPPORT_CONTACT_EMAIL') . "\r\n";
-                        //
-                        // $sender = mail($email, $subject, $message, $headers);
-
                         $response['success'] = 'User created correctly.  <strong>NB No email has been sent to the user.</strong>';
                     } else {
                         $response['danger'] = 'User could not be created';
