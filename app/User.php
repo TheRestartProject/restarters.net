@@ -610,4 +610,14 @@ class User extends Authenticatable implements Auditable
 
         return $api_token;
     }
+
+    /**
+     * Get the user's preferred locale.  This is automatically used by email notifications.
+     *
+     * @return string
+     */
+    public function preferredLocale()
+    {
+        return $this->locale;
+    }
 }
