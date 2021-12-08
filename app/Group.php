@@ -637,6 +637,9 @@ class Group extends Model implements Auditable
                 if (! $response->getStatusCode() === 200) {
                     if ($response->getReasonPhrase() == 'Name has already been taken') {
                         // Discourse sometimes seems to have groups stuck in a bad state which are not accessible.
+                        // This may be a consequence of testing with multiple Restarters instances against the same
+                        // Discourse instance.
+                        //
                         // This can result in a create failure, and a group which we cannot then locate to delete.
                         // So skip over it and retry creation with a different name.
                         $retry = true;
