@@ -779,6 +779,17 @@ class GroupController extends Controller
 
                 $event = $group->getNextUpcomingEvent();
 
+                // We want to return the distance from our own location.
+                $distance = null;
+                $grouplat = $group['latitude'];
+                $grouplng = $group['longitude'];
+                $userlat = Auth::user()->latitude;
+                $userlng = Auth::user()->longitude;
+
+                if ($userlat !== null && $userlng !== null) {
+                    $distance = 6371 * acos( cos(deg2rad($userlat)) * cos(deg2rad($grouplat)) * cos(deg2rad($grouplng) - deg2rad($userlng)) + sin(deg2rad($userlat) ) * sin(deg2rad($grouplat)));
+                }
+
                 $ret[] = [
                     'idgroups' => $group['idgroups'],
                     'name' => $group['name'],
@@ -793,7 +804,7 @@ class GroupController extends Controller
                     'networks' => \Illuminate\Support\Arr::pluck($group->networks, 'id'),
                     'country' => $group->country,
                     'group_tags' => $group->group_tags()->get()->pluck('id'),
-                    'distance' => $group->distance,
+                    'distance' => $distance,
                     'following' => in_array($group['idgroups'], $your_groupids),
                     'nearby' => in_array($group['idgroups'], $nearby_groupids),
                 ];
