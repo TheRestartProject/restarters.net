@@ -46,8 +46,6 @@ class AdminModerationEventPhotos extends Notification implements ShouldQueue
      */
     public function toMail($notifiable)
     {
-        // TODO Use of preferredLocale should mean we don't have to explicitly pass the locale.  But that isn't
-        // working.
         $locale = $notifiable->language;
         return (new MailMessage)
                       ->subject(__('notifications.new_event_photos_subject', [
@@ -68,8 +66,9 @@ class AdminModerationEventPhotos extends Notification implements ShouldQueue
      */
     public function toArray($notifiable)
     {
+        $locale = $notifiable->language;
         return [
-            'title' => 'New event photos uploaded:',
+            'title' => __('notifications.new_event_photos_subject', [], $locale),
             'event_id' => $this->arr['event_id'],
             'name' => $this->arr['event_venue'],
             'url' => $this->arr['event_url'],

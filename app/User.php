@@ -619,6 +619,9 @@ class User extends Authenticatable implements Auditable, HasLocalePreference
      */
     public function preferredLocale()
     {
+        // TODO Use of preferredLocale should mean we don't have to explicitly pass the locale.  But that isn't
+        // working.  So at the moment we are passing a locale explicitly in the translations in the notifications
+        // to users (not admins).
         return $this->language;
     }
 }
