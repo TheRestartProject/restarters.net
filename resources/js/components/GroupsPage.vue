@@ -159,6 +159,8 @@ export default {
     nearbyGroups() {
       return this.groups.filter(g => {
         return g.nearby && !g.following
+      }).sort((a, b) => {
+        return a.distance - b.distance
       })
     },
     nearestGroups() {

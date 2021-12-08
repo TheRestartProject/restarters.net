@@ -55,7 +55,7 @@
       </template>
       <template slot="cell(location)" slot-scope="data">
         <div class="d-none d-md-block">
-          {{ data.item.location.location }} <span class="text-muted small" v-if="data.item.location.distance">{{ distance(data.item.location.distance )}} km</span>
+          {{ data.item.location.location }} <span class="text-muted small" v-if="data.item.location.distance">{{ distance(data.item.location.distance )}}&nbsp;km</span>
           <br />
           <span class="small text-muted">{{ data.item.location.country }}</span>
         </div>
