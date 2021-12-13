@@ -15,7 +15,7 @@ return [
 
     'event_confirmed_title' => 'Event Confirmed',
     'event_confirmed_subject' => 'Event Confirmed',
-    'event_confirmed_line1' => 'Your event has been confirmed by an admin. This is now publicly available on <a href=":url">:url.</a>',
+    'event_confirmed_line1' => 'Your event :name has been confirmed by an admin. This is now publicly available on <a href=":url">:url.</a>',
     'event_confirmed_view' => 'View event',
 
     'event_devices_title' => 'Contribute Devices',

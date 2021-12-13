@@ -2,6 +2,7 @@
 
 namespace App\Notifications;
 
+use App\Party;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Notifications\Messages\MailMessage;
@@ -11,16 +12,16 @@ class EventConfirmed extends Notification implements ShouldQueue
 {
     use Queueable;
 
-    protected $arr;
+    public $party;
 
     /**
      * Create a new notification instance.
      *
      * @return void
      */
-    public function __construct($arr)
+    public function __construct(Party $party)
     {
-        $this->arr = $arr;
+        $this->party = $party;
     }
 
     /**
@@ -43,15 +44,18 @@ class EventConfirmed extends Notification implements ShouldQueue
     public function toMail($notifiable)
     {
         $locale = $notifiable->language;
+        $url = url('/party/view/' . $this->party->idevents);
+
         return (new MailMessage)
                     ->subject(__('notifications.event_confirmed_subject', [], $locale))
                     ->greeting(__('notifications.greeting', [], $locale))
                     ->line(__('notifications.event_confirmed_line1', [
-                        'url' => $this->arr[0]
+                        'name' => $this->party->venue,
+                        'url' => $url
                     ], $locale))
                     ->action(__('notifications.event_confirmed_view', [], $locale), url('/'))
                     ->line(__('notifications.email_preferences', [
-                        'url' => $this->arr[1]
+                        'url' => $url
                     ], $locale));
     }
 
@@ -64,12 +68,13 @@ class EventConfirmed extends Notification implements ShouldQueue
     public function toArray($notifiable)
     {
         $locale = $notifiable->language;
+        $url = url('/party/view/' . $this->party->idevents);
 
         return [
             'title' => __('notifications.event_confirmed_title', [], $locale),
-            'event_id' => $this->arr['event_id'],
-            'name' => $this->arr['event_venue'],
-            'url' => $this->arr['event_url'],
+            'event_id' => $this->party->idevents,
+            'name' => $this->party->venut,
+            'url' => $url,
         ];
     }
 }
