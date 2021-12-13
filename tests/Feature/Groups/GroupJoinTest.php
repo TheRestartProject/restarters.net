@@ -4,15 +4,19 @@ namespace Tests\Feature\Groups;
 
 use App\Group;
 use App\GroupTags;
-use App\Role;
+use App\Listeners\AddUserToDiscourseGroup;
 use App\User;
 use App\UserGroups;
+use Illuminate\Support\Facades\Notification;
 use Tests\TestCase;
+use Mockery;
 
 class GroupJoinTest extends TestCase
 {
     public function testJoin()
     {
+        Notification::fake();
+
         $this->withoutExceptionHandling();
 
         $group = factory(Group::class)->create();
@@ -25,6 +29,12 @@ class GroupJoinTest extends TestCase
         $this->actingAs($host);
 
         $this->followingRedirects();
+
+        // When we follow a Restarters group, we should try to follow the Discourse group.
+        $this->instance(AddUserToDiscourseGroup::class, Mockery::mock(AddUserToDiscourseGroup::class, function ($mock) {
+            $mock->shouldReceive('handle')->once();
+        }));
+
         $response = $this->get('/group/join/'.$group->idgroups);
 
         // Should redirect to the dashboard.

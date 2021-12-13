@@ -7,6 +7,7 @@
         :canedit="canedit"
         :calendar-copy-url="calendarCopyUrl"
         add-button
+        :location="location"
     />
   </div>
 </template>
@@ -41,7 +42,11 @@ export default {
       type: Boolean,
       required: false,
       default: false
-    }
+    },
+    location: {
+      type: String,
+      required: true
+    },
   },
   computed: {
     group() {

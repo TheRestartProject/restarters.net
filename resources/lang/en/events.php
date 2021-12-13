@@ -210,4 +210,5 @@ return [
   'address_error' => 'The address you entered could not be found.  Please try a more general address, and enter any more specific address details in the event description.',
   'before_submit_text_autoapproved' => 'When you create or save this event, it will be made public.',
   'created_success_message_autoapproved' => 'Event created! It is now public.',
+  'no_location' => '<b>You do not currently have a town/city set.  You can set one in <a href="/profile/edit">your profile</a>.</b>'
 ];

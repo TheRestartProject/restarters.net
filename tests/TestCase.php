@@ -258,10 +258,4 @@ abstract class TestCase extends BaseTestCase
 
         return $props;
     }
-
-    public function setDiscourseTestEnvironment()
-    {
-        // TODO I feel this isn't really necessary.
-        config(['restarters.features.discourse_integration' => true]);
-    }
 }

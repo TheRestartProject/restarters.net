@@ -8,8 +8,7 @@ events, to bring down the barriers to repair.
 
 It combines together three core modules: 
 
-* The Fixometer - our engine for capturing the impact of our community repair
-  activities
+* The Fixometer - our engine for organising community repair events and recording their impact 
 * Restarters Talk - a space for local and global discussion of community repair
 * Restarters Wiki - a collectively produced knowledge base of advice and support
   for community repair
