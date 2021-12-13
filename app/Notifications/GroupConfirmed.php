@@ -45,12 +45,18 @@ class GroupConfirmed extends Notification implements ShouldQueue
     public function toMail($notifiable)
     {
         if ($this->user !== null && $this->user->invites == 1) {
+            $locale = $notifiable->language;
+
             return (new MailMessage)
-                  ->subject('Group Confirmed')
-                  ->greeting(__('notifications.greeting', [], $notifiable->language))
-                  ->line('Your group \''.$this->arr['group_name'].'\' has been confirmed by an admin.')
-                  ->action('View Group', $this->arr['group_url'])
-                  ->line('If you would like to stop receiving these emails, please visit <a href="'.$this->arr['preferences'].'">your preferences</a> on your account.');
+                ->subject(__('notifications.group_confirmed_subject', [], $locale))
+                ->greeting(__('notifications.greeting', [], $notifiable->language))
+                ->line(__('notifications.group_confirmed_line1', [
+                    'name' => $this->arr['group_name']
+                ], $locale))
+                ->action(__('notifications.group_confirmed_action', [], $locale), $this->arr['group_url'])
+                ->line(__('notifications.email_preferences', [
+                    'url' => $this->arr['preferences']
+                ], $locale));
         }
     }
 
@@ -63,7 +69,8 @@ class GroupConfirmed extends Notification implements ShouldQueue
     public function toArray($notifiable)
     {
         return [
-
+            'name' => $this->arr['group_name'],
+            'url' => $this->arr['group_url']
         ];
     }
 }
