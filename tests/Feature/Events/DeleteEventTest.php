@@ -9,12 +9,14 @@ use App\Helpers\Geocoder;
 use App\Listeners\DeleteEventFromWordPress;
 use App\Network;
 use App\Notifications\DeleteEventFromWordpressFailed;
+use App\Notifications\EventRepairs;
 use App\Notifications\NotifyRestartersOfNewEvent;
 use App\Party;
 use App\Preferences;
 use App\Role;
 use App\User;
 use App\UserGroups;
+use Auth;
 use Carbon\Carbon;
 use DB;
 use HieuLe\WordpressXmlrpcClient\WordpressClient;
@@ -219,5 +221,54 @@ class DeleteEventTest extends TestCase
                 ':candelete' => $canDelete ? 'true' : 'false',
             ],
         ]);
+    }
+
+
+    /**
+     * @test
+     */
+    public function request_review()
+    {
+        Notification::fake();
+
+        $admin = factory(User::class)->states('Administrator')->create();
+        $this->actingAs($admin);
+        $id = $this->createGroup();
+        $group = Group::find($id);
+
+        $network = factory(Network::class)->create([
+                                                       'events_push_to_wordpress' => false,
+                                                   ]);
+        $network->addGroup($group);
+
+        $this->assertNotNull($id);
+        $idevents = $this->createEvent($id, 'Past');
+
+        // Add a restarter who is attending.
+        $this->get('/logout');
+        $user = factory(User::class)->states('Restarter')->create();
+        $this->actingAs($user);
+
+        // Join.  Should get redirected, and also prompted to follow the group (which we haven't).
+        $response = $this->get('/party/join/'. $idevents);
+        $this->assertTrue($response->isRedirection());
+        $response->assertSessionHas('prompt-follow-group');
+
+        // Restarter can't trigger contribution ask.
+        $response = $this->get("/party/contribution/$idevents");
+        $response->assertSessionHas('warning');
+
+        // Admin can.
+        $this->get('/logout');
+        $this->actingAs($admin);
+
+        $response = $this->get("/party/contribution/$idevents");
+        $response->assertSessionHas('success');
+
+        // Should trigger a notification to the restarter.
+        Notification::assertSentTo(
+            $user,
+            EventRepairs::class
+        );
     }
 }

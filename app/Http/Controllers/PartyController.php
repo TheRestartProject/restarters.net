@@ -1244,10 +1244,10 @@ class PartyController extends Controller
                 'preferences' => url('/profile/edit'),
             ]));
 
-            return redirect()->back()->with('success', 'Thanks - all Restarters that attended have been sent a notification');
+            return redirect()->back()->with('success', __('events.review_requested'));
         }
 
-        return redirect()->back()->with('warning', 'Sorry - you do not have the correct permissions for this action');
+        return redirect()->back()->with('warning', __('events.review_requested_permissions'));
     }
 
     // TODO: is this alive?
