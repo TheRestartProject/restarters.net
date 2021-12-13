@@ -21,5 +21,10 @@ return [
     'event_devices_title' => 'Contribute Devices',
     'event_devices_subject' => 'Contribute Devices',
     'event_devices_line1' => 'Thank you for hosting the event :event, please help us outline what devices were bought to the event and the status of their repair. This will help us improve the quality of our data.',
-    'event_devices_action' => 'Contribute Data'
+    'event_devices_action' => 'Contribute Data',
+
+    'event_repairs_title' => 'Help us log repair info for :name',
+    'event_repairs_subject' => 'Help us log repair info for :name',
+    'event_repairs_line1' => 'Thank you for fixing at the \':name\' event. The host has posted photos of any feedback left by participants and repair data. Please help us to improve the details of the repairs you carried out by adding any useful information or photos you have. Any extra details you can add will help future repair attempts.',
+    'event_repairs_action' => 'Contribute repair info'
 ];

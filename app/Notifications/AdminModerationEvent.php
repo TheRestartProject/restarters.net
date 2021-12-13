@@ -48,7 +48,7 @@ class AdminModerationEvent extends Notification implements ShouldQueue
     {
         return (new MailMessage)
                       ->subject('New event created: '.$this->arr['event_venue'])
-                      ->greeting(__('notifications.greeting'))
+                      ->greeting(__('notifications.greeting', [], $notifiable->language))
                       ->line('A new event has been created: \''.$this->arr['event_venue'].'\'.')
                       ->action('View event', $this->arr['event_url'])
                       ->line('This event might need your moderation, if your network moderates events and it hasn\'t yet been moderated by another administrator.')

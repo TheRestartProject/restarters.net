@@ -48,7 +48,7 @@ class NewGroupMember extends Notification implements ShouldQueue
     {
         return (new MailMessage)
                   ->subject('New group member followed '.$this->arr['group_name'])
-                  ->greeting(__('notifications.greeting'))
+                  ->greeting(__('notifications.greeting', [], $notifiable->language))
                   ->line('A new volunteer, '.$this->arr['user_name'].', has followed your group \''.$this->arr['group_name'].'\'.')
                   ->action('Go to group', $this->arr['group_url'])
                   ->line('If you would like to stop receiving these emails, please visit <a href="'.url('/user/edit/'.$notifiable->id).'">your preferences</a> on your account.');

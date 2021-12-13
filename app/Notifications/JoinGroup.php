@@ -53,7 +53,7 @@ class JoinGroup extends Notification implements ShouldQueue
             if ($this->user->invites == 1) { // user has opted in to receive emails
                 $mail = (new MailMessage)
                       ->subject($subject)
-                      ->greeting(__('notifications.greeting'))
+                      ->greeting(__('notifications.greeting', [], $notifiable->language))
                       ->line($introLine)
                       ->line('');
 
@@ -74,7 +74,7 @@ class JoinGroup extends Notification implements ShouldQueue
         } else { // users not yet on the platform
             $mail = (new MailMessage)
                     ->subject($subject)
-                    ->greeting(__('notifications.greeting'))
+                    ->greeting(__('notifications.greeting', [], $notifiable->language))
                     ->line($introLine)
                     ->line('');
 

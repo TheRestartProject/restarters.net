@@ -48,7 +48,7 @@ class DeleteEventFromWordpressFailed extends Notification implements ShouldQueue
     {
         return (new MailMessage)
                       ->subject('Failed to delete event from WordPress: '.$this->arr['event_venue'])
-                      ->greeting(__('notifications.greeting'))
+                      ->greeting(__('notifications.greeting', [], $notifiable->language))
                       ->line("Event deletion failed for {$this->arr['event_venue']} by {$this->arr['group_name']}.")
                       ->line(' ')
                       ->line('Please find and delete this event manually from WordPress.')

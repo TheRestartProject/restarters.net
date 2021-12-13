@@ -48,7 +48,7 @@ class NewGroupWithinRadius extends Notification implements ShouldQueue
     {
         return (new MailMessage)
                     ->subject('There\'s a new repair group near to you')
-                    ->greeting(__('notifications.greeting'))
+                    ->greeting(__('notifications.greeting', [], $notifiable->language))
                     ->line('A new group near to you, '.$this->arr['group_name'].', has just become active on Restarters.net.')
                     ->action('Find out more about '.$this->arr['group_name'], $this->arr['group_url'])
                     ->line('If you would like to stop receiving these emails, please visit <a href="'.url('/user/edit/'.$notifiable->id).'">your preferences</a> on your account.');

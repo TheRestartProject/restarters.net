@@ -48,7 +48,7 @@ class NotifyHostRSVPInvitesMade extends Notification implements ShouldQueue
     {
         return (new MailMessage)
                       ->subject('Invites have been sent to your event')
-                      ->greeting(__('notifications.greeting'))
+                      ->greeting(__('notifications.greeting', [], $notifiable->language))
                       ->line('There have been invites sent out to your event: \''.$this->event_details['event_venue'].'\'. URL for reference: \''.$this->event_details['event_url'].'\'.')
                       ->line('If you think this email was not intended for you, please discard.')
                       ->line('Thank you.');

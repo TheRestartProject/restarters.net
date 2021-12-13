@@ -50,7 +50,7 @@ class AdminModerationGroup extends Notification implements ShouldQueue
     {
         return (new MailMessage)
                   ->subject('New group created: '.$this->arr['group_name'])
-                  ->greeting(__('notifications.greeting'))
+                  ->greeting(__('notifications.greeting', [], $notifiable->language))
                   ->line('A new group has been created: \''.$this->arr['group_name'].'\'.')
                   ->action('View group', $this->arr['group_url'])
                   ->line('This group might need your moderation, if it hasn\'t yet been moderated by another administrator.')

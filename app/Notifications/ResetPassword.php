@@ -44,7 +44,7 @@ class ResetPassword extends Notification implements ShouldQueue
     {
         return (new MailMessage)
                     ->subject('Reset password')
-                    ->greeting(__('notifications.greeting'))
+                    ->greeting(__('notifications.greeting', [], $notifiable->language))
                     ->line('You are receiving this email because we received a password reset request for your account.')
                     ->action('Reset password', $this->arr['url'])
                     ->line('If you did not request a password reset, no further action is required.');
