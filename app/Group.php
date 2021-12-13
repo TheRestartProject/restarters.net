@@ -554,6 +554,12 @@ class Group extends Model implements Auditable
         // Get the host who created the group.
         $success = false;
         $member = UserGroups::where('group', $this->idgroups)->first();
+
+        if (empty($member)) {
+            Log::error('Group has no members');
+            return;
+        }
+
         $host = User::find($member->user);
 
         if (empty($host)) {
@@ -593,8 +599,8 @@ class Group extends Model implements Auditable
                 ]);
 
                 // Restricted characters allowed in name, and only 25 characters.
-                $name = str_replace(' ', '_', $this->name);
-                $name = preg_replace("/[^A-Za-z0-9_]/", '', $name);
+                $name = str_replace(' ', '_', trim($this->name));
+                $name = preg_replace("/[^A-Za-z0-9]/", '', $name);
                 $name = substr($name, 0, 25);
 
                 $params = [
