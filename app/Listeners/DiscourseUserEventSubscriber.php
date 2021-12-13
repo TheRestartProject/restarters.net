@@ -23,71 +23,94 @@ class DiscourseUserEventSubscriber
 
     public function onUserEmailUpdated(UserEmailUpdated $event)
     {
-        $user = $event->user;
+        if (config('restarters.features.discourse_integration') === true)
+        {
+            $user = $event->user;
 
-        // Only sync if the email actually changed.
-        if (! $user->isDirty('email')) {
-            return;
-        }
+            // Only sync if the email actually changed.
+            if (!$user->isDirty('email'))
+            {
+                return;
+            }
 
-        try {
-            $this->syncSso($user);
-        } catch (\Exception $ex) {
-            Log::error('Could not sync '.$user->id.' to Discourse: '.$ex->getMessage());
+            try
+            {
+                $this->syncSso($user);
+            } catch (\Exception $ex)
+            {
+                Log::error('Could not sync ' . $user->id . ' to Discourse: ' . $ex->getMessage());
+            }
         }
     }
 
     public function onUserLanguageUpdated(UserLanguageUpdated $event)
     {
-        $user = $event->user;
+        if (config('restarters.features.discourse_integration') === true)
+        {
+            $user = $event->user;
 
-        // Only sync if the language actually changed.
-        if (! $user->isDirty('language')) {
-            return;
-        }
-
-        try {
-            $endpoint = "/users/by-external/{$user->id}.json";
-            $response = $this->discourseClient->request(
-                'GET',
-                $endpoint
-            );
-
-            if ($response->getStatusCode() !== 200) {
-                Log::error('Could not sync '.$user->id.' language to Discourse: '.$response->getReasonPhrase());
+            // Only sync if the language actually changed.
+            if (!$user->isDirty('language'))
+            {
+                return;
             }
 
-            $json = json_decode($response->getBody()->getContents(), true);
-            if (empty($json['user'])) {
-                throw new \Exception("User {$user->id} not found in Discourse");
+            try
+            {
+                $endpoint = "/users/by-external/{$user->id}.json";
+                $response = $this->discourseClient->request(
+                    'GET',
+                    $endpoint
+                );
+
+                if ($response->getStatusCode() !== 200)
+                {
+                    Log::error(
+                        'Could not sync ' . $user->id . ' language to Discourse: ' . $response->getReasonPhrase()
+                    );
+                }
+
+                $json = json_decode($response->getBody()->getContents(), true);
+                if (empty($json['user']))
+                {
+                    throw new \Exception("User {$user->id} not found in Discourse");
+                }
+
+                $userName = $json['user']['username'];
+
+                // TODO: Discourse doesn't have e.g. fr-BE, so just going with main locale.
+                $locale = explode('-', $user->language)[0];
+
+                $endpoint = "/u/{$userName}.json";
+                $response = $this->discourseClient->request(
+                    'PUT',
+                    $endpoint,
+                    [
+                        'form_params' => [
+                            'locale' => $locale,
+                        ]
+                    ]
+                );
+            } catch (\Exception $ex)
+            {
+                Log::error('Could not sync ' . $user->id . ' language to Discourse: ' . $ex->getMessage());
             }
-
-            $userName = $json['user']['username'];
-
-            // TODO: Discourse doesn't have e.g. fr-BE, so just going with main locale.
-            $locale = explode('-', $user->language)[0];
-
-            $endpoint = "/u/{$userName}.json";
-            $response = $this->discourseClient->request(
-                'PUT',
-                $endpoint,
-                ['form_params' => [
-                    'locale' => $locale,
-                ]]
-            );
-        } catch (\Exception $ex) {
-            Log::error('Could not sync '.$user->id.' language to Discourse: '.$ex->getMessage());
         }
     }
 
     public function onUserRegistered(UserRegistered $event)
     {
-        $user = $event->user;
+        if (config('restarters.features.discourse_integration') === true)
+        {
+            $user = $event->user;
 
-        try {
-            $this->syncSso($user);
-        } catch (\Exception $ex) {
-            Log::error('Could not sync '.$user->id.' to Discourse: '.$ex->getMessage());
+            try
+            {
+                $this->syncSso($user);
+            } catch (\Exception $ex)
+            {
+                Log::error('Could not sync ' . $user->id . ' to Discourse: ' . $ex->getMessage());
+            }
         }
     }
 
@@ -135,21 +158,20 @@ class DiscourseUserEventSubscriber
      */
     public function subscribe($events)
     {
-        if (config('restarters.features.discourse_integration') === true) {
-            $events->listen(
-                \App\Events\UserEmailUpdated::class,
-                'App\Listeners\DiscourseUserEventSubscriber@onUserEmailUpdated'
-            );
+        // We subscribe to all the events irrespective of whether the feature is enabled so that we can test them.
+        $events->listen(
+            \App\Events\UserEmailUpdated::class,
+            'App\Listeners\DiscourseUserEventSubscriber@onUserEmailUpdated'
+        );
 
-            $events->listen(
-                \App\Events\UserLanguageUpdated::class,
-                'App\Listeners\DiscourseUserEventSubscriber@onUserLanguageUpdated'
-            );
+        $events->listen(
+            \App\Events\UserLanguageUpdated::class,
+            'App\Listeners\DiscourseUserEventSubscriber@onUserLanguageUpdated'
+        );
 
-            $events->listen(
-                \App\Events\UserRegistered::class,
-                'App\Listeners\DiscourseUserEventSubscriber@onUserRegistered'
-            );
-        }
+        $events->listen(
+            \App\Events\UserRegistered::class,
+            'App\Listeners\DiscourseUserEventSubscriber@onUserRegistered'
+        );
     }
 }

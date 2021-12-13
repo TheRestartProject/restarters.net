@@ -3,9 +3,13 @@
 namespace App\Listeners;
 
 use App\Events\UserFollowedGroup;
+use App\Group;
+use App\Notifications\NewDiscourseMember;
+use App\Notifications\NewGroupMember;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Support\Facades\Log;
+use Notification;
 
 class AddUserToDiscourseGroup
 {
@@ -81,6 +85,10 @@ class AddUserToDiscourseGroup
 
             if (! $response->getStatusCode() === 200) {
                 Log::error('Could not sync user\'s ('.$user->id.') groups to Discourse: '.$response->getReasonPhrase());
+            } else {
+                Notification::send($user, new NewDiscourseMember([
+                    'group_name' => $repairGroup->name
+                ]));
             }
         } catch (\Exception $ex) {
             Log::error('Could not sync user\'s ('.$user->id.') groups to Discourse: '.$ex->getMessage());

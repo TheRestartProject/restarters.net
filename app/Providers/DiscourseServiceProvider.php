@@ -20,9 +20,7 @@ class DiscourseServiceProvider extends ServiceProvider
      */
     public function register()
     {
-        if (! config('restarters.features.discourse_integration')) {
-            return;
-        }
+        // We need to register the service whether or not the feature is turned on, so that we can mock it in testing.
 
         // We use the retry middleware to work around Discourse throttling requests.  This is necessary for UT and
         // could be necessary live under load.
