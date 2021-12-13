@@ -552,19 +552,12 @@ class Group extends Model implements Auditable
     
     public function createDiscourseGroup() {
         // Get the host who created the group.
-        $success = false;
-        $member = UserGroups::where('group', $this->idgroups)->first();
+	$success = false;
+	$member = UserGroups::where('group', $this->idgroups)->first();
+        $host = null;
 
-        if (empty($member)) {
-            Log::error('Group has no members');
-            return;
-        }
-
-        $host = User::find($member->user);
-
-        if (empty($host)) {
-            Log::error('Could not find host of group');
-            return;
+        if (!empty($member)) {
+            $host = User::find($member->user);
         }
 
         $unique = '';
@@ -622,7 +615,7 @@ class Group extends Model implements Auditable
                         'public_exit' => false,
                         'default_notification_level' => 3,
                         'publish_read_state' => true,
-                        'owner_usernames' => $host->username
+                        'owner_usernames' => $host ? $host->username : env('DISCOURSE_APIUSER')
                     ]
                 ];
 
@@ -668,7 +661,7 @@ class Group extends Model implements Auditable
             } catch (\Exception $ex) {
                 Log::error('Could not create group ('.$this->idgroups.') thread: '.$ex->getMessage());
             }
-        } while ($retry);
+	} while ($retry);
 
         return $success;
     }
