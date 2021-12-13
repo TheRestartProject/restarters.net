@@ -45,12 +45,12 @@ class EventConfirmed extends Notification implements ShouldQueue
         $locale = $notifiable->language;
         return (new MailMessage)
                     ->subject(__('notifications.event_confirmed_subject', [], $locale))
-                    ->greeting(__('notifications.greeting'))
+                    ->greeting(__('notifications.greeting', [], $locale))
                     ->line(__('notifications.event_confirmed_line1', [
                         'url' => $this->arr[0]
                     ], $locale))
                     ->action(__('notifications.event_confirmed_view', [], $locale), url('/'))
-                    ->line(__('notifications.event_confirmed_line2', [
+                    ->line(__('notifications.email_preferences', [
                         'url' => $this->arr[1]
                     ], $locale));
     }
@@ -66,7 +66,7 @@ class EventConfirmed extends Notification implements ShouldQueue
         $locale = $notifiable->language;
 
         return [
-            'title' => __('notifications.event_confirmed_subject', [], $locale),
+            'title' => __('notifications.event_confirmed_title', [], $locale),
             'event_id' => $this->arr['event_id'],
             'name' => $this->arr['event_venue'],
             'url' => $this->arr['event_url'],
