@@ -1001,8 +1001,11 @@ class Party extends Model implements Auditable
         }
 
         // Notify the person who created it that it has now been approved.
-        $host = User::find(EventsUsers::where('event', $this->idevents)->get()[0]->user);
-        Notification::send($host, new EventConfirmed($this));
+        $host = User::find(EventsUsers::where('event', $this->idevents)->first());
+
+        if ($host) {
+            Notification::send($host->user, new EventConfirmed($this));
+        }
 
         event(new ApproveEvent($this));
     }
