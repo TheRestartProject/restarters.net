@@ -6,6 +6,8 @@ use App\Network;
 use DB;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Facades\Lang;
+use Illuminate\Support\Facades\Log;
 use OwenIt\Auditing\Contracts\Auditable;
 
 class Group extends Model implements Auditable
@@ -546,5 +548,121 @@ class Group extends Model implements Auditable
     public function setDistanceAttribute($val)
     {
         $this->distance = $val;
+    }
+    
+    public function createDiscourseGroup() {
+        // Get the host who created the group.
+	$success = false;
+	$member = UserGroups::where('group', $this->idgroups)->first();
+        $host = null;
+
+        if (!empty($member)) {
+            $host = User::find($member->user);
+        }
+
+        $unique = '';
+
+        do {
+            $retry = false;
+
+            try {
+                // We want to internationalise the message.  Use the languages of any networks that the group
+                // is in.
+                $text = '';
+                $langs = [];
+
+                foreach ($this->networks as $network) {
+                    $lang = $network->default_language;
+
+                    if (!in_array($lang, $langs)) {
+                        $text .= Lang::get('groups.discourse_title',[
+                            'group' => $this->name,
+                            'link' => env('APP_URL') . '/group/view/' . $this->idgroups,
+                            'help' => 'https://talk.restarters.net/t/how-to-communicate-with-your-repair-group/6293'
+                        ],$lang);
+
+                        $langs[] = $lang;
+                    }
+                }
+
+                // We want the host to create the group, so use their username.  The API key should
+                // allow us to do this - see https://meta.discourse.org/t/how-can-an-api-user-create-posts-as-another-user/45968/3.
+                $client = app('discourse-client', [
+                    'username' => env('DISCOURSE_APIUSER'),
+                ]);
+
+                // Restricted characters allowed in name, and only 25 characters.
+                $name = str_replace(' ', '_', trim($this->name));
+                $name = preg_replace("/[^A-Za-z0-9]/", '', $name);
+                $name = substr($name, 0, 25);
+
+                $params = [
+                    'group' => [
+                        'name' => "$name$unique",
+                        'full_name' => $this->name,
+                        'mentionable_level' => 4,
+                        'messageable_level' => 99,
+                        'visibility_level' => 0,
+                        'members_visibility_level' => 0,
+                        'automatic_membership_email_domains' => null,
+                        'automatic_membership_retroactive' => false,
+                        'primary_group' => false,
+                        'flair_url' => $this->groupImagePath(),
+                        'flair_bg_color' => null,
+                        'flair_color' => null,
+                        'bio_raw' => $text,
+                        'public_admission' => false,
+                        'public_exit' => false,
+                        'default_notification_level' => 3,
+                        'publish_read_state' => true,
+                        'owner_usernames' => $host ? $host->username : env('DISCOURSE_APIUSER')
+                    ]
+                ];
+
+                $endpoint = '/admin/groups.json';
+
+                Log::info('Creating group : '.json_encode($params));
+                $response = $client->request(
+                    'POST',
+                    $endpoint,
+                    [
+                        'form_params' => $params,
+                    ]
+                );
+
+                Log::info('Response status: '.$response->getStatusCode());
+                Log::info('Response body: '.$response->getBody());
+
+                if ($response->getStatusCode() !== 200) {
+                    if (strpos($response->getBody(), 'Name has already been taken') !== false) {
+                        // Discourse sometimes seems to have groups stuck in a bad state which are not accessible.
+                        // This may be a consequence of testing with multiple Restarters instances against the same
+                        // Discourse instance.
+                        //
+                        // This can result in a create failure, and a group which we cannot then locate to delete.
+                        // So skip over it and retry creation with a different name.
+                        $retry = true;
+                        $unique = $unique ? ($unique + 1) : 1;
+                    } else {
+                        Log::error('Could not create group ('.$this->idgroups.') thread: '.$response->getReasonPhrase());
+                    }
+                } else {
+                    // We want to save the discourse thread id in the group, so that we can invite people to it later
+                    // when they join.
+                    $json = json_decode($response->getBody(), true);
+                    if (empty($json['basic_group'])) {
+                        throw new \Exception('Group not found in create response');
+                    }
+
+                    $this->discourse_group = "$name$unique";
+                    $this->save();
+                    $success = true;
+                }
+            } catch (\Exception $ex) {
+                Log::error('Could not create group ('.$this->idgroups.') thread: '.$ex->getMessage());
+            }
+	} while ($retry);
+
+        return $success;
     }
 }
