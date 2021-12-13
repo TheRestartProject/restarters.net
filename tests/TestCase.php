@@ -95,6 +95,7 @@ abstract class TestCase extends BaseTestCase
     public function loginAsTestUser($role = Role::RESTARTER)
     {
         // This is testing the external interface, whereas actingAs() wouldn't be.
+        Auth::logout();
         $response = $this->post('/user/register/', $this->userAttributes($role));
 
         $response->assertStatus(302);
@@ -201,10 +202,11 @@ abstract class TestCase extends BaseTestCase
 
     private function canonicalise($val)
     {
-        // Sinple code to filter out timestamps.
+        // Sinple code to filter out timestamps or other random values.
         if ($val && is_string($val)) {
             $val = preg_replace('/"created_at":".*"/', '"created_at":"TIMESTAMP"', $val);
             $val = preg_replace('/"updated_at":".*"/', '"updated_at":"TIMESTAMP"', $val);
+            $val = preg_replace('/"shareable_code":".*"/', '"shareable_code":"SHARECODE"', $val);
         }
 
         return $val;
@@ -255,11 +257,5 @@ abstract class TestCase extends BaseTestCase
         $this->assertTrue($foundSome);
 
         return $props;
-    }
-
-    public function setDiscourseTestEnvironment()
-    {
-        // TODO I feel this isn't really necessary.
-        config(['restarters.features.discourse_integration' => true]);
     }
 }

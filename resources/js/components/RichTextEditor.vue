@@ -89,7 +89,7 @@ export default {
     }
   },
   mounted() {
-    this.currentValue = value
+    this.currentValue = this.value
   }
 }
 </script>
