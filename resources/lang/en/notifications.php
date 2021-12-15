@@ -31,6 +31,15 @@ return [
     'group_confirmed_title' => 'Group Confirmed',
     'group_confirmed_subject' => 'Group Confirmed',
     'group_confirmed_line1' => 'Your group \':name\' has been confirmed by an admin.',
-    'group_confirmed_action' => 'View Group'
+    'group_confirmed_action' => 'View Group',
 
+    'join_event_title' => 'You\'ve been invited to an upcoming :groupname event',
+    'join_event_subject' => 'You\'ve been invited to an upcoming :groupname event',
+    'join_event_line1' => ':inviter has invited you to join :groupname at an upcoming repair event.',
+    'join_event_date' => 'Date:',
+    'join_event_time' => 'Time:',
+    'join_event_location' => 'Location:',
+    'join_event_ignore' => 'If you think this invitation was not intended for you, please disregard this email.',
+    'join_event_rsvp_now' => 'RSVP now',
+    'join_event_rsvp_message' => 'You can turn up on the day, or if you would prefer you can also create an account with us and RSVP online now.'
 ];

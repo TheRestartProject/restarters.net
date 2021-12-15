@@ -60,24 +60,32 @@ class JoinEvent extends Notification implements ShouldQueue
      */
     public function toMail($notifiable)
     {
-        $subject = 'You\'ve been invited to an upcoming '.$this->arr['group'].' event';
-        $greeting = 'Hello!';
-        $introLine = $this->arr['name'].' has invited you to join '.$this->arr['group'].' at an upcoming repair event.';
+        $locale = $notifiable->language;
+        $subject = __('notifications.join_event_subject', [
+            'groupname' => $this->arr['group']
+        ], $locale);
+        $greeting = __('notifications.greeting', [], $locale);
+
+        $introLine = __('notifications.join_event_line1', [
+            'inviter' => $this->arr['name'],
+            'groupname' => $this->arr['group']
+        ], $locale);
+
         $eventDetailsTable = '<table style="margin-left:120px; color:black">
                                     <tr>
-                                    <td>Date:</td>
+                                    <td>' . __('notifications.join_event_date') . '</td>
                                     <td>'.$this->arr['event']->getEventDate('D jS M Y').'</td>
                                   </tr>
                                   <tr>
-                                    <td>Time:</td>'.
-                                    '<td>'.$this->arr['event']->getEventStartEnd().'</td>
+                                    <td>' . __('notifications.join_event_time') . '</td>
+                                    <td>'.$this->arr['event']->getEventStartEnd().'</td>
                                   </tr>
                                     <tr>
-                                    <td>Location:</td>
+                                    <td>' . __('notifications.join_event_location') . '</td>
                                     <td>'.$this->arr['event']->location.'</td>
                                   </tr>
                             </table>';
-        $ignoreLine = 'If you think this invitation was not intended for you, please disregard this email.';
+        $ignoreLine = __('notifications.join_event_ignore', [], $locale);
 
         if ($this->user !== null) { // existing user
             if ($this->user->invites == 1) { // opted in to emails
@@ -115,9 +123,9 @@ class JoinEvent extends Notification implements ShouldQueue
             }
 
             $mail->line($eventDetailsTable)
-                 ->action('RSVP now', $this->arr['url'])
+                 ->action(__('notifications.join_event_rsvp_now', [], $locale), $this->arr['url'])
                  ->line('')
-                 ->line('You can turn up on the day, or if you would prefer you can also create an account with us and RSVP online now.')
+                 ->line(__('notifications.join_event_rsvp_now', [], $locale))
                  ->line('')
                  ->line($ignoreLine);
 

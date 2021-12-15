@@ -45,7 +45,20 @@ class InviteEventTest extends TestCase
 
         Notification::assertSentTo(
             [$user],
-            JoinEvent::class
+            JoinEvent::class,
+            function ($notification, $channels, $user) use ($group, $event, $host) {
+                $mailData = $notification->toMail($user)->toArray();
+                self::assertEquals(__('notifications.join_event_subject', [
+                    'groupname' => $group->name
+                ], $user->language), $mailData['subject']);
+
+                // Mail should mention the host, message and location.
+                self::assertRegexp('/' . $host->name . '/', $mailData['introLines'][0]);
+                self::assertRegexp('/creepy/', $mailData['introLines'][2]);
+                self::assertRegexp('/' . $event->location  . '/', $mailData['introLines'][4]);
+
+                return true;
+            }
         );
 
         $response->assertSessionHas('success');
