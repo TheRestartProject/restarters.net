@@ -33,7 +33,7 @@ return [
     'group_confirmed_line1' => 'Your group \':name\' has been confirmed by an admin.',
     'group_confirmed_action' => 'View Group',
 
-    'join_event_title' => 'You\'ve been invited to an upcoming :groupname event',
+    'join_event_title' => 'You\'ve been invited to join an event: ',
     'join_event_subject' => 'You\'ve been invited to an upcoming :groupname event',
     'join_event_line1' => ':inviter has invited you to join :groupname at an upcoming repair event.',
     'join_event_date' => 'Date:',
