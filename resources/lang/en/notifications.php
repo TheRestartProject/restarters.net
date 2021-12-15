@@ -7,6 +7,7 @@ return [
     'marked_as_read' => 'Marked as read',
     'mark_all_as_read' => 'Mark all notifications as read',
     'greeting' => 'Hello!',
+    'email_footer' => 'If you have any questions or issues, please contact <a href="mailto:community@therestartproject.org">community@therestartproject.org</a>',
 
     'new_event_photos_title' => 'New event photos uploaded:',
     'new_event_photos_subject' => 'New event photos uploaded to event: :event',

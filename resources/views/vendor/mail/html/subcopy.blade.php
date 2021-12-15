@@ -6,7 +6,7 @@
 </tr>
 <tr>
 <td>
-If you have any questions or issues, please contact <a href="mailto:community@therestartproject.org">community@therestartproject.org</a>
+{!! __('notifications.email_footer') !!}
 </td>
 </tr>
 </table>
