@@ -28,6 +28,26 @@ jobs:
       - image: mcr.microsoft.com/playwright:focal
         environment:
           NODE_ENV: development
+      - image: 'bitnami/mariadb:latest'
+        name: mariadb
+        environment:
+          - ALLOW_EMPTY_PASSWORD=yes
+          - MARIADB_USER=bn_mediawiki
+          - MARIADB_DATABASE=bitnami_mediawiki
+      - image: 'bitnami/mediawiki:1'
+        name: mediawiki
+        labels:
+          kompose.service.type: nodeport
+        environment:
+          - MARIADB_HOST=mariadb
+          - MARIADB_PORT_NUMBER=3306
+          - MEDIAWIKI_DATABASE_USER=bn_mediawiki
+          - MEDIAWIKI_DATABASE_NAME=bitnami_mediawiki
+          - ALLOW_EMPTY_PASSWORD=yes
+          - MEDIAWIKI_EXTERNAL_HTTP_PORT_NUMBER=8080
+          - MEDIAWIKI_HOST=mediawiki
+        depends_on:
+          - mariadb
     steps:
       - checkout
       - run: sudo apt update
@@ -37,6 +57,15 @@ jobs:
 
       # We don't have Discourse on CircleCI.
       - run: sed -i 's/FEATURE__DISCOURSE_INTEGRATION=.*$/FEATURE__DISCOURSE_INTEGRATION=false/g' .env
+
+      # ...but we do have Mediawiki.
+      - run: sed -i 's/FEATURE__WIKI_INTEGRATION=.*$/FEATURE__WIKI_INTEGRATION=true/g' .env
+      - run: sed -i 's/WIKI_URL=.*$/WIKI_URL=http:\/\/mediawiki:8080/g' .env
+      - run: sed -i 's/WIKI_DB=.*$/WIKI_DB=bitnami_mediawiki/g' .env
+      - run: sed -i 's/WIKI_USER=.*$/WIKI_USER=user/g' .env
+      - run: sed -i 's/WIKI_PASSWORD=.*$/WIKI_PASSWORD=bitnami123/g' .env
+      - run: sed -i 's/WIKI_APIUSER=.*$/WIKI_APIUSER=user/g' .env
+      - run: sed -i 's/WIKI_APIPASSWORD=.*$/WIKI_APIPASSWORD=bitnami123/g' .env
 
       # Playwright needs the debug bar not to appear
       - run: sed -i 's/APP_DEBUG=.*$/APP_DEBUG=FALSE/g' .env
