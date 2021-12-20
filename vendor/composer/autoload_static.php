@@ -725,6 +725,7 @@ class ComposerStaticInitf57f72b7adaf50a29437647288004820
         'App\\Console\\Commands\\FixViews' => __DIR__ . '/../..' . '/app/Console/Commands/FixViews.php',
         'App\\Console\\Commands\\ImportRepairTogether' => __DIR__ . '/../..' . '/app/Console/Commands/ImportRepairTogether.php',
         'App\\Console\\Commands\\LanguageSync' => __DIR__ . '/../..' . '/app/Console/Commands/LanguageSync.php',
+        'App\\Console\\Commands\\MigrateWikiPasswords' => __DIR__ . '/../..' . '/app/Console/Commands/MigrateWikiPasswords.php',
         'App\\Console\\Commands\\PopulateUniqueCodeToEventsAndGroups' => __DIR__ . '/../..' . '/app/Console/Commands/PopulateUniqueCodeToEventsAndGroups.php',
         'App\\Console\\Commands\\SetPostcodes' => __DIR__ . '/../..' . '/app/Console/Commands/SetPostcodes.php',
         'App\\Console\\Commands\\SetRepairTogetherPasswords' => __DIR__ . '/../..' . '/app/Console/Commands/SetRepairTogetherPasswords.php',

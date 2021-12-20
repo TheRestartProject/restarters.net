@@ -23,6 +23,7 @@ return array(
     'App\\Console\\Commands\\FixViews' => $baseDir . '/app/Console/Commands/FixViews.php',
     'App\\Console\\Commands\\ImportRepairTogether' => $baseDir . '/app/Console/Commands/ImportRepairTogether.php',
     'App\\Console\\Commands\\LanguageSync' => $baseDir . '/app/Console/Commands/LanguageSync.php',
+    'App\\Console\\Commands\\MigrateWikiPasswords' => $baseDir . '/app/Console/Commands/MigrateWikiPasswords.php',
     'App\\Console\\Commands\\PopulateUniqueCodeToEventsAndGroups' => $baseDir . '/app/Console/Commands/PopulateUniqueCodeToEventsAndGroups.php',
     'App\\Console\\Commands\\SetPostcodes' => $baseDir . '/app/Console/Commands/SetPostcodes.php',
     'App\\Console\\Commands\\SetRepairTogetherPasswords' => $baseDir . '/app/Console/Commands/SetRepairTogetherPasswords.php',
