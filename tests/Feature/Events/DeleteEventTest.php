@@ -147,7 +147,7 @@ class DeleteEventTest extends TestCase
         // - role
         // - past/future
         // - (for past) whether to add a device
-        // - whether the delete flag should show (only for admins and where no devices)
+        // - whether the delete flag should show
         return [
             [
                 'Administrator', 'Past', false, true,
@@ -168,10 +168,13 @@ class DeleteEventTest extends TestCase
                 'NetworkCoordinator', 'Future', false, true,
             ],
             [
-                'Host', 'Past', false, false,
+                'Host', 'Past', false, true,
             ],
             [
-                'Host', 'Future', false, false,
+                'Host', 'Past', true, false,
+            ],
+            [
+                'Host', 'Future', false, true,
             ],
             [
                 'Restarter', 'Past', false, false,
@@ -208,6 +211,11 @@ class DeleteEventTest extends TestCase
 
         if ($role == 'NetworkCoordinator') {
             $network->addCoordinator($user);
+        }
+
+        if ($role == 'Host') {
+            $group->addVolunteer($user);
+            $group->makeMemberAHost($user);
         }
 
         $this->actingAs($user);
