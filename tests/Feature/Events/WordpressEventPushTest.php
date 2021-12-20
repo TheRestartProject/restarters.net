@@ -6,6 +6,7 @@ use App\Events\ApproveEvent;
 use App\Events\EditEvent;
 use App\Group;
 use App\GroupNetwork;
+use App\Listeners\CreateWordpressPostForEvent;
 use App\Network;
 use App\Party;
 use App\User;
@@ -45,6 +46,29 @@ class WordpressEventPushTest extends TestCase
         ]);
 
         $event->approve();
+    }
+
+    /** @test */
+    public function date_format_in_events() {
+        $network = factory(Network::class)->create([
+           'events_push_to_wordpress' => true,
+        ]);
+        $group = factory(Group::class)->create();
+        $network->addGroup($group);
+        $event = factory(Party::class)->create(['group' => $group->idgroups]);
+        $event->save();
+
+        $this->mock(WordpressClient::class, function ($mock) use ($event) {
+            $mock->shouldReceive('newPost')
+                ->withArgs(function($name, $text, $content) use ($event) {
+                    // Check name, and that timestamp doesn't include seconds.
+                    $party_time = substr($event->start, 0, 5) . ' - ' . substr($event->end, 0, 5);
+                    return $name == $event->venue && $content['custom_fields'][3]['value'] == $party_time;
+                })->once();
+        });
+
+        $handler = app(CreateWordpressPostForEvent::class);
+        $handler->handle(new ApproveEvent($event));
     }
 
     /** @test */
