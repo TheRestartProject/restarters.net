@@ -57,7 +57,7 @@
           <template slot="title">
             <div>
               <b>{{ __('devices.title_powered') }}</b>
-              ({{ impactData.total_powered.toLocaleString() }})
+              ({{ total_powered.toLocaleString() }})
             </div>
           </template>
           <p class="pl-3" v-html="__('devices.description_powered')" />
@@ -86,7 +86,7 @@
           <template slot="title">
             <div>
               <b>{{ __('devices.title_unpowered') }}</b>
-              ({{ impactData.total_unpowered.toLocaleString() }})
+              ({{ total_unpowered.toLocaleString() }})
             </div>
           </template>
           <p class="pl-3" v-html="__('devices.description_unpowered')" />
@@ -151,9 +151,9 @@
               :group="group"
               :from_date="from_date"
               :to_date="to_date"
-              :total.sync="impactData.total_powered"
-              :weight.sync="impactData.waste_powered"
-              :co2.sync="impactData.co2_powered"
+              :total.sync="total_powered"
+              :weight.sync="waste_powered"
+              :co2.sync="co2_powered"
           />
         </template>
       </CollapsibleSection>
@@ -195,9 +195,9 @@
               :group="group"
               :from_date="from_date"
               :to_date="to_date"
-              :total.sync="impactData.total_unpowered"
-              :weight.sync="impactData.waste_unpowered"
-              :co2.sync="impactData.co2_unpowered"
+              :total.sync="total_unpowered"
+              :weight.sync="waste_unpowered"
+              :co2.sync="co2_unpowered"
           />
         </template>
       </CollapsibleSection>
@@ -265,6 +265,13 @@ export default {
       from_date: null,
       to_date: null,
 
+      total_powered: 0,
+      total_unpowered: 0,
+      waste_powered: 0,
+      waste_unpowered: 0,
+      co2_powered: 0,
+      co2_unpowered: 0,
+
       startExpandedItems: false,
       startExpandedEvents: false,
 
@@ -331,6 +338,13 @@ export default {
       this.to_date = params.get('to_date')
       this.startExpandedEvents = true
     }
+
+    this.total_powered = this.impactData.total_powered
+    this.total_unpowered = this.impactData.total_unpowered
+    this.waste_powered = this.impactData.waste_powered
+    this.waste_unpowered = this.impactData.waste_unpowered
+    this.co2_powered = this.impactData.co2_powered
+    this.co2_unpowered = this.impactData.co2_unpowered
   },
   watch: {
     url(newVal) {
