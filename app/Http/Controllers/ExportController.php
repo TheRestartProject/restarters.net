@@ -37,7 +37,7 @@ class ExportController extends Controller
         $uEmissionratio = \App\Helpers\LcaStats::getEmissionRatioUnpowered();
 
         // Create CSV
-        $filename = 'devices.csv';
+        $filename = base_path() . DIRECTORY_SEPARATOR . 'public' . DIRECTORY_SEPARATOR . 'devices.csv';
         $file = fopen($filename, 'w+');
 
         // Do not include model column
