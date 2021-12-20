@@ -34,8 +34,10 @@ class MediawikiServiceProvider extends ServiceProvider
 
         $this->app->singleton(MediawikiFactory::class, function () {
             try {
+                Log::debug('Connect to Mediawiki');
                 $api = new MediawikiApi(env('WIKI_URL').'/api.php');
                 $api->login(new ApiUser(env('WIKI_APIUSER'), env('WIKI_APIPASSWORD')));
+                Log::debug('...connected');
 
                 return new MediawikiFactory($api);
             } catch (\Exception $ex) {

@@ -552,13 +552,12 @@ class Group extends Model implements Auditable
     
     public function createDiscourseGroup() {
         // Get the host who created the group.
-        $success = false;
-        $member = UserGroups::where('group', $this->idgroups)->first();
-        $host = User::find($member->user);
+	$success = false;
+	$member = UserGroups::where('group', $this->idgroups)->first();
+        $host = null;
 
-        if (empty($host)) {
-            Log::error('Could not find host of group');
-            return;
+        if (!empty($member)) {
+            $host = User::find($member->user);
         }
 
         $unique = '';
@@ -593,8 +592,8 @@ class Group extends Model implements Auditable
                 ]);
 
                 // Restricted characters allowed in name, and only 25 characters.
-                $name = str_replace(' ', '_', $this->name);
-                $name = preg_replace("/[^A-Za-z0-9_]/", '', $name);
+                $name = str_replace(' ', '_', trim($this->name));
+                $name = preg_replace("/[^A-Za-z0-9]/", '', $name);
                 $name = substr($name, 0, 25);
 
                 $params = [
@@ -616,7 +615,7 @@ class Group extends Model implements Auditable
                         'public_exit' => false,
                         'default_notification_level' => 3,
                         'publish_read_state' => true,
-                        'owner_usernames' => $host->username
+                        'owner_usernames' => $host ? $host->username : env('DISCOURSE_APIUSER')
                     ]
                 ];
 
@@ -662,7 +661,7 @@ class Group extends Model implements Auditable
             } catch (\Exception $ex) {
                 Log::error('Could not create group ('.$this->idgroups.') thread: '.$ex->getMessage());
             }
-        } while ($retry);
+	} while ($retry);
 
         return $success;
     }
