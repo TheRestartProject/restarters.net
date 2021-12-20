@@ -55,21 +55,9 @@
       <b-tabs class="ourtabs ourtabs-brand w-100 d-none d-md-block" v-model="tabIndex">
         <b-tab active title-item-class="w-50" title-link-class="smallpad" class="pt-2">
           <template slot="title">
-            <div class="d-flex justify-content-between">
-              <div>
-                <b>{{ __('devices.title_powered') }}</b>
-                ({{ impactData.total_powered.toLocaleString() }})
-              </div>
-              <div class="d-flex text-brand font-weight-bold">
-                <div class="mr-3 lower">
-                  <b-img src="/images/trash_brand.svg" class="icon" />
-                  {{ Math.round(impactData.waste_powered).toLocaleString() }} kg
-                </div>
-                <div class="mr-1 lower">
-                  <b-img src="/images/co2_brand.svg" class="icon" />
-                  {{ Math.round(impactData.co2_powered).toLocaleString() }} kg
-                </div>
-              </div>
+            <div>
+              <b>{{ __('devices.title_powered') }}</b>
+              ({{ impactData.total_powered.toLocaleString() }})
             </div>
           </template>
           <p class="pl-3" v-html="__('devices.description_powered')" />
@@ -96,21 +84,9 @@
         </b-tab>
         <b-tab title-item-class="w-50" title-link-class="smallpad" class="pt-2">
           <template slot="title">
-            <div class="d-flex justify-content-between">
-              <div>
-                <b>{{ __('devices.title_unpowered') }}</b>
-                ({{ impactData.total_unpowered.toLocaleString() }})
-              </div>
-              <div class="d-flex text-brand font-weight-bold">
-                <div class="mr-3 lower">
-                  <b-img src="/images/trash_brand.svg" class="icon" />
-                  {{ Math.round(impactData.waste_unpowered).toLocaleString() }} kg
-                </div>
-                <div class="mr-1 lower">
-                  <b-img src="/images/co2_brand.svg" class="icon" />
-                  {{ Math.round(impactData.co2_unpowered).toLocaleString() }} kg
-                </div>
-              </div>
+            <div>
+              <b>{{ __('devices.title_unpowered') }}</b>
+              ({{ impactData.total_unpowered.toLocaleString() }})
             </div>
           </template>
           <p class="pl-3" v-html="__('devices.description_unpowered')" />
