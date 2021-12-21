@@ -529,13 +529,13 @@ class Party extends Model implements Auditable
 
     public function scopeFutureForUser($query, $userids = null) {
         $this->defaultUserIds($userids);
-        $query = $query->future($userids);
+        $query = $query->forUser()->future($userids);
         return $query;
     }
 
     public function scopePastForUser($query, $userids = null) {
         $this->defaultUserIds($userids);
-        $query = $query->past($userids);
+        $query = $query->forUser()->past($userids);
         return $query;
     }
 
