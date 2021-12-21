@@ -576,40 +576,6 @@ class Party extends Model implements Auditable
         return $query;
     }
 
-    /**
-     * [scopeUsersUpcomingEvents description]
-     *
-     * Get all Upcoming Events from the User or User's groups
-     *
-     * @param  [type]                  $query
-     * @param  [type]                  $user_ids
-     * @return [type]
-     */
-    public function scopeUsersUpcomingEvents($query, array $user_ids = null)
-    {
-        // if no $user_ids are supplied, then use the current Auth's ID
-        if (empty($user_ids)) {
-            $user_ids[] = auth()->id();
-        }
-
-        return $query->join('groups', 'groups.idgroups', '=', 'events.group')
-            ->leftJoin('users_groups', 'users_groups.group', '=', 'groups.idgroups')
-            ->leftJoin('events_users', 'events_users.event', '=', 'events.idevents')
-            ->whereNotNull('events.wordpress_post_id')
-            ->where('users_groups.status', 1)
-            ->whereNull('users_groups.deleted_at')
-            ->whereDate('events.event_date', '>=', date('Y-m-d'))
-
-            ->where(function ($query) use ($user_ids) {
-                $query->whereIn('users_groups.user', $user_ids)
-                    ->orWhereIn('events_users.user', $user_ids);
-            })
-
-            ->select('events.*')
-            ->groupBy('idevents')
-            ->orderBy('events.event_date', 'DESC');
-    }
-
     public function allDevices()
     {
         return $this->hasMany(\App\Device::class, 'event', 'idevents')->join('categories', 'categories.idcategories', '=', 'devices.category');

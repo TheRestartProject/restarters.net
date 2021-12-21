@@ -104,7 +104,7 @@ class PartyController extends Controller
         } else {
             // This is a logged-in user's events page.  We want all upcoming events for groups we are a member
             // of.
-            foreach (Party::usersUpcomingEvents()->get() as $event) {
+            foreach (Party::futureForUser()->get() as $event) {
                 $e = \App\Http\Controllers\PartyController::expandEvent($event, NULL);
                 $events[] = $e;
             }
