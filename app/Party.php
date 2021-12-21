@@ -389,7 +389,7 @@ class Party extends Model implements Auditable
     public function scopeUndeleted($query) {
         // This is the base scope.  Almost always we are only interested in seeing events which have not been
         // deleted.
-        return $query->whereNull('deleted_at')
+        return $query->whereNull('events.deleted_at')
             ->orderBy('event_date', 'DESC')
             ->orderBy('start', 'DESC')
             ->orderBy('end', 'DESC');
@@ -406,8 +406,8 @@ class Party extends Model implements Auditable
         $query = $query->where('event_date', '<', $date)
             ->orWhere(function($q2) use ($date, $time)  {
                 $q2->where([
-                    [ 'event_date', '=', $date ],
-                    [ 'end', '<', $time ]
+                    [ 'event_date', '=', "'$date'" ],
+                    [ 'end', '<', "'$time'" ]
                 ]);
             });
         return $query;
@@ -418,11 +418,11 @@ class Party extends Model implements Auditable
         $date = date('Y-m-d');
         $time = date('H:i');
         $query = $query->undeleted();
-        $query = $query->where('event_date', '>', $date)
+        $query = $query->whereDate('event_date', '>', "'$date'")
             ->orWhere(function($q2) use ($date, $time) {
                 $q2->where([
-                               [ 'event_date', '=', $date ],
-                               [ 'start', '>', $time ]
+                               [ 'event_date', '=', "'$date'" ],
+                               [ 'start', '>', "'$time'" ]
                            ]);
             });
         return $query;
@@ -433,9 +433,9 @@ class Party extends Model implements Auditable
         $date = date('Y-m-d');
         $time = date('H:i');
         $query = $query->undeleted();
-        $query = $query->where('event_date', '=', $date)
-            ->where('start', '<=', $time)
-            ->where('end', '>=', $time);
+        $query = $query->whereDate('event_date', '=', "'$date'")
+            ->where('start', '<=', "'$time'")
+            ->where('end', '>=', "'$time'");
         return $query;
     }
 
@@ -449,11 +449,11 @@ class Party extends Model implements Auditable
     public function scopeHostFor($query, $userid) {
         // Events where this user is a host.
         $query = $query->undeleted();
-        $query = $query->join('events_users', function ($join) use ($userid) {
-            $join->on('events_users.event', '=', 'events.idevents');
-            $join->where('events_users.user', '=', $userid);
-            $join->where('events_users.role', '=', Role::HOST);
-        });
+        $query = $query->join('events_users AS hf', function ($join) use ($userid) {
+            $join->on('hf.event', '=', 'events.idevents');
+            $join->where('hf.user', '=', $userid);
+            $join->where('hf.role', '=', Role::HOST);
+        })->select('events.*');
 
         return $query;
     }
@@ -461,13 +461,13 @@ class Party extends Model implements Auditable
     public function scopeAttendingOrAttended($query, $userid) {
         // Events this user has attending/is attending.
         $query = $query->undeleted();
-        $query = $query->join('events_users', function ($join) use ($userid) {
-            $join->on('events_users.event', '=', 'events.idevents');
-            $join->where('events_users.user', '=', $userid);
+        $query = $query->join('events_users AS aoa', function ($join) use ($userid) {
+            $join->on('aoa.event', '=', 'events.idevents');
+            $join->where('aoa.user', '=', $userid);
 
             // Check the status so that we exclude any events we have been invited to but not confirmed.
-            $join->where('events_users.status', 1);
-        });
+            $join->where('aoa.status', 1);
+        })->select('events.*');
 
         return $query;
     }
@@ -475,11 +475,11 @@ class Party extends Model implements Auditable
     public function scopeInvitedNotConfirmed($query, $userid) {
         // Events this user has been invited to but not confirmed.  Only interested in future events.
         $query = $query->future();
-        $query = $query->join('events_users', function ($join) use ($userid) {
-            $join->on('events_users.event', '=', 'events.idevents');
-            $join->where('events_users.user', '=', $userid);
-            $join->where('events_users.status', '!=', 1);
-        });
+        $query = $query->join('events_users AS inceu', function ($join) use ($userid) {
+            $join->on('inceu.event', '=', 'events.idevents');
+            $join->where('inceu.user', '=', $userid);
+            $join->where('inceu.status', '!=', 1);
+        })->select('events.*');
 
         return $query;
     }
@@ -487,11 +487,12 @@ class Party extends Model implements Auditable
     public function scopeHostForGroup($query, $userid) {
         // Any approved events for groups that this user has joined (not just been invited to) and not left.
         $query = $query->approved();
-        $query = $query->join('users_groups', 'users_groups.group', '=', 'groups.idgroups')
-            ->where('users_groups.status', 1)
-            ->where('users_groups.role', '=', Role::HOST)
-            ->whereNull('users_groups.deleted_at')
-            ->where('users_groups.user', $userid);
+        $query = $query->join('users_groups AS hfgug', 'hfgug.group', '=', 'events.group')
+            ->where('hfgug.status', 1)
+            ->where('hfgug.role', '=', Role::HOST)
+            ->whereNull('hfgug.deleted_at')
+            ->where('hfgug.user', '=', $userid)
+            ->select('events.*');
         return $query;
     }
 
@@ -500,10 +501,17 @@ class Party extends Model implements Auditable
         // - ones they are a host for
         // - ones they have attending/are attending
         // - ones for groups where they are a host
-        $query = $query->future();
-        $query = $query->hostFor($userid)->
-            merge($query->attendingOrAttended($userid))->
-            merge($query->hostForGroup($userid));
+        $future = Party::future();
+        $hostFor = Party::hostFor($userid);
+        $attending = Party::attendingOrAttended($userid);
+        $hostForGroup = Party::hostForGroup($userid);
+
+        $query = $query->union($future)->
+            union($hostFor)->
+            union($attending)->
+            union($hostForGroup)->
+        select('events.*');
+
         return $query;
     }
 
