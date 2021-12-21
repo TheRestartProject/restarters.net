@@ -544,6 +544,13 @@ class Party extends Model implements Auditable
         return $query;
     }
 
+    public function scopeForGroup($query, $idgroups) {
+        // TODO This should probably move into Group, and be a scope in there.  But we've not yet rationalised the
+        // scopes in Groups.
+        $query->where('events.group', $idgroups);
+        return $query;
+    }
+
     /**
      * [scopeUpcomingEventsInUserArea description]
      * All upcoming events (greater than today) by a User's Location.

@@ -297,7 +297,7 @@ class GroupController extends Controller
 
         $allPastEvents = Party::past()
             ->with('devices.deviceCategory')
-            ->where('events.group', $group->idgroups)
+            ->forGroup($group->idgroups)
             ->get();
 
         $Device->ofThisGroup($group->idgroups);
@@ -341,11 +341,11 @@ class GroupController extends Controller
 
         //Event tabs
         $upcoming_events = Party::future()
-            ->where('events.group', $group->idgroups)
+            ->forGroup($group->idgroups)
             ->get();
 
         $past_events = Party::past()
-            ->where('events.group', $group->idgroups)
+            ->forGroup($group->idgroups)
             ->get();
 
         //Checking user for validatity
@@ -1060,7 +1060,7 @@ class GroupController extends Controller
 
         $allPastEvents = Party::past()
             ->with('devices.deviceCategory')
-            ->where('events.group', $group->idgroups)
+            ->forGroup($group->idgroups)
             ->get();
 
         $clusters = [];
@@ -1094,12 +1094,12 @@ class GroupController extends Controller
 
         //Event tabs
         $upcoming_events = Party::futureForUser()
-            ->where('events.group', $group->idgroups)
+            ->forGroup($group->idgroups)
             ->take(5)
             ->get();
 
         $past_events = Party::past()
-            ->where('events.group', $group->idgroups)
+            ->forGroup($group->idgroups)
             ->take(5)
             ->get();
 
