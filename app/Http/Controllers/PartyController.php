@@ -153,49 +153,6 @@ class PartyController extends Controller
         ]);
     }
 
-    public function allPast()
-    {
-        $past_events = Party::pastEvents();
-        $past_events_count = $past_events->count();
-        $past_events = $past_events->paginate(env('PAGINATE'));
-
-        return view('events.all-past', [
-          'past_events' => $past_events,
-          'past_events_count' => $past_events_count,
-        ]);
-    }
-
-    public function allUpcoming(Request $request)
-    {
-        $allUpcomingEventsQuery = Party::allUpcomingEvents();
-
-        $hasSearched = false;
-        if ($request->input('from-date') !== null) {
-            $allUpcomingEventsQuery->whereDate('event_date', '>=', $request->input('from-date'));
-            $hasSearched = true;
-        }
-        if ($request->input('to-date') !== null) {
-            $allUpcomingEventsQuery->whereDate('event_date', '<=', $request->input('to-date'));
-            $hasSearched = true;
-        }
-        if ($request->has('online')) {
-            $allUpcomingEventsQuery->where('online', true);
-            $hasSearched = true;
-        }
-
-        $allUpcomingEventsCount = $allUpcomingEventsQuery->count();
-        $allUpcomingEvents = $allUpcomingEventsQuery->paginate(env('PAGINATE'));
-
-        return view('events.all', [
-            'upcoming_events' => $allUpcomingEvents,
-            'upcoming_events_count' => $allUpcomingEventsCount,
-            'fromDate' => $request->input('from-date'),
-            'toDate' => $request->input('to-date'),
-            'online' => $request->input('online'),
-            'hasSearched' => $hasSearched,
-        ]);
-    }
-
     public function create(Request $request, $group_id = null)
     {
         $user = Auth::user();

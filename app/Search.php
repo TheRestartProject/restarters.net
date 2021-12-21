@@ -10,7 +10,7 @@ class Search extends Model
 {
     public function parties($list = [], $groups = [], $from = null, $to = null, $group_tags = null, $allowedParties = null)
     {
-        $eventsQuery = Party::pastEvents()
+        $eventsQuery = Party::past()
                      ->with('devices.deviceCategory')
                      ->leftJoin('grouptags_groups as gtag', 'events.group', 'gtag.group');
 

@@ -295,7 +295,7 @@ class GroupController extends Controller
             return abort(404, 'Invalid group.');
         }
 
-        $allPastEvents = Party::pastEvents()
+        $allPastEvents = Party::past()
             ->with('devices.deviceCategory')
             ->where('events.group', $group->idgroups)
             ->get();
@@ -344,7 +344,7 @@ class GroupController extends Controller
             ->where('events.group', $group->idgroups)
             ->get();
 
-        $past_events = Party::pastEvents()
+        $past_events = Party::past()
             ->where('events.group', $group->idgroups)
             ->get();
 
@@ -1058,7 +1058,7 @@ class GroupController extends Controller
             $restarters_nearby = null;
         }
 
-        $allPastEvents = Party::pastEvents()
+        $allPastEvents = Party::past()
             ->with('devices.deviceCategory')
             ->where('events.group', $group->idgroups)
             ->get();
@@ -1098,7 +1098,7 @@ class GroupController extends Controller
             ->take(5)
             ->get();
 
-        $past_events = Party::pastEvents()
+        $past_events = Party::past()
             ->where('events.group', $group->idgroups)
             ->take(5)
             ->get();

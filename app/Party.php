@@ -381,13 +381,132 @@ class Party extends Model implements Auditable
 
     public function attendees()
     {
-        //Tested
         return DB::select(DB::raw('SELECT SUM(pax) AS pax FROM '.$this->table));
     }
 
-    /**
-     * Laravel specific code.
-     */
+    // Scopes.  Each scope should build on a previous scope, getting more specific as we go down this file.  That
+    // isolates query logic more clearly.
+    public function scopeUndeleted($query) {
+        // This is the base scope.  Almost always we are only interested in seeing events which have not been
+        // deleted.
+        return $query->whereNull('deleted_at')
+            ->orderBy('event_date', 'DESC')
+            ->orderBy('start', 'DESC')
+            ->orderBy('end', 'DESC');
+    }
+
+    public function scopePast($query) {
+        // A past event is an event where the end time is less than now.
+        //
+        // We want to use local variables when formatted times to avoid windows where the date/time changes under
+        // our feet between one line of code and the next.
+        $date = date('Y-m-d');
+        $time = date('H:i');
+        $query = $query->undeleted();
+        $query = $query->where('event_date', '<', $date)
+            ->orWhere(function($q2) use ($date, $time)  {
+                $q2->where([
+                    [ 'event_date', '=', $date ],
+                    [ 'end', '<', $time ]
+                ]);
+            });
+        return $query;
+    }
+
+    public function scopeFuture($query) {
+        // A future event is an event where the start time is greater than to now.
+        $date = date('Y-m-d');
+        $time = date('H:i');
+        $query = $query->undeleted();
+        $query = $query->where('event_date', '>', $date)
+            ->orWhere(function($q2) use ($date, $time) {
+                $q2->where([
+                               [ 'event_date', '=', $date ],
+                               [ 'start', '>', $time ]
+                           ]);
+            });
+        return $query;
+    }
+
+    public function scopeActive($query) {
+        // An active event is an event which has started and not yet finished.
+        $date = date('Y-m-d');
+        $time = date('H:i');
+        $query = $query->undeleted();
+        $query = $query->where('event_date', '=', $date)
+            ->where('start', '<=', $time)
+            ->where('end', '>=', $time);
+        return $query;
+    }
+
+    public function scopeApproved($query) {
+        // wordpress_post_id indicates event approval.
+        $query = $query->undeleted();
+        $query = $query->whereNotNull('wordpress_post_id');
+        return $query;
+    }
+
+    public function scopeHostFor($query, $userid) {
+        // Events where this user is a host.
+        $query = $query->undeleted();
+        $query = $query->join('events_users', function ($join) use ($userid) {
+            $join->on('events_users.event', '=', 'events.idevents');
+            $join->where('events_users.user', '=', $userid);
+            $join->where('events_users.role', '=', Role::HOST);
+        });
+
+        return $query;
+    }
+
+    public function scopeAttendingOrAttended($query, $userid) {
+        // Events this user has attending/is attending.
+        $query = $query->undeleted();
+        $query = $query->join('events_users', function ($join) use ($userid) {
+            $join->on('events_users.event', '=', 'events.idevents');
+            $join->where('events_users.user', '=', $userid);
+
+            // Check the status so that we exclude any events we have been invited to but not confirmed.
+            $join->where('events_users.status', 1);
+        });
+
+        return $query;
+    }
+
+    public function scopeInvitedNotConfirmed($query, $userid) {
+        // Events this user has been invited to but not confirmed.  Only interested in future events.
+        $query = $query->future();
+        $query = $query->join('events_users', function ($join) use ($userid) {
+            $join->on('events_users.event', '=', 'events.idevents');
+            $join->where('events_users.user', '=', $userid);
+            $join->where('events_users.status', '!=', 1);
+        });
+
+        return $query;
+    }
+
+    public function scopeHostForGroup($query, $userid) {
+        // Any approved events for groups that this user has joined (not just been invited to) and not left.
+        $query = $query->approved();
+        $query = $query->join('users_groups', 'users_groups.group', '=', 'groups.idgroups')
+            ->where('users_groups.status', 1)
+            ->where('users_groups.role', '=', Role::HOST)
+            ->whereNull('users_groups.deleted_at')
+            ->where('users_groups.user', $userid);
+        return $query;
+    }
+
+    public function scopeUpcomingForUser($query, $userid) {
+        // Events that are relevant to a user are:
+        // - ones they are a host for
+        // - ones they have attending/are attending
+        // - ones for groups where they are a host
+        $query = $query->future();
+        $query = $query->hostFor($userid)->
+            merge($query->attendingOrAttended($userid))->
+            merge($query->hostForGroup($userid));
+        return $query;
+    }
+
     public function scopeUpcomingEvents($query)
     {
         // We want to show approved events (wordpress_post_id IS NOT NULL), or where we are a host (e.g. because
@@ -445,24 +564,11 @@ class Party extends Model implements Auditable
       ->orderBy('distance', 'ASC');
     }
 
-    public function scopeAllUpcomingEvents()
+    public function scopeRequiresModeration($query)
     {
-        return $this->whereRaw('CONCAT(`event_date`, " ", `start`) > CURRENT_TIMESTAMP()')
-            ->orderByRaw('CONCAT(`event_date`, " ", `start`)');
-    }
-
-    public function scopeRequiresModeration()
-    {
-        return $this->whereNull('wordpress_post_id')
-            ->whereDate('event_date', '>=', date('Y-m-d'))
-            ->orderBy('event_date', 'ASC');
-    }
-
-    public function scopePastEvents()
-    {
-        return $this->whereNotNull('wordpress_post_id')
-            ->whereDate('event_date', '<', date('Y-m-d'))
-            ->orderBy('event_date', 'DESC');
+        $query = $query->future();
+        $query = $query->whereNull('wordpress_post_id');
+        return $query;
     }
 
     /**
