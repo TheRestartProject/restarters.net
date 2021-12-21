@@ -340,7 +340,7 @@ class GroupController extends Controller
         }
 
         //Event tabs
-        $upcoming_events = Party::futureForUser()
+        $upcoming_events = Party::future()
             ->where('events.group', $group->idgroups)
             ->get();
 

@@ -493,16 +493,21 @@ class Party extends Model implements Auditable
         return $query;
     }
 
-    public function scopeHostForGroup($query, $userids = null) {
+    public function scopeMemberOfGroup($query, $userids = null) {
         // Any approved events for groups that this user has joined (not just been invited to) and not left.
         $this->defaultUserIds($userids);
         $query = $query->approved();
         $query = $query->join('users_groups AS hfgug', 'hfgug.group', '=', 'events.group')
             ->where('hfgug.status', 1)
-            ->where('hfgug.role', '=', Role::HOST)
             ->whereNull('hfgug.deleted_at')
             ->whereIn('hfgug.user', $userids)
             ->select('events.*');
+        return $query;
+    }
+
+    public function scopeHostOfGroup($query, $userids = null) {
+        $query = $query->memberOfGroup()
+            ->where('hfgug.role', '=', Role::HOST);
         return $query;
     }
 
@@ -510,18 +515,18 @@ class Party extends Model implements Auditable
         // Events that are relevant to a user are:
         // - ones they are a host for
         // - ones they have are attending
-        // - ones for groups where they are a host
+        // - ones for groups that they're a member of
         //
         // The queries here are not desperately efficient, but we're battling Eloquent a bit.  The data size is
         // low enough it's not really an issue.
         $this->defaultUserIds($userids);
         $hostFor = Party::future()->hostFor($userids);
         $attending = Party::future()->attendingOrAttended($userids);
-        $hostForGroup = Party::future()->hostForGroup($userids);
+        $memberOf = Party::future()->memberOfGroup($userids);
 
         $query = $hostFor->
             union($attending)->
-            union($hostForGroup)->
+            union($memberOf)->
             select('events.*');
 
         return $query;

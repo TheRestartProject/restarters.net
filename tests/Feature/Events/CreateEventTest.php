@@ -145,7 +145,7 @@ class CreateEventTest extends TestCase
         $event->wordpress_post_id = 100;
         $event->save();
 
-        // Check that the event shows for a restarter.
+        // Check that the event shows for a restarter who has joined the group.
         $this->loginAsTestUser(Role::RESTARTER);
 
         $response = $this->get('/party');

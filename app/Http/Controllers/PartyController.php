@@ -102,15 +102,8 @@ class PartyController extends Controller
 
             $group = Group::find($group_id);
         } else {
-            // This is a logged-in user's events page.  We want all upcoming events for groups we are a member
-            // of.
-            foreach (Party::futureForUser()->get() as $event) {
-                $e = \App\Http\Controllers\PartyController::expandEvent($event, NULL);
-                $events[] = $e;
-            }
-
-            // ...and any past events relevant to us.
-            foreach (Party::pastForUser()->get() as $event) {
+            // This is a logged-in user's events page.  We want all relevant events.
+            foreach (Party::forUser()->get() as $event) {
                 $e = \App\Http\Controllers\PartyController::expandEvent($event, NULL);
                 $events[] = $e;
             }
@@ -130,7 +123,8 @@ class PartyController extends Controller
             }
 
             // ...and any other upcoming events
-            $other_upcoming_events = Party::futureForUser()->whereNotIn('idevents', \Illuminate\Support\Arr::pluck($events, 'idevents'))->get();
+            $other_upcoming_events = Party::future()->
+                whereNotIn('idevents', \Illuminate\Support\Arr::pluck($events, 'idevents'))->get();
 
             foreach ($other_upcoming_events as $event) {
                 $e = self::expandEvent($event, NULL);
