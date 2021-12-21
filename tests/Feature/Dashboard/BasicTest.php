@@ -88,7 +88,7 @@ class BasicTest extends TestCase
                                                    'location' => 'London'
                                                ]);
 
-        // Join the group as a host.
+        // Join the group - as a Restarter.
         $this->actingAs($host);
         $this->get('/group/join/' . $this->idgroups);
 
@@ -104,6 +104,21 @@ class BasicTest extends TestCase
         $eventData['id'] = $event->idevents;
         $eventData['moderate'] = 'approve';
         $this->post('/party/edit/'.$event->idevents, $eventData);
+
+        // Won't yet show on Dashboard, as we are a member of the group, but not a host on it.
+        $this->actingAs($host);
+        $response = $this->get('/dashboard');
+        $props = $this->assertVueProperties($response, [
+            [
+                ':is-logged-in' => 'true'
+            ]
+        ]);
+        $upcomingEvents = json_decode($props[0][':upcoming-events'], TRUE);
+        $this->assertEquals(0, count($upcomingEvents));
+
+        // Promote to a host.
+        $group = Group::find($this->idgroups);
+        $group->makeMemberAHost($host);
 
         // Should now show as an upcoming event, both on dashboard page and events page.
         $this->actingAs($host);

@@ -501,13 +501,15 @@ class Party extends Model implements Auditable
         // - ones they are a host for
         // - ones they have attending/are attending
         // - ones for groups where they are a host
+        //
+        // The queries here are not desperately efficient, but we're battling Eloquent a bit.  The data size is
+        // low enough it's not really an issue.
         $future = Party::future();
-        $hostFor = Party::hostFor($userid);
-        $attending = Party::attendingOrAttended($userid);
-        $hostForGroup = Party::hostForGroup($userid);
+        $hostFor = Party::future()->hostFor($userid);
+        $attending = Party::future()->attendingOrAttended($userid);
+        $hostForGroup = Party::future()->hostForGroup($userid);
 
-        $query = $query->union($future)->
-            union($hostFor)->
+        $query = $hostFor->
             union($attending)->
             union($hostForGroup)->
         select('events.*');
