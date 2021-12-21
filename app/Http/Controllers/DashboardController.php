@@ -41,7 +41,7 @@ class DashboardController extends Controller
 
         $expanded_events = [];
 
-        $upcoming_events = Party::upcomingForUser(Auth::user()->id)->get();
+        $upcoming_events = Party::upcomingForUser()->get();
 
         foreach ($upcoming_events as $event) {
             $thisone = $event->getAttributes();

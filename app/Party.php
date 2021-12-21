@@ -386,6 +386,12 @@ class Party extends Model implements Auditable
 
     // Scopes.  Each scope should build on a previous scope, getting more specific as we go down this file.  That
     // isolates query logic more clearly.
+    private function defaultUserIds(&$userids) {
+        if (!$userids) {
+            $userids = [ Auth::user()->id ];
+        }
+    }
+
     public function scopeUndeleted($query) {
         // This is the base scope.  Almost always we are only interested in seeing events which have not been
         // deleted.
@@ -446,24 +452,26 @@ class Party extends Model implements Auditable
         return $query;
     }
 
-    public function scopeHostFor($query, $userid) {
+    public function scopeHostFor($query, $userids = null) {
         // Events where this user is a host.
+        $this->defaultUserIds($userids);
         $query = $query->undeleted();
-        $query = $query->join('events_users AS hf', function ($join) use ($userid) {
+        $query = $query->join('events_users AS hf', function ($join) use ($userids) {
             $join->on('hf.event', '=', 'events.idevents');
-            $join->where('hf.user', '=', $userid);
+            $join->whereIn('hf.user', $userids);
             $join->where('hf.role', '=', Role::HOST);
         })->select('events.*');
 
         return $query;
     }
 
-    public function scopeAttendingOrAttended($query, $userid) {
+    public function scopeAttendingOrAttended($query, $userids = null) {
         // Events this user has attending/is attending.
+        $this->defaultUserIds($userids);
         $query = $query->undeleted();
-        $query = $query->join('events_users AS aoa', function ($join) use ($userid) {
+        $query = $query->join('events_users AS aoa', function ($join) use ($userids) {
             $join->on('aoa.event', '=', 'events.idevents');
-            $join->where('aoa.user', '=', $userid);
+            $join->whereIn('aoa.user', $userids);
 
             // Check the status so that we exclude any events we have been invited to but not confirmed.
             $join->where('aoa.status', 1);
@@ -472,76 +480,63 @@ class Party extends Model implements Auditable
         return $query;
     }
 
-    public function scopeInvitedNotConfirmed($query, $userid) {
+    public function scopeInvitedNotConfirmed($query, $userids = null) {
         // Events this user has been invited to but not confirmed.  Only interested in future events.
+        $this->defaultUserIds($userids);
         $query = $query->future();
-        $query = $query->join('events_users AS inceu', function ($join) use ($userid) {
+        $query = $query->join('events_users AS inceu', function ($join) use ($userids) {
             $join->on('inceu.event', '=', 'events.idevents');
-            $join->where('inceu.user', '=', $userid);
+            $join->whereIn('inceu.user', $userids);
             $join->where('inceu.status', '!=', 1);
         })->select('events.*');
 
         return $query;
     }
 
-    public function scopeHostForGroup($query, $userid) {
+    public function scopeHostForGroup($query, $userids = null) {
         // Any approved events for groups that this user has joined (not just been invited to) and not left.
+        $this->defaultUserIds($userids);
         $query = $query->approved();
         $query = $query->join('users_groups AS hfgug', 'hfgug.group', '=', 'events.group')
             ->where('hfgug.status', 1)
             ->where('hfgug.role', '=', Role::HOST)
             ->whereNull('hfgug.deleted_at')
-            ->where('hfgug.user', '=', $userid)
+            ->whereIn('hfgug.user', $userids)
             ->select('events.*');
         return $query;
     }
 
-    public function scopeUpcomingForUser($query, $userid) {
+    public function scopeForUser($query, $userids = null) {
         // Events that are relevant to a user are:
         // - ones they are a host for
-        // - ones they have attending/are attending
+        // - ones they have are attending
         // - ones for groups where they are a host
         //
         // The queries here are not desperately efficient, but we're battling Eloquent a bit.  The data size is
         // low enough it's not really an issue.
-        $future = Party::future();
-        $hostFor = Party::future()->hostFor($userid);
-        $attending = Party::future()->attendingOrAttended($userid);
-        $hostForGroup = Party::future()->hostForGroup($userid);
+        $this->defaultUserIds($userids);
+        $hostFor = Party::future()->hostFor($userids);
+        $attending = Party::future()->attendingOrAttended($userids);
+        $hostForGroup = Party::future()->hostForGroup($userids);
 
         $query = $hostFor->
             union($attending)->
             union($hostForGroup)->
-        select('events.*');
+            select('events.*');
 
         return $query;
     }
 
-    public function scopeUpcomingEvents($query)
-    {
-        // We want to show approved events (wordpress_post_id IS NOT NULL), or where we are a host (e.g. because
-        // we created it, or if we are a network coordinator/admin.
-        $ret = $this->join('groups', 'groups.idgroups', '=', 'events.group')
-            ->join('users_groups', 'users_groups.group', '=', 'groups.idgroups')
-            ->leftJoin('events_users', function ($join) {
-                $join->on('events_users.event', '=', 'events.idevents');
-                $join->where('events_users.user', '=', Auth::user()->id);
-            })
-            ->leftJoin('users', 'users.id', '=', 'events_users.user')
-            ->where(function ($query) {
-                $query
-                    ->whereNotNull('events.wordpress_post_id')
-                    ->orWhere('events_users.role', '=', Role::HOST)
-                    ->orWhere('users_groups.role', '=', Role::HOST)
-                    ->orWhereIn('users.role', [Role::NETWORK_COORDINATOR, Role::ADMINISTRATOR]);
-            })
-            ->whereDate('event_date', '>=', date('Y-m-d'))
-            ->select('events.*')
-            ->groupBy('idevents')
-            ->orderBy('event_date', 'ASC');
+    public function scopeFutureForUser($query, $userids = null) {
+        $this->defaultUserIds($userids);
+        $query = $query->future($userids);
+        return $query;
+    }
 
-        //error_log("Query " . $ret->toSql() . " with " . Auth::user()->id . " and " . date('Y-m-d'));
-        return $ret;
+    public function scopePastForUser($query, $userids = null) {
+        $this->defaultUserIds($userids);
+        $query = $query->past($userids);
+        return $query;
     }
 
     /**
@@ -579,42 +574,6 @@ class Party extends Model implements Auditable
         $query = $query->future();
         $query = $query->whereNull('wordpress_post_id');
         return $query;
-    }
-
-    /**
-     * [scopeUsersPastEvents description]
-     * Get all Past Events from the User or User's groups, or any Past Events
-     * in which the User(s) has attended but is NOT a part of the
-     * group associated.
-     * @author Christopher Kelker
-     * @date   2019-05-28T09:50:22+010
-     * @param  [type]                  $query
-     * @param  [type]                  $user_ids
-     * @return [type]
-     */
-    public function scopeUsersPastEvents($query, array $user_ids = null)
-    {
-        // if no $user_ids are supplied, then use the current Auth's ID
-        if (empty($user_ids)) {
-            $user_ids[] = auth()->id();
-        }
-
-        return $query->join('groups', 'groups.idgroups', '=', 'events.group')
-            ->join('users_groups', 'users_groups.group', '=', 'groups.idgroups')
-            ->join('events_users', 'events_users.event', '=', 'events.idevents')
-            ->whereNotNull('events.wordpress_post_id')
-            ->whereDate('events.event_date', '<', date('Y-m-d'))
-            // Not left the group.
-            ->whereNull('users_groups.deleted_at')
-
-            ->where(function ($query) use ($user_ids) {
-                $query->whereIn('users_groups.user', $user_ids)
-                    ->orWhereIn('events_users.user', $user_ids);
-            })
-
-            ->select('events.*')
-            ->groupBy('idevents')
-            ->orderBy('events.event_date', 'DESC');
     }
 
     /**

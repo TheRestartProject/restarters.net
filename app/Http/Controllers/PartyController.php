@@ -109,8 +109,8 @@ class PartyController extends Controller
                 $events[] = $e;
             }
 
-            // ...and any past events for our groups or which we've attended.
-            foreach (Party::usersPastEvents()->get() as $event) {
+            // ...and any past events relevant to us.
+            foreach (Party::pastForUser()->get() as $event) {
                 $e = \App\Http\Controllers\PartyController::expandEvent($event, NULL);
                 $events[] = $e;
             }
@@ -130,7 +130,7 @@ class PartyController extends Controller
             }
 
             // ...and any other upcoming events
-            $other_upcoming_events = Party::upcomingEvents()->whereNotIn('idevents', \Illuminate\Support\Arr::pluck($events, 'idevents'))->get();
+            $other_upcoming_events = Party::futureForUser()->whereNotIn('idevents', \Illuminate\Support\Arr::pluck($events, 'idevents'))->get();
 
             foreach ($other_upcoming_events as $event) {
                 $e = self::expandEvent($event, NULL);
