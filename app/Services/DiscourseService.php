@@ -280,7 +280,12 @@ class DiscourseService
 
                             Log::debug("Response from flair_url update " . $response->getBody());
 
-                            if ($response->getStatusCode() != 200) {
+                            if ($response->getStatusCode() === 200) {
+                                // Update the group to record that we've uploaded, then we'll skip this next time
+                                // through.
+                                $group->discourse_logo = $group->groupimage->idimages;
+                                $group->save();
+                            } else {
                                 Log::error("Failed to update flair url for {$discourseId}");
                                 throw new \Exception("Failed to update flair url for {$discourseId}");
                             }
