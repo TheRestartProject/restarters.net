@@ -37,5 +37,17 @@ class EditTest extends TestCase
         $atts['quantity'] = 2;
         $rsp = $this->post('/device/edit/' . $iddevices, $atts);
         self::assertEquals('Device updated!', $rsp['success']);
+
+        # Delete the device.
+        $rsp = $this->get('/device/delete/' . $iddevices, [
+            'HTTP_X-Requested-With' => 'XMLHttpRequest'
+        ]);
+        self::assertTrue($rsp['success']);
+
+        # Delete again - should fail.
+        $rsp = $this->get('/device/delete/' . $iddevices, [
+            'HTTP_X-Requested-With' => 'XMLHttpRequest'
+        ]);
+        self::assertFalse($rsp['success']);
     }
 }

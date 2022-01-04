@@ -503,27 +503,30 @@ class DeviceController extends Controller
         $user = Auth::user();
 
         $device = Device::find($id);
-        $eventId = $device->event;
-        $is_attending = EventsUsers::where('event', $device->event)->where('user', Auth::id())->first();
-        $is_attending = is_object($is_attending) && $is_attending->status == 1;
 
-        if (Fixometer::hasRole($user, 'Administrator') ||
-            Fixometer::userHasEditPartyPermission($eventId, $user->id) ||
-            $is_attending
-        ) {
-            $device->delete();
+        if ($device) {
+            $eventId = $device->event;
+            $is_attending = EventsUsers::where('event', $device->event)->where('user', Auth::id())->first();
+            $is_attending = is_object($is_attending) && $is_attending->status == 1;
 
-            if ($request->ajax()) {
-                $event = Party::find($eventId);
-                $stats = $event->getEventStats();
+            if (Fixometer::hasRole($user, 'Administrator') ||
+                Fixometer::userHasEditPartyPermission($eventId, $user->id) ||
+                $is_attending
+            ) {
+                $device->delete();
 
-                return response()->json([
-                    'success' => true,
-                    'stats' => $stats,
-                ]);
+                if ($request->ajax()) {
+                    $event = Party::find($eventId);
+                    $stats = $event->getEventStats();
+
+                    return response()->json([
+                                                'success' => true,
+                                                'stats' => $stats,
+                                            ]);
+                }
+
+                return redirect('/party/view/'.$eventId)->with('success', 'Device has been deleted!');
             }
-
-            return redirect('/party/view/'.$eventId)->with('success', 'Device has been deleted!');
         }
 
         if ($request->ajax()) {
