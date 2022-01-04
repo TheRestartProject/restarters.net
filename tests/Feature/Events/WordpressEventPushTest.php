@@ -7,6 +7,7 @@ use App\Events\EditEvent;
 use App\Group;
 use App\GroupNetwork;
 use App\Listeners\CreateWordpressPostForEvent;
+use App\Listeners\EditWordpressPostForEvent;
 use App\Network;
 use App\Party;
 use App\User;
@@ -65,10 +66,39 @@ class WordpressEventPushTest extends TestCase
                     $party_time = substr($event->start, 0, 5) . ' - ' . substr($event->end, 0, 5);
                     return $name == $event->venue && $content['custom_fields'][3]['value'] == $party_time;
                 })->once();
+            $mock->shouldReceive('getPost')
+                ->andReturn([]);
+            $mock->shouldReceive('editPost')
+                ->withArgs(function($event2, $content) use ($event) {
+                    // Check name, and that timestamp doesn't include seconds.
+                    $party_time = substr($event->start, 0, 5) . ' - ' . substr($event->end, 0, 5);
+                    return $party_time == $content['custom_fields'][5]['value'];
+                })
+                ->once();
         });
 
+        // Approve event.
         $handler = app(CreateWordpressPostForEvent::class);
         $handler->handle(new ApproveEvent($event));
+
+        # Fake approval
+        $event->wordpress_post_id = 1;
+        $event->save();
+
+        # Edit event.
+        $handler = app(EditWordpressPostForEvent::class);
+        $handler->handle(new EditEvent($event, [
+            'event_date' => $event->date,
+            'start' => $event->start,
+            'end' => $event->end,
+            'latitude' => 1,
+            'longitude' => 2,
+            'group' => 3,
+            'online' => FALSE,
+            'venue' => 'Cloud 9',
+            'location' => 'Cloud 10',
+            'free_text' => 'Text is free'
+        ]));
     }
 
     /** @test */

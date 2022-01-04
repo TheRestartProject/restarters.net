@@ -60,7 +60,7 @@ class EditWordpressPostForEvent
                     ['key' => 'party_groupcity', 'value' => $group->area],
                     ['key' => 'party_venue', 'value' => $data['venue']],
                     ['key' => 'party_location', 'value' => $data['location']],
-                    ['key' => 'party_time', 'value' => $data['start'].' - '.$data['end']],
+                    ['key' => 'party_time', 'value' => substr($data['start'], 0, 5).' - '.substr($data['end'], 0, 5)],
                     ['key' => 'party_date', 'value' => $data['event_date']],
                     ['key' => 'party_timestamp', 'value' => $startTimestamp],
                     ['key' => 'party_timestamp_end', 'value' => $endTimestamp],
