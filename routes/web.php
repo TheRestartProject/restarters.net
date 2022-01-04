@@ -232,7 +232,6 @@ Route::group(['middleware' => ['auth', 'verifyUserConsent']], function () {
         Route::get('/delete/{id}', 'DeviceController@delete');
         Route::post('/image-upload/{id}', 'DeviceController@imageUpload');
         Route::get('/image/delete/{iddevices}/{id}/{path}', 'DeviceController@deleteImage');
-        Route::post('/column-preferences', 'DeviceController@columnPreferences');
     });
 
     Route::resource('networks', 'NetworkController');

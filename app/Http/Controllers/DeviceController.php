@@ -210,50 +210,6 @@ class DeviceController extends Controller
         return redirect('/user/forbidden');
     }
 
-    public function ajax_update($id)
-    {
-        $this->set('title', 'Edit Device');
-        if (hasRole($this->user, 'Administrator') || hasRole($this->user, 'Host')) {
-            $Categories = new Category;
-            $Device = $this->Device->findOne($id);
-
-            $this->set('title', 'Edit Device');
-            $this->set('categories', $Categories->listed());
-            $this->set('formdata', $Device);
-
-            event(new DeviceCreatedOrUpdated($Device));
-
-            return view('device.edit', [
-                'title' => 'Edit Device',
-                'categories' => $Categories->findAll(),
-                'formdata' => $Device,
-            ]);
-        }
-        header('Location: /user/forbidden');
-    }
-
-    public function ajax_update_save($id)
-    {
-        if ($_SERVER['REQUEST_METHOD'] == 'POST' && ! empty($_POST) && filter_var($id, FILTER_VALIDATE_INT)) {
-            $data = $_POST;
-            $u = $this->Device->update($data, $id);
-
-            if (! $u) {
-                $response['response_type'] = 'danger';
-                $response['message'] = 'Something went wrong. Please check the data and try again.';
-            } else {
-                $response['response_type'] = 'success';
-                $response['message'] = 'Device updated!';
-                $response['data'] = $data;
-                $response['id'] = $id;
-            }
-
-            event(new DeviceCreatedOrUpdated($this->Device));
-
-            echo json_encode($response);
-        }
-    }
-
     public function ajaxCreate(Request $request)
     {
         $rules = [
@@ -614,10 +570,5 @@ class DeviceController extends Controller
         }
 
         return redirect()->back()->with('message', 'Sorry, but the image can\'t be deleted');
-    }
-
-    public function columnPreferences(Request $request)
-    {
-        $request->session()->put('column_preferences', $request->input('column_preferences'));
     }
 }
