@@ -231,7 +231,7 @@ class DiscourseService
 
                 // Check if the flair_url needs updating.  This keeps the logo in sync with changes on Restarters.
                 Log::debug("Check Discourse logo {$group->discourse_logo} vs {$group->groupimage->idimages}");
-                if (!$group->discourse_logo || $group->discourse_logo != $group->groupimage->idimages) {
+                if (!$group->discourse_logo || $group->discourse_logo != $group->groupimage->image->idimages) {
                     // We need to update it.  To do that, we first have to upload the image file to Discourse.
                     Log::debug("Need to update flair_url with ". $group->groupImagePath());
 
@@ -283,8 +283,10 @@ class DiscourseService
                             if ($response->getStatusCode() === 200) {
                                 // Update the group to record that we've uploaded, then we'll skip this next time
                                 // through.
-                                $group->discourse_logo = $group->groupimage->idimages;
+                                Log::debug("Updated flair url OK for {$discourseId} to {$group->groupimage->idimages}");
+                                $group->discourse_logo = $group->groupimage->image->idimages;
                                 $group->save();
+                                Log::debug("...saved update to group");
                             } else {
                                 Log::error("Failed to update flair url for {$discourseId}");
                                 throw new \Exception("Failed to update flair url for {$discourseId}");
