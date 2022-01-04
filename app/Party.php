@@ -524,12 +524,11 @@ class Party extends Model implements Auditable
         $attending = Party::future()->attendingOrAttended($userids);
         $memberOf = Party::future()->memberOfGroup($userids);
 
-        $query = $hostFor->
+        // In theory $query could contain something other than all().
+        return $query->whereIn('idevents', $hostFor->
             union($attending)->
-            union($memberOf)->
+            union($memberOf)->pluck('idevents'))->
             select('events.*');
-
-        return $query;
     }
 
     public function scopeFutureForUser($query, $userids = null) {
