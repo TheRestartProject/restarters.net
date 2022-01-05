@@ -181,6 +181,9 @@ class InviteEventTest extends TestCase
         $response = $this->get('/party/view/'.$event->idevents);
         $response->assertSee('You&#039;ve been invited to join an event');
         preg_match('/href="(\/party\/accept-invite.*?)"/', $response->getContent(), $matches);
+        if (!count($matches)) {
+            error_log($response->getContent());
+        }
         $this->assertGreaterThan(0, count($matches));
         $invitation = $matches[1];
 
