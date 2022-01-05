@@ -966,7 +966,6 @@ class Fixometer
 
         $device_array = [
             'NotifyAdminNoDevices',
-            'ReviewNotes',
             'AdminAbnormalDevices',
         ];
 

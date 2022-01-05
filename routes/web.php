@@ -225,8 +225,6 @@ Route::group(['middleware' => ['auth', 'verifyUserConsent']], function () {
             return redirect('/fixometer');
         });
         Route::get('/search', 'DeviceController@search');
-        Route::get('/page-edit/{id}', 'DeviceController@edit');
-        Route::post('/page-edit/{id}', 'DeviceController@edit');
         Route::post('/edit/{id}', 'DeviceController@ajaxEdit');
         Route::post('/create', 'DeviceController@ajaxCreate');
         Route::get('/delete/{id}', 'DeviceController@delete');

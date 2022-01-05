@@ -13,7 +13,6 @@ use App\EventsUsers;
 use App\Group;
 use App\Helpers\Fixometer;
 use App\Notifications\AdminAbnormalDevices;
-use App\Notifications\ReviewNotes;
 use App\Party;
 use App\User;
 use App\UserGroups;
@@ -93,19 +92,6 @@ class DeviceController extends Controller
                     $wiki = 1;
                 } else {
                     $wiki = 0;
-                }
-
-                //Send Wiki Notification to Admins
-                if (env('APP_ENV') != 'development' && env('APP_ENV') != 'local' && ($wiki == 1 && $old_wiki !== 1)) {
-                    $all_admins = User::where('role', 2)->get();
-                    $group_id = Party::find($data['event'])->group;
-
-                    $arr = [
-                        'group_url' => url('/group/view/'.$group_id),
-                        'preferences' => url('/profile/edit'),
-                    ];
-
-                    Notification::send($all_admins, new ReviewNotes($arr));
                 }
 
                 if (! isset($data['repair_more']) || empty($data['repair_more'])) { //Override
@@ -393,27 +379,6 @@ class DeviceController extends Controller
             }
 
             $old_wiki = Device::find($id)->wiki;
-
-            //Send Wiki Notification to Admins
-            try {
-                if ($wiki == 1 && $old_wiki !== 1) {
-                    $currentUser = Auth::user();
-
-                    $all_admins = User::where('role', 2)->get();
-                    $group_id = Party::find($event_id)->group;
-
-                    $arr = [
-                        'device_url' => url('/device/page-edit/'.$id),
-                        'current_user_name' => $currentUser->name,
-                        'group_url' => url('/group/view/'.$group_id),
-                        'preferences' => url('/profile/edit'),
-                    ];
-
-                    Notification::send($all_admins, new ReviewNotes($arr));
-                }
-            } catch (\Exception $ex) {
-                Log::error('An error occurred while sending ReviewNotes email: '.$ex->getMessage());
-            }
 
             if ($spare_parts == 3) { // Third party
                 $spare_parts = 1;
