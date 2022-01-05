@@ -151,7 +151,7 @@ class Fixometer
 
         $group = Party::find($partyId)->theGroup;
 
-        if (self::hasRole($user, 'Host') && self::userIsHostOfGroup($partyId, $userId)) {
+        if (self::hasRole($user, 'Host') && self::userIsHostOfGroup($group->idgroups, $userId)) {
             return true;
         }
 
