@@ -2,6 +2,7 @@
 
 namespace App\Notifications;
 
+use App\Party;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Notifications\Messages\MailMessage;
@@ -11,16 +12,16 @@ class EventConfirmed extends Notification implements ShouldQueue
 {
     use Queueable;
 
-    protected $arr;
+    public $party;
 
     /**
      * Create a new notification instance.
      *
      * @return void
      */
-    public function __construct($arr)
+    public function __construct(Party $party)
     {
-        $this->arr = $arr;
+        $this->party = $party;
     }
 
     /**
@@ -42,12 +43,20 @@ class EventConfirmed extends Notification implements ShouldQueue
      */
     public function toMail($notifiable)
     {
+        $locale = $notifiable->language;
+        $url = url('/party/view/' . $this->party->idevents);
+
         return (new MailMessage)
-                    ->subject('Event Confirmed')
-                    ->greeting('Hello!')
-                    ->line('Your event has been confirmed by an admin. This is now publicly available on <a href="'.$this->arr[0].'">'.$this->arr[0].'</a>')
-                    ->action('View event', url('/'))
-                    ->line('If you would like to stop receiving these emails, please visit <a href="'.$this->arr[1].'">your preferences</a> on your account.');
+                    ->subject(__('notifications.event_confirmed_subject', [], $locale))
+                    ->greeting(__('notifications.greeting', [], $locale))
+                    ->line(__('notifications.event_confirmed_line1', [
+                        'name' => $this->party->venue,
+                        'url' => $url
+                    ], $locale))
+                    ->action(__('notifications.event_confirmed_view', [], $locale), url('/'))
+                    ->line(__('notifications.email_preferences', [
+                        'url' => $url
+                    ], $locale));
     }
 
     /**
@@ -58,8 +67,14 @@ class EventConfirmed extends Notification implements ShouldQueue
      */
     public function toArray($notifiable)
     {
-        return [
+        $locale = $notifiable->language;
+        $url = url('/party/view/' . $this->party->idevents);
 
+        return [
+            'title' => __('notifications.event_confirmed_title', [], $locale),
+            'event_id' => $this->party->idevents,
+            'name' => $this->party->venut,
+            'url' => $url,
         ];
     }
 }

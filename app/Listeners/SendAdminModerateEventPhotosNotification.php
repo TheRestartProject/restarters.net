@@ -43,7 +43,7 @@ class SendAdminModerateEventPhotosNotification
 
         Fixometer::usersWhoHavePreference('admin-moderate-event-photos')->each(function (User $user) {
             if ($this->shouldSendNotification($user)) {
-                Notification::send($user, new AdminModerationEventPhotos([
+                $user->notify(new AdminModerationEventPhotos([
                     'event_id' => $this->party->idevents,
                     'event_venue' => $this->party->venue,
                     'event_url' => url('/party/view/'.$this->party->idevents),
