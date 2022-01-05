@@ -288,7 +288,7 @@ class DiscourseService
                                 $group->save();
                                 Log::debug("...saved update to group");
                             } else {
-                                Log::error("Failed to update flair url for {$discourseId}");
+                                Log::error("Failed to update flair url");
                                 throw new \Exception("Failed to update flair url for {$discourseId}");
                             }
                         } else {
