@@ -50,7 +50,7 @@ class NotifyAdminNoDevices extends Notification implements ShouldQueue
     {
         return (new MailMessage)
                     ->subject('Recent event with no devices added')
-                    ->greeting('Hello!')
+                    ->greeting(__('notifications.greeting', [], $notifiable->language))
                     ->line('Your moderation is needed for \''.$this->arr['event_venue'].'\'.')
                     ->line('No devices have been added against this event.')
                     ->action('View event', $this->arr['event_url'])

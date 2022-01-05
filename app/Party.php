@@ -2,11 +2,11 @@
 
 namespace App;
 
-use App\Device;
 use App\Events\ApproveEvent;
 use App\EventUsers;
 use App\Helpers\Fixometer;
 use App\Notifications\NotifyRestartersOfNewEvent;
+use App\Notifications\EventConfirmed;
 use Auth;
 use Carbon\Carbon;
 use DB;
@@ -1050,6 +1050,13 @@ class Party extends Model implements Auditable
                                                                                          'event_group' => $group->name,
                                                                                      ]));
             }
+        }
+
+        // Notify the person who created it that it has now been approved.
+        $host = User::find(EventsUsers::where('event', $this->idevents)->first());
+
+        if ($host) {
+            Notification::send($host, new EventConfirmed($this));
         }
 
         event(new ApproveEvent($this));

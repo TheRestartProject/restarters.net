@@ -13,11 +13,14 @@ use App\User;
 use DB;
 use Illuminate\Support\Facades\Notification;
 use Tests\TestCase;
+use App\Notifications\JoinEvent;
 
 class InviteEventTest extends TestCase
 {
     public function testInvite()
     {
+        Notification::fake();
+
         $this->withoutExceptionHandling();
 
         $group = factory(Group::class)->create();
@@ -32,12 +35,36 @@ class InviteEventTest extends TestCase
 
         // Invite a user.
         $user = factory(User::class)->states('Restarter')->create();
+
         $response = $this->post('/party/invite', [
             'group_name' => $group->name,
             'event_id' => $event->idevents,
             'manual_invite_box' => $user->email,
             'message_to_restarters' => 'Join us, but not in a creepy zombie way',
         ]);
+
+        Notification::assertSentTo(
+            [$user],
+            JoinEvent::class,
+            function ($notification, $channels, $user) use ($group, $event, $host) {
+                $mailData = $notification->toMail($user)->toArray();
+                self::assertEquals(__('notifications.join_event_subject', [
+                    'groupname' => $group->name
+                ], $user->language), $mailData['subject']);
+
+                // Mail should mention the host, message and location.
+                self::assertRegexp('/' . $host->name . '/', $mailData['introLines'][0]);
+                self::assertRegexp('/creepy/', $mailData['introLines'][2]);
+                self::assertRegexp('/' . $event->location  . '/', $mailData['introLines'][4]);
+
+                // Render to HTML to check the footer which is inserted by email.blade.php isn't accidentally
+                // escaped.
+                $html = $notification->toMail($user)->render();
+                self::assertGreaterThan(0, strpos($html, 'contact <a href'));
+
+                return true;
+            }
+        );
 
         $response->assertSessionHas('success');
         $response = $this->get('/party/view/'.$event->idevents);
@@ -70,7 +97,7 @@ class InviteEventTest extends TestCase
 
         // We should see that we have been invited.
         $response = $this->get('/party/view/'.$event->idevents);
-        $response->assertSee('You&#039;ve been invited to join an event');
+        $response->assertSee(__('events.pending_rsvp_message'));
         preg_match('/href="(\/party\/accept-invite.*?)"/', $response->getContent(), $matches);
         $this->assertGreaterThan(0, count($matches));
         $invitation = $matches[1];
@@ -154,6 +181,9 @@ class InviteEventTest extends TestCase
         $response = $this->get('/party/view/'.$event->idevents);
         $response->assertSee('You&#039;ve been invited to join an event');
         preg_match('/href="(\/party\/accept-invite.*?)"/', $response->getContent(), $matches);
+        if (!count($matches)) {
+            error_log($response->getContent());
+        }
         $this->assertGreaterThan(0, count($matches));
         $invitation = $matches[1];
 

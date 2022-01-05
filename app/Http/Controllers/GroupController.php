@@ -19,6 +19,7 @@ use App\Notifications\AdminModerationGroup;
 use App\Notifications\JoinGroup;
 use App\Notifications\NewGroupMember;
 use App\Notifications\NewGroupWithinRadius;
+use App\Notifications\GroupConfirmed;
 use App\Party;
 use App\User;
 use App\UserGroups;
@@ -681,6 +682,13 @@ class GroupController extends Controller
                 // Send WordPress Notification if group approved with POSTed data
                 if (isset($data['moderate']) && $data['moderate'] == 'approve') {
                     event(new ApproveGroup($group, $data));
+
+                    // Notify the creator, as long as it's not the current user.
+                    $creator = User::find(UserGroups::where('group', $id)->first()->user);
+
+                    if ($creator->id != Auth::user()->id) {
+                        Notification::send($creator, new GroupConfirmed($group));
+                    }
 
                     // Notify nearest users.
                     if (! is_null($latitude) && ! is_null($longitude)) {

@@ -346,32 +346,6 @@ class PartyController extends Controller
         ]);
     }
 
-    public function sendCreationNotificationEmail($venue, $location, $event_date, $start, $end, $group_id)
-    {
-        $Groups = new Group;
-
-        $group = $Groups->findOne($group_id);
-        $group_name = $group->name;
-
-        $hostname = Auth::user()->name;
-
-        // send email to Admin
-        $message = '<p>Hi,</p>'.
-        '<p>This is an automatic email to let you know that <strong>'.$hostname.' </strong>has created a party on the <strong>'.APPNAME.'</strong>.</p>'.
-        '<p><strong>Group Name:</strong> '.$group_name.' <p>'.
-        '<p><strong>Party Name:</strong> '.$venue.' </p>'.
-        '<p><strong>Party Location:</strong> '.$location.' </p>'.
-        '<p><strong>Party Date:</strong> '.$event_date.' </p>'.
-        '<p><strong>Party Start Time:</strong> '.$start.' </p>'.
-        '<p><strong>Party End Time:</strong> '.$end.' </p>';
-
-        $subject = env('APP_NAME').': Party created by the host : '.$hostname.' ';
-        $headers = 'From: '.env('APP_EMAIL')."\r\n";
-        $headers .= "Content-Type: text/html; charset=ISO-8859-1\r\n";
-        $email = env('NOTIFICATION_EMAIL');
-        mail($email, $subject, $message, $headers);
-    }
-
     public function edit($id, Request $request)
     {
         $user = Auth::user();
@@ -1221,10 +1195,10 @@ class PartyController extends Controller
                 'preferences' => url('/profile/edit'),
             ]));
 
-            return redirect()->back()->with('success', 'Thanks - all Restarters that attended have been sent a notification');
+            return redirect()->back()->with('success', __('events.review_requested'));
         }
 
-        return redirect()->back()->with('warning', 'Sorry - you do not have the correct permissions for this action');
+        return redirect()->back()->with('warning', __('events.review_requested_permissions'));
     }
 
     // TODO: is this alive?
