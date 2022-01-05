@@ -937,8 +937,6 @@ class Fixometer
         $modal = str_replace("App\Notifications\\", '', $modal);
 
         $user_array = [
-            //'AccountCreated', doesn't appear to be in use
-            //'NewRegister',
             'AdminNewUser',
             'ResetPassword',
         ];
