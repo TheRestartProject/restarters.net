@@ -47,15 +47,19 @@ class SearchController extends Controller
 
                     /// waste stats
                     $stats = Party::getEventStatsArrayKeys();
+                    $eEmissionRatio = \App\Helpers\LcaStats::getEmissionRatioPowered();
+                    $uEmissionratio = \App\Helpers\LcaStats::getEmissionRatioUnpowered();
+                    $debug640 = [];
                     foreach ($PartyList as $party) {
                         $partyIds[] = $party->idevents;
-
-                        $eventStats = $party->getEventStats();
+                        $eventStats = $party->getEventStats($eEmissionRatio, $uEmissionratio);
+                        $debug640[$party->idevents] = $eventStats;
                         foreach (array_keys($stats) as $v) {
                             $party->{$v} = $eventStats[$v];
                             $stats[$v] += $eventStats[$v];
                         }
                     }
+                    SearchHelper::debugDAT640($debug640, 'search', $stats);
 
                     // cluster dataviz
                     $clusters = [];

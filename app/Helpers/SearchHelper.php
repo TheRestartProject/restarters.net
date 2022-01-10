@@ -130,4 +130,17 @@ class SearchHelper
             logger($k.' => '.$type);
         }
     }
+
+    public static function debugDAT640($data, $suffix, $headers)
+    {
+        $filename = base_path() . DIRECTORY_SEPARATOR . 'public' . DIRECTORY_SEPARATOR . "debugDat640_$suffix.csv";
+        $file = fopen($filename, 'w+');
+        $headers = array_keys($headers);
+        $headers[] =  'idevents';
+        fputcsv($file, $headers);
+        foreach ($data as $k => $v) {
+            $v['idevents'] = $k;
+            fputcsv($file, $v);
+        }
+    }
 }

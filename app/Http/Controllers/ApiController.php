@@ -38,6 +38,7 @@ class ApiController extends Controller
         $result['items_fixed'] = count($fixed) ? $fixed[0]->counter : 0;
 
         $stats = \App\Helpers\LcaStats::getWasteStats();
+        $debug640 = \App\Helpers\LcaStats::getWasteStatsDat640();
         $result['waste_powered'] = round($stats[0]->powered_waste);
         $result['waste_unpowered'] = round($stats[0]->unpowered_waste);
         $result['waste_total'] = round($stats[0]->powered_waste + $stats[0]->unpowered_waste);

@@ -57,6 +57,53 @@ FROM ($t1) t1
         return DB::select(DB::raw($sql));
     }
 
+    public static function getWasteStatsDat640($group = null)
+    {
+        $dF = self::getDisplacementFactor();
+        $eR = self::getEmissionRatioPowered();
+        $uR = self::getEmissionRatioUnpowered();
+
+$headers = ['co2_powered','co2_unpowered','co2_total','waste_powered','waste_unpowered','waste_total','fixed_devices','idevents'];
+$headers = array_combine($headers, array_fill(0,count($headers),0));
+
+        $t1 = "
+SELECT
+CASE WHEN (c.powered = 1) THEN (CASE WHEN (c.weight = 0) THEN ((d.estimate + 0.00) * $eR) ELSE c.footprint END) ELSE 0 END AS co2_powered,
+CASE WHEN (c.powered = 0) THEN (CASE WHEN (COALESCE(d.estimate,0) + 0.00 = 0) THEN c.footprint ELSE ((d.estimate + 0.00) * $uR) END) ELSE 0 END AS co2_unpowered,
+CASE WHEN (c.powered = 1) THEN (CASE WHEN (c.weight = 0) THEN (d.estimate + 0.00) ELSE c.weight END) ELSE 0 END  AS waste_powered,
+CASE WHEN (c.powered = 0) THEN (CASE WHEN (COALESCE(d.estimate,0) + 0.00 = 0) THEN c.weight ELSE d.estimate END) ELSE 0 END AS waste_unpowered,
+d.iddevices,
+e.idevents
+FROM devices d, categories c, events e
+WHERE d.category = c.idcategories
+AND d.event = e.idevents
+AND d.repair_status = 1
+";
+
+$sql = "
+SELECT
+SUM(t1.co2_powered) * $dF AS co2_powered,
+SUM(t1.co2_unpowered) * $dF AS co2_unpowered,
+0 AS co2_total,
+SUM(t1.waste_powered) AS waste_powered,
+SUM(t1.waste_unpowered) AS waste_unpowered,
+0 AS waste_total,
+COUNT(t1.iddevices) as fixed_devices,
+t1.idevents
+FROM ($t1) t1
+GROUP BY t1.idevents
+";
+
+        $result = DB::select(DB::raw($sql));
+        foreach ($result as $v) {
+            $data[$v->idevents] = (array)$v;
+            $data[$v->idevents]['co2_total'] = $v->co2_powered + $v->co2_unpowered;
+            $data[$v->idevents]['waste_total'] = $v->waste_powered + $v->waste_unpowered;
+        }
+        SearchHelper::debugDAT640($data, 'lcastats', $headers);
+        return;
+    }
+
     /**
      * DEPRECATED IN PRODUCTION
      *
