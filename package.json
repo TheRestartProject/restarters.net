@@ -21,7 +21,7 @@
         "jquery": "3.4.1",
         "laravel-mix": "^2.0",
         "laravel-mix-bundle-analyzer": "^1.0.5",
-        "lodash": "^4.17.12",
+        "lodash": "^4.17.21",
         "lodash.mergewith": "^4.6.2",
         "lodash.template": "^4.5.0",
         "nyc": "^15.1.0",
