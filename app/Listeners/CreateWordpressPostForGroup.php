@@ -37,8 +37,10 @@ class CreateWordpressPostForGroup
 
         $group = Group::find($id);
 
-        if (! empty($group)) {
+        if (empty($group)) {
             Log::error('Group not found');
+
+            return;
         }
 
         if (! $group->eventsShouldPushToWordpress()) {

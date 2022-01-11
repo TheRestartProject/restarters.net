@@ -77,7 +77,7 @@ abstract class TestCase extends BaseTestCase
     {
         // Return a test user.
         $userAttributes = [];
-        $userAttributes['name'] = 'Test'.$this->userCount++;
+        $userAttributes['name'] = 'Test'.uniqid($this->userCount++, true);
         $userAttributes['email'] = $userAttributes['name'].'@restarters.dev';
         $userAttributes['age'] = '1982';
         $userAttributes['country'] = 'GBR';
@@ -257,11 +257,5 @@ abstract class TestCase extends BaseTestCase
         $this->assertTrue($foundSome);
 
         return $props;
-    }
-
-    public function setDiscourseTestEnvironment()
-    {
-        // TODO I feel this isn't really necessary.
-        config(['restarters.features.discourse_integration' => true]);
     }
 }

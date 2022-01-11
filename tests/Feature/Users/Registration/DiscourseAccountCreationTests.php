@@ -3,22 +3,24 @@
 namespace Tests\Feature;
 
 use App\Events\UserRegistered;
+use App\Listeners\AddUserToDiscourseGroup;
 use App\Listeners\DiscourseUserEventSubscriber;
+use App\Providers\DiscourseServiceProvider;
 use App\User;
 use DB;
 use Hash;
+use HieuLe\WordpressXmlrpcClient\WordpressClient;
 use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\Log;
 use Mockery;
 use Tests\TestCase;
+use Tests\Feature\MockInterface;
 
 class DiscourseAccountCreationTests extends TestCase
 {
     /** @test */
     public function user_registration_triggers_user_registered_event()
     {
-        $this->setDiscourseTestEnvironment();
-
         Event::fake();
 
         // Register should redirect to dashboard page.
@@ -32,30 +34,22 @@ class DiscourseAccountCreationTests extends TestCase
     /** @test */
     public function user_registration_triggers_discourse_sync_attempt()
     {
-        // We might not have Discourse integration enabled, e.g. when running on Circle.  This is a hacky way of
-        // checking that until we integrate in the Docker Compose work to allow Discourse testing on Circle.
-        if (! env('CIRCLECI')) {
-            $this->setDiscourseTestEnvironment();
+        config('restarters.features.discourse_integration', true);
+        $this->instance(DiscourseUserEventSubscriber::class, Mockery::mock(DiscourseUserEventSubscriber::class, function ($mock) {
+            $mock->shouldReceive('onUserRegistered')->once();
+        }));
 
-            $this->instance(DiscourseUserEventSubscriber::class, Mockery::mock(DiscourseUserEventSubscriber::class, function ($mock) {
-                $mock->shouldReceive('onUserRegistered')->once();
-            }));
+        $response = $this->post('/user/register/', $this->userAttributes());
 
-            $response = $this->post('/user/register/', $this->userAttributes());
-
-            $response->assertStatus(302);
-            $response->assertRedirect('dashboard');
-        } else {
-            $this->assertTrue((true));
-        }
+        $response->assertStatus(302);
+        $response->assertRedirect('dashboard');
     }
 
     /** @test */
     public function user_registration_discourse_sync()
     {
-        if (! env('CIRCLECI')) {
-            $this->setDiscourseTestEnvironment();
-
+        if (config('restarters.features.discourse_integration')) {
+            // This is a test against a real Discourse instance.
             $atts = $this->userAttributes();
             $response = $this->post('/user/register/', $atts);
             $response->assertStatus(302);
@@ -76,7 +70,7 @@ class DiscourseAccountCreationTests extends TestCase
             $json = json_decode($response->getBody()->getContents(), true);
             $this->assertEquals($atts['name'], $json['user']['username']);
         } else {
-            $this->assertTrue((true));
+            $this->assertTrue(true);
         }
     }
 
@@ -85,13 +79,9 @@ class DiscourseAccountCreationTests extends TestCase
     {
         $this->withExceptionHandling();
 
-        if (! env('CIRCLECI')) {
-            Log::shouldReceive('info')
-                ->with('Failed to Save Venue');
-            $this->artisan('sync:discourseusernames')
-                ->assertExitCode(0);
-        } else {
-            $this->assertTrue((true));
-        }
+        Log::shouldReceive('info')
+            ->with('Failed to Save Venue');
+        $this->artisan('sync:discourseusernames')
+            ->assertExitCode(0);
     }
 }

@@ -108,6 +108,7 @@
             :canedit="{{ $can_edit_group ? 'true' : 'false' }}"
             add-group-name
             show-other
+            location="{{ Auth::user()->location ?? '' }}"
         />
       </div>
       @else
@@ -120,6 +121,7 @@
           calendar-edit-url="{{ $calendar_edit_url }}"
           :initial-group="{{ json_encode($group, JSON_INVALID_UTF8_IGNORE) }}"
           :canedit="{{ $can_edit_group ? 'true' : 'false' }}"
+          location="{{ Auth::user()->location ?? '' }}"
         />
       </div>
       @endif

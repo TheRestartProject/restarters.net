@@ -2,6 +2,9 @@
 
 namespace App\Services;
 
+use App\User;
+use App\Group;
+use App\UserGroups;
 use Auth;
 use Illuminate\Support\Facades\Log;
 
@@ -204,5 +207,199 @@ class DiscourseService
         } while ($limited || count($users));
 
         return $allUsers;
+    }
+
+    public function syncUsersToGroups($idgroups = NULL) {
+        $restartIds = $idgroups ? $idgroups : Group::whereNotNull('discourse_group')->pluck('idgroups');
+
+        // Get all Discourse groups.  We need to find the ids matching the group name we store.  The groups.json
+        // call doesn't return all the groups, so we query each one we know to find the id.
+        Log::debug('Get list of Discourse groups');
+        $client = app('discourse-client');
+
+        foreach ($restartIds as $restartId) {
+            $group = Group::find($restartId);
+            $discourseName = $group->discourse_group;
+            $response = $client->request('GET', "/g/$discourseName.json");
+
+            if ($response->getStatusCode() == 200)
+            {
+                $discourseResult = json_decode($response->getBody(), true);
+
+                $discourseId = $discourseResult['group']['id'];
+                Log::debug("Sync members for Restarters group $restartId, {$group->discourse_group}, Discourse group $discourseId");
+
+                // Check if the flair_url needs updating.  This keeps the logo in sync with changes on Restarters.
+                Log::debug("Check Discourse logo {$group->discourse_logo} vs {$group->groupimage->idimages}");
+                if (!$group->discourse_logo || $group->discourse_logo != $group->groupimage->image->idimages) {
+                    // We need to update it.  To do that, we first have to upload the image file to Discourse.
+                    Log::debug("Need to update flair_url with ". $group->groupImagePath());
+
+                    // Upload an image.  We need the MIME type of the file.
+                    $fh = fopen(public_path('uploads/mid_' . $group->groupImage->image->path),'r');
+
+                    $data = [
+                        [
+                            'name' => 'upload_type',
+                            'contents' => 'group_flair'
+                        ],
+                        [
+                            'name' => 'type',
+                            'contents' => mime_content_type($fh)
+                        ],
+                        [
+                            'name' => 'sha1_checksum',
+                            'contents' => sha1_file($group->groupImagePath())
+                        ],
+                        [
+                            'name' => 'file',
+                            'contents' => file_get_contents($group->groupImagePath()),
+                            'filename' => 'GroupLogo' . $idgroups
+                        ]
+                    ];
+
+                    $response = $client->request('POST', '/uploads.json', [
+                        'multipart' => $data
+                    ]);
+
+                    Log::debug("Response from upload ". $response->getStatusCode() . " " . $response->getBody());
+
+                    if ($response->getStatusCode() === 200) {
+                        // Now we can update the group to use it.
+                        $rsp = json_decode($response->getBody(), TRUE);
+
+                        if ($rsp && array_key_exists('id', $rsp)) {
+                            $uploadId = $rsp['id'];
+                            $response = $client->request('PUT', "/g/$discourseId.json", [
+                                'form_params' => [
+                                    'group' => [
+                                        'flair_upload_id' => $uploadId
+                                    ]
+                                ]
+                            ]);
+
+                            Log::debug("Response from flair_url update " . $response->getBody());
+
+                            if ($response->getStatusCode() === 200) {
+                                // Update the group to record that we've uploaded, then we'll skip this next time
+                                // through.
+                                Log::debug("Updated flair url OK for {$discourseId} to {$group->groupimage->idimages}");
+                                $group->discourse_logo = $group->groupimage->image->idimages;
+                                $group->save();
+                                Log::debug("...saved update to group");
+                            } else {
+                                Log::error("Failed to update flair url");
+                                throw new \Exception("Failed to update flair url for {$discourseId}");
+                            }
+                        } else {
+                            Log::error("Failed to upload group logo for {$discourseId}");
+                            throw new \Exception("Failed to upload group logo for {$discourseId}");
+                        }
+                    }
+                }
+
+                // TODO The Discourse API accepts up to around 1000 as the limit.  This is plenty for now, but
+                // we will assert below if it turns out not to be in future.
+                $limit = 1000;
+
+                $response = $client->request('GET', "/groups/$discourseName/members.json?limit=$limit");
+
+                Log::info('Response status: ' . $response->getStatusCode());
+
+                if ($response->getStatusCode() != 200)
+                {
+                    Log::error("Failed to get list of members for {$discourseId}");
+                    throw new \Exception("Failed to get list of members for {$discourseId}");
+                } else
+                {
+                    $discourseResult = json_decode($response->getBody(), true);
+                    $total = $discourseResult['meta']['total'];
+                    Log::debug("Total $total");
+
+                    if ($total > $limit)
+                    {
+                        Log::error("Group $discourseId too large at $total");
+                        throw new \Exception("Group $discourseId too large at $total");
+                    }
+
+                    $discourseMembers = array_column($discourseResult['members'], 'username');
+                    $restartersMembersIds = UserGroups::where('group', $restartId)->where('status', '=', 1)->pluck(
+                        'user'
+                    )->toArray();
+                    $restartersMembers = User::whereIn('id', $restartersMembersIds)->pluck('username')->toArray();
+
+                    Log::debug(
+                        count($discourseMembers) . " Discourse members vs " . count(
+                            $restartersMembers
+                        ) . " on Restarters"
+                    );
+                    Log::debug("Discourse Members " . json_encode($discourseMembers));
+                    Log::debug("Restarter Members " . json_encode($restartersMembers));
+
+                    $todelete = [];
+
+                    foreach ($discourseMembers as $discourseMember)
+                    {
+                        if (!in_array($discourseMember, $restartersMembers))
+                        {
+                            Log::debug("Remove user $discourseMember from Discourse group $discourseName");
+                            $todelete[] = $discourseMember;
+                        }
+                    }
+
+                    if (count($todelete))
+                    {
+                        Log::info(
+                            "Remove Discourse members " . json_encode(
+                                implode(',', $todelete)
+                            ) . " from $discourseName as members on Discourse but no longer members on Restarters"
+                        );
+
+                        $response = $client->request('DELETE', "/admin/groups/$discourseId/members.json", [
+                            'form_params' => [
+                                'usernames' => implode(',', $todelete)
+                            ]
+                        ]);
+
+                        Log::info('Response status: ' . $response->getStatusCode());
+                        Log::debug($response->getBody());
+
+                        if ($response->getStatusCode() != 200)
+                        {
+                            Log::error("Failed to add members for {$discourseId} {$discourseName}");
+                            throw new \Exception("Failed to add members for {$discourseId} {$discourseName}");
+                        }
+                    }
+
+                    foreach ($restartersMembers as $restartersMember)
+                    {
+                        if (!in_array($restartersMember, $discourseMembers))
+                        {
+                            Log::debug("Add Restarter user $restartersMember to Discourse group $discourseName");
+
+                            // We add these one by one, rather than in a single call.  This is because if our Restarters
+                            // usernames don't match the Discourse ones, e.g. due to anonymisation, then the single
+                            // call would fail.
+                            $response = $client->request('PUT', "/admin/groups/$discourseId/members.json", [
+                                'form_params' => [
+                                    'usernames' => $restartersMember
+                                ]
+                            ]);
+
+                            Log::debug('Response status: ' . $response->getStatusCode());
+                            Log::debug($response->getBody());
+
+                            if ($response->getStatusCode() != 200)
+                            {
+                                Log::error("Failed to add member for {$discourseId} {$discourseName}");
+                            } else
+                            {
+                                Log::info("Added Restarter user $restartersMember to Discourse group $discourseName");
+                            }
+                        }
+                    }
+                }
+            }
+        }
     }
 }

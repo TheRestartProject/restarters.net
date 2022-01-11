@@ -43,12 +43,17 @@ class EventDevices extends Notification implements ShouldQueue
     public function toMail($notifiable)
     {
         if ($notifiable !== null && $notifiable->invites == 1) {
+            $locale = $notifiable->language;
             return (new MailMessage)
-                  ->subject('Contribute Devices')
-                  ->greeting('Hello!')
-                  ->line('Thank you for hosting the event \''.$this->arr['event_venue'].'\', please help us outline what devices were bought to the event and the status of their repair. This will help us improve the quality of our data.')
-                  ->action('Contribute data', $this->arr['event_url'])
-                  ->line('If you would like to stop receiving these emails, please visit <a href="'.$this->arr['preferences'].'/'.$notifiable->id.'">your preferences</a> on your account.');
+                  ->subject(__('notifications.event_devices_subject', [], $locale))
+                  ->greeting(__('notifications.greeting', [], $locale))
+                  ->line(__('notifications.event_devices_line1', [
+                      'event' => $this->arr['event_venue']
+                    ], $locale))
+                  ->action(__('notification.event_devices_action', [], $locale), $this->arr['event_url'])
+                  ->line(__('notifications.email_preferences', [
+                    'url' => $this->arr['preferences']
+                  ], $locale));
         }
     }
 
@@ -60,8 +65,10 @@ class EventDevices extends Notification implements ShouldQueue
      */
     public function toArray($notifiable)
     {
+        $locale = $notifiable->language;
         return [
-
+            'title' => __('notifications.event_devices_title', [], $locale),
+            'name' => $this->arr['event_venue'],
         ];
     }
 }

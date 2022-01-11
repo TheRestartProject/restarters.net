@@ -7,17 +7,20 @@ use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Notifications\Messages\MailMessage;
 use Illuminate\Notifications\Notification;
 
-class AccountCreated extends Notification implements ShouldQueue
+class NewDiscourseMember extends Notification implements ShouldQueue
 {
     use Queueable;
+
+    protected $arr;
 
     /**
      * Create a new notification instance.
      *
      * @return void
      */
-    public function __construct()
+    public function __construct($arr)
     {
+        $this->arr = $arr;
     }
 
     /**
@@ -28,7 +31,11 @@ class AccountCreated extends Notification implements ShouldQueue
      */
     public function via($notifiable)
     {
-        return ['mail'];
+        if ($notifiable->invites == 1) {
+            return ['mail', 'database'];
+        }
+
+        return ['database'];
     }
 
     /**
@@ -40,11 +47,16 @@ class AccountCreated extends Notification implements ShouldQueue
     public function toMail($notifiable)
     {
         return (new MailMessage)
-                    ->subject('Account Created')
-                    ->greeting('Hello!')
-                    ->line('An account has been created for you on our community space. Click below to continue and set a password.')
-                    ->action('Set password', url('/'))
-                    ->line('If you think this invitation was not intended for you, please discard this email.');
+            ->subject(__('groups.talk_group_add_title', [
+                'group_name' => $this->arr['group_name']
+            ]))
+            ->greeting(__('partials.notification_greeting'))
+            ->line(__('groups.talk_group_add_body', [
+                'group_name' => $this->arr['group_name']
+            ]))
+            ->line(__('partials.notification_footer', [
+                'url' => url('/user/edit/' . $notifiable->id)
+            ]));
     }
 
     /**
@@ -56,7 +68,10 @@ class AccountCreated extends Notification implements ShouldQueue
     public function toArray($notifiable)
     {
         return [
-
+            'title' => __('groups.talk_group_add_title', [
+                'group_name' => $this->arr['group_name']
+            ]),
+            'group_name' => $this->arr['group_name']
         ];
     }
 }
