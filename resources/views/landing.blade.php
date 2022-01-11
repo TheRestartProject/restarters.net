@@ -76,13 +76,13 @@
           <div>
             <h2>{{ __('landing.learn') }}</h2>
             <p>
-              <span class="landing-icon">@include('svgs/navigation/wiki-icon')</span> {{ __('landing.repair_skills') }}
+              <img class="landing-icon" src="{{ asset('/images/landing/icon-book.svg') }}" /> {{ __('landing.repair_skills') }}
             </p>
             <p>
-              <span class="landing-icon">@include('svgs/navigation/talk-icon')</span> {{ __('landing.repair_advice') }}
+              <img class="landing-icon" src="{{ asset('/images/landing/icon-chat-bubble.svg') }}" /> {{ __('landing.repair_advice') }}
             </p>
             <p>
-              <span class="landing-icon">@include('svgs/navigation/groups-icon')</span> {{ __('landing.repair_group') }}
+              <img class="landing-icon" src="{{ asset('/images/landing/icon-group.svg') }}" /> {{ __('landing.repair_group') }}
             </p>
             <div class="d-flex justify-content-around justify-content-md-start">
               <a href="/user/register" class="btn btn-primary">{{ __('landing.repair_start') }}</a>
@@ -98,13 +98,13 @@
           <div>
             <h2>{{ __('landing.organise') }}</h2>
             <p>
-              <span class="landing-icon">@include('svgs/navigation/talk-icon')</span> {{ __('landing.organise_advice') }}
+              <img class="landing-icon" src="{{ asset('/images/landing/icon-chat-bubble.svg') }}" /> {{ __('landing.organise_advice') }}
             </p>
             <p>
-              <span class="landing-icon">@include('svgs/navigation/groups-icon')</span> {{ __('landing.organise_manage') }}
+              <img class="landing-icon" src="{{ asset('/images/landing/icon-group.svg') }}" /> {{ __('landing.organise_manage') }}
             </p>
             <p>
-              <span class="landing-icon">@include('svgs/navigation/events-icon')</span> {{ __('landing.organise_publicise') }}
+              <img class="landing-icon" src="{{ asset('/images/landing/icon-drill.svg') }}" /> {{ __('landing.organise_publicise') }}
             </p>
             <div class="d-flex justify-content-around justify-content-md-start">
               <a href="/user/register" class="btn btn-primary">{{ __('landing.organise_start') }}</a>
@@ -122,10 +122,10 @@
           <div>
             <h2>{{ __('landing.campaign') }}</h2>
             <p>
-              <span class="landing-icon">@include('svgs/navigation/wiki-icon')</span> {{ __('landing.campaign_join') }}
+              <img class="landing-icon" src="{{ asset('/images/landing/icon-group.svg') }}" /> {{ __('landing.campaign_join') }}
             </p>
             <p>
-              <span class="landing-icon">@include('svgs/navigation/talk-icon')</span> {{ __('landing.campaign_barriers') }}
+              <img class="landing-icon" src="{{ asset('/images/landing/icon-book.svg') }}" /> {{ __('landing.campaign_barriers') }}
             </p>
             <p>
               <span class="landing-icon">@include('svgs/navigation/workbench-icon')</span> {{ __('landing.campaign_data') }}
@@ -164,22 +164,22 @@
             </div>
             <div class="network-right">
               <p>
-                <span class="landing-icon">@include('svgs/navigation/talk-icon')</span> {{ __('landing.network_tools') }}
+                <img class="landing-icon" src="{{ asset('/images/landing/icon-chat-bubble.svg') }}" /> {{ __('landing.network_tools') }}
               </p>
               <p>
-                <span class="landing-icon">@include('svgs/navigation/events-icon')</span> {{ __('landing.network_events') }}
+                <img class="landing-icon" src="{{ asset('/images/landing/icon-cal.svg') }}" /> {{ __('landing.network_events') }}
               </p>
               <p>
-                <span class="landing-icon">@include('svgs/navigation/drill-icon')</span> {{ __('landing.network_record') }}
+                <img class="landing-icon" src="{{ asset('/images/landing/icon-drill.svg') }}" /> {{ __('landing.network_record') }}
               </p>
               <p>
                 <span class="landing-icon">@include('svgs/navigation/workbench-icon')</span> {{ __('landing.network_impact') }}
               </p>
               <p>
-                <span class="landing-icon">@include('svgs/navigation/groups-icon')</span> {{ __('landing.network_brand') }}
+                <img class="landing-icon" src="{{ asset('/images/landing/icon-group.svg') }}" /> {{ __('landing.network_brand') }}
               </p>
               <p class="mb-0">
-                <span class="landing-icon">@include('svgs/navigation/wiki-icon')</span> {{ __('landing.network_power') }}
+                <img class="landing-icon" src="{{ asset('/images/landing/icon-book.svg') }}" /> {{ __('landing.network_power') }}
               </p>
               <div class="d-flex d-md-none mt-2 justify-content-around">
                 <a href="/user/register" class="btn btn-primary">{{ __('landing.network_start') }}</a>
@@ -213,7 +213,8 @@
       padding: 20px;
   }
 
-  .landing-section .landing-icon svg {
+  .landing-section .landing-icon {
+      max-height: 30px;
       width: 30px !important;
       margin-right: 5px;
   }
