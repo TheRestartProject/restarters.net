@@ -28,7 +28,7 @@ class InviteGroupTest extends TestCase
         $user = factory(User::class)->states('Restarter')->create();
 
         $response = $this->post('/group/invite', [
-            'group_name' => 'Test Group',
+            'group_name' => $group->name,
             'group_id' => $group->idgroups,
             'manual_invite_box' => $user->email,
             'message_to_restarters' => 'Join us, but not in a creepy zombie way',
