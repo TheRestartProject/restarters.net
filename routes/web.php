@@ -169,6 +169,7 @@ Route::prefix('battcat')->group(function () {
 
 Route::group(['middleware' => ['guest']], function () {
     Route::get('/', 'HomeController@index')->name('home');
+    Route::get('/about', 'HomeController@index')->name('home');
 });
 
 Route::group(['middleware' => ['auth', 'verifyUserConsent']], function () {
