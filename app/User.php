@@ -290,7 +290,6 @@ class User extends Authenticatable implements Auditable, HasLocalePreference
 
     public function inGroup($group)
     {
-        //Tested!
         return DB::select(DB::raw('SELECT
                     users.id AS id,
                     users.name,

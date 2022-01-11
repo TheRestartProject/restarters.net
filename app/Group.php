@@ -552,8 +552,8 @@ class Group extends Model implements Auditable
     
     public function createDiscourseGroup() {
         // Get the host who created the group.
-	$success = false;
-	$member = UserGroups::where('group', $this->idgroups)->first();
+        $success = false;
+        $member = UserGroups::where('group', $this->idgroups)->first();
         $host = null;
 
         if (!empty($member)) {
@@ -661,7 +661,7 @@ class Group extends Model implements Auditable
             } catch (\Exception $ex) {
                 Log::error('Could not create group ('.$this->idgroups.') thread: '.$ex->getMessage());
             }
-	} while ($retry);
+    	} while ($retry);
 
         return $success;
     }
