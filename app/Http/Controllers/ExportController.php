@@ -32,8 +32,12 @@ class ExportController extends Controller
             ->join('groups', 'groups.idgroups', '=', 'events.group')
             ->select('devices.*', 'groups.name AS group_name')->get();
 
+        $displacementFactor = \App\Device::getDisplacementFactor();
+        $eEmissionRatio = \App\Helpers\LcaStats::getEmissionRatioPowered();
+        $uEmissionratio = \App\Helpers\LcaStats::getEmissionRatioUnpowered();
+
         // Create CSV
-        $filename = 'devices.csv';
+        $filename = base_path() . DIRECTORY_SEPARATOR . 'public' . DIRECTORY_SEPARATOR . 'devices.csv';
         $file = fopen($filename, 'w+');
 
         // Do not include model column
@@ -47,11 +51,26 @@ class ExportController extends Controller
                 'Event',
                 'Group',
                 'Date',
+                'Waste Prevented',
+                'CO2 Prevented',
             ];
 
             fputcsv($file, $columns);
 
             foreach ($all_devices as $device) {
+                $wasteImpact = 0;
+                $co2Diverted = 0;
+
+                if ($device->isFixed()) {
+                    if ($device->deviceCategory->powered) {
+                        $wasteImpact = $device->eWasteDiverted();
+                        $co2Diverted = $device->eCo2Diverted($eEmissionRatio, $displacementFactor);
+                    } else {
+                        $wasteImpact = $device->uWasteDiverted();
+                        $co2Diverted = $device->uCo2Diverted($uEmissionratio, $displacementFactor);
+                    }
+                }
+
                 fputcsv($file, [
                     $device->deviceCategory->name,
                     $device->brand,
@@ -61,6 +80,8 @@ class ExportController extends Controller
                     $device->deviceEvent->getEventName(),
                     $device->deviceEvent->theGroup->name,
                     $device->deviceEvent->getEventDate('Y-m-d'),
+                    $wasteImpact,
+                    $co2Diverted
                 ]);
             }
         } else {
@@ -74,11 +95,26 @@ class ExportController extends Controller
                 'Event',
                 'Group',
                 'Date',
+                'Waste Prevented',
+                'CO2 Prevented',
             ];
 
             fputcsv($file, $columns);
 
             foreach ($all_devices as $device) {
+                $wasteImpact = 0;
+                $co2Diverted = 0;
+
+                if ($device->isFixed()) {
+                    if ($device->deviceCategory->powered) {
+                        $wasteImpact = $device->eWasteDiverted();
+                        $co2Diverted = $device->eCo2Diverted($eEmissionRatio, $displacementFactor);
+                    } else {
+                        $wasteImpact = $device->uWasteDiverted();
+                        $co2Diverted = $device->uCo2Diverted($uEmissionratio, $displacementFactor);
+                    }
+                }
+
                 fputcsv($file, [
                     $device->deviceCategory->name,
                     $device->brand,
@@ -89,6 +125,8 @@ class ExportController extends Controller
                     $device->deviceEvent->getEventName(),
                     $device->deviceEvent->theGroup->name,
                     $device->deviceEvent->getEventDate('Y-m-d'),
+                    $wasteImpact,
+                    $co2Diverted,
                 ]);
             }
         }
@@ -387,75 +425,5 @@ class ExportController extends Controller
             'country_hours_completed' => $country_hours_completed,
             'city_hours_completed' => $city_hours_completed,
         ];
-    }
-
-    public function exportTimeVolunteered(Request $request)
-    {
-        if (! empty($request->all())) {
-            $data = $this->getTimeVolunteered($request, true, true);
-        } else {
-            $data = $this->getTimeVolunteered($request, null, true);
-        }
-
-        //Creat new file and set headers
-        $file_name = 'time_reporting.csv';
-        $file = fopen($file_name, 'w+');
-        $file_headers = [
-            'Content-type' => 'text/csv',
-        ];
-
-        //Put stats in csv
-        $stats_headers = ['Hours Volunteered', 'Average age', 'Number of groups', 'Total number of users', 'Number of anonymous users'];
-        fputcsv($file, ['Overall Stats:']);
-        fputcsv($file, $stats_headers);
-        fputcsv($file, [$data['hours_completed'], $data['average_age'], $data['group_count'], $data['total_users'], $data['anonymous_users']]);
-        fputcsv($file, []);
-
-        //Put breakdown by country in csv
-        $country_headers = ['Country name', 'Total hours'];
-        fputcsv($file, ['Breakdown by country:']);
-        fputcsv($file, $country_headers);
-        foreach ($data['country_hours_completed'] as $country_hours) {
-            if (! is_null($country_hours->country)) {
-                $country = $country_hours->country;
-            } else {
-                $country = 'N/A';
-            }
-            fputcsv($file, [$country, substr($country_hours->event_hours, 0, -4)]);
-        }
-        fputcsv($file, []);
-
-        //Put breakdown by city in csv
-        $city_headers = ['Town/city name', 'Total hours'];
-        fputcsv($file, ['Breakdown by city:']);
-        fputcsv($file, $city_headers);
-        foreach ($data['city_hours_completed'] as $city_hours) {
-            if (! is_null($city_hours->location)) {
-                $city = $city_hours->location;
-            } else {
-                $city = 'N/A';
-            }
-            fputcsv($file, [$city, substr($city_hours->event_hours, 0, -4)]);
-        }
-        fputcsv($file, []);
-
-        //Put users in csv
-        $users_headers = ['#', 'Hours', 'Event date', 'Restart group', 'Location'];
-        fputcsv($file, ['Results:']);
-        fputcsv($file, $users_headers);
-        foreach ($data['user_events'] as $ue) {
-            $start_time = new DateTime($ue->start);
-            $diff = $start_time->diff(new DateTime($ue->end));
-            fputcsv($file, [
-                $ue->idevents, $diff->h.'.'.sprintf('%02d', $diff->i / 60 * 100),
-                date('d/m/Y', strtotime($ue->event_date)), $ue->groupname, $ue->location,
-            ]);
-        }
-        fputcsv($file, []);
-
-        //close file
-        fclose($file);
-
-        return Response::download($file_name, $file_name, $file_headers);
     }
 }

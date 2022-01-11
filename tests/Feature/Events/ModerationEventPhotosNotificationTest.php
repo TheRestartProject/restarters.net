@@ -54,8 +54,22 @@ class ModerationEventPhotosNotificationTest extends TestCase
                          ]);
         $response->assertOk();
 
+        $admins = $this->admins;
+        $event = $this->event;
+
         Notification::assertSentTo(
-            $this->admins, AdminModerationEventPhotos::class
+            $admins,
+            AdminModerationEventPhotos::class,
+            function ($notification, $channels, $admin) use ($event) {
+                // Check that the email was internationalised correctly.
+                $mailData = $notification->toMail($admin)->toArray();
+                self::assertEquals(__('notifications.greeting', [], $admin->language), $mailData['greeting']);
+                self::assertEquals(__('notifications.new_event_photos_subject', [
+                    'event' => $event->venue
+                ], $admin->language), $mailData['subject']);
+
+                return true;
+            }
         );
     }
 
@@ -63,6 +77,20 @@ class ModerationEventPhotosNotificationTest extends TestCase
     {
         /** @var User[] $admins */
         $this->admins = factory(User::class, 5)->states('Administrator')->create();
+
+        // Set some locales.
+        $locales = [
+            'en',
+            'fr',
+        ];
+
+        $ix = 0;
+
+        foreach ($this->admins as $admin) {
+            $admin->language = $locales[$ix++];
+            $ix = $ix % count($locales);
+            $admin->save();
+        }
 
         foreach ($this->admins as $admin) {
             $admin->addPreference('admin-moderate-event-photos');

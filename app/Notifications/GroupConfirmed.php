@@ -11,18 +11,16 @@ class GroupConfirmed extends Notification implements ShouldQueue
 {
     use Queueable;
 
-    protected $arr;
-    protected $user;
+    protected $group;
 
     /**
      * Create a new notification instance.
      *
      * @return void
      */
-    public function __construct($arr, $user = null)
+    public function __construct($group)
     {
-        $this->arr = $arr;
-        $this->user = $user;
+        $this->group = $group;
     }
 
     /**
@@ -44,14 +42,18 @@ class GroupConfirmed extends Notification implements ShouldQueue
      */
     public function toMail($notifiable)
     {
-        if ($this->user !== null && $this->user->invites == 1) {
-            return (new MailMessage)
-                  ->subject('Group Confirmed')
-                  ->greeting('Hello!')
-                  ->line('Your group \''.$this->arr['group_name'].'\' has been confirmed by an admin.')
-                  ->action('View Group', $this->arr['group_url'])
-                  ->line('If you would like to stop receiving these emails, please visit <a href="'.$this->arr['preferences'].'">your preferences</a> on your account.');
-        }
+        $locale = $notifiable->language;
+
+        return (new MailMessage)
+            ->subject(__('notifications.group_confirmed_subject', [], $locale))
+            ->greeting(__('notifications.greeting', [], $notifiable->language))
+            ->line(__('notifications.group_confirmed_line1', [
+                'name' => $this->group->name
+            ], $locale))
+            ->action(__('notifications.group_confirmed_action', [], $locale), url('/group/view/' . $this->group->idgroups))
+            ->line(__('notifications.email_preferences', [
+                'url' => url('/profile/edit')
+            ], $locale));
     }
 
     /**
@@ -63,7 +65,8 @@ class GroupConfirmed extends Notification implements ShouldQueue
     public function toArray($notifiable)
     {
         return [
-
+            'name' => $this->group->name,
+            'url' => url('/group/view/' . $this->group->idgroups)
         ];
     }
 }

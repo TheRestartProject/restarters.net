@@ -15,6 +15,7 @@ use App\User;
 use DB;
 use Illuminate\Support\Facades\Notification;
 use Tests\TestCase;
+use App\Notifications\EventConfirmed;
 
 class GeocoderMock extends Geocoder
 {
@@ -60,6 +61,7 @@ class CreateEventTest extends TestCase
      */
     public function a_host_with_a_group_can_create_an_event($data)
     {
+        Notification::fake();
         $this->withoutExceptionHandling();
 
         // arrange
@@ -142,8 +144,22 @@ class CreateEventTest extends TestCase
         }
 
         // Approve the event.
-        $event->wordpress_post_id = 100;
-        $event->save();
+        $event->approve();
+
+        // Approval should generate a notification to the host.
+        Notification::assertSentTo(
+            [$host],
+            EventConfirmed::class,
+            function ($notification, $channels, $host) use ($event) {
+                $mailData = $notification->toMail($host)->toArray();
+                self::assertEquals(__('notifications.event_confirmed_subject', [], $host->language), $mailData['subject']);
+
+                // Mail should mention the venue.
+                self::assertRegexp('/' . $event->venue . '/', $mailData['introLines'][0]);
+
+                return true;
+            }
+        );
 
         // Check that the event shows for a restarter.
         $this->loginAsTestUser(Role::RESTARTER);
