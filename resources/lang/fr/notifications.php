@@ -6,4 +6,6 @@ return [
   'mark_as_read' => 'Marquer comme lu',
   'notifications' => 'Notifications',
   'view_all' => 'Voir toutes les notifications',
+
+  'greeting' => 'Bonjour!',
 ];

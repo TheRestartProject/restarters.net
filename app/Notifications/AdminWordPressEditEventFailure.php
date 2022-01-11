@@ -50,7 +50,7 @@ class AdminWordPressEditEventFailure extends Notification implements ShouldQueue
     {
         return (new MailMessage)
                   ->subject('Event WordPress failure')
-                  ->greeting('Hello!')
+                  ->greeting(__('notifications.greeting', [], $notifiable->language))
                   ->line('Event \''.$this->arr['event_venue'].'\' failed to post to WordPress during an edit to the event.')
                   ->action('View event', $this->arr['event_url'])
                   ->line('If you would like to stop receiving these emails, please visit <a href="'.url('/user/edit/'.$notifiable->id).'">your preferences</a> on your account.');

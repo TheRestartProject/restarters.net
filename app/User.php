@@ -13,6 +13,7 @@ use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Illuminate\Support\Str;
 use OwenIt\Auditing\Contracts\Auditable;
+use Illuminate\Contracts\Translation\HasLocalePreference;
 
 class WikiSyncStatus
 {
@@ -21,7 +22,7 @@ class WikiSyncStatus
     const Created = 2;
 }
 
-class User extends Authenticatable implements Auditable
+class User extends Authenticatable implements Auditable, HasLocalePreference
 {
     use Notifiable;
     use SoftDeletes;
@@ -289,7 +290,6 @@ class User extends Authenticatable implements Auditable
 
     public function inGroup($group)
     {
-        //Tested!
         return DB::select(DB::raw('SELECT
                     users.id AS id,
                     users.name,
@@ -609,5 +609,18 @@ class User extends Authenticatable implements Auditable
         }
 
         return $api_token;
+    }
+
+    /**
+     * Get the user's preferred locale.  This is automatically used by email notifications.
+     *
+     * @return string
+     */
+    public function preferredLocale()
+    {
+        // TODO Use of preferredLocale should mean we don't have to explicitly pass the locale.  But that isn't
+        // working.  So at the moment we are passing a locale explicitly in the translations in the notifications
+        // to users (not admins).
+        return $this->language;
     }
 }

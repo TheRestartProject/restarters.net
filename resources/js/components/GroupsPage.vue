@@ -25,9 +25,9 @@
           <b class="text-uppercase d-none d-md-block">{{ __('groups.groups_title1') }}</b>
         </template>
         <div class="pt-2 pb-2">
-          <div v-if="myGroups && myGroups.length">
+          <div v-if="yourGroups.length">
             <GroupsTable
-                :groups="myGroups"
+                :groups="yourGroups"
                 class="mt-3"
                 :tab="currentTab"
                 @nearest="currentTab = 1"
@@ -42,7 +42,7 @@
           <b class="text-uppercase d-block d-lg-none">{{ __('groups.groups_title2_mobile') }}</b>
           <b class="text-uppercase d-none d-lg-block">{{ __('groups.groups_title2') }}</b>
         </template>
-        <div v-if="nearbyGroups && nearbyGroups.length">
+        <div v-if="nearbyGroups.length">
           <p class="mt-1">
             {{ nearestGroups }}
             <a href="/profile/edit" class="small">{{ __('groups.nearest_groups_change') }}</a>.
@@ -104,16 +104,6 @@ export default {
       required: false,
       default: null
     },
-    yourGroups: {
-      type: Array,
-      required: false,
-      default: null
-    },
-    nearbyGroups: {
-      type: Array,
-      required: false,
-      default: null
-    },
     yourArea: {
       type: String,
       required: false,
@@ -161,14 +151,16 @@ export default {
         return a.name.localeCompare(b.name)
       }) : []
     },
-    myGroups() {
+    yourGroups() {
       return this.groups.filter(g => {
-        return g.ingroup
+        return g.following
       })
     },
-    nearGroups() {
+    nearbyGroups() {
       return this.groups.filter(g => {
-        return g.nearby
+        return g.nearby && !g.following
+      }).sort((a, b) => {
+        return a.distance - b.distance
       })
     },
     nearestGroups() {
@@ -204,26 +196,8 @@ export default {
     // and so that as/when it changes then reactivity updates all the views.
     //
     // Further down the line this may change so that the data is obtained via an AJAX call and perhaps SSR.
-    let groups = {}
-
-    this.allGroups.forEach(g => {
-      groups[g.idgroups] = g
-    })
-
-    if (this.yourGroups) {
-      this.yourGroups.forEach(g => {
-        groups[g.idgroups].ingroup = true
-      })
-    }
-
-    if (this.nearbyGroups) {
-      this.yourGroups.forEach(g => {
-        groups[g.idgroups].nearby = true
-      })
-    }
-
     this.$store.dispatch('groups/setList', {
-      groups: Object.values(groups)
+      groups: Object.values(this.allGroups)
     })
 
     // We have three tabs, and might be asked to start on a specific one.

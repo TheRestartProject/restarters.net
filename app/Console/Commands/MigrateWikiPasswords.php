@@ -41,7 +41,7 @@ class MigrateWikiPasswords extends Command
         $users = User::whereNotNull('mediawiki')->whereNull('deleted_at')->get();
 
         foreach ($users as $user) {
-            $this->info("php changePassword.php --user={$user->mediawiki} --password='{$user->password}'");
+            $this->info("php changePassword.php --user=\"{$user->mediawiki}\" --password='{$user->password}'");
         }
     }
 }

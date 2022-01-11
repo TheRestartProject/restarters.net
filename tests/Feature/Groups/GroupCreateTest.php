@@ -2,8 +2,12 @@
 
 namespace Tests\Feature\Groups;
 
+use App\Group;
+use App\Notifications\GroupConfirmed;
 use App\Role;
+use App\User;
 use Tests\TestCase;
+use Illuminate\Support\Facades\Notification;
 
 class GroupCreateTest extends TestCase
 {
@@ -37,5 +41,45 @@ class GroupCreateTest extends TestCase
         ]);
 
         $this->assertContains('That group name (Test Group0) already exists', $response->getContent());
+    }
+
+    public function testApprove() {
+        Notification::fake();
+
+        $admin1 = factory(User::class)->state('Administrator')->create();
+        $this->actingAs($admin1);
+
+        $idgroups = $this->createGroup('Test Group');
+        $group = Group::find($idgroups);
+
+        $admin2 = factory(User::class)->state('Administrator')->create();
+        $this->actingAs($admin2);
+
+        $response = $this->post('/group/edit/'.$idgroups, [
+            'description' => 'Test',
+            'location' => 'London',
+            'name' => $group->name,
+            'website' => 'https://therestartproject.org',
+            'free_text' => 'HQ',
+            'moderate' => 'approve',
+            'area' => 'London',
+            'postcode' => 'SW9 7QD'
+        ]);
+
+        Notification::assertSentTo(
+            [$admin1],
+            GroupConfirmed::class,
+            function ($notification, $channels, $host) use ($group) {
+                $mailData = $notification->toMail($host)->toArray();
+                self::assertEquals(__('notifications.group_confirmed_subject', [], $host->language), $mailData['subject']);
+
+                // Mail should mention the group name.
+                self::assertRegexp('/' . $group->name . '/', $mailData['introLines'][0]);
+
+                return true;
+            }
+        );
+
+        $this->assertContains('Group updated!', $response->getContent());
     }
 }

@@ -149,8 +149,13 @@ class Fixometer
             return true;
         }
 
+        $group = Party::find($partyId)->theGroup;
+
+        if (self::hasRole($user, 'Host') && self::userIsHostOfGroup($group->idgroups, $userId)) {
+            return true;
+        }
+
         if (self::hasRole($user, 'NetworkCoordinator')) {
-            $group = Party::find($partyId)->theGroup;
             foreach ($group->networks as $network) {
                 if ($network->coordinators->contains($user)) {
                     return true;
@@ -937,8 +942,6 @@ class Fixometer
         $modal = str_replace("App\Notifications\\", '', $modal);
 
         $user_array = [
-            //'AccountCreated', doesn't appear to be in use
-            //'NewRegister',
             'AdminNewUser',
             'ResetPassword',
         ];

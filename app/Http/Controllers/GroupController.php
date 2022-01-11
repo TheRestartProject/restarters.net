@@ -19,6 +19,7 @@ use App\Notifications\AdminModerationGroup;
 use App\Notifications\JoinGroup;
 use App\Notifications\NewGroupMember;
 use App\Notifications\NewGroupWithinRadius;
+use App\Notifications\GroupConfirmed;
 use App\Party;
 use App\User;
 use App\UserGroups;
@@ -38,12 +39,8 @@ class GroupController extends Controller
         //Get current logged in user
         $user = Auth::user();
 
-        // We only need some attributes.
-        $group_atts = ['groups.idgroups', 'groups.name', 'groups.location', 'groups.country'];
-
         // Get all groups
         $groups = Group::with(['networks'])
-            ->select($group_atts)
             ->orderBy('name', 'ASC')
             ->get();
 
@@ -53,23 +50,21 @@ class GroupController extends Controller
 
         // Look for groups we have joined, not just been invited to.  We have to explicitly test on deleted_at because
         // the normal filtering out of soft deletes won't happen for joins.
-        $your_groups = Group::join('users_groups', 'users_groups.group', '=', 'groups.idgroups')
+        $your_groups =array_column(Group::join('users_groups', 'users_groups.group', '=', 'groups.idgroups')
             ->leftJoin('events', 'events.group', '=', 'groups.idgroups')
             ->where('users_groups.user', $user->id)
             ->where('users_groups.status', 1)
             ->whereNull('users_groups.deleted_at')
             ->orderBy('groups.name', 'ASC')
             ->groupBy('groups.idgroups')
-            ->select($group_atts)
-            ->get();
+            ->get()
+            ->toArray(), 'idgroups');
 
         // We pass a high limit to the groups nearby; there is a distance limit which will normally kick in first.
-        $groups_near_you = $user->groupsNearby(1000);
+        $groups_near_you = array_column($user->groupsNearby(1000), 'idgroups');
 
         return view('group.index', [
-            'your_groups' => $this->expandGroups($your_groups),
-            'groups_near_you' => $this->expandGroups($groups_near_you),
-            'groups' => $this->expandGroups($groups),
+            'groups' => $this->expandGroups($groups, $your_groups, $groups_near_you),
             'your_area' => $user->location,
             'tab' => $tab,
             'network' => $network,
@@ -682,6 +677,13 @@ class GroupController extends Controller
                 if (isset($data['moderate']) && $data['moderate'] == 'approve') {
                     event(new ApproveGroup($group, $data));
 
+                    // Notify the creator, as long as it's not the current user.
+                    $creator = User::find(UserGroups::where('group', $id)->first()->user);
+
+                    if ($creator->id != Auth::user()->id) {
+                        Notification::send($creator, new GroupConfirmed($group));
+                    }
+
                     // Notify nearest users.
                     if (! is_null($latitude) && ! is_null($longitude)) {
                         $restarters_nearby = User::nearbyRestarters($latitude, $longitude, 25)
@@ -770,7 +772,7 @@ class GroupController extends Controller
         }
     }
 
-    private function expandGroups($groups)
+    private function expandGroups($groups, $your_groupids, $nearby_groupids)
     {
         $ret = [];
 
@@ -780,13 +782,24 @@ class GroupController extends Controller
 
                 $event = $group->getNextUpcomingEvent();
 
+                // We want to return the distance from our own location.
+                $distance = null;
+                $grouplat = $group->latitude;
+                $grouplng = $group->longitude;
+                $userlat = Auth::user()->latitude;
+                $userlng = Auth::user()->longitude;
+
+                if ($grouplat !== null && $grouplng !== null && $userlat !== null && $userlng !== null) {
+                    $distance = 6371 * acos( cos(deg2rad($userlat)) * cos(deg2rad($grouplat)) * cos(deg2rad($grouplng) - deg2rad($userlng)) + sin(deg2rad($userlat) ) * sin(deg2rad($grouplat)));
+                }
+
                 $ret[] = [
-                    'idgroups' => $group['idgroups'],
-                    'name' => $group['name'],
+                    'idgroups' => $group->idgroups,
+                    'name' => $group->name,
                     'image' => (is_object($group_image) && is_object($group_image->image)) ?
                         asset('uploads/mid_'.$group_image->image->path) : null,
-                    'location' => rtrim($group['location']),
-                    'next_event' => $event ? $event['event_date'] : null,
+                    'location' => rtrim($group->location),
+                    'next_event' => $event ? $event->event_date : null,
                     'all_restarters_count' => $group->all_restarters_count,
                     'all_hosts_count' => $group->all_hosts_count,
                     'all_confirmed_restarters_count' => $group->all_confirmed_restarters_count,
@@ -794,7 +807,9 @@ class GroupController extends Controller
                     'networks' => \Illuminate\Support\Arr::pluck($group->networks, 'id'),
                     'country' => $group->country,
                     'group_tags' => $group->group_tags()->get()->pluck('id'),
-                    'distance' => $group->distance,
+                    'distance' => $distance,
+                    'following' => in_array($group->idgroups, $your_groupids),
+                    'nearby' => in_array($group->idgroups, $nearby_groupids),
                 ];
             }
         }
