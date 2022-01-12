@@ -44,10 +44,16 @@ class JoinGroup extends Notification implements ShouldQueue
      */
     public function toMail($notifiable)
     {
-        $subject = 'Invitation from '.$this->arr['name'].' to follow '.$this->arr['group'];
-        $introLine = 'You have received this email because you have been invited by '.$this->arr['name'].' to follow the community repair group <b>'.$this->arr['group'].'</b> on restarters.net.';
-        $actionText = 'Click to follow group';
-        $ignoreLine = 'If you think this invitation was not intended for you, please disregard this email.';
+        $subject = __('notifications.join_group_title', [
+            'name' => $this->arr['name'],
+            'group' => $this->arr['group']
+        ]);
+        $introLine = __('notifications.join_group_intro', [
+            'name' => $this->arr['name'],
+            'group' => $this->arr['group']
+        ]);
+        $actionText = __('notifications.join_group_action');
+        $ignoreLine = __('notifications.join_group_ignore');
 
         if (! is_null($this->user)) { // user is already on the platform
             if ($this->user->invites == 1) { // user has opted in to receive emails
@@ -58,7 +64,9 @@ class JoinGroup extends Notification implements ShouldQueue
                       ->line('');
 
                 if (! is_null($this->arr['message'])) { // host has added a message
-                    $mail->line($this->arr['name'].' attached this message with the invite:')
+                    $mail->line(__('notifications.join_group_attached', [
+                        'name' => $this->arr['name']
+                    ]))
                          ->line('')
                          ->line('"'.$this->arr['message'].'"')
                          ->line('');
@@ -79,14 +87,18 @@ class JoinGroup extends Notification implements ShouldQueue
                     ->line('');
 
             if (! is_null($this->arr['message'])) { // host has added a message
-                $mail->line($this->arr['name'].' attached this message with the invite:')
+                $mail->line(__('notifications.join_group_attached', [
+                    'name' => $this->arr['name']
+                ]))
                      ->line('')
                      ->line('"'.$this->arr['message'].'"')
                      ->line('');
             }
 
             $mail->action($actionText, $this->arr['url'])
-                  ->line('You can find out more about restarters.net <a href="'.env('APP_URL').'/about">here</a>.');
+                  ->line(__('notifications.join_group_more', [
+                      'more' => env('APP_URL').'/about'
+            ]));
 
             $mail->line('');
             $mail->line($ignoreLine);

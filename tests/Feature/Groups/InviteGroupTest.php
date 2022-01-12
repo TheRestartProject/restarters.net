@@ -2,13 +2,8 @@
 
 namespace Tests\Feature;
 
-use App\EventsUsers;
 use App\Group;
-use App\Helpers\Geocoder;
-use App\Network;
-use App\Notifications\AdminModerationEvent;
-use App\Notifications\NotifyRestartersOfNewEvent;
-use App\Party;
+use App\Notifications\JoinGroup;
 use App\User;
 use DB;
 use Illuminate\Support\Facades\Notification;
@@ -18,6 +13,7 @@ class InviteGroupTest extends TestCase
 {
     public function testInvite()
     {
+        Notification::fake();
         $this->withoutExceptionHandling();
 
         $group = factory(Group::class)->create();
@@ -35,6 +31,20 @@ class InviteGroupTest extends TestCase
         ]);
 
         $response->assertSessionHas('success');
+
+        // Invitation should generate a notification.
+        Notification::assertSentTo(
+            [$user],
+            JoinGroup::class,
+            function ($notification, $channels, $user) use ($group, $host) {
+                $mailData = $notification->toMail($host)->toArray();
+                self::assertEquals(__('notifications.join_group_title', [
+                    'name' => $host->name,
+                    'group' => $group->name
+                ], $user->language), $mailData['subject']);
+                return true;
+            }
+        );
 
         // We should see that we have been invited.
         $this->actingAs($user);
@@ -62,6 +72,8 @@ class InviteGroupTest extends TestCase
         $redirectTo = $response->getTargetUrl();
         $this->assertNotFalse(strpos($redirectTo, '/group/view/'.$group->idgroups));
         $response->assertSessionHas('success');
+
+
 
         // Check the counts have changed.
         $response = $this->get('/group/view/'.$group->idgroups);

@@ -102,7 +102,7 @@ class JoinEvent extends Notification implements ShouldQueue
                 }
 
                 $mail->line($eventDetailsTable)
-                     ->action('RSVP now', $this->arr['url'])
+                     ->action(__('notifications.join_event_rsvp_now'), $this->arr['url'])
                      ->line('')
                      ->line($ignoreLine)
                      ->line('');
