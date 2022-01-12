@@ -77,4 +77,9 @@ return [
     'password_reset_action' => 'Reset password',
     'password_reset_noaction' => 'If you did not request a password reset, no further action is required.',
 
+    'rsvp_subject' => ':name has RSVPed to your event',
+    'rsvp_title' => ':name has RSVPed to your event:',
+    'rsvp_line1' => 'A volunteer, :user, has RSVPed to the \':event\' event.',
+    'rsvp_action' => 'View your event'
+
 ];

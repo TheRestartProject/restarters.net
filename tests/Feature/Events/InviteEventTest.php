@@ -10,8 +10,11 @@ use App\Notifications\AdminModerationEvent;
 use App\Notifications\NewGroupWithinRadius;
 use App\Notifications\NotifyHostRSVPInvitesMade;
 use App\Notifications\NotifyRestartersOfNewEvent;
+use App\Notifications\RSVPEvent;
 use App\Party;
+use App\Role;
 use App\User;
+use App\UserGroups;
 use DB;
 use Illuminate\Support\Facades\Notification;
 use Tests\TestCase;
@@ -135,7 +138,13 @@ class InviteEventTest extends TestCase
                                                    'start' => '12:13',
                                                    'user_id' => $host->id
                                                ]);
-
+        EventsUsers::create([
+                                'event' => $event->getKey(),
+                                'user' => $host->getKey(),
+                                'status' => 1,
+                                'role' => 3,
+                                'full_name' => null,
+                           ]);
         $this->actingAs($host);
 
         // Should have no group members and therefore no invitable members.
@@ -210,6 +219,23 @@ class InviteEventTest extends TestCase
         $this->assertTrue($response3->isRedirection());
         $redirectTo = $response3->getTargetUrl();
         $this->assertNotFalse(strpos($redirectTo, '/party/view/'.$event->idevents));
+
+        // This should generate a notification to the host.
+        Notification::assertSentTo(
+            [$host],
+            RSVPEvent::class,
+            function ($notification, $channels, $host) use ($user, $event) {
+                $mailData = $notification->toMail($host)->toArray();
+                self::assertEquals(__('notifications.rsvp_subject', [
+                    'name' => $user->name
+                ], $host->language), $mailData['subject']);
+
+                // Mail should mention the venue.
+                self::assertRegexp('/' . $event->venue . '/', $mailData['introLines'][0]);
+
+                return true;
+            }
+        );
 
         // Now a group member and confirmed so should not show as invitable.
         $this->get('/logout');
