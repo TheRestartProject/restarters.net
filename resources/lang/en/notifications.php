@@ -8,6 +8,7 @@ return [
     'mark_all_as_read' => 'Mark all notifications as read',
     'greeting' => 'Hello!',
     'email_footer' => 'If you have any questions or issues, please contact <a href="mailto:community@therestartproject.org">community@therestartproject.org</a>',
+    'thanks' => 'Thank you.',
 
     'new_event_photos_title' => 'New event photos uploaded:',
     'new_event_photos_subject' => 'New event photos uploaded to event: :event',
@@ -60,4 +61,10 @@ return [
     'new_group_title' => 'A new repair group near you:',
     'new_group_line1' => 'A new group near to you, :name, has just become active on Restarters.net.',
     'new_group_action' => 'Find out more about :name',
+
+    'invites_made_subject' => 'Invites have been sent to your event',
+    'invites_made_title' => 'Invites have been sent to your event:',
+    'invites_made_line1' => 'There have been invites sent out to your event: \':name\'. URL for reference: \':url\'.',
+    'invites_made_line2' => 'If you think this email was not intended for you, please discard.',
+
 ];

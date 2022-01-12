@@ -172,6 +172,5 @@ class GroupsNearbyTest extends TestCase
                 return true;
             }
         );
-
     }
 }

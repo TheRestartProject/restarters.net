@@ -7,6 +7,8 @@ use App\Group;
 use App\Helpers\Geocoder;
 use App\Network;
 use App\Notifications\AdminModerationEvent;
+use App\Notifications\NewGroupWithinRadius;
+use App\Notifications\NotifyHostRSVPInvitesMade;
 use App\Notifications\NotifyRestartersOfNewEvent;
 use App\Party;
 use App\User;
@@ -122,16 +124,18 @@ class InviteEventTest extends TestCase
 
     public function testInvitable()
     {
+        Notification::fake();
         $this->withoutExceptionHandling();
 
         $group = factory(Group::class)->create();
+        $host = factory(User::class)->states('Host')->create();
         $event = factory(Party::class)->create([
                                                    'group' => $group,
                                                    'event_date' => '2130-01-01',
                                                    'start' => '12:13',
+                                                   'user_id' => $host->id
                                                ]);
 
-        $host = factory(User::class)->states('Host')->create();
         $this->actingAs($host);
 
         // Should have no group members and therefore no invitable members.
@@ -168,6 +172,21 @@ class InviteEventTest extends TestCase
 
         $response->assertSessionHas('success');
 
+        // This should generate a notification to the host.
+        Notification::assertSentTo(
+            [$host],
+            NotifyHostRSVPInvitesMade::class,
+            function ($notification, $channels, $host) use ($event) {
+                $mailData = $notification->toMail($host)->toArray();
+                self::assertEquals(__('notifications.invites_made_subject', [], $host->language), $mailData['subject']);
+
+                // Mail should mention the group name.
+                self::assertRegexp('/' . $event->venue . '/', $mailData['introLines'][0]);
+
+                return true;
+            }
+        );
+
         // Invited member should not show up as invitable.
         $response = $this->get('/party/get-group-emails-with-names/'.$event->idevents);
         $members = json_decode($response->getContent());
@@ -179,7 +198,7 @@ class InviteEventTest extends TestCase
 
         // Now accept the invitation.
         $response2 = $this->get('/party/view/'.$event->idevents);
-        $response2->assertSee('You&#039;ve been invited to join an event');
+        $response2->assertSee(__('events.pending_rsvp_message'));
         preg_match('/href="(\/party\/accept-invite.*?)"/', $response2->getContent(), $matches);
         if (count($matches) <= 0) {
             error_log("Invite failed " . $response2->getContent());
