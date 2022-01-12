@@ -4,6 +4,7 @@ namespace Tests\Feature;
 
 use App\Group;
 use App\Notifications\JoinGroup;
+use App\Notifications\NewGroupMember;
 use App\User;
 use DB;
 use Illuminate\Support\Facades\Notification;
@@ -18,6 +19,8 @@ class InviteGroupTest extends TestCase
 
         $group = factory(Group::class)->create();
         $host = factory(User::class)->states('Host')->create();
+        $group->addVolunteer($host);
+        $group->makeMemberAHost($host);
         $this->actingAs($host);
 
         // Invite a user.
@@ -59,8 +62,8 @@ class InviteGroupTest extends TestCase
         ]);
 
         $initialGroup = json_decode($props[0][':initial-group'], true);
-        $this->assertEquals(0, $initialGroup['all_hosts_count']);
-        $this->assertEquals(0, $initialGroup['all_confirmed_hosts_count']);
+        $this->assertEquals(1, $initialGroup['all_hosts_count']);
+        $this->assertEquals(1, $initialGroup['all_confirmed_hosts_count']);
         $this->assertEquals(1, $initialGroup['all_restarters_count']);
         $this->assertEquals(0, $initialGroup['all_confirmed_restarters_count']);
 
@@ -73,7 +76,18 @@ class InviteGroupTest extends TestCase
         $this->assertNotFalse(strpos($redirectTo, '/group/view/'.$group->idgroups));
         $response->assertSessionHas('success');
 
-
+        // Acceptance should notify the host.
+        Notification::assertSentTo(
+            [$host],
+            NewGroupMember::class,
+            function ($notification, $channels, $host) use ($group, $user) {
+                $mailData = $notification->toMail($host)->toArray();
+                self::assertEquals(__('notifications.new_member_subject', [
+                    'name' => $group->name
+                ], $host->language), $mailData['subject']);
+                return true;
+            }
+        );
 
         // Check the counts have changed.
         $response = $this->get('/group/view/'.$group->idgroups);
@@ -84,8 +98,8 @@ class InviteGroupTest extends TestCase
         ]);
 
         $initialGroup = json_decode($props[0][':initial-group'], true);
-        $this->assertEquals(0, $initialGroup['all_hosts_count']);
-        $this->assertEquals(0, $initialGroup['all_confirmed_hosts_count']);
+        $this->assertEquals(1, $initialGroup['all_hosts_count']);
+        $this->assertEquals(1, $initialGroup['all_confirmed_hosts_count']);
         $this->assertEquals(1, $initialGroup['all_restarters_count']);
         $this->assertEquals(1, $initialGroup['all_confirmed_restarters_count']);
     }

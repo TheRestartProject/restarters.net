@@ -50,4 +50,9 @@ return [
     'join_group_ignore' => 'If you think this invitation was not intended for you, please disregard this email.',
     'join_group_attached' => ':name attached this message with the invite:',
     'join_group_more' => 'You can find out more about restarters.net <a href=":more">here</a>.',
+
+    'new_member_subject' => 'New group member followed :name',
+    'new_member_title' => 'A new volunteer, :name, has followed ',
+    'new_member_line1' => 'A new volunteer, :user, has followed your group \':group\'.',
+    'new_member_action' => 'Go to group'
 ];

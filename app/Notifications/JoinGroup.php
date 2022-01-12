@@ -44,29 +44,30 @@ class JoinGroup extends Notification implements ShouldQueue
      */
     public function toMail($notifiable)
     {
+        $locale = $notifiable->language;
         $subject = __('notifications.join_group_title', [
             'name' => $this->arr['name'],
             'group' => $this->arr['group']
-        ]);
+        ], $locale);
         $introLine = __('notifications.join_group_intro', [
             'name' => $this->arr['name'],
             'group' => $this->arr['group']
-        ]);
-        $actionText = __('notifications.join_group_action');
-        $ignoreLine = __('notifications.join_group_ignore');
+        ], $locale);
+        $actionText = __('notifications.join_group_action', [], $locale);
+        $ignoreLine = __('notifications.join_group_ignore', [], $locale);
 
         if (! is_null($this->user)) { // user is already on the platform
             if ($this->user->invites == 1) { // user has opted in to receive emails
                 $mail = (new MailMessage)
                       ->subject($subject)
-                      ->greeting(__('notifications.greeting', [], $notifiable->language))
+                      ->greeting(__('notifications.greeting', [], $locale))
                       ->line($introLine)
                       ->line('');
 
                 if (! is_null($this->arr['message'])) { // host has added a message
                     $mail->line(__('notifications.join_group_attached', [
                         'name' => $this->arr['name']
-                    ]))
+                    ], $locale))
                          ->line('')
                          ->line('"'.$this->arr['message'].'"')
                          ->line('');
@@ -82,14 +83,14 @@ class JoinGroup extends Notification implements ShouldQueue
         } else { // users not yet on the platform
             $mail = (new MailMessage)
                     ->subject($subject)
-                    ->greeting(__('notifications.greeting', [], $notifiable->language))
+                    ->greeting(__('notifications.greeting', [], $locale))
                     ->line($introLine)
                     ->line('');
 
             if (! is_null($this->arr['message'])) { // host has added a message
                 $mail->line(__('notifications.join_group_attached', [
                     'name' => $this->arr['name']
-                ]))
+                ], $locale))
                      ->line('')
                      ->line('"'.$this->arr['message'].'"')
                      ->line('');
@@ -98,7 +99,7 @@ class JoinGroup extends Notification implements ShouldQueue
             $mail->action($actionText, $this->arr['url'])
                   ->line(__('notifications.join_group_more', [
                       'more' => env('APP_URL').'/about'
-            ]));
+            ], $locale));
 
             $mail->line('');
             $mail->line($ignoreLine);
