@@ -70,6 +70,11 @@ return [
     'new_event_subject' => 'New event for :name',
     'new_event_title' => 'A new event has been created for group :name:',
     'new_event_line1' => 'There has been a new event added to your group: \':name\'.',
-    'new_event_action' => 'View event'
+    'new_event_action' => 'View event',
+
+    'password_reset_subject' => 'Reset password',
+    'password_reset_line1' => 'You are receiving this email because we received a password reset request for your account.',
+    'password_reset_action' => 'Reset password',
+    'password_reset_noaction' => 'If you did not request a password reset, no further action is required.',
 
 ];

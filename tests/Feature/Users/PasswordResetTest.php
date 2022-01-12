@@ -41,7 +41,13 @@ class PasswordResetTest extends TestCase
         $response->assertSeeText(__('passwords.sent'));
 
         Notification::assertSentTo(
-            [$restarter], ResetPassword::class
+            [$restarter],
+            ResetPassword::class,
+            function ($notification, $channels, $user) {
+                $mailData = $notification->toMail($user)->toArray();
+                self::assertEquals(__('notifications.password_reset_subject', [], $user->language), $mailData['subject']);
+                return true;
+            }
         );
 
         $restarter->refresh();
