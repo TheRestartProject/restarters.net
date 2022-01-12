@@ -128,7 +128,7 @@
               <img class="landing-icon" src="{{ asset('/images/landing/icon-book.svg') }}" /> {{ __('landing.campaign_barriers') }}
             </p>
             <p>
-              <span class="landing-icon">@include('svgs/navigation/workbench-icon')</span> {{ __('landing.campaign_data') }}
+              <img class="landing-icon" src="{{ asset('/images/landing/icon-microscope.svg') }}" /> {{ __('landing.campaign_data') }}
             </p>
             <div class="d-flex justify-content-around justify-content-md-start">
               <a href="/user/register" class="btn btn-primary">{{ __('landing.campaign_start') }}</a>
@@ -173,7 +173,7 @@
                 <img class="landing-icon" src="{{ asset('/images/landing/icon-drill.svg') }}" /> {{ __('landing.network_record') }}
               </p>
               <p>
-                <span class="landing-icon">@include('svgs/navigation/workbench-icon')</span> {{ __('landing.network_impact') }}
+                <img class="landing-icon" src="{{ asset('/images/landing/icon-microscope.svg') }}" /> {{ __('landing.network_impact') }}
               </p>
               <p>
                 <img class="landing-icon" src="{{ asset('/images/landing/icon-group.svg') }}" /> {{ __('landing.network_brand') }}

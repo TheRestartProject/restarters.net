@@ -3,7 +3,7 @@ const faker = require('faker')
 
 const login = async function(page, baseURL, email = 'jane@bloggs.net', password = 'passw0rd') {
   // Load the login page.
-  await page.goto(baseURL)
+  await page.goto(baseURL + '/login')
   await expect(page.locator('legend')).toHaveText('Sign in')
 
   await page.waitForSelector('#fp_email')
