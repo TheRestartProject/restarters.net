@@ -790,7 +790,12 @@ class GroupController extends Controller
                 $userlng = Auth::user()->longitude;
 
                 if ($grouplat !== null && $grouplng !== null && $userlat !== null && $userlng !== null) {
-                    $distance = 6371 * acos( cos(deg2rad($userlat)) * cos(deg2rad($grouplat)) * cos(deg2rad($grouplng) - deg2rad($userlng)) + sin(deg2rad($userlat) ) * sin(deg2rad($grouplat)));
+                    if ($grouplat == $userlat && $grouplng == $userlng) {
+                        $distance = 0;
+                    } else {
+                        $distance = 6371 * acos( cos(deg2rad($userlat)) * cos(deg2rad($grouplat)) * cos(deg2rad($grouplng) -
+                                                                                                        deg2rad($userlng)) + sin(deg2rad($userlat) ) * sin(deg2rad($grouplat)));
+                    }
                 }
 
                 $ret[] = [
