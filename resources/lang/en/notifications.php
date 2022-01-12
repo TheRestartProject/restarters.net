@@ -54,5 +54,10 @@ return [
     'new_member_subject' => 'New group member followed :name',
     'new_member_title' => 'A new volunteer, :name, has followed ',
     'new_member_line1' => 'A new volunteer, :user, has followed your group \':group\'.',
-    'new_member_action' => 'Go to group'
+    'new_member_action' => 'Go to group',
+
+    'new_group_subject' => 'There\'s a new repair group near to you',
+    'new_group_title' => 'A new repair group near you:',
+    'new_group_line1' => 'A new group near to you, :name, has just become active on Restarters.net.',
+    'new_group_action' => 'Find out more about :name',
 ];
