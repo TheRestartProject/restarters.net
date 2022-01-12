@@ -67,4 +67,9 @@ return [
     'invites_made_line1' => 'There have been invites sent out to your event: \':name\'. URL for reference: \':url\'.',
     'invites_made_line2' => 'If you think this email was not intended for you, please discard.',
 
+    'new_event_subject' => 'New event for :name',
+    'new_event_title' => 'A new event has been created for group :name:',
+    'new_event_line1' => 'There has been a new event added to your group: \':name\'.',
+    'new_event_action' => 'View event'
+
 ];
