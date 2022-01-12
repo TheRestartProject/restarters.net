@@ -178,25 +178,25 @@ class InviteEventTest extends TestCase
         $this->actingAs($user);
 
         // Now accept the invitation.
-        $response = $this->get('/party/view/'.$event->idevents);
-        $response->assertSee('You&#039;ve been invited to join an event');
-        preg_match('/href="(\/party\/accept-invite.*?)"/', $response->getContent(), $matches);
+        $response2 = $this->get('/party/view/'.$event->idevents);
+        $response2->assertSee('You&#039;ve been invited to join an event');
+        preg_match('/href="(\/party\/accept-invite.*?)"/', $response2->getContent(), $matches);
         if (count($matches) <= 0) {
-            error_log("Invite failed " . $response->getContent());
+            error_log("Invite failed " . $response2->getContent());
         }
         $this->assertGreaterThan(0, count($matches));
         $invitation = $matches[1];
 
-        $response = $this->get($invitation);
-        $this->assertTrue($response->isRedirection());
-        $redirectTo = $response->getTargetUrl();
+        $response3 = $this->get($invitation);
+        $this->assertTrue($response3->isRedirection());
+        $redirectTo = $response3->getTargetUrl();
         $this->assertNotFalse(strpos($redirectTo, '/party/view/'.$event->idevents));
 
         // Now a group member and confirmed so should not show as invitable.
         $this->get('/logout');
         $this->actingAs($host);
-        $response = $this->get('/party/get-group-emails-with-names/'.$event->idevents);
-        $members = json_decode($response->getContent());
+        $response4 = $this->get('/party/get-group-emails-with-names/'.$event->idevents);
+        $members = json_decode($response4->getContent());
         $this->assertEquals([], $members);
     }
 }
