@@ -2,13 +2,8 @@
 
 namespace Tests\Feature;
 
-use App\EventsUsers;
 use App\Group;
-use App\Helpers\Geocoder;
-use App\Network;
-use App\Notifications\AdminModerationEvent;
-use App\Notifications\NotifyRestartersOfNewEvent;
-use App\Party;
+use App\Notifications\JoinGroup;
 use App\User;
 use DB;
 use Illuminate\Support\Facades\Notification;
@@ -17,6 +12,8 @@ use Tests\TestCase;
 class VolunteersNearbyTest extends TestCase
 {
     public function testBasic() {
+        Notification::fake();
+
         // Create a group.
         $groupAttributes = factory(Group::class)->raw();
         $groupAttributes['name'] = 'Lancaster Fixers';
@@ -50,10 +47,18 @@ class VolunteersNearbyTest extends TestCase
         $host = factory(User::class)->states('Host')->create();
         $this->actingAs($host);
 
-        // Should see these users in the list of nearby.
+        // Should see the appropriate users in the list of nearby.
         $rsp = $this->get('/group/nearby/' . $group->idgroups);
         $rsp->assertSee($user1->name);
         $rsp->assertSee($user2->name);
         $rsp->assertDontSee($user3->name);
+
+        // Invite one of them.
+        $rsp = $this->get('/group/nearbyinvite/' . $group->idgroups . '/' . $user1->id);
+
+        Notification::assertSentTo(
+            $user1,
+            JoinGroup::class
+        );
     }
 }
