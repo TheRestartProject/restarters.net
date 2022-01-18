@@ -38,7 +38,7 @@ class ExportTest extends TestCase
         $group2->makeMemberAHost($host);
 
         // Create an event on each and approve it.
-        $idevents1 = $this->createEvent($group1->idgroups, '2000-01-01');
+        $idevents1 = $this->createEvent($group1->idgroups, '2000-01-02');
         $event1 = Party::find($idevents1);
         $event1->wordpress_post_id = 100;
         $event1->save();
