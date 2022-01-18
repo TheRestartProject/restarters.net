@@ -22,19 +22,23 @@ class ExportTest extends TestCase
         $this->actingAs($host);
 
         // Create two groups.
-        $group1 = factory(Group::class)->create();
+        $group1 = factory(Group::class)->create([
+            'name' => 'test1'
+                                                ]);
         $this->networkService = new RepairNetworkService();
         $this->networkService->addGroupToNetwork($host, $group1, $network);
         $group1->addVolunteer($host);
         $group1->makeMemberAHost($host);
 
-        $group2 = factory(Group::class)->create();
+        $group2 = factory(Group::class)->create([
+                                                    'name' => 'test2'
+                                                ]);
         $this->networkService->addGroupToNetwork($host, $group2, $network);
         $group2->addVolunteer($host);
         $group2->makeMemberAHost($host);
 
         // Create an event on each and approve it.
-        $idevents1 = $this->createEvent($group1->idgroups, '2000-01-01');
+        $idevents1 = $this->createEvent($group1->idgroups, '2000-01-02');
         $event1 = Party::find($idevents1);
         $event1->wordpress_post_id = 100;
         $event1->save();

@@ -290,9 +290,9 @@ class GroupController extends Controller
             return abort(404, 'Invalid group.');
         }
 
-        $allPastEvents = Party::pastEvents()
+        $allPastEvents = Party::past()
             ->with('devices.deviceCategory')
-            ->where('events.group', $group->idgroups)
+            ->forGroup($group->idgroups)
             ->get();
 
         $Device->ofThisGroup($group->idgroups);
@@ -335,12 +335,12 @@ class GroupController extends Controller
         }
 
         //Event tabs
-        $upcoming_events = Party::upcomingEvents()
-            ->where('events.group', $group->idgroups)
+        $upcoming_events = Party::future()
+            ->forGroup($group->idgroups)
             ->get();
 
-        $past_events = Party::pastEvents()
-            ->where('events.group', $group->idgroups)
+        $past_events = Party::past()
+            ->forGroup($group->idgroups)
             ->get();
 
         //Checking user for validatity
@@ -916,13 +916,16 @@ class GroupController extends Controller
         }
     }
 
-    // TODO: is this alive?  Not completely clear, but it is referenced from a route.
+    // TODO: This is not currently used, so far as I can tell, even though it's referenced from a route.  But
+    // something like this ought to exist, for when we Vue-ify the group edit page.
     public function imageUpload(Request $request, $id)
     {
         try {
             if (isset($_FILES) && ! empty($_FILES)) {
                 $existing_image = Fixometer::hasImage($id, 'groups', true);
                 if (! empty($existing_image)) {
+                    // TODO This can't work.  But it's hard to test given that we use raw file uploads
+                    // rather than the Laravel mechanism.
                     $Group->removeImage($id, $existing_image[0]);
                 }
                 $file = new FixometerFile;
@@ -1073,9 +1076,9 @@ class GroupController extends Controller
             $restarters_nearby = null;
         }
 
-        $allPastEvents = Party::pastEvents()
+        $allPastEvents = Party::past()
             ->with('devices.deviceCategory')
-            ->where('events.group', $group->idgroups)
+            ->forGroup($group->idgroups)
             ->get();
 
         $clusters = [];
@@ -1108,13 +1111,13 @@ class GroupController extends Controller
         }
 
         //Event tabs
-        $upcoming_events = Party::upcomingEvents()
-            ->where('events.group', $group->idgroups)
+        $upcoming_events = Party::futureForUser()
+            ->forGroup($group->idgroups)
             ->take(5)
             ->get();
 
-        $past_events = Party::pastEvents()
-            ->where('events.group', $group->idgroups)
+        $past_events = Party::past()
+            ->forGroup($group->idgroups)
             ->take(5)
             ->get();
 

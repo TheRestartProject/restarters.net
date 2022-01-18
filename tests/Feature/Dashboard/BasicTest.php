@@ -88,7 +88,7 @@ class BasicTest extends TestCase
                                                    'location' => 'London'
                                                ]);
 
-        // Join the group as a host.
+        // Join the group - as a Restarter.
         $this->actingAs($host);
         $this->get('/group/join/' . $this->idgroups);
 

@@ -30,6 +30,11 @@ class GroupStatsTest extends StatsTestCase
         $expect['parties'] = 1;
         $expect['hours_volunteered'] = 21;
         $this->assertEquals($expect, $group->getGroupStats());
+
+        // Get the stats via the web page.
+        $rsp = $this->get('/group/stats/' . $group->idgroups);
+        $rsp->assertSee('<h5>hours volunteered</h5>');
+        $rsp->assertSee('<span class="largetext">21</span>');
     }
 
     /** @test */

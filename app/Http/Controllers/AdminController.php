@@ -27,7 +27,7 @@ class AdminController extends Controller
     {
         $Device = new Device;
 
-        $allparties = Party::pastEvents()
+        $allparties = Party::past()
             ->with('devices.deviceCategory')
             ->get();
 
