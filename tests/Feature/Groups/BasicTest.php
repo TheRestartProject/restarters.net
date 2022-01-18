@@ -20,8 +20,6 @@ class BasicTest extends TestCase
             [
                 // Can't assert on all-group-tags dev systems might have varying info.
                 ':all-groups' => '[]',
-                ':your-groups' => '[]',
-                ':nearby-groups' => '[]',
                 'your-area' => 'London',
                 ':can-create' => 'false',
                 ':user-id' => '1',

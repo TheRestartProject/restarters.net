@@ -220,6 +220,7 @@ class DiscourseService
         foreach ($restartIds as $restartId) {
             $group = Group::find($restartId);
             $discourseName = $group->discourse_group;
+
             $response = $client->request('GET', "/g/$discourseName.json");
 
             if ($response->getStatusCode() == 200)
@@ -229,31 +230,75 @@ class DiscourseService
                 $discourseId = $discourseResult['group']['id'];
                 Log::debug("Sync members for Restarters group $restartId, {$group->discourse_group}, Discourse group $discourseId");
 
-                // Check if the flair_url needs updating.  This keeps the logo in sync with changes on Restarters.
-                Log::debug("Check flair url {$discourseResult['group']['flair_url']} vs {$group->groupImagePath()}");
+                if ($group->groupimage && $group->groupimage->idimages) {
+                    // Check if the flair_url needs updating.  This keeps the logo in sync with changes on Restarters.
+                    Log::debug("Check Discourse logo {$group->discourse_logo} vs {$group->groupimage->idimages}");
+                    if (!$group->discourse_logo || $group->discourse_logo != $group->groupimage->image->idimages) {
+                        // We need to update it.  To do that, we first have to upload the image file to Discourse.
+                        Log::debug("Need to update flair_url with ". $group->groupImagePath());
 
-                if ($group->groupImagePath() && $discourseResult['group']['flair_url'] != $group->groupImagePath()) {
-                    // We need to update it.  To do that, we first have to upload it to Discourse.
-                    Log::debug("Need to update flair_url");
+                        // Upload an image.  We need the MIME type of the file.
+                        $fh = fopen(public_path('uploads/mid_' . $group->groupImage->image->path),'r');
 
-                    // TODO Can't get upload to work.
+                        $data = [
+                            [
+                                'name' => 'upload_type',
+                                'contents' => 'group_flair'
+                            ],
+                            [
+                                'name' => 'type',
+                                'contents' => mime_content_type($fh)
+                            ],
+                            [
+                                'name' => 'sha1_checksum',
+                                'contents' => sha1_file($group->groupImagePath())
+                            ],
+                            [
+                                'name' => 'file',
+                                'contents' => file_get_contents($group->groupImagePath()),
+                                'filename' => 'GroupLogo' . $idgroups
+                            ]
+                        ];
 
-                    // Now we can update the group to use it.
-//                    $response = $client->request('PUT', "/g/$discourseId.json", [
-//                        'form_params' => [
-//                            'group' => [
-//                                'flair_url' => $group->groupImagePath()
-//                            ]
-//                        ]
-//                    ]);
-//
-//                    Log::debug("Response from flair_url update " . $response->getBody());
-//
-//                    if ($response->getStatusCode() != 200)
-//                    {
-//                        Log::error("Failed to update flair url for {$discourseId}");
-//                        throw new \Exception("Failed to update flair url for {$discourseId}");
-//                    }
+                        $response = $client->request('POST', '/uploads.json', [
+                            'multipart' => $data
+                        ]);
+
+                        Log::debug("Response from upload ". $response->getStatusCode() . " " . $response->getBody());
+
+                        if ($response->getStatusCode() === 200) {
+                            // Now we can update the group to use it.
+                            $rsp = json_decode($response->getBody(), TRUE);
+
+                            if ($rsp && array_key_exists('id', $rsp)) {
+                                $uploadId = $rsp['id'];
+                                $response = $client->request('PUT', "/g/$discourseId.json", [
+                                    'form_params' => [
+                                        'group' => [
+                                            'flair_upload_id' => $uploadId
+                                        ]
+                                    ]
+                                ]);
+
+                                Log::debug("Response from flair_url update " . $response->getBody());
+
+                                if ($response->getStatusCode() === 200) {
+                                    // Update the group to record that we've uploaded, then we'll skip this next time
+                                    // through.
+                                    Log::debug("Updated flair url OK for {$discourseId} to {$group->groupimage->idimages}");
+                                    $group->discourse_logo = $group->groupimage->image->idimages;
+                                    $group->save();
+                                    Log::debug("...saved update to group");
+                                } else {
+                                    Log::error("Failed to update flair url");
+                                    throw new \Exception("Failed to update flair url for {$discourseId}");
+                                }
+                            } else {
+                                Log::error("Failed to upload group logo for {$discourseId}");
+                                throw new \Exception("Failed to upload group logo for {$discourseId}");
+                            }
+                        }
+                    }
                 }
 
                 // TODO The Discourse API accepts up to around 1000 as the limit.  This is plenty for now, but
