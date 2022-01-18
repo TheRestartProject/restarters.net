@@ -474,7 +474,9 @@ class Party extends Model implements Auditable
             $join->whereIn('aoa.user', $userids);
 
             // Check the status so that we exclude any events we have been invited to but not confirmed.
-            $join->where('aoa.status', 1);
+            // status is a string, so using 'like' rather than = otherwise
+            // those with an invite string starting with '1' are included.
+            $join->where('aoa.status', 'like', '1');
         })->select('events.*');
 
         return $query;
