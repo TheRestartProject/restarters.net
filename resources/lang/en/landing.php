@@ -2,11 +2,9 @@
 
 return [
     'title' => 'Welcome to Restarters!',
-    'intro1' => 'We are a global network of people who help',
-    'intro2' => 'others repair at community events.',
+    'intro' => 'We are a global network of people who help others repair at community events.',
     'join' => 'Join us',
     'login' => 'Log in',
-    'platform' => 'Restarters is a free, open source platform for the community repair movement.  Join us if you would like to...',
 
     'learn' => 'Learn and share repair skills with others',
     'repair_skills' => 'Brush up on your repair skills with our repair wiki',

@@ -8,68 +8,42 @@
       @include('includes.info')
     </div>
 
-    <div class="text-center mt-4 mt-md-0">
-      <div class="d-flex justify-content-around">
-        <div class="d-flex align-items-center">
-          <div class="mr-5 mb-2 d-none d-md-block">
-            @include('svgs/navigation/drill-icon')
-          </div>
-          <h1>{{ __('landing.title') }}</h1>
-          <div class="ml-5 mb-2 d-none d-md-block">
-            @include('svgs/navigation/wiki-icon')
-          </div>
+    <div class="landing-layout">
+      <div class="landing-top-left">
+        @include('svgs/navigation/drill-icon')
+      </div>
+      <div class="landing-top-middle">
+        <h1>{{ __('landing.title') }}</h1>
+      </div>
+      <div class="landing-top-right">
+        @include('svgs/navigation/wiki-icon')
+      </div>
+      <div class="landing-middle-left">
+        @include('svgs/navigation/groups-icon')
+      </div>
+      <div class="landing-middle-middle">
+        <div class="textlarge">
+          {{ __('landing.intro') }}
         </div>
       </div>
-      <div class="mt-2 mb-2 d-flex justify-content-around">
-        <div class="d-flex align-items-center">
-          <div class="mr-5">
-            <div class="mr-5">
-              <div class="mr-5 d-none d-md-block">
-                @include('svgs/navigation/groups-icon')
-              </div>
-            </div>
-          </div>
-          <div>
-            {{ __('landing.intro1') }}
-            <br />
-            {{ __('landing.intro2') }}
-          </div>
-          <div class="ml-5">
-            <div class="ml-5">
-              <div class="ml-5 d-none d-md-block">
-                @include('svgs/navigation/talk-icon')
-              </div>
-            </div>
-          </div>
+      <div class="landing-middle-right">
+        @include('svgs/navigation/talk-icon')
+      </div>
+      <div class="landing-bottom-left">
+        @include('svgs/navigation/events-icon')
+      </div>
+      <div class="landing-bottom-middle">
+        <div>
+          <a href="/user/register" class="btn btn-primary mr-3">{{ __('landing.join') }}</a>
+          <a href="/login" class="btn btn-primary ml-3">{{ __('landing.login') }}</a>
         </div>
       </div>
-      <div class="d-flex justify-content-around pt-3">
-        <div class="d-flex align-items-center">
-          <div class="mr-5 mb-2">
-            <div class="mr-5 d-none d-md-block" style="height: 30px">
-              @include('svgs/navigation/events-icon')
-            </div>
-          </div>
-          <div class="d-flex justify-content-around">
-            <div>
-              <a href="/user/register" class="btn btn-primary mr-3">{{ __('landing.join') }}</a>
-              <a href="/login" class="btn btn-primary ml-3">{{ __('landing.login') }}</a>
-            </div>
-          </div>
-          <div class="ml-5 mb-2">
-            <div class="ml-5 d-none d-md-block">
-              @include('svgs/navigation/workbench-icon')
-            </div>
-          </div>
-        </div>
+      <div class="landing-bottom-right">
+        @include('svgs/navigation/workbench-icon')
       </div>
     </div>
 
-    <p class="justify-content-around text-center mt-4 mb-4 small">
-      {{ __('landing.platform') }}
-    </p>
-
-    <div class="row">
+    <div class="row mt-5">
       <div class="col-12 col-md-8 offset-md-2">
         <div class="landing-section has-background-gold">
           <img src="{{ asset('/images/landing/landing1.jpg') }}" alt="Repair Skills (credit Mark Phillips)" class="d-none d-md-block" />
@@ -155,7 +129,7 @@
               <div class="d-flex flex-column justify-content-between h-100">
                 <div class="flex-grow-1">
                   <h2>{{ __('landing.network') }}</h2>
-                  <p>{{ __('landing.network_blurb') }}</p>
+                  <p class="noindent">{{ __('landing.network_blurb') }}</p>
                 </div>
                 <div class="d-none d-md-block">
                   <a href="/user/register" class="btn btn-primary">{{ __('landing.organise_start') }}</a>
@@ -188,10 +162,14 @@
           </div>
         </div>
       </div>
-
+    </div>
   </div>
 </section>
 <style>
+  .landing-page {
+      padding-top: 31px;
+  }
+
   .landing-page .row-expanded {
       width: 100%;
   }
@@ -219,9 +197,9 @@
       margin-right: 5px;
   }
 
-  .landing-page .has-background-gold {background-color: #F69B05;}
-  .landing-page .has-background-teal {background-color: #21ACA7;}
-  .landing-page .has-background-pink {background-color: lightpink;}
+  .landing-page .has-background-gold {background-color: #FFBE5F;}
+  .landing-page .has-background-teal {background-color: #4AAEBC;}
+  .landing-page .has-background-pink {background-color: #F49292;}
   .landing-page .has-background-purple {background-color: #80a4e0; }
 
   .landing-page h1, h2 {
@@ -251,6 +229,99 @@
           width: 100%;
           padding-left: 0rem;
       }
+  }
+
+  .landing-section p:not(.noindent) {
+      padding-left: 39px;
+      text-indent: -39px;
+  }
+
+  .textlarge {
+      font-size: 20px;
+  }
+
+  .landing-layout {
+      display: grid;
+      grid-template-rows: 1fr 1fr 1fr;
+      grid-template-columns: 1fr 1fr 1fr;
+      column-gap: 30px;
+      align-items: center;
+  }
+
+  @media only screen and (max-width: 767px) {
+      .landing-layout {
+          grid-template-columns: 0px 1fr 0px;
+          margin-top: 20px;
+          text-align: center;
+      }
+  }
+
+  .landing-top-left {
+      grid-row: 1 / 2;
+      grid-column: 1 / 2;
+      display: flex;
+      justify-content: end;
+  }
+
+  .landing-top-middle {
+      grid-row: 1 / 2;
+      grid-column: 2 / 3;
+  }
+
+  .landing-top-right {
+      grid-row: 1 / 2;
+      grid-column: 3 / 4;
+      display: flex;
+      justify-content: start;
+  }
+
+  .landing-middle-left {
+      grid-row: 2 / 3;
+      grid-column: 1 / 2;
+      display: flex;
+      justify-content: end;
+      padding-right: 30px;
+  }
+
+  .landing-middle-middle {
+      grid-row: 2 / 3;
+      grid-column: 2 / 3;
+  }
+
+  .landing-middle-right {
+      grid-row: 2 / 3;
+      grid-column: 3 / 4;
+      display: flex;
+      justify-content: start;
+      padding-left: 30px;
+  }
+
+  .landing-bottom-left {
+      grid-row: 3 / 4;
+      grid-column: 1 / 2;
+      display: flex;
+      justify-content: end;
+      margin-top: 10px;
+  }
+
+  .landing-bottom-middle {
+      grid-row: 3 / 4;
+      grid-column: 2 / 3;
+      display: flex;
+      justify-content: center;
+      margin-top: 10px;
+  }
+
+  .landing-bottom-right {
+      grid-row: 3 / 4;
+      grid-column: 3 / 4;
+      display: flex;
+      justify-content: start;
+      margin-top: 10px;
+  }
+
+  .landing-layout svg {
+    width: 30px;
   }
 </style>
 
