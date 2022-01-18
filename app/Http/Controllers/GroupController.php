@@ -916,13 +916,16 @@ class GroupController extends Controller
         }
     }
 
-    // TODO: is this alive?  Not completely clear, but it is referenced from a route.
+    // TODO: This is not currently used, so far as I can tell, even though it's referenced from a route.  But
+    // something like this ought to exist, for when we Vue-ify the group edit page.
     public function imageUpload(Request $request, $id)
     {
         try {
             if (isset($_FILES) && ! empty($_FILES)) {
                 $existing_image = Fixometer::hasImage($id, 'groups', true);
                 if (! empty($existing_image)) {
+                    // TODO This can't work.  But it's hard to test given that we use raw file uploads
+                    // rather than the Laravel mechanism.
                     $Group->removeImage($id, $existing_image[0]);
                 }
                 $file = new FixometerFile;

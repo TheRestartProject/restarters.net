@@ -8,7 +8,9 @@ use App\User;
 use Carbon\Carbon;
 use DB;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Http\UploadedFile;
 use Tests\TestCase;
+use Illuminate\Support\Facades\Storage;
 
 class GroupEditTest extends TestCase
 {
@@ -65,5 +67,37 @@ class GroupEditTest extends TestCase
         ]);
 
         $this->assertContains(__('groups.geocode_failed'), $response->getContent());
+    }
+
+    /** @test */
+    public function image_upload() {
+        Storage::fake('avatars');
+        $group = factory(Group::class)->create();
+
+        $host = factory(User::class)->states('Host')->create();
+        $group->addVolunteer($host);
+        $group->makeMemberAHost($host);
+
+        $this->actingAs($host);
+
+        // We don't upload files in a standard Laravel way, so testing upload is a bit of a hack.
+        $_FILES = [
+            'file' => [
+                'error'    => "0",
+                'name'     => 'avatar.jpg',
+                'size'     => 123,
+                'tmp_name' => __FILE__,   // use THIS file - a real file
+                'type'     => 'image/jpg'
+            ]
+        ];
+
+        $response = $this->json('POST', '/group/image-upload/' . $group->idgroups, []);
+        $response->assertOk();
+        $this->assertEquals('success - image uploaded', $response->getContent());
+
+        // And again, which will test the case of overwriting.
+        $response = $this->json('POST', '/group/image-upload/' . $group->idgroups, []);
+        $response->assertOk();
+        $this->assertEquals('success - image uploaded', $response->getContent());
     }
 }
