@@ -200,7 +200,7 @@ class UserController extends Controller
         $user = User::find($id);
 
         if ($request->input('new-password') !== $request->input('new-password-repeat')) {
-            return redirect()->back()->with('error', 'New Passwords do not match!');
+            return redirect()->back()->with('error', __('profile.password_new_mismatch'));
         }
 
         if ($request->input('new-password') == $request->input('new-password-repeat') && Hash::check($request->input('current-password'), $user->password)) {
@@ -215,10 +215,10 @@ class UserController extends Controller
 
             event(new PasswordChanged($user, $oldPassword));
 
-            return redirect()->back()->with('message', 'User Password Updated!');
+            return redirect()->back()->with('message', __('profile.password_changed'));
         }
 
-        return redirect()->back()->with('error', 'Current Password does not match!');
+        return redirect()->back()->with('error', __('profile.password_old_mismatch'));
     }
 
     public function postProfileRepairDirectory(Request $request)
@@ -246,7 +246,7 @@ class UserController extends Controller
 
         $user->save();
 
-        return redirect()->back()->with('message', 'User Profile Updated!');
+        return redirect()->back()->with('message', __('profile.profile_updated'));
     }
 
     public function storeLanguage(Request $request)

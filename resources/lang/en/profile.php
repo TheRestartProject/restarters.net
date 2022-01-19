@@ -43,4 +43,8 @@ return [
   'repair_dir_editor' => 'Editor',
   'repair_dir_regional_admin' => 'Regional Admin',
   'repair_dir_superadmin' => 'SuperAdmin',
+  'password_old_mismatch' => 'Current Password does not match!',
+  'password_new_mismatch' => 'New Passwords do not match!',
+  'password_changed' => 'User Password Updated!',
+  'profile_updated' => 'User Profile Updated!'
 ];

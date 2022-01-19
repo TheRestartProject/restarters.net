@@ -2,16 +2,13 @@
 
 namespace Tests\Feature;
 
-use App\Events\UserUpdated;
+use App\Role;
 use App\User;
-use Carbon\Carbon;
 use DB;
 use Illuminate\Auth\AuthenticationException;
-use Illuminate\Foundation\Testing\RefreshDatabase;
-use Illuminate\Support\Facades\Event;
-use Illuminate\Validation\UnauthorizedException;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Tests\TestCase;
+use Illuminate\Support\Facades\Hash;
 
 class ProfileTest extends TestCase
 {
@@ -126,5 +123,52 @@ class ProfileTest extends TestCase
     {
         $this->expectException(NotFoundHttpException::class);
         $this->get('/user/thumbnail?wiki_username=invalid');
+    }
+
+    public function testChangePassword() {
+        $user = factory(User::class)->states('Restarter')->create();
+        $user->setPassword(Hash::make('secret1'));
+
+        $this->actingAs($user);
+
+        $response = $this->post('/profile/edit-password', ['current-password' => 'secret', 'new-password' => 'f00', 'new-password-repeat' => 'f00']);
+        $this->assertTrue($response->isRedirection());
+        $this->assertEquals(__('profile.password_old_mismatch'), \Session::get('error'));
+
+        $response = $this->post('/profile/edit-password', ['current-password' => 'secret', 'new-password' => 'f00', 'new-password-repeat' => 'f01']);
+        $this->assertTrue($response->isRedirection());
+        $this->assertEquals(__('profile.password_new_mismatch'), \Session::get('error'));
+
+        $response = $this->post('/profile/edit-password', ['current-password' => 'secret1', 'new-password' => 'f00', 'new-password-repeat' => 'f00']);
+        $this->assertTrue($response->isRedirection());
+        $this->assertEquals(__('profile.password_changed'), \Session::get('message'));
+    }
+
+    public function testRepairDirectoryRole() {
+        $user = factory(User::class)->states('Restarter')->create();
+        $admin = factory(User::class)->states('Administrator')->create([
+            'repairdir_role' => Role::REPAIR_DIRECTORY_SUPERADMIN
+        ]);
+
+        $this->actingAs($admin);
+
+        $response = $this->post('/profile/edit-repair-directory', [
+            'id' => $user->id,
+            'role' => Role::REPAIR_DIRECTORY_EDITOR
+        ]);
+        $this->assertTrue($response->isRedirection());
+        $this->assertEquals(__('profile.profile_updated'), \Session::get('message'));
+    }
+
+    public function testLanguage() {
+        $user = factory(User::class)->states('Restarter')->create();
+        $this->actingAs($user);
+
+        $response = $this->post('/profile/edit-language', [
+            'id' => $user->id,
+            'user_language' => 'fr'
+        ]);
+        $this->assertTrue($response->isRedirection());
+        $this->assertEquals(__('profile.language_updated'), \Session::get('message'));
     }
 }
