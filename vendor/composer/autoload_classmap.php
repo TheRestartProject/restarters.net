@@ -188,7 +188,6 @@ return array(
     'App\\Notifications\\NotifyRestartersOfNewEvent' => $baseDir . '/app/Notifications/NotifyRestartersOfNewEvent.php',
     'App\\Notifications\\RSVPEvent' => $baseDir . '/app/Notifications/RSVPEvent.php',
     'App\\Notifications\\ResetPassword' => $baseDir . '/app/Notifications/ResetPassword.php',
-    'App\\Notifications\\ReviewNotes' => $baseDir . '/app/Notifications/ReviewNotes.php',
     'App\\Outbound' => $baseDir . '/app/Outbound.php',
     'App\\Party' => $baseDir . '/app/Party.php',
     'App\\Permissions' => $baseDir . '/app/Permissions.php',

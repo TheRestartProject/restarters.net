@@ -890,7 +890,6 @@ class ComposerStaticInitf57f72b7adaf50a29437647288004820
         'App\\Notifications\\NotifyRestartersOfNewEvent' => __DIR__ . '/../..' . '/app/Notifications/NotifyRestartersOfNewEvent.php',
         'App\\Notifications\\RSVPEvent' => __DIR__ . '/../..' . '/app/Notifications/RSVPEvent.php',
         'App\\Notifications\\ResetPassword' => __DIR__ . '/../..' . '/app/Notifications/ResetPassword.php',
-        'App\\Notifications\\ReviewNotes' => __DIR__ . '/../..' . '/app/Notifications/ReviewNotes.php',
         'App\\Outbound' => __DIR__ . '/../..' . '/app/Outbound.php',
         'App\\Party' => __DIR__ . '/../..' . '/app/Party.php',
         'App\\Permissions' => __DIR__ . '/../..' . '/app/Permissions.php',
