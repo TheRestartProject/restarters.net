@@ -408,7 +408,6 @@ class Party extends Model implements Auditable
         // our feet between one line of code and the next.
         $date = date('Y-m-d');
         $time = date('H:i');
-        DB::connection()->enableQueryLog();
         $query = $query->undeleted();
         $query = $query->where('event_date', '<', $date)
             ->orWhere(function($q2) use ($date, $time)  {
@@ -417,8 +416,6 @@ class Party extends Model implements Auditable
                     [ 'end', '<', $time ]
                 ]);
             });
-        $queries = DB::getQueryLog();
-        error_log(var_export($queries, TRUE));
         return $query;
     }
 
