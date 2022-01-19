@@ -132,7 +132,7 @@
                   <p class="noindent">{{ __('landing.network_blurb') }}</p>
                 </div>
                 <div class="d-none d-md-block">
-                  <a href="/user/register" class="btn btn-primary">{{ __('landing.organise_start') }}</a>
+                  <a href="https://therestartproject.org/contact/" class="btn btn-primary">{{ __('landing.network_start') }}</a>
                 </div>
               </div>
             </div>
@@ -156,7 +156,7 @@
                 <img class="landing-icon" src="{{ asset('/images/landing/icon-book.svg') }}" /> {{ __('landing.network_power') }}
               </p>
               <div class="d-flex d-md-none mt-2 justify-content-around">
-                <a href="/user/register" class="btn btn-primary">{{ __('landing.network_start') }}</a>
+                <a href="https://therestartproject.org/contact/" class="btn btn-primary">{{ __('landing.network_start') }}</a>
               </div>
             </div>
           </div>
