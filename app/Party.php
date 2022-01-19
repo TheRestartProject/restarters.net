@@ -408,14 +408,17 @@ class Party extends Model implements Auditable
         // our feet between one line of code and the next.
         $date = date('Y-m-d');
         $time = date('H:i');
+        DB::connection()->enableQueryLog();
         $query = $query->undeleted();
         $query = $query->where('event_date', '<', $date)
             ->orWhere(function($q2) use ($date, $time)  {
                 $q2->where([
-                    [ 'event_date', '=', "'$date'" ],
-                    [ 'end', '<', "'$time'" ]
+                    [ 'event_date', '=', $date ],
+                    [ 'end', '<', $time ]
                 ]);
             });
+        $queries = DB::getQueryLog();
+        error_log(var_export($queries, TRUE));
         return $query;
     }
 
@@ -424,11 +427,11 @@ class Party extends Model implements Auditable
         $date = date('Y-m-d');
         $time = date('H:i');
         $query = $query->undeleted();
-        $query = $query->whereDate('event_date', '>', "'$date'")
+        $query = $query->whereDate('event_date', '>', $date)
             ->orWhere(function($q2) use ($date, $time) {
                 $q2->where([
-                               [ 'event_date', '=', "'$date'" ],
-                               [ 'start', '>', "'$time'" ]
+                               [ 'event_date', '=', $date ],
+                               [ 'start', '>', $time ]
                            ]);
             });
         return $query;
@@ -439,9 +442,9 @@ class Party extends Model implements Auditable
         $date = date('Y-m-d');
         $time = date('H:i');
         $query = $query->undeleted();
-        $query = $query->whereDate('event_date', '=', "'$date'")
-            ->where('start', '<=', "'$time'")
-            ->where('end', '>=', "'$time'");
+        $query = $query->whereDate('event_date', '=', $date)
+            ->where('start', '<=', $time)
+            ->where('end', '>=', $time);
         return $query;
     }
 
@@ -522,9 +525,9 @@ class Party extends Model implements Auditable
         // The queries here are not desperately efficient, but we're battling Eloquent a bit.  The data size is
         // low enough it's not really an issue.
         $this->defaultUserIds($userids);
-        $hostFor = Party::future()->hostFor($userids);
-        $attending = Party::future()->attendingOrAttended($userids);
-        $memberOf = Party::future()->memberOfGroup($userids);
+        $hostFor = Party::hostFor($userids);
+        $attending = Party::attendingOrAttended($userids);
+        $memberOf = Party::memberOfGroup($userids);
 
         // In theory $query could contain something other than all().
         return $query->whereIn('idevents', $hostFor->
