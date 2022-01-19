@@ -21,7 +21,7 @@ class ApiController extends Controller
 
         $Device = new Device;
 
-        $allparties = Party::pastEvents()->get();
+        $allparties = Party::past()->get();
 
         $participants = 0;
         $hours_volunteered = 0;
