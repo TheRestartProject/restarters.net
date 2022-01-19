@@ -33,6 +33,11 @@ Route::get('/user/forbidden', function () {
 // We use the Laravel login route.
 Auth::routes();
 
+Route::group(['middleware' => 'guest'], function ()
+{
+    Route::get('/', 'HomeController@index')->name('home');
+});
+
 // We are not using Laravel's default registration methods. So we redirect /register to /user/register.
 Route::redirect('register', '/user/register');
 Route::get('/logout', 'UserController@logout');
@@ -162,9 +167,12 @@ Route::prefix('battcat')->group(function () {
     Route::get('/status', 'BattcatOraController@status');
 });
 
-Route::group(['middleware' => ['auth', 'verifyUserConsent']], function () {
+Route::group(['middleware' => ['guest']], function () {
     Route::get('/', 'HomeController@index')->name('home');
+    Route::get('/about', 'HomeController@index')->name('home');
+});
 
+Route::group(['middleware' => ['auth', 'verifyUserConsent']], function () {
     //User Controller
     Route::prefix('profile')->group(function () {
         Route::get('/', 'UserController@index')->name('profile');
