@@ -13,7 +13,6 @@ use App\EventsUsers;
 use App\Group;
 use App\Helpers\Fixometer;
 use App\Notifications\AdminAbnormalDevices;
-use App\Notifications\ReviewNotes;
 use App\Party;
 use App\User;
 use App\UserGroups;
@@ -93,19 +92,6 @@ class DeviceController extends Controller
                     $wiki = 1;
                 } else {
                     $wiki = 0;
-                }
-
-                //Send Wiki Notification to Admins
-                if (env('APP_ENV') != 'development' && env('APP_ENV') != 'local' && ($wiki == 1 && $old_wiki !== 1)) {
-                    $all_admins = User::where('role', 2)->get();
-                    $group_id = Party::find($data['event'])->group;
-
-                    $arr = [
-                        'group_url' => url('/group/view/'.$group_id),
-                        'preferences' => url('/profile/edit'),
-                    ];
-
-                    Notification::send($all_admins, new ReviewNotes($arr));
                 }
 
                 if (! isset($data['repair_more']) || empty($data['repair_more'])) { //Override
@@ -208,50 +194,6 @@ class DeviceController extends Controller
         }
 
         return redirect('/user/forbidden');
-    }
-
-    public function ajax_update($id)
-    {
-        $this->set('title', 'Edit Device');
-        if (hasRole($this->user, 'Administrator') || hasRole($this->user, 'Host')) {
-            $Categories = new Category;
-            $Device = $this->Device->findOne($id);
-
-            $this->set('title', 'Edit Device');
-            $this->set('categories', $Categories->listed());
-            $this->set('formdata', $Device);
-
-            event(new DeviceCreatedOrUpdated($Device));
-
-            return view('device.edit', [
-                'title' => 'Edit Device',
-                'categories' => $Categories->findAll(),
-                'formdata' => $Device,
-            ]);
-        }
-        header('Location: /user/forbidden');
-    }
-
-    public function ajax_update_save($id)
-    {
-        if ($_SERVER['REQUEST_METHOD'] == 'POST' && ! empty($_POST) && filter_var($id, FILTER_VALIDATE_INT)) {
-            $data = $_POST;
-            $u = $this->Device->update($data, $id);
-
-            if (! $u) {
-                $response['response_type'] = 'danger';
-                $response['message'] = 'Something went wrong. Please check the data and try again.';
-            } else {
-                $response['response_type'] = 'success';
-                $response['message'] = 'Device updated!';
-                $response['data'] = $data;
-                $response['id'] = $id;
-            }
-
-            event(new DeviceCreatedOrUpdated($this->Device));
-
-            echo json_encode($response);
-        }
     }
 
     public function ajaxCreate(Request $request)
@@ -438,27 +380,6 @@ class DeviceController extends Controller
 
             $old_wiki = Device::find($id)->wiki;
 
-            //Send Wiki Notification to Admins
-            try {
-                if ($wiki == 1 && $old_wiki !== 1) {
-                    $currentUser = Auth::user();
-
-                    $all_admins = User::where('role', 2)->get();
-                    $group_id = Party::find($event_id)->group;
-
-                    $arr = [
-                        'device_url' => url('/device/page-edit/'.$id),
-                        'current_user_name' => $currentUser->name,
-                        'group_url' => url('/group/view/'.$group_id),
-                        'preferences' => url('/profile/edit'),
-                    ];
-
-                    Notification::send($all_admins, new ReviewNotes($arr));
-                }
-            } catch (\Exception $ex) {
-                Log::error('An error occurred while sending ReviewNotes email: '.$ex->getMessage());
-            }
-
             if ($spare_parts == 3) { // Third party
                 $spare_parts = 1;
                 $parts_provider = 2;
@@ -547,27 +468,30 @@ class DeviceController extends Controller
         $user = Auth::user();
 
         $device = Device::find($id);
-        $eventId = $device->event;
-        $is_attending = EventsUsers::where('event', $device->event)->where('user', Auth::id())->first();
-        $is_attending = is_object($is_attending) && $is_attending->status == 1;
 
-        if (Fixometer::hasRole($user, 'Administrator') ||
-            Fixometer::userHasEditPartyPermission($eventId, $user->id) ||
-            $is_attending
-        ) {
-            $device->delete();
+        if ($device) {
+            $eventId = $device->event;
+            $is_attending = EventsUsers::where('event', $device->event)->where('user', Auth::id())->first();
+            $is_attending = is_object($is_attending) && $is_attending->status == 1;
 
-            if ($request->ajax()) {
-                $event = Party::find($eventId);
-                $stats = $event->getEventStats();
+            if (Fixometer::hasRole($user, 'Administrator') ||
+                Fixometer::userHasEditPartyPermission($eventId, $user->id) ||
+                $is_attending
+            ) {
+                $device->delete();
 
-                return response()->json([
-                    'success' => true,
-                    'stats' => $stats,
-                ]);
+                if ($request->ajax()) {
+                    $event = Party::find($eventId);
+                    $stats = $event->getEventStats();
+
+                    return response()->json([
+                                                'success' => true,
+                                                'stats' => $stats,
+                                            ]);
+                }
+
+                return redirect('/party/view/'.$eventId)->with('success', 'Device has been deleted!');
             }
-
-            return redirect('/party/view/'.$eventId)->with('success', 'Device has been deleted!');
         }
 
         if ($request->ajax()) {
@@ -614,10 +538,5 @@ class DeviceController extends Controller
         }
 
         return redirect()->back()->with('message', 'Sorry, but the image can\'t be deleted');
-    }
-
-    public function columnPreferences(Request $request)
-    {
-        $request->session()->put('column_preferences', $request->input('column_preferences'));
     }
 }
