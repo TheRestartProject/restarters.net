@@ -408,6 +408,7 @@ class Party extends Model implements Auditable
         // our feet between one line of code and the next.
         $date = date('Y-m-d');
         $time = date('H:i');
+        DB::connection()->enableQueryLog();
         $query = $query->undeleted();
         $query = $query->where('event_date', '<', $date)
             ->orWhere(function($q2) use ($date, $time)  {
@@ -416,6 +417,8 @@ class Party extends Model implements Auditable
                     [ 'end', '<', $time ]
                 ]);
             });
+        $queries = DB::getQueryLog();
+        error_log(var_export($queries, TRUE));
         return $query;
     }
 
@@ -522,9 +525,9 @@ class Party extends Model implements Auditable
         // The queries here are not desperately efficient, but we're battling Eloquent a bit.  The data size is
         // low enough it's not really an issue.
         $this->defaultUserIds($userids);
-        $hostFor = Party::future()->hostFor($userids);
-        $attending = Party::future()->attendingOrAttended($userids);
-        $memberOf = Party::future()->memberOfGroup($userids);
+        $hostFor = Party::hostFor($userids);
+        $attending = Party::attendingOrAttended($userids);
+        $memberOf = Party::memberOfGroup($userids);
 
         // In theory $query could contain something other than all().
         return $query->whereIn('idevents', $hostFor->
