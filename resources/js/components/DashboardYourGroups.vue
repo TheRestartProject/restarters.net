@@ -19,7 +19,7 @@
       <div class="content">
         <DashboardNoGroups v-if="!myGroups || !myGroups.length" :nearby-groups="nearbyGroups" :location="location" />
         <div v-else>
-          <a href="/group/nearby" v-if="newGroups" class="added added-xs d-block d-md-none pr-3 pt-3 pb-3 mb-2">
+          <a href="/group/nearby" v-if="newGroups && newGroups.length" class="added added-xs d-block d-md-none pr-3 pt-3 pb-3 mb-2">
             <b-img src="/images/arrow-right-doodle-white.svg" />
             {{ translatedNewlyAdded }}
           </a>

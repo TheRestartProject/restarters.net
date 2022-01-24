@@ -96,27 +96,27 @@ class InviteEventTest extends TestCase
         $this->assertTrue($response->isRedirection());
 
         // We should see that we have been invited.
-        $response = $this->get('/party/view/'.$event->idevents);
-        $response->assertSee(__('events.pending_rsvp_message'));
-        preg_match('/href="(\/party\/accept-invite.*?)"/', $response->getContent(), $matches);
+        $response2 = $this->get('/party/view/'.$event->idevents);
+        $response2->assertSee(__('events.pending_rsvp_message'));
+        preg_match('/href="(\/party\/accept-invite.*?)"/', $response2->getContent(), $matches);
         $this->assertGreaterThan(0, count($matches));
         $invitation = $matches[1];
 
         // ...should show up in the list of events with an invitation as we have not yet accepted.
-        $response = $this->get('/party');
-        $events = $this->getVueProperties($response)[0][':initial-events'];
+        $response3 = $this->get('/party');
+        $events = $this->getVueProperties($response3)[0][':initial-events'];
         $this->assertNotFalse(strpos($events, '"attending":false'));
         $this->assertNotFalse(strpos($events, '"invitation"'));
 
         // Now accept the invitation.
-        $response = $this->get($invitation);
-        $this->assertTrue($response->isRedirection());
-        $redirectTo = $response->getTargetUrl();
+        $response4 = $this->get($invitation);
+        $this->assertTrue($response4->isRedirection());
+        $redirectTo = $response4->getTargetUrl();
         $this->assertNotFalse(strpos($redirectTo, '/party/view/'.$event->idevents));
 
         // Now should show.
-        $response = $this->get('/party');
-        $events = $this->getVueProperties($response)[0][':initial-events'];
+        $response5 = $this->get('/party');
+        $events = $this->getVueProperties($response5)[0][':initial-events'];
         $this->assertNotFalse(strpos($events, '"attending":true'));
     }
 
@@ -143,34 +143,34 @@ class InviteEventTest extends TestCase
         $user = factory(User::class)->states('Restarter')->create();
         $this->get('/logout');
         $this->actingAs($user);
-        $response = $this->get('/group/join/'.$group->idgroups);
-        $this->assertTrue($response->isRedirection());
+        $response2 = $this->get('/group/join/'.$group->idgroups);
+        $this->assertTrue($response2->isRedirection());
 
         // Shouldn't show up as invitable when we are logged in.
-        $response = $this->get('/party/get-group-emails-with-names/'.$event->idevents);
-        $members = json_decode($response->getContent());
+        $response3 = $this->get('/party/get-group-emails-with-names/'.$event->idevents);
+        $members = json_decode($response3->getContent());
         $this->assertEquals([], $members);
 
         // Now should show as invitable to the event.
         $this->get('/logout');
         $this->actingAs($host);
-        $response = $this->get('/party/get-group-emails-with-names/'.$event->idevents);
-        $members = json_decode($response->getContent());
+        $response4 = $this->get('/party/get-group-emails-with-names/'.$event->idevents);
+        $members = json_decode($response4->getContent());
         $this->assertEquals(1, count($members));
 
         // Invite the user to the event.
-        $response = $this->post('/party/invite', [
+        $response5 = $this->post('/party/invite', [
             'group_name' => $group->name,
             'event_id' => $event->idevents,
             'manual_invite_box' => $user->email,
             'message_to_restarters' => 'Join us, but not in a creepy zombie way',
         ]);
 
-        $response->assertSessionHas('success');
+        $response5->assertSessionHas('success');
 
         // Invited member should not show up as invitable.
-        $response = $this->get('/party/get-group-emails-with-names/'.$event->idevents);
-        $members = json_decode($response->getContent());
+        $response6 = $this->get('/party/get-group-emails-with-names/'.$event->idevents);
+        $members = json_decode($response6->getContent());
         $this->assertEquals([], $members);
 
         // As the user...
@@ -178,25 +178,25 @@ class InviteEventTest extends TestCase
         $this->actingAs($user);
 
         // Now accept the invitation.
-        $response = $this->get('/party/view/'.$event->idevents);
-        $response->assertSee('You&#039;ve been invited to join an event');
-        preg_match('/href="(\/party\/accept-invite.*?)"/', $response->getContent(), $matches);
-        if (!count($matches)) {
-            error_log($response->getContent());
+        $response7 = $this->get('/party/view/'.$event->idevents);
+        $response7->assertSee('You&#039;ve been invited to join an event');
+        preg_match('/href="(\/party\/accept-invite.*?)"/', $response7->getContent(), $matches);
+        if (count($matches) <= 0) {
+            error_log("Invite failed " . $response7->getContent());
         }
         $this->assertGreaterThan(0, count($matches));
         $invitation = $matches[1];
 
-        $response = $this->get($invitation);
-        $this->assertTrue($response->isRedirection());
-        $redirectTo = $response->getTargetUrl();
+        $response8 = $this->get($invitation);
+        $this->assertTrue($response8->isRedirection());
+        $redirectTo = $response8->getTargetUrl();
         $this->assertNotFalse(strpos($redirectTo, '/party/view/'.$event->idevents));
 
         // Now a group member and confirmed so should not show as invitable.
         $this->get('/logout');
         $this->actingAs($host);
-        $response = $this->get('/party/get-group-emails-with-names/'.$event->idevents);
-        $members = json_decode($response->getContent());
+        $response9 = $this->get('/party/get-group-emails-with-names/'.$event->idevents);
+        $members = json_decode($response9->getContent());
         $this->assertEquals([], $members);
     }
 }

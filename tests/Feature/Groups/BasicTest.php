@@ -2,6 +2,8 @@
 
 namespace Tests\Feature\Groups;
 
+use App\Group;
+use App\User;
 use DB;
 use Hash;
 use Mockery;
@@ -13,15 +15,23 @@ class BasicTest extends TestCase
     {
         // Test the dashboard page loads.  Most of the work is done inside Vue, so a basic test is just that the
         // Vue component exists.
-        $this->loginAsTestUser();
+        $group = factory(Group::class)->create([
+                                                   'latitude' => 50.6325574,
+                                                   'longitude' => 5.5796662,
+                                                   'wordpress_post_id' => '99999',
+                                               ]);
+        $user = factory(User::class)->create([
+                                                 'latitude' => 50.6325574,
+                                                 'longitude' => 5.5796662,
+                                                 'location' => 'London'
+                                             ]);
+        $this->actingAs($user);
+
         $response = $this->get('/group');
 
-        $this->assertVueProperties($response, [
+        $props = $this->assertVueProperties($response, [
             [
                 // Can't assert on all-group-tags dev systems might have varying info.
-                ':all-groups' => '[]',
-                ':your-groups' => '[]',
-                ':nearby-groups' => '[]',
                 'your-area' => 'London',
                 ':can-create' => 'false',
                 ':user-id' => '1',
@@ -31,5 +41,9 @@ class BasicTest extends TestCase
                 ':show-tags' => 'false',
             ],
         ]);
+
+        $groups = json_decode($props[0][':all-groups'], true);
+        $this->assertEquals($group->idgroups, $groups[0]['idgroups']);
+        $this->assertEquals(0, $groups[0]['distance']);
     }
 }

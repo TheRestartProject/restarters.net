@@ -41,12 +41,7 @@ class DashboardController extends Controller
 
         $expanded_events = [];
 
-        // Look for any upcoming events for groups we have joined (not just been invited to).
-        $upcoming_events = Party::upcomingEvents()->where('users_groups.user', Auth::user()->id)
-            ->where('users_groups.status', 1)
-            ->whereNull('users_groups.deleted_at')
-            ->orderBy('event_date', 'ASC')
-            ->get();
+        $upcoming_events = Party::futureForUser()->get();
 
         foreach ($upcoming_events as $event) {
             $thisone = $event->getAttributes();

@@ -1,12 +1,12 @@
 <div class="row row-expanded" id="logostats-header">
-    <div class="col-lg-4">
+    <div class="col-md-3 offset-2 p-0">
         <header>
           <a href="/">
             @include('includes.logo')
           </a>
         </header>
     </div>
-    <div class="col-lg-8 d-none d-md-block">
+    <div class="col-md-6 d-none d-md-block p-0">
         @if (!$agent->isPhone())
         <div class="row row-compressed stats float-right text-center">
             <div class="stats__stat">
