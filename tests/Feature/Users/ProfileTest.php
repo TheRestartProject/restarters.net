@@ -171,4 +171,40 @@ class ProfileTest extends TestCase
         $this->assertTrue($response->isRedirection());
         $this->assertEquals(__('profile.language_updated'), \Session::get('message'));
     }
+
+    /**
+     * @dataProvider invitesProvider
+     */
+    public function testInvites($admin, $invites) {
+        $user = factory(User::class)->states('Restarter')->create();
+
+        $params = [];
+
+        if ($invites) {
+            $params['invites'] = $invites;
+        }
+
+        if ($admin) {
+            $this->loginAsTestUser(Role::ADMINISTRATOR);
+            $params['id'] = $user->id;
+        } else {
+            $this->actingAs($user);
+        }
+
+        $response = $this->post('/profile/edit-preferences', $params);
+        $this->assertTrue($response->isRedirection());
+        $this->assertEquals(__('profile.preferences_updated'), \Session::get('message'));
+
+        $user->refresh();
+        $this->assertEquals($invites, $user->invites);
+    }
+
+    public function invitesProvider() {
+        return [
+            [ FALSE, 0 ],
+            [ FALSE, 1 ],
+            [ TRUE, 0 ],
+            [ TRUE, 1 ],
+        ];
+    }
 }

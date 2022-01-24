@@ -317,7 +317,7 @@ class UserController extends Controller
 
         $user->save();
 
-        return redirect()->back()->with('message', 'User Preferences Updated!');
+        return redirect()->back()->with('message', Lang::get('profile.preferences_updated'));
     }
 
     public function postProfileTagsEdit(Request $request)

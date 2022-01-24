@@ -46,5 +46,6 @@ return [
   'password_old_mismatch' => 'Current Password does not match!',
   'password_new_mismatch' => 'New Passwords do not match!',
   'password_changed' => 'User Password Updated!',
-  'profile_updated' => 'User Profile Updated!'
+  'profile_updated' => 'User Profile Updated!',
+  'preferences_updated' => 'User Preferences Updated!'
 ];
