@@ -38,6 +38,7 @@ class Group extends Model implements Auditable
         'network_id',
         'external_id',
         'devices_updated_at',
+        'timezone'
     ];
 
     protected $appends = ['ShareableLink', 'approved', 'auto_approve'];
@@ -664,5 +665,37 @@ class Group extends Model implements Auditable
     	} while ($retry);
 
         return $success;
+    }
+
+    public function getTimezoneAttribute($value)
+    {
+        // We might have a timezone attribute on the group.
+        if ($value) {
+            return $value;
+        }
+
+        // See if the network(s) the group is in have a consensus timezone.
+        $timezone = null;
+
+        foreach ($this->networks as $network) {
+            if ($network->timezone) {
+                if ($timezone) {
+                    if ($timezone != $network->timezone) {
+                        // This should not occur if the networks are set up correctly.
+                        throw new \Exception("Group is in networks with conflicting timezones");
+                    }
+                } else {
+                    // First timezone found.
+                    $timezone = $network->timezone;
+                }
+            }
+        }
+
+        if (!$timezone) {
+            // This should not occur if the networks are set up correctly.
+            throw new \Exception('Group cannot resolve timezone');
+        }
+
+        return $timezone;
     }
 }

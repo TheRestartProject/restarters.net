@@ -44,6 +44,7 @@ class Party extends Model implements Auditable
         'discourse_thread',
         'devices_updated_at',
         'link',
+        'timezone'
     ];
     protected $hidden = ['created_at', 'updated_at', 'deleted_at', 'frequency', 'group', 'group', 'user_id', 'wordpress_post_id', 'cancelled', 'devices_updated_at'];
 
@@ -1062,5 +1063,16 @@ class Party extends Model implements Auditable
         }
 
         event(new ApproveEvent($this));
+    }
+
+    public function getTimezoneAttribute($value)
+    {
+        // We might have a timezone attribute on the event.
+        if ($value) {
+            return $value;
+        }
+
+        // Use the timezone from the group (which will fallback to network if required).
+        return $this->theGroup->timezone;
     }
 }
