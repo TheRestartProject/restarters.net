@@ -49,4 +49,19 @@ class UserAdminTest extends TestCase
             $response->assertDontSee('Create new user');
         }
     }
+
+    public function testSoftDelete() {
+        $user = factory(User::class)->states('Restarter')->create();
+        $this->loginAsTestUser(Role::ADMINISTRATOR);
+        $response = $this->post('/user/soft-delete', [
+            'id' => $user->id
+        ]);
+        $response->assertSessionHas('danger');
+        $this->assertTrue($response->isRedirection());
+
+        $response = $this->post('/user/soft-delete');
+        $this->assertTrue($response->isRedirection());
+        $redirectTo = $response->getTargetUrl();
+        $this->assertNotFalse(strpos($redirectTo, '/login'));
+    }
 }
