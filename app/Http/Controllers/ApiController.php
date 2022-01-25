@@ -145,7 +145,16 @@ class ApiController extends Controller
     }
 
     /**
-     * REDUNDANT???
+     * THIS METHOD HAS NOT BEEN REFACTORED FOR UNPOWERED DEVICES!!
+     * An attempt was made, see \app\Helpers\LcaStats::getWasteStatsFiltered().
+     * Deemed too time-consuming and possibly redundant.
+     * It was eventually found to be called from a Vue that rendered the search table on the Fixometer landing page.
+     * Stats produced by this method were subsequently removed from that table.
+     *
+     * Possibly called externally!
+     * See \routes\api.php.
+     *
+     * @ToDo Determine usage and refactor or deprecate (stats) as appropriate.
      *
      * List/search devices.
      *
