@@ -149,7 +149,7 @@ class Party extends Model implements Auditable
     public function createUserList($party, $users)
     {
         /* reset user list **/
-        if (! self::deleteUserList($party)) {
+        if (!self::deleteUserList($party)) {
             return false;
         }
         $sql = 'INSERT INTO `events_users`(`event`, `user`) VALUES (:party, :user)';
@@ -171,7 +171,7 @@ class Party extends Model implements Auditable
     {
         //Tested
         $sql = 'SELECT *, `e`.`venue` AS `venue`, `e`.`link` AS `link`, `e`.`location` as `location`, UNIX_TIMESTAMP( CONCAT(`e`.`event_date`, " ", `e`.`start`) ) AS `event_timestamp`
-                FROM `'.$this->table.'` AS `e`
+                FROM `' . $this->table . '` AS `e`
                 INNER JOIN `events_users` AS `eu` ON `eu`.`event` = `e`.`idevents`
                 INNER JOIN `groups` as `g` ON `e`.`group` = `g`.`idgroups`
                 LEFT JOIN (
@@ -212,7 +212,7 @@ class Party extends Model implements Auditable
 
                     UNIX_TIMESTAMP( CONCAT(`e`.`event_date`, " ", `e`.`start`) ) AS `event_timestamp`
 
-                FROM `'.$this->table.'` AS `e`
+                FROM `' . $this->table . '` AS `e`
 
                     INNER JOIN `groups` as `g` ON `e`.`group` = `g`.`idgroups`
 
@@ -267,7 +267,7 @@ class Party extends Model implements Auditable
 
                     UNIX_TIMESTAMP( CONCAT(`e`.`event_date`, " ", `e`.`start`) ) AS `event_timestamp`
 
-                FROM `'.$this->table.'` AS `e`
+                FROM `' . $this->table . '` AS `e`
 
                     INNER JOIN `groups` as `g` ON `e`.`group` = `g`.`idgroups`
 
@@ -278,7 +278,7 @@ class Party extends Model implements Auditable
                     ) AS `d` ON `d`.`event` = `e`.`idevents` ';
         //UNIX_TIMESTAMP( CONCAT(`e`.`event_date`, " ", `e`.`start`) )
         if (is_array($groups) && $groups != 'admin') {
-            $sql .= ' WHERE `e`.`group` IN ('.implode(', ', $groups).') ';
+            $sql .= ' WHERE `e`.`group` IN (' . implode(', ', $groups) . ') ';
         }
 
         if ($only_past) {
@@ -336,18 +336,18 @@ class Party extends Model implements Auditable
                     `e`.`end`,
                     `e`.`latitude`,
                     `e`.`longitude`
-                FROM `'.$this->table.'` AS `e`
+                FROM `' . $this->table . '` AS `e`
 
                 WHERE TIMESTAMP(`e`.`event_date`, `e`.`start`) >= NOW() '; // added one day to make sure it only gets moved to the past the next day
 
-        if (! is_null($group)) {
+        if (!is_null($group)) {
             $sql .= ' AND `e`.`group` = :group ';
         }
 
         $sql .= ' ORDER BY `e`.`event_date` ASC
                 LIMIT 10';
 
-        if (! is_null($group)) {
+        if (!is_null($group)) {
             try {
                 return DB::select(DB::raw($sql), ['group' => $group]);
             } catch (\Illuminate\Database\QueryException $e) {
@@ -374,25 +374,27 @@ class Party extends Model implements Auditable
                     `e`.`end`,
                     `e`.`latitude`,
                     `e`.`longitude`
-                FROM `'.$this->table.'` AS `e`
+                FROM `' . $this->table . '` AS `e`
                 ORDER BY `e`.`event_date` DESC
                 LIMIT :limit'), ['limit' => $limit]);
     }
 
     public function attendees()
     {
-        return DB::select(DB::raw('SELECT SUM(pax) AS pax FROM '.$this->table));
+        return DB::select(DB::raw('SELECT SUM(pax) AS pax FROM ' . $this->table));
     }
 
     // Scopes.  Each scope should build on a previous scope, getting more specific as we go down this file.  That
     // isolates query logic more clearly.
-    private function defaultUserIds(&$userids) {
+    private function defaultUserIds(&$userids)
+    {
         if (!$userids) {
-            $userids = [ Auth::user()->id ];
+            $userids = [Auth::user()->id];
         }
     }
 
-    public function scopeUndeleted($query) {
+    public function scopeUndeleted($query)
+    {
         // This is the base scope.  Almost always we are only interested in seeing events which have not been
         // deleted.
         return $query->whereNull('events.deleted_at')
@@ -401,7 +403,8 @@ class Party extends Model implements Auditable
             ->orderBy('end', 'DESC');
     }
 
-    public function scopePast($query) {
+    public function scopePast($query)
+    {
         // A past event is an event where the end time is less than now.
         //
         // We want to use local variables when formatted times to avoid windows where the date/time changes under
@@ -410,31 +413,33 @@ class Party extends Model implements Auditable
         $time = date('H:i');
         $query = $query->undeleted();
         $query = $query->where('event_date', '<', $date)
-            ->orWhere(function($q2) use ($date, $time)  {
+            ->orWhere(function ($q2) use ($date, $time) {
                 $q2->where([
-                    [ 'event_date', '=', $date ],
-                    [ 'end', '<', $time ]
+                    ['event_date', '=', $date],
+                    ['end', '<', $time]
                 ]);
             });
         return $query;
     }
 
-    public function scopeFuture($query) {
+    public function scopeFuture($query)
+    {
         // A future event is an event where the start time is greater than to now.
         $date = date('Y-m-d');
         $time = date('H:i');
         $query = $query->undeleted();
         $query = $query->whereDate('event_date', '>', $date)
-            ->orWhere(function($q2) use ($date, $time) {
+            ->orWhere(function ($q2) use ($date, $time) {
                 $q2->where([
-                               [ 'event_date', '=', $date ],
-                               [ 'start', '>', $time ]
-                           ]);
+                    ['event_date', '=', $date],
+                    ['start', '>', $time]
+                ]);
             });
         return $query;
     }
 
-    public function scopeActive($query) {
+    public function scopeActive($query)
+    {
         // An active event is an event which has started and not yet finished.
         $date = date('Y-m-d');
         $time = date('H:i');
@@ -445,14 +450,16 @@ class Party extends Model implements Auditable
         return $query;
     }
 
-    public function scopeApproved($query) {
+    public function scopeApproved($query)
+    {
         // wordpress_post_id indicates event approval.
         $query = $query->undeleted();
         $query = $query->whereNotNull('wordpress_post_id');
         return $query;
     }
 
-    public function scopeHostFor($query, $userids = null) {
+    public function scopeHostFor($query, $userids = null)
+    {
         // Events where this user is a host.
         $this->defaultUserIds($userids);
         $query = $query->undeleted();
@@ -465,7 +472,8 @@ class Party extends Model implements Auditable
         return $query;
     }
 
-    public function scopeAttendingOrAttended($query, $userids = null) {
+    public function scopeAttendingOrAttended($query, $userids = null)
+    {
         // Events this user has attending/is attending.
         $this->defaultUserIds($userids);
         $query = $query->undeleted();
@@ -482,7 +490,8 @@ class Party extends Model implements Auditable
         return $query;
     }
 
-    public function scopeInvitedNotConfirmed($query, $userids = null) {
+    public function scopeInvitedNotConfirmed($query, $userids = null)
+    {
         // Events this user has been invited to but not confirmed.  Only interested in future events.
         $this->defaultUserIds($userids);
         $query = $query->future();
@@ -495,7 +504,8 @@ class Party extends Model implements Auditable
         return $query;
     }
 
-    public function scopeMemberOfGroup($query, $userids = null) {
+    public function scopeMemberOfGroup($query, $userids = null)
+    {
         // Any approved events for groups that this user has joined (not just been invited to) and not left.
         $this->defaultUserIds($userids);
         $query = $query->approved();
@@ -507,13 +517,15 @@ class Party extends Model implements Auditable
         return $query;
     }
 
-    public function scopeHostOfGroup($query, $userids = null) {
+    public function scopeHostOfGroup($query, $userids = null)
+    {
         $query = $query->memberOfGroup()
             ->where('hfgug.role', '=', Role::HOST);
         return $query;
     }
 
-    public function scopeForUser($query, $userids = null) {
+    public function scopeForUser($query, $userids = null)
+    {
         // Events that are relevant to a user are:
         // - ones they are a host for
         // - ones they have are attending
@@ -527,25 +539,25 @@ class Party extends Model implements Auditable
         $memberOf = Party::memberOfGroup($userids);
 
         // In theory $query could contain something other than all().
-        return $query->whereIn('idevents', $hostFor->
-            union($attending)->
-            union($memberOf)->pluck('idevents'))->
-            select('events.*');
+        return $query->whereIn('idevents', $hostFor->union($attending)->union($memberOf)->pluck('idevents'))->select('events.*');
     }
 
-    public function scopeFutureForUser($query, $userids = null) {
+    public function scopeFutureForUser($query, $userids = null)
+    {
         $this->defaultUserIds($userids);
         $query = $query->forUser()->future($userids);
         return $query;
     }
 
-    public function scopePastForUser($query, $userids = null) {
+    public function scopePastForUser($query, $userids = null)
+    {
         $this->defaultUserIds($userids);
         $query = $query->forUser()->past($userids);
         return $query;
     }
 
-    public function scopeForGroup($query, $idgroups) {
+    public function scopeForGroup($query, $idgroups)
+    {
         // TODO This should probably move into Group, and be a scope in there.  But we've not yet rationalised the
         // scopes in Groups.
         $query->where('events.group', $idgroups);
@@ -568,18 +580,18 @@ class Party extends Model implements Auditable
         $user_group_ids = UserGroups::where('user', $user->id)->where('status', 1)->pluck('group')->toArray();
 
         return $this
-      ->select(DB::raw('`events`.*, ( 6371 * acos( cos( radians('.$user->latitude.') ) * cos( radians( events.latitude ) ) * cos( radians( events.longitude ) - radians('.$user->longitude.') ) + sin( radians('.$user->latitude.') ) * sin( radians( events.latitude ) ) ) ) AS distance'))
-      ->join('groups', 'groups.idgroups', '=', 'events.group')
-      ->join('users_groups', 'users_groups.group', '=', 'groups.idgroups')
-      ->where(function ($query) use ($user_group_ids) {
-          $query->whereNotIn('events.group', $user_group_ids)
-        ->whereDate('event_date', '>=', date('Y-m-d'));
-      })
-      ->having('distance', '<=', User::NEARBY_KM)
-      ->groupBy('events.idevents')
-      ->orderBy('events.event_date', 'ASC')
-      ->orderBy('events.start', 'ASC')
-      ->orderBy('distance', 'ASC');
+            ->select(DB::raw('`events`.*, ( 6371 * acos( cos( radians(' . $user->latitude . ') ) * cos( radians( events.latitude ) ) * cos( radians( events.longitude ) - radians(' . $user->longitude . ') ) + sin( radians(' . $user->latitude . ') ) * sin( radians( events.latitude ) ) ) ) AS distance'))
+            ->join('groups', 'groups.idgroups', '=', 'events.group')
+            ->join('users_groups', 'users_groups.group', '=', 'groups.idgroups')
+            ->where(function ($query) use ($user_group_ids) {
+                $query->whereNotIn('events.group', $user_group_ids)
+                    ->whereDate('event_date', '>=', date('Y-m-d'));
+            })
+            ->having('distance', '<=', User::NEARBY_KM)
+            ->groupBy('events.idevents')
+            ->orderBy('events.event_date', 'ASC')
+            ->orderBy('events.start', 'ASC')
+            ->orderBy('distance', 'ASC');
     }
 
     public function scopeRequiresModeration($query)
@@ -641,12 +653,12 @@ class Party extends Model implements Auditable
 
     public function getEventStartEnd()
     {
-        return $this->getEventStart().'-'.$this->getEventEnd();
+        return $this->getEventStart() . '-' . $this->getEventEnd();
     }
 
     public function getEventName()
     {
-        if (! empty($this->venue)) {
+        if (!empty($this->venue)) {
             return $this->venue;
         }
 
@@ -656,7 +668,7 @@ class Party extends Model implements Auditable
     public function isUpcoming()
     {
         $date_now = new \DateTime();
-        $event_start = new \DateTime($this->event_date.' '.$this->start);
+        $event_start = new \DateTime($this->event_date . ' ' . $this->start);
 
         if ($date_now < $event_start) {
             return true;
@@ -689,7 +701,7 @@ class Party extends Model implements Auditable
         }
 
         $date_now = new \DateTime();
-        $event_end = new \DateTime($this->event_date.' '.$this->end);
+        $event_end = new \DateTime($this->event_date . ' ' . $this->end);
 
         if ($date_now > $event_end) {
             return false;
@@ -702,12 +714,12 @@ class Party extends Model implements Auditable
     {
         $date_now = Carbon::now();
 
-        $event_start = new Carbon($this->event_date.' '.$this->start);
+        $event_start = new Carbon($this->event_date . ' ' . $this->start);
         // Temporarily start an hour early for Repair Together
         // Until we have timezone support.
         $event_start = $event_start->addHours(-1);
 
-        $event_end = new Carbon($this->event_date.' '.$this->end);
+        $event_end = new Carbon($this->event_date . ' ' . $this->end);
 
         if ($date_now >= $event_start && $date_now <= $event_end) {
             return true;
@@ -719,7 +731,7 @@ class Party extends Model implements Auditable
     public function hasFinished()
     {
         $date_now = new \DateTime();
-        $event_end = new \DateTime($this->event_date.' '.$this->end);
+        $event_end = new \DateTime($this->event_date . ' ' . $this->end);
 
         if ($date_now > $event_end) {
             return true;
@@ -764,13 +776,25 @@ class Party extends Model implements Auditable
         }
 
         $result = self::getEventStatsArrayKeys();
+        $debug640 = [];
 
-        if (! empty($this->allDevices)) {
+        if (!empty($this->allDevices)) {
+            $i = -1;
             foreach ($this->allDevices as $device) {
+                $debug640[++$i] = [
+                    'co2_powered' => 0,
+                    'co2_unpowered' => 0,
+                    'waste_powered' => 0,
+                    'waste_unpowered' => 0,
+                    'iddevices' => $device->iddevices,
+                    'idevents' => $device->event,
+                ];
                 if ($device->deviceCategory->powered) {
                     $result['devices_powered']++;
 
                     if ($device->isFixed()) {
+                        $debug640[$i]['co2_powered'] = $device->eCo2Diverted($eEmissionRatio, $displacementFactor);
+                        $debug640[$i]['waste_powered'] = $device->eWasteDiverted();
                         $result['co2_powered'] += $device->eCo2Diverted($eEmissionRatio, $displacementFactor);
                         $result['waste_powered'] += $device->eWasteDiverted();
                         $result['fixed_powered']++;
@@ -779,6 +803,8 @@ class Party extends Model implements Auditable
                     $result['devices_unpowered']++;
 
                     if ($device->isFixed()) {
+                        $debug640[$i]['co2_unpowered'] = $device->uCo2Diverted($eEmissionRatio, $displacementFactor);
+                        $debug640[$i]['waste_unpowered'] = $device->uWasteDiverted();
                         $result['co2_unpowered'] += $device->uCo2Diverted($uEmissionratio, $displacementFactor);
                         $result['waste_unpowered'] += $device->uWasteDiverted();
                         $result['fixed_unpowered']++;
@@ -801,7 +827,7 @@ class Party extends Model implements Auditable
                 }
 
                 if ($device->isFixed()) {
-                    if (! $device->deviceCategory->weight && ! $device->estimate) {
+                    if (!$device->deviceCategory->weight && !$device->estimate) {
                         if ($device->deviceCategory->isMiscPowered()) {
                             $result['no_weight_powered']++;
                         } elseif ($device->deviceCategory->isMiscUnpowered()) {
@@ -810,7 +836,7 @@ class Party extends Model implements Auditable
                     }
                 }
             }
-
+            \App\Helpers\SearchHelper::debugDAT640Event($debug640, 'search');
             $result['co2_total'] = $result['co2_powered'] + $result['co2_unpowered'];
             $result['waste_total'] = $result['waste_powered'] + $result['waste_unpowered'];
             $result['participants'] = $this->pax ?? 0;
@@ -828,7 +854,7 @@ class Party extends Model implements Auditable
 
     public function hoursVolunteered()
     {
-        if (! $this->cancelled) {
+        if (!$this->cancelled) {
             $lengthOfEventInHours = 3;
             $extraHostHours = 9;
             $hoursIfNoVolunteersRecorded = 12;
@@ -850,12 +876,12 @@ class Party extends Model implements Auditable
 
     public function getEventStartTimestampAttribute()
     {
-        return strtotime($this->event_date.' '.$this->start);
+        return strtotime($this->event_date . ' ' . $this->start);
     }
 
     public function getShareableLinkAttribute()
     {
-        if (! empty($this->shareable_code)) {
+        if (!empty($this->shareable_code)) {
             return url("party/invite/{$this->shareable_code}");
         }
 
@@ -929,7 +955,7 @@ class Party extends Model implements Auditable
 
     public function requiresModerationByAdmin()
     {
-        if (! is_null($this->wordpress_post_id)) {
+        if (!is_null($this->wordpress_post_id)) {
             return false;
         }
 
@@ -941,7 +967,7 @@ class Party extends Model implements Auditable
         if ($this->requiresModerationByAdmin() && Fixometer::hasRole(auth()->user(), 'Administrator')) {
             return 'cell-warning-heading';
         } elseif ($this->isUpcoming() || $this->isInProgress()) {
-            if (! $this->isVolunteer()) {
+            if (!$this->isVolunteer()) {
                 return 'cell-warning-heading';
             } else {
                 return 'cell-primary-heading';
@@ -1044,13 +1070,13 @@ class Party extends Model implements Auditable
                 ->get();
 
             // If there are restarters against the group
-            if (! $group_restarters->isEmpty()) {
+            if (!$group_restarters->isEmpty()) {
                 // Send user a notification and email
                 Notification::send($group_restarters, new NotifyRestartersOfNewEvent([
-                                                                                         'event_venue' => $this->venue,
-                                                                                         'event_url' => url('/party/view/'.$this->idevents),
-                                                                                         'event_group' => $group->name,
-                                                                                     ]));
+                    'event_venue' => $this->venue,
+                    'event_url' => url('/party/view/' . $this->idevents),
+                    'event_group' => $group->name,
+                ]));
             }
         }
 

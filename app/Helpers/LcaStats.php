@@ -73,11 +73,11 @@ CASE WHEN (c.powered = 0) THEN (CASE WHEN (COALESCE(d.estimate,0) + 0.00 = 0) TH
 CASE WHEN (c.powered = 1) THEN (CASE WHEN (c.weight = 0) THEN (d.estimate + 0.00) ELSE c.weight END) ELSE 0 END  AS waste_powered,
 CASE WHEN (c.powered = 0) THEN (CASE WHEN (COALESCE(d.estimate,0) + 0.00 = 0) THEN c.weight ELSE d.estimate END) ELSE 0 END AS waste_unpowered,
 d.iddevices,
-e.idevents
-FROM devices d, categories c, events e
+d.event as idevents
+FROM devices d, categories c
 WHERE d.category = c.idcategories
-AND d.event = e.idevents
 AND d.repair_status = 1
+AND d.event = 3035
 ";
 
 $sql = "
@@ -91,8 +91,11 @@ SUM(t1.waste_unpowered) AS waste_unpowered,
 COUNT(t1.iddevices) as fixed_devices,
 t1.idevents
 FROM ($t1) t1
+WHERE t1.idevents = 3035
 GROUP BY t1.idevents
 ";
+
+$sql = $t1;
 
         $result = DB::select(DB::raw($sql));
         foreach ($result as $v) {
@@ -100,6 +103,7 @@ GROUP BY t1.idevents
             $data[$v->idevents]['co2_total'] = $v->co2_powered + $v->co2_unpowered;
             $data[$v->idevents]['waste_total'] = $v->waste_powered + $v->waste_unpowered;
         }
+        SearchHelper::debugDAT640Event((array)$result, 'lcastats');
         SearchHelper::debugDAT640($data, 'lcastats', $headers);
         return;
     }

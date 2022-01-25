@@ -143,4 +143,17 @@ class SearchHelper
             fputcsv($file, $v);
         }
     }
+
+    public static function debugDAT640Event($data, $suffix)
+    {
+        $filename = base_path() . DIRECTORY_SEPARATOR . 'public' . DIRECTORY_SEPARATOR . "debugDat640Event_$suffix.csv";
+        $file = fopen($filename, 'w+');
+        $headers = array_keys((array)$data[0]);
+        // $headers[] =  'idevents';
+        fputcsv($file, $headers);
+        foreach ($data as $k => $v) {
+            // $v['idevents'] = $k;
+            fputcsv($file, (array)$v);
+        }
+    }
 }
