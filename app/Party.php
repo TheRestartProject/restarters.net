@@ -1070,73 +1070,31 @@ class Party extends Model implements Auditable
 
     // TODO The intention is that we migrate all the code over to use the UTC variants of event date/start/end.
     // Timezone-aware, ISO8601 formatted.  These are unambiguous, e.g. for API results.
-    public function getStartDateTimeISO8601Attribute() {
-        error_log("Start utc " . $this->event_start_utc);
-        $start = new Carbon($this->event_start_utc);
+    public function getEventStartUtcAttribute() {
+        $start = Carbon::parse($this->attributes['event_start_utc'], 'UTC');
         return $start->toIso8601String();
     }
 
-    public function getEndDateTimeISO8601Attribute() {
-        $end = new Carbon($this->event_end_utc);
+    public function getEventEndUtcAttribute() {
+        $end = Carbon::parse($this->attributes['event_end_utc'], 'UTC');
         return $end->toIso8601String();
     }
 
     // Mutators for legacy event_date/start/end fields.  These are now derived from the UTC fields via virtual
-    // columns, so to set these values we update the UTC fields.
+    // columns, and therefore should never be set directly.  Throw exceptions to ensure that they are not.
+    //
+    // You might think that we could have mutators which set these correctly.  But this isn't possible; the UTC value
+    // of the date depends on the local date, time and timezone, and cannot be set in isolation.
     public function setEventDateAttribute($val) {
-        // We want to change the date value.  What we are passed is local, so first parse it using the event's
-        // timezone.
-        $c = Carbon::parse($val, $this->timezone);
-
-        // Now change that date to UTC, which might result in a different date.
-        $c->setTimezone('UTC');
-
-        // Now copy over the date values, which are now in UTC, to the start and end UTC times.
-        $start = new Carbon($this->event_start_utc);
-        $start->year = $c->year;
-        $start->month = $c->month;
-        $start->day = $c->day;
-        $end = new Carbon($this->event_end_utc);
-        $end->year = $c->year;
-        $end->month = $c->month;
-        $end->day = $c->day;
-
-        $this->event_start_utc = $start->toIso8601String();
-        error_log("Set date utc " . $this->event_start_utc);
-        $this->event_end_utc = $end->toIso8601String();
+        throw new \Exception("Attempt to set event time fields directly; please use event_start_utc and event_end_utc");
     }
 
     public function setStartAttribute($val) {
-        // We want to change the start time.  The value we are passed is local, so first parse it using the event's
-        // timezone.
-        $c = Carbon::parse($val, $this->timezone);
-
-        // Now change that to UTC, which might adjust the time.
-        $c->setTimezone('UTC');
-
-        // Now copy over the time values, which are now in UTC, to our UTC time.
-        $start = new Carbon($this->event_start_utc);
-        $start->hour = $c->hour;
-        $start->minute = $c->minute;
-        $start->second = $c->second;
-        $this->event_start_utc = $start->toIso8601String();
-        error_log("Set start  utc " . $this->event_start_utc);
+        throw new \Exception("Attempt to set event time fields directly; please use event_start_utc and event_end_utc");
     }
 
     public function setEndAttribute($val) {
-        // We want to change the end time.  The value we are passed is local, so first parse it using the event's
-        // timezone.
-        $c = Carbon::parse($val, $this->timezone);
-
-        // Now change that to UTC, which might adjust the time.
-        $c->setTimezone('UTC');
-
-        // Now copy over the time values, which are now in UTC, to our UTC time..
-        $end = new Carbon($this->event_end_utc);
-        $end->hour = $c->hour;
-        $end->minute = $c->minute;
-        $end->second = $c->second;
-        $this->event_end_utc = $end->toIso8601String();
+        throw new \Exception("Attempt to set event time fields directly; please use event_start_utc and event_end_utc");
     }
 
     // We also need accessors, to avoid any cases where we mutate the values and access them before we have

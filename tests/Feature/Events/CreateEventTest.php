@@ -12,6 +12,7 @@ use App\Notifications\NotifyRestartersOfNewEvent;
 use App\Party;
 use App\Role;
 use App\User;
+use Carbon\Carbon;
 use DB;
 use Illuminate\Support\Facades\Notification;
 use Tests\TestCase;
@@ -82,9 +83,14 @@ class CreateEventTest extends TestCase
         $eventAttributes['link'] = 'https://therestartproject.org/';
 
         // We want an upcoming event so that we can check it appears in various places.
-        $eventAttributes['event_date'] = date('Y-m-d', strtotime('tomorrow'));
+        $eventAttributes['event_start_utc'] = Carbon::parse('1pm tomorrow')->format('Y-m-d H:i:s');
+        $eventAttributes['event_end_utc'] = Carbon::parse('2pm tomorrow')->format('Y-m-d H:i:s');
 
         $this->post('/party/create/', $eventAttributes);
+
+        // The event_start_utc and event_end_utc will be in the database, but not ISO8601 formatted - that is implicit.
+        $eventAttributes['event_start_utc'] = Carbon::parse($eventAttributes['event_start_utc'])->format('Y-m-d H:i:s');
+        $eventAttributes['event_end_utc'] = Carbon::parse($eventAttributes['event_end_utc'])->format('Y-m-d H:i:s');
         $this->assertDatabaseHas('events', $eventAttributes);
 
         // Check that we can view the event, and that it shows the creation success message.

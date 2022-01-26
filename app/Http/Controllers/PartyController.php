@@ -31,6 +31,7 @@ use App\Session;
 use App\User;
 use App\UserGroups;
 use Auth;
+use Carbon\Carbon;
 use DateTime;
 use DB;
 use FixometerFile;
@@ -164,17 +165,54 @@ class PartyController extends Controller
 
         if ($request->isMethod('post')) {
             $request->validate([
-                'event_date' => 'required',
-                'start' => 'required',
-                'end' => 'required',
-                'location' => [
-                    function ($attribute, $value, $fail) use ($request) {
-                        if (! $request->filled('online') && ! $value) {
-                            $fail(__('events.validate_location'));
-                        }
-                    },
-                ],
+                                   'group' => 'required'
             ]);
+
+            $group = $request->input('group');
+            $groupobj = Group::where('idgroups', $group)->first();
+
+            // We might be passed a timezone; if not then use the timezone of the group.
+            $timezone = $request->input('timezone', $groupobj->timezone);
+
+            // There are two ways events can be created.
+            // 1. By passing event_start_utc and event_end_utc, or
+            // 2. By passing event_date, start, end.
+            if ($request->has('event_start_utc') && $request->has('event_end_utc')) {
+                $request->validate([
+                                       'location' => [
+                                           function ($attribute, $value, $fail) use ($request) {
+                                               if (! $request->filled('online') && ! $value) {
+                                                   $fail(__('events.validate_location'));
+                                               }
+                                           },
+                                       ],
+                                   ]);
+
+                $event_start_utc = $request->input('event_start_utc');
+                $event_end_utc = $request->input('event_end_utc');
+            } else {
+                $request->validate([
+                                       'event_date' => 'required',
+                                       'start' => 'required',
+                                       'end' => 'required',
+                                       'location' => [
+                                           function ($attribute, $value, $fail) use ($request) {
+                                               if (! $request->filled('online') && ! $value) {
+                                                   $fail(__('events.validate_location'));
+                                               }
+                                           },
+                                       ],
+                                   ]);
+
+                $event_date = $request->input('event_date');
+                $start = $request->input('start');
+                $end = $request->input('end');
+
+                $startCarbon = Carbon::parse($event_date . ' ' . $start, $timezone);
+                $event_start_utc = $startCarbon->toIso8601String();
+                $endCarbon = Carbon::parse($event_date . ' ' . $end, $timezone);
+                $event_end_utc = $endCarbon->toIso8601String();
+            }
 
             $error = [];
 
@@ -210,50 +248,27 @@ class PartyController extends Controller
             $data['longitude'] = $longitude;
 
             $online = $request->has('online');
-            $event_date = $request->input('event_date');
-            $start = $request->input('start');
-            $end = $request->input('end');
             $pax = 0;
             $free_text = $request->input('free_text');
             $venue = $request->input('venue');
             $location = $request->input('location');
-            $group = $request->input('group');
             $user_id = Auth::user()->id;
             $link = $request->input('link');
 
             // Check whether the event should be auto-approved, if all of the networks it belongs to
             // allow it.
-            $groupobj = Group::where('idgroups', $group)->first();
             $autoapprove = $groupobj->auto_approve;
 
-            // formatting dates for the DB
-            $event_date = date('Y-m-d', strtotime($event_date));
-
-            if (! Fixometer::verify($event_date)) {
-                $error['event_date'] = 'We must have a starting date and time.';
-            }
-            if (! Fixometer::verify($start)) {
-                $error['name'] = 'We must have a starting date and time.';
-            }
-
             if (empty($error)) {
-                $startTime = $event_date.' '.$start;
-                $endTime = $event_date.' '.$end;
-
-                $dtStart = new DateTime($startTime);
-                $dtDiff = $dtStart->diff(new DateTime($endTime));
-
-                $hours = $dtDiff->h;
+                $hours = Carbon::parse($event_start_utc)->diffInHours(Carbon::parse($event_end_utc));
 
                 // No errors. We can proceed and create the Party.
                 //
                 // timezone needs to be the first attribute set, because it is used in mutators for later attributes.
                 $data = [
-                    'timezone' => $groupobj->timezone,
-                    'event_date' => $event_date,
-                    'start' => $start,
-                    'end' => $end,
-                    'pax' => $pax,
+                    'timezone' => $timezone,
+                    'event_start_utc' => $event_start_utc,
+                    'event_end_utc' => $event_end_utc,
                     'free_text' => $free_text,
                     'link' => $link,
                     'venue' => $venue,
@@ -262,7 +277,6 @@ class PartyController extends Controller
                     'longitude' => $longitude,
                     'group' => $group,
                     'hours' => $hours,
-                    // 'volunteers'    => $volunteers,
                     'user_id' => $user_id,
                     'created_at' => date('Y-m-d H:i:s'),
                     'shareable_code' => Fixometer::generateUniqueShareableCode(\App\Party::class, 'shareable_code'),
