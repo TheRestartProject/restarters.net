@@ -83,8 +83,8 @@ class CreateEventTest extends TestCase
         $eventAttributes['link'] = 'https://therestartproject.org/';
 
         // We want an upcoming event so that we can check it appears in various places.
-        $eventAttributes['event_start_utc'] = Carbon::parse('1pm tomorrow')->format('Y-m-d H:i:s');
-        $eventAttributes['event_end_utc'] = Carbon::parse('2pm tomorrow')->format('Y-m-d H:i:s');
+        $eventAttributes['event_start_utc'] = Carbon::parse('1pm tomorrow')->toIso8601String();
+        $eventAttributes['event_end_utc'] = Carbon::parse('3pm tomorrow')->toIso8601String();
 
         $this->post('/party/create/', $eventAttributes);
 

@@ -137,7 +137,11 @@ class WordpressEventPushTest extends TestCase
         ]);
         $group = factory(Group::class)->create();
         $restart->addGroup($group);
-        $event = factory(Party::class)->create(['group' => $group->idgroups]);
+        $event = factory(Party::class)->create([
+            'group' => $group->idgroups,
+            'event_start_utc' => Carbon::parse('1pm tomorrow')->toIso8601String(),
+            'event_end_utc' => Carbon::parse('3pm tomorrow')->toIso8601String()
+        ]);
         $event->wordpress_post_id = 100;
         $event->save();
 
