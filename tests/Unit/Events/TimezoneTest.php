@@ -51,14 +51,22 @@ class TimezoneTest extends TestCase
            'timezone' => 'Asia/Samarkand'
         ]);
 
+        DB::connection()->enableQueryLog();
+
+        // Create an event in a different timezone, using local times.
         $e = factory(Party::class)->create([
             'group' => $g->idgroups,
             'event_date' => '2021-01-01',
             'start' => '10:15',
-            'end' => '13:45'
+            'end' => '13:45',
+            'timezone' => NULL // Inherit from group.
         ]);
 
-        self::assertEquals('2021-01-01T10:15:00+05:00', $e->startDateTimeISO8601);
-        self::assertEquals('2021-01-01T13:45:00+05:00', $e->endDateTimeISO8601);
+        $queries = DB::getQueryLog();
+        error_log(var_export($queries, TRUE));
+
+        // Check that the ISO times are as we would expect for this zone.
+        self::assertEquals('2021-01-01T05:15:00+00:00', $e->startDateTimeISO8601);
+        self::assertEquals('2021-01-01T08:45:00+00:00', $e->endDateTimeISO8601);
     }
 }

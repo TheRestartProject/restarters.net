@@ -330,10 +330,7 @@ class CreateEventTest extends TestCase
         $eventData = factory(Party::class)->raw(['group' => $group->idgroups, 'event_date' => '1930-01-01', 'latitude'=>'1', 'longitude'=>'1']);
 
         // act
-        DB::connection()->enableQueryLog();
         $response = $this->post('/party/create/', $eventData);
-        $queries = DB::getQueryLog();
-        error_log(var_export($queries, TRUE));
         $event = Party::where('event_date', '1930-01-01')->first();
         $eventData['wordpress_post_id'] = 100;
         $eventData['id'] = $event->idevents;

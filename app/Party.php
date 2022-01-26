@@ -1068,31 +1068,30 @@ class Party extends Model implements Auditable
         return $this->theGroup->timezone;
     }
 
-    // Timezone-aware date start and end.  Uses the timezone of the event (inherited if necessary).
     // TODO The intention is that we migrate all the code over to use the UTC variants of event date/start/end.
-    // Timezone-aware timestamp values.  These can be used for sortBy.
-    public function getStartDateTimestampAttribute() {
-        return $this->startDateTimeCarbon->timestamp();
-    }
-
-    public function getEndDateTimeAttribute() {
-        return $this->endDateTimeCarbon->timestamp();
-    }
-
     // Timezone-aware, ISO8601 formatted.  These are unambiguous, e.g. for API results.
     public function getStartDateTimeISO8601Attribute() {
-        return $this->startDateTimeCarbon->toIso8601String();
+        error_log("Start utc " . $this->event_start_utc);
+        $start = new Carbon($this->event_start_utc);
+        return $start->toIso8601String();
     }
 
     public function getEndDateTimeISO8601Attribute() {
-        return $this->endDateTimeCarbon->toIso8601String();
+        $end = new Carbon($this->event_end_utc);
+        return $end->toIso8601String();
     }
 
     // Mutators for legacy event_date/start/end fields.  These are now derived from the UTC fields via virtual
     // columns, so to set these values we update the UTC fields.
-    // TODO The intention is that these legacy fields are retired and we use only the UTC fields.
     public function setEventDateAttribute($val) {
+        // We want to change the date value.  What we are passed is local, so first parse it using the event's
+        // timezone.
         $c = Carbon::parse($val, $this->timezone);
+
+        // Now change that date to UTC, which might result in a different date.
+        $c->setTimezone('UTC');
+
+        // Now copy over the date values, which are now in UTC, to the start and end UTC times.
         $start = new Carbon($this->event_start_utc);
         $start->year = $c->year;
         $start->month = $c->month;
@@ -1103,20 +1102,36 @@ class Party extends Model implements Auditable
         $end->day = $c->day;
 
         $this->event_start_utc = $start->toIso8601String();
+        error_log("Set date utc " . $this->event_start_utc);
         $this->event_end_utc = $end->toIso8601String();
     }
 
     public function setStartAttribute($val) {
+        // We want to change the start time.  The value we are passed is local, so first parse it using the event's
+        // timezone.
         $c = Carbon::parse($val, $this->timezone);
+
+        // Now change that to UTC, which might adjust the time.
+        $c->setTimezone('UTC');
+
+        // Now copy over the time values, which are now in UTC, to our UTC time.
         $start = new Carbon($this->event_start_utc);
         $start->hour = $c->hour;
         $start->minute = $c->minute;
         $start->second = $c->second;
         $this->event_start_utc = $start->toIso8601String();
+        error_log("Set start  utc " . $this->event_start_utc);
     }
 
     public function setEndAttribute($val) {
+        // We want to change the end time.  The value we are passed is local, so first parse it using the event's
+        // timezone.
         $c = Carbon::parse($val, $this->timezone);
+
+        // Now change that to UTC, which might adjust the time.
+        $c->setTimezone('UTC');
+
+        // Now copy over the time values, which are now in UTC, to our UTC time..
         $end = new Carbon($this->event_end_utc);
         $end->hour = $c->hour;
         $end->minute = $c->minute;
