@@ -99,7 +99,9 @@ class BasicTest extends TestCase
         // Admin approves the event.
         $this->loginAsTestUser(Role::ADMINISTRATOR);
 
-        $eventData = $event->getAttributes();
+        $eventData = $event->attributesToArray();
+        error_log("Ats " . var_export($eventData, TRUE));
+        error_log("Event " . var_export($event, TRUE));
         $eventData['wordpress_post_id'] = 100;
         $eventData['id'] = $event->idevents;
         $eventData['moderate'] = 'approve';

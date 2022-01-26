@@ -223,7 +223,8 @@ class PartyController extends Controller
 
             // Check whether the event should be auto-approved, if all of the networks it belongs to
             // allow it.
-            $autoapprove = Group::where('idgroups', $group)->first()->auto_approve;
+            $groupobj = Group::where('idgroups', $group)->first();
+            $autoapprove = $groupobj->auto_approve;
 
             // formatting dates for the DB
             $event_date = date('Y-m-d', strtotime($event_date));
@@ -263,6 +264,7 @@ class PartyController extends Controller
                     'created_at' => date('Y-m-d H:i:s'),
                     'shareable_code' => Fixometer::generateUniqueShareableCode(\App\Party::class, 'shareable_code'),
                     'online' => $online,
+                    'timezone' => $groupobj->timezone
                 ];
 
                 $party = Party::create($data);
@@ -1291,6 +1293,7 @@ class PartyController extends Controller
          ->join('users', 'users.access_group_tag_id', '=', 'group_tags.id');
 
         if (! empty($date_from) && ! empty($date_to)) {
+            // TODO Timezones
             $parties = $parties->where('events.event_date', '>=', date('Y-m-d', strtotime($date_from)))
            ->where('events.event_date', '<=', date('Y-m-d', strtotime($date_to)));
         }

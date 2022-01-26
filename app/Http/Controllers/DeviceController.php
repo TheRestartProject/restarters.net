@@ -37,6 +37,7 @@ class DeviceController extends Controller
         $most_recent_finished_event = Party::with('theGroup')
         ->hasDevicesRepaired(1)
         ->eventHasFinished()
+        // TODO Timezones
         ->orderBy('event_date', 'DESC')
         ->first();
 

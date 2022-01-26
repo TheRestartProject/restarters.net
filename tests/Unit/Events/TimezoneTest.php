@@ -37,9 +37,28 @@ class TimezoneTest extends TestCase
 
     public function timezoneProvider() {
         return [
-            [ NULL, 'Europe/Paris', 'Europe/Paris', FALSE ],
-            [ 'Europe/Paris', NULL, 'Europe/Paris', FALSE ],
+            [ NULL, 'Asia/Samarkand', 'Asia/Samarkand', FALSE ],
+            [ 'Asia/Samarkand', NULL, 'Asia/Samarkand', FALSE ],
             [ NULL, NULL, NULL, TRUE],
         ];
+    }
+
+    /**
+     * @test
+     */
+    public function startEnd() {
+        $g = factory(Group::class)->create([
+           'timezone' => 'Asia/Samarkand'
+        ]);
+
+        $e = factory(Party::class)->create([
+            'group' => $g->idgroups,
+            'event_date' => '2021-01-01',
+            'start' => '10:15',
+            'end' => '13:45'
+        ]);
+
+        self::assertEquals('2021-01-01T10:15:00+05:00', $e->startDateTimeISO8601);
+        self::assertEquals('2021-01-01T13:45:00+05:00', $e->endDateTimeISO8601);
     }
 }

@@ -385,6 +385,7 @@ class Group extends Model implements Auditable
      */
     public function upcomingParties($exclude_parties = [])
     {
+        // TODO Timezones
         $from = date('Y-m-d');
 
         if (! empty($exclude_parties)) {
@@ -409,6 +410,7 @@ class Group extends Model implements Auditable
      */
     public function pastParties($exclude_parties = [])
     {
+        // TODO Timezones
         if (! empty($exclude_parties)) {
             return $this->parties()
                 ->where('event_date', '<', date('Y-m-d'))
@@ -450,6 +452,7 @@ class Group extends Model implements Auditable
 
     public function getNextUpcomingEvent()
     {
+        // TODO Timezones
         $event = $this->parties()
             ->whereNotNull('wordpress_post_id')
             ->whereDate('event_date', '>=', date('Y-m-d'))
@@ -693,7 +696,10 @@ class Group extends Model implements Auditable
 
         if (!$timezone) {
             // This should not occur if the networks are set up correctly.
-            throw new \Exception('Group cannot resolve timezone');
+            // TODO Later on we should throw an exception, but only once this code has gone live, as we rely on
+            // the default behaviour during migration.
+            //throw new \Exception("Group {$this->idgroups} cannot resolve timezone");
+            $timezone = 'Europe/London';
         }
 
         return $timezone;

@@ -22,10 +22,12 @@ class Search extends Model
         }
 
         if (! is_null($from)) {
+            // TODO Timezones
             $eventsQuery->whereRaw('UNIX_TIMESTAMP(event_date) >= '.$from);
         }
 
         if (! is_null($to)) {
+            // TODO Timezones
             $eventsQuery->whereRaw('UNIX_TIMESTAMP(event_date) <= '.$to);
         }
 
@@ -38,6 +40,7 @@ class Search extends Model
         }
 
         $eventsQuery->groupBy('events.idevents');
+        // TODO Timezones
         $eventsQuery->orderBy('events.event_date', 'desc');
 
         // We need to explicitly select what we want to return otherwise gtag.group might overwrite events.group.

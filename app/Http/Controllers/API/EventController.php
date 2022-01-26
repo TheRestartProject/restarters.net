@@ -28,6 +28,7 @@ class EventController extends Controller
                   ->join('users', 'users.id', '=', 'user_network.user_id');
 
         if (! empty($date_from) && ! empty($date_to)) {
+            // TODO Timezones
             $parties = $parties->where('events.event_date', '>=', date('Y-m-d', strtotime($date_from)))
            ->where('events.event_date', '<=', date('Y-m-d', strtotime($date_to)));
         }

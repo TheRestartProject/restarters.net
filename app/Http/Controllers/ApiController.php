@@ -205,10 +205,12 @@ class ApiController extends Controller
         }
 
         if ($from_date) {
+            // TODO Timezones
             $wheres[] = ['events.event_date', '>=', $from_date];
         }
 
         if ($to_date) {
+            // TODO Timezones
             $wheres[] = ['events.event_date', '<=', $to_date];
         }
 

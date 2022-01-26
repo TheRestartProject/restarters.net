@@ -69,7 +69,7 @@ class Device extends Model implements Auditable
 
     public function getList($params = null)
     {
-        //Tested!
+        // TODO Timezones
         $sql = 'SELECT * FROM `view_devices_list`';
 
         if (! is_null($params)) {
@@ -340,6 +340,7 @@ class Device extends Model implements Auditable
     public function export()
     {
         //Tested
+        // TODO Timezones
         return DB::select(DB::raw('SELECT
                     `c`.`name` AS `category`,
                     `brand`,

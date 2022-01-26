@@ -58,6 +58,7 @@ class SyncEvents extends Command
 
                 return;
             }
+            // TODO Timezones
             $eventsQuery->where('event_date', '>=', $this->option('datefrom'));
             $this->info('Starting from date: '.$dateFrom);
         }
@@ -70,6 +71,7 @@ class SyncEvents extends Command
 
         foreach ($events as $event) {
             try {
+                // TODO Timezones
                 $startTimestamp = strtotime($event->event_date.' '.$event->start);
                 $endTimestamp = strtotime($event->event_date.' '.$event->end);
 
@@ -82,6 +84,7 @@ class SyncEvents extends Command
                     ['key' => 'party_venue', 'value' => $event->venue],
                     ['key' => 'party_location', 'value' => $event->location],
                     ['key' => 'party_time', 'value' => $event->start.' - '.$event->end],
+                    // TODO Timezones
                     ['key' => 'party_date', 'value' => $event->event_date],
                     ['key' => 'party_timestamp', 'value' => $startTimestamp],
                     ['key' => 'party_timestamp_end', 'value' => $endTimestamp],

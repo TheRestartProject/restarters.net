@@ -16,6 +16,7 @@ $factory->define(App\Party::class, function (Faker $faker) {
         'start' => $faker->time(),
         'end' => $faker->time(),
         'free_text' => $faker->paragraph,
+        'timezone' => 'Europe/London'
     ];
 });
 

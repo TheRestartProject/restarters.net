@@ -54,6 +54,7 @@ class CreateWordpressPostForEvent
         }
 
         try {
+            // TODO Timezones
             $startTimestamp = strtotime($theParty->event_date.' '.$theParty->start);
             $endTimestamp = strtotime($theParty->event_date.' '.$theParty->end);
 

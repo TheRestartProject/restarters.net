@@ -221,6 +221,8 @@ class GroupController extends Controller
     {
         $group = $group->load('parties');
 
+        // TODO Timezones
+
         $events = $group->parties->sortByDesc('event_date');
 
         if ($request->has('format') && $request->input('format') == 'location') {

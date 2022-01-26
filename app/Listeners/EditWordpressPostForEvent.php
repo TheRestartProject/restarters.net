@@ -49,6 +49,7 @@ class EditWordpressPostForEvent
 
         try {
             if (is_numeric($theParty->wordpress_post_id)) {
+                // TODO Timezones
                 $startTimestamp = strtotime($data['event_date'].' '.$data['start']);
                 $endTimestamp = strtotime($data['event_date'].' '.$data['end']);
 

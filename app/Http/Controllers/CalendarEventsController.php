@@ -41,6 +41,7 @@ class CalendarEventsController extends Controller
       })
       ->select('events.*', 'groups.name')
       ->groupBy('idevents')
+            // TODO Timezones
       ->orderBy('event_date', 'ASC')
       ->get();
 
@@ -56,6 +57,8 @@ class CalendarEventsController extends Controller
       })
       ->select('events.*', 'groups.name')
       ->groupBy('events.idevents')
+            // TODO Timezones
+
       ->orderBy('events.event_date', 'ASC')
       ->get();
 
@@ -74,6 +77,7 @@ class CalendarEventsController extends Controller
       })
       ->select('events.*', 'groups.name')
       ->groupBy('events.idevents')
+      // TODO Timezones
       ->orderBy('events.event_date', 'ASC')
       ->get();
 
@@ -94,6 +98,7 @@ class CalendarEventsController extends Controller
       })
       ->select('events.*', 'groups.name')
       ->groupBy('events.idevents')
+    // TODO Timezones
       ->orderBy('events.event_date', 'ASC')
       ->get();
 
@@ -136,6 +141,7 @@ class CalendarEventsController extends Controller
                 $ical[] = "UID:{$event->idevents}";
                 $ical[] = 'DTSTAMP:'.date($this->ical_format).'';
                 $ical[] = "SUMMARY:{$event->venue} ({$event->name})";
+                // TODO Timezones
                 $ical[] = 'DTSTART;TZID=Europe/London:'.date($this->ical_format, strtotime($event->event_date.' '.$event->start)).'';
                 $ical[] = 'DTEND;TZID=Europe/London:'.date($this->ical_format, strtotime($event->event_date.' '.$event->end)).'';
                 $ical[] = 'DESCRIPTION:'.url('/party/view').'/'.$event->idevents;

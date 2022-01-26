@@ -290,6 +290,7 @@ class ExportController extends Controller
             }
 
             //By date
+            // TODO Timezones
             if ($request->input('from_date') !== null && $request->input('to_date') == null) {
                 $user_events = $user_events->whereDate('events.event_date', '>', $request->input('from_date'));
             } elseif ($request->input('to_date') !== null && $request->input('from_date') == null) {
