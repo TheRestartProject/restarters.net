@@ -9,11 +9,14 @@ $factory->define(App\Party::class, function (Faker $faker, $attributes = []) {
     if (array_key_exists('event_date', $attributes)) {
         $startTime = array_key_exists('start', $attributes) ? $attributes['start'] : $faker->time();
         $endTime = array_key_exists('end', $attributes) ? $attributes['end'] : $faker->time();
-        $start = Carbon\Carbon::parse($attributes['event_date'] . ' ' . $startTime);
-        $end = Carbon\Carbon::parse($attributes['event_date'] . ' ' . $endTime);
+        $start = Carbon\Carbon::parse($attributes['event_date'] . ' ' . $startTime, 'UTC');
+        $end = Carbon\Carbon::parse($attributes['event_date'] . ' ' . $endTime, 'UTC');
         unset($attributes['event_date']);
         unset($attributes['start']);
         unset($attributes['end']);
+    } else if (array_key_exists('event_start_utc', $attributes)) {
+        $start = Carbon\Carbon::parse($attributes['event_start_utc']);
+        $end = Carbon\Carbon::parse($attributes['event_end_utc']);
     } else {
         // Fake an event that's two hours long.
         $start = Carbon\Carbon::parse($faker->iso8601());

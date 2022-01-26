@@ -174,9 +174,9 @@ class PartyController extends Controller
             // We might be passed a timezone; if not then use the timezone of the group.
             $timezone = $request->input('timezone', $groupobj->timezone);
 
-            // There are two ways events can be created.
+            // There are two ways event date/times can be created.
             // 1. By passing event_start_utc and event_end_utc, or
-            // 2. By passing event_date, start, end.
+            // 2. By passing event_date, start, end (deprecated).
             if ($request->has('event_start_utc') && $request->has('event_end_utc')) {
                 $request->validate([
                                        'location' => [
@@ -435,9 +435,9 @@ class PartyController extends Controller
             // We might have been passed a timezone; if not then inherit from the current value.
             $timezone = $request->input('timezone', Party::find($id)->timezone);
 
-            // There are two ways events can be update.
+            // There are two ways event date/times can be updated.
             // 1. By passing event_start_utc and event_end_utc, or
-            // 2. By passing event_date, start, end.
+            // 2. By passing event_date, start, end (deprecated).
             if ($request->has('event_start_utc') && $request->has('event_end_utc')) {
                 $event_start_utc = $request->input('event_start_utc');
                 $event_end_utc = $request->input('event_end_utc');

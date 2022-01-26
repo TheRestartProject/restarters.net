@@ -56,12 +56,12 @@ class TimezoneTest extends TestCase
             'group' => $g->idgroups,
             'event_start_utc' => '2021-01-01T10:15:05+05:00',
             'event_end_utc' => '2021-01-01T13:45:05+05:00',
-            'timezone' => NULL // Inherit from group.
+            'timezone' => NULL
         ]);
 
         // Check that the ISO times are as we would expect for this zone.
-        self::assertEquals('2021-01-01T10:15:05+00:00', $e->startDateTimeISO8601);
-        self::assertEquals('2021-01-01T13:45:05+00:00', $e->endDateTimeISO8601);
+        self::assertEquals('2021-01-01T10:15:05+00:00', $e->event_start_utc);
+        self::assertEquals('2021-01-01T13:45:05+00:00', $e->event_end_utc);
 
         // Check that the local times are as we expect.
         self::assertEquals('2021-01-01', $e->event_date);
