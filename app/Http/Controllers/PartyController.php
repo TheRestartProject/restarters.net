@@ -246,7 +246,10 @@ class PartyController extends Controller
                 $hours = $dtDiff->h;
 
                 // No errors. We can proceed and create the Party.
+                //
+                // timezone needs to be the first attribute set, because it is used in mutators for later attributes.
                 $data = [
+                    'timezone' => $groupobj->timezone,
                     'event_date' => $event_date,
                     'start' => $start,
                     'end' => $end,
@@ -263,8 +266,7 @@ class PartyController extends Controller
                     'user_id' => $user_id,
                     'created_at' => date('Y-m-d H:i:s'),
                     'shareable_code' => Fixometer::generateUniqueShareableCode(\App\Party::class, 'shareable_code'),
-                    'online' => $online,
-                    'timezone' => $groupobj->timezone
+                    'online' => $online
                 ];
 
                 $party = Party::create($data);

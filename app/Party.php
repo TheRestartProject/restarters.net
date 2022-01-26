@@ -696,23 +696,10 @@ class Party extends Model implements Auditable
      */
     public function isStartingSoon()
     {
-        $current_date = date('Y-m-d');
-        // TODO Timezones
-        $event_date = $this->event_date;
+        $start = new Carbon($this->event_start_utc);
 
-        if ($current_date != $event_date) {
-            return false;
-        }
-
-        if ($this->isInProgress()) {
-            return false;
-        }
-
-        $date_now = new \DateTime();
-        $event_end = new \DateTime($this->event_date.' '.$this->end);
-
-        if ($date_now > $event_end) {
-            return false;
+        if (!$this->$this->isInProgress() && !$this->hasFinished() && $start->isCurrentDay()) {
+            return true;
         }
 
         return true;
@@ -721,33 +708,16 @@ class Party extends Model implements Auditable
     public function isInProgress()
     {
         $date_now = Carbon::now();
-
-        // TODO Timezones
-        $event_start = new Carbon($this->event_date.' '.$this->start);
-        // Temporarily start an hour early for Repair Together
-        // Until we have timezone support.
-        $event_start = $event_start->addHours(-1);
-
-        $event_end = new Carbon($this->event_date.' '.$this->end);
-
-        if ($date_now >= $event_start && $date_now <= $event_end) {
-            return true;
-        }
-
-        return false;
+        $start = new Carbon($this->event_start_utc);
+        $end = new Carbon($this->event_end_utc);
+        return $date_now->gte($start) && $date_now->lte($end);
     }
 
     public function hasFinished()
     {
-        // TODO Timezones
-        $date_now = new \DateTime();
-        $event_end = new \DateTime($this->event_date.' '.$this->end);
-
-        if ($date_now > $event_end) {
-            return true;
-        }
-
-        return false;
+        $date_now = Carbon::now();
+        $end = new Carbon($this->event_end_utc);
+        return $date_now->gt($end);
     }
 
     public static function getEventStatsArrayKeys()
@@ -1100,22 +1070,6 @@ class Party extends Model implements Auditable
 
     // Timezone-aware date start and end.  Uses the timezone of the event (inherited if necessary).
     // TODO The intention is that we migrate all the code over to use the UTC variants of event date/start/end.
-    public function getStartDateTimeCarbonAttribute() {
-        if (array_key_exists('event_date', $this->attributes)) {
-            return Carbon::createFromFormat('Y-m-d H:i:s', $this->attributes['event_date'] . ' ' . $this->attributes['start'], $this->timezone);
-        } else {
-            return new Carbon();
-        }
-    }
-
-    public function getEndDateTimeCarbonAttribute() {
-        if (array_key_exists('event_date', $this->attributes)) {
-            return Carbon::createFromFormat('Y-m-d H:i:s', $this->attributes['event_date'] . ' ' . $this->attributes['end'], $this->timezone);
-        } else {
-            return new Carbon();
-        }
-    }
-
     // Timezone-aware timestamp values.  These can be used for sortBy.
     public function getStartDateTimestampAttribute() {
         return $this->startDateTimeCarbon->timestamp();
@@ -1138,12 +1092,12 @@ class Party extends Model implements Auditable
     // columns, so to set these values we update the UTC fields.
     // TODO The intention is that these legacy fields are retired and we use only the UTC fields.
     public function setEventDateAttribute($val) {
-        $c = new Carbon($val);
-        $start = $this->getStartDateTimeCarbonAttribute();
+        $c = Carbon::parse($val, $this->timezone);
+        $start = new Carbon($this->event_start_utc);
         $start->year = $c->year;
         $start->month = $c->month;
         $start->day = $c->day;
-        $end = $this->getEndDateTimeCarbonAttribute();
+        $end = new Carbon($this->event_end_utc);
         $end->year = $c->year;
         $end->month = $c->month;
         $end->day = $c->day;
@@ -1153,7 +1107,7 @@ class Party extends Model implements Auditable
     }
 
     public function setStartAttribute($val) {
-        $c = new Carbon($val);
+        $c = Carbon::parse($val, $this->timezone);
         $start = new Carbon($this->event_start_utc);
         $start->hour = $c->hour;
         $start->minute = $c->minute;
@@ -1162,7 +1116,7 @@ class Party extends Model implements Auditable
     }
 
     public function setEndAttribute($val) {
-        $c = new Carbon($val);
+        $c = Carbon::parse($val, $this->timezone);
         $end = new Carbon($this->event_end_utc);
         $end->hour = $c->hour;
         $end->minute = $c->minute;
@@ -1175,18 +1129,18 @@ class Party extends Model implements Auditable
     //
     // These should return local values, i.e. in the timezone of the event.
     public function getEventDateAttribute() {
-        $dt = $this->getStartDateTimeCarbonAttribute();
+        $dt = new Carbon($this->event_start_utc);
         $dt->setTimezone($this->timezone);
         return $dt->toDateString();
     }
     public function getStartAttribute() {
-        $dt = $this->getStartDateTimeCarbonAttribute();
+        $dt = new Carbon($this->event_start_utc);
         $dt->setTimezone($this->timezone);
         return $dt->toTimeString();
     }
 
     public function getEndAttribute() {
-        $dt = $this->getEndDateTimeCarbonAttribute();
+        $dt = new Carbon($this->event_end_utc);
         $dt->setTimezone($this->timezone);
         return $dt->toTimeString();
     }
