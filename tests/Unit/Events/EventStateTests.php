@@ -28,10 +28,8 @@ class EventStateTests extends TestCase
     {
         // arrange
         $event = factory(Party::class)->create();
-        error_log("Created");
-        $event->event_date = Carbon::now()->toDateString();
-        $event->start = Carbon::now()->addHours(-1)->toTimeString();
-        $event->end = Carbon::now()->addHours(2)->toTimeString();
+        $event->event_start_utc = Carbon::now()->addHours(-1)->toIso8601String();
+        $event->event_end_utc = Carbon::now()->addHours(2)->toIso8601String();
 
         // assert
         $this->assertTrue($event->isInProgress());
@@ -42,9 +40,8 @@ class EventStateTests extends TestCase
     {
         // arrange
         $event = factory(Party::class)->create();
-        $event->event_date = Carbon::now()->toDateString();
-        $event->start = Carbon::now()->toTimeString();
-        $event->end = Carbon::now()->addHours(3)->toTimeString();
+        $event->event_start_utc = Carbon::now()->toIso8601String();
+        $event->event_end_utc = Carbon::now()->addHours(3)->toIso8601String();
 
         // assert
         $this->assertTrue($event->isInProgress());

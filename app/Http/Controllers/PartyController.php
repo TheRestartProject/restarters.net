@@ -375,6 +375,7 @@ class PartyController extends Controller
         $Groups = new Group;
         $File = new FixometerFile;
         $Party = new Party;
+        $party = $Party->findThis($id)[0];
 
         $groupsUserIsInChargeOf = $user->groupsInChargeOf();
         $userInChargeOfMultipleGroups = $user->hasRole('Administrator') || count($groupsUserIsInChargeOf) > 1;
@@ -431,10 +432,29 @@ class PartyController extends Controller
             $data['latitude'] = $latitude;
             $data['longitude'] = $longitude;
 
+            // We might have been passed a timezone; if not then inherit from the current value.
+            $timezone = $request->input('timezone', Party::find($id)->timezone);
+
+            // There are two ways events can be update.
+            // 1. By passing event_start_utc and event_end_utc, or
+            // 2. By passing event_date, start, end.
+            if ($request->has('event_start_utc') && $request->has('event_end_utc')) {
+                $event_start_utc = $request->input('event_start_utc');
+                $event_end_utc = $request->input('event_end_utc');
+            } else {
+                $event_date = $request->input('event_date');
+                $start = $request->input('start');
+                $end = $request->input('end');
+
+                $startCarbon = Carbon::parse($event_date . ' ' . $start, $timezone);
+                $event_start_utc = $startCarbon->toIso8601String();
+                $endCarbon = Carbon::parse($event_date . ' ' . $end, $timezone);
+                $event_end_utc = $endCarbon->toIso8601String();
+            }
+
             $update = [
-                'event_date' => $data['event_date'],
-                'start' => $data['start'],
-                'end' => $data['end'],
+                'event_start_utc' => $event_start_utc,
+                'event_end_utc' => $event_end_utc,
                 'free_text' => $data['free_text'],
                 'online' => $request->has('online'),
                 'group' => $data['group'],
@@ -443,6 +463,7 @@ class PartyController extends Controller
                 'location' => $data['location'],
                 'latitude' => $latitude,
                 'longitude' => $longitude,
+                'timezone' => $timezone
             ];
 
             $u = Party::findOrFail($id)->update($update);
@@ -479,8 +500,6 @@ class PartyController extends Controller
             if (! isset($remotePost)) {
                 $remotePost = null;
             }
-
-            $party = $Party->findThis($id)[0];
 
             $audits = Party::findOrFail($id)->audits;
 

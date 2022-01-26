@@ -1081,20 +1081,34 @@ class Party extends Model implements Auditable
     }
 
     // Mutators for legacy event_date/start/end fields.  These are now derived from the UTC fields via virtual
-    // columns, and therefore should never be set directly.  Throw exceptions to ensure that they are not.
+    // columns, and therefore should never be set directly.  Throw exceptions to ensure that they are not, until we
+    // have retired these fields.
+    //
+    // The tests create events using the old fields, and we've not changed those yet, but PartyFactory will have
+    // populated the new ones - so just ignore that.
     //
     // You might think that we could have mutators which set these correctly.  But this isn't possible; the UTC value
     // of the date depends on the local date, time and timezone, and cannot be set in isolation.
     public function setEventDateAttribute($val) {
-        throw new \Exception("Attempt to set event time fields directly; please use event_start_utc and event_end_utc");
+        if (!array_key_exists('event_start_utc', $this->attributes)) {
+            throw new \Exception("Attempt to set event time fields directly; please use event_start_utc and event_end_utc");
+        }
     }
 
     public function setStartAttribute($val) {
-        throw new \Exception("Attempt to set event time fields directly; please use event_start_utc and event_end_utc");
+        if (!array_key_exists('event_start_utc', $this->attributes)) {
+            throw new \Exception(
+                "Attempt to set event time fields directly; please use event_start_utc and event_end_utc"
+            );
+        }
     }
 
     public function setEndAttribute($val) {
-        throw new \Exception("Attempt to set event time fields directly; please use event_start_utc and event_end_utc");
+        if (!array_key_exists('event_start_utc', $this->attributes)) {
+            throw new \Exception(
+                "Attempt to set event time fields directly; please use event_start_utc and event_end_utc"
+            );
+        }
     }
 
     // We also need accessors, to avoid any cases where we mutate the values and access them before we have

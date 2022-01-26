@@ -3,14 +3,27 @@
 use App\Group;
 use Faker\Generator as Faker;
 
-$factory->define(App\Party::class, function (Faker $faker) {
-    // Need to force the location otherwise the random one may not be geocodable and therefore the event may not
-    // get created.
-    $start = Carbon\Carbon::parse($faker->iso8601());
-    $end = $start;
-    $end->addHours(2);
+$factory->define(App\Party::class, function (Faker $faker, $attributes = []) {
+    // Many tests use the old event_date/start/end method.  Convert those here to the new event_start_utc/
+    // event_end_utc approach.  This avoids changing lots of tests.
+    if (array_key_exists('event_date', $attributes)) {
+        $startTime = array_key_exists('start', $attributes) ? $attributes['start'] : $faker->time();
+        $endTime = array_key_exists('end', $attributes) ? $attributes['end'] : $faker->time();
+        $start = Carbon\Carbon::parse($attributes['event_date'] . ' ' . $startTime);
+        $end = Carbon\Carbon::parse($attributes['event_date'] . ' ' . $endTime);
+        unset($attributes['event_date']);
+        unset($attributes['start']);
+        unset($attributes['end']);
+    } else {
+        // Fake an event that's two hours long.
+        $start = Carbon\Carbon::parse($faker->iso8601());
+        $end = $start;
+        $end->addHours(2);
+    }
 
     return [
+        // Need to force the location otherwise the random one may not be geocodable and therefore the event may not
+        // get created.
         'location' => 'International House, 3Space, 6 Canterbury Cres, London SW9 7QD',
         'group' => function () {
             return factory(Group::class)->create()->idgroups;
