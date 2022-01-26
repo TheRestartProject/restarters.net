@@ -8,6 +8,7 @@ use App\Helpers\Fixometer;
 use App\Network;
 use App\Notifications\AdminWordPressEditEventFailure;
 use App\Party;
+use Carbon\Carbon;
 use HieuLe\WordpressXmlrpcClient\WordpressClient;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Queue\InteractsWithQueue;
@@ -49,9 +50,9 @@ class EditWordpressPostForEvent
 
         try {
             if (is_numeric($theParty->wordpress_post_id)) {
-                // TODO Timezones
-                $startTimestamp = strtotime($data['event_date'].' '.$data['start']);
-                $endTimestamp = strtotime($data['event_date'].' '.$data['end']);
+                // TODO Timezones - this code doesn't yet push the timezone information to Wordpress.
+                $start = Carbon::parse($data['event_start_utc']);
+                $end = Carbon::parse($data['event_end_utc']);
 
                 $group = Group::where('idgroups', $theParty->group)->first();
 
@@ -61,10 +62,10 @@ class EditWordpressPostForEvent
                     ['key' => 'party_groupcity', 'value' => $group->area],
                     ['key' => 'party_venue', 'value' => $data['venue']],
                     ['key' => 'party_location', 'value' => $data['location']],
-                    ['key' => 'party_time', 'value' => substr($data['start'], 0, 5).' - '.substr($data['end'], 0, 5)],
-                    ['key' => 'party_date', 'value' => $data['event_date']],
-                    ['key' => 'party_timestamp', 'value' => $startTimestamp],
-                    ['key' => 'party_timestamp_end', 'value' => $endTimestamp],
+                    ['key' => 'party_time', 'value' => $start->toTimeString('minute') .' - '. $end->toTimeString('minute')],
+                    ['key' => 'party_date', 'value' => $start->toDateString()],
+                    ['key' => 'party_timestamp', 'value' => $start->timestamp],
+                    ['key' => 'party_timestamp_end', 'value' => $end->timestamp],
                     ['key' => 'party_stats', 'value' => $id],
                     ['key' => 'party_lat', 'value' => $data['latitude']],
                     ['key' => 'party_lon', 'value' => $data['longitude']],
