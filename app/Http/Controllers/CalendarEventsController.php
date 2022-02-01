@@ -41,8 +41,7 @@ class CalendarEventsController extends Controller
       })
       ->select('events.*', 'groups.name')
       ->groupBy('idevents')
-            // TODO Timezones
-      ->orderBy('event_date', 'ASC')
+      ->orderBy('event_start_utc', 'ASC')
       ->get();
 
         $this->exportCalendar($events);
@@ -57,9 +56,7 @@ class CalendarEventsController extends Controller
       })
       ->select('events.*', 'groups.name')
       ->groupBy('events.idevents')
-            // TODO Timezones
-
-      ->orderBy('events.event_date', 'ASC')
+      ->orderBy('events.event_start_utc', 'ASC')
       ->get();
 
         if (empty($events)) {
@@ -77,8 +74,7 @@ class CalendarEventsController extends Controller
       })
       ->select('events.*', 'groups.name')
       ->groupBy('events.idevents')
-      // TODO Timezones
-      ->orderBy('events.event_date', 'ASC')
+      ->orderBy('events.event_start_utc', 'ASC')
       ->get();
 
         if (empty($events)) {
@@ -98,8 +94,7 @@ class CalendarEventsController extends Controller
       })
       ->select('events.*', 'groups.name')
       ->groupBy('events.idevents')
-    // TODO Timezones
-      ->orderBy('events.event_date', 'ASC')
+      ->orderBy('events.event_start_utc', 'ASC')
       ->get();
 
         if (empty($events)) {

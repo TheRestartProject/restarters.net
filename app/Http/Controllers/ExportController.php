@@ -290,7 +290,9 @@ class ExportController extends Controller
             }
 
             //By date
-            // TODO Timezones
+            // TODO Timezones.  This is trick because the input fields are currently in local time, but the events
+            // we are exporting might span multiple time zones.  We need to change the client to pass in a UTC
+            // string.
             if ($request->input('from_date') !== null && $request->input('to_date') == null) {
                 $user_events = $user_events->whereDate('events.event_date', '>', $request->input('from_date'));
             } elseif ($request->input('to_date') !== null && $request->input('from_date') == null) {
@@ -363,8 +365,8 @@ class ExportController extends Controller
         $all_city_hours_completed = $city_hours_completed->orderBy('event_hours', 'DESC')->get();
         $city_hours_completed = $city_hours_completed->orderBy('event_hours', 'DESC')->take(5)->get();
 
-        //order by users id
-        $user_events = $user_events->orderBy('events.event_date', 'DESC');
+        //order by event date.
+        $user_events = $user_events->orderBy('events.event_start_utc', 'DESC');
 
         //Select all necessary information for table
         $user_events = $user_events->select(

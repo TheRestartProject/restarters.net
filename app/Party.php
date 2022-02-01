@@ -407,57 +407,30 @@ class Party extends Model implements Auditable
     public function scopeUndeleted($query) {
         // This is the base scope.  Almost always we are only interested in seeing events which have not been
         // deleted.
-        // TODO Timezones
         return $query->whereNull('events.deleted_at')
-            ->orderBy('event_date', 'DESC')
-            ->orderBy('start', 'DESC')
-            ->orderBy('end', 'DESC');
+            ->orderBy('event_start_utc', 'DESC');
     }
 
     public function scopePast($query) {
         // A past event is an event where the end time is less than now.
-        //
-        // We want to use local variables when formatted times to avoid windows where the date/time changes under
-        // our feet between one line of code and the next.
-        $date = date('Y-m-d');
-        $time = date('H:i');
         $query = $query->undeleted();
-        $query = $query->where('event_date', '<', $date)
-            ->orWhere(function($q2) use ($date, $time)  {
-                $q2->where([
-                    // TODO Timezones
-                    [ 'event_date', '=', $date ],
-                    [ 'end', '<', $time ]
-                ]);
-            });
+        $query = $query->whereDate('event_end_utc', '<', date('Y-m-d H:i:s'));
         return $query;
     }
 
     public function scopeFuture($query) {
-        // A future event is an event where the start time is greater than to now.
-        $date = date('Y-m-d');
-        $time = date('H:i');
+        // A future event is an event where the start time is greater than now.
         $query = $query->undeleted();
-        // TODO Timezones
-        $query = $query->whereDate('event_date', '>', $date)
-            ->orWhere(function($q2) use ($date, $time) {
-                $q2->where([
-                               [ 'event_date', '=', $date ],
-                               [ 'start', '>', $time ]
-                           ]);
-            });
+        $query = $query->whereDate('event_start_utc', '>', date('Y-m-d H:i:s'));
         return $query;
     }
 
     public function scopeActive($query) {
         // An active event is an event which has started and not yet finished.
-        $date = date('Y-m-d');
-        $time = date('H:i');
         $query = $query->undeleted();
-        // TODO Timezones
-        $query = $query->whereDate('event_date', '=', $date)
-            ->where('start', '<=', $time)
-            ->where('end', '>=', $time);
+        $now = date('Y-m-d H:i:s');
+        $query = $query->whereDate('event_start_utc', '<=', $now)
+            ->whereDate('event_end_utc', '<=', $now);
         return $query;
     }
 
@@ -589,13 +562,11 @@ class Party extends Model implements Auditable
       ->join('users_groups', 'users_groups.group', '=', 'groups.idgroups')
       ->where(function ($query) use ($user_group_ids) {
           $query->whereNotIn('events.group', $user_group_ids)
-          // TODO Timezones
-        ->whereDate('event_date', '>=', date('Y-m-d'));
+        ->whereDate('event_start_utc', '>=', date('Y-m-d H:i:s'));
       })
       ->having('distance', '<=', User::NEARBY_KM)
       ->groupBy('events.idevents')
-      ->orderBy('events.event_date', 'ASC')
-      ->orderBy('events.start', 'ASC')
+      ->orderBy('events.event_start_utc', 'ASC')
       ->orderBy('distance', 'ASC');
     }
 

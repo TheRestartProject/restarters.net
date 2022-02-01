@@ -452,11 +452,10 @@ class Group extends Model implements Auditable
 
     public function getNextUpcomingEvent()
     {
-        // TODO Timezones
         $event = $this->parties()
             ->whereNotNull('wordpress_post_id')
-            ->whereDate('event_date', '>=', date('Y-m-d'))
-            ->orderBy('event_date', 'asc');
+            ->whereDate('event_start_utc', '>=', date('Y-m-d H:i:s'))
+            ->orderBy('event_start_utc', 'asc');
 
         if (! $event->count()) {
             return null;
