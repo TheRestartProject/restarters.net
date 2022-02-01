@@ -10,7 +10,6 @@ use Illuminate\Http\Request;
 
 class EventController extends Controller
 {
-    /** ToDo Test */
     public function getEventsByUsersNetworks(Request $request, $date_from = null, $date_to = null)
     {
         $authenticatedUser = Auth::user();
@@ -28,7 +27,8 @@ class EventController extends Controller
                   ->join('users', 'users.id', '=', 'user_network.user_id');
 
         if (! empty($date_from) && ! empty($date_to)) {
-            // TODO Timezones
+            // TODO Timezones.  The API call may return events spanning multiple timezones, and it's unclear what
+            // timezone the inputs will be in.
             $parties = $parties->where('events.event_date', '>=', date('Y-m-d', strtotime($date_from)))
            ->where('events.event_date', '<=', date('Y-m-d', strtotime($date_to)));
         }

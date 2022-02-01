@@ -130,15 +130,12 @@ class CalendarEventsController extends Controller
             if (! is_null($event->event_date) && $event->event_date != '0000-00-00') {
                 $ical[] = 'BEGIN:VEVENT';
 
-                // Timezone currently fixed to Europe/London, but in future when we
-                // have better timezone support in the app this will need amending.
                 $ical[] = 'TZID:Europe/London';
                 $ical[] = "UID:{$event->idevents}";
                 $ical[] = 'DTSTAMP:'.date($this->ical_format).'';
                 $ical[] = "SUMMARY:{$event->venue} ({$event->name})";
-                // TODO Timezones
-                $ical[] = 'DTSTART;TZID=Europe/London:'.date($this->ical_format, strtotime($event->event_date.' '.$event->start)).'';
-                $ical[] = 'DTEND;TZID=Europe/London:'.date($this->ical_format, strtotime($event->event_date.' '.$event->end)).'';
+                $ical[] = 'DTSTART;TZID=' . $event->timezone . ':'.date($this->ical_format, strtotime($event->event_date.' '.$event->start)).'';
+                $ical[] = 'DTEND;TZID=' . $event->timezone . ':'.date($this->ical_format, strtotime($event->event_date.' '.$event->end)).'';
                 $ical[] = 'DESCRIPTION:'.url('/party/view').'/'.$event->idevents;
                 $ical[] = "LOCATION:{$event->location}";
                 $ical[] = 'URL:'.url('/party/view').'/'.$event->idevents;

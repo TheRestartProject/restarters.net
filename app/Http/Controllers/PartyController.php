@@ -1332,7 +1332,8 @@ class PartyController extends Controller
          ->join('users', 'users.access_group_tag_id', '=', 'group_tags.id');
 
         if (! empty($date_from) && ! empty($date_to)) {
-            // TODO Timezones
+            // TODO Timezones.  The API call may return events spanning multiple timezones, and it's unclear what
+            // timezone the inputs will be in.
             $parties = $parties->where('events.event_date', '>=', date('Y-m-d', strtotime($date_from)))
            ->where('events.event_date', '<=', date('Y-m-d', strtotime($date_to)));
         }

@@ -376,7 +376,7 @@ class Group extends Model implements Auditable
     }
 
     /**
-     * All parties for the group that are taking place today or later.
+     * All parties for the group that are taking place in the future.
      *
      * @author Christopher Kelker - @date 2019-03-21
      * @editor  Christopher Kelker, Neil Mather
@@ -385,23 +385,21 @@ class Group extends Model implements Auditable
      */
     public function upcomingParties($exclude_parties = [])
     {
-        // TODO Timezones
-        $from = date('Y-m-d');
+        $from = date('Y-m-d H:i:s');
 
         if (! empty($exclude_parties)) {
             return $this->parties()
-                ->where('event_date', '>=', $from)
+                ->where('event_end_utc', '>', $from)
                 ->whereNotIn('idevents', $exclude_parties)
                 ->get();
         }
 
-        return $this->parties()->where('event_date', '>=', $from)->get();
+        return $this->parties()->where('event_end_utc', '>', $from)->get();
     }
 
     /**
      * [pastParties description]
-     * All Past Parties where between the Start Parties Date
-     * is yesterday or a month earlier.
+     * All Past Parties.
      *
      * @author Christopher Kelker - @date 2019-03-21
      * @editor  Christopher Kelker
@@ -410,15 +408,16 @@ class Group extends Model implements Auditable
      */
     public function pastParties($exclude_parties = [])
     {
-        // TODO Timezones
+        $now = date('Y-m-d H:i:s');
+
         if (! empty($exclude_parties)) {
             return $this->parties()
-                ->where('event_date', '<', date('Y-m-d'))
+                ->where('event_end_utc', '<', $now)
                 ->whereNotIn('idevents', $exclude_parties)
                 ->get();
         }
 
-        return $this->parties()->where('event_date', '<', date('Y-m-d'))->get();
+        return $this->parties()->where('event_start_utc', '<', $now)->get();
     }
 
     /**

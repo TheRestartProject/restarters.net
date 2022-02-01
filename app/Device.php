@@ -69,7 +69,7 @@ class Device extends Model implements Auditable
 
     public function getList($params = null)
     {
-        // TODO Timezones
+        // TODO Timezones.  The input filters are in local time, so we need to fix the client.
         $sql = 'SELECT * FROM `view_devices_list`';
 
         if (! is_null($params)) {
@@ -340,7 +340,6 @@ class Device extends Model implements Auditable
     public function export()
     {
         //Tested
-        // TODO Timezones
         return DB::select(DB::raw('SELECT
                     `c`.`name` AS `category`,
                     `brand`,
@@ -349,7 +348,7 @@ class Device extends Model implements Auditable
                     `repair_status`,
                     `spare_parts`,
                     `e`.`location`,
-                    UNIX_TIMESTAMP( CONCAT(`e`.`event_date`, " ", `e`.`start`) ) AS `event_timestamp`,
+                    UNIX_TIMESTAMP(event_start_utc) AS `event_timestamp`,
                     `g`.`name` AS `group_name`
 
                 FROM `devices` AS `d`

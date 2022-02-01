@@ -54,9 +54,9 @@ class CreateWordpressPostForEvent
         }
 
         try {
-            // TODO Timezones
-            $startTimestamp = strtotime($theParty->event_date.' '.$theParty->start);
-            $endTimestamp = strtotime($theParty->event_date.' '.$theParty->end);
+            // TODO Timezones.  We need to pass the timezone and display it.
+            $startTimestamp = strtotime($theParty->event_start_utc);
+            $endTimestamp = strtotime($theParty->event_end_utc);
 
             $group = Group::where('idgroups', $theParty->group)->first();
 
