@@ -54,7 +54,8 @@ class PartyController extends Controller
 
     public static function expandEvent($event, $group)
     {
-        $thisone = $event->getAttributes();
+        // Use attributesToArray rather than getAttributes so that our custom accessors are invoked.
+        $thisone = $event->attributesToArray();
 
         if (is_null($group)) {
             // We are showing events for multiple groups and so we need to pass the relevant group, in order that
@@ -208,9 +209,12 @@ class PartyController extends Controller
                 $start = $request->input('start');
                 $end = $request->input('end');
 
+                // Convert these to the UTC timezone for storage.
                 $startCarbon = Carbon::parse($event_date . ' ' . $start, $timezone);
+                $startCarbon->setTimezone('UTC');
                 $event_start_utc = $startCarbon->toIso8601String();
                 $endCarbon = Carbon::parse($event_date . ' ' . $end, $timezone);
+                $endCarbon->setTimezone('UTC');
                 $event_end_utc = $endCarbon->toIso8601String();
             }
 
