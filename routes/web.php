@@ -33,6 +33,11 @@ Route::get('/user/forbidden', function () {
 // We use the Laravel login route.
 Auth::routes();
 
+Route::group(['middleware' => 'guest'], function ()
+{
+    Route::get('/', 'HomeController@index')->name('home');
+});
+
 // We are not using Laravel's default registration methods. So we redirect /register to /user/register.
 Route::redirect('register', '/user/register');
 Route::get('/logout', 'UserController@logout');
@@ -162,9 +167,12 @@ Route::prefix('battcat')->group(function () {
     Route::get('/status', 'BattcatOraController@status');
 });
 
-Route::group(['middleware' => ['auth', 'verifyUserConsent']], function () {
+Route::group(['middleware' => ['guest']], function () {
     Route::get('/', 'HomeController@index')->name('home');
+    Route::get('/about', 'HomeController@index')->name('home');
+});
 
+Route::group(['middleware' => ['auth', 'verifyUserConsent']], function () {
     //User Controller
     Route::prefix('profile')->group(function () {
         Route::get('/', 'UserController@index')->name('profile');
@@ -180,8 +188,6 @@ Route::group(['middleware' => ['auth', 'verifyUserConsent']], function () {
         Route::post('/edit-admin-settings', 'UserController@postAdminEdit');
         Route::post('/edit-repair-directory', 'UserController@postProfileRepairDirectory');
     });
-
-    Route::post('/edit-user', 'UserController@postEdit');
 
     Route::prefix('user')->group(function () {
         Route::get('/create', 'UserController@create');
@@ -225,14 +231,11 @@ Route::group(['middleware' => ['auth', 'verifyUserConsent']], function () {
             return redirect('/fixometer');
         });
         Route::get('/search', 'DeviceController@search');
-        Route::get('/page-edit/{id}', 'DeviceController@edit');
-        Route::post('/page-edit/{id}', 'DeviceController@edit');
         Route::post('/edit/{id}', 'DeviceController@ajaxEdit');
         Route::post('/create', 'DeviceController@ajaxCreate');
         Route::get('/delete/{id}', 'DeviceController@delete');
         Route::post('/image-upload/{id}', 'DeviceController@imageUpload');
         Route::get('/image/delete/{iddevices}/{id}/{path}', 'DeviceController@deleteImage');
-        Route::post('/column-preferences', 'DeviceController@columnPreferences');
     });
 
     Route::resource('networks', 'NetworkController');

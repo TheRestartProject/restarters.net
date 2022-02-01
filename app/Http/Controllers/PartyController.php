@@ -102,15 +102,8 @@ class PartyController extends Controller
 
             $group = Group::find($group_id);
         } else {
-            // This is a logged-in user's events page.  We want all upcoming events for groups we are a member
-            // of.
-            foreach (Party::usersUpcomingEvents()->get() as $event) {
-                $e = \App\Http\Controllers\PartyController::expandEvent($event, NULL);
-                $events[] = $e;
-            }
-
-            // ...and any past events for our groups or which we've attended.
-            foreach (Party::usersPastEvents()->get() as $event) {
+            // This is a logged-in user's events page.  We want all relevant events.
+            foreach (Party::forUser()->get() as $event) {
                 $e = \App\Http\Controllers\PartyController::expandEvent($event, NULL);
                 $events[] = $e;
             }
@@ -130,7 +123,8 @@ class PartyController extends Controller
             }
 
             // ...and any other upcoming events
-            $other_upcoming_events = Party::upcomingEvents()->whereNotIn('idevents', \Illuminate\Support\Arr::pluck($events, 'idevents'))->get();
+            $other_upcoming_events = Party::future()->
+                whereNotIn('idevents', \Illuminate\Support\Arr::pluck($events, 'idevents'))->get();
 
             foreach ($other_upcoming_events as $event) {
                 $e = self::expandEvent($event, NULL);
@@ -150,49 +144,6 @@ class PartyController extends Controller
             'is_host_of_group' => $is_host_of_group,
             'isCoordinatorForGroup' => $isCoordinatorForGroup,
             'group' => $group,
-        ]);
-    }
-
-    public function allPast()
-    {
-        $past_events = Party::pastEvents();
-        $past_events_count = $past_events->count();
-        $past_events = $past_events->paginate(env('PAGINATE'));
-
-        return view('events.all-past', [
-          'past_events' => $past_events,
-          'past_events_count' => $past_events_count,
-        ]);
-    }
-
-    public function allUpcoming(Request $request)
-    {
-        $allUpcomingEventsQuery = Party::allUpcomingEvents();
-
-        $hasSearched = false;
-        if ($request->input('from-date') !== null) {
-            $allUpcomingEventsQuery->whereDate('event_date', '>=', $request->input('from-date'));
-            $hasSearched = true;
-        }
-        if ($request->input('to-date') !== null) {
-            $allUpcomingEventsQuery->whereDate('event_date', '<=', $request->input('to-date'));
-            $hasSearched = true;
-        }
-        if ($request->has('online')) {
-            $allUpcomingEventsQuery->where('online', true);
-            $hasSearched = true;
-        }
-
-        $allUpcomingEventsCount = $allUpcomingEventsQuery->count();
-        $allUpcomingEvents = $allUpcomingEventsQuery->paginate(env('PAGINATE'));
-
-        return view('events.all', [
-            'upcoming_events' => $allUpcomingEvents,
-            'upcoming_events_count' => $allUpcomingEventsCount,
-            'fromDate' => $request->input('from-date'),
-            'toDate' => $request->input('to-date'),
-            'online' => $request->input('online'),
-            'hasSearched' => $hasSearched,
         ]);
     }
 
@@ -731,27 +682,34 @@ class PartyController extends Controller
 
         if (empty($not_in_event)) {
             try {
-                $user_event = EventsUsers::updateOrCreate([
-                    'user' => $user_id,
-                    'event' => $event_id,
-                ], [
-                    'status' => 1,
-                    'role' => 4,
-                ]);
-
                 $event = Party::find($event_id);
 
-                $event->increment('volunteers');
+                if (!$event) {
+                    $flashData['danger'] = 'Invalid event id';
 
-                $flashData = [];
-                if (! Auth::user()->isInGroup($event->theGroup->idgroups)) {
-                    $flashData['prompt-follow-group'] = true;
+                    return redirect()->back()->with($flashData);
+                } else {
+                    $user_event = EventsUsers::updateOrCreate([
+                                                                  'user' => $user_id,
+                                                                  'event' => $event_id,
+                                                              ], [
+                                                                  'status' => 1,
+                                                                  'role' => 4,
+                                                              ]);
+
+
+                    $event->increment('volunteers');
+
+                    $flashData = [];
+                    if (! Auth::user()->isInGroup($event->theGroup->idgroups)) {
+                        $flashData['prompt-follow-group'] = true;
+                    }
+
+                    $this->notifyHostsOfRsvp($user_event, $event_id);
+                    $this->addToDiscourseThread($event, Auth::user());
+
+                    return redirect()->back()->with($flashData);
                 }
-
-                $this->notifyHostsOfRsvp($user_event, $event_id);
-                $this->addToDiscourseThread($event, Auth::user());
-
-                return redirect()->back()->with($flashData);
             } catch (\Exception $e) {
                 $flashData['danger'] = 'Failed to join this event';
 

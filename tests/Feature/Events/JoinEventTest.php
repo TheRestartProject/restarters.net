@@ -50,4 +50,13 @@ class JoinEventTest extends TestCase
             ],
         ]);
     }
+
+    public function testJoinInvalid() {
+        $user = factory(User::class)->states('Restarter')->create();
+        $this->actingAs($user);
+
+        $response = $this->get('/party/join/-1');
+        $response->assertSessionHas('danger');
+        $this->assertTrue($response->isRedirection());
+    }
 }

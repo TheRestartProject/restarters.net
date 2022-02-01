@@ -286,7 +286,7 @@ class Group extends Model implements Auditable
             $uEmissionratio = \App\Helpers\LcaStats::getEmissionRatioUnpowered();
         }
 
-        $allPastEvents = Party::pastEvents()
+        $allPastEvents = Party::past()
             ->where('events.group', $this->idgroups)
             ->get();
 
