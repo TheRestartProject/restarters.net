@@ -301,7 +301,7 @@ class Party extends Model implements Auditable
         return self::when($only_past, function ($query) {
             // We only want the ones in the past.
             $now = date('Y-m-d H:i:s');
-            return $query->whereDate('event_end_utc', '<', $now);
+            return $query->where('event_end_utc', '<', $now);
         })->when(is_numeric($group), function ($query) use ($group) {
             // For a specific group.  Note that 'admin' is not numeric so won't pass this test.
             return $query->where('group', $group);
@@ -387,14 +387,14 @@ class Party extends Model implements Auditable
     public function scopePast($query) {
         // A past event is an event where the end time is less than now.
         $query = $query->undeleted();
-        $query = $query->whereDate('event_end_utc', '<', date('Y-m-d H:i:s'));
+        $query = $query->where('event_end_utc', '<', date('Y-m-d H:i:s'));
         return $query;
     }
 
     public function scopeFuture($query) {
         // A future event is an event where the start time is greater than now.
         $query = $query->undeleted();
-        $query = $query->whereDate('event_start_utc', '>', date('Y-m-d H:i:s'));
+        $query = $query->where('event_start_utc', '>', date('Y-m-d H:i:s'));
         return $query;
     }
 
@@ -402,8 +402,8 @@ class Party extends Model implements Auditable
         // An active event is an event which has started and not yet finished.
         $query = $query->undeleted();
         $now = date('Y-m-d H:i:s');
-        $query = $query->whereDate('event_start_utc', '<=', $now)
-            ->whereDate('event_end_utc', '<=', $now);
+        $query = $query->where('event_start_utc', '<=', $now)
+            ->where('event_end_utc', '<=', $now);
         return $query;
     }
 
@@ -535,7 +535,7 @@ class Party extends Model implements Auditable
       ->join('users_groups', 'users_groups.group', '=', 'groups.idgroups')
       ->where(function ($query) use ($user_group_ids) {
           $query->whereNotIn('events.group', $user_group_ids)
-        ->whereDate('event_start_utc', '>=', date('Y-m-d H:i:s'));
+        ->where('event_start_utc', '>=', date('Y-m-d H:i:s'));
       })
       ->having('distance', '<=', User::NEARBY_KM)
       ->groupBy('events.idevents')

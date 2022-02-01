@@ -453,7 +453,7 @@ class Group extends Model implements Auditable
     {
         $event = $this->parties()
             ->whereNotNull('wordpress_post_id')
-            ->whereDate('event_start_utc', '>=', date('Y-m-d H:i:s'))
+            ->where('event_start_utc', '>=', date('Y-m-d H:i:s'))
             ->orderBy('event_start_utc', 'asc');
 
         if (! $event->count()) {

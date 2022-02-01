@@ -125,8 +125,13 @@ class PartyController extends Controller
             }
 
             // ...and any other upcoming events
+            DB::enableQueryLog();
+
             $other_upcoming_events = Party::future()->
                 whereNotIn('idevents', \Illuminate\Support\Arr::pluck($events, 'idevents'))->get();
+
+            $queries = DB::getQueryLog();
+            error_log(var_export($queries, TRUE));
 
             foreach ($other_upcoming_events as $event) {
                 $e = self::expandEvent($event, NULL);

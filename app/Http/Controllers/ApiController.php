@@ -242,8 +242,6 @@ class ApiController extends Controller
             // We need the total weight/CO2 impact for this filtering.
             $d = new Device();
 
-            DB::enableQueryLog();
-
             $wheres[] = ['repair_status', '=', env('DEVICE_FIXED')];
 
             // We select the powered and unpowered weights separately and then add them afterwards just because

@@ -22,11 +22,11 @@ class Search extends Model
         }
 
         if (! is_null($from)) {
-            $eventsQuery->whereDate('event_start_utc', '>=', date('Y-m-d H:i:s', $from));
+            $eventsQuery->where('event_start_utc', '>=', date('Y-m-d H:i:s', $from));
         }
 
         if (! is_null($to)) {
-            $eventsQuery->whereDate('event_end_utc', '<=', date('Y-m-d H:i:s', $to));
+            $eventsQuery->where('event_end_utc', '<=', date('Y-m-d H:i:s', $to));
         }
 
         if (! is_null($group_tags)) {

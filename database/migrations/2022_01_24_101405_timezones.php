@@ -1,5 +1,6 @@
 <?php
 
+use Carbon\Carbon;
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
@@ -43,11 +44,16 @@ class Timezones extends Migration
 
             # Convert the start/end to UTC.
             $atts = $event->getAttributes();
-            $start = (new DateTime($atts['event_date'] . ' ' . $atts['start'], new DateTimeZone($tz)))->format('c');
-            $end = (new DateTime($atts['event_date'] . ' ' . $atts['end'], new DateTimeZone($tz)))->format('c');
-            error_log("Event {$event->idevents} {$atts['event_date']} {$atts['start']}-{$atts['end']} => $start - $end");
+            $startCarbon = Carbon::parse($atts['event_date'] . ' ' . $atts['start'], $tz);
+            $startCarbon->setTimezone('UTC');
+            $event_start_utc = $startCarbon->toIso8601String();
+            $endCarbon = Carbon::parse($atts['event_date'] . ' ' . $atts['start'], $tz);
+            $endCarbon->setTimezone('UTC');
+            $event_end_utc = $startCarbon->toIso8601String();
 
-            DB::statement(DB::raw("UPDATE events SET timezone = '$tz', event_start_utc = '$start', event_end_utc = '$end' WHERE idevents = {$event->idevents}"));
+            error_log("Event {$event->idevents} {$atts['event_date']} {$atts['start']}-{$atts['end']} => $event_start_utc - $event_end_utc");
+
+            DB::statement(DB::raw("UPDATE events SET timezone = '$tz', event_start_utc = '$event_start_utc', event_end_utc = '$event_end_utc' WHERE idevents = {$event->idevents}"));
         }
 
         # Set up virtual generated columns which replicate event_date/start/end but generated from the new timestamps.
