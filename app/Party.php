@@ -82,7 +82,7 @@ class Party extends Model implements Auditable
 
     public function findAllSearchable()
     {
-        // TODO Can this be replaced by Partp::past?
+        // TODO Can this be replaced by Party::past?
         return DB::select(DB::raw('SELECT
                     `e`.`idevents` AS `id`,
                     UNIX_TIMESTAMP(`event_start_utc`) AS `event_timestamp`,
@@ -593,6 +593,12 @@ class Party extends Model implements Auditable
     public function getEventEnd()
     {
         return date('H:i', strtotime($this->end));
+    }
+
+    public function getEventTimestampAttribute()
+    {
+        // Returning in local time.
+        return "{$this->event_date} {$this->start}";
     }
 
     public function getEventStartEnd()
