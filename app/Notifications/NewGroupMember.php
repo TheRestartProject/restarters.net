@@ -46,12 +46,21 @@ class NewGroupMember extends Notification implements ShouldQueue
      */
     public function toMail($notifiable)
     {
+        $locale = $notifiable->language;
+
         return (new MailMessage)
-                  ->subject('New group member followed '.$this->arr['group_name'])
-                  ->greeting(__('notifications.greeting', [], $notifiable->language))
-                  ->line('A new volunteer, '.$this->arr['user_name'].', has followed your group \''.$this->arr['group_name'].'\'.')
-                  ->action('Go to group', $this->arr['group_url'])
-                  ->line('If you would like to stop receiving these emails, please visit <a href="'.url('/user/edit/'.$notifiable->id).'">your preferences</a> on your account.');
+                  ->subject(__('notifications.new_member_subject', [
+                      'name' => $this->arr['group_name']
+                  ], $locale))
+                  ->greeting(__('notifications.greeting', [], $locale))
+                  ->line(__('notifications.new_member_line1', [
+                        'user' => $this->arr['user_name'],
+                        'group' => $this->arr['group_name']
+                    ], $locale))
+                  ->action(__('notifications.new_member_action', [], $locale), $this->arr['group_url'])
+                   ->line(__('notifications.email_preferences', [
+                       'url' => url('/user/edit/'.$notifiable->id)
+                   ], $locale));
     }
 
     /**
@@ -63,7 +72,9 @@ class NewGroupMember extends Notification implements ShouldQueue
     public function toArray($notifiable)
     {
         return [
-            'title' => 'A new volunteer, '.$this->arr['user_name'].', has followed ',
+            'title' => __('notifications.new_member_title', [
+                'name' => $this->arr['user_name']
+                    ], $notifiable->language),
             'name' => $this->arr['group_name'],
             'url' => $this->arr['group_url'],
         ];

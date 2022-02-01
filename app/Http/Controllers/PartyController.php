@@ -735,7 +735,7 @@ class PartyController extends Controller
             $hosts = null;
         }
 
-        if (! is_null($hosts)) {
+        if ($hosts && count($hosts)) {
             try {
                 // Get user information
                 $user = User::find($user_event->user);

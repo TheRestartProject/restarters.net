@@ -48,12 +48,21 @@ class RSVPEvent extends Notification implements ShouldQueue
      */
     public function toMail($notifiable)
     {
+        $locale = $notifiable->language;
+
         return (new MailMessage)
-                      ->subject($this->arr['user_name'].' has RSVPed to your event')
-                      ->greeting(__('notifications.greeting', [], $notifiable->language))
-                      ->line('A volunteer, '.$this->arr['user_name'].', has RSVPed to the \''.$this->arr['event_venue'].'\' event.')
-                      ->action('View your event', $this->arr['event_url'])
-                      ->line('If you would like to stop receiving these emails, please visit <a href="'.url('/user/edit/'.$notifiable->id).'">your preferences</a> on your account.');
+          ->subject(__('notifications.rsvp_subject', [
+              'name' => $this->arr['user_name']
+          ], $locale))
+          ->greeting(__('notifications.greeting', [], $locale))
+          ->line(__('notifications.rsvp_line1', [
+              'user' => $this->arr['user_name'],
+              'event' => $this->arr['event_venue']
+          ], $locale))
+          ->action(__('notifications.rsvp_action', [], $locale), $this->arr['event_url'])
+          ->line(__('partials.notification_footer', [
+              'url' => url('/user/edit/' . $notifiable->id)
+          ]));
     }
 
     /**
@@ -65,7 +74,9 @@ class RSVPEvent extends Notification implements ShouldQueue
     public function toArray($notifiable)
     {
         return [
-            'title' => $this->arr['user_name'].' has RSVPed to your event:',
+            'title' => __('notifications.rsvp_title', [
+                'name' => $this->arr['user_name']
+            ], $notifiable->language),
             'name' => $this->arr['event_venue'],
             'url' => $this->arr['event_url'],
         ];

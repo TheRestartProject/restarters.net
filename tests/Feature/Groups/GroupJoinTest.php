@@ -5,6 +5,7 @@ namespace Tests\Feature\Groups;
 use App\Group;
 use App\GroupTags;
 use App\Listeners\AddUserToDiscourseGroup;
+use App\Notifications\NewGroupMember;
 use App\User;
 use App\UserGroups;
 use Illuminate\Support\Facades\Notification;
@@ -26,7 +27,11 @@ class GroupJoinTest extends TestCase
         $host = factory(User::class)->states('Restarter')->create([
           'api_token' => '1234',
         ]);
-        $this->actingAs($host);
+        $group->addVolunteer($host);
+        $group->makeMemberAHost($host);
+
+        $user = factory(User::class)->states('Restarter')->create();
+        $this->actingAs($user);
 
         $this->followingRedirects();
 
@@ -36,6 +41,18 @@ class GroupJoinTest extends TestCase
         }));
 
         $response = $this->get('/group/join/'.$group->idgroups);
+
+        Notification::assertSentTo(
+            [$host],
+            NewGroupMember::class,
+            function ($notification, $channels, $host) use ($group, $user) {
+                $mailData = $notification->toMail($host)->toArray();
+                self::assertEquals(__('notifications.new_member_subject', [
+                    'name' => $group->name
+                ], $host->language), $mailData['subject']);
+                return true;
+            }
+        );
 
         // Should redirect to the dashboard.
         $this->assertVueProperties($response, [
