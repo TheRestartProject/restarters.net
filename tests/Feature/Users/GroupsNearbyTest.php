@@ -134,8 +134,6 @@ class GroupsNearbyTest extends TestCase
              'latitude' => 51.5072178,
              'longitude' => -0.1275862,
          ]);
-        error_log("Created " . $user->id . " at " . $user->latitude . "," . $user->longitude);
-
 
         $admin1 = factory(User::class)->state('Administrator')->create();
         $this->actingAs($admin1);
