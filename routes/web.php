@@ -189,8 +189,6 @@ Route::group(['middleware' => ['auth', 'verifyUserConsent']], function () {
         Route::post('/edit-repair-directory', 'UserController@postProfileRepairDirectory');
     });
 
-    Route::post('/edit-user', 'UserController@postEdit');
-
     Route::prefix('user')->group(function () {
         Route::get('/create', 'UserController@create');
         Route::post('/create', 'UserController@create');
