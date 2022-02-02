@@ -83,4 +83,11 @@
     </div>
     @include('partials.languages')
 </section>
+<style>
+    #login-form-submit:disabled {
+        background-color: #ccc;
+        opacity: .5;
+        color: inherit;
+    }
+</style>
 @include('layouts.footer')
