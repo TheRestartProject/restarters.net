@@ -232,11 +232,11 @@ class DiscourseService
 
                 if ($discourseResult['group']['messageable_level'] != 4) {
                     Log::debug("Update messageable_level for Restarters group $restartId, {$group->discourse_group}, Discourse group $discourseId");
+                    $gData = $discourseResult['group'];
+                    $gData['messageable_level'] = 4;
                     $response = $client->request('PUT', "/g/$discourseId.json", [
                         'form_params' => [
-                            'group' => [
-                                'messageable_level' => 4
-                            ]
+                            'group' => $gData
                         ]
                     ]);
 
