@@ -37,7 +37,7 @@ class Timezones extends Migration
 
         # Set up the new timestamps.  Currently event_start/time/end are all implicitly localised to the timezone
         # of the group.
-        $events = Party::all();
+        $events = Party::withTrashed();
 
         foreach ($events as $event) {
             $tz = $event->timezone;
