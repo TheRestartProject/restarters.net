@@ -27,8 +27,8 @@ class EventController extends Controller
                   ->join('users', 'users.id', '=', 'user_network.user_id');
 
         if (! empty($date_from) && ! empty($date_to)) {
-            // TODO Timezones.  The API call may return events spanning multiple timezones, and it's unclear what
-            // timezone the inputs will be in.
+            // TODO Timezones.  Add optional timezone parameter to route, defaulted to UTC, and let API users
+            // know about.
             $parties = $parties->where('events.event_date', '>=', date('Y-m-d', strtotime($date_from)))
            ->where('events.event_date', '<=', date('Y-m-d', strtotime($date_to)));
         }

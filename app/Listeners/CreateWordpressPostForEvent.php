@@ -54,7 +54,8 @@ class CreateWordpressPostForEvent
         }
 
         try {
-            // TODO Timezones.  We need to pass the timezone and display it.
+            // TODO Timezones.  We need to pass party_timezone field, and change party_time to have timezone
+            // in brackets afterwards.
             $startTimestamp = strtotime($theParty->event_start_utc);
             $endTimestamp = strtotime($theParty->event_end_utc);
 

@@ -290,9 +290,7 @@ class ExportController extends Controller
             }
 
             //By date
-            // TODO Timezones.  This is trick because the input fields are currently in local time, but the events
-            // we are exporting might span multiple time zones.  We need to change the client to pass in a UTC
-            // string.
+            // TODO Timezones.  This is only used by admins and therefore the dates can be assumed to be in UTC.
             if ($request->input('from_date') !== null && $request->input('to_date') == null) {
                 $user_events = $user_events->whereDate('events.event_date', '>', $request->input('from_date'));
             } elseif ($request->input('to_date') !== null && $request->input('from_date') == null) {
