@@ -2,14 +2,10 @@
 
 namespace Tests\Feature;
 
-use App\EventsUsers;
 use App\Group;
+use App\Notifications\JoinGroup;
+use App\Notifications\NewGroupMember;
 use App\Helpers\Fixometer;
-use App\Helpers\Geocoder;
-use App\Network;
-use App\Notifications\AdminModerationEvent;
-use App\Notifications\NotifyRestartersOfNewEvent;
-use App\Party;
 use App\User;
 use DB;
 use Illuminate\Support\Facades\Notification;
@@ -20,10 +16,13 @@ class InviteGroupTest extends TestCase
 {
     public function testInvite()
     {
+        Notification::fake();
         $this->withoutExceptionHandling();
 
         $group = factory(Group::class)->create();
         $host = factory(User::class)->states('Host')->create();
+        $group->addVolunteer($host);
+        $group->makeMemberAHost($host);
         $this->actingAs($host);
 
         // Invite a user.
@@ -38,44 +37,71 @@ class InviteGroupTest extends TestCase
 
         $response->assertSessionHas('success');
 
+        // Invitation should generate a notification.
+        Notification::assertSentTo(
+            [$user],
+            JoinGroup::class,
+            function ($notification, $channels, $user) use ($group, $host) {
+                $mailData = $notification->toMail($host)->toArray();
+                self::assertEquals(__('notifications.join_group_title', [
+                    'name' => $host->name,
+                    'group' => $group->name
+                ], $user->language), $mailData['subject']);
+                return true;
+            }
+        );
+
         // We should see that we have been invited.
         $this->actingAs($user);
-        $response = $this->get('/group/view/'.$group->idgroups);
-        $response->assertSee('You have an invitation to this group.');
+        $response2 = $this->get('/group/view/'.$group->idgroups);
+        $response2->assertSee('You have an invitation to this group.');
 
         // Check the counts.
-        $props = $this->assertVueProperties($response, [
+        $props = $this->assertVueProperties($response2, [
             [
                 ':idgroups' => $group->idgroups,
             ],
         ]);
 
         $initialGroup = json_decode($props[0][':initial-group'], true);
-        $this->assertEquals(0, $initialGroup['all_hosts_count']);
-        $this->assertEquals(0, $initialGroup['all_confirmed_hosts_count']);
+        $this->assertEquals(1, $initialGroup['all_hosts_count']);
+        $this->assertEquals(1, $initialGroup['all_confirmed_hosts_count']);
         $this->assertEquals(1, $initialGroup['all_restarters_count']);
         $this->assertEquals(0, $initialGroup['all_confirmed_restarters_count']);
 
         // Now accept the invite.
-        preg_match('/href="(\/group\/accept-invite.*?)"/', $response->getContent(), $matches);
+        preg_match('/href="(\/group\/accept-invite.*?)"/', $response2->getContent(), $matches);
         $invitation = $matches[1];
-        $response = $this->get($invitation);
-        $this->assertTrue($response->isRedirection());
-        $redirectTo = $response->getTargetUrl();
+        $response3 = $this->get($invitation);
+        $this->assertTrue($response3->isRedirection());
+        $redirectTo = $response3->getTargetUrl();
         $this->assertNotFalse(strpos($redirectTo, '/group/view/'.$group->idgroups));
-        $response->assertSessionHas('success');
+        $response3->assertSessionHas('success');
+
+        // Acceptance should notify the host.
+        Notification::assertSentTo(
+            [$host],
+            NewGroupMember::class,
+            function ($notification, $channels, $host) use ($group, $user) {
+                $mailData = $notification->toMail($host)->toArray();
+                self::assertEquals(__('notifications.new_member_subject', [
+                    'name' => $group->name
+                ], $host->language), $mailData['subject']);
+                return true;
+            }
+        );
 
         // Check the counts have changed.
-        $response = $this->get('/group/view/'.$group->idgroups);
-        $props = $this->assertVueProperties($response, [
+        $response4 = $this->get('/group/view/'.$group->idgroups);
+        $props = $this->assertVueProperties($response4, [
             [
                 ':idgroups' => $group->idgroups,
             ],
         ]);
 
         $initialGroup = json_decode($props[0][':initial-group'], true);
-        $this->assertEquals(0, $initialGroup['all_hosts_count']);
-        $this->assertEquals(0, $initialGroup['all_confirmed_hosts_count']);
+        $this->assertEquals(1, $initialGroup['all_hosts_count']);
+        $this->assertEquals(1, $initialGroup['all_confirmed_hosts_count']);
         $this->assertEquals(1, $initialGroup['all_restarters_count']);
         $this->assertEquals(1, $initialGroup['all_confirmed_restarters_count']);
     }

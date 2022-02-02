@@ -682,27 +682,34 @@ class PartyController extends Controller
 
         if (empty($not_in_event)) {
             try {
-                $user_event = EventsUsers::updateOrCreate([
-                    'user' => $user_id,
-                    'event' => $event_id,
-                ], [
-                    'status' => 1,
-                    'role' => 4,
-                ]);
-
                 $event = Party::find($event_id);
 
-                $event->increment('volunteers');
+                if (!$event) {
+                    $flashData['danger'] = 'Invalid event id';
 
-                $flashData = [];
-                if (! Auth::user()->isInGroup($event->theGroup->idgroups)) {
-                    $flashData['prompt-follow-group'] = true;
+                    return redirect()->back()->with($flashData);
+                } else {
+                    $user_event = EventsUsers::updateOrCreate([
+                                                                  'user' => $user_id,
+                                                                  'event' => $event_id,
+                                                              ], [
+                                                                  'status' => 1,
+                                                                  'role' => 4,
+                                                              ]);
+
+
+                    $event->increment('volunteers');
+
+                    $flashData = [];
+                    if (! Auth::user()->isInGroup($event->theGroup->idgroups)) {
+                        $flashData['prompt-follow-group'] = true;
+                    }
+
+                    $this->notifyHostsOfRsvp($user_event, $event_id);
+                    $this->addToDiscourseThread($event, Auth::user());
+
+                    return redirect()->back()->with($flashData);
                 }
-
-                $this->notifyHostsOfRsvp($user_event, $event_id);
-                $this->addToDiscourseThread($event, Auth::user());
-
-                return redirect()->back()->with($flashData);
             } catch (\Exception $e) {
                 $flashData['danger'] = 'Failed to join this event';
 
@@ -728,7 +735,7 @@ class PartyController extends Controller
             $hosts = null;
         }
 
-        if (! is_null($hosts)) {
+        if ($hosts && count($hosts)) {
             try {
                 // Get user information
                 $user = User::find($user_event->user);
