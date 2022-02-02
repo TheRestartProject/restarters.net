@@ -5,11 +5,14 @@ namespace Tests\Feature;
 use App\Events\UserUpdated;
 use App\Group;
 use App\GroupTags;
+use App\Notifications\GroupConfirmed;
+use App\Notifications\NewGroupWithinRadius;
 use App\Role;
 use App\User;
 use Carbon\Carbon;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Event;
+use Illuminate\Support\Facades\Notification;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Tests\TestCase;
 
@@ -120,5 +123,52 @@ class GroupsNearbyTest extends TestCase
         // Should no longer show up.
         $groups = $user->groupsNearby();
         $this->assertEquals(0, count($groups));
+    }
+
+    public function testNotification() {
+        Notification::fake();
+
+        // Create a user in London.
+        $user = factory(User::class)->create([
+            'location' => 'London',
+             'latitude' => 51.5072178,
+             'longitude' => -0.1275862,
+         ]);
+
+        $admin1 = factory(User::class)->state('Administrator')->create();
+        $this->actingAs($admin1);
+
+        $idgroups = $this->createGroup('Test Group');
+        $group = Group::find($idgroups);
+
+        $admin2 = factory(User::class)->state('Administrator')->create();
+        $this->actingAs($admin2);
+
+        // Approve the group.
+        $response = $this->post('/group/edit/'.$idgroups, [
+            'description' => 'Test',
+            'location' => 'London',
+            'name' => $group->name,
+            'website' => 'https://therestartproject.org',
+            'free_text' => 'HQ',
+            'moderate' => 'approve',
+            'area' => 'London',
+            'postcode' => 'SW9 7QD'
+        ]);
+
+        // This should trigger a notification.
+        Notification::assertSentTo(
+            [$user],
+            NewGroupWithinRadius::class,
+            function ($notification, $channels, $host) use ($group) {
+                $mailData = $notification->toMail($host)->toArray();
+                self::assertEquals(__('notifications.new_group_subject', [], $host->language), $mailData['subject']);
+
+                // Mail should mention the group name.
+                self::assertRegexp('/' . $group->name . '/', $mailData['introLines'][0]);
+
+                return true;
+            }
+        );
     }
 }
