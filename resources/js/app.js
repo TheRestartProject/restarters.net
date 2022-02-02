@@ -997,18 +997,7 @@ function initAutocomplete() {
     // double-clicking.
     $('#login-form-submit').attr('disabled', 'disabled')
     $('#login-form').submit()
-  })
-
-$('#register-form-submit').on('click', function(e) {
-  e.preventDefault();
-
-  if ( $('#consent_gdpr')["0"].checked && $('#consent_future_data')["0"].checked ) {
-    $('#register-form').submit();
-  } else {
-    alert('You must consent to the use of your data in order to register');
-  }
-
-});
+  });
 
   // On toggling between multi collapable invite modal content
   // Then also toggle the link to change the text (show a different link -
