@@ -601,7 +601,7 @@ class Group extends Model implements Auditable
                         'name' => "$name$unique",
                         'full_name' => $this->name,
                         'mentionable_level' => 4,
-                        'messageable_level' => 99,
+                        'messageable_level' => 4,
                         'visibility_level' => 0,
                         'members_visibility_level' => 0,
                         'automatic_membership_email_domains' => null,
