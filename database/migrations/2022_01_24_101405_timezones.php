@@ -49,7 +49,7 @@ class Timezones extends Migration
             $event_start_utc = $startCarbon->toIso8601String();
             $endCarbon = Carbon::parse($atts['event_date'] . ' ' . $atts['end'], $tz);
             $endCarbon->setTimezone('UTC');
-            $event_end_utc = $startCarbon->toIso8601String();
+            $event_end_utc = $endCarbon->toIso8601String();
 
             error_log("Event {$event->idevents} {$atts['event_date']} {$atts['start']}-{$atts['end']} => $event_start_utc - $event_end_utc");
 
