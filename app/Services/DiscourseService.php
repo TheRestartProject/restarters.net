@@ -326,7 +326,7 @@ class DiscourseService
                     }
 
                     $discourseMembers = array_column($discourseResult['members'], 'username');
-                    $restartersMembersIds = UserGroups::where('group', $restartId)->where('status', '=', 1)->pluck(
+                    $restartersMembersIds = UserGroups::where('group', $restartId)->where('status', '=', 1)->whereNull('deleted_at')->pluck(
                         'user'
                     )->toArray();
                     $restartersMembers = User::whereIn('id', $restartersMembersIds)->pluck('username')->toArray();

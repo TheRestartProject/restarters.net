@@ -125,6 +125,12 @@ abstract class TestCase extends BaseTestCase
             $group = Group::find($idgroups);
             $group->wordpress_post_id = '99999';
             $group->save();
+
+            // Currently logged in user should be present, with status 1 = approved.
+            $member = UserGroups::where('group', $idgroups)->first();
+            $this->assertEquals(1, $member->status);
+            $this->assertEquals(3, $member->role);
+            $this->assertEquals(Auth::user()->id, $member->user);
         }
 
         return $idgroups;
