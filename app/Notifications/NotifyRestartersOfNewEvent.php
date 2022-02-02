@@ -48,12 +48,20 @@ class NotifyRestartersOfNewEvent extends Notification implements ShouldQueue
      */
     public function toMail($notifiable)
     {
+        $locale = $notifiable->language;
+
         return (new MailMessage)
-                    ->subject('New event for '.$this->arr['event_group'])
-                    ->greeting(__('notifications.greeting', [], $notifiable->language))
-                    ->line('There has been a new event added to your group: \''.$this->arr['event_venue'].'\'.')
-                    ->action('View event', $this->arr['event_url'])
-                    ->line('If you would like to stop receiving these emails, please visit <a href="'.url('/user/edit/'.$notifiable->id).'">your preferences</a> on your account.');
+                    ->subject(__('notifications.new_event_subject', [
+                        'name' => $this->arr['event_group']
+                    ], $locale))
+                    ->greeting(__('notifications.greeting', [], $locale))
+                    ->line(__('notifications.new_event_line1', [
+                        'name' => $this->arr['event_venue']
+                    ], $locale))
+                    ->action(__('notifications.new_event_action', [], $locale), $this->arr['event_url'])
+                    ->line(__('notifications.email_preferences', [
+                        'url' => url('/user/edit/'.$notifiable->id)
+                    ], $locale));
     }
 
     /**
@@ -65,7 +73,9 @@ class NotifyRestartersOfNewEvent extends Notification implements ShouldQueue
     public function toArray($notifiable)
     {
         return [
-            'title' => 'A new event has been created for group '.$this->arr['event_group'].':',
+            'title' => __('notifications.new_event_title', [
+                'name' => $this->arr['event_group']
+            ], $notifiable->language),
             'name' => $this->arr['event_venue'],
             'url' => $this->arr['event_url'],
         ];

@@ -8,6 +8,7 @@ use App\Helpers\Geocoder;
 use App\Helpers\RepairNetworkService;
 use App\Network;
 use App\Notifications\AdminModerationEvent;
+use App\Notifications\JoinGroup;
 use App\Notifications\NotifyRestartersOfNewEvent;
 use App\Party;
 use App\Role;
@@ -293,7 +294,7 @@ class CreateEventTest extends TestCase
 
         $eventData = factory(Party::class)->raw(['group' => $group->idgroups, 'event_date' => '2030-01-01', 'latitude'=>'1', 'longitude'=>'1']);
 
-        // act
+        // Approve the event
         $response = $this->post('/party/create/', $eventData);
         $event = Party::where('event_date', '2030-01-01')->first();
         $eventData['wordpress_post_id'] = 100;
@@ -305,6 +306,19 @@ class CreateEventTest extends TestCase
         Notification::assertSentTo(
             [$restarter], NotifyRestartersOfNewEvent::class
         );
+
+        Notification::assertSentTo(
+            [$restarter],
+            NotifyRestartersOfNewEvent::class,
+            function ($notification, $channels, $user) use ($group, $host) {
+                $mailData = $notification->toMail($host)->toArray();
+                self::assertEquals(__('notifications.new_event_subject', [
+                    'name' => $group->name
+                ], $user->language), $mailData['subject']);
+                return true;
+            }
+        );
+
         Notification::assertNotSentTo(
             [$host], NotifyRestartersOfNewEvent::class
         );
@@ -417,6 +431,12 @@ class CreateEventTest extends TestCase
 
         $response->assertSessionHas('success');
         $this->assertTrue($response->isRedirection());
+
+
+        // Check the notification appears on the web.
+        $this->actingAs($host);
+        $response = $this->get('/profile/notifications');
+        $response->assertSeeText('New event created');
     }
 
     public function provider()

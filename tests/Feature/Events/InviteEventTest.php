@@ -7,9 +7,14 @@ use App\Group;
 use App\Helpers\Geocoder;
 use App\Network;
 use App\Notifications\AdminModerationEvent;
+use App\Notifications\NewGroupWithinRadius;
+use App\Notifications\NotifyHostRSVPInvitesMade;
 use App\Notifications\NotifyRestartersOfNewEvent;
+use App\Notifications\RSVPEvent;
 use App\Party;
+use App\Role;
 use App\User;
+use App\UserGroups;
 use DB;
 use Illuminate\Support\Facades\Notification;
 use Tests\TestCase;
@@ -120,18 +125,25 @@ class InviteEventTest extends TestCase
         $this->assertNotFalse(strpos($events, '"attending":true'));
     }
 
-    public function testInvitable()
+    public function testInvitableUserPOV()
     {
         $this->withoutExceptionHandling();
 
         $group = factory(Group::class)->create();
+        $host = factory(User::class)->states('Host')->create();
         $event = factory(Party::class)->create([
                                                    'group' => $group,
                                                    'event_date' => '2130-01-01',
                                                    'start' => '12:13',
+                                                   'user_id' => $host->id
                                                ]);
-
-        $host = factory(User::class)->states('Host')->create();
+        EventsUsers::create([
+                                'event' => $event->getKey(),
+                                'user' => $host->getKey(),
+                                'status' => 1,
+                                'role' => 3,
+                                'full_name' => null,
+                           ]);
         $this->actingAs($host);
 
         // Should have no group members and therefore no invitable members.
@@ -191,6 +203,120 @@ class InviteEventTest extends TestCase
         $this->assertTrue($response8->isRedirection());
         $redirectTo = $response8->getTargetUrl();
         $this->assertNotFalse(strpos($redirectTo, '/party/view/'.$event->idevents));
+
+        // Now a group member and confirmed so should not show as invitable.
+        $this->get('/logout');
+        $this->actingAs($host);
+        $response9 = $this->get('/party/get-group-emails-with-names/'.$event->idevents);
+        $members = json_decode($response9->getContent());
+        $this->assertEquals([], $members);
+    }
+
+    public function testInvitableNotifications()
+    {
+        Notification::fake();
+        $this->withoutExceptionHandling();
+
+        $group = factory(Group::class)->create();
+        $host = factory(User::class)->states('Host')->create();
+        $event = factory(Party::class)->create([
+                                                   'group' => $group,
+                                                   'event_date' => '2130-01-01',
+                                                   'start' => '12:13',
+                                                   'user_id' => $host->id
+                                               ]);
+        EventsUsers::create([
+                                'event' => $event->getKey(),
+                                'user' => $host->getKey(),
+                                'status' => 1,
+                                'role' => 3,
+                                'full_name' => null,
+                            ]);
+        $this->actingAs($host);
+
+        // Should have no group members and therefore no invitable members.
+        $response = $this->get('/party/get-group-emails-with-names/'.$event->idevents);
+        $members = json_decode($response->getContent());
+        $this->assertEquals([], $members);
+
+        // User joins the group.
+        $user = factory(User::class)->states('Restarter')->create();
+        $this->get('/logout');
+        $this->actingAs($user);
+        $response2 = $this->get('/group/join/'.$group->idgroups);
+        $this->assertTrue($response2->isRedirection());
+
+        // Shouldn't show up as invitable when we are logged in.
+        $response3 = $this->get('/party/get-group-emails-with-names/'.$event->idevents);
+        $members = json_decode($response3->getContent());
+        $this->assertEquals([], $members);
+
+        // Now should show as invitable to the event.
+        $this->get('/logout');
+        $this->actingAs($host);
+        $response4 = $this->get('/party/get-group-emails-with-names/'.$event->idevents);
+        $members = json_decode($response4->getContent());
+        $this->assertEquals(1, count($members));
+
+        // Invite the user to the event.
+        $response5 = $this->post('/party/invite', [
+            'group_name' => $group->name,
+            'event_id' => $event->idevents,
+            'manual_invite_box' => $user->email,
+            'message_to_restarters' => 'Join us, but not in a creepy zombie way',
+        ]);
+
+        $response5->assertSessionHas('success');
+
+        // This should generate a notification to the host.
+        Notification::assertSentTo(
+            [$host],
+            NotifyHostRSVPInvitesMade::class,
+            function ($notification, $channels, $host) use ($event) {
+                $mailData = $notification->toMail($host)->toArray();
+                self::assertEquals(__('notifications.invites_made_subject', [], $host->language), $mailData['subject']);
+
+                // Mail should mention the group name.
+                self::assertRegexp('/' . $event->venue . '/', $mailData['introLines'][0]);
+
+                return true;
+            }
+        );
+
+        // Invited member should not show up as invitable.
+        $response6 = $this->get('/party/get-group-emails-with-names/'.$event->idevents);
+        $members = json_decode($response6->getContent());
+        $this->assertEquals([], $members);
+
+        // As the user...
+        $this->get('/logout');
+        $this->actingAs($user);
+
+        // Now accept the invitation.
+        $eu = EventsUsers::where('user', '=', $user->id)->first();
+        $invitation = '/party/accept-invite/' . $event->idevents . '/' . $eu->status;
+
+        $response8 = $this->get($invitation);
+        $this->assertTrue($response8->isRedirection());
+        $redirectTo = $response8->getTargetUrl();
+        $this->assertNotFalse(strpos($redirectTo, '/party/view/'.$event->idevents));
+
+        // This should generate a notification to the host.
+        Notification::assertSentTo(
+            [$host],
+            RSVPEvent::class,
+            function ($notification, $channels, $host) use ($user, $event) {
+                $mailData = $notification->toMail($host)->toArray();
+                self::assertEquals(__('notifications.rsvp_subject', [
+                    'name' => $user->name
+                ], $host->language), $mailData['subject']);
+
+                // Mail should mention the venue.
+                self::assertRegexp('/' . $event->venue . '/', $mailData['introLines'][0]);
+
+                return true;
+            }
+        );
 
         // Now a group member and confirmed so should not show as invitable.
         $this->get('/logout');

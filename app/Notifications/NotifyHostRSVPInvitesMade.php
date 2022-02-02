@@ -46,16 +46,20 @@ class NotifyHostRSVPInvitesMade extends Notification implements ShouldQueue
      */
     public function toMail($notifiable)
     {
+        $locale = $notifiable->language;
         return (new MailMessage)
-                      ->subject('Invites have been sent to your event')
+                      ->subject(__('notifications.invites_made_subject', [], $locale))
                       ->greeting(__('notifications.greeting', [], $notifiable->language))
-                      ->line('There have been invites sent out to your event: \''.$this->event_details['event_venue'].'\'. URL for reference: \''.$this->event_details['event_url'].'\'.')
-                      ->line('If you think this email was not intended for you, please discard.')
-                      ->line('Thank you.');
+                      ->line(__('notifications.invites_made_line1', [
+                          'name' => $this->event_details['event_venue'],
+                          'url' => $this->event_details['event_url']
+                      ], $notifiable->language))
+                      ->line(__('notifications.invites_made_line2', [], $locale))
+                      ->line(__('notifications.thanks', [], $locale));
     }
 
     /**
-     * Get the event_detailsay representation of the notification.
+     * Get the event_details representation of the notification.
      *
      * @param  mixed  $notifiable
      * @return event_detailsay
@@ -63,7 +67,7 @@ class NotifyHostRSVPInvitesMade extends Notification implements ShouldQueue
     public function toArray($notifiable)
     {
         return [
-            'title' => 'Invites have been sent to your event:',
+            'title' => __('notifications.invites_made_title', [], $notifiable->language),
             'name' => $this->event_details['event_venue'],
             'url' => $this->event_details['event_url'],
         ];
