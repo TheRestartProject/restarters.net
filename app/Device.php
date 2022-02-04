@@ -392,21 +392,17 @@ class Device extends Model implements Auditable
     }
 
     /**
-     * Powered estimate only takes precedence over category weight when Misc.
-     *
-     * REDUNDANT?
+     * Powered estimate only takes precedence over category weight when Misc and if not 0.
      */
     public function eCo2Diverted($emissionRatio, $displacementFactor)
     {
         $footprint = 0;
 
         if ($this->isFixed()) {
-            if ($this->deviceCategory->isMiscPowered()) {
-                if (is_numeric($this->estimate)) {
-                    $footprint = $this->estimate * $emissionRatio;
-                }
+            if ($this->deviceCategory->isMiscPowered() && is_numeric($this->estimate) && $this->estimate > 0) {
+                $footprint = $this->estimate * $emissionRatio;
             } else {
-                $footprint = (float) $this->deviceCategory->footprint;
+                $footprint = $this->deviceCategory->footprint;
             }
         }
 
@@ -414,19 +410,18 @@ class Device extends Model implements Auditable
     }
 
     /**
-     * Unpowered estimate always takes precedence over category weight.
+     * Unpowered estimate always takes precedence over category weight unless is is 0.
      *
-     * REDUNDANT?
      */
     public function uCo2Diverted($emissionRatio, $displacementFactor)
     {
         $footprint = 0;
 
         if ($this->isFixed()) {
-            if (is_numeric($this->estimate)) {
-                $footprint = $this->estimate * $emissionRatio;
+            if (is_numeric($this->estimate) && $this->estimate > 0) {
+                $footprint = ($this->estimate * $emissionRatio);
             } else {
-                $footprint = (float) $this->deviceCategory->footprint;
+                $footprint = $this->deviceCategory->footprint;
             }
         }
 
@@ -434,21 +429,18 @@ class Device extends Model implements Auditable
     }
 
     /**
-     * Powered estimate only takes precedence over category weight when Misc.
+     * Powered estimate only takes precedence over category weight when Misc and if not 0.
      *
-     * REDUNDANT?
      */
     public function eWasteDiverted()
     {
         $ewasteDiverted = 0;
 
         if ($this->isFixed() && $this->deviceCategory->isPowered()) {
-            if ($this->deviceCategory->isMiscPowered()) {
-                if (is_numeric($this->estimate)) {
-                    $ewasteDiverted = $this->estimate;
-                }
+            if ($this->deviceCategory->isMiscPowered() && is_numeric($this->estimate) && $this->estimate > 0) {
+                $ewasteDiverted = $this->estimate;
             } else {
-                $ewasteDiverted = (float) $this->deviceCategory->weight;
+                $ewasteDiverted = $this->deviceCategory->weight;
             }
         }
 
@@ -456,19 +448,18 @@ class Device extends Model implements Auditable
     }
 
     /**
-     * Unpowered estimate always takes precedence over category weight.
+     * Unpowered estimate always takes precedence over category weight unless it is 0.
      *
-     * REDUNDANT?
      */
     public function uWasteDiverted()
     {
         $wasteDiverted = 0;
 
         if ($this->isFixed() && $this->deviceCategory->isUnpowered()) {
-            if (is_numeric($this->estimate)) {
+            if (is_numeric($this->estimate) && $this->estimate > 0) {
                 $wasteDiverted = $this->estimate;
             } else {
-                $wasteDiverted = (float) $this->deviceCategory->weight;
+                $wasteDiverted = $this->deviceCategory->weight;
             }
         }
 
