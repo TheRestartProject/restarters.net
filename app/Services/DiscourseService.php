@@ -331,8 +331,7 @@ class DiscourseService
                 {
                     Log::error("Failed to get list of members for {$discourseId}");
                     throw new \Exception("Failed to get list of members for {$discourseId}");
-                } else
-                {
+                } else {
                     $discourseResult = json_decode($response->getBody(), true);
                     $total = $discourseResult['meta']['total'];
                     Log::debug("Total $total");
@@ -373,8 +372,7 @@ class DiscourseService
                     Log::debug("Discourse Members " . json_encode($discourseMembers));
                     Log::debug("Restarter Members " . json_encode($restartersMembers));
 
-                    foreach ($discourseMembers as $discourseMember => $d)
-                    {
+                    foreach ($discourseMembers as $discourseMember => $d) {
                         if (!array_key_exists($discourseMember, $restartersMembers)) {
                             Log::debug("Remove user $discourseMember from Discourse group $discourseName");
 
@@ -434,10 +432,8 @@ class DiscourseService
                         }
                     }
 
-                    foreach ($restartersMembers as $restartersMember => $r)
-                    {
-                        if (!array_key_exists($restartersMember, $discourseMembers))
-                        {
+                    foreach ($restartersMembers as $restartersMember => $r) {
+                        if (!array_key_exists($restartersMember, $discourseMembers)) {
                             Log::debug("Add Restarter user $restartersMember to Discourse group $discourseName");
 
                             // We add these one by one, rather than in a single call.  This is because if our Restarters
