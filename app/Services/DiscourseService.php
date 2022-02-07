@@ -230,6 +230,23 @@ class DiscourseService
                 $discourseId = $discourseResult['group']['id'];
                 Log::debug("Sync members for Restarters group $restartId, {$group->discourse_group}, Discourse group $discourseId");
 
+                if ($discourseResult['group']['messageable_level'] != 4) {
+                    Log::debug("Update messageable_level for Restarters group $restartId, {$group->discourse_group}, Discourse group $discourseId");
+                    $gData = $discourseResult['group'];
+                    $gData['messageable_level'] = 4;
+                    $response = $client->request('PUT', "/g/$discourseId.json", [
+                        'form_params' => [
+                            'group' => $gData
+                        ]
+                    ]);
+
+                    if ($response->getStatusCode() === 200) {
+                        Log::debug("...succeeded");
+                    } else {
+                        Log::debug("...failed with " . $response->getStatusCode() . ", " . $response->getBody());
+                    }
+                }
+
                 if ($group->groupimage && $group->groupimage->idimages) {
                     // Check if the flair_url needs updating.  This keeps the logo in sync with changes on Restarters.
                     Log::debug("Check Discourse logo {$group->discourse_logo} vs {$group->groupimage->idimages}");
