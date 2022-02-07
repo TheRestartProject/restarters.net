@@ -348,9 +348,15 @@ class DiscourseService
 
                     foreach ($discourseResult['members'] as $d) {
                         $discourseMembers[$d['username']] = $d;
+                        $discourseMembers[$d['username']]['owner'] = false;
                     }
 
-                    $restartersMembersUGs = UserGroups::where('group', $restartId)->where('status', '=', 1)->toArray();
+                    foreach ($discourseResult['owners'] as $d) {
+                        $discourseMembers[$d['username']] = $d;
+                        $discourseMembers[$d['username']]['owner'] = true;
+                    }
+
+                    $restartersMembersUGs = UserGroups::where('group', $restartId)->where('status', '=', 1)->get();
 
                     $restartersMembers = [];
 
@@ -387,12 +393,12 @@ class DiscourseService
                                 throw new \Exception("Failed to add member $discourseMember for {$discourseId} {$discourseName}");
                             }
                         } else {
-                            // See whether the admin status on Discourse matches the status on Restarters.
+                            // See whether the owner status on Discourse matches the status on Restarters.
                             $role = $restartersMembers[$discourseMember]->role;
-                            $shouldBeAdmin = $role == Role::HOST;
-                            Log::debug("Role for $discourseMember is $role, should be admin? $shouldBeAdmin");
+                            $shouldBeOwner = $role == Role::HOST;
+                            Log::debug("Role for $discourseMember is $role, should be admin? $shouldBeOwner");
 
-                            if ($d['admin'] && !$shouldBeAdmin) {
+                            if ($d['owner'] && !$shouldBeOwner) {
                                 Log::info("Remove $discourseMember as admin of {$discourseId} {$discourseName}");
                                 $response = $client->request('DELETE', "/admin/groups/$discourseId/owners.json", [
                                     'form_params' => [
@@ -409,7 +415,7 @@ class DiscourseService
                                     throw new \Exception("Failed to remove $discourseMember as owner of {$discourseId} {$discourseName}");
                                 }
                                 exit(0);
-                            } else if (!$d['admin'] && !$shouldBeAdmin) {
+                            } else if (!$d['owner'] && $shouldBeOwner) {
                                 Log::info("Add $discourseMember as admin of {$discourseId} {$discourseName}");
                                 $response = $client->request('PUT', "/admin/groups/$discourseId/owners.json", [
                                     'form_params' => [
