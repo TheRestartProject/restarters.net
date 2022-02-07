@@ -1333,13 +1333,16 @@ class PartyController extends Controller
                'co2_emissions_prevented' => $gstats['co2_total'],
            ]);
         }
+        // Send these to getEventStats() to speed things up a bit.
+        $eEmissionRatio = \App\Helpers\LcaStats::getEmissionRatioPowered();
+        $uEmissionratio = \App\Helpers\LcaStats::getEmissionRatioUnpowered();
 
         $collection = collect([]);
         foreach ($parties as $key => $party) {
             $group = $groups_array->filter(function ($group) use ($party) {
                 return $group['id'] == $party->group;
             })->first();
-            $estats = $party->getEventStats();
+            $estats = $party->getEventStats($eEmissionRatio, $uEmissionratio);
             // Push Party to Collection
             $collection->push([
              'id' => $party->idevents,

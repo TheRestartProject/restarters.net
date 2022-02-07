@@ -93,8 +93,8 @@ class BasicTest extends TestCase
         $this->get('/group/join/' . $this->idgroups);
 
         // Should not show in upcoming as not yet approved.
-        $response = $this->get('/dashboard');
-        $response->assertDontSeeText('A test event');
+        $response1 = $this->get('/dashboard');
+        $response1->assertDontSeeText('A test event');
 
         // Admin approves the event.
         $this->loginAsTestUser(Role::ADMINISTRATOR);
@@ -103,13 +103,13 @@ class BasicTest extends TestCase
         $eventData['wordpress_post_id'] = 100;
         $eventData['id'] = $event->idevents;
         $eventData['moderate'] = 'approve';
-        $this->post('/party/edit/'.$event->idevents, $eventData);
+        $response1a = $this->post('/party/edit/'.$event->idevents, $eventData);
 
         // Should now show as an upcoming event, both on dashboard page and events page.
         $this->actingAs($host);
-        $response = $this->get('/dashboard');
+        $response2 = $this->get('/dashboard');
 
-        $props = $this->assertVueProperties($response, [
+        $props = $this->assertVueProperties($response2, [
             [
                 ':is-logged-in' => 'true'
             ]
@@ -117,9 +117,9 @@ class BasicTest extends TestCase
         $upcomingEvents = json_decode($props[0][':upcoming-events'], TRUE);
         $this->assertEquals($event->idevents, $upcomingEvents[0]['idevents']);
 
-        $response = $this->get('/party');
+        $response3 = $this->get('/party');
 
-        $props = $this->assertVueProperties($response, [
+        $props = $this->assertVueProperties($response3, [
             [
                 ':canedit' => 'false'
             ]
@@ -135,21 +135,21 @@ class BasicTest extends TestCase
         ]);
         $this->loginAsTestUser(Role::ADMINISTRATOR);
 
-        $response = $this->post('/group/invite', [
+        $response4 = $this->post('/group/invite', [
             'group_name' => 'Test Group',
             'group_id' => $this->idgroups,
             'manual_invite_box' => $host2->email,
             'message_to_restarters' => 'Join us, but not in a creepy zombie way',
         ]);
 
-        $response->assertSessionHas('success');
+        $response4->assertSessionHas('success');
 
         // Should not show in upcoming as not yet a member, but should show in nearby.
         $this->get('/logout');
         $this->actingAs($host2);
 
-        $response = $this->get('/dashboard');
-        $props = $this->assertVueProperties($response, [
+        $response5 = $this->get('/dashboard');
+        $props = $this->assertVueProperties($response5, [
             [
                 ':is-logged-in' => 'true'
             ]
@@ -157,9 +157,9 @@ class BasicTest extends TestCase
         $upcomingEvents = json_decode($props[0][':upcoming-events'], TRUE);
         $this->assertEquals(0, count($upcomingEvents));
 
-        $response = $this->get('/party');
+        $response6 = $this->get('/party');
 
-        $props = $this->assertVueProperties($response, [
+        $props = $this->assertVueProperties($response6, [
             [
                 ':canedit' => 'false'
             ]

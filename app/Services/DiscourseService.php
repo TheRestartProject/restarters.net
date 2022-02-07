@@ -363,6 +363,11 @@ class DiscourseService
                         $u = User::find($r->user);
                         $restartersMembers[$u->username] = $r;
                     }
+                    $discourseMembers = array_column($discourseResult['members'], 'username');
+                    $restartersMembersIds = UserGroups::where('group', $restartId)->where('status', '=', 1)->whereNull('deleted_at')->pluck(
+                        'user'
+                    )->toArray();
+                    $restartersMembers = User::whereIn('id', $restartersMembersIds)->pluck('username')->toArray();
 
                     Log::debug(
                         count($discourseMembers) . " Discourse members vs " . count(
