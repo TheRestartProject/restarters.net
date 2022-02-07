@@ -346,18 +346,17 @@ class DiscourseService
                     // Save off the members and whether they're an admin.
                     $discourseMembers = [];
 
-                    foreach ($discourseResult as $d) {
+                    foreach ($discourseResult['members'] as $d) {
                         $discourseMembers[$d['username']] = $d;
                     }
 
-                    $restartersMembersIds = UserGroups::where('group', $restartId)->where('status', '=', 1)->pluck(
-                        'user'
-                    )->toArray();
+                    $restartersMembersUGs = UserGroups::where('group', $restartId)->where('status', '=', 1)->toArray();
 
                     $restartersMembers = [];
 
-                    foreach (User::whereIn('id', $restartersMembersIds)->get() as $r) {
-                        $restartersMembers[$r->username] = $r->role;
+                    foreach ($restartersMembersUGs as $r) {
+                        $u = User::find($r->user);
+                        $restartersMembers[$u->username] = $r;
                     }
 
                     Log::debug(
@@ -370,7 +369,7 @@ class DiscourseService
 
                     foreach ($discourseMembers as $discourseMember => $d)
                     {
-                        if (!in_array($discourseMember, $restartersMembers)) {
+                        if (!array_key_exists($discourseMember, $restartersMembers)) {
                             Log::debug("Remove user $discourseMember from Discourse group $discourseName");
 
                             $response = $client->request('DELETE', "/admin/groups/$discourseId/members.json", [
@@ -389,7 +388,9 @@ class DiscourseService
                             }
                         } else {
                             // See whether the admin status on Discourse matches the status on Restarters.
-                            $shouldBeAdmin = $restartersMembers[$discourseMember] == Role::HOST;
+                            $role = $restartersMembers[$discourseMember]->role;
+                            $shouldBeAdmin = $role == Role::HOST;
+                            Log::debug("Role for $discourseMember is $role, should be admin? $shouldBeAdmin");
 
                             if ($d['admin'] && !$shouldBeAdmin) {
                                 Log::info("Remove $discourseMember as admin of {$discourseId} {$discourseName}");
@@ -431,7 +432,7 @@ class DiscourseService
 
                     foreach ($restartersMembers as $restartersMember)
                     {
-                        if (!in_array($restartersMember, $discourseMembers))
+                        if (!array_key_exists($restartersMember, $discourseMembers))
                         {
                             Log::debug("Add Restarter user $restartersMember to Discourse group $discourseName");
 
