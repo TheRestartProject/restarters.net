@@ -401,9 +401,7 @@ class DiscourseService
                             if ($d['owner'] && !$shouldBeOwner) {
                                 Log::info("Remove $discourseMember as admin of {$discourseId} {$discourseName}");
                                 $response = $client->request('DELETE', "/admin/groups/$discourseId/owners.json", [
-                                    'form_params' => [
-                                        'user_id' => $d['id']
-                                    ]
+                                    'user_id' => $d['id']
                                 ]);
 
                                 Log::info('Response status: ' . $response->getStatusCode());
@@ -414,12 +412,13 @@ class DiscourseService
                                     Log::error("Failed to remove $discourseMember as owner of {$discourseId} {$discourseName}");
                                     throw new \Exception("Failed to remove $discourseMember as owner of {$discourseId} {$discourseName}");
                                 }
-                                exit(0);
                             } else if (!$d['owner'] && $shouldBeOwner) {
                                 Log::info("Add $discourseMember as admin of {$discourseId} {$discourseName}");
                                 $response = $client->request('PUT', "/admin/groups/$discourseId/owners.json", [
                                     'form_params' => [
-                                        'user_names' => [ $discourseMember ]
+                                        'group' => [
+                                            'usernames' => $discourseMember
+                                        ]
                                     ]
                                 ]);
 
@@ -431,12 +430,11 @@ class DiscourseService
                                     Log::error("Failed to add $discourseMember as owner of {$discourseId} {$discourseName}");
                                     throw new \Exception("Failed to add $discourseMember as owner of {$discourseId} {$discourseName}");
                                 }
-                                exit(0);
                             }
                         }
                     }
 
-                    foreach ($restartersMembers as $restartersMember)
+                    foreach ($restartersMembers as $restartersMember => $r)
                     {
                         if (!array_key_exists($restartersMember, $discourseMembers))
                         {
