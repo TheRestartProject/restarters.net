@@ -171,10 +171,15 @@ class ExportController extends Controller
                     $k = implode(' ', $key);
                 });
                 $headers = array_merge(['Date', 'Venue', 'Group'], $statsKeys);
+
+                // Send these to getEventStats() to speed things up a bit.
+                $eEmissionRatio = \App\Helpers\LcaStats::getEmissionRatioPowered();
+                $uEmissionratio = \App\Helpers\LcaStats::getEmissionRatioUnpowered();
+
                 // prepare the column values
                 $PartyArray = [];
                 foreach ($PartyList as $i => $party) {
-                    $stats = $party->getEventStats();
+                    $stats = $party->getEventStats($eEmissionRatio, $uEmissionratio);
                     array_walk($stats, function (&$v) {
                         $v = round($v);
                     });

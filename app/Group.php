@@ -262,8 +262,13 @@ class Group extends Model implements Auditable
         $allEvents = Party::where('events.group', $this->idgroups)
             ->get();
 
+
+        // Send these to getEventStats() to speed things up a bit.
+        $eEmissionRatio = \App\Helpers\LcaStats::getEmissionRatioPowered();
+        $uEmissionratio = \App\Helpers\LcaStats::getEmissionRatioUnpowered();
+
         foreach ($allEvents as $event) {
-            $stats = $event->getEventStats();
+            $stats = $event->getEventStats($eEmissionRatio, $uEmissionratio);
 
             if ($stats['devices_powered'] || $stats['devices_unpowered']) {
                 $ret = false;
@@ -551,7 +556,7 @@ class Group extends Model implements Auditable
     {
         $this->distance = $val;
     }
-    
+
     public function createDiscourseGroup() {
         // Get the host who created the group.
         $success = false;
@@ -603,7 +608,7 @@ class Group extends Model implements Auditable
                         'name' => "$name$unique",
                         'full_name' => $this->name,
                         'mentionable_level' => 4,
-                        'messageable_level' => 99,
+                        'messageable_level' => 4,
                         'visibility_level' => 0,
                         'members_visibility_level' => 0,
                         'automatic_membership_email_domains' => null,

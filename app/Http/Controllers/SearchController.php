@@ -42,6 +42,10 @@ class SearchController extends Controller
                     $dropdowns['allowed_parties']
                 );
 
+                // Send these to getEventStats() to speed things up a bit.
+                $eEmissionRatio = \App\Helpers\LcaStats::getEmissionRatioPowered();
+                $uEmissionratio = \App\Helpers\LcaStats::getEmissionRatioUnpowered();
+
                 if (count($PartyList) > 0) {
                     $partyIds = [];
 
@@ -50,7 +54,7 @@ class SearchController extends Controller
                     foreach ($PartyList as $party) {
                         $partyIds[] = $party->idevents;
 
-                        $eventStats = $party->getEventStats();
+                        $eventStats = $party->getEventStats($eEmissionRatio, $uEmissionratio);
                         foreach (array_keys($stats) as $v) {
                             $party->{$v} = $eventStats[$v];
                             $stats[$v] += $eventStats[$v];
