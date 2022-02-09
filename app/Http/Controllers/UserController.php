@@ -353,13 +353,6 @@ class UserController extends Controller
         }
 
         if (isset($_FILES) && ! empty($_FILES)) {
-            // $file = $request->file('profilePhoto');
-            // $path = 'images/' . $file->getClientOriginalName();
-            // $image = Image::make($file)
-            // // ->resize(320, 240)
-            // ->orientate()
-            // ->save($path);
-
             $file = new FixometerFile;
             $file->upload('profilePhoto', 'image', $id, env('TBL_USERS'), false, true);
 
