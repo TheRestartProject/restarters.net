@@ -10,11 +10,13 @@ use App\EventsUsers;
 use App\Group;
 use App\GroupNetwork;
 use App\GroupTags;
+use App\Images;
 use App\Network;
 use App\Party;
 use App\Role;
 use App\User;
 use App\UserGroups;
+use App\Xref;
 use Auth;
 use Carbon\Carbon;
 use DB;
@@ -48,6 +50,8 @@ abstract class TestCase extends BaseTestCase
         Category::truncate();
         Brands::truncate();
         GroupTags::truncate();
+        Xref::truncate();
+        Images::truncate();
         DB::statement('delete from audits');
         DB::delete('delete from user_network');
         DB::delete('delete from grouptags_groups');
@@ -72,8 +76,8 @@ abstract class TestCase extends BaseTestCase
         factory(Category::class, 1)->states('Misc')->create();
         factory(Category::class, 1)->states('Desktop computer')->create();
 
+        // We manipulate some globals for image upload testing.
         if (isset($_FILES)) {
-            // We manipulate this for image upload testing.
             unset($_FILES);
         }
     }
