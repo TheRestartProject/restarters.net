@@ -506,6 +506,7 @@ class PartyController extends Controller
             }
 
             $audits = Party::findOrFail($id)->audits;
+            $party = $Party->findThis($id)[0];
 
             return view('events.edit', [ //party.edit
                 'response' => $response,
