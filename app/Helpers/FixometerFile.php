@@ -19,7 +19,7 @@ class FixometerFile extends Model
     public function move($from, $to) {
         // This is for phpunit tests.
         if (FixometerFile::$uploadTesting) {
-            return @copy($from, $to);
+            return copy($from, $to);
         } else {
             return @move_uploaded_file($from, $to);
         }
