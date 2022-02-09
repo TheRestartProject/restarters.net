@@ -422,7 +422,7 @@ class Group extends Model implements Auditable
                 ->get();
         }
 
-        return $this->parties()->where('event_start_utc', '<', $now)->get();
+        return $this->parties()->where('event_end_utc', '<', $now)->get();
     }
 
     /**
@@ -690,7 +690,7 @@ class Group extends Model implements Auditable
                         // This should not occur if the networks are set up correctly.
                         \Sentry\captureMessage("Problem getting timezone for group {$this->idgroups} - networks conflict with $timezone and {$network->timezone}.  Will use $timezone.");
                         // TODO Convert to exception once groups have timezones set by Neil.
-                        // throw new \Exception("Group is in networks with conflicting timezones");
+                        // throw new \Exception("Group does not have own timezone and is in networks with conflicting timezones");
                     }
                 } else {
                     // First timezone found.

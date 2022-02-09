@@ -130,7 +130,7 @@ class CalendarEventsController extends Controller
             if (! is_null($event->event_date) && $event->event_date != '0000-00-00') {
                 $ical[] = 'BEGIN:VEVENT';
 
-                $ical[] = 'TZID:Europe/London';
+                $ical[] = 'TZID:' . $event->timezone;
                 $ical[] = "UID:{$event->idevents}";
                 $ical[] = 'DTSTAMP:'.date($this->ical_format).'';
                 $ical[] = "SUMMARY:{$event->venue} ({$event->name})";

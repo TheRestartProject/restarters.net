@@ -403,7 +403,7 @@ class Party extends Model implements Auditable
         $query = $query->undeleted();
         $now = date('Y-m-d H:i:s');
         $query = $query->where('event_start_utc', '<=', $now)
-            ->where('event_end_utc', '<=', $now);
+            ->where('event_end_utc', '>=', $now);
         return $query;
     }
 
@@ -640,7 +640,7 @@ class Party extends Model implements Auditable
             return true;
         }
 
-        return true;
+        return false;
     }
 
     public function isInProgress()
