@@ -58,6 +58,19 @@ abstract class TestCase extends BaseTestCase
         DB::table('notifications')->truncate();
         DB::statement('SET foreign_key_checks=1');
 
+        // Set up random auto increment values.  This avoids tests working because everything is 1.
+        $tables = DB::select('SHOW TABLES');
+        foreach ($tables as $table)
+        {
+            foreach ($table as $field => $tablename) {
+                try {
+                    // This will throw an exception if the table doesn't have auto increment.
+                    DB::update("ALTER TABLE $tablename AUTO_INCREMENT = " . rand(1, 1000) . ";");
+                } catch (\Exception $e) {
+                }
+            }
+        }
+
         $network = new Network();
         $network->name = 'Restarters';
         $network->shortname = 'restarters';
