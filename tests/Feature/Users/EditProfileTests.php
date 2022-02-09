@@ -185,8 +185,6 @@ class EditProfileTests extends TestCase
         $this->actingAs($user);
 
         // Try with no file.
-        unset($_FILES);
-
         $response = $this->json('POST', '/profile/edit-photo', []);
         $this->assertTrue($response->isRedirection());
         $response->assertSessionHas('error');

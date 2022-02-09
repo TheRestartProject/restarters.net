@@ -71,6 +71,11 @@ abstract class TestCase extends BaseTestCase
         factory(Category::class, 1)->states('Mobile')->create();
         factory(Category::class, 1)->states('Misc')->create();
         factory(Category::class, 1)->states('Desktop computer')->create();
+
+        if (isset($_FILES)) {
+            // We manipulate this for image upload testing.
+            unset($_FILES);
+        }
     }
 
     public function userAttributes()
