@@ -261,7 +261,7 @@ class DeleteEventTest extends TestCase
     {
         $this->loginAsTestUser(Role::ADMINISTRATOR);
         $id = $this->createGroup();
-        $group = Group::find($id);
+        $group = Group::findOrFail($id);
 
         $network = factory(Network::class)->create([
            'events_push_to_wordpress' => false,
@@ -288,7 +288,7 @@ class DeleteEventTest extends TestCase
 
         $this->actingAs($user);
 
-        $response = $this->get("/party/view/$id");
+        $response = $this->get("/party/view/$idevents");
 
         $this->assertVueProperties($response, [
             [
