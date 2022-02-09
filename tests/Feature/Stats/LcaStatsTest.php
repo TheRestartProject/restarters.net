@@ -3,6 +3,7 @@
 namespace Tests\Feature\Stats;
 
 use App\Device;
+use App\Group;
 use App\Helpers\LcaStats;
 use App\Party;
 use DB;
@@ -176,11 +177,12 @@ class LcaStatsTest extends StatsTestCase
     public function get_waste_stats_group()
     {
         $this->_setupCategoriesWithUnpoweredWeights();
-        $event = factory(Party::class)->create();
 
         DB::statement("UPDATE categories SET weight=0, footprint=0 WHERE idcategories IN (' . $this->_idPoweredMisc . ',' . $this->_idUnpoweredMisc .')");
 
-        $group = 1;
+        $groupObj = factory(Group::class)->create();
+        $group = $groupObj->idgroups;
+        $event = factory(Party::class)->create([ 'group' => $group ]);
 
         // #1 add a single powered non-misc device
         factory(Device::class)->states('fixed')->create([
