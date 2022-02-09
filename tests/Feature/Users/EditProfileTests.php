@@ -3,6 +3,9 @@
 namespace Tests\Feature;
 
 use App\Events\UserUpdated;
+use App\Helpers\Fixometer;
+use App\Role;
+use App\Skills;
 use App\User;
 use Carbon\Carbon;
 use DB;
@@ -118,5 +121,39 @@ class EditProfileTests extends TestCase
         $user = $user->fresh();
         $this->assertNull($user->latitude);
         $this->assertNull($user->longitude);
+    }
+
+    /** test */
+    public function test_tags_update() {
+        $user = factory(User::class)->create();
+        $this->actingAs($user);
+
+        $skill1 = Skills::create([
+                                     'skill_name'  => 'UT1',
+                                     'description' => 'Planning',
+                                     'category' => 1
+                                 ]);
+        $skill2 = Skills::create([
+                                    'skill_name'  => 'UT2',
+                                    'description' => 'Unit Testing',
+                                    'category' => 2
+                                ]);
+
+        // Add this skill.
+        $response = $this->post('/profile/edit-tags', [
+            'tags' => [ $skill1->id, $skill2->id ]
+        ]);
+
+        $this->assertTrue($response->isRedirection());
+        $response->assertSessionHas('message');
+
+        // Check it shows.
+        $response2 = $this->get('/profile/edit');
+        $response2->assertSee('selected>UT1</option>');
+        $response2->assertSee('selected>UT2</option>');
+
+        // Should have promoted to host because we have a category 1 skill.
+        $user->refresh();
+        self::assertEquals(Role::HOST, $user->role);
     }
 }

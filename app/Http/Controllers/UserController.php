@@ -72,6 +72,7 @@ class UserController extends Controller
     {
         if (is_null($id)) {
             $user = Auth::user();
+            $id = $user->id;
         } elseif (! Fixometer::hasRole(Auth::user(), 'Administrator') &&
             ! Auth::user()->isRepairDirectorySuperAdmin() &&
             ! Auth::user()->isRepairDirectoryRegionalAdmin() &&
@@ -332,6 +333,7 @@ class UserController extends Controller
 
         $skills = $request->input('tags');
         $user->skillsold()->sync($skills);
+        $user->refresh();
 
         $roleBasedOnSkills = Fixometer::skillsDetermineRole($skills);
 
@@ -628,109 +630,93 @@ class UserController extends Controller
 
             $User = new User;
 
-            if ($request->getMethod() == 'POST') {
-                $error = [];
+            $error = [];
 
-                // We got data! Elaborate.
-                $name = $request->get('name');
-                $email = $request->get('email');
-                $role = $request->get('role');
-                if (! $request->has('modal')) {
-                    $groups = $request->get('groups');
-                }
-
-                // dbga($group);
-
-                if (empty($name)) {
-                    $error['name'] = 'Please input a name.';
-                }
-
-                if (empty($email) || ! filter_var($email, FILTER_VALIDATE_EMAIL)) {
-                    $error['email'] = 'Please input a <strong>valid</strong> email.';
-                }
-                /*
-                if(empty($pwd) || empty($cpwd) || !($pwd === $cpwd)){
-                $error['password'] = 'The password cannot be empty and must match with the confirmation field.';
-            }
-            */
-                if (empty($role)) {
-                    $error['role'] = 'Please select a role for the User.';
-                }
-
-                if (empty($group)) {
-                    $group = null;
-                }
-                if (! $User->checkEmail($email)) {
-                    $error['email'] = 'This email is already in use in our database. Please use another one.';
-                }
-
-                if (empty($error)) {
-                    // random password
-                    $pwd = bin2hex(openssl_random_pseudo_bytes(8));
-
-                    // No errors. We can proceed and create the User.
-                    $data = ['name'     => $name,
-                    'email'    => $email,
-                    'password' => crypt($pwd, '$1$'.strrev(md5(env('APP_KEY')))),
-                    'role'     => $role,
-                    'calendar_hash' => Str::random(15),
-                    //'group'    => $group
-                      ];
-
-                    // add password recovery data
-                    $bytes = 32;
-                    $data['recovery'] = substr(bin2hex(openssl_random_pseudo_bytes($bytes)), 0, 24);
-                    // add date timestamp
-                    $data['recovery_expires'] = strftime('%Y-%m-%d %X', time() + (24 * 60 * 60));
-
-                    $idUser = $User->create($data)->id;
-                    if ($idUser) {
-                        if (isset($groups) && ! empty($groups)) {
-                            $Usersgroups = new UserGroups;
-                            $Usersgroups->createUsersGroups($idUser, $groups);
-                        }
-
-                        if (isset($_FILES) && ! empty($_FILES)) {
-                            $file = new FixometerFile;
-                            $file->upload('profile', 'image', $idUser, env('TBL_USERS'), false, true);
-                        }
-                    }
-                    if ($idUser) {
-                        $response['success'] = 'User created correctly.  <strong>NB No email has been sent to the user.</strong>';
-                    } else {
-                        $response['danger'] = 'User could not be created';
-                    }
-                } else {
-                    $response['danger'] = 'User could <strong>not</strong> be created. Please look at the reported errors, correct them, and try again.';
-                }
-
-                if (! isset($data)) {
-                    $data = null;
-                }
-
-                if (! isset($_POST['modal'])) {
-                    return view('user.create', [
-                        'title' => 'New User',
-                        'user' => $user,
-                        'header' => true,
-                        'roles' => $Roles,
-                        'groups' => $Groups,
-                        'response' => $response,
-                        'error' => $error,
-                        'originalData' => $data,
-                      ]);
-                } else {
-                    return redirect()->back()->with('success', 'User Successfully Created!');
-                }
+            // We got data! Elaborate.
+            $name = $request->get('name');
+            $email = $request->get('email');
+            $role = $request->get('role');
+            if (! $request->has('modal')) {
+                $groups = $request->get('groups');
             }
 
-            return view('user.create', [
-            'title' => 'New User',
-            'user' => $user,
-            'header' => true,
-            'roles' => $Roles,
-            'groups' => $Groups,
-            ]);
+            if (empty($name)) {
+                $error['name'] = 'Please input a name.';
+            }
+
+            if (empty($email) || ! filter_var($email, FILTER_VALIDATE_EMAIL)) {
+                $error['email'] = 'Please input a <strong>valid</strong> email.';
+            }
+
+            if (empty($role)) {
+                $error['role'] = 'Please select a role for the User.';
+            }
+
+            if (empty($group)) {
+                $group = null;
+            }
+            if (! $User->checkEmail($email)) {
+                $error['email'] = 'This email is already in use in our database. Please use another one.';
+            }
+
+            if (empty($error)) {
+                // random password
+                $pwd = bin2hex(openssl_random_pseudo_bytes(8));
+
+                // No errors. We can proceed and create the User.
+                $data = ['name'     => $name,
+                'email'    => $email,
+                'password' => crypt($pwd, '$1$'.strrev(md5(env('APP_KEY')))),
+                'role'     => $role,
+                'calendar_hash' => Str::random(15),
+                //'group'    => $group
+                  ];
+
+                // add password recovery data
+                $bytes = 32;
+                $data['recovery'] = substr(bin2hex(openssl_random_pseudo_bytes($bytes)), 0, 24);
+                // add date timestamp
+                $data['recovery_expires'] = strftime('%Y-%m-%d %X', time() + (24 * 60 * 60));
+
+                $idUser = $User->create($data)->id;
+                if ($idUser) {
+                    if (isset($groups) && ! empty($groups)) {
+                        $Usersgroups = new UserGroups;
+                        $Usersgroups->createUsersGroups($idUser, $groups);
+                    }
+
+                    if (isset($_FILES) && ! empty($_FILES)) {
+                        $file = new FixometerFile;
+                        $file->upload('profile', 'image', $idUser, env('TBL_USERS'), false, true);
+                    }
+                }
+                if ($idUser) {
+                    $response['success'] = 'User created correctly.  <strong>NB No email has been sent to the user.</strong>';
+                } else {
+                    $response['danger'] = 'User could not be created';
+                }
+            } else {
+                $response['danger'] = 'User could <strong>not</strong> be created. Please look at the reported errors, correct them, and try again.';
+            }
+
+            if (! isset($data)) {
+                $data = null;
+            }
+
+            if (! isset($_POST['modal'])) {
+                return view('user.create', [
+                    'title' => 'New User',
+                    'user' => $user,
+                    'header' => true,
+                    'roles' => $Roles,
+                    'groups' => $Groups,
+                    'response' => $response,
+                    'error' => $error,
+                    'originalData' => $data,
+                  ]);
+            } else {
+                return redirect()->back()->with('success', 'User Successfully Created!');
+            }
         } else {
             header('Location: /user/forbidden');
         }
