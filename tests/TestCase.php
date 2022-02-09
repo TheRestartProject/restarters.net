@@ -77,6 +77,8 @@ abstract class TestCase extends BaseTestCase
         factory(Category::class, 1)->states('Desktop computer')->create();
 
         // We manipulate some globals for image upload testing.
+        \FixometerFile::$uploadTesting = FALSE;
+
         if (isset($_FILES)) {
             unset($_FILES);
         }

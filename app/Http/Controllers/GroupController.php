@@ -942,7 +942,7 @@ class GroupController extends Controller
 
             return 'success - image uploaded';
         } catch (\Exception $e) {
-            return 'fail - image could not be uploaded' . $e->getMessage();
+            return 'fail - image could not be uploaded ' . $e->getMessage();
         }
     }
 
