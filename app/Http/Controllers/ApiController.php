@@ -214,11 +214,11 @@ class ApiController extends Controller
         }
 
         if ($from_date) {
-            $wheres[] = ['events.event_date', '>=', $from_date];
+            $wheres[] = ['events.event_start_utc', '>=', $from_date];
         }
 
         if ($to_date) {
-            $wheres[] = ['events.event_date', '<=', $to_date];
+            $wheres[] = ['events.event_end_utc', '<=', $to_date];
         }
 
         // Get the items we want for this page.
@@ -250,8 +250,6 @@ class ApiController extends Controller
         } else {
             // We need the total weight/CO2 impact for this filtering.
             $d = new Device();
-
-            DB::enableQueryLog();
 
             $wheres[] = ['repair_status', '=', env('DEVICE_FIXED')];
 

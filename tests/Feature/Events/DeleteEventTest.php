@@ -250,7 +250,7 @@ class DeleteEventTest extends TestCase
         $network->addGroup($group);
 
         $this->assertNotNull($id);
-        $idevents = $this->createEvent($id, 'Past');
+        $idevents = $this->createEvent($id, '1981-01-01');
 
         // Add a restarter who is attending.
         $this->get('/logout');
