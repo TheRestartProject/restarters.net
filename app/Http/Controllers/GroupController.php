@@ -934,9 +934,7 @@ class GroupController extends Controller
             if (isset($_FILES) && ! empty($_FILES)) {
                 $existing_image = Fixometer::hasImage($id, 'groups', true);
                 if (! empty($existing_image)) {
-                    // TODO This can't work.  But it's hard to test given that we use raw file uploads
-                    // rather than the Laravel mechanism.
-                    $Group->removeImage($id, $existing_image[0]);
+                    Fixometer::removeImage($id, env('TBL_GROUPS'), $existing_image[0]);
                 }
                 $file = new FixometerFile;
                 $file->upload('file', 'image', $id, env('TBL_GROUPS'), false, true, true);
@@ -944,7 +942,7 @@ class GroupController extends Controller
 
             return 'success - image uploaded';
         } catch (\Exception $e) {
-            return 'fail - image could not be uploaded';
+            return 'fail - image could not be uploaded ' . $e->getMessage();
         }
     }
 

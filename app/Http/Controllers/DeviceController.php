@@ -69,133 +69,6 @@ class DeviceController extends Controller
         ]);
     }
 
-    public function edit($id)
-    {
-        // This page now only exists to provide a kind of API for updating a device using POST.
-        $device = Device::find($id);
-
-        $is_attending = EventsUsers::where('event', $device->event)->where('user', Auth::id())->first();
-
-        $user = Auth::user();
-
-        if (Fixometer::hasRole($user, 'Administrator') || ! empty($is_attending)) {
-            if ($_SERVER['REQUEST_METHOD'] == 'POST' && ! empty($_POST) && filter_var($id, FILTER_VALIDATE_INT)) {
-                $data = $_POST;
-
-                // Remove some inputs.  Probably these aren't present any more, but it does no harm to ensure that.
-                unset($data['files']);
-                unset($data['users']);
-
-                $old_wiki = Device::find($id)->wiki;
-
-                if (isset($data['wiki'])) {
-                    $wiki = 1;
-                } else {
-                    $wiki = 0;
-                }
-
-                if (! isset($data['repair_more']) || empty($data['repair_more'])) { //Override
-                    $data['repair_more'] = 0;
-                }
-
-                if ($data['repair_status'] != 2) { //Override
-                    $data['repair_more'] = 0;
-                }
-
-                if ($data['repair_more'] == 1) {
-                    $more_time_needed = 1;
-                } else {
-                    $more_time_needed = 0;
-                }
-
-                if ($data['repair_more'] == 2) {
-                    $professional_help = 1;
-                } else {
-                    $professional_help = 0;
-                }
-
-                if ($data['repair_more'] == 3) {
-                    $do_it_yourself = 1;
-                } else {
-                    $do_it_yourself = 0;
-                }
-
-                if ($data['category'] == 46 && isset($data['weight'])) {
-                    $weight = $data['weight'];
-                } else {
-                    $weight = null;
-                }
-
-                if ($data['spare_parts'] == 3) { // Third party
-                    $data['spare_parts'] = 1;
-                    $parts_provider = 2;
-                } elseif ($data['spare_parts'] == 1) { // Manufacturer
-                    $data['spare_parts'] = 1;
-                    $parts_provider = 1;
-                } elseif ($data['spare_parts'] == 2) { // Not needed
-                    $data['spare_parts'] = 2;
-                    $parts_provider = null;
-                } elseif ($data['spare_parts'] == 4) { // Historical data, resets spare parts to 1 but keeps parts provider as null
-                    $data['spare_parts'] = 1;
-                    $parts_provider = null;
-                } else {
-                    $parts_provider = null;
-                }
-
-                if (! isset($data['barrier'])) {
-                    $data['barrier'] = null;
-                } elseif (in_array(1, $data['barrier']) || in_array(2, $data['barrier'])) { // 'Spare parts not available' or 'spare parts too expensive' selected
-                    $data['spare_parts'] = 1;
-                } elseif (count($data['barrier']) > 0) {
-                    $data['spare_parts'] = 2;
-                }
-
-                $update = [
-                    'event' => $data['event'],
-                    'category' => $data['category'],
-                    'category_creation' => $data['category'],
-                    'estimate' => $weight,
-                    'repair_status' => $data['repair_status'],
-                    'spare_parts' => $data['spare_parts'],
-                    'parts_provider' => $parts_provider,
-                    'brand' => $data['brand'],
-                    'model' => $data['model'],
-                    'problem' => $data['problem'],
-                    'age' => $data['age'],
-                    'more_time_needed' => $more_time_needed,
-                    'professional_help' => $professional_help,
-                    'do_it_yourself' => $do_it_yourself,
-                    'wiki' => $wiki,
-                ];
-
-                $u = Device::find($id)->update($update);
-
-                // Update barriers
-                if (isset($data['barrier']) && ! empty($data['barrier']) && $data['repair_status'] == 3) { // Only sync when repair status is end-of-life
-                      Device::find($id)->barriers()->sync($data['barrier']);
-                } else {
-                    Device::find($id)->barriers()->sync([]);
-                }
-
-                if (! $u) {
-                    $response['danger'] = 'Something went wrong. Please check the data and try again.';
-                } else {
-                    $response['success'] = 'Device updated!';
-
-                    /* let's create the image attachment! **/
-                    if (isset($_FILES) && ! empty($_FILES['files']['name'])) {
-                        $file = new FixometerFile;
-                        $file->upload('devicePhoto', 'image', $id, env('TBL_DEVICES'), true);
-                    }
-                }
-
-                event(new DeviceCreatedOrUpdated(Device::find($id)));
-            }
-        }
-
-        return redirect('/user/forbidden');
-    }
-
     public function ajaxCreate(Request $request)
     {
         $rules = [
@@ -508,7 +381,7 @@ class DeviceController extends Controller
 
             if (isset($_FILES) && ! empty($_FILES)) {
                 $file = new FixometerFile;
-                $file->upload('file', 'image', $id, env('TBL_DEVICES'), true, false, true);
+                $fn = $file->upload('file', 'image', $id, env('TBL_DEVICES'), true, false, true);
                 $device = Device::find($id);
                 $images = $device->getImages();
             }
