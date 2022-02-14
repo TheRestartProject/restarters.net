@@ -107,9 +107,13 @@ AND d.category <> 50
     }
 
     /**
-     * BORKED ATTEMPT TO APPLY SENT FILTERS TO STATS QUERY
-     * MAY BE REDUNDANT
-     * SEE ApiController::getDevices()
+     * BORKED ATTEMPT TO APPLY REQUEST FILTERS TO STATS QUERY.
+     *
+     * See \app\Http\Controllers\ApiController::getDevices() for more info.
+     *
+     * @ToDo Determine if this is useful and fix.
+     *
+     * It could replace getWasteStats() if it worked.
      */
     public static function getWasteStatsFiltered($filters = [])
     {

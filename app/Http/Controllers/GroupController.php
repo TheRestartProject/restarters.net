@@ -371,13 +371,17 @@ class GroupController extends Controller
 
         $expanded_events = [];
 
+        // Send these to getEventStats() to speed things up a bit.
+        $eEmissionRatio = \App\Helpers\LcaStats::getEmissionRatioPowered();
+        $uEmissionratio = \App\Helpers\LcaStats::getEmissionRatioUnpowered();
+
         foreach (array_merge($upcoming_events->all(), $past_events->all()) as $event) {
             $thisone = $event->getAttributes();
             $thisone['attending'] = Auth::user() && $event->isBeingAttendedBy(Auth::user()->id);
             $thisone['allinvitedcount'] = $event->allInvited->count();
 
             // TODO LATER Consider whether these stats should be in the event or passed into the store.
-            $thisone['stats'] = $event->getEventStats();
+            $thisone['stats'] = $event->getEventStats($eEmissionRatio, $uEmissionratio);
             $thisone['participants_count'] = $event->participants;
             $thisone['volunteers_count'] = $event->allConfirmedVolunteers->count();
 

@@ -63,12 +63,17 @@ class EventController extends Controller
         }
 
         $collection = collect([]);
+
+        // Send these to getEventStats() to speed things up a bit.
+        $eEmissionRatio = \App\Helpers\LcaStats::getEmissionRatioPowered();
+        $uEmissionratio = \App\Helpers\LcaStats::getEmissionRatioUnpowered();
+
         foreach ($parties as $key => $party) {
             $group = $groups_array->filter(function ($group) use ($party) {
                 return $group['id'] == $party->group;
             })->first();
 
-            $eventStats = $party->getEventStats();
+            $eventStats = $party->getEventStats($eEmissionRatio, $uEmissionratio);
             // Push Party to Collection
             $collection->push([
              'id' => $party->idevents,

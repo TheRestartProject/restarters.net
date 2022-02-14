@@ -355,7 +355,7 @@ class DiscourseService
                         $discourseMembers[$d['username']]['owner'] = true;
                     }
 
-                    $restartersMembersUGs = UserGroups::where('group', $restartId)->where('status', '=', 1)->get();
+                    $restartersMembersUGs = UserGroups::where('group', $restartId)->where('status', '=', 1)->whereNull('deleted_at')->get();
 
                     $restartersMembers = [];
 
