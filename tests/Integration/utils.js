@@ -37,8 +37,10 @@ exports.createGroup = async function(page, baseURL) {
 
   await page.click('button[type=submit]')
 
-  // Get redirected to Edit form which should have details section.
-  await expect(page.locator('#details'))
+  // Should get redirected to Edit form.  We used to wait on #details, but this stopped working for reasons we don't
+  // understand.  It may be as design in Playwright.  However the page URL will have been updated and we can use that
+  // to check that the create redirected to edit.
+  await page.waitForURL('**/edit/**');
 
   // Return id from URL
   const p = page.url().lastIndexOf('/')
