@@ -40,6 +40,6 @@ class SyncDiscourseGroups extends Command
      */
     public function handle()
     {
-        $this->discourseService->syncUsersToGroups();
+        $this->discourseService->syncGroups();
     }
 }
