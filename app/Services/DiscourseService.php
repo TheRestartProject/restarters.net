@@ -392,8 +392,8 @@ class DiscourseService
 
                             if ($response->getStatusCode() != 200)
                             {
-                                Log::error("Failed to add member $discourseMember for {$discourseId} {$discourseName}");
-                                throw new \Exception("Failed to add member $discourseMember for {$discourseId} {$discourseName}");
+                                Log::error("Failed to remove member $discourseMember for {$discourseId} {$discourseName}");
+                                throw new \Exception("Failed to remove member $discourseMember for {$discourseId} {$discourseName}");
                             }
                         } else {
                             // See whether the owner status on Discourse matches the status on Restarters.
@@ -413,7 +413,7 @@ class DiscourseService
                                 if ($response->getStatusCode() != 200)
                                 {
                                     Log::error("Failed to remove $discourseMember as owner of {$discourseId} {$discourseName}");
-                                    throw new \Exception("Failed to remove $discourseMember as owner of {$discourseId} {$discourseName}");
+                                    #throw new \Exception("Failed to remove $discourseMember as owner of {$discourseId} {$discourseName}");
                                 }
                             } else if (!$d['owner'] && $shouldBeOwner) {
                                 Log::info("Add $discourseMember as admin of {$discourseId} {$discourseName}");
@@ -457,11 +457,19 @@ class DiscourseService
                                 // This happens if the user doesn't exist on Discourse.  That can happen for historical
                                 // reasons, or failures during user creation.  Try to create them.
                                 Log::info('Create missing member on Discourse ' . $restartersMember);
-                                $u = User::find($r->user);
+                                $u = User::where('username', $r)->first();
                                 $this->syncSso($u);
-                            }
 
-                            if ($response->getStatusCode() != 200)
+                                // Now try again to add.
+                                $response = $client->request('PUT', "/admin/groups/$discourseId/members.json", [
+                                    'form_params' => [
+                                        'usernames' => $restartersMember
+                                    ]
+                                ]);
+
+                                Log::debug('Response status after add: ' . $response->getStatusCode());
+                                Log::debug($response->getBody());
+                            } else if ($response->getStatusCode() != 200)
                             {
                                 Log::error("Failed to add member for {$discourseId} {$discourseName}");
                             } else
