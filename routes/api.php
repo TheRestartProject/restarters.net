@@ -48,28 +48,19 @@ Route::get('/group-tag/stats/{group_tag_id}/{format?}', function ($group_tag_id,
 });
 
 // API calls to get Group(s)/Event(s) Info relevant
-Route::group(['middleware' => 'checkAPIAccess'], function () {
-    Route::get('/{api_token}/group/{group}/{date_from?}/{date_to?}', 'GroupController@getGroupByKeyAndId');
-    Route::get('/{api_token}/groups/group-tag/', 'GroupController@getGroupsByKey');
-
-    Route::get('/{api_token}/event/{party}/', 'PartyController@getEventByKeyAndId');
-    Route::get('/{api_token}/events/group-tag/{date_from?}/{date_to?}', 'PartyController@getEventsByKey');
-});
-
 Route::group(['middleware' => 'auth:api'], function () {
     Route::get('/users/me', 'ApiController@getUserInfo');
     Route::get('/users', 'ApiController@getUserList');
     Route::get('/users/changes', 'API\UserController@changes');
     Route::put('/users/{id}', 'API\UserController@update');
 
-    Route::get('/networks/{network}/stats/', 'API\NetworkController@stats');
+    Route::get('/networks/{network}/stats/', 'API\NetworkController@stats'); // Used by RepairTogether.
 
     Route::get('/groups', 'API\GroupController@getGroupList');
     Route::get('/groups/changes', 'API\GroupController@getGroupChanges');
-    Route::get('/groups/group-tag/', 'API\GroupController@getGroupsByUserGroupTag');
-    Route::get('/groups/network/', 'API\GroupController@getGroupsByUsersNetworks');
+    Route::get('/groups/network/', 'API\GroupController@getGroupsByUsersNetworks');  // Used by RepairTogether.
 
-    Route::get('/events/network/{date_from?}/{date_to?}', 'API\EventController@getEventsByUsersNetworks');
+    Route::get('/events/network/{date_from?}/{date_to?}', 'API\EventController@getEventsByUsersNetworks'); // Used by RepairTogether.
 
     Route::get('/usersgroups/changes', 'API\UserGroupsController@changes');
     Route::delete('/usersgroups/{id}', 'API\UserGroupsController@leave');
