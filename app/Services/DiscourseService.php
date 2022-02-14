@@ -364,11 +364,6 @@ class DiscourseService
                         $restartersMembers[$u->username] = $r;
                     }
 
-                    $restartersMembersIds = UserGroups::where('group', $restartId)->where('status', '=', 1)->whereNull('deleted_at')->pluck(
-                        'user'
-                    )->toArray();
-                    $restartersMembers = User::whereIn('id', $restartersMembersIds)->pluck('username')->toArray();
-
                     Log::debug(
                         count($discourseMembers) . " Discourse members vs " . count(
                             $restartersMembers
@@ -457,18 +452,15 @@ class DiscourseService
                                 // This happens if the user doesn't exist on Discourse.  That can happen for historical
                                 // reasons, or failures during user creation.  Try to create them.
                                 Log::info('Create missing member on Discourse ' . $restartersMember);
-                                $u = User::where('username', $r)->first();
+                                $u = User::where('username', $restartersMember)->first();
                                 $this->syncSso($u);
 
-                                // Now try again to add.
+                                // Now try again to add.  If this fails we'll pick it up again next time through.
                                 $response = $client->request('PUT', "/admin/groups/$discourseId/members.json", [
                                     'form_params' => [
                                         'usernames' => $restartersMember
                                     ]
                                 ]);
-
-                                Log::debug('Response status after add: ' . $response->getStatusCode());
-                                Log::debug($response->getBody());
                             } else if ($response->getStatusCode() != 200)
                             {
                                 Log::error("Failed to add member for {$discourseId} {$discourseName}");
