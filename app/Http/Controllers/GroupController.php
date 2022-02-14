@@ -1395,6 +1395,7 @@ class GroupController extends Controller
         $exclude_parties = [];
         if (! empty($date_from) && ! empty($date_to)) {
             foreach ($group->parties as $party) {
+                // TODO Timezones.  The inputs are probably in local timezones.
                 if (! Fixometer::validateBetweenDates($party->event_date, $date_from, $date_to)) {
                     $exclude_parties[] = $party->idevents;
                 }

@@ -221,7 +221,7 @@ class GroupController extends Controller
     {
         $group = $group->load('parties');
 
-        $events = $group->parties->sortByDesc('event_date');
+        $events = $group->parties->sortByDesc('event_start_utc');
 
         if ($request->has('format') && $request->input('format') == 'location') {
             $events = $events->map(function ($event) {

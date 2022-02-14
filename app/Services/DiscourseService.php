@@ -355,7 +355,7 @@ class DiscourseService
                         $discourseMembers[$d['username']]['owner'] = true;
                     }
 
-                    $restartersMembersUGs = UserGroups::where('group', $restartId)->where('status', '=', 1)->get();
+                    $restartersMembersUGs = UserGroups::where('group', $restartId)->where('status', '=', 1)->whereNull('deleted_at')->get();
 
                     $restartersMembers = [];
 
@@ -363,7 +363,7 @@ class DiscourseService
                         $u = User::find($r->user);
                         $restartersMembers[$u->username] = $r;
                     }
-                    $discourseMembers = array_column($discourseResult['members'], 'username');
+
                     $restartersMembersIds = UserGroups::where('group', $restartId)->where('status', '=', 1)->whereNull('deleted_at')->pluck(
                         'user'
                     )->toArray();

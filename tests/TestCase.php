@@ -166,9 +166,19 @@ abstract class TestCase extends BaseTestCase
         $eventAttributes = factory(Party::class)->raw();
         $eventAttributes['group'] = $idgroups;
 
+        // Use old-style event creation rather than UTC.
+        unset($eventAttributes['event_start_utc']);
+        unset($eventAttributes['event_end_utc']);
         $eventAttributes['event_date'] = date('Y-m-d', strtotime($date));
+        $eventAttributes['start'] = '13:00:00';
+        $eventAttributes['end'] = '14:00:00';
 
         $response = $this->post('/party/create/', $eventAttributes);
+
+        // The event_start_utc and event_end_utc will be in the database, but not ISO8601 formatted - that is implicit.
+//        $eventAttributes['event_start_utc'] = Carbon::parse($eventAttributes['event_start_utc'])->format('Y-m-d H:i:s');
+//        $eventAttributes['event_end_utc'] = Carbon::parse($eventAttributes['event_end_utc'])->format('Y-m-d H:i:s');
+
         $this->assertDatabaseHas('events', $eventAttributes);
         $redirectTo = $response->getTargetUrl();
         $p = strrpos($redirectTo, '/');

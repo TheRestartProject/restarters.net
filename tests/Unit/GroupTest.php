@@ -133,4 +133,45 @@ class GroupTest extends TestCase
 
         $this->assertFalse($shouldPush);
     }
+
+    /**
+     * @test
+     * @dataProvider timezoneProvider
+     */
+    public function timezone_inheritance($group, $network1, $network2, $result, $exception) {
+        $network1 = factory(Network::class)->create([
+            'timezone' => $network1
+        ]);
+        $network2 = factory(Network::class)->create([
+            'timezone' => $network2
+        ]);
+
+        $group = factory(Group::class)->create([
+            'timezone' => $group
+        ]);
+        $network1->addGroup($group);
+        $network2->addGroup($group);
+
+        try {
+            $timezone = $group->timezone;
+            $this->assertEquals($result, $timezone);
+        } catch(\Exception $e) {
+            if ($exception) {
+                $this->assertTrue(true);
+            } else {
+                $this->assertFalse(true, 'Unexpected exception thrown');
+            }
+        }
+    }
+
+    public function timezoneProvider() {
+        return [
+            [ NULL, 'Europe/Paris', NULL, 'Europe/Paris', FALSE ],
+            [ NULL, 'Europe/Paris', 'Europe/Paris', 'Europe/Paris', FALSE ],
+            [ NULL, 'Europe/Paris', 'Europe/London', NULL, TRUE ],
+            [ 'Europe/Brussels','Europe/Paris', 'Europe/Paris', 'Europe/Brussels', FALSE ],
+            [ 'Europe/Brussels', NULL, 'Europe/Paris', 'Europe/Brussels', FALSE ],
+            [ NULL, NULL, NULL, NULL, TRUE ],
+        ];
+    }
 }
