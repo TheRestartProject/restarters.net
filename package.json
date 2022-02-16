@@ -34,7 +34,7 @@
     "dependencies": {
         "@sentry/tracing": "^6.7.2",
         "@sentry/vue": "^6.7.2",
-        "ajv": "^6.5.4",
+        "ajv": "^6.12.3",
         "bootstrap-fileinput": "^4.4.9",
         "bootstrap-select": "^1.13.17",
         "bootstrap-tokenfield": "^0.12.0",
