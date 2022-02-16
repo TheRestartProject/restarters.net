@@ -21,6 +21,7 @@ use App\Notifications\NewGroupMember;
 use App\Notifications\NewGroupWithinRadius;
 use App\Notifications\GroupConfirmed;
 use App\Party;
+use App\Role;
 use App\User;
 use App\UserGroups;
 use Auth;
@@ -899,7 +900,7 @@ class GroupController extends Controller
             event(new UserFollowedGroup($user, $group));
 
             // A new User has joined your group
-            $groupHostLinks = UserGroups::where('group', $group->idgroups)->where('role', 3)->get();
+            $groupHostLinks = UserGroups::where('group', $group->idgroups)->where('role', Role::HOST)->get();
 
             foreach ($groupHostLinks as $groupHostLink) {
                 $host = User::where('id', $groupHostLink->user)->first();
@@ -1396,6 +1397,7 @@ class GroupController extends Controller
         $exclude_parties = [];
         if (! empty($date_from) && ! empty($date_to)) {
             foreach ($group->parties as $party) {
+                // TODO Timezones.  The inputs are probably in local timezones.
                 if (! Fixometer::validateBetweenDates($party->event_date, $date_from, $date_to)) {
                     $exclude_parties[] = $party->idevents;
                 }

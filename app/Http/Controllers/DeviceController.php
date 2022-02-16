@@ -37,7 +37,7 @@ class DeviceController extends Controller
         $most_recent_finished_event = Party::with('theGroup')
         ->hasDevicesRepaired(1)
         ->eventHasFinished()
-        ->orderBy('event_date', 'DESC')
+        ->orderBy('event_start_utc', 'DESC')
         ->first();
 
         if ($most_recent_finished_event) {

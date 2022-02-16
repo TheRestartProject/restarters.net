@@ -8,5 +8,6 @@ $factory->define(App\Group::class, function (Faker $faker) {
         'free_text' => $faker->sentence,
         'facebook' => '',
         'postcode' => '',
+        'timezone' => 'Europe/London'
     ];
 });

@@ -67,52 +67,6 @@ class Device extends Model implements Auditable
         return \App\Helpers\LcaStats::getDisplacementFactor();
     }
 
-    public function getList($params = null)
-    {
-        //Tested!
-        $sql = 'SELECT * FROM `view_devices_list`';
-
-        if (! is_null($params)) {
-            $sql .= ' WHERE 1=1 AND ';
-
-            $params = array_filter($params);
-            foreach ($params as $field => $value) {
-                if ($field == 'brand' || $field == 'model' || $field == 'problem') {
-                    $params[$field] = '%'.strtolower($value).'%';
-                } elseif ($field == 'event_date') {
-                    $params[$field] = implode(' AND ', $value);
-                }
-            }
-
-            $clauses = [];
-
-            foreach ($params as $f => $v) {
-                if ($f == 'event_date') {
-                    $clauses[] = 'event_date BETWEEN '.$v;
-                }
-                if ($f == 'category' || $f == 'group') {
-                    $clauses[] = 'id'.$f.' IN ('.$v.')';
-                } elseif ($f == 'brand' || $f == 'model' || $f == 'problem') {
-                    $clauses[] = $f.' LIKE :'.$f;
-                }
-            }
-
-            $sql .= implode(' AND ', $clauses);
-        }
-
-        $sql .= ' ORDER BY `sorter` DESC';
-
-        if (! empty($params) && array_key_exists('event_date', $params)) {
-            unset($params['event_date']);
-        }
-
-        if ($params != null) {
-            return DB::select(DB::raw($sql), $params);
-        }
-
-        return DB::select(DB::raw($sql));
-    }
-
     public function ofThisUser($id)
     {
         //Tested
@@ -348,7 +302,7 @@ class Device extends Model implements Auditable
                     `repair_status`,
                     `spare_parts`,
                     `e`.`location`,
-                    UNIX_TIMESTAMP( CONCAT(`e`.`event_date`, " ", `e`.`start`) ) AS `event_timestamp`,
+                    UNIX_TIMESTAMP(event_start_utc) AS `event_timestamp`,
                     `g`.`name` AS `group_name`
 
                 FROM `devices` AS `d`

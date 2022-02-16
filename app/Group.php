@@ -38,6 +38,7 @@ class Group extends Model implements Auditable
         'network_id',
         'external_id',
         'devices_updated_at',
+        'timezone'
     ];
 
     protected $appends = ['ShareableLink', 'approved', 'auto_approve'];
@@ -380,7 +381,7 @@ class Group extends Model implements Auditable
     }
 
     /**
-     * All parties for the group that are taking place today or later.
+     * All parties for the group that are taking place in the future.
      *
      * @author Christopher Kelker - @date 2019-03-21
      * @editor  Christopher Kelker, Neil Mather
@@ -389,22 +390,21 @@ class Group extends Model implements Auditable
      */
     public function upcomingParties($exclude_parties = [])
     {
-        $from = date('Y-m-d');
+        $from = date('Y-m-d H:i:s');
 
         if (! empty($exclude_parties)) {
             return $this->parties()
-                ->where('event_date', '>=', $from)
+                ->where('event_end_utc', '>', $from)
                 ->whereNotIn('idevents', $exclude_parties)
                 ->get();
         }
 
-        return $this->parties()->where('event_date', '>=', $from)->get();
+        return $this->parties()->where('event_end_utc', '>', $from)->get();
     }
 
     /**
      * [pastParties description]
-     * All Past Parties where between the Start Parties Date
-     * is yesterday or a month earlier.
+     * All Past Parties.
      *
      * @author Christopher Kelker - @date 2019-03-21
      * @editor  Christopher Kelker
@@ -413,14 +413,16 @@ class Group extends Model implements Auditable
      */
     public function pastParties($exclude_parties = [])
     {
+        $now = date('Y-m-d H:i:s');
+
         if (! empty($exclude_parties)) {
             return $this->parties()
-                ->where('event_date', '<', date('Y-m-d'))
+                ->where('event_end_utc', '<', $now)
                 ->whereNotIn('idevents', $exclude_parties)
                 ->get();
         }
 
-        return $this->parties()->where('event_date', '<', date('Y-m-d'))->get();
+        return $this->parties()->where('event_end_utc', '<', $now)->get();
     }
 
     /**
@@ -456,8 +458,8 @@ class Group extends Model implements Auditable
     {
         $event = $this->parties()
             ->whereNotNull('wordpress_post_id')
-            ->whereDate('event_date', '>=', date('Y-m-d'))
-            ->orderBy('event_date', 'asc');
+            ->where('event_start_utc', '>=', date('Y-m-d H:i:s'))
+            ->orderBy('event_start_utc', 'asc');
 
         if (! $event->count()) {
             return null;
@@ -606,7 +608,7 @@ class Group extends Model implements Auditable
                         'name' => "$name$unique",
                         'full_name' => $this->name,
                         'mentionable_level' => 4,
-                        'messageable_level' => 99,
+                        'messageable_level' => 4,
                         'visibility_level' => 0,
                         'members_visibility_level' => 0,
                         'automatic_membership_email_domains' => null,
@@ -669,5 +671,42 @@ class Group extends Model implements Auditable
     	} while ($retry);
 
         return $success;
+    }
+
+    public function getTimezoneAttribute($value)
+    {
+        // We might have a timezone attribute on the group.
+        if ($value) {
+            return $value;
+        }
+
+        // See if the network(s) the group is in have a consensus timezone.
+        $timezone = null;
+
+        foreach ($this->networks as $network) {
+            if ($network->timezone) {
+                if ($timezone) {
+                    if ($timezone != $network->timezone) {
+                        // This should not occur if the networks are set up correctly.
+                        \Sentry\captureMessage("Problem getting timezone for group {$this->idgroups} - networks conflict with $timezone and {$network->timezone}.  Will use $timezone.");
+                        // TODO Convert to exception once groups have timezones set by Neil.
+                        // throw new \Exception("Group does not have own timezone and is in networks with conflicting timezones");
+                    }
+                } else {
+                    // First timezone found.
+                    $timezone = $network->timezone;
+                }
+            }
+        }
+
+        if (!$timezone) {
+            // This should not occur if the networks are set up correctly.
+            // TODO Later on we should throw an exception, but only once this code has gone live, as we rely on
+            // the default behaviour during migration.
+            //throw new \Exception("Group {$this->idgroups} cannot resolve timezone");
+            $timezone = 'Europe/London';
+        }
+
+        return $timezone;
     }
 }

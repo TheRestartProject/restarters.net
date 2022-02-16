@@ -2,6 +2,7 @@
 
 namespace App\Services;
 
+use App\Role;
 use App\User;
 use App\Group;
 use App\UserGroups;
@@ -209,7 +210,7 @@ class DiscourseService
         return $allUsers;
     }
 
-    public function syncUsersToGroups($idgroups = NULL) {
+    public function syncGroups($idgroups = NULL) {
         $restartIds = $idgroups ? $idgroups : Group::whereNotNull('discourse_group')->pluck('idgroups');
 
         // Get all Discourse groups.  We need to find the ids matching the group name we store.  The groups.json
@@ -229,6 +230,23 @@ class DiscourseService
 
                 $discourseId = $discourseResult['group']['id'];
                 Log::debug("Sync members for Restarters group $restartId, {$group->discourse_group}, Discourse group $discourseId");
+
+                if ($discourseResult['group']['messageable_level'] != 4) {
+                    Log::debug("Update messageable_level for Restarters group $restartId, {$group->discourse_group}, Discourse group $discourseId");
+                    $gData = $discourseResult['group'];
+                    $gData['messageable_level'] = 4;
+                    $response = $client->request('PUT', "/g/$discourseId.json", [
+                        'form_params' => [
+                            'group' => $gData
+                        ]
+                    ]);
+
+                    if ($response->getStatusCode() === 200) {
+                        Log::debug("...succeeded");
+                    } else {
+                        Log::debug("...failed with " . $response->getStatusCode() . ", " . $response->getBody());
+                    }
+                }
 
                 if ($group->groupimage && $group->groupimage->idimages) {
                     // Check if the flair_url needs updating.  This keeps the logo in sync with changes on Restarters.
@@ -313,8 +331,7 @@ class DiscourseService
                 {
                     Log::error("Failed to get list of members for {$discourseId}");
                     throw new \Exception("Failed to get list of members for {$discourseId}");
-                } else
-                {
+                } else {
                     $discourseResult = json_decode($response->getBody(), true);
                     $total = $discourseResult['meta']['total'];
                     Log::debug("Total $total");
@@ -325,11 +342,27 @@ class DiscourseService
                         throw new \Exception("Group $discourseId too large at $total");
                     }
 
-                    $discourseMembers = array_column($discourseResult['members'], 'username');
-                    $restartersMembersIds = UserGroups::where('group', $restartId)->where('status', '=', 1)->whereNull('deleted_at')->pluck(
-                        'user'
-                    )->toArray();
-                    $restartersMembers = User::whereIn('id', $restartersMembersIds)->pluck('username')->toArray();
+                    // Save off the members and whether they're an admin.
+                    $discourseMembers = [];
+
+                    foreach ($discourseResult['members'] as $d) {
+                        $discourseMembers[$d['username']] = $d;
+                        $discourseMembers[$d['username']]['owner'] = false;
+                    }
+
+                    foreach ($discourseResult['owners'] as $d) {
+                        $discourseMembers[$d['username']] = $d;
+                        $discourseMembers[$d['username']]['owner'] = true;
+                    }
+
+                    $restartersMembersUGs = UserGroups::where('group', $restartId)->where('status', '=', 1)->whereNull('deleted_at')->get();
+
+                    $restartersMembers = [];
+
+                    foreach ($restartersMembersUGs as $r) {
+                        $u = User::find($r->user);
+                        $restartersMembers[$u->username] = $r;
+                    }
 
                     Log::debug(
                         count($discourseMembers) . " Discourse members vs " . count(
@@ -339,45 +372,68 @@ class DiscourseService
                     Log::debug("Discourse Members " . json_encode($discourseMembers));
                     Log::debug("Restarter Members " . json_encode($restartersMembers));
 
-                    $todelete = [];
-
-                    foreach ($discourseMembers as $discourseMember)
-                    {
-                        if (!in_array($discourseMember, $restartersMembers))
-                        {
+                    foreach ($discourseMembers as $discourseMember => $d) {
+                        if (!array_key_exists($discourseMember, $restartersMembers)) {
                             Log::debug("Remove user $discourseMember from Discourse group $discourseName");
-                            $todelete[] = $discourseMember;
+
+                            $response = $client->request('DELETE', "/admin/groups/$discourseId/members.json", [
+                                'form_params' => [
+                                    'usernames' => [ $discourseMember ]
+                                ]
+                            ]);
+
+                            Log::info('Response status: ' . $response->getStatusCode());
+                            Log::debug($response->getBody());
+
+                            if ($response->getStatusCode() != 200)
+                            {
+                                Log::error("Failed to add member $discourseMember for {$discourseId} {$discourseName}");
+                                throw new \Exception("Failed to add member $discourseMember for {$discourseId} {$discourseName}");
+                            }
+                        } else {
+                            // See whether the owner status on Discourse matches the status on Restarters.
+                            $role = $restartersMembers[$discourseMember]->role;
+                            $shouldBeOwner = $role == Role::HOST;
+                            Log::debug("Role for $discourseMember is $role, should be admin? $shouldBeOwner");
+
+                            if ($d['owner'] && !$shouldBeOwner) {
+                                Log::info("Remove $discourseMember as admin of {$discourseId} {$discourseName}");
+                                $response = $client->request('DELETE', "/admin/groups/$discourseId/owners.json", [
+                                    'user_id' => $d['id']
+                                ]);
+
+                                Log::info('Response status: ' . $response->getStatusCode());
+                                Log::debug($response->getBody());
+
+                                if ($response->getStatusCode() != 200)
+                                {
+                                    Log::error("Failed to remove $discourseMember as owner of {$discourseId} {$discourseName}");
+                                    throw new \Exception("Failed to remove $discourseMember as owner of {$discourseId} {$discourseName}");
+                                }
+                            } else if (!$d['owner'] && $shouldBeOwner) {
+                                Log::info("Add $discourseMember as admin of {$discourseId} {$discourseName}");
+                                $response = $client->request('PUT', "/admin/groups/$discourseId/owners.json", [
+                                    'form_params' => [
+                                        'group' => [
+                                            'usernames' => $discourseMember
+                                        ]
+                                    ]
+                                ]);
+
+                                Log::info('Response status: ' . $response->getStatusCode());
+                                Log::debug($response->getBody());
+
+                                if ($response->getStatusCode() != 200)
+                                {
+                                    Log::error("Failed to add $discourseMember as owner of {$discourseId} {$discourseName}");
+                                    throw new \Exception("Failed to add $discourseMember as owner of {$discourseId} {$discourseName}");
+                                }
+                            }
                         }
                     }
 
-                    if (count($todelete))
-                    {
-                        Log::info(
-                            "Remove Discourse members " . json_encode(
-                                implode(',', $todelete)
-                            ) . " from $discourseName as members on Discourse but no longer members on Restarters"
-                        );
-
-                        $response = $client->request('DELETE', "/admin/groups/$discourseId/members.json", [
-                            'form_params' => [
-                                'usernames' => implode(',', $todelete)
-                            ]
-                        ]);
-
-                        Log::info('Response status: ' . $response->getStatusCode());
-                        Log::debug($response->getBody());
-
-                        if ($response->getStatusCode() != 200)
-                        {
-                            Log::error("Failed to add members for {$discourseId} {$discourseName}");
-                            throw new \Exception("Failed to add members for {$discourseId} {$discourseName}");
-                        }
-                    }
-
-                    foreach ($restartersMembers as $restartersMember)
-                    {
-                        if (!in_array($restartersMember, $discourseMembers))
-                        {
+                    foreach ($restartersMembers as $restartersMember => $r) {
+                        if (!array_key_exists($restartersMember, $discourseMembers)) {
                             Log::debug("Add Restarter user $restartersMember to Discourse group $discourseName");
 
                             // We add these one by one, rather than in a single call.  This is because if our Restarters

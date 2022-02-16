@@ -998,14 +998,12 @@ class Fixometer
     public static function filterColumns()
     {
         return [
-            // 'deviceID' => '#', - shouldn't really hide this column as this allows someone to view or edit the device!
             'category' => 'Category',
             'brand' => 'Brand',
             'model' => 'Model',
             'problem' => 'Comment',
             'group_name' => 'Group',
             'event_date' => 'Date',
-            //'location' => 'Location', no column for this
             'repair_status' => 'State',
         ];
     }

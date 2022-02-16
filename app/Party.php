@@ -25,6 +25,8 @@ class Party extends Model implements Auditable
     protected $primaryKey = 'idevents';
     protected $fillable = [
         'group',
+        'event_start_utc',
+        'event_end_utc',
         'event_date',
         'start',
         'end',
@@ -44,6 +46,7 @@ class Party extends Model implements Auditable
         'discourse_thread',
         'devices_updated_at',
         'link',
+        'timezone'
     ];
     protected $hidden = ['created_at', 'updated_at', 'deleted_at', 'frequency', 'group', 'group', 'user_id', 'wordpress_post_id', 'cancelled', 'devices_updated_at'];
 
@@ -53,10 +56,9 @@ class Party extends Model implements Auditable
     //Getters
     public function findAll()
     {
-        //Tested
         return DB::select(DB::raw('SELECT
                     `e`.`idevents` AS `id`,
-                    UNIX_TIMESTAMP( CONCAT(`e`.`event_date`, " ", `e`.`start`) ) AS `event_timestamp`,
+                    UNIX_TIMESTAMP(`event_start_utc`) AS `event_timestamp`,
                     `e`.`start` AS `start`,
                     `e`.`end` AS `end`,
                     `e`.`venue`,
@@ -75,15 +77,15 @@ class Party extends Model implements Auditable
                 FROM `events` AS `e`
                 INNER JOIN `groups` AS `g`
                     ON `g`.`idgroups` = `e`.`group`
-                ORDER BY `e`.`start` DESC'));
+                ORDER BY `e`.`event_start_utc` DESC'));
     }
 
     public function findAllSearchable()
     {
-        //Tested
+        // TODO Can this be replaced by Party::past?
         return DB::select(DB::raw('SELECT
                     `e`.`idevents` AS `id`,
-                    UNIX_TIMESTAMP( CONCAT(`e`.`event_date`, " ", `e`.`start`) ) AS `event_timestamp`,
+                    UNIX_TIMESTAMP(`event_start_utc`) AS `event_timestamp`,
                     `e`.`start` AS `start`,
                     `e`.`end` AS `end`,
                     `e`.`venue`,
@@ -100,18 +102,17 @@ class Party extends Model implements Auditable
                 FROM `events` AS `e`
                 INNER JOIN `groups` AS `g`
                     ON `g`.`idgroups` = `e`.`group`
-                WHERE `event_date` <= NOW()
-                ORDER BY `e`.`event_date` DESC'));
+                WHERE `event_end_utc` < NOW()
+                ORDER BY `e`.`event_start_utc` DESC'));
     }
 
     public function findThis($id, $devices = false)
     {
-        //Tested however with devices = true doesn't work
         $sql = 'SELECT
                     `e`.`idevents` AS `id`,
-                    UNIX_TIMESTAMP( CONCAT(`e`.`event_date`, " ", `e`.`start`) ) AS `event_date` ,
-                    UNIX_TIMESTAMP( CONCAT(`e`.`event_date`, " ", `e`.`start`) ) AS `event_timestamp`,
-                    UNIX_TIMESTAMP( CONCAT(`e`.`event_date`, " ", `e`.`end`) ) AS `event_end_timestamp`,
+                    UNIX_TIMESTAMP(`event_start_utc`) AS `event_date` ,
+                    UNIX_TIMESTAMP(`event_start_utc`) AS `event_timestamp`,
+                    UNIX_TIMESTAMP(`event_end_utc`) AS `event_end_timestamp`,
                     `e`.`start` AS `start`,
                     `e`.`end` AS `end`,
                     `e`.`venue`,
@@ -134,7 +135,7 @@ class Party extends Model implements Auditable
                 INNER JOIN `groups` AS `g`
                     ON `g`.`idgroups` = `e`.`group`
                 WHERE `e`.`idevents` = :id
-                ORDER BY `e`.`start` DESC';
+                ORDER BY `e`.`event_start_utc` DESC';
 
         $party = DB::select(DB::raw($sql), ['id' => $id]);
 
@@ -170,7 +171,7 @@ class Party extends Model implements Auditable
     public function ofThisUser($id, $only_past = false, $devices = false)
     {
         //Tested
-        $sql = 'SELECT *, `e`.`venue` AS `venue`, `e`.`link` AS `link`, `e`.`location` as `location`, UNIX_TIMESTAMP( CONCAT(`e`.`event_date`, " ", `e`.`start`) ) AS `event_timestamp`
+        $sql = 'SELECT *, `e`.`venue` AS `venue`, `e`.`link` AS `link`, `e`.`location` as `location`, UNIX_TIMESTAMP(`event_start_utc`) AS `event_timestamp`
                 FROM `'.$this->table.'` AS `e`
                 INNER JOIN `events_users` AS `eu` ON `eu`.`event` = `e`.`idevents`
                 INNER JOIN `groups` as `g` ON `e`.`group` = `g`.`idgroups`
@@ -181,9 +182,9 @@ class Party extends Model implements Auditable
                 ) AS `d` ON `d`.`event` = `e`.`idevents`
                 WHERE `eu`.`user` = :id';
         if ($only_past) {
-            $sql .= ' AND `e`.`event_date` < NOW()';
+            $sql .= ' AND `e`.`event_end_utc` < NOW()';
         }
-        $sql .= ' ORDER BY `e`.`event_date` DESC';
+        $sql .= ' ORDER BY `e`.`event_start_utc` DESC';
 
         try {
             $parties = DB::select(DB::raw($sql), ['id' => $id]);
@@ -208,10 +209,7 @@ class Party extends Model implements Auditable
                     *,
 	`e`.`venue` AS `venue`, `e`.`link` AS `link`, `e`.`location` as `location`,
                     `g`.`name` AS group_name,
-
-
-                    UNIX_TIMESTAMP( CONCAT(`e`.`event_date`, " ", `e`.`start`) ) AS `event_timestamp`
-
+                    UNIX_TIMESTAMP(e.`event_start_utc`) ) AS `event_timestamp`
                 FROM `'.$this->table.'` AS `e`
 
                     INNER JOIN `groups` as `g` ON `e`.`group` = `g`.`idgroups`
@@ -221,16 +219,15 @@ class Party extends Model implements Auditable
                         FROM `devices` AS `dv`
                         GROUP BY  `dv`.`event`
                     ) AS `d` ON `d`.`event` = `e`.`idevents` ';
-        //UNIX_TIMESTAMP( CONCAT(`e`.`event_date`, " ", `e`.`start`) )
         if (is_numeric($group) && $group != 'admin') {
             $sql .= ' WHERE `e`.`group` = :id ';
         }
 
         if ($only_past) {
-            $sql .= ' AND TIMESTAMP(`e`.`event_date`, `e`.`start`) < NOW()';
+            $sql .= ' AND `e`.`event_end_utc`) < NOW()';
         }
 
-        $sql .= ' ORDER BY `e`.`event_date` DESC';
+        $sql .= ' ORDER BY `e`.`event_start_utc` DESC';
 
         if (is_numeric($group) && $group != 'admin') {
             try {
@@ -263,10 +260,7 @@ class Party extends Model implements Auditable
                     *,
 	`e`.`venue` AS `venue`, `e`.`link` AS `link`, `e`.`location` as `location`,
                     `g`.`name` AS group_name,
-
-
-                    UNIX_TIMESTAMP( CONCAT(`e`.`event_date`, " ", `e`.`start`) ) AS `event_timestamp`
-
+                    UNIX_TIMESTAMP(e.`event_start_utc`) ) AS `event_timestamp`
                 FROM `'.$this->table.'` AS `e`
 
                     INNER JOIN `groups` as `g` ON `e`.`group` = `g`.`idgroups`
@@ -276,16 +270,15 @@ class Party extends Model implements Auditable
                         FROM `devices` AS `dv`
                         GROUP BY  `dv`.`event`
                     ) AS `d` ON `d`.`event` = `e`.`idevents` ';
-        //UNIX_TIMESTAMP( CONCAT(`e`.`event_date`, " ", `e`.`start`) )
         if (is_array($groups) && $groups != 'admin') {
             $sql .= ' WHERE `e`.`group` IN ('.implode(', ', $groups).') ';
         }
 
         if ($only_past) {
-            $sql .= ' AND TIMESTAMP(`e`.`event_date`, `e`.`start`) < NOW()';
+            $sql .= ' AND `e`.`event_end_utc` < NOW()';
         }
 
-        $sql .= ' ORDER BY `e`.`event_date` DESC';
+        $sql .= ' ORDER BY `e`.`event_start_utc` DESC';
 
         try {
             $parties = DB::select(DB::raw($sql));
@@ -307,14 +300,8 @@ class Party extends Model implements Auditable
     {
         return self::when($only_past, function ($query) {
             // We only want the ones in the past.
-            return $query->where(function ($query) {
-                // Before today, or before the start time.
-                return $query->where('event_date', '<', Carbon::now()->toDateString())
-                    ->orWhere(function ($query) {
-                        return $query->where('event_date', '=', Carbon::now()->toDateString())
-                            ->where('start', '<', Carbon::now()->toTimeString());
-                    });
-            });
+            $now = date('Y-m-d H:i:s');
+            return $query->where('event_end_utc', '<', $now);
         })->when(is_numeric($group), function ($query) use ($group) {
             // For a specific group.  Note that 'admin' is not numeric so won't pass this test.
             return $query->where('group', $group);
@@ -323,13 +310,12 @@ class Party extends Model implements Auditable
 
     public function findNextParties($group = null)
     {
-        //Tested
         $sql = 'SELECT
                     `e`.`idevents`,
                     `e`.`venue`,
                     `e`.`link`,
                     `e`.`location`,
-                    UNIX_TIMESTAMP( CONCAT(`e`.`event_date`, " ", `e`.`start`) ) AS `event_timestamp`,
+                    UNIX_TIMESTAMP(`e`.`event_start_utc`) AS `event_timestamp`,
                     `e`.`event_date` AS `plain_date`,
                     NOW() AS `this_moment`,
                     `e`.`start`,
@@ -337,8 +323,7 @@ class Party extends Model implements Auditable
                     `e`.`latitude`,
                     `e`.`longitude`
                 FROM `'.$this->table.'` AS `e`
-
-                WHERE TIMESTAMP(`e`.`event_date`, `e`.`start`) >= NOW() '; // added one day to make sure it only gets moved to the past the next day
+                WHERE `e`.`event_end_utc` >= NOW()';
 
         if (! is_null($group)) {
             $sql .= ' AND `e`.`group` = :group ';
@@ -396,52 +381,29 @@ class Party extends Model implements Auditable
         // This is the base scope.  Almost always we are only interested in seeing events which have not been
         // deleted.
         return $query->whereNull('events.deleted_at')
-            ->orderBy('event_date', 'DESC')
-            ->orderBy('start', 'DESC')
-            ->orderBy('end', 'DESC');
+            ->orderBy('event_start_utc', 'DESC');
     }
 
     public function scopePast($query) {
         // A past event is an event where the end time is less than now.
-        //
-        // We want to use local variables when formatted times to avoid windows where the date/time changes under
-        // our feet between one line of code and the next.
-        $date = date('Y-m-d');
-        $time = date('H:i');
         $query = $query->undeleted();
-        $query = $query->where('event_date', '<', $date)
-            ->orWhere(function($q2) use ($date, $time)  {
-                $q2->where([
-                    [ 'event_date', '=', $date ],
-                    [ 'end', '<', $time ]
-                ]);
-            });
+        $query = $query->where('event_end_utc', '<', date('Y-m-d H:i:s'));
         return $query;
     }
 
     public function scopeFuture($query) {
-        // A future event is an event where the start time is greater than to now.
-        $date = date('Y-m-d');
-        $time = date('H:i');
+        // A future event is an event where the start time is greater than now.
         $query = $query->undeleted();
-        $query = $query->whereDate('event_date', '>', $date)
-            ->orWhere(function($q2) use ($date, $time) {
-                $q2->where([
-                               [ 'event_date', '=', $date ],
-                               [ 'start', '>', $time ]
-                           ]);
-            });
+        $query = $query->where('event_start_utc', '>', date('Y-m-d H:i:s'));
         return $query;
     }
 
     public function scopeActive($query) {
         // An active event is an event which has started and not yet finished.
-        $date = date('Y-m-d');
-        $time = date('H:i');
         $query = $query->undeleted();
-        $query = $query->whereDate('event_date', '=', $date)
-            ->where('start', '<=', $time)
-            ->where('end', '>=', $time);
+        $now = date('Y-m-d H:i:s');
+        $query = $query->where('event_start_utc', '<=', $now)
+            ->where('event_end_utc', '>=', $now);
         return $query;
     }
 
@@ -573,12 +535,11 @@ class Party extends Model implements Auditable
       ->join('users_groups', 'users_groups.group', '=', 'groups.idgroups')
       ->where(function ($query) use ($user_group_ids) {
           $query->whereNotIn('events.group', $user_group_ids)
-        ->whereDate('event_date', '>=', date('Y-m-d'));
+        ->where('event_start_utc', '>=', date('Y-m-d H:i:s'));
       })
       ->having('distance', '<=', User::NEARBY_KM)
       ->groupBy('events.idevents')
-      ->orderBy('events.event_date', 'ASC')
-      ->orderBy('events.start', 'ASC')
+      ->orderBy('events.event_start_utc', 'ASC')
       ->orderBy('distance', 'ASC');
     }
 
@@ -636,6 +597,7 @@ class Party extends Model implements Auditable
 
     public function getEventTimestampAttribute()
     {
+        // Returning in local time.
         return "{$this->event_date} {$this->start}";
     }
 
@@ -655,14 +617,9 @@ class Party extends Model implements Auditable
 
     public function isUpcoming()
     {
-        $date_now = new \DateTime();
-        $event_start = new \DateTime($this->event_date.' '.$this->start);
-
-        if ($date_now < $event_start) {
-            return true;
-        }
-
-        return false;
+        $now = Carbon::now();
+        $event_start = new Carbon($this->event_start_utc);
+        return ($event_start->greaterThan($now));
     }
 
     /**
@@ -677,55 +634,28 @@ class Party extends Model implements Auditable
      */
     public function isStartingSoon()
     {
-        $current_date = date('Y-m-d');
-        $event_date = $this->event_date;
+        $start = new Carbon($this->event_start_utc);
 
-        if ($current_date != $event_date) {
-            return false;
+        if (!$this->$this->isInProgress() && !$this->hasFinished() && $start->isCurrentDay()) {
+            return true;
         }
 
-        if ($this->isInProgress()) {
-            return false;
-        }
-
-        $date_now = new \DateTime();
-        $event_end = new \DateTime($this->event_date.' '.$this->end);
-
-        if ($date_now > $event_end) {
-            return false;
-        }
-
-        return true;
+        return false;
     }
 
     public function isInProgress()
     {
         $date_now = Carbon::now();
-
-        $event_start = new Carbon($this->event_date.' '.$this->start);
-        // Temporarily start an hour early for Repair Together
-        // Until we have timezone support.
-        $event_start = $event_start->addHours(-1);
-
-        $event_end = new Carbon($this->event_date.' '.$this->end);
-
-        if ($date_now >= $event_start && $date_now <= $event_end) {
-            return true;
-        }
-
-        return false;
+        $start = new Carbon($this->event_start_utc);
+        $end = new Carbon($this->event_end_utc);
+        return $date_now->gte($start) && $date_now->lte($end);
     }
 
     public function hasFinished()
     {
-        $date_now = new \DateTime();
-        $event_end = new \DateTime($this->event_date.' '.$this->end);
-
-        if ($date_now > $event_end) {
-            return true;
-        }
-
-        return false;
+        $date_now = Carbon::now();
+        $end = new Carbon($this->event_end_utc);
+        return $date_now->gt($end);
     }
 
     public static function getEventStatsArrayKeys()
@@ -850,7 +780,7 @@ class Party extends Model implements Auditable
 
     public function getEventStartTimestampAttribute()
     {
-        return strtotime($this->event_date.' '.$this->start);
+        return strtotime($this->event_start_utc);
     }
 
     public function getShareableLinkAttribute()
@@ -969,8 +899,7 @@ class Party extends Model implements Auditable
     public function scopeEventHasFinished($query)
     {
         $now = Carbon::now();
-
-        return $query->whereRaw("CONCAT(`event_date`, ' ', `end`) < '{$now}'");
+        return $query->whereRaw("`event_end_utc` < '{$now}'");
     }
 
     public function getWastePreventedAttribute()
@@ -1066,5 +995,80 @@ class Party extends Model implements Auditable
         }
 
         event(new ApproveEvent($this));
+    }
+
+    public function getTimezoneAttribute($value)
+    {
+        // We might have a timezone attribute on the event.
+        if ($value) {
+            return $value;
+        }
+
+        // Use the timezone from the group (which will fallback to network if required).
+        return $this->theGroup->timezone;
+    }
+
+    // TODO The intention is that we migrate all the code over to use the UTC variants of event date/start/end.
+    // Timezone-aware, ISO8601 formatted.  These are unambiguous, e.g. for API results.
+    public function getEventStartUtcAttribute() {
+        $start = Carbon::parse($this->attributes['event_start_utc'], 'UTC');
+        return $start->toIso8601String();
+    }
+
+    public function getEventEndUtcAttribute() {
+        $end = Carbon::parse($this->attributes['event_end_utc'], 'UTC');
+        return $end->toIso8601String();
+    }
+
+    // Mutators for legacy event_date/start/end fields.  These are now derived from the UTC fields via virtual
+    // columns, and therefore should never be set directly.  Throw exceptions to ensure that they are not, until we
+    // have retired these fields.
+    //
+    // The tests create events using the old fields, and we've not changed those yet, but PartyFactory will have
+    // populated the new ones - so just ignore that.
+    //
+    // You might think that we could have mutators which set these correctly.  But this isn't possible; the UTC value
+    // of the date depends on the local date, time and timezone, and cannot be set in isolation.
+    public function setEventDateAttribute($val) {
+        if (!array_key_exists('event_start_utc', $this->attributes)) {
+            throw new \Exception("Attempt to set event time fields directly; please use event_start_utc and event_end_utc");
+        }
+    }
+
+    public function setStartAttribute($val) {
+        if (!array_key_exists('event_start_utc', $this->attributes)) {
+            throw new \Exception(
+                "Attempt to set event time fields directly; please use event_start_utc and event_end_utc"
+            );
+        }
+    }
+
+    public function setEndAttribute($val) {
+        if (!array_key_exists('event_start_utc', $this->attributes)) {
+            throw new \Exception(
+                "Attempt to set event time fields directly; please use event_start_utc and event_end_utc"
+            );
+        }
+    }
+
+    // We also need accessors, to avoid any cases where we mutate the values and access them before we have
+    // saved and done issue a refresh(), which would pick up new values from the virtual columns.
+    //
+    // These should return local values, i.e. in the timezone of the event.
+    public function getEventDateAttribute() {
+        $dt = new Carbon($this->event_start_utc);
+        $dt->setTimezone($this->timezone);
+        return $dt->toDateString();
+    }
+    public function getStartAttribute() {
+        $dt = new Carbon($this->event_start_utc);
+        $dt->setTimezone($this->timezone);
+        return $dt->toTimeString();
+    }
+
+    public function getEndAttribute() {
+        $dt = new Carbon($this->event_end_utc);
+        $dt->setTimezone($this->timezone);
+        return $dt->toTimeString();
     }
 }
