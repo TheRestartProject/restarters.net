@@ -145,8 +145,6 @@ class ApiController extends Controller
     }
 
     /**
-     * REDUNDANT???
-     *
      * List/search devices.
      *
      * @param  Request  $request
@@ -205,11 +203,11 @@ class ApiController extends Controller
         }
 
         if ($from_date) {
-            $wheres[] = ['events.event_date', '>=', $from_date];
+            $wheres[] = ['events.event_start_utc', '>=', $from_date];
         }
 
         if ($to_date) {
-            $wheres[] = ['events.event_date', '<=', $to_date];
+            $wheres[] = ['events.event_end_utc', '<=', $to_date];
         }
 
         // Get the items we want for this page.
@@ -233,47 +231,8 @@ class ApiController extends Controller
             $item['category'] = $item['deviceCategory'];
         }
 
-        if ($status && $status !== env('DEVICE_FIXED')) {
-            // We only count savings from fixed items.  So if we are filtering on repair status other than fixed, then
-            // there can be no savings to return, so don't bother querying.
-            $weight = 0;
-            $co2 = 0;
-        } else {
-            // We need the total weight/CO2 impact for this filtering.
-            $d = new Device();
-
-            DB::enableQueryLog();
-
-            $wheres[] = ['repair_status', '=', env('DEVICE_FIXED')];
-
-            // We select the powered and unpowered weights separately and then add them afterwards just because
-            // this keeps the logic separate and is easier to compare with other code.
-            $counts = Device::select(
-                DB::raw(
-                    'sum(case when (categories.powered = 1) then (case when (devices.category = 46) then (devices.estimate + 0.0) else categories.weight end) else 0 end) as ewaste'
-                ),
-                DB::raw(
-                    'sum(case when (categories.powered = 0) then devices.estimate + 0.0 else 0 end) as unpowered_waste'
-                ),
-                DB::raw(
-                    "sum(case when (devices.category = 46) then (devices.estimate + 0.0) *
-                     (select (sum(`categories`.`footprint`) * {$d->getDisplacementFactor()}) / sum(`categories`.`weight` + 0.0) from `devices`, `categories` where `categories`.`idcategories` = `devices`.`category` and `devices`.`repair_status` = 1 and categories.idcategories != 46)
-                     else (categories.footprint * {$d->getDisplacementFactor()}) end) as `total_footprint`"
-                )
-            )->join('events', 'events.idevents', '=', 'devices.event')
-                ->join('groups', 'events.group', '=', 'groups.idgroups')
-                ->join('categories', 'devices.category', '=', 'categories.idcategories')
-                ->where($wheres)
-                ->first();
-
-            $weight = round($counts->ewaste + $counts->unpowered_waste);
-            $co2 = round($counts->total_footprint);
-        }
-
         return response()->json([
             'count' => $count,
-            'weight' => $weight,
-            'co2' => $co2,
             'items' => $items,
         ]);
     }

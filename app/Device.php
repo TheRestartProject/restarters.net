@@ -67,52 +67,6 @@ class Device extends Model implements Auditable
         return \App\Helpers\LcaStats::getDisplacementFactor();
     }
 
-    public function getList($params = null)
-    {
-        //Tested!
-        $sql = 'SELECT * FROM `view_devices_list`';
-
-        if (! is_null($params)) {
-            $sql .= ' WHERE 1=1 AND ';
-
-            $params = array_filter($params);
-            foreach ($params as $field => $value) {
-                if ($field == 'brand' || $field == 'model' || $field == 'problem') {
-                    $params[$field] = '%'.strtolower($value).'%';
-                } elseif ($field == 'event_date') {
-                    $params[$field] = implode(' AND ', $value);
-                }
-            }
-
-            $clauses = [];
-
-            foreach ($params as $f => $v) {
-                if ($f == 'event_date') {
-                    $clauses[] = 'event_date BETWEEN '.$v;
-                }
-                if ($f == 'category' || $f == 'group') {
-                    $clauses[] = 'id'.$f.' IN ('.$v.')';
-                } elseif ($f == 'brand' || $f == 'model' || $f == 'problem') {
-                    $clauses[] = $f.' LIKE :'.$f;
-                }
-            }
-
-            $sql .= implode(' AND ', $clauses);
-        }
-
-        $sql .= ' ORDER BY `sorter` DESC';
-
-        if (! empty($params) && array_key_exists('event_date', $params)) {
-            unset($params['event_date']);
-        }
-
-        if ($params != null) {
-            return DB::select(DB::raw($sql), $params);
-        }
-
-        return DB::select(DB::raw($sql));
-    }
-
     public function ofThisUser($id)
     {
         //Tested
@@ -348,7 +302,7 @@ class Device extends Model implements Auditable
                     `repair_status`,
                     `spare_parts`,
                     `e`.`location`,
-                    UNIX_TIMESTAMP( CONCAT(`e`.`event_date`, " ", `e`.`start`) ) AS `event_timestamp`,
+                    UNIX_TIMESTAMP(event_start_utc) AS `event_timestamp`,
                     `g`.`name` AS `group_name`
 
                 FROM `devices` AS `d`
@@ -392,21 +346,17 @@ class Device extends Model implements Auditable
     }
 
     /**
-     * Powered estimate only takes precedence over category weight when Misc.
-     *
-     * REDUNDANT?
+     * Powered estimate only takes precedence over category weight when Misc and if not 0.
      */
     public function eCo2Diverted($emissionRatio, $displacementFactor)
     {
         $footprint = 0;
 
         if ($this->isFixed()) {
-            if ($this->deviceCategory->isMiscPowered()) {
-                if (is_numeric($this->estimate)) {
-                    $footprint = $this->estimate * $emissionRatio;
-                }
+            if ($this->deviceCategory->isMiscPowered() && is_numeric($this->estimate) && $this->estimate > 0) {
+                $footprint = $this->estimate * $emissionRatio;
             } else {
-                $footprint = (float) $this->deviceCategory->footprint;
+                $footprint = $this->deviceCategory->footprint;
             }
         }
 
@@ -414,19 +364,18 @@ class Device extends Model implements Auditable
     }
 
     /**
-     * Unpowered estimate always takes precedence over category weight.
+     * Unpowered estimate always takes precedence over category weight unless is is 0.
      *
-     * REDUNDANT?
      */
     public function uCo2Diverted($emissionRatio, $displacementFactor)
     {
         $footprint = 0;
 
         if ($this->isFixed()) {
-            if (is_numeric($this->estimate)) {
-                $footprint = $this->estimate * $emissionRatio;
+            if (is_numeric($this->estimate) && $this->estimate > 0) {
+                $footprint = ($this->estimate * $emissionRatio);
             } else {
-                $footprint = (float) $this->deviceCategory->footprint;
+                $footprint = $this->deviceCategory->footprint;
             }
         }
 
@@ -434,21 +383,18 @@ class Device extends Model implements Auditable
     }
 
     /**
-     * Powered estimate only takes precedence over category weight when Misc.
+     * Powered estimate only takes precedence over category weight when Misc and if not 0.
      *
-     * REDUNDANT?
      */
     public function eWasteDiverted()
     {
         $ewasteDiverted = 0;
 
         if ($this->isFixed() && $this->deviceCategory->isPowered()) {
-            if ($this->deviceCategory->isMiscPowered()) {
-                if (is_numeric($this->estimate)) {
-                    $ewasteDiverted = $this->estimate;
-                }
+            if ($this->deviceCategory->isMiscPowered() && is_numeric($this->estimate) && $this->estimate > 0) {
+                $ewasteDiverted = $this->estimate;
             } else {
-                $ewasteDiverted = (float) $this->deviceCategory->weight;
+                $ewasteDiverted = $this->deviceCategory->weight;
             }
         }
 
@@ -456,19 +402,18 @@ class Device extends Model implements Auditable
     }
 
     /**
-     * Unpowered estimate always takes precedence over category weight.
+     * Unpowered estimate always takes precedence over category weight unless it is 0.
      *
-     * REDUNDANT?
      */
     public function uWasteDiverted()
     {
         $wasteDiverted = 0;
 
         if ($this->isFixed() && $this->deviceCategory->isUnpowered()) {
-            if (is_numeric($this->estimate)) {
+            if (is_numeric($this->estimate) && $this->estimate > 0) {
                 $wasteDiverted = $this->estimate;
             } else {
-                $wasteDiverted = (float) $this->deviceCategory->weight;
+                $wasteDiverted = $this->deviceCategory->weight;
             }
         }
 

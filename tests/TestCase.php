@@ -10,11 +10,13 @@ use App\EventsUsers;
 use App\Group;
 use App\GroupNetwork;
 use App\GroupTags;
+use App\Images;
 use App\Network;
 use App\Party;
 use App\Role;
 use App\User;
 use App\UserGroups;
+use App\Xref;
 use Auth;
 use Carbon\Carbon;
 use DB;
@@ -48,11 +50,26 @@ abstract class TestCase extends BaseTestCase
         Category::truncate();
         Brands::truncate();
         GroupTags::truncate();
+        Xref::truncate();
+        Images::truncate();
         DB::statement('delete from audits');
         DB::delete('delete from user_network');
         DB::delete('delete from grouptags_groups');
         DB::table('notifications')->truncate();
         DB::statement('SET foreign_key_checks=1');
+
+        // Set up random auto increment values.  This avoids tests working because everything is 1.
+        $tables = DB::select('SHOW TABLES');
+        foreach ($tables as $table)
+        {
+            foreach ($table as $field => $tablename) {
+                try {
+                    // This will throw an exception if the table doesn't have auto increment.
+                    DB::update("ALTER TABLE $tablename AUTO_INCREMENT = " . rand(1, 1000) . ";");
+                } catch (\Exception $e) {
+                }
+            }
+        }
 
         $network = new Network();
         $network->name = 'Restarters';
@@ -71,6 +88,13 @@ abstract class TestCase extends BaseTestCase
         factory(Category::class, 1)->states('Mobile')->create();
         factory(Category::class, 1)->states('Misc')->create();
         factory(Category::class, 1)->states('Desktop computer')->create();
+
+        // We manipulate some globals for image upload testing.
+        \FixometerFile::$uploadTesting = FALSE;
+
+        if (isset($_FILES)) {
+            unset($_FILES);
+        }
     }
 
     public function userAttributes()
@@ -142,9 +166,19 @@ abstract class TestCase extends BaseTestCase
         $eventAttributes = factory(Party::class)->raw();
         $eventAttributes['group'] = $idgroups;
 
+        // Use old-style event creation rather than UTC.
+        unset($eventAttributes['event_start_utc']);
+        unset($eventAttributes['event_end_utc']);
         $eventAttributes['event_date'] = date('Y-m-d', strtotime($date));
+        $eventAttributes['start'] = '13:00:00';
+        $eventAttributes['end'] = '14:00:00';
 
         $response = $this->post('/party/create/', $eventAttributes);
+
+        // The event_start_utc and event_end_utc will be in the database, but not ISO8601 formatted - that is implicit.
+//        $eventAttributes['event_start_utc'] = Carbon::parse($eventAttributes['event_start_utc'])->format('Y-m-d H:i:s');
+//        $eventAttributes['event_end_utc'] = Carbon::parse($eventAttributes['event_end_utc'])->format('Y-m-d H:i:s');
+
         $this->assertDatabaseHas('events', $eventAttributes);
         $redirectTo = $response->getTargetUrl();
         $p = strrpos($redirectTo, '/');

@@ -98,6 +98,8 @@ class Fixometer
 
     public static function userHasEditPartyPermission($partyId, $userId = null)
     {
+        $party = Party::findOrFail($partyId);
+
         if (is_null($userId)) {
             if (empty(Auth::user())) {
                 return false;
@@ -106,14 +108,14 @@ class Fixometer
             }
         }
 
-        $user = User::find($userId);
+        $user = User::findOrFail($userId);
 
         if (self::hasRole($user, 'Administrator')) {
             return true;
         }
 
         if (self::hasRole($user, 'NetworkCoordinator')) {
-            $group = Party::find($partyId)->theGroup;
+            $group = $party->theGroup;
             foreach ($group->networks as $network) {
                 if ($network->coordinators->contains($user)) {
                     return true;
@@ -998,14 +1000,12 @@ class Fixometer
     public static function filterColumns()
     {
         return [
-            // 'deviceID' => '#', - shouldn't really hide this column as this allows someone to view or edit the device!
             'category' => 'Category',
             'brand' => 'Brand',
             'model' => 'Model',
             'problem' => 'Comment',
             'group_name' => 'Group',
             'event_date' => 'Date',
-            //'location' => 'Location', no column for this
             'repair_status' => 'State',
         ];
     }

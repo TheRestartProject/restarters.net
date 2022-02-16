@@ -18,6 +18,7 @@ jobs:
           - DB_DATABASE: restarters_db
           - DB_USERNAME: restarters
           - DB_PASSWORD: s3cr3t
+          - TZ: "UTC"
       - image: circleci/mysql:5.7.33
         environment:
           # You can connect once ssh'd in using  mysql -u root -p -h 127.0.0.1
@@ -28,6 +29,7 @@ jobs:
       - image: mcr.microsoft.com/playwright:focal
         environment:
           NODE_ENV: development
+          TZ: "UTC"
       - image: 'bitnami/mariadb:latest'
         name: mariadb
         environment:
@@ -46,6 +48,7 @@ jobs:
           - ALLOW_EMPTY_PASSWORD=yes
           - MEDIAWIKI_EXTERNAL_HTTP_PORT_NUMBER=8080
           - MEDIAWIKI_HOST=mediawiki
+          - TZ: "UTC"
         depends_on:
           - mariadb
     steps:
@@ -86,6 +89,7 @@ jobs:
       - run: php artisan migrate
 
       - run: wget -O phpunit https://phar.phpunit.de/phpunit-7.phar ; chmod +x phpunit
+      - run: mkdir uploads
 
       - run: export XDEBUG_MODE=coverage;./phpunit -d memory_limit=512M --bootstrap vendor/autoload.php -dxdebug.coverage_enable=1 --coverage-clover tests/clover.xml --configuration ./phpunit.xml
 

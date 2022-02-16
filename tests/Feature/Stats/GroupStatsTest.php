@@ -23,7 +23,7 @@ class GroupStatsTest extends StatsTestCase
     {
         $group = factory(Group::class)->create();
         factory(Party::class)->states('moderated')->create([
-            'event_date' => Carbon::yesterday(),
+            'event_date' => Carbon::yesterday()->toDateString(),
             'group' => $group->idgroups,
         ]);
         $expect = \App\Group::getGroupStatsArrayKeys();
@@ -42,7 +42,7 @@ class GroupStatsTest extends StatsTestCase
     {
         $group = factory(Group::class)->create();
         $event = factory(Party::class)->states('moderated')->create([
-            'event_date' => Carbon::yesterday(),
+            'event_date' => Carbon::yesterday()->toDateString(),
             'group' => $group->idgroups,
         ]);
 
@@ -172,7 +172,7 @@ class GroupStatsTest extends StatsTestCase
         $device = factory(Device::class)->states('fixed')->create([
             'category' => $this->_idUnpoweredMisc,
             'category_creation' => $this->_idUnpoweredMisc,
-            'event' => 1,
+            'event' => $event->idevents,
             'estimate' => 7.89,
         ]);
         $expect['fixed_devices']++;
@@ -195,7 +195,7 @@ class GroupStatsTest extends StatsTestCase
     {
         $group1 = factory(Group::class)->create();
         $event1 = factory(Party::class)->states('moderated')->create([
-            'event_date' => Carbon::yesterday(),
+            'event_date' => Carbon::yesterday()->toDateString(),
             'group' => $group1->idgroups,
         ]);
 
@@ -270,11 +270,11 @@ class GroupStatsTest extends StatsTestCase
 
         $group2 = factory(Group::class)->create();
         $event2 = factory(Party::class)->states('moderated')->create([
-            'event_date' => Carbon::yesterday(),
+            'event_date' => Carbon::yesterday()->toDateString(),
             'group' => $group2->idgroups,
         ]);
         $event3 = factory(Party::class)->states('moderated')->create([
-            'event_date' => Carbon::yesterday(),
+            'event_date' => Carbon::yesterday()->toDateString(),
             'group' => $group2->idgroups,
         ]);
 

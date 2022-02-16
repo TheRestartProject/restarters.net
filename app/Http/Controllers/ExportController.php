@@ -171,10 +171,15 @@ class ExportController extends Controller
                     $k = implode(' ', $key);
                 });
                 $headers = array_merge(['Date', 'Venue', 'Group'], $statsKeys);
+
+                // Send these to getEventStats() to speed things up a bit.
+                $eEmissionRatio = \App\Helpers\LcaStats::getEmissionRatioPowered();
+                $uEmissionratio = \App\Helpers\LcaStats::getEmissionRatioUnpowered();
+
                 // prepare the column values
                 $PartyArray = [];
                 foreach ($PartyList as $i => $party) {
-                    $stats = $party->getEventStats();
+                    $stats = $party->getEventStats($eEmissionRatio, $uEmissionratio);
                     array_walk($stats, function (&$v) {
                         $v = round($v);
                     });
@@ -290,6 +295,7 @@ class ExportController extends Controller
             }
 
             //By date
+            // TODO Timezones.  This is only used by admins and therefore the dates can be assumed to be in UTC.
             if ($request->input('from_date') !== null && $request->input('to_date') == null) {
                 $user_events = $user_events->whereDate('events.event_date', '>', $request->input('from_date'));
             } elseif ($request->input('to_date') !== null && $request->input('from_date') == null) {
@@ -362,8 +368,8 @@ class ExportController extends Controller
         $all_city_hours_completed = $city_hours_completed->orderBy('event_hours', 'DESC')->get();
         $city_hours_completed = $city_hours_completed->orderBy('event_hours', 'DESC')->take(5)->get();
 
-        //order by users id
-        $user_events = $user_events->orderBy('events.event_date', 'DESC');
+        //order by event date.
+        $user_events = $user_events->orderBy('events.event_start_utc', 'DESC');
 
         //Select all necessary information for table
         $user_events = $user_events->select(

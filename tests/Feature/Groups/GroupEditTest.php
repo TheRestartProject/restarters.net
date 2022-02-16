@@ -81,12 +81,16 @@ class GroupEditTest extends TestCase
         $this->actingAs($host);
 
         // We don't upload files in a standard Laravel way, so testing upload is a bit of a hack.
+        $_SERVER['DOCUMENT_ROOT'] = getcwd();
+        \FixometerFile::$uploadTesting = TRUE;
+        file_put_contents('/tmp/UT.jpg', file_get_contents('public/images/community.jpg'));
+
         $_FILES = [
             'file' => [
                 'error'    => "0",
-                'name'     => 'avatar.jpg',
+                'name'     => 'UT.jpg',
                 'size'     => 123,
-                'tmp_name' => __FILE__,   // use THIS file - a real file
+                'tmp_name' => [ '/tmp/UT.jpg' ],
                 'type'     => 'image/jpg'
             ]
         ];

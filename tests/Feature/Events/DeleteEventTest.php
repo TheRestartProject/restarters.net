@@ -20,6 +20,7 @@ use Auth;
 use Carbon\Carbon;
 use DB;
 use HieuLe\WordpressXmlrpcClient\WordpressClient;
+use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\Notification;
@@ -82,6 +83,71 @@ class DeleteEventTest extends TestCase
         // Check that getting the outbound info behaves gracefully.
         $this->expectException(NotFoundHttpException::class);
         $this->get("/outbound/info/party/{$event->idevents}");
+    }
+
+    /**
+     * @test
+     * @dataProvider roleProvider
+     */
+    public function view_edit_deleted_event($role)
+    {
+        $this->withoutExceptionHandling();
+
+        switch ($role) {
+            case Role::ADMINISTRATOR: $roleToCreate = 'Administrator'; break;
+            case Role::NETWORK_COORDINATOR: $roleToCreate = 'NetworkCoordinator'; break;
+            case Role::HOST: $roleToCreate = 'Host'; break;
+        }
+        $host = factory(User::class)->states($roleToCreate)->create();
+        $this->actingAs($host);
+
+        $group = factory(Group::class)->create();
+        $group->addVolunteer($host);
+        $group->makeMemberAHost($host);
+
+        $event = factory(Party::class)->create(['group' => $group->idgroups]);
+        $event->save();
+
+        // View the event
+        $response = $this->get("/party/view/{$event->idevents}");
+        $props = $this->assertVueProperties($response, [
+            [
+                ':idevents' => $event->idevents
+            ]
+        ]);
+        $initialEvent = json_decode($props[0][':initial-event'], TRUE);
+        $this->assertEquals($event->venue, $initialEvent['venue']);
+        $this->assertFalse($initialEvent['approved']);
+
+        // Now delete the event.
+        $response = $this->post('/party/delete/'.$event->idevents);
+        $response->assertRedirect('/party/');
+        $this->assertSoftDeleted('events', ['idevents' => $event['idevents']]);
+
+        // View page should fail.
+        try {
+            $response = $this->get('/party/view/'.$event->idevents);
+            $this->assertTrue(false, "Failed to throw exception");
+        } catch (NotFoundHttpException $e) {
+            $this->assertTrue(true);
+        }
+
+        // Edit also.
+        try {
+            $response2 = $this->get('/party/edit/'.$event->idevents);
+            error_log($response->getContent());
+            $this->assertTrue(false, "Failed to throw exception");
+        } catch (ModelNotFoundException $e) {
+            $this->assertTrue(true);
+        }
+    }
+
+    public function roleProvider() {
+        return [
+            [ Role::ADMINISTRATOR ],
+            [ Role::NETWORK_COORDINATOR ],
+            [ Role::HOST ],
+        ];
     }
 
     /** @test */
@@ -195,7 +261,7 @@ class DeleteEventTest extends TestCase
     {
         $this->loginAsTestUser(Role::ADMINISTRATOR);
         $id = $this->createGroup();
-        $group = Group::find($id);
+        $group = Group::findOrFail($id);
 
         $network = factory(Network::class)->create([
            'events_push_to_wordpress' => false,
@@ -222,7 +288,7 @@ class DeleteEventTest extends TestCase
 
         $this->actingAs($user);
 
-        $response = $this->get("/party/view/$id");
+        $response = $this->get("/party/view/$idevents");
 
         $this->assertVueProperties($response, [
             [
@@ -250,7 +316,7 @@ class DeleteEventTest extends TestCase
         $network->addGroup($group);
 
         $this->assertNotNull($id);
-        $idevents = $this->createEvent($id, 'Past');
+        $idevents = $this->createEvent($id, '1981-01-01');
 
         // Add a restarter who is attending.
         $this->get('/logout');

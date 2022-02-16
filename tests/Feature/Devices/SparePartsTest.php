@@ -37,8 +37,9 @@ class SparePartsTest extends TestCase
         $this->device_inputs['repair_status'] = Device::REPAIR_STATUS_FIXED;
         $this->device_inputs['spare_parts'] = $this->input_spare_parts_from_manufacturer;
         $response = $this->post('/device/create', $this->device_inputs);
+        $iddevices = Device::latest()->first()->iddevices;
 
-        $device = Device::find(1);
+        $device = Device::find($iddevices);
         $this->assertEquals(Device::SPARE_PARTS_NEEDED, $device->spare_parts);
         $this->assertEquals(Device::PARTS_PROVIDER_MANUFACTURER, $device->parts_provider);
     }
@@ -50,8 +51,9 @@ class SparePartsTest extends TestCase
         $this->device_inputs['spare_parts'] = $this->input_spare_parts_from_third_party;
 
         $response = $this->post('/device/create', $this->device_inputs);
+        $iddevices = Device::latest()->first()->iddevices;
 
-        $device = Device::find(1);
+        $device = Device::find($iddevices);
         $this->assertEquals(Device::SPARE_PARTS_NEEDED, $device->spare_parts);
         $this->assertEquals(Device::PARTS_PROVIDER_THIRD_PARTY, $device->parts_provider);
     }
@@ -63,8 +65,9 @@ class SparePartsTest extends TestCase
         $this->device_inputs['spare_parts'] = $this->input_no_spare_parts_needed;
 
         $response = $this->post('/device/create', $this->device_inputs);
+        $iddevices = Device::latest()->first()->iddevices;
 
-        $device = Device::find(1);
+        $device = Device::find($iddevices);
         $this->assertEquals(Device::SPARE_PARTS_NOT_NEEDED, $device->spare_parts);
         $this->assertNull($device->parts_provider);
     }
@@ -76,8 +79,9 @@ class SparePartsTest extends TestCase
         $this->device_inputs['barrier'] = [1];
 
         $response = $this->post('/device/create', $this->device_inputs);
+        $iddevices = Device::latest()->first()->iddevices;
 
-        $device = Device::find(1);
+        $device = Device::find($iddevices);
         $this->assertEquals(Device::SPARE_PARTS_NEEDED, $device->spare_parts);
         $this->assertNull($device->parts_provider);
     }
@@ -89,8 +93,9 @@ class SparePartsTest extends TestCase
         $this->device_inputs['barrier'] = [4];
 
         $response = $this->post('/device/create', $this->device_inputs);
+        $iddevices = Device::latest()->first()->iddevices;
 
-        $device = Device::find(1);
+        $device = Device::find($iddevices);
         $this->assertEquals(Device::SPARE_PARTS_NOT_NEEDED, $device->spare_parts);
         $this->assertNull($device->parts_provider);
     }

@@ -33,8 +33,8 @@ class Kernel extends ConsoleKernel
     {
         $schedule->call(function () {
             $parties = Party::doesnthave('devices')
-            ->where('event_date', '>=', date('Y-m-d', strtotime(Carbon::now()->subDays(env('NO_DATA_ENTERED', 5)))))
-              ->where('event_date', '<=', date('Y-m-d', strtotime(Carbon::now())))
+            ->where('event_start_utc', '>=', date('Y-m-d', strtotime(Carbon::now()->subDays(env('NO_DATA_ENTERED', 5)))))
+              ->where('event_end_utc', '<', date('Y-m-d', strtotime(Carbon::now())))
                 ->get();
 
             foreach ($parties as $party) {
