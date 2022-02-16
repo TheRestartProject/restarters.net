@@ -3,6 +3,7 @@
 namespace Tests\Feature\Groups;
 
 use App\Group;
+use App\Network;
 use App\User;
 use DB;
 use Hash;
@@ -34,10 +35,10 @@ class BasicTest extends TestCase
                 // Can't assert on all-group-tags dev systems might have varying info.
                 'your-area' => 'London',
                 ':can-create' => 'false',
-                ':user-id' => '1',
+                ':user-id' => $user->id,
                 'tab' => 'mine',
                 ':network' => 'null',
-                ':networks' => '[{"id":1,"name":"Restarters","description":null,"website":null,"default_language":"en","timezone":"Europe\\/London","created_at":"2021-05-24 12:19:37","updated_at":"2021-05-24 12:19:37","events_push_to_wordpress":0,"include_in_zapier":0,"users_push_to_drip":0,"shortname":"restarters","discourse_group":null,"auto_approve_events":0}]',
+                ':networks' => '[{"id":' . Network::first()->id . ',"name":"Restarters","description":null,"website":null,"default_language":"en","timezone":"Europe\\/London","created_at":"2021-05-24 12:19:37","updated_at":"2021-05-24 12:19:37","events_push_to_wordpress":0,"include_in_zapier":0,"users_push_to_drip":0,"shortname":"restarters","discourse_group":null,"auto_approve_events":0}]',
                 ':show-tags' => 'false',
             ],
         ]);

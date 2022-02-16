@@ -3,7 +3,9 @@
 namespace Tests\Feature\Stats;
 
 use App\Device;
+use App\Group;
 use App\Helpers\LcaStats;
+use App\Party;
 use DB;
 use Tests\Feature\Stats\StatsTestCase;
 
@@ -178,13 +180,15 @@ class LcaStatsTest extends StatsTestCase
 
         DB::statement("UPDATE categories SET weight=0, footprint=0 WHERE idcategories IN (' . $this->_idPoweredMisc . ',' . $this->_idUnpoweredMisc .')");
 
-        $group = 1;
+        $groupObj = factory(Group::class)->create();
+        $group = $groupObj->idgroups;
+        $event = factory(Party::class)->create([ 'group' => $group ]);
 
         // #1 add a single powered non-misc device
         factory(Device::class)->states('fixed')->create([
             'category' => $this->_idPoweredNonMisc,
             'category_creation' => $this->_idPoweredNonMisc,
-            'event' => 1,
+            'event' => $event->idevents,
         ]);
         $expect = [
             'powered_waste' => 4,
@@ -203,7 +207,7 @@ class LcaStatsTest extends StatsTestCase
         factory(Device::class)->states('fixed')->create([
             'category' => $this->_idPoweredMisc,
             'category_creation' => $this->_idPoweredMisc,
-            'event' => 1,
+            'event' => $event->idevents,
         ]);
         $expect = [
             'powered_waste' => 4,
@@ -222,7 +226,7 @@ class LcaStatsTest extends StatsTestCase
         factory(Device::class)->states('fixed')->create([
             'category' => $this->_idUnpoweredNonMisc,
             'category_creation' => $this->_idUnpoweredNonMisc,
-            'event' => 1,
+            'event' => $event->idevents,
         ]);
         $expect = [
             'powered_waste' => 4,
@@ -241,7 +245,7 @@ class LcaStatsTest extends StatsTestCase
         factory(Device::class)->states('fixed')->create([
             'category' => $this->_idUnpoweredMisc,
             'category_creation' => $this->_idUnpoweredMisc,
-            'event' => 1,
+            'event' => $event->idevents,
         ]);
         $expect = [
             'powered_waste' => 4,
@@ -260,7 +264,7 @@ class LcaStatsTest extends StatsTestCase
         $device = factory(Device::class)->states('fixed')->create([
             'category' => $this->_idPoweredMisc,
             'category_creation' => $this->_idPoweredMisc,
-            'event' => 1,
+            'event' => $event->idevents,
             'estimate' => 1.23,
         ]);
         $expect = [
@@ -280,7 +284,7 @@ class LcaStatsTest extends StatsTestCase
         $device = factory(Device::class)->states('fixed')->create([
             'category' => $this->_idUnpoweredMisc,
             'category_creation' => $this->_idUnpoweredMisc,
-            'event' => 1,
+            'event' => $event->idevents,
             'estimate' => 4.56,
         ]);
         $expect = [

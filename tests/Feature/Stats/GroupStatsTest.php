@@ -172,7 +172,7 @@ class GroupStatsTest extends StatsTestCase
         $device = factory(Device::class)->states('fixed')->create([
             'category' => $this->_idUnpoweredMisc,
             'category_creation' => $this->_idUnpoweredMisc,
-            'event' => 1,
+            'event' => $event->idevents,
             'estimate' => 7.89,
         ]);
         $expect['fixed_devices']++;
