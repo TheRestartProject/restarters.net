@@ -31,6 +31,7 @@ use App\Session;
 use App\User;
 use App\UserGroups;
 use Auth;
+use Carbon\Carbon;
 use DateTime;
 use DB;
 use FixometerFile;
@@ -53,7 +54,8 @@ class PartyController extends Controller
 
     public static function expandEvent($event, $group)
     {
-        $thisone = $event->getAttributes();
+        // Use attributesToArray rather than getAttributes so that our custom accessors are invoked.
+        $thisone = $event->attributesToArray();
 
         if (is_null($group)) {
             // We are showing events for multiple groups and so we need to pass the relevant group, in order that
@@ -164,17 +166,57 @@ class PartyController extends Controller
 
         if ($request->isMethod('post')) {
             $request->validate([
-                'event_date' => 'required',
-                'start' => 'required',
-                'end' => 'required',
-                'location' => [
-                    function ($attribute, $value, $fail) use ($request) {
-                        if (! $request->filled('online') && ! $value) {
-                            $fail(__('events.validate_location'));
-                        }
-                    },
-                ],
+                                   'group' => 'required'
             ]);
+
+            $group = $request->input('group');
+            $groupobj = Group::where('idgroups', $group)->first();
+
+            // We might be passed a timezone; if not then use the timezone of the group.
+            $timezone = $request->input('timezone', $groupobj->timezone);
+
+            // There are two ways event date/times can be created.
+            // 1. By passing event_start_utc and event_end_utc, or
+            // 2. By passing event_date, start, end (deprecated).
+            if ($request->has('event_start_utc') && $request->has('event_end_utc')) {
+                $request->validate([
+                                       'location' => [
+                                           function ($attribute, $value, $fail) use ($request) {
+                                               if (! $request->filled('online') && ! $value) {
+                                                   $fail(__('events.validate_location'));
+                                               }
+                                           },
+                                       ],
+                                   ]);
+
+                $event_start_utc = $request->input('event_start_utc');
+                $event_end_utc = $request->input('event_end_utc');
+            } else {
+                $request->validate([
+                                       'event_date' => 'required',
+                                       'start' => 'required',
+                                       'end' => 'required',
+                                       'location' => [
+                                           function ($attribute, $value, $fail) use ($request) {
+                                               if (! $request->filled('online') && ! $value) {
+                                                   $fail(__('events.validate_location'));
+                                               }
+                                           },
+                                       ],
+                                   ]);
+
+                $event_date = $request->input('event_date');
+                $start = $request->input('start');
+                $end = $request->input('end');
+
+                // Convert these to the UTC timezone for storage.
+                $startCarbon = Carbon::parse($event_date . ' ' . $start, $timezone);
+                $startCarbon->setTimezone('UTC');
+                $event_start_utc = $startCarbon->toIso8601String();
+                $endCarbon = Carbon::parse($event_date . ' ' . $end, $timezone);
+                $endCarbon->setTimezone('UTC');
+                $event_end_utc = $endCarbon->toIso8601String();
+            }
 
             $error = [];
 
@@ -210,46 +252,27 @@ class PartyController extends Controller
             $data['longitude'] = $longitude;
 
             $online = $request->has('online');
-            $event_date = $request->input('event_date');
-            $start = $request->input('start');
-            $end = $request->input('end');
             $pax = 0;
             $free_text = $request->input('free_text');
             $venue = $request->input('venue');
             $location = $request->input('location');
-            $group = $request->input('group');
             $user_id = Auth::user()->id;
             $link = $request->input('link');
 
             // Check whether the event should be auto-approved, if all of the networks it belongs to
             // allow it.
-            $autoapprove = Group::where('idgroups', $group)->first()->auto_approve;
-
-            // formatting dates for the DB
-            $event_date = date('Y-m-d', strtotime($event_date));
-
-            if (! Fixometer::verify($event_date)) {
-                $error['event_date'] = 'We must have a starting date and time.';
-            }
-            if (! Fixometer::verify($start)) {
-                $error['name'] = 'We must have a starting date and time.';
-            }
+            $autoapprove = $groupobj->auto_approve;
 
             if (empty($error)) {
-                $startTime = $event_date.' '.$start;
-                $endTime = $event_date.' '.$end;
-
-                $dtStart = new DateTime($startTime);
-                $dtDiff = $dtStart->diff(new DateTime($endTime));
-
-                $hours = $dtDiff->h;
+                $hours = Carbon::parse($event_start_utc)->diffInHours(Carbon::parse($event_end_utc));
 
                 // No errors. We can proceed and create the Party.
+                //
+                // timezone needs to be the first attribute set, because it is used in mutators for later attributes.
                 $data = [
-                    'event_date' => $event_date,
-                    'start' => $start,
-                    'end' => $end,
-                    'pax' => $pax,
+                    'timezone' => $timezone,
+                    'event_start_utc' => $event_start_utc,
+                    'event_end_utc' => $event_end_utc,
                     'free_text' => $free_text,
                     'link' => $link,
                     'venue' => $venue,
@@ -258,11 +281,10 @@ class PartyController extends Controller
                     'longitude' => $longitude,
                     'group' => $group,
                     'hours' => $hours,
-                    // 'volunteers'    => $volunteers,
                     'user_id' => $user_id,
                     'created_at' => date('Y-m-d H:i:s'),
                     'shareable_code' => Fixometer::generateUniqueShareableCode(\App\Party::class, 'shareable_code'),
-                    'online' => $online,
+                    'online' => $online
                 ];
 
                 $party = Party::create($data);
@@ -357,6 +379,7 @@ class PartyController extends Controller
         $Groups = new Group;
         $File = new FixometerFile;
         $Party = new Party;
+        $party = $Party->findThis($id)[0];
 
         $groupsUserIsInChargeOf = $user->groupsInChargeOf();
         $userInChargeOfMultipleGroups = $user->hasRole('Administrator') || count($groupsUserIsInChargeOf) > 1;
@@ -413,10 +436,29 @@ class PartyController extends Controller
             $data['latitude'] = $latitude;
             $data['longitude'] = $longitude;
 
+            // We might have been passed a timezone; if not then inherit from the current value.
+            $timezone = $request->input('timezone', Party::find($id)->timezone);
+
+            // There are two ways event date/times can be updated.
+            // 1. By passing event_start_utc and event_end_utc, or
+            // 2. By passing event_date, start, end (deprecated).
+            if ($request->has('event_start_utc') && $request->has('event_end_utc')) {
+                $event_start_utc = $request->input('event_start_utc');
+                $event_end_utc = $request->input('event_end_utc');
+            } else {
+                $event_date = $request->input('event_date');
+                $start = $request->input('start');
+                $end = $request->input('end');
+
+                $startCarbon = Carbon::parse($event_date . ' ' . $start, $timezone);
+                $event_start_utc = $startCarbon->toIso8601String();
+                $endCarbon = Carbon::parse($event_date . ' ' . $end, $timezone);
+                $event_end_utc = $endCarbon->toIso8601String();
+            }
+
             $update = [
-                'event_date' => $data['event_date'],
-                'start' => $data['start'],
-                'end' => $data['end'],
+                'event_start_utc' => $event_start_utc,
+                'event_end_utc' => $event_end_utc,
                 'free_text' => $data['free_text'],
                 'online' => $request->has('online'),
                 'group' => $data['group'],
@@ -425,6 +467,7 @@ class PartyController extends Controller
                 'location' => $data['location'],
                 'latitude' => $latitude,
                 'longitude' => $longitude,
+                'timezone' => $timezone
             ];
 
             $u = Party::findOrFail($id)->update($update);
@@ -462,9 +505,8 @@ class PartyController extends Controller
                 $remotePost = null;
             }
 
-            $party = $Party->findThis($id)[0];
-
             $audits = Party::findOrFail($id)->audits;
+            $party = $Party->findThis($id)[0];
 
             return view('events.edit', [ //party.edit
                 'response' => $response,
@@ -1298,6 +1340,8 @@ class PartyController extends Controller
          ->join('users', 'users.access_group_tag_id', '=', 'group_tags.id');
 
         if (! empty($date_from) && ! empty($date_to)) {
+            // TODO Timezones.  The API call may return events spanning multiple timezones, and it's unclear what
+            // timezone the inputs will be in.
             $parties = $parties->where('events.event_date', '>=', date('Y-m-d', strtotime($date_from)))
            ->where('events.event_date', '<=', date('Y-m-d', strtotime($date_to)));
         }
@@ -1333,13 +1377,16 @@ class PartyController extends Controller
                'co2_emissions_prevented' => $gstats['co2_total'],
            ]);
         }
+        // Send these to getEventStats() to speed things up a bit.
+        $eEmissionRatio = \App\Helpers\LcaStats::getEmissionRatioPowered();
+        $uEmissionratio = \App\Helpers\LcaStats::getEmissionRatioUnpowered();
 
         $collection = collect([]);
         foreach ($parties as $key => $party) {
             $group = $groups_array->filter(function ($group) use ($party) {
                 return $group['id'] == $party->group;
             })->first();
-            $estats = $party->getEventStats();
+            $estats = $party->getEventStats($eEmissionRatio, $uEmissionratio);
             // Push Party to Collection
             $collection->push([
              'id' => $party->idevents,

@@ -21,6 +21,7 @@ use App\Notifications\NewGroupMember;
 use App\Notifications\NewGroupWithinRadius;
 use App\Notifications\GroupConfirmed;
 use App\Party;
+use App\Role;
 use App\User;
 use App\UserGroups;
 use Auth;
@@ -370,13 +371,17 @@ class GroupController extends Controller
 
         $expanded_events = [];
 
+        // Send these to getEventStats() to speed things up a bit.
+        $eEmissionRatio = \App\Helpers\LcaStats::getEmissionRatioPowered();
+        $uEmissionratio = \App\Helpers\LcaStats::getEmissionRatioUnpowered();
+
         foreach (array_merge($upcoming_events->all(), $past_events->all()) as $event) {
             $thisone = $event->getAttributes();
             $thisone['attending'] = Auth::user() && $event->isBeingAttendedBy(Auth::user()->id);
             $thisone['allinvitedcount'] = $event->allInvited->count();
 
             // TODO LATER Consider whether these stats should be in the event or passed into the store.
-            $thisone['stats'] = $event->getEventStats();
+            $thisone['stats'] = $event->getEventStats($eEmissionRatio, $uEmissionratio);
             $thisone['participants_count'] = $event->participants;
             $thisone['volunteers_count'] = $event->allConfirmedVolunteers->count();
 
@@ -895,7 +900,7 @@ class GroupController extends Controller
             event(new UserFollowedGroup($user, $group));
 
             // A new User has joined your group
-            $groupHostLinks = UserGroups::where('group', $group->idgroups)->where('role', 3)->get();
+            $groupHostLinks = UserGroups::where('group', $group->idgroups)->where('role', Role::HOST)->get();
 
             foreach ($groupHostLinks as $groupHostLink) {
                 $host = User::where('id', $groupHostLink->user)->first();
@@ -929,9 +934,7 @@ class GroupController extends Controller
             if (isset($_FILES) && ! empty($_FILES)) {
                 $existing_image = Fixometer::hasImage($id, 'groups', true);
                 if (! empty($existing_image)) {
-                    // TODO This can't work.  But it's hard to test given that we use raw file uploads
-                    // rather than the Laravel mechanism.
-                    $Group->removeImage($id, $existing_image[0]);
+                    Fixometer::removeImage($id, env('TBL_GROUPS'), $existing_image[0]);
                 }
                 $file = new FixometerFile;
                 $file->upload('file', 'image', $id, env('TBL_GROUPS'), false, true, true);
@@ -939,7 +942,7 @@ class GroupController extends Controller
 
             return 'success - image uploaded';
         } catch (\Exception $e) {
-            return 'fail - image could not be uploaded';
+            return 'fail - image could not be uploaded ' . $e->getMessage();
         }
     }
 
@@ -1392,6 +1395,7 @@ class GroupController extends Controller
         $exclude_parties = [];
         if (! empty($date_from) && ! empty($date_to)) {
             foreach ($group->parties as $party) {
+                // TODO Timezones.  The inputs are probably in local timezones.
                 if (! Fixometer::validateBetweenDates($party->event_date, $date_from, $date_to)) {
                     $exclude_parties[] = $party->idevents;
                 }

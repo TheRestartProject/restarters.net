@@ -56,7 +56,11 @@ class WordpressEventPushTest extends TestCase
         ]);
         $group = factory(Group::class)->create();
         $network->addGroup($group);
-        $event = factory(Party::class)->create(['group' => $group->idgroups]);
+        $event = factory(Party::class)->create([
+            'group' => $group->idgroups,
+            'event_start_utc' => Carbon::parse('1pm tomorrow')->toIso8601String(),
+            'event_end_utc' => Carbon::parse('3pm tomorrow')->toIso8601String()
+           ]);
         $event->save();
 
         $this->mock(WordpressClient::class, function ($mock) use ($event) {
@@ -88,9 +92,8 @@ class WordpressEventPushTest extends TestCase
         # Edit event.
         $handler = app(EditWordpressPostForEvent::class);
         $handler->handle(new EditEvent($event, [
-            'event_date' => $event->date,
-            'start' => $event->start,
-            'end' => $event->end,
+            'event_start_utc' => Carbon::parse('2pm tomorrow')->toIso8601String(),
+            'event_end_utc' => Carbon::parse('4pm tomorrow')->toIso8601String(),
             'latitude' => 1,
             'longitude' => 2,
             'group' => 3,
@@ -137,7 +140,11 @@ class WordpressEventPushTest extends TestCase
         ]);
         $group = factory(Group::class)->create();
         $restart->addGroup($group);
-        $event = factory(Party::class)->create(['group' => $group->idgroups]);
+        $event = factory(Party::class)->create([
+            'group' => $group->idgroups,
+            'event_start_utc' => Carbon::parse('1pm tomorrow')->toIso8601String(),
+            'event_end_utc' => Carbon::parse('3pm tomorrow')->toIso8601String()
+        ]);
         $event->wordpress_post_id = 100;
         $event->save();
 

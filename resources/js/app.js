@@ -990,9 +990,14 @@ function initAutocomplete() {
     } else {
       alert('You must consent to the use of your data in order to register');
     }
-
   });
 
+  $('#login-form-submit').on('click', function(e) {
+    // We've seen double submits of the login form, leading to 419 errors.  Prevent the user submitting twice by
+    // double-clicking.
+    $('#login-form-submit').attr('disabled', 'disabled')
+    $('#login-form').submit()
+  });
 
   // On toggling between multi collapable invite modal content
   // Then also toggle the link to change the text (show a different link -

@@ -94,7 +94,7 @@ class GroupByKeyTest extends TestCase
         $this->assertEquals($eventpast->idevents, $ret['past_parties'][0]['event_id']);
 
         // Get stats
-        $response = $this->get('/api/group-tag/stats/'.$group->idgroups);
+        $response = $this->get('/api/group-tag/stats/'.$tag1->id);
         $stats = json_decode($response->getContent(), true);
         $this->assertEquals(1, $stats['parties']);
 

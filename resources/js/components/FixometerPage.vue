@@ -78,8 +78,6 @@
               :from_date="from_date"
               :to_date="to_date"
               :total.sync="impactData.total_powered"
-              :weight.sync="impactData.waste_powered"
-              :co2.sync="impactData.co2_powered"
           />
         </b-tab>
         <b-tab title-item-class="w-50" title-link-class="smallpad" class="pt-2">
@@ -106,8 +104,6 @@
               :from_date="from_date"
               :to_date="to_date"
               :total.sync="impactData.total_unpowered"
-              :weight.sync="impactData.waste_unpowered"
-              :co2.sync="impactData.co2_unpowered"
           />
         </b-tab>
       </b-tabs>
@@ -116,24 +112,6 @@
       <CollapsibleSection collapsed :count="impactData.total_powered" heading-level="h6" count-class="small">
         <template slot="title">
           {{ __('devices.title_powered') }}
-        </template>
-        <template slot="title-right">
-          <div class="small mt-2">
-            <div class="d-flex text-brand font-weight-bold small">
-              <div class="mr-3 lower d-flex align-content-center">
-                <b-img src="/images/trash_brand.svg" class="iconsmall" />
-                <span class="mb-1">
-                  {{ Math.round(impactData.waste_powered).toLocaleString() }}
-                </span>
-              </div>
-              <div class="mr-1 lower d-flex">
-                <b-img src="/images/co2_brand.svg" class="iconsmall" />
-                <span class="mb-1">
-                  {{ Math.round(impactData.co2_powered).toLocaleString() }}
-                </span>
-              </div>
-            </div>
-          </div>
         </template>
         <template slot="content">
           <FixometerRecordsTable
@@ -152,32 +130,12 @@
               :from_date="from_date"
               :to_date="to_date"
               :total.sync="total_powered"
-              :weight.sync="waste_powered"
-              :co2.sync="co2_powered"
           />
         </template>
       </CollapsibleSection>
       <CollapsibleSection collapsed :count="impactData.total_unpowered" heading-level="h6" count-class="small">
         <template slot="title">
           {{ __('devices.title_unpowered') }}
-        </template>
-        <template slot="title-right">
-          <div class="small mt-2">
-            <div class="d-flex text-brand font-weight-bold small">
-              <div class="mr-3 lower d-flex align-content-center">
-                <b-img src="/images/trash_brand.svg" class="iconsmall" />
-                <span class="mb-1">
-                  {{ Math.round(impactData.waste_unpowered).toLocaleString() }}
-                </span>
-              </div>
-              <div class="mr-1 lower d-flex">
-                <b-img src="/images/co2_brand.svg" class="iconsmall" />
-                <span class="mb-1">
-                  {{ Math.round(impactData.co2_unpowered).toLocaleString() }}
-                </span>
-              </div>
-            </div>
-          </div>
         </template>
         <template slot="content">
           <FixometerRecordsTable
@@ -196,8 +154,6 @@
               :from_date="from_date"
               :to_date="to_date"
               :total.sync="total_unpowered"
-              :weight.sync="waste_unpowered"
-              :co2.sync="co2_unpowered"
           />
         </template>
       </CollapsibleSection>
@@ -267,10 +223,6 @@ export default {
 
       total_powered: 0,
       total_unpowered: 0,
-      waste_powered: 0,
-      waste_unpowered: 0,
-      co2_powered: 0,
-      co2_unpowered: 0,
 
       startExpandedItems: false,
       startExpandedEvents: false,
@@ -341,10 +293,6 @@ export default {
 
     this.total_powered = this.impactData.total_powered
     this.total_unpowered = this.impactData.total_unpowered
-    this.waste_powered = this.impactData.waste_powered
-    this.waste_unpowered = this.impactData.waste_unpowered
-    this.co2_powered = this.impactData.co2_powered
-    this.co2_unpowered = this.impactData.co2_unpowered
   },
   watch: {
     url(newVal) {

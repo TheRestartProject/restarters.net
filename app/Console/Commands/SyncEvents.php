@@ -58,7 +58,7 @@ class SyncEvents extends Command
 
                 return;
             }
-            $eventsQuery->where('event_date', '>=', $this->option('datefrom'));
+            $eventsQuery->where('event_start_utc', '>=', $this->option('datefrom'));
             $this->info('Starting from date: '.$dateFrom);
         }
 
@@ -70,8 +70,8 @@ class SyncEvents extends Command
 
         foreach ($events as $event) {
             try {
-                $startTimestamp = strtotime($event->event_date.' '.$event->start);
-                $endTimestamp = strtotime($event->event_date.' '.$event->end);
+                $startTimestamp = strtotime($event->event_start_utc);
+                $endTimestamp = strtotime($event->event_end_utc);
 
                 $group = Group::where('idgroups', $event->group)->first();
 

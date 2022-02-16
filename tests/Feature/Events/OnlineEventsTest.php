@@ -2,6 +2,7 @@
 
 namespace Tests\Feature;
 
+use App\Device;
 use App\EventsUsers;
 use App\Group;
 use App\Helpers\Geocoder;
@@ -43,9 +44,10 @@ class OnlineEventsTest extends TestCase
         // act
         $eventAttributes = factory(Party::class)->raw(['online' => true]);
         $response = $this->post('/party/create/', $eventAttributes);
+        $idevents = Party::latest()->first()->idevents;
 
         // assert
-        $event = Party::find(1);
+        $event = Party::find($idevents);
         $this->assertTrue($event->online == true);
     }
 }
