@@ -146,6 +146,11 @@ class CreateEventTest extends TestCase
             $this->assertEquals($canModerate, $events[0]['canModerate']);
             $this->assertEquals(true, $events[0]['attending']);
             $this->assertEquals(true, $events[0]['isVolunteer']);
+            $this->assertEquals(substr($eventAttributes['event_start_utc'], 0, 10), $events[0]['event_date_local']);
+            $this->assertEquals(substr($eventAttributes['event_start_utc'], 11, 5), $events[0]['start_local']);
+            $this->assertEquals(substr($eventAttributes['event_end_utc'], 11, 5), $events[0]['end_local']);
+            $this->assertEquals(Carbon::parse($eventAttributes['event_start_utc'])->toIso8601String(), $events[0]['event_start_utc']);
+            $this->assertEquals(Carbon::parse($eventAttributes['event_end_utc'])->toIso8601String(), $events[0]['event_start_utc']);
         } else {
             $this->assertEquals(true, $events[0]['requiresModeration']);
         }
