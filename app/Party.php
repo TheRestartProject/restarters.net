@@ -48,7 +48,7 @@ class Party extends Model implements Auditable
     protected $hidden = ['created_at', 'updated_at', 'deleted_at', 'frequency', 'group', 'group', 'user_id', 'wordpress_post_id', 'cancelled', 'devices_updated_at'];
 
     // Append data to Model
-    protected $appends = ['participants', 'ShareableLink'];
+    protected $appends = ['participants', 'ShareableLink', 'event_date_local', 'start_local', 'end_local'];
 
     //Getters
     public function findAll()

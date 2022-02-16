@@ -82,6 +82,10 @@ class PartyController extends Controller
         $thisone['requiresModeration'] = $event->requiresModerationByAdmin();
         $thisone['canModerate'] = Auth::user() && (Fixometer::hasRole(Auth::user(), 'Administrator') || Fixometer::hasRole(Auth::user(), 'NetworkCoordinator'));
 
+        $thisone['event_date_local'] = $event->eventDateLocal;
+        $thisone['event_start_local'] = $event->eventStartLocal;
+        $thisone['event_end_local'] = $event->eventEndLocal;
+
         $thisone['upcoming'] = $event->isUpcoming();
         $thisone['finished'] = $event->hasFinished();
         $thisone['inprogress'] = $event->isInProgress();
