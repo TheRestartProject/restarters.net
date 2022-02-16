@@ -83,8 +83,8 @@ class PartyController extends Controller
         $thisone['canModerate'] = Auth::user() && (Fixometer::hasRole(Auth::user(), 'Administrator') || Fixometer::hasRole(Auth::user(), 'NetworkCoordinator'));
 
         $thisone['event_date_local'] = $event->eventDateLocal;
-        $thisone['event_start_local'] = $event->eventStartLocal;
-        $thisone['event_end_local'] = $event->eventEndLocal;
+        $thisone['start_local'] = $event->startLocal;
+        $thisone['end_local'] = $event->endLocal;
 
         $thisone['upcoming'] = $event->isUpcoming();
         $thisone['finished'] = $event->hasFinished();

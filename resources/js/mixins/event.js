@@ -34,11 +34,11 @@ export default {
     },
     start() {
       // Local time.
-      return this.event.start.substring(0, 5)
+      return this.event ? this.event.start_local : null
     },
     end() {
       // Local time.
-      return this.event.end.substring(0, 5)
+      return this.event ? this.event.end_local : null
     },
     date() {
       // Local time.
