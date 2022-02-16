@@ -65,7 +65,7 @@ class CountsTests extends TestCase
         $this->assertGreaterThan($pastcount, $allcount);
 
         // The accessor should construct the timestamp.
-        $this->assertEquals('2130-01-01 12:13:00', $event2->event_timestamp);
+        $this->assertEquals('2130-01-01 12:13', $event2->event_timestamp);
 
         // The devices should be fetched on demand.
         $this->assertEquals(1, count($event2->devices));

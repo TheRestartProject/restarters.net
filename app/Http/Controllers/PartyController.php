@@ -193,6 +193,10 @@ class PartyController extends Controller
             $event_start_utc = $request->input('event_start_utc');
             $event_end_utc = $request->input('event_end_utc');
 
+            // Convert the timezone to UTC, because the timezone is not itself stored in the DB.
+            $event_start_utc = Carbon::parse($event_start_utc, $timezone)->setTimezone('UTC')->toIso8601String();
+            $event_end_utc = Carbon::parse($event_end_utc, $timezone)->setTimezone('UTC')->toIso8601String();
+
             $error = [];
 
             if ($request->filled('location')) {

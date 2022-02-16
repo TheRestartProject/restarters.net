@@ -302,7 +302,7 @@ class CreateEventTest extends TestCase
 
         // Approve the event
         $response = $this->post('/party/create/', $eventData);
-        $event = Party::where('event_date', '2030-01-01')->first();
+        $event = Party::latest()->first();
         $eventData['wordpress_post_id'] = 100;
         $eventData['id'] = $event->idevents;
         $eventData['moderate'] = 'approve';
@@ -351,7 +351,7 @@ class CreateEventTest extends TestCase
 
         // act
         $response = $this->post('/party/create/', $eventData);
-        $event = Party::where('event_date', '1930-01-01')->first();
+        $event = Party::latest()->first();
         $eventData['wordpress_post_id'] = 100;
         $eventData['id'] = $event->idevents;
         $eventData['moderate'] = 'approve';

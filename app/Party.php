@@ -56,8 +56,8 @@ class Party extends Model implements Auditable
         return DB::select(DB::raw('SELECT
                     `e`.`idevents` AS `id`,
                     UNIX_TIMESTAMP(`event_start_utc`) AS `event_timestamp`,
-                    `e`.`start` AS `start`,
-                    `e`.`end` AS `end`,
+                    TIME(CONVERT_TZ(`event_start_utc`, \'GMT\', `e`.`timezone`)) AS `start`,
+                    TIME(CONVERT_TZ(`event_end_utc`, \'GMT\', `e`.`timezone`)) AS `end`,
                     `e`.`venue`,
                     `e`.`link`,
                     `e`.`location`,
@@ -83,8 +83,8 @@ class Party extends Model implements Auditable
         return DB::select(DB::raw('SELECT
                     `e`.`idevents` AS `id`,
                     UNIX_TIMESTAMP(`event_start_utc`) AS `event_timestamp`,
-                    `e`.`start` AS `start`,
-                    `e`.`end` AS `end`,
+                    TIME(CONVERT_TZ(`event_start_utc`, \'GMT\', `e`.`timezone`)) AS `start`,
+                    TIME(CONVERT_TZ(`event_end_utc`, \'GMT\', `e`.`timezone`)) AS `end`,
                     `e`.`venue`,
                     `e`.`link`,
                     `e`.`location`,
@@ -110,8 +110,8 @@ class Party extends Model implements Auditable
                     UNIX_TIMESTAMP(`event_start_utc`) AS `event_date` ,
                     UNIX_TIMESTAMP(`event_start_utc`) AS `event_timestamp`,
                     UNIX_TIMESTAMP(`event_end_utc`) AS `event_end_timestamp`,
-                    `e`.`start` AS `start`,
-                    `e`.`end` AS `end`,
+                    TIME(CONVERT_TZ(`event_start_utc`, \'GMT\', `e`.`timezone`)) AS `start`,
+                    TIME(CONVERT_TZ(`event_end_utc`, \'GMT\', `e`.`timezone`)) AS `end`,
                     `e`.`venue`,
                     `e`.`link`,
                     `e`.`location`,
@@ -315,8 +315,8 @@ class Party extends Model implements Auditable
                     UNIX_TIMESTAMP(`e`.`event_start_utc`) AS `event_timestamp`,
                     DATE(`e`.`event_start_utc`) AS `plain_date`,
                     NOW() AS `this_moment`,
-                    `e`.`start`,
-                    `e`.`end`,
+                    TIME(CONVERT_TZ(`event_start_utc`, \'GMT\', `e`.`timezone`)) AS `start`,
+                    TIME(CONVERT_TZ(`event_end_utc`, \'GMT\', `e`.`timezone`)) AS `end`,
                     `e`.`latitude`,
                     `e`.`longitude`
                 FROM `'.$this->table.'` AS `e`
@@ -352,8 +352,8 @@ class Party extends Model implements Auditable
                     `e`.`link`,
                     `e`.`location`,
                     UNIX_TIMESTAMP( `e`.`event_start_utc` ) AS `event_date`,
-                    `e`.`start`,
-                    `e`.`end`,
+                    TIME(CONVERT_TZ(`event_start_utc`, \'GMT\', `e`.`timezone`)) AS `start`,
+                    TIME(CONVERT_TZ(`event_end_utc`, \'GMT\', `e`.`timezone`)) AS `end`,
                     `e`.`latitude`,
                     `e`.`longitude`
                 FROM `'.$this->table.'` AS `e`
@@ -603,9 +603,15 @@ class Party extends Model implements Auditable
         return $dt->format($format);
     }
 
+    public function getEventTimestampAttribute()
+    {
+        // Returning in local time.
+        return "{$this->event_date_local} {$this->start_local}";
+    }
+
     public function getEventStartEndLocal()
     {
-        return $this->start . '-' . $this->end;
+        return $this->start_local . ' - ' . $this->end_local;
     }
 
     public function getEventName()
@@ -638,7 +644,7 @@ class Party extends Model implements Auditable
     {
         $start = new Carbon($this->event_start_utc);
 
-        if (!$this->$this->isInProgress() && !$this->hasFinished() && $start->isCurrentDay()) {
+        if (!$this->isInProgress() && !$this->hasFinished() && $start->isCurrentDay()) {
             return true;
         }
 
@@ -1057,12 +1063,12 @@ class Party extends Model implements Auditable
     public function getStartLocalAttribute() {
         $dt = new Carbon($this->event_start_utc);
         $dt->setTimezone($this->timezone);
-        return $dt->toTimeString();
+        return $dt->toTimeString('minute');
     }
 
     public function getEndLocalAttribute() {
         $dt = new Carbon($this->event_end_utc);
         $dt->setTimezone($this->timezone);
-        return $dt->toTimeString();
+        return $dt->toTimeString('minute');
     }
 }
