@@ -82,6 +82,11 @@ class PartyController extends Controller
         $thisone['requiresModeration'] = $event->requiresModerationByAdmin();
         $thisone['canModerate'] = Auth::user() && (Fixometer::hasRole(Auth::user(), 'Administrator') || Fixometer::hasRole(Auth::user(), 'NetworkCoordinator'));
 
+        $thisone['upcoming'] = $event->isUpcoming();
+        $thisone['finished'] = $event->hasFinished();
+        $thisone['inprogress'] = $event->isInProgress();
+        $thisone['startingsoon'] = $event->isStartingSoon();
+
         return $thisone;
     }
 
@@ -175,48 +180,18 @@ class PartyController extends Controller
             // We might be passed a timezone; if not then use the timezone of the group.
             $timezone = $request->input('timezone', $groupobj->timezone);
 
-            // There are two ways event date/times can be created.
-            // 1. By passing event_start_utc and event_end_utc, or
-            // 2. By passing event_date, start, end (deprecated).
-            if ($request->has('event_start_utc') && $request->has('event_end_utc')) {
-                $request->validate([
-                                       'location' => [
-                                           function ($attribute, $value, $fail) use ($request) {
-                                               if (! $request->filled('online') && ! $value) {
-                                                   $fail(__('events.validate_location'));
-                                               }
-                                           },
-                                       ],
-                                   ]);
+            $request->validate([
+                                   'location' => [
+                                       function ($attribute, $value, $fail) use ($request) {
+                                           if (! $request->filled('online') && ! $value) {
+                                               $fail(__('events.validate_location'));
+                                           }
+                                       },
+                                   ],
+                               ]);
 
-                $event_start_utc = $request->input('event_start_utc');
-                $event_end_utc = $request->input('event_end_utc');
-            } else {
-                $request->validate([
-                                       'event_date' => 'required',
-                                       'start' => 'required',
-                                       'end' => 'required',
-                                       'location' => [
-                                           function ($attribute, $value, $fail) use ($request) {
-                                               if (! $request->filled('online') && ! $value) {
-                                                   $fail(__('events.validate_location'));
-                                               }
-                                           },
-                                       ],
-                                   ]);
-
-                $event_date = $request->input('event_date');
-                $start = $request->input('start');
-                $end = $request->input('end');
-
-                // Convert these to the UTC timezone for storage.
-                $startCarbon = Carbon::parse($event_date . ' ' . $start, $timezone);
-                $startCarbon->setTimezone('UTC');
-                $event_start_utc = $startCarbon->toIso8601String();
-                $endCarbon = Carbon::parse($event_date . ' ' . $end, $timezone);
-                $endCarbon->setTimezone('UTC');
-                $event_end_utc = $endCarbon->toIso8601String();
-            }
+            $event_start_utc = $request->input('event_start_utc');
+            $event_end_utc = $request->input('event_end_utc');
 
             $error = [];
 
@@ -400,9 +375,6 @@ class PartyController extends Controller
             unset($data['users']);
             unset($data['id']);
 
-            // formatting dates for the DB
-            $data['event_date'] = Fixometer::dbDateNoTime($data['event_date']);
-
             if (! empty($data['location'])) {
                 $results = $this->geocoder->geocode($data['location']);
 
@@ -439,22 +411,8 @@ class PartyController extends Controller
             // We might have been passed a timezone; if not then inherit from the current value.
             $timezone = $request->input('timezone', Party::find($id)->timezone);
 
-            // There are two ways event date/times can be updated.
-            // 1. By passing event_start_utc and event_end_utc, or
-            // 2. By passing event_date, start, end (deprecated).
-            if ($request->has('event_start_utc') && $request->has('event_end_utc')) {
-                $event_start_utc = $request->input('event_start_utc');
-                $event_end_utc = $request->input('event_end_utc');
-            } else {
-                $event_date = $request->input('event_date');
-                $start = $request->input('start');
-                $end = $request->input('end');
-
-                $startCarbon = Carbon::parse($event_date . ' ' . $start, $timezone);
-                $event_start_utc = $startCarbon->toIso8601String();
-                $endCarbon = Carbon::parse($event_date . ' ' . $end, $timezone);
-                $event_end_utc = $endCarbon->toIso8601String();
-            }
+            $event_start_utc = $request->input('event_start_utc');
+            $event_end_utc = $request->input('event_end_utc');
 
             $update = [
                 'event_start_utc' => $event_start_utc,
@@ -696,8 +654,8 @@ class PartyController extends Controller
     public function generateAddToCalendarLinks($event)
     {
         try {
-            $from = DateTime::createFromFormat('Y-m-d H:i', $event->getEventDate('Y-m-d').' '.$event->getEventStart());
-            $to = DateTime::createFromFormat('Y-m-d H:i', $event->getEventDate('Y-m-d').' '.$event->getEventEnd());
+            $from = DateTime::createFromFormat('Y-m-d H:i', $event->getFormattedLocalStart('Y-m-d').' '.$event->getEventStart());
+            $to = DateTime::createFromFormat('Y-m-d H:i', $event->getFormattedLocalStart('Y-m-d').' '.$event->getEventEnd());
 
             $link = Link::create(trim(addslashes($event->getEventName())), $from, $to)
                             ->description(trim(addslashes(strip_tags($event->free_text))))

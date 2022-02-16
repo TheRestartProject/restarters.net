@@ -993,44 +993,6 @@ class Fixometer
     }
 
     /**
-     * Simplifies the logic on blade template for displaying the column drop down
-     * @return array
-     * @author Dean Appleton-Claydon
-     */
-    public static function filterColumns()
-    {
-        return [
-            'category' => 'Category',
-            'brand' => 'Brand',
-            'model' => 'Model',
-            'problem' => 'Comment',
-            'group_name' => 'Group',
-            'event_date' => 'Date',
-            'repair_status' => 'State',
-        ];
-    }
-
-    /**
-     * Simplifies the logic in the blade templates around display device columns
-     * @param  string $column           checks to see whether column exists in session array
-     * @param  array $user_preferences array from session
-     * @return bool                   true or false!
-     * @author Dean Appleton-Claydon
-     */
-    public static function checkColumn($column, $user_preferences)
-    {
-        if (! is_null($user_preferences) && is_array($user_preferences)) {
-            if (in_array($column, $user_preferences)) {
-                return true;
-            }
-
-            return false;
-        }
-
-        return true;
-    }
-
-    /**
      * [generateUniqueShareableCode description]
      * Generate a unique Shareable Code from a random string,
      * If the Code already exists then loop again!

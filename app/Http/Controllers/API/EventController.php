@@ -10,7 +10,7 @@ use Illuminate\Http\Request;
 
 class EventController extends Controller
 {
-    public function getEventsByUsersNetworks(Request $request, $date_from = null, $date_to = null)
+    public function getEventsByUsersNetworks(Request $request, $date_from = null, $date_to = null, $timezone = 'UTC')
     {
         $authenticatedUser = Auth::user();
 
@@ -27,10 +27,12 @@ class EventController extends Controller
                   ->join('users', 'users.id', '=', 'user_network.user_id');
 
         if (! empty($date_from) && ! empty($date_to)) {
-            // TODO Timezones.  Add optional timezone parameter to route, defaulted to UTC, and let API users
-            // know about.
-            $parties = $parties->where('events.event_date', '>=', date('Y-m-d', strtotime($date_from)))
-           ->where('events.event_date', '<=', date('Y-m-d', strtotime($date_to)));
+            $start = Carbon\Carbon::parse($date_from, $timezone);
+            $start->setTimezone('UTC');
+            $end = Carbon\Carbon::parse($date_to, $timezone);
+            $end->setTimezone('UTC');
+            $parties = $parties->where('events.event_start_utc', '>=', $start->toIso8601String())
+           ->where('events.event_end_utc', '<=', $end->toIso8601String());
         }
 
         $parties = $parties->where([
@@ -81,11 +83,11 @@ class EventController extends Controller
              'group' => [$group],
              'area' => $group['area'],
              'postcode' => $group['postcode'],
-             'event_date' => $party->event_date,
-             'start_time' => $party->start,
-             'end_time' => $party->end,
+             'event_date' => $party->event_date_local,
+             'start_time' => $party->start_local,
+             'end_time' => $party->end_local,
              'name' => $party->venue,
-// TODO Once DOT-1502 is released 'link' => $party->link,
+             'link' => $party->link,
              'online' => $party->online,
              'location' => [
                  'value' => $party->location,

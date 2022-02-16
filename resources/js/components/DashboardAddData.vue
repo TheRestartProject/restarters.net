@@ -72,7 +72,7 @@ export default {
       return Object.values(this.$store.getters['events/getAll'])
     },
     attendedEvents() {
-      return this.events.filter(e => e.attended).sort((a,b) => new moment(b.event_date + ' ' + b.start).unix() - new moment(a.event_date + ' ' + a.start).unix())
+      return this.events.filter(e => e.attended).sort((a,b) => new moment(b.event_start_utc).unix() - new moment(a.event_start_utc).unix())
     },
     groupEvents() {
       return this.events
@@ -88,7 +88,7 @@ export default {
       return this.groupEvents.filter(e => e.idgroups === this.groupValue.idgroups).map(e => {
         return {
           idevents: e.idevents,
-          name: new moment(e.event_date).format('DD MMM YY') + ' @ ' + e.venue
+          name: new moment(e.event_start_utc).format('DD MMM YY') + ' @ ' + e.venue
         }
       })
     },
@@ -100,7 +100,7 @@ export default {
 
       this.eventValue = {
         idevents: e.idevents,
-        name: new moment(e.event_date).format('DD MMM YY') + ' @ ' + e.venue
+        name: new moment(e.event_start_utc).format('DD MMM YY') + ' @ ' + e.venue
       }
 
       this.groupValue = this.groups.find(g => g.idgroups === e.idgroups)

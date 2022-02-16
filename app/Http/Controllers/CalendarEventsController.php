@@ -127,15 +127,15 @@ class CalendarEventsController extends Controller
 
         // loop over events
         foreach ($events as $event) {
-            if (! is_null($event->event_date) && $event->event_date != '0000-00-00') {
+            if (! is_null($event->event_start_utc) ) {
                 $ical[] = 'BEGIN:VEVENT';
 
                 $ical[] = 'TZID:' . $event->timezone;
                 $ical[] = "UID:{$event->idevents}";
                 $ical[] = 'DTSTAMP:'.date($this->ical_format).'';
                 $ical[] = "SUMMARY:{$event->venue} ({$event->name})";
-                $ical[] = 'DTSTART;TZID=' . $event->timezone . ':'.date($this->ical_format, strtotime($event->event_date.' '.$event->start)).'';
-                $ical[] = 'DTEND;TZID=' . $event->timezone . ':'.date($this->ical_format, strtotime($event->event_date.' '.$event->end)).'';
+                $ical[] = 'DTSTART;TZID=' . $event->timezone . ':'.$event->getFormattedLocalStart($this->ical_format);
+                $ical[] = 'DTEND;TZID=' . $event->timezone . ':'.$event->getFormattedLocalEnd($this->ical_format);
                 $ical[] = 'DESCRIPTION:'.url('/party/view').'/'.$event->idevents;
                 $ical[] = "LOCATION:{$event->location}";
                 $ical[] = 'URL:'.url('/party/view').'/'.$event->idevents;

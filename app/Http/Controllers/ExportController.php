@@ -79,7 +79,7 @@ class ExportController extends Controller
                     $device->getSpareParts(),
                     $device->deviceEvent->getEventName(),
                     $device->deviceEvent->theGroup->name,
-                    $device->deviceEvent->getEventDate('Y-m-d'),
+                    $device->deviceEvent->getFormattedLocalStart('Y-m-d'),
                     $wasteImpact,
                     $co2Diverted
                 ]);
@@ -124,7 +124,7 @@ class ExportController extends Controller
                     $device->getSpareParts(),
                     $device->deviceEvent->getEventName(),
                     $device->deviceEvent->theGroup->name,
-                    $device->deviceEvent->getEventDate('Y-m-d'),
+                    $device->deviceEvent->getFormattedLocalStart('Y-m-d'),
                     $wasteImpact,
                     $co2Diverted,
                 ]);
@@ -185,7 +185,7 @@ class ExportController extends Controller
                     });
 
                     $PartyArray[$i] = [
-                        $party->getEventDate(),
+                        $party->getFormattedLocalStart(),
                         $party->getEventName(),
                         $party->theGroup && $party->theGroup->name ? $party->theGroup->name : '?',
                     ];
@@ -295,13 +295,13 @@ class ExportController extends Controller
             }
 
             //By date
-            // TODO Timezones.  This is only used by admins and therefore the dates can be assumed to be in UTC.
+            // This is only used by admins and therefore the dates can be assumed to be in UTC.
             if ($request->input('from_date') !== null && $request->input('to_date') == null) {
-                $user_events = $user_events->whereDate('events.event_date', '>', $request->input('from_date'));
+                $user_events = $user_events->whereDate('events.event_start_utc', '>', $request->input('from_date'));
             } elseif ($request->input('to_date') !== null && $request->input('from_date') == null) {
-                $user_events = $user_events->whereDate('events.event_date', '<', $request->input('to_date'));
+                $user_events = $user_events->whereDate('events.event_end_utc', '<', $request->input('to_date'));
             } elseif ($request->input('to_date') !== null && $request->input('from_date') !== null) {
-                $user_events = $user_events->whereBetween('events.event_date', [
+                $user_events = $user_events->whereBetween('events.event_start_utc', [
                     $request->input('from_date'),
                     $request->input('to_date'),
                 ]);
@@ -372,13 +372,15 @@ class ExportController extends Controller
         $user_events = $user_events->orderBy('events.event_start_utc', 'DESC');
 
         //Select all necessary information for table
+        //
+        // This is only used by Admins, and therefore we can assume that they are in UTC and return times accordingly.
         $user_events = $user_events->select(
             'users.id',
             'users.name as username',
             'events.idevents',
-            'events.start',
-            'events.end',
-            'events.event_date',
+            'TIME(events.event_start_utc) AS start',
+            'TIME(events.event_end_utc) AS end',
+            'DATE(events.event_start_utc) AS event_date',
             'events.location',
             'events.venue',
             'groups.name as groupname'
