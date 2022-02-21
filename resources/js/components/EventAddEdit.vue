@@ -1,7 +1,9 @@
 <template>
   <b-form :action="formAction" method="post">
     <input type="hidden" name="_token" :value="CSRF" :enctype="encType" />
-    <input type="hidden" name="id" :value="initialEvent.id" v-if="!creating" />
+    <input type="hidden" name="id" :value="initialEvent.idevents" v-if="!creating" />
+    <input type="hidden" name="event_start_utc" :value="eventStartUtc" />
+    <input type="hidden" name="event_end_utc" :value="eventEndUtc" />
 
     <div class="layout">
       <EventVenue
@@ -101,7 +103,7 @@
           </span>
         </div>
         <div class="col-lg-4 d-flex align-items-center justify-content-end mt-2 mt-lg-0">
-          <b-btn :href="'/party/duplicate/' + initialEvent.id" variant="primary" size="md" class="mr-2">
+          <b-btn :href="'/party/duplicate/' + initialEvent.idevents" variant="primary" size="md" class="mr-2">
             {{ __('events.duplicate_event') }}
           </b-btn>
           <b-btn variant="primary" class="break" type="submit" @click="submit">
@@ -124,6 +126,7 @@ import EventGroup from './EventGroup'
 import EventLink from './EventLink'
 import { required, minLength, url, helpers } from 'vuelidate/lib/validators'
 import validationHelpers from '../mixins/validationHelpers'
+import moment from 'moment-timezone'
 
 function geocodeableValidation() {
   return this.lat !== null && this.lng !== null
@@ -208,7 +211,7 @@ export default {
       return !this.initialEvent
     },
     formAction() {
-      return this.creating ? "/party/create" : ("/party/edit/" + this.initialEvent.id)
+      return this.creating ? "/party/create" : ("/party/edit/" + this.initialEvent.idevents)
     },
     encType() {
       return this.creating ? null : 'enctype="multipart/form-data"'
@@ -225,6 +228,23 @@ export default {
     autoApprove() {
       return this.group ? this.group.auto_approve : false
     },
+    // The server expects the UTC versions of the data.
+    eventStartUtc() {
+      if (!this.eventDate || !this.eventStart || !this.group) {
+        return null
+      }
+
+      const m = moment.tz(this.eventDate + ' ' + this.eventStart, this.group.timezone)
+      return m.toISOString()
+    },
+    eventEndUtc() {
+      if (!this.eventDate || !this.eventEnd || !this.group) {
+        return null
+      }
+
+      const m = moment.tz(this.eventDate + ' ' + this.eventEnd, this.group.timezone)
+      return m.toISOString()
+    }
   },
   created() {
     // Data is passed from the blade template to us via props.  We put it in the store for all components to use,
@@ -244,13 +264,13 @@ export default {
     }
 
     if (setFrom) {
-      this.idgroups = setFrom.group
+      this.idgroups = setFrom.group.idgroups
       this.eventVenue = setFrom.venue
       this.eventLink = setFrom.link
       this.eventAddress = setFrom.location
       this.free_text = setFrom.free_text
-      this.eventStart = setFrom.start.substring(0, 5)
-      this.eventEnd = setFrom.end.substring(0, 5)
+      this.eventStart = setFrom.start_local
+      this.eventEnd = setFrom.end_local
       this.eventOnline = setFrom.online ? true : false
       this.lat = setFrom.latitude
       this.lng = setFrom.longitude

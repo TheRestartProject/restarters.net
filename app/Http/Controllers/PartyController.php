@@ -362,7 +362,6 @@ class PartyController extends Controller
         $Groups = new Group;
         $File = new FixometerFile;
         $Party = new Party;
-        $party = $Party->findThis($id)[0];
 
         $groupsUserIsInChargeOf = $user->groupsInChargeOf();
         $userInChargeOfMultipleGroups = $user->hasRole('Administrator') || count($groupsUserIsInChargeOf) > 1;
@@ -396,7 +395,7 @@ class PartyController extends Controller
                       'images' => $images,
                       'title' => 'Edit Party',
                       'allGroups' => $allGroups,
-                      'formdata' => $party,
+                      'formdata' => PartyController::expandEvent($party, NULL),
                       'remotePost' => null,
                       'grouplist' => $Groups->findList(),
                       'user' => Auth::user(),
@@ -472,7 +471,7 @@ class PartyController extends Controller
             }
 
             $audits = Party::findOrFail($id)->audits;
-            $party = $Party->findThis($id)[0];
+            $party = $Party->find($id);
 
             return view('events.edit', [ //party.edit
                 'response' => $response,
@@ -480,7 +479,7 @@ class PartyController extends Controller
                 'images' => $images,
                 'title' => 'Edit Party',
                 'allGroups' => $allGroups,
-                'formdata' => $party,
+                'formdata' => PartyController::expandEvent($party, NULL),
                 'remotePost' => $remotePost,
                 'grouplist' => $Groups->findList(),
                 'user' => Auth::user(),
@@ -497,7 +496,7 @@ class PartyController extends Controller
             $images = null;
         }
 
-        $party = $Party->findThis($id)[0];
+        $party = $Party->find($id);
         $remotePost = null;
 
         $audits = Party::findOrFail($id)->audits;
@@ -507,7 +506,7 @@ class PartyController extends Controller
             'images' => $images,
             'title' => 'Edit Party',
             'allGroups' => $allGroups,
-            'formdata' => $party,
+            'formdata' => PartyController::expandEvent($party, NULL),
             'remotePost' => $remotePost,
             'grouplist' => $Groups->findList(),
             'user' => Auth::user(),
@@ -545,7 +544,7 @@ class PartyController extends Controller
             $images = null;
         }
 
-        $party = $Party->findThis($id)[0];
+        $party = $Party->find($id);
         $remotePost = null;
 
         return view('events.create', [
@@ -555,7 +554,7 @@ class PartyController extends Controller
             'user' => Auth::user(),
             'user_groups' => $groupsUserIsInChargeOf,
             'userInChargeOfMultipleGroups' => $userInChargeOfMultipleGroups,
-            'duplicateFrom' => $party,
+            'duplicateFrom' => PartyController::expandEvent($party, NULL),
         ]);
     }
 
