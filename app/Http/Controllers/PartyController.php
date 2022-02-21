@@ -22,7 +22,6 @@ use App\Notifications\EventDevices;
 use App\Notifications\EventRepairs;
 use App\Notifications\JoinEvent;
 use App\Notifications\JoinGroup;
-use App\Notifications\NotifyHostRSVPInvitesMade;
 use App\Notifications\NotifyRestartersOfNewEvent;
 use App\Notifications\RSVPEvent;
 use App\Party;
@@ -1026,9 +1025,6 @@ class PartyController extends Controller
                             'event_venue' => $event->venue,
                             'event_url' => url('/party/edit/'.$event->idevents),
                         ];
-
-                        // Notify Host of event that Invites have been sent out
-                        Notification::send($userCreator, new NotifyHostRSVPInvitesMade($event_details));
                     }
 
                     // Send Invites

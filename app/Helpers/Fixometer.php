@@ -954,7 +954,6 @@ class Fixometer
             'EventRepairs',
             'JoinEvent',
             'AdminModerationEvent',
-            'NotifyHostRSVPInvitesMade',
             'NotifyRestartersOfNewEvent',
             'RSVPEvent',
             'AdminWordPressCreateEventFailure',

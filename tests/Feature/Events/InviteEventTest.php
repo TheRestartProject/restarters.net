@@ -4,17 +4,9 @@ namespace Tests\Feature;
 
 use App\EventsUsers;
 use App\Group;
-use App\Helpers\Geocoder;
-use App\Network;
-use App\Notifications\AdminModerationEvent;
-use App\Notifications\NewGroupWithinRadius;
-use App\Notifications\NotifyHostRSVPInvitesMade;
-use App\Notifications\NotifyRestartersOfNewEvent;
 use App\Notifications\RSVPEvent;
 use App\Party;
-use App\Role;
 use App\User;
-use App\UserGroups;
 use DB;
 use Illuminate\Support\Facades\Notification;
 use Tests\TestCase;
@@ -267,21 +259,6 @@ class InviteEventTest extends TestCase
         ]);
 
         $response5->assertSessionHas('success');
-
-        // This should generate a notification to the host.
-        Notification::assertSentTo(
-            [$host],
-            NotifyHostRSVPInvitesMade::class,
-            function ($notification, $channels, $host) use ($event) {
-                $mailData = $notification->toMail($host)->toArray();
-                self::assertEquals(__('notifications.invites_made_subject', [], $host->language), $mailData['subject']);
-
-                // Mail should mention the group name.
-                self::assertRegexp('/' . $event->venue . '/', $mailData['introLines'][0]);
-
-                return true;
-            }
-        );
 
         // Invited member should not show up as invitable.
         $response6 = $this->get('/party/get-group-emails-with-names/'.$event->idevents);
