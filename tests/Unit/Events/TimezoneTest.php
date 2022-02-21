@@ -6,6 +6,7 @@ use App\Group;
 use App\Party;
 use App\User;
 use DB;
+use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Tests\TestCase;
 
 class TimezoneTest extends TestCase
@@ -52,14 +53,17 @@ class TimezoneTest extends TestCase
         // Create an event in a different timezone, using local times.
         $e = factory(Party::class)->create([
             'group' => $g->idgroups,
-            'event_start_utc' => '2021-01-01T10:15:05+05:00',
-            'event_end_utc' => '2021-01-01T13:45:05+05:00',
+            'event_start_utc' => '2021-02-01T10:15:05+05:00',
+            'event_end_utc' => '2021-02-01T13:45:05+05:00',
             'timezone' => NULL
         ]);
 
         // Check that the ISO times are as we would expect for this zone.
-        self::assertEquals('2021-01-01T10:15:05+00:00', $e->event_start_utc);
-        self::assertEquals('2021-01-01T13:45:05+00:00', $e->event_end_utc);
+        self::assertEquals('2021-02-01T10:15:05+00:00', $e->event_start_utc);
+        self::assertEquals('2021-02-01T13:45:05+00:00', $e->event_end_utc);
+        self::assertEquals('15:15', $e->start_local);
+        self::assertEquals('18:45', $e->end_local);
+        self::assertEquals('01/02/2021', $e->getFormattedLocalEnd());
     }
 
     public function testOrder() {
@@ -129,5 +133,23 @@ class TimezoneTest extends TestCase
         $this->assertEquals(strtotime($events[0]['event_end_utc']), (new \DateTime('2037-01-01 12:35', new \DateTimeZone('Europe/Amsterdam')))->format('U'));
         $this->assertEquals(strtotime($events[1]['event_start_utc']), (new \DateTime('2037-01-01 06:10', new \DateTimeZone('Asia/Samarkand')))->format('U'));
         $this->assertEquals(strtotime($events[1]['event_end_utc']), (new \DateTime('2037-01-01 08:20', new \DateTimeZone('Asia/Samarkand')))->format('U'));
+    }
+
+    public function testOldDateFieldException() {
+        $this->expectException(\Exception::class);
+        $p = new Party();
+        $p->event_date = '1970-01-01';
+    }
+
+    public function testOldStartFieldException() {
+        $this->expectException(\Exception::class);
+        $p = new Party();
+        $p->start = '10:00';
+    }
+
+    public function testOldEndFieldException() {
+        $this->expectException(\Exception::class);
+        $p = new Party();
+        $p->end = '10:00';
     }
 }

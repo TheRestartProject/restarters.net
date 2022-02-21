@@ -1030,29 +1030,20 @@ class Party extends Model implements Auditable
 
     // Mutators for previous event_date/start/end fields.  These are now superceded by the UTC fields and therefore
     // should never be set directly.  Throw exceptions to ensure that they are not.
-    //
-    // The tests create events using the old fields, and we've not changed those yet, but PartyFactory will have
-    // populated the new ones - so just ignore that.
     public function setEventDateAttribute($val) {
-        if (!array_key_exists('event_start_utc', $this->attributes)) {
-            throw new \Exception("Attempt to set event time fields directly; please use event_start_utc and event_end_utc");
-        }
+        throw new \Exception("Attempt to set event time fields directly; please use event_start_utc and event_end_utc");
     }
 
     public function setStartAttribute($val) {
-        if (!array_key_exists('event_start_utc', $this->attributes)) {
-            throw new \Exception(
-                "Attempt to set event time fields directly; please use event_start_utc and event_end_utc"
-            );
-        }
+        throw new \Exception(
+            "Attempt to set event time fields directly; please use event_start_utc and event_end_utc"
+        );
     }
 
     public function setEndAttribute($val) {
-        if (!array_key_exists('event_start_utc', $this->attributes)) {
-            throw new \Exception(
-                "Attempt to set event time fields directly; please use event_start_utc and event_end_utc"
-            );
-        }
+        throw new \Exception(
+            "Attempt to set event time fields directly; please use event_start_utc and event_end_utc"
+        );
     }
 
     public function getEventDateLocalAttribute() {
