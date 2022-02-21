@@ -43,7 +43,8 @@ class WordpressEventPushTest extends TestCase
             'group' => $group->idgroups,
             'latitude' => 1,
             'longitude' => 1,
-            'event_date' => '2100-01-01',
+            'event_start_utc' => '2100-01-01T10:15:05+05:00',
+            'event_end_utc' => '2100-01-0113:45:05+05:00',
         ]);
 
         $event->approve();

@@ -303,7 +303,13 @@ class CreateEventTest extends TestCase
         $group->makeMemberAHost($host);
         $group->addVolunteer($restarter);
 
-        $eventData = factory(Party::class)->raw(['group' => $group->idgroups, 'event_date' => '2030-01-01', 'latitude'=>'1', 'longitude'=>'1']);
+        $eventData = factory(Party::class)->raw([
+            'group' => $group->idgroups,
+            'event_start_utc' => '2100-01-01T10:15:05+05:00',
+            'event_end_utc' => '2100-01-0113:45:05+05:00',
+            'latitude'=>'1',
+            'longitude'=>'1'
+        ]);
 
         // Approve the event
         $response = $this->post('/party/create/', $eventData);

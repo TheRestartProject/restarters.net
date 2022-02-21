@@ -8,6 +8,7 @@ use App\Helpers\Fixometer;
 use App\Network;
 use App\Party;
 use App\User;
+use Carbon\Carbon;
 use DB;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Foundation\Testing\WithFaker;
@@ -15,20 +16,6 @@ use Tests\TestCase;
 
 class CountsTests extends TestCase
 {
-    protected function setUp(): void
-    {
-        parent::setUp();
-        DB::statement('SET foreign_key_checks=0');
-        User::truncate();
-        Group::truncate();
-        Network::truncate();
-        Party::truncate();
-        DB::delete('delete from users_groups');
-        DB::delete('delete from group_network');
-        DB::delete('delete from user_network');
-        DB::statement('SET foreign_key_checks=1');
-    }
-
     // Event counts should only include events in the past.
 
     /** @test */
@@ -41,8 +28,8 @@ class CountsTests extends TestCase
 
         $event = factory(Party::class)->create([
             'group' => $group,
-            'event_date' => '2130-01-01',
-            'start' => '12:13',
+            'event_start_utc' => '2130-01-01T10:15:05+05:00',
+            'event_end_utc' => '2130-01-01T13:45:05+05:00',
         ]);
 
         // Delete all events - can hang around in the DB because the relation doesn't cascade the deletes.
@@ -65,7 +52,7 @@ class CountsTests extends TestCase
         $this->assertGreaterThan($pastcount, $allcount);
 
         // The accessor should construct the timestamp.
-        $this->assertEquals('2130-01-01 12:13', $event2->event_timestamp);
+        $this->assertEquals('2130-01-01 10:15', $event2->event_timestamp);
 
         // The devices should be fetched on demand.
         $this->assertEquals(1, count($event2->devices));
