@@ -94,8 +94,11 @@ class CreateEventTest extends TestCase
         $eventAttributes['event_end_utc'] = Carbon::parse($eventAttributes['event_end_utc'])->format('Y-m-d H:i:s');
         $this->assertDatabaseHas('events', $eventAttributes);
 
-        // Check that we can view the event, and that it shows the creation success message.
+        // The logged in user should be recorded as the creator.
         $event = Party::latest()->first();
+        $this->assertEquals($host->id, $event->user_id);
+
+        // Check that we can view the event, and that it shows the creation success message.
         $this->get('/party/view/'.$event->idevents)->
             assertSee($eventAttributes['venue'])->
             assertSee(__('events.created_success_message'));
