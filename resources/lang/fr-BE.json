@@ -106,7 +106,7 @@
     "Help\/configuration": "Aide\/configuration",
     "Unknown": "Inconnu",
     "Other": "Autre",
-    "Fixed": "Fixée",
+    "Fixed": "Réparé",
     "Repairable": "Réparable",
     "End of life": "Fin de vie",
     "Card reader": "Lecteur de cartes",
@@ -125,7 +125,7 @@
     "Software issue\/update": "Problème\/mise à jour du logiciel",
     "Toner": "Toner",
     "USB port\/cable": "Port ou câble USB",
-    "Vendor lock-in": "Vendor lock-in",
+    "Vendor lock-in": "Verrouillage du vendeur",
     "WiFi": "Connexion sans fil",
     "Storage Storage": "Stockage",
     "Waste toner\/ink box": "Bac de récupération de toner",
@@ -153,8 +153,8 @@
     "Replace the charger or charging cable": "Remplacer le chargeur ou le câble de chargement",
     "Replace with new battery": "Remplacer par une nouvelle batterie",
     "Unrepairable corrosion or leakage": "Corrosion ou fuite irréparable",
-    "Coffee maker": "Coffee maker",
-    "Iron": "Iron",
-    "Hand tool": "Hand tool",
-    "Jewellery": "Jewellery"
+    "Coffee maker": "Machine à café",
+    "Iron": "Fer à repasser",
+    "Hand tool": "Outil manuel",
+    "Jewellery": "Bijoux"
 }

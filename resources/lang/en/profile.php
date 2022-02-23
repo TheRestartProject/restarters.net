@@ -47,5 +47,5 @@ return [
   'password_new_mismatch' => 'New Passwords do not match!',
   'password_changed' => 'User Password Updated!',
   'profile_updated' => 'User Profile Updated!',
-  'preferences_updated' => 'User Preferences Updated!'
+  'preferences_updated' => 'User Preferences Updated!',
 ];
