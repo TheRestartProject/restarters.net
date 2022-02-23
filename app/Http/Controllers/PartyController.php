@@ -451,8 +451,10 @@ class PartyController extends Controller
                 $end = $request->input('end');
 
                 $startCarbon = Carbon::parse($event_date . ' ' . $start, $timezone);
+                $startCarbon->setTimezone('UTC');
                 $event_start_utc = $startCarbon->toIso8601String();
                 $endCarbon = Carbon::parse($event_date . ' ' . $end, $timezone);
+                $endCarbon->setTimezone('UTC');
                 $event_end_utc = $endCarbon->toIso8601String();
             }
 

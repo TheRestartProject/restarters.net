@@ -75,24 +75,27 @@ class TimezoneTest extends TestCase
         self::assertEquals('19:00:00', $e->end);
     }
 
-    public function testOrder() {
+    /**
+     * @dataProvider timesProvider
+     */
+    public function testOrder($date, $tz1, $start1, $end1, $tz2, $start2, $end2, $editstart2, $editend2) {
         // Two groups in different timezones.
         $g1 = factory(Group::class)->create([
-                                               'timezone' => 'Asia/Samarkand'
+                                               'timezone' => $tz1
                                            ]);
 
         $g2 = factory(Group::class)->create([
-                                               'timezone' => 'Europe/Amsterdam'
+                                               'timezone' => $tz2
                                            ]);
 
-        // A host for each.
-        $host1 = factory(User::class)->states('Host')->create();
+        // Use Admins to avoid headers already sent problem.
+        $host1 = factory(User::class)->states('Administrator')->create();
         $g1->addVolunteer($host1);
         $g1->makeMemberAHost($host1);
 
-        $host2 = factory(User::class)->states('Host')->create();
-        $g1->addVolunteer($host2);
-        $g1->makeMemberAHost($host2);
+        $host2 = factory(User::class)->states('Administrator')->create();
+        $g2->addVolunteer($host2);
+        $g2->makeMemberAHost($host2);
 
         // Create an event for each, using the old style local time create format.
         $this->actingAs($host1);
@@ -101,9 +104,9 @@ class TimezoneTest extends TestCase
         unset($event['event_end_utc']);
         unset($event['timezone']);
         $event['group'] = $g1->idgroups;
-        $event['event_date'] = '2037-01-01';
-        $event['start'] = '11:10';
-        $event['end'] = '13:20';
+        $event['event_date'] = $date;
+        $event['start'] = $start1;
+        $event['end'] = $end1;
         $response = $this->post('/party/create/', $event);
         $response->assertStatus(302);
 
@@ -113,9 +116,9 @@ class TimezoneTest extends TestCase
         unset($event['event_end_utc']);
         unset($event['timezone']);
         $event['group'] = $g2->idgroups;
-        $event['event_date'] = '2037-01-01';
-        $event['start'] = '12:15';
-        $event['end'] = '14:35';
+        $event['event_date'] = $date;
+        $event['start'] = $start2;
+        $event['end'] = $end2;
         $response = $this->post('/party/create/', $event);
         $response->assertStatus(302);
 
@@ -131,29 +134,53 @@ class TimezoneTest extends TestCase
         $events = json_decode($props[0][':initial-events'], TRUE);
 
         // Check the returned events:
-        // - The events should be Amsterdam first because that is the earliest actual time and therefore the soonest
+        // - The events should be second first because that is the earliest actual time and therefore the soonest
         //   starting event.
         // - The local times (event_date, start, end) should be the same as we put in.
-        // - The UTC fields should be returned with the times converted to UTC.
+        // - The UTC fields should be returned matching, but with the times converted to UTC.
         // - The timezone should be set.
-        $this->assertEquals('Europe/Amsterdam', $events[0]['timezone']);
-        $this->assertEquals('2037-01-01T11:15:00+00:00', $events[0]['event_start_utc']);
-        $this->assertEquals('2037-01-01T13:35:00+00:00', $events[0]['event_end_utc']);
-        $this->assertEquals('2037-01-01', $events[0]['event_date']);
-        $this->assertEquals('12:15:00', $events[0]['start']);
-        $this->assertEquals('14:35:00', $events[0]['end']);
-        $this->assertEquals('Asia/Samarkand', $events[1]['timezone']);
-        $this->assertEquals('2037-01-01T06:10:00+00:00', $events[1]['event_start_utc']);
-        $this->assertEquals('2037-01-01T08:20:00+00:00', $events[1]['event_end_utc']);
-        $this->assertEquals('2037-01-01', $events[1]['event_date']);
-        $this->assertEquals('11:10:00', $events[1]['start']);
-        $this->assertEquals('13:20:00', $events[1]['end']);
+        $this->assertEquals($tz2, $events[0]['timezone']);
+        $this->assertEquals($date, $events[0]['event_date']);
+        $this->assertEquals($start2, $events[0]['start']);
+        $this->assertEquals($end2, $events[0]['end']);
+        $this->assertEquals(strtotime($events[0]['event_start_utc']), (new \DateTime("$date $start2", new \DateTimeZone($tz2)))->format('U'));
+        $this->assertEquals(strtotime($events[0]['event_end_utc']), (new \DateTime("$date $end2", new \DateTimeZone($tz2)))->format('U'));
+        $this->assertStringContainsString('+00:00', $events[0]['event_start_utc']);
+        $this->assertStringContainsString('+00:00', $events[0]['event_end_utc']);
 
-        // A different way of confirming the same thing is to convert the input and returned times to epoch -
-        // they should be the same.
-        $this->assertEquals(strtotime($events[0]['event_start_utc']), (new \DateTime('2037-01-01 12:15', new \DateTimeZone('Europe/Amsterdam')))->format('U'));
-        $this->assertEquals(strtotime($events[0]['event_end_utc']), (new \DateTime('2037-01-01 14:35', new \DateTimeZone('Europe/Amsterdam')))->format('U'));
-        $this->assertEquals(strtotime($events[1]['event_start_utc']), (new \DateTime('2037-01-01 11:10', new \DateTimeZone('Asia/Samarkand')))->format('U'));
-        $this->assertEquals(strtotime($events[1]['event_end_utc']), (new \DateTime('2037-01-01 13:20', new \DateTimeZone('Asia/Samarkand')))->format('U'));
+        $this->assertEquals($tz1, $events[1]['timezone']);
+        $this->assertEquals($date, $events[1]['event_date']);
+        $this->assertEquals($start1, $events[1]['start']);
+        $this->assertEquals($end1, $events[1]['end']);
+        $this->assertEquals(strtotime($events[1]['event_start_utc']), (new \DateTime("$date $start1", new \DateTimeZone($tz1)))->format('U'));
+        $this->assertEquals(strtotime($events[1]['event_end_utc']), (new \DateTime("$date $end1", new \DateTimeZone($tz1)))->format('U'));
+        $this->assertStringContainsString('+00:00', $events[1]['event_start_utc']);
+        $this->assertStringContainsString('+00:00', $events[1]['event_end_utc']);
+
+        // Edit the event to check timezones work there too.
+        $this->actingAs($host2);
+        $id2 = $events[0]['idevents'];
+        $event = Party::findOrFail($id2);
+        $eventData = $event->getAttributes();
+        $eventData['id'] = $id2;
+        $eventData['start'] = $editstart2;
+        $eventData['end'] = $editend2;
+        unset($eventData['event_start_utc']);
+        unset($eventData['event_end_utc']);
+        $response2 = $this->post('/party/edit/'.$event->idevents, $eventData);
+        $event->refresh();
+        $this->assertEquals($editstart2, $event->start);
+        $this->assertEquals($editend2, $event->end);
+    }
+
+    public function timesProvider() {
+        // The first event must be chronologically later than the second event once timezones are considered.
+        return [
+            [ '2037-01-15', 'Europe/London', '12:00:00', '12:00:00', 'Europe/Brussels', '12:00:00', '13:00:00', '13:00:00', '14:00:00' ],
+            [ '2037-01-01', 'Europe/London', '12:00:00', '12:00:00', 'Europe/Brussels', '12:00:00', '13:00:00', '13:00:00', '14:00:00'  ],
+            [ '2037-06-15', 'Europe/London', '12:00:00', '12:00:00', 'Europe/Brussels', '12:00:00', '13:00:00', '13:00:00', '14:00:00'  ],
+            [ '2037-06-01', 'Europe/London', '12:00:00', '12:00:00', 'Europe/Brussels', '12:00:00', '13:00:00', '13:00:00', '14:00:00'  ],
+            [ '2037-01-01', 'Asia/Samarkand', '11:10:00', '13:20:00', 'Europe/Amsterdam', '12:15:00', '14:35:00', '13:00:00', '14:00:00' ],
+        ];
     }
 }

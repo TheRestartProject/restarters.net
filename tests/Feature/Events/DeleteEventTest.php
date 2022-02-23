@@ -135,7 +135,6 @@ class DeleteEventTest extends TestCase
         // Edit also.
         try {
             $response2 = $this->get('/party/edit/'.$event->idevents);
-            error_log($response->getContent());
             $this->assertTrue(false, "Failed to throw exception");
         } catch (ModelNotFoundException $e) {
             $this->assertTrue(true);
