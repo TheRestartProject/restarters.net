@@ -14,8 +14,7 @@
 export default {
   props: {
     age: {
-      // Server may return string
-      type: [Number, String],
+      type: [Number],
       required: false,
       default: 0
     },
