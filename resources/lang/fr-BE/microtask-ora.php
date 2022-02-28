@@ -17,4 +17,11 @@ return [
     'btn-signup' => 'Enregistrer',
     'header' => 'Merci pour votre aide!',
   ],
+  'quest-closed' => [
+    'header' => 'Cette tâche est terminée.',
+    'message-1' => 'Cette tâche est maintenant terminée. Merci pour votre intérêt!',
+    'message-2' => 'Pourquoi ne pas en lire plus sur nos trouvailles, ou en savoir plus sur notre travail de données de l\'Atelier.',
+    'read-more' => 'Lire plus sur :quest',
+    'visit-workbench' => 'Visiter l\'Atelier',
+  ],
 ];

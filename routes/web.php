@@ -190,7 +190,6 @@ Route::group(['middleware' => ['auth', 'verifyUserConsent']], function () {
     });
 
     Route::prefix('user')->group(function () {
-        Route::get('/create', 'UserController@create');
         Route::post('/create', 'UserController@create');
         Route::get('/all', 'UserController@all')->name('users');
         Route::get('/all/search', 'UserController@search');

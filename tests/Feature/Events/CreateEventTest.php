@@ -437,12 +437,6 @@ class CreateEventTest extends TestCase
 
         $response->assertSessionHas('success');
         $this->assertTrue($response->isRedirection());
-
-
-        // Check the notification appears on the web.
-        $this->actingAs($host);
-        $response = $this->get('/profile/notifications');
-        $response->assertSeeText('New event created');
     }
 
     public function provider()

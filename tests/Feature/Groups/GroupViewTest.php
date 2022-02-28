@@ -6,6 +6,7 @@ use App\Device;
 use App\Party;
 use App\Role;
 use Carbon\Carbon;
+use Illuminate\Support\Facades\DB;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Tests\TestCase;
 
@@ -61,6 +62,8 @@ class GroupViewTest extends TestCase
         ]);
 
         $response = $this->post('/device/create', factory(Device::class)->raw([
+                                                                                  'category' => env('MISC_CATEGORY_ID_POWERED'),
+                                                                                  'category_creation' => env('MISC_CATEGORY_ID_POWERED'),
                                                                                   'event_id' => $event->idevents,
                                                                                   'quantity' => 1,
                                                                               ]));
@@ -72,6 +75,13 @@ class GroupViewTest extends TestCase
                 ':can-perform-delete' => 'false',
             ],
         ]);
+
+        # Check the device shows in the API.
+        $rsp2 = $this->get('/api/devices/1/10?sortBy=iddevices&sortDesc=asc&powered=true');
+        $ret = json_decode($rsp2->getContent(), true);
+        self::assertEquals(1, $ret['count']);
+        self::assertEquals(1, count($ret['items']));
+        self::assertEquals($event->idevents, $ret['items'][0]['event']);
 
         // Only administrators can delete.
         foreach (['Restarter', 'Host', 'NetworkCoordinator'] as $role) {

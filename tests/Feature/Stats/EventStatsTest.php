@@ -23,10 +23,11 @@ class EventStatsTest extends StatsTestCase
         $this->_setupCategoriesWithUnpoweredWeights();
 
         // #1 add a powered non-misc device
+        $event = factory(Party::class)->create();
         $device = factory(Device::class)->states('fixed')->create([
             'category' => $this->_idPoweredNonMisc,
             'category_creation' => $this->_idPoweredNonMisc,
-            'event' => 1,
+            'event' => $event->idevents,
         ]);
         $expect = \App\Party::getEventStatsArrayKeys();
         $expect['co2_powered'] = 14.4 * $this->_displacementFactor;
@@ -48,7 +49,7 @@ class EventStatsTest extends StatsTestCase
         $device = factory(Device::class)->states('fixed')->create([
             'category' => $this->_idPoweredMisc,
             'category_creation' => $this->_idPoweredMisc,
-            'event' => 1,
+                                                                      'event' => $event->idevents,
         ]);
         $expect['fixed_devices']++;
         $expect['fixed_powered']++;
@@ -65,7 +66,7 @@ class EventStatsTest extends StatsTestCase
         $device = factory(Device::class)->states('fixed')->create([
             'category' => 5,
             'category_creation' => 5,
-            'event' => 1,
+            'event' => $event->idevents,
         ]);
         $expect['fixed_devices']++;
         $expect['fixed_unpowered']++;
@@ -85,7 +86,7 @@ class EventStatsTest extends StatsTestCase
         $device = factory(Device::class)->states('fixed')->create([
             'category' => $this->_idUnpoweredMisc,
             'category_creation' => $this->_idUnpoweredMisc,
-            'event' => 1,
+            'event' => $event->idevents,
         ]);
         $expect['fixed_devices']++;
         $expect['fixed_unpowered']++;
@@ -102,7 +103,7 @@ class EventStatsTest extends StatsTestCase
         $device = factory(Device::class)->states('fixed')->create([
             'category' => $this->_idPoweredMisc,
             'category_creation' => $this->_idPoweredMisc,
-            'event' => 1,
+            'event' => $event->idevents,
             'estimate' => 1.23,
         ]);
         $expect['fixed_devices']++;
@@ -123,7 +124,7 @@ class EventStatsTest extends StatsTestCase
         $device = factory(Device::class)->states('fixed')->create([
             'category' => $this->_idUnpoweredMisc,
             'category_creation' => $this->_idUnpoweredMisc,
-            'event' => 1,
+            'event' => $event->idevents,
             'estimate' => 4.56,
         ]);
         $expect['fixed_devices']++;
@@ -144,7 +145,7 @@ class EventStatsTest extends StatsTestCase
         $device = factory(Device::class)->states('fixed')->create([
             'category' => $this->_idUnpoweredMisc,
             'category_creation' => $this->_idUnpoweredMisc,
-            'event' => 1,
+            'event' => $event->idevents,
             'estimate' => 7.89,
         ]);
         $expect['fixed_devices']++;

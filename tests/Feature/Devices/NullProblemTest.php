@@ -36,8 +36,9 @@ class NullProblemTest extends TestCase
     {
         $this->device_inputs['problem'] = null;
         $this->post('/device/create', $this->device_inputs);
+        $iddevices = Device::latest()->first()->iddevices;
 
-        $device = Device::find(1);
+        $device = Device::find($iddevices);
         $this->assertEquals('', $device->problem);
     }
 }

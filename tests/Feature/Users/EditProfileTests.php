@@ -3,12 +3,17 @@
 namespace Tests\Feature;
 
 use App\Events\UserUpdated;
+use App\Group;
+use App\Helpers\Fixometer;
+use App\Role;
+use App\Skills;
 use App\User;
 use Carbon\Carbon;
 use DB;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Config;
 use Illuminate\Support\Facades\Event;
+use Illuminate\Support\Facades\Storage;
 use Tests\TestCase;
 
 class EditProfileTests extends TestCase
@@ -118,5 +123,96 @@ class EditProfileTests extends TestCase
         $user = $user->fresh();
         $this->assertNull($user->latitude);
         $this->assertNull($user->longitude);
+    }
+
+    public function idProvider() {
+        return [
+            [ TRUE ],
+            [ FALSE ]
+        ];
+    }
+
+    /**
+     * @test
+     * @dataProvider idProvider
+     */
+    public function test_tags_update($id) {
+        $user = factory(User::class)->create();
+        $this->actingAs($user);
+
+        $skill1 = Skills::create([
+                                     'skill_name'  => 'UT1',
+                                     'description' => 'Planning',
+                                     'category' => 1
+                                 ]);
+        $skill2 = Skills::create([
+                                    'skill_name'  => 'UT2',
+                                    'description' => 'Unit Testing',
+                                    'category' => 2
+                                ]);
+
+        // Add this skill.
+        $params = [
+            'tags' => [ $skill1->id, $skill2->id ]
+        ];
+
+        if ($id) {
+            $params['id'] = $user->id;
+        };
+
+        $response = $this->post('/profile/edit-tags', $params);
+
+        $this->assertTrue($response->isRedirection());
+        $response->assertSessionHas('message');
+
+        // Check it shows.
+        $response2 = $this->get('/profile/edit');
+        $response2->assertSee('selected>UT1</option>');
+        $response2->assertSee('selected>UT2</option>');
+
+        // Should have promoted to host because we have a category 1 skill.
+        $user->refresh();
+        self::assertEquals(Role::HOST, $user->role);
+    }
+
+    /**
+     * @test
+     * @dataProvider idProvider
+     */
+    public function image_upload($id) {
+        Storage::fake('avatars');
+        $user = factory(User::class)->create();
+        $this->actingAs($user);
+
+        // Try with no file.
+        $response = $this->json('POST', '/profile/edit-photo', []);
+        $this->assertTrue($response->isRedirection());
+        $response->assertSessionHas('error');
+
+        // We don't upload files in a standard Laravel way, so testing upload is a bit of a hack.
+        $_FILES = [
+            'profilePhoto' => [
+                'error'    => "0",
+                'name'     => 'avatar.jpg',
+                'size'     => 123,
+                'tmp_name' => __FILE__,   // use THIS file - a real file
+                'type'     => 'image/jpg'
+            ]
+        ];
+
+        $params = [];
+
+        if ($id) {
+            $params['id'] = $id;
+        }
+
+        $response = $this->json('POST', '/profile/edit-photo', $params);
+        $this->assertTrue($response->isRedirection());
+        $response->assertSessionHas('message');
+
+        // And again, which will test the case of overwriting.
+        $response = $this->json('POST', '/profile/edit-photo', $params);
+        $this->assertTrue($response->isRedirection());
+        $response->assertSessionHas('message');
     }
 }
