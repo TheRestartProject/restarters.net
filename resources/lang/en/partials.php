@@ -106,6 +106,7 @@ return [
   'and' => 'and',
   'quantity' => 'Quantity',
   'cancel' => 'Cancel',
+  'confirm' => 'Confirm',
   'loading' => 'Loading',
   'close' => 'Close',
   'skills' => 'skill|skills',
