@@ -184,7 +184,6 @@ return array(
     'App\\Notifications\\NewGroupMember' => $baseDir . '/app/Notifications/NewGroupMember.php',
     'App\\Notifications\\NewGroupWithinRadius' => $baseDir . '/app/Notifications/NewGroupWithinRadius.php',
     'App\\Notifications\\NotifyAdminNoDevices' => $baseDir . '/app/Notifications/NotifyAdminNoDevices.php',
-    'App\\Notifications\\NotifyHostRSVPInvitesMade' => $baseDir . '/app/Notifications/NotifyHostRSVPInvitesMade.php',
     'App\\Notifications\\NotifyRestartersOfNewEvent' => $baseDir . '/app/Notifications/NotifyRestartersOfNewEvent.php',
     'App\\Notifications\\RSVPEvent' => $baseDir . '/app/Notifications/RSVPEvent.php',
     'App\\Notifications\\ResetPassword' => $baseDir . '/app/Notifications/ResetPassword.php',
