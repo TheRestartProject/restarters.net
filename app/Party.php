@@ -43,7 +43,8 @@ class Party extends Model implements Auditable
         'discourse_thread',
         'devices_updated_at',
         'link',
-        'timezone'
+        'timezone',
+        'user_id'
     ];
     protected $hidden = ['created_at', 'updated_at', 'deleted_at', 'frequency', 'group', 'group', 'user_id', 'wordpress_post_id', 'cancelled', 'devices_updated_at'];
 

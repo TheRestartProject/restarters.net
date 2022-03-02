@@ -116,4 +116,5 @@ return [
   'event_requires_moderation' => 'L\'événement nécessite une approbation',
   'remove' => 'Supprimer',
   'total' => 'total',
+  'please_choose' => 'Veuillez choisir...',
 ];
