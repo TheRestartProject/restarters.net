@@ -429,6 +429,23 @@ class DiscourseService
                                     throw new \Exception("Failed to add $discourseMember as owner of {$discourseId} {$discourseName}");
                                 }
                             }
+
+                            if ($restartersMembers[$discourseMember]->role == Role::HOST && $d['trust_level'] == 0) {
+                                Log::info("$discourseMember is on trust_level 0, promote");
+                                $response = $client->request('PUT', "/admin/users/{$d['id']}/trust_level.json", [
+                                    'form_params' => [
+                                        'level' => 1
+                                    ]
+                                ]);
+
+                                Log::info('Response status: ' . $response->getStatusCode());
+                                Log::debug($response->getBody());
+
+                                if ($response->getStatusCode() != 200) {
+                                    Log::error("Failed to promote $discourseMember to trust level 1");
+                                    throw new \Exception("Failed to promote $discourseMember to trust level 1");
+                                }
+                            }
                         }
                     }
 
