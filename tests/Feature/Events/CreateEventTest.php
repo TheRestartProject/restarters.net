@@ -70,7 +70,9 @@ class CreateEventTest extends TestCase
         $host = factory(User::class)->states('Host')->create();
         $this->actingAs($host);
 
-        $group = factory(Group::class)->create();
+        $group = factory(Group::class)->create([
+            'wordpress_post_id' => '99999'
+        ]);
         $group->addVolunteer($host);
         $group->makeMemberAHost($host);
 
