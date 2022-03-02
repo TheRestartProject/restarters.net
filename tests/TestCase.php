@@ -129,7 +129,7 @@ abstract class TestCase extends BaseTestCase
         Auth::user()->role = $role;
     }
 
-    public function createGroup($name = 'Test Group', $website = 'https://therestartproject.org', $location = 'London', $text = 'Some text.', $assert = true)
+    public function createGroup($name = 'Test Group', $website = 'https://therestartproject.org', $location = 'London', $text = 'Some text.', $assert = true, $approve = true)
     {
         $idgroups = null;
 
@@ -146,9 +146,12 @@ abstract class TestCase extends BaseTestCase
             $this->assertNotFalse(strpos($redirectTo, '/group/edit'));
             $p = strrpos($redirectTo, '/');
             $idgroups = substr($redirectTo, $p + 1);
-            $group = Group::find($idgroups);
-            $group->wordpress_post_id = '99999';
-            $group->save();
+
+            if ($approve) {
+                $group = Group::find($idgroups);
+                $group->wordpress_post_id = '99999';
+                $group->save();
+            }
 
             // Currently logged in user should be present, with status 1 = approved.
             $member = UserGroups::where('group', $idgroups)->first();

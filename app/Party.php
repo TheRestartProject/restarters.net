@@ -528,14 +528,17 @@ class Party extends Model implements Auditable
     {
         // We want to exclude groups which we are a member of, but include ones where we have been invited but
         // not yet joined.
-        $user_group_ids = UserGroups::where('user', $user->id)->where('status', 1)->pluck('group')->toArray();
+        $exclude_group_ids = UserGroups::where('user', $user->id)->where('status', 1)->pluck('group')->toArray();
+
+        // We also want to exclude any groups which are not yet approved.
+        $exclude_group_ids = array_merge($exclude_group_ids, Groups::whereNull('wordpress_post_id')->pluck('idgroups')->toArray());
 
         return $this
       ->select(DB::raw('`events`.*, ( 6371 * acos( cos( radians('.$user->latitude.') ) * cos( radians( events.latitude ) ) * cos( radians( events.longitude ) - radians('.$user->longitude.') ) + sin( radians('.$user->latitude.') ) * sin( radians( events.latitude ) ) ) ) AS distance'))
       ->join('groups', 'groups.idgroups', '=', 'events.group')
       ->join('users_groups', 'users_groups.group', '=', 'groups.idgroups')
-      ->where(function ($query) use ($user_group_ids) {
-          $query->whereNotIn('events.group', $user_group_ids)
+      ->where(function ($query) use ($exclude_group_ids) {
+          $query->whereNotIn('events.group', $exclude_group_ids)
         ->where('event_start_utc', '>=', date('Y-m-d H:i:s'));
       })
       ->having('distance', '<=', User::NEARBY_KM)
