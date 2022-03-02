@@ -142,12 +142,12 @@ class TimezoneTest extends TestCase
         $event = Party::findOrFail($id2);
         $eventData = $event->getAttributes();
         $eventData['id'] = $id2;
-        $eventData['event_start_utc'] = (new \DateTime("$date $editstart2", new \DateTimeZone($tz1)))->format(\DateTimeInterface::ISO8601);
-        $eventData['event_end_utc'] = (new \DateTime("$date $editend2", new \DateTimeZone($tz1)))->format(\DateTimeInterface::ISO8601);
+        $eventData['event_start_utc'] = Carbon::parse("$date $editstart2", $tz1)->setTimezone('UTC')->toIso8601String();
+        $eventData['event_end_utc'] = Carbon::parse("$date $editend2", $tz1)->setTimezone('UTC')->toIso8601String();
         $response2 = $this->post('/party/edit/'.$event->idevents, $eventData);
         $event->refresh();
-        $this->assertEquals($editstart2, $event->start);
-        $this->assertEquals($editend2, $event->end);
+        $this->assertEquals($eventData['event_start_utc'], $event->event_start_utc);
+        $this->assertEquals($eventData['event_end_utc'], $event->event_end_utc);
     }
 
     public function timesProvider() {
