@@ -197,8 +197,8 @@ class PartyController extends Controller
             $event_end_utc = $request->input('event_end_utc');
 
             // Convert the timezone to UTC, because the timezone is not itself stored in the DB.
-            $event_start_utc = Carbon::parse($event_start_utc, $timezone)->setTimezone('UTC')->toIso8601String();
-            $event_end_utc = Carbon::parse($event_end_utc, $timezone)->setTimezone('UTC')->toIso8601String();
+            $event_start_utc = Carbon::parse($event_start_utc)->setTimezone('UTC')->toIso8601String();
+            $event_end_utc = Carbon::parse($event_end_utc)->setTimezone('UTC')->toIso8601String();
 
             $error = [];
 
@@ -234,7 +234,6 @@ class PartyController extends Controller
             $data['longitude'] = $longitude;
 
             $online = $request->has('online');
-            $pax = 0;
             $free_text = $request->input('free_text');
             $venue = $request->input('venue');
             $location = $request->input('location');
@@ -417,8 +416,9 @@ class PartyController extends Controller
             // We might have been passed a timezone; if not then inherit from the current value.
             $timezone = $request->input('timezone', Party::find($id)->timezone);
 
-            $event_start_utc = $request->input('event_start_utc');
-            $event_end_utc = $request->input('event_end_utc');
+            // Convert the timezone to UTC, because the timezone is not itself stored in the DB.
+            $event_start_utc = Carbon::parse($request->input('event_start_utc'))->setTimezone('UTC')->toIso8601String();
+            $event_end_utc = Carbon::parse($request->input('event_end_utc'))->setTimezone('UTC')->toIso8601String();
 
             $update = [
                 'event_start_utc' => $event_start_utc,

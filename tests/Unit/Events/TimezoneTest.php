@@ -5,6 +5,7 @@ namespace Tests\Unit;
 use App\Group;
 use App\Party;
 use App\User;
+use Carbon\Carbon;
 use DB;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Tests\TestCase;
@@ -69,7 +70,7 @@ class TimezoneTest extends TestCase
     /**
      * @dataProvider timesProvider
      */
-    public function testOrder($tz1, $start1, $end1, $tz2, $start2, $end2, $editstart2, $editend2) {
+    public function testOrder($date, $tz1, $start1, $end1, $tz2, $start2, $end2, $editstart2, $editend2) {
         // Two groups in different timezones.
         $g1 = factory(Group::class)->create([
                                                'timezone' => $tz1
@@ -92,8 +93,8 @@ class TimezoneTest extends TestCase
         $this->actingAs($host1);
         $event = factory(Party::class)->raw();
         unset($event['timezone']);
-        $event['event_start_utc'] = (new \DateTime("$date $start1", new \DateTimeZone($tz1)))->toUTCString();
-        $event['event_end_utc'] = (new \DateTime("$date $end1", new \DateTimeZone($tz1)))->toUTCString();
+        $event['event_start_utc'] = (new \DateTime("$date $start1", new \DateTimeZone($tz1)))->format(\DateTimeInterface::ISO8601);
+        $event['event_end_utc'] = (new \DateTime("$date $end1", new \DateTimeZone($tz1)))->format(\DateTimeInterface::ISO8601);
         $event['group'] = $g1->idgroups;
         $response = $this->post('/party/create/', $event);
         $response->assertStatus(302);
@@ -102,8 +103,8 @@ class TimezoneTest extends TestCase
         $event = factory(Party::class)->raw();
         unset($event['timezone']);
         $event['group'] = $g2->idgroups;
-        $event['event_start_utc'] = (new \DateTime("$date $start2", new \DateTimeZone($tz1)))->toUTCString();
-        $event['event_end_utc'] = (new \DateTime("$date $end2", new \DateTimeZone($tz1)))->toUTCString();
+        $event['event_start_utc'] = (new \DateTime("$date $start2", new \DateTimeZone($tz2)))->format(\DateTimeInterface::ISO8601);
+        $event['event_end_utc'] = (new \DateTime("$date $end2", new \DateTimeZone($tz2)))->format(\DateTimeInterface::ISO8601);
         $response = $this->post('/party/create/', $event);
         $response->assertStatus(302);
 
@@ -124,14 +125,14 @@ class TimezoneTest extends TestCase
         // - The UTC fields should be returned, but having converted to UTC and therefore having +00:00.
         // - The timezone should be set.
         $this->assertEquals($tz2, $events[0]['timezone']);
-        $this->assertEquals(strtotime($events[0]['event_start_utc']), (new \DateTime("$date $start2", new \DateTimeZone($tz2)))->format('U'));
-        $this->assertEquals(strtotime($events[0]['event_end_utc']), (new \DateTime("$date $end2", new \DateTimeZone($tz2)))->format('U'));
+        $this->assertEquals(Carbon::parse("$date $start2", $tz2)->setTimezone('UTC')->toIso8601String(), $events[0]['event_start_utc']);
+        $this->assertEquals(Carbon::parse("$date $end2", $tz2)->setTimezone('UTC')->toIso8601String(), $events[0]['event_end_utc']);
         $this->assertStringContainsString('+00:00', $events[0]['event_start_utc']);
         $this->assertStringContainsString('+00:00', $events[0]['event_end_utc']);
 
         $this->assertEquals($tz1, $events[1]['timezone']);
-        $this->assertEquals(strtotime($events[1]['event_start_utc']), (new \DateTime("$date $start1", new \DateTimeZone($tz1)))->format('U'));
-        $this->assertEquals(strtotime($events[1]['event_end_utc']), (new \DateTime("$date $end1", new \DateTimeZone($tz1)))->format('U'));
+        $this->assertEquals(Carbon::parse("$date $start1", $tz1)->setTimezone('UTC')->toIso8601String(), $events[1]['event_start_utc']);
+        $this->assertEquals(Carbon::parse("$date $end1", $tz1)->setTimezone('UTC')->toIso8601String(), $events[1]['event_end_utc']);
         $this->assertStringContainsString('+00:00', $events[1]['event_start_utc']);
         $this->assertStringContainsString('+00:00', $events[1]['event_end_utc']);
 
@@ -141,8 +142,8 @@ class TimezoneTest extends TestCase
         $event = Party::findOrFail($id2);
         $eventData = $event->getAttributes();
         $eventData['id'] = $id2;
-        $eventData['event_start_utc'] = (new \DateTime("$date $editstart2", new \DateTimeZone($tz1)))->toUTCString();
-        $eventData['event_end_utc'] = (new \DateTime("$date $editend2", new \DateTimeZone($tz1)))->toUTCString();
+        $eventData['event_start_utc'] = (new \DateTime("$date $editstart2", new \DateTimeZone($tz1)))->format(\DateTimeInterface::ISO8601);
+        $eventData['event_end_utc'] = (new \DateTime("$date $editend2", new \DateTimeZone($tz1)))->format(\DateTimeInterface::ISO8601);
         $response2 = $this->post('/party/edit/'.$event->idevents, $eventData);
         $event->refresh();
         $this->assertEquals($editstart2, $event->start);
