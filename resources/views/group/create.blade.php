@@ -18,7 +18,7 @@
           <div class="col-12 col-md-12">
               <div class="d-flex align-items-center">
                   <h1 class="mb-0 mr-30">
-                      Create a new group
+                    @lang('general.new_group')
                   </h1>
               </div>
           </div>
@@ -74,7 +74,7 @@
                             <div class="col-lg-7">
                               <div class="form-group">
                                 <label for="autocomplete">@lang('groups.location'):</label>
-                                <input type="text" placeholder="Enter your address" id="autocomplete" name="location" class="form-control field field-geolocate" aria-describedby="locationHelpBlock"  />
+                                <input type="text" placeholder="@lang('groups.groups_location_placeholder')" id="autocomplete" name="location" class="form-control field field-geolocate" aria-describedby="locationHelpBlock"  />
 
                                 <small id="locationHelpBlock" class="form-text text-muted">
                                   @lang('groups.groups_location_small')

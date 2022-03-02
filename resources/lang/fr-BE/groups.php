@@ -189,4 +189,14 @@ return [
   'delete_group_confirm' => 'Veuillez confirmer que vous voulez supprimer :name',
   'delete_succeeded' => 'Repair Café <strong>:name</strong> a été supprimé.',
   'duplicate' => 'Ce nom (:name) existe déjà.  Si c\'est le vôtre, veuillez vous rendre dans la page Repair Cafés, utiliser le menu et l\'éditer.',
+  'geocode_failed' => 'L\'adresse que vous avez encodée n\'a pas pu être trouvée. Veuillez essayer une adresse plus générale.',
+  'invitation_pending' => 'Vous avez une invitation à rejoindre ce Repair Café. Cliquez <a href=":accept">ici</a> si vous voulez le rejoindre.',
+  'nearest_groups' => 'Ce sont les Repair Cafés qui se trouvent dans un rayon de 50km autour de :location',
+  'nearest_groups_change' => '(change)',
+  'discourse_title' => 'Ceci est une discussion de groupe pour chaque personne qui suit le Repair Café :group.
+
+Trouvez la page principale du Repair Café ici: :link.
+
+Apprenez comment utiliser la page du Repair Café ici: :help',
+  'talk_group_add_title' => 'Bienvenue sur :group_name',
 ];

@@ -28,6 +28,7 @@ return [
   'groups_website_small' => 'Don\'t have a website? Feel free to add a Facebook group or similar',
   'groups_group_small' => 'A couple of examples include \'Restarters Torino\' or \'Nottingham Fixers\'',
   'groups_location' => 'Location',
+  'groups_location_placeholder' => 'Enter your address',
   'location' => 'Group location',
   'area' => 'Area',
   'groups_frequency' => 'Frequency',
@@ -73,6 +74,7 @@ return [
   'infographic_message' => 'An infographic of an easy-to-understand equivalent of the CO<sub>2</sub> emissions that your group has prevented, such as equivalent number of cars manufactured.',
   'headline_stats_message' => 'This widget shows the headline stats for your group e.g. the number of participants at your parties; the hours volunteered',
   'edit_group' => 'Edit group',
+  'editing' => 'Editing',
   'edit_group_save_changes' => 'Save changes',
   'edit_group_text' => 'Go ahead and change or improve your group\'s profile.',
   'delete_group' => 'Delete group',
@@ -193,8 +195,14 @@ return [
   'nearest_groups_change' => '(change)',
   'invitation_pending' => 'You have an invitation to this group.  Please click <a href=":accept">here</a> if you would like to join.',
   'geocode_failed' => 'The address you entered could not be found. Please try a more general address.',
-  'discourse_title' => "This is a discussion group for anyone who follows :group.\n\nFind the group's main page here: :link.\n\nLearn how to use this group here: :help\n\n",
+  'discourse_title' => 'This is a discussion group for anyone who follows :group.
+
+Find the group\'s main page here: :link.
+
+Learn how to use this group here: :help
+
+',
   'talk_group' => 'View group conversation',
   'talk_group_add_title' => 'Welcome to :group_name',
-  'talk_group_add_body' => 'Thank you for following :group_name! You will now receive notifications when new events are planned and will be added to group messages. <a href="https://talk.restarters.net/t/how-to-communicate-with-your-repair-group/6293">Learn how group messages work and how to change your notification settings</a>.'
+  'talk_group_add_body' => 'Thank you for following :group_name! You will now receive notifications when new events are planned and will be added to group messages. <a href="https://talk.restarters.net/t/how-to-communicate-with-your-repair-group/6293">Learn how group messages work and how to change your notification settings</a>.',
 ];

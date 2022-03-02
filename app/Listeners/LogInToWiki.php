@@ -48,6 +48,7 @@ class LogInToWiki
         if ($user->wiki_sync_status == WikiSyncStatus::CreateAtLogin) {
             Log::info("Need to create " . $user->name);
             $this->createUserInWiki($user);
+            $user->refresh();
         }
 
         if (! is_null($user->mediawiki) && ! empty($user->mediawiki) &&
