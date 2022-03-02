@@ -30,7 +30,7 @@ Route::get('/outbound/info/{type}/{id}/{format?}', function ($type, $id, $format
 });
 
 Route::group(['middleware' => 'auth:api'], function () {
-    Route::get('/users/me', 'ApiController@getUserInfo');
+    Route::get('/users/me', 'ApiController@getUserInfo'); // Not used but worth keeping and tested.
     Route::get('/users', 'ApiController@getUserList');
     Route::get('/users/changes', 'API\UserController@changes'); // Used by Zapier
     Route::put('/users/{id}', 'API\UserController@update');

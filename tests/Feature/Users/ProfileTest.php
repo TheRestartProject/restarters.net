@@ -207,4 +207,23 @@ class ProfileTest extends TestCase
             [ TRUE, 1 ],
         ];
     }
+
+    public function testAPI() {
+        $user = factory(User::class)->states('Restarter')->create([
+                                                                      'api_token' => '1234',
+                                                                  ]);
+        $this->actingAs($user);
+        $response = $this->get('/api/users/me?api_token=1234');
+        $response->assertSuccessful();
+        $ret = json_decode($response->getContent(), TRUE);
+        self::assertEquals($user->id, $ret['id']);
+        self::assertEquals($user->email, $ret['email']);
+        self::assertEquals($user->name, $ret['name']);
+
+        $response = $this->get('/api/users');
+        $response->assertSuccessful();
+        $ret = json_decode($response->getContent(), TRUE);
+        self::assertEquals(1, count($ret));
+        self::assertEquals($user->id, $ret[0]['id']);
+    }
 }
