@@ -335,9 +335,6 @@ Route::group(['middleware' => ['auth', 'verifyUserConsent']], function () {
     //Search Controller
     Route::get('/search', 'SearchController@index');
 
-    //AJAX Controller
-    Route::get('/ajax/restarters_in_group', 'AjaxController@restarters_in_group');
-
     //Export Controller
     Route::get('/export/parties', 'ExportController@parties');
     Route::get('/reporting/time-volunteered', 'ExportController@getTimeVolunteered');
