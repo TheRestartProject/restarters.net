@@ -167,6 +167,19 @@ Route::prefix('battcat')->group(function () {
     Route::get('/status', 'BattcatOraController@status');
 });
 
+Route::prefix('DustUp')->group(function () {
+    Route::get('/', 'DustupOraController@index');
+    Route::post('/', 'DustupOraController@index');
+    Route::get('/survey', 'DustupOraController@survey');
+    Route::get('/status', 'DustupOraController@status');
+});
+Route::prefix('dustup')->group(function () {
+    Route::get('/', 'DustupOraController@index');
+    Route::post('/', 'DustupOraController@index');
+    Route::get('/survey', 'DustupOraController@survey');
+    Route::get('/status', 'DustupOraController@status');
+});
+
 Route::group(['middleware' => ['guest']], function () {
     Route::get('/', 'HomeController@index')->name('home');
     Route::get('/about', 'HomeController@index')->name('home');
