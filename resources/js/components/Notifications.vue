@@ -50,7 +50,7 @@ export default {
       type: Number,
       required: true
     },
-    discourseUrl: {
+    discourseBaseUrl: {
       type: String,
       required: true
     },
@@ -67,12 +67,11 @@ export default {
   },
   computed: {
     url () {
-      return this.discourseUrl + '/session/sso?return_path=' + this.discourseUrl + '/u/' + this.discourseUserName + '/notifications'
+      return this.discourseBaseUrl + '/session/sso?return_path=' + this.discourseBaseUrl + '/u/' + this.discourseUserName + '/notifications'
     },
   },
   async mounted() {
     const ret = await axios.get('/api/users/notifications/' + this.userId)
-    console.log("Returned", ret)
 
     if (ret.data.success) {
       this.restartersNotifications = ret.data.restarters

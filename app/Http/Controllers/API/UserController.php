@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\User;
 use Auth;
 use Illuminate\Http\Request;
+use Cache;
 
 class UserController extends Controller
 {
@@ -151,7 +152,7 @@ class UserController extends Controller
                             }
                         }
 
-                        Cache::put('talk_notification_' . $user->username, $discourseNotifications, 600);
+                        Cache::put('talk_notification_' . $user->username, $discourseNotifications, 60);
                     }
                 }
             }

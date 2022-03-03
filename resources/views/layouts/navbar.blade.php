@@ -84,7 +84,7 @@
     @else
       <li class="d-flex">
           <div class="vue">
-            <Notifications :user-id="{{{ Auth::user()->id }}}" discourse-url="{{{ env('DISCOURSE_URL') }}}" discourse-user-name="{{{ Auth::user()->username }}}" />
+            <Notifications :user-id="{{{ Auth::user()->id }}}" discourse-base-url="{{{ env('DISCOURSE_URL') }}}" discourse-user-name="{{{ Auth::user()->username }}}" />
           </div>
       </li>
 
