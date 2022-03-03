@@ -78,14 +78,14 @@
                 </div>
                 <div class="task-step-info panel" id="step1-info">
                     <div class="row text-left">
+                        <div class="col-12 col-md-4">
+                            <span class="label">@lang('dustupora.task.status'):</span> <span class="repair-status span-{{ $status_class }}">@lang($fault->repair_status)</span>
+                        </div>
                         @if (!empty($fault->brand && $fault->brand !== 'Unknown'))
                         <div class="col-12 col-md-4">
                             <span class="label">@lang('dustupora.task.brand'):</span> <span class="brand">{{ $fault->brand }}</span>
                         </div>
                         @endif
-                        <div class="col-12 col-md-4">
-                            <span class="label">@lang('dustupora.task.status'):</span> <span class="repair-status span-{{ $status_class }}">@lang($fault->repair_status)</span>
-                        </div>
                     </div>
                     <div class="row">
                         <div class="col">
