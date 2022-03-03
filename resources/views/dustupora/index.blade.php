@@ -64,7 +64,7 @@
 
         @if ($fault)
         @php( $status_class = "repairable" )
-        <div class="battcat-layout">
+        <div class="battcat-layout battcat-layout-{{ $status_class }}">
             <div class="task-step" id="step1">
                 <div class="task-step-help" id="step1-help">
                     <div class="task-step-help-text">
