@@ -25,7 +25,7 @@ return [
     'thankyou_user' => 'Thank you! <a href="https://survey.actionproject.eu/chat/?data=U2FsdGVkX1%207YCj%20CRieUSNsHbebWsbk97sB4QRw%2F%206soz4B9MsCqwSYA2WEWYjmPruZ%20bkR8PKsQbSX5dPmLQ%3D%3D">Please take our survey</a>',
     'thankyou_guest' => 'Thank you for helping! Every fault you categorise makes this data more useful. Why not <a href="../">join our community</a> too?',
     'progress_title' => 'Our progress',
-    'progress_subtitle' => 'The percentage of vacuum cleaners we have classified so far',
+    'progress_subtitle' => 'The percentage of vacuum cleaner problems we have classified so far',
     'title' => 'DustUp: categorise vacuum cleaner problems',
   ],
   'status' => [
