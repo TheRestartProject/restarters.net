@@ -13,19 +13,19 @@ use Illuminate\Http\Request;
 |
 */
 
-Route::get('/homepage_data', function () { // Used from DeviceController.
+Route::get('/homepage_data', function () { // Used from DeviceController, tested.
     return App\Http\Controllers\ApiController::homepage_data();
 });
 
-Route::get('/party/{id}/stats', function ($id) {
+Route::get('/party/{id}/stats', function ($id) { // Not used but worth keeping, tested.
     return App\Http\Controllers\ApiController::partyStats($id);
 });
 
-Route::get('/group/{id}/stats', function ($id) {
+Route::get('/group/{id}/stats', function ($id) { // Not used but worth keeping, tested.
     return App\Http\Controllers\ApiController::groupStats($id);
 });
 
-Route::get('/outbound/info/{type}/{id}/{format?}', function ($type, $id, $format = 'fixometer') {
+Route::get('/outbound/info/{type}/{id}/{format?}', function ($type, $id, $format = 'fixometer') { // Used from share plugins, tested.
     return App\Http\Controllers\OutboundController::info($type, $id, $format);
 });
 
