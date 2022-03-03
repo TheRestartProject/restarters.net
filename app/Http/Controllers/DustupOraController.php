@@ -36,6 +36,7 @@ class DustupOraController extends Controller
             $user = $this->_anon();
         }
         // if survey is being submitted
+        $thankyou = false;
         if ($request->has('task-survey')) {
             $inputs = $request->all();
             unset($inputs['_token']);
@@ -54,6 +55,7 @@ class DustupOraController extends Controller
                 logger('MicrotaskSurvey error on insert.');
                 logger(print_r($insert, 1));
             }
+            $thankyou = 'guest';
         }
 
         $this->Model = new DustupOra;
@@ -103,6 +105,7 @@ class DustupOraController extends Controller
         if (! $fault) {
             return redirect()->action('DustupOraController@status')->withSuccess('done');
         }
+        $progress = $this->Model->fetchProgress()[0]->total;
 
         $fault->translate = rawurlencode($fault->problem);
         $fault_types = $this->Model->fetchFaultTypes();
@@ -124,7 +127,9 @@ class DustupOraController extends Controller
             'fault' => $fault,
             'poor_data' => $poor_data,
             'user' => $user,
+            'progress' => $progress > 1 ? $progress : 0,
             'signpost' => $signpost,
+            'thankyou' => $thankyou,
             'locale' => $this->_getUserLocale(),
         ]);
     }

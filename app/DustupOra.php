@@ -99,6 +99,41 @@ LIMIT 1;
         return DB::select('SELECT * FROM `fault_types_vacuums` WHERE `id`=25');
     }
 
+
+
+    /**
+     * @return array
+     */
+    public function fetchProgress()
+    {
+        $result = DB::select('
+SELECT
+ROUND((r2.opinions/r2.vacuums)*100,1) as total
+FROM (
+SELECT
+COUNT(*) AS opinions,
+(SELECT COUNT(*) FROM devices_dustup_ora) as vacuums
+FROM (
+SELECT
+o.id_ords,
+(SELECT a.fault_type_id FROM devices_faults_vacuums_ora_adjudicated a WHERE a.id_ords = o.id_ords) AS adjudicated_opinion_id,
+(SELECT o1.fault_type_id FROM devices_faults_vacuums_ora_opinions o1 WHERE o1.id_ords = o.id_ords GROUP BY o1.fault_type_id ORDER BY COUNT(o1.fault_type_id) DESC LIMIT 1) AS winning_opinion_id,
+ROUND((SELECT COUNT(o3.fault_type_id) as top_crowd_opinion_count FROM devices_faults_vacuums_ora_opinions o3 WHERE o3.id_ords = o.id_ords GROUP BY o3.fault_type_id ORDER BY top_crowd_opinion_count DESC LIMIT 1) /
+(SELECT COUNT(o4.fault_type_id) as all_votes FROM devices_faults_vacuums_ora_opinions o4 WHERE o4.id_ords = o.id_ords) * 100) AS top_crowd_opinion_percentage,
+COUNT(o.fault_type_id) AS all_crowd_opinions_count
+FROM devices_faults_vacuums_ora_opinions o
+GROUP BY o.id_ords
+HAVING
+(all_crowd_opinions_count > 1 AND top_crowd_opinion_percentage > 60)
+OR
+(all_crowd_opinions_count = 3 AND top_crowd_opinion_percentage < 60 AND adjudicated_opinion_id IS NOT NULL)
+) AS r1
+) AS r2
+');
+
+        return $result;
+    }
+
     /**
      * @return mixed
      */
