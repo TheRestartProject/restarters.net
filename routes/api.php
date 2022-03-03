@@ -13,7 +13,7 @@ use Illuminate\Http\Request;
 |
 */
 
-Route::get('/homepage_data', function () {
+Route::get('/homepage_data', function () { // Used from DeviceController.
     return App\Http\Controllers\ApiController::homepage_data();
 });
 
@@ -31,13 +31,12 @@ Route::get('/outbound/info/{type}/{id}/{format?}', function ($type, $id, $format
 
 Route::group(['middleware' => 'auth:api'], function () {
     Route::get('/users/me', 'ApiController@getUserInfo'); // Not used but worth keeping and tested.
-    Route::get('/users', 'ApiController@getUserList');
+    Route::get('/users', 'ApiController@getUserList');  // Not used but worth keeping and tested.
     Route::get('/users/changes', 'API\UserController@changes'); // Used by Zapier
-    Route::put('/users/{id}', 'API\UserController@update');
 
     Route::get('/networks/{network}/stats/', 'API\NetworkController@stats');  // Used by Repair Together.
 
-    Route::get('/groups', 'API\GroupController@getGroupList');
+    Route::get('/groups', 'API\GroupController@getGroupList'); // Not used but worth keeping and tested.
     Route::get('/groups/changes', 'API\GroupController@getGroupChanges'); // Used by Zapier
 
     Route::get('/groups/network/', 'API\GroupController@getGroupsByUsersNetworks'); // Used by Repair Together.
