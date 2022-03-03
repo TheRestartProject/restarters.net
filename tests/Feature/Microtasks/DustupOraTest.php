@@ -96,8 +96,34 @@ class DustupOraTest extends TestCase
         $response->assertRedirect(url()->current() . '/status');
     }
 
+
     /** @test */
     public function fetch_dustupora_status()
+    {
+        $fault_types = $this->_setup_fault_types();
+        $data = $this->_setup_devices();
+        $opinions = $this->_setup_opinions($data);
+        $BattcatOra = new DustupOra;
+        $result = $BattcatOra->fetchStatus();
+        $this->assertTrue(is_array($result), 'fetch_dustupora_status: result is not array');
+        foreach ($opinions['status'] as $k => $v) {
+            $this->assertTrue(isset($result, $k), 'fetch_dustupora_status: missing key - '.$k);
+            if ($k == 'list_recats') {
+                $this->assertTrue(is_array($result[$k]), 'fetch_dustupora_status: not array - '.$k);
+                foreach ($v[0] as $key => $val) {
+                    $this->assertTrue(property_exists($result[$k][0], $key), 'fetch_dustupora_status #'.$k.': missing key - '.$key);
+                    $this->assertEquals($val, $result[$k][0]->{$key}, 'fetch_dustupora_status #'.$k.': wrong '.$key);
+                }
+            } else {
+                $this->assertEquals(1, count($result[$k]), 'fetch_dustupora_status: wrong array count '.$k);
+                $this->assertTrue(is_object($result[$k][0]), 'fetch_dustupora_status: not object '.$k);
+                $this->assertTrue(property_exists($result[$k][0], 'total'), 'fetch_dustupora_status #'.$k.': missing key - total');
+                $this->assertEquals($v, $result[$k][0]->total, 'fetch_dustupora_status: wrong total for '.$k);
+            }
+        }
+    }
+
+    public function fetch_dustupora_statusX()
     {
         $fault_types = $this->_setup_fault_types();
         $data = $this->_setup_devices();
@@ -403,26 +429,15 @@ class DustupOraTest extends TestCase
 
         $status = [
             'total_devices' => 8,
-            'total_opinions_3' => 4,
-            'total_opinions_2' => 2,
-            'total_opinions_1' => 1,
-            'total_opinions_0' => 1,
+            'total_opinions' => 17,
             'total_recats' => 4,
             'list_recats' => [
                 0 => [
                     'winning_opinion' => 'Motor',
-                    'total' => 4,
+                    'total' => 2,
                 ],
             ],
-            'total_splits' => 1,
-            'list_splits' => [
-                0 => [
-                    'id_ords' => $data[2]['id_ords'],
-                    'all_crowd_opinions_count' => 3,
-                    'opinions' => 'Motor,Other,Poor data',
-                ],
-            ],
-            'progress' => 63,
+            'progress' => 50,
         ];
 
         return [
