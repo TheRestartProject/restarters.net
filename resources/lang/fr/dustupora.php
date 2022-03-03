@@ -3,8 +3,6 @@
 return [
   'task' => [
     'subtitle' => 'Un volontaire a essayé de réparer cet appareil dans un Repair Café et a écrit cette description.',
-    'question-endoflife' => 'Qu\'est-ce qui a empêché la réparation de cet appareil?',
-    'question-repairable' => 'Quelle est la prochaine étape pour réparer cet appareil?',
     'fetch_another' => 'Je ne sais pas, chercher une autre réparation',
     'translate' => 'Traduire',
     'go_with' => 'Aller avec',

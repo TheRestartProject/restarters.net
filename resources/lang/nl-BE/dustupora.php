@@ -3,8 +3,6 @@
 return [
   'task' => [
     'subtitle' => 'Een vrijwilliger probeerde dit toestel te repareren in een Repair Café en schreef deze beschrijving.',
-    'question-endoflife' => 'Waardoor kon dit toestel niet worden gerepareerd?',
-    'question-repairable' => 'Wat is de volgende stap om dit toetel te repareren?',
     'fetch_another' => 'Ik weet het niet, haal nog een reparatie',
     'translate' => 'Vertalen',
     'go_with' => 'Ga mee',

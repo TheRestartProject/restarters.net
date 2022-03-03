@@ -22,7 +22,7 @@
 
 @section('content')
 
-<section class="dustup">
+<section class="battcat">
     <div class="container mt-1 mt-sm-2">
         <div class="row row-compressed align-items-center">
             <div class="col-12 col-md-9 order-12 order-md-1 mt-2 mt-md-0">
@@ -63,8 +63,8 @@
         @endif
 
         @if ($fault)
-        @php( $status_class = $fault->repair_status == "Repairable" ? "repairable" : "endoflife" )
-        <div class="dustup-layout dustup-layout-{{ $status_class }}">
+        @php( $status_class = "repairable" )
+        <div class="battcat-layout">
             <div class="task-step" id="step1">
                 <div class="task-step-help" id="step1-help">
                     <div class="task-step-help-text">
@@ -78,9 +78,6 @@
                 </div>
                 <div class="task-step-info panel" id="step1-info">
                     <div class="row text-left">
-                        <!-- <div class="col-12 col-md-4">
-                            <span class="label">@lang('dustupora.task.device'):</span> <span class="category">@lang($fault->product_category)</span>
-                        </div> -->
                         @if (!empty($fault->brand && $fault->brand !== 'Unknown'))
                         <div class="col-12 col-md-4">
                             <span class="label">@lang('dustupora.task.brand'):</span> <span class="brand">{{ $fault->brand }}</span>
@@ -118,16 +115,9 @@
                         <div class="number">2</div>
                         <div>
                             <strong>
-                                @if ($fault->repair_status == "Repairable")
-                                @lang('dustupora.task.question-repairable')
-                                @else
-                                @lang('dustupora.task.question-endoflife')
-                                @endif
+                                <p>@lang('dustupora.task.step2-extra')</p>
                             </strong>
                         </div>
-                    </div>
-                    <div>
-                        <p>@lang('dustupora.task.step2-extra')</p>
                     </div>
                 </div>
                 <div id="step2-info" class="panel text-center">

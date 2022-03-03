@@ -3,8 +3,6 @@
 return [
   'task' => [
     'subtitle' => 'Un volontario ha cercato di riparare questo dispositivo ad un Restart Party e ha scritto questa descrizione.',
-    'question-endoflife' => 'Cosa ha impedito la riparazione di questo dispositivo?',
-    'question-repairable' => 'Qual è il prossimo passo per riparare questo dispositivo?',
     'fetch_another' => 'Non lo so, vai a prendere un\'altra riparazione',
     'translate' => 'Tradurre',
     'go_with' => 'Vai con',

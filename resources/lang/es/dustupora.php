@@ -3,8 +3,6 @@
 return [
   'task' => [
     'subtitle' => 'Un voluntario intentó arreglar este dispositivo en un evento de reparación y escribió esta descripción.',
-    'question-endoflife' => '¿Qué ha impedido la reparación de este dispositivo?',
-    'question-repairable' => '¿Cuál es el siguiente paso para reparar este dispositivo?',
     'fetch_another' => 'No lo sé. Mostrar otra reparación',
     'translate' => 'Traducir',
     'go_with' => 'Elegir',

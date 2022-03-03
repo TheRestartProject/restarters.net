@@ -3,8 +3,6 @@
 return [
   'task' => [
     'subtitle' => 'A volunteer tried to fix this vacuum cleaner at a community repair event and wrote this description.',
-    'question-endoflife' => 'What prevented this vacuum cleaner from being repaired?',
-    'question-repairable' => 'What are the next steps?',
     'fetch_another' => 'I don\'t know',
     'translate' => 'Translate',
     'go_with' => 'Go with',
