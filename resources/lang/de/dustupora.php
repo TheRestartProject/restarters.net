@@ -21,7 +21,6 @@ return [
     'thankyou_user' => 'Vielen Dank an Sie! <a href="https://survey.actionproject.eu/chat/?data=U2FsdGVkX1%207YCj%20CRieUSNsHbebWsbk97sB4QRw%2F%206soz4B9MsCqwSYA2WEWYjmPruZ%20bkR8PKsQbSX5dPmLQ%3D%3D">Bitte nehmen Sie an unserer Umfrage teil</a>',
     'thankyou_guest' => 'Vielen Dank für Ihre Hilfe! Jeder Fehler, den Sie kategorisieren, macht diese Daten noch nützlicher. <a href="../">Werden Sie doch auch Mitglied unserer Community</a>.',
     'brand' => 'Brand',
-    'device' => 'Gerät',
     'problem' => 'Beschreibung des Problems',
     'progress_subtitle' => 'Der Prozentsatz der Geräte, die wir bisher klassifiziert haben',
     'progress_title' => 'Unser Fortschritt',

@@ -54,6 +54,11 @@ return [
       'description' => '<p>We see lots of broken devices at community repair events that have a battery problem. But what\'s causing the batteries to fail and what could make them easier to fix or replace? Help us figure out the most common issues we see with batteries with BattCat!</p> <p>The repair data in BattCat comes from around the world, via partners of the <a target="_blank" style="color:#212529;text-decoration:underline" href="https://openrepair.org">Open Repair Alliance</a>.</p>',
       'get_involved' => 'Get involved',
     ],
+    'dustup' => [
+      'title' => 'Help Now! DustUp',
+      'description' => '<p>We see lots of broken vacuum cleaners at community repair events. But what\'s causing them to break and what could make them easier to fix? Help us figure out the most common issues we see with vacuum cleaners with DustUp!</p> <p>The repair data in DustUp comes from around the world, via partners of the <a target="_blank" style="color:#212529;text-decoration:underline" href="https://openrepair.org">Open Repair Alliance</a>.</p>',
+      'get_involved' => 'Get involved',
+    ],
   ],
   'discussion' => [
     'title' => 'What\'s happening',

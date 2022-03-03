@@ -21,7 +21,6 @@ return [
     'thankyou_user' => 'Bedankt! <a href="https://survey.actionproject.eu/chat/?data=U2FsdGVkX1%207YCj%20CRieUSNsHbebWsbk97sB4QRw%2F%206soz4B9MsCqwSYA2WEWYjmPruZ%20bkR8PKsQbSX5dPmLQ%3D%3D">Vul onze enquête in</a>',
     'thankyou_guest' => 'Bedankt voor uw hulp! Elke fout die u categoriseert maakt de gegevens nuttiger. <a href="../">Waarom wordt u ook geen lid van onze community</a>?',
     'brand' => 'Merk',
-    'device' => 'Toestel',
     'problem' => 'Beschrijving van het probleem',
     'progress_subtitle' => 'Het percentage toestellen dat we tot nu toe hebben geclassificeerd',
     'progress_title' => 'Onze vooruitgang',

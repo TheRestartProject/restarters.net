@@ -78,9 +78,9 @@
                 </div>
                 <div class="task-step-info panel" id="step1-info">
                     <div class="row text-left">
-                        <div class="col-12 col-md-4">
+                        <!-- <div class="col-12 col-md-4">
                             <span class="label">@lang('dustupora.task.device'):</span> <span class="category">@lang($fault->product_category)</span>
-                        </div>
+                        </div> -->
                         @if (!empty($fault->brand && $fault->brand !== 'Unknown'))
                         <div class="col-12 col-md-4">
                             <span class="label">@lang('dustupora.task.brand'):</span> <span class="brand">{{ $fault->brand }}</span>

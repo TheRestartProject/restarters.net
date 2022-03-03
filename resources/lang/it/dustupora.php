@@ -21,7 +21,6 @@ return [
     'thankyou_user' => 'Grazie! Per favore, <a href="https://survey.actionproject.eu/chat/?data=U2FsdGVkX1%207YCj%20CRieUSNsHbebWsbk97sB4QRw%2F%206soz4B9MsCqwSYA2WEWYjmPruZ%20bkR8PKsQbSX5dPmLQ%3D%3D">partecipa al nostro sondaggio</a>',
     'thankyou_guest' => 'Grazie per il tuo aiuto! Ogni difetto che classifichi rende questi dati più utili. Perché non ti <a href="../">unisci anche tu alla nostra comunità</a>?',
     'brand' => 'Marca',
-    'device' => 'Dispositivo',
     'problem' => 'Descrizione del problema',
     'progress_subtitle' => 'La percentuale di dispositivi che abbiamo classificato finora',
     'progress_title' => 'Il nostro progresso',
