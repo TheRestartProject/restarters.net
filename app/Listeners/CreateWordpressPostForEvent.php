@@ -63,7 +63,7 @@ class CreateWordpressPostForEvent
                 ['key' => 'party_grouphash', 'value' => $theParty->group],
                 ['key' => 'party_venue', 'value' => $theParty->venue],
                 ['key' => 'party_location', 'value' => $theParty->location],
-                ['key' => 'party_time', 'value' => $theParty->getEventStartEndLocal() . ' (' . $theParty->timezone . ')'],
+                ['key' => 'party_time', 'value' => $theParty->getEventStartEndLocal()],
                 ['key' => 'party_groupcountry', 'value' => $group->country],
                 ['key' => 'party_groupcity', 'value' => $group->area],
                 ['key' => 'party_date', 'value' => $theParty->event_date_local],

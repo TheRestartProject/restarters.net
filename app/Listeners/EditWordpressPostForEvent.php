@@ -61,7 +61,7 @@ class EditWordpressPostForEvent
                     ['key' => 'party_groupcity', 'value' => $group->area],
                     ['key' => 'party_venue', 'value' => $data['venue']],
                     ['key' => 'party_location', 'value' => $data['location']],
-                    ['key' => 'party_time', 'value' => $theParty->getEventStartEndLocal() . ' (' . $theParty->timezone . ')'],
+                    ['key' => 'party_time', 'value' => $theParty->getEventStartEndLocal()],
                     ['key' => 'party_date', 'value' => $theParty->event_date_local],
                     ['key' => 'party_timestamp', 'value' => $startTimestamp],
                     ['key' => 'party_timestamp_end', 'value' => $endTimestamp],
