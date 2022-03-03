@@ -660,7 +660,7 @@ class PartyController extends Controller
     public function generateAddToCalendarLinks($event)
     {
         try {
-            $link = Link::create(trim(addslashes($event->getEventName())), $event->event_start_utc, $event->event_end_utc)
+            $link = Link::create(trim(addslashes($event->getEventName())), new DateTime($event->event_start_utc), new DateTime($event->event_end_utc))
                             ->description(trim(addslashes(strip_tags($event->free_text))))
                                 ->address(trim(addslashes($event->location)));
 
