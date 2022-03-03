@@ -21,6 +21,7 @@ class GroupViewTest extends TestCase
         $response = $this->get("/group/view/$id");
 
         $this->assertVueProperties($response, [
+            [],
             [
                 ':idgroups' => $id,
                 ':canedit' => 'true',
@@ -54,6 +55,7 @@ class GroupViewTest extends TestCase
         // Groups are deletable unless they have an event with a device.
         $response = $this->get("/group/view/$id");
         $this->assertVueProperties($response, [
+            [],
             [
                 ':idgroups' => $id,
                 ':can-see-delete' => 'true',
@@ -69,6 +71,7 @@ class GroupViewTest extends TestCase
                                                                               ]));
         $response = $this->get("/group/view/$id");
         $this->assertVueProperties($response, [
+            [],
             [
                 ':idgroups' => $id,
                 ':can-see-delete' => 'true',
@@ -89,6 +92,7 @@ class GroupViewTest extends TestCase
             $this->actingAs($user);
             $response = $this->get("/group/view/$id");
             $this->assertVueProperties($response, [
+                [],
                 [
                     ':idgroups' => $id,
                     ':can-see-delete' => 'false',
