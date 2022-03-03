@@ -30,7 +30,7 @@
 </style>
 @section('content')
 
-<section class="dustup">
+<section class="battcat">
     <div class="container mt-1 mt-sm-4">
         <div class="row row-compressed align-items-center">
             <div class="col-5">
