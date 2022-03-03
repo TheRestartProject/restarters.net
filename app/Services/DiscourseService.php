@@ -378,7 +378,7 @@ class DiscourseService
 
                             $response = $client->request('DELETE', "/admin/groups/$discourseId/members.json", [
                                 'form_params' => [
-                                    'usernames' => [ $discourseMember ]
+                                    'user_id' => $d['id']
                                 ]
                             ]);
 
