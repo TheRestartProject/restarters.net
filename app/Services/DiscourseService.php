@@ -399,7 +399,9 @@ class DiscourseService
                             if ($d['owner'] && !$shouldBeOwner) {
                                 Log::info("Remove $discourseMember as admin of {$discourseId} {$discourseName}");
                                 $response = $client->request('DELETE', "/admin/groups/$discourseId/owners.json", [
-                                    'user_id' => $d['id']
+                                    'form_params' => [
+                                        'user_id' => $d['id']
+                                    ]
                                 ]);
 
                                 Log::info('Response status: ' . $response->getStatusCode());
