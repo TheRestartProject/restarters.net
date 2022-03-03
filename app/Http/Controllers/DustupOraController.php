@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App;
+use App\Helpers\Microtask;
 use App\MicrotaskSurvey;
 use App\DustupOra;
 use Auth;
@@ -33,7 +34,12 @@ class DustupOraController extends Controller
         if (Auth::check()) {
             $user = Auth::user();
         } else {
-            $user = $this->_anon();
+            // $user = $this->_anon();
+            // $request->session()->flush();
+            $user = Microtask::getAnonUserCta($request);
+            if ($user->action) {
+                return redirect()->action('DustupOraController@cta');
+            }
         }
         // if survey is being submitted
         $thankyou = false;
