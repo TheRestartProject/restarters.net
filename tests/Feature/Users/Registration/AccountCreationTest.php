@@ -30,6 +30,14 @@ class AccountCreationTest extends TestCase
         $user = User::latest()->first();
         $this->assertEquals(51.507, round($user->latitude, 3));
         $this->assertEquals(-0.128, round($user->longitude, 3));
+
+        // No notifications immediately after creation.
+        $response2 = $this->get('/api/users/notifications/' . $user->id);
+        $this->assertEquals([
+                                'success' => 'success',
+                                'restarters' => 0,
+                                'discourse' => 0
+                            ], json_decode($response2->getContent(), TRUE));
     }
 
     public function testWorkbenchThenRegister()
