@@ -34,9 +34,9 @@
     <div class="container mt-1 mt-sm-4">
         <div class="row row-compressed align-items-center">
             <div class="col-5">
-                <!-- <h1 class="pull-left">DustUp @lang('dustupora.status.status')
+                <h1 class="pull-left">DustUp @lang('dustupora.status.status')
                     <img id="dustup" class="pull-left d-none d-lg-block" src="{{ asset('/images/dustupora/paw-prints.png') }}" alt="DustUp status" />
-                </h1> -->
+                </h1>
             </div>
             <div class="col-7 text-right">
                 <a id="btn-info-open" data-toggle="modal" data-target="#dustuporaInfoModal" class="btn btn-primary ml-2">
