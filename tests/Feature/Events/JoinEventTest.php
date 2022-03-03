@@ -36,6 +36,7 @@ class JoinEventTest extends TestCase
         // Should now show attendance on the event page.
         $response = $this->get('/party/view/'.$event->idevents);
         $this->assertVueProperties($response, [
+            [],
             [
                 ':is-attending' => 'true',
             ],
@@ -45,6 +46,7 @@ class JoinEventTest extends TestCase
         $this->followingRedirects();
         $response = $this->get('/party/cancel-invite/'.$event->idevents);
         $this->assertVueProperties($response, [
+            [],
             [
                 ':is-attending' => 'false',
             ],

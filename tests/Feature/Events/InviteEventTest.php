@@ -101,7 +101,7 @@ class InviteEventTest extends TestCase
 
         // ...should show up in the list of events with an invitation as we have not yet accepted.
         $response3 = $this->get('/party');
-        $events = $this->getVueProperties($response3)[0][':initial-events'];
+        $events = $this->getVueProperties($response3)[1][':initial-events'];
         $this->assertNotFalse(strpos($events, '"attending":false'));
         $this->assertNotFalse(strpos($events, '"invitation"'));
 
@@ -113,7 +113,7 @@ class InviteEventTest extends TestCase
 
         // Now should show.
         $response5 = $this->get('/party');
-        $events = $this->getVueProperties($response5)[0][':initial-events'];
+        $events = $this->getVueProperties($response5)[1][':initial-events'];
         $this->assertNotFalse(strpos($events, '"attending":true'));
     }
 
