@@ -353,7 +353,7 @@ class Device extends Model implements Auditable
         $footprint = 0;
 
         if ($this->isFixed()) {
-            if ($this->deviceCategory->isMiscPowered() && is_numeric($this->estimate) && $this->estimate > 0) {
+            if ($this->deviceCategory->isMiscPowered() && $this->estimate > 0) {
                 $footprint = $this->estimate * $emissionRatio;
             } else {
                 $footprint = $this->deviceCategory->footprint;
@@ -372,7 +372,7 @@ class Device extends Model implements Auditable
         $footprint = 0;
 
         if ($this->isFixed()) {
-            if (is_numeric($this->estimate) && $this->estimate > 0) {
+            if ($this->estimate > 0) {
                 $footprint = ($this->estimate * $emissionRatio);
             } else {
                 $footprint = $this->deviceCategory->footprint;
@@ -391,7 +391,7 @@ class Device extends Model implements Auditable
         $ewasteDiverted = 0;
 
         if ($this->isFixed() && $this->deviceCategory->isPowered()) {
-            if ($this->deviceCategory->isMiscPowered() && is_numeric($this->estimate) && $this->estimate > 0) {
+            if ($this->deviceCategory->isMiscPowered() && $this->estimate > 0) {
                 $ewasteDiverted = $this->estimate;
             } else {
                 $ewasteDiverted = $this->deviceCategory->weight;
@@ -410,7 +410,7 @@ class Device extends Model implements Auditable
         $wasteDiverted = 0;
 
         if ($this->isFixed() && $this->deviceCategory->isUnpowered()) {
-            if (is_numeric($this->estimate) && $this->estimate > 0) {
+            if ($this->estimate > 0) {
                 $wasteDiverted = $this->estimate;
             } else {
                 $wasteDiverted = $this->deviceCategory->weight;
