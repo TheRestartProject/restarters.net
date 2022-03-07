@@ -35,7 +35,7 @@
         <div class="row row-compressed align-items-center">
             <div class="col-5">
                 <h1 class="pull-left">DustUp @lang('dustupora.status.status')
-                    <img id="dustup" class="pull-left d-none d-lg-block" src="{{ asset('/images/dustupora/paw-prints.png') }}" alt="DustUp status" />
+                    <img id="dustup" class="pull-left d-none d-lg-block" src="{{ asset('/images/dustupora/status-icon.png') }}" alt="DustUp status" />
                 </h1>
             </div>
             <div class="col-7 text-right">

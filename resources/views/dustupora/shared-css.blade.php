@@ -7,8 +7,7 @@
     }
 
     img#dustup {
-        width: 48px;
-        height: 48px;
+        width: 24px;
         float: right;
         margin-left: 10px;
     }
@@ -55,6 +54,10 @@
 
     .dustup .btn {
         font-family: 'Open Sans';
+    }
+
+    #btn-poordata {
+        background-color: #F45B69;
     }
 
     #btn-info-open {
@@ -113,7 +116,7 @@
     }
 
     div.quest-closed {
-        background-color:#4aaebc !important;
+        background-color: #4aaebc !important;
     }
 
     .quest-closed li {

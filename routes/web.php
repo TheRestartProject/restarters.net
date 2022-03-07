@@ -171,14 +171,12 @@ Route::prefix('DustUp')->group(function () {
     Route::get('/', 'DustupOraController@index');
     Route::post('/', 'DustupOraController@index');
     Route::get('/cta', 'DustupOraController@cta');
-    Route::get('/survey', 'DustupOraController@survey');
     Route::get('/status', 'DustupOraController@status');
 });
 Route::prefix('dustup')->group(function () {
     Route::get('/', 'DustupOraController@index');
     Route::post('/', 'DustupOraController@index');
     Route::get('/cta', 'DustupOraController@cta');
-    Route::get('/survey', 'DustupOraController@survey');
     Route::get('/status', 'DustupOraController@status');
 });
 

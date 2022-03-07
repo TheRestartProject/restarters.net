@@ -37,13 +37,6 @@
                 </a>
             </div>
         </div>
-        <!-- <div class="d-none row row-compressed align-items-left">
-            <div class="col-12 text-left strapline">
-                <p>@lang('dustupora.task.strapline')
-                    <a href="javascript:void(0);" id="a-info-open" data-toggle="modal" data-target="#dustuporaInfoModal">@lang('dustupora.task.learn_more')</a>.
-                </p>
-            </div>
-        </div> -->
         @if (!$signpost)
         <div class="row row-compressed align-items-left">
             <div class="col-12 text-left strapline">
@@ -52,7 +45,8 @@
                 </p>
             </div>
         </div>
-        @elseif ($signpost < 5) <div class="row row-compressed information-alert banner alert-secondary align-items-left signpost">
+        @elseif ($signpost < $max_signposts)
+        <div class="row row-compressed information-alert banner alert-secondary align-items-left signpost">
             <div class="col-1 text-left">
                 <img class="d-none d-sm-block" src="{{ asset('/images/dustupora/signpost.png') }}" alt="i" />
             </div>
@@ -60,26 +54,16 @@
                 <h5>@lang('dustupora.task.did_you_know')</h5>
                 <p>@lang('dustupora.task.signpost_' . $signpost)</p>
             </div>
-    </div>
-    @else
-    <div class="row row-compressed align-items-left">
-        <div class="col-12 text-center">
-            <p>@lang('dustupora.task.signpost_' . $signpost)</p>
         </div>
-    </div>
-    @endif
-    @if ($thankyou)
-    <div class="row row-compressed information-alert banner alert-secondary align-items-left thankyou">
+        @else
         <div class="row row-compressed align-items-left">
             <div class="col-12 text-center">
-                <p>@lang('dustupora.task.thankyou_' . $thankyou)</p>
+                <p>@lang('dustupora.task.signpost_' . $signpost)</p>
             </div>
         </div>
-    </div>
-    @endif
+        @endif
 
     <a id="btn-cta-open" data-toggle="modal" data-target="#taskctaModal" class="hide">cta</a>
-    <a id="btn-survey-open" data-toggle="modal" data-target="#tasksurveyModal" class="hide">survey</a>
 
     @if($errors->any())
     <div class="row problem panel p-2 mb-4 mx-1 mx-sm-0 text-center">
@@ -106,7 +90,7 @@
                     <div class="col-12 col-md-4">
                         <span class="label">@lang('dustupora.task.status'):</span> <span class="repair-status span-{{ $status_class }}">@lang($fault->repair_status)</span>
                     </div>
-                    @if (!empty($fault->brand && $fault->brand !== 'Unknown'))
+                    @if (!empty($fault->brand) && $fault->brand !== 'Unknown')
                     <div class="col-12 col-md-4">
                         <span class="label">@lang('dustupora.task.brand'):</span> <span class="brand">{{ $fault->brand }}</span>
                     </div>
@@ -122,12 +106,7 @@
                 @if ($fault->language !== $locale )
                 <div class="row">
                     <div class="col">
-                        <p>
-                            <button id="btn-translate" class="btn-sm btn-primary">
-                                <a href="https://translate.google.com/#view=home&op=translate&sl={{ $fault->language }}&tl={{ $locale }}&text={{ $fault->problem }}" target="_blank">
-                                    @lang('dustupora.task.translate')
-                                </a>
-                            </button>
+                        <p><i>Inline translation goes here when record lang differs from user lang else this is hidden</i>
                         </p>
                     </div>
                 </div>
@@ -157,10 +136,11 @@
                             </p>
                             <div class="options mb-3">
                                 <div class="buttons">
-                                    @foreach($fault->faulttypes as $fault_type)
-                                    <button class="btn btn-md btn-fault-option btn-rounded" data-fname="{{ $fault_type->title }}" data-toggle="tooltip" data-fid="{{ $fault_type->id }}">@lang($fault_type->title)</button>
-                                    @endforeach
-                                </div>
+                                @foreach($fault->faulttypes as $fault_type)
+                                <button class="btn btn-sm btn-fault-option btn-rounded" data-toggle="tooltip" data-fid="{{ $fault_type->id }}">@lang($fault_type->title)</button>
+                                @endforeach
+                                <button id="btn-poordata" class="btn btn-sm btn-fault-option btn-rounded" data-toggle="tooltip" data-fid="{{ $poor_data[0]->id }}">@lang($poor_data[0]->title)</button>
+                            </div>
                             </div>
                         </div>
                     </div>
@@ -189,7 +169,6 @@
         </a>
     </div>
     @include('dustupora/info-modal')
-    @include('dustupora/task-survey-modal')
     @include('partials/task-cta-ora-modal')
 </section>
 
@@ -223,9 +202,6 @@
             } else if (e.code == 'KeyI') {
                 e.preventDefault();
                 document.getElementById('btn-info-open').click();
-            } else if (e.code == 'KeyS') {
-                e.preventDefault();
-                document.getElementById('btn-survey-open').click();
             } else if (e.code == 'KeyC') {
                 e.preventDefault();
                 document.getElementById('btn-cta-open').click();
@@ -267,10 +243,6 @@
 
         function fetchNew() {
             window.location.replace(window.location.href);
-        }
-
-        if (window.location.href.indexOf('survey') != -1) {
-            document.getElementById('btn-survey-open').click();
         }
 
         if (window.location.href.indexOf('cta') != -1) {
