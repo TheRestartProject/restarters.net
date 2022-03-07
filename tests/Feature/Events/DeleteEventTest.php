@@ -111,11 +111,12 @@ class DeleteEventTest extends TestCase
         // View the event
         $response = $this->get("/party/view/{$event->idevents}");
         $props = $this->assertVueProperties($response, [
+            [],
             [
                 ':idevents' => $event->idevents
             ]
         ]);
-        $initialEvent = json_decode($props[0][':initial-event'], TRUE);
+        $initialEvent = json_decode($props[1][':initial-event'], TRUE);
         $this->assertEquals($event->venue, $initialEvent['venue']);
         $this->assertFalse($initialEvent['approved']);
 
@@ -290,6 +291,7 @@ class DeleteEventTest extends TestCase
         $response = $this->get("/party/view/$idevents");
 
         $this->assertVueProperties($response, [
+            [],
             [
                 ':candelete' => $canDelete ? 'true' : 'false',
             ],

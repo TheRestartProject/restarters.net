@@ -115,12 +115,13 @@ class CreateEventTest extends TestCase
         $response = $this->get('/group/view/'.$group->idgroups);
 
         $props = $this->assertVueProperties($response, [
+            [],
             [
                 ':idgroups' => $group->idgroups,
             ],
         ]);
 
-        $events = json_decode($props[0][':events'], TRUE);
+        $events = json_decode($props[1][':events'], TRUE);
 
         if ($seeEvent) {
             // We should be able to see this upcoming event in the Vue properties.
@@ -136,12 +137,13 @@ class CreateEventTest extends TestCase
         $response = $this->get('/party');
 
         $props = $this->assertVueProperties($response, [
+            [],
             [
                 'heading-level' => 'h2',
             ],
         ]);
 
-        $events = json_decode($props[0][':initial-events'], TRUE);
+        $events = json_decode($props[1][':initial-events'], TRUE);
 
         if ($seeEvent) {
             // We should be able to see this upcoming event in the Vue properties.
@@ -177,12 +179,13 @@ class CreateEventTest extends TestCase
         $response = $this->get('/party');
 
         $props = $this->assertVueProperties($response, [
+            [],
             [
                 'heading-level' => 'h2',
             ],
         ]);
 
-        $events = json_decode($props[0][':initial-events'], TRUE);
+        $events = json_decode($props[1][':initial-events'], TRUE);
         $this->assertEquals(1, count($events));
 
         // Should have the 'all' property set because we've not joined the group.
@@ -196,12 +199,13 @@ class CreateEventTest extends TestCase
         $response = $this->get('/party');
 
         $props = $this->assertVueProperties($response, [
+            [],
             [
                 'heading-level' => 'h2',
             ],
         ]);
 
-        $events = json_decode($props[0][':initial-events'], TRUE);
+        $events = json_decode($props[1][':initial-events'], TRUE);
         $this->assertEquals(1, count($events));
 
         // Should not have 'all' or 'nearby' flag - those go in the "Other events" section.

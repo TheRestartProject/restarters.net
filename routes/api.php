@@ -49,3 +49,10 @@ Route::group(['middleware' => 'auth:api'], function () {
 Route::get('/groups/{group}/events', 'API\GroupController@getEventsForGroup'); // Used by old JS client.
 
 Route::get('/devices/{page}/{size}', [App\Http\Controllers\ApiController::class, 'getDevices']); // Used by Vue client.
+
+// Notifications info.  We don't authenticate this, as API keys don't exist for all users.  There's no real privacy
+// issue with exposing the number of outstanding notifications.
+Route::get('/users/{id}/notifications', 'API\UserController@notifications');
+
+// Top Talk topics.  Doesn't need authentication either.
+Route::get('/talk/topics/{tag?}', 'API\DiscourseController@discussionTopics');

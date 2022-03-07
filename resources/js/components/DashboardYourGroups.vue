@@ -98,7 +98,7 @@ export default {
       required: true
     },
     newGroups: {
-      type: Number,
+      type: Array,
       required: true
     },
     nearbyGroups: {

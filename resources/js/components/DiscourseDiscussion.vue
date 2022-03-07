@@ -43,14 +43,11 @@
 <script>
 import DiscourseTopic from './DiscourseTopic'
 import CollapsibleSection from './CollapsibleSection'
+const axios = require('axios')
 
 export default {
   components: {CollapsibleSection, DiscourseTopic},
   props: {
-    topics: {
-      type: Array,
-      required: true
-    },
     seeAllTopicsLink: {
       type: String,
       required: true
@@ -62,8 +59,25 @@ export default {
     isLoggedIn: {
       type: Boolean,
       required: true
+    },
+    tag: {
+      type: String,
+      required: false,
+      default: null
     }
   },
+  data () {
+    return {
+      topics: []
+    }
+  },
+  async mounted() {
+    const ret = await axios.get(this.tag ? ('/api/talk/topics/' + this.tag) : '/api/talk/topics')
+
+    if (ret.data.success) {
+      this.topics = ret.data.topics
+    }
+  }
 }
 </script>
 
