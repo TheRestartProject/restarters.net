@@ -141,7 +141,7 @@ class DustupOraSetup extends Migration
                 'regex' => 'slow|nois',
             ],
             25 => [
-                'title' => 'Unknown',
+                'title' => 'Poor data',
                 'description' => 'Not enough info to determine the main fault',
                 'regex' => '',
             ],
