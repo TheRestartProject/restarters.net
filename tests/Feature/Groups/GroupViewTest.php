@@ -66,6 +66,8 @@ class GroupViewTest extends TestCase
                                                                                   'category_creation' => env('MISC_CATEGORY_ID_POWERED'),
                                                                                   'event_id' => $event->idevents,
                                                                                   'quantity' => 1,
+                                                                                  'repair_status' => Device::REPAIR_STATUS_FIXED,
+                                                                                  'category' => 111
                                                                               ]));
         $response = $this->get("/group/view/$id");
         $this->assertVueProperties($response, [
@@ -95,6 +97,17 @@ class GroupViewTest extends TestCase
                     ':can-perform-delete' => 'false',
                 ],
             ]);
+        }
+
+        // Test stats API.
+        foreach (['fixometer', 'consume', 'manufacture'] as $format) {
+            $response = $this->get("/api/outbound/info/party/{$event->idevents}/$format");
+            $stats = json_decode($response->getContent(), TRUE);
+            self::assertEquals(1, $stats['co2']);
+
+            $response = $this->get("/api/outbound/info/group/{$id}/$format");
+            $stats = json_decode($response->getContent(), TRUE);
+            self::assertEquals(1, $stats['co2']);
         }
     }
 }

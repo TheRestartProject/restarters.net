@@ -43,16 +43,6 @@ class OutboundController extends Controller
                 }
                 $groupStats = $group->getGroupStats();
                 $co2 = $groupStats['co2_total'];
-            } elseif (strtolower($type) == 'group-tag') {
-                $groups = Group::join('grouptags_groups', 'grouptags_groups.group', '=', 'groups.idgroups')
-                  ->where('grouptags_groups.group_tag', $id)
-                    ->select('groups.*')
-                      ->get();
-                $co2 = 0;
-                foreach ($groups as $group) {
-                    $groupStats = $group->getGroupStats();
-                    $co2 += $groupStats['co2_total'];
-                }
             }
 
             if ($format == 'fixometer') {
