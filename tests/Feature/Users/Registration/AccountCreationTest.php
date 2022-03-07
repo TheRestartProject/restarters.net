@@ -32,7 +32,7 @@ class AccountCreationTest extends TestCase
         $this->assertEquals(-0.128, round($user->longitude, 3));
 
         // No notifications immediately after creation.
-        $response2 = $this->get('/api/users/notifications/' . $user->id);
+        $response2 = $this->get('/api/users/' . $user->id . '/notifications');
         $this->assertEquals([
                                 'success' => 'success',
                                 'restarters' => 0,
