@@ -6,6 +6,7 @@ use App\Audits;
 use App\Brands;
 use App\Category;
 use App\Device;
+use App\DeviceBarrier;
 use App\EventsUsers;
 use App\Group;
 use App\GroupNetwork;
@@ -43,9 +44,10 @@ abstract class TestCase extends BaseTestCase
         User::truncate();
         Audits::truncate();
         EventsUsers::truncate();
-        Party::truncate();
         UserGroups::truncate();
+        DeviceBarrier::truncate();
         Device::truncate();
+        Party::truncate();
         GroupNetwork::truncate();
         Category::truncate();
         Brands::truncate();
@@ -165,19 +167,11 @@ abstract class TestCase extends BaseTestCase
         // Create a party for the specific group.
         $eventAttributes = factory(Party::class)->raw();
         $eventAttributes['group'] = $idgroups;
-
-        // Use old-style event creation rather than UTC.
-        unset($eventAttributes['event_start_utc']);
-        unset($eventAttributes['event_end_utc']);
-        $eventAttributes['event_date'] = date('Y-m-d', strtotime($date));
-        $eventAttributes['start'] = '13:00:00';
-        $eventAttributes['end'] = '14:00:00';
+        $event_date_time = date('Y-m-d H:i:s', strtotime($date));
+        $eventAttributes['event_start_utc'] = $event_date_time;
+        $eventAttributes['event_end_utc'] = $event_date_time;
 
         $response = $this->post('/party/create/', $eventAttributes);
-
-        // The event_start_utc and event_end_utc will be in the database, but not ISO8601 formatted - that is implicit.
-//        $eventAttributes['event_start_utc'] = Carbon::parse($eventAttributes['event_start_utc'])->format('Y-m-d H:i:s');
-//        $eventAttributes['event_end_utc'] = Carbon::parse($eventAttributes['event_end_utc'])->format('Y-m-d H:i:s');
 
         $this->assertDatabaseHas('events', $eventAttributes);
         $redirectTo = $response->getTargetUrl();

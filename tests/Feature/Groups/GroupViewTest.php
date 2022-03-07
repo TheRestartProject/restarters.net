@@ -48,7 +48,8 @@ class GroupViewTest extends TestCase
 
         // Create a past event
         $event = factory(Party::class)->states('moderated')->create([
-                                                                        'event_date' => Carbon::yesterday()->toDateString(),
+                                                                        'event_start_utc' => '2000-01-01T10:15:05+05:00',
+                                                                        'event_end_utc' => '2000-01-0113:45:05+05:00',
                                                                         'group' => $id,
                                                                     ]);
 

@@ -89,10 +89,11 @@ class BasicTest extends TestCase
 
         // Create an event.
         $this->loginAsTestUser(Role::ADMINISTRATOR);
+
         $event = factory(Party::class)->create([
                                                    'group' => $this->idgroups,
-                                                   'event_date' => '2130-01-01',
-                                                   'start' => '12:13',
+                                                   'event_start_utc' => '2130-01-01T12:13:00+00:00',
+                                                   'event_end_utc' => '2130-01-01T13:14:00+00:00',
                                                    'free_text' => 'A test event',
                                                    'location' => 'London'
                                                ]);

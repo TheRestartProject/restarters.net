@@ -284,7 +284,7 @@ export default {
 
         if (this.searchStart || this.searchEnd) {
           // Either or both can be set.  This allows searching for all past or all future.
-          const date = new moment(event.event_date)
+          const date = new moment(event.event_date_local)
 
           if (this.searchStart && this.searchEnd) {
             match &= date.isBetween(new moment(this.searchStart), new moment(this.searchEnd), undefined, '[]')
@@ -307,7 +307,7 @@ export default {
       switch (key) {
         case 'date_short':
         case 'date_long':
-          return new moment(b.event_date + ' ' + b.start).unix() - new moment(a.event_date + ' ' + a.start).unix()
+          return new moment(b.event_start_utc).unix() - new moment(a.event_start_utc).unix()
         case 'title':
           const atitle = a.venue ? a.venue : a.location
           const btitle = b.venue ? b.venue : b.location
@@ -329,20 +329,10 @@ export default {
     stats(event) {
       return this.$store.getters['events/getStats'](event.idevents)
     },
-    finished(event) {
-      let ret = false;
-
-      if (event) {
-        const end = new moment(event.event_date + ' ' + event.end)
-        ret = end.isBefore()
-      }
-
-      return ret
-    },
     noDevices(event) {
       const stats = this.stats(event)
 
-      return stats && (stats.fixed_devices + stats.repairable_devices + stats.dead_devices === 0) && this.canedit && this.finished(event)
+      return stats && (stats.fixed_devices + stats.repairable_devices + stats.dead_devices === 0) && this.canedit && event.finished
     },
     rowClass(item) {
       // This gets called to supply a class for the tr of the table.  We want to highlight the rows where we are

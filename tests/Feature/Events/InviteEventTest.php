@@ -23,8 +23,8 @@ class InviteEventTest extends TestCase
         $group = factory(Group::class)->create();
         $event = factory(Party::class)->create([
                                                    'group' => $group,
-                                                   'event_date' => '2130-01-01',
-                                                   'start' => '12:13',
+                                                   'event_start_utc' => '2130-01-01T12:13:00+00:00',
+                                                   'event_end_utc' => '2130-01-01T13:14:00+00:00',
                                                ]);
 
         $host = factory(User::class)->states('Host')->create();
@@ -125,8 +125,8 @@ class InviteEventTest extends TestCase
         $host = factory(User::class)->states('Host')->create();
         $event = factory(Party::class)->create([
                                                    'group' => $group,
-                                                   'event_date' => '2130-01-01',
-                                                   'start' => '12:13',
+                                                   'event_start_utc' => '2130-01-01T12:13:00+00:00',
+                                                   'event_end_utc' => '2130-01-01T13:14:00+00:00',
                                                    'user_id' => $host->id
                                                ]);
         EventsUsers::create([
@@ -213,8 +213,8 @@ class InviteEventTest extends TestCase
         $host = factory(User::class)->states('Host')->create();
         $event = factory(Party::class)->create([
                                                    'group' => $group,
-                                                   'event_date' => '2130-01-01',
-                                                   'start' => '12:13',
+                                                   'event_start_utc' => '2130-01-01T12:13:00+00:00',
+                                                   'event_end_utc' => '2130-01-01T13:14:00+00:00',
                                                    'user_id' => $host->id
                                                ]);
         EventsUsers::create([

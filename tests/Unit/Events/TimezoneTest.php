@@ -5,7 +5,9 @@ namespace Tests\Unit;
 use App\Group;
 use App\Party;
 use App\User;
+use Carbon\Carbon;
 use DB;
+use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Tests\TestCase;
 
 class TimezoneTest extends TestCase
@@ -52,27 +54,17 @@ class TimezoneTest extends TestCase
         // Create an event in a different timezone, using local times.
         $e = factory(Party::class)->create([
             'group' => $g->idgroups,
-            'event_start_utc' => '2021-01-01T10:15:05+05:00',
-            'event_end_utc' => '2021-01-01T13:45:05+05:00',
+            'event_start_utc' => '2021-02-01T10:15:05+05:00',
+            'event_end_utc' => '2021-02-01T13:45:05+05:00',
             'timezone' => NULL
         ]);
 
         // Check that the ISO times are as we would expect for this zone.
-        self::assertEquals('2021-01-01T10:15:05+00:00', $e->event_start_utc);
-        self::assertEquals('2021-01-01T13:45:05+00:00', $e->event_end_utc);
-
-        // Check that the local times are as we expect.
-        self::assertEquals('2021-01-01', $e->event_date);
-        self::assertEquals('15:15:05', $e->start);
-        self::assertEquals('18:45:05', $e->end);
-
-        // Update the ISO times using a different timezone and check that the local times update.
-        $e->event_start_utc = '2021-01-01T13:00:00+00:00';
-        $e->event_end_utc = '2021-01-01T14:00:00+00:00';
-
-        self::assertEquals('2021-01-01', $e->event_date);
-        self::assertEquals('18:00:00', $e->start);
-        self::assertEquals('19:00:00', $e->end);
+        self::assertEquals('2021-02-01T10:15:05+00:00', $e->event_start_utc);
+        self::assertEquals('2021-02-01T13:45:05+00:00', $e->event_end_utc);
+        self::assertEquals('15:15', $e->start_local);
+        self::assertEquals('18:45', $e->end_local);
+        self::assertEquals('01/02/2021', $e->getFormattedLocalEnd());
     }
 
     /**
@@ -97,28 +89,22 @@ class TimezoneTest extends TestCase
         $g2->addVolunteer($host2);
         $g2->makeMemberAHost($host2);
 
-        // Create an event for each, using the old style local time create format.
+        // Create an event for each.
         $this->actingAs($host1);
         $event = factory(Party::class)->raw();
-        unset($event['event_start_utc']);
-        unset($event['event_end_utc']);
         unset($event['timezone']);
+        $event['event_start_utc'] = (new \DateTime("$date $start1", new \DateTimeZone($tz1)))->format(\DateTimeInterface::ISO8601);
+        $event['event_end_utc'] = (new \DateTime("$date $end1", new \DateTimeZone($tz1)))->format(\DateTimeInterface::ISO8601);
         $event['group'] = $g1->idgroups;
-        $event['event_date'] = $date;
-        $event['start'] = $start1;
-        $event['end'] = $end1;
         $response = $this->post('/party/create/', $event);
         $response->assertStatus(302);
 
         $this->actingAs($host2);
         $event = factory(Party::class)->raw();
-        unset($event['event_start_utc']);
-        unset($event['event_end_utc']);
         unset($event['timezone']);
         $event['group'] = $g2->idgroups;
-        $event['event_date'] = $date;
-        $event['start'] = $start2;
-        $event['end'] = $end2;
+        $event['event_start_utc'] = (new \DateTime("$date $start2", new \DateTimeZone($tz2)))->format(\DateTimeInterface::ISO8601);
+        $event['event_end_utc'] = (new \DateTime("$date $end2", new \DateTimeZone($tz2)))->format(\DateTimeInterface::ISO8601);
         $response = $this->post('/party/create/', $event);
         $response->assertStatus(302);
 
@@ -137,24 +123,17 @@ class TimezoneTest extends TestCase
         // Check the returned events:
         // - The events should be second first because that is the earliest actual time and therefore the soonest
         //   starting event.
-        // - The local times (event_date, start, end) should be the same as we put in.
-        // - The UTC fields should be returned matching, but with the times converted to UTC.
+        // - The UTC fields should be returned, but having converted to UTC and therefore having +00:00.
         // - The timezone should be set.
         $this->assertEquals($tz2, $events[0]['timezone']);
-        $this->assertEquals($date, $events[0]['event_date']);
-        $this->assertEquals($start2, $events[0]['start']);
-        $this->assertEquals($end2, $events[0]['end']);
-        $this->assertEquals(strtotime($events[0]['event_start_utc']), (new \DateTime("$date $start2", new \DateTimeZone($tz2)))->format('U'));
-        $this->assertEquals(strtotime($events[0]['event_end_utc']), (new \DateTime("$date $end2", new \DateTimeZone($tz2)))->format('U'));
+        $this->assertEquals(Carbon::parse("$date $start2", $tz2)->setTimezone('UTC')->toIso8601String(), $events[0]['event_start_utc']);
+        $this->assertEquals(Carbon::parse("$date $end2", $tz2)->setTimezone('UTC')->toIso8601String(), $events[0]['event_end_utc']);
         $this->assertStringContainsString('+00:00', $events[0]['event_start_utc']);
         $this->assertStringContainsString('+00:00', $events[0]['event_end_utc']);
 
         $this->assertEquals($tz1, $events[1]['timezone']);
-        $this->assertEquals($date, $events[1]['event_date']);
-        $this->assertEquals($start1, $events[1]['start']);
-        $this->assertEquals($end1, $events[1]['end']);
-        $this->assertEquals(strtotime($events[1]['event_start_utc']), (new \DateTime("$date $start1", new \DateTimeZone($tz1)))->format('U'));
-        $this->assertEquals(strtotime($events[1]['event_end_utc']), (new \DateTime("$date $end1", new \DateTimeZone($tz1)))->format('U'));
+        $this->assertEquals(Carbon::parse("$date $start1", $tz1)->setTimezone('UTC')->toIso8601String(), $events[1]['event_start_utc']);
+        $this->assertEquals(Carbon::parse("$date $end1", $tz1)->setTimezone('UTC')->toIso8601String(), $events[1]['event_end_utc']);
         $this->assertStringContainsString('+00:00', $events[1]['event_start_utc']);
         $this->assertStringContainsString('+00:00', $events[1]['event_end_utc']);
 
@@ -164,14 +143,12 @@ class TimezoneTest extends TestCase
         $event = Party::findOrFail($id2);
         $eventData = $event->getAttributes();
         $eventData['id'] = $id2;
-        $eventData['start'] = $editstart2;
-        $eventData['end'] = $editend2;
-        unset($eventData['event_start_utc']);
-        unset($eventData['event_end_utc']);
+        $eventData['event_start_utc'] = Carbon::parse("$date $editstart2", $tz1)->setTimezone('UTC')->toIso8601String();
+        $eventData['event_end_utc'] = Carbon::parse("$date $editend2", $tz1)->setTimezone('UTC')->toIso8601String();
         $response2 = $this->post('/party/edit/'.$event->idevents, $eventData);
         $event->refresh();
-        $this->assertEquals($editstart2, $event->start);
-        $this->assertEquals($editend2, $event->end);
+        $this->assertEquals($eventData['event_start_utc'], $event->event_start_utc);
+        $this->assertEquals($eventData['event_end_utc'], $event->event_end_utc);
     }
 
     public function timesProvider() {
@@ -183,5 +160,23 @@ class TimezoneTest extends TestCase
             [ '2037-06-01', 'Europe/London', '12:00:00', '12:00:00', 'Europe/Brussels', '12:00:00', '13:00:00', '13:00:00', '14:00:00'  ],
             [ '2037-01-01', 'Asia/Samarkand', '11:10:00', '13:20:00', 'Europe/Amsterdam', '12:15:00', '14:35:00', '13:00:00', '14:00:00' ],
         ];
+    }
+
+    public function testOldDateFieldException() {
+        $this->expectException(\Exception::class);
+        $p = new Party();
+        $p->event_date = '1970-01-01';
+    }
+
+    public function testOldStartFieldException() {
+        $this->expectException(\Exception::class);
+        $p = new Party();
+        $p->start = '10:00';
+    }
+
+    public function testOldEndFieldException() {
+        $this->expectException(\Exception::class);
+        $p = new Party();
+        $p->end = '10:00';
     }
 }

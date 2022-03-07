@@ -22,9 +22,9 @@
     </td>
 
     <td class="cell-date">
-        {{ $event->getEventDate('D jS M Y') }}
+        {{ $event->getFormattedLocalStart('D jS M Y') }}
         <br>
-        {{ $event->getEventStartEnd() }}
+        {{ $event->getEventStartEndLocal() }}
     </td>
 
 
