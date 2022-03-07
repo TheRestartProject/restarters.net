@@ -139,6 +139,20 @@ class DustupOraController extends Controller
     }
 
     /**
+     * Fetch mock user record for anonymous user.
+     *
+     * @return object
+     */
+    protected function _anon()
+    {
+        $user = new \stdClass();
+        $user->id = 0;
+        $user->name = 'Guest';
+
+        return $user;
+    }
+
+    /**
      * Fetch "call to action".
      *
      * @param Illuminate\Http\Request $request
