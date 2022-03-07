@@ -90,40 +90,6 @@ class UserController extends Controller
     }
 
     /**
-     * Update the specified resource in storage.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
-    public function update(Request $request, $id)
-    {
-        $authenticatedUser = Auth::user();
-        if (! $authenticatedUser->hasRole('Administrator')) {
-            return abort(403, 'The authenticated user is not authorized to update this resource');
-        }
-
-        $user = User::find($id);
-        if ($user === null) {
-            abort(404, 'Resource not found');
-        }
-
-        $changesMade = false;
-
-        if ($request->has('username')) {
-            $user->username = $request->input('username');
-            $changesMade = true;
-        }
-
-        if ($changesMade) {
-            $user->save();
-        }
-
-        // Zapier seems to require some response body.
-        return response()->json(['success' => 'success'], 200);
-    }
-
-    /**
      * Get notification counts for a user.
      *
      * @param  \Illuminate\Http\Request  $request
@@ -159,9 +125,9 @@ class UserController extends Controller
         }
 
         return response()->json([
-            'success' => 'success',
-            'restarters' => $restartersNotifications,
-            'discourse' => $discourseNotifications
-        ], 200);
+                                    'success' => 'success',
+                                    'restarters' => $restartersNotifications,
+                                    'discourse' => $discourseNotifications
+                                ], 200);
     }
 }

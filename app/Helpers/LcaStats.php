@@ -33,10 +33,10 @@ class LcaStats
 
         $t1 = "
 SELECT
-CASE WHEN (c.powered = 1) THEN (CASE WHEN (c.weight = 0) THEN (d.estimate + 0.00) ELSE c.weight END) ELSE 0 END  AS powered_device_weights,
-CASE WHEN (c.powered = 0) THEN (CASE WHEN (COALESCE(d.estimate,0) + 0.00 = 0) THEN c.weight ELSE d.estimate END) ELSE 0 END AS unpowered_device_weights,
-CASE WHEN (c.powered = 1) THEN (CASE WHEN (c.weight = 0) THEN ((d.estimate + 0.00) * $eR) ELSE c.footprint END) ELSE 0 END AS powered_footprints,
-CASE WHEN (c.powered = 0) THEN (CASE WHEN (COALESCE(d.estimate,0) + 0.00 = 0) THEN c.footprint ELSE ((d.estimate + 0.00) * $uR) END) ELSE 0 END AS unpowered_footprints
+CASE WHEN (c.powered = 1) THEN (CASE WHEN (c.weight = 0) THEN d.estimate ELSE c.weight END) ELSE 0 END  AS powered_device_weights,
+CASE WHEN (c.powered = 0) THEN (CASE WHEN (d.estimate = 0) THEN c.weight ELSE d.estimate END) ELSE 0 END AS unpowered_device_weights,
+CASE WHEN (c.powered = 1) THEN (CASE WHEN (c.weight = 0) THEN (d.estimate * $eR) ELSE c.footprint END) ELSE 0 END AS powered_footprints,
+CASE WHEN (c.powered = 0) THEN (CASE WHEN (d.estimate = 0) THEN c.footprint ELSE (d.estimate * $uR) END) ELSE 0 END AS unpowered_footprints
 FROM devices d, categories c, events e
 WHERE d.category = c.idcategories
 AND d.event = e.idevents
@@ -95,7 +95,7 @@ AND d.category <> 46
     {
         $value = DB::select(DB::raw('
 SELECT
-SUM(c.footprint) / SUM(IF(COALESCE(d.estimate,0) + 0.00 = 0, c.weight, d.estimate + 0.00)) AS ratio
+SUM(c.footprint) / SUM(IF(d.estimate = 0, c.weight, d.estimate)) AS ratio
 FROM devices d
 JOIN categories c ON c.idcategories = d.category
 WHERE c.powered = 0
@@ -129,10 +129,10 @@ AND d.category <> 50
 
         $t1 = DB::table('devices')->select(
             DB::raw("
-                    CASE WHEN (categories.powered = 1) THEN (CASE WHEN (categories.weight = 0) THEN (devices.estimate + 0.00) ELSE categories.weight END) ELSE 0 END  AS powered_device_weights,
-                    CASE WHEN (categories.powered = 0) THEN (CASE WHEN (COALESCE(devices.estimate,0) + 0.00 = 0) THEN categories.weight ELSE devices.estimate END) ELSE 0 END AS unpowered_device_weights,
-                    CASE WHEN (categories.powered = 1) THEN (CASE WHEN (categories.weight = 0) THEN ((devices.estimate + 0.00) * $eR) ELSE categories.footprint END) ELSE 0 END AS powered_footprints,
-                    CASE WHEN (categories.powered = 0) THEN (CASE WHEN (COALESCE(devices.estimate,0) + 0.00 = 0) THEN categories.footprint ELSE ((devices.estimate + 0.00) * $uR) END) ELSE 0 END AS unpowered_footprints
+                    CASE WHEN (categories.powered = 1) THEN (CASE WHEN (categories.weight = 0) THEN devices.estimate ELSE categories.weight END) ELSE 0 END  AS powered_device_weights,
+                    CASE WHEN (categories.powered = 0) THEN (CASE WHEN (devices.estimate = 0) THEN categories.weight ELSE devices.estimate END) ELSE 0 END AS unpowered_device_weights,
+                    CASE WHEN (categories.powered = 1) THEN (CASE WHEN (categories.weight = 0) THEN (devices.estimate * $eR) ELSE categories.footprint END) ELSE 0 END AS powered_footprints,
+                    CASE WHEN (categories.powered = 0) THEN (CASE WHEN (devices.estimate = 0) THEN categories.footprint ELSE (devices.estimate * $uR) END) ELSE 0 END AS unpowered_footprints
                     ")
         )
             ->join('categories', 'devices.category', '=', 'categories.idcategories')

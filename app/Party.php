@@ -732,7 +732,7 @@ class Party extends Model implements Auditable
                 }
 
                 if ($device->isFixed()) {
-                    if (! $device->deviceCategory->weight && ! $device->estimate) {
+                    if ($device->deviceCategory->weight == 0 && $device->estimate == 0) {
                         if ($device->deviceCategory->isMiscPowered()) {
                             $result['no_weight_powered']++;
                         } elseif ($device->deviceCategory->isMiscUnpowered()) {

@@ -13,8 +13,21 @@ class GroupCreateTest extends TestCase
 {
     public function testCreate()
     {
-        $this->loginAsTestUser(Role::ADMINISTRATOR);
-        $this->assertNotNull($this->createGroup());
+        $user = factory(User::class)->states('Administrator')->create([
+                                                                      'api_token' => '1234',
+                                                                  ]);
+        $this->actingAs($user);
+
+        $idgroups = $this->createGroup();
+        $this->assertNotNull($idgroups);
+        $group = Group::find($idgroups);
+
+        $response = $this->get('/api/groups?api_token=1234');
+        $response->assertSuccessful();
+        $ret = json_decode($response->getContent(), TRUE);
+        self::assertEquals(1, count($ret));
+        self::assertEquals($idgroups, $ret[0]['idgroups']);
+        self::assertEquals($group->name, $ret[0]['name']);
     }
 
     public function testCreateBadLocation()
