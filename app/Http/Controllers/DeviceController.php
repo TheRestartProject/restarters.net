@@ -82,7 +82,7 @@ class DeviceController extends Controller
         }
 
         $category = $request->input('category');
-        $weight = $request->input('estimate');
+        $weight = $request->input('estimate', 0);
         $brand = $request->input('brand');
         $model = $request->input('model');
         $item_type = $request->input('item_type');
@@ -209,7 +209,6 @@ class DeviceController extends Controller
     public function ajaxEdit(Request $request, $id)
     {
         $category = $request->input('category');
-        $weight = $request->input('weight');
         $brand = $request->input('brand');
         $item_type = $request->input('item_type');
         $model = $request->input('model');
@@ -222,7 +221,7 @@ class DeviceController extends Controller
         $spare_parts = $request->input('spare_parts');
         $event_id = $request->input('event_id');
         $wiki = $request->input('wiki');
-        $estimate = $request->input('estimate');
+        $estimate = $request->input('estimate',0);
 
         if (empty($repair_status)) { //Override
             $repair_status = 0;
@@ -282,7 +281,6 @@ class DeviceController extends Controller
             $Device->update([
                 'category' => $category,
                 'category_creation' => $category,
-                'estimate' => $weight,
                 'brand' => $brand,
                 'item_type' => $item_type,
                 'model' => $model,

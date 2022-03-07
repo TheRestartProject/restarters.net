@@ -841,36 +841,6 @@ class GroupController extends Controller
         return view('group.stats', $groupStats);
     }
 
-    public static function statsByGroupTag($group_tag_id, $format = 'row')
-    {
-        $groups = Group::join('grouptags_groups', 'grouptags_groups.group', '=', 'groups.idgroups')
-            ->where('grouptags_groups.group_tag', $group_tag_id)
-            ->select('groups.*')
-            ->get();
-
-        $groupStats = \App\Group::getGroupStatsArrayKeys();
-
-        // Loop through all groups and increase the values for groupStats
-        foreach ($groups as $group) {
-            // Get stats for this particular group
-            $single_group_stats = $group->getGroupStats();
-
-            // Loop through the stats whilst adding the new value to the existing value
-            foreach ($single_group_stats as $key => $value) {
-                $groupStats[$key] = $groupStats[$key] + $value;
-            }
-        }
-
-        $groupStats['format'] = $format;
-
-        // Return json for api.php
-        if (\Request::is('api*')) {
-            return response()->json($groupStats);
-        }
-
-        return view('group.stats', $groupStats);
-    }
-
     public function getJoinGroup($group_id)
     {
         $user_id = Auth::id();
