@@ -17,11 +17,11 @@ Route::get('/homepage_data', function () { // Used from DeviceController, tested
     return App\Http\Controllers\ApiController::homepage_data();
 });
 
-Route::get('/party/{id}/stats', function ($id) { // Not used but worth keeping, tested.
+Route::get('/party/{id}/stats', function ($id) { // Used from TRP.org.
     return App\Http\Controllers\ApiController::partyStats($id);
 });
 
-Route::get('/group/{id}/stats', function ($id) { // Not used but worth keeping, tested.
+Route::get('/group/{id}/stats', function ($id) { // Used from TRP.org.
     return App\Http\Controllers\ApiController::groupStats($id);
 });
 
