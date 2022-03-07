@@ -53,7 +53,6 @@ export default {
       return this.event ? (new moment(this.event.event_date_local).format('MMM').toUpperCase()) : null
     },
     timezone() {
-      console.log("Timezone", this.event)
       return this.event ? this.event.timezone : null
     },
     attendees() {
