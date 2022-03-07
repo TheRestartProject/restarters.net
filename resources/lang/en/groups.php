@@ -184,6 +184,7 @@ return [
   'no_other_events' => 'There are currently no other upcoming events.',
   'no_other_nearby_events' => 'There are currently no other upcoming nearby events.',
   'postcode' => 'Group postcode',
+  'timezone' => 'Timezone',
   'groups_postcode_small' => '(Optional)',
   'duplicate' => 'That group name (:name) already exists.  If it\'s yours, please go to the Groups page using the menu and edit it.',
   'database_error' => 'Group could <strong>not</strong> be created. Something went wrong with the database.',

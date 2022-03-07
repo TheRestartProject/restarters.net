@@ -90,6 +90,8 @@ class PartyController extends Controller
         $thisone['inprogress'] = $event->isInProgress();
         $thisone['startingsoon'] = $event->isStartingSoon();
 
+        $thisone['approved'] = $event->wordpress_post_id !== null;
+
         return $thisone;
     }
 

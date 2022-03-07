@@ -597,11 +597,17 @@ class Party extends Model implements Auditable
      * @param string $format
      * @return false|string
      */
-    public function getFormattedLocalEnd($format = 'd/m/Y')
+    public function getFormattedLocalEnd($format = 'd/m/Y', $includeTimezone = false)
     {
         $dt = new Carbon($this->event_start_utc);
         $dt->setTimezone($this->timezone);
-        return $dt->format($format);
+        $ret = $dt->format($format);
+
+        if ($includeTimezone) {
+            $ret .= ' (' . $this->timezone . ')';
+        }
+
+        return $ret;
     }
 
     public function getEventTimestampAttribute()

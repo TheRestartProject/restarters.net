@@ -78,7 +78,7 @@ class JoinEvent extends Notification implements ShouldQueue
                                   </tr>
                                   <tr>
                                     <td>' . __('notifications.join_event_time') . '</td>
-                                    <td>'.$this->arr['event']->getEventStartEndLocal().'</td>
+                                    <td>'.$this->arr['event']->getEventStartEndLocal(true).'</td>
                                   </tr>
                                     <tr>
                                     <td>' . __('notifications.join_event_location') . '</td>

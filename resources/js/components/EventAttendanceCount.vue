@@ -27,7 +27,8 @@ export default {
   props: {
     count: {
       type: Number,
-      required: true
+      required: false,
+      default: null
     },
     canedit: {
       type: Boolean,
@@ -41,7 +42,7 @@ export default {
     }
   },
   mounted() {
-    this.current = this.count
+    this.current = this.count !== null ? this.count : 0
   },
   methods: {
     inc() {

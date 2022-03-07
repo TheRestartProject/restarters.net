@@ -123,6 +123,10 @@
                             <small id="postcodeHelpBlock" class="form-text text-muted">
                               @lang('groups.groups_postcode_small')
                             </small>
+
+                            <label for="postcode" class="mt-3">@lang('groups.timezone'):</label>
+                            <input type="text" id="timezone" name="timezone" class="form-control field" value="{{ $formdata->timezone }}" readonly />
+
                           </div>
                         </div>
 

@@ -150,14 +150,14 @@
               $expanded_brands[] = $brand;
           }
 
-          $event->approved = $event->wordpress_post_id !== null;
+          $expanded_event = \App\Http\Controllers\PartyController::expandEvent($event, NULL);
         ?>
         <div class="vue">
           <EventPage
             csrf="{{ csrf_token() }}"
             :idevents="{{ $event->idevents }}"
             :devices="{{ json_encode($expanded_devices, JSON_INVALID_UTF8_IGNORE) }}"
-            :initial-event="{{ json_encode($event, JSON_INVALID_UTF8_IGNORE) }}"
+            :initial-event="{{ json_encode($expanded_event, JSON_INVALID_UTF8_IGNORE) }}"
             :is-attending="{{ $is_attending ? 'true' : 'false' }}"
             discourse-thread="{{ $discourseThread }}"
             :canedit="{{ $can_edit_event ? 'true' : 'false' }}"

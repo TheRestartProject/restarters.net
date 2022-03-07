@@ -10,6 +10,9 @@
     <br class="hidecell"/>
     {{ start }} <span class="d-none d-md-inline">- {{ end }}</span>
     <br class="d-block d-md-none"/>
+    <div class="text-muted small">
+      {{ timezone }}
+    </div>
   </div>
 </template>
 <script>
