@@ -101,6 +101,12 @@ class DustupOraSetup extends Migration
                         'problem' => $v['problem'],
                         'googletrans' => $v['googletrans'],
                         'language' => $v['language'],
+                        'en' => $v['en'],
+                        'de' => $v['de'],
+                        'nl' => $v['nl'],
+                        'it' => $v['it'],
+                        'fr' => $v['fr'],
+                        'es' => $v['es'],
                     ]);
                 }
             }
@@ -160,9 +166,9 @@ class DustupOraSetup extends Migration
      */
     public function down()
     {
-        // Schema::dropIfExists('devices_faults_vacuums_ora_adjudicated');
-        // Schema::dropIfExists('devices_faults_vacuums_ora_opinions');
-        // Schema::dropIfExists('fault_types_vacuums');
-        // Schema::dropIfExists('devices_dustup_ora');
+        Schema::dropIfExists('devices_faults_vacuums_ora_adjudicated');
+        Schema::dropIfExists('devices_faults_vacuums_ora_opinions');
+        Schema::dropIfExists('fault_types_vacuums');
+        Schema::dropIfExists('devices_dustup_ora');
     }
 }
