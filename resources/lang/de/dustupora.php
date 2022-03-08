@@ -4,7 +4,7 @@ return [
   'task' => [
     'subtitle' => 'Ein Freiwilliger hat versucht, dieses Gerät bei einer Reparaturveranstaltung zu reparieren und diese Beschreibung verfasst.',
     'fetch_another' => 'Ich weiß es nicht, zeig eine andere Reparatur',
-    'translate' => 'Übersetzen',
+    'translation' => 'Übersetzung',
     'go_with' => 'Geh mit',
     'source' => 'Quelle',
     'strapline' => 'Lesen Sie einfach die Informationen über das defekte Gerät und wählen Sie die Art des beschriebenen Fehlers aus der Liste darunter aus.',

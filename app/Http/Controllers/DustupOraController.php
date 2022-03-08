@@ -4,7 +4,6 @@ namespace App\Http\Controllers;
 
 use App;
 use App\Helpers\Microtask;
-use App\MicrotaskSurvey;
 use App\DustupOra;
 use Auth;
 use Illuminate\Http\Request;
@@ -49,7 +48,7 @@ class DustupOraController extends Controller
         $signpost = false;
         // If opinion is being submitted.
         if ($request->has('id-ords')) {
-            if (! (is_numeric($request->input('fault-type-id')) && $request->input('fault-type-id') > 0)) {
+            if (!(is_numeric($request->input('fault-type-id')) && $request->input('fault-type-id') > 0)) {
                 return redirect()->back()->withErrors(['Oops, there was an error, please try again, sorry! If this error persists please contact The Restart Project.']);
             }
             $insert = [
@@ -61,7 +60,7 @@ class DustupOraController extends Controller
             ];
             $this->Model = new DustupOra;
             $success = $this->Model->create($insert);
-            if (! $success) {
+            if (!$success) {
                 logger('DustUp error on insert.');
                 logger(print_r($insert, 1));
             }
@@ -75,14 +74,18 @@ class DustupOraController extends Controller
                 }
             }
         }
-        $fault = $this->_fetchRecord($request);
-        if (! $fault) {
+        $locale = $this->_getUserLocale();
+        $fault = $this->_fetchRecord($request, $locale);
+        if (!$fault) {
             return redirect()->action('DustupOraController@status')->withSuccess('done');
         }
         $progress = $this->Model->fetchProgress()[0]->total;
-
-        // @ToDo language handling
-        // $fault->translate = rawurlencode($fault->problem);
+        // Show user translation for testing purposes.
+        $testlang = $request->get('testlang');
+        if ($testlang) {
+            $locale = strtolower($testlang);
+        }
+        $fault->translate = $fault->{$locale};
 
         $fault->faulttypes = $this->Model->fetchFaultTypes();
 
@@ -97,7 +100,7 @@ class DustupOraController extends Controller
         // send non-suggested fault_types to view
         // $fault->faulttypes = array_diff_key($fault_types, $fault->suggestions);
 
-        // send the "poor data" fault_type to view so it can be styled separately
+        // Send the "poor data" fault_type to view so it can be styled separately
         $poor_data = $this->Model->fetchFaultTypePoorData();
         return view('dustupora.index', [
             'title' => 'DustUp',
@@ -107,8 +110,7 @@ class DustupOraController extends Controller
             'progress' => $progress > 1 ? $progress : 0,
             'signpost' => $signpost,
             'max_signposts' => $this->MaxSignposts,
-            // 'thankyou' => $thankyou,
-            'locale' => $this->_getUserLocale(),
+            'locale' => $locale,
         ]);
     }
 
@@ -198,12 +200,11 @@ class DustupOraController extends Controller
      *
      * @return object
      */
-    protected function _fetchRecord(Request $request)
+    protected function _fetchRecord(Request $request, $locale = null)
     {
         $result = false;
         $exclusions = $request->session()->get('dustupora.exclusions', []);
         $this->Model = new DustupOra;
-        $locale = $this->_getUserLocale();
         $fault = $this->Model->fetchFault($exclusions, $locale);
         if ($fault) {
             $result = $fault[0];

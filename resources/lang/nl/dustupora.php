@@ -4,7 +4,7 @@ return [
   'task' => [
     'subtitle' => 'Een vrijwilliger probeerde dit toestel te repareren in een Repair Café en schreef deze beschrijving.',
     'fetch_another' => 'Ik weet het niet, haal nog een reparatie',
-    'translate' => 'Vertalen',
+    'translation' => 'Vertaling',
     'go_with' => 'Ga mee',
     'source' => 'Bron',
     'strapline' => 'Lees de informatie over het kapotte toestel en selecteer het type fout uit de lijst eronder.',

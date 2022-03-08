@@ -106,7 +106,9 @@
                 @if ($fault->language !== $locale )
                 <div class="row">
                     <div class="col">
-                        <p><i>Inline translation goes here when record lang differs from user lang else this is hidden</i>
+                        <br />
+                        <div class="label">@lang('dustupora.task.translation'):</div>
+                        <p>{{ $fault->translate }}
                         </p>
                     </div>
                 </div>

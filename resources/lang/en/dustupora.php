@@ -4,7 +4,7 @@ return [
   'task' => [
     'subtitle' => 'A volunteer tried to fix this vacuum cleaner at a community repair event and wrote this description.',
     'fetch_another' => 'I don\'t know',
-    'translate' => 'Translate',
+    'translation' => 'Translation',
     'go_with' => 'Go with',
     'source' => 'Source',
     'strapline' => 'Simply read the information about the broken vacuum cleaner and select the type of fault described from the list underneath.',

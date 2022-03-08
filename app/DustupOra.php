@@ -57,7 +57,12 @@ TRIM(d.`brand`) as brand,
 d.`repair_status` as repair_status,
 TRIM(d.`problem`) as problem,
 d.`language` as language,
-TRIM(d.`googletrans`) as googletrans
+TRIM(d.`en`) as en,
+TRIM(d.`de`) as de,
+TRIM(d.`nl`) as nl,
+TRIM(d.`fr`) as fr,
+TRIM(d.`es`) as es,
+TRIM(d.`it`) as it
 FROM devices_dustup_ora d
 LEFT OUTER JOIN devices_faults_vacuums_ora_opinions o ON o.id_ords = d.id_ords
 WHERE 1 %s
