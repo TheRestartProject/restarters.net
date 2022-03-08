@@ -23,6 +23,7 @@ return [
     'status' => 'Status',
     'step1' => 'Lees de informatie over het kapotte toestel.',
     'step1-extra' => 'Een vrijwilliger probeerde dit toestel te repareren in een Repair Café en schreef deze beschrijving.',
+    'step2' => 'What caused this vacuum cleaner to fail?',
     'step2-extra' => 'Selecteer de optie die het beste past bij het hierboven beschreven probleem.',
     'title' => 'DustUp: accu problemen categoriseren',
   ],

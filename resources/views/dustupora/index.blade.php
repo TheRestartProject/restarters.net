@@ -121,8 +121,11 @@
                     <div class="number">2</div>
                     <div>
                         <strong>
-                            <p>@lang('dustupora.task.step2-extra')</p>
+                            <p>@lang('dustupora.task.step2')</p>
                         </strong>
+                    </div>
+                    <div>
+                        <p>@lang('dustupora.task.step2-extra')</p>
                     </div>
                 </div>
             </div>

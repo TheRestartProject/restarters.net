@@ -23,6 +23,7 @@ return [
     'status' => 'Status',
     'step1' => 'Read the information about the broken vacuum cleaner.',
     'step1-extra' => 'A volunteer tried to fix this vacuum cleaner at a community repair event and wrote this description.',
+    'step2' => 'What caused this vacuum cleaner to fail?',
     'step2-extra' => 'Select the option that best fits the problem described above.',
     'title' => 'DustUp: categorise vacuum cleaner problems',
   ],

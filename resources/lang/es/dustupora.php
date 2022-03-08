@@ -23,6 +23,7 @@ return [
     'status' => 'Estado',
     'step1' => 'Lee la información sobre el dispositivo roto.',
     'step1-extra' => 'Un voluntario intentó arreglar este dispositivo en un evento de reparación y escribió esta descripción.',
+    'step2' => 'What caused this vacuum cleaner to fail?',
     'step2-extra' => 'Seleccione la opción que mejor se ajuste al problema descrito.',
     'title' => 'DustUp: clasificar los problemas de las baterías',
   ],
