@@ -189,7 +189,6 @@
   @include('includes.modals.event-share-stats')
   @include('includes.modals.event-all-volunteers')
   @include('includes.modals.event-all-attended')
-  @include('includes.modals.event-add-volunteer')
   @include('includes.modals.event-request-review')
 
 @endsection

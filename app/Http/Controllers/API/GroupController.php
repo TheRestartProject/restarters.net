@@ -3,7 +3,9 @@
 namespace App\Http\Controllers\API;
 
 use App\Group;
+use App\Helpers\Fixometer;
 use App\Http\Controllers\Controller;
+use App\Party;
 use Auth;
 use Illuminate\Http\Request;
 
@@ -218,5 +220,29 @@ class GroupController extends Controller
         return response()->json([
             'events' => $events->values()->toJson(),
         ]);
+    }
+
+    public function listVolunteers(Request $request, $idgroups) {
+        $group = Group::findOrFail($idgroups);
+
+        if (!Auth::user() || !Fixometer::userIsHostOfGroup($idgroups, Auth::user()->id)) {
+            // We require host permissions to view the list of volunteers.
+            abort(403);
+        }
+
+        $volunteers = $group->allConfirmedVolunteers()->get();
+
+        $ret = [];
+
+        foreach ($volunteers as $v) {
+            $volunteer = $v->volunteer;
+            $ret[] = [
+                'id' => $volunteer->id,
+                'name' => $volunteer->name,
+                'email'=> $volunteer->email
+            ];
+        }
+
+        return response()->json($ret);
     }
 }

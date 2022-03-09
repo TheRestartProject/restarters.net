@@ -443,18 +443,25 @@ class CreateEventTest extends TestCase
         ])->assertSee('true');
 
         // Assert that we see the host in the list of volunteers to add to the event.
-        $this->get('/party/view/'.$party->idevents)->assertSeeInOrder(['Group member', '<option value="'.$host->id.'">', '</div>']);
+        $response = $this->get('/api/group/'. $group->idgroups . '/volunteers');
+        $response->assertJson([
+            [
+                'id' => $host->id,
+                'name' => $host->name,
+                'email' => $host->email
+            ]
+        ]);
 
         // Assert we can add them back in.
-        $response = $this->post('/party/add-volunteer', [
-            'event' => $party->idevents,
+        $response = $this->put('/api/party/' . $party->idevents . '/volunteers', [
             'volunteer_email_address' => $host->email,
             'full_name' => $host->name,
             'user' => $host->id,
         ]);
 
-        $response->assertSessionHas('success');
-        $this->assertTrue($response->isRedirection());
+        $response->assertSuccessful();
+        $rsp = json_decode($response->getContent(), TRUE);
+        $this->assertEquals('success', $rsp['success']);
     }
 
     public function provider()

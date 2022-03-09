@@ -43,16 +43,17 @@
                 </p>
                 <hr />
                 <div v-if="upcoming" class="d-flex justify-content-end">
-                  <!-- TODO LATER In due course these modals should become Vue components.-->
+                  <!-- TODO LATER In due course this modal should become Vue components.-->
                   <a data-toggle="modal" data-target="#event-all-attended" href="#" class="mr-2">
                     {{ __('events.see_all') }}
                   </a>
                 </div>
                 <div v-else>
                   <div class="d-flex justify-content-between">
-                    <b-btn variant="link" data-toggle="modal" data-target="#event-add-volunteer">
+                    <b-btn variant="link" @click="addVolunteer">
                       {{ __('events.add_volunteer_modal_heading') }}
                     </b-btn>
+                    <EventAddVolunteerModal :idevents="idevents" ref="addVolunteerModal"/>
                   <b-btn variant="link" data-toggle="modal" data-target="#event-all-attended" href="#">
                     {{ __('events.see_all') }}
                     </b-btn>
@@ -92,6 +93,7 @@ import event from '../mixins/event'
 import EventAttendanceCount from './EventAttendanceCount'
 import EventAttendee from './EventAttendee'
 import CollapsibleSection from './CollapsibleSection'
+import EventAddVolunteerModal from './EventAddVolunteerModal'
 
 export default {
   props: {
@@ -113,9 +115,9 @@ export default {
       type: Array,
       required: false,
       default: function () { return [] }
-    },
+    }
   },
-  components: {CollapsibleSection, EventAttendee, EventAttendanceCount},
+  components: {EventAddVolunteerModal, CollapsibleSection, EventAttendee, EventAttendanceCount},
   mixins: [event],
   created() {
     // The attendance is passed from the server to the client via a prop on this component.  When we are created
@@ -164,6 +166,9 @@ export default {
       if (ret && ret.data && ret.data.success) {
         this.event.volunteers = val
       }
+    },
+    addVolunteer() {
+      this.$refs.addVolunteerModal.show()
     }
   }
 }
