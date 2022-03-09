@@ -26,7 +26,6 @@ class EnsureAPIToken
             $response = $next($request);
 
             if (method_exists($response, 'withCookie')) {
-                error_log("Return token $token");
                 $response->withCookie(cookie()->forever('restarters_apitoken', $token, null, null, false, false));
             }
 

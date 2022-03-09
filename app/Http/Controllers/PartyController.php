@@ -1047,10 +1047,6 @@ class PartyController extends Controller
         return redirect('/party/view/'.intval($event_id))->with('success', 'You are no longer attending this event.');
     }
 
-    public function addVolunteer(Request $request)
-    {
-    }
-
     public function imageUpload(Request $request, $id)
     {
         try {
