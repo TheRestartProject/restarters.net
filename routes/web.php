@@ -55,17 +55,16 @@ Route::group(['middleware' => ['ensureAPIToken']], function () {
 
     Route::get('/party/view/{id}', 'PartyController@view');
 
-// Device export is also called from https://therestartproject.org/download-dataset,
-// so we allow anonymous access.
+    // Device export is also called from https://therestartproject.org/download-dataset,
+    // so we allow anonymous access.
     Route::get('/export/devices', 'ExportController@devices');
 
-// Calendar routes do not require authentication.
-// (You would not be able to subscribe from a calendar application if they did.)
+    // Calendar routes do not require authentication.
+    // (You would not be able to subscribe from a calendar application if they did.)
     Route::prefix('calendar')->group(function () {
         Route::get('/user/{calendar_hash}', 'CalendarEventsController@allEventsByUser')->name('calendar-events-by-user');
         Route::get('/group/{group}', 'CalendarEventsController@allEventsByGroup')->name('calendar-events-by-group');
         Route::get('/group-area/{area}', 'CalendarEventsController@allEventsByArea')->name('calendar-events-by-area');
-        Route::get('/group-tag/{grouptags_groups}', 'CalendarEventsController@allEventsByGroupTag')->name('calendar-events-by-group-tag');
         Route::get('/all-events/{hash_env}', 'CalendarEventsController@allEvents')->name('calendar-events-all');
     });
 

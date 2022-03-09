@@ -6,7 +6,7 @@
          convertErrorsToExceptions="true"
          convertNoticesToExceptions="true"
          convertWarningsToExceptions="true"
-         processIsolation="false"
+         processIsolation="true"
          stopOnFailure="false">
     <testsuites>
         <testsuite name="Feature">
@@ -42,5 +42,6 @@
         <env name="DB_TEST_USERNAME" value="restarters"/>
         <env name="DB_TEST_PASSWORD" value="s3cr3t"/>
         <env name="AUDIT_CONSOLE_EVENTS" value="true"/>
+        <env name="CALENDAR_HASH" value="somehash"/>
     </php>
 </phpunit>
