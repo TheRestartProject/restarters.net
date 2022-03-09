@@ -443,7 +443,7 @@ class CreateEventTest extends TestCase
         ])->assertSee('true');
 
         // Assert that we see the host in the list of volunteers to add to the event.
-        $response = $this->get('/api/group/'. $group->idgroups . '/volunteers');
+        $response = $this->get('/api/groups/'. $group->idgroups . '/volunteers?api_token=' . $host->api_token);
         $response->assertJson([
             [
                 'id' => $host->id,

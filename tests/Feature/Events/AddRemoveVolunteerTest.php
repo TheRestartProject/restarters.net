@@ -36,6 +36,7 @@ class AddRemoveVolunteerTest extends TestCase
 
         // Add an existing user
         $response = $this->put('/api/party/' . $event->idevents . '/volunteers', [
+            'api_token' => $host->api_token,
             'volunteer_email_address' => $restarter->email,
             'full_name' => $restarter->name,
             'user' => $restarter->id,

@@ -36,11 +36,17 @@ Route::group(['middleware' => 'auth:api'], function () {
 
     Route::get('/networks/{network}/stats/', 'API\NetworkController@stats'); // Used by RepairTogether.
 
-    Route::get('/groups', 'API\GroupController@getGroupList'); // Not used but worth keeping and tested.
-    Route::get('/groups/changes', 'API\GroupController@getGroupChanges'); // Used by Zapier
+    Route::prefix('/groups')->group(function() {
+        Route::get('/', 'API\GroupController@getGroupList'); // Not used but worth keeping and tested.
+        Route::get('/changes', 'API\GroupController@getGroupChanges'); // Used by Zapier
+        Route::get('{id}/volunteers', 'API\GroupController@listVolunteers');
+        Route::get('/network/', 'API\GroupController@getGroupsByUsersNetworks'); // Used by Repair Together.
+    });
 
+    Route::prefix('/party')->group(function() {
+        Route::put('{id}/volunteers', 'API\PartyController@addVolunteer');
+    });
 
-    Route::get('/groups/network/', 'API\GroupController@getGroupsByUsersNetworks'); // Used by Repair Together.
     Route::get('/events/network/{date_from?}/{date_to?}', 'API\PartyController@getEventsByUsersNetworks'); // Used by Repair Together.
 
     Route::get('/usersgroups/changes', 'API\UserGroupsController@changes'); // Used by Zapier
@@ -57,15 +63,3 @@ Route::get('/users/{id}/notifications', 'API\UserController@notifications');
 
 // Top Talk topics.  Doesn't need authentication either.
 Route::get('/talk/topics/{tag?}', 'API\DiscourseController@discussionTopics');
-
-// API calls which piggy-back on the user authentication.  We are doing this because API keys don't
-// exist for all users.
-Route::group(['middleware' => 'auth' ], function() {
-    Route::prefix('/group')->group(function() {
-        Route::get('{id}/volunteers', 'API\GroupController@listVolunteers');
-    });
-
-    Route::prefix('/party')->group(function() {
-        Route::put('{id}/volunteers', 'API\PartyController@addVolunteer');
-    });
-});

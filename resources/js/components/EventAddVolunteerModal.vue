@@ -30,6 +30,9 @@
   </b-modal>
 </template>
 <script>
+import event from '../mixins/event'
+import auth from '../mixins/auth'
+
 const axios = require('axios')
 
 export default {
@@ -39,12 +42,14 @@ export default {
       required: true,
     }
   },
+  mixins: [ event, auth ],
   data: function() {
     return {
       showModal: false,
       user: null,
       fullName: null,
-      volunteerEmailAddress: null
+      volunteerEmailAddress: null,
+      groupVolunteers: []
     }
   },
   computed: {
@@ -103,17 +108,25 @@ export default {
     }
   },
   methods: {
-    show() {
+    async show() {
+      // Get the list of volunteers.
+      // TODO We don't handle failures very well.  One way to do this is to move the axios requests into store actions,
+      // which we will do at some point, and then have a generic "something went wrong" popup to alert the user, as
+      // well as Sentry to alert us.
+      const ret = await axios.get('/api/groups/' + this.event.the_group.idgroups + '/volunteers?api_token=' + this.apiToken)
+
+      if (ret && ret.data) {
+        this.groupVolunteers = ret.data
+      }
+
       this.showModal = true
     },
     hide() {
       this.showModal = false
     },
     async submit() {
-      // TODO We don't handle failures very well.  One way to do this is to move the axios requests into store actions,
-      // which we will do at some point, and then have a generic "something went wrong" popup to alert the user, as
-      // well as Sentry to alert us.
       await axios.put('/api/party/' + this.idevents + '/volunteers', {
+        'api_token': this.apiToken,
         'user': this.user,
         'full_name': this.fullName,
         'volunteer_email_address': this.volunteerEmailAddress

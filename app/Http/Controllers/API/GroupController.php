@@ -225,7 +225,10 @@ class GroupController extends Controller
     public function listVolunteers(Request $request, $idgroups) {
         $group = Group::findOrFail($idgroups);
 
-        if (!Auth::user() || !Fixometer::userIsHostOfGroup($idgroups, Auth::user()->id)) {
+        // Get the user that the API has been authenticated as.
+        $user = auth('api')->user();
+
+        if (!$user || !Fixometer::userHasEditGroupPermission($idgroups, $user->id)) {
             // We require host permissions to view the list of volunteers.
             abort(403);
         }
