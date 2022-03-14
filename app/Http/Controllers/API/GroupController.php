@@ -229,7 +229,8 @@ class GroupController extends Controller
         $user = auth('api')->user();
 
         if (!$user || !Fixometer::userHasEditGroupPermission($idgroups, $user->id)) {
-            // We require host permissions to view the list of volunteers.
+            // We require host permissions to view the list of volunteers.  At the moment this call is only used when
+            // adding volunteers, and this check means we don't have to worry about exposing sensitive data.
             abort(403);
         }
 

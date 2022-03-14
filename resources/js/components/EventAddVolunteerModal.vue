@@ -125,7 +125,7 @@ export default {
       this.showModal = false
     },
     async submit() {
-      await axios.put('/api/party/' + this.idevents + '/volunteers', {
+      await axios.put('/api/events/' + this.idevents + '/volunteers', {
         'api_token': this.apiToken,
         'user': this.user,
         'full_name': this.fullName,

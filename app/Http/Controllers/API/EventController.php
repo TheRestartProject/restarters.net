@@ -13,7 +13,7 @@ use App\User;
 use Auth;
 use Illuminate\Http\Request;
 
-class PartyController extends Controller
+class EventController extends Controller
 {
     public function getEventsByUsersNetworks(Request $request, $date_from = null, $date_to = null, $timezone = 'UTC')
     {

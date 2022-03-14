@@ -345,14 +345,6 @@ Route::group(['middleware' => ['ensureAPIToken']], function () {
     Route::get('/party/invite/{code}', 'PartyController@confirmCodeInvite');
     Route::get('/group/invite/{code}', 'GroupController@confirmCodeInvite');
 
-    Route::get('/media-wiki', function () {
-        if (Fixometer::hasRole(Auth::user(), 'Administrator')) {
-            return view('mediawiki.index');
-        }
-
-        return redirect('/user/forbidden');
-    });
-
 //iFrames
     Route::get('/outbound/info/{type}/{id}/{format?}', function ($type, $id, $format = 'fixometer') {
         return App\Http\Controllers\OutboundController::info($type, $id, $format);

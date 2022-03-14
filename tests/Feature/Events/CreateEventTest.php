@@ -453,7 +453,7 @@ class CreateEventTest extends TestCase
         ]);
 
         // Assert we can add them back in.
-        $response = $this->put('/api/party/' . $party->idevents . '/volunteers', [
+        $response = $this->put('/api/events/' . $party->idevents . '/volunteers', [
             'volunteer_email_address' => $host->email,
             'full_name' => $host->name,
             'user' => $host->id,

@@ -126,6 +126,11 @@ class ApiController extends Controller
 
     public static function getUserList()
     {
+        $authenticatedUser = Auth::user();
+        if (! $authenticatedUser->hasRole('Administrator')) {
+            return abort(403, 'The authenticated user is not authorized to access this resource');
+        }
+
         $users = User::whereNull('deleted_at')
             ->orderBy('created_at', 'desc')
             ->get();

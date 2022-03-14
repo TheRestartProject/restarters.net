@@ -43,11 +43,10 @@ Route::group(['middleware' => 'auth:api'], function () {
         Route::get('/network/', 'API\GroupController@getGroupsByUsersNetworks'); // Used by Repair Together.
     });
 
-    Route::prefix('/party')->group(function() {
+    Route::prefix('/events')->group(function() {
+        Route::get('/network/{date_from?}/{date_to?}', 'API\PartyController@getEventsByUsersNetworks'); // Used by Repair Together.
         Route::put('{id}/volunteers', 'API\PartyController@addVolunteer');
     });
-
-    Route::get('/events/network/{date_from?}/{date_to?}', 'API\PartyController@getEventsByUsersNetworks'); // Used by Repair Together.
 
     Route::get('/usersgroups/changes', 'API\UserGroupsController@changes'); // Used by Zapier
     Route::delete('/usersgroups/{id}', 'API\UserGroupsController@leave'); // Used by Vue client.

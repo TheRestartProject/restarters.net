@@ -35,7 +35,7 @@ class AddRemoveVolunteerTest extends TestCase
         $restarter = factory(User::class)->states('Restarter')->create();
 
         // Add an existing user
-        $response = $this->put('/api/party/' . $event->idevents . '/volunteers', [
+        $response = $this->put('/api/events/' . $event->idevents . '/volunteers', [
             'api_token' => $host->api_token,
             'volunteer_email_address' => $restarter->email,
             'full_name' => $restarter->name,
@@ -65,7 +65,7 @@ class AddRemoveVolunteerTest extends TestCase
         $response = $this->get('/party/view/'.$event->idevents);
         $response->assertSee('Invites Sent!');
 
-        $response = $this->put('/api/party/' . $event->idevents . '/volunteers', [
+        $response = $this->put('/api/events/' . $event->idevents . '/volunteers', [
             'volunteer_email_address' => $restarter->email,
             'full_name' => $restarter->name,
             'user' => $restarter->id,
@@ -81,7 +81,7 @@ class AddRemoveVolunteerTest extends TestCase
         ])->assertSee('true');
 
         // Add by name only
-        $response = $this->put('/api/party/' . $event->idevents . '/volunteers', [
+        $response = $this->put('/api/events/' . $event->idevents . '/volunteers', [
             'full_name' => 'Jo Bloggins',
         ]);
 
@@ -95,7 +95,7 @@ class AddRemoveVolunteerTest extends TestCase
         ])->assertSee('true');
 
         // Add anonymous.
-        $response = $this->put('/api/party/' . $event->idevents . '/volunteers', []);
+        $response = $this->put('/api/events/' . $event->idevents . '/volunteers', []);
 
         $response->assertJson([
             'success' => 'success'
