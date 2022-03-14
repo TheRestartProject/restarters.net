@@ -20,7 +20,9 @@ class InviteEventTest extends TestCase
 
         $this->withoutExceptionHandling();
 
-        $group = factory(Group::class)->create();
+        $group = factory(Group::class)->create([
+                                                   'wordpress_post_id' => '99999'
+                                               ]);
         $event = factory(Party::class)->create([
                                                    'group' => $group,
                                                    'event_start_utc' => '2130-01-01T12:13:00+00:00',
@@ -121,7 +123,9 @@ class InviteEventTest extends TestCase
     {
         $this->withoutExceptionHandling();
 
-        $group = factory(Group::class)->create();
+        $group = factory(Group::class)->create([
+                                                   'wordpress_post_id' => '99999'
+                                               ]);
         $host = factory(User::class)->states('Host')->create();
         $event = factory(Party::class)->create([
                                                    'group' => $group,

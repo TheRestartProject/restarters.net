@@ -20,7 +20,9 @@ class JoinEventTest extends TestCase
     {
         $this->withoutExceptionHandling();
 
-        $group = factory(Group::class)->create();
+        $group = factory(Group::class)->create([
+                                                   'wordpress_post_id' => '99999'
+                                               ]);
         $event = factory(Party::class)->create(['group' => $group->idgroups]);
 
         $user = factory(User::class)->states('Restarter')->create();

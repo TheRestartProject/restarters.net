@@ -82,6 +82,50 @@ class Fixometer
         return date('D, j M Y, H:i', $timestamp);
     }
 
+    public static function userHasViewPartyPermission($partyId, $userId = null)
+    {
+        $party = Party::findOrFail($partyId);
+        $group = $party->theGroup;
+
+        if ($group->approved) {
+            // Events on approved groups are always visible, whether or not the event has been approved.
+            return true;
+        }
+
+        // The group is not approved.  Events are only visible to:
+        // - administrators
+        // - (relevant) network coordinators
+        // - hosts of the relevant group
+        if (is_null($userId)) {
+            if (empty(Auth::user())) {
+                return false;
+            } else {
+                $userId = Auth::user()->id;
+            }
+        }
+
+        $user = User::findOrFail($userId);
+
+        if (self::hasRole($user, 'Administrator')) {
+            return true;
+        }
+
+        if (self::hasRole($user, 'NetworkCoordinator')) {
+            $group = $party->theGroup;
+            foreach ($group->networks as $network) {
+                if ($network->coordinators->contains($user)) {
+                    return true;
+                }
+            }
+        }
+
+        if (self::hasRole($user, 'Host') && self::userIsHostOfGroup($group->idgroups, $userId)) {
+            return true;
+        }
+
+        return false;
+    }
+
     public static function userHasEditPartyPermission($partyId, $userId = null)
     {
         $party = Party::findOrFail($partyId);
