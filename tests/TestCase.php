@@ -16,6 +16,7 @@ use App\Network;
 use App\Party;
 use App\Role;
 use App\Skills;
+use App\UsersSkills;
 use App\User;
 use App\UserGroups;
 use App\Xref;
@@ -55,6 +56,7 @@ abstract class TestCase extends BaseTestCase
         GroupTags::truncate();
         Xref::truncate();
         Images::truncate();
+        UsersSkills::truncate();
         Skills::truncate();
         DB::statement('delete from audits');
         DB::delete('delete from user_network');

@@ -44,8 +44,8 @@ Route::group(['middleware' => 'auth:api'], function () {
     });
 
     Route::prefix('/events')->group(function() {
-        Route::get('/network/{date_from?}/{date_to?}', 'API\PartyController@getEventsByUsersNetworks'); // Used by Repair Together.
-        Route::put('{id}/volunteers', 'API\PartyController@addVolunteer');
+        Route::get('/network/{date_from?}/{date_to?}', 'API\EventController@getEventsByUsersNetworks'); // Used by Repair Together.
+        Route::put('{id}/volunteers', 'API\EventController@addVolunteer');
     });
 
     Route::get('/usersgroups/changes', 'API\UserGroupsController@changes'); // Used by Zapier
