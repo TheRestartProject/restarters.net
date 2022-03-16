@@ -100,6 +100,11 @@ class CreateEventTest extends TestCase
         $event = Party::latest()->first();
         $this->assertEquals($host->id, $event->user_id);
 
+        // The event should show in the future events for this user.
+        $upcoming_events = Party::futureForUser()->get();
+        self::assertEquals(1, $upcoming_events->count());
+        self::assertEquals($event->idevents, $upcoming_events[0]->idevents);
+
         // Check that we can view the event, and that it shows the creation success message.
         $this->get('/party/view/'.$event->idevents)->
             assertSee($eventAttributes['venue'])->
@@ -503,5 +508,53 @@ class CreateEventTest extends TestCase
         $party = $group->parties()->latest()->first();
         $this->assertEquals($idevents, $party->idevents);
         $this->assertEquals($wordpress_post_id, $party->wordpress_post_id);
+    }
+
+    /**
+     * @test
+     */
+    public function a_past_event_is_not_upcoming() {
+        $host = factory(User::class)->states('Administrator')->create();
+        $this->actingAs($host);
+
+        $group = factory(Group::class)->create();
+        $group->addVolunteer($host);
+        $group->makeMemberAHost($host);
+
+        // Create the event
+        $idevents = $this->createEvent($group->idgroups, '2000-01-01');
+
+        // The event is past and should not show in the future events for this user.
+        $upcoming_events = Party::futureForUser()->get();
+        self::assertEquals(0, $upcoming_events->count());
+
+        // ...but should show as past.
+        $past_events = Party::pastForUser()->get();
+        self::assertEquals(1, $past_events->count());
+        self::assertEquals($idevents, $past_events[0]->idevents);
+    }
+
+    /**
+     * @test
+     */
+    public function a_future_event_is_upcoming() {
+        $host = factory(User::class)->states('Administrator')->create();
+        $this->actingAs($host);
+
+        $group = factory(Group::class)->create();
+        $group->addVolunteer($host);
+        $group->makeMemberAHost($host);
+
+        // Create the event
+        $idevents = $this->createEvent($group->idgroups, '2100-01-01');
+
+        // The event is future and should not show in the past events for this user.
+        $past_events = Party::pastForUser()->get();
+        self::assertEquals(0, $past_events->count());
+
+        // ...but should show as future.
+        $upcoming_events = Party::futureForUser()->get();
+        self::assertEquals(1, $upcoming_events->count());
+        self::assertEquals($idevents, $upcoming_events[0]->idevents);
     }
 }
