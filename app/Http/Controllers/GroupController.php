@@ -707,6 +707,7 @@ class GroupController extends Controller
         }
 
         $group = $Group->findOne($id);
+        error_log("Group timezone " . Group::find($group->idgroups)->timezone);
 
         if (! isset($response)) {
             $response = null;
