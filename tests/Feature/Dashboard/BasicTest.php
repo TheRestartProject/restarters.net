@@ -11,6 +11,8 @@ use Hash;
 use Mockery;
 use Tests\TestCase;
 
+use function PHPUnit\Framework\assertEquals;
+
 class BasicTest extends TestCase
 {
     protected function setUp(): void
@@ -46,6 +48,7 @@ class BasicTest extends TestCase
         $response = $this->get('/dashboard');
 
         $props = $this->assertVueProperties($response, [
+            [],
             [
                 'administrator' => 'false',
                 'host' => 'false',
@@ -54,15 +57,21 @@ class BasicTest extends TestCase
                 'location' => "$city",
                 ':your-groups' => '[]',
                 ':upcoming-events' => '[]',
-                ':topics' => '[]',
                 'see-all-topics-link' => env('DISCOURSE_URL').'/latest',
                 ':is-logged-in' => 'true',
                 'discourse-base-url' => env('DISCOURSE_URL'),
             ],
         ]);
 
-        $this->assertEquals($nearbyGroupCount, count(json_decode($props[0][':nearby-groups'], true)));
-        $this->assertEquals($nearbyGroupCount, count(json_decode($props[0][':new-groups'], true)));
+        $this->assertEquals($nearbyGroupCount, count(json_decode($props[1][':nearby-groups'], true)));
+        $this->assertEquals($nearbyGroupCount, count(json_decode($props[1][':new-groups'], true)));
+
+        // Test Discourse API call which will be made by the Vue client.
+        $response = $this->get('/api/talk/topics');
+        $response->assertSuccessful();
+        $ret = json_decode($response->getContent(), TRUE);
+        self::assertEquals('success', $ret['success']);
+        self::assertTrue(array_key_exists('topics', $ret));
     }
 
     public function provider()
@@ -111,21 +120,23 @@ class BasicTest extends TestCase
         $response2 = $this->get('/dashboard');
 
         $props = $this->assertVueProperties($response2, [
+            [],
             [
                 ':is-logged-in' => 'true'
             ]
         ]);
-        $upcomingEvents = json_decode($props[0][':upcoming-events'], TRUE);
+        $upcomingEvents = json_decode($props[1][':upcoming-events'], TRUE);
         $this->assertEquals($event->idevents, $upcomingEvents[0]['idevents']);
 
         $response3 = $this->get('/party');
 
         $props = $this->assertVueProperties($response3, [
+            [],
             [
                 ':canedit' => 'false'
             ]
         ]);
-        $initialEvents = json_decode($props[0][':initial-events'], TRUE);
+        $initialEvents = json_decode($props[1][':initial-events'], TRUE);
         $this->assertEquals($event->idevents, $initialEvents[0]['idevents']);
 
         // Invite a second host to the group.
@@ -151,21 +162,23 @@ class BasicTest extends TestCase
 
         $response5 = $this->get('/dashboard');
         $props = $this->assertVueProperties($response5, [
+            [],
             [
                 ':is-logged-in' => 'true'
             ]
         ]);
-        $upcomingEvents = json_decode($props[0][':upcoming-events'], TRUE);
+        $upcomingEvents = json_decode($props[1][':upcoming-events'], TRUE);
         $this->assertEquals(0, count($upcomingEvents));
 
         $response6 = $this->get('/party');
 
         $props = $this->assertVueProperties($response6, [
+            [],
             [
                 ':canedit' => 'false'
             ]
         ]);
-        $initialEvents = json_decode($props[0][':initial-events'], TRUE);
+        $initialEvents = json_decode($props[1][':initial-events'], TRUE);
         $this->assertEquals($event->idevents, $initialEvents[0]['idevents']);
         $this->assertTrue($initialEvents[0]['nearby']);
     }

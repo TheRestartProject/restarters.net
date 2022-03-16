@@ -56,6 +56,7 @@ class GroupJoinTest extends TestCase
 
         // Should redirect to the dashboard.
         $this->assertVueProperties($response, [
+            [],
             [
                 'VueComponent' => 'dashboardpage',
             ],

@@ -59,6 +59,7 @@ class MicrotaskingController extends Controller
             'currentUserQuests' => $currentUserQuests,
             'currentUserContributions' => $currentUserContributions,
             'topics' => $discourseService->getDiscussionTopics($tag, 5),
+            'tag' => $tag,
             'seeAllTopicsLink' => env('DISCOURSE_URL')."/tag/{$tag}/l/latest",
             'activeQuest' => $activeQuest,
         ]);

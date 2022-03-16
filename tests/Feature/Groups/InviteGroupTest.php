@@ -58,12 +58,13 @@ class InviteGroupTest extends TestCase
 
         // Check the counts.
         $props = $this->assertVueProperties($response2, [
+            [],
             [
                 ':idgroups' => $group->idgroups,
             ],
         ]);
 
-        $initialGroup = json_decode($props[0][':initial-group'], true);
+        $initialGroup = json_decode($props[1][':initial-group'], true);
         $this->assertEquals(1, $initialGroup['all_hosts_count']);
         $this->assertEquals(1, $initialGroup['all_confirmed_hosts_count']);
         $this->assertEquals(1, $initialGroup['all_restarters_count']);
@@ -94,12 +95,13 @@ class InviteGroupTest extends TestCase
         // Check the counts have changed.
         $response4 = $this->get('/group/view/'.$group->idgroups);
         $props = $this->assertVueProperties($response4, [
+            [],
             [
                 ':idgroups' => $group->idgroups,
             ],
         ]);
 
-        $initialGroup = json_decode($props[0][':initial-group'], true);
+        $initialGroup = json_decode($props[1][':initial-group'], true);
         $this->assertEquals(1, $initialGroup['all_hosts_count']);
         $this->assertEquals(1, $initialGroup['all_confirmed_hosts_count']);
         $this->assertEquals(1, $initialGroup['all_restarters_count']);

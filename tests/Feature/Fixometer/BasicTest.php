@@ -48,6 +48,7 @@ class BasicTest extends TestCase
         ]);
 
         $this->assertVueProperties($response, [
+            [],
             [
                 // Can't assert on latest-data or impact-data as dev systems might have varying info.
                 ':clusters' => $clusters,

@@ -11,6 +11,9 @@
           :current-page="currentPage"
           sort-null-last
       >
+        <template slot="cell(device_category.name)" slot-scope="data">
+          {{ __('strings.' + data.item.category.name) }}
+        </template>
         <template slot="cell(shortProblem)" slot-scope="data">
           <div v-line-clamp="3">
             {{ data.item.shortProblem }}

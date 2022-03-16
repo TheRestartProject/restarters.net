@@ -31,6 +31,7 @@ class BasicTest extends TestCase
         $response = $this->get('/group');
 
         $props = $this->assertVueProperties($response, [
+            [],
             [
                 // Can't assert on all-group-tags dev systems might have varying info.
                 'your-area' => 'London',
@@ -43,7 +44,7 @@ class BasicTest extends TestCase
             ],
         ]);
 
-        $groups = json_decode($props[0][':all-groups'], true);
+        $groups = json_decode($props[1][':all-groups'], true);
         $this->assertEquals($group->idgroups, $groups[0]['idgroups']);
         $this->assertEquals(0, $groups[0]['distance']);
     }

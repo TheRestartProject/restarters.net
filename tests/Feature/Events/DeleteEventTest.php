@@ -101,7 +101,9 @@ class DeleteEventTest extends TestCase
         $host = factory(User::class)->states($roleToCreate)->create();
         $this->actingAs($host);
 
-        $group = factory(Group::class)->create();
+        $group = factory(Group::class)->create([
+                                                   'wordpress_post_id' => '99999'
+                                               ]);
         $group->addVolunteer($host);
         $group->makeMemberAHost($host);
 
@@ -111,11 +113,12 @@ class DeleteEventTest extends TestCase
         // View the event
         $response = $this->get("/party/view/{$event->idevents}");
         $props = $this->assertVueProperties($response, [
+            [],
             [
                 ':idevents' => $event->idevents
             ]
         ]);
-        $initialEvent = json_decode($props[0][':initial-event'], TRUE);
+        $initialEvent = json_decode($props[1][':initial-event'], TRUE);
         $this->assertEquals($event->venue, $initialEvent['venue']);
         $this->assertFalse($initialEvent['approved']);
 
@@ -290,6 +293,7 @@ class DeleteEventTest extends TestCase
         $response = $this->get("/party/view/$idevents");
 
         $this->assertVueProperties($response, [
+            [],
             [
                 ':candelete' => $canDelete ? 'true' : 'false',
             ],
