@@ -45,6 +45,7 @@ Route::group(['middleware' => 'auth:api'], function () {
 
     Route::prefix('/events')->group(function() {
         Route::get('/network/{date_from?}/{date_to?}', 'API\EventController@getEventsByUsersNetworks'); // Used by Repair Together.
+        Route::get('{id}/volunteers', 'API\EventController@listVolunteers');
         Route::put('{id}/volunteers', 'API\EventController@addVolunteer');
     });
 

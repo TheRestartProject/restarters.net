@@ -204,4 +204,21 @@ class EventController extends Controller
                                     'success' => 'success'
                                 ]);
     }
+
+
+    public function listVolunteers(Request $request, $idevents) {
+        $party = Party::findOrFail($idevents);
+
+        // Get the user that the API has been authenticated as.
+        $user = auth('api')->user();
+
+        // Emails are sensitive.
+        $showEmails = $user && !Fixometer::userHasEditPartyPermission($idevents, $user->id);
+        $volunteers = $party->expandVolunteers($party->allConfirmedVolunteers()->get(), $showEmails);
+
+        return response()->json([
+            'success' => 'success',
+            'volunteers' => $volunteers
+        ]);
+    }
 }

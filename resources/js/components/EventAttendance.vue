@@ -53,7 +53,7 @@
                     <b-btn variant="link" @click="addVolunteer">
                       {{ __('events.add_volunteer_modal_heading') }}
                     </b-btn>
-                    <EventAddVolunteerModal :idevents="idevents" ref="addVolunteerModal"/>
+                    <EventAddVolunteerModal :idevents="idevents" ref="addVolunteerModal" @hide="fetchVolunteers" />
                   <b-btn variant="link" data-toggle="modal" data-target="#event-all-attended" href="#">
                     {{ __('events.see_all') }}
                     </b-btn>
@@ -106,11 +106,6 @@ export default {
       required: false,
       default: false
     },
-    attendance:  {
-      type: Array,
-      required: false,
-      default: function () { return [] }
-    },
     invitations:  {
       type: Array,
       required: false,
@@ -119,28 +114,10 @@ export default {
   },
   components: {EventAddVolunteerModal, CollapsibleSection, EventAttendee, EventAttendanceCount},
   mixins: [event],
-  created() {
-    // The attendance is passed from the server to the client via a prop on this component.  When we are created
-    // we put it in the store.  From then on we get the data from the store so that we get reactivity.
-    //
-    // Further down the line this initial data might be provided either by an API call from the client to the server,
-    // or from Vue server-side rendering, where the whole initial state is passed to the client.
-    let attendees = []
-
-    this.attendance.forEach((a) => {
-      a.confirmed = true
-      attendees.push(a)
-    })
-
-    this.invitations.forEach((a) => {
-      a.confirmed = false
-      attendees.push(a)
-    })
-
-    this.$store.dispatch('attendance/set', {
-      idevents: this.idevents,
-      attendees: attendees
-    })
+  computed: {
+    attendance() {
+      return this.$store.getters['attendance/byEvent'](this.idevents)
+    }
   },
   methods: {
     async changeParticipants(val) {
@@ -169,6 +146,11 @@ export default {
     },
     addVolunteer() {
       this.$refs.addVolunteerModal.show()
+    },
+    fetchVolunteers() {
+      this.$store.dispatch('attendance/fetch', {
+        idevents: this.idevents
+      })
     }
   }
 }

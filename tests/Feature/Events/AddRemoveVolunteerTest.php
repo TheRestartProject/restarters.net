@@ -46,11 +46,35 @@ class AddRemoveVolunteerTest extends TestCase
             'success' => 'success'
         ]);
 
+        // Check they show in the list of volunteers.
+        $response = $this->get('/api/events/' . $event->idevents . '/volunteers?api_token='  . $host->api_token);
+        $response->assertSuccessful();
+        $response->assertJson([
+            'success' => true,
+            'volunteers' => [
+                [
+                    'user' => $restarter->id
+                ]
+            ]
+        ]);
+
         // Remove them
         $volunteer = EventsUsers::where('user', $restarter->id)->first();
         $this->post('/party/remove-volunteer/', [
             'id' => $volunteer->idevents_users,
         ])->assertSee('true');
+
+        // Check they no longer show in the list of volunteers.
+        $response = $this->get('/api/events/' . $event->idevents . '/volunteers?api_token='  . $host->api_token);
+        $response->assertSuccessful();
+        $response->assertJsonMissing([
+                                  'success' => true,
+                                  'volunteers' => [
+                                      [
+                                          'user' => $restarter->id
+                                      ]
+                                  ]
+                              ]);
 
         // Add an invited user
         $restarter = factory(User::class)->states('Restarter')->create();

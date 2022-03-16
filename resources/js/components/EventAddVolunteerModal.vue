@@ -76,8 +76,8 @@ export default {
       return ret
     },
     disabled() {
-      // Blank name is allowed.
-      return this.user === null || (this.user === 'not-registered' && !this.volunteerEmailAddress)
+      // Name and email are optional, but not both.
+      return this.user === null || (this.user === 'not-registered' && !this.volunteerEmailAddress && !this.fullName)
     },
     translatedOptionDefault() {
       return this.$lang.get('events.option_default')
@@ -122,11 +122,12 @@ export default {
       this.showModal = true
     },
     hide() {
+      this.$emit('hide')
       this.showModal = false
     },
     async submit() {
-      await axios.put('/api/events/' + this.idevents + '/volunteers', {
-        'api_token': this.apiToken,
+      await this.$store.dispatch('attendance/add', {
+        'idevents': this.idevents,
         'user': this.user,
         'full_name': this.fullName,
         'volunteer_email_address': this.volunteerEmailAddress
