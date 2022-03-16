@@ -395,17 +395,7 @@ class User extends Authenticatable implements Auditable, HasLocalePreference
             return false;
         }
 
-        try {
-            $client = app('discourse-client');
-            $emailToSearchFor = urlencode(trim($this->email));
-            $endpoint = sprintf('/admin/users/list/all.json?email=%s', $emailToSearchFor);
-            $response = $client->request('GET', $endpoint);
-            $discourseResult = json_decode($response->getBody());
-
-            return count($discourseResult) >= 1;
-        } catch (\Exception $ex) {
-            return false;
-        }
+        return $this->user_name != NULL;
     }
 
     /**

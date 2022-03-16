@@ -70,7 +70,9 @@ class CreateEventTest extends TestCase
         $host = factory(User::class)->states('Host')->create();
         $this->actingAs($host);
 
-        $group = factory(Group::class)->create();
+        $group = factory(Group::class)->create([
+            'wordpress_post_id' => '99999'
+        ]);
         $group->addVolunteer($host);
         $group->makeMemberAHost($host);
 
@@ -115,12 +117,13 @@ class CreateEventTest extends TestCase
         $response = $this->get('/group/view/'.$group->idgroups);
 
         $props = $this->assertVueProperties($response, [
+            [],
             [
                 ':idgroups' => $group->idgroups,
             ],
         ]);
 
-        $events = json_decode($props[0][':events'], TRUE);
+        $events = json_decode($props[1][':events'], TRUE);
 
         if ($seeEvent) {
             // We should be able to see this upcoming event in the Vue properties.
@@ -136,12 +139,13 @@ class CreateEventTest extends TestCase
         $response = $this->get('/party');
 
         $props = $this->assertVueProperties($response, [
+            [],
             [
                 'heading-level' => 'h2',
             ],
         ]);
 
-        $events = json_decode($props[0][':initial-events'], TRUE);
+        $events = json_decode($props[1][':initial-events'], TRUE);
 
         if ($seeEvent) {
             // We should be able to see this upcoming event in the Vue properties.
@@ -149,6 +153,11 @@ class CreateEventTest extends TestCase
             $this->assertEquals($canModerate, $events[0]['canModerate']);
             $this->assertEquals(true, $events[0]['attending']);
             $this->assertEquals(true, $events[0]['isVolunteer']);
+            $this->assertEquals(substr($eventAttributes['event_start_utc'], 0, 10), $events[0]['event_date_local']);
+            $this->assertEquals(substr($eventAttributes['event_start_utc'], 11, 5), $events[0]['start_local']);
+            $this->assertEquals(substr($eventAttributes['event_end_utc'], 11, 5), $events[0]['end_local']);
+            $this->assertEquals(Carbon::parse($eventAttributes['event_start_utc'])->toIso8601String(), $events[0]['event_start_utc']);
+            $this->assertEquals(Carbon::parse($eventAttributes['event_end_utc'])->toIso8601String(), $events[0]['event_start_utc']);
         } else {
             $this->assertEquals(true, $events[0]['requiresModeration']);
         }
@@ -177,12 +186,13 @@ class CreateEventTest extends TestCase
         $response = $this->get('/party');
 
         $props = $this->assertVueProperties($response, [
+            [],
             [
                 'heading-level' => 'h2',
             ],
         ]);
 
-        $events = json_decode($props[0][':initial-events'], TRUE);
+        $events = json_decode($props[1][':initial-events'], TRUE);
         $this->assertEquals(1, count($events));
 
         // Should have the 'all' property set because we've not joined the group.
@@ -196,12 +206,13 @@ class CreateEventTest extends TestCase
         $response = $this->get('/party');
 
         $props = $this->assertVueProperties($response, [
+            [],
             [
                 'heading-level' => 'h2',
             ],
         ]);
 
-        $events = json_decode($props[0][':initial-events'], TRUE);
+        $events = json_decode($props[1][':initial-events'], TRUE);
         $this->assertEquals(1, count($events));
 
         // Should not have 'all' or 'nearby' flag - those go in the "Other events" section.
@@ -301,11 +312,17 @@ class CreateEventTest extends TestCase
         $group->makeMemberAHost($host);
         $group->addVolunteer($restarter);
 
-        $eventData = factory(Party::class)->raw(['group' => $group->idgroups, 'event_date' => '2030-01-01', 'latitude'=>'1', 'longitude'=>'1']);
+        $eventData = factory(Party::class)->raw([
+            'group' => $group->idgroups,
+            'event_start_utc' => '2100-01-01T10:15:05+05:00',
+            'event_end_utc' => '2100-01-0113:45:05+05:00',
+            'latitude'=>'1',
+            'longitude'=>'1'
+        ]);
 
         // Approve the event
         $response = $this->post('/party/create/', $eventData);
-        $event = Party::where('event_date', '2030-01-01')->first();
+        $event = Party::latest()->first();
         $eventData['wordpress_post_id'] = 100;
         $eventData['id'] = $event->idevents;
         $eventData['moderate'] = 'approve';
@@ -354,7 +371,7 @@ class CreateEventTest extends TestCase
 
         // act
         $response = $this->post('/party/create/', $eventData);
-        $event = Party::where('event_date', '1930-01-01')->first();
+        $event = Party::latest()->first();
         $eventData['wordpress_post_id'] = 100;
         $eventData['id'] = $event->idevents;
         $eventData['moderate'] = 'approve';

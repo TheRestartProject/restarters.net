@@ -20,7 +20,7 @@ use Illuminate\Support\Facades\Log;
 
 class DashboardController extends Controller
 {
-    public function index(DiscourseService $discourseService)
+    public function index()
     {
         $user = User::getProfile(Auth::id());
 
@@ -82,7 +82,6 @@ class DashboardController extends Controller
                 'user' => $user,
                 'groups_near_you' => $groupsNearYou,
                 'upcoming_events' => $upcoming_events,
-                'topics' => $discourseService->getDiscussionTopics(),
                 'your_groups' => $your_groups,
                 'seeAllTopicsLink' => env('DISCOURSE_URL').'/latest',
                 'new_groups' => $new_groups,

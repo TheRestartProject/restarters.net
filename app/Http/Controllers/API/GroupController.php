@@ -39,23 +39,6 @@ class GroupController extends Controller
         return response()->json($groupChanges);
     }
 
-    /**
-     * To provide a more uniform API, this is just a wrapper around
-     * the method in the GroupController for now.
-     *
-     * That method should be moved out of the controller.
-     */
-    public static function getGroupsByUserGroupTag(Request $request)
-    {
-        $authenticatedUser = Auth::user();
-
-        $groupController = new \App\Http\Controllers\GroupController();
-
-        $groups = $groupController->getGroupsByKey($request, $authenticatedUser->api_token);
-
-        return response()->json($groups);
-    }
-
     public static function getGroupsByUsersNetworks(Request $request)
     {
         $authenticatedUser = Auth::user();
@@ -127,11 +110,11 @@ class GroupController extends Controller
                 foreach ($group->upcomingParties() as $event) {
                     $upcoming_parties_collection->push([
                                                            'event_id' => $event->idevents,
-                                                           'event_date' => $event->event_date,
-                                                           'start_time' => $event->start,
-                                                           'end_time' => $event->end,
+                                                           'event_date' => $event->event_date_local,
+                                                           'start_time' => $event->start_local,
+                                                           'end_time' => $event->end_local,
                                                            'name' => $event->venue,
-// TODO Once DOT-1502 is released                                                           'link' => $event->link,
+                                                           'link' => $event->link,
                                                            'online' => $event->online,
                                                            'description' => $event->free_text,
                                                            'location' => [
@@ -147,11 +130,11 @@ class GroupController extends Controller
                 foreach ($group->pastParties() as $key => $event) {
                     $past_parties_collection->push([
                                                        'event_id' => $event->idevents,
-                                                       'event_date' => $event->event_date,
-                                                       'start_time' => $event->start,
-                                                       'end_time' => $event->end,
+                                                       'event_date' => $event->event_date_local,
+                                                       'start_time' => $event->start_local,
+                                                       'end_time' => $event->end_local,
                                                        'name' => $event->venue,
-// TODO Once DOT-1502 is released                                                       'link' => $event->link,
+                                                       'link' => $event->link,
                                                        'online' => $event->online,
                                                        'description' => $event->free_text,
                                                        'location' => [

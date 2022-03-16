@@ -12,8 +12,8 @@
         <div class="group-name"><a class="group-name" href="/group/view/{{ $event->theGroup->idgroups }}">{{ $event->theGroup->name }}</a></div>
     </td>
     <td class="cell-date">
-        <div>{{ $event->getEventDate('D jS M Y') }}</div>
-        <div>{{ $event->getEventStartEnd() }}</div>
+        <div>{{ $event->getFormattedLocalStart('D jS M Y') }}</div>
+        <div>{{ $event->getEventStartEndLocal() }}</div>
     </td>
     @if( !isset($group_view) )
       <td class="cell-locations d-none d-sm-table-cell">

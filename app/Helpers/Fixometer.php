@@ -20,22 +20,8 @@ use Request;
 
 class Fixometer
 {
-    public static function allAges($range = false)
+    public static function allAges()
     {
-        if ($range) {
-            return [
-                '' => 'N/A',
-                (intval(date('Y')) - 20).'-'.(intval(date('Y')) - 16) => '16-20',
-                (intval(date('Y')) - 30).'-'.(intval(date('Y')) - 21) => '21-30',
-                (intval(date('Y')) - 40).'-'.(intval(date('Y')) - 31) => '31-40',
-                (intval(date('Y')) - 50).'-'.(intval(date('Y')) - 41) => '41-50',
-                (intval(date('Y')) - 60).'-'.(intval(date('Y')) - 51) => '51-60',
-                (intval(date('Y')) - 70).'-'.(intval(date('Y')) - 61) => '61-70',
-                (intval(date('Y')) - 80).'-'.(intval(date('Y')) - 71) => '71-80',
-                (intval(date('Y')) - 90).'-'.(intval(date('Y')) - 81) => '81-90',
-                (intval(date('Y')) - 100).'-'.(intval(date('Y')) - 91) => '91-100',
-            ];
-        }
         $ages = ['' => ''];
 
         for ($i = intval(date('Y')) - 18; $i > intval(date('Y', strtotime('- 100 years'))); $i--) {
@@ -94,6 +80,50 @@ class Fixometer
     public static function dateFormat($timestamp)
     {
         return date('D, j M Y, H:i', $timestamp);
+    }
+
+    public static function userHasViewPartyPermission($partyId, $userId = null)
+    {
+        $party = Party::findOrFail($partyId);
+        $group = $party->theGroup;
+
+        if ($group->approved) {
+            // Events on approved groups are always visible, whether or not the event has been approved.
+            return true;
+        }
+
+        // The group is not approved.  Events are only visible to:
+        // - administrators
+        // - (relevant) network coordinators
+        // - hosts of the relevant group
+        if (is_null($userId)) {
+            if (empty(Auth::user())) {
+                return false;
+            } else {
+                $userId = Auth::user()->id;
+            }
+        }
+
+        $user = User::findOrFail($userId);
+
+        if (self::hasRole($user, 'Administrator')) {
+            return true;
+        }
+
+        if (self::hasRole($user, 'NetworkCoordinator')) {
+            $group = $party->theGroup;
+            foreach ($group->networks as $network) {
+                if ($network->coordinators->contains($user)) {
+                    return true;
+                }
+            }
+        }
+
+        if (self::hasRole($user, 'Host') && self::userIsHostOfGroup($group->idgroups, $userId)) {
+            return true;
+        }
+
+        return false;
     }
 
     public static function userHasEditPartyPermission($partyId, $userId = null)
@@ -299,60 +329,6 @@ class Fixometer
 
               </div>';
         }
-    }
-
-    /**
-     * verify that an array index exists and is not empty or null.
-     * can also do some type control.
-     * */
-    public static function verify($var, $strict = false, $type = 'string')
-    {
-        if (! isset($var) || empty($var) || is_null($var)) {
-            return false;
-        }
-        if ($strict) {
-            switch ($type) {
-                case 'number':
-                    if (is_numeric($var)) {
-                        return true;
-                    }
-
-                    break;
-                case 'string':
-                    return true;
-
-                    break;
-                case 'array':
-                    if (is_array($var)) {
-                        return true;
-                    }
-
-                    break;
-                default:
-                    return false;
-
-                    break;
-            }
-        } else {
-            return true;
-        }
-    }
-
-    public static function dbDateNoTime($string)
-    {
-        $d = explode('/', $string);
-
-        return implode('-', array_reverse($d));
-    }
-
-    public static function translate($key)
-    {
-        $translation = __(App::getLocale().'.'.$key);
-        if (strpos($translation, App::getLocale().'.') !== false) {
-            return $key;
-        }
-
-        return $translation;
     }
 
     /**
@@ -742,25 +718,6 @@ class Fixometer
         return '';
     }
 
-    public static function checkDistance($object, $user)
-    {
-        $url = 'https://maps.googleapis.com/maps/api/distancematrix/json?units=imperial&origins='.$object->latitude.','.$object->longitude.'&destinations='.$user->latitude.','.$user->longitude;
-
-        $json = file_get_contents($url);
-        $json = json_decode($json);
-
-        if (is_object($json) && ! empty($json->{'rows'})) {
-            try {
-                $distance = str_replace(' mi', '', $json->{'rows'}[0]->{'elements'}[0]->{'distance'}->{'text'});
-                $distance = floatval(str_replace(',', '', $distance));
-            } catch (\Exception $e) {
-                return false;
-            }
-
-            return $distance;
-        }
-    }
-
     public static function skillCategories()
     {
         return [
@@ -878,30 +835,7 @@ class Fixometer
         return $role;
     }
 
-    /** checks if user has preference **/
-    public static function hasPreference($slug)
-    {
-
-        // Check if guest
-        if (Auth::guest()) {
-            return false;
-        }
-
-        // Check if preference exists
-        $has_preference = UsersPreferences::join('preferences', 'preferences.id', '=', 'users_preferences.preference_id')
-            ->where('users_preferences.user_id', Auth::user()->id)
-            ->where('preferences.slug', $slug)
-            ->first();
-
-        // Does user have it?
-        if (empty($has_preference)) {
-            return false;
-        }
-
-        return true;
-    }
-
-    /** checks if user has preference **/
+    /** checks if user has permission **/
     public static function hasPermission($slug)
     {
 
@@ -992,44 +926,6 @@ class Fixometer
     }
 
     /**
-     * Simplifies the logic on blade template for displaying the column drop down
-     * @return array
-     * @author Dean Appleton-Claydon
-     */
-    public static function filterColumns()
-    {
-        return [
-            'category' => 'Category',
-            'brand' => 'Brand',
-            'model' => 'Model',
-            'problem' => 'Comment',
-            'group_name' => 'Group',
-            'event_date' => 'Date',
-            'repair_status' => 'State',
-        ];
-    }
-
-    /**
-     * Simplifies the logic in the blade templates around display device columns
-     * @param  string $column           checks to see whether column exists in session array
-     * @param  array $user_preferences array from session
-     * @return bool                   true or false!
-     * @author Dean Appleton-Claydon
-     */
-    public static function checkColumn($column, $user_preferences)
-    {
-        if (! is_null($user_preferences) && is_array($user_preferences)) {
-            if (in_array($column, $user_preferences)) {
-                return true;
-            }
-
-            return false;
-        }
-
-        return true;
-    }
-
-    /**
      * [generateUniqueShareableCode description]
      * Generate a unique Shareable Code from a random string,
      * If the Code already exists then loop again!
@@ -1048,28 +944,5 @@ class Fixometer
         } while ($model::where($column, $random)->exists());
 
         return $random;
-    }
-
-    /**
-     * [validateBetweenDates description]
-     * Check if date is between two dates...
-     *
-     * @author Christopher Kelker - @date 2019-04-05
-     * @editor  Christopher Kelker
-     * @version 1.0.0
-     * @param   [type]      $date_to_check
-     * @param   [type]      $date_from
-     * @param   [type]      $date_to
-     * @return  [type]
-     */
-    public static function validateBetweenDates($date_to_check, $date_from, $date_to)
-    {
-        $date_to_check = date('Y-m-d', strtotime($date_to_check));
-        $date_from = date('Y-m-d', strtotime($date_from));
-        $date_to = date('Y-m-d', strtotime($date_to));
-
-        // If $date_to_check is equal to one of or in between the
-        // two dates then return true, else false
-        return ($date_to_check >= $date_from) && ($date_to_check <= $date_to);
     }
 }

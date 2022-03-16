@@ -20,11 +20,13 @@ class InviteEventTest extends TestCase
 
         $this->withoutExceptionHandling();
 
-        $group = factory(Group::class)->create();
+        $group = factory(Group::class)->create([
+                                                   'wordpress_post_id' => '99999'
+                                               ]);
         $event = factory(Party::class)->create([
                                                    'group' => $group,
-                                                   'event_date' => '2130-01-01',
-                                                   'start' => '12:13',
+                                                   'event_start_utc' => '2130-01-01T12:13:00+00:00',
+                                                   'event_end_utc' => '2130-01-01T13:14:00+00:00',
                                                ]);
 
         $host = factory(User::class)->states('Host')->create();
@@ -101,7 +103,7 @@ class InviteEventTest extends TestCase
 
         // ...should show up in the list of events with an invitation as we have not yet accepted.
         $response3 = $this->get('/party');
-        $events = $this->getVueProperties($response3)[0][':initial-events'];
+        $events = $this->getVueProperties($response3)[1][':initial-events'];
         $this->assertNotFalse(strpos($events, '"attending":false'));
         $this->assertNotFalse(strpos($events, '"invitation"'));
 
@@ -113,7 +115,7 @@ class InviteEventTest extends TestCase
 
         // Now should show.
         $response5 = $this->get('/party');
-        $events = $this->getVueProperties($response5)[0][':initial-events'];
+        $events = $this->getVueProperties($response5)[1][':initial-events'];
         $this->assertNotFalse(strpos($events, '"attending":true'));
     }
 
@@ -121,12 +123,14 @@ class InviteEventTest extends TestCase
     {
         $this->withoutExceptionHandling();
 
-        $group = factory(Group::class)->create();
+        $group = factory(Group::class)->create([
+                                                   'wordpress_post_id' => '99999'
+                                               ]);
         $host = factory(User::class)->states('Host')->create();
         $event = factory(Party::class)->create([
                                                    'group' => $group,
-                                                   'event_date' => '2130-01-01',
-                                                   'start' => '12:13',
+                                                   'event_start_utc' => '2130-01-01T12:13:00+00:00',
+                                                   'event_end_utc' => '2130-01-01T13:14:00+00:00',
                                                    'user_id' => $host->id
                                                ]);
         EventsUsers::create([
@@ -213,8 +217,8 @@ class InviteEventTest extends TestCase
         $host = factory(User::class)->states('Host')->create();
         $event = factory(Party::class)->create([
                                                    'group' => $group,
-                                                   'event_date' => '2130-01-01',
-                                                   'start' => '12:13',
+                                                   'event_start_utc' => '2130-01-01T12:13:00+00:00',
+                                                   'event_end_utc' => '2130-01-01T13:14:00+00:00',
                                                    'user_id' => $host->id
                                                ]);
         EventsUsers::create([
