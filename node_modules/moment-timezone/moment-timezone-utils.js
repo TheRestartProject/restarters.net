@@ -1,6 +1,6 @@
 //! moment-timezone-utils.js
-//! version : 0.4.1
-//! author : Tim Wood
+//! version : 0.5.34
+//! Copyright (c) JS Foundation and other contributors
 //! license : MIT
 //! github.com/moment/moment-timezone
 
@@ -8,10 +8,10 @@
 	"use strict";
 
 	/*global define*/
-	if (typeof define === 'function' && define.amd) {
+    if (typeof module === 'object' && module.exports) {
+        module.exports = factory(require('./'));     // Node
+    } else if (typeof define === 'function' && define.amd) {
 		define(['moment'], factory);                 // AMD
-	} else if (typeof exports === 'object') {
-		module.exports = factory(require('./'));     // Node
 	} else {
 		factory(root.moment);                        // Browser
 	}
@@ -117,6 +117,25 @@
 		return abbrs.join(' ') + '|' + offsets.join(' ') + '|' + indices.join('');
 	}
 
+	function packPopulation (number) {
+		if (!number) {
+			return '';
+		}
+		if (number < 1000) {
+			return number;
+		}
+		var exponent = String(number | 0).length - 2;
+		var precision = Math.round(number / Math.pow(10, exponent));
+		return precision + 'e' + exponent;
+	}
+
+	function packCountries (countries) {
+		if (!countries) {
+			return '';
+		}
+		return countries.join(' ');
+	}
+
 	function validatePackData (source) {
 		if (!source.name)    { throw new Error("Missing name"); }
 		if (!source.abbrs)   { throw new Error("Missing abbrs"); }
@@ -132,7 +151,19 @@
 
 	function pack (source) {
 		validatePackData(source);
-		return source.name + '|' + packAbbrsAndOffsets(source) + '|' + packUntils(source.untils);
+		return [
+			source.name, // 0 - timezone name
+			packAbbrsAndOffsets(source), // 1 - abbrs, 2 - offsets, 3 - indices
+			packUntils(source.untils), // 4 - untils
+			packPopulation(source.population) // 5 - population
+		].join('|');
+	}
+
+	function packCountry (source) {
+		return [
+			source.name,
+			source.zones.join(' '),
+		].join('|');
 	}
 
 	/************************************
@@ -156,30 +187,43 @@
 		return arraysAreEqual(a.offsets, b.offsets) && arraysAreEqual(a.abbrs, b.abbrs) && arraysAreEqual(a.untils, b.untils);
 	}
 
-	function findAndCreateLinks (input, output, links) {
-		var i, j, a, b, isUnique;
+	function findAndCreateLinks (input, output, links, groupLeaders) {
+		var i, j, a, b, group, foundGroup, groups = [];
 
 		for (i = 0; i < input.length; i++) {
-			isUnique = true;
+			foundGroup = false;
 			a = input[i];
 
-			for (j = 0; j < output.length; j++) {
-				b = output[j];
-
+			for (j = 0; j < groups.length; j++) {
+				group = groups[j];
+				b = group[0];
 				if (zonesAreEqual(a, b)) {
-					links.push(b.name + '|' + a.name);
-					isUnique = false;
-					continue;
+					if (a.population > b.population) {
+						group.unshift(a);
+					} else if (a.population === b.population && groupLeaders && groupLeaders[a.name]) {
+                        group.unshift(a);
+                    } else {
+						group.push(a);
+					}
+					foundGroup = true;
 				}
 			}
 
-			if (isUnique) {
-				output.push(a);
+			if (!foundGroup) {
+				groups.push([a]);
+			}
+		}
+
+		for (i = 0; i < groups.length; i++) {
+			group = groups[i];
+			output.push(group[0]);
+			for (j = 1; j < group.length; j++) {
+				links.push(group[0].name + '|' + group[j].name);
 			}
 		}
 	}
 
-	function createLinks (source) {
+	function createLinks (source, groupLeaders) {
 		var zones = [],
 			links = [];
 
@@ -187,12 +231,12 @@
 			links = source.links.slice();
 		}
 
-		findAndCreateLinks(source.zones, zones, links);
+		findAndCreateLinks(source.zones, zones, links, groupLeaders);
 
 		return {
-			version : source.version,
-			zones   : zones,
-			links   : links.sort()
+			version 	: source.version,
+			zones   	: zones,
+			links   	: links.sort()
 		};
 	}
 
@@ -240,10 +284,12 @@
 		untils[untils.length - 1] = null;
 
 		return {
-			name    : source.name,
-			abbrs   : slice.apply(source.abbrs, indices),
-			untils  : untils,
-			offsets : slice.apply(source.offsets, indices)
+			name       : source.name,
+			abbrs      : slice.apply(source.abbrs, indices),
+			untils     : untils,
+			offsets    : slice.apply(source.offsets, indices),
+			population : source.population,
+			countries  : source.countries
 		};
 	}
 
@@ -251,7 +297,7 @@
 		Filter, Link, and Pack
 	************************************/
 
-	function filterLinkPack (input, start, end) {
+	function filterLinkPack (input, start, end, groupLeaders) {
 		var i,
 			inputZones = input.zones,
 			outputZones = [],
@@ -265,11 +311,15 @@
 			zones : outputZones,
 			links : input.links.slice(),
 			version : input.version
-		});
+		}, groupLeaders);
 
 		for (i = 0; i < output.zones.length; i++) {
 			output.zones[i] = pack(output.zones[i]);
 		}
+
+		output.countries = input.countries ? input.countries.map(function (unpacked) {
+			return packCountry(unpacked);
+		}) : [];
 
 		return output;
 	}
@@ -283,6 +333,7 @@
 	moment.tz.createLinks    = createLinks;
 	moment.tz.filterYears    = filterYears;
 	moment.tz.filterLinkPack = filterLinkPack;
+	moment.tz.packCountry	 = packCountry;
 
 	return moment;
 }));
