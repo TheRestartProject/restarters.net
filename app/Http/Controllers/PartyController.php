@@ -118,21 +118,26 @@ class PartyController extends Controller
                     ->get();
 
                 foreach ($upcoming_events_in_area as $event) {
-                    $e = self::expandEvent($event, NULL);
-                    $e['nearby'] = TRUE;
-                    $e['all'] = TRUE;
-                    $events[] = $e;
+                    if (Fixometer::userHasViewPartyPermission($event->idevents)) {
+                        $e = self::expandEvent($event, null);
+                        $e['nearby'] = true;
+                        $e['all'] = true;
+                        $events[] = $e;
+                    }
                 }
             }
 
-            // ...and any other upcoming events
+            // ...and any other upcoming approved events
             $other_upcoming_events = Party::future()->
-                whereNotIn('idevents', \Illuminate\Support\Arr::pluck($events, 'idevents'))->get();
+                whereNotIn('idevents', \Illuminate\Support\Arr::pluck($events, 'idevents'))->
+                get();
 
             foreach ($other_upcoming_events as $event) {
-                $e = self::expandEvent($event, NULL);
-                $e['all'] = TRUE;
-                $events[] = $e;
+                if (Fixometer::userHasViewPartyPermission($event->idevents)) {
+                    $e = self::expandEvent($event, NULL);
+                    $e['all'] = TRUE;
+                    $events[] = $e;
+                }
             }
 
             $group = null;
@@ -556,8 +561,8 @@ class PartyController extends Controller
         $Party = new Party;
         $event = Party::find($id);
 
-        // If event no longer exists
-        if (empty($event)) {
+        // If event no longer exists or is not visible
+        if (empty($event) || !Fixometer::userHasViewPartyPermission($id)) {
             abort(404);
         }
 
