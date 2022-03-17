@@ -602,7 +602,7 @@ class Party extends Model implements Auditable
      */
     public function getFormattedLocalEnd($format = 'd/m/Y')
     {
-        $dt = new Carbon($this->event_start_utc);
+        $dt = new Carbon($this->event_end_utc);
         $dt->setTimezone($this->timezone);
         return $dt->format($format);
     }
