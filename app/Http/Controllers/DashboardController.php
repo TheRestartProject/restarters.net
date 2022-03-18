@@ -44,9 +44,9 @@ class DashboardController extends Controller
         $upcoming_events = Party::futureForUser()->get();
 
         foreach ($upcoming_events as $event) {
-            $thisone = $event->getAttributes();
-            $thisone['the_group'] = \App\Group::find($event->group);
-            $expanded_events[] = $thisone;
+            $expanded_event = \App\Http\Controllers\PartyController::expandEvent($event, null);
+            $expanded_event['the_group'] = \App\Group::find($event->group);
+            $expanded_events[] = $expanded_event;
         }
 
         $upcoming_events = $expanded_events;
