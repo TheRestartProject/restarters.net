@@ -86,6 +86,7 @@
   </CollapsibleSection>
 </template>
 <script>
+import moment from 'moment'
 import DashboardGroup from './DashboardGroup'
 import CollapsibleSection from './CollapsibleSection'
 import DashboardEvent from './DashboardEvent'
