@@ -150,7 +150,13 @@
               $expanded_brands[] = $brand;
           }
 
+          // TODO: more properties may need expanding on the event here.
+          // Added 'finished' and 'upcoming' in https://therestartproject.atlassian.net/browse/RES-1659
+          // Not used PartyController::expandEvent here yet as it gives an array, and the code below looks
+          // seems to expect an object.
           $event->approved = $event->wordpress_post_id !== null;
+          $event->finished = $event->hasFinished();
+          $event->upcoming = $event->isUpcoming();
         ?>
         <div class="vue">
           <EventPage
