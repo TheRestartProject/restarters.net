@@ -376,20 +376,11 @@ class GroupController extends Controller
         $uEmissionratio = \App\Helpers\LcaStats::getEmissionRatioUnpowered();
 
         foreach (array_merge($upcoming_events->all(), $past_events->all()) as $event) {
-            $thisone = $event->getAttributes();
-            $thisone['attending'] = Auth::user() && $event->isBeingAttendedBy(Auth::user()->id);
-            $thisone['allinvitedcount'] = $event->allInvited->count();
-
-            // TODO LATER Consider whether these stats should be in the event or passed into the store.
-            $thisone['stats'] = $event->getEventStats($eEmissionRatio, $uEmissionratio);
-            $thisone['participants_count'] = $event->participants;
-            $thisone['volunteers_count'] = $event->allConfirmedVolunteers->count();
-
-            $thisone['isVolunteer'] = $event->isVolunteer();
-            $thisone['requiresModeration'] = $event->requiresModerationByAdmin();
-            $thisone['canModerate'] = Auth::user() && (\App\Helpers\Fixometer::hasRole(Auth::user(), 'Administrator') || \App\Helpers\Fixometer::hasRole(Auth::user(), 'NetworkCoordinator'));
-
-            $expanded_events[] = $thisone;
+            $expanded_event = \App\Http\Controllers\PartyController::expandEvent($event, $group);
+            // TODO: here we seem to expect group to be the group id, not the group object.
+            // expandEvent seems to expect the object.
+            $expanded_event['group'] = $event->group;
+            $expanded_events[] = $expanded_event;
         }
 
         return view('group.view', [ //host.index
@@ -809,7 +800,7 @@ class GroupController extends Controller
                     'image' => (is_object($group_image) && is_object($group_image->image)) ?
                         asset('uploads/mid_'.$group_image->image->path) : null,
                     'location' => rtrim($group->location),
-                    'next_event' => $event ? $event->event_date : null,
+                    'next_event' => $event ? $event->event_date_local : null,
                     'all_restarters_count' => $group->all_restarters_count,
                     'all_hosts_count' => $group->all_hosts_count,
                     'all_confirmed_restarters_count' => $group->all_confirmed_restarters_count,
@@ -837,36 +828,6 @@ class GroupController extends Controller
         $groupStats = $group->getGroupStats();
 
         $groupStats['format'] = $format;
-
-        return view('group.stats', $groupStats);
-    }
-
-    public static function statsByGroupTag($group_tag_id, $format = 'row')
-    {
-        $groups = Group::join('grouptags_groups', 'grouptags_groups.group', '=', 'groups.idgroups')
-            ->where('grouptags_groups.group_tag', $group_tag_id)
-            ->select('groups.*')
-            ->get();
-
-        $groupStats = \App\Group::getGroupStatsArrayKeys();
-
-        // Loop through all groups and increase the values for groupStats
-        foreach ($groups as $group) {
-            // Get stats for this particular group
-            $single_group_stats = $group->getGroupStats();
-
-            // Loop through the stats whilst adding the new value to the existing value
-            foreach ($single_group_stats as $key => $value) {
-                $groupStats[$key] = $groupStats[$key] + $value;
-            }
-        }
-
-        $groupStats['format'] = $format;
-
-        // Return json for api.php
-        if (\Request::is('api*')) {
-            return response()->json($groupStats);
-        }
 
         return view('group.stats', $groupStats);
     }
@@ -1254,215 +1215,5 @@ class GroupController extends Controller
         session()->push('groups.'.$code, $hash);
 
         return redirect('/user/register')->with('auth-for-invitation', __('auth.login_before_using_shareable_link', ['login_url' => url('/login')]));
-    }
-
-    /**
-     * [getGroupsByKey description]
-     * Find Groups from User Access Key,
-     * If the Groups are not found, through 404 error,
-     * Else return the Groups JSON data.
-     *
-     * @author Christopher Kelker - @date 2019-03-26
-     * @editor  Christopher Kelker
-     * @version 1.0.0
-     * @param   Request     $request
-     * @param   [type]      $api_token
-     * @return  [type]
-     */
-    public function getGroupsByKey(Request $request, $api_token)
-    {
-        // Find User by Access Key
-        $user = User::where('api_token', $api_token)->first();
-
-        if (empty($user->groupTag) || is_null($user->groupTag)) {
-            return abort(404, 'No groups tags found.');
-        }
-
-        $group_tags_groups = $user->groupTag->groupTagGroups;
-
-        // If Group is not found, through 404 error
-        if (
-            $user->groupTag->groupTagGroups->isEmpty()
-            || $user->groupTag->groupTagGroups->count() <= 0
-        ) {
-            return abort(404, 'No groups found.');
-        }
-
-        // New Collection Instance
-        $collection = collect([]);
-
-        foreach ($group_tags_groups as $group_tags_group) {
-            $group = $group_tags_group->theGroup;
-            if (! empty($group)) {
-                $stats = $group->getGroupStats();
-                $collection->push([
-                    'id' => $group->idgroups,
-                    'name' => $group->name,
-                    'location' => [
-                        'value' => $group->location,
-                        'country' => $group->country,
-                        'latitude' => $group->latitude,
-                        'longitude' => $group->longitude,
-                        'area' => $group->area,
-                        'postcode' => $group->postcode,
-                    ],
-                    'website' => $group->website,
-                    'facebook' => $group->facebook,
-                    'description' => $group->free_text,
-                    'image_url' => $group->groupImagePath(),
-                    'upcoming_parties' => $upcoming_parties_collection = collect([]),
-                    'past_parties' => $past_parties_collection = collect([]),
-                    'impact' => [
-                        'volunteers' => $stats['participants'],
-                        'hours_volunteered' => $stats['hours_volunteered'],
-                        'parties_thrown' => $stats['parties'],
-                        'waste_prevented' => $stats['waste_total'],
-                        'co2_emissions_prevented' => $stats['co2_total'],
-                    ],
-                    'widgets' => [
-                        'headline_stats' => url("/group/stats/{$group->idgroups}"),
-                        'co2_equivalence_visualisation' => url("/outbound/info/group/{$group->idgroups}/manufacture"),
-                    ],
-                    'created_at' => $group->created_at,
-                    'updated_at' => $group->updated_at,
-                ]);
-
-                foreach ($group->upcomingParties() as $key => $event) {
-                    $upcoming_parties_collection->push([
-                        'event_id' => $event->idevents,
-                        'event_date' => $event->event_date,
-                        'start_time' => $event->start,
-                        'end_time' => $event->end,
-                        'name' => $event->venue,
-                        'location' => [
-                            'value' => $event->location,
-                            'latitude' => $event->latitude,
-                            'longitude' => $event->longitude,
-                        ],
-                        'created_at' => $event->created_at,
-                        'updated_at' => $event->updated_at,
-                    ]);
-                }
-
-                foreach ($group->pastParties() as $key => $event) {
-                    $past_parties_collection->push([
-                        'event_id' => $event->idevents,
-                        'event_date' => $event->event_date,
-                        'start_time' => $event->start,
-                        'end_time' => $event->end,
-                        'name' => $event->venue,
-                        'location' => [
-                            'value' => $event->location,
-                            'latitude' => $event->latitude,
-                            'longitude' => $event->longitude,
-                        ],
-                        'created_at' => $event->created_at,
-                        'updated_at' => $event->updated_at,
-                    ]);
-                }
-            }
-        }
-
-        return $collection;
-    }
-
-    /**
-     * [getGroupByKeyAndId description]
-     * Find Group from User Access Key and Group ID,
-     * If the Group is not found, through 404 error,
-     * Else return the Group JSON data.
-     *
-     * @author Christopher Kelker - @date 2019-03-26
-     * @editor  Christopher Kelker
-     * @version 1.0.0
-     * @param   Request     $request
-     * @param   [type]      $api_token
-     * @param   Group       $group
-     * @return  [type]
-     */
-    public function getGroupByKeyAndId(Request $request, $api_token, Group $group, $date_from = null, $date_to = null)
-    {
-        // Get Group from Access Key and Group ID
-        $group_tags_group = User::where('api_token', $api_token)->first()
-            ->groupTag->groupTagGroups->where('group', $group->idgroups)->first();
-
-        // If Group is not found, through 404 error
-        if (empty($group_tags_group)) {
-            return abort(404, 'No groups found.');
-        }
-
-        // If Event is found but is not the of the date specified
-        $exclude_parties = [];
-        if (! empty($date_from) && ! empty($date_to)) {
-            foreach ($group->parties as $party) {
-                // TODO Timezones.  The inputs are probably in local timezones.
-                if (! Fixometer::validateBetweenDates($party->event_date, $date_from, $date_to)) {
-                    $exclude_parties[] = $party->idevents;
-                }
-            }
-        }
-
-        $stats = $group->getGroupStats();
-        // New Collection Instance
-        $collection = collect([
-            'id' => $group->idgroups,
-            'name' => $group->name,
-            'location' => [
-                'value' => $group->location,
-                'country' => $group->country,
-                'latitude' => $group->latitude,
-                'longitude' => $group->longitude,
-                'area' => $group->area,
-                'postcode' => $group->postcode,
-            ],
-            'website' => $group->website,
-            'description' => $group->free_text,
-            'image_url' => $group->groupImagePath(),
-            'upcoming_parties' => $upcoming_parties_collection = collect([]),
-            'past_parties' => $past_parties_collection = collect([]),
-            'impact' => [
-                'volunteers' => $stats['participants'],
-                'hours_volunteered' => $stats['hours_volunteered'],
-                'parties_thrown' => $stats['parties'],
-                'waste_prevented' => $stats['waste_total'],
-                'co2_emissions_prevented' => $stats['co2_total'],
-            ],
-            'widgets' => [
-                'headline_stats' => url("/group/stats/{$group->idgroups}"),
-                'co2_equivalence_visualisation' => url("/{$group->idgroups}/manufacture"),
-            ],
-        ]);
-
-        foreach ($group->upcomingParties($exclude_parties) as $key => $event) {
-            $upcoming_parties_collection->push([
-                'event_id' => $event->idevents,
-                'event_date' => $event->event_date,
-                'start_time' => $event->start,
-                'end_time' => $event->end,
-                'name' => $event->venue,
-                'location' => [
-                    'value' => $event->location,
-                    'latitude' => $event->latitude,
-                    'longitude' => $event->longitude,
-                ],
-            ]);
-        }
-
-        foreach ($group->pastParties($exclude_parties) as $key => $event) {
-            $past_parties_collection->push([
-                'event_id' => $event->idevents,
-                'event_date' => $event->event_date,
-                'start_time' => $event->start,
-                'end_time' => $event->end,
-                'name' => $event->venue,
-                'location' => [
-                    'value' => $event->location,
-                    'latitude' => $event->latitude,
-                    'longitude' => $event->longitude,
-                ],
-            ]);
-        }
-
-        return $collection;
     }
 }

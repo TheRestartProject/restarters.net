@@ -22,7 +22,6 @@ use App\Notifications\EventDevices;
 use App\Notifications\EventRepairs;
 use App\Notifications\JoinEvent;
 use App\Notifications\JoinGroup;
-use App\Notifications\NotifyHostRSVPInvitesMade;
 use App\Notifications\NotifyRestartersOfNewEvent;
 use App\Notifications\RSVPEvent;
 use App\Party;
@@ -82,6 +81,15 @@ class PartyController extends Controller
         $thisone['requiresModeration'] = $event->requiresModerationByAdmin();
         $thisone['canModerate'] = Auth::user() && (Fixometer::hasRole(Auth::user(), 'Administrator') || Fixometer::hasRole(Auth::user(), 'NetworkCoordinator'));
 
+        $thisone['event_date_local'] = $event->eventDateLocal;
+        $thisone['start_local'] = $event->startLocal;
+        $thisone['end_local'] = $event->endLocal;
+
+        $thisone['upcoming'] = $event->isUpcoming();
+        $thisone['finished'] = $event->hasFinished();
+        $thisone['inprogress'] = $event->isInProgress();
+        $thisone['startingsoon'] = $event->isStartingSoon();
+
         return $thisone;
     }
 
@@ -117,21 +125,26 @@ class PartyController extends Controller
                     ->get();
 
                 foreach ($upcoming_events_in_area as $event) {
-                    $e = self::expandEvent($event, NULL);
-                    $e['nearby'] = TRUE;
-                    $e['all'] = TRUE;
-                    $events[] = $e;
+                    if (Fixometer::userHasViewPartyPermission($event->idevents)) {
+                        $e = self::expandEvent($event, null);
+                        $e['nearby'] = true;
+                        $e['all'] = true;
+                        $events[] = $e;
+                    }
                 }
             }
 
-            // ...and any other upcoming events
+            // ...and any other upcoming approved events
             $other_upcoming_events = Party::future()->
-                whereNotIn('idevents', \Illuminate\Support\Arr::pluck($events, 'idevents'))->get();
+                whereNotIn('idevents', \Illuminate\Support\Arr::pluck($events, 'idevents'))->
+                get();
 
             foreach ($other_upcoming_events as $event) {
-                $e = self::expandEvent($event, NULL);
-                $e['all'] = TRUE;
-                $events[] = $e;
+                if (Fixometer::userHasViewPartyPermission($event->idevents)) {
+                    $e = self::expandEvent($event, NULL);
+                    $e['all'] = TRUE;
+                    $events[] = $e;
+                }
             }
 
             $group = null;
@@ -175,48 +188,22 @@ class PartyController extends Controller
             // We might be passed a timezone; if not then use the timezone of the group.
             $timezone = $request->input('timezone', $groupobj->timezone);
 
-            // There are two ways event date/times can be created.
-            // 1. By passing event_start_utc and event_end_utc, or
-            // 2. By passing event_date, start, end (deprecated).
-            if ($request->has('event_start_utc') && $request->has('event_end_utc')) {
-                $request->validate([
-                                       'location' => [
-                                           function ($attribute, $value, $fail) use ($request) {
-                                               if (! $request->filled('online') && ! $value) {
-                                                   $fail(__('events.validate_location'));
-                                               }
-                                           },
-                                       ],
-                                   ]);
+            $request->validate([
+                                   'location' => [
+                                       function ($attribute, $value, $fail) use ($request) {
+                                           if (! $request->filled('online') && ! $value) {
+                                               $fail(__('events.validate_location'));
+                                           }
+                                       },
+                                   ],
+                               ]);
 
-                $event_start_utc = $request->input('event_start_utc');
-                $event_end_utc = $request->input('event_end_utc');
-            } else {
-                $request->validate([
-                                       'event_date' => 'required',
-                                       'start' => 'required',
-                                       'end' => 'required',
-                                       'location' => [
-                                           function ($attribute, $value, $fail) use ($request) {
-                                               if (! $request->filled('online') && ! $value) {
-                                                   $fail(__('events.validate_location'));
-                                               }
-                                           },
-                                       ],
-                                   ]);
+            $event_start_utc = $request->input('event_start_utc');
+            $event_end_utc = $request->input('event_end_utc');
 
-                $event_date = $request->input('event_date');
-                $start = $request->input('start');
-                $end = $request->input('end');
-
-                // Convert these to the UTC timezone for storage.
-                $startCarbon = Carbon::parse($event_date . ' ' . $start, $timezone);
-                $startCarbon->setTimezone('UTC');
-                $event_start_utc = $startCarbon->toIso8601String();
-                $endCarbon = Carbon::parse($event_date . ' ' . $end, $timezone);
-                $endCarbon->setTimezone('UTC');
-                $event_end_utc = $endCarbon->toIso8601String();
-            }
+            // Convert the timezone to UTC, because the timezone is not itself stored in the DB.
+            $event_start_utc = Carbon::parse($event_start_utc)->setTimezone('UTC')->toIso8601String();
+            $event_end_utc = Carbon::parse($event_end_utc)->setTimezone('UTC')->toIso8601String();
 
             $error = [];
 
@@ -252,7 +239,6 @@ class PartyController extends Controller
             $data['longitude'] = $longitude;
 
             $online = $request->has('online');
-            $pax = 0;
             $free_text = $request->input('free_text');
             $venue = $request->input('venue');
             $location = $request->input('location');
@@ -379,7 +365,6 @@ class PartyController extends Controller
         $Groups = new Group;
         $File = new FixometerFile;
         $Party = new Party;
-        $party = $Party->findThis($id)[0];
 
         $groupsUserIsInChargeOf = $user->groupsInChargeOf();
         $userInChargeOfMultipleGroups = $user->hasRole('Administrator') || count($groupsUserIsInChargeOf) > 1;
@@ -400,9 +385,6 @@ class PartyController extends Controller
             unset($data['users']);
             unset($data['id']);
 
-            // formatting dates for the DB
-            $data['event_date'] = Fixometer::dbDateNoTime($data['event_date']);
-
             if (! empty($data['location'])) {
                 $results = $this->geocoder->geocode($data['location']);
 
@@ -416,7 +398,7 @@ class PartyController extends Controller
                       'images' => $images,
                       'title' => 'Edit Party',
                       'allGroups' => $allGroups,
-                      'formdata' => $party,
+                      'formdata' => PartyController::expandEvent($party, NULL),
                       'remotePost' => null,
                       'grouplist' => $Groups->findList(),
                       'user' => Auth::user(),
@@ -439,24 +421,9 @@ class PartyController extends Controller
             // We might have been passed a timezone; if not then inherit from the current value.
             $timezone = $request->input('timezone', Party::find($id)->timezone);
 
-            // There are two ways event date/times can be updated.
-            // 1. By passing event_start_utc and event_end_utc, or
-            // 2. By passing event_date, start, end (deprecated).
-            if ($request->has('event_start_utc') && $request->has('event_end_utc')) {
-                $event_start_utc = $request->input('event_start_utc');
-                $event_end_utc = $request->input('event_end_utc');
-            } else {
-                $event_date = $request->input('event_date');
-                $start = $request->input('start');
-                $end = $request->input('end');
-
-                $startCarbon = Carbon::parse($event_date . ' ' . $start, $timezone);
-                $startCarbon->setTimezone('UTC');
-                $event_start_utc = $startCarbon->toIso8601String();
-                $endCarbon = Carbon::parse($event_date . ' ' . $end, $timezone);
-                $endCarbon->setTimezone('UTC');
-                $event_end_utc = $endCarbon->toIso8601String();
-            }
+            // Convert the timezone to UTC, because the timezone is not itself stored in the DB.
+            $event_start_utc = Carbon::parse($request->input('event_start_utc'))->setTimezone('UTC')->toIso8601String();
+            $event_end_utc = Carbon::parse($request->input('event_end_utc'))->setTimezone('UTC')->toIso8601String();
 
             $update = [
                 'event_start_utc' => $event_start_utc,
@@ -508,7 +475,7 @@ class PartyController extends Controller
             }
 
             $audits = Party::findOrFail($id)->audits;
-            $party = $Party->findThis($id)[0];
+            $party = $Party->find($id);
 
             return view('events.edit', [ //party.edit
                 'response' => $response,
@@ -516,7 +483,7 @@ class PartyController extends Controller
                 'images' => $images,
                 'title' => 'Edit Party',
                 'allGroups' => $allGroups,
-                'formdata' => $party,
+                'formdata' => PartyController::expandEvent($party, NULL),
                 'remotePost' => $remotePost,
                 'grouplist' => $Groups->findList(),
                 'user' => Auth::user(),
@@ -533,7 +500,7 @@ class PartyController extends Controller
             $images = null;
         }
 
-        $party = $Party->findThis($id)[0];
+        $party = $Party->find($id);
         $remotePost = null;
 
         $audits = Party::findOrFail($id)->audits;
@@ -543,7 +510,7 @@ class PartyController extends Controller
             'images' => $images,
             'title' => 'Edit Party',
             'allGroups' => $allGroups,
-            'formdata' => $party,
+            'formdata' => PartyController::expandEvent($party, NULL),
             'remotePost' => $remotePost,
             'grouplist' => $Groups->findList(),
             'user' => Auth::user(),
@@ -581,7 +548,7 @@ class PartyController extends Controller
             $images = null;
         }
 
-        $party = $Party->findThis($id)[0];
+        $party = $Party->find($id);
         $remotePost = null;
 
         return view('events.create', [
@@ -591,7 +558,7 @@ class PartyController extends Controller
             'user' => Auth::user(),
             'user_groups' => $groupsUserIsInChargeOf,
             'userInChargeOfMultipleGroups' => $userInChargeOfMultipleGroups,
-            'duplicateFrom' => $party,
+            'duplicateFrom' => PartyController::expandEvent($party, NULL),
         ]);
     }
 
@@ -601,8 +568,8 @@ class PartyController extends Controller
         $Party = new Party;
         $event = Party::find($id);
 
-        // If event no longer exists
-        if (empty($event)) {
+        // If event no longer exists or is not visible
+        if (empty($event) || !Fixometer::userHasViewPartyPermission($id)) {
             abort(404);
         }
 
@@ -698,10 +665,7 @@ class PartyController extends Controller
     public function generateAddToCalendarLinks($event)
     {
         try {
-            $from = DateTime::createFromFormat('Y-m-d H:i', $event->getEventDate('Y-m-d').' '.$event->getEventStart());
-            $to = DateTime::createFromFormat('Y-m-d H:i', $event->getEventDate('Y-m-d').' '.$event->getEventEnd());
-
-            $link = Link::create(trim(addslashes($event->getEventName())), $from, $to)
+            $link = Link::create(trim(addslashes($event->getEventName())), new DateTime($event->event_start_utc), new DateTime($event->event_end_utc))
                             ->description(trim(addslashes(strip_tags($event->free_text))))
                                 ->address(trim(addslashes($event->location)));
 
@@ -1028,9 +992,6 @@ class PartyController extends Controller
                             'event_venue' => $event->venue,
                             'event_url' => url('/party/edit/'.$event->idevents),
                         ];
-
-                        // Notify Host of event that Invites have been sent out
-                        Notification::send($userCreator, new NotifyHostRSVPInvitesMade($event_details));
                     }
 
                     // Send Invites
@@ -1319,187 +1280,5 @@ class PartyController extends Controller
         session()->push('events.'.$code, $hash);
 
         return redirect('/user/register')->with('auth-for-invitation', __('auth.login_before_using_shareable_link', ['login_url' => url('/login')]));
-    }
-
-    /**
-     * [getEventsByKey description]
-     * Get all Events where a User has an API KEY that exists,
-     * and that User has Group Tags associated with it.
-     *
-     * @author  Christopher Kelker
-     * @version 1.0.0
-     * @date    2019-03-13
-     * @param   [type]     $api_token
-     * @return  [type]
-     */
-    public function getEventsByKey(Request $request, $api_token, $date_from = null, $date_to = null)
-    {
-        $user = User::where('api_token', $api_token)->first();
-
-        $parties = Party::join('groups', 'groups.idgroups', '=', 'events.group')
-         ->join('grouptags_groups', 'grouptags_groups.group', '=', 'groups.idgroups')
-         ->join('group_tags', 'group_tags.id', '=', 'grouptags_groups.group_tag')
-         ->join('users', 'users.access_group_tag_id', '=', 'group_tags.id');
-
-        if (! empty($date_from) && ! empty($date_to)) {
-            // TODO Timezones.  The API call may return events spanning multiple timezones, and it's unclear what
-            // timezone the inputs will be in.
-            $parties = $parties->where('events.event_date', '>=', date('Y-m-d', strtotime($date_from)))
-           ->where('events.event_date', '<=', date('Y-m-d', strtotime($date_to)));
-        }
-
-        $parties = $parties->where([
-             ['users.api_token', $user->api_token],
-             ['users.access_group_tag_id', $user->access_group_tag_id],
-         ])
-         ->select('events.*')
-         ->get();
-
-        // If no parties are found, through 404 error
-        if (! count($parties)) {
-            return abort(404, 'No Events found.');
-        }
-
-        $groups = Group::join('grouptags_groups', 'grouptags_groups.group', '=', 'groups.idgroups')
-         ->where('group_tag', $user->access_group_tag_id)->get();
-
-        $groups_array = collect([]);
-        foreach ($groups as $group) {
-            $gstats = $group->getGroupStats();
-            $groups_array->push([
-               'id' => $group->idgroups,
-               'name' => $group->name,
-               'description' => $group->free_text,
-               'image_url' => $group->groupImagePath(),
-               'volunteers' => $group->volunteers,
-               'participants' => $gstats['participants'],
-               'hours_volunteered' => $gstats['hours_volunteered'],
-               'parties_thrown' => $gstats['parties'],
-               'waste_prevented' => $gstats['waste_total'],
-               'co2_emissions_prevented' => $gstats['co2_total'],
-           ]);
-        }
-        // Send these to getEventStats() to speed things up a bit.
-        $eEmissionRatio = \App\Helpers\LcaStats::getEmissionRatioPowered();
-        $uEmissionratio = \App\Helpers\LcaStats::getEmissionRatioUnpowered();
-
-        $collection = collect([]);
-        foreach ($parties as $key => $party) {
-            $group = $groups_array->filter(function ($group) use ($party) {
-                return $group['id'] == $party->group;
-            })->first();
-            $estats = $party->getEventStats($eEmissionRatio, $uEmissionratio);
-            // Push Party to Collection
-            $collection->push([
-             'id' => $party->idevents,
-             'group' => [$group],
-             'event_date' => $party->event_date,
-             'start_time' => $party->start,
-             'end_time' => $party->end,
-             'name' => $party->venue,
-             'location' => [
-                 'value' => $party->location,
-                 'latitude' => $party->latitude,
-                 'longitude' => $party->longitude,
-             ],
-             'description' => $party->free_text,
-             'user' => $party_user = collect(),
-             'impact' => [
-                 'participants' => $party->pax,
-                 'volunteers' => $estats['volunteers'],
-                 'waste_prevented' => $estats['waste_powered'],
-                 'co2_emissions_prevented' => $estats['co2_powered'],
-                 'devices_fixed' => $estats['fixed_devices'],
-                 'devices_repairable' => $estats['repairable_devices'],
-                 'devices_dead' => $estats['dead_devices'],
-             ],
-             'widgets' => [
-                 'headline_stats' => url("/party/stats/{$party->idevents}/wide"),
-                 'co2_equivalence_visualisation' => url("/outbound/info/party/{$party->idevents}/manufacture"),
-             ],
-             'hours_volunteered' => $party->hoursVolunteered(),
-           ]);
-
-            if (! empty($party->owner)) {
-                $party_user->put('id', $party->owner->id);
-                $party_user->put('name', $party->owner->name);
-            }
-        }
-
-        return $collection;
-    }
-
-    /**
-     * [getEventByKeyAndId description]
-     * Get Past Event using Route Model Binding,
-     * If Event is not found, throw 404 error,
-     * Else return the Event's JSON data.
-     *
-     * @author  Christopher Kelker
-     * @version 1.0.0
-     * @date    2019-03-13
-     * @param   [type]     $api_token
-     * @param   [type]     $id
-     * @return  [type]
-     */
-    public function getEventByKeyAndId(Request $request, $api_token, Party $party)
-    {
-        // If Event is not found, through 404 error
-        if (empty($party) && ! $party->exists) {
-            return abort(404, 'Invalid Event ID.');
-        }
-
-        $estats = $party->getEventStats();
-        $gstats = $party->theGroup->getGroupStats();
-        // New Collection Instance
-        $collection = collect([
-            'id' => $party->idevents,
-            'group' => [
-                'id' => $party->theGroup->idgroups,
-                'name' => $party->theGroup->name,
-                'description' => $party->theGroup->free_text,
-                'image_url' => $party->theGroup->groupImagePath(),
-                'volunteers' => $party->theGroup->volunteers,
-                'participants' => $gstats['participants'],
-                'hours_volunteered' => $gstats['hours_volunteered'],
-                'parties_thrown' => $gstats['parties'],
-                'waste_prevented' => $gstats['waste_total'],
-                'co2_emissions_prevented' => $gstats['co2_total'],
-            ],
-            'event_date' => $party->event_date,
-            'start_time' => $party->start,
-            'end_time' => $party->end,
-            'name' => $party->venue,
-            'location' => [
-                'value' => $party->location,
-                'latitude' => $party->latitude,
-                'longitude' => $party->longitude,
-                'area' => $party->theGroup->area,
-                'postcode' => $party->theGroup->postcode,
-            ],
-            'description' => $party->free_text,
-            'user' => $party_user = collect(),
-            'impact' => [
-                'participants' => $party->pax,
-                'volunteers' => $estats['volunteers'],
-                'waste_prevented' => $estats['waste_total'],
-                'co2_emissions_prevented' => $estats['co2_total'],
-                'devices_fixed' => $estats['fixed_devices'],
-                'devices_repairable' => $estats['repairable_devices'],
-                'devices_dead' => $estats['dead_devices'],
-            ],
-            'widgets' => [
-                'headline_stats' => url("/party/stats/{$party->idevents}/wide"),
-                'co2_equivalence_visualisation' => url("/outbound/info/party/{$party->idevents}/manufacture"),
-            ],
-            'hours_volunteered' => $party->hoursVolunteered(),
-        ]);
-
-        if (! empty($party->owner)) {
-            $party_user->put('id', $party->owner->id);
-            $party_user->put('name', $party->owner->name);
-        }
-
-        return $collection;
     }
 }

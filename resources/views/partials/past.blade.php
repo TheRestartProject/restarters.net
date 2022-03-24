@@ -21,7 +21,7 @@
                   @foreach($past_events as $past_event)
                     <tr>
                         <td class="cell-name"><a href="/party/view/{{ $past_event->idevents }}">{{ $past_event->getEventName() }}</a></td>
-                        <td class="d-none d-sm-table-cell">{{ $past_event->getEventDate() }}</td>
+                        <td class="d-none d-sm-table-cell">{{ $past_event->getFormattedLocalStart() }}</td>
                         @if( $past_event->allDevices->count() == 0 )
                           <td><a href="/party/view/{{{ $past_event->idevents }}}#devices">@lang('dashboard.log_devices')</a></td>
                         @else

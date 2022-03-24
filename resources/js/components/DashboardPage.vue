@@ -13,7 +13,6 @@
       <DashboardAddData class="adddata justify-self-end" />
       <DashboardRightSidebar class="sidebar" />
       <DiscourseDiscussion
-          v-if="topics"
           class="discourse"
           :topics="topics"
           :see-all-topics-link="seeAllTopicsLink"
@@ -53,11 +52,6 @@ export default {
       type: Array,
       required: false,
       default: null
-    },
-    topics: {
-      type: Array,
-      required: false,
-      detault: null
     },
     seeAllTopicsLink: {
       type: String,

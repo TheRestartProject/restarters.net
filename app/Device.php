@@ -118,7 +118,7 @@ class Device extends Model implements Auditable
             $sql .= ' AND `group` = :g ';
         }
         if (! is_null($year) && is_numeric($year)) {
-            $sql .= ' AND YEAR(`event_date`) = :year ';
+            $sql .= ' AND YEAR(`event_start_utc`) = :year ';
         }
 
         $sql .= ' GROUP BY `status`';
@@ -167,7 +167,7 @@ class Device extends Model implements Auditable
             $sql .= ' AND `e`.`group` = :group ';
         }
         if (! is_null($year)) {
-            $sql .= ' AND YEAR(`e`.`event_date`) = :year ';
+            $sql .= ' AND YEAR(`e`.`event_start_utc`) = :year ';
         }
 
         $sql .= ' GROUP BY `repair_status`

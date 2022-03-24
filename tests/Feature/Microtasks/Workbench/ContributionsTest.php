@@ -71,6 +71,7 @@ class ContributionsTest extends TestCase
         $response = $this->get('/workbench');
 
         $this->assertVueProperties($response, [
+            [],
             [
                 ':current-user-quests' => 0,
                 ':current-user-contributions' => 0,
@@ -84,6 +85,7 @@ class ContributionsTest extends TestCase
         $response = $this->get('/workbench');
 
         $this->assertVueProperties($response, [
+            [],
             [
                 ':current-user-quests' => 3,
                 ':current-user-contributions' => 3,
@@ -97,6 +99,7 @@ class ContributionsTest extends TestCase
         $response = $this->get('/workbench');
 
         $this->assertVueProperties($response, [
+            [],
             [
                 ':current-user-quests' => 1,
                 ':current-user-contributions' => 2,

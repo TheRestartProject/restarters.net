@@ -27,7 +27,7 @@
               :total-contributions="{{ $totalContributions }}"
               :current-user-quests="{{ $currentUserQuests }}"
               :current-user-contributions="{{ $currentUserContributions }}"
-              :topics="{{ json_encode($topics, JSON_INVALID_UTF8_IGNORE) }}"
+              tag="{{ $tag }}"
               see-all-topics-link="{{ $seeAllTopicsLink }}"
               :is-logged-in="{{ Auth::check() ? 'true' : 'false'  }}"
               discourse-base-url="{{ env('DISCOURSE_URL') }}"

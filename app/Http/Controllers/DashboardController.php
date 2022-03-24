@@ -20,7 +20,7 @@ use Illuminate\Support\Facades\Log;
 
 class DashboardController extends Controller
 {
-    public function index(DiscourseService $discourseService)
+    public function index()
     {
         $user = User::getProfile(Auth::id());
 
@@ -44,9 +44,9 @@ class DashboardController extends Controller
         $upcoming_events = Party::futureForUser()->get();
 
         foreach ($upcoming_events as $event) {
-            $thisone = $event->getAttributes();
-            $thisone['the_group'] = \App\Group::find($event->group);
-            $expanded_events[] = $thisone;
+            $expanded_event = \App\Http\Controllers\PartyController::expandEvent($event, null);
+            $expanded_event['the_group'] = \App\Group::find($event->group);
+            $expanded_events[] = $expanded_event;
         }
 
         $upcoming_events = $expanded_events;
@@ -82,7 +82,6 @@ class DashboardController extends Controller
                 'user' => $user,
                 'groups_near_you' => $groupsNearYou,
                 'upcoming_events' => $upcoming_events,
-                'topics' => $discourseService->getDiscussionTopics(),
                 'your_groups' => $your_groups,
                 'seeAllTopicsLink' => env('DISCOURSE_URL').'/latest',
                 'new_groups' => $new_groups,

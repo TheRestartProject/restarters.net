@@ -378,7 +378,7 @@ class DiscourseService
 
                             $response = $client->request('DELETE', "/admin/groups/$discourseId/members.json", [
                                 'form_params' => [
-                                    'usernames' => [ $discourseMember ]
+                                    'user_id' => $d['id']
                                 ]
                             ]);
 
@@ -399,7 +399,9 @@ class DiscourseService
                             if ($d['owner'] && !$shouldBeOwner) {
                                 Log::info("Remove $discourseMember as admin of {$discourseId} {$discourseName}");
                                 $response = $client->request('DELETE', "/admin/groups/$discourseId/owners.json", [
-                                    'user_id' => $d['id']
+                                    'form_params' => [
+                                        'user_id' => $d['id']
+                                    ]
                                 ]);
 
                                 Log::info('Response status: ' . $response->getStatusCode());
@@ -427,6 +429,23 @@ class DiscourseService
                                 {
                                     Log::error("Failed to add $discourseMember as owner of {$discourseId} {$discourseName}");
                                     throw new \Exception("Failed to add $discourseMember as owner of {$discourseId} {$discourseName}");
+                                }
+                            }
+
+                            if ($restartersMembers[$discourseMember]->role == Role::HOST && $d['trust_level'] == 0) {
+                                Log::info("$discourseMember is on trust_level 0, promote");
+                                $response = $client->request('PUT', "/admin/users/{$d['id']}/trust_level.json", [
+                                    'form_params' => [
+                                        'level' => 1
+                                    ]
+                                ]);
+
+                                Log::info('Response status: ' . $response->getStatusCode());
+                                Log::debug($response->getBody());
+
+                                if ($response->getStatusCode() != 200) {
+                                    Log::error("Failed to promote $discourseMember to trust level 1");
+                                    throw new \Exception("Failed to promote $discourseMember to trust level 1");
                                 }
                             }
                         }

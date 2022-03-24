@@ -27,9 +27,6 @@ class Party extends Model implements Auditable
         'group',
         'event_start_utc',
         'event_end_utc',
-        'event_date',
-        'start',
-        'end',
         'venue',
         'location',
         'latitude',
@@ -46,12 +43,13 @@ class Party extends Model implements Auditable
         'discourse_thread',
         'devices_updated_at',
         'link',
-        'timezone'
+        'timezone',
+        'user_id'
     ];
     protected $hidden = ['created_at', 'updated_at', 'deleted_at', 'frequency', 'group', 'group', 'user_id', 'wordpress_post_id', 'cancelled', 'devices_updated_at'];
 
     // Append data to Model
-    protected $appends = ['participants', 'ShareableLink'];
+    protected $appends = ['participants', 'ShareableLink', 'event_date_local', 'start_local', 'end_local'];
 
     //Getters
     public function findAll()
@@ -59,8 +57,8 @@ class Party extends Model implements Auditable
         return DB::select(DB::raw('SELECT
                     `e`.`idevents` AS `id`,
                     UNIX_TIMESTAMP(`event_start_utc`) AS `event_timestamp`,
-                    `e`.`start` AS `start`,
-                    `e`.`end` AS `end`,
+                    TIME(CONVERT_TZ(`event_start_utc`, \'GMT\', `e`.`timezone`)) AS `start`,
+                    TIME(CONVERT_TZ(`event_end_utc`, \'GMT\', `e`.`timezone`)) AS `end`,
                     `e`.`venue`,
                     `e`.`link`,
                     `e`.`location`,
@@ -86,8 +84,8 @@ class Party extends Model implements Auditable
         return DB::select(DB::raw('SELECT
                     `e`.`idevents` AS `id`,
                     UNIX_TIMESTAMP(`event_start_utc`) AS `event_timestamp`,
-                    `e`.`start` AS `start`,
-                    `e`.`end` AS `end`,
+                    TIME(CONVERT_TZ(`event_start_utc`, \'GMT\', `e`.`timezone`)) AS `start`,
+                    TIME(CONVERT_TZ(`event_end_utc`, \'GMT\', `e`.`timezone`)) AS `end`,
                     `e`.`venue`,
                     `e`.`link`,
                     `e`.`location`,
@@ -113,8 +111,8 @@ class Party extends Model implements Auditable
                     UNIX_TIMESTAMP(`event_start_utc`) AS `event_date` ,
                     UNIX_TIMESTAMP(`event_start_utc`) AS `event_timestamp`,
                     UNIX_TIMESTAMP(`event_end_utc`) AS `event_end_timestamp`,
-                    `e`.`start` AS `start`,
-                    `e`.`end` AS `end`,
+                    TIME(CONVERT_TZ(`event_start_utc`, \'GMT\', `e`.`timezone`)) AS `start`,
+                    TIME(CONVERT_TZ(`event_end_utc`, \'GMT\', `e`.`timezone`)) AS `end`,
                     `e`.`venue`,
                     `e`.`link`,
                     `e`.`location`,
@@ -316,10 +314,10 @@ class Party extends Model implements Auditable
                     `e`.`link`,
                     `e`.`location`,
                     UNIX_TIMESTAMP(`e`.`event_start_utc`) AS `event_timestamp`,
-                    `e`.`event_date` AS `plain_date`,
+                    DATE(`e`.`event_start_utc`) AS `plain_date`,
                     NOW() AS `this_moment`,
-                    `e`.`start`,
-                    `e`.`end`,
+                    TIME(CONVERT_TZ(`event_start_utc`, \'GMT\', `e`.`timezone`)) AS `start`,
+                    TIME(CONVERT_TZ(`event_end_utc`, \'GMT\', `e`.`timezone`)) AS `end`,
                     `e`.`latitude`,
                     `e`.`longitude`
                 FROM `'.$this->table.'` AS `e`
@@ -329,7 +327,7 @@ class Party extends Model implements Auditable
             $sql .= ' AND `e`.`group` = :group ';
         }
 
-        $sql .= ' ORDER BY `e`.`event_date` ASC
+        $sql .= ' ORDER BY `e`.`event_start_utc` ASC
                 LIMIT 10';
 
         if (! is_null($group)) {
@@ -354,13 +352,13 @@ class Party extends Model implements Auditable
                     `e`.`venue`,
                     `e`.`link`,
                     `e`.`location`,
-                    UNIX_TIMESTAMP( CONCAT(`e`.`event_date`, " ", `e`.`start`) ) AS `event_date`,
-                    `e`.`start`,
-                    `e`.`end`,
+                    UNIX_TIMESTAMP( `e`.`event_start_utc` ) AS `event_date`,
+                    TIME(CONVERT_TZ(`event_start_utc`, \'GMT\', `e`.`timezone`)) AS `start`,
+                    TIME(CONVERT_TZ(`event_end_utc`, \'GMT\', `e`.`timezone`)) AS `end`,
                     `e`.`latitude`,
                     `e`.`longitude`
                 FROM `'.$this->table.'` AS `e`
-                ORDER BY `e`.`event_date` DESC
+                ORDER BY `e`.`event_start_utc` DESC
                 LIMIT :limit'), ['limit' => $limit]);
     }
 
@@ -527,14 +525,17 @@ class Party extends Model implements Auditable
     {
         // We want to exclude groups which we are a member of, but include ones where we have been invited but
         // not yet joined.
-        $user_group_ids = UserGroups::where('user', $user->id)->where('status', 1)->pluck('group')->toArray();
+        $exclude_group_ids = UserGroups::where('user', $user->id)->where('status', 1)->pluck('group')->toArray();
+
+        // We also want to exclude any groups which are not yet approved.
+        $exclude_group_ids = array_merge($exclude_group_ids, Group::whereNull('wordpress_post_id')->pluck('idgroups')->toArray());
 
         return $this
       ->select(DB::raw('`events`.*, ( 6371 * acos( cos( radians('.$user->latitude.') ) * cos( radians( events.latitude ) ) * cos( radians( events.longitude ) - radians('.$user->longitude.') ) + sin( radians('.$user->latitude.') ) * sin( radians( events.latitude ) ) ) ) AS distance'))
       ->join('groups', 'groups.idgroups', '=', 'events.group')
       ->join('users_groups', 'users_groups.group', '=', 'groups.idgroups')
-      ->where(function ($query) use ($user_group_ids) {
-          $query->whereNotIn('events.group', $user_group_ids)
+      ->where(function ($query) use ($exclude_group_ids) {
+          $query->whereNotIn('events.group', $exclude_group_ids)
         ->where('event_start_utc', '>=', date('Y-m-d H:i:s'));
       })
       ->having('distance', '<=', User::NEARBY_KM)
@@ -580,30 +581,41 @@ class Party extends Model implements Auditable
         return $this->hasOne(\App\Group::class, 'idgroups', 'group');
     }
 
-    public function getEventDate($format = 'd/m/Y')
+    /**
+     * Return formatted date, in timezone of event.
+     *
+     * @param string $format
+     * @return false|string
+     */
+    public function getFormattedLocalStart($format = 'd/m/Y')
     {
-        return date($format, strtotime($this->event_date));
+        $dt = new Carbon($this->event_start_utc);
+        $dt->setTimezone($this->timezone);
+        return $dt->format($format);
     }
 
-    public function getEventStart()
+    /**
+     * Return formatted date, in timezone of event.
+     *
+     * @param string $format
+     * @return false|string
+     */
+    public function getFormattedLocalEnd($format = 'd/m/Y')
     {
-        return date('H:i', strtotime($this->start));
-    }
-
-    public function getEventEnd()
-    {
-        return date('H:i', strtotime($this->end));
+        $dt = new Carbon($this->event_end_utc);
+        $dt->setTimezone($this->timezone);
+        return $dt->format($format);
     }
 
     public function getEventTimestampAttribute()
     {
         // Returning in local time.
-        return "{$this->event_date} {$this->start}";
+        return "{$this->event_date_local} {$this->start_local}";
     }
 
-    public function getEventStartEnd()
+    public function getEventStartEndLocal()
     {
-        return $this->getEventStart().'-'.$this->getEventEnd();
+        return $this->start_local . ' - ' . $this->end_local;
     }
 
     public function getEventName()
@@ -636,7 +648,7 @@ class Party extends Model implements Auditable
     {
         $start = new Carbon($this->event_start_utc);
 
-        if (!$this->$this->isInProgress() && !$this->hasFinished() && $start->isCurrentDay()) {
+        if (!$this->isInProgress() && !$this->hasFinished() && $start->isCurrentDay()) {
             return true;
         }
 
@@ -923,7 +935,7 @@ class Party extends Model implements Auditable
     {
         $short_location = Str::limit($this->venue, 30);
 
-        return "{$this->getEventDate('d/m/Y')} / {$short_location}";
+        return "{$this->getFormattedLocalStart('d/m/Y')} / {$short_location}";
     }
 
     public function shouldPushToWordpress()
@@ -1020,55 +1032,38 @@ class Party extends Model implements Auditable
         return $end->toIso8601String();
     }
 
-    // Mutators for legacy event_date/start/end fields.  These are now derived from the UTC fields via virtual
-    // columns, and therefore should never be set directly.  Throw exceptions to ensure that they are not, until we
-    // have retired these fields.
-    //
-    // The tests create events using the old fields, and we've not changed those yet, but PartyFactory will have
-    // populated the new ones - so just ignore that.
-    //
-    // You might think that we could have mutators which set these correctly.  But this isn't possible; the UTC value
-    // of the date depends on the local date, time and timezone, and cannot be set in isolation.
+    // Mutators for previous event_date/start/end fields.  These are now superceded by the UTC fields and therefore
+    // should never be set directly.  Throw exceptions to ensure that they are not.
     public function setEventDateAttribute($val) {
-        if (!array_key_exists('event_start_utc', $this->attributes)) {
-            throw new \Exception("Attempt to set event time fields directly; please use event_start_utc and event_end_utc");
-        }
+        throw new \Exception("Attempt to set event time fields directly; please use event_start_utc and event_end_utc");
     }
 
     public function setStartAttribute($val) {
-        if (!array_key_exists('event_start_utc', $this->attributes)) {
-            throw new \Exception(
-                "Attempt to set event time fields directly; please use event_start_utc and event_end_utc"
-            );
-        }
+        throw new \Exception(
+            "Attempt to set event time fields directly; please use event_start_utc and event_end_utc"
+        );
     }
 
     public function setEndAttribute($val) {
-        if (!array_key_exists('event_start_utc', $this->attributes)) {
-            throw new \Exception(
-                "Attempt to set event time fields directly; please use event_start_utc and event_end_utc"
-            );
-        }
+        throw new \Exception(
+            "Attempt to set event time fields directly; please use event_start_utc and event_end_utc"
+        );
     }
 
-    // We also need accessors, to avoid any cases where we mutate the values and access them before we have
-    // saved and done issue a refresh(), which would pick up new values from the virtual columns.
-    //
-    // These should return local values, i.e. in the timezone of the event.
-    public function getEventDateAttribute() {
+    public function getEventDateLocalAttribute() {
         $dt = new Carbon($this->event_start_utc);
         $dt->setTimezone($this->timezone);
         return $dt->toDateString();
     }
-    public function getStartAttribute() {
+    public function getStartLocalAttribute() {
         $dt = new Carbon($this->event_start_utc);
         $dt->setTimezone($this->timezone);
-        return $dt->toTimeString();
+        return $dt->toTimeString('minute');
     }
 
-    public function getEndAttribute() {
+    public function getEndLocalAttribute() {
         $dt = new Carbon($this->event_end_utc);
         $dt->setTimezone($this->timezone);
-        return $dt->toTimeString();
+        return $dt->toTimeString('minute');
     }
 }

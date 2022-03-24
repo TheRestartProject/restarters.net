@@ -86,6 +86,7 @@
   </CollapsibleSection>
 </template>
 <script>
+import moment from 'moment'
 import DashboardGroup from './DashboardGroup'
 import CollapsibleSection from './CollapsibleSection'
 import DashboardEvent from './DashboardEvent'
@@ -98,7 +99,7 @@ export default {
       required: true
     },
     newGroups: {
-      type: Number,
+      type: Array,
       required: true
     },
     nearbyGroups: {
@@ -124,7 +125,7 @@ export default {
     events() {
       return this.$store.getters['events/getByGroup'](null).filter(e => e.upcoming).sort((a, b) => {
         // Sort soonest first.
-        return Date.parse(a.event_date + ' ' + a.start) - Date.parse(b.event_date + ' ' + b.start)
+        return new moment(a.event_start_utc).unix() - new moment(b.event_start_utc).unix()
       })
     },
     translatedNewlyAdded() {

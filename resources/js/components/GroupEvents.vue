@@ -116,22 +116,16 @@ export default {
   },
   computed: {
     events() {
-      return this.$store.getters['events/getByGroup'](this.idgroups).sort((a,b) => new moment(a.event_date).format('YYYYMMDD') - new moment(b.event_date).format('YYYYMMDD'))
+      return this.$store.getters['events/getByGroup'](this.idgroups).sort((a,b) => new moment(a.event_start_utc).unix() - new moment(b.event_start_utc).unix())
     },
     reverse() {
-      return this.$store.getters['events/getByGroup'](this.idgroups).sort((a,b) => new moment(b.event_date).format('YYYYMMDD') - new moment(a.event_date).format('YYYYMMDD'))
+      return this.$store.getters['events/getByGroup'](this.idgroups).sort((a,b) => new moment(b.event_start_utc).unix() - new moment(a.event_start_utc).unix())
     },
     past() {
-      return this.reverse.filter(e => {
-        const start = new moment(e.event_date + ' ' + e.start)
-        return start.isBefore() && !e.nearby && !e.all
-      })
+      return this.reverse.filter(e => e.finished && !e.nearby && !e.all)
     },
     upcoming() {
-      return this.events.filter(e => {
-        const start = new moment(e.event_date + ' ' + e.start)
-        return start.isAfter() && !e.nearby && !e.all
-      })
+      return this.events.filter(e => e.upcoming && !e.nearby && !e.all)
     },
     nearby() {
       return this.events.filter(e => e.nearby)
