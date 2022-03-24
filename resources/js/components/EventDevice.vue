@@ -270,6 +270,7 @@ export default {
       }
 
       this.currentDevice.estimate = parseFloat(this.currentDevice.estimate)
+      this.currentDevice.age = parseFloat(this.currentDevice.age)
 
       this.nextSteps()
       this.partsProvider()
