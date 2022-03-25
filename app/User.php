@@ -395,7 +395,7 @@ class User extends Authenticatable implements Auditable, HasLocalePreference
             return false;
         }
 
-        return $this->user_name != NULL;
+        return $this->username != NULL;
     }
 
     /**
