@@ -52,7 +52,7 @@ class NetworkController extends Controller
      */
     public function create()
     {
-        //
+        $this->authorize('create', Network::class);
     }
 
     /**
@@ -63,7 +63,7 @@ class NetworkController extends Controller
      */
     public function store(Request $request)
     {
-        //
+        $this->authorize('create', Network::class);
     }
 
     /**
@@ -77,6 +77,7 @@ class NetworkController extends Controller
         $this->authorize('view', $network);
 
         $groupsForAssociating = [];
+
         if (Auth::user()->can('associateGroups', $network)) {
             $groupsForAssociating = $network->groupsNotIn()->sortBy('name');
         }
@@ -95,7 +96,7 @@ class NetworkController extends Controller
      */
     public function edit(Network $network)
     {
-        // TODO: authorisation?
+        $this->authorize('update', $network);
 
         return view('networks.edit', [
             'network' => $network,
@@ -111,7 +112,7 @@ class NetworkController extends Controller
      */
     public function update(Request $request, Network $network)
     {
-        // TODO: authorisation?
+        $this->authorize('update', $network);
 
         if ($request->hasFile('network_logo')) {
             $fileHelper = new FixometerFile;
@@ -129,7 +130,7 @@ class NetworkController extends Controller
      */
     public function associateGroup(Request $request, Network $network)
     {
-        // TODO: authorisation?
+        $this->authorize('associateGroups', $network);
 
         $groupIds = $request->input('groups');
 
@@ -155,6 +156,6 @@ class NetworkController extends Controller
      */
     public function destroy(Network $network)
     {
-        //
+        $this->authorize('delete', $network);
     }
 }

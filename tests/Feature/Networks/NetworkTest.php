@@ -98,6 +98,10 @@ class NetworkTest extends TestCase
            'latitude' => 51.5074,
            'longitude' => -0.1278,
         ]);
+
+        $atts = factory(Network::class)->raw();
+        $response = $this->post('/api/groups/network?api_token=1234', $atts);
+
         $network = factory(Network::class)->create();
 
         $this->networkService->addGroupToNetwork($admin, $group, $network);
