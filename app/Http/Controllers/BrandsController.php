@@ -24,17 +24,6 @@ class BrandsController extends Controller
         ]);
     }
 
-    public function getCreateBrand()
-    {
-        if (! Fixometer::hasRole(Auth::user(), 'Administrator')) {
-            return redirect('/user/forbidden');
-        }
-
-        return view('brands.create', [
-        'title' => 'Add Brand',
-        ]);
-    }
-
     public function postCreateBrand(Request $request)
     {
         if (! Fixometer::hasRole(Auth::user(), 'Administrator')) {
