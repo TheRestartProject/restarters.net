@@ -44,12 +44,15 @@ class CalendarTest extends TestCase
                                                ]);
         $this->group2 = $group2;
 
+        $this->start = '2100-01-01T10:15:05+05:00';
+        $this->end = '2100-01-0113:45:05+05:00';
+
         $event = factory(Party::class)->create([
                                                    'group' => $group->idgroups,
                                                    'latitude' => 50.645,
                                                    'longitude' => 5.575,
-                                                   'event_start_utc' => '2100-01-01T10:15:05+05:00',
-                                                   'event_end_utc' => '2100-01-0113:45:05+05:00',
+                                                   'event_start_utc' => $this->start,
+                                                   'event_end_utc' => $this->end,
                                                ]);
 
         $event->approve();
@@ -70,6 +73,8 @@ class CalendarTest extends TestCase
         $response = $this->get('/calendar/user/' . $this->host->calendar_hash);
         $response->assertStatus(200);
         $this->expectOutputRegex('/VEVENT/');
+        $this->expectOutputString($this->start);
+        $this->expectOutputString($this->end);
 
         // Invalid hash.
         $this->expectException(\Exception::class);
@@ -81,6 +86,8 @@ class CalendarTest extends TestCase
         $response = $this->get('/calendar/group/' . $this->group->idgroups);
         $response->assertStatus(200);
         $this->expectOutputRegex('/VEVENT/');
+        $this->expectOutputString($this->start);
+        $this->expectOutputString($this->end);
 
         // No events.
         $this->expectException(NotFoundHttpException::class);
@@ -92,6 +99,8 @@ class CalendarTest extends TestCase
         $response = $this->get('/calendar/group-area/London');
         $response->assertStatus(200);
         $this->expectOutputRegex('/VEVENT/');
+        $this->expectOutputString($this->start);
+        $this->expectOutputString($this->end);
 
         // No events.
         $this->expectException(NotFoundHttpException::class);
@@ -103,6 +112,8 @@ class CalendarTest extends TestCase
         $response = $this->get('/calendar/all-events/' . env('CALENDAR_HASH'));
         $response->assertStatus(200);
         $this->expectOutputRegex('/VEVENT/');
+        $this->expectOutputString($this->start);
+        $this->expectOutputString($this->end);
 
         $this->expectException(NotFoundHttpException::class);
         $response = $this->get('/calendar/all-events/' . env('CALENDAR_HASH') . '1');
