@@ -2,7 +2,6 @@
 
 namespace Tests\Feature\Dashboard;
 
-use App\Category;
 use App\Role;
 use DB;
 use Hash;

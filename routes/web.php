@@ -218,7 +218,9 @@ Route::group(['middleware' => ['auth', 'verifyUserConsent', 'ensureAPIToken']], 
     });
 
     //Device Controller
-    Route::resource('device-url', 'DeviceUrlController');
+    Route::resource('device-url', 'DeviceUrlController')->only([
+        'store', 'update', 'destroy'
+                                                               ]);
 
     Route::prefix('fixometer')->group(function () {
         Route::get('/', 'DeviceController@index')->name('devices');
