@@ -71,7 +71,7 @@ export default {
     },
   },
   async mounted() {
-    const ret = await axios.get('/api/users/' + this.userId + '/notifications')
+    const ret = await axios.get('/api/users/' + this.userId + '/notifications/')
 
     if (ret.data.success) {
       this.restartersNotifications = ret.data.restarters
