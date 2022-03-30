@@ -113,7 +113,7 @@ export default {
       // TODO We don't handle failures very well.  One way to do this is to move the axios requests into store actions,
       // which we will do at some point, and then have a generic "something went wrong" popup to alert the user, as
       // well as Sentry to alert us.
-      const ret = await axios.get('/api/groups/' + this.event.the_group.idgroups + '/volunteers?api_token=' + this.apiToken)
+      const ret = await axios.get('/api/groups/' + this.event.group.idgroups + '/volunteers?api_token=' + this.apiToken)
 
       if (ret && ret.data) {
         this.groupVolunteers = ret.data

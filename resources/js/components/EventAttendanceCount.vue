@@ -27,7 +27,8 @@ export default {
   props: {
     count: {
       type: Number,
-      required: true
+      required: false,
+      default: 0
     },
     canedit: {
       type: Boolean,
