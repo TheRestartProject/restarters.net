@@ -43,7 +43,6 @@ Route::group(['middleware' => ['ensureAPIToken']], function () {
     Route::redirect('register', '/user/register');
     Route::get('/logout', 'UserController@logout');
 
-    Route::get('/about', 'AboutController@index')->name('features');
     Route::get('/about/cookie-policy', function () {
         return View::make('features.cookie-policy');
     });
