@@ -122,20 +122,14 @@
               $expanded_brands[] = $brand;
           }
 
-          // TODO: more properties may need expanding on the event here.
-          // Added 'finished' and 'upcoming' in https://therestartproject.atlassian.net/browse/RES-1659
-          // Not used PartyController::expandEvent here yet as it gives an array, and the code below looks
-          // seems to expect an object.
-          $event->approved = $event->wordpress_post_id !== null;
-          $event->finished = $event->hasFinished();
-          $event->upcoming = $event->isUpcoming();
+          $expanded_event = \App\Http\Controllers\PartyController::expandEvent($event);
         ?>
         <div class="vue">
           <EventPage
             csrf="{{ csrf_token() }}"
             :idevents="{{ $event->idevents }}"
             :devices="{{ json_encode($expanded_devices, JSON_INVALID_UTF8_IGNORE) }}"
-            :initial-event="{{ json_encode($event, JSON_INVALID_UTF8_IGNORE) }}"
+            :initial-event="{{ json_encode($expanded_event, JSON_INVALID_UTF8_IGNORE) }}"
             :is-attending="{{ $is_attending ? 'true' : 'false' }}"
             discourse-thread="{{ $discourseThread }}"
             :canedit="{{ $can_edit_event ? 'true' : 'false' }}"

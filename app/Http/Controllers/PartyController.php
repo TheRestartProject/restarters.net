@@ -44,7 +44,7 @@ class PartyController extends Controller
         $this->discourseService = $discourseService;
     }
 
-    public static function expandEvent($event, $group)
+    public static function expandEvent($event, $group = null)
     {
         // Use attributesToArray rather than getAttributes so that our custom accessors are invoked.
         $thisone = $event->attributesToArray();
@@ -82,8 +82,12 @@ class PartyController extends Controller
         $thisone['finished'] = $event->hasFinished();
         $thisone['inprogress'] = $event->isInProgress();
         $thisone['startingsoon'] = $event->isStartingSoon();
+
         if (!empty($event->wordpress_post_id)) {
+            $thisone['approved'] = true;
             $thisone['wordpress_post_id'] = $event->wordpress_post_id;
+        } else {
+            $thisone['approved'] = false;
         }
 
         return $thisone;
