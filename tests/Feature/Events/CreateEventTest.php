@@ -86,14 +86,16 @@ class CreateEventTest extends TestCase
         $eventAttributes['link'] = 'https://therestartproject.org/';
 
         // We want an upcoming event so that we can check it appears in various places.
-        $eventAttributes['event_start_utc'] = Carbon::parse('1pm tomorrow')->toIso8601String();
-        $eventAttributes['event_end_utc'] = Carbon::parse('3pm tomorrow')->toIso8601String();
+        $start = Carbon::createFromTimestamp(strtotime('tomorrow 1pm'));
+        $end = Carbon::createFromTimestamp(strtotime('tomorrow 3pm'));
+        $eventAttributes['event_start_utc'] = $start->toIso8601String();
+        $eventAttributes['event_end_utc'] = $end->toIso8601String();
 
         $this->post('/party/create/', $eventAttributes);
 
         // The event_start_utc and event_end_utc will be in the database, but not ISO8601 formatted - that is implicit.
-        $eventAttributes['event_start_utc'] = Carbon::parse($eventAttributes['event_start_utc'])->format('Y-m-d H:i:s');
-        $eventAttributes['event_end_utc'] = Carbon::parse($eventAttributes['event_end_utc'])->format('Y-m-d H:i:s');
+        $eventAttributes['event_start_utc'] = Carbon::parse($eventAttributes['event_start_utc'])->setTimezone('UTC')->format('Y-m-d H:i:s');
+        $eventAttributes['event_end_utc'] = Carbon::parse($eventAttributes['event_end_utc'])->setTimezone('UTC')->format('Y-m-d H:i:s');
         $this->assertDatabaseHas('events', $eventAttributes);
 
         // The logged in user should be recorded as the creator.
@@ -159,10 +161,10 @@ class CreateEventTest extends TestCase
             $this->assertEquals(true, $events[0]['attending']);
             $this->assertEquals(true, $events[0]['isVolunteer']);
             $this->assertEquals(substr($eventAttributes['event_start_utc'], 0, 10), $events[0]['event_date_local']);
-            $this->assertEquals(substr($eventAttributes['event_start_utc'], 11, 5), $events[0]['start_local']);
-            $this->assertEquals(substr($eventAttributes['event_end_utc'], 11, 5), $events[0]['end_local']);
-            $this->assertEquals(Carbon::parse($eventAttributes['event_start_utc'])->toIso8601String(), $events[0]['event_start_utc']);
-            $this->assertEquals(Carbon::parse($eventAttributes['event_end_utc'])->toIso8601String(), $events[0]['event_start_utc']);
+            $this->assertEquals('13:00', $events[0]['start_local']);
+            $this->assertEquals('15:00', $events[0]['end_local']);
+            $this->assertEquals($start->setTimezone('UTC')->toIso8601String(), $events[0]['event_start_utc']);
+            $this->assertEquals($end->setTimezone('UTC')->toIso8601String(), $events[0]['event_end_utc']);
         } else {
             $this->assertEquals(true, $events[0]['requiresModeration']);
         }
