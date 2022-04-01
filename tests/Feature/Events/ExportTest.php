@@ -64,6 +64,8 @@ class ExportTest extends TestCase
 
         // Bit hacky, but grab the file that was created.  Can't find a way to do this in Laravel easily, though it's
         // probably possible using mocking.
+        //
+        // TODO These files sometimes appear in public/ and sometimes don't.  Is this just an artefact of testing?
         $filename = 'parties.csv';
         $fh = fopen($filename, 'r');
         fgetcsv($fh);
@@ -75,8 +77,6 @@ class ExportTest extends TestCase
         // Export devices.
         $response = $this->get("/export/devices");
 
-        // Bit hacky, but grab the file that was created.  Can't find a way to do this in Laravel easily, though it's
-        // probably possible using mocking.
         $filename = 'public/devices.csv';
         $fh = fopen($filename, 'r');
         fgetcsv($fh);

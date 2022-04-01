@@ -40,8 +40,8 @@ export default {
       await axios.put('/api/events/' + params.idevents + '/volunteers', {
         api_token: apiToken,
         user: params.user,
-        full_name: params.fullName,
-        volunteer_email_address: params.volunteerEmailAddress
+        full_name: params.full_name,
+        volunteer_email_address: params.volunteer_email_address
       })
 
       await dispatch('attendance/fetch', {
