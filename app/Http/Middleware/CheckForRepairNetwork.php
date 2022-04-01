@@ -30,7 +30,7 @@ class CheckForRepairNetwork
             $networkQuery = Network::where('shortname', 'repairshare');
         } elseif (Str::contains($host, 'repairtogether')) {
             $networkQuery = Network::where('shortname', 'repairtogether');
-        } elseif (Str::contains($host, 'test-restarters') || Str::contains($host, 'restarters.test')) {
+        } elseif (Str::contains($host, 'test-restarters')) {
             $networkQuery = Network::where('shortname', 'test');
         } else {
             $networkQuery = Network::where('shortname', 'like', 'restarters');

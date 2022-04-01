@@ -216,7 +216,7 @@ class NetworkTest extends TestCase
     public function network_page()
     {
         $network = factory(Network::class)->create([
-            'shortname' => 'test'
+            'shortname' => 'restarters'
                                                    ]);
 
         $coordinator = factory(User::class)->states('NetworkCoordinator')->create();
