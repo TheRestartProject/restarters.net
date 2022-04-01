@@ -209,7 +209,7 @@ class ProfileTest extends TestCase
     }
 
     public function testAPI() {
-        $user = factory(User::class)->states('Restarter')->create([
+        $user = factory(User::class)->states('Administrator')->create([
                                                                       'api_token' => '1234',
                                                                   ]);
         $this->actingAs($user);

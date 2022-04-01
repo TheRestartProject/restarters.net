@@ -7,7 +7,7 @@
         <EventDescription class="pr-md-3" :idevents="idevents" />
       </div>
       <div>
-        <EventAttendance class="pl-md-3" :idevents="idevents" :canedit="canedit" :attendance="attendance" :invitations="invitations" />
+        <EventAttendance class="pl-md-3" :idevents="idevents" :canedit="canedit" :invitations="invitations" />
       </div>
     </div>
     <EventImages :images="images" v-if="images && images.length" />
@@ -148,6 +148,11 @@ export default {
         devices: this.devices
       })
     }
+
+    this.$store.dispatch('attendance/set', {
+      idevents: this.idevents,
+      attendees: this.attendance
+    })
 
     if (window && window.location && window.location.hash) {
       setTimeout(() => {

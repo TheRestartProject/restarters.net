@@ -32,6 +32,8 @@ class NetworkController extends Controller
         }
 
         $yourNetworks = $user->networks->sortBy('name');
+        $allNetworks = [];
+        $showAllNetworks = false;
 
         if ($user->hasRole('Administrator')) {
             $showAllNetworks = true;
@@ -46,27 +48,6 @@ class NetworkController extends Controller
     }
 
     /**
-     * Show the form for creating a new resource.
-     *
-     * @return \Illuminate\Http\Response
-     */
-    public function create()
-    {
-        //
-    }
-
-    /**
-     * Store a newly created resource in storage.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @return \Illuminate\Http\Response
-     */
-    public function store(Request $request)
-    {
-        //
-    }
-
-    /**
      * Display the specified network.
      *
      * @param  \App\Network  $network
@@ -77,6 +58,7 @@ class NetworkController extends Controller
         $this->authorize('view', $network);
 
         $groupsForAssociating = [];
+
         if (Auth::user()->can('associateGroups', $network)) {
             $groupsForAssociating = $network->groupsNotIn()->sortBy('name');
         }
@@ -95,7 +77,7 @@ class NetworkController extends Controller
      */
     public function edit(Network $network)
     {
-        // TODO: authorisation?
+        $this->authorize('update', $network);
 
         return view('networks.edit', [
             'network' => $network,
@@ -111,7 +93,7 @@ class NetworkController extends Controller
      */
     public function update(Request $request, Network $network)
     {
-        // TODO: authorisation?
+        $this->authorize('update', $network);
 
         if ($request->hasFile('network_logo')) {
             $fileHelper = new FixometerFile;
@@ -129,7 +111,7 @@ class NetworkController extends Controller
      */
     public function associateGroup(Request $request, Network $network)
     {
-        // TODO: authorisation?
+        $this->authorize('associateGroups', $network);
 
         $groupIds = $request->input('groups');
 
@@ -145,16 +127,5 @@ class NetworkController extends Controller
         $numberOfGroups = count($groupIds);
 
         return redirect()->route('networks.show', [$network])->withSuccess(Lang::get('networks.show.add_groups_success', ['number' => $numberOfGroups]));
-    }
-
-    /**
-     * Remove the specified resource from storage.
-     *
-     * @param  \App\Network  $network
-     * @return \Illuminate\Http\Response
-     */
-    public function destroy(Network $network)
-    {
-        //
     }
 }

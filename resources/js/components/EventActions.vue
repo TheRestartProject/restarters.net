@@ -32,7 +32,7 @@
           <b-dropdown-item :href="'/party/join/' + idevents" v-else>
             {{ __('events.RSVP') }}
           </b-dropdown-item>
-          <b-dropdown-item :href="'/group/join/' + event.the_group.idgroups" v-if="!inGroup">
+          <b-dropdown-item :href="'/group/join/' + event.group.idgroups" v-if="!inGroup">
             {{ __('events.follow_group') }}
           </b-dropdown-item>
         </div>
@@ -42,7 +42,7 @@
           {{ __('events.share_event_stats') }}
         </b-dropdown-item>
         <div v-else>
-          <b-dropdown-item :href="'/group/join/' + event.the_group.idgroups" v-if="!inGroup">
+          <b-dropdown-item :href="'/group/join/' + event.group.idgroups" v-if="!inGroup">
             {{ __('events.follow_group') }}
           </b-dropdown-item>
           <b-dropdown-item data-toggle="modal" data-target="#event-invite-to" v-if="attending && upcoming">

@@ -4,10 +4,8 @@ namespace App\Http\Controllers;
 
 use App\Audits;
 use App\Brands;
-use App\Category;
 use App\Cluster;
 use App\Device;
-use App\Events\ApproveEvent;
 use App\Events\EditEvent;
 use App\Events\EventDeleted;
 use App\Events\EventImagesUploaded;
@@ -15,18 +13,13 @@ use App\EventsUsers;
 use App\Group;
 use App\Helpers\Fixometer;
 use App\Helpers\Geocoder;
-use App\Host;
 use App\Invite;
 use App\Notifications\AdminModerationEvent;
-use App\Notifications\EventDevices;
 use App\Notifications\EventRepairs;
 use App\Notifications\JoinEvent;
-use App\Notifications\JoinGroup;
-use App\Notifications\NotifyRestartersOfNewEvent;
 use App\Notifications\RSVPEvent;
 use App\Party;
 use App\Services\DiscourseService;
-use App\Session;
 use App\User;
 use App\UserGroups;
 use Auth;
@@ -51,7 +44,7 @@ class PartyController extends Controller
         $this->discourseService = $discourseService;
     }
 
-    public static function expandEvent($event, $group)
+    public static function expandEvent($event, $group = null)
     {
         // Use attributesToArray rather than getAttributes so that our custom accessors are invoked.
         $thisone = $event->attributesToArray();
@@ -89,8 +82,12 @@ class PartyController extends Controller
         $thisone['finished'] = $event->hasFinished();
         $thisone['inprogress'] = $event->isInProgress();
         $thisone['startingsoon'] = $event->isStartingSoon();
+
         if (!empty($event->wordpress_post_id)) {
+            $thisone['approved'] = true;
             $thisone['wordpress_post_id'] = $event->wordpress_post_id;
+        } else {
+            $thisone['approved'] = false;
         }
 
         return $thisone;
@@ -622,13 +619,6 @@ class PartyController extends Controller
             $device_images[$device->iddevices] = $File->findImages(env('TBL_DEVICES'), $device->iddevices);
         }
 
-        //Retrieve group volunteers
-        if ($event->hasFinished() && ! Auth::guest()) {
-            $group_volunteers = $this->getGroupEmails($id, true);
-        } else {
-            $group_volunteers = null;
-        }
-
         if ($event->isInProgress() || $event->hasFinished()) {
             $stats = $event->getEventStats();
         } else {
@@ -652,7 +642,6 @@ class PartyController extends Controller
             'brands' => $brands,
             'clusters' => $clusters,
             'device_images' => $device_images,
-            'group_volunteers' => $group_volunteers,
             'calendar_links' => $this->generateAddToCalendarLinks($event),
             'item_types' => Device::getItemTypes(),
         ]);
@@ -1068,78 +1057,6 @@ class PartyController extends Controller
         EventsUsers::where('user', Auth::user()->id)->where('event', $event_id)->delete();
 
         return redirect('/party/view/'.intval($event_id))->with('success', 'You are no longer attending this event.');
-    }
-
-    public function addVolunteer(Request $request)
-    {
-
-      // Get event ID
-        $event_id = $request->input('event');
-        $volunteer_email_address = $request->input('volunteer_email_address');
-
-        // Retrieve name if one exists.  If no name exists and user is null as well then this volunteer is anonymous.
-        if ($request->has('full_name')) {
-            $full_name = $request->input('full_name');
-        } else {
-            $full_name = null;
-        }
-
-        // User is null, this volunteer is either anonymous or no user exists.
-        if ($request->has('user') && $request->input('user') !== 'not-registered') {
-            $user = $request->input('user');
-        } else {
-            $user = null;
-        }
-
-        // Check if user was invited but not RSVPed.
-        $invitedUserQuery = EventsUsers::where('event', $event_id)
-        ->where('user', $user)
-        ->where('status', '<>', 1)
-        ->whereNotNull('status')
-        ->where('role', 4);
-        $userWasInvited = $invitedUserQuery->count() == 1;
-
-        if ($userWasInvited) {
-            $invitedUser = $invitedUserQuery->first();
-            $invitedUser->status = 1;
-            $invitedUser->save();
-        } else {
-            //Let's add the volunteer
-            EventsUsers::create([
-                'event' => $event_id,
-                'user' => $user,
-                'status' => 1,
-                'role' => 4,
-                'full_name' => $full_name,
-            ]);
-        }
-
-        Party::find($event_id)->increment('volunteers');
-
-        // Send email
-        if (! is_null($volunteer_email_address)) {
-            $event = Party::find($event_id);
-            $from = User::find(Auth::user()->id);
-
-            $hash = substr(bin2hex(openssl_random_pseudo_bytes(32)), 0, 24);
-            $url = url('/user/register/'.$hash);
-
-            $invite = Invite::create([
-                'record_id' => $event->theGroup->idgroups,
-                'email' => $volunteer_email_address,
-                'hash' => $hash,
-                'type' => 'group',
-            ]);
-
-            Notification::send($invite, new JoinGroup([
-                'name' => $from->name,
-                'group' => $event->theGroup->name,
-                'url' => $url,
-                'message' => null,
-            ]));
-        }
-
-        return redirect('/party/view/'.intval($event_id))->with('success', 'Volunteer has successfully been added to event');
     }
 
     public function imageUpload(Request $request, $id)

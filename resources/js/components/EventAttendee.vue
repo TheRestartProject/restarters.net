@@ -1,6 +1,6 @@
 <template>
   <div class="pl-4 pr-4">
-    <div class="pt-2 pb-2 blackbord d-flex justify-content-between" v-if="attendee.volunteer">
+    <div class="pt-2 pb-2 blackbord d-flex justify-content-between">
       <div class="d-flex w-100">
         <b-img-lazy :src="profile" class="profile mr-2" rounded="circle" @error.native="brokenProfileImage" />
         <div class="namewidth flex-grow-1">
@@ -10,15 +10,15 @@
             'font-weight-bold': host,
             'd-flex': true,
             'flex-wrap': true
-            }" :title="attendee.volunteer.name">
+            }" :title="name">
             <span class="pr-1 overflow-hidden ellipsis">
-              {{ attendee.volunteer.name }}
+              {{ name }}
             </span>
               <span class="host" v-if="host">
               {{ __('partials.host') }}
             </span>
             </div>
-          <div :id="'skills-' + attendee.volunteer.id" data-toggle="popover" data-placement="top" :data-content="skillList" :class="{
+          <div :id="'skills-' + attendee.idevents_users" data-toggle="popover" data-placement="top" :data-content="skillList" :class="{
              'small': true,
              'd-flex': true,
              'clickme' : true,
@@ -66,6 +66,15 @@ export default {
     }
   },
   computed: {
+    name() {
+      if (this.attendee.volunteer) {
+        // Volunteer registered on Restarters.
+        return this.attendee.volunteer.name
+      } else {
+        // Not registered.
+        return this.attendee.fullName
+      }
+    },
     profile() {
       return this.attendee ? this.attendee.profilePath : DEFAULT_PROFILE
     },
@@ -73,25 +82,34 @@ export default {
       return this.attendee.role === HOST
     },
     noskills() {
-      return !this.attendee.volunteer.user_skills || !this.attendee.volunteer.user_skills.length
+      return !this.attendee.volunteer || !this.attendee.volunteer.user_skills || !this.attendee.volunteer.user_skills.length
     },
     skillCount() {
       let ret = null
-      let skills = this.attendee.volunteer.user_skills
-      ret = (skills && skills.length ? skills.length : '0') + ' ' + this.$lang.choice('partials.skills', skills.length)
+
+      if (this.attendee.volunteer) {
+        let skills = this.attendee.volunteer.user_skills
+        ret = (skills && skills.length ? skills.length : '0') + ' ' + this.$lang.choice('partials.skills', skills.length)
+      } else {
+        ret = '0 ' + this.$lang.choice('partials.skills', 0)
+      }
+
       return ret
     },
     skillList() {
       let ret = null
-      let skills = this.attendee.volunteer.user_skills
 
-      if (skills) {
-        let names = []
-        skills.forEach((s) => {
-          names.push(s.skill_name.skill_name)
-        })
+      if (this.attendee.volunteer) {
+        let skills = this.attendee.volunteer.user_skills
 
-        ret = names.join(', ')
+        if (skills) {
+          let names = []
+          skills.forEach((s) => {
+            names.push(s.skill_name.skill_name)
+          })
+
+          ret = names.join(', ')
+        }
       }
 
       return ret

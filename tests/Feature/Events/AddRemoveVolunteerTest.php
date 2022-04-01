@@ -35,23 +35,46 @@ class AddRemoveVolunteerTest extends TestCase
         $restarter = factory(User::class)->states('Restarter')->create();
 
         // Add an existing user
-        $response = $this->post('/party/add-volunteer', [
-            'event' => $event->idevents,
+        $response = $this->put('/api/events/' . $event->idevents . '/volunteers', [
+            'api_token' => $host->api_token,
             'volunteer_email_address' => $restarter->email,
             'full_name' => $restarter->name,
             'user' => $restarter->id,
         ]);
 
-        $response->assertSessionHas('success');
-        $this->assertTrue($response->isRedirection());
-        $redirectTo = $response->getTargetUrl();
-        $this->assertNotFalse(strpos($redirectTo, '/party/view/'.$event->idevents));
+        $response->assertJson([
+            'success' => 'success'
+        ]);
+
+        // Check they show in the list of volunteers.
+        $response = $this->get('/api/events/' . $event->idevents . '/volunteers?api_token='  . $host->api_token);
+        $response->assertSuccessful();
+        $response->assertJson([
+            'success' => true,
+            'volunteers' => [
+                [
+                    'user' => $restarter->id
+                ]
+            ]
+        ]);
 
         // Remove them
         $volunteer = EventsUsers::where('user', $restarter->id)->first();
         $this->post('/party/remove-volunteer/', [
             'id' => $volunteer->idevents_users,
         ])->assertSee('true');
+
+        // Check they no longer show in the list of volunteers.
+        $response = $this->get('/api/events/' . $event->idevents . '/volunteers?api_token='  . $host->api_token);
+        $response->assertSuccessful();
+        $response->assertJsonMissing([
+                                  'success' => true,
+                                  'volunteers' => [
+                                      [
+                                          'user' => $restarter->id
+                                      ]
+                                  ]
+                              ]);
 
         // Add an invited user
         $restarter = factory(User::class)->states('Restarter')->create();
@@ -66,17 +89,15 @@ class AddRemoveVolunteerTest extends TestCase
         $response = $this->get('/party/view/'.$event->idevents);
         $response->assertSee('Invites Sent!');
 
-        $response = $this->post('/party/add-volunteer', [
-            'event' => $event->idevents,
+        $response = $this->put('/api/events/' . $event->idevents . '/volunteers', [
             'volunteer_email_address' => $restarter->email,
             'full_name' => $restarter->name,
             'user' => $restarter->id,
         ]);
 
-        $response->assertSessionHas('success');
-        $this->assertTrue($response->isRedirection());
-        $redirectTo = $response->getTargetUrl();
-        $this->assertNotFalse(strpos($redirectTo, '/party/view/'.$event->idevents));
+        $response->assertJson([
+            'success' => 'success'
+        ]);
 
         $volunteer = EventsUsers::where('user', $restarter->id)->first();
         $this->post('/party/remove-volunteer/', [
@@ -84,15 +105,13 @@ class AddRemoveVolunteerTest extends TestCase
         ])->assertSee('true');
 
         // Add by name only
-        $response = $this->post('/party/add-volunteer', [
-            'event' => $event->idevents,
+        $response = $this->put('/api/events/' . $event->idevents . '/volunteers', [
             'full_name' => 'Jo Bloggins',
         ]);
 
-        $response->assertSessionHas('success');
-        $this->assertTrue($response->isRedirection());
-        $redirectTo = $response->getTargetUrl();
-        $this->assertNotFalse(strpos($redirectTo, '/party/view/'.$event->idevents));
+        $response->assertSuccessful();
+        $rsp = json_decode($response->getContent(), TRUE);
+        $this->assertEquals('success', $rsp['success']);
 
         $volunteer = EventsUsers::where('full_name', 'Jo Bloggins')->first();
         $this->post('/party/remove-volunteer/', [
@@ -100,14 +119,11 @@ class AddRemoveVolunteerTest extends TestCase
         ])->assertSee('true');
 
         // Add anonymous.
-        $response = $this->post('/party/add-volunteer', [
-            'event' => $event->idevents,
-        ]);
+        $response = $this->put('/api/events/' . $event->idevents . '/volunteers', []);
 
-        $response->assertSessionHas('success');
-        $this->assertTrue($response->isRedirection());
-        $redirectTo = $response->getTargetUrl();
-        $this->assertNotFalse(strpos($redirectTo, '/party/view/'.$event->idevents));
+        $response->assertJson([
+            'success' => 'success'
+        ]);
 
         $volunteer = EventsUsers::where('event', $event->idevents)->whereNull('user')->first();
         $this->post('/party/remove-volunteer/', [

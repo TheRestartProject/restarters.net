@@ -128,11 +128,6 @@ export default {
       type: Array,
       required: true
     },
-    apiToken: {
-      type: String,
-      required: false,
-      default: null
-    },
     allGroupTags: {
       type: Array,
       required: true

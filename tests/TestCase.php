@@ -15,6 +15,8 @@ use App\Images;
 use App\Network;
 use App\Party;
 use App\Role;
+use App\Skills;
+use App\UsersSkills;
 use App\User;
 use App\UserGroups;
 use App\Xref;
@@ -54,6 +56,8 @@ abstract class TestCase extends BaseTestCase
         GroupTags::truncate();
         Xref::truncate();
         Images::truncate();
+        UsersSkills::truncate();
+        Skills::truncate();
         DB::statement('delete from audits');
         DB::delete('delete from user_network');
         DB::delete('delete from grouptags_groups');
@@ -170,11 +174,17 @@ abstract class TestCase extends BaseTestCase
         // Create a party for the specific group.
         $eventAttributes = factory(Party::class)->raw();
         $eventAttributes['group'] = $idgroups;
-        $event_date_time = date('Y-m-d H:i:s', strtotime($date));
-        $eventAttributes['event_start_utc'] = $event_date_time;
-        $eventAttributes['event_end_utc'] = $event_date_time;
+
+        $event_date_time = Carbon::createFromTimestamp(strtotime($date))->setTimezone('UTC');
+
+        $eventAttributes['event_start_utc'] = $event_date_time->toIso8601String();
+        $eventAttributes['event_end_utc'] = $event_date_time->toIso8601String();
 
         $response = $this->post('/party/create/', $eventAttributes);
+
+        // Need to reformat start/end for row comparison.
+        $eventAttributes['event_start_utc'] = $event_date_time->toDateTimeString();
+        $eventAttributes['event_end_utc'] = $event_date_time->toDateTimeString();
 
         $this->assertDatabaseHas('events', $eventAttributes);
         $redirectTo = $response->getTargetUrl();

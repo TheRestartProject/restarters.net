@@ -32,6 +32,7 @@ $factory->define(User::class, function (Faker $faker) {
         'role' => Role::RESTARTER,
         'invites' => 1,
         'repairdir_role' => Role::REPAIR_DIRECTORY_NONE,
+        'api_token' => \Illuminate\Support\Str::random(60)
     ];
 });
 

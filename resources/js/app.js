@@ -900,8 +900,6 @@ function initAutocomplete() {
         // need to cope with both.
         $field = jQuery(this).parents('.card-body').find('.weight')
       }
-
-      console.log("Category change", $(this), $value, $field)
       if( $value === 46 || $value === '' ){
         $field.prop('disabled', false);
         $field.parents('.display-weight').removeClass('d-none');
@@ -911,22 +909,6 @@ function initAutocomplete() {
         $field.prop('disabled', true);
         $field.parents('.display-weight').addClass('d-none');
       }
-    });
-
-    jQuery('.toggle-manual-invite').on('change', function (e) {
-
-      var $value = jQuery(this).val();
-      var $toggle = jQuery('.show-hide-manual-invite');
-
-      $('#full_name, #volunteer_email_address').val('');
-
-      if( $value === 'not-registered' ){
-        $toggle.show();
-        $('#full_name').focus();
-      } else {
-        $toggle.hide();
-      }
-
     });
 
     jQuery('.js-remove').on('click', removeUser);

@@ -2,9 +2,14 @@
 
 namespace App\Http\Controllers\API;
 
-use App\Group;
+use App\EventsUsers;
+use App\Helpers\Fixometer;
 use App\Http\Controllers\Controller;
+use App\Invite;
+use Notification;
+use App\Notifications\JoinGroup;
 use App\Party;
+use App\User;
 use Auth;
 use Illuminate\Http\Request;
 
@@ -123,5 +128,97 @@ class EventController extends Controller
         }
 
         return $collection;
+    }
+
+    public function addVolunteer(Request $request, $idevents) {
+        $party = Party::findOrFail($idevents);
+
+        if (!Fixometer::userHasEditPartyPermission($idevents)) {
+            abort(403);
+        }
+
+        $volunteer_email_address = $request->input('volunteer_email_address');
+
+        // Retrieve name if one exists.  If no name exists and user is null as well then this volunteer is anonymous.
+        if ($request->has('full_name')) {
+            $full_name = $request->input('full_name');
+        } else {
+            $full_name = null;
+        }
+
+        // User is null, this volunteer is either anonymous or no user exists.
+        if ($request->has('user') && $request->input('user') !== 'not-registered') {
+            $user = $request->input('user');
+        } else {
+            $user = null;
+        }
+
+        // Check if user was invited but not RSVPed.
+        $invitedUserQuery = EventsUsers::where('event', $idevents)
+            ->where('user', $user)
+            ->where('status', '<>', 1)
+            ->whereNotNull('status')
+            ->where('role', 4);
+        $userWasInvited = $invitedUserQuery->count() == 1;
+
+        if ($userWasInvited) {
+            $invitedUser = $invitedUserQuery->first();
+            $invitedUser->status = 1;
+            $invitedUser->save();
+        } else {
+            // Let's add the volunteer.
+            EventsUsers::create([
+                                    'event' => $idevents,
+                                    'user' => $user,
+                                    'status' => 1,
+                                    'role' => 4,
+                                    'full_name' => $full_name,
+                                ]);
+        }
+
+        $party->increment('volunteers');
+
+        if (! is_null($volunteer_email_address)) {
+            // Send email.
+            $from = User::find(Auth::user()->id);
+
+            $hash = substr(bin2hex(openssl_random_pseudo_bytes(32)), 0, 24);
+            $url = url('/user/register/'.$hash);
+
+            $invite = Invite::create([
+                                         'record_id' => $party->theGroup->idgroups,
+                                         'email' => $volunteer_email_address,
+                                         'hash' => $hash,
+                                         'type' => 'group',
+                                     ]);
+
+            Notification::send($invite, new JoinGroup([
+                                                          'name' => $from->name,
+                                                          'group' => $party->theGroup->name,
+                                                          'url' => $url,
+                                                          'message' => null,
+                                                      ]));
+        }
+
+        return response()->json([
+                                    'success' => 'success'
+                                ]);
+    }
+
+
+    public function listVolunteers(Request $request, $idevents) {
+        $party = Party::findOrFail($idevents);
+
+        // Get the user that the API has been authenticated as.
+        $user = auth('api')->user();
+
+        // Emails are sensitive.
+        $showEmails = $user && !Fixometer::userHasEditPartyPermission($idevents, $user->id);
+        $volunteers = $party->expandVolunteers($party->allConfirmedVolunteers()->get(), $showEmails);
+
+        return response()->json([
+            'success' => 'success',
+            'volunteers' => $volunteers
+        ]);
     }
 }

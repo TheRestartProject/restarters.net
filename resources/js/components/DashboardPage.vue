@@ -14,7 +14,6 @@
       <DashboardRightSidebar class="sidebar" />
       <DiscourseDiscussion
           class="discourse"
-          :topics="topics"
           :see-all-topics-link="seeAllTopicsLink"
           :discourse-base-url="discourseBaseUrl"
           :is-logged-in="isLoggedIn"
@@ -66,7 +65,7 @@ export default {
       required: true
     },
     newGroups: {
-      type: Number,
+      type: Array,
       required: true
     }
   },
@@ -91,15 +90,6 @@ export default {
     })
 
     let events = {}
-
-    if (this.upcomingEvents) {
-      this.upcomingEvents.forEach(e => {
-        events[e.idevents] = e
-        e.group = e.the_group
-        delete e.the_group
-        e.upcoming = true
-      })
-    }
 
     this.$store.dispatch('events/setList', {
       events: Object.values(events)
