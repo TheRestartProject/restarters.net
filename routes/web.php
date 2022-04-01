@@ -239,7 +239,9 @@ Route::group(['middleware' => ['auth', 'verifyUserConsent', 'ensureAPIToken']], 
         Route::get('/image/delete/{iddevices}/{id}/{path}', 'DeviceController@deleteImage');
     });
 
-    Route::resource('networks', 'NetworkController');
+    Route::resource('networks', 'NetworkController')->only([
+        'index', 'show', 'edit', 'update'
+                                                           ]);
     Route::prefix('networks')->group(function () {
         Route::post('/{network}/groups', 'NetworkController@associateGroup')->name('networks.associate-group');
     });

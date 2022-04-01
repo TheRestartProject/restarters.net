@@ -32,6 +32,8 @@ class NetworkController extends Controller
         }
 
         $yourNetworks = $user->networks->sortBy('name');
+        $allNetworks = [];
+        $showAllNetworks = false;
 
         if ($user->hasRole('Administrator')) {
             $showAllNetworks = true;
@@ -43,27 +45,6 @@ class NetworkController extends Controller
             'allNetworks' => $allNetworks,
             'showAllNetworks' => $showAllNetworks,
         ]);
-    }
-
-    /**
-     * Show the form for creating a new resource.
-     *
-     * @return \Illuminate\Http\Response
-     */
-    public function create()
-    {
-        $this->authorize('create', Network::class);
-    }
-
-    /**
-     * Store a newly created resource in storage.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @return \Illuminate\Http\Response
-     */
-    public function store(Request $request)
-    {
-        $this->authorize('create', Network::class);
     }
 
     /**
@@ -146,16 +127,5 @@ class NetworkController extends Controller
         $numberOfGroups = count($groupIds);
 
         return redirect()->route('networks.show', [$network])->withSuccess(Lang::get('networks.show.add_groups_success', ['number' => $numberOfGroups]));
-    }
-
-    /**
-     * Remove the specified resource from storage.
-     *
-     * @param  \App\Network  $network
-     * @return \Illuminate\Http\Response
-     */
-    public function destroy(Network $network)
-    {
-        $this->authorize('delete', $network);
     }
 }

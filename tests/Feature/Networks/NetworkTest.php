@@ -11,6 +11,7 @@ use App\User;
 use Carbon\Carbon;
 use DB;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Symfony\Component\DomCrawler\Crawler;
 use Tests\TestCase;
 
 class NetworkTest extends TestCase
@@ -209,5 +210,66 @@ class NetworkTest extends TestCase
         $stats = json_decode($response->getContent(), true);
         $expectedStats = \App\Group::getGroupStatsArrayKeys();
         $this->assertEquals($expectedStats, $stats);
+    }
+
+    /** @test */
+    public function network_page()
+    {
+        $network = factory(Network::class)->create([
+            'shortname' => 'test'
+                                                   ]);
+
+        $coordinator = factory(User::class)->states('NetworkCoordinator')->create();
+        $this->actingAs($coordinator);
+
+        $group = factory(Group::class)->create();
+        $group->save();
+
+        // Not a coordinator yet.
+        $response = $this->get('/networks');
+        $response->assertSee(__('networks.index.your_networks_no_networks'));
+        $response->assertDontSee(__('networks.index.all_networks_explainer'));
+
+        // Make a coordinator.
+        $network->addCoordinator($coordinator);
+        $coordinator->refresh();
+        $response = $this->get('/networks');
+        $response->assertDontSee(__('networks.index.your_networks_no_networks'));
+        $response->assertDontSee(__('networks.index.all_networks_explainer'));
+        $response->assertSee(htmlspecialchars($network->name));
+
+        // Coordinator should show on network page.
+        $response = $this->get('/networks/' . $network->id);
+        $response->assertSee(htmlspecialchars($coordinator->name));
+
+        // Group should not show on network page yet.
+        $response = $this->get('/group/network/' . $network->id);
+        $response->assertDontSee('&quot;networks&quot;:[' . $network->id . ']');
+
+        // Add the group.
+        $response = $this->get('/networks/' . $network->id);
+        $crawler = new Crawler($response->getContent());
+
+        $tokens = $crawler->filter('input[name=_token]')->each(function (Crawler $node, $i) {
+            return $node;
+        });
+
+        $tokenValue = $tokens[0]->attr('value');
+
+        $response = $this->post('/networks/' . $network->id . '/groups', [
+            '_token' => $tokenValue,
+            'groups' => [ $group->idgroups ]
+        ]);
+        $response->assertRedirect();
+
+        // Group should now show on network page and in encoded list of networks for a groiup.
+        $response = $this->get('/group/network/' . $network->id);
+        $response->assertSee($group->name);
+        $response->assertSee('&quot;networks&quot;:[' . $network->id . ']');
+
+        // All networks list visible to admin.
+        $this->loginAsTestUser(Role::ADMINISTRATOR);
+        $response = $this->get('/networks');
+        $response->assertSee(__('networks.index.all_networks_explainer'));
     }
 }
