@@ -90,7 +90,7 @@ class ExportTest extends TestCase
 
         // Now as a CSV.
         $response = $this->get("/export/time-volunteered?a");
-        $filename = 'public/time_reporting.csv';
+        $filename = 'time_reporting.csv';
         $fh = fopen($filename, 'r');
         $row1 = fgetcsv($fh);
         $row2 = fgetcsv($fh);
