@@ -7,8 +7,10 @@
         :data="timezones"
         :minMatchingChars="1"
         inputClass="form-control field"
-        :placeholder="__('groups.timezone_placeholder')"
     />
+    <small class="form-text text-muted">
+      {{ __('groups.timezone_placeholder') }}
+    </small>
     <input type="hidden" name="timezone" :value="currentValue" />
   </div>
 </template>
