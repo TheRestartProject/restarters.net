@@ -74,7 +74,7 @@ jobs:
 #          - app-network
 
       - image: docker.io/bitnami/discourse:2
-        container_name: restarters_discourse
+        name: restarters_discourse
 # No ports on CircleCI
 #        ports:
 #          - '8003:80'
@@ -101,41 +101,24 @@ jobs:
 #    networks:
 #      - app-network
 
-  sidekiq:
-    image: docker.io/bitnami/discourse:2
-    container_name: restarters_discourse_sidekiq
-    depends_on:
-      - restarters_discourse
-    volumes:
-      - 'sidekiq_data:/bitnami/discourse'
-    command: /opt/bitnami/scripts/discourse-sidekiq/run.sh
-    environment:
-      - ALLOW_EMPTY_PASSWORD=yes
-      - DISCOURSE_HOST=www.example.com
-      - DISCOURSE_DATABASE_HOST=postgresql
-      - DISCOURSE_DATABASE_PORT_NUMBER=5432
-      - DISCOURSE_DATABASE_USER=bn_discourse
-      - DISCOURSE_DATABASE_NAME=bitnami_discourse
-      - DISCOURSE_REDIS_HOST=restarters_discourse_redis
-      - DISCOURSE_REDIS_PORT_NUMBER=6379
-    networks:
-      - app-network
-
-networks:
-  app-network:
-    driver: bridge
-
-volumes:
-  dbdata:
-    driver: local
-  postgresql_data:
-    driver: local
-  redis_data:
-    driver: local
-  discourse_data:
-    driver: local
-  sidekiq_data:
-    driver: local
+      - image: docker.io/bitnami/discourse:2
+        name: restarters_discourse_sidekiq
+        depends_on:
+          - restarters_discourse
+#        volumes:
+#          - 'sidekiq_data:/bitnami/discourse'
+        command: /opt/bitnami/scripts/discourse-sidekiq/run.sh
+        environment:
+          - ALLOW_EMPTY_PASSWORD=yes
+          - DISCOURSE_HOST=www.example.com
+          - DISCOURSE_DATABASE_HOST=postgresql
+          - DISCOURSE_DATABASE_PORT_NUMBER=5432
+          - DISCOURSE_DATABASE_USER=bn_discourse
+          - DISCOURSE_DATABASE_NAME=bitnami_discourse
+          - DISCOURSE_REDIS_HOST=restarters_discourse_redis
+          - DISCOURSE_REDIS_PORT_NUMBER=6379
+#        networks:
+#          - app-network
 
     steps:
       - checkout
