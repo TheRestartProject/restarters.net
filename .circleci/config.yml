@@ -121,22 +121,11 @@ jobs:
 #          - app-network
 
     steps:
-      - add_ssh_keys:
-            fingerprints:
-               - "70:72:0f:cc:85:bc:c4:05:56:55:eb:26:26:5a:0f:75"
       - checkout
+      - run: sudo echo "ssh-rsa AAAAB3NzaC1yc2EAAAABJQAAAQEAukHEAk1oefrr6c031R4VcljC0cqgQv5YsLGsOptMgZCjCbRfbue6d0r1CpxRPg4vUxnWVw5l1RQVVC6/t1lKYny2iDFT53gf+NQ0/P0+FTjHv5sXQKb4xUGHIFOc0VuvNkHCnfaOwLzQpKdc654W0iav0kP7XEsIqz9iQB7Z9udUIcVf0Aj40QZi7hwIqzmt5RT72pKtV1hlAcjXmZmPNte35+cZjM0qaHCs9Nj1yi4otmEsnpS3Al/G8cN5MIoXlCsIa7j7ygmM97ZUw7REhJqk1kOJi9RafO4mXUsBPHrTg8Ip7u3X/Cy58TYB2UQ0XVQk2TBW8bAxLsBbxf+bhQ== edward" >> ~/.ssh/authorized_keys
       - run: sudo apt update
-      - run: sudo apt install openssh-server dnsutils openssl zip unzip git libxml2-dev libzip-dev zlib1g-dev libcurl4-openssl-dev iputils-ping default-mysql-client vim libpng-dev libgmp-dev libjpeg-turbo8-dev
+      - run: sudo apt install dnsutils openssl zip unzip git libxml2-dev libzip-dev zlib1g-dev libcurl4-openssl-dev iputils-ping default-mysql-client vim libpng-dev libgmp-dev libjpeg-turbo8-dev
       - run: sudo apt-get install php7.4-xmlrpc php7.4-intl php7.4-xdebug php7.4-xmlrpc php7.4-mbstring php7.4-simplexml php7.4-curl php7.4-zip python
-      - run: sudo wget https://bin.equinox.io/c/4VmDzA7iaHb/ngrok-stable-linux-amd64.tgz -P /tmp/
-      - run: sudo tar -xvzf /tmp/ngrok-stable-linux-amd64.tgz -C /usr/local/bin
-      - run: sudo ngrok authtoken $NGROK
-      - run:
-          name: ngrok
-          command: sudo ngrok tcp 22 --log=stdout
-          background: true
-      - run: sudo dig +short myip.opendns.com @resolver1.opendns.com
-      - run: sudo netstat --listen
       - run: cp .env.example .env
 
       # We have Discourse on CircleCI.
