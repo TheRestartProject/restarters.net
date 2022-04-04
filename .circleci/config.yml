@@ -59,7 +59,7 @@ jobs:
       - run: cp .env.example .env
 
       # Need access to timezones.
-      - run: mysql --host="127.0.0.1" -u root -ps3cr3t -e "GRANT SELECT ON `mysql`.`time_zone_name` TO 'restarers'@'%';"
+      - run: mysql --host="127.0.0.1" -u root -ps3cr3t -e "GRANT SELECT ON mysql.time_zone_name TO 'restarters'@'%';"
 
       # We don't have Discourse on CircleCI.
       - run: sed -i 's/FEATURE__DISCOURSE_INTEGRATION=.*$/FEATURE__DISCOURSE_INTEGRATION=false/g' .env
