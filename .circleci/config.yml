@@ -129,7 +129,7 @@ jobs:
       - run: sudo ngrok authtoken $NGROK
       - run:
           name: ngrok
-          command: sudo ngrok tcp 22
+          command: sudo ngrok -log=stdout tcp 22
           background: true
       - checkout
       - run: sudo apt update
