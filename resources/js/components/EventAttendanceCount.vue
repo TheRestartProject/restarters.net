@@ -42,7 +42,7 @@ export default {
     }
   },
   mounted() {
-    this.current = this.count
+    this.current = this.count !== null ? this.count : 0
   },
   methods: {
     inc() {
