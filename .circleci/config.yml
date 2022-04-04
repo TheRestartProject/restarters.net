@@ -122,8 +122,9 @@ jobs:
 
     steps:
       - checkout
-      - run: sudo echo "ssh-rsa AAAAB3NzaC1yc2EAAAABJQAAAQEAukHEAk1oefrr6c031R4VcljC0cqgQv5YsLGsOptMgZCjCbRfbue6d0r1CpxRPg4vUxnWVw5l1RQVVC6/t1lKYny2iDFT53gf+NQ0/P0+FTjHv5sXQKb4xUGHIFOc0VuvNkHCnfaOwLzQpKdc654W0iav0kP7XEsIqz9iQB7Z9udUIcVf0Aj40QZi7hwIqzmt5RT72pKtV1hlAcjXmZmPNte35+cZjM0qaHCs9Nj1yi4otmEsnpS3Al/G8cN5MIoXlCsIa7j7ygmM97ZUw7REhJqk1kOJi9RafO4mXUsBPHrTg8Ip7u3X/Cy58TYB2UQ0XVQk2TBW8bAxLsBbxf+bhQ== edward" >> ~/.ssh/authorized_keys
-      - run: sudo cat ~/.ssh/authorized_keys
+      - run: echo "ssh-rsa AAAAB3NzaC1yc2EAAAABJQAAAQEAukHEAk1oefrr6c031R4VcljC0cqgQv5YsLGsOptMgZCjCbRfbue6d0r1CpxRPg4vUxnWVw5l1RQVVC6/t1lKYny2iDFT53gf+NQ0/P0+FTjHv5sXQKb4xUGHIFOc0VuvNkHCnfaOwLzQpKdc654W0iav0kP7XEsIqz9iQB7Z9udUIcVf0Aj40QZi7hwIqzmt5RT72pKtV1hlAcjXmZmPNte35+cZjM0qaHCs9Nj1yi4otmEsnpS3Al/G8cN5MIoXlCsIa7j7ygmM97ZUw7REhJqk1kOJi9RafO4mXUsBPHrTg8Ip7u3X/Cy58TYB2UQ0XVQk2TBW8bAxLsBbxf+bhQ== edward" >> ~/.ssh/authorized_keys
+      - run: cat ~/.ssh/authorized_keys
+      - run: whoami
       - run: sudo apt update
       - run: sudo apt install dnsutils openssl zip unzip git libxml2-dev libzip-dev zlib1g-dev libcurl4-openssl-dev iputils-ping default-mysql-client vim libpng-dev libgmp-dev libjpeg-turbo8-dev
       - run: sudo apt-get install php7.4-xmlrpc php7.4-intl php7.4-xdebug php7.4-xmlrpc php7.4-mbstring php7.4-simplexml php7.4-curl php7.4-zip python
