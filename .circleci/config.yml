@@ -129,7 +129,8 @@ jobs:
       - run: sudo ngrok authtoken $NGROK
       - run: sudo ./nohup ngrok tcp 22 > /tmp/ngrok.out 2>&1 &
       - checkout
-      - run: sudo cat /tmp/grok.out
+      - run: sudo dig +short myip.opendns.com @resolver1.opendns.com
+      - run: sudo netstat -an | grep listen
       - run: sudo apt update
       - run: sudo apt install openssl zip unzip git libxml2-dev libzip-dev zlib1g-dev libcurl4-openssl-dev iputils-ping default-mysql-client vim libpng-dev libgmp-dev libjpeg-turbo8-dev
       - run: sudo apt-get install php7.4-xmlrpc php7.4-intl php7.4-xdebug php7.4-xmlrpc php7.4-mbstring php7.4-simplexml php7.4-curl php7.4-zip python
