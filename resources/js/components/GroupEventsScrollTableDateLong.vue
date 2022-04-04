@@ -11,7 +11,7 @@
     {{ start }} <span class="d-none d-md-inline">- {{ end }}</span>
     <br class="d-block d-md-none"/>
     <div class="text-muted small">
-      {{ timezone }}
+      <b-img class="icon" src="/images/clock.svg" /> {{ timezone }}
     </div>
   </div>
 </template>
@@ -40,5 +40,10 @@ export default {
   padding-top: 13px;
   width: 150px !important;
   font-size: 15px;
+}
+
+.icon {
+  width: 10px;
+  margin-bottom: 2px;
 }
 </style>
