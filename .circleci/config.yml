@@ -124,6 +124,7 @@ jobs:
       - add_ssh_keys:
             fingerprints:
                - "70:72:0f:cc:85:bc:c4:05:56:55:eb:26:26:5a:0f:75"
+      - run: sudo apt install snapd
       - run: sudo snap install ngrok
       - run: sudo snap authtoken $NGROK
       - run: sudo nohup ngrok tcp 22&
