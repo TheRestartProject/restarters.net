@@ -28,7 +28,7 @@ export default {
     count: {
       type: Number,
       required: false,
-      default: null
+      default: 0
     },
     canedit: {
       type: Boolean,

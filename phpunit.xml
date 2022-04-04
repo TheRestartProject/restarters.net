@@ -6,7 +6,7 @@
          convertErrorsToExceptions="true"
          convertNoticesToExceptions="true"
          convertWarningsToExceptions="true"
-         processIsolation="false"
+         processIsolation="true"
          stopOnFailure="false">
     <testsuites>
         <testsuite name="Feature">
@@ -38,9 +38,10 @@
         <env name="QUEUE_CONNECTION" value="sync"/>
         <env name="MAIL_DRIVER" value="array"/>
         <env name="DB_CONNECTION" value="mysql_testing"/>
-        <env name="DB_TEST_DATABASE" value="restarters_db_test"/>
+        <env name="DB_TEST_DATABASE" value="restarters_db"/>
         <env name="DB_TEST_USERNAME" value="restarters"/>
         <env name="DB_TEST_PASSWORD" value="s3cr3t"/>
         <env name="AUDIT_CONSOLE_EVENTS" value="true"/>
+        <env name="CALENDAR_HASH" value="somehash"/>
     </php>
 </phpunit>

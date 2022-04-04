@@ -1,20 +1,26 @@
+var Vue = require('vue')
+Vue.use(require('vue-cookies'))
+
 export default {
   props: {
-    apiToken: {
+    csrf: {
       type: String,
       required: false,
       default: null
-    },
-    csrf: {
-      type: String,
-      required: true
+    }
+  },
+  computed: {
+    apiToken() {
+      return this.$store.getters['auth/apiToken']
     }
   },
   created() {
-    if (this.apiToken) {
-      // The API token is passed as a prop, and we put it in the store for use anywhere we need to make API calls.
+    // We may get an API token from the server as a cookie.  Save it in the store so that it is then available for
+    // making API calls.
+    const apiToken = Vue.$cookies.get('restarters_apitoken');
+    if (apiToken) {
       this.$store.dispatch('auth/setApiToken', {
-        apiToken: this.apiToken
+        apiToken: apiToken
       })
     }
 
@@ -22,8 +28,6 @@ export default {
       this.$store.dispatch('auth/setCSRF', {
         CSRF: this.csrf
       })
-    } else {
-      console.error("No CSRF provided by blade template")
     }
   }
 }

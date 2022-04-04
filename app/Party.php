@@ -602,7 +602,7 @@ class Party extends Model implements Auditable
      */
     public function getFormattedLocalEnd($format = 'd/m/Y')
     {
-        $dt = new Carbon($this->event_start_utc);
+        $dt = new Carbon($this->event_end_utc);
         $dt->setTimezone($this->timezone);
         return $dt->format($format);
     }
@@ -1075,5 +1075,38 @@ class Party extends Model implements Auditable
         $dt = new Carbon($this->event_end_utc);
         $dt->setTimezone($this->timezone);
         return $dt->toTimeString('minute');
+    }
+
+    public static function expandVolunteers($volunteers, $showEmails) {
+        $ret = [];
+
+        foreach ($volunteers as $volunteer) {
+            $volunteer['userSkills'] = [];
+            $volunteer['confirmed'] = intval($volunteer->status) === 1;
+            $volunteer['profilePath'] = '/uploads/thumbnail_placeholder.png';
+            $volunteer['fullName'] = $volunteer->getFullName();
+
+            if ($volunteer->volunteer) {
+                $volunteer['volunteer'] = $volunteer->volunteer;
+
+                if (!$showEmails) {
+                    $volunteer['volunteer']['email'] = NULL;
+                }
+
+                if (! empty($volunteer->volunteer)) {
+                    $volunteer['userSkills'] = $volunteer->volunteer->userSkills->all();
+                    $volunteer['profilePath'] = '/uploads/thumbnail_'.$volunteer->volunteer->getProfile($volunteer->volunteer->id)->path;
+
+                    foreach ($volunteer['userSkills'] as $skill) {
+                        // Force expansion
+                        $skill->skillName->skill_name;
+                    }
+                }
+            }
+
+            $ret[] = $volunteer;
+        }
+
+        return $ret;
     }
 }

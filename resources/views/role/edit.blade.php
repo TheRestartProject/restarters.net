@@ -39,8 +39,7 @@
                     class="form-check-input"
                     type="checkbox"
                     value="<?php echo $p->idpermissions; ?>"
-                    name="permissions[<?php echo $p->idpermissions; ?>]"
-                    <?php echo (in_array($p->idpermissions, $activePermissions) ? ' checked' : '' ); ?>
+                    name="permissions[<?php echo $p->idpermissions; ?>]"<?php echo (in_array($p->idpermissions, $activePermissions) ? ' checked' : '' ); ?>
                     >
                   <label class="form-check-label" for="permissions[<?php echo $p->idpermissions; ?>]"> <?php echo $p->permission; ?></label>
                 </div>

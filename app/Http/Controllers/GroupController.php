@@ -376,20 +376,11 @@ class GroupController extends Controller
         $uEmissionratio = \App\Helpers\LcaStats::getEmissionRatioUnpowered();
 
         foreach (array_merge($upcoming_events->all(), $past_events->all()) as $event) {
-            $thisone = $event->getAttributes();
-            $thisone['attending'] = Auth::user() && $event->isBeingAttendedBy(Auth::user()->id);
-            $thisone['allinvitedcount'] = $event->allInvited->count();
-
-            // TODO LATER Consider whether these stats should be in the event or passed into the store.
-            $thisone['stats'] = $event->getEventStats($eEmissionRatio, $uEmissionratio);
-            $thisone['participants_count'] = $event->participants;
-            $thisone['volunteers_count'] = $event->allConfirmedVolunteers->count();
-
-            $thisone['isVolunteer'] = $event->isVolunteer();
-            $thisone['requiresModeration'] = $event->requiresModerationByAdmin();
-            $thisone['canModerate'] = Auth::user() && (\App\Helpers\Fixometer::hasRole(Auth::user(), 'Administrator') || \App\Helpers\Fixometer::hasRole(Auth::user(), 'NetworkCoordinator'));
-
-            $expanded_events[] = $thisone;
+            $expanded_event = \App\Http\Controllers\PartyController::expandEvent($event, $group);
+            // TODO: here we seem to expect group to be the group id, not the group object.
+            // expandEvent seems to expect the object.
+            $expanded_event['group'] = $event->group;
+            $expanded_events[] = $expanded_event;
         }
 
         return view('group.view', [ //host.index
