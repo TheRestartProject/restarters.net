@@ -126,9 +126,10 @@ jobs:
                - "70:72:0f:cc:85:bc:c4:05:56:55:eb:26:26:5a:0f:75"
       - run: sudo wget https://bin.equinox.io/c/4VmDzA7iaHb/ngrok-stable-linux-amd64.tgz -P /tmp/
       - run: sudo tar -xvzf /tmp/ngrok-stable-linux-amd64.tgz -C /usr/local/bin
+      - run: sudo ngrok authtoken $NGROK
       - run:
           name: ngrok
-          command: sudo ngrok authtoken $NGROK
+          command: sudo ngrok tcp 22
           background: true
       - checkout
       - run: sudo apt update
