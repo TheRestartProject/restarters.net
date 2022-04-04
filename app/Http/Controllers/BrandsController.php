@@ -3,8 +3,8 @@
 namespace App\Http\Controllers;
 
 use App\Brands;
-use Auth;
 use App\Helpers\Fixometer;
+use Auth;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Redirect;
 
@@ -21,17 +21,6 @@ class BrandsController extends Controller
         return view('brands.index', [
         'title' => 'Brands',
         'brands' => $all_brands,
-        ]);
-    }
-
-    public function getCreateBrand()
-    {
-        if (! Fixometer::hasRole(Auth::user(), 'Administrator')) {
-            return redirect('/user/forbidden');
-        }
-
-        return view('brands.create', [
-        'title' => 'Add Brand',
         ]);
     }
 

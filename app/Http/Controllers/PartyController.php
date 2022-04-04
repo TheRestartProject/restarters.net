@@ -4,34 +4,26 @@ namespace App\Http\Controllers;
 
 use App\Audits;
 use App\Brands;
-use App\Category;
 use App\Cluster;
 use App\Device;
-use App\Events\ApproveEvent;
 use App\Events\EditEvent;
 use App\Events\EventDeleted;
 use App\Events\EventImagesUploaded;
 use App\EventsUsers;
 use App\Group;
 use App\Helpers\Fixometer;
-use App\Helpers\FootprintRatioCalculator;
 use App\Helpers\Geocoder;
-use App\Host;
 use App\Invite;
 use App\Notifications\AdminModerationEvent;
-use App\Notifications\EventDevices;
 use App\Notifications\EventRepairs;
 use App\Notifications\JoinEvent;
-use App\Notifications\JoinGroup;
-use App\Notifications\NotifyHostRSVPInvitesMade;
-use App\Notifications\NotifyRestartersOfNewEvent;
 use App\Notifications\RSVPEvent;
 use App\Party;
 use App\Services\DiscourseService;
-use App\Session;
 use App\User;
 use App\UserGroups;
 use Auth;
+use Carbon\Carbon;
 use DateTime;
 use DB;
 use FixometerFile;
@@ -52,9 +44,10 @@ class PartyController extends Controller
         $this->discourseService = $discourseService;
     }
 
-    public static function expandEvent($event, $group)
+    public static function expandEvent($event, $group = null)
     {
-        $thisone = $event->getAttributes();
+        // Use attributesToArray rather than getAttributes so that our custom accessors are invoked.
+        $thisone = $event->attributesToArray();
 
         if (is_null($group)) {
             // We are showing events for multiple groups and so we need to pass the relevant group, in order that
@@ -81,6 +74,22 @@ class PartyController extends Controller
         $thisone['requiresModeration'] = $event->requiresModerationByAdmin();
         $thisone['canModerate'] = Auth::user() && (Fixometer::hasRole(Auth::user(), 'Administrator') || Fixometer::hasRole(Auth::user(), 'NetworkCoordinator'));
 
+        $thisone['event_date_local'] = $event->eventDateLocal;
+        $thisone['start_local'] = $event->startLocal;
+        $thisone['end_local'] = $event->endLocal;
+
+        $thisone['upcoming'] = $event->isUpcoming();
+        $thisone['finished'] = $event->hasFinished();
+        $thisone['inprogress'] = $event->isInProgress();
+        $thisone['startingsoon'] = $event->isStartingSoon();
+
+        if (!empty($event->wordpress_post_id)) {
+            $thisone['approved'] = true;
+            $thisone['wordpress_post_id'] = $event->wordpress_post_id;
+        } else {
+            $thisone['approved'] = false;
+        }
+
         return $thisone;
     }
 
@@ -92,134 +101,71 @@ class PartyController extends Controller
             $moderate_events = null;
         }
 
-        // Use this view for showing group only upcoming and past events
-        if (! is_null($group_id)) {
-            $upcoming_events = Party::upcomingEvents()
-                ->where('events.group', $group_id)
-                ->get();
+        $events = [];
 
-            $past_events = Party::pastEvents()
-                ->where('events.group', $group_id)
-                ->get();
+        if (! is_null($group_id)) {
+            // This is the page for a specific group's events.  We want all events for this group.
+            foreach (Party::events()->where('events.group', $group_id)->get() as $event) {
+                $e = \App\Http\Controllers\PartyController::expandEvent($event, NULL);
+                $events[] = $e;
+            }
 
             $group = Group::find($group_id);
         } else {
-            $upcoming_events = Party::upcomingEvents()->where('users_groups.user', Auth::user()->id)
-                ->get();
+            // This is a logged-in user's events page.  We want all relevant events.
+            foreach (Party::forUser()->get() as $event) {
+                $e = \App\Http\Controllers\PartyController::expandEvent($event, NULL);
+                $events[] = $e;
+            }
 
-            $past_events = Party::UsersPastEvents([auth()->id()])->get();
+            if (! is_null(Auth::user()->latitude) && ! is_null(Auth::user()->longitude)) {
+                // We know the location of this user, so we can also get nearby upcoming events.
+                $upcoming_events_in_area = Party::upcomingEventsInUserArea(Auth::user())
+                    ->whereNotIn('idevents', \Illuminate\Support\Arr::pluck($events, 'idevents'))
+                    ->get();
+
+                foreach ($upcoming_events_in_area as $event) {
+                    if (Fixometer::userHasViewPartyPermission($event->idevents)) {
+                        $e = self::expandEvent($event, null);
+                        $e['nearby'] = true;
+                        $e['all'] = true;
+                        $events[] = $e;
+                    }
+                }
+            }
+
+            // ...and any other upcoming approved events
+            $other_upcoming_events = Party::future()->
+                whereNotIn('idevents', \Illuminate\Support\Arr::pluck($events, 'idevents'))->
+                get();
+
+            foreach ($other_upcoming_events as $event) {
+                if (Fixometer::userHasViewPartyPermission($event->idevents)) {
+                    $e = self::expandEvent($event, NULL);
+                    $e['all'] = TRUE;
+                    $events[] = $e;
+                }
+            }
 
             $group = null;
         }
 
-        // We want the upcoming events in the area, and all upcoming events, irrespective of whether or not we're
-        // looking at a specific group.  We want to exclude any events we have already obtained.
-        $exclude = [];
-
-        foreach ($upcoming_events as $e) {
-            $exclude[] = $e->idevents;
-        }
-
-        foreach ($past_events as $e) {
-            $exclude[] = $e->idevents;
-        }
-
-        if (! is_null(Auth::user()->latitude) && ! is_null(Auth::user()->longitude)) {
-            $upcoming_events_in_area = Party::upcomingEventsInUserArea(Auth::user())->whereNotIn('idevents', $exclude)->get();
-        } else {
-            $upcoming_events_in_area = null;
-        }
-
-        $upcoming_events_all = Party::upcomingEvents()->whereNotIn('idevents', $exclude)->get();
-
-        //Looks to see whether user has a group already, if they do, they can create events
-        $user_groups = UserGroups::where('user', Auth::user()->id)->count();
-
         $is_host_of_group = Fixometer::userHasEditGroupPermission($group_id, Auth::user()->id);
         $isCoordinatorForGroup = $group && Auth::user()->isCoordinatorForGroup($group);
 
-        $expanded_events = [];
-
-        foreach (array_merge($upcoming_events->all(), $past_events->all()) as $event) {
-            $expanded_events[] = \App\Http\Controllers\PartyController::expandEvent($event, $group);
-        }
-
-        if ($upcoming_events_in_area) {
-          foreach ($upcoming_events_in_area as $event) {
-              $e = \App\Http\Controllers\PartyController::expandEvent($event, $group);
-              $e['nearby'] = TRUE;
-              $expanded_events[] = $e;
-          }
-        }
-
-        if ($upcoming_events_all) {
-          foreach ($upcoming_events_all as $event) {
-              $e = \App\Http\Controllers\PartyController::expandEvent($event, $group);
-              $e['all'] = TRUE;
-              $expanded_events[] = $e;
-          }
-        }
-
         return view('events.index', [
             'moderate_events' => $moderate_events,
-            'upcoming_events' => $upcoming_events,
-            'past_events' => $past_events,
-            'upcoming_events_in_area' => $upcoming_events_in_area,
-            'upcoming_events_all' => $upcoming_events_all,
-            'user_groups' => $user_groups,
-            'expanded_events' => $expanded_events,
+            'expanded_events' => $events,
             'is_host_of_group' => $is_host_of_group,
             'isCoordinatorForGroup' => $isCoordinatorForGroup,
             'group' => $group,
         ]);
     }
 
-    public function allPast()
-    {
-        $past_events = Party::pastEvents();
-        $past_events_count = $past_events->count();
-        $past_events = $past_events->paginate(env('PAGINATE'));
-
-        return view('events.all-past', [
-          'past_events' => $past_events,
-          'past_events_count' => $past_events_count,
-        ]);
-    }
-
-    public function allUpcoming(Request $request)
-    {
-        $allUpcomingEventsQuery = Party::allUpcomingEvents();
-
-        $hasSearched = false;
-        if ($request->input('from-date') !== null) {
-            $allUpcomingEventsQuery->whereDate('event_date', '>=', $request->input('from-date'));
-            $hasSearched = true;
-        }
-        if ($request->input('to-date') !== null) {
-            $allUpcomingEventsQuery->whereDate('event_date', '<=', $request->input('to-date'));
-            $hasSearched = true;
-        }
-        if ($request->has('online')) {
-            $allUpcomingEventsQuery->where('online', true);
-            $hasSearched = true;
-        }
-
-        $allUpcomingEventsCount = $allUpcomingEventsQuery->count();
-        $allUpcomingEvents = $allUpcomingEventsQuery->paginate(env('PAGINATE'));
-
-        return view('events.all', [
-            'upcoming_events' => $allUpcomingEvents,
-            'upcoming_events_count' => $allUpcomingEventsCount,
-            'fromDate' => $request->input('from-date'),
-            'toDate' => $request->input('to-date'),
-            'online' => $request->input('online'),
-            'hasSearched' => $hasSearched,
-        ]);
-    }
-
     public function create(Request $request, $group_id = null)
     {
         $user = Auth::user();
+        $autoapprove = $group_id ? Group::where('idgroups', $group_id)->first()->auto_approve : false;
 
         $groupsUserIsInChargeOf = $user->groupsInChargeOf();
         $userInChargeOfMultipleGroups = $user->hasRole('Administrator') || count($groupsUserIsInChargeOf) > 1;
@@ -233,17 +179,31 @@ class PartyController extends Controller
 
         if ($request->isMethod('post')) {
             $request->validate([
-                'event_date' => 'required',
-                'start' => 'required',
-                'end' => 'required',
-                'location' => [
-                    function ($attribute, $value, $fail) use ($request) {
-                        if (! $request->filled('online') && ! $value) {
-                            $fail(__('events.validate_location'));
-                        }
-                    },
-                ],
+                                   'group' => 'required'
             ]);
+
+            $group = $request->input('group');
+            $groupobj = Group::where('idgroups', $group)->first();
+
+            // We might be passed a timezone; if not then use the timezone of the group.
+            $timezone = $request->input('timezone', $groupobj->timezone);
+
+            $request->validate([
+                                   'location' => [
+                                       function ($attribute, $value, $fail) use ($request) {
+                                           if (! $request->filled('online') && ! $value) {
+                                               $fail(__('events.validate_location'));
+                                           }
+                                       },
+                                   ],
+                               ]);
+
+            $event_start_utc = $request->input('event_start_utc');
+            $event_end_utc = $request->input('event_end_utc');
+
+            // Convert the timezone to UTC, because the timezone is not itself stored in the DB.
+            $event_start_utc = Carbon::parse($event_start_utc)->setTimezone('UTC')->toIso8601String();
+            $event_end_utc = Carbon::parse($event_end_utc)->setTimezone('UTC')->toIso8601String();
 
             $error = [];
 
@@ -262,6 +222,7 @@ class PartyController extends Controller
                             'user' => Auth::user(),
                             'user_groups' => $groupsUserIsInChargeOf,
                             'selected_group_id' => $group_id,
+                            'autoapprove' => $autoapprove,
                         ]);
                     }
 
@@ -278,42 +239,26 @@ class PartyController extends Controller
             $data['longitude'] = $longitude;
 
             $online = $request->has('online');
-            $event_date = $request->input('event_date');
-            $start = $request->input('start');
-            $end = $request->input('end');
-            $pax = 0;
             $free_text = $request->input('free_text');
             $venue = $request->input('venue');
             $location = $request->input('location');
-            $group = $request->input('group');
             $user_id = Auth::user()->id;
             $link = $request->input('link');
 
-            // formatting dates for the DB
-            $event_date = date('Y-m-d', strtotime($event_date));
-
-            if (! Fixometer::verify($event_date)) {
-                $error['event_date'] = 'We must have a starting date and time.';
-            }
-            if (! Fixometer::verify($start)) {
-                $error['name'] = 'We must have a starting date and time.';
-            }
+            // Check whether the event should be auto-approved, if all of the networks it belongs to
+            // allow it.
+            $autoapprove = $groupobj->auto_approve;
 
             if (empty($error)) {
-                $startTime = $event_date.' '.$start;
-                $endTime = $event_date.' '.$end;
-
-                $dtStart = new DateTime($startTime);
-                $dtDiff = $dtStart->diff(new DateTime($endTime));
-
-                $hours = $dtDiff->h;
+                $hours = Carbon::parse($event_start_utc)->diffInHours(Carbon::parse($event_end_utc));
 
                 // No errors. We can proceed and create the Party.
+                //
+                // timezone needs to be the first attribute set, because it is used in mutators for later attributes.
                 $data = [
-                    'event_date' => $event_date,
-                    'start' => $start,
-                    'end' => $end,
-                    'pax' => $pax,
+                    'timezone' => $timezone,
+                    'event_start_utc' => $event_start_utc,
+                    'event_end_utc' => $event_end_utc,
                     'free_text' => $free_text,
                     'link' => $link,
                     'venue' => $venue,
@@ -322,11 +267,10 @@ class PartyController extends Controller
                     'longitude' => $longitude,
                     'group' => $group,
                     'hours' => $hours,
-                    // 'volunteers'    => $volunteers,
                     'user_id' => $user_id,
                     'created_at' => date('Y-m-d H:i:s'),
                     'shareable_code' => Fixometer::generateUniqueShareableCode(\App\Party::class, 'shareable_code'),
-                    'online' => $online,
+                    'online' => $online
                 ];
 
                 $party = Party::create($data);
@@ -359,6 +303,11 @@ class PartyController extends Controller
                             $File->upload($upload, 'image', $idParty, env('TBL_EVENTS'));
                         }
                     }
+
+                    if ($autoapprove) {
+                        Log::info('Auto-approve event $idParty');
+                        Party::find($idParty)->approve();
+                    }
                 } else {
                     $response['danger'] = 'Party could <strong>not</strong> be created. Something went wrong with the database.';
                 }
@@ -374,7 +323,8 @@ class PartyController extends Controller
             }
 
             if (is_numeric($idParty)) {
-                return redirect('/party/edit/'.$idParty)->with('success', Lang::get('events.created_success_message'));
+                return redirect('/party/edit/'.$idParty)->with('success', Lang::get($autoapprove ?
+                                    'events.created_success_message_autoapproved' : 'events.created_success_message'));
             }
 
             return view('events.create', [
@@ -388,6 +338,7 @@ class PartyController extends Controller
                 'user_groups' => $groupsUserIsInChargeOf,
                 'selected_group_id' => $group_id,
                 'userInChargeOfMultipleGroups' => $userInChargeOfMultipleGroups,
+                'autoapprove' => $autoapprove,
             ]);
         }
 
@@ -399,33 +350,8 @@ class PartyController extends Controller
             'user_groups' => $groupsUserIsInChargeOf,
             'selected_group_id' => $group_id,
             'userInChargeOfMultipleGroups' => $userInChargeOfMultipleGroups,
+            'autoapprove' => $autoapprove,
         ]);
-    }
-
-    public function sendCreationNotificationEmail($venue, $location, $event_date, $start, $end, $group_id)
-    {
-        $Groups = new Group;
-
-        $group = $Groups->findOne($group_id);
-        $group_name = $group->name;
-
-        $hostname = Auth::user()->name;
-
-        // send email to Admin
-        $message = '<p>Hi,</p>'.
-        '<p>This is an automatic email to let you know that <strong>'.$hostname.' </strong>has created a party on the <strong>'.APPNAME.'</strong>.</p>'.
-        '<p><strong>Group Name:</strong> '.$group_name.' <p>'.
-        '<p><strong>Party Name:</strong> '.$venue.' </p>'.
-        '<p><strong>Party Location:</strong> '.$location.' </p>'.
-        '<p><strong>Party Date:</strong> '.$event_date.' </p>'.
-        '<p><strong>Party Start Time:</strong> '.$start.' </p>'.
-        '<p><strong>Party End Time:</strong> '.$end.' </p>';
-
-        $subject = env('APP_NAME').': Party created by the host : '.$hostname.' ';
-        $headers = 'From: '.env('APP_EMAIL')."\r\n";
-        $headers .= "Content-Type: text/html; charset=ISO-8859-1\r\n";
-        $email = env('NOTIFICATION_EMAIL');
-        mail($email, $subject, $message, $headers);
     }
 
     public function edit($id, Request $request)
@@ -459,9 +385,6 @@ class PartyController extends Controller
             unset($data['users']);
             unset($data['id']);
 
-            // formatting dates for the DB
-            $data['event_date'] = Fixometer::dbDateNoTime($data['event_date']);
-
             if (! empty($data['location'])) {
                 $results = $this->geocoder->geocode($data['location']);
 
@@ -475,7 +398,7 @@ class PartyController extends Controller
                       'images' => $images,
                       'title' => 'Edit Party',
                       'allGroups' => $allGroups,
-                      'formdata' => $party,
+                      'formdata' => PartyController::expandEvent($party, NULL),
                       'remotePost' => null,
                       'grouplist' => $Groups->findList(),
                       'user' => Auth::user(),
@@ -495,10 +418,16 @@ class PartyController extends Controller
             $data['latitude'] = $latitude;
             $data['longitude'] = $longitude;
 
+            // We might have been passed a timezone; if not then inherit from the current value.
+            $timezone = $request->input('timezone', Party::find($id)->timezone);
+
+            // Convert the timezone to UTC, because the timezone is not itself stored in the DB.
+            $event_start_utc = Carbon::parse($request->input('event_start_utc'))->setTimezone('UTC')->toIso8601String();
+            $event_end_utc = Carbon::parse($request->input('event_end_utc'))->setTimezone('UTC')->toIso8601String();
+
             $update = [
-                'event_date' => $data['event_date'],
-                'start' => $data['start'],
-                'end' => $data['end'],
+                'event_start_utc' => $event_start_utc,
+                'event_end_utc' => $event_end_utc,
                 'free_text' => $data['free_text'],
                 'online' => $request->has('online'),
                 'group' => $data['group'],
@@ -507,6 +436,7 @@ class PartyController extends Controller
                 'location' => $data['location'],
                 'latitude' => $latitude,
                 'longitude' => $longitude,
+                'timezone' => $timezone
             ];
 
             $u = Party::findOrFail($id)->update($update);
@@ -519,35 +449,11 @@ class PartyController extends Controller
                 $theParty = $Party->findThis($id)[0];
 
                 // If event has just been approved, email Restarters attached to group, and push to Wordpress.
+                $event = Party::find($id);
+
                 if (isset($data['moderate']) && $data['moderate'] == 'approve') {
-                    // Notify Restarters of relevant Group
-                    $event = Party::find($id);
-                    $group = Group::find($event->group);
-
-                    // Only send notifications if the event is in the future.
-                    // We don't want to send emails to Restarters about past events being added.
-                    if ($event->isUpcoming()) {
-                        // Retrieving all users from the User model whereby they allow you send emails but their role must not include group admins
-                        $group_restarters = User::join('users_groups', 'users_groups.user', '=', 'users.id')
-                                        ->where('users_groups.group', $event->group)
-                                        ->where('users_groups.role', 4)
-                                            ->select('users.*')
-                                            ->get();
-
-                        // If there are restarters against the group
-                        if (! $group_restarters->isEmpty()) {
-                            // Send user a notification and email
-                            Notification::send($group_restarters, new NotifyRestartersOfNewEvent([
-                                'event_venue' => $event->venue,
-                                'event_url' => url('/party/view/'.$event->idevents),
-                                'event_group' => $group->name,
-                            ]));
-                        }
-                    }
-
-                    event(new ApproveEvent($event, $data));
+                    $event->approve();
                 } elseif (! empty($theParty->wordpress_post_id)) {
-                    $event = Party::find($id);
                     event(new EditEvent($event, $data));
                 }
 
@@ -568,9 +474,8 @@ class PartyController extends Controller
                 $remotePost = null;
             }
 
-            $party = $Party->findThis($id)[0];
-
             $audits = Party::findOrFail($id)->audits;
+            $party = $Party->find($id);
 
             return view('events.edit', [ //party.edit
                 'response' => $response,
@@ -578,7 +483,7 @@ class PartyController extends Controller
                 'images' => $images,
                 'title' => 'Edit Party',
                 'allGroups' => $allGroups,
-                'formdata' => $party,
+                'formdata' => PartyController::expandEvent($party, NULL),
                 'remotePost' => $remotePost,
                 'grouplist' => $Groups->findList(),
                 'user' => Auth::user(),
@@ -595,7 +500,7 @@ class PartyController extends Controller
             $images = null;
         }
 
-        $party = $Party->findThis($id)[0];
+        $party = $Party->find($id);
         $remotePost = null;
 
         $audits = Party::findOrFail($id)->audits;
@@ -605,7 +510,7 @@ class PartyController extends Controller
             'images' => $images,
             'title' => 'Edit Party',
             'allGroups' => $allGroups,
-            'formdata' => $party,
+            'formdata' => PartyController::expandEvent($party, NULL),
             'remotePost' => $remotePost,
             'grouplist' => $Groups->findList(),
             'user' => Auth::user(),
@@ -643,7 +548,7 @@ class PartyController extends Controller
             $images = null;
         }
 
-        $party = $Party->findThis($id)[0];
+        $party = $Party->find($id);
         $remotePost = null;
 
         return view('events.create', [
@@ -653,7 +558,7 @@ class PartyController extends Controller
             'user' => Auth::user(),
             'user_groups' => $groupsUserIsInChargeOf,
             'userInChargeOfMultipleGroups' => $userInChargeOfMultipleGroups,
-            'duplicateFrom' => $party
+            'duplicateFrom' => PartyController::expandEvent($party, NULL),
         ]);
     }
 
@@ -663,8 +568,8 @@ class PartyController extends Controller
         $Party = new Party;
         $event = Party::find($id);
 
-        // If event no longer exists
-        if (empty($event)) {
+        // If event no longer exists or is not visible
+        if (empty($event) || !Fixometer::userHasViewPartyPermission($id)) {
             abort(404);
         }
 
@@ -714,13 +619,6 @@ class PartyController extends Controller
             $device_images[$device->iddevices] = $File->findImages(env('TBL_DEVICES'), $device->iddevices);
         }
 
-        //Retrieve group volunteers
-        if ($event->hasFinished() && ! Auth::guest()) {
-            $group_volunteers = $this->getGroupEmails($id, true);
-        } else {
-            $group_volunteers = null;
-        }
-
         if ($event->isInProgress() || $event->hasFinished()) {
             $stats = $event->getEventStats();
         } else {
@@ -744,7 +642,6 @@ class PartyController extends Controller
             'brands' => $brands,
             'clusters' => $clusters,
             'device_images' => $device_images,
-            'group_volunteers' => $group_volunteers,
             'calendar_links' => $this->generateAddToCalendarLinks($event),
             'item_types' => Device::getItemTypes(),
         ]);
@@ -760,10 +657,7 @@ class PartyController extends Controller
     public function generateAddToCalendarLinks($event)
     {
         try {
-            $from = DateTime::createFromFormat('Y-m-d H:i', $event->getEventDate('Y-m-d').' '.$event->getEventStart());
-            $to = DateTime::createFromFormat('Y-m-d H:i', $event->getEventDate('Y-m-d').' '.$event->getEventEnd());
-
-            $link = Link::create(trim(addslashes($event->getEventName())), $from, $to)
+            $link = Link::create(trim(addslashes($event->getEventName())), new DateTime($event->event_start_utc), new DateTime($event->event_end_utc))
                             ->description(trim(addslashes(strip_tags($event->free_text))))
                                 ->address(trim(addslashes($event->location)));
 
@@ -788,27 +682,34 @@ class PartyController extends Controller
 
         if (empty($not_in_event)) {
             try {
-                $user_event = EventsUsers::updateOrCreate([
-                    'user' => $user_id,
-                    'event' => $event_id,
-                ], [
-                    'status' => 1,
-                    'role' => 4,
-                ]);
-
                 $event = Party::find($event_id);
 
-                $event->increment('volunteers');
+                if (!$event) {
+                    $flashData['danger'] = 'Invalid event id';
 
-                $flashData = [];
-                if (! Auth::user()->isInGroup($event->theGroup->idgroups)) {
-                    $flashData['prompt-follow-group'] = true;
+                    return redirect()->back()->with($flashData);
+                } else {
+                    $user_event = EventsUsers::updateOrCreate([
+                                                                  'user' => $user_id,
+                                                                  'event' => $event_id,
+                                                              ], [
+                                                                  'status' => 1,
+                                                                  'role' => 4,
+                                                              ]);
+
+
+                    $event->increment('volunteers');
+
+                    $flashData = [];
+                    if (! Auth::user()->isInGroup($event->theGroup->idgroups)) {
+                        $flashData['prompt-follow-group'] = true;
+                    }
+
+                    $this->notifyHostsOfRsvp($user_event, $event_id);
+                    $this->addToDiscourseThread($event, Auth::user());
+
+                    return redirect()->back()->with($flashData);
                 }
-
-                $this->notifyHostsOfRsvp($user_event, $event_id);
-                $this->addToDiscourseThread($event, Auth::user());
-
-                return redirect()->back()->with($flashData);
             } catch (\Exception $e) {
                 $flashData['danger'] = 'Failed to join this event';
 
@@ -834,7 +735,7 @@ class PartyController extends Controller
             $hosts = null;
         }
 
-        if (! is_null($hosts)) {
+        if ($hosts && count($hosts)) {
             try {
                 // Get user information
                 $user = User::find($user_event->user);
@@ -880,8 +781,6 @@ class PartyController extends Controller
         $event = Party::where('idevents', $id)->first();
 
         $eventStats = $event->getEventStats();
-
-        $eventStats['co2'] = number_format(round($eventStats['co2']), 0, '.', ',');
 
         if (! is_null($class)) {
             return view('party.stats', [
@@ -935,14 +834,15 @@ class PartyController extends Controller
     {
         $group_user_ids = UserGroups::where('group', Party::find($event_id)->group)
         ->where('user', '!=', Auth::user()->id)
+        ->where('status', '=', 1)
         ->pluck('user')
         ->toArray();
 
-        // Users already associated with the event.
-        // (Not including those invited but not RSVPed)
+        // Users already confirmed as attending the event.
+        //
+        // We don't want to return users who are already invited - we shouldn't be able to invite twice.
         $event_user_ids = EventsUsers::where('event', $event_id)
         ->where('user', '!=', Auth::user()->id)
-        ->where('status', 'like', '1')
         ->pluck('user')
         ->toArray();
 
@@ -1084,9 +984,6 @@ class PartyController extends Controller
                             'event_venue' => $event->venue,
                             'event_url' => url('/party/edit/'.$event->idevents),
                         ];
-
-                        // Notify Host of event that Invites have been sent out
-                        Notification::send($userCreator, new NotifyHostRSVPInvitesMade($event_details));
                     }
 
                     // Send Invites
@@ -1162,78 +1059,6 @@ class PartyController extends Controller
         return redirect('/party/view/'.intval($event_id))->with('success', 'You are no longer attending this event.');
     }
 
-    public function addVolunteer(Request $request)
-    {
-
-      // Get event ID
-        $event_id = $request->input('event');
-        $volunteer_email_address = $request->input('volunteer_email_address');
-
-        // Retrieve name if one exists.  If no name exists and user is null as well then this volunteer is anonymous.
-        if ($request->has('full_name')) {
-            $full_name = $request->input('full_name');
-        } else {
-            $full_name = null;
-        }
-
-        // User is null, this volunteer is either anonymous or no user exists.
-        if ($request->has('user') && $request->input('user') !== 'not-registered') {
-            $user = $request->input('user');
-        } else {
-            $user = null;
-        }
-
-        // Check if user was invited but not RSVPed.
-        $invitedUserQuery = EventsUsers::where('event', $event_id)
-        ->where('user', $user)
-        ->where('status', '<>', 1)
-        ->whereNotNull('status')
-        ->where('role', 4);
-        $userWasInvited = $invitedUserQuery->count() == 1;
-
-        if ($userWasInvited) {
-            $invitedUser = $invitedUserQuery->first();
-            $invitedUser->status = 1;
-            $invitedUser->save();
-        } else {
-            //Let's add the volunteer
-            EventsUsers::create([
-                'event' => $event_id,
-                'user' => $user,
-                'status' => 1,
-                'role' => 4,
-                'full_name' => $full_name,
-            ]);
-        }
-
-        Party::find($event_id)->increment('volunteers');
-
-        // Send email
-        if (! is_null($volunteer_email_address)) {
-            $event = Party::find($event_id);
-            $from = User::find(Auth::user()->id);
-
-            $hash = substr(bin2hex(openssl_random_pseudo_bytes(32)), 0, 24);
-            $url = url('/user/register/'.$hash);
-
-            $invite = Invite::create([
-                'record_id' => $event->theGroup->idgroups,
-                'email' => $volunteer_email_address,
-                'hash' => $hash,
-                'type' => 'group',
-            ]);
-
-            Notification::send($invite, new JoinGroup([
-                'name' => $from->name,
-                'group' => $event->theGroup->name,
-                'url' => $url,
-                'message' => null,
-            ]));
-        }
-
-        return redirect('/party/view/'.intval($event_id))->with('success', 'Volunteer has successfully been added to event');
-    }
-
     public function imageUpload(Request $request, $id)
     {
         try {
@@ -1302,10 +1127,10 @@ class PartyController extends Controller
                 'preferences' => url('/profile/edit'),
             ]));
 
-            return redirect()->back()->with('success', 'Thanks - all Restarters that attended have been sent a notification');
+            return redirect()->back()->with('success', __('events.review_requested'));
         }
 
-        return redirect()->back()->with('warning', 'Sorry - you do not have the correct permissions for this action');
+        return redirect()->back()->with('warning', __('events.review_requested_permissions'));
     }
 
     // TODO: is this alive?
@@ -1375,182 +1200,5 @@ class PartyController extends Controller
         session()->push('events.'.$code, $hash);
 
         return redirect('/user/register')->with('auth-for-invitation', __('auth.login_before_using_shareable_link', ['login_url' => url('/login')]));
-    }
-
-    /**
-     * [getEventsByKey description]
-     * Get all Events where a User has an API KEY that exists,
-     * and that User has Group Tags associated with it.
-     *
-     * @author  Christopher Kelker
-     * @version 1.0.0
-     * @date    2019-03-13
-     * @param   [type]     $api_token
-     * @return  [type]
-     */
-    public function getEventsByKey(Request $request, $api_token, $date_from = null, $date_to = null)
-    {
-        $user = User::where('api_token', $api_token)->first();
-
-        $parties = Party::join('groups', 'groups.idgroups', '=', 'events.group')
-         ->join('grouptags_groups', 'grouptags_groups.group', '=', 'groups.idgroups')
-         ->join('group_tags', 'group_tags.id', '=', 'grouptags_groups.group_tag')
-         ->join('users', 'users.access_group_tag_id', '=', 'group_tags.id');
-
-        if (! empty($date_from) && ! empty($date_to)) {
-            $parties = $parties->where('events.event_date', '>=', date('Y-m-d', strtotime($date_from)))
-           ->where('events.event_date', '<=', date('Y-m-d', strtotime($date_to)));
-        }
-
-        $parties = $parties->where([
-             ['users.api_token', $user->api_token],
-             ['users.access_group_tag_id', $user->access_group_tag_id],
-         ])
-         ->select('events.*')
-         ->get();
-
-        // If no parties are found, through 404 error
-        if (! count($parties)) {
-            return abort(404, 'No Events found.');
-        }
-
-        $groups = Group::join('grouptags_groups', 'grouptags_groups.group', '=', 'groups.idgroups')
-         ->where('group_tag', $user->access_group_tag_id)->get();
-
-        $groups_array = collect([]);
-        foreach ($groups as $group) {
-            $gstats = $group->getGroupStats();
-            $groups_array->push([
-               'id' => $group->idgroups,
-               'name' => $group->name,
-               'description' => $group->free_text,
-               'image_url' => $group->groupImagePath(),
-               'volunteers' => $group->volunteers,
-               'participants' => $gstats['pax'],
-               'hours_volunteered' => $gstats['hours'],
-               'parties_thrown' => $gstats['parties'],
-               'waste_prevented' => $gstats['waste'],
-               'co2_emissions_prevented' => $gstats['co2'],
-           ]);
-        }
-
-        $collection = collect([]);
-        foreach ($parties as $key => $party) {
-            $group = $groups_array->filter(function ($group) use ($party) {
-                return $group['id'] == $party->group;
-            })->first();
-            $estats = $party->getEventStats();
-            // Push Party to Collection
-            $collection->push([
-             'id' => $party->idevents,
-             'group' => [$group],
-             'event_date' => $party->event_date,
-             'start_time' => $party->start,
-             'end_time' => $party->end,
-             'name' => $party->venue,
-             'location' => [
-                 'value' => $party->location,
-                 'latitude' => $party->latitude,
-                 'longitude' => $party->longitude,
-             ],
-             'description' => $party->free_text,
-             'user' => $party_user = collect(),
-             'impact' => [
-                 'participants' => $party->pax,
-                 'volunteers' => $estats['volunteers'],
-                 'waste_prevented' => $estats['ewaste'],
-                 'co2_emissions_prevented' => $estats['co2'],
-                 'devices_fixed' => $estats['fixed_devices'],
-                 'devices_repairable' => $estats['repairable_devices'],
-                 'devices_dead' => $estats['dead_devices'],
-             ],
-             'widgets' => [
-                 'headline_stats' => url("/party/stats/{$party->idevents}/wide"),
-                 'co2_equivalence_visualisation' => url("/outbound/info/party/{$party->idevents}/manufacture"),
-             ],
-             'hours_volunteered' => $party->hoursVolunteered(),
-           ]);
-
-            if (! empty($party->owner)) {
-                $party_user->put('id', $party->owner->id);
-                $party_user->put('name', $party->owner->name);
-            }
-        }
-
-        return $collection;
-    }
-
-    /**
-     * [getEventByKeyAndId description]
-     * Get Past Event using Route Model Binding,
-     * If Event is not found, throw 404 error,
-     * Else return the Event's JSON data.
-     *
-     * @author  Christopher Kelker
-     * @version 1.0.0
-     * @date    2019-03-13
-     * @param   [type]     $api_token
-     * @param   [type]     $id
-     * @return  [type]
-     */
-    public function getEventByKeyAndId(Request $request, $api_token, Party $party)
-    {
-        // If Event is not found, through 404 error
-        if (empty($party) && ! $party->exists) {
-            return abort(404, 'Invalid Event ID.');
-        }
-
-        $estats = $party->getEventStats();
-        $gstats = $party->theGroup->getGroupStats();
-        // New Collection Instance
-        $collection = collect([
-            'id' => $party->idevents,
-            'group' => [
-                'id' => $party->theGroup->idgroups,
-                'name' => $party->theGroup->name,
-                'description' => $party->theGroup->free_text,
-                'image_url' => $party->theGroup->groupImagePath(),
-                'volunteers' => $party->theGroup->volunteers,
-                'participants' => $gstats['pax'],
-                'hours_volunteered' => $gstats['hours'],
-                'parties_thrown' => $gstats['parties'],
-                'waste_prevented' => $gstats['waste'],
-                'co2_emissions_prevented' => $gstats['co2'],
-            ],
-            'event_date' => $party->event_date,
-            'start_time' => $party->start,
-            'end_time' => $party->end,
-            'name' => $party->venue,
-            'location' => [
-                'value' => $party->location,
-                'latitude' => $party->latitude,
-                'longitude' => $party->longitude,
-                'area' => $party->theGroup->area,
-                'postcode' => $party->theGroup->postcode,
-            ],
-            'description' => $party->free_text,
-            'user' => $party_user = collect(),
-            'impact' => [
-                'participants' => $party->pax,
-                'volunteers' => $estats['volunteers'],
-                'waste_prevented' => $estats['ewaste'],
-                'co2_emissions_prevented' => $estats['co2'],
-                'devices_fixed' => $estats['fixed_devices'],
-                'devices_repairable' => $estats['repairable_devices'],
-                'devices_dead' => $estats['dead_devices'],
-            ],
-            'widgets' => [
-                'headline_stats' => url("/party/stats/{$party->idevents}/wide"),
-                'co2_equivalence_visualisation' => url("/outbound/info/party/{$party->idevents}/manufacture"),
-            ],
-            'hours_volunteered' => $party->hoursVolunteered(),
-        ]);
-
-        if (! empty($party->owner)) {
-            $party_user->put('id', $party->owner->id);
-            $party_user->put('name', $party->owner->name);
-        }
-
-        return $collection;
     }
 }

@@ -2,15 +2,36 @@
 
 namespace Tests\Feature\Groups;
 
+use App\Group;
+use App\Network;
+use App\Notifications\GroupConfirmed;
+use App\Party;
 use App\Role;
+use App\User;
+use Carbon\Carbon;
+use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Tests\TestCase;
+use Illuminate\Support\Facades\Notification;
 
 class GroupCreateTest extends TestCase
 {
     public function testCreate()
     {
-        $this->loginAsTestUser(Role::ADMINISTRATOR);
-        $this->assertNotNull($this->createGroup());
+        $user = factory(User::class)->states('Administrator')->create([
+                                                                      'api_token' => '1234',
+                                                                  ]);
+        $this->actingAs($user);
+
+        $idgroups = $this->createGroup();
+        $this->assertNotNull($idgroups);
+        $group = Group::find($idgroups);
+
+        $response = $this->get('/api/groups?api_token=1234');
+        $response->assertSuccessful();
+        $ret = json_decode($response->getContent(), TRUE);
+        self::assertEquals(1, count($ret));
+        self::assertEquals($idgroups, $ret[0]['idgroups']);
+        self::assertEquals($group->name, $ret[0]['name']);
     }
 
     public function testCreateBadLocation()
@@ -19,7 +40,7 @@ class GroupCreateTest extends TestCase
 
         // Use an address which will fail to geocode.
         $this->assertNull($this->createGroup('Test Group', 'https://therestartproject.org', 'zzzzzzzzzzz123', 'Some text', false));
-        $this->assertContains(' Address not found.', $this->lastResponse->getContent());
+        $this->assertContains(__('groups.geocode_failed'), $this->lastResponse->getContent());
     }
 
     public function testDuplicate()
@@ -37,5 +58,103 @@ class GroupCreateTest extends TestCase
         ]);
 
         $this->assertContains('That group name (Test Group0) already exists', $response->getContent());
+    }
+
+    public function testApprove() {
+        Notification::fake();
+
+        $admin1 = factory(User::class)->state('Administrator')->create();
+        $this->actingAs($admin1);
+
+        $idgroups = $this->createGroup('Test Group');
+        $group = Group::find($idgroups);
+
+        $admin2 = factory(User::class)->state('Administrator')->create();
+        $this->actingAs($admin2);
+
+        $response = $this->post('/group/edit/'.$idgroups, [
+            'description' => 'Test',
+            'location' => 'London',
+            'name' => $group->name,
+            'website' => 'https://therestartproject.org',
+            'free_text' => 'HQ',
+            'moderate' => 'approve',
+            'area' => 'London',
+            'postcode' => 'SW9 7QD'
+        ]);
+
+        Notification::assertSentTo(
+            [$admin1],
+            GroupConfirmed::class,
+            function ($notification, $channels, $host) use ($group) {
+                $mailData = $notification->toMail($host)->toArray();
+                self::assertEquals(__('notifications.group_confirmed_subject', [], $host->language), $mailData['subject']);
+
+                // Mail should mention the group name.
+                self::assertRegexp('/' . $group->name . '/', $mailData['introLines'][0]);
+
+                return true;
+            }
+        );
+
+        $this->assertContains('Group updated!', $response->getContent());
+    }
+
+    public function testEventVisibility() {
+        // Create a network.
+        $network = factory(Network::class)->create();
+
+        // Create an unapproved group in that network.
+        $admin1 = factory(User::class)->state('Administrator')->create();
+        $this->actingAs($admin1);
+        $idgroups = $this->createGroup('Test Group', 'https://therestartproject.org', 'London', 'Some text.', true, false);
+        $group = Group::find($idgroups);
+        $network->addGroup($group);
+
+        // Create a host for the group.
+        $host = factory(User::class)->states('Host')->create();
+        $group->addVolunteer($host);
+        $group->makeMemberAHost($host);
+        $this->actingAs($host);
+
+        // Create an event on this as yet unapproved group.
+        $eventAttributes = factory(Party::class)->raw();
+        $eventAttributes['group'] = $idgroups;
+        $eventAttributes['link'] = 'https://therestartproject.org/';
+        $eventAttributes['event_start_utc'] = Carbon::parse('1pm tomorrow')->toIso8601String();
+        $eventAttributes['event_end_utc'] = Carbon::parse('3pm tomorrow')->toIso8601String();
+
+        $this->post('/party/create/', $eventAttributes);
+        $event = Party::latest()->first();
+        $this->assertEquals($host->id, $event->user_id);
+
+        // The event should be visible to the host.
+        $this->get('/party/view/'.$event->idevents)->assertSee($eventAttributes['venue']);
+        $this->get('/party')->assertSee($eventAttributes['venue']);
+
+        // And to a network coordinator
+        $coordinator = factory(User::class)->state('NetworkCoordinator')->create();
+        $network->addCoordinator($coordinator);
+        $this->actingAs($coordinator);
+        $this->get('/party/view/'.$event->idevents)->assertSee($eventAttributes['venue']);
+        $this->get('/party')->assertSee($eventAttributes['venue']);
+
+        // This event should not be visible to a Restarter, as the group is not yet approved.
+        $restarter = factory(User::class)->states('Restarter')->create();
+        $this->actingAs($restarter);
+        try {
+            $this->get('/party/view/'.$event->idevents)->assertDontSee($eventAttributes['venue']);
+            $this->assertTrue(false);
+        } catch (NotFoundHttpException $e) {}
+
+        $this->get('/party')->assertDontSee($eventAttributes['venue']);
+
+        // Now approve the group.
+        $group->wordpress_post_id = '99999';
+        $group->save();
+
+        // Should now be visible.
+        $this->get('/party/view/'.$event->idevents)->assertSee($eventAttributes['venue']);
+        $this->get('/party')->assertSee($eventAttributes['venue']);
     }
 }

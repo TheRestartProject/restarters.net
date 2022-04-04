@@ -55,20 +55,9 @@
       <b-tabs class="ourtabs ourtabs-brand w-100 d-none d-md-block" v-model="tabIndex">
         <b-tab active title-item-class="w-50" title-link-class="smallpad" class="pt-2">
           <template slot="title">
-            <div class="d-flex justify-content-between">
-              <div>
-                <b>{{ __('devices.title_powered') }}</b> ({{ powered_total.toLocaleString() }})
-              </div>
-              <div class="d-flex text-brand font-weight-bold">
-                <div class="mr-3 lower">
-                  <b-img src="/images/trash_brand.svg" class="icon" />
-                  {{ powered_weight.toLocaleString() }} kg
-                </div>
-                <div class="mr-1 lower">
-                  <b-img src="/images/co2_brand.svg" class="icon" />
-                  {{ powered_co2.toLocaleString() }} kg
-                </div>
-              </div>
+            <div>
+              <b>{{ __('devices.title_powered') }}</b>
+              ({{ total_powered.toLocaleString() }})
             </div>
           </template>
           <p class="pl-3" v-html="__('devices.description_powered')" />
@@ -88,21 +77,14 @@
               :group="group"
               :from_date="from_date"
               :to_date="to_date"
-              :total.sync="powered_total"
-              :weight.sync="powered_weight"
-              :co2.sync="powered_co2"
+              :total.sync="impactData.total_powered"
           />
         </b-tab>
         <b-tab title-item-class="w-50" title-link-class="smallpad" class="pt-2">
           <template slot="title">
-            <div class="d-flex justify-content-between">
-              <div>
-                <b>{{ __('devices.title_unpowered') }}</b> ({{ unpowered_total.toLocaleString() }})
-              </div>
-              <div class="lower text-brand font-weight-bold">
-                <b-img src="/images/trash_brand.svg" class="icon" />
-                {{ unpowered_weight.toLocaleString() }} kg
-              </div>
+            <div>
+              <b>{{ __('devices.title_unpowered') }}</b>
+              ({{ total_unpowered.toLocaleString() }})
             </div>
           </template>
           <p class="pl-3" v-html="__('devices.description_unpowered')" />
@@ -121,35 +103,15 @@
               :group="group"
               :from_date="from_date"
               :to_date="to_date"
-              :total.sync="unpowered_total"
-              :weight.sync="unpowered_weight"
-              :co2.sync="unpowered_co2"
+              :total.sync="impactData.total_unpowered"
           />
         </b-tab>
       </b-tabs>
     </div>
     <div class="d-block d-md-none">
-      <CollapsibleSection collapsed :count="powered_total" heading-level="h6" count-class="small">
+      <CollapsibleSection collapsed :count="impactData.total_powered" heading-level="h6" count-class="small">
         <template slot="title">
           {{ __('devices.title_powered') }}
-        </template>
-        <template slot="title-right">
-          <div class="small mt-2">
-            <div class="d-flex text-brand font-weight-bold small">
-              <div class="mr-3 lower d-flex align-content-center">
-                <b-img src="/images/trash_brand.svg" class="iconsmall" />
-                <span class="mb-1">
-                  {{ powered_weight.toLocaleString() }}
-                </span>
-              </div>
-              <div class="mr-1 lower d-flex">
-                <b-img src="/images/co2_brand.svg" class="iconsmall" />
-                <span class="mb-1">
-                  {{ powered_co2.toLocaleString() }}
-                </span>
-              </div>
-            </div>
-          </div>
         </template>
         <template slot="content">
           <FixometerRecordsTable
@@ -167,27 +129,13 @@
               :group="group"
               :from_date="from_date"
               :to_date="to_date"
-              :total.sync="powered_total"
-              :weight.sync="powered_weight"
-              :co2.sync="powered_co2"
+              :total.sync="total_powered"
           />
         </template>
       </CollapsibleSection>
-      <CollapsibleSection collapsed :count="unpowered_total" heading-level="h6" count-class="small">
+      <CollapsibleSection collapsed :count="impactData.total_unpowered" heading-level="h6" count-class="small">
         <template slot="title">
           {{ __('devices.title_unpowered') }}
-        </template>
-        <template slot="title-right">
-          <div class="small mt-2">
-            <div class="d-flex text-brand font-weight-bold small">
-              <div class="mr-1 lower d-flex">
-                <b-img src="/images/trash_brand.svg" class="iconsmall" />
-                <span class="mb-1">
-                  {{ unpowered_weight.toLocaleString() }}
-                </span>
-              </div>
-            </div>
-          </div>
         </template>
         <template slot="content">
           <FixometerRecordsTable
@@ -205,9 +153,7 @@
               :group="group"
               :from_date="from_date"
               :to_date="to_date"
-              :total.sync="unpowered_total"
-              :weight.sync="unpowered_weight"
-              :co2.sync="unpowered_co2"
+              :total.sync="total_unpowered"
           />
         </template>
       </CollapsibleSection>
@@ -275,15 +221,12 @@ export default {
       from_date: null,
       to_date: null,
 
+      total_powered: 0,
+      total_unpowered: 0,
+
       startExpandedItems: false,
       startExpandedEvents: false,
 
-      powered_total: 0,
-      unpowered_total: 0,
-      powered_weight: 0,
-      unpowered_weight: 0,
-      powered_co2: 0,
-      unpowered_co2: 0,
     }
   },
   created() {
@@ -347,6 +290,9 @@ export default {
       this.to_date = params.get('to_date')
       this.startExpandedEvents = true
     }
+
+    this.total_powered = this.impactData.total_powered
+    this.total_unpowered = this.impactData.total_unpowered
   },
   watch: {
     url(newVal) {

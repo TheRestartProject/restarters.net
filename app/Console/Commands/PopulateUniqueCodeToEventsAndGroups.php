@@ -3,8 +3,8 @@
 namespace App\Console\Commands;
 
 use App\Group;
-use App\Party;
 use App\Helpers\Fixometer;
+use App\Party;
 use Illuminate\Console\Command;
 
 class PopulateUniqueCodeToEventsAndGroups extends Command

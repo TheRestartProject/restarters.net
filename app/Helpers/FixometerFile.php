@@ -14,6 +14,16 @@ class FixometerFile extends Model
     protected $table;
 
     protected $dates = true;
+    public static $uploadTesting = false;
+
+    public function move($from, $to) {
+        // This is for phpunit tests.
+        if (FixometerFile::$uploadTesting) {
+            return copy($from, $to);
+        } else {
+            return @move_uploaded_file($from, $to);
+        }
+    }
 
     /**
      * receives the POST data from an HTML form
@@ -54,7 +64,7 @@ class FixometerFile extends Model
             $filename = $this->filename($tmp_name);
             $this->file = $filename;
             $lpath = $_SERVER['DOCUMENT_ROOT'].'/uploads/'.$filename;
-            if (! @move_uploaded_file($tmp_name, $lpath)) {
+            if (!$this->move($tmp_name, $lpath)) {
                 return false;
             }
             $data = [];

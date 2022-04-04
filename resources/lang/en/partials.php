@@ -92,7 +92,6 @@ return [
   'choose_barriers' => 'Choose barriers to repair',
   'choose_spare_parts' => 'Spare parts',
   'choose_next_steps' => 'Next steps',
-  'please_choose' => 'Please choose...',
   'add_device_button' => 'Add',
   'item_type' => 'Item Type',
   'add_device_powered' => 'Add Powered Item',
@@ -107,6 +106,7 @@ return [
   'and' => 'and',
   'quantity' => 'Quantity',
   'cancel' => 'Cancel',
+  'confirm' => 'Confirm',
   'loading' => 'Loading',
   'close' => 'Close',
   'skills' => 'skill|skills',
@@ -117,4 +117,7 @@ return [
   'copied_to_clipboard' => 'Copied to clipboard.',
   'total' => 'total',
   'remove' => 'remove',
+  'please_choose' => 'Please choose...',
+  'notification_greeting' => 'Hello!',
+  'notification_footer' => 'If you would like to stop receiving these emails, please visit <a href=":url">your preferences</a> on your account.',
 ];

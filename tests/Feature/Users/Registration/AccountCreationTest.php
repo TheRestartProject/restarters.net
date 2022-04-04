@@ -6,6 +6,7 @@ use App\Role;
 use App\User;
 use DB;
 use Hash;
+use Illuminate\Support\Facades\Config;
 use Mockery;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Tests\TestCase;
@@ -29,9 +30,18 @@ class AccountCreationTest extends TestCase
         $user = User::latest()->first();
         $this->assertEquals(51.507, round($user->latitude, 3));
         $this->assertEquals(-0.128, round($user->longitude, 3));
+
+        // No notifications immediately after creation.
+        $response2 = $this->get('/api/users/' . $user->id . '/notifications');
+        $this->assertEquals([
+                                'success' => 'success',
+                                'restarters' => 0,
+                                'discourse' => 0
+                            ], json_decode($response2->getContent(), TRUE));
     }
 
-    public function testWorkbenchThenRegister() {
+    public function testWorkbenchThenRegister()
+    {
         $this->get('/workbench');
         $userAttributes = $this->userAttributes();
         $response = $this->post('/user/register/', $userAttributes);
@@ -44,9 +54,14 @@ class AccountCreationTest extends TestCase
     {
         $userAttributes = $this->userAttributes();
 
-        // Specify an invalid city
+        // Specify an invalid city and force geocoding to fail by invalidating the Google key.
+        $good = Config::get('GOOGLE_API_CONSOLE_KEY');
+        Config::set('GOOGLE_API_CONSOLE_KEY', 'zzz');
+
         $userAttributes['city'] = 'zzzzzzz';
         $response = $this->post('/user/register/', $userAttributes);
+
+        Config::set('GOOGLE_API_CONSOLE_KEY', $good);
 
         $response->assertStatus(302);
         $response->assertRedirect('dashboard');
@@ -106,12 +121,13 @@ class AccountCreationTest extends TestCase
         $response->assertRedirect('dashboard');
     }
 
-    public function testValidEmail() {
+    public function testValidEmail()
+    {
 
         // Check with a registered email.
         $restarter = factory(User::class)->state('Restarter')->create();
         $response = $this->post('user/register/check-valid-email', [
-            'email' => $restarter->email
+            'email' => $restarter->email,
         ]);
 
         $this->assertEquals([
@@ -119,13 +135,14 @@ class AccountCreationTest extends TestCase
                             ], json_decode($response->getContent(), true));
 
         $response = $this->post('user/register/check-valid-email', [
-            'email' => 'test@invalid.com'
+            'email' => 'test@invalid.com',
         ]);
 
         $this->assertNull(json_decode($response->getContent(), true));
     }
 
-    public function testAdminCreate() {
+    public function testAdminCreate()
+    {
         $this->loginAsTestUser(Role::ADMINISTRATOR);
 
         $userAttributes = $this->userAttributes();

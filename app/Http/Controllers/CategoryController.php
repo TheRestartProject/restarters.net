@@ -3,9 +3,9 @@
 namespace App\Http\Controllers;
 
 use App\Category;
+use App\Helpers\Fixometer;
 use App\User;
 use Auth;
-use App\Helpers\Fixometer;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Redirect;
 
@@ -53,6 +53,7 @@ class CategoryController extends Controller
             'footprint' => $request->input('co2_footprint'),
             'footprint_reliability' => $request->input('reliability'),
             'cluster' => $request->input('category_cluster'),
+            'description_short' => $request->input('categories_desc')
             ]);
         } catch (\Exception $e) {
             return redirect()->back()->with('danger', 'Category could not be updated!');

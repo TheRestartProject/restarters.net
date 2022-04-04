@@ -105,7 +105,7 @@ class ViewUsersTest extends TestCase
             $response = $this->get('/user/all/search?sort=last_login_at&sortdir=desc');
             $datestr = $dateOfMostRecentLogin->diffForHumans(null, true);
 
-            if (stripos($response->getContent(), $datestr) !== FALSE) {
+            if (stripos($response->getContent(), $datestr) !== false) {
                 // Then the first result is the most recent login
                 $found = true;
                 break;
@@ -125,7 +125,7 @@ class ViewUsersTest extends TestCase
             $response = $this->get('/user/all/search?sort=last_login_at&sortdir=asc');
             $datestr = $dateOfLeastRecentLogin->diffForHumans(null, true);
 
-            if (stripos($response->getContent(), $datestr) !== FALSE) {
+            if (stripos($response->getContent(), $datestr) !== false) {
                 // Then the first result is the most recent login
                 $found = true;
                 break;

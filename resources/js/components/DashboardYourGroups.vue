@@ -19,7 +19,7 @@
       <div class="content">
         <DashboardNoGroups v-if="!myGroups || !myGroups.length" :nearby-groups="nearbyGroups" :location="location" />
         <div v-else>
-          <a href="/group/nearby" v-if="newGroups" class="added added-xs d-block d-md-none pr-3 pt-3 pb-3 mb-2">
+          <a href="/group/nearby" v-if="newGroups && newGroups.length" class="added added-xs d-block d-md-none pr-3 pt-3 pb-3 mb-2">
             <b-img src="/images/arrow-right-doodle-white.svg" />
             {{ translatedNewlyAdded }}
           </a>
@@ -86,6 +86,7 @@
   </CollapsibleSection>
 </template>
 <script>
+import moment from 'moment'
 import DashboardGroup from './DashboardGroup'
 import CollapsibleSection from './CollapsibleSection'
 import DashboardEvent from './DashboardEvent'
@@ -98,7 +99,7 @@ export default {
       required: true
     },
     newGroups: {
-      type: Number,
+      type: Array,
       required: true
     },
     nearbyGroups: {
@@ -124,7 +125,7 @@ export default {
     events() {
       return this.$store.getters['events/getByGroup'](null).filter(e => e.upcoming).sort((a, b) => {
         // Sort soonest first.
-        return Date.parse(a.event_date + ' ' + a.start) - Date.parse(b.event_date + ' ' + b.start)
+        return new moment(a.event_start_utc).unix() - new moment(b.event_start_utc).unix()
       })
     },
     translatedNewlyAdded() {

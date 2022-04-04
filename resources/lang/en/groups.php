@@ -19,7 +19,7 @@ return [
   'create_groups' => 'Add a new group',
   'create_group' => 'Create group',
   'groups_title1' => 'Your Groups',
-  'groups_title2' => 'Groups nearest to you',
+  'groups_title2' => 'Other groups nearby',
   'groups_title3' => 'Groups',
   'groups_name' => 'Name',
   'groups_name_of' => 'Name of group',
@@ -28,6 +28,7 @@ return [
   'groups_website_small' => 'Don\'t have a website? Feel free to add a Facebook group or similar',
   'groups_group_small' => 'A couple of examples include \'Restarters Torino\' or \'Nottingham Fixers\'',
   'groups_location' => 'Location',
+  'groups_location_placeholder' => 'Enter your address',
   'location' => 'Group location',
   'area' => 'Area',
   'groups_frequency' => 'Frequency',
@@ -73,6 +74,7 @@ return [
   'infographic_message' => 'An infographic of an easy-to-understand equivalent of the CO<sub>2</sub> emissions that your group has prevented, such as equivalent number of cars manufactured.',
   'headline_stats_message' => 'This widget shows the headline stats for your group e.g. the number of participants at your parties; the hours volunteered',
   'edit_group' => 'Edit group',
+  'editing' => 'Editing',
   'edit_group_save_changes' => 'Save changes',
   'edit_group_text' => 'Go ahead and change or improve your group\'s profile.',
   'delete_group' => 'Delete group',
@@ -165,8 +167,6 @@ return [
   'no_groups_mine' => '<b>If you can\'t see any here yet, why not <a href="/group/nearby">follow your nearest group</a> to hear about their upcoming repair events?</b>',
   'no_groups_nearest_no_location' => '<b><p>You do not currently have a town/city set.  You can set one in <a href="/profile/edit">your profile</a>.</p><p>You can also <a href="/group/all">view all groups</a>.</p></b>',
   'no_groups_nearest_with_location' => '<p>There are no groups within 50 km of your location. You can <a href="/group/all">see all groups here</a>. Or why not start your own? <a href="https://talk.restarters.net/t/how-to-run-a-repair-event-the-restart-party-kit/324">Learn what running your own repair event involves.</a></p>',
-  'nearest_groups'  => 'These are the groups that are within 50 km of :location',
-  'nearest_groups_change' => '(change)',
   'group_count' => 'There is <b>:count group</b>.|There are <b>:count groups</b>.',
   'search_name_placeholder' => 'Search name...',
   'search_location_placeholder' => 'Search location...',
@@ -191,5 +191,18 @@ return [
   'delete_group' => 'Delete group',
   'delete_group_confirm' => 'Please confirm that you want to delete :name.',
   'delete_succeeded' => 'Group <strong>:name</strong> has been deleted.',
-  'invitation_pending' => 'You have an invitation to this group.  Please click <a href=":accept">here</a> if you would like to join.'
+  'nearest_groups' => 'These are the groups that are within 50 km of :location',
+  'nearest_groups_change' => '(change)',
+  'invitation_pending' => 'You have an invitation to this group.  Please click <a href=":accept">here</a> if you would like to join.',
+  'geocode_failed' => 'The address you entered could not be found. Please try a more general address.',
+  'discourse_title' => 'This is a discussion group for anyone who follows :group.
+
+Find the group\'s main page here: :link.
+
+Learn how to use this group here: :help
+
+',
+  'talk_group' => 'View group conversation',
+  'talk_group_add_title' => 'Welcome to :group_name',
+  'talk_group_add_body' => 'Thank you for following :group_name! You will now receive notifications when new events are planned and will be added to group messages. <a href="https://talk.restarters.net/t/how-to-communicate-with-your-repair-group/6293">Learn how group messages work and how to change your notification settings</a>.',
 ];

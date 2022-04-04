@@ -17,12 +17,12 @@ class BasicTest extends TestCase
         $response = $this->get('/workbench');
 
         $this->assertVueProperties($response, [
+            [],
             [
                 // Can't assert on total-contributions dev systems might have varying info.
                 'active-quest' => 'mobifixora',
                 ':current-user-quests' => '0',
                 ':current-user-contributions' => '0',
-                ':topics' => '[]',
                 'see-all-topics-link' => env('DISCOURSE_URL').'/tag/workbench/l/latest',
                 ':is-logged-in' => 'true',
                 'discourse-base-url' => env('DISCOURSE_URL').'',

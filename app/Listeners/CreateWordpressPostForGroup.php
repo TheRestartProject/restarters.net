@@ -4,8 +4,8 @@ namespace App\Listeners;
 
 use App\Events\ApproveGroup;
 use App\Group;
-use App\Notifications\AdminWordPressCreateGroupFailure;
 use App\Helpers\Fixometer;
+use App\Notifications\AdminWordPressCreateGroupFailure;
 use HieuLe\WordpressXmlrpcClient\WordpressClient;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Queue\InteractsWithQueue;
@@ -37,8 +37,10 @@ class CreateWordpressPostForGroup
 
         $group = Group::find($id);
 
-        if (! empty($group)) {
+        if (empty($group)) {
             Log::error('Group not found');
+
+            return;
         }
 
         if (! $group->eventsShouldPushToWordpress()) {

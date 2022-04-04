@@ -13,9 +13,7 @@
       <DashboardAddData class="adddata justify-self-end" />
       <DashboardRightSidebar class="sidebar" />
       <DiscourseDiscussion
-          v-if="topics"
           class="discourse"
-          :topics="topics"
           :see-all-topics-link="seeAllTopicsLink"
           :discourse-base-url="discourseBaseUrl"
           :is-logged-in="isLoggedIn"
@@ -54,16 +52,6 @@ export default {
       required: false,
       default: null
     },
-    pastEvents: {
-      type: Array,
-      required: false,
-      default: null
-    },
-    topics: {
-      type: Array,
-      required: false,
-      detault: null
-    },
     seeAllTopicsLink: {
       type: String,
       required: true
@@ -77,7 +65,7 @@ export default {
       required: true
     },
     newGroups: {
-      type: Number,
+      type: Array,
       required: true
     }
   },
@@ -102,24 +90,6 @@ export default {
     })
 
     let events = {}
-
-    if (this.upcomingEvents) {
-      this.upcomingEvents.forEach(e => {
-        events[e.idevents] = e
-        e.group = e.the_group
-        delete e.the_group
-        e.upcoming = true
-      })
-    }
-
-    if (this.pastEvents) {
-      this.pastEvents.forEach(e => {
-        events[e.idevents] = e
-        e.group = e.the_group
-        delete e.the_group
-        e.attended = true
-      })
-    }
 
     this.$store.dispatch('events/setList', {
       events: Object.values(events)

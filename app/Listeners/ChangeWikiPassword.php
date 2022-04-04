@@ -33,6 +33,7 @@ class ChangeWikiPassword
     public function handle(PasswordChanged $event)
     {
         $user = $event->user;
+        $oldpw = $event->oldPassword;
 
         if ($user->wiki_sync_status !== WikiSyncStatus::Created) {
             Log::info("No wiki account for '".$user->username."' - not attempting to change password");
@@ -42,14 +43,16 @@ class ChangeWikiPassword
 
         try {
             $api = MediawikiApi::newFromApiEndpoint(env('WIKI_URL').'/api.php');
-            $api->login(new ApiUser($user->mediawiki, $this->request->input('current-password')));
+
+            $api->login(new ApiUser($user->mediawiki, $oldpw));
             $token = $api->getToken('csrf');
 
+            // The Mediawiki new password is the Laravel hashed password.
             $changePasswordRequest = FluentRequest::factory()
                                    ->setAction('changeauthenticationdata')
                                    ->setParam('changeauthrequest', 'MediaWiki\Auth\PasswordAuthenticationRequest')
-                                   ->setParam('password', $this->request->input('new-password'))
-                                   ->setParam('retype', $this->request->input('new-password'))
+                                   ->setParam('password', $user->password)
+                                   ->setParam('retype', $user->password)
                                    ->setParam('changeauthtoken', $token);
             $api->postRequest($changePasswordRequest);
         } catch (\Exception $ex) {

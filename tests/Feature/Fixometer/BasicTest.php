@@ -2,6 +2,8 @@
 
 namespace Tests\Feature\Fixometer;
 
+use App\Category;
+use App\Device;
 use DB;
 use Hash;
 use Mockery;
@@ -46,6 +48,7 @@ class BasicTest extends TestCase
         ]);
 
         $this->assertVueProperties($response, [
+            [],
             [
                 // Can't assert on latest-data or impact-data as dev systems might have varying info.
                 ':clusters' => $clusters,
@@ -55,5 +58,50 @@ class BasicTest extends TestCase
                 ':is-admin' => 'false',
             ],
         ]);
+    }
+
+    public function testExport() {
+        $this->loginAsTestUser();
+
+        DB::statement('SET foreign_key_checks=0');
+        Category::truncate();
+        DB::statement('SET foreign_key_checks=1');
+        factory(Category::class)->create([
+                                             'idcategories' => 1,
+                                             'revision' => 1,
+                                             'name' => 'powered non-misc',
+                                             'powered' => 1,
+                                             'weight' => 4,
+                                             'footprint' => 14.4,
+                                         ]);
+
+        factory(Device::class)->create([
+                                                     'category' => 1,
+                                                     'category_creation' => 1,
+                                                     'repair_status' => 0
+                                                 ]);
+        factory(Device::class)->create([
+                                           'category' => 1,
+                                           'category_creation' => 1,
+                                           'repair_status' => env('DEVICE_FIXED')
+                                       ]);
+
+        $response = $this->get('/export/devices');
+
+        $this->assertTrue($response->headers->get('content-disposition') == 'attachment; filename=devices.csv');
+
+        // Bit hacky, but grab the file that was created.  Can't find a way to do this in Laravel easily, though it's
+        // probably possible using mocking.
+        $filename = base_path() . DIRECTORY_SEPARATOR . 'public' . DIRECTORY_SEPARATOR . 'devices.csv';
+        $fh = fopen($filename, 'r');
+
+        # Skip headers.
+        fgetcsv($fh);
+        $row2 = fgetcsv($fh);
+        $row3 = fgetcsv($fh);
+        $this->assertEquals(0, $row2[9]);
+        $this->assertEquals(0, $row2[10]);
+        $this->assertEquals(4, $row3[9]);
+        $this->assertEquals(7.2, $row3[10]);
     }
 }

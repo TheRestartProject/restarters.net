@@ -97,19 +97,19 @@
         <GroupEventsScrollTableNumber :value="data.item.volunteers_count.volunteers_count" />
       </template>
 
-      <template slot="head(ewaste)">
+      <template slot="head(waste)">
         <div class="hidecell text-center">
           <b-img class="icon mt-3" src="/images/trash.svg" :title="__('groups.waste_prevented')" />
         </div>
       </template>
-      <template slot="cell(ewaste)" slot-scope="data" v-bind="stats">
-        <div v-if="noDevices(data.item.ewaste)" class="d-none d-md-block">
+      <template slot="cell(waste)" slot-scope="data" v-bind="stats">
+        <div v-if="noDevices(data.item.waste)" class="d-none d-md-block">
           {{ __('partials.no_devices_added') }}
-          <a :href="'/party/view/' + data.item.ewaste.idevents">
+          <a :href="'/party/view/' + data.item.waste.idevents">
             {{ __('partials.add_a_device') }}
           </a>
         </div>
-        <GroupEventsScrollTableNumber v-else :value="Math.round(stats(data.item.ewaste).ewaste)" units="kg" />
+        <GroupEventsScrollTableNumber v-else :value="Math.round(stats(data.item.waste).waste_total)" units="kg" />
       </template>
 
       <template slot="head(co2)">
@@ -118,7 +118,7 @@
         </div>
       </template>
       <template slot="cell(co2)" slot-scope="data" v-bind="stats">
-        <GroupEventsScrollTableNumber :value="Math.round(stats(data.item.co2).co2)" units="kg" />
+        <GroupEventsScrollTableNumber :value="Math.round(stats(data.item.co2).co2_total)" units="kg" />
       </template>
 
       <template slot="head(fixed_devices)">
@@ -219,7 +219,7 @@ export default {
           { key: 'actions', label: 'Actions', },
           { key: 'participants_count', label: 'Participants', sortable: true, tdClass: this.dangerIfZero},
           { key: 'volunteers_count', label: 'Volunteers', sortable: true, tdClass: this.dangerIfOne},
-          { key: 'ewaste', label: 'ewaste', sortable: true, tdClass: this.noDevicesError},
+          { key: 'waste', label: 'waste', sortable: true, tdClass: this.noDevicesError},
           { key: 'co2', label: 'co2', sortable: true},
           { key: 'fixed_devices', label: 'Fixed Devices', sortable: true},
           { key: 'repairable_devices', label: 'Repairable Devices', sortable: true},
@@ -246,7 +246,7 @@ export default {
             actions: e,
             participants_count: e,
             volunteers_count: e,
-            ewaste: e,
+            waste: e,
             co2: e,
             fixed_devices: e,
             repairable_devices: e,
@@ -284,7 +284,7 @@ export default {
 
         if (this.searchStart || this.searchEnd) {
           // Either or both can be set.  This allows searching for all past or all future.
-          const date = new moment(event.event_date)
+          const date = new moment(event.event_date_local)
 
           if (this.searchStart && this.searchEnd) {
             match &= date.isBetween(new moment(this.searchStart), new moment(this.searchEnd), undefined, '[]')
@@ -307,14 +307,14 @@ export default {
       switch (key) {
         case 'date_short':
         case 'date_long':
-          return new moment(b.event_date + ' ' + b.start).unix() - new moment(a.event_date + ' ' + a.start).unix()
+          return new moment(b.event_start_utc).unix() - new moment(a.event_start_utc).unix()
         case 'title':
           const atitle = a.venue ? a.venue : a.location
           const btitle = b.venue ? b.venue : b.location
           return atitle.toLowerCase().localeCompare(btitle.toLowerCase())
         case 'participants_count':
         case 'volunteers_count':
-        case 'ewaste':
+        case 'waste':
         case 'co2':
         case 'fixed_devices':
         case 'repairable_devices':
@@ -329,20 +329,10 @@ export default {
     stats(event) {
       return this.$store.getters['events/getStats'](event.idevents)
     },
-    finished(event) {
-      let ret = false;
-
-      if (event) {
-        const end = new moment(event.event_date + ' ' + event.end)
-        ret = end.isBefore()
-      }
-
-      return ret
-    },
     noDevices(event) {
       const stats = this.stats(event)
 
-      return stats && (stats.fixed_devices + stats.repairable_devices + stats.dead_devices === 0) && this.canedit && this.finished(event)
+      return stats && (stats.fixed_devices + stats.repairable_devices + stats.dead_devices === 0) && this.canedit && event.finished
     },
     rowClass(item) {
       // This gets called to supply a class for the tr of the table.  We want to highlight the rows where we are

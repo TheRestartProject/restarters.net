@@ -20,7 +20,9 @@ class JoinEventTest extends TestCase
     {
         $this->withoutExceptionHandling();
 
-        $group = factory(Group::class)->create();
+        $group = factory(Group::class)->create([
+                                                   'wordpress_post_id' => '99999'
+                                               ]);
         $event = factory(Party::class)->create(['group' => $group->idgroups]);
 
         $user = factory(User::class)->states('Restarter')->create();
@@ -36,6 +38,7 @@ class JoinEventTest extends TestCase
         // Should now show attendance on the event page.
         $response = $this->get('/party/view/'.$event->idevents);
         $this->assertVueProperties($response, [
+            [],
             [
                 ':is-attending' => 'true',
             ],
@@ -45,9 +48,19 @@ class JoinEventTest extends TestCase
         $this->followingRedirects();
         $response = $this->get('/party/cancel-invite/'.$event->idevents);
         $this->assertVueProperties($response, [
+            [],
             [
                 ':is-attending' => 'false',
             ],
         ]);
+    }
+
+    public function testJoinInvalid() {
+        $user = factory(User::class)->states('Restarter')->create();
+        $this->actingAs($user);
+
+        $response = $this->get('/party/join/-1');
+        $response->assertSessionHas('danger');
+        $this->assertTrue($response->isRedirection());
     }
 }

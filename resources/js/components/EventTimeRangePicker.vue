@@ -7,6 +7,7 @@
         v-model="currentStartTime"
         :class="{ hasError: hasError, 'mr-1': true, time: true }"
         placeholder="--:--"
+        @blur="changeCurrentStartTime"
     />
     <b-form-input
         size="lg"
@@ -15,6 +16,7 @@
         v-model="currentEndTime"
         :class="{ hasError: hasError, 'ml-1': true, time: true }"
         placeholder="--:--"
+        @blur="changeCurrentEndTime"
     />
   </div>
 </template>
@@ -60,6 +62,9 @@ export default {
         if (newVal) {
           if (newVal >= this.currentStartTime) {
             this.currentEndTime = newVal.substring(0, 5)
+            this.$nextTick(() => {
+              this.$emit('update:end', this.currentEndTime)
+            })
           } else {
             // We prevent end times before start times.  This is slightly clunky - we can't seem to update the
             // value in timepicker while it's open, so trigger a re-render by changing the key.
@@ -71,12 +76,6 @@ export default {
         }
       },
       immediate: true
-    },
-    currentStartTime(newVal) {
-      this.$emit('update:start', newVal)
-    },
-    currentEndTime(newVal) {
-      this.$emit('update:end', newVal)
     },
     currentPickerStartTime(newVal) {
       // Trim seconds
@@ -108,9 +107,18 @@ export default {
           var mins = timeParts[1]
 
           this.currentEndTime = hours + ':' + mins
+          this.$nextTick(() => {
+            this.$emit('update:end', this.currentEndTime)
+          })
         }
       }
-    }
+    },
+    changeCurrentStartTime() {
+      this.$emit('update:start', this.currentStartTime)
+    },
+    changeCurrentEndTime() {
+      this.$emit('update:end', this.currentEndTime)
+    },
   }
 }
 </script>

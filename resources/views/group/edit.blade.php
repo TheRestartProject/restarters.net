@@ -19,7 +19,7 @@
         <div class="col-12 col-md-12">
             <div class="d-flex align-items-center">
                 <h1 class="mb-0 mr-30">
-                    Editing <a style="text-decoration:underline;color:black" href="/group/view/{{ $formdata->idgroups }}">{{{ $formdata->name }}}</a>
+                    @lang('groups.editing') <a style="text-decoration:underline;color:black" href="/group/view/{{ $formdata->idgroups }}">{{{ $formdata->name }}}</a>
                 </h1>
             </div>
         </div>
@@ -81,7 +81,7 @@
                 <div class="form-group">
                   <label for="grp_about">@lang('groups.groups_about_group'):</label>
                   <div class="vue">
-                    <RichTextEditor name="free_text" :initial-value="{{ json_encode($formdata->free_text, JSON_INVALID_UTF8_IGNORE) }}" />
+                    <RichTextEditor name="free_text" :value="{{ json_encode($formdata->free_text, JSON_INVALID_UTF8_IGNORE) }}" />
                   </div>
                 </div>
               </div>
@@ -96,7 +96,7 @@
                         <div class="col-lg-7">
                           <div class="form-group">
                             <label for="autocomplete">@lang('groups.location'):</label>
-                            <input type="text" placeholder="Enter your address" id="autocomplete" name="location" class="form-control field field-geolocate" aria-describedby="locationHelpBlock" value="{{ $formdata->location }}" />
+                            <input type="text" placeholder="@lang('groups.groups_location_placeholder')" id="autocomplete" name="location" class="form-control field field-geolocate" aria-describedby="locationHelpBlock" value="{{ $formdata->location }}" />
 
                             <small id="locationHelpBlock" class="form-text text-muted">
                               @lang('groups.groups_location_small')

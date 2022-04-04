@@ -34,6 +34,38 @@ export default {
     set({commit}, params) {
       commit('set', params);
     },
+    async add({ commit, dispatch, rootGetters }, params) {
+      const apiToken = rootGetters['auth/apiToken']
+
+      await axios.put('/api/events/' + params.idevents + '/volunteers', {
+        api_token: apiToken,
+        user: params.user,
+        full_name: params.full_name,
+        volunteer_email_address: params.volunteer_email_address
+      })
+
+      await dispatch('attendance/fetch', {
+        idevents: params.idevents
+      })
+    },
+    async fetch({ commit, rootGetters }, params) {
+      const apiToken = rootGetters['auth/apiToken']
+
+      let ret = await axios.get('/api/events/' + params.idevents + '/volunteers', {
+        params: {
+          api_token: apiToken
+        }
+      })
+
+      if (ret && ret.data && ret.data.success) {
+        commit('set', {
+          idevents: params.idevents,
+          attendees: ret.data.volunteers
+        })
+      } else {
+        throw "Server request failed"
+      }
+    },
     async remove({commit, rootGetters}, params) {
       let ret = await axios.post('/party/remove-volunteer', {
         id: params.id
@@ -46,7 +78,7 @@ export default {
       if (ret && ret.data && ret.data.success) {
         commit('remove', params.id)
       } else {
-        throw new Exception("Server request failed")
+        throw "Server request failed"
       }
     }
   },

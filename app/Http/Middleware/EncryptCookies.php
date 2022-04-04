@@ -30,5 +30,6 @@ class EncryptCookies extends Middleware
         'wiki_dev_mw_UserID',
         'wiki_dev_mw_UserName',
         'authenticated',
+        'restarters_apitoken'
     ];
 }

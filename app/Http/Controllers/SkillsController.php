@@ -2,10 +2,10 @@
 
 namespace App\Http\Controllers;
 
+use App\Helpers\Fixometer;
 use App\Skills;
 use App\UsersSkills;
 use Auth;
-use App\Helpers\Fixometer;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Redirect;
 
@@ -33,7 +33,6 @@ class SkillsController extends Controller
 
         $skill = Skills::create([
         'skill_name'  => $request->input('skill_name'),
-        // 'category'    => $request->input('category'),
         'description' => $request->input('skill_desc'),
         ]);
 

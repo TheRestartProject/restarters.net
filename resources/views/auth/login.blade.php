@@ -8,7 +8,7 @@
         <div class="row row-expanded pb-3">
             <div class="col-lg-6 d-flex">
 
-                <form action="{{ route('login') }}" method="post" class="card card__login col-12 panel">
+                <form id="login-form" action="{{ route('login') }}" method="post" class="card card__login col-12 panel">
 
                     @if (\Session::has('success'))
                         <div class="alert alert-success">
@@ -60,7 +60,7 @@
 
                         </div>
                         <div class="col-6 col-md-4 align-content-center flex-column justify-content-end d-flex">
-                            <button type="submit" class="btn btn-primary">@lang('auth.login')</button>
+                            <button id="login-form-submit" type="submit" class="btn btn-primary">@lang('auth.login')</button>
                         </div>
                     </div>
 

@@ -87,7 +87,7 @@
 
                 <div class="form-group">
                     <label for="categories_desc">@lang('admin.description'):</label>
-                    <textarea name="categories_desc" id="categories_desc" class="form-control field textarea-large"></textarea>
+                    <textarea name="categories_desc" id="categories_desc" class="form-control field textarea-large">{{ $category->description_short }}</textarea>
                 </div>
                 <div class="button-group row">
                     <div class="col-lg-12 d-flex align-items-center justify-content-end">

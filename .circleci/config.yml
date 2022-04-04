@@ -9,7 +9,7 @@ dependencies:
 jobs:
   build:
     docker:
-      - image: cimg/php:7.4-node
+      - image: cimg/php:7.4.11-node
         name: restarters.test
         environment:
           - DB_CONNECTION: mysql
@@ -18,6 +18,7 @@ jobs:
           - DB_DATABASE: restarters_db
           - DB_USERNAME: restarters
           - DB_PASSWORD: s3cr3t
+          - TZ: "UTC"
       - image: circleci/mysql:5.7.33
         environment:
           # You can connect once ssh'd in using  mysql -u root -p -h 127.0.0.1
@@ -28,15 +29,46 @@ jobs:
       - image: mcr.microsoft.com/playwright:focal
         environment:
           NODE_ENV: development
+          TZ: "UTC"
+      - image: 'bitnami/mariadb:latest'
+        name: mariadb
+        environment:
+          - ALLOW_EMPTY_PASSWORD=yes
+          - MARIADB_USER=bn_mediawiki
+          - MARIADB_DATABASE=bitnami_mediawiki
+      - image: 'bitnami/mediawiki:1'
+        name: mediawiki
+        labels:
+          kompose.service.type: nodeport
+        environment:
+          - MARIADB_HOST=mariadb
+          - MARIADB_PORT_NUMBER=3306
+          - MEDIAWIKI_DATABASE_USER=bn_mediawiki
+          - MEDIAWIKI_DATABASE_NAME=bitnami_mediawiki
+          - ALLOW_EMPTY_PASSWORD=yes
+          - MEDIAWIKI_EXTERNAL_HTTP_PORT_NUMBER=8080
+          - MEDIAWIKI_HOST=mediawiki
+          - TZ: "UTC"
+        depends_on:
+          - mariadb
     steps:
       - checkout
       - run: sudo apt update
       - run: sudo apt install openssl zip unzip git libxml2-dev libzip-dev zlib1g-dev libcurl4-openssl-dev iputils-ping default-mysql-client vim libpng-dev libgmp-dev libjpeg-turbo8-dev
-      - run: sudo apt-get install php7.4-xmlrpc php7.4-intl php7.4-xdebug
+      - run: sudo apt-get install php7.4-xmlrpc php7.4-intl php7.4-xdebug php7.4-xmlrpc php7.4-mbstring php7.4-simplexml php7.4-curl php7.4-zip python
       - run: cp .env.example .env
 
       # We don't have Discourse on CircleCI.
       - run: sed -i 's/FEATURE__DISCOURSE_INTEGRATION=.*$/FEATURE__DISCOURSE_INTEGRATION=false/g' .env
+
+      # ...but we do have Mediawiki.
+      - run: sed -i 's/FEATURE__WIKI_INTEGRATION=.*$/FEATURE__WIKI_INTEGRATION=true/g' .env
+      - run: sed -i 's/WIKI_URL=.*$/WIKI_URL=http:\/\/mediawiki:8080/g' .env
+      - run: sed -i 's/WIKI_DB=.*$/WIKI_DB=bitnami_mediawiki/g' .env
+      - run: sed -i 's/WIKI_USER=.*$/WIKI_USER=user/g' .env
+      - run: sed -i 's/WIKI_PASSWORD=.*$/WIKI_PASSWORD=bitnami123/g' .env
+      - run: sed -i 's/WIKI_APIUSER=.*$/WIKI_APIUSER=user/g' .env
+      - run: sed -i 's/WIKI_APIPASSWORD=.*$/WIKI_APIPASSWORD=bitnami123/g' .env
 
       # Playwright needs the debug bar not to appear
       - run: sed -i 's/APP_DEBUG=.*$/APP_DEBUG=FALSE/g' .env
@@ -47,7 +79,7 @@ jobs:
       # ...and needs honeypot rate-limiting needs to be turned off.
       - run: sed -i 's/HONEYPOT_DISABLE=.*$/HONEYPOT_DISABLE=TRUE/g' .env
 
-      - run: wget https://getcomposer.org/composer-1.phar; rm -rf vendor; php composer-1.phar install
+      - run: wget https://getcomposer.org/composer-1.phar; rm -rf vendor; php7.4 composer-1.phar install
       - run: npm install
       - run: npx playwright install
       - run: npx playwright install-deps
@@ -57,6 +89,7 @@ jobs:
       - run: php artisan migrate
 
       - run: wget -O phpunit https://phar.phpunit.de/phpunit-7.phar ; chmod +x phpunit
+      - run: mkdir uploads
 
       - run: export XDEBUG_MODE=coverage;./phpunit -d memory_limit=512M --bootstrap vendor/autoload.php -dxdebug.coverage_enable=1 --coverage-clover tests/clover.xml --configuration ./phpunit.xml
 
@@ -64,7 +97,9 @@ jobs:
       - run: mkdir build; mkdir build/logs; php vendor/bin/php-coveralls -v -x tests/clover.xml
 
       # Run the Playwright tests.
-      - run: echo "User::create(['name'=>'Jane Bloggs','email'=>'jane@bloggs.net','password'=>Hash::make('passw0rd'),'role'=>2,'consent_past_data'=>'2021-01-01','consent_future_data'=>'2021-01-01','consent_gdpr'=>'2021-01-01']);" | php artisan tinker
+      # Ignore the return code from the tinker; the user might exist from the phpunit tests.  If it doesn't and
+      # the create fails, the tests will fail too.
+      - run: echo "App\User::create(['name'=>'Jane Bloggs','email'=>'jane@bloggs.net','password'=>Hash::make('passw0rd'),'role'=>2,'consent_past_data'=>'2021-01-01','consent_future_data'=>'2021-01-01','consent_gdpr'=>'2021-01-01']);" | php artisan tinker || true
       - run: export NODE_OPTIONS=--max-old-space-size=8192;  npm rebuild node-sass; npm run prod
       - run: npx playwright install
       - run: npx playwright test

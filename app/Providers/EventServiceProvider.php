@@ -51,6 +51,7 @@ class EventServiceProvider extends ServiceProvider
 
         \App\Events\ApproveGroup::class => [
             \App\Listeners\CreateWordpressPostForGroup::class,
+            \App\Listeners\CreateDiscourseGroupForGroup::class,
         ],
 
         \App\Events\EditGroup::class => [

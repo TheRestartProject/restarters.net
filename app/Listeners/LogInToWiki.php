@@ -16,6 +16,10 @@ use Mediawiki\Api\Service\UserCreator;
 
 class LogInToWiki
 {
+    // We use the Laravel hashed password as the mediawiki password.  This means we can log in to the wiki
+    // if we need to, which we wouldn't always be able to do if we used the original password (for example
+    // during password reset).  It also avoids Mediawiki complaining about the password being a common one.
+
     protected $wikiUserCreator;
 
     /**
@@ -39,25 +43,26 @@ class LogInToWiki
     {
         $user = $event->user;
 
-        // TODO: for all of this we need to move to restarters.net being the auth provider for Mediawiki.
-        // This is currently a workaround.
+
 
         if ($user->wiki_sync_status == WikiSyncStatus::CreateAtLogin) {
-            $this->createUserInWiki($user, $this->request->input('password'));
+            Log::info("Need to create " . $user->name);
+            $this->createUserInWiki($user);
+            $user->refresh();
         }
 
         if (! is_null($user->mediawiki) && ! empty($user->mediawiki) &&
             $user->wiki_sync_status == WikiSyncStatus::Created) {
-            $this->logUserIn($user->mediawiki, $this->request->input('password'));
+            $this->logUserIn($user);
         }
     }
 
-    protected function createUserInWiki($user, $password)
+    protected function createUserInWiki($user)
     {
         try {
             // Mediawiki does strange things with underscores.
             $mediawikiUsername = str_replace('_', '-', $user->username);
-            $this->wikiUserCreator->create($mediawikiUsername, $password, $user->email);
+            $this->wikiUserCreator->create($mediawikiUsername, $user->password, $user->email);
 
             $user->wiki_sync_status = WikiSyncStatus::Created;
             $user->mediawiki = $mediawikiUsername;
@@ -67,11 +72,13 @@ class LogInToWiki
         }
     }
 
-    protected function logUserIn($wikiUsername, $password)
+    protected function logUserIn($user)
     {
         try {
+            Log::info("Log in to wiki $user->mediawiki");
             $api = MediawikiApi::newFromApiEndpoint(env('WIKI_URL').'/api.php');
-            $api->login(new ApiUser($wikiUsername, $password));
+            $api->login(new ApiUser($user->mediawiki, $user->password));
+            Log::info("Logged in to wiki $user->mediawiki");
 
             // NGM: it appears that right from the beginning MediawikiApi->getClient access modifier was changed
             // in our vendor folder from private to public in order to access the underlying client for the cookies.
@@ -86,7 +93,7 @@ class LogInToWiki
                 }
             }
         } catch (\Exception $ex) {
-            Log::error("Failed to log user '".$wikiUsername."' in to mediawiki: ".$ex->getMessage());
+            Log::error("Failed to log user '".$user->mediawiki."' in to mediawiki: ".$ex->getMessage());
         }
     }
 }

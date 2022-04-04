@@ -23,7 +23,6 @@ class Device extends Model implements Auditable
 
     use \OwenIt\Auditing\Auditable;
     protected $table = 'devices';
-    public $displacement = 0.5;
     protected $primaryKey = 'iddevices';
     /**
      * The attributes that are mass assignable.
@@ -65,74 +64,7 @@ class Device extends Model implements Auditable
 
     public static function getDisplacementFactor()
     {
-        return env('DISPLACEMENT_VALUE');
-    }
-
-    public function getList($params = null)
-    {
-        //Tested!
-        $sql = 'SELECT * FROM `view_devices_list`';
-
-        if (! is_null($params)) {
-            $sql .= ' WHERE 1=1 AND ';
-
-            $params = array_filter($params);
-            foreach ($params as $field => $value) {
-                if ($field == 'brand' || $field == 'model' || $field == 'problem') {
-                    $params[$field] = '%'.strtolower($value).'%';
-                } elseif ($field == 'event_date') {
-                    $params[$field] = implode(' AND ', $value);
-                }
-            }
-
-            $clauses = [];
-
-            foreach ($params as $f => $v) {
-                if ($f == 'event_date') {
-                    $clauses[] = 'event_date BETWEEN '.$v;
-                }
-                if ($f == 'category' || $f == 'group') {
-                    $clauses[] = 'id'.$f.' IN ('.$v.')';
-                } elseif ($f == 'brand' || $f == 'model' || $f == 'problem') {
-                    $clauses[] = $f.' LIKE :'.$f;
-                }
-            }
-
-            $sql .= implode(' AND ', $clauses);
-        }
-
-        $sql .= ' ORDER BY `sorter` DESC';
-
-        if (! empty($params) && array_key_exists('event_date', $params)) {
-            unset($params['event_date']);
-        }
-
-        if ($params != null) {
-            return DB::select(DB::raw($sql), $params);
-        }
-
-        return DB::select(DB::raw($sql));
-    }
-
-    public function getWeights($group = null)
-    {
-        $emissionRatio = \App\Helpers\FootprintRatioCalculator::calculateRatio();
-
-        $sql = "SELECT
-sum(case when (devices.category = 46) then (devices.estimate + 0.0) else categories.weight end) as `total_weights`,
-sum(case when (categories.powered = 1) then (case when (devices.category = 46) then (devices.estimate + 0.0) else categories.weight end) else 0 end) as ewaste,
-sum(case when (categories.powered = 0) then devices.estimate + 0.0 else 0 end) as unpowered_waste,
-sum(case when (devices.category = 46) then (devices.estimate + 0.0) * $emissionRatio else (categories.footprint * $this->displacement) end) as `total_footprints`
-FROM devices, categories, events
-WHERE devices.category = categories.idcategories
-AND devices.repair_status = 1
-AND devices.event = events.idevents";
-
-        if (! is_null($group) && is_numeric($group)) {
-            $sql .= " AND events.group = $group";
-        }
-
-        return DB::select(DB::raw($sql));
+        return \App\Helpers\LcaStats::getDisplacementFactor();
     }
 
     public function ofThisUser($id)
@@ -186,7 +118,7 @@ AND devices.event = events.idevents";
             $sql .= ' AND `group` = :g ';
         }
         if (! is_null($year) && is_numeric($year)) {
-            $sql .= ' AND YEAR(`event_date`) = :year ';
+            $sql .= ' AND YEAR(`event_start_utc`) = :year ';
         }
 
         $sql .= ' GROUP BY `status`';
@@ -235,7 +167,7 @@ AND devices.event = events.idevents";
             $sql .= ' AND `e`.`group` = :group ';
         }
         if (! is_null($year)) {
-            $sql .= ' AND YEAR(`e`.`event_date`) = :year ';
+            $sql .= ' AND YEAR(`e`.`event_start_utc`) = :year ';
         }
 
         $sql .= ' GROUP BY `repair_status`
@@ -264,7 +196,7 @@ AND devices.event = events.idevents";
                     ON `d`.`event` = `e`.`idevents`
                 INNER JOIN `categories` AS `c`
                     ON `d`.`category` = `c`.`idcategories`
-                WHERE 1=1 and `c`.`powered` = 1 AND `c`.`idcategories` <> '.env('MISC_CATEGORY_ID');
+                WHERE 1=1 and `c`.`powered` = 1 AND `c`.`idcategories` <> '.env('MISC_CATEGORY_ID_POWERED');
 
         if (! is_null($status) && is_numeric($status)) {
             $sql .= ' AND `d`.`repair_status` = :status ';
@@ -370,7 +302,7 @@ AND devices.event = events.idevents";
                     `repair_status`,
                     `spare_parts`,
                     `e`.`location`,
-                    UNIX_TIMESTAMP( CONCAT(`e`.`event_date`, " ", `e`.`start`) ) AS `event_timestamp`,
+                    UNIX_TIMESTAMP(event_start_utc) AS `event_timestamp`,
                     `g`.`name` AS `group_name`
 
                 FROM `devices` AS `d`
@@ -413,47 +345,75 @@ AND devices.event = events.idevents";
         return $this->belongsToMany(\App\Barrier::class, 'devices_barriers', 'device_id', 'barrier_id');
     }
 
-    public function co2Diverted($emissionRatio, $displacementFactor)
+    /**
+     * Powered estimate only takes precedence over category weight when Misc and if not 0.
+     */
+    public function eCo2Diverted($emissionRatio, $displacementFactor)
     {
         $footprint = 0;
 
-        if ($this->isFixed() && $this->deviceCategory->isPowered()) {
-            if ($this->deviceCategory->isMiscPowered()) {
-                if (is_numeric($this->estimate)) {
-                    $footprint = $this->estimate * $emissionRatio;
-                }
+        if ($this->isFixed()) {
+            if ($this->deviceCategory->isMiscPowered() && $this->estimate > 0) {
+                $footprint = $this->estimate * $emissionRatio;
             } else {
-                $footprint = (float) $this->deviceCategory->footprint;
+                $footprint = $this->deviceCategory->footprint;
             }
         }
 
         return $footprint * $displacementFactor;
     }
 
-    public function ewasteDiverted()
+    /**
+     * Unpowered estimate always takes precedence over category weight unless is is 0.
+     *
+     */
+    public function uCo2Diverted($emissionRatio, $displacementFactor)
+    {
+        $footprint = 0;
+
+        if ($this->isFixed()) {
+            if ($this->estimate > 0) {
+                $footprint = ($this->estimate * $emissionRatio);
+            } else {
+                $footprint = $this->deviceCategory->footprint;
+            }
+        }
+
+        return $footprint * $displacementFactor;
+    }
+
+    /**
+     * Powered estimate only takes precedence over category weight when Misc and if not 0.
+     *
+     */
+    public function eWasteDiverted()
     {
         $ewasteDiverted = 0;
 
         if ($this->isFixed() && $this->deviceCategory->isPowered()) {
-            if ($this->deviceCategory->isMiscPowered()) {
-                if (is_numeric($this->estimate)) {
-                    $ewasteDiverted = $this->estimate;
-                }
+            if ($this->deviceCategory->isMiscPowered() && $this->estimate > 0) {
+                $ewasteDiverted = $this->estimate;
             } else {
-                $ewasteDiverted = (float) $this->deviceCategory->weight;
+                $ewasteDiverted = $this->deviceCategory->weight;
             }
         }
 
         return $ewasteDiverted;
     }
 
-    public function unpoweredWasteDiverted()
+    /**
+     * Unpowered estimate always takes precedence over category weight unless it is 0.
+     *
+     */
+    public function uWasteDiverted()
     {
         $wasteDiverted = 0;
 
         if ($this->isFixed() && $this->deviceCategory->isUnpowered()) {
-            if (is_numeric($this->estimate)) {
+            if ($this->estimate > 0) {
                 $wasteDiverted = $this->estimate;
+            } else {
+                $wasteDiverted = $this->deviceCategory->weight;
             }
         }
 

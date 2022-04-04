@@ -3,7 +3,9 @@
 namespace App\Http\Controllers\API;
 
 use App\Group;
+use App\Helpers\Fixometer;
 use App\Http\Controllers\Controller;
+use App\Party;
 use Auth;
 use Illuminate\Http\Request;
 
@@ -39,23 +41,6 @@ class GroupController extends Controller
         return response()->json($groupChanges);
     }
 
-    /**
-     * To provide a more uniform API, this is just a wrapper around
-     * the method in the GroupController for now.
-     *
-     * That method should be moved out of the controller.
-     */
-    public static function getGroupsByUserGroupTag(Request $request)
-    {
-        $authenticatedUser = Auth::user();
-
-        $groupController = new \App\Http\Controllers\GroupController();
-
-        $groups = $groupController->getGroupsByKey($request, $authenticatedUser->api_token);
-
-        return response()->json($groups);
-    }
-
     public static function getGroupsByUsersNetworks(Request $request)
     {
         $authenticatedUser = Auth::user();
@@ -85,7 +70,7 @@ class GroupController extends Controller
 
         foreach ($groups as $group) {
             // If we have a bounding box, check that the group is within it.
-            if (!$bbox || (
+            if (! $bbox || (
                 $group->latitude !== null && $group->longitude !== null &&
                 $group->latitude >= $minLat && $group->latitude <= $maxLat &&
                 $group->longitude >= $minLng && $group->longitude <= $maxLng
@@ -109,11 +94,11 @@ class GroupController extends Controller
                                       'upcoming_parties' => $upcoming_parties_collection = collect([]),
                                       'past_parties' => $past_parties_collection = collect([]),
                                       'impact' => [
-                                          'volunteers' => $groupStats['pax'],
-                                          'hours_volunteered' => $groupStats['hours'],
+                                        'volunteers' => $groupStats['participants'],
+                                        'hours_volunteered' => $groupStats['hours_volunteered'],
                                           'parties_thrown' => $groupStats['parties'],
-                                          'waste_prevented' => $groupStats['waste'],
-                                          'co2_emissions_prevented' => $groupStats['co2'],
+                                          'waste_prevented' => round($groupStats['waste_total']),
+                                          'co2_emissions_prevented' => round($groupStats['co2_total']),
                                       ],
                                       'widgets' => [
                                           'headline_stats' => url("/group/stats/{$group->idgroups}"),
@@ -127,11 +112,11 @@ class GroupController extends Controller
                 foreach ($group->upcomingParties() as $event) {
                     $upcoming_parties_collection->push([
                                                            'event_id' => $event->idevents,
-                                                           'event_date' => $event->event_date,
-                                                           'start_time' => $event->start,
-                                                           'end_time' => $event->end,
+                                                           'event_date' => $event->event_date_local,
+                                                           'start_time' => $event->start_local,
+                                                           'end_time' => $event->end_local,
                                                            'name' => $event->venue,
-// TODO Once DOT-1502 is released                                                           'link' => $event->link,
+                                                           'link' => $event->link,
                                                            'online' => $event->online,
                                                            'description' => $event->free_text,
                                                            'location' => [
@@ -147,11 +132,11 @@ class GroupController extends Controller
                 foreach ($group->pastParties() as $key => $event) {
                     $past_parties_collection->push([
                                                        'event_id' => $event->idevents,
-                                                       'event_date' => $event->event_date,
-                                                       'start_time' => $event->start,
-                                                       'end_time' => $event->end,
+                                                       'event_date' => $event->event_date_local,
+                                                       'start_time' => $event->start_local,
+                                                       'end_time' => $event->end_local,
                                                        'name' => $event->venue,
-// TODO Once DOT-1502 is released                                                       'link' => $event->link,
+                                                       'link' => $event->link,
                                                        'online' => $event->online,
                                                        'description' => $event->free_text,
                                                        'location' => [
@@ -221,7 +206,7 @@ class GroupController extends Controller
     {
         $group = $group->load('parties');
 
-        $events = $group->parties->sortByDesc('event_date');
+        $events = $group->parties->sortByDesc('event_start_utc');
 
         if ($request->has('format') && $request->input('format') == 'location') {
             $events = $events->map(function ($event) {
@@ -235,5 +220,33 @@ class GroupController extends Controller
         return response()->json([
             'events' => $events->values()->toJson(),
         ]);
+    }
+
+    public function listVolunteers(Request $request, $idgroups) {
+        $group = Group::findOrFail($idgroups);
+
+        // Get the user that the API has been authenticated as.
+        $user = auth('api')->user();
+
+        if (!$user || !Fixometer::userHasEditGroupPermission($idgroups, $user->id)) {
+            // We require host permissions to view the list of volunteers.  At the moment this call is only used when
+            // adding volunteers, and this check means we don't have to worry about exposing sensitive data.
+            abort(403);
+        }
+
+        $volunteers = $group->allConfirmedVolunteers()->get();
+
+        $ret = [];
+
+        foreach ($volunteers as $v) {
+            $volunteer = $v->volunteer;
+            $ret[] = [
+                'id' => $volunteer->id,
+                'name' => $volunteer->name,
+                'email'=> $volunteer->email
+            ];
+        }
+
+        return response()->json($ret);
     }
 }

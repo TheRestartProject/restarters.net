@@ -2,11 +2,12 @@
 
 namespace App\Http\Controllers;
 
+use App\Helpers\Fixometer;
+use App\Providers\RouteServiceProvider;
 use App\Role;
 use App\RolePermissions;
 use App\User;
 use Auth;
-use App\Helpers\Fixometer;
 use Illuminate\Http\Request;
 
 class RoleController extends Controller
@@ -28,18 +29,20 @@ class RoleController extends Controller
               'roleList' => $Role->findAll(),
             ]);
         }
+
+        return redirect(RouteServiceProvider::HOME);
     }
 
-    public function edit($id)
+    public function edit($id, Request $request)
     {
         $user = Auth::user();
 
         if (Fixometer::hasRole($user, 'Administrator')) {
             $role = Role::where('idroles', $id)->first();
 
-            if ($_SERVER['REQUEST_METHOD'] == 'POST' && ! empty($_POST)) {
-                $permissions = $_POST['permissions'];
-                $formid = (int) substr(strrchr($_POST['formId'], '_'), 1);
+            if ($request->getMethod() == 'POST') {
+                $permissions = $request->get('permissions');
+                $formid = (int) substr(strrchr($request->get('formId'), '_'), 1);
 
                 $update = $role->edit($formid, $permissions);
                 if (! $update) {
@@ -69,9 +72,4 @@ class RoleController extends Controller
             ]);
         }
     }
-
-    // public function test() {
-    //   $r = new Role;
-    //   dd($r->permissions());//NB::findAll on Role isn't working
-    // }
 }

@@ -21,8 +21,8 @@
                         @lang('reporting.time_volunteered')
                     </h1>
 
-                    @if( App\Helpers\Fixometer::userCanCreateEvents(Auth::user()) )
-                    <a href="/export/time-volunteered?{{ $_SERVER['QUERY_STRING'] }}" class="btn btn-primary ml-auto">
+                    @if( FixometerHelper::userCanCreateEvents(Auth::user()) )
+                    <a href="/export/time-volunteered?{{ $query }}" class="btn btn-primary ml-auto">
                         <span class="d-lg-block">@lang('reporting.export_csv')</span>
                     </a>
                     @endif
@@ -31,7 +31,7 @@
         </div>
 
         <div class="row">
-            @if (App\Helpers\Fixometer::hasRole($user, 'Administrator') || App\Helpers\Fixometer::hasRole($user, 'Host'))
+            @if (FixometerHelper::hasRole($user, 'Administrator') || FixometerHelper::hasRole($user, 'Host'))
             <div class="col-lg-3">
 
                 <form id="filter-result" action="/reporting/time-volunteered/search" method="get">
@@ -81,7 +81,7 @@
                             <div class="form-control form-control__select">
                                 <select id="age_range" name="year" class="select2">
                                     <option value="">@lang('reporting.placeholder_age_range')</option>
-                                    @foreach(App\Helpers\Fixometer::allAges(true) as $years => $range)
+                                    @foreach(FixometerHelper::allAges(true) as $years => $range)
                                     @if(isset($age) && $age == $years)
                                     <option value="{{ $years }}" selected>{{ $range }}</option>
                                     @else
@@ -112,7 +112,7 @@
                             <div class="form-control form-control__select">
                                 <select id="country" name="country" class="field select2">
                                     <option value="">Choose country</option>
-                                    @foreach (App\Helpers\Fixometer::getAllCountries() as $country_code => $country_name)
+                                    @foreach (FixometerHelper::getAllCountries() as $country_code => $country_name)
                                     @if (isset($country) && $country_code == $country)
                                     <option value="{{ $country_code }}" selected>{{ $country_name }}</option>
                                     @else
@@ -196,7 +196,7 @@
                                         @foreach($country_hours_completed as $country_hours)
                                         <tr>
                                             @if(!is_null($country_hours->country))
-                                            <td>{{ App\Helpers\Fixometer::getCountryFromCountryCode($country_hours->country) }}</td>
+                                            <td>{{ FixometerHelper::getCountryFromCountryCode($country_hours->country) }}</td>
                                             @else
                                             <td>N/A</td>
                                             @endif

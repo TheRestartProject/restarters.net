@@ -10,8 +10,7 @@ class Search extends Model
 {
     public function parties($list = [], $groups = [], $from = null, $to = null, $group_tags = null, $allowedParties = null)
     {
-        $eventsQuery = Party::pastEvents()
-                     ->with('devices.deviceCategory')
+        $eventsQuery = Party::past()
                      ->leftJoin('grouptags_groups as gtag', 'events.group', 'gtag.group');
 
         if (! empty($list)) {
@@ -23,11 +22,11 @@ class Search extends Model
         }
 
         if (! is_null($from)) {
-            $eventsQuery->whereRaw('UNIX_TIMESTAMP(event_date) >= '.$from);
+            $eventsQuery->where('event_start_utc', '>=', date('Y-m-d H:i:s', $from));
         }
 
         if (! is_null($to)) {
-            $eventsQuery->whereRaw('UNIX_TIMESTAMP(event_date) <= '.$to);
+            $eventsQuery->where('event_end_utc', '<=', date('Y-m-d H:i:s', $to));
         }
 
         if (! is_null($group_tags)) {
@@ -39,9 +38,10 @@ class Search extends Model
         }
 
         $eventsQuery->groupBy('events.idevents');
-        $eventsQuery->orderBy('events.event_date', 'desc');
+        $eventsQuery->orderBy('events.event_start_utc', 'desc');
 
-        return $eventsQuery->get();
+        // We need to explicitly select what we want to return otherwise gtag.group might overwrite events.group.
+        return $eventsQuery->select(['events.*', 'gtag.group_tag'])->get();
     }
 
     public function deviceStatusCount($parties)

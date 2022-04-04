@@ -59,7 +59,7 @@ class CreateDiscourseThreadForEvent
             // See https://meta.discourse.org/t/private-message-send-api/27593/21.
             $params = [
                 'raw' => $theParty->free_text,
-                'title' => $theParty->venue.' '.$theParty->event_date,
+                'title' => $theParty->venue.' '.$theParty->event_date_local,
                 'target_usernames' => $host->username,
                 'archetype' => 'private_message',
             ];
@@ -78,18 +78,18 @@ class CreateDiscourseThreadForEvent
             Log::info('Response status: '.$response->getStatusCode());
             Log::info('Response body: '.$response->getBody());
 
-            // We want to save the discourse thread id in the event, so that we can invite people to it later
-            // when they RSVP.
-            $json = json_decode($response->getBody(), true);
-            if (empty($json['topic_id'])) {
-                throw new \Exception('Topic id not found in create response');
-            }
-
-            $theParty->discourse_thread = $json['topic_id'];
-            $theParty->save();
-
             if (! $response->getStatusCode() === 200) {
                 Log::error('Could not create event ('.$partyId.') thread: '.$response->getReasonPhrase());
+            } else {
+                // We want to save the discourse thread id in the event, so that we can invite people to it later
+                // when they RSVP.
+                $json = json_decode($response->getBody(), true);
+                if (empty($json['topic_id'])) {
+                    throw new \Exception('Topic id not found in create response');
+                }
+
+                $theParty->discourse_thread = $json['topic_id'];
+                $theParty->save();
             }
         } catch (\Exception $ex) {
             Log::error('Could not create event ('.$partyId.') thread: '.$ex->getMessage());

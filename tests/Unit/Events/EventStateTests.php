@@ -3,12 +3,12 @@
 namespace Tests\Unit;
 
 use App\Group;
+use App\Helpers\Fixometer;
 use App\Network;
 use App\Party;
 use App\User;
 use Carbon\Carbon;
 use DB;
-use App\Helpers\Fixometer;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Foundation\Testing\WithFaker;
 use Tests\TestCase;
@@ -28,9 +28,8 @@ class EventStateTests extends TestCase
     {
         // arrange
         $event = factory(Party::class)->create();
-        $event->event_date = Carbon::now()->toDateString();
-        $event->start = Carbon::now()->addHours(-1)->toTimeString();
-        $event->end = Carbon::now()->addHours(2)->toTimeString();
+        $event->event_start_utc = Carbon::now()->addHours(-1)->toIso8601String();
+        $event->event_end_utc = Carbon::now()->addHours(2)->toIso8601String();
 
         // assert
         $this->assertTrue($event->isInProgress());
@@ -41,25 +40,8 @@ class EventStateTests extends TestCase
     {
         // arrange
         $event = factory(Party::class)->create();
-        $event->event_date = Carbon::now()->toDateString();
-        $event->start = Carbon::now()->toTimeString();
-        $event->end = Carbon::now()->addHours(3)->toTimeString();
-
-        // assert
-        $this->assertTrue($event->isInProgress());
-    }
-
-    // This is just temporary for Repair Together, until we have
-    // proper timezone support.
-
-    /** @test */
-    public function it_is_active_an_hour_before_the_start_time()
-    {
-        // arrange
-        $event = factory(Party::class)->create();
-        $event->event_date = Carbon::now()->toDateString();
-        $event->start = Carbon::now()->addHours(1)->toTimeString();
-        $event->end = Carbon::now()->addHours(4)->toTimeString();
+        $event->event_start_utc = Carbon::now()->toIso8601String();
+        $event->event_end_utc = Carbon::now()->addHours(3)->toIso8601String();
 
         // assert
         $this->assertTrue($event->isInProgress());

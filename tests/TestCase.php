@@ -6,15 +6,20 @@ use App\Audits;
 use App\Brands;
 use App\Category;
 use App\Device;
+use App\DeviceBarrier;
 use App\EventsUsers;
 use App\Group;
 use App\GroupNetwork;
 use App\GroupTags;
+use App\Images;
 use App\Network;
 use App\Party;
 use App\Role;
+use App\Skills;
+use App\UsersSkills;
 use App\User;
 use App\UserGroups;
+use App\Xref;
 use Auth;
 use Carbon\Carbon;
 use DB;
@@ -41,18 +46,36 @@ abstract class TestCase extends BaseTestCase
         User::truncate();
         Audits::truncate();
         EventsUsers::truncate();
-        Party::truncate();
         UserGroups::truncate();
+        DeviceBarrier::truncate();
         Device::truncate();
+        Party::truncate();
         GroupNetwork::truncate();
         Category::truncate();
         Brands::truncate();
         GroupTags::truncate();
+        Xref::truncate();
+        Images::truncate();
+        UsersSkills::truncate();
+        Skills::truncate();
         DB::statement('delete from audits');
         DB::delete('delete from user_network');
         DB::delete('delete from grouptags_groups');
         DB::table('notifications')->truncate();
         DB::statement('SET foreign_key_checks=1');
+
+        // Set up random auto increment values.  This avoids tests working because everything is 1.
+        $tables = DB::select('SHOW TABLES');
+        foreach ($tables as $table)
+        {
+            foreach ($table as $field => $tablename) {
+                try {
+                    // This will throw an exception if the table doesn't have auto increment.
+                    DB::update("ALTER TABLE $tablename AUTO_INCREMENT = " . rand(1, 1000) . ";");
+                } catch (\Exception $e) {
+                }
+            }
+        }
 
         $network = new Network();
         $network->name = 'Restarters';
@@ -71,13 +94,20 @@ abstract class TestCase extends BaseTestCase
         factory(Category::class, 1)->states('Mobile')->create();
         factory(Category::class, 1)->states('Misc')->create();
         factory(Category::class, 1)->states('Desktop computer')->create();
+
+        // We manipulate some globals for image upload testing.
+        \FixometerFile::$uploadTesting = FALSE;
+
+        if (isset($_FILES)) {
+            unset($_FILES);
+        }
     }
 
     public function userAttributes()
     {
         // Return a test user.
         $userAttributes = [];
-        $userAttributes['name'] = 'Test'.$this->userCount++;
+        $userAttributes['name'] = 'Test'.uniqid($this->userCount++, true);
         $userAttributes['email'] = $userAttributes['name'].'@restarters.dev';
         $userAttributes['age'] = '1982';
         $userAttributes['country'] = 'GBR';
@@ -95,6 +125,7 @@ abstract class TestCase extends BaseTestCase
     public function loginAsTestUser($role = Role::RESTARTER)
     {
         // This is testing the external interface, whereas actingAs() wouldn't be.
+        Auth::logout();
         $response = $this->post('/user/register/', $this->userAttributes($role));
 
         $response->assertStatus(302);
@@ -104,7 +135,7 @@ abstract class TestCase extends BaseTestCase
         Auth::user()->role = $role;
     }
 
-    public function createGroup($name = 'Test Group', $website = 'https://therestartproject.org', $location = 'London', $text = 'Some text.', $assert = true)
+    public function createGroup($name = 'Test Group', $website = 'https://therestartproject.org', $location = 'London', $text = 'Some text.', $assert = true, $approve = true)
     {
         $idgroups = null;
 
@@ -112,7 +143,7 @@ abstract class TestCase extends BaseTestCase
             'name' => $name.$this->groupCount++,
             'website' => $website,
             'location' => $location,
-            'free_text' => $text
+            'free_text' => $text,
         ]);
 
         if ($assert) {
@@ -121,9 +152,18 @@ abstract class TestCase extends BaseTestCase
             $this->assertNotFalse(strpos($redirectTo, '/group/edit'));
             $p = strrpos($redirectTo, '/');
             $idgroups = substr($redirectTo, $p + 1);
-            $group = Group::find($idgroups);
-            $group->wordpress_post_id = '99999';
-            $group->save();
+
+            if ($approve) {
+                $group = Group::find($idgroups);
+                $group->wordpress_post_id = '99999';
+                $group->save();
+            }
+
+            // Currently logged in user should be present, with status 1 = approved.
+            $member = UserGroups::where('group', $idgroups)->first();
+            $this->assertEquals(1, $member->status);
+            $this->assertEquals(3, $member->role);
+            $this->assertEquals(Auth::user()->id, $member->user);
         }
 
         return $idgroups;
@@ -135,9 +175,17 @@ abstract class TestCase extends BaseTestCase
         $eventAttributes = factory(Party::class)->raw();
         $eventAttributes['group'] = $idgroups;
 
-        $eventAttributes['event_date'] = date('Y-m-d', strtotime($date));
+        $event_date_time = Carbon::createFromTimestamp(strtotime($date))->setTimezone('UTC');
+
+        $eventAttributes['event_start_utc'] = $event_date_time->toIso8601String();
+        $eventAttributes['event_end_utc'] = $event_date_time->toIso8601String();
 
         $response = $this->post('/party/create/', $eventAttributes);
+
+        // Need to reformat start/end for row comparison.
+        $eventAttributes['event_start_utc'] = $event_date_time->toDateTimeString();
+        $eventAttributes['event_end_utc'] = $event_date_time->toDateTimeString();
+
         $this->assertDatabaseHas('events', $eventAttributes);
         $redirectTo = $response->getTargetUrl();
         $p = strrpos($redirectTo, '/');
@@ -201,18 +249,21 @@ abstract class TestCase extends BaseTestCase
 
     private function canonicalise($val)
     {
-        // Sinple code to filter out timestamps.
+        // Sinple code to filter out timestamps or other random values.
         if ($val && is_string($val)) {
             $val = preg_replace('/"created_at":".*"/', '"created_at":"TIMESTAMP"', $val);
             $val = preg_replace('/"updated_at":".*"/', '"updated_at":"TIMESTAMP"', $val);
+            $val = preg_replace('/"shareable_code":".*"/', '"shareable_code":"SHARECODE"', $val);
         }
 
         return $val;
     }
 
-    private function isJson2($string) {
+    private function isJson2($string)
+    {
         // We have our own version because the PHPUnit one returns TRUE for a simple string.
         json_decode($string);
+
         return json_last_error() === JSON_ERROR_NONE;
     }
 
@@ -253,11 +304,5 @@ abstract class TestCase extends BaseTestCase
         $this->assertTrue($foundSome);
 
         return $props;
-    }
-
-    public function setDiscourseTestEnvironment()
-    {
-        // TODO I feel this isn't really necessary.
-        config(['restarters.features.discourse_integration' => true]);
     }
 }

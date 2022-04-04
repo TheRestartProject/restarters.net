@@ -8,7 +8,7 @@ use App\Group;
 use App\GroupTags;
 use App\GrouptagsGroups;
 use App\Helpers\Fixometer;
-use App\Helpers\FootprintRatioCalculator;
+use App\Helpers\SearchHelper;
 use App\Search;
 use App\UserGroups;
 use Auth;
@@ -25,15 +25,19 @@ class ExportController extends Controller
         $host = parse_url(\Request::server('HTTP_REFERER'), PHP_URL_HOST);
 
         $all_devices = Device::with([
-                                        'deviceCategory',
-                                        'deviceEvent',
-                                    ])
-        ->join('events', 'events.idevents', '=', 'devices.event')
-        ->join('groups', 'groups.idgroups', '=', 'events.group')
-        ->select('devices.*', 'groups.name AS group_name')->get();
+            'deviceCategory',
+            'deviceEvent',
+        ])
+            ->join('events', 'events.idevents', '=', 'devices.event')
+            ->join('groups', 'groups.idgroups', '=', 'events.group')
+            ->select('devices.*', 'groups.name AS group_name')->get();
+
+        $displacementFactor = \App\Device::getDisplacementFactor();
+        $eEmissionRatio = \App\Helpers\LcaStats::getEmissionRatioPowered();
+        $uEmissionratio = \App\Helpers\LcaStats::getEmissionRatioUnpowered();
 
         // Create CSV
-        $filename = 'devices.csv';
+        $filename = base_path() . DIRECTORY_SEPARATOR . 'public' . DIRECTORY_SEPARATOR . 'devices.csv';
         $file = fopen($filename, 'w+');
 
         // Do not include model column
@@ -47,11 +51,26 @@ class ExportController extends Controller
                 'Event',
                 'Group',
                 'Date',
+                'Waste Prevented',
+                'CO2 Prevented',
             ];
 
             fputcsv($file, $columns);
 
             foreach ($all_devices as $device) {
+                $wasteImpact = 0;
+                $co2Diverted = 0;
+
+                if ($device->isFixed()) {
+                    if ($device->deviceCategory->powered) {
+                        $wasteImpact = $device->eWasteDiverted();
+                        $co2Diverted = $device->eCo2Diverted($eEmissionRatio, $displacementFactor);
+                    } else {
+                        $wasteImpact = $device->uWasteDiverted();
+                        $co2Diverted = $device->uCo2Diverted($uEmissionratio, $displacementFactor);
+                    }
+                }
+
                 fputcsv($file, [
                     $device->deviceCategory->name,
                     $device->brand,
@@ -60,7 +79,9 @@ class ExportController extends Controller
                     $device->getSpareParts(),
                     $device->deviceEvent->getEventName(),
                     $device->deviceEvent->theGroup->name,
-                    $device->deviceEvent->getEventDate('Y-m-d'),
+                    $device->deviceEvent->getFormattedLocalStart('Y-m-d'),
+                    $wasteImpact,
+                    $co2Diverted
                 ]);
             }
         } else {
@@ -74,11 +95,26 @@ class ExportController extends Controller
                 'Event',
                 'Group',
                 'Date',
+                'Waste Prevented',
+                'CO2 Prevented',
             ];
 
             fputcsv($file, $columns);
 
             foreach ($all_devices as $device) {
+                $wasteImpact = 0;
+                $co2Diverted = 0;
+
+                if ($device->isFixed()) {
+                    if ($device->deviceCategory->powered) {
+                        $wasteImpact = $device->eWasteDiverted();
+                        $co2Diverted = $device->eCo2Diverted($eEmissionRatio, $displacementFactor);
+                    } else {
+                        $wasteImpact = $device->uWasteDiverted();
+                        $co2Diverted = $device->uCo2Diverted($uEmissionratio, $displacementFactor);
+                    }
+                }
+
                 fputcsv($file, [
                     $device->deviceCategory->name,
                     $device->brand,
@@ -88,7 +124,9 @@ class ExportController extends Controller
                     $device->getSpareParts(),
                     $device->deviceEvent->getEventName(),
                     $device->deviceEvent->theGroup->name,
-                    $device->deviceEvent->getEventDate('Y-m-d'),
+                    $device->deviceEvent->getFormattedLocalStart('Y-m-d'),
+                    $wasteImpact,
+                    $co2Diverted,
                 ]);
             }
         }
@@ -103,151 +141,82 @@ class ExportController extends Controller
     }
 
     /**
-     * Folder /public must be writable.
-     * Example URL: http://restarters.test/export/parties?fltr=1&groups[]=1.
+     * @return \Illuminate\Http\Response
      */
-    public function parties()
+    public function parties(Request $request)
     {
-        $Device = new Device;
-        $Search = new Search;
-        unset($_GET['url']);
-        if (isset($_GET['fltr']) && ! empty($_GET['fltr'])) {
-            $searched_groups = null;
-            $searched_parties = null;
-            $toTimeStamp = null;
-            $fromTimeStamp = null;
-            $group_tags = null;
+        if ($request->has('fltr') && ! empty($request->input('fltr'))) {
+            $dropdowns = SearchHelper::getUserGroupsAndParties();
+            $filters = SearchHelper::getSearchFilters($request);
 
-            /* collect params **/
-            if (isset($_GET['groups'])) {
-                $searched_groups = filter_var_array($_GET['groups'], FILTER_SANITIZE_NUMBER_INT);
-            }
-            if (isset($_GET['parties'])) {
-                $searched_parties = filter_var_array($_GET['parties'], FILTER_SANITIZE_NUMBER_INT);
-            }
+            $Search = new Search;
+            $PartyList = $Search->parties(
+                $filters['searched_parties'],
+                $filters['searched_groups'],
+                $filters['from_date'],
+                $filters['to_date'],
+                $filters['group_tags'],
+                $dropdowns['allowed_parties']
+            );
 
-            if (isset($_GET['from-date']) && ! empty($_GET['from-date'])) {
-                if (! DateTime::createFromFormat('Y-m-d', $_GET['from-date'])) {
-                    $response['danger'] = 'Invalid "from date"';
-                    $fromTimeStamp = null;
-                } else {
-                    $fromDate = DateTime::createFromFormat('Y-m-d', $_GET['from-date']);
-                    $fromTimeStamp = strtotime($fromDate->format('Y-m-d'));
-                }
-            }
+            if (count($PartyList) > 0) {
 
-            if (isset($_GET['to-date']) && ! empty($_GET['to-date'])) {
-                if (! DateTime::createFromFormat('Y-m-d', $_GET['to-date'])) {
-                    $response['danger'] = 'Invalid "to date"';
-                } else {
-                    $toDate = DateTime::createFromFormat('Y-m-d', $_GET['to-date']);
-                    $toTimeStamp = strtotime($toDate->format('Y-m-d'));
-                }
-            }
+                // prepare the column headers
+                $statsKeys = array_keys(\App\Party::getEventStatsArrayKeys());
+                array_walk($statsKeys, function (&$k) {
+                    $key = explode('_', $k);
+                    array_walk($key, function (&$v) {
+                        $v = str_replace('Waste', 'Weight', str_replace('Co2', 'CO2', ucfirst($v)));
+                    });
+                    $k = implode(' ', $key);
+                });
+                $headers = array_merge(['Date', 'Venue', 'Group'], $statsKeys);
 
-            if (isset($_GET['group_tags']) && is_array($_GET['group_tags'])) {
-                $group_tags = $_GET['group_tags'];
-            }
+                // Send these to getEventStats() to speed things up a bit.
+                $eEmissionRatio = \App\Helpers\LcaStats::getEmissionRatioPowered();
+                $uEmissionratio = \App\Helpers\LcaStats::getEmissionRatioUnpowered();
 
-            $PartyList = $Search->parties($searched_parties, $searched_groups, $fromTimeStamp, $toTimeStamp, $group_tags);
-            $PartyArray = [];
-            $need_attention = 0;
+                // prepare the column values
+                $PartyArray = [];
+                foreach ($PartyList as $i => $party) {
+                    $stats = $party->getEventStats($eEmissionRatio, $uEmissionratio);
+                    array_walk($stats, function (&$v) {
+                        $v = round($v);
+                    });
 
-            $participants = 0;
-            $hours_volunteered = 0;
-            $totalCO2 = 0;
-
-            $emissionRatio = FootprintRatioCalculator::calculateRatio();
-
-            foreach ($PartyList as $i => $party) {
-                if ($party->device_count == 0) {
-                    $need_attention++;
+                    $PartyArray[$i] = [
+                        $party->getFormattedLocalStart(),
+                        $party->getEventName(),
+                        $party->theGroup && $party->theGroup->name ? $party->theGroup->name : '?',
+                    ];
+                    $PartyArray[$i] += $stats;
                 }
 
-                $partyIds[] = $party->idevents;
+                // write content to file
+                $filename = 'parties.csv';
 
-                $party->co2 = 0;
-                $party->weight = 0;
-                $party->fixed_devices = 0;
-                $party->repairable_devices = 0;
-                $party->dead_devices = 0;
-                $party->guesstimates = false;
+                $file = fopen($filename, 'w+');
+                fputcsv($file, $headers);
 
-                $participants += $party->pax;
-                $party->hours_volunteered = $party->hoursVolunteered();
-                $hours_volunteered += $party->hours_volunteered;
-
-                foreach ($party->devices as $device) {
-                    switch ($device->repair_status) {
-                        case 1:
-                            $party->co2 += $device->co2Diverted($emissionRatio, $Device->getDisplacementFactor());
-                            $party->fixed_devices++;
-                            $party->weight += $device->ewasteDiverted();
-
-                            break;
-                        case 2:
-                            $party->repairable_devices++;
-
-                            break;
-                        case 3:
-                            $party->dead_devices++;
-                            break;
-                        default:
-                            break;
-                    }
-                    if ($device->category == 46) {
-                        $party->guesstimates = true;
-                    }
+                foreach ($PartyArray as $d) {
+                    fputcsv($file, $d);
                 }
+                fclose($file);
 
-                $totalCO2 += $party->co2;
-
-                $partyName = ! is_null($party->venue) ? $party->venue : $party->location;
-                $groupName = $party->name; // because of the way the join in the query works
-                $PartyArray[$i] = [
-                    date('d/m/Y', strtotime($party->event_date)),
-                    $partyName,
-                    $groupName,
-                    ($party->pax > 0 ? $party->pax : 0),
-                    ($party->volunteers > 0 ? $party->volunteers : 0),
-                    ($party->co2 > 0 ? round($party->co2, 2) : 0),
-                    ($party->weight > 0 ? round($party->weight, 2) : 0),
-                    ($party->fixed_devices > 0 ? $party->fixed_devices : 0),
-                    ($party->repairable_devices > 0 ? $party->repairable_devices : 0),
-                    ($party->dead_devices > 0 ? $party->dead_devices : 0),
-                    ($party->hours_volunteered > 0 ? $party->hours_volunteered : 0),
+                $headers = [
+                    'Content-Type' => 'text/csv',
                 ];
+
+                return Response::download($filename, $filename, $headers);
             }
-
-            /** lets format the array **/
-            $columns = [
-                'Date', 'Venue', 'Group', 'Participants', 'Volunteers', 'CO2 (kg)', 'Weight (kg)', 'Fixed', 'Repairable', 'Dead', 'Hours Volunteered',
-            ];
-
-            $filename = 'parties.csv';
-
-            $file = fopen($filename, 'w+');
-            fputcsv($file, $columns);
-
-            foreach ($PartyArray as $d) {
-                fputcsv($file, $d);
-            }
-            fclose($file);
-
-            $headers = [
-                'Content-Type' => 'text/csv',
-            ];
-
-            return Response::download($filename, $filename, $headers);
+            // }
         }
-        $data = ['No data to return'];
 
         return view('export.parties', [
-            'data' => $data,
+            'data' => ['No data to return'],
         ]);
     }
 
-    // TODO: why is this in ExportController?
     public function getTimeVolunteered(Request $request, $search = null, $export = false)
     {
         $user = Auth::user();
@@ -268,9 +237,9 @@ class ExportController extends Controller
         //See whether it is a get search or index page
         if (is_null($search)) {
             $user_events = EventsUsers::join('users', 'events_users.user', 'users.id')
-                             ->join('events', 'events_users.event', 'events.idevents')
-                                ->join('groups', 'events.group', 'groups.idgroups')
-                                  ->whereNotNull('events_users.user');
+                ->join('events', 'events_users.event', 'events.idevents')
+                ->join('groups', 'events.group', 'groups.idgroups')
+                ->whereNotNull('events_users.user');
 
             if (Fixometer::hasRole($user, 'Host')) {
                 $user_events = $user_events->whereIn('groups.idgroups', $host_groups);
@@ -282,13 +251,13 @@ class ExportController extends Controller
             //Anonymous
             if ($request->input('misc') !== null && $request->input('misc') == 1) {
                 $user_events = EventsUsers::leftJoin('users', 'events_users.user', 'users.id')
-                                 ->join('events', 'events_users.event', 'events.idevents')
-                                    ->join('groups', 'events.group', 'groups.idgroups');
+                    ->join('events', 'events_users.event', 'events.idevents')
+                    ->join('groups', 'events.group', 'groups.idgroups');
             } else {
                 $user_events = EventsUsers::join('users', 'events_users.user', 'users.id')
-                                 ->join('events', 'events_users.event', 'events.idevents')
-                                    ->join('groups', 'events.group', 'groups.idgroups')
-                                      ->whereNotNull('events_users.user');
+                    ->join('events', 'events_users.event', 'events.idevents')
+                    ->join('groups', 'events.group', 'groups.idgroups')
+                    ->whereNotNull('events_users.user');
             }
 
             if (Fixometer::hasRole($user, 'Host')) {
@@ -325,13 +294,16 @@ class ExportController extends Controller
             }
 
             //By date
+            // This is only used by admins and therefore the dates can be assumed to be in UTC.
             if ($request->input('from_date') !== null && $request->input('to_date') == null) {
-                $user_events = $user_events->whereDate('events.event_date', '>', $request->input('from_date'));
+                $user_events = $user_events->whereDate('events.event_start_utc', '>', $request->input('from_date'));
             } elseif ($request->input('to_date') !== null && $request->input('from_date') == null) {
-                $user_events = $user_events->whereDate('events.event_date', '<', $request->input('to_date'));
+                $user_events = $user_events->whereDate('events.event_end_utc', '<', $request->input('to_date'));
             } elseif ($request->input('to_date') !== null && $request->input('from_date') !== null) {
-                $user_events = $user_events->whereBetween('events.event_date', [$request->input('from_date'),
-                    $request->input('to_date'), ]);
+                $user_events = $user_events->whereBetween('events.event_start_utc', [
+                    $request->input('from_date'),
+                    $request->input('to_date'),
+                ]);
             }
 
             //By location
@@ -381,31 +353,33 @@ class ExportController extends Controller
 
         //hours completed
         $hours_completed = clone $user_events;
-        $hours_completed = substr($hours_completed->sum(DB::raw('TIMEDIFF(end, start)')), 0, -4);
+        $hours_completed = substr($hours_completed->sum(DB::raw('TIMEDIFF(event_start_utc, event_end_utc)')), 0, -4);
 
         //country hours completed
         $country_hours_completed = clone $user_events;
-        $country_hours_completed = $country_hours_completed->groupBy('users.country')->select('users.country', DB::raw('SUM(TIMEDIFF(end, start)) as event_hours'));
+        $country_hours_completed = $country_hours_completed->groupBy('users.country')->select('users.country', DB::raw('SUM(TIMEDIFF(event_start_utc, event_end_utc)) as event_hours'));
         $all_country_hours_completed = $country_hours_completed->orderBy('event_hours', 'DESC')->get();
         $country_hours_completed = $country_hours_completed->orderBy('event_hours', 'DESC')->take(5)->get();
 
         //city hours completed
         $city_hours_completed = clone $user_events;
-        $city_hours_completed = $city_hours_completed->groupBy('users.location')->select('users.location', DB::raw('SUM(TIMEDIFF(end, start)) as event_hours'));
+        $city_hours_completed = $city_hours_completed->groupBy('users.location')->select('users.location', DB::raw('SUM(TIMEDIFF(event_start_utc, event_end_utc)) as event_hours'));
         $all_city_hours_completed = $city_hours_completed->orderBy('event_hours', 'DESC')->get();
         $city_hours_completed = $city_hours_completed->orderBy('event_hours', 'DESC')->take(5)->get();
 
-        //order by users id
-        $user_events = $user_events->orderBy('events.event_date', 'DESC');
+        //order by event date.
+        $user_events = $user_events->orderBy('events.event_start_utc', 'DESC');
 
         //Select all necessary information for table
+        //
+        // This is only used by Admins, and therefore we can assume that they are in UTC and return times accordingly.
         $user_events = $user_events->select(
             'users.id',
             'users.name as username',
             'events.idevents',
-            'events.start',
-            'events.end',
-            'events.event_date',
+            \DB::raw('TIME(events.event_start_utc) AS start'),
+            \DB::raw('TIME(events.event_end_utc) AS end'),
+            \DB::raw('DATE(events.event_start_utc) AS event_date'),
             'events.location',
             'events.venue',
             'groups.name as groupname'
@@ -442,6 +416,7 @@ class ExportController extends Controller
                 'all_country_hours_completed' => $all_country_hours_completed,
                 'city_hours_completed' => $city_hours_completed,
                 'all_city_hours_completed' => $all_city_hours_completed,
+                'query' => str_replace($request->url(), '',$request->fullUrl())
             ]);
         }
 
@@ -460,9 +435,8 @@ class ExportController extends Controller
         ];
     }
 
-    public function exportTimeVolunteered(Request $request)
-    {
-        if (! empty($request->all())) {
+    public function exportTimeVolunteered(Request $request) {
+        if (!empty($request->all())) {
             $data = $this->getTimeVolunteered($request, true, true);
         } else {
             $data = $this->getTimeVolunteered($request, null, true);
@@ -471,60 +445,59 @@ class ExportController extends Controller
         //Creat new file and set headers
         $file_name = 'time_reporting.csv';
         $file = fopen($file_name, 'w+');
-        $file_headers = [
-            'Content-type' => 'text/csv',
-        ];
+        $file_headers = array(
+            "Content-type" => "text/csv",
+        );
 
         //Put stats in csv
-        $stats_headers = ['Hours Volunteered', 'Average age', 'Number of groups', 'Total number of users', 'Number of anonymous users'];
-        fputcsv($file, ['Overall Stats:']);
+        $stats_headers = array('Hours Volunteered', 'Average age', 'Number of groups', 'Total number of users', 'Number of anonymous users');
+        fputcsv($file, array('Overall Stats:'));
         fputcsv($file, $stats_headers);
-        fputcsv($file, [$data['hours_completed'], $data['average_age'], $data['group_count'], $data['total_users'], $data['anonymous_users']]);
-        fputcsv($file, []);
+        fputcsv($file, array(number_format($data['hours_completed'], 0, '.', ','), 'N/A', $data['group_count'], $data['total_users'], $data['anonymous_users']));
+        fputcsv($file, array());
 
         //Put breakdown by country in csv
-        $country_headers = ['Country name', 'Total hours'];
-        fputcsv($file, ['Breakdown by country:']);
+        $country_headers = array('Country name', 'Total hours');
+        fputcsv($file, array('Breakdown by country:'));
         fputcsv($file, $country_headers);
-        foreach ($data['country_hours_completed'] as $country_hours) {
-            if (! is_null($country_hours->country)) {
+        foreach($data['country_hours_completed'] as $country_hours) {
+            if(!is_null($country_hours->country)) {
                 $country = $country_hours->country;
             } else {
                 $country = 'N/A';
             }
-            fputcsv($file, [$country, substr($country_hours->event_hours, 0, -4)]);
+            fputcsv($file, array($country, number_format($country_hours->hours/60/60, 0, '.', ',')));
         }
-        fputcsv($file, []);
+        fputcsv($file, array());
 
         //Put breakdown by city in csv
-        $city_headers = ['Town/city name', 'Total hours'];
-        fputcsv($file, ['Breakdown by city:']);
+        $city_headers = array('Town/city name', 'Total hours');
+        fputcsv($file, array('Breakdown by city:'));
         fputcsv($file, $city_headers);
-        foreach ($data['city_hours_completed'] as $city_hours) {
-            if (! is_null($city_hours->location)) {
+        foreach($data['city_hours_completed'] as $city_hours) {
+            if(!is_null($city_hours->location)) {
                 $city = $city_hours->location;
             } else {
                 $city = 'N/A';
             }
-            fputcsv($file, [$city, substr($city_hours->event_hours, 0, -4)]);
+            fputcsv($file, array($city, number_format($city_hours->hours/60/60, 0, '.', ',')));
         }
-        fputcsv($file, []);
+        fputcsv($file, array());
 
         //Put users in csv
-        $users_headers = ['#', 'Hours', 'Event date', 'Restart group', 'Location'];
-        fputcsv($file, ['Results:']);
+        $users_headers = array('#', 'Hours', 'Event date', 'Restart group', 'Location');
+        fputcsv($file, array('Results:'));
         fputcsv($file, $users_headers);
-        foreach ($data['user_events'] as $ue) {
-            $start_time = new DateTime($ue->start);
-            $diff = $start_time->diff(new DateTime($ue->end));
-            fputcsv($file, [$ue->idevents, $diff->h.'.'.sprintf('%02d', $diff->i / 60 * 100),
-                date('d/m/Y', strtotime($ue->event_date)), $ue->groupname, $ue->location, ]);
+        foreach($data['user_events'] as $ue) {
+            fputcsv($file, array($ue->id, date('H:i', strtotime($ue->end) - strtotime($ue->start)),
+                date('d/m/Y', strtotime($ue->event_date)), $ue->groupname, $ue->location));
         }
-        fputcsv($file, []);
+        fputcsv($file, array());
 
         //close file
         fclose($file);
 
         return Response::download($file_name, $file_name, $file_headers);
+
     }
 }

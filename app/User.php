@@ -13,6 +13,7 @@ use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Illuminate\Support\Str;
 use OwenIt\Auditing\Contracts\Auditable;
+use Illuminate\Contracts\Translation\HasLocalePreference;
 
 class WikiSyncStatus
 {
@@ -21,7 +22,7 @@ class WikiSyncStatus
     const Created = 2;
 }
 
-class User extends Authenticatable implements Auditable
+class User extends Authenticatable implements Auditable, HasLocalePreference
 {
     use Notifiable;
     use SoftDeletes;
@@ -124,7 +125,7 @@ class User extends Authenticatable implements Auditable
      * @param int $numberOfGroups How many groups to return
      * @param string String of minimum creation date
      */
-    public function groupsNearby($numberOfGroups = 10, $createdSince = NULL, $nearby = self::NEARBY_KM)
+    public function groupsNearby($numberOfGroups = 10, $createdSince = null, $nearby = self::NEARBY_KM)
     {
         if (is_null($this->latitude) || is_null($this->longitude)) {
             return [];
@@ -132,7 +133,7 @@ class User extends Authenticatable implements Auditable
 
         $groupsNearbyQuery = Group::select(
             DB::raw('*, ( 6371 * acos( cos( radians('.$this->latitude.') ) * cos( radians( latitude ) ) * cos( radians( longitude ) - radians('.$this->longitude.') ) + sin( radians('.$this->latitude.') ) * sin( radians( latitude ) ) ) ) AS dist')
-        )->leftJoin('grouptags_groups', function($join) {
+        )->leftJoin('grouptags_groups', function ($join) {
             // Exclude any groups tagged with the special value of 10, which is 'Inactive'.
             $join->on('group', '=', 'idgroups');
             $join->on('group_tag', '=', DB::raw(GroupTags::INACTIVE));
@@ -289,7 +290,6 @@ class User extends Authenticatable implements Auditable
 
     public function inGroup($group)
     {
-        //Tested!
         return DB::select(DB::raw('SELECT
                     users.id AS id,
                     users.name,
@@ -395,17 +395,7 @@ class User extends Authenticatable implements Auditable
             return false;
         }
 
-        try {
-            $client = app('discourse-client');
-            $emailToSearchFor = urlencode(trim($this->email));
-            $endpoint = sprintf('/admin/users/list/all.json?email=%s', $emailToSearchFor);
-            $response = $client->request('GET', $endpoint);
-            $discourseResult = json_decode($response->getBody());
-
-            return count($discourseResult) >= 1;
-        } catch (\Exception $ex) {
-            return false;
-        }
+        return $this->username != NULL;
     }
 
     /**
@@ -609,5 +599,18 @@ class User extends Authenticatable implements Auditable
         }
 
         return $api_token;
+    }
+
+    /**
+     * Get the user's preferred locale.  This is automatically used by email notifications.
+     *
+     * @return string
+     */
+    public function preferredLocale()
+    {
+        // TODO Use of preferredLocale should mean we don't have to explicitly pass the locale.  But that isn't
+        // working.  So at the moment we are passing a locale explicitly in the translations in the notifications
+        // to users (not admins).
+        return $this->language;
     }
 }

@@ -2,15 +2,18 @@
 
 namespace App;
 
-use App\Device;
+use App\Events\ApproveEvent;
 use App\EventUsers;
 use App\Helpers\Fixometer;
+use App\Notifications\NotifyRestartersOfNewEvent;
+use App\Notifications\EventConfirmed;
 use Auth;
 use Carbon\Carbon;
 use DB;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Support\Str;
+use Notification;
 use OwenIt\Auditing\Contracts\Auditable;
 
 class Party extends Model implements Auditable
@@ -22,9 +25,8 @@ class Party extends Model implements Auditable
     protected $primaryKey = 'idevents';
     protected $fillable = [
         'group',
-        'event_date',
-        'start',
-        'end',
+        'event_start_utc',
+        'event_end_utc',
         'venue',
         'location',
         'latitude',
@@ -40,22 +42,23 @@ class Party extends Model implements Auditable
         'online',
         'discourse_thread',
         'devices_updated_at',
-        'link'
+        'link',
+        'timezone',
+        'user_id'
     ];
     protected $hidden = ['created_at', 'updated_at', 'deleted_at', 'frequency', 'group', 'group', 'user_id', 'wordpress_post_id', 'cancelled', 'devices_updated_at'];
 
     // Append data to Model
-    protected $appends = ['participants', 'ShareableLink'];
+    protected $appends = ['participants', 'ShareableLink', 'event_date_local', 'start_local', 'end_local'];
 
     //Getters
     public function findAll()
     {
-        //Tested
         return DB::select(DB::raw('SELECT
                     `e`.`idevents` AS `id`,
-                    UNIX_TIMESTAMP( CONCAT(`e`.`event_date`, " ", `e`.`start`) ) AS `event_timestamp`,
-                    `e`.`start` AS `start`,
-                    `e`.`end` AS `end`,
+                    UNIX_TIMESTAMP(`event_start_utc`) AS `event_timestamp`,
+                    TIME(CONVERT_TZ(`event_start_utc`, \'GMT\', `e`.`timezone`)) AS `start`,
+                    TIME(CONVERT_TZ(`event_end_utc`, \'GMT\', `e`.`timezone`)) AS `end`,
                     `e`.`venue`,
                     `e`.`link`,
                     `e`.`location`,
@@ -72,17 +75,17 @@ class Party extends Model implements Auditable
                 FROM `events` AS `e`
                 INNER JOIN `groups` AS `g`
                     ON `g`.`idgroups` = `e`.`group`
-                ORDER BY `e`.`start` DESC'));
+                ORDER BY `e`.`event_start_utc` DESC'));
     }
 
     public function findAllSearchable()
     {
-        //Tested
+        // TODO Can this be replaced by Party::past?
         return DB::select(DB::raw('SELECT
                     `e`.`idevents` AS `id`,
-                    UNIX_TIMESTAMP( CONCAT(`e`.`event_date`, " ", `e`.`start`) ) AS `event_timestamp`,
-                    `e`.`start` AS `start`,
-                    `e`.`end` AS `end`,
+                    UNIX_TIMESTAMP(`event_start_utc`) AS `event_timestamp`,
+                    TIME(CONVERT_TZ(`event_start_utc`, \'GMT\', `e`.`timezone`)) AS `start`,
+                    TIME(CONVERT_TZ(`event_end_utc`, \'GMT\', `e`.`timezone`)) AS `end`,
                     `e`.`venue`,
                     `e`.`link`,
                     `e`.`location`,
@@ -97,20 +100,19 @@ class Party extends Model implements Auditable
                 FROM `events` AS `e`
                 INNER JOIN `groups` AS `g`
                     ON `g`.`idgroups` = `e`.`group`
-                WHERE `event_date` <= NOW()
-                ORDER BY `e`.`event_date` DESC'));
+                WHERE `event_end_utc` < NOW()
+                ORDER BY `e`.`event_start_utc` DESC'));
     }
 
     public function findThis($id, $devices = false)
     {
-        //Tested however with devices = true doesn't work
         $sql = 'SELECT
                     `e`.`idevents` AS `id`,
-                    UNIX_TIMESTAMP( CONCAT(`e`.`event_date`, " ", `e`.`start`) ) AS `event_date` ,
-                    UNIX_TIMESTAMP( CONCAT(`e`.`event_date`, " ", `e`.`start`) ) AS `event_timestamp`,
-                    UNIX_TIMESTAMP( CONCAT(`e`.`event_date`, " ", `e`.`end`) ) AS `event_end_timestamp`,
-                    `e`.`start` AS `start`,
-                    `e`.`end` AS `end`,
+                    UNIX_TIMESTAMP(`event_start_utc`) AS `event_date` ,
+                    UNIX_TIMESTAMP(`event_start_utc`) AS `event_timestamp`,
+                    UNIX_TIMESTAMP(`event_end_utc`) AS `event_end_timestamp`,
+                    TIME(CONVERT_TZ(`event_start_utc`, \'GMT\', `e`.`timezone`)) AS `start`,
+                    TIME(CONVERT_TZ(`event_end_utc`, \'GMT\', `e`.`timezone`)) AS `end`,
                     `e`.`venue`,
                     `e`.`link`,
                     `e`.`location`,
@@ -131,7 +133,7 @@ class Party extends Model implements Auditable
                 INNER JOIN `groups` AS `g`
                     ON `g`.`idgroups` = `e`.`group`
                 WHERE `e`.`idevents` = :id
-                ORDER BY `e`.`start` DESC';
+                ORDER BY `e`.`event_start_utc` DESC';
 
         $party = DB::select(DB::raw($sql), ['id' => $id]);
 
@@ -167,7 +169,7 @@ class Party extends Model implements Auditable
     public function ofThisUser($id, $only_past = false, $devices = false)
     {
         //Tested
-        $sql = 'SELECT *, `e`.`venue` AS `venue`, `e`.`link` AS `link`, `e`.`location` as `location`, UNIX_TIMESTAMP( CONCAT(`e`.`event_date`, " ", `e`.`start`) ) AS `event_timestamp`
+        $sql = 'SELECT *, `e`.`venue` AS `venue`, `e`.`link` AS `link`, `e`.`location` as `location`, UNIX_TIMESTAMP(`event_start_utc`) AS `event_timestamp`
                 FROM `'.$this->table.'` AS `e`
                 INNER JOIN `events_users` AS `eu` ON `eu`.`event` = `e`.`idevents`
                 INNER JOIN `groups` as `g` ON `e`.`group` = `g`.`idgroups`
@@ -178,9 +180,9 @@ class Party extends Model implements Auditable
                 ) AS `d` ON `d`.`event` = `e`.`idevents`
                 WHERE `eu`.`user` = :id';
         if ($only_past) {
-            $sql .= ' AND `e`.`event_date` < NOW()';
+            $sql .= ' AND `e`.`event_end_utc` < NOW()';
         }
-        $sql .= ' ORDER BY `e`.`event_date` DESC';
+        $sql .= ' ORDER BY `e`.`event_start_utc` DESC';
 
         try {
             $parties = DB::select(DB::raw($sql), ['id' => $id]);
@@ -205,10 +207,7 @@ class Party extends Model implements Auditable
                     *,
 	`e`.`venue` AS `venue`, `e`.`link` AS `link`, `e`.`location` as `location`,
                     `g`.`name` AS group_name,
-
-
-                    UNIX_TIMESTAMP( CONCAT(`e`.`event_date`, " ", `e`.`start`) ) AS `event_timestamp`
-
+                    UNIX_TIMESTAMP(e.`event_start_utc`) ) AS `event_timestamp`
                 FROM `'.$this->table.'` AS `e`
 
                     INNER JOIN `groups` as `g` ON `e`.`group` = `g`.`idgroups`
@@ -218,16 +217,15 @@ class Party extends Model implements Auditable
                         FROM `devices` AS `dv`
                         GROUP BY  `dv`.`event`
                     ) AS `d` ON `d`.`event` = `e`.`idevents` ';
-        //UNIX_TIMESTAMP( CONCAT(`e`.`event_date`, " ", `e`.`start`) )
         if (is_numeric($group) && $group != 'admin') {
             $sql .= ' WHERE `e`.`group` = :id ';
         }
 
         if ($only_past) {
-            $sql .= ' AND TIMESTAMP(`e`.`event_date`, `e`.`start`) < NOW()';
+            $sql .= ' AND `e`.`event_end_utc`) < NOW()';
         }
 
-        $sql .= ' ORDER BY `e`.`event_date` DESC';
+        $sql .= ' ORDER BY `e`.`event_start_utc` DESC';
 
         if (is_numeric($group) && $group != 'admin') {
             try {
@@ -260,10 +258,7 @@ class Party extends Model implements Auditable
                     *,
 	`e`.`venue` AS `venue`, `e`.`link` AS `link`, `e`.`location` as `location`,
                     `g`.`name` AS group_name,
-
-
-                    UNIX_TIMESTAMP( CONCAT(`e`.`event_date`, " ", `e`.`start`) ) AS `event_timestamp`
-
+                    UNIX_TIMESTAMP(e.`event_start_utc`) ) AS `event_timestamp`
                 FROM `'.$this->table.'` AS `e`
 
                     INNER JOIN `groups` as `g` ON `e`.`group` = `g`.`idgroups`
@@ -273,16 +268,15 @@ class Party extends Model implements Auditable
                         FROM `devices` AS `dv`
                         GROUP BY  `dv`.`event`
                     ) AS `d` ON `d`.`event` = `e`.`idevents` ';
-        //UNIX_TIMESTAMP( CONCAT(`e`.`event_date`, " ", `e`.`start`) )
         if (is_array($groups) && $groups != 'admin') {
             $sql .= ' WHERE `e`.`group` IN ('.implode(', ', $groups).') ';
         }
 
         if ($only_past) {
-            $sql .= ' AND TIMESTAMP(`e`.`event_date`, `e`.`start`) < NOW()';
+            $sql .= ' AND `e`.`event_end_utc` < NOW()';
         }
 
-        $sql .= ' ORDER BY `e`.`event_date` DESC';
+        $sql .= ' ORDER BY `e`.`event_start_utc` DESC';
 
         try {
             $parties = DB::select(DB::raw($sql));
@@ -304,14 +298,8 @@ class Party extends Model implements Auditable
     {
         return self::when($only_past, function ($query) {
             // We only want the ones in the past.
-            return $query->where(function ($query) {
-                // Before today, or before the start time.
-                return $query->where('event_date', '<', Carbon::now()->toDateString())
-                    ->orWhere(function ($query) {
-                        return $query->where('event_date', '=', Carbon::now()->toDateString())
-                            ->where('start', '<', Carbon::now()->toTimeString());
-                    });
-            });
+            $now = date('Y-m-d H:i:s');
+            return $query->where('event_end_utc', '<', $now);
         })->when(is_numeric($group), function ($query) use ($group) {
             // For a specific group.  Note that 'admin' is not numeric so won't pass this test.
             return $query->where('group', $group);
@@ -320,28 +308,26 @@ class Party extends Model implements Auditable
 
     public function findNextParties($group = null)
     {
-        //Tested
         $sql = 'SELECT
                     `e`.`idevents`,
                     `e`.`venue`,
                     `e`.`link`,
                     `e`.`location`,
-                    UNIX_TIMESTAMP( CONCAT(`e`.`event_date`, " ", `e`.`start`) ) AS `event_timestamp`,
-                    `e`.`event_date` AS `plain_date`,
+                    UNIX_TIMESTAMP(`e`.`event_start_utc`) AS `event_timestamp`,
+                    DATE(`e`.`event_start_utc`) AS `plain_date`,
                     NOW() AS `this_moment`,
-                    `e`.`start`,
-                    `e`.`end`,
+                    TIME(CONVERT_TZ(`event_start_utc`, \'GMT\', `e`.`timezone`)) AS `start`,
+                    TIME(CONVERT_TZ(`event_end_utc`, \'GMT\', `e`.`timezone`)) AS `end`,
                     `e`.`latitude`,
                     `e`.`longitude`
                 FROM `'.$this->table.'` AS `e`
-
-                WHERE TIMESTAMP(`e`.`event_date`, `e`.`start`) >= NOW() '; // added one day to make sure it only gets moved to the past the next day
+                WHERE `e`.`event_end_utc` >= NOW()';
 
         if (! is_null($group)) {
             $sql .= ' AND `e`.`group` = :group ';
         }
 
-        $sql .= ' ORDER BY `e`.`event_date` ASC
+        $sql .= ' ORDER BY `e`.`event_start_utc` ASC
                 LIMIT 10';
 
         if (! is_null($group)) {
@@ -366,50 +352,164 @@ class Party extends Model implements Auditable
                     `e`.`venue`,
                     `e`.`link`,
                     `e`.`location`,
-                    UNIX_TIMESTAMP( CONCAT(`e`.`event_date`, " ", `e`.`start`) ) AS `event_date`,
-                    `e`.`start`,
-                    `e`.`end`,
+                    UNIX_TIMESTAMP( `e`.`event_start_utc` ) AS `event_date`,
+                    TIME(CONVERT_TZ(`event_start_utc`, \'GMT\', `e`.`timezone`)) AS `start`,
+                    TIME(CONVERT_TZ(`event_end_utc`, \'GMT\', `e`.`timezone`)) AS `end`,
                     `e`.`latitude`,
                     `e`.`longitude`
                 FROM `'.$this->table.'` AS `e`
-                ORDER BY `e`.`event_date` DESC
+                ORDER BY `e`.`event_start_utc` DESC
                 LIMIT :limit'), ['limit' => $limit]);
     }
 
     public function attendees()
     {
-        //Tested
         return DB::select(DB::raw('SELECT SUM(pax) AS pax FROM '.$this->table));
     }
 
-    /**
-     * Laravel specific code.
-     */
-    public function scopeUpcomingEvents($query)
-    {
-        // We want to show approved events (wordpress_post_id IS NOT NULL), or where we are a host (e.g. because
-        // we created it, or if we are a network coordinator/admin.
-        $ret = $this->join('groups', 'groups.idgroups', '=', 'events.group')
-            ->join('users_groups', 'users_groups.group', '=', 'groups.idgroups')
-            ->leftJoin('events_users', function ($join) {
-                $join->on('events_users.event', '=', 'events.idevents');
-                $join->where('events_users.user', '=', Auth::user()->id);
-            })
-            ->leftJoin('users', 'users.id', '=', 'events_users.user')
-            ->where(function ($query) {
-                $query
-                  ->whereNotNull('events.wordpress_post_id')
-                  ->orWhere('events_users.role', '=', Role::HOST)
-                  ->orWhere('users_groups.role', '=', Role::HOST)
-                  ->orWhereIn('users.role', [Role::NETWORK_COORDINATOR, Role::ADMINISTRATOR]);
-            })
-            ->whereDate('event_date', '>=', date('Y-m-d'))
-            ->select('events.*')
-            ->groupBy('idevents')
-            ->orderBy('event_date', 'ASC');
+    // Scopes.  Each scope should build on a previous scope, getting more specific as we go down this file.  That
+    // isolates query logic more clearly.
+    private function defaultUserIds(&$userids) {
+        if (!$userids) {
+            $userids = [ Auth::user()->id ];
+        }
+    }
 
-        //error_log("Query " . $ret->toSql() . " with " . Auth::user()->id . " and " . date('Y-m-d'));
-        return $ret;
+    public function scopeUndeleted($query) {
+        // This is the base scope.  Almost always we are only interested in seeing events which have not been
+        // deleted.
+        return $query->whereNull('events.deleted_at')
+            ->orderBy('event_start_utc', 'DESC');
+    }
+
+    public function scopePast($query) {
+        // A past event is an event where the end time is less than now.
+        $query = $query->undeleted();
+        $query = $query->where('event_end_utc', '<', date('Y-m-d H:i:s'));
+        return $query;
+    }
+
+    public function scopeFuture($query) {
+        // A future event is an event where the start time is greater than now.
+        $query = $query->undeleted();
+        $query = $query->where('event_start_utc', '>', date('Y-m-d H:i:s'));
+        return $query;
+    }
+
+    public function scopeActive($query) {
+        // An active event is an event which has started and not yet finished.
+        $query = $query->undeleted();
+        $now = date('Y-m-d H:i:s');
+        $query = $query->where('event_start_utc', '<=', $now)
+            ->where('event_end_utc', '>=', $now);
+        return $query;
+    }
+
+    public function scopeApproved($query) {
+        // wordpress_post_id indicates event approval.
+        $query = $query->undeleted();
+        $query = $query->whereNotNull('wordpress_post_id');
+        return $query;
+    }
+
+    public function scopeHostFor($query, $userids = null) {
+        // Events where this user is a host.
+        $this->defaultUserIds($userids);
+        $query = $query->undeleted();
+        $query = $query->join('events_users AS hf', function ($join) use ($userids) {
+            $join->on('hf.event', '=', 'events.idevents');
+            $join->whereIn('hf.user', $userids);
+            $join->where('hf.role', '=', Role::HOST);
+        })->select('events.*');
+
+        return $query;
+    }
+
+    public function scopeAttendingOrAttended($query, $userids = null) {
+        // Events this user has attending/is attending.
+        $this->defaultUserIds($userids);
+        $query = $query->undeleted();
+        $query = $query->join('events_users AS aoa', function ($join) use ($userids) {
+            $join->on('aoa.event', '=', 'events.idevents');
+            $join->whereIn('aoa.user', $userids);
+
+            // Check the status so that we exclude any events we have been invited to but not confirmed.
+            // status is a string, so using 'like' rather than = otherwise
+            // those with an invite string starting with '1' are included.
+            $join->where('aoa.status', 'like', '1');
+        })->select('events.*');
+
+        return $query;
+    }
+
+    public function scopeInvitedNotConfirmed($query, $userids = null) {
+        // Events this user has been invited to but not confirmed.  Only interested in future events.
+        $this->defaultUserIds($userids);
+        $query = $query->future();
+        $query = $query->join('events_users AS inceu', function ($join) use ($userids) {
+            $join->on('inceu.event', '=', 'events.idevents');
+            $join->whereIn('inceu.user', $userids);
+            $join->where('inceu.status', '!=', 1);
+        })->select('events.*');
+
+        return $query;
+    }
+
+    public function scopeMemberOfGroup($query, $userids = null) {
+        // Any approved events for groups that this user has joined (not just been invited to) and not left.
+        $this->defaultUserIds($userids);
+        $query = $query->approved();
+        $query = $query->join('users_groups AS hfgug', 'hfgug.group', '=', 'events.group')
+            ->where('hfgug.status', 1)
+            ->whereNull('hfgug.deleted_at')
+            ->whereIn('hfgug.user', $userids)
+            ->select('events.*');
+        return $query;
+    }
+
+    public function scopeHostOfGroup($query, $userids = null) {
+        $query = $query->memberOfGroup()
+            ->where('hfgug.role', '=', Role::HOST);
+        return $query;
+    }
+
+    public function scopeForUser($query, $userids = null) {
+        // Events that are relevant to a user are:
+        // - ones they are a host for
+        // - ones they have are attending
+        // - ones for groups that they're a member of
+        //
+        // The queries here are not desperately efficient, but we're battling Eloquent a bit.  The data size is
+        // low enough it's not really an issue.
+        $this->defaultUserIds($userids);
+        $hostFor = Party::hostFor($userids);
+        $attending = Party::attendingOrAttended($userids);
+        $memberOf = Party::memberOfGroup($userids);
+
+        // In theory $query could contain something other than all().
+        return $query->whereIn('idevents', $hostFor->
+            union($attending)->
+            union($memberOf)->pluck('idevents'))->
+            select('events.*');
+    }
+
+    public function scopeFutureForUser($query, $userids = null) {
+        $this->defaultUserIds($userids);
+        $query = $query->forUser()->future($userids);
+        return $query;
+    }
+
+    public function scopePastForUser($query, $userids = null) {
+        $this->defaultUserIds($userids);
+        $query = $query->forUser()->past($userids);
+        return $query;
+    }
+
+    public function scopeForGroup($query, $idgroups) {
+        // TODO This should probably move into Group, and be a scope in there.  But we've not yet rationalised the
+        // scopes in Groups.
+        $query->where('events.group', $idgroups);
+        return $query;
     }
 
     /**
@@ -423,76 +523,32 @@ class Party extends Model implements Auditable
      */
     public function scopeUpcomingEventsInUserArea($query, $user)
     {
-        //Look for groups where user ID exists in pivot table
-        $user_group_ids = UserGroups::where('user', $user->id)->pluck('group')->toArray();
+        // We want to exclude groups which we are a member of, but include ones where we have been invited but
+        // not yet joined.
+        $exclude_group_ids = UserGroups::where('user', $user->id)->where('status', 1)->pluck('group')->toArray();
+
+        // We also want to exclude any groups which are not yet approved.
+        $exclude_group_ids = array_merge($exclude_group_ids, Group::whereNull('wordpress_post_id')->pluck('idgroups')->toArray());
 
         return $this
       ->select(DB::raw('`events`.*, ( 6371 * acos( cos( radians('.$user->latitude.') ) * cos( radians( events.latitude ) ) * cos( radians( events.longitude ) - radians('.$user->longitude.') ) + sin( radians('.$user->latitude.') ) * sin( radians( events.latitude ) ) ) ) AS distance'))
       ->join('groups', 'groups.idgroups', '=', 'events.group')
       ->join('users_groups', 'users_groups.group', '=', 'groups.idgroups')
-      ->where(function ($query) use ($user_group_ids) {
-          $query->whereNotIn('events.group', $user_group_ids)
-        ->whereDate('event_date', '>=', date('Y-m-d'));
+      ->where(function ($query) use ($exclude_group_ids) {
+          $query->whereNotIn('events.group', $exclude_group_ids)
+        ->where('event_start_utc', '>=', date('Y-m-d H:i:s'));
       })
       ->having('distance', '<=', User::NEARBY_KM)
       ->groupBy('events.idevents')
-      ->orderBy('events.event_date', 'ASC')
-      ->orderBy('events.start', 'ASC')
+      ->orderBy('events.event_start_utc', 'ASC')
       ->orderBy('distance', 'ASC');
     }
 
-    public function scopeAllUpcomingEvents()
+    public function scopeRequiresModeration($query)
     {
-        return $this->whereRaw('CONCAT(`event_date`, " ", `start`) > CURRENT_TIMESTAMP()')
-                    ->orderByRaw('CONCAT(`event_date`, " ", `start`)');
-    }
-
-    public function scopeRequiresModeration()
-    {
-        return $this->whereNull('wordpress_post_id')
-                      ->whereDate('event_date', '>=', date('Y-m-d'))
-                        ->orderBy('event_date', 'ASC');
-    }
-
-    public function scopePastEvents()
-    {
-        return $this->whereNotNull('wordpress_post_id')
-                      ->whereDate('event_date', '<', date('Y-m-d'))
-                        ->orderBy('event_date', 'DESC');
-    }
-
-    /**
-     * [scopeUsersPastEvents description]
-     * Get all Past Events from the User or User's groups, or any Past Events
-     * in which the User(s) has attended but is NOT a part of the
-     * group associated.
-     * @author Christopher Kelker
-     * @date   2019-05-28T09:50:22+010
-     * @param  [type]                  $query
-     * @param  [type]                  $user_ids
-     * @return [type]
-     */
-    public function scopeUsersPastEvents($query, array $user_ids = null)
-    {
-        // if no $user_ids are supplied, the use the current Auth's ID
-        if (empty($user_ids)) {
-            $user_ids[] = auth()->id();
-        }
-
-        return $query->join('groups', 'groups.idgroups', '=', 'events.group')
-      ->join('users_groups', 'users_groups.group', '=', 'groups.idgroups')
-      ->join('events_users', 'events_users.event', '=', 'events.idevents')
-      ->whereNotNull('events.wordpress_post_id')
-      ->whereDate('events.event_date', '<', date('Y-m-d'))
-
-      ->where(function ($query) use ($user_ids) {
-          $query->whereIn('users_groups.user', $user_ids)
-          ->orWhereIn('events_users.user', $user_ids);
-      })
-
-      ->select('events.*')
-      ->groupBy('idevents')
-      ->orderBy('events.event_date', 'DESC');
+        $query = $query->future();
+        $query = $query->whereNull('wordpress_post_id');
+        return $query;
     }
 
     public function allDevices()
@@ -508,10 +564,10 @@ class Party extends Model implements Auditable
     public function allConfirmedVolunteers()
     {
         return $this->hasMany(EventsUsers::class, 'event', 'idevents')
-          ->where(function ($query) {
-              $query->where('status', 1)
-                  ->orWhereNull('status');
-          });
+            ->where(function ($query) {
+                $query->where('status', 1)
+                    ->orWhereNull('status');
+            });
     }
 
     public function host()
@@ -525,29 +581,41 @@ class Party extends Model implements Auditable
         return $this->hasOne(\App\Group::class, 'idgroups', 'group');
     }
 
-    public function getEventDate($format = 'd/m/Y')
+    /**
+     * Return formatted date, in timezone of event.
+     *
+     * @param string $format
+     * @return false|string
+     */
+    public function getFormattedLocalStart($format = 'd/m/Y')
     {
-        return date($format, strtotime($this->event_date));
+        $dt = new Carbon($this->event_start_utc);
+        $dt->setTimezone($this->timezone);
+        return $dt->format($format);
     }
 
-    public function getEventStart()
+    /**
+     * Return formatted date, in timezone of event.
+     *
+     * @param string $format
+     * @return false|string
+     */
+    public function getFormattedLocalEnd($format = 'd/m/Y')
     {
-        return date('H:i', strtotime($this->start));
-    }
-
-    public function getEventEnd()
-    {
-        return date('H:i', strtotime($this->end));
+        $dt = new Carbon($this->event_end_utc);
+        $dt->setTimezone($this->timezone);
+        return $dt->format($format);
     }
 
     public function getEventTimestampAttribute()
     {
-        return "{$this->event_date} {$this->start}";
+        // Returning in local time.
+        return "{$this->event_date_local} {$this->start_local}";
     }
 
-    public function getEventStartEnd()
+    public function getEventStartEndLocal()
     {
-        return $this->getEventStart().'-'.$this->getEventEnd();
+        return $this->start_local . ' - ' . $this->end_local;
     }
 
     public function getEventName()
@@ -561,14 +629,9 @@ class Party extends Model implements Auditable
 
     public function isUpcoming()
     {
-        $date_now = new \DateTime();
-        $event_start = new \DateTime($this->event_date.' '.$this->start);
-
-        if ($date_now < $event_start) {
-            return true;
-        }
-
-        return false;
+        $now = Carbon::now();
+        $event_start = new Carbon($this->event_start_utc);
+        return ($event_start->greaterThan($now));
     }
 
     /**
@@ -583,134 +646,120 @@ class Party extends Model implements Auditable
      */
     public function isStartingSoon()
     {
-        $current_date = date('Y-m-d');
-        $event_date = $this->event_date;
+        $start = new Carbon($this->event_start_utc);
 
-        if ($current_date != $event_date) {
-            return false;
+        if (!$this->isInProgress() && !$this->hasFinished() && $start->isCurrentDay()) {
+            return true;
         }
 
-        if ($this->isInProgress()) {
-            return false;
-        }
-
-        $date_now = new \DateTime();
-        $event_end = new \DateTime($this->event_date.' '.$this->end);
-
-        if ($date_now > $event_end) {
-            return false;
-        }
-
-        return true;
+        return false;
     }
 
     public function isInProgress()
     {
         $date_now = Carbon::now();
-
-        $event_start = new Carbon($this->event_date.' '.$this->start);
-        // Temporarily start an hour early for Repair Together
-        // Until we have timezone support.
-        $event_start = $event_start->addHours(-1);
-
-        $event_end = new Carbon($this->event_date.' '.$this->end);
-
-        if ($date_now >= $event_start && $date_now <= $event_end) {
-            return true;
-        }
-
-        return false;
+        $start = new Carbon($this->event_start_utc);
+        $end = new Carbon($this->event_end_utc);
+        return $date_now->gte($start) && $date_now->lte($end);
     }
 
     public function hasFinished()
     {
-        $date_now = new \DateTime();
-        $event_end = new \DateTime($this->event_date.' '.$this->end);
-
-        if ($date_now > $event_end) {
-            return true;
-        }
-
-        return false;
+        $date_now = Carbon::now();
+        $end = new Carbon($this->event_end_utc);
+        return $date_now->gt($end);
     }
 
-    public function getEventStats($emissionRatio = null)
+    public static function getEventStatsArrayKeys()
+    {
+        return [
+            'co2_powered' => 0,
+            'co2_unpowered' => 0,
+            'co2_total' => 0,
+            'waste_powered' => 0,
+            'waste_unpowered' => 0,
+            'waste_total' => 0,
+            'fixed_devices' => 0,
+            'fixed_powered' => 0,
+            'fixed_unpowered' => 0,
+            'repairable_devices' => 0,
+            'dead_devices' => 0,
+            'unknown_repair_status' => 0,
+            'devices_powered' => 0,
+            'devices_unpowered' => 0,
+            'no_weight_powered' => 0,
+            'no_weight_unpowered' => 0,
+            'participants' => 0,
+            'volunteers' => 0,
+            'hours_volunteered' => 0,
+        ];
+    }
+
+    public function getEventStats($eEmissionRatio = null, $uEmissionratio = null)
     {
         $displacementFactor = \App\Device::getDisplacementFactor();
-        if (is_null($emissionRatio)) {
-            $emissionRatio = \App\Helpers\FootprintRatioCalculator::calculateRatio();
+        if (is_null($eEmissionRatio)) {
+            $eEmissionRatio = \App\Helpers\LcaStats::getEmissionRatioPowered();
+        }
+        if (is_null($uEmissionratio)) {
+            $uEmissionratio = \App\Helpers\LcaStats::getEmissionRatioUnpowered();
         }
 
-        $co2Diverted = 0;
-        $ewasteDiverted = 0;
-        $unpoweredWasteDiverted = 0;
-        $fixed_devices = 0;
-        $fixed_powered = 0;
-        $fixed_unpowered = 0;
-        $repairable_devices = 0;
-        $dead_devices = 0;
-        $no_weight = 0;
-        $devices_powered = 0;
-        $devices_unpowered = 0;
+        $result = self::getEventStatsArrayKeys();
 
         if (! empty($this->allDevices)) {
             foreach ($this->allDevices as $device) {
                 if ($device->deviceCategory->powered) {
-                    $devices_powered++;
+                    $result['devices_powered']++;
 
                     if ($device->isFixed()) {
-                        $co2Diverted += $device->co2Diverted($emissionRatio, $displacementFactor);
-                        $ewasteDiverted += $device->ewasteDiverted();
-                        $fixed_powered++;
+                        $result['co2_powered'] += $device->eCo2Diverted($eEmissionRatio, $displacementFactor);
+                        $result['waste_powered'] += $device->eWasteDiverted();
+                        $result['fixed_powered']++;
                     }
                 } else {
-                    $devices_unpowered++;
+                    $result['devices_unpowered']++;
 
                     if ($device->isFixed()) {
-                        // CO2 estimates don't include unpowered items.
-                        $unpoweredWasteDiverted += $device->unpoweredWasteDiverted();
-                        $fixed_unpowered++;
+                        $result['co2_unpowered'] += $device->uCo2Diverted($uEmissionratio, $displacementFactor);
+                        $result['waste_unpowered'] += $device->uWasteDiverted();
+                        $result['fixed_unpowered']++;
                     }
                 }
 
                 switch ($device->repair_status) {
                     case 1:
-                        $fixed_devices++;
-
+                        $result['fixed_devices']++;
                         break;
                     case 2:
-                        $repairable_devices++;
-
+                        $result['repairable_devices']++;
                         break;
                     case 3:
-                        $dead_devices++;
-
+                        $result['dead_devices']++;
                         break;
                     default:
+                        $result['unknown_repair_status']++;
                         break;
                 }
 
-                if ($device->isFixed() && ($device->category == 46 || ! $device->deviceCategory->weight) && ! $device->estimate) {
-                    $no_weight++;
+                if ($device->isFixed()) {
+                    if ($device->deviceCategory->weight == 0 && $device->estimate == 0) {
+                        if ($device->deviceCategory->isMiscPowered()) {
+                            $result['no_weight_powered']++;
+                        } elseif ($device->deviceCategory->isMiscUnpowered()) {
+                            $result['no_weight_unpowered']++;
+                        }
+                    }
                 }
             }
 
-            return [
-                'co2' => $co2Diverted,
-                'ewaste' => $ewasteDiverted,
-                'unpowered_waste' => $unpoweredWasteDiverted,
-                'fixed_devices' => $fixed_devices,
-                'fixed_powered' => $fixed_powered,
-                'fixed_unpowered' => $fixed_unpowered,
-                'repairable_devices' => $repairable_devices,
-                'dead_devices' => $dead_devices,
-                'no_weight' => $no_weight,
-                'participants' => $this->pax,
-                'volunteers' => $this->volunteers,
-                'hours_volunteered' => $this->hoursVolunteered(),
-                'devices_powered' => $devices_powered,
-                'devices_unpowered' => $devices_unpowered,
-            ];
+            $result['co2_total'] = $result['co2_powered'] + $result['co2_unpowered'];
+            $result['waste_total'] = $result['waste_powered'] + $result['waste_unpowered'];
+            $result['participants'] = $this->pax ?? 0;
+            $result['volunteers'] = $this->volunteers ?? 0;
+            $result['hours_volunteered'] = $this->hoursVolunteered();
+
+            return $result;
         }
     }
 
@@ -743,7 +792,7 @@ class Party extends Model implements Auditable
 
     public function getEventStartTimestampAttribute()
     {
-        return strtotime($this->event_date.' '.$this->start);
+        return strtotime($this->event_start_utc);
     }
 
     public function getShareableLinkAttribute()
@@ -762,7 +811,7 @@ class Party extends Model implements Auditable
     public function isVolunteer($user_id = null)
     {
         return $this->allConfirmedVolunteers
-        ->contains('user', $user_id ?: auth()->id());
+            ->contains('user', $user_id ?: auth()->id());
     }
 
     public function isBeingAttendedBy($userId)
@@ -814,10 +863,10 @@ class Party extends Model implements Auditable
         $devices_count = $this->allDevices->count();
 
         return [
-        'participants_count' => $participants_count,
-        'volunteers_count' => $volunteers_count,
-        'devices_count' => $devices_count,
-      ];
+            'participants_count' => $participants_count,
+            'volunteers_count' => $volunteers_count,
+            'devices_count' => $devices_count,
+        ];
     }
 
     public function requiresModerationByAdmin()
@@ -840,9 +889,11 @@ class Party extends Model implements Auditable
                 return 'cell-primary-heading';
             }
         } elseif ($this->hasFinished()) {
-            if ($this->checkForMissingData()['participants_count'] == 0 ||
-        $this->checkForMissingData()['volunteers_count'] <= 1 ||
-        $this->checkForMissingData()['devices_count'] == 0) {
+            if (
+                $this->checkForMissingData()['participants_count'] == 0 ||
+                $this->checkForMissingData()['volunteers_count'] <= 1 ||
+                $this->checkForMissingData()['devices_count'] == 0
+            ) {
                 return 'cell-danger-heading';
             }
         } else {
@@ -860,24 +911,23 @@ class Party extends Model implements Auditable
     public function scopeEventHasFinished($query)
     {
         $now = Carbon::now();
-
-        return $query->whereRaw("CONCAT(`event_date`, ' ', `end`) < '{$now}'");
+        return $query->whereRaw("`event_end_utc` < '{$now}'");
     }
 
     public function getWastePreventedAttribute()
     {
-        return round($this->getEventStats()['ewaste'], 2);
+        return round($this->getEventStats()['waste_total'], 2);
     }
 
     public function scopeWithAll($query)
     {
         return $query->with([
-          'allDevices.deviceCategory',
-          'allInvited',
-          'allConfirmedVolunteers',
-          'host',
-          'theGroup.groupImage.image',
-          'devices.deviceCategory',
+            'allDevices.deviceCategory',
+            'allInvited',
+            'allConfirmedVolunteers',
+            'host',
+            'theGroup.groupImage.image',
+            'devices.deviceCategory',
         ]);
     }
 
@@ -885,7 +935,7 @@ class Party extends Model implements Auditable
     {
         $short_location = Str::limit($this->venue, 30);
 
-        return "{$this->getEventDate('d/m/Y')} / {$short_location}";
+        return "{$this->getFormattedLocalStart('d/m/Y')} / {$short_location}";
     }
 
     public function shouldPushToWordpress()
@@ -913,8 +963,140 @@ class Party extends Model implements Auditable
         return strtotime($this->updated_at) > strtotime($this->devices_updated_at) ? $this->updated_at : $this->devices_updated_at;
     }
 
-    public function canDelete() {
+    public function canDelete()
+    {
         $stats = $this->getEventStats();
+
         return $stats['devices_powered'] == 0 && $stats['devices_unpowered'] == 0;
+    }
+
+    public function approve()
+    {
+        $group = Group::find($this->group);
+
+        // Only send notifications if the event is in the future.
+        // We don't want to send emails to Restarters about past events being added.
+        if ($this->isUpcoming()) {
+            // Retrieving all users from the User model whereby they allow you send emails but their role must not include group admins
+            $group_restarters = User::join('users_groups', 'users_groups.user', '=', 'users.id')
+                ->where('users_groups.group', $this->group)
+                ->where('users_groups.role', 4)
+                ->select('users.*')
+                ->get();
+
+            // If there are restarters against the group
+            if (! $group_restarters->isEmpty()) {
+                // Send user a notification and email
+                Notification::send($group_restarters, new NotifyRestartersOfNewEvent([
+                                                                                         'event_venue' => $this->venue,
+                                                                                         'event_url' => url('/party/view/'.$this->idevents),
+                                                                                         'event_group' => $group->name,
+                                                                                     ]));
+            }
+        }
+
+        // Notify the person who created it that it has now been approved.
+        $eu = EventsUsers::where('event', $this->idevents)->orderBy('idevents_users')->first();
+
+        if ($eu) {
+            $host = User::find($eu->user);
+
+            if ($host) {
+                Notification::send($host, new EventConfirmed($this));
+            }
+        }
+
+        event(new ApproveEvent($this));
+    }
+
+    public function getTimezoneAttribute($value)
+    {
+        // We might have a timezone attribute on the event.
+        if ($value) {
+            return $value;
+        }
+
+        // Use the timezone from the group (which will fallback to network if required).
+        return $this->theGroup->timezone;
+    }
+
+    // TODO The intention is that we migrate all the code over to use the UTC variants of event date/start/end.
+    // Timezone-aware, ISO8601 formatted.  These are unambiguous, e.g. for API results.
+    public function getEventStartUtcAttribute() {
+        $start = Carbon::parse($this->attributes['event_start_utc'], 'UTC');
+        return $start->toIso8601String();
+    }
+
+    public function getEventEndUtcAttribute() {
+        $end = Carbon::parse($this->attributes['event_end_utc'], 'UTC');
+        return $end->toIso8601String();
+    }
+
+    // Mutators for previous event_date/start/end fields.  These are now superceded by the UTC fields and therefore
+    // should never be set directly.  Throw exceptions to ensure that they are not.
+    public function setEventDateAttribute($val) {
+        throw new \Exception("Attempt to set event time fields directly; please use event_start_utc and event_end_utc");
+    }
+
+    public function setStartAttribute($val) {
+        throw new \Exception(
+            "Attempt to set event time fields directly; please use event_start_utc and event_end_utc"
+        );
+    }
+
+    public function setEndAttribute($val) {
+        throw new \Exception(
+            "Attempt to set event time fields directly; please use event_start_utc and event_end_utc"
+        );
+    }
+
+    public function getEventDateLocalAttribute() {
+        $dt = new Carbon($this->event_start_utc);
+        $dt->setTimezone($this->timezone);
+        return $dt->toDateString();
+    }
+    public function getStartLocalAttribute() {
+        $dt = new Carbon($this->event_start_utc);
+        $dt->setTimezone($this->timezone);
+        return $dt->toTimeString('minute');
+    }
+
+    public function getEndLocalAttribute() {
+        $dt = new Carbon($this->event_end_utc);
+        $dt->setTimezone($this->timezone);
+        return $dt->toTimeString('minute');
+    }
+
+    public static function expandVolunteers($volunteers, $showEmails) {
+        $ret = [];
+
+        foreach ($volunteers as $volunteer) {
+            $volunteer['userSkills'] = [];
+            $volunteer['confirmed'] = intval($volunteer->status) === 1;
+            $volunteer['profilePath'] = '/uploads/thumbnail_placeholder.png';
+            $volunteer['fullName'] = $volunteer->getFullName();
+
+            if ($volunteer->volunteer) {
+                $volunteer['volunteer'] = $volunteer->volunteer;
+
+                if (!$showEmails) {
+                    $volunteer['volunteer']['email'] = NULL;
+                }
+
+                if (! empty($volunteer->volunteer)) {
+                    $volunteer['userSkills'] = $volunteer->volunteer->userSkills->all();
+                    $volunteer['profilePath'] = '/uploads/thumbnail_'.$volunteer->volunteer->getProfile($volunteer->volunteer->id)->path;
+
+                    foreach ($volunteer['userSkills'] as $skill) {
+                        // Force expansion
+                        $skill->skillName->skill_name;
+                    }
+                }
+            }
+
+            $ret[] = $volunteer;
+        }
+
+        return $ret;
     }
 }

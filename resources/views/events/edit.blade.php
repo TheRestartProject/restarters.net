@@ -17,7 +17,7 @@
         <div class="row">
       <div class="col">
         <h1 class="mb-30 mr-30">
-            @lang('events.editing', ['event' => '<a style="color:black; text-decoration:underline" href="/party/view/'. $formdata->id .'">'. $formdata->venue .'</a>'])
+            @lang('events.editing', ['event' => '<a style="color:black; text-decoration:underline" href="/party/view/'. $formdata['idevents'] .'">'. $formdata['venue'] .'</a>'])
         </h1>
       </div>
     </div>
@@ -65,7 +65,7 @@
                     @else
                     :groups="{{ json_encode($user_groups, JSON_INVALID_UTF8_IGNORE) }}"
                     @endif
-                    :can-approve="<?php echo App\Helpers\Fixometer::userCanApproveEvent($formdata->id) && is_null($formdata->wordpress_post_id) ? 'true' : 'false' ?>"
+                    :can-approve="<?php echo App\Helpers\Fixometer::userCanApproveEvent($formdata['idevents']) && !array_key_exists('wordpress_post_id', $formdata) ? 'true' : 'false' ?>"
                 />
               </div>
           </div>
@@ -75,11 +75,11 @@
 
                 <div class="col-6 col-lg-6">
                   <label for="file">@lang('events.field_add_image'):</label>
-                  <form id="dropzoneEl-{{ $formdata->id }}" data-deviceid="{{ $formdata->id }}" class="dropzone dropzoneEl" action="/party/image-upload/{{ $formdata->id }}" method="post" enctype="multipart/form-data" data-field1="@lang('events.field_event_images')" data-field2="@lang('events.field_event_images_2')">
+                  <form id="dropzoneEl-{{ $formdata['idevents'] }}" data-deviceid="{{ $formdata['idevents'] }}" class="dropzone dropzoneEl" action="/party/image-upload/{{ $formdata['idevents'] }}" method="post" enctype="multipart/form-data" data-field1="@lang('events.field_event_images')" data-field2="@lang('events.field_event_images_2')">
                       @csrf
                       <div class="dz-default dz-message"></div>
                       <div class="fallback">
-                          <input id="file-{{ $formdata->id }}" name="file-{{ $formdata->id }}" type="file" multiple />
+                          <input id="file-{{ $formdata['idevents'] }}" name="file-{{ $formdata['idevents'] }}" type="file" multiple />
                       </div>
                   </form>
                 </div>
@@ -88,14 +88,14 @@
                   <div class="previews">
                     @if( !empty($images) )
                       @foreach($images as $image)
-                        <div id="device-image-{{ $formdata->id }}" class="dz-image">
+                        <div id="device-image-{{ $formdata['idevents'] }}" class="dz-image">
                           <a href="/uploads/{{ $image->path }}" data-toggle="lightbox">
                           <img src="/uploads/thumbnail_{{ $image->path }}" alt="placeholder"></a>
-                          <a href="/party/image/delete/{{ $formdata->id }}/{{{ $image->idimages }}}/{{{ $image->path }}}" data-device-id="{{ $formdata->id }}" class="dz-remove ajax-delete-image">Remove file</a>
+                          <a href="/party/image/delete/{{ $formdata['idevents'] }}/{{{ $image->idimages }}}/{{{ $image->path }}}" data-device-id="{{ $formdata['idevents'] }}" class="dz-remove ajax-delete-image">Remove file</a>
                         </div>
                       @endforeach
                     @endif
-                    <div class="uploads-{{ $formdata->id }}"></div>
+                    <div class="uploads-{{ $formdata['idevents'] }}"></div>
                   </div>
                 </div>
 
@@ -109,7 +109,7 @@
               <div class="row">
                 <div class="col">
                   <h4>Event changes</h4>
-                  <p>Changes made on event <strong>{{ $formdata->venue }}</strong></p>
+                  <p>Changes made on event <strong>{{ $formdata['venue'] }}</strong></p>
                 </div>
               </div>
 

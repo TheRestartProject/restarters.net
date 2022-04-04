@@ -900,8 +900,6 @@ function initAutocomplete() {
         // need to cope with both.
         $field = jQuery(this).parents('.card-body').find('.weight')
       }
-
-      console.log("Category change", $(this), $value, $field)
       if( $value === 46 || $value === '' ){
         $field.prop('disabled', false);
         $field.parents('.display-weight').removeClass('d-none');
@@ -911,22 +909,6 @@ function initAutocomplete() {
         $field.prop('disabled', true);
         $field.parents('.display-weight').addClass('d-none');
       }
-    });
-
-    jQuery('.toggle-manual-invite').on('change', function (e) {
-
-      var $value = jQuery(this).val();
-      var $toggle = jQuery('.show-hide-manual-invite');
-
-      $('#full_name, #volunteer_email_address').val('');
-
-      if( $value === 'not-registered' ){
-        $toggle.show();
-        $('#full_name').focus();
-      } else {
-        $toggle.hide();
-      }
-
     });
 
     jQuery('.js-remove').on('click', removeUser);
@@ -990,9 +972,14 @@ function initAutocomplete() {
     } else {
       alert('You must consent to the use of your data in order to register');
     }
-
   });
 
+  $('#login-form-submit').on('click', function(e) {
+    // We've seen double submits of the login form, leading to 419 errors.  Prevent the user submitting twice by
+    // double-clicking.
+    $('#login-form-submit').attr('disabled', 'disabled')
+    $('#login-form').submit()
+  });
 
   // On toggling between multi collapable invite modal content
   // Then also toggle the link to change the text (show a different link -
@@ -1329,8 +1316,8 @@ function initAutocomplete() {
   }
 
   function updateEventStats(stats) {
-    $('#waste-insert').html(stats['ewaste']);
-    $('#co2-insert').html(stats['co2']);
+    $('#waste-insert').html(stats['waste_total']);
+    $('#co2-insert').html(stats['co2_total']);
     $('#fixed-insert').html(stats['fixed_devices']);
     $('#repair-insert').html(stats['repairable_devices']);
     $('#dead-insert').html(stats['dead_devices']);
@@ -1347,7 +1334,7 @@ function initAutocomplete() {
         this.value = this.value + "\n";
       }
     });
-    
+
     $('#participants_qty').on('change', function() {
       updateParticipants();
     });
@@ -1550,7 +1537,8 @@ jQuery(document).ready(function () {
         'eventtimerangepicker': require('./components/EventTimeRangePicker.vue'),
         'eventdatepicker': require('./components/EventDatePicker.vue'),
         'venueaddress': require('./components/VenueAddress.vue'),
-        'richtexteditor': require('./components/RichTextEditor.vue')
+        'richtexteditor': require('./components/RichTextEditor.vue'),
+        'notifications': require('./components/Notifications.vue')
       }
     })
   })

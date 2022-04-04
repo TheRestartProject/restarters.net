@@ -6,6 +6,8 @@ use App\Network;
 use DB;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Facades\Lang;
+use Illuminate\Support\Facades\Log;
 use OwenIt\Auditing\Contracts\Auditable;
 
 class Group extends Model implements Auditable
@@ -36,9 +38,10 @@ class Group extends Model implements Auditable
         'network_id',
         'external_id',
         'devices_updated_at',
+        'timezone'
     ];
 
-    protected $appends = ['ShareableLink', 'approved'];
+    protected $appends = ['ShareableLink', 'approved', 'auto_approve'];
 
     // The distance is not in the groups table; we add it on some queries from the select.
     private $distance = null;
@@ -60,6 +63,14 @@ class Group extends Model implements Auditable
 
         static::addGlobalScope('all_restarters_count', function ($builder) {
             $builder->withCount('allRestarters');
+        });
+
+        static::addGlobalScope('all_confirmed_hosts_count', function ($builder) {
+            $builder->withCount('allConfirmedHosts');
+        });
+
+        static::addGlobalScope('all_confirmed_restarters_count', function ($builder) {
+            $builder->withCount('allConfirmedRestarters');
         });
     }
 
@@ -155,29 +166,6 @@ class Group extends Model implements Auditable
         }
     }
 
-    public function findHost($id)
-    {
-        return DB::select(DB::raw('SELECT *,
-                    `g`.`name` AS `groupname`,
-                    `u`.`name` AS `hostname`
-                FROM `'.$this->table.'` AS `g`
-                INNER JOIN `users_groups` AS `ug`
-                    ON `ug`.`group` = `g`.`idgroups`
-                INNER JOIN `users` AS `u`
-                    ON `u`.`id` = `ug`.`user`
-                LEFT JOIN (
-                    SELECT * FROM `images`
-                        INNER JOIN `xref` ON `xref`.`object` = `images`.`idimages`
-                        WHERE `xref`.`object_type` = 5
-                        AND `xref`.`reference_type` = '.env('TBL_USERS').'
-                        GROUP BY `images`.`path`
-                ) AS `xi`
-                ON `xi`.`reference` = `u`.`id`
-
-                WHERE `g`.`idgroups` = :id
-                AND `u`.`role` = 3'), ['id' => $id]);
-    }
-
     public function ofThisUser($id)
     {
         return DB::select(DB::raw('SELECT * FROM `'.$this->table.'` AS `g`
@@ -204,12 +192,12 @@ class Group extends Model implements Auditable
 
     public function allHosts()
     {
-        return $this->hasMany(\App\UserGroups::class, 'group', 'idgroups')->where('role', 3);
+        return $this->hasMany(\App\UserGroups::class, 'group', 'idgroups')->where('role', Role::HOST);
     }
 
     public function allRestarters()
     {
-        return $this->hasMany(\App\UserGroups::class, 'group', 'idgroups')->where('role', 4);
+        return $this->hasMany(\App\UserGroups::class, 'group', 'idgroups')->where('role', Role::RESTARTER);
     }
 
     public function allVolunteers()
@@ -251,8 +239,13 @@ class Group extends Model implements Auditable
         $allEvents = Party::where('events.group', $this->idgroups)
             ->get();
 
+
+        // Send these to getEventStats() to speed things up a bit.
+        $eEmissionRatio = \App\Helpers\LcaStats::getEmissionRatioPowered();
+        $uEmissionratio = \App\Helpers\LcaStats::getEmissionRatioUnpowered();
+
         foreach ($allEvents as $event) {
-            $stats = $event->getEventStats();
+            $stats = $event->getEventStats($eEmissionRatio, $uEmissionratio);
 
             if ($stats['devices_powered'] || $stats['devices_unpowered']) {
                 $ret = false;
@@ -262,48 +255,38 @@ class Group extends Model implements Auditable
         return $ret;
     }
 
-    public function getGroupStats($emissionRatio = null)
+    public static function getGroupStatsArrayKeys()
     {
-        if (is_null($emissionRatio)) {
-            $emissionRatio = \App\Helpers\FootprintRatioCalculator::calculateRatio();
+        return \App\Party::getEventStatsArrayKeys() + ['parties' => 0];
+    }
+
+    public function getGroupStats($eEmissionRatio = null, $uEmissionratio = null)
+    {
+        if (is_null($eEmissionRatio)) {
+            $eEmissionRatio = \App\Helpers\LcaStats::getEmissionRatioPowered();
+        }
+        if (is_null($uEmissionratio)) {
+            $uEmissionratio = \App\Helpers\LcaStats::getEmissionRatioUnpowered();
         }
 
-        $allPastEvents = Party::pastEvents()
+        $allPastEvents = Party::past()
             ->where('events.group', $this->idgroups)
             ->get();
 
-        $groupStats = [];
+        $result = \App\Party::getEventStatsArrayKeys();
+
         // Rollup all events stats into stats for this group.
         foreach ($allPastEvents as $event) {
-            $eventStats = $event->getEventStats($emissionRatio);
+            $eventStats = $event->getEventStats($eEmissionRatio, $uEmissionratio);
 
             foreach ($eventStats as $statKey => $statValue) {
-                if (! array_key_exists($statKey, $groupStats)) {
-                    $groupStats[$statKey] = 0;
-                }
-                $groupStats[$statKey] += $statValue;
+                $result[$statKey] += $statValue;
             }
         }
 
-        // Keeping the specific subset of stats returned for now,
-        // with existing names.
-        return [
-            'pax' => $groupStats['participants'] ?? 0,
-            'hours' => $groupStats['hours_volunteered'] ?? 0,
-            'parties' => count($allPastEvents),
-            'co2' => $groupStats['co2'] ?? 0,
-            'ewaste' => $groupStats['ewaste'] ?? 0,
-            'unpowered_waste' => $groupStats['unpowered_waste'] ?? 0,
-            'waste' => ($groupStats['ewaste'] ?? 0) + ($groupStats['unpowered_waste'] ?? 0),
-            'fixed_devices' => $groupStats['fixed_devices'] ?? 0,
-            'fixed_powered' => $groupStats['fixed_powered'] ?? 0,
-            'fixed_unpowered' => $groupStats['fixed_unpowered'] ?? 0,
-            'repairable_devices' => $groupStats['repairable_devices'] ?? 0,
-            'dead_devices' => $groupStats['dead_devices'] ?? 0,
-            'no_weight' => $groupStats['no_weight'] ?? 0,
-            'devices_powered' => $groupStats['devices_powered'] ?? 0,
-            'devices_unpowered' => $groupStats['devices_unpowered'] ?? 0,
-        ];
+        $result['parties'] = count($allPastEvents);
+
+        return $result;
     }
 
     /**
@@ -364,18 +347,13 @@ class Group extends Model implements Auditable
         return $this->allConfirmedVolunteers()->where($attributes)->exists();
     }
 
-    public function addEvent($event)
-    {
-        $event->theGroup()->associate($this);
-    }
-
     public function parties()
     {
         return $this->hasMany(Party::class, 'group', 'idgroups');
     }
 
     /**
-     * All parties for the group that are taking place today or later.
+     * All parties for the group that are taking place in the future.
      *
      * @author Christopher Kelker - @date 2019-03-21
      * @editor  Christopher Kelker, Neil Mather
@@ -384,22 +362,21 @@ class Group extends Model implements Auditable
      */
     public function upcomingParties($exclude_parties = [])
     {
-        $from = date('Y-m-d');
+        $from = date('Y-m-d H:i:s');
 
         if (! empty($exclude_parties)) {
             return $this->parties()
-                ->where('event_date', '>=', $from)
+                ->where('event_end_utc', '>', $from)
                 ->whereNotIn('idevents', $exclude_parties)
                 ->get();
         }
 
-        return $this->parties()->where('event_date', '>=', $from)->get();
+        return $this->parties()->where('event_end_utc', '>', $from)->get();
     }
 
     /**
      * [pastParties description]
-     * All Past Parties where between the Start Parties Date
-     * is yesterday or a month earlier.
+     * All Past Parties.
      *
      * @author Christopher Kelker - @date 2019-03-21
      * @editor  Christopher Kelker
@@ -408,34 +385,16 @@ class Group extends Model implements Auditable
      */
     public function pastParties($exclude_parties = [])
     {
+        $now = date('Y-m-d H:i:s');
+
         if (! empty($exclude_parties)) {
             return $this->parties()
-                ->where('event_date', '<', date('Y-m-d'))
+                ->where('event_end_utc', '<', $now)
                 ->whereNotIn('idevents', $exclude_parties)
                 ->get();
         }
 
-        return $this->parties()->where('event_date', '<', date('Y-m-d'))->get();
-    }
-
-    /**
-     * [totalPartiesHours description]
-     * Total Group Parties Hours.
-     *
-     * @author Christopher Kelker - @date 2019-03-21
-     * @editor  Christopher Kelker
-     * @version 1.0.0
-     * @return  [type]
-     */
-    public function totalPartiesHours()
-    {
-        $sum = 0;
-
-        foreach ($this->parties as $party) {
-            $sum += $party->hours;
-        }
-
-        return $sum;
+        return $this->parties()->where('event_end_utc', '<', $now)->get();
     }
 
     public function groupImagePath()
@@ -451,28 +410,14 @@ class Group extends Model implements Auditable
     {
         $event = $this->parties()
             ->whereNotNull('wordpress_post_id')
-            ->whereDate('event_date', '>=', date('Y-m-d'))
-            ->orderBy('event_date', 'asc');
+            ->where('event_start_utc', '>=', date('Y-m-d H:i:s'))
+            ->orderBy('event_start_utc', 'asc');
 
         if (! $event->count()) {
             return null;
         }
 
         return $event->first();
-    }
-
-    public function userEvents()
-    {
-        return $this->parties()
-            ->join('events_users', 'events.idevents', '=', 'events_users.event')
-            ->where(function ($query) {
-                $query->where('events.group', $this->idgroups)
-                    ->where('events_users.user', auth()->id());
-            })
-            ->select('events.*')
-            ->groupBy('events.idevents')
-            ->orderBy('events.idevents', 'ASC')
-            ->get();
     }
 
     public function getApprovedAttribute()
@@ -521,11 +466,185 @@ class Group extends Model implements Auditable
         return strtotime($this->updated_at) > strtotime($this->devices_updated_at) ? $this->updated_at : $this->devices_updated_at;
     }
 
-    public function getDistanceAttribute() {
+    public function getAutoApproveAttribute()
+    {
+        // A group's events are auto-approved iff all the networks that the group belongs to are set to auto-approve
+        // events.
+        $autoapprove = false;
+
+        $networks = $this->networks;
+
+        if ($networks && count($networks)) {
+            $autoapprove = true;
+
+            foreach ($networks as $network) {
+                $autoapprove &= $network->auto_approve_events;
+            }
+        }
+
+        return $autoapprove;
+    }
+
+    public function getDistanceAttribute()
+    {
         return $this->distance;
     }
 
-    public function setDistanceAttribute($val) {
+    public function setDistanceAttribute($val)
+    {
         $this->distance = $val;
+    }
+
+    public function createDiscourseGroup() {
+        // Get the host who created the group.
+        $success = false;
+        $member = UserGroups::where('group', $this->idgroups)->first();
+        $host = null;
+
+        if (!empty($member)) {
+            $host = User::find($member->user);
+        }
+
+        $unique = '';
+
+        do {
+            $retry = false;
+
+            try {
+                // We want to internationalise the message.  Use the languages of any networks that the group
+                // is in.
+                $text = '';
+                $langs = [];
+
+                foreach ($this->networks as $network) {
+                    $lang = $network->default_language;
+
+                    if (!in_array($lang, $langs)) {
+                        $text .= Lang::get('groups.discourse_title',[
+                            'group' => $this->name,
+                            'link' => env('APP_URL') . '/group/view/' . $this->idgroups,
+                            'help' => 'https://talk.restarters.net/t/how-to-communicate-with-your-repair-group/6293'
+                        ],$lang);
+
+                        $langs[] = $lang;
+                    }
+                }
+
+                // We want the host to create the group, so use their username.  The API key should
+                // allow us to do this - see https://meta.discourse.org/t/how-can-an-api-user-create-posts-as-another-user/45968/3.
+                $client = app('discourse-client', [
+                    'username' => env('DISCOURSE_APIUSER'),
+                ]);
+
+                // Restricted characters allowed in name, and only 25 characters.
+                $name = str_replace(' ', '_', trim($this->name));
+                $name = preg_replace("/[^A-Za-z0-9]/", '', $name);
+                $name = substr($name, 0, 25);
+
+                $params = [
+                    'group' => [
+                        'name' => "$name$unique",
+                        'full_name' => $this->name,
+                        'mentionable_level' => 4,
+                        'messageable_level' => 4,
+                        'visibility_level' => 0,
+                        'members_visibility_level' => 0,
+                        'automatic_membership_email_domains' => null,
+                        'automatic_membership_retroactive' => false,
+                        'primary_group' => false,
+                        'flair_url' => $this->groupImagePath(),
+                        'flair_bg_color' => null,
+                        'flair_color' => null,
+                        'bio_raw' => $text,
+                        'public_admission' => false,
+                        'public_exit' => false,
+                        'default_notification_level' => 3,
+                        'publish_read_state' => true,
+                        'owner_usernames' => $host ? $host->username : env('DISCOURSE_APIUSER')
+                    ]
+                ];
+
+                $endpoint = '/admin/groups.json';
+
+                Log::info('Creating group : '.json_encode($params));
+                $response = $client->request(
+                    'POST',
+                    $endpoint,
+                    [
+                        'form_params' => $params,
+                    ]
+                );
+
+                Log::info('Response status: '.$response->getStatusCode());
+                Log::info('Response body: '.$response->getBody());
+
+                if ($response->getStatusCode() !== 200) {
+                    if (strpos($response->getBody(), 'Name has already been taken') !== false) {
+                        // Discourse sometimes seems to have groups stuck in a bad state which are not accessible.
+                        // This may be a consequence of testing with multiple Restarters instances against the same
+                        // Discourse instance.
+                        //
+                        // This can result in a create failure, and a group which we cannot then locate to delete.
+                        // So skip over it and retry creation with a different name.
+                        $retry = true;
+                        $unique = $unique ? ($unique + 1) : 1;
+                    } else {
+                        Log::error('Could not create group ('.$this->idgroups.') thread: '.$response->getReasonPhrase());
+                    }
+                } else {
+                    // We want to save the discourse thread id in the group, so that we can invite people to it later
+                    // when they join.
+                    $json = json_decode($response->getBody(), true);
+                    if (empty($json['basic_group'])) {
+                        throw new \Exception('Group not found in create response');
+                    }
+
+                    $this->discourse_group = "$name$unique";
+                    $this->save();
+                    $success = true;
+                }
+            } catch (\Exception $ex) {
+                Log::error('Could not create group ('.$this->idgroups.') thread: '.$ex->getMessage());
+            }
+    	} while ($retry);
+
+        return $success;
+    }
+
+    public function getTimezoneAttribute($value)
+    {
+        // We might have a timezone attribute on the group.
+        if ($value) {
+            return $value;
+        }
+
+        // See if the network(s) the group is in have a consensus timezone.
+        $timezone = null;
+
+        foreach ($this->networks as $network) {
+            if ($network->timezone) {
+                if ($timezone) {
+                    if ($timezone != $network->timezone) {
+                        // This should not occur if the networks are set up correctly.
+                        \Sentry\captureMessage("Problem getting timezone for group {$this->idgroups} - networks conflict with $timezone and {$network->timezone}.  Will use $timezone.");
+                        // TODO Convert to exception once groups have timezones set by Neil.
+                        // throw new \Exception("Group does not have own timezone and is in networks with conflicting timezones");
+                    }
+                } else {
+                    // First timezone found.
+                    $timezone = $network->timezone;
+                }
+            }
+        }
+
+        if (!$timezone) {
+            // This should not occur if the networks are set up correctly.
+            // TODO Later on we should throw an exception, but only once this code has gone live, as we rely on
+            // the default behaviour during migration.
+            //throw new \Exception("Group {$this->idgroups} cannot resolve timezone");
+            $timezone = 'Europe/London';
+        }
+
+        return $timezone;
     }
 }

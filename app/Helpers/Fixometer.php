@@ -20,22 +20,8 @@ use Request;
 
 class Fixometer
 {
-    public static function allAges($range = false)
+    public static function allAges()
     {
-        if ($range) {
-            return [
-                '' => 'N/A',
-                (intval(date('Y')) - 20).'-'.(intval(date('Y')) - 16) => '16-20',
-                (intval(date('Y')) - 30).'-'.(intval(date('Y')) - 21) => '21-30',
-                (intval(date('Y')) - 40).'-'.(intval(date('Y')) - 31) => '31-40',
-                (intval(date('Y')) - 50).'-'.(intval(date('Y')) - 41) => '41-50',
-                (intval(date('Y')) - 60).'-'.(intval(date('Y')) - 51) => '51-60',
-                (intval(date('Y')) - 70).'-'.(intval(date('Y')) - 61) => '61-70',
-                (intval(date('Y')) - 80).'-'.(intval(date('Y')) - 71) => '71-80',
-                (intval(date('Y')) - 90).'-'.(intval(date('Y')) - 81) => '81-90',
-                (intval(date('Y')) - 100).'-'.(intval(date('Y')) - 91) => '91-100',
-            ];
-        }
         $ages = ['' => ''];
 
         for ($i = intval(date('Y')) - 18; $i > intval(date('Y', strtotime('- 100 years'))); $i--) {
@@ -96,7 +82,90 @@ class Fixometer
         return date('D, j M Y, H:i', $timestamp);
     }
 
+    public static function userHasViewPartyPermission($partyId, $userId = null)
+    {
+        $party = Party::findOrFail($partyId);
+        $group = $party->theGroup;
+
+        if ($group->approved) {
+            // Events on approved groups are always visible, whether or not the event has been approved.
+            return true;
+        }
+
+        // The group is not approved.  Events are only visible to:
+        // - administrators
+        // - (relevant) network coordinators
+        // - hosts of the relevant group
+        if (is_null($userId)) {
+            if (empty(Auth::user())) {
+                return false;
+            } else {
+                $userId = Auth::user()->id;
+            }
+        }
+
+        $user = User::findOrFail($userId);
+
+        if (self::hasRole($user, 'Administrator')) {
+            return true;
+        }
+
+        if (self::hasRole($user, 'NetworkCoordinator')) {
+            $group = $party->theGroup;
+            foreach ($group->networks as $network) {
+                if ($network->coordinators->contains($user)) {
+                    return true;
+                }
+            }
+        }
+
+        if (self::hasRole($user, 'Host') && self::userIsHostOfGroup($group->idgroups, $userId)) {
+            return true;
+        }
+
+        return false;
+    }
+
     public static function userHasEditPartyPermission($partyId, $userId = null)
+    {
+        $party = Party::findOrFail($partyId);
+
+        if (is_null($userId)) {
+            if (empty(Auth::user())) {
+                return false;
+            } else {
+                $userId = Auth::user()->id;
+            }
+        }
+
+        $user = User::findOrFail($userId);
+
+        if (self::hasRole($user, 'Administrator')) {
+            return true;
+        }
+
+        if (self::hasRole($user, 'NetworkCoordinator')) {
+            $group = $party->theGroup;
+            foreach ($group->networks as $network) {
+                if ($network->coordinators->contains($user)) {
+                    return true;
+                }
+            }
+        }
+
+        if (self::hasRole($user, 'Host')) {
+            $group_id_of_event = Party::where('idevents', $partyId)->value('group');
+            if (self::userIsHostOfGroup($group_id_of_event, $userId)) {
+                return true;
+            } elseif (empty(DB::table('events_users')->where('event', $partyId)->where('user', $user->id)->first())) {
+                return false;
+            }
+        }
+
+        return false;
+    }
+
+    public static function userHasDeletePartyPermission($partyId, $userId = null)
     {
         if (is_null($userId)) {
             if (empty(Auth::user())) {
@@ -111,20 +180,18 @@ class Fixometer
         if (self::hasRole($user, 'Administrator')) {
             return true;
         }
+
+        $group = Party::find($partyId)->theGroup;
+
+        if (self::hasRole($user, 'Host') && self::userIsHostOfGroup($group->idgroups, $userId)) {
+            return true;
+        }
+
         if (self::hasRole($user, 'NetworkCoordinator')) {
-            $group = Party::find($partyId)->theGroup;
             foreach ($group->networks as $network) {
                 if ($network->coordinators->contains($user)) {
                     return true;
                 }
-            }
-        }
-        if (self::hasRole($user, 'Host')) {
-            $group_id_of_event = Party::where('idevents', $partyId)->value('group');
-            if (self::userIsHostOfGroup($group_id_of_event, $userId)) {
-                return true;
-            } elseif (empty(DB::table('events_users')->where('event', $partyId)->where('user', $user->id)->first())) {
-                return false;
             }
         }
 
@@ -196,8 +263,8 @@ class Fixometer
         }
 
         $userIsHostOfAGroup = UserGroups::where('user', Auth::user()->id)
-                            ->where('role', 3)
-                            ->count() > 0;
+            ->where('role', 3)
+            ->count() > 0;
 
         if ($userIsHostOfAGroup) {
             return true;
@@ -209,11 +276,11 @@ class Fixometer
     public static function userIsHostOfGroup($groupId, $userId)
     {
         $user_group_association = DB::table('users_groups')
-                                ->where('group', $groupId)
-                                ->where('user', $userId)
-                                ->where('role', 3)
-                                ->whereNull('deleted_at')
-                                ->first();
+            ->where('group', $groupId)
+            ->where('user', $userId)
+            ->where('role', 3)
+            ->whereNull('deleted_at')
+            ->first();
 
         if (! empty($user_group_association)) {
             return true;
@@ -262,60 +329,6 @@ class Fixometer
 
               </div>';
         }
-    }
-
-    /**
-     * verify that an array index exists and is not empty or null.
-     * can also do some type control.
-     * */
-    public static function verify($var, $strict = false, $type = 'string')
-    {
-        if (! isset($var) || empty($var) || is_null($var)) {
-            return false;
-        }
-        if ($strict) {
-            switch ($type) {
-                    case 'number':
-                        if (is_numeric($var)) {
-                            return true;
-                        }
-
-                        break;
-                    case 'string':
-                        return true;
-
-                      break;
-                    case 'array':
-                        if (is_array($var)) {
-                            return true;
-                        }
-
-                        break;
-                    default:
-                        return false;
-
-                      break;
-                }
-        } else {
-            return true;
-        }
-    }
-
-    public static function dbDateNoTime($string)
-    {
-        $d = explode('/', $string);
-
-        return implode('-', array_reverse($d));
-    }
-
-    public static function translate($key)
-    {
-        $translation = __(App::getLocale().'.'.$key);
-        if (strpos($translation, App::getLocale().'.') !== false) {
-            return $key;
-        }
-
-        return $translation;
     }
 
     /**
@@ -705,25 +718,6 @@ class Fixometer
         return '';
     }
 
-    public static function checkDistance($object, $user)
-    {
-        $url = 'https://maps.googleapis.com/maps/api/distancematrix/json?units=imperial&origins='.$object->latitude.','.$object->longitude.'&destinations='.$user->latitude.','.$user->longitude;
-
-        $json = file_get_contents($url);
-        $json = json_decode($json);
-
-        if (is_object($json) && ! empty($json->{'rows'})) {
-            try {
-                $distance = str_replace(' mi', '', $json->{'rows'}[0]->{'elements'}[0]->{'distance'}->{'text'});
-                $distance = floatval(str_replace(',', '', $distance));
-            } catch (\Exception $e) {
-                return false;
-            }
-
-            return $distance;
-        }
-    }
-
     public static function skillCategories()
     {
         return [
@@ -755,11 +749,11 @@ class Fixometer
     public static function categoryCluster()
     {
         return [
-            '1' => 'Computers and Home Office',
-            '2' => 'Computers',
-            '3' => 'Home Office',
-            '4' => 'Test',
-        ];
+            1 => 'Computers and Home Office',
+            2 => 'Electronic Gadgets',
+            3 => 'Home Entertainment',
+            4 => 'Kitchen and Household Items',
+          ];
     }
 
     public static function loginRegisterStats()
@@ -772,9 +766,10 @@ class Fixometer
             $stats = \Cache::get('all_stats');
 
             // We've seen a Sentry problem which I can only see happening if there was invalid data in the cache.
-            if (! $stats ||
+            if (
+                ! $stats ||
                 ! array_key_exists('allparties', $stats) ||
-                ! array_key_exists('co2Total', $stats) ||
+                ! array_key_exists('waste_stats', $stats) ||
                 ! array_key_exists('device_count_status', $stats)
             ) {
                 $stats = [];
@@ -783,7 +778,7 @@ class Fixometer
 
         if ($stats == []) {
             $stats['allparties'] = $Party->ofThisGroup('admin', true, false);
-            $stats['co2Total'] = $Device->getWeights();
+            $stats['waste_stats'] = \App\Helpers\LcaStats::getWasteStats();
             $stats['device_count_status'] = $Device->statusCount();
             \Cache::put('all_stats', $stats, 7200);
         }
@@ -793,10 +788,15 @@ class Fixometer
 
     public static function userHasEditGroupPermission($group_id, $user_id, $role = 3)
     {
+        // Admins can do anything.
+        if (self::hasRole(User::find($user_id), 'Administrator')) {
+            return true;
+        }
+
         return ! empty(\App\UserGroups::where('group', $group_id)
-                                  ->where('user', $user_id)
-                                    ->where('role', $role)
-                                      ->first());
+            ->where('user', $user_id)
+            ->where('role', $role)
+            ->first());
     }
 
     public static function buildSortQuery($columnName)
@@ -840,43 +840,20 @@ class Fixometer
         return $role;
     }
 
-    /** checks if user has preference **/
-    public static function hasPreference($slug)
-    {
-
-      // Check if guest
-        if (Auth::guest()) {
-            return false;
-        }
-
-        // Check if preference exists
-        $has_preference = UsersPreferences::join('preferences', 'preferences.id', '=', 'users_preferences.preference_id')
-                                      ->where('users_preferences.user_id', Auth::user()->id)
-                                        ->where('preferences.slug', $slug)
-                                          ->first();
-
-        // Does user have it?
-        if (empty($has_preference)) {
-            return false;
-        }
-
-        return true;
-    }
-
-    /** checks if user has preference **/
+    /** checks if user has permission **/
     public static function hasPermission($slug)
     {
 
-      // Check if guest
+        // Check if guest
         if (Auth::guest()) {
             return false;
         }
 
         // Check if Permission Exists
         $has_permission = UsersPermissions::join('permissions', 'permissions.idpermissions', '=', 'users_permissions.permission_id')
-                                      ->where('users_permissions.user_id', Auth::user()->id)
-                                        ->where('permissions.slug', $slug)
-                                          ->first();
+            ->where('users_permissions.user_id', Auth::user()->id)
+            ->where('permissions.slug', $slug)
+            ->first();
 
         // Does user have it?
         if (empty($has_permission)) {
@@ -895,10 +872,10 @@ class Fixometer
     public static function usersWhoHavePreference($slug)
     {
         return User::join('users_preferences', 'users_preferences.user_id', '=', 'users.id')
-                      ->join('preferences', 'preferences.id', '=', 'users_preferences.preference_id')
-                        ->where('preferences.slug', $slug)
-                          ->select('users.*')
-                            ->get();
+            ->join('preferences', 'preferences.id', '=', 'users_preferences.preference_id')
+            ->where('preferences.slug', $slug)
+            ->select('users.*')
+            ->get();
     }
 
     public static function notificationClasses($modal)
@@ -906,8 +883,6 @@ class Fixometer
         $modal = str_replace("App\Notifications\\", '', $modal);
 
         $user_array = [
-            //'AccountCreated', doesn't appear to be in use
-            //'NewRegister',
             'AdminNewUser',
             'ResetPassword',
         ];
@@ -918,7 +893,6 @@ class Fixometer
             'EventRepairs',
             'JoinEvent',
             'AdminModerationEvent',
-            'NotifyHostRSVPInvitesMade',
             'NotifyRestartersOfNewEvent',
             'RSVPEvent',
             'AdminWordPressCreateEventFailure',
@@ -937,7 +911,6 @@ class Fixometer
 
         $device_array = [
             'NotifyAdminNoDevices',
-            'ReviewNotes',
             'AdminAbnormalDevices',
         ];
 
@@ -955,46 +928,6 @@ class Fixometer
     public static function allBarriers()
     {
         return Barrier::all();
-    }
-
-    /**
-     * Simplifies the logic on blade template for displaying the column drop down
-     * @return array
-     * @author Dean Appleton-Claydon
-     */
-    public static function filterColumns()
-    {
-        return [
-            // 'deviceID' => '#', - shouldn't really hide this column as this allows someone to view or edit the device!
-            'category' => 'Category',
-            'brand' => 'Brand',
-            'model' => 'Model',
-            'problem' => 'Comment',
-            'group_name' => 'Group',
-            'event_date' => 'Date',
-            //'location' => 'Location', no column for this
-            'repair_status' => 'State',
-        ];
-    }
-
-    /**
-     * Simplifies the logic in the blade templates around display device columns
-     * @param  string $column           checks to see whether column exists in session array
-     * @param  array $user_preferences array from session
-     * @return bool                   true or false!
-     * @author Dean Appleton-Claydon
-     */
-    public static function checkColumn($column, $user_preferences)
-    {
-        if (! is_null($user_preferences) && is_array($user_preferences)) {
-            if (in_array($column, $user_preferences)) {
-                return true;
-            }
-
-            return false;
-        }
-
-        return true;
     }
 
     /**
@@ -1016,28 +949,5 @@ class Fixometer
         } while ($model::where($column, $random)->exists());
 
         return $random;
-    }
-
-    /**
-     * [validateBetweenDates description]
-     * Check if date is between two dates...
-     *
-     * @author Christopher Kelker - @date 2019-04-05
-     * @editor  Christopher Kelker
-     * @version 1.0.0
-     * @param   [type]      $date_to_check
-     * @param   [type]      $date_from
-     * @param   [type]      $date_to
-     * @return  [type]
-     */
-    public static function validateBetweenDates($date_to_check, $date_from, $date_to)
-    {
-        $date_to_check = date('Y-m-d', strtotime($date_to_check));
-        $date_from = date('Y-m-d', strtotime($date_from));
-        $date_to = date('Y-m-d', strtotime($date_to));
-
-        // If $date_to_check is equal to one of or in between the
-        // two dates then return true, else false
-        return ($date_to_check >= $date_from) && ($date_to_check <= $date_to);
     }
 }

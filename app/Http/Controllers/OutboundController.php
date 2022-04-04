@@ -4,7 +4,6 @@ namespace App\Http\Controllers;
 
 use App\Device;
 use App\Group;
-use App\Helpers\FootprintRatioCalculator;
 use App\Party;
 use Request;
 
@@ -26,8 +25,6 @@ class OutboundController extends Controller
             $id = (int) $id;
             $id = filter_var($id, FILTER_SANITIZE_NUMBER_INT);
 
-            // Calculators
-
             // Get the data by type
             if (strtolower($type) == 'party') {
                 $event = Party::find($id);
@@ -37,28 +34,15 @@ class OutboundController extends Controller
                 }
 
                 $eventStats = $event->getEventStats();
-                $co2 = $eventStats['co2'];
+                $co2 = $eventStats['co2_total'];
             } elseif (strtolower($type) == 'group') {
                 $group = Group::find($id);
 
                 if (! $group) {
                     abort(404);
                 }
-
-                $EmissionRatio = FootprintRatioCalculator::calculateRatio();
-
-                $groupStats = $group->getGroupStats($EmissionRatio);
-                $co2 = $groupStats['co2'];
-            } elseif (strtolower($type) == 'group-tag') {
-                $groups = Group::join('grouptags_groups', 'grouptags_groups.group', '=', 'groups.idgroups')
-                  ->where('grouptags_groups.group_tag', $id)
-                    ->select('groups.*')
-                      ->get();
-                $co2 = 0;
-                foreach ($groups as $group) {
-                    $groupStats = $group->getGroupStats($EmissionRatio);
-                    $co2 += $groupStats['co2'];
-                }
+                $groupStats = $group->getGroupStats();
+                $co2 = $groupStats['co2_total'];
             }
 
             if ($format == 'fixometer') {
@@ -90,12 +74,12 @@ class OutboundController extends Controller
                 if (Request::is('api*')) {
                     return response()->json([
                             'info' => $info,
-                            'co2' => $co2,
+                            'co2' => round($co2),
                         ]);
                 } else {
                     return view('outbound.info', [
                             'info' => $info,
-                            'co2' => $co2,
+                            'co2' => round($co2),
                         ]);
                 }
             } else {
@@ -130,7 +114,7 @@ class OutboundController extends Controller
                 if (Request::is('api*')) {
                     return response()->json([
                             'format'        => $format,
-                            'co2'           => $co2,
+                            'co2'           => round($co2),
                             'title'         => $title,
                             'measure'   => $measure,
                             'equal_to'  => $equal_to,
@@ -138,7 +122,7 @@ class OutboundController extends Controller
                 } else {
                     return view('visualisations', [
                             'format'        => $format,
-                            'co2'           => $co2,
+                            'co2'           => round($co2),
                             'title'         => $title,
                             'measure'   => $measure,
                             'equal_to'  => $equal_to,

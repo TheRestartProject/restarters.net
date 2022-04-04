@@ -42,12 +42,14 @@ class ResetPassword extends Notification implements ShouldQueue
      */
     public function toMail($notifiable)
     {
+        $locale = $notifiable->language;
+
         return (new MailMessage)
-                    ->subject('Reset password')
-                    ->greeting('Hello!')
-                    ->line('You are receiving this email because we received a password reset request for your account.')
-                    ->action('Reset password', $this->arr['url'])
-                    ->line('If you did not request a password reset, no further action is required.');
+                    ->subject(__('notifications.password_reset_subject', [], $locale))
+                    ->greeting(__('notifications.greeting', [], $locale))
+                    ->line(__('notifications.password_reset_line1', [], $locale))
+                    ->action(__('notifications.password_reset_action', [], $locale), $this->arr['url'])
+                    ->line(__('notifications.password_reset_noaction', [], $locale));
     }
 
     /**

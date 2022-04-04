@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\User;
 use Auth;
 use Illuminate\Http\Request;
+use Cache;
 
 class UserController extends Controller
 {
@@ -89,36 +90,44 @@ class UserController extends Controller
     }
 
     /**
-     * Update the specified resource in storage.
+     * Get notification counts for a user.
      *
      * @param  \Illuminate\Http\Request  $request
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function update(Request $request, $id)
+    public function notifications(Request $request, $id)
     {
-        $authenticatedUser = Auth::user();
-        if (! $authenticatedUser->hasRole('Administrator')) {
-            return abort(403, 'The authenticated user is not authorized to update this resource');
+        $user = User::findOrFail($id);
+        $restartersNotifications = $user->unReadNotifications->count();
+        $discourseNotifications = 0;
+
+        if (config('restarters.features.discourse_integration')) {
+            if (Cache::has('talk_notification_' . $user->username)) {
+                $discourseNotifications = Cache::get('talk_notification_' . $user->username);
+            } else {
+                if (config('restarters.features.discourse_integration')) {
+                    $client = app('discourse-client');
+                    $response = $client->request('GET', '/notifications.json?username=' . $user->username);
+                    $talk_notifications = json_decode($response->getBody()->getContents(), true);
+
+                    if (!empty($talk_notifications) && array_key_exists('notifications', $talk_notifications)) {
+                        foreach ($talk_notifications['notifications'] as $notification) {
+                            if ($notification['read'] !== true) {
+                                $discourseNotifications++;
+                            }
+                        }
+
+                        Cache::put('talk_notification_' . $user->username, $discourseNotifications, 60);
+                    }
+                }
+            }
         }
 
-        $user = User::find($id);
-        if ($user === null) {
-            abort(404, 'Resource not found');
-        }
-
-        $changesMade = false;
-
-        if ($request->has('username')) {
-            $user->username = $request->input('username');
-            $changesMade = true;
-        }
-
-        if ($changesMade) {
-            $user->save();
-        }
-
-        // Zapier seems to require some response body.
-        return response()->json(['success' => 'success'], 200);
+        return response()->json([
+                                    'success' => 'success',
+                                    'restarters' => $restartersNotifications,
+                                    'discourse' => $discourseNotifications
+                                ], 200);
     }
 }

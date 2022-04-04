@@ -7,13 +7,13 @@
         <EventDescription class="pr-md-3" :idevents="idevents" />
       </div>
       <div>
-        <EventAttendance class="pl-md-3" :idevents="idevents" :canedit="canedit" :attendance="attendance" :invitations="invitations" />
+        <EventAttendance class="pl-md-3" :idevents="idevents" :canedit="canedit" :invitations="invitations" />
       </div>
     </div>
     <EventImages :images="images" v-if="images && images.length" />
     <div v-if="inProgress || finished">
       <EventStats :idevents="idevents" />
-      <EventDevices id="devices-section":idevents="idevents" :canedit="canedit" :devices="devices" :clusters="clusters" :brands="brands" :barrier-list="barrierList" :itemTypes="itemTypes" />
+      <EventDevices id="devices-section":idevents="idevents" :canedit="canedit || isAttending" :devices="devices" :clusters="clusters" :brands="brands" :barrier-list="barrierList" :itemTypes="itemTypes" />
     </div>
   </div>
 </template>
@@ -148,6 +148,11 @@ export default {
         devices: this.devices
       })
     }
+
+    this.$store.dispatch('attendance/set', {
+      idevents: this.idevents,
+      attendees: this.attendance
+    })
 
     if (window && window.location && window.location.hash) {
       setTimeout(() => {

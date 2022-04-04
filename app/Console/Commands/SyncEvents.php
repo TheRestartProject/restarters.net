@@ -58,7 +58,7 @@ class SyncEvents extends Command
 
                 return;
             }
-            $eventsQuery->where('event_date', '>=', $this->option('datefrom'));
+            $eventsQuery->where('event_start_utc', '>=', $this->option('datefrom'));
             $this->info('Starting from date: '.$dateFrom);
         }
 
@@ -70,8 +70,8 @@ class SyncEvents extends Command
 
         foreach ($events as $event) {
             try {
-                $startTimestamp = strtotime($event->event_date.' '.$event->start);
-                $endTimestamp = strtotime($event->event_date.' '.$event->end);
+                $startTimestamp = strtotime($event->event_start_utc);
+                $endTimestamp = strtotime($event->event_end_utc);
 
                 $group = Group::where('idgroups', $event->group)->first();
 
@@ -81,10 +81,11 @@ class SyncEvents extends Command
                     ['key' => 'party_groupcity', 'value' => $group->area],
                     ['key' => 'party_venue', 'value' => $event->venue],
                     ['key' => 'party_location', 'value' => $event->location],
-                    ['key' => 'party_time', 'value' => $event->start.' - '.$event->end],
-                    ['key' => 'party_date', 'value' => $event->event_date],
+                    ['key' => 'party_time', 'value' => $event->getEventStartEndLocal()],
+                    ['key' => 'party_date', 'value' => $event->event_date_local],
                     ['key' => 'party_timestamp', 'value' => $startTimestamp],
                     ['key' => 'party_timestamp_end', 'value' => $endTimestamp],
+                    ['key' => 'party_timezone', 'value' => $event->timezone],
                     ['key' => 'party_stats', 'value' => $event->idevents],
                     ['key' => 'party_lat', 'value' => $event->latitude],
                     ['key' => 'party_lon', 'value' => $event->longitude],

@@ -4,10 +4,11 @@ namespace App\Listeners;
 
 use App\Events\EditEvent;
 use App\Group;
+use App\Helpers\Fixometer;
 use App\Network;
 use App\Notifications\AdminWordPressEditEventFailure;
 use App\Party;
-use App\Helpers\Fixometer;
+use Carbon\Carbon;
 use HieuLe\WordpressXmlrpcClient\WordpressClient;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Queue\InteractsWithQueue;
@@ -49,8 +50,8 @@ class EditWordpressPostForEvent
 
         try {
             if (is_numeric($theParty->wordpress_post_id)) {
-                $startTimestamp = strtotime($data['event_date'].' '.$data['start']);
-                $endTimestamp = strtotime($data['event_date'].' '.$data['end']);
+                $startTimestamp = strtotime($theParty->event_start_utc);
+                $endTimestamp = strtotime($theParty->event_end_utc);
 
                 $group = Group::where('idgroups', $theParty->group)->first();
 
@@ -60,10 +61,11 @@ class EditWordpressPostForEvent
                     ['key' => 'party_groupcity', 'value' => $group->area],
                     ['key' => 'party_venue', 'value' => $data['venue']],
                     ['key' => 'party_location', 'value' => $data['location']],
-                    ['key' => 'party_time', 'value' => $data['start'].' - '.$data['end']],
-                    ['key' => 'party_date', 'value' => $data['event_date']],
+                    ['key' => 'party_time', 'value' => $theParty->getEventStartEndLocal()],
+                    ['key' => 'party_date', 'value' => $theParty->event_date_local],
                     ['key' => 'party_timestamp', 'value' => $startTimestamp],
                     ['key' => 'party_timestamp_end', 'value' => $endTimestamp],
+                    ['key' => 'party_timezone', 'value' => $theParty->timezone],
                     ['key' => 'party_stats', 'value' => $id],
                     ['key' => 'party_lat', 'value' => $data['latitude']],
                     ['key' => 'party_lon', 'value' => $data['longitude']],

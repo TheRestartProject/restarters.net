@@ -1,12 +1,14 @@
 <div id="accordion-grps" class="accordion accordion__grps accordion__share">
 
     <?php
-      $category_clusters = [
-        1 => 'Computers and Home Office',
-        2 => 'Electronic Gadgets',
-        3 => 'Home Entertainment',
-        4 => 'Kitchen and Household Items'
-      ];
+        if (is_null($category_clusters) ) {
+            $category_clusters = [
+                1 => 'Computers and Home Office',
+                2 => 'Electronic Gadgets',
+                3 => 'Home Entertainment',
+                4 => 'Kitchen and Household Items'
+            ];
+        }
     ?>
 
     @foreach( $category_clusters as $key => $category_cluster )
@@ -25,41 +27,28 @@
 
             <?php
 
-              //Counters
+              //Counters & Percentages
               if ( isset($clusters['all'][$key][0]) ):
                 $fixed = (int)$clusters['all'][$key][0]->counter;
+                $fixed_percent = App\Helpers\Fixometer::barChartValue($fixed, $clusters['all'][$key]['total']) + 15;
               else:
                 $fixed = 0;
+                $fixed_percent = null;
               endif;
 
               if ( isset($clusters['all'][$key][1]) ):
                 $repairable = (int)$clusters['all'][$key][1]->counter;
+                $repairable_percent = App\Helpers\Fixometer::barChartValue($repairable, $clusters['all'][$key]['total']) + 15;
               else:
                 $repairable = 0;
+                $repairable_percent = null;
               endif;
 
               if ( isset($clusters['all'][$key][2]) ):
                 $dead = (int)$clusters['all'][$key][2]->counter;
+                $dead_percent = App\Helpers\Fixometer::barChartValue($dead, $clusters['all'][$key]['total']) + 15;
               else:
                 $dead = 0;
-              endif;
-
-              //Percentages
-              if (array_key_exists(0, $clusters['all'][$key])):
-                $fixed_percent = App\Helpers\Fixometer::barChartValue($clusters['all'][$key][0]->counter, $clusters['all'][$key]['total']) + 15;
-              else:
-                $fixed_percent = null;
-              endif;
-
-              if (array_key_exists(1, $clusters['all'][$key])):
-                $repairable_percent = App\Helpers\Fixometer::barChartValue($clusters['all'][$key][1]->counter, $clusters['all'][$key]['total']) + 15;
-              else:
-                $repairable_percent = null;
-              endif;
-
-              if (array_key_exists(2, $clusters['all'][$key])):
-                $dead_percent = App\Helpers\Fixometer::barChartValue($clusters['all'][$key][2]->counter, $clusters['all'][$key]['total']) + 15;
-              else:
                 $dead_percent = null;
               endif;
 
