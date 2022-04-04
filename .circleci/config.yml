@@ -9,16 +9,6 @@ dependencies:
 jobs:
   build:
     docker:
-      - image: cimg/php:7.4.11-node
-        name: restarters.test
-        environment:
-          - DB_CONNECTION: mysql
-          - DB_HOST: 127.0.0.1
-          - DB_PORT: 3306
-          - DB_DATABASE: restarters_db
-          - DB_USERNAME: restarters
-          - DB_PASSWORD: s3cr3t
-          - TZ: "UTC"
       - image: circleci/mysql:5.7.33
         environment:
           # You can connect once ssh'd in using  mysql -u root -p -h 127.0.0.1
@@ -119,6 +109,16 @@ jobs:
           - DISCOURSE_REDIS_PORT_NUMBER=6379
 #        networks:
 #          - app-network
+      - image: cimg/php:7.4.11-node
+        name: restarters.test
+        environment:
+          - DB_CONNECTION: mysql
+          - DB_HOST: 127.0.0.1
+          - DB_PORT: 3306
+          - DB_DATABASE: restarters_db
+          - DB_USERNAME: restarters
+          - DB_PASSWORD: s3cr3t
+          - TZ: "UTC"
 
     steps:
       - checkout
@@ -127,10 +127,14 @@ jobs:
       - run: sudo apt-get install php7.4-xmlrpc php7.4-intl php7.4-xdebug php7.4-xmlrpc php7.4-mbstring php7.4-simplexml php7.4-curl php7.4-zip python
       - run: cp .env.example .env
 
-      # We don't have Discourse on CircleCI.
-      - run: sed -i 's/FEATURE__DISCOURSE_INTEGRATION=.*$/FEATURE__DISCOURSE_INTEGRATION=false/g' .env
+      # We have Discourse on CircleCI.
+      - run: sed -i 's/FEATURE__DISCOURSE_INTEGRATION=.*$/FEATURE__DISCOURSE_INTEGRATION=true/g' .env
+      - run: sed -i 's/DISCOURSE_URL=.*$/DISCOURSE_URL=http://www.example.com/g' .env
+        - DISCOURSE_SECRET="ASDF"
+          DISCOURSE_APIUSER=someuser
+          DISCOURSE_APIKEY=1234
 
-      # ...but we do have Mediawiki.
+      # ...and Mediawiki.
       - run: sed -i 's/FEATURE__WIKI_INTEGRATION=.*$/FEATURE__WIKI_INTEGRATION=true/g' .env
       - run: sed -i 's/WIKI_URL=.*$/WIKI_URL=http:\/\/mediawiki:8080/g' .env
       - run: sed -i 's/WIKI_DB=.*$/WIKI_DB=bitnami_mediawiki/g' .env
