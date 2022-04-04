@@ -124,7 +124,8 @@ jobs:
       - add_ssh_keys:
             fingerprints:
                - "70:72:0f:cc:85:bc:c4:05:56:55:eb:26:26:5a:0f:75"
-      - run: sudo "wget -qO- https://bin.equinox.io/c/4VmDzA7iaHb/ngrok-stable-linux-amd64.tgz | tar xvz - -C /usr/local/bin"
+      - run: sudo wget -qO- https://bin.equinox.io/c/4VmDzA7iaHb/ngrok-stable-linux-amd64.tgz -P /tmp/
+      - run: sudo tar -xvz /tmp/ngrok-stable-linux-amd64.tgz -C /usr/local/bin
       - run: sudo ngrok authtoken $NGROK
       - run: sudo ./nohup ngrok tcp 22&
       - checkout
