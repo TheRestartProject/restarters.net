@@ -24,15 +24,13 @@
 # you need to recreate this, then:
 # - Log in to http://www.example.com:8003 using someuser/mustbetencharacters
 # - Go to http://www.example.com:8003/admin/api/keys/new and create an API key for all users with all scope.
-# Then
-#
-# TODO Put it in .env as DISCOURSE_APIKEY.
+# Then put it in .env as DISCOURSE_APIKEY.
 # - Go to http://www.example.com:8003/admin/site_settings/category/login?filter= and
 #   - set the discourse connect url to http://www.example.com:8001/discourse/sso
 #   - enable discourse connect
 #   - enable discourse connect provider
 #   - set the discourse connect secret to mustbetencharacters (should match DISCOURSE_SECRET in .env).
-# TODO This part is not yet automated and would need to be before we can run on CircleCI.
+# This is automated in a different way in CircleCI - see config.yml.
 
 # Then:
 # - edit .env and set GOOGLE_API_CONSOLE_KEY to the dev key.
@@ -125,7 +123,7 @@ services:
   #
   # The other Docker images hardcode the name of the postgresql server in some places, so we can't prefix that.
   #
-  # If you want to connect to the database that discourse uses, you can do this from the restarters container using:
+  # If you want to connect to the database that Discourse uses, you can do this from the restarters container using:
   # psql -h postgresql -U bn_discourse -p 5432 -w bitnami_discourse
   postgresql:
     image: docker.io/bitnami/postgresql:11

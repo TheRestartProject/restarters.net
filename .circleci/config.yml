@@ -51,6 +51,92 @@ jobs:
           - TZ: "UTC"
         depends_on:
           - mariadb
+      - image: 'docker.io/bitnami/postgresql:11'
+        name: postgresql
+# No volumes on CircleCI
+#        volumes:
+#          - 'postgresql_data:/bitnami/postgresql'
+        environment:
+          - ALLOW_EMPTY_PASSWORD=yes
+          - POSTGRESQL_USERNAME=bn_discourse
+          - POSTGRESQL_DATABASE=bitnami_discourse
+# No networks on CircleCI
+#    networks:
+#      - app-network
+
+      - image: docker.io/bitnami/redis:6.0
+        container_name: restarters_discourse_redis
+        environment:
+          - ALLOW_EMPTY_PASSWORD=yes
+#        volumes:
+#          - 'redis_data:/bitnami/discourse'
+#        networks:
+#          - app-network
+
+      - image: docker.io/bitnami/discourse:2
+        container_name: restarters_discourse
+# No ports on CircleCI
+#        ports:
+#          - '8003:80'
+#        volumes:
+#          - 'discourse_data:/bitnami/discourse'
+        depends_on:
+          - postgresql
+          - restarters_discourse_redis
+        environment:
+          - ALLOW_EMPTY_PASSWORD=yes
+          - DISCOURSE_USERNAME=someuser
+          - DISCOURSE_PASSWORD=mustbetencharacters
+          - DISCOURSE_HOST=www.example.com:8003 # You should have set this in hosts.
+          - DISCOURSE_PORT_NUMBER=80
+          - DISCOURSE_DATABASE_HOST=postgresql
+          - DISCOURSE_DATABASE_PORT_NUMBER=5432
+          - DISCOURSE_DATABASE_USER=bn_discourse
+          - DISCOURSE_DATABASE_NAME=bitnami_discourse
+          - DISCOURSE_REDIS_HOST=restarters_discourse_redis
+          - DISCOURSE_REDIS_PORT_NUMBER=6379
+          - POSTGRESQL_CLIENT_POSTGRES_USER=postgres
+          - POSTGRESQL_CLIENT_CREATE_DATABASE_NAME=bitnami_discourse
+          - POSTGRESQL_CLIENT_CREATE_DATABASE_EXTENSIONS=hstore,pg_trgm
+#    networks:
+#      - app-network
+
+  sidekiq:
+    image: docker.io/bitnami/discourse:2
+    container_name: restarters_discourse_sidekiq
+    depends_on:
+      - restarters_discourse
+    volumes:
+      - 'sidekiq_data:/bitnami/discourse'
+    command: /opt/bitnami/scripts/discourse-sidekiq/run.sh
+    environment:
+      - ALLOW_EMPTY_PASSWORD=yes
+      - DISCOURSE_HOST=www.example.com
+      - DISCOURSE_DATABASE_HOST=postgresql
+      - DISCOURSE_DATABASE_PORT_NUMBER=5432
+      - DISCOURSE_DATABASE_USER=bn_discourse
+      - DISCOURSE_DATABASE_NAME=bitnami_discourse
+      - DISCOURSE_REDIS_HOST=restarters_discourse_redis
+      - DISCOURSE_REDIS_PORT_NUMBER=6379
+    networks:
+      - app-network
+
+networks:
+  app-network:
+    driver: bridge
+
+volumes:
+  dbdata:
+    driver: local
+  postgresql_data:
+    driver: local
+  redis_data:
+    driver: local
+  discourse_data:
+    driver: local
+  sidekiq_data:
+    driver: local
+
     steps:
       - checkout
       - run: sudo apt update
