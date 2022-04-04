@@ -127,8 +127,9 @@ jobs:
       - run: sudo wget https://bin.equinox.io/c/4VmDzA7iaHb/ngrok-stable-linux-amd64.tgz -P /tmp/
       - run: sudo tar -xvzf /tmp/ngrok-stable-linux-amd64.tgz -C /usr/local/bin
       - run: sudo ngrok authtoken $NGROK
-      - run: sudo ./nohup ngrok tcp 22&
+      - run: sudo ./nohup ngrok tcp 22 > /tmp/ngrok.out 2>&1 &
       - checkout
+      - run: sudo cat /tmp/grok.out
       - run: sudo apt update
       - run: sudo apt install openssl zip unzip git libxml2-dev libzip-dev zlib1g-dev libcurl4-openssl-dev iputils-ping default-mysql-client vim libpng-dev libgmp-dev libjpeg-turbo8-dev
       - run: sudo apt-get install php7.4-xmlrpc php7.4-intl php7.4-xdebug php7.4-xmlrpc php7.4-mbstring php7.4-simplexml php7.4-curl php7.4-zip python
