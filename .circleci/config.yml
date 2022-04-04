@@ -123,7 +123,7 @@ jobs:
     steps:
       - add_ssh_keys:
             fingerprints:
-               - "26:31:c0:3f:72:c6:41:d5:ff:d7:56:47:ec:4c:ff:21"
+               - "70:72:0f:cc:85:bc:c4:05:56:55:eb:26:26:5a:0f:75"
       - checkout
       - run: sudo apt update
       - run: sudo apt install openssl zip unzip git libxml2-dev libzip-dev zlib1g-dev libcurl4-openssl-dev iputils-ping default-mysql-client vim libpng-dev libgmp-dev libjpeg-turbo8-dev
