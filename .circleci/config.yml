@@ -129,10 +129,10 @@ jobs:
 
       # We have Discourse on CircleCI.
       - run: sed -i 's/FEATURE__DISCOURSE_INTEGRATION=.*$/FEATURE__DISCOURSE_INTEGRATION=true/g' .env
-      - run: sed -i 's/DISCOURSE_URL=.*$/DISCOURSE_URL=http://www.example.com/g' .env
-        - DISCOURSE_SECRET="ASDF"
-          DISCOURSE_APIUSER=someuser
-          DISCOURSE_APIKEY=1234
+      - run: sed -i 's/DISCOURSE_URL=.*$/DISCOURSE_URL=http:\/\/www.example.com/g' .env
+#        - DISCOURSE_SECRET="ASDF"
+#          DISCOURSE_APIUSER=someuser
+#          DISCOURSE_APIKEY=1234
 
       # ...and Mediawiki.
       - run: sed -i 's/FEATURE__WIKI_INTEGRATION=.*$/FEATURE__WIKI_INTEGRATION=true/g' .env
