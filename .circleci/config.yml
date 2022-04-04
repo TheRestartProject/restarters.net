@@ -9,16 +9,6 @@ dependencies:
 jobs:
   build:
     docker:
-      - image: cimg/php:7.4.11-node
-        name: restarters.test
-        environment:
-          - DB_CONNECTION: mysql
-          - DB_HOST: 127.0.0.1
-          - DB_PORT: 3306
-          - DB_DATABASE: restarters_db
-          - DB_USERNAME: restarters
-          - DB_PASSWORD: s3cr3t
-          - TZ: "UTC"
       - image: circleci/mysql:5.7.33
         environment:
           # You can connect once ssh'd in using  mysql -u root -p -h 127.0.0.1
@@ -120,6 +110,18 @@ jobs:
 #        networks:
 #          - app-network
 
+  test:
+    docker:
+      - image: cimg/php:7.4.11-node
+        name: restarters.test
+        environment:
+          - DB_CONNECTION: mysql
+          - DB_HOST: 127.0.0.1
+          - DB_PORT: 3306
+          - DB_DATABASE: restarters_db
+          - DB_USERNAME: restarters
+          - DB_PASSWORD: s3cr3t
+          - TZ: "UTC"
     steps:
       - checkout
       - run: sudo apt update
