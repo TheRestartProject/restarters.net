@@ -1538,7 +1538,8 @@ jQuery(document).ready(function () {
         'eventdatepicker': require('./components/EventDatePicker.vue'),
         'venueaddress': require('./components/VenueAddress.vue'),
         'richtexteditor': require('./components/RichTextEditor.vue'),
-        'notifications': require('./components/Notifications.vue')
+        'notifications': require('./components/Notifications.vue'),
+        'grouptimezone': require('./components/GroupTimeZone.vue')
       }
     })
   })
