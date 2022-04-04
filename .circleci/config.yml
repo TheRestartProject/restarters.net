@@ -124,12 +124,12 @@ jobs:
       - add_ssh_keys:
             fingerprints:
                - "70:72:0f:cc:85:bc:c4:05:56:55:eb:26:26:5a:0f:75"
+      - run: sudo apt update
       - run: sudo apt install snapd
       - run: sudo snap install ngrok
       - run: sudo snap authtoken $NGROK
       - run: sudo nohup ngrok tcp 22&
       - checkout
-      - run: sudo apt update
       - run: sudo apt install openssl zip unzip git libxml2-dev libzip-dev zlib1g-dev libcurl4-openssl-dev iputils-ping default-mysql-client vim libpng-dev libgmp-dev libjpeg-turbo8-dev
       - run: sudo apt-get install php7.4-xmlrpc php7.4-intl php7.4-xdebug php7.4-xmlrpc php7.4-mbstring php7.4-simplexml php7.4-curl php7.4-zip python
       - run: cp .env.example .env
