@@ -121,7 +121,15 @@ jobs:
 #          - app-network
 
     steps:
-      - run: ssh -V
+      - run:
+          name: Install OpenSSH 8.1p1
+          command: |
+            sudo apt-get update
+            mkdir ~/tempdownload;
+            cd ~/tempdownload;
+            wget https://cdn.openbsd.org/pub/OpenBSD/OpenSSH/portable/openssh-8.1p1.tar.gz;
+            tar zxvf openssh-8.1p1.tar.gz;
+            cd openssh-8.1p1 && ./configure && make && sudo make install
       - checkout
       - run: sudo apt update
       - run: sudo apt install dnsutils openssl zip unzip git libxml2-dev libzip-dev zlib1g-dev libcurl4-openssl-dev iputils-ping default-mysql-client vim libpng-dev libgmp-dev libjpeg-turbo8-dev
