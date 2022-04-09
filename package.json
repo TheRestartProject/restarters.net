@@ -53,7 +53,7 @@
         "js-cookie": "^2.2.0",
         "lang.js": "^1.1.14",
         "leaflet": "^1.4.0",
-        "moment": "^2.22.2",
+        "moment": "^2.29.2",
         "moment-timezone": "^0.5.34",
         "npm": "^6.14.5",
         "perfect-scrollbar": "^1.4.0",
