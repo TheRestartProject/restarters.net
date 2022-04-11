@@ -121,28 +121,18 @@ jobs:
 #          - app-network
 
     steps:
-#      - run:
-#          name: Install OpenSSH 8.1p1
-#          command: |
-#            sudo apt-get update
-#            mkdir ~/tempdownload;
-#            cd ~/tempdownload;
-#            wget https://cdn.openbsd.org/pub/OpenBSD/OpenSSH/portable/openssh-8.1p1.tar.gz;
-#            tar zxvf openssh-8.1p1.tar.gz;
-#            cd openssh-8.1p1 && ./configure && make && sudo make install
-#
       - checkout
       - run: sudo apt update
       - run: sudo apt install dnsutils openssl zip unzip git libxml2-dev libzip-dev zlib1g-dev libcurl4-openssl-dev iputils-ping default-mysql-client vim libpng-dev libgmp-dev libjpeg-turbo8-dev
-      - run: sudo apt-get install php7.4-xmlrpc php7.4-intl php7.4-xdebug php7.4-xmlrpc php7.4-mbstring php7.4-simplexml php7.4-curl php7.4-zip python
+      - run: sudo apt-get install php7.4-xmlrpc php7.4-intl php7.4-xdebug php7.4-xmlrpc php7.4-mbstring php7.4-simplexml php7.4-curl php7.4-zip python postgresql-client
       - run: cp .env.example .env
 
-      # We have Discourse on CircleCI.
+      # We have Discourse on CircleCI.  Create Discourse API key.  We do this hackily in the DB because the Bitnami image
+      # doesn't expose an easy way to do it.
+      - run: psql -h postgresql -U postgres -c "INSERT INTO api_keys (id, user_id, created_by_id, created_at, updated_at, allowed_ips, hidden, last_used_at, revoked_at, description, key_hash, truncated_key) VALUES (1, NULL, 1, '2021-10-25 13:56:20.033338', '2021-10-25 13:56:20.033338', NULL, false, NULL, NULL, 'Restarters', '2e56d3066ba32b7fd7602c783083d556ffb905bbd90577799af437f9acb55d06', '9fd7.');" bitnami_discourse
       - run: sed -i 's/FEATURE__DISCOURSE_INTEGRATION=.*$/FEATURE__DISCOURSE_INTEGRATION=true/g' .env
-      - run: sed -i 's/DISCOURSE_URL=.*$/DISCOURSE_URL=http:\/\/www.example.com/g' .env
-#        - DISCOURSE_SECRET="ASDF"
-#          DISCOURSE_APIUSER=someuser
-#          DISCOURSE_APIKEY=1234
+      - run: sed -i 's/DISCOURSE_URL=.*$/DISCOURSE_URL=http:\/\/restarters_discourse/g' .env
+      - run: sed -i 's/DISCOURSE_APIKEY=.*$/DISCOURSE_APIKEY=2e56d3066ba32b7fd7602c783083d556ffb905bbd90577799af437f9acb55d06/g' .env
 
       # ...and Mediawiki.
       - run: sed -i 's/FEATURE__WIKI_INTEGRATION=.*$/FEATURE__WIKI_INTEGRATION=true/g' .env
