@@ -169,7 +169,7 @@ jobs:
 
       # Wait for Discourse to finish initialising.
       - run: while ! nc -z restarters_discourse 80; do sleep 1 ; done
-      - run: psql -h postgresql -U postgres -c "INSERT INTO api_keys (id, user_id, created_by_id, created_at, updated_at, allowed_ips, hidden, last_used_at, revoked_at, description, key_hash, truncated_key) VALUES (1, NULL, 1, '2021-10-25 13:56:20.033338', '2021-10-25 13:56:20.033338', NULL, false, NULL, NULL, 'Restarters', '2e56d3066ba32b7fd7602c783083d556ffb905bbd90577799af437f9acb55d06', '9fd7');" bitnami_discourse
+      - run: psql -h postgresql -U postgres -c "INSERT INTO api_keys (id, user_id, created_by_id, created_at, updated_at, allowed_ips, hidden, last_used_at, revoked_at, description, key_hash, truncated_key) VALUES (1, NULL, 1, '2021-10-25 13:56:20.033338', '2021-10-25 13:56:20.033338', NULL, false, NULL, NULL, 'Restarters', 'd89e9dfacfb611fbaf004807648187ce7ed474df44dcb0ada230fab5c8dd6a5b', '9fd7');" bitnami_discourse
 
       # Run phpunit.
       - run: export XDEBUG_MODE=coverage;./phpunit -d memory_limit=512M --bootstrap vendor/autoload.php -dxdebug.coverage_enable=1 --coverage-clover tests/clover.xml --configuration ./phpunit.xml
