@@ -14,7 +14,7 @@ use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Foundation\Testing\WithFaker;
 use Tests\TestCase;
 
-class CountsTests extends TestCase
+class CountsTest extends TestCase
 {
     // Event counts should only include events in the past.
 

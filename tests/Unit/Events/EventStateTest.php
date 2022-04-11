@@ -13,7 +13,7 @@ use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Foundation\Testing\WithFaker;
 use Tests\TestCase;
 
-class EventStateTests extends TestCase
+class EventStateTest extends TestCase
 {
     protected function setUp(): void
     {
@@ -45,5 +45,23 @@ class EventStateTests extends TestCase
 
         // assert
         $this->assertTrue($event->isInProgress());
+    }
+
+    /** @test */
+    public function it_starts_an_hour_early() {
+        $event = factory(Party::class)->create();
+
+        $event->event_start_utc = Carbon::now()->addMinutes(30)->toIso8601String();
+        $event->event_end_utc = Carbon::now()->addMinutes(90)->toIso8601String();
+        $this->assertTrue($event->isInProgress());
+    }
+
+    /** @test */
+    public function is_doesnt_start_too_soon() {
+        $event = factory(Party::class)->create();
+        $event->event_start_utc = Carbon::now()->addMinutes(65)->toIso8601String();
+        $event->event_end_utc = Carbon::now()->addMinutes(90)->toIso8601String();
+
+        $this->assertFalse($event->isInProgress());
     }
 }

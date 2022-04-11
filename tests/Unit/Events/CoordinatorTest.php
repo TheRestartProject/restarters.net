@@ -12,7 +12,7 @@ use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Foundation\Testing\WithFaker;
 use Tests\TestCase;
 
-class CoordinatorTests extends TestCase
+class CoordinatorTest extends TestCase
 {
     protected function setUp(): void
     {
