@@ -124,8 +124,9 @@
                               @lang('groups.groups_postcode_small')
                             </small>
 
-                            <label for="postcode" class="mt-3">@lang('groups.timezone'):</label>
-                            <input type="text" id="timezone" name="timezone" class="form-control field" value="{{ App\Group::find($formdata->idgroups)->timezone }}" readonly />
+                            <div class="vue">
+                              <GroupTimeZone value="{{ App\Group::find($formdata->idgroups)->timezone }}" />
+                            </div>
 
                           </div>
                         </div>

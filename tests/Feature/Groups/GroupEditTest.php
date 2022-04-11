@@ -104,4 +104,14 @@ class GroupEditTest extends TestCase
         $response->assertOk();
         $this->assertEquals('success - image uploaded', $response->getContent());
     }
+
+    /** @test */
+    public function can_edit_timezone() {
+        // Get list of timezones.
+        $response = $this->get('/api/timezones');
+        $response->assertSuccessful();
+        $timezones = json_decode($response->getContent(), TRUE);
+        self::assertGreaterThan(0, count($timezones));
+        self::assertTrue(array_key_exists('name', $timezones[0]));
+    }
 }

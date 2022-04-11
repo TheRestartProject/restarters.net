@@ -58,6 +58,9 @@ jobs:
       - run: sudo apt-get install php7.4-xmlrpc php7.4-intl php7.4-xdebug php7.4-xmlrpc php7.4-mbstring php7.4-simplexml php7.4-curl php7.4-zip python
       - run: cp .env.example .env
 
+      # Need access to timezones.
+      - run: mysql --host="127.0.0.1" -u root -ps3cr3t -e "GRANT SELECT ON mysql.time_zone_name TO 'restarters'@'%';"
+
       # We don't have Discourse on CircleCI.
       - run: sed -i 's/FEATURE__DISCOURSE_INTEGRATION=.*$/FEATURE__DISCOURSE_INTEGRATION=false/g' .env
 

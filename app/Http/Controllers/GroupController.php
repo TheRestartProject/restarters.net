@@ -612,6 +612,7 @@ class GroupController extends Controller
                 'website' => $data['website'],
                 'free_text' => $data['free_text'],
                 'location' => $data['location'],
+                'timezone' => array_key_exists('timezone', $data) ? $data['timezone'] : null,
                 'latitude' => $latitude,
                 'longitude' => $longitude,
                 'country' => $country,
