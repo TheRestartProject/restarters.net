@@ -87,7 +87,7 @@ jobs:
           - ALLOW_EMPTY_PASSWORD=yes
           - DISCOURSE_USERNAME=someuser
           - DISCOURSE_PASSWORD=mustbetencharacters
-          - DISCOURSE_HOST=www.example.com:8003 # You should have set this in hosts.
+          - DISCOURSE_HOST=www.example.com:8003
           - DISCOURSE_PORT_NUMBER=80
           - DISCOURSE_DATABASE_HOST=postgresql
           - DISCOURSE_DATABASE_PORT_NUMBER=5432
@@ -129,7 +129,6 @@ jobs:
 
       # We have Discourse on CircleCI.  Create Discourse API key.  We do this hackily in the DB because the Bitnami image
       # doesn't expose an easy way to do it.
-      - run: psql -h postgresql -U postgres -c "INSERT INTO api_keys (id, user_id, created_by_id, created_at, updated_at, allowed_ips, hidden, last_used_at, revoked_at, description, key_hash, truncated_key) VALUES (1, NULL, 1, '2021-10-25 13:56:20.033338', '2021-10-25 13:56:20.033338', NULL, false, NULL, NULL, 'Restarters', '2e56d3066ba32b7fd7602c783083d556ffb905bbd90577799af437f9acb55d06', '9fd7.');" bitnami_discourse
       - run: sed -i 's/FEATURE__DISCOURSE_INTEGRATION=.*$/FEATURE__DISCOURSE_INTEGRATION=true/g' .env
       - run: sed -i 's/DISCOURSE_URL=.*$/DISCOURSE_URL=http:\/\/restarters_discourse/g' .env
       - run: sed -i 's/DISCOURSE_APIKEY=.*$/DISCOURSE_APIKEY=2e56d3066ba32b7fd7602c783083d556ffb905bbd90577799af437f9acb55d06/g' .env
@@ -164,6 +163,11 @@ jobs:
       - run: wget -O phpunit https://phar.phpunit.de/phpunit-7.phar ; chmod +x phpunit
       - run: mkdir uploads
 
+      # Wait for Discourse to finish initialising.
+      - run: while ! nc -z restarters_discourse 80; do sleep 1 ; done
+      - run: psql -h postgresql -U postgres -c "INSERT INTO api_keys (id, user_id, created_by_id, created_at, updated_at, allowed_ips, hidden, last_used_at, revoked_at, description, key_hash, truncated_key) VALUES (1, NULL, 1, '2021-10-25 13:56:20.033338', '2021-10-25 13:56:20.033338', NULL, false, NULL, NULL, 'Restarters', '2e56d3066ba32b7fd7602c783083d556ffb905bbd90577799af437f9acb55d06', '9fd7');" bitnami_discourse
+
+      # Run phpunit.
       - run: export XDEBUG_MODE=coverage;./phpunit -d memory_limit=512M --bootstrap vendor/autoload.php -dxdebug.coverage_enable=1 --coverage-clover tests/clover.xml --configuration ./phpunit.xml
 
       # Coveralls is pernickety about the location it uploads from existing.
