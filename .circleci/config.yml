@@ -135,6 +135,7 @@ jobs:
       - run: sed -i 's/FEATURE__DISCOURSE_INTEGRATION=.*$/FEATURE__DISCOURSE_INTEGRATION=true/g' .env
       - run: sed -i 's/DISCOURSE_URL=.*$/DISCOURSE_URL=http:\/\/restarters_discourse/g' .env
       - run: sed -i 's/DISCOURSE_APIKEY=.*$/DISCOURSE_APIKEY=2e56d3066ba32b7fd7602c783083d556ffb905bbd90577799af437f9acb55d06/g' .env
+      - run: sed -i 's/DISCOURSE_APIUSER=.*$/DISCOURSE_APIUSER=someuser/g' .env
 
       # ...and Mediawiki.
       - run: sed -i 's/FEATURE__WIKI_INTEGRATION=.*$/FEATURE__WIKI_INTEGRATION=true/g' .env
