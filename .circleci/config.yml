@@ -127,6 +127,9 @@ jobs:
       - run: sudo apt-get install php7.4-xmlrpc php7.4-intl php7.4-xdebug php7.4-xmlrpc php7.4-mbstring php7.4-simplexml php7.4-curl php7.4-zip python postgresql-client
       - run: cp .env.example .env
 
+      # Need access to timezones.
+      - run: mysql --host="127.0.0.1" -u root -ps3cr3t -e "GRANT SELECT ON mysql.time_zone_name TO 'restarters'@'%';"
+
       # We have Discourse on CircleCI.  Create Discourse API key.  We do this hackily in the DB because the Bitnami image
       # doesn't expose an easy way to do it.
       - run: sed -i 's/FEATURE__DISCOURSE_INTEGRATION=.*$/FEATURE__DISCOURSE_INTEGRATION=true/g' .env

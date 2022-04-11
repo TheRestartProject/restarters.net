@@ -613,9 +613,15 @@ class Party extends Model implements Auditable
         return "{$this->event_date_local} {$this->start_local}";
     }
 
-    public function getEventStartEndLocal()
+    public function getEventStartEndLocal($includeTimezone = false)
     {
-        return $this->start_local . ' - ' . $this->end_local;
+        $ret = $this->start_local . ' - ' . $this->end_local;
+
+        if ($includeTimezone) {
+            $ret .= ' (' . $this->timezone . ')';
+        }
+
+        return $ret;
     }
 
     public function getEventName()
@@ -660,6 +666,10 @@ class Party extends Model implements Auditable
         $date_now = Carbon::now();
         $start = new Carbon($this->event_start_utc);
         $end = new Carbon($this->event_end_utc);
+
+        // We have a hack (preserving old behaviour) to make events appear to start an hour before they actually do.
+        $start = $start->subHours(1);
+
         return $date_now->gte($start) && $date_now->lte($end);
     }
 

@@ -51,10 +51,11 @@ class InviteEventTest extends TestCase
                     'groupname' => $group->name
                 ], $user->language), $mailData['subject']);
 
-                // Mail should mention the host, message and location.
-                self::assertRegexp('/' . $host->name . '/', $mailData['introLines'][0]);
-                self::assertRegexp('/creepy/', $mailData['introLines'][2]);
-                self::assertRegexp('/' . $event->location  . '/', $mailData['introLines'][4]);
+                // Mail should mention the host, message, location and timezone.
+                self::assertContains($host->name, $mailData['introLines'][0]);
+                self::assertContains('creepy', $mailData['introLines'][2]);
+                self::assertContains($event->location, $mailData['introLines'][4]);
+                self::assertContains($event->timezone,  $mailData['introLines'][4]);
 
                 // Render to HTML to check the footer which is inserted by email.blade.php isn't accidentally
                 // escaped.
