@@ -1492,10 +1492,18 @@ jQuery(document).ready(function () {
       __(key) {
         // This means we can use __('key') in Vue templates in the same way as we are used to in Laravel
         // templates.
-        return this.$lang.get(key)
+        if (this.$lang.has(key)) {
+          return this.$lang.get(key)
+        } else {
+          Sentry.captureMessage("Missing translation " + key)
+        }
       },
       __(key, values) {
-        return this.$lang.get(key, values)
+        if ($this.$lang.has(key)) {
+          return this.$lang.get(key, values)
+        } else {
+          Sentry.captureMessage("Missing translation " + key)
+        }
       }
     }
   })
