@@ -1499,7 +1499,7 @@ jQuery(document).ready(function () {
         }
       },
       __(key, values) {
-        if ($this.$lang.has(key)) {
+        if (this.$lang.has(key)) {
           return this.$lang.get(key, values)
         } else {
           Sentry.captureMessage("Missing translation " + key)
