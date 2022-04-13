@@ -175,16 +175,17 @@ abstract class TestCase extends BaseTestCase
         $eventAttributes = factory(Party::class)->raw();
         $eventAttributes['group'] = $idgroups;
 
-        $event_date_time = Carbon::createFromTimestamp(strtotime($date))->setTimezone('UTC');
+        $event_start = Carbon::createFromTimestamp(strtotime($date))->setTimezone('UTC');
+        $event_end = Carbon::createFromTimestamp(strtotime($date))->setTimezone('UTC')->addHour(2);
 
-        $eventAttributes['event_start_utc'] = $event_date_time->toIso8601String();
-        $eventAttributes['event_end_utc'] = $event_date_time->toIso8601String();
+        $eventAttributes['event_start_utc'] = $event_start->toIso8601String();
+        $eventAttributes['event_end_utc'] = $event_end->toIso8601String();
 
         $response = $this->post('/party/create/', $eventAttributes);
 
         // Need to reformat start/end for row comparison.
-        $eventAttributes['event_start_utc'] = $event_date_time->toDateTimeString();
-        $eventAttributes['event_end_utc'] = $event_date_time->toDateTimeString();
+        $eventAttributes['event_start_utc'] = $event_start->toDateTimeString();
+        $eventAttributes['event_end_utc'] = $event_end->toDateTimeString();
 
         $this->assertDatabaseHas('events', $eventAttributes);
         $redirectTo = $response->getTargetUrl();
