@@ -115,7 +115,6 @@ return [
   'total_devices' => 'Total devices worked on',
   'fixed_devices' => 'Fixed devices',
   'repairable_devices' => 'Repairable devices',
-  'end_of_life_devices' => 'End-of-life devices',
   'most_repaired_devices' => 'Most repaired devices',
   'like_watching_tv' => 'Like watching TV for',
   'like_manufacturing' => 'Like manufacturing',

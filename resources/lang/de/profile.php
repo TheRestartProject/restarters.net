@@ -11,6 +11,4 @@ return [
   'panel_title_2' => 'Emails & alerts',
   'change_photo' => 'Change my photo',
   'profile_picture' => 'Profile picture',
-  'delete_account' => 'Delete account',
-  'delete_account_text' => 'I understand that deleting my account will remove all of my personal data and this is a permanent action.',
 ];

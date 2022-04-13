@@ -41,7 +41,5 @@ return [
   'brand-name' => 'Nom de la marque',
   'edit-tag' => 'Editer l\'étiquette',
   'edit-brand' => 'Editer la marque',
-  'edit-group-tag' => 'Editer l\'étiquette du groupe',
-  'edit-group-tag-content' => 'Editer le contenu de l\'étiquette du groupe',
   'edit-brand-content' => 'Editer le contenu de la marque',
 ];

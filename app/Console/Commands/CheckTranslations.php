@@ -43,7 +43,7 @@ class CheckTranslations extends Command
         foreach ($files as $file) {
             if ($file == '_json.php') {
                 // This is a special case used for data from the DB.  Ignore it.
-            } else if ($file == 'auth.php') {
+            } else if ($file == 'auth.php' || $file == 'passwords.php') {
                 // This is a special case used for login by Laravel itself.  Ignore it.
             } else if ($file == 'validation.php') {
                 // This is probably a special case used for form validation.  It throws up many errors, and these
@@ -88,6 +88,7 @@ class CheckTranslations extends Command
         foreach ([
             'resources/views/',               // Blade templates
             'resources/js/components/',       // Vue templates
+            'resources/js/mixins/',           // Vue mixins (rare)
             'app/Notifications/',             // Email notifications
             'app/Http/Controllers/',          // Controllers (rarely)
             'app/Services/'                   // Services(rarely)

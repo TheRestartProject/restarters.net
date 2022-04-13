@@ -3,8 +3,6 @@
 return [
   'biography' => 'Biografie',
   'change_photo' => 'Foto vervangen',
-  'delete_account' => 'Account verwijderen',
-  'delete_account_text' => 'Ik begrijp dat het verwijderen van mijn account ervoor zorgt dat al mijn persoonlijke gegevens voor altijd verwijderd worden.',
   'edit_profile' => 'Profiel bewerken',
   'edit_user' => 'Gebruiker bewerken',
   'my_skills' => 'Mijn competenties',

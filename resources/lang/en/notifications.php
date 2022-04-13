@@ -10,7 +10,6 @@ return [
   'email_footer' => 'If you have any questions or issues, please contact <a href="mailto:community@therestartproject.org">community@therestartproject.org</a>',
     'thanks' => 'Thank you.',
 
-  'new_event_photos_title' => 'New event photos uploaded:',
   'new_event_photos_subject' => 'New event photos uploaded to event: :event',
 
   'email_preferences' => 'If you would like to stop receiving these emails, please visit <a href=":url">your preferences</a> on your account.',

@@ -35,7 +35,4 @@ return [
     'view_groups_menuitem' => 'Voir les groupes',
   ],
   'single-network' => ':network Nom du réseau',
-  'yourNetworks' => 'Vos réseaux',
-  'yourNetworksExplainer' => 'Voici les réseaux dont vous êtes coordinateur',
-  'yourNetworksNoNetworks' => 'Vous n\'êtes coordinateur d\'aucun réseau',
 ];

@@ -11,6 +11,4 @@ return [
   'panel_title_2' => 'Courriels & alertes',
   'change_photo' => 'Changer ma photo',
   'profile_picture' => 'Photo de profil',
-  'delete_account' => 'Supprimer compte',
-  'delete_account_text' => 'Je comprends que la suppression de mon compte entraînera celle de mes données personnelles et que c\'est une action permanente.',
 ];

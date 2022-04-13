@@ -11,8 +11,6 @@ return [
   'panel_title_2' => 'Emails & alertes',
   'change_photo' => 'Changer ma photo',
   'profile_picture' => 'Photo de profil',
-  'delete_account' => 'Supprimer compte',
-  'delete_account_text' => 'Je comprends que la suppression de mon compte entraînera celle de mes données personnelles et que c\'est une action permanente.',
   'language_panel_title' => 'Paramètres de langue',
   'language_updated' => 'Préférence de langue mise à jour',
   'preferred_language' => 'Langue de préférence',

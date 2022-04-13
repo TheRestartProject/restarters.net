@@ -20,8 +20,6 @@ return [
   'edit-brand-content' => 'Leeg',
   'edit-category' => 'Categorie bewerken',
   'edit-category-content' => 'Leeg',
-  'edit-group-tag' => 'Groepslabel bewerken',
-  'edit-group-tag-content' => 'Leeg',
   'edit-skill' => 'Competentie bewerken',
   'edit-skill-content' => 'Leeg',
   'edit-tag' => 'Label bewerken',

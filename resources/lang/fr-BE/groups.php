@@ -94,7 +94,6 @@ return [
   'co2_prevented' => 'Emissions de CO<sub>2</sub> évitées',
   'days' => '{0}jours|{1}jour|[2,*]jours',
   'device_breakdown' => 'Panne de l\'appareil',
-  'end_of_life_devices' => 'Appareils en fin de vie',
   'environmental_impact' => 'Impact environnemental',
   'equal_to_driving' => 'Equivalent à rouler',
   'fixed_devices' => 'Appareils réparés',
