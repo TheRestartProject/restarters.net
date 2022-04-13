@@ -3,8 +3,6 @@
 return [
   'alert_uptodate' => 'Bedankt! Je bent up to date',
   'alert_uptodate_text' => 'Je hoeft momenteel niets te doen. Als dat wel zo is, laten we het je weten.',
-  'change_photo' => 'Foto veranderen',
-  'change_photo_text' => 'Kies een foto zodat anderen je kunnen herkennen tijdens een activiteit of op deze website.',
   'dashboard' => 'Dashboard',
   'email_alerts' => 'E-mails en waarschuwingen',
   'email_alerts_pref1' => 'Ik wil graag de maandelijkse nieuwsbrief van Restart Project ontvangen',
@@ -31,7 +29,6 @@ return [
   'previous' => 'Vorige',
   'profile' => 'Jouw profiel',
   'profile_content' => 'Geef aub wat info over jezelf. Zo kun je makkelijker in contact komen met andere organisatoren en herstellers. En het helpt ons om de gemeenschap beter te begrijpen.',
-  'profile_picture' => 'Profielfoto',
   'repair_skills' => 'Competenties',
   'repair_skills_content' => 'Dit is optioneel, maar het helpt ons om je gebruikerservaring te verbeteren. Welke competenties heb je en wil je met anderen delen?',
   'reporting' => 'Verslagen',
