@@ -3,11 +3,6 @@
 return [
   'networks' => 'Networks',
   'network' => 'Network',
-  'single-network' => ':networkName network',
-  'allNetworks' => 'All networks',
-  'allNetworksExplainer' => 'All networks in the system (admin-only).',
-  'allNetworksNoNetworks' => 'There are no networks in the system.',
-  'aboutNetworkHeader' => 'About :name',
   'general' => [
     'networks' => 'Networks',
     'network' => 'Network',

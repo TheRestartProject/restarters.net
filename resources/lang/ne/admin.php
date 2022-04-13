@@ -22,7 +22,6 @@ return [
   'edit-category-content' => 'Leeg',
   'edit-skill' => 'Competentie bewerken',
   'edit-skill-content' => 'Leeg',
-  'edit-tag' => 'Label bewerken',
   'group-tags' => 'Groepslabels',
   'name' => 'Naam',
   'reliability' => 'Betrouwbaarheid',

@@ -50,7 +50,7 @@ class EventDevices extends Notification implements ShouldQueue
                   ->line(__('notifications.event_devices_line1', [
                       'event' => $this->arr['event_venue']
                     ], $locale))
-                  ->action(__('notification.event_devices_action', [], $locale), $this->arr['event_url'])
+                  ->action(__('notifications.event_devices_action', [], $locale), $this->arr['event_url'])
                   ->line(__('notifications.email_preferences', [
                     'url' => $this->arr['preferences']
                   ], $locale));

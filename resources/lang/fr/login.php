@@ -14,6 +14,5 @@ return [
   'stat_2' => 'Émissions de CO<sub>2</sub> évitées',
   'stat_3' => 'Déchets<br>évités',
   'stat_4' => 'Événements<br>réalisés',
-  'lead' => 'Bienvenue dans la communauté',
   'login_title' => 'Connexion',
 ];

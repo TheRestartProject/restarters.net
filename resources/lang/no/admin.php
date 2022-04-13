@@ -39,7 +39,6 @@ return [
   'save-brand' => 'Save brand',
   'tag-name' => 'Tag name',
   'brand-name' => 'Brand name',
-  'edit-tag' => 'Edit tag',
   'edit-brand' => 'Edit brand',
   'edit-brand-content' => '',
 ];

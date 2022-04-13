@@ -29,7 +29,6 @@ return [
   'event_repairs_line1' => 'Thank you for fixing at the \':name\' event. The host has posted photos of any feedback left by participants and repair data. Please help us to improve the details of the repairs you carried out by adding any useful information or photos you have. Any extra details you can add will help future repair attempts.',
   'event_repairs_action' => 'Contribute repair info',
 
-  'group_confirmed_title' => 'Group Confirmed',
   'group_confirmed_subject' => 'Group Confirmed',
   'group_confirmed_line1' => 'Your group \':name\' has been confirmed by an admin.',
   'group_confirmed_action' => 'View Group',
@@ -42,7 +41,6 @@ return [
   'join_event_location' => 'Location:',
   'join_event_ignore' => 'If you think this invitation was not intended for you, please disregard this email.',
   'join_event_rsvp_now' => 'RSVP now',
-  'join_event_rsvp_message' => 'You can turn up on the day, or if you would prefer you can also create an account with us and RSVP online now.',
 
   'join_group_title' => 'Invitation from :name to follow :group',
   'join_group_intro' => 'You have received this email because you have been invited by :name to follow the community repair group <b>:group</b> on restarters.net.',

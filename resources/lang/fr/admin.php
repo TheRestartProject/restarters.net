@@ -39,7 +39,6 @@ return [
   'save-brand' => 'Sauver marque',
   'tag-name' => 'Nom de l\'étiquette',
   'brand-name' => 'Nom de la marque',
-  'edit-tag' => 'Editer l\'étiquette',
   'edit-brand' => 'Editer la marque',
   'edit-brand-content' => 'Editer le contenu de la marque',
 ];
