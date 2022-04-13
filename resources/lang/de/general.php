@@ -1,11 +1,7 @@
 <?php
 
 return [
-  'top_item1' => 'Events',
-  'top_item2' => 'Devices',
-  'top_item3' => 'Groups',
   'login' => 'Login',
-  'register' => 'Register',
   'dashboard' => 'Dashboard',
   'profile' => 'Your profile',
   'other_profile' => 'profile',
@@ -13,13 +9,6 @@ return [
   'logout' => 'Logout',
   'side_upcoming' => 'Upcoming events',
   'side_attention' => 'Needs attention',
-  'onboarding_heading_1' => 'Welcome to Fixometer',
-  'onboarding_heading_2' => 'Create parties in your area',
-  'onboarding_heading_3' => 'Add devices to parties',
-  'onboarding_greeting' => 'Hi ',
-  'onboarding_content_1' => 'vel scelerisque nisl consectetur et. Aenean eu leo quam. Pellentesque ornare sem lacinia quam venenatis vestibulum. Cras mattis consectetur purus sit amet fermentum. ',
-  'onboarding_content_2' => 'praesent commodo cursus magna, vel scelerisque nisl consectetur et. Aenean eu leo quam. Pellentesque ornare sem lacinia quam venenatis vestibulum. Cras mattis consectetur purus sit amet fermentum.',
-  'onboarding_content_3' => 'praesent commodo cursus magna, vel scelerisque nisl consectetur et. Aenean eu leo quam. Pellentesque ornare sem lacinia quam venenatis vestibulum. Cras mattis consectetur purus sit amet fermentum.',
   'new_group' => 'Create a new group',
   'next' => 'Next',
   'previous' => 'Previous',
@@ -58,8 +47,6 @@ return [
   'help_feedback_url' => 'https://talk.restarters.net/c/help',
   'faq_url' => 'https://therestartproject.org/faq',
   'restartproject_url' => 'https://therestartproject.org',
-  'discourse_url' => 'https://talk.restarters.net',
-  'wiki_url' => 'https://wiki.restarters.net',
   'please_select' => 'Please select',
   'calendar_feed_help_url' => '/t/fixometer-how-to-subscribe-to-a-calendar',
 ];
