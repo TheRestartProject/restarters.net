@@ -3,6 +3,7 @@
 namespace Tests\Feature\Groups;
 
 use App\Group;
+use App\Party;
 use App\Role;
 use Tests\TestCase;
 
@@ -69,5 +70,23 @@ class GroupDeleteTest extends TestCase
         $this->followingRedirects();
         $response = $this->get("/group/delete/$id");
         $this->assertContains('Sorry, but you do not have the permissions to perform that action.', $response->getContent());
+    }
+
+    public function testCanDeleteWithDeletedEvent()
+    {
+        $this->loginAsTestUser(Role::ADMINISTRATOR);
+        $id = $this->createGroup();
+        $this->assertNotNull($id);
+
+        // Create a past event
+        $event = factory(Party::class)->states('moderated')->create([
+                                                                        'event_start_utc' => '2000-01-01T10:15:05+05:00',
+                                                                        'event_end_utc' => '2000-01-0113:45:05+05:00',
+                                                                        'group' => $id,
+                                                                    ]);
+        $event->delete();
+        $response = $this->get("/group/delete/$id");
+        $response->assertRedirect();
+        $response->assertSessionHas('success');
     }
 }
