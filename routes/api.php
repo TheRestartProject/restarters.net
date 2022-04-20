@@ -37,6 +37,7 @@ Route::group(['middleware' => 'auth:api'], function () {
     Route::get('/networks/{network}/stats/', 'API\NetworkController@stats'); // Used by RepairTogether.
 
     Route::prefix('/groups')->group(function() {
+
         Route::get('/', 'API\GroupController@getGroupList'); // Not used but worth keeping and tested.
         Route::get('/changes', 'API\GroupController@getGroupChanges'); // Used by Zapier
         Route::get('{id}/volunteers', 'API\GroupController@listVolunteers');
@@ -63,3 +64,6 @@ Route::get('/users/{id}/notifications', 'API\UserController@notifications');
 
 // Top Talk topics.  Doesn't need authentication either.
 Route::get('/talk/topics/{tag?}', 'API\DiscourseController@discussionTopics');
+
+// Timezones
+Route::get('/timezones', [App\Http\Controllers\ApiController::class, 'timezones']);

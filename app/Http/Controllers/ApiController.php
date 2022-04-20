@@ -230,4 +230,8 @@ class ApiController extends Controller
             'items' => $items,
         ]);
     }
+
+    public function timezones() {
+        return response()->json(\DB::select("SELECT name FROM mysql.time_zone_name WHERE name NOT LIKE 'posix%' AND name NOT LIKE 'right%';"));
+    }
 }

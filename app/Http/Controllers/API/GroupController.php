@@ -79,6 +79,7 @@ class GroupController extends Controller
                 $collection->push([
                                       'id' => $group->idgroups,
                                       'name' => $group->name,
+                                      'timezone' => $group->timezone,
                                       'location' => [
                                           'value' => $group->location,
                                           'country' => $group->country,
@@ -115,6 +116,7 @@ class GroupController extends Controller
                                                            'event_date' => $event->event_date_local,
                                                            'start_time' => $event->start_local,
                                                            'end_time' => $event->end_local,
+                                                           'timezone' => $event->timezone,
                                                            'name' => $event->venue,
                                                            'link' => $event->link,
                                                            'online' => $event->online,
@@ -135,6 +137,7 @@ class GroupController extends Controller
                                                        'event_date' => $event->event_date_local,
                                                        'start_time' => $event->start_local,
                                                        'end_time' => $event->end_local,
+                                                       'timezone' => $event->timezone,
                                                        'name' => $event->venue,
                                                        'link' => $event->link,
                                                        'online' => $event->online,

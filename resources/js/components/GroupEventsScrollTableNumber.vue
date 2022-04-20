@@ -1,5 +1,5 @@
 <template>
-  <div class="hidecell cell-number w-100 d-flex justify-content-center pr-3">
+  <div class="hidecell cell-number w-100 d-flex justify-content-center pr-3" v-if="value !== null">
     {{ value || '0' }}&nbsp;
     <span v-if="units">
       {{ units}}
@@ -11,7 +11,8 @@ export default {
   props: {
     value: {
       type: Number,
-      required: true
+      required: false,
+      default: null
     },
     units: {
       type: String,
