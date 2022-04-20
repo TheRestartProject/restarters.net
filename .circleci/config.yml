@@ -19,7 +19,7 @@ jobs:
           - DB_USERNAME: restarters
           - DB_PASSWORD: s3cr3t
           - TZ: "UTC"
-      - image: circleci/mysql:5.7.33
+      - image: cimg/mysql:5.7.36
         environment:
           # You can connect once ssh'd in using  mysql -u root -p -h 127.0.0.1
           - MYSQL_ROOT_PASSWORD: s3cr3t
@@ -51,20 +51,93 @@ jobs:
           - TZ: "UTC"
         depends_on:
           - mariadb
+      - image: 'docker.io/bitnami/postgresql:11'
+        name: postgresql
+# No volumes on CircleCI
+#        volumes:
+#          - 'postgresql_data:/bitnami/postgresql'
+        environment:
+          - ALLOW_EMPTY_PASSWORD=yes
+          - POSTGRESQL_USERNAME=bn_discourse
+          - POSTGRESQL_DATABASE=bitnami_discourse
+# No networks on CircleCI
+#    networks:
+#      - app-network
+
+      - image: docker.io/bitnami/redis:6.0
+        name: restarters_discourse_redis
+        environment:
+          - ALLOW_EMPTY_PASSWORD=yes
+#        volumes:
+#          - 'redis_data:/bitnami/discourse'
+#        networks:
+#          - app-network
+
+      - image: docker.io/bitnami/discourse:2
+        name: restarters_discourse
+# No ports on CircleCI
+#        ports:
+#          - '8003:80'
+#        volumes:
+#          - 'discourse_data:/bitnami/discourse'
+        depends_on:
+          - postgresql
+          - restarters_discourse_redis
+        environment:
+          - ALLOW_EMPTY_PASSWORD=yes
+          - DISCOURSE_USERNAME=someuser
+          - DISCOURSE_PASSWORD=mustbetencharacters
+          - DISCOURSE_HOST=www.example.com:8003
+          - DISCOURSE_PORT_NUMBER=80
+          - DISCOURSE_DATABASE_HOST=postgresql
+          - DISCOURSE_DATABASE_PORT_NUMBER=5432
+          - DISCOURSE_DATABASE_USER=bn_discourse
+          - DISCOURSE_DATABASE_NAME=bitnami_discourse
+          - DISCOURSE_REDIS_HOST=restarters_discourse_redis
+          - DISCOURSE_REDIS_PORT_NUMBER=6379
+          - POSTGRESQL_CLIENT_POSTGRES_USER=postgres
+          - POSTGRESQL_CLIENT_CREATE_DATABASE_NAME=bitnami_discourse
+          - POSTGRESQL_CLIENT_CREATE_DATABASE_EXTENSIONS=hstore,pg_trgm
+#    networks:
+#      - app-network
+
+      - image: docker.io/bitnami/discourse:2
+        name: restarters_discourse_sidekiq
+        depends_on:
+          - restarters_discourse
+#        volumes:
+#          - 'sidekiq_data:/bitnami/discourse'
+        command: /opt/bitnami/scripts/discourse-sidekiq/run.sh
+        environment:
+          - ALLOW_EMPTY_PASSWORD=yes
+          - DISCOURSE_HOST=www.example.com
+          - DISCOURSE_DATABASE_HOST=postgresql
+          - DISCOURSE_DATABASE_PORT_NUMBER=5432
+          - DISCOURSE_DATABASE_USER=bn_discourse
+          - DISCOURSE_DATABASE_NAME=bitnami_discourse
+          - DISCOURSE_REDIS_HOST=restarters_discourse_redis
+          - DISCOURSE_REDIS_PORT_NUMBER=6379
+#        networks:
+#          - app-network
+
     steps:
       - checkout
       - run: sudo apt update
-      - run: sudo apt install openssl zip unzip git libxml2-dev libzip-dev zlib1g-dev libcurl4-openssl-dev iputils-ping default-mysql-client vim libpng-dev libgmp-dev libjpeg-turbo8-dev
-      - run: sudo apt-get install php7.4-xmlrpc php7.4-intl php7.4-xdebug php7.4-xmlrpc php7.4-mbstring php7.4-simplexml php7.4-curl php7.4-zip python
+      - run: sudo apt install dnsutils openssl zip unzip git libxml2-dev libzip-dev zlib1g-dev libcurl4-openssl-dev iputils-ping default-mysql-client vim libpng-dev libgmp-dev libjpeg-turbo8-dev
+      - run: sudo apt-get install php7.4-xmlrpc php7.4-intl php7.4-xdebug php7.4-xmlrpc php7.4-mbstring php7.4-simplexml php7.4-curl php7.4-zip python postgresql-client
       - run: cp .env.example .env
 
       # Need access to timezones.
       - run: mysql --host="127.0.0.1" -u root -ps3cr3t -e "GRANT SELECT ON mysql.time_zone_name TO 'restarters'@'%';"
 
-      # We don't have Discourse on CircleCI.
-      - run: sed -i 's/FEATURE__DISCOURSE_INTEGRATION=.*$/FEATURE__DISCOURSE_INTEGRATION=false/g' .env
+      # We have Discourse on CircleCI.  Create Discourse API key.  We do this hackily in the DB because the Bitnami image
+      # doesn't expose an easy way to do it.
+      - run: sed -i 's/FEATURE__DISCOURSE_INTEGRATION=.*$/FEATURE__DISCOURSE_INTEGRATION=true/g' .env
+      - run: sed -i 's/DISCOURSE_URL=.*$/DISCOURSE_URL=http:\/\/restarters_discourse/g' .env
+      - run: sed -i 's/DISCOURSE_APIKEY=.*$/DISCOURSE_APIKEY=fb71f38ca2b8b7cd6a041e57fd8202c9937088f0ecae7db40722bd758dda92fc/g' .env
+      - run: sed -i 's/DISCOURSE_APIUSER=.*$/DISCOURSE_APIUSER=someuser/g' .env
 
-      # ...but we do have Mediawiki.
+      # ...and Mediawiki.
       - run: sed -i 's/FEATURE__WIKI_INTEGRATION=.*$/FEATURE__WIKI_INTEGRATION=true/g' .env
       - run: sed -i 's/WIKI_URL=.*$/WIKI_URL=http:\/\/mediawiki:8080/g' .env
       - run: sed -i 's/WIKI_DB=.*$/WIKI_DB=bitnami_mediawiki/g' .env
@@ -94,7 +167,14 @@ jobs:
       - run: wget -O phpunit https://phar.phpunit.de/phpunit-7.phar ; chmod +x phpunit
       - run: mkdir uploads
 
-      - run: export XDEBUG_MODE=coverage;./phpunit -d memory_limit=512M --bootstrap vendor/autoload.php -dxdebug.coverage_enable=1 --coverage-clover tests/clover.xml --configuration ./phpunit.xml
+      # Wait for Discourse to finish initialising.
+      - run: while ! nc -z restarters_discourse 80; do sleep 1 ; done
+      - run: psql -h postgresql -U postgres -c "INSERT INTO api_keys (id, user_id, created_by_id, created_at, updated_at, allowed_ips, hidden, last_used_at, revoked_at, description, key_hash, truncated_key) VALUES (1, NULL, 1, '2021-10-25 13:56:20.033338', '2021-10-25 13:56:20.033338', NULL, false, NULL, NULL, 'Restarters', 'd89e9dfacfb611fbaf004807648187ce7ed474df44dcb0ada230fab5c8dd6a5b', '9fd7');" bitnami_discourse
+
+      # Run phpunit.  Discourse makes things slow, so up the timeout.
+      - run:
+           command: export XDEBUG_MODE=coverage;./phpunit -d memory_limit=1024M --bootstrap vendor/autoload.php -dxdebug.coverage_enable=1 --coverage-clover tests/clover.xml --configuration ./phpunit.xml
+           no_output_timeout: 45m
 
       # Coveralls is pernickety about the location it uploads from existing.
       - run: mkdir build; mkdir build/logs; php vendor/bin/php-coveralls -v -x tests/clover.xml

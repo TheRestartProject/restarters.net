@@ -494,7 +494,7 @@ class DiscourseService
         }
     }
 
-    public function syncSso($user)
+    public function  syncSso($user)
     {
         $endpoint = '/admin/users/sync_sso';
 

@@ -307,7 +307,7 @@ class PartyController extends Controller
                     }
 
                     if ($autoapprove) {
-                        Log::info('Auto-approve event $idParty');
+                        Log::info("Auto-approve event $idParty");
                         Party::find($idParty)->approve();
                     }
                 } else {
