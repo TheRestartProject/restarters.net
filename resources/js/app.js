@@ -1265,7 +1265,6 @@ function initAutocomplete() {
   function tokenFieldCheck(){
     setTimeout(function(){
       var count_tokens = document.getElementById("manual_invite_box").value.split(",");
-      console.log(count_tokens.length);
       if( $('#manual_invite_box').val() === '' ) {
         $('#event-invite-to button, #invite-to-group button').prop('disabled', true);
       } else if( count_tokens.length === 0 ){
