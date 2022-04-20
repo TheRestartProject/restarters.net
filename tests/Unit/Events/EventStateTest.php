@@ -101,8 +101,11 @@ class EventStateTest extends TestCase
             // Future event
             [ '2038-01-01 12:00', true, false, false, false ],
 
-            // Starting soon
-            [ Carbon::now()->addHour()->toIso8601String(), true, false, false, true ],
+            // Starting soon, but more than an hour away (currently the inprogress flag gets set an hour early).
+            [ Carbon::now()->addMinutes(90)->toIso8601String(), true, false, false, true ],
+
+            // Starting less than an hour away, which currently has inprogress set.
+            [ Carbon::now()->addMinutes(30)->toIso8601String(), true, false, true, false ],
 
             // In progress
             [ Carbon::now()->subHour()->toIso8601String(), false, false, true, false ],
