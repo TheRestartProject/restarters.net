@@ -100,7 +100,7 @@ class Party extends Model implements Auditable
                 FROM `events` AS `e`
                 INNER JOIN `groups` AS `g`
                     ON `g`.`idgroups` = `e`.`group`
-                WHERE `event_end_utc` < NOW()
+                WHERE `event_end_utc` < NOW() AND `deleted_at` IS NULL
                 ORDER BY `e`.`event_start_utc` DESC'));
     }
 
