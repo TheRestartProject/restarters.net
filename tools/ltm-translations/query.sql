@@ -1,3 +1,16 @@
+
+-- ** FOR EXPORT/REVIEW AND TESTING **
+-- DROP TABLE IF EXISTS `ltm_translations_todo`;
+-- CREATE TABLE `ltm_translations_todo` (
+--   `group` varchar(24) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT '',
+--   `key` varchar(64) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT '',
+--   `en` longtext CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci,
+--   `fk` longtext CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci,
+--   `lang` varchar(8) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT '',
+--   `alias` varchar(2) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT '',
+--   `trans` longtext CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL
+-- ) ENGINE=InnoDB;
+
 SELECT t1.*,
 '' as trans FROM (
 	SELECT
