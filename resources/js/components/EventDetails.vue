@@ -27,7 +27,7 @@
           <b-img-lazy src="/icons/time_ico.svg" class="icon" />
         </div>
         <div>
-          {{ start }}-{{ end }}
+          {{ start }}-{{ end }} <span class="text-muted small">{{ timezone }}</span>
         </div>
       </div>
       <div class="border-top-thin d-flex pt-1 pb-1" v-if="isAttending && discourseThread">
@@ -113,7 +113,7 @@ export default {
       type: String,
       required: false,
       default: null
-    },
+    }
   }
 }
 </script>

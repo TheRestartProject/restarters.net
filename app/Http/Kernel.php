@@ -67,8 +67,7 @@ class Kernel extends HttpKernel
         'throttle' => \Illuminate\Routing\Middleware\ThrottleRequests::class,
         'verifyUserConsent' => \App\Http\Middleware\VerifyUserConsent::class,
         'AcceptUserInvites' => \App\Http\Middleware\AcceptUserInvites::class,
-
-        'checkAPIAccess' => \App\Http\Middleware\checkAPIAccess::class,
+        'ensureAPIToken' => \App\Http\Middleware\EnsureAPIToken::class,
 
         /**** OTHER MIDDLEWARE ****/
         'localize' => \Mcamara\LaravelLocalization\Middleware\LaravelLocalizationRoutes::class,

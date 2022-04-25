@@ -123,6 +123,11 @@
                             <small id="postcodeHelpBlock" class="form-text text-muted">
                               @lang('groups.groups_postcode_small')
                             </small>
+
+                            <div class="vue">
+                              <GroupTimeZone value="{{ App\Group::find($formdata->idgroups)->timezone }}" />
+                            </div>
+
                           </div>
                         </div>
 

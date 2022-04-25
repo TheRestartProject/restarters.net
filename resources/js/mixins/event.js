@@ -52,6 +52,9 @@ export default {
       // Local time.
       return this.event ? (new moment(this.event.event_date_local).format('MMM').toUpperCase()) : null
     },
+    timezone() {
+      return this.event ? this.event.timezone : null
+    },
     attendees() {
       // Everyone, both invited and confirmed.
       return this.$store.getters['attendance/byEvent'](this.idevents)

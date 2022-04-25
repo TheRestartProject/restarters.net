@@ -126,6 +126,11 @@ class ApiController extends Controller
 
     public static function getUserList()
     {
+        $authenticatedUser = Auth::user();
+        if (! $authenticatedUser->hasRole('Administrator')) {
+            return abort(403, 'The authenticated user is not authorized to access this resource');
+        }
+
         $users = User::whereNull('deleted_at')
             ->orderBy('created_at', 'desc')
             ->get();
@@ -224,5 +229,9 @@ class ApiController extends Controller
             'count' => $count,
             'items' => $items,
         ]);
+    }
+
+    public function timezones() {
+        return response()->json(\DB::select("SELECT name FROM mysql.time_zone_name WHERE name NOT LIKE 'posix%' AND name NOT LIKE 'right%';"));
     }
 }

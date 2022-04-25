@@ -612,6 +612,7 @@ class GroupController extends Controller
                 'website' => $data['website'],
                 'free_text' => $data['free_text'],
                 'location' => $data['location'],
+                'timezone' => array_key_exists('timezone', $data) ? $data['timezone'] : null,
                 'latitude' => $latitude,
                 'longitude' => $longitude,
                 'country' => $country,
@@ -740,7 +741,7 @@ class GroupController extends Controller
         if (Auth::user()->hasRole('Administrator') && $group->canDelete()) {
             // We know we can delete the group; if it has any past events they must be empty, so delete all
             // events (including future).
-            $allEvents = Party::where('events.group', $id)->get();
+            $allEvents = Party::withTrashed()->where('events.group', $id)->get();
 
             foreach ($allEvents as $event) {
                 // Delete any users - these are not cascaded in the DB.

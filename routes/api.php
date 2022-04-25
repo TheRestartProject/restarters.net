@@ -36,11 +36,19 @@ Route::group(['middleware' => 'auth:api'], function () {
 
     Route::get('/networks/{network}/stats/', 'API\NetworkController@stats'); // Used by RepairTogether.
 
-    Route::get('/groups', 'API\GroupController@getGroupList'); // Not used but worth keeping and tested.
-    Route::get('/groups/changes', 'API\GroupController@getGroupChanges'); // Used by Zapier
+    Route::prefix('/groups')->group(function() {
 
-    Route::get('/groups/network/', 'API\GroupController@getGroupsByUsersNetworks'); // Used by Repair Together.
-    Route::get('/events/network/{date_from?}/{date_to?}', 'API\EventController@getEventsByUsersNetworks'); // Used by Repair Together.
+        Route::get('/', 'API\GroupController@getGroupList'); // Not used but worth keeping and tested.
+        Route::get('/changes', 'API\GroupController@getGroupChanges'); // Used by Zapier
+        Route::get('{id}/volunteers', 'API\GroupController@listVolunteers');
+        Route::get('/network/', 'API\GroupController@getGroupsByUsersNetworks'); // Used by Repair Together.
+    });
+
+    Route::prefix('/events')->group(function() {
+        Route::get('/network/{date_from?}/{date_to?}', 'API\EventController@getEventsByUsersNetworks'); // Used by Repair Together.
+        Route::get('{id}/volunteers', 'API\EventController@listVolunteers');
+        Route::put('{id}/volunteers', 'API\EventController@addVolunteer');
+    });
 
     Route::get('/usersgroups/changes', 'API\UserGroupsController@changes'); // Used by Zapier
     Route::delete('/usersgroups/{id}', 'API\UserGroupsController@leave'); // Used by Vue client.
@@ -56,3 +64,6 @@ Route::get('/users/{id}/notifications', 'API\UserController@notifications');
 
 // Top Talk topics.  Doesn't need authentication either.
 Route::get('/talk/topics/{tag?}', 'API\DiscourseController@discussionTopics');
+
+// Timezones
+Route::get('/timezones', [App\Http\Controllers\ApiController::class, 'timezones']);

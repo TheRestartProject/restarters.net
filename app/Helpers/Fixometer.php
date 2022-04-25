@@ -788,6 +788,11 @@ class Fixometer
 
     public static function userHasEditGroupPermission($group_id, $user_id, $role = 3)
     {
+        // Admins can do anything.
+        if (self::hasRole(User::find($user_id), 'Administrator')) {
+            return true;
+        }
+
         return ! empty(\App\UserGroups::where('group', $group_id)
             ->where('user', $user_id)
             ->where('role', $role)

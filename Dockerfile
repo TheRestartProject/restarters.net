@@ -6,7 +6,7 @@ WORKDIR /var/www
 
 # Install dependencies
 RUN sudo apt-get update && \
-    sudo apt-get install build-essential locales curl unzip openssl zip unzip git libxml2-dev libzip-dev zlib1g-dev libcurl4-openssl-dev iputils-ping default-mysql-client vim libpng-dev libgmp-dev libjpeg62-turbo-dev
+    sudo apt-get install build-essential locales curl unzip openssl zip unzip git libxml2-dev libzip-dev zlib1g-dev libcurl4-openssl-dev iputils-ping default-mysql-client vim libpng-dev libgmp-dev libjpeg62-turbo-dev postgresql-client
 
 # Clear cache - reduces image size.
 RUN sudo apt-get clean && sudo rm -rf /var/lib/apt/lists/*

@@ -17,7 +17,7 @@ class Category extends Model
      *
      * @var array
      */
-    protected $fillable = ['name', 'weight', 'footprint', 'footprint_reliability', 'lifecycle', 'lifecycle_reliability', 'extended_lifecycle', 'extended_lifecycle_reliability', 'revision', 'cluster', 'powered'];
+    protected $fillable = ['name', 'weight', 'footprint', 'footprint_reliability', 'lifecycle', 'lifecycle_reliability', 'extended_lifecycle', 'extended_lifecycle_reliability', 'revision', 'cluster', 'powered', 'description_short' ];
 
     /**
      * The attributes that should be hidden for arrays.

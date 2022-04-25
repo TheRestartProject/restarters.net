@@ -20,14 +20,14 @@
         </div>
         <div class="pl-md-4 d-flex maybeborder pt-3 p-md-0 d-flex flex-column justify-content-center">
           <div class="d-flex justify-content-between w-100">
-            <div class="d-flex mr-2" v-if="event.the_group">
+            <div class="d-flex mr-2" v-if="event.group">
               <b-img @error="brokenGroupImage" :src="groupImage" class="groupImage d-none d-md-block" />
               <div class="d-flex flex-wrap ml-md-2">
                 {{ translatedOrganised }}&nbsp;
                 <br class="d-none d-md-block"/>
                 <b>
-                  <a :href="'/group/view/' + event.the_group.idgroups">
-                    {{ event.the_group.name.trim() }}
+                  <a :href="'/group/view/' + event.group.idgroups">
+                    {{ event.group.name.trim() }}
                   </a>
                 </b>
               </div>
@@ -81,7 +81,7 @@ export default {
   },
   computed: {
     groupImage() {
-      return this.event.the_group && this.event.the_group.group_image ? ('/uploads/mid_' + this.event.the_group.group_image.image.path) : DEFAULT_PROFILE
+      return this.event.group && this.event.group.group_image ? ('/uploads/mid_' + this.event.group.group_image.image.path) : DEFAULT_PROFILE
     },
     translatedOrganised() {
       // Existing translations may have a :group parameter, so set that empty so that it doesn't appear in the result.

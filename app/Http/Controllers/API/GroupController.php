@@ -3,7 +3,9 @@
 namespace App\Http\Controllers\API;
 
 use App\Group;
+use App\Helpers\Fixometer;
 use App\Http\Controllers\Controller;
+use App\Party;
 use Auth;
 use Illuminate\Http\Request;
 
@@ -77,6 +79,7 @@ class GroupController extends Controller
                 $collection->push([
                                       'id' => $group->idgroups,
                                       'name' => $group->name,
+                                      'timezone' => $group->timezone,
                                       'location' => [
                                           'value' => $group->location,
                                           'country' => $group->country,
@@ -113,6 +116,7 @@ class GroupController extends Controller
                                                            'event_date' => $event->event_date_local,
                                                            'start_time' => $event->start_local,
                                                            'end_time' => $event->end_local,
+                                                           'timezone' => $event->timezone,
                                                            'name' => $event->venue,
                                                            'link' => $event->link,
                                                            'online' => $event->online,
@@ -133,6 +137,7 @@ class GroupController extends Controller
                                                        'event_date' => $event->event_date_local,
                                                        'start_time' => $event->start_local,
                                                        'end_time' => $event->end_local,
+                                                       'timezone' => $event->timezone,
                                                        'name' => $event->venue,
                                                        'link' => $event->link,
                                                        'online' => $event->online,
@@ -218,5 +223,33 @@ class GroupController extends Controller
         return response()->json([
             'events' => $events->values()->toJson(),
         ]);
+    }
+
+    public function listVolunteers(Request $request, $idgroups) {
+        $group = Group::findOrFail($idgroups);
+
+        // Get the user that the API has been authenticated as.
+        $user = auth('api')->user();
+
+        if (!$user || !Fixometer::userHasEditGroupPermission($idgroups, $user->id)) {
+            // We require host permissions to view the list of volunteers.  At the moment this call is only used when
+            // adding volunteers, and this check means we don't have to worry about exposing sensitive data.
+            abort(403);
+        }
+
+        $volunteers = $group->allConfirmedVolunteers()->get();
+
+        $ret = [];
+
+        foreach ($volunteers as $v) {
+            $volunteer = $v->volunteer;
+            $ret[] = [
+                'id' => $volunteer->id,
+                'name' => $volunteer->name,
+                'email'=> $volunteer->email
+            ];
+        }
+
+        return response()->json($ret);
     }
 }
