@@ -77,7 +77,8 @@
                           @foreach($sorted_parties as $groupname => $groupparties)
                           <optgroup label="<?php echo trim($groupname); ?>">
                             <?php foreach($groupparties as $party) { ?>
-                            <option value="<?php echo $party->id; ?>" data-subtext="<?php echo $party->event_date_local; ?>"
+                            <?php $event = App\Party::withTrashed()->find($party->id); ?>
+                            <option value="<?php echo $party->id; ?>" data-subtext="<?php echo $event->event_date_local; ?>"
                               <?php
                               if(isset($_GET['parties']) && !empty($_GET['parties'])){
                                 foreach($_GET['parties'] as $p){
@@ -85,7 +86,7 @@
                                 }
                               }
                               ?>
-                                >{{  $party->venue }} ({{ $party->getFormattedLocalStart('%d/%m/%Y') }})</option>
+                                >{{  $party->venue }} ({{ $event->getFormattedLocalStart('%d/%m/%Y') }})</option>
                             <?php } ?>
                           </optgroup>
                           @endforeach
