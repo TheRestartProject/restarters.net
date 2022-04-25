@@ -152,7 +152,6 @@ class Fixometer
                     return true;
                 }
             }
-            error_log("Not in");
         }
 
         if (self::hasRole($user, 'Host')) {
