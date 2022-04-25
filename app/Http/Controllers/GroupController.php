@@ -929,7 +929,7 @@ class GroupController extends Controller
         // - Is a host of the group.
         // - Is a network coordinator of a network which the group is in.
         // - Is an Administrator
-        $group = Group::find($group_id);
+        $group = Group::findOrFail($group_id);
         $loggedInUser = Auth::user();
 
         if (($loggedInUser->hasRole('Host') && Fixometer::userIsHostOfGroup($group_id, $loggedInUser->id)) ||
@@ -949,7 +949,12 @@ class GroupController extends Controller
     public function getRemoveVolunteer($group_id, $user_id, Request $request)
     {
         //Has current logged in user got permission to remove volunteer
-        if ((Fixometer::hasRole(Auth::user(), 'Host') && Fixometer::userIsHostOfGroup($group_id, Auth::id())) || Fixometer::hasRole(Auth::user(), 'Administrator')) {
+        $group = Group::findOrFail($group_id);
+        $loggedInUser = Auth::user();
+
+        if ((Fixometer::hasRole($loggedInUser, 'Host') && Fixometer::userIsHostOfGroup($group_id, Auth::id())) ||
+            $loggedInUser->isCoordinatorForGroup($group) ||
+            Fixometer::hasRole($loggedInUser, 'Administrator')) {
             // Retrieve user
             $user = User::find($user_id);
 

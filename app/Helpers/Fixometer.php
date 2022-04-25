@@ -4,6 +4,7 @@ namespace App\Helpers;
 
 use App;
 use App\Barrier;
+use App\Group;
 use App\Party;
 use App\Permissions;
 use App\Role;
@@ -151,6 +152,7 @@ class Fixometer
                     return true;
                 }
             }
+            error_log("Not in");
         }
 
         if (self::hasRole($user, 'Host')) {

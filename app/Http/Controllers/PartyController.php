@@ -914,7 +914,7 @@ class PartyController extends Controller
             $event_id = $volunteer->event;
 
             // Has current logged-in user got permission to remove volunteer?
-            if ((Fixometer::hasRole(Auth::user(), 'Host') && Fixometer::userHasEditPartyPermission($event_id, Auth::user()->id)) || Fixometer::hasRole(Auth::user(), 'Administrator')) {
+            if (((Fixometer::hasRole(Auth::user(), 'Host') || Fixometer::hasRole(Auth::user(), 'NetworkCoordinator')) && Fixometer::userHasEditPartyPermission($event_id, Auth::user()->id)) || Fixometer::hasRole(Auth::user(), 'Administrator')) {
                 //Let's delete the user
                 $delete_user = $volunteer->delete();
 
