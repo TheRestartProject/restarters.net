@@ -236,9 +236,8 @@ class Group extends Model implements Auditable
         // Groups are deletable unless they have an event with a device.
         $ret = true;
 
-        $allEvents = Party::where('events.group', $this->idgroups)
+        $allEvents = Party::withTrashed()->where('events.group', $this->idgroups)
             ->get();
-
 
         // Send these to getEventStats() to speed things up a bit.
         $eEmissionRatio = \App\Helpers\LcaStats::getEmissionRatioPowered();
