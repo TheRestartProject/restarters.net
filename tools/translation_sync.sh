@@ -37,4 +37,12 @@ then
     git add resources/lang
     git commit -m "Update translations from live system"
     git push --set-upstream origin $BRANCH
+
+    curl -s --user "api:$MAILGUN_KEY" \
+      https://api.eu.mailgun.net/v3/eu.mg.rstrt.org/messages \
+      -F from="noreply@eu.mg.rstrt.org" \
+      -F to="neil@therestartproject.org,edward@therestartproject.org" \
+      -F subject="ACTION REQUIRED: Translations to commit to codebase" \
+      -F text="$BRANCH staged in /var/www/restarters.yesterday; please push and raise a PR."
+    exit 1;
 fi
