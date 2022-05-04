@@ -35,7 +35,7 @@
           </div>
         </div>
       </div>
-      <b-dropdown v-if="canedit" variant="none" ref="dropdown" class="edit-dropdown">
+      <b-dropdown v-if="canedit" variant="none" ref="dropdown" class="edit-dropdown" no-caret>
         <b-dropdown-item :href="'/group/make-host/' + idgroups + '/' + volunteer.user" v-if="volunteer.role === restarter">{{ __('groups.make_host') }}</b-dropdown-item>
         <b-dropdown-item target="_blank" rel="noopener" :href="'/group/remove-volunteer/' + idgroups + '/' + volunteer.user">{{ __('groups.remove_volunteer') }}</b-dropdown-item>
       </b-dropdown>
