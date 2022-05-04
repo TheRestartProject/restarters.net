@@ -106,7 +106,6 @@ return [
   'and' => 'and',
   'quantity' => 'Quantity',
   'cancel' => 'Cancel',
-  'confirm' => 'Confirm',
   'loading' => 'Loading',
   'close' => 'Close',
   'skills' => 'skill|skills',
@@ -120,4 +119,5 @@ return [
   'please_choose' => 'Please choose...',
   'notification_greeting' => 'Hello!',
   'notification_footer' => 'If you would like to stop receiving these emails, please visit <a href=":url">your preferences</a> on your account.',
+  'confirm' => 'Confirm',
 ];
