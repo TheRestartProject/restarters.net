@@ -60,8 +60,9 @@ exports.createEvent = async function(page, baseURL, idgroups) {
   // Venue name
   await page.fill('#event_name', faker.company.companyName())
 
-  // Select the group.
-  await page.click('.event-group .bv-no-focus-ring > .multiselect > .multiselect__select')
+  // Select the group.  Bit hard to get the select to open, but tabbing from the previous field works.
+  await page.click('#event_link')
+  await page.keyboard.press('Tab')
   await page.click('.multiselect__content-wrapper > .multiselect__content > .multiselect__element > .multiselect__option--highlight > span')
 
   // Type into the RTE
@@ -77,9 +78,8 @@ exports.createEvent = async function(page, baseURL, idgroups) {
   await page.click('#event_time input[name="end"]')
   await page.fill('#event_time input[name="end"]', '14:00')
 
-  // Always say London for geocoding.
-  await page.fill('.event-address input', 'London, UK')
-  await page.click('.pac-item:first-child')
+  // Use group location.
+  await page.click('.event-address .btn-primary')
 
   await page.click('button[type=submit]')
 
