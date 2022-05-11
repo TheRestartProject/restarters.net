@@ -75,7 +75,6 @@ return [
   'edit_group' => 'Edit group',
   'edit_group_save_changes' => 'Save changes',
   'edit_group_text' => 'Go ahead and change or improve your group\'s profile.',
-  'delete_group' => 'Delete group',
   'groups_location_small' => 'I.e the place where the fixing happens!',
   'group_image' => 'Group image',
   'tag-1' => 'Tag 1',
