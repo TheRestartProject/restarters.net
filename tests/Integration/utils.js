@@ -94,21 +94,7 @@ exports.createEvent = async function(page, baseURL, idgroups) {
   return id
 }
 
-exports.approveEvent = async function(page, baseURL, idevents) {
-  // Go to event edit page.
-  await page.goto('/party/edit/' + idevents)
-
-  // Set approve.
-  await page.selectOption('.event-approve .custom-select', 'approve')
-
-  // Approve
-  await page.locator('text=Save Event').click()
-
-  // Should show change.
-  await page.locator('text=Event details updated.')
-}
-
-exports.createEvent = async function(page, baseURL, idgroups) {
+exports.createEvent = async function(page, baseURL, idgroups, past) {
   // Go to groups page
   await page.goto('/group/view/' + idgroups)
 
@@ -128,6 +114,12 @@ exports.createEvent = async function(page, baseURL, idgroups) {
 
   // Set a date.
   await page.click('#event_date button')
+
+  if (past) {
+    // Go back a month
+    await page.locator('[aria-label="Previous month"]').click()
+  }
+
   await page.click('#event_date .b-calendar-grid > .b-calendar-grid-body > .row:last-child .btn:last-child')
 
   await page.click('#event_time input[name="start"]')
@@ -151,3 +143,34 @@ exports.createEvent = async function(page, baseURL, idgroups) {
   const id = page.url().substring(p + 1)
   return id
 }
+
+exports.approveEvent = async function(page, baseURL, idevents) {
+  // Go to event edit page.
+  await page.goto('/party/edit/' + idevents)
+
+  // Set approve.
+  await page.selectOption('.event-approve .custom-select', 'approve')
+
+  // Approve
+  await page.locator('text=Save Event').click()
+
+  // Should show change.
+  await page.locator('text=Event details updated.')
+}
+
+exports.addDevice = async function(page, baseURL, idevents, powered) {
+  // Go to event edit page.
+  await page.goto('/party/view/' + idevents)
+
+  await page.locator(powered ? '.add-powered-device-desktop' : '.add-unpowered-device-desktop').click()
+
+  // Tab to category
+  await page.keyboard.press('Tab')
+  await page.keyboard.press('Enter')
+
+  await page.locator('text=Add item >> visible=true').click()
+
+  // Wait for device to show.
+  await expect(page.locator('h3 >> text=Misc')).toHaveCount(2)
+}
+
