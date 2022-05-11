@@ -1,40 +1,37 @@
-import Vue from '../../utils/vue'
-import { mergeData } from 'vue-functional-data-merge'
+import { Vue, mergeData } from '../../vue'
+import { NAME_INPUT_GROUP_ADDON } from '../../constants/components'
+import { PROP_TYPE_BOOLEAN, PROP_TYPE_STRING } from '../../constants/props'
+import { makeProp, makePropsConfigurable } from '../../utils/props'
 import { BInputGroupText } from './input-group-text'
 
-export const commonProps = {
-  id: {
-    type: String,
-    default: null
+// --- Props ---
+
+export const props = makePropsConfigurable(
+  {
+    append: makeProp(PROP_TYPE_BOOLEAN, false),
+    id: makeProp(PROP_TYPE_STRING),
+    isText: makeProp(PROP_TYPE_BOOLEAN, false),
+    tag: makeProp(PROP_TYPE_STRING, 'div')
   },
-  tag: {
-    type: String,
-    default: 'div'
-  },
-  isText: {
-    type: Boolean,
-    default: false
-  }
-}
+  NAME_INPUT_GROUP_ADDON
+)
+
+// --- Main component ---
 
 // @vue/component
 export const BInputGroupAddon = /*#__PURE__*/ Vue.extend({
-  name: 'BInputGroupAddon',
+  name: NAME_INPUT_GROUP_ADDON,
   functional: true,
-  props: {
-    ...commonProps,
-    append: {
-      type: Boolean,
-      default: false
-    }
-  },
+  props,
   render(h, { props, data, children }) {
+    const { append } = props
+
     return h(
       props.tag,
       mergeData(data, {
         class: {
-          'input-group-append': props.append,
-          'input-group-prepend': !props.append
+          'input-group-append': append,
+          'input-group-prepend': !append
         },
         attrs: {
           id: props.id

@@ -1,65 +1,52 @@
-import Vue from '../../utils/vue'
-import { mergeData } from 'vue-functional-data-merge'
+import { Vue, mergeData } from '../../vue'
+import { NAME_MEDIA } from '../../constants/components'
+import { PROP_TYPE_BOOLEAN, PROP_TYPE_STRING } from '../../constants/props'
+import { SLOT_NAME_ASIDE, SLOT_NAME_DEFAULT } from '../../constants/slots'
 import { normalizeSlot } from '../../utils/normalize-slot'
-import { BMediaBody } from './media-body'
+import { makeProp, makePropsConfigurable } from '../../utils/props'
 import { BMediaAside } from './media-aside'
+import { BMediaBody } from './media-body'
 
-export const props = {
-  tag: {
-    type: String,
-    default: 'div'
+// --- Props ---
+
+export const props = makePropsConfigurable(
+  {
+    noBody: makeProp(PROP_TYPE_BOOLEAN, false),
+    rightAlign: makeProp(PROP_TYPE_BOOLEAN, false),
+    tag: makeProp(PROP_TYPE_STRING, 'div'),
+    verticalAlign: makeProp(PROP_TYPE_STRING, 'top')
   },
-  rightAlign: {
-    type: Boolean,
-    default: false
-  },
-  verticalAlign: {
-    type: String,
-    default: 'top'
-  },
-  noBody: {
-    type: Boolean,
-    default: false
-  }
-}
+  NAME_MEDIA
+)
+
+// --- Main component ---
 
 // @vue/component
 export const BMedia = /*#__PURE__*/ Vue.extend({
-  name: 'BMedia',
+  name: NAME_MEDIA,
   functional: true,
   props,
   render(h, { props, data, slots, scopedSlots, children }) {
-    const childNodes = props.noBody ? children : []
+    const { noBody, rightAlign, verticalAlign } = props
+    const $children = noBody ? children : []
 
-    if (!props.noBody) {
+    if (!noBody) {
+      const slotScope = {}
       const $slots = slots()
       const $scopedSlots = scopedSlots || {}
-      const $aside = normalizeSlot('aside', {}, $scopedSlots, $slots)
-      const $default = normalizeSlot('default', {}, $scopedSlots, $slots)
 
-      if ($aside && !props.rightAlign) {
-        childNodes.push(
-          h(
-            BMediaAside,
-            { staticClass: 'mr-3', props: { verticalAlign: props.verticalAlign } },
-            $aside
-          )
-        )
-      }
+      $children.push(
+        h(BMediaBody, normalizeSlot(SLOT_NAME_DEFAULT, slotScope, $scopedSlots, $slots))
+      )
 
-      childNodes.push(h(BMediaBody, $default))
-
-      if ($aside && props.rightAlign) {
-        childNodes.push(
-          h(
-            BMediaAside,
-            { staticClass: 'ml-3', props: { verticalAlign: props.verticalAlign } },
-            $aside
-          )
+      const $aside = normalizeSlot(SLOT_NAME_ASIDE, slotScope, $scopedSlots, $slots)
+      if ($aside) {
+        $children[rightAlign ? 'push' : 'unshift'](
+          h(BMediaAside, { props: { right: rightAlign, verticalAlign } }, $aside)
         )
       }
     }
 
-    return h(props.tag, mergeData(data, { staticClass: 'media' }), childNodes)
+    return h(props.tag, mergeData(data, { staticClass: 'media' }), $children)
   }
 })

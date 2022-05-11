@@ -8,7 +8,7 @@ import { warnNoMutationObserverSupport } from './warn'
  * @param {object} [options={childList: true, subtree: true}] observe options
  * @see https://stackoverflow.com/questions/3219758
  */
-const observeDom = (
+export const observeDom = (
   el,
   callback,
   options
@@ -45,7 +45,7 @@ const observeDom = (
 
       // Detect whether a change happened based on type and target
       if (type === 'characterData' && target.nodeType === Node.TEXT_NODE) {
-        // We ignore nodes that are not TEXT (i.e. comments, etc)
+        // We ignore nodes that are not TEXT (i.e. comments, etc.)
         // as they don't change layout
         changed = true
       } else if (type === 'attributes') {
@@ -75,5 +75,3 @@ const observeDom = (
   // To reduce overhead when the root element is hidden
   return obs
 }
-
-export default observeDom

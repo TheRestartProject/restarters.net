@@ -31,14 +31,13 @@
 //     )
 //   }
 
-import looseEqual from '../../utils/loose-equal'
+import { RX_DIGITS } from '../../constants/regex'
 import { requestAF } from '../../utils/dom'
 import { isFunction } from '../../utils/inspect'
+import { looseEqual } from '../../utils/loose-equal'
 import { clone, keys } from '../../utils/object'
 
 const OBSERVER_PROP_NAME = '__bv__visibility_observer'
-
-const RX_ONLY_DIGITS = /^\d+$/
 
 class VisibilityObserver {
   constructor(el, options, vnode) {
@@ -100,7 +99,7 @@ class VisibilityObserver {
   }
 
   /* istanbul ignore next */
-  handler(entries) /* istanbul ignore next: IntersectionObserver not supported in JSDOM */ {
+  handler(entries) {
     const entry = entries ? entries[0] : {}
     const isIntersecting = Boolean(entry.isIntersecting || entry.intersectionRatio > 0.0)
     if (isIntersecting !== this.visible) {
@@ -138,7 +137,7 @@ const bind = (el, { value, modifiers }, vnode) => {
   // Parse modifiers
   keys(modifiers).forEach(mod => {
     /* istanbul ignore else: Until <b-img-lazy> is switched to use this directive */
-    if (RX_ONLY_DIGITS.test(mod)) {
+    if (RX_DIGITS.test(mod)) {
       options.margin = `${mod}px`
     } else if (mod.toLowerCase() === 'once') {
       options.once = true

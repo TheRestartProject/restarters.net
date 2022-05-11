@@ -1,58 +1,48 @@
-import Vue from '../../utils/vue'
-import { mergeData } from 'vue-functional-data-merge'
+import { Vue, mergeData } from '../../vue'
+import { NAME_FORM_INVALID_FEEDBACK } from '../../constants/components'
+import { PROP_TYPE_BOOLEAN, PROP_TYPE_STRING } from '../../constants/props'
+import { makeProp, makePropsConfigurable } from '../../utils/props'
 
-export const props = {
-  id: {
-    type: String
-    // default: null
+// --- Props ---
+
+export const props = makePropsConfigurable(
+  {
+    ariaLive: makeProp(PROP_TYPE_STRING),
+    forceShow: makeProp(PROP_TYPE_BOOLEAN, false),
+    id: makeProp(PROP_TYPE_STRING),
+    role: makeProp(PROP_TYPE_STRING),
+    // Tri-state prop: `true`, `false`, or `null`
+    state: makeProp(PROP_TYPE_BOOLEAN, null),
+    tag: makeProp(PROP_TYPE_STRING, 'div'),
+    tooltip: makeProp(PROP_TYPE_BOOLEAN, false)
   },
-  tag: {
-    type: String,
-    default: 'div'
-  },
-  tooltip: {
-    type: Boolean,
-    default: false
-  },
-  forceShow: {
-    type: Boolean,
-    default: false
-  },
-  state: {
-    // Tri-stste prop: `true`, `false`, or `null`
-    type: Boolean,
-    default: null
-  },
-  ariaLive: {
-    type: String
-    // default: null
-  },
-  role: {
-    type: String
-    // default: null
-  }
-}
+  NAME_FORM_INVALID_FEEDBACK
+)
+
+// --- Main component ---
 
 // @vue/component
 export const BFormInvalidFeedback = /*#__PURE__*/ Vue.extend({
-  name: 'BFormInvalidFeedback',
+  name: NAME_FORM_INVALID_FEEDBACK,
   functional: true,
   props,
   render(h, { props, data, children }) {
+    const { tooltip, ariaLive } = props
     const show = props.forceShow === true || props.state === false
+
     return h(
       props.tag,
       mergeData(data, {
         class: {
-          'invalid-feedback': !props.tooltip,
-          'invalid-tooltip': props.tooltip,
-          'd-block': show
+          'd-block': show,
+          'invalid-feedback': !tooltip,
+          'invalid-tooltip': tooltip
         },
         attrs: {
           id: props.id || null,
           role: props.role || null,
-          'aria-live': props.ariaLive || null,
-          'aria-atomic': props.ariaLive ? 'true' : null
+          'aria-live': ariaLive || null,
+          'aria-atomic': ariaLive ? 'true' : null
         }
       }),
       children

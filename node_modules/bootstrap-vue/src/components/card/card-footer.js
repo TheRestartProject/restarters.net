@@ -1,31 +1,28 @@
-import { mergeData } from 'vue-functional-data-merge'
-import Vue from '../../utils/vue'
+import { Vue, mergeData } from '../../vue'
+import { NAME_CARD_FOOTER } from '../../constants/components'
+import { PROP_TYPE_ARRAY_OBJECT_STRING, PROP_TYPE_STRING } from '../../constants/props'
 import { htmlOrText } from '../../utils/html'
-import { copyProps, prefixPropName } from '../../utils/props'
-import cardMixin from '../../mixins/card'
+import { sortKeys } from '../../utils/object'
+import { copyProps, makeProp, makePropsConfigurable, prefixPropName } from '../../utils/props'
+import { props as BCardProps } from '../../mixins/card'
 
 // --- Props ---
 
-export const props = {
-  ...copyProps(cardMixin.props, prefixPropName.bind(null, 'footer')),
-  footer: {
-    type: String
-    // default: null
-  },
-  footerHtml: {
-    type: String
-    // default: null
-  },
-  footerClass: {
-    type: [String, Object, Array]
-    // default: null
-  }
-}
+export const props = makePropsConfigurable(
+  sortKeys({
+    ...copyProps(BCardProps, prefixPropName.bind(null, 'footer')),
+    footer: makeProp(PROP_TYPE_STRING),
+    footerClass: makeProp(PROP_TYPE_ARRAY_OBJECT_STRING),
+    footerHtml: makeProp(PROP_TYPE_STRING)
+  }),
+  NAME_CARD_FOOTER
+)
 
 // --- Main component ---
+
 // @vue/component
 export const BCardFooter = /*#__PURE__*/ Vue.extend({
-  name: 'BCardFooter',
+  name: NAME_CARD_FOOTER,
   functional: true,
   props,
   render(h, { props, data, children }) {

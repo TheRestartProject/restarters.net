@@ -1,48 +1,34 @@
-import { mergeData } from 'vue-functional-data-merge'
-import Vue from '../../utils/vue'
-import { getComponentConfig } from '../../utils/config'
+import { Vue, mergeData } from '../../vue'
+import { NAME_INPUT_GROUP } from '../../constants/components'
+import { PROP_TYPE_STRING } from '../../constants/props'
+import { SLOT_NAME_APPEND, SLOT_NAME_DEFAULT, SLOT_NAME_PREPEND } from '../../constants/slots'
 import { htmlOrText } from '../../utils/html'
 import { hasNormalizedSlot, normalizeSlot } from '../../utils/normalize-slot'
+import { makeProp, makePropsConfigurable } from '../../utils/props'
 import { BInputGroupAppend } from './input-group-append'
 import { BInputGroupPrepend } from './input-group-prepend'
 import { BInputGroupText } from './input-group-text'
 
-// --- Constants ---
-
-const NAME = 'BInputGroup'
-
 // --- Props ---
 
-export const props = {
-  id: {
-    type: String
+export const props = makePropsConfigurable(
+  {
+    append: makeProp(PROP_TYPE_STRING),
+    appendHtml: makeProp(PROP_TYPE_STRING),
+    id: makeProp(PROP_TYPE_STRING),
+    prepend: makeProp(PROP_TYPE_STRING),
+    prependHtml: makeProp(PROP_TYPE_STRING),
+    size: makeProp(PROP_TYPE_STRING),
+    tag: makeProp(PROP_TYPE_STRING, 'div')
   },
-  size: {
-    type: String,
-    default: () => getComponentConfig(NAME, 'size')
-  },
-  prepend: {
-    type: String
-  },
-  prependHtml: {
-    type: String
-  },
-  append: {
-    type: String
-  },
-  appendHtml: {
-    type: String
-  },
-  tag: {
-    type: String,
-    default: 'div'
-  }
-}
+  NAME_INPUT_GROUP
+)
 
 // --- Main component ---
+
 // @vue/component
 export const BInputGroup = /*#__PURE__*/ Vue.extend({
-  name: NAME,
+  name: NAME_INPUT_GROUP,
   functional: true,
   props,
   render(h, { props, data, slots, scopedSlots }) {
@@ -52,21 +38,21 @@ export const BInputGroup = /*#__PURE__*/ Vue.extend({
     const slotScope = {}
 
     let $prepend = h()
-    const hasPrependSlot = hasNormalizedSlot('prepend', $scopedSlots, $slots)
+    const hasPrependSlot = hasNormalizedSlot(SLOT_NAME_PREPEND, $scopedSlots, $slots)
     if (hasPrependSlot || prepend || prependHtml) {
       $prepend = h(BInputGroupPrepend, [
         hasPrependSlot
-          ? normalizeSlot('prepend', slotScope, $scopedSlots, $slots)
+          ? normalizeSlot(SLOT_NAME_PREPEND, slotScope, $scopedSlots, $slots)
           : h(BInputGroupText, { domProps: htmlOrText(prependHtml, prepend) })
       ])
     }
 
     let $append = h()
-    const hasAppendSlot = hasNormalizedSlot('append', $scopedSlots, $slots)
+    const hasAppendSlot = hasNormalizedSlot(SLOT_NAME_APPEND, $scopedSlots, $slots)
     if (hasAppendSlot || append || appendHtml) {
       $append = h(BInputGroupAppend, [
         hasAppendSlot
-          ? normalizeSlot('append', slotScope, $scopedSlots, $slots)
+          ? normalizeSlot(SLOT_NAME_APPEND, slotScope, $scopedSlots, $slots)
           : h(BInputGroupText, { domProps: htmlOrText(appendHtml, append) })
       ])
     }
@@ -81,7 +67,7 @@ export const BInputGroup = /*#__PURE__*/ Vue.extend({
           role: 'group'
         }
       }),
-      [$prepend, normalizeSlot('default', slotScope, $scopedSlots, $slots), $append]
+      [$prepend, normalizeSlot(SLOT_NAME_DEFAULT, slotScope, $scopedSlots, $slots), $append]
     )
   }
 })

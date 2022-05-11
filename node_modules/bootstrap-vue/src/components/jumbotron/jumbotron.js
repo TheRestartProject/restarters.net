@@ -1,75 +1,43 @@
-import Vue from '../../utils/vue'
-import { mergeData } from 'vue-functional-data-merge'
-import { getComponentConfig } from '../../utils/config'
+import { Vue, mergeData } from '../../vue'
+import { NAME_JUMBOTRON } from '../../constants/components'
+import {
+  PROP_TYPE_BOOLEAN,
+  PROP_TYPE_BOOLEAN_STRING,
+  PROP_TYPE_NUMBER_STRING,
+  PROP_TYPE_STRING
+} from '../../constants/props'
+import { SLOT_NAME_DEFAULT, SLOT_NAME_HEADER, SLOT_NAME_LEAD } from '../../constants/slots'
 import { htmlOrText } from '../../utils/html'
 import { hasNormalizedSlot, normalizeSlot } from '../../utils/normalize-slot'
+import { makeProp, makePropsConfigurable } from '../../utils/props'
 import { BContainer } from '../layout/container'
-
-// --- Constants ---
-
-const NAME = 'BJumbotron'
 
 // --- Props ---
 
-export const props = {
-  fluid: {
-    type: Boolean,
-    default: false
+export const props = makePropsConfigurable(
+  {
+    bgVariant: makeProp(PROP_TYPE_STRING),
+    borderVariant: makeProp(PROP_TYPE_STRING),
+    containerFluid: makeProp(PROP_TYPE_BOOLEAN_STRING, false),
+    fluid: makeProp(PROP_TYPE_BOOLEAN, false),
+    header: makeProp(PROP_TYPE_STRING),
+    headerHtml: makeProp(PROP_TYPE_STRING),
+    headerLevel: makeProp(PROP_TYPE_NUMBER_STRING, 3),
+    headerTag: makeProp(PROP_TYPE_STRING, 'h1'),
+    lead: makeProp(PROP_TYPE_STRING),
+    leadHtml: makeProp(PROP_TYPE_STRING),
+    leadTag: makeProp(PROP_TYPE_STRING, 'p'),
+    tag: makeProp(PROP_TYPE_STRING, 'div'),
+    textVariant: makeProp(PROP_TYPE_STRING)
   },
-  containerFluid: {
-    type: [Boolean, String],
-    default: false
-  },
-  header: {
-    type: String
-    // default: null
-  },
-  headerHtml: {
-    type: String
-    // default: null
-  },
-  headerTag: {
-    type: String,
-    default: 'h1'
-  },
-  headerLevel: {
-    type: [Number, String],
-    default: '3'
-  },
-  lead: {
-    type: String
-    // default: null
-  },
-  leadHtml: {
-    type: String
-    // default: null
-  },
-  leadTag: {
-    type: String,
-    default: 'p'
-  },
-  tag: {
-    type: String,
-    default: 'div'
-  },
-  bgVariant: {
-    type: String,
-    default: () => getComponentConfig(NAME, 'bgVariant')
-  },
-  borderVariant: {
-    type: String,
-    default: () => getComponentConfig(NAME, 'borderVariant')
-  },
-  textVariant: {
-    type: String,
-    default: () => getComponentConfig(NAME, 'textVariant')
-  }
-}
+  NAME_JUMBOTRON
+)
 
 // --- Main component ---
+
 // @vue/component
 export const BJumbotron = /*#__PURE__*/ Vue.extend({
-  name: NAME,
+  name: NAME_JUMBOTRON,
   functional: true,
   props,
   render(h, { props, data, slots, scopedSlots }) {
@@ -79,7 +47,7 @@ export const BJumbotron = /*#__PURE__*/ Vue.extend({
     const slotScope = {}
 
     let $header = h()
-    const hasHeaderSlot = hasNormalizedSlot('header', $scopedSlots, $slots)
+    const hasHeaderSlot = hasNormalizedSlot(SLOT_NAME_HEADER, $scopedSlots, $slots)
     if (hasHeaderSlot || header || headerHtml) {
       const { headerLevel } = props
 
@@ -89,12 +57,12 @@ export const BJumbotron = /*#__PURE__*/ Vue.extend({
           class: { [`display-${headerLevel}`]: headerLevel },
           domProps: hasHeaderSlot ? {} : htmlOrText(headerHtml, header)
         },
-        normalizeSlot('header', slotScope, $scopedSlots, $slots)
+        normalizeSlot(SLOT_NAME_HEADER, slotScope, $scopedSlots, $slots)
       )
     }
 
     let $lead = h()
-    const hasLeadSlot = hasNormalizedSlot('lead', $scopedSlots, $slots)
+    const hasLeadSlot = hasNormalizedSlot(SLOT_NAME_LEAD, $scopedSlots, $slots)
     if (hasLeadSlot || lead || leadHtml) {
       $lead = h(
         props.leadTag,
@@ -102,11 +70,15 @@ export const BJumbotron = /*#__PURE__*/ Vue.extend({
           staticClass: 'lead',
           domProps: hasLeadSlot ? {} : htmlOrText(leadHtml, lead)
         },
-        normalizeSlot('lead', slotScope, $scopedSlots, $slots)
+        normalizeSlot(SLOT_NAME_LEAD, slotScope, $scopedSlots, $slots)
       )
     }
 
-    let $children = [$header, $lead, normalizeSlot('default', slotScope, $scopedSlots, $slots)]
+    let $children = [
+      $header,
+      $lead,
+      normalizeSlot(SLOT_NAME_DEFAULT, slotScope, $scopedSlots, $slots)
+    ]
 
     // If fluid, wrap content in a container
     if (props.fluid) {

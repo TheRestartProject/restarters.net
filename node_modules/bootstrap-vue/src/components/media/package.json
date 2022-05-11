@@ -24,7 +24,11 @@
         "slots": [
           {
             "name": "aside",
-            "description": "Media Aside"
+            "description": "Media aside"
+          },
+          {
+            "name": "default",
+            "description": "Content to place in the media element"
           }
         ]
       },
@@ -32,12 +36,30 @@
         "component": "BMediaAside",
         "props": [
           {
+            "prop": "right",
+            "description": "Position the 'aside' on the right. Default is on the left"
+          },
+          {
             "prop": "verticalAlign",
             "description": "Vertical alignment of the aside: 'start' (or 'top'), 'center', or 'end' (or 'bottom')"
           }
+        ],
+        "slots": [
+          {
+            "name": "default",
+            "description": "Content to place in the media aside"
+          }
         ]
       },
-      "BMediaBody"
+      {
+        "component": "BMediaBody",
+        "slots": [
+          {
+            "name": "default",
+            "description": "Content to place in the media body"
+          }
+        ]
+      }
     ]
   }
 }

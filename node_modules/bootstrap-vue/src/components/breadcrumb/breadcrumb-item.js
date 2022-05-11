@@ -1,10 +1,17 @@
-import Vue from '../../utils/vue'
-import { mergeData } from 'vue-functional-data-merge'
-import { BBreadcrumbLink, props } from './breadcrumb-link'
+import { Vue, mergeData } from '../../vue'
+import { NAME_BREADCRUMB_ITEM } from '../../constants/components'
+import { makePropsConfigurable } from '../../utils/props'
+import { BBreadcrumbLink, props as BBreadcrumbLinkProps } from './breadcrumb-link'
+
+// --- Props ---
+
+export const props = makePropsConfigurable(BBreadcrumbLinkProps, NAME_BREADCRUMB_ITEM)
+
+// --- Main component ---
 
 // @vue/component
 export const BBreadcrumbItem = /*#__PURE__*/ Vue.extend({
-  name: 'BBreadcrumbItem',
+  name: NAME_BREADCRUMB_ITEM,
   functional: true,
   props,
   render(h, { props, data, children }) {

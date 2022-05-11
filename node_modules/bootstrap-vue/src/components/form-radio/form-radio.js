@@ -1,62 +1,34 @@
-import Vue from '../../utils/vue'
-import idMixin from '../../mixins/id'
-import formMixin from '../../mixins/form'
-import formStateMixin from '../../mixins/form-state'
-import formSizeMixin from '../../mixins/form-size'
-import formRadioCheckMixin from '../../mixins/form-radio-check'
-import looseEqual from '../../utils/loose-equal'
+import { Vue } from '../../vue'
+import { NAME_FORM_RADIO } from '../../constants/components'
+import { looseEqual } from '../../utils/loose-equal'
+import { makePropsConfigurable } from '../../utils/props'
+import {
+  MODEL_EVENT_NAME,
+  formRadioCheckMixin,
+  props as formRadioCheckProps
+} from '../../mixins/form-radio-check'
+
+// --- Props ---
+
+export const props = makePropsConfigurable(formRadioCheckProps, NAME_FORM_RADIO)
+
+// --- Main component ---
 
 // @vue/component
 export const BFormRadio = /*#__PURE__*/ Vue.extend({
-  name: 'BFormRadio',
-  mixins: [
-    idMixin,
-    formRadioCheckMixin, // Includes shared render function
-    formMixin,
-    formSizeMixin,
-    formStateMixin
-  ],
+  name: NAME_FORM_RADIO,
+  mixins: [formRadioCheckMixin],
   inject: {
     bvGroup: {
       from: 'bvRadioGroup',
       default: false
     }
   },
-  props: {
-    checked: {
-      // v-model
-      // type: [String, Number, Boolean, Object],
-      default: null
-    }
-  },
-  computed: {
-    // Radio Groups can only have a single value, so determining if checked is simple
-    isChecked() {
-      return looseEqual(this.value, this.computedLocalChecked)
-    },
-    // Flags for form-radio-check mixin
-    isRadio() {
-      return true
-    },
-    isCheck() {
-      return false
-    }
-  },
+  props,
   watch: {
-    // Radio Groups can only have a single value, so our watchers are simple
-    computedLocalChecked() {
-      this.$emit('input', this.computedLocalChecked)
-    }
-  },
-  methods: {
-    handleChange({ target: { checked } }) {
-      const value = this.value
-      this.computedLocalChecked = value
-      // Change is only emitted on user interaction
-      this.$emit('change', checked ? value : null)
-      // If this is a child of form-radio-group, we emit a change event on it as well
-      if (this.isGroup) {
-        this.bvGroup.$emit('change', checked ? value : null)
+    computedLocalChecked(newValue, oldValue) {
+      if (!looseEqual(newValue, oldValue)) {
+        this.$emit(MODEL_EVENT_NAME, newValue)
       }
     }
   }

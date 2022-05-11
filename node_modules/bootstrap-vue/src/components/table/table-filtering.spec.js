@@ -1,6 +1,6 @@
 import { mount } from '@vue/test-utils'
 import { waitNT } from '../../../tests/utils'
-import stringifyRecordValues from './helpers/stringify-record-values'
+import { stringifyRecordValues } from './helpers/stringify-record-values'
 import { BTable } from './table'
 
 const testItems = [{ a: 3, b: 'b', c: 'x' }, { a: 1, b: 'c', c: 'y' }, { a: 2, b: 'a', c: 'z' }]
@@ -76,7 +76,7 @@ describe('table > filtering', () => {
 
     expect(wrapper.findAll('tbody > tr').exists()).toBe(true)
     expect(wrapper.findAll('tbody > tr').length).toBe(3)
-    expect(wrapper.emitted('filtered')).not.toBeDefined()
+    expect(wrapper.emitted('filtered')).toBeUndefined()
 
     await wrapper.setProps({
       filter: 'z'
@@ -157,7 +157,7 @@ describe('table > filtering', () => {
 
     expect(wrapper.findAll('tbody > tr').exists()).toBe(true)
     expect(wrapper.findAll('tbody > tr').length).toBe(3)
-    expect(wrapper.emitted('filtered')).not.toBeDefined()
+    expect(wrapper.emitted('filtered')).toBeUndefined()
 
     await wrapper.setProps({
       filter: /z/
@@ -203,6 +203,91 @@ describe('table > filtering', () => {
     await waitNT(wrapper.vm)
 
     expect(wrapper.findAll('tbody > tr').length).toBe(0)
+
+    wrapper.destroy()
+  })
+
+  it('`filter-ignored-fields` prop works', async () => {
+    const wrapper = mount(BTable, {
+      propsData: {
+        fields: testFields,
+        items: testItems,
+        filter: '',
+        filterIgnoredFields: []
+      }
+    })
+
+    expect(wrapper).toBeDefined()
+    await waitNT(wrapper.vm)
+
+    expect(wrapper.findAll('tbody > tr').length).toBe(3)
+
+    // Search for a value in "a" column
+    await wrapper.setProps({ filter: '3' })
+    await waitNT(wrapper.vm)
+    expect(wrapper.findAll('tbody > tr').length).toBe(1)
+
+    // Ignore "a" column from filtering
+    await wrapper.setProps({ filterIgnoredFields: ['a'] })
+    await waitNT(wrapper.vm)
+    expect(wrapper.findAll('tbody > tr').length).toBe(0)
+
+    wrapper.destroy()
+  })
+
+  it('`filter-included-fields` prop works', async () => {
+    const wrapper = mount(BTable, {
+      propsData: {
+        fields: testFields,
+        // Add a extra item with a duplicated value in another field
+        items: [...testItems, { a: 4, b: 'y', c: 'a' }],
+        filter: '',
+        filterIncludedFields: []
+      }
+    })
+
+    expect(wrapper).toBeDefined()
+    await waitNT(wrapper.vm)
+
+    expect(wrapper.findAll('tbody > tr').length).toBe(4)
+
+    // Search for "a"
+    await wrapper.setProps({ filter: 'a' })
+    await waitNT(wrapper.vm)
+    expect(wrapper.findAll('tbody > tr').length).toBe(2)
+
+    // Only include "a" and "b" fields
+    await wrapper.setProps({ filterIncludedFields: ['a', 'b'] })
+    await waitNT(wrapper.vm)
+    expect(wrapper.findAll('tbody > tr').length).toBe(1)
+
+    wrapper.destroy()
+  })
+
+  it('should filter for formatted values for keys which are not present in row', async () => {
+    const wrapper = mount(BTable, {
+      propsData: {
+        items: [{ a: 'A', b: 'B' }],
+        fields: [
+          { key: 'a' },
+          {
+            key: 'b',
+            formatter: () => 'Foo',
+            filterByFormatted: true
+          },
+          {
+            key: 'c',
+            formatter: () => 'Bar',
+            filterByFormatted: true
+          }
+        ],
+        filter: 'Bar'
+      }
+    })
+    expect(wrapper).toBeDefined()
+    await waitNT(wrapper.vm)
+
+    expect(wrapper.findAll('tbody > tr').length).toBe(1)
 
     wrapper.destroy()
   })

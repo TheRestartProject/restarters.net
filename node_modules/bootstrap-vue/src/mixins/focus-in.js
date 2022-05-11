@@ -1,7 +1,9 @@
-import { EVENT_OPTIONS_NO_CAPTURE, eventOn, eventOff } from '../utils/events'
+import { Vue } from '../vue'
+import { EVENT_OPTIONS_NO_CAPTURE } from '../constants/events'
+import { eventOn, eventOff } from '../utils/events'
 
 // @vue/component
-export default {
+export const focusInMixin = Vue.extend({
   data() {
     return {
       listenForFocusIn: false
@@ -29,14 +31,14 @@ export default {
       eventOn(this.focusInElement, 'focusin', this._focusInHandler, EVENT_OPTIONS_NO_CAPTURE)
     }
   },
-  beforeDestroy() /* istanbul ignore next */ {
+  beforeDestroy() {
     eventOff(this.focusInElement, 'focusin', this._focusInHandler, EVENT_OPTIONS_NO_CAPTURE)
   },
   methods: {
-    _focusInHandler(evt) {
+    _focusInHandler(event) {
       if (this.focusInHandler) {
-        this.focusInHandler(evt)
+        this.focusInHandler(event)
       }
     }
   }
-}
+})

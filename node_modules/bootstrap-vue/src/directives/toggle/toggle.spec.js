@@ -1,5 +1,5 @@
 import { mount } from '@vue/test-utils'
-import { waitNT } from '../../../tests/utils'
+import { waitNT, waitRAF } from '../../../tests/utils'
 import { VBToggle } from './toggle'
 
 // Emitted control event for collapse (emitted to collapse)
@@ -9,7 +9,7 @@ const EVENT_TOGGLE = 'bv::toggle::collapse'
 const EVENT_STATE = 'bv::collapse::state'
 
 // Listen to event for toggle sync state update (emitted by collapse)
-const EVENT_STATE_SYNC = 'bv::collapse::sync::state'
+const EVENT_SYNC_STATE = 'bv::collapse::sync-state'
 
 describe('v-b-toggle directive', () => {
   it('works on buttons', async () => {
@@ -29,6 +29,9 @@ describe('v-b-toggle directive', () => {
 
     const wrapper = mount(App)
 
+    await waitRAF()
+    await waitNT(wrapper.vm)
+
     expect(wrapper.vm).toBeDefined()
     expect(wrapper.element.tagName).toBe('BUTTON')
     expect(spy).not.toHaveBeenCalled()
@@ -36,7 +39,7 @@ describe('v-b-toggle directive', () => {
     const $button = wrapper.find('button')
     expect($button.attributes('aria-controls')).toBe('test')
     expect($button.attributes('aria-expanded')).toBe('false')
-    expect($button.attributes('tabindex')).not.toBeDefined()
+    expect($button.attributes('tabindex')).toBeUndefined()
     expect($button.classes()).toContain('collapsed')
     expect($button.classes()).not.toContain('not-collapsed')
 
@@ -48,7 +51,7 @@ describe('v-b-toggle directive', () => {
     // current state, the classes and attrs remain the same
     expect($button.attributes('aria-controls')).toBe('test')
     expect($button.attributes('aria-expanded')).toBe('false')
-    expect($button.attributes('tabindex')).not.toBeDefined()
+    expect($button.attributes('tabindex')).toBeUndefined()
     expect($button.classes()).toContain('collapsed')
     expect($button.classes()).not.toContain('not-collapsed')
 
@@ -71,6 +74,9 @@ describe('v-b-toggle directive', () => {
     }
 
     const wrapper = mount(App)
+
+    await waitRAF()
+    await waitNT(wrapper.vm)
 
     expect(wrapper.vm).toBeDefined()
     expect(wrapper.element.tagName).toBe('BUTTON')
@@ -113,6 +119,9 @@ describe('v-b-toggle directive', () => {
 
     const wrapper = mount(App)
 
+    await waitRAF()
+    await waitNT(wrapper.vm)
+
     expect(wrapper.vm).toBeDefined()
     expect(wrapper.element.tagName).toBe('BUTTON')
     expect(spy).not.toHaveBeenCalled()
@@ -154,6 +163,9 @@ describe('v-b-toggle directive', () => {
 
     const wrapper = mount(App)
 
+    await waitRAF()
+    await waitNT(wrapper.vm)
+
     expect(wrapper.vm).toBeDefined()
     expect(wrapper.element.tagName).toBe('A')
     expect(spy).not.toHaveBeenCalled()
@@ -161,7 +173,7 @@ describe('v-b-toggle directive', () => {
     const $link = wrapper.find('a')
     expect($link.attributes('aria-controls')).toBe('test')
     expect($link.attributes('aria-expanded')).toBe('false')
-    expect($link.attributes('tabindex')).not.toBeDefined()
+    expect($link.attributes('tabindex')).toBeUndefined()
     expect($link.classes()).toContain('collapsed')
     expect($link.classes()).not.toContain('not-collapsed')
 
@@ -173,7 +185,7 @@ describe('v-b-toggle directive', () => {
     // current state, the classes and attrs remain the same
     expect($link.attributes('aria-controls')).toBe('test')
     expect($link.attributes('aria-expanded')).toBe('false')
-    expect($link.attributes('tabindex')).not.toBeDefined()
+    expect($link.attributes('tabindex')).toBeUndefined()
     expect($link.classes()).toContain('collapsed')
     expect($link.classes()).not.toContain('not-collapsed')
 
@@ -206,6 +218,9 @@ describe('v-b-toggle directive', () => {
         target: 'test1'
       }
     })
+
+    await waitRAF()
+    await waitNT(wrapper.vm)
 
     expect(wrapper.vm).toBeDefined()
     expect(wrapper.element.tagName).toBe('BUTTON')
@@ -278,6 +293,9 @@ describe('v-b-toggle directive', () => {
     }
 
     const wrapper = mount(App)
+
+    await waitRAF()
+    await waitNT(wrapper.vm)
 
     expect(wrapper.vm).toBeDefined()
     expect(wrapper.element.tagName).toBe('SPAN')
@@ -415,14 +433,14 @@ describe('v-b-toggle directive', () => {
     expect($button.classes()).toContain('collapsed')
     expect($button.classes()).not.toContain('not-collapsed')
 
-    $root.$emit(EVENT_STATE_SYNC, 'test', true)
+    $root.$emit(EVENT_SYNC_STATE, 'test', true)
     await waitNT(wrapper.vm)
     expect($button.attributes('aria-controls')).toBe('test')
     expect($button.attributes('aria-expanded')).toBe('true')
     expect($button.classes()).not.toContain('collapsed')
     expect($button.classes()).toContain('not-collapsed')
 
-    $root.$emit(EVENT_STATE_SYNC, 'test', false)
+    $root.$emit(EVENT_SYNC_STATE, 'test', false)
     await waitNT(wrapper.vm)
     expect($button.attributes('aria-controls')).toBe('test')
     expect($button.attributes('aria-expanded')).toBe('false')

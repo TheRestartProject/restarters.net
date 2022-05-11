@@ -1,296 +1,88 @@
-import Vue from '../../utils/vue'
-import { arrayIncludes } from '../../utils/array'
-import { BVFormBtnLabelControl, dropdownProps } from '../../utils/bv-form-btn-label-control'
-import { getComponentConfig } from '../../utils/config'
+import { Vue } from '../../vue'
+import { NAME_FORM_DATEPICKER } from '../../constants/components'
+import { EVENT_NAME_CONTEXT, EVENT_NAME_HIDDEN, EVENT_NAME_SHOWN } from '../../constants/events'
+import { PROP_TYPE_BOOLEAN, PROP_TYPE_DATE_STRING, PROP_TYPE_STRING } from '../../constants/props'
+import { SLOT_NAME_BUTTON_CONTENT } from '../../constants/slots'
 import { createDate, constrainDate, formatYMD, parseYMD } from '../../utils/date'
 import { attemptBlur, attemptFocus } from '../../utils/dom'
 import { isUndefinedOrNull } from '../../utils/inspect'
-import { pick } from '../../utils/object'
-import idMixin from '../../mixins/id'
-import { BButton } from '../button/button'
-import { BCalendar, STR_LONG, STR_NARROW, STR_NUMERIC, STR_SHORT } from '../calendar/calendar'
+import { makeModelMixin } from '../../utils/model'
+import { omit, pick, sortKeys } from '../../utils/object'
+import { makeProp, makePropsConfigurable, pluckProps } from '../../utils/props'
+import { idMixin, props as idProps } from '../../mixins/id'
 import { BIconCalendar, BIconCalendarFill } from '../../icons/icons'
+import { BButton } from '../button/button'
+import { BCalendar, props as BCalendarProps } from '../calendar/calendar'
+import {
+  BVFormBtnLabelControl,
+  props as BVFormBtnLabelControlProps
+} from '../form-btn-label-control/bv-form-btn-label-control'
 
-const NAME = 'BFormDatepicker'
+// --- Constants ---
 
-// Fallback to BCalendar prop if no value found
-const getConfigFallback = prop => {
-  return getComponentConfig(NAME, prop) || getComponentConfig('BCalendar', prop)
-}
+const {
+  mixin: modelMixin,
+  props: modelProps,
+  prop: MODEL_PROP_NAME,
+  event: MODEL_EVENT_NAME
+} = makeModelMixin('value', { type: PROP_TYPE_DATE_STRING })
 
-// We create our props as a mixin so that we can control
-// where they appear in the props listing reference section
-const propsMixin = {
-  props: {
-    value: {
-      type: [String, Date],
-      default: null
-    },
-    valueAsDate: {
-      type: Boolean,
-      default: false
-    },
-    resetValue: {
-      type: [String, Date]
-      // default: null
-    },
-    initialDate: {
-      // This specifies the calendar year/month/day that will be shown when
-      // first opening the datepicker if no v-model value is provided
-      // Default is the current date (or `min`/`max`)
-      // Passed directly to <b-calendar>
-      type: [String, Date]
-      // default: null
-    },
-    placeholder: {
-      type: String
-      // Defaults to `labelNoDateSelected` from calendar context
-      // default: null
-    },
-    size: {
-      type: String
-      // default: null
-    },
-    min: {
-      type: [String, Date]
-      // default: null
-    },
-    max: {
-      type: [String, Date]
-      // default: null
-    },
-    disabled: {
-      type: Boolean,
-      default: false
-    },
-    readonly: {
-      type: Boolean,
-      default: false
-    },
-    required: {
-      // If true adds the `aria-required` attribute
-      type: Boolean,
-      default: false
-    },
-    name: {
-      type: String
-      // default: null
-    },
-    form: {
-      type: String
-      // default: null
-    },
-    state: {
-      // Tri-state prop: `true`, `false` or `null`
-      type: Boolean,
-      default: null
-    },
-    dateDisabledFn: {
-      type: Function
-      // default: null
-    },
-    noCloseOnSelect: {
-      type: Boolean,
-      default: false
-    },
-    hideHeader: {
-      type: Boolean,
-      default: false
-    },
-    showDecadeNav: {
-      // When `true` enables the decade navigation buttons
-      type: Boolean,
-      default: false
-    },
-    locale: {
-      type: [String, Array]
-      // default: null
-    },
-    startWeekday: {
-      // `0` (Sunday), `1` (Monday), ... `6` (Saturday)
-      // Day of week to start calendar on
-      type: [Number, String],
-      default: 0
-    },
-    direction: {
-      type: String
-      // default: null
-    },
-    buttonOnly: {
-      type: Boolean,
-      default: false
-    },
-    buttonVariant: {
-      // Applicable in button only mode
-      type: String,
-      default: 'secondary'
-    },
-    calendarWidth: {
-      // Width of the calendar dropdown
-      type: String,
-      default: '270px'
-    },
-    selectedVariant: {
-      // Variant color to use for the selected date
-      type: String,
-      default: 'primary'
-    },
-    todayVariant: {
-      // Variant color to use for today's date (defaults to `variant`)
-      type: String
-      // default: null
-    },
-    noHighlightToday: {
-      // Disable highlighting today's date
-      type: Boolean,
-      default: false
-    },
-    todayButton: {
-      type: Boolean,
-      default: false
-    },
-    labelTodayButton: {
-      type: String,
-      default: () => getComponentConfig(NAME, 'labelTodayButton')
-    },
-    todayButtonVariant: {
-      type: String,
-      default: 'outline-primary'
-    },
-    resetButton: {
-      type: Boolean,
-      default: false
-    },
-    labelResetButton: {
-      type: String,
-      default: () => getComponentConfig(NAME, 'labelResetButton')
-    },
-    resetButtonVariant: {
-      type: String,
-      default: 'outline-danger'
-    },
-    closeButton: {
-      type: Boolean,
-      default: false
-    },
-    labelCloseButton: {
-      type: String,
-      default: () => getComponentConfig(NAME, 'labelCloseButton')
-    },
-    closeButtonVariant: {
-      type: String,
-      default: 'outline-secondary'
-    },
-    dateInfoFn: {
-      // Passed through to b-calendar
-      type: Function
-      // default: undefined
-    },
-    // Labels for buttons and keyboard shortcuts
-    // These pick BCalendar global config if no BFormDate global config
-    labelPrevDecade: {
-      type: String,
-      default: () => getConfigFallback('labelPrevDecade')
-    },
-    labelPrevYear: {
-      type: String,
-      default: () => getConfigFallback('labelPrevYear')
-    },
-    labelPrevMonth: {
-      type: String,
-      default: () => getConfigFallback('labelPrevMonth')
-    },
-    labelCurrentMonth: {
-      type: String,
-      default: () => getConfigFallback('labelCurrentMonth')
-    },
-    labelNextMonth: {
-      type: String,
-      default: () => getConfigFallback('labelNextMonth')
-    },
-    labelNextYear: {
-      type: String,
-      default: () => getConfigFallback('labelNextYear')
-    },
-    labelNextDecade: {
-      type: String,
-      default: () => getConfigFallback('labelNextDecade')
-    },
-    labelToday: {
-      type: String,
-      default: () => getConfigFallback('labelToday')
-    },
-    labelSelected: {
-      type: String,
-      default: () => getConfigFallback('labelSelected')
-    },
-    labelNoDateSelected: {
-      type: String,
-      default: () => getConfigFallback('labelNoDateSelected')
-    },
-    labelCalendar: {
-      type: String,
-      default: () => getConfigFallback('labelCalendar')
-    },
-    labelNav: {
-      type: String,
-      default: () => getConfigFallback('labelNav')
-    },
-    labelHelp: {
-      type: String,
-      default: () => getConfigFallback('labelHelp')
-    },
-    dateFormatOptions: {
-      // `Intl.DateTimeFormat` object
-      // Note: This value is *not* to be placed in the global config
-      type: Object,
-      default: () => ({
-        year: STR_NUMERIC,
-        month: STR_LONG,
-        day: STR_NUMERIC,
-        weekday: STR_LONG
-      })
-    },
-    weekdayHeaderFormat: {
-      // Format of the weekday names at the top of the calendar
-      // Note: This value is *not* to be placed in the global config
-      type: String,
-      // `short` is typically a 3 letter abbreviation,
-      // `narrow` is typically a single letter
-      // `long` is the full week day name
-      // Although some locales may override this (i.e `ar`, etc)
-      default: STR_SHORT,
-      validator: value => arrayIncludes([STR_LONG, STR_SHORT, STR_NARROW], value)
-    },
+// --- Props ---
+
+const calendarProps = omit(BCalendarProps, [
+  'block',
+  'hidden',
+  'id',
+  'noKeyNav',
+  'roleDescription',
+  'value',
+  'width'
+])
+
+const formBtnLabelControlProps = omit(BVFormBtnLabelControlProps, [
+  'formattedValue',
+  'id',
+  'lang',
+  'rtl',
+  'value'
+])
+
+export const props = makePropsConfigurable(
+  sortKeys({
+    ...idProps,
+    ...modelProps,
+    ...calendarProps,
+    ...formBtnLabelControlProps,
+    // Width of the calendar dropdown
+    calendarWidth: makeProp(PROP_TYPE_STRING, '270px'),
+    closeButton: makeProp(PROP_TYPE_BOOLEAN, false),
+    closeButtonVariant: makeProp(PROP_TYPE_STRING, 'outline-secondary'),
     // Dark mode
-    dark: {
-      type: Boolean,
-      default: false
-    },
-    // extra dropdown stuff
-    menuClass: {
-      type: [String, Array, Object]
-      // default: null
-    },
-    ...dropdownProps
-  }
-}
+    dark: makeProp(PROP_TYPE_BOOLEAN, false),
+    labelCloseButton: makeProp(PROP_TYPE_STRING, 'Close'),
+    labelResetButton: makeProp(PROP_TYPE_STRING, 'Reset'),
+    labelTodayButton: makeProp(PROP_TYPE_STRING, 'Select today'),
+    noCloseOnSelect: makeProp(PROP_TYPE_BOOLEAN, false),
+    resetButton: makeProp(PROP_TYPE_BOOLEAN, false),
+    resetButtonVariant: makeProp(PROP_TYPE_STRING, 'outline-danger'),
+    resetValue: makeProp(PROP_TYPE_DATE_STRING),
+    todayButton: makeProp(PROP_TYPE_BOOLEAN, false),
+    todayButtonVariant: makeProp(PROP_TYPE_STRING, 'outline-primary')
+  }),
+  NAME_FORM_DATEPICKER
+)
 
-// --- BFormDate component ---
+// --- Main component ---
 
 // @vue/component
 export const BFormDatepicker = /*#__PURE__*/ Vue.extend({
-  name: NAME,
-  // The mixins order determines the order of appearance in the props reference section
-  mixins: [idMixin, propsMixin],
-  model: {
-    prop: 'value',
-    event: 'input'
-  },
+  name: NAME_FORM_DATEPICKER,
+  mixins: [idMixin, modelMixin],
+  props,
   data() {
     return {
       // We always use `YYYY-MM-DD` value internally
-      localYMD: formatYMD(this.value) || '',
+      localYMD: formatYMD(this[MODEL_PROP_NAME]) || '',
       // If the popup is open
       isVisible: false,
       // Context data from BCalendar
@@ -306,46 +98,6 @@ export const BFormDatepicker = /*#__PURE__*/ Vue.extend({
       // Returns the `YYYY-MM` portion of the active calendar date
       return this.activeYMD.slice(0, -3)
     },
-    calendarProps() {
-      // Use self for better minification, as `this` won't
-      // minimize and we reference it many times below
-      const self = this
-      return {
-        hidden: !self.isVisible,
-        value: self.localYMD,
-        min: self.min,
-        max: self.max,
-        initialDate: self.initialDate,
-        readonly: self.readonly,
-        disabled: self.disabled,
-        locale: self.locale,
-        startWeekday: self.startWeekday,
-        direction: self.direction,
-        width: self.calendarWidth,
-        dateDisabledFn: self.dateDisabledFn,
-        selectedVariant: self.selectedVariant,
-        todayVariant: self.todayVariant,
-        dateInfoFn: self.dateInfoFn,
-        hideHeader: self.hideHeader,
-        showDecadeNav: self.showDecadeNav,
-        noHighlightToday: self.noHighlightToday,
-        labelPrevDecade: self.labelPrevDecade,
-        labelPrevYear: self.labelPrevYear,
-        labelPrevMonth: self.labelPrevMonth,
-        labelCurrentMonth: self.labelCurrentMonth,
-        labelNextMonth: self.labelNextMonth,
-        labelNextYear: self.labelNextYear,
-        labelNextDecade: self.labelNextDecade,
-        labelToday: self.labelToday,
-        labelSelected: self.labelSelected,
-        labelNoDateSelected: self.labelNoDateSelected,
-        labelCalendar: self.labelCalendar,
-        labelNav: self.labelNav,
-        labelHelp: self.labelHelp,
-        dateFormatOptions: self.dateFormatOptions,
-        weekdayHeaderFormat: self.weekdayHeaderFormat
-      }
-    },
     computedLang() {
       return (this.localLocale || '').replace(/-u-.*$/i, '') || null
     },
@@ -354,20 +106,20 @@ export const BFormDatepicker = /*#__PURE__*/ Vue.extend({
     }
   },
   watch: {
-    value(newVal) {
-      this.localYMD = formatYMD(newVal) || ''
+    [MODEL_PROP_NAME](newValue) {
+      this.localYMD = formatYMD(newValue) || ''
     },
-    localYMD(newVal) {
+    localYMD(newValue) {
       // We only update the v-model when the datepicker is open
       if (this.isVisible) {
-        this.$emit('input', this.valueAsDate ? parseYMD(newVal) || null : newVal || '')
+        this.$emit(MODEL_EVENT_NAME, this.valueAsDate ? parseYMD(newValue) || null : newValue || '')
       }
     },
-    calendarYM(newVal, oldVal) /* istanbul ignore next */ {
+    calendarYM(newValue, oldValue) {
       // Displayed calendar month has changed
       // So possibly the calendar height has changed...
       // We need to update popper computed position
-      if (newVal !== oldVal && oldVal) {
+      if (newValue !== oldValue && oldValue) {
         try {
           this.$refs.control.updatePopper()
         } catch {}
@@ -414,7 +166,7 @@ export const BFormDatepicker = /*#__PURE__*/ Vue.extend({
       this.localYMD = selectedYMD
       this.activeYMD = activeYMD
       // Re-emit the context event
-      this.$emit('context', ctx)
+      this.$emit(EVENT_NAME_CONTEXT, ctx)
     },
     onTodayButton() {
       // Set to today (or min/max if today is out of range)
@@ -433,12 +185,12 @@ export const BFormDatepicker = /*#__PURE__*/ Vue.extend({
     onShown() {
       this.$nextTick(() => {
         attemptFocus(this.$refs.calendar)
-        this.$emit('shown')
+        this.$emit(EVENT_NAME_SHOWN)
       })
     },
     onHidden() {
       this.isVisible = false
-      this.$emit('hidden')
+      this.$emit(EVENT_NAME_HIDDEN)
     },
     // Render helpers
     defaultButtonFn({ isHovered, hasFocus }) {
@@ -448,10 +200,7 @@ export const BFormDatepicker = /*#__PURE__*/ Vue.extend({
     }
   },
   render(h) {
-    const $scopedSlots = this.$scopedSlots
-    const localYMD = this.localYMD
-    const disabled = this.disabled
-    const readonly = this.readonly
+    const { localYMD, disabled, readonly, dark, $props, $scopedSlots } = this
     const placeholder = isUndefinedOrNull(this.placeholder)
       ? this.labelNoDateSelected
       : this.placeholder
@@ -465,7 +214,11 @@ export const BFormDatepicker = /*#__PURE__*/ Vue.extend({
         h(
           BButton,
           {
-            props: { size: 'sm', disabled: disabled || readonly, variant: this.todayButtonVariant },
+            props: {
+              disabled: disabled || readonly,
+              size: 'sm',
+              variant: this.todayButtonVariant
+            },
             attrs: { 'aria-label': label || null },
             on: { click: this.onTodayButton }
           },
@@ -480,7 +233,11 @@ export const BFormDatepicker = /*#__PURE__*/ Vue.extend({
         h(
           BButton,
           {
-            props: { size: 'sm', disabled: disabled || readonly, variant: this.resetButtonVariant },
+            props: {
+              disabled: disabled || readonly,
+              size: 'sm',
+              variant: this.resetButtonVariant
+            },
             attrs: { 'aria-label': label || null },
             on: { click: this.onResetButton }
           },
@@ -495,7 +252,11 @@ export const BFormDatepicker = /*#__PURE__*/ Vue.extend({
         h(
           BButton,
           {
-            props: { size: 'sm', disabled, variant: this.closeButtonVariant },
+            props: {
+              disabled,
+              size: 'sm',
+              variant: this.closeButtonVariant
+            },
             attrs: { 'aria-label': label || null },
             on: { click: this.onCloseButton }
           },
@@ -523,10 +284,14 @@ export const BFormDatepicker = /*#__PURE__*/ Vue.extend({
     const $calendar = h(
       BCalendar,
       {
-        key: 'calendar',
-        ref: 'calendar',
         staticClass: 'b-form-date-calendar w-100',
-        props: this.calendarProps,
+        props: {
+          ...pluckProps(calendarProps, $props),
+          hidden: !this.isVisible,
+          value: localYMD,
+          valueAsDate: false,
+          width: this.calendarWidth
+        },
         on: {
           selected: this.onSelected,
           input: this.onInput,
@@ -540,7 +305,9 @@ export const BFormDatepicker = /*#__PURE__*/ Vue.extend({
           'nav-next-month',
           'nav-next-year',
           'nav-next-decade'
-        ])
+        ]),
+        key: 'calendar',
+        ref: 'calendar'
       },
       $footer
     )
@@ -548,19 +315,16 @@ export const BFormDatepicker = /*#__PURE__*/ Vue.extend({
     return h(
       BVFormBtnLabelControl,
       {
-        ref: 'control',
         staticClass: 'b-form-datepicker',
         props: {
-          // This adds unneeded props, but reduces code size:
-          ...this.$props,
-          // Overridden / computed props
-          id: this.safeId(),
-          rtl: this.isRTL,
-          lang: this.computedLang,
-          value: localYMD || '',
+          ...pluckProps(formBtnLabelControlProps, $props),
           formattedValue: localYMD ? this.formattedValue : '',
-          placeholder: placeholder || '',
-          menuClass: [{ 'bg-dark': !!this.dark, 'text-light': !!this.dark }, this.menuClass]
+          id: this.safeId(),
+          lang: this.computedLang,
+          menuClass: [{ 'bg-dark': dark, 'text-light': dark }, this.menuClass],
+          placeholder,
+          rtl: this.isRTL,
+          value: localYMD
         },
         on: {
           show: this.onShow,
@@ -568,8 +332,9 @@ export const BFormDatepicker = /*#__PURE__*/ Vue.extend({
           hidden: this.onHidden
         },
         scopedSlots: {
-          'button-content': $scopedSlots['button-content'] || this.defaultButtonFn
-        }
+          [SLOT_NAME_BUTTON_CONTENT]: $scopedSlots[SLOT_NAME_BUTTON_CONTENT] || this.defaultButtonFn
+        },
+        ref: 'control'
       },
       [$calendar]
     )

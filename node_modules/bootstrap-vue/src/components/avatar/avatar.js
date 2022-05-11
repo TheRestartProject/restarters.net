@@ -1,122 +1,74 @@
-import Vue from '../../utils/vue'
-import { getComponentConfig } from '../../utils/config'
-import { isNumber, isString, isUndefinedOrNull } from '../../utils/inspect'
+import { Vue } from '../../vue'
+import { NAME_AVATAR } from '../../constants/components'
+import { EVENT_NAME_CLICK, EVENT_NAME_IMG_ERROR } from '../../constants/events'
+import {
+  PROP_TYPE_BOOLEAN,
+  PROP_TYPE_BOOLEAN_STRING,
+  PROP_TYPE_NUMBER_STRING,
+  PROP_TYPE_STRING
+} from '../../constants/props'
+import { SLOT_NAME_BADGE } from '../../constants/slots'
+import { isNumber, isNumeric, isString } from '../../utils/inspect'
 import { toFloat } from '../../utils/number'
-import { omit } from '../../utils/object'
-import { pluckProps } from '../../utils/props'
+import { omit, sortKeys } from '../../utils/object'
+import { makeProp, makePropsConfigurable, pluckProps } from '../../utils/props'
 import { isLink } from '../../utils/router'
-import { BButton } from '../button/button'
-import { BLink, props as BLinkProps } from '../link/link'
+import { normalizeSlotMixin } from '../../mixins/normalize-slot'
 import { BIcon } from '../../icons/icon'
 import { BIconPersonFill } from '../../icons/icons'
-import normalizeSlotMixin from '../../mixins/normalize-slot'
+import { BButton } from '../button/button'
+import { BLink, props as BLinkProps } from '../link/link'
 
 // --- Constants ---
-const NAME = 'BAvatar'
+
 const CLASS_NAME = 'b-avatar'
 
-const RX_NUMBER = /^[0-9]*\.?[0-9]+$/
+const SIZES = ['sm', null, 'lg']
 
 const FONT_SIZE_SCALE = 0.4
 const BADGE_FONT_SIZE_SCALE = FONT_SIZE_SCALE * 0.7
 
-const DEFAULT_SIZES = {
-  sm: '1.5em',
-  md: '2.5em',
-  lg: '3.5em'
+// --- Helper methods ---
+
+export const computeSize = value => {
+  // Parse to number when value is a float-like string
+  value = isString(value) && isNumeric(value) ? toFloat(value, 0) : value
+  // Convert all numbers to pixel values
+  return isNumber(value) ? `${value}px` : value || null
 }
 
 // --- Props ---
+
 const linkProps = omit(BLinkProps, ['active', 'event', 'routerTag'])
 
-const props = {
-  src: {
-    type: String
-    // default: null
-  },
-  text: {
-    type: String
-    // default: null
-  },
-  icon: {
-    type: String
-    // default: null
-  },
-  alt: {
-    type: String,
-    default: 'avatar'
-  },
-  variant: {
-    type: String,
-    default: () => getComponentConfig(NAME, 'variant')
-  },
-  size: {
-    type: [Number, String],
-    default: null
-  },
-  square: {
-    type: Boolean,
-    default: false
-  },
-  rounded: {
-    type: [Boolean, String],
-    default: false
-  },
-  button: {
-    type: Boolean,
-    default: false
-  },
-  buttonType: {
-    type: String,
-    default: 'button'
-  },
-  badge: {
-    type: [Boolean, String],
-    default: false
-  },
-  badgeVariant: {
-    type: String,
-    default: () => getComponentConfig(NAME, 'badgeVariant')
-  },
-  badgeTop: {
-    type: Boolean,
-    default: false
-  },
-  badgeLeft: {
-    type: Boolean,
-    default: false
-  },
-  badgeOffset: {
-    type: String,
-    default: '0px'
-  },
-  ...linkProps,
-  ariaLabel: {
-    type: String
-    // default: null
-  }
-}
-
-// --- Utility methods ---
-export const computeSize = value => {
-  // Default to `md` size when `null`, or parse to
-  // number when value is a float-like string
-  value =
-    isUndefinedOrNull(value) || value === ''
-      ? 'md'
-      : isString(value) && RX_NUMBER.test(value)
-        ? toFloat(value, 0)
-        : value
-  // Convert all numbers to pixel values
-  // Handle default sizes when `sm`, `md` or `lg`
-  // Or use value as is
-  return isNumber(value) ? `${value}px` : DEFAULT_SIZES[value] || value
-}
+export const props = makePropsConfigurable(
+  sortKeys({
+    ...linkProps,
+    alt: makeProp(PROP_TYPE_STRING, 'avatar'),
+    ariaLabel: makeProp(PROP_TYPE_STRING),
+    badge: makeProp(PROP_TYPE_BOOLEAN_STRING, false),
+    badgeLeft: makeProp(PROP_TYPE_BOOLEAN, false),
+    badgeOffset: makeProp(PROP_TYPE_STRING),
+    badgeTop: makeProp(PROP_TYPE_BOOLEAN, false),
+    badgeVariant: makeProp(PROP_TYPE_STRING, 'primary'),
+    button: makeProp(PROP_TYPE_BOOLEAN, false),
+    buttonType: makeProp(PROP_TYPE_STRING, 'button'),
+    icon: makeProp(PROP_TYPE_STRING),
+    rounded: makeProp(PROP_TYPE_BOOLEAN_STRING, false),
+    size: makeProp(PROP_TYPE_NUMBER_STRING),
+    square: makeProp(PROP_TYPE_BOOLEAN, false),
+    src: makeProp(PROP_TYPE_STRING),
+    text: makeProp(PROP_TYPE_STRING),
+    variant: makeProp(PROP_TYPE_STRING, 'secondary')
+  }),
+  NAME_AVATAR
+)
 
 // --- Main component ---
+
 // @vue/component
 export const BAvatar = /*#__PURE__*/ Vue.extend({
-  name: NAME,
+  name: NAME_AVATAR,
   mixins: [normalizeSlotMixin],
   inject: {
     bvAvatarGroup: { default: null }
@@ -130,28 +82,27 @@ export const BAvatar = /*#__PURE__*/ Vue.extend({
   computed: {
     computedSize() {
       // Always use the avatar group size
-      return computeSize(this.bvAvatarGroup ? this.bvAvatarGroup.size : this.size)
+      const { bvAvatarGroup } = this
+      return computeSize(bvAvatarGroup ? bvAvatarGroup.size : this.size)
     },
     computedVariant() {
-      // Prefer avatar-group variant if provided
-      const avatarGroup = this.bvAvatarGroup
-      return avatarGroup && avatarGroup.variant ? avatarGroup.variant : this.variant
+      const { bvAvatarGroup } = this
+      return bvAvatarGroup && bvAvatarGroup.variant ? bvAvatarGroup.variant : this.variant
     },
     computedRounded() {
-      const avatarGroup = this.bvAvatarGroup
-      const square = avatarGroup && avatarGroup.square ? true : this.square
-      const rounded = avatarGroup && avatarGroup.rounded ? avatarGroup.rounded : this.rounded
+      const { bvAvatarGroup } = this
+      const square = bvAvatarGroup && bvAvatarGroup.square ? true : this.square
+      const rounded = bvAvatarGroup && bvAvatarGroup.rounded ? bvAvatarGroup.rounded : this.rounded
       return square ? '0' : rounded === '' ? true : rounded || 'circle'
     },
     fontStyle() {
-      let fontSize = this.computedSize
-      fontSize = fontSize ? `calc(${fontSize} * ${FONT_SIZE_SCALE})` : null
+      const { computedSize: size } = this
+      const fontSize = SIZES.indexOf(size) === -1 ? `calc(${size} * ${FONT_SIZE_SCALE})` : null
       return fontSize ? { fontSize } : {}
     },
     marginStyle() {
-      const avatarGroup = this.bvAvatarGroup
-      const overlapScale = avatarGroup ? avatarGroup.overlapScale : 0
-      const size = this.computedSize
+      const { computedSize: size, bvAvatarGroup } = this
+      const overlapScale = bvAvatarGroup ? bvAvatarGroup.overlapScale : 0
       const value = size && overlapScale ? `calc(${size} * -${overlapScale})` : null
       return value ? { marginLeft: value, marginRight: value } : {}
     },
@@ -159,7 +110,7 @@ export const BAvatar = /*#__PURE__*/ Vue.extend({
       const { computedSize: size, badgeTop, badgeLeft, badgeOffset } = this
       const offset = badgeOffset || '0px'
       return {
-        fontSize: size ? `calc(${size} * ${BADGE_FONT_SIZE_SCALE} )` : null,
+        fontSize: SIZES.indexOf(size) === -1 ? `calc(${size} * ${BADGE_FONT_SIZE_SCALE} )` : null,
         top: badgeTop ? offset : null,
         bottom: badgeTop ? null : offset,
         left: badgeLeft ? offset : null,
@@ -168,19 +119,19 @@ export const BAvatar = /*#__PURE__*/ Vue.extend({
     }
   },
   watch: {
-    src(newSrc, oldSrc) {
-      if (newSrc !== oldSrc) {
-        this.localSrc = newSrc || null
+    src(newValue, oldValue) {
+      if (newValue !== oldValue) {
+        this.localSrc = newValue || null
       }
     }
   },
   methods: {
-    onImgError(evt) {
+    onImgError(event) {
       this.localSrc = null
-      this.$emit('img-error', evt)
+      this.$emit(EVENT_NAME_IMG_ERROR, event)
     },
-    onClick(evt) {
-      this.$emit('click', evt)
+    onClick(event) {
+      this.$emit(EVENT_NAME_CLICK, event)
     }
   },
   render(h) {
@@ -206,9 +157,9 @@ export const BAvatar = /*#__PURE__*/ Vue.extend({
     const ariaLabel = this.ariaLabel || null
 
     let $content = null
-    if (this.hasNormalizedSlot('default')) {
+    if (this.hasNormalizedSlot()) {
       // Default slot overrides props
-      $content = h('span', { staticClass: 'b-avatar-custom' }, [this.normalizeSlot('default')])
+      $content = h('span', { staticClass: 'b-avatar-custom' }, [this.normalizeSlot()])
     } else if (src) {
       $content = h('img', {
         style: variant ? {} : { width: '100%', height: '100%' },
@@ -222,30 +173,39 @@ export const BAvatar = /*#__PURE__*/ Vue.extend({
         attrs: { 'aria-hidden': 'true', alt }
       })
     } else if (text) {
-      $content = h('span', { staticClass: 'b-avatar-text', style: fontStyle }, [h('span', text)])
+      $content = h(
+        'span',
+        {
+          staticClass: 'b-avatar-text',
+          style: fontStyle
+        },
+        [h('span', text)]
+      )
     } else {
       // Fallback default avatar content
       $content = h(BIconPersonFill, { attrs: { 'aria-hidden': 'true', alt } })
     }
 
     let $badge = h()
-    const hasBadgeSlot = this.hasNormalizedSlot('badge')
+    const hasBadgeSlot = this.hasNormalizedSlot(SLOT_NAME_BADGE)
     if (badge || badge === '' || hasBadgeSlot) {
       const badgeText = badge === true ? '' : badge
       $badge = h(
         'span',
         {
           staticClass: 'b-avatar-badge',
-          class: { [`badge-${badgeVariant}`]: !!badgeVariant },
+          class: { [`badge-${badgeVariant}`]: badgeVariant },
           style: badgeStyle
         },
-        [hasBadgeSlot ? this.normalizeSlot('badge') : badgeText]
+        [hasBadgeSlot ? this.normalizeSlot(SLOT_NAME_BADGE) : badgeText]
       )
     }
 
     const componentData = {
       staticClass: CLASS_NAME,
       class: {
+        // Apply size class
+        [`${CLASS_NAME}-${size}`]: size && SIZES.indexOf(size) !== -1,
         // We use badge styles for theme variants when not rendering `BButton`
         [`badge-${variant}`]: !button && variant,
         // Rounding/Square
@@ -254,7 +214,7 @@ export const BAvatar = /*#__PURE__*/ Vue.extend({
         // Other classes
         disabled
       },
-      style: { width: size, height: size, ...marginStyle },
+      style: { ...marginStyle, width: size, height: size },
       attrs: { 'aria-label': ariaLabel || null },
       props: button ? { variant, disabled, type } : link ? pluckProps(linkProps, this) : {},
       on: button || link ? { click: this.onClick } : {}

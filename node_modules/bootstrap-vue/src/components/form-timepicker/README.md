@@ -50,14 +50,26 @@ allowing for tabbing between spinbuttons. The `v-model` will not be updated in t
 ```html
 <template>
   <div>
-    <b-form-group label="Select time picker interactive state">
-      <b-form-radio-group v-model="state" aria-controls="ex-disabled-readonly">
+    <b-form-group
+      label="Select time picker interactive state"
+      v-slot="{ ariaDescribedby }"
+    >
+      <b-form-radio-group
+        v-model="state"
+        :aria-describedby="ariaDescribedby"
+        aria-controls="ex-disabled-readonly"
+      >
         <b-form-radio value="disabled">Disabled</b-form-radio>
         <b-form-radio value="readonly">Readonly</b-form-radio>
         <b-form-radio value="normal">Normal</b-form-radio>
       </b-form-radio-group>
     </b-form-group>
-    <b-form-timepicker id="ex-disabled-readonly" :disabled="disabled" :readonly="readonly"></b-form-timepicker>
+
+    <b-form-timepicker
+      id="ex-disabled-readonly"
+      :disabled="disabled"
+      :readonly="readonly"
+    ></b-form-timepicker>
   </div>
 </template>
 
@@ -144,10 +156,10 @@ popup time selection dialog.
 <template>
   <div>
     <label for="timepicker-sm">Small time picker</label>
-    <b-form-timepicker id="timepicker-sm" size="sm" local="en" class="mb-2"></b-form-timepicker>
+    <b-form-timepicker id="timepicker-sm" size="sm" locale="en" class="mb-2"></b-form-timepicker>
 
     <label for="timepicker-lg">Large time picker</label>
-    <b-form-timepicker id="timepicker-lg" size="lg" local="en"></b-form-timepicker>
+    <b-form-timepicker id="timepicker-lg" size="lg" locale="en"></b-form-timepicker>
   </div>
 </template>
 
@@ -163,7 +175,7 @@ a placeholder is not provided, the value of the `label-no-time-selected` prop is
 <template>
   <div>
     <label for="timepicker-placeholder">Time picker with placeholder</label>
-    <b-form-timepicker id="timepicker-placeholder" placeholder="Choose a time" local="en"></b-form-timepicker>
+    <b-form-timepicker id="timepicker-placeholder" placeholder="Choose a time" locale="en"></b-form-timepicker>
   </div>
 </template>
 
@@ -205,8 +217,8 @@ keep these labels short.
 Use the dropdown props `right`, `dropup`, `dropright`, `dropleft`, `no-flip`, and `offset` to
 control the positioning of the popup calendar.
 
-Refer to the [`<b-dropdown>` documentation](/docs/components/dropdown) for details on the effects
-and usage of these props.
+Refer to the [`<b-dropdown>` positioning section](/docs/components/dropdown#positioning) for details
+on the effects and usage of these props.
 
 ### Button only mode
 
@@ -239,7 +251,7 @@ In the following simple example, we are placing the timepicker (button only mode
           locale="en"
           aria-controls="example-input"
         ></b-form-timepicker>
-      </b-input-group-append">
+      </b-input-group-append>
     </b-input-group>
     <p>Value: '{{ value }}'</p>
   </div>
@@ -267,7 +279,7 @@ Internationalization of the time interface is provided via
 [`Intl.DateTimeFormat`](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/DateTimeFormat)
 and
 [`Intl.NumberFormat`](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/NumberFormat),
-except for the labels applied to elements of the time control (aria-labels, selected status, etc).
+except for the labels applied to elements of the time control (aria-labels, selected status, etc.).
 You must provide your own translations for these labels. The available locales will be browser
 dependent (not all browsers support all locales).
 

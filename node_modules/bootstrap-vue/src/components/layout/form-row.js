@@ -1,16 +1,22 @@
-import Vue from '../../utils/vue'
-import { mergeData } from 'vue-functional-data-merge'
+import { Vue, mergeData } from '../../vue'
+import { NAME_FORM_ROW } from '../../constants/components'
+import { PROP_TYPE_STRING } from '../../constants/props'
+import { makeProp, makePropsConfigurable } from '../../utils/props'
 
-export const props = {
-  tag: {
-    type: String,
-    default: 'div'
-  }
-}
+// --- Props ---
+
+export const props = makePropsConfigurable(
+  {
+    tag: makeProp(PROP_TYPE_STRING, 'div')
+  },
+  NAME_FORM_ROW
+)
+
+// --- Main component ---
 
 // @vue/component
 export const BFormRow = /*#__PURE__*/ Vue.extend({
-  name: 'BFormRow',
+  name: NAME_FORM_ROW,
   functional: true,
   props,
   render(h, { props, data, children }) {

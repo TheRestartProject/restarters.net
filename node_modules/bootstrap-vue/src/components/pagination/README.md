@@ -131,16 +131,16 @@ For a full list of all available slots see the [Slots](#comp-ref-b-pagination-sl
       :per-page="perPage"
       class="mt-4"
     >
-      <template v-slot:first-text><span class="text-success">First</span></template>
-      <template v-slot:prev-text><span class="text-danger">Prev</span></template>
-      <template v-slot:next-text><span class="text-warning">Next</span></template>
-      <template v-slot:last-text><span class="text-info">Last</span></template>
-      <template v-slot:ellipsis-text>
+      <template #first-text><span class="text-success">First</span></template>
+      <template #prev-text><span class="text-danger">Prev</span></template>
+      <template #next-text><span class="text-warning">Next</span></template>
+      <template #last-text><span class="text-info">Last</span></template>
+      <template #ellipsis-text>
         <b-spinner small type="grow"></b-spinner>
         <b-spinner small type="grow"></b-spinner>
         <b-spinner small type="grow"></b-spinner>
       </template>
-      <template v-slot:page="{ page, active }">
+      <template #page="{ page, active }">
         <b v-if="active">{{ page }}</b>
         <i v-else>{{ page }}</i>
       </template>
@@ -363,6 +363,19 @@ By default the pagination component is left aligned. Change the alignment to `ce
 
 <!-- b-pagination-alignment.vue -->
 ```
+
+## Preventing a page from being selected
+
+You can listen for the `page-click` event, which provides an option to prevent the page from being
+selected. The event is emitted with two arguments:
+
+- `bvEvent`: The `BvEvent` object. Call `bvEvent.preventDefault()` to cancel page selection
+- `page`: Page number to select (starting with `1`)
+
+For accessibility reasons, when using the `page-click` event to prevent a page from being selected,
+you should provide some means of notification to the user as to why the page is not able to be
+selected. It is recommended to use the `disabled` attribute on the `<b-pagination>` component
+instead of using the `page-click` event (as `disabled` is more intuitive for screen reader users).
 
 ## Accessibility
 

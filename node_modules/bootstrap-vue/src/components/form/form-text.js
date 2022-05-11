@@ -1,31 +1,25 @@
-import Vue from '../../utils/vue'
-import { mergeData } from 'vue-functional-data-merge'
-import { getComponentConfig } from '../../utils/config'
+import { Vue, mergeData } from '../../vue'
+import { NAME_FORM_TEXT } from '../../constants/components'
+import { PROP_TYPE_BOOLEAN, PROP_TYPE_STRING } from '../../constants/props'
+import { makeProp, makePropsConfigurable } from '../../utils/props'
 
-const NAME = 'BFormText'
+// --- Props ---
 
-export const props = {
-  id: {
-    type: String
-    // default: null
+export const props = makePropsConfigurable(
+  {
+    id: makeProp(PROP_TYPE_STRING),
+    inline: makeProp(PROP_TYPE_BOOLEAN, false),
+    tag: makeProp(PROP_TYPE_STRING, 'small'),
+    textVariant: makeProp(PROP_TYPE_STRING, 'muted')
   },
-  tag: {
-    type: String,
-    default: 'small'
-  },
-  textVariant: {
-    type: String,
-    default: () => getComponentConfig(NAME, 'textVariant')
-  },
-  inline: {
-    type: Boolean,
-    default: false
-  }
-}
+  NAME_FORM_TEXT
+)
+
+// --- Main component ---
 
 // @vue/component
 export const BFormText = /*#__PURE__*/ Vue.extend({
-  name: NAME,
+  name: NAME_FORM_TEXT,
   functional: true,
   props,
   render(h, { props, data, children }) {

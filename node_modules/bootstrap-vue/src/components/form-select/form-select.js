@@ -1,56 +1,72 @@
-import Vue from '../../utils/vue'
-import { from as arrayFrom, isArray } from '../../utils/array'
+import { Vue } from '../../vue'
+import { NAME_FORM_SELECT } from '../../constants/components'
+import { EVENT_NAME_CHANGE } from '../../constants/events'
+import {
+  PROP_TYPE_BOOLEAN,
+  PROP_TYPE_BOOLEAN_STRING,
+  PROP_TYPE_NUMBER
+} from '../../constants/props'
+import { SLOT_NAME_FIRST } from '../../constants/slots'
+import { from as arrayFrom } from '../../utils/array'
 import { attemptBlur, attemptFocus } from '../../utils/dom'
 import { htmlOrText } from '../../utils/html'
-import formCustomMixin from '../../mixins/form-custom'
-import formMixin from '../../mixins/form'
-import formSizeMixin from '../../mixins/form-size'
-import formStateMixin from '../../mixins/form-state'
-import idMixin from '../../mixins/id'
-import normalizeSlotMixin from '../../mixins/normalize-slot'
-import optionsMixin from './helpers/mixin-options'
+import { isArray } from '../../utils/inspect'
+import { sortKeys } from '../../utils/object'
+import { makeProp, makePropsConfigurable } from '../../utils/props'
+import { formControlMixin, props as formControlProps } from '../../mixins/form-control'
+import { formCustomMixin, props as formCustomProps } from '../../mixins/form-custom'
+import { formSizeMixin, props as formSizeProps } from '../../mixins/form-size'
+import { formStateMixin, props as formStateProps } from '../../mixins/form-state'
+import { idMixin, props as idProps } from '../../mixins/id'
+import {
+  MODEL_EVENT_NAME,
+  MODEL_PROP_NAME,
+  modelMixin,
+  props as modelProps
+} from '../../mixins/model'
+import { normalizeSlotMixin } from '../../mixins/normalize-slot'
+import { optionsMixin } from './helpers/mixin-options'
 import { BFormSelectOption } from './form-select-option'
 import { BFormSelectOptionGroup } from './form-select-option-group'
 
+// --- Props ---
+
+export const props = makePropsConfigurable(
+  sortKeys({
+    ...idProps,
+    ...modelProps,
+    ...formControlProps,
+    ...formCustomProps,
+    ...formSizeProps,
+    ...formStateProps,
+    ariaInvalid: makeProp(PROP_TYPE_BOOLEAN_STRING, false),
+    multiple: makeProp(PROP_TYPE_BOOLEAN, false),
+    // Browsers default size to `0`, which shows 4 rows in most browsers in multiple mode
+    // Size of `1` can bork out Firefox
+    selectSize: makeProp(PROP_TYPE_NUMBER, 0)
+  }),
+  NAME_FORM_SELECT
+)
+
+// --- Main component ---
+
 // @vue/component
 export const BFormSelect = /*#__PURE__*/ Vue.extend({
-  name: 'BFormSelect',
+  name: NAME_FORM_SELECT,
   mixins: [
     idMixin,
-    normalizeSlotMixin,
-    formMixin,
+    modelMixin,
+    formControlMixin,
     formSizeMixin,
     formStateMixin,
     formCustomMixin,
-    optionsMixin
+    optionsMixin,
+    normalizeSlotMixin
   ],
-  model: {
-    prop: 'value',
-    event: 'input'
-  },
-  props: {
-    value: {
-      // type: [Object, Array, String, Number, Boolean],
-      // default: undefined
-    },
-    multiple: {
-      type: Boolean,
-      default: false
-    },
-    selectSize: {
-      // Browsers default size to 0, which shows 4 rows in most browsers in multiple mode
-      // Size of 1 can bork out Firefox
-      type: Number,
-      default: 0
-    },
-    ariaInvalid: {
-      type: [Boolean, String],
-      default: false
-    }
-  },
+  props,
   data() {
     return {
-      localValue: this.value
+      localValue: this[MODEL_PROP_NAME]
     }
   },
   computed: {
@@ -66,20 +82,14 @@ export const BFormSelect = /*#__PURE__*/ Vue.extend({
         this.size && !this.plain ? `custom-select-${this.size}` : null,
         this.stateClass
       ]
-    },
-    computedAriaInvalid() {
-      if (this.ariaInvalid === true || this.ariaInvalid === 'true') {
-        return 'true'
-      }
-      return this.stateClass === 'is-invalid' ? 'true' : null
     }
   },
   watch: {
-    value(newVal) {
-      this.localValue = newVal
+    value(newValue) {
+      this.localValue = newValue
     },
     localValue() {
-      this.$emit('input', this.localValue)
+      this.$emit(MODEL_EVENT_NAME, this.localValue)
     }
   },
   methods: {
@@ -89,14 +99,16 @@ export const BFormSelect = /*#__PURE__*/ Vue.extend({
     blur() {
       attemptBlur(this.$refs.input)
     },
-    onChange(evt) {
-      const { target } = evt
-      const selectedVal = arrayFrom(target.options)
+    onChange(event) {
+      const { target } = event
+      const selectedValue = arrayFrom(target.options)
         .filter(o => o.selected)
         .map(o => ('_value' in o ? o._value : o.value))
-      this.localValue = target.multiple ? selectedVal : selectedVal[0]
+
+      this.localValue = target.multiple ? selectedValue : selectedValue[0]
+
       this.$nextTick(() => {
-        this.$emit('change', this.localValue)
+        this.$emit(EVENT_NAME_CHANGE, this.localValue)
       })
     }
   },
@@ -135,7 +147,7 @@ export const BFormSelect = /*#__PURE__*/ Vue.extend({
         directives: [{ name: 'model', value }],
         ref: 'input'
       },
-      [this.normalizeSlot('first'), $options, this.normalizeSlot('default')]
+      [this.normalizeSlot(SLOT_NAME_FIRST), $options, this.normalizeSlot()]
     )
   }
 })

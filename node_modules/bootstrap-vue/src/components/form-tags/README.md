@@ -21,8 +21,8 @@ button will only appear when the user has entered a new tag value.
 <template>
   <div>
     <label for="tags-basic">Type a new tag and press enter</label>
-    <b-form-tags input-id="tags-basic" v-model="value" class="mb-2"></b-form-tags>
-    <p>Value: {{ value }}</p>
+    <b-form-tags input-id="tags-basic" v-model="value"></b-form-tags>
+    <p class="mt-2">Value: {{ value }}</p>
   </div>
 </template>
 
@@ -44,7 +44,7 @@ enable adding a tag on the input's `change` event via the `add-on-change` prop.
 
 ## Tag creation using separators
 
-To auto create tags when a separator character is typed (i.e. <kbd>Space</kbd>, <kbd>,</kbd>, etc),
+To auto create tags when a separator character is typed (i.e. <kbd>Space</kbd>, <kbd>,</kbd>, etc.),
 set the `separator` prop to the character that will trigger the tag to be added. If multiple
 separator characters are needed, then include them as a single string (i.e. `' ,;'`), or an array of
 characters (i.e. `[' ', ',', ';']`), which will trigger a new tag to be added when <kbd>Space</kbd>,
@@ -63,9 +63,8 @@ are typed:
       separator=" ,;"
       placeholder="Enter new tags separated by space, comma or semicolon"
       no-add-on-enter
-      class="mb-2"
     ></b-form-tags>
-    <p>Value: {{ value }}</p>
+    <p class="mt-2">Value: {{ value }}</p>
   </div>
 </template>
 
@@ -99,9 +98,8 @@ When the prop `remove-on-delete` is set, and the user presses <kbd>Backspace</kb
       placeholder="Enter new tags separated by space"
       remove-on-delete
       no-add-on-enter
-      class="mb-2"
     ></b-form-tags>
-    <b-form-text id="tags-remove-on-delete-help">
+    <b-form-text id="tags-remove-on-delete-help" class="mt-2">
       Press <kbd>Backspace</kbd> to remove the last tag entered
     </b-form-text>
     <p>Value: {{ value }}</p>
@@ -150,9 +148,8 @@ The focus and validation state styling of the component relies upon BootstrapVue
       size="lg"
       separator=" "
       placeholder="Enter new tags separated by space"
-      class="mb-2"
     ></b-form-tags>
-    <p>Value: {{ value }}</p>
+    <p class="mt-2">Value: {{ value }}</p>
   </div>
 </template>
 
@@ -186,7 +183,7 @@ duplicate tag, and will provide integrated feedback to the user.
 You can optionally provide a tag validator method via the `tag-validator` prop. The validator
 function will receive one argument which is the tag being added, and should return either `true` if
 the tag passes validation and can be added, or `false` if the tag fails validation (in which case it
-is not added to the array of tags). integrated feedback will be provided to the user listing the
+is not added to the array of tags). Integrated feedback will be provided to the user listing the
 invalid tag(s) that could not be added.
 
 Tag validation occurs only for tags added via user input. Changes to the tags via the `v-model` are
@@ -195,20 +192,21 @@ not validated.
 ```html
 <template>
   <div>
-    <b-form-group :state="state" label="Tags validation example" label-for="tags-validation">
+    <b-form-group label="Tags validation example" label-for="tags-validation" :state="state">
       <b-form-tags
         input-id="tags-validation"
-        :input-attrs="{ 'aria-describedby': 'tags-validation-help' }"
         v-model="tags"
-        :state="state"
+        :input-attrs="{ 'aria-describedby': 'tags-validation-help' }"
         :tag-validator="tagValidator"
+        :state="state"
         separator=" "
       ></b-form-tags>
-      <!-- The following slots are for b-form-group -->
-      <template v-slot:invalid-feedback>
+
+      <template #invalid-feedback>
         You must provide at least 3 tags and no more than 8
       </template>
-      <template v-slot:description>
+
+      <template #description>
         <div id="tags-validation-help">
          Tags must be 3 to 5 characters in length and all lower
          case. Enter tags separated by spaces or press enter.
@@ -233,7 +231,7 @@ not validated.
       }
     },
     watch: {
-      tags(newVal, oldVal) {
+      tags(newValue, oldValue) {
         // Set the dirty flag on first change to the tags array
         this.dirty = true
       }
@@ -318,6 +316,41 @@ to either an empty string (`''`) or `null`.
 <!-- b-form-tags-tags-state-event.vue -->
 ```
 
+## Limiting tags
+
+If you want to limit the amount of tags the user is able to add use the `limit` prop. When
+configured, adding more tags than the `limit` allows is only possible by the `v-model`.
+
+When the limit of tags is reached, the user is still able to type but adding more tags is disabled.
+A message is shown to give the user feedback about the reached limit. This message can be configured
+by the `limit-tags-text` prop. Setting it to either an empty string (`''`) or `null` will disable
+the feedback.
+
+Removing tags is unaffected by the `limit` prop.
+
+```html
+<template>
+  <div>
+    <label for="tags-limit">Enter tags</label>
+    <b-form-tags input-id="tags-limit" v-model="value" :limit="limit" remove-on-delete></b-form-tags>
+    <p class="mt-2">Value: {{ value }}</p>
+  </div>
+</template>
+
+<script>
+  export default {
+    data() {
+      return {
+        value: [],
+        limit: 5
+      }
+    }
+  }
+</script>
+
+<!-- b-form-tags-limit.vue -->
+```
+
 ## Custom rendering with default scoped slot
 
 If you fancy a different look and feel for the tags control, you can provide your own custom
@@ -333,28 +366,37 @@ The default slot scope properties are as follows:
 
 | Property           | Type                     | Description                                                                                                                                            |
 | ------------------ | ------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| `tags`             | Array                    | Array of current tag strings                                                                                                                           |
-| `inputAttrs`       | Object                   | Object of attributes to apply to the new tag input element via `v-bind="inputAttrs"`. See below for details                                            |
-| `inputType`        | String                   | <span class="badge badge-secondary">v2.3.0+</span> Type of input to render (normalized version of prop `input-type`)                                   |
-| `inputHandlers`    | Object                   | Object of event handlers to apply to the new tag input element via `v-on="inputHandlers"`. See below for details                                       |
-| `removeTag`        | Function                 | Method to remove a tag. Accepts one argument which is the tag value to remove                                                                          |
-| `addTag`           | Function                 | Method to add a new tag. Assumes the tag is the value of the input, but optionally accepts one argument which is the tag value to be added             |
-| `inputId`          | String                   | ID to add to the new tag input element. Defaults to prop `input-id`. If not provided a unique ID is auto-generated. Also available via 'inputAttrs.id' |
-| `isInvalid`        | Boolean                  | `true` if the user input contains invalid tag(s)                                                                                                       |
-| `invalidTags`      | Array                    | Array of the invalid tag(s) the user has entered                                                                                                       |
-| `isDuplicate`      | Boolean                  | `true` if the user input contains duplicate tag(s)                                                                                                     |
-| `duplicateTags`    | Array                    | Array of the duplicate tag(s) the user has entered                                                                                                     |
-| `disableAddButton` | Boolean                  | Will be `true` if the tag(s) in the input cannot be added (all invalid and/or duplicates)                                                              |
-| `disabled`         | Boolean                  | `true` if the component is in the disabled state. Value of the `disabled` prop                                                                         |
-| `state`            | Boolean                  | The contextual state of the component. Value of the `state` prop. Possible values are `true`, `false` or `null`                                        |
-| `size`             | String                   | The value of the `size` prop                                                                                                                           |
-| `separator`        | String                   | The value of the `separator` prop                                                                                                                      |
-| `placeholder`      | String                   | The value of the `placeholder` prop                                                                                                                    |
-| `tagRemoveLabel`   | String                   | Value of the `tag-remove-label` prop. Used as the `aria-label` attribute on the remove button of tags                                                  |
-| `tagVariant`       | String                   | The value of the `tag-variant` prop                                                                                                                    |
-| `tagClass`         | String, Array, or Object | The value of the `tag-variant` prop. Class (or classes) to apply to the tag elements                                                                   |
 | `addButtonText`    | String                   | The value of the `add-button-text` prop                                                                                                                |
 | `addButtonVariant` | String                   | The value of the `add-button-variant` prop                                                                                                             |
+| `addTag`           | Function                 | Method to add a new tag. Assumes the tag is the value of the input, but optionally accepts one argument which is the tag value to be added             |
+| `disableAddButton` | Boolean                  | Will be `true` if the tag(s) in the input cannot be added (all invalid and/or duplicates)                                                              |
+| `disabled`         | Boolean                  | `true` if the component is in the disabled state. Value of the `disabled` prop                                                                         |
+| `duplicateTagText` | String                   | The value of the `duplicate-tag-text` prop                                                                                                             |
+| `duplicateTags`    | Array                    | Array of the duplicate tag(s) the user has entered                                                                                                     |
+| `form`             | String                   | <span class="badge badge-secondary">v2.20.0+</span> The value of the `form` prop                                                                       |
+| `inputAttrs`       | Object                   | Object of attributes to apply to the new tag input element via `v-bind="inputAttrs"`. See below for details                                            |
+| `inputHandlers`    | Object                   | Object of event handlers to apply to the new tag input element via `v-on="inputHandlers"`. See below for details                                       |
+| `inputId`          | String                   | ID to add to the new tag input element. Defaults to prop `input-id`. If not provided a unique ID is auto-generated. Also available via 'inputAttrs.id' |
+| `inputType`        | String                   | <span class="badge badge-secondary">v2.3.0+</span> Type of input to render (normalized version of prop `input-type`)                                   |
+| `invalidTagText`   | String                   | The value of the `invalid-tag-text` prop                                                                                                               |
+| `invalidTags`      | Array                    | Array of the invalid tag(s) the user has entered                                                                                                       |
+| `isDuplicate`      | Boolean                  | `true` if the user input contains duplicate tag(s)                                                                                                     |
+| `isInvalid`        | Boolean                  | `true` if the user input contains invalid tag(s)                                                                                                       |
+| `isLimitReached`   | Boolean                  | <span class="badge badge-secondary">v2.17.0+</span> `true` if a `limit` is configured and the amount of tags has reached the limit                     |
+| `limitTagsText`    | String                   | <span class="badge badge-secondary">v2.17.0+</span> The value of the `limit-tags-text` prop                                                            |
+| `limit`            | String                   | <span class="badge badge-secondary">v2.17.0+</span> The value of the `limit` prop                                                                      |
+| `noTagRemove`      | Boolean                  | <span class="badge badge-secondary">v2.21.0+</span> The value of the `no-tag-remove` prop                                                              |
+| `placeholder`      | String                   | The value of the `placeholder` prop                                                                                                                    |
+| `removeTag`        | Function                 | Method to remove a tag. Accepts one argument which is the tag value to remove                                                                          |
+| `required`         | Boolean                  | <span class="badge badge-secondary">v2.20.0+</span> The value of the `required` prop                                                                   |
+| `separator`        | String                   | The value of the `separator` prop                                                                                                                      |
+| `size`             | String                   | The value of the `size` prop                                                                                                                           |
+| `state`            | Boolean                  | The contextual state of the component. Value of the `state` prop. Possible values are `true`, `false` or `null`                                        |
+| `tagClass`         | String, Array, or Object | The value of the `tag-variant` prop. Class (or classes) to apply to the tag elements                                                                   |
+| `tagPills`         | Boolean                  | The value of the `tag-pills` prop                                                                                                                      |
+| `tagRemoveLabel`   | String                   | Value of the `tag-remove-label` prop. Used as the `aria-label` attribute on the remove button of tags                                                  |
+| `tagVariant`       | String                   | The value of the `tag-variant` prop                                                                                                                    |
+| `tags`             | Array                    | Array of current tag strings                                                                                                                           |
 
 #### `inputAttrs` object properties
 
@@ -362,10 +404,10 @@ The `inputAttrs` object contains attributes to bind (`v-bind`) to the new tag in
 
 | Property   | Type    | Description                                                                  |
 | ---------- | ------- | ---------------------------------------------------------------------------- |
-| `id`       | String  | the `id` attribute for the new tag input                                     |
-| `value`    | String  | The `value` attribute for the new tag input                                  |
 | `disabled` | Boolean | The `disabled` attribute for the new tag input. Value of the `disabled` prop |
 | `form`     | String  | The `form` attribute for the new tag input. Value of the `form` prop         |
+| `id`       | String  | the `id` attribute for the new tag input                                     |
+| `value`    | String  | The `value` attribute for the new tag input                                  |
 
 The `inputAttrs` object will also include any attributes set via the `input-attrs` prop. Note that
 the above attributes take precedence over any of the same attributes specified in the `input-attrs`
@@ -377,8 +419,8 @@ The `inputHandlers` object contains event handlers to bind (`v-on`) to the new t
 
 | Property  | Type     | Description                                                                                                                                                                    |
 | --------- | -------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| `input`   | Function | Event handler for the input element `input` event. Accepts a single argument of either an event object or a string. Updates the internal v-model for the new tag input element |
 | `change`  | Function | Event handler for the input element `change` event. Accepts a single argument of either an event object or a string. Change will trigger adding the tag.                       |
+| `input`   | Function | Event handler for the input element `input` event. Accepts a single argument of either an event object or a string. Updates the internal v-model for the new tag input element |
 | `keydown` | Function | Event handler for the input element `keydown` <kbd>Enter</kbd> and <kbd>Del</kbd> events. Accepts a single argument which is the native keydown event object                   |
 
 The `change` handler, when needed, must be enabled via the `add-on-change` prop, otherwise it is a
@@ -513,9 +555,16 @@ of tags:
 ```html
 <template>
   <div>
-    <b-form-group label="Tagged input using select">
-      <!-- prop `add-on-change` is needed to enable adding tags vie the `change` event -->
-      <b-form-tags v-model="value" size="lg" add-on-change no-outer-focus class="mb-2">
+    <b-form-group label="Tagged input using select" label-for="tags-component-select">
+      <!-- Prop `add-on-change` is needed to enable adding tags vie the `change` event -->
+      <b-form-tags
+        id="tags-component-select"
+        v-model="value"
+        size="lg"
+        class="mb-2"
+        add-on-change
+        no-outer-focus
+      >
         <template v-slot="{ tags, inputAttrs, inputHandlers, disabled, removeTag }">
           <ul v-if="tags.length > 0" class="list-inline d-inline-block mb-2">
             <li v-for="tag in tags" :key="tag" class="list-inline-item">
@@ -533,7 +582,7 @@ of tags:
             :disabled="disabled || availableOptions.length === 0"
             :options="availableOptions"
           >
-            <template v-slot:first>
+            <template #first>
               <!-- This is required to prevent bugs with Safari -->
               <option disabled value="">Choose a tag...</option>
             </template>
@@ -567,7 +616,7 @@ If the custom input is using custom event names that mimic `input` and `change`,
 `.native` modifier for keydown, you can do something similar to below to bind the event handlers:
 
 ```html
-<template v-slot:default="{ inputAttrs, inputHandlers, removeTag, tags }">
+<template #default="{ inputAttrs, inputHandlers, removeTag, tags }">
   <custom-input
     :id="inputAttrs.id"
     :vistom-value-prop="inputAttrs.value"
@@ -679,8 +728,8 @@ pre-defined set of tags:
 ```html
 <template>
   <div>
-    <b-form-group label="Tagged input using dropdown">
-      <b-form-tags v-model="value" no-outer-focus class="mb-2">
+    <b-form-group label="Tagged input using dropdown" label-for="tags-with-dropdown">
+      <b-form-tags id="tags-with-dropdown" v-model="value" no-outer-focus class="mb-2">
         <template v-slot="{ tags, disabled, addTag, removeTag }">
           <ul v-if="tags.length > 0" class="list-inline d-inline-block mb-2">
             <li v-for="tag in tags" :key="tag" class="list-inline-item">
@@ -694,13 +743,13 @@ pre-defined set of tags:
           </ul>
 
           <b-dropdown size="sm" variant="outline-secondary" block menu-class="w-100">
-            <template v-slot:button-content>
+            <template #button-content>
               <b-icon icon="tag-fill"></b-icon> Choose tags
             </template>
             <b-dropdown-form @submit.stop.prevent="() => {}">
               <b-form-group
-                label-for="tag-search-input"
                 label="Search tags"
+                label-for="tag-search-input"
                 label-cols-md="auto"
                 class="mb-0"
                 label-size="sm"
@@ -795,7 +844,7 @@ You can easily create a custom wrapper component with your preferred rendering s
   import { BFormTags } from 'bootstrap-vue'
 
   export default {
-    name: 'MyCustomTags",
+    name: 'MyCustomTags',
     components: { BFormTags },
     model: {
       prop: 'value',

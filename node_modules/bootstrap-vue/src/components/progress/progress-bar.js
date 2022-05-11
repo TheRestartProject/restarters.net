@@ -1,77 +1,51 @@
-import Vue from '../../utils/vue'
-import { getComponentConfig } from '../../utils/config'
+import { Vue } from '../../vue'
+import { NAME_PROGRESS_BAR } from '../../constants/components'
+import { PROP_TYPE_BOOLEAN, PROP_TYPE_NUMBER_STRING, PROP_TYPE_STRING } from '../../constants/props'
 import { htmlOrText } from '../../utils/html'
 import { isBoolean } from '../../utils/inspect'
 import { mathMax, mathPow } from '../../utils/math'
 import { toFixed, toFloat, toInteger } from '../../utils/number'
+import { makeProp, makePropsConfigurable } from '../../utils/props'
 import { toString } from '../../utils/string'
-import normalizeSlotMixin from '../../mixins/normalize-slot'
+import { normalizeSlotMixin } from '../../mixins/normalize-slot'
 
-// --- Constants ---
+// --- Props ---
 
-const NAME = 'BProgressBar'
+export const props = makePropsConfigurable(
+  {
+    animated: makeProp(PROP_TYPE_BOOLEAN, null),
+    label: makeProp(PROP_TYPE_STRING),
+    labelHtml: makeProp(PROP_TYPE_STRING),
+    max: makeProp(PROP_TYPE_NUMBER_STRING, null),
+    precision: makeProp(PROP_TYPE_NUMBER_STRING, null),
+    showProgress: makeProp(PROP_TYPE_BOOLEAN, null),
+    showValue: makeProp(PROP_TYPE_BOOLEAN, null),
+    striped: makeProp(PROP_TYPE_BOOLEAN, null),
+    value: makeProp(PROP_TYPE_NUMBER_STRING, 0),
+    variant: makeProp(PROP_TYPE_STRING)
+  },
+  NAME_PROGRESS_BAR
+)
 
 // --- Main component ---
+
 // @vue/component
 export const BProgressBar = /*#__PURE__*/ Vue.extend({
-  name: NAME,
+  name: NAME_PROGRESS_BAR,
   mixins: [normalizeSlotMixin],
   inject: {
     bvProgress: {
-      default() /* istanbul ignore next */ {
-        return {}
-      }
+      default: /* istanbul ignore next */ () => ({})
     }
   },
-  props: {
-    value: {
-      type: [Number, String],
-      default: 0
-    },
-    label: {
-      type: String
-      // default: null
-    },
-    labelHtml: {
-      type: String
-    },
-    // $parent (this.bvProgress) prop values may take precedence over the following props
-    // Which is why they are defaulted to null
-    max: {
-      type: [Number, String],
-      default: null
-    },
-    precision: {
-      type: [Number, String],
-      default: null
-    },
-    variant: {
-      type: String,
-      default: () => getComponentConfig(NAME, 'variant')
-    },
-    striped: {
-      type: Boolean,
-      default: null
-    },
-    animated: {
-      type: Boolean,
-      default: null
-    },
-    showProgress: {
-      type: Boolean,
-      default: null
-    },
-    showValue: {
-      type: Boolean,
-      default: null
-    }
-  },
+  props,
   computed: {
     progressBarClasses() {
+      const { computedAnimated, computedVariant } = this
       return [
-        this.computedVariant ? `bg-${this.computedVariant}` : '',
-        this.computedStriped || this.computedAnimated ? 'progress-bar-striped' : '',
-        this.computedAnimated ? 'progress-bar-animated' : ''
+        computedVariant ? `bg-${computedVariant}` : '',
+        this.computedStriped || computedAnimated ? 'progress-bar-striped' : '',
+        computedAnimated ? 'progress-bar-animated' : ''
       ]
     },
     progressBarStyles() {
@@ -124,16 +98,16 @@ export const BProgressBar = /*#__PURE__*/ Vue.extend({
   render(h) {
     const { label, labelHtml, computedValue, computedPrecision } = this
 
-    let $content = h()
+    let $children
     let domProps = {}
-    if (this.hasNormalizedSlot('default')) {
-      $content = this.normalizeSlot('default')
+    if (this.hasNormalizedSlot()) {
+      $children = this.normalizeSlot()
     } else if (label || labelHtml) {
       domProps = htmlOrText(labelHtml, label)
     } else if (this.computedShowProgress) {
-      $content = this.computedProgress
+      $children = this.computedProgress
     } else if (this.computedShowValue) {
-      $content = toFixed(computedValue, computedPrecision)
+      $children = toFixed(computedValue, computedPrecision)
     }
 
     return h(
@@ -150,7 +124,7 @@ export const BProgressBar = /*#__PURE__*/ Vue.extend({
         },
         domProps
       },
-      [$content]
+      $children
     )
   }
 })

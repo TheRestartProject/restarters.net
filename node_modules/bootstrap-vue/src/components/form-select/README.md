@@ -111,7 +111,7 @@ options specified by the `options` prop, use the named slot `first`.
   <div>
     <b-form-select v-model="selected" :options="options" class="mb-3">
       <!-- This slot appears above the options from 'options' prop -->
-      <template v-slot:first>
+      <template #first>
         <b-form-select-option :value="null" disabled>-- Please select an option --</b-form-select-option>
       </template>
 
@@ -153,7 +153,7 @@ options specified by the `options` prop, use the named slot `first`.
 
 If both `html` and `text` are provided, `html` will take precedence. Only basic/native HTML is
 supported in the `html` field (components will not work). Note that not all browsers will render
-inline html (i.e. `<i>`, `<strong>`, etc) inside `<option>` elements of a `<select>`.
+inline html (i.e. `<i>`, `<strong>`, etc.) inside `<option>` elements of a `<select>`.
 
 <p class="alert alert-danger">
   <strong>Be cautious</strong> of placing user supplied content in the <code>html</code> field,
@@ -313,7 +313,7 @@ option with an empty value as your first option.
 
 ```html
 <b-form-select v-model="selected" :options="options">
-  <template v-slot:first>
+  <template #first>
     <b-form-select-option value="" disabled>-- Please select an option --</b-form-select-option>
   </template>
 </b-form-select>

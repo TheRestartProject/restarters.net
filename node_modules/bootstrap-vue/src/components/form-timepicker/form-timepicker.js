@@ -1,208 +1,77 @@
-import Vue from '../../utils/vue'
-import { BVFormBtnLabelControl, dropdownProps } from '../../utils/bv-form-btn-label-control'
-import { getComponentConfig } from '../../utils/config'
+import { Vue } from '../../vue'
+import { NAME_FORM_TIMEPICKER } from '../../constants/components'
+import { EVENT_NAME_CONTEXT, EVENT_NAME_SHOWN, EVENT_NAME_HIDDEN } from '../../constants/events'
+import { PROP_TYPE_BOOLEAN, PROP_TYPE_DATE_STRING, PROP_TYPE_STRING } from '../../constants/props'
+import { SLOT_NAME_BUTTON_CONTENT } from '../../constants/slots'
 import { attemptBlur, attemptFocus } from '../../utils/dom'
 import { isUndefinedOrNull } from '../../utils/inspect'
-import idMixin from '../../mixins/id'
-import { BButton } from '../button/button'
-import { BTime } from '../time/time'
+import { makeModelMixin } from '../../utils/model'
+import { omit, sortKeys } from '../../utils/object'
+import { makeProp, makePropsConfigurable, pluckProps } from '../../utils/props'
+import { idMixin, props as idProps } from '../../mixins/id'
 import { BIconClock, BIconClockFill } from '../../icons/icons'
+import { BButton } from '../button/button'
+import {
+  BVFormBtnLabelControl,
+  props as BVFormBtnLabelControlProps
+} from '../form-btn-label-control/bv-form-btn-label-control'
+import { BTime, props as BTimeProps } from '../time/time'
 
-const NAME = 'BFormTimepicker'
+// --- Constants ---
 
-// Fallback to BTime/BFormSpinbutton prop if no value found
-const getConfigFallback = prop => {
-  return (
-    getComponentConfig(NAME, prop) ||
-    getComponentConfig('BTime', prop) ||
-    getComponentConfig('BFormSpinbutton', prop)
-  )
-}
+const {
+  mixin: modelMixin,
+  props: modelProps,
+  prop: MODEL_PROP_NAME,
+  event: MODEL_EVENT_NAME
+} = makeModelMixin('value', {
+  type: PROP_TYPE_STRING,
+  defaultValue: ''
+})
 
-// We create our props as a mixin so that we can control
-// where they appear in the props listing reference section
-const propsMixin = {
-  props: {
-    value: {
-      type: String,
-      default: ''
-    },
-    resetValue: {
-      type: String,
-      default: ''
-    },
-    placeholder: {
-      type: String
-      // Defaults to `labelNoTime` from BTime context
-      // default: null
-    },
-    size: {
-      type: String
-      // default: null
-    },
-    disabled: {
-      type: Boolean,
-      default: false
-    },
-    readonly: {
-      type: Boolean,
-      default: false
-    },
-    required: {
-      // If true adds the `aria-required` attribute
-      type: Boolean,
-      default: false
-    },
-    name: {
-      type: String
-      // default: null
-    },
-    form: {
-      type: String
-      // default: null
-    },
-    state: {
-      // Tri-state prop: `true`, `false` or `null`
-      type: Boolean,
-      default: null
-    },
-    hour12: {
-      // Tri-state prop: `true` => 12 hour, `false` => 24 hour, `null` => auto
-      type: Boolean,
-      default: null
-    },
-    locale: {
-      type: [String, Array]
-      // default: null
-    },
-    showSeconds: {
-      type: Boolean,
-      default: false
-    },
-    hideHeader: {
-      type: Boolean,
-      default: false
-    },
-    secondsStep: {
-      type: [Number, String],
-      default: 1
-    },
-    minutesStep: {
-      type: [Number, String],
-      default: 1
-    },
-    buttonOnly: {
-      type: Boolean,
-      default: false
-    },
-    buttonVariant: {
-      // Applicable in button only mode
-      type: String,
-      default: 'secondary'
-    },
-    nowButton: {
-      type: Boolean,
-      default: false
-    },
-    labelNowButton: {
-      type: String,
-      default: () => getComponentConfig(NAME, 'labelNowButton')
-    },
-    nowButtonVariant: {
-      type: String,
-      default: 'outline-primary'
-    },
-    resetButton: {
-      type: Boolean,
-      default: false
-    },
-    labelResetButton: {
-      type: String,
-      default: () => getComponentConfig(NAME, 'labelResetButton')
-    },
-    resetButtonVariant: {
-      type: String,
-      default: 'outline-danger'
-    },
-    noCloseButton: {
-      type: Boolean,
-      default: false
-    },
-    labelCloseButton: {
-      type: String,
-      default: () => getComponentConfig(NAME, 'labelCloseButton')
-    },
-    closeButtonVariant: {
-      type: String,
-      default: 'outline-secondary'
-    },
-    // Labels
-    // These fallback to BTime values
-    labelSelected: {
-      type: String,
-      default: () => getConfigFallback('labelSelected')
-    },
-    labelNoTimeSelected: {
-      type: String,
-      default: () => getConfigFallback('labelNoTimeSelected')
-    },
-    labelHours: {
-      type: String,
-      default: () => getConfigFallback('labelHours')
-    },
-    labelMinutes: {
-      type: String,
-      default: () => getConfigFallback('labelMinutes')
-    },
-    labelSeconds: {
-      type: String,
-      default: () => getConfigFallback('labelSeconds')
-    },
-    labelAmpm: {
-      type: String,
-      default: () => getConfigFallback('labelAmpm')
-    },
-    labelAm: {
-      type: String,
-      default: () => getConfigFallback('labelAm')
-    },
-    labelPm: {
-      type: String,
-      default: () => getConfigFallback('labelPm')
-    },
-    // These pick BTime or BFormSpinbutton global config if no BFormTimepicker global config
-    labelIncrement: {
-      type: String,
-      default: () => getConfigFallback('labelIncrement')
-    },
-    labelDecrement: {
-      type: String,
-      default: () => getConfigFallback('labelDecrement')
-    },
-    // extra dropdown stuff
-    menuClass: {
-      type: [String, Array, Object]
-      // default: null
-    },
-    ...dropdownProps
-  }
-}
+// --- Props ---
 
-// --- BFormDate component ---
+const timeProps = omit(BTimeProps, ['hidden', 'id', 'value'])
+
+const formBtnLabelControlProps = omit(BVFormBtnLabelControlProps, [
+  'formattedValue',
+  'id',
+  'lang',
+  'rtl',
+  'value'
+])
+
+export const props = makePropsConfigurable(
+  sortKeys({
+    ...idProps,
+    ...modelProps,
+    ...timeProps,
+    ...formBtnLabelControlProps,
+    closeButtonVariant: makeProp(PROP_TYPE_STRING, 'outline-secondary'),
+    labelCloseButton: makeProp(PROP_TYPE_STRING, 'Close'),
+    labelNowButton: makeProp(PROP_TYPE_STRING, 'Select now'),
+    labelResetButton: makeProp(PROP_TYPE_STRING, 'Reset'),
+    noCloseButton: makeProp(PROP_TYPE_BOOLEAN, false),
+    nowButton: makeProp(PROP_TYPE_BOOLEAN, false),
+    nowButtonVariant: makeProp(PROP_TYPE_STRING, 'outline-primary'),
+    resetButton: makeProp(PROP_TYPE_BOOLEAN, false),
+    resetButtonVariant: makeProp(PROP_TYPE_STRING, 'outline-danger'),
+    resetValue: makeProp(PROP_TYPE_DATE_STRING)
+  }),
+  NAME_FORM_TIMEPICKER
+)
+
+// --- Main component ---
 
 // @vue/component
 export const BFormTimepicker = /*#__PURE__*/ Vue.extend({
-  name: NAME,
-  // The mixins order determines the order of appearance in the props reference section
-  mixins: [idMixin, propsMixin],
-  model: {
-    prop: 'value',
-    event: 'input'
-  },
+  name: NAME_FORM_TIMEPICKER,
+  mixins: [idMixin, modelMixin],
+  props,
   data() {
     return {
       // We always use `HH:mm:ss` value internally
-      localHMS: this.value || '',
+      localHMS: this[MODEL_PROP_NAME] || '',
       // Context data from BTime
       localLocale: null,
       isRTL: false,
@@ -214,47 +83,18 @@ export const BFormTimepicker = /*#__PURE__*/ Vue.extend({
   computed: {
     computedLang() {
       return (this.localLocale || '').replace(/-u-.*$/i, '') || null
-    },
-    timeProps() {
-      // Props we pass to BTime
-      // Use self for better minification, as `this` won't
-      // minimize and we reference it many times below
-      const self = this
-      return {
-        hidden: !self.isVisible,
-        value: self.localHMS,
-        // Passthrough props
-        readonly: self.readonly,
-        disabled: self.disabled,
-        locale: self.locale,
-        hour12: self.hour12,
-        hideHeader: self.hideHeader,
-        showSeconds: self.showSeconds,
-        secondsStep: self.secondsStep,
-        minutesStep: self.minutesStep,
-        labelNoTimeSelected: self.labelNoTimeSelected,
-        labelSelected: self.labelSelected,
-        labelHours: self.labelHours,
-        labelMinutes: self.labelMinutes,
-        labelSeconds: self.labelSeconds,
-        labelAmpm: self.labelAmpm,
-        labelAm: self.labelAm,
-        labelPm: self.labelPm,
-        labelIncrement: self.labelIncrement,
-        labelDecrement: self.labelDecrement
-      }
     }
   },
   watch: {
-    value(newVal) {
-      this.localHMS = newVal || ''
+    [MODEL_PROP_NAME](newValue) {
+      this.localHMS = newValue || ''
     },
-    localHMS(newVal) {
+    localHMS(newValue) {
       // We only update the v-model value when the timepicker
       // is open, to prevent cursor jumps when bound to a
       // text input in button only mode
       if (this.isVisible) {
-        this.$emit('input', newVal || '')
+        this.$emit(MODEL_EVENT_NAME, newValue || '')
       }
     }
   },
@@ -289,7 +129,7 @@ export const BFormTimepicker = /*#__PURE__*/ Vue.extend({
       this.formattedValue = formatted
       this.localHMS = value || ''
       // Re-emit the context event
-      this.$emit('context', ctx)
+      this.$emit(EVENT_NAME_CONTEXT, ctx)
     },
     onNowButton() {
       const now = new Date()
@@ -311,12 +151,12 @@ export const BFormTimepicker = /*#__PURE__*/ Vue.extend({
     onShown() {
       this.$nextTick(() => {
         attemptFocus(this.$refs.time)
-        this.$emit('shown')
+        this.$emit(EVENT_NAME_SHOWN)
       })
     },
     onHidden() {
       this.isVisible = false
-      this.$emit('hidden')
+      this.$emit(EVENT_NAME_HIDDEN)
     },
     // Render function helpers
     defaultButtonFn({ isHovered, hasFocus }) {
@@ -326,7 +166,7 @@ export const BFormTimepicker = /*#__PURE__*/ Vue.extend({
     }
   },
   render(h) {
-    const { localHMS, disabled, readonly } = this
+    const { localHMS, disabled, readonly, $props } = this
     const placeholder = isUndefinedOrNull(this.placeholder)
       ? this.labelNoTimeSelected
       : this.placeholder
@@ -340,10 +180,14 @@ export const BFormTimepicker = /*#__PURE__*/ Vue.extend({
         h(
           BButton,
           {
-            key: 'now-btn',
-            props: { size: 'sm', disabled: disabled || readonly, variant: this.nowButtonVariant },
+            props: {
+              size: 'sm',
+              disabled: disabled || readonly,
+              variant: this.nowButtonVariant
+            },
             attrs: { 'aria-label': label || null },
-            on: { click: this.onNowButton }
+            on: { click: this.onNowButton },
+            key: 'now-btn'
           },
           label
         )
@@ -360,10 +204,14 @@ export const BFormTimepicker = /*#__PURE__*/ Vue.extend({
         h(
           BButton,
           {
-            key: 'reset-btn',
-            props: { size: 'sm', disabled: disabled || readonly, variant: this.resetButtonVariant },
+            props: {
+              size: 'sm',
+              disabled: disabled || readonly,
+              variant: this.resetButtonVariant
+            },
             attrs: { 'aria-label': label || null },
-            on: { click: this.onResetButton }
+            on: { click: this.onResetButton },
+            key: 'reset-btn'
           },
           label
         )
@@ -371,19 +219,25 @@ export const BFormTimepicker = /*#__PURE__*/ Vue.extend({
     }
 
     if (!this.noCloseButton) {
+      // Add a "spacer" between buttons ('&nbsp;')
       if ($footer.length > 0) {
-        // Add a "spacer" between buttons ('&nbsp;')
         $footer.push(h('span', '\u00a0'))
       }
+
       const label = this.labelCloseButton
+
       $footer.push(
         h(
           BButton,
           {
-            key: 'close-btn',
-            props: { size: 'sm', disabled, variant: this.closeButtonVariant },
+            props: {
+              size: 'sm',
+              disabled,
+              variant: this.closeButtonVariant
+            },
             attrs: { 'aria-label': label || null },
-            on: { click: this.onCloseButton }
+            on: { click: this.onCloseButton },
+            key: 'close-btn'
           },
           label
         )
@@ -409,13 +263,17 @@ export const BFormTimepicker = /*#__PURE__*/ Vue.extend({
     const $time = h(
       BTime,
       {
-        ref: 'time',
         staticClass: 'b-form-time-control',
-        props: this.timeProps,
+        props: {
+          ...pluckProps(timeProps, $props),
+          value: localHMS,
+          hidden: !this.isVisible
+        },
         on: {
           input: this.onInput,
           context: this.onContext
-        }
+        },
+        ref: 'time'
       },
       $footer
     )
@@ -423,18 +281,15 @@ export const BFormTimepicker = /*#__PURE__*/ Vue.extend({
     return h(
       BVFormBtnLabelControl,
       {
-        ref: 'control',
         staticClass: 'b-form-timepicker',
         props: {
-          // This adds unneeded props, but reduces code size:
-          ...this.$props,
-          // Overridden / computed props
+          ...pluckProps(formBtnLabelControlProps, $props),
           id: this.safeId(),
-          rtl: this.isRTL,
-          lang: this.computedLang,
-          value: localHMS || '',
+          value: localHMS,
           formattedValue: localHMS ? this.formattedValue : '',
-          placeholder: placeholder || ''
+          placeholder,
+          rtl: this.isRTL,
+          lang: this.computedLang
         },
         on: {
           show: this.onShow,
@@ -442,8 +297,10 @@ export const BFormTimepicker = /*#__PURE__*/ Vue.extend({
           hidden: this.onHidden
         },
         scopedSlots: {
-          'button-content': this.$scopedSlots['button-content'] || this.defaultButtonFn
-        }
+          [SLOT_NAME_BUTTON_CONTENT]:
+            this.$scopedSlots[SLOT_NAME_BUTTON_CONTENT] || this.defaultButtonFn
+        },
+        ref: 'control'
       },
       [$time]
     )

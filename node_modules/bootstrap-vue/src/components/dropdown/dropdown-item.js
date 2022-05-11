@@ -1,33 +1,38 @@
-import Vue from '../../utils/vue'
+import { Vue } from '../../vue'
+import { NAME_DROPDOWN_ITEM } from '../../constants/components'
+import { EVENT_NAME_CLICK } from '../../constants/events'
+import { PROP_TYPE_ARRAY_OBJECT_STRING, PROP_TYPE_STRING } from '../../constants/props'
 import { requestAF } from '../../utils/dom'
-import { omit } from '../../utils/object'
-import attrsMixin from '../../mixins/attrs'
-import normalizeSlotMixin from '../../mixins/normalize-slot'
+import { omit, sortKeys } from '../../utils/object'
+import { makeProp, makePropsConfigurable, pluckProps } from '../../utils/props'
+import { attrsMixin } from '../../mixins/attrs'
+import { normalizeSlotMixin } from '../../mixins/normalize-slot'
 import { BLink, props as BLinkProps } from '../link/link'
 
-export const props = omit(BLinkProps, ['event', 'routerTag'])
+// --- Props ---
+
+const linkProps = omit(BLinkProps, ['event', 'routerTag'])
+
+export const props = makePropsConfigurable(
+  sortKeys({
+    ...linkProps,
+    linkClass: makeProp(PROP_TYPE_ARRAY_OBJECT_STRING),
+    variant: makeProp(PROP_TYPE_STRING)
+  }),
+  NAME_DROPDOWN_ITEM
+)
+
+// --- Main component ---
 
 // @vue/component
 export const BDropdownItem = /*#__PURE__*/ Vue.extend({
-  name: 'BDropdownItem',
+  name: NAME_DROPDOWN_ITEM,
   mixins: [attrsMixin, normalizeSlotMixin],
-  inheritAttrs: false,
   inject: {
-    bvDropdown: {
-      default: null
-    }
+    bvDropdown: { default: null }
   },
-  props: {
-    ...props,
-    linkClass: {
-      type: [String, Array, Object],
-      default: null
-    },
-    variant: {
-      type: String,
-      default: null
-    }
-  },
+  inheritAttrs: false,
+  props,
   computed: {
     computedAttrs() {
       return {
@@ -45,30 +50,35 @@ export const BDropdownItem = /*#__PURE__*/ Vue.extend({
         }
       })
     },
-    onClick(evt) {
-      this.$emit('click', evt)
+    onClick(event) {
+      this.$emit(EVENT_NAME_CLICK, event)
       this.closeDropdown()
     }
   },
   render(h) {
-    return h('li', { attrs: { role: 'presentation' } }, [
-      h(
-        BLink,
-        {
-          props: this.$props,
-          staticClass: 'dropdown-item',
-          class: [
-            this.linkClass,
-            {
-              [`text-${this.variant}`]: this.variant && !(this.active || this.disabled)
-            }
-          ],
-          attrs: this.computedAttrs,
-          on: { click: this.onClick },
-          ref: 'item'
-        },
-        this.normalizeSlot('default')
-      )
-    ])
+    const { linkClass, variant, active, disabled, onClick, bvAttrs } = this
+
+    return h(
+      'li',
+      {
+        class: bvAttrs.class,
+        style: bvAttrs.style,
+        attrs: { role: 'presentation' }
+      },
+      [
+        h(
+          BLink,
+          {
+            staticClass: 'dropdown-item',
+            class: [linkClass, { [`text-${variant}`]: variant && !(active || disabled) }],
+            props: pluckProps(linkProps, this.$props),
+            attrs: this.computedAttrs,
+            on: { click: onClick },
+            ref: 'item'
+          },
+          this.normalizeSlot()
+        )
+      ]
+    )
   }
 })

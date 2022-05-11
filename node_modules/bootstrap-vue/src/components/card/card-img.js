@@ -1,57 +1,33 @@
-import Vue from '../../utils/vue'
-import { mergeData } from 'vue-functional-data-merge'
+import { Vue, mergeData } from '../../vue'
+import { NAME_CARD_IMG } from '../../constants/components'
+import { PROP_TYPE_BOOLEAN } from '../../constants/props'
+import { pick, sortKeys } from '../../utils/object'
+import { makeProp, makePropsConfigurable } from '../../utils/props'
+import { props as BImgProps } from '../image/img'
 
-export const props = {
-  src: {
-    type: String,
-    required: true
-  },
-  alt: {
-    type: String,
-    default: null
-  },
-  top: {
-    type: Boolean,
-    default: false
-  },
-  bottom: {
-    type: Boolean,
-    default: false
-  },
-  start: {
-    type: Boolean,
-    default: false
-  },
-  left: {
-    // alias of 'start'
-    type: Boolean,
-    default: false
-  },
-  end: {
-    type: Boolean,
-    default: false
-  },
-  right: {
-    // alias of 'end'
-    type: Boolean,
-    default: false
-  },
-  height: {
-    type: [Number, String]
-    // default: null
-  },
-  width: {
-    type: [Number, String]
-    // default: null
-  }
-}
+// --- Props ---
+
+export const props = makePropsConfigurable(
+  sortKeys({
+    ...pick(BImgProps, ['src', 'alt', 'width', 'height', 'left', 'right']),
+    bottom: makeProp(PROP_TYPE_BOOLEAN, false),
+    end: makeProp(PROP_TYPE_BOOLEAN, false),
+    start: makeProp(PROP_TYPE_BOOLEAN, false),
+    top: makeProp(PROP_TYPE_BOOLEAN, false)
+  }),
+  NAME_CARD_IMG
+)
+
+// --- Main component ---
 
 // @vue/component
 export const BCardImg = /*#__PURE__*/ Vue.extend({
-  name: 'BCardImg',
+  name: NAME_CARD_IMG,
   functional: true,
   props,
   render(h, { props, data }) {
+    const { src, alt, width, height } = props
+
     let baseClass = 'card-img'
     if (props.top) {
       baseClass += '-top'
@@ -66,13 +42,8 @@ export const BCardImg = /*#__PURE__*/ Vue.extend({
     return h(
       'img',
       mergeData(data, {
-        class: [baseClass],
-        attrs: {
-          src: props.src || null,
-          alt: props.alt,
-          height: props.height || null,
-          width: props.width || null
-        }
+        class: baseClass,
+        attrs: { src, alt, width, height }
       })
     )
   }

@@ -68,14 +68,26 @@ For disabling specific dates or setting minimum and maximum date limits, refer t
 ```html
 <template>
   <div>
-    <b-form-group label="Select date picker interactive state">
-      <b-form-radio-group v-model="state" aria-controls="ex-disabled-readonly">
+    <b-form-group
+      label="Select date picker interactive state"
+      v-slot="{ ariaDescribedby }"
+    >
+      <b-form-radio-group
+        v-model="state"
+        :aria-describedby="ariaDescribedby"
+        aria-controls="ex-disabled-readonly"
+      >
         <b-form-radio value="disabled">Disabled</b-form-radio>
         <b-form-radio value="readonly">Readonly</b-form-radio>
         <b-form-radio value="normal">Normal</b-form-radio>
       </b-form-radio-group>
     </b-form-group>
-    <b-form-datepicker id="ex-disabled-readonly" :disabled="disabled" :readonly="readonly"></b-form-datepicker>
+
+    <b-form-datepicker
+      id="ex-disabled-readonly"
+      :disabled="disabled"
+      :readonly="readonly"
+    ></b-form-datepicker>
   </div>
 </template>
 
@@ -219,6 +231,9 @@ default. To specify a different theme color to use for today's date, use the `to
 
 To disable highlighting of today's date altogether, set the `no-highlight-today` prop.
 
+The navigation buttons default to the `'secondary'` theme variant. You can change this via the
+`nav-button-variant` prop.
+
 ### Control sizing
 
 Fancy a smaller or larger `<b-form-datepicker>` control? Set the `size` prop to `'sm'` for a smaller
@@ -229,9 +244,9 @@ popup calendar dialog.
 <template>
   <div>
     <label for="datepicker-sm">Small date picker</label>
-    <b-form-datepicker id="datepicker-sm" size="sm" local="en" class="mb-2"></b-form-datepicker>
+    <b-form-datepicker id="datepicker-sm" size="sm" locale="en" class="mb-2"></b-form-datepicker>
     <label for="datepicker-lg">Large date picker</label>
-    <b-form-datepicker id="datepicker-lg" size="lg" local="en"></b-form-datepicker>
+    <b-form-datepicker id="datepicker-lg" size="lg" locale="en"></b-form-datepicker>
   </div>
 </template>
 
@@ -247,7 +262,7 @@ a placeholder is not provided, the value of the `label-no-date-selected` prop is
 <template>
   <div>
     <label for="datepicker-placeholder">Date picker with placeholder</label>
-    <b-form-datepicker id="datepicker-placeholder" placeholder="Choose a date" local="en"></b-form-datepicker>
+    <b-form-datepicker id="datepicker-placeholder" placeholder="Choose a date" locale="en"></b-form-datepicker>
   </div>
 </template>
 
@@ -297,8 +312,8 @@ either `min` or `max` (depending on which is closes to today's date).
 Use the dropdown props `right`, `dropup`, `dropright`, `dropleft`, `no-flip`, and `offset` to
 control the positioning of the popup calendar.
 
-Refer to the [`<b-dropdown>` documentation](/docs/components/dropdown) for details on the effects
-and usage of these props.
+Refer to the [`<b-dropdown>` positioning section](/docs/components/dropdown#positioning) for details
+on the effects and usage of these props.
 
 ### Initial open calendar date
 

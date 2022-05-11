@@ -1,9 +1,10 @@
-import getScopId from '../../utils/get-scope-id'
-import identity from '../../utils/identity'
-import looseEqual from '../../utils/loose-equal'
+import { NAME_POPOVER } from '../../constants/components'
+import { IS_BROWSER } from '../../constants/env'
+import { EVENT_NAME_SHOW } from '../../constants/events'
 import { concat } from '../../utils/array'
 import { getComponentConfig } from '../../utils/config'
-import { isBrowser } from '../../utils/env'
+import { getScopeId } from '../../utils/get-scope-id'
+import { identity } from '../../utils/identity'
 import {
   isFunction,
   isNumber,
@@ -12,6 +13,7 @@ import {
   isUndefined,
   isUndefinedOrNull
 } from '../../utils/inspect'
+import { looseEqual } from '../../utils/loose-equal'
 import { toInteger } from '../../utils/number'
 import { keys } from '../../utils/object'
 import { BVPopover } from '../../components/popover/helpers/bv-popover'
@@ -47,7 +49,6 @@ const spacesRE = /\s+/
 // Arguments and modifiers take precedence over passed value config object
 const parseBindings = (bindings, vnode) => /* istanbul ignore next: not easy to test */ {
   // We start out with a basic config
-  const NAME = 'BPopover'
   let config = {
     title: undefined,
     content: undefined,
@@ -60,11 +61,11 @@ const parseBindings = (bindings, vnode) => /* istanbul ignore next: not easy to 
     disabled: false,
     id: null,
     html: false,
-    delay: getComponentConfig(NAME, 'delay'),
-    boundary: String(getComponentConfig(NAME, 'boundary')),
-    boundaryPadding: toInteger(getComponentConfig(NAME, 'boundaryPadding'), 0),
-    variant: getComponentConfig(NAME, 'variant'),
-    customClass: getComponentConfig(NAME, 'customClass')
+    delay: getComponentConfig(NAME_POPOVER, 'delay', 50),
+    boundary: String(getComponentConfig(NAME_POPOVER, 'boundary', 'scrollParent')),
+    boundaryPadding: toInteger(getComponentConfig(NAME_POPOVER, 'boundaryPadding', 5), 0),
+    variant: getComponentConfig(NAME_POPOVER, 'variant'),
+    customClass: getComponentConfig(NAME_POPOVER, 'customClass')
   }
 
   // Process `bindings.value`
@@ -178,7 +179,7 @@ const parseBindings = (bindings, vnode) => /* istanbul ignore next: not easy to 
 
 // Add or update Popover on our element
 const applyPopover = (el, bindings, vnode) => {
-  if (!isBrowser) {
+  if (!IS_BROWSER) {
     /* istanbul ignore next */
     return
   }
@@ -188,10 +189,10 @@ const applyPopover = (el, bindings, vnode) => {
     el[BV_POPOVER] = new BVPopover({
       parent: $parent,
       // Add the parent's scoped style attribute data
-      _scopeId: getScopId($parent, undefined)
+      _scopeId: getScopeId($parent, undefined)
     })
     el[BV_POPOVER].__bv_prev_data__ = {}
-    el[BV_POPOVER].$on('show', () => /* istanbul ignore next: for now */ {
+    el[BV_POPOVER].$on(EVENT_NAME_SHOW, () => /* istanbul ignore next: for now */ {
       // Before showing the popover, we update the title
       // and content if they are functions
       const data = {}

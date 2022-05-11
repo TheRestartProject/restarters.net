@@ -1,45 +1,39 @@
-import Vue from '../../utils/vue'
-import idMixin from '../../mixins/id'
-import formMixin from '../../mixins/form'
-import formOptionsMixin from '../../mixins/form-options'
-import formRadioCheckGroupMixin from '../../mixins/form-radio-check-group'
-import formSizeMixin from '../../mixins/form-size'
-import formStateMixin from '../../mixins/form-state'
+import { Vue } from '../../vue'
+import { NAME_FORM_CHECKBOX_GROUP } from '../../constants/components'
+import { PROP_TYPE_ARRAY, PROP_TYPE_BOOLEAN } from '../../constants/props'
+import { sortKeys } from '../../utils/object'
+import { makeProp, makePropsConfigurable } from '../../utils/props'
+import {
+  MODEL_PROP_NAME,
+  formRadioCheckGroupMixin,
+  props as formRadioCheckGroupProps
+} from '../../mixins/form-radio-check-group'
 
-export const props = {
-  switches: {
+// --- Props ---
+
+export const props = makePropsConfigurable(
+  sortKeys({
+    ...formRadioCheckGroupProps,
+    [MODEL_PROP_NAME]: makeProp(PROP_TYPE_ARRAY, []),
     // Custom switch styling
-    type: Boolean,
-    default: false
-  },
-  checked: {
-    type: Array,
-    default: null
-  }
-}
+    switches: makeProp(PROP_TYPE_BOOLEAN, false)
+  }),
+  NAME_FORM_CHECKBOX_GROUP
+)
+
+// --- Main component ---
 
 // @vue/component
 export const BFormCheckboxGroup = /*#__PURE__*/ Vue.extend({
-  name: 'BFormCheckboxGroup',
-  mixins: [
-    idMixin,
-    formMixin,
-    formRadioCheckGroupMixin, // Includes render function
-    formOptionsMixin,
-    formSizeMixin,
-    formStateMixin
-  ],
+  name: NAME_FORM_CHECKBOX_GROUP,
+  // Includes render function
+  mixins: [formRadioCheckGroupMixin],
   provide() {
     return {
       bvCheckGroup: this
     }
   },
   props,
-  data() {
-    return {
-      localChecked: this.checked || []
-    }
-  },
   computed: {
     isRadioGroup() {
       return false

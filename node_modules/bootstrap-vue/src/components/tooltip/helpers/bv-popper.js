@@ -5,14 +5,28 @@
 //   Templates are only instantiated when shown, and destroyed when hidden
 //
 
-import Vue from '../../../utils/vue'
 import Popper from 'popper.js'
-import { getCS, select } from '../../../utils/dom'
+import { Vue } from '../../../vue'
+import { NAME_POPPER } from '../../../constants/components'
+import {
+  EVENT_NAME_HIDDEN,
+  EVENT_NAME_HIDE,
+  EVENT_NAME_SHOW,
+  EVENT_NAME_SHOWN,
+  HOOK_EVENT_NAME_DESTROYED
+} from '../../../constants/events'
+import {
+  PROP_TYPE_ARRAY_STRING,
+  PROP_TYPE_NUMBER_STRING,
+  PROP_TYPE_STRING
+} from '../../../constants/props'
+import { HTMLElement, SVGElement } from '../../../constants/safe-types'
+import { getCS, requestAF, select } from '../../../utils/dom'
 import { toFloat } from '../../../utils/number'
-import { HTMLElement, SVGElement } from '../../../utils/safe-types'
-import { BVTransition } from '../../../utils/bv-transition'
+import { makeProp } from '../../../utils/props'
+import { BVTransition } from '../../transition/bv-transition'
 
-const NAME = 'BVPopper'
+// --- Constants ---
 
 const AttachmentMap = {
   AUTO: 'auto',
@@ -46,45 +60,30 @@ const OffsetMap = {
   LEFTBOTTOM: +1
 }
 
+// --- Props ---
+
+export const props = {
+  // The minimum distance (in `px`) from the edge of the
+  // tooltip/popover that the arrow can be positioned
+  arrowPadding: makeProp(PROP_TYPE_NUMBER_STRING, 6),
+  // 'scrollParent', 'viewport', 'window', or `Element`
+  boundary: makeProp([HTMLElement, PROP_TYPE_STRING], 'scrollParent'),
+  // Tooltip/popover will try and stay away from
+  // boundary edge by this many pixels
+  boundaryPadding: makeProp(PROP_TYPE_NUMBER_STRING, 5),
+  fallbackPlacement: makeProp(PROP_TYPE_ARRAY_STRING, 'flip'),
+  offset: makeProp(PROP_TYPE_NUMBER_STRING, 0),
+  placement: makeProp(PROP_TYPE_STRING, 'top'),
+  // Element that the tooltip/popover is positioned relative to
+  target: makeProp([HTMLElement, SVGElement])
+}
+
+// --- Main component ---
+
 // @vue/component
 export const BVPopper = /*#__PURE__*/ Vue.extend({
-  name: NAME,
-  props: {
-    target: {
-      // Element that the tooltip/popover is positioned relative to
-      type: [HTMLElement, SVGElement]
-      // default: null
-    },
-    placement: {
-      type: String,
-      default: 'top'
-    },
-    fallbackPlacement: {
-      type: [String, Array],
-      default: 'flip'
-    },
-    offset: {
-      type: Number,
-      default: 0
-    },
-    boundary: {
-      // 'scrollParent', 'viewport', 'window', or Element
-      type: [String, HTMLElement],
-      default: 'scrollParent'
-    },
-    boundaryPadding: {
-      // Tooltip/popover will try and stay away from
-      // boundary edge by this many pixels
-      type: Number,
-      default: 5
-    },
-    arrowPadding: {
-      // The minimum distance (in `px`) from the edge of the
-      // tooltip/popover that the arrow can be positioned
-      type: Number,
-      default: 6
-    }
-  },
+  name: NAME_POPPER,
+  props,
   data() {
     return {
       // reactive props set by parent
@@ -96,12 +95,12 @@ export const BVPopper = /*#__PURE__*/ Vue.extend({
   },
   computed: {
     /* istanbul ignore next */
-    templateType() /* istanbul ignore next */ {
+    templateType() {
       // Overridden by template component
       return 'unknown'
     },
     popperConfig() {
-      const placement = this.placement
+      const { placement } = this
       return {
         placement: this.getAttachment(placement),
         modifiers: {
@@ -136,23 +135,27 @@ export const BVPopper = /*#__PURE__*/ Vue.extend({
     // Ensure we show as we mount
     this.localShow = true
     // Create popper instance before shown
-    this.$on('show', el => {
+    this.$on(EVENT_NAME_SHOW, el => {
       this.popperCreate(el)
     })
-    // Self destruct once hidden
-    this.$on('hidden', () => {
-      this.$nextTick(this.$destroy)
-    })
-    // If parent is destroyed, ensure we are destroyed
-    this.$parent.$once('hook:destroyed', this.$destroy)
+    // Self destruct handler
+    const handleDestroy = () => {
+      this.$nextTick(() => {
+        // In a `requestAF()` to release control back to application
+        requestAF(() => {
+          this.$destroy()
+        })
+      })
+    }
+    // Self destruct if parent destroyed
+    this.$parent.$once(HOOK_EVENT_NAME_DESTROYED, handleDestroy)
+    // Self destruct after hidden
+    this.$once(EVENT_NAME_HIDDEN, handleDestroy)
   },
   beforeMount() {
     // Ensure that the attachment position is correct before mounting
     // as our propsData is added after `new Template({...})`
     this.attachment = this.getAttachment(this.placement)
-  },
-  mounted() {
-    // TBD
   },
   updated() {
     // Update popper if needed
@@ -215,24 +218,26 @@ export const BVPopper = /*#__PURE__*/ Vue.extend({
       this.attachment = this.getAttachment(data.placement)
     },
     /* istanbul ignore next */
-    renderTemplate(h) /* istanbul ignore next */ {
+    renderTemplate(h) {
       // Will be overridden by templates
       return h('div')
     }
   },
   render(h) {
-    // Note: `show` and 'fade' classes are only appled during transition
+    const { noFade } = this
+
+    // Note: 'show' and 'fade' classes are only appled during transition
     return h(
       BVTransition,
       {
         // Transitions as soon as mounted
-        props: { appear: true, noFade: this.noFade },
+        props: { appear: true, noFade },
         on: {
           // Events used by parent component/instance
-          beforeEnter: el => this.$emit('show', el),
-          afterEnter: el => this.$emit('shown', el),
-          beforeLeave: el => this.$emit('hide', el),
-          afterLeave: el => this.$emit('hidden', el)
+          beforeEnter: el => this.$emit(EVENT_NAME_SHOW, el),
+          afterEnter: el => this.$emit(EVENT_NAME_SHOWN, el),
+          beforeLeave: el => this.$emit(EVENT_NAME_HIDE, el),
+          afterLeave: el => this.$emit(EVENT_NAME_HIDDEN, el)
         }
       },
       [this.localShow ? this.renderTemplate(h) : h()]

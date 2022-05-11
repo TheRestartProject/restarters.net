@@ -1,44 +1,57 @@
-import { mergeData } from 'vue-functional-data-merge'
-import Vue from '../../utils/vue'
+import { Vue, mergeData } from '../../vue'
+import { NAME_CARD } from '../../constants/components'
+import { PROP_TYPE_BOOLEAN, PROP_TYPE_STRING } from '../../constants/props'
+import { SLOT_NAME_DEFAULT, SLOT_NAME_FOOTER, SLOT_NAME_HEADER } from '../../constants/slots'
 import { htmlOrText } from '../../utils/html'
 import { hasNormalizedSlot, normalizeSlot } from '../../utils/normalize-slot'
-import { copyProps, pluckProps, prefixPropName, unprefixPropName } from '../../utils/props'
-import cardMixin from '../../mixins/card'
-import { BCardBody, props as bodyProps } from './card-body'
-import { BCardHeader, props as headerProps } from './card-header'
-import { BCardFooter, props as footerProps } from './card-footer'
-import { BCardImg, props as imgProps } from './card-img'
+import { sortKeys } from '../../utils/object'
+import {
+  copyProps,
+  makeProp,
+  makePropsConfigurable,
+  pluckProps,
+  prefixPropName,
+  unprefixPropName
+} from '../../utils/props'
+import { props as cardProps } from '../../mixins/card'
+import { BCardBody, props as BCardBodyProps } from './card-body'
+import { BCardHeader, props as BCardHeaderProps } from './card-header'
+import { BCardFooter, props as BCardFooterProps } from './card-footer'
+import { BCardImg, props as BCardImgProps } from './card-img'
 
-const cardImgProps = copyProps(imgProps, prefixPropName.bind(null, 'img'))
+// --- Props ---
+
+const cardImgProps = copyProps(BCardImgProps, prefixPropName.bind(null, 'img'))
 cardImgProps.imgSrc.required = false
 
-export const props = {
-  ...bodyProps,
-  ...headerProps,
-  ...footerProps,
-  ...cardImgProps,
-  ...copyProps(cardMixin.props),
-  align: {
-    type: String
-    // default: null
-  },
-  noBody: {
-    type: Boolean,
-    default: false
-  }
-}
+export const props = makePropsConfigurable(
+  sortKeys({
+    ...BCardBodyProps,
+    ...BCardHeaderProps,
+    ...BCardFooterProps,
+    ...cardImgProps,
+    ...cardProps,
+    align: makeProp(PROP_TYPE_STRING),
+    noBody: makeProp(PROP_TYPE_BOOLEAN, false)
+  }),
+  NAME_CARD
+)
+
+// --- Main component ---
 
 // @vue/component
 export const BCard = /*#__PURE__*/ Vue.extend({
-  name: 'BCard',
+  name: NAME_CARD,
   functional: true,
   props,
   render(h, { props, data, slots, scopedSlots }) {
     const {
+      imgSrc,
       imgLeft,
       imgRight,
       imgStart,
       imgEnd,
+      imgBottom,
       header,
       headerHtml,
       footer,
@@ -54,12 +67,12 @@ export const BCard = /*#__PURE__*/ Vue.extend({
 
     let $imgFirst = h()
     let $imgLast = h()
-    if (props.imgSrc) {
+    if (imgSrc) {
       const $img = h(BCardImg, {
         props: pluckProps(cardImgProps, props, unprefixPropName.bind(null, 'img'))
       })
 
-      if (props.imgBottom) {
+      if (imgBottom) {
         $imgLast = $img
       } else {
         $imgFirst = $img
@@ -67,35 +80,44 @@ export const BCard = /*#__PURE__*/ Vue.extend({
     }
 
     let $header = h()
-    const hasHeaderSlot = hasNormalizedSlot('header', $scopedSlots, $slots)
+    const hasHeaderSlot = hasNormalizedSlot(SLOT_NAME_HEADER, $scopedSlots, $slots)
     if (hasHeaderSlot || header || headerHtml) {
       $header = h(
         BCardHeader,
         {
-          props: pluckProps(headerProps, props),
+          props: pluckProps(BCardHeaderProps, props),
           domProps: hasHeaderSlot ? {} : htmlOrText(headerHtml, header)
         },
-        normalizeSlot('header', slotScope, $scopedSlots, $slots)
+        normalizeSlot(SLOT_NAME_HEADER, slotScope, $scopedSlots, $slots)
       )
     }
 
-    let $content = normalizeSlot('default', slotScope, $scopedSlots, $slots)
+    let $content = normalizeSlot(SLOT_NAME_DEFAULT, slotScope, $scopedSlots, $slots)
 
-    // Wrap content in <card-body> when `noBody` prop set
+    // Wrap content in `<card-body>` when `noBody` prop set
     if (!props.noBody) {
-      $content = h(BCardBody, { props: pluckProps(bodyProps, props) }, $content)
+      $content = h(BCardBody, { props: pluckProps(BCardBodyProps, props) }, $content)
+
+      // When the `overlap` prop is set we need to wrap the `<b-card-img>` and `<b-card-body>`
+      // into a relative positioned wrapper to don't distract a potential header or footer
+      if (props.overlay && imgSrc) {
+        $content = h('div', { staticClass: 'position-relative' }, [$imgFirst, $content, $imgLast])
+        // Reset image variables since they are already in the wrapper
+        $imgFirst = h()
+        $imgLast = h()
+      }
     }
 
     let $footer = h()
-    const hasFooterSlot = hasNormalizedSlot('footer', $scopedSlots, $slots)
+    const hasFooterSlot = hasNormalizedSlot(SLOT_NAME_FOOTER, $scopedSlots, $slots)
     if (hasFooterSlot || footer || footerHtml) {
       $footer = h(
         BCardFooter,
         {
-          props: pluckProps(footerProps, props),
+          props: pluckProps(BCardFooterProps, props),
           domProps: hasHeaderSlot ? {} : htmlOrText(footerHtml, footer)
         },
-        normalizeSlot('footer', slotScope, $scopedSlots, $slots)
+        normalizeSlot(SLOT_NAME_FOOTER, slotScope, $scopedSlots, $slots)
       )
     }
 

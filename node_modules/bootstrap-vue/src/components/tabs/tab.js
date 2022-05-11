@@ -1,77 +1,78 @@
-import Vue from '../../utils/vue'
-import idMixin from '../../mixins/id'
-import normalizeSlotMixin from '../../mixins/normalize-slot'
-import BVTransition from '../../utils/bv-transition'
+import { Vue } from '../../vue'
+import { NAME_TAB } from '../../constants/components'
+import { MODEL_EVENT_NAME_PREFIX } from '../../constants/events'
+import {
+  PROP_TYPE_ARRAY_OBJECT_STRING,
+  PROP_TYPE_BOOLEAN,
+  PROP_TYPE_OBJECT,
+  PROP_TYPE_STRING
+} from '../../constants/props'
+import { SLOT_NAME_TITLE } from '../../constants/slots'
+import { sortKeys } from '../../utils/object'
+import { makeProp, makePropsConfigurable } from '../../utils/props'
+import { idMixin, props as idProps } from '../../mixins/id'
+import { normalizeSlotMixin } from '../../mixins/normalize-slot'
+import { BVTransition } from '../transition/bv-transition'
+
+// --- Constants ---
+
+const MODEL_PROP_NAME_ACTIVE = 'active'
+const MODEL_EVENT_NAME_ACTIVE = MODEL_EVENT_NAME_PREFIX + MODEL_PROP_NAME_ACTIVE
+
+// --- Props ---
+
+export const props = makePropsConfigurable(
+  sortKeys({
+    ...idProps,
+    [MODEL_PROP_NAME_ACTIVE]: makeProp(PROP_TYPE_BOOLEAN, false),
+    buttonId: makeProp(PROP_TYPE_STRING),
+    disabled: makeProp(PROP_TYPE_BOOLEAN, false),
+    lazy: makeProp(PROP_TYPE_BOOLEAN, false),
+    noBody: makeProp(PROP_TYPE_BOOLEAN, false),
+    tag: makeProp(PROP_TYPE_STRING, 'div'),
+    title: makeProp(PROP_TYPE_STRING),
+    // Sniffed by `<b-tabs>` and added to nav `li.nav-item`
+    titleItemClass: makeProp(PROP_TYPE_ARRAY_OBJECT_STRING),
+    titleLinkAttributes: makeProp(PROP_TYPE_OBJECT),
+    // Sniffed by `<b-tabs>` and added to nav `a.nav-link`
+    titleLinkClass: makeProp(PROP_TYPE_ARRAY_OBJECT_STRING)
+  }),
+  NAME_TAB
+)
+
+// --- Main component ---
 
 // @vue/component
 export const BTab = /*#__PURE__*/ Vue.extend({
-  name: 'BTab',
+  name: NAME_TAB,
   mixins: [idMixin, normalizeSlotMixin],
   inject: {
     bvTabs: {
       default: () => ({})
     }
   },
-  props: {
-    active: {
-      type: Boolean,
-      default: false
-    },
-    tag: {
-      type: String,
-      default: 'div'
-    },
-    buttonId: {
-      type: String
-      // default: ''
-    },
-    title: {
-      type: String,
-      default: ''
-    },
-    titleItemClass: {
-      // Sniffed by tabs.js and added to nav 'li.nav-item'
-      type: [String, Array, Object]
-      // default: null
-    },
-    titleLinkClass: {
-      // Sniffed by tabs.js and added to nav 'a.nav-link'
-      type: [String, Array, Object]
-      // default: null
-    },
-    titleLinkAttributes: {
-      type: Object
-      // default: null
-    },
-    disabled: {
-      type: Boolean,
-      default: false
-    },
-    noBody: {
-      type: Boolean,
-      default: false
-    },
-    lazy: {
-      type: Boolean,
-      default: false
-    }
-  },
+  props,
   data() {
     return {
-      localActive: this.active && !this.disabled,
-      show: false
+      localActive: this[MODEL_PROP_NAME_ACTIVE] && !this.disabled
     }
   },
   computed: {
+    // For parent sniffing of child
+    _isTab() {
+      return true
+    },
     tabClasses() {
+      const { localActive: active, disabled } = this
+
       return [
         {
-          active: this.localActive,
-          disabled: this.disabled,
+          active,
+          disabled,
           'card-body': this.bvTabs.card && !this.noBody
         },
         // Apply <b-tabs> `activeTabClass` styles when this tab is active
-        this.localActive ? this.bvTabs.activeTabClass : null
+        active ? this.bvTabs.activeTabClass : null
       ]
     },
     controlledBy() {
@@ -82,20 +83,12 @@ export const BTab = /*#__PURE__*/ Vue.extend({
     },
     computedLazy() {
       return this.bvTabs.lazy || this.lazy
-    },
-    _isTab() {
-      // For parent sniffing of child
-      return true
     }
   },
   watch: {
-    localActive(newVal) {
-      // Make 'active' prop work with `.sync` modifier
-      this.$emit('update:active', newVal)
-    },
-    active(newVal, oldVal) {
-      if (newVal !== oldVal) {
-        if (newVal) {
+    [MODEL_PROP_NAME_ACTIVE](newValue, oldValue) {
+      if (newValue !== oldValue) {
+        if (newValue) {
           // If activated post mount
           this.activate()
         } else {
@@ -103,90 +96,99 @@ export const BTab = /*#__PURE__*/ Vue.extend({
           if (!this.deactivate()) {
             // Tab couldn't be deactivated, so we reset the synced active prop
             // Deactivation will fail if no other tabs to activate
-            this.$emit('update:active', this.localActive)
+            this.$emit(MODEL_EVENT_NAME_ACTIVE, this.localActive)
           }
         }
       }
     },
-    disabled(newVal, oldVal) {
-      if (newVal !== oldVal) {
-        if (newVal && this.localActive && this.bvTabs.firstTab) {
+    disabled(newValue, oldValue) {
+      if (newValue !== oldValue) {
+        const { firstTab } = this.bvTabs
+        if (newValue && this.localActive && firstTab) {
           this.localActive = false
-          this.bvTabs.firstTab()
+          firstTab()
         }
       }
+    },
+    localActive(newValue) {
+      // Make `active` prop work with `.sync` modifier
+      this.$emit(MODEL_EVENT_NAME_ACTIVE, newValue)
     }
   },
   mounted() {
-    // Inform b-tabs of our presence
+    // Inform `<b-tabs>` of our presence
     this.registerTab()
-    // Initially show on mount if active and not disabled
-    this.show = this.localActive
   },
   updated() {
     // Force the tab button content to update (since slots are not reactive)
     // Only done if we have a title slot, as the title prop is reactive
-    if (this.hasNormalizedSlot('title') && this.bvTabs.updateButton) {
-      this.bvTabs.updateButton(this)
+    const { updateButton } = this.bvTabs
+    if (updateButton && this.hasNormalizedSlot(SLOT_NAME_TITLE)) {
+      updateButton(this)
     }
   },
-  destroyed() {
-    // inform b-tabs of our departure
+  beforeDestroy() {
+    // Inform `<b-tabs>` of our departure
     this.unregisterTab()
   },
   methods: {
     // Private methods
     registerTab() {
-      // Inform `b-tabs` of our presence
-      this.bvTabs.registerTab && this.bvTabs.registerTab(this)
+      // Inform `<b-tabs>` of our presence
+      const { registerTab } = this.bvTabs
+      if (registerTab) {
+        registerTab(this)
+      }
     },
     unregisterTab() {
-      // Inform `b-tabs` of our departure
-      this.bvTabs.unregisterTab && this.bvTabs.unregisterTab(this)
+      // Inform `<b-tabs>` of our departure
+      const { unregisterTab } = this.bvTabs
+      if (unregisterTab) {
+        unregisterTab(this)
+      }
     },
     // Public methods
     activate() {
-      if (this.bvTabs.activateTab && !this.disabled) {
-        return this.bvTabs.activateTab(this)
-      } else {
-        // Not inside a <b-tabs> component or tab is disabled
-        return false
-      }
+      // Not inside a `<b-tabs>` component or tab is disabled
+      const { activateTab } = this.bvTabs
+      return activateTab && !this.disabled ? activateTab(this) : false
     },
     deactivate() {
-      if (this.bvTabs.deactivateTab && this.localActive) {
-        return this.bvTabs.deactivateTab(this)
-      } else {
-        // Not inside a <b-tabs> component or not active to begin with
-        return false
-      }
+      // Not inside a `<b-tabs>` component or not active to begin with
+      const { deactivateTab } = this.bvTabs
+      return deactivateTab && this.localActive ? deactivateTab(this) : false
     }
   },
   render(h) {
-    const content = h(
+    const { localActive } = this
+
+    const $content = h(
       this.tag,
       {
-        ref: 'panel',
         staticClass: 'tab-pane',
         class: this.tabClasses,
-        directives: [
-          {
-            name: 'show',
-            rawName: 'v-show',
-            value: this.localActive,
-            expression: 'localActive'
-          }
-        ],
+        directives: [{ name: 'show', value: localActive }],
         attrs: {
           role: 'tabpanel',
           id: this.safeId(),
-          'aria-hidden': this.localActive ? 'false' : 'true',
+          'aria-hidden': localActive ? 'false' : 'true',
           'aria-labelledby': this.controlledBy || null
-        }
+        },
+        ref: 'panel'
       },
       // Render content lazily if requested
-      [this.localActive || !this.computedLazy ? this.normalizeSlot('default') : h()]
+      [localActive || !this.computedLazy ? this.normalizeSlot() : h()]
     )
-    return h(BVTransition, { props: { mode: 'out-in', noFade: this.computedNoFade } }, [content])
+
+    return h(
+      BVTransition,
+      {
+        props: {
+          mode: 'out-in',
+          noFade: this.computedNoFade
+        }
+      },
+      [$content]
+    )
   }
 })

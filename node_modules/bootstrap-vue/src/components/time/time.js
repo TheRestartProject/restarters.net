@@ -1,51 +1,56 @@
 // BTime control (not form input control)
-import Vue from '../../utils/vue'
-// Utilities
-import identity from '../../utils/identity'
-import KeyCodes from '../../utils/key-codes'
-import looseEqual from '../../utils/loose-equal'
+import { Vue } from '../../vue'
+import { NAME_TIME } from '../../constants/components'
+import { EVENT_NAME_CONTEXT } from '../../constants/events'
+import { CODE_LEFT, CODE_RIGHT } from '../../constants/key-codes'
+import {
+  PROP_TYPE_ARRAY_STRING,
+  PROP_TYPE_BOOLEAN,
+  PROP_TYPE_NUMBER_STRING,
+  PROP_TYPE_STRING
+} from '../../constants/props'
+import { RX_TIME } from '../../constants/regex'
 import { concat } from '../../utils/array'
-import { getComponentConfig } from '../../utils/config'
 import { createDate, createDateFormatter } from '../../utils/date'
 import { attemptBlur, attemptFocus, contains, getActiveElement, requestAF } from '../../utils/dom'
+import { stopEvent } from '../../utils/events'
+import { identity } from '../../utils/identity'
 import { isNull, isUndefinedOrNull } from '../../utils/inspect'
+import { looseEqual } from '../../utils/loose-equal'
 import { isLocaleRTL } from '../../utils/locale'
+import { makeModelMixin } from '../../utils/model'
 import { toInteger } from '../../utils/number'
+import { pick, sortKeys } from '../../utils/object'
+import { makeProp, makePropsConfigurable } from '../../utils/props'
 import { toString } from '../../utils/string'
-// Mixins
-import idMixin from '../../mixins/id'
-import normalizeSlotMixin from '../../mixins/normalize-slot'
-// Sub components used
-import { BFormSpinbutton } from '../form-spinbutton/form-spinbutton'
+import { idMixin, props as idProps } from '../../mixins/id'
+import { normalizeSlotMixin } from '../../mixins/normalize-slot'
+import { BFormSpinbutton, props as BFormSpinbuttonProps } from '../form-spinbutton/form-spinbutton'
 import { BIconCircleFill, BIconChevronUp } from '../../icons/icons'
 
 // --- Constants ---
 
-const NAME = 'BTime'
+const {
+  mixin: modelMixin,
+  props: modelProps,
+  prop: MODEL_PROP_NAME,
+  event: MODEL_EVENT_NAME
+} = makeModelMixin('value', {
+  type: PROP_TYPE_STRING,
+  defaultValue: ''
+})
 
 const NUMERIC = 'numeric'
 
-const { LEFT, RIGHT } = KeyCodes
+// --- Helper methods ---
 
-// Time string RegExpr (optional seconds)
-const RE_TIME = /^([0-1]?[0-9]|2[0-3]):[0-5]?[0-9](:[0-5]?[0-9])?$/
+const padLeftZeros = value => `00${value || ''}`.slice(-2)
 
-// --- Helpers ---
-
-// Fallback to BFormSpinbutton prop if no value found
-const getConfigFallback = prop => {
-  return getComponentConfig(NAME, prop) || getComponentConfig('BFormSpinbutton', prop)
-}
-
-const padLeftZeros = num => {
-  return `00${num || ''}`.slice(-2)
-}
-
-const parseHMS = hms => {
-  hms = toString(hms)
+const parseHMS = value => {
+  value = toString(value)
   let [hh, mm, ss] = [null, null, null]
-  if (RE_TIME.test(hms)) {
-    ;[hh, mm, ss] = hms.split(':').map(v => toInteger(v, null))
+  if (RX_TIME.test(value)) {
+    ;[hh, mm, ss] = value.split(':').map(v => toInteger(v, null))
   }
   return {
     hours: isUndefinedOrNull(hh) ? null : hh,
@@ -63,110 +68,51 @@ const formatHMS = ({ hours, minutes, seconds }, requireSeconds = false) => {
   return hms.map(padLeftZeros).join(':')
 }
 
+// --- Props ---
+
+export const props = makePropsConfigurable(
+  sortKeys({
+    ...idProps,
+    ...modelProps,
+    ...pick(BFormSpinbuttonProps, ['labelIncrement', 'labelDecrement']),
+    // ID of label element
+    ariaLabelledby: makeProp(PROP_TYPE_STRING),
+    disabled: makeProp(PROP_TYPE_BOOLEAN, false),
+    footerTag: makeProp(PROP_TYPE_STRING, 'footer'),
+    headerTag: makeProp(PROP_TYPE_STRING, 'header'),
+    hidden: makeProp(PROP_TYPE_BOOLEAN, false),
+    hideHeader: makeProp(PROP_TYPE_BOOLEAN, false),
+    // Explicitly force 12 or 24 hour time
+    // Default is to use resolved locale for 12/24 hour display
+    // Tri-state: `true` = 12, `false` = 24, `null` = auto
+    hour12: makeProp(PROP_TYPE_BOOLEAN, null),
+    labelAm: makeProp(PROP_TYPE_STRING, 'AM'),
+    labelAmpm: makeProp(PROP_TYPE_STRING, 'AM/PM'),
+    labelHours: makeProp(PROP_TYPE_STRING, 'Hours'),
+    labelMinutes: makeProp(PROP_TYPE_STRING, 'Minutes'),
+    labelNoTimeSelected: makeProp(PROP_TYPE_STRING, 'No time selected'),
+    labelPm: makeProp(PROP_TYPE_STRING, 'PM'),
+    labelSeconds: makeProp(PROP_TYPE_STRING, 'Seconds'),
+    labelSelected: makeProp(PROP_TYPE_STRING, 'Selected time'),
+    locale: makeProp(PROP_TYPE_ARRAY_STRING),
+    minutesStep: makeProp(PROP_TYPE_NUMBER_STRING, 1),
+    readonly: makeProp(PROP_TYPE_BOOLEAN, false),
+    secondsStep: makeProp(PROP_TYPE_NUMBER_STRING, 1),
+    // If `true`, show the second spinbutton
+    showSeconds: makeProp(PROP_TYPE_BOOLEAN, false)
+  }),
+  NAME_TIME
+)
+
+// --- Main component ---
+
 // @vue/component
 export const BTime = /*#__PURE__*/ Vue.extend({
-  name: NAME,
-  mixins: [idMixin, normalizeSlotMixin],
-  model: {
-    prop: 'value',
-    event: 'input'
-  },
-  props: {
-    value: {
-      type: String,
-      default: ''
-    },
-    showSeconds: {
-      // If true, show the second spinbutton
-      type: Boolean,
-      default: false
-    },
-    hour12: {
-      // Explicitly force 12 or 24 hour time
-      // Default is to use resolved locale for 12/24 hour display
-      // Tri-state: `true` = 12, `false` = 24, `null` = auto
-      type: Boolean,
-      default: null
-    },
-    locale: {
-      type: [String, Array]
-      // default: null
-    },
-    ariaLabelledby: {
-      // ID of label element
-      type: String
-      // default: null
-    },
-    secondsStep: {
-      type: [Number, String],
-      default: 1
-    },
-    minutesStep: {
-      type: [Number, String],
-      default: 1
-    },
-    disabled: {
-      type: Boolean,
-      default: false
-    },
-    readonly: {
-      type: Boolean,
-      default: false
-    },
-    hideHeader: {
-      type: Boolean,
-      default: false
-    },
-    labelNoTimeSelected: {
-      type: String,
-      default: () => getComponentConfig(NAME, 'labelNoTimeSelected')
-    },
-    labelSelected: {
-      type: String,
-      default: () => getComponentConfig(NAME, 'labelSelected')
-    },
-    labelHours: {
-      type: String,
-      default: () => getComponentConfig(NAME, 'labelHours')
-    },
-    labelMinutes: {
-      type: String,
-      default: () => getComponentConfig(NAME, 'labelMinutes')
-    },
-    labelSeconds: {
-      type: String,
-      default: () => getComponentConfig(NAME, 'labelSeconds')
-    },
-    labelAmpm: {
-      type: String,
-      default: () => getComponentConfig(NAME, 'labelAmpm')
-    },
-    labelAm: {
-      type: String,
-      default: () => getComponentConfig(NAME, 'labelAm')
-    },
-    labelPm: {
-      type: String,
-      default: () => getComponentConfig(NAME, 'labelPm')
-    },
-    // Passed to the spin buttons
-    labelIncrement: {
-      type: String,
-      // Falls back to BFormSpinbutton label
-      default: () => getConfigFallback('labelIncrement')
-    },
-    labelDecrement: {
-      type: String,
-      // Falls back to BFormSpinbutton label
-      default: () => getConfigFallback('labelDecrement')
-    },
-    hidden: {
-      type: Boolean,
-      default: false
-    }
-  },
+  name: NAME_TIME,
+  mixins: [idMixin, modelMixin, normalizeSlotMixin],
+  props,
   data() {
-    const parsed = parseHMS(this.value || '')
+    const parsed = parseHMS(this[MODEL_PROP_NAME] || '')
     return {
       // Spin button models
       modelHours: parsed.hours,
@@ -204,8 +150,8 @@ export const BTime = /*#__PURE__*/ Vue.extend({
       const hourCycle = resolved.hourCycle || (hour12 ? 'h12' : 'h23')
       return {
         locale: resolved.locale,
-        hour12: hour12,
-        hourCycle: hourCycle
+        hour12,
+        hourCycle
       }
     },
     computedLocale() {
@@ -303,33 +249,33 @@ export const BTime = /*#__PURE__*/ Vue.extend({
     }
   },
   watch: {
-    value(newVal, oldVal) {
-      if (newVal !== oldVal && !looseEqual(parseHMS(newVal), parseHMS(this.computedHMS))) {
-        const { hours, minutes, seconds, ampm } = parseHMS(newVal)
+    [MODEL_PROP_NAME](newValue, oldValue) {
+      if (newValue !== oldValue && !looseEqual(parseHMS(newValue), parseHMS(this.computedHMS))) {
+        const { hours, minutes, seconds, ampm } = parseHMS(newValue)
         this.modelHours = hours
         this.modelMinutes = minutes
         this.modelSeconds = seconds
         this.modelAmpm = ampm
       }
     },
-    computedHMS(newVal, oldVal) {
-      if (newVal !== oldVal) {
-        this.$emit('input', newVal)
+    computedHMS(newValue, oldValue) {
+      if (newValue !== oldValue) {
+        this.$emit(MODEL_EVENT_NAME, newValue)
       }
     },
-    context(newVal, oldVal) {
-      if (!looseEqual(newVal, oldVal)) {
-        this.$emit('context', newVal)
+    context(newValue, oldValue) {
+      if (!looseEqual(newValue, oldValue)) {
+        this.$emit(EVENT_NAME_CONTEXT, newValue)
       }
     },
-    modelAmpm(newVal, oldVal) {
-      if (newVal !== oldVal) {
+    modelAmpm(newValue, oldValue) {
+      if (newValue !== oldValue) {
         const hours = isNull(this.modelHours) ? 0 : this.modelHours
         this.$nextTick(() => {
-          if (newVal === 0 && hours > 11) {
+          if (newValue === 0 && hours > 11) {
             // Switched to AM
             this.modelHours = hours - 12
-          } else if (newVal === 1 && hours < 12) {
+          } else if (newValue === 1 && hours < 12) {
             // Switched to PM
             this.modelHours = hours + 12
           }
@@ -344,18 +290,18 @@ export const BTime = /*#__PURE__*/ Vue.extend({
   },
   created() {
     this.$nextTick(() => {
-      this.$emit('context', this.context)
+      this.$emit(EVENT_NAME_CONTEXT, this.context)
     })
   },
   mounted() {
     this.setLive(true)
   },
   /* istanbul ignore next */
-  activated() /* istanbul ignore next */ {
+  activated() {
     this.setLive(true)
   },
   /* istanbul ignore next */
-  deactivated() /* istanbul ignore next */ {
+  deactivated() {
     this.setLive(false)
   },
   beforeDestroy() {
@@ -417,14 +363,17 @@ export const BTime = /*#__PURE__*/ Vue.extend({
     setAmpm(value) {
       this.modelAmpm = value
     },
-    onSpinLeftRight(evt = {}) {
-      const { type, keyCode } = evt
-      if (!this.disabled && type === 'keydown' && (keyCode === LEFT || keyCode === RIGHT)) {
-        evt.preventDefault()
-        evt.stopPropagation()
+    onSpinLeftRight(event = {}) {
+      const { type, keyCode } = event
+      if (
+        !this.disabled &&
+        type === 'keydown' &&
+        (keyCode === CODE_LEFT || keyCode === CODE_RIGHT)
+      ) {
+        stopEvent(event)
         const spinners = this.$refs.spinners || []
         let index = spinners.map(cmp => !!cmp.hasFocus).indexOf(true)
-        index = index + (keyCode === LEFT ? -1 : 1)
+        index = index + (keyCode === CODE_LEFT ? -1 : 1)
         index = index >= spinners.length ? 0 : index < 0 ? spinners.length - 1 : index
         attemptFocus(spinners[index])
       }
@@ -442,35 +391,41 @@ export const BTime = /*#__PURE__*/ Vue.extend({
     }
   },
   render(h) {
+    // If hidden, we just render a placeholder comment
     /* istanbul ignore if */
     if (this.hidden) {
-      // If hidden, we just render a placeholder comment
       return h()
     }
 
-    const valueId = this.valueId
-    const computedAriaLabelledby = this.computedAriaLabelledby
+    const {
+      disabled,
+      readonly,
+      computedLocale: locale,
+      computedAriaLabelledby: ariaLabelledby,
+      labelIncrement,
+      labelDecrement,
+      valueId,
+      focus: focusHandler
+    } = this
     const spinIds = []
 
     // Helper method to render a spinbutton
     const makeSpinbutton = (handler, key, classes, spinbuttonProps = {}) => {
       const id = this.safeId(`_spinbutton_${key}_`) || null
       spinIds.push(id)
+
       return h(BFormSpinbutton, {
-        key: key,
-        ref: 'spinners',
-        refInFor: true,
         class: classes,
         props: {
-          id: id,
+          id,
           placeholder: '--',
           vertical: true,
           required: true,
-          disabled: this.disabled,
-          readonly: this.readonly,
-          locale: this.computedLocale,
-          labelIncrement: this.labelIncrement,
-          labelDecrement: this.labelDecrement,
+          disabled,
+          readonly,
+          locale,
+          labelIncrement,
+          labelDecrement,
           wrap: true,
           ariaControls: valueId,
           min: 0,
@@ -483,7 +438,10 @@ export const BTime = /*#__PURE__*/ Vue.extend({
           // and we don't want the formatted time to be announced
           // on each value input if repeat is happening
           change: handler
-        }
+        },
+        key,
+        ref: 'spinners',
+        refInFor: true
       })
     }
 
@@ -493,9 +451,7 @@ export const BTime = /*#__PURE__*/ Vue.extend({
         'div',
         {
           staticClass: 'd-flex flex-column',
-          class: {
-            'text-muted': this.disabled || this.readonly
-          },
+          class: { 'text-muted': disabled || readonly },
           attrs: { 'aria-hidden': 'true' }
         },
         [
@@ -572,14 +528,14 @@ export const BTime = /*#__PURE__*/ Vue.extend({
         staticClass: 'd-flex align-items-center justify-content-center mx-auto',
         attrs: {
           role: 'group',
-          tabindex: this.disabled || this.readonly ? null : '-1',
-          'aria-labelledby': computedAriaLabelledby
+          tabindex: disabled || readonly ? null : '-1',
+          'aria-labelledby': ariaLabelledby
         },
         on: {
           keydown: this.onSpinLeftRight,
-          click /* istanbul ignore next */: evt => /* istanbul ignore next */ {
-            if (evt.target === evt.currentTarget) {
-              this.focus()
+          click: /* istanbul ignore next */ event => {
+            if (event.target === event.currentTarget) {
+              focusHandler()
             }
           }
         }
@@ -593,20 +549,20 @@ export const BTime = /*#__PURE__*/ Vue.extend({
       {
         staticClass: 'form-control form-control-sm text-center',
         class: {
-          disabled: this.disabled || this.readonly
+          disabled: disabled || readonly
         },
         attrs: {
           id: valueId,
           role: 'status',
           for: spinIds.filter(identity).join(' ') || null,
-          tabindex: this.disabled ? null : '-1',
+          tabindex: disabled ? null : '-1',
           'aria-live': this.isLive ? 'polite' : 'off',
           'aria-atomic': 'true'
         },
         on: {
           // Transfer focus/click to focus hours spinner
-          click: this.focus,
-          focus: this.focus
+          click: focusHandler,
+          focus: focusHandler
         }
       },
       [
@@ -615,14 +571,16 @@ export const BTime = /*#__PURE__*/ Vue.extend({
       ]
     )
     const $header = h(
-      'header',
-      { staticClass: 'b-time-header', class: { 'sr-only': this.hideHeader } },
+      this.headerTag,
+      {
+        staticClass: 'b-time-header',
+        class: { 'sr-only': this.hideHeader }
+      },
       [$value]
     )
 
-    // Optional bottom slot
-    let $slot = this.normalizeSlot('default')
-    $slot = $slot ? h('footer', { staticClass: 'b-time-footer' }, $slot) : h()
+    const $content = this.normalizeSlot()
+    const $footer = $content ? h(this.footerTag, { staticClass: 'b-time-footer' }, $content) : h()
 
     return h(
       'div',
@@ -631,12 +589,12 @@ export const BTime = /*#__PURE__*/ Vue.extend({
         attrs: {
           role: 'group',
           lang: this.computedLang || null,
-          'aria-labelledby': computedAriaLabelledby || null,
-          'aria-disabled': this.disabled ? 'true' : null,
-          'aria-readonly': this.readonly && !this.disabled ? 'true' : null
+          'aria-labelledby': ariaLabelledby || null,
+          'aria-disabled': disabled ? 'true' : null,
+          'aria-readonly': readonly && !disabled ? 'true' : null
         }
       },
-      [$header, $spinners, $slot]
+      [$header, $spinners, $footer]
     )
   }
 })
