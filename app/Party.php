@@ -991,6 +991,7 @@ class Party extends Model implements Auditable
             $group_restarters = User::join('users_groups', 'users_groups.user', '=', 'users.id')
                 ->where('users_groups.group', $this->group)
                 ->where('users_groups.role', 4)
+                ->where('users_groups.status', 'like', 1)
                 ->select('users.*')
                 ->get();
 
