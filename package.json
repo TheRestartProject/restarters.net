@@ -13,7 +13,7 @@
     "devDependencies": {
         "@playwright/test": "^1.14.1",
         "axios": "^0.21.2",
-        "bootstrap": "^4.5.2",
+        "bootstrap": "^4.6.1",
         "browser-sync": "^2.26.7",
         "browser-sync-webpack-plugin": "2.0.1",
         "cross-env": "^5.2.0",
@@ -38,7 +38,7 @@
         "bootstrap-fileinput": "^4.4.9",
         "bootstrap-select": "^1.13.17",
         "bootstrap-tokenfield": "^0.12.0",
-        "bootstrap-vue": "^2.16.0",
+        "bootstrap-vue": "^2.22.0",
         "bootstrap4-datetimepicker": "^5.2.3",
         "chart.js": "^2.7.2",
         "codemirror": "^5.39.2",
