@@ -990,7 +990,7 @@ class Party extends Model implements Auditable
             $group_restarters = $group->membersRestarters();
 
             // If there are restarters against the group
-            if (!$group_restarters->count()) {
+            if ($group_restarters->count()) {
                 // Send user a notification and email
                 Notification::send($group_restarters->get(), new NotifyRestartersOfNewEvent([
                                                                                          'event_venue' => $this->venue,
