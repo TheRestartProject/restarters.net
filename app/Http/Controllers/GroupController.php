@@ -515,17 +515,14 @@ class GroupController extends Controller
         // Send emails to hosts of group to let them know.
         // (only those that have opted in to receiving emails).
         $user = User::find($user_group->user);
+        $group = Group::find($group_id);
 
-        $group_hosts = User::join('users_groups', 'users_groups.user', '=', 'users.id')
-            ->where('users_groups.group', $group_id)
-            ->where('users_groups.role', 3)
-            ->select('users.*')
-            ->get();
+        $group_hosts = $group->membersHosts();
 
-        if (! empty($group_hosts)) {
+        if ($group_hosts->count()) {
             Notification::send($group_hosts, new NewGroupMember([
                 'user_name' => $user->name,
-                'group_name' => Group::find($group_id)->name,
+                'group_name' => $group->name,
                 'group_url' => url('/group/view/'.$group_id),
             ]));
         }
