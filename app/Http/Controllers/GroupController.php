@@ -520,7 +520,7 @@ class GroupController extends Controller
         $group_hosts = $group->membersHosts();
 
         if ($group_hosts->count()) {
-            Notification::send($group_hosts, new NewGroupMember([
+            Notification::send($group_hosts->get(), new NewGroupMember([
                 'user_name' => $user->name,
                 'group_name' => $group->name,
                 'group_url' => url('/group/view/'.$group_id),
