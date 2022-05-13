@@ -1125,8 +1125,7 @@ class PartyController extends Controller
 
             Notification::send($all_restarters, new EventRepairs([
                 'event_name' => $event->getEventName(),
-                'event_url' => url('/party/view/'.intval($event_id).'#devices'),
-                'preferences' => url('/profile/edit'),
+                'event_url' => url('/party/view/'.intval($event_id).'#devices')
             ]));
 
             return redirect()->back()->with('success', __('events.review_requested'));

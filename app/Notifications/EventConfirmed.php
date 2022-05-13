@@ -55,7 +55,7 @@ class EventConfirmed extends Notification implements ShouldQueue
                     ], $locale))
                     ->action(__('notifications.event_confirmed_view', [], $locale), url('/'))
                     ->line(__('notifications.email_preferences', [
-                        'url' => $url
+                        'url' => url('/user/edit/'.$notifiable->id)
                     ], $locale));
     }
 

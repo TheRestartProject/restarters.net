@@ -13,7 +13,7 @@ return [
   'new_event_photos_title' => 'New event photos uploaded:',
   'new_event_photos_subject' => 'New event photos uploaded to event: :event',
 
-  'email_preferences' => 'If you would like to stop receiving these emails, please visit <a href=":url#list-email-preferences-list">your preferences</a> on your account.',
+  'email_preferences' => 'If you would like to stop receiving these emails, please visit <a href=":url#list-email-preferences">your preferences</a> on your account.',
 
   'event_confirmed_title' => 'Event Confirmed',
   'event_confirmed_subject' => 'Event Confirmed',

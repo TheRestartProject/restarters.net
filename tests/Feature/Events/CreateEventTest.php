@@ -182,6 +182,7 @@ class CreateEventTest extends TestCase
 
                 // Mail should mention the venue.
                 self::assertRegexp('/' . $event->venue . '/', $mailData['introLines'][0]);
+                self::assertStringContainsString('#list-email-preferences-list', $mailData['outroLines'][0]);
 
                 return true;
             }
