@@ -164,6 +164,7 @@
       </div>
     </div>
   </div>
+  @include('partials.languages')
 </section>
 <style>
   .landing-page {
