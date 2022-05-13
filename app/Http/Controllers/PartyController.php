@@ -1110,10 +1110,6 @@ class PartyController extends Controller
         return redirect()->back()->with('warning', __('events.review_requested_permissions'));
     }
 
-    // TODO: is this alive?
-    // It looks like recent-ish code, but I recall James mentioned recently that
-    // he couldn't delete events.  Perhaps it's disappeared from the interface?
-
     /**
      * Called via AJAX.
      * @param id The event id.
