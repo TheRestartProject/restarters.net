@@ -621,13 +621,8 @@ class PartyController extends Controller
             $device_images[$device->iddevices] = $File->findImages(env('TBL_DEVICES'), $device->iddevices);
         }
 
-        if ($event->isInProgress() || $event->hasFinished()) {
-            $stats = $event->getEventStats();
-        } else {
-            $stats = [
-              'force_object' => true,
-            ];
-        }
+        // We want to include device stats from events even if they haven't taken place yet.
+        $stats = $event->getEventStats(null, null, true);
 
         return view('events.view', [
             'gmaps' => true,

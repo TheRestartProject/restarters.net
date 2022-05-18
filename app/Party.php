@@ -701,7 +701,7 @@ class Party extends Model implements Auditable
         ];
     }
 
-    public function getEventStats($eEmissionRatio = null, $uEmissionratio = null)
+    public function getEventStats($eEmissionRatio = null, $uEmissionratio = null, $includeFuture = false)
     {
         $displacementFactor = \App\Device::getDisplacementFactor();
         if (is_null($eEmissionRatio)) {
@@ -713,7 +713,8 @@ class Party extends Model implements Auditable
 
         $result = self::getEventStatsArrayKeys();
 
-        if (! empty($this->allDevices)) {
+        // Normally we only count stats for devices for events that have started or finished.
+        if (($includeFuture || $this->hasFinished() || $this->isInProgress()) && !empty($this->allDevices)) {
             foreach ($this->allDevices as $device) {
                 if ($device->deviceCategory->powered) {
                     $result['devices_powered']++;
@@ -758,15 +759,15 @@ class Party extends Model implements Auditable
                     }
                 }
             }
-
-            $result['co2_total'] = $result['co2_powered'] + $result['co2_unpowered'];
-            $result['waste_total'] = $result['waste_powered'] + $result['waste_unpowered'];
-            $result['participants'] = $this->pax ?? 0;
-            $result['volunteers'] = $this->volunteers ?? 0;
-            $result['hours_volunteered'] = $this->hoursVolunteered();
-
-            return $result;
         }
+
+        $result['co2_total'] = $result['co2_powered'] + $result['co2_unpowered'];
+        $result['waste_total'] = $result['waste_powered'] + $result['waste_unpowered'];
+        $result['participants'] = $this->pax ?? 0;
+        $result['volunteers'] = $this->volunteers ?? 0;
+        $result['hours_volunteered'] = $this->hoursVolunteered();
+
+        return $result;
     }
 
     public function devices()
