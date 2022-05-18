@@ -967,44 +967,6 @@ class GroupController extends Controller
 
     public function volunteersNearby($groupid)
     {
-        if (isset($_GET['action']) && isset($_GET['code'])) {
-            $actn = $_GET['action'];
-            $code = $_GET['code'];
-
-            switch ($actn) {
-                case 'gu':
-                    $response['success'] = 'Group updated.';
-
-                    break;
-                case 'pe':
-                    $response['success'] = 'Party updated.';
-
-                    break;
-                case 'pc':
-                    $response['success'] = 'Party created.';
-
-                    break;
-                case 'ue':
-                    $response['success'] = 'Profile updated.';
-
-                    break;
-                case 'de':
-                    if ($code == 200) {
-                        $response['success'] = 'Party deleted.';
-                    } elseif ($code == 403) {
-                        $response['danger'] = 'Couldn\'t delete the party!';
-                    } elseif ($code == 500) {
-                        $response['warning'] = 'The party has been deleted, but <strong>something went wrong while deleting it from WordPress</strong>. <br /> You\'ll need to do that manually!';
-                    }
-
-                    break;
-                default: {
-                        $response['danger'] = 'Unexpected arguments';
-                        break;
-                    }
-            }
-        }
-
         $user = User::find(Auth::id());
 
         //Object Instances
