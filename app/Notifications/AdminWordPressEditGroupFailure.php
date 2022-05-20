@@ -53,7 +53,9 @@ class AdminWordPressEditGroupFailure extends Notification implements ShouldQueue
                   ->greeting(__('notifications.greeting', [], $notifiable->language))
                   ->line('Group \''.$this->arr['group_name'].'\' failed to post to WordPress during an edit to the group.')
                   ->action('View group', $this->arr['group_url'])
-                  ->line('If you would like to stop receiving these emails, please visit <a href="'.url('/user/edit/'.$notifiable->id).'">your preferences</a> on your account.');
+                  ->line(__('notifications.email_preferences', [
+                      'url' => url('/user/edit/'.$notifiable->id)
+                  ], $notifiable->locale));
     }
 
     /**

@@ -866,8 +866,7 @@ class GroupController extends Controller
                 $arr = [
                     'user_name' => Auth::user()->name,
                     'group_name' => $group->name,
-                    'group_url' => url('/group/view/'.$group->idgroups),
-                    'preferences' => url('/profile/edit/'.$host->id),
+                    'group_url' => url('/group/view/'.$group->idgroups)
                 ];
                 Notification::send($host, new NewGroupMember($arr, $host));
             }
