@@ -307,8 +307,6 @@ class CreateEventTest extends TestCase
     /** @test */
     public function emails_sent_to_restarters_when_upcoming_event_approved()
     {
-        DB::connection()->enableQueryLog();
-
         $this->withoutExceptionHandling();
         $admin = factory(User::class)->state('Administrator')->create();
         $this->actingAs($admin);
