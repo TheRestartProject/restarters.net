@@ -163,6 +163,15 @@ class EventStatsTest extends StatsTestCase
             $this->assertEquals($v, $result[$k], "Wrong value for $k => $v");
         }
 
+        // Get the stats pages.
+        $response = $this->get('/admin/stats/1');
+        $response->assertSuccessful();
+        $response->assertSee('<span class="title">7</span>');
+
+        $response = $this->get('/admin/stats/2');
+        $response->assertSuccessful();
+        $response->assertSee('>27 kg<');
+
         // Get the wide stats page.
         $response = $this->get('/party/stats/' . $event->idevents . '/wide');
         $response->assertSuccessful();
@@ -173,5 +182,6 @@ class EventStatsTest extends StatsTestCase
         $response = $this->get('/search');
         $response->assertSuccessful();
         $response->assertSee(e($event->venue));
+
     }
 }
