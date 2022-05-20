@@ -47,12 +47,12 @@ class CreateDiscourseThreadForEvent
         }
 
         // Get the user who created the event.
-        $users = User::find(EventsUsers::where('event', $partyId)->get());
+        $users = EventsUsers::where('event', $partyId)->get();
 
         if (!count($users)) {
             Log::error("Can't find event creator");
         } else {
-            $host = $users[0]->user;
+            $host = User::find($users[0]->user);
 
             try {
                 // We want the host to create the message, so use their username.  The API key should

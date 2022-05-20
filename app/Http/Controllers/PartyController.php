@@ -798,31 +798,6 @@ class PartyController extends Controller
         ]);
     }
 
-    public function getGroupEmails($event_id, $object = false)
-    {
-        $group_user_ids = UserGroups::where('group', Party::find($event_id)->group)
-            ->pluck('user')
-            ->toArray();
-
-        // Users already associated with the event.  Normally this would include the host, unless they've been
-        // removed.
-        // (Not including those invited but not RSVPed)
-        $event_user_ids = EventsUsers::where('event', $event_id)
-            ->where('status', 'like', '1')
-            ->pluck('user')
-            ->toArray();
-
-        $unique_user_ids = array_diff($group_user_ids, $event_user_ids);
-
-        if ($object) {
-            return User::whereIn('id', $unique_user_ids)->get();
-        }
-
-        $group_users = User::whereIn('id', $unique_user_ids)->pluck('email')->toArray();
-
-        return json_encode($group_users);
-    }
-
     /**
      * This is called via ajax in the Invite Volunteers to Event modal.
      * It finds the users associated with the group that the event is for,
@@ -1133,10 +1108,6 @@ class PartyController extends Controller
 
         return redirect()->back()->with('warning', __('events.review_requested_permissions'));
     }
-
-    // TODO: is this alive?
-    // It looks like recent-ish code, but I recall James mentioned recently that
-    // he couldn't delete events.  Perhaps it's disappeared from the interface?
 
     /**
      * Called via AJAX.

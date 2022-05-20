@@ -103,10 +103,10 @@
           </span>
         </div>
         <div class="col-lg-4 d-flex align-items-center justify-content-end mt-2 mt-lg-0">
-          <b-btn :href="'/party/duplicate/' + initialEvent.idevents" variant="primary" size="md" class="mr-2">
+          <b-btn :href="'/party/duplicate/' + initialEvent.idevents" variant="primary" size="md" class="mr-2 duplicate">
             {{ __('events.duplicate_event') }}
           </b-btn>
-          <b-btn variant="primary" class="break" type="submit" @click="submit">
+          <b-btn variant="primary" class="break submit" type="submit" @click="submit">
             {{ __('events.save_event') }}
           </b-btn>
         </div>

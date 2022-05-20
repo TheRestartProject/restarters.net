@@ -106,7 +106,6 @@ return [
   'and' => 'and',
   'quantity' => 'Quantity',
   'cancel' => 'Cancel',
-  'confirm' => 'Confirm',
   'loading' => 'Loading',
   'close' => 'Close',
   'skills' => 'skill|skills',
@@ -119,4 +118,5 @@ return [
   'remove' => 'remove',
   'please_choose' => 'Please choose...',
   'notification_greeting' => 'Hello!',
+  'confirm' => 'Confirm',
 ];

@@ -515,17 +515,14 @@ class GroupController extends Controller
         // Send emails to hosts of group to let them know.
         // (only those that have opted in to receiving emails).
         $user = User::find($user_group->user);
+        $group = Group::find($group_id);
 
-        $group_hosts = User::join('users_groups', 'users_groups.user', '=', 'users.id')
-            ->where('users_groups.group', $group_id)
-            ->where('users_groups.role', 3)
-            ->select('users.*')
-            ->get();
+        $group_hosts = $group->membersHosts();
 
-        if (! empty($group_hosts)) {
-            Notification::send($group_hosts, new NewGroupMember([
+        if ($group_hosts->count()) {
+            Notification::send($group_hosts->get(), new NewGroupMember([
                 'user_name' => $user->name,
-                'group_name' => Group::find($group_id)->name,
+                'group_name' => $group->name,
                 'group_url' => url('/group/view/'.$group_id),
             ]));
         }
@@ -969,44 +966,6 @@ class GroupController extends Controller
 
     public function volunteersNearby($groupid)
     {
-        if (isset($_GET['action']) && isset($_GET['code'])) {
-            $actn = $_GET['action'];
-            $code = $_GET['code'];
-
-            switch ($actn) {
-                case 'gu':
-                    $response['success'] = 'Group updated.';
-
-                    break;
-                case 'pe':
-                    $response['success'] = 'Party updated.';
-
-                    break;
-                case 'pc':
-                    $response['success'] = 'Party created.';
-
-                    break;
-                case 'ue':
-                    $response['success'] = 'Profile updated.';
-
-                    break;
-                case 'de':
-                    if ($code == 200) {
-                        $response['success'] = 'Party deleted.';
-                    } elseif ($code == 403) {
-                        $response['danger'] = 'Couldn\'t delete the party!';
-                    } elseif ($code == 500) {
-                        $response['warning'] = 'The party has been deleted, but <strong>something went wrong while deleting it from WordPress</strong>. <br /> You\'ll need to do that manually!';
-                    }
-
-                    break;
-                default: {
-                        $response['danger'] = 'Unexpected arguments';
-                        break;
-                    }
-            }
-        }
-
         $user = User::find(Auth::id());
 
         //Object Instances

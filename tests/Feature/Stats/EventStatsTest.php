@@ -163,6 +163,11 @@ class EventStatsTest extends StatsTestCase
             $this->assertEquals($v, $result[$k], "Wrong value for $k => $v");
         }
 
+        // Get the wide stats page.
+        $response = $this->get('/party/stats/' . $event->idevents . '/wide');
+        $response->assertSuccessful();
+        $response->assertSee('<span id="ewaste-diverted-value">23</span>');
+
         // Check that the search page loads.
         $this->loginAsTestUser(Role::ADMINISTRATOR);
         $response = $this->get('/search');

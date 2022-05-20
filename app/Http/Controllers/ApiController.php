@@ -94,6 +94,13 @@ class ApiController extends Controller
     public static function groupStats($groupId)
     {
         $group = Group::where('idgroups', $groupId)->first();
+
+        if (!$group) {
+            return response()->json([
+                                        'message' => "Invalid group id $groupId",
+                                    ], 404);
+        }
+
         $stats = $group->getGroupStats();
 
         $result = [
