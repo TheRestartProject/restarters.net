@@ -172,6 +172,6 @@ class EventStatsTest extends StatsTestCase
         $this->loginAsTestUser(Role::ADMINISTRATOR);
         $response = $this->get('/search');
         $response->assertSuccessful();
-        $response->assertSee($event->venue);
+        $response->assertSee(e($event->venue));
     }
 }
