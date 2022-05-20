@@ -781,19 +781,11 @@ class PartyController extends Controller
         }
     }
 
-    public static function stats($id, $class = null)
+    public static function stats($id)
     {
         $event = Party::where('idevents', $id)->first();
 
         $eventStats = $event->getEventStats();
-
-        if (! is_null($class)) {
-            return view('party.stats', [
-                'framed' => true,
-                'party' => $eventStats,
-                'class' => 'wide',
-            ]);
-        }
 
         return view('party.stats', [
             'framed' => true,
