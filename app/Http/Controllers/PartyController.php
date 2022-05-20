@@ -107,7 +107,7 @@ class PartyController extends Controller
 
         if (! is_null($group_id)) {
             // This is the page for a specific group's events.  We want all events for this group.
-            foreach (Party::events()->where('events.group', $group_id)->get() as $event) {
+            foreach (Party::where('events.group', $group_id)->get() as $event) {
                 $e = \App\Http\Controllers\PartyController::expandEvent($event, NULL);
                 $events[] = $e;
             }
