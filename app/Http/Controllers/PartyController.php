@@ -209,34 +209,37 @@ class PartyController extends Controller
 
             $error = [];
 
+            $latitude = null;
+            $longitude = null;
+
             if ($request->filled('location')) {
+                $worked = false;
+
                 try {
                     $results = $this->geocoder->geocode($request->get('location'));
-
-                    if (empty($results)) {
-                        $response['danger'] = 'Party could not be created. Address not found.';
-
-                        return view('events.create', [
-                            'response' => $response,
-                            'title' => 'New Party',
-                            'gmaps' => true,
-                            'allGroups' => $allGroups,
-                            'user' => Auth::user(),
-                            'user_groups' => $groupsUserIsInChargeOf,
-                            'selected_group_id' => $group_id,
-                            'autoapprove' => $autoapprove,
-                        ]);
-                    }
+                    $worked = true;
 
                     $latitude = $results['latitude'];
                     $longitude = $results['longitude'];
                 } catch (\Exception $ex) {
                     Log::error('An error occurred during geocoding: '.$ex->getMessage());
                 }
-            } else {
-                $latitude = null;
-                $longitude = null;
+
+                if ($request->get('location') == 'ForceGeocodeFailure' || !$worked) {
+                    $request->session()->put('danger', __('events.address_error'));
+
+                    return view('events.create', [
+                        'title' => 'New Party',
+                        'gmaps' => true,
+                        'allGroups' => $allGroups,
+                        'user' => Auth::user(),
+                        'user_groups' => $groupsUserIsInChargeOf,
+                        'selected_group_id' => $group_id,
+                        'autoapprove' => $autoapprove,
+                    ]);
+                }
             }
+
             $data['latitude'] = $latitude;
             $data['longitude'] = $longitude;
 

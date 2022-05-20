@@ -607,4 +607,21 @@ class CreateEventTest extends TestCase
             [$restarter], NotifyRestartersOfNewEvent::class
         );
     }
+
+    /**
+     * @test
+     */
+    public function invalid_location_fails() {
+        $this->loginAsTestUser(Role::ADMINISTRATOR);
+        $idgroups = $this->createGroup();
+
+        $eventData = factory(Party::class)->raw([
+                                                    'group' => $idgroups,
+                                                    'location' => 'ForceGeocodeFailure',
+                                                ]);
+
+        // A geocode failure should result in an error alert.
+        $response = $this->post('/party/create/', $eventData);
+        $response->assertSee('alert-danger');
+    }
 }
