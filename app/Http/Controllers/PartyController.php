@@ -892,7 +892,7 @@ class PartyController extends Controller
             $event_id = $volunteer->event;
 
             // Has current logged-in user got permission to remove volunteer?
-            if ((Fixometer::hasRole(Auth::user(), 'Host') && Fixometer::userHasEditPartyPermission($event_id, Auth::user()->id)) || Fixometer::hasRole(Auth::user(), 'Administrator')) {
+            if (((Fixometer::hasRole(Auth::user(), 'Host') || Fixometer::hasRole(Auth::user(), 'NetworkCoordinator')) && Fixometer::userHasEditPartyPermission($event_id, Auth::user()->id)) || Fixometer::hasRole(Auth::user(), 'Administrator')) {
                 //Let's delete the user
                 $delete_user = $volunteer->delete();
 
@@ -1103,8 +1103,7 @@ class PartyController extends Controller
 
             Notification::send($all_restarters, new EventRepairs([
                 'event_name' => $event->getEventName(),
-                'event_url' => url('/party/view/'.intval($event_id).'#devices'),
-                'preferences' => url('/profile/edit'),
+                'event_url' => url('/party/view/'.intval($event_id).'#devices')
             ]));
 
             return redirect()->back()->with('success', __('events.review_requested'));
