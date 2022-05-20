@@ -183,5 +183,8 @@ class EventStatsTest extends StatsTestCase
         $response->assertSuccessful();
         $response->assertSee(e($event->venue));
 
+        $response = $this->get("/search?fltr=1&parties[]={$event->idevents}");
+        $response->assertSee('id="key-stats"');
+        $response->assertSee(e($event->venue));
     }
 }
