@@ -18,18 +18,29 @@ use Tests\TestCase;
 
 class AddRemoveVolunteerTest extends TestCase
 {
-    public function testAddRemove()
+    /**
+     * @dataProvider roleProvider
+     */
+
+    public function testAddRemove($role)
     {
         $this->withoutExceptionHandling();
 
         $group = factory(Group::class)->create();
+        $network = factory(Network::class)->create();
+        $network->addGroup($group);
         $event = factory(Party::class)->create([
                                                    'group' => $group,
                                                    'event_start_utc' => '2130-01-01T12:13:00+00:00',
                                                    'event_end_utc' => '2130-01-01T13:14:00+00:00',
                                                ]);
 
-        $host = factory(User::class)->states('Administrator')->create();
+        $host = factory(User::class)->states($role)->create();
+
+        if ($role == 'NetworkCoordinator') {
+            $network->addCoordinator($host);
+        }
+
         $this->actingAs($host);
 
         $restarter = factory(User::class)->states('Restarter')->create();
@@ -129,6 +140,13 @@ class AddRemoveVolunteerTest extends TestCase
         $this->post('/party/remove-volunteer/', [
             'id' => $volunteer->idevents_users,
         ])->assertSee('true');
+    }
+
+    public function roleProvider() {
+        return [
+            [ 'Administrator' ],
+            [ 'NetworkCoordinator' ],
+        ];
     }
 
     public function testAdminRemoveReaddHost() {
