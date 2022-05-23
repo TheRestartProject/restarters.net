@@ -1,6 +1,6 @@
 <template>
   <div>
-    <CollapsibleSection class="lineheight" collapsed :count="upcoming.length" count-badge :heading-level="headingLevel">
+    <CollapsibleSection class="lineheight" collapsed :count="upcomingOrActive.length" count-badge :heading-level="headingLevel">
       <template slot="title">
         <div class="d-flex justify-content-between w-100">
         <div>
@@ -18,12 +18,12 @@
       </template>
       <template slot="content">
         <b-tabs class="ourtabs w-100">
-          <GroupEventsTab active :limit="limit" :events="upcoming" :canedit="canedit" :add-group-name="addGroupName" title="groups.upcoming_active" noneMessage="groups.no_upcoming_events" />
+          <GroupEventsTab active :limit="limit" :events="upcomingOrActive" :canedit="canedit" :add-group-name="addGroupName" title="groups.upcoming_active" noneMessage="groups.no_upcoming_events" />
           <GroupEventsTab :limit="limit" :events="past" :canedit="canedit" :add-group-name="addGroupName" title="groups.past" noneMessage="groups.no_past_events" past />
         </b-tabs>
       </template>
     </CollapsibleSection>
-    <CollapsibleSection class="lineheight mt-4" collapsed :count="upcoming.length" count-badge :heading-level="headingLevel" v-if="showOther">
+    <CollapsibleSection class="lineheight mt-4" collapsed :count="upcomingOrActive.length" count-badge :heading-level="headingLevel" v-if="showOther">
       <template slot="title">
         <div class="d-flex justify-content-between w-100">
           <div>
@@ -111,7 +111,8 @@ export default {
     },
     location: {
       type: String,
-      required: true
+      required: false,
+      default: null
     },
   },
   computed: {
@@ -124,8 +125,8 @@ export default {
     past() {
       return this.reverse.filter(e => e.finished && !e.nearby && !e.all)
     },
-    upcoming() {
-      return this.events.filter(e => e.upcoming && !e.nearby && !e.all)
+    upcomingOrActive() {
+      return this.events.filter(e => (e.upcoming || e.inprogress) && !e.nearby && !e.all)
     },
     nearby() {
       return this.events.filter(e => e.nearby)
