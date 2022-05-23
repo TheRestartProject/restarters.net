@@ -66,7 +66,7 @@ final class Versions
   'grpc/grpc' => '1.39.0@101485614283d1ecb6b2ad1d5b95dc82495931db',
   'guzzlehttp/guzzle' => '6.5.5@9d4290de1cfd701f38099ef7e183b64b4b7b0c5e',
   'guzzlehttp/promises' => '1.5.1@fe752aedc9fd8fcca3fe7ad05d419d32998a06da',
-  'guzzlehttp/psr7' => '1.8.3@1afdd860a2566ed3c2b0b4a3de6e23434a79ec85',
+  'guzzlehttp/psr7' => '1.8.5@337e3ad8e5716c15f9657bd214d16cc5e69df268',
   'hieu-le/wordpress-xmlrpc-client' => '2.6.0@4eced3821b41ba21ce314569b79d7302d65f4b16',
   'http-interop/http-factory-guzzle' => '1.2.0@8f06e92b95405216b237521cc64c804dd44c4a81',
   'intervention/image' => '2.7.0@9a8cc99d30415ec0b3f7649e1647d03a55698545',
@@ -154,7 +154,7 @@ final class Versions
   'vlucas/phpdotenv' => 'v3.6.9@a1bf4c9853d90ade427b4efe35355fc41b3d6988',
   'wouternl/laravel-drip' => '1.2.4@f9d96140ba62f4ddb4df909e20931e897e0edd54',
   'yandex/translate-api' => '1.5.2@c99e69cde3e688fc0f99c4d8a21585226a8e1938',
-  'laravel/laravel' => 'dev-production@4d59943b1b4874f376cb48d2c4623c78f2c1f83f',
+  'laravel/laravel' => 'dev-production@d93417c0e71c01bc58345603b1de4f3010527964',
 );
 
     private function __construct()
