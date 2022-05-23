@@ -5,7 +5,9 @@ namespace Tests\Feature\Stats;
 use App\Device;
 use App\Group;
 use App\Party;
+use App\User;
 use Carbon\Carbon;
+use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Tests\Feature\Stats\StatsTestCase;
 
 class GroupStatsTest extends StatsTestCase
@@ -336,5 +338,26 @@ class GroupStatsTest extends StatsTestCase
             $this->assertArrayHasKey($k, $result, "Missing array key $k");
             $this->assertEquals($v, $result[$k], "Wrong value for $k => $v");
         }
+    }
+
+    /** @test */
+    public function get_of_stats_after_deletion() {
+
+        $admin = factory(User::class)->states('Administrator')->create([
+                                                                           'api_token' => '1234',
+                                                                       ]);
+        $this->actingAs($admin);
+
+        $idgroups = $this->createGroup();
+
+        $response = $this->get("/api/group/$idgroups/stats?api_token=1234");
+        $stats = json_decode($response->getContent(), true);
+        $this->assertEquals(0, $stats['num_hours_volunteered']);
+
+        Group::findOrFail($idgroups)->delete();
+
+        $response = $this->get("/api/group/$idgroups/stats?api_token=1234");
+        $err = $response->getStatusCode();
+        $this->assertEquals($err, 404);
     }
 }

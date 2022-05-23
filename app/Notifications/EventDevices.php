@@ -52,7 +52,7 @@ class EventDevices extends Notification implements ShouldQueue
                     ], $locale))
                   ->action(__('notification.event_devices_action', [], $locale), $this->arr['event_url'])
                   ->line(__('notifications.email_preferences', [
-                    'url' => $this->arr['preferences']
+                      'url' => url('/user/edit/'.$notifiable->id)
                   ], $locale));
         }
     }

@@ -291,7 +291,6 @@ Route::group(['middleware' => ['auth', 'verifyUserConsent', 'ensureAPIToken']], 
         Route::get('/accept-invite/{id}/{hash}', 'PartyController@confirmInvite');
         Route::get('/cancel-invite/{id}', 'PartyController@cancelInvite');
         Route::post('/remove-volunteer', 'PartyController@removeVolunteer');
-        Route::get('/get-group-emails/{event_id}', 'PartyController@getGroupEmails');
         Route::get('/get-group-emails-with-names/{event_id}', 'PartyController@getGroupEmailsWithNames');
         Route::post('/update-quantity', 'PartyController@updateQuantity');
         Route::post('/image-upload/{id}', 'PartyController@imageUpload');

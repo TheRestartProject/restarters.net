@@ -60,7 +60,7 @@ class RSVPEvent extends Notification implements ShouldQueue
               'event' => $this->arr['event_venue']
           ], $locale))
           ->action(__('notifications.rsvp_action', [], $locale), $this->arr['event_url'])
-          ->line(__('partials.notification_footer', [
+          ->line(__('notifications.email_preference', [
               'url' => url('/user/edit/' . $notifiable->id)
           ]));
     }
