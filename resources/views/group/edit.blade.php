@@ -125,7 +125,7 @@
                             </small>
 
                             <div class="vue">
-                              <GroupTimeZone value="{{ App\Group::find($formdata->idgroups)->timezone }}" />
+                              <GroupTimeZone value="{{ App\Group::find($formdata->idgroups)->timezone }}" inherit />
                             </div>
 
                           </div>

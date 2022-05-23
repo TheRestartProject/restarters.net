@@ -55,6 +55,7 @@ class GroupCreateTest extends TestCase
             'website' => 'https://therestartproject.org',
             'location' => 'London',
             'free_text' => 'Some text.',
+            'timezone' => 'Europe/London'
         ]);
 
         $this->assertContains('That group name (Test Group0) already exists', $response->getContent());

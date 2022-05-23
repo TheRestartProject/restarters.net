@@ -6,9 +6,9 @@
         :maxMatches="3"
         :data="timezones"
         :minMatchingChars="1"
-        inputClass="form-control field"
+        inputClass="form-control field timezone"
     />
-    <small class="form-text text-muted">
+    <small class="form-text text-muted" v-if="inherit">
       {{ __('groups.timezone_placeholder') }}
     </small>
     <input type="hidden" name="timezone" :value="currentValue" />
@@ -24,6 +24,16 @@ export default {
       type: String,
       required: false,
       default: null
+    },
+    inherit: {
+      type: Boolean,
+      required: false,
+      default: false
+    },
+    required: {
+      type: Boolean,
+      required: false,
+      default: false
     }
   },
   components: { VueTypeaheadBootstrap },
@@ -40,6 +50,12 @@ export default {
 
     if (ret.status && ret.status === 200 && ret.data) {
       this.timezones = ret.data.map(t => t.name)
+    }
+
+    if (this.required) {
+      // The plugin doesn't let us set the required attribute - so do that manually here.
+      const input = this.$el.querySelector('input')
+      input.required = true
     }
   }
 }

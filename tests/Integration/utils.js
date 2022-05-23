@@ -34,6 +34,7 @@ exports.createGroup = async function(page, baseURL) {
 
   // Always say London for geocoding.
   await page.fill('#autocomplete', 'London')
+  await page.fill('.timezone', 'Europe/London')
 
   await page.click('button[type=submit]')
 
