@@ -542,14 +542,14 @@ class User extends Authenticatable implements Auditable, HasLocalePreference
         return $network->include_in_zapier;
     }
 
-    public function networks()
-    {
-        return $this->belongsToMany(Network::class, 'user_network', 'user_id', 'network_id');
-    }
-
     public function isCoordinatorOf($network)
     {
         return $this->networks->contains($network);
+    }
+
+    public function networks()
+    {
+        return $this->belongsToMany(Network::class, 'user_network', 'user_id', 'network_id');
     }
 
     public function isCoordinatorForGroup($group)

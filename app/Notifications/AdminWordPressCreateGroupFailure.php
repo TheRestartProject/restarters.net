@@ -53,7 +53,9 @@ class AdminWordPressCreateGroupFailure extends Notification implements ShouldQue
                   ->greeting(__('notifications.greeting', [], $notifiable->language))
                   ->line('Error creating group page for \''.$this->arr['group_name'].'\' on WordPress.')
                   ->action('View group', $this->arr['group_url'])
-                  ->line('If you would like to stop receiving these emails, please visit <a href="'.url('/user/edit/'.$notifiable->id).'">your preferences</a> on your account.');
+                  ->line(__('notifications.email_preferences', [
+                      'url' => url('/user/edit/'.$notifiable->id)
+                  ], $notifiable->locale));
     }
 
     /**

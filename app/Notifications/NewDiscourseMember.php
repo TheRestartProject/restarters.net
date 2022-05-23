@@ -54,7 +54,7 @@ class NewDiscourseMember extends Notification implements ShouldQueue
             ->line(__('groups.talk_group_add_body', [
                 'group_name' => $this->arr['group_name']
             ]))
-            ->line(__('partials.notification_footer', [
+            ->line(__('notifications.email_preference', [
                 'url' => url('/user/edit/' . $notifiable->id)
             ]));
     }

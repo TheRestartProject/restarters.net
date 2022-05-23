@@ -55,7 +55,9 @@ class AdminModerationEventPhotos extends Notification implements ShouldQueue
                       ->line('Photos have been uploaded to an event: \''.$this->arr['event_venue'].'\'.')
                       ->action('View event', $this->arr['event_url'])
                       ->line('These photos might need your moderation, if they haven\'t yet been moderated by another administrator.')
-                      ->line('If you would like to stop receiving these notifications, please edit <a href="'.url('/user/edit/'.$notifiable->id).'">your preferences</a> on your account.');
+                      ->line(__('notifications.email_preferences', [
+                          'url' => url('/user/edit/'.$notifiable->id)
+                      ], $notifiable->locale));
     }
 
     /**
