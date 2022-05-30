@@ -10,6 +10,15 @@ use Illuminate\Notifications\Notification;
 // Don't ShouldQueue yet - we're intentionally only doing this for admin notifications.
 class BaseNotification extends Notification
 {
+    // Wait for 10 minutes between retries.
+    public $retryAfter = 600;
+
+    public function retryUntil()
+    {
+        // Retry for 4 days - bank holiday weekends.
+        return now()->addDays(4);
+    }
+
     public function failed($e)
     {
         if (gettype($e) == 'string') {
