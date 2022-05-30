@@ -16,6 +16,7 @@ use App\User;
 use Carbon\Carbon;
 use DB;
 use Illuminate\Support\Facades\Notification;
+use Illuminate\Support\Facades\Queue;
 use Tests\TestCase;
 use App\Notifications\EventConfirmed;
 
@@ -607,5 +608,49 @@ class CreateEventTest extends TestCase
         Notification::assertNotSentTo(
             [$restarter], NotifyRestartersOfNewEvent::class
         );
+    }
+
+    /** @test */
+    public function notifications_are_queued_as_expected()
+    {
+        // At the moment we are queueing (backgrounding) admin notifications but not user notifications.
+        //
+        // Don't call Notification::fake() - we want real notifications.
+        $this->withoutExceptionHandling();
+
+        // Create an admin
+        $admin = factory(User::class)->state('Administrator')->create();
+        // Create a network with a group.
+        $network = factory(Network::class)->create();
+        $group = factory(Group::class)->create();
+        $network->addGroup($group);
+
+        // Make the admin coordinators of the network, so that they should get notified.
+        $network->addCoordinator($admin);
+
+        // Log in so that we can create an event.
+        $host = factory(User::class)->states('Host')->create();
+        $group->addVolunteer($host);
+        $group->makeMemberAHost($host);
+        $this->actingAs($host);
+
+        // Create an event.
+        $initialQueueSize = \Illuminate\Support\Facades\Queue::size();
+        $event = factory(Party::class)->raw();
+        $event['group'] = $group->idgroups;
+        $response = $this->post('/party/create/', $event);
+        $response->assertStatus(302);
+
+        // Should have queued AdminModerationEvent.
+        $queueSize = Queue::size();
+        self::assertGreaterThan($initialQueueSize, $queueSize);
+
+        // Approval should generate a notification to the host which is not queued.
+        $event = Party::latest()->first();
+        $event->approve();
+
+        # Should not have queued anything
+        $queueSize2 = Queue::size();
+        self::assertEquals($queueSize, $queueSize2);
     }
 }
