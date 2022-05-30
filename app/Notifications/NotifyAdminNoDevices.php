@@ -7,7 +7,7 @@ use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Notifications\Messages\MailMessage;
 use Illuminate\Notifications\Notification;
 
-class NotifyAdminNoDevices extends Notification implements ShouldQueue
+class NotifyAdminNoDevices extends BaseNotification implements ShouldQueue
 {
     use Queueable;
 

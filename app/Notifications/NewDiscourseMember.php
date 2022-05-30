@@ -4,9 +4,8 @@ namespace App\Notifications;
 
 use Illuminate\Bus\Queueable;
 use Illuminate\Notifications\Messages\MailMessage;
-use Illuminate\Notifications\Notification;
 
-class NewDiscourseMember extends Notification
+class NewDiscourseMember extends BaseNotification
 {
     use Queueable;
 

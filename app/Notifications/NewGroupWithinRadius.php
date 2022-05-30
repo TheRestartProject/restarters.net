@@ -4,9 +4,8 @@ namespace App\Notifications;
 
 use Illuminate\Bus\Queueable;
 use Illuminate\Notifications\Messages\MailMessage;
-use Illuminate\Notifications\Notification;
 
-class NewGroupWithinRadius extends Notification
+class NewGroupWithinRadius extends BaseNotification
 {
     use Queueable;
 

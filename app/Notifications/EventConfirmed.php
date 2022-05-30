@@ -5,9 +5,8 @@ namespace App\Notifications;
 use App\Party;
 use Illuminate\Bus\Queueable;
 use Illuminate\Notifications\Messages\MailMessage;
-use Illuminate\Notifications\Notification;
 
-class EventConfirmed extends Notification
+class EventConfirmed extends BaseNotification
 {
     use Queueable;
 

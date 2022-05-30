@@ -4,9 +4,8 @@ namespace App\Notifications;
 
 use Illuminate\Bus\Queueable;
 use Illuminate\Notifications\Messages\MailMessage;
-use Illuminate\Notifications\Notification;
 
-class NotifyRestartersOfNewEvent extends Notification
+class NotifyRestartersOfNewEvent extends BaseNotification
 {
     use Queueable;
 
