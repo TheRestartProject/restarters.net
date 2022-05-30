@@ -12,14 +12,12 @@ class BaseNotification extends Notification
 {
     public function failed($e)
     {
-        if (app()->bound('sentry')) {
-            if (gettype($e) == 'string') {
-                app('sentry')->captureMessage("Notification failed with $e");
-            } else if ($e instanceof \Exception) {
-                app('sentry')->captureException($e);
-            } else {
-                app('sentry')->captureMessage('Notification in an unexpected way ' . gettype($e));
-            }
+        if (gettype($e) == 'string') {
+            \Sentry\captureMessage("Notification failed with $e");
+        } else if ($e instanceof \Exception) {
+            \Sentry\captureException($e);
+        } else {
+            \Sentry\captureMessage('Notification in an unexpected way ' . gettype($e));
         }
     }
 }
