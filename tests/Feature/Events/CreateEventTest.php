@@ -634,6 +634,19 @@ class CreateEventTest extends TestCase
         $group->makeMemberAHost($host);
         $this->actingAs($host);
 
+        // Clear any jobs queued in earlier tests.
+        $max = 1000;
+        do {
+            $job = Queue::pop();
+
+            if ($job) {
+                $job->fail('removed in UT');
+            }
+
+            $max--;
+        }
+        while (Queue::size() > 0 && $max > 0);
+
         // Create an event.
         $initialQueueSize = \Illuminate\Support\Facades\Queue::size();
         $event = factory(Party::class)->raw();
@@ -644,13 +657,26 @@ class CreateEventTest extends TestCase
         // Should have queued AdminModerationEvent.
         $queueSize = Queue::size();
         self::assertGreaterThan($initialQueueSize, $queueSize);
+        $max = 1000;
+        do {
+            $job = Queue::pop();
+
+            if ($job) {
+                self::assertStringContainsString('AdminModerationEvent', $job->getRawBody());
+                $job->fail('removed in UT');
+            }
+
+            $max--;
+        }
+        while (Queue::size() > 0 && $max > 0);
+
+        self::assertEquals(0, Queue::size());
 
         // Approval should generate a notification to the host which is not queued.
         $event = Party::latest()->first();
         $event->approve();
 
         # Should not have queued anything
-        $queueSize2 = Queue::size();
-        self::assertEquals($queueSize, $queueSize2);
+        self::assertEquals(0, Queue::size());
     }
 }
