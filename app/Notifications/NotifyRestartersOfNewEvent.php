@@ -3,11 +3,10 @@
 namespace App\Notifications;
 
 use Illuminate\Bus\Queueable;
-use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Notifications\Messages\MailMessage;
 use Illuminate\Notifications\Notification;
 
-class NotifyRestartersOfNewEvent extends Notification implements ShouldQueue
+class NotifyRestartersOfNewEvent extends Notification
 {
     use Queueable;
 

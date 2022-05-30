@@ -4,11 +4,10 @@ namespace App\Notifications;
 
 use App\Party;
 use Illuminate\Bus\Queueable;
-use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Notifications\Messages\MailMessage;
 use Illuminate\Notifications\Notification;
 
-class EventConfirmed extends Notification implements ShouldQueue
+class EventConfirmed extends Notification
 {
     use Queueable;
 
