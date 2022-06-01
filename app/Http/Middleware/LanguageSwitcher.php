@@ -27,6 +27,7 @@ class LanguageSwitcher
             if (in_array($locale, LaravelLocalization::getSupportedLanguagesKeys())) {
                 $this->setLocale($locale);
             }
+        // We have a 'UT' locale for testing.
         } elseif (session('locale') && session('locale') != 'UT') {
             // Otherwise, check if locale session already exists.
             // If it does, continue to maintain that locale.
