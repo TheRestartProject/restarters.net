@@ -393,9 +393,9 @@ Route::group(['middleware' => ['ensureAPIToken']], function () {
         return new \App\Services\CheckAuthService;
     });
 
-    Route::prefix('test')->group(function () {
-        Route::get('/', 'TestController@index');
-        Route::get('/styles', 'TestController@styles');
-        Route::get('/styles/find', 'TestController@stylesFind');
+    Route::prefix('style')->group(function () {
+        Route::get('/', 'StyleController@index');
+        Route::get('/guide', 'StyleController@guide');
+        Route::get('/find', 'StyleController@find');
     });
 });

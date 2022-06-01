@@ -236,11 +236,11 @@ class NetworkTest extends TestCase
         $response = $this->get('/networks');
         $response->assertDontSee(__('networks.index.your_networks_no_networks'));
         $response->assertDontSee(__('networks.index.all_networks_explainer'));
-        $response->assertSee(htmlspecialchars($network->name));
+        $response->assertSee(e($network->name));
 
         // Coordinator should show on network page.
         $response = $this->get('/networks/' . $network->id);
-        $response->assertSee(htmlspecialchars($coordinator->name));
+        $response->assertSee(e($coordinator->name));
 
         // Group should not show on network page yet.
         $response = $this->get('/group/network/' . $network->id);
