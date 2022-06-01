@@ -29,13 +29,12 @@ class BasicTest extends TestCase
         $rsp = $this->get('/profile/notifications');
         $rsp->assertSee(__('notifications.new_group_title'));
 
+        // Mark it as read.
         if (preg_match('/.*(markAsRead\/.+?)".*/', $rsp->getContent(), $matches)) {
             $rsp = $this->get($matches[1]);
             $rsp->assertRedirect();
         } else {
             self::assertFalse(true);
         }
-
-        // Mark it as read.
     }
 }
