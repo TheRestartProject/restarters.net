@@ -81,7 +81,7 @@
                                 </small>
 
                                 <div class="vue">
-                                  <GroupTimeZone required />
+                                  <GroupTimeZone />
                                 </div>
                               </div>
 

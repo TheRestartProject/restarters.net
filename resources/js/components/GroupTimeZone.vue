@@ -29,11 +29,6 @@ export default {
       type: Boolean,
       required: false,
       default: false
-    },
-    required: {
-      type: Boolean,
-      required: false,
-      default: false
     }
   },
   components: { VueTypeaheadBootstrap },
@@ -50,12 +45,6 @@ export default {
 
     if (ret.status && ret.status === 200 && ret.data) {
       this.timezones = ret.data.map(t => t.name)
-    }
-
-    if (this.required) {
-      // The plugin doesn't let us set the required attribute - so do that manually here.
-      const input = this.$el.querySelector('input')
-      input.required = true
     }
   }
 }
