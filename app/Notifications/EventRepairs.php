@@ -58,7 +58,7 @@ class EventRepairs extends Notification implements ShouldQueue
             ], $locale))
             ->action(__('notification.event_repairs_action', [], $locale), url($this->arr['event_url']))
             ->line(__('notifications.email_preferences', [
-                'url' => $this->arr['preferences']
+                'url' => url('/user/edit/'.$notifiable->id)
             ], $locale));
     }
 

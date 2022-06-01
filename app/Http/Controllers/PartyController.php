@@ -798,31 +798,6 @@ class PartyController extends Controller
         ]);
     }
 
-    public function getGroupEmails($event_id, $object = false)
-    {
-        $group_user_ids = UserGroups::where('group', Party::find($event_id)->group)
-            ->pluck('user')
-            ->toArray();
-
-        // Users already associated with the event.  Normally this would include the host, unless they've been
-        // removed.
-        // (Not including those invited but not RSVPed)
-        $event_user_ids = EventsUsers::where('event', $event_id)
-            ->where('status', 'like', '1')
-            ->pluck('user')
-            ->toArray();
-
-        $unique_user_ids = array_diff($group_user_ids, $event_user_ids);
-
-        if ($object) {
-            return User::whereIn('id', $unique_user_ids)->get();
-        }
-
-        $group_users = User::whereIn('id', $unique_user_ids)->pluck('email')->toArray();
-
-        return json_encode($group_users);
-    }
-
     /**
      * This is called via ajax in the Invite Volunteers to Event modal.
      * It finds the users associated with the group that the event is for,
@@ -914,7 +889,7 @@ class PartyController extends Controller
             $event_id = $volunteer->event;
 
             // Has current logged-in user got permission to remove volunteer?
-            if ((Fixometer::hasRole(Auth::user(), 'Host') && Fixometer::userHasEditPartyPermission($event_id, Auth::user()->id)) || Fixometer::hasRole(Auth::user(), 'Administrator')) {
+            if (((Fixometer::hasRole(Auth::user(), 'Host') || Fixometer::hasRole(Auth::user(), 'NetworkCoordinator')) && Fixometer::userHasEditPartyPermission($event_id, Auth::user()->id)) || Fixometer::hasRole(Auth::user(), 'Administrator')) {
                 //Let's delete the user
                 $delete_user = $volunteer->delete();
 
@@ -1125,8 +1100,7 @@ class PartyController extends Controller
 
             Notification::send($all_restarters, new EventRepairs([
                 'event_name' => $event->getEventName(),
-                'event_url' => url('/party/view/'.intval($event_id).'#devices'),
-                'preferences' => url('/profile/edit'),
+                'event_url' => url('/party/view/'.intval($event_id).'#devices')
             ]));
 
             return redirect()->back()->with('success', __('events.review_requested'));
@@ -1134,10 +1108,6 @@ class PartyController extends Controller
 
         return redirect()->back()->with('warning', __('events.review_requested_permissions'));
     }
-
-    // TODO: is this alive?
-    // It looks like recent-ish code, but I recall James mentioned recently that
-    // he couldn't delete events.  Perhaps it's disappeared from the interface?
 
     /**
      * Called via AJAX.

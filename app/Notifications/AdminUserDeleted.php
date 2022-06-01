@@ -50,7 +50,9 @@ class AdminUserDeleted extends Notification implements ShouldQueue
                       ->subject('User Deleted')
                       ->greeting(__('notifications.greeting', [], $notifiable->language))
                       ->line('The user "'.$this->arr['name'].'" has deleted their Restarters account.')
-                      ->line('If you would like to stop receiving these emails, please visit <a href="'.url('/user/edit/'.$notifiable->id).'">your preferences</a> on your account.');
+                      ->line(__('notifications.email_preferences', [
+                          'url' => url('/user/edit/'.$notifiable->id)
+                      ], $notifiable->locale));
     }
 
     /**

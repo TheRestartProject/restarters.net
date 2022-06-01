@@ -14,6 +14,7 @@ use Illuminate\Foundation\Testing\WithoutMiddleware;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Notification;
 use Tests\TestCase;
+use Illuminate\Support\Facades\DB;
 
 class ModerationEventPhotosNotificationTest extends TestCase
 {
@@ -46,12 +47,22 @@ class ModerationEventPhotosNotificationTest extends TestCase
 
         \Storage::fake('avatars');
 
-        $file = UploadedFile::fake()->image('avatar.jpg');
+        $_SERVER['DOCUMENT_ROOT'] = getcwd();
+        \FixometerFile::$uploadTesting = TRUE;
+        file_put_contents('/tmp/UT.jpg', file_get_contents('public/images/community.jpg'));
+
+        $_FILES = [
+            'file' => [
+                'error'    => "0",
+                'name'     => 'UT.jpg',
+                'size'     => 123,
+                'tmp_name' => [ '/tmp/UT.jpg' ],
+                'type'     => 'image/jpg'
+            ]
+        ];
 
         $response = $this->actingAs($this->restarter)
-                         ->json('POST', '/party/image-upload/'.$this->event->getKey(), [
-                             'file' => $file,
-                         ]);
+                         ->json('POST', '/party/image-upload/'.$this->event->getKey(), []);
         $response->assertOk();
 
         $admins = $this->admins;
@@ -71,6 +82,14 @@ class ModerationEventPhotosNotificationTest extends TestCase
                 return true;
             }
         );
+
+        // Delete the image.
+        $image = \DB::select(DB::raw("SELECT idimages, path FROM images ORDER BY idimages DESC LIMIT 1"));
+        $idimages = $image[0]->idimages;
+        $path = $image[0]->path;
+        $response = $this->get("/party/image/delete/{$event->idevents}/$idimages/$path");
+        $response->assertRedirect();
+        $response->assertSessionHas('success');
     }
 
     protected function init_event_and_dependencies()

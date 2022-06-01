@@ -54,7 +54,9 @@ class AdminModerationGroup extends Notification implements ShouldQueue
                   ->line('A new group has been created: \''.$this->arr['group_name'].'\'.')
                   ->action('View group', $this->arr['group_url'])
                   ->line('This group might need your moderation, if it hasn\'t yet been moderated by another administrator.')
-                  ->line('If you would like to stop receiving these emails, please visit <a href="'.url('/user/edit/'.$notifiable->id).'">your preferences</a> on your account.');
+                  ->line(__('notifications.email_preferences', [
+                      'url' => url('/user/edit/'.$notifiable->id)
+                  ], $notifiable->locale));
     }
 
     /**

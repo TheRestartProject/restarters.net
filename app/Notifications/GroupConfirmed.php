@@ -52,7 +52,7 @@ class GroupConfirmed extends Notification implements ShouldQueue
             ], $locale))
             ->action(__('notifications.group_confirmed_action', [], $locale), url('/group/view/' . $this->group->idgroups))
             ->line(__('notifications.email_preferences', [
-                'url' => url('/profile/edit')
+                'url' => url('/user/edit/'.$notifiable->id)
             ], $locale));
     }
 

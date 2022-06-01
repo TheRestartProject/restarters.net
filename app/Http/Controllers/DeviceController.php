@@ -86,7 +86,7 @@ class DeviceController extends Controller
         $brand = $request->input('brand');
         $model = $request->input('model');
         $item_type = $request->input('item_type');
-        $age = $request->input('age',0);
+        $age = $request->filled('age') ? $request->input('age',0) : 0;
         $problem = $request->input('problem');
         $notes = $request->input('notes');
         $repair_status = $request->input('repair_status');
@@ -212,7 +212,7 @@ class DeviceController extends Controller
         $brand = $request->input('brand');
         $item_type = $request->input('item_type');
         $model = $request->input('model');
-        $age = $request->input('age',0);
+        $age = $request->filled('age') ? $request->input('age',0) : 0;
         $problem = $request->input('problem');
         $notes = $request->input('notes');
         $repair_status = $request->input('repair_status');
