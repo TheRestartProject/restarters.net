@@ -124,6 +124,7 @@ class GroupController extends Controller
 
                 if (empty($geocoded)) {
                     $response['danger'] = __('groups.geocode_failed');
+                    \Sentry\CaptureMessage($response['danger']);
 
                     return view('group.create', [
                         'title' => 'New Group',
@@ -187,6 +188,7 @@ class GroupController extends Controller
                         }
                     } else {
                         $response['danger'] = 'Group could <strong>not</strong> be created. Something went wrong with the database.';
+                        \Sentry\CaptureMessage($response['danger']);
                     }
                 } catch (QueryException $e) {
                     $errorCode = $e->errorInfo[1];
@@ -194,12 +196,15 @@ class GroupController extends Controller
                         $response['danger'] = __('groups.duplicate', [
                             'name' => $name,
                         ]);
+                        \Sentry\CaptureMessage($response['danger']);
                     } else {
                         $response['danger'] = __('groups.database_error');
+                        \Sentry\CaptureMessage($response['danger']);
                     }
                 }
             } else {
                 $response['danger'] = __('groups.create_failed');
+                \Sentry\CaptureMessage($response['danger']);
             }
 
             if (! isset($response)) {
@@ -424,6 +429,7 @@ class GroupController extends Controller
         $message = $request->input('message_to_restarters');
 
         if (empty($emails)) {
+            \Sentry\CaptureMessage('You have not entered any emails!');
             return redirect()->back()->with('warning', 'You have not entered any emails!');
         }
 
@@ -496,6 +502,7 @@ class GroupController extends Controller
             return redirect()->back()->with('success', 'Invites sent!');
         }
 
+        // Don't log to Sentry - legitimate user error.
         return redirect()->back()->with('warning', 'Invites sent - apart from these ('.rtrim(implode(', ', $not_sent), ', ').') who have already joined the group, have already been sent an invite, or have not opted in to receive emails');
     }
 
@@ -504,6 +511,7 @@ class GroupController extends Controller
         // Find user/group relationship based on the invitation hash.
         $user_group = UserGroups::where('status', $hash)->where('group', $group_id)->first();
         if (empty($user_group)) {
+            \Sentry\CaptureMessage('Something went wrong - this invite is invalid or has expired');
             return redirect('/group/view/'.intval($group_id))->with('warning', 'Something went wrong - this invite is invalid or has expired');
         }
 
@@ -558,6 +566,7 @@ class GroupController extends Controller
 
                 if (empty($geocoded)) {
                     $response['danger'] = __('groups.geocode_failed');
+                    \Sentry\CaptureMessage($response['danger']);
                     $group = Group::find($id);
                     $images = $File->findImages(env('TBL_GROUPS'), $id);
                     $tags = GroupTags::all();
@@ -638,6 +647,7 @@ class GroupController extends Controller
 
             if (! $u) {
                 $response['danger'] = 'Something went wrong. Please check the data and try again.';
+                \Sentry\CaptureMessage($response['danger']);
                 echo $response['danger'];
             } else {
                 $response['success'] = 'Group updated!';
@@ -840,8 +850,9 @@ class GroupController extends Controller
 
         if ($alreadyInGroup) {
             $response['warning'] = 'You are already part of this group';
+            \Sentry\CaptureMessage($response['warning']);
 
-            return redirect()->back()->with('response', $response)->with('warning', 'You are already part of this group');
+            return redirect()->back()->with('response', $response)->with('warning', $response['warning']);
         }
 
         try {
@@ -879,6 +890,7 @@ class GroupController extends Controller
                 ]));
         } catch (\Exception $e) {
             $response['danger'] = 'Failed to follow this group';
+            \Sentry\CaptureMessage($response['danger']);
 
             return redirect()->back()->with('response', $response)->with('warning', 'Failed to follow this group');
         }
@@ -939,6 +951,7 @@ class GroupController extends Controller
             return redirect()->back()->with('success', 'We have made '.$user->name.' a host for this group');
         }
 
+        \Sentry\CaptureMessage('Sorry, you do not have permission to do this');
         return redirect()->back()->with('warning', 'Sorry, you do not have permission to do this');
     }
 
@@ -962,10 +975,12 @@ class GroupController extends Controller
 
                 return redirect()->back()->with('success', 'We have removed '.$user->name.' from this group');
             }
+            \Sentry\CaptureMessage('We are unable to remove from this group');
 
             return redirect()->back()->with('warning', 'We are unable to remove '.$user->name.' from this group');
         }
 
+        \Sentry\CaptureMessage('Sorry, you do not have permission to do this');
         return redirect()->back()->with('warning', 'Sorry, you do not have permission to do this');
     }
 

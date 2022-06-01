@@ -369,6 +369,7 @@ class DeviceController extends Controller
             return response()->json(['success' => false]);
         }
 
+        \Sentry\CaptureMessage('You do not have the right permissions for deleting a device');
         return redirect('/party/view/'.$eventId)->with('warning', 'You do not have the right permissions for deleting a device');
     }
 

@@ -47,6 +47,7 @@ class RoleController extends Controller
                 $update = $role->edit($formid, $permissions);
                 if (! $update) {
                     $response['danger'] = 'Something went wrong. Could <strong>not</strong> update the permissions.';
+                    \Sentry\CaptureMessage($response['danger']);
                 } else {
                     $response['success'] = 'Permissions for this Role have been updated.';
                 }
