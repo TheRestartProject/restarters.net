@@ -199,4 +199,6 @@ Trouvez la page principale du Repair Café ici: :link.
 
 Apprenez comment utiliser la page du Repair Café ici: :help',
   'talk_group_add_title' => 'Bienvenue sur :group_name',
+  'editing' => 'Editer',
+  'groups_location_placeholder' => 'Entrez votre adresse',
 ];
