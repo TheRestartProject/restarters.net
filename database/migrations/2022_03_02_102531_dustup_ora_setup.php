@@ -117,34 +117,85 @@ class DustupOraSetup extends Migration
     {
         return [
             1 => [
-                'title' => 'Power/battery',
-                'description' => '',
-                'regex' => 'batter|power|start|switch|charg|plug|bricked',
-            ],
-            2 => [
-                'title' => 'Motor',
+                'title' => 'Accessories/attachments',
                 'description' => '',
                 'regex' => '',
             ],
-            18 => [
+            2 => [
+                'title' => 'Power/battery',
+                'description' => '',
+                'regex' => 'batter|power|start|switch|charg|plug',
+            ],
+            3 => [
+                'title' => 'Brush',
+                'description' => '',
+                'regex' => '',
+            ],
+            4 => [
+                'title' => 'Button/switch',
+                'description' => '',
+                'regex' => '',
+            ],
+            5 => [
+                'title' => 'Cable/cord',
+                'description' => '',
+                'regex' => '',
+            ],
+            6 => [
+                'title' => 'Blockage',
+                'description' => '',
+                'regex' => '',
+            ],
+            7 => [
+
+                'title' => 'Display/LED',
+                'description' => '',
+                'regex' => '',
+            ],
+            8 => [
+                'title' => 'Dustbag/canister',
+                'description' => '',
+                'regex' => '',
+            ],
+            9 => [
                 'title' => 'External damage',
                 'description' => 'Damage to the chassis/case',
                 'regex' => 'case|dropped|rear|keyb|shell|frame|edge|housing',
             ],
-            19 => [
+            10 => [
+                'title' => 'Filter',
+                'description' => '',
+                'regex' => '',
+            ],
+            11 => [
+                'title' => 'Hose/tube/pipe',
+                'description' => '',
+                'regex' => '',
+            ],
+            12 => [
                 'title' => 'Internal damage',
                 'description' => 'System board, internal component...',
-                'regex' => 'board|dropped|component|contact|solder|keyb',
+                'regex' => 'board|circuit|component|contact|solder',
             ],
-            20 => [
+            13 => [
+                'title' => 'Motor',
+                'description' => '',
+                'regex' => '',
+            ],
+            14 => [
+                'title' => 'Overheating',
+                'description' => '',
+                'regex' => '',
+            ],
+            15 => [
                 'title' => 'Liquid damage',
-                'description' => 'Spillage, submersion, humidity...',
-                'regex' => 'water|humid|moist|liquid|coffee|drink|toilet',
+                'description' => '',
+                'regex' => '',
             ],
-            21 => [
-                'title' => 'Performance',
-                'description' => 'Slow, noisy...',
-                'regex' => 'slow|nois',
+            16 => [
+                'title' => 'Wheels/rollers',
+                'description' => '',
+                'regex' => '',
             ],
             25 => [
                 'title' => 'Poor data',
