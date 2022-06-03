@@ -21,6 +21,7 @@ class GroupViewTest extends TestCase
         $response = $this->get("/group/view/$id");
 
         $this->assertVueProperties($response, [
+            [],
             [
                 ':idgroups' => $id,
                 ':canedit' => 'true',
@@ -47,13 +48,15 @@ class GroupViewTest extends TestCase
 
         // Create a past event
         $event = factory(Party::class)->states('moderated')->create([
-                                                                        'event_date' => Carbon::yesterday()->toDateString(),
+                                                                        'event_start_utc' => '2000-01-01T10:15:05+05:00',
+                                                                        'event_end_utc' => '2000-01-0113:45:05+05:00',
                                                                         'group' => $id,
                                                                     ]);
 
         // Groups are deletable unless they have an event with a device.
         $response = $this->get("/group/view/$id");
         $this->assertVueProperties($response, [
+            [],
             [
                 ':idgroups' => $id,
                 ':can-see-delete' => 'true',
@@ -66,9 +69,12 @@ class GroupViewTest extends TestCase
                                                                                   'category_creation' => env('MISC_CATEGORY_ID_POWERED'),
                                                                                   'event_id' => $event->idevents,
                                                                                   'quantity' => 1,
+                                                                                  'repair_status' => Device::REPAIR_STATUS_FIXED,
+                                                                                  'category' => 111
                                                                               ]));
         $response = $this->get("/group/view/$id");
         $this->assertVueProperties($response, [
+            [],
             [
                 ':idgroups' => $id,
                 ':can-see-delete' => 'true',
@@ -89,12 +95,24 @@ class GroupViewTest extends TestCase
             $this->actingAs($user);
             $response = $this->get("/group/view/$id");
             $this->assertVueProperties($response, [
+                [],
                 [
                     ':idgroups' => $id,
                     ':can-see-delete' => 'false',
                     ':can-perform-delete' => 'false',
                 ],
             ]);
+        }
+
+        // Test stats API.
+        foreach (['fixometer', 'consume', 'manufacture'] as $format) {
+            $response = $this->get("/api/outbound/info/party/{$event->idevents}/$format");
+            $stats = json_decode($response->getContent(), TRUE);
+            self::assertEquals(1, $stats['co2']);
+
+            $response = $this->get("/api/outbound/info/group/{$id}/$format");
+            $stats = json_decode($response->getContent(), TRUE);
+            self::assertEquals(1, $stats['co2']);
         }
     }
 }

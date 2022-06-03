@@ -53,7 +53,9 @@ class AdminAbnormalDevices extends Notification implements ShouldQueue
                   ->greeting(__('notifications.greeting', [], $notifiable->language))
                   ->line('The event \''.$this->arr['event_venue'].'\' has an abnormal number of miscellaneous devices.')
                   ->action('View event', $this->arr['event_url'])
-                  ->line('If you would like to stop receiving these emails, please visit <a href="'.url('/user/edit/'.$notifiable->id).'">your preferences</a> on your account.');
+                  ->line(__('notifications.email_preferences', [
+                      'url' => url('/user/edit/'.$notifiable->id)
+                  ], $notifiable->locale));
     }
 
     /**

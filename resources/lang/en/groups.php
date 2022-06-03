@@ -75,7 +75,6 @@ return [
   'edit_group' => 'Edit group',
   'edit_group_save_changes' => 'Save changes',
   'edit_group_text' => 'Go ahead and change or improve your group\'s profile.',
-  'delete_group' => 'Delete group',
   'groups_location_small' => 'I.e the place where the fixing happens!',
   'group_image' => 'Group image',
   'tag-1' => 'Tag 1',
@@ -203,4 +202,8 @@ Learn how to use this group here: :help
   'talk_group' => 'View group conversation',
   'talk_group_add_title' => 'Welcome to :group_name',
   'talk_group_add_body' => 'Thank you for following :group_name! You will now receive notifications when new events are planned and will be added to group messages. <a href="https://talk.restarters.net/t/how-to-communicate-with-your-repair-group/6293">Learn how group messages work and how to change your notification settings</a>.',
+  'groups_location_placeholder' => 'Enter your address',
+  'editing' => 'Editing',
+  'timezone' => 'Timezone',
+  'timezone_placeholder' => 'Leave this blank to inherit the value from the network.',
 ];

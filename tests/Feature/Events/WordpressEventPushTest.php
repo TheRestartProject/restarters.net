@@ -43,7 +43,8 @@ class WordpressEventPushTest extends TestCase
             'group' => $group->idgroups,
             'latitude' => 1,
             'longitude' => 1,
-            'event_date' => '2100-01-01',
+            'event_start_utc' => '2100-01-01T10:15:05+05:00',
+            'event_end_utc' => '2100-01-0113:45:05+05:00',
         ]);
 
         $event->approve();
@@ -67,7 +68,7 @@ class WordpressEventPushTest extends TestCase
             $mock->shouldReceive('newPost')
                 ->withArgs(function($name, $text, $content) use ($event) {
                     // Check name, and that timestamp doesn't include seconds.
-                    $party_time = substr($event->start, 0, 5) . ' - ' . substr($event->end, 0, 5);
+                    $party_time = substr($event->start_local, 0, 5) . ' - ' . substr($event->end_local, 0, 5);
                     return $name == $event->venue && $content['custom_fields'][3]['value'] == $party_time;
                 })->once();
             $mock->shouldReceive('getPost')
@@ -75,7 +76,7 @@ class WordpressEventPushTest extends TestCase
             $mock->shouldReceive('editPost')
                 ->withArgs(function($event2, $content) use ($event) {
                     // Check name, and that timestamp doesn't include seconds.
-                    $party_time = substr($event->start, 0, 5) . ' - ' . substr($event->end, 0, 5);
+                    $party_time = substr($event->start_local, 0, 5) . ' - ' . substr($event->end_local, 0, 5);
                     return $party_time == $content['custom_fields'][5]['value'];
                 })
                 ->once();

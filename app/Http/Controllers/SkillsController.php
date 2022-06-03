@@ -33,7 +33,6 @@ class SkillsController extends Controller
 
         $skill = Skills::create([
         'skill_name'  => $request->input('skill_name'),
-        // 'category'    => $request->input('category'),
         'description' => $request->input('skill_desc'),
         ]);
 

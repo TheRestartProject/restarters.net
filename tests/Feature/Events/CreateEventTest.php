@@ -70,7 +70,9 @@ class CreateEventTest extends TestCase
         $host = factory(User::class)->states('Host')->create();
         $this->actingAs($host);
 
-        $group = factory(Group::class)->create();
+        $group = factory(Group::class)->create([
+            'wordpress_post_id' => '99999'
+        ]);
         $group->addVolunteer($host);
         $group->makeMemberAHost($host);
 
@@ -84,19 +86,26 @@ class CreateEventTest extends TestCase
         $eventAttributes['link'] = 'https://therestartproject.org/';
 
         // We want an upcoming event so that we can check it appears in various places.
-        $eventAttributes['event_start_utc'] = Carbon::parse('1pm tomorrow')->toIso8601String();
-        $eventAttributes['event_end_utc'] = Carbon::parse('3pm tomorrow')->toIso8601String();
+        $start = Carbon::createFromTimestamp(strtotime('tomorrow 1pm'));
+        $end = Carbon::createFromTimestamp(strtotime('tomorrow 3pm'));
+        $eventAttributes['event_start_utc'] = $start->toIso8601String();
+        $eventAttributes['event_end_utc'] = $end->toIso8601String();
 
         $this->post('/party/create/', $eventAttributes);
 
         // The event_start_utc and event_end_utc will be in the database, but not ISO8601 formatted - that is implicit.
-        $eventAttributes['event_start_utc'] = Carbon::parse($eventAttributes['event_start_utc'])->format('Y-m-d H:i:s');
-        $eventAttributes['event_end_utc'] = Carbon::parse($eventAttributes['event_end_utc'])->format('Y-m-d H:i:s');
+        $eventAttributes['event_start_utc'] = Carbon::parse($eventAttributes['event_start_utc'])->setTimezone('UTC')->format('Y-m-d H:i:s');
+        $eventAttributes['event_end_utc'] = Carbon::parse($eventAttributes['event_end_utc'])->setTimezone('UTC')->format('Y-m-d H:i:s');
         $this->assertDatabaseHas('events', $eventAttributes);
 
         // The logged in user should be recorded as the creator.
         $event = Party::latest()->first();
         $this->assertEquals($host->id, $event->user_id);
+
+        // The event should show in the future events for this user.
+        $upcoming_events = Party::futureForUser()->get();
+        self::assertEquals(1, $upcoming_events->count());
+        self::assertEquals($event->idevents, $upcoming_events[0]->idevents);
 
         // Check that we can view the event, and that it shows the creation success message.
         $this->get('/party/view/'.$event->idevents)->
@@ -115,12 +124,13 @@ class CreateEventTest extends TestCase
         $response = $this->get('/group/view/'.$group->idgroups);
 
         $props = $this->assertVueProperties($response, [
+            [],
             [
                 ':idgroups' => $group->idgroups,
             ],
         ]);
 
-        $events = json_decode($props[0][':events'], TRUE);
+        $events = json_decode($props[1][':events'], TRUE);
 
         if ($seeEvent) {
             // We should be able to see this upcoming event in the Vue properties.
@@ -136,12 +146,13 @@ class CreateEventTest extends TestCase
         $response = $this->get('/party');
 
         $props = $this->assertVueProperties($response, [
+            [],
             [
                 'heading-level' => 'h2',
             ],
         ]);
 
-        $events = json_decode($props[0][':initial-events'], TRUE);
+        $events = json_decode($props[1][':initial-events'], TRUE);
 
         if ($seeEvent) {
             // We should be able to see this upcoming event in the Vue properties.
@@ -149,6 +160,11 @@ class CreateEventTest extends TestCase
             $this->assertEquals($canModerate, $events[0]['canModerate']);
             $this->assertEquals(true, $events[0]['attending']);
             $this->assertEquals(true, $events[0]['isVolunteer']);
+            $this->assertEquals(substr($eventAttributes['event_start_utc'], 0, 10), $events[0]['event_date_local']);
+            $this->assertEquals('13:00', $events[0]['start_local']);
+            $this->assertEquals('15:00', $events[0]['end_local']);
+            $this->assertEquals($start->setTimezone('UTC')->toIso8601String(), $events[0]['event_start_utc']);
+            $this->assertEquals($end->setTimezone('UTC')->toIso8601String(), $events[0]['event_end_utc']);
         } else {
             $this->assertEquals(true, $events[0]['requiresModeration']);
         }
@@ -166,6 +182,7 @@ class CreateEventTest extends TestCase
 
                 // Mail should mention the venue.
                 self::assertRegexp('/' . $event->venue . '/', $mailData['introLines'][0]);
+                self::assertStringContainsString('#list-email-preferences', $mailData['outroLines'][0]);
 
                 return true;
             }
@@ -177,12 +194,13 @@ class CreateEventTest extends TestCase
         $response = $this->get('/party');
 
         $props = $this->assertVueProperties($response, [
+            [],
             [
                 'heading-level' => 'h2',
             ],
         ]);
 
-        $events = json_decode($props[0][':initial-events'], TRUE);
+        $events = json_decode($props[1][':initial-events'], TRUE);
         $this->assertEquals(1, count($events));
 
         // Should have the 'all' property set because we've not joined the group.
@@ -196,12 +214,13 @@ class CreateEventTest extends TestCase
         $response = $this->get('/party');
 
         $props = $this->assertVueProperties($response, [
+            [],
             [
                 'heading-level' => 'h2',
             ],
         ]);
 
-        $events = json_decode($props[0][':initial-events'], TRUE);
+        $events = json_decode($props[1][':initial-events'], TRUE);
         $this->assertEquals(1, count($events));
 
         // Should not have 'all' or 'nearby' flag - those go in the "Other events" section.
@@ -288,6 +307,8 @@ class CreateEventTest extends TestCase
     /** @test */
     public function emails_sent_to_restarters_when_upcoming_event_approved()
     {
+        DB::connection()->enableQueryLog();
+
         $this->withoutExceptionHandling();
         $admin = factory(User::class)->state('Administrator')->create();
         $this->actingAs($admin);
@@ -301,11 +322,17 @@ class CreateEventTest extends TestCase
         $group->makeMemberAHost($host);
         $group->addVolunteer($restarter);
 
-        $eventData = factory(Party::class)->raw(['group' => $group->idgroups, 'event_date' => '2030-01-01', 'latitude'=>'1', 'longitude'=>'1']);
+        $eventData = factory(Party::class)->raw([
+            'group' => $group->idgroups,
+            'event_start_utc' => '2100-01-01T10:15:05+05:00',
+            'event_end_utc' => '2100-01-0113:45:05+05:00',
+            'latitude'=>'1',
+            'longitude'=>'1'
+        ]);
 
         // Approve the event
         $response = $this->post('/party/create/', $eventData);
-        $event = Party::where('event_date', '2030-01-01')->first();
+        $event = Party::latest()->first();
         $eventData['wordpress_post_id'] = 100;
         $eventData['id'] = $event->idevents;
         $eventData['moderate'] = 'approve';
@@ -354,7 +381,7 @@ class CreateEventTest extends TestCase
 
         // act
         $response = $this->post('/party/create/', $eventData);
-        $event = Party::where('event_date', '1930-01-01')->first();
+        $event = Party::latest()->first();
         $eventData['wordpress_post_id'] = 100;
         $eventData['id'] = $event->idevents;
         $eventData['moderate'] = 'approve';
@@ -428,18 +455,25 @@ class CreateEventTest extends TestCase
         ])->assertSee('true');
 
         // Assert that we see the host in the list of volunteers to add to the event.
-        $this->get('/party/view/'.$party->idevents)->assertSeeInOrder(['Group member', '<option value="'.$host->id.'">', '</div>']);
+        $response = $this->get('/api/groups/'. $group->idgroups . '/volunteers?api_token=' . $host->api_token);
+        $response->assertJson([
+            [
+                'id' => $host->id,
+                'name' => $host->name,
+                'email' => $host->email
+            ]
+        ]);
 
         // Assert we can add them back in.
-        $response = $this->post('/party/add-volunteer', [
-            'event' => $party->idevents,
+        $response = $this->put('/api/events/' . $party->idevents . '/volunteers', [
             'volunteer_email_address' => $host->email,
             'full_name' => $host->name,
             'user' => $host->id,
         ]);
 
-        $response->assertSessionHas('success');
-        $this->assertTrue($response->isRedirection());
+        $response->assertSuccessful();
+        $rsp = json_decode($response->getContent(), TRUE);
+        $this->assertEquals('success', $rsp['success']);
     }
 
     public function provider()
@@ -479,5 +513,99 @@ class CreateEventTest extends TestCase
         $party = $group->parties()->latest()->first();
         $this->assertEquals($idevents, $party->idevents);
         $this->assertEquals($wordpress_post_id, $party->wordpress_post_id);
+    }
+
+    /**
+     * @test
+     */
+    public function a_past_event_is_not_upcoming() {
+        $host = factory(User::class)->states('Administrator')->create();
+        $this->actingAs($host);
+
+        $group = factory(Group::class)->create();
+        $group->addVolunteer($host);
+        $group->makeMemberAHost($host);
+
+        // Create the event
+        $idevents = $this->createEvent($group->idgroups, '2000-01-01');
+
+        // The event is past and should not show in the future events for this user.
+        $upcoming_events = Party::futureForUser()->get();
+        self::assertEquals(0, $upcoming_events->count());
+
+        // ...but should show as past.
+        $past_events = Party::pastForUser()->get();
+        self::assertEquals(1, $past_events->count());
+        self::assertEquals($idevents, $past_events[0]->idevents);
+    }
+
+    /**
+     * @test
+     */
+    public function a_future_event_is_upcoming() {
+        $host = factory(User::class)->states('Administrator')->create();
+        $this->actingAs($host);
+
+        $group = factory(Group::class)->create();
+        $group->addVolunteer($host);
+        $group->makeMemberAHost($host);
+
+        // Create the event
+        $idevents = $this->createEvent($group->idgroups, '2100-01-01');
+
+        // The event is future and should not show in the past events for this user.
+        $past_events = Party::pastForUser()->get();
+        self::assertEquals(0, $past_events->count());
+
+        // ...but should show as future.
+        $upcoming_events = Party::futureForUser()->get();
+        self::assertEquals(1, $upcoming_events->count());
+        self::assertEquals($idevents, $upcoming_events[0]->idevents);
+    }
+
+    /**
+     * @test
+     */
+    public function no_notification_after_leaving() {
+        Notification::fake();
+        $this->withoutExceptionHandling();
+
+        $host = factory(User::class)->states('Host')->create();
+        $this->actingAs($host);
+
+        $restarter = factory(User::class)->states('Restarter')->create();
+
+        $group = factory(Group::class)->create([
+            'wordpress_post_id' => '99999'
+        ]);
+
+        $group->addVolunteer($host);
+        $group->makeMemberAHost($host);
+        $group->addVolunteer($restarter);
+
+        // Remove volunteer.
+        $response = $this->get("/group/remove-volunteer/{$group->idgroups}/{$restarter->id}");
+        $response->assertSessionHas('success');
+
+        $eventData = factory(Party::class)->raw([
+                                                    'group' => $group->idgroups,
+                                                    'event_start_utc' => '2100-01-01T10:15:05+05:00',
+                                                    'event_end_utc' => '2100-01-0113:45:05+05:00',
+                                                    'latitude'=>'1',
+                                                    'longitude'=>'1'
+                                                ]);
+
+        // Create and approve an event.
+        $response = $this->post('/party/create/', $eventData);
+        $event = Party::latest()->first();
+        $eventData['wordpress_post_id'] = 100;
+        $eventData['id'] = $event->idevents;
+        $eventData['moderate'] = 'approve';
+        $response = $this->post('/party/edit/'.$event->idevents, $eventData);
+
+        // Shouldn't notify
+        Notification::assertNotSentTo(
+            [$restarter], NotifyRestartersOfNewEvent::class
+        );
     }
 }

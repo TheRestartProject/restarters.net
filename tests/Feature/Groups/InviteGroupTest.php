@@ -6,6 +6,8 @@ use App\Group;
 use App\Notifications\JoinGroup;
 use App\Notifications\NewGroupMember;
 use App\Helpers\Fixometer;
+use App\Notifications\NotifyRestartersOfNewEvent;
+use App\Party;
 use App\User;
 use DB;
 use Illuminate\Support\Facades\Notification;
@@ -51,19 +53,28 @@ class InviteGroupTest extends TestCase
             }
         );
 
-        // We should see that we have been invited.
+        // Create an event.  Should not generate a notification to users who are invited but not yet accepted.
+        $idevents = $this->createEvent($group->idgroups, 'tomorrow');
+        Party::find($idevents)->approve();
+
+        Notification::assertNotSentTo(
+            [$user], NotifyRestartersOfNewEvent::class
+        );
+
+        // We should see that we have been invited to the group.
         $this->actingAs($user);
         $response2 = $this->get('/group/view/'.$group->idgroups);
         $response2->assertSee('You have an invitation to this group.');
 
         // Check the counts.
         $props = $this->assertVueProperties($response2, [
+            [],
             [
                 ':idgroups' => $group->idgroups,
             ],
         ]);
 
-        $initialGroup = json_decode($props[0][':initial-group'], true);
+        $initialGroup = json_decode($props[1][':initial-group'], true);
         $this->assertEquals(1, $initialGroup['all_hosts_count']);
         $this->assertEquals(1, $initialGroup['all_confirmed_hosts_count']);
         $this->assertEquals(1, $initialGroup['all_restarters_count']);
@@ -94,16 +105,26 @@ class InviteGroupTest extends TestCase
         // Check the counts have changed.
         $response4 = $this->get('/group/view/'.$group->idgroups);
         $props = $this->assertVueProperties($response4, [
+            [],
             [
                 ':idgroups' => $group->idgroups,
             ],
         ]);
 
-        $initialGroup = json_decode($props[0][':initial-group'], true);
+        $initialGroup = json_decode($props[1][':initial-group'], true);
         $this->assertEquals(1, $initialGroup['all_hosts_count']);
         $this->assertEquals(1, $initialGroup['all_confirmed_hosts_count']);
         $this->assertEquals(1, $initialGroup['all_restarters_count']);
         $this->assertEquals(1, $initialGroup['all_confirmed_restarters_count']);
+
+        // Create another event.  Should now generate a notification.
+        $this->actingAs($host);
+        $idevents = $this->createEvent($group->idgroups, '+7 day');
+        Party::find($idevents)->approve();
+
+        Notification::assertSentTo(
+            [$user], NotifyRestartersOfNewEvent::class
+        );
     }
 
     public function testInviteViaLink() {

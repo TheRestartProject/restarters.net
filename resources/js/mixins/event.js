@@ -17,45 +17,43 @@ export default {
       return this.event && this.event.approved
     },
     upcoming() {
-      let ret = false;
-
-      if (this.event) {
-        const start = new moment(this.event.event_date + ' ' + this.event.start)
-        ret = start.isAfter()
-      }
-
-      return ret
+      // Use server value as this is timezone aware.
+      return this.event && this.event.upcoming
     },
     finished() {
-      let ret = false;
-
-      if (this.event) {
-        const end = new moment(this.event.event_date + ' ' + this.event.end)
-        ret = end.isBefore()
-      }
-
-      return ret
+      // Use server value as this is timezone aware.
+      return this.event && this.event.finished
     },
     inProgress() {
-      return !this.upcoming && !this.finished
+      // Use server value as this is timezone aware.
+      return this.event && this.event.inprogress
     },
     startingSoon() {
-      return this.upcoming && !this.finished && (new moment().isSame(this.event.event_date, 'day'))
+      // Use server value as this is timezone aware.
+      return this.event && this.event.startingsoon
     },
     start() {
-      return this.event.start.substring(0, 5)
+      // Local time.
+      return this.event ? this.event.start_local : null
     },
     end() {
-      return this.event.end.substring(0, 5)
+      // Local time.
+      return this.event ? this.event.end_local : null
     },
     date() {
-      return this.event ? (new moment(this.event.event_date).format(DATE_FORMAT)) : null
+      // Local time.
+      return this.event ? (new moment(this.event.event_date_local).format(DATE_FORMAT)) : null
     },
     dayofmonth() {
-      return this.event ? (new moment(this.event.event_date).format('DD')) : null
+      // Local time.
+      return this.event ? (new moment(this.event.event_date_local).format('DD')) : null
     },
     month() {
-      return this.event ? (new moment(this.event.event_date).format('MMM').toUpperCase()) : null
+      // Local time.
+      return this.event ? (new moment(this.event.event_date_local).format('MMM').toUpperCase()) : null
+    },
+    timezone() {
+      return this.event ? this.event.timezone : null
     },
     attendees() {
       // Everyone, both invited and confirmed.

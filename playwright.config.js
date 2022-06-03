@@ -12,7 +12,8 @@ const config = {
   workers: 1,
 
   use: {
-    trace: 'on-first-retry',
+    // Always record traces, so that we can check the success ones.
+    trace: 'on',
   },
   projects: [
     {
@@ -54,7 +55,10 @@ const config = {
     port: 8000,
     timeout: 120 * 1000,
     reuseExistingServer: !process.env.CI,
-  }
+  },
+
+  // Flakiness
+  timeout: 45000
 };
 
 module.exports = config;

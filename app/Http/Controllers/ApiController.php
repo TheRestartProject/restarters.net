@@ -94,6 +94,13 @@ class ApiController extends Controller
     public static function groupStats($groupId)
     {
         $group = Group::where('idgroups', $groupId)->first();
+
+        if (!$group) {
+            return response()->json([
+                                        'message' => "Invalid group id $groupId",
+                                    ], 404);
+        }
+
         $stats = $group->getGroupStats();
 
         $result = [
@@ -115,17 +122,6 @@ class ApiController extends Controller
         return response()->json($result, 200);
     }
 
-    public static function getEventsByGroupTag($group_tag_id)
-    {
-        $events = Party::join('groups', 'groups.idgroups', '=', 'events.group')
-            ->join('grouptags_groups', 'grouptags_groups.group', '=', 'groups.idgroups')
-            ->where('grouptags_groups.group_tag', $group_tag_id)
-            ->select('events.*', 'groups.area')
-            ->get();
-
-        return response()->json($events, 200);
-    }
-
     public static function getUserInfo()
     {
         $user = Auth::user();
@@ -137,6 +133,11 @@ class ApiController extends Controller
 
     public static function getUserList()
     {
+        $authenticatedUser = Auth::user();
+        if (! $authenticatedUser->hasRole('Administrator')) {
+            return abort(403, 'The authenticated user is not authorized to access this resource');
+        }
+
         $users = User::whereNull('deleted_at')
             ->orderBy('created_at', 'desc')
             ->get();
@@ -235,5 +236,9 @@ class ApiController extends Controller
             'count' => $count,
             'items' => $items,
         ]);
+    }
+
+    public function timezones() {
+        return response()->json(\DB::select("SELECT name FROM mysql.time_zone_name WHERE name NOT LIKE 'posix%' AND name NOT LIKE 'right%';"));
     }
 }

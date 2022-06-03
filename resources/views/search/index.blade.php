@@ -77,7 +77,8 @@
                           @foreach($sorted_parties as $groupname => $groupparties)
                           <optgroup label="<?php echo trim($groupname); ?>">
                             <?php foreach($groupparties as $party) { ?>
-                            <option value="<?php echo $party->id; ?>" data-subtext="<?php echo strftime('%d/%m/%Y', $party->event_timestamp); ?>"
+                            <?php $event = App\Party::withTrashed()->find($party->id); ?>
+                            <option value="<?php echo $party->id; ?>" data-subtext="<?php echo $event->event_date_local; ?>"
                               <?php
                               if(isset($_GET['parties']) && !empty($_GET['parties'])){
                                 foreach($_GET['parties'] as $p){
@@ -85,7 +86,7 @@
                                 }
                               }
                               ?>
-                                >{{  $party->venue }} ({{ strftime('%d/%m/%Y', $party->event_timestamp) }})</option>
+                                >{{  $party->venue }} ({{ $event->getFormattedLocalStart('%d/%m/%Y') }})</option>
                             <?php } ?>
                           </optgroup>
                           @endforeach
@@ -243,7 +244,7 @@
                                             {{ $party->getEventName() }}
                                         </a>
                                       </td>
-                                      <td class="cell-date"><?php print date('d/m/Y', strtotime($party->event_date)); ?> <?php print date('H:i', strtotime($party->start)) . '-' . date('H:i', strtotime($party->end)); ?></td>
+                                      <td class="cell-date">{{ $party->getFormattedLocalStart('d/m/Y') }} {{ $party->getEventStartEndLocal() }}</td>
                                       <td class="cell-figure">{{ $party->participants }}</td>
                                       <td class="cell-figure">{{ $party->volunteers }}</td>
                                       <td class="cell-figure">{{ round($party->waste_total) }}<small>kg<small></td>

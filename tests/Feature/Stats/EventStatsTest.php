@@ -4,6 +4,7 @@ namespace Tests\Feature\Stats;
 
 use App\Device;
 use App\Party;
+use App\Role;
 use Tests\Feature\Stats\StatsTestCase;
 
 class EventStatsTest extends StatsTestCase
@@ -161,5 +162,16 @@ class EventStatsTest extends StatsTestCase
             $this->assertArrayHasKey($k, $result, "Missing array key $k");
             $this->assertEquals($v, $result[$k], "Wrong value for $k => $v");
         }
+
+        // Get the wide stats page.
+        $response = $this->get('/party/stats/' . $event->idevents . '/wide');
+        $response->assertSuccessful();
+        $response->assertSee('<span id="ewaste-diverted-value">23</span>');
+
+        // Check that the search page loads.
+        $this->loginAsTestUser(Role::ADMINISTRATOR);
+        $response = $this->get('/search');
+        $response->assertSuccessful();
+        $response->assertSee($event->venue);
     }
 }

@@ -6,6 +6,7 @@ use App\Audits;
 use App\Brands;
 use App\Category;
 use App\Device;
+use App\DeviceBarrier;
 use App\EventsUsers;
 use App\Group;
 use App\GroupNetwork;
@@ -14,6 +15,8 @@ use App\Images;
 use App\Network;
 use App\Party;
 use App\Role;
+use App\Skills;
+use App\UsersSkills;
 use App\User;
 use App\UserGroups;
 use App\Xref;
@@ -43,15 +46,18 @@ abstract class TestCase extends BaseTestCase
         User::truncate();
         Audits::truncate();
         EventsUsers::truncate();
-        Party::truncate();
         UserGroups::truncate();
+        DeviceBarrier::truncate();
         Device::truncate();
+        Party::truncate();
         GroupNetwork::truncate();
         Category::truncate();
         Brands::truncate();
         GroupTags::truncate();
         Xref::truncate();
         Images::truncate();
+        UsersSkills::truncate();
+        Skills::truncate();
         DB::statement('delete from audits');
         DB::delete('delete from user_network');
         DB::delete('delete from grouptags_groups');
@@ -78,9 +84,6 @@ abstract class TestCase extends BaseTestCase
 
         $this->withoutExceptionHandling();
         app('honeypot')->disable();
-
-        // We don't yet have a Discourse test environment.
-        config(['restarters.features.discourse_integration' => false]);
 
         factory(Category::class, 1)->states('Cat1')->create();
         factory(Category::class, 1)->states('Cat2')->create();
@@ -129,7 +132,7 @@ abstract class TestCase extends BaseTestCase
         Auth::user()->role = $role;
     }
 
-    public function createGroup($name = 'Test Group', $website = 'https://therestartproject.org', $location = 'London', $text = 'Some text.', $assert = true)
+    public function createGroup($name = 'Test Group', $website = 'https://therestartproject.org', $location = 'London', $text = 'Some text.', $assert = true, $approve = true)
     {
         $idgroups = null;
 
@@ -146,9 +149,12 @@ abstract class TestCase extends BaseTestCase
             $this->assertNotFalse(strpos($redirectTo, '/group/edit'));
             $p = strrpos($redirectTo, '/');
             $idgroups = substr($redirectTo, $p + 1);
-            $group = Group::find($idgroups);
-            $group->wordpress_post_id = '99999';
-            $group->save();
+
+            if ($approve) {
+                $group = Group::find($idgroups);
+                $group->wordpress_post_id = '99999';
+                $group->save();
+            }
 
             // Currently logged in user should be present, with status 1 = approved.
             $member = UserGroups::where('group', $idgroups)->first();
@@ -166,18 +172,17 @@ abstract class TestCase extends BaseTestCase
         $eventAttributes = factory(Party::class)->raw();
         $eventAttributes['group'] = $idgroups;
 
-        // Use old-style event creation rather than UTC.
-        unset($eventAttributes['event_start_utc']);
-        unset($eventAttributes['event_end_utc']);
-        $eventAttributes['event_date'] = date('Y-m-d', strtotime($date));
-        $eventAttributes['start'] = '13:00:00';
-        $eventAttributes['end'] = '14:00:00';
+        $event_start = Carbon::createFromTimestamp(strtotime($date))->setTimezone('UTC');
+        $event_end = Carbon::createFromTimestamp(strtotime($date))->setTimezone('UTC')->addHour(2);
+
+        $eventAttributes['event_start_utc'] = $event_start->toIso8601String();
+        $eventAttributes['event_end_utc'] = $event_end->toIso8601String();
 
         $response = $this->post('/party/create/', $eventAttributes);
 
-        // The event_start_utc and event_end_utc will be in the database, but not ISO8601 formatted - that is implicit.
-//        $eventAttributes['event_start_utc'] = Carbon::parse($eventAttributes['event_start_utc'])->format('Y-m-d H:i:s');
-//        $eventAttributes['event_end_utc'] = Carbon::parse($eventAttributes['event_end_utc'])->format('Y-m-d H:i:s');
+        // Need to reformat start/end for row comparison.
+        $eventAttributes['event_start_utc'] = $event_start->toDateTimeString();
+        $eventAttributes['event_end_utc'] = $event_end->toDateTimeString();
 
         $this->assertDatabaseHas('events', $eventAttributes);
         $redirectTo = $response->getTargetUrl();

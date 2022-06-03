@@ -5,6 +5,9 @@
     </template>
     <template slot="content">
       <read-more :html="event.free_text" class="mt-2 readmore small" :max-chars="440" :more-str="__('events.read_more')" :less-str="__('events.read_less')" />
+      <p v-if="!event.approved" class="small text-muted">
+        {{ __('partials.event_requires_moderation_by_an_admin') }}.
+      </p>
     </template>
   </CollapsibleSection>
 </template>

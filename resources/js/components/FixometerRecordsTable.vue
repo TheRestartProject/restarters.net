@@ -11,6 +11,9 @@
           :current-page="currentPage"
           sort-null-last
       >
+        <template slot="cell(device_category.name)" slot-scope="data">
+          {{ __('strings.' + data.item.category.name) }}
+        </template>
         <template slot="cell(shortProblem)" slot-scope="data">
           <div v-line-clamp="3">
             {{ data.item.shortProblem }}
@@ -45,7 +48,7 @@
             {{ showStatus(data) }}
           </div>
         </template>
-        <template slot="cell(device_event.event_date)" slot-scope="data">
+        <template slot="cell(device_event.event_start_utc)" slot-scope="data">
           {{ formatDate(data) }}
         </template>
         <template slot="cell(show_details)" slot-scope="row">
@@ -296,7 +299,7 @@ export default {
       // table's async method of providing data.
       //
       // Default sort is descending date order.
-      let sortBy = 'event_date'
+      let sortBy = 'event_start_utc'
       let sortDesc = ctx.sortBy ? (ctx.sortDesc ? 'DESC' : 'ASC') : 'DESC'
 
       if (ctx.sortBy) {
@@ -380,7 +383,7 @@ export default {
       }
     },
     formatDate (data) {
-      return new moment(data.item.device_event.event_date).format('DD/MM/YYYY')
+      return new moment(data.item.device_event.event_start_utc).format('DD/MM/YYYY')
     },
     deleteConfirm() {
       this.$refs.confirmDelete.show()

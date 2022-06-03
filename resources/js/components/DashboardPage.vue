@@ -13,9 +13,7 @@
       <DashboardAddData class="adddata justify-self-end" />
       <DashboardRightSidebar class="sidebar" />
       <DiscourseDiscussion
-          v-if="topics"
           class="discourse"
-          :topics="topics"
           :see-all-topics-link="seeAllTopicsLink"
           :discourse-base-url="discourseBaseUrl"
           :is-logged-in="isLoggedIn"
@@ -54,11 +52,6 @@ export default {
       required: false,
       default: null
     },
-    topics: {
-      type: Array,
-      required: false,
-      detault: null
-    },
     seeAllTopicsLink: {
       type: String,
       required: true
@@ -72,7 +65,7 @@ export default {
       required: true
     },
     newGroups: {
-      type: Number,
+      type: Array,
       required: true
     }
   },

@@ -59,11 +59,13 @@ class ExportTest extends TestCase
                                                                       'category_creation' => 111,
                                                                       'event' => $idevents2,
                                                                   ]);
-        // Export.
+        // Export parties.
         $response = $this->get("/export/parties?fltr=dummy&parties[0]=$idevents1&parties[1]=$idevents2&from-date=&to-date=");
 
         // Bit hacky, but grab the file that was created.  Can't find a way to do this in Laravel easily, though it's
         // probably possible using mocking.
+        //
+        // TODO These files sometimes appear in public/ and sometimes don't.  Is this just an artefact of testing?
         $filename = 'parties.csv';
         $fh = fopen($filename, 'r');
         fgetcsv($fh);
@@ -71,5 +73,27 @@ class ExportTest extends TestCase
         self::assertEquals($group1->name, $row2[2]);
         $row3 = fgetcsv($fh);
         self::assertEquals($group2->name, $row3[2]);
+
+        // Export devices.
+        $response = $this->get("/export/devices");
+
+        $filename = 'public/devices.csv';
+        $fh = fopen($filename, 'r');
+        fgetcsv($fh);
+        $row2 = fgetcsv($fh);
+        self::assertEquals(htmlspecialchars($event1->getEventName()), $row2[6]);
+
+        // Export time volunteered - first as a web page.
+        $response = $this->get("/reporting/time-volunteered?a");
+        $response->assertSee(htmlspecialchars($event1->getEventName(), ENT_QUOTES));
+        $response->assertSee(htmlspecialchars($event2->getEventName(), ENT_QUOTES));
+
+        // Now as a CSV.
+        $response = $this->get("/export/time-volunteered?a");
+        $filename = 'time_reporting.csv';
+        $fh = fopen($filename, 'r');
+        $row1 = fgetcsv($fh);
+        $row2 = fgetcsv($fh);
+        $this->assertEquals('Hours Volunteered', $row2[0]);
     }
 }

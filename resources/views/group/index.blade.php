@@ -27,11 +27,6 @@
 
         $user = Auth::user();
         $myid = $user ? $user->id : null;
-        $api_token = NULL;
-
-        if ($user) {
-            $api_token = $user->ensureAPIToken();
-        }
       ?>
 
       <div class="vue-placeholder vue-placeholder-large">
@@ -50,7 +45,6 @@
           :networks="{{ json_encode($networks, JSON_INVALID_UTF8_IGNORE) }}"
           :all-group-tags="{{ json_encode($all_group_tags, JSON_INVALID_UTF8_IGNORE) }}"
           :show-tags="{{ $show_tags ? 'true' : 'false' }}"
-          api-token="{{ $api_token }}"
         />
       </div>
 

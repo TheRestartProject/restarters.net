@@ -900,8 +900,6 @@ function initAutocomplete() {
         // need to cope with both.
         $field = jQuery(this).parents('.card-body').find('.weight')
       }
-
-      console.log("Category change", $(this), $value, $field)
       if( $value === 46 || $value === '' ){
         $field.prop('disabled', false);
         $field.parents('.display-weight').removeClass('d-none');
@@ -911,22 +909,6 @@ function initAutocomplete() {
         $field.prop('disabled', true);
         $field.parents('.display-weight').addClass('d-none');
       }
-    });
-
-    jQuery('.toggle-manual-invite').on('change', function (e) {
-
-      var $value = jQuery(this).val();
-      var $toggle = jQuery('.show-hide-manual-invite');
-
-      $('#full_name, #volunteer_email_address').val('');
-
-      if( $value === 'not-registered' ){
-        $toggle.show();
-        $('#full_name').focus();
-      } else {
-        $toggle.hide();
-      }
-
     });
 
     jQuery('.js-remove').on('click', removeUser);
@@ -1283,25 +1265,44 @@ function initAutocomplete() {
   function tokenFieldCheck(){
     setTimeout(function(){
       var count_tokens = document.getElementById("manual_invite_box").value.split(",");
-      console.log(count_tokens.length);
+      var disabled = false
+
       if( $('#manual_invite_box').val() === '' ) {
-        $('#event-invite-to button, #invite-to-group button').prop('disabled', true);
-      } else if( count_tokens.length === 0 ){
-        $('#event-invite-to button, #invite-to-group button').prop('disabled', true);
+        disabled = true
+      } else if( count_tokens.length === 0 ) {
+        disabled = true
       } else {
-        $('#event-invite-to button, #invite-to-group button').prop('disabled', false);
+        for (var i = 0; i < count_tokens.length; i++) {
+          if (!count_tokens[i] || count_tokens[i].indexOf('@') == -1 ) {
+            disabled = true
+          }
+        }
       }
+
+      $('#event-invite-to button, #invite-to-group button').prop('disabled', disabled);
     }, 500);
   }
 
 
   $('#manual_invite_box').on('tokenfield:createtoken', function (event) {
     var existingTokens = $(this).tokenfield('getTokens');
+    var newval = event.attrs.value
+
     $.each(existingTokens, function(index, token) {
-      if (token.value === event.attrs.value)
+      if (token.value === newval)
       event.preventDefault();
     });
-    tokenFieldCheck();
+
+    if (!newval || newval.indexOf('@') == -1) {
+      // This is a very basic check that we're putting in something which looks like an email.  Email regexp validation
+      // is a bit of a fool's errand, and in the longer term this code will be replaced by Vue and/or a different
+      // invitation model.
+      $(event.target).closest('div.tokenfield').css('border', '2px solid red')
+    } else {
+      $(event.target).closest('div.tokenfield').css('border', '')
+    }
+
+      tokenFieldCheck();
   });
 
   $('#manual_invite_box').on('tokenfield:removedtoken', function (event) {
@@ -1555,7 +1556,9 @@ jQuery(document).ready(function () {
         'eventtimerangepicker': require('./components/EventTimeRangePicker.vue'),
         'eventdatepicker': require('./components/EventDatePicker.vue'),
         'venueaddress': require('./components/VenueAddress.vue'),
-        'richtexteditor': require('./components/RichTextEditor.vue')
+        'richtexteditor': require('./components/RichTextEditor.vue'),
+        'notifications': require('./components/Notifications.vue'),
+        'grouptimezone': require('./components/GroupTimeZone.vue')
       }
     })
   })

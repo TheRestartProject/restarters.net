@@ -62,6 +62,9 @@ export default {
         if (newVal) {
           if (newVal >= this.currentStartTime) {
             this.currentEndTime = newVal.substring(0, 5)
+            this.$nextTick(() => {
+              this.$emit('update:end', this.currentEndTime)
+            })
           } else {
             // We prevent end times before start times.  This is slightly clunky - we can't seem to update the
             // value in timepicker while it's open, so trigger a re-render by changing the key.
@@ -104,6 +107,9 @@ export default {
           var mins = timeParts[1]
 
           this.currentEndTime = hours + ':' + mins
+          this.$nextTick(() => {
+            this.$emit('update:end', this.currentEndTime)
+          })
         }
       }
     },

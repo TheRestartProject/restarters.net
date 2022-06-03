@@ -166,29 +166,6 @@ class Group extends Model implements Auditable
         }
     }
 
-    public function findHost($id)
-    {
-        return DB::select(DB::raw('SELECT *,
-                    `g`.`name` AS `groupname`,
-                    `u`.`name` AS `hostname`
-                FROM `'.$this->table.'` AS `g`
-                INNER JOIN `users_groups` AS `ug`
-                    ON `ug`.`group` = `g`.`idgroups`
-                INNER JOIN `users` AS `u`
-                    ON `u`.`id` = `ug`.`user`
-                LEFT JOIN (
-                    SELECT * FROM `images`
-                        INNER JOIN `xref` ON `xref`.`object` = `images`.`idimages`
-                        WHERE `xref`.`object_type` = 5
-                        AND `xref`.`reference_type` = '.env('TBL_USERS').'
-                        GROUP BY `images`.`path`
-                ) AS `xi`
-                ON `xi`.`reference` = `u`.`id`
-
-                WHERE `g`.`idgroups` = :id
-                AND `u`.`role` = 3'), ['id' => $id]);
-    }
-
     public function ofThisUser($id)
     {
         return DB::select(DB::raw('SELECT * FROM `'.$this->table.'` AS `g`
@@ -259,9 +236,8 @@ class Group extends Model implements Auditable
         // Groups are deletable unless they have an event with a device.
         $ret = true;
 
-        $allEvents = Party::where('events.group', $this->idgroups)
+        $allEvents = Party::withTrashed()->where('events.group', $this->idgroups)
             ->get();
-
 
         // Send these to getEventStats() to speed things up a bit.
         $eEmissionRatio = \App\Helpers\LcaStats::getEmissionRatioPowered();
@@ -370,11 +346,6 @@ class Group extends Model implements Auditable
         return $this->allConfirmedVolunteers()->where($attributes)->exists();
     }
 
-    public function addEvent($event)
-    {
-        $event->theGroup()->associate($this);
-    }
-
     public function parties()
     {
         return $this->hasMany(Party::class, 'group', 'idgroups');
@@ -425,26 +396,6 @@ class Group extends Model implements Auditable
         return $this->parties()->where('event_end_utc', '<', $now)->get();
     }
 
-    /**
-     * [totalPartiesHours description]
-     * Total Group Parties Hours.
-     *
-     * @author Christopher Kelker - @date 2019-03-21
-     * @editor  Christopher Kelker
-     * @version 1.0.0
-     * @return  [type]
-     */
-    public function totalPartiesHours()
-    {
-        $sum = 0;
-
-        foreach ($this->parties as $party) {
-            $sum += $party->hours;
-        }
-
-        return $sum;
-    }
-
     public function groupImagePath()
     {
         if (is_object($this->groupImage) && is_object($this->groupImage->image)) {
@@ -466,20 +417,6 @@ class Group extends Model implements Auditable
         }
 
         return $event->first();
-    }
-
-    public function userEvents()
-    {
-        return $this->parties()
-            ->join('events_users', 'events.idevents', '=', 'events_users.event')
-            ->where(function ($query) {
-                $query->where('events.group', $this->idgroups)
-                    ->where('events_users.user', auth()->id());
-            })
-            ->select('events.*')
-            ->groupBy('events.idevents')
-            ->orderBy('events.idevents', 'ASC')
-            ->get();
     }
 
     public function getApprovedAttribute()
@@ -708,5 +645,32 @@ class Group extends Model implements Auditable
         }
 
         return $timezone;
+    }
+
+    // TODO We've started to refactor into scopes, but this isn't complete yet.
+    public function scopeMembers() {
+        return User::join('users_groups', 'users_groups.user', '=', 'users.id')
+            ->where('users_groups.group', $this->idgroups)
+            ->select('users.*');
+    }
+
+    public function scopeMembersUndeleted($query) {
+        $query = $query->members();
+        return $query->whereNull('users_groups.deleted_at');
+    }
+
+    public function scopeMembersJoined($query) {
+        $query = $query->membersUndeleted();
+        return $query->where('users_groups.status', 'like', 1);
+    }
+
+    public function scopeMembersRestarters($query) {
+        $query = $query->membersJoined();
+        return $query->where('users_groups.role', Role::RESTARTER);
+    }
+
+    public function scopeMembersHosts($query) {
+        $query = $query->membersJoined();
+        return $query->where('users_groups.role', Role::HOST);
     }
 }

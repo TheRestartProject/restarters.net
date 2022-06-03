@@ -59,7 +59,7 @@ class CalendarEventsController extends Controller
       ->orderBy('events.event_start_utc', 'ASC')
       ->get();
 
-        if (empty($events)) {
+        if (empty($events) || !$events->count()) {
             return abort(404, 'No events found.');
         }
 
@@ -77,27 +77,7 @@ class CalendarEventsController extends Controller
       ->orderBy('events.event_start_utc', 'ASC')
       ->get();
 
-        if (empty($events)) {
-            return abort(404, 'No events found.');
-        }
-
-        $this->exportCalendar($events);
-    }
-
-    public function allEventsByGroupTag(Request $request, GrouptagsGroups $grouptags_groups)
-    {
-        $events = Party::join('groups', 'groups.idgroups', '=', 'events.group')
-      ->join('grouptags_groups', 'grouptags_groups.group', '=', 'groups.idgroups')
-      ->where(function ($query) use ($grouptags_groups) {
-          $query->where('grouptags_groups.id', $grouptags_groups->id)
-              ->whereNull('events.deleted_at');
-      })
-      ->select('events.*', 'groups.name')
-      ->groupBy('events.idevents')
-      ->orderBy('events.event_start_utc', 'ASC')
-      ->get();
-
-        if (empty($events)) {
+        if (empty($events) || !$events->count()) {
             return abort(404, 'No events found.');
         }
 
@@ -127,15 +107,15 @@ class CalendarEventsController extends Controller
 
         // loop over events
         foreach ($events as $event) {
-            if (! is_null($event->event_date) && $event->event_date != '0000-00-00') {
+            if (! is_null($event->event_start_utc) ) {
                 $ical[] = 'BEGIN:VEVENT';
 
                 $ical[] = 'TZID:' . $event->timezone;
                 $ical[] = "UID:{$event->idevents}";
                 $ical[] = 'DTSTAMP:'.date($this->ical_format).'';
                 $ical[] = "SUMMARY:{$event->venue} ({$event->name})";
-                $ical[] = 'DTSTART;TZID=' . $event->timezone . ':'.date($this->ical_format, strtotime($event->event_date.' '.$event->start)).'';
-                $ical[] = 'DTEND;TZID=' . $event->timezone . ':'.date($this->ical_format, strtotime($event->event_date.' '.$event->end)).'';
+                $ical[] = 'DTSTART;TZID=' . $event->timezone . ':'.$event->getFormattedLocalStart($this->ical_format);
+                $ical[] = 'DTEND;TZID=' . $event->timezone . ':'.$event->getFormattedLocalEnd($this->ical_format);
                 $ical[] = 'DESCRIPTION:'.url('/party/view').'/'.$event->idevents;
                 $ical[] = "LOCATION:{$event->location}";
                 $ical[] = 'URL:'.url('/party/view').'/'.$event->idevents;
@@ -153,36 +133,5 @@ class CalendarEventsController extends Controller
         header('Content-Disposition: attachment; filename="cal.ics"');
 
         echo $ical;
-    }
-
-    protected function ical_split($preamble, $value)
-    {
-        $value = trim($value);
-        $value = strip_tags($value);
-        $value = preg_replace('/\n+/', ' ', $value);
-        $value = preg_replace('/\s{2,}/', ' ', $value);
-        $preamble_len = strlen($preamble);
-        $lines = [];
-        while (strlen($value) > (75 - $preamble_len)) {
-            $space = (75 - $preamble_len);
-            $mbcc = $space;
-            while ($mbcc) {
-                $line = mb_substr($value, 0, $mbcc);
-                $oct = strlen($line);
-                if ($oct > $space) {
-                    $mbcc -= $oct - $space;
-                } else {
-                    $lines[] = $line;
-                    $preamble_len = 1; // Still take the tab into account
-                    $value = mb_substr($value, $mbcc);
-                    break;
-                }
-            }
-        }
-        if (! empty($value)) {
-            $lines[] = $value;
-        }
-
-        return implode($lines, "\n\t");
     }
 }

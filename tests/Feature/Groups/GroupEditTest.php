@@ -103,5 +103,24 @@ class GroupEditTest extends TestCase
         $response = $this->json('POST', '/group/image-upload/' . $group->idgroups, []);
         $response->assertOk();
         $this->assertEquals('success - image uploaded', $response->getContent());
+
+        // Delete the image.
+        $image = \DB::select(
+        \Illuminate\Support\Facades\DB::raw("SELECT idimages, path FROM images ORDER BY idimages DESC LIMIT 1"));
+        $idimages = $image[0]->idimages;
+        $path = $image[0]->path;
+        $response = $this->get("/group/image/delete/{$group->idgroups}/$idimages/$path");
+        $response->assertOk();
+        self::assertEquals('Thank you, the image has been deleted', $response->getContent());
+    }
+
+    /** @test */
+    public function can_edit_timezone() {
+        // Get list of timezones.
+        $response = $this->get('/api/timezones');
+        $response->assertSuccessful();
+        $timezones = json_decode($response->getContent(), TRUE);
+        self::assertGreaterThan(0, count($timezones));
+        self::assertTrue(array_key_exists('name', $timezones[0]));
     }
 }

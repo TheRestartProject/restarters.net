@@ -54,8 +54,6 @@ class CreateWordpressPostForEvent
         }
 
         try {
-            // TODO Timezones.  We need to pass party_timezone field, and change party_time to have timezone
-            // in brackets afterwards.
             $startTimestamp = strtotime($theParty->event_start_utc);
             $endTimestamp = strtotime($theParty->event_end_utc);
 
@@ -65,12 +63,13 @@ class CreateWordpressPostForEvent
                 ['key' => 'party_grouphash', 'value' => $theParty->group],
                 ['key' => 'party_venue', 'value' => $theParty->venue],
                 ['key' => 'party_location', 'value' => $theParty->location],
-                ['key' => 'party_time', 'value' => substr($theParty->start, 0, 5) . ' - ' . substr($theParty->end, 0, 5)],
+                ['key' => 'party_time', 'value' => $theParty->getEventStartEndLocal()],
                 ['key' => 'party_groupcountry', 'value' => $group->country],
                 ['key' => 'party_groupcity', 'value' => $group->area],
-                ['key' => 'party_date', 'value' => $theParty->event_date],
+                ['key' => 'party_date', 'value' => $theParty->event_date_local],
                 ['key' => 'party_timestamp', 'value' => $startTimestamp],
                 ['key' => 'party_timestamp_end', 'value' => $endTimestamp],
+                ['key' => 'party_timezone', 'value' => $theParty->timezone],
                 ['key' => 'party_stats', 'value' => $partyId],
                 ['key' => 'party_lat', 'value' => $theParty->latitude],
                 ['key' => 'party_lon', 'value' => $theParty->longitude],

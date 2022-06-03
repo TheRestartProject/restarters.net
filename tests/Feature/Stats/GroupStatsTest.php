@@ -5,7 +5,9 @@ namespace Tests\Feature\Stats;
 use App\Device;
 use App\Group;
 use App\Party;
+use App\User;
 use Carbon\Carbon;
+use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Tests\Feature\Stats\StatsTestCase;
 
 class GroupStatsTest extends StatsTestCase
@@ -23,7 +25,8 @@ class GroupStatsTest extends StatsTestCase
     {
         $group = factory(Group::class)->create();
         factory(Party::class)->states('moderated')->create([
-            'event_date' => Carbon::yesterday()->toDateString(),
+            'event_start_utc' => '2000-01-01T10:15:05+05:00',
+            'event_end_utc' => '2000-01-0113:45:05+05:00',
             'group' => $group->idgroups,
         ]);
         $expect = \App\Group::getGroupStatsArrayKeys();
@@ -42,7 +45,8 @@ class GroupStatsTest extends StatsTestCase
     {
         $group = factory(Group::class)->create();
         $event = factory(Party::class)->states('moderated')->create([
-            'event_date' => Carbon::yesterday()->toDateString(),
+            'event_start_utc' => '2000-01-01T10:15:05+05:00',
+            'event_end_utc' => '2000-01-0113:45:05+05:00',
             'group' => $group->idgroups,
         ]);
 
@@ -195,7 +199,8 @@ class GroupStatsTest extends StatsTestCase
     {
         $group1 = factory(Group::class)->create();
         $event1 = factory(Party::class)->states('moderated')->create([
-            'event_date' => Carbon::yesterday()->toDateString(),
+            'event_start_utc' => '2000-01-01T10:15:05+05:00',
+            'event_end_utc' => '2000-01-0113:45:05+05:00',
             'group' => $group1->idgroups,
         ]);
 
@@ -270,11 +275,13 @@ class GroupStatsTest extends StatsTestCase
 
         $group2 = factory(Group::class)->create();
         $event2 = factory(Party::class)->states('moderated')->create([
-            'event_date' => Carbon::yesterday()->toDateString(),
+            'event_start_utc' => '2000-01-01T10:15:05+05:00',
+            'event_end_utc' => '2000-01-0113:45:05+05:00',
             'group' => $group2->idgroups,
         ]);
         $event3 = factory(Party::class)->states('moderated')->create([
-            'event_date' => Carbon::yesterday()->toDateString(),
+            'event_start_utc' => '2000-01-01T10:15:05+05:00',
+            'event_end_utc' => '2000-01-0113:45:05+05:00',
             'group' => $group2->idgroups,
         ]);
 
@@ -331,5 +338,26 @@ class GroupStatsTest extends StatsTestCase
             $this->assertArrayHasKey($k, $result, "Missing array key $k");
             $this->assertEquals($v, $result[$k], "Wrong value for $k => $v");
         }
+    }
+
+    /** @test */
+    public function get_of_stats_after_deletion() {
+
+        $admin = factory(User::class)->states('Administrator')->create([
+                                                                           'api_token' => '1234',
+                                                                       ]);
+        $this->actingAs($admin);
+
+        $idgroups = $this->createGroup();
+
+        $response = $this->get("/api/group/$idgroups/stats?api_token=1234");
+        $stats = json_decode($response->getContent(), true);
+        $this->assertEquals(0, $stats['num_hours_volunteered']);
+
+        Group::findOrFail($idgroups)->delete();
+
+        $response = $this->get("/api/group/$idgroups/stats?api_token=1234");
+        $err = $response->getStatusCode();
+        $this->assertEquals($err, 404);
     }
 }

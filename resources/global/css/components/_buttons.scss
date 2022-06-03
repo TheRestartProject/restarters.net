@@ -70,10 +70,6 @@
   }
 
   &.dropdown-toggle {
-    &::after {
-      display: none !important;
-    }
-
     svg {
       path,
       text {

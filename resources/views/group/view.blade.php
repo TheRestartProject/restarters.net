@@ -120,12 +120,6 @@
               ->whereNull('users_groups.deleted_at')
               ->exists();
 
-          $user = Auth::user();
-
-          if ($user) {
-              $api_token = $user->ensureAPIToken();
-          }
-
           $discourseGroup = $group->discourse_group ? (env('DISCOURSE_URL').'/g/'.$group->discourse_group) : null;
 
           ?>
@@ -150,7 +144,6 @@
               calendar-copy-url="{{ $showCalendar ? url("/calendar/group/{$group->idgroups}") : '' }}"
               calendar-edit-url="{{ $showCalendar ? url("/profile/edit/{$user->id}#list-calendar-links") : '' }}"
               :ingroup="{{ $in_group ? 'true' : 'false' }}"
-              api-token="{{ $api_token }}"
               discourse-group="{{ $discourseGroup }}"
           />
       </div>

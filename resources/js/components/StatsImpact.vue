@@ -8,7 +8,7 @@
     </h2>
     <div class="impact-container">
       <StatsValue
-        :count="Math.round(stats.waste_total)"
+        :count="Math.ceil(stats.waste_total)"
         icon="trash"
         size="md"
         title="partials.waste_prevented"

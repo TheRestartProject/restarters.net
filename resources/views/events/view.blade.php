@@ -63,50 +63,22 @@
         </div>
 
         <?php
+          $can_edit_event = Auth::check() && App\Helpers\Fixometer::userHasEditPartyPermission($event->idevents, Auth::user()->id);
+          $can_delete_event = Auth::check() && App\Helpers\Fixometer::userHasDeletePartyPermission($event->idevents, Auth::user()->id) && $event->canDelete();
+          $is_admin = Auth::check() && App\Helpers\Fixometer::hasRole(Auth::user(), 'Administrator');
+          $is_attending = is_object($is_attending) && $is_attending->status == 1;
+
           // We need to expand a lot of event information to pass to the client.  In due course this will be replaced
           // by an API call to get the event details, and/or server-side rendering.
-          $expandVolunteerEvent = function ($volunteers) {
-              $ret = [];
-
-              foreach ($volunteers as $volunteer) {
-                  // We might not be able to fetch a volunteer if they're deleted.
-                  if ($volunteer->volunteer) {
-                      $volunteer['volunteer'] = $volunteer->volunteer;
-                      $volunteer['userSkills'] = [];
-                      $volunteer['profilePath'] = '/uploads/thumbnail_placeholder.png';
-
-                      if (! empty($volunteer->volunteer)) {
-                          $volunteer['userSkills'] = $volunteer->volunteer->userSkills->all();
-                          $volunteer['profilePath'] = '/uploads/thumbnail_'.$volunteer->volunteer->getProfile($volunteer->volunteer->id)->path;
-                      }
-
-                      foreach ($volunteer['userSkills'] as $skill) {
-                          // Force expansion
-                          $skill->skillName->skill_name;
-                      }
-
-                      $volunteer['fullName'] = $volunteer->getFullName();
-                      $ret[] = $volunteer;
-                  }
-              }
-
-              return $ret;
-          };
-
-          $expanded_attended = $expandVolunteerEvent($attended);
-          $expanded_invited = $expandVolunteerEvent($invited);
-          $expanded_hosts = $expandVolunteerEvent($hosts);
+          $expanded_attended = $event->expandVolunteers($attended, $can_edit_event);
+          $expanded_invited = $event->expandVolunteers($invited, $can_edit_event);
+          $expanded_hosts = $event->expandVolunteers($hosts, $can_edit_event);
 
           // Trigger expansion of group.
           $group_image = $event->theGroup->groupImage;
           if (is_object($group_image) && is_object($group_image->image)) {
               $group_image->image->path;
           }
-
-          $can_edit_event = Auth::check() && App\Helpers\Fixometer::userHasEditPartyPermission($event->idevents, Auth::user()->id);
-          $can_delete_event = Auth::check() && App\Helpers\Fixometer::userHasDeletePartyPermission($event->idevents, Auth::user()->id) && $event->canDelete();
-          $is_admin = Auth::check() && App\Helpers\Fixometer::hasRole(Auth::user(), 'Administrator');
-          $is_attending = is_object($is_attending) && $is_attending->status == 1;
 
           $discourseThread = $is_attending ? (env('DISCOURSE_URL').'/t/'.$event->discourse_thread) : null;
 
@@ -150,14 +122,14 @@
               $expanded_brands[] = $brand;
           }
 
-          $event->approved = $event->wordpress_post_id !== null;
+          $expanded_event = \App\Http\Controllers\PartyController::expandEvent($event);
         ?>
         <div class="vue">
           <EventPage
             csrf="{{ csrf_token() }}"
             :idevents="{{ $event->idevents }}"
             :devices="{{ json_encode($expanded_devices, JSON_INVALID_UTF8_IGNORE) }}"
-            :initial-event="{{ json_encode($event, JSON_INVALID_UTF8_IGNORE) }}"
+            :initial-event="{{ json_encode($expanded_event, JSON_INVALID_UTF8_IGNORE) }}"
             :is-attending="{{ $is_attending ? 'true' : 'false' }}"
             discourse-thread="{{ $discourseThread }}"
             :canedit="{{ $can_edit_event ? 'true' : 'false' }}"
@@ -189,7 +161,6 @@
   @include('includes.modals.event-share-stats')
   @include('includes.modals.event-all-volunteers')
   @include('includes.modals.event-all-attended')
-  @include('includes.modals.event-add-volunteer')
   @include('includes.modals.event-request-review')
 
 @endsection
