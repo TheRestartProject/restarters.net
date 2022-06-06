@@ -5,6 +5,7 @@ return [
     'subtitle' => 'Un volontaire a essayé de réparer cet appareil dans un Repair Café et a écrit cette description.',
     'fetch_another' => 'Je ne sais pas, chercher une autre réparation',
     'translation' => 'Traduction',
+    'suggestions' => 'Suggestions',
     'go_with' => 'Aller avec',
     'source' => 'La source',
     'strapline' => 'Il vous suffit de lire les informations relatives à l’appareil en panne et de sélectionner le type de panne décrite dans la liste située en dessous.',

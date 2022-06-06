@@ -135,7 +135,16 @@
                     <div class="fault-type">
                         <div class="options">
                             <input type="hidden" id="id-ords" name="id-ords" value="{{ $fault->id_ords }}">
-                            <input type="hidden" id="fault-type-id" name="fault-type-id" value="">
+                            <input type="hidden" id="fault-type-id" name="fault-type-id" value=""> @if (count($fault->suggestions))
+                            <div class="buttons suggestions">
+                                <p class="title is-size-6-mobile is-size-6-tablet">@lang('dustupora.task.suggestions')</p>
+                                <p>
+                                    @foreach($fault->suggestions as $fault_type)
+                                    <button class="btn btn-sm btn-fault-suggestion btn-success btn-rounded" data-toggle="tooltip" data-fid="@php( print($fault_type->id) )">@lang($fault_type->title)</button>
+                                    @endforeach
+                                </p>
+                            </div>
+                            @endif
                             <p class="confirm hide">
                                 <button class="btn-md btn-primary" id="change">@lang('dustupora.task.go_with') "<span id="fault-type-new" data-fid=""></span>" &rarr;</button>
                             </p>
@@ -183,8 +192,8 @@
 <script>
     document.addEventListener(`DOMContentLoaded`, async () => {
 
-        [...document.querySelectorAll('.btn-fault-option')].forEach(elem => {
-            elem.addEventListener('click', function(e) {
+        [...document.querySelectorAll('.btn-fault-option, .btn-fault-suggestion')].forEach(elem => {
+            elem.addEventListener('click', function (e) {
                 e.preventDefault();
                 doOption(e);
             });

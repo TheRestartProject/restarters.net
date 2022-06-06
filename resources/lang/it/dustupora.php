@@ -5,6 +5,7 @@ return [
     'subtitle' => 'Un volontario ha cercato di riparare questo dispositivo ad un Restart Party e ha scritto questa descrizione.',
     'fetch_another' => 'Non lo so, vai a prendere un\'altra riparazione',
     'translation' => 'Traduzione',
+    'suggestions' => 'Suggerimenti',
     'go_with' => 'Vai con',
     'source' => 'Fonte',
     'strapline' => 'Basta leggere le informazioni sul dispositivo rotto e selezionare il tipo di guasto descritto dalla lista sottostante.',

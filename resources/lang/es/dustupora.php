@@ -5,6 +5,7 @@ return [
     'subtitle' => 'Un voluntario intentó arreglar este dispositivo en un evento de reparación y escribió esta descripción.',
     'fetch_another' => 'No lo sé. Mostrar otra reparación',
     'translation' => 'Traducción',
+    'suggestions' => 'Sugerencias',
     'go_with' => 'Elegir',
     'source' => 'Fuente',
     'strapline' => 'Simplemente lee la información sobre la tableta averiada y selecciona el tipo de problema que se describe en la lista a continuación.',

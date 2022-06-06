@@ -4,6 +4,7 @@ return [
   'task' => [
     'subtitle' => 'A volunteer tried to fix this vacuum cleaner at a community repair event and wrote this description.',
     'fetch_another' => 'I don\'t know',
+    'suggestions' => 'Suggestions',
     'translation' => 'Translation',
     'go_with' => 'Go with',
     'source' => 'Source',

@@ -119,83 +119,82 @@ class DustupOraSetup extends Migration
             1 => [
                 'title' => 'Accessories/attachments',
                 'description' => '',
-                'regex' => '',
+                'regex' => 'nozzle|attachment',
             ],
             2 => [
-                'title' => 'Power/battery',
+                'title' => 'Blockage',
                 'description' => '',
-                'regex' => 'batter|power|start|switch|charg|plug',
+                'regex' => 'suck|suction|dirt|clog|dust|block|jam|hair|fur|tangle|fluff',
             ],
             3 => [
                 'title' => 'Brush',
                 'description' => '',
-                'regex' => '',
+                'regex' => 'brush|roller|bristle',
             ],
             4 => [
                 'title' => 'Button/switch',
                 'description' => '',
-                'regex' => '',
+                'regex' => 'switch|button|trigger|lever',
             ],
             5 => [
                 'title' => 'Cable/cord',
                 'description' => '',
-                'regex' => '',
+                'regex' => 'cord|cable|wire| wind| lead|retract|reel',
             ],
             6 => [
-                'title' => 'Blockage',
-                'description' => '',
-                'regex' => '',
-            ],
-            7 => [
-
                 'title' => 'Display/LED',
                 'description' => '',
-                'regex' => '',
+                'regex' => ' led |light',
             ],
-            8 => [
+            7 => [
                 'title' => 'Dustbag/canister',
                 'description' => '',
-                'regex' => '',
+                'regex' => 'bag|container|canist',
             ],
-            9 => [
+            8 => [
                 'title' => 'External damage',
                 'description' => 'Damage to the chassis/case',
-                'regex' => 'case|dropped|rear|keyb|shell|frame|edge|housing',
+                'regex' => 'crack|case|body|handle|cover|housing|plastic|clip',
             ],
-            10 => [
+            9 => [
                 'title' => 'Filter',
                 'description' => '',
-                'regex' => '',
+                'regex' => 'filter|hair|fur|fluff',
             ],
-            11 => [
+            10 => [
                 'title' => 'Hose/tube/pipe',
                 'description' => '',
-                'regex' => '',
+                'regex' => 'hose|tube|pipe|flex',
+            ],
+            11 => [
+                'title' => 'Internal damage',
+                'description' => 'Problem with a circuit board or other internal component',
+                'regex' => 'board|circuit|component|contact|bearing|capacitor|solder',
             ],
             12 => [
-                'title' => 'Internal damage',
-                'description' => 'System board, internal component...',
-                'regex' => 'board|circuit|component|contact|solder',
+                'title' => 'Liquid damage',
+                'description' => 'Water/fluid leaks or has caused damage',
+                'regex' => 'water|leak|wet|pump',
             ],
             13 => [
                 'title' => 'Motor',
-                'description' => '',
-                'regex' => '',
+                'description' => 'Motor, engine, drive belt...',
+                'regex' => 'motor|engine|speed|belt|drive|spark',
             ],
             14 => [
                 'title' => 'Overheating',
-                'description' => '',
-                'regex' => '',
+                'description' => 'Device is hot, emits burning smell...',
+                'regex' => 'burn|heat|hot|warm|smoke|smell',
             ],
             15 => [
-                'title' => 'Liquid damage',
+                'title' => 'Power/battery',
                 'description' => '',
-                'regex' => '',
+                'regex' => 'batter|power|start|switch|charg|plug|fuse|mains|adapter|electric',
             ],
             16 => [
                 'title' => 'Wheels/rollers',
-                'description' => '',
-                'regex' => '',
+                'description' => 'Problem with external rotating elements',
+                'regex' => ' roll|wheel|spin|sweep',
             ],
             25 => [
                 'title' => 'Poor data',

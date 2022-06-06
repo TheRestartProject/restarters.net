@@ -3,10 +3,10 @@
 namespace App\Http\Controllers;
 
 use App;
-use App\Helpers\Microtask;
-use App\DustupOra;
 use Auth;
 use Illuminate\Http\Request;
+use App\Helpers\Microtask;
+use App\DustupOra;
 
 class DustupOraController extends Controller
 {
@@ -39,9 +39,10 @@ class DustupOraController extends Controller
             $user = Auth::user();
         } else {
             $user = Microtask::getAnonUserCta($request);
-            if ($user->action) {
-                return redirect()->action('DustupOraController@cta');
-            }
+            // CTA not required if quest is not public
+            // if ($user->action) {
+            //     return redirect()->action('DustupOraController@cta');
+            // }
         }
 
         $this->Model = new DustupOra;
@@ -89,23 +90,22 @@ class DustupOraController extends Controller
 
         $fault->faulttypes = $this->Model->fetchFaultTypes();
 
-        // @ToDo suggestions (if required)
-        // $fault->suggestions = [];
-        // match problem terms with suggestions
-        // foreach ($fault_types as $k => $v) {
-        //     if (! empty($v->regex) && preg_match('/'.$v->regex.'/', strtolower($fault->googletrans), $matches)) {
-        //         $fault->suggestions[$k] = $fault_types[$k];
-        //     }
-        // }
-        // send non-suggested fault_types to view
-        // $fault->faulttypes = array_diff_key($fault_types, $fault->suggestions);
+        // Suggestions
+        $fault->suggestions = [];
+        // Match problem terms with suggestions
+        foreach ($fault->faulttypes as $k => $v) {
+            if (! empty($v->regex) && preg_match('/'.$v->regex.'/', strtolower($fault->en), $matches)) {
+                $fault->suggestions[$k] = $fault->faulttypes[$k];
+            }
+        }
+        // Send non-suggested fault_types to view
+        $fault->faulttypes = array_diff_key($fault->faulttypes, $fault->suggestions);
 
         // Send the "poor data" fault_type to view so it can be styled separately
-        $poor_data = $this->Model->fetchFaultTypePoorData();
         return view('dustupora.index', [
             'title' => 'DustUp',
             'fault' => $fault,
-            'poor_data' => $poor_data,
+            'poor_data' => $this->Model->fetchFaultTypePoorData(),
             'user' => $user,
             'progress' => $progress > 1 ? $progress : 0,
             'signpost' => $signpost,
