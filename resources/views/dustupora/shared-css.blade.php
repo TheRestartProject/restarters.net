@@ -57,7 +57,27 @@
     }
 
     #btn-poordata {
-        background-color: #F45B69;
+        background-color: #f49292;
+        color: #000;
+        border-color: #f45b69;
+    }
+
+    #btn-poordata:hover {
+        color: #fff;
+        background-color: #f45b69;
+    }
+
+    .btn-fault-suggestion {
+        /* margin-bottom: 3px; */
+        color: #000;
+        background-color: #acdae0;
+        border-color: #19a5b9;
+        border-width: 1.5px;
+    }
+
+    .btn-fault-suggestion:hover {
+        color: #fff;
+        background-color: #19a5b9;
     }
 
     #btn-info-open {

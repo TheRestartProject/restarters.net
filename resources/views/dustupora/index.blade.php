@@ -135,12 +135,13 @@
                     <div class="fault-type">
                         <div class="options">
                             <input type="hidden" id="id-ords" name="id-ords" value="{{ $fault->id_ords }}">
-                            <input type="hidden" id="fault-type-id" name="fault-type-id" value=""> @if (count($fault->suggestions))
+                            <input type="hidden" id="fault-type-id" name="fault-type-id" value="">
+                            @if (count($fault->suggestions))
                             <div class="buttons suggestions">
                                 <p class="title is-size-6-mobile is-size-6-tablet">@lang('dustupora.task.suggestions')</p>
                                 <p>
                                     @foreach($fault->suggestions as $fault_type)
-                                    <button class="btn btn-sm btn-fault-suggestion btn-success btn-rounded" data-toggle="tooltip" data-fid="@php( print($fault_type->id) )">@lang($fault_type->title)</button>
+                                    <button class="btn btn-sm btn-fault-suggestion btn-rounded" data-toggle="tooltip" data-fid="@php( print($fault_type->id) )">@lang($fault_type->title)</button>
                                     @endforeach
                                 </p>
                             </div>
