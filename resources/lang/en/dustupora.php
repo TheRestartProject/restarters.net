@@ -48,9 +48,9 @@ return [
   ],
   'info' => [
     'body-s1-header' => 'What is DustUp?',
-    'body-s1-p1' => 'We want to understand how vacuum cleaners to fail so that we can tell policymakers how future models can be made easier to repair. Repair reduces waste and lessens the strain on our planet’s resources.',
+    'body-s1-p1' => 'We want to understand how vacuum cleaners fail so that we can tell policymakers how future models can be made easier to repair. Repair reduces waste and lessens the strain on our planet’s resources.',
     'body-s1-p2' => 'With DustUp, you can join our investigation. We’ve collected information on over 3,000 broken vacuum cleaners and we need your help to categorise them.',
-    'body-s2-header' => 'What do do I need to do?',
+    'body-s2-header' => 'What do I need to do?',
     'body-s2-p1' => 'Simply read the information about the broken vacuum cleaner and select the type of fault described from the list underneath. If you’re not sure, just select ‘I don’t know’ at the bottom. Once you’ve selected an option, we’ll show you another device. The more device faults you can categorise, the more we learn!',
     'body-s3-header' => 'Where does DustUp get data about broken vacuum cleaners?',
     'body-s3-p1' => 'DustUp uses information from the <a href=":url" target="_blank">Open Repair Alliance</a>, which collects data about broken devices that real people around the world have tried to fix at community events, such as Repair Cafés and Restart Parties.',

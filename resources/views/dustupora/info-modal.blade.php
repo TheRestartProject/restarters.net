@@ -18,9 +18,9 @@
                 <hr>
                 <h5>@lang('dustupora.info.body-s3-header')</h5>
                 <p>@lang('dustupora.info.body-s3-p1', ['url' => 'https://openrepair.org/about/'])</p>
-                <hr>
-                <h5>@lang('dustupora.info.body-s4-header')</h5>
-                <p>@lang('dustupora.info.body-s4-p1', ['url' => 'https://talk.restarters.net/t/5216'])</p>
+                <!-- <hr>
+                     <h5>@lang('dustupora.info.body-s4-header')</h5>
+                     <p>@lang('dustupora.info.body-s4-p1', ['url' => 'https://talk.restarters.net/t/5216'])</p> -->
             </div>
         </div>
     </div>
