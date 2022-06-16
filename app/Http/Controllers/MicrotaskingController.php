@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\BattcatOra;
+use App\DustupOra;
 use App\Faultcat;
 use App\Misccat;
 use App\Mobifix;
@@ -29,6 +30,7 @@ class MicrotaskingController extends Controller
             new PrintcatOra,
             new TabicatOra,
             new BattcatOra,
+            new DustupOra,
         ];
     }
 

@@ -84,7 +84,7 @@ export default {
   },
   computed: {
     showCta() {
-      return false
+      return true
     },
   }
 }
