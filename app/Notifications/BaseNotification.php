@@ -17,7 +17,7 @@ class BaseNotification extends Notification
         } else if ($e instanceof \Exception) {
             \Sentry\captureException($e);
         } else {
-            \Sentry\captureMessage('Notification in an unexpected way ' . gettype($e));
+            \Sentry\captureMessage('Notification failed in an unexpected way ' . gettype($e));
         }
     }
 }
