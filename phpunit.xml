@@ -16,6 +16,7 @@
             <exclude>./tests/Feature/Microtasks/FaultcatTest.php</exclude>
             <exclude>./tests/Feature/Microtasks/MisccatTest.php</exclude>
             <exclude>./tests/Feature/Microtasks/MobifixTest.php</exclude>
+            <exclude>./tests/Feature/Microtasks/ContributionsTest.php</exclude>
             <exclude>./tests/Feature/Stats/StatsTestCase.php</exclude>
             <exclude>./tests/Feature/Users/Registration/DiscourseAccountCreationTests.php</exclude>
         </testsuite>
