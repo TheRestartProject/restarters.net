@@ -10,10 +10,6 @@ class DiscourseTest extends TestCase {
         $this->artisan('sync:discourseusernames')->assertExitCode(0);
     }
 
-    public function testLanguageSync() {
-        $this->artisan('language:sync')->assertExitCode(0);
-    }
-
     public function testDiscourseSyncGroups() {
         $this->artisan('discourse:syncgroups')->assertExitCode(0);
     }
