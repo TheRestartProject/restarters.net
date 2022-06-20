@@ -8,7 +8,7 @@
         :minMatchingChars="1"
         inputClass="form-control field timezone"
     />
-    <small class="form-text text-muted" v-if="inherit">
+    <small class="form-text text-muted">
       {{ __('groups.timezone_placeholder') }}
     </small>
     <input type="hidden" name="timezone" :value="currentValue" />
@@ -25,11 +25,6 @@ export default {
       required: false,
       default: null
     },
-    inherit: {
-      type: Boolean,
-      required: false,
-      default: false
-    }
   },
   components: { VueTypeaheadBootstrap },
   data () {
