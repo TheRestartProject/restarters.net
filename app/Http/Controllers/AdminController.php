@@ -59,11 +59,39 @@ class AdminController extends Controller
             }
         }
 
+        // statusCount() and findMostSeen() might not return 3 values, depending on what entries are in the DB.  So make sure that we
+        // always have values, otherwise the blade fails (for example on Circle, where the DB is empty).
+        $statusCount = [];
+        $mostSeen = [];
+
+        for ($i = 0; $i < 3; $i++) {
+            $statusCount[$i] = [
+                'counter' => 0
+            ];
+            $mostSeen[$i] = [
+                'name' => null,
+                'counter' => 0
+            ];
+        }
+
+        $i = 0;
+
+        foreach ($Device->statusCount() as $status) {
+            $statusCount[$i++]['counter'] = $status->counter;
+        }
+
+        $i = 0;
+
+        foreach ($Device->findMostSeen(1, null, null) as $top) {
+            $mostSeen[$i]['name'] = $top->name;
+            $mostSeen[$i++]['counter'] = $top->counter;
+        }
+
         return [
             'pax' => $participants,
             'hours' => $hours_volunteered,
-            'device_count_status' => $Device->statusCount(),
-            'top' => $Device->findMostSeen(1, null, null),
+            'device_count_status' => $statusCount,
+            'top' => $mostSeen,
         ];
     }
 
