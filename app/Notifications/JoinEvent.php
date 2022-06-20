@@ -4,6 +4,7 @@ namespace App\Notifications;
 
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
+use Illuminate\Notifications\Action;
 use Illuminate\Notifications\Messages\MailMessage;
 use Illuminate\Notifications\Notification;
 
@@ -103,6 +104,8 @@ class JoinEvent extends Notification implements ShouldQueue
 
                 $mail->line($eventDetailsTable)
                      ->action(__('notifications.join_event_rsvp_now'), $this->arr['url'])
+                     ->line('')
+                     ->line('<p><a href="' . $this->arr['view_url'] . '">' . __('notifications.join_event_view') . '</a></p>')
                      ->line('')
                      ->line($ignoreLine)
                      ->line('');
