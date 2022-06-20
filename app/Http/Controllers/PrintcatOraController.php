@@ -26,11 +26,6 @@ class PrintcatOraController extends Controller
         return redirect()->action('PrintcatOraController@status');
     }
 
-    protected function _getUserLocale()
-    {
-        return substr(App::getLocale(), 0, 2);
-    }
-
     /**
      * Fetch "call to action".
      *
@@ -70,30 +65,5 @@ class PrintcatOraController extends Controller
             'closed' => true,
             'partner' => $request->input('partner', null),
         ]);
-    }
-
-    /**
-     * Fetch random record with optional partner filter and exclusions.
-     *
-     * @param Illuminate\Http\Request $request
-     *
-     * @return object
-     */
-    protected function _fetchRecord(Request $request)
-    {
-
-//        $request->session()->flush();
-        $result = false;
-        $partner = $request->input('partner', null);
-        $exclusions = $request->session()->get('printcatora.exclusions', []);
-        $this->Model = new PrintcatOra;
-        $locale = $this->_getUserLocale();
-        $fault = $this->Model->fetchFault($exclusions, $locale, $partner);
-        if ($fault) {
-            $result = $fault[0];
-            $request->session()->push('printcatora.exclusions', $result->id_ords);
-        }
-
-        return $result;
     }
 }

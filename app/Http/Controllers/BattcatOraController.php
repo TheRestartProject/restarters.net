@@ -106,21 +106,6 @@ class BattcatOraController extends Controller
     }
 
     /**
-     * Fetch random record.
-     *
-     * @param Illuminate\Http\Request $request
-     *
-     * @return int
-     */
-    protected function _getSubmits($request)
-    {
-        $submits = $request->session()->get('battcatora.submits', 0);
-        $request->session()->put('battcatora.submits', ++$submits);
-
-        return $submits;
-    }
-
-    /**
      * Fetch mock user record for anonymous user.
      *
      * @return object
@@ -132,38 +117,5 @@ class BattcatOraController extends Controller
         $user->name = 'Guest';
 
         return $user;
-    }
-
-    /**
-     * Fetch user locale string.
-     *
-     * @return string
-     */
-    protected function _getUserLocale()
-    {
-        return substr(App::getLocale(), 0, 2);
-    }
-
-    /**
-     * Fetch random record.
-     *
-     * @param Illuminate\Http\Request $request
-     *
-     * @return object
-     */
-    protected function _fetchRecord(Request $request)
-    {
-        // $request->session()->flush();
-        $result = false;
-        $exclusions = $request->session()->get('battcatora.exclusions', []);
-        $this->Model = new BattcatOra;
-        $locale = $this->_getUserLocale();
-        $fault = $this->Model->fetchFault($exclusions, $locale);
-        if ($fault) {
-            $result = $fault[0];
-            $request->session()->push('battcatora.exclusions', $result->id_ords);
-        }
-
-        return $result;
     }
 }
