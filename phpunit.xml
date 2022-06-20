@@ -23,7 +23,6 @@
         <testsuite name="Unit">
             <directory suffix=".php">./tests/Unit</directory>
             <exclude>./tests/Unit/CharsetTest.php</exclude>
-            <exclude>./tests/Unit/WikiPageRetrieverTest.php</exclude>
         </testsuite>
     </testsuites>
     <filter>

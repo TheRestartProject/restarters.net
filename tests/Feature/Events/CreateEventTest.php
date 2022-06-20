@@ -308,8 +308,6 @@ class CreateEventTest extends TestCase
     /** @test */
     public function emails_sent_to_restarters_when_upcoming_event_approved()
     {
-        DB::connection()->enableQueryLog();
-
         $this->withoutExceptionHandling();
         $admin = factory(User::class)->state('Administrator')->create();
         $this->actingAs($admin);
@@ -608,6 +606,23 @@ class CreateEventTest extends TestCase
         Notification::assertNotSentTo(
             [$restarter], NotifyRestartersOfNewEvent::class
         );
+    }
+
+    /**
+     * @test
+     */
+    public function invalid_location_fails() {
+        $this->loginAsTestUser(Role::ADMINISTRATOR);
+        $idgroups = $this->createGroup();
+
+        $eventData = factory(Party::class)->raw([
+                                                    'group' => $idgroups,
+                                                    'location' => 'ForceGeocodeFailure',
+                                                ]);
+
+        // A geocode failure should result in an error alert.
+        $response = $this->post('/party/create/', $eventData);
+        $response->assertSee('alert-danger');
     }
 
     /** @test */
