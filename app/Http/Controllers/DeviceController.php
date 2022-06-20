@@ -223,7 +223,6 @@ class DeviceController extends Controller
         $wiki = $request->input('wiki');
         $estimate = $request->filled('estimate') ? $request->input('estimate', 0) : 0;
 
-
         if (empty($repair_status)) { //Override
             $repair_status = 0;
         }
