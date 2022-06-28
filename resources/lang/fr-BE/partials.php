@@ -95,7 +95,7 @@ return [
   'choose_spare_parts' => 'Pièces détachées',
   'solution_text2' => 'Cas d\'étude intéressant à partager?',
   'quantity' => 'Quantité',
-  'cancel' => 'Cancel',
+  'cancel' => 'Annuler',
   'powered_only' => '(calculé pour les objets électriques uniquement)',
   'add_device_powered' => 'Ajouter appareil électrique',
   'add_device_unpowered' => 'Ajouter appareil non-électrique',
@@ -117,4 +117,7 @@ return [
   'remove' => 'Supprimer',
   'total' => 'total',
   'please_choose' => 'Veuillez choisir...',
+  'confirm' => 'Confirmer',
+  'notification_greeting' => 'Bonjour !',
+  'notification_footer' => 'Si vous désirez ne plus recevoir ces emails, veuillez vous rendre sur <a href=":url">vos preferences</a> sur votre compte',
 ];

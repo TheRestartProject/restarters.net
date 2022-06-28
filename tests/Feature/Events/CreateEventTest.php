@@ -182,6 +182,7 @@ class CreateEventTest extends TestCase
 
                 // Mail should mention the venue.
                 self::assertRegexp('/' . $event->venue . '/', $mailData['introLines'][0]);
+                self::assertStringContainsString('#list-email-preferences', $mailData['outroLines'][0]);
 
                 return true;
             }
@@ -558,5 +559,68 @@ class CreateEventTest extends TestCase
         $upcoming_events = Party::futureForUser()->get();
         self::assertEquals(1, $upcoming_events->count());
         self::assertEquals($idevents, $upcoming_events[0]->idevents);
+    }
+
+    /**
+     * @test
+     */
+    public function no_notification_after_leaving() {
+        Notification::fake();
+        $this->withoutExceptionHandling();
+
+        $host = factory(User::class)->states('Host')->create();
+        $this->actingAs($host);
+
+        $restarter = factory(User::class)->states('Restarter')->create();
+
+        $group = factory(Group::class)->create([
+            'wordpress_post_id' => '99999'
+        ]);
+
+        $group->addVolunteer($host);
+        $group->makeMemberAHost($host);
+        $group->addVolunteer($restarter);
+
+        // Remove volunteer.
+        $response = $this->get("/group/remove-volunteer/{$group->idgroups}/{$restarter->id}");
+        $response->assertSessionHas('success');
+
+        $eventData = factory(Party::class)->raw([
+                                                    'group' => $group->idgroups,
+                                                    'event_start_utc' => '2100-01-01T10:15:05+05:00',
+                                                    'event_end_utc' => '2100-01-0113:45:05+05:00',
+                                                    'latitude'=>'1',
+                                                    'longitude'=>'1'
+                                                ]);
+
+        // Create and approve an event.
+        $response = $this->post('/party/create/', $eventData);
+        $event = Party::latest()->first();
+        $eventData['wordpress_post_id'] = 100;
+        $eventData['id'] = $event->idevents;
+        $eventData['moderate'] = 'approve';
+        $response = $this->post('/party/edit/'.$event->idevents, $eventData);
+
+        // Shouldn't notify
+        Notification::assertNotSentTo(
+            [$restarter], NotifyRestartersOfNewEvent::class
+        );
+    }
+
+    /**
+     * @test
+     */
+    public function invalid_location_fails() {
+        $this->loginAsTestUser(Role::ADMINISTRATOR);
+        $idgroups = $this->createGroup();
+
+        $eventData = factory(Party::class)->raw([
+                                                    'group' => $idgroups,
+                                                    'location' => 'ForceGeocodeFailure',
+                                                ]);
+
+        // A geocode failure should result in an error alert.
+        $response = $this->post('/party/create/', $eventData);
+        $response->assertSee('alert-danger');
     }
 }

@@ -166,6 +166,19 @@ Route::group(['middleware' => ['ensureAPIToken']], function () {
         Route::get('/status', 'BattcatOraController@status');
     });
 
+    Route::prefix('DustUp')->group(function () {
+        Route::get('/', 'DustupOraController@index');
+        Route::post('/', 'DustupOraController@index');
+        Route::get('/cta', 'DustupOraController@cta');
+        Route::get('/status', 'DustupOraController@status');
+    });
+    Route::prefix('dustup')->group(function () {
+        Route::get('/', 'DustupOraController@index');
+        Route::post('/', 'DustupOraController@index');
+        Route::get('/cta', 'DustupOraController@cta');
+        Route::get('/status', 'DustupOraController@status');
+    });
+
     Route::group(['middleware' => ['guest']], function () {
         Route::get('/', 'HomeController@index')->name('home');
         Route::get('/about', 'HomeController@index')->name('home');
@@ -291,7 +304,6 @@ Route::group(['middleware' => ['auth', 'verifyUserConsent', 'ensureAPIToken']], 
         Route::get('/accept-invite/{id}/{hash}', 'PartyController@confirmInvite');
         Route::get('/cancel-invite/{id}', 'PartyController@cancelInvite');
         Route::post('/remove-volunteer', 'PartyController@removeVolunteer');
-        Route::get('/get-group-emails/{event_id}', 'PartyController@getGroupEmails');
         Route::get('/get-group-emails-with-names/{event_id}', 'PartyController@getGroupEmailsWithNames');
         Route::post('/update-quantity', 'PartyController@updateQuantity');
         Route::post('/image-upload/{id}', 'PartyController@imageUpload');
@@ -394,9 +406,9 @@ Route::group(['middleware' => ['ensureAPIToken']], function () {
         return new \App\Services\CheckAuthService;
     });
 
-    Route::prefix('test')->group(function () {
-        Route::get('/', 'TestController@index');
-        Route::get('/styles', 'TestController@styles');
-        Route::get('/styles/find', 'TestController@stylesFind');
+    Route::prefix('style')->group(function () {
+        Route::get('/', 'StyleController@index');
+        Route::get('/guide', 'StyleController@guide');
+        Route::get('/find', 'StyleController@find');
     });
 });

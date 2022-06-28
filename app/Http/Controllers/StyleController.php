@@ -5,7 +5,7 @@ namespace App\Http\Controllers;
 use Auth;
 use Illuminate\Http\Request;
 
-class TestController extends Controller
+class StyleController extends Controller
 {
     /**
      * Nothing to see here.
@@ -17,7 +17,7 @@ class TestController extends Controller
         return redirect()->action('HomeController@index');
     }
 
-    public function styles(Request $request)
+    public function guide(Request $request)
     {
         if (! Auth::check()) {
             return $this->index($request);
@@ -26,7 +26,7 @@ class TestController extends Controller
         return view('test.styles', []);
     }
 
-    public function stylesFind(Request $request)
+    public function find(Request $request)
     {
         $result = $this->findClassElements();
         logger($result);

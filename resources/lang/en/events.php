@@ -213,4 +213,5 @@ return [
   'no_location' => '<b>You do not currently have a town/city set.  You can set one in <a href="/profile/edit">your profile</a>.</b>',
   'review_requested' => 'Thanks - all Restarters that attended have been sent a notification',
   'review_requested_permissions' => 'Sorry - you do not have the correct permissions for this action',
+  'you_have_joined' => 'You have joined <a class="plain-link" href=":url">:name</a>',
 ];
