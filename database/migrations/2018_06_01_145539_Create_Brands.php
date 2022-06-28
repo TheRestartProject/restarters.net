@@ -19,7 +19,7 @@ class CreateBrands extends Migration
             $table->timestamps();
         });
         Schema::table('devices', function (Blueprint $table) {
-            $table->string('device_brand');
+            $table->string('device_brand')->nullable();
         });
     }
 

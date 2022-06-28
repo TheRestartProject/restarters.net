@@ -82,7 +82,7 @@ class DeviceController extends Controller
         }
 
         $category = $request->input('category');
-        $weight = $request->input('estimate', 0);
+        $weight = $request->filled('estimate') ? $request->input('estimate', 0) : 0;
         $brand = $request->input('brand');
         $model = $request->input('model');
         $item_type = $request->input('item_type');
@@ -221,7 +221,7 @@ class DeviceController extends Controller
         $spare_parts = $request->input('spare_parts');
         $event_id = $request->input('event_id');
         $wiki = $request->input('wiki');
-        $estimate = $request->input('estimate',0);
+        $estimate = $request->filled('estimate') ? $request->input('estimate', 0) : 0;
 
         if (empty($repair_status)) { //Override
             $repair_status = 0;
