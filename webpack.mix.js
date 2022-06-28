@@ -1,14 +1,6 @@
 let mix = require('laravel-mix');
 let webpack = require('webpack');
 const WebpackShellPlugin = require('webpack-shell-plugin');
-require('laravel-mix-bundle-analyzer');
-
-if (!mix.inProduction()) {
-    mix.bundleAnalyzer({
-        analyzerMode: 'static',
-        openAnalyzer: false
-    });
-}
 
 mix.webpackConfig({
     plugins: [
