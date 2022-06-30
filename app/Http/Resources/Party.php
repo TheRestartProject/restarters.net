@@ -26,7 +26,7 @@ class Party extends JsonResource
             'lng' => $this->longitude,
             'group' => Group::make($this->theGroup),
             'description' => $this->free_text,
-            // TODO Stats
+            'stats' => $this->resource->getEventStats()
         ];
     }
 }

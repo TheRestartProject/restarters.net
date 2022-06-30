@@ -73,4 +73,8 @@ Route::group(['prefix' => 'v2'], function() {
     Route::prefix('/groups')->group(function() {
         Route::get('{id}/events', 'API\GroupController@getEventsForGroupv2');
     });
+
+    Route::prefix('/events')->group(function() {
+        Route::get('{id}', 'API\EventController@getEventv2');
+    });
 });
