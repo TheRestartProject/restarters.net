@@ -229,7 +229,6 @@ class GroupController extends Controller
     }
 
     public static function getEventsForGroupv2(Request $request, $idgroups) {
-        // TODO Date filtering
         Group::findOrFail($idgroups);
 
         // Get date filters.  We default to far past and far future so that we don't need multiple code branches.  We
