@@ -228,6 +228,11 @@ class GroupController extends Controller
         ]);
     }
 
+    public static function getGroupv2(Request $request, $idgroups) {
+        $group = Group::findOrFail($idgroups);
+        return \App\Http\Resources\Group::make($group);
+    }
+
     public static function getEventsForGroupv2(Request $request, $idgroups) {
         Group::findOrFail($idgroups);
 

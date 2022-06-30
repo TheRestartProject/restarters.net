@@ -22,9 +22,10 @@ class PartySummary extends JsonResource
             'timezone' => $this->timezone,
             'title' => $this->venue ?? $this->location,
             'location' => $this->location,
+            'online' => $this->online,
             'lat' => $this->latitude,
             'lng' => $this->longitude,
-            'group' => Group::make($this->theGroup),
+            'group' => GroupSummary::make($this->theGroup),
         ];
     }
 }

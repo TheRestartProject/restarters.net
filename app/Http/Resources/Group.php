@@ -14,11 +14,15 @@ class Group extends JsonResource
      */
     public function toArray($request)
     {
-        // For now we only need to return a minimal set of information used in the event call.
         return [
             'id' => $this->idgroups,
             'name' => $this->name,
-            'image' => $this->groupImage && is_object($this->groupImage) && is_object($this->groupImage->image) ? $this->groupImage->image->path : null
+            'image' => $this->groupImage && is_object($this->groupImage) && is_object($this->groupImage->image) ? $this->groupImage->image->path : null,
+            'area' => $this->area,
+            'country' => $this->country,
+            'website' => $this->website,
+            'description' => $this->free_text,
+            'stats' => $this->resource->getGroupStats()
         ];
     }
 }
