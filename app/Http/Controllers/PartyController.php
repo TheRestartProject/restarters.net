@@ -946,6 +946,7 @@ class PartyController extends Controller
                         'name' => $from->name,
                         'group' => $group_name,
                         'url' => $url,
+                        'view_url' => url('/party/view/'.$event->idevents),
                         'message' => $message,
                         'event' => $event,
                     ];
@@ -983,6 +984,7 @@ class PartyController extends Controller
                         'name' => $from->name,
                         'group' => $group_name,
                         'url' => $url,
+                        'view_url' => url('/party/view/'.$event->idevents),
                         'message' => $message,
                         'event' => $event,
                     ];
