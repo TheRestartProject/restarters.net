@@ -3,7 +3,7 @@
 /*
  * This file is part of Psy Shell.
  *
- * (c) 2012-2020 Justin Hileman
+ * (c) 2012-2022 Justin Hileman
  *
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
@@ -93,7 +93,7 @@ class Presenter
      *
      * @return string
      */
-    public function presentRef($value)
+    public function presentRef($value): string
     {
         return $this->present($value, 0);
     }
@@ -109,7 +109,7 @@ class Presenter
      *
      * @return string
      */
-    public function present($value, $depth = null, $options = 0)
+    public function present($value, int $depth = null, int $options = 0): string
     {
         $data = $this->cloner->cloneVar($value, !($options & self::VERBOSE) ? Caster::EXCLUDE_VERBOSE : 0);
 

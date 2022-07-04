@@ -47,6 +47,9 @@ export interface Event {
     spans?: Span[];
     measurements?: Measurements;
     debug_meta?: DebugMeta;
+    sdkProcessingMetadata?: {
+        [key: string]: any;
+    };
 }
 /** JSDoc */
 export declare type EventType = 'transaction';

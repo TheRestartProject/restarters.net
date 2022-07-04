@@ -1,18 +1,23 @@
 import { SentryError } from './error';
-import { SyncPromise } from './syncpromise';
-/** A simple queue that holds promises. */
-var PromiseBuffer = /** @class */ (function () {
-    function PromiseBuffer(_limit) {
-        this._limit = _limit;
-        /** Internal set of queued Promises */
-        this._buffer = [];
+import { rejectedSyncPromise, resolvedSyncPromise, SyncPromise } from './syncpromise';
+/**
+ * Creates an new PromiseBuffer object with the specified limit
+ * @param limit max number of promises that can be stored in the buffer
+ */
+export function makePromiseBuffer(limit) {
+    var buffer = [];
+    function isReady() {
+        return limit === undefined || buffer.length < limit;
     }
     /**
-     * Says if the buffer is ready to take more requests
+     * Remove a promise from the queue.
+     *
+     * @param task Can be any PromiseLike<T>
+     * @returns Removed promise.
      */
-    PromiseBuffer.prototype.isReady = function () {
-        return this._limit === undefined || this.length() < this._limit;
-    };
+    function remove(task) {
+        return buffer.splice(buffer.indexOf(task), 1)[0];
+    }
     /**
      * Add a promise (representing an in-flight action) to the queue, and set it to remove itself on fulfillment.
      *
@@ -23,44 +28,27 @@ var PromiseBuffer = /** @class */ (function () {
      *        limit check.
      * @returns The original promise.
      */
-    PromiseBuffer.prototype.add = function (taskProducer) {
-        var _this = this;
-        if (!this.isReady()) {
-            return SyncPromise.reject(new SentryError('Not adding Promise due to buffer limit reached.'));
+    function add(taskProducer) {
+        if (!isReady()) {
+            return rejectedSyncPromise(new SentryError('Not adding Promise due to buffer limit reached.'));
         }
         // start the task and add its promise to the queue
         var task = taskProducer();
-        if (this._buffer.indexOf(task) === -1) {
-            this._buffer.push(task);
+        if (buffer.indexOf(task) === -1) {
+            buffer.push(task);
         }
         void task
-            .then(function () { return _this.remove(task); })
+            .then(function () { return remove(task); })
             // Use `then(null, rejectionHandler)` rather than `catch(rejectionHandler)` so that we can use `PromiseLike`
             // rather than `Promise`. `PromiseLike` doesn't have a `.catch` method, making its polyfill smaller. (ES5 didn't
             // have promises, so TS has to polyfill when down-compiling.)
             .then(null, function () {
-            return _this.remove(task).then(null, function () {
-                // We have to add another catch here because `this.remove()` starts a new promise chain.
+            return remove(task).then(null, function () {
+                // We have to add another catch here because `remove()` starts a new promise chain.
             });
         });
         return task;
-    };
-    /**
-     * Remove a promise from the queue.
-     *
-     * @param task Can be any PromiseLike<T>
-     * @returns Removed promise.
-     */
-    PromiseBuffer.prototype.remove = function (task) {
-        var removedTask = this._buffer.splice(this._buffer.indexOf(task), 1)[0];
-        return removedTask;
-    };
-    /**
-     * This function returns the number of unresolved promises in the queue.
-     */
-    PromiseBuffer.prototype.length = function () {
-        return this._buffer.length;
-    };
+    }
     /**
      * Wait for all promises in the queue to resolve or for timeout to expire, whichever comes first.
      *
@@ -70,9 +58,12 @@ var PromiseBuffer = /** @class */ (function () {
      * @returns A promise which will resolve to `true` if the queue is already empty or drains before the timeout, and
      * `false` otherwise
      */
-    PromiseBuffer.prototype.drain = function (timeout) {
-        var _this = this;
-        return new SyncPromise(function (resolve) {
+    function drain(timeout) {
+        return new SyncPromise(function (resolve, reject) {
+            var counter = buffer.length;
+            if (!counter) {
+                return resolve(true);
+            }
             // wait for `timeout` ms and then resolve to `false` (if not cancelled first)
             var capturedSetTimeout = setTimeout(function () {
                 if (timeout && timeout > 0) {
@@ -80,17 +71,21 @@ var PromiseBuffer = /** @class */ (function () {
                 }
             }, timeout);
             // if all promises resolve in time, cancel the timer and resolve to `true`
-            void SyncPromise.all(_this._buffer)
-                .then(function () {
-                clearTimeout(capturedSetTimeout);
-                resolve(true);
-            })
-                .then(null, function () {
-                resolve(true);
+            buffer.forEach(function (item) {
+                void resolvedSyncPromise(item).then(function () {
+                    // eslint-disable-next-line no-plusplus
+                    if (!--counter) {
+                        clearTimeout(capturedSetTimeout);
+                        resolve(true);
+                    }
+                }, reject);
             });
         });
+    }
+    return {
+        $: buffer,
+        add: add,
+        drain: drain,
     };
-    return PromiseBuffer;
-}());
-export { PromiseBuffer };
+}
 //# sourceMappingURL=promisebuffer.js.map

@@ -28,4 +28,16 @@ export declare function safeJoin(input: any[], delimiter?: string): string;
  * @param pattern Either a regex or a string that must be contained in value
  */
 export declare function isMatchingPattern(value: string, pattern: RegExp | string): boolean;
+/**
+ * Given a string, escape characters which have meaning in the regex grammar, such that the result is safe to feed to
+ * `new RegExp()`.
+ *
+ * Based on https://github.com/sindresorhus/escape-string-regexp. Vendored to a) reduce the size by skipping the runtime
+ * type-checking, and b) ensure it gets down-compiled for old versions of Node (the published package only supports Node
+ * 12+).
+ *
+ * @param regexString The string to escape
+ * @returns An version of the string with all special regex characters escaped
+ */
+export declare function escapeStringForRegex(regexString: string): string;
 //# sourceMappingURL=string.d.ts.map

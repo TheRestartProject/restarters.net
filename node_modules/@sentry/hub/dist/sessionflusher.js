@@ -1,6 +1,6 @@
 Object.defineProperty(exports, "__esModule", { value: true });
-var types_1 = require("@sentry/types");
 var utils_1 = require("@sentry/utils");
+var flags_1 = require("./flags");
 var hub_1 = require("./hub");
 /**
  * @inheritdoc
@@ -19,11 +19,11 @@ var SessionFlusher = /** @class */ (function () {
     /** Sends session aggregates to Transport */
     SessionFlusher.prototype.sendSessionAggregates = function (sessionAggregates) {
         if (!this._transport.sendSession) {
-            utils_1.logger.warn("Dropping session because custom transport doesn't implement sendSession");
+            flags_1.IS_DEBUG_BUILD && utils_1.logger.warn("Dropping session because custom transport doesn't implement sendSession");
             return;
         }
         void this._transport.sendSession(sessionAggregates).then(null, function (reason) {
-            utils_1.logger.error("Error while sending session: " + reason);
+            flags_1.IS_DEBUG_BUILD && utils_1.logger.error('Error while sending session:', reason);
         });
     };
     /** Checks if `pendingAggregates` has entries, and if it does flushes them by calling `sendSessions` */
@@ -59,17 +59,18 @@ var SessionFlusher = /** @class */ (function () {
      * `_incrementSessionStatusCount` along with the start date
      */
     SessionFlusher.prototype.incrementSessionStatusCount = function () {
-        var _a, _b;
         if (!this._isEnabled) {
             return;
         }
         var scope = hub_1.getCurrentHub().getScope();
-        var requestSession = (_a = scope) === null || _a === void 0 ? void 0 : _a.getRequestSession();
+        var requestSession = scope && scope.getRequestSession();
         if (requestSession && requestSession.status) {
             this._incrementSessionStatusCount(requestSession.status, new Date());
             // This is not entirely necessarily but is added as a safe guard to indicate the bounds of a request and so in
             // case captureRequestSession is called more than once to prevent double count
-            (_b = scope) === null || _b === void 0 ? void 0 : _b.setRequestSession(undefined);
+            if (scope) {
+                scope.setRequestSession(undefined);
+            }
             /* eslint-enable @typescript-eslint/no-unsafe-member-access */
         }
     };
@@ -88,13 +89,13 @@ var SessionFlusher = /** @class */ (function () {
             aggregationCounts.started = new Date(sessionStartedTrunc).toISOString();
         }
         switch (status) {
-            case types_1.RequestSessionStatus.Errored:
+            case 'errored':
                 aggregationCounts.errored = (aggregationCounts.errored || 0) + 1;
                 return aggregationCounts.errored;
-            case types_1.RequestSessionStatus.Ok:
+            case 'ok':
                 aggregationCounts.exited = (aggregationCounts.exited || 0) + 1;
                 return aggregationCounts.exited;
-            case types_1.RequestSessionStatus.Crashed:
+            default:
                 aggregationCounts.crashed = (aggregationCounts.crashed || 0) + 1;
                 return aggregationCounts.crashed;
         }

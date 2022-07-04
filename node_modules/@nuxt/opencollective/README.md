@@ -91,8 +91,8 @@ production or running a CI pipeline. That's why the message is
 - `CONTINUOUS_INTEGRATION`
 - `NODE_ENV` (set and **not** `dev` or `development`)
 - `DISABLE_OPENCOLLECTIVE` (set to any string value that is not `'false'` or `'0'`,
-  for compatability with
-  [opencollective-postinatall](https://github.com/opencollective/opencollective-postinstall))
+  for compatibility with
+  [opencollective-postinstall](https://github.com/opencollective/opencollective-postinstall))
 
 ## Development
 

@@ -20,7 +20,7 @@ export declare class Session implements SessionInterface {
     /** JSDoc */
     update(context?: SessionContext): void;
     /** JSDoc */
-    close(status?: Exclude<SessionStatus, SessionStatus.Ok>): void;
+    close(status?: Exclude<SessionStatus, 'ok'>): void;
     /** JSDoc */
     toJSON(): {
         init: boolean;

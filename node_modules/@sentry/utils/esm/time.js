@@ -1,4 +1,4 @@
-import { getGlobalObject } from './misc';
+import { getGlobalObject } from './global';
 import { dynamicRequire, isNodeEnv } from './node';
 /**
  * A TimestampSource implementation for environments that do not support the Performance Web API natively.

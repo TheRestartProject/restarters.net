@@ -28,14 +28,6 @@ export declare class TryCatch implements Integration {
      * and provide better metadata.
      */
     setupOnce(): void;
-    /** JSDoc */
-    private _wrapTimeFunction;
-    /** JSDoc */
-    private _wrapRAF;
-    /** JSDoc */
-    private _wrapEventTarget;
-    /** JSDoc */
-    private _wrapXHR;
 }
 export {};
 //# sourceMappingURL=trycatch.d.ts.map

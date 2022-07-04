@@ -187,7 +187,7 @@ export function markText(doc, from, to, options, type) {
     if (marker.collapsed && curLine != from.line) updateLineHeight(line, 0)
     addMarkedSpan(line, new MarkedSpan(marker,
                                        curLine == from.line ? from.ch : null,
-                                       curLine == to.line ? to.ch : null))
+                                       curLine == to.line ? to.ch : null), doc.cm && doc.cm.curOp)
     ++curLine
   })
   // lineIsHidden depends on the presence of the spans, so needs a second pass
@@ -211,7 +211,8 @@ export function markText(doc, from, to, options, type) {
     if (updateMaxLine) cm.curOp.updateMaxLine = true
     if (marker.collapsed)
       regChange(cm, from.line, to.line + 1)
-    else if (marker.className || marker.title || marker.startStyle || marker.endStyle || marker.css)
+    else if (marker.className || marker.startStyle || marker.endStyle || marker.css ||
+             marker.attributes || marker.title)
       for (let i = from.line; i <= to.line; i++) regLineChange(cm, i, "text")
     if (marker.atomic) reCheckSelection(cm.doc)
     signalLater(cm, "markerAdded", cm, marker)

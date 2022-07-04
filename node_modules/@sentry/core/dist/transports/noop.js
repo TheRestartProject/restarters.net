@@ -1,5 +1,4 @@
 Object.defineProperty(exports, "__esModule", { value: true });
-var types_1 = require("@sentry/types");
 var utils_1 = require("@sentry/utils");
 /** Noop transport */
 var NoopTransport = /** @class */ (function () {
@@ -9,16 +8,16 @@ var NoopTransport = /** @class */ (function () {
      * @inheritDoc
      */
     NoopTransport.prototype.sendEvent = function (_) {
-        return utils_1.SyncPromise.resolve({
-            reason: "NoopTransport: Event has been skipped because no Dsn is configured.",
-            status: types_1.Status.Skipped,
+        return utils_1.resolvedSyncPromise({
+            reason: 'NoopTransport: Event has been skipped because no Dsn is configured.',
+            status: 'skipped',
         });
     };
     /**
      * @inheritDoc
      */
     NoopTransport.prototype.close = function (_) {
-        return utils_1.SyncPromise.resolve(true);
+        return utils_1.resolvedSyncPromise(true);
     };
     return NoopTransport;
 }());

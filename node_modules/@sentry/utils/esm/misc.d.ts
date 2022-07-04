@@ -1,26 +1,4 @@
-import { Event, Integration, StackFrame } from '@sentry/types';
-/** Internal */
-interface SentryGlobal {
-    Sentry?: {
-        Integrations?: Integration[];
-    };
-    SENTRY_ENVIRONMENT?: string;
-    SENTRY_DSN?: string;
-    SENTRY_RELEASE?: {
-        id?: string;
-    };
-    __SENTRY__: {
-        globalEventProcessors: any;
-        hub: any;
-        logger: any;
-    };
-}
-/**
- * Safely get global scope object
- *
- * @returns Global scope object
- */
-export declare function getGlobalObject<T>(): T & SentryGlobal;
+import { Event, Mechanism, StackFrame } from '@sentry/types';
 /**
  * UUID4 generator
  *
@@ -45,8 +23,6 @@ export declare function parseUrl(url: string): {
  * @returns event's description
  */
 export declare function getEventDescription(event: Event): string;
-/** JSDoc */
-export declare function consoleSandbox(callback: () => any): any;
 /**
  * Adds exception values, type and value to an synthetic Exception.
  * @param event The event to modify.
@@ -56,18 +32,13 @@ export declare function consoleSandbox(callback: () => any): any;
  */
 export declare function addExceptionTypeValue(event: Event, value?: string, type?: string): void;
 /**
- * Adds exception mechanism to a given event.
+ * Adds exception mechanism data to a given event. Uses defaults if the second parameter is not passed.
+ *
  * @param event The event to modify.
- * @param mechanism Mechanism of the mechanism.
+ * @param newMechanism Mechanism data to add to the event.
  * @hidden
  */
-export declare function addExceptionMechanism(event: Event, mechanism?: {
-    [key: string]: any;
-}): void;
-/**
- * A safe form of location.href
- */
-export declare function getLocationHref(): string;
+export declare function addExceptionMechanism(event: Event, newMechanism?: Partial<Mechanism>): void;
 /**
  * Represents Semantic Versioning object
  */
@@ -84,12 +55,6 @@ interface SemVer {
  */
 export declare function parseSemver(input: string): SemVer;
 /**
- * Extracts Retry-After value from the request header or returns default value
- * @param now current unix timestamp
- * @param header string representation of 'Retry-After' header
- */
-export declare function parseRetryAfterHeader(now: number, header?: string | number | null): number;
-/**
  * This function adds context (pre/post/line) lines to the provided frame
  *
  * @param lines string[] containing all lines
@@ -104,5 +69,27 @@ export declare function addContextToFrame(lines: string[], frame: StackFrame, li
  * @returns URL or path without query string or fragment
  */
 export declare function stripUrlQueryAndFragment(urlPath: string): string;
+/**
+ * Checks whether or not we've already captured the given exception (note: not an identical exception - the very object
+ * in question), and marks it captured if not.
+ *
+ * This is useful because it's possible for an error to get captured by more than one mechanism. After we intercept and
+ * record an error, we rethrow it (assuming we've intercepted it before it's reached the top-level global handlers), so
+ * that we don't interfere with whatever effects the error might have had were the SDK not there. At that point, because
+ * the error has been rethrown, it's possible for it to bubble up to some other code we've instrumented. If it's not
+ * caught after that, it will bubble all the way up to the global handlers (which of course we also instrument). This
+ * function helps us ensure that even if we encounter the same error more than once, we only record it the first time we
+ * see it.
+ *
+ * Note: It will ignore primitives (always return `false` and not mark them as seen), as properties can't be set on
+ * them. {@link: Object.objectify} can be used on exceptions to convert any that are primitives into their equivalent
+ * object wrapper forms so that this check will always work. However, because we need to flag the exact object which
+ * will get rethrown, and because that rethrowing happens outside of the event processing pipeline, the objectification
+ * must be done before the exception captured.
+ *
+ * @param A thrown exception to check or flag as having been seen
+ * @returns `true` if the exception has already been captured, `false` if not (with the side effect of marking it seen)
+ */
+export declare function checkOrSetAlreadyCaught(exception: unknown): boolean;
 export {};
 //# sourceMappingURL=misc.d.ts.map

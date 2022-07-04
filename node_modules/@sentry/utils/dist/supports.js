@@ -1,6 +1,7 @@
 Object.defineProperty(exports, "__esModule", { value: true });
+var flags_1 = require("./flags");
+var global_1 = require("./global");
 var logger_1 = require("./logger");
-var misc_1 = require("./misc");
 /**
  * Tells whether current environment supports ErrorEvent objects
  * {@link supportsErrorEvent}.
@@ -59,7 +60,7 @@ exports.supportsDOMException = supportsDOMException;
  * @returns Answer to the given question.
  */
 function supportsFetch() {
-    if (!('fetch' in misc_1.getGlobalObject())) {
+    if (!('fetch' in global_1.getGlobalObject())) {
         return false;
     }
     try {
@@ -91,7 +92,7 @@ function supportsNativeFetch() {
     if (!supportsFetch()) {
         return false;
     }
-    var global = misc_1.getGlobalObject();
+    var global = global_1.getGlobalObject();
     // Fast path to avoid DOM I/O
     // eslint-disable-next-line @typescript-eslint/unbound-method
     if (isNativeFetch(global.fetch)) {
@@ -102,7 +103,7 @@ function supportsNativeFetch() {
     var result = false;
     var doc = global.document;
     // eslint-disable-next-line deprecation/deprecation
-    if (doc && typeof doc.createElement === "function") {
+    if (doc && typeof doc.createElement === 'function') {
         try {
             var sandbox = doc.createElement('iframe');
             sandbox.hidden = true;
@@ -114,7 +115,8 @@ function supportsNativeFetch() {
             doc.head.removeChild(sandbox);
         }
         catch (err) {
-            logger_1.logger.warn('Could not create sandbox iframe for pure fetch check, bailing to window.fetch: ', err);
+            flags_1.IS_DEBUG_BUILD &&
+                logger_1.logger.warn('Could not create sandbox iframe for pure fetch check, bailing to window.fetch: ', err);
         }
     }
     return result;
@@ -127,7 +129,7 @@ exports.supportsNativeFetch = supportsNativeFetch;
  * @returns Answer to the given question.
  */
 function supportsReportingObserver() {
-    return 'ReportingObserver' in misc_1.getGlobalObject();
+    return 'ReportingObserver' in global_1.getGlobalObject();
 }
 exports.supportsReportingObserver = supportsReportingObserver;
 /**
@@ -137,9 +139,9 @@ exports.supportsReportingObserver = supportsReportingObserver;
  * @returns Answer to the given question.
  */
 function supportsReferrerPolicy() {
-    // Despite all stars in the sky saying that Edge supports old draft syntax, aka 'never', 'always', 'origin' and 'default
-    // https://caniuse.com/#feat=referrer-policy
-    // It doesn't. And it throw exception instead of ignoring this parameter...
+    // Despite all stars in the sky saying that Edge supports old draft syntax, aka 'never', 'always', 'origin' and 'default'
+    // (see https://caniuse.com/#feat=referrer-policy),
+    // it doesn't. And it throws an exception instead of ignoring this parameter...
     // REF: https://github.com/getsentry/raven-js/issues/1233
     if (!supportsFetch()) {
         return false;
@@ -165,7 +167,7 @@ function supportsHistory() {
     // NOTE: in Chrome App environment, touching history.pushState, *even inside
     //       a try/catch block*, will cause Chrome to output an error to console.error
     // borrowed from: https://github.com/angular/angular.js/pull/13945/files
-    var global = misc_1.getGlobalObject();
+    var global = global_1.getGlobalObject();
     /* eslint-disable @typescript-eslint/no-unsafe-member-access */
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     var chrome = global.chrome;

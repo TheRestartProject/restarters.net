@@ -1,19 +1,11 @@
-import { Event, Response, Session } from '@sentry/types';
+import { Event, Response, SentryRequest, Session } from '@sentry/types';
 import { BaseTransport } from './base';
 /** `XHR` based transport */
 export declare class XHRTransport extends BaseTransport {
     /**
-     * @inheritDoc
-     */
-    sendEvent(event: Event): PromiseLike<Response>;
-    /**
-     * @inheritDoc
-     */
-    sendSession(session: Session): PromiseLike<Response>;
-    /**
      * @param sentryRequest Prepared SentryRequest to be delivered
      * @param originalPayload Original payload used to create SentryRequest
      */
-    private _sendRequest;
+    protected _sendRequest(sentryRequest: SentryRequest, originalPayload: Event | Session): PromiseLike<Response>;
 }
 //# sourceMappingURL=xhr.d.ts.map

@@ -19,7 +19,7 @@ class TinkerCommand extends Command
      * @var array
      */
     protected $commandWhitelist = [
-        'clear-compiled', 'down', 'env', 'inspire', 'migrate', 'optimize', 'up',
+        'clear-compiled', 'down', 'env', 'inspire', 'migrate', 'migrate:install', 'optimize', 'up',
     ];
 
     /**
@@ -102,7 +102,9 @@ class TinkerCommand extends Command
         $config = $this->getLaravel()->make('config');
 
         foreach ($config->get('tinker.commands', []) as $command) {
-            $commands[] = $this->getApplication()->resolve($command);
+            $commands[] = $this->getApplication()->add(
+                $this->getLaravel()->make($command)
+            );
         }
 
         return $commands;

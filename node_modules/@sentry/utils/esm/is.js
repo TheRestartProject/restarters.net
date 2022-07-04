@@ -1,5 +1,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 /* eslint-disable @typescript-eslint/explicit-module-boundary-types */
+// eslint-disable-next-line @typescript-eslint/unbound-method
+var objectToString = Object.prototype.toString;
 /**
  * Checks whether given value's type is one of a few Error or Error-like
  * {@link isError}.
@@ -8,16 +10,17 @@
  * @returns A boolean representing the result.
  */
 export function isError(wat) {
-    switch (Object.prototype.toString.call(wat)) {
+    switch (objectToString.call(wat)) {
         case '[object Error]':
-            return true;
         case '[object Exception]':
-            return true;
         case '[object DOMException]':
             return true;
         default:
             return isInstanceOf(wat, Error);
     }
+}
+function isBuiltin(wat, ty) {
+    return objectToString.call(wat) === "[object " + ty + "]";
 }
 /**
  * Checks whether given value's type is ErrorEvent
@@ -27,7 +30,7 @@ export function isError(wat) {
  * @returns A boolean representing the result.
  */
 export function isErrorEvent(wat) {
-    return Object.prototype.toString.call(wat) === '[object ErrorEvent]';
+    return isBuiltin(wat, 'ErrorEvent');
 }
 /**
  * Checks whether given value's type is DOMError
@@ -37,7 +40,7 @@ export function isErrorEvent(wat) {
  * @returns A boolean representing the result.
  */
 export function isDOMError(wat) {
-    return Object.prototype.toString.call(wat) === '[object DOMError]';
+    return isBuiltin(wat, 'DOMError');
 }
 /**
  * Checks whether given value's type is DOMException
@@ -47,7 +50,7 @@ export function isDOMError(wat) {
  * @returns A boolean representing the result.
  */
 export function isDOMException(wat) {
-    return Object.prototype.toString.call(wat) === '[object DOMException]';
+    return isBuiltin(wat, 'DOMException');
 }
 /**
  * Checks whether given value's type is a string
@@ -57,10 +60,10 @@ export function isDOMException(wat) {
  * @returns A boolean representing the result.
  */
 export function isString(wat) {
-    return Object.prototype.toString.call(wat) === '[object String]';
+    return isBuiltin(wat, 'String');
 }
 /**
- * Checks whether given value's is a primitive (undefined, null, number, boolean, string, bigint, symbol)
+ * Checks whether given value is a primitive (undefined, null, number, boolean, string, bigint, symbol)
  * {@link isPrimitive}.
  *
  * @param wat A value to be checked.
@@ -77,7 +80,7 @@ export function isPrimitive(wat) {
  * @returns A boolean representing the result.
  */
 export function isPlainObject(wat) {
-    return Object.prototype.toString.call(wat) === '[object Object]';
+    return isBuiltin(wat, 'Object');
 }
 /**
  * Checks whether given value's type is an Event instance
@@ -107,7 +110,7 @@ export function isElement(wat) {
  * @returns A boolean representing the result.
  */
 export function isRegExp(wat) {
-    return Object.prototype.toString.call(wat) === '[object RegExp]';
+    return isBuiltin(wat, 'RegExp');
 }
 /**
  * Checks whether given value has a then function.
@@ -126,6 +129,16 @@ export function isThenable(wat) {
  */
 export function isSyntheticEvent(wat) {
     return isPlainObject(wat) && 'nativeEvent' in wat && 'preventDefault' in wat && 'stopPropagation' in wat;
+}
+/**
+ * Checks whether given value is NaN
+ * {@link isNaN}.
+ *
+ * @param wat A value to be checked.
+ * @returns A boolean representing the result.
+ */
+export function isNaN(wat) {
+    return typeof wat === 'number' && wat !== wat;
 }
 /**
  * Checks whether given value's type is an instance of provided constructor.

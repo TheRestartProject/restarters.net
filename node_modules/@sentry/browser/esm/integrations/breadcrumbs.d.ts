@@ -42,26 +42,6 @@ export declare class Breadcrumbs implements Integration {
      *  - History API
      */
     setupOnce(): void;
-    /**
-     * Creates breadcrumbs from console API calls
-     */
-    private _consoleBreadcrumb;
-    /**
-     * Creates breadcrumbs from DOM API calls
-     */
-    private _domBreadcrumb;
-    /**
-     * Creates breadcrumbs from XHR API calls
-     */
-    private _xhrBreadcrumb;
-    /**
-     * Creates breadcrumbs from fetch API calls
-     */
-    private _fetchBreadcrumb;
-    /**
-     * Creates breadcrumbs from history API calls
-     */
-    private _historyBreadcrumb;
 }
 export {};
 //# sourceMappingURL=breadcrumbs.d.ts.map

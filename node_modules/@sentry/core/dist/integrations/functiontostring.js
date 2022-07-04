@@ -1,4 +1,5 @@
 Object.defineProperty(exports, "__esModule", { value: true });
+var utils_1 = require("@sentry/utils");
 var originalFunctionToString;
 /** Patch toString calls to return proper name for wrapped functions */
 var FunctionToString = /** @class */ (function () {
@@ -20,7 +21,7 @@ var FunctionToString = /** @class */ (function () {
             for (var _i = 0; _i < arguments.length; _i++) {
                 args[_i] = arguments[_i];
             }
-            var context = this.__sentry_original__ || this;
+            var context = utils_1.getOriginalFunction(this) || this;
             return originalFunctionToString.apply(context, args);
         };
     };

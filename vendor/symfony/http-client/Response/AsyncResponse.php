@@ -85,6 +85,9 @@ final class AsyncResponse implements ResponseInterface, StreamableInterface
         if (\array_key_exists('user_data', $options)) {
             $this->info['user_data'] = $options['user_data'];
         }
+        if (\array_key_exists('max_duration', $options)) {
+            $this->info['max_duration'] = $options['max_duration'];
+        }
     }
 
     public function getStatusCode(): int
@@ -311,6 +314,9 @@ final class AsyncResponse implements ResponseInterface, StreamableInterface
         }
     }
 
+    /**
+     * @param \SplObjectStorage<ResponseInterface, AsyncResponse>|null $asyncMap
+     */
     private static function passthru(HttpClientInterface $client, self $r, ChunkInterface $chunk, \SplObjectStorage $asyncMap = null): \Generator
     {
         $r->stream = null;
@@ -332,6 +338,9 @@ final class AsyncResponse implements ResponseInterface, StreamableInterface
         yield from self::passthruStream($response, $r, null, $asyncMap);
     }
 
+    /**
+     * @param \SplObjectStorage<ResponseInterface, AsyncResponse>|null $asyncMap
+     */
     private static function passthruStream(ResponseInterface $response, self $r, ?ChunkInterface $chunk, ?\SplObjectStorage $asyncMap): \Generator
     {
         while (true) {

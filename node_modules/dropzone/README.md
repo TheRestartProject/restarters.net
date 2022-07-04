@@ -1,36 +1,65 @@
-<img alt="Dropzone.js" src="http://www.dropzonejs.com/images/new-logo.svg" />
+<img alt="Dropzone.js" src="https://raw.githubusercontent.com/dropzone/dropzone/assets/github-logo.svg" />
 
-Dropzone.js is a light weight JavaScript library that turns an HTML element into a dropzone.
-This means that a user can drag and drop a file onto it, and the file gets uploaded to the server via AJAX.
+[![Test and Release](https://github.com/dropzone/dropzone/actions/workflows/test-and-release.yml/badge.svg)](https://github.com/dropzone/dropzone/actions/workflows/test-and-release.yml)
 
-* * *
+Dropzone is a JavaScript library that turns any HTML element into a dropzone.
+This means that a user can drag and drop a file onto it, and Dropzone will
+display file previews and upload progress, and handle the upload for you via
+XHR.
 
-_If you want support, please use [stackoverflow](http://stackoverflow.com/) with the `dropzone.js` tag and not the
-GitHub issues tracker. Only post an issue here if you think you discovered a bug or have a feature request._
+It's fully configurable and can be styled according to your needs.
 
-* * *
+Quickstart
+----------
 
-**Please read the [contributing guidelines](CONTRIBUTING.md) before you start working on Dropzone!**
+- [📚 Full documentation](https://dropzone.gitbook.io/dropzone/)
+- [💾 Download
+  link](https://github.com/dropzone/dropzone/releases/latest/download/dist.zip)
+  containing JavaScript UMD modules and CSS files (full and minimised)
+- [⚙️ `src/options.js`](https://github.com/dropzone/dropzone/blob/main/src/options.js)
+  for all available options
 
-<br>
-<div align="center">
-  <a href="https://gitlab.com/meno/dropzone/builds/artifacts/master/download?job=release"><strong>&gt;&gt; Download &lt;&lt;</strong></a>
-</div>
-<br>
-<br>
+&nbsp;
 
-This is no longer the official repository for Dropzone. I have switched to [gitlab.com](https://gitlab.com/meno/dropzone)
-as the primary location to continue development.
- 
-There are multiple reasons why I am switching from GitHub to GitLab, but a few of the reasons are the
-issue tracker that GitHub is providing, *drowning* me in issues that I am unable to categorise or prioritize properly,
-the lack of proper continuous integration, and build files. I don't want the compiled `.js` files in my repository, and
-people regularly commit changes to the compiled files and create pull requests with them.
+<img alt="Dropzone Screenshot" width="568" src="https://github.com/dropzone/dropzone/raw/a19faf6c3aef5d3d7f912ca988cc62af1967d5d9/dropzone-preview.png" />
 
-I will write a blog post soon, that goes into detail about why I am doing the switch.
+&nbsp;
 
-This repository will still remain, and always host the most up to date versions of dropzone, but only the distribution
-files!
 
-MIT License
------------
+Community
+---------
+
+If you need support please use the [discussions section][discussions] or
+[stackoverflow][so] with the `dropzone.js` tag and **not** the GitHub issues
+tracker. Only post an issue here if you think you discovered a bug.
+
+If you have a feature request or want to discuss something, please use the
+[discussions][] as well.
+
+[discussions]: https://github.com/dropzone/dropzone/discussions
+[so]: https://stackoverflow.com/questions/tagged/dropzone.js
+
+
+> ⚠️ **Please read the [contributing guidelines](CONTRIBUTING.md) before you start
+> working on Dropzone!**
+
+
+Main features
+-------------
+
+- Beautiful by default
+- Image thumbnail previews. Simply register the callback `thumbnail(file, data)`
+  and display the image wherever you like
+- Retina enabled
+- Multiple files and synchronous uploads
+- Progress updates
+- Support for large files
+- Complete theming. The look and feel of Dropzone is just the default theme. You
+  can define everything yourself by overwriting the default event listeners.
+- Browser image resizing (resize the images before you upload them to your
+  server)
+- Well tested
+
+# MIT License
+
+See LICENSE file

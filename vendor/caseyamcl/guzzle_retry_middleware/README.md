@@ -66,20 +66,21 @@ until giving up after 10 attempts.
 
 The following options are available:
 
-| Option                             | Type              | Default            | Summary |
-| ---------------------------------- | ----------------- | ------------------ | ------- |
-| `retry_enabled`                    | boolean           | true               | Is retry enabled (useful for disabling for individual requests)
-| `max_retry_attempts`               | integer           | 10                 | Maximum number of retries per request
-| `max_allowable_timeout_secs`       | integer           | null               | If set, specifies a hard ceiling in seconds that the client can wait between requests 
-| `retry_only_if_retry_after_header` | boolean           | false              | Retry only if `RetryAfter` header sent
-| `retry_on_status`                  | array<int>        | 503, 429           | The response status codes that will trigger a retry
-| `default_retry_multiplier`         | float or callable | 1.5                | Value to multiply the number of requests by if `RetryAfter` not supplied (see [below](#setting-default-retry-delay) for details)
-| `on_retry_callback`                | callable          | null               | Optional callback to call when a retry occurs
-| `retry_on_timeout`                 | boolean           | false              | Set to TRUE if you wish to retry requests that timeout (configured with `connect_timeout` or `timeout` options)
-| `expose_retry_header`              | boolean           | false              | Set to TRUE if you wish to expose the number of retries as a header on the response object
-| `retry_header`                     | string            | X-Retry-Counter    | The header key to use for the retry counter (if you need it)
-| `retry_after_header`               | string            | Retry-After        | The header key to use for the retry after header.
-| `retry_after_date_format`          | string            | `D, d M Y H:i:s T` | Optional customization for servers that return date/times that violate the HTTP spec
+| Option                             | Type              | Default            | Summary                                                                                                                          |
+|------------------------------------|-------------------|--------------------|----------------------------------------------------------------------------------------------------------------------------------|
+| `retry_enabled`                    | boolean           | true               | Is retry enabled (useful for disabling per individual request)                                                                   |
+| `max_retry_attempts`               | integer           | 10                 | Maximum number of retries per request                                                                                            |
+| `max_allowable_timeout_secs`       | integer           | null               | If set, specifies a hard ceiling in seconds that the client can wait between requests                                            | 
+| `give_up_after_secs`               | integer           | null               | If set, specifies a hard ceiling in seconds that this middleware will allow retries                                              |
+| `retry_only_if_retry_after_header` | boolean           | false              | Retry only if `RetryAfter` header sent                                                                                           |
+| `retry_on_status`                  | array<int>        | 503, 429           | The response status codes that will trigger a retry                                                                              |
+| `default_retry_multiplier`         | float or callable | 1.5                | Value to multiply the number of requests by if `RetryAfter` not supplied (see [below](#setting-default-retry-delay) for details) |
+| `on_retry_callback`                | callable          | null               | Optional callback to call before a retry occurs                                                                                  |
+| `retry_on_timeout`                 | boolean           | false              | Set to TRUE if you wish to retry requests that throw a ConnectException such as a timeout or 'connection refused'                |
+| `expose_retry_header`              | boolean           | false              | Set to TRUE if you wish to expose the number of retries as a header on the response object                                       |
+| `retry_header`                     | string            | X-Retry-Counter    | The header key to use for the retry counter (if you need it)                                                                     |
+| `retry_after_header`               | string            | Retry-After        | The remote server header key to look for information about how long to wait until retrying the request.                          |
+| `retry_after_date_format`          | string            | `D, d M Y H:i:s T` | Optional customization for servers that return date/times that violate the HTTP spec                                             |
 
 Each option is discussed in detail below.
 
@@ -99,7 +100,7 @@ $response = $client->get('/some-url', [
 $client = new \GuzzleHttp\Client([
 
     // Standard Guzzle options
-    'base_url'        => 'http://example.org',
+    'base_url'        => 'https://example.org',
     'connect_timeout' => 10.0,
     
     // Retry options
@@ -118,7 +119,7 @@ $stack->push(GuzzleRetryMiddleware::factory([
 
 If you specify options in two or more places, the configuration is merged as follows:
 
-1. Request options take precedence over Guzzle constructor options
+1. Individual request options take precedence over Guzzle constructor options
 2. Guzzle constructor options take precedence over middleware constructor options.
 
 ### Setting maximum retry attempts
@@ -242,12 +243,13 @@ $response = $guzzle->get('https://example.org');
 
 ### On-Retry callback
 
-You can supply a callback method that will be called each time a request is retried.  This is useful for logging,
+You can supply a callback method that will be called before each time a request is retried.  This is useful for logging,
 reporting, or anything else you can think of.
 
-If you specify a callback, it will be called before the middleware calls the `usleep()` delay function.
+If you specify a callback, it will be called *before* the middleware calls the `usleep()` delay function.
 
-The `request` and `options` arguments are sent by reference in case you want to modify them in the callback.
+The `request` and `options` arguments are sent by reference in case you want to modify them in the callback before the
+request is re-sent.
 
 ```php
 
@@ -263,7 +265,7 @@ use Psr\Http\Message\ResponseInterface;
  * @param array                  $options        Guzzle request options
  * @param ResponseInterface|null $response       Response (or NULL if response not sent; e.g. connect timeout)
  */
-$listener = function($attemptNumber, $delay, &$request, &$options, $response) {
+$listener = function(int $attemptNumber, float $delay, RequestInterface &$request, array &$options, ?ResponseInterface $response) {
     
     echo sprintf(
         "Retrying request to %s.  Server responded with %s.  Will wait %s seconds.  This is attempt #%s",
@@ -296,10 +298,10 @@ You can disable retry for individual requests as by setting the `retry_enabled` 
 
 ```php
 // Retry will NOT be attempted for this request..
-$client->get('http://example.org', ['retry_enabled' => false]);
+$client->get('https://example.org', ['retry_enabled' => false]);
 
 // Retry WILL be attempted for this request...
-$client->get('http://example.org');
+$client->get('https://example.org');
 ``` 
 
 ### Adding a custom retry header to HTTP responses
@@ -360,20 +362,10 @@ library expects. By default, this library expects an RFC 2822 header as defined 
 edge-cases, the server may implement some other date format. This library allows for the
 possibility of that.
 
-```php
-# Change the expected date format of the `Retry-After` header
-$response = $client->get('/some-path', [
-    'retry_after_date_format' => 'Y-m-d H:i:s'
-]);
-
-# Otherwise, the default date format for the `Retry-After` header will be used.
-# (ex. 'Wed, 24 Nov 2020 07:28:00 GMT')
-$response = $client->get('/some-path');
-```
-
 *Note*: Be careful not to use this option with the Unix epoch (`u`) format.  The
 client will interpret this value as an integer and subsequently timeout  
 for a very, very long time.
+
 
 ### Setting a maximum allowable timeout value
 
@@ -391,6 +383,22 @@ $response = $client->get('/some-path', [
     'max_allowable_timeout_secs' => 120
 ]);
 ```
+
+
+### Setting a hard ceiling for all retries
+
+If you want to set a hard time-limit for all retry requests, set the `give_up_after_secs` option. If set, this will be
+checked before the number of retries is, so any requests will fail even if you haven't reached your retry count limit.
+
+```php
+# This will fail when either the number of seconds is reached, or the number of retry attempts is reached, whichever
+# comes first 
+$response = $client->get('/some-path', [
+   'max_retry_attempts' => 10 
+   'give_up_after_secs' => 10
+]);
+```
+
 
 ## Change log
 
@@ -436,4 +444,4 @@ The MIT License (MIT). Please see [License File](LICENSE.md) for more informatio
 [link-ghbuild]: https://github.com/caseyamcl/guzzle_retry_middleware/actions?query=workflow%3A%22Github+Build%22
 [link-downloads]: https://packagist.org/packages/caseyamcl/guzzle_retry_middleware
 [link-author]: https://github.com/caseyamcl
-[link-contributors]: ../../contributors
+[link-contributors]: https://github.com/caseyamcl/guzzle_retry_middleware/contributors

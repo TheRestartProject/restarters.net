@@ -1,0 +1,38 @@
+# https://help.github.com/en/categories/automating-your-workflow-with-github-actions
+
+name: Run Tests
+
+on:
+  - pull_request
+  - push
+
+jobs:
+  tests:
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: true
+      matrix:
+        os: [ubuntu-latest]
+        php: [7.4, 8.0, 8.1]
+        dependency-version: [prefer-lowest, prefer-stable]
+
+    name: P${{ matrix.php }} - ${{ matrix.dependency-version }} - ${{ matrix.os }}
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: ${{ matrix.php }}
+          extensions: dom, json, libxml, mbstring, pcre, reflection, spl, xml, xmlwriter
+          coverage: none
+          ini-values: assert.exception=1, zend.assertions=1
+
+      - name: Install dependencies
+        run: |
+          composer update --${{ matrix.dependency-version }} --prefer-dist --no-interaction
+
+      - name: Execute tests
+        run: composer test

@@ -23,30 +23,30 @@ export function truncate(str, max) {
  */
 export function snipLine(line, colno) {
     var newLine = line;
-    var ll = newLine.length;
-    if (ll <= 150) {
+    var lineLength = newLine.length;
+    if (lineLength <= 150) {
         return newLine;
     }
-    if (colno > ll) {
+    if (colno > lineLength) {
         // eslint-disable-next-line no-param-reassign
-        colno = ll;
+        colno = lineLength;
     }
     var start = Math.max(colno - 60, 0);
     if (start < 5) {
         start = 0;
     }
-    var end = Math.min(start + 140, ll);
-    if (end > ll - 5) {
-        end = ll;
+    var end = Math.min(start + 140, lineLength);
+    if (end > lineLength - 5) {
+        end = lineLength;
     }
-    if (end === ll) {
+    if (end === lineLength) {
         start = Math.max(end - 140, 0);
     }
     newLine = newLine.slice(start, end);
     if (start > 0) {
         newLine = "'{snip} " + newLine;
     }
-    if (end < ll) {
+    if (end < lineLength) {
         newLine += ' {snip}';
     }
     return newLine;
@@ -91,5 +91,21 @@ export function isMatchingPattern(value, pattern) {
         return value.indexOf(pattern) !== -1;
     }
     return false;
+}
+/**
+ * Given a string, escape characters which have meaning in the regex grammar, such that the result is safe to feed to
+ * `new RegExp()`.
+ *
+ * Based on https://github.com/sindresorhus/escape-string-regexp. Vendored to a) reduce the size by skipping the runtime
+ * type-checking, and b) ensure it gets down-compiled for old versions of Node (the published package only supports Node
+ * 12+).
+ *
+ * @param regexString The string to escape
+ * @returns An version of the string with all special regex characters escaped
+ */
+export function escapeStringForRegex(regexString) {
+    // escape the hyphen separately so we can also replace it with a unicode literal hyphen, to avoid the problems
+    // discussed in https://github.com/sindresorhus/escape-string-regexp/issues/20.
+    return regexString.replace(/[|\\{}()[\]^$+*?.]/g, '\\$&').replace(/-/g, '\\x2d');
 }
 //# sourceMappingURL=string.js.map

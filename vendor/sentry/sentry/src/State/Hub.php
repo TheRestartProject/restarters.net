@@ -85,12 +85,12 @@ final class Hub implements HubInterface
     /**
      * {@inheritdoc}
      */
-    public function withScope(callable $callback): void
+    public function withScope(callable $callback)
     {
         $scope = $this->pushScope();
 
         try {
-            $callback($scope);
+            return $callback($scope);
         } finally {
             $this->popScope();
         }
@@ -121,7 +121,6 @@ final class Hub implements HubInterface
         $client = $this->getClient();
 
         if (null !== $client) {
-            /** @psalm-suppress TooManyArguments */
             return $this->lastEventId = $client->captureMessage($message, $level, $this->getScope(), $hint);
         }
 
@@ -136,7 +135,6 @@ final class Hub implements HubInterface
         $client = $this->getClient();
 
         if (null !== $client) {
-            /** @psalm-suppress TooManyArguments */
             return $this->lastEventId = $client->captureException($exception, $this->getScope(), $hint);
         }
 
@@ -165,7 +163,6 @@ final class Hub implements HubInterface
         $client = $this->getClient();
 
         if (null !== $client) {
-            /** @psalm-suppress TooManyArguments */
             return $this->lastEventId = $client->captureLastError($this->getScope(), $hint);
         }
 
@@ -267,9 +264,6 @@ final class Hub implements HubInterface
 
     /**
      * {@inheritdoc}
-     *
-     * @psalm-suppress MoreSpecificReturnType
-     * @psalm-suppress LessSpecificReturnStatement
      */
     public function getTransaction(): ?Transaction
     {

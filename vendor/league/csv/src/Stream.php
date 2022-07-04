@@ -13,6 +13,7 @@ declare(strict_types=1);
 
 namespace League\Csv;
 
+use ReturnTypeWillChange;
 use SeekableIterator;
 use SplFileObject;
 use TypeError;
@@ -48,79 +49,23 @@ use const SEEK_SET;
  */
 final class Stream implements SeekableIterator
 {
-    /**
-     * Attached filters.
-     *
-     * @var array<string, array<resource>>
-     */
-    private $filters = [];
-
-    /**
-     * stream resource.
-     *
-     * @var resource
-     */
+    /** @var array<string, array<resource>> Attached filters. */
+    private array $filters = [];
+    /** @var resource */
     private $stream;
-
-    /**
-     * Tell whether the stream should be closed on object destruction.
-     *
-     * @var bool
-     */
-    private $should_close_stream = false;
-
-    /**
-     * Current iterator value.
-     *
-     * @var mixed can be a null false or a scalar type value
-     */
+    private bool $should_close_stream = false;
+    /** @var mixed can be a null false or a scalar type value. Current iterator value. */
     private $value;
+    /** Current iterator key. */
+    private int $offset;
+    /** Flags for the Document.*/
+    private int $flags = 0;
+    private string $delimiter = ',';
+    private string $enclosure = '"';
+    private string $escape = '\\';
+    private bool $is_seekable = false;
 
     /**
-     * Current iterator key.
-     *
-     * @var int
-     */
-    private $offset;
-
-    /**
-     * Flags for the Document.
-     *
-     * @var int
-     */
-    private $flags = 0;
-
-    /**
-     * the field delimiter (one character only).
-     *
-     * @var string
-     */
-    private $delimiter = ',';
-
-    /**
-     * the field enclosure character (one character only).
-     *
-     * @var string
-     */
-    private $enclosure = '"';
-
-    /**
-     * the field escape character (one character only).
-     *
-     * @var string
-     */
-    private $escape = '\\';
-
-    /**
-     * Tell whether the current stream is seekable;.
-     *
-     * @var bool
-     */
-    private $is_seekable = false;
-
-    /**
-     * New instance.
-     *
      * @param mixed $stream stream type resource
      */
     public function __construct($stream)
@@ -137,16 +82,9 @@ final class Stream implements SeekableIterator
         $this->stream = $stream;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function __destruct()
     {
-        $walker = static function ($filter): bool {
-            return @stream_filter_remove($filter);
-        };
-
-        array_walk_recursive($this->filters, $walker);
+        array_walk_recursive($this->filters, fn ($filter): bool => @stream_filter_remove($filter));
 
         if ($this->should_close_stream && is_resource($this->stream)) {
             fclose($this->stream);
@@ -155,17 +93,11 @@ final class Stream implements SeekableIterator
         unset($this->stream);
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function __clone()
     {
         throw UnavailableStream::dueToForbiddenCloning(self::class);
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function __debugInfo(): array
     {
         return stream_get_meta_data($this->stream) + [
@@ -218,7 +150,9 @@ final class Stream implements SeekableIterator
     }
 
     /**
-     * Return the URI of the underlying stream.
+     * returns the URI of the underlying stream.
+     *
+     * @see https://www.php.net/manual/en/splfileinfo.getpathname.php
      */
     public function getPathname(): string
     {
@@ -230,12 +164,11 @@ final class Stream implements SeekableIterator
      *
      * @see http://php.net/manual/en/function.stream-filter-append.php
      *
-     * @param  null|mixed      $params
      * @throws InvalidArgument if the filter can not be appended
      */
-    public function appendFilter(string $filtername, int $read_write, $params = null): void
+    public function appendFilter(string $filtername, int $read_write, array $params = null): void
     {
-        $res = @stream_filter_append($this->stream, $filtername, $read_write, $params);
+        $res = @stream_filter_append($this->stream, $filtername, $read_write, $params ?? []);
         if (!is_resource($res)) {
             throw InvalidArgument::dueToStreamFilterNotFound($filtername);
         }
@@ -250,7 +183,7 @@ final class Stream implements SeekableIterator
      */
     public function setCsvControl(string $delimiter = ',', string $enclosure = '"', string $escape = '\\'): void
     {
-        list($this->delimiter, $this->enclosure, $this->escape) = $this->filterControl($delimiter, $enclosure, $escape, __METHOD__);
+        [$this->delimiter, $this->enclosure, $this->escape] = $this->filterControl($delimiter, $enclosure, $escape, __METHOD__);
     }
 
     /**
@@ -318,10 +251,8 @@ final class Stream implements SeekableIterator
      * Get line number.
      *
      * @see http://php.net/manual/en/SplFileObject.key.php
-     *
-     * @return int
      */
-    public function key()
+    public function key(): int
     {
         return $this->offset;
     }
@@ -362,10 +293,8 @@ final class Stream implements SeekableIterator
      * Not at EOF.
      *
      * @see http://php.net/manual/en/SplFileObject.valid.php
-     *
-     * @return bool
      */
-    public function valid()
+    public function valid(): bool
     {
         if (0 !== ($this->flags & SplFileObject::READ_AHEAD)) {
             return $this->current() !== false;
@@ -381,6 +310,7 @@ final class Stream implements SeekableIterator
      *
      * @return mixed The value of the current element.
      */
+    #[ReturnTypeWillChange]
     public function current()
     {
         if (false !== $this->value) {
@@ -451,7 +381,7 @@ final class Stream implements SeekableIterator
      *
      * @see http://php.net/manual/en/SplFileObject.fread.php
      *
-     * @param int $length The number of bytes to read
+     * @param int<0, max> $length The number of bytes to read
      *
      * @return string|false
      */

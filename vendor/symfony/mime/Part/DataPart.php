@@ -20,6 +20,9 @@ use Symfony\Component\Mime\MimeTypes;
  */
 class DataPart extends TextPart
 {
+    /** @internal */
+    protected $_parent;
+
     private static $mimeTypes;
 
     private $filename;
@@ -32,6 +35,8 @@ class DataPart extends TextPart
      */
     public function __construct($body, string $filename = null, string $contentType = null, string $encoding = null)
     {
+        unset($this->_parent);
+
         if (null === $contentType) {
             $contentType = 'application/octet-stream';
         }
@@ -56,13 +61,20 @@ class DataPart extends TextPart
             $contentType = self::$mimeTypes->getMimeTypes($ext)[0] ?? 'application/octet-stream';
         }
 
-        if (false === is_readable($path)) {
+        if ((is_file($path) && !is_readable($path)) || is_dir($path)) {
             throw new InvalidArgumentException(sprintf('Path "%s" is not readable.', $path));
         }
 
         if (false === $handle = @fopen($path, 'r', false)) {
             throw new InvalidArgumentException(sprintf('Unable to open path "%s".', $path));
         }
+
+        if (!is_file($path)) {
+            $cache = fopen('php://temp', 'r+');
+            stream_copy_to_stream($handle, $cache);
+            $handle = $cache;
+        }
+
         $p = new self($handle, $name ?: basename($path), $contentType);
         $p->handle = $handle;
 

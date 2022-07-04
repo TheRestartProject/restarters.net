@@ -1,4 +1,5 @@
 import { Event, EventHint, Options, Session, Severity, Transport } from '@sentry/types';
+import { NewTransport } from './transports/base';
 /**
  * Internal platform-dependent Sentry SDK Backend.
  *
@@ -20,9 +21,9 @@ import { Event, EventHint, Options, Session, Severity, Transport } from '@sentry
  * @hidden
  */
 export interface Backend {
-    /** Creates a {@link Event} from an exception. */
+    /** Creates an {@link Event} from all inputs to `captureException` and non-primitive inputs to `captureMessage`. */
     eventFromException(exception: any, hint?: EventHint): PromiseLike<Event>;
-    /** Creates a {@link Event} from a plain message. */
+    /** Creates an {@link Event} from primitive inputs to `captureMessage`. */
     eventFromMessage(message: string, level?: Severity, hint?: EventHint): PromiseLike<Event>;
     /** Submits the event to Sentry */
     sendEvent(event: Event): void;
@@ -50,6 +51,8 @@ export declare abstract class BaseBackend<O extends Options> implements Backend 
     protected readonly _options: O;
     /** Cached transport used internally. */
     protected _transport: Transport;
+    /** New v7 Transport that is initialized alongside the old one */
+    protected _newTransport?: NewTransport;
     /** Creates a new backend instance. */
     constructor(options: O);
     /**

@@ -2,7 +2,69 @@
 
 All Notable changes to `Csv` will be documented in this file
 
-## 9.7.2 - 2021-10-05
+## [9.8.0] - 2022-01-04
+
+### Added
+
+- Added PHP7.4 typed properties where applicable
+- `TabularDataReader::fetchColumnByName` to replace `TabularDataReader::fetchColumn`
+- `TabularDataReader::fetchColumnByOffset` to replace `TabularDataReader::fetchColumn`
+
+### Deprecated
+
+- `TabularDataReader::fetchColumn` use `TabularDataReader::fetchColumnByOffset` or `TabularDataReader::fetchColumnByName` instead
+
+### Fixed
+
+- `AbstractCsv` constructor is marked final via docblock.  
+ The method should never be extended or changed in child classes to avoid unexpected behaviour
+
+### Removed
+
+- PHP7.3 support
+- Remove internal `EmptyEscapeParser` Polyfill used in `Reader` class
+- Remove PHP7.4 polyfill features in `Writer` class
+
+## [9.7.4] - 2021-11-30
+
+### Added
+
+- None
+
+### Deprecated
+
+- None
+
+### Fixed
+
+- Bug fix `EscapeFormula` to follow OWASP latest recommendation [PR #452](https://github.com/thephpleague/csv/pull/452)  
+thanks to [@robertfausk](https://github.com/robertfausk) and [@Lehmub](https://github.com/Lehmhub)
+
+### Removed
+
+- None
+
+## [9.7.3] - 2021-11-21
+
+### Added
+
+- None
+
+### Deprecated
+
+- None
+
+### Fixed
+
+- Update PHPStan requirement for development
+- Improve Documentation generation thanks to [pdelre](https://github.com/pdelre)
+- PHP8.1 compliance: using `ReturnTypeWillChange` to avoid emitting a unnecessary deprecation notice. thanks to [cedric-anne](https://github.com/cedric-anne)
+
+### Removed
+
+- None
+
+## [9.7.2] - 2021-10-05
 
 ### Added
 
@@ -15,7 +77,7 @@ All Notable changes to `Csv` will be documented in this file
 ### Fixed
 
 - Update dependencies requirement for development
-- PHP8.1 compliance: replace `FILTER_SANITIZE_STRING` by `FILTER_UNSAFE_RAW` 
+- PHP8.1 compliance: replace `FILTER_SANITIZE_STRING` by `FILTER_UNSAFE_RAW`
 - PHP8.1 compliance: remove duplicated public properties declaration
 - PHP8.1 compliance: add support for fputcsv `$eol` argument
 
@@ -23,7 +85,7 @@ All Notable changes to `Csv` will be documented in this file
 
 - None
 
-## 9.7.1 - 2021-04-17
+## [9.7.1] - 2021-04-17
 
 ### Added
 
@@ -41,7 +103,7 @@ All Notable changes to `Csv` will be documented in this file
 
 - None
 
-## 9.7.0 - 2021-03-26
+## [9.7.0] - 2021-03-26
 
 ### Added
 
@@ -69,7 +131,7 @@ All Notable changes to `Csv` will be documented in this file
 ### Fixed
 
 - Move tests into the `src` directory
-- Fixed encoder method resolver implementation 
+- Fixed encoder method resolver implementation
 - all classes marked as `@internal` are now final
 - `League\Csv\AbstractCsv::STREAM_FILTER_MODE` constant replaces `League\Csv\AbstractCsv::$stream_filter_mode`
 
@@ -78,10 +140,9 @@ All Notable changes to `Csv` will be documented in this file
 - PHP7.2 support
 - `League\Csv\AbstractCsv::$stream_filter_mode`
 
+## [9.6.2] - 2020-12-10
 
-## 9.6.2 - 2020-12-10
-
-### Added 
+### Added
 
 - Using Github actions as development tools.
 
@@ -97,9 +158,9 @@ All Notable changes to `Csv` will be documented in this file
 
 - Removing Travis and Scrutinizr as development tools
 
-## 9.6.1 - 2020-09-05
+## [9.6.1] - 2020-09-05
 
-### Added 
+### Added
 
 - None
 
@@ -115,7 +176,7 @@ All Notable changes to `Csv` will be documented in this file
 
 - None
 
-## 9.6.0 - 2020-03-17
+## [9.6.0] - 2020-03-17
 
 ### Added
 
@@ -123,7 +184,7 @@ All Notable changes to `Csv` will be documented in this file
 - `League\Csv\Statement::create` named constructor to ease constraint builder instantiation
 - `League\Csv\Statement` can now also process `League\Csv\ResultSet` instances.
 - `League\Csv\TabularDataReader` interface to represent how to read tabular data
-- `League\Csv\ResultSet::getRecords` has an optional `$header` second argument to make the method works like `League\Csv\Reader::getRecords` 
+- `League\Csv\ResultSet::getRecords` has an optional `$header` second argument to make the method works like `League\Csv\Reader::getRecords`
 - `League\Csv\ResultSet::createFromTabularDataReader` create a new instance from `League\Csv\TabularDataReader` implementing class.
 
 ### Deprecated
@@ -140,17 +201,17 @@ All Notable changes to `Csv` will be documented in this file
 - Internal polyfill for `is_nullable_int`
 - Support for PHP7.0 and PHP7.1
 
-## 9.5.0 - 2019-12-15
+## [9.5.0] - 2019-12-15
 
 ### Added
 
-- Improve package exception throwing by adding new exceptions classes that extends 
+- Improve package exception throwing by adding new exceptions classes that extends
 the `League\Csv\Exception` exception marker class [#360](https://github.com/thephpleague/csv/issues/360), [#361](https://github.com/thephpleague/csv/issues/360)
 feature proposed and developed by [Darren Miller](https://github.com/dmlogic)
-    - `League\Csv\UnavailableFeature`
-    - `League\Csv\InvalidArgument`
-    - `League\Csv\SyntaxError`
-    
+  - `League\Csv\UnavailableFeature`
+  - `League\Csv\InvalidArgument`
+  - `League\Csv\SyntaxError`
+
 ### Deprecated
 
 - Nothing
@@ -164,7 +225,7 @@ feature proposed and developed by [Darren Miller](https://github.com/dmlogic)
 
 - Nothing
 
-## 9.4.1 - 2019-10-17
+## [9.4.1] - 2019-10-17
 
 ### Added
 
@@ -182,19 +243,19 @@ feature proposed and developed by [Darren Miller](https://github.com/dmlogic)
 
 - Nothing
 
-## 9.4.0 - 2019-10-02
+## [9.4.0] - 2019-10-02
 
 ### Added
 
 - Adding support for controlling empty record presence in `Reader::getRecords` return value.
-    - `Reader::includeEmptyRecords`
-    - `Reader::skipEmptyRecords`
-    - `Reader::isEmptyRecordsIncluded`
+  - `Reader::includeEmptyRecords`
+  - `Reader::skipEmptyRecords`
+  - `Reader::isEmptyRecordsIncluded`
 
 - Adding support for controlling Input BOM usage in the library:
-    - `AbstractCsv::skipInputBOM`
-    - `AbstractCsv::includeInputBOM`
-    - `AbstractCsv::isInputBOMIncluded`
+  - `AbstractCsv::skipInputBOM`
+  - `AbstractCsv::includeInputBOM`
+  - `AbstractCsv::isInputBOMIncluded`
 
 ### Deprecated
 
@@ -208,12 +269,12 @@ feature proposed and developed by [Darren Miller](https://github.com/dmlogic)
 
 - Nothing
 
-## 9.3.0 - 2019-07-30
+## [9.3.0] - 2019-07-30
 
 ### Added
 
 - `XMLConverter::import` see [#348](https://github.com/thephpleague/csv/pull/348) thanks [@kusabi](https://github.com/kusabi)
-- Support for `thead`, `tfoot` and `tbody` in `HTMLConverter::convert` via the addition of 
+- Support for `thead`, `tfoot` and `tbody` in `HTMLConverter::convert` via the addition of
 protected methods `HTMLConverter::addHTMLAttributes` and `HTMLConverter::appendHeaderSection` [#348](https://github.com/thephpleague/csv/pull/348) thanks [@kusabi](https://github.com/kusabi)
 
 ### Deprecated
@@ -224,13 +285,13 @@ protected methods `HTMLConverter::addHTMLAttributes` and `HTMLConverter::appendH
 
 - Internal improvement in `Reader` dockblock thanks [@ghobaty](https://github.com/ghobaty).
 - Improve strict comparison when using `preg_match`.
-- Improve CSV control in `Stream`. 
+- Improve CSV control in `Stream`.
 
 ### Removed
 
 - Nothing
 
-## 9.2.1 - 2019-06-08
+## [9.2.1] - 2019-06-08
 
 ### Added
 
@@ -249,7 +310,7 @@ protected methods `HTMLConverter::addHTMLAttributes` and `HTMLConverter::appendH
 
 - Nothing
 
-## 9.2.0 - 2019-03-08
+## [9.2.0] - 2019-03-08
 
 ### Added
 
@@ -271,7 +332,7 @@ protected methods `HTMLConverter::addHTMLAttributes` and `HTMLConverter::appendH
 - Internal `Stream::createFromString` named constructor default argument is now the empty string
 - Internal `Stream::fwrite` improved
 - Internal `Stream::__destruct` no longer emit warning on invalid stream filter removal.
-- Internal `Stream::seek` returns `0` if the seeked position `0` is valid see [#321](https://github.com/thephpleague/csv/pull/332) thanks [@HaozhouChen](https://github.com/HaozhouChen) 
+- Internal `Stream::seek` returns `0` if the seeked position `0` is valid see [#321](https://github.com/thephpleague/csv/pull/332) thanks [@HaozhouChen](https://github.com/HaozhouChen)
 
 - `Reader:getHeader` when the record is an empty line.
 
@@ -279,7 +340,7 @@ protected methods `HTMLConverter::addHTMLAttributes` and `HTMLConverter::appendH
 
 - Nothing
 
-## 9.1.4 - 2018-05-01
+## [9.1.4] - 2018-05-01
 
 ### Added
 
@@ -298,7 +359,7 @@ protected methods `HTMLConverter::addHTMLAttributes` and `HTMLConverter::appendH
 
 - Nothing
 
-## 9.1.3 - 2018-03-12
+## [9.1.3] - 2018-03-12
 
 ### Added
 
@@ -318,7 +379,7 @@ protected methods `HTMLConverter::addHTMLAttributes` and `HTMLConverter::appendH
 
 - Nothing
 
-## 9.1.2 - 2018-02-05
+## [9.1.2] - 2018-02-05
 
 ### Added
 
@@ -337,7 +398,7 @@ protected methods `HTMLConverter::addHTMLAttributes` and `HTMLConverter::appendH
 
 - Nothing
 
-## 9.1.1 - 2017-11-28
+## [9.1.1] - 2017-11-28
 
 ### Added
 
@@ -357,7 +418,7 @@ protected methods `HTMLConverter::addHTMLAttributes` and `HTMLConverter::appendH
 
 - Nothing
 
-## 9.1.0 - 2017-10-20
+## [9.1.0] - 2017-10-20
 
 ### Added
 
@@ -381,7 +442,7 @@ protected methods `HTMLConverter::addHTMLAttributes` and `HTMLConverter::appendH
 
 - Nothing
 
-## 9.0.1 - 2017-08-21
+## [9.0.1] - 2017-08-21
 
 ### Added
 
@@ -399,37 +460,37 @@ protected methods `HTMLConverter::addHTMLAttributes` and `HTMLConverter::appendH
 
 - Nothing
 
-## 9.0.0 - 2017-08-18
+## [9.0.0] - 2017-08-18
 
 ### Added
 
 - Improved CSV Records selection
-    - `League\Csv\Reader::getRecords` to access all CSV records
-    - `League\Csv\Statement` provides a constraint builder to select CSV records.
-    - `League\Csv\ResultSet` represents the result set of the selected CSV records.
-    - `League\Csv\delimiter_detect` function to detect CSV delimiter character
+  - `League\Csv\Reader::getRecords` to access all CSV records
+  - `League\Csv\Statement` provides a constraint builder to select CSV records.
+  - `League\Csv\ResultSet` represents the result set of the selected CSV records.
+  - `League\Csv\delimiter_detect` function to detect CSV delimiter character
 - Improved CSV document header selection.
-    - `League\Csv\Reader::getHeader`
-    - `League\Csv\Reader::getHeaderOffset`
-    - `League\Csv\Reader::setHeaderOffset`
+  - `League\Csv\Reader::getHeader`
+  - `League\Csv\Reader::getHeaderOffset`
+  - `League\Csv\Reader::setHeaderOffset`
 - Improved CSV Records conversion
-    - `League\Csv\CharsetConverter` converts CSV records charset.
-    - `League\Csv\XMLConverter` converts CSV records into DOMDocument
-    - `League\Csv\HTMLConverter` converts CSV records into HTML table.
+  - `League\Csv\CharsetConverter` converts CSV records charset.
+  - `League\Csv\XMLConverter` converts CSV records into DOMDocument
+  - `League\Csv\HTMLConverter` converts CSV records into HTML table.
 - Improved Exception handling
-    - `League\Csv\Exception` the default exception
-    - `League\Csv\CannotInsertRecord`
+  - `League\Csv\Exception` the default exception
+  - `League\Csv\CannotInsertRecord`
 - Improved CSV document output
-    - `League\Csv\AbstractCsv::chunk` method to output the CSV document in chunk
-    - `League\Csv\bom_match` function to detect BOM sequence in a given string
-    - `League\Csv\ByteSequence` interface to decoupled BOM sequence from CSV documents
+  - `League\Csv\AbstractCsv::chunk` method to output the CSV document in chunk
+  - `League\Csv\bom_match` function to detect BOM sequence in a given string
+  - `League\Csv\ByteSequence` interface to decoupled BOM sequence from CSV documents
 - Improved CSV records column count consistency on insertion
-    - `League\Csv\ColumnConsistency`
+  - `League\Csv\ColumnConsistency`
 - Improved CSV document flush mechanism on insertion
-    - `League\Csv\Writer::setFlushThreshold`
-    - `League\Csv\Writer::getFlushThreshold`
+  - `League\Csv\Writer::setFlushThreshold`
+  - `League\Csv\Writer::getFlushThreshold`
 - Improve RFC4180 compliance
-    - `League\Csv\RFC4180Field` to format field according to RFC4180 rules
+  - `League\Csv\RFC4180Field` to format field according to RFC4180 rules
 
 ### Deprecated
 
@@ -438,61 +499,61 @@ protected methods `HTMLConverter::addHTMLAttributes` and `HTMLConverter::appendH
 ### Fixed
 
 - Improved CSV record insertion
-    - `League\Csv\Writer::insertOne` only accepts an array and returns a integer
-    - `League\Csv\Writer::insertAll` only accepts an iterable of array and returns an integer
+  - `League\Csv\Writer::insertOne` only accepts an array and returns a integer
+  - `League\Csv\Writer::insertAll` only accepts an iterable of array and returns an integer
 
 - Normalized CSV offset returned value
-    - `League\Csv\Reader::fetchColumn` always returns the CSV document original offset.
+  - `League\Csv\Reader::fetchColumn` always returns the CSV document original offset.
 
 ### Removed
 
 - `examples` directory
 - `PHP5` support
 - The following method is removed because The BOM API is simplified:
-    - `League\Csv\AbstractCsv::stripBOM`
+  - `League\Csv\AbstractCsv::stripBOM`
 - All conversion methods are removed in favor of the conversion classes:
-    - `League\Csv\Writer::jsonSerialize`
-    - `League\Csv\AbstractCsv::toHTML`
-    - `League\Csv\AbstractCsv::toXML`
-    - `League\Csv\AbstractCsv::setInputEncoding`
-    - `League\Csv\AbstractCsv::getInputEncoding`
+  - `League\Csv\Writer::jsonSerialize`
+  - `League\Csv\AbstractCsv::toHTML`
+  - `League\Csv\AbstractCsv::toXML`
+  - `League\Csv\AbstractCsv::setInputEncoding`
+  - `League\Csv\AbstractCsv::getInputEncoding`
 - The following methods are removed because the PHP stream filter API is simplified:
-    - `League\Csv\AbstractCsv::isActiveStreamFilter`
-    - `League\Csv\AbstractCsv::setStreamFilterMode`
-    - `League\Csv\AbstractCsv::appendStreamFilter`
-    - `League\Csv\AbstractCsv::prependStreamFilter`
-    - `League\Csv\AbstractCsv::removeStreamFilter`
-    - `League\Csv\AbstractCsv::clearStreamFilters`
+  - `League\Csv\AbstractCsv::isActiveStreamFilter`
+  - `League\Csv\AbstractCsv::setStreamFilterMode`
+  - `League\Csv\AbstractCsv::appendStreamFilter`
+  - `League\Csv\AbstractCsv::prependStreamFilter`
+  - `League\Csv\AbstractCsv::removeStreamFilter`
+  - `League\Csv\AbstractCsv::clearStreamFilters`
 - The following methods are removed because switching between connections is no longer possible:
-    - `League\Csv\AbstractCsv::newReader`
-    - `League\Csv\AbstractCsv::newWriter`
-    - `League\Csv\Reader::getNewline`
-    - `League\Csv\Reader::setNewline`
+  - `League\Csv\AbstractCsv::newReader`
+  - `League\Csv\AbstractCsv::newWriter`
+  - `League\Csv\Reader::getNewline`
+  - `League\Csv\Reader::setNewline`
 - The Exception mechanism is improved thus the following class is removed:
-    - `League\Csv\Exception\InvalidRowException`;
+  - `League\Csv\Exception\InvalidRowException`;
 - The CSV records filtering methods are removed in favor of the `League\Csv\Statement` class:
-    - `League\Csv\AbstractCsv::addFilter`,
-    - `League\Csv\AbstractCsv::addSortBy`,
-    - `League\Csv\AbstractCsv::setOffset`,
-    - `League\Csv\AbstractCsv::setLimit`;
+  - `League\Csv\AbstractCsv::addFilter`,
+  - `League\Csv\AbstractCsv::addSortBy`,
+  - `League\Csv\AbstractCsv::setOffset`,
+  - `League\Csv\AbstractCsv::setLimit`;
 - CSV records selecting API methods is simplified:
-    - `League\Csv\Reader::each`
-    - `League\Csv\Reader::fetch`
-    - `League\Csv\Reader::fetchAll`
-    - `League\Csv\Reader::fetchAssoc`
-    - `League\Csv\Reader::fetchPairsWithoutDuplicates`
+  - `League\Csv\Reader::each`
+  - `League\Csv\Reader::fetch`
+  - `League\Csv\Reader::fetchAll`
+  - `League\Csv\Reader::fetchAssoc`
+  - `League\Csv\Reader::fetchPairsWithoutDuplicates`
 - Formatting and validating CSV records on insertion is simplified, the following methods are removed:
-    - `League\Csv\Writer::hasFormatter`
-    - `League\Csv\Writer::removeFormatter`
-    - `League\Csv\Writer::clearFormatters`
-    - `League\Csv\Writer::hasValidator`
-    - `League\Csv\Writer::removeValidator`
-    - `League\Csv\Writer::clearValidators`
-    - `League\Csv\Writer::getIterator`
+  - `League\Csv\Writer::hasFormatter`
+  - `League\Csv\Writer::removeFormatter`
+  - `League\Csv\Writer::clearFormatters`
+  - `League\Csv\Writer::hasValidator`
+  - `League\Csv\Writer::removeValidator`
+  - `League\Csv\Writer::clearValidators`
+  - `League\Csv\Writer::getIterator`
 - The following Formatters and Validators classes are removed from the package:
-    - `League\Csv\Plugin\SkipNullValuesFormatter`
-    - `League\Csv\Plugin\ForbiddenNullValuesValidator`
-    - `League\Csv\Plugin\ColumnConsistencyValidator` *replace by `League\Csv\ColumnConsistency`*
+  - `League\Csv\Plugin\SkipNullValuesFormatter`
+  - `League\Csv\Plugin\ForbiddenNullValuesValidator`
+  - `League\Csv\Plugin\ColumnConsistencyValidator` *replace by `League\Csv\ColumnConsistency`*
 - `League\Csv\Writer` no longers implements the `IteratorAggregate` interface
 - `League\Csv\AbstractCsv::fetchDelimitersOccurrence` is removed *replace by `League\Csv\delimiter_detect` function*
 
@@ -650,7 +711,7 @@ protected methods `HTMLConverter::addHTMLAttributes` and `HTMLConverter::appendH
 - `Reader::fetchColumn` and `Reader::fetchAssoc` now return `Iterator`
 - `Reader::fetchAssoc` callable argument expects an indexed row using the submitted keys as its first argument
 - `Reader::fetchColumn` callable argument expects the selected column value as its first argument
--  Default value on `setOutputBOM` is removed
+- Default value on `setOutputBOM` is removed
 - `AbstractCsv::getOutputBOM` always return a string
 - `AbstractCsv::getInputBOM` always return a string
 
@@ -771,19 +832,19 @@ protected methods `HTMLConverter::addHTMLAttributes` and `HTMLConverter::appendH
 ### Added
 
 - A new flexible mechanism to format and validate a row before its insertion by adding
-    - `Writer::addFormatter` to add a formatter to the `Writer` object
-    - `Writer::removeFormatter` to remove an already registered formatter
-    - `Writer::hasFormatter` to detect the presence of a formatter
-    - `Writer::clearFormatters` to clear all registered formatter
-    - `Writer::addValidator` to add a validator to the `Writer` object
-    - `Writer::removeValidator` to remove an already registered validator
-    - `Writer::hasValidator` to detect the presence of a validator
-    - `Writer::clearValidators` to clear all registered validator
-    - `League\Csv\Exception\InvalidRowException` exception thrown when row validation failed
+  - `Writer::addFormatter` to add a formatter to the `Writer` object
+  - `Writer::removeFormatter` to remove an already registered formatter
+  - `Writer::hasFormatter` to detect the presence of a formatter
+  - `Writer::clearFormatters` to clear all registered formatter
+  - `Writer::addValidator` to add a validator to the `Writer` object
+  - `Writer::removeValidator` to remove an already registered validator
+  - `Writer::hasValidator` to detect the presence of a validator
+  - `Writer::clearValidators` to clear all registered validator
+  - `League\Csv\Exception\InvalidRowException` exception thrown when row validation failed
 - Classes to maintain removed features from the `Writer` class
-    - `League\Csv\Plugin\ColumnConsistencyValidator` to validate column consistency on insertion
-    - `League\Csv\Plugin\ForbiddenNullValuesValidator` to validate `null` value on insertion
-    - `League\Csv\Plugin\SkipNullValuesFormatter` to format `null` value on insertion
+  - `League\Csv\Plugin\ColumnConsistencyValidator` to validate column consistency on insertion
+  - `League\Csv\Plugin\ForbiddenNullValuesValidator` to validate `null` value on insertion
+  - `League\Csv\Plugin\SkipNullValuesFormatter` to format `null` value on insertion
 
 ### Deprecated
 
@@ -807,14 +868,14 @@ protected methods `HTMLConverter::addHTMLAttributes` and `HTMLConverter::appendH
 - Setting `ini_set("auto_detect_line_endings", true);` is no longer set in the class constructor. Mac OS X users must explicitly set this ini options in their script.
 - `Writer` and `Reader` default constructor are removed from public API in favor of the named constructors.
 - All `Writer` methods and constant related to CSV data validation and formatting before insertion
-    - `Writer::getNullHandlingMode`
-    - `Writer::setNullHandlingMode`
-    - `Writer::setColumnsCount`
-    - `Writer::getColumnsCount`
-    - `Writer::autodetectColumnsCount`
-    - `Writer::NULL_AS_EXCEPTION`
-    - `Writer::NULL_AS_EMPTY`
-    - `Writer::NULL_AS_SKIP_CELL`
+  - `Writer::getNullHandlingMode`
+  - `Writer::setNullHandlingMode`
+  - `Writer::setColumnsCount`
+  - `Writer::getColumnsCount`
+  - `Writer::autodetectColumnsCount`
+  - `Writer::NULL_AS_EXCEPTION`
+  - `Writer::NULL_AS_EMPTY`
+  - `Writer::NULL_AS_SKIP_CELL`
 
 ## 6.3.0 - 2015-01-21
 
@@ -1186,3 +1247,27 @@ to manage BOM character with CSV.
 ## 1.0.0 - 2013-12-03
 
 Initial Release of `Bakame\Csv`
+
+[Next]: https://github.com/thephpleague/csv/compare/9.8.0...master
+[9.8.0]: https://github.com/thephpleague/csv/compare/9.7.4...9.8.0
+[9.7.4]: https://github.com/thephpleague/csv/compare/9.7.3...9.7.4
+[9.7.3]: https://github.com/thephpleague/csv/compare/9.7.2...9.7.3
+[9.7.2]: https://github.com/thephpleague/csv/compare/9.7.1...9.7.2
+[9.7.1]: https://github.com/thephpleague/csv/compare/9.7.0...9.7.1
+[9.7.0]: https://github.com/thephpleague/csv/compare/9.6.2...9.7.0
+[9.6.2]: https://github.com/thephpleague/csv/compare/9.6.1...9.6.2
+[9.6.1]: https://github.com/thephpleague/csv/compare/9.6.0...9.6.1
+[9.6.0]: https://github.com/thephpleague/csv/compare/9.5.0...9.6.0
+[9.5.0]: https://github.com/thephpleague/csv/compare/9.4.1...9.5.0
+[9.4.1]: https://github.com/thephpleague/csv/compare/9.4.0...9.4.1
+[9.4.0]: https://github.com/thephpleague/csv/compare/9.3.0...9.4.0
+[9.3.0]: https://github.com/thephpleague/csv/compare/9.2.1...9.3.0
+[9.2.1]: https://github.com/thephpleague/csv/compare/9.2.0...9.2.1
+[9.2.0]: https://github.com/thephpleague/csv/compare/9.1.4...9.2.0
+[9.1.4]: https://github.com/thephpleague/csv/compare/9.1.3...9.1.4
+[9.1.3]: https://github.com/thephpleague/csv/compare/9.1.2...9.1.3
+[9.1.2]: https://github.com/thephpleague/csv/compare/9.1.1...9.1.2
+[9.1.1]: https://github.com/thephpleague/csv/compare/9.1.0...9.1.1
+[9.1.0]: https://github.com/thephpleague/csv/compare/9.0.1...9.1.0
+[9.0.1]: https://github.com/thephpleague/csv/compare/9.0.0...9.0.1
+[9.0.0]: https://github.com/thephpleague/csv/compare/8.2.2...9.0.0

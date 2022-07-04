@@ -1,3 +1,4 @@
+import { getGlobalObject } from './global';
 import { isString } from './is';
 /**
  * Given a child DOM element, returns a query-selector statement describing that
@@ -46,7 +47,6 @@ export function htmlTreeAsString(elem, keyAttrs) {
  * @returns generated DOM path
  */
 function _htmlElementAsString(el, keyAttrs) {
-    var _a, _b;
     var elem = el;
     var out = [];
     var className;
@@ -59,9 +59,10 @@ function _htmlElementAsString(el, keyAttrs) {
     }
     out.push(elem.tagName.toLowerCase());
     // Pairs of attribute keys defined in `serializeAttribute` and their values on element.
-    var keyAttrPairs = ((_a = keyAttrs) === null || _a === void 0 ? void 0 : _a.length) ? keyAttrs.filter(function (keyAttr) { return elem.getAttribute(keyAttr); }).map(function (keyAttr) { return [keyAttr, elem.getAttribute(keyAttr)]; })
+    var keyAttrPairs = keyAttrs && keyAttrs.length
+        ? keyAttrs.filter(function (keyAttr) { return elem.getAttribute(keyAttr); }).map(function (keyAttr) { return [keyAttr, elem.getAttribute(keyAttr)]; })
         : null;
-    if ((_b = keyAttrPairs) === null || _b === void 0 ? void 0 : _b.length) {
+    if (keyAttrPairs && keyAttrPairs.length) {
         keyAttrPairs.forEach(function (keyAttrPair) {
             out.push("[" + keyAttrPair[0] + "=\"" + keyAttrPair[1] + "\"]");
         });
@@ -88,5 +89,17 @@ function _htmlElementAsString(el, keyAttrs) {
         }
     }
     return out.join('');
+}
+/**
+ * A safe form of location.href
+ */
+export function getLocationHref() {
+    var global = getGlobalObject();
+    try {
+        return global.document.location.href;
+    }
+    catch (oO) {
+        return '';
+    }
 }
 //# sourceMappingURL=browser.js.map

@@ -15,6 +15,7 @@ namespace League\Csv;
 
 use OutOfRangeException;
 use php_user_filter;
+use Traversable;
 use function array_combine;
 use function array_map;
 use function in_array;
@@ -38,19 +39,8 @@ class CharsetConverter extends php_user_filter
 {
     const FILTERNAME = 'convert.league.csv';
 
-    /**
-     * The records input encoding charset.
-     *
-     * @var string
-     */
-    protected $input_encoding = 'UTF-8';
-
-    /**
-     * The records output encoding charset.
-     *
-     * @var string
-     */
-    protected $output_encoding = 'UTF-8';
+    protected string $input_encoding = 'UTF-8';
+    protected string $output_encoding = 'UTF-8';
 
     /**
      * Static method to add the stream filter to a {@link AbstractCsv} object.
@@ -67,9 +57,9 @@ class CharsetConverter extends php_user_filter
      */
     public static function register(): void
     {
-        $filtername = self::FILTERNAME.'.*';
-        if (!in_array($filtername, stream_get_filters(), true)) {
-            stream_filter_register($filtername, self::class);
+        $filter_name = self::FILTERNAME.'.*';
+        if (!in_array($filter_name, stream_get_filters(), true)) {
+            stream_filter_register($filter_name, self::class);
         }
     }
 
@@ -107,9 +97,6 @@ class CharsetConverter extends php_user_filter
         throw new OutOfRangeException('The submitted charset '.$encoding.' is not supported by the mbstring extension.');
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function onCreate(): bool
     {
         $prefix = self::FILTERNAME.'.';
@@ -140,10 +127,10 @@ class CharsetConverter extends php_user_filter
      */
     public function filter($in, $out, &$consumed, $closing): int
     {
-        while ($res = stream_bucket_make_writeable($in)) {
-            $res->data = @mb_convert_encoding($res->data, $this->output_encoding, $this->input_encoding);
-            $consumed += $res->datalen;
-            stream_bucket_append($out, $res);
+        while (null !== ($bucket = stream_bucket_make_writeable($in))) {
+            $bucket->data = @mb_convert_encoding($bucket->data, $this->output_encoding, $this->input_encoding);
+            $consumed += $bucket->datalen;
+            stream_bucket_append($out, $bucket);
         }
 
         return PSFS_PASS_ON;
@@ -162,7 +149,7 @@ class CharsetConverter extends php_user_filter
             return array_map($this, $records);
         }
 
-        /* @var \Traversable $records */
+        /* @var Traversable $records */
         return new MapIterator($records, $this);
     }
 
@@ -183,17 +170,17 @@ class CharsetConverter extends php_user_filter
     /**
      * Walker method to convert the offset and the value of a CSV record field.
      *
-     * @param mixed $value  can be a scalar type or null
-     * @param mixed $offset can be a string or an int
+     * @param int|float|string|null $value  can be a scalar type or null
+     * @param int|string            $offset can be a string or an int
      */
     protected function encodeField($value, $offset): array
     {
         if (null !== $value && !is_numeric($value)) {
-            $value = mb_convert_encoding((string) $value, $this->output_encoding, $this->input_encoding);
+            $value = mb_convert_encoding($value, $this->output_encoding, $this->input_encoding);
         }
 
         if (!is_numeric($offset)) {
-            $offset = mb_convert_encoding((string) $offset, $this->output_encoding, $this->input_encoding);
+            $offset = mb_convert_encoding($offset, $this->output_encoding, $this->input_encoding);
         }
 
         return [$offset, $value];

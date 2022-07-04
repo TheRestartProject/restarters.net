@@ -1,11 +1,11 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-var path = require("path");
-var fs_1 = require("fs");
-var immutable_1 = require("immutable");
-var utils = require("../utils");
-var cli_options_1 = require("./cli-options");
-var _ = require("../lodash.custom");
+const path = require("path");
+const fs_1 = require("fs");
+const immutable_1 = require("immutable");
+const utils = require("../utils");
+const cli_options_1 = require("./cli-options");
+const _ = require("../lodash.custom");
 /**
  * $ browser-sync start <options>
  *
@@ -16,23 +16,23 @@ var _ = require("../lodash.custom");
  * @returns {Function}
  */
 function default_1(opts) {
-    var flags = preprocessFlags(opts.cli.flags);
-    var cwd = flags.cwd || process.cwd();
-    var maybepkg = path.resolve(cwd, "package.json");
-    var input = flags;
+    const flags = preprocessFlags(opts.cli.flags);
+    const cwd = flags.cwd || process.cwd();
+    const maybepkg = path.resolve(cwd, "package.json");
+    let input = flags;
     if (flags.config) {
-        var maybeconf = path.resolve(cwd, flags.config);
-        if (fs_1.existsSync(maybeconf)) {
-            var conf = require(maybeconf);
+        const maybeconf = path.resolve(cwd, flags.config);
+        if ((0, fs_1.existsSync)(maybeconf)) {
+            const conf = require(maybeconf);
             input = _.merge({}, conf, flags);
         }
         else {
-            utils.fail(true, new Error("Configuration file '" + flags.config + "' not found"), opts.cb);
+            utils.fail(true, new Error(`Configuration file '${flags.config}' not found`), opts.cb);
         }
     }
     else {
-        if (fs_1.existsSync(maybepkg)) {
-            var pkg = require(maybepkg);
+        if ((0, fs_1.existsSync)(maybepkg)) {
+            const pkg = require(maybepkg);
             if (pkg["browser-sync"]) {
                 console.log("> Configuration obtained from package.json");
                 input = _.merge({}, pkg["browser-sync"], flags);
@@ -53,7 +53,7 @@ function preprocessFlags(flags) {
         stripUndefined,
         legacyFilesArgs,
         removeWatchBooleanWhenFalse
-    ].reduce(function (flags, fn) { return fn.call(null, flags); }, flags);
+    ].reduce((flags, fn) => fn.call(null, flags), flags);
 }
 /**
  * Incoming undefined values are problematic as
@@ -62,8 +62,8 @@ function preprocessFlags(flags) {
  * @returns {*}
  */
 function stripUndefined(subject) {
-    return Object.keys(subject).reduce(function (acc, key) {
-        var value = subject[key];
+    return Object.keys(subject).reduce((acc, key) => {
+        const value = subject[key];
         if (typeof value === "undefined") {
             return acc;
         }
@@ -77,7 +77,7 @@ function stripUndefined(subject) {
  */
 function legacyFilesArgs(flags) {
     if (flags.files && flags.files.length) {
-        flags.files = flags.files.reduce(function (acc, item) { return acc.concat(cli_options_1.explodeFilesArg(item)); }, []);
+        flags.files = flags.files.reduce((acc, item) => acc.concat((0, cli_options_1.explodeFilesArg)(item)), []);
     }
     return flags;
 }
@@ -89,7 +89,7 @@ function legacyFilesArgs(flags) {
  */
 function removeWatchBooleanWhenFalse(flags) {
     if (flags.watch === false) {
-        return immutable_1.fromJS(flags)
+        return (0, immutable_1.fromJS)(flags)
             .delete("watch")
             .toJS();
     }

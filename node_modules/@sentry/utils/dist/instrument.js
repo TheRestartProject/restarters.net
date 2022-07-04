@@ -1,12 +1,13 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 var tslib_1 = require("tslib");
+var flags_1 = require("./flags");
+var global_1 = require("./global");
 var is_1 = require("./is");
 var logger_1 = require("./logger");
-var misc_1 = require("./misc");
 var object_1 = require("./object");
 var stacktrace_1 = require("./stacktrace");
 var supports_1 = require("./supports");
-var global = misc_1.getGlobalObject();
+var global = global_1.getGlobalObject();
 /**
  * Instrument native APIs to call handlers that can be used to create breadcrumbs, APM spans etc.
  *  - Console API
@@ -48,7 +49,8 @@ function instrument(type) {
             instrumentUnhandledRejection();
             break;
         default:
-            logger_1.logger.warn('unknown instrumentation type:', type);
+            flags_1.IS_DEBUG_BUILD && logger_1.logger.warn('unknown instrumentation type:', type);
+            return;
     }
 }
 /**
@@ -56,13 +58,10 @@ function instrument(type) {
  * Use at your own risk, this might break without changelog notice, only used internally.
  * @hidden
  */
-function addInstrumentationHandler(handler) {
-    if (!handler || typeof handler.type !== 'string' || typeof handler.callback !== 'function') {
-        return;
-    }
-    handlers[handler.type] = handlers[handler.type] || [];
-    handlers[handler.type].push(handler.callback);
-    instrument(handler.type);
+function addInstrumentationHandler(type, callback) {
+    handlers[type] = handlers[type] || [];
+    handlers[type].push(callback);
+    instrument(type);
 }
 exports.addInstrumentationHandler = addInstrumentationHandler;
 /** JSDoc */
@@ -78,7 +77,8 @@ function triggerHandlers(type, data) {
                 handler(data);
             }
             catch (e) {
-                logger_1.logger.error("Error while triggering instrumentation handler.\nType: " + type + "\nName: " + stacktrace_1.getFunctionName(handler) + "\nError: " + e);
+                flags_1.IS_DEBUG_BUILD &&
+                    logger_1.logger.error("Error while triggering instrumentation handler.\nType: " + type + "\nName: " + stacktrace_1.getFunctionName(handler) + "\nError:", e);
             }
         }
     }
@@ -95,11 +95,11 @@ function instrumentConsole() {
     if (!('console' in global)) {
         return;
     }
-    ['debug', 'info', 'warn', 'error', 'log', 'assert'].forEach(function (level) {
+    logger_1.CONSOLE_LEVELS.forEach(function (level) {
         if (!(level in global.console)) {
             return;
         }
-        object_1.fill(global.console, level, function (originalConsoleLevel) {
+        object_1.fill(global.console, level, function (originalConsoleMethod) {
             return function () {
                 var args = [];
                 for (var _i = 0; _i < arguments.length; _i++) {
@@ -107,8 +107,8 @@ function instrumentConsole() {
                 }
                 triggerHandlers('console', { args: args, level: level });
                 // this fails for some browsers. :(
-                if (originalConsoleLevel) {
-                    Function.prototype.apply.call(originalConsoleLevel, global.console, args);
+                if (originalConsoleMethod) {
+                    originalConsoleMethod.apply(global.console, args);
                 }
             };
         });
@@ -177,9 +177,6 @@ function instrumentXHR() {
     if (!('XMLHttpRequest' in global)) {
         return;
     }
-    // Poor man's implementation of ES6 `Map`, tracking and keeping in sync key and value separately.
-    var requestKeys = [];
-    var requestValues = [];
     var xhrproto = XMLHttpRequest.prototype;
     object_1.fill(xhrproto, 'open', function (originalOpen) {
         return function () {
@@ -190,14 +187,14 @@ function instrumentXHR() {
             // eslint-disable-next-line @typescript-eslint/no-this-alias
             var xhr = this;
             var url = args[1];
-            xhr.__sentry_xhr__ = {
+            var xhrInfo = (xhr.__sentry_xhr__ = {
                 // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
                 method: is_1.isString(args[0]) ? args[0].toUpperCase() : args[0],
                 url: args[1],
-            };
+            });
             // if Sentry key appears in URL, don't capture it as a request
             // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
-            if (is_1.isString(url) && xhr.__sentry_xhr__.method === 'POST' && url.match(/sentry_key/)) {
+            if (is_1.isString(url) && xhrInfo.method === 'POST' && url.match(/sentry_key/)) {
                 xhr.__sentry_own_request__ = true;
             }
             var onreadystatechangeHandler = function () {
@@ -205,23 +202,7 @@ function instrumentXHR() {
                     try {
                         // touching statusCode in some platforms throws
                         // an exception
-                        if (xhr.__sentry_xhr__) {
-                            xhr.__sentry_xhr__.status_code = xhr.status;
-                        }
-                    }
-                    catch (e) {
-                        /* do nothing */
-                    }
-                    try {
-                        var requestPos = requestKeys.indexOf(xhr);
-                        if (requestPos !== -1) {
-                            // Make sure to pop both key and value to keep it in sync.
-                            requestKeys.splice(requestPos);
-                            var args_1 = requestValues.splice(requestPos)[0];
-                            if (xhr.__sentry_xhr__ && args_1[0] !== undefined) {
-                                xhr.__sentry_xhr__.body = args_1[0];
-                            }
-                        }
+                        xhrInfo.status_code = xhr.status;
                     }
                     catch (e) {
                         /* do nothing */
@@ -258,8 +239,9 @@ function instrumentXHR() {
             for (var _i = 0; _i < arguments.length; _i++) {
                 args[_i] = arguments[_i];
             }
-            requestKeys.push(this);
-            requestValues.push(args);
+            if (this.__sentry_xhr__ && args[0] !== undefined) {
+                this.__sentry_xhr__.body = args[0];
+            }
             triggerHandlers('xhr', {
                 args: args,
                 startTimestamp: Date.now(),

@@ -47,27 +47,8 @@ export interface SessionContext {
     user?: User | null;
     ignoreDuration?: boolean;
 }
-/**
- * Session Status
- */
-export declare enum SessionStatus {
-    /** JSDoc */
-    Ok = "ok",
-    /** JSDoc */
-    Exited = "exited",
-    /** JSDoc */
-    Crashed = "crashed",
-    /** JSDoc */
-    Abnormal = "abnormal"
-}
-export declare enum RequestSessionStatus {
-    /** JSDoc */
-    Ok = "ok",
-    /** JSDoc */
-    Errored = "errored",
-    /** JSDoc */
-    Crashed = "crashed"
-}
+export declare type SessionStatus = 'ok' | 'exited' | 'crashed' | 'abnormal';
+export declare type RequestSessionStatus = 'ok' | 'errored' | 'crashed';
 /** JSDoc */
 export interface SessionAggregates {
     attrs?: {

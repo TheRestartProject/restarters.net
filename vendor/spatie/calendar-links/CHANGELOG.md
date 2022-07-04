@@ -3,6 +3,12 @@
 All notable changes to `calendar-links` will be documented in this file
 
 ## Unreleased
+ - ... [add your changes here]
+
+## 1.7.0 - 2022-02-13
+### Changed
+- New: Add support for outlook.office.com $link->webOffice(); (@dravenk and @gulios)
+- Google: Add timezone name if it is specified in both `from` and `to` dates and is the same for both (@bradyemerson)
 
 ## 1.6.0 - 2021-04-22
 ### Changed
@@ -33,7 +39,7 @@ All notable changes to `calendar-links` will be documented in this file
 ### Changed
  - Simplify extending of WebOutlook (e.g. for Office365)
  - Yahoo: use `allday` parameter only for a single-day events
- - Improve exception hierarchy: `InvalidLink` now extends `\InvalidArgumentException` 
+ - Improve exception hierarchy: `InvalidLink` now extends `\InvalidArgumentException`
 
 ### Added
  - Add more tests, reorganize existing

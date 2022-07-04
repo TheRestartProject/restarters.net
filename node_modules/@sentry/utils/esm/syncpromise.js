@@ -3,16 +3,28 @@
 /* eslint-disable @typescript-eslint/explicit-module-boundary-types */
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { isThenable } from './is';
-/** SyncPromise internal states */
-var States;
-(function (States) {
-    /** Pending */
-    States["PENDING"] = "PENDING";
-    /** Resolved / OK */
-    States["RESOLVED"] = "RESOLVED";
-    /** Rejected / Error */
-    States["REJECTED"] = "REJECTED";
-})(States || (States = {}));
+/**
+ * Creates a resolved sync promise.
+ *
+ * @param value the value to resolve the promise with
+ * @returns the resolved sync promise
+ */
+export function resolvedSyncPromise(value) {
+    return new SyncPromise(function (resolve) {
+        resolve(value);
+    });
+}
+/**
+ * Creates a rejected sync promise.
+ *
+ * @param value the value to reject the promise with
+ * @returns the rejected sync promise
+ */
+export function rejectedSyncPromise(reason) {
+    return new SyncPromise(function (_, reject) {
+        reject(reason);
+    });
+}
 /**
  * Thenable class that behaves like a Promise and follows it's interface
  * but is not async internally
@@ -20,19 +32,19 @@ var States;
 var SyncPromise = /** @class */ (function () {
     function SyncPromise(executor) {
         var _this = this;
-        this._state = States.PENDING;
+        this._state = 0 /* PENDING */;
         this._handlers = [];
         /** JSDoc */
         this._resolve = function (value) {
-            _this._setResult(States.RESOLVED, value);
+            _this._setResult(1 /* RESOLVED */, value);
         };
         /** JSDoc */
         this._reject = function (reason) {
-            _this._setResult(States.REJECTED, reason);
+            _this._setResult(2 /* REJECTED */, reason);
         };
         /** JSDoc */
         this._setResult = function (state, value) {
-            if (_this._state !== States.PENDING) {
+            if (_this._state !== 0 /* PENDING */) {
                 return;
             }
             if (isThenable(value)) {
@@ -43,35 +55,25 @@ var SyncPromise = /** @class */ (function () {
             _this._value = value;
             _this._executeHandlers();
         };
-        // TODO: FIXME
-        /** JSDoc */
-        this._attachHandler = function (handler) {
-            _this._handlers = _this._handlers.concat(handler);
-            _this._executeHandlers();
-        };
         /** JSDoc */
         this._executeHandlers = function () {
-            if (_this._state === States.PENDING) {
+            if (_this._state === 0 /* PENDING */) {
                 return;
             }
             var cachedHandlers = _this._handlers.slice();
             _this._handlers = [];
             cachedHandlers.forEach(function (handler) {
-                if (handler.done) {
+                if (handler[0]) {
                     return;
                 }
-                if (_this._state === States.RESOLVED) {
-                    if (handler.onfulfilled) {
-                        // eslint-disable-next-line @typescript-eslint/no-floating-promises
-                        handler.onfulfilled(_this._value);
-                    }
+                if (_this._state === 1 /* RESOLVED */) {
+                    // eslint-disable-next-line @typescript-eslint/no-floating-promises
+                    handler[1](_this._value);
                 }
-                if (_this._state === States.REJECTED) {
-                    if (handler.onrejected) {
-                        handler.onrejected(_this._value);
-                    }
+                if (_this._state === 2 /* REJECTED */) {
+                    handler[2](_this._value);
                 }
-                handler.done = true;
+                handler[0] = true;
             });
         };
         try {
@@ -82,81 +84,41 @@ var SyncPromise = /** @class */ (function () {
         }
     }
     /** JSDoc */
-    SyncPromise.resolve = function (value) {
-        return new SyncPromise(function (resolve) {
-            resolve(value);
-        });
-    };
-    /** JSDoc */
-    SyncPromise.reject = function (reason) {
-        return new SyncPromise(function (_, reject) {
-            reject(reason);
-        });
-    };
-    /** JSDoc */
-    SyncPromise.all = function (collection) {
-        return new SyncPromise(function (resolve, reject) {
-            if (!Array.isArray(collection)) {
-                reject(new TypeError("Promise.all requires an array as input."));
-                return;
-            }
-            if (collection.length === 0) {
-                resolve([]);
-                return;
-            }
-            var counter = collection.length;
-            var resolvedCollection = [];
-            collection.forEach(function (item, index) {
-                void SyncPromise.resolve(item)
-                    .then(function (value) {
-                    resolvedCollection[index] = value;
-                    counter -= 1;
-                    if (counter !== 0) {
-                        return;
-                    }
-                    resolve(resolvedCollection);
-                })
-                    .then(null, reject);
-            });
-        });
-    };
-    /** JSDoc */
     SyncPromise.prototype.then = function (onfulfilled, onrejected) {
         var _this = this;
         return new SyncPromise(function (resolve, reject) {
-            _this._attachHandler({
-                done: false,
-                onfulfilled: function (result) {
+            _this._handlers.push([
+                false,
+                function (result) {
                     if (!onfulfilled) {
                         // TODO: ¯\_(ツ)_/¯
                         // TODO: FIXME
                         resolve(result);
-                        return;
                     }
-                    try {
-                        resolve(onfulfilled(result));
-                        return;
-                    }
-                    catch (e) {
-                        reject(e);
-                        return;
+                    else {
+                        try {
+                            resolve(onfulfilled(result));
+                        }
+                        catch (e) {
+                            reject(e);
+                        }
                     }
                 },
-                onrejected: function (reason) {
+                function (reason) {
                     if (!onrejected) {
                         reject(reason);
-                        return;
                     }
-                    try {
-                        resolve(onrejected(reason));
-                        return;
-                    }
-                    catch (e) {
-                        reject(e);
-                        return;
+                    else {
+                        try {
+                            resolve(onrejected(reason));
+                        }
+                        catch (e) {
+                            reject(e);
+                        }
                     }
                 },
-            });
+            ]);
+            _this._executeHandlers();
         });
     };
     /** JSDoc */
@@ -189,10 +151,6 @@ var SyncPromise = /** @class */ (function () {
                 resolve(val);
             });
         });
-    };
-    /** JSDoc */
-    SyncPromise.prototype.toString = function () {
-        return '[object SyncPromise]';
     };
     return SyncPromise;
 }());

@@ -17,19 +17,5 @@ export declare class Dedupe implements Integration {
      * @inheritDoc
      */
     setupOnce(addGlobalEventProcessor: (callback: EventProcessor) => void, getCurrentHub: () => Hub): void;
-    /** JSDoc */
-    private _shouldDropEvent;
-    /** JSDoc */
-    private _isSameMessageEvent;
-    /** JSDoc */
-    private _getFramesFromEvent;
-    /** JSDoc */
-    private _isSameStacktrace;
-    /** JSDoc */
-    private _getExceptionFromEvent;
-    /** JSDoc */
-    private _isSameExceptionEvent;
-    /** JSDoc */
-    private _isSameFingerprint;
 }
 //# sourceMappingURL=dedupe.d.ts.map

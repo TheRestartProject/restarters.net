@@ -3,7 +3,7 @@
 /*
  * This file is part of Psy Shell.
  *
- * (c) 2012-2020 Justin Hileman
+ * (c) 2012-2022 Justin Hileman
  *
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
@@ -54,13 +54,6 @@ class ExecutionLoopClosure extends ExecutionClosure
                         // Evaluate the current code buffer
                         $_ = eval($__psysh__->onExecute($__psysh__->flushCode() ?: ExecutionClosure::NOOP_INPUT));
                     } catch (\Throwable $_e) {
-                        // Clean up on our way out.
-                        if (\ob_get_level() > 0) {
-                            \ob_end_clean();
-                        }
-
-                        throw $_e;
-                    } catch (\Exception $_e) {
                         // Clean up on our way out.
                         if (\ob_get_level() > 0) {
                             \ob_end_clean();

@@ -27,13 +27,7 @@ function callOnHub(method) {
  */
 // eslint-disable-next-line @typescript-eslint/no-explicit-any, @typescript-eslint/explicit-module-boundary-types
 function captureException(exception, captureContext) {
-    var syntheticException;
-    try {
-        throw new Error('Sentry syntheticException');
-    }
-    catch (exception) {
-        syntheticException = exception;
-    }
+    var syntheticException = new Error('Sentry syntheticException');
     return callOnHub('captureException', exception, {
         captureContext: captureContext,
         originalException: exception,
@@ -45,17 +39,11 @@ exports.captureException = captureException;
  * Captures a message event and sends it to Sentry.
  *
  * @param message The message to send to Sentry.
- * @param level Define the level of the message.
+ * @param Severity Define the level of the message.
  * @returns The generated eventId.
  */
 function captureMessage(message, captureContext) {
-    var syntheticException;
-    try {
-        throw new Error(message);
-    }
-    catch (exception) {
-        syntheticException = exception;
-    }
+    var syntheticException = new Error(message);
     // This is necessary to provide explicit scopes upgrade, without changing the original
     // arity of the `captureMessage(message, level)` method.
     var level = typeof captureContext === 'string' ? captureContext : undefined;

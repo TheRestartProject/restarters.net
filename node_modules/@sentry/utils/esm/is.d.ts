@@ -6,7 +6,7 @@ import { Primitive } from '@sentry/types';
  * @param wat A value to be checked.
  * @returns A boolean representing the result.
  */
-export declare function isError(wat: any): boolean;
+export declare function isError(wat: unknown): wat is Error;
 /**
  * Checks whether given value's type is ErrorEvent
  * {@link isErrorEvent}.
@@ -14,7 +14,7 @@ export declare function isError(wat: any): boolean;
  * @param wat A value to be checked.
  * @returns A boolean representing the result.
  */
-export declare function isErrorEvent(wat: any): boolean;
+export declare function isErrorEvent(wat: unknown): boolean;
 /**
  * Checks whether given value's type is DOMError
  * {@link isDOMError}.
@@ -22,7 +22,7 @@ export declare function isErrorEvent(wat: any): boolean;
  * @param wat A value to be checked.
  * @returns A boolean representing the result.
  */
-export declare function isDOMError(wat: any): boolean;
+export declare function isDOMError(wat: unknown): boolean;
 /**
  * Checks whether given value's type is DOMException
  * {@link isDOMException}.
@@ -30,7 +30,7 @@ export declare function isDOMError(wat: any): boolean;
  * @param wat A value to be checked.
  * @returns A boolean representing the result.
  */
-export declare function isDOMException(wat: any): boolean;
+export declare function isDOMException(wat: unknown): boolean;
 /**
  * Checks whether given value's type is a string
  * {@link isString}.
@@ -38,15 +38,15 @@ export declare function isDOMException(wat: any): boolean;
  * @param wat A value to be checked.
  * @returns A boolean representing the result.
  */
-export declare function isString(wat: any): boolean;
+export declare function isString(wat: unknown): wat is string;
 /**
- * Checks whether given value's is a primitive (undefined, null, number, boolean, string, bigint, symbol)
+ * Checks whether given value is a primitive (undefined, null, number, boolean, string, bigint, symbol)
  * {@link isPrimitive}.
  *
  * @param wat A value to be checked.
  * @returns A boolean representing the result.
  */
-export declare function isPrimitive(wat: any): wat is Primitive;
+export declare function isPrimitive(wat: unknown): wat is Primitive;
 /**
  * Checks whether given value's type is an object literal
  * {@link isPlainObject}.
@@ -54,7 +54,7 @@ export declare function isPrimitive(wat: any): wat is Primitive;
  * @param wat A value to be checked.
  * @returns A boolean representing the result.
  */
-export declare function isPlainObject(wat: any): boolean;
+export declare function isPlainObject(wat: unknown): wat is Record<string, unknown>;
 /**
  * Checks whether given value's type is an Event instance
  * {@link isEvent}.
@@ -62,7 +62,7 @@ export declare function isPlainObject(wat: any): boolean;
  * @param wat A value to be checked.
  * @returns A boolean representing the result.
  */
-export declare function isEvent(wat: any): boolean;
+export declare function isEvent(wat: unknown): boolean;
 /**
  * Checks whether given value's type is an Element instance
  * {@link isElement}.
@@ -70,7 +70,7 @@ export declare function isEvent(wat: any): boolean;
  * @param wat A value to be checked.
  * @returns A boolean representing the result.
  */
-export declare function isElement(wat: any): boolean;
+export declare function isElement(wat: unknown): boolean;
 /**
  * Checks whether given value's type is an regexp
  * {@link isRegExp}.
@@ -78,12 +78,12 @@ export declare function isElement(wat: any): boolean;
  * @param wat A value to be checked.
  * @returns A boolean representing the result.
  */
-export declare function isRegExp(wat: any): boolean;
+export declare function isRegExp(wat: unknown): wat is RegExp;
 /**
  * Checks whether given value has a then function.
  * @param wat A value to be checked.
  */
-export declare function isThenable(wat: any): boolean;
+export declare function isThenable(wat: any): wat is PromiseLike<any>;
 /**
  * Checks whether given value's type is a SyntheticEvent
  * {@link isSyntheticEvent}.
@@ -91,7 +91,15 @@ export declare function isThenable(wat: any): boolean;
  * @param wat A value to be checked.
  * @returns A boolean representing the result.
  */
-export declare function isSyntheticEvent(wat: any): boolean;
+export declare function isSyntheticEvent(wat: unknown): boolean;
+/**
+ * Checks whether given value is NaN
+ * {@link isNaN}.
+ *
+ * @param wat A value to be checked.
+ * @returns A boolean representing the result.
+ */
+export declare function isNaN(wat: unknown): boolean;
 /**
  * Checks whether given value's type is an instance of provided constructor.
  * {@link isInstanceOf}.

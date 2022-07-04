@@ -1,21 +1,6 @@
+export declare type MemoFunc = [(obj: any) => boolean, (obj: any) => void];
 /**
- * Memo class used for decycle json objects. Uses WeakSet if available otherwise array.
+ * Helper to decycle json objects
  */
-export declare class Memo {
-    /** Determines if WeakSet is available */
-    private readonly _hasWeakSet;
-    /** Either WeakSet or Array */
-    private readonly _inner;
-    constructor();
-    /**
-     * Sets obj to remember.
-     * @param obj Object to remember
-     */
-    memoize(obj: any): boolean;
-    /**
-     * Removes object from internal storage.
-     * @param obj Object to forget
-     */
-    unmemoize(obj: any): void;
-}
+export declare function memoBuilder(): MemoFunc;
 //# sourceMappingURL=memo.d.ts.map

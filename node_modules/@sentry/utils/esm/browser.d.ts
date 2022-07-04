@@ -5,4 +5,8 @@
  * @returns generated DOM path
  */
 export declare function htmlTreeAsString(elem: unknown, keyAttrs?: string[]): string;
+/**
+ * A safe form of location.href
+ */
+export declare function getLocationHref(): string;
 //# sourceMappingURL=browser.d.ts.map

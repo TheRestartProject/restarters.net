@@ -1,7 +1,6 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 var types_1 = require("@sentry/types");
 exports.Severity = types_1.Severity;
-exports.Status = types_1.Status;
 var core_1 = require("@sentry/core");
 exports.addGlobalEventProcessor = core_1.addGlobalEventProcessor;
 exports.addBreadcrumb = core_1.addBreadcrumb;
@@ -14,6 +13,7 @@ exports.getCurrentHub = core_1.getCurrentHub;
 exports.Hub = core_1.Hub;
 exports.makeMain = core_1.makeMain;
 exports.Scope = core_1.Scope;
+exports.Session = core_1.Session;
 exports.startTransaction = core_1.startTransaction;
 exports.SDK_VERSION = core_1.SDK_VERSION;
 exports.setContext = core_1.setContext;

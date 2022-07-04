@@ -1,12 +1,13 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-var immutable_1 = require("immutable");
+exports.copyCLIIgnoreToWatchOptions = void 0;
+const immutable_1 = require("immutable");
 function copyCLIIgnoreToWatchOptions(incoming) {
     if (!incoming.get("ignore")) {
         return [incoming, []];
     }
-    var output = incoming.updateIn(["watchOptions", "ignored"], immutable_1.List([]), function (ignored) {
-        return immutable_1.List([]).concat(ignored, incoming.get("ignore"));
+    const output = incoming.updateIn(["watchOptions", "ignored"], (0, immutable_1.List)([]), ignored => {
+        return (0, immutable_1.List)([]).concat(ignored, incoming.get("ignore"));
     });
     return [output, []];
 }

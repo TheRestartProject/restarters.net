@@ -1,12 +1,12 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 function default_1() {
-    var serveStatic = require("serve-static");
+    const serveStatic = require("serve-static");
     /**
      * Adding a custom mime-type for wasm whilst we wait for
      * the `send` package to be updated.
      */
-    var send = require("send");
+    const send = require("send");
     send.mime.define({ "application/wasm": ["wasm"] });
     return serveStatic;
 }

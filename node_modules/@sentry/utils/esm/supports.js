@@ -1,5 +1,6 @@
+import { IS_DEBUG_BUILD } from './flags';
+import { getGlobalObject } from './global';
 import { logger } from './logger';
-import { getGlobalObject } from './misc';
 /**
  * Tells whether current environment supports ErrorEvent objects
  * {@link supportsErrorEvent}.
@@ -96,7 +97,7 @@ export function supportsNativeFetch() {
     var result = false;
     var doc = global.document;
     // eslint-disable-next-line deprecation/deprecation
-    if (doc && typeof doc.createElement === "function") {
+    if (doc && typeof doc.createElement === 'function') {
         try {
             var sandbox = doc.createElement('iframe');
             sandbox.hidden = true;
@@ -108,7 +109,8 @@ export function supportsNativeFetch() {
             doc.head.removeChild(sandbox);
         }
         catch (err) {
-            logger.warn('Could not create sandbox iframe for pure fetch check, bailing to window.fetch: ', err);
+            IS_DEBUG_BUILD &&
+                logger.warn('Could not create sandbox iframe for pure fetch check, bailing to window.fetch: ', err);
         }
     }
     return result;
@@ -129,9 +131,9 @@ export function supportsReportingObserver() {
  * @returns Answer to the given question.
  */
 export function supportsReferrerPolicy() {
-    // Despite all stars in the sky saying that Edge supports old draft syntax, aka 'never', 'always', 'origin' and 'default
-    // https://caniuse.com/#feat=referrer-policy
-    // It doesn't. And it throw exception instead of ignoring this parameter...
+    // Despite all stars in the sky saying that Edge supports old draft syntax, aka 'never', 'always', 'origin' and 'default'
+    // (see https://caniuse.com/#feat=referrer-policy),
+    // it doesn't. And it throws an exception instead of ignoring this parameter...
     // REF: https://github.com/getsentry/raven-js/issues/1233
     if (!supportsFetch()) {
         return false;

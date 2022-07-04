@@ -1,4 +1,3 @@
-import { SessionStatus } from '@sentry/types';
 import { dropUndefinedKeys, timestampInSeconds, uuid4 } from '@sentry/utils';
 /**
  * @inheritdoc
@@ -8,7 +7,7 @@ var Session = /** @class */ (function () {
         this.errors = 0;
         this.sid = uuid4();
         this.duration = 0;
-        this.status = SessionStatus.Ok;
+        this.status = 'ok';
         this.init = true;
         this.ignoreDuration = false;
         // Both timestamp and started are in seconds since the UNIX epoch.
@@ -82,8 +81,8 @@ var Session = /** @class */ (function () {
         if (status) {
             this.update({ status: status });
         }
-        else if (this.status === SessionStatus.Ok) {
-            this.update({ status: SessionStatus.Exited });
+        else if (this.status === 'ok') {
+            this.update({ status: 'exited' });
         }
         else {
             this.update();
@@ -101,12 +100,12 @@ var Session = /** @class */ (function () {
             errors: this.errors,
             did: typeof this.did === 'number' || typeof this.did === 'string' ? "" + this.did : undefined,
             duration: this.duration,
-            attrs: dropUndefinedKeys({
+            attrs: {
                 release: this.release,
                 environment: this.environment,
                 ip_address: this.ipAddress,
                 user_agent: this.userAgent,
-            }),
+            },
         });
     };
     return Session;

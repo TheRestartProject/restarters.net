@@ -1,6 +1,7 @@
 Object.defineProperty(exports, "__esModule", { value: true });
-/** JSDoc */
-// eslint-disable-next-line import/export
+/**
+ * TODO(v7): Remove this enum and replace with SeverityLevel
+ */
 var Severity;
 (function (Severity) {
     /** JSDoc */
@@ -18,34 +19,7 @@ var Severity;
     /** JSDoc */
     Severity["Critical"] = "critical";
 })(Severity = exports.Severity || (exports.Severity = {}));
-// eslint-disable-next-line @typescript-eslint/no-namespace, import/export
-(function (Severity) {
-    /**
-     * Converts a string-based level into a {@link Severity}.
-     *
-     * @param level string representation of Severity
-     * @returns Severity
-     */
-    function fromString(level) {
-        switch (level) {
-            case 'debug':
-                return Severity.Debug;
-            case 'info':
-                return Severity.Info;
-            case 'warn':
-            case 'warning':
-                return Severity.Warning;
-            case 'error':
-                return Severity.Error;
-            case 'fatal':
-                return Severity.Fatal;
-            case 'critical':
-                return Severity.Critical;
-            case 'log':
-            default:
-                return Severity.Log;
-        }
-    }
-    Severity.fromString = fromString;
-})(Severity = exports.Severity || (exports.Severity = {}));
+// TODO: in v7, these can disappear, because they now also exist in `@sentry/utils`. (Having them there rather than here
+// is nice because then it enforces the idea that only types are exported from `@sentry/types`.)
+exports.SeverityLevels = ['fatal', 'error', 'warning', 'log', 'info', 'debug', 'critical'];
 //# sourceMappingURL=severity.js.map

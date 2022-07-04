@@ -1,5 +1,5 @@
 Object.defineProperty(exports, "__esModule", { value: true });
-var misc_1 = require("./misc");
+var global_1 = require("./global");
 var node_1 = require("./node");
 /**
  * A TimestampSource implementation for environments that do not support the Performance Web API natively.
@@ -18,7 +18,7 @@ var dateTimestampSource = {
  * Wrapping the native API works around differences in behavior from different browsers.
  */
 function getBrowserPerformance() {
-    var performance = misc_1.getGlobalObject().performance;
+    var performance = global_1.getGlobalObject().performance;
     if (!performance || !performance.now) {
         return undefined;
     }
@@ -101,7 +101,7 @@ exports.browserPerformanceTimeOrigin = (function () {
     // Unfortunately browsers may report an inaccurate time origin data, through either performance.timeOrigin or
     // performance.timing.navigationStart, which results in poor results in performance data. We only treat time origin
     // data as reliable if they are within a reasonable threshold of the current time.
-    var performance = misc_1.getGlobalObject().performance;
+    var performance = global_1.getGlobalObject().performance;
     if (!performance || !performance.now) {
         exports._browserPerformanceTimeOriginMode = 'none';
         return undefined;

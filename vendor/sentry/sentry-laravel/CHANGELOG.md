@@ -2,6 +2,38 @@
 
 ## Unreleased
 
+## 2.12.1
+
+- Fix incorrect `release` and `environment` values when using the `sentry:test` command
+
+## 2.12.0
+
+- Add support for normalized route names when using [Laravel Lumen](https://lumen.laravel.com/docs/9.x) (#449)
+- Add support for adding the user ID to the user scope when using [Laravel Sanctum](https://laravel.com/docs/9.x/sanctum) (#542)
+- Allow configuration of the [`send_default_pii`](https://docs.sentry.io/platforms/php/configuration/options/#send-default-pii) SDK option with the `SENTRY_SEND_DEFAULT_PII` env variable
+
+## 2.11.1
+
+- Fix deprecation notice in route name extraction (#543)
+
+## 2.11.0
+
+- Add support for Laravel 9 (#534)
+- Fix double wrapping the log channel in a `FingersCrossedHandler` on Laravel `v8.97` and newer when `action_level` option is set on the Log channel config (#534)
+- Update span operation names to match what Sentry server is expecting (#533)
+
+## 2.10.2
+
+- Fix `sentry:test` command not having correct exit code on success
+
+## 2.10.1
+
+- Fix compatibility with Laravel <= 6 of the `sentry:test` and `sentry:publish` commands
+
+## 2.10.0
+
+- Improve output and DX for `sentry:test` and `sentry:publish` commands (#522)
+
 ## 2.9.0
 
 - Add support for Laravel Octane (#495)

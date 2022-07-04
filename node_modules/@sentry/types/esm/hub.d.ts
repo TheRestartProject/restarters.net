@@ -207,6 +207,6 @@ export interface Hub {
      * Sends the current session on the scope to Sentry
      * @param endSession If set the session will be marked as exited and removed from the scope
      */
-    captureSession(endSession: boolean): void;
+    captureSession(endSession?: boolean): void;
 }
 //# sourceMappingURL=hub.d.ts.map

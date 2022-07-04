@@ -1,5 +1,16 @@
 # Change Log
 
+## 2.5.0 - 2021-11-26
+
+### Added
+
+- Support for Symfony 6
+- Support for PHP 8.1
+
+### Changed
+
+- Dropped support for Symfony 2 and 3 - please keep using version 2.4.0 of this library if you can't update Symfony.
+
 ## 2.4.0 - 2021-07-05
 
 ### Added
@@ -68,6 +79,18 @@
 
 - Deprecated option `debug_plugins` has been removed from `PluginClient`
 - Deprecated options `decider` and `delay` have been removed from `RetryPlugin`, use `exception_decider` and `exception_delay` instead.
+
+## 1.11.0 - 2021-07-11
+
+### Changed
+
+- Backported from version 2: AddPathPlugin: Do not add the prefix if the URL already has the same prefix.
+
+## 1.10.0 - 2019-11-18
+
+### Added
+
+- Support for Symfony 5
 
 ## 1.9.1 - 2019-02-02
 

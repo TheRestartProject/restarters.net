@@ -5,8 +5,10 @@ namespace App\Http\Controllers\API;
 use App\Group;
 use App\Helpers\Fixometer;
 use App\Http\Controllers\Controller;
+use App\Http\Resources\PartySummaryCollection;
 use App\Party;
 use Auth;
+use Carbon\Carbon;
 use Illuminate\Http\Request;
 
 class GroupController extends Controller
@@ -207,6 +209,7 @@ class GroupController extends Controller
 
     public static function getEventsForGroup(Request $request, Group $group)
     {
+        // Used by old JS client.
         $group = $group->load('parties');
 
         $events = $group->parties->sortByDesc('event_start_utc');
@@ -223,6 +226,24 @@ class GroupController extends Controller
         return response()->json([
             'events' => $events->values()->toJson(),
         ]);
+    }
+
+    public static function getGroupv2(Request $request, $idgroups) {
+        $group = Group::findOrFail($idgroups);
+        return \App\Http\Resources\Group::make($group);
+    }
+
+    public static function getEventsForGroupv2(Request $request, $idgroups) {
+        Group::findOrFail($idgroups);
+
+        // Get date filters.  We default to far past and far future so that we don't need multiple code branches.  We
+        // don't need to validate the date format - if they put junk in then they'll get junk matches back.
+        $start = Carbon::parse($request->get('start', '1970-01-01'))->setTimezone('UTC')->toIso8601String();
+        $end = Carbon::parse($request->get('end', '3000-01-01'))->setTimezone('UTC')->toIso8601String();
+
+        $parties = Party::undeleted()->forGroup($idgroups)->where('event_start_utc', '>=', $start)->where('event_end_utc', '<=', $end)->get();
+
+        return PartySummaryCollection::make($parties);
     }
 
     public function listVolunteers(Request $request, $idgroups) {

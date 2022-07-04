@@ -1,3 +1,66 @@
+## 5.9.3
+
+- Fix incorrect resize method used for creating thumbnails of existing files
+  (thanks to @gplwhite)
+
+## 5.9.2
+
+- Handle `xhr.readyState` in the `submitRequest` function and don't attempt to
+  send if it's not `1` (OPENED). (thanks to @bobbysmith007)
+
+## 5.9.1
+
+- Fix the way upload progress is calculated when using chunked uploads. (thanks
+  to @ckovey)
+
+## 5.9.0
+
+- Properly handle when timeout is null or 0
+- Make the default of timeout null
+
+## 5.8.1
+
+- Fix custom event polyfill for IE11
+- Fix build to use ES5 instead of ES6, which was broken due to webpack upgrade.
+  (thanks to @fukayatsu)
+
+## 5.8.0
+
+- Dropzone now also triggers custom events on the DOM element. The custom events
+  are the same as the events you can listen on with Dropzone but start with
+  `dropzone:`. (thanks to @1cg)
+- Moved the `./src/options.js` previewTemplate in its own
+  `preview-template.html` file.
+- Switched to yarn as the primary package manager (shouldn't affect anybody that
+  is not working Dropzone itself).
+
+## 5.7.6
+
+- Revert `dist/min/*.css` files to be named `dist/min/*.min.css`.
+- Setup bower releases.
+
+## 5.7.5
+
+- Rename `blacklistedBrowsers` to `blockedBrowsers` (but still accept
+  `blacklistedBrowsers` for legacy).
+- Add automatic trigger for packagist deployment.
+- Fix links in `package.json`.
+
+## 5.7.4
+
+- Prevent hidden input field from getting focus (thanks to @sinedied)
+- Fix documentation of `maxFilesize` (thanks to @alxndr-w)
+- Fix build issues so the UMD module can be imported properly
+
+## 5.7.3 (retracted)
+
+- Add `disablePreviews` option.
+- Fix IE problems with Symbols.
+- **WARNING**: This release had issues because the .js files couldn't be
+  imported as AMD/CommonJS packages properly. The standalone version worked fine
+  though. I have retracted this version from npm but have left the release on
+  GitHub.
+
 ## 5.7.2
 
 - Base the calculation of the chunks to send on the transformed files

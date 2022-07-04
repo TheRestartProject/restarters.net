@@ -71,7 +71,7 @@ final class Event
     private $messageFormatted;
 
     /**
-     * @var mixed[] The parameters to use to format the message
+     * @var string[] The parameters to use to format the message
      */
     private $messageParams = [];
 
@@ -175,7 +175,7 @@ final class Event
      */
     public static function createEvent(?EventId $eventId = null): self
     {
-        return new self($eventId, EventType::default());
+        return new self($eventId, EventType::event());
     }
 
     /**
@@ -376,7 +376,7 @@ final class Event
      * Sets the error message.
      *
      * @param string      $message   The message
-     * @param mixed[]     $params    The parameters to use to format the message
+     * @param string[]    $params    The parameters to use to format the message
      * @param string|null $formatted The formatted message
      */
     public function setMessage(string $message, array $params = [], ?string $formatted = null): void
@@ -487,6 +487,27 @@ final class Event
     public function setTags(array $tags): void
     {
         $this->tags = $tags;
+    }
+
+    /**
+     * Sets or updates a tag in this event.
+     *
+     * @param string $key   The key that uniquely identifies the tag
+     * @param string $value The value
+     */
+    public function setTag(string $key, string $value): void
+    {
+        $this->tags[$key] = $value;
+    }
+
+    /**
+     * Removes a given tag from the event.
+     *
+     * @param string $key The key that uniquely identifies the tag
+     */
+    public function removeTag(string $key): void
+    {
+        unset($this->tags[$key]);
     }
 
     /**

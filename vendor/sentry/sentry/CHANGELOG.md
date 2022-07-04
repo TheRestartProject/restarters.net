@@ -2,6 +2,45 @@
 
 ## Unreleased
 
+## 3.6.1 (2022-06-27)
+
+- Set the `sentry-trace` header when using the tracing middleware (#1331)
+
+## 3.6.0 (2022-06-10)
+
+- Add support for `monolog/monolog:^3.0` (#1321)
+- Add `setTag` and `removeTag` public methods to `Event` for easier manipulation of tags (#1324)
+
+## 3.5.0 (2022-05-19)
+
+- Bump minimum version of `guzzlehttp/psr7` package to avoid [`CVE-2022-24775`](https://github.com/guzzle/psr7/security/advisories/GHSA-q7rv-6hp3-vh96) (#1305)
+- Fix stripping of memory addresses from stacktrace frames of anonymous classes in PHP `>=7.4.2` (#1314)
+- Set the default `send_attempts` to `0` (this disables retries) and deprecate the option. If you require retries you can increase the `send_attempts` option to the desired value. (#1312)
+- Add `http_connect_timeout` and `http_timeout` client options (#1282)
+
+## 3.4.0 (2022-03-14)
+
+- Update Guzzle tracing middleware to meet the [expected standard](https://develop.sentry.dev/sdk/features/#http-client-integrations) (#1234)
+- Add `toArray` public method in `PayloadSerializer` to be able to re-use Event serialization
+- The `withScope` methods now return the callback's return value (#1263)
+- Set the event extras by taking the data from the Monolog record's context (#1244)
+- Make the `StacktraceBuilder` class part of the public API and add the `Client::getStacktraceBuilder()` method to build custom stacktraces (#1124)
+- Support handling the server rate-limits when sending events to Sentry (#1291)
+- Treat the project ID component of the DSN as a `string` rather than an `integer` (#1293)
+
+## 3.3.7 (2022-01-19)
+
+- Fix the serialization of a `callable` when the autoloader throws exceptions (#1280)
+
+## 3.3.6 (2022-01-14)
+
+- Optimize `Span` constructor and add benchmarks (#1274)
+- Handle autoloader that throws an exception while trying to serialize a possible callable (#1276)
+
+## 3.3.5 (2021-12-27)
+
+- Bump the minimum required version of the `jean85/pretty-package-versions` package (#1267)
+
 ## 3.3.4 (2021-11-08)
 
 - Avoid overwriting the error level set by the user on the event when capturing an `ErrorException` exception (#1251)
@@ -24,7 +63,7 @@
 ## 3.3.0 (2021-05-26)
 
 - Allow setting a custom timestamp on the breadcrumbs (#1193)
-- Add option `ignore_tags` to `IgnoreErrorsIntegration` in order to ignore exceptions by tags values. (#1201)
+- Add option `ignore_tags` to `IgnoreErrorsIntegration` in order to ignore exceptions by tags values (#1201)
 
 ## 3.2.2 (2021-05-06)
 

@@ -24,11 +24,11 @@
         "ext-json": "*",
         "ext-mbstring": "*",
         "guzzlehttp/promises": "^1.4",
-        "guzzlehttp/psr7": "^1.7|^2.0",
-        "jean85/pretty-package-versions": "^1.5|^2.0.1",
+        "guzzlehttp/psr7": "^1.8.4|^2.1.1",
+        "jean85/pretty-package-versions": "^1.5|^2.0.4",
         "php-http/async-client-implementation": "^1.0",
         "php-http/client-common": "^1.5|^2.0",
-        "php-http/discovery": "^1.6.1",
+        "php-http/discovery": "^1.11",
         "php-http/httplug": "^1.1|^2.0",
         "php-http/message": "^1.5",
         "psr/http-factory": "^1.0",
@@ -39,17 +39,18 @@
         "symfony/polyfill-uuid": "^1.13.1"
     },
     "require-dev": {
-        "friendsofphp/php-cs-fixer": "^2.17",
+        "friendsofphp/php-cs-fixer": "^2.19|3.4.*",
         "http-interop/http-factory-guzzle": "^1.0",
-        "monolog/monolog": "^1.3|^2.0",
+        "monolog/monolog": "^1.6|^2.0|^3.0",
         "nikic/php-parser": "^4.10.3",
         "php-http/mock-client": "^1.3",
+        "phpbench/phpbench": "^1.0",
         "phpstan/extension-installer": "^1.0",
-        "phpstan/phpstan": "^0.12",
-        "phpstan/phpstan-phpunit": "^0.12",
+        "phpstan/phpstan": "^1.3",
+        "phpstan/phpstan-phpunit": "^1.0",
         "phpunit/phpunit": "^8.5.14|^9.4",
         "symfony/phpunit-bridge": "^5.2|^6.0",
-        "vimeo/psalm": "^4.2"
+        "vimeo/psalm": "^4.17"
     },
     "suggest": {
         "monolog/monolog": "Allow sending log messages to Sentry by using the included Monolog handler."
@@ -86,12 +87,16 @@
         ]
     },
     "config": {
-        "sort-packages": true
+        "sort-packages": true,
+        "allow-plugins": {
+            "composer/package-versions-deprecated": true,
+            "phpstan/extension-installer": true
+        }
     },
     "prefer-stable": true,
     "extra": {
         "branch-alias": {
-            "dev-master": "3.3.x-dev"
+            "dev-master": "3.6.x-dev"
         }
     }
 }

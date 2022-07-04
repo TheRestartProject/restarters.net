@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Sentry;
 
+use Sentry\State\Scope;
 use Sentry\Tracing\Transaction;
 use Sentry\Tracing\TransactionContext;
 
@@ -28,7 +29,6 @@ function init(array $options = []): void
  */
 function captureMessage(string $message, ?Severity $level = null, ?EventHint $hint = null): ?EventId
 {
-    /** @psalm-suppress TooManyArguments */
     return SentrySdk::getCurrentHub()->captureMessage($message, $level, $hint);
 }
 
@@ -40,7 +40,6 @@ function captureMessage(string $message, ?Severity $level = null, ?EventHint $hi
  */
 function captureException(\Throwable $exception, ?EventHint $hint = null): ?EventId
 {
-    /** @psalm-suppress TooManyArguments */
     return SentrySdk::getCurrentHub()->captureException($exception, $hint);
 }
 
@@ -62,7 +61,6 @@ function captureEvent(Event $event, ?EventHint $hint = null): ?EventId
  */
 function captureLastError(?EventHint $hint = null): ?EventId
 {
-    /** @psalm-suppress TooManyArguments */
     return SentrySdk::getCurrentHub()->captureLastError($hint);
 }
 
@@ -94,10 +92,18 @@ function configureScope(callable $callback): void
  * is automatically removed once the operation finishes or throws.
  *
  * @param callable $callback The callback to be executed
+ *
+ * @return mixed|void The callback's return value, upon successful execution
+ *
+ * @psalm-template T
+ *
+ * @psalm-param callable(Scope): T $callback
+ *
+ * @psalm-return T
  */
-function withScope(callable $callback): void
+function withScope(callable $callback)
 {
-    SentrySdk::getCurrentHub()->withScope($callback);
+    return SentrySdk::getCurrentHub()->withScope($callback);
 }
 
 /**
@@ -120,6 +126,5 @@ function withScope(callable $callback): void
  */
 function startTransaction(TransactionContext $context, array $customSamplingContext = []): Transaction
 {
-    /** @psalm-suppress TooManyArguments */
     return SentrySdk::getCurrentHub()->startTransaction($context, $customSamplingContext);
 }

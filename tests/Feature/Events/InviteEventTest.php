@@ -59,12 +59,7 @@ class InviteEventTest extends TestCase
                 self::assertContains('creepy', $mailData['introLines'][2]);
                 self::assertContains($event->location, $mailData['introLines'][4]);
                 self::assertContains($event->timezone,  $mailData['introLines'][4]);
-
-                // Render to HTML to check the footer which is inserted by email.blade.php isn't accidentally
-                // escaped.
-                $html = $notification->toMail($user)->render();
-                self::assertGreaterThan(0, strpos($html, 'contact <a href'));
-
+                self::assertContains('/view/', $mailData['introLines'][4]);
                 return true;
             }
         );

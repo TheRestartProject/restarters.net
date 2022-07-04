@@ -15,6 +15,7 @@ use Http\Client\Common\PluginClient;
 use Http\Client\Curl\Client as CurlHttpClient;
 use Http\Client\HttpAsyncClient as HttpAsyncClientInterface;
 use Http\Discovery\HttpAsyncClientDiscovery;
+use Psr\Http\Client\ClientInterface;
 use Psr\Http\Message\ResponseFactoryInterface;
 use Psr\Http\Message\StreamFactoryInterface;
 use Psr\Http\Message\UriFactoryInterface;
@@ -30,27 +31,6 @@ use Symfony\Component\HttpClient\HttplugClient as SymfonyHttplugClient;
  */
 final class HttpClientFactory implements HttpClientFactoryInterface
 {
-    /**
-     * @var int The timeout of the request in seconds
-     */
-    private const DEFAULT_HTTP_TIMEOUT = 5;
-
-    /**
-     * @var int The default number of seconds to wait while trying to connect
-     *          to a server
-     */
-    private const DEFAULT_HTTP_CONNECT_TIMEOUT = 2;
-
-    /**
-     * @var UriFactoryInterface The PSR-7 URI factory
-     */
-    private $uriFactory;
-
-    /**
-     * @var ResponseFactoryInterface The PSR-7 response factory
-     */
-    private $responseFactory;
-
     /**
      * @var StreamFactoryInterface The PSR-17 stream factory
      */
@@ -89,8 +69,6 @@ final class HttpClientFactory implements HttpClientFactoryInterface
         string $sdkIdentifier,
         string $sdkVersion
     ) {
-        $this->uriFactory = $uriFactory;
-        $this->responseFactory = $responseFactory;
         $this->streamFactory = $streamFactory;
         $this->httpClient = $httpClient;
         $this->sdkIdentifier = $sdkIdentifier;
@@ -106,66 +84,17 @@ final class HttpClientFactory implements HttpClientFactoryInterface
             throw new \RuntimeException('Cannot create an HTTP client without the Sentry DSN set in the options.');
         }
 
-        $httpClient = $this->httpClient;
-
-        if (null !== $httpClient && null !== $options->getHttpProxy()) {
+        if (null !== $this->httpClient && null !== $options->getHttpProxy()) {
             throw new \RuntimeException('The "http_proxy" option does not work together with a custom HTTP client.');
         }
 
-        if (null === $httpClient) {
-            if (class_exists(SymfonyHttplugClient::class)) {
-                $symfonyConfig = [
-                    'max_duration' => self::DEFAULT_HTTP_TIMEOUT,
-                ];
-
-                if (null !== $options->getHttpProxy()) {
-                    $symfonyConfig['proxy'] = $options->getHttpProxy();
-                }
-
-                /** @psalm-suppress UndefinedClass */
-                $httpClient = new SymfonyHttplugClient(
-                    SymfonyHttpClient::create($symfonyConfig)
-                );
-            } elseif (class_exists(GuzzleHttpClient::class)) {
-                /** @psalm-suppress UndefinedClass */
-                $guzzleConfig = [
-                    GuzzleHttpClientOptions::TIMEOUT => self::DEFAULT_HTTP_TIMEOUT,
-                    GuzzleHttpClientOptions::CONNECT_TIMEOUT => self::DEFAULT_HTTP_CONNECT_TIMEOUT,
-                ];
-
-                if (null !== $options->getHttpProxy()) {
-                    /** @psalm-suppress UndefinedClass */
-                    $guzzleConfig[GuzzleHttpClientOptions::PROXY] = $options->getHttpProxy();
-                }
-
-                /** @psalm-suppress InvalidPropertyAssignmentValue */
-                $httpClient = GuzzleHttpClient::createWithConfig($guzzleConfig);
-            } elseif (class_exists(CurlHttpClient::class)) {
-                $curlConfig = [
-                    \CURLOPT_TIMEOUT => self::DEFAULT_HTTP_TIMEOUT,
-                    \CURLOPT_CONNECTTIMEOUT => self::DEFAULT_HTTP_CONNECT_TIMEOUT,
-                ];
-
-                if (null !== $options->getHttpProxy()) {
-                    $curlConfig[\CURLOPT_PROXY] = $options->getHttpProxy();
-                }
-
-                /** @psalm-suppress InvalidPropertyAssignmentValue */
-                $httpClient = new CurlHttpClient(null, null, $curlConfig);
-            } elseif (null !== $options->getHttpProxy()) {
-                throw new \RuntimeException('The "http_proxy" option requires either the "php-http/curl-client" or the "php-http/guzzle6-adapter" package to be installed.');
-            }
-        }
-
-        if (null === $httpClient) {
-            $httpClient = HttpAsyncClientDiscovery::find();
-        }
+        $httpClient = $this->httpClient ?? $this->resolveClient($options);
 
         $httpClientPlugins = [
             new HeaderSetPlugin(['User-Agent' => $this->sdkIdentifier . '/' . $this->sdkVersion]),
             new AuthenticationPlugin(new SentryAuthentication($options, $this->sdkIdentifier, $this->sdkVersion)),
-            new RetryPlugin(['retries' => $options->getSendAttempts()]),
-            new ErrorPlugin(),
+            new RetryPlugin(['retries' => $options->getSendAttempts(false)]),
+            new ErrorPlugin(['only_server_exception' => true]),
         ];
 
         if ($options->isCompressionEnabled()) {
@@ -174,5 +103,56 @@ final class HttpClientFactory implements HttpClientFactoryInterface
         }
 
         return new PluginClient($httpClient, $httpClientPlugins);
+    }
+
+    /**
+     * @return ClientInterface|HttpAsyncClientInterface
+     */
+    private function resolveClient(Options $options)
+    {
+        if (class_exists(SymfonyHttplugClient::class)) {
+            $symfonyConfig = [
+                'timeout' => $options->getHttpConnectTimeout(),
+                'max_duration' => $options->getHttpTimeout(),
+            ];
+
+            if (null !== $options->getHttpProxy()) {
+                $symfonyConfig['proxy'] = $options->getHttpProxy();
+            }
+
+            return new SymfonyHttplugClient(SymfonyHttpClient::create($symfonyConfig));
+        }
+
+        if (class_exists(GuzzleHttpClient::class)) {
+            $guzzleConfig = [
+                GuzzleHttpClientOptions::TIMEOUT => $options->getHttpTimeout(),
+                GuzzleHttpClientOptions::CONNECT_TIMEOUT => $options->getHttpConnectTimeout(),
+            ];
+
+            if (null !== $options->getHttpProxy()) {
+                $guzzleConfig[GuzzleHttpClientOptions::PROXY] = $options->getHttpProxy();
+            }
+
+            return GuzzleHttpClient::createWithConfig($guzzleConfig);
+        }
+
+        if (class_exists(CurlHttpClient::class)) {
+            $curlConfig = [
+                \CURLOPT_TIMEOUT => $options->getHttpTimeout(),
+                \CURLOPT_CONNECTTIMEOUT => $options->getHttpConnectTimeout(),
+            ];
+
+            if (null !== $options->getHttpProxy()) {
+                $curlConfig[\CURLOPT_PROXY] = $options->getHttpProxy();
+            }
+
+            return new CurlHttpClient(null, null, $curlConfig);
+        }
+
+        if (null !== $options->getHttpProxy()) {
+            throw new \RuntimeException('The "http_proxy" option requires either the "php-http/curl-client", the "symfony/http-client" or the "php-http/guzzle6-adapter" package to be installed.');
+        }
+
+        return HttpAsyncClientDiscovery::find();
     }
 }

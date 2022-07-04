@@ -4,6 +4,14 @@ All Notable changes to `guzzle_retry_middleware` will be documented in this file
 
 Updates should follow the [Keep a CHANGELOG](http://keepachangelog.com/) principles.
 
+## 2.7 (2021-12-03)
+### Added
+- Support PHP v8.1
+- New [`give_up_after_secs` parameter](./README.md#setting-a-hard-ceiling-for-all-retries)
+### Changed
+- Upgraded to PHPStan 1.2
+- Improved comments for options array
+
 ## v2.6.1 (2020-11-27)
 ### Added
 - PHPStan in dev dependencies

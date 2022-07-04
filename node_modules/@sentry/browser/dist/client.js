@@ -3,6 +3,7 @@ var tslib_1 = require("tslib");
 var core_1 = require("@sentry/core");
 var utils_1 = require("@sentry/utils");
 var backend_1 = require("./backend");
+var flags_1 = require("./flags");
 var helpers_1 = require("./helpers");
 var integrations_1 = require("./integrations");
 /**
@@ -48,7 +49,7 @@ var BrowserClient = /** @class */ (function (_super) {
             return;
         }
         if (!this._isEnabled()) {
-            utils_1.logger.error('Trying to call showReportDialog with Sentry Client disabled');
+            flags_1.IS_DEBUG_BUILD && utils_1.logger.error('Trying to call showReportDialog with Sentry Client disabled');
             return;
         }
         helpers_1.injectReportDialog(tslib_1.__assign(tslib_1.__assign({}, options), { dsn: options.dsn || this.getDsn() }));

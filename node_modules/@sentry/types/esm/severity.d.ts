@@ -1,4 +1,6 @@
-/** JSDoc */
+/**
+ * TODO(v7): Remove this enum and replace with SeverityLevel
+ */
 export declare enum Severity {
     /** JSDoc */
     Fatal = "fatal",
@@ -15,13 +17,6 @@ export declare enum Severity {
     /** JSDoc */
     Critical = "critical"
 }
-export declare namespace Severity {
-    /**
-     * Converts a string-based level into a {@link Severity}.
-     *
-     * @param level string representation of Severity
-     * @returns Severity
-     */
-    function fromString(level: string): Severity;
-}
+export declare const SeverityLevels: readonly ["fatal", "error", "warning", "log", "info", "debug", "critical"];
+export declare type SeverityLevel = typeof SeverityLevels[number];
 //# sourceMappingURL=severity.d.ts.map

@@ -1,5 +1,4 @@
-import { Status } from '@sentry/types';
-import { SyncPromise } from '@sentry/utils';
+import { resolvedSyncPromise } from '@sentry/utils';
 /** Noop transport */
 var NoopTransport = /** @class */ (function () {
     function NoopTransport() {
@@ -8,16 +7,16 @@ var NoopTransport = /** @class */ (function () {
      * @inheritDoc
      */
     NoopTransport.prototype.sendEvent = function (_) {
-        return SyncPromise.resolve({
-            reason: "NoopTransport: Event has been skipped because no Dsn is configured.",
-            status: Status.Skipped,
+        return resolvedSyncPromise({
+            reason: 'NoopTransport: Event has been skipped because no Dsn is configured.',
+            status: 'skipped',
         });
     };
     /**
      * @inheritDoc
      */
     NoopTransport.prototype.close = function (_) {
-        return SyncPromise.resolve(true);
+        return resolvedSyncPromise(true);
     };
     return NoopTransport;
 }());
