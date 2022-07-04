@@ -4,6 +4,7 @@ namespace App\Notifications;
 
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
+use Illuminate\Notifications\Action;
 use Illuminate\Notifications\Messages\MailMessage;
 use Illuminate\Notifications\Notification;
 
@@ -80,9 +81,12 @@ class JoinEvent extends Notification implements ShouldQueue
                                     <td>' . __('notifications.join_event_time') . '</td>
                                     <td>'.$this->arr['event']->getEventStartEndLocal(true).'</td>
                                   </tr>
-                                    <tr>
+                                  <tr>
                                     <td>' . __('notifications.join_event_location') . '</td>
                                     <td>'.$this->arr['event']->location.'</td>
+                                  </tr>
+                                  <tr>
+                                    <td colspan="2"><a href="' . $this->arr['view_url'] . '">' . __('notifications.join_event_view') . '</a></td>
                                   </tr>
                             </table>';
         $ignoreLine = __('notifications.join_event_ignore', [], $locale);
@@ -101,12 +105,6 @@ class JoinEvent extends Notification implements ShouldQueue
                          ->line('');
                 }
 
-                $mail->line($eventDetailsTable)
-                     ->action(__('notifications.join_event_rsvp_now'), $this->arr['url'])
-                     ->line('')
-                     ->line($ignoreLine)
-                     ->line('');
-
                 return $mail;
             }
         } else { // receiver is someone not yet on the platform
@@ -121,13 +119,6 @@ class JoinEvent extends Notification implements ShouldQueue
                 $mail->line('')
                      ->line('"'.nl2br($this->arr['message']).'"');
             }
-
-            $mail->line($eventDetailsTable)
-                 ->action(__('notifications.join_event_rsvp_now', [], $locale), $this->arr['url'])
-                 ->line('')
-                 ->line(__('notifications.join_event_rsvp_now', [], $locale))
-                 ->line('')
-                 ->line($ignoreLine);
 
             return $mail;
         }
