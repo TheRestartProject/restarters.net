@@ -105,6 +105,10 @@ class JoinEvent extends Notification implements ShouldQueue
                          ->line('');
                 }
 
+                $mail->line($eventDetailsTable)
+                     ->line($ignoreLine)
+                     ->line('');
+
                 return $mail;
             }
         } else { // receiver is someone not yet on the platform
@@ -119,6 +123,11 @@ class JoinEvent extends Notification implements ShouldQueue
                 $mail->line('')
                      ->line('"'.nl2br($this->arr['message']).'"');
             }
+
+            $mail->line($eventDetailsTable)
+                 ->line(__('notifications.join_event_rsvp_now', [], $locale))
+                 ->line('')
+                 ->line($ignoreLine);
 
             return $mail;
         }
