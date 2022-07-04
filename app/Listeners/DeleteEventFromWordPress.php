@@ -6,8 +6,6 @@ use App\Events\EventDeleted;
 use App\Helpers\Fixometer;
 use App\Notifications\DeleteEventFromWordpressFailed;
 use HieuLe\WordpressXmlrpcClient\WordpressClient;
-use Illuminate\Contracts\Queue\ShouldQueue;
-use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Support\Facades\Log;
 use Notification;
 
