@@ -341,12 +341,14 @@ class GroupController extends Controller
         $upcoming_events = Party::future()
             ->forGroup($group->idgroups)
             ->get();
-
+        $active_events = Party::active()
+            ->forGroup($group->idgroups)
+            ->get();
         $past_events = Party::past()
             ->forGroup($group->idgroups)
             ->get();
 
-        //Checking user for validatity
+        //Checking user for validity
         $in_group = ! empty(UserGroups::where('group', $groupid)
             ->where('user', $user->id)
             ->where(function ($query) {
@@ -377,7 +379,7 @@ class GroupController extends Controller
         $eEmissionRatio = \App\Helpers\LcaStats::getEmissionRatioPowered();
         $uEmissionratio = \App\Helpers\LcaStats::getEmissionRatioUnpowered();
 
-        foreach (array_merge($upcoming_events->all(), $past_events->all()) as $event) {
+        foreach (array_merge($upcoming_events->all(), $active_events->all(), $past_events->all()) as $event) {
             $expanded_event = \App\Http\Controllers\PartyController::expandEvent($event, $group);
             // TODO: here we seem to expect group to be the group id, not the group object.
             // expandEvent seems to expect the object.
@@ -395,7 +397,6 @@ class GroupController extends Controller
             'userGroups' => $groups,
             'group' => $group,
             'profile' => $User->getProfile($user->id),
-            'upcomingparties' => $Party->findNextParties($group->idgroups),
             'allparties' => $allPastEvents,
             'devices' => $Device->ofThisGroup($group->idgroups),
             'device_count_status' => $Device->statusCount(),
