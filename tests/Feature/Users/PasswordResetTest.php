@@ -46,6 +46,12 @@ class PasswordResetTest extends TestCase
             function ($notification, $channels, $user) {
                 $mailData = $notification->toMail($user)->toArray();
                 self::assertEquals(__('notifications.password_reset_subject', [], $user->language), $mailData['subject']);
+
+                // Render to HTML to check the footer which is inserted by email.blade.php isn't accidentally
+                // escaped.
+                $html = $notification->toMail($user)->render();
+                self::assertGreaterThan(0, strpos($html, 'contact <a href'));
+
                 return true;
             }
         );

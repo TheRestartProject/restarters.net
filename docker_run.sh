@@ -28,9 +28,8 @@ sed -i 's/DISCOURSE_SECRET=.*$/DISCOURSE_SECRET=mustbetencharacters/g' .env
 sed -i 's/SESSION_DOMAIN=.*$/SESSION_DOMAIN=/g' phpunit.xml
 sed -i 's/DB_TEST_HOST=.*$/DB_TEST_HOST=restarters_db/g' phpunit.xml
 
-
 php artisan migrate
-npm install
+npm install --legacy-peer-deps
 npm rebuild node-sass
 
 npm run watch&
@@ -44,4 +43,4 @@ echo "User::create(['name'=>'Jane Bloggs','email'=>'jane@bloggs.net','password'=
 php artisan serve --host=0.0.0.0 --port=80
 
 # In case everything else bombs out.
-bash
+sleep infinity
