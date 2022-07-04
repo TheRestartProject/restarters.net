@@ -170,6 +170,7 @@ return array(
     'App\\Notifications\\AdminWordPressCreateGroupFailure' => $baseDir . '/app/Notifications/AdminWordPressCreateGroupFailure.php',
     'App\\Notifications\\AdminWordPressEditEventFailure' => $baseDir . '/app/Notifications/AdminWordPressEditEventFailure.php',
     'App\\Notifications\\AdminWordPressEditGroupFailure' => $baseDir . '/app/Notifications/AdminWordPressEditGroupFailure.php',
+    'App\\Notifications\\BaseNotification' => $baseDir . '/app/Notifications/BaseNotification.php',
     'App\\Notifications\\DeleteEventFromWordpressFailed' => $baseDir . '/app/Notifications/DeleteEventFromWordpressFailed.php',
     'App\\Notifications\\EventConfirmed' => $baseDir . '/app/Notifications/EventConfirmed.php',
     'App\\Notifications\\EventDevices' => $baseDir . '/app/Notifications/EventDevices.php',

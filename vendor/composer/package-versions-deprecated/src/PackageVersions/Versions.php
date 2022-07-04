@@ -140,7 +140,7 @@ final class Versions
   'twbs/bootstrap' => 'v4.1.0@8f7bd419935adfcd53c471a0202083464800619e',
   'vlucas/phpdotenv' => 'v3.6.10@5b547cdb25825f10251370f57ba5d9d924e6f68e',
   'wouternl/laravel-drip' => '1.2.4@f9d96140ba62f4ddb4df909e20931e897e0edd54',
-  'laravel/laravel' => 'dev-production@9b77346c7c45d6f71b7274f60c353c9e28bf7144',
+  'laravel/laravel' => 'dev-production@8142dc54196aaeddfdd13f5d128528e55c0fa5c7',
 );
 
     private function __construct()

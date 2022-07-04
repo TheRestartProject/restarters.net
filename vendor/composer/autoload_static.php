@@ -17,15 +17,15 @@ class ComposerStaticInitf57f72b7adaf50a29437647288004820
         '320cde22f66dd4f5d3fd621d3e88b98f' => __DIR__ . '/..' . '/symfony/polyfill-ctype/bootstrap.php',
         '7b11c4dc42b3b3023073cb14e519683c' => __DIR__ . '/..' . '/ralouphie/getallheaders/src/getallheaders.php',
         'a0edc8309cc5e1d60e3047b5df6b7052' => __DIR__ . '/..' . '/guzzlehttp/psr7/src/functions_include.php',
+        '667aeda72477189d0494fecd327c3641' => __DIR__ . '/..' . '/symfony/var-dumper/Resources/functions/dump.php',
         'c964ee0ededf28c96ebd9db5099ef910' => __DIR__ . '/..' . '/guzzlehttp/promises/src/functions_include.php',
         '37a3dc5111fe8f707ab4c132ef1dbc62' => __DIR__ . '/..' . '/guzzlehttp/guzzle/src/functions_include.php',
-        '667aeda72477189d0494fecd327c3641' => __DIR__ . '/..' . '/symfony/var-dumper/Resources/functions/dump.php',
         'def43f6c87e4f8dfd0c9e1b1bab14fe8' => __DIR__ . '/..' . '/symfony/polyfill-iconv/bootstrap.php',
         '2c102faa651ef8ea5874edb585946bce' => __DIR__ . '/..' . '/swiftmailer/swiftmailer/lib/swift_required.php',
         '9c67151ae59aff4788964ce8eb2a0f43' => __DIR__ . '/..' . '/clue/stream-filter/src/functions_include.php',
         '8cff32064859f4559445b89279f3199c' => __DIR__ . '/..' . '/php-http/message/src/filters.php',
-        'e39a8b23c42d4e1452234d762b03835a' => __DIR__ . '/..' . '/ramsey/uuid/src/functions.php',
         '538ca81a9a966a6716601ecf48f4eaef' => __DIR__ . '/..' . '/opis/closure/functions.php',
+        'e39a8b23c42d4e1452234d762b03835a' => __DIR__ . '/..' . '/ramsey/uuid/src/functions.php',
         'f0906e6318348a765ffb6eb24e0d0938' => __DIR__ . '/..' . '/laravel/framework/src/Illuminate/Foundation/helpers.php',
         '58571171fd5812e6e447dce228f52f4d' => __DIR__ . '/..' . '/laravel/framework/src/Illuminate/Support/helpers.php',
         '09f6b20656683369174dd6fa83b7e5fb' => __DIR__ . '/..' . '/symfony/polyfill-uuid/bootstrap.php',
@@ -462,8 +462,8 @@ class ComposerStaticInitf57f72b7adaf50a29437647288004820
         ),
         'Http\\Message\\' => 
         array (
-            0 => __DIR__ . '/..' . '/php-http/message-factory/src',
-            1 => __DIR__ . '/..' . '/php-http/message/src',
+            0 => __DIR__ . '/..' . '/php-http/message/src',
+            1 => __DIR__ . '/..' . '/php-http/message-factory/src',
         ),
         'Http\\Factory\\Guzzle\\' => 
         array (
@@ -779,6 +779,7 @@ class ComposerStaticInitf57f72b7adaf50a29437647288004820
         'App\\Notifications\\AdminWordPressCreateGroupFailure' => __DIR__ . '/../..' . '/app/Notifications/AdminWordPressCreateGroupFailure.php',
         'App\\Notifications\\AdminWordPressEditEventFailure' => __DIR__ . '/../..' . '/app/Notifications/AdminWordPressEditEventFailure.php',
         'App\\Notifications\\AdminWordPressEditGroupFailure' => __DIR__ . '/../..' . '/app/Notifications/AdminWordPressEditGroupFailure.php',
+        'App\\Notifications\\BaseNotification' => __DIR__ . '/../..' . '/app/Notifications/BaseNotification.php',
         'App\\Notifications\\DeleteEventFromWordpressFailed' => __DIR__ . '/../..' . '/app/Notifications/DeleteEventFromWordpressFailed.php',
         'App\\Notifications\\EventConfirmed' => __DIR__ . '/../..' . '/app/Notifications/EventConfirmed.php',
         'App\\Notifications\\EventDevices' => __DIR__ . '/../..' . '/app/Notifications/EventDevices.php',
