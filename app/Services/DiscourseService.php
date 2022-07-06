@@ -361,6 +361,15 @@ class DiscourseService
 
                     foreach ($restartersMembersUGs as $r) {
                         $u = User::find($r->user);
+
+                        if (!strlen($u->username)) {
+                            // No current user.  Create one.
+                            $u->generateAndSetUsername();
+                            $u->save();
+                            $u->refresh();
+                            $this->syncSso($u);
+                        }
+
                         $restartersMembers[$u->username] = $r;
                     }
 

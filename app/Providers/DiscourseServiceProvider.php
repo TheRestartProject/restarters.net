@@ -26,6 +26,11 @@ class DiscourseServiceProvider extends ServiceProvider
         // could be necessary live under load.
         $this->app->bind('discourse-client', function ($app, $parameters) {
             $stack = HandlerStack::create();
+
+            $stack->push(
+                $this->createGuzzleLoggingMiddleware(" {method} {uri} HTTP/{version} {req_body}")
+            );
+
             $stack->push(GuzzleRetryMiddleware::factory());
 
             return new Client([
@@ -42,6 +47,10 @@ class DiscourseServiceProvider extends ServiceProvider
 
         $this->app->bind('discourse-client-anonymous', function ($app, $parameters) {
             $stack = HandlerStack::create();
+            $stack->push(
+                $this->createGuzzleLoggingMiddleware(" {method} {uri} HTTP/{version} {req_body}")
+            );
+
             $stack->push(GuzzleRetryMiddleware::factory());
 
             return new Client([
@@ -53,5 +62,24 @@ class DiscourseServiceProvider extends ServiceProvider
                                   'handler' => $stack,
                               ]);
         });
+    }
+
+    private function createGuzzleLoggingMiddleware(string $messageFormat)
+    {
+        return \GuzzleHttp\Middleware::log(
+            $this->getLogger(),
+            new \GuzzleHttp\MessageFormatter($messageFormat)
+        );
+    }
+
+    private function getLogger()
+    {
+        if (! $this->logger) {
+            $this->logger = with(new \Monolog\Logger('api-consumer'))->pushHandler(
+                new \Monolog\Handler\RotatingFileHandler(storage_path('logs/discourse-api.log'))
+            );
+        }
+
+        return $this->logger;
     }
 }
