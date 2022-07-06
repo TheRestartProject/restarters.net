@@ -2,15 +2,10 @@
 
 namespace App\Notifications;
 
-use Illuminate\Bus\Queueable;
-use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Notifications\Messages\MailMessage;
-use Illuminate\Notifications\Notification;
 
-class NotifyAdminNoDevices extends BaseNotification implements ShouldQueue
+class NotifyAdminNoDevices extends BaseNotification
 {
-    use Queueable;
-
     protected $arr;
     protected $user;
 

@@ -3,13 +3,10 @@
 namespace App\Notifications;
 
 use App\Party;
-use Illuminate\Bus\Queueable;
 use Illuminate\Notifications\Messages\MailMessage;
 
 class EventConfirmed extends BaseNotification
 {
-    use Queueable;
-
     public $party;
 
     /**

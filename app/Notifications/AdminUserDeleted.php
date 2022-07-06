@@ -2,14 +2,10 @@
 
 namespace App\Notifications;
 
-use Illuminate\Bus\Queueable;
-use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Notifications\Messages\MailMessage;
 
-class AdminUserDeleted extends BaseNotification implements ShouldQueue
+class AdminUserDeleted extends BaseNotification
 {
-    use Queueable;
-
     protected $arr;
 
     /**

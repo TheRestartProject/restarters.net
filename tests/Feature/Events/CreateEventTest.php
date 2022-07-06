@@ -691,7 +691,22 @@ class CreateEventTest extends TestCase
         $event = Party::latest()->first();
         $event->approve();
 
-        # Should not have queued anything
+        # Should have queued the approve.
+        $queueSize = Queue::size();
+        self::assertGreaterThan($initialQueueSize, $queueSize);
+        $max = 1000;
+        do {
+            $job = Queue::pop();
+
+            if ($job) {
+                self::assertStringContainsString('EventConfirmed', $job->getRawBody());
+                $job->fail('removed in UT');
+            }
+
+            $max--;
+        }
+        while (Queue::size() > 0 && $max > 0);
+
         self::assertEquals(0, Queue::size());
     }
 }

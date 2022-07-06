@@ -4,12 +4,12 @@ namespace App\Notifications;
 
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
-use Illuminate\Notifications\Messages\MailMessage;
 use Illuminate\Notifications\Notification;
 
-// Don't ShouldQueue yet - we're intentionally only doing this for admin notifications.
-class BaseNotification extends Notification
+abstract class BaseNotification extends Notification implements ShouldQueue
 {
+    use Queueable;
+
     public function failed($e)
     {
         if (gettype($e) == 'string') {

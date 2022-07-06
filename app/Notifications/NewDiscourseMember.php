@@ -2,13 +2,10 @@
 
 namespace App\Notifications;
 
-use Illuminate\Bus\Queueable;
 use Illuminate\Notifications\Messages\MailMessage;
 
 class NewDiscourseMember extends BaseNotification
 {
-    use Queueable;
-
     protected $arr;
 
     /**

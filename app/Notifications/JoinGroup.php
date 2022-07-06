@@ -2,13 +2,10 @@
 
 namespace App\Notifications;
 
-use Illuminate\Bus\Queueable;
 use Illuminate\Notifications\Messages\MailMessage;
 
 class JoinGroup extends BaseNotification
 {
-    use Queueable;
-
     protected $arr;
     protected $user;
 
