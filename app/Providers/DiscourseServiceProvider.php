@@ -18,6 +18,9 @@ class DiscourseServiceProvider extends ServiceProvider
      *
      * @return \GuzzleHttp\Client
      */
+
+    private $logger = null;
+
     public function register()
     {
         // We need to register the service whether or not the feature is turned on, so that we can mock it in testing.

@@ -48,7 +48,7 @@ class UsernameGeneratorTest extends TestCase
 
         $user->generateAndSetUsername();
 
-        $this->assertEquals('Philip_J._Fry', $user->username);
+        $this->assertEquals('Philip_J_Fry', $user->username);
     }
 
     /** @test */
