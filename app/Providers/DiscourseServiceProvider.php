@@ -78,7 +78,7 @@ class DiscourseServiceProvider extends ServiceProvider
     private function getLogger()
     {
         if (! $this->logger) {
-            $this->logger = with(new \Monolog\Logger('api-consumer'))->pushHandler(
+            $this->logger = with(new \Monolog\Logger('discourse-api'))->pushHandler(
                 new \Monolog\Handler\RotatingFileHandler(storage_path('logs/discourse-api.log'))
             );
         }
