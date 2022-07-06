@@ -8,7 +8,9 @@ use App\Party;
 use App\Role;
 use App\User;
 use DB;
+use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\Notification;
+use Illuminate\Support\Facades\Queue;
 use Tests\TestCase;
 
 class BasicTest extends TestCase
@@ -24,6 +26,9 @@ class BasicTest extends TestCase
                                                                             'group_name' => $group->name,
                                                                             'group_url' => url('/group/view/'.$idgroups),
                                                                         ]));
+
+        $this->processQueuedNotifications();
+
         // Should have generated a notification for the approval.
         $this->actingAs($host);
         $rsp = $this->get('/profile/notifications');
