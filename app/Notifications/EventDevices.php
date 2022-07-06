@@ -6,18 +6,6 @@ use Illuminate\Notifications\Messages\MailMessage;
 
 class EventDevices extends BaseNotification
 {
-    protected $arr;
-
-    /**
-     * Create a new notification instance.
-     *
-     * @return void
-     */
-    public function __construct($arr)
-    {
-        $this->arr = $arr;
-    }
-
     /**
      * Get the notification's delivery channels.
      *

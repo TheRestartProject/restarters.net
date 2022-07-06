@@ -6,33 +6,6 @@ use Illuminate\Notifications\Messages\MailMessage;
 
 class NewDiscourseMember extends BaseNotification
 {
-    protected $arr;
-
-    /**
-     * Create a new notification instance.
-     *
-     * @return void
-     */
-    public function __construct($arr)
-    {
-        $this->arr = $arr;
-    }
-
-    /**
-     * Get the notification's delivery channels.
-     *
-     * @param  mixed  $notifiable
-     * @return array
-     */
-    public function via($notifiable)
-    {
-        if ($notifiable->invites == 1) {
-            return ['mail', 'database'];
-        }
-
-        return ['database'];
-    }
-
     /**
      * Get the mail representation of the notification.
      *

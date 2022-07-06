@@ -6,20 +6,6 @@ use Illuminate\Notifications\Messages\MailMessage;
 
 class JoinGroup extends BaseNotification
 {
-    protected $arr;
-    protected $user;
-
-    /**
-     * Create a new notification instance.
-     *
-     * @return void
-     */
-    public function __construct($arr, $user = null)
-    {
-        $this->arr = $arr;
-        $this->user = $user;
-    }
-
     /**
      * Get the notification's delivery channels.
      *
