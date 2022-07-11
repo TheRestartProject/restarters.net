@@ -163,7 +163,12 @@ return [
   'invitation_pending' => 'Vous avez une invitation à rejoindre ce Repair Café. Cliquez <a href=":accept">ici</a> si vous voulez le rejoindre.',
   'nearest_groups' => 'Ce sont les Repair Cafés qui se trouvent dans un rayon de 50km autour de :location',
   'nearest_groups_change' => '(change)',
+  'talk_group' => 'Voir la conversation de groupe',
   'talk_group_add_title' => 'Bienvenue sur :group_name',
-  'editing' => 'Editer',
+  'editing' => 'Modification de',
   'groups_location_placeholder' => 'Entrez votre adresse',
+  'shareable_link' => 'Invitation via un lien à partager',
+  'timezone' => 'Fuseau horaire',
+  'timezone_placeholder' => 'Laissez ce champ vide pour hériter de la valeur du réseau.',
+  'talk_group_add_body' => 'Merci de suivre le groupe :group_name ! Vous recevrez désormais des notifications lorsque de nouveaux événements seront planifiés et seront ajoutés aux messages de groupe. <a href="https://talk.restarters.net/t/how-to-communicate-with-your-repair-group/6293">Découvrez comment fonctionnent les messages de groupe et comment modifier vos paramètres de notification</a>.',
 ];

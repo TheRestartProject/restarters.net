@@ -100,5 +100,5 @@ return [
   'please_choose' => 'Veuillez choisir...',
   'confirm' => 'Confirmer',
   'notification_greeting' => 'Bonjour !',
-  'notification_footer' => 'Si vous désirez ne plus recevoir ces emails, veuillez vous rendre sur <a href=":url">vos preferences</a> sur votre compte',
+  'notification_footer' => 'Si vous souhaitez ne plus recevoir ces courriels, veuillez consulter <a href=":url">vos préférences</a> sur votre compte.',
 ];

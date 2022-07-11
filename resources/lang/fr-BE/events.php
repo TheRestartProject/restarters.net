@@ -158,6 +158,7 @@ return [
   'created_success_message_autoapproved' => 'Evénement créé! Il est maintenant public.',
   'field_event_link' => 'Lien de l\'événement',
   'field_event_link_helper' => 'Lien web optionnel',
-  'review_requested' => 'Merci - tous les bénévoles qui ont participé ont reçu une notification',
-  'review_requested_permissions' => 'Désolé - vous n\'avez pas les permissions pour cette action',
+  'review_requested' => 'Merci - tous les participants ont reçu une notification.',
+  'review_requested_permissions' => 'Désolé - vous n\'avez pas les autorisations nécessaires pour cette action.',
+  'no_location' => '<b>Vous n\'avez pas actuellement de ville définie.  Vous pouvez en définir une dans <a href="/profil/edit">votre profil</a>.</b>',
 ];
