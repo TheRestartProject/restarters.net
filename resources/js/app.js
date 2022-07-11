@@ -974,13 +974,6 @@ function initAutocomplete() {
     }
   });
 
-  $('#login-form-submit').on('click', function(e) {
-    // We've seen double submits of the login form, leading to 419 errors.  Prevent the user submitting twice by
-    // double-clicking.
-    $('#login-form-submit').attr('disabled', 'disabled')
-    $('#login-form').submit()
-  });
-
   // On toggling between multi collapable invite modal content
   // Then also toggle the link to change the text (show a different link -
   // that has the same functionality)
@@ -1542,6 +1535,7 @@ jQuery(document).ready(function () {
       el: $(this).get(0),
       store: store,
       components: {
+        'loginpage': require('./components/LoginPage.vue'),
         'dashboardpage': require('./components/DashboardPage.vue'),
         'eventaddeditpage': require('./components/EventAddEditPage.vue'),
         'eventaddedit': require('./components/EventAddEdit.vue'),

@@ -102,29 +102,19 @@ class RecoverTest extends TestCase
         $response = $this->get('/login');
         $response->assertStatus(200);
 
-        $crawler = new Crawler($response->getContent());
+        $props = $this->assertVueProperties($response, [
+            [
+                ':error'=> "false",
+                'email' => ""
+            ],
+        ]);
 
-        $tokens = $crawler->filter('input[name=_token]')->each(function (Crawler $node, $i) {
-            return $node;
-        });
-
-        $tokenValue = $tokens[0]->attr('value');
-
-        $names = $crawler->filter('input[name=my_name]')->each(function (Crawler $node, $i) {
-            return $node;
-        });
-
-        $nameValue = $names[0]->attr('value');
-
-        $times = $crawler->filter('input[name=my_time]')->each(function (Crawler $node, $i) {
-            return $node;
-        });
-
-        $timeValue = $times[0]->attr('value');
+        $tokenValue = $props[0]['csrf'];
+        $timeValue = $props[0]['time'];
 
         $response = $this->post('/login', [
             '_token' => $tokenValue,
-            'my_name' => $nameValue,
+            'my_name' => 'my_name',
             'my_time' => $timeValue,
             'email' => $restarter->email,
             'password' => '1234',
