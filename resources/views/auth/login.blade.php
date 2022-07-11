@@ -5,6 +5,13 @@
 
         @include('includes.info')
 
+        @if (\Session::has('success'))
+            {{-- This is used by password reset. --}}
+            <div class="alert alert-success">
+                {!! \Session::get('success') !!}
+            </div>
+        @endif
+
         <div class="vue">
             <LoginPage
                 csrf="{{ csrf_token() }}"
