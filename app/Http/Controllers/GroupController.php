@@ -339,12 +339,14 @@ class GroupController extends Controller
         $upcoming_events = Party::future()
             ->forGroup($group->idgroups)
             ->get();
-
+        $active_events = Party::active()
+            ->forGroup($group->idgroups)
+            ->get();
         $past_events = Party::past()
             ->forGroup($group->idgroups)
             ->get();
 
-        //Checking user for validatity
+        //Checking user for validity
         $in_group = ! empty(UserGroups::where('group', $groupid)
             ->where('user', $user->id)
             ->where(function ($query) {
@@ -375,7 +377,7 @@ class GroupController extends Controller
         $eEmissionRatio = \App\Helpers\LcaStats::getEmissionRatioPowered();
         $uEmissionratio = \App\Helpers\LcaStats::getEmissionRatioUnpowered();
 
-        foreach (array_merge($upcoming_events->all(), $past_events->all()) as $event) {
+        foreach (array_merge($upcoming_events->all(), $active_events->all(), $past_events->all()) as $event) {
             $expanded_event = \App\Http\Controllers\PartyController::expandEvent($event, $group);
             // TODO: here we seem to expect group to be the group id, not the group object.
             // expandEvent seems to expect the object.
@@ -393,7 +395,6 @@ class GroupController extends Controller
             'userGroups' => $groups,
             'group' => $group,
             'profile' => $User->getProfile($user->id),
-            'upcomingparties' => $Party->findNextParties($group->idgroups),
             'allparties' => $allPastEvents,
             'devices' => $Device->ofThisGroup($group->idgroups),
             'device_count_status' => $Device->statusCount(),
@@ -515,17 +516,14 @@ class GroupController extends Controller
         // Send emails to hosts of group to let them know.
         // (only those that have opted in to receiving emails).
         $user = User::find($user_group->user);
+        $group = Group::find($group_id);
 
-        $group_hosts = User::join('users_groups', 'users_groups.user', '=', 'users.id')
-            ->where('users_groups.group', $group_id)
-            ->where('users_groups.role', 3)
-            ->select('users.*')
-            ->get();
+        $group_hosts = $group->membersHosts();
 
-        if (! empty($group_hosts)) {
-            Notification::send($group_hosts, new NewGroupMember([
+        if ($group_hosts->count()) {
+            Notification::send($group_hosts->get(), new NewGroupMember([
                 'user_name' => $user->name,
-                'group_name' => Group::find($group_id)->name,
+                'group_name' => $group->name,
                 'group_url' => url('/group/view/'.$group_id),
             ]));
         }
@@ -741,7 +739,7 @@ class GroupController extends Controller
         if (Auth::user()->hasRole('Administrator') && $group->canDelete()) {
             // We know we can delete the group; if it has any past events they must be empty, so delete all
             // events (including future).
-            $allEvents = Party::where('events.group', $id)->get();
+            $allEvents = Party::withTrashed()->where('events.group', $id)->get();
 
             foreach ($allEvents as $event) {
                 // Delete any users - these are not cascaded in the DB.
@@ -869,8 +867,7 @@ class GroupController extends Controller
                 $arr = [
                     'user_name' => Auth::user()->name,
                     'group_name' => $group->name,
-                    'group_url' => url('/group/view/'.$group->idgroups),
-                    'preferences' => url('/profile/edit/'.$host->id),
+                    'group_url' => url('/group/view/'.$group->idgroups)
                 ];
                 Notification::send($host, new NewGroupMember($arr, $host));
             }
@@ -929,7 +926,7 @@ class GroupController extends Controller
         // - Is a host of the group.
         // - Is a network coordinator of a network which the group is in.
         // - Is an Administrator
-        $group = Group::find($group_id);
+        $group = Group::findOrFail($group_id);
         $loggedInUser = Auth::user();
 
         if (($loggedInUser->hasRole('Host') && Fixometer::userIsHostOfGroup($group_id, $loggedInUser->id)) ||
@@ -949,7 +946,12 @@ class GroupController extends Controller
     public function getRemoveVolunteer($group_id, $user_id, Request $request)
     {
         //Has current logged in user got permission to remove volunteer
-        if ((Fixometer::hasRole(Auth::user(), 'Host') && Fixometer::userIsHostOfGroup($group_id, Auth::id())) || Fixometer::hasRole(Auth::user(), 'Administrator')) {
+        $group = Group::findOrFail($group_id);
+        $loggedInUser = Auth::user();
+
+        if ((Fixometer::hasRole($loggedInUser, 'Host') && Fixometer::userIsHostOfGroup($group_id, Auth::id())) ||
+            $loggedInUser->isCoordinatorForGroup($group) ||
+            Fixometer::hasRole($loggedInUser, 'Administrator')) {
             // Retrieve user
             $user = User::find($user_id);
 
@@ -970,44 +972,6 @@ class GroupController extends Controller
 
     public function volunteersNearby($groupid)
     {
-        if (isset($_GET['action']) && isset($_GET['code'])) {
-            $actn = $_GET['action'];
-            $code = $_GET['code'];
-
-            switch ($actn) {
-                case 'gu':
-                    $response['success'] = 'Group updated.';
-
-                    break;
-                case 'pe':
-                    $response['success'] = 'Party updated.';
-
-                    break;
-                case 'pc':
-                    $response['success'] = 'Party created.';
-
-                    break;
-                case 'ue':
-                    $response['success'] = 'Profile updated.';
-
-                    break;
-                case 'de':
-                    if ($code == 200) {
-                        $response['success'] = 'Party deleted.';
-                    } elseif ($code == 403) {
-                        $response['danger'] = 'Couldn\'t delete the party!';
-                    } elseif ($code == 500) {
-                        $response['warning'] = 'The party has been deleted, but <strong>something went wrong while deleting it from WordPress</strong>. <br /> You\'ll need to do that manually!';
-                    }
-
-                    break;
-                default: {
-                        $response['danger'] = 'Unexpected arguments';
-                        break;
-                    }
-            }
-        }
-
         $user = User::find(Auth::id());
 
         //Object Instances

@@ -32,7 +32,7 @@ return [
   'full_name' => 'Full name',
   'full_name_helper' => 'Leave field blank if anonymous',
   'volunteer_email_address' => 'Volunteer\'s email address (optional)',
-  'message_volunteer_email_address' => 'This field will invite the volunteer to join the group',
+  'message_volunteer_email_address' => 'This field will invite volunteer to join the group',
   'volunteer_attended_button' => 'Volunteer attended',
   'option_not_registered' => 'Not registered on Fixometer',
   'option_default' => '-- Select --',

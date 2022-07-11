@@ -158,4 +158,6 @@ return [
   'created_success_message_autoapproved' => 'Evénement créé! Il est maintenant public.',
   'field_event_link' => 'Lien de l\'événement',
   'field_event_link_helper' => 'Lien web optionnel',
+  'review_requested' => 'Merci - tous les bénévoles qui ont participé ont reçu une notification',
+  'review_requested_permissions' => 'Désolé - vous n\'avez pas les permissions pour cette action',
 ];

@@ -5,9 +5,8 @@ namespace App\Notifications;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Notifications\Messages\MailMessage;
-use Illuminate\Notifications\Notification;
 
-class DeleteEventFromWordpressFailed extends Notification implements ShouldQueue
+class DeleteEventFromWordpressFailed extends BaseNotification implements ShouldQueue
 {
     use Queueable;
 
@@ -53,7 +52,9 @@ class DeleteEventFromWordpressFailed extends Notification implements ShouldQueue
                       ->line(' ')
                       ->line('Please find and delete this event manually from WordPress.')
                       ->line(' ')
-                      ->line('If you would like to stop receiving these notifications, please edit <a href="'.url('/user/edit/'.$notifiable->id).'">your preferences</a> on your account.');
+                      ->line(__('notifications.email_preferences', [
+                          'url' => url('/user/edit/'.$notifiable->id)
+                      ], $notifiable->locale));
     }
 
     /**

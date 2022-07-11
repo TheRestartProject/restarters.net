@@ -85,7 +85,6 @@ return [
   'to_be_repaired' => ':value item to be repaired|:value items to be repaired',
   'no_weight' => ':value misc or unpowered item with no weight estimate|:value misc or unpowered items with no weight estimate',
   'cancel' => 'Cancel',
-  'confirm' => 'Confirm',
   'loading' => 'Loading',
   'close' => 'Close',
   'skills' => 'skill|skills',
@@ -98,5 +97,5 @@ return [
   'remove' => 'remove',
   'please_choose' => 'Please choose...',
   'notification_greeting' => 'Hello!',
-  'notification_footer' => 'If you would like to stop receiving these emails, please visit <a href=":url">your preferences</a> on your account.',
+  'confirm' => 'Confirm',
 ];

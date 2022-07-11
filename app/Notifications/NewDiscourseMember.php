@@ -3,11 +3,9 @@
 namespace App\Notifications;
 
 use Illuminate\Bus\Queueable;
-use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Notifications\Messages\MailMessage;
-use Illuminate\Notifications\Notification;
 
-class NewDiscourseMember extends Notification implements ShouldQueue
+class NewDiscourseMember extends BaseNotification
 {
     use Queueable;
 
@@ -54,7 +52,7 @@ class NewDiscourseMember extends Notification implements ShouldQueue
             ->line(__('groups.talk_group_add_body', [
                 'group_name' => $this->arr['group_name']
             ]))
-            ->line(__('partials.notification_footer', [
+            ->line(__('notifications.email_preference', [
                 'url' => url('/user/edit/' . $notifiable->id)
             ]));
     }

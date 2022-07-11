@@ -63,6 +63,7 @@ abstract class TestCase extends BaseTestCase
         DB::delete('delete from grouptags_groups');
         DB::table('notifications')->truncate();
         DB::statement('SET foreign_key_checks=1');
+        DB::delete('delete from devices_faults_vacuums_ora_opinions');
 
         // Set up random auto increment values.  This avoids tests working because everything is 1.
         $tables = DB::select('SHOW TABLES');
@@ -84,9 +85,6 @@ abstract class TestCase extends BaseTestCase
 
         $this->withoutExceptionHandling();
         app('honeypot')->disable();
-
-        // We don't yet have a Discourse test environment.
-        config(['restarters.features.discourse_integration' => false]);
 
         factory(Category::class, 1)->states('Cat1')->create();
         factory(Category::class, 1)->states('Cat2')->create();
@@ -175,16 +173,17 @@ abstract class TestCase extends BaseTestCase
         $eventAttributes = factory(Party::class)->raw();
         $eventAttributes['group'] = $idgroups;
 
-        $event_date_time = Carbon::createFromTimestamp(strtotime($date))->setTimezone('UTC');
+        $event_start = Carbon::createFromTimestamp(strtotime($date))->setTimezone('UTC');
+        $event_end = Carbon::createFromTimestamp(strtotime($date))->setTimezone('UTC')->addHour(2);
 
-        $eventAttributes['event_start_utc'] = $event_date_time->toIso8601String();
-        $eventAttributes['event_end_utc'] = $event_date_time->toIso8601String();
+        $eventAttributes['event_start_utc'] = $event_start->toIso8601String();
+        $eventAttributes['event_end_utc'] = $event_end->toIso8601String();
 
         $response = $this->post('/party/create/', $eventAttributes);
 
         // Need to reformat start/end for row comparison.
-        $eventAttributes['event_start_utc'] = $event_date_time->toDateTimeString();
-        $eventAttributes['event_end_utc'] = $event_date_time->toDateTimeString();
+        $eventAttributes['event_start_utc'] = $event_start->toDateTimeString();
+        $eventAttributes['event_end_utc'] = $event_end->toDateTimeString();
 
         $this->assertDatabaseHas('events', $eventAttributes);
         $redirectTo = $response->getTargetUrl();

@@ -107,7 +107,7 @@ class PartyController extends Controller
 
         if (! is_null($group_id)) {
             // This is the page for a specific group's events.  We want all events for this group.
-            foreach (Party::events()->where('events.group', $group_id)->get() as $event) {
+            foreach (Party::where('events.group', $group_id)->get() as $event) {
                 $e = \App\Http\Controllers\PartyController::expandEvent($event, NULL);
                 $events[] = $e;
             }
@@ -209,34 +209,37 @@ class PartyController extends Controller
 
             $error = [];
 
+            $latitude = null;
+            $longitude = null;
+
             if ($request->filled('location')) {
+                $worked = false;
+
                 try {
                     $results = $this->geocoder->geocode($request->get('location'));
-
-                    if (empty($results)) {
-                        $response['danger'] = 'Party could not be created. Address not found.';
-
-                        return view('events.create', [
-                            'response' => $response,
-                            'title' => 'New Party',
-                            'gmaps' => true,
-                            'allGroups' => $allGroups,
-                            'user' => Auth::user(),
-                            'user_groups' => $groupsUserIsInChargeOf,
-                            'selected_group_id' => $group_id,
-                            'autoapprove' => $autoapprove,
-                        ]);
-                    }
+                    $worked = true;
 
                     $latitude = $results['latitude'];
                     $longitude = $results['longitude'];
                 } catch (\Exception $ex) {
                     Log::error('An error occurred during geocoding: '.$ex->getMessage());
                 }
-            } else {
-                $latitude = null;
-                $longitude = null;
+
+                if ($request->get('location') == 'ForceGeocodeFailure' || !$worked) {
+                    $request->session()->put('danger', __('events.address_error'));
+
+                    return view('events.create', [
+                        'title' => 'New Party',
+                        'gmaps' => true,
+                        'allGroups' => $allGroups,
+                        'user' => Auth::user(),
+                        'user_groups' => $groupsUserIsInChargeOf,
+                        'selected_group_id' => $group_id,
+                        'autoapprove' => $autoapprove,
+                    ]);
+                }
             }
+
             $data['latitude'] = $latitude;
             $data['longitude'] = $longitude;
 
@@ -307,7 +310,7 @@ class PartyController extends Controller
                     }
 
                     if ($autoapprove) {
-                        Log::info('Auto-approve event $idParty');
+                        Log::info("Auto-approve event $idParty");
                         Party::find($idParty)->approve();
                     }
                 } else {
@@ -778,49 +781,16 @@ class PartyController extends Controller
         }
     }
 
-    public static function stats($id, $class = null)
+    public static function stats($id)
     {
         $event = Party::where('idevents', $id)->first();
 
         $eventStats = $event->getEventStats();
 
-        if (! is_null($class)) {
-            return view('party.stats', [
-                'framed' => true,
-                'party' => $eventStats,
-                'class' => 'wide',
-            ]);
-        }
-
         return view('party.stats', [
             'framed' => true,
             'party' => $eventStats,
         ]);
-    }
-
-    public function getGroupEmails($event_id, $object = false)
-    {
-        $group_user_ids = UserGroups::where('group', Party::find($event_id)->group)
-            ->pluck('user')
-            ->toArray();
-
-        // Users already associated with the event.  Normally this would include the host, unless they've been
-        // removed.
-        // (Not including those invited but not RSVPed)
-        $event_user_ids = EventsUsers::where('event', $event_id)
-            ->where('status', 'like', '1')
-            ->pluck('user')
-            ->toArray();
-
-        $unique_user_ids = array_diff($group_user_ids, $event_user_ids);
-
-        if ($object) {
-            return User::whereIn('id', $unique_user_ids)->get();
-        }
-
-        $group_users = User::whereIn('id', $unique_user_ids)->pluck('email')->toArray();
-
-        return json_encode($group_users);
     }
 
     /**
@@ -914,7 +884,7 @@ class PartyController extends Controller
             $event_id = $volunteer->event;
 
             // Has current logged-in user got permission to remove volunteer?
-            if ((Fixometer::hasRole(Auth::user(), 'Host') && Fixometer::userHasEditPartyPermission($event_id, Auth::user()->id)) || Fixometer::hasRole(Auth::user(), 'Administrator')) {
+            if (((Fixometer::hasRole(Auth::user(), 'Host') || Fixometer::hasRole(Auth::user(), 'NetworkCoordinator')) && Fixometer::userHasEditPartyPermission($event_id, Auth::user()->id)) || Fixometer::hasRole(Auth::user(), 'Administrator')) {
                 //Let's delete the user
                 $delete_user = $volunteer->delete();
 
@@ -976,6 +946,7 @@ class PartyController extends Controller
                         'name' => $from->name,
                         'group' => $group_name,
                         'url' => $url,
+                        'view_url' => url('/party/view/'.$event->idevents),
                         'message' => $message,
                         'event' => $event,
                     ];
@@ -1013,6 +984,7 @@ class PartyController extends Controller
                         'name' => $from->name,
                         'group' => $group_name,
                         'url' => $url,
+                        'view_url' => url('/party/view/'.$event->idevents),
                         'message' => $message,
                         'event' => $event,
                     ];
@@ -1125,8 +1097,7 @@ class PartyController extends Controller
 
             Notification::send($all_restarters, new EventRepairs([
                 'event_name' => $event->getEventName(),
-                'event_url' => url('/party/view/'.intval($event_id).'#devices'),
-                'preferences' => url('/profile/edit'),
+                'event_url' => url('/party/view/'.intval($event_id).'#devices')
             ]));
 
             return redirect()->back()->with('success', __('events.review_requested'));
@@ -1134,10 +1105,6 @@ class PartyController extends Controller
 
         return redirect()->back()->with('warning', __('events.review_requested_permissions'));
     }
-
-    // TODO: is this alive?
-    // It looks like recent-ish code, but I recall James mentioned recently that
-    // he couldn't delete events.  Perhaps it's disappeared from the interface?
 
     /**
      * Called via AJAX.

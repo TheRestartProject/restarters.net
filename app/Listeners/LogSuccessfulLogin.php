@@ -2,14 +2,10 @@
 
 namespace App\Listeners;
 
-use App\User;
 use Carbon\Carbon;
 use Cookie;
 use Illuminate\Auth\Events\Login;
-use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Http\Request;
-use Illuminate\Queue\InteractsWithQueue;
-use Illuminate\Support\Facades\Log;
 
 class LogSuccessfulLogin
 {

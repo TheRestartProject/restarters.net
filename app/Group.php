@@ -236,9 +236,8 @@ class Group extends Model implements Auditable
         // Groups are deletable unless they have an event with a device.
         $ret = true;
 
-        $allEvents = Party::where('events.group', $this->idgroups)
+        $allEvents = Party::withTrashed()->where('events.group', $this->idgroups)
             ->get();
-
 
         // Send these to getEventStats() to speed things up a bit.
         $eEmissionRatio = \App\Helpers\LcaStats::getEmissionRatioPowered();
@@ -646,5 +645,32 @@ class Group extends Model implements Auditable
         }
 
         return $timezone;
+    }
+
+    // TODO We've started to refactor into scopes, but this isn't complete yet.
+    public function scopeMembers() {
+        return User::join('users_groups', 'users_groups.user', '=', 'users.id')
+            ->where('users_groups.group', $this->idgroups)
+            ->select('users.*');
+    }
+
+    public function scopeMembersUndeleted($query) {
+        $query = $query->members();
+        return $query->whereNull('users_groups.deleted_at');
+    }
+
+    public function scopeMembersJoined($query) {
+        $query = $query->membersUndeleted();
+        return $query->where('users_groups.status', 'like', 1);
+    }
+
+    public function scopeMembersRestarters($query) {
+        $query = $query->membersJoined();
+        return $query->where('users_groups.role', Role::RESTARTER);
+    }
+
+    public function scopeMembersHosts($query) {
+        $query = $query->membersJoined();
+        return $query->where('users_groups.role', Role::HOST);
     }
 }

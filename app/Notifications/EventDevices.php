@@ -3,11 +3,9 @@
 namespace App\Notifications;
 
 use Illuminate\Bus\Queueable;
-use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Notifications\Messages\MailMessage;
-use Illuminate\Notifications\Notification;
 
-class EventDevices extends Notification implements ShouldQueue
+class EventDevices extends BaseNotification
 {
     use Queueable;
 
@@ -52,7 +50,7 @@ class EventDevices extends Notification implements ShouldQueue
                     ], $locale))
                   ->action(__('notifications.event_devices_action', [], $locale), $this->arr['event_url'])
                   ->line(__('notifications.email_preferences', [
-                    'url' => $this->arr['preferences']
+                      'url' => url('/user/edit/'.$notifiable->id)
                   ], $locale));
         }
     }

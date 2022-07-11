@@ -5,9 +5,8 @@ namespace App\Notifications;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Notifications\Messages\MailMessage;
-use Illuminate\Notifications\Notification;
 
-class AdminAbnormalDevices extends Notification implements ShouldQueue
+class AdminAbnormalDevices extends BaseNotification implements ShouldQueue
 {
     use Queueable;
 
@@ -53,7 +52,9 @@ class AdminAbnormalDevices extends Notification implements ShouldQueue
                   ->greeting(__('notifications.greeting', [], $notifiable->language))
                   ->line('The event \''.$this->arr['event_venue'].'\' has an abnormal number of miscellaneous devices.')
                   ->action('View event', $this->arr['event_url'])
-                  ->line('If you would like to stop receiving these emails, please visit <a href="'.url('/user/edit/'.$notifiable->id).'">your preferences</a> on your account.');
+                  ->line(__('notifications.email_preferences', [
+                      'url' => url('/user/edit/'.$notifiable->id)
+                  ], $notifiable->locale));
     }
 
     /**

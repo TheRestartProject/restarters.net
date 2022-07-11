@@ -1265,25 +1265,44 @@ function initAutocomplete() {
   function tokenFieldCheck(){
     setTimeout(function(){
       var count_tokens = document.getElementById("manual_invite_box").value.split(",");
-      console.log(count_tokens.length);
+      var disabled = false
+
       if( $('#manual_invite_box').val() === '' ) {
-        $('#event-invite-to button, #invite-to-group button').prop('disabled', true);
-      } else if( count_tokens.length === 0 ){
-        $('#event-invite-to button, #invite-to-group button').prop('disabled', true);
+        disabled = true
+      } else if( count_tokens.length === 0 ) {
+        disabled = true
       } else {
-        $('#event-invite-to button, #invite-to-group button').prop('disabled', false);
+        for (var i = 0; i < count_tokens.length; i++) {
+          if (!count_tokens[i] || count_tokens[i].indexOf('@') == -1 ) {
+            disabled = true
+          }
+        }
       }
+
+      $('#event-invite-to button, #invite-to-group button').prop('disabled', disabled);
     }, 500);
   }
 
 
   $('#manual_invite_box').on('tokenfield:createtoken', function (event) {
     var existingTokens = $(this).tokenfield('getTokens');
+    var newval = event.attrs.value
+
     $.each(existingTokens, function(index, token) {
-      if (token.value === event.attrs.value)
+      if (token.value === newval)
       event.preventDefault();
     });
-    tokenFieldCheck();
+
+    if (!newval || newval.indexOf('@') == -1) {
+      // This is a very basic check that we're putting in something which looks like an email.  Email regexp validation
+      // is a bit of a fool's errand, and in the longer term this code will be replaced by Vue and/or a different
+      // invitation model.
+      $(event.target).closest('div.tokenfield').css('border', '2px solid red')
+    } else {
+      $(event.target).closest('div.tokenfield').css('border', '')
+    }
+
+      tokenFieldCheck();
   });
 
   $('#manual_invite_box').on('tokenfield:removedtoken', function (event) {

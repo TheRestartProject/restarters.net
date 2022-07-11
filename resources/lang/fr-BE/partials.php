@@ -76,7 +76,9 @@ return [
   'hot_topics_text' => 'Prenez part au dernier sujet d\'actualité de réparation sur Restarters Talk',
   'choose_barriers' => 'Choisir les freins à la réparation',
   'solution_text2' => 'Cas d\'étude intéressant à partager?',
-  'cancel' => 'Cancel',
+  'quantity' => 'Quantité',
+  'cancel' => 'Annuler',
+  'powered_only' => '(calculé pour les objets électriques uniquement)',
   'add_device_powered' => 'Ajouter appareil électrique',
   'add_device_unpowered' => 'Ajouter appareil non-électrique',
   'are_you_sure' => 'Etes-vous sûr?',
@@ -96,4 +98,7 @@ return [
   'remove' => 'Supprimer',
   'total' => 'total',
   'please_choose' => 'Veuillez choisir...',
+  'confirm' => 'Confirmer',
+  'notification_greeting' => 'Bonjour !',
+  'notification_footer' => 'Si vous désirez ne plus recevoir ces emails, veuillez vous rendre sur <a href=":url">vos preferences</a> sur votre compte',
 ];

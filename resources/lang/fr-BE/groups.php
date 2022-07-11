@@ -164,4 +164,6 @@ return [
   'nearest_groups' => 'Ce sont les Repair Cafés qui se trouvent dans un rayon de 50km autour de :location',
   'nearest_groups_change' => '(change)',
   'talk_group_add_title' => 'Bienvenue sur :group_name',
+  'editing' => 'Editer',
+  'groups_location_placeholder' => 'Entrez votre adresse',
 ];

@@ -456,7 +456,7 @@ class Party extends Model implements Auditable
     }
 
     public function scopeMemberOfGroup($query, $userids = null) {
-        // Any approved events for groups that this user has joined (not just been invited to) and not left.
+
         $this->defaultUserIds($userids);
         $query = $query->approved();
         $query = $query->join('users_groups AS hfgug', 'hfgug.group', '=', 'events.group')
@@ -982,22 +982,17 @@ class Party extends Model implements Auditable
 
     public function approve()
     {
-        $group = Group::find($this->group);
+        $group = Group::findOrFail($this->group);
 
         // Only send notifications if the event is in the future.
         // We don't want to send emails to Restarters about past events being added.
         if ($this->isUpcoming()) {
-            // Retrieving all users from the User model whereby they allow you send emails but their role must not include group admins
-            $group_restarters = User::join('users_groups', 'users_groups.user', '=', 'users.id')
-                ->where('users_groups.group', $this->group)
-                ->where('users_groups.role', 4)
-                ->select('users.*')
-                ->get();
+            $group_restarters = $group->membersRestarters();
 
             // If there are restarters against the group
-            if (! $group_restarters->isEmpty()) {
+            if ($group_restarters->count()) {
                 // Send user a notification and email
-                Notification::send($group_restarters, new NotifyRestartersOfNewEvent([
+                Notification::send($group_restarters->get(), new NotifyRestartersOfNewEvent([
                                                                                          'event_venue' => $this->venue,
                                                                                          'event_url' => url('/party/view/'.$this->idevents),
                                                                                          'event_group' => $group->name,
@@ -1030,7 +1025,6 @@ class Party extends Model implements Auditable
         return $this->theGroup->timezone;
     }
 
-    // TODO The intention is that we migrate all the code over to use the UTC variants of event date/start/end.
     // Timezone-aware, ISO8601 formatted.  These are unambiguous, e.g. for API results.
     public function getEventStartUtcAttribute() {
         $start = Carbon::parse($this->attributes['event_start_utc'], 'UTC');

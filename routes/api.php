@@ -67,3 +67,15 @@ Route::get('/talk/topics/{tag?}', 'API\DiscourseController@discussionTopics');
 
 // Timezones
 Route::get('/timezones', [App\Http\Controllers\ApiController::class, 'timezones']);
+
+// We are working towards a new and more coherent API.
+Route::group(['prefix' => 'v2'], function() {
+    Route::prefix('/groups')->group(function() {
+        Route::get('{id}/events', 'API\GroupController@getEventsForGroupv2');
+        Route::get('{id}', 'API\GroupController@getGroupv2');
+    });
+
+    Route::prefix('/events')->group(function() {
+        Route::get('{id}', 'API\EventController@getEventv2');
+    });
+});
