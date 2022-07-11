@@ -30,6 +30,7 @@
         "league/csv": "^9.7",
         "mariuzzo/laravel-js-localization": "^1.6",
         "mcamara/laravel-localization": "^1.3",
+        "msurguy/honeypot": "^1.0",
         "owen-it/laravel-auditing": "^12.0",
         "sentry/sentry-laravel": "^2.9",
         "soundasleep/html2text": "^1.1",
