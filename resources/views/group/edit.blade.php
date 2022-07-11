@@ -92,9 +92,9 @@
 
                     <div class="col-12">
 
-                      <div class="row row-compressed">
+                      <div class="row row-compressed mb-1">
                         <div class="col-lg-7">
-                          <div class="form-group">
+                          <div class="form-group mb-1">
                             <label for="autocomplete">@lang('groups.location'):</label>
                             <input type="text" placeholder="@lang('groups.groups_location_placeholder')" id="autocomplete" name="location" class="form-control field field-geolocate" aria-describedby="locationHelpBlock" value="{{ $formdata->location }}" />
 
@@ -124,11 +124,12 @@
                               @lang('groups.groups_postcode_small')
                             </small>
 
-                            <div class="vue">
-                              <GroupTimeZone value="{{ App\Group::find($formdata->idgroups)->timezone }}" />
-                            </div>
-
                           </div>
+
+                          <div class="vue">
+                            <GroupTimeZone value="{{ App\Group::find($formdata->idgroups)->timezone }}" />
+                          </div>
+
                         </div>
 
                         <div class="col-lg-5">
