@@ -60,4 +60,7 @@ return [
     'rsvp_title' => ':name a répondu à l\'invitation à votre événement :',
     'rsvp_line1' => 'Un volontaire, :user, s\'est inscrit à l\'événement \':event\'.',
     'rsvp_action' => 'Voir votre événement',
+    'invites_made_subject' => 'Des invitations ont été envoyées à votre événement',
+    'invites_made_line1' => 'Des invitations ont été envoyées à votre événement : \':name\'. URL pour référence : \':url\'.',
+    'invites_made_line2' => 'Si vous pensez que cet e-mail ne vous est pas destiné, veuillez le rejeter.',
 ];
