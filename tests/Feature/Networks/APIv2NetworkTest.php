@@ -4,6 +4,7 @@ namespace Tests\Feature;
 
 use App\Group;
 use App\Network;
+use App\Party;
 use App\User;
 use DB;
 use Tests\TestCase;
@@ -53,9 +54,14 @@ class APIv2NetworkTest extends TestCase
         $this->assertEquals($network->description, $json['description']);
         $this->assertEquals($network->website, $json['website']);
         $this->assertTrue(array_key_exists('stats', $json));
+        $this->assertTrue(array_key_exists('default_language', $json));
     }
 
-    public function testListGroups() {
+    /**
+     * @dataProvider providerTrueFalse
+     * @param $value
+     */
+    public function testListGroups($getNextEvent) {
         $network = factory(Network::class)->create([
                                                        'name' => 'Restart',
                                                        'events_push_to_wordpress' => true,
@@ -63,14 +69,36 @@ class APIv2NetworkTest extends TestCase
         $group = factory(Group::class)->create();
         $network->addGroup($group);
 
-        // List networks.
-        $response = $this->get("/api/v2/networks/{$network->id}/groups");
+        // Create event for group
+        $event = factory(Party::class)->states('moderated')->create([
+                                                                         'event_start_utc' => '2038-01-01T00:00:00Z',
+                                                                         'event_end_utc' => '2038-01-01T02:00:00Z',
+                                                                         'group' => $group->idgroups,
+                                                                     ]);
 
-        $response->assertSuccessful();
-        $json = json_decode($response->getContent(), true)['data'];
-        $this->assertEquals(1, count($json));
-        $this->assertEquals($group->idgroups, $json[0]['id']);
+        // List networks.
+        $response = $this->get("/api/v2/networks/{$network->id}/groups?" . ($getNextEvent ? 'includeNextEvent=true' : ''));
+
+        try {
+            $response->assertSuccessful();
+            $json = json_decode($response->getContent(), true)['data'];
+            $this->assertEquals(1, count($json));
+            $this->assertEquals($group->idgroups, $json[0]['id']);
+
+            if ($getNextEvent) {
+                $this->assertEquals($event->idevents, $json[0]['next_event']['id']);
+            } else {
+                $this->assertFalse(array_key_exists('next_event', $json[0]));
+            }
+        } catch (\Exception $e) {
+            error_log($e->getMessage());
+        }
     }
 
-    // TODO List groups.
+    public function providerTrueFalse() {
+        return [
+            [false],
+            [true],
+        ];
+    }
 }

@@ -21,6 +21,7 @@ class Network extends JsonResource
             'description' => $this->description,
             'website' => $this->website,
             'shortname' => $this->shortname,
+            'default_language' => $this->default_language,
             'stats' => $this->resource->stats()
         ];
     }

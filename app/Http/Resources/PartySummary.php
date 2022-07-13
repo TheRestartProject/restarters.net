@@ -26,7 +26,8 @@ class PartySummary extends JsonResource
             'online' => $this->online,
             'lat' => $this->latitude,
             'lng' => $this->longitude,
-            'group' => GroupSummary::make($this->theGroup),
-            'updated_at' => Carbon::parse($this->updated_at)->toIso8601String(),        ];
+            'group' => \App\Http\Resources\GroupSummary::make($this->theGroup),
+            'updated_at' => Carbon::parse($this->updated_at)->toIso8601String(),
+        ];
     }
 }
