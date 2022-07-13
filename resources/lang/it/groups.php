@@ -63,7 +63,6 @@ return [
   'tag-8' => 'Tag 8',
   'area' => 'Area',
   'cancel_invites_link' => 'Cancella',
- <a href=":resources_url"> nostre risorse</a>.',
   'done_button' => 'Fatto',
   'email_invite' => 'Invita via email',
   'hosted_by' => 'Ospitato da',
