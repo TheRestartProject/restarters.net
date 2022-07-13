@@ -25,7 +25,13 @@ class NetworkController extends Controller
 
     public function getNetworkv2($id)
     {
-        $network = Network::find($id);
+        $network = Network::findOrFail($id);
         return \App\Http\Resources\Network::make($network);
+    }
+
+    public function getNetworkGroupsv2($id)
+    {
+        $network = Network::findOrFail($id);
+        return \App\Http\Resources\GroupSummaryCollection::make($network->groups);
     }
 }

@@ -2,6 +2,7 @@
 
 namespace Tests\Feature;
 
+use App\Group;
 use App\Network;
 use App\User;
 use DB;
@@ -52,6 +53,23 @@ class APIv2NetworkTest extends TestCase
         $this->assertEquals($network->description, $json['description']);
         $this->assertEquals($network->website, $json['website']);
         $this->assertTrue(array_key_exists('stats', $json));
+    }
+
+    public function testListGroups() {
+        $network = factory(Network::class)->create([
+                                                       'name' => 'Restart',
+                                                       'events_push_to_wordpress' => true,
+                                                   ]);
+        $group = factory(Group::class)->create();
+        $network->addGroup($group);
+
+        // List networks.
+        $response = $this->get("/api/v2/networks/{$network->id}/groups");
+
+        $response->assertSuccessful();
+        $json = json_decode($response->getContent(), true)['data'];
+        $this->assertEquals(1, count($json));
+        $this->assertEquals($group->idgroups, $json[0]['id']);
     }
 
     // TODO List groups.

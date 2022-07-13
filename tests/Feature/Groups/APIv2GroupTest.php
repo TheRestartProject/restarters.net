@@ -34,5 +34,6 @@ class APIv2GroupTest extends TestCase
         $this->assertEquals($idgroups, $json['data']['id']);
         $this->assertTrue(array_key_exists('description', $json['data']));
         $this->assertTrue(array_key_exists('stats', $json['data']));
+        $this->assertTrue(array_key_exists('updated_at', $json['data']));
     }
 }

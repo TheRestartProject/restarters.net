@@ -2,6 +2,7 @@
 
 namespace App\Http\Resources;
 
+use Carbon\Carbon;
 use Illuminate\Http\Resources\Json\JsonResource;
 
 class PartySummary extends JsonResource
@@ -26,6 +27,6 @@ class PartySummary extends JsonResource
             'lat' => $this->latitude,
             'lng' => $this->longitude,
             'group' => GroupSummary::make($this->theGroup),
-        ];
+            'updated_at' => Carbon::parse($this->updated_at)->toIso8601String(),        ];
     }
 }
