@@ -17,7 +17,6 @@ return [
   'no' => 'No',
   'country' => 'Nazione',
   'time_volunteered' => 'Ore di Volontariato',
-  'hours_volunteered' => 'Ore di volontariato',
   'average_age' => 'Età media',
   'number_of_groups' => 'Numero di gruppi',
   'total_number_of_users' => 'Numero totale di utenti',

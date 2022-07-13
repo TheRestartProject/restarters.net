@@ -10,5 +10,4 @@ return [
   'devices_logged' => 'devices logged',
   'visit_wiki' => 'Visit the wiki',
   'discussion_header' => 'Discussion Forum',
-  'join_discussion' => 'Join the discussion',
 ];

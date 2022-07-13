@@ -10,7 +10,6 @@ return [
   'devices_logged' => 'dispositivi registrati',
   'visit_wiki' => 'Visita il wiki',
   'discussion_header' => 'Forum di discussione',
-  'join_discussion' => 'Unisciti alla discussione',
   'groups_near_you_follow_action' => 'Segui',
   'groups_near_you_header' => 'Gruppi vicino a te',
   'groups_near_you_none_nearby' => 'Attualmente non ci sono gruppi vicino a te che sono stati inseriti in Restarters.net',

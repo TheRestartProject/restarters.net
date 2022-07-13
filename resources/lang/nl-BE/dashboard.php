@@ -4,7 +4,6 @@ return [
   'getting_started_text' => 'Repair&Share gebruikt het Restarters platform voor gegevensuitwisseling tussen en over Repair Café\'s.<br/> 
 Ga onmiddellijk naar:',
   'getting_started_header' => 'Welkom!',
-  'join_discussion' => 'Neem deel aan een gesprek',
   'join_group' => 'Sluit je aan bij een groep',
   'rsvp_event' => 'Stuur een antwoord voor deze activiteit',
   'visit_wiki' => 'Ga naar de wiki',

@@ -1,24 +1,6 @@
 <?php
 
 return [
-  'task' => [
-    'where_is_the_main_fault' => 'Qual è il guasto principale?',
-    'fetch_another' => 'Non lo so, vai a prendere un\'altra riparazione',
-    'suggestions' => 'Suggerimenti',
-    'translate' => 'Tradurre',
-    'go_with' => 'Vai con',
-    'source' => 'Fonte',
-    'learn_more' => 'Più informazioni',
-    'strapline' => 'Basta leggere le informazioni sul dispositivo rotto e selezionare il tipo di guasto descritto dalla lista sottostante.',
-    'did_you_know' => 'Lo sapevi?',
-    'signpost_1' => 'Un tablet medio produce l\'equivalente di 150 kg di CO2 durante la sua vita. Ma poiché ci vogliono molti materiali preziosi e una produzione intensiva per fare ogni tablet, oltre il 75% di questo impatto si verifica prima che sia acceso per la prima volta.',
-    'signpost_2' => 'Riparare un dispositivo ne prolunga la vita, riduce il suo impatto ambientale complessivo e diminuisce la domanda di nuovi prodotti. Infatti, se usassimo ogni computer in Europa per un anno in più, potremmo risparmiare 3 milioni di tonnellate di CO2e.',
-    'signpost_3' => 'L\'Unione Europea includerà tablet e smartphone nelle regole di Ecodesign entro il 2022. Questo ci darà la possibilità di chiedere il Diritto alla Riparazione di questi dispositivi. Le regole decise dall\'UE potrebbero anche essere usate per influenzare le leggi in altri luoghi, compreso il Regno Unito.',
-    'signpost_4' => '"Vogliamo dire ai legislatori perché i tablet si rompono e come potrebbero essere resi più facili da riparare. I gruppi di riparazione comunitaria in tutto il mondo hanno 
-registrato queste informazioni, e provando TabiCat, ci stai aiutando ad analizzarle."',
-    'signpost_5' => 'Grazie! Per favore, <a href="https://survey.actionproject.eu/chat/?data=U2FsdGVkX1%207YCj%20CRieUSNsHbebWsbk97sB4QRw%2F%206soz4B9MsCqwSYA2WEWYjmPruZ%20bkR8PKsQbSX5dPmLQ%3D%3D">partecipa al nostro sondaggio</a>',
-    'signpost_6' => 'Grazie per il tuo aiuto! Ogni difetto che classifichi rende questi dati più utili. Perché non ti <a href="../">unisci anche tu alla nostra comunità</a>?',
-  ],
   'status' => [
     'status' => 'Stato',
     'items_opinions' => 'Articoli / opinioni',

@@ -16,7 +16,6 @@ return [
   'export_csv' => 'Exporteer als CSV',
   'gender' => 'Gender',
   'hours' => 'Uren',
-  'hours_volunteered' => 'Uren vrijwilligerswerk',
   'include_anonymous_users' => 'Anonieme gebruikers insluiten',
   'miscellaneous' => 'Diversen',
   'no' => 'Nee',

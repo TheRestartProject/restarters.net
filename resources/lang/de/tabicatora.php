@@ -1,23 +1,6 @@
 <?php
 
 return [
-  'task' => [
-    'where_is_the_main_fault' => 'Wo ist der hauptfehler',
-    'fetch_another' => 'Ich weiß es nicht, zeig eine andere Reparatur',
-    'suggestions' => 'Vorschläge',
-    'translate' => 'Übersetzen',
-    'go_with' => 'Geh mit',
-    'source' => 'Quelle',
-    'strapline' => 'Lesen Sie einfach die Informationen über das defekte Gerät und wählen Sie die Art des beschriebenen Fehlers aus der Liste darunter aus.',
-    'did_you_know' => 'Wussten Sie schon?',
-    'learn_more' => 'Mehr Informationen',
-    'signpost_1' => 'Ein durchschnittliches Tablet produziert während seiner Lebensdauer das Äquivalent von 150 kg CO2. Da für die Herstellung jedes Tablets jedoch viele wertvolle Materialien und eine intensive Fertigung erforderlich sind, entstehen über 75 % dieser Auswirkungen, bevor das Gerät zum ersten Mal eingeschaltet wird.',
-    'signpost_2' => 'Die Reparatur eines Geräts verlängert seine Lebensdauer, reduziert die Gesamtumweltbelastung und senkt die Nachfrage nach neuen Produkten. Wenn wir jeden Computer in Europa ein Jahr länger nutzen würden, könnten wir das Äquivalent von 3 Millionen Tonnen CO2 einsparen.',
-    'signpost_3' => 'Die Europäische Union plant, Tablets und Smartphones bis 2022 in die Ökodesign-Regeln aufzunehmen. Dies wird uns die Möglichkeit geben, das Recht auf Reparatur dieser Geräte einzufordern. Regeln, die von der EU beschlossen werden, könnten auch genutzt werden, um Gesetze an anderen Orten zu beeinflussen, auch in Großbritannien.',
-    'signpost_4' => 'Wir wollen den politischen Entscheidungsträgern sagen, warum Tablets kaputt gehen und wie sie einfacher zu reparieren sind. Community-Reparaturgruppen auf der ganzen Welt haben dazu Daten gesammelt. Sie helfen uns, diese Informationen zu analysieren, indem sie TabiCat ausprobieren.',
-    'signpost_5' => 'Vielen Dank an Sie! <a href="https://survey.actionproject.eu/chat/?data=U2FsdGVkX1%207YCj%20CRieUSNsHbebWsbk97sB4QRw%2F%206soz4B9MsCqwSYA2WEWYjmPruZ%20bkR8PKsQbSX5dPmLQ%3D%3D">Bitte nehmen Sie an unserer Umfrage teil</a>',
-    'signpost_6' => 'Vielen Dank für Ihre Hilfe! Jeder Fehler, den Sie kategorisieren, macht diese Daten noch nützlicher. <a href="../">Werden Sie doch auch Mitglied unserer Community</a>.',
-  ],
   'status' => [
     'status' => 'Status',
     'items_opinions' => 'Artikel / meinungen',

@@ -1,24 +1,6 @@
 <?php
 
 return [
-  'task' => [
-    'where_is_the_main_fault' => 'Waar is de belangrijkste fout',
-    'fetch_another' => 'Ik weet het niet, haal nog een reparatie',
-    'suggestions' => 'Suggesties',
-    'translate' => 'Vertalen',
-    'go_with' => 'Ga mee',
-    'source' => 'Bron',
-    'strapline' => 'Lees de informatie over het kapotte toestel en selecteer het type fout uit de lijst eronder.',
-    'learn_more' => 'Lees meer',
-    'did_you_know' => 'Wist u dat?',
-    'signpost_1' => 'Een gemiddelde tablet produceert tijdens zijn levensduur het equivalent van 150 kg CO2. Omdat het maken van nieuwe tablets veel kostbare materialen en intensieve productieprocessen vraagt, vindt meer dan 75% van die impact plaats voordat hij een eerste keer wordt aangezet.',
-    'signpost_2' => 'Repareren verlengt de levensduur van toestellen, vermindert hun totale milieu-impact en verlaagt de vraag naar nieuwe producten. Als we elke computer in Europa een jaar langer zouden gebruiken, zouden we het equivalent van 3 miljoen ton CO2 kunnen uitsparen.',
-    'signpost_3' => 'De Europese Unie is van plan om tegen 2020 regelgeving in te voeren die tablets en smartphones ecologischer moet maken. Wij willen deze kans grijpen om op te roepen voor het recht op repareren. Europese regelgeving kan ook een invloed hebben op landen buiten de EU, zoals het VK.',
-    'signpost_4' => '"We willen beleidsmakers vertellen waarom tablets stuk gaan en hoe ze 
-makkerlijker herstelbaar kunnen worden. Repair groepen over de hele wereld hebben deze informatie ingevoerd. Door TabiCat te gebruiken, helpt u ons ze te analyseren."',
-    'signpost_5' => 'Bedankt! <a href="https://survey.actionproject.eu/chat/?data=U2FsdGVkX1%207YCj%20CRieUSNsHbebWsbk97sB4QRw%2F%206soz4B9MsCqwSYA2WEWYjmPruZ%20bkR8PKsQbSX5dPmLQ%3D%3D">Vul onze enquête in</a>',
-    'signpost_6' => 'Bedankt voor uw hulp! Elke fout die u categoriseert maakt de gegevens nuttiger. <a href="../">Waarom wordt u ook geen lid van onze community</a>?',
-  ],
   'status' => [
     'status' => 'Status',
     'items_opinions' => 'Items / meningen',
