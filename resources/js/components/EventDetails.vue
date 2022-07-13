@@ -13,7 +13,7 @@
             {{ date }}
           </div>
           <div v-if="upcoming">
-            <b-dropdown v-if="upcoming && calendarLinks" id="event-calendar-dropdown" text="Add to calendar" variant="white" class="linkdrop" no-caret>
+            <b-dropdown v-if="upcoming && calendarLinks" id="event-calendar-dropdown" :text="__('calendars.add_to_calendar')" variant="white" class="linkdrop" no-caret>
               <b-dropdown-item target="_blank" rel="noopener" :href="calendarLinks.google">{{ __('events.calendar_google') }}</b-dropdown-item>
               <b-dropdown-item target="_blank" rel="noopener" :href="calendarLinks.webOutlook">{{ __('events.calendar_outlook') }}</b-dropdown-item>
               <b-dropdown-item target="_blank" rel="noopener" :href="calendarLinks.ics">{{ __('events.calendar_ical') }}</b-dropdown-item>

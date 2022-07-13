@@ -9,7 +9,7 @@ return [
   'placeholder_name' => 'Chercher nom',
   'placeholder_gender_text' => 'Cherchez le genre',
   'placeholder_age_range' => 'Choisissez la tranche d\'âge',
-  'placeholder_group' => 'Choisissez groupe',
+  'placeholder_group' => 'Choisissez repair café',
   'placeholder_gender' => 'Choisissez le genre',
   'miscellaneous' => 'Divers',
   'include_anonymous_users' => 'Utilisateurs anonymes inclus',
@@ -34,6 +34,6 @@ return [
   'hours' => 'Heures',
   'event_date' => 'Date de l\'événement',
   'event_name' => 'Evénement',
-  'restart_group' => 'Groupe',
+  'restart_group' => 'Repair Café',
   'export_csv' => 'Exporter en CSV',
 ];

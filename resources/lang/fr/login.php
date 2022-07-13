@@ -15,4 +15,6 @@ return [
   'stat_3' => 'Déchets<br>évités',
   'stat_4' => 'Événements<br>réalisés',
   'login_title' => 'Connexion',
+  'join_title' => 'Rejoindre Restarters',
+  'join_title_short' => 'Rejoindre',
 ];
