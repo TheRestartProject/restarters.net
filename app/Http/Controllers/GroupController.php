@@ -114,6 +114,7 @@ class GroupController extends Controller
             $website = $request->input('website');
             $location = $request->input('location');
             $text = $request->input('free_text');
+            $timezone = $request->input('timezone');
 
             if (empty($name)) {
                 $error['name'] = 'Please input a name.';
@@ -151,6 +152,7 @@ class GroupController extends Controller
                     'country' => $country,
                     'free_text' => $text,
                     'shareable_code' => Fixometer::generateUniqueShareableCode(\App\Group::class, 'shareable_code'),
+                    'timezone' => $timezone,
                 ];
 
                 try {
