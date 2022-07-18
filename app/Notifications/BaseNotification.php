@@ -27,6 +27,7 @@ abstract class BaseNotification extends Notification implements ShouldQueue
      */
     public function via($notifiable)
     {
+        // If user being notified has opted in to receive emails.
         if ($notifiable->invites == 1) {
             return ['mail', 'database'];
         }
