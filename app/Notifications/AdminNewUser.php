@@ -5,9 +5,8 @@ namespace App\Notifications;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Notifications\Messages\MailMessage;
-use Illuminate\Notifications\Notification;
 
-class AdminNewUser extends Notification implements ShouldQueue
+class AdminNewUser extends BaseNotification implements ShouldQueue
 {
     use Queueable;
 

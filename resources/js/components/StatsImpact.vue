@@ -77,6 +77,7 @@ export default {
       if (!ret.length) {
         return null
       } else if (ret.length === 1) {
+        // events.not_counting, groups.not_counting
         const intro = this.$lang.choice(langSource + '.not_counting', this.stats.no_weight)
         return intro + ' ' + ret[0] + '.'
       } else {

@@ -5,9 +5,8 @@ namespace App\Notifications;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Notifications\Messages\MailMessage;
-use Illuminate\Notifications\Notification;
 
-class AdminWordPressEditEventFailure extends Notification implements ShouldQueue
+class AdminWordPressEditEventFailure extends BaseNotification implements ShouldQueue
 {
     use Queueable;
 

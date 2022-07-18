@@ -930,13 +930,6 @@ function initAutocomplete() {
     }
   });
 
-  $('#login-form-submit').on('click', function(e) {
-    // We've seen double submits of the login form, leading to 419 errors.  Prevent the user submitting twice by
-    // double-clicking.
-    $('#login-form-submit').attr('disabled', 'disabled')
-    $('#login-form').submit()
-  });
-
   // On toggling between multi collapable invite modal content
   // Then also toggle the link to change the text (show a different link -
   // that has the same functionality)
@@ -1367,10 +1360,18 @@ jQuery(document).ready(function () {
       __(key) {
         // This means we can use __('key') in Vue templates in the same way as we are used to in Laravel
         // templates.
-        return this.$lang.get(key)
+        if (this.$lang.has(key)) {
+          return this.$lang.get(key)
+        } else {
+          Sentry.captureMessage("Missing translation " + key)
+        }
       },
       __(key, values) {
-        return this.$lang.get(key, values)
+        if (this.$lang.has(key)) {
+          return this.$lang.get(key, values)
+        } else {
+          Sentry.captureMessage("Missing translation " + key)
+        }
       }
     }
   })
@@ -1398,6 +1399,7 @@ jQuery(document).ready(function () {
       el: $(this).get(0),
       store: store,
       components: {
+        'loginpage': require('./components/LoginPage.vue'),
         'dashboardpage': require('./components/DashboardPage.vue'),
         'eventaddeditpage': require('./components/EventAddEditPage.vue'),
         'eventaddedit': require('./components/EventAddEdit.vue'),

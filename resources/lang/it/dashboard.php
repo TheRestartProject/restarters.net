@@ -2,15 +2,10 @@
 
 return [
   'getting_started_header' => 'Per incominciare',
-  'getting_started_text' => 'Benvenuto nello spazio della comunità dei Restarters. Ecco alcune azioni per iniziare:',
-  'add_avatar' => 'Aggiungi un avatar',
-  'add_skills' => 'Aggiungi tue competenze',
   'join_group' => 'Unisciti a un gruppo',
-  'rsvp_event' => 'Registrati ad un evento',
   'devices_logged' => 'dispositivi registrati',
   'visit_wiki' => 'Visita il wiki',
   'discussion_header' => 'Forum di discussione',
-  'join_discussion' => 'Unisciti alla discussione',
   'groups_near_you_follow_action' => 'Segui',
   'groups_near_you_header' => 'Gruppi vicino a te',
   'groups_near_you_none_nearby' => 'Attualmente non ci sono gruppi vicino a te che sono stati inseriti in Restarters.net',
@@ -19,9 +14,5 @@ return [
   'groups_near_you_start_a_group' => 'Vuoi iniziare o aggiungere un gruppo? <a href=":resources_url"> Ulteriori informazioni </a>.',
   'groups_near_you_text' => 'Segui un gruppo di riparazione per saperne di più sulla comunità di riparazione nella tua zona.',
   'groups_near_you_your_location_is' => 'La tua città è attualmente impostata a :location.',
-  'join_group_host' => 'Segui o crea un gruppo',
-  'join_group_link_host' => 'Cerca gruppi vicini',
-  'join_group_link_restarter' => 'Trova un gruppo',
-  'join_group_restarter' => 'Segui un gruppo di riparazione',
   'log_devices' => 'Registra dispositivi',
 ];

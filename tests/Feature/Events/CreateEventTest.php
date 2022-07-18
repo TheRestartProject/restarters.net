@@ -16,6 +16,7 @@ use App\User;
 use Carbon\Carbon;
 use DB;
 use Illuminate\Support\Facades\Notification;
+use Illuminate\Support\Facades\Queue;
 use Tests\TestCase;
 use App\Notifications\EventConfirmed;
 
@@ -622,5 +623,75 @@ class CreateEventTest extends TestCase
         // A geocode failure should result in an error alert.
         $response = $this->post('/party/create/', $eventData);
         $response->assertSee('alert-danger');
+    }
+
+    /** @test */
+    public function notifications_are_queued_as_expected()
+    {
+        // At the moment we are queueing (backgrounding) admin notifications but not user notifications.
+        //
+        // Don't call Notification::fake() - we want real notifications.
+        $this->withoutExceptionHandling();
+
+        // Create an admin
+        $admin = factory(User::class)->state('Administrator')->create();
+        // Create a network with a group.
+        $network = factory(Network::class)->create();
+        $group = factory(Group::class)->create();
+        $network->addGroup($group);
+
+        // Make the admin coordinators of the network, so that they should get notified.
+        $network->addCoordinator($admin);
+
+        // Log in so that we can create an event.
+        $host = factory(User::class)->states('Host')->create();
+        $group->addVolunteer($host);
+        $group->makeMemberAHost($host);
+        $this->actingAs($host);
+
+        // Clear any jobs queued in earlier tests.
+        $max = 1000;
+        do {
+            $job = Queue::pop();
+
+            if ($job) {
+                $job->fail('removed in UT');
+            }
+
+            $max--;
+        }
+        while (Queue::size() > 0 && $max > 0);
+
+        // Create an event.
+        $initialQueueSize = \Illuminate\Support\Facades\Queue::size();
+        $event = factory(Party::class)->raw();
+        $event['group'] = $group->idgroups;
+        $response = $this->post('/party/create/', $event);
+        $response->assertStatus(302);
+
+        // Should have queued AdminModerationEvent.
+        $queueSize = Queue::size();
+        self::assertGreaterThan($initialQueueSize, $queueSize);
+        $max = 1000;
+        do {
+            $job = Queue::pop();
+
+            if ($job) {
+                self::assertStringContainsString('AdminModerationEvent', $job->getRawBody());
+                $job->fail('removed in UT');
+            }
+
+            $max--;
+        }
+        while (Queue::size() > 0 && $max > 0);
+
+        self::assertEquals(0, Queue::size());
+
+        // Approval should generate a notification to the host which is not queued.
+        $event = Party::latest()->first();
+        $event->approve();
+
+        # Should not have queued anything
+        self::assertEquals(0, Queue::size());
     }
 }

@@ -1,16 +1,6 @@
 <?php
 
 return [
-  'task' => [
-    'where_is_the_main_fault' => 'Waar is de belangrijkste fout',
-    'fetch_another' => 'Ik weet het niet. Laat me een andere reparatie zien',
-    'suggestions' => 'Suggesties',
-    'translate' => 'Vertalen',
-    'go_with' => 'Ga mee',
-    'source' => 'Bron',
-    'strapline' => 'Lees gewoon de informatie over de kapotte printer en selecteer het beschreven type fout uit de lijst eronder.',
-    'learn_more' => 'Lees meer',
-  ],
   'status' => [
     'status' => 'Status',
     'items_opinions' => 'Items / meningen',

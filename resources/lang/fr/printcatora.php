@@ -1,16 +1,6 @@
 <?php
 
 return [
-  'task' => [
-    'where_is_the_main_fault' => 'Où se trouve le principal défaut?',
-    'fetch_another' => 'Je ne sais pas, chercher une autre réparation',
-    'suggestions' => 'Suggestions',
-    'translate' => 'Traduire',
-    'go_with' => 'Aller avec',
-    'source' => 'La source',
-    'learn_more' => 'Plus d\'informations',
-    'strapline' => 'Il vous suffit de lire les informations relatives à l’imprimante en panne et de sélectionner le type de panne décrite dans la liste située en dessous.',
-  ],
   'status' => [
     'status' => 'Statut',
     'items_opinions' => 'Articles / opinions',
@@ -26,7 +16,11 @@ return [
     'problem' => 'Problème',
     'number_of_records' => 'Nombre d\'enregistrements',
     'winning_opinion' => 'Opinion gagnante',
-    'task_completed' => 'Vous les avez tous vus, mercis',
+    'task_completed' => 'Vous les avez tous vus, merci',
+  ],
+  'about' => 'Plus d\'informations',
+  'branding' => [
+    'powered_by' => 'Utilisation de données provenant de:',
   ],
   'info' => [
     'body-s1-header' => 'Qu’est-ce que PrintCat?',
@@ -40,8 +34,4 @@ return [
     'body-s4-p1' => 'Pour en savoir plus, posez nous des questions et faites nous part de <a href=":url" target="_blank">vos commentaires dans le forum PrintCat</a>.',
     'title' => 'Merci d’avoir essayé PrintCat',
   ],
-  'branding' => [
-    'powered_by' => 'Utilisation de données provenant de:',
-  ],
-  'about' => 'Plus d\'informations',
 ];
