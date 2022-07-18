@@ -12,7 +12,7 @@ class ScheduleServiceProvider extends ServiceProvider
         $this->app->booted(function () {
             $schedule = $this->app->make(Schedule::class);
             $schedule->command('language:sync')->everyFiveMinutes()->withoutOverlapping();
-            $schedule->command('discourse:syncgroups')->everyFiveMinutes()->withoutOverlapping();
+            $schedule->command('discourse:syncgroups')->everyFifteenMinutes()->withoutOverlapping();
         });
     }
 
