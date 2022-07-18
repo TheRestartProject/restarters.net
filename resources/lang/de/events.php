@@ -21,7 +21,7 @@ return [
   'all_restarters_attended_modal_heading' => 'All Restarters attended',
   'all_restarters_attended_modal_description' => 'An overview of who attended your event and their skills.',
   'invite_restarters_modal_heading' => 'Invite volunteers to the event',
-  'send_invites_to_restarters_tickbox' => 'Add invites for group members. Members marked with a ⚠ will be invited but won\'t be sent an email due to their notification settings.',
+  'send_invites_to_restarters_tickbox' => 'Add invites for group members.',
   'manual_invite_box' => 'Send invites to',
   'message_to_restarters' => 'Invitation message',
   'sample_text_message_to_restarters' => '<add a custom message here if required>',

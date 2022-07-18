@@ -13,7 +13,7 @@ return [
   'headline_stats_dropdown' => 'Headline stats',
   'co2_equivalence_visualisation_dropdown' => 'CO<sub>2</sub> equivalence visualisation',
   'full_name_helper' => 'Leave field blank if anonymous',
-  'send_invites_to_restarters_tickbox' => 'Add invites for group members. Members marked with a ⚠ will be invited but won\'t be sent an email due to their notification settings.',
+  'send_invites_to_restarters_tickbox' => 'Add invites for group members.',
   'sample_text_message_to_restarters' => '<add a custom message here if required>',
   'event_time' => 'Time',
   'stat-0' => 'Participants',

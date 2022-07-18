@@ -61,6 +61,15 @@ export default {
       })
 
       commit('remove', params)
+    },
+    async getVolunteers({commit, rootGetters}, params) {      console.log("Get volunteers")
+      let ret = await axios.get('/party/get-group-emails-with-names/' + params.idevents, {
+        headers: {
+          'X-CSRF-TOKEN': rootGetters['auth/CSRF']
+        }
+      })
+
+      return ret.data
     }
   },
 }

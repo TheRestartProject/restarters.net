@@ -1267,7 +1267,6 @@ function initAutocomplete() {
     $(".toggle-invite-modals").click(function (e) {
 
       $('#invite-to-group').modal('toggle');
-      $('#event-invite-to').modal('toggle');
 
       $('#shareable-modal').modal('toggle');
     });
