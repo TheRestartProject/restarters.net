@@ -4,7 +4,7 @@ return [
   'email_address_validation' => 'An account with this email address already exists. Have you tried logging in?',
   'login' => 'Login',
   'delete_account' => 'Delete account',
-  'failed' => 'These credentials do not match our records.',
+  'failed' => 'Either this email address isn\'t registered on the system or the password is incorrect.',
   'throttle' => 'Too many login attempts. Please try again in :seconds seconds.',
   'email_address' => 'Email address',
   'sign_in' => 'I remembered.  Let me sign in',

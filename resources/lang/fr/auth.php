@@ -1,7 +1,7 @@
 <?php
 
 return [
-  'failed' => 'Ces références ne correspondent pas à notre base de données',
+  'failed' => 'Soit cette adresse électronique n’est pas enregistrée dans le système, soit le mot de passe est incorrect.',
   'throttle' => 'Trop de tentatives de connexion. S\'il vous plaît réessayer dans :seconds secondes.',
   'email_address' => 'Adresse e-mail',
   'email_address_validation' => 'Veuillez taper une adresse e-mail valide',
