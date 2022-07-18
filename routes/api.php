@@ -78,4 +78,10 @@ Route::group(['prefix' => 'v2'], function() {
     Route::prefix('/events')->group(function() {
         Route::get('{id}', 'API\EventController@getEventv2');
     });
+
+    Route::prefix('/networks')->group(function() {
+        Route::get('/', 'API\NetworkController@getNetworksv2');
+        Route::get('{id}', 'API\NetworkController@getNetworkv2');
+        Route::get('{id}/groups', 'API\NetworkController@getNetworkGroupsv2');
+    });
 });

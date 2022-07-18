@@ -59,5 +59,6 @@ class APIv2EventTest extends TestCase
         $this->assertEquals($id1, $json['data']['id']);
         $this->assertTrue(array_key_exists('description', $json['data']));
         $this->assertTrue(array_key_exists('stats', $json['data']));
+        $this->assertTrue(array_key_exists('updated_at', $json['data']));
     }
 }
