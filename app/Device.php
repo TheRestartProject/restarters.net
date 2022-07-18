@@ -345,43 +345,37 @@ class Device extends Model implements Auditable
         return $this->belongsToMany(\App\Barrier::class, 'devices_barriers', 'device_id', 'barrier_id');
     }
 
-    public function eCo2Diverted($emissionRatio, $displacementFactor)
-    {
-        return Device::eCo2DivertedCalc($emissionRatio, $displacementFactor, $this->isFixed(), $this->deviceCategory, env('MISC_CATEGORY_ID_POWERED'), $this->estimate, $this->deviceCategory->footprint);
-    }
-
     /**
      * Powered estimate only takes precedence over category weight when Misc and if not 0.
      */
-    public static function eCo2DivertedCalc($emissionRatio, $displacementFactor, $fixed, $category, $miscPoweredCategory, $estimate, $categoryFootprint) {
-        if ($fixed) {
-            if ($category == $miscPoweredCategory && $estimate > 0) {
-                $footprint = $estimate * $emissionRatio;
+    public function eCo2Diverted($emissionRatio, $displacementFactor)
+    {
+        $footprint = 0;
+
+        if ($this->isFixed()) {
+            if ($this->deviceCategory->isMiscPowered() && $this->estimate > 0) {
+                $footprint = $this->estimate * $emissionRatio;
             } else {
-                $footprint = $categoryFootprint;
+                $footprint = $this->deviceCategory->footprint;
             }
         }
 
         return $footprint * $displacementFactor;
     }
 
-    public function uCo2Diverted($emissionRatio, $displacementFactor)
-    {
-        return Device::uCo2DivertedCalc($emissionRatio, $displacementFactor, $this->isFixed(), $this->estimate, $this->deviceCategory->footprint);
-    }
-
     /**
-     * Unpowered estimate always takes precedence over category weight unless it is 0.
+     * Unpowered estimate always takes precedence over category weight unless is is 0.
+     *
      */
-    public static function uCo2DivertedCalc($emissionRatio, $displacementFactor, $fixed, $estimate, $categoryFootprint)
+    public function uCo2Diverted($emissionRatio, $displacementFactor)
     {
         $footprint = 0;
 
-        if ($fixed) {
-            if ($estimate > 0) {
-                $footprint = ($estimate * $emissionRatio);
+        if ($this->isFixed()) {
+            if ($this->estimate > 0) {
+                $footprint = ($this->estimate * $emissionRatio);
             } else {
-                $footprint = $categoryFootprint;
+                $footprint = $this->deviceCategory->footprint;
             }
         }
 
@@ -394,46 +388,32 @@ class Device extends Model implements Auditable
      */
     public function eWasteDiverted()
     {
-        return Device::eWasteDivertedCalc($this->isFixed(), $this->deviceCategory->idcategories, env('MISC_CATEGORY_ID_POWERED'), $this->estimate, $this->deviceCategory->weight);
-    }
-
-    /**
-     * Powered estimate only takes precedence over category weight when Misc and if not 0.
-     *
-     */
-    public static function eWasteDivertedCalc($fixed, $category, $miscPoweredCategory, $estimate, $categoryWeight)
-    {
         $ewasteDiverted = 0;
 
-        if ($fixed) {
-            if ($category == $miscPoweredCategory && $estimate > 0) {
-                $ewasteDiverted = $estimate;
+        if ($this->isFixed() && $this->deviceCategory->isPowered()) {
+            if ($this->deviceCategory->isMiscPowered() && $this->estimate > 0) {
+                $ewasteDiverted = $this->estimate;
             } else {
-                $ewasteDiverted = $categoryWeight;
+                $ewasteDiverted = $this->deviceCategory->weight;
             }
         }
 
         return $ewasteDiverted;
     }
 
-    public function uWasteDiverted()
-    {
-        return self::uWasteDivertedCalc($this->isFixed(), $this->deviceCategory->isPowered(), $this->estimate, $this->deviceCategory->weight);
-    }
-
     /**
      * Unpowered estimate always takes precedence over category weight unless it is 0.
      *
      */
-    public static function uWasteDivertedCalc($fixed, $powered, $estimate, $weight)
+    public function uWasteDiverted()
     {
         $wasteDiverted = 0;
 
-        if ($fixed && !$powered) {
-            if ($estimate > 0) {
-                $wasteDiverted = $estimate;
+        if ($this->isFixed() && $this->deviceCategory->isUnpowered()) {
+            if ($this->estimate > 0) {
+                $wasteDiverted = $this->estimate;
             } else {
-                $wasteDiverted = $weight;
+                $wasteDiverted = $this->deviceCategory->weight;
             }
         }
 

@@ -717,69 +717,60 @@ class Party extends Model implements Auditable
 
         $result = self::getEventStatsArrayKeys();
 
-        // Bypass Eloquent in favour of raw queries, which allow us to collect stats much more rapidly.
-        $allDevices = DB::select(DB::raw("SELECT `repair_status`, `category`, `powered`, `weight`, `estimate`, `footprint` FROM `devices` INNER JOIN `categories` ON devices.category = categories.idcategories WHERE devices.event = :idevents"), [
-            'idevents' => $this->idevents
-        ]);
+        if (! empty($this->allDevices)) {
+            foreach ($this->allDevices as $device) {
+                if ($device->deviceCategory->powered) {
+                    $result['devices_powered']++;
 
-        $fixed_status = env('DEVICE_FIXED');
-        $misc_powered = env('MISC_CATEGORY_ID_POWERED');
-        $misc_unpowered = env('MISC_CATEGORY_ID_UNPOWERED');
+                    if ($device->isFixed()) {
+                        $result['co2_powered'] += $device->eCo2Diverted($eEmissionRatio, $displacementFactor);
+                        $result['waste_powered'] += $device->eWasteDiverted();
+                        $result['fixed_powered']++;
+                    }
+                } else {
+                    $result['devices_unpowered']++;
 
-        foreach ($allDevices as $device) {
-            $fixed = $device->repair_status == $fixed_status;
-
-            if ($device->powered) {
-                $result['devices_powered']++;
-
-                if ($fixed) {
-                    $result['co2_powered'] += Device::eCo2DivertedCalc($eEmissionRatio, $displacementFactor, $fixed, $device->category, $misc_powered, $device->estimate, $device->footprint);
-                    $result['waste_powered'] += Device::eWasteDivertedCalc($fixed, $device->category, $misc_powered, $device->estimate, $device->weight);
-                    $result['fixed_powered']++;
+                    if ($device->isFixed()) {
+                        $result['co2_unpowered'] += $device->uCo2Diverted($uEmissionratio, $displacementFactor);
+                        $result['waste_unpowered'] += $device->uWasteDiverted();
+                        $result['fixed_unpowered']++;
+                    }
                 }
-            } else {
-                $result['devices_unpowered']++;
 
-                if ($fixed) {
-                    $result['co2_unpowered'] += Device::uCo2DivertedCalc($uEmissionratio, $displacementFactor, $fixed, $device->estimate, $device->footprint);
-                    $result['waste_unpowered'] += Device::uWasteDivertedCalc($fixed, false, $device->estimate, $device->weight);
-                    $result['fixed_unpowered']++;
+                switch ($device->repair_status) {
+                    case 1:
+                        $result['fixed_devices']++;
+                        break;
+                    case 2:
+                        $result['repairable_devices']++;
+                        break;
+                    case 3:
+                        $result['dead_devices']++;
+                        break;
+                    default:
+                        $result['unknown_repair_status']++;
+                        break;
                 }
-            }
 
-            switch ($device->repair_status) {
-                case 1:
-                    $result['fixed_devices']++;
-                    break;
-                case 2:
-                    $result['repairable_devices']++;
-                    break;
-                case 3:
-                    $result['dead_devices']++;
-                    break;
-                default:
-                    $result['unknown_repair_status']++;
-                    break;
-            }
-
-            if ($fixed) {
-                if ($device->weight == 0 && $device->estimate == 0) {
-                    if ($device->category == $misc_powered) {
-                        $result['no_weight_powered']++;
-                    } elseif ($device->category == $misc_unpowered) {
-                        $result['no_weight_unpowered']++;
+                if ($device->isFixed()) {
+                    if ($device->deviceCategory->weight == 0 && $device->estimate == 0) {
+                        if ($device->deviceCategory->isMiscPowered()) {
+                            $result['no_weight_powered']++;
+                        } elseif ($device->deviceCategory->isMiscUnpowered()) {
+                            $result['no_weight_unpowered']++;
+                        }
                     }
                 }
             }
+
+            $result['co2_total'] = $result['co2_powered'] + $result['co2_unpowered'];
+            $result['waste_total'] = $result['waste_powered'] + $result['waste_unpowered'];
+            $result['participants'] = $this->pax ?? 0;
+            $result['volunteers'] = $this->volunteers ?? 0;
+            $result['hours_volunteered'] = $this->hoursVolunteered();
+
+            return $result;
         }
-
-        $result['co2_total'] = $result['co2_powered'] + $result['co2_unpowered'];
-        $result['waste_total'] = $result['waste_powered'] + $result['waste_unpowered'];
-        $result['participants'] = $this->pax ?? 0;
-        $result['volunteers'] = $this->volunteers ?? 0;
-        $result['hours_volunteered'] = $this->hoursVolunteered();
-
-        return $result;
     }
 
     public function devices()
