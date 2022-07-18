@@ -1266,8 +1266,6 @@ function initAutocomplete() {
 
     $(".toggle-invite-modals").click(function (e) {
 
-      $('#invite-to-group').modal('toggle');
-
       $('#shareable-modal').modal('toggle');
     });
 
@@ -1365,13 +1363,6 @@ jQuery(document).ready(function () {
           Sentry.captureMessage("Missing translation " + key)
         }
       },
-      __(key, values) {
-        if (this.$lang.has(key)) {
-          return this.$lang.get(key, values)
-        } else {
-          Sentry.captureMessage("Missing translation " + key)
-        }
-      }
     }
   })
 
@@ -1408,6 +1399,7 @@ jQuery(document).ready(function () {
         'grouppage': require('./components/GroupPage.vue'),
         'groupeventspage': require('./components/GroupEventsPage.vue'),
         'groupevents': require('./components/GroupEvents.vue'),
+        'groupinvitemodal': require('./components/GroupInviteModal.vue'),
         'microtaskingpage': require('./components/MicrotaskingPage.vue'),
 
         'eventtimerangepicker': require('./components/EventTimeRangePicker.vue'),

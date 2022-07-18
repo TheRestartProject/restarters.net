@@ -43,6 +43,7 @@ return [
   'shareable_link' => 'Invite via shareable link',
   'email_invite' => 'Invite via email',
   'shareable_link_box' => 'Shareable link',
+  'type_shareable_link_message' => 'Share the above link to invite people to join this event.  If a person you share the link with does not have an account yet, they will be prompted to register.',
   'cancel_invites_link' => 'Cancel',
   'manual_invite_box' => 'Send invites to',
   'type_email_addresses_message' => 'Use email addresses separated by commas.',

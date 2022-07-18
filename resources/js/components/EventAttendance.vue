@@ -84,9 +84,9 @@
             </b-tabs>
           </div>
         </div>
+        <EventInviteModal ref="invite" :idevents="idevents" :groupName="event.group.name.trim()" :canedit="canedit" />
       </div>
     </template>
-    <EventInviteModal ref="invite" :idevents="idevents" :groupName="event.group.name.trim()" :canedit="canedit" />
   </CollapsibleSection>
 </template>
 <script>
