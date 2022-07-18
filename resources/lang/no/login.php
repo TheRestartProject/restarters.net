@@ -14,6 +14,5 @@ return [
   'stat_2' => 'CO<sub>2</sub> emissions prevented',
   'stat_3' => 'Waste prevented',
   'stat_4' => 'Events held',
-  'lead' => 'Welcome to our Restarter community',
   'login_title' => 'Sign in',
 ];

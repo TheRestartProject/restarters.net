@@ -1,7 +1,7 @@
 <?php
 
 return [
-  'unavailable_audits' => 'No changes have been made to this device!',
+  'unavailable_audits' => 'Aucun changements n\'ont été faits sur cet appareil!',
   'created' => [
     'metadata' => 'On :audit_created_at, :user_name created record <strong>:audit_url</strong>',
     'modified' => [

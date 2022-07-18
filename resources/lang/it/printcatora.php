@@ -1,16 +1,6 @@
 <?php
 
 return [
-  'task' => [
-    'where_is_the_main_fault' => 'Qual è il guasto principale?',
-    'fetch_another' => 'Non lo so, mostrami un\'altra riparazione',
-    'suggestions' => 'Suggerimenti',
-    'translate' => 'Tradurre',
-    'go_with' => 'Scegli',
-    'source' => 'Fonte',
-    'learn_more' => 'Più informazioni',
-    'strapline' => 'Basta leggere le informazioni sulla stampante rotta e selezionare il tipo di guasto descritto dalla lista sottostante.',
-  ],
   'status' => [
     'status' => 'Stato',
     'items_opinions' => 'Articoli / opinioni',

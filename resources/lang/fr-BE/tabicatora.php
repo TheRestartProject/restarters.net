@@ -1,23 +1,6 @@
 <?php
 
 return [
-  'task' => [
-    'where_is_the_main_fault' => 'Où se trouve le principal défaut?',
-    'fetch_another' => 'Je ne sais pas, chercher une autre réparation',
-    'suggestions' => 'Suggestions',
-    'translate' => 'Traduire',
-    'go_with' => 'Aller avec',
-    'source' => 'La source',
-    'learn_more' => 'Plus d\'informations',
-    'strapline' => 'Il vous suffit de lire les informations relatives à l’appareil en panne et de sélectionner le type de panne décrite dans la liste située en dessous.',
-    'did_you_know' => 'Le saviez-vous ?',
-    'signpost_1' => 'Une tablette moyenne produit l\'équivalent de 150 kg de CO2 au cours de sa vie. Mais comme il faut beaucoup de matériaux précieux et une fabrication intensive pour fabriquer chaque tablette, plus de 75 % de cet impact se produit avant qu\'elle ne soit allumée pour la première fois.',
-    'signpost_2' => 'La réparation d\'un appareil prolonge sa durée de vie, réduit son impact environnemental global et diminue la demande de nouveaux produits. En fait, si nous utilisions chaque ordinateur en Europe pendant un an de plus, nous pourrions économiser l\'équivalent de 3 millions de tonnes de CO2.',
-    'signpost_3' => 'L\'Union européenne prévoit d\'inclure les tablettes et les smartphones dans les règles d\'écoconception d\'ici 2022. Cela nous donnera la possibilité de réclamer le droit de réparer ces appareils. Les règles décidées par l\'UE pourraient également être utilisées pour influencer les lois dans d\'autres endroits, y compris au Royaume-Uni.',
-    'signpost_4' => 'Nous voulons expliquer aux décideurs politiques pourquoi les tablettes se cassent et comment il serait plus facile de les réparer. Les groupes de réparation communautaires du monde entier ont enregistré ces informations, et en essayant TabiCat, vous nous aidez à les analyser.',
-    'signpost_5' => 'Merci! <a href="https://survey.actionproject.eu/chat/?data=U2FsdGVkX1%207YCj%20CRieUSNsHbebWsbk97sB4QRw%2F%206soz4B9MsCqwSYA2WEWYjmPruZ%20bkR8PKsQbSX5dPmLQ%3D%3D">Veuillez répondre à notre enquête</a>',
-    'signpost_6' => 'Merci de votre aide ! Chaque défaut que vous catégorisez rend ces données plus utiles. Pourquoi ne pas <a href="../">rejoindre notre communauté</a>?',
-  ],
   'status' => [
     'status' => 'Statut',
     'items_opinions' => 'Articles / opinions',

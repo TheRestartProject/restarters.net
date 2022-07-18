@@ -14,6 +14,5 @@ return [
   'stat_2' => 'Emissioni di CO<sub>2</sub> prevenute',
   'stat_3' => 'Rifiuti evitati',
   'stat_4' => 'Eventi realizzati',
-  'lead' => 'Benvenuto nella nostra comunita\' di Restarter',
   'login_title' => 'Entra',
 ];

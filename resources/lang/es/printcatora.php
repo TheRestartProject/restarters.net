@@ -18,16 +18,6 @@ return [
     'total' => 'Total',
     'winning_opinion' => 'Opinión mayoritaria',
   ],
-  'task' => [
-    'fetch_another' => 'No lo sé. Mostrar otra reparación',
-    'go_with' => 'Elegir',
-    'source' => 'Fuente',
-    'suggestions' => 'Sugerencias',
-    'translate' => 'Traducir',
-    'where_is_the_main_fault' => '¿Dónde está el fallo principal?',
-    'strapline' => 'Simplemente lea la información sobre la impresora averiada y seleccione el tipo de problema que se describe en la lista a continuación.',
-    'learn_more' => 'Más información',
-  ],
   'branding' => [
     'powered_by' => 'Utilizando datos de:',
   ],

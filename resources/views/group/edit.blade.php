@@ -198,6 +198,7 @@
                       @if (in_array($tag->id, $group_tags))
                       <option value="{{ $tag->id }}" selected>{{ $tag->tag_name }}</option>
                       @else
+{{--                        groups.tag-1, groups.tag-2, groups.tag-3, groups.tag-4, groups.tag-5, groups.tag-6, groups.tag-7, groups.tag-8--}}
                       <option value="{{ $tag->id }}">{{ $tag->tag_name }}</option>
                       @endif
                       @endforeach
