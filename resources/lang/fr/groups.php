@@ -41,7 +41,6 @@ return [
   'invite_group_name_header' => 'Inviter des bénévoles dans le groupe :group',
   'invite_group_name_message' => 'Invitez des bénévoles à rejoindre votre groupe, afin que vous puissiez les inviter plus facilement à vos événements à venir.',
   'email_addresses_field' => 'Adresses courriel',
-  'type_email_addresses_message' => 'Entrez les adresses courriel des personnes que vous souhaitez inviter à ce groupe. Appuyez sur la touche de tabulation (TAB) ou tapez une virgule après chaque adresse courriel.',
   'message_header' => 'Message d\'invitation',
   'message_example_text' => '<ajouter un message personnalisé ici si nécessaire>',
   'message_explainer' => 'Un courriel sera envoyé aux destinataires pour les inviter à rejoindre votre groupe. Si vous le souhaitez, ajoutez un message supplémentaire à votre courriel en remplissant le champ ci‐dessus.',

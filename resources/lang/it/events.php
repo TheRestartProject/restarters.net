@@ -25,7 +25,6 @@ return [
   'invite_restarters_modal_description' => 'Un evento di riparazione non è nulla senza volontari. Invitali al tuo evento qui.',
   'send_invites_to_restarters_tickbox' => 'Aggiungi inviti per i membri del gruppo. I membri contrassegnati con un ⚠ saranno invitati ma non riceveranno un\'e-mail a causa delle loro impostazioni di notifica.',
   'manual_invite_box' => 'Spedisici invito a',
-  'type_email_addresses_message' => 'Nota: puoi anche digitare manualmente l\'indirizzo email di chiunque desideri invitare a questo evento. Premi la scheda inserisci o una virgola dopo ogni indirizzo email inserito.',
   'message_to_restarters' => 'Messaggio di invito',
   'message_explainer' => 'Un invito con i dettagli dell\'evento sara\' spedito agli invitati. Se vuoi puoi aggiungere un messaggio all\'invito scrivendolo nel riquadro sopra',
   'sample_text_message_to_restarters' => '<aggiungi un messaggio personale se necessario>',

@@ -41,7 +41,6 @@ return [
   'invite_group_name_header' => 'Inviter des bénévoles dans le repair café :group',
   'invite_group_name_message' => 'Invitez des bénévoles à rejoindre votre repair café, afin que vous puissiez les inviter plus facilement à vos événements à venir.',
   'email_addresses_field' => 'Adresses e-mail',
-  'type_email_addresses_message' => 'Entrez les adresses e‐mail des personnes que vous souhaitez inviter à ce groupe. Appuyez sur la touche de tabulation (TAB) ou tapez une virgule après chaque adresse e-mail.',
   'message_header' => 'Message d\'invitation',
   'message_example_text' => '<ajouter un message personnalisé ici si nécessaire>',
   'message_explainer' => 'Un e-mail sera envoyé aux destinataires pour les inviter à rejoindre votre repair café. Si vous le souhaitez, ajoutez un message supplémentaire à votre e-mail en remplissant le champ ci‐dessus.',

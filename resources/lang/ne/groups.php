@@ -75,5 +75,4 @@ return [
   'tag-7' => 'Label 7',
   'tag-8' => 'Label 8',
   'town-city-placeholder' => 'Bv Parijs, Londen, Brussel',
-  'type_email_addresses_message' => 'Typ hier de e-mailadressen van de mensen die je wilt uitnodigen om lid te worden van je groep. Zet een tab of komma achter elk e-mailadres.',
 ];

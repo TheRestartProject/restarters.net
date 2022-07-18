@@ -41,7 +41,6 @@ return [
   'invite_group_name_header' => 'Invita volontari a :group',
   'invite_group_name_message' => 'Invita volontari ad unirsi al tuo gruppo, in modo da poterli avere più facilmente ai tuoi prossimi eventi.',
   'email_addresses_field' => 'Indirizzi email',
-  'type_email_addresses_message' => 'Digita gli indirizzi email delle persone che desideri invitare a questo gruppo. Premi il tasto tab o virgola dopo ogni indirizzo email.',
   'message_header' => 'Messaggio di invito',
   'message_example_text' => '<aggiungi un messaggio qui se richiesto>',
   'message_explainer' => 'Verrà inviata un\'email agli invitati, invitandoli a unirsi al tuo gruppo. Se lo desideri, puoi includere un messaggio aggiuntivo nell\'email compilando la casella sopra.',

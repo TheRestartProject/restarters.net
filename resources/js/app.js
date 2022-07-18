@@ -5,7 +5,6 @@
 */
 
 require('./bootstrap');
-require('./bootstrap-tokenfield.min');
 require('./bootstrap-sortable.js');
 require('select2');
 require('slick-carousel');
@@ -55,7 +54,6 @@ Lang.setFallback('en')
 Lang.setMessages(translations)
 
 window.Dropzone = require('dropzone');
-window.Tokenfield = require("tokenfield");
 
 if ( jQuery('.slideshow').length > 0 ) {
   jQuery('.slideshow').slick({
@@ -238,47 +236,6 @@ function onboarding() {
 
   }
 }
-
-function serialize(tokenfield) {
-  var items = tokenfield.getItems();
-  //console.log(items);
-  var prop;
-  var data = {};
-  items.forEach(function (item) {
-    if (item.isNew) {
-      prop = tokenfield._options.newItemName;
-    } else {
-      prop = tokenfield._options.itemName;
-    }
-    if (typeof data[prop] === 'undefined') {
-      data[prop] = [];
-    }
-    if (item.isNew) {
-      data[prop].push(item.name);
-    } else {
-      data[prop].push(item[tokenfield._options.itemValue]);
-    }
-  });
-  return data;
-}
-
-// function initTokenfields() {
-//     if ( document.querySelectorAll('.tokenfield').length > 0 ) {
-//
-//         var tokens = document.querySelector('#prepopulate');
-//
-//         var tf = new Tokenfield({
-//             el: document.querySelector('.tokenfield')
-//         });
-//
-//         tf.on('change', function () {
-//             var out = JSON.stringify(serialize(tf), null, 2);
-//             tokens.value = out;
-//         });
-//
-//     }
-//
-// }
 
 var placeSearch, autocomplete;
 var componentForm = {
@@ -845,7 +802,6 @@ function initAutocomplete() {
   Dropzone.autoDiscover = false;
   registration();
   onboarding();
-  //initTokenfields();
   numericInputs();
   eventsMap();
   truncate();
@@ -1100,8 +1056,6 @@ function initAutocomplete() {
       });
     });
 
-    $('.tokenfield').tokenfield();
-
     var $current_column = $('input[name=sort_column]:checked').val();
 
     $('input[name=sort_column]').on('click', function(e) {
@@ -1140,56 +1094,6 @@ function initAutocomplete() {
         }
       });
 
-    });
-
-    $("#invites_to_volunteers").on("click", function(){
-      if (this.checked){
-        var event_id = $('#event_id').val();
-
-        $.ajax({
-          headers: {
-            'X-CSRF-TOKEN': $("input[name='_token']").val()
-          },
-          type: 'get',
-          url: '/party/get-group-emails-with-names/'+event_id,
-          datatype: 'json',
-          success: function(data) {
-            var current_items = $('#manual_invite_box').tokenfield('getTokens');
-            var new_items = data;
-
-            var pop_arr = [];
-
-            // Keep all the items that were already there.
-            current_items.forEach(function(current_item) {
-                var manual_email = {
-                    value: current_item.value,
-                    label: current_item.value
-                };
-                pop_arr.push(manual_email);
-            });
-
-            // Add the new items - i.e. existing volunteers for the group.
-            new_items.forEach(function(new_item) {
-                var label = '';
-                if (! new_item.invites)
-                    label += '\u{26A0} ';
-                label += new_item.name;
-
-                var volunteer = {
-                    value: new_item.email,
-                    label: label
-                };
-                pop_arr.push(volunteer);
-            });
-
-            $('#manual_invite_box').tokenfield('setTokens', pop_arr);
-          },
-            error: function(xhr, status, error) {
-                var err = JSON.parse(xhr.responseText);
-                console.log(err);
-          }
-        });
-      }
     });
 
     $('#start-time').on('change', function() {
@@ -1260,54 +1164,6 @@ function initAutocomplete() {
       window.prompt("Copy to clipboard: Ctrl+C or Command+C, Enter", content_to_copy);
     }
   }
-
-
-  function tokenFieldCheck(){
-    setTimeout(function(){
-      var count_tokens = document.getElementById("manual_invite_box").value.split(",");
-      var disabled = false
-
-      if( $('#manual_invite_box').val() === '' ) {
-        disabled = true
-      } else if( count_tokens.length === 0 ) {
-        disabled = true
-      } else {
-        for (var i = 0; i < count_tokens.length; i++) {
-          if (!count_tokens[i] || count_tokens[i].indexOf('@') == -1 ) {
-            disabled = true
-          }
-        }
-      }
-
-      $('#event-invite-to button, #invite-to-group button').prop('disabled', disabled);
-    }, 500);
-  }
-
-
-  $('#manual_invite_box').on('tokenfield:createtoken', function (event) {
-    var existingTokens = $(this).tokenfield('getTokens');
-    var newval = event.attrs.value
-
-    $.each(existingTokens, function(index, token) {
-      if (token.value === newval)
-      event.preventDefault();
-    });
-
-    if (!newval || newval.indexOf('@') == -1) {
-      // This is a very basic check that we're putting in something which looks like an email.  Email regexp validation
-      // is a bit of a fool's errand, and in the longer term this code will be replaced by Vue and/or a different
-      // invitation model.
-      $(event.target).closest('div.tokenfield').css('border', '2px solid red')
-    } else {
-      $(event.target).closest('div.tokenfield').css('border', '')
-    }
-
-      tokenFieldCheck();
-  });
-
-  $('#manual_invite_box').on('tokenfield:removedtoken', function (event) {
-    tokenFieldCheck();
-  });
 
   function deviceFormCollect($form) {
     var formdata = $form.serializeArray()

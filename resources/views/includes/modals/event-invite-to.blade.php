@@ -51,8 +51,9 @@
 
               <div id="invite_div" class="form-group">
                 <label for="manual_invite_box">@lang('events.manual_invite_box'):</label>
-                <input type="text" id="manual_invite_box" name="manual_invite_box" class="tokenfield form-control" autocomplete="off">
+                <input id="manual_invite_box" type="email" inputmode="text" multiple name="manual_invite_box" class="form-control" autocomplete="off" onblur="reportValidity()">
               </div>
+              <small class="after-offset">@lang('events.type_email_addresses_message')</small>
               @if( App\Helpers\Fixometer::userHasEditPartyPermission($formdata->id, Auth::user()->id) || App\Helpers\Fixometer::hasRole(Auth::user(), 'Administrator') )
                 <div class="form-check">
                   <label class="form-check-label" for="invites_to_volunteers">
@@ -62,7 +63,6 @@
                 </div>
                 <br>
               @endif
-              <small class="after-offset">@lang('events.type_email_addresses_message')</small>
               <hr/>
               <div class="form-group">
                 <label for="message_to_restarters">@lang('events.message_to_restarters'):</label>
@@ -71,7 +71,7 @@
 
               <div class="d-flex flex-row justify-content-between align-items-center">
                 <a href="#" class="text-dark mb-0" data-dismiss="modal">@lang('events.cancel_invites_link')</a>
-                <button disabled type="submit" class="btn btn-primarym-0">@lang('events.send_invite_button')</button>
+                <button type="submit" class="btn btn-primarym-0">@lang('events.send_invite_button')</button>
               </div>
             </form>
           </div>

@@ -52,7 +52,7 @@ return [
   'cancel_invites_link' => 'Cancel',
   'invite_restarters_modal_description' => 'A repair event is nothing without volunteers. Invite them to your event here.',
   'manual_invite_box' => 'Send invites to',
-  'type_email_addresses_message' => 'Note: you can also manually type in the email address of anyone else you would like to invite to this event.  Press the tab, enter or comma key after each email address that you enter.',
+  'type_email_addresses_message' => 'Use email addresses separated by commas.',
   'message_to_restarters' => 'Invitation message',
   'message_explainer' => 'Type in the email addresses of the people you would like to invite to this event. Press the tab or comma key after each email address.',
   'send_invite_button' => 'Send invites',
