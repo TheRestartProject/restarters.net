@@ -347,15 +347,13 @@ class Device extends Model implements Auditable
 
     public function eCo2Diverted($emissionRatio, $displacementFactor)
     {
-        return Device::eCo2DivertedCalc($emissionRatio, $displacementFactor, $this->isFixed(), $this->deviceCategory->idcategories, env('MISC_CATEGORY_ID_POWERED'), $this->estimate, $this->deviceCategory->footprint);
+        return Device::eCo2DivertedCalc($emissionRatio, $displacementFactor, $this->isFixed(), $this->deviceCategory, env('MISC_CATEGORY_ID_POWERED'), $this->estimate, $this->deviceCategory->footprint);
     }
 
     /**
      * Powered estimate only takes precedence over category weight when Misc and if not 0.
      */
     public static function eCo2DivertedCalc($emissionRatio, $displacementFactor, $fixed, $category, $miscPoweredCategory, $estimate, $categoryFootprint) {
-        $footprint = 0;
-
         if ($fixed) {
             if ($category == $miscPoweredCategory && $estimate > 0) {
                 $footprint = $estimate * $emissionRatio;
