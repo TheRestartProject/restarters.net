@@ -152,7 +152,7 @@ class GroupController extends Controller
                     'country' => $country,
                     'free_text' => $text,
                     'shareable_code' => Fixometer::generateUniqueShareableCode(\App\Group::class, 'shareable_code'),
-                    'timezone' => $timezone
+                    'timezone' => $timezone,
                 ];
 
                 try {

@@ -3,12 +3,9 @@
 namespace App\Notifications;
 
 use Illuminate\Bus\Queueable;
-use Illuminate\Contracts\Queue\ShouldQueue;
-use Illuminate\Notifications\Action;
 use Illuminate\Notifications\Messages\MailMessage;
-use Illuminate\Notifications\Notification;
 
-class JoinEvent extends Notification implements ShouldQueue
+class JoinEvent extends BaseNotification
 {
     use Queueable;
 
@@ -106,8 +103,6 @@ class JoinEvent extends Notification implements ShouldQueue
                 }
 
                 $mail->line($eventDetailsTable)
-                     ->action(__('notifications.join_event_rsvp_now'), $this->arr['url'])
-                     ->line('')
                      ->line($ignoreLine)
                      ->line('');
 
@@ -127,8 +122,6 @@ class JoinEvent extends Notification implements ShouldQueue
             }
 
             $mail->line($eventDetailsTable)
-                 ->action(__('notifications.join_event_rsvp_now', [], $locale), $this->arr['url'])
-                 ->line('')
                  ->line(__('notifications.join_event_rsvp_now', [], $locale))
                  ->line('')
                  ->line($ignoreLine);

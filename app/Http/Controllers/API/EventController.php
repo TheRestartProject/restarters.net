@@ -223,4 +223,9 @@ class EventController extends Controller
             'volunteers' => $volunteers
         ]);
     }
+
+    public function getEventv2(Request $request, $idevents) {
+        $party = Party::findOrFail($idevents);
+        return \App\Http\Resources\Party::make($party);
+    }
 }

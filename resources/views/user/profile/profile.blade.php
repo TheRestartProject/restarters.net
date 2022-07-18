@@ -139,8 +139,8 @@
 
     <div class="col-lg-6 d-flex col-bottom" id="change-photo">
     <div class="edit-panel">
-        <h4>@lang('general.change_photo')</h4>
-        <p>@lang('general.change_photo_text')</p>
+        <h4>@lang('profile.change_photo')</h4>
+        <p>@lang('profile.change_photo_text')</p>
         <form action="/profile/edit-photo" method="post" enctype="multipart/form-data">
         @csrf
 
@@ -148,7 +148,7 @@
 
         <div class="form-row">
             <div class="form-group col-lg-12">
-            <label for="profilePhoto">@lang('general.profile_picture'):</label>
+            <label for="profilePhoto">@lang('profile.profile_picture'):</label>
             <input type="file" class="form-control" id="profilePhoto" name="profilePhoto">
             <!-- <input type="file" class="form-control file" name="profile"data-show-upload="false" data-show-caption="true"> -->
             </div>
@@ -162,7 +162,7 @@
             </div>
             <div class="form-group col-lg-8">
             <div class="d-flex justify-content-end">
-                <button type="submit" class="btn btn-primary">@lang('general.change_photo')</button>
+                <button type="submit" class="btn btn-primary">@lang('profile.change_photo')</button>
             </div>
             </div>
         </div>

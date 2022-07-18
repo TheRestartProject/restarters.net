@@ -92,9 +92,9 @@
 
                     <div class="col-12">
 
-                      <div class="row row-compressed">
+                      <div class="row row-compressed mb-1">
                         <div class="col-lg-7">
-                          <div class="form-group">
+                          <div class="form-group mb-1">
                             <label for="autocomplete">@lang('groups.location'):</label>
                             <input type="text" placeholder="@lang('groups.groups_location_placeholder')" id="autocomplete" name="location" class="form-control field field-geolocate" aria-describedby="locationHelpBlock" value="{{ $formdata->location }}" />
 
@@ -124,11 +124,12 @@
                               @lang('groups.groups_postcode_small')
                             </small>
 
-                            <div class="vue">
-                              <GroupTimeZone value="{{ App\Group::find($formdata->idgroups)->timezone }}" />
-                            </div>
-
                           </div>
+
+                          <div class="vue">
+                            <GroupTimeZone value="{{ App\Group::find($formdata->idgroups)->timezone }}" />
+                          </div>
+
                         </div>
 
                         <div class="col-lg-5">
@@ -198,6 +199,7 @@
                       @if (in_array($tag->id, $group_tags))
                       <option value="{{ $tag->id }}" selected>{{ $tag->tag_name }}</option>
                       @else
+{{--                        groups.tag-1, groups.tag-2, groups.tag-3, groups.tag-4, groups.tag-5, groups.tag-6, groups.tag-7, groups.tag-8--}}
                       <option value="{{ $tag->id }}">{{ $tag->tag_name }}</option>
                       @endif
                       @endforeach
