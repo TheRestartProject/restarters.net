@@ -12,12 +12,10 @@
                       :suppress-type-warning="suppressTypeWarning" :powered="powered"
                       :unknown.sync="unknownItemType"
           />
-          <div class="border-danger">
-            Computed category: {{ computedCategoryName }}, {{ computedPowered }}
-          </div>
-          <DeviceCategorySelect v-if="unknownItemType" :class="{
+          <DeviceCategorySelect :class="{
             'mb-2': true,
-            'border-thick': missingCategory
+            'border-thick': missingCategory,
+            'pulsate': pulsating,
             }" :category.sync="currentDevice.category" :clusters="clusters" :powered="powered"
                                 :icon-variant="add ? 'black' : 'brand'" :disabled="disabled" @changed="categoryChange"/>
 
@@ -184,7 +182,8 @@ export default {
     return {
       currentDevice: {},
       missingCategory: false,
-      unknownItemType: false
+      unknownItemType: false,
+      pulsating: false
     }
   },
   watch: {
@@ -192,6 +191,17 @@ export default {
       if (this.missingCategory && newval) {
         // Reset warning.
         this.missingCategory = false
+      }
+    },
+    suggestedCategory(newval) {
+      if (newval) {
+        this.currentDevice.category = newval.idcategories
+
+        // Make it obvious that we have done this to encourage people to review it rather than ignore it.
+        this.pulsating = true
+        setTimeout(() => {
+          this.pulsating = false
+        }, 2000)
       }
     }
   },
@@ -202,7 +212,7 @@ export default {
     currentCategory () {
       return this.currentDevice ? this.currentDevice.category : null
     },
-    computedCategory() {
+    suggestedCategory() {
       let ret = null
 
       if (this.currentDevice && this.currentDevice.item_type) {
@@ -211,7 +221,7 @@ export default {
           cluster.categories.forEach((c) => {
             const name = this.$lang.get('strings.' + c.name)
 
-            if (name === this.currentDevice.item_type) {
+            if (Boolean(c.powered) === Boolean(this.powered) && name === this.currentDevice.item_type) {
               ret = {
                 categoryname: c.name,
                 powered: c.powered
@@ -223,7 +233,7 @@ export default {
         if (!ret) {
           // Now check the item types.
           this.itemTypes.forEach(t => {
-            if (this.currentDevice.item_type === t.item_type) {
+            if (Boolean(t.powered) === Boolean(this.powered) && this.currentDevice.item_type === t.item_type) {
               ret = t
             }
           })
@@ -232,12 +242,15 @@ export default {
 
       return ret
     },
-    computedCategoryName() {
-      return this.computedCategory ? this.computedCategory.categoryname : null
+    suggestedCategoryId() {
+      return this.suggestedCategory ? this.suggestedCategory.idcategories : null
+    },
+    suggestedCategoryName() {
+      return this.suggestedCategory? this.suggestedCategory.categoryname : null
     },
     computedPowered() {
-      if (this.computedCategory) {
-        if (this.computedCategory.powered) {
+      if (this.suggestedCategory) {
+        if (this.suggestedCategory.powered) {
           return 'Powered'
         } else {
           return 'Unpowered'
@@ -570,5 +583,10 @@ h3 {
 
 /deep/ .form-text {
   line-height: 1rem;
+}
+
+.pulsate {
+  -webkit-animation: pulsate 1s ease-out;
+  -webkit-animation-iteration-count: infinite;
 }
 </style>

@@ -50,7 +50,8 @@ export default {
   },
   computed: {
     suggestions() {
-      return this.itemTypes.map(i => i.item_type)
+      const ret = this.itemTypes.filter(i => Boolean(i.powered) === Boolean(this.powered)).map(i => i.item_type)
+      return ret
     },
     notASuggestion() {
       if (!this.currentType) {
