@@ -4,12 +4,37 @@ namespace App\Notifications;
 
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
-use Illuminate\Notifications\Messages\MailMessage;
 use Illuminate\Notifications\Notification;
 
-// Don't ShouldQueue yet - we're intentionally only doing this for admin notifications.
-class BaseNotification extends Notification
+abstract class BaseNotification extends Notification implements ShouldQueue
 {
+    use Queueable;
+
+    protected $arr;
+    protected $user;
+
+    public function __construct($arr, $user = null)
+    {
+        $this->arr = $arr;
+        $this->user = $user;
+    }
+
+    /**
+     * Get the notification's delivery channels.
+     *
+     * @param  mixed  $notifiable
+     * @return array
+     */
+    public function via($notifiable)
+    {
+        // If user being notified has opted in to receive emails.
+        if ($notifiable->invites == 1) {
+            return ['mail', 'database'];
+        }
+
+        return ['database'];
+    }
+
     public function failed($e)
     {
         if (gettype($e) == 'string') {

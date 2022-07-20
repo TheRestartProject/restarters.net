@@ -2,41 +2,10 @@
 
 namespace App\Notifications;
 
-use Illuminate\Bus\Queueable;
-use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Notifications\Messages\MailMessage;
 
-class AdminUserDeleted extends BaseNotification implements ShouldQueue
+class AdminUserDeleted extends BaseNotification
 {
-    use Queueable;
-
-    protected $arr;
-
-    /**
-     * Create a new notification instance.
-     *
-     * @return void
-     */
-    public function __construct($arr)
-    {
-        $this->arr = $arr;
-    }
-
-    /**
-     * Get the notification's delivery channels.
-     *
-     * @param  mixed  $notifiable
-     * @return array
-     */
-    public function via($notifiable)
-    {
-        if ($notifiable->invites == 1) {
-            return ['mail', 'database'];
-        }
-
-        return ['database'];
-    }
-
     /**
      * Get the mail representation of the notification.
      *

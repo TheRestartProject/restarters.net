@@ -652,10 +652,12 @@ class CreateEventTest extends TestCase
         // Clear any jobs queued in earlier tests.
         $max = 1000;
         do {
-            $job = Queue::pop();
+            $job = Queue::pop('database');
 
             if ($job) {
-                $job->fail('removed in UT');
+                try {
+                    $job->fail('removed in UT');
+                } catch (\Exception $e) {}
             }
 
             $max--;
@@ -663,7 +665,7 @@ class CreateEventTest extends TestCase
         while (Queue::size() > 0 && $max > 0);
 
         // Create an event.
-        $initialQueueSize = \Illuminate\Support\Facades\Queue::size();
+        $initialQueueSize = \Illuminate\Support\Facades\Queue::size('database');
         $event = factory(Party::class)->raw();
         $event['group'] = $group->idgroups;
         $response = $this->post('/party/create/', $event);
@@ -672,26 +674,21 @@ class CreateEventTest extends TestCase
         // Should have queued AdminModerationEvent.
         $queueSize = Queue::size();
         self::assertGreaterThan($initialQueueSize, $queueSize);
-        $max = 1000;
-        do {
-            $job = Queue::pop();
 
-            if ($job) {
-                self::assertStringContainsString('AdminModerationEvent', $job->getRawBody());
-                $job->fail('removed in UT');
-            }
+        // Fail it.
+        $job = Queue::pop();
+        self::assertNotNull($job);
+        self::assertStringContainsString('AdminModerationEvent', $job->getRawBody());
+        try {
+            $job->fail('removed in UT');
+        } catch (\Exception $e) {}
+        self::assertEquals(0, Queue::size('database'));
 
-            $max--;
-        }
-        while (Queue::size() > 0 && $max > 0);
-
-        self::assertEquals(0, Queue::size());
-
-        // Approval should generate a notification to the host which is not queued.
+        // Approval should generate a notification to the host which is also queued.
         $event = Party::latest()->first();
         $event->approve();
 
-        # Should not have queued anything
-        self::assertEquals(0, Queue::size());
+        # Should have queued ApproveEvent.
+        self::assertEquals(0, Queue::size('database'));
     }
 }
