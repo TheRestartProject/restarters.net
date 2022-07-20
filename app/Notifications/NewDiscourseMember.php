@@ -22,7 +22,7 @@ class NewDiscourseMember extends BaseNotification
             ->line(__('groups.talk_group_add_body', [
                 'group_name' => $this->arr['group_name']
             ]))
-            ->line(__('notifications.email_preference', [
+            ->line(__('notifications.email_preferences', [
                 'url' => url('/user/edit/' . $notifiable->id)
             ]));
     }
