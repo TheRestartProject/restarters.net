@@ -1,13 +1,13 @@
 <?php
 
 return [
-  'failed' => 'Ces références ne correspondent pas à notre base de données',
+  'failed' => 'Soit cette adresse électronique n’est pas enregistrée dans le système, soit le mot de passe est incorrect.',
   'throttle' => 'Trop de tentatives de connexion. S\'il vous plaît réessayer dans :seconds secondes.',
-  'email_address' => 'Courriel',
-  'email_address_validation' => 'Svp tapez une adresse courriel valide',
+  'email_address' => 'Adresse e-mail',
+  'email_address_validation' => 'Veuillez taper une adresse e-mail valide',
   'sign_in' => 'Je m’en souviens. Retour à la connexion.',
   'forgotten_pw' => 'Vous avez oublié votre mot de passe?',
-  'forgotten_pw_text' => 'Cela arrive à tout le monde ! Entrez simplement votre courriel ci‐dessous pour recevoir un message de réinitialisation de mot de passe.',
+  'forgotten_pw_text' => 'Ça arrive à tout le monde ! Entrez simplement votre adresse e-mail ci‐dessous pour recevoir un message de réinitialisation de mot de passe.',
   'reset' => 'Réinitialiser',
   'password' => 'Mot de passe',
   'repeat_password' => 'Répétez le mot de passe',
@@ -25,10 +25,10 @@ return [
   'delete_account_text' => 'J\'accepte que le fait d\'effacer mon compte supprimera toutes mes données personnelles et que ceci constitue une action permanente',
   'save_preferences' => 'Sauvegarder les préférences',
   'set_preferences' => 'Cliquez ici pour définir vos préférences de messagerie pour notre plate‐forme de discussion',
-  'profile_admin' => 'Admin only',
+  'profile_admin' => 'Administrateur',
   'profile_admin_text' => 'Les administrateurs ont ici la possibilité de changer le rôle d\'un utilisateur ou de ses groupes attribués',
   'user_role' => 'Rôle d\'utilisateur',
-  'assigned_groups' => 'Groupes attribués',
+  'assigned_groups' => 'Attribués aux Repair Cafés',
   'save_user' => 'Sauver utilisateur',
   'login_before_using_shareable_link' => 'Pour compléter votre invitation, veuillez créer un compte ci-dessous, ou si vous avez déjà un compte <a href=":login_url">connectez-vous</a>.',
 ];

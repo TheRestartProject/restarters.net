@@ -82,7 +82,7 @@
       <li style="width:130px;"><a style="text-transform: initial;  background: white; color: black; margin-bottom: 10px; border: 2px solid black; width: 120px; height: 40px;" href="/login">@lang('login.login_title')</a></li>
       <li style="width:130px;"><a style="text-transform: initial; background: black; color: white; margin-bottom: 10px; width: 120px; height: 40px;" href="/user/register">@lang('login.join_title_short')</a></li>
     @else
-      <li class="d-flex">
+      <li class="d-flex" style="width: 152px">
           <div class="vue">
             <Notifications :user-id="{{{ Auth::user()->id }}}" discourse-base-url="{{{ env('DISCOURSE_URL') }}}" discourse-user-name="{{{ Auth::user()->username }}}" />
           </div>

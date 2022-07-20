@@ -114,6 +114,7 @@ class GroupController extends Controller
             $website = $request->input('website');
             $location = $request->input('location');
             $text = $request->input('free_text');
+            $timezone = $request->input('timezone');
 
             if (empty($name)) {
                 $error['name'] = 'Please input a name.';
@@ -151,6 +152,7 @@ class GroupController extends Controller
                     'country' => $country,
                     'free_text' => $text,
                     'shareable_code' => Fixometer::generateUniqueShareableCode(\App\Group::class, 'shareable_code'),
+                    'timezone' => $timezone,
                 ];
 
                 try {
@@ -537,7 +539,7 @@ class GroupController extends Controller
         $Group = new Group;
         $File = new FixometerFile;
 
-        $group = Group::find($id);
+        $group = Group::findOrFail($id);
         $is_host_of_group = Fixometer::userHasEditGroupPermission($id, $user->id);
         $isCoordinatorForGroup = $user->isCoordinatorForGroup($group);
 
@@ -605,11 +607,12 @@ class GroupController extends Controller
                 //return redirect()->back()->with('error', 'Could not find group location - please try again!');
             }
 
+            $old_zone = $group->timezone;
             $update = [
                 'name' => $data['name'],
-                'website' => $data['website'],
+                'website' => array_key_exists('website', $data) ? $data['website'] : null,
                 'free_text' => $data['free_text'],
-                'location' => $data['location'],
+                'location' => array_key_exists('location', $data) ? $data['location'] : null,
                 'timezone' => array_key_exists('timezone', $data) ? $data['timezone'] : null,
                 'latitude' => $latitude,
                 'longitude' => $longitude,
@@ -621,7 +624,18 @@ class GroupController extends Controller
                 $update['postcode'] = $data['postcode'];
             }
 
-            $u = Group::findOrFail($id)->update($update);
+            $u = $group->update($update);
+
+            if ($update['timezone'] != $old_zone) {
+                // The timezone of the group has changed.  Update the zone of any future events.  This happens
+                // sometimes when a group is created and events are created before the group is approved (and therefore
+                // before the admin has a chance to set the zone on the group.
+                foreach ($group->upcomingParties() as $party) {
+                    $party->update([
+                        'timezone' => $update['timezone']
+                    ]);
+                }
+            }
 
             if (Fixometer::hasRole($user, 'Administrator')) {
                 if (! empty($_POST['group_tags'])) {

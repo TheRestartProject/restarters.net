@@ -1,10 +1,6 @@
 <?php
 
 return [
-  'aboutNetworkHeader' => 'A propos :name',
-  'allNetworks' => 'Tous les réseaux',
-  'allNetworksExplainer' => 'Tous les réseaux dans le système (seulement administrateur)',
-  'allNetworksNoNetworks' => 'Il n\'y a pas de réseaux dans le système',
   'edit' => [
     'button_save' => 'Sauver les changements',
     'label_logo' => 'Logo du réseau',
@@ -35,8 +31,4 @@ return [
     'add_groups_warning_none_selected' => 'Pas de repair café(s) sélectionné(s)',
     'view_groups_menuitem' => 'Voir les repair cafés',
   ],
-  'single-network' => 'réseau :networkName',
-  'yourNetworks' => 'Vos réseaux',
-  'yourNetworksExplainer' => 'Voici les réseaux dont vous êtes coordinateur',
-  'yourNetworksNoNetworks' => 'Vous n\'êtes coordinateur d\'aucun réseau',
 ];

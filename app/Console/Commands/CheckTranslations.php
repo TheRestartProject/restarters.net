@@ -60,7 +60,7 @@ class CheckTranslations extends Command
 
                 foreach ($keys as $key => $value) {
                     // Find the translation in the languages we care about.
-                    foreach (['fr-BE'] as $other) {
+                    foreach (['fr-BE', 'fr'] as $other) {
                         // First we want to check if the translation is used in the code.  If it's not, then we
                         // will want to remove it and it doesn't matter if it is not translated properly.
                         if (!$this->usedInCode("$group.$key")) {
@@ -93,6 +93,7 @@ class CheckTranslations extends Command
             'resources/js/mixins/',           // Vue mixins (rare)
             'app/Notifications/',             // Email notifications
             'app/Http/Controllers/',          // Controllers (rarely)
+            'app/Http/Middleware/',           // Middleware(rarely)
             'app/Services/'                   // Services(rarely)
                  ] as $loc) {
             $cmd = 'grep -r "' . addslashes($key) . '" ' . $loc . ' > /dev/null';

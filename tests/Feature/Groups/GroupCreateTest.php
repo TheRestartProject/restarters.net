@@ -55,6 +55,7 @@ class GroupCreateTest extends TestCase
             'website' => 'https://therestartproject.org',
             'location' => 'London',
             'free_text' => 'Some text.',
+            'timezone' => 'Europe/London'
         ]);
 
         $this->assertContains('That group name (Test Group0) already exists', $response->getContent());
@@ -160,4 +161,26 @@ class GroupCreateTest extends TestCase
         $this->get('/party/view/'.$event->idevents)->assertSee(e($eventAttributes['venue']));
         $this->get('/party')->assertSee(e($eventAttributes['venue']));
     }
+
+    public function testCreateTimezone()
+    {
+        $this->loginAsTestUser(Role::ADMINISTRATOR);
+
+        // Test creating the same group twice.
+        $response = $this->post('/group/create', [
+            'name' => 'Test Group0',
+            'website' => 'https://therestartproject.org',
+            'location' => 'London',
+            'free_text' => 'Some text.',
+            'timezone' => 'Asia/Samarkand'
+        ]);
+
+        $response->assertRedirect();
+        $redirectTo = $response->getTargetUrl();
+        $this->assertNotFalse(strpos($redirectTo, '/group/edit'));
+        $group = Group::latest()->first();
+        $this->assertEquals('Asia/Samarkand', $group->timezone);
+    }
+
+
 }

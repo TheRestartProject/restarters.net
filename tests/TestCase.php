@@ -25,6 +25,8 @@ use Carbon\Carbon;
 use DB;
 use Hash;
 use Illuminate\Foundation\Testing\TestCase as BaseTestCase;
+use Illuminate\Support\Facades\Artisan;
+use Illuminate\Support\Facades\Queue;
 use Symfony\Component\DomCrawler\Crawler;
 
 abstract class TestCase extends BaseTestCase
@@ -99,6 +101,8 @@ abstract class TestCase extends BaseTestCase
         if (isset($_FILES)) {
             unset($_FILES);
         }
+
+        $this->processQueuedNotifications();
     }
 
     public function userAttributes()
@@ -142,6 +146,7 @@ abstract class TestCase extends BaseTestCase
             'website' => $website,
             'location' => $location,
             'free_text' => $text,
+            'timezone' => 'Europe/London'
         ]);
 
         if ($assert) {
@@ -303,5 +308,12 @@ abstract class TestCase extends BaseTestCase
         $this->assertTrue($foundSome);
 
         return $props;
+    }
+
+    public function processQueuedNotifications() {
+        // Process queued notifications.
+        while (Queue::size() > 0) {
+            Artisan::call('queue:work', ['--once' => true]);
+        }
     }
 }

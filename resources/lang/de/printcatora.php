@@ -1,15 +1,6 @@
 <?php
 
 return [
-  'task' => [
-    'where_is_the_main_fault' => 'Was ist der Hauptfehler',
-    'fetch_another' => 'Ich weiß es nicht, zeig eine andere Reparatur',
-    'suggestions' => 'Vorschläge',
-    'translate' => 'Übersetzen',
-    'go_with' => 'Wähle',
-    'source' => 'Quelle',
-    'strapline' => 'Lesen Sie einfach die Informationen über den defekten Drucker und wählen Sie die Art des beschriebenen Fehlers aus der Liste darunter aus.',
-  ],
   'status' => [
     'status' => 'Status',
     'items_opinions' => 'Artikel / Meinungen',

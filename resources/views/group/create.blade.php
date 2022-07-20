@@ -55,7 +55,7 @@
                 </div>
                 <small class="after-offset">@lang('groups.groups_website_small')</small>
 
-                <div class="form-group">
+                <div class="form-group mt-4">
                   <label for="grp_about">@lang('groups.groups_about_group'):</label>
                   <div class="vue">
                     <RichTextEditor name="free_text" class="mb-2" />
@@ -70,9 +70,9 @@
 
                     <div class="col-12">
 
-                        <div class="row row-compressed">
+                        <div class="row row-compressed mb-1">
                             <div class="col-lg-7">
-                              <div class="form-group">
+                              <div class="form-group mb-1">
                                 <label for="autocomplete">@lang('groups.location'):</label>
                                 <input type="text" placeholder="@lang('groups.groups_location_placeholder')" id="autocomplete" name="location" class="form-control field field-geolocate" aria-describedby="locationHelpBlock"  />
 
@@ -80,6 +80,9 @@
                                   @lang('groups.groups_location_small')
                                 </small>
 
+                                <div class="vue">
+                                  <GroupTimeZone />
+                                </div>
                               </div>
 
                               <div style="position: absolute; left: -10000px; top: -10000px;">
@@ -110,6 +113,11 @@
                                 </div>
 
                               </div>
+
+                              <div class="vue">
+                                <GroupTimeZone :value="null" />
+                              </div>
+
                             </div>
                             <div class="col-lg-5">
                               <div id="map-plugin" class="events__map"></div>
@@ -119,30 +127,27 @@
                     </div>
                   </div>
 
+                  <div class="row">
 
-                  <div class="form-group">
+                    <div class="col-12">
 
-                      <div class="previews"></div>
+                      <div class="row row-compressed mb-1">
 
-                      <label for="file">@lang('groups.group_image'):</label>
+                        <div class="form-group">
 
-                      <!-- <form id="dropzoneSingleEl" class="dropzone" action="/" method="post" enctype="multipart/form-data" data-field1="@lang('groups.field_group_images')" data-field2="@lang('groups.field_group_images_2')"> -->
+                          <div class="previews"></div>
+
+                          <label for="file">@lang('groups.group_image'):</label>
+
                           <div class="fallback">
                               <input id="file" name="file" type="file" />
                           </div>
-                      <!-- </form> -->
 
-                      <!-- <div id="dropzoneSingleEl-create" name="dropzone" class="dropzone" action="/" method="post" enctype="multipart/form-data" data-field1="@lang('groups.field_group_images') " data-field2="@lang('groups.field_group_images_2')">
-                          <div class="fallback">
-                              <input id="file" name="file" type="file" />
-                          </div>
+                        </div>
+
                       </div>
 
-                      <div class="previews">
-                        <div class="uploads"></div>
-                      </div> -->
-
-
+                    </div>
 
                   </div>
 
