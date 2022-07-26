@@ -10,7 +10,7 @@
             <GroupVolunteer v-for="a in volunteers" :key="'group-' + a.idusers_groups" :volunteer="a" :canedit="canedit" v-if="!a.deleted_at" :idgroups="idgroups" />
           </div>
           <div class="d-flex justify-content-between">
-            <a class="justify-content-end" @click="invite">
+            <a class="justify-content-end" href="#" data-toggle="modal" data-target="#invite-to-group">
               {{ __('groups.invite_to_group') }}
             </a>
             <a class="justify-content-end" href="#" data-toggle="modal" data-target="#group-volunteers">
@@ -21,7 +21,6 @@
         <p v-else>
           {{ __('groups.no_volunteers') }}.
         </p>
-        <GroupInviteModal ref="invite" :idgroups="idgroups" />
       </div>
     </template>
   </CollapsibleSection>
@@ -31,10 +30,9 @@ import group from '../mixins/group'
 import GroupVolunteer from './GroupVolunteer'
 import CollapsibleSection from './CollapsibleSection'
 import Group from '../mixins/group'
-import GroupInviteModal from './GroupInviteModal'
 
 export default {
-  components: {Group, CollapsibleSection, GroupVolunteer, GroupInviteModal},
+  components: {Group, CollapsibleSection, GroupVolunteer},
   mixins: [group],
   props: {
     idgroups: {
@@ -63,9 +61,6 @@ export default {
     })
   },
   methods: {
-    invite() {
-      this.$refs.invite.show()
-    }
   }
 }
 </script>

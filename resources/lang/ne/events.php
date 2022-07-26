@@ -76,5 +76,6 @@ return [
   'volunteer_attended_button' => 'Vrijwilliger nam deel',
   'volunteer_email_address' => 'E-mail van de vrijwilliger (optioneel)',
   'warning_volunteers_message' => 'Opgelet, het aantal vrijwilligers komt niet overeen met het aantal deelnemers. Misschien moet je vrijwilligers toevoegen of verwijderen?',
+  'type_email_addresses_message' => 'Tip: je kunt hier ook andere e-mailadressen toevoegen. Zet een tab, enter of komma na elke e-mailadres dat je toevoegt.',
   'share_stats_message' => 'Goed gedaan! Tijdens :event op :date werden <strong>:number toestellen </strong> gerepareerd. Help ons dit nieuws te verspreiden door je milieu-impact op je eigen website te delen.',
 ];

@@ -204,9 +204,69 @@
     margin-bottom: 30px;
 }
 
-.form-control {
+.form-control,
+.tokenfield {
     font-size: 15px;
     font-family: $font-family-second;
     border-width: 2px;
     padding: 5px 10px;
+}
+
+.form-control.tokenfield {
+    height: auto;
+}
+
+.tokenfield {
+    margin-bottom: 15px;
+    padding: 3px 2px;
+    min-height: 41px;
+    height: auto;
+
+    .token-input {
+        background-color: transparent;
+        margin: auto;
+        position: relative;
+        top: 2px;
+        z-index: 1;
+        display: inline-block;
+        border: 0 none;
+    }
+
+    //
+    // .tokenfield-set {
+    //      > ul {
+    //          margin-bottom: -5px;
+    //         position: relative;
+    //         z-index: 1;
+    //         top: 6px;
+
+    .token {
+        background-color: $brand;
+        color: #FFF;
+        font-size: 14px;
+        padding: 4px 10px;
+        border-bottom: 3px solid #155E67;
+        margin-left: 3px;
+        margin-right: 3px;
+        border-radius: 3px;
+        white-space: nowrap;
+        display: inline-block;
+        padding-right: 30px;
+        position: relative;
+        z-index: 1;
+        margin: 0 1px 1px 0;
+
+        .close {
+            position: absolute;
+            right: 6px;
+            top: 3px;
+            z-index: 1;
+            color: #FFF;
+            font-size: 22px;
+            font-weight: 400;
+        }
+    }
+
+    //      }
+    // }
 }

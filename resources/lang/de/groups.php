@@ -29,6 +29,7 @@ return [
   'groups_modal_title' => 'Would you like to start a community repair group?',
   'groups_modal_content' => 'We can help you get started, scheduling and announcing events, logging data and getting reports on their impact.',
   'email_addresses_field' => 'Email addresses',
+  'type_email_addresses_message' => 'Type in the email addresses of the people you would like to invite to this group.  Press the tab or comma key after each email address.',
   'message_header' => 'Invitation message',
   'message_example_text' => '<add a custom message here if required>',
   'send_invite_button' => 'Send invites',

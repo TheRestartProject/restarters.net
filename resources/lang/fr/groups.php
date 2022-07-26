@@ -28,8 +28,6 @@ return [
   'groups_modal-button' => 'Oui, c\'est parti !',
   'groups_modal_title' => 'Voulez-vous créer un  Repair Café?',
   'groups_modal_content' => 'Nous pouvons vous aider à démarrer, à programmer et à annoncer des événements, à enregistrer des données et à obtenir des rapports sur leur impact.',
-  'invite_group_name_header' => 'Inviter des bénévoles dans le groupe :group',
-  'invite_group_name_message' => 'Invitez des bénévoles à rejoindre votre groupe, afin que vous puissiez les inviter plus facilement à vos événements à venir.',
   'email_addresses_field' => 'Adresses e-mail',
   'type_email_addresses_message' => 'Entrez les adresses e‐mail des personnes que vous souhaitez inviter à ce groupe. Appuyez sur la touche de tabulation (TAB) ou tapez une virgule après chaque adresse e-mail.',
   'message_header' => 'Message d\'invitation',

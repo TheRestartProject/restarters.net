@@ -23,10 +23,10 @@
           </b-dropdown-item>
         </div>
         <div v-else>
-          <b-dropdown-item v-if="isAttending && upcoming && approved" @click="invite">
+          <b-dropdown-item data-toggle="modal" data-target="#event-invite-to" v-if="isAttending && upcoming && approved">
             {{ __('events.invite_volunteers') }}
           </b-dropdown-item>
-          <b-dropdown-item v-b-tooltip.hover  @click="invite" v-else-if="isAttending && upcoming" :title="__('events.invite_when_approved')" disabled>
+          <b-dropdown-item v-b-tooltip.hover id="invite-when-approved" data-toggle="modal" v-else-if="isAttending && upcoming" :title="__('events.invite_when_approved')" disabled>
             {{ __('events.invite_volunteers') }}
           </b-dropdown-item>
           <b-dropdown-item :href="'/party/join/' + idevents" v-else>
@@ -45,7 +45,7 @@
           <b-dropdown-item :href="'/group/join/' + event.group.idgroups" v-if="!inGroup">
             {{ __('events.follow_group') }}
           </b-dropdown-item>
-          <b-dropdown-item v-if="attending && upcoming" @click="invite">
+          <b-dropdown-item data-toggle="modal" data-target="#event-invite-to" v-if="attending && upcoming">
             {{ __('events.invite_volunteers') }}
           </b-dropdown-item>
           <b-dropdown-item :href="'/party/join/' + idevents" v-else>
@@ -55,16 +55,14 @@
       </div>
     </b-dropdown>
     <ConfirmModal @confirm="confirmedDelete" :message="__('events.confirm_delete')" ref="confirmdelete" />
-    <EventInviteModal ref="invite" :idevents="idevents" :groupName="event.group.name.trim()" :canedit="canedit" />
   </div>
 </template>
 <script>
 import event from '../mixins/event'
 import ConfirmModal from './ConfirmModal'
-import EventInviteModal from './EventInviteModal'
 
 export default {
-  components: {ConfirmModal, EventInviteModal},
+  components: {ConfirmModal},
   mixins: [ event ],
   props: {
     idevents: {
@@ -107,9 +105,6 @@ export default {
 
       // TODO LATER Assumes always works.
       window.location = '/party'
-    },
-    invite() {
-      this.$refs.invite.show()
     }
   }
 }

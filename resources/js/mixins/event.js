@@ -42,6 +42,7 @@ export default {
     },
     date() {
       // Local time.
+      console.log("Locale", this.$lang.getLocale())
       moment.locale(this.$lang.getLocale())
       return this.event ? (new moment(this.event.event_date_local).format(DATE_FORMAT)) : null
     },

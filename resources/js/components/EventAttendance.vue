@@ -72,7 +72,7 @@
                 </p>
                 <hr />
                 <div v-if="upcoming && approved" class="d-flex justify-content-between">
-                  <a class="ml-2" @click="invite">
+                  <a data-toggle="modal" data-target="#event-invite-to" href="#" class="ml-2">
                     <img class="icon" src="/images/add-icon.svg" />
                     {{ __('events.invite_to_join') }}
                   </a>
@@ -84,7 +84,6 @@
             </b-tabs>
           </div>
         </div>
-        <EventInviteModal ref="invite" :idevents="idevents" :groupName="event.group.name.trim()" :canedit="canedit" />
       </div>
     </template>
   </CollapsibleSection>
@@ -95,7 +94,6 @@ import EventAttendanceCount from './EventAttendanceCount'
 import EventAttendee from './EventAttendee'
 import CollapsibleSection from './CollapsibleSection'
 import EventAddVolunteerModal from './EventAddVolunteerModal'
-import EventInviteModal from './EventInviteModal'
 
 export default {
   props: {
@@ -114,7 +112,7 @@ export default {
       default: function () { return [] }
     }
   },
-  components: {EventAddVolunteerModal, CollapsibleSection, EventAttendee, EventAttendanceCount, EventInviteModal},
+  components: {EventAddVolunteerModal, CollapsibleSection, EventAttendee, EventAttendanceCount},
   mixins: [event],
   computed: {
     attendance() {
@@ -153,9 +151,6 @@ export default {
       this.$store.dispatch('attendance/fetch', {
         idevents: this.idevents
       })
-    },
-    invite() {
-      this.$refs.invite.show()
     }
   }
 }

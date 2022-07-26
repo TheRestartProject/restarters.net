@@ -23,6 +23,7 @@ return [
   'invite_restarters_modal_heading' => 'Invitez les bénévoles à l\'événement',
   'send_invites_to_restarters_tickbox' => 'Ajouter les invitations pour les membres. Les membres marqués avec un ⚠ seront invités mais ne recevront pas un e-mail en raison de leurs paramètres de notifications',
   'manual_invite_box' => 'Envoyez les invitations à',
+  'type_email_addresses_message' => 'Note: vous pouvez aussi taper manuellement l\'adresse e-mail de quelqu\'un d\'autre que vous voulez inviter à cet événement. Appuyez sur tab, enter ou la touche \' après chaque adresse e-mail que vous avez entré.',
   'message_to_restarters' => 'Message d\'invitation',
   'sample_text_message_to_restarters' => '<ajoutez un message personnalisé ici si nécessaire>',
   'send_invite_button' => 'Envoyer les invitations',

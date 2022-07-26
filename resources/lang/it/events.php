@@ -23,6 +23,7 @@ return [
   'invite_restarters_modal_heading' => 'Invita volontari all\'evento.',
   'send_invites_to_restarters_tickbox' => 'Aggiungi inviti per i membri del gruppo. I membri contrassegnati con un ⚠ saranno invitati ma non riceveranno un\'e-mail a causa delle loro impostazioni di notifica.',
   'manual_invite_box' => 'Spedisici invito a',
+  'type_email_addresses_message' => 'Nota: puoi anche digitare manualmente l\'indirizzo email di chiunque desideri invitare a questo evento. Premi la scheda inserisci o una virgola dopo ogni indirizzo email inserito.',
   'message_to_restarters' => 'Messaggio di invito',
   'sample_text_message_to_restarters' => '<aggiungi un messaggio personale se necessario>',
   'send_invite_button' => 'Invio inviti',

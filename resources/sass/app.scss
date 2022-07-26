@@ -9,6 +9,12 @@
 @import '~slick-carousel/slick/slick';
 @import '~slick-carousel/slick/slick-theme';
 
+// Tokenfield
+@import 'tfvariables';
+@import '~tokenfield/lib/scss/mixins';
+@import '~tokenfield/lib/scss/tokenfield';
+// @import '~bootstrap-tokenfield/dist/css/bootstrap-tokenfield.css';
+
 // Dropzone
 @import '~dropzone/dist/basic';
 @import '~dropzone/dist/dropzone';

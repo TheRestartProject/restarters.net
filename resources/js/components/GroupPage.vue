@@ -181,7 +181,7 @@ export default {
     this.$store.dispatch('events/setList', {
       events: this.events
     })
-  },
+  }
 }
 </script>
 <style scoped lang="scss">

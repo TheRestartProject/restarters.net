@@ -8,7 +8,7 @@
         <b-dropdown-item :href="'/party/create/' + idgroups" v-if="canedit">
           {{ __('groups.add_event') }}
         </b-dropdown-item>
-        <b-dropdown-item @click="invite" v-if="canedit">
+        <b-dropdown-item  data-toggle="modal" data-target="#invite-to-group" v-if="canedit">
           {{ __('groups.invite_volunteers') }}
         </b-dropdown-item>
         <b-dropdown-item :href="'/group/nearby/' + idgroups" v-if="canedit">
@@ -33,7 +33,7 @@
     </div>
     <div v-else>
       <b-dropdown variant="primary" :text="__('groups.group_actions')" class="deepnowrap">
-        <b-dropdown-item @click="invite" v-if="ingroup">
+        <b-dropdown-item data-toggle="modal" data-target="#invite-to-group" v-if="ingroup">
           {{ __('groups.invite_volunteers') }}
         </b-dropdown-item>
         <b-dropdown-item :href="'/group/join/' + idgroups" v-else>
@@ -51,16 +51,14 @@
     <ConfirmModal :key="'deletegroupmodal-' + idgroups" ref="confirmDelete" @confirm="deleteConfirmed" :message="__('groups.delete_group_confirm', {
       name: group.name
     })" />
-    <GroupInviteModal ref="invite" :idgroups="idgroups" />
   </div>
 </template>
 <script>
 import group from '../mixins/group'
 import ConfirmModal from './ConfirmModal'
-import GroupInviteModal from './GroupInviteModal'
 
 export default {
-  components: {ConfirmModal,GroupInviteModal},
+  components: {ConfirmModal},
   mixins: [ group ],
   props: {
     idgroups: {
@@ -99,9 +97,6 @@ export default {
     },
     async deleteConfirmed() {
       window.location = '/group/delete/' + this.idgroups
-    },
-    invite() {
-      this.$refs.invite.show()
     }
   }
 }
