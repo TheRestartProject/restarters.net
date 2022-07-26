@@ -690,14 +690,13 @@ class Group extends Model implements Auditable
         if ($u->hasRole('Administrator')) {
             // Can see all.
             $ret = $this->unapproved()->get();
-            error_log("Returning " . count($ret) . " unapproved groups");
         } else if ($u->hasRole('NetworkCoordinator')) {
             // Can see groups for this network.  Logic doesn't scale well, but we will have few unapproved
             // groups at any one time.
             $groups = $this->unapproved()->get();
 
             foreach ($groups as $group) {
-                foreach ($groups->networks as $network) {
+                foreach ($group->networks as $network) {
                     foreach ($unetworks as $user_network) {
                         if ($network->idnetworks == $user_network->idnetworks) {
                             $ret[] = $group;
@@ -708,6 +707,6 @@ class Group extends Model implements Auditable
             }
         }
 
-        return $ret;
+        return array_unique($ret);
     }
 }

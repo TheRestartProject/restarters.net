@@ -148,6 +148,7 @@ class CreateEventTest extends TestCase
 
         $props = $this->getVueProperties($response);
         if ($role == 'Administrator') {
+            // Should see the event in the moderation list.
             $props = $this->assertVueProperties($response, [
                 [],
                 [
@@ -169,7 +170,6 @@ class CreateEventTest extends TestCase
 
             $events = json_decode($props[1][':initial-events'], TRUE);
         }
-
 
         if ($seeEvent) {
             // We should be able to see this upcoming event in the Vue properties.
