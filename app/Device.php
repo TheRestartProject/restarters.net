@@ -560,7 +560,7 @@ class Device extends Model implements Auditable
         $types = DB::table('devices')->whereNotNull('item_type')
             ->select(['item_type', 'categories.name AS categoryname', 'categories.idcategories', 'categories.powered', DB::raw('COUNT(*) as count')])
             ->join('categories', 'categories.idcategories', '=', 'devices.category')
-            ->groupBy('item_type')
+            ->groupBy(DB::raw('CONCAT(item_type, categoryname)'))
             ->orderBy('count', 'desc')
             ->get()->toArray();
 

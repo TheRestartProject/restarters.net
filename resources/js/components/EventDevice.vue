@@ -201,7 +201,7 @@ export default {
         this.pulsating = true
         setTimeout(() => {
           this.pulsating = false
-        }, 2000)
+        }, 5000)
       }
     }
   },
@@ -221,8 +221,9 @@ export default {
           cluster.categories.forEach((c) => {
             const name = this.$lang.get('strings.' + c.name)
 
-            if (Boolean(c.powered) === Boolean(this.powered) && name === this.currentDevice.item_type) {
+            if (Boolean(c.powered) === Boolean(this.powered) && name.toLowerCase().indexOf(this.currentDevice.item_type.toLowerCase()) !== -1) {
               ret = {
+                idcategories: c.idcategories,
                 categoryname: c.name,
                 powered: c.powered
               }
@@ -231,11 +232,15 @@ export default {
         })
 
         if (!ret) {
-          // Now check the item types.
-          this.itemTypes.forEach(t => {
-            if (Boolean(t.powered) === Boolean(this.powered) && this.currentDevice.item_type === t.item_type) {
+          // Now check the item types.  Stop at the first match, which is the most popular.
+          this.itemTypes.every(t => {
+            if (!ret && Boolean(t.powered) === Boolean(this.powered) && this.currentDevice.item_type === t.item_type) {
               ret = t
+
+              return false
             }
+
+            return true
           })
         }
       }
