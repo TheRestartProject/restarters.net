@@ -141,8 +141,8 @@ class InviteGroupTest extends TestCase
         $this->actingAs($host);
         $response = $this->get('/group/view/'.$group->idgroups);
 
-        // No longer see shareable code because this is constructed via Vue.
-        $response->assertDontSee($group->shareable_link);
+        // Should see shareable code in there.
+        $response->assertSee($group->shareable_link);
 
         // Now pretend we've received that code.
         Auth::logout();
