@@ -705,8 +705,10 @@ class Group extends Model implements Auditable
                     }
                 }
             }
+
+            $ret = array_unique($ret);
         }
 
-        return array_unique($ret);
+        return $ret;
     }
 }
