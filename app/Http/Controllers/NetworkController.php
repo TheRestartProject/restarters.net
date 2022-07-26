@@ -55,17 +55,22 @@ class NetworkController extends Controller
      */
     public function show(Network $network)
     {
+        $user = Auth::user();
+
         $this->authorize('view', $network);
 
         $groupsForAssociating = [];
 
-        if (Auth::user()->can('associateGroups', $network)) {
+        if ($user->can('associateGroups', $network)) {
             $groupsForAssociating = $network->groupsNotIn()->sortBy('name');
         }
+
+        $unapproved = Group::unapprovedVisibleTo($user->id);
 
         return view('networks.show', [
             'network' => $network,
             'groupsForAssociating' => $groupsForAssociating,
+            'moderate_groups' => GroupController::expandGroups($unapproved, [], []),
         ]);
     }
 

@@ -57,10 +57,10 @@
         ?>
 
         <h2>@lang('events.events_title_admin')</h2>
-        <div class="vue-placeholder vue-placeholder-large">
-          <div class="vue-placeholder-content">@lang('partials.loading')...</div>
-        </div>
         <section class="table-section" id="events-1">
+          <div class="vue-placeholder vue-placeholder-large">
+            <div class="vue-placeholder-content">@lang('partials.loading')...</div>
+          </div>
           <div class="vue">
               <EventsRequiringModeration :events="{{ json_encode($events, JSON_INVALID_UTF8_IGNORE) }}" />
           </div>

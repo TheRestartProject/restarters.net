@@ -2,9 +2,7 @@
 
 namespace App;
 
-use App\Network;
 use DB;
-use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Lang;
 use Illuminate\Support\Facades\Log;
@@ -424,6 +422,12 @@ class Group extends Model implements Auditable
         return ! is_null($this->wordpress_post_id);
     }
 
+    public function scopeRequiresModeration($query)
+    {
+        $query = $query->whereNull('wordpress_post_id');
+        return $query;
+    }
+
     public function networks()
     {
         return $this->belongsToMany(Network::class, 'group_network', 'group_id', 'network_id');
@@ -672,5 +676,38 @@ class Group extends Model implements Auditable
     public function scopeMembersHosts($query) {
         $query = $query->membersJoined();
         return $query->where('users_groups.role', Role::HOST);
+    }
+
+    public function scopeUnapproved($query) {
+        return $query->whereNull('wordpress_post_id');
+    }
+
+    public function scopeUnapprovedVisibleTo($query, $user_id) {
+        $u = User::findOrFail($user_id);
+        $unetworks = $u->networks;
+        $ret = [];
+
+        if ($u->hasRole('Administrator')) {
+            // Can see all.
+            $ret = $this->unapproved()->get();
+            error_log("Returning " . count($ret) . " unapproved groups");
+        } else if ($u->hasRole('NetworkCoordinator')) {
+            // Can see groups for this network.  Logic doesn't scale well, but we will have few unapproved
+            // groups at any one time.
+            $groups = $this->unapproved()->get();
+
+            foreach ($groups as $group) {
+                foreach ($groups->networks as $network) {
+                    foreach ($unetworks as $user_network) {
+                        if ($network->idnetworks == $user_network->idnetworks) {
+                            $ret[] = $group;
+                            break;
+                        }
+                    }
+                }
+            }
+        }
+
+        return $ret;
     }
 }

@@ -1554,6 +1554,7 @@ jQuery(document).ready(function () {
         'grouppage': require('./components/GroupPage.vue'),
         'groupeventspage': require('./components/GroupEventsPage.vue'),
         'groupevents': require('./components/GroupEvents.vue'),
+        'groupsrequiringmoderation': require('./components/GroupsRequiringModeration.vue'),
         'microtaskingpage': require('./components/MicrotaskingPage.vue'),
 
         'eventtimerangepicker': require('./components/EventTimeRangePicker.vue'),

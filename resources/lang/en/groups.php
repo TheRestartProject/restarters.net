@@ -153,4 +153,7 @@ return [
   'timezone' => 'Timezone',
   'timezone_placeholder' => 'Leave this blank to inherit the value from the network.',
   'you_have_joined' => 'You have joined <a class="plain-link" href=":url">:name</a>',
+  'moderation_none' => 'There are currently no groups to moderate',
+  'groups_title_admin' => 'Groups to moderate',
+  'group_requires_moderation' => 'Group requires moderation',
 ];

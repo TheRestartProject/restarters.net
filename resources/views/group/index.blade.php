@@ -29,7 +29,21 @@
         $myid = $user ? $user->id : null;
       ?>
 
-      <div class="vue-placeholder vue-placeholder-large">
+        @if (count($moderate_groups))
+          <h2>@lang('groups.groups_title_admin')</h2>
+          <section class="table-section" id="events-1">
+            <div class="vue-placeholder vue-placeholder-large">
+              <div class="vue-placeholder-content">@lang('partials.loading')...</div>
+            </div>
+            <div class="vue">
+              <GroupsRequiringModeration :groups="{{ json_encode($moderate_groups, JSON_INVALID_UTF8_IGNORE) }}" />
+            </div>
+          </section>
+        @else
+          <p class="pt-3 pb-3">@lang('groups.moderation_none').</p>
+        @endif
+
+        <div class="vue-placeholder vue-placeholder-large">
         <div class="vue-placeholder-content">@lang('partials.loading')...</div>
       </div>
 
