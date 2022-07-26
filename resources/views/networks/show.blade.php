@@ -109,25 +109,26 @@
 
                 </section>
 
-                <section class="mt-40">
+                @if( count($network->eventsRequiringModeration()) > 0 )
+                    <?php
+                    $events = [];
+                    foreach ($network->eventsRequiringModeration()->sortBy('event_start_utc') as $event) {
+                        $e = \App\Http\Controllers\PartyController::expandEvent($event, NULL);
+                        $events[] = $e;
+                    }
+                    ?>
                     <h2>@lang('events.events_title_admin')</h2>
-                    <div class="table-responsive panel">
-                        <table class="table table-events table-striped" role="table">
-                            @include('events.tables.headers.head-events-admin-only', ['hide_invite' => true])
-                            <tbody>
-                                @if( count($network->eventsRequiringModeration()) > 0 )
-                                @foreach ($network->eventsRequiringModeration()->sortBy('event_start_utc') as $event)
-                                @include('partials.tables.row-events', ['show_invites_count' => false])
-                                @endforeach
-                                @else
-                                <tr>
-                                    <td colspan="13" align="center" class="p-3">@lang('events.moderation_none')</td>
-                                </tr>
-                                @endif
-                            </tbody>
-                        </table>
+                    <div class="vue-placeholder vue-placeholder-large">
+                        <div class="vue-placeholder-content">@lang('partials.loading')...</div>
                     </div>
-                </section>
+                    <section class="mt-40">
+                        <div class="vue">
+                            <EventsRequiringModeration :events="{{ json_encode($events, JSON_INVALID_UTF8_IGNORE) }}" />
+                        </div>
+                    </section>
+                @else
+                    <p class="pt-3 pb-3">@lang('events.moderation_none').</p>
+                @endif
 
             </div>
         </div>

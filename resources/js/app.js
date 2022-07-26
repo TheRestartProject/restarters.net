@@ -1547,6 +1547,7 @@ jQuery(document).ready(function () {
         'dashboardpage': require('./components/DashboardPage.vue'),
         'eventaddeditpage': require('./components/EventAddEditPage.vue'),
         'eventaddedit': require('./components/EventAddEdit.vue'),
+        'eventsrequiringmoderation': require('./components/EventsRequiringModeration.vue'),
         'eventpage': require('./components/EventPage.vue'),
         'fixometerpage': require('./components/FixometerPage.vue'),
         'groupspage': require('./components/GroupsPage.vue'),

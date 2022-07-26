@@ -48,7 +48,7 @@
       <template slot="cell(title)" slot-scope="data" v-bind:addGroupName="addGroupName">
         <b><EventTitle :idevents="data.item.title.idevents" component="a" :href="'/party/view/' + data.item.title.idevents" /></b>
         <div class="hidecell">
-          <span v-if="addGroupName" class="small">
+          <span v-if="addGroupName && data.item.title.group" class="small">
             <a :href="'/group/view/' + data.item.title.group.idgroups">{{ data.item.title.group.name }}</a>
           </span>
         </div>
