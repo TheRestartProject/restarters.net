@@ -12,6 +12,7 @@ return [
   'how_to_host_an_event' => 'Comment organiser un événement',
   'how_to_host_an_event_text' => 'Forts de plusieurs années d\'expérience, nous vous offrons la recette de l\'organisation d\'événements communautaires de réparation. Découvrez également notre forum pour le soutien entre pairs.',
   'view_the_materials' => 'Voir les ressources',
+  'waste_prevented' => 'Déchets évités',
   'co2' => 'Émissions de CO<sub>2</sub> évitées',
   'restarters_in_your_area' => 'Réparateurs dans votre région',
   'information_up_to_date' => 'Tenez votre Repair Café informé!',
