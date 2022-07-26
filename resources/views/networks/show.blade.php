@@ -109,6 +109,7 @@
 
                 </section>
 
+                <h2 class="mt-4">@lang('events.events_title_admin')</h2>
                 @if( count($network->eventsRequiringModeration()) > 0 )
                     <?php
                     $events = [];
@@ -117,7 +118,6 @@
                         $events[] = $e;
                     }
                     ?>
-                    <h2>@lang('events.events_title_admin')</h2>
                     <div class="vue-placeholder vue-placeholder-large">
                         <div class="vue-placeholder-content">@lang('partials.loading')...</div>
                     </div>

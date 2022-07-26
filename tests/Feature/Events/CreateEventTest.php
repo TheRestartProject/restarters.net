@@ -146,14 +146,30 @@ class CreateEventTest extends TestCase
         // Check the top-level events page.
         $response = $this->get('/party');
 
-        $props = $this->assertVueProperties($response, [
-            [],
-            [
-                'heading-level' => 'h2',
-            ],
-        ]);
+        $props = $this->getVueProperties($response);
+        if ($role == 'Administrator') {
+            $props = $this->assertVueProperties($response, [
+                [],
+                [
+                    'VueComponent' => 'eventsrequiringmoderation'
+                ],
+                [
+                    'heading-level' => 'h2',
+                ],
+            ]);
 
-        $events = json_decode($props[1][':initial-events'], TRUE);
+            $events = json_decode($props[2][':initial-events'], TRUE);
+        } else {
+            $props = $this->assertVueProperties($response, [
+                [],
+                [
+                    'heading-level' => 'h2',
+                ],
+            ]);
+
+            $events = json_decode($props[1][':initial-events'], TRUE);
+        }
+
 
         if ($seeEvent) {
             // We should be able to see this upcoming event in the Vue properties.
