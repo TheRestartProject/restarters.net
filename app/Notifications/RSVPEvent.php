@@ -2,42 +2,10 @@
 
 namespace App\Notifications;
 
-use Illuminate\Bus\Queueable;
 use Illuminate\Notifications\Messages\MailMessage;
 
 class RSVPEvent extends BaseNotification
 {
-    use Queueable;
-
-    protected $arr;
-    protected $user;
-
-    /**
-     * Create a new notification instance.
-     *
-     * @return void
-     */
-    public function __construct($arr, $user = null)
-    {
-        $this->arr = $arr;
-        $this->user = $user;
-    }
-
-    /**
-     * Get the notification's delivery channels.
-     *
-     * @param  mixed  $notifiable
-     * @return array
-     */
-    public function via($notifiable)
-    {
-        if ($notifiable->invites == 1) {
-            return ['mail', 'database'];
-        }
-
-        return ['database'];
-    }
-
     /**
      * Get the mail representation of the notification.
      *
@@ -58,7 +26,7 @@ class RSVPEvent extends BaseNotification
               'event' => $this->arr['event_venue']
           ], $locale))
           ->action(__('notifications.rsvp_action', [], $locale), $this->arr['event_url'])
-          ->line(__('notifications.email_preference', [
+          ->line(__('notifications.email_preferences', [
               'url' => url('/user/edit/' . $notifiable->id)
           ]));
     }

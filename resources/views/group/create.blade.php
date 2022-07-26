@@ -80,6 +80,9 @@
                                   @lang('groups.groups_location_small')
                                 </small>
 
+                                <div class="vue">
+                                  <GroupTimeZone />
+                                </div>
                               </div>
 
                               <div style="position: absolute; left: -10000px; top: -10000px;">

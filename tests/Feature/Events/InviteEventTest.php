@@ -184,6 +184,8 @@ class InviteEventTest extends TestCase
         $this->get('/logout');
         $this->actingAs($user);
 
+        $this->processQueuedNotifications();
+
         // Now accept the invitation.
         $response7 = $this->get('/party/view/'.$event->idevents);
         $response7->assertSee('You&#039;ve been invited to join an event');

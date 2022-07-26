@@ -6,7 +6,7 @@
         :maxMatches="3"
         :data="timezones"
         :minMatchingChars="1"
-        inputClass="form-control field"
+        inputClass="form-control field timezone"
     />
     <small class="form-text text-muted">
       {{ __('groups.timezone_placeholder') }}
@@ -24,7 +24,7 @@ export default {
       type: String,
       required: false,
       default: null
-    }
+    },
   },
   components: { VueTypeaheadBootstrap },
   data () {

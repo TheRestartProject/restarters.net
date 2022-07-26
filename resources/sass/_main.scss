@@ -10,6 +10,8 @@ body {
     min-height: 100%;
     height: 100%;
     background-color: #0394A6;
+  padding-left: calc(100vw - 100%); /* This avoids things jumping if/when the scrollbar appears. */
+
 }
 
 h1,h2,h3 {
