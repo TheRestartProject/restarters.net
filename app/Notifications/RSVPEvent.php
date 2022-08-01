@@ -26,7 +26,7 @@ class RSVPEvent extends BaseNotification
               'event' => $this->arr['event_venue']
           ], $locale))
           ->action(__('notifications.rsvp_action', [], $locale), $this->arr['event_url'])
-          ->line(__('notifications.email_preference', [
+          ->line(__('notifications.email_preferences', [
               'url' => url('/user/edit/' . $notifiable->id)
           ]));
     }

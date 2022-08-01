@@ -18,6 +18,9 @@ class DiscourseServiceProvider extends ServiceProvider
      *
      * @return \GuzzleHttp\Client
      */
+
+    private $logger = null;
+
     public function register()
     {
         // We need to register the service whether or not the feature is turned on, so that we can mock it in testing.
@@ -26,6 +29,11 @@ class DiscourseServiceProvider extends ServiceProvider
         // could be necessary live under load.
         $this->app->bind('discourse-client', function ($app, $parameters) {
             $stack = HandlerStack::create();
+
+            $stack->push(
+                $this->createGuzzleLoggingMiddleware(" {method} {uri} HTTP/{version} {req_body}")
+            );
+
             $stack->push(GuzzleRetryMiddleware::factory());
 
             return new Client([
@@ -42,6 +50,10 @@ class DiscourseServiceProvider extends ServiceProvider
 
         $this->app->bind('discourse-client-anonymous', function ($app, $parameters) {
             $stack = HandlerStack::create();
+            $stack->push(
+                $this->createGuzzleLoggingMiddleware(" {method} {uri} HTTP/{version} {req_body}")
+            );
+
             $stack->push(GuzzleRetryMiddleware::factory());
 
             return new Client([
@@ -53,5 +65,24 @@ class DiscourseServiceProvider extends ServiceProvider
                                   'handler' => $stack,
                               ]);
         });
+    }
+
+    private function createGuzzleLoggingMiddleware(string $messageFormat)
+    {
+        return \GuzzleHttp\Middleware::log(
+            $this->getLogger(),
+            new \GuzzleHttp\MessageFormatter($messageFormat)
+        );
+    }
+
+    private function getLogger()
+    {
+        if (! $this->logger) {
+            $this->logger = with(new \Monolog\Logger('discourse-api'))->pushHandler(
+                new \Monolog\Handler\RotatingFileHandler(storage_path('logs/discourse-api.log'))
+            );
+        }
+
+        return $this->logger;
     }
 }

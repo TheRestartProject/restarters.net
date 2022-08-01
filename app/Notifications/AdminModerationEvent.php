@@ -15,7 +15,9 @@ class AdminModerationEvent extends BaseNotification
     public function toMail($notifiable)
     {
         return (new MailMessage)
-                      ->subject('New event created: '.$this->arr['event_venue'])
+                      ->subject(__('notifications.new_event_subject', [
+                          'name'=> $this->arr['event_venue']
+                      ]))
                       ->greeting(__('notifications.greeting', [], $notifiable->language))
                       ->line('A new event has been created: \''.$this->arr['event_venue'].'\'.')
                       ->action('View event', $this->arr['event_url'])
@@ -34,7 +36,9 @@ class AdminModerationEvent extends BaseNotification
     public function toArray($notifiable)
     {
         return [
-            'title' => 'New event created:',
+            'title' => __('notifications.new_event_subject', [
+                'name'=> $this->arr['event_venue']
+            ]),
             'name' => $this->arr['event_venue'],
             'url' => $this->arr['event_url'],
         ];
