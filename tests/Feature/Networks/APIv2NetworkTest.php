@@ -133,24 +133,28 @@ class APIv2NetworkTest extends TestCase
                                                                         'group' => $group->idgroups,
                                                                     ]);
 
+        // Manually set the updated_at fields so that we can check they are returned correctly.
+        DB::statement(DB::raw("UPDATE events SET updated_at = '2011-01-01 12:34'"));
+        DB::statement(DB::raw("UPDATE `groups` SET updated_at = '2011-01-02 12:34'"));
+
         $response = $this->get("/api/v2/networks/{$network->id}/events");
         $response->assertSuccessful();
         $json = json_decode($response->getContent(), true)['data'];
         $this->assertEquals(1, count($json));
         $this->assertEquals($event->idevents, $json[0]['id']);
-        $this->assertTrue(array_key_exists('updated_at', $json[0]));
-        $this->assertTrue(array_key_exists('updated_at', $json[0]['group']));
+        $this->assertEquals('2011-01-01T12:34:00+00:00', $json[0]['updated_at']);
+        $this->assertEquals('2011-01-02T12:34:00+00:00', $json[0]['group']['updated_at']);
 
         # Test updated filters.
-        $start = Carbon::now()->subDays(1)->toIso8601String();
-        $end = Carbon::now()->addDays(1)->toIso8601String();
+        $start = '2011-01-01T10:34:00+00:00';
+        $end = '2011-01-01T14:34:00+00:00';
         $response = $this->get("/api/v2/networks/{$network->id}/events?updated_start=" . urlencode($start) . "&updated_end=" . urlencode($end));
         $response->assertSuccessful();
         $json = json_decode($response->getContent(), true)['data'];
         $this->assertEquals(1, count($json));
 
-        $start = Carbon::now()->addDays(1)->toIso8601String();
-        $end = Carbon::now()->addDays(2)->toIso8601String();
+        $start = '2011-01-01T15:34:00+00:00';
+        $end = '2011-01-01T16:34:00+00:00';
         $response = $this->get("/api/v2/networks/{$network->id}/events?updated_start=" . urlencode($start) . "&updated_end=" . urlencode($end));
         $response->assertSuccessful();
         $json = json_decode($response->getContent(), true)['data'];

@@ -62,11 +62,14 @@ class NetworkController extends Controller
         $start = Carbon::parse($request->get('updated_start', '1970-01-01'))->setTimezone('UTC')->format('Y-m-d H:i:s');
         $end = Carbon::parse($request->get('updated_end', '3000-01-01'))->setTimezone('UTC')->format('Y-m-d H:i:s');
 
+        // We need to explicity select events.*, otherwise the updated_at values we get back are from the group_network
+        // table, which is mightily confusing.
         $events = Party::join('groups', 'groups.idgroups', '=', 'events.group')
             ->join('group_network', 'group_network.group_id', '=', 'groups.idgroups')
             ->where('group_network.network_id', $id)
             ->where('events.updated_at', '>=', $start)
             ->where('events.updated_at', '<=', $end)
+            ->select('events.*')
             ->get();
 
         return \App\Http\Resources\PartySummaryCollection::make($events);
