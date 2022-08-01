@@ -81,7 +81,7 @@
     <div class="form-row">
         <div class="form-group col-lg-12">
         <div class="d-flex justify-content-end">
-            <button type="submit" class="btn btn-primary">Save profile</button>
+            <button type="submit" class="btn btn-primary">@lang('profile.save_profile')</button>
         </div>
         </div>
     </div>
