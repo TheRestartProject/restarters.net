@@ -54,9 +54,11 @@ export default {
     async unfollow({commit, rootGetters, getters}, params) {
       // We can't use the DELETE verb because we want to pass the api token as a parameter so that it doesn't
       // show up in the URL in logs, which is bad practice.  So use POST with _method to override.
+      const apiToken = rootGetters['auth/apiToken']
+
       const ret = await axios.post('/api/usersgroups/' + params.idgroups, {
         _method: 'delete',
-        api_token: this.apiToken
+        api_token: apiToken
       })
 
       if (ret.data.success) {

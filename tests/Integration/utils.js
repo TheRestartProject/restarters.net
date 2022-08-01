@@ -175,3 +175,14 @@ exports.addDevice = async function(page, baseURL, idevents, powered) {
   await expect(page.locator('h3 >> text=Misc')).toHaveCount(2)
 }
 
+exports.unfollowGroup = async function(page, baseURL, idgroups) {
+  await page.goto('/group/view/' + idgroups)
+
+  await page.click('#groupactions .dropdown-toggle >> visible=true')
+
+  await page.click('#groupactions .dropdown-menu > li:nth-child(6) > .dropdown-item >> visible=true')
+
+  await page.click('#confirmmodal .btn-primary')
+
+  await page.locator('text=You have now unfollowed')
+}
