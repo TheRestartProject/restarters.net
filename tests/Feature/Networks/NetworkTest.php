@@ -107,9 +107,18 @@ class NetworkTest extends TestCase
         $this->assertTrue($network->containsGroup($group));
         $this->assertTrue($group->isMemberOf($network));
 
-        $event = factory(Party::class)->create([
+        $event1 = factory(Party::class)->create([
             'group' => $group->idgroups,
             'online' => 1,
+            'event_start_utc' => Carbon::parse('1pm yesterday')->toIso8601String(),
+            'event_end_utc' => Carbon::parse('3pm yesterday')->toIso8601String()
+        ]);
+
+        $event2 = factory(Party::class)->create([
+           'group' => $group->idgroups,
+           'online' => 1,
+           'event_start_utc' => Carbon::parse('1pm tomorrow')->toIso8601String(),
+           'event_end_utc' => Carbon::parse('3pm tomorrow')->toIso8601String()
         ]);
 
         // Check the group shows up in the list of groups for this network.
@@ -127,8 +136,13 @@ class NetworkTest extends TestCase
 
         // Check that the event is listed.
         $this->assertEquals(1, count($groups[0]['past_parties']));
-        $this->assertEquals($event->idevents, $groups[0]['past_parties'][0]['event_id']);
-        $this->assertEquals($event->free_text, $groups[0]['past_parties'][0]['description']);
+        $this->assertEquals($event1->idevents, $groups[0]['past_parties'][0]['event_id']);
+        $this->assertEquals($event1->free_text, $groups[0]['past_parties'][0]['description']);
+        $this->assertEquals(1, $groups[0]['past_parties'][0]['online']);
+
+        $this->assertEquals(1, count($groups[0]['upcoming_parties']));
+        $this->assertEquals($event2->idevents, $groups[0]['upcoming_parties'][0]['event_id']);
+        $this->assertEquals($event2->free_text, $groups[0]['upcoming_parties'][0]['description']);
         $this->assertEquals(1, $groups[0]['past_parties'][0]['online']);
 
         // Get again with a bounding box which the group is inside.
@@ -146,10 +160,13 @@ class NetworkTest extends TestCase
         // Check the event shows in the events network API call.
         $response = $this->get('/api/events/network?api_token=1234');
         $events = json_decode($response->getContent(), true);
-        $this->assertEquals(1, count($events));
-        $this->assertEquals($event->idevents, $events[0]['id']);
-        $this->assertEquals($event->free_text, $events[0]['description']);
+        $this->assertEquals(2, count($events));
+        $this->assertEquals($event1->idevents, $events[0]['id']);
+        $this->assertEquals($event1->free_text, $events[0]['description']);
         $this->assertEquals(1, $events[0]['online']);
+        $this->assertEquals($event2->idevents, $events[1]['id']);
+        $this->assertEquals($event2->free_text, $events[1]['description']);
+        $this->assertEquals(1, $events[1]['online']);
     }
 
     /** @test */
@@ -236,11 +253,11 @@ class NetworkTest extends TestCase
         $response = $this->get('/networks');
         $response->assertDontSee(__('networks.index.your_networks_no_networks'));
         $response->assertDontSee(__('networks.index.all_networks_explainer'));
-        $response->assertSee(htmlspecialchars($network->name));
+        $response->assertSee(e($network->name));
 
         // Coordinator should show on network page.
         $response = $this->get('/networks/' . $network->id);
-        $response->assertSee(htmlspecialchars($coordinator->name));
+        $response->assertSee(e($coordinator->name));
 
         // Group should not show on network page yet.
         $response = $this->get('/group/network/' . $network->id);
@@ -264,7 +281,7 @@ class NetworkTest extends TestCase
 
         // Group should now show on network page and in encoded list of networks for a groiup.
         $response = $this->get('/group/network/' . $network->id);
-        $response->assertSee($group->name);
+        $response->assertSee(htmlspecialchars($group->name, ENT_QUOTES));
         $response->assertSee('&quot;networks&quot;:[' . $network->id . ']');
 
         // All networks list visible to admin.

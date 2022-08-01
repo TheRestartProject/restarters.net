@@ -13,8 +13,13 @@
             {!! \Session::get('warning') !!}
         </div>
     @endif
+      @if (\Session::has('danger'))
+        <div class="alert alert-danger">
+          {!! \Session::get('danger') !!}
+        </div>
+      @endif
 
-    <div class="vue">
+      <div class="vue">
       <EventAddEditPage
           csrf="{{ csrf_token() }}"
           :duplicate-from="<?php echo isset($duplicateFrom) ? e(json_encode($duplicateFrom, JSON_INVALID_UTF8_IGNORE)) : 'null'; ?>"

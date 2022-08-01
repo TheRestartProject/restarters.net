@@ -48,7 +48,7 @@ class UsernameGeneratorTest extends TestCase
 
         $user->generateAndSetUsername();
 
-        $this->assertEquals('Philip_J._Fry', $user->username);
+        $this->assertEquals('Philip_J_Fry', $user->username);
     }
 
     /** @test */
@@ -86,6 +86,16 @@ class UsernameGeneratorTest extends TestCase
         $user2->generateAndSetUsername();
 
         $this->assertEquals('Philip_J_Fry_'.$user2->id, $user2->username);
+    }
+
+    /** @test */
+    public function username_repeated_special_char() {
+        $user = factory(\App\User::class)->create();
+        $user->name = 'M._Someone';
+
+        $user->generateAndSetUsername();
+
+        $this->assertEquals('M_Someone', $user->username);
     }
 
     // if name is empty?

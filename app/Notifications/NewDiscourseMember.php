@@ -2,42 +2,10 @@
 
 namespace App\Notifications;
 
-use Illuminate\Bus\Queueable;
-use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Notifications\Messages\MailMessage;
-use Illuminate\Notifications\Notification;
 
-class NewDiscourseMember extends Notification implements ShouldQueue
+class NewDiscourseMember extends BaseNotification
 {
-    use Queueable;
-
-    protected $arr;
-
-    /**
-     * Create a new notification instance.
-     *
-     * @return void
-     */
-    public function __construct($arr)
-    {
-        $this->arr = $arr;
-    }
-
-    /**
-     * Get the notification's delivery channels.
-     *
-     * @param  mixed  $notifiable
-     * @return array
-     */
-    public function via($notifiable)
-    {
-        if ($notifiable->invites == 1) {
-            return ['mail', 'database'];
-        }
-
-        return ['database'];
-    }
-
     /**
      * Get the mail representation of the notification.
      *
@@ -54,7 +22,7 @@ class NewDiscourseMember extends Notification implements ShouldQueue
             ->line(__('groups.talk_group_add_body', [
                 'group_name' => $this->arr['group_name']
             ]))
-            ->line(__('partials.notification_footer', [
+            ->line(__('notifications.email_preferences', [
                 'url' => url('/user/edit/' . $notifiable->id)
             ]));
     }

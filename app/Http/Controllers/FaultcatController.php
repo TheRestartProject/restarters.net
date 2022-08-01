@@ -18,65 +18,6 @@ class FaultcatController extends Controller
     public function index(Request $request)
     {
         return redirect()->action('FaultcatController@status')->withSuccess('done');
-
-        if (Auth::check()) {
-            $user = Auth::user();
-        } else {
-            $user = new \stdClass();
-            $user->id = 0;
-            $user->name = 'Guest';
-        }
-
-        $user->clicks = $request->session()->get('faultcat.counter', 0);
-        $request->session()->put('faultcat.counter', ++$user->clicks);
-
-        $user->country = $request->session()->get('faultcat.country', null);
-        $user->age = $request->session()->get('faultcat.age', null);
-
-        if (! $user->id && ($user->clicks % 4 == 0) && (! $user->country || ! $user->age)) {
-            return redirect()->action('FaultcatController@demographics');
-        }
-
-        if ($request->isMethod('post') && ! empty($_POST)) {
-            if (isset($_POST['iddevices']) && ! isset($_POST['fetch'])) {
-                $data = array_filter($_POST);
-                if (isset($_POST['country'])) {
-                    $request->session()->put('faultcat.country', $data['country']);
-                } else {
-                    $data['country'] = '';
-                }
-                if (isset($_POST['age'])) {
-                    $request->session()->put('faultcat.age', $data['age']);
-                } else {
-                    $data['age'] = '';
-                }
-                $Faultcat = new Faultcat;
-                $insert = [
-                    'iddevices' => $data['iddevices'],
-                    'fault_type' => $data['fault_type'],
-                    'user_id' => $user->id,
-                    'ip_address' => $_SERVER['REMOTE_ADDR'],
-                    'session_id' => session()->getId(),
-                ];
-                $success = $Faultcat->create($insert);
-                if (! $success) {
-                    logger(print_r($insert, 1));
-                    logger('FaultCat error on insert.');
-                }
-            }
-        }
-        $user->country = $request->session()->get('faultcat.country', null);
-        $user->age = $request->session()->get('faultcat.age', null);
-
-        $Faultcat = new Faultcat;
-        $fault = $Faultcat->fetchFault()[0];
-        $fault->category = preg_replace('/Laptop (small|medium|large)/', 'Laptop', $fault->category);
-        $fault->translate = rawurlencode($fault->problem);
-
-        return view('faultcat.index', [
-            'fault' => $fault,
-            'user' => $user,
-        ]);
     }
 
     public function demographics(Request $request)

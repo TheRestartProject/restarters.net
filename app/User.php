@@ -464,6 +464,9 @@ class User extends Authenticatable implements Auditable, HasLocalePreference
 
         $desired_username = implode('_', $name_parts);
 
+        // Discourse doesn't allow repeated special characters - see https://github.com/discourse/discourse/blob/main/app/models/username_validator.rb.
+        $desired_username = preg_replace('/[-_.]{2,}/', '_', $desired_username);
+
         if (! (self::where('username', '=', $desired_username)->exists())) {
             $username = $desired_username;
         } else { // someone already has the desired username
@@ -542,14 +545,14 @@ class User extends Authenticatable implements Auditable, HasLocalePreference
         return $network->include_in_zapier;
     }
 
-    public function networks()
-    {
-        return $this->belongsToMany(Network::class, 'user_network', 'user_id', 'network_id');
-    }
-
     public function isCoordinatorOf($network)
     {
         return $this->networks->contains($network);
+    }
+
+    public function networks()
+    {
+        return $this->belongsToMany(Network::class, 'user_network', 'user_id', 'network_id');
     }
 
     public function isCoordinatorForGroup($group)

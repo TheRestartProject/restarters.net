@@ -2,27 +2,10 @@
 
 namespace App\Notifications;
 
-use Illuminate\Bus\Queueable;
-use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Notifications\Messages\MailMessage;
-use Illuminate\Notifications\Notification;
 
-class EventDevices extends Notification implements ShouldQueue
+class EventDevices extends BaseNotification
 {
-    use Queueable;
-
-    protected $arr;
-
-    /**
-     * Create a new notification instance.
-     *
-     * @return void
-     */
-    public function __construct($arr)
-    {
-        $this->arr = $arr;
-    }
-
     /**
      * Get the notification's delivery channels.
      *
@@ -50,9 +33,9 @@ class EventDevices extends Notification implements ShouldQueue
                   ->line(__('notifications.event_devices_line1', [
                       'event' => $this->arr['event_venue']
                     ], $locale))
-                  ->action(__('notification.event_devices_action', [], $locale), $this->arr['event_url'])
+                  ->action(__('notifications.event_devices_action', [], $locale), $this->arr['event_url'])
                   ->line(__('notifications.email_preferences', [
-                    'url' => $this->arr['preferences']
+                      'url' => url('/user/edit/'.$notifiable->id)
                   ], $locale));
         }
     }

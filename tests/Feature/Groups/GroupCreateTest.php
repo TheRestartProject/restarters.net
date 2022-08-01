@@ -55,6 +55,7 @@ class GroupCreateTest extends TestCase
             'website' => 'https://therestartproject.org',
             'location' => 'London',
             'free_text' => 'Some text.',
+            'timezone' => 'Europe/London'
         ]);
 
         $this->assertContains('That group name (Test Group0) already exists', $response->getContent());
@@ -130,31 +131,56 @@ class GroupCreateTest extends TestCase
 
         // The event should be visible to the host.
         $this->get('/party/view/'.$event->idevents)->assertSee($eventAttributes['venue']);
-        $this->get('/party')->assertSee($eventAttributes['venue']);
+        $this->get('/party')->assertSee(e($eventAttributes['venue']));
+
+        // ...and on the page for this group's events.
+        $this->get('/party/group/' . $idgroups)->assertSee($eventAttributes['venue']);
 
         // And to a network coordinator
         $coordinator = factory(User::class)->state('NetworkCoordinator')->create();
         $network->addCoordinator($coordinator);
         $this->actingAs($coordinator);
         $this->get('/party/view/'.$event->idevents)->assertSee($eventAttributes['venue']);
-        $this->get('/party')->assertSee($eventAttributes['venue']);
+        $this->get('/party')->assertSee(e($eventAttributes['venue']));
 
         // This event should not be visible to a Restarter, as the group is not yet approved.
         $restarter = factory(User::class)->states('Restarter')->create();
         $this->actingAs($restarter);
         try {
-            $this->get('/party/view/'.$event->idevents)->assertDontSee($eventAttributes['venue']);
+            $this->get('/party/view/'.$event->idevents)->assertDontSee(e($eventAttributes['venue']));
             $this->assertTrue(false);
         } catch (NotFoundHttpException $e) {}
 
-        $this->get('/party')->assertDontSee($eventAttributes['venue']);
+        $this->get('/party')->assertDontSee(e($eventAttributes['venue']));
 
         // Now approve the group.
         $group->wordpress_post_id = '99999';
         $group->save();
 
         // Should now be visible.
-        $this->get('/party/view/'.$event->idevents)->assertSee($eventAttributes['venue']);
-        $this->get('/party')->assertSee($eventAttributes['venue']);
+        $this->get('/party/view/'.$event->idevents)->assertSee(e($eventAttributes['venue']));
+        $this->get('/party')->assertSee(e($eventAttributes['venue']));
     }
+
+    public function testCreateTimezone()
+    {
+        $this->loginAsTestUser(Role::ADMINISTRATOR);
+
+        // Test creating the same group twice.
+        $response = $this->post('/group/create', [
+            'name' => 'Test Group0',
+            'website' => 'https://therestartproject.org',
+            'location' => 'London',
+            'free_text' => 'Some text.',
+            'timezone' => 'Asia/Samarkand'
+        ]);
+
+        $response->assertRedirect();
+        $redirectTo = $response->getTargetUrl();
+        $this->assertNotFalse(strpos($redirectTo, '/group/edit'));
+        $group = Group::latest()->first();
+        $this->assertEquals('Asia/Samarkand', $group->timezone);
+    }
+
+
 }

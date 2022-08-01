@@ -2,44 +2,10 @@
 
 namespace App\Notifications;
 
-use Illuminate\Bus\Queueable;
-use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Notifications\Messages\MailMessage;
-use Illuminate\Notifications\Notification;
 
-class AdminWordPressEditGroupFailure extends Notification implements ShouldQueue
+class AdminWordPressEditGroupFailure extends BaseNotification
 {
-    use Queueable;
-
-    protected $arr;
-    protected $user;
-
-    /**
-     * Create a new notification instance.
-     *
-     * @return void
-     */
-    public function __construct($arr, $user = null)
-    {
-        $this->arr = $arr;
-        $this->user = $user;
-    }
-
-    /**
-     * Get the notification's delivery channels.
-     *
-     * @param  mixed  $notifiable
-     * @return array
-     */
-    public function via($notifiable)
-    {
-        if ($notifiable->invites == 1) {
-            return ['mail', 'database'];
-        }
-
-        return ['database'];
-    }
-
     /**
      * Get the mail representation of the notification.
      *
@@ -53,7 +19,9 @@ class AdminWordPressEditGroupFailure extends Notification implements ShouldQueue
                   ->greeting(__('notifications.greeting', [], $notifiable->language))
                   ->line('Group \''.$this->arr['group_name'].'\' failed to post to WordPress during an edit to the group.')
                   ->action('View group', $this->arr['group_url'])
-                  ->line('If you would like to stop receiving these emails, please visit <a href="'.url('/user/edit/'.$notifiable->id).'">your preferences</a> on your account.');
+                  ->line(__('notifications.email_preferences', [
+                      'url' => url('/user/edit/'.$notifiable->id)
+                  ], $notifiable->locale));
     }
 
     /**

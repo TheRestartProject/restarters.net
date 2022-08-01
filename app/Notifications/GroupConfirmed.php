@@ -2,15 +2,10 @@
 
 namespace App\Notifications;
 
-use Illuminate\Bus\Queueable;
-use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Notifications\Messages\MailMessage;
-use Illuminate\Notifications\Notification;
 
-class GroupConfirmed extends Notification implements ShouldQueue
+class GroupConfirmed extends BaseNotification
 {
-    use Queueable;
-
     protected $group;
 
     /**
@@ -52,7 +47,7 @@ class GroupConfirmed extends Notification implements ShouldQueue
             ], $locale))
             ->action(__('notifications.group_confirmed_action', [], $locale), url('/group/view/' . $this->group->idgroups))
             ->line(__('notifications.email_preferences', [
-                'url' => url('/profile/edit')
+                'url' => url('/user/edit/'.$notifiable->id)
             ], $locale));
     }
 

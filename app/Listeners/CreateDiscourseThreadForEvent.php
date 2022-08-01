@@ -3,12 +3,9 @@
 namespace App\Listeners;
 
 use App\Events\ApproveEvent;
-use App\Events\UserFollowedGroup;
 use App\EventsUsers;
 use App\Party;
 use App\User;
-use Illuminate\Contracts\Queue\ShouldQueue;
-use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Support\Facades\Log;
 
 class CreateDiscourseThreadForEvent

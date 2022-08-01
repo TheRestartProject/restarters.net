@@ -1022,7 +1022,6 @@ class Party extends Model implements Auditable
         return $this->theGroup->timezone;
     }
 
-    // TODO The intention is that we migrate all the code over to use the UTC variants of event date/start/end.
     // Timezone-aware, ISO8601 formatted.  These are unambiguous, e.g. for API results.
     public function getEventStartUtcAttribute() {
         $start = Carbon::parse($this->attributes['event_start_utc'], 'UTC');

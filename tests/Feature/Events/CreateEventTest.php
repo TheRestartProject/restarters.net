@@ -16,6 +16,7 @@ use App\User;
 use Carbon\Carbon;
 use DB;
 use Illuminate\Support\Facades\Notification;
+use Illuminate\Support\Facades\Queue;
 use Tests\TestCase;
 use App\Notifications\EventConfirmed;
 
@@ -182,6 +183,7 @@ class CreateEventTest extends TestCase
 
                 // Mail should mention the venue.
                 self::assertRegexp('/' . $event->venue . '/', $mailData['introLines'][0]);
+                self::assertStringContainsString('#list-email-preferences', $mailData['outroLines'][0]);
 
                 return true;
             }
@@ -306,8 +308,6 @@ class CreateEventTest extends TestCase
     /** @test */
     public function emails_sent_to_restarters_when_upcoming_event_approved()
     {
-        DB::connection()->enableQueryLog();
-
         $this->withoutExceptionHandling();
         $admin = factory(User::class)->state('Administrator')->create();
         $this->actingAs($admin);
@@ -606,5 +606,89 @@ class CreateEventTest extends TestCase
         Notification::assertNotSentTo(
             [$restarter], NotifyRestartersOfNewEvent::class
         );
+    }
+
+    /**
+     * @test
+     */
+    public function invalid_location_fails() {
+        $this->loginAsTestUser(Role::ADMINISTRATOR);
+        $idgroups = $this->createGroup();
+
+        $eventData = factory(Party::class)->raw([
+                                                    'group' => $idgroups,
+                                                    'location' => 'ForceGeocodeFailure',
+                                                ]);
+
+        // A geocode failure should result in an error alert.
+        $response = $this->post('/party/create/', $eventData);
+        $response->assertSee('alert-danger');
+    }
+
+    /** @test */
+    public function notifications_are_queued_as_expected()
+    {
+        // At the moment we are queueing (backgrounding) admin notifications but not user notifications.
+        //
+        // Don't call Notification::fake() - we want real notifications.
+        $this->withoutExceptionHandling();
+
+        // Create an admin
+        $admin = factory(User::class)->state('Administrator')->create();
+        // Create a network with a group.
+        $network = factory(Network::class)->create();
+        $group = factory(Group::class)->create();
+        $network->addGroup($group);
+
+        // Make the admin coordinators of the network, so that they should get notified.
+        $network->addCoordinator($admin);
+
+        // Log in so that we can create an event.
+        $host = factory(User::class)->states('Host')->create();
+        $group->addVolunteer($host);
+        $group->makeMemberAHost($host);
+        $this->actingAs($host);
+
+        // Clear any jobs queued in earlier tests.
+        $max = 1000;
+        do {
+            $job = Queue::pop('database');
+
+            if ($job) {
+                try {
+                    $job->fail('removed in UT');
+                } catch (\Exception $e) {}
+            }
+
+            $max--;
+        }
+        while (Queue::size() > 0 && $max > 0);
+
+        // Create an event.
+        $initialQueueSize = \Illuminate\Support\Facades\Queue::size('database');
+        $event = factory(Party::class)->raw();
+        $event['group'] = $group->idgroups;
+        $response = $this->post('/party/create/', $event);
+        $response->assertStatus(302);
+
+        // Should have queued AdminModerationEvent.
+        $queueSize = Queue::size();
+        self::assertGreaterThan($initialQueueSize, $queueSize);
+
+        // Fail it.
+        $job = Queue::pop();
+        self::assertNotNull($job);
+        self::assertStringContainsString('AdminModerationEvent', $job->getRawBody());
+        try {
+            $job->fail('removed in UT');
+        } catch (\Exception $e) {}
+        self::assertEquals(0, Queue::size('database'));
+
+        // Approval should generate a notification to the host which is also queued.
+        $event = Party::latest()->first();
+        $event->approve();
+
+        # Should have queued ApproveEvent.
+        self::assertEquals(0, Queue::size('database'));
     }
 }

@@ -109,6 +109,12 @@ class BasicTest extends TestCase
         // Admin approves the event.
         $this->loginAsTestUser(Role::ADMINISTRATOR);
 
+        $response1b = $this->get('/party/edit/'.$event->idevents);
+
+        $props = $this->getVueProperties($response1b);
+        $initialEvent = json_decode($props[1][':initial-event'], TRUE);
+        $this->assertEquals($event->idevents, $initialEvent['idevents']);
+
         $eventData = $event->getAttributes();
         $eventData['wordpress_post_id'] = 100;
         $eventData['id'] = $event->idevents;

@@ -1,7 +1,6 @@
 <?php
 
 return [
-  'lead' => 'Welkom bij de Restart gemeenschap',
   'login_title' => 'Inloggen',
   'more' => 'Meer weten',
   'stat_1' => 'Herstelde toestellen',

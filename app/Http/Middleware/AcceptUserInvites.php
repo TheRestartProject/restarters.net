@@ -45,7 +45,10 @@ class AcceptUserInvites
                             'role' => 4,
                         ]);
                         $acceptance->delete();
-                        $request->session()->push('invites-feedback', 'You have joined <a class="plain-link" href='.url("/group/view/{$group->idgroups}").">{$group->name}</a>");
+                        $request->session()->push('invites-feedback', __('groups.you_have_joined', [
+                            'url' => url("/group/view/{$group->idgroups}"),
+                            'name' => $group->name
+                        ]));
 
                     // Else that must mean the User is already part of the Group.
                         // We can then delete the Invite and create a new session
@@ -75,7 +78,10 @@ class AcceptUserInvites
                             'role' => 4,
                         ]);
                         $acceptance->delete();
-                        $request->session()->push('invites-feedback', 'You have joined <a class="plain-link" href='.url("/party/view/{$event->idevents}").">{$event->venue}</a>");
+                        $request->session()->push('invites-feedback', __('events.you_have_joined', [
+                            'url' => url("/party/view/{$event->idevents}"),
+                            'name' => $event->venue
+                        ]));
 
                     // Else that must mean the User is already part of the Event.
                         // We can then delete the Invite and create a new session

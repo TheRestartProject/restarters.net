@@ -11,7 +11,7 @@
         "php": "^7.2|^8.0",
         "addwiki/mediawiki-api": "~0.7.0",
         "addwiki/mediawiki-api-base": "~2.0",
-        "barryvdh/laravel-translation-manager": "^0.5.1",
+        "barryvdh/laravel-translation-manager": "^0.6.2",
         "caseyamcl/guzzle_retry_middleware": "^2.6",
         "cweagans/composer-patches": "^1.7",
         "doctrine/dbal": "^2.6",

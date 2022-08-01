@@ -13,7 +13,7 @@
 
                 <p class="big">
                     <?php if($paragraph_only == 'yes'){ ?> <a href="https://therestartproject.org/impact" target="_top"> <?php } ?>
-                    <span class="big blue"><?php echo $pax; ?> participants</span> aided by <span class="big blue"><?php echo $hours; ?> hours of volunteered time</span> worked on <span class="big blue"><?php echo ($device_count_status[0]->counter + $device_count_status[1]->counter + $device_count_status[2]->counter) ?> devices.</span>
+                    <span class="big blue"><?php echo $pax; ?> participants</span> aided by <span class="big blue"><?php echo $hours; ?> hours of volunteered time</span> worked on <span class="big blue"><?php echo ($device_count_status[0]['counter'] + $device_count_status[1]['counter'] + $device_count_status[2]['counter']) ?> devices.</span>
                     <?php if($paragraph_only == 'yes'){ ?> </a> <?php } ?>
                 </p>
 
@@ -25,19 +25,19 @@
 
                 <div class="impact-devices-1">
                     <img src="{{ asset('/icons/impact_device_1.jpg') }}" class="" width="200">
-                    <span class="title"><?php echo (int)$device_count_status[0]->counter;?></span>
+                    <span class="title"><?php echo (int)$device_count_status[0]['counter'];?></span>
                     <span class="legend">were fixed</span>
                 </div>
 
                 <div class="impact-devices-2">
                     <img src="{{ asset('/icons/impact_device_2.jpg') }}" class="" width="200">
-                    <span class="title"><?php echo (int)$device_count_status[1]->counter;?></span>
+                    <span class="title"><?php echo (int)$device_count_status[1]['counter'];?></span>
                     <span class="legend">were still repairable</span>
                 </div>
 
                 <div class="impact-devices-3">
                     <img src="{{ asset('/icons/impact_device_3.jpg') }}" class="" width="200">
-                    <span class="title"><?php echo (int)$device_count_status[2]->counter;?></span>
+                    <span class="title"><?php echo (int)$device_count_status[2]['counter'];?></span>
                     <span class="legend">were dead</span>
                 </div>
 
@@ -47,9 +47,9 @@
                 <h2><span class="title-text">Most Repaired Devices</span></h2>
 
                 <div class="row">
-                    <div class="col-xs-4 col-sm-4 col-md-4"><div class="topper  text-center"><?php echo $top[0]->name . ' [' . $top[0]->counter . ']'; ?></div></div>
-                    <div class="col-xs-4 col-sm-4 col-md-4"><div class="topper  text-center"><?php echo $top[1]->name . ' [' . $top[1]->counter . ']'; ?></div></div>
-                    <div class="col-xs-4 col-sm-4 col-md-4"><div class="topper  text-center"><?php echo $top[2]->name . ' [' . $top[2]->counter . ']'; ?></div></div>
+                    <div class="col-xs-4 col-sm-4 col-md-4"><div class="topper  text-center"><?php echo $top[0]['name'] . ' [' . $top[0]['counter'] . ']'; ?></div></div>
+                    <div class="col-xs-4 col-sm-4 col-md-4"><div class="topper  text-center"><?php echo $top[1]['name'] . ' [' . $top[1]['counter'] . ']'; ?></div></div>
+                    <div class="col-xs-4 col-sm-4 col-md-4"><div class="topper  text-center"><?php echo $top[2]['name'] . ' [' . $top[2]['counter'] . ']'; ?></div></div>
                 </div>
             </div>
             <?php if($paragraph_only == false ) { ?>

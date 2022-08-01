@@ -13,7 +13,6 @@ use App\Group;
 use App\Helpers\Fixometer;
 use App\Http\Controllers\PartyController;
 use App\Invite;
-use App\Mail\RegistrationWelcome;
 use App\Network;
 use App\Notifications\AdminNewUser;
 use App\Notifications\ResetPassword;
@@ -997,16 +996,6 @@ class UserController extends Controller
                   'role' => 4,
                 ]);
                 $acceptance->delete();
-            }
-        }
-
-        // Send post-registration welcome email.
-        if (env('FEATURE__REGISTRATION_WELCOME_EMAIL') === true) {
-            try {
-                $firstName = $user->getFirstName();
-                Mail::to($user)->send(new RegistrationWelcome($firstName));
-            } catch (\Exception $ex) {
-                Log::error('Failed to send post-registration welcome email: '.$ex->getMessage());
             }
         }
 

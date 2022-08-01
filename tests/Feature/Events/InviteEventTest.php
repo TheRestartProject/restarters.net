@@ -4,11 +4,14 @@ namespace Tests\Feature;
 
 use App\EventsUsers;
 use App\Group;
+use App\Helpers\Fixometer;
 use App\Notifications\RSVPEvent;
 use App\Party;
+use App\Role;
 use App\User;
 use DB;
 use Illuminate\Support\Facades\Notification;
+use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Tests\TestCase;
 use App\Notifications\JoinEvent;
 
@@ -56,12 +59,7 @@ class InviteEventTest extends TestCase
                 self::assertContains('creepy', $mailData['introLines'][2]);
                 self::assertContains($event->location, $mailData['introLines'][4]);
                 self::assertContains($event->timezone,  $mailData['introLines'][4]);
-
-                // Render to HTML to check the footer which is inserted by email.blade.php isn't accidentally
-                // escaped.
-                $html = $notification->toMail($user)->render();
-                self::assertGreaterThan(0, strpos($html, 'contact <a href'));
-
+                self::assertContains('/view/', $mailData['introLines'][4]);
                 return true;
             }
         );
@@ -186,6 +184,8 @@ class InviteEventTest extends TestCase
         $this->get('/logout');
         $this->actingAs($user);
 
+        $this->processQueuedNotifications();
+
         // Now accept the invitation.
         $response7 = $this->get('/party/view/'.$event->idevents);
         $response7->assertSee('You&#039;ve been invited to join an event');
@@ -306,5 +306,37 @@ class InviteEventTest extends TestCase
         $response9 = $this->get('/party/get-group-emails-with-names/'.$event->idevents);
         $members = json_decode($response9->getContent());
         $this->assertEquals([], $members);
+    }
+
+    public function testInviteViaLink() {
+        $this->loginAsTestUser(Role::ADMINISTRATOR);
+        $user = factory(User::class)->states('Restarter')->create([
+                                                                          'api_token' => '1234',
+                                                                      ]);
+
+        $idgroups = $this->createGroup();
+        $group = Group::findOrFail($idgroups);
+        $idevents = $this->createEvent($idgroups, 'tomorrow');
+        $event = Party::findOrFail($idevents);
+
+        $unique_shareable_code = Fixometer::generateUniqueShareableCode(\App\Party::class, 'shareable_code');
+        $event->update([
+                           'shareable_code' => $unique_shareable_code,
+                       ]);
+
+        // Accept the invite via the code.
+        $this->actingAs($user);
+        $this->followingRedirects();
+        $rsp = $this->get('/party/invite/' . $unique_shareable_code);
+        $rsp->assertSuccessful();
+        $this->assertStringContainsString('/dashboard', url()->current());
+        $rsp->assertSee(__('events.you_have_joined', [
+            'url' => url("/party/view/{$event->idevents}"),
+            'name' => $event->venue
+        ]));
+
+        // Try with invalid code.
+        $this->expectException(NotFoundHttpException::class);
+        $rsp = $this->get('/party/invite/' . $unique_shareable_code . '1');
     }
 }

@@ -2,42 +2,10 @@
 
 namespace App\Notifications;
 
-use Illuminate\Bus\Queueable;
-use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Notifications\Messages\MailMessage;
-use Illuminate\Notifications\Notification;
 
-class AdminModerationEventPhotos extends Notification implements ShouldQueue
+class AdminModerationEventPhotos extends BaseNotification
 {
-    use Queueable;
-
-    protected $arr;
-
-    /**
-     * Create a new notification instance.
-     *
-     * @return void
-     */
-    public function __construct($arr)
-    {
-        $this->arr = $arr;
-    }
-
-    /**
-     * Get the notification's delivery channels.
-     *
-     * @param  mixed  $notifiable
-     * @return array
-     */
-    public function via($notifiable)
-    {
-        if ($notifiable->invites == 1) {
-            return ['mail', 'database'];
-        }
-
-        return ['database'];
-    }
-
     /**
      * Get the mail representation of the notification.
      *
@@ -55,7 +23,9 @@ class AdminModerationEventPhotos extends Notification implements ShouldQueue
                       ->line('Photos have been uploaded to an event: \''.$this->arr['event_venue'].'\'.')
                       ->action('View event', $this->arr['event_url'])
                       ->line('These photos might need your moderation, if they haven\'t yet been moderated by another administrator.')
-                      ->line('If you would like to stop receiving these notifications, please edit <a href="'.url('/user/edit/'.$notifiable->id).'">your preferences</a> on your account.');
+                      ->line(__('notifications.email_preferences', [
+                          'url' => url('/user/edit/'.$notifiable->id)
+                      ], $notifiable->locale));
     }
 
     /**

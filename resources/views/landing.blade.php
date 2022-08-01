@@ -2,6 +2,165 @@
 
 @yield('content')
 
+<style>
+    .landing-page {
+        padding-top: 31px;
+    }
+
+    .landing-page .row-expanded {
+        width: 100%;
+    }
+
+    .landing-section {
+        display: flex;
+        background-color: #fff;
+        border: 1px solid black;
+        -webkit-box-shadow: 6px 6px 0 0 black;
+        box-shadow: 6px 6px 0 0 black;
+    }
+
+    .landing-section img {
+        max-height: 250px;
+        object-fit: cover;
+    }
+
+    .landing-section > div {
+        padding: 20px;
+    }
+
+    .landing-section .landing-icon {
+        max-height: 30px;
+        width: 30px !important;
+        margin-right: 5px;
+    }
+
+    .landing-page .has-background-gold {background-color: #FFBE5F;}
+    .landing-page .has-background-teal {background-color: #4AAEBC;}
+    .landing-page .has-background-pink {background-color: #F49292;}
+    .landing-page .has-background-purple {background-color: #80a4e0; }
+
+    .landing-page h1, h2 {
+        font-weight: bold;
+    }
+
+    .landing-page .landing-hr {
+        border-top: 3px dashed black;
+    }
+
+    .landing-page .network-left {
+        width: 45%;
+        padding-right: 1rem;
+    }
+
+    .landing-page .network-right {
+        width: 55%;
+        padding-left: 1rem;
+    }
+
+    @media only screen and (max-width: 767px) {
+        .landing-page .network-left {
+            width: 100%;
+            padding-right: 0;
+        }
+        .landing-page .network-right {
+            width: 100%;
+            padding-left: 0rem;
+        }
+    }
+
+    .landing-section p:not(.noindent) {
+        padding-left: 39px;
+        text-indent: -39px;
+    }
+
+    .textlarge {
+        font-size: 20px;
+    }
+
+    .landing-layout {
+        display: grid;
+        grid-template-rows: 1fr 1fr 1fr;
+        grid-template-columns: 1fr 1fr 1fr;
+        column-gap: 30px;
+        align-items: center;
+    }
+
+    @media only screen and (max-width: 767px) {
+        .landing-layout {
+            grid-template-columns: 0px 1fr 0px;
+            margin-top: 20px;
+            text-align: center;
+        }
+    }
+
+    .landing-top-left {
+        grid-row: 1 / 2;
+        grid-column: 1 / 2;
+        display: flex;
+        justify-content: end;
+    }
+
+    .landing-top-middle {
+        grid-row: 1 / 2;
+        grid-column: 2 / 3;
+    }
+
+    .landing-top-right {
+        grid-row: 1 / 2;
+        grid-column: 3 / 4;
+        display: flex;
+        justify-content: start;
+    }
+
+    .landing-middle-left {
+        grid-row: 2 / 3;
+        grid-column: 1 / 2;
+        display: flex;
+        justify-content: end;
+        padding-right: 30px;
+    }
+
+    .landing-middle-middle {
+        grid-row: 2 / 3;
+        grid-column: 2 / 3;
+    }
+
+    .landing-middle-right {
+        grid-row: 2 / 3;
+        grid-column: 3 / 4;
+        display: flex;
+        justify-content: start;
+        padding-left: 30px;
+    }
+
+    .landing-bottom-left {
+        grid-row: 3 / 4;
+        grid-column: 1 / 2;
+        display: flex;
+        justify-content: end;
+        margin-top: 10px;
+    }
+
+    .landing-bottom-middle {
+        grid-row: 3 / 4;
+        grid-column: 2 / 3;
+        display: flex;
+        justify-content: center;
+        margin-top: 10px;
+    }
+
+    .landing-bottom-right {
+        grid-row: 3 / 4;
+        grid-column: 3 / 4;
+        display: flex;
+        justify-content: start;
+        margin-top: 10px;
+    }
+
+    .landing-layout svg {
+        width: 30px;
+    }
+</style>
 <section class="landing-page">
   <div class="container">
     <div class="d-flex justify-content-around justify-content-md-start">
@@ -164,167 +323,9 @@
       </div>
     </div>
   </div>
+  @include('partials.languages')
+  @include('layouts.footer')
 </section>
-<style>
-  .landing-page {
-      padding-top: 31px;
-  }
-
-  .landing-page .row-expanded {
-      width: 100%;
-  }
-
-  .landing-section {
-      display: flex;
-      background-color: #fff;
-      border: 1px solid black;
-      -webkit-box-shadow: 6px 6px 0 0 black;
-      box-shadow: 6px 6px 0 0 black;
-  }
-
-  .landing-section img {
-      max-height: 250px;
-      object-fit: cover;
-  }
-
-  .landing-section > div {
-      padding: 20px;
-  }
-
-  .landing-section .landing-icon {
-      max-height: 30px;
-      width: 30px !important;
-      margin-right: 5px;
-  }
-
-  .landing-page .has-background-gold {background-color: #FFBE5F;}
-  .landing-page .has-background-teal {background-color: #4AAEBC;}
-  .landing-page .has-background-pink {background-color: #F49292;}
-  .landing-page .has-background-purple {background-color: #80a4e0; }
-
-  .landing-page h1, h2 {
-      font-weight: bold;
-  }
-
-  .landing-page .landing-hr {
-      border-top: 3px dashed black;
-  }
-
-  .landing-page .network-left {
-      width: 45%;
-      padding-right: 1rem;
-  }
-
-  .landing-page .network-right {
-      width: 55%;
-      padding-left: 1rem;
-  }
-
-  @media only screen and (max-width: 767px) {
-      .landing-page .network-left {
-          width: 100%;
-          padding-right: 0;
-      }
-      .landing-page .network-right {
-          width: 100%;
-          padding-left: 0rem;
-      }
-  }
-
-  .landing-section p:not(.noindent) {
-      padding-left: 39px;
-      text-indent: -39px;
-  }
-
-  .textlarge {
-      font-size: 20px;
-  }
-
-  .landing-layout {
-      display: grid;
-      grid-template-rows: 1fr 1fr 1fr;
-      grid-template-columns: 1fr 1fr 1fr;
-      column-gap: 30px;
-      align-items: center;
-  }
-
-  @media only screen and (max-width: 767px) {
-      .landing-layout {
-          grid-template-columns: 0px 1fr 0px;
-          margin-top: 20px;
-          text-align: center;
-      }
-  }
-
-  .landing-top-left {
-      grid-row: 1 / 2;
-      grid-column: 1 / 2;
-      display: flex;
-      justify-content: end;
-  }
-
-  .landing-top-middle {
-      grid-row: 1 / 2;
-      grid-column: 2 / 3;
-  }
-
-  .landing-top-right {
-      grid-row: 1 / 2;
-      grid-column: 3 / 4;
-      display: flex;
-      justify-content: start;
-  }
-
-  .landing-middle-left {
-      grid-row: 2 / 3;
-      grid-column: 1 / 2;
-      display: flex;
-      justify-content: end;
-      padding-right: 30px;
-  }
-
-  .landing-middle-middle {
-      grid-row: 2 / 3;
-      grid-column: 2 / 3;
-  }
-
-  .landing-middle-right {
-      grid-row: 2 / 3;
-      grid-column: 3 / 4;
-      display: flex;
-      justify-content: start;
-      padding-left: 30px;
-  }
-
-  .landing-bottom-left {
-      grid-row: 3 / 4;
-      grid-column: 1 / 2;
-      display: flex;
-      justify-content: end;
-      margin-top: 10px;
-  }
-
-  .landing-bottom-middle {
-      grid-row: 3 / 4;
-      grid-column: 2 / 3;
-      display: flex;
-      justify-content: center;
-      margin-top: 10px;
-  }
-
-  .landing-bottom-right {
-      grid-row: 3 / 4;
-      grid-column: 3 / 4;
-      display: flex;
-      justify-content: start;
-      margin-top: 10px;
-  }
-
-  .landing-layout svg {
-    width: 30px;
-  }
-</style>
-
 </body>
 </html>
 

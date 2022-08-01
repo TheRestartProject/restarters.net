@@ -115,4 +115,22 @@ class GroupViewTest extends TestCase
             self::assertEquals(1, $stats['co2']);
         }
     }
+
+    public function testInProgressVisible() {
+        $this->loginAsTestUser(Role::ADMINISTRATOR);
+        $id = $this->createGroup();
+        $this->assertNotNull($id);
+
+        factory(Party::class)->states('moderated')->create([
+                                                                    'event_start_utc' => Carbon::parse('1 hour ago')->toIso8601String(),
+                                                                    'event_end_utc' => Carbon::parse('4pm tomorrow')->toIso8601String(),
+                                                                    'group' => $id,
+                                                                ]);
+
+        // Event should show in list for group.
+        $response = $this->get("/group/view/$id");
+        $props = $this->getVueProperties($response);
+        $events = json_decode($props[1][':events'], true);
+        self::assertEquals(Party::latest()->first()->idevents, $events[0]['idevents']);
+    }
 }

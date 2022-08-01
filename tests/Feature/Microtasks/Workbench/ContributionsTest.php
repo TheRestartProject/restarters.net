@@ -125,7 +125,7 @@ class ContributionsTest extends TestCase
 
         $this->assertVueProperties($response, [
             [
-                ':total-quests' => 7,
+                ':total-quests' => 8,
                 ':total-contributions' => 5,
             ],
         ]);

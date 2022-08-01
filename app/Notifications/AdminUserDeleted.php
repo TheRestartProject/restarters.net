@@ -2,42 +2,10 @@
 
 namespace App\Notifications;
 
-use Illuminate\Bus\Queueable;
-use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Notifications\Messages\MailMessage;
-use Illuminate\Notifications\Notification;
 
-class AdminUserDeleted extends Notification implements ShouldQueue
+class AdminUserDeleted extends BaseNotification
 {
-    use Queueable;
-
-    protected $arr;
-
-    /**
-     * Create a new notification instance.
-     *
-     * @return void
-     */
-    public function __construct($arr)
-    {
-        $this->arr = $arr;
-    }
-
-    /**
-     * Get the notification's delivery channels.
-     *
-     * @param  mixed  $notifiable
-     * @return array
-     */
-    public function via($notifiable)
-    {
-        if ($notifiable->invites == 1) {
-            return ['mail', 'database'];
-        }
-
-        return ['database'];
-    }
-
     /**
      * Get the mail representation of the notification.
      *
@@ -50,7 +18,9 @@ class AdminUserDeleted extends Notification implements ShouldQueue
                       ->subject('User Deleted')
                       ->greeting(__('notifications.greeting', [], $notifiable->language))
                       ->line('The user "'.$this->arr['name'].'" has deleted their Restarters account.')
-                      ->line('If you would like to stop receiving these emails, please visit <a href="'.url('/user/edit/'.$notifiable->id).'">your preferences</a> on your account.');
+                      ->line(__('notifications.email_preferences', [
+                          'url' => url('/user/edit/'.$notifiable->id)
+                      ], $notifiable->locale));
     }
 
     /**

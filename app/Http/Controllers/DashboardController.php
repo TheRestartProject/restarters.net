@@ -2,17 +2,9 @@
 
 namespace App\Http\Controllers;
 
-use App\Device;
-use App\EventsUsers;
 use App\Group;
-use App\Helpers\CachingRssRetriever;
-use App\Helpers\CachingWikiPageRetriever;
-use App\Helpers\Fixometer;
 use App\Party;
-use App\Services\DiscourseService;
 use App\User;
-use App\UserGroups;
-use App\UsersSkills;
 use Auth;
 use Cache;
 use DB;

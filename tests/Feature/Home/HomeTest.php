@@ -18,6 +18,7 @@ class HomeTest extends TestCase
         $response = $this->get($url);
         $response->assertSuccessful();
         $response->assertSee(__('landing.learn'));
+        $response->assertSee('language-bar');
     }
 
     public function landingPagesProvider() {

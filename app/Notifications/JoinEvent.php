@@ -2,29 +2,10 @@
 
 namespace App\Notifications;
 
-use Illuminate\Bus\Queueable;
-use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Notifications\Messages\MailMessage;
-use Illuminate\Notifications\Notification;
 
-class JoinEvent extends Notification implements ShouldQueue
+class JoinEvent extends BaseNotification
 {
-    use Queueable;
-
-    protected $arr;
-    protected $user;
-
-    /**
-     * Create a new notification instance.
-     *
-     * @return void
-     */
-    public function __construct($arr, $user = null)
-    {
-        $this->arr = $arr;
-        $this->user = $user;
-    }
-
     /**
      * Get the notification's delivery channels.
      *
@@ -80,9 +61,12 @@ class JoinEvent extends Notification implements ShouldQueue
                                     <td>' . __('notifications.join_event_time') . '</td>
                                     <td>'.$this->arr['event']->getEventStartEndLocal(true).'</td>
                                   </tr>
-                                    <tr>
+                                  <tr>
                                     <td>' . __('notifications.join_event_location') . '</td>
                                     <td>'.$this->arr['event']->location.'</td>
+                                  </tr>
+                                  <tr>
+                                    <td colspan="2"><a href="' . $this->arr['view_url'] . '">' . __('notifications.join_event_view') . '</a></td>
                                   </tr>
                             </table>';
         $ignoreLine = __('notifications.join_event_ignore', [], $locale);
@@ -102,8 +86,6 @@ class JoinEvent extends Notification implements ShouldQueue
                 }
 
                 $mail->line($eventDetailsTable)
-                     ->action(__('notifications.join_event_rsvp_now'), $this->arr['url'])
-                     ->line('')
                      ->line($ignoreLine)
                      ->line('');
 
@@ -123,8 +105,6 @@ class JoinEvent extends Notification implements ShouldQueue
             }
 
             $mail->line($eventDetailsTable)
-                 ->action(__('notifications.join_event_rsvp_now', [], $locale), $this->arr['url'])
-                 ->line('')
                  ->line(__('notifications.join_event_rsvp_now', [], $locale))
                  ->line('')
                  ->line($ignoreLine);

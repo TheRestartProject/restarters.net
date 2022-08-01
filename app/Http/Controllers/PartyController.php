@@ -107,7 +107,7 @@ class PartyController extends Controller
 
         if (! is_null($group_id)) {
             // This is the page for a specific group's events.  We want all events for this group.
-            foreach (Party::events()->where('events.group', $group_id)->get() as $event) {
+            foreach (Party::where('events.group', $group_id)->get() as $event) {
                 $e = \App\Http\Controllers\PartyController::expandEvent($event, NULL);
                 $events[] = $e;
             }
@@ -209,34 +209,37 @@ class PartyController extends Controller
 
             $error = [];
 
+            $latitude = null;
+            $longitude = null;
+
             if ($request->filled('location')) {
+                $worked = false;
+
                 try {
                     $results = $this->geocoder->geocode($request->get('location'));
-
-                    if (empty($results)) {
-                        $response['danger'] = 'Party could not be created. Address not found.';
-
-                        return view('events.create', [
-                            'response' => $response,
-                            'title' => 'New Party',
-                            'gmaps' => true,
-                            'allGroups' => $allGroups,
-                            'user' => Auth::user(),
-                            'user_groups' => $groupsUserIsInChargeOf,
-                            'selected_group_id' => $group_id,
-                            'autoapprove' => $autoapprove,
-                        ]);
-                    }
+                    $worked = true;
 
                     $latitude = $results['latitude'];
                     $longitude = $results['longitude'];
                 } catch (\Exception $ex) {
                     Log::error('An error occurred during geocoding: '.$ex->getMessage());
                 }
-            } else {
-                $latitude = null;
-                $longitude = null;
+
+                if ($request->get('location') == 'ForceGeocodeFailure' || !$worked) {
+                    $request->session()->put('danger', __('events.address_error'));
+
+                    return view('events.create', [
+                        'title' => 'New Party',
+                        'gmaps' => true,
+                        'allGroups' => $allGroups,
+                        'user' => Auth::user(),
+                        'user_groups' => $groupsUserIsInChargeOf,
+                        'selected_group_id' => $group_id,
+                        'autoapprove' => $autoapprove,
+                    ]);
+                }
             }
+
             $data['latitude'] = $latitude;
             $data['longitude'] = $longitude;
 
@@ -621,8 +624,8 @@ class PartyController extends Controller
             $device_images[$device->iddevices] = $File->findImages(env('TBL_DEVICES'), $device->iddevices);
         }
 
-        // We want to include device stats from events even if they haven't taken place yet.
-        $stats = $event->getEventStats(null, null, true);
+        // Items can be logged at any time.
+        $stats = $event->getEventStats();
 
         return view('events.view', [
             'gmaps' => true,
@@ -773,19 +776,11 @@ class PartyController extends Controller
         }
     }
 
-    public static function stats($id, $class = null)
+    public static function stats($id)
     {
         $event = Party::where('idevents', $id)->first();
 
         $eventStats = $event->getEventStats();
-
-        if (! is_null($class)) {
-            return view('party.stats', [
-                'framed' => true,
-                'party' => $eventStats,
-                'class' => 'wide',
-            ]);
-        }
 
         return view('party.stats', [
             'framed' => true,
@@ -884,7 +879,7 @@ class PartyController extends Controller
             $event_id = $volunteer->event;
 
             // Has current logged-in user got permission to remove volunteer?
-            if ((Fixometer::hasRole(Auth::user(), 'Host') && Fixometer::userHasEditPartyPermission($event_id, Auth::user()->id)) || Fixometer::hasRole(Auth::user(), 'Administrator')) {
+            if (((Fixometer::hasRole(Auth::user(), 'Host') || Fixometer::hasRole(Auth::user(), 'NetworkCoordinator')) && Fixometer::userHasEditPartyPermission($event_id, Auth::user()->id)) || Fixometer::hasRole(Auth::user(), 'Administrator')) {
                 //Let's delete the user
                 $delete_user = $volunteer->delete();
 
@@ -946,6 +941,7 @@ class PartyController extends Controller
                         'name' => $from->name,
                         'group' => $group_name,
                         'url' => $url,
+                        'view_url' => url('/party/view/'.$event->idevents),
                         'message' => $message,
                         'event' => $event,
                     ];
@@ -983,6 +979,7 @@ class PartyController extends Controller
                         'name' => $from->name,
                         'group' => $group_name,
                         'url' => $url,
+                        'view_url' => url('/party/view/'.$event->idevents),
                         'message' => $message,
                         'event' => $event,
                     ];
@@ -1095,8 +1092,7 @@ class PartyController extends Controller
 
             Notification::send($all_restarters, new EventRepairs([
                 'event_name' => $event->getEventName(),
-                'event_url' => url('/party/view/'.intval($event_id).'#devices'),
-                'preferences' => url('/profile/edit'),
+                'event_url' => url('/party/view/'.intval($event_id).'#devices')
             ]));
 
             return redirect()->back()->with('success', __('events.review_requested'));

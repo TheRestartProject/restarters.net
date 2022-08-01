@@ -1,5 +1,5 @@
 <IfModule mod_headers.c>
-    SetEnvIf Origin "http(s)?://(www\.)?(therestartproject.org|wiki.restarters.net)$" AccessControlAllowOrigin=$0
+    SetEnvIf Origin "http(s)?://(www\.)?(therestartproject.org|wiki.restarters.net|therestartproject.local|staging-website.rstrt.org)$" AccessControlAllowOrigin=$0
     Header add Access-Control-Allow-Origin %{AccessControlAllowOrigin}e env=AccessControlAllowOrigin
     Header set Access-Control-Allow-Credentials true
 </IfModule>

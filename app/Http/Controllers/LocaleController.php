@@ -10,7 +10,6 @@ class LocaleController extends Controller
 {
     public function setLang($locale)
     {
-
         // Get local from URL and set in the session
         session()->put('locale', $locale);
 

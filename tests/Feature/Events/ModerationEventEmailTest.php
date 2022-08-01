@@ -5,8 +5,6 @@ namespace Tests\Feature;
 use App\Notifications\AdminModerationEvent;
 use App\Party;
 use App\User;
-use Illuminate\Foundation\Testing\RefreshDatabase;
-use Illuminate\Foundation\Testing\WithoutMiddleware;
 use Illuminate\Support\Facades\Notification;
 use Tests\TestCase;
 

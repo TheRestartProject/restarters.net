@@ -19,13 +19,29 @@ class GroupHostTest extends TestCase
         $this->loginAsTestUser(Role::ADMINISTRATOR);
         $this->idgroups = $this->createGroup();
         $this->group = Group::find($this->idgroups);
+        $this->network = factory(Network::class)->create();
+        $this->network->addGroup($this->group);
         $this->assertNotNull($this->idgroups);
     }
 
-    public function testVolunteerNotInGroup()
+    public function roleProvider() {
+        return [
+            [ 'Administrator' ],
+            [ 'NetworkCoordinator' ],
+        ];
+    }
+
+    /**
+     * @dataProvider roleProvider
+     */
+    public function testVolunteerNotInGroup($role)
     {
-        $user = factory(User::class)->states('Administrator')->create();
+        $user = factory(User::class)->states($role)->create();
         $this->actingAs($user);
+
+        if ($role == 'NetworkCoordinator') {
+            $this->network->addCoordinator($user);
+        }
 
         $host = factory(User::class)->states('Host')->create();
 
@@ -37,31 +53,32 @@ class GroupHostTest extends TestCase
         }
     }
 
-    public function testAdministratorMakeHost()
+    /**
+     * @dataProvider roleProvider
+     */
+    public function testMakeHost($role)
     {
-        $user = factory(User::class)->states('Administrator')->create();
+        $user = factory(User::class)->states($role)->create();
         $this->actingAs($user);
 
-        $host = factory(User::class)->states('Host')->create();
-        $this->group->addVolunteer($host);
-
-        $response = $this->get("/group/make-host/{$this->idgroups}/{$host->id}");
-        $response->assertSessionHas('success');
-    }
-
-    public function testNetworkCoordinatorMakeHost()
-    {
-        $network = factory(Network::class)->create();
-        $coordinator = factory(User::class)->state('NetworkCoordinator')->create();
-        $network->addGroup($this->group);
-        $network->addCoordinator($coordinator);
-        $this->actingAs($coordinator);
+        if ($role == 'NetworkCoordinator') {
+            $this->network->addCoordinator($user);
+        }
 
         $host = factory(User::class)->states('Host')->create();
         $this->group->addVolunteer($host);
 
         $response = $this->get("/group/make-host/{$this->idgroups}/{$host->id}");
         $response->assertSessionHas('success');
+
+        // Remove them.
+        $response = $this->get("/group/remove-volunteer/{$this->idgroups}/{$host->id}");
+        $response->assertSessionHas('success');
+
+        // Remove them again - should redirect back with warning.
+        $response = $this->from('/')->get("/group/remove-volunteer/{$this->idgroups}/{$host->id}");
+        $response->assertRedirect('/');
+        $response->assertSessionHas('warning');
     }
 
     public function testHostMakeHost()

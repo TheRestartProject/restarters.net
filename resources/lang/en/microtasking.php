@@ -12,7 +12,7 @@ return [
   'volunteering' => [
     'title' => 'Volunteer from anywhere',
     'content' => '<p>We collect data at community events.  But the raw data needs your help to become strong evidence for better products.  With your help, we can change the system.</p>
-<p>This is an easy way to make a difference, whether or not you can join us at our repair events.  Join us, and contribute as little or as much time and brain-power you can.  Most of the tasks here are OK for non-technical people.  And we\'re always here to help.</p><p><strong>There are currently no open quests.</strong>  In the meantime, why not join the discussion on repair data below, and find out more about <a href="https://talk.restarters.net/t/our-work-on-repair-data/1150">our work with repair data</a>.</p>',
+<p>This is an easy way to make a difference, whether or not you can join us at our repair events.  Join us, and contribute as little or as much time and brain-power you can.  Most of the tasks here are OK for non-technical people.  And we\'re always here to help.</p>',
     'number_of_tasks' => 'Number of tasks',
     'number_of_quests' => 'Number of quests',
     'all_volunteer_contributions' => 'Total volunteer contributions',
@@ -52,6 +52,11 @@ return [
     'battcat' => [
       'title' => 'Help Now! BattCat',
       'description' => '<p>We see lots of broken devices at community repair events that have a battery problem. But what\'s causing the batteries to fail and what could make them easier to fix or replace? Help us figure out the most common issues we see with batteries with BattCat!</p> <p>The repair data in BattCat comes from around the world, via partners of the <a target="_blank" style="color:#212529;text-decoration:underline" href="https://openrepair.org">Open Repair Alliance</a>.</p>',
+      'get_involved' => 'Get involved',
+    ],
+    'dustup' => [
+      'title' => 'Help Now! DustUp',
+      'description' => '<p>We see lots of broken vacuum cleaners at community repair events. But what\'s causing them to break and what could make them easier to fix? Help us figure out the most common issues we see with vacuum cleaners with DustUp!</p> <p>The repair data in DustUp comes from around the world, via partners of the <a target="_blank" style="color:#212529;text-decoration:underline" href="https://openrepair.org">Open Repair Alliance</a>.</p>',
       'get_involved' => 'Get involved',
     ],
   ],

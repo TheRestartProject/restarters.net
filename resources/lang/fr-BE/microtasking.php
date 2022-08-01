@@ -31,6 +31,11 @@ return [
       'description' => '<p>Nous voyons beaucoup d\'appareils cassés, lors des événements de réparation communautaires, qui ont un problème de batterie. Mais qu\'est-ce qui cause la défaillance des batteries et qu\'est-ce qui pourrait les rendre plus faciles à réparer ou à remplacer ? Aidez-nous à comprendre les problèmes les plus courants que nous rencontrons avec les batteries grâce à BattCat !</p> <p>Les données de réparation dans BattCat proviennent du monde entier, via les partenaires de l\' <a target="_blank" style="color:#212529;text-decoration:underline" href="https://openrepair.org">Open Repair Alliance</a>.</p>',
       'get_involved' => 'Participer',
       'title' => 'Aider maintenant! BattCat',
+      'dustup' => [
+        'title' => 'Help Now! DustUp',
+        'description' => '<p>We see lots of broken vacuum cleaners at community repair events. But what\'s causing them to break and what could make them easier to fix? Help us figure out the most common issues we see with vacuum cleaners with DustUp!</p> <p>The repair data in DustUp comes from around the world, via partners of the <a target="_blank" style="color:#212529;text-decoration:underline" href="https://openrepair.org">Open Repair Alliance</a>.</p>',
+        'get_involved' => 'Get involved',
+      ],
     ],
   ],
   'discussion' => [
@@ -53,7 +58,7 @@ return [
     'my_contributions' => 'Mes contributions',
     'number_of_tasks' => 'Nombre de tâches',
     'title' => 'Bénévoles de partout',
-    'content' => 'Nous collectons les données lors d\'évènements locaux de réparation. Mais les données brutes ont besoin de vous pour devenir des preuves solides pour de meilleurs produits. Avec votre aide, nous pouvons changer le système 
+    'content' => 'Nous collectons les données lors d\'évènements locaux de réparation. Mais les données brutes ont besoin de vous pour devenir des preuves solides pour de meilleurs produits. Avec votre aide, nous pouvons changer le système
             </p>
             <p>
                C\'est un moyen facile de faire changer les choses, que vous puissiez nous rejoindre lors d\'événements de réparation ou non. Rejoignez-nous, et contribuez en consacrant autant de temps et de ressources intellectuelles que vous pouvez. La plupart des tâches sont accessibles pour les personnes n\'ayant pas de bagage technique. Et nous sommes là pour vous aider.',

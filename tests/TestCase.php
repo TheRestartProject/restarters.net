@@ -25,6 +25,8 @@ use Carbon\Carbon;
 use DB;
 use Hash;
 use Illuminate\Foundation\Testing\TestCase as BaseTestCase;
+use Illuminate\Support\Facades\Artisan;
+use Illuminate\Support\Facades\Queue;
 use Symfony\Component\DomCrawler\Crawler;
 
 abstract class TestCase extends BaseTestCase
@@ -63,6 +65,7 @@ abstract class TestCase extends BaseTestCase
         DB::delete('delete from grouptags_groups');
         DB::table('notifications')->truncate();
         DB::statement('SET foreign_key_checks=1');
+        DB::delete('delete from devices_faults_vacuums_ora_opinions');
 
         // Set up random auto increment values.  This avoids tests working because everything is 1.
         $tables = DB::select('SHOW TABLES');
@@ -98,6 +101,8 @@ abstract class TestCase extends BaseTestCase
         if (isset($_FILES)) {
             unset($_FILES);
         }
+
+        $this->processQueuedNotifications();
     }
 
     public function userAttributes()
@@ -141,6 +146,7 @@ abstract class TestCase extends BaseTestCase
             'website' => $website,
             'location' => $location,
             'free_text' => $text,
+            'timezone' => 'Europe/London'
         ]);
 
         if ($assert) {
@@ -302,5 +308,12 @@ abstract class TestCase extends BaseTestCase
         $this->assertTrue($foundSome);
 
         return $props;
+    }
+
+    public function processQueuedNotifications() {
+        // Process queued notifications.
+        while (Queue::size() > 0) {
+            Artisan::call('queue:work', ['--once' => true]);
+        }
     }
 }

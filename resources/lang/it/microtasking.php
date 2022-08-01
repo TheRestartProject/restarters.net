@@ -20,6 +20,11 @@ return [
       'get_involved' => 'Partecipa',
       'title' => 'Aiutaci adesso! BattCat',
     ],
+    'dustup' => [
+      'title' => 'Help Now! DustUp',
+      'description' => '<p>We see lots of broken vacuum cleaners at community repair events. But what\'s causing them to break and what could make them easier to fix? Help us figure out the most common issues we see with vacuum cleaners with DustUp!</p> <p>The repair data in DustUp comes from around the world, via partners of the <a target="_blank" style="color:#212529;text-decoration:underline" href="https://openrepair.org">Open Repair Alliance</a>.</p>',
+      'get_involved' => 'Get involved',
+    ],
   ],
   'discussion' => [
     'number_of_comments' => 'Numero di commenti',

@@ -1,0 +1,184 @@
+.dustup {
+
+    .dustup-layout {
+        --repairable-light: #FFE5C7;
+        --repairable-dark: #F9A33F;
+        --eol-light: #ffcfd3;
+        --eol-dark: #F46E77;
+
+        display: grid;
+
+        grid-template-columns: 1fr;
+
+        @include media-breakpoint-up(md) {
+            grid-template-columns: 1fr;
+            grid-template-rows: auto auto;
+        }
+
+        .task-step {
+            display: grid;
+            grid-template-columns: 1fr;
+            grid-template-rows: auto auto;
+            grid-gap: 0;
+            margin-bottom: 1em;
+
+            @include media-breakpoint-up(md) {
+                grid-gap: 1.5em;
+                margin-bottom: 0;
+                margin-top: 1em;
+                grid-template-columns: 1fr 3fr;
+            }
+        }
+
+        .task-step-help {
+            display: grid;
+
+            grid-template-columns: 1fr;
+            align-self: start;
+            grid-gap: 0.5em;
+
+            .task-step-help-text {
+                display: grid;
+                grid-template-columns: min-content 1fr;
+                align-items: center;
+                justify-items: start;
+                grid-gap: 1em;
+                line-height: 1.2;
+
+                @include media-breakpoint-up(md) {
+                    grid-template-columns: 1fr;
+                }
+            }
+
+            .number {
+                padding:10px; background-color: #19A5B9; color:white; font-size: 40px; line-height: 1; font-weight: bold; width: 60px; height: 60px;
+                text-align: center;
+            }
+        }
+
+        .task-step-info {
+            .label {
+                font-weight: bold;
+            }
+        }
+
+        &-repairable {
+            .repair-status {
+                background-color: var(--repairable-dark);
+                color: #fff;
+            }
+
+            .btn-fault-option {
+                background-color: var(--repairable-light);
+                border: 1.5px solid var(--repairable-dark);
+
+                &:hover {
+                    background-color: var(--repairable-dark);
+                }
+
+                &.btn-fault-selected {
+                    background-color: var(--repairable-dark);
+                }
+            }
+
+            .panel {
+                box-shadow: 6px 6px 0 0 var(--repairable-dark);
+                border-color: var(--repairable-dark);
+            }
+        }
+
+        .repair-status {
+            padding: 5px;
+        }
+
+        &-endoflife {
+            .repair-status {
+                background-color: var(--eol-dark);
+                color: #fff;
+            }
+
+            .btn-fault-option {
+                background-color: var(--eol-light);
+                border: 1.5px solid var(--eol-dark);
+
+                &:hover {
+                    background-color: var(--eol-dark);
+                }
+
+                &.btn-fault-selected {
+                    background-color: var(--eol-dark);
+                }
+            }
+
+            .panel {
+                box-shadow: 6px 6px 0 0 var(--eol-dark);
+                border-color: var(--eol-dark);
+            }
+        }
+    }
+
+    .btn-fault-option {
+        color: #000;
+        margin-bottom: 10px;
+        margin-right: 10px;
+        line-height: 1.2;
+
+        &.btn-fault-selected {
+            color: white;
+        }
+    }
+
+    .btn-fault-option[data-fname="Poor data"],
+    .btn-fault-option[data-fname="Other"] {
+        background-color: #ACDAE0;
+        border: 1.5px solid #19A5B9;
+
+        &:hover, &.btn-fault-selected {
+            background-color: #19A5B9;
+        }
+    }
+
+    #ora-partnership {
+        text-align: center;
+
+        hr {
+            width: 50%;
+        }
+
+        p {
+            font-size: medium;
+            font-weight: bold;
+        }
+
+        img {
+            width: 300px;
+        }
+    }
+
+    #a-info-open {
+        color: #222;
+        text-decoration: underline;
+    }
+
+    button#fetch,
+    button#change,
+    button#btn-translate,
+    {
+        text-transform: none;
+        letter-spacing: 1px;
+    }
+
+    /* overriding default focus styles.
+       see: https://therestartproject.atlassian.net/browse/DAT-574
+       Long term we should have a focus style we like, across the app.
+   */
+    button#change:focus {
+        -webkit-box-shadow: 5px 5px 0 0 $black !important;
+        box-shadow: 5px 5px 0 0 $black !important;
+        border: 2px solid $black !important;
+        padding: 9px !important;
+        background-color: $white !important;
+        color: $black !important;
+        outline: none;
+    }
+}

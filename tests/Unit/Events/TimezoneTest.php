@@ -179,4 +179,41 @@ class TimezoneTest extends TestCase
         $p = new Party();
         $p->end = '10:00';
     }
+
+    public function testTimezoneChangeUpdatesFutureEvents() {
+        // Create a group.
+        $g = factory(Group::class)->create([
+                                               'timezone' => 'Asia/Samarkand'
+                                           ]);
+
+        $host = factory(User::class)->states('Restarter')->create();
+        $g->addVolunteer($host);
+        $g->makeMemberAHost($host);
+
+        // Create a future event - will inherit the group timezone.
+        $this->actingAs($host);
+        $event = factory(Party::class)->raw();
+        unset($event['timezone']);
+
+        $event_start = Carbon::createFromTimestamp(time())->setTimezone('UTC')->addDay(2);;
+        $event_end = $event_start->addHour(2);
+
+        $event['event_start_utc'] = $event_start;
+        $event['event_end_utc'] = $event_end;
+        $event['group'] = $g->idgroups;
+        $response = $this->post('/party/create/', $event);
+        $response->assertRedirect();
+
+        $party = Party::latest()->first();
+        self::assertEquals('Asia/Samarkand', $party->timezone);
+
+        // Now edit the group timezone as though we were an admin.  This expects some extra attributes.
+        $atts = $g->getAttributes();
+        $atts['timezone'] = 'Europe/London';
+        $this->post('/group/edit/'.$g->idgroups, $atts);
+
+        // This should have updated the timezone of the event.
+        $party->refresh();
+        self::assertEquals('Europe/London', $party->timezone);
+    }
 }
