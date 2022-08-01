@@ -625,7 +625,7 @@ class PartyController extends Controller
         }
 
         // Items can be logged at any time.
-        $stats = $event->getEventStats();
+        $stats = $event->getEventStats(null, null, true);
 
         return view('events.view', [
             'gmaps' => true,
