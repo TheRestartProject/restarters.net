@@ -16,7 +16,8 @@
             'mb-2': true,
             'border-thick': missingCategory,
             'pulsate': pulsating,
-            }" :category.sync="currentDevice.category" :clusters="clusters" :powered="powered"
+            }" :category.sync="currentDevice.category" :clusters="clusters" :powered="powered" :key="currentDevice.item_type"
+                                @open="pulsating = false"
                                 :icon-variant="add ? 'black' : 'brand'" :disabled="disabled" @changed="categoryChange"/>
 
           <DeviceBrand class="mb-2" :brand.sync="currentDevice.brand" :brands="brands" :disabled="disabled"
@@ -202,6 +203,8 @@ export default {
         setTimeout(() => {
           this.pulsating = false
         }, 5000)
+      } else {
+        this.currentDevice.category = null
       }
     }
   },

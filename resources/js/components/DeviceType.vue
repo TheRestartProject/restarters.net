@@ -1,6 +1,6 @@
 <template>
   <div class="w-100 device-select-row">
-    <vue-typeahead-bootstrap v-model="currentType" :maxMatches="5" :data="suggestions" :minMatchingChars="1" size="lg" inputClass="marg form-control-lg" :disabled="disabled" :placeholder="__('devices.item_type')" @input="input" />
+    <vue-typeahead-bootstrap v-model="currentType" :maxMatches="5" :data="suggestions" :minMatchingChars="1" size="lg" inputClass="marg form-control-lg" :disabled="disabled" :placeholder="__('devices.item_type')" @hit="emit" />
     <div v-b-popover.html.left="translatedTooltip" class="ml-3 mt-2">
       <b-img class="icon clickable" src="/icons/info_ico_black.svg" v-if="iconVariant === 'black'" />
       <b-img class="icon clickable" src="/icons/info_ico_green.svg" v-else />
@@ -100,13 +100,18 @@ export default {
     type(newVal) {
       this.currentType = newVal
     },
+    currentType(newVal) {
+      if (!newVal.length) {
+        this.$emit('update:type', null)
+      }
+    },
     unknownType(newVal) {
       this.$emit('update:unknown', newVal)
     }
   },
   methods: {
-    input(e) {
-      this.$emit('update:type', e)
+    emit() {
+      this.$emit('update:type', this.currentType)
     }
   }
 }
