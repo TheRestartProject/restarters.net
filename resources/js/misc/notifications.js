@@ -2,7 +2,7 @@ function toggleRead(event) {
     event.preventDefault();
 
     $button = $(this);
-    $counter = $('button.badge.badge-pill.badge-info span');
+    $counter = $('#notifications-badge .chat-count');
 
     $notificationsBadge = $('#notifications-badge');
 

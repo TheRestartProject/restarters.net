@@ -30,6 +30,7 @@ return [
   'name' => 'Name',
   'country' => 'Country',
   'email_address' => 'Email address',
+  'save_profile' => 'Save profile',
   'view_profile' => 'View profile',
   'view_user_profile' => 'View user profile',
   'repair_directory' => 'Repair Directory',

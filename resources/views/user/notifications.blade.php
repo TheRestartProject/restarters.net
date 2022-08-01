@@ -10,9 +10,9 @@
                     </h1>
 
                     @if (Auth::id() == $user->id)
-                        <a href="/profile" class="btn btn-primary ml-auto">View profile</a>
+                        <a href="/profile" class="btn btn-primary ml-auto">@lang('profile.view_profile')</a>
                     @else
-                        <a href="/profile/{{ $user->id }}" class="btn btn-primary ml-auto">View user profile</a>
+                        <a href="/profile/{{ $user->id }}" class="btn btn-primary ml-auto">@lang('profile.view_user_profile')</a>
                     @endif
                 </div>
             </div>
