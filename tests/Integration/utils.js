@@ -175,7 +175,7 @@ exports.addDevice = async function(page, baseURL, idevents, powered) {
   await expect(page.locator('h3 >> text=Misc')).toHaveCount(2)
 }
 
-exports.unfollowGroup = async function(page, baseURL, idgroups) {
+exports.unfollowGroup = async function(page, idgroups) {
   await page.goto('/group/view/' + idgroups)
 
   await page.click('#groupactions .dropdown-toggle >> visible=true')
