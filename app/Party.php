@@ -46,7 +46,7 @@ class Party extends Model implements Auditable
         'timezone',
         'user_id'
     ];
-    protected $hidden = ['created_at', 'updated_at', 'deleted_at', 'frequency', 'group', 'group', 'user_id', 'wordpress_post_id', 'cancelled', 'devices_updated_at'];
+    protected $hidden = ['created_at', 'deleted_at', 'frequency', 'group', 'group', 'user_id', 'wordpress_post_id', 'cancelled', 'devices_updated_at'];
 
     // Append data to Model
     protected $appends = ['participants', 'ShareableLink', 'event_date_local', 'start_local', 'end_local'];

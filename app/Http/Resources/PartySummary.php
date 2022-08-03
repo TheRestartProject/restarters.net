@@ -16,6 +16,9 @@ class PartySummary extends JsonResource
     public function toArray($request)
     {
         // We return information which can be public, and we rename fields to look more consistent.
+        //
+        // The updated_at field is always being returned NULL, even though it's set.  This will be some Eloquent
+        // peculiarity which I can't get to the bottom of.  So pull it from the resource.
         return [
             'id' => $this->idevents,
             'start' => $this->event_start_utc,
@@ -27,7 +30,7 @@ class PartySummary extends JsonResource
             'lat' => $this->latitude,
             'lng' => $this->longitude,
             'group' => \App\Http\Resources\GroupSummary::make($this->theGroup),
-            'updated_at' => Carbon::parse($this->updated_at)->toIso8601String(),
+            'updated_at' => $this->updated_at->toIso8601String(),
         ];
     }
 }
