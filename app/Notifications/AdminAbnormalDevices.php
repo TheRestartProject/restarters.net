@@ -15,7 +15,7 @@ class AdminAbnormalDevices extends BaseNotification
     public function toMail($notifiable)
     {
         return (new MailMessage)
-            ->subject(__('notificatins.abnormal_devices_subject', [], $notifiable->language))
+            ->subject(__('notifications.abnormal_devices_subject', [], $notifiable->language))
             ->greeting(__('notifications.greeting', [], $notifiable->language))
             ->line(
                 __('notifications.abnormal_devices_line1', [
@@ -39,7 +39,7 @@ class AdminAbnormalDevices extends BaseNotification
     public function toArray($notifiable)
     {
         return [
-            'title' => __('notificatins.abnormal_devices_title', [], $notifiable->language),
+            'title' => __('notifications.abnormal_devices_title', [], $notifiable->language),
             'name' => $this->arr['event_venue'],
             'url' => $this->arr['event_url'],
         ];
