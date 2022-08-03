@@ -18,13 +18,13 @@ class AdminModerationGroup extends BaseNotification
         return (new MailMessage)
             ->subject(
                 __('notifications.moderation_group_subject', [
-                    'event' => $this->arr['moderation_group_subject']
+                    'name' => $this->arr['group_name']
                 ], $locale)
             )
             ->greeting(__('notifications.greeting', [], $notifiable->language))
             ->line(
                 __('notifications.moderation_group_line1', [
-                    'name' => $this->arr['moderation_group_subject']
+                    'name' => $this->arr['group_name']
                 ], $notifiable->language)
             )
             ->action('View group', $this->arr['group_url'])
@@ -46,10 +46,7 @@ class AdminModerationGroup extends BaseNotification
     {
         $locale = $notifiable->language;
         return [
-            'title' => __('notifications.moderation_group_subject', [
-                'event' => $this->arr['group_name']
-            ],            $locale),
-
+            'title' => __('notifications.moderation_group_title', [], $locale),
             'name' => $this->arr['group_name'],
             'url' => $this->arr['group_url'],
         ];

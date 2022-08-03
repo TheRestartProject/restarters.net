@@ -17,7 +17,7 @@ class AdminUserDeleted extends BaseNotification
         $locale = $notifiable->language;
         return (new MailMessage)
             ->subject(
-                __('notifications.user_deleted_subject', [], $locale)
+                __('notifications.user_deleted_subject', [], $locale))
                     ->greeting(__('notifications.greeting', [], $notifiable->language))
                     ->line(
                         __('notifications.user_deleted_line1', [
@@ -28,7 +28,6 @@ class AdminUserDeleted extends BaseNotification
                         __('notifications.email_preferences', [
                             'url' => url('/user/edit/' . $notifiable->id)
                         ], $notifiable->locale)
-                    )
             );
     }
 
