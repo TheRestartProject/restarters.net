@@ -1,7 +1,7 @@
 <template>
   <div>
     <div v-if="canedit">
-      <b-dropdown variant="primary" :text="__('groups.group_actions')" class="deepnowrap">
+      <b-dropdown variant="primary" :text="__('groups.group_actions')" class="deepnowrap" id="groupactions">
         <b-dropdown-item :href="'/group/edit/' + idgroups" v-if="canedit">
           {{ __('groups.edit_group') }}
         </b-dropdown-item>
@@ -17,7 +17,7 @@
         <b-dropdown-item  data-toggle="modal" data-target="#group-share-stats" v-if="canedit">
           {{ __('groups.share_group_stats') }}
         </b-dropdown-item>
-        <b-dropdown-item data-toggle="modal" @click="leaveGroup" v-if="ingroup">
+        <b-dropdown-item data-toggle="modal" @click="leaveGroup" v-if="ingroup" class="leavegroup">
           {{ __('groups.leave_group_button') }}
         </b-dropdown-item>
         <b-dropdown-item :href="'/group/join/' + idgroups" v-else>
