@@ -9,7 +9,7 @@ class NotifyRestartersOfNewEvent extends BaseNotification
     /**
      * Get the mail representation of the notification.
      *
-     * @param  mixed  $notifiable
+     * @param mixed $notifiable
      * @return \Illuminate\Notifications\Messages\MailMessage
      */
     public function toMail($notifiable)
@@ -17,23 +17,29 @@ class NotifyRestartersOfNewEvent extends BaseNotification
         $locale = $notifiable->language;
 
         return (new MailMessage)
-                    ->subject(__('notifications.new_event_subject', [
-                        'name' => $this->arr['event_group']
-                    ], $locale))
-                    ->greeting(__('notifications.greeting', [], $locale))
-                    ->line(__('notifications.new_event_line1', [
-                        'name' => $this->arr['event_venue']
-                    ], $locale))
-                    ->action(__('notifications.new_event_action', [], $locale), $this->arr['event_url'])
-                    ->line(__('notifications.email_preferences', [
-                        'url' => url('/user/edit/'.$notifiable->id)
-                    ], $locale));
+            ->subject(
+                __('notifications.new_event_subject', [
+                    'name' => $this->arr['event_group']
+                ], $locale)
+            )
+            ->greeting(__('notifications.greeting', [], $locale))
+            ->line(
+                __('notifications.new_event_line1', [
+                    'name' => $this->arr['event_venue']
+                ], $locale)
+            )
+            ->action(__('notifications.view_event', [], $locale), $this->arr['event_url'])
+            ->line(
+                __('notifications.email_preferences', [
+                    'url' => url('/user/edit/' . $notifiable->id)
+                ], $locale)
+            );
     }
 
     /**
      * Get the array representation of the notification.
      *
-     * @param  mixed  $notifiable
+     * @param mixed $notifiable
      * @return array
      */
     public function toArray($notifiable)
@@ -41,7 +47,7 @@ class NotifyRestartersOfNewEvent extends BaseNotification
         return [
             'title' => __('notifications.new_event_title', [
                 'name' => $this->arr['event_group']
-            ], $notifiable->language),
+            ],            $notifiable->language),
             'name' => $this->arr['event_venue'],
             'url' => $this->arr['event_url'],
         ];

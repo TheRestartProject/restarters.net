@@ -21,7 +21,7 @@ class GroupConfirmed extends BaseNotification
     /**
      * Get the notification's delivery channels.
      *
-     * @param  mixed  $notifiable
+     * @param mixed $notifiable
      * @return array
      */
     public function via($notifiable)
@@ -32,7 +32,7 @@ class GroupConfirmed extends BaseNotification
     /**
      * Get the mail representation of the notification.
      *
-     * @param  mixed  $notifiable
+     * @param mixed $notifiable
      * @return \Illuminate\Notifications\Messages\MailMessage
      */
     public function toMail($notifiable)
@@ -42,19 +42,23 @@ class GroupConfirmed extends BaseNotification
         return (new MailMessage)
             ->subject(__('notifications.group_confirmed_subject', [], $locale))
             ->greeting(__('notifications.greeting', [], $notifiable->language))
-            ->line(__('notifications.group_confirmed_line1', [
-                'name' => $this->group->name
-            ], $locale))
-            ->action(__('notifications.group_confirmed_action', [], $locale), url('/group/view/' . $this->group->idgroups))
-            ->line(__('notifications.email_preferences', [
-                'url' => url('/user/edit/'.$notifiable->id)
-            ], $locale));
+            ->line(
+                __('notifications.group_confirmed_line1', [
+                    'name' => $this->group->name
+                ], $locale)
+            )
+            ->action(__('notifications.view_group', [], $locale), url('/group/view/' . $this->group->idgroups))
+            ->line(
+                __('notifications.email_preferences', [
+                    'url' => url('/user/edit/' . $notifiable->id)
+                ], $locale)
+            );
     }
 
     /**
      * Get the array representation of the notification.
      *
-     * @param  mixed  $notifiable
+     * @param mixed $notifiable
      * @return array
      */
     public function toArray($notifiable)

@@ -9,30 +9,40 @@ class AdminUserDeleted extends BaseNotification
     /**
      * Get the mail representation of the notification.
      *
-     * @param  mixed  $notifiable
+     * @param mixed $notifiable
      * @return \Illuminate\Notifications\Messages\MailMessage
      */
     public function toMail($notifiable)
     {
+        $locale = $notifiable->language;
         return (new MailMessage)
-                      ->subject('User Deleted')
-                      ->greeting(__('notifications.greeting', [], $notifiable->language))
-                      ->line('The user "'.$this->arr['name'].'" has deleted their Restarters account.')
-                      ->line(__('notifications.email_preferences', [
-                          'url' => url('/user/edit/'.$notifiable->id)
-                      ], $notifiable->locale));
+            ->subject(
+                __('notifications.user_deleted_subject', [], $locale)
+                    ->greeting(__('notifications.greeting', [], $notifiable->language))
+                    ->line(
+                        __('notifications.user_deleted_line1', [
+                            'name' => $this->arr['name']
+                        ], $notifiable->locale)
+                    )
+                    ->line(
+                        __('notifications.email_preferences', [
+                            'url' => url('/user/edit/' . $notifiable->id)
+                        ], $notifiable->locale)
+                    )
+            );
     }
 
     /**
      * Get the array representation of the notification.
      *
-     * @param  mixed  $notifiable
+     * @param mixed $notifiable
      * @return array
      */
     public function toArray($notifiable)
     {
+        $locale = $notifiable->language;
         return [
-            'title' => 'User has deleted their account:',
+            'title' => __('notifications.user_deleted_title', [], $locale),
             'name' => $this->arr['name'],
         ];
     }

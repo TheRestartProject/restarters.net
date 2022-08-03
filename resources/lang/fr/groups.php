@@ -50,8 +50,6 @@ return [
   'edit_group_save_changes' => 'Sauvegarder',
   'edit_group_text' => 'Allez-y! Changez ou améliorez le profil de votre Repair Café',
   'groups_location_small' => 'Ex: l\'endroit où les réparations ont lieu!',
-  'field_group_images' => 'Ajouter l\'image du Repair Café ici',
-  'field_group_images_2' => 'Choisissez une image pour votre Repair Café',
   'group_image' => 'Image du Repair Café',
   'tag-1' => 'Tag 1',
   'tag-2' => 'Tag 2',
