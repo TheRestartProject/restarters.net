@@ -284,13 +284,6 @@ class Device extends Model implements Auditable
         return DB::select(DB::raw($sql));
     }
 
-    /** REDUNDANT? */
-    public function guesstimates()
-    {
-        //Tested
-        return DB::select(DB::raw('SELECT COUNT(*) AS guesstimates FROM `'.$this->table.'` WHERE `category` = 46'));
-    }
-
     public function export()
     {
         //Tested

@@ -91,6 +91,7 @@ class SearchController extends Controller
                 } else {
                     // return no-results message
 
+                    // Don't log to Sentry - legitimate user error.
                     $params['response'] = ['warning' => 'No results for these filters'];
                 }
             }
