@@ -48,7 +48,7 @@ class APIv2GroupTest extends TestCase
 
         if (!$approve) {
             self::assertEquals(1, count($json));
-            self::assertEquals($idgroups, $json[0]['idgroups']);
+            self::assertEquals($idgroups, $json[0]['id']);
         } else {
             // Group should not show as requiring moderation because it was approved during createGroup().
             self::assertEquals(0, count($json));

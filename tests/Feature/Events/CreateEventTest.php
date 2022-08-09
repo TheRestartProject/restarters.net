@@ -163,12 +163,13 @@ class CreateEventTest extends TestCase
         } else {
             $props = $this->assertVueProperties($response, [
                 [],
+                [],
                 [
                     'heading-level' => 'h2',
                 ],
             ]);
 
-            $events = json_decode($props[1][':initial-events'], TRUE);
+            $events = json_decode($props[2][':initial-events'], TRUE);
         }
 
         if ($seeEvent) {
