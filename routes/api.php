@@ -85,4 +85,12 @@ Route::group(['prefix' => 'v2'], function() {
         Route::get('{id}/groups', 'API\NetworkController@getNetworkGroupsv2');
         Route::get('{id}/events', 'API\NetworkController@getNetworkEventsv2');
     });
+
+    Route::prefix('/moderate')->group(function() {
+        Route::group(['middleware' => 'auth:api'], function ()
+        {
+            Route::get('/groups', 'API\GroupController@moderateGroupsv2');
+            Route::get('/events', 'API\EventController@moderateEventsv2');
+        });
+    });
 });

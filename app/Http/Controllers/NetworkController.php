@@ -65,12 +65,9 @@ class NetworkController extends Controller
             $groupsForAssociating = $network->groupsNotIn()->sortBy('name');
         }
 
-        $unapproved = Group::unapprovedVisibleTo($user->id);
-
         return view('networks.show', [
             'network' => $network,
             'groupsForAssociating' => $groupsForAssociating,
-            'moderate_groups' => GroupController::expandGroups($unapproved, [], []),
         ]);
     }
 

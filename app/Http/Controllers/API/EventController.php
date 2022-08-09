@@ -6,6 +6,7 @@ use App\EventsUsers;
 use App\Helpers\Fixometer;
 use App\Http\Controllers\Controller;
 use App\Invite;
+use App\Network;
 use Notification;
 use App\Notifications\JoinGroup;
 use App\Party;
@@ -227,5 +228,31 @@ class EventController extends Controller
     public function getEventv2(Request $request, $idevents) {
         $party = Party::findOrFail($idevents);
         return \App\Http\Resources\Party::make($party);
+    }
+
+    public function moderateEventsv2(Request $request) {
+        // Get the user that the API has been authenticated as.
+        $user = auth('api')->user();
+        $ret = [];
+        $networks = [];
+
+        if ($user->hasRole('Administrator')) {
+            $networks = Network::all();
+        } else if ($user->hasRole('NetworkCoordinator')) {
+            $networks = $user->networks;
+        }
+
+        foreach ($networks as $network) {
+            foreach ($network->eventsRequiringModeration() as $event) {
+                $ret[] = \App\Http\Resources\Party::make($event);
+            }
+        }
+
+        // Sort $ret by ->sortBy('event_start_utc') ascending order of time
+        usort($ret, function($a, $b) {
+            return strtotime($a->resource->event_start_utc) - strtotime($b->resource->event_start_utc);
+        });
+
+        return response()->json($ret);
     }
 }

@@ -47,26 +47,16 @@
     <div class="row justify-content-center">
       <div class="col-lg-12">
         {{-- Events to Moderate (Admin Only) --}}
-        @if ( App\Helpers\Fixometer::hasRole(Auth::user(), 'Administrator') && is_null($group) && !$moderate_events->isEmpty() )
-        <?php
-        $events = [];
-        foreach ($moderate_events as $event) {
-            $e = \App\Http\Controllers\PartyController::expandEvent($event, NULL);
-            $events[] = $e;
-        }
-        ?>
-
+        @if ( App\Helpers\Fixometer::hasRole(Auth::user(), 'Administrator') || App\Helpers\Fixometer::hasRole(Auth::user(), 'NetworkController'))
         <h2>@lang('events.events_title_admin')</h2>
         <section class="table-section" id="events-1">
           <div class="vue-placeholder vue-placeholder-large">
             <div class="vue-placeholder-content">@lang('partials.loading')...</div>
           </div>
           <div class="vue">
-              <EventsRequiringModeration :events="{{ json_encode($events, JSON_INVALID_UTF8_IGNORE) }}" />
+              <EventsRequiringModeration />
           </div>
         </section>
-        @else
-          <p class="pt-3 pb-3">@lang('events.moderation_none').</p>
         @endif
         {{-- END Events to Moderate (Admin Only) --}}
 

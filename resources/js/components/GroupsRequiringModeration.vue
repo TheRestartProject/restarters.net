@@ -1,24 +1,36 @@
 <template>
   <div>
-    <GroupsTable :groups="groups" approve />
+    <div v-if="loaded">
+      <GroupsTable :groups="groups" approve v-if="groups.length" />
+      <p v-else class="pt-3 pb-3">__('groups.moderation_none').</p>
+    </div>
+    <div v-else class="vue-placeholder-large" />
   </div>
+
 </template>
 <script>
 import GroupsTable from './GroupsTable'
+import auth from '../mixins/auth'
 
 export default {
-  props: {
-    groups: {
-      type: Array,
-      required: true
+  mixins: [auth],
+  data () {
+    return {
+      loaded: false
     }
   },
   components: {
     GroupsTable,
   },
-  mounted() {
-    this.$store.dispatch('groups/setList', {
-      events: this.groups
+  computed: {
+    groups() {
+      return Object.values(this.$store.getters['groups/getModerate'])
+    },
+  },
+  async mounted() {
+    await this.$store.dispatch('groups/getModerationRequired')
+    this.$nextTick(() => {
+      this.loaded = true
     })
   }
 }

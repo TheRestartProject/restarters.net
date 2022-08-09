@@ -110,39 +110,24 @@
                 </section>
 
                 <h2 class="mt-4">@lang('groups.groups_title_admin')</h2>
-                @if (count($moderate_groups))
-                    <section class="table-section" id="events-1">
-                        <div class="vue-placeholder vue-placeholder-large">
-                            <div class="vue-placeholder-content">@lang('partials.loading')...</div>
-                        </div>
-                        <div class="vue">
-                            <GroupsRequiringModeration :groups="{{ json_encode($moderate_groups, JSON_INVALID_UTF8_IGNORE) }}" />
-                        </div>
-                    </section>
-                @else
-                    <p class="pt-3 pb-3">@lang('groups.moderation_none').</p>
-                @endif
+                <section class="table-section" id="events-1">
+                    <div class="vue-placeholder vue-placeholder-large">
+                        <div class="vue-placeholder-content">@lang('partials.loading')...</div>
+                    </div>
+                    <div class="vue">
+                        <GroupsRequiringModeration />
+                    </div>
+                </section>
 
                 <h2 class="mt-4">@lang('events.events_title_admin')</h2>
-                @if( count($network->eventsRequiringModeration()) > 0 )
-                    <?php
-                    $events = [];
-                    foreach ($network->eventsRequiringModeration()->sortBy('event_start_utc') as $event) {
-                        $e = \App\Http\Controllers\PartyController::expandEvent($event, NULL);
-                        $events[] = $e;
-                    }
-                    ?>
-                    <section class="mt-40">
-                        <div class="vue-placeholder vue-placeholder-large">
-                            <div class="vue-placeholder-content">@lang('partials.loading')...</div>
-                        </div>
-                        <div class="vue">
-                            <EventsRequiringModeration :events="{{ json_encode($events, JSON_INVALID_UTF8_IGNORE) }}" />
-                        </div>
-                    </section>
-                @else
-                    <p class="pt-3 pb-3">@lang('events.moderation_none').</p>
-                @endif
+                <section class="mt-40">
+                    <div class="vue-placeholder vue-placeholder-large">
+                        <div class="vue-placeholder-content">@lang('partials.loading')...</div>
+                    </div>
+                    <div class="vue">
+                        <EventsRequiringModeration />
+                    </div>
+                </section>
 
             </div>
         </div>

@@ -273,4 +273,11 @@ class GroupController extends Controller
 
         return response()->json($ret);
     }
+
+    public function moderateGroupsv2(Request $request) {
+        // Get the user that the API has been authenticated as.
+        $user = auth('api')->user();
+        $ret = \App\Http\Resources\GroupCollection::make(Group::unapprovedVisibleTo($user->id));
+        return response()->json($ret);
+    }
 }

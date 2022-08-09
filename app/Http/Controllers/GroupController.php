@@ -64,9 +64,6 @@ class GroupController extends Controller
         // We pass a high limit to the groups nearby; there is a distance limit which will normally kick in first.
         $groups_near_you = array_column($user->groupsNearby(1000), 'idgroups');
 
-        // Get unapproved groups.
-        $unapproved = Group::unapprovedVisibleTo($user->id);
-
         return view('group.index', [
             'groups' => GroupController::expandGroups($groups, $your_groups, $groups_near_you),
             'your_area' => $user->location,
@@ -74,7 +71,6 @@ class GroupController extends Controller
             'network' => $network,
             'networks' => $networks,
             'all_group_tags' => $all_group_tags,
-            'moderate_groups' => GroupController::expandGroups($unapproved, [], []),
         ]);
     }
 
