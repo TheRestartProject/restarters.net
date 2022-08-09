@@ -9,33 +9,49 @@ class DeleteEventFromWordpressFailed extends BaseNotification
     /**
      * Get the mail representation of the notification.
      *
-     * @param  mixed  $notifiable
+     * @param mixed $notifiable
      * @return \Illuminate\Notifications\Messages\MailMessage
      */
     public function toMail($notifiable)
     {
+        $locale = $notifiable->language;
         return (new MailMessage)
-                      ->subject('Failed to delete event from WordPress: '.$this->arr['event_venue'])
-                      ->greeting(__('notifications.greeting', [], $notifiable->language))
-                      ->line("Event deletion failed for {$this->arr['event_venue']} by {$this->arr['group_name']}.")
-                      ->line(' ')
-                      ->line('Please find and delete this event manually from WordPress.')
-                      ->line(' ')
-                      ->line(__('notifications.email_preferences', [
-                          'url' => url('/user/edit/'.$notifiable->id)
-                      ], $notifiable->locale));
+            ->subject(
+                __('notifications.wordpress_delete_event_failed_subject', [
+                    'name' => $this->arr['event_venue']
+                ], $locale)
+            )
+            ->greeting(__('notifications.greeting', [], $notifiable->language))
+            ->line(
+                __('notifications.wordpress_delete_event_failed_line1', [
+                    'name' => $this->arr['event_venue'],
+                    'group' => $this->arr['group_name']
+                ], $locale)
+            )
+            ->line(' ')
+            ->line(__('notifications.wordpress_delete_event_failed_line2', [], $locale))
+            ->line(' ')
+            ->line(
+                __('notifications.email_preferences', [
+                    'url' => url('/user/edit/' . $notifiable->id)
+                ], $notifiable->locale)
+            );
     }
 
     /**
      * Get the array representation of the notification.
      *
-     * @param  mixed  $notifiable
+     * @param mixed $notifiable
      * @return array
      */
     public function toArray($notifiable)
     {
+        $locale = $notifiable->language;
         return [
-            'title' => "Failed to delete event {$this->arr['event_venue']} by {$this->arr['group_name']} from WordPress",
+            'title' => __('notifications.wordpress_delete_event_failed_title', [
+                'name' => $this->arr['event_venue'],
+                'group' => $this->arr['group_name']
+            ],            $locale),
         ];
     }
 }

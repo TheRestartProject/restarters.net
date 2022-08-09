@@ -9,7 +9,7 @@ class EventDevices extends BaseNotification
     /**
      * Get the notification's delivery channels.
      *
-     * @param  mixed  $notifiable
+     * @param mixed $notifiable
      * @return array
      */
     public function via($notifiable)
@@ -20,30 +20,35 @@ class EventDevices extends BaseNotification
     /**
      * Get the mail representation of the notification.
      *
-     * @param  mixed  $notifiable
+     * @param mixed $notifiable
      * @return \Illuminate\Notifications\Messages\MailMessage
      */
     public function toMail($notifiable)
     {
-        if ($notifiable !== null && $notifiable->invites == 1) {
+        if ($notifiable !== null && $notifiable->invites == 1)
+        {
             $locale = $notifiable->language;
             return (new MailMessage)
-                  ->subject(__('notifications.event_devices_subject', [], $locale))
-                  ->greeting(__('notifications.greeting', [], $locale))
-                  ->line(__('notifications.event_devices_line1', [
-                      'event' => $this->arr['event_venue']
-                    ], $locale))
-                  ->action(__('notifications.event_devices_action', [], $locale), $this->arr['event_url'])
-                  ->line(__('notifications.email_preferences', [
-                      'url' => url('/user/edit/'.$notifiable->id)
-                  ], $locale));
+                ->subject(__('notifications.event_devices_subject', [], $locale))
+                ->greeting(__('notifications.greeting', [], $locale))
+                ->line(
+                    __('notifications.event_devices_line1', [
+                        'event' => $this->arr['event_venue']
+                    ], $locale)
+                )
+                ->action(__('notifications.event_devices_action', [], $locale), $this->arr['event_url'])
+                ->line(
+                    __('notifications.email_preferences', [
+                        'url' => url('/user/edit/' . $notifiable->id)
+                    ], $locale)
+                );
         }
     }
 
     /**
      * Get the array representation of the notification.
      *
-     * @param  mixed  $notifiable
+     * @param mixed $notifiable
      * @return array
      */
     public function toArray($notifiable)
