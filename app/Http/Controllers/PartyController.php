@@ -308,9 +308,11 @@ class PartyController extends Controller
                     }
                 } else {
                     $response['danger'] = 'Party could <strong>not</strong> be created. Something went wrong with the database.';
+                    \Sentry\CaptureMessage($response['danger']);
                 }
             } else {
                 $response['danger'] = 'Party could <strong>not</strong> be created. Please look at the reported errors, correct them, and try again.';
+                \Sentry\CaptureMessage($response['danger']);
             }
 
             if (! isset($response)) {
@@ -388,6 +390,7 @@ class PartyController extends Controller
 
                 if (empty($results)) {
                     $response['danger'] = 'Party could not be saved. Address not found.';
+                    \Sentry\CaptureMessage($response['danger']);
                     $party = $Party->findThis($id)[0];
                     $audits = Party::findOrFail($id)->audits;
 
@@ -441,6 +444,7 @@ class PartyController extends Controller
 
             if (! $u) {
                 $response['danger'] = 'Something went wrong. Please check the data and try again.';
+                \Sentry\CaptureMessage($response['danger']);
             } else {
                 $response['success'] = '<div class="row"><div class="col-md-8 col-lg-8 d-flex flex-column align-content-center">Event details updated.</div><div class="col-md-4 col-lg-4 text-right"><a href="/party/view/'.$id.'" class="btn btn-secondary">View event</a></div></div>';
 
@@ -711,6 +715,7 @@ class PartyController extends Controller
         } else {
             $flashData['warning'] = 'You are already part of this event';
 
+            // Don't log to Sentry - legitimate user error.
             return redirect()->back()->with($flashData);
         }
     }
@@ -985,8 +990,11 @@ class PartyController extends Controller
                 return redirect()->back()->with('success', 'Invites Sent!');
             }
 
+            // Don't log to Sentry - legitimate user error.
             return redirect()->back()->with('warning', 'Invites Sent - apart from these ('.implode(',', $not_sent).') who were already part of the event');
         }
+
+        \Sentry\CaptureMessage('You have not entered any emails!');
 
         return redirect()->back()->with('warning', 'You have not entered any emails!');
     }
@@ -1011,6 +1019,7 @@ class PartyController extends Controller
             return redirect('/party/view/'.$user_event->event);
         }
 
+        \Sentry\CaptureMessage('Something went wrong - this invite is invalid or has expired');
         return redirect('/party/view/'.intval($event_id))->with('warning', 'Something went wrong - this invite is invalid or has expired');
     }
 
@@ -1063,6 +1072,7 @@ class PartyController extends Controller
             return redirect()->back()->with('success', 'Thank you, the image has been deleted');
         }
 
+        \Sentry\CaptureMessage('Sorry, but the image can\'t be deleted');
         return redirect()->back()->with('warning', 'Sorry, but the image can\'t be deleted');
     }
 
@@ -1091,6 +1101,7 @@ class PartyController extends Controller
             return redirect()->back()->with('success', __('events.review_requested'));
         }
 
+        \Sentry\CaptureMessage(__('events.review_requested_permissions'));
         return redirect()->back()->with('warning', __('events.review_requested_permissions'));
     }
 
@@ -1107,6 +1118,7 @@ class PartyController extends Controller
 
         if (! Fixometer::userHasEditPartyPermission($id) &&
             ! Fixometer::userIsHostOfGroup($event->group, Auth::user()->id)) {
+            \Sentry\CaptureMessage(__('You do not have permission to delete this event'));
             return redirect()->back()->with('warning', 'You do not have permission to delete this event');
         }
 
