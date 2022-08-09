@@ -147,8 +147,8 @@ class CreateEventTest extends TestCase
         $response = $this->get('/party');
 
         $props = $this->getVueProperties($response);
-        if ($role == 'Administrator') {
-            // Should see the event in the moderation list.
+        if ($role == 'Administrator' || $role == 'NetworkCoordinator') {
+            // Should see the moderation list.
             $props = $this->assertVueProperties($response, [
                 [],
                 [
@@ -158,33 +158,13 @@ class CreateEventTest extends TestCase
                     'heading-level' => 'h2',
                 ],
             ]);
-
-            $events = json_decode($props[2][':initial-events'], TRUE);
         } else {
             $props = $this->assertVueProperties($response, [
-                [],
                 [],
                 [
                     'heading-level' => 'h2',
                 ],
             ]);
-
-            $events = json_decode($props[2][':initial-events'], TRUE);
-        }
-
-        if ($seeEvent) {
-            // We should be able to see this upcoming event in the Vue properties.
-            $this->assertEquals(true, $events[0]['requiresModeration']);
-            $this->assertEquals($canModerate, $events[0]['canModerate']);
-            $this->assertEquals(true, $events[0]['attending']);
-            $this->assertEquals(true, $events[0]['isVolunteer']);
-            $this->assertEquals(substr($eventAttributes['event_start_utc'], 0, 10), $events[0]['event_date_local']);
-            $this->assertEquals('13:00', $events[0]['start_local']);
-            $this->assertEquals('15:00', $events[0]['end_local']);
-            $this->assertEquals($start->setTimezone('UTC')->toIso8601String(), $events[0]['event_start_utc']);
-            $this->assertEquals($end->setTimezone('UTC')->toIso8601String(), $events[0]['event_end_utc']);
-        } else {
-            $this->assertEquals(true, $events[0]['requiresModeration']);
         }
 
         // Approve the event.
