@@ -29,7 +29,7 @@
         $myid = $user ? $user->id : null;
       ?>
 
-        @if ( App\Helpers\Fixometer::hasRole(Auth::user(), 'Administrator') || App\Helpers\Fixometer::hasRole(Auth::user(), 'NetworkController'))
+        @if ( App\Helpers\Fixometer::hasRole(Auth::user(), 'Administrator') || App\Helpers\Fixometer::hasRole(Auth::user(), 'NetworkCoordinator'))
         <h2>@lang('groups.groups_title_admin')</h2>
         <section class="table-section" id="events-1">
           <div class="vue-placeholder vue-placeholder-large">

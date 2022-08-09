@@ -86,7 +86,8 @@ class GroupCreateTest extends TestCase
             $network->addCoordinator($actas);
         }
 
-        // Group should show as unapproved on the groups page.
+        // Vue component should exist for group to be moderated, though the component itself fetches the group info
+        // so it won't show as props.
         $response = $this->get('/group');
         $response->assertSuccessful();
 
@@ -96,10 +97,6 @@ class GroupCreateTest extends TestCase
                 'VueComponent' => 'groupsrequiringmoderation'
             ],
         ]);
-
-        $groups = json_decode($props[1][':groups'], TRUE);
-        self::assertEquals(1, count($groups));
-        self::assertEquals($idgroups, $groups[0]['idgroups']);
 
         $admin2 = factory(User::class)->state('Administrator')->create();
         $this->actingAs($admin2);

@@ -47,7 +47,7 @@
     <div class="row justify-content-center">
       <div class="col-lg-12">
         {{-- Events to Moderate (Admin Only) --}}
-        @if ( App\Helpers\Fixometer::hasRole(Auth::user(), 'Administrator') || App\Helpers\Fixometer::hasRole(Auth::user(), 'NetworkController'))
+        @if ( App\Helpers\Fixometer::hasRole(Auth::user(), 'Administrator') || App\Helpers\Fixometer::hasRole(Auth::user(), 'NetworkCoordinator'))
         <h2>@lang('events.events_title_admin')</h2>
         <section class="table-section" id="events-1">
           <div class="vue-placeholder vue-placeholder-large">

@@ -61,12 +61,11 @@ class APIv2EventTest extends TestCase
         $this->assertTrue(array_key_exists('stats', $json['data']));
         $this->assertTrue(array_key_exists('updated_at', $json['data']));
 
-        // Check events show as unapproved.
+        // Check unapproved.  Only the event for tomorrow will show as we do not show past events for moderation.
         $response = $this->get("/api/v2/moderate/events?api_token=1234");
         $response->assertSuccessful();
         $json = json_decode($response->getContent(), true);
-        self::assertEquals(2, count($json));
-        self::assertEquals($id2, $json[0]['id']);
-        self::assertEquals($id1, $json[1]['id']);
+        self::assertEquals(1, count($json));
+        self::assertEquals($id1, $json[0]['id']);
     }
 }
