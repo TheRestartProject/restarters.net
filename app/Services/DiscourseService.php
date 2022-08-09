@@ -219,6 +219,9 @@ class DiscourseService
         $client = app('discourse-client');
 
         foreach ($restartIds as $restartId) {
+            // Sleep so that we don't hit the Discourse or Communiteq rate limits.
+            usleep(500000);
+
             $group = Group::find($restartId);
             $discourseName = $group->discourse_group;
 
@@ -361,6 +364,15 @@ class DiscourseService
 
                     foreach ($restartersMembersUGs as $r) {
                         $u = User::find($r->user);
+
+                        if (!strlen($u->username)) {
+                            // No current user.  Create one.
+                            $u->generateAndSetUsername();
+                            $u->save();
+                            $u->refresh();
+                            $this->syncSso($u);
+                        }
+
                         $restartersMembers[$u->username] = $r;
                     }
 

@@ -5,16 +5,19 @@
         <div class="action-text mb-0">
           <div class='mb-2'>
             <span class='badge badge-warning'>NEW!</span>
-            <strong>Help us maintain & improve this site</strong>
+            <strong>Are you a Paypal user? Help us maintain & improve this site &#128154;</strong>
           </div>
           <p>
-              Restarters is a non-profit platform and we need your help to keep it running. Until the 30th of June, vote for Restart as your favourite charity, and we could be on Give at Checkout with PayPal AND receive matched donations.  You can find more information <a href="https://talk.restarters.net/t/9197">here</a>.  Thank you!
+            As people interested in repair, we all understand the importance of maintenance. It’s not always flashy,
+            but it is fundamental and Restarters.net is no exception. Right now, we’re asking you to help by making
+            a donation, if you can. Throughout August, <b>all donations will be doubled by Paypal Giving Fund</b>, so
+            there’s never been a better time to support us! Thank you &#128591;
           </p>
         </div>
       </div>
 
       <div class="float-right mt-3 mt-sm-0">
-          <a href='https://forms.office.com/pages/responsepage.aspx?id=FHkA-yBgdEOXfiG6xfP0yLpJiqalbJRLvNFodrLa3cxUOElMV1YxTUlKVTZYMENTTEtZNlQ0QjJUTS4u' class='btn btn-md btn-primary btn-block' title=''>Vote now</a>
+          <a href='https://www.paypal.com/gb/fundraiser/charity/61071' class='btn btn-md btn-primary btn-block' title=''>Donate now</a>
       </div>
     </div>
   </b-alert>
@@ -37,7 +40,7 @@ export default {
     bannerActive() {
       var now = moment()
 
-      return now.isBefore('2022-06-30 17:00')
+      return now.isBefore('2022-08-31 12:00')
     },
     show() {
       let ret = true

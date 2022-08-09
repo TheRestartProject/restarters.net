@@ -13,6 +13,7 @@ return [
   'how_to_host_an_event' => 'How to host an event',
   'how_to_host_an_event_text' => 'We have years of experience hosting community repair events, and we offer materials on how to organise events them. We also offer peer to peer support on our forum.',
   'view_the_materials' => 'View the materials',
+  'waste_prevented' => 'waste prevented',
   'co2' => 'CO<sub>2</sub> emissions prevented',
   'restarters_in_your_area' => 'Repairers in your area',
   'information_up_to_date' => 'Keep your group information up to date!',

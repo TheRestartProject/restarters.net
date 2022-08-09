@@ -28,6 +28,7 @@ return [
     'email_preferences' => 'Préférences E-mail',
     'page_title' => 'Profil & préférences',
     'profile' => 'Profil',
+    'save_profile' => 'Sauver le profil',
     'view_profile' => 'Voir profil',
     'view_user_profile' => 'Voir profil d\'utilisateur',
     'name' => 'Prénom & Nom',
