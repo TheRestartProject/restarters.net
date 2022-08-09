@@ -148,7 +148,7 @@ class CreateEventTest extends TestCase
 
         $props = $this->getVueProperties($response);
         if ($role == 'Administrator' || $role == 'NetworkCoordinator') {
-            // Should see the moderation list.
+            // Should see the moderation list.  The Vue component fetches the events, so we don't check the props.
             $props = $this->assertVueProperties($response, [
                 [],
                 [
