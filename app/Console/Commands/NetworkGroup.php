@@ -14,7 +14,7 @@ class NetworkGroup extends Command
      *
      * @var string
      */
-    protected $signature = 'network:group {networkid} {groupid}';
+    protected $signature = 'network:group:add {networkname} {groupname}';
 
     /**
      * The console command description.
@@ -40,11 +40,23 @@ class NetworkGroup extends Command
      */
     public function handle()
     {
-        $networkid = $this->argument('networkid');
-        $groupid = $this->argument('groupid');
+        $networkname = $this->argument('networkname');
+        $groupname = $this->argument('groupname');
 
-        $network = Network::findOrFail($networkid);
-        $group = Group::findOrFail($groupid);
+        // Find or fail network
+        $network = Network::where('name', $networkname)->first();
+
+        if (!$network) {
+            $this->error('Network not found.');
+            return;
+        }
+
+        $group = Group::where('name', $groupname)->first();
+
+        if (!$group) {
+            $this->error('Group not found.');
+            return;
+        }
 
         $network->addGroup($group);
         $this->info("Added group to network");

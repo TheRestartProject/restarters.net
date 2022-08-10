@@ -36,7 +36,7 @@ class NetworkCommands extends TestCase {
         $user = factory(User::class)->states('Restarter')->create();
 
         assertFalse($user->isCoordinatorForGroup($group));
-        $this->artisan('network:coordinator ' . $network->id . ' --add=' . $user->id)->assertExitCode(0);
+        $this->artisan('network:coordinator:add ' . $network->name . ' ' . $user->email)->assertExitCode(0);
         $user->refresh();
         assertTrue($user->isCoordinatorForGroup($group));
     }
@@ -46,7 +46,7 @@ class NetworkCommands extends TestCase {
         $network = Network::orderBy('id', 'desc')->first();
 
         $group = factory(Group::class)->create();
-        $this->artisan('network:group ' . $network->id . ' ' . $group->idgroups)->assertExitCode(0);
+        $this->artisan('network:group:add "' . $network->name . '" "' . $group->name . '"')->assertExitCode(0);
         $group->refresh();
         $this->assertEquals($network->id, $group->networks->first()->id);
     }

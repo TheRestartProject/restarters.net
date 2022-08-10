@@ -14,7 +14,7 @@ class NetworkCoordinator extends Command
      *
      * @var string
      */
-    protected $signature = 'network:coordinator {id} {--add=}';
+    protected $signature = 'network:coordinator:add {networkname} {email}';
 
     /**
      * The console command description.
@@ -40,12 +40,24 @@ class NetworkCoordinator extends Command
      */
     public function handle()
     {
-        $id = $this->argument('id');
-        $add = $this->option('add');
+        $networkname = $this->argument('networkname');
 
-        $network = Network::findOrFail($id);
+        $network = Network::where('name', $networkname)->first();
 
-        $user = User::findOrFail($add);
+        if (!$network) {
+            $this->error('Network not found.');
+            return;
+        }
+
+        $email = $this->argument('email');
+
+        $user = User::where('email', $email)->first();
+
+        if (!$user) {
+            $this->error('User not found.');
+            return;
+        }
+
         $network->addCoordinator($user);
         $this->info("Added network coordinator");
     }
