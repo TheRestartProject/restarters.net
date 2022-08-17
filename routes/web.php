@@ -412,3 +412,5 @@ Route::group(['middleware' => ['ensureAPIToken']], function () {
         Route::get('/find', 'StyleController@find');
     });
 });
+
+Route::get('/navbar', 'UserController@navbar');
