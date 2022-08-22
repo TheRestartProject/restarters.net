@@ -4,8 +4,6 @@ return [
   'message_example_text' => '<add a custom message here if required>',
   'headline_stats_dropdown' => 'Headline stats',
   'co2_equivalence_visualisation_dropdown' => 'CO<sub>2</sub> equivalence visualisation',
-  'field_group_images' => 'Add group image here',
-  'field_group_images_2' => 'Choose an image for your group',
   'group_admin_only' => 'Admin only',
   'search_name' => 'Search name',
   'group' => 'Group',

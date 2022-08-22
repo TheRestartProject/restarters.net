@@ -172,7 +172,8 @@ class DeviceController extends Controller
             }
 
             // If the number of devices exceeds set amount then show the following message
-            $deviceMiscCount = DB::table('devices')->where('category', 46)->where('event', $event_id)->count();
+            $deviceMiscCount = DB::table('devices')->where('category', env('MISC_CATEGORY_ID_POWERED'))->where('event', $event_id)->count() +
+                DB::table('devices')->where('category', env('MISC_CATEGORY_ID_UNPOWERED'))->where('event', $event_id)->count();
             if ($deviceMiscCount == env('DEVICE_ABNORMAL_MISC_COUNT', 5)) {
                 $notify_users = Fixometer::usersWhoHavePreference('admin-abnormal-devices');
                 Notification::send($notify_users, new AdminAbnormalDevices([
@@ -369,6 +370,7 @@ class DeviceController extends Controller
             return response()->json(['success' => false]);
         }
 
+        \Sentry\CaptureMessage('You do not have the right permissions for deleting a device');
         return redirect('/party/view/'.$eventId)->with('warning', 'You do not have the right permissions for deleting a device');
     }
 

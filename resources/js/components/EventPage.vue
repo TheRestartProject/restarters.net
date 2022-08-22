@@ -151,7 +151,7 @@ export default {
 
     this.$store.dispatch('attendance/set', {
       idevents: this.idevents,
-      attendees: this.attendance
+      attendees: [...this.attendance, ...this.invitations]
     })
 
     if (window && window.location && window.location.hash) {
