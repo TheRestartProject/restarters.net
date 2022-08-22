@@ -3,6 +3,10 @@
   padding: 0;
 }
 
+:not('.showtoc') .toc {
+  display: none;
+}
+
 // Resolve random padding issue
 :target {
   padding-top: 0 !important;
