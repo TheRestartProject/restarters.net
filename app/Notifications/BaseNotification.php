@@ -22,13 +22,14 @@ abstract class BaseNotification extends Notification implements ShouldQueue
     /**
      * Get the notification's delivery channels.
      *
-     * @param  mixed  $notifiable
+     * @param mixed $notifiable
      * @return array
      */
     public function via($notifiable)
     {
         // If user being notified has opted in to receive emails.
-        if ($notifiable->invites == 1) {
+        if ($notifiable->invites == 1)
+        {
             return ['mail', 'database'];
         }
 
@@ -37,12 +38,18 @@ abstract class BaseNotification extends Notification implements ShouldQueue
 
     public function failed($e)
     {
-        if (gettype($e) == 'string') {
+        if (gettype($e) == 'string')
+        {
             \Sentry\captureMessage("Notification failed with $e");
-        } else if ($e instanceof \Exception) {
-            \Sentry\captureException($e);
-        } else {
-            \Sentry\captureMessage('Notification failed in an unexpected way ' . gettype($e));
+        } else
+        {
+            if ($e instanceof \Exception)
+            {
+                \Sentry\captureException($e);
+            } else
+            {
+                \Sentry\captureMessage('Notification failed in an unexpected way ' . gettype($e));
+            }
         }
     }
 }
