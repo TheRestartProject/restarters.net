@@ -3,12 +3,6 @@
   padding: 0;
 }
 
-// Hide Glossary
-.toc,
-#toc {
-  display: none;
-}
-
 // Resolve random padding issue
 :target {
   padding-top: 0 !important;
