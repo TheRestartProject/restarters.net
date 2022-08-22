@@ -175,7 +175,8 @@ export default {
       searchCountry: null,
       searchShow: false,
       searchTags: null,
-      show: 3
+      show: 3,
+      left: []
     }
   },
   computed: {
@@ -214,6 +215,10 @@ export default {
 
             match &= tagsInCommon.length > 0
           }
+        }
+
+        if (this.left.includes(g.idgroups)) {
+          match = false
         }
 
         return match
@@ -306,10 +311,12 @@ export default {
     leaveGroup(idgroups) {
       this.$refs['confirmLeave-' + idgroups].show()
     },
-    leaveConfirmed(idgroups) {
-      this.$store.dispatch('groups/unfollow', {
+    async leaveConfirmed(idgroups) {
+      await this.$store.dispatch('groups/unfollow', {
         idgroups: idgroups
       })
+
+      this.left.push(idgroups)
     },
     distance(dist ) {
       if (dist < 5) {
