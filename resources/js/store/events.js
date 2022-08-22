@@ -1,4 +1,5 @@
 import Vue from 'vue'
+import moment from 'moment'
 
 const axios = require('axios')
 
@@ -14,12 +15,23 @@ function newToOld(e) {
     location: e.location,
     group: {
       idgroups: e.group.id,
-      name: e.group.name
+      name: e.group.name,
+      networks: e.group.networks
     },
     volunteers: e.stats.volunteers,
     allinvitedcount: e.stats.invited,
-    event_start_utc: e.start
+    event_start_utc: e.start,
+    event_end_utc: e.end,
+    timezone: e.timezone
   }
+
+  const start = new moment(e.start)
+  start.tz(e.timezone)
+  ret.start_local = start.format('HH:mm')
+
+  const end = new moment(e.end)
+  end.tz(e.timezone)
+  ret.end_local = end.format('HH:mm')
 
   return ret
 }
@@ -36,7 +48,14 @@ export default {
   },
   getters: {
     get: state => idevents => {
-      return state.list[idevents]
+      let ret = state.list[idevents]
+
+      if (!ret) {
+        // Might be an event we're moderating.
+        ret = state.moderate[idevents]
+      }
+
+      return ret
     },
     getAll: state => state.list,
     getModerate: state => state.moderate,

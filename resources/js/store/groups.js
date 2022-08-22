@@ -17,6 +17,7 @@ function newToOld(e) {
     all_confirmed_hosts_count: e.hosts,
     all_confirmed_restarters_count: e.restarters,
     image: e.image ? ('/uploads/mid_' + e.image) : null,
+    networks: e.networks
   }
 
   return ret

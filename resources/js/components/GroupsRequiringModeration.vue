@@ -1,12 +1,10 @@
 <template>
-  <div>
-    <div v-if="loaded">
-      <GroupsTable :groups="groups" approve v-if="groups.length" />
-      <p v-else class="pt-3 pb-3">__('groups.moderation_none').</p>
-    </div>
-    <div v-else class="vue-placeholder-large" />
+  <div v-if="loaded && groups.length">
+    <h2 class="mt-4">{{ __('groups.groups_title_admin') }}</h2>
+    <section class="table-section" id="events-1">
+      <GroupsTable :groups="groups" approve />
+    </section>
   </div>
-
 </template>
 <script>
 import GroupsTable from './GroupsTable'
@@ -19,12 +17,34 @@ export default {
       loaded: false
     }
   },
+  props: {
+    network: {
+      type: Number,
+      required: false,
+      default: null
+    }
+  },
   components: {
     GroupsTable,
   },
   computed: {
     groups() {
-      return Object.values(this.$store.getters['groups/getModerate'])
+      let ret = Object.values(this.$store.getters['groups/getModerate'])
+
+      if (this.network) {
+        // We are trying to show only data for a specific network.
+        ret = ret.filter((e) =>  {
+          if (e.networks.find((n) => {
+            return n.id === this.network
+          })) {
+            return true
+          } else {
+            return false
+          }
+        })
+      }
+
+      return ret
     },
   },
   async mounted() {

@@ -109,25 +109,19 @@
 
                 </section>
 
-                <h2 class="mt-4">@lang('groups.groups_title_admin')</h2>
-                <section class="table-section" id="events-1">
-                    <div class="vue-placeholder vue-placeholder-large">
-                        <div class="vue-placeholder-content">@lang('partials.loading')...</div>
-                    </div>
-                    <div class="vue">
-                        <GroupsRequiringModeration />
-                    </div>
-                </section>
+                <div class="vue-placeholder vue-placeholder-large">
+                    <div class="vue-placeholder-content">@lang('partials.loading')...</div>
+                </div>
+                <div class="vue">
+                    <GroupsRequiringModeration :network="{{ $network->id }}" />
+                </div>
 
-                <h2 class="mt-4">@lang('events.events_title_admin')</h2>
-                <section class="mt-40">
-                    <div class="vue-placeholder vue-placeholder-large">
-                        <div class="vue-placeholder-content">@lang('partials.loading')...</div>
-                    </div>
-                    <div class="vue">
-                        <EventsRequiringModeration />
-                    </div>
-                </section>
+                <div class="vue-placeholder vue-placeholder-large">
+                    <div class="vue-placeholder-large">@lang('partials.loading')...</div>
+                </div>
+                <div class="vue">
+                    <EventsRequiringModeration :network="{{ $network->id }}" />
+                </div>
 
             </div>
         </div>

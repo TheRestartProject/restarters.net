@@ -26,6 +26,7 @@ class Group extends JsonResource
             'stats' => $this->resource->getGroupStats(),
             'updated_at' => Carbon::parse($this->updated_at)->toIso8601String(),
             'location' => $this->location,
+            'networks' => $this->resource->networks,
         ];
 
         $ret['hosts'] = $this->resource->all_confirmed_hosts_count;

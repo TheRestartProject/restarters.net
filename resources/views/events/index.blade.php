@@ -48,15 +48,12 @@
       <div class="col-lg-12">
         {{-- Events to Moderate (Admin Only) --}}
         @if ( App\Helpers\Fixometer::hasRole(Auth::user(), 'Administrator') || App\Helpers\Fixometer::hasRole(Auth::user(), 'NetworkCoordinator'))
-        <h2>@lang('events.events_title_admin')</h2>
-        <section class="table-section" id="events-1">
-          <div class="vue-placeholder vue-placeholder-large">
-            <div class="vue-placeholder-content">@lang('partials.loading')...</div>
-          </div>
-          <div class="vue">
-              <EventsRequiringModeration />
-          </div>
-        </section>
+        <div class="vue-placeholder vue-placeholder-large">
+          <div class="vue-placeholder-content">@lang('partials.loading')...</div>
+        </div>
+        <div class="vue">
+            <EventsRequiringModeration />
+        </div>
         @endif
         {{-- END Events to Moderate (Admin Only) --}}
 

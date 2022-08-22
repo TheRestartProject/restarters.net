@@ -30,15 +30,12 @@
       ?>
 
         @if ( App\Helpers\Fixometer::hasRole(Auth::user(), 'Administrator') || App\Helpers\Fixometer::hasRole(Auth::user(), 'NetworkCoordinator'))
-        <h2>@lang('groups.groups_title_admin')</h2>
-        <section class="table-section" id="events-1">
           <div class="vue-placeholder vue-placeholder-large">
             <div class="vue-placeholder-content">@lang('partials.loading')...</div>
           </div>
           <div class="vue">
             <GroupsRequiringModeration />
           </div>
-        </section>
         @endif
 
         <div class="vue-placeholder vue-placeholder-large">
