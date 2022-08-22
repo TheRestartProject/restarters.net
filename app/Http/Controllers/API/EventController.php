@@ -30,7 +30,8 @@ class EventController extends Controller
                   ->join('group_network', 'group_network.group_id', '=', 'groups.idgroups')
                   ->join('networks', 'networks.id', '=', 'group_network.network_id')
                   ->join('user_network', 'networks.id', '=', 'user_network.network_id')
-                  ->join('users', 'users.id', '=', 'user_network.user_id');
+                  ->join('users', 'users.id', '=', 'user_network.user_id')
+                  ->orderBy('event_start_utc', 'ASC');
 
         if (! empty($date_from) && ! empty($date_to)) {
             $start = Carbon\Carbon::parse($date_from, $timezone);

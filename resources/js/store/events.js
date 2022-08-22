@@ -17,7 +17,8 @@ function newToOld(e) {
       name: e.group.name
     },
     volunteers: e.stats.volunteers,
-    allinvitedcount: e.stats.invited
+    allinvitedcount: e.stats.invited,
+    event_start_utc: e.start
   }
 
   return ret

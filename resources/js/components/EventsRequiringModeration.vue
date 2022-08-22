@@ -1,7 +1,13 @@
 <template>
   <div>
     <div v-if="loaded">
-      <GroupEventScrollTable :events="events" :canedit="true" :addGroupName="true"  v-if="events.length" />
+      <GroupEventScrollTable
+          v-if="events.length"
+          :events="events"
+          :canedit="true"
+          :addGroupName="true"
+          sort-by="date_long"
+          :sort-desc="false" />
       <p v-else class="pt-3 pb-3">__('events.moderation_none').</p>
     </div>
     <div v-else class="vue-placeholder-large" />
