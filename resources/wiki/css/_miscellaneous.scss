@@ -24,3 +24,7 @@
 .mw-parser-output .mw-collapsible div:first-of-type h2 span:first-child::before {
   min-width: 50px
 }
+
+.oo-ui-dialog {
+  z-index: 10000 !important;
+}
