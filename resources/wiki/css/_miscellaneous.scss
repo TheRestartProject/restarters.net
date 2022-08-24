@@ -24,3 +24,13 @@
 .mw-parser-output .mw-collapsible div:first-of-type h2 span:first-child::before {
   min-width: 50px
 }
+
+.mw-notification {
+  background-color: lightgrey!important
+}
+
+.oo-ui-messageWidget.oo-ui-flaggedElement-success:not(.oo-ui-messageWidget-block) {
+  background-color: black;
+  border-color: #f5f5f5;
+  background-color: #f45b69!important;
+}
