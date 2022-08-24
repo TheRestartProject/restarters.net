@@ -25,4 +25,8 @@
       background-size: 15px 15px !important;
     }
   }
+
+  .oo-ui-messageWidget.oo-ui-flaggedElement-success:not(.oo-ui-messageWidget-block) {
+    color: white !important;
+  }
 }
