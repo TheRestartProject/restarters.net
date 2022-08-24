@@ -191,6 +191,9 @@ export default {
     }
   },
   computed: {
+    idtouse() {
+      return this.currentDevice ? this.currentDevice.iddevices : null
+    },
     disabled () {
       return !this.edit && !this.add
     },
@@ -274,6 +277,13 @@ export default {
 
       this.nextSteps()
       this.partsProvider()
+    }
+
+    if (this.add) {
+      // Use a -ve id to give us something to track uploaded photos against.
+      //
+      // Need to ensure this isn't too large as the xref table has an int value.
+      this.currentDevice.iddevices = -Math.round(new Date().getTime() / 1000)
     }
   },
   methods: {
@@ -387,8 +397,11 @@ export default {
       // TODO LATER The remove of the image should not happen until the edit completes.  At the moment we do it
       // immediately.  The way we set ids here is poor, but this is because the underlying API call for images
       // is weak.
-      image.iddevices = this.currentDevice.iddevices
-      this.$store.dispatch('devices/deleteImage', image)
+      console.log("Remove imnage", image, this.idtouse, this.device, this.currentDevice)
+      this.$store.dispatch('devices/deleteImage', {
+        iddevices: this.idtouse,
+        idxref: image.idxref
+      })
     },
     confirmDeleteDevice () {
       this.$refs.confirm.show()

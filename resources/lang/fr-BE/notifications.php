@@ -11,6 +11,7 @@ return [
     'notifications' => 'Notifications',
     'view_event' => 'Voir l\'événement',
     'view_group' => 'Voir le Repair Café',
+    'view_profile' => 'Voir profil',
     'view_all' => 'Voir toutes les notifications',
     'event_confirmed_title' => 'Événement confirmé',
     'event_confirmed_subject' => 'Événement confirmé',

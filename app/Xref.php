@@ -8,6 +8,7 @@ use Illuminate\Database\Eloquent\Model;
 class Xref extends Model
 {
     protected $table = 'xref';
+    protected $primaryKey = 'idxref';
 
     public $timestamps = false;
 
@@ -17,8 +18,6 @@ class Xref extends Model
     protected $refType;
 
     private $index;
-    private $search_id;
-    private $search_type;
 
     /**
      * The attributes that are mass assignable.
@@ -26,34 +25,6 @@ class Xref extends Model
      * @var array
      */
     protected $fillable = ['object', 'object_type', 'reference', 'reference_type'];
-
-    /**
-     * returns object with cross-references to selected
-     * ID and TABLE.
-     * @ $index can be 'object' || 'reference'
-     *   this selects in which direction to look
-     * */
-    public function findXref()
-    {
-        if ($this->index !== false) {
-            $sql = 'SELECT * FROM `'.$this->table.'`
-                    WHERE `'.$this->index.'` = :id
-                    AND `'.$this->index.'_type` = :type';
-
-            try {
-                return DB::select(DB::raw($sql), ['id' => $this->search_id, 'type' => $this->search_type]);
-            } catch (\Illuminate\Database\QueryException $e) {
-                return false;
-            }
-        } else {
-            return false;
-        }
-    }
-
-    public function findFullXref()
-    {
-        //switch ($table
-    }
 
     public function createXref($clear = true)
     {
@@ -102,5 +73,17 @@ class Xref extends Model
     public function image()
     {
         return $this->hasOne(\App\Images::class, 'idimages', 'object');
+    }
+
+
+    public function copy($reference) {
+        error_log("Copy {$this->idxref} to {$reference}");
+
+        return Xref::create([
+                         'object' => $this->object,
+                         'object_type' => $this->object_type,
+                         'reference' => $reference,
+                         'reference_type' => $this->reference_type,
+                     ]);
     }
 }

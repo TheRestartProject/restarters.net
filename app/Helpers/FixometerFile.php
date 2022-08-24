@@ -25,6 +25,11 @@ class FixometerFile extends Model
         }
     }
 
+    public function copy($from, $to) {
+        // This is for phpunit tests.
+        copy($from, $to);
+    }
+
     /**
      * receives the POST data from an HTML form
      * processes file upload and saves
@@ -184,25 +189,12 @@ class FixometerFile extends Model
         }
     }
 
-    public function deleteImage($id, $path)
+    public function deleteImage($idxref)
     {
-        unlink($_SERVER['DOCUMENT_ROOT'].'/uploads/'.basename($path));
-
-        $sql = 'DELETE FROM `images` WHERE `idimages` = :id';
-
-        try {
-            return DB::delete(DB::raw($sql), ['id' => $id]);
-        } catch (\Illuminate\Database\QueryException $e) {
-            return db($e);
-        }
-
-        $sql = 'DELETE FROM `xref` WHERE `object` = :id AND `object_type` = '.env('TBL_IMAGES');
-
-        try {
-            return DB::delete(DB::raw($sql), ['id' => $id]);
-        } catch (\Illuminate\Database\QueryException $e) {
-            return db($e);
-        }
+        // Delete the xref.  This is sufficient to stop the image being attached to the device.  We leave the
+        // file in existence in case we want it later for debugging/mining.
+        $sql = 'DELETE FROM `xref` WHERE `idxref` = :id AND `object_type` = '.env('TBL_IMAGES');
+        DB::delete(DB::raw($sql), ['id' => $idxref]);
     }
 
     public function simpleUpload($file, $object_id, $object = 'device', $title = null)
@@ -230,5 +222,126 @@ class FixometerFile extends Model
                 $xref->createXref(true);
             }
         }
+    }
+
+    /**
+     * @param $tmp_name
+     * @param string $lpath
+     * @param bool $filename
+     * @param $type
+     * @param $profile
+     * @param $crop
+     * @param $reference
+     * @param $referenceType
+     * @return bool
+     */
+    private function createImage(
+        $tmp_name,
+        $copy,
+        $lpath,
+        $filename,
+        $type,
+        $profile,
+        $crop,
+        $reference,
+        $referenceType
+    ): bool {
+        if ($copy) {
+            if (!$this->copy($tmp_name, $lpath)) {
+                return false;
+            }
+        } else {
+            if (!$this->move($tmp_name, $lpath)) {
+                return false;
+            }
+        }
+
+        $data = [];
+        $this->path = $lpath;
+        $data['path'] = $this->file;
+
+        // Fix orientation
+        Image::make($lpath)->orientate()->save($lpath);
+
+        if ($type === 'image')
+        {
+            $size = getimagesize($this->path);
+            $data['width'] = $size[0];
+            $data['height'] = $size[1];
+
+            if ($profile)
+            {
+                $data['alt_text'] = 'Profile Picture';
+            }
+
+            if ($data['width'] > $data['height'])
+            {
+                $resize_height = true;
+            } else
+            {
+                $resize_height = false;
+            }
+
+            $thumbSize = 80;
+            $midSize = 260;
+
+            // Let's make images, which we will resize or crop
+            $thumb = Image::make($lpath);
+            $mid = Image::make($lpath);
+
+            if ($resize_height)
+            { // Resize before crop
+                $thumb->resize(null, $thumbSize, function ($constraint)
+                {
+                    $constraint->aspectRatio();
+                });
+
+                $mid->resize(null, $midSize, function ($constraint)
+                {
+                    $constraint->aspectRatio();
+                });
+            } else
+            {
+                $thumb->resize($thumbSize, null, function ($constraint)
+                {
+                    $constraint->aspectRatio();
+                });
+
+                $mid->resize($midSize, null, function ($constraint)
+                {
+                    $constraint->aspectRatio();
+                });
+            }
+
+            if ($crop)
+            {
+                $thumb->crop($thumbSize, $thumbSize);
+                $mid->crop($midSize, $midSize);
+            }
+
+            $thumb->save($_SERVER['DOCUMENT_ROOT'] . '/uploads/' . 'thumbnail_' . $filename, 85);
+            $mid->save($_SERVER['DOCUMENT_ROOT'] . '/uploads/' . 'mid_' . $filename, 85);
+
+            $this->table = 'images';
+            $Images = new Images;
+
+            $image = $Images->create($data)->id;
+
+            if (is_numeric($image) && !is_null($reference) && !is_null($referenceType))
+            {
+                Xref::create([
+                                 'object' => $image,
+                                 'object_type' => env('TBL_IMAGES'),
+                                 'reference' => $reference,
+                                 'reference_type' => $referenceType,
+                             ]);
+            }
+        }
+
+        return $filename;
+    }
+
+    public function copyImage($idimages) {
+
     }
 }

@@ -113,7 +113,7 @@ export default {
     },
     removeImage(state, params) {
       Vue.set(state.images, params.iddevices, state.images[params.iddevices].filter(u => {
-        return u.idimages !== params.idimages
+        return u.idxref !== params.idxref
       }))
     },
   },
@@ -260,17 +260,19 @@ export default {
       commit('setImages', params)
     },
     async deleteImage({commit, rootGetters}, params) {
-      params.idimages = params.idxref
-      const url = '/device/image/delete/' + params.iddevices + '/' + params.idimages + '/' + params.path
-      const ret = await axios.get(url, {
-        headers: {
-          'X-CSRF-TOKEN': rootGetters['auth/CSRF']
-        }
-      })
+      console.log("Delete image", params)
+      if (params.iddevices && params.idxref) {
+        const url = '/device/image/delete/' + params.iddevices + '/' + params.idxref
+        const ret = await axios.get(url, {
+          headers: {
+            'X-CSRF-TOKEN': rootGetters['auth/CSRF']
+          }
+        })
 
-      // This isn't a proper API call, and returns success/failure via a redirect to another page.  Assume
-      // it works until we have a better API.
-      commit('removeImage', params)
+        // This isn't a proper API call, and returns success/failure via a redirect to another page.  Assume
+        // it works until we have a better API.
+        commit('removeImage', params)
+      }
     }
   },
 }

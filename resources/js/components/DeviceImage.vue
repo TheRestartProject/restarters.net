@@ -32,7 +32,6 @@ export default {
       this.$refs.confirm.show()
     },
     zoom() {
-      console.log("Zoom")
       this.$refs.modal.show()
     }
   }

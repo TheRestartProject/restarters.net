@@ -63,7 +63,6 @@ return [
   'unpowered_items' => 'Objets non électriques',
   'weight' => 'Poids',
   'confirm_delete' => 'Cliquer sur confirmer supprimera cet appareil de l\'événement',
-  'images_on_edit' => 'Pour le moment, les images peuvent uniquement être ajoutées en éditant un appareil, après que celui-ci ait été ajouté.',
   'spare_parts' => 'Pièces détachées',
   'status' => 'Statut',
   'latest_data' => 'Dernières données',
