@@ -202,11 +202,8 @@ class DeviceController extends Controller
                 // Each instance of a device shares the same underlying photo file.
                 $File = new \FixometerFile;
                 $images = $File->findImages(env('TBL_DEVICES'), $iddevices);
-                error_log("Find draft iamges for $iddevices " . count($images));
                 foreach ($images as $image) {
-                    error_log("Get xref {$image->idxref}");
                     $xref = Xref::findOrFail($image->idxref);
-                    error_log("Copy for {$device[$i]->iddevices}");
                     $xref->copy($device[$i]->iddevices);
                 }
 
@@ -427,13 +424,11 @@ class DeviceController extends Controller
     public function deleteImage($device_id, $idxref)
     {
         $user = Auth::user();
-        error_log("Delete image $idxref for device $device_id");
 
         if ($device_id > 0) {
             // We are deleting a photo from an existing device.
             $event_id = Device::find($device_id)->event;
             $in_event = EventsUsers::where('event', $event_id)->where('user', Auth::user()->id)->first();
-            error_log("Event id $event_id in event " . print_r($in_event, true));
             if (Fixometer::hasRole($user, 'Administrator') || is_object($in_event)) {
                 $Image = new FixometerFile;
                 $Image->deleteImage($idxref);
@@ -447,7 +442,6 @@ class DeviceController extends Controller
             //
             // There is a slight security issue here, in that one user could delete the photos from devices which
             // are in the process of being added by another user.  The chances of this being a real issue are very low.
-            error_log("Delete from not added");
             $Image = new FixometerFile;
             $Image->deleteImage($idxref);
 
