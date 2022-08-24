@@ -12,14 +12,14 @@
   .postedit-icon,
   .postedit-icon-checkmark,
   .postedit-content,
-  .oo-ui-widget {
+  .oo-ui-iconElement-icon {
     font-size: 18px;
     font-family: "Asap", sans-serif;
     font-weight: bold;
     font-stretch: normal;
     font-style: normal;
     padding-left: 0;
-    background-image: none;
+    background-image: none !important;
 
     &::after {
       background-size: 15px 15px !important;
