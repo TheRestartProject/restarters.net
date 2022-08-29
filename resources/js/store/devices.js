@@ -16,7 +16,7 @@ export default {
       return state.devices[idevents]
     },
     imagesByDevice: state => (iddevices) => {
-      return state.images[iddevices]
+      return state.images[iddevices] || []
     }
   },
   mutations: {
