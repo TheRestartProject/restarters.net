@@ -14,6 +14,7 @@
         "barryvdh/laravel-translation-manager": "^0.6.2",
         "caseyamcl/guzzle_retry_middleware": "^2.6",
         "cweagans/composer-patches": "^1.7",
+        "darkaonline/l5-swagger": "6.*",
         "doctrine/dbal": "^2.6",
         "egulias/email-validator": "2.1.25",
         "fideloper/proxy": "^4.4",

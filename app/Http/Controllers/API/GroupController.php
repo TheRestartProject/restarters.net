@@ -228,6 +228,33 @@ class GroupController extends Controller
         ]);
     }
 
+    /**
+     * @OA\Get(
+     *      path="/api/v2/groups/{id}",
+     *      operationId="getGroup",
+     *      tags={"Groups"},
+     *      summary="Get Group",
+     *      description="Returns information about a group.",
+     *      @OA\Parameter(
+     *          name="id",
+     *          description="Group id",
+     *          required=true,
+     *          in="path",
+     *          @OA\Schema(
+     *              type="integer"
+     *          )
+     *      ),
+     *      @OA\Response(
+     *          response=200,
+     *          description="Successful operation",
+     *          @OA\JsonContent(ref="#/components/schemas/GroupResponse")
+     *       ),
+     *      @OA\Response(
+     *          response=404,
+     *          description="Group not found",
+     *      ),
+     *     )
+     */
     public static function getGroupv2(Request $request, $idgroups) {
         $group = Group::findOrFail($idgroups);
         return \App\Http\Resources\Group::make($group);
