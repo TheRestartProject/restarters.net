@@ -165,6 +165,10 @@ jobs:
       - run: php artisan migrate
 
       - run: wget -O phpunit https://phar.phpunit.de/phpunit-7.phar ; chmod +x phpunit
+
+      # The phpunit and playwright tests require an uploads directory in a slightly different place.  Not really
+      # worth fixing.
+      - run: mkdir uploads
       - run: mkdir public/uploads
 
       # Wait for Discourse to finish initialising.
