@@ -146,6 +146,8 @@ class FixometerFile extends Model
 
             return $filename;
         }
+
+        return null;
     }
 
     /**

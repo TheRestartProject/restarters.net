@@ -5,7 +5,7 @@
         {{ __('devices.images') }}
       </label>
       <div class="d-flex flex-wrap device-photos dropzone-previews">
-        <FileUploader :url="uploadURL" v-if="(edit || add) && !disabled" previews-container=".device-photos" @uploaded="uploaded($event)" />
+        <FileUploader :url="uploadURL" v-if="(edit || add) && !disabled && images.length < maxFiles" previews-container=".device-photos" @uploaded="uploaded($event)" :max-files="maxFiles" />
         <DeviceImage v-for="image in images" :key="'img-' + image.path" :image="image" @remove="$emit('remove', image)" :disabled="disabled" />
       </div>
     </div>
@@ -42,6 +42,11 @@ export default {
       required: false,
       default: false
     },
+  },
+  data () {
+    return {
+      maxFiles: 5
+    }
   },
   computed: {
     idtouse() {

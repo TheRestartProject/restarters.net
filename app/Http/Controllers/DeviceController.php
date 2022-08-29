@@ -404,8 +404,13 @@ class DeviceController extends Controller
                     // We are adding a photo for a device that hasn't yet been added.  Upload the file. We will add
                     // them to the device once the device is created.
                     $fn = $file->upload('file', 'image', $id, env('TBL_DEVICES'), true, false, true);
-                    $File = new \FixometerFile;
-                    $images = $File->findImages(env('TBL_DEVICES'), $id);
+
+                    if ($fn) {
+                        $File = new \FixometerFile;
+                        $images = $File->findImages(env('TBL_DEVICES'), $id);
+                    } else {
+                        return 'fail - image could not be uploaded';
+                    }
                 }
             }
 
