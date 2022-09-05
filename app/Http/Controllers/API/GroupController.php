@@ -305,7 +305,17 @@ class GroupController extends Controller
      *      @OA\Response(
      *          response=200,
      *          description="Successful operation",
-     *          @OA\JsonContent(ref="#/components/schemas/EventSummaryCollection")
+     *          @OA\JsonContent(
+     *              @OA\Property(
+     *                property="data",
+     *                title="data",
+     *                description="An array of groups",
+     *                type="array",
+     *                @OA\Items(
+     *                    ref="#/components/schemas/EventSummary"
+     *                )
+     *              )
+     *          )
      *       ),
      *      @OA\Response(
      *          response=404,

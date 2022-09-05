@@ -43,7 +43,7 @@ class Group extends JsonResource
      *          title="image",
      *          description="URL of an image for this group.  You should prefix this with /uploads before use.",
      *          format="string",
-     *          example="https://restarters.net/uploads/mid_1597853610178a4b76e4d666b2a7b32ee75d8a24c706f1cbf213970.png"
+     *          example="/mid_1597853610178a4b76e4d666b2a7b32ee75d8a24c706f1cbf213970.png"
      *     )
      */
 

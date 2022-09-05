@@ -22,11 +22,74 @@ class NetworkController extends Controller
         return response()->json($network->stats());
     }
 
+    /**
+     * @OA\Get(
+     *      path="/api/v2/networks",
+     *      operationId="getNetworks",
+     *      tags={"Networks"},
+     *      summary="Get Networks",
+     *      description="Returns list of networks on the platform.",
+     *      @OA\Response(
+     *          response=200,
+     *          description="Successful operation",
+     *          @OA\JsonContent(
+     *              @OA\Property(
+     *                property="data",
+     *                title="data",
+     *                description="An array of networks",
+     *                type="array",
+     *                @OA\Items(
+     *                    ref="#/components/schemas/NetworkSummary"
+     *                 )
+     *              )
+     *          )
+     *       ),
+     *      @OA\Response(
+     *          response=404,
+     *          description="Network not found",
+     *      ),
+     *     )
+     */
+
     public function getNetworksv2()
     {
         $networks = Network::all();
         return \App\Http\Resources\NetworkSummaryCollection::make($networks);
     }
+
+    /**
+     * @OA\Get(
+     *      path="/api/v2/networks/{id}",
+     *      operationId="getNetwork",
+     *      tags={"Networks"},
+     *      summary="Get Network",
+     *      description="Returns information about a network.",
+     *      @OA\Parameter(
+     *          name="id",
+     *          description="Network id",
+     *          required=true,
+     *          in="path",
+     *          @OA\Schema(
+     *              type="integer"
+     *          )
+     *      ),
+     *      @OA\Response(
+     *          response=200,
+     *          description="Successful operation",
+     *          @OA\JsonContent(
+     *              @OA\Property(
+     *                property="data",
+     *                title="data",
+     *                ref="#/components/schemas/Network"
+     *              )
+     *          )
+     *       ),
+     *      @OA\Response(
+     *          response=404,
+     *          description="Event not found",
+     *      ),
+     *     )
+     */
 
     public function getNetworkv2($id)
     {
