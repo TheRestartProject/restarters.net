@@ -251,11 +251,7 @@ class GroupController extends Controller
      *              @OA\Property(
      *                property="data",
      *                title="data",
-     *                description="An array of events",
-     *                type="array",
-     *                @OA\Items(
-     *                    ref="#/components/schemas/EventSummary"
-     *                 )
+     *                ref="#/components/schemas/Group"
      *              )
      *          )
      *       ),
