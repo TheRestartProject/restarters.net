@@ -234,14 +234,22 @@ class GroupController extends Controller
     }
 
     public static function getEventsForGroupv2(Request $request, $idgroups) {
-        Group::findOrFail($idgroups);
+        $group = Group::findOrFail($idgroups);
 
-        // Get date filters.  We default to far past and far future so that we don't need multiple code branches.  We
-        // don't need to validate the date format - if they put junk in then they'll get junk matches back.
-        $start = Carbon::parse($request->get('start', '1970-01-01'))->setTimezone('UTC')->toIso8601String();
-        $end = Carbon::parse($request->get('end', '3000-01-01'))->setTimezone('UTC')->toIso8601String();
+        $parties = collect([]);
 
-        $parties = Party::undeleted()->forGroup($idgroups)->where('event_start_utc', '>=', $start)->where('event_end_utc', '<=', $end)->get();
+        // Only show events on approved groups.
+        if ($group->approved) {
+            // Get date filters.  We default to far past and far future so that we don't need multiple code branches.  We
+            // don't need to validate the date format - if they put junk in then they'll get junk matches back.
+            $start = Carbon::parse($request->get('start', '1970-01-01'))->setTimezone('UTC')->toIso8601String();
+            $end = Carbon::parse($request->get('end', '3000-01-01'))->setTimezone('UTC')->toIso8601String();
+
+            $parties = Party::undeleted()->forGroup($idgroups)
+                ->where('event_start_utc', '>=', $start)
+                ->where('event_end_utc', '<=', $end)
+                ->get();
+        }
 
         return PartySummaryCollection::make($parties);
     }

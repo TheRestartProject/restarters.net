@@ -23,7 +23,7 @@ class GroupSummary extends JsonResource
         ];
 
         if ($request->get('includeNextEvent', false)) {
-            // Get next approved event for group
+            // Get next approved event for group.
             $nextevent = \App\Group::find($this->idgroups)->getNextUpcomingEvent();
 
             if ($nextevent) {

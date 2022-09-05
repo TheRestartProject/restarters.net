@@ -63,12 +63,14 @@ class NetworkController extends Controller
         $end = Carbon::parse($request->get('updated_end', '3000-01-01'))->setTimezone('UTC')->format('Y-m-d H:i:s');
 
         // We need to explicity select events.*, otherwise the updated_at values we get back are from the group_network
-        // table, which is mightily confusing.
+        // table, which is mightily confusing.  We only want to return approved events on approved groups.
         $events = Party::join('groups', 'groups.idgroups', '=', 'events.group')
             ->join('group_network', 'group_network.group_id', '=', 'groups.idgroups')
             ->where('group_network.network_id', $id)
             ->where('events.updated_at', '>=', $start)
             ->where('events.updated_at', '<=', $end)
+            ->whereNotNull('events.wordpress_post_id')
+            ->whereNotNull('groups.wordpress_post_id')
             ->select('events.*')
             ->get();
 

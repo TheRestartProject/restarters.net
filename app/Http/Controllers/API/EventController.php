@@ -226,6 +226,11 @@ class EventController extends Controller
 
     public function getEventv2(Request $request, $idevents) {
         $party = Party::findOrFail($idevents);
+
+        if (!$party->theGroup->approved) {
+            abort(404);
+        }
+
         return \App\Http\Resources\Party::make($party);
     }
 }
