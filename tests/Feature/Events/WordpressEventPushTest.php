@@ -182,4 +182,32 @@ class WordpressEventPushTest extends TestCase
 
         event(new EditEvent($event, $eventData));
     }
+
+
+    /** @test */
+    public function given_group_not_approved_then_not_pushed_to_wordpress()
+    {
+        $this->instance(WordpressClient::class, Mockery::mock(WordpressClient::class, function ($mock) {
+            $mock->shouldNotReceive('getPost');
+            $mock->shouldNotReceive('editPost');
+        }));
+
+        $restart = factory(Network::class)->create([
+                                                       'name' => 'Restart',
+                                                       'events_push_to_wordpress' => true,
+                                                   ]);
+        $group = factory(Group::class)->create([
+            'wordpress_post_id' => null,
+                                               ]);
+        $restart->addGroup($group);
+        $event = factory(Party::class)->create([
+                                                   'group' => $group->idgroups,
+                                                   'latitude' => 1,
+                                                   'longitude' => 1,
+                                                   'event_start_utc' => '2100-01-01T10:15:05+05:00',
+                                                   'event_end_utc' => '2100-01-0113:45:05+05:00',
+                                               ]);
+
+        $event->approve();
+    }
 }
