@@ -9,9 +9,9 @@ use Illuminate\Http\Resources\Json\JsonResource;
  * @OA\Schema(
  *     title="GroupSummary",
  *     schema="GroupSummary",
- *     description="A response containing a group summary",
+ *     description="The very basic information about a group.  For full information, fetch the group.",
  *     @OA\Xml(
- *         name="GroupResponse"
+ *         name="GroupSummary"
  *     ),
  * )
  */
@@ -20,8 +20,8 @@ class GroupSummary extends JsonResource
 {
     /**
      *     @OA\Property(
-     *          property="idgroups",
-     *          title="idgroups",
+     *          property="id",
+     *          title="id",
      *          description="Unique identifier of this group",
      *          format="int64",
      *          example=1
@@ -54,6 +54,16 @@ class GroupSummary extends JsonResource
      *          title="updated_at",
      *          description="The last change to this group.  This includes changes which affect the stats.",
      *          format="date-time",
+     *     )
+     */
+
+    /**
+     *     @OA\Property(
+     *          property="next_event",
+     *          title="next_event",
+     *          description="The next event, if any, for this group.  Only present if includeNextEvent=true.",
+     *          format="object",
+     *          ref="#/components/schemas/EventSummary"
      *     )
      */
 

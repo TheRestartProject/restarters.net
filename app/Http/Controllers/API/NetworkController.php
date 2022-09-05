@@ -50,10 +50,29 @@ class NetworkController extends Controller
      *              type="integer"
      *          )
      *      ),
+     *      @OA\Parameter(
+     *          name="includeNextEvent",
+     *          description="Include the next event for the group.  This makes the call slower.  Default false.",
+     *          required=false,
+     *          in="query",
+     *          @OA\Schema(
+     *              type="boolean"
+     *          )
+     *      ),
      *      @OA\Response(
      *          response=200,
      *          description="Successful operation",
-     *          @OA\JsonContent(ref="#/components/schemas/GroupSummaryCollection")
+     *          @OA\JsonContent(
+     *              @OA\Property(
+     *                property="data",
+     *                title="data",
+     *                description="An array of groups",
+     *                type="array",
+     *                @OA\Items(
+     *                    ref="#/components/schemas/GroupSummary"
+     *                 )
+     *              )
+     *          )
      *       ),
      *      @OA\Response(
      *          response=404,
@@ -80,6 +99,64 @@ class NetworkController extends Controller
 
         return \App\Http\Resources\GroupSummaryCollection::make($groups);
     }
+
+    /**
+     * @OA\Get(
+     *      path="/api/v2/networks/{id}/events",
+     *      operationId="getNetworkEvents",
+     *      tags={"Networks"},
+     *      summary="Get Network Groups",
+     *      description="Returns list of events for a network.",
+     *      @OA\Parameter(
+     *          name="id",
+     *          description="Network id",
+     *          required=true,
+     *          in="path",
+     *          @OA\Schema(
+     *              type="integer"
+     *          )
+     *      ),
+     *      @OA\Parameter(
+     *          name="updated_start",
+     *          description="The minimum start date for an event in ISO8601 format.  Inclusive.",
+     *          required=false,
+     *          in="query",
+     *          @OA\Schema(
+     *              type="string",
+     *              example="2022-09-18T11:30:00+00:00"
+     *          )
+     *      ),
+     *      @OA\Parameter(
+     *          name="updated_end",
+     *          description="The maximum end date for an event in ISO8601 format.  Inclusive.",
+     *          required=false,
+     *          in="query",
+     *          @OA\Schema(
+     *              type="string",
+     *              example="2022-09-18T12:30:00+00:00"
+     *          )
+     *      ),
+     *      @OA\Response(
+     *          response=200,
+     *          description="Successful operation",
+     *          @OA\JsonContent(
+     *              @OA\Property(
+     *                property="data",
+     *                title="data",
+     *                description="An array of events",
+     *                type="array",
+     *                @OA\Items(
+     *                    ref="#/components/schemas/EventSummary"
+     *                 )
+     *              )
+     *          )
+     *       ),
+     *      @OA\Response(
+     *          response=404,
+     *          description="Network not found",
+     *      ),
+     *     )
+     */
 
     public function getNetworkEventsv2(Request $request, $id)
     {
