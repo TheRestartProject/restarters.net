@@ -34,6 +34,34 @@ class NetworkController extends Controller
         return \App\Http\Resources\Network::make($network);
     }
 
+    /**
+     * @OA\Get(
+     *      path="/api/v2/networks/{id}/groups",
+     *      operationId="getNetworkGroups",
+     *      tags={"Networks"},
+     *      summary="Get Network Groups",
+     *      description="Returns list of groups for a network.",
+     *      @OA\Parameter(
+     *          name="id",
+     *          description="Network id",
+     *          required=true,
+     *          in="path",
+     *          @OA\Schema(
+     *              type="integer"
+     *          )
+     *      ),
+     *      @OA\Response(
+     *          response=200,
+     *          description="Successful operation",
+     *          @OA\JsonContent(ref="#/components/schemas/GroupSummaryCollection")
+     *       ),
+     *      @OA\Response(
+     *          response=404,
+     *          description="Network not found",
+     *      ),
+     *     )
+     */
+
     public function getNetworkGroupsv2(Request $request, $id)
     {
         $network = Network::findOrFail($id);

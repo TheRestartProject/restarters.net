@@ -5,8 +5,58 @@ namespace App\Http\Resources;
 use Carbon\Carbon;
 use Illuminate\Http\Resources\Json\JsonResource;
 
+/**
+ * @OA\Schema(
+ *     title="GroupSummary",
+ *     schema="GroupSummary",
+ *     description="A response containing a group summary",
+ *     @OA\Xml(
+ *         name="GroupResponse"
+ *     ),
+ * )
+ */
+
 class GroupSummary extends JsonResource
 {
+    /**
+     *     @OA\Property(
+     *          property="idgroups",
+     *          title="idgroups",
+     *          description="Unique identifier of this group",
+     *          format="int64",
+     *          example=1
+     *     )
+     */
+
+    /**
+     *     @OA\Property(
+     *          property="name",
+     *          title="name",
+     *          description="Unique name of this group",
+     *          format="string",
+     *          example="Restarters HQ"
+     *     )
+     */
+
+    /**
+     *     @OA\Property(
+     *          property="image",
+     *          title="image",
+     *          description="URL of an image for this group.  You should prefix this with /uploads before use.",
+     *          format="string",
+     *          example="https://restarters.net/uploads/mid_1597853610178a4b76e4d666b2a7b32ee75d8a24c706f1cbf213970.png"
+     *     )
+     */
+
+    /**
+     *     @OA\Property(
+     *          property="updated_at",
+     *          title="updated_at",
+     *          description="The last change to this group.  This includes changes which affect the stats.",
+     *          format="date-time",
+     *     )
+     */
+
     /**
      * Transform the resource into an array.
      *
