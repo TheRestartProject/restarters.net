@@ -37,7 +37,9 @@ class WordpressEventPushTest extends TestCase
             'name' => 'Restart',
             'events_push_to_wordpress' => true,
         ]);
-        $group = factory(Group::class)->create();
+        $group = factory(Group::class)->create([
+                                                   'wordpress_post_id' => '99999',
+                                               ]);
         $restart->addGroup($group);
         $event = factory(Party::class)->create([
             'group' => $group->idgroups,
@@ -55,7 +57,9 @@ class WordpressEventPushTest extends TestCase
         $network = factory(Network::class)->create([
            'events_push_to_wordpress' => true,
         ]);
-        $group = factory(Group::class)->create();
+        $group = factory(Group::class)->create([
+                                                   'wordpress_post_id' => '99999',
+                                               ]);
         $network->addGroup($group);
         $event = factory(Party::class)->create([
             'group' => $group->idgroups,
@@ -115,7 +119,9 @@ class WordpressEventPushTest extends TestCase
         $repairTogether = factory(Network::class)->create([
             'name' => 'Repair Together',
         ]);
-        $group = factory(Group::class)->create();
+        $group = factory(Group::class)->create([
+                                                   'wordpress_post_id' => '99999',
+                                               ]);
         $repairTogether->addGroup($group);
         $event = factory(Party::class)->create(['group' => $group->idgroups]);
 
@@ -139,7 +145,9 @@ class WordpressEventPushTest extends TestCase
             'name' => 'Restart',
             'events_push_to_wordpress' => true,
         ]);
-        $group = factory(Group::class)->create();
+        $group = factory(Group::class)->create([
+                                                   'wordpress_post_id' => '99999',
+                                               ]);
         $restart->addGroup($group);
         $event = factory(Party::class)->create([
             'group' => $group->idgroups,
@@ -169,7 +177,9 @@ class WordpressEventPushTest extends TestCase
             'name' => 'Repair Together',
             'events_push_to_wordpress' => false,
         ]);
-        $group = factory(Group::class)->create();
+        $group = factory(Group::class)->create([
+                                                   'wordpress_post_id' => '99999',
+                                               ]);
         $repairTogether->addGroup($group);
         $event = factory(Party::class)->create(['group' => $group->idgroups]);
         $event->wordpress_post_id = 100;
