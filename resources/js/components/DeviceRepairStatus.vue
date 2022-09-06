@@ -106,8 +106,9 @@ export default {
   computed: {
     translatedBarriers() {
       return this.barrierList.map(b => {
-        b.barrier = this.$lang.get('strings.' + b.barrier)
-        return b
+        var newb = JSON.parse(JSON.stringify(b))
+        newb.barrier = this.$lang.get('strings.' + b.barrier) + '-'
+        return newb
       })
     },
     showSteps () {
