@@ -107,7 +107,7 @@ export default {
     translatedBarriers() {
       return this.barrierList.map(b => {
         var newb = JSON.parse(JSON.stringify(b))
-        newb.barrier = this.$lang.get('strings.' + b.barrier) + '-'
+        newb.barrier = this.$lang.get('strings.' + b.barrier)
         return newb
       })
     },
@@ -205,8 +205,14 @@ export default {
     barriersValue: {
       get() {
         // We have an array of ids which we need to map to an array of options.
-        return this.barrierList.filter(b => {
+        var ret = this.barrierList.filter(b => {
           return this.barriers && this.barriers.indexOf(b.id) !== -1
+        })
+
+        return ret.map(b => {
+          return this.translatedBarriers.find(t => {
+            return t.id === b.id
+          })
         })
       },
       set(newval) {
