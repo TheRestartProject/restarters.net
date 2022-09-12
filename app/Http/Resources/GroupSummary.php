@@ -94,7 +94,12 @@ class GroupSummary extends JsonResource
                     'start' => $nextevent->event_start_utc,
                     'end' => $nextevent->event_end_utc,
                     'timezone' => $nextevent->timezone,
-                    'title' => $nextevent->venue ?? $nextevent->location
+                    'title' => $nextevent->venue ?? $nextevent->location,
+                    'location' => $nextevent->location,
+                    'online' => $nextevent->online,
+                    'lat' => $nextevent->latitude,
+                    'lng' => $nextevent->longitude,
+                    'updated_at' => $nextevent->updated_at->toIso8601String(),
                 ];
             }
         }

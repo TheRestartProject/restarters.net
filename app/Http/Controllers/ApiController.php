@@ -14,24 +14,24 @@ use Illuminate\Http\Request;
  * @OA\Info(
  *      version="2.0.0",
  *      title="Restarters API",
- *      description="An API for accessing Restarters data.  TODO Consider license, check contact address.  No API authorisation is necessary - all data is read-only and public.",
+ *      description="An API for accessing Restarters data.  No API authorisation is necessary - all data is read-only and public.",
  *      @OA\Contact(
  *          email="tech@therestartproject.org"
  *      ),
  *      @OA\License(
- *          name="Apache 2.0",
- *          url="http://www.apache.org/licenses/LICENSE-2.0.html"
+ *          name="GPL v3",
+ *          url="https://tldrlegal.com/license/gnu-general-public-license-v3-(gpl-3)"
  *      )
- * )
- *
- * @OA\Server(
- *      url=L5_SWAGGER_CONST_HOST_TEST,
- *      description="Test API Server"
  * )
  *
  * @OA\Server(
  *      url=L5_SWAGGER_CONST_HOST_LIVE,
  *      description="Live API Server"
+ * )
+ *
+ * @OA\Server(
+ *      url=L5_SWAGGER_CONST_HOST_TEST,
+ *      description="Test API Server"
  * )
  *
  * @OA\SecurityScheme(
