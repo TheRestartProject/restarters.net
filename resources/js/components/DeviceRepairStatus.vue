@@ -46,7 +46,7 @@
         v-if="showBarriers"
         v-model="barriersValue"
         :placeholder="__('partials.choose_barriers')"
-        :options="barrierList"
+        :options="translatedBarriers"
         :multiple="true"
         :allow-empty="false"
         deselect-label=""
@@ -104,6 +104,12 @@ export default {
     },
   },
   computed: {
+    translatedBarriers() {
+      return this.barrierList.map(b => {
+        b.barrier = this.$lang.get('strings.' + b.barrier)
+        return b
+      })
+    },
     showSteps () {
       return this.status === REPAIRABLE
     },
