@@ -113,14 +113,14 @@
                     <div class="vue-placeholder-content">@lang('partials.loading')...</div>
                 </div>
                 <div class="vue">
-                    <GroupsRequiringModeration :network="[{{ $network->id }}]" />
+                    <GroupsRequiringModeration :networks="[{{ $network->id }}]" />
                 </div>
 
                 <div class="vue-placeholder vue-placeholder-large">
                     <div class="vue-placeholder-large">@lang('partials.loading')...</div>
                 </div>
                 <div class="vue">
-                    <EventsRequiringModeration :network="{{ $network->id }}" />
+                    <EventsRequiringModeration :networks="[{{ $network->id }}]" />
                 </div>
 
             </div>

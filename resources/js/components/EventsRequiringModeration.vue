@@ -28,8 +28,8 @@ export default {
     }
   },
   props: {
-    network: {
-      type: Number,
+    networks: {
+      type: Array,
       required: false,
       default: null
     }
@@ -41,10 +41,9 @@ export default {
       if (this.network) {
         // We are trying to show only data for a specific network.
         ret = ret.filter((e) =>  {
+          var intersection = e.networks.filter(x => this.networks.includes(x.id));
 
-          if (e.group.networks.find((n) => {
-            return n.id === this.network
-          })) {
+          if (intersection.length) {
             return true
           } else {
             return false

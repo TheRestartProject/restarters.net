@@ -11,8 +11,7 @@ function newToOld(e) {
   // Similar code in group store.
   let ret = {
     idevents: e.id,
-    title: e.title,
-    location: e.location,
+    venue: e.title,
     group: {
       idgroups: e.group.id,
       name: e.group.name,
