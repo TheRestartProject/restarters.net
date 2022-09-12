@@ -5,7 +5,7 @@ return [
         'title' => 'Restarters API',
     ],
     'routes' => [
-        'api' => 'api/documentation',
+        'api' => 'apiv2/documentation',
         'docs' => 'docs',
 
         // We don't use OAuth to log in, but the code wrongly requires this to be set.
