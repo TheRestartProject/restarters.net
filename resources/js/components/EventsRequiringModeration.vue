@@ -42,7 +42,6 @@ export default {
         // We are trying to show only data for a specific network.
         ret = ret.filter((e) =>  {
 
-          console.log("Filter", e, this.network)
           if (e.group.networks.find((n) => {
             return n.id === this.network
           })) {
@@ -57,11 +56,8 @@ export default {
     },
   },
   async mounted() {
-    console.log("Mounted")
     await this.$store.dispatch('events/getModerationRequired')
-    console.log("Got events")
     this.$nextTick(() => {
-      console.log("Set loaded")
       this.loaded = true
     })
   }

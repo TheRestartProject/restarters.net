@@ -1,7 +1,7 @@
 <template>
   <div v-if="loaded && groups.length">
     <h2 class="mt-4">{{ __('groups.groups_title_admin') }}</h2>
-    <section class="table-section" id="events-1">
+    <section class="table-section" id="groups-1">
       <GroupsTable :groups="groups" approve />
     </section>
   </div>
@@ -18,8 +18,8 @@ export default {
     }
   },
   props: {
-    network: {
-      type: Number,
+    networks: {
+      type: Array,
       required: false,
       default: null
     }
@@ -31,12 +31,12 @@ export default {
     groups() {
       let ret = Object.values(this.$store.getters['groups/getModerate'])
 
-      if (this.network) {
-        // We are trying to show only data for a specific network.
+      if (this.networks) {
+        // We are trying to show only data for specific networks.
         ret = ret.filter((e) =>  {
-          if (e.networks.find((n) => {
-            return n.id === this.network
-          })) {
+          var intersection = e.networks.filter(x => this.networks.includes(x.id));
+
+          if (intersection.length) {
             return true
           } else {
             return false

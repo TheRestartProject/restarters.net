@@ -22,6 +22,7 @@ function newToOld(e) {
     allinvitedcount: e.stats.invited,
     event_start_utc: e.start,
     event_end_utc: e.end,
+    event_date_local: e.start,
     timezone: e.timezone
   }
 
