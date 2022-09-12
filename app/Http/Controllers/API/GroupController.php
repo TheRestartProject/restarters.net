@@ -228,10 +228,101 @@ class GroupController extends Controller
         ]);
     }
 
+    /**
+     * @OA\Get(
+     *      path="/api/v2/groups/{id}",
+     *      operationId="getGroup",
+     *      tags={"Groups"},
+     *      summary="Get Group",
+     *      description="Returns information about a group.",
+     *      @OA\Parameter(
+     *          name="id",
+     *          description="Group id",
+     *          required=true,
+     *          in="path",
+     *          @OA\Schema(
+     *              type="integer"
+     *          )
+     *      ),
+     *      @OA\Response(
+     *          response=200,
+     *          description="Successful operation",
+     *          @OA\JsonContent(
+     *              @OA\Property(
+     *                property="data",
+     *                title="data",
+     *                ref="#/components/schemas/Group"
+     *              )
+     *          )
+     *       ),
+     *      @OA\Response(
+     *          response=404,
+     *          description="Group not found",
+     *      ),
+     *     )
+     */
     public static function getGroupv2(Request $request, $idgroups) {
         $group = Group::findOrFail($idgroups);
         return \App\Http\Resources\Group::make($group);
     }
+
+    /**
+     * @OA\Get(
+     *      path="/api/v2/groups/{id}/events",
+     *      operationId="getGroup",
+     *      tags={"Groups"},
+     *      summary="Get Group",
+     *      description="Returns the list of events for a group.",
+     *      @OA\Parameter(
+     *          name="id",
+     *          description="Group id",
+     *          required=true,
+     *          in="path",
+     *          @OA\Schema(
+     *              type="integer"
+     *          )
+     *      ),
+     *      @OA\Parameter(
+     *          name="start",
+     *          description="The minimum start date for an event in ISO8601 format.  Inclusive.",
+     *          required=false,
+     *          in="query",
+     *          @OA\Schema(
+     *              type="string",
+     *              example="2022-09-18T11:30:00+00:00"
+     *          )
+     *      ),
+     *      @OA\Parameter(
+     *          name="end",
+     *          description="The maximum end date for an event in ISO8601 format.  Inclusive.",
+     *          required=false,
+     *          in="query",
+     *          @OA\Schema(
+     *              type="string",
+     *              example="2022-09-18T12:30:00+00:00"
+     *          )
+     *      ),
+     *      @OA\Response(
+     *          response=200,
+     *          description="Successful operation",
+     *          @OA\JsonContent(
+     *              @OA\Property(
+     *                property="data",
+     *                title="data",
+     *                description="An array of groups",
+     *                type="array",
+     *                @OA\Items(
+     *                    ref="#/components/schemas/EventSummary"
+     *                )
+     *              )
+     *          )
+     *       ),
+     *      @OA\Response(
+     *          response=404,
+     *          description="Group not found",
+     *      ),
+     *     )
+     */
 
     public static function getEventsForGroupv2(Request $request, $idgroups) {
         Group::findOrFail($idgroups);
