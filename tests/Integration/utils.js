@@ -167,6 +167,7 @@ exports.addDevice = async function(page, baseURL, idevents, powered) {
 
   // Tab to category
   await page.keyboard.press('Tab')
+  await page.keyboard.press('Tab')
   await page.keyboard.press('Enter')
 
   await page.locator('text=Add item >> visible=true').click()
