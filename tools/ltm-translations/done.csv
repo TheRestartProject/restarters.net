@@ -1,0 +1,1151 @@
+group,key,en,fk,lang,alias,trans
+_json,"Coffee maker","Coffee maker","Coffee maker",de,de,Kaffeemaschine
+_json,"Hand tool","Hand tool","Hand tool",de,de,Handwerkzeug
+_json,Iron,Iron,Iron,de,de,Eisen
+_json,Jewellery,Jewellery,Jewellery,de,de,Schmuck
+_json,Laptop,Laptop,Laptop,de,de,Laptop
+_json,Scanner,Scanner,Scanner,de,de,Scanner
+_json,Tablet,Tablet,Tablet,de,de,Tablette
+_json,Toaster,Toaster,Toaster,de,de,Toaster
+_json,Toner,Toner,Toner,de,de,Toner
+_json,"Vendor lock-in","Vendor lock-in","Vendor Lock-in",de,de,"Bindung an den Lieferanten"
+admin,brand,Brand,Brand,de,de,Marke
+admin,brand_modal_title,"Add new brand","Add new brand",de,de,"Neue Marke hinzufügen"
+admin,brand-name,"Brand name","Brand name",de,de,Markenname
+admin,categories,Categories,Categories,de,de,Kategorien
+admin,category_cluster,"Category Cluster","Category Cluster",de,de,"Kategorie Cluster"
+admin,category_name,"Category name","Category name",de,de,"Name der Kategorie"
+admin,co2_footprint,"CO<sub>2</sub> Footprint (kg)","CO<sub>2</sub> Footprint (kg)",de,de,"CO<sub>2</sub> Fußabdruck (kg)"
+admin,create-new-brand,"Create new brand","Create new brand",de,de,"Neue Marke schaffen"
+admin,create-new-category,"Create new category","Create new category",de,de,"Neue Kategorie erstellen"
+admin,create-new-skill,"Create new skill","Create new skill",de,de,"Neue Fertigkeit erstellen"
+admin,create-new-tag,"Create new tag","Create new tag",de,de,"Neues Tag erstellen"
+admin,delete-skill,"Delete skill","Delete skill",de,de,"Fähigkeit löschen"
+admin,delete-tag,"Delete tag","Delete tag",de,de,"Tag löschen"
+admin,description,Description,Description,de,de,Beschreibung
+admin,description_optional,"Description (optional)","Description (optional)",de,de,"Beschreibung (fakultativ)"
+admin,edit-brand,"Edit brand","Edit brand",de,de,"Marke bearbeiten"
+admin,edit-brand-content,,,de,de,
+admin,edit-category,"Edit category","Edit category",de,de,"Kategorie bearbeiten"
+admin,edit-category-content,,,de,de,
+admin,edit-group-tag,"Edit group tag","Edit group tag",de,de,"Gruppen-Tag bearbeiten"
+admin,edit-group-tag-content,,,de,de,
+admin,edit-skill,"Edit skill","Edit skill",de,de,"Fähigkeit bearbeiten"
+admin,edit-skill-content,,,de,de,
+admin,edit-tag,"Edit tag","Edit tag",de,de,"Tag bearbeiten"
+admin,group-tags,"Group tags","Group tags",de,de,Gruppen-Tags
+admin,name,Name,Name,de,de,Name
+admin,reliability,Reliability,Reliability,de,de,Verlässlichkeit
+admin,reliability-1,"Very poor","Very poor",de,de,"Sehr schlecht"
+admin,reliability-2,Poor,Poor,de,de,Schlecht
+admin,reliability-3,Fair,Fair,de,de,Messe
+admin,reliability-4,Good,Good,de,de,Gut
+admin,reliability-5,"Very good","Very good",de,de,"Sehr gut"
+admin,reliability-6,N/A,N/A,de,de,K.A.
+admin,save-brand,"Save brand","Save brand",de,de,"Marke speichern"
+admin,save-category,"Save category","Save category",de,de,"Kategorie speichern"
+admin,save-skill,"Save skill","Save skill",de,de,"Fähigkeit speichern"
+admin,save-tag,"Save tag","Save tag",de,de,"Tag speichern"
+admin,skill_name,"Skill name","Skill name",de,de,"Name der Fertigkeit"
+admin,skills,Skills,Skills,de,de,Fertigkeiten
+admin,skills_modal_title,"Add new skill","Add new skill",de,de,"Neue Fähigkeit hinzufügen"
+admin,tag-name,"Tag name","Tag name",de,de,Tag-Name
+admin,tags_modal_title,"Add new tag","Add new tag",de,de,"Neuen Tag hinzufügen"
+admin,weight,"Weight (kg)","Weight (kg)",de,de,"Gewicht (kg)"
+auth,assigned_groups,"Assigned to groups","Assigned to groups",de,de,"Den Gruppen zugewiesen"
+auth,change_password,"Change password","Change password",de,de,"Passwort ändern"
+auth,change_password_text,"Keep your account safe and regularly change your password.","Keep your account safe and regularly change your password.",de,de,"Bewahren Sie Ihr Konto sicher auf und ändern Sie Ihr Passwort regelmäßig."
+auth,create_account,"Create an account","Create an account",de,de,"Ein Konto erstellen"
+auth,current_password,"Current password","Current password",de,de,"Aktuelles Passwort"
+auth,delete_account,"Delete account","Delete account",de,de,"Konto löschen"
+auth,delete_account_text,"I understand that deleting my account will remove all of my personal data and
+this is a permanent action.","I understand that deleting my account will remove all of my personal data and
+this is a permanent action.",de,de,"Mir ist bekannt, dass durch das Löschen meines Kontos alle meine persönlichen Daten gelöscht werden und
+dies eine dauerhafte Maßnahme ist."
+auth,email_address,"Email address","Email address",de,de,"E-Mail Adresse"
+auth,email_address_validation,"An account with this email address already exists. Have you tried logging in?","An account with this email address already exists. Have you tried logging in?",de,de,"Es existiert bereits ein Konto mit dieser E-Mail-Adresse. Haben Sie versucht, sich anzumelden?"
+auth,failed,"These credentials do not match our records.","These credentials do not match our records.",de,de,"Diese Angaben stimmen nicht mit unseren Aufzeichnungen überein."
+auth,forgot_password,"Forgot password","Forgot password",de,de,"Passwort vergessen"
+auth,forgotten_pw,"Forgotten your password?","Forgotten your password?",de,de,"Haben Sie Ihr Passwort vergessen?"
+auth,forgotten_pw_text,"It happens to all of us. Simply enter your email to receive a password reset message.","It happens to all of us. Simply enter your email to receive a password reset message.",de,de,"Das kann jedem von uns passieren. Geben Sie einfach Ihre E-Mail-Adresse ein, um eine Nachricht zum Zurücksetzen des Passworts zu erhalten."
+auth,login,Login,Login,de,de,Anmeldung
+auth,new_password,"New password","New password",de,de,"Neues Passwort"
+auth,new_repeat_password,"Repeat new password","Repeat new password",de,de,"Wiederholung des neuen Passworts"
+auth,password,Password,Password,de,de,Passwort
+auth,profile_admin,"Admin only","Admin only",de,de,"Nur Verwaltung"
+auth,profile_admin_text,"Here admins have the ability to change a user's role or their associated groups","Here admins have the ability to change a user's role or their associated groups",de,de,"Hier haben Administratoren die Möglichkeit, die Rolle eines Benutzers oder die zugehörigen Gruppen zu ändern"
+auth,repeat_password,"Repeat password","Repeat password",de,de,"Passwort wiederholen"
+auth,repeat_password_validation,"Passwords do not match or are fewer than six characters","Passwords do not match or are fewer than six characters",de,de,"Passwörter stimmen nicht überein oder bestehen aus weniger als sechs Zeichen"
+auth,reset,Reset,Reset,de,de,Zurücksetzen
+auth,reset_password,"Reset password","Reset password",de,de,"Passwort zurücksetzen"
+auth,save_preferences,"Save preferences","Save preferences",de,de,"Einstellungen speichern"
+auth,save_user,"Save user","Save user",de,de,"Benutzer speichern"
+auth,set_preferences,"Click here to set your email preferences for our discussion platform","Click here to set your email preferences for our discussion platform",de,de,"Klicken Sie hier, um Ihre E-Mail-Präferenzen für unsere Diskussionsplattform festzulegen"
+auth,sign_in,"I remembered.  Let me sign in","I remembered.  Let me sign in",de,de,"Ich habe mich erinnert.  Ich möchte mich anmelden"
+auth,throttle,"Too many login attempts. Please try again in :seconds seconds.","Too many login attempts. Please try again in :seconds seconds.",de,de,"Zu viele Anmeldeversuche. Bitte versuchen Sie es in :Sekunden Sekunden erneut."
+auth,user_role,"User role","User role",de,de,"Rolle des Benutzers"
+battcatora,status.problem,Problem,Problem,de,de,Problem
+battcatora,status.status,Status,Status,de,de,Status
+battcatora,survey.a3,Neutral,Neutral,de,de,Neutral
+battcatora,task.brand,Brand,Brand,de,de,Marke
+battcatora,task.status,Status,Status,de,de,Status
+dashboard,add_avatar,"Add an avatar","Add an avatar",de,de,"Einen Avatar hinzufügen"
+dashboard,add_skills,"Add your skills","Add your skills",de,de,"Fügen Sie Ihre Fähigkeiten hinzu"
+dashboard,devices_logged,"devices logged","devices logged",de,de,"erfasste Geräte"
+dashboard,getting_started_header,"Getting started","Getting Started",de,de,"Erste Schritte"
+dashboard,join_discussion,"Join the discussion","Join the discussion",de,de,"Beteiligen Sie sich an der Diskussion"
+dashboard,rsvp_event,"RSVP to an event","RSVP to an event",de,de,"RSVP für eine Veranstaltung"
+dashboard,visit_wiki,"Visit the wiki","Visit the wiki",de,de,"Besuchen Sie das Wiki"
+device-audits,unavailable_audits,"No changes have been made to this device!","No changes have been made to this device!",de,de,"An diesem Gerät wurden keine Änderungen vorgenommen!"
+device-audits,updated.metadata,"On :audit_created_at, :user_name updated record <strong>:audit_url</strong>","On :audit_created_at, :user_name updated record <strong>:audit_url</strong>",de,de,"Am :audit_created_at hat :user_name den Datensatz <strong>:audit_url</strong> aktualisiert"
+device-audits,updated.modified.age,"<strong>Age</strong> was modified from ""<strong>:old</strong>"" to ""<strong>:new</strong>""","<strong>Age</strong> was modified from ""<strong>:old</strong>"" to ""<strong>:new</strong>""",de,de,"<strong>Alter</strong> wurde geändert von ""<strong>:alt</strong>"" zu ""<strong>:neu</strong>"""
+device-audits,updated.modified.brand,"<strong>Brand</strong> was modified from ""<strong>:old</strong>"" to ""<strong>:new</strong>""","<strong>Brand</strong> was modified from ""<strong>:old</strong>"" to ""<strong>:new</strong>""",de,de,"<strong>Marke</strong> wurde geändert von ""<strong>:alt</strong>"" zu ""<strong>:neu</strong>"""
+device-audits,updated.modified.category,"<strong>Category</strong> was modified from ""<strong>:old</strong>"" to ""<strong>:new</strong>""","<strong>Category</strong> was modified from ""<strong>:old</strong>"" to ""<strong>:new</strong>""",de,de,"<strong>Kategorie</strong> wurde geändert von ""<strong>:alt</strong>"" zu ""<strong>:neu</strong>"""
+device-audits,updated.modified.category_creation,"<strong>Category Creation</strong> was modified from ""<strong>:old</strong>"" to ""<strong>:new</strong>""","<strong>Category Creation</strong> was modified from ""<strong>:old</strong>"" to ""<strong>:new</strong>""",de,de,"<strong>Kategorie Erstellung</strong> wurde geändert von ""<strong>:alt</strong>"" zu ""<strong>:neu</strong>"""
+device-audits,updated.modified.do_it_yourself,"<strong>Do it yourself</strong> was modified from ""<strong>:old</strong>"" to ""<strong>:new</strong>""","<strong>Do it yourself</strong> was modified from ""<strong>:old</strong>"" to ""<strong>:new</strong>""",de,de,"<strong>Do it yourself</strong> wurde geändert von ""<strong>:alt</strong>"" zu ""<strong>:neu</strong>"""
+device-audits,updated.modified.estimate,"<strong>Estimate</strong> was modified from ""<strong>:old</strong>"" to ""<strong>:new</strong>""","<strong>Estimate</strong> was modified from ""<strong>:old</strong>"" to ""<strong>:new</strong>""",de,de,"<strong>Schätzung</strong> wurde geändert von ""<strong>:alt</strong>"" zu ""<strong>:neu</strong>"""
+device-audits,updated.modified.event,"<strong>Event</strong> was modified from ""<strong>:old</strong>"" to ""<strong>:new</strong>""","<strong>Event</strong> was modified from ""<strong>:old</strong>"" to ""<strong>:new</strong>""",de,de,"<strong>Ereignis</strong> wurde geändert von ""<strong>:alt</strong>"" zu ""<strong>:neu</strong>"""
+device-audits,updated.modified.model,"<strong>Model</strong> was modified from ""<strong>:old</strong>"" to ""<strong>:new</strong>""","<strong>Model</strong> was modified from ""<strong>:old</strong>"" to ""<strong>:new</strong>""",de,de,"<strong>Modell</strong> wurde geändert von ""<strong>:alt</strong>"" zu ""<strong>:neu</strong>"""
+device-audits,updated.modified.more_time_needed,"<strong>More time needed</strong> was modified from ""<strong>:old</strong>"" to ""<strong>:new</strong>""","<strong>More time needed</strong> was modified from ""<strong>:old</strong>"" to ""<strong>:new</strong>""",de,de,"<strong>Mehr Zeit benötigt</strong> wurde geändert von ""<strong>:alt</strong>"" in ""<strong>:neu</strong>"""
+device-audits,updated.modified.problem,"<strong>Problem</strong> was modified from ""<strong>:old</strong>"" to ""<strong>:new</strong>""","<strong>Problem</strong> was modified from ""<strong>:old</strong>"" to ""<strong>:new</strong>""",de,de,"<strong>Problem</strong> wurde geändert von ""<strong>:alt</strong>"" zu ""<strong>:neu</strong>"""
+device-audits,updated.modified.professional_help,"<strong>Professional Help</strong> was modified from ""<strong>:old</strong>"" to ""<strong>:new</strong>""","<strong>Professional Help</strong> was modified from ""<strong>:old</strong>"" to ""<strong>:new</strong>""",de,de,"<strong>Professionelle Hilfe</strong> wurde von ""<strong>:alt</strong>"" auf ""<strong>:neu</strong>"" geändert."
+device-audits,updated.modified.repair_status,"<strong>Repair Status</strong> was modified from ""<strong>:old</strong>"" to ""<strong>:new</strong>""","<strong>Repair Status</strong> was modified from ""<strong>:old</strong>"" to ""<strong>:new</strong>""",de,de,"Der <strong>Reparaturstatus</strong> wurde von ""<strong>:alt</strong>"" auf ""<strong>:neu</strong>"" geändert."
+device-audits,updated.modified.repaired_by,"<strong>Reparied by</strong> was modified from ""<strong>:old</strong>"" to ""<strong>:new</strong>""","<strong>Reparied by</strong> was modified from ""<strong>:old</strong>"" to ""<strong>:new</strong>""",de,de,"<strong>Repariert von</strong> wurde geändert von ""<strong>:alt</strong>"" zu ""<strong>:neu</strong>"""
+device-audits,updated.modified.spare_parts,"<strong>Spare Parts</strong> was modified from ""<strong>:old</strong>"" to ""<strong>:new</strong>""","<strong>Spare Parts</strong> was modified from ""<strong>:old</strong>"" to ""<strong>:new</strong>""",de,de,"<strong>Ersatzteile</strong> wurde geändert von ""<strong>:alt</strong>"" in ""<strong>:neu</strong>"""
+device-audits,updated.modified.wiki,"<strong>Wiki</strong> was modified from ""<strong>:old</strong>"" to ""<strong>:new</strong>""","<strong>Wiki</strong> was modified from ""<strong>:old</strong>"" to ""<strong>:new</strong>""",de,de,"<strong>Wiki</strong> wurde von ""<strong>:alt</strong>"" auf ""<strong>:neu</strong>"" geändert."
+devices,age,Age,Age,de,de,Alter
+devices,brand,Brand,Brand,de,de,Marke
+devices,by_date,"By date","By date",de,de,"Nach Datum"
+devices,by_taxonomy,"By taxonomy","By taxonomy",de,de,"Nach Taxonomie"
+devices,category,Category,Category,de,de,Kategorie
+devices,category_of_device,"Category of device","Category of device",de,de,"Kategorie des Geräts"
+devices,comment,Comment,Comment,de,de,Kommentar
+devices,delete_device,"Delete device","Delete device",de,de,"Gerät löschen"
+devices,delete_device_content,"Delete this device from the Fixometer","Delete this device from the Fixometer",de,de,"Dieses Gerät aus dem Fixometer löschen"
+devices,device_brand,"Device brand","Device brand",de,de,"Marke des Geräts"
+devices,device_brand_placeholder,"E.g. Samsung, Apple, Bose...","E.g. Samsung, Apple, Bose...",de,de,"Z.B. Samsung, Apple, Bose..."
+devices,device_id,"Device ID","Device ID",de,de,Geräte-ID
+devices,device_info,"Device info","Device info",de,de,"Informationen zum Gerät"
+devices,device_model,"Device model","Device model",de,de,"Modell des Geräts"
+devices,device_model_placeholder,"E.g. XPS, iPad, Viao, Wii","E.g. XPS, iPad, Viao, Wii",de,de,"Z.B. XPS, iPad, Viao, Wii"
+devices,devices_description,"Description of problem/solution","Description of problem/solution",de,de,"Beschreibung des Problems/Lösung"
+devices,edit_devices,"Edit device","Edit device",de,de,"Gerät bearbeiten"
+devices,edit_devices_details,"Edit device details","Edit device details",de,de,"Gerätedetails bearbeiten"
+devices,edit_devices_details_content,"Aenean eu leo quam. Pellentesque ornare sem lacinia quam venenatis vestibulum.","Aenean eu leo quam. Pellentesque ornare sem lacinia quam venenatis vestibulum.",de,de,"Aenean eu leo quam. Pellentesque ornare sem lacinia quam venenatis vestibulum."
+devices,end,End,End,de,de,Ende
+devices,event_info,"Event info","Event info",de,de,"Infos zur Veranstaltung"
+devices,eventdate,"Event Date","Event Date",de,de,"Datum der Veranstaltung"
+devices,eventgroup,"Event (Group)","Event (Group)",de,de,"Ereignis (Gruppe)"
+devices,field_device_images,"Add device images here","Add device images here",de,de,"Gerätebilder hier hinzufügen"
+devices,field_device_images_2,"Choose compelling images that show off your work","Choose compelling images that show off your work",de,de,"Wählen Sie aussagekräftige Bilder, die Ihre Arbeit zur Geltung bringen"
+devices,fixed,Fixed,Fixed,de,de,Festgelegt
+devices,from_date,"From date","From date",de,de,"Vom Datum"
+devices,from_manufacturer,"From manufacturer","From manufacturer",de,de,"Vom Hersteller"
+devices,from_third_party,"From third party","From third party",de,de,"Von einer dritten Partei"
+devices,graphic-camera,Camera,Camera,de,de,Kamera
+devices,graphic-comment,Comment,Comment,de,de,Kommentar
+devices,group,Group,Group,de,de,Gruppe
+devices,location,Location,Location,de,de,Standort
+devices,model,Model,Model,de,de,Modell
+devices,n/a,N/A,N/A,de,de,K.A.
+devices,repair,"Repair date","Repair date",de,de,"Datum der Reparatur"
+devices,repair_barrier,"Barriers to repair?","Barriers to repair?",de,de,"Hindernisse für die Reparatur?"
+devices,repair_details,"Next steps","Next steps",de,de,"Nächste Schritte"
+devices,repair_info,"Repair info","Repair info",de,de,Reparatur-Infos
+devices,repair_source,"Source of repair information","Source of repair information",de,de,"Quelle der Reparaturinformationen"
+devices,repair_status,"Repair status","Repair status",de,de,"Status der Reparatur"
+devices,repair_url,"URL for repair information","URL for repair information",de,de,"URL für Reparaturinformationen"
+devices,repairable,Repairable,Repairable,de,de,Repairable
+devices,required_impact,"kg - required for environmental impact calculation","kg - required for environmental impact calculation",de,de,"kg - erforderlich für die Berechnung der Umweltauswirkungen"
+devices,save_device,"Save device","Save device",de,de,"Gerät speichern"
+devices,search_comments,"Search comments","Search comments",de,de,"Kommentare suchen"
+devices,search_comments_placeholder,"E.g. Screen not working","E.g. Screen not working",de,de,"Z.B. Bildschirm funktioniert nicht"
+devices,spare_parts_required,"Spare parts required?","Spare parts required?",de,de,"Ersatzteile erforderlich?"
+devices,state,State,State,de,de,Staat
+devices,to_date,"To date","To date",de,de,"Bis heute"
+devices,upload_photos,"Upload photos","Upload photos",de,de,"Fotos hochladen"
+devices,useful_repair_urls,"URL of useful repair information used","URL of useful repair information used",de,de,"URL der verwendeten nützlichen Reparaturinformationen"
+devices,useful_repair_urls_explanation,"Useful repair URL","Useful repair URL",de,de,"Nützliche Reparatur-URL"
+devices,useful_repair_urls_helper,"Enter URL here","Enter URL here",de,de,"URL hier eingeben"
+devices,various,Various,Various,de,de,Verschiedene
+devices,weight,Weight,Weight,de,de,Gewicht
+event-audits,created.metadata,"On :audit_created_at, :user_name created record <strong>:audit_url</strong>","On :audit_created_at, :user_name created record <strong>:audit_url</strong>",de,de,"Am :audit_created_at, :user_name erstellte Datensatz <strong>:audit_url</strong>"
+event-audits,created.modified.end,"<strong>Event End Time</strong> set as ""<strong>:new</strong>""","<strong>Event End Time</strong> set as ""<strong>:new</strong>""",de,de,"<strong>Ereignis-Endzeit</strong> als ""<strong>:neu</strong>"" eingestellt"
+event-audits,created.modified.event_date,"<strong>Event Date</strong> set as ""<strong>:new</strong>""","<strong>Event Date</strong> set as ""<strong>:new</strong>""",de,de,"<strong>Ereignisdatum</strong> als ""<strong>:neu</strong>"" eingestellt"
+event-audits,created.modified.free_text,"<strong>Free Text</strong> set as ""<strong>:new</strong>""","<strong>Free Text</strong> set as ""<strong>:new</strong>""",de,de,"<strong>Freier Text</strong> als ""<strong>:neu</strong>"" eingestellt"
+event-audits,created.modified.group,"<strong>Event Group ID</strong> set as ""<strong>:new</strong>""","<strong>Event Group ID</strong> set as ""<strong>:new</strong>""",de,de,"<strong>Ereignisgruppen-ID</strong> als ""<strong>:neu</strong>"" eingestellt"
+event-audits,created.modified.hours,"<strong>Event Hours</strong> set as ""<strong>:new</strong>""","<strong>Event Hours</strong> set as ""<strong>:new</strong>""",de,de,"<strong>Event Hours</strong> als ""<strong>:new</strong>"" eingestellt"
+event-audits,created.modified.idevents,"<strong>Event ID</strong> set as ""<strong>:new</strong>""","<strong>Event ID</strong> set as ""<strong>:new</strong>""",de,de,"<strong>Ereignis-ID</strong> als ""<strong>:neu</strong>"" eingestellt"
+event-audits,created.modified.latitude,"<strong>Event Latitude</strong> set as ""<strong>:new</strong>""","<strong>Event Latitude</strong> set as ""<strong>:new</strong>""",de,de,"<strong>Ereignis Breitengrad</strong> als ""<strong>:neu</strong>"" eingestellt"
+event-audits,created.modified.location,"<strong>Event Location</strong> set as ""<strong>:new</strong>""","<strong>Event Location</strong> set as ""<strong>:new</strong>""",de,de,"<strong>Ereignisort</strong> als ""<strong>:neu</strong>"" festgelegt"
+event-audits,created.modified.longitude,"<strong>Event Longitude</strong> set as ""<strong>:new</strong>""","<strong>Event Longitude</strong> set as ""<strong>:new</strong>""",de,de,"<strong>Ereignis Längengrad</strong> als ""<strong>:neu</strong>"" eingestellt"
+event-audits,created.modified.pax,"<strong>pax</strong> set as ""<strong>:new</strong>""","<strong>pax</strong> set as ""<strong>:new</strong>""",de,de,"<strong>pax</strong> als ""<strong>:neu</strong>"" eingestellt"
+event-audits,created.modified.start,"<strong>Event Start Time</strong> set as ""<strong>:new</strong>""","<strong>Event Start Time</strong> set as ""<strong>:new</strong>""",de,de,"<strong>Ereignis-Startzeit</strong> als ""<strong>:neu</strong>"" eingestellt"
+event-audits,created.modified.venue,"<strong>Event Name</strong> set as ""<strong>:new</strong>""","<strong>Event Name</strong> set as ""<strong>:new</strong>""",de,de,"<strong>Ereignisname</strong> als ""<strong>:neu</strong>"" eingestellt"
+event-audits,created.modified.volunteers,"<strong>Quantity of Volunteers</strong> set as ""<strong>:new</strong>""","<strong>Quantity of Volunteers</strong> set as ""<strong>:new</strong>""",de,de,"<strong>Anzahl der Freiwilligen</strong> als ""<strong>:neu</strong>"" eingestellt"
+event-audits,unavailable_audits,"No changes have been made to this event!","No changes have been made to this event!",de,de,"Es wurden keine Änderungen an dieser Veranstaltung vorgenommen!"
+event-audits,updated.metadata,"On :audit_created_at, :user_name updated record <strong>:audit_url</strong>","On :audit_created_at, :user_name updated record <strong>:audit_url</strong>",de,de,"Am :audit_created_at hat :user_name den Datensatz <strong>:audit_url</strong> aktualisiert"
+event-audits,updated.modified.end,"<strong>Event End Time</strong> was modified from ""<strong>:old</strong>"" to ""<strong>:new</strong>""","<strong>Event End Time</strong> was modified from ""<strong>:old</strong>"" to ""<strong>:new</strong>""",de,de,"<strong>Ereignis-Endzeit</strong> wurde von ""<strong>:alt</strong>"" auf ""<strong>:neu</strong>"" geändert"
+event-audits,updated.modified.event_date,"<strong>Event Date</strong> was modified from ""<strong>:old</strong>"" to ""<strong>:new</strong>""","<strong>Event Date</strong> was modified from ""<strong>:old</strong>"" to ""<strong>:new</strong>""",de,de,"<strong>Ereignisdatum</strong> wurde von ""<strong>:alt</strong>"" auf ""<strong>:neu</strong>"" geändert"
+event-audits,updated.modified.free_text,"<strong>Free Text</strong> was modified from ""<strong>:old</strong>"" to ""<strong>:new</strong>""","<strong>Free Text</strong> was modified from ""<strong>:old</strong>"" to ""<strong>:new</strong>""",de,de,"<strong>Freier Text</strong> wurde von ""<strong>:alt</strong>"" auf ""<strong>:neu</strong>"" geändert."
+event-audits,updated.modified.group,"<strong>Event Group ID</strong> was modified from ""<strong>:old</strong>"" to ""<strong>:new</strong>""","<strong>Event Group ID</strong> was modified from ""<strong>:old</strong>"" to ""<strong>:new</strong>""",de,de,"<strong>Ereignisgruppen-ID</strong> wurde von ""<strong>:alt</strong>"" auf ""<strong>:neu</strong>"" geändert"
+event-audits,updated.modified.hours,"<strong>Event Hours</strong> was modified from ""<strong>:old</strong>"" to ""<strong>:new</strong>""","<strong>Event Hours</strong> was modified from ""<strong>:old</strong>"" to ""<strong>:new</strong>""",de,de,"<strong>Veranstaltungszeiten</strong> wurde geändert von ""<strong>:alt</strong>"" zu ""<strong>:neu</strong>"""
+event-audits,updated.modified.latitude,"<strong>Event Latitude</strong> was modified from ""<strong>:old</strong>"" to ""<strong>:new</strong>""","<strong>Event Latitude</strong> was modified from ""<strong>:old</strong>"" to ""<strong>:new</strong>""",de,de,"<strong>Ereignis Breitengrad</strong> wurde von ""<strong>:alt</strong>"" auf ""<strong>:neu</strong>"" geändert"
+event-audits,updated.modified.location,"<strong>Event Location</strong> was modified from ""<strong>:old</strong>"" to ""<strong>:new</strong>""","<strong>Event Location</strong> was modified from ""<strong>:old</strong>"" to ""<strong>:new</strong>""",de,de,"<strong>Ereignisort</strong> wurde geändert von ""<strong>:alt</strong>"" zu ""<strong>:neu</strong>"""
+event-audits,updated.modified.longitude,"<strong>Event Longitude</strong> was modified from ""<strong>:old</strong>"" to ""<strong>:new</strong>""","<strong>Event Longitude</strong> was modified from ""<strong>:old</strong>"" to ""<strong>:new</strong>""",de,de,"<strong>Ereignislänge</strong> wurde von ""<strong>:alt</strong>"" auf ""<strong>:neu</strong>"" geändert."
+event-audits,updated.modified.pax,"<strong>pax</strong> was modified from ""<strong>:old</strong>"" to ""<strong>:new</strong>""","<strong>pax</strong> was modified from ""<strong>:old</strong>"" to ""<strong>:new</strong>""",de,de,"<strong>pax</strong> wurde geändert von ""<strong>:alt</strong>"" zu ""<strong>:neu</strong>"""
+event-audits,updated.modified.start,"<strong>Event Start Time</strong> was modified from ""<strong>:old</strong>"" to ""<strong>:new</strong>""","<strong>Event Start Time</strong> was modified from ""<strong>:old</strong>"" to ""<strong>:new</strong>""",de,de,"<strong>Ereignisstartzeit</strong> wurde von ""<strong>:alt</strong>"" auf ""<strong>:neu</strong>"" geändert"
+event-audits,updated.modified.venue,"<strong>Event Name</strong> was modified from ""<strong>:old</strong>"" to ""<strong>:new</strong>""","<strong>Event Name</strong> was modified from ""<strong>:old</strong>"" to ""<strong>:new</strong>""",de,de,"<strong>Ereignisname</strong> wurde geändert von ""<strong>:alt</strong>"" zu ""<strong>:neu</strong>"""
+event-audits,updated.modified.volunteers,"<strong>Quantity of Volunteers</strong> was modified from ""<strong>:old</strong>"" to ""<strong>:new</strong>""","<strong>Quantity of Volunteers</strong> was modified from ""<strong>:old</strong>"" to ""<strong>:new</strong>""",de,de,"<strong>Anzahl der Freiwilligen</strong> wurde geändert von ""<strong>:alt</strong>"" in ""<strong>:neu</strong>"""
+events,about_event_name_header,"About :event","About :event",de,de,"Über :event"
+events,add_an_event,"Add an event","Add an event",de,de,"Ein Ereignis hinzufügen"
+events,add_event,"Add event","Add event",de,de,"Ereignis hinzufügen"
+events,add_event_content,"Announce your event on The Restart Project website and to fixers near you.","Announce your event on The Restart Project website and to fixers near you.",de,de,"Kündigen Sie Ihre Veranstaltung auf der Website von The Restart Project und bei Fixern in Ihrer Nähe an."
+events,add_volunteer_modal_heading,"Add volunteer","Add volunteer",de,de,"Freiwillige hinzufügen"
+events,all_restarters_attended_modal_description,"An overview of who attended your event and their skills.","An overview of who attended your event and their skills.",de,de,"Ein Überblick über die Teilnehmer Ihrer Veranstaltung und deren Fähigkeiten."
+events,approve_event,"Approve Event","Approve Event",de,de,"Ereignis genehmigen"
+events,by_event,"By event","By event",de,de,"Nach Veranstaltung"
+events,by_group,"By group","By group",de,de,"Nach Gruppe"
+events,co2_equivalence_visualisation_dropdown,"CO<sub>2</sub> equivalence visualisation","CO<sub>2</sub> equivalence visualisation",de,de,"Visualisierung der CO<sub>2</sub>-Äquivalenz"
+events,create_event,"Create event","Create event",de,de,"Ereignis erstellen"
+events,create_new_event,"Create new event","Create new event",de,de,"Neues Ereignis erstellen"
+events,download-results,"Download Results (CSV)","Download Results (CSV)",de,de,"Ergebnisse herunterladen (CSV)"
+events,edit_event,"Edit event","Edit event",de,de,"Ereignis bearbeiten"
+events,embed_code_header,"Embed code","Embed code",de,de,"Code einbetten"
+events,event,Event,Event,de,de,Veranstaltung
+events,event_all,"See all events","See all events",de,de,"Alle Ereignisse anzeigen"
+events,event_date,Date,Date,de,de,Datum
+events,event_datetime,Date/time,Date/time,de,de,Datum/Uhrzeit
+events,event_location,Location,Location,de,de,Standort
+events,event_name,Event,Event,de,de,Veranstaltung
+events,event_time,Time,Time,de,de,Zeit
+events,events,Events,Events,de,de,Veranstaltungen
+events,events_title_admin,"Events to moderate","Events to moderate",de,de,"Zu moderierende Veranstaltungen"
+events,events-filter,"Events filter","Events filter",de,de,"Filter für Ereignisse"
+events,field_add_image,"Add images","Add images",de,de,"Bilder hinzufügen"
+events,field_event_city,City,City,de,de,Stadt
+events,field_event_country,Country,Country,de,de,Land
+events,field_event_county,County/State,County/State,de,de,Landkreis/Bundesland
+events,field_event_date,"Date of event","Date of event",de,de,"Datum der Veranstaltung"
+events,field_event_device_images,"Add device images here","Add device images here",de,de,"Gerätebilder hier hinzufügen"
+events,field_event_device_images_2,,,de,de,
+events,field_event_group,"Event group","Event group",de,de,Veranstaltungsgruppe
+events,field_event_images,"Add event images here","Add event images here",de,de,"Bilder der Veranstaltung hier hinzufügen"
+events,field_event_images_2,"Choose an image for your event","Choose an image for your event",de,de,"Wählen Sie ein Bild für Ihre Veranstaltung"
+events,field_event_route,Route,Route,de,de,Route
+events,field_event_street_address,"Street address","Street address",de,de,"Straße und Hausnummer"
+events,field_event_time,"Start/end time","Start/end time",de,de,Start-/Endzeit
+events,field_event_venue,"Venue address","Venue address",de,de,"Adresse des Veranstaltungsorts"
+events,field_event_zip,"Post/Zip code","Post/Zip code",de,de,Post/Postleitzahl
+events,field_venue_helper,"I.e. the place where the fixing happens!","I.e. the place where the fixing happens!",de,de,"D.h. der Ort, an dem die Reparaturen stattfinden!"
+events,full_name,"Full name","Full name",de,de,"Vollständiger Name"
+events,full_name_helper,"Leave field blank if anonymous","Leave field blank if anonymous",de,de,"Lassen Sie das Feld leer, wenn Sie anonym sind."
+events,group_member,"Group member","Group member",de,de,"Mitglied der Gruppe"
+events,headline_stats_dropdown,"Headline stats","Headline stats",de,de,Schlagzeilen-Statistiken
+events,headline_stats_message,"This widget shows the headline stats for your event e.g. the number of participants at your parties; the hours volunteered","This widget shows the headline stats for your event e.g. the number of participants at your parties; the hours volunteered",de,de,"Dieses Widget zeigt die Hauptstatistiken für Ihre Veranstaltung an, z. B. die Anzahl der Teilnehmer an Ihren Partys, die freiwillig geleisteten Stunden"
+events,infographic_message,"An infographic of an easy-to-understand equivalent of the CO<sub>2</sub> emissions that your group has prevented, such as equivalent number of cars manufactured","An infographic of an easy-to-understand equivalent of the CO<sub>2</sub> emissions that your group has prevented, such as equivalent number of cars manufactured",de,de,"Eine Infografik mit einem leicht verständlichen Äquivalent der CO<sub>2</sub>-Emissionen, die Ihre Gruppe vermieden hat, z. B. die entsprechende Anzahl der hergestellten Autos"
+events,invite_restarters_modal_description,"A repair event is nothing without volunteers. Invite them to your event here.","A repair event is nothing without volunteers. Invite them to your event here.",de,de,"Eine Reparaturveranstaltung ist nichts ohne Freiwillige. Laden Sie sie hier zu Ihrer Veranstaltung ein."
+events,manual_invite_box,"Send invites to","Send invites to",de,de,"Einladungen senden an"
+events,message_to_restarters,"Invitation message","Invitation message",de,de,Einladungsnachricht
+events,message_volunteer_email_address,"This field will invite volunteer to join the group","This field will invite volunteer to join the group",de,de,"Dieses Feld lädt Freiwillige dazu ein, der Gruppe beizutreten"
+events,option_default,"-- Select --","-- Select --",de,de,"-- Wählen Sie --"
+events,option_not_registered,"Not registered on Fixometer","Not registered on Fixometer",de,de,"Nicht auf dem Fixometer registriert"
+events,past_events,"Past events","Past events",de,de,"Vergangene Ereignisse"
+events,pending_rsvp_button,"I am attending","I am attending",de,de,"Ich nehme teil an"
+events,pending_rsvp_message,"You have an invite pending for this event","You have an invite pending for this event",de,de,"Sie haben eine ausstehende Einladung für diese Veranstaltung"
+events,remove_volunteer_link,"Remove volunteer","Remove volunteer",de,de,"Freiwillige entfernen"
+events,sample_text_message_to_restarters,"<add a custom message here if required>","<add a custom message here if required>",de,de,"<Fügen Sie hier bei Bedarf eine eigene Nachricht ein>"
+events,save_event,"Save Event","Save Event",de,de,"Ereignis speichern"
+events,send_invite_button,"Send invites","Send invites",de,de,"Einladungen verschicken"
+events,send_invites_to_restarters_tickbox,"Add invites for group members. Members marked with a ⚠ will be invited but won't be sent an email due to their notification settings.","Add invites for group members. Members marked with a ⚠ will be invited but won't be sent an email due to their notification settings.",de,de,"Fügen Sie Einladungen für Gruppenmitglieder hinzu. Mitglieder, die mit einem ⚠ markiert sind, werden eingeladen, erhalten aber aufgrund ihrer Benachrichtigungseinstellungen keine E-Mail."
+events,share_stats_header,"Share your stats","Share your stats",de,de,"Teilen Sie Ihre Statistiken"
+events,share_stats_message,"Well done! On the :date at :event_name we were able to repair <strong>:number_devices devices</strong>. Help us spread the message by sharing your environmental impact on your website.","Well done! On the :date at :event_name we were able to repair <strong>:number_devices devices</strong>. Help us spread the message by sharing your environmental impact on your website.",de,de,"Gut gemacht! Am :Datum bei :event_name konnten wir <strong>:Anzahl_Geräte</strong> reparieren. Helfen Sie uns, die Botschaft zu verbreiten, indem Sie auf Ihrer Website über Ihren Beitrag zum Umweltschutz berichten."
+events,stat-0,Participants,Participants,de,de,Teilnehmer
+events,stat-1,Invited,Invited,de,de,Eingeladen
+events,stat-3,"Repairable devices","Repairable devices",de,de,"Reparierbare Geräte"
+events,stat-4,"End-of-life devices","End-of-life devices",de,de,End-of-Life-Geräte
+events,stat-5,"Fixed devices","Fixed devices",de,de,"Feststehende Geräte"
+events,stat-6,"CO2 emissions prevented","CO2 emissions prevented",de,de,"Verhinderte CO2-Emissionen"
+events,stat-7,"Waste prevented","Waste prevented",de,de,Abfallvermeidung
+events,table_skills_column,Skills,Skills,de,de,Fertigkeiten
+events,type_email_addresses_message,"Note: you can also manually type in the email address of anyone else you would like to invite to this event.  Press the tab, enter or comma key after each email address that you enter.","Note: you can also manually type in the email address of anyone else you would like to invite to this event.  Press the tab, enter or comma key after each email address that you enter.",de,de,"Hinweis: Sie können auch manuell die E-Mail-Adresse einer anderen Person eingeben, die Sie zu diesem Ereignis einladen möchten.  Drücken Sie die Tabulatortaste, die Eingabetaste oder die Kommataste nach jeder E-Mail-Adresse, die Sie eingeben."
+events,upcoming_events,"Upcoming events","Upcoming events",de,de,"Kommende Veranstaltungen"
+events,volunteer_attended_button,"Volunteer attended","Volunteer attended",de,de,"Freiwilliger besucht"
+events,volunteer_email_address,"Volunteer's email address (optional)","Volunteer's email address (optional)",de,de,"E-Mail Adresse des Freiwilligen (optional)"
+events,warning_volunteers_message,"Please note that the number of volunteers does not match the attendance record.  Do you need to add or remove volunteers?","Please note that the number of volunteers does not match the attendance record.  Do you need to add or remove volunteers?",de,de,"Bitte beachten Sie, dass die Anzahl der Freiwilligen nicht mit der Anwesenheitsliste übereinstimmt.  Müssen Sie Freiwillige hinzufügen oder entfernen?"
+general,alert_uptodate,"Thanks! You are up to date","Thanks! You are up to date",de,de,"Danke! Sie sind auf dem neuesten Stand"
+general,alert_uptodate_text,"You have nothing to action now. When you do, we'll let you know.","You have nothing to action now. When you do, we'll let you know.",de,de,"Sie haben jetzt nichts zu tun. Wenn Sie es tun, werden wir es Sie wissen lassen."
+general,calendar_feed_help_url,/t/fixometer-how-to-subscribe-to-a-calendar,/t/fixometer-how-to-subscribe-to-a-calendar,de,de,/t/fixometer-wie-schreibe-ich-einen-Kalender
+general,change_photo,"Change photo","Change photo",de,de,"Foto ändern"
+general,change_photo_text,"Choose a photo so others can recognise you from an event or meet you here","Choose a photo so others can recognise you from an event or meet you here",de,de,"Wählen Sie ein Foto, damit andere Sie auf einer Veranstaltung wiedererkennen oder Sie hier treffen können"
+general,dashboard,Dashboard,Dashboard,de,de,Dashboard
+general,discourse_url,https://talk.restarters.net,https://talk.restarters.net,de,de,https://talk.restarters.net
+general,email_alerts,"Emails & alerts","Emails & alerts",de,de,"E-Mails und Warnungen"
+general,email_alerts_pref1,"I would like to receive The Restart Project monthly newsletter","I would like to receive The Restart Project monthly newsletter",de,de,"Ich möchte den monatlichen Newsletter von The Restart Project erhalten"
+general,email_alerts_pref2,"I would like to receive email notifications about events or groups near me","I would like to receive email notifications about events or groups near me",de,de,"Ich möchte per E-Mail über Veranstaltungen oder Gruppen in meiner Nähe benachrichtigt werden"
+general,email_alerts_text,"Please choose what kind of email updates you would like to receive. You can change these at any time. Our Privacy Policy is available <a href=""https://therestartproject.org/data-and-privacy-policy/fixometer/"" rel=""noopener noreferrer"" target=""_blank"">here</a>","Please choose what kind of email updates you would like to receive. You can change these at any time. Our Privacy Policy is available <a href=""https://therestartproject.org/data-and-privacy-policy/fixometer/"" rel=""noopener noreferrer"" target=""_blank"">here</a>",de,de,"Bitte wählen Sie aus, welche Art von E-Mail-Updates Sie erhalten möchten. Sie können diese jederzeit ändern. Unsere Datenschutzrichtlinie finden Sie <a href=""https://therestartproject.org/data-and-privacy-policy/fixometer/"" rel=""noopener noreferrer"" target=""_blank"">hier</a>"
+general,faq_url,https://therestartproject.org/faq,https://therestartproject.org/faq,de,de,https://therestartproject.org/faq
+general,filter-results,"Filter results","Filter results",de,de,"Ergebnisse filtern"
+general,general,General,General,de,de,Allgemein
+general,help_feedback_url,https://talk.restarters.net/c/help,https://talk.restarters.net/c/help,de,de,https://talk.restarters.net/c/help
+general,introduction_message,"We are a global community of people who help others fix their electronics in community events. Join us!","We are a global community of people who help others fix their electronics in community events. Join us!",de,de,"Wir sind eine globale Gemeinschaft von Menschen, die anderen bei Gemeinschaftsveranstaltungen helfen, ihre Elektronik zu reparieren. Mach mit!"
+general,login,Login,Login,de,de,Anmeldung
+general,logout,Logout,Logout,de,de,Abmeldung
+general,menu_faq,FAQs,FAQs,de,de,FAQs
+general,menu_help_feedback,"Help & Feedback","Help & Feedback",de,de,"Hilfe und Feedback"
+general,menu_other,"Other Links","Other Links",de,de,"Andere Links"
+general,menu_tools,"Community Tools","Community Tools",de,de,Community-Tools
+general,menu_wiki,Wiki,Wiki,de,de,Wiki
+general,new_group,"Create a new group","Create a new group",de,de,"Eine neue Gruppe erstellen"
+general,next,Next,Next,de,de,Weiter
+general,onboarding_content_1,"vel scelerisque nisl consectetur et. Aenean eu leo quam. Pellentesque ornare sem lacinia quam venenatis vestibulum. Cras mattis consectetur purus sit amet fermentum. ","vel scelerisque nisl consectetur et. Aenean eu leo quam. Pellentesque ornare sem lacinia quam venenatis vestibulum. Cras mattis consectetur purus sit amet fermentum. ",de,de,"vel scelerisque nisl consectetur et. Aenean eu leo quam. Pellentesque ornare sem lacinia quam venenatis vestibulum. Cras mattis consectetur purus sit amet fermentum."
+general,onboarding_content_2,"praesent commodo cursus magna, vel scelerisque nisl consectetur et. Aenean eu leo quam. Pellentesque ornare sem lacinia quam venenatis vestibulum. Cras mattis consectetur purus sit amet fermentum.","praesent commodo cursus magna, vel scelerisque nisl consectetur et. Aenean eu leo quam. Pellentesque ornare sem lacinia quam venenatis vestibulum. Cras mattis consectetur purus sit amet fermentum.",de,de,"praesent commodo cursus magna, vel scelerisque nisl consectetur et. Aenean eu leo quam. Pellentesque ornare sem lacinia quam venenatis vestibulum. Cras mattis consectetur purus sit amet fermentum."
+general,onboarding_content_3,"praesent commodo cursus magna, vel scelerisque nisl consectetur et. Aenean eu leo quam. Pellentesque ornare sem lacinia quam venenatis vestibulum. Cras mattis consectetur purus sit amet fermentum.","praesent commodo cursus magna, vel scelerisque nisl consectetur et. Aenean eu leo quam. Pellentesque ornare sem lacinia quam venenatis vestibulum. Cras mattis consectetur purus sit amet fermentum.",de,de,"praesent commodo cursus magna, vel scelerisque nisl consectetur et. Aenean eu leo quam. Pellentesque ornare sem lacinia quam venenatis vestibulum. Cras mattis consectetur purus sit amet fermentum."
+general,onboarding_greeting,"Hi ","Hi ",de,de,Hallo
+general,onboarding_heading_1,"Welcome to Fixometer","Welcome to Fixometer",de,de,"Willkommen bei Fixometer"
+general,onboarding_heading_2,"Create parties in your area","Create parties in your area",de,de,"Partys in Ihrer Region gründen"
+general,onboarding_heading_3,"Add devices to parties","Add devices to parties",de,de,"Geräte zu Gruppen hinzufügen"
+general,other_profile,profile,profile,de,de,Profil
+general,party_reporting,"Event reporting","Event reporting",de,de,"Berichterstattung über Ereignisse"
+general,please_select,"Please select","Please select",de,de,"Bitte auswählen"
+general,previous,Previous,Previous,de,de,Vorherige
+general,profile,"Your profile","Your profile",de,de,"Ihr Profil"
+general,profile_content,"Please share some information about yourself, so you can connect with other organisers and fixers, and so we can understand the community better","Please share some information about yourself, so you can connect with other organisers and fixers, and so we can understand the community better",de,de,"Bitte teilen Sie uns einige Informationen über sich selbst mit, damit Sie mit anderen Organisatoren und Fixern in Kontakt treten können und damit wir die Gemeinschaft besser verstehen können"
+general,profile_picture,"Profile picture","Profile picture",de,de,Profilbild
+general,register,Register,Register,de,de,Register
+general,register-signin,"Register/Sign in","Register/Sign in",de,de,Registrieren/Anmelden
+general,repair_skills,Skills,Skills,de,de,Fertigkeiten
+general,repair_skills_content,"This is optional but helps us improve your experience - which skills do you have and would like to share with others?","This is optional but helps us improve your experience - which skills do you have and would like to share with others?",de,de,"Diese Angabe ist freiwillig, hilft uns aber, Ihre Erfahrungen zu verbessern - welche Fähigkeiten haben Sie und würden Sie gerne mit anderen teilen?"
+general,reporting,Reporting,Reporting,de,de,Berichterstattung
+general,restartproject_url,https://therestartproject.org,https://therestartproject.org,de,de,https://therestartproject.org
+general,save_repair_skills,"Save skills","Save skills",de,de,"Fähigkeiten speichern"
+general,side_attention,"Needs attention","Needs attention",de,de,"Benötigt Aufmerksamkeit"
+general,side_upcoming,"Upcoming events","Upcoming events",de,de,"Kommende Veranstaltungen"
+general,signmeup,"Sign me up!","Sign me up!",de,de,"Melden Sie mich an!"
+general,tag_line,"Let's get fixing","Let's get fixing",de,de,"Jetzt geht's ans Eingemachte"
+general,therestartproject,"The Restart Project","The Restart Project",de,de,"Das Neustart-Projekt"
+general,time_reporting,"Volunteer hours","Volunteer hours",de,de,"Ehrenamtliche Stunden"
+general,top_item1,Events,Events,de,de,Veranstaltungen
+general,top_item3,Groups,Groups,de,de,Gruppen
+general,user,User,User,de,de,Benutzer
+general,wiki_url,https://wiki.restarters.net,https://wiki.restarters.net,de,de,https://wiki.restarters.net
+general,your_name,"Your name","Your name",de,de,"Ihr Name"
+general,your_name_validation,"Please enter your name","Please enter your name",de,de,"Bitte geben Sie Ihren Namen ein"
+general,your_repair_skills,"Your skills","Your skills",de,de,"Deine Fähigkeiten"
+group-audits,unavailable_audits,"No changes have been made to this group!","No changes have been made to this group!",de,de,"Es wurden keine Änderungen an dieser Gruppe vorgenommen!"
+group-audits,updated.metadata,"On :audit_created_at, :user_name updated record <strong>:audit_url</strong>","On :audit_created_at, :user_name updated record <strong>:audit_url</strong>",de,de,"Am :audit_created_at hat :user_name den Datensatz <strong>:audit_url</strong> aktualisiert"
+group-audits,updated.modified.area,"<strong>Area</strong> was modified from ""<strong>:old</strong>"" to ""<strong>:new</strong>""","<strong>Area</strong> was modified from ""<strong>:old</strong>"" to ""<strong>:new</strong>""",de,de,"<strong>Bereich</strong> wurde geändert von ""<strong>:alt</strong>"" zu ""<strong>:neu</strong>"""
+group-audits,updated.modified.free_text,"<strong>Free Text</strong> was modified from ""<strong>:old</strong>"" to ""<strong>:new</strong>""","<strong>Free Text</strong> was modified from ""<strong>:old</strong>"" to ""<strong>:new</strong>""",de,de,"<strong>Freier Text</strong> wurde von ""<strong>:alt</strong>"" auf ""<strong>:neu</strong>"" geändert."
+group-audits,updated.modified.latitude,"<strong>Latitude</strong> was modified from ""<strong>:old</strong>"" to ""<strong>:new</strong>""","<strong>Latitude</strong> was modified from ""<strong>:old</strong>"" to ""<strong>:new</strong>""",de,de,"<strong>Breitengrad</strong> wurde von ""<strong>:alt</strong>"" auf ""<strong>:neu</strong>"" geändert."
+group-audits,updated.modified.location,"<strong>Location</strong> was modified from ""<strong>:old</strong>"" to ""<strong>:new</strong>""","<strong>Location</strong> was modified from ""<strong>:old</strong>"" to ""<strong>:new</strong>""",de,de,"<strong>Ort</strong> wurde geändert von ""<strong>:alt</strong>"" zu ""<strong>:neu</strong>"""
+group-audits,updated.modified.longitude,"<strong>Longitude</strong> was modified from ""<strong>:old</strong>"" to ""<strong>:new</strong>""","<strong>Longitude</strong> was modified from ""<strong>:old</strong>"" to ""<strong>:new</strong>""",de,de,"<strong>Längengrad</strong> wurde von ""<strong>:alt</strong>"" auf ""<strong>:neu</strong>"" geändert."
+group-audits,updated.modified.name,"<strong>Name</strong> was modified from ""<strong>:old</strong>"" to ""<strong>:new</strong>""","<strong>Name</strong> was modified from ""<strong>:old</strong>"" to ""<strong>:new</strong>""",de,de,"<strong>Name</strong> wurde geändert von ""<strong>:alt</strong>"" zu ""<strong>:neu</strong>"""
+group-audits,updated.modified.website,"<strong>Website</strong> was modified from ""<strong>:old</strong>"" to ""<strong>:new</strong>""","<strong>Website</strong> was modified from ""<strong>:old</strong>"" to ""<strong>:new</strong>""",de,de,"<strong>Website</strong> wurde von ""<strong>:alt</strong>"" auf ""<strong>:neu</strong>"" geändert"
+groups,about_group_name_header,"About :group","About :group",de,de,"Über :group"
+groups,add_groups,"Add a group","Add a group",de,de,"Eine Gruppe hinzufügen"
+groups,add_groups_content,"Tell us more about your group, so we can create a page for you and help you publicise to potential volunteers and participants.","Tell us more about your group, so we can create a page for you and help you publicise to potential volunteers and participants.",de,de,"Erzählen Sie uns mehr über Ihre Gruppe, damit wir eine Seite für Sie erstellen und Sie bei der Werbung für potenzielle Freiwillige und Teilnehmer unterstützen können."
+groups,all_groups,"All Groups","All groups",de,de,"Alle Gruppen"
+groups,all_volunteers_group_name_header,"All volunteers of :group","All volunteers of :group",de,de,"Alle Freiwilligen der :group"
+groups,all_volunteers_group_name_message,"Here's a list of all of the volunteers affiliated with your group and their skills.","Here's a list of all of the volunteers affiliated with your group and their skills.",de,de,"Hier finden Sie eine Liste aller Freiwilligen, die Ihrer Gruppe angehören, und ihrer Fähigkeiten."
+groups,approve_group,"Approve group","Approve group",de,de,"Gruppe genehmigen"
+groups,by_details,"By details","By details",de,de,"Nach Details"
+groups,co2_equivalence_visualisation_dropdown,"CO<sub>2</sub> equivalence visualisation","CO<sub>2</sub> equivalence visualisation",de,de,"Visualisierung der CO<sub>2</sub>-Äquivalenz"
+groups,create_group,"Create group","Create group",de,de,"Gruppe erstellen"
+groups,edit_group,"Edit group","Edit group",de,de,"Gruppe bearbeiten"
+groups,edit_group_save_changes,"Save changes","Save changes",de,de,"Änderungen speichern"
+groups,edit_group_text,"Go ahead and change or improve your group's profile.","Go ahead and change or improve your group's profile.",de,de,"Ändern oder verbessern Sie das Profil Ihrer Gruppe."
+groups,email_addresses_field,"Email addresses","Email addresses",de,de,E-Mail-Adressen
+groups,embed_code_header,"Embed code","Embed code",de,de,"Code einbetten"
+groups,field_group_images,"Add group image here","Add group image here",de,de,"Gruppenbild hier hinzufügen"
+groups,field_group_images_2,"Choose an image for your group","Choose an image for your group",de,de,"Wählen Sie ein Bild für Ihre Gruppe"
+groups,group,Group,Group,de,de,Gruppe
+groups,group_admin_only,"Admin only","Admin only",de,de,"Nur Verwaltung"
+groups,group_country,Country,Country,de,de,Land
+groups,group_image,"Group image","Group image",de,de,Gruppenbild
+groups,group_tag,Tag,Tag,de,de,Tag
+groups,group_tag2,"Group tag","Group tag",de,de,Gruppen-Tag
+groups,group_tags,"Group tags","Group tags",de,de,Gruppen-Tags
+groups,group_tags_add,"Add new tag","Add new tag",de,de,"Neuen Tag hinzufügen"
+groups,group_town-city,Town/city,Town/city,de,de,Stadt/Stadt
+groups,groups,Groups,Groups,de,de,Gruppen
+groups,groups_about_group,"Tell us about your group","Tell us about your group",de,de,"Erzählen Sie uns von Ihrer Gruppe"
+groups,groups_approval_text,"Group submissions need to be approved by an administrator","Group submissions need to be approved by an administrator",de,de,"Gruppeneinreichungen müssen von einem Administrator genehmigt werden"
+groups,groups_frequency,Frequency,Frequency,de,de,Frequenz
+groups,groups_group_small,"A couple of examples include 'Restarters Torino' or 'Nottingham Fixers'","A couple of examples include 'Restarters Torino' or 'Nottingham Fixers'",de,de,"Einige Beispiele sind ""Restarters Torino"" oder ""Nottingham Fixers""."
+groups,groups_location,Location,Location,de,de,Standort
+groups,groups_location_small,"I.e the place where the fixing happens!","I.e the place where the fixing happens!",de,de,"D.h. der Ort, an dem die Reparaturen stattfinden!"
+groups,groups_modal_content,"We can help you get started, scheduling and announcing events, logging data and getting reports on their impact.","We can help you get started, scheduling and announcing events, logging data and getting reports on their impact.",de,de,"Wir helfen Ihnen bei den ersten Schritten, der Planung und Ankündigung von Veranstaltungen, der Erfassung von Daten und der Erstellung von Berichten über deren Auswirkungen."
+groups,groups_modal_title,"Would you like to start a community repair group?","Would you like to start a community repair group?",de,de,"Möchten Sie eine kommunale Reparaturgruppe gründen?"
+groups,groups_modal-button,"Yes, lets get started!","Yes, lets get started!",de,de,"Ja, fangen wir an!"
+groups,groups_name,Name,Name,de,de,Name
+groups,groups_name_of,"Name of group","Name of group",de,de,"Name der Gruppe"
+groups,groups_title1,"Your Groups","Your groups",de,de,"Ihre Gruppen"
+groups,groups_title2,"Groups nearest to you","Groups nearest to you",de,de,"Gruppen in Ihrer Nähe"
+groups,groups_website,"Your website","Your website",de,de,"Ihre Website"
+groups,groups_website_small,"Don't have a website? Feel free to add a Facebook group or similar","Don't have a website? Feel free to add a Facebook group or similar",de,de,"Sie haben noch keine Website? Fügen Sie doch einfach eine Facebook-Gruppe oder ähnliches hinzu"
+groups,headline_stats_dropdown,"Headline stats","Headline stats",de,de,Schlagzeilen-Statistiken
+groups,headline_stats_message,"This widget shows the headline stats for your group e.g. the number of participants at your parties; the hours volunteered","This widget shows the headline stats for your group e.g. the number of participants at your parties; the hours volunteered",de,de,"Dieses Widget zeigt die Hauptstatistiken für Ihre Gruppe an, z. B. die Anzahl der Teilnehmer an Ihren Partys, die freiwillig geleisteten Stunden"
+groups,infographic_message,"An infographic of an easy-to-understand equivalent of the CO<sub>2</sub> emissions that your group has prevented, such as equivalent number of cars manufactured.","An infographic of an easy-to-understand equivalent of the CO<sub>2</sub> emissions that your group has prevented, such as equivalent number of cars manufactured.",de,de,"Eine Infografik mit einem leicht verständlichen Äquivalent der CO<sub>2</sub>-Emissionen, die Ihre Gruppe vermieden hat, z. B. die entsprechende Anzahl produzierter Autos."
+groups,invite_group_name_header,"Invite volunteers to :group","Invite volunteers to :group",de,de,"Freiwillige zur :Gruppe einladen"
+groups,invite_group_name_message,"Invite volunteers to affiliate themselves with your group, so that you can invite them more easily to your upcoming events.","Invite volunteers to affiliate themselves with your group, so that you can invite them more easily to your upcoming events.",de,de,"Bitten Sie Freiwillige, sich Ihrer Gruppe anzuschließen, damit Sie sie leichter zu Ihren kommenden Veranstaltungen einladen können."
+groups,location,"Group location","Group location",de,de,"Standort der Gruppe"
+groups,message_example_text,"<add a custom message here if required>","<add a custom message here if required>",de,de,"<Fügen Sie hier bei Bedarf eine eigene Nachricht ein>"
+groups,message_header,"Invitation message","Invitation message",de,de,Einladungsnachricht
+groups,search_name,"Search name","Search name",de,de,"Name suchen"
+groups,send_invite_button,"Send invites","Send invites",de,de,"Einladungen verschicken"
+groups,share_stats_header,"Share your stats","Share your stats",de,de,"Teilen Sie Ihre Statistiken"
+groups,share_stats_message,":group have made a real impact fixing electronics and preventing waste. Help share this on your website and get other people involved:",":group have made a real impact fixing electronics and preventing waste. Help share this on your website and get other people involved:",de,de,"Die :group hat einen echten Einfluss auf die Reparatur von Elektronik und die Vermeidung von Abfall. Helfen Sie mit, dies auf Ihrer Website zu verbreiten und andere Menschen zum Mitmachen zu bewegen:"
+groups,skills_column_table,Skills,Skills,de,de,Fertigkeiten
+groups,tag-1,"Tag 1","Tag 1",de,de,"Tag 1"
+groups,tag-2,"Tag 2","Tag 2",de,de,"Tag 2"
+groups,tag-3,"Tag 3","Tag 3",de,de,"Tag 3"
+groups,tag-4,"Tag 4","Tag 4",de,de,"Tag 4"
+groups,tag-5,"Tag 5","Tag 5",de,de,"Tag 5"
+groups,tag-6,"Tag 6","Tag 6",de,de,"Tag 6"
+groups,tag-7,"Tag 7","Tag 7",de,de,"Tag 7"
+groups,tag-8,"Tag 8","Tag 8",de,de,"Tag 8"
+groups,town-city-placeholder,"E.g. Paris, London, Brussels","E.g. Paris, London, Brussels",de,de,"Z.B. Paris, London, Brüssel"
+groups,type_email_addresses_message,"Type in the email addresses of the people you would like to invite to this group.  Press the tab or comma key after each email address.","Type in the email addresses of the people you would like to invite to this group.  Press the tab or comma key after each email address.",de,de,"Geben Sie die E-Mail-Adressen der Personen ein, die Sie zu dieser Gruppe einladen möchten.  Drücken Sie nach jeder E-Mail-Adresse die Tabulator- oder Kommataste."
+login,lead,"Welcome to our Restarter community","Welcome to our Restarter community",de,de,"Willkommen in unserer Restarter-Community"
+login,login_title,"Sign in","Sign in",de,de,Eintragen
+login,more,"Find out more","Find out more",de,de,"Weitere Informationen"
+login,stat_1,"Devices fixed","Devices fixed",de,de,"Festgelegte Geräte"
+login,stat_2,"CO<sub>2</sub> emissions prevented","CO<sub>2</sub> emissions prevented",de,de,"Verhinderte CO<sub>2</sub>-Emissionen"
+login,stat_3,"Waste prevented","Waste prevented",de,de,Abfallvermeidung
+login,stat_4,"Events held","Events held",de,de,"Ausgetragene Veranstaltungen"
+login,whatis_content,"<p>This is a place to grow the community electronics repair movement. The world needs more fixing and more fixing skills to be shared.</p><p>Join in if you would like to:</p><ul>
+                                <li>Learn electronics repair with others</li>
+                                <li>Share your repair skills with others</li>
+                                <li>Organise electronics repair events</li>
+                                <li>View and share the impact of repair events</li>
+                                <li>Document and bring down the barriers to repair</li>
+                            </ul>","<p>This is a place to grow the community electronics repair movement. The world needs more fixing and more fixing skills to be shared.</p><p>Join in if you would like to:</p><ul>
+                                <li>Learn electronics repair with others</li>
+                                <li>Share your repair skills with others</li>
+                                <li>Organise electronics repair events</li>
+                                <li>View and share the impact of repair events</li>
+                                <li>Document and bring down the barriers to repair</li>
+                            </ul>",de,de,"<p>Dies ist ein Ort, an dem die gemeinschaftliche Elektronikreparaturbewegung wächst. Die Welt braucht mehr Reparaturen und mehr Reparaturfähigkeiten, die geteilt werden können.</p><p>Mach mit, wenn du Lust hast:</p><ul>
+                                <li>Elektronikreparatur mit anderen lernen</li>
+                                <li>Ihre Reparaturfähigkeiten mit anderen teilen</li>
+                                <li>Organisieren Sie Veranstaltungen zur Elektronikreparatur</li>
+                                <li>Betrachten und teilen Sie die Auswirkungen von Reparaturveranstaltungen</li>
+                                <li>Dokumentieren und die Barrieren für Reparaturen abbauen</li>
+                            </ul>"
+onboarding,finishing_action,"To the dashboard","To the dashboard",de,de,"Zum Armaturenbrett"
+onboarding,next,Next,Next,de,de,Weiter
+onboarding,previous,Previous,Previous,de,de,Vorherige
+onboarding,slide1_heading,Welcome!,Welcome!,de,de,"Herzlich willkommen!"
+onboarding,slide2_heading,"Your gateway to community repair","Your gateway to community repair",de,de,"Ihr Tor zur Gemeinschaftsreparatur"
+onboarding,slide3_content,"<p>Your starting point is the <strong>community dashboard</strong>.</p><p>Your dashboard gives you at a glance info on the latest happenings in the community, as well as quick access to common actions.</p><p>A good place to start is the <strong>Getting Started</strong> section.</p>","<p>Your starting point is the <strong>community dashboard</strong>.</p><p>Your dashboard gives you at a glance info on the latest happenings in the community, as well as quick access to common actions.</p><p>A good place to start is the <strong>Getting Started</strong> section.</p>",de,de,"<p>Ausgangspunkt ist das <strong>Community-Dashboard</strong>.</p><p>Das Dashboard bietet Ihnen auf einen Blick Informationen über die neuesten Ereignisse in der Community sowie schnellen Zugriff auf gemeinsame Aktionen.</p><p>Ein guter Ausgangspunkt ist der Abschnitt <strong>Einstieg</strong>.</p>"
+onboarding,slide3_heading,"Let's get started!","Let's get started!",de,de,"Fangen wir an!"
+pagination,next,"Next &raquo;","Next &raquo;",de,de,"Nächste &raquo;"
+pagination,previous,"&laquo; Previous","&laquo; Previous",de,de,"&laquo; Zurück"
+partials,1,"How to set up a group","How to set up a group",de,de,"Wie man eine Gruppe einrichtet"
+partials,2,how_to_set_up_a_group_text,how_to_set_up_a_group_text,de,de,wie_man_eine_gruppe_einrichtet_text
+partials,3,"Once you've gone through some preliminary steps to organise a group, we can create one for you here.","Once you've gone through some preliminary steps to organise a group, we can create one for you here.",de,de,"Sobald Sie einige vorbereitende Schritte zur Organisation einer Gruppe unternommen haben, können wir hier eine Gruppe für Sie erstellen."
+partials,add_a_device,"Add a device","Add a device",de,de,"Ein Gerät hinzufügen"
+partials,add_device,"Add item","Add item",de,de,"Artikel hinzufügen"
+partials,add_image,"Add image","Add image",de,de,"Bild hinzufügen"
+partials,age,Age,Age,de,de,Alter
+partials,age_placeholder,"Age (years)","Age (years)",de,de,"Alter (Jahre)"
+partials,area_text_1,"Through this community, potential volunteers self-register and share their location. The platform is designed to connect organisers and fixers.","Through this community, potential volunteers self-register and share their location. The platform is designed to connect organisers and fixers.",de,de,"Über diese Gemeinschaft können sich potenzielle Freiwillige selbst registrieren und ihren Standort mitteilen. Die Plattform ist darauf ausgelegt, Organisatoren und Helfer zusammenzubringen."
+partials,area_text_2,"Through this community, potential volunteers self-register and share their location. Here's a list of potential volunteers near you","Through this community, potential volunteers self-register and share their location. Here's a list of potential volunteers near you",de,de,"Über diese Community können sich potenzielle Freiwillige selbst registrieren und ihren Standort angeben. Hier finden Sie eine Liste potenzieller Freiwilliger in Ihrer Nähe"
+partials,brand,Brand,Brand,de,de,Marke
+partials,cancel,Cancel,Cancel,de,de,Abbrechen
+partials,category,Category,Category,de,de,Kategorie
+partials,category_none,"None of the above","None of the above",de,de,"Keiner der oben genannten Punkte"
+partials,co2,"CO<sub>2</sub> emissions prevented","CO<sub>2</sub> emissions prevented",de,de,"Verhinderte CO<sub>2</sub>-Emissionen"
+partials,community_news_text,"The latest from our community blog - we are always looking for guest posts, send ideas to <a href=""mailto:janet@therestartproject.org"">janet@therestartproject.org</a>","The latest from our community blog - we are always looking for guest posts, send ideas to <a href=""mailto:janet@therestartproject.org"">janet@therestartproject.org</a>",de,de,"Das Neueste aus unserem Gemeinschaftsblog - wir sind immer auf der Suche nach Gastbeiträgen, senden Sie Ihre Ideen an <a href=""mailto:janet@therestartproject.org"">janet@therestartproject.org</a>"
+partials,create_a_new_event,"Create a new event","Create a new event",de,de,"Ein neues Ereignis erstellen"
+partials,create_a_new_event_text,"Create an event here to publicise it to our network, and to invite volunteers. Afterwards, you can log repairs and discover its impact.","Create an event here to publicise it to our network, and to invite volunteers. Afterwards, you can log repairs and discover its impact.",de,de,"Erstellen Sie hier eine Veranstaltung, um sie in unserem Netzwerk bekannt zu machen und Freiwillige einzuladen. Anschließend können Sie die Reparaturen protokollieren und ihre Auswirkungen feststellen."
+partials,create_an_event,"Create an event","Create an event",de,de,"Ein Ereignis erstellen"
+partials,description_of_problem,"Description of problem","Description of problem",de,de,"Beschreibung des Problems"
+partials,description_of_problem_solution,"Description of problem/solution","Description of problem/solution",de,de,"Beschreibung des Problems/Lösung"
+partials,device_images,"Device images","Device images",de,de,Gerätebilder
+partials,discussion,Discussion,Discussion,de,de,Diskussion
+partials,discussion_text,"Meet other event organisers and repair volunteers, trade tips, get help, or discuss the system-level barriers to longer-lasting products","Meet other event organisers and repair volunteers, trade tips, get help, or discuss the system-level barriers to longer-lasting products",de,de,"Treffen Sie andere Organisatoren und freiwillige Reparateure, tauschen Sie Tipps aus, holen Sie sich Hilfe oder diskutieren Sie über die Hindernisse auf Systemebene, die einer längeren Produktlebensdauer im Wege stehen."
+partials,diy,"Do it yourself","Do it yourself",de,de,"Selber machen"
+partials,end,End,End,de,de,Ende
+partials,end_of_life,End-of-life,End-of-life,de,de,End-of-Life
+partials,est_weight,"Est. weight","Est. weight",de,de,"Geschätztes Gewicht"
+partials,event_requires_moderation_by_an_admin,"Event requires moderation by an admin","Event requires moderation by an admin",de,de,"Ereignis erfordert Moderation durch einen Administrator"
+partials,fixed,Fixed,Fixed,de,de,Festgelegt
+partials,getting_started_link,"View the materials","View the materials",de,de,"Ansicht der Materialien"
+partials,host,Host,Host,de,de,Gastgeber
+partials,host_getting_started_text,"We offer materials on how to help organise repair events in your community.","We offer materials on how to help organise repair events in your community.",de,de,"Wir bieten Materialien an, wie Sie bei der Organisation von Reparaturveranstaltungen in Ihrer Gemeinde helfen können."
+partials,host_getting_started_title,"Getting started in community repair","Getting started in community repair",de,de,"Einstieg in die kommunale Reparatur"
+partials,how_to_host_an_event,"How to host an event","How to host an event",de,de,"Wie man eine Veranstaltung ausrichtet"
+partials,how_to_host_an_event_text,"We have years of experience hosting community repair events, and we offer materials on how to organise events them. We also offer peer to peer support on our forum.","We have years of experience hosting community repair events, and we offer materials on how to organise events them. We also offer peer to peer support on our forum.",de,de,"Wir haben jahrelange Erfahrung mit der Durchführung von Reparaturveranstaltungen in der Gemeinde und bieten Materialien zur Organisation von Veranstaltungen an. Außerdem bieten wir in unserem Forum gegenseitige Unterstützung an."
+partials,information_up_to_date,"Keep your group information up to date!","Keep your group information up to date!",de,de,"Halten Sie Ihre Gruppeninformationen auf dem neuesten Stand!"
+partials,information_up_to_date_text,"A fresh profile helps recruit more volunteers. Make sure to link to your website or social media channels.","A fresh profile helps recruit more volunteers. Make sure to link to your website or social media channels.",de,de,"Ein frisches Profil trägt dazu bei, mehr Freiwillige zu rekrutieren. Stellen Sie sicher, dass Sie einen Link zu Ihrer Website oder Ihren Social-Media-Kanälen angeben."
+partials,join_the_discussion,"Join the discussion","Join the discussion",de,de,"Beteiligen Sie sich an der Diskussion"
+partials,least_repaired,"Least repaired","Least repaired",de,de,"Am wenigsten repariert"
+partials,model,Model,Model,de,de,Modell
+partials,more_info,"More Info","More Info",de,de,"Mehr Infos"
+partials,more_time,"More time needed","More time needed",de,de,"Mehr Zeit erforderlich"
+partials,most_repaired,"Most repaired","Most repaired",de,de,"Meist repariert"
+partials,most_seen,"Most seen","Most seen",de,de,"Meist gesehen"
+partials,n_a,N/A,N/A,de,de,K.A.
+partials,no_devices_added,"No devices added","No devices added",de,de,"Keine Geräte hinzugefügt"
+partials,no_past_events,"No Past Events","No Past Events",de,de,"Keine vergangenen Ereignisse"
+partials,no_upcoming_events,"No Upcoming Events","No Upcoming Events",de,de,"Keine bevorstehenden Veranstaltungen"
+partials,none_of_the_above,"No of the above","No of the above",de,de,"Keiner der oben genannten Punkte"
+partials,our_global_environmental_impact,"Our Global Environmental Impact","Our Global Environmental Impact",de,de,"Unser globaler Einfluss auf die Umwelt"
+partials,professional_help,"Professional help","Professional help",de,de,"Professionelle Hilfe"
+partials,quantity,Quantity,Quantity,de,de,Menge
+partials,read_more,"Read more","Read more",de,de,"Mehr lesen"
+partials,remove_file,"Remove file","Remove file",de,de,"Datei entfernen"
+partials,remove_volunteer,"Remove volunteer","Remove volunteer",de,de,"Freiwillige entfernen"
+partials,repair_details,"Next steps","Next steps",de,de,"Nächste Schritte"
+partials,repairable,Repairable,Repairable,de,de,Repairable
+partials,restarter_getting_started_text,"We offer materials on how to help others fix their electronics at community events: on how to share your repair skills in your community and help organise events.","We offer materials on how to help others fix their electronics at community events: on how to share your repair skills in your community and help organise events.",de,de,"Wir bieten Materialien an, mit denen Sie anderen bei der Reparatur ihrer elektronischen Geräte helfen können: wie Sie Ihre Reparaturkenntnisse in Ihrer Gemeinde weitergeben und bei der Organisation von Veranstaltungen helfen können."
+partials,restarter_getting_started_title,"Getting started in community repair","Getting started in community repair",de,de,"Einstieg in die kommunale Reparatur"
+partials,save,"Save item","Save item",de,de,"Artikel speichern"
+partials,see_all_events,"See all events","See all events",de,de,"Alle Ereignisse anzeigen"
+partials,see_more_posts,"See more posts","See more posts",de,de,"Mehr Beiträge sehen"
+partials,solution_text2,"Interesting case study to share?","Interesting case study to share?",de,de,"Interessante Fallstudie zum Mitteilen?"
+partials,spare_parts,"Spare parts","Spare parts",de,de,Ersatzteile
+partials,status,"Repair status","Repair status",de,de,"Status der Reparatur"
+partials,this_event_hasnt_started,"This event hasn't started","This event hasn't started",de,de,"Diese Veranstaltung hat noch nicht begonnen"
+partials,upcoming_events,"Upcoming events","Upcoming events",de,de,"Kommende Veranstaltungen"
+partials,upcoming_events_text,"If possible, the best way to get involved is to go to an event, see how it works, and participate","If possible, the best way to get involved is to go to an event, see how it works, and participate",de,de,"Der beste Weg, sich zu engagieren, ist, eine Veranstaltung zu besuchen, zu sehen, wie sie funktioniert, und daran teilzunehmen."
+partials,upcoming_events_text_2,"Find and attend events.  If you have entered your town/city in your profile, you will see the events nearest to you.","Find and attend events.  If you have entered your town/city in your profile, you will see the events nearest to you.",de,de,"Veranstaltungen finden und besuchen.  Wenn Sie in Ihrem Profil Ihre Stadt angegeben haben, werden Ihnen die Veranstaltungen in Ihrer Nähe angezeigt."
+partials,update,Update,Update,de,de,Update
+partials,waste_prevented,"waste prevented","waste prevented",de,de,Abfallvermeidung
+partials,welcome_text,"We offer materials on how to help others fix their electronics at community events: on how to share your repair skills in your community and help organise events","We offer materials on how to help others fix their electronics at community events: on how to share your repair skills in your community and help organise events",de,de,"Wir bieten Materialien an, mit denen Sie anderen bei der Reparatur ihrer elektronischen Geräte helfen können: wie Sie Ihre Reparaturkenntnisse in Ihrer Gemeinde weitergeben und bei der Organisation von Veranstaltungen helfen können"
+partials,welcome_title,"Getting started in community repair","Getting started in community repair",de,de,"Einstieg in die kommunale Reparatur"
+partials,wiki_text,"A changing selection of pages from our repair wiki.  Read and contribute advice for community repair!","A changing selection of pages from our repair wiki.  Read and contribute advice for community repair!",de,de,"Eine wechselnde Auswahl von Seiten aus unserem Reparatur-Wiki.  Lesen und schreiben Sie Tipps für die Reparatur in der Gemeinschaft!"
+partials,wiki_title,Wiki,Wiki,de,de,Wiki
+partials,yes,Yes,Yes,de,de,Ja
+partials,your_recent_events,"Your recent events","Your recent events",de,de,"Ihre jüngsten Ereignisse"
+partials,your_recent_events_txt1,"These are events you RSVP'ed to, or where a host logged your participation.","These are events you RSVP'ed to, or where a host logged your participation.",de,de,"Dies sind Veranstaltungen, für die Sie eine Einladungsbestätigung (RSVP) abgegeben haben oder bei denen ein Gastgeber Ihre Teilnahme registriert hat."
+partials,your_recent_events_txt2,"Here's a list of recent events you have been a part of - all important contributions to your community and the environment.","Here's a list of recent events you have been a part of - all important contributions to your community and the environment.",de,de,"Hier finden Sie eine Liste von Veranstaltungen, an denen Sie in letzter Zeit teilgenommen haben - alles wichtige Beiträge für Ihre Gemeinde und die Umwelt."
+passwords,password,"Passwords must be at least six characters and match the confirmation.","Passwords must be at least six characters and match the confirmation.",de,de,"Die Passwörter müssen mindestens sechs Zeichen lang sein und mit der Bestätigung übereinstimmen."
+passwords,reset,"Your password has been reset!","Your password has been reset!",de,de,"Ihr Passwort wurde zurückgesetzt!"
+passwords,sent,"We have e-mailed your password reset link!","We have e-mailed your password reset link!",de,de,"Wir haben Ihnen den Link zum Zurücksetzen Ihres Passworts per E-Mail geschickt!"
+passwords,token,"This password reset token is invalid.","This password reset token is invalid.",de,de,"Dieses Passwort-Reset-Token ist ungültig."
+passwords,user,"We can't find a user with that e-mail address.","We can't find a user with that e-mail address.",de,de,"Wir können keinen Benutzer mit dieser E-Mail-Adresse finden."
+printcatora,status.problem,Problem,Problem,de,de,Problem
+printcatora,status.status,Status,Status,de,de,Status
+profile,biography,Biography,Biography,de,de,Biografie
+profile,change_photo,"Change my photo","Change my photo",de,de,"Mein Foto ändern"
+profile,delete_account,"Delete account","Delete account",de,de,"Konto löschen"
+profile,delete_account_text,"I understand that deleting my account will remove all of my personal data and this is a permanent action.","I understand that deleting my account will remove all of my personal data and this is a permanent action.",de,de,"Mir ist bekannt, dass mit der Löschung meines Kontos alle meine persönlichen Daten gelöscht werden und dies eine dauerhafte Maßnahme ist."
+profile,edit_profile,"Edit profile","Edit profile",de,de,"Profil bearbeiten"
+profile,edit_user,"Edit user","Edit user",de,de,"Benutzer bearbeiten"
+profile,my_skills,"My skills","My skills",de,de,"Meine Fähigkeiten"
+profile,no_bio,":name has not yet entered a biography.",":name has not yet entered a biography.",de,de,":name hat noch keine Biografie eingegeben."
+profile,panel_title_1,"Basic profile","Basic profile",de,de,"Grundlegendes Profil"
+profile,panel_title_2,"Emails & alerts","Emails & alerts",de,de,"E-Mails und Warnungen"
+profile,profile_picture,"Profile picture","Profile picture",de,de,Profilbild
+profile,skills,Skills,Skills,de,de,Fertigkeiten
+registration,age,"Year of birth","Year of birth",de,de,"Jahr der Geburt"
+registration,age_help,"To help spread community repair, we need greater insights into intergenerational dynamics.","To help spread community repair, we need greater insights into intergenerational dynamics.",de,de,"Um die Reparatur des Gemeinwesens voranzutreiben, müssen wir die Dynamik zwischen den Generationen besser verstehen."
+registration,age_validation,"Please add your year of birth.","Please add your year of birth.",de,de,"Bitte geben Sie Ihr Geburtsjahr an."
+registration,complete-profile,"Complete my profile","Complete my profile",de,de,"Mein Profil vervollständigen"
+registration,country,Country,Country,de,de,Land
+registration,country_help,"Knowing where volunteers are based helps to grow the global community.","Knowing where volunteers are based helps to grow the global community.",de,de,"Zu wissen, wo sich Freiwillige aufhalten, trägt dazu bei, die globale Gemeinschaft zu vergrößern."
+registration,country_validation,"Please add your country.","Please add your country.",de,de,"Bitte fügen Sie Ihr Land hinzu."
+registration,gender,"Gender (Optional)","Gender (Optional)",de,de,"Geschlecht (fakultativ)"
+registration,gender_help,"Sharing your gender identity can help the community learn how to promote diversity, but we understand not everybody wants to share.","Sharing your gender identity can help the community learn how to promote diversity, but we understand not everybody wants to share.",de,de,"Das Mitteilen der eigenen Geschlechtsidentität kann der Gemeinschaft helfen zu lernen, wie man Vielfalt fördert, aber wir verstehen, dass nicht jeder dies tun möchte."
+registration,next-step,"Next step","Next step",de,de,"Nächster Schritt"
+registration,previous-step,"Previous step","Previous step",de,de,"Vorheriger Schritt"
+registration,reg-alert-1,"Thank you for your registration, please complete your profile below to continue","Thank you for your registration, please complete your profile below to continue",de,de,"Vielen Dank für Ihre Anmeldung, bitte füllen Sie Ihr Profil aus, um fortzufahren"
+registration,reg-step-1-1,"This is optional but helps us to improve your experience and helps organise events.  You can change these later in your profile.","This is optional but helps us to improve your experience and helps organise events.  You can change these later in your profile.",de,de,"Diese Angaben sind freiwillig, helfen uns aber, Ihre Erfahrungen zu verbessern und Veranstaltungen zu organisieren.  Sie können diese Angaben später in Ihrem Profil ändern."
+registration,reg-step-1-heading,"What skills would you like to share with others?","What skills would you like to share with others?",de,de,"Welche Fähigkeiten würden Sie gerne mit anderen teilen?"
+registration,reg-step-1-sub-heading-1,"Organising skills - please select at least one if you’d like to host events","Organising skills - please select at least one if you’d like to host events",de,de,"Organisationstalent - bitte wählen Sie mindestens eines aus, wenn Sie Veranstaltungen organisieren möchten"
+registration,reg-step-1-sub-heading-2,"Technical skills","Technical skills",de,de,"Technische Fähigkeiten"
+registration,reg-step-2-1,"This information is useful for us to serve the community better. Of your personal data, only your skills, town/city and name will be visible to other community members.","This information is useful for us to serve the community better. Of your personal data, only your skills, town/city and name will be visible to other community members.",de,de,"Diese Informationen sind nützlich für uns, um der Gemeinschaft besser zu dienen. Von Ihren persönlichen Daten werden nur Ihre Fähigkeiten, Ihre Stadt und Ihr Name für andere Community-Mitglieder sichtbar sein."
+registration,reg-step-2-2,"To create an account, you must set a password","To create an account, you must set a password",de,de,"Um ein Konto zu erstellen, müssen Sie ein Passwort festlegen"
+registration,reg-step-2-heading,"Tell us a little bit about yourself","Tell us a little bit about yourself",de,de,"Erzählen Sie uns ein wenig über sich selbst"
+registration,reg-step-3-1a,"We can send you email updates about events and groups related to you, and about Restart Project activities in general.","We can send you email updates about events and groups related to you, and about Restart Project activities in general.",de,de,"Wir können Ihnen per E-Mail aktuelle Informationen über Veranstaltungen und Gruppen, die Sie betreffen, sowie über die Aktivitäten des Restart-Projekts im Allgemeinen zusenden."
+registration,reg-step-3-1b," (optional)"," (optional)",de,de," (fakultativ)"
+registration,reg-step-3-2b,"Following registration, you will receive a short series of welcome emails. You can also opt-in to other communications below.","Following registration, you will receive a short series of welcome emails. You can also opt-in to other communications below.",de,de,"Nach der Anmeldung erhalten Sie eine kurze Reihe von Willkommens-E-Mails. Im Folgenden können Sie sich auch für weitere Mitteilungen anmelden."
+registration,reg-step-3-heading,"How would you like us to keep in touch?","How would you like us to keep in touch?",de,de,"Wie möchten Sie, dass wir in Kontakt bleiben?"
+registration,reg-step-3-label1,"I would like to receive The Restart Project monthly newsletter","I would like to receive The Restart Project monthly newsletter",de,de,"Ich möchte den monatlichen Newsletter von The Restart Project erhalten"
+registration,reg-step-3-label2,"I would like to receive email notifications about events or groups near me","I would like to receive email notifications about events or groups near me",de,de,"Ich möchte per E-Mail über Veranstaltungen oder Gruppen in meiner Nähe benachrichtigt werden"
+registration,reg-step-4,"Please give your consent to our uses of the data that you enter.","Please give your consent to our uses of the data that you enter.",de,de,"Bitte geben Sie Ihr Einverständnis, dass wir die von Ihnen eingegebenen Daten verwenden dürfen."
+registration,reg-step-4-heading,"Uses of the data you enter","Uses of the data you enter",de,de,"Verwendung der von Ihnen eingegebenen Daten"
+registration,reg-step-4-label1,"<strong>Personal Data</strong>. I consent for The Restart Project to use my personal data internally for the purposes of registering me in the community, verifying the source of repair data and improving the volunteer experience. I understand that my personal profile will be visible to other community members, however personal data provided will never be shared with third parties without my consent. I understand I can delete my profile and all my personal data at any time - and access the community Privacy Policy <a href=""https://therestartproject.org/data-and-privacy-policy/fixometer/"" rel=""noopener noreferrer"" target=""_blank"">here</a>.","<strong>Personal Data</strong>. I consent for The Restart Project to use my personal data internally for the purposes of registering me in the community, verifying the source of repair data and improving the volunteer experience. I understand that my personal profile will be visible to other community members, however personal data provided will never be shared with third parties without my consent. I understand I can delete my profile and all my personal data at any time - and access the community Privacy Policy <a href=""https://therestartproject.org/data-and-privacy-policy/fixometer/"" rel=""noopener noreferrer"" target=""_blank"">here</a>.",de,de,"<strong>Personenbezogene Daten</strong>. Ich bin damit einverstanden, dass The Restart Project meine persönlichen Daten intern verwendet, um mich in der Gemeinschaft zu registrieren, die Quelle der Reparaturdaten zu überprüfen und die Erfahrungen der Freiwilligen zu verbessern. Ich bin mir bewusst, dass mein persönliches Profil für andere Mitglieder der Gemeinschaft sichtbar sein wird, jedoch werden die angegebenen persönlichen Daten niemals ohne meine Zustimmung an Dritte weitergegeben. Ich weiß, dass ich mein Profil und alle meine persönlichen Daten jederzeit löschen kann - und die Datenschutzbestimmungen der Gemeinschaft <a href=""https://therestartproject.org/data-and-privacy-policy/fixometer/"" rel=""noopener noreferrer"" target=""_blank"">hier</a> einsehen kann."
+registration,reg-step-4-label2,"<strong>Repair Data</strong>.  By contributing repair data to the Fixometer, I give The Restart Project a perpetual royalty-free license to use it. The license allows Restart to distribute the data under any open license and to retain any non-personal data even in case I request deletion of my personal profile on the Fixometer. (<i>Read more about how we use repair data <a href=""https://therestartproject.org/fixometer/why-we-collect-repair-data/"" rel=""noopener noreferrer"" target=""_blank"">here</a></i>.)","<strong>Repair Data</strong>.  By contributing repair data to the Fixometer, I give The Restart Project a perpetual royalty-free license to use it. The license allows Restart to distribute the data under any open license and to retain any non-personal data even in case I request deletion of my personal profile on the Fixometer. (<i>Read more about how we use repair data <a href=""https://therestartproject.org/fixometer/why-we-collect-repair-data/"" rel=""noopener noreferrer"" target=""_blank"">here</a></i>.)",de,de,"<strong>Reparaturdaten</strong>.  Indem ich Reparaturdaten zum Fixometer beisteuere, gewähre ich dem Restart-Projekt eine unbefristete, gebührenfreie Lizenz zur Nutzung dieser Daten. Die Lizenz erlaubt es Restart, die Daten unter jeder offenen Lizenz zu verbreiten und alle nicht-personenbezogenen Daten zu behalten, selbst wenn ich die Löschung meines persönlichen Profils im Fixometer beantrage. (<i>Lesen Sie mehr darüber, wie wir Reparaturdaten verwenden <a href=""https://therestartproject.org/fixometer/why-we-collect-repair-data/"" rel=""noopener noreferrer"" target=""_blank"">hier</a></i>)."
+registration,reg-step-4-label3,"<strong>Historical Repair Data</strong>. I give a perpetual royalty-free license to any of my previous repair data contributions to The Restart Project. The license allows Restart to distribute the data under any open license and to retain any non-personal data even in case I request deletion of my personal profile on the Fixometer. (<i>Read more about how we use repair data <a href=""https://therestartproject.org/fixometer/why-we-collect-repair-data/"" rel=""noopener noreferrer"" target=""_blank"">here</a></i>.)","<strong>Historical Repair Data</strong>. I give a perpetual royalty-free license to any of my previous repair data contributions to The Restart Project. The license allows Restart to distribute the data under any open license and to retain any non-personal data even in case I request deletion of my personal profile on the Fixometer. (<i>Read more about how we use repair data <a href=""https://therestartproject.org/fixometer/why-we-collect-repair-data/"" rel=""noopener noreferrer"" target=""_blank"">here</a></i>.)",de,de,"<strong>Historische Reparaturdaten</strong>. Ich gewähre eine unbefristete, gebührenfreie Lizenz für alle meine früheren Reparaturdaten, die ich dem Restart-Projekt zur Verfügung gestellt habe. Die Lizenz erlaubt es Restart, die Daten unter jeder offenen Lizenz zu verbreiten und alle nicht-personenbezogenen Daten zu behalten, auch wenn ich die Löschung meines persönlichen Profils auf dem Fixometer beantrage. (<i>Lesen Sie mehr darüber, wie wir Reparaturdaten verwenden <a href=""https://therestartproject.org/fixometer/why-we-collect-repair-data/"" rel=""noopener noreferrer"" target=""_blank"">hier</a></i>.)"
+registration,step-1,"Step 1 of 4","Step 1 of 4",de,de,"Schritt 1 von 4"
+registration,step-2,"Step 2 of 4","Step 2 of 4",de,de,"Schritt 2 von 4"
+registration,step-3,"Step 3 of 4","Step 3 of 4",de,de,"Schritt 3 von 4"
+registration,step-4,"Step 4 of 4","Step 4 of 4",de,de,"Schritt 4 von 4"
+registration,town-city,"Town/City (Optional)","Town/City (Optional)",de,de,"Stadt (fakultativ)"
+registration,town-city_help,"Town/city helps match volunteers to groups and to find local events.","Town/city helps match volunteers to groups and to find local events.",de,de,"Die Stadt/Stadt hilft bei der Vermittlung von Freiwilligen an Gruppen und bei der Suche nach lokalen Veranstaltungen."
+registration,town-city-placeholder,"E.g. Paris, London, Brussels","E.g. Paris, London, Brussels",de,de,"Z.B. Paris, London, Brüssel"
+reporting,age_range,"Age range","Age range",de,de,Altersspanne
+reporting,average_age,"Average age","Average age",de,de,"Durchschnittliches Alter"
+reporting,birth_year,"Birth Year","Birth Year",de,de,Geburtsjahr
+reporting,breakdown_by_city,"Breakdown by city","Breakdown by city",de,de,"Aufschlüsselung nach Städten"
+reporting,breakdown_by_city_content,"Volunteer hours grouped by the volunteer town/city (note: town/country is optional so may not be set for all volunteers).","Volunteer hours grouped by the volunteer town/city (note: town/country is optional so may not be set for all volunteers).",de,de,"Freiwilligenstunden, gruppiert nach der Stadt des Freiwilligen (Hinweis: Stadt/Land ist fakultativ und kann nicht für alle Freiwilligen angegeben werden)."
+reporting,breakdown_by_country,"Breakdown by country","Breakdown by country",de,de,"Aufschlüsselung nach Ländern"
+reporting,breakdown_by_country_content,"Volunteer hours grouped by volunteer country.","Volunteer hours grouped by volunteer country.",de,de,"Freiwilligenstunden gruppiert nach Freiwilligenländern."
+reporting,by_location,"By location","By location",de,de,"Nach Standort"
+reporting,by_users,"By volunteer","By volunteer",de,de,"Von Freiwilligen"
+reporting,country,Country,Country,de,de,Land
+reporting,country_name,"Country name","Country name",de,de,"Name des Landes"
+reporting,event_date,"Event date","Event date",de,de,"Datum der Veranstaltung"
+reporting,event_name,Event,Event,de,de,Veranstaltung
+reporting,export_csv,"Export to CSV","Export to CSV",de,de,"Exportieren nach CSV"
+reporting,gender,Gender,Gender,de,de,Geschlecht
+reporting,hours,Hours,Hours,de,de,Stunden
+reporting,hours_volunteered,"Hours volunteered","Hours volunteered",de,de,"Freiwillig geleistete Arbeitsstunden"
+reporting,include_anonymous_users,"Include anonymous users","Include anonymous users",de,de,"Anonyme Benutzer einbeziehen"
+reporting,location,Location,Location,de,de,Standort
+reporting,miscellaneous,Miscellaneous,Miscellaneous,de,de,Sonstiges
+reporting,no,No,No,de,de,Nein
+reporting,number_of_anonymous_users,"Number of anonymous users","Number of anonymous users",de,de,"Anzahl der anonymen Nutzer"
+reporting,number_of_groups,"Number of groups","Number of groups",de,de,"Anzahl der Gruppen"
+reporting,placeholder_age_range,"Choose age range","Choose age range",de,de,"Altersgruppe wählen"
+reporting,placeholder_birth_year,"Choose birth year","Choose birth year",de,de,"Geburtsjahr wählen"
+reporting,placeholder_country,"Choose country","Choose country",de,de,"Land wählen"
+reporting,placeholder_gender,"Choose gender","Choose gender",de,de,"Geschlecht wählen"
+reporting,placeholder_gender_text,"Search gender","Search gender",de,de,"Geschlecht suchen"
+reporting,placeholder_group,"Choose group","Choose group",de,de,"Gruppe wählen"
+reporting,placeholder_name,"Search name","Search name",de,de,"Name suchen"
+reporting,placeholder_region,"Choose region","Choose region",de,de,"Region auswählen"
+reporting,region,Region,Region,de,de,Region
+reporting,restart_group,Group,Group,de,de,Gruppe
+reporting,search-all-time-volunteered,"Search time volunteered","Search time volunteered",de,de,"Freiwillig geleistete Suchzeit"
+reporting,see_all_results,"See all results","See all results",de,de,"Alle Ergebnisse anzeigen"
+reporting,time_volunteered,"Time Volunteered","Time Volunteered",de,de,"Ehrenamtlich geleistete Zeit"
+reporting,total_hours,"Total hours","Total hours",de,de,"Stunden insgesamt"
+reporting,total_number_of_users,"Total number of users","Total number of users",de,de,"Gesamtzahl der Nutzer"
+reporting,town_city_name,"Town/city name","Town/city name",de,de,"Name der Gemeinde/Stadt"
+reporting,yes,Yes,Yes,de,de,Ja
+tabicatora,status.problem,Problem,Problem,de,de,Problem
+tabicatora,status.status,Status,Status,de,de,Status
+tabicatora,survey.a3,Neutral,Neutral,de,de,Neutral
+validation,accepted,"The :attribute must be accepted.","The :attribute must be accepted.",de,de,"Das Attribut :muss akzeptiert werden."
+validation,active_url,"The :attribute is not a valid URL.","The :attribute is not a valid URL.",de,de,"Das Attribut :ist keine gültige URL."
+validation,after,"The :attribute must be a date after :date.","The :attribute must be a date after :date.",de,de,"Das :Attribut muss ein Datum nach :date sein."
+validation,after_or_equal,"The :attribute must be a date after or equal to :date.","The :attribute must be a date after or equal to :date.",de,de,"Das :Attribut muss ein Datum nach oder gleich :date sein."
+validation,alpha,"The :attribute may only contain letters.","The :attribute may only contain letters.",de,de,"Das Attribut :darf nur Buchstaben enthalten."
+validation,alpha_num,"The :attribute may only contain letters and numbers.","The :attribute may only contain letters and numbers.",de,de,"Das Attribut :darf nur Buchstaben und Zahlen enthalten."
+validation,array,"The :attribute must be an array.","The :attribute must be an array.",de,de,"Das :-Attribut muss ein Array sein."
+validation,before,"The :attribute must be a date before :date.","The :attribute must be a date before :date.",de,de,"Das :attribute muss ein Datum vor :date sein."
+validation,before_or_equal,"The :attribute must be a date before or equal to :date.","The :attribute must be a date before or equal to :date.",de,de,"Das :Attribut muss ein Datum vor oder gleich :date sein."
+validation,between.array,"The :attribute must have between :min and :max items.","The :attribute must have between :min and :max items.",de,de,"Das Attribut :muss zwischen :min und :max liegen."
+validation,between.file,"The :attribute must be between :min and :max kilobytes.","The :attribute must be between :min and :max kilobytes.",de,de,"Das :Attribut muss zwischen :min und :max Kilobytes liegen."
+validation,between.numeric,"The :attribute must be between :min and :max.","The :attribute must be between :min and :max.",de,de,"Das Attribut :muss zwischen :min und :max liegen."
+validation,between.string,"The :attribute must be between :min and :max characters.","The :attribute must be between :min and :max characters.",de,de,"Das :Attribut muss zwischen den Zeichen :min und :max liegen."
+validation,boolean,"The :attribute field must be true or false.","The :attribute field must be true or false.",de,de,"Das Feld :attribute muss true oder false sein."
+validation,confirmed,"The :attribute confirmation does not match.","The :attribute confirmation does not match.",de,de,"Das :Attribut confirmation stimmt nicht überein."
+validation,custom.attribute-name.rule-name,custom-message,custom-message,de,de,"benutzerdefinierte Nachricht"
+validation,date,"The :attribute is not a valid date.","The :attribute is not a valid date.",de,de,"Das Attribut :ist kein gültiges Datum."
+validation,date_format,"The :attribute does not match the format :format.","The :attribute does not match the format :format.",de,de,"Das :attribute entspricht nicht dem Format :format."
+validation,different,"The :attribute and :other must be different.","The :attribute and :other must be different.",de,de,"Das :attribute und das :other müssen unterschiedlich sein."
+validation,digits,"The :attribute must be :digits digits.","The :attribute must be :digits digits.",de,de,"Das :Attribut muss :digits Ziffern sein."
+validation,digits_between,"The :attribute must be between :min and :max digits.","The :attribute must be between :min and :max digits.",de,de,"Das :Attribut muss zwischen den Ziffern :min und :max liegen."
+validation,dimensions,"The :attribute has invalid image dimensions.","The :attribute has invalid image dimensions.",de,de,"Das Attribut :hat ungültige Bildabmessungen."
+validation,distinct,"The :attribute field has a duplicate value.","The :attribute field has a duplicate value.",de,de,"Das Feld :attribute hat einen doppelten Wert."
+validation,email,"The :attribute must be a valid email address.","The :attribute must be a valid email address.",de,de,"Das Attribut :muss eine gültige E-Mail-Adresse sein."
+validation,exists,"The selected :attribute is invalid.","The selected :attribute is invalid.",de,de,"Das ausgewählte :-Attribut ist ungültig."
+validation,file,"The :attribute must be a file.","The :attribute must be a file.",de,de,"Das :-Attribut muss eine Datei sein."
+validation,filled,"The :attribute field must have a value.","The :attribute field must have a value.",de,de,"Das Feld :attribute muss einen Wert haben."
+validation,gt.array,"The :attribute must have more than :value items.","The :attribute must have more than :value items.",de,de,"Das :Attribut muss mehr als :Wertelemente haben."
+validation,gt.file,"The :attribute must be greater than :value kilobytes.","The :attribute must be greater than :value kilobytes.",de,de,"Das :Attribut muss größer sein als der :Wert Kilobytes."
+validation,gt.numeric,"The :attribute must be greater than :value.","The :attribute must be greater than :value.",de,de,"Das :attribute muss größer sein als :value."
+validation,gt.string,"The :attribute must be greater than :value characters.","The :attribute must be greater than :value characters.",de,de,"Das :attribute muss größer sein als :value-Zeichen."
+validation,gte.array,"The :attribute must have :value items or more.","The :attribute must have :value items or more.",de,de,"Das :Attribut muss mindestens :Wert-Elemente haben."
+validation,gte.file,"The :attribute must be greater than or equal :value kilobytes.","The :attribute must be greater than or equal :value kilobytes.",de,de,"Das :Attribut muss größer oder gleich dem :Wert Kilobytes sein."
+validation,gte.numeric,"The :attribute must be greater than or equal :value.","The :attribute must be greater than or equal :value.",de,de,"Das :Attribut muss größer oder gleich dem :Wert sein."
+validation,gte.string,"The :attribute must be greater than or equal :value characters.","The :attribute must be greater than or equal :value characters.",de,de,"Das :attribute muss größer oder gleich :value-Zeichen sein."
+validation,image,"The :attribute must be an image.","The :attribute must be an image.",de,de,"Das Attribut :muss ein Bild sein."
+validation,in,"The selected :attribute is invalid.","The selected :attribute is invalid.",de,de,"Das ausgewählte :-Attribut ist ungültig."
+validation,in_array,"The :attribute field does not exist in :other.","The :attribute field does not exist in :other.",de,de,"Das Feld :attribute ist in :other nicht vorhanden."
+validation,integer,"The :attribute must be an integer.","The :attribute must be an integer.",de,de,"Das Attribut :muss eine ganze Zahl sein."
+validation,ip,"The :attribute must be a valid IP address.","The :attribute must be a valid IP address.",de,de,"Das Attribut :muss eine gültige IP-Adresse sein."
+validation,ipv4,"The :attribute must be a valid IPv4 address.","The :attribute must be a valid IPv4 address.",de,de,"Das Attribut :muss eine gültige IPv4-Adresse sein."
+validation,ipv6,"The :attribute must be a valid IPv6 address.","The :attribute must be a valid IPv6 address.",de,de,"Das Attribut :muss eine gültige IPv6-Adresse sein."
+validation,json,"The :attribute must be a valid JSON string.","The :attribute must be a valid JSON string.",de,de,"Das Attribut :muss eine gültige JSON-Zeichenkette sein."
+validation,lt.array,"The :attribute must have less than :value items.","The :attribute must have less than :value items.",de,de,"Das :attribute muss weniger als :value Elemente haben."
+validation,lt.file,"The :attribute must be less than :value kilobytes.","The :attribute must be less than :value kilobytes.",de,de,"Das :attribute muss kleiner sein als :value kilobytes."
+validation,lt.numeric,"The :attribute must be less than :value.","The :attribute must be less than :value.",de,de,"Das :attribute muss kleiner sein als :value."
+validation,lt.string,"The :attribute must be less than :value characters.","The :attribute must be less than :value characters.",de,de,"Das :Attribut muss kleiner sein als die Zeichen des :Wertes."
+validation,lte.array,"The :attribute must not have more than :value items.","The :attribute must not have more than :value items.",de,de,"Das :Attribut darf nicht mehr als :Wertelemente haben."
+validation,lte.file,"The :attribute must be less than or equal :value kilobytes.","The :attribute must be less than or equal :value kilobytes.",de,de,"Das :Attribut muss kleiner oder gleich dem :Wert Kilobytes sein."
+validation,lte.numeric,"The :attribute must be less than or equal :value.","The :attribute must be less than or equal :value.",de,de,"Das :attribute muss kleiner oder gleich :value sein."
+validation,lte.string,"The :attribute must be less than or equal :value characters.","The :attribute must be less than or equal :value characters.",de,de,"Das :attribute muss kleiner oder gleich :value-Zeichen sein."
+validation,max.array,"The :attribute may not have more than :max items.","The :attribute may not have more than :max items.",de,de,"Das :Attribut darf nicht mehr als :max Elemente haben."
+validation,max.file,"The :attribute may not be greater than :max kilobytes.","The :attribute may not be greater than :max kilobytes.",de,de,"Das :Attribut darf nicht größer sein als :max kilobytes."
+validation,max.numeric,"The :attribute may not be greater than :max.","The :attribute may not be greater than :max.",de,de,"Das Attribut :darf nicht größer sein als :max."
+validation,max.string,"The :attribute may not be greater than :max characters.","The :attribute may not be greater than :max characters.",de,de,"Das :Attribut darf nicht größer sein als :max Zeichen."
+validation,mimes,"The :attribute must be a file of type: :values.","The :attribute must be a file of type: :values.",de,de,"Das :Attribut muss eine Datei vom Typ: :values sein."
+validation,mimetypes,"The :attribute must be a file of type: :values.","The :attribute must be a file of type: :values.",de,de,"Das :Attribut muss eine Datei vom Typ: :values sein."
+validation,min.array,"The :attribute must have at least :min items.","The :attribute must have at least :min items.",de,de,"Das :Attribut muss mindestens :min Elemente haben."
+validation,min.file,"The :attribute must be at least :min kilobytes.","The :attribute must be at least :min kilobytes.",de,de,"Das :Attribut muss mindestens :min Kilobytes betragen."
+validation,min.numeric,"The :attribute must be at least :min.","The :attribute must be at least :min.",de,de,"Das :Attribut muss mindestens :min sein."
+validation,min.string,"The :attribute must be at least :min characters.","The :attribute must be at least :min characters.",de,de,"Das :Attribut muss mindestens :min Zeichen umfassen."
+validation,not_in,"The selected :attribute is invalid.","The selected :attribute is invalid.",de,de,"Das ausgewählte :-Attribut ist ungültig."
+validation,not_regex,"The :attribute format is invalid.","The :attribute format is invalid.",de,de,"Das Format :attribute ist ungültig."
+validation,numeric,"The :attribute must be a number.","The :attribute must be a number.",de,de,"Das Attribut :muss eine Zahl sein."
+validation,present,"The :attribute field must be present.","The :attribute field must be present.",de,de,"Das Feld :attribute muss vorhanden sein."
+validation,regex,"The :attribute format is invalid.","The :attribute format is invalid.",de,de,"Das Format :attribute ist ungültig."
+validation,required,"The :attribute field is required.","The :attribute field is required.",de,de,"Das Feld :attribute ist erforderlich."
+validation,required_if,"The :attribute field is required when :other is :value.","The :attribute field is required when :other is :value.",de,de,"Das Feld :attribute ist erforderlich, wenn :other :value ist."
+validation,required_unless,"The :attribute field is required unless :other is in :values.","The :attribute field is required unless :other is in :values.",de,de,"Das Feld :attribute ist erforderlich, es sei denn, :other steht in :values."
+validation,required_with,"The :attribute field is required when :values is present.","The :attribute field is required when :values is present.",de,de,"Das Feld :attribute ist erforderlich, wenn :values vorhanden ist."
+validation,required_without,"The :attribute field is required when :values is not present.","The :attribute field is required when :values is not present.",de,de,"Das Feld :attribute ist erforderlich, wenn :values nicht vorhanden ist."
+validation,required_without_all,"The :attribute field is required when none of :values are present.","The :attribute field is required when none of :values are present.",de,de,"Das Feld :attribute ist erforderlich, wenn keines der :values vorhanden ist."
+validation,same,"The :attribute and :other must match.","The :attribute and :other must match.",de,de,"Die Angaben :attribute und :other müssen übereinstimmen."
+validation,size.array,"The :attribute must contain :size items.","The :attribute must contain :size items.",de,de,"Das Attribut :muss die Elemente :size enthalten."
+validation,size.file,"The :attribute must be :size kilobytes.","The :attribute must be :size kilobytes.",de,de,"Das :Attribut muss :size kilobytes sein."
+validation,size.numeric,"The :attribute must be :size.","The :attribute must be :size.",de,de,"Das :Attribut muss :size sein."
+validation,size.string,"The :attribute must be :size characters.","The :attribute must be :size characters.",de,de,"Das :Attribut muss :size Zeichen sein."
+validation,string,"The :attribute must be a string.","The :attribute must be a string.",de,de,"Das Attribut :muss eine Zeichenkette sein."
+validation,timezone,"The :attribute must be a valid zone.","The :attribute must be a valid zone.",de,de,"Das Attribut :muss ein gültiges Gebiet sein."
+validation,unique,"The :attribute has already been taken.","The :attribute has already been taken.",de,de,"Das Attribut :ist bereits vergeben."
+validation,uploaded,"The :attribute failed to upload.","The :attribute failed to upload.",de,de,"Das :-Attribut konnte nicht hochgeladen werden."
+validation,url,"The :attribute format is invalid.","The :attribute format is invalid.",de,de,"Das Format :attribute ist ungültig."
+visualisation,message_consume_high,"Visualisation of equivalent number of kilometres driven.","Visualisation of equivalent number of kilometres driven.",de,de,"Visualisierung der äquivalenten Anzahl der gefahrenen Kilometer."
+visualisation,message_consume_low,"Visualisation of equivalent number of hours spent watching TV.","Visualisation of equivalent number of hours spent watching TV.",de,de,"Visualisierung der äquivalenten Anzahl der vor dem Fernseher verbrachten Stunden."
+visualisation,message_manufacture_high,"Visualisation of equivalent number of cars manufactured.","Visualisation of equivalent number of cars manufactured.",de,de,"Visualisierung der äquivalenten Anzahl der hergestellten Autos."
+visualisation,message_manufacture_low,"Visualisation of equivalent number of sofas manufactured.","Visualisation of equivalent number of sofas manufactured.",de,de,"Visualisierung der entsprechenden Anzahl der hergestellten Sofas."
+_json,Bluetooth,Bluetooth,Bluetooth,es,es,Bluetooth
+_json,"Coffee maker","Coffee maker","Coffee maker",es,es,Cafetera
+_json,"Hand tool","Hand tool","Hand tool",es,es,"Herramienta manual"
+_json,Iron,Iron,Iron,es,es,Hierro
+_json,Jewellery,Jewellery,Jewellery,es,es,Joyería
+_json,Software/OS,Software/OS,Software/OS,es,es,Software/OS
+_json,Toner,Toner,Tóner,es,es,Tóner
+_json,WiFi,WiFi,WiFi,es,es,WiFi
+battcatora,status.total,Total,Total,es,es,Total
+battcatora,survey.a3,Neutral,Neutral,es,es,Neutral
+partials,powered_only,"(calculated from powered items only)","(calculated from powered items only)",es,es,"(calculado sólo a partir de los artículos con motor)"
+printcatora,status.total,Total,Total,es,es,Total
+tabicatora,status.total,Total,Total,es,es,Total
+tabicatora,survey.a3,Neutral,Neutral,es,es,Neutral
+_json,Bluetooth,Bluetooth,Bluetooth,fr,fr,Bluetooth
+_json,Camera,Camera,Caméra,fr,fr,"Appareil photo"
+_json,"Coffee maker","Coffee maker","Coffee maker",fr,fr,Cafetière
+_json,Configuration,Configuration,Configuration,fr,fr,Configuration
+_json,"Hand tool","Hand tool","Hand tool",fr,fr,"Outil à main"
+_json,Iron,Iron,Iron,fr,fr,Fer
+_json,Jewellery,Jewellery,Jewellery,fr,fr,Bijoux
+_json,Microphone,Microphone,Microphone,fr,fr,Microphone
+_json,Performance,Performance,Performance,fr,fr,Performance
+_json,Scanner,Scanner,Scanner,fr,fr,Scanner
+_json,Software/OS,Software/OS,Software/OS,fr,fr,Logiciel/OS
+_json,Toner,Toner,Toner,fr,fr,Toner
+_json,"Vendor lock-in","Vendor lock-in","Vendor lock-in",fr,fr,"Blocage des fournisseurs"
+admin,categories,Categories,Catégories,fr,fr,Catégories
+admin,description,Description,Description,fr,fr,Description
+admin,reliability-6,N/A,N/A,fr,fr,N/A
+auth,profile_admin,"Admin only","Admin only",fr,fr,"Admin seulement"
+device-audits,created.metadata,"On :audit_created_at, :user_name created record <strong>:audit_url</strong>","On :audit_created_at, :user_name created record <strong>:audit_url</strong>",fr,fr,"Le :audit_created_at, :user_name a créé l'enregistrement <strong>:audit_url</strong>."
+device-audits,created.modified.age,"<strong>Age</strong> set as ""<strong>:new</strong>""","<strong>Age</strong> set as ""<strong>:new</strong>""",fr,fr,"<strong>Age</strong> défini comme ""<strong>:new</strong>"""
+device-audits,created.modified.brand,"<strong>Brand</strong> set as ""<strong>:new</strong>""","<strong>Brand</strong> set as ""<strong>:new</strong>""",fr,fr,"<strong>Marque</strong> définie comme ""<strong>:new</strong>"""
+device-audits,created.modified.category,"<strong>Category</strong> set as ""<strong>:new</strong>""","<strong>Category</strong> set as ""<strong>:new</strong>""",fr,fr,"<strong>Catégorie</strong> définie comme ""<strong>:new</strong>"""
+device-audits,created.modified.category_creation,"<strong>Category Creation</strong> set as ""<strong>:new</strong>""","<strong>Category Creation</strong> set as ""<strong>:new</strong>""",fr,fr,"<strong>Création de catégorie</strong> définie comme ""<strong>:new</strong>""."
+device-audits,created.modified.do_it_yourself,"<strong>Do it yourself</strong> set as ""<strong>:new</strong>""","<strong>Do it yourself</strong> set as ""<strong>:new</strong>""",fr,fr,"<strong>Faites-le vous-même</strong> défini comme ""<strong>:new</strong>"""
+device-audits,created.modified.estimate,"<strong>Estimate</strong> set as ""<strong>:new</strong>""","<strong>Estimate</strong> set as ""<strong>:new</strong>""",fr,fr,"<strong>Estimate</strong> défini comme ""<strong>:new</strong>"""
+device-audits,created.modified.event,"<strong>Event</strong> set as ""<strong>:new</strong>""","<strong>Event</strong> set as ""<strong>:new</strong>""",fr,fr,"<strong>Event</strong> défini comme ""<strong>:new</strong>"""
+device-audits,created.modified.iddevices,"<strong>Device ID</strong> set as ""<strong>:new</strong>""","<strong>Device ID</strong> set as ""<strong>:new</strong>""",fr,fr,"<strong>Device ID</strong> défini comme ""<strong>:new</strong>"""
+device-audits,created.modified.model,"<strong>Model</strong> set as ""<strong>:new</strong>""","<strong>Model</strong> set as ""<strong>:new</strong>""",fr,fr,"<strong>Modèle</strong> défini comme ""<strong>:new</strong>"""
+device-audits,created.modified.more_time_needed,"<strong>More time needed</strong> set as ""<strong>:new</strong>""","<strong>More time needed</strong> set as ""<strong>:new</strong>""",fr,fr,"<strong>Plus de temps nécessaire</strong> fixé comme ""<strong>:nouveau</strong>""."
+device-audits,created.modified.problem,"<strong>Problem</strong> set as ""<strong>:new</strong>""","<strong>Problem</strong> set as ""<strong>:new</strong>""",fr,fr,"<strong>Problème</strong> défini comme ""<strong>:new</strong>"""
+device-audits,created.modified.professional_help,"<strong>Professional Help</strong> set as ""<strong>:new</strong>""","<strong>Professional Help</strong> set as ""<strong>:new</strong>""",fr,fr,"<strong>Aide professionnelle</strong> défini comme ""<strong>:new</strong>"""
+device-audits,created.modified.repair_status,"<strong>Repair Status</strong> set as ""<strong>:new</strong>""","<strong>Repair Status</strong> set as ""<strong>:new</strong>""",fr,fr,"<L'état de réparation a été fixé à ""<strong>:new</strong>""."
+device-audits,created.modified.repaired_by,"<strong>Reparied by</strong> set as ""<strong>:new</strong>""","<strong>Reparied by</strong> set as ""<strong>:new</strong>""",fr,fr,"<strong>Reparied by</strong> défini comme ""<strong>:new</strong>""."
+device-audits,created.modified.spare_parts,"<strong>Spare Parts</strong> set as ""<strong>:new</strong>""","<strong>Spare Parts</strong> set as ""<strong>:new</strong>""",fr,fr,"<strong>Pièces détachées</strong> définies comme ""<strong>:new</strong>""."
+device-audits,created.modified.wiki,"<strong>Wiki</strong> set as ""<strong>:new</strong>""","<strong>Wiki</strong> set as ""<strong>:new</strong>""",fr,fr,"<strong>Wiki</strong> défini comme ""<strong>:new</strong>"""
+device-audits,unavailable_audits,"No changes have been made to this device!","No changes have been made to this device!",fr,fr,"Aucune modification n'a été apportée à cet appareil !"
+device-audits,updated.metadata,"On :audit_created_at, :user_name updated record <strong>:audit_url</strong>","On :audit_created_at, :user_name updated record <strong>:audit_url</strong>",fr,fr,"Sur :audit_created_at, :user_name a mis à jour l'enregistrement <strong>:audit_url</strong>."
+device-audits,updated.modified.age,"<strong>Age</strong> was modified from ""<strong>:old</strong>"" to ""<strong>:new</strong>""","<strong>Age</strong> was modified from ""<strong>:old</strong>"" to ""<strong>:new</strong>""",fr,fr,"<strong>Age</strong> a été modifié de ""<strong>:old</strong>"" à ""<strong>:new</strong>""."
+device-audits,updated.modified.brand,"<strong>Brand</strong> was modified from ""<strong>:old</strong>"" to ""<strong>:new</strong>""","<strong>Brand</strong> was modified from ""<strong>:old</strong>"" to ""<strong>:new</strong>""",fr,fr,"<strong>Marque</strong> a été modifiée de ""<strong>:old</strong>"" à ""<strong>:new</strong>""."
+device-audits,updated.modified.category,"<strong>Category</strong> was modified from ""<strong>:old</strong>"" to ""<strong>:new</strong>""","<strong>Category</strong> was modified from ""<strong>:old</strong>"" to ""<strong>:new</strong>""",fr,fr,"<strong>Catégorie</strong> a été modifiée de ""<strong>:old</strong>"" à ""<strong>:new</strong>""."
+device-audits,updated.modified.category_creation,"<strong>Category Creation</strong> was modified from ""<strong>:old</strong>"" to ""<strong>:new</strong>""","<strong>Category Creation</strong> was modified from ""<strong>:old</strong>"" to ""<strong>:new</strong>""",fr,fr,"<strong>Création de catégorie</strong> a été modifié de ""<strong>:old</strong>"" à ""<strong>:new</strong>""."
+device-audits,updated.modified.do_it_yourself,"<strong>Do it yourself</strong> was modified from ""<strong>:old</strong>"" to ""<strong>:new</strong>""","<strong>Do it yourself</strong> was modified from ""<strong>:old</strong>"" to ""<strong>:new</strong>""",fr,fr,"<strong>Do it yourself</strong> a été modifié de ""<strong>:old</strong>"" à ""<strong>:new</strong>""."
+device-audits,updated.modified.estimate,"<strong>Estimate</strong> was modified from ""<strong>:old</strong>"" to ""<strong>:new</strong>""","<strong>Estimate</strong> was modified from ""<strong>:old</strong>"" to ""<strong>:new</strong>""",fr,fr,"<strong>Estimate</strong> a été modifié de ""<strong>:old</strong>"" à ""<strong>:new</strong>""."
+device-audits,updated.modified.event,"<strong>Event</strong> was modified from ""<strong>:old</strong>"" to ""<strong>:new</strong>""","<strong>Event</strong> was modified from ""<strong>:old</strong>"" to ""<strong>:new</strong>""",fr,fr,"<strong>Event</strong> a été modifié de ""<strong>:old</strong>"" à ""<strong>:new</strong>""."
+device-audits,updated.modified.model,"<strong>Model</strong> was modified from ""<strong>:old</strong>"" to ""<strong>:new</strong>""","<strong>Model</strong> was modified from ""<strong>:old</strong>"" to ""<strong>:new</strong>""",fr,fr,"<strong>Modèle</strong> a été modifié de ""<strong>:old</strong>"" à ""<strong>:new</strong>""."
+device-audits,updated.modified.more_time_needed,"<strong>More time needed</strong> was modified from ""<strong>:old</strong>"" to ""<strong>:new</strong>""","<strong>More time needed</strong> was modified from ""<strong>:old</strong>"" to ""<strong>:new</strong>""",fr,fr,"<strong>Plus de temps nécessaire</strong> a été modifié de ""<strong>:old</strong>"" à ""<strong>:new</strong>""."
+device-audits,updated.modified.problem,"<strong>Problem</strong> was modified from ""<strong>:old</strong>"" to ""<strong>:new</strong>""","<strong>Problem</strong> was modified from ""<strong>:old</strong>"" to ""<strong>:new</strong>""",fr,fr,"<strong>Problème</strong> a été modifié de ""<strong>:old</strong>"" à ""<strong>:new</strong>""."
+device-audits,updated.modified.professional_help,"<strong>Professional Help</strong> was modified from ""<strong>:old</strong>"" to ""<strong>:new</strong>""","<strong>Professional Help</strong> was modified from ""<strong>:old</strong>"" to ""<strong>:new</strong>""",fr,fr,"<strong>L'aide professionnelle</strong> a été modifiée de ""<strong>:old</strong>"" à ""<strong>:new</strong>""."
+device-audits,updated.modified.repair_status,"<strong>Repair Status</strong> was modified from ""<strong>:old</strong>"" to ""<strong>:new</strong>""","<strong>Repair Status</strong> was modified from ""<strong>:old</strong>"" to ""<strong>:new</strong>""",fr,fr,"<strong>État de la réparation</strong> a été modifié de ""<strong>:old</strong>"" à ""<strong>:new</strong>""."
+device-audits,updated.modified.repaired_by,"<strong>Reparied by</strong> was modified from ""<strong>:old</strong>"" to ""<strong>:new</strong>""","<strong>Reparied by</strong> was modified from ""<strong>:old</strong>"" to ""<strong>:new</strong>""",fr,fr,"<strong>Reparied by</strong> a été modifié de ""<strong>:old</strong>"" à ""<strong>:new</strong>""."
+device-audits,updated.modified.spare_parts,"<strong>Spare Parts</strong> was modified from ""<strong>:old</strong>"" to ""<strong>:new</strong>""","<strong>Spare Parts</strong> was modified from ""<strong>:old</strong>"" to ""<strong>:new</strong>""",fr,fr,"<strong>Pièces détachées</strong> a été modifié de ""<strong>:old</strong>"" à ""<strong>:new</strong>""."
+device-audits,updated.modified.wiki,"<strong>Wiki</strong> was modified from ""<strong>:old</strong>"" to ""<strong>:new</strong>""","<strong>Wiki</strong> was modified from ""<strong>:old</strong>"" to ""<strong>:new</strong>""",fr,fr,"<strong>Wiki</strong> a été modifié de ""<strong>:old</strong>"" à ""<strong>:new</strong>""."
+devices,age,Age,Âge,fr,fr,Âge
+devices,device_model_placeholder,"E.g. XPS, iPad, Viao, Wii","E.g. XPS, iPad, Viao, Wii",fr,fr,"Par exemple : XPS, iPad, Viao, Wii"
+devices,devices_date,Date,Date,fr,fr,Date
+event-audits,created.metadata,"On :audit_created_at, :user_name created record <strong>:audit_url</strong>","On :audit_created_at, :user_name created record <strong>:audit_url</strong>",fr,fr,"Le :audit_created_at, :user_name a créé l'enregistrement <strong>:audit_url</strong>."
+event-audits,created.modified.end,"<strong>Event End Time</strong> set as ""<strong>:new</strong>""","<strong>Event End Time</strong> set as ""<strong>:new</strong>""",fr,fr,"<strong>Heure de fin d'événement</strong> définie comme ""<strong>:new</strong>""."
+event-audits,created.modified.event_date,"<strong>Event Date</strong> set as ""<strong>:new</strong>""","<strong>Event Date</strong> set as ""<strong>:new</strong>""",fr,fr,"<strong>Date de l'événement</strong> définie comme ""<strong>:new</strong>"""
+event-audits,created.modified.free_text,"<strong>Free Text</strong> set as ""<strong>:new</strong>""","<strong>Free Text</strong> set as ""<strong>:new</strong>""",fr,fr,"<strong>Texte libre</strong> défini comme ""<strong>:new</strong>"""
+event-audits,created.modified.group,"<strong>Event Group ID</strong> set as ""<strong>:new</strong>""","<strong>Event Group ID</strong> set as ""<strong>:new</strong>""",fr,fr,"<L'ID du groupe d'événements est défini comme ""<strong>:new</strong>""."
+event-audits,created.modified.hours,"<strong>Event Hours</strong> set as ""<strong>:new</strong>""","<strong>Event Hours</strong> set as ""<strong>:new</strong>""",fr,fr,"<strong>Heures de l'événement</strong> défini comme ""<strong>:new</strong>"""
+event-audits,created.modified.idevents,"<strong>Event ID</strong> set as ""<strong>:new</strong>""","<strong>Event ID</strong> set as ""<strong>:new</strong>""",fr,fr,"<strong>ID de l'événement</strong> défini comme ""<strong>:new</strong>"""
+event-audits,created.modified.latitude,"<strong>Event Latitude</strong> set as ""<strong>:new</strong>""","<strong>Event Latitude</strong> set as ""<strong>:new</strong>""",fr,fr,"<strong>Latitude de l'événement</strong> définie comme ""<strong>:new</strong>""."
+event-audits,created.modified.location,"<strong>Event Location</strong> set as ""<strong>:new</strong>""","<strong>Event Location</strong> set as ""<strong>:new</strong>""",fr,fr,"<strong>L'emplacement de l'événement</strong> a été défini comme ""<strong>:new</strong>""."
+event-audits,created.modified.longitude,"<strong>Event Longitude</strong> set as ""<strong>:new</strong>""","<strong>Event Longitude</strong> set as ""<strong>:new</strong>""",fr,fr,"<strong>Longitude de l'événement</strong> définie comme ""<strong>:new</strong>""."
+event-audits,created.modified.pax,"<strong>pax</strong> set as ""<strong>:new</strong>""","<strong>pax</strong> set as ""<strong>:new</strong>""",fr,fr,"<strong>pax</strong> défini comme ""<strong>:new</strong>"""
+event-audits,created.modified.start,"<strong>Event Start Time</strong> set as ""<strong>:new</strong>""","<strong>Event Start Time</strong> set as ""<strong>:new</strong>""",fr,fr,"<strong>Heure de début de l'événement</strong> définie comme ""<strong>:new</strong>""."
+event-audits,created.modified.venue,"<strong>Event Name</strong> set as ""<strong>:new</strong>""","<strong>Event Name</strong> set as ""<strong>:new</strong>""",fr,fr,"<strong>Nom de l'évènement</strong> défini comme ""<strong>:new</strong>"""
+event-audits,created.modified.volunteers,"<strong>Quantity of Volunteers</strong> set as ""<strong>:new</strong>""","<strong>Quantity of Volunteers</strong> set as ""<strong>:new</strong>""",fr,fr,"<strong>Quantité de volontaires</strong> définie comme ""<strong>:new</strong>""."
+event-audits,unavailable_audits,"No changes have been made to this event!","No changes have been made to this event!",fr,fr,"Aucun changement n'a été apporté à cet événement !"
+event-audits,updated.metadata,"On :audit_created_at, :user_name updated record <strong>:audit_url</strong>","On :audit_created_at, :user_name updated record <strong>:audit_url</strong>",fr,fr,"Sur :audit_created_at, :user_name a mis à jour l'enregistrement <strong>:audit_url</strong>."
+event-audits,updated.modified.end,"<strong>Event End Time</strong> was modified from ""<strong>:old</strong>"" to ""<strong>:new</strong>""","<strong>Event End Time</strong> was modified from ""<strong>:old</strong>"" to ""<strong>:new</strong>""",fr,fr,"<strong>L'heure de fin de l'événement</strong> a été modifiée de ""<strong>:old</strong>"" à ""<strong>:new</strong>""."
+event-audits,updated.modified.event_date,"<strong>Event Date</strong> was modified from ""<strong>:old</strong>"" to ""<strong>:new</strong>""","<strong>Event Date</strong> was modified from ""<strong>:old</strong>"" to ""<strong>:new</strong>""",fr,fr,"<strong>Date de l'événement</strong> a été modifiée de ""<strong>:old</strong>"" à ""<strong>:new</strong>""."
+event-audits,updated.modified.free_text,"<strong>Free Text</strong> was modified from ""<strong>:old</strong>"" to ""<strong>:new</strong>""","<strong>Free Text</strong> was modified from ""<strong>:old</strong>"" to ""<strong>:new</strong>""",fr,fr,"<strong>Texte libre</strong> a été modifié de ""<strong>:old</strong>"" à ""<strong>:new</strong>""."
+event-audits,updated.modified.group,"<strong>Event Group ID</strong> was modified from ""<strong>:old</strong>"" to ""<strong>:new</strong>""","<strong>Event Group ID</strong> was modified from ""<strong>:old</strong>"" to ""<strong>:new</strong>""",fr,fr,"<strong>L'ID du groupe d'événements</strong> a été modifié de ""<strong>:old</strong>"" à ""<strong>:new</strong>""."
+event-audits,updated.modified.hours,"<strong>Event Hours</strong> was modified from ""<strong>:old</strong>"" to ""<strong>:new</strong>""","<strong>Event Hours</strong> was modified from ""<strong>:old</strong>"" to ""<strong>:new</strong>""",fr,fr,"<strong>Heures de l'événement</strong> a été modifié de ""<strong>:old</strong>"" à ""<strong>:new</strong>""."
+event-audits,updated.modified.latitude,"<strong>Event Latitude</strong> was modified from ""<strong>:old</strong>"" to ""<strong>:new</strong>""","<strong>Event Latitude</strong> was modified from ""<strong>:old</strong>"" to ""<strong>:new</strong>""",fr,fr,"<strong>Latitude de l'événement</strong> a été modifiée de ""<strong>:old</strong>"" à ""<strong>:new</strong>""."
+event-audits,updated.modified.location,"<strong>Event Location</strong> was modified from ""<strong>:old</strong>"" to ""<strong>:new</strong>""","<strong>Event Location</strong> was modified from ""<strong>:old</strong>"" to ""<strong>:new</strong>""",fr,fr,"<strong>L'emplacement de l'événement</strong> a été modifié de ""<strong>:old</strong>"" à ""<strong>:new</strong>""."
+event-audits,updated.modified.longitude,"<strong>Event Longitude</strong> was modified from ""<strong>:old</strong>"" to ""<strong>:new</strong>""","<strong>Event Longitude</strong> was modified from ""<strong>:old</strong>"" to ""<strong>:new</strong>""",fr,fr,"<strong>Longitude de l'événement</strong> a été modifiée de ""<strong>:old</strong>"" à ""<strong>:new</strong>""."
+event-audits,updated.modified.pax,"<strong>pax</strong> was modified from ""<strong>:old</strong>"" to ""<strong>:new</strong>""","<strong>pax</strong> was modified from ""<strong>:old</strong>"" to ""<strong>:new</strong>""",fr,fr,"<strong>pax</strong> a été modifié de ""<strong>:old</strong>"" à ""<strong>:new</strong>""."
+event-audits,updated.modified.start,"<strong>Event Start Time</strong> was modified from ""<strong>:old</strong>"" to ""<strong>:new</strong>""","<strong>Event Start Time</strong> was modified from ""<strong>:old</strong>"" to ""<strong>:new</strong>""",fr,fr,"<strong>L'heure de début de l'événement</strong> a été modifiée de ""<strong>:old</strong>"" à ""<strong>:new</strong>""."
+event-audits,updated.modified.venue,"<strong>Event Name</strong> was modified from ""<strong>:old</strong>"" to ""<strong>:new</strong>""","<strong>Event Name</strong> was modified from ""<strong>:old</strong>"" to ""<strong>:new</strong>""",fr,fr,"Le <strong>Nom de l'événement</strong> a été modifié de ""<strong>:old</strong>"" à ""<strong>:new</strong>""."
+event-audits,updated.modified.volunteers,"<strong>Quantity of Volunteers</strong> was modified from ""<strong>:old</strong>"" to ""<strong>:new</strong>""","<strong>Quantity of Volunteers</strong> was modified from ""<strong>:old</strong>"" to ""<strong>:new</strong>""",fr,fr,"<strong>Quantité de volontaires</strong> a été modifiée de ""<strong>:old</strong>"" à ""<strong>:new</strong>""."
+events,event_date,Date,Date,fr,fr,Date
+events,field_event_device_images_2,,,fr,fr,
+events,stat-0,Participants,Participants,fr,fr,Participants
+general,calendar_feed_help_url,/t/fixometer-how-to-subscribe-to-a-calendar,/t/fixometer-how-to-subscribe-to-a-calendar,fr,fr,/t/fixometer-comment-s'abonner-à-un-calendrier
+general,discourse_url,https://talk.restarters.net,https://talk.restarters.net,fr,fr,https://talk.restarters.net
+general,faq_url,https://therestartproject.org/faq,https://therestartproject.org/faq,fr,fr,https://therestartproject.org/faq
+general,filter-results,"Filter results","Filter results",fr,fr,"Filtrer les résultats"
+general,general,General,Général,fr,fr,Général
+general,help_feedback_url,https://talk.restarters.net/c/help,https://talk.restarters.net/c/help,fr,fr,https://talk.restarters.net/c/help
+general,login,Login,Login,fr,fr,Connexion
+general,menu_faq,FAQs,FAQs,fr,fr,FAQs
+general,menu_fixometer,Fixometer,Fixometer,fr,fr,Fixomètre
+general,menu_wiki,Wiki,Wiki,fr,fr,Wiki
+general,onboarding_content_1,"vel scelerisque nisl consectetur et. Aenean eu leo quam. Pellentesque ornare sem lacinia quam venenatis vestibulum. Cras mattis consectetur purus sit amet fermentum. ","vel scelerisque nisl consectetur et. Aenean eu leo quam. Pellentesque ornare sem lacinia quam venenatis vestibulum. Cras mattis consectetur purus sit amet fermentum. ",fr,fr,"vel scelerisque nisl consectetur et. Aenean eu leo quam. Pellentesque ornare sem lacinia quam venenatis vestibulum. Cras mattis consectetur purus sit amet fermentum."
+general,onboarding_content_2,"praesent commodo cursus magna, vel scelerisque nisl consectetur et. Aenean eu leo quam. Pellentesque ornare sem lacinia quam venenatis vestibulum. Cras mattis consectetur purus sit amet fermentum.","praesent commodo cursus magna, vel scelerisque nisl consectetur et. Aenean eu leo quam. Pellentesque ornare sem lacinia quam venenatis vestibulum. Cras mattis consectetur purus sit amet fermentum.",fr,fr,"praesent commodo cursus magna, vel scelerisque nisl consectetur et. Aenean eu leo quam. Pellentesque ornare sem lacinia quam venenatis vestibulum. Cras mattis consectetur purus sit amet fermentum."
+general,onboarding_content_3,"praesent commodo cursus magna, vel scelerisque nisl consectetur et. Aenean eu leo quam. Pellentesque ornare sem lacinia quam venenatis vestibulum. Cras mattis consectetur purus sit amet fermentum.","praesent commodo cursus magna, vel scelerisque nisl consectetur et. Aenean eu leo quam. Pellentesque ornare sem lacinia quam venenatis vestibulum. Cras mattis consectetur purus sit amet fermentum.",fr,fr,"praesent commodo cursus magna, vel scelerisque nisl consectetur et. Aenean eu leo quam. Pellentesque ornare sem lacinia quam venenatis vestibulum. Cras mattis consectetur purus sit amet fermentum."
+general,restartproject_url,https://therestartproject.org,https://therestartproject.org,fr,fr,https://therestartproject.org
+general,therestartproject,"The Restart Project","The Restart Project",fr,fr,"Le projet Restart"
+general,wiki_url,https://wiki.restarters.net,https://wiki.restarters.net,fr,fr,https://wiki.restarters.net
+group-audits,created.metadata,"On :audit_created_at, :user_name created record <strong>:audit_url</strong>","On :audit_created_at, :user_name created record <strong>:audit_url</strong>",fr,fr,"Le :audit_created_at, :user_name a créé l'enregistrement <strong>:audit_url</strong>."
+group-audits,created.modified.area,"<strong>Area</strong> set as ""<strong>:new</strong>""","<strong>Area</strong> set as ""<strong>:new</strong>""",fr,fr,"<strong>Aire</strong> définie comme ""<strong>:new</strong>"""
+group-audits,created.modified.country,"<strong>Country</strong> set as ""<strong>:new</strong>""","<strong>Country</strong> set as ""<strong>:new</strong>""",fr,fr,"<strong>Pays</strong> défini comme ""<strong>:new</strong>"""
+group-audits,created.modified.free_text,"<strong>Free Text</strong> set as ""<strong>:new</strong>""","<strong>Free Text</strong> set as ""<strong>:new</strong>""",fr,fr,"<strong>Texte libre</strong> défini comme ""<strong>:new</strong>"""
+group-audits,created.modified.idgroups,"<strong>Group ID</strong> set as ""<strong>:new</strong>""","<strong>Group ID</strong> set as ""<strong>:new</strong>""",fr,fr,"<strong>ID du groupe</strong> défini comme ""<strong>:new</strong>"""
+group-audits,created.modified.latitude,"<strong>Latitude</strong> set as ""<strong>:new</strong>""","<strong>Latitude</strong> set as ""<strong>:new</strong>""",fr,fr,"<strong>Latitude</strong> définie comme ""<strong>:new</strong>"""
+group-audits,created.modified.location,"<strong>Location</strong> set as ""<strong>:new</strong>""","<strong>Location</strong> set as ""<strong>:new</strong>""",fr,fr,"<strong>Location</strong> définie comme ""<strong>:new</strong>"""
+group-audits,created.modified.longitude,"<strong>Longitude</strong> set as ""<strong>:new</strong>""","<strong>Longitude</strong> set as ""<strong>:new</strong>""",fr,fr,"<strong>Longitude</strong> définie comme ""<strong>:new</strong>"""
+group-audits,created.modified.name,"<strong>Name</strong> set as ""<strong>:new</strong>""","<strong>Name</strong> set as ""<strong>:new</strong>""",fr,fr,"<strong>Nom</strong> défini comme ""<strong>:new</strong>"""
+group-audits,created.modified.website,"<strong>Website</strong> set as ""<strong>:new</strong>""","<strong>Website</strong> set as ""<strong>:new</strong>""",fr,fr,"<strong>Website</strong> défini comme ""<strong>:new</strong>"""
+group-audits,unavailable_audits,"No changes have been made to this group!","No changes have been made to this group!",fr,fr,"Aucune modification n'a été apportée à ce groupe !"
+group-audits,updated.metadata,"On :audit_created_at, :user_name updated record <strong>:audit_url</strong>","On :audit_created_at, :user_name updated record <strong>:audit_url</strong>",fr,fr,"Sur :audit_created_at, :user_name a mis à jour l'enregistrement <strong>:audit_url</strong>."
+group-audits,updated.modified.area,"<strong>Area</strong> was modified from ""<strong>:old</strong>"" to ""<strong>:new</strong>""","<strong>Area</strong> was modified from ""<strong>:old</strong>"" to ""<strong>:new</strong>""",fr,fr,"<strong>Area</strong> a été modifié de ""<strong>:old</strong>"" à ""<strong>:new</strong>""."
+group-audits,updated.modified.country,"<strong>Country</strong> was modified from ""<strong>:old</strong>"" to ""<strong>:new</strong>""","<strong>Country</strong> was modified from ""<strong>:old</strong>"" to ""<strong>:new</strong>""",fr,fr,"<strong>Pays</strong> a été modifié de ""<strong>:old</strong>"" à ""<strong>:new</strong>""."
+group-audits,updated.modified.free_text,"<strong>Free Text</strong> was modified from ""<strong>:old</strong>"" to ""<strong>:new</strong>""","<strong>Free Text</strong> was modified from ""<strong>:old</strong>"" to ""<strong>:new</strong>""",fr,fr,"<strong>Texte libre</strong> a été modifié de ""<strong>:old</strong>"" à ""<strong>:new</strong>""."
+group-audits,updated.modified.latitude,"<strong>Latitude</strong> was modified from ""<strong>:old</strong>"" to ""<strong>:new</strong>""","<strong>Latitude</strong> was modified from ""<strong>:old</strong>"" to ""<strong>:new</strong>""",fr,fr,"<strong>Latitude</strong> a été modifiée de ""<strong>:old</strong>"" à ""<strong>:new</strong>""."
+group-audits,updated.modified.location,"<strong>Location</strong> was modified from ""<strong>:old</strong>"" to ""<strong>:new</strong>""","<strong>Location</strong> was modified from ""<strong>:old</strong>"" to ""<strong>:new</strong>""",fr,fr,"<strong>Location</strong> a été modifiée de ""<strong>:old</strong>"" à ""<strong>:new</strong>""."
+group-audits,updated.modified.longitude,"<strong>Longitude</strong> was modified from ""<strong>:old</strong>"" to ""<strong>:new</strong>""","<strong>Longitude</strong> was modified from ""<strong>:old</strong>"" to ""<strong>:new</strong>""",fr,fr,"<strong>Longitude</strong> a été modifiée de ""<strong>:old</strong>"" à ""<strong>:new</strong>""."
+group-audits,updated.modified.name,"<strong>Name</strong> was modified from ""<strong>:old</strong>"" to ""<strong>:new</strong>""","<strong>Name</strong> was modified from ""<strong>:old</strong>"" to ""<strong>:new</strong>""",fr,fr,"<strong>Nom</strong> a été modifié de ""<strong>:old</strong>"" à ""<strong>:new</strong>""."
+group-audits,updated.modified.website,"<strong>Website</strong> was modified from ""<strong>:old</strong>"" to ""<strong>:new</strong>""","<strong>Website</strong> was modified from ""<strong>:old</strong>"" to ""<strong>:new</strong>""",fr,fr,"<strong>Le site web</strong> a été modifié de ""<strong>:old</strong>"" à ""<strong>:new</strong>""."
+groups,tag-1,"Tag 1","Tag 1",fr,fr,"Étiquette 1"
+groups,tag-2,"Tag 2","Tag 2",fr,fr,"Étiquette 2"
+groups,tag-3,"Tag 3","Tag 3",fr,fr,"Étiquette 3"
+groups,tag-4,"Tag 4","Tag 4",fr,fr,"Étiquette 4"
+groups,tag-5,"Tag 5","Tag 5",fr,fr,"Étiquette 5"
+groups,tag-6,"Tag 6","Tag 6",fr,fr,"Étiquette 6"
+groups,tag-7,"Tag 7","Tag 7",fr,fr,"Étiquette 7"
+groups,tag-8,"Tag 8","Tag 8",fr,fr,"Étiquette 8"
+notifications,notifications,Notifications,Notifications,fr,fr,Notifications
+partials,age,Age,Age,fr,fr,Âge
+partials,diy,"Do it yourself","Do It Yourself",fr,fr,"Faites-le vous-même"
+partials,information_up_to_date,"Keep your group information up to date!","Keep your group information up to date!",fr,fr,"Gardez les informations sur votre groupe à jour !"
+partials,information_up_to_date_text,"A fresh profile helps recruit more volunteers. Make sure to link to your website or social media channels.","A fresh profile helps recruit more volunteers. Make sure to link to your website or social media channels.",fr,fr,"Un profil frais aide à recruter davantage de volontaires. Veillez à créer un lien vers votre site web ou vos canaux de médias sociaux."
+partials,least_repaired,"Least repaired","Least repaired",fr,fr,"Le moins réparé"
+partials,model,Model,Model,fr,fr,Modèle
+partials,more_time,"More time needed","More time needed",fr,fr,"Plus de temps nécessaire"
+partials,most_repaired,"Most repaired","Most repaired",fr,fr,"Les plus réparés"
+partials,most_seen,"Most seen","Most seen",fr,fr,"Les plus vus"
+partials,n_a,N/A,N/A,fr,fr,N/A
+partials,no_devices_added,"No devices added","No devices added",fr,fr,"Aucun dispositif ajouté"
+partials,no_past_events,"No Past Events","No Past Events",fr,fr,"Aucun événement passé"
+partials,none_of_the_above,"No of the above","No of the above",fr,fr,"Aucun des éléments ci-dessus"
+partials,powered_only,"(calculated from powered items only)","(calculated from powered items only)",fr,fr,"(calculé à partir des articles alimentés uniquement)"
+partials,professional_help,"Professional help","Professional help",fr,fr,"Aide professionnelle"
+partials,read_more,"Read more","Read more",fr,fr,"Lire la suite"
+partials,remove_file,"Remove file","Remove file",fr,fr,"Supprimer le fichier"
+partials,remove_volunteer,"Remove volunteer","Remove volunteer",fr,fr,"Retirer le volontaire"
+partials,repair_details,"Next steps","Next steps",fr,fr,"Prochaines étapes"
+partials,repairable,Repairable,Repairable,fr,fr,Réparable
+partials,spare_parts,"Spare parts","Spare parts",fr,fr,"Pièces de rechange"
+partials,status,"Repair status","Repair status",fr,fr,"État des réparations"
+partials,this_event_hasnt_started,"This event hasn't started","This event hasn't started",fr,fr,"Cet événement n'a pas commencé"
+partials,upcoming_events_text,"If possible, the best way to get involved is to go to an event, see how it works, and participate","If possible, the best way to get involved is to go to an event, see how it works, and participate",fr,fr,"Si possible, la meilleure façon de s'impliquer est d'aller à un événement, de voir comment il fonctionne et de participer."
+partials,update,Update,Update,fr,fr,"Mise à jour"
+partials,welcome_text,"We offer materials on how to help others fix their electronics at community events: on how to share your repair skills in your community and help organise events","We offer materials on how to help others fix their electronics at community events: on how to share your repair skills in your community and help organise events",fr,fr,"Nous proposons des documents sur la manière d'aider les autres à réparer leurs appareils électroniques lors d'événements communautaires : comment partager vos compétences en matière de réparation dans votre communauté et aider à organiser des événements."
+partials,welcome_title,"Getting started in community repair","Getting started in community repair",fr,fr,"Se lancer dans la réparation communautaire"
+partials,wiki_title,Wiki,Wiki,fr,fr,Wiki
+partials,yes,Yes,Yes,fr,fr,Oui
+partials,your_recent_events,"Your recent events","Your recent events",fr,fr,"Vos événements récents"
+partials,your_recent_events_txt1,"These are events you RSVP'ed to, or where a host logged your participation.","These are events you RSVP'ed to, or where a host logged your participation.",fr,fr,"Il s'agit d'événements auxquels vous avez répondu par RSVP ou pour lesquels un hôte a enregistré votre participation."
+partials,your_recent_events_txt2,"Here's a list of recent events you have been a part of - all important contributions to your community and the environment.","Here's a list of recent events you have been a part of - all important contributions to your community and the environment.",fr,fr,"Voici une liste d'événements récents auxquels vous avez participé - autant de contributions importantes pour votre communauté et l'environnement."
+printcatora,task.suggestions,Suggestions,Suggestions,fr,fr,Suggestions
+registration,reg-alert-1,"Thank you for your registration, please complete your profile below to continue","Thank you for your registration, please complete your profile below to continue",fr,fr,"Merci pour votre inscription, veuillez compléter votre profil ci-dessous pour continuer"
+registration,reg-step-4-label3,"<strong>Historical Repair Data</strong>. I give a perpetual royalty-free license to any of my previous repair data contributions to The Restart Project. The license allows Restart to distribute the data under any open license and to retain any non-personal data even in case I request deletion of my personal profile on the Fixometer. (<i>Read more about how we use repair data <a href=""https://therestartproject.org/fixometer/why-we-collect-repair-data/"" rel=""noopener noreferrer"" target=""_blank"">here</a></i>.)","<strong>Historical Repair Data</strong>. I give a perpetual royalty-free license to any of my previous repair data contributions to The Restart Project. The license allows Restart to distribute the data under any open license and to retain any non-personal data even in case I request deletion of my personal profile on the Fixometer. (<i>Read more about how we use repair data <a href=""https://therestartproject.org/fixometer/why-we-collect-repair-data/"" rel=""noopener noreferrer"" target=""_blank"">here</a></i>.)",fr,fr,"<strong>Données historiques de réparation</strong>. Je donne une licence perpétuelle et libre de droits pour toutes mes contributions précédentes de données de réparation au projet Restart. La licence permet à Restart de distribuer les données sous n'importe quelle licence ouverte et de conserver toute donnée non personnelle même dans le cas où je demande la suppression de mon profil personnel sur le Fixometer. (<i>Lire plus sur la façon dont nous utilisons les données de réparation <a href=""https://therestartproject.org/fixometer/why-we-collect-repair-data/"" rel=""noopener noreferrer"" target=""_blank"">ici</a></i>.)"
+reporting,region,Region,Région,fr,fr,Région
+tabicatora,task.suggestions,Suggestions,Suggestions,fr,fr,Suggestions
+_json,Bluetooth,Bluetooth,Bluetooth,fr-BE,fr,Bluetooth
+_json,Camera,Camera,Caméra,fr-BE,fr,"Appareil photo"
+_json,Configuration,Configuration,Configuration,fr-BE,fr,Configuration
+_json,Microphone,Microphone,Microphone,fr-BE,fr,Microphone
+_json,Performance,Performance,Performance,fr-BE,fr,Performance
+_json,Scanner,Scanner,Scanner,fr-BE,fr,Scanner
+_json,Software/OS,Software/OS,Software/OS,fr-BE,fr,Logiciel/OS
+_json,Toner,Toner,Toner,fr-BE,fr,Toner
+admin,categories,Categories,Catégories,fr-BE,fr,Catégories
+admin,description,Description,Description,fr-BE,fr,Description
+device-audits,created.metadata,"On :audit_created_at, :user_name created record <strong>:audit_url</strong>","On :audit_created_at, :user_name created record <strong>:audit_url</strong>",fr-BE,fr,"Le :audit_created_at, :user_name a créé l'enregistrement <strong>:audit_url</strong>."
+device-audits,created.modified.age,"<strong>Age</strong> set as ""<strong>:new</strong>""","<strong>Age</strong> set as ""<strong>:new</strong>""",fr-BE,fr,"<strong>Age</strong> défini comme ""<strong>:new</strong>"""
+device-audits,created.modified.brand,"<strong>Brand</strong> set as ""<strong>:new</strong>""","<strong>Brand</strong> set as ""<strong>:new</strong>""",fr-BE,fr,"<strong>Marque</strong> définie comme ""<strong>:new</strong>"""
+device-audits,created.modified.category,"<strong>Category</strong> set as ""<strong>:new</strong>""","<strong>Category</strong> set as ""<strong>:new</strong>""",fr-BE,fr,"<strong>Catégorie</strong> définie comme ""<strong>:new</strong>"""
+device-audits,created.modified.category_creation,"<strong>Category Creation</strong> set as ""<strong>:new</strong>""","<strong>Category Creation</strong> set as ""<strong>:new</strong>""",fr-BE,fr,"<strong>Création de catégorie</strong> définie comme ""<strong>:new</strong>""."
+device-audits,created.modified.do_it_yourself,"<strong>Do it yourself</strong> set as ""<strong>:new</strong>""","<strong>Do it yourself</strong> set as ""<strong>:new</strong>""",fr-BE,fr,"<strong>Faites-le vous-même</strong> défini comme ""<strong>:new</strong>"""
+device-audits,created.modified.estimate,"<strong>Estimate</strong> set as ""<strong>:new</strong>""","<strong>Estimate</strong> set as ""<strong>:new</strong>""",fr-BE,fr,"<strong>Estimate</strong> défini comme ""<strong>:new</strong>"""
+device-audits,created.modified.event,"<strong>Event</strong> set as ""<strong>:new</strong>""","<strong>Event</strong> set as ""<strong>:new</strong>""",fr-BE,fr,"<strong>Event</strong> défini comme ""<strong>:new</strong>"""
+device-audits,created.modified.iddevices,"<strong>Device ID</strong> set as ""<strong>:new</strong>""","<strong>Device ID</strong> set as ""<strong>:new</strong>""",fr-BE,fr,"<strong>Device ID</strong> défini comme ""<strong>:new</strong>"""
+device-audits,created.modified.model,"<strong>Model</strong> set as ""<strong>:new</strong>""","<strong>Model</strong> set as ""<strong>:new</strong>""",fr-BE,fr,"<strong>Modèle</strong> défini comme ""<strong>:new</strong>"""
+device-audits,created.modified.more_time_needed,"<strong>More time needed</strong> set as ""<strong>:new</strong>""","<strong>More time needed</strong> set as ""<strong>:new</strong>""",fr-BE,fr,"<strong>Plus de temps nécessaire</strong> fixé comme ""<strong>:nouveau</strong>""."
+device-audits,created.modified.problem,"<strong>Problem</strong> set as ""<strong>:new</strong>""","<strong>Problem</strong> set as ""<strong>:new</strong>""",fr-BE,fr,"<strong>Problème</strong> défini comme ""<strong>:new</strong>"""
+device-audits,created.modified.professional_help,"<strong>Professional Help</strong> set as ""<strong>:new</strong>""","<strong>Professional Help</strong> set as ""<strong>:new</strong>""",fr-BE,fr,"<strong>Aide professionnelle</strong> défini comme ""<strong>:new</strong>"""
+device-audits,created.modified.repair_status,"<strong>Repair Status</strong> set as ""<strong>:new</strong>""","<strong>Repair Status</strong> set as ""<strong>:new</strong>""",fr-BE,fr,"<L'état de réparation a été fixé à ""<strong>:new</strong>""."
+device-audits,created.modified.repaired_by,"<strong>Reparied by</strong> set as ""<strong>:new</strong>""","<strong>Reparied by</strong> set as ""<strong>:new</strong>""",fr-BE,fr,"<strong>Reparied by</strong> défini comme ""<strong>:new</strong>""."
+device-audits,created.modified.spare_parts,"<strong>Spare Parts</strong> set as ""<strong>:new</strong>""","<strong>Spare Parts</strong> set as ""<strong>:new</strong>""",fr-BE,fr,"<strong>Pièces détachées</strong> définies comme ""<strong>:new</strong>""."
+device-audits,created.modified.wiki,"<strong>Wiki</strong> set as ""<strong>:new</strong>""","<strong>Wiki</strong> set as ""<strong>:new</strong>""",fr-BE,fr,"<strong>Wiki</strong> défini comme ""<strong>:new</strong>"""
+device-audits,updated.metadata,"On :audit_created_at, :user_name updated record <strong>:audit_url</strong>","On :audit_created_at, :user_name updated record <strong>:audit_url</strong>",fr-BE,fr,"Sur :audit_created_at, :user_name a mis à jour l'enregistrement <strong>:audit_url</strong>."
+device-audits,updated.modified.age,"<strong>Age</strong> was modified from ""<strong>:old</strong>"" to ""<strong>:new</strong>""","<strong>Age</strong> was modified from ""<strong>:old</strong>"" to ""<strong>:new</strong>""",fr-BE,fr,"<strong>Age</strong> a été modifié de ""<strong>:old</strong>"" à ""<strong>:new</strong>""."
+device-audits,updated.modified.brand,"<strong>Brand</strong> was modified from ""<strong>:old</strong>"" to ""<strong>:new</strong>""","<strong>Brand</strong> was modified from ""<strong>:old</strong>"" to ""<strong>:new</strong>""",fr-BE,fr,"<strong>Marque</strong> a été modifiée de ""<strong>:old</strong>"" à ""<strong>:new</strong>""."
+device-audits,updated.modified.category,"<strong>Category</strong> was modified from ""<strong>:old</strong>"" to ""<strong>:new</strong>""","<strong>Category</strong> was modified from ""<strong>:old</strong>"" to ""<strong>:new</strong>""",fr-BE,fr,"<strong>Catégorie</strong> a été modifiée de ""<strong>:old</strong>"" à ""<strong>:new</strong>""."
+device-audits,updated.modified.category_creation,"<strong>Category Creation</strong> was modified from ""<strong>:old</strong>"" to ""<strong>:new</strong>""","<strong>Category Creation</strong> was modified from ""<strong>:old</strong>"" to ""<strong>:new</strong>""",fr-BE,fr,"<strong>Création de catégorie</strong> a été modifié de ""<strong>:old</strong>"" à ""<strong>:new</strong>""."
+device-audits,updated.modified.do_it_yourself,"<strong>Do it yourself</strong> was modified from ""<strong>:old</strong>"" to ""<strong>:new</strong>""","<strong>Do it yourself</strong> was modified from ""<strong>:old</strong>"" to ""<strong>:new</strong>""",fr-BE,fr,"<strong>Do it yourself</strong> a été modifié de ""<strong>:old</strong>"" à ""<strong>:new</strong>""."
+device-audits,updated.modified.estimate,"<strong>Estimate</strong> was modified from ""<strong>:old</strong>"" to ""<strong>:new</strong>""","<strong>Estimate</strong> was modified from ""<strong>:old</strong>"" to ""<strong>:new</strong>""",fr-BE,fr,"<strong>Estimate</strong> a été modifié de ""<strong>:old</strong>"" à ""<strong>:new</strong>""."
+device-audits,updated.modified.event,"<strong>Event</strong> was modified from ""<strong>:old</strong>"" to ""<strong>:new</strong>""","<strong>Event</strong> was modified from ""<strong>:old</strong>"" to ""<strong>:new</strong>""",fr-BE,fr,"<strong>Event</strong> a été modifié de ""<strong>:old</strong>"" à ""<strong>:new</strong>""."
+device-audits,updated.modified.model,"<strong>Model</strong> was modified from ""<strong>:old</strong>"" to ""<strong>:new</strong>""","<strong>Model</strong> was modified from ""<strong>:old</strong>"" to ""<strong>:new</strong>""",fr-BE,fr,"<strong>Modèle</strong> a été modifié de ""<strong>:old</strong>"" à ""<strong>:new</strong>""."
+device-audits,updated.modified.more_time_needed,"<strong>More time needed</strong> was modified from ""<strong>:old</strong>"" to ""<strong>:new</strong>""","<strong>More time needed</strong> was modified from ""<strong>:old</strong>"" to ""<strong>:new</strong>""",fr-BE,fr,"<strong>Plus de temps nécessaire</strong> a été modifié de ""<strong>:old</strong>"" à ""<strong>:new</strong>""."
+device-audits,updated.modified.problem,"<strong>Problem</strong> was modified from ""<strong>:old</strong>"" to ""<strong>:new</strong>""","<strong>Problem</strong> was modified from ""<strong>:old</strong>"" to ""<strong>:new</strong>""",fr-BE,fr,"<strong>Problème</strong> a été modifié de ""<strong>:old</strong>"" à ""<strong>:new</strong>""."
+device-audits,updated.modified.professional_help,"<strong>Professional Help</strong> was modified from ""<strong>:old</strong>"" to ""<strong>:new</strong>""","<strong>Professional Help</strong> was modified from ""<strong>:old</strong>"" to ""<strong>:new</strong>""",fr-BE,fr,"<strong>L'aide professionnelle</strong> a été modifiée de ""<strong>:old</strong>"" à ""<strong>:new</strong>""."
+device-audits,updated.modified.repair_status,"<strong>Repair Status</strong> was modified from ""<strong>:old</strong>"" to ""<strong>:new</strong>""","<strong>Repair Status</strong> was modified from ""<strong>:old</strong>"" to ""<strong>:new</strong>""",fr-BE,fr,"<strong>État de la réparation</strong> a été modifié de ""<strong>:old</strong>"" à ""<strong>:new</strong>""."
+device-audits,updated.modified.repaired_by,"<strong>Reparied by</strong> was modified from ""<strong>:old</strong>"" to ""<strong>:new</strong>""","<strong>Reparied by</strong> was modified from ""<strong>:old</strong>"" to ""<strong>:new</strong>""",fr-BE,fr,"<strong>Reparied by</strong> a été modifié de ""<strong>:old</strong>"" à ""<strong>:new</strong>""."
+device-audits,updated.modified.spare_parts,"<strong>Spare Parts</strong> was modified from ""<strong>:old</strong>"" to ""<strong>:new</strong>""","<strong>Spare Parts</strong> was modified from ""<strong>:old</strong>"" to ""<strong>:new</strong>""",fr-BE,fr,"<strong>Pièces détachées</strong> a été modifié de ""<strong>:old</strong>"" à ""<strong>:new</strong>""."
+device-audits,updated.modified.wiki,"<strong>Wiki</strong> was modified from ""<strong>:old</strong>"" to ""<strong>:new</strong>""","<strong>Wiki</strong> was modified from ""<strong>:old</strong>"" to ""<strong>:new</strong>""",fr-BE,fr,"<strong>Wiki</strong> a été modifié de ""<strong>:old</strong>"" à ""<strong>:new</strong>""."
+devices,age,Age,Âge,fr-BE,fr,Âge
+devices,devices_date,Date,Date,fr-BE,fr,Date
+devices,fixometer,Fixometer,Fixometer,fr-BE,fr,Fixomètre
+devices,images,Images,Images,fr-BE,fr,Images
+devices,n/a,N/A,N/A,fr-BE,fr,N/A
+devices,participants,participants,Participants,fr-BE,fr,participants
+event-audits,created.metadata,"On :audit_created_at, :user_name created record <strong>:audit_url</strong>","On :audit_created_at, :user_name created record <strong>:audit_url</strong>",fr-BE,fr,"Le :audit_created_at, :user_name a créé l'enregistrement <strong>:audit_url</strong>."
+event-audits,created.modified.end,"<strong>Event End Time</strong> set as ""<strong>:new</strong>""","<strong>Event End Time</strong> set as ""<strong>:new</strong>""",fr-BE,fr,"<strong>Heure de fin d'événement</strong> définie comme ""<strong>:new</strong>""."
+event-audits,created.modified.event_date,"<strong>Event Date</strong> set as ""<strong>:new</strong>""","<strong>Event Date</strong> set as ""<strong>:new</strong>""",fr-BE,fr,"<strong>Date de l'événement</strong> définie comme ""<strong>:new</strong>"""
+event-audits,created.modified.free_text,"<strong>Free Text</strong> set as ""<strong>:new</strong>""","<strong>Free Text</strong> set as ""<strong>:new</strong>""",fr-BE,fr,"<strong>Texte libre</strong> défini comme ""<strong>:new</strong>"""
+event-audits,created.modified.group,"<strong>Event Group ID</strong> set as ""<strong>:new</strong>""","<strong>Event Group ID</strong> set as ""<strong>:new</strong>""",fr-BE,fr,"<L'ID du groupe d'événements est défini comme ""<strong>:new</strong>""."
+event-audits,created.modified.hours,"<strong>Event Hours</strong> set as ""<strong>:new</strong>""","<strong>Event Hours</strong> set as ""<strong>:new</strong>""",fr-BE,fr,"<strong>Heures de l'événement</strong> défini comme ""<strong>:new</strong>"""
+event-audits,created.modified.idevents,"<strong>Event ID</strong> set as ""<strong>:new</strong>""","<strong>Event ID</strong> set as ""<strong>:new</strong>""",fr-BE,fr,"<strong>ID de l'événement</strong> défini comme ""<strong>:new</strong>"""
+event-audits,created.modified.latitude,"<strong>Event Latitude</strong> set as ""<strong>:new</strong>""","<strong>Event Latitude</strong> set as ""<strong>:new</strong>""",fr-BE,fr,"<strong>Latitude de l'événement</strong> définie comme ""<strong>:new</strong>""."
+event-audits,created.modified.location,"<strong>Event Location</strong> set as ""<strong>:new</strong>""","<strong>Event Location</strong> set as ""<strong>:new</strong>""",fr-BE,fr,"<strong>L'emplacement de l'événement</strong> a été défini comme ""<strong>:new</strong>""."
+event-audits,created.modified.longitude,"<strong>Event Longitude</strong> set as ""<strong>:new</strong>""","<strong>Event Longitude</strong> set as ""<strong>:new</strong>""",fr-BE,fr,"<strong>Longitude de l'événement</strong> définie comme ""<strong>:new</strong>""."
+event-audits,created.modified.pax,"<strong>pax</strong> set as ""<strong>:new</strong>""","<strong>pax</strong> set as ""<strong>:new</strong>""",fr-BE,fr,"<strong>pax</strong> défini comme ""<strong>:new</strong>"""
+event-audits,created.modified.start,"<strong>Event Start Time</strong> set as ""<strong>:new</strong>""","<strong>Event Start Time</strong> set as ""<strong>:new</strong>""",fr-BE,fr,"<strong>Heure de début de l'événement</strong> définie comme ""<strong>:new</strong>""."
+event-audits,created.modified.venue,"<strong>Event Name</strong> set as ""<strong>:new</strong>""","<strong>Event Name</strong> set as ""<strong>:new</strong>""",fr-BE,fr,"<strong>Nom de l'évènement</strong> défini comme ""<strong>:new</strong>"""
+event-audits,created.modified.volunteers,"<strong>Quantity of Volunteers</strong> set as ""<strong>:new</strong>""","<strong>Quantity of Volunteers</strong> set as ""<strong>:new</strong>""",fr-BE,fr,"<strong>Quantité de volontaires</strong> définie comme ""<strong>:new</strong>""."
+event-audits,unavailable_audits,"No changes have been made to this event!","No changes have been made to this event!",fr-BE,fr,"Aucun changement n'a été apporté à cet événement !"
+event-audits,updated.metadata,"On :audit_created_at, :user_name updated record <strong>:audit_url</strong>","On :audit_created_at, :user_name updated record <strong>:audit_url</strong>",fr-BE,fr,"Sur :audit_created_at, :user_name a mis à jour l'enregistrement <strong>:audit_url</strong>."
+event-audits,updated.modified.end,"<strong>Event End Time</strong> was modified from ""<strong>:old</strong>"" to ""<strong>:new</strong>""","<strong>Event End Time</strong> was modified from ""<strong>:old</strong>"" to ""<strong>:new</strong>""",fr-BE,fr,"<strong>L'heure de fin de l'événement</strong> a été modifiée de ""<strong>:old</strong>"" à ""<strong>:new</strong>""."
+event-audits,updated.modified.event_date,"<strong>Event Date</strong> was modified from ""<strong>:old</strong>"" to ""<strong>:new</strong>""","<strong>Event Date</strong> was modified from ""<strong>:old</strong>"" to ""<strong>:new</strong>""",fr-BE,fr,"<strong>Date de l'événement</strong> a été modifiée de ""<strong>:old</strong>"" à ""<strong>:new</strong>""."
+event-audits,updated.modified.free_text,"<strong>Free Text</strong> was modified from ""<strong>:old</strong>"" to ""<strong>:new</strong>""","<strong>Free Text</strong> was modified from ""<strong>:old</strong>"" to ""<strong>:new</strong>""",fr-BE,fr,"<strong>Texte libre</strong> a été modifié de ""<strong>:old</strong>"" à ""<strong>:new</strong>""."
+event-audits,updated.modified.group,"<strong>Event Group ID</strong> was modified from ""<strong>:old</strong>"" to ""<strong>:new</strong>""","<strong>Event Group ID</strong> was modified from ""<strong>:old</strong>"" to ""<strong>:new</strong>""",fr-BE,fr,"<strong>L'ID du groupe d'événements</strong> a été modifié de ""<strong>:old</strong>"" à ""<strong>:new</strong>""."
+event-audits,updated.modified.hours,"<strong>Event Hours</strong> was modified from ""<strong>:old</strong>"" to ""<strong>:new</strong>""","<strong>Event Hours</strong> was modified from ""<strong>:old</strong>"" to ""<strong>:new</strong>""",fr-BE,fr,"<strong>Heures de l'événement</strong> a été modifié de ""<strong>:old</strong>"" à ""<strong>:new</strong>""."
+event-audits,updated.modified.latitude,"<strong>Event Latitude</strong> was modified from ""<strong>:old</strong>"" to ""<strong>:new</strong>""","<strong>Event Latitude</strong> was modified from ""<strong>:old</strong>"" to ""<strong>:new</strong>""",fr-BE,fr,"<strong>Latitude de l'événement</strong> a été modifiée de ""<strong>:old</strong>"" à ""<strong>:new</strong>""."
+event-audits,updated.modified.location,"<strong>Event Location</strong> was modified from ""<strong>:old</strong>"" to ""<strong>:new</strong>""","<strong>Event Location</strong> was modified from ""<strong>:old</strong>"" to ""<strong>:new</strong>""",fr-BE,fr,"<strong>L'emplacement de l'événement</strong> a été modifié de ""<strong>:old</strong>"" à ""<strong>:new</strong>""."
+event-audits,updated.modified.longitude,"<strong>Event Longitude</strong> was modified from ""<strong>:old</strong>"" to ""<strong>:new</strong>""","<strong>Event Longitude</strong> was modified from ""<strong>:old</strong>"" to ""<strong>:new</strong>""",fr-BE,fr,"<strong>Longitude de l'événement</strong> a été modifiée de ""<strong>:old</strong>"" à ""<strong>:new</strong>""."
+event-audits,updated.modified.pax,"<strong>pax</strong> was modified from ""<strong>:old</strong>"" to ""<strong>:new</strong>""","<strong>pax</strong> was modified from ""<strong>:old</strong>"" to ""<strong>:new</strong>""",fr-BE,fr,"<strong>pax</strong> a été modifié de ""<strong>:old</strong>"" à ""<strong>:new</strong>""."
+event-audits,updated.modified.start,"<strong>Event Start Time</strong> was modified from ""<strong>:old</strong>"" to ""<strong>:new</strong>""","<strong>Event Start Time</strong> was modified from ""<strong>:old</strong>"" to ""<strong>:new</strong>""",fr-BE,fr,"<strong>L'heure de début de l'événement</strong> a été modifiée de ""<strong>:old</strong>"" à ""<strong>:new</strong>""."
+event-audits,updated.modified.venue,"<strong>Event Name</strong> was modified from ""<strong>:old</strong>"" to ""<strong>:new</strong>""","<strong>Event Name</strong> was modified from ""<strong>:old</strong>"" to ""<strong>:new</strong>""",fr-BE,fr,"Le <strong>Nom de l'événement</strong> a été modifié de ""<strong>:old</strong>"" à ""<strong>:new</strong>""."
+event-audits,updated.modified.volunteers,"<strong>Quantity of Volunteers</strong> was modified from ""<strong>:old</strong>"" to ""<strong>:new</strong>""","<strong>Quantity of Volunteers</strong> was modified from ""<strong>:old</strong>"" to ""<strong>:new</strong>""",fr-BE,fr,"<strong>Quantité de volontaires</strong> a été modifiée de ""<strong>:old</strong>"" à ""<strong>:new</strong>""."
+events,age,Age,Age,fr-BE,fr,Âge
+events,calendar_google,"Google Calendar","Google Calendar",fr-BE,fr,"Google Agenda"
+events,calendar_ical,iCal,iCal,fr-BE,fr,iCal
+events,calendar_outlook,Outlook,Outlook,fr-BE,fr,Outlook
+events,calendar_yahoo,"Yahoo Calendar","Yahoo Calendar",fr-BE,fr,"Calendrier Yahoo"
+events,event_date,Date,Date,fr-BE,fr,Date
+events,event_description,Description,Description,fr-BE,fr,Description
+events,participants,Participants,Participants,fr-BE,fr,Participants
+events,stat-0,Participants,Participants,fr-BE,fr,Participants
+general,calendar_feed_help_url,/t/fixometer-how-to-subscribe-to-a-calendar,/t/fixometer-how-to-subscribe-to-a-calendar,fr-BE,fr,/t/fixometer-comment-s'abonner-à-un-calendrier
+general,discourse_url,https://talk.restarters.net,https://talk.restarters.net,fr-BE,fr,https://talk.restarters.net
+general,faq_url,https://therestartproject.org/faq,https://therestartproject.org/faq,fr-BE,fr,https://therestartproject.org/faq
+general,general,General,Général,fr-BE,fr,Général
+general,help_feedback_url,https://talk.restarters.net/c/help,https://talk.restarters.net/c/help,fr-BE,fr,https://talk.restarters.net/c/help
+general,menu_faq,FAQs,FAQs,fr-BE,fr,FAQs
+general,menu_fixometer,Fixometer,Fixometer,fr-BE,fr,Fixomètre
+general,menu_wiki,Wiki,Wiki,fr-BE,fr,Wiki
+general,onboarding_content_1,"vel scelerisque nisl consectetur et. Aenean eu leo quam. Pellentesque ornare sem lacinia quam venenatis vestibulum. Cras mattis consectetur purus sit amet fermentum. ","vel scelerisque nisl consectetur et. Aenean eu leo quam. Pellentesque ornare sem lacinia quam venenatis vestibulum. Cras mattis consectetur purus sit amet fermentum. ",fr-BE,fr,"vel scelerisque nisl consectetur et. Aenean eu leo quam. Pellentesque ornare sem lacinia quam venenatis vestibulum. Cras mattis consectetur purus sit amet fermentum."
+general,onboarding_content_2,"praesent commodo cursus magna, vel scelerisque nisl consectetur et. Aenean eu leo quam. Pellentesque ornare sem lacinia quam venenatis vestibulum. Cras mattis consectetur purus sit amet fermentum.","praesent commodo cursus magna, vel scelerisque nisl consectetur et. Aenean eu leo quam. Pellentesque ornare sem lacinia quam venenatis vestibulum. Cras mattis consectetur purus sit amet fermentum.",fr-BE,fr,"praesent commodo cursus magna, vel scelerisque nisl consectetur et. Aenean eu leo quam. Pellentesque ornare sem lacinia quam venenatis vestibulum. Cras mattis consectetur purus sit amet fermentum."
+general,onboarding_content_3,"praesent commodo cursus magna, vel scelerisque nisl consectetur et. Aenean eu leo quam. Pellentesque ornare sem lacinia quam venenatis vestibulum. Cras mattis consectetur purus sit amet fermentum.","praesent commodo cursus magna, vel scelerisque nisl consectetur et. Aenean eu leo quam. Pellentesque ornare sem lacinia quam venenatis vestibulum. Cras mattis consectetur purus sit amet fermentum.",fr-BE,fr,"praesent commodo cursus magna, vel scelerisque nisl consectetur et. Aenean eu leo quam. Pellentesque ornare sem lacinia quam venenatis vestibulum. Cras mattis consectetur purus sit amet fermentum."
+general,restartproject_url,https://therestartproject.org,https://therestartproject.org,fr-BE,fr,https://therestartproject.org
+general,therestartproject,"The Restart Project","The Restart Project",fr-BE,fr,"Le projet Restart"
+general,wiki_url,https://wiki.restarters.net,https://wiki.restarters.net,fr-BE,fr,https://wiki.restarters.net
+group-audits,created.metadata,"On :audit_created_at, :user_name created record <strong>:audit_url</strong>","On :audit_created_at, :user_name created record <strong>:audit_url</strong>",fr-BE,fr,"Le :audit_created_at, :user_name a créé l'enregistrement <strong>:audit_url</strong>."
+group-audits,created.modified.area,"<strong>Area</strong> set as ""<strong>:new</strong>""","<strong>Area</strong> set as ""<strong>:new</strong>""",fr-BE,fr,"<strong>Aire</strong> définie comme ""<strong>:new</strong>"""
+group-audits,created.modified.country,"<strong>Country</strong> set as ""<strong>:new</strong>""","<strong>Country</strong> set as ""<strong>:new</strong>""",fr-BE,fr,"<strong>Pays</strong> défini comme ""<strong>:new</strong>"""
+group-audits,created.modified.free_text,"<strong>Free Text</strong> set as ""<strong>:new</strong>""","<strong>Free Text</strong> set as ""<strong>:new</strong>""",fr-BE,fr,"<strong>Texte libre</strong> défini comme ""<strong>:new</strong>"""
+group-audits,created.modified.idgroups,"<strong>Group ID</strong> set as ""<strong>:new</strong>""","<strong>Group ID</strong> set as ""<strong>:new</strong>""",fr-BE,fr,"<strong>ID du groupe</strong> défini comme ""<strong>:new</strong>"""
+group-audits,created.modified.latitude,"<strong>Latitude</strong> set as ""<strong>:new</strong>""","<strong>Latitude</strong> set as ""<strong>:new</strong>""",fr-BE,fr,"<strong>Latitude</strong> définie comme ""<strong>:new</strong>"""
+group-audits,created.modified.location,"<strong>Location</strong> set as ""<strong>:new</strong>""","<strong>Location</strong> set as ""<strong>:new</strong>""",fr-BE,fr,"<strong>Location</strong> définie comme ""<strong>:new</strong>"""
+group-audits,created.modified.longitude,"<strong>Longitude</strong> set as ""<strong>:new</strong>""","<strong>Longitude</strong> set as ""<strong>:new</strong>""",fr-BE,fr,"<strong>Longitude</strong> définie comme ""<strong>:new</strong>"""
+group-audits,created.modified.name,"<strong>Name</strong> set as ""<strong>:new</strong>""","<strong>Name</strong> set as ""<strong>:new</strong>""",fr-BE,fr,"<strong>Nom</strong> défini comme ""<strong>:new</strong>"""
+group-audits,created.modified.website,"<strong>Website</strong> set as ""<strong>:new</strong>""","<strong>Website</strong> set as ""<strong>:new</strong>""",fr-BE,fr,"<strong>Website</strong> défini comme ""<strong>:new</strong>"""
+group-audits,unavailable_audits,"No changes have been made to this group!","No changes have been made to this group!",fr-BE,fr,"Aucune modification n'a été apportée à ce groupe !"
+group-audits,updated.metadata,"On :audit_created_at, :user_name updated record <strong>:audit_url</strong>","On :audit_created_at, :user_name updated record <strong>:audit_url</strong>",fr-BE,fr,"Sur :audit_created_at, :user_name a mis à jour l'enregistrement <strong>:audit_url</strong>."
+group-audits,updated.modified.area,"<strong>Area</strong> was modified from ""<strong>:old</strong>"" to ""<strong>:new</strong>""","<strong>Area</strong> was modified from ""<strong>:old</strong>"" to ""<strong>:new</strong>""",fr-BE,fr,"<strong>Area</strong> a été modifié de ""<strong>:old</strong>"" à ""<strong>:new</strong>""."
+group-audits,updated.modified.country,"<strong>Country</strong> was modified from ""<strong>:old</strong>"" to ""<strong>:new</strong>""","<strong>Country</strong> was modified from ""<strong>:old</strong>"" to ""<strong>:new</strong>""",fr-BE,fr,"<strong>Pays</strong> a été modifié de ""<strong>:old</strong>"" à ""<strong>:new</strong>""."
+group-audits,updated.modified.free_text,"<strong>Free Text</strong> was modified from ""<strong>:old</strong>"" to ""<strong>:new</strong>""","<strong>Free Text</strong> was modified from ""<strong>:old</strong>"" to ""<strong>:new</strong>""",fr-BE,fr,"<strong>Texte libre</strong> a été modifié de ""<strong>:old</strong>"" à ""<strong>:new</strong>""."
+group-audits,updated.modified.latitude,"<strong>Latitude</strong> was modified from ""<strong>:old</strong>"" to ""<strong>:new</strong>""","<strong>Latitude</strong> was modified from ""<strong>:old</strong>"" to ""<strong>:new</strong>""",fr-BE,fr,"<strong>Latitude</strong> a été modifiée de ""<strong>:old</strong>"" à ""<strong>:new</strong>""."
+group-audits,updated.modified.location,"<strong>Location</strong> was modified from ""<strong>:old</strong>"" to ""<strong>:new</strong>""","<strong>Location</strong> was modified from ""<strong>:old</strong>"" to ""<strong>:new</strong>""",fr-BE,fr,"<strong>Location</strong> a été modifiée de ""<strong>:old</strong>"" à ""<strong>:new</strong>""."
+group-audits,updated.modified.longitude,"<strong>Longitude</strong> was modified from ""<strong>:old</strong>"" to ""<strong>:new</strong>""","<strong>Longitude</strong> was modified from ""<strong>:old</strong>"" to ""<strong>:new</strong>""",fr-BE,fr,"<strong>Longitude</strong> a été modifiée de ""<strong>:old</strong>"" à ""<strong>:new</strong>""."
+group-audits,updated.modified.name,"<strong>Name</strong> was modified from ""<strong>:old</strong>"" to ""<strong>:new</strong>""","<strong>Name</strong> was modified from ""<strong>:old</strong>"" to ""<strong>:new</strong>""",fr-BE,fr,"<strong>Nom</strong> a été modifié de ""<strong>:old</strong>"" à ""<strong>:new</strong>""."
+group-audits,updated.modified.website,"<strong>Website</strong> was modified from ""<strong>:old</strong>"" to ""<strong>:new</strong>""","<strong>Website</strong> was modified from ""<strong>:old</strong>"" to ""<strong>:new</strong>""",fr-BE,fr,"<strong>Le site web</strong> a été modifié de ""<strong>:old</strong>"" à ""<strong>:new</strong>""."
+groups,nearest_groups_change,(change),(change),fr-BE,fr,(changement)
+groups,participants,Participants,Participants,fr-BE,fr,Participants
+groups,search_tags_placeholder,Tag,Tag,fr-BE,fr,Étiquette
+groups,tag-1,"Tag 1","Tag 1",fr-BE,fr,"Étiquette 1"
+groups,tag-2,"Tag 2","Tag 2",fr-BE,fr,"Étiquette 2"
+groups,tag-3,"Tag 3","Tag 3",fr-BE,fr,"Étiquette 3"
+groups,tag-4,"Tag 4","Tag 4",fr-BE,fr,"Étiquette 4"
+groups,tag-5,"Tag 5","Tag 5",fr-BE,fr,"Étiquette 5"
+groups,tag-6,"Tag 6","Tag 6",fr-BE,fr,"Étiquette 6"
+groups,tag-7,"Tag 7","Tag 7",fr-BE,fr,"Étiquette 7"
+groups,tag-8,"Tag 8","Tag 8",fr-BE,fr,"Étiquette 8"
+networks,index.description,Description,Description,fr-BE,fr,Description
+notifications,notifications,Notifications,Notifications,fr-BE,fr,Notifications
+partials,age,Age,Age,fr-BE,fr,Âge
+partials,diy,"Do it yourself","Do it yourself",fr-BE,fr,"Faites-le vous-même"
+partials,n_a,N/A,N/A,fr-BE,fr,N/A
+partials,total,total,total,fr-BE,fr,total
+partials,wiki_title,Wiki,Wiki,fr-BE,fr,Wiki
+printcatora,task.suggestions,Suggestions,Suggestions,fr-BE,fr,Suggestions
+profile,notifications,Notifications,Notifications,fr-BE,fr,Notifications
+registration,reg-step-4-label3,"<strong>Historical Repair Data</strong>. I give a perpetual royalty-free license to any of my previous repair data contributions to The Restart Project. The license allows Restart to distribute the data under any open license and to retain any non-personal data even in case I request deletion of my personal profile on the Fixometer. (<i>Read more about how we use repair data <a href=""https://therestartproject.org/fixometer/why-we-collect-repair-data/"" rel=""noopener noreferrer"" target=""_blank"">here</a></i>.)","<strong>Historical Repair Data</strong>. I give a perpetual royalty-free license to any of my previous repair data contributions to The Restart Project. The license allows Restart to distribute the data under any open license and to retain any non-personal data even in case I request deletion of my personal profile on the Fixometer. (<i>Read more about how we use repair data <a href=""https://therestartproject.org/fixometer/why-we-collect-repair-data/"" rel=""noopener noreferrer"" target=""_blank"">here</a></i>.)",fr-BE,fr,"<strong>Données historiques de réparation</strong>. Je donne une licence perpétuelle et libre de droits pour toutes mes contributions précédentes de données de réparation au projet Restart. La licence permet à Restart de distribuer les données sous n'importe quelle licence ouverte et de conserver toute donnée non personnelle même dans le cas où je demande la suppression de mon profil personnel sur le Fixometer. (<i>Lire plus sur la façon dont nous utilisons les données de réparation <a href=""https://therestartproject.org/fixometer/why-we-collect-repair-data/"" rel=""noopener noreferrer"" target=""_blank"">ici</a></i>.)"
+reporting,region,Region,Région,fr-BE,fr,Région
+tabicatora,task.suggestions,Suggestions,Suggestions,fr-BE,fr,Suggestions
+_json,Bluetooth,Bluetooth,Bluetooth,it,it,Bluetooth
+_json,"Coffee maker","Coffee maker","Coffee maker",it,it,"Macchina da caffè"
+_json,"Food processor","Food processor","Food processor",it,it,"Robot da cucina"
+_json,"Hand tool","Hand tool","Hand tool",it,it,"Strumento manuale"
+_json,Iron,Iron,Iron,it,it,Ferro
+_json,Jewellery,Jewellery,Jewellery,it,it,Gioielli
+_json,Laptop,Laptop,Laptop,it,it,Laptop
+_json,Misc,Misc,Misc,it,it,Misc
+_json,Scanner,Scanner,Scanner,it,it,Scanner
+_json,Tablet,Tablet,Tablet,it,it,Tablet
+_json,Toner,Toner,Toner,it,it,Toner
+_json,"Vendor lock-in","Vendor lock-in","Vendor lock-in",it,it,"Blocco del fornitore"
+_json,WiFi,WiFi,Wifi,it,it,WiFi
+admin,co2_footprint,"CO<sub>2</sub> Footprint (kg)","CO<sub>2</sub> Footprint (kg)",it,it,"Impronta di CO<sub>2</sub> (kg)"
+admin,reliability-6,N/A,N/A,it,it,N/A
+auth,password,Password,Password,it,it,Password
+device-audits,created.metadata,"On :audit_created_at, :user_name created record <strong>:audit_url</strong>","On :audit_created_at, :user_name created record <strong>:audit_url</strong>",it,it,"Su :audit_created_at, :user_name ha creato il record <strong>:audit_url</strong>"
+device-audits,updated.metadata,"On :audit_created_at, :user_name updated record <strong>:audit_url</strong>","On :audit_created_at, :user_name updated record <strong>:audit_url</strong>",it,it,"Su :audit_created_at, :user_name ha aggiornato il record <strong>:audit_url</strong>"
+devices,edit_devices_details_content,"Aenean eu leo quam. Pellentesque ornare sem lacinia quam venenatis vestibulum.","Aenean eu leo quam. Pellentesque ornare sem lacinia quam venenatis vestibulum.",it,it,"Aenean eu leo quam. Pellentesque ornare sem lacinia quam venenatis vestibulum."
+devices,graphic-camera,Camera,Camera,it,it,"Macchina fotografica"
+devices,n/a,N/A,N/A,it,it,N/A
+devices,repair_source,"Source of repair information","Source of repair information",it,it,"Fonte di informazioni sulla riparazione"
+devices,repair_url,"URL for repair information","URL for repair information",it,it,"URL per informazioni sulla riparazione"
+devices,required_impact,"kg - required for environmental impact calculation","kg - required for environmental impact calculation",it,it,"kg - richiesto per il calcolo dell'impatto ambientale"
+devices,restart-party,"Restart party","Restart party",it,it,"Riavviare la festa"
+events,field_event_device_images_2,,,it,it,
+events,online_event_search,Online?,Online?,it,it,Online?
+general,calendar_feed_help_url,/t/fixometer-how-to-subscribe-to-a-calendar,/t/fixometer-how-to-subscribe-to-a-calendar,it,it,/t/fixometer-how-to-subscribe-to-a-calendar
+general,discourse_url,https://talk.restarters.net,https://talk.restarters.net,it,it,https://talk.restarters.net
+general,faq_url,https://therestartproject.org/faq,https://therestartproject.org/faq,it,it,https://therestartproject.org/faq
+general,help_feedback_url,https://talk.restarters.net/c/help,https://talk.restarters.net/c/help,it,it,https://talk.restarters.net/c/help
+general,menu_faq,FAQs,FAQs,it,it,FAQs
+general,menu_wiki,Wiki,Wiki,it,it,Wiki
+general,onboarding_content_1,"vel scelerisque nisl consectetur et. Aenean eu leo quam. Pellentesque ornare sem lacinia quam venenatis vestibulum. Cras mattis consectetur purus sit amet fermentum. ","vel scelerisque nisl consectetur et. Aenean eu leo quam. Pellentesque ornare sem lacinia quam venenatis vestibulum. Cras mattis consectetur purus sit amet fermentum. ",it,it,"Aenean eu leo quam. Pellentesque ornare sem lacinia quam venenatis vestibulum. Cras mattis consectetur purus sit amet fermentum."
+general,onboarding_content_2,"praesent commodo cursus magna, vel scelerisque nisl consectetur et. Aenean eu leo quam. Pellentesque ornare sem lacinia quam venenatis vestibulum. Cras mattis consectetur purus sit amet fermentum.","praesent commodo cursus magna, vel scelerisque nisl consectetur et. Aenean eu leo quam. Pellentesque ornare sem lacinia quam venenatis vestibulum. Cras mattis consectetur purus sit amet fermentum.",it,it,"praesent commodo cursus magna, vel scelerisque nisl consectetur et. Aenean eu leo quam. Pellentesque ornare sem lacinia quam venenatis vestibulum. Cras mattis consectetur purus sit amet fermentum."
+general,onboarding_content_3,"praesent commodo cursus magna, vel scelerisque nisl consectetur et. Aenean eu leo quam. Pellentesque ornare sem lacinia quam venenatis vestibulum. Cras mattis consectetur purus sit amet fermentum.","praesent commodo cursus magna, vel scelerisque nisl consectetur et. Aenean eu leo quam. Pellentesque ornare sem lacinia quam venenatis vestibulum. Cras mattis consectetur purus sit amet fermentum.",it,it,"praesent commodo cursus magna, vel scelerisque nisl consectetur et. Aenean eu leo quam. Pellentesque ornare sem lacinia quam venenatis vestibulum. Cras mattis consectetur purus sit amet fermentum."
+general,reporting,Reporting,Reporting,it,it,Segnalare
+general,restartproject_url,https://therestartproject.org,https://therestartproject.org,it,it,https://therestartproject.org
+general,wiki_url,https://wiki.restarters.net,https://wiki.restarters.net,it,it,https://wiki.restarters.net
+groups,area,Area,Area,it,it,Area
+groups,tag-1,"Tag 1","Tag 1",it,it,"Tag 1"
+groups,tag-2,"Tag 2","Tag 2",it,it,"Tag 2"
+groups,tag-3,"Tag 3","Tag 3",it,it,"Tag 3"
+groups,tag-4,"Tag 4","Tag 4",it,it,"Tag 4"
+groups,tag-5,"Tag 5","Tag 5",it,it,"Tag 5"
+groups,tag-6,"Tag 6","Tag 6",it,it,"Tag 6"
+groups,tag-7,"Tag 7","Tag 7",it,it,"Tag 7"
+groups,tag-8,"Tag 8","Tag 8",it,it,"Tag 8"
+partials,2,how_to_set_up_a_group_text,how_to_set_up_a_group_text,it,it,"come impostare un gruppo di testo"
+partials,cancel,Cancel,Cancel,it,it,Cancella
+partials,n_a,N/A,N/A,it,it,N/A
+partials,quantity,Quantity,Quantity,it,it,Quantità
+partials,solution_text2,"Interesting case study to share?","Interesting case study to share?",it,it,"Un caso di studio interessante da condividere?"
+partials,wiki_title,Wiki,Wiki,it,it,Wiki
+reporting,no,No,No,it,it,No
+_json,Administrator,Admin,Admin,nl,nl,Admin
+_json,Bluetooth,Bluetooth,Bluetooth,nl,nl,Bluetooth
+_json,Camera,Camera,Camera,nl,nl,Camera
+_json,"Coffee maker","Coffee maker","Coffee maker",nl,nl,Koffiezetapparaat
+_json,"Desktop computer","Desktop computer","Desktop computer",nl,nl,"Desktop computer"
+_json,"Flat screen","Flat screen","Flat screen",nl,nl,"Plat scherm"
+_json,"Flat screen 15-17""","Flat screen 15-17""","Flat screen 15-17""",nl,nl,"Flat screen 15-17"""
+_json,"Flat screen 19-20""","Flat screen 19-20""","Flat screen 19-20""",nl,nl,"Flatscreen 19-20"""
+_json,"Flat screen 22-24""","Flat screen 22-24""","Flat screen 22-24""",nl,nl,"Flatscreen 22-24"""
+_json,"Flat screen 26-30""","Flat screen 26-30""","Flat screen 26-30""",nl,nl,"Flatscreen 26-30"""
+_json,"Flat screen 32-37""","Flat screen 32-37""","Flat screen 32-37""",nl,nl,"Flatscreen 32-37"""
+_json,"Hand tool","Hand tool","Hand tool",nl,nl,Handgereedschap
+_json,Iron,Iron,Iron,nl,nl,IJzer
+_json,Jewellery,Jewellery,Jewellery,nl,nl,Juwelen
+_json,Lamp,Lamp,Lamp,nl,nl,Lamp
+_json,Laptop,Laptop,Laptop,nl,nl,Laptop
+_json,"Laptop medium","Laptop medium","Laptop medium",nl,nl,"Laptop medium"
+_json,Printer/scanner,Printer/scanner,Printer/scanner,nl,nl,Printer/scanner
+_json,Projector,Projector,Projector,nl,nl,Projector
+_json,Scanner,Scanner,Scanner,nl,nl,Scanner
+_json,"Sim card slot","SIM card slot","SIM card slot",nl,nl,SIM-kaartsleuf
+_json,Software/OS,Software/OS,Software/OS,nl,nl,Software/OS
+_json,Tablet,Tablet,Tablet,nl,nl,Tablet
+_json,Toner,Toner,Toner,nl,nl,Toner
+_json,"Vendor lock-in","Vendor lock-in","Vendor lock-in",nl,nl,"Vendor lock-in"
+_json,WiFi,WiFi,Wifi,nl,nl,WiFi
+battcatora,status.status,Status,Status,nl,nl,Status
+battcatora,task.status,Status,Status,nl,nl,Status
+microtasking,volunteering.all_quests,":value quests",":value quests",nl,nl,"waarde quests"
+microtasking,volunteering.my_quests,":value quests",":value quests",nl,nl,"waarde quests"
+printcatora,status.status,Status,Status,nl,nl,Status
+tabicatora,status.status,Status,Status,nl,nl,Status
+_json,Administrator,Admin,Admin,nl-BE,nl,Admin
+_json,Bluetooth,Bluetooth,Bluetooth,nl-BE,nl,Bluetooth
+_json,Camera,Camera,Camera,nl-BE,nl,Camera
+_json,"Coffee maker","Coffee maker","Coffee maker",nl-BE,nl,Koffiezetapparaat
+_json,"Desktop computer","Desktop computer","Desktop computer",nl-BE,nl,"Desktop computer"
+_json,"Flat screen","Flat screen","Flat screen",nl-BE,nl,"Plat scherm"
+_json,"Flat screen 15-17""","Flat screen 15-17""","Flat screen 15-17""",nl-BE,nl,"Flat screen 15-17"""
+_json,"Flat screen 19-20""","Flat screen 19-20""","Flat screen 19-20""",nl-BE,nl,"Flatscreen 19-20"""
+_json,"Flat screen 22-24""","Flat screen 22-24""","Flat screen 22-24""",nl-BE,nl,"Flatscreen 22-24"""
+_json,"Flat screen 26-30""","Flat screen 26-30""","Flat screen 26-30""",nl-BE,nl,"Flatscreen 26-30"""
+_json,"Flat screen 32-37""","Flat screen 32-37""","Flat screen 32-37""",nl-BE,nl,"Flat screen 32-37"""
+_json,"Hand tool","Hand tool","Hand tool",nl-BE,nl,Handgereedschap
+_json,Iron,Iron,Iron,nl-BE,nl,IJzer
+_json,Jewellery,Jewellery,Jewellery,nl-BE,nl,Juwelen
+_json,Lamp,Lamp,Lamp,nl-BE,nl,Lamp
+_json,Laptop,Laptop,Laptop,nl-BE,nl,Laptop
+_json,"Laptop medium","Laptop medium","Laptop medium",nl-BE,nl,"Laptop medium"
+_json,Printer/scanner,Printer/scanner,Printer/scanner,nl-BE,nl,Printer/scanner
+_json,Projector,Projector,Projector,nl-BE,nl,Projector
+_json,Scanner,Scanner,Scanner,nl-BE,nl,Scanner
+_json,"Sim card slot","SIM card slot","SIM card slot",nl-BE,nl,SIM-kaartsleuf
+_json,Software/OS,Software/OS,Software/OS,nl-BE,nl,Software/OS
+_json,Tablet,Tablet,Tablet,nl-BE,nl,Tablet
+_json,Toner,Toner,Toner,nl-BE,nl,Toner
+_json,"Vendor lock-in","Vendor lock-in","Vendor lock-in",nl-BE,nl,"Vendor lock-in"
+_json,WiFi,WiFi,Wifi,nl-BE,nl,WiFi
+battcatora,status.status,Status,Status,nl-BE,nl,Status
+battcatora,task.status,Status,Status,nl-BE,nl,Status
+microtasking,volunteering.all_quests,":value quests",":value quests",nl-BE,nl,"waarde quests"
+microtasking,volunteering.my_quests,":value quests",":value quests",nl-BE,nl,"waarde quests"
+printcatora,status.status,Status,Status,nl-BE,nl,Status
+tabicatora,status.status,Status,Status,nl-BE,nl,Status
