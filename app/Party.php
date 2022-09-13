@@ -890,29 +890,6 @@ class Party extends Model implements Auditable
         return true;
     }
 
-    public function VisuallyHighlight()
-    {
-        if ($this->requiresModerationByAdmin() && Fixometer::hasRole(auth()->user(), 'Administrator')) {
-            return 'cell-warning-heading';
-        } elseif ($this->isUpcoming() || $this->isInProgress()) {
-            if (! $this->isVolunteer()) {
-                return 'cell-warning-heading';
-            } else {
-                return 'cell-primary-heading';
-            }
-        } elseif ($this->hasFinished()) {
-            if (
-                $this->checkForMissingData()['participants_count'] == 0 ||
-                $this->checkForMissingData()['volunteers_count'] <= 1 ||
-                $this->checkForMissingData()['devices_count'] == 0
-            ) {
-                return 'cell-danger-heading';
-            }
-        } else {
-            return '';
-        }
-    }
-
     public function scopeHasDevicesRepaired($query, int $has_x_devices_fixed = 1)
     {
         return $query->whereHas('allDevices', function ($query) {
