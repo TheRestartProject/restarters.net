@@ -40,8 +40,6 @@ class LogInToWiki
     {
         $user = $event->user;
 
-
-
         if ($user->wiki_sync_status == WikiSyncStatus::CreateAtLogin) {
             Log::info("Need to create " . $user->name);
             $this->createUserInWiki($user);
