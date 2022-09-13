@@ -159,20 +159,49 @@ exports.approveEvent = async function(page, baseURL, idevents) {
   await page.locator('text=Event details updated.')
 }
 
-exports.addDevice = async function(page, baseURL, idevents, powered) {
+exports.addDevice = async function(page, baseURL, idevents, powered, photo) {
   // Go to event edit page.
   await page.goto('/party/view/' + idevents)
 
-  await page.locator(powered ? '.add-powered-device-desktop' : '.add-unpowered-device-desktop').click()
+  var addsel = powered ? '.add-powered-device-desktop' : '.add-unpowered-device-desktop'
 
-  // Tab to category
+  // Get current device count.
+  await page.waitForSelector(addsel)
+  var current = await page.locator('h3:visible').count()
+
+  // Click the add button.
+  await page.locator(addsel).click()
+
+  // Tab to category and select first.
   await page.keyboard.press('Tab')
   await page.keyboard.press('Enter')
+
+  if (photo) {
+    const [fileChooser] = await Promise.all([
+      page.waitForEvent('filechooser'),
+
+      // Trigger file upload.
+      page.locator('.add-device .vue-dropzone:visible').click(),
+    ]);
+
+    await fileChooser.setFiles('public/images/community.jpg');
+  }
 
   await page.locator('text=Add item >> visible=true').click()
 
   // Wait for device to show.
-  await expect(page.locator('h3 >> text=Misc')).toHaveCount(2)
+  await expect(page.locator('h3:visible')).toHaveCount(current + 1)
+
+  // Check that the photo appears.
+  await page.locator('.edit:visible').click()
+
+  if (photo) {
+    // Should see the dropzone and uploaded photo.
+    await expect(page.locator('.device-photos:visible img')).toHaveCount(2)
+  } else {
+    // Just dropzone
+    await expect(page.locator('.device-photos:visible img')).toHaveCount(1)
+  }
 }
 
 exports.unfollowGroup = async function(page, idgroups) {

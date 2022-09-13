@@ -165,7 +165,11 @@ jobs:
       - run: php artisan migrate
 
       - run: wget -O phpunit https://phar.phpunit.de/phpunit-7.phar ; chmod +x phpunit
+
+      # The phpunit and playwright tests require an uploads directory in a slightly different place.  Not really
+      # worth fixing.
       - run: mkdir uploads
+      - run: mkdir public/uploads
 
       # Wait for Discourse to finish initialising.
       - run: while ! nc -z restarters_discourse 80; do sleep 1 ; done
@@ -178,6 +182,9 @@ jobs:
 
       # Coveralls is pernickety about the location it uploads from existing.
       - run: mkdir build; mkdir build/logs; php vendor/bin/php-coveralls -v -x tests/clover.xml
+
+      # Zap groups set up by the UT; this can confuse Playwright tests.
+      - run: mysql --host="127.0.0.1" -u root -ps3cr3t -e "use restarters_db;SET foreign_key_checks=0;DELETE FROM groups WHERE location IS NULL;SET foreign_key_checks=1;"
 
       # Run the Playwright tests.
       # Ignore the return code from the tinker; the user might exist from the phpunit tests.  If it doesn't and

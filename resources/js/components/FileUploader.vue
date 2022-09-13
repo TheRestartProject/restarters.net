@@ -19,7 +19,12 @@ export default {
     previewsContainer: {
       type: String,
       required: true
-    }
+    },
+    maxFiles: {
+      type: Number,
+      required: false,
+      default: 1
+    },
   },
   components: {
     vueDropzone: vue2Dropzone
@@ -35,9 +40,13 @@ export default {
         addRemoveLinks: false,
         thumbnailWidth: 120,
         thumbnailHeight: 120,
+        maxFiles: this.maxFiles,
+        resizeWidth: 800,
+        resizeHeight: 800,
         thumbnailMethod: 'contain',
         previewsContainer: this.previewsContainer,
         dictRemoveFile: null,
+        acceptedFiles: ".jpeg,.jpg,.png,.gif",
         previewTemplate:
             '<div>' +
             ' <div class="dz-preview dz-file-preview">' +
