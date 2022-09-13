@@ -166,91 +166,6 @@ class Party extends Model implements Auditable
         return DB::delete(DB::raw('DELETE FROM `events_users` WHERE `event` = :party'), ['party' => $party]);
     }
 
-    public function ofThisUser($id, $only_past = false, $devices = false)
-    {
-        //Tested
-        $sql = 'SELECT *, `e`.`venue` AS `venue`, `e`.`link` AS `link`, `e`.`location` as `location`, UNIX_TIMESTAMP(`event_start_utc`) AS `event_timestamp`
-                FROM `'.$this->table.'` AS `e`
-                INNER JOIN `events_users` AS `eu` ON `eu`.`event` = `e`.`idevents`
-                INNER JOIN `groups` as `g` ON `e`.`group` = `g`.`idgroups`
-                LEFT JOIN (
-                    SELECT COUNT(`dv`.`iddevices`) AS `device_count`, `dv`.`event`
-                    FROM `devices` AS `dv`
-                    GROUP BY  `dv`.`event`
-                ) AS `d` ON `d`.`event` = `e`.`idevents`
-                WHERE `eu`.`user` = :id';
-        if ($only_past) {
-            $sql .= ' AND `e`.`event_end_utc` < NOW()';
-        }
-        $sql .= ' ORDER BY `e`.`event_start_utc` DESC';
-
-        try {
-            $parties = DB::select(DB::raw($sql), ['id' => $id]);
-        } catch (\Illuminate\Database\QueryException $e) {
-            dd($e);
-        }
-
-        if ($devices) {
-            $devices = new Device;
-            foreach ($parties as $i => $party) {
-                $parties[$i]->devices = $devices->ofThisEvent($party->idevents);
-            }
-        }
-
-        return $parties;
-    }
-
-    public function ofThisGroup2($group = 'admin', $only_past = false, $devices = false)
-    {
-        //Tested
-        $sql = 'SELECT
-                    *,
-	`e`.`venue` AS `venue`, `e`.`link` AS `link`, `e`.`location` as `location`,
-                    `g`.`name` AS group_name,
-                    UNIX_TIMESTAMP(e.`event_start_utc`) ) AS `event_timestamp`
-                FROM `'.$this->table.'` AS `e`
-
-                    INNER JOIN `groups` as `g` ON `e`.`group` = `g`.`idgroups`
-
-                    LEFT JOIN (
-                        SELECT COUNT(`dv`.`iddevices`) AS `device_count`, `dv`.`event`
-                        FROM `devices` AS `dv`
-                        GROUP BY  `dv`.`event`
-                    ) AS `d` ON `d`.`event` = `e`.`idevents` ';
-        if (is_numeric($group) && $group != 'admin') {
-            $sql .= ' WHERE `e`.`group` = :id ';
-        }
-
-        if ($only_past) {
-            $sql .= ' AND `e`.`event_end_utc`) < NOW()';
-        }
-
-        $sql .= ' ORDER BY `e`.`event_start_utc` DESC';
-
-        if (is_numeric($group) && $group != 'admin') {
-            try {
-                $parties = DB::select(DB::raw($sql), ['id' => $group]);
-            } catch (\Illuminate\Database\QueryException $e) {
-                dd($e);
-            }
-        } else {
-            try {
-                $parties = DB::select(DB::raw($sql));
-            } catch (\Illuminate\Database\QueryException $e) {
-                dd($e);
-            }
-        }
-
-        if ($devices) {
-            $devices = new Device;
-            foreach ($parties as $i => $party) {
-                $parties[$i]->devices = $devices->ofThisEvent($party->idevents);
-            }
-        }
-
-        return $parties;
-    }
-
     public function ofTheseGroups($groups = 'admin', $only_past = false, $devices = false)
     {
         //Tested
@@ -345,28 +260,6 @@ class Party extends Model implements Auditable
         }
     }
 
-    public function findLatest($limit = 10)
-    {
-        return DB::select(DB::raw('SELECT
-                    `e`.`idevents`,
-                    `e`.`venue`,
-                    `e`.`link`,
-                    `e`.`location`,
-                    UNIX_TIMESTAMP( `e`.`event_start_utc` ) AS `event_date`,
-                    TIME(CONVERT_TZ(`event_start_utc`, \'GMT\', `e`.`timezone`)) AS `start`,
-                    TIME(CONVERT_TZ(`event_end_utc`, \'GMT\', `e`.`timezone`)) AS `end`,
-                    `e`.`latitude`,
-                    `e`.`longitude`
-                FROM `'.$this->table.'` AS `e`
-                ORDER BY `e`.`event_start_utc` DESC
-                LIMIT :limit'), ['limit' => $limit]);
-    }
-
-    public function attendees()
-    {
-        return DB::select(DB::raw('SELECT SUM(pax) AS pax FROM '.$this->table));
-    }
-
     // Scopes.  Each scope should build on a previous scope, getting more specific as we go down this file.  That
     // isolates query logic more clearly.
     private function defaultUserIds(&$userids) {
@@ -442,19 +335,6 @@ class Party extends Model implements Auditable
         return $query;
     }
 
-    public function scopeInvitedNotConfirmed($query, $userids = null) {
-        // Events this user has been invited to but not confirmed.  Only interested in future events.
-        $this->defaultUserIds($userids);
-        $query = $query->future();
-        $query = $query->join('events_users AS inceu', function ($join) use ($userids) {
-            $join->on('inceu.event', '=', 'events.idevents');
-            $join->whereIn('inceu.user', $userids);
-            $join->where('inceu.status', '!=', 1);
-        })->select('events.*');
-
-        return $query;
-    }
-
     public function scopeMemberOfGroup($query, $userids = null) {
 
         $this->defaultUserIds($userids);
@@ -464,12 +344,6 @@ class Party extends Model implements Auditable
             ->whereNull('hfgug.deleted_at')
             ->whereIn('hfgug.user', $userids)
             ->select('events.*');
-        return $query;
-    }
-
-    public function scopeHostOfGroup($query, $userids = null) {
-        $query = $query->memberOfGroup()
-            ->where('hfgug.role', '=', Role::HOST);
         return $query;
     }
 
@@ -831,20 +705,6 @@ class Party extends Model implements Auditable
             ['user', '=', $userId],
             ['status', '=', 1],
         ])->exists();
-    }
-
-    /**
-     * [users description]
-     * All Event Users.
-     *
-     * @author Christopher Kelker - @date 2019-03-21
-     * @editor  Christopher Kelker
-     * @version 1.0.0
-     * @return  [type]
-     */
-    public function users()
-    {
-        return $this->hasMany(EventsUsers::class, 'event', 'idevents');
     }
 
     /**
