@@ -224,8 +224,47 @@ class EventController extends Controller
         ]);
     }
 
+    /**
+     * @OA\Get(
+     *      path="/api/v2/events/{id}",
+     *      operationId="getEvent",
+     *      tags={"Events"},
+     *      summary="Get Event",
+     *      description="Returns information about an event.",
+     *      @OA\Parameter(
+     *          name="id",
+     *          description="Event id",
+     *          required=true,
+     *          in="path",
+     *          @OA\Schema(
+     *              type="integer"
+     *          )
+     *      ),
+     *      @OA\Response(
+     *          response=200,
+     *          description="Successful operation",
+     *          @OA\JsonContent(
+     *              @OA\Property(
+     *                property="data",
+     *                title="data",
+     *                ref="#/components/schemas/Event"
+     *              )
+     *          )
+     *       ),
+     *      @OA\Response(
+     *          response=404,
+     *          description="Event not found",
+     *      ),
+     *     )
+     */
+
     public function getEventv2(Request $request, $idevents) {
         $party = Party::findOrFail($idevents);
+
+        if (!$party->theGroup->approved) {
+            abort(404);
+        }
+
         return \App\Http\Resources\Party::make($party);
     }
 }

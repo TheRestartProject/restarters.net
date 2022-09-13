@@ -123,7 +123,9 @@ class APIv2NetworkTest extends TestCase
                                                        'name' => 'Restart',
                                                        'events_push_to_wordpress' => true,
                                                    ]);
-        $group = factory(Group::class)->create();
+        $group = factory(Group::class)->create([
+                                                   'wordpress_post_id' => '99999',
+                                               ]);
         $network->addGroup($group);
 
         // Create event for group

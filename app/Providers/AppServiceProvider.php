@@ -53,5 +53,7 @@ class AppServiceProvider extends ServiceProvider
             $trans->setFallback($translator->getFallback());
             return $trans;
         });
+
+        $this->app->register(\L5Swagger\L5SwaggerServiceProvider::class);
     }
 }
