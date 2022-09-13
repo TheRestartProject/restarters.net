@@ -702,6 +702,7 @@ class Party extends Model implements Auditable
             'participants' => 0,
             'volunteers' => 0,
             'hours_volunteered' => 0,
+            'invited' => 0,
         ];
     }
 
@@ -767,6 +768,7 @@ class Party extends Model implements Auditable
             $result['waste_total'] = $result['waste_powered'] + $result['waste_unpowered'];
             $result['participants'] = $this->pax ?? 0;
             $result['volunteers'] = $this->volunteers ?? 0;
+            $result['invited'] = $this->allInvited->count();
             $result['hours_volunteered'] = $this->hoursVolunteered();
 
             return $result;
@@ -886,29 +888,6 @@ class Party extends Model implements Auditable
         }
 
         return true;
-    }
-
-    public function VisuallyHighlight()
-    {
-        if ($this->requiresModerationByAdmin() && Fixometer::hasRole(auth()->user(), 'Administrator')) {
-            return 'cell-warning-heading';
-        } elseif ($this->isUpcoming() || $this->isInProgress()) {
-            if (! $this->isVolunteer()) {
-                return 'cell-warning-heading';
-            } else {
-                return 'cell-primary-heading';
-            }
-        } elseif ($this->hasFinished()) {
-            if (
-                $this->checkForMissingData()['participants_count'] == 0 ||
-                $this->checkForMissingData()['volunteers_count'] <= 1 ||
-                $this->checkForMissingData()['devices_count'] == 0
-            ) {
-                return 'cell-danger-heading';
-            }
-        } else {
-            return '';
-        }
     }
 
     public function scopeHasDevicesRepaired($query, int $has_x_devices_fixed = 1)

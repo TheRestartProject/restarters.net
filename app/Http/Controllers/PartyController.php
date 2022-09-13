@@ -97,12 +97,6 @@ class PartyController extends Controller
 
     public function index($group_id = null)
     {
-        if (Fixometer::hasRole(Auth::user(), 'Administrator')) {
-            $moderate_events = Party::RequiresModeration()->get();
-        } else {
-            $moderate_events = null;
-        }
-
         $events = [];
 
         if (! is_null($group_id)) {
@@ -156,7 +150,6 @@ class PartyController extends Controller
         $isCoordinatorForGroup = $group && Auth::user()->isCoordinatorForGroup($group);
 
         return view('events.index', [
-            'moderate_events' => $moderate_events,
             'expanded_events' => $events,
             'is_host_of_group' => $is_host_of_group,
             'isCoordinatorForGroup' => $isCoordinatorForGroup,

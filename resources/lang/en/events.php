@@ -87,7 +87,6 @@ return [
   'request_review_modal_heading' => 'Request review',
   'send_requests' => 'Send',
   'cancel_requests' => 'Cancel',
-  'moderation_none' => 'There are currently no events to moderate',
   'online_event' => 'ONLINE EVENT',
   'create_new_event_mobile' => 'Create',
   'no_upcoming_for_your_groups' => 'There are currently no upcoming events for your groups',

@@ -65,7 +65,7 @@ class GroupController extends Controller
         $groups_near_you = array_column($user->groupsNearby(1000), 'idgroups');
 
         return view('group.index', [
-            'groups' => $this->expandGroups($groups, $your_groups, $groups_near_you),
+            'groups' => GroupController::expandGroups($groups, $your_groups, $groups_near_you),
             'your_area' => $user->location,
             'tab' => $tab,
             'network' => $network,
@@ -791,7 +791,7 @@ class GroupController extends Controller
         }
     }
 
-    private function expandGroups($groups, $your_groupids, $nearby_groupids)
+    public static function expandGroups($groups, $your_groupids, $nearby_groupids)
     {
         $ret = [];
 

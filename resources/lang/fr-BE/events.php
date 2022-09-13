@@ -82,7 +82,6 @@ return [
   'cancel_requests' => 'Annuler demandes',
   'email_invite' => 'Inviter par e-mail',
   'follow_hosting_group' => 'Cet événement est organisé par :group. Voulez-vous le suivre?',
-  'moderation_none' => 'Il n\'y a actuellement pas d\'événements à modérer',
   'request_review_message' => '<p>Cela permet d\'informer les bénévoles qui ont participé à cet événement que des données de réparation ont été ajoutées et qu\'ils peuvent les visualiser et ajouter des détails de réparation supplémentaires.</p><p> Cela permettra également aux bénévoles de savoir que des photos (y compris des commentaires sur le livre d\'or) ont peut-être été affichées.</p><p> Souhaitez-vous envoyer ces notifications?</p>',
   'request_review_modal_heading' => 'Retours de bénévoles',
   'send_requests' => 'Envoyer',

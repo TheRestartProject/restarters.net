@@ -80,6 +80,7 @@ class GroupSummary extends JsonResource
             'name' => $this->name,
             'image' => $this->groupImage && is_object($this->groupImage) && is_object($this->groupImage->image) ? $this->groupImage->image->path : null,
             'updated_at' => Carbon::parse($this->updated_at)->toIso8601String(),
+            'networks' => $this->resource->networks,
         ];
 
         if ($request->get('includeNextEvent', false)) {
