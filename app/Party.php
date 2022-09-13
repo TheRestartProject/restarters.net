@@ -52,32 +52,6 @@ class Party extends Model implements Auditable
     protected $appends = ['participants', 'ShareableLink', 'event_date_local', 'start_local', 'end_local'];
 
     //Getters
-    public function findAll()
-    {
-        return DB::select(DB::raw('SELECT
-                    `e`.`idevents` AS `id`,
-                    UNIX_TIMESTAMP(`event_start_utc`) AS `event_timestamp`,
-                    TIME(CONVERT_TZ(`event_start_utc`, \'GMT\', `e`.`timezone`)) AS `start`,
-                    TIME(CONVERT_TZ(`event_end_utc`, \'GMT\', `e`.`timezone`)) AS `end`,
-                    `e`.`venue`,
-                    `e`.`link`,
-                    `e`.`location`,
-                    `e`.`latitude`,
-                    `e`.`longitude`,
-                    `e`.`pax`,
-                    `e`.`volunteers`,
-                    `e`.`free_text`,
-                    `e`.`hours`,
-                    `e`.`wordpress_post_id`,
-                    `e`.`discourse_thread`,
-                    `g`.`name` AS `group_name`,
-                    `g`.`idgroups` AS `group_id`
-                FROM `events` AS `e`
-                INNER JOIN `groups` AS `g`
-                    ON `g`.`idgroups` = `e`.`group`
-                ORDER BY `e`.`event_start_utc` DESC'));
-    }
-
     public function findAllSearchable()
     {
         // TODO Can this be replaced by Party::past?
@@ -789,18 +763,6 @@ class Party extends Model implements Auditable
         return round($this->getEventStats()['waste_total'], 2);
     }
 
-    public function scopeWithAll($query)
-    {
-        return $query->with([
-            'allDevices.deviceCategory',
-            'allInvited',
-            'allConfirmedVolunteers',
-            'host',
-            'theGroup.groupImage.image',
-            'devices.deviceCategory',
-        ]);
-    }
-
     public function getFriendlyLocationAttribute()
     {
         $short_location = Str::limit($this->venue, 30);
@@ -826,11 +788,6 @@ class Party extends Model implements Auditable
         }
 
         return $coordinators;
-    }
-
-    public function getMaxUpdatedAtDevicesUpdatedAtAttribute()
-    {
-        return strtotime($this->updated_at) > strtotime($this->devices_updated_at) ? $this->updated_at : $this->devices_updated_at;
     }
 
     public function canDelete()
