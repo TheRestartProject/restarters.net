@@ -19,7 +19,7 @@
         "cross-env": "^5.2.0",
         "faker": "^5.5.3",
         "jquery": "3.4.1",
-        "laravel-mix": "^2.0",
+        "laravel-mix": "^6.0",
         "laravel-mix-bundle-analyzer": "^1.0.5",
         "lodash": "^4.17.21",
         "lodash.mergewith": "^4.6.2",
