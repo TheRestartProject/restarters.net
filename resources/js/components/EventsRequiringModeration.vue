@@ -38,10 +38,10 @@ export default {
     events() {
       let ret = Object.values(this.$store.getters['events/getModerate'])
 
-      if (this.network) {
-        // We are trying to show only data for a specific network.
+      if (this.networks) {
+        // We are trying to show only data for specific networks.
         ret = ret.filter((e) =>  {
-          var intersection = e.networks.filter(x => this.networks.includes(x.id));
+          var intersection = e.group.networks.filter(x => this.networks.includes(x.id));
 
           if (intersection.length) {
             return true
