@@ -199,33 +199,6 @@ class FixometerFile extends Model
         DB::delete(DB::raw($sql), ['id' => $idxref]);
     }
 
-    public function simpleUpload($file, $object_id, $object = 'device', $title = null)
-    {
-        if ($file['error'] == 0) {
-            $filename = $this->filename($file);
-            $lpath = $_SERVER['DOCUMENT_ROOT'].'/uploads/'.$filename;
-
-            if (! move_uploaded_file($file['tmp_name'], $lpath)) {
-                return false;
-            }
-            $size = getimagesize($lpath);
-
-            $data['path'] = $filename;
-            $data['width'] = $size[0];
-            $data['height'] = $size[1];
-            $data['alt_text'] = $title;
-
-            $Images = new Images;
-
-            $image = $Images->create($data);
-
-            if (is_numeric($image) && ! is_null($object_id)) {
-                $xref = new Xref('object', $image, env('TBL_IMAGES'), $object_id, env('TBL_DEVICES'));
-                $xref->createXref(true);
-            }
-        }
-    }
-
     /**
      * @param $tmp_name
      * @param string $lpath
@@ -341,9 +314,5 @@ class FixometerFile extends Model
         }
 
         return $filename;
-    }
-
-    public function copyImage($idimages) {
-
     }
 }
