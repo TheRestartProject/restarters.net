@@ -106,7 +106,9 @@ class GroupTest extends TestCase
             'events_push_to_wordpress' => false,
         ]);
 
-        $group = factory(Group::class)->create();
+        $group = factory(Group::class)->create([
+                                                   'wordpress_post_id' => '99999',
+                                               ]);
         $network1->addGroup($group);
         $network2->addGroup($group);
 
