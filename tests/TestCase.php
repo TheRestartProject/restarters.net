@@ -241,8 +241,10 @@ abstract class TestCase extends BaseTestCase
         foreach ($vues as $vue) {
             foreach ($vue->children() as $child) {
                 $dom = simplexml_import_dom($child);
+                $atts = current($dom->attributes());
+                $atts = $atts ? $atts : [];
 
-                $props[] = array_merge(current($dom->attributes()), [
+                $props[] = array_merge($atts, [
                     'VueComponent' => $vue->children()->first()->nodeName(),
                 ]);
             }

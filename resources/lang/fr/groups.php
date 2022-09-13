@@ -156,4 +156,5 @@ return [
   'timezone_placeholder' => 'Laissez ce champ vide pour hériter de la valeur du réseau.',
   'talk_group_add_body' => 'Merci de suivre le Repair Café :group_name ! Vous recevrez désormais des notifications lorsque de nouveaux événements seront planifiés et seront ajoutés aux messages de Repair Café. <a href="https://talk.restarters.net/t/how-to-communicate-with-your-repair-group/6293">Découvrez comment fonctionnent les messages de Repair Café et comment modifier vos paramètres de notification</a>.',
   'you_have_joined' => 'Vous avez rejoint <a class="plain-link" href=":url">:name</a>',
+  'groups_title_admin' => 'Repair Cafés à modérer',
 ];

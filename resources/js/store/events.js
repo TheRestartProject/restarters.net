@@ -1,21 +1,64 @@
 import Vue from 'vue'
+import moment from 'moment'
 
 const axios = require('axios')
+
+function newToOld(e) {
+  // We are in the frustrating position of having a half-written new API with sensible field names, but existing
+  // Vue components that expect old-style field names.  We therefore sometimes need to convert the new API data
+  // back into the old format which is expected.  In some bright future where we have shifted over to using the
+  // new API completely, we can then migrate the Vue components to use the new field names and retire this function.
+  // Similar code in group store.
+  let ret = {
+    idevents: e.id,
+    venue: e.title,
+    group: {
+      idgroups: e.group.id,
+      name: e.group.name,
+      networks: e.group.networks
+    },
+    volunteers: e.stats.volunteers,
+    allinvitedcount: e.stats.invited,
+    event_start_utc: e.start,
+    event_end_utc: e.end,
+    event_date_local: e.start,
+    timezone: e.timezone
+  }
+
+  const start = new moment(e.start)
+  start.tz(e.timezone)
+  ret.start_local = start.format('HH:mm')
+
+  const end = new moment(e.end)
+  end.tz(e.timezone)
+  ret.end_local = end.format('HH:mm')
+
+  return ret
+}
 
 export default {
   namespaced: true,
   state: {
     // List of events indexed by event id.  Use object rather than array so that it's sparse.
     list: {},
+    moderate: {},
 
     // List of stats indexed by event id.
     stats: {}
   },
   getters: {
     get: state => idevents => {
-      return state.list[idevents]
+      let ret = state.list[idevents]
+
+      if (!ret) {
+        // Might be an event we're moderating.
+        ret = state.moderate[idevents]
+      }
+
+      return ret
     },
     getAll: state => state.list,
+    getModerate: state => state.moderate,
     getByGroup: state => idgroups => {
       // null idgroups means fetch all
       return Object.values(state.list).filter(e => (idgroups === null || e.group === idgroups))
@@ -34,6 +77,11 @@ export default {
     setList(state, params) {
       params.events.forEach(e => {
         Vue.set(state.list, e.idevents, e)
+      })
+    },
+    setModerate(state, params) {
+      params.forEach(e => {
+        Vue.set(state.moderate, e.id, newToOld(e))
       })
     },
     setStats(state, params) {
@@ -61,6 +109,15 @@ export default {
       })
 
       commit('remove', params)
+    },
+    async getModerationRequired({commit, rootGetters}, params) {
+      const apiToken = rootGetters['auth/apiToken']
+
+      let ret = await axios.get('/api/v2/moderate/events?api_token=' + apiToken)
+
+      if (ret && ret.data) {
+        commit('setModerate', ret.data)
+      }
     }
   },
 }

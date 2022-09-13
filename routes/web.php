@@ -249,7 +249,7 @@ Route::group(['middleware' => ['auth', 'verifyUserConsent', 'ensureAPIToken']], 
         Route::post('/create', 'DeviceController@ajaxCreate');
         Route::get('/delete/{id}', 'DeviceController@delete');
         Route::post('/image-upload/{id}', 'DeviceController@imageUpload');
-        Route::get('/image/delete/{iddevices}/{id}/{path}', 'DeviceController@deleteImage');
+        Route::get('/image/delete/{iddevices}/{idxref}', 'DeviceController@deleteImage');
     });
 
     Route::resource('networks', 'NetworkController')->only([

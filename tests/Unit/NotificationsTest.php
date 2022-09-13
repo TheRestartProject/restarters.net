@@ -263,7 +263,7 @@ class NotificationsTest extends TestCase
         $this->outputs['App\\Notifications\\AdminNewUser']['mail']['fr']['introLines'][0] = 'A new user "Name" has joined the Restarters community.';
         $this->outputs['App\\Notifications\\AdminNewUser']['mail']['fr']['outroLines'] = [];
         $this->outputs['App\\Notifications\\AdminNewUser']['mail']['fr']['outroLines'][0] = 'If you would like to stop receiving these emails, please visit <a href="http://restarters.test:8000/user/edit/10002#list-email-preferences">your preferences</a> on your account.';
-        $this->outputs['App\\Notifications\\AdminNewUser']['mail']['fr']['actionText'] = 'View profile';
+        $this->outputs['App\\Notifications\\AdminNewUser']['mail']['fr']['actionText'] = 'Voir profil';
         $this->outputs['App\\Notifications\\AdminNewUser']['mail']['fr']['actionUrl'] = 'http://restarters.test:8000/profile/456';
         $this->outputs['App\\Notifications\\AdminNewUser']['mail']['fr']['displayableActionUrl'] = 'http://restarters.test:8000/profile/456';
         $this->outputs['App\\Notifications\\AdminNewUser']['array'] = [];

@@ -67,12 +67,6 @@ class Device extends Model implements Auditable
         return \App\Helpers\LcaStats::getDisplacementFactor();
     }
 
-    public function ofThisUser($id)
-    {
-        //Tested
-        return DB::select(DB::raw('SELECT * FROM `'.$this->table.'` WHERE `repaired_by` = :id'), ['id' => $id]);
-    }
-
     public function ofThisEvent($event)
     {
         //Tested
@@ -94,14 +88,6 @@ class Device extends Model implements Auditable
                 INNER JOIN `categories` AS `c` ON `c`.`idcategories` = `d`.`category`
                 INNER JOIN `events` AS `e` ON `e`.`idevents` = `d`.`event`
                 WHERE `group` = :group'), ['group' => $group]);
-    }
-
-    public function ofAllGroups()
-    {
-        //Tested
-        return DB::select(DB::raw('SELECT * FROM `'.$this->table.'` AS `d`
-                INNER JOIN `categories` AS `c` ON `c`.`idcategories` = `d`.`category`
-                INNER JOIN `events` AS `e` ON `e`.`idevents` = `d`.`event`'));
     }
 
     public function statusCount($g = null, $year = null)
@@ -136,22 +122,6 @@ class Device extends Model implements Auditable
         }
 
         return DB::select(DB::raw($sql));
-    }
-
-    public function partyStatusCount($event)
-    {
-        $sql = 'SELECT COUNT(*) AS `counter`, `d`.`repair_status` AS `status`, `d`.`event`
-                FROM `'.$this->table.'` AS `d`';
-
-        $sql .= ' WHERE `repair_status` > 0 ';
-
-        $sql .= ' GROUP BY `status`';
-
-        if (! is_null($event) && is_numeric($event)) {
-            $sql .= ' AND `event` = :event ';
-        }
-
-        return DB::select(DB::raw($sql), ['event' => $event]);
     }
 
     public function countByCluster($cluster, $group = null, $year = null)
@@ -242,80 +212,6 @@ class Device extends Model implements Auditable
                 dd($e);
             }
         }
-    }
-
-    public function successRates($cluster = null, $direction = 'DESC', $threshold = 10)
-    {
-        $sql = 'SELECT
-                        COUNT(repair_status) AS fixed,
-                        total_devices,
-                        categories.name AS category_name,
-                        clusters.name AS cluster_name,
-                        ROUND( (COUNT(repair_status) * 100 / total_devices), 1) AS success_rate ';
-        if (! is_null($cluster)) {
-            $sql .= ', clusters.idclusters AS cluster ';
-        }
-
-        $sql .= ' FROM devices
-                        INNER JOIN categories ON categories.idcategories = devices.category
-                        INNER JOIN (
-                            SELECT
-                                COUNT(iddevices) AS total_devices,
-                                devices.category
-                            FROM devices
-                            GROUP BY devices.category
-                            ) AS totals ON totals.category = devices.category
-                        INNER JOIN clusters ON clusters.idclusters = categories.cluster ';
-
-        $sql .= 'WHERE
-                        repair_status = 1 AND
-                        total_devices > '.$threshold.' ';
-
-        if (! is_null($cluster)) {
-            $sql .= ' AND cluster = :cluster ';
-        }
-        $sql .= 'GROUP BY devices.category
-                    ORDER BY cluster ASC, success_rate '.$direction.' LIMIT 1';
-
-        if (! is_null($cluster)) {
-            return DB::select(DB::raw($sql), ['cluster' => $cluster]);
-        }
-
-        return DB::select(DB::raw($sql));
-    }
-
-    public function export()
-    {
-        //Tested
-        return DB::select(DB::raw('SELECT
-                    `c`.`name` AS `category`,
-                    `brand`,
-                    `model`,
-                    `problem`,
-                    `repair_status`,
-                    `spare_parts`,
-                    `e`.`location`,
-                    UNIX_TIMESTAMP(event_start_utc) AS `event_timestamp`,
-                    `g`.`name` AS `group_name`
-
-                FROM `devices` AS `d`
-                INNER JOIN `categories` AS `c` ON `c`.`idcategories` = `d`.`category`
-                INNER JOIN `events` AS `e` ON `e`.`idevents` = `d`.`event`
-                INNER JOIN `groups` AS `g` ON `g`.`idgroups` = `e`.`group`'));
-    }
-
-    public function findOne($id)
-    {
-        return $this->where('iddevices', $id)->first();
-    }
-
-    public function howMany($params = null)
-    {
-        if (empty($params)) {
-            return count(self::all());
-        }
-
-        return count(self::where($params));
     }
 
     public function deviceCategory()
@@ -418,15 +314,6 @@ class Device extends Model implements Auditable
         return $this->repair_status == env('DEVICE_FIXED');
     }
 
-    public function getProblem()
-    {
-        if (! empty($this->problem)) {
-            return $this->problem;
-        }
-
-        return 'N/A';
-    }
-
     public function getRepairStatus()
     {
         if ($this->repair_status == 1) {
@@ -440,19 +327,6 @@ class Device extends Model implements Auditable
         return 'N/A';
     }
 
-    public function getNextSteps()
-    {
-        if ($this->more_time_needed == 1) {
-            return trans('partials.more_time');
-        } elseif ($this->professional_help == 1) {
-            return trans('partials.professional_help');
-        } elseif ($this->do_it_yourself == 1) {
-            return trans('partials.diy');
-        }
-
-        return null;
-    }
-
     public function getSpareParts()
     {
         if ($this->parts_provider == 2) {
@@ -464,15 +338,6 @@ class Device extends Model implements Auditable
         }
 
         return null;
-    }
-
-    public function getAge()
-    {
-        if (! empty($this->age)) {
-            return $this->age;
-        }
-
-        return '-';
     }
 
     public function getShortProblem($length = 60)

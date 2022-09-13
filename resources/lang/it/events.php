@@ -82,7 +82,6 @@ return [
   'cancel_requests' => 'Annulla richiesta',
   'send_requests' => 'Spedisci richiesta',
   'email_invite' => 'Invito via email',
-  'moderation_none' => 'Attualmente non ci sono eventi da valutare',
   'request_review_message' => '<p> Questo informerà i volontari che hanno partecipato a questo evento che i dati di riparazione sono stati aggiunti e che potrebbero aggiungere  contributi e recensioni. </p> <p> Inoltre, farà sapere ai volontari che le foto ed eventuali feedback potrebbero essere stati pubblicati. </p> <p> Desideri inviare queste notifiche? </p>',
   'request_review_modal_heading' => 'Richiedi valutazione',
   'shareable_link' => 'Invia attravesro link condivisibile',

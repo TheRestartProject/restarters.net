@@ -109,25 +109,19 @@
 
                 </section>
 
-                <section class="mt-40">
-                    <h2>@lang('events.events_title_admin')</h2>
-                    <div class="table-responsive panel">
-                        <table class="table table-events table-striped" role="table">
-                            @include('events.tables.headers.head-events-admin-only', ['hide_invite' => true])
-                            <tbody>
-                                @if( count($network->eventsRequiringModeration()) > 0 )
-                                @foreach ($network->eventsRequiringModeration()->sortBy('event_start_utc') as $event)
-                                @include('partials.tables.row-events', ['show_invites_count' => false])
-                                @endforeach
-                                @else
-                                <tr>
-                                    <td colspan="13" align="center" class="p-3">@lang('events.moderation_none')</td>
-                                </tr>
-                                @endif
-                            </tbody>
-                        </table>
-                    </div>
-                </section>
+                <div class="vue-placeholder vue-placeholder-large">
+                    <div class="vue-placeholder-content">@lang('partials.loading')...</div>
+                </div>
+                <div class="vue">
+                    <GroupsRequiringModeration :networks="[{{ $network->id }}]" />
+                </div>
+
+                <div class="vue-placeholder vue-placeholder-large">
+                    <div class="vue-placeholder-large">@lang('partials.loading')...</div>
+                </div>
+                <div class="vue">
+                    <EventsRequiringModeration :networks="[{{ $network->id }}]" />
+                </div>
 
             </div>
         </div>

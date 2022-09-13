@@ -61,14 +61,42 @@ class GroupCreateTest extends TestCase
         $this->assertContains('That group name (Test Group0) already exists', $response->getContent());
     }
 
-    public function testApprove() {
+    public function roles() {
+        return [
+            [ 'Administrator'],
+            [ 'NetworkCoordinator' ]
+        ];
+    }
+
+    /**
+     * @dataProvider roles
+     */
+    public function testApprove($role) {
         Notification::fake();
 
-        $admin1 = factory(User::class)->state('Administrator')->create();
-        $this->actingAs($admin1);
+        $actas = factory(User::class)->state($role)->create();
+        $this->actingAs($actas);
 
-        $idgroups = $this->createGroup('Test Group');
+        $network = factory(Network::class)->create();
+        $idgroups = $this->createGroup('Test Group', 'https://therestartproject.org','London', 'Some text.', true, false);
         $group = Group::find($idgroups);
+        $network->addGroup($group);
+
+        if ($role == 'NetworkCoordinator') {
+            $network->addCoordinator($actas);
+        }
+
+        // Vue component should exist for group to be moderated, though the component itself fetches the group info
+        // so it won't show as props.
+        $response = $this->get('/group');
+        $response->assertSuccessful();
+
+        $props = $this->assertVueProperties($response, [
+            [],
+            [
+                'VueComponent' => 'groupsrequiringmoderation'
+            ],
+        ]);
 
         $admin2 = factory(User::class)->state('Administrator')->create();
         $this->actingAs($admin2);
@@ -85,7 +113,7 @@ class GroupCreateTest extends TestCase
         ]);
 
         Notification::assertSentTo(
-            [$admin1],
+            [$actas],
             GroupConfirmed::class,
             function ($notification, $channels, $host) use ($group) {
                 $mailData = $notification->toMail($host)->toArray();

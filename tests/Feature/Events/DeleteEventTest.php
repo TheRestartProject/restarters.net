@@ -165,7 +165,9 @@ class DeleteEventTest extends TestCase
         $network = factory(Network::class)->create([
             'events_push_to_wordpress' => true,
         ]);
-        $group = factory(Group::class)->create();
+        $group = factory(Group::class)->create([
+            'wordpress_post_id' => '99999',
+        ]);
         $network->addGroup($group);
         $event = factory(Party::class)->create(['group' => $group->idgroups]);
         $event->wordpress_post_id = 100;
@@ -194,7 +196,9 @@ class DeleteEventTest extends TestCase
         $network = factory(Network::class)->create([
             'events_push_to_wordpress' => true,
         ]);
-        $group = factory(Group::class)->create();
+        $group = factory(Group::class)->create([
+                                                   'wordpress_post_id' => '99999',
+                                               ]);
         $network->addGroup($group);
         $event = factory(Party::class)->create(['group' => $group->idgroups]);
         $event->wordpress_post_id = 100;

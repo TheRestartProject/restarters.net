@@ -18,8 +18,8 @@
       <b-td v-if="powered">
         {{ device.model }}
         <div class="d-block d-md-none">
-          <span class="pl-0 pl-md-2 pr-2 clickme" @click="editDevice">
-            <b-img class="icon" src="/icons/edit_ico_green.svg" />
+          <span class="pl-0 pl-md-2 pr-2 clickme edit" @click="editDevice">
+            <b-img class="icon edit" src="/icons/edit_ico_green.svg" />
           </span>
           <span class="pl-2 pr-2 clickme" @click="deleteConfirm">
             <b-img class="icon" src="/icons/delete_ico_red.svg" />
@@ -29,7 +29,7 @@
       <b-td v-if="!powered">
         {{ device.item_type }}
         <div class="d-block d-md-none">
-          <span class="pl-0 pl-md-2 pr-2 clickme" @click="editDevice">
+          <span class="pl-0 pl-md-2 pr-2 clickme edit" @click="editDevice">
             <b-img class="icon" src="/icons/edit_ico_green.svg" />
           </span>
           <span class="pl-2 pr-2 clickme" @click="deleteConfirm">
@@ -53,7 +53,7 @@
       </b-td>
       <b-td v-if="canedit" class="text-right d-none d-md-table-cell">
         <div class="d-flex">
-          <span class="pl-0 pl-md-2 pr-2 clickme" @click="editDevice">
+          <span class="pl-0 pl-md-2 pr-2 clickme edit" @click="editDevice">
             <b-img class="icon" src="/icons/edit_ico_green.svg" />
           </span>
             <span class="pl-2 pr-2 clickme" @click="deleteConfirm">

@@ -2,9 +2,7 @@
 
 namespace App;
 
-use App\Network;
 use DB;
-use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Lang;
 use Illuminate\Support\Facades\Log;
@@ -424,6 +422,12 @@ class Group extends Model implements Auditable
         return ! is_null($this->wordpress_post_id);
     }
 
+    public function scopeRequiresModeration($query)
+    {
+        $query = $query->whereNull('wordpress_post_id');
+        return $query;
+    }
+
     public function networks()
     {
         return $this->belongsToMany(Network::class, 'group_network', 'group_id', 'network_id');
@@ -434,10 +438,14 @@ class Group extends Model implements Auditable
         return $this->networks->contains($network);
     }
 
-    // If just one of the networks that the group is a member of
-    // should push to Wordpress, then we should push.
+    // If just one of the networks that the group is a member of should push to Wordpress, then we should push.
+    // If an group is not approved, then we should not push the events to Wordpress.
     public function eventsShouldPushToWordpress()
     {
+        if (!$this->approved) {
+            return false;
+        }
+
         foreach ($this->networks as $network) {
             if ($network->events_push_to_wordpress) {
                 return true;
@@ -458,11 +466,6 @@ class Group extends Model implements Auditable
         }
 
         return false;
-    }
-
-    public function getMaxUpdatedAtDevicesUpdatedAtAttribute()
-    {
-        return strtotime($this->updated_at) > strtotime($this->devices_updated_at) ? $this->updated_at : $this->devices_updated_at;
     }
 
     public function getAutoApproveAttribute()
@@ -672,5 +675,39 @@ class Group extends Model implements Auditable
     public function scopeMembersHosts($query) {
         $query = $query->membersJoined();
         return $query->where('users_groups.role', Role::HOST);
+    }
+
+    public function scopeUnapproved($query) {
+        return $query->whereNull('wordpress_post_id');
+    }
+
+    public function scopeUnapprovedVisibleTo($query, $user_id) {
+        $u = User::findOrFail($user_id);
+        $unetworks = $u->networks;
+        $ret = [];
+
+        if ($u->hasRole('Administrator')) {
+            // Can see all.
+            $ret = $this->unapproved()->get();
+        } else if ($u->hasRole('NetworkCoordinator')) {
+            // Can see groups for this network.  Logic doesn't scale well, but we will have few unapproved
+            // groups at any one time.
+            $groups = $this->unapproved()->get();
+
+            foreach ($groups as $group) {
+                foreach ($group->networks as $network) {
+                    foreach ($unetworks as $user_network) {
+                        if ($network->idnetworks == $user_network->idnetworks) {
+                            $ret[] = $group;
+                            break;
+                        }
+                    }
+                }
+            }
+
+            $ret = array_unique($ret);
+        }
+
+        return $ret;
     }
 }

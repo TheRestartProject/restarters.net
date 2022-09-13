@@ -228,20 +228,119 @@ class GroupController extends Controller
         ]);
     }
 
+    /**
+     * @OA\Get(
+     *      path="/api/v2/groups/{id}",
+     *      operationId="getGroup",
+     *      tags={"Groups"},
+     *      summary="Get Group",
+     *      description="Returns information about a group.",
+     *      @OA\Parameter(
+     *          name="id",
+     *          description="Group id",
+     *          required=true,
+     *          in="path",
+     *          @OA\Schema(
+     *              type="integer"
+     *          )
+     *      ),
+     *      @OA\Response(
+     *          response=200,
+     *          description="Successful operation",
+     *          @OA\JsonContent(
+     *              @OA\Property(
+     *                property="data",
+     *                title="data",
+     *                ref="#/components/schemas/Group"
+     *              )
+     *          )
+     *       ),
+     *      @OA\Response(
+     *          response=404,
+     *          description="Group not found",
+     *      ),
+     *     )
+     */
     public static function getGroupv2(Request $request, $idgroups) {
         $group = Group::findOrFail($idgroups);
         return \App\Http\Resources\Group::make($group);
     }
 
+    /**
+     * @OA\Get(
+     *      path="/api/v2/groups/{id}/events",
+     *      operationId="getGroup",
+     *      tags={"Groups"},
+     *      summary="Get Group",
+     *      description="Returns the list of events for a group.",
+     *      @OA\Parameter(
+     *          name="id",
+     *          description="Group id",
+     *          required=true,
+     *          in="path",
+     *          @OA\Schema(
+     *              type="integer"
+     *          )
+     *      ),
+     *      @OA\Parameter(
+     *          name="start",
+     *          description="The minimum start date for an event in ISO8601 format.  Inclusive.",
+     *          required=false,
+     *          in="query",
+     *          @OA\Schema(
+     *              type="string",
+     *              example="2022-09-18T11:30:00+00:00"
+     *          )
+     *      ),
+     *      @OA\Parameter(
+     *          name="end",
+     *          description="The maximum end date for an event in ISO8601 format.  Inclusive.",
+     *          required=false,
+     *          in="query",
+     *          @OA\Schema(
+     *              type="string",
+     *              example="2022-09-18T12:30:00+00:00"
+     *          )
+     *      ),
+     *      @OA\Response(
+     *          response=200,
+     *          description="Successful operation",
+     *          @OA\JsonContent(
+     *              @OA\Property(
+     *                property="data",
+     *                title="data",
+     *                description="An array of groups",
+     *                type="array",
+     *                @OA\Items(
+     *                    ref="#/components/schemas/EventSummary"
+     *                )
+     *              )
+     *          )
+     *       ),
+     *      @OA\Response(
+     *          response=404,
+     *          description="Group not found",
+     *      ),
+     *     )
+     */
+
     public static function getEventsForGroupv2(Request $request, $idgroups) {
-        Group::findOrFail($idgroups);
+        $group = Group::findOrFail($idgroups);
 
-        // Get date filters.  We default to far past and far future so that we don't need multiple code branches.  We
-        // don't need to validate the date format - if they put junk in then they'll get junk matches back.
-        $start = Carbon::parse($request->get('start', '1970-01-01'))->setTimezone('UTC')->toIso8601String();
-        $end = Carbon::parse($request->get('end', '3000-01-01'))->setTimezone('UTC')->toIso8601String();
+        $parties = collect([]);
 
-        $parties = Party::undeleted()->forGroup($idgroups)->where('event_start_utc', '>=', $start)->where('event_end_utc', '<=', $end)->get();
+        // Only show events on approved groups.
+        if ($group->approved) {
+            // Get date filters.  We default to far past and far future so that we don't need multiple code branches.  We
+            // don't need to validate the date format - if they put junk in then they'll get junk matches back.
+            $start = Carbon::parse($request->get('start', '1970-01-01'))->setTimezone('UTC')->toIso8601String();
+            $end = Carbon::parse($request->get('end', '3000-01-01'))->setTimezone('UTC')->toIso8601String();
+
+            $parties = Party::undeleted()->forGroup($idgroups)
+                ->where('event_start_utc', '>=', $start)
+                ->where('event_end_utc', '<=', $end)
+                ->get();
+        }
 
         return PartySummaryCollection::make($parties);
     }
@@ -271,6 +370,13 @@ class GroupController extends Controller
             ];
         }
 
+        return response()->json($ret);
+    }
+
+    public function moderateGroupsv2(Request $request) {
+        // Get the user that the API has been authenticated as.
+        $user = auth('api')->user();
+        $ret = \App\Http\Resources\GroupCollection::make(Group::unapprovedVisibleTo($user->id));
         return response()->json($ret);
     }
 }

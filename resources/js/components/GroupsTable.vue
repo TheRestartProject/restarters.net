@@ -83,7 +83,10 @@
         <span />
       </template>
       <template slot="cell(following)" slot-scope="data">
-        <b-btn variant="primary" class="text-nowrap mr-2" v-if="!data.item.following" :to="'/group/join/' + data.item.idgroups">
+        <div v-if="approve" class="cell-warning d-flex justify-content-around p-2">
+          <a :href="'/group/edit/' + data.item.idgroups">{{ __('groups.group_requires_moderation') }}</a>
+        </div>
+        <b-btn variant="primary" class="text-nowrap mr-2" v-else-if="!data.item.following" :to="'/group/join/' + data.item.idgroups">
           <span class="d-block d-md-none">
             {{ __('groups.join_group_button_mobile') }}
           </span>
@@ -156,6 +159,11 @@ export default {
       type: String,
       required: false,
       default: null
+    },
+    approve: {
+      type: Boolean,
+      required: false,
+      default: false
     }
   },
   data () {
