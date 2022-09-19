@@ -2,6 +2,7 @@
 
 namespace App\Console\Commands;
 
+use App\Helpers\Fixometer;
 use App\User;
 use Illuminate\Console\Command;
 
@@ -60,17 +61,19 @@ class ImportGroups extends Command
                     return iconv( "Windows-1252", "UTF-8", $str );
                 }, $fields);
 
-                // Format is  'Name', 'Location', 'Country', 'Latitude', 'Longitude', 'Website', 'Phone', 'Networks', 'Description'.
+                // Format is  'Name', 'Location', 'Postcode', 'Area', 'Country', 'Latitude', 'Longitude', 'Website', 'Phone', 'Networks', 'Description'.
 
                 $groupname = $fields[0];
                 $location = $fields[1];
-                $country = $fields[2];
-                $lat = $fields[3];
-                $lng = $fields[4];
-                $website = $fields[5];
-                $phone = $fields[6];
-                $networks = $fields[7];
-                $description = $fields[8];
+                $postcode = $fields[2];
+                $area = $fields[3];
+                $country = $fields[4];
+                $lat = $fields[5];
+                $lng = $fields[6];
+                $website = $fields[7];
+                $phone = $fields[8];
+                $networks = $fields[9];
+                $description = $fields[10];
 
                 // Validate.
                 if (!$groupname) {
@@ -115,11 +118,15 @@ class ImportGroups extends Command
                     $group = new \App\Group();
                     $group->name = $groupname;
                     $group->location = $location;
+                    $group->postcode = $postcode;
+                    $group->area = $area;
                     $group->latitude = $lat;
                     $group->longitude = $lng;
                     $group->country = $country;
                     $group->website = $website;
+                    $group->phone = $phone;
                     $group->free_text = $description;
+                    $group->shareable_code = Fixometer::generateUniqueShareableCode(\App\Group::class, 'shareable_code');
                     $group->save();
 
                     if ($networks) {

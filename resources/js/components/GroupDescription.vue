@@ -11,6 +11,12 @@
           </p>
           <read-more v-else :html="group.free_text" class="mt-2" :max-chars="440" :more-str="__('groups.read_more')" :less-str="__('groups.read_less')" />
         </div>
+        <p v-if="group.phone" class="font-weight-bold">
+          {{ __('groups.field_phone') }}:
+          <a :href="'tel:' +  group.phone">
+            {{ group.phone }}
+          </a>
+        </p>
         <div class="d-flex pt-1 pb-1" v-if="discourseGroup">
           <div class="mr-2">
             <b-img-lazy src="/icons/talk_ico.svg" class="icon" />

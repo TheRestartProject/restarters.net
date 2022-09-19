@@ -12,7 +12,7 @@ class ImportMRES extends Command
      *
      * @var string
      */
-    protected $signature = 'import:mres {input} {output} {--networks=}';
+    protected $signature = 'import:mres {input} {output} {--networks=CSV list of ids}';
 
 
     /**
@@ -52,7 +52,7 @@ class ImportMRES extends Command
         fgetcsv($inputFile);
 
         // Write headers to output.
-        fputcsv($outputFile, ['Name', 'Location', 'Country', 'Latitude', 'Longitude', 'Website', 'Phone', 'Networks', 'Description']);
+        fputcsv($outputFile, ['Name', 'Location', 'Postcode', 'Area', 'Country', 'Latitude', 'Longitude', 'Website', 'Phone', 'Networks', 'Description']);
 
         while (!feof($inputFile))
         {
@@ -66,15 +66,14 @@ class ImportMRES extends Command
                 $hostname = $fields[4];
                 $organisateur = $fields[5];
                 $dates = $fields[6];
-                $website = $fields[7];
-                $catsupport = $fields[8];
-                $geoloc1 = $fields[9];
-                $lat = $fields[10];
-                $lng = $fields[11];
-                $address = $fields[12];
-                $ville = $fields[13];
-                $cp = $fields[14];
-                $website2 = $fields[15];
+                $regroupements = $fields[7];
+                $website = $fields[8];
+                $lat = $fields[9];
+                $lng = $fields[10];
+                $address = $fields[11];
+                $ville = $fields[12];
+                $cp = $fields[13];
+                $website2 = $fields[14];
 
                 // Validate.
                 if (!$groupname) {
@@ -130,6 +129,14 @@ class ImportMRES extends Command
                     $description .= "<p>Organisateur: " . htmlspecialchars($organisateur) . "</p>";
                 }
 
+                if ($inscription) {
+                    $description .= "<p>Inscription: " . htmlspecialchars($inscription) . "</p>";
+                }
+
+                if ($regroupements) {
+                    $description .= "<p>Regroupement: " . htmlspecialchars($regroupements) . "</p>";
+                }
+
                 $website = str_replace('http://', 'https://', $website);
                 $location = "$address, $ville, $cp";
 
@@ -137,6 +144,8 @@ class ImportMRES extends Command
                         [
                             $groupname,
                             $location,
+                            $cp,
+                            $ville,
                             'France',
                             $lat,
                             $lng,

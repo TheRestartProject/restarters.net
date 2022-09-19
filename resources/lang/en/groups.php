@@ -156,4 +156,6 @@ return [
   'you_have_joined' => 'You have joined <a class="plain-link" href=":url">:name</a>',
   'groups_title_admin' => 'Groups to moderate',
   'group_requires_moderation' => 'Group requires moderation',
+  'field_phone' => 'Phone number',
+  'phone_small' => '(Optional)',
 ];
