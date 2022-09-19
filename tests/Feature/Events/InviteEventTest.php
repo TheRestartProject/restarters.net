@@ -339,4 +339,35 @@ class InviteEventTest extends TestCase
         $this->expectException(NotFoundHttpException::class);
         $rsp = $this->get('/party/invite/' . $unique_shareable_code . '1');
     }
+
+    public function testInviteInvalid()
+    {
+        Notification::fake();
+
+        $this->withoutExceptionHandling();
+
+        $group = factory(Group::class)->create([
+                                                   'wordpress_post_id' => '99999'
+                                               ]);
+        $event = factory(Party::class)->create([
+                                                   'group' => $group,
+                                                   'event_start_utc' => '2130-01-01T12:13:00+00:00',
+                                                   'event_end_utc' => '2130-01-01T13:14:00+00:00',
+                                               ]);
+
+        $host = factory(User::class)->states('Host')->create();
+        $this->actingAs($host);
+
+        // Invite a user.
+        $user = factory(User::class)->states('Restarter')->create();
+
+        $response = $this->post('/party/invite', [
+            'group_name' => $group->name,
+            'event_id' => $event->idevents,
+            'manual_invite_box' => '@invalidmail',
+            'message_to_restarters' => 'Join us, but not in a creepy zombie way',
+        ]);
+
+        $response->assertSessionHas('warning');
+    }
 }
