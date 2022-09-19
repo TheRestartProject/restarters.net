@@ -9,6 +9,11 @@ return [
     'network' => 'Réseau',
     'networks' => 'Réseaux',
     'particular_network' => 'Réseau :networkName',
+    'groups' => 'Repair Cafés',
+    'about' => 'Plus d\'informations',
+    'count' => 'Il y a actuellement :count Repair Cafés dans le réseau :name. <a href="/group/network/:id">Voir ces Repair Cafés</a>.',
+    'actions' => 'Gestion du Réseaux',
+    'coordinators' => 'Coordinateurs du réseau',
   ],
   'index' => [
     'all_networks' => 'Tous les réseaux',
