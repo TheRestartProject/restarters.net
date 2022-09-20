@@ -58,7 +58,7 @@ class ImportGroups extends Command
             if ($fields) {
                 // Convert charset so that we handle accented characters.
                 $fields = array_map( function($str) {
-                    return iconv( "Windows-1252", "UTF-8", $str );
+                    return iconv( "iso-8859-15", "UTF-8", $str );
                 }, $fields);
 
                 // Format is  'Name', 'Location', 'Postcode', 'Area', 'Country', 'Latitude', 'Longitude', 'Website', 'Phone', 'Networks', 'Description'.
@@ -127,12 +127,16 @@ class ImportGroups extends Command
                     $group->phone = $phone;
                     $group->free_text = $description;
                     $group->shareable_code = Fixometer::generateUniqueShareableCode(\App\Group::class, 'shareable_code');
+
+                    // All these groups are approved.
+                    $group->wordpress_post_id = '99999';
+
                     $group->save();
 
                     if ($networks) {
                         $networks = explode(',', $networks);
                         foreach ($networks as $network) {
-                            $n = \App\Network::findOrFail($network)->first();
+                            $n = \App\Network::findOrFail($network);
                             $n->addGroup($group);
                         }
                     }

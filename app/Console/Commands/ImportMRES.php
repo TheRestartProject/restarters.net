@@ -59,21 +59,21 @@ class ImportMRES extends Command
             $fields = fgetcsv($inputFile);
 
             if ($fields) {
-                $groupname = $fields[0];
-                $email = $fields[1];
-                $phone = $fields[2];
-                $inscription = $fields[3];
-                $hostname = $fields[4];
-                $organisateur = $fields[5];
-                $dates = $fields[6];
-                $regroupements = $fields[7];
-                $website = $fields[8];
-                $lat = $fields[9];
-                $lng = $fields[10];
-                $address = $fields[11];
-                $ville = $fields[12];
-                $cp = $fields[13];
-                $website2 = $fields[14];
+                $groupname = trim($fields[0]);
+                $email = trim($fields[1]);
+                $phone = trim($fields[2]);
+                $inscription = trim($fields[3]);
+                $hostname = trim($fields[4]);
+                $organisateur = trim($fields[5]);
+                $dates = trim($fields[6]);
+                $regroupements = trim($fields[7]);
+                $website = trim($fields[8]);
+                $lat = trim($fields[9]);
+                $lng = trim($fields[10]);
+                $address = trim($fields[11]);
+                $ville = trim($fields[12]);
+                $cp = trim($fields[13]);
+                $website2 = trim($fields[14]);
 
                 // Validate.
                 if (!$groupname) {
@@ -122,19 +122,19 @@ class ImportMRES extends Command
                 $description = "";
 
                 if ($dates) {
-                    $description .= "<p>Dates et horaires: " . htmlspecialchars($dates) . "</p>";
+                    $description .= "<p>Dates et horaires: " . htmlspecialchars($dates, ENT_COMPAT,'ISO-8859-15', true) . "</p>";
                 }
 
                 if ($organisateur) {
-                    $description .= "<p>Organisateur: " . htmlspecialchars($organisateur) . "</p>";
+                    $description .= "<p>Organisateur: " . htmlspecialchars($organisateur, ENT_COMPAT,'ISO-8859-15', true) . "</p>";
                 }
 
                 if ($inscription) {
-                    $description .= "<p>Inscription: " . htmlspecialchars($inscription) . "</p>";
+                    $description .= "<p>Inscription: " . htmlspecialchars($inscription, ENT_COMPAT,'ISO-8859-15', true) . "</p>";
                 }
 
                 if ($regroupements) {
-                    $description .= "<p>Regroupement: " . htmlspecialchars($regroupements) . "</p>";
+                    $description .= "<p>Regroupement: " . htmlspecialchars($regroupements, ENT_COMPAT,'ISO-8859-15', true) . "</p>";
                 }
 
                 $website = str_replace('http://', 'https://', $website);
