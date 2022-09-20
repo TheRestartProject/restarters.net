@@ -95,6 +95,7 @@ class JoinEvent extends BaseNotification
                 }
 
                 $mail->line($eventDetailsTable)
+                    ->action(__('notifications.join_event_rsvp_now', [], $locale), $this->arr['url'])
                     ->line($ignoreLine)
                     ->line('');
 
@@ -116,7 +117,7 @@ class JoinEvent extends BaseNotification
             }
 
             $mail->line($eventDetailsTable)
-                ->line(__('notifications.join_event_rsvp_now', [], $locale))
+                ->action(__('notifications.join_event_rsvp_now', [], $locale), $this->arr['url'])
                 ->line('')
                 ->line($ignoreLine);
 

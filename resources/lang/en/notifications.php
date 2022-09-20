@@ -34,6 +34,7 @@ return [
     'join_event_location' => 'Location:',
     'join_event_ignore' => 'If you think this invitation was not intended for you, please disregard this email.',
     'join_event_rsvp_now' => 'RSVP now',
+    'join_event_view' => 'View event',
     'join_group_title' => 'Invitation from :name to follow :group',
     'join_group_intro' => 'You have received this email because you have been invited by :name to follow the community repair group <b>:group</b> on restarters.net.',
     'join_group_action' => 'Click to follow group',
