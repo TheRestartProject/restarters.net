@@ -445,7 +445,7 @@ class GroupController extends Controller
         }
 
         if (count($invalid)) {
-            return redirect()->back()->with('warning', 'Invalid emails: ' . implode(', ', $invalid));
+            return redirect()->back()->with('warning', 'Invalid emails were entered, so no notifications were sent - please send your invitation again.  The invalid emails were: ' . implode(', ', $invalid));
         }
 
         $users = User::whereIn('email', $emails)->get();
