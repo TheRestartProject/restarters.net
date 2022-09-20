@@ -403,6 +403,12 @@
                         "format": "string",
                         "example": "<p>This is a description.</p>"
                     },
+                    "phone": {
+                        "title": "phone",
+                        "description": "An optional phone number to contact the group.",
+                        "format": "string",
+                        "example": "07544 314678"
+                    },
                     "website": {
                         "title": "website",
                         "description": "An URL for the group's own separate website.",

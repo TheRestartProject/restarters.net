@@ -146,7 +146,7 @@ final class Versions
   'vlucas/phpdotenv' => 'v3.6.10@5b547cdb25825f10251370f57ba5d9d924e6f68e',
   'wouternl/laravel-drip' => '1.2.4@f9d96140ba62f4ddb4df909e20931e897e0edd54',
   'zircote/swagger-php' => '3.3.6@5016342f966fca29dda84455de066c5c90d37941',
-  'laravel/laravel' => 'dev-production@fb8569fff5be829df025a3d99d2e24fd8f5a00b7',
+  'laravel/laravel' => 'dev-production@424813caa86de333f60347d3a0fad543ea3e6e7e',
 );
 
     private function __construct()
