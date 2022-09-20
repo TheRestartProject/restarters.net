@@ -441,6 +441,18 @@ class GroupController extends Controller
             return redirect()->back()->with('warning', 'You have not entered any emails!');
         }
 
+        $invalid = [];
+
+        foreach ($emails as $email) {
+            if (! filter_var($email, FILTER_VALIDATE_EMAIL)) {
+                $invalid[] = $email;
+            }
+        }
+
+        if (count($invalid)) {
+            return redirect()->back()->with('warning', 'Invalid emails were entered, so no notifications were sent - please send your invitation again.  The invalid emails were: ' . implode(', ', $invalid));
+        }
+
         $users = User::whereIn('email', $emails)->get();
 
         $non_users = array_diff($emails, User::whereIn('email', $emails)->pluck('email')->toArray());
