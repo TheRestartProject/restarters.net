@@ -120,6 +120,11 @@ class GroupController extends Controller
                 $error['name'] = 'Please input a name.';
             }
 
+            if ($timezone && !in_array($timezone, \DateTimeZone::listIdentifiers())) {
+                $error['timezone'] =  __('partials.validate_timezone');
+                $response['warning'] = $error['timezone'];
+            }
+
             if (! empty($location)) {
                 $geocoded = $geocoder->geocode($location);
 

@@ -183,6 +183,11 @@ class PartyController extends Controller
             // We might be passed a timezone; if not then use the timezone of the group.
             $timezone = $request->input('timezone', $groupobj->timezone);
 
+            if ($timezone && !in_array($timezone, \DateTimeZone::listIdentifiers())) {
+                $error['timezone'] = 'Please select a valid timezone.';
+                $response['warning'] = $error['timezone'];
+            }
+
             $request->validate([
                                    'location' => [
                                        function ($attribute, $value, $fail) use ($request) {
@@ -191,6 +196,13 @@ class PartyController extends Controller
                                            }
                                        },
                                    ],
+                                   'timezone' => [
+                                       function ($attribute, $value, $fail) use ($request) {
+                                           if ($request->filled('timezone') && !in_array($request->timezone, \DateTimeZone::listIdentifiers())) {
+                                               $fail(__('partials.validate_timezone'));
+                                           }
+                                       },
+                                   ]
                                ]);
 
             $event_start_utc = $request->input('event_start_utc');
