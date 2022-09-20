@@ -71,7 +71,7 @@ class Group extends JsonResource
      *          title="phone",
      *          description="An optional phone number to contact the group.",
      *          format="string",
-     *          example="https://therestartproject.org"
+     *          example="07544 314678"
      *     )
      */
 
