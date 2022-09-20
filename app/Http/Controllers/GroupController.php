@@ -115,9 +115,15 @@ class GroupController extends Controller
             $location = $request->input('location');
             $text = $request->input('free_text');
             $timezone = $request->input('timezone');
+            $phone = $request->input('phone');
 
             if (empty($name)) {
                 $error['name'] = 'Please input a name.';
+            }
+
+            if ($timezone && !in_array($timezone, \DateTimeZone::listIdentifiers())) {
+                $error['timezone'] =  __('partials.validate_timezone');
+                $response['warning'] = $error['timezone'];
             }
 
             if (! empty($location)) {
@@ -154,6 +160,7 @@ class GroupController extends Controller
                     'free_text' => $text,
                     'shareable_code' => Fixometer::generateUniqueShareableCode(\App\Group::class, 'shareable_code'),
                     'timezone' => $timezone,
+                    'phone' => $phone,
                 ];
 
                 try {
@@ -436,6 +443,18 @@ class GroupController extends Controller
             return redirect()->back()->with('warning', 'You have not entered any emails!');
         }
 
+        $invalid = [];
+
+        foreach ($emails as $email) {
+            if (! filter_var($email, FILTER_VALIDATE_EMAIL)) {
+                $invalid[] = $email;
+            }
+        }
+
+        if (count($invalid)) {
+            return redirect()->back()->with('warning', 'Invalid emails were entered, so no notifications were sent - please send your invitation again.  The invalid emails were: ' . implode(', ', $invalid));
+        }
+
         $users = User::whereIn('email', $emails)->get();
 
         $non_users = array_diff($emails, User::whereIn('email', $emails)->pluck('email')->toArray());
@@ -620,6 +639,7 @@ class GroupController extends Controller
             $update = [
                 'name' => $data['name'],
                 'website' => array_key_exists('website', $data) ? $data['website'] : null,
+                'phone' => array_key_exists('phone', $data) ? $data['phone'] : null,
                 'free_text' => $data['free_text'],
                 'location' => array_key_exists('location', $data) ? $data['location'] : null,
                 'timezone' => array_key_exists('timezone', $data) ? $data['timezone'] : null,

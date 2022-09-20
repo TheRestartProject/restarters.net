@@ -28,3 +28,13 @@
 .oo-ui-dialog {
   z-index: 10000 !important;
 }
+
+// Hide the navbar when the wiki visual editor opens a modal.
+body.oo-ui-windowManager-modal-active > nav {
+  visibility: hidden;
+}
+
+// Hide "Leave feedback about this software" link, which is confusing.
+.ve-ui-mwHelpPopupTool-item .oo-ui-buttonElement-frameless:nth-child(3) {
+  display: none !important;
+}

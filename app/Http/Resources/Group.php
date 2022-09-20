@@ -67,6 +67,16 @@ class Group extends JsonResource
 
     /**
      *     @OA\Property(
+     *          property="phone",
+     *          title="phone",
+     *          description="An optional phone number to contact the group.",
+     *          format="string",
+     *          example="07544 314678"
+     *     )
+     */
+
+    /**
+     *     @OA\Property(
      *          property="website",
      *          title="website",
      *          description="An URL for the group's own separate website.",
@@ -238,6 +248,7 @@ class Group extends JsonResource
             'area' => $this->area,
             'country' => $this->country,
             'website' => $this->website,
+            'phone' => $this->phone,
             'description' => $this->free_text,
             'stats' => $stats,
             'updated_at' => Carbon::parse($this->updated_at)->toIso8601String(),

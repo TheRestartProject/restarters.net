@@ -144,7 +144,12 @@ return [
   'delete_succeeded' => 'Repair Café <strong>:name</strong> a été supprimé.',
   'duplicate' => 'Ce nom (:name) existe déjà.  Si c\'est le vôtre, veuillez vous rendre dans la page Repair Cafés, utiliser le menu et l\'éditer.',
   'geocode_failed' => 'L\'adresse que vous avez encodée n\'a pas pu être trouvée. Veuillez essayer une adresse plus générale.',
-  'invitation_pending' => 'Vous avez une invitation à rejoindre ce Repair Café. Cliquez <a href=":accept">ici</a> si vous voulez le rejoindre.',
+  'discourse_title' => 'Il s\'agit d\'un groupe de discussion pour tous ceux qui suivent le Repair Café :group.
+
+Vous trouverez la page principale du Repair Café ici : :link.
+
+Apprenez à utiliser ce groupe ici : :help.',
+    'invitation_pending' => 'Vous avez une invitation à rejoindre ce Repair Café. Cliquez <a href=":accept">ici</a> si vous voulez le rejoindre.',
   'nearest_groups' => 'Ce sont les Repair Cafés qui se trouvent dans un rayon de 50km autour de :location',
   'nearest_groups_change' => '(change)',
   'talk_group' => 'Voir la conversation de Repair Café',
@@ -157,4 +162,6 @@ return [
   'talk_group_add_body' => 'Merci de suivre le Repair Café :group_name ! Vous recevrez désormais des notifications lorsque de nouveaux événements seront planifiés et seront ajoutés aux messages de Repair Café. <a href="https://talk.restarters.net/t/how-to-communicate-with-your-repair-group/6293">Découvrez comment fonctionnent les messages de Repair Café et comment modifier vos paramètres de notification</a>.',
   'you_have_joined' => 'Vous avez rejoint <a class="plain-link" href=":url">:name</a>',
   'groups_title_admin' => 'Repair Cafés à modérer',
+  'field_phone' => 'Numéro de téléphone',
+  'phone_small' => '(Optionnel)',
 ];

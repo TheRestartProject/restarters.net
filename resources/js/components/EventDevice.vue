@@ -484,6 +484,10 @@ h3 {
     border-radius: 0;
   }
 
+  h3 {
+    color: #222;
+  }
+
   ::v-deep {
     label {
       color: white;

@@ -34,6 +34,7 @@ return [
     'join_event_location' => 'Emplacement :',
     'join_event_ignore' => 'Si vous pensez que cette invitation ne vous est pas destinée, veuillez ne pas tenir compte de cet e-mail.',
     'join_event_rsvp_now' => 'RSVP maintenant',
+    'join_event_view' => 'Voir l\'événement',
     'join_group_title' => 'Invitation de :name à suivre :group',
     'join_group_intro' => 'Vous avez reçu cet e-mail car vous avez été invité par :name à suivre leRepair Café <b>:group</b> sur restarters.net.',
     'join_group_action' => 'Cliquez pour suivre le Repair Café',

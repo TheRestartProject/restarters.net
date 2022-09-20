@@ -176,4 +176,13 @@ class GroupTest extends TestCase
             [ NULL, NULL, NULL, NULL, TRUE ],
         ];
     }
+
+    public function can_store_phone() {
+        $group = factory(Group::class)->create([
+                                                   'phone' => 1234
+                                               ]);
+
+        $group2 = Group::find($group->id);
+        self::assertEquals(1234, $group2->phone);
+    }
 }

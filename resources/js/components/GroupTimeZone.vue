@@ -7,6 +7,9 @@
         :data="timezones"
         :minMatchingChars="1"
         inputClass="form-control field timezone"
+        :class="{
+'invalid': !valid
+        }"
     />
     <small class="form-text text-muted">
       {{ __('groups.timezone_placeholder') }}
@@ -33,6 +36,16 @@ export default {
       timezones: []
     }
   },
+  computed: {
+    valid() {
+      return !this.currentValue || !this.timezones.length || this.timezones.includes(this.currentValue)
+    }
+  },
+  watch: {
+    valid(newValue) {
+      this.$emit('update:valid', newValue)
+    }
+  },
   async mounted() {
     this.currentValue = this.value
 
@@ -44,3 +57,10 @@ export default {
   }
 }
 </script>
+<style scoped lang="scss">
+@import 'resources/global/css/_variables';
+
+/deep/ .invalid input {
+  border: 2px solid $brand-danger;
+}
+</style>

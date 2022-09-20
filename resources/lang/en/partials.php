@@ -83,4 +83,5 @@ return [
   'please_choose' => 'Please choose...',
   'notification_greeting' => 'Hello!',
   'confirm' => 'Confirm',
+  'validate_timezone' => 'Please select a valid timezone.',
 ];

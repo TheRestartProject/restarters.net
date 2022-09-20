@@ -12,7 +12,7 @@ class ImportMRES extends Command
      *
      * @var string
      */
-    protected $signature = 'import:mres {input} {output} {--networks=}';
+    protected $signature = 'import:mres {input} {output} {--networks=CSV list of ids}';
 
 
     /**
@@ -52,29 +52,28 @@ class ImportMRES extends Command
         fgetcsv($inputFile);
 
         // Write headers to output.
-        fputcsv($outputFile, ['Name', 'Location', 'Country', 'Latitude', 'Longitude', 'Website', 'Phone', 'Networks', 'Description']);
+        fputcsv($outputFile, ['Name', 'Location', 'Postcode', 'Area', 'Country', 'Latitude', 'Longitude', 'Website', 'Phone', 'Networks', 'Description']);
 
         while (!feof($inputFile))
         {
             $fields = fgetcsv($inputFile);
 
             if ($fields) {
-                $groupname = $fields[0];
-                $email = $fields[1];
-                $phone = $fields[2];
-                $inscription = $fields[3];
-                $hostname = $fields[4];
-                $organisateur = $fields[5];
-                $dates = $fields[6];
-                $website = $fields[7];
-                $catsupport = $fields[8];
-                $geoloc1 = $fields[9];
-                $lat = $fields[10];
-                $lng = $fields[11];
-                $address = $fields[12];
-                $ville = $fields[13];
-                $cp = $fields[14];
-                $website2 = $fields[15];
+                $groupname = trim($fields[0]);
+                $email = trim($fields[1]);
+                $phone = trim($fields[2]);
+                $inscription = trim($fields[3]);
+                $hostname = trim($fields[4]);
+                $organisateur = trim($fields[5]);
+                $dates = trim($fields[6]);
+                $regroupements = trim($fields[7]);
+                $website = trim($fields[8]);
+                $lat = trim($fields[9]);
+                $lng = trim($fields[10]);
+                $address = trim($fields[11]);
+                $ville = trim($fields[12]);
+                $cp = trim($fields[13]);
+                $website2 = trim($fields[14]);
 
                 // Validate.
                 if (!$groupname) {
@@ -123,20 +122,29 @@ class ImportMRES extends Command
                 $description = "";
 
                 if ($dates) {
-                    $description .= "<p>Dates et horaires: " . htmlspecialchars($dates) . "</p>";
+                    $description .= "<p>Dates et horaires: " . htmlspecialchars($dates, ENT_COMPAT,'ISO-8859-15', true) . "</p>";
                 }
 
                 if ($organisateur) {
-                    $description .= "<p>Organisateur: " . htmlspecialchars($organisateur) . "</p>";
+                    $description .= "<p>Organisateur: " . htmlspecialchars($organisateur, ENT_COMPAT,'ISO-8859-15', true) . "</p>";
+                }
+
+                if ($inscription) {
+                    $description .= "<p>Inscription: " . htmlspecialchars($inscription, ENT_COMPAT,'ISO-8859-15', true) . "</p>";
+                }
+
+                if ($regroupements) {
+                    $description .= "<p>Regroupement: " . htmlspecialchars($regroupements, ENT_COMPAT,'ISO-8859-15', true) . "</p>";
                 }
 
                 $website = str_replace('http://', 'https://', $website);
-                $location = "$address, $ville, $cp";
 
                 fputcsv($outputFile,
                         [
                             $groupname,
                             $location,
+                            $cp,
+                            $ville,
                             'France',
                             $lat,
                             $lng,

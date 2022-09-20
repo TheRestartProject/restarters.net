@@ -30,6 +30,12 @@ class Network extends Model
     public function addCoordinator($coordinator)
     {
         $this->coordinators()->syncWithoutDetaching($coordinator->id);
+
+        // Set us to a network coordinator (but don't demote us from admin).
+        if ($coordinator->role != Role::ADMINISTRATOR) {
+            $coordinator->role = Role::NETWORK_COORDINATOR;
+            $coordinator->save();
+        }
     }
 
     public function eventsRequiringModeration()

@@ -146,6 +146,11 @@ return [
   'nearest_groups_change' => '(change)',
   'invitation_pending' => 'You have an invitation to this group.  Please click <a href=":accept">here</a> if you would like to join.',
   'geocode_failed' => 'The address you entered could not be found. Please try a more general address.',
+  'discourse_title' => 'This is a discussion group for anyone who follows :group.
+
+Find the group\'s main page here: :link.
+
+Learn how to use this group here: :help.',
   'talk_group' => 'View group conversation',
   'talk_group_add_title' => 'Welcome to :group_name',
   'talk_group_add_body' => 'Thank you for following :group_name! You will now receive notifications when new events are planned and will be added to group messages. <a href="https://talk.restarters.net/t/how-to-communicate-with-your-repair-group/6293">Learn how group messages work and how to change your notification settings</a>.',
@@ -156,4 +161,6 @@ return [
   'you_have_joined' => 'You have joined <a class="plain-link" href=":url">:name</a>',
   'groups_title_admin' => 'Groups to moderate',
   'group_requires_moderation' => 'Group requires moderation',
+  'field_phone' => 'Phone number',
+  'phone_small' => '(Optional)',
 ];

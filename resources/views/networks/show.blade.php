@@ -46,8 +46,8 @@
                             <div class="button-group button-group__r">
                                 @if( Auth::check() )
                                 <div class="dropdown">
-                                    <button class="btn btn-primary dropdown-toggle" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                                        Network actions
+                                    <button class="btn btn-primary dropdown-toggle text-uppercase" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                        {{ __('networks.general.actions') }}
                                     </button>
                                     <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
                                         <a class="dropdown-item" href="/group/network/{{ $network->id }}">@lang('networks.show.view_groups_menuitem')</a>
@@ -69,17 +69,17 @@
         <div class="row">
             <div class="col-lg-3">
 
-                <h2 id="about-grp">About</h2>
+                <h2 id="about-grp">{{ __('networks.general.about') }}</h2>
 
                 <div class="events__description">
                     <p>{!! Str::limit(strip_tags($network->description), 160, '...') !!}</p>
                     @if( strlen($network->description) > 160 )
-                    <button data-toggle="modal" data-target="#group-description"><span>Read more</span></button>
+                    <button data-toggle="modal" data-target="#group-description"><span>{{ __('partials.read_more') }}</span></button>
                     @endif
                 </div><!-- /events__description -->
 
 
-                <h2 id="volunteers">Coordinators</h2>
+                <h2 id="volunteers">{{ __('networks.general.coordinators') }}</h2>
 
                 <div class="tab">
 
@@ -99,11 +99,15 @@
             <div class="col-lg-9">
 
                 <section style="mt-40 mb-40">
-                    <h2>Groups</h2>
+                    <h2>{{ __('networks.general.groups') }}</h2>
 
                     <div class="panel">
                     <p>
-                        There are currently {{ $network->groups->count() }} groups in the {{ $network->name }} network. <a href="/group/network/{{ $network->id }}">View these groups</a>.
+                        {!! __('networks.general.count', [
+                            'count' => $network->groups->count(),
+                            'name' => $network->name,
+                            'id' => $network->id
+                        ]) !!}
                     </p>
                     </div>
 
