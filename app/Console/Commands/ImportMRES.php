@@ -138,7 +138,6 @@ class ImportMRES extends Command
                 }
 
                 $website = str_replace('http://', 'https://', $website);
-                $location = "$address, $ville, $cp";
 
                 fputcsv($outputFile,
                         [
