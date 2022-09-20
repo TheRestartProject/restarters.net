@@ -36,5 +36,5 @@ body.oo-ui-windowManager-modal-active > nav {
 
 // Hide "Leave feedback about this software" link, which is confusing.
 .ve-ui-mwHelpPopupTool-item .oo-ui-buttonElement-frameless:nth-child(3) {
-  display: none;
+  display: none !important;
 }
