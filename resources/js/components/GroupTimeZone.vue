@@ -38,7 +38,7 @@ export default {
   },
   computed: {
     valid() {
-      return !this.currentValue || this.timezones.includes(this.currentValue)
+      return !this.currentValue || !this.timezones.length || this.timezones.includes(this.currentValue)
     }
   },
   watch: {
