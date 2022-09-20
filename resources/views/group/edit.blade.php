@@ -130,6 +130,15 @@
                             <GroupTimeZone value="{{ App\Group::find($formdata->idgroups)->timezone }}" />
                           </div>
 
+                          <div class="form-group">
+                            <label for="phone">@lang('groups.field_phone'):</label>
+                            <input class="form-control field" id="phone" name="phone" type="tel"  value="{{ $formdata->phone }}"  aria-describedby="phoneHelpBlock" />
+
+                            <small id="phoneHelpBlock" class="form-text text-muted">
+                              @lang('groups.phone_small')
+                            </small>
+                          </div>
+
                         </div>
 
                         <div class="col-lg-5">

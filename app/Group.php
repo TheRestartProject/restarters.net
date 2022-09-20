@@ -36,7 +36,8 @@ class Group extends Model implements Auditable
         'network_id',
         'external_id',
         'devices_updated_at',
-        'timezone'
+        'timezone',
+        'phone'
     ];
 
     protected $appends = ['ShareableLink', 'approved', 'auto_approve'];
