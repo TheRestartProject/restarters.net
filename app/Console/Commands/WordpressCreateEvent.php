@@ -2,10 +2,8 @@
 
 namespace App\Console\Commands;
 
-use App\Listeners\CreateDiscourseGroupForGroup;
-use App\Listeners\CreateWordpressPostForGroup;
-use App\Network;
-use App\User;
+use App\Listeners\CreateWordpressPostForEvent;
+use App\Party;
 use Illuminate\Console\Command;
 
 class WordpressCreateEvent extends Command
