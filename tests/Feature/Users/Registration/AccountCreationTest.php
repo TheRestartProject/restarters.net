@@ -157,4 +157,14 @@ class AccountCreationTest extends TestCase
             'email' => $userAttributes['email'],
         ]);
     }
+
+    public function testValidationFail()
+    {
+        $userAttributes = $this->userAttributes();
+        unset($userAttributes['consent_gdpr']);
+        $response = $this->post('/user/register/', $userAttributes);
+
+        $response->assertStatus(302);
+        $response->assertSessionHas('errors');
+    }
 }
