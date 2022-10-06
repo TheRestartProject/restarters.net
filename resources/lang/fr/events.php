@@ -150,4 +150,5 @@ return [
   'review_requested_permissions' => 'Désolé - vous n\'avez pas les autorisations nécessaires pour cette action.',
   'no_location' => '<b>Vous n\'avez pas actuellement de ville définie.  Vous pouvez en définir une dans <a href="/profil/edit">votre profil</a>.</b>',
   'you_have_joined' => 'Vous avez rejoint <a class="plain-link" href=":url">:name</a>',
+  'discourse_intro' => "Il s'agit de la discussion des volontaires pour le Repair Café <a href=\":url\">:name</a> qui se tiendra du :start au :fend.\r\n\r\r\nNous pouvons utiliser ce fil avant l'événement pour discuter de la logistique, et après pour discuter des réparations que nous avons effectuées.",
 ];
