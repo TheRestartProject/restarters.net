@@ -2,6 +2,14 @@
   <transition name="recent">
     <b-tr v-if="!editing" :key="'summary-' + device.iddevices">
       <b-td>
+        <span v-if="device.item_type">
+          {{ device.item_type }}
+        </span>
+        <em v-else class="text-muted">
+          -
+        </em>
+      </b-td>
+      <b-td>
         <h3 class="noheader">
           {{ translatedName }}
         </h3>
@@ -16,7 +24,6 @@
           {{ device.brand }}
       </b-td>
       <b-td v-if="powered">
-        {{ device.model }}
         <div class="d-block d-md-none">
           <span class="pl-0 pl-md-2 pr-2 clickme edit" @click="editDevice">
             <b-img class="icon edit" src="/icons/edit_ico_green.svg" />
@@ -27,7 +34,6 @@
         </div>
       </b-td>
       <b-td v-if="!powered">
-        {{ device.item_type }}
         <div class="d-block d-md-none">
           <span class="pl-0 pl-md-2 pr-2 clickme edit" @click="editDevice">
             <b-img class="icon" src="/icons/edit_ico_green.svg" />

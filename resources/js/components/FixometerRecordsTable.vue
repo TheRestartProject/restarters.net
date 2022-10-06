@@ -11,6 +11,14 @@
           :current-page="currentPage"
           sort-null-last
       >
+        <template slot="cell(item_type)" slot-scope="data">
+          <span v-if="data.item.item_type">
+            {{ data.item.item_type }}
+          </span>
+          <em v-else class="text-muted">
+            -
+          </em>
+        </template>
         <template slot="cell(device_category.name)" slot-scope="data">
           {{ __('strings.' + data.item.category.name) }}
         </template>
@@ -18,14 +26,6 @@
           <div v-line-clamp="3">
             {{ data.item.shortProblem }}
           </div>
-        </template>
-        <template slot="cell(model)" slot-scope="data">
-          <span v-if="data.item.model">
-            {{ data.item.model }}
-          </span>
-          <em v-else class="text-muted">
-            [Missing]
-          </em>
         </template>
         <template slot="cell(brand)" slot-scope="data">
           <span v-if="data.item.brand">
@@ -207,6 +207,12 @@ export default {
     fields () {
       let ret = [
         {
+          key: 'item_type',
+          label: this.__('devices.model_or_type'),
+          sortable: true,
+          tdClass: 'pl-0 pl-md-3'
+        },
+        {
           key: 'device_category.name',
           label: this.__('devices.category'),
           thClass: 'width20 pl-0 pl-md-3',
@@ -216,10 +222,7 @@ export default {
       ]
 
       if (this.powered) {
-        ret.push({key: 'model', label: this.__('devices.model'), sortable: true})
         ret.push({key: 'brand', label: this.__('devices.brand'), sortable: true, thClass: 'd-none d-md-table-cell', tdClass: 'd-none d-md-table-cell'})
-      } else {
-        ret.push({key: 'item_type', label: this.__('devices.model_or_type'), sortable: true, tdClass: 'pl-0 pl-md-3'})
       }
 
       ret.push({key: 'shortProblem', label: this.__('devices.assessment'), thClass: 'width10 d-none d-md-table-cell', tdClass: 'width10 d-none d-md-table-cell'})

@@ -75,6 +75,7 @@ return [
   'add_data_event' => 'Veuillez sélectionner un événement',
   'add_data_group' => 'Veuillez sélectionner un Repair Café',
   'item_type' => 'Qu\'est-ce que c\'est?',
+  'item_type_short' => 'Type',
   'tooltip_type_powered' => 'Quel type d\'appareil est-ce? (ex: "blender", "drone")',
   'tooltip_type_unpowered' => 'Ajoutez autant d\'informations que possible sur le type d\'appareil (ex: "divan" "Jeans Denim")',
   'unknown_brand' => 'Vous créez une nouvelle marque. Etes-vous sûr(e) qu\'une marque existante ne convient pas?',
