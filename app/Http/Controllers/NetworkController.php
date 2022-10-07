@@ -98,7 +98,6 @@ class NetworkController extends Controller
 
             // Store it in the network object.
             if ($path) {
-                error_log("Save logo $path");
                 $network->logo = $path;
                 $network->save();
             } else {
