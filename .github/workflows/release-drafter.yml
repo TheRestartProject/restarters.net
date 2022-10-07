@@ -1,5 +1,8 @@
 name-template: 'v$RESOLVED_VERSION 🌈'
 tag-template: 'v$RESOLVED_VERSION'
+on:
+  pull_request:
+    types: [closed]
 categories:
   - title: '🚀 Features'
     label: 'enhancement'
