@@ -11,7 +11,7 @@ use Tests\TestCase;
 use function PHPUnit\Framework\assertFalse;
 use function PHPUnit\Framework\assertTrue;
 
-class NetworkCommands extends TestCase {
+class NetworkCommandsTest extends TestCase {
     public function testCreate() {
         $this->artisan('network:create testname testshortname "test description" --website="https://therestartproject.org" --language=fr --timezone="Asia/Samarkand" --wordpress --zapier --drip --auto-approve-events')->assertExitCode(0);
         $network = Network::orderBy('id', 'desc')->first();

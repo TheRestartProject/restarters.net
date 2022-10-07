@@ -4,6 +4,9 @@ namespace App\Console\Commands;
 
 use App\User;
 use Illuminate\Console\Command;
+use Illuminate\Support\Str;
+
+use function Symfony\Component\VarDumper\Dumper\esc;
 
 class ImportMRES extends Command
 {
@@ -12,7 +15,7 @@ class ImportMRES extends Command
      *
      * @var string
      */
-    protected $signature = 'import:mres {input} {output} {--networks=CSV list of ids}';
+    protected $signature = 'import:mres {input} {output} {commands} {--networks=CSV list of ids}';
 
 
     /**
@@ -20,7 +23,7 @@ class ImportMRES extends Command
      *
      * @var string
      */
-    protected $description = 'One-off script to import MRES groups.  This takes a CSV of the groups in MRES format and outputs a CSV in our standard import format.  You can convert from the ODS file to CSV; make sure you select "Western Europe (ISO08859-15/EURO)" as the Character set.';
+    protected $description = 'One-off script to import MRES groups.  This takes a CSV of the groups in MRES format and outputs a CSV in our standard import format.  You can convert from the ODS file to CSV; make sure you select "Western Europe (ISO08859-15/EURO)" as the Character set.  It also outputs a command script with user creation commands.';
 
     /**
      * Create a new command instance.
@@ -41,10 +44,12 @@ class ImportMRES extends Command
     {
         $input = $this->argument('input');
         $output = $this->argument('output');
+        $commands = $this->argument('commands');
         $networks = $this->option('networks');
 
         $inputFile = fopen($input, 'r');
         $outputFile = fopen($output, 'w');
+        $commandsFile = fopen($commands, 'w');
 
         // First three lines are headers.
         fgetcsv($inputFile);
@@ -53,6 +58,8 @@ class ImportMRES extends Command
 
         // Write headers to output.
         fputcsv($outputFile, ['Name', 'Location', 'Postcode', 'Area', 'Country', 'Latitude', 'Longitude', 'Website', 'Phone', 'Networks', 'Description']);
+
+        $creating = [];
 
         while (!feof($inputFile))
         {
@@ -153,6 +160,28 @@ class ImportMRES extends Command
                             $networks,
                             $description,
                         ]);
+
+                // Now the host, if any.
+                if (!$email) {
+                    // We default to Enzo.
+                    $email = "e.mandrin@mres-asso.fr";
+                    $hostname = "Enzo Mandrin";
+                }
+
+                if (!$hostname) {
+                    // We use the LHS of the email.
+                    $hostname = explode("@", $email)[0];
+                }
+
+                // Random password.
+                $password = Str::random(32);
+
+                if (User::where('email', '=', $email)->count() == 0 && !array_key_exists($email, $creating)) {
+                    // User doesn't exist, create it.
+                    $creating[$email] = true;
+                    fwrite($commandsFile, "php artisan user:create " . escapeshellarg($hostname) . " " . escapeshellarg($email) . " " . escapeshellarg($password) . "\n");
+                    fwrite($commandsFile, "php artisan user:makehost " . escapeshellarg($email) . " " . escapeshellarg(utf8_encode($groupname)) . "\n");
+                }
             }
         }
     }
