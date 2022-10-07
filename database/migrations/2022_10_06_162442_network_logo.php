@@ -20,14 +20,15 @@ class NetworkLogo extends Migration
         $networks = \App\Network::all();
 
         foreach ($networks as $network) {
+            // Find the logo.
             $logo = \App\Xref::where('reference', $network->id)
                 ->where('reference_type', config('restarters.xref_types.networks'))
                 ->where('object_type', 5)
             ->first();
 
             if (is_object($logo) && is_object($logo->image)) {
+                // Save in the network column.
                 $network->logo = $logo->image->path;
-                error_log("{$network->id} logo {$network->logo}");
                 $network->save();
             }
         }

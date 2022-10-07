@@ -50,9 +50,10 @@ class Network extends Model
         return $events->flatten(1);
     }
 
-    public function logo()
+    public function logo($size)
     {
-        return url('/uploads/' . $this->logo);
+        $logo = preg_replace('/\\.([^.\\s]{3,4})$/', "-$size.$1", $this->logo);
+        return $logo;
     }
 
     public function groupsNotIn()
