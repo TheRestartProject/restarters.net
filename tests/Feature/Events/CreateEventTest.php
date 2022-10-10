@@ -28,6 +28,10 @@ class GeocoderMock extends Geocoder
 
     public function geocode($location)
     {
+        if ($location == 'ForceGeocodeFailure') {
+            return null;
+        }
+
         return [
             'latitude' => '1',
             'longitude' => '1',
@@ -78,7 +82,9 @@ class CreateEventTest extends TestCase
         $group->makeMemberAHost($host);
 
         // Fetch the event create page.
+        error_log("Call create");
         $response = $this->get('/party/create');
+        error_log("Called create");
         $this->get('/party/create')->assertStatus(200);
 
         // Create a party for the specific group.
@@ -370,6 +376,12 @@ class CreateEventTest extends TestCase
         Notification::assertNotSentTo(
             [$host], NotifyRestartersOfNewEvent::class
         );
+
+        // Edit to a bad location for coverage.
+        $eventData['id'] = $event->idevents;
+        $eventData['location'] = 'ForceGeocodeFailure';
+        $response = $this->post('/party/edit/'.$event->idevents, $eventData);
+        $response->assertSee(__('events.address_error'));
     }
 
     /** @test */
