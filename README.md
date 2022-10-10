@@ -48,7 +48,7 @@ The first version of the tool (2015) was the core Fixometer engine. This was
 made possible with modest funding from the Innovation in Waste Prevention Fund,
 Defra-funded and administered by WRAP. Subsequent development has been financed
 by the Shuttleworth Foundation, and by Nesta and the Department for Digital,
-Culture, Media & Sport.
+Culture, Media & Sport.  
 
 [![CircleCI](https://circleci.com/gh/TheRestartProject/restarters.net/tree/develop.svg?style=svg)](https://circleci.com/gh/TheRestartProject/restarters.net/?branch=develop)
 
