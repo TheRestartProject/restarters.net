@@ -31,7 +31,7 @@ class ResetPassword extends BaseNotification
             ->subject(__('notifications.password_reset_subject', [], $locale))
             ->greeting(__('notifications.greeting', [], $locale))
             ->line(__('notifications.password_reset_line1', [], $locale))
-            ->action(__('notifications.password_reset_action', [], $locale), $this->arr['url'])
+            ->action(__('notifications.password_reset_action', [], $locale), $this->arr['url'] . "&locale=" . $locale)
             ->line(__('notifications.password_reset_noaction', [], $locale));
     }
 
