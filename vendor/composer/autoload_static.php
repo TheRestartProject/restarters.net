@@ -674,6 +674,8 @@ class ComposerStaticInitf57f72b7adaf50a29437647288004820
         'App\\Console\\Commands\\SyncGroups' => __DIR__ . '/../..' . '/app/Console/Commands/SyncGroups.php',
         'App\\Console\\Commands\\SyncMicrotasks' => __DIR__ . '/../..' . '/app/Console/Commands/SyncMicrotasks.php',
         'App\\Console\\Commands\\SyncNetworkUsersToDiscourseGroup' => __DIR__ . '/../..' . '/app/Console/Commands/SyncNetworkUsersToDiscourseGroup.php',
+        'App\\Console\\Commands\\UserCreate' => __DIR__ . '/../..' . '/app/Console/Commands/UserCreate.php',
+        'App\\Console\\Commands\\UserMakeHost' => __DIR__ . '/../..' . '/app/Console/Commands/UserMakeHost.php',
         'App\\Console\\Kernel' => __DIR__ . '/../..' . '/app/Console/Kernel.php',
         'App\\Dashboard' => __DIR__ . '/../..' . '/app/Dashboard.php',
         'App\\Device' => __DIR__ . '/../..' . '/app/Device.php',

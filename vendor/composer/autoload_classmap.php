@@ -38,6 +38,8 @@ return array(
     'App\\Console\\Commands\\SyncGroups' => $baseDir . '/app/Console/Commands/SyncGroups.php',
     'App\\Console\\Commands\\SyncMicrotasks' => $baseDir . '/app/Console/Commands/SyncMicrotasks.php',
     'App\\Console\\Commands\\SyncNetworkUsersToDiscourseGroup' => $baseDir . '/app/Console/Commands/SyncNetworkUsersToDiscourseGroup.php',
+    'App\\Console\\Commands\\UserCreate' => $baseDir . '/app/Console/Commands/UserCreate.php',
+    'App\\Console\\Commands\\UserMakeHost' => $baseDir . '/app/Console/Commands/UserMakeHost.php',
     'App\\Console\\Kernel' => $baseDir . '/app/Console/Kernel.php',
     'App\\Dashboard' => $baseDir . '/app/Dashboard.php',
     'App\\Device' => $baseDir . '/app/Device.php',
