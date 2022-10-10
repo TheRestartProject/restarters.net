@@ -543,5 +543,34 @@ class DiscourseService
         } else {
             Log::debug('Sync '.$user->id.' to Discourse OK');
         }
+
+        if ($user->network->name === 'MRES') {
+            // Special case - ensure that emails are turned off.  This is primarily turning off email_digests.
+            // Nothing else should ever be happening on Discourse for these users.
+            $response = $this->discourseClient->request(
+                'PUT',
+                "/u/{$user->username}.json",
+                [
+                    'form_params' => [
+                        'mailing_list_mode' => false,
+                        'mailing_list_mode_frequency' => 1,
+                        'email_digests' => false,
+                        'email_in_reply_to' => true,
+                        'email_messages_level' => 2,
+                        'email_level' => 2,
+                        'email_previous_replies' => 1,
+                        'digest_after_minutes' => 10080,
+                        'include_tl0_in_digests' => true
+                    ]
+                ]
+            );
+
+            if ($response->getStatusCode() !== 200) {
+                Log::error('Could not turn off Discourse mails for user '.$user->id.': '.$response->getReasonPhrase());
+            } else {
+                Log::debug('Turned off Discourse mails for'.$user->id);
+            }
+
+        }
     }
 }
