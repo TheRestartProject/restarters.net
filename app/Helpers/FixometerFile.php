@@ -56,7 +56,7 @@ class FixometerFile extends Model
                     ->forceDelete();
         }
 
-        if ($ajax) {
+        if ($ajax && gettype($user_file['tmp_name']) == 'array') {
             $error = $user_file['error'][0];
             $tmp_name = $user_file['tmp_name'][0];
         } else {

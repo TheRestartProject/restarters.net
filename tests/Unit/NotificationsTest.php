@@ -744,8 +744,8 @@ class NotificationsTest extends TestCase
         $this->outputs['App\\Notifications\\ResetPassword']['mail']['en']['outroLines'] = [];
         $this->outputs['App\\Notifications\\ResetPassword']['mail']['en']['outroLines'][0] = 'If you did not request a password reset, no further action is required.';
         $this->outputs['App\\Notifications\\ResetPassword']['mail']['en']['actionText'] = 'Reset password';
-        $this->outputs['App\\Notifications\\ResetPassword']['mail']['en']['actionUrl'] = 'https://someurl.com';
-        $this->outputs['App\\Notifications\\ResetPassword']['mail']['en']['displayableActionUrl'] = 'https://someurl.com';
+        $this->outputs['App\\Notifications\\ResetPassword']['mail']['en']['actionUrl'] = 'https://someurl.com&locale=en';
+        $this->outputs['App\\Notifications\\ResetPassword']['mail']['en']['displayableActionUrl'] = 'https://someurl.com&locale=en';
         $this->outputs['App\\Notifications\\ResetPassword']['mail']['fr'] = [];
         $this->outputs['App\\Notifications\\ResetPassword']['mail']['fr']['level'] = 'info';
         $this->outputs['App\\Notifications\\ResetPassword']['mail']['fr']['subject'] = 'Réinitialiser le mot de passe';
@@ -756,8 +756,8 @@ class NotificationsTest extends TestCase
         $this->outputs['App\\Notifications\\ResetPassword']['mail']['fr']['outroLines'] = [];
         $this->outputs['App\\Notifications\\ResetPassword']['mail']['fr']['outroLines'][0] = 'Si vous n\'avez pas demandé de réinitialisation du mot de passe, aucune action supplémentaire n\'est requise.';
         $this->outputs['App\\Notifications\\ResetPassword']['mail']['fr']['actionText'] = 'Réinitialiser le mot de passe';
-        $this->outputs['App\\Notifications\\ResetPassword']['mail']['fr']['actionUrl'] = 'https://someurl.com';
-        $this->outputs['App\\Notifications\\ResetPassword']['mail']['fr']['displayableActionUrl'] = 'https://someurl.com';
+        $this->outputs['App\\Notifications\\ResetPassword']['mail']['fr']['actionUrl'] = 'https://someurl.com&locale=fr';
+        $this->outputs['App\\Notifications\\ResetPassword']['mail']['fr']['displayableActionUrl'] = 'https://someurl.com&locale=fr';
         $this->outputs['App\\Notifications\\ResetPassword']['array'] = [];
         $this->outputs['App\\Notifications\\ResetPassword']['array']['en'] = [];
         $this->outputs['App\\Notifications\\ResetPassword']['array']['fr'] = [];
