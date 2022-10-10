@@ -82,9 +82,7 @@ class CreateEventTest extends TestCase
         $group->makeMemberAHost($host);
 
         // Fetch the event create page.
-        error_log("Call create");
         $response = $this->get('/party/create');
-        error_log("Called create");
         $this->get('/party/create')->assertStatus(200);
 
         // Create a party for the specific group.
