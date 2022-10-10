@@ -17,7 +17,7 @@ class UserCreate extends Command
      *
      * @var string
      */
-    protected $signature = 'user:create {name} {email} {password}';
+    protected $signature = 'user:create {name} {email} {password} {language} {repair_network_id}';
 
     /**
      * The console command description.
@@ -46,27 +46,32 @@ class UserCreate extends Command
         $name = $this->argument('name');
         $email = $this->argument('email');
         $password = $this->argument('password');
+        $language = $this->argument('language');
+        $repair_network_id = $this->argument('repair_network_id');
 
-        if (User::where('email', $email)->count() > 0) {
+        if (User::where('email', $email)->count() > 0)
+        {
             $this->info("User $email already exists - leaving unmodified");
             return;
         }
 
         $rules = [
-            'name'                => 'required|string|max:255',
-            'email'               => 'required|string|email|max:255|unique:users',
-            'password'            => 'required|string|min:6',
+            'name' => 'required|string|max:255',
+            'email' => 'required|string|email|max:255|unique:users',
+            'password' => 'required|string|min:6',
         ];
 
         $validator = Validator::make([
-            'name'                => $name,
-            'email'               => $email,
-            'password'            => $password,
-         ], $rules);
+                                         'name' => $name,
+                                         'email' => $email,
+                                         'password' => $password,
+                                     ], $rules);
 
-        if ($validator->fails()) {
+        if ($validator->fails())
+        {
             $this->error("Invalid parameters " . $validator->messages()->toJson());
-        } else {
+        } else
+        {
             $user = User::create([
                                      'name' => $name,
                                      'email' => $email,
@@ -76,12 +81,16 @@ class UserCreate extends Command
                                      'recovery_expires' => strftime('%Y-%m-%d %X', time() + (24 * 60 * 60)),
                                      'calendar_hash' => Str::random(15),
                                      'username' => '',
-                                     'wiki_sync_status' => WikiSyncStatus::CreateAtLogin
+                                     'wiki_sync_status' => WikiSyncStatus::CreateAtLogin,
+                                     'language' => $language,
+                                     'repair_network' => $repair_network_id,
                                  ]);
 
-            if ($user) {
+            if ($user)
+            {
                 $this->info("User created #" . $user->id);
-            } else {
+            } else
+            {
                 $this->error("User creation failed");
             }
 

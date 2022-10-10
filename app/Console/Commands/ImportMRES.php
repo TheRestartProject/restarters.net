@@ -15,7 +15,7 @@ class ImportMRES extends Command
      *
      * @var string
      */
-    protected $signature = 'import:mres {input} {output} {commands} {--networks=CSV list of ids}';
+    protected $signature = 'import:mres {input} {output} {commands} {user_network} {group_networks}';
 
 
     /**
@@ -45,7 +45,8 @@ class ImportMRES extends Command
         $input = $this->argument('input');
         $output = $this->argument('output');
         $commands = $this->argument('commands');
-        $networks = $this->option('networks');
+        $user_network = $this->argument('user_network');
+        $group_networks = $this->argument('group_networks');
 
         $inputFile = fopen($input, 'r');
         $outputFile = fopen($output, 'w');
@@ -157,7 +158,7 @@ class ImportMRES extends Command
                             $lng,
                             $website,
                             $phone,
-                            $networks,
+                            $group_networks,
                             $description,
                         ]);
 
@@ -179,7 +180,7 @@ class ImportMRES extends Command
                 if (User::where('email', '=', $email)->count() == 0 && !array_key_exists($email, $creating)) {
                     // User doesn't exist, create it.
                     $creating[$email] = true;
-                    fwrite($commandsFile, "php artisan user:create " . escapeshellarg($hostname) . " " . escapeshellarg($email) . " " . escapeshellarg($password) . "\n");
+                    fwrite($commandsFile, "php artisan user:create " . escapeshellarg(utf8_encode($hostname)) . " " . escapeshellarg($email) . " " . escapeshellarg($password) . " fr $user_network\n");
                     fwrite($commandsFile, "php artisan user:makehost " . escapeshellarg($email) . " " . escapeshellarg(utf8_encode($groupname)) . "\n");
                 }
             }
