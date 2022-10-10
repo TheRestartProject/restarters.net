@@ -162,7 +162,7 @@ class GroupCreateTest extends TestCase
         $this->get('/party')->assertSee(e($eventAttributes['venue']));
 
         // ...and on the page for this group's events.
-        $this->get('/party/group/' . $idgroups)->assertSee($eventAttributes['venue']);
+        $this->get('/party/group/' . $idgroups)->assertSee(e($eventAttributes['venue']));
 
         // And to a network coordinator
         $coordinator = factory(User::class)->state('NetworkCoordinator')->create();
