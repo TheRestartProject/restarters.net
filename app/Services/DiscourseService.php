@@ -508,6 +508,10 @@ class DiscourseService
 
     public function syncSso($user)
     {
+        if (! config('restarters.features.discourse_integration')) {
+            return;
+        }
+
         $endpoint = '/admin/users/sync_sso';
 
         // see https://meta.discourse.org/t/sync-sso-user-data-with-the-sync-sso-route/84398 for details on the sync_sso route.
@@ -544,33 +548,35 @@ class DiscourseService
             Log::debug('Sync '.$user->id.' to Discourse OK');
         }
 
-        if ($user->network->name === 'MRES') {
-            // Special case - ensure that emails are turned off.  This is primarily turning off email_digests.
-            // Nothing else should ever be happening on Discourse for these users.
-            $response = $this->discourseClient->request(
-                'PUT',
-                "/u/{$user->username}.json",
-                [
-                    'form_params' => [
-                        'mailing_list_mode' => false,
-                        'mailing_list_mode_frequency' => 1,
-                        'email_digests' => false,
-                        'email_in_reply_to' => true,
-                        'email_messages_level' => 2,
-                        'email_level' => 2,
-                        'email_previous_replies' => 1,
-                        'digest_after_minutes' => 10080,
-                        'include_tl0_in_digests' => true
+        foreach ($user->networks as $network) {
+            if ($network->name === 'MRES') {
+                // Special case - ensure that emails are turned off.  This is primarily turning off email_digests.
+                // Nothing else should ever be happening on Discourse for these users.
+                $response = $this->discourseClient->request(
+                    'PUT',
+                    "/u/{$user->username}.json",
+                    [
+                        'form_params' => [
+                            'mailing_list_mode' => false,
+                            'mailing_list_mode_frequency' => 1,
+                            'email_digests' => false,
+                            'email_in_reply_to' => true,
+                            'email_messages_level' => 2,
+                            'email_level' => 2,
+                            'email_previous_replies' => 1,
+                            'digest_after_minutes' => 10080,
+                            'include_tl0_in_digests' => true
+                        ]
                     ]
-                ]
-            );
+                );
 
-            if ($response->getStatusCode() !== 200) {
-                Log::error('Could not turn off Discourse mails for user '.$user->id.': '.$response->getReasonPhrase());
-            } else {
-                Log::debug('Turned off Discourse mails for'.$user->id);
+                if ($response->getStatusCode() !== 200) {
+                    Log::error('Could not turn off Discourse mails for user '.$user->id.': '.$response->getReasonPhrase());
+                } else {
+                    Log::debug('Turned off Discourse mails for'.$user->id);
+                }
+
             }
-
         }
     }
 }

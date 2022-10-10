@@ -3,6 +3,7 @@
 namespace App\Console\Commands;
 
 use App\Role;
+use App\Services\DiscourseService;
 use App\User;
 use App\WikiSyncStatus;
 use Illuminate\Console\Command;
@@ -41,7 +42,7 @@ class UserCreate extends Command
      *
      * @return mixed
      */
-    public function handle()
+    public function handle(DiscourseService $discourseService)
     {
         $name = $this->argument('name');
         $email = $this->argument('email');
@@ -89,6 +90,10 @@ class UserCreate extends Command
             if ($user)
             {
                 $this->info("User created #" . $user->id);
+
+                if (config('restarters.features.discourse_integration')) {
+                    $discourseService->syncSso($user);
+                }
             } else
             {
                 $this->error("User creation failed");
