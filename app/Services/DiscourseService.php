@@ -2,6 +2,7 @@
 
 namespace App\Services;
 
+use App\Network;
 use App\Role;
 use App\User;
 use App\Group;
@@ -548,34 +549,57 @@ class DiscourseService
             Log::debug('Sync '.$user->id.' to Discourse OK');
         }
 
-        foreach ($user->networks as $network) {
-            if ($network->name === 'MRES') {
+        if ($user->repair_network) {
+            $network = Network::find($user->repair_network);
+
+            if ($network->name === 'Repair café Haut-de-France') {
                 // Special case - ensure that emails are turned off.  This is primarily turning off email_digests.
                 // Nothing else should ever be happening on Discourse for these users.
-                $response = $this->discourseClient->request(
-                    'PUT',
-                    "/u/{$user->username}.json",
-                    [
-                        'form_params' => [
-                            'mailing_list_mode' => false,
-                            'mailing_list_mode_frequency' => 1,
-                            'email_digests' => false,
-                            'email_in_reply_to' => true,
-                            'email_messages_level' => 2,
-                            'email_level' => 2,
-                            'email_previous_replies' => 1,
-                            'digest_after_minutes' => 10080,
-                            'include_tl0_in_digests' => true
-                        ]
-                    ]
+                $worked = false;
+
+                $response = $client->request(
+                    'GET',
+                    "/users/by-external/{$user->id}.json"
                 );
 
-                if ($response->getStatusCode() !== 200) {
-                    Log::error('Could not turn off Discourse mails for user '.$user->id.': '.$response->getReasonPhrase());
-                } else {
-                    Log::debug('Turned off Discourse mails for'.$user->id);
+                if ($response->getStatusCode() == 200)
+                {
+                    $json = json_decode($response->getBody()->getContents(), true);
+
+                    if (!empty($json['user']))
+                    {
+                        $userName = $json['user']['username'];
+
+                        $client = app('discourse-client');
+                        $response = $client->request(
+                            'PUT',
+                            "/u/{$userName}.json",
+                            [
+                                'form_params' => [
+                                    'mailing_list_mode' => false,
+                                    'mailing_list_mode_frequency' => 1,
+                                    'email_digests' => false,
+                                    'email_in_reply_to' => true,
+                                    'email_messages_level' => 2,
+                                    'email_level' => 2,
+                                    'email_previous_replies' => 1,
+                                    'digest_after_minutes' => 10080,
+                                    'include_tl0_in_digests' => true
+                                ]
+                            ]
+                        );
+
+                        $worked = true;
+                    }
                 }
 
+                if ($worked) {
+                    Log::debug('Turned off Discourse mails for' . $user->id);
+                } else {
+                    Log::error(
+                        'Could not turn off Discourse mails for user ' . $user->id . ': ' . $response->getReasonPhrase()
+                    );
+                }
             }
         }
     }
