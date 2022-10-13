@@ -96,9 +96,9 @@ class NetworkTest extends TestCase
         $this->actingAs($admin);
 
         $group = factory(Group::class)->create([
-           'latitude' => 51.5074,
-           'longitude' => -0.1278,
-        ]);
+                                                   'latitude' => 51.5074,
+                                                   'longitude' => -0.1278,
+                                               ]);
 
         $network = factory(Network::class)->create();
 
@@ -108,23 +108,26 @@ class NetworkTest extends TestCase
         $this->assertTrue($group->isMemberOf($network));
 
         $event1 = factory(Party::class)->create([
-            'group' => $group->idgroups,
-            'online' => 1,
-            'event_start_utc' => Carbon::parse('1pm yesterday')->toIso8601String(),
-            'event_end_utc' => Carbon::parse('3pm yesterday')->toIso8601String()
-        ]);
+                                                    'group' => $group->idgroups,
+                                                    'online' => 1,
+                                                    'event_start_utc' => Carbon::parse(
+                                                        '1pm yesterday'
+                                                    )->toIso8601String(),
+                                                    'event_end_utc' => Carbon::parse('3pm yesterday')->toIso8601String()
+                                                ]);
 
         $event2 = factory(Party::class)->create([
-           'group' => $group->idgroups,
-           'online' => 1,
-           'event_start_utc' => Carbon::parse('1pm tomorrow')->toIso8601String(),
-           'event_end_utc' => Carbon::parse('3pm tomorrow')->toIso8601String()
-        ]);
+                                                    'group' => $group->idgroups,
+                                                    'online' => 1,
+                                                    'event_start_utc' => Carbon::parse('1pm tomorrow')->toIso8601String(
+                                                    ),
+                                                    'event_end_utc' => Carbon::parse('3pm tomorrow')->toIso8601String()
+                                                ]);
 
         // Check the group shows up in the list of groups for this network.
         $coordinator = factory(User::class)->states('NetworkCoordinator')->create([
                                                                                       'api_token' => '1234',
-        ]);
+                                                                                  ]);
         $network->addCoordinator($coordinator);
         $this->actingAs($coordinator);
 
@@ -146,14 +149,14 @@ class NetworkTest extends TestCase
         $this->assertEquals(1, $groups[0]['past_parties'][0]['online']);
 
         // Get again with a bounding box which the group is inside.
-        $response = $this->get('/api/groups/network?api_token=1234&bbox='.urlencode('51.5,-0.13,51.51,-0.12'));
+        $response = $this->get('/api/groups/network?api_token=1234&bbox=' . urlencode('51.5,-0.13,51.51,-0.12'));
         $groups = json_decode($response->getContent(), true);
         $this->assertEquals(1, count($groups));
         $this->assertEquals($group->idgroups, $groups[0]['id']);
         $this->assertEquals($group->name, $groups[0]['name']);
 
         // Get again with a bounding box which the group is outside.
-        $response = $this->get('/api/groups/network?api_token=1234&bbox='.urlencode('51.5,-0.13,51.505,-0.12'));
+        $response = $this->get('/api/groups/network?api_token=1234&bbox=' . urlencode('51.5,-0.13,51.505,-0.12'));
         $groups = json_decode($response->getContent(), true);
         $this->assertEquals(0, count($groups));
 
@@ -233,7 +236,7 @@ class NetworkTest extends TestCase
     public function network_page()
     {
         $network = factory(Network::class)->create([
-            'shortname' => 'restarters'
+                                                       'shortname' => 'restarters'
                                                    ]);
 
         $coordinator = factory(User::class)->states('NetworkCoordinator')->create();
@@ -267,7 +270,8 @@ class NetworkTest extends TestCase
         $response = $this->get('/networks/' . $network->id);
         $crawler = new Crawler($response->getContent());
 
-        $tokens = $crawler->filter('input[name=_token]')->each(function (Crawler $node, $i) {
+        $tokens = $crawler->filter('input[name=_token]')->each(function (Crawler $node, $i)
+        {
             return $node;
         });
 
@@ -275,7 +279,7 @@ class NetworkTest extends TestCase
 
         $response = $this->post('/networks/' . $network->id . '/groups', [
             '_token' => $tokenValue,
-            'groups' => [ $group->idgroups ]
+            'groups' => [$group->idgroups]
         ]);
         $response->assertRedirect();
 
@@ -288,5 +292,39 @@ class NetworkTest extends TestCase
         $this->loginAsTestUser(Role::ADMINISTRATOR);
         $response = $this->get('/networks');
         $response->assertSee(__('networks.index.all_networks_explainer'));
+    }
+
+    /** @test */
+    public function admins_can_edit()
+    {
+        $this->withoutExceptionHandling();
+
+        $admin = factory(User::class)->states('Administrator')->create();
+        $this->actingAs($admin);
+
+        $network = new Network();
+        $network->name = 'Restarters';
+        $network->shortname = 'restarters';
+        $network->save();
+
+        $response = $this->get('/networks/' . $network->id . '/edit', $network->attributesToArray());
+        $response->assertSuccessful();
+        $response->assertSee('Editing');
+
+        $response = $this->put('/networks/' . $network->id, $network->attributesToArray());
+        $response->assertRedirect();
+
+        // Associate a group.
+        $group = factory(Group::class)->create();
+        $group->name = 'Hackney Fixers';
+        $group->save();
+
+        $response = $this->post('/networks/' . $network->id . '/groups', [
+            'groups' => [ $group->idgroups ]
+        ]);
+
+        $response->assertRedirect();
+        $this->assertTrue($network->containsGroup($group));
+        $this->assertTrue($group->isMemberOf($network));
     }
 }
