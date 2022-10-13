@@ -21,10 +21,4 @@ class Brands extends Model
      * @var array
      */
     protected $hidden = [];
-
-    //Table Relations
-
-    // Setters
-
-    //Getters
 }
