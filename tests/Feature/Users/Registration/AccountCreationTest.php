@@ -31,6 +31,11 @@ class AccountCreationTest extends TestCase
         $this->assertEquals(51.507, round($user->latitude, 3));
         $this->assertEquals(-0.128, round($user->longitude, 3));
 
+        // JS would load this.
+        $response = $this->get('/user/onboarding-complete');
+        $response->assertStatus(200);
+        $response->assertSee('true');
+
         // No notifications immediately after creation.
         $response2 = $this->get('/api/users/' . $user->id . '/notifications');
         $this->assertEquals([
