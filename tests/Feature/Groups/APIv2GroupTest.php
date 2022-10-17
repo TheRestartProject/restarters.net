@@ -2,12 +2,14 @@
 
 namespace Tests\Feature;
 
+use App\Group;
 use App\Network;
 use App\User;
 use Carbon\Carbon;
 use DB;
 use Illuminate\Auth\AuthenticationException;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
+use Illuminate\Http\UploadedFile;
 use Symfony\Component\DomCrawler\Crawler;
 use Illuminate\Validation\ValidationException;
 use Tests\TestCase;
@@ -19,19 +21,29 @@ class APIv2GroupTest extends TestCase
      *
      * @param $approve
      */
-    public function testGetGroup($approve) {
+    public function testGetGroup($approve)
+    {
         $user = factory(User::class)->states('Administrator')->create([
                                                                           'api_token' => '1234',
                                                                       ]);
         $this->actingAs($user);
 
-        $idgroups = $this->createGroup('Test Group', 'https://therestartproject.org', 'London', 'Some text.', true, $approve);
+        $idgroups = $this->createGroup(
+            'Test Group',
+            'https://therestartproject.org',
+            'London',
+            'Some text.',
+            true,
+            $approve
+        );
 
         // Test invalid group id.
-        try {
+        try
+        {
             $this->get('/api/v2/groups/-1');
             $this->assertFalse(true);
-        } catch (ModelNotFoundException $e) {
+        } catch (ModelNotFoundException $e)
+        {
         }
 
         // Get group.
@@ -48,23 +60,27 @@ class APIv2GroupTest extends TestCase
         $response->assertSuccessful();
         $json = json_decode($response->getContent(), true);
 
-        if (!$approve) {
+        if (!$approve)
+        {
             self::assertEquals(1, count($json));
             self::assertEquals($idgroups, $json[0]['id']);
-        } else {
+        } else
+        {
             // Group should not show as requiring moderation because it was approved during createGroup().
             self::assertEquals(0, count($json));
         }
     }
 
-    public function providerTrueFalse() {
+    public function providerTrueFalse()
+    {
         return [
             [false],
             [true],
         ];
     }
 
-    public function testCreateGroupLoggedOut() {
+    public function testCreateGroupLoggedOut()
+    {
         $this->expectException(AuthenticationException::class);
 
         $response = $this->post('/api/v2/groups', [
@@ -74,7 +90,8 @@ class APIv2GroupTest extends TestCase
         ]);
     }
 
-    public function testCreateGroupLoggedInWithoutToken() {
+    public function testCreateGroupLoggedInWithoutToken()
+    {
         $user = factory(User::class)->states('Administrator')->create([
                                                                           'api_token' => '1234',
                                                                       ]);
@@ -89,7 +106,8 @@ class APIv2GroupTest extends TestCase
         ]);
     }
 
-    public function testCreateGroupLoggedInWithToken() {
+    public function testCreateGroupLoggedInWithToken()
+    {
         $user = factory(User::class)->states('Administrator')->create([
                                                                           'api_token' => '1234',
                                                                       ]);
@@ -102,20 +120,46 @@ class APIv2GroupTest extends TestCase
         $user->repair_network = $network->id;
         $user->save();
 
-        $response = $this->post('/api/v2/groups?api_token=1234', [
-            'name' => 'Test Group',
-            'location' => 'London',
-            'description' => 'Some text.',
-        ]);
+        \Storage::fake('avatars');
+
+        $_SERVER['DOCUMENT_ROOT'] = getcwd();
+        \FixometerFile::$uploadTesting = TRUE;
+        file_put_contents('/tmp/UT.jpg', file_get_contents('public/images/community.jpg'));
+
+        $_FILES = [
+            'image' => [
+                'error'    => "0",
+                'name'     => 'UT.jpg',
+                'size'     => 123,
+                'tmp_name' => [ '/tmp/UT.jpg' ],
+                'type'     => 'image/jpg'
+            ]
+        ];
+
+        $response = $this->post(
+            '/api/v2/groups?api_token=1234',
+            [
+                'name' => 'Test Group',
+                'location' => 'London',
+                'description' => 'Some text.',
+            ]
+        );
 
         $response->assertSuccessful();
         $json = json_decode($response->getContent(), true);
         $this->assertTrue(array_key_exists('id', $json));
         $this->assertGreaterThan(0, $json['id']);
+
+        $group = Group::findOrfail($json['id']);
+        $this->assertEquals('Test Group', $group->name);
+        $this->assertEquals('London', $group->location);
+        $this->assertEquals('Some text.', $group->free_text);
+        $this->assertStringContainsString('.jpg', $group->groupImage->image->path);
     }
 
 
-    public function testCreateGroupGeocodeFailure() {
+    public function testCreateGroupGeocodeFailure()
+    {
         $user = factory(User::class)->states('Administrator')->create([
                                                                           'api_token' => '1234',
                                                                       ]);

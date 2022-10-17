@@ -532,6 +532,11 @@ class GroupController extends Controller
                                'role' => 3,
                            ]);
 
+        if (isset($_FILES) && ! empty($_FILES)) {
+            $file = new \FixometerFile();
+            $file->upload('image', 'image', $idGroup, env('TBL_GROUPS'), false, true, true);
+        }
+
         // Notify relevant admins.
         $notify_admins = Fixometer::usersWhoHavePreference('admin-moderate-group');
         Notification::send($notify_admins, new AdminModerationGroup([
