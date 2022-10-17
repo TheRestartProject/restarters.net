@@ -5,11 +5,16 @@
     </p>
 
     <div class="layout">
-      <GroupName
-          class="flex-grow-1 group-name"
-          :name.sync="name"
-          :has-error="$v.name.$error"
-          ref="name" />
+      <div class="flex-grow-1 group-name">
+        <GroupName
+            class=""
+            :name.sync="name"
+            :has-error="$v.name.$error || duplicateName"
+            ref="name" />
+        <p v-if="duplicateName" class="text-danger font-weight-bold">
+          {{ duplicateError }}
+        </p>
+      </div>
       <GroupWebsite
           class="flex-grow-1 group-website"
           :website.sync="website"
@@ -200,6 +205,22 @@ export default {
         return a.name.localeCompare(b.name)
       }) : []
     },
+    duplicateName() {
+      let ret = false
+
+      this.groups.forEach(group => {
+        if ((this.creating || this.idgroups != group.id) && group.name.toLowerCase() === this.name.toLowerCase()) {
+          ret = true
+        }
+      })
+
+      return ret
+    },
+    duplicateError() {
+      return this.$lang.get('groups.duplicate', {
+        name: this.name
+      })
+    }
   },
   created () {
     if (this.initialGroup) {
@@ -227,29 +248,28 @@ export default {
       this.failed = false
       this.$v.$touch()
 
-      if (this.$v.$invalid) {
-        // It's not.
-        console.log("Invalid")
-        this.validationFocusFirstError()
-      } else if (this.creating) {
-        console.log("Create call")
-        const id = await this.$store.dispatch('groups/create', {
-          name: this.name,
-          website: this.website,
-          description: this.description,
-          location: this.location,
-          timezone: this.timezone,
-          phone: this.phone,
-        })
+      if (!this.duplicateName) {
+        if (this.$v.$invalid) {
+          // It's not.
+          this.validationFocusFirstError()
+        } else if (this.creating) {
+          // TODO Image upload.
+          const id = await this.$store.dispatch('groups/create', {
+            name: this.name,
+            website: this.website,
+            description: this.description,
+            location: this.location,
+            timezone: this.timezone,
+            phone: this.phone,
+          })
 
-        console.log("Returned", id)
-
-        if (id) {
-          // Success.
-          window.location = '/group/edit/' + id
-        } else {
-          this.failed = true
-        }
+          if (id) {
+            // Success.
+            window.location = '/group/edit/' + id
+          } else {
+            this.failed = true
+          }
+      }
       } else {
         // TODO Edit
       }

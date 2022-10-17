@@ -94,7 +94,8 @@ class CheckTranslations extends Command
             'app/Notifications/',             // Email notifications
             'app/Http/Controllers/',          // Controllers (rarely)
             'app/Http/Middleware/',           // Middleware(rarely)
-            'app/Services/'                   // Services(rarely)
+            'app/Services/',                  // Services(rarely)
+            'app/'                            // Models rarely)
                  ] as $loc) {
             $cmd = 'grep -r "' . addslashes($key) . '" ' . $loc . ' > /dev/null';
             system($cmd, $rc);

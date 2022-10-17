@@ -53,7 +53,7 @@ export default {
     setList(state, params) {
       let list = {}
       params.groups.forEach(e => {
-        list[e.idgroups] = e
+        list[e.idgroups || e.id] = e
       })
 
       state.list = list
