@@ -1,7 +1,7 @@
 <template>
   <b-form-group>
     <label for="group_name">{{ __('groups.groups_name_of') }}:</label>
-    <b-input type="url" id="group_name" name="name" v-model="currentname" :class="{ hasError: hasError }"/>
+    <b-input id="group_name" name="name" v-model="currentname" :class="{ hasError: hasError }"/>
     <small>{{ __('groups.groups_group_small') }}</small>
   </b-form-group>
 </template>

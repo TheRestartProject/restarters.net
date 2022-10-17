@@ -116,6 +116,22 @@ export default {
           groups: ret.data.data
         })
       }
+    },
+    async create({ rootGetters, commit }, params) {
+      let id = null
+      try {
+        params.api_token = rootGetters['auth/apiToken']
+
+        let ret = await axios.post('/api/v2/groups', params)
+
+        if (ret && ret.data) {
+          id = ret.data.id
+        }
+      } catch (e) {
+        console.error("Group create failed", e)
+      }
+
+      return id
     }
   },
 }

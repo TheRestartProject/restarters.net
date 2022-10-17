@@ -1,7 +1,5 @@
 <template>
-  <b-form>
-    <input type="hidden" name="id" :value="initialGroup.idgroups" v-if="!creating"/>
-
+  <div>
     <p>
       {{ __('groups.add_groups_content') }}
     </p>
@@ -119,8 +117,11 @@
           </div>
         </div>
       </div>
+      <p class="text-danger font-weight-bold" v-if="failed">
+        {{ __('groups.create_failed') }}
+      </p>
     </div>
-  </b-form>
+  </div>
 </template>
 <script>
 import group from '../mixins/group'
@@ -158,7 +159,6 @@ export default {
     return {
       idgroups: null,
       name: null,
-      area: null,
       location: null,
       phone: null,
       website: null,
@@ -167,7 +167,8 @@ export default {
       description: null,
       lat: null,
       lng: null,
-      moderate: null
+      moderate: null,
+      failed: false
     }
   },
   validations: {
@@ -175,9 +176,6 @@ export default {
     // which is responsible for setting the hasError class.
     //
     // These need to match API\GroupController::createGroupv2.
-    idgroups: {
-      required
-    },
     name: {
       required,
     },
@@ -221,19 +219,39 @@ export default {
     this.$store.dispatch('groups/list')
   },
   methods: {
-    submit (e) {
+    async submit() {
       // Events are created via form submission - we don't yet have an API call to do this over AJAX.  Therefore
       // this page and the subcomponents have form inputs with suitable names.
       //
       // Check the form is valid.
+      this.failed = false
       this.$v.$touch()
 
       if (this.$v.$invalid) {
-        // It's not - prevent the submit.
-        console.log('Not valid', this.$v)
-        e.preventDefault()
-
+        // It's not.
+        console.log("Invalid")
         this.validationFocusFirstError()
+      } else if (this.creating) {
+        console.log("Create call")
+        const id = await this.$store.dispatch('groups/create', {
+          name: this.name,
+          website: this.website,
+          description: this.description,
+          location: this.location,
+          timezone: this.timezone,
+          phone: this.phone,
+        })
+
+        console.log("Returned", id)
+
+        if (id) {
+          // Success.
+          window.location = '/group/edit/' + id
+        } else {
+          this.failed = true
+        }
+      } else {
+        // TODO Edit
       }
     }
   }

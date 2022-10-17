@@ -1,7 +1,7 @@
 <template>
   <b-form-group>
     <label for="group_phone">{{ __('groups.field_phone') }}:</label>
-    <b-input type="url" id="group_phone" name="name" v-model="currentphone" :class="{ hasError: hasError }"/>
+    <b-input id="group_phone" name="name" v-model="currentphone" :class="{ hasError: hasError }"/>
     <small>{{ __('groups.phone_small') }}</small>
   </b-form-group>
 </template>
