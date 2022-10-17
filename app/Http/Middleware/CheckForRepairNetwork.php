@@ -25,6 +25,7 @@ class CheckForRepairNetwork
         $host = $request->getHost();
         $update_user = [];
 
+        error_log("Check $host for network");
         // Restart network is the default.
         if (Str::contains($host, 'repairshare')) {
             $networkQuery = Network::where('shortname', 'repairshare');

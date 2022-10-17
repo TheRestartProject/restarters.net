@@ -6,10 +6,17 @@ use App\Group;
 use App\Helpers\Fixometer;
 use App\Http\Controllers\Controller;
 use App\Http\Resources\PartySummaryCollection;
+use App\Network;
+use App\Notifications\AdminModerationGroup;
 use App\Party;
+use App\Rules\Timezone;
+use App\UserGroups;
 use Auth;
 use Carbon\Carbon;
+use Illuminate\Database\QueryException;
 use Illuminate\Http\Request;
+use Notification;
+use Illuminate\Validation\ValidationException;
 
 class GroupController extends Controller
 {
@@ -345,6 +352,7 @@ class GroupController extends Controller
         return PartySummaryCollection::make($parties);
     }
 
+    // TODO Add to OpenAPI.
     public function listVolunteers(Request $request, $idgroups) {
         $group = Group::findOrFail($idgroups);
 
@@ -373,10 +381,166 @@ class GroupController extends Controller
         return response()->json($ret);
     }
 
+    // TODO Add to OpenAPI.
     public function moderateGroupsv2(Request $request) {
         // Get the user that the API has been authenticated as.
         $user = auth('api')->user();
         $ret = \App\Http\Resources\GroupCollection::make(Group::unapprovedVisibleTo($user->id));
         return response()->json($ret);
+    }
+
+    /**
+     * @OA\Post(
+     *      path="/api/v2/groups",
+     *      operationId="createGroup",
+     *      tags={"Groups"},
+     *      summary="Create Group",
+     *      description="Creates a group.",
+     *      @OA\Parameter(
+     *          name="api_token",
+     *          description="A valid user API token",
+     *          required=true,
+     *          in="query",
+     *          @OA\Schema(
+     *              type="string",
+     *              example="1234"
+     *          )
+     *      ),
+     *     @OA\RequestBody(
+     *         @OA\MediaType(
+     *             mediaType="multipart/form-data",
+     *             @OA\Schema(
+     *                required={"name","location","description"},
+     *                @OA\Property(
+     *                   property="name",
+     *                   ref="#/components/schemas/Group/properties/name",
+     *                ),
+     *                @OA\Property(
+     *                   property="area",
+     *                   ref="#/components/schemas/Group/properties/area"
+     *                ),
+     *                @OA\Property(
+     *                   property="location",
+     *                   ref="#/components/schemas/Group/properties/location",
+     *                ),
+     *                @OA\Property(
+     *                   property="phone",
+     *                   ref="#/components/schemas/Group/properties/phone"
+     *                ),
+     *                @OA\Property(
+     *                   property="website",
+     *                   ref="#/components/schemas/Group/properties/website"
+     *                ),
+     *                @OA\Property(
+     *                   property="description",
+     *                   ref="#/components/schemas/Group/properties/description",
+     *                ),
+     *                @OA\Property(
+     *                   property="timezone",
+     *                   ref="#/components/schemas/Group/properties/timezone"
+     *                ),
+     *                @OA\Property(
+     *                   description="Image for the group",
+     *                   property="image",
+     *                   type="string", format="binary"
+     *                 )
+     *             )
+     *         )
+     *    ),
+     *    @OA\Response(
+     *        response=200,
+     *        description="Successful operation",
+     *        @OA\JsonContent(
+     *            @OA\Property(
+     *              property="data",
+     *              title="data",
+     *              ref="#/components/schemas/Group"
+     *            )
+     *        ),
+     *     )
+     *  )
+     */
+    public static function createGroupv2(Request $request) {
+        $user = auth('api')->user();
+
+        // We don't validate max lengths of other strings, to avoid duplicating the length information both here
+        // and in the migrations.  If we wanted to do that we should extract the length dynamically from the
+        // schema, which is possible but not trivial.
+        $request->validate([
+            'name' => ['required', 'unique:groups', 'max:255'],
+            'location' => ['required', 'max:255'],
+            'description' => ['required'],
+            'timezone' => [new Timezone() ]
+        ]);
+
+        $name = $request->input('name');
+        $area = $request->input('area');
+        $location = $request->input('location');
+        $phone = $request->input('phone');
+        $website = $request->input('website');
+        $description = $request->input('description');
+        $timezone = $request->input('timezone');
+
+        $latitude = null;
+        $longitude = null;
+        $country = null;
+
+        if (! empty($location)) {
+            $geocoder = new \App\Helpers\Geocoder();
+            $geocoded = $geocoder->geocode($location);
+
+            if (empty($geocoded)) {
+                throw ValidationException::withMessages(['location ' => __('groups.geocode_failed')]);
+            }
+
+            $latitude = $geocoded['latitude'];
+            $longitude = $geocoded['longitude'];
+            $country = $geocoded['country'];
+        }
+
+        $data = [
+            'name' => $name,
+            'website' => $website,
+            'location' => $location,
+            'area' => $area,
+            'latitude' => $latitude,
+            'longitude' => $longitude,
+            'country' => $country,
+            'free_text' => $description,
+            'shareable_code' => Fixometer::generateUniqueShareableCode(\App\Group::class, 'shareable_code'),
+            'timezone' => $timezone,
+            'phone' => $phone,
+        ];
+
+        $group = Group::create($data);
+        $idGroup = $group->idgroups;
+
+        // Add the group to the same network as this logged in user.  Note that the CheckForRepairNetwork middleware
+        // which checks the host name is only used for the web interface, not the API.
+        //
+        // The networks can be amended in the update call.
+        if ($user->repair_network) {
+            $network = Network::find($user->repair_network);
+            $network->addGroup($group);
+        }
+
+        //Associate currently logged-in user as a host.
+        UserGroups::create([
+                               'user' => $user->id,
+                               'group' => $idGroup,
+                               'status' => 1,
+                               'role' => 3,
+                           ]);
+
+        // Notify relevant admins.
+        $notify_admins = Fixometer::usersWhoHavePreference('admin-moderate-group');
+        Notification::send($notify_admins, new AdminModerationGroup([
+                                                                        'group_name' => $name,
+                                                                        'group_url' => url('/group/edit/'.$idGroup),
+                                                                    ]));
+
+        return response()->json([
+            'id' => $idGroup,
+        ]);
     }
 }

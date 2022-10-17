@@ -2,9 +2,11 @@
 
 namespace Tests\Feature;
 
+use App\Network;
 use App\User;
 use Carbon\Carbon;
 use DB;
+use Illuminate\Auth\AuthenticationException;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Symfony\Component\DomCrawler\Crawler;
 use Illuminate\Validation\ValidationException;
@@ -60,5 +62,71 @@ class APIv2GroupTest extends TestCase
             [false],
             [true],
         ];
+    }
+
+    public function testCreateGroupLoggedOut() {
+        $this->expectException(AuthenticationException::class);
+
+        $response = $this->post('/api/v2/groups', [
+            'name' => 'Test Group',
+            'location' => 'London',
+            'description' => 'Some text.',
+        ]);
+    }
+
+    public function testCreateGroupLoggedInWithoutToken() {
+        $user = factory(User::class)->states('Administrator')->create([
+                                                                          'api_token' => '1234',
+                                                                      ]);
+        $this->actingAs($user);
+
+        $this->expectException(AuthenticationException::class);
+
+        $response = $this->post('/api/v2/groups', [
+            'name' => 'Test Group',
+            'location' => 'London',
+            'description' => 'Some text.',
+        ]);
+    }
+
+    public function testCreateGroupLoggedInWithToken() {
+        $user = factory(User::class)->states('Administrator')->create([
+                                                                          'api_token' => '1234',
+                                                                      ]);
+        $this->actingAs($user);
+
+        // Set a network on the user.
+        $network = factory(Network::class)->create([
+                                                       'shortname' => 'network',
+                                                   ]);
+        $user->repair_network = $network->id;
+        $user->save();
+
+        $response = $this->post('/api/v2/groups?api_token=1234', [
+            'name' => 'Test Group',
+            'location' => 'London',
+            'description' => 'Some text.',
+        ]);
+
+        $response->assertSuccessful();
+        $json = json_decode($response->getContent(), true);
+        $this->assertTrue(array_key_exists('id', $json));
+        $this->assertGreaterThan(0, $json['id']);
+    }
+
+
+    public function testCreateGroupGeocodeFailure() {
+        $user = factory(User::class)->states('Administrator')->create([
+                                                                          'api_token' => '1234',
+                                                                      ]);
+        $this->actingAs($user);
+
+        $this->expectException(ValidationException::class);
+
+        $response = $this->post('/api/v2/groups?api_token=1234', [
+            'name' => 'Test Group',
+            'location' => 'ForceGeocodeFailure',
+            'description' => 'Some text.',
+        ]);
     }
 }
