@@ -1552,6 +1552,7 @@ jQuery(document).ready(function () {
         'fixometerpage': require('./components/FixometerPage.vue'),
         'groupspage': require('./components/GroupsPage.vue'),
         'grouppage': require('./components/GroupPage.vue'),
+        'groupaddeditpage': require('./components/GroupAddEditPage.vue'),
         'groupeventspage': require('./components/GroupEventsPage.vue'),
         'groupevents': require('./components/GroupEvents.vue'),
         'groupsrequiringmoderation': require('./components/GroupsRequiringModeration.vue'),

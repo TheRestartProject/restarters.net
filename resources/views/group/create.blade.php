@@ -14,19 +14,12 @@
           </div>
       @endif
 
-      <div class="row mb-30">
-          <div class="col-12 col-md-12">
-              <div class="d-flex align-items-center">
-                  <h1 class="mb-0 mr-30">
-                    @lang('general.new_group')
-                  </h1>
-              </div>
-          </div>
-      </div>
-
     <div class="row justify-content-center">
       <div class="col-lg-12">
 
+        <div class="vue">
+          <GroupAddEditPage />
+        </div>
         @if(isset($response))
           @php( App\Helpers\Fixometer::printResponse($response) )
         @endif

@@ -94,12 +94,8 @@ class GroupController extends Controller
         return $this->indexVariations('all', $id);
     }
 
-    public function create(Request $request, $networkId = null)
+    public function create(Request $request)
     {
-        $geocoder = new \App\Helpers\Geocoder();
-
-        $idGroup = false;
-
         $user = User::find(Auth::id());
 
         // Only administrators can add groups
@@ -107,148 +103,7 @@ class GroupController extends Controller
             return redirect('/user/forbidden');
         }
 
-        if ($request->isMethod('post') && ! empty($request->post())) {
-            $error = [];
-
-            $name = $request->input('name');
-            $website = $request->input('website');
-            $location = $request->input('location');
-            $text = $request->input('free_text');
-            $timezone = $request->input('timezone');
-            $phone = $request->input('phone');
-
-            if (empty($name)) {
-                $error['name'] = 'Please input a name.';
-            }
-
-            if ($timezone && !in_array($timezone, \DateTimeZone::listIdentifiers())) {
-                $error['timezone'] =  __('partials.validate_timezone');
-                $response['warning'] = $error['timezone'];
-            }
-
-            if (! empty($location)) {
-                $geocoded = $geocoder->geocode($location);
-
-                if (empty($geocoded)) {
-                    $response['danger'] = __('groups.geocode_failed');
-                    \Sentry\CaptureMessage($response['danger']);
-
-                    return view('group.create', [
-                        'title' => 'New Group',
-                        'gmaps' => true,
-                        'response' => $response,
-                    ]);
-                }
-
-                $latitude = $geocoded['latitude'];
-                $longitude = $geocoded['longitude'];
-                $country = $geocoded['country'];
-            } else {
-                $latitude = null;
-                $longitude = null;
-                $country = null;
-            }
-
-            if (empty($error)) {
-                $data = [
-                    'name' => $name,
-                    'website' => $website,
-                    'location' => $location,
-                    'latitude' => $latitude,
-                    'longitude' => $longitude,
-                    'country' => $country,
-                    'free_text' => $text,
-                    'shareable_code' => Fixometer::generateUniqueShareableCode(\App\Group::class, 'shareable_code'),
-                    'timezone' => $timezone,
-                    'phone' => $phone,
-                ];
-
-                try {
-                    $group = Group::create($data);
-                    $idGroup = $group->idgroups;
-
-                    $network = Network::find(session()->get('repair_network'));
-                    $network->addGroup($group);
-
-                    if (is_numeric($idGroup) && $idGroup !== false) {
-                        $idGroup = Group::find($idGroup);
-                        $idGroup = $idGroup->idgroups;
-
-                        $response['success'] = 'Group created correctly.';
-
-                        //Associate current logged in user as a host
-                        UserGroups::create([
-                            'user' => Auth::user()->id,
-                            'group' => $idGroup,
-                            'status' => 1,
-                            'role' => 3,
-                        ]);
-
-                        // Notify relevant admins
-                        $notify_admins = Fixometer::usersWhoHavePreference('admin-moderate-group');
-                        Notification::send($notify_admins, new AdminModerationGroup([
-                            'group_name' => $name,
-                            'group_url' => url('/group/edit/'.$idGroup),
-                        ]));
-
-                        if (isset($_FILES) && ! empty($_FILES)) {
-                            $file = new FixometerFile;
-                            $file->upload('file', 'image', $idGroup, env('TBL_GROUPS'), false, true);
-                        }
-                    } else {
-                        $response['danger'] = 'Group could <strong>not</strong> be created. Something went wrong with the database.';
-                        \Sentry\CaptureMessage($response['danger']);
-                    }
-                } catch (QueryException $e) {
-                    $errorCode = $e->errorInfo[1];
-                    if ($errorCode == 1062) {
-                        $response['danger'] = __('groups.duplicate', [
-                            'name' => $name,
-                        ]);
-                        \Sentry\CaptureMessage($response['danger']);
-                    } else {
-                        $response['danger'] = __('groups.database_error');
-                        \Sentry\CaptureMessage($response['danger']);
-                    }
-                }
-            } else {
-                $response['danger'] = __('groups.create_failed');
-                \Sentry\CaptureMessage($response['danger']);
-            }
-
-            if (! isset($response)) {
-                $response = null;
-            }
-
-            if (! isset($error)) {
-                $error = null;
-            }
-
-            if (! isset($_POST)) {
-                $udata = null;
-            } else {
-                $udata = $_POST;
-            }
-
-            if (is_numeric($idGroup) && $idGroup !== false) {
-                return redirect('/group/edit/'.$idGroup)->with('response', $response);
-            }
-
-            return view('group.create', [
-                'title' => 'New Group',
-                'gmaps' => true,
-                'response' => $response,
-                'error' => $error,
-                'udata' => $udata,
-                'selectedNetworkId' => $networkId,
-            ]);
-        }
-
-        return view('group.create', [
-            'title' => 'New Group',
-            'gmaps' => true,
-            'selectedNetworkId' => $networkId,
-        ]);
+        return view('group.create');
     }
 
     private function expandVolunteers($volunteers)

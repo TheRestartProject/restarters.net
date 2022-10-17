@@ -148,13 +148,31 @@ class APIv2GroupTest extends TestCase
         $response->assertSuccessful();
         $json = json_decode($response->getContent(), true);
         $this->assertTrue(array_key_exists('id', $json));
-        $this->assertGreaterThan(0, $json['id']);
+        $idgroups = $json['id'];
+        $this->assertGreaterThan(0, $idgroups);
 
-        $group = Group::findOrfail($json['id']);
+        $group = Group::findOrfail($idgroups);
         $this->assertEquals('Test Group', $group->name);
         $this->assertEquals('London', $group->location);
         $this->assertEquals('Some text.', $group->free_text);
         $this->assertStringContainsString('.jpg', $group->groupImage->image->path);
+
+        // Group should now appear in the list of groups.
+        $response = $this->get('/api/v2/groups');
+        $response->assertSuccessful();
+        $json = json_decode($response->getContent(), true);
+        $groups = $json['data'];
+        $found = false;
+
+        foreach ($groups as $group)
+        {
+            if ($group['id'] == $idgroups)
+            {
+                $found = true;
+            }
+        }
+
+        $this->assertTrue($found);
     }
 
 

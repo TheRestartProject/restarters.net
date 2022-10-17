@@ -1,6 +1,6 @@
 <template>
   <div>
-    <label for="postcode" class="mt-3">{{ __('groups.timezone') }}:</label>
+    <label for="postcode">{{ __('groups.timezone') }}:</label>
     <vue-typeahead-bootstrap
         v-model="currentValue"
         :maxMatches="3"
@@ -44,6 +44,9 @@ export default {
   watch: {
     valid(newValue) {
       this.$emit('update:valid', newValue)
+    },
+    currentValue(newValue) {
+      this.$emit('update:timezone', newValue)
     }
   },
   async mounted() {

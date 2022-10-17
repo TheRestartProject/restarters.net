@@ -124,7 +124,7 @@ import VenueAddress from './VenueAddress'
 import EventVenue from './EventVenue'
 import EventGroup from './EventGroup'
 import EventLink from './EventLink'
-import { required, minLength, url, helpers } from 'vuelidate/lib/validators'
+import { required, url, helpers } from 'vuelidate/lib/validators'
 import validationHelpers from '../mixins/validationHelpers'
 import moment from 'moment-timezone'
 

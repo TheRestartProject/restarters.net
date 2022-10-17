@@ -237,6 +237,39 @@ class GroupController extends Controller
 
     /**
      * @OA\Get(
+     *      path="/api/v2/groups",
+     *      operationId="listGroup",
+     *      tags={"Groups"},
+     *      summary="List Groups",
+     *      description="Returns a list of groups",
+     *      @OA\Response(
+     *          response=200,
+     *          description="Successful operation",
+     *          @OA\JsonContent(
+     *              @OA\Property(
+     *                property="data",
+     *                title="data",
+     *                description="An array of groups",
+     *                type="array",
+     *                @OA\Items(
+     *                    ref="#/components/schemas/GroupSummary"
+     *                 )
+     *              )
+     *          )
+     *       ),
+     *      @OA\Response(
+     *          response=404,
+     *          description="Group not found",
+     *      ),
+     *     )
+     */
+    public static function listv2(Request $request) {
+        $groups = Group::all();
+        return \App\Http\Resources\GroupSummaryCollection::make($groups);
+    }
+
+    /**
+     * @OA\Get(
      *      path="/api/v2/groups/{id}",
      *      operationId="getGroup",
      *      tags={"Groups"},
@@ -462,6 +495,8 @@ class GroupController extends Controller
      */
     public static function createGroupv2(Request $request) {
         $user = auth('api')->user();
+
+        // TODO Should we restrict group creation to non-Restarters?  The code in GroupController does.
 
         // We don't validate max lengths of other strings, to avoid duplicating the length information both here
         // and in the migrations.  If we wanted to do that we should extract the length dynamically from the
