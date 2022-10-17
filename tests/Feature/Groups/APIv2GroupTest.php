@@ -175,7 +175,6 @@ class APIv2GroupTest extends TestCase
         $this->assertTrue($found);
     }
 
-
     public function testCreateGroupGeocodeFailure()
     {
         $user = factory(User::class)->states('Administrator')->create([
@@ -189,6 +188,23 @@ class APIv2GroupTest extends TestCase
             'name' => 'Test Group',
             'location' => 'ForceGeocodeFailure',
             'description' => 'Some text.',
+        ]);
+    }
+
+    public function testCreateGroupInvalidTimezone()
+    {
+        $user = factory(User::class)->states('Administrator')->create([
+                                                                          'api_token' => '1234',
+                                                                      ]);
+        $this->actingAs($user);
+
+        $this->expectException(ValidationException::class);
+
+        $response = $this->post('/api/v2/groups?api_token=1234', [
+            'name' => 'Test Group',
+            'location' => 'London, UK',
+            'description' => 'Some text.',
+            'timezone' => 'invalidtimezone'
         ]);
     }
 }

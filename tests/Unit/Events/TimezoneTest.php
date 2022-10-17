@@ -223,17 +223,6 @@ class TimezoneTest extends TestCase
     public function testInvalidTimezones() {
         $this->loginAsTestUser(Role::ADMINISTRATOR);
 
-        $response = $this->post('/group/create', [
-            'name' => 'Test Group0',
-            'website' => 'https://therestartproject.org',
-            'location' => 'London',
-            'free_text' => 'Some text.',
-            'timezone' => 'bad timezone'
-        ]);
-
-        $response->assertStatus(200);
-        $response->assertSee('Please select a valid timezone.');
-
         $g = factory(Group::class)->create([
                                                'timezone' => 'Asia/Samarkand'
                                            ]);

@@ -501,9 +501,6 @@ class GroupController extends Controller
         // We don't validate max lengths of other strings, to avoid duplicating the length information both here
         // and in the migrations.  If we wanted to do that we should extract the length dynamically from the
         // schema, which is possible but not trivial.
-        //
-        // We also don't validate timezones.  Not quite sure how to do this, but the front-end client should
-        // be validating it.
         $request->validate([
             'name' => ['required', 'unique:groups', 'max:255'],
             'location' => ['required', 'max:255'],
@@ -521,6 +518,10 @@ class GroupController extends Controller
         $latitude = null;
         $longitude = null;
         $country = null;
+
+        if ($timezone && !in_array($timezone, \DateTimeZone::listIdentifiers())) {
+            throw ValidationException::withMessages(['location ' => __('partials.validate_timezone')]);
+        }
 
         if (! empty($location)) {
             $geocoder = new \App\Helpers\Geocoder();
