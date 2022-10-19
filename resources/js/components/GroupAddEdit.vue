@@ -4,6 +4,9 @@
       {{ __('groups.add_groups_content') }}
     </p>
 
+    <input type="hidden" id="lat" v-model="lat" />
+    <input type="hidden" id="lng" v-model="lng" />
+
     <div class="layout">
       <div class="flex-grow-1 group-name">
         <GroupName

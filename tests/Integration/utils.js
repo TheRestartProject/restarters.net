@@ -32,13 +32,11 @@ exports.createGroup = async function(page, baseURL) {
   // Type into the RTE
   await page.fill('.ql-editor', faker.lorem.sentence())
 
-  // Always say London for geocoding.
-  await page.fill('.group-location input', 'London')
-  await page.keyboard.down('L')
-  await page.keyboard.up('L')
-  await page.waitForSelector('.group-location .pac-container .pac-item')
-  await page.keyboard.down('ArrowDown')
-  await page.keyboard.press('Enter')
+  // Always say London for geocoding.  Google blocks playwright so we have to hack this.
+  await page.fill('.group-location input', 'London, UK')
+  await page.fill('#lat', '51.5072')
+  await page.fill('#lng', '-0.1276')
+  await page.click('.pac-container .pac-item:first', { force: true} )
 
   await page.fill('.timezone', 'Europe/London')
 
