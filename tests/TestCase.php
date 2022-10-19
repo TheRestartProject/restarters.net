@@ -141,6 +141,8 @@ abstract class TestCase extends BaseTestCase
 
         // Ensure API token in case we need to make API calls.
         Auth::user()->ensureAPIToken();
+
+        return Auth::user();
     }
 
     public function createGroup($name = 'Test Group', $website = 'https://therestartproject.org', $location = 'London', $text = 'Some text.', $assert = true, $approve = true)

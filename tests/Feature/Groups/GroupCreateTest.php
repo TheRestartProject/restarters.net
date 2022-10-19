@@ -9,6 +9,7 @@ use App\Party;
 use App\Role;
 use App\User;
 use Carbon\Carbon;
+use Illuminate\Validation\ValidationException;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Tests\TestCase;
 use Illuminate\Support\Facades\Notification;
@@ -39,8 +40,8 @@ class GroupCreateTest extends TestCase
         $this->loginAsTestUser(Role::ADMINISTRATOR);
 
         // Use an address which will fail to geocode.
+        $this->expectException(ValidationException::class);
         $this->assertNull($this->createGroup('Test Group', 'https://therestartproject.org', 'zzzzzzzzzzz123', 'Some text', false));
-        $this->assertContains(__('groups.geocode_failed'), $this->lastResponse->getContent());
     }
 
     public function testDuplicate()
