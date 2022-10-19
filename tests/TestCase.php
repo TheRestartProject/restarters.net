@@ -149,8 +149,13 @@ abstract class TestCase extends BaseTestCase
     {
         $idgroups = null;
 
+        // Get the dashboard.  This will ensure that we have set the repair_network on the user.
+        $this->get('/');
+
         // We create groups using the API.
         $user = Auth::user();
+
+        echo("Creating with " . $user->id . " on repairnetwork " . $user->repair_network . "\n");
 
         $this->lastResponse = $this->post('/api/v2/groups?api_token=' . $user->api_token, [
              'name' => $name.$this->groupCount++,

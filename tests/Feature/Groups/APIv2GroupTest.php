@@ -144,6 +144,7 @@ class APIv2GroupTest extends TestCase
                 'name' => 'Test Group',
                 'location' => 'London',
                 'description' => 'Some text.',
+                'timezone' => 'Europe/Brussels'
             ]
         );
 
@@ -158,6 +159,7 @@ class APIv2GroupTest extends TestCase
         $this->assertEquals('London', $group->location);
         $this->assertEquals('Some text.', $group->free_text);
         $this->assertStringContainsString('.jpg', $group->groupImage->image->path);
+        $this->assertEquals('Europe/Brussels', $group->timezone);
 
         // Group should now appear in the list of groups.
         $response = $this->get('/api/v2/groups');
@@ -207,6 +209,32 @@ class APIv2GroupTest extends TestCase
             'location' => 'London, UK',
             'description' => 'Some text.',
             'timezone' => 'invalidtimezone'
+        ]);
+    }
+
+    public function testCreateGroupDuplicate()
+    {
+        // Logged in as a user should work, even if we don't use an API token.
+        $user = factory(User::class)->states('Administrator')->create([
+                                                                          'api_token' => null,
+                                                                      ]);
+        $this->actingAs($user);
+
+        $response = $this->post('/api/v2/groups', [
+            'name' => 'Test Group',
+            'location' => 'London',
+            'description' => 'Some text.',
+        ]);
+
+        $response->assertSuccessful();
+
+        // Creating again should cause a validation exception.
+        $this->expectException(ValidationException::class);
+
+        $response = $this->post('/api/v2/groups', [
+            'name' => 'Test Group',
+            'location' => 'London',
+            'description' => 'Some text.',
         ]);
     }
 }
