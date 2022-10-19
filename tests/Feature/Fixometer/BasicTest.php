@@ -4,6 +4,10 @@ namespace Tests\Feature\Fixometer;
 
 use App\Category;
 use App\Device;
+use App\Group;
+use App\Helpers\RepairNetworkService;
+use App\Party;
+use App\User;
 use DB;
 use Hash;
 use Mockery;
@@ -13,6 +17,21 @@ class BasicTest extends TestCase
 {
     public function testPageLoads()
     {
+        // Create a past event with a fixed device.  This is shown on the Fixometer page as the latest data.
+        $group = factory(Group::class)->create([
+                                                   'wordpress_post_id' => '99999'
+                                               ]);
+        $event = factory(Party::class)->create([
+                                                   'group' => $group,
+                                                   'event_start_utc' => '2000-01-01T12:13:00+00:00',
+                                                   'event_end_utc' => '2000-01-01T13:14:00+00:00',
+                                               ]);
+        $device = factory(Device::class)->states('fixed')->create([
+                                                                      'category' => 111,
+                                                                      'category_creation' => 111,
+                                                                      'event' => $event->idevents,
+                                                                  ]);
+
         // Test the dashboard page loads.  Most of the work is done inside Vue, so a basic test is just that the
         // Vue component exists.
         $this->loginAsTestUser();
@@ -47,7 +66,7 @@ class BasicTest extends TestCase
             ],
         ]);
 
-        $this->assertVueProperties($response, [
+        $props = $this->assertVueProperties($response, [
             [],
             [
                 // Can't assert on latest-data or impact-data as dev systems might have varying info.
@@ -58,6 +77,9 @@ class BasicTest extends TestCase
                 ':is-admin' => 'false',
             ],
         ]);
+
+        $data = json_decode($props[1][':latest-data'], TRUE);
+        $this->assertEquals($event->idevents, $data['idevents']);
     }
 
     public function testExport() {

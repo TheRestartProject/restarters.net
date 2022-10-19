@@ -9,30 +9,37 @@ class NewGroupWithinRadius extends BaseNotification
     /**
      * Get the mail representation of the notification.
      *
-     * @param  mixed  $notifiable
+     * @param mixed $notifiable
      * @return \Illuminate\Notifications\Messages\MailMessage
      */
     public function toMail($notifiable)
     {
         $locale = $notifiable->language;
         return (new MailMessage)
-                    ->subject(__('notifications.new_group_subject', [], $locale))
-                    ->greeting(__('notifications.greeting', [], $notifiable->language))
-                    ->line(__('notifications.new_group_line1', [
-                        'name' => $this->arr['group_name']
-                    ], $locale))
-                    ->action(__('notifications.new_group_action', [
-                        'name' => $this->arr['group_name']
-                    ], $locale), $this->arr['group_url'])
-                    ->line(__('notifications.email_preferences', [
-                       'url' => url('/user/edit/'.$notifiable->id)
-                    ], $locale));
+            ->subject(__('notifications.new_group_subject', [], $locale))
+            ->greeting(__('notifications.greeting', [], $notifiable->language))
+            ->line(
+                __('notifications.new_group_line1', [
+                    'name' => $this->arr['group_name']
+                ], $locale)
+            )
+            ->action(
+                __('notifications.new_group_action', [
+                    'name' => $this->arr['group_name']
+                ], $locale),
+                $this->arr['group_url']
+            )
+            ->line(
+                __('notifications.email_preferences', [
+                    'url' => url('/user/edit/' . $notifiable->id)
+                ], $locale)
+            );
     }
 
     /**
      * Get the array representation of the notification.
      *
-     * @param  mixed  $notifiable
+     * @param mixed $notifiable
      * @return array
      */
     public function toArray($notifiable)

@@ -18,7 +18,7 @@ return [
   'country' => 'Pays',
   'time_volunteered' => 'Temps de bénévolat',
   'average_age' => 'Moyenne d\'âge',
-  'number_of_groups' => 'Nombre de groupes',
+  'number_of_groups' => 'Nombre de Repair Cafés',
   'total_number_of_users' => 'Nombre total d\'utilisateurs',
   'number_of_anonymous_users' => 'Nombre d\'utilisateurs anonymes',
   'breakdown_by_country' => 'Répartition par pays',

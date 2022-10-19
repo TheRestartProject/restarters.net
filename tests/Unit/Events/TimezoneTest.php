@@ -4,9 +4,11 @@ namespace Tests\Unit;
 
 use App\Group;
 use App\Party;
+use App\Role;
 use App\User;
 use Carbon\Carbon;
 use DB;
+use Illuminate\Validation\ValidationException;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Tests\TestCase;
 
@@ -113,12 +115,13 @@ class TimezoneTest extends TestCase
 
         $props = $this->assertVueProperties($response, [
             [],
+            [],
             [
                 'heading-level' => 'h2',
             ],
         ]);
 
-        $events = json_decode($props[1][':initial-events'], TRUE);
+        $events = json_decode($props[2][':initial-events'], TRUE);
 
         // Check the returned events:
         // - The events should be second first because that is the earliest actual time and therefore the soonest
@@ -215,5 +218,36 @@ class TimezoneTest extends TestCase
         // This should have updated the timezone of the event.
         $party->refresh();
         self::assertEquals('Europe/London', $party->timezone);
+    }
+
+    public function testInvalidTimezones() {
+        $this->loginAsTestUser(Role::ADMINISTRATOR);
+
+        $response = $this->post('/group/create', [
+            'name' => 'Test Group0',
+            'website' => 'https://therestartproject.org',
+            'location' => 'London',
+            'free_text' => 'Some text.',
+            'timezone' => 'bad timezone'
+        ]);
+
+        $response->assertStatus(200);
+        $response->assertSee('Please select a valid timezone.');
+
+        $g = factory(Group::class)->create([
+                                               'timezone' => 'Asia/Samarkand'
+                                           ]);
+
+        $host = factory(User::class)->states('Restarter')->create();
+        $g->addVolunteer($host);
+        $g->makeMemberAHost($host);
+
+        $this->actingAs($host);
+        $event = factory(Party::class)->raw([
+                                                'timezone' => 'bad timezone'
+                                            ]);
+        $event['group'] = $g->idgroups;
+        $this->expectException(ValidationException::class);
+        $this->post('/party/create/', $event);
     }
 }

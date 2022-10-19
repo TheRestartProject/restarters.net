@@ -411,35 +411,6 @@ class User extends Authenticatable implements Auditable, HasLocalePreference
         }
     }
 
-    /**
-     * Getter to display the user's repair network with options to provide the network name/slug
-     *
-     * NOT IN USE, decided on a more straightforward approach could be useful in the future
-     * @author Dean Appleton-Claydon
-     * @date   2019-03-22
-     * @param  bool $string
-     * @param  bool $slug
-     * @return mixed either string or int
-     */
-    public function getRepairNetwork($string = false, $slug = false)
-    {
-        if ($string) {
-            if ($this->repair_network === 2) {
-                $network = 'Repair Share';
-            } else {
-                $network = 'Restarters';
-            }
-
-            if ($slug) {
-                return Str::slug($network);
-            }
-
-            return $network;
-        }
-
-        return $this->repair_network;
-    }
-
     public function groupTag()
     {
         return $this->hasOne(GroupTags::class, 'id', 'access_group_tag_id');

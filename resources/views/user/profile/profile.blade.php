@@ -140,7 +140,7 @@
     <div class="col-lg-6 d-flex col-bottom" id="change-photo">
     <div class="edit-panel">
         <h4>@lang('profile.change_photo')</h4>
-        <p>@lang('profile.change_photo_text')</p>
+        <p>@lang('profile.change_photo')</p>
         <form action="/profile/edit-photo" method="post" enctype="multipart/form-data">
         @csrf
 

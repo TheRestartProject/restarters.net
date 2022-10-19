@@ -3,11 +3,8 @@
 namespace App\Http\Controllers;
 
 use App\Brands;
-use App\Category;
 use App\Cluster;
 use App\Device;
-use App\DeviceList;
-use App\DeviceUrl;
 use App\Events\DeviceCreatedOrUpdated;
 use App\EventsUsers;
 use App\Group;
@@ -16,6 +13,7 @@ use App\Notifications\AdminAbnormalDevices;
 use App\Party;
 use App\User;
 use App\UserGroups;
+use App\Xref;
 use Auth;
 use FixometerFile;
 use Illuminate\Http\Request;
@@ -96,6 +94,8 @@ class DeviceController extends Controller
         $event_id = $request->input('event_id');
         $barrier = $request->input('barrier');
 
+        $iddevices = $request->input('iddevices');
+
         // Get party for later
         $event = Party::find($event_id);
 
@@ -172,7 +172,8 @@ class DeviceController extends Controller
             }
 
             // If the number of devices exceeds set amount then show the following message
-            $deviceMiscCount = DB::table('devices')->where('category', 46)->where('event', $event_id)->count();
+            $deviceMiscCount = DB::table('devices')->where('category', env('MISC_CATEGORY_ID_POWERED'))->where('event', $event_id)->count() +
+                DB::table('devices')->where('category', env('MISC_CATEGORY_ID_UNPOWERED'))->where('event', $event_id)->count();
             if ($deviceMiscCount == env('DEVICE_ABNORMAL_MISC_COUNT', 5)) {
                 $notify_users = Fixometer::usersWhoHavePreference('admin-abnormal-devices');
                 Notification::send($notify_users, new AdminAbnormalDevices([
@@ -195,6 +196,19 @@ class DeviceController extends Controller
             }
 
             $device[$i]->barrier = $barriers;
+
+            if ($iddevices && $iddevices < 0) {
+                // We might have some photos uploaded for this device.  Record them against this device instance.
+                // Each instance of a device shares the same underlying photo file.
+                $File = new \FixometerFile;
+                $images = $File->findImages(env('TBL_DEVICES'), $iddevices);
+                foreach ($images as $image) {
+                    $xref = Xref::findOrFail($image->idxref);
+                    $xref->copy($device[$i]->iddevices);
+                }
+
+                $device[$i]->images = $device[$i]->getImages();
+            }
         }
         // end quantity loop
 
@@ -369,6 +383,7 @@ class DeviceController extends Controller
             return response()->json(['success' => false]);
         }
 
+        \Sentry\CaptureMessage('You do not have the right permissions for deleting a device');
         return redirect('/party/view/'.$eventId)->with('warning', 'You do not have the right permissions for deleting a device');
     }
 
@@ -379,9 +394,24 @@ class DeviceController extends Controller
 
             if (isset($_FILES) && ! empty($_FILES)) {
                 $file = new FixometerFile;
-                $fn = $file->upload('file', 'image', $id, env('TBL_DEVICES'), true, false, true);
-                $device = Device::find($id);
-                $images = $device->getImages();
+
+                if ($id > 0) {
+                    // We are adding a photo to an existing device.
+                    $fn = $file->upload('file', 'image', $id, env('TBL_DEVICES'), true, false, true);
+                    $device = Device::find($id);
+                    $images = $device->getImages();
+                } else {
+                    // We are adding a photo for a device that hasn't yet been added.  Upload the file. We will add
+                    // them to the device once the device is created.
+                    $fn = $file->upload('file', 'image', $id, env('TBL_DEVICES'), true, false, true);
+
+                    if ($fn) {
+                        $File = new \FixometerFile;
+                        $images = $File->findImages(env('TBL_DEVICES'), $id);
+                    } else {
+                        return 'fail - image could not be uploaded';
+                    }
+                }
             }
 
             // Return the current set of images for this device so that the client doesn't need to merge.
@@ -391,23 +421,36 @@ class DeviceController extends Controller
                 'images' => $images,
             ]);
         } catch (\Exception $e) {
+            error_log("Exception  " . $e->getMessage());
             return 'fail - image could not be uploaded';
         }
     }
 
-    public function deleteImage($device_id, $id, $path)
+    public function deleteImage($device_id, $idxref)
     {
         $user = Auth::user();
 
-        $event_id = Device::find($device_id)->event;
-        $in_event = EventsUsers::where('event', $event_id)->where('user', Auth::user()->id)->first();
-        if (Fixometer::hasRole($user, 'Administrator') || is_object($in_event)) {
+        if ($device_id > 0) {
+            // We are deleting a photo from an existing device.
+            $event_id = Device::find($device_id)->event;
+            $in_event = EventsUsers::where('event', $event_id)->where('user', Auth::user()->id)->first();
+            if (Fixometer::hasRole($user, 'Administrator') || is_object($in_event)) {
+                $Image = new FixometerFile;
+                $Image->deleteImage($idxref);
+
+                return redirect()->back()->with('message', 'Thank you, the image has been deleted');
+            }
+
+            return redirect()->back()->with('message', 'Sorry, but the image can\'t be deleted');
+        } else {
+            // We are deleting a photo from a device which has not yet been added.
+            //
+            // There is a slight security issue here, in that one user could delete the photos from devices which
+            // are in the process of being added by another user.  The chances of this being a real issue are very low.
             $Image = new FixometerFile;
-            $Image->deleteImage($id, basename($path));
+            $Image->deleteImage($idxref);
 
             return redirect()->back()->with('message', 'Thank you, the image has been deleted');
         }
-
-        return redirect()->back()->with('message', 'Sorry, but the image can\'t be deleted');
     }
 }

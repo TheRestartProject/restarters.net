@@ -125,6 +125,13 @@ jobs:
       - run: sudo apt update
       - run: sudo apt install dnsutils openssl zip unzip git libxml2-dev libzip-dev zlib1g-dev libcurl4-openssl-dev iputils-ping default-mysql-client vim libpng-dev libgmp-dev libjpeg-turbo8-dev
       - run: sudo apt-get install php7.4-xmlrpc php7.4-intl php7.4-xdebug php7.4-xmlrpc php7.4-mbstring php7.4-simplexml php7.4-curl php7.4-zip python postgresql-client
+
+      # We now need Node 14 for Playwright.
+      - run: sudo curl -sL https://deb.nodesource.com/setup_14.x | sudo bash -
+      - run: sudo apt update
+      - run: sudo apt -y install nodejs
+      - run: sudo rm /usr/local/bin/node
+
       - run: cp .env.example .env
 
       # Need access to timezones.
@@ -165,7 +172,11 @@ jobs:
       - run: php artisan migrate
 
       - run: wget -O phpunit https://phar.phpunit.de/phpunit-7.phar ; chmod +x phpunit
+
+      # The phpunit and playwright tests require an uploads directory in a slightly different place.  Not really
+      # worth fixing.
       - run: mkdir uploads
+      - run: mkdir public/uploads
 
       # Wait for Discourse to finish initialising.
       - run: while ! nc -z restarters_discourse 80; do sleep 1 ; done
@@ -178,6 +189,9 @@ jobs:
 
       # Coveralls is pernickety about the location it uploads from existing.
       - run: mkdir build; mkdir build/logs; php vendor/bin/php-coveralls -v -x tests/clover.xml
+
+      # Zap groups set up by the UT; this can confuse Playwright tests.
+      - run: mysql --host="127.0.0.1" -u root -ps3cr3t -e "use restarters_db;SET foreign_key_checks=0;DELETE FROM groups WHERE location IS NULL;SET foreign_key_checks=1;"
 
       # Run the Playwright tests.
       # Ignore the return code from the tinker; the user might exist from the phpunit tests.  If it doesn't and

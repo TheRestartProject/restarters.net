@@ -7,6 +7,11 @@ return [
     'networks' => 'Networks',
     'network' => 'Network',
     'particular_network' => ':networkName network',
+    'groups' => 'Groups',
+    'about' => 'About',
+    'count' => 'There are currently :count groups in the :name network. <a href="/group/network/:id">View these groups</a>.',
+    'actions' => 'Network Actions',
+    'coordinators' => 'Network Coordinators'
   ],
   'index' => [
     'your_networks' => 'Your networks',

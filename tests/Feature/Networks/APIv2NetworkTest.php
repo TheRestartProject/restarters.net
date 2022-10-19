@@ -6,6 +6,7 @@ use App\Group;
 use App\Network;
 use App\Party;
 use App\User;
+use Carbon\Carbon;
 use DB;
 use Tests\TestCase;
 
@@ -93,6 +94,21 @@ class APIv2NetworkTest extends TestCase
         } catch (\Exception $e) {
             error_log($e->getMessage());
         }
+
+        // Test updated_at filters.
+        $start = Carbon::now()->subDays(1)->toIso8601String();
+        $end = Carbon::now()->addDays(1)->toIso8601String();
+        $response = $this->get("/api/v2/networks/{$network->id}/groups?updated_start=" . urlencode($start) . "&updated_end=" . urlencode($end));
+        $response->assertSuccessful();
+        $json = json_decode($response->getContent(), true)['data'];
+        $this->assertEquals(1, count($json));
+
+        $start = Carbon::now()->addDays(1)->toIso8601String();
+        $end = Carbon::now()->addDays(2)->toIso8601String();
+        $response = $this->get("/api/v2/networks/{$network->id}/groups?updated_start=" . urlencode($start) . "&updated_end=" . urlencode($end));
+        $response->assertSuccessful();
+        $json = json_decode($response->getContent(), true)['data'];
+        $this->assertEquals(0, count($json));
     }
 
     public function providerTrueFalse() {
@@ -100,5 +116,50 @@ class APIv2NetworkTest extends TestCase
             [false],
             [true],
         ];
+    }
+
+    public function testListEvents() {
+        $network = factory(Network::class)->create([
+                                                       'name' => 'Restart',
+                                                       'events_push_to_wordpress' => true,
+                                                   ]);
+        $group = factory(Group::class)->create([
+                                                   'wordpress_post_id' => '99999',
+                                               ]);
+        $network->addGroup($group);
+
+        // Create event for group
+        $event = factory(Party::class)->states('moderated')->create([
+                                                                        'event_start_utc' => '2038-01-01T00:00:00Z',
+                                                                        'event_end_utc' => '2038-01-01T02:00:00Z',
+                                                                        'group' => $group->idgroups,
+                                                                    ]);
+
+        // Manually set the updated_at fields so that we can check they are returned correctly.
+        DB::statement(DB::raw("UPDATE events SET updated_at = '2011-01-01 12:34'"));
+        DB::statement(DB::raw("UPDATE `groups` SET updated_at = '2011-01-02 12:34'"));
+
+        $response = $this->get("/api/v2/networks/{$network->id}/events");
+        $response->assertSuccessful();
+        $json = json_decode($response->getContent(), true)['data'];
+        $this->assertEquals(1, count($json));
+        $this->assertEquals($event->idevents, $json[0]['id']);
+        $this->assertEquals('2011-01-01T12:34:00+00:00', $json[0]['updated_at']);
+        $this->assertEquals('2011-01-02T12:34:00+00:00', $json[0]['group']['updated_at']);
+
+        # Test updated filters.
+        $start = '2011-01-01T10:34:00+00:00';
+        $end = '2011-01-01T14:34:00+00:00';
+        $response = $this->get("/api/v2/networks/{$network->id}/events?updated_start=" . urlencode($start) . "&updated_end=" . urlencode($end));
+        $response->assertSuccessful();
+        $json = json_decode($response->getContent(), true)['data'];
+        $this->assertEquals(1, count($json));
+
+        $start = '2011-01-01T15:34:00+00:00';
+        $end = '2011-01-01T16:34:00+00:00';
+        $response = $this->get("/api/v2/networks/{$network->id}/events?updated_start=" . urlencode($start) . "&updated_end=" . urlencode($end));
+        $response->assertSuccessful();
+        $json = json_decode($response->getContent(), true)['data'];
+        $this->assertEquals(0, count($json));
     }
 }

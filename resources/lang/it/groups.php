@@ -50,8 +50,6 @@ return [
   'edit_group_save_changes' => 'Memorizza cambiamenti',
   'edit_group_text' => 'Vai avanti e modifica o migliora il profilo del tuo gruppo.',
   'groups_location_small' => 'Luogo dove si svolge l\'evento di riparazione!',
-  'field_group_images' => 'Aggiungi qui una  immagine del gruppo',
-  'field_group_images_2' => 'Scegli una immagine per il tuo gruppo',
   'group_image' => 'Immagine del gruppo',
   'tag-1' => 'Tag 1',
   'tag-2' => 'Tag 2',

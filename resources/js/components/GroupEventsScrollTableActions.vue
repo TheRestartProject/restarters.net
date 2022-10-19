@@ -1,6 +1,6 @@
 <template>
   <div>
-    <div v-if="upcoming" class="d-flex justify-content-around">
+    <div class="d-flex justify-content-around">
       <div v-if="event.requiresModeration" class="cell-warning d-flex justify-content-around p-2">
         <span v-if="event.canModerate">
           <a :href="'/party/edit/' + idevents">{{ __('partials.event_requires_moderation') }}</a>
@@ -9,7 +9,7 @@
         {{ __('partials.event_requires_moderation_by_an_admin') }}
       </span>
       </div>
-      <div v-else class="hidecell">
+      <div v-else-if="upcoming" class="hidecell">
         <div v-if="attending" class="text-black font-weight-bold d-flex justify-content-around">
         <span>
           {{ __('events.youre_going') }}

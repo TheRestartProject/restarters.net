@@ -114,8 +114,13 @@
 
                               </div>
 
-                              <div class="vue">
-                                <GroupTimeZone :value="null" />
+                              <div class="form-group">
+                                <label for="phone">@lang('groups.field_phone'):</label>
+                                <input class="form-control field" id="phone" name="phone" type="tel" aria-describedby="phoneHelpBlock" />
+
+                                <small id="phoneHelpBlock" class="form-text text-muted">
+                                  @lang('groups.phone_small')
+                                </small>
                               </div>
 
                             </div>

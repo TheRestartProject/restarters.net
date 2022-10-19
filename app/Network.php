@@ -30,6 +30,12 @@ class Network extends Model
     public function addCoordinator($coordinator)
     {
         $this->coordinators()->syncWithoutDetaching($coordinator->id);
+
+        // Set us to a network coordinator (but don't demote us from admin).
+        if ($coordinator->role != Role::ADMINISTRATOR) {
+            $coordinator->role = Role::NETWORK_COORDINATOR;
+            $coordinator->save();
+        }
     }
 
     public function eventsRequiringModeration()
@@ -38,7 +44,7 @@ class Network extends Model
         $events = collect([]);
 
         foreach ($groups as $group) {
-            $events->push($group->parties()->whereNull('wordpress_post_id')->whereNull('deleted_at')->get());
+            $events->push($group->upcomingParties()->whereNull('wordpress_post_id')->whereNull('deleted_at'));
         }
 
         return $events->flatten(1);

@@ -152,4 +152,28 @@ class InviteGroupTest extends TestCase
         $redirectTo = $response->getTargetUrl();
         $this->assertNotFalse(strpos($redirectTo, '/user/register'));
     }
+
+    public function testInviteInvalid()
+    {
+        Notification::fake();
+        $this->withoutExceptionHandling();
+
+        $group = factory(Group::class)->create();
+        $host = factory(User::class)->states('Host')->create();
+        $group->addVolunteer($host);
+        $group->makeMemberAHost($host);
+        $this->actingAs($host);
+
+        // Invite a user.
+        $user = factory(User::class)->states('Restarter')->create();
+
+        $response = $this->post('/group/invite', [
+            'group_name' => $group->name,
+            'group_id' => $group->idgroups,
+            'manual_invite_box' => '@invalidmail',
+            'message_to_restarters' => 'Join us, but not in a creepy zombie way',
+        ]);
+
+        $response->assertSessionHas('warning');
+    }
 }

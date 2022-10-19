@@ -7,21 +7,26 @@
   border: 0;
   padding-right: 4rem;
   background-color: #f45b69 !important;
+  color: white;
 
   .postedit-icon,
   .postedit-icon-checkmark,
-  .postedit-content {
+  .postedit-content,
+  .oo-ui-iconElement-icon {
     font-size: 18px;
     font-family: "Asap", sans-serif;
     font-weight: bold;
     font-stretch: normal;
     font-style: normal;
-    color: white;
     padding-left: 0;
-    background-image: none;
+    background-image: none !important;
 
     &::after {
       background-size: 15px 15px !important;
     }
+  }
+
+  .oo-ui-messageWidget.oo-ui-flaggedElement-success:not(.oo-ui-messageWidget-block) {
+    color: white !important;
   }
 }

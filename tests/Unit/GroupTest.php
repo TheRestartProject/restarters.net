@@ -106,7 +106,9 @@ class GroupTest extends TestCase
             'events_push_to_wordpress' => false,
         ]);
 
-        $group = factory(Group::class)->create();
+        $group = factory(Group::class)->create([
+                                                   'wordpress_post_id' => '99999',
+                                               ]);
         $network1->addGroup($group);
         $network2->addGroup($group);
 
@@ -173,5 +175,14 @@ class GroupTest extends TestCase
             [ 'Europe/Brussels', NULL, 'Europe/Paris', 'Europe/Brussels', FALSE ],
             [ NULL, NULL, NULL, NULL, TRUE ],
         ];
+    }
+
+    public function can_store_phone() {
+        $group = factory(Group::class)->create([
+                                                   'phone' => 1234
+                                               ]);
+
+        $group2 = Group::find($group->id);
+        self::assertEquals(1234, $group2->phone);
     }
 }

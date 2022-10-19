@@ -12,13 +12,18 @@ use Tests\TestCase;
 
 class APIv2GroupTest extends TestCase
 {
-    public function testGetEventsForGroup() {
+    /**
+     * @dataProvider providerTrueFalse
+     *
+     * @param $approve
+     */
+    public function testGetGroup($approve) {
         $user = factory(User::class)->states('Administrator')->create([
                                                                           'api_token' => '1234',
                                                                       ]);
         $this->actingAs($user);
 
-        $idgroups = $this->createGroup();
+        $idgroups = $this->createGroup('Test Group', 'https://therestartproject.org', 'London', 'Some text.', true, $approve);
 
         // Test invalid group id.
         try {
@@ -35,5 +40,25 @@ class APIv2GroupTest extends TestCase
         $this->assertTrue(array_key_exists('description', $json['data']));
         $this->assertTrue(array_key_exists('stats', $json['data']));
         $this->assertTrue(array_key_exists('updated_at', $json['data']));
+
+        // Test group moderation.
+        $response = $this->get("/api/v2/moderate/groups?api_token=1234");
+        $response->assertSuccessful();
+        $json = json_decode($response->getContent(), true);
+
+        if (!$approve) {
+            self::assertEquals(1, count($json));
+            self::assertEquals($idgroups, $json[0]['id']);
+        } else {
+            // Group should not show as requiring moderation because it was approved during createGroup().
+            self::assertEquals(0, count($json));
+        }
+    }
+
+    public function providerTrueFalse() {
+        return [
+            [false],
+            [true],
+        ];
     }
 }

@@ -17,8 +17,6 @@ return [
   'edit_group_text' => 'Verdergaan en je groepsprofiel veranderen of verbeteren.',
   'email_addresses_field' => 'E-mailadressen',
   'embed_code_header' => 'Embed code',
-  'field_group_images' => 'Voeg hier een afbeelding voor je groep toe',
-  'field_group_images_2' => 'Afbeelding voor je groep kiezen',
   'group' => 'Groep',
   'groups' => 'Groepen',
   'groups_about_group' => 'Vertel ons iets over je groep',

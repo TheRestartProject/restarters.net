@@ -406,6 +406,8 @@ class UserController extends Controller
         if ($request->getMethod() == 'POST' && $email) {
             if (empty($email) || ! filter_var($email, FILTER_VALIDATE_EMAIL)) {
                 $response['danger'] = __('passwords.invalid');
+
+                // Don't log to Sentry - legitimate user error.
             } else {
                 $user = $User->where('email', $email)->first();
 
@@ -433,6 +435,8 @@ class UserController extends Controller
                     $response['success'] = __('passwords.sent');
                 } else {
                     $response['danger'] = __('passwords.user');
+
+                    // Don't log to Sentry - legitimate user error.
                 }
             }
 
@@ -474,8 +478,11 @@ class UserController extends Controller
         if ($request->getMethod() == 'POST' && $pwd && $cpwd) {
             if (!$valid_code) {
                 $response['danger'] = __('passwords.token');
+                \Sentry\CaptureMessage($response['danger']);
             } elseif ($pwd !== $cpwd) {
                 $response['danger'] = __('passwords.match');
+
+                // Don't log to Sentry - legitimate user error.
             } else {
                 $email = $user->email;
                 $oldPassword = $user->password;
@@ -489,6 +496,7 @@ class UserController extends Controller
                     return redirect('login')->with('success', __('passwords.updated'));
                 } else {
                     $response['danger'] = __('passwords.failed');
+                    \Sentry\CaptureMessage($response['danger']);
                 }
             }
         }
@@ -686,9 +694,11 @@ class UserController extends Controller
                     $response['success'] = 'User created correctly.  <strong>NB No email has been sent to the user.</strong>';
                 } else {
                     $response['danger'] = 'User could not be created';
+                    \Sentry\CaptureMessage($response['danger']);
                 }
             } else {
                 $response['danger'] = 'User could <strong>not</strong> be created. Please look at the reported errors, correct them, and try again.';
+                \Sentry\CaptureMessage($response['danger']);
             }
 
             if (! isset($data)) {
@@ -772,6 +782,7 @@ class UserController extends Controller
 
                 if (! $u) {
                     $response['danger'] = 'Something went wrong. Please check the data and try again.';
+                    \Sentry\CaptureMessage($response['danger']);
                 } else {
                     $response['success'] = 'User updated!';
                     if (Fixometer::hasRole($user, 'Host')) {
