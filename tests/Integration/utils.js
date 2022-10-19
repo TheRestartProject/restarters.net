@@ -27,13 +27,19 @@ exports.createGroup = async function(page, baseURL) {
   // await page.goto(baseURL + '/group/create')
 
   // Name
-  await page.fill('#grp_name', faker.company.companyName())
+  await page.fill('#group_name', faker.company.companyName())
 
   // Type into the RTE
   await page.fill('.ql-editor', faker.lorem.sentence())
 
   // Always say London for geocoding.
-  await page.fill('#autocomplete', 'London')
+  await page.fill('.group-location input', 'London')
+  await page.keyboard.down('L')
+  await page.keyboard.up('L')
+  await page.waitForSelector('.group-location .pac-container .pac-item')
+  await page.keyboard.down('ArrowDown')
+  await page.keyboard.press('Enter')
+
   await page.fill('.timezone', 'Europe/London')
 
   await page.click('button[type=submit]')

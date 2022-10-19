@@ -155,8 +155,6 @@ abstract class TestCase extends BaseTestCase
         // We create groups using the API.
         $user = Auth::user();
 
-        echo("Creating with " . $user->id . " on repairnetwork " . $user->repair_network . "\n");
-
         $this->lastResponse = $this->post('/api/v2/groups?api_token=' . $user->api_token, [
              'name' => $name.$this->groupCount++,
              'website' => $website,
