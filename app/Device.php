@@ -94,10 +94,8 @@ class Device extends Model implements Auditable
     {
         $sql = 'SELECT COUNT(*) AS `counter`, `d`.`repair_status` AS `status`, `d`.`event`
                 FROM `'.$this->table.'` AS `d`';
-        if ((! is_null($g) && is_numeric($g)) || (! is_null($year) && is_numeric($year))) {
-            $sql .= ' INNER JOIN `events` AS `e` ON `e`.`idevents` = `d`.`event` ';
-        }
 
+        $sql .= ' INNER JOIN `events` AS `e` ON `e`.`idevents` = `d`.`event` ';
         $sql .= ' WHERE `repair_status` > 0 ';
 
         if (! is_null($g) && is_numeric($g)) {
@@ -106,6 +104,9 @@ class Device extends Model implements Auditable
         if (! is_null($year) && is_numeric($year)) {
             $sql .= ' AND YEAR(`event_start_utc`) = :year ';
         }
+
+        // We only want to include devices for events which have started or finished.
+        $sql .= " AND `event_start_utc` <= NOW() ";
 
         $sql .= ' GROUP BY `status`';
 
