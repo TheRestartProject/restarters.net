@@ -46,6 +46,7 @@ export default {
       this.$emit('update:valid', newValue)
     },
     currentValue(newValue) {
+      console.log("Current timezone value", newValue)
       this.$emit('update:timezone', newValue)
     }
   },

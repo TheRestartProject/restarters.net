@@ -122,7 +122,19 @@ export default {
       try {
         params.api_token = rootGetters['auth/apiToken']
 
-        let ret = await axios.post('/api/v2/groups', params)
+        const formData = new FormData()
+
+        for (var key in params) {
+          if (params[key]) {
+            formData.append(key, params[key]);
+          }
+        }
+
+        let ret = await axios.post('/api/v2/groups', formData, {
+          headers: {
+            "Content-Type": "multipart/form-data",
+          },
+        })
 
         if (ret && ret.data) {
           id = ret.data.id

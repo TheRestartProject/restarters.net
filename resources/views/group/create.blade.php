@@ -12,3 +12,6 @@
   </div>
 </section>
 @endsection
+@section('scripts')
+  @include('includes/gmap')
+@endsection

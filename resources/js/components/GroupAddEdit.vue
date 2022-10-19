@@ -60,6 +60,12 @@
           class="group-phone"
           ref="phone"
       />
+      <GroupImage
+          :image.sync="image"
+          class="group-image"
+          ref="image"
+      />
+
       <div class="group-approve" v-if="canApprove">
         <b-form-group>
           <label class="groups-tags-label" for="moderate">
@@ -122,9 +128,7 @@
           </div>
         </div>
       </div>
-      <p class="text-danger font-weight-bold" v-if="failed">
-        {{ __('groups.create_failed') }}
-      </p>
+      <p class="text-danger font-weight-bold" v-if="failed" v-html="__('groups.create_failed')" />
     </div>
   </div>
 </template>
@@ -140,13 +144,14 @@ import GroupLocation from './GroupLocation'
 import GroupLocationMap from './GroupLocationMap'
 import GroupTimeZone from './GroupTimeZone'
 import GroupPhone from './GroupPhone'
+import GroupImage from './GroupImage'
 
 function geocodeableValidation () {
   return this.lat !== null && this.lng !== null
 }
 
 export default {
-  components: {GroupTimeZone, RichTextEditor, GroupName, GroupWebsite, GroupLocation, GroupLocationMap, GroupPhone},
+  components: {GroupTimeZone, RichTextEditor, GroupName, GroupWebsite, GroupLocation, GroupLocationMap, GroupPhone, GroupImage},
   mixins: [group, auth, validationHelpers],
   props: {
     initialGroup: {
@@ -173,7 +178,8 @@ export default {
       lat: null,
       lng: null,
       moderate: null,
-      failed: false
+      failed: false,
+      image: null
     }
   },
   validations: {
@@ -261,6 +267,7 @@ export default {
             location: this.location,
             timezone: this.timezone,
             phone: this.phone,
+            image: this.image
           })
 
           if (id) {
@@ -366,8 +373,19 @@ export default {
     }
   }
 
-  .group-approve {
+  .group-image {
     grid-row: 8 / 9;
+    grid-column: 1 / 2;
+    margin-right: 2px;
+
+    @include media-breakpoint-up(lg) {
+      grid-row: 4 / 5;
+      grid-column: 2 / 3;
+    }
+  }
+
+  .group-approve {
+    grid-row: 9 / 10;
     grid-column: 1 / 2;
 
     /deep/ .btn {
