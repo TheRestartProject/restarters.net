@@ -13,6 +13,7 @@ use App\Rules\Timezone;
 use App\UserGroups;
 use Auth;
 use Carbon\Carbon;
+use Illuminate\Auth\AuthenticationException;
 use Illuminate\Database\QueryException;
 use Illuminate\Http\Request;
 use Notification;
@@ -414,10 +415,27 @@ class GroupController extends Controller
         return response()->json($ret);
     }
 
+    private function getUser() {
+        // We want to allow this call to work if a) we are logged in as a user, or b) we have a valid API token.
+        //
+        // This is a slightly odd thing to do, but it is necessary to get both the PHPUnit tests and the
+        // real client use of the API to work.
+        $user = Auth::user();
+
+        if (!$user) {
+            $user = auth('api')->user();
+        }
+
+        if (!$user) {
+            throw new AuthenticationException();
+        }
+
+        return $user;
+    }
+
     // TODO Add to OpenAPI.
     public function moderateGroupsv2(Request $request) {
-        // Get the user that the API has been authenticated as.
-        $user = auth('api')->user();
+        $user = $this->getUser();
         $ret = \App\Http\Resources\GroupCollection::make(Group::unapprovedVisibleTo($user->id));
         return response()->json($ret);
     }
@@ -493,10 +511,9 @@ class GroupController extends Controller
      *     )
      *  )
      */
-    public static function createGroupv2(Request $request) {
-        $user = auth('api')->user();
-
+    public function createGroupv2(Request $request) {
         // TODO Should we restrict group creation to non-Restarters?  The code in GroupController does.
+        $user = $this->getUser();
 
         // We don't validate max lengths of other strings, to avoid duplicating the length information both here
         // and in the migrations.  If we wanted to do that we should extract the length dynamically from the

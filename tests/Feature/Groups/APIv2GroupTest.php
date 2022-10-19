@@ -92,27 +92,29 @@ class APIv2GroupTest extends TestCase
 
     public function testCreateGroupLoggedInWithoutToken()
     {
+        // Logged in as a user should work, even if we don't use an API token.
         $user = factory(User::class)->states('Administrator')->create([
-                                                                          'api_token' => '1234',
+                                                                          'api_token' => null,
                                                                       ]);
         $this->actingAs($user);
-
-        $this->expectException(AuthenticationException::class);
 
         $response = $this->post('/api/v2/groups', [
             'name' => 'Test Group',
             'location' => 'London',
             'description' => 'Some text.',
         ]);
+
+        $response->assertSuccessful();
+        $json = json_decode($response->getContent(), true);
+        $this->assertTrue(array_key_exists('id', $json));
     }
 
-    public function testCreateGroupLoggedInWithToken()
+    public function testCreateGroupLoggedOutWithToken()
     {
+        // Logged out should work if we use an API token.
         $user = factory(User::class)->states('Administrator')->create([
                                                                           'api_token' => '1234',
                                                                       ]);
-        $this->actingAs($user);
-
         // Set a network on the user.
         $network = factory(Network::class)->create([
                                                        'shortname' => 'network',

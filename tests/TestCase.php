@@ -130,7 +130,7 @@ abstract class TestCase extends BaseTestCase
     public function loginAsTestUser($role = Role::RESTARTER)
     {
         // This is testing the external interface, whereas actingAs() wouldn't be.
-        Auth::logout();
+        $response = $this->get('/logout');
         $response = $this->post('/user/register/', $this->userAttributes($role));
 
         $response->assertStatus(302);
@@ -138,15 +138,17 @@ abstract class TestCase extends BaseTestCase
 
         // Set the role.
         Auth::user()->role = $role;
+
+        // Ensure API token in case we need to make API calls.
+        Auth::user()->ensureAPIToken();
     }
 
     public function createGroup($name = 'Test Group', $website = 'https://therestartproject.org', $location = 'London', $text = 'Some text.', $assert = true, $approve = true)
     {
         $idgroups = null;
 
-        // We create groups using the API, so we need to ensure we have an API token and then use it.
+        // We create groups using the API.
         $user = Auth::user();
-        $user->ensureAPIToken();
 
         $this->lastResponse = $this->post('/api/v2/groups?api_token=' . $user->api_token, [
              'name' => $name.$this->groupCount++,
