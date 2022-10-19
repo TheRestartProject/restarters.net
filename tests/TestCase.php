@@ -144,20 +144,23 @@ abstract class TestCase extends BaseTestCase
     {
         $idgroups = null;
 
-        $this->lastResponse = $this->post('/group/create', [
-            'name' => $name.$this->groupCount++,
-            'website' => $website,
-            'location' => $location,
-            'free_text' => $text,
-            'timezone' => 'Europe/London'
+        // We create groups using the API, so we need to ensure we have an API token and then use it.
+        $user = Auth::user();
+        $user->ensureAPIToken();
+
+        $this->lastResponse = $this->post('/api/v2/groups?api_token=' . $user->api_token, [
+             'name' => $name.$this->groupCount++,
+             'website' => $website,
+             'location' => $location,
+             'description' => $text,
+             'timezone' => 'Europe/London'
         ]);
 
         if ($assert) {
-            $this->assertTrue($this->lastResponse->isRedirection());
-            $redirectTo = $this->lastResponse->getTargetUrl();
-            $this->assertNotFalse(strpos($redirectTo, '/group/edit'));
-            $p = strrpos($redirectTo, '/');
-            $idgroups = substr($redirectTo, $p + 1);
+            $this->assertTrue($this->lastResponse->isSuccessful());
+            $json = json_decode($this->lastResponse->getContent(), true);
+            $this->assertTrue(array_key_exists('id', $json));
+            $idgroups = $json['id'];
 
             if ($approve) {
                 $group = Group::find($idgroups);

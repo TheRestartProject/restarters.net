@@ -559,7 +559,10 @@ class GroupController extends Controller
         // The networks can be amended in the update call.
         if ($user->repair_network) {
             $network = Network::find($user->repair_network);
-            $network->addGroup($group);
+
+            if ($network) {
+                $network->addGroup($group);
+            }
         }
 
         //Associate currently logged-in user as a host.
