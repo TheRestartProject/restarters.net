@@ -213,7 +213,6 @@ jobs:
           command: heroku run --app=${HEROKU_APP_NAME} php artisan migrate --force
 workflows:
   version: 2
-  resource_class: small
   deploy:
     jobs:
       - build
