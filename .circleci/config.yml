@@ -1,4 +1,4 @@
-version: 2.1
+version: 2
 
 dependencies:
   pre:
@@ -208,9 +208,7 @@ jobs:
       - run:
           name: Deploy Branch to Heroku
           command: git push https://heroku:$HEROKU_API_KEY@git.heroku.com/$HEROKU_APP_NAME.git ${CIRCLE_BRANCH}
-      - run:
-          name: Migrate DB
-          command: heroku run --app=${HEROKU_APP_NAME} php artisan migrate --force
+      - run: heroku run --app=${HEROKU_APP_NAME} php artisan migrate --force
 workflows:
   deploy:
     jobs:
