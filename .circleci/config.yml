@@ -40,6 +40,8 @@ jobs:
           - MARIADB_DATABASE=bitnami_mediawiki
       - image: 'bitnami/mediawiki:1'
         name: mediawiki
+        labels:
+          kompose.service.type: nodeport
         environment:
           - MARIADB_HOST=mariadb
           - MARIADB_PORT_NUMBER=3306
@@ -49,6 +51,8 @@ jobs:
           - MEDIAWIKI_EXTERNAL_HTTP_PORT_NUMBER=8080
           - MEDIAWIKI_HOST=mediawiki
           - TZ: "UTC"
+        depends_on:
+          - mariadb
       - image: 'docker.io/bitnami/postgresql:11'
         name: postgresql
 # No volumes on CircleCI
@@ -78,6 +82,9 @@ jobs:
 #          - '8003:80'
 #        volumes:
 #          - 'discourse_data:/bitnami/discourse'
+        depends_on:
+          - postgresql
+          - restarters_discourse_redis
         environment:
           - ALLOW_EMPTY_PASSWORD=yes
           - DISCOURSE_USERNAME=someuser
@@ -98,6 +105,8 @@ jobs:
 
       - image: docker.io/bitnami/discourse:2
         name: restarters_discourse_sidekiq
+        depends_on:
+          - restarters_discourse
 #        volumes:
 #          - 'sidekiq_data:/bitnami/discourse'
         command: /opt/bitnami/scripts/discourse-sidekiq/run.sh
