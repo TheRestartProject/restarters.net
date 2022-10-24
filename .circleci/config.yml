@@ -1,4 +1,4 @@
-version: 2.1
+version: 2
 
 dependencies:
   pre:
@@ -6,10 +6,9 @@ dependencies:
     - sudo dpkg -i google-chrome.deb
     - sudo sed -i 's|HERE/chrome\"|HERE/chrome\" --disable-setuid-sandbox|g' /opt/google/chrome/google-chrome
     - rm google-chrome.deb
-orbs:
-  heroku: circleci/heroku@1.2.6
 jobs:
   build:
+    resource_class: large
     docker:
       - image: cimg/php:7.4.11-node
         name: restarters.test
@@ -215,6 +214,7 @@ jobs:
           name: Migrate DB
           command: heroku run --app=${HEROKU_APP_NAME} php artisan migrate --force
 workflows:
+  version: 2
   deploy:
     jobs:
       - build
