@@ -8,6 +8,7 @@ dependencies:
     - rm google-chrome.deb
 jobs:
   build:
+    resource_class: large
     docker:
       - image: cimg/php:7.4.11-node
         name: restarters.test
@@ -202,6 +203,7 @@ jobs:
       - run: npx playwright test
   deploy_app:
     executor: heroku/default
+    resource_class: large
     steps:
       - checkout
       - heroku/install
@@ -213,7 +215,6 @@ jobs:
           command: heroku run --app=${HEROKU_APP_NAME} php artisan migrate --force
 workflows:
   version: 2
-  resource_class: medium
   deploy:
     jobs:
       - build
