@@ -839,7 +839,7 @@ class PartyController extends Controller
             'success' => false,
         ];
 
-        if ((Fixometer::hasRole(Auth::user(), 'Host') && Fixometer::userHasEditPartyPermission($event_id, Auth::user()->id)) || Fixometer::hasRole(Auth::user(), 'Administrator')) {
+        if ((Fixometer::hasRole(Auth::user(), 'Host') || Fixometer::hasRole(Auth::user(), 'NetworkCoordinator') && Fixometer::userHasEditPartyPermission($event_id, Auth::user()->id)) || Fixometer::hasRole(Auth::user(), 'Administrator')) {
             Party::find($event_id)->update([
                 'pax' => $quantity,
             ]);
@@ -861,7 +861,7 @@ class PartyController extends Controller
             'success' => false,
         ];
 
-        if ((Fixometer::hasRole(Auth::user(), 'Host') && Fixometer::userHasEditPartyPermission($event_id, Auth::user()->id)) || Fixometer::hasRole(Auth::user(), 'Administrator')) {
+        if ((Fixometer::hasRole(Auth::user(), 'Host') || Fixometer::hasRole(Auth::user(), 'NetworkCoordinator') && Fixometer::userHasEditPartyPermission($event_id, Auth::user()->id)) || Fixometer::hasRole(Auth::user(), 'Administrator')) {
             Party::find($event_id)->update([
                 'volunteers' => $quantity,
             ]);
