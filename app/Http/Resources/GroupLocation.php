@@ -66,6 +66,16 @@ class GroupLocation extends JsonResource
      */
 
     /**
+     *     @OA\Property(
+     *          property="postcode",
+     *          title="postcode",
+     *          description="The group postcode",
+     *          format="string",
+     *          example="SW9 7QD"
+     *     )
+     */
+
+    /**
      * Transform the resource into an array.
      *
      * @param  \Illuminate\Http\Request  $request
