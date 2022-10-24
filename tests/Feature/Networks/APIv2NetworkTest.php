@@ -90,9 +90,13 @@ class APIv2NetworkTest extends TestCase
             $this->assertEquals(1, count($json));
             $this->assertEquals($group->idgroups, $json[0]['id']);
             $this->assertEquals($group->name, $json[0]['name']);
-            $this->assertEquals($group->location, $json[0]['location']);
-            $this->assertEquals($group->area, $json[0]['area']);
-            $this->assertEquals($group->country, $json[0]['country']);
+            $this->assertTrue(array_key_exists('location', $json[0]));
+            $location = $json[0]['location'];
+            $this->assertEquals($group->location, $location['location']);
+            $this->assertEquals($group->country, $location['country']);
+            $this->assertEquals($group->area, $location['area']);
+            $this->assertEquals($group->latitude, $location['lat']);
+            $this->assertEquals($group->longitude, $location['lng']);
 
             if ($getNextEvent) {
                 $this->assertEquals($event->idevents, $json[0]['next_event']['id']);
