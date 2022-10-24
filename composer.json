@@ -9,6 +9,7 @@
     "type": "project",
     "require": {
         "php": "^7.2|^8.0",
+        "ext-xmlrpc": "*",
         "addwiki/mediawiki-api": "~0.7.0",
         "addwiki/mediawiki-api-base": "~2.0",
         "barryvdh/laravel-translation-manager": "^0.6.2",
@@ -20,7 +21,6 @@
         "fideloper/proxy": "^4.4",
         "filp/whoops": "^2.14",
         "fruitcake/laravel-cors": "^0.11.0",
-        "fzaninotto/faker": "^1.9.2",
         "guzzlehttp/guzzle": "^6.3",
         "hieu-le/wordpress-xmlrpc-client": "^2.6",
         "intervention/image": "^2.7",
@@ -42,6 +42,7 @@
         "wouternl/laravel-drip": "^1.1"
     },
     "require-dev": {
+        "fzaninotto/faker": "^1.9.2",
         "barryvdh/laravel-debugbar": "^3.6",
         "laravel/dusk": "^6.19",
         "mockery/mockery": "^1.2",
