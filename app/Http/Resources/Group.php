@@ -58,6 +58,15 @@ class Group extends JsonResource
 
     /**
      *     @OA\Property(
+     *          property="location",
+     *          description="The location that this group is in.  Must be geocodable.",
+     *          format="string",
+     *          example="College Road, London NW10 5EX, UK"
+     *     )
+     */
+
+    /**
+     *     @OA\Property(
      *          property="country",
      *          description="The free-form country.",
      *          format="string",
@@ -95,6 +104,42 @@ class Group extends JsonResource
      *     )
      */
 
+    /**
+     *     @OA\Property(
+     *          property="next_event",
+     *          title="next_event",
+     *          description="Next event for this group",
+     *          ref="#/components/schemas/Event"
+     *     )
+     */
+
+    /**
+     *     @OA\Property(
+     *          property="timezone",
+     *          title="timezone",
+     *          description="Timezone for this group.",
+     *          format="string",
+     *          example="Europe/London"
+     *     )
+     */
+
+    /**
+     *     @OA\Property(
+     *         property="hosts",
+     *         title="hosts",
+     *         description="The number of hosts of this group.",
+     *         type="number",
+     *     ),
+
+    /**
+     *     @OA\Property(
+     *         property="restarters",
+     *         title="hosts",
+     *         description="The number of restarters in this group.",
+     *         type="number",
+     *     ),
+
+     */
     /**
      *     @OA\Property(
      *          property="stats",
@@ -254,6 +299,7 @@ class Group extends JsonResource
             'updated_at' => Carbon::parse($this->updated_at)->toIso8601String(),
             'location' => $this->location,
             'networks' => $this->resource->networks,
+            'timezone' => $this->timezone,
         ];
 
         $ret['hosts'] = $this->resource->all_confirmed_hosts_count;

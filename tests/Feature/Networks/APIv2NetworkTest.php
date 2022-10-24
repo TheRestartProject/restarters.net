@@ -67,7 +67,11 @@ class APIv2NetworkTest extends TestCase
                                                        'name' => 'Restart',
                                                        'events_push_to_wordpress' => true,
                                                    ]);
-        $group = factory(Group::class)->create();
+        $group = factory(Group::class)->create([
+                                                   'location' => 'London',
+                                                   'area' => 'London',
+                                                   'country' => 'GB',
+                                               ]);
         $network->addGroup($group);
 
         // Create event for group
@@ -85,6 +89,10 @@ class APIv2NetworkTest extends TestCase
             $json = json_decode($response->getContent(), true)['data'];
             $this->assertEquals(1, count($json));
             $this->assertEquals($group->idgroups, $json[0]['id']);
+            $this->assertEquals($group->name, $json[0]['name']);
+            $this->assertEquals($group->location, $json[0]['location']);
+            $this->assertEquals($group->area, $json[0]['area']);
+            $this->assertEquals($group->country, $json[0]['country']);
 
             if ($getNextEvent) {
                 $this->assertEquals($event->idevents, $json[0]['next_event']['id']);

@@ -40,6 +40,33 @@ class GroupSummary extends JsonResource
 
     /**
      *     @OA\Property(
+     *          property="area",
+     *          description="The free-form area that this group is in.",
+     *          format="string",
+     *          example="<p>This is a description.</p>"
+     *     )
+     */
+
+    /**
+     *     @OA\Property(
+     *          property="location",
+     *          description="The location that this group is in.  Must be geocodable.",
+     *          format="string",
+     *          example="College Road, London NW10 5EX, UK"
+     *     )
+     */
+
+    /**
+     *     @OA\Property(
+     *          property="country",
+     *          description="The free-form country.",
+     *          format="string",
+     *          example="<p>This is a description.</p>"
+     *     )
+     */
+
+    /**
+     *     @OA\Property(
      *          property="image",
      *          title="image",
      *          description="URL of an image for this group.  You should prefix this with /uploads before use.",
@@ -81,6 +108,9 @@ class GroupSummary extends JsonResource
             'image' => $this->groupImage && is_object($this->groupImage) && is_object($this->groupImage->image) ? $this->groupImage->image->path : null,
             'updated_at' => Carbon::parse($this->updated_at)->toIso8601String(),
             'networks' => $this->resource->networks,
+            'area' => $this->area,
+            'country' => $this->country,
+            'location' => $this->location,
         ];
 
         if ($request->get('includeNextEvent', false)) {
