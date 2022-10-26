@@ -41,7 +41,7 @@ return [
   'add_data_action_button' => 'Go to event',
   'repair_records' => 'Repair Records',
   'images' => 'Images',
-  'model_or_type' => 'Model / Item',
+  'model_or_type' => 'Item',
   'repair_outcome' => 'Repair outcome?',
   'powered_items' => 'powered items',
   'unpowered_items' => 'unpowered items',

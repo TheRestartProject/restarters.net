@@ -32,7 +32,7 @@
             {{ data.item.brand }}
           </span>
           <em v-else class="text-muted">
-            [Missing]
+            -
           </em>
         </template>
         <template slot="cell(item_type)" slot-scope="data">
@@ -40,7 +40,7 @@
             {{ data.item.item_type }}
           </span>
           <em v-else class="text-muted">
-            [Missing]
+            -
           </em>
         </template>
         <template slot="cell(repair_status)" slot-scope="data">

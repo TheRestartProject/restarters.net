@@ -44,7 +44,7 @@ return [
   'description_powered' => 'Un <b>appareil électrique</b> est tout ce qui a besoin d\'une source électrique pour fonctionner.',
   'description_unpowered' => 'Un <b>appareil non-électrique</b> est tout ce qui ne dispose pas ou n\'a pas besoin de source électrique.',
   'images' => 'Images',
-  'model_or_type' => 'Modèle/type d\'objet',
+  'model_or_type' => 'Type d\'objet',
   'placeholder_notes' => 'Notes. Ex: difficultés de réparation, perception du problème par le propriétaire etc.',
   'powered_items' => 'Appareils électriques',
   'repair_outcome' => 'Résultat de la réparation?',
