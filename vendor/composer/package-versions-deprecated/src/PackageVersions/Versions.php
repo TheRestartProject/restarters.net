@@ -38,6 +38,7 @@ final class Versions
   'addwiki/mediawiki-datamodel' => '0.8.0@ed644d977f96bd9f1b165fbb9f186dbdf0c0ff7d',
   'asm89/stack-cors' => '1.3.0@b9c31def6a83f84b4d4a40d35996d375755f0e08',
   'barryvdh/laravel-translation-manager' => 'v0.6.3@b21c18afdb1315ab616005b6d33104802a405ebc',
+  'bkwld/croppa' => '4.11.1@ccec1bff1da60d37801b66e9defb21ef7cfa5ca6',
   'caseyamcl/guzzle_retry_middleware' => 'v2.7@e6717d8460e5ef40db6d2e7218069a2826f69138',
   'clue/stream-filter' => 'v1.6.0@d6169430c7731d8509da7aecd0af756a5747b78e',
   'composer/package-versions-deprecated' => '1.11.99.5@b4f54f74ef3453349c24a845d22392cd31e65f1d',
@@ -144,9 +145,10 @@ final class Versions
   'tijsverkoyen/css-to-inline-styles' => '2.2.4@da444caae6aca7a19c0c140f68c6182e337d5b1c',
   'twbs/bootstrap' => 'v4.1.0@8f7bd419935adfcd53c471a0202083464800619e',
   'vlucas/phpdotenv' => 'v3.6.10@5b547cdb25825f10251370f57ba5d9d924e6f68e',
+  'weotch/phpthumb' => '1.0.5@f5c1d2ef2e9de3bded7483778618bf8cac2511c3',
   'wouternl/laravel-drip' => '1.2.4@f9d96140ba62f4ddb4df909e20931e897e0edd54',
   'zircote/swagger-php' => '3.3.6@5016342f966fca29dda84455de066c5c90d37941',
-  'laravel/laravel' => 'dev-production@1177e559027edf36b8fb7a212a9ee6cceaee542c',
+  'laravel/laravel' => 'dev-production@1e8fb610dda4126cb75862a28784715893bd4019',
 );
 
     private function __construct()

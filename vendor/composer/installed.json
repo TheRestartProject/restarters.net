@@ -275,6 +275,71 @@
         ]
     },
     {
+        "name": "bkwld/croppa",
+        "version": "4.11.1",
+        "version_normalized": "4.11.1.0",
+        "source": {
+            "type": "git",
+            "url": "https://github.com/BKWLD/croppa.git",
+            "reference": "ccec1bff1da60d37801b66e9defb21ef7cfa5ca6"
+        },
+        "dist": {
+            "type": "zip",
+            "url": "https://api.github.com/repos/BKWLD/croppa/zipball/ccec1bff1da60d37801b66e9defb21ef7cfa5ca6",
+            "reference": "ccec1bff1da60d37801b66e9defb21ef7cfa5ca6",
+            "shasum": ""
+        },
+        "require": {
+            "ext-gd": "*",
+            "illuminate/console": "4 - 8",
+            "illuminate/routing": "4 - 8",
+            "illuminate/support": "4 - 8",
+            "league/flysystem": "~1.0",
+            "php": "^7.2.5|^8.0",
+            "symfony/http-foundation": "2 - 5",
+            "symfony/http-kernel": "2 - 5",
+            "weotch/phpthumb": "^1.0.5"
+        },
+        "conflict": {
+            "league/flysystem-cached-adapter": "<1.0.2"
+        },
+        "require-dev": {
+            "mockery/mockery": "~0.9",
+            "phpunit/phpunit": "4 - 5"
+        },
+        "suggest": {
+            "ext-exif": "Required if you want to have Croppa auto-rotate images from devices like mobile phones based on exif meta data."
+        },
+        "time": "2021-03-19T17:25:26+00:00",
+        "type": "library",
+        "extra": {
+            "laravel": {
+                "providers": [
+                    "Bkwld\\Croppa\\ServiceProvider"
+                ],
+                "aliases": {
+                    "Croppa": "Bkwld\\Croppa\\Facade"
+                }
+            }
+        },
+        "installation-source": "dist",
+        "autoload": {
+            "psr-0": {
+                "Bkwld\\Croppa": "src/"
+            }
+        },
+        "notification-url": "https://packagist.org/downloads/",
+        "license": [
+            "MIT"
+        ],
+        "authors": [
+            {
+                "name": "Robert Reinhard"
+            }
+        ],
+        "description": "Image thumbnail creation through specially formatted URLs for Laravel"
+    },
+    {
         "name": "caseyamcl/guzzle_retry_middleware",
         "version": "v2.7",
         "version_normalized": "2.7.0.0",
@@ -7115,6 +7180,43 @@
             "env",
             "environment"
         ]
+    },
+    {
+        "name": "weotch/phpthumb",
+        "version": "1.0.5",
+        "version_normalized": "1.0.5.0",
+        "source": {
+            "type": "git",
+            "url": "https://github.com/weotch/PHPThumb.git",
+            "reference": "f5c1d2ef2e9de3bded7483778618bf8cac2511c3"
+        },
+        "dist": {
+            "type": "zip",
+            "url": "https://api.github.com/repos/weotch/PHPThumb/zipball/f5c1d2ef2e9de3bded7483778618bf8cac2511c3",
+            "reference": "f5c1d2ef2e9de3bded7483778618bf8cac2511c3",
+            "shasum": ""
+        },
+        "replace": {
+            "dannytrue/phpthumb": "dev-master#2d8898f62e75a743e248dd5906a038d574e0dfe0"
+        },
+        "time": "2015-05-12T22:56:19+00:00",
+        "type": "library",
+        "installation-source": "dist",
+        "autoload": {
+            "classmap": [
+                "src/"
+            ]
+        },
+        "notification-url": "https://packagist.org/downloads/",
+        "license": [
+            "MIT"
+        ],
+        "authors": [
+            {
+                "name": "Robert Reinhard"
+            }
+        ],
+        "description": "Fork of PHPThumb that adds auto-image rotation based on EXIF data and composer support"
     },
     {
         "name": "wouternl/laravel-drip",

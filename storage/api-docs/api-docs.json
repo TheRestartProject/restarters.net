@@ -387,21 +387,14 @@
                         "format": "string",
                         "example": "Restarters HQ"
                     },
+                    "location": {
+                        "$ref": "#/components/schemas/GroupLocation"
+                    },
                     "image": {
                         "title": "image",
                         "description": "URL of an image for this group.  You should prefix this with /uploads before use.",
                         "format": "string",
                         "example": "/mid_1597853610178a4b76e4d666b2a7b32ee75d8a24c706f1cbf213970.png"
-                    },
-                    "area": {
-                        "description": "The free-form area that this group is in.",
-                        "format": "string",
-                        "example": "<p>This is a description.</p>"
-                    },
-                    "country": {
-                        "description": "The free-form country.",
-                        "format": "string",
-                        "example": "<p>This is a description.</p>"
                     },
                     "phone": {
                         "title": "phone",
@@ -420,6 +413,25 @@
                         "description": "HTML description of the group.",
                         "format": "string",
                         "example": "<p>This is a description.</p>"
+                    },
+                    "next_event": {
+                        "$ref": "#/components/schemas/Event"
+                    },
+                    "timezone": {
+                        "title": "timezone",
+                        "description": "Timezone for this group.",
+                        "format": "string",
+                        "example": "Europe/London"
+                    },
+                    "hosts": {
+                        "title": "hosts",
+                        "description": "The number of hosts of this group.",
+                        "type": "number"
+                    },
+                    "restarters": {
+                        "title": "hosts",
+                        "description": "The number of restarters in this group.",
+                        "type": "number"
                     },
                     "stats": {
                         "title": "stats",
@@ -535,6 +547,49 @@
                     "name": "Group"
                 }
             },
+            "GroupLocation": {
+                "title": "GroupLocation",
+                "description": "The information about the location of a group.",
+                "properties": {
+                    "area": {
+                        "description": "The free-form area that this group is in.",
+                        "format": "string",
+                        "example": "London"
+                    },
+                    "location": {
+                        "description": "The location that this group is in.  Must be geocodable.",
+                        "format": "string",
+                        "example": "College Road, London NW10 5EX, UK"
+                    },
+                    "country": {
+                        "description": "The free-form country.",
+                        "format": "string",
+                        "example": "United Kingdom"
+                    },
+                    "lat": {
+                        "title": "lat",
+                        "description": "Latitude of the group.",
+                        "format": "float",
+                        "example": "50.8113243"
+                    },
+                    "lng": {
+                        "title": "lng",
+                        "description": "Longitude of the group.",
+                        "format": "float",
+                        "example": "-1.0788839"
+                    },
+                    "postcode": {
+                        "title": "postcode",
+                        "description": "The group postcode",
+                        "format": "string",
+                        "example": "SW9 7QD"
+                    }
+                },
+                "type": "object",
+                "xml": {
+                    "name": "GroupLocation"
+                }
+            },
             "GroupSummary": {
                 "title": "GroupSummary",
                 "description": "The very basic information about a group.  For full information, fetch the group.",
@@ -545,11 +600,14 @@
                         "format": "int64",
                         "example": 1
                     },
-                    "name": {
+                    "area": {
                         "title": "name",
                         "description": "Unique name of this group",
                         "format": "string",
                         "example": "Restarters HQ"
+                    },
+                    "location": {
+                        "$ref": "#/components/schemas/GroupLocation"
                     },
                     "image": {
                         "title": "image",
