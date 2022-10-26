@@ -39,29 +39,21 @@ class Group extends JsonResource
 
     /**
      *     @OA\Property(
+     *          property="location",
+     *          title="location",
+     *          description="The group's location",
+     *          format="object",
+     *          ref="#/components/schemas/GroupLocation"
+     *     )
+     */
+
+    /**
+     *     @OA\Property(
      *          property="image",
      *          title="image",
      *          description="URL of an image for this group.  You should prefix this with /uploads before use.",
      *          format="string",
      *          example="/mid_1597853610178a4b76e4d666b2a7b32ee75d8a24c706f1cbf213970.png"
-     *     )
-     */
-
-    /**
-     *     @OA\Property(
-     *          property="area",
-     *          description="The free-form area that this group is in.",
-     *          format="string",
-     *          example="<p>This is a description.</p>"
-     *     )
-     */
-
-    /**
-     *     @OA\Property(
-     *          property="country",
-     *          description="The free-form country.",
-     *          format="string",
-     *          example="<p>This is a description.</p>"
      *     )
      */
 
@@ -95,6 +87,42 @@ class Group extends JsonResource
      *     )
      */
 
+    /**
+     *     @OA\Property(
+     *          property="next_event",
+     *          title="next_event",
+     *          description="Next event for this group",
+     *          ref="#/components/schemas/Event"
+     *     )
+     */
+
+    /**
+     *     @OA\Property(
+     *          property="timezone",
+     *          title="timezone",
+     *          description="Timezone for this group.",
+     *          format="string",
+     *          example="Europe/London"
+     *     )
+     */
+
+    /**
+     *     @OA\Property(
+     *         property="hosts",
+     *         title="hosts",
+     *         description="The number of hosts of this group.",
+     *         type="number",
+     *     ),
+
+    /**
+     *     @OA\Property(
+     *         property="restarters",
+     *         title="hosts",
+     *         description="The number of restarters in this group.",
+     *         type="number",
+     *     ),
+
+     */
     /**
      *     @OA\Property(
      *          property="stats",
@@ -245,15 +273,14 @@ class Group extends JsonResource
             'id' => $this->idgroups,
             'name' => $this->name,
             'image' => $this->groupImage && is_object($this->groupImage) && is_object($this->groupImage->image) ? $this->groupImage->image->path : null,
-            'area' => $this->area,
-            'country' => $this->country,
             'website' => $this->website,
             'phone' => $this->phone,
             'description' => $this->free_text,
             'stats' => $stats,
             'updated_at' => Carbon::parse($this->updated_at)->toIso8601String(),
-            'location' => $this->location,
+            'location' => new GroupLocation($this),
             'networks' => $this->resource->networks,
+            'timezone' => $this->timezone,
         ];
 
         $ret['hosts'] = $this->resource->all_confirmed_hosts_count;
