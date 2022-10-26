@@ -418,11 +418,6 @@ class Party extends Model implements Auditable
             });
     }
 
-    public function host()
-    {
-        return $this->hasOne(\App\Host::class, 'idgroups', 'group');
-    }
-
     // Doesn't work if called 'group' - I guess because a reserved SQL keyword.
     public function theGroup()
     {

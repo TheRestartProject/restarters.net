@@ -13,6 +13,7 @@
         "addwiki/mediawiki-api": "~0.7.0",
         "addwiki/mediawiki-api-base": "~2.0",
         "barryvdh/laravel-translation-manager": "^0.6.2",
+        "bkwld/croppa": "^4.11",
         "caseyamcl/guzzle_retry_middleware": "^2.6",
         "cweagans/composer-patches": "^1.7",
         "darkaonline/l5-swagger": "6.*",

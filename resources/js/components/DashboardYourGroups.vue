@@ -75,7 +75,7 @@
             <div class="event-seeall">
               <div class="d-flex justify-content-end">
                 <a href="/party" class="mr-1">
-                  {{ __('dashboard.see_all_groups') }}
+                  {{ __('partials.see_all_events') }}
                 </a>
               </div>
             </div>
