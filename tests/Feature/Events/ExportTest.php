@@ -81,7 +81,7 @@ class ExportTest extends TestCase
         $fh = fopen($filename, 'r');
         fgetcsv($fh);
         $row2 = fgetcsv($fh);
-        self::assertEquals(e($event1->getEventName()), $row2[6]);
+        self::assertEquals(e($event1->getEventName()), e($row2[6]));
 
         // Export time volunteered - first as a web page.
         $response = $this->get("/reporting/time-volunteered?a");
