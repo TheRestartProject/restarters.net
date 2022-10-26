@@ -202,10 +202,10 @@ class GroupController extends Controller
                 } catch (QueryException $e) {
                     $errorCode = $e->errorInfo[1];
                     if ($errorCode == 1062) {
+                        // This is a legitimate user error, and will be displayed to them, so we don't need to log it.
                         $response['danger'] = __('groups.duplicate', [
                             'name' => $name,
                         ]);
-                        \Sentry\CaptureMessage($response['danger']);
                     } else {
                         $response['danger'] = __('groups.database_error');
                         \Sentry\CaptureMessage($response['danger']);

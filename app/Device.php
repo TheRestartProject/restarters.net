@@ -94,10 +94,8 @@ class Device extends Model implements Auditable
     {
         $sql = 'SELECT COUNT(*) AS `counter`, `d`.`repair_status` AS `status`, `d`.`event`
                 FROM `'.$this->table.'` AS `d`';
-        if ((! is_null($g) && is_numeric($g)) || (! is_null($year) && is_numeric($year))) {
-            $sql .= ' INNER JOIN `events` AS `e` ON `e`.`idevents` = `d`.`event` ';
-        }
 
+        $sql .= ' INNER JOIN `events` AS `e` ON `e`.`idevents` = `d`.`event` ';
         $sql .= ' WHERE `repair_status` > 0 ';
 
         if (! is_null($g) && is_numeric($g)) {
@@ -106,6 +104,9 @@ class Device extends Model implements Auditable
         if (! is_null($year) && is_numeric($year)) {
             $sql .= ' AND YEAR(`event_start_utc`) = :year ';
         }
+
+        // We only want to include devices for events which have started or finished.
+        $sql .= " AND `event_start_utc` <= NOW() ";
 
         $sql .= ' GROUP BY `status`';
 
@@ -144,19 +145,15 @@ class Device extends Model implements Auditable
                 ORDER BY `repair_status` ASC
                 ';
 
-        try {
-            if (! is_null($group) && is_numeric($group) && is_null($year)) {
-                return DB::select(DB::raw($sql), ['group' => $group, 'cluster' => $cluster]);
-            } elseif (! is_null($year) && is_numeric($year) && is_null($group)) {
-                return DB::select(DB::raw($sql), ['year' => $year, 'cluster' => $cluster]);
-            } elseif (! is_null($year) && is_numeric($year) && ! is_null($group) && is_numeric($group)) {
-                return DB::select(DB::raw($sql), ['year' => $year, 'group' => $group, 'cluster' => $cluster]);
-            }
-
-            return DB::select(DB::raw($sql), ['cluster' => $cluster]);
-        } catch (\Illuminate\Database\QueryException $e) {
-            dd($e);
+        if (! is_null($group) && is_numeric($group) && is_null($year)) {
+            return DB::select(DB::raw($sql), ['group' => $group, 'cluster' => $cluster]);
+        } elseif (! is_null($year) && is_numeric($year) && is_null($group)) {
+            return DB::select(DB::raw($sql), ['year' => $year, 'cluster' => $cluster]);
+        } elseif (! is_null($year) && is_numeric($year) && ! is_null($group) && is_numeric($group)) {
+            return DB::select(DB::raw($sql), ['year' => $year, 'group' => $group, 'cluster' => $cluster]);
         }
+
+        return DB::select(DB::raw($sql), ['cluster' => $cluster]);
     }
 
     public function findMostSeen($status = null, $cluster = null, $group = null)
@@ -184,33 +181,25 @@ class Device extends Model implements Auditable
         $sql .= (! is_null($cluster) ? '  LIMIT 1' : '');
 
         if (! is_null($cluster) && is_numeric($cluster)) {
-            try {
-                if (! is_null($group) && is_numeric($group) && is_null($status)) {
-                    return DB::select(DB::raw($sql), ['group' => $group, 'cluster' => $cluster]);
-                } elseif (! is_null($status) && is_numeric($status) && is_null($group)) {
-                    return DB::select(DB::raw($sql), ['status' => $status, 'cluster' => $cluster]);
-                } elseif (! is_null($status) && is_numeric($status) && ! is_null($group) && is_numeric($group)) {
-                    return DB::select(DB::raw($sql), ['status' => $status, 'group' => $group, 'cluster' => $cluster]);
-                }
-
-                return DB::select(DB::raw($sql), ['cluster' => $cluster]);
-            } catch (\Illuminate\Database\QueryException $e) {
-                dd($e);
+            if (! is_null($group) && is_numeric($group) && is_null($status)) {
+                return DB::select(DB::raw($sql), ['group' => $group, 'cluster' => $cluster]);
+            } elseif (! is_null($status) && is_numeric($status) && is_null($group)) {
+                return DB::select(DB::raw($sql), ['status' => $status, 'cluster' => $cluster]);
+            } elseif (! is_null($status) && is_numeric($status) && ! is_null($group) && is_numeric($group)) {
+                return DB::select(DB::raw($sql), ['status' => $status, 'group' => $group, 'cluster' => $cluster]);
             }
+
+            return DB::select(DB::raw($sql), ['cluster' => $cluster]);
         } else {
-            try {
-                if (! is_null($group) && is_numeric($group) && is_null($status)) {
-                    return DB::select(DB::raw($sql), ['group' => $group]);
-                } elseif (! is_null($status) && is_numeric($status) && is_null($group)) {
-                    return DB::select(DB::raw($sql), ['status' => $status]);
-                } elseif (! is_null($status) && is_numeric($status) && ! is_null($group) && is_numeric($group)) {
-                    return DB::select(DB::raw($sql), ['status' => $status, 'group' => $group]);
-                }
-
-                return DB::select(DB::raw($sql));
-            } catch (\Illuminate\Database\QueryException $e) {
-                dd($e);
+            if (! is_null($group) && is_numeric($group) && is_null($status)) {
+                return DB::select(DB::raw($sql), ['group' => $group]);
+            } elseif (! is_null($status) && is_numeric($status) && is_null($group)) {
+                return DB::select(DB::raw($sql), ['status' => $status]);
+            } elseif (! is_null($status) && is_numeric($status) && ! is_null($group) && is_numeric($group)) {
+                return DB::select(DB::raw($sql), ['status' => $status, 'group' => $group]);
             }
+
+            return DB::select(DB::raw($sql));
         }
     }
 

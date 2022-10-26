@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "bfe55024b27dbf16d764b7a6317138a7",
+    "content-hash": "cbe298a0bdba527d8a4912594cbd49d9",
     "packages": [
         {
             "name": "addwiki/mediawiki-api",
@@ -270,6 +270,69 @@
                 "translator"
             ],
             "time": "2022-03-17T20:07:34+00:00"
+        },
+        {
+            "name": "bkwld/croppa",
+            "version": "4.11.1",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/BKWLD/croppa.git",
+                "reference": "ccec1bff1da60d37801b66e9defb21ef7cfa5ca6"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/BKWLD/croppa/zipball/ccec1bff1da60d37801b66e9defb21ef7cfa5ca6",
+                "reference": "ccec1bff1da60d37801b66e9defb21ef7cfa5ca6",
+                "shasum": ""
+            },
+            "require": {
+                "ext-gd": "*",
+                "illuminate/console": "4 - 8",
+                "illuminate/routing": "4 - 8",
+                "illuminate/support": "4 - 8",
+                "league/flysystem": "~1.0",
+                "php": "^7.2.5|^8.0",
+                "symfony/http-foundation": "2 - 5",
+                "symfony/http-kernel": "2 - 5",
+                "weotch/phpthumb": "^1.0.5"
+            },
+            "conflict": {
+                "league/flysystem-cached-adapter": "<1.0.2"
+            },
+            "require-dev": {
+                "mockery/mockery": "~0.9",
+                "phpunit/phpunit": "4 - 5"
+            },
+            "suggest": {
+                "ext-exif": "Required if you want to have Croppa auto-rotate images from devices like mobile phones based on exif meta data."
+            },
+            "type": "library",
+            "extra": {
+                "laravel": {
+                    "providers": [
+                        "Bkwld\\Croppa\\ServiceProvider"
+                    ],
+                    "aliases": {
+                        "Croppa": "Bkwld\\Croppa\\Facade"
+                    }
+                }
+            },
+            "autoload": {
+                "psr-0": {
+                    "Bkwld\\Croppa": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Robert Reinhard"
+                }
+            ],
+            "description": "Image thumbnail creation through specially formatted URLs for Laravel",
+            "time": "2021-03-19T17:25:26+00:00"
         },
         {
             "name": "caseyamcl/guzzle_retry_middleware",
@@ -590,12 +653,6 @@
                 "api",
                 "laravel",
                 "swagger"
-            ],
-            "funding": [
-                {
-                    "url": "https://github.com/DarkaOnLine",
-                    "type": "github"
-                }
             ],
             "time": "2021-01-11T12:34:15+00:00"
         },
@@ -6910,6 +6967,41 @@
             "time": "2021-12-12T23:02:06+00:00"
         },
         {
+            "name": "weotch/phpthumb",
+            "version": "1.0.5",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/weotch/PHPThumb.git",
+                "reference": "f5c1d2ef2e9de3bded7483778618bf8cac2511c3"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/weotch/PHPThumb/zipball/f5c1d2ef2e9de3bded7483778618bf8cac2511c3",
+                "reference": "f5c1d2ef2e9de3bded7483778618bf8cac2511c3",
+                "shasum": ""
+            },
+            "replace": {
+                "dannytrue/phpthumb": "dev-master#2d8898f62e75a743e248dd5906a038d574e0dfe0"
+            },
+            "type": "library",
+            "autoload": {
+                "classmap": [
+                    "src/"
+                ]
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Robert Reinhard"
+                }
+            ],
+            "description": "Fork of PHPThumb that adds auto-image rotation based on EXIF data and composer support",
+            "time": "2015-05-12T22:56:19+00:00"
+        },
+        {
             "name": "wouternl/laravel-drip",
             "version": "1.2.4",
             "source": {
@@ -9890,6 +9982,5 @@
     "platform": {
         "php": "^7.2|^8.0"
     },
-    "platform-dev": [],
-    "plugin-api-version": "1.1.0"
+    "platform-dev": []
 }

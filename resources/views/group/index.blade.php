@@ -22,7 +22,7 @@
 
       <?php
         $all_groups = $groups;
-        $can_create = App\Helpers\Fixometer::hasRole(Auth::user(), 'Administrator') || App\Helpers\Fixometer::hasRole(Auth::user(), 'Host');
+        $can_create = App\Helpers\Fixometer::hasRole(Auth::user(), 'Administrator') || App\Helpers\Fixometer::hasRole(Auth::user(), 'NetworkCoordinator') || App\Helpers\Fixometer::hasRole(Auth::user(), 'Host');
         $show_tags = App\Helpers\Fixometer::hasRole(Auth::user(), 'Administrator');
 
         $user = Auth::user();

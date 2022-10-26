@@ -23,8 +23,11 @@ class RobustTranslator extends BaseTranslator
         // - Things in the JSON files, i.e. without a dot, as these do contain values which are validly the
         //   same as the key in English.
         // - Audit info, where we often don't expect a translation.
+        // - Validation errors - if the translation does not exist then a default message will be generated.
         if (strpos($key, '.') !== FALSE &&
+            strpos($key, 'group-audits') === FALSE &&
             strpos($key, 'event-audits') === FALSE &&
+            strpos($key, 'validation.') === FALSE &&
             $translation === $key) {
             // This is very likely to be an error, where we have failed to translate something or fat-fingered the key.
             \Sentry\captureMessage('Translation not found for ' . $key);
