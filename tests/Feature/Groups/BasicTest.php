@@ -49,7 +49,7 @@ class BasicTest extends TestCase
 
         $groups = json_decode($props[1][':all-groups'], true);
         $this->assertEquals($group->idgroups, $groups[0]['idgroups']);
-        $this->assertEquals(0, $groups[0]['distance']);
+        $this->assertEquals(0, $groups[0]['location']['distance']);
     }
 
 
