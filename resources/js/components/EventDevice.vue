@@ -305,7 +305,9 @@ export default {
     },
     partsProvider () {
       // Third part parts are indicated via the parts provider field.
-      if (this.currentDevice.spare_parts === SPARE_PARTS_NOT_NEEDED) {
+      if (!this.currentDevice.spare_parts) {
+        return null
+      } else if (this.currentDevice.spare_parts === SPARE_PARTS_NOT_NEEDED) {
         this.currentDevice.spare_parts = SPARE_PARTS_NOT_NEEDED
       } else if (this.currentDevice.parts_provider === PARTS_PROVIDER_THIRD_PARTY) {
         this.currentDevice.spare_parts = SPARE_PARTS_THIRD_PARTY
