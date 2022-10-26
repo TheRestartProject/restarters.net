@@ -11,7 +11,7 @@
       </b-td>
       <b-td>
         <h3 class="noheader">
-          {{ translatedName }}
+          {{ translatedCategoryName }}
         </h3>
         <div class="d-block d-md-none">
           <div :class="badgeClass + ' d-block d-md-none'">
@@ -23,8 +23,8 @@
       <b-td class="d-none d-md-table-cell" v-if="powered">
           {{ device.brand }}
       </b-td>
-      <b-td v-if="powered">
-        <div class="d-block d-md-none">
+      <b-td v-if="powered" class="d-block d-md-none">
+        <div>
           <span class="pl-0 pl-md-2 pr-2 clickme edit" @click="editDevice">
             <b-img class="icon edit" src="/icons/edit_ico_green.svg" />
           </span>
@@ -33,8 +33,8 @@
           </span>
         </div>
       </b-td>
-      <b-td v-if="!powered">
-        <div class="d-block d-md-none">
+      <b-td v-if="!powered" class="d-block d-md-none">
+        <div>
           <span class="pl-0 pl-md-2 pr-2 clickme edit" @click="editDevice">
             <b-img class="icon" src="/icons/edit_ico_green.svg" />
           </span>
@@ -132,7 +132,7 @@ export default {
     }
   },
   computed: {
-    translatedName() {
+    translatedCategoryName() {
       return this.$lang.get('strings.' + this.device.category.name)
     },
     powered() {
