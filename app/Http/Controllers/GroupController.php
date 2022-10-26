@@ -842,14 +842,16 @@ class GroupController extends Controller
                     'name' => $group->name,
                     'image' => (is_object($group_image) && is_object($group_image->image)) ?
                         asset('uploads/mid_'.$group_image->image->path) : null,
-                    'location' => rtrim($group->location),
+                    'location' => [
+                        'location' => rtrim($group->location),
+                        'country' => $group->country,
+                    ],
                     'next_event' => $event ? $event->event_date_local : null,
                     'all_restarters_count' => $group->all_restarters_count,
                     'all_hosts_count' => $group->all_hosts_count,
                     'all_confirmed_restarters_count' => $group->all_confirmed_restarters_count,
                     'all_confirmed_hosts_count' => $group->all_confirmed_hosts_count,
                     'networks' => \Illuminate\Support\Arr::pluck($group->networks, 'id'),
-                    'country' => $group->country,
                     'group_tags' => $group->group_tags()->get()->pluck('id'),
                     'distance' => $distance,
                     'following' => in_array($group->idgroups, $your_groupids),
