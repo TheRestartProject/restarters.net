@@ -30,11 +30,21 @@ class GroupSummary extends JsonResource
 
     /**
      *     @OA\Property(
-     *          property="name",
+     *          property="area",
      *          title="name",
      *          description="Unique name of this group",
      *          format="string",
      *          example="Restarters HQ"
+     *     )
+     */
+
+    /**
+     *     @OA\Property(
+     *          property="location",
+     *          title="location",
+     *          description="The group's location",
+     *          format="object",
+     *          ref="#/components/schemas/GroupLocation"
      *     )
      */
 
@@ -81,6 +91,7 @@ class GroupSummary extends JsonResource
             'image' => $this->groupImage && is_object($this->groupImage) && is_object($this->groupImage->image) ? $this->groupImage->image->path : null,
             'updated_at' => Carbon::parse($this->updated_at)->toIso8601String(),
             'networks' => $this->resource->networks,
+            'location' => new GroupLocation($this),
         ];
 
         if ($request->get('includeNextEvent', false)) {
