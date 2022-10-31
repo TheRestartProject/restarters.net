@@ -32,15 +32,12 @@ exports.createGroup = async function(page, baseURL) {
   // Type into the RTE
   await page.fill('.ql-editor', faker.lorem.sentence())
 
-  // Always say London for geocoding.  Google blocks playwright so we have to hack this by manually setting the
-  // hidden inputs.
-  await page.fill('input.group-location', 'London, UK')
-  // await page.fill('input.hiddenlat', '51.5073509', { force: true })
-  // await page.fill('input.hiddenlng', '-0.1277583', { force: true })
-  // await page.fill('input.hiddenlocation', 'London, UK', { force: true} )
-
   await page.fill('.timezone', 'Europe/London')
 
+  // Always say London for geocoding.  There's something weird with Google autocomplete where the dropdown doesn't
+  // appear during test, but it does if we try to submit.  So we click submit, then select the dropdown, then click
+  // submit again.
+  await page.fill('input.group-location', 'London, UK')
   await page.click('button[type=submit]')
   await page.click('.pac-item:first-child')
   await page.click('button[type=submit]')
