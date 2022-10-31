@@ -129,11 +129,11 @@ export default {
 
       if (this.groups) {
         this.groups.forEach(g => {
-          if (g.country && !ret.find(g2 => {
-            return g2.country && g2.country.localeCompare(g.country) === 0
+          if (g.location && g.location.country && !ret.find(g2 => {
+            return g2.country && g2.country.localeCompare(g.location.country) === 0
           })) {
             ret.push({
-              country: g.country
+              country: g.location.country
             })
           }
         })
