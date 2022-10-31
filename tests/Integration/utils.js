@@ -33,7 +33,7 @@ exports.createGroup = async function(page, baseURL) {
   await page.fill('.ql-editor', faker.lorem.sentence())
 
   // Always say London for geocoding.  Google blocks playwright so we have to hack this.
-  await page.fill('.group-location input', 'London, UK')
+  await page.fill('input.group-location', 'London, UK')
   await page.click('.pac-container .pac-item:first', { force: true} )
 
   await page.fill('.timezone', 'Europe/London')

@@ -250,8 +250,9 @@ export default {
     }
   },
   async mounted () {
-    // Fetch the list of groups, so that we can ensure group names are unique.
-    await this.$store.dispatch('groups/list')
+    // Fetch the list of groups, so that we can ensure group names are unique.  No need to await because the check
+    // can happen later.
+    this.$store.dispatch('groups/list')
 
     if (this.idgroups) {
       // Fetch the group we're editing.
@@ -266,8 +267,8 @@ export default {
       this.website = group.website
       this.timezone = group.timezone
       this.description = group.description
-      this.lat = group.lat
-      this.lng = group.lng
+      this.lat = group.location.lat
+      this.lng = group.location.lng
       this.image = group.image
     }
 

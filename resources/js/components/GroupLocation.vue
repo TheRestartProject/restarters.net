@@ -5,7 +5,7 @@
       <vue-google-autocomplete
           :id="$id('address-autocomplete')"
           name="location"
-          classname="form-control"
+          classname="form-control group-location"
           :placeholder="__('groups.groups_location_placeholder')"
           @placechanged="placeChanged"
           aria-describedby="locationHelpBlock"
@@ -88,7 +88,7 @@ export default {
   mounted() {
     this.currentValue = this.value
     this.currentPostcode = this.postcode
-    this.$refs.autocomplete.update(this.currentValue.location)
+    this.$refs.autocomplete.update(this.currentValue)
   },
   watch: {
     postcode(newVal) {
