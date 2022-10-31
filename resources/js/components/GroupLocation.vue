@@ -88,7 +88,7 @@ export default {
   mounted() {
     this.currentValue = this.value
     this.currentPostcode = this.postcode
-    this.$refs.autocomplete.update(this.currentValue)
+    this.$refs.autocomplete.update(this.currentValue.location)
   },
   watch: {
     postcode(newVal) {

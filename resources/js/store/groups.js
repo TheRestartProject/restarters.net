@@ -39,7 +39,14 @@ export default {
       return state.list[idgroups]
     },
     list: state => {
-      return Object.values(state.list)
+      try {
+        console.log("Getting list of groups")
+        const ret = Object.values(state.list)
+        console.log("Got", ret)
+        return ret
+      } catch (e) {
+        console.log("Exception", e)
+      }
     },
     getModerate: state => state.moderate,
     getStats: state => idgroups => {
@@ -149,9 +156,7 @@ export default {
       try {
         let ret = await axios.get('/api/v2/groups/' + params.id + '?api_token=' + rootGetters['auth/apiToken'])
 
-        commit('set', {
-          groups: ret.data.data
-        })
+        commit('set', ret.data.data)
 
         return ret.data.data
       } catch (e) {

@@ -1,20 +1,23 @@
 <template>
   <div>
-    <p>
+    TODO Group log.
+    <p v-if="creating">
       {{ __('groups.add_groups_content') }}
     </p>
+    <p v-else>
+      {{ __('groups.edit_groups_text') }}
+    </p>
 
-    <input type="hidden" id="lat" v-model="lat" />
-    <input type="hidden" id="lng" v-model="lng" />
+    <input type="hidden" id="lat" v-model="lat"/>
+    <input type="hidden" id="lng" v-model="lng"/>
 
-    <div class="layout">
+    <div class="layout" v-if="ready">
       <div class="flex-grow-1 group-name">
-        Name is {{ name }} for {{ idgroups }}
         <GroupName
             class=""
             :name.sync="name"
             :has-error="$v.name.$error || duplicateName"
-            ref="name" />
+            ref="name"/>
         <p v-if="duplicateName" class="text-danger font-weight-bold">
           {{ duplicateError }}
         </p>
@@ -23,7 +26,7 @@
           class="flex-grow-1 group-website"
           :website.sync="website"
           :has-error="$v.website.$error"
-          ref="website" />
+          ref="website"/>
       <div class="form-group group-description">
         <b-form-group>
           <label for="group_desc">{{ __('groups.groups_about_group') }}:</label>
@@ -114,26 +117,22 @@
           </b-select>
         </b-form-group>
       </div>
-      <div class="group-buttons button-group row" v-if="creating">
-        <div class="offset-lg-3 col-lg-7 d-flex align-items-right justify-content-end text-right">
-          {{ __('groups.groups_approval_text') }}
-        </div>
-        <div class="col-lg-2 d-flex align-items-center justify-content-end mt-2 mt-lg-0">
+      <div class="group-buttons" v-else>
+        <div class="d-flex justify-content-between flex-wrap" v-if="creating">
+          <div class="text-right flex-grow-1 mr-4">
+            {{ __('groups.groups_approval_text') }}
+          </div>
           <b-btn variant="primary" class="break" type="submit" @click="submit">
             {{ __('groups.create_group') }}
           </b-btn>
         </div>
-      </div>
-      <div class="group-buttons button-group row" v-else>
-        <div class="offset-lg-3 col-lg-5 d-flex align-items-right justify-content-end text-right notice">
-          <div class="col-lg-4 d-flex align-items-center justify-content-end mt-2 mt-lg-0">
-            <b-btn variant="primary" class="break submit" type="submit" @click="submit">
-              {{ __('groups.edit_group_save_changes') }}
-            </b-btn>
-          </div>
+        <div class="d-flex justify-content-end" v-else>
+          <b-btn variant="primary" class="break submit" type="submit" @click="submit">
+            {{ __('groups.edit_group_save_changes') }}
+          </b-btn>
         </div>
       </div>
-      <p class="text-danger font-weight-bold" v-if="failed" v-html="__('groups.create_failed')" />
+      <p class="text-danger font-weight-bold" v-if="failed" v-html="__('groups.create_failed')"/>
     </div>
   </div>
 </template>
@@ -156,7 +155,16 @@ function geocodeableValidation () {
 }
 
 export default {
-  components: {GroupTimeZone, RichTextEditor, GroupName, GroupWebsite, GroupLocation, GroupLocationMap, GroupPhone, GroupImage},
+  components: {
+    GroupTimeZone,
+    RichTextEditor,
+    GroupName,
+    GroupWebsite,
+    GroupLocation,
+    GroupLocationMap,
+    GroupPhone,
+    GroupImage
+  },
   mixins: [group, auth, validationHelpers],
   props: {
     idgroups: {
@@ -186,6 +194,7 @@ export default {
       moderate: null,
       failed: false,
       image: null,
+      ready: false,
     }
   },
   validations: {
@@ -213,33 +222,34 @@ export default {
     groups () {
       let groups = this.$store.getters['groups/list']
 
-      return groups ? groups.sort((a, b) => {
+      groups = JSON.parse(JSON.stringify(groups))
+
+      const ret = groups ? groups.sort((a, b) => {
         return a.name.localeCompare(b.name)
       }) : []
-    },
-    duplicateName() {
-      let ret = false
-
-      this.groups.forEach(group => {
-        if ((this.creating || this.idgroups != group.id) && group.name.toLowerCase() === this.name.toLowerCase()) {
-          ret = true
-        }
-      })
 
       return ret
     },
-    duplicateError() {
+    duplicateName () {
+      let ret = false
+
+      if (this.name && this.groups && this.groups.length) {
+        this.groups.forEach(group => {
+            if ((this.creating || this.idgroups != group.id) && group.name.toLowerCase() === this.name.toLowerCase()) {
+              ret = true
+            }
+        })
+      }
+
+      return ret
+    },
+    duplicateError () {
       return this.$lang.get('groups.duplicate', {
         name: this.name
       })
     }
   },
-  watch: {
-    name(newVal) {
-      console.log("NAme in upper", newVal, this)
-    }
-  },
-  async created() {
+  async mounted () {
     // Fetch the list of groups, so that we can ensure group names are unique.
     await this.$store.dispatch('groups/list')
 
@@ -248,10 +258,9 @@ export default {
       let group = await this.$store.dispatch('groups/fetch', {
         id: this.idgroups
       })
-      console.log("Fetched group", group)
 
       this.name = group.name
-      this.location = group.location
+      this.location = group.location.location
       this.postcode = group.location.postcode
       this.phone = group.phone
       this.website = group.website
@@ -260,11 +269,12 @@ export default {
       this.lat = group.lat
       this.lng = group.lng
       this.image = group.image
-      console.log('Bumped', this.name, group.name)
     }
+
+    this.ready = true
   },
   methods: {
-    async submit() {
+    async submit () {
       // Events are created via form submission - we don't yet have an API call to do this over AJAX.  Therefore
       // this page and the subcomponents have form inputs with suitable names.
       //
@@ -293,7 +303,7 @@ export default {
           } else {
             this.failed = true
           }
-      }
+        }
       } else {
         // TODO Edit
       }
