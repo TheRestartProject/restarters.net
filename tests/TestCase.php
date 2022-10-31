@@ -270,9 +270,9 @@ abstract class TestCase extends BaseTestCase
     {
         // Sinple code to filter out timestamps or other random values.
         if ($val && is_string($val)) {
-            $val = preg_replace('/"created_at":".*"/', '"created_at":"TIMESTAMP"', $val);
-            $val = preg_replace('/"updated_at":".*"/', '"updated_at":"TIMESTAMP"', $val);
-            $val = preg_replace('/"shareable_code":".*"/', '"shareable_code":"SHARECODE"', $val);
+            $val = preg_replace('/"created_at":".*?"/', '"created_at":"TIMESTAMP"', $val);
+            $val = preg_replace('/"updated_at":".*?"/', '"updated_at":"TIMESTAMP"', $val);
+            $val = preg_replace('/"shareable_code":".*?"/', '"shareable_code":"SHARECODE"', $val);
         }
 
         return $val;

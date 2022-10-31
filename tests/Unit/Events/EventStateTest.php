@@ -53,12 +53,12 @@ class EventStateTest extends TestCase
     }
 
     /** @test */
-    public function it_starts_an_hour_early() {
+    public function it_doesnt_start_an_hour_early() {
         $event = factory(Party::class)->create();
 
         $event->event_start_utc = Carbon::now()->addMinutes(30)->toIso8601String();
         $event->event_end_utc = Carbon::now()->addMinutes(90)->toIso8601String();
-        $this->assertTrue($event->isInProgress());
+        $this->assertFalse($event->isInProgress());
     }
 
     /** @test */
@@ -101,11 +101,11 @@ class EventStateTest extends TestCase
             // Future event
             [ '2038-01-01 12:00', true, false, false, false ],
 
-            // Starting soon, but more than an hour away (currently the inprogress flag gets set an hour early).
+            // Starting soon, but more than an hour away .
             [ Carbon::now()->addMinutes(90)->toIso8601String(), true, false, false, true ],
 
-            // Starting less than an hour away, which currently has inprogress set.
-            [ Carbon::now()->addMinutes(30)->toIso8601String(), true, false, true, false ],
+            // Starting less than an hour away, no longer has inprogress set and is starting soon.
+            [ Carbon::now()->addMinutes(30)->toIso8601String(), true, false, false, true ],
 
             // In progress
             [ Carbon::now()->subHour()->toIso8601String(), false, false, true, false ],

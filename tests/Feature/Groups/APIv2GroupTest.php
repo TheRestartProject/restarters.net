@@ -54,6 +54,10 @@ class APIv2GroupTest extends TestCase
         $this->assertTrue(array_key_exists('description', $json['data']));
         $this->assertTrue(array_key_exists('stats', $json['data']));
         $this->assertTrue(array_key_exists('updated_at', $json['data']));
+        $this->assertTrue(array_key_exists('location', $json['data']));
+        $location = $json['data']['location'];
+        $this->assertEquals('London', $location['location']);
+        $this->assertEquals('United Kingdom', $location['country']);
 
         // Test group moderation.
         $response = $this->get("/api/v2/moderate/groups?api_token=1234");
