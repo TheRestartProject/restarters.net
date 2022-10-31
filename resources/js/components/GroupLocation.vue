@@ -27,6 +27,9 @@
       <b-input type="url" id="group_postcode" name="postcode" v-model="currentPostcode" :class="{ hasError: hasError }"/>
       <small>{{ __('groups.groups_postcode_small') }}</small>
     </b-form-group>
+    <input type="text" class="d-none hiddenlat" v-model="hiddenLat" />
+    <input type="text" class="d-none hiddenlng" v-model="hiddenLng" />
+    <input type="text" class="d-none hiddenlocation" v-model="currentValue" />
   </div>
 </template>
 <script>
@@ -82,6 +85,8 @@ export default {
       currentValue: null,
       location: null,
       currentPostcode: null,
+      hiddenLat: null,
+      hiddenLng: null,
       timer: null,
     }
   },
@@ -94,6 +99,15 @@ export default {
     postcode(newVal) {
       this.$emit('update:postcode', newVal)
     },
+    hiddenLat(newVal) {
+      this.$emit('update:lat', newVal)
+    },
+    hiddenLng(newVal) {
+      this.$emit('update:lng', newVal)
+    },
+    currentValue(newVal) {
+      this.$emit('update:value', newVal)
+    }
   },
   methods: {
     placeChanged(addressData, placeResultData) {

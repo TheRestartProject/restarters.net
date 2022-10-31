@@ -58,7 +58,7 @@ const config = {
   },
 
   // Flakiness
-  timeout: 45000
+  timeout: 45000,
 };
 
 module.exports = config;

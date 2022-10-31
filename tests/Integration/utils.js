@@ -20,7 +20,7 @@ exports.login = login
 
 exports.createGroup = async function(page, baseURL) {
   // Go to groups page
-  await page.goto('/group')
+  await page.goto('/group', { timeout: 30000 })
 
   // Click on add a new group button
   await page.click('a[href="/group/create"]')
@@ -32,12 +32,17 @@ exports.createGroup = async function(page, baseURL) {
   // Type into the RTE
   await page.fill('.ql-editor', faker.lorem.sentence())
 
-  // Always say London for geocoding.  Google blocks playwright so we have to hack this.
+  // Always say London for geocoding.  Google blocks playwright so we have to hack this by manually setting the
+  // hidden inputs.
   await page.fill('input.group-location', 'London, UK')
-  await page.click('.pac-container .pac-item:first', { force: true} )
+  // await page.fill('input.hiddenlat', '51.5073509', { force: true })
+  // await page.fill('input.hiddenlng', '-0.1277583', { force: true })
+  // await page.fill('input.hiddenlocation', 'London, UK', { force: true} )
 
   await page.fill('.timezone', 'Europe/London')
 
+  await page.click('button[type=submit]')
+  await page.click('.pac-item:first-child')
   await page.click('button[type=submit]')
 
   // Should get redirected to Edit form.  We used to wait on #details, but this stopped working for reasons we don't

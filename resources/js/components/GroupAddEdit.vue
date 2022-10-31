@@ -8,7 +8,7 @@
       {{ __('groups.add_groups_content') }}
     </p>
     <p v-else>
-      {{ __('groups.edit_groups_text') }}
+      {{ __('groups.edit_group_text') }}
     </p>
 
     <input type="hidden" id="lat" v-model="lat"/>
