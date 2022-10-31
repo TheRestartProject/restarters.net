@@ -2,6 +2,8 @@
   <div>
     TODO Group log.
     TODO Postcode/area for admins only
+    TODO Tags
+    TODO Networks
     <p v-if="creating">
       {{ __('groups.add_groups_content') }}
     </p>
@@ -268,8 +270,8 @@ export default {
       this.website = group.website
       this.timezone = group.timezone
       this.description = group.description
-      this.lat = group.location.lat
-      this.lng = group.location.lng
+      this.lat = parseFloat(group.location.lat)
+      this.lng = parseFloat(group.location.lng)
       this.image = group.image
     }
 
@@ -279,35 +281,62 @@ export default {
     async submit () {
       // Events are created via form submission - we don't yet have an API call to do this over AJAX.  Therefore
       // this page and the subcomponents have form inputs with suitable names.
-      //
-      // Check the form is valid.
       this.failed = false
       this.$v.$touch()
 
       if (!this.duplicateName) {
+        // Check the form is valid.
         if (this.$v.$invalid) {
           // It's not.
           this.validationFocusFirstError()
-        } else if (this.creating) {
-          const id = await this.$store.dispatch('groups/create', {
-            name: this.name,
-            website: this.website,
-            description: this.description,
-            location: this.location,
-            timezone: this.timezone,
-            phone: this.phone,
-            image: this.image
-          })
+        } else {
+          if (this.creating) {
+            const id = await this.$store.dispatch('groups/create', {
+              name: this.name,
+              website: this.website,
+              description: this.description,
+              location: this.location,
+              timezone: this.timezone,
+              phone: this.phone,
+              image: this.image
+            })
 
-          if (id) {
-            // Success.
-            window.location = '/group/edit/' + id
+            if (id) {
+              // Success.
+              window.location = '/group/edit/' + id
+            } else {
+              this.failed = true
+            }
           } else {
-            this.failed = true
+            console.log("Editing")
+            if (this.$v.$invalid) {
+              // It's not.
+              console.log("Invalid")
+              this.validationFocusFirstError()
+            } else {
+              console.log("Edit")
+              let id = await this.$store.dispatch('groups/edit', {
+                id: this.idgroups,
+                name: this.name,
+                website: this.website,
+                description: this.description,
+                location: this.location,
+                timezone: this.timezone,
+                phone: this.phone,
+                image: this.image
+              })
+
+              console.log("Returned", id)
+              if (id) {
+                // Reload the page.  We don't need to do this for the data, but people will expect it.
+                // window.location = '/group/edit/' + id
+              } else {
+                console.log("Edit failed", e)
+                this.failed = true
+              }
+            }
           }
         }
-      } else {
-        // TODO Edit
       }
     }
   }

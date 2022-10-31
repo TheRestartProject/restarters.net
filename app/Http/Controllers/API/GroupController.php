@@ -563,7 +563,7 @@ class GroupController extends Controller
                                'role' => 3,
                            ]);
 
-        if (isset($_FILES) && ! empty($_FILES)) {
+        if (isset($_FILES) && !empty($_FILES)) {
             $file = new \FixometerFile();
             $file->upload('image', 'image', $idGroup, env('TBL_GROUPS'), false, true, true);
         }
@@ -617,7 +617,7 @@ class GroupController extends Controller
             unset($data['postcode']);
         }
 
-        if (isset($_FILES) && ! empty($_FILES)) {
+        if (isset($_FILES) && !empty($_FILES)) {
             // Update the group image.
             $file = new \FixometerFile();
             $group_avatar = $file->upload('image', 'image', $idGroup, env('TBL_GROUPS'), false, true, true);
@@ -682,8 +682,7 @@ class GroupController extends Controller
                                 ]);
     }
 
-    private function validateGroupParams(Request $request, $create): array
-    {
+    private function validateGroupParams(Request $request, $create): array {
         // We don't validate max lengths of other strings, to avoid duplicating the length information both here
         // and in the migrations.  If we wanted to do that we should extract the length dynamically from the
         // schema, which is possible but not trivial.
@@ -713,13 +712,11 @@ class GroupController extends Controller
         $longitude = null;
         $country = null;
 
-        if ($timezone && !in_array($timezone, \DateTimeZone::listIdentifiers()))
-        {
+        if ($timezone && !in_array($timezone, \DateTimeZone::listIdentifiers())) {
             throw ValidationException::withMessages(['location ' => __('partials.validate_timezone')]);
         }
 
-        if (!empty($location))
-        {
+        if (!empty($location)) {
             $geocoder = new \App\Helpers\Geocoder();
             $geocoded = $geocoder->geocode($location);
 

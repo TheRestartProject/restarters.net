@@ -39,14 +39,7 @@ export default {
       return state.list[idgroups]
     },
     list: state => {
-      try {
-        console.log("Getting list of groups")
-        const ret = Object.values(state.list)
-        console.log("Got", ret)
-        return ret
-      } catch (e) {
-        console.log("Exception", e)
-      }
+      return Object.values(state.list)
     },
     getModerate: state => state.moderate,
     getStats: state => idgroups => {
@@ -127,8 +120,6 @@ export default {
     async create({ rootGetters, commit }, params) {
       let id = null
       try {
-        params.api_token = rootGetters['auth/apiToken']
-
         const formData = new FormData()
 
         for (var key in params) {
@@ -137,7 +128,7 @@ export default {
           }
         }
 
-        let ret = await axios.post('/api/v2/groups', formData, {
+        let ret = await axios.post('/api/v2/groups?api_token=' + rootGetters['auth/apiToken'], formData, {
           headers: {
             "Content-Type": "multipart/form-data",
           },
@@ -148,6 +139,36 @@ export default {
         }
       } catch (e) {
         console.error("Group create failed", e)
+      }
+
+      return id
+    },
+    async edit({ rootGetters, commit }, params) {
+      let id = null
+      try {
+        const formData = new FormData()
+
+        for (var key in params) {
+          if (params[key]) {
+            formData.append(key, params[key]);
+          }
+        }
+
+        // We need to use a POST verb and override to a PATCH - see
+        // https://stackoverflow.com/questions/55116787/laravel-patch-request-doesnt-read-axios-form-data
+        formData.append('_method', 'PATCH');
+
+        let ret = await axios.post('/api/v2/groups/' + params.id + '?api_token=' + rootGetters['auth/apiToken'], formData, {
+          headers: {
+            "Content-Type": "multipart/form-data",
+          },
+        })
+
+        if (ret && ret.data) {
+          id = ret.data.id
+        }
+      } catch (e) {
+        console.error("Group edit failed", e)
       }
 
       return id

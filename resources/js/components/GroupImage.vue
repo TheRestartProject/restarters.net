@@ -5,7 +5,7 @@
       <vue-dropzone ref="dropzone" id="dropzone" :options="dropzoneOptions"
                     class="ourdropzone" useCustomSlot
                     @vdropzone-file-added="fileAdded">
-        <b-img src="/images/upload_ico_grey.svg"/>
+        <b-img class="image" :src="src" />
         <div class="dz-message d-none"/>
       </vue-dropzone>
       <b-btn variant="none" @click="deleteMe" class="deleteme" v-if="currentimage">
@@ -18,6 +18,13 @@
 import vue2Dropzone from 'vue2-dropzone'
 
 export default {
+  props: {
+    image: {
+      type: String,
+      required: false,
+      default: null
+    }
+  },
   data () {
     return {
       currentimage: null,
@@ -27,6 +34,13 @@ export default {
     vueDropzone: vue2Dropzone
   },
   computed: {
+    src() {
+      if (this.image) {
+        return '/uploads/' + this.image
+      } else {
+        return '/images/upload_ico_grey.svg'
+      }
+    },
     dropzoneOptions () {
       return {
         url: 'thisisrequired',
@@ -107,4 +121,10 @@ export default {
   justify-self: end;
 }
 
+
+.image {
+  width: 260px;
+  height: 260px;
+  object-fit: cover;
+}
 </style>
