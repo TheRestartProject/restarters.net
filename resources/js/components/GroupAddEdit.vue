@@ -1,6 +1,7 @@
 <template>
   <div>
     TODO Group log.
+    TODO Postcode/area for admins only
     <p v-if="creating">
       {{ __('groups.add_groups_content') }}
     </p>

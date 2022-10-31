@@ -213,7 +213,7 @@ class TimezoneTest extends TestCase
         // Now edit the group timezone as though we were an admin.  This expects some extra attributes.
         $atts = $g->getAttributes();
         $atts['timezone'] = 'Europe/London';
-        $this->post('/group/edit/'.$g->idgroups, $atts);
+        $this->patch('/api/v2/groups/' . $g->idgroups, $atts)->assertSuccessful();
 
         // This should have updated the timezone of the event.
         $party->refresh();

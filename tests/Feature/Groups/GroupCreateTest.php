@@ -84,7 +84,7 @@ class GroupCreateTest extends TestCase
         $admin2 = factory(User::class)->state('Administrator')->create();
         $this->actingAs($admin2);
 
-        $response = $this->post('/group/edit/'.$idgroups, [
+        $response = $this->patch('/api/v2/groups/' . $idgroups, [
             'description' => 'Test',
             'location' => 'London',
             'name' => $group->name,
@@ -94,6 +94,8 @@ class GroupCreateTest extends TestCase
             'area' => 'London',
             'postcode' => 'SW9 7QD'
         ]);
+
+        $response->assertSuccessful();
 
         Notification::assertSentTo(
             [$actas],
@@ -108,8 +110,6 @@ class GroupCreateTest extends TestCase
                 return true;
             }
         );
-
-        $this->assertContains('Group updated!', $response->getContent());
     }
 
     public function testEventVisibility() {

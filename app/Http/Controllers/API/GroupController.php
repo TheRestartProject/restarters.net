@@ -2,14 +2,19 @@
 
 namespace App\Http\Controllers\API;
 
+use App\Events\ApproveGroup;
+use App\Events\EditGroup;
 use App\Group;
 use App\Helpers\Fixometer;
 use App\Http\Controllers\Controller;
 use App\Http\Resources\PartySummaryCollection;
 use App\Network;
 use App\Notifications\AdminModerationGroup;
+use App\Notifications\GroupConfirmed;
+use App\Notifications\NewGroupWithinRadius;
 use App\Party;
 use App\Rules\Timezone;
+use App\User;
 use App\UserGroups;
 use Auth;
 use Carbon\Carbon;
@@ -515,49 +520,17 @@ class GroupController extends Controller
         // TODO Should we restrict group creation to non-Restarters?  The code in GroupController does.
         $user = $this->getUser();
 
-        // We don't validate max lengths of other strings, to avoid duplicating the length information both here
-        // and in the migrations.  If we wanted to do that we should extract the length dynamically from the
-        // schema, which is possible but not trivial.
-        $request->validate([
-            'name' => ['required', 'unique:groups', 'max:255'],
-            'location' => ['required', 'max:255'],
-            'description' => ['required'],
-        ]);
-
-        $name = $request->input('name');
-        $area = $request->input('area');
-        $location = $request->input('location');
-        $phone = $request->input('phone');
-        $website = $request->input('website');
-        $description = $request->input('description');
-        $timezone = $request->input('timezone');
-
-        $latitude = null;
-        $longitude = null;
-        $country = null;
-
-        if ($timezone && !in_array($timezone, \DateTimeZone::listIdentifiers())) {
-            throw ValidationException::withMessages(['location ' => __('partials.validate_timezone')]);
-        }
-
-        if (! empty($location)) {
-            $geocoder = new \App\Helpers\Geocoder();
-            $geocoded = $geocoder->geocode($location);
-
-            if (empty($geocoded)) {
-                throw ValidationException::withMessages(['location ' => __('groups.geocode_failed')]);
-            }
-
-            $latitude = $geocoded['latitude'];
-            $longitude = $geocoded['longitude'];
-            $country = $geocoded['country'];
-        }
+        list($name, $area, $postcode, $location, $phone, $website, $description, $timezone, $latitude, $longitude, $country) = $this->validateGroupParams(
+            $request,
+            true
+        );
 
         $data = [
             'name' => $name,
             'website' => $website,
             'location' => $location,
             'area' => $area,
+            'postcode' => $postcode,
             'latitude' => $latitude,
             'longitude' => $longitude,
             'country' => $country,
@@ -605,5 +578,173 @@ class GroupController extends Controller
         return response()->json([
             'id' => $idGroup,
         ]);
+    }
+
+    // TODO Add to OpenAPI
+    public function updateGroupv2(Request $request, $idGroup) {
+        $user = $this->getUser();
+
+        list($name, $area, $postcode, $location, $phone, $website, $description, $timezone, $latitude, $longitude, $country) = $this->validateGroupParams(
+            $request,
+            false
+        );
+
+        $group = Group::findOrFail($idGroup);
+        $is_host_of_group = Fixometer::userHasEditGroupPermission($idGroup, $user->id);
+        $isCoordinatorForGroup = $user->isCoordinatorForGroup($group);
+
+        if (! Fixometer::hasRole($user, 'Administrator') && ! $is_host_of_group && ! $isCoordinatorForGroup) {
+            abort(403);
+        }
+
+        $old_zone = $group->timezone;
+
+        $data = [
+            'name' => $name,
+            'website' => $website,
+            'location' => $location,
+            'latitude' => $latitude,
+            'longitude' => $longitude,
+            'country' => $country,
+            'free_text' => $description,
+            'timezone' => $timezone,
+            'phone' => $phone,
+        ];
+
+        if (!$user->hasRole('Administrator') && !$user->hasRole('NetworkCoordinator')) {
+            // Not got permission to update these.
+            unset($data['area']);
+            unset($data['postcode']);
+        }
+
+        if (isset($_FILES) && ! empty($_FILES)) {
+            // Update the group image.
+            $file = new \FixometerFile();
+            $group_avatar = $file->upload('image', 'image', $idGroup, env('TBL_GROUPS'), false, true, true);
+            $group_avatar = env('UPLOADS_URL').'mid_'.$group_avatar;
+        } else {
+            // Get the existing image to pass in data to the notification in case it needs it.
+            $existing_image = Fixometer::hasImage($idGroup, 'groups', true);
+            if (! empty($existing_image)) {
+                $group_avatar = env('UPLOADS_URL').'mid_'.$existing_image[0]->path;
+            } else {
+                $group_avatar = 'null';
+            }
+        }
+
+        $data['group_avatar'] = $group_avatar;
+
+        $group->update($data);
+
+        // TODO Networks, tags
+
+        if ($timezone != $old_zone) {
+            // The timezone of the group has changed.  Update the zone of any future events.  This happens
+            // sometimes when a group is created and events are created before the group is approved (and therefore
+            // before the admin has a chance to set the zone on the group.
+            foreach ($group->upcomingParties() as $party) {
+                $party->update([
+                                   'timezone' => $timezone
+                               ]);
+            }
+        }
+
+        $moderate = $request->input('moderate');
+
+        if ($moderate == 'approve' && (Fixometer::hasRole($user, 'Administrator') || $isCoordinatorForGroup)) {
+            // We've been asked to approve this group.
+            event(new ApproveGroup($group, $data));
+
+            // Notify the creator, as long as it's not the current user.
+            $creator = User::find(UserGroups::where('group', $idGroup)->first()->user);
+
+            if ($creator->id != Auth::user()->id) {
+                Notification::send($creator, new GroupConfirmed($group));
+            }
+
+            // Notify nearest users.
+            if (! is_null($latitude) && ! is_null($longitude)) {
+                $restarters_nearby = User::nearbyRestarters($latitude, $longitude, 25)
+                    ->orderBy('name', 'ASC')
+                    ->get();
+
+                Notification::send($restarters_nearby, new NewGroupWithinRadius([
+                                                                                    'group_name' => $group->name,
+                                                                                    'group_url' => url('/group/view/'.$idGroup),
+                                                                                ]));
+            }
+        } elseif (!empty($group->wordpress_post_id)) {
+            event(new EditGroup($group, $data));
+        }
+
+        return response()->json([
+                                    'id' => $idGroup,
+                                ]);
+    }
+
+    private function validateGroupParams(Request $request, $create): array
+    {
+        // We don't validate max lengths of other strings, to avoid duplicating the length information both here
+        // and in the migrations.  If we wanted to do that we should extract the length dynamically from the
+        // schema, which is possible but not trivial.
+        if ($create) {
+            $request->validate([
+                                   'name' => ['required', 'unique:groups', 'max:255'],
+                                   'location' => ['required', 'max:255'],
+                                   'description' => ['required'],
+                               ]);
+        } else {
+            $request->validate([
+                                   'name' => ['max:255'],
+                                   'location' => ['max:255'],
+                               ]);
+        }
+
+        $name = $request->input('name');
+        $area = $request->input('area');
+        $postcode = $request->input('postcode', '');
+        $location = $request->input('location');
+        $phone = $request->input('phone');
+        $website = $request->input('website');
+        $description = $request->input('description');
+        $timezone = $request->input('timezone');
+
+        $latitude = null;
+        $longitude = null;
+        $country = null;
+
+        if ($timezone && !in_array($timezone, \DateTimeZone::listIdentifiers()))
+        {
+            throw ValidationException::withMessages(['location ' => __('partials.validate_timezone')]);
+        }
+
+        if (!empty($location))
+        {
+            $geocoder = new \App\Helpers\Geocoder();
+            $geocoded = $geocoder->geocode($location);
+
+            if (empty($geocoded))
+            {
+                throw ValidationException::withMessages(['location ' => __('groups.geocode_failed')]);
+            }
+
+            $latitude = $geocoded['latitude'];
+            $longitude = $geocoded['longitude'];
+            $country = $geocoded['country'];
+        }
+
+        return array(
+            $name,
+            $area,
+            $postcode,
+            $location,
+            $phone,
+            $website,
+            $description,
+            $timezone,
+            $latitude,
+            $longitude,
+            $country
+        );
     }
 }

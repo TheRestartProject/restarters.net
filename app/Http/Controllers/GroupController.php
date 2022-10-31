@@ -418,8 +418,6 @@ class GroupController extends Controller
     public function edit(Request $request, $id, Geocoder $geocoder)
     {
         $user = Auth::user();
-        $Group = new Group;
-        $File = new FixometerFile;
 
         $group = Group::findOrFail($id);
         $is_host_of_group = Fixometer::userHasEditGroupPermission($id, $user->id);

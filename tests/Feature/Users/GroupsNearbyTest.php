@@ -145,7 +145,7 @@ class GroupsNearbyTest extends TestCase
         $this->actingAs($admin2);
 
         // Approve the group.
-        $response = $this->post('/group/edit/'.$idgroups, [
+        $this->patch('/api/v2/groups/' . $group->idgroups, [
             'description' => 'Test',
             'location' => 'London',
             'name' => $group->name,
@@ -154,7 +154,7 @@ class GroupsNearbyTest extends TestCase
             'moderate' => 'approve',
             'area' => 'London',
             'postcode' => 'SW9 7QD'
-        ]);
+        ])->assertSuccessful();
 
         // This should trigger a notification.
         Notification::assertSentTo(
