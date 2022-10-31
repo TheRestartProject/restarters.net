@@ -211,7 +211,7 @@ export default {
         }
 
         if (this.searchCountry) {
-          match &= g.country && g.country.toLowerCase().indexOf(this.searchCountry.country.toLowerCase()) !== -1
+          match &= g.location && g.location.country && g.location.country.toLowerCase().indexOf(this.searchCountry.country.toLowerCase()) !== -1
         }
 
         if (this.searchTags) {
