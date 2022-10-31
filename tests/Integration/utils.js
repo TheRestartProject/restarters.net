@@ -34,8 +34,6 @@ exports.createGroup = async function(page, baseURL) {
 
   // Always say London for geocoding.  Google blocks playwright so we have to hack this.
   await page.fill('.group-location input', 'London, UK')
-  await page.fill('#lat', '51.5072')
-  await page.fill('#lng', '-0.1276')
   await page.click('.pac-container .pac-item:first', { force: true} )
 
   await page.fill('.timezone', 'Europe/London')
