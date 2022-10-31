@@ -281,7 +281,7 @@ class GroupController extends Controller
             'isCoordinatorForGroup' => $isCoordinatorForGroup,
             'user_groups' => $user_groups,
             'view_group' => $view_group,
-            'group_id' => $groupid,
+            'group_id' => $groupid
         ]);
     }
 
@@ -427,8 +427,12 @@ class GroupController extends Controller
             abort(403);
         }
 
+        compact($audits = $group->audits);
+
         return view('group.edit', [
             'id' => $id,
+            'name' => $group->name,
+            'audits' => $audits,
         ]);
     }
 

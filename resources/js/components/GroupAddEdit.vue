@@ -1,6 +1,5 @@
 <template>
   <div>
-    TODO Group log.
     TODO Postcode/area for admins only
     TODO Tags
     TODO Networks
