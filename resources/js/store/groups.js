@@ -144,6 +144,19 @@ export default {
       }
 
       return id
+    },
+    async fetch({ rootGetters, commit }, params) {
+      try {
+        let ret = await axios.get('/api/v2/groups/' + params.id + '?api_token=' + rootGetters['auth/apiToken'])
+
+        commit('set', {
+          groups: ret.data.data
+        })
+
+        return ret.data.data
+      } catch (e) {
+        console.error("Group fetch failed", e)
+      }
     }
   },
 }

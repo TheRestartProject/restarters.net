@@ -28,6 +28,10 @@ export default {
     this.currentname = this.name
   },
   watch: {
+    name(newVal) {
+      console.log("NAme changed", newVal)
+      this.currentname = newVal
+    },
     currentname(newVal) {
       this.$emit('update:name', newVal)
     },

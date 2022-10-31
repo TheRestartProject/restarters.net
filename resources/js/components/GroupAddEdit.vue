@@ -9,6 +9,7 @@
 
     <div class="layout">
       <div class="flex-grow-1 group-name">
+        Name is {{ name }} for {{ idgroups }}
         <GroupName
             class=""
             :name.sync="name"
@@ -40,6 +41,7 @@
           :value.sync="location"
           :lat.sync="lat"
           :lng.sync="lng"
+          :postcode.sync="postcode"
           class="group-location"
           :has-error="$v.location.$error"
           ref="location"
@@ -157,12 +159,13 @@ export default {
   components: {GroupTimeZone, RichTextEditor, GroupName, GroupWebsite, GroupLocation, GroupLocationMap, GroupPhone, GroupImage},
   mixins: [group, auth, validationHelpers],
   props: {
-    initialGroup: {
-      type: Object,
+    idgroups: {
+      type: Number,
       required: false,
       default: null
     },
     canApprove: {
+      // TODO Approval.
       type: Boolean,
       required: false,
       default: false
@@ -170,7 +173,6 @@ export default {
   },
   data () {
     return {
-      idgroups: null,
       name: null,
       location: null,
       phone: null,
@@ -180,9 +182,10 @@ export default {
       description: null,
       lat: null,
       lng: null,
+      postcode: null,
       moderate: null,
       failed: false,
-      image: null
+      image: null,
     }
   },
   validations: {
@@ -205,7 +208,7 @@ export default {
   },
   computed: {
     creating () {
-      return !this.initialGroup
+      return !this.idgroups
     },
     groups () {
       let groups = this.$store.getters['groups/list']
@@ -231,22 +234,34 @@ export default {
       })
     }
   },
-  created () {
-    if (this.initialGroup) {
-      this.name = this.initialGroup.name
-      this.area = this.initialGroup.area
-      this.location = this.initialGroup.location
-      this.phone = this.initialGroup.phone
-      this.website = this.initialGroup.website
-      this.description = this.initialGroup.description
-      this.timezone = this.initialGroup.timezone
-      this.lat = this.initialGroup.latitude
-      this.lng = this.initialGroup.longitude
+  watch: {
+    name(newVal) {
+      console.log("NAme in upper", newVal, this)
     }
   },
-  mounted () {
+  async created() {
     // Fetch the list of groups, so that we can ensure group names are unique.
-    this.$store.dispatch('groups/list')
+    await this.$store.dispatch('groups/list')
+
+    if (this.idgroups) {
+      // Fetch the group we're editing.
+      let group = await this.$store.dispatch('groups/fetch', {
+        id: this.idgroups
+      })
+      console.log("Fetched group", group)
+
+      this.name = group.name
+      this.location = group.location
+      this.postcode = group.location.postcode
+      this.phone = group.phone
+      this.website = group.website
+      this.timezone = group.timezone
+      this.description = group.description
+      this.lat = group.lat
+      this.lng = group.lng
+      this.image = group.image
+      console.log('Bumped', this.name, group.name)
+    }
   },
   methods: {
     async submit() {
@@ -262,7 +277,6 @@ export default {
           // It's not.
           this.validationFocusFirstError()
         } else if (this.creating) {
-          // TODO Image upload.
           const id = await this.$store.dispatch('groups/create', {
             name: this.name,
             website: this.website,

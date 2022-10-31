@@ -1,25 +1,32 @@
 <template>
-  <div class="form-group">
-    <label :for="$id('address-autocomplete')">{{ __('groups.location') }}:</label>
-    <vue-google-autocomplete
-        :id="$id('address-autocomplete')"
-        name="location"
-        classname="form-control"
-        :placeholder="__('groups.groups_location_placeholder')"
-        @placechanged="placeChanged"
-        aria-describedby="locationHelpBlock"
-        types="geocode"
-        ref="autocomplete"
-        :class="{ hasError: hasError, 'm-0': true }"
-    />
-    <small id="locationHelpBlock">
+  <div>
+    <b-form-group>
+      <label :for="$id('address-autocomplete')">{{ __('groups.location') }}:</label>
+      <vue-google-autocomplete
+          :id="$id('address-autocomplete')"
+          name="location"
+          classname="form-control"
+          :placeholder="__('groups.groups_location_placeholder')"
+          @placechanged="placeChanged"
+          aria-describedby="locationHelpBlock"
+          types="geocode"
+          ref="autocomplete"
+          :class="{ hasError: hasError, 'm-0': true }"
+      />
+      <small id="locationHelpBlock">
       <span class="form-text text-danger" v-if="hasError">
         {{ __('groups.geocode_failed') }}
       </span>
-      <span v-else>
+        <span v-else>
       {{ __('groups.groups_location_small') }}
       </span>
-    </small>
+      </small>
+    </b-form-group>
+    <b-form-group>
+      <label for="group_postcode">{{ __('groups.postcode') }}:</label>
+      <b-input type="url" id="group_postcode" name="postcode" v-model="currentPostcode" :class="{ hasError: hasError }"/>
+      <small>{{ __('groups.groups_postcode_small') }}</small>
+    </b-form-group>
   </div>
 </template>
 <script>
@@ -46,6 +53,11 @@ export default {
       required: false,
       default: null
     },
+    postcode: {
+      type: String,
+      required: false,
+      default: null
+    },
     hasError: {
       type: Boolean,
       required: false,
@@ -69,23 +81,19 @@ export default {
     return {
       currentValue: null,
       location: null,
+      currentPostcode: null,
       timer: null,
     }
   },
-  computed: {
-    groupLocation() {
-      return this.group ? this.group.location : null
-    },
-    groupLat() {
-      return this.group ? this.group.latitude : null
-    },
-    groupLng() {
-      return this.group ? this.group.longitude : null
-    },
-  },
   mounted() {
     this.currentValue = this.value
+    this.currentPostcode = this.postcode
     this.$refs.autocomplete.update(this.currentValue)
+  },
+  watch: {
+    postcode(newVal) {
+      this.$emit('update:postcode', newVal)
+    },
   },
   methods: {
     placeChanged(addressData, placeResultData) {
@@ -93,11 +101,6 @@ export default {
       this.$emit('update:value', this.currentValue)
       this.$emit('update:lat', addressData.latitude)
       this.$emit('update:lng', addressData.longitude)
-    },
-    useGroup() {
-      this.$refs.autocomplete.update(this.groupLocation)
-      this.$emit('update:lat', parseFloat(this.groupLat))
-      this.$emit('update:lng', parseFloat(this.groupLng))
     },
   }
 }

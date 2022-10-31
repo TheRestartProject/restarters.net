@@ -1,9 +1,10 @@
 <template>
   <div>
-    <h1>{{ __('general.new_group') }}</h1>
+    <h1 v-if="idgroups">{{ __('groups.editing') }}</h1>
+    <h1 v-else>{{ __('general.new_group') }}</h1>
     <b-card no-body class="box mt-4">
       <b-card-body class="p-4">
-        <GroupAddEdit :initial-group="initialGroup" />
+        <GroupAddEdit :idgroups="idgroups" />
       </b-card-body>
     </b-card>
   </div>
@@ -16,8 +17,8 @@ export default {
   components: {GroupAddEdit},
   mixins: [ auth ],
   props: {
-    initialGroup: {
-      type: Object,
+    idgroups: {
+      type: Number,
       required: false,
       default: null
     },
