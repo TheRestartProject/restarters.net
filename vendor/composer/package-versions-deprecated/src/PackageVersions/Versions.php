@@ -148,7 +148,7 @@ final class Versions
   'weotch/phpthumb' => '1.0.5@f5c1d2ef2e9de3bded7483778618bf8cac2511c3',
   'wouternl/laravel-drip' => '1.2.4@f9d96140ba62f4ddb4df909e20931e897e0edd54',
   'zircote/swagger-php' => '3.3.6@5016342f966fca29dda84455de066c5c90d37941',
-  'laravel/laravel' => 'dev-production@301bf34adfb02feb7da6c4227f8de5d16c9d8881',
+  'laravel/laravel' => 'dev-production@0cd1ac2821ccc2cb2e65f5d5d6e782d59bc5ba85',
 );
 
     private function __construct()
