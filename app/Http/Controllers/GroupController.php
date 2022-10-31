@@ -845,6 +845,7 @@ class GroupController extends Controller
                     'location' => [
                         'location' => rtrim($group->location),
                         'country' => $group->country,
+                        'distance' => $distance,
                     ],
                     'next_event' => $event ? $event->event_date_local : null,
                     'all_restarters_count' => $group->all_restarters_count,
@@ -853,7 +854,6 @@ class GroupController extends Controller
                     'all_confirmed_hosts_count' => $group->all_confirmed_hosts_count,
                     'networks' => \Illuminate\Support\Arr::pluck($group->networks, 'id'),
                     'group_tags' => $group->group_tags()->get()->pluck('id'),
-                    'distance' => $distance,
                     'following' => in_array($group->idgroups, $your_groupids),
                     'nearby' => in_array($group->idgroups, $nearby_groupids),
                 ];
