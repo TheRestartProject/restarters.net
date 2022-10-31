@@ -27,6 +27,10 @@
       <b-input type="url" id="group_postcode" name="postcode" v-model="currentPostcode" :class="{ hasError: hasError }"/>
       <small>{{ __('groups.groups_postcode_small') }}</small>
     </b-form-group>
+    <b-form-group>
+      <label for="group_area">{{ __('groups.area') }}:</label>
+      <b-input type="url" id="group_area" name="area" v-model="currentArea" :class="{ hasError: hasError }"/>
+    </b-form-group>
   </div>
 </template>
 <script>
@@ -58,6 +62,11 @@ export default {
       required: false,
       default: null
     },
+    area: {
+      type: String,
+      required: false,
+      default: null
+    },
     hasError: {
       type: Boolean,
       required: false,
@@ -82,17 +91,22 @@ export default {
       currentValue: null,
       location: null,
       currentPostcode: null,
+      currentArea: null,
       timer: null,
     }
   },
   mounted() {
     this.currentValue = this.value
     this.currentPostcode = this.postcode
+    this.currentArea = this.area
     this.$refs.autocomplete.update(this.currentValue)
   },
   watch: {
     postcode(newVal) {
       this.$emit('update:postcode', newVal)
+    },
+    area(newVal) {
+      this.$emit('update:area', newVal)
     },
   },
   methods: {

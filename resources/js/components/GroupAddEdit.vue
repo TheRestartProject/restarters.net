@@ -47,6 +47,7 @@
           :lat.sync="lat"
           :lng.sync="lng"
           :postcode.sync="postcode"
+          :area.sync="area"
           class="group-location"
           :has-error="$v.location.$error"
           ref="location"
@@ -193,6 +194,7 @@ export default {
       lat: null,
       lng: null,
       postcode: null,
+      area: null,
       moderate: null,
       failed: false,
       image: null,
@@ -265,6 +267,7 @@ export default {
       this.name = group.name
       this.location = group.location.location
       this.postcode = group.location.postcode
+      this.area = group.location.area
       this.phone = group.phone
       this.website = group.website
       this.timezone = group.timezone
@@ -295,6 +298,8 @@ export default {
               website: this.website,
               description: this.description,
               location: this.location,
+              postcode: this.postcode,
+              area: this.area,
               timezone: this.timezone,
               phone: this.phone,
               image: this.image
@@ -307,30 +312,27 @@ export default {
               this.failed = true
             }
           } else {
-            console.log("Editing")
             if (this.$v.$invalid) {
               // It's not.
-              console.log("Invalid")
               this.validationFocusFirstError()
             } else {
-              console.log("Edit")
               let id = await this.$store.dispatch('groups/edit', {
                 id: this.idgroups,
                 name: this.name,
                 website: this.website,
                 description: this.description,
                 location: this.location,
+                postcode: this.postcode,
+                area: this.area,
                 timezone: this.timezone,
                 phone: this.phone,
                 image: this.image
               })
 
-              console.log("Returned", id)
               if (id) {
                 // Reload the page.  We don't need to do this for the data, but people will expect it.
-                // window.location = '/group/edit/' + id
+                window.location = '/group/edit/' + id
               } else {
-                console.log("Edit failed", e)
                 this.failed = true
               }
             }
