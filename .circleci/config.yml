@@ -199,4 +199,4 @@ jobs:
       - run: echo "App\User::create(['name'=>'Jane Bloggs','email'=>'jane@bloggs.net','password'=>Hash::make('passw0rd'),'role'=>2,'consent_past_data'=>'2021-01-01','consent_future_data'=>'2021-01-01','consent_gdpr'=>'2021-01-01']);" | php artisan tinker || true
       - run: export NODE_OPTIONS=--max-old-space-size=8192;  npm rebuild node-sass; npm run prod
       - run: npx playwright install
-      - run: npx playwright test
+      - run: npx playwright test --reporter=list
