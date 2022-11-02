@@ -87,7 +87,7 @@
         ],
         "post-autoload-dump": [
             "Illuminate\\Foundation\\ComposerScripts::postAutoloadDump",
-            "@php artisan package:discover --ansi"
+            "if test -f 'storage/oauth-public.key'; then @php artisan package:discover --ansi; fi"
         ]
     },
     "config": {
