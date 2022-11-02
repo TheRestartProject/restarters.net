@@ -174,7 +174,7 @@ class APIv2GroupTest extends TestCase
 
         foreach ($groups as $group)
         {
-            if ($group == $group->name)
+            if ($group == $group['name'])
             {
                 $found = true;
             }

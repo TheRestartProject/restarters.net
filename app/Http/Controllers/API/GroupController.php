@@ -230,7 +230,7 @@ class GroupController extends Controller
         if ($request->has('format') && $request->input('format') == 'location') {
             $events = $events->map(function ($event) {
                 return (object) [
-                    'idgroups' => $event->idevents,
+                    'id' => $event->idevents,
                     'location' => $event->FriendlyLocation,
                 ];
             });
