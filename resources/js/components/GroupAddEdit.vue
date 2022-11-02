@@ -459,7 +459,7 @@ export default {
 
   .group-buttons {
     grid-row: 9 / 10;
-    grid-colum: 1 / 2;
+    grid-column: 1 / 2;
 
     /deep/ .btn {
       font-size: 16px;

@@ -427,12 +427,10 @@ class GroupController extends Controller
             abort(403);
         }
 
-        compact($audits = $group->audits);
-
         return view('group.edit', [
             'id' => $id,
             'name' => $group->name,
-            'audits' => $audits,
+            'audits' => $group->audits,
         ]);
     }
 
