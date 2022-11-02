@@ -68,7 +68,7 @@
         {{ __('devices.delete_device') }}
       </b-btn>
       <DeviceQuantity v-if="add" :quantity.sync="currentDevice.quantity" class="flex-md-shrink-1 ml-2 mr-2"/>
-      <b-btn variant="tertiary" class="ml-2" @click="cancel" v-if="cancelButton">
+      <b-btn variant="tertiary" class="ml-2 cancel" @click="cancel" v-if="cancelButton">
         {{ __('partials.cancel') }}
       </b-btn>
     </div>
