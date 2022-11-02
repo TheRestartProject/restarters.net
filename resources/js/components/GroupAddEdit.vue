@@ -10,9 +10,6 @@
       {{ __('groups.edit_group_text') }}
     </p>
 
-    <input type="hidden" id="lat" v-model="lat"/>
-    <input type="hidden" id="lng" v-model="lng"/>
-
     <div class="layout" v-if="ready">
       <div class="flex-grow-1 group-name">
         <GroupName
@@ -41,6 +38,11 @@
               ref="free_text"/>
         </b-form-group>
       </div>
+      <!-- These are inputs for playwright testing. -->
+      <input type="text" id="lat" name="lat" v-model="lat" style="width: 1px; height: 1px;" />
+      <input type="text" id="lng" name="lng" v-model="lng"  style="width: 1px; height: 1px;" />
+      <input type="text" id="location" name="location" v-model="location"  style="width: 1px; height: 1px;" />
+
       <GroupLocation
           :all-groups="groups"
           :value.sync="location"
@@ -92,7 +94,7 @@
         <p v-if="edited" class="text-success font-weight-bold" v-html="__('groups.edit_succeeded')" />
         <div v-else-if="failed">
           <p v-if="creating" class="text-danger font-weight-bold" v-html="__('groups.create_failed')"/>
-          <p v-else class="text-danger font-weight-bold" v-if="failed" v-html="__('groups.edit_failed')"/>
+          <p v-else class="text-danger font-weight-bold" v-html="__('groups.edit_failed')"/>
         </div>
 
         <div class="d-flex justify-content-between flex-wrap" v-if="creating">
@@ -127,6 +129,7 @@ import GroupPhone from './GroupPhone'
 import GroupImage from './GroupImage'
 
 function geocodeableValidation () {
+  console.log("Validate location", this.lat, this.lng, this.lat !== null && this.lng !== null)
   return this.lat !== null && this.lng !== null
 }
 
@@ -213,7 +216,7 @@ export default {
 
       if (this.name && this.groups && this.groups.length) {
         this.groups.forEach(group => {
-            if ((this.creating || this.idgroups != group.id) && group.name.toLowerCase() === this.name.toLowerCase()) {
+            if ((this.creating || this.idgroups != parseInt(group.id)) && group.name.toLowerCase() === this.name.toLowerCase()) {
               ret = true
             }
         })

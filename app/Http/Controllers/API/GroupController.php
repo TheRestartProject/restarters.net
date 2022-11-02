@@ -230,7 +230,7 @@ class GroupController extends Controller
         if ($request->has('format') && $request->input('format') == 'location') {
             $events = $events->map(function ($event) {
                 return (object) [
-                    'id' => $event->idevents,
+                    'idgroups' => $event->idevents,
                     'location' => $event->FriendlyLocation,
                 ];
             });
@@ -241,37 +241,21 @@ class GroupController extends Controller
         ]);
     }
 
-    /**
-     * @OA\Get(
-     *      path="/api/v2/groups/names",
-     *      operationId="listGroupNames",
-     *      tags={"Groups"},
-     *      summary="List Group Names",
-     *      description="Returns a list of group namess",
-     *      @OA\Response(
-     *          response=200,
-     *          description="Successful operation",
-     *          @OA\JsonContent(
-     *              @OA\Property(
-     *                property="data",
-     *                title="data",
-     *                description="An array of group names",
-     *                type="array",
-     *                @OA\Items(type="string")
-     *              )
-     *          )
-     *       ),
-     *      @OA\Response(
-     *          response=404,
-     *          description="Group not found",
-     *      ),
-     *     )
-     */
+    // TODO Add to OpenAPI.
     public static function listNamesv2(Request $request) {
         // We only return the group id and name, for speed.
-        $groups = Group::select('idgroups', 'name')->get()->toArray();
+        $groups = Group::select('idgroups', 'name')->get();
+        $ret = [];
+
+        foreach ($groups as $group) {
+            $ret[] = [
+                'id' => $group->idgroups,
+                'name' => $group->name,
+            ];
+        }
+
         return [
-            'data' => $groups
+            'data' => $ret
         ];
     }
 

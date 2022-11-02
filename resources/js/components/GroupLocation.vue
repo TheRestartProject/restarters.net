@@ -27,10 +27,11 @@
       <b-input type="url" id="group_postcode" name="postcode" v-model="currentPostcode" :class="{ hasError: hasError }"/>
       <small>{{ __('groups.groups_postcode_small') }}</small>
     </b-form-group>
-    <b-form-group>
-      <label for="group_area">{{ __('groups.area') }}:</label>
-      <b-input type="url" id="group_area" name="area" v-model="currentArea" :class="{ hasError: hasError }"/>
-    </b-form-group>
+    <!-- TODO area should be admin only, in that section -->
+<!--    <b-form-group>-->
+<!--      <label for="group_area">{{ __('groups.area') }}:</label>-->
+<!--      <b-input type="url" id="group_area" name="area" v-model="currentArea" :class="{ hasError: hasError }"/>-->
+<!--    </b-form-group>-->
   </div>
 </template>
 <script>
