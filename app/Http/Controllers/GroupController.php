@@ -122,7 +122,9 @@ class GroupController extends Controller
                 }
 
                 $volunteer['fullName'] = $volunteer->name;
-                $volunteer['profilePath'] = '/uploads/thumbnail_'.$volunteer->volunteer->getProfile($volunteer->volunteer->id)->path;
+                $image = $volunteer->volunteer->getProfile($volunteer->volunteer->id)->path;
+                $image = $image ? "/uploads/thumbnail_$image" : "/images/placeholder-avatar.png";
+                $volunteer['profilePath'] = $image;
                 $ret[] = $volunteer;
             }
         }
@@ -248,8 +250,6 @@ class GroupController extends Controller
 
         foreach (array_merge($upcoming_events->all(), $active_events->all(), $past_events->all()) as $event) {
             $expanded_event = \App\Http\Controllers\PartyController::expandEvent($event, $group);
-            // TODO: here we seem to expect group to be the group id, not the group object.
-            // expandEvent seems to expect the object.
             $expanded_event['group'] = $event->group;
             $expanded_events[] = $expanded_event;
         }
