@@ -166,7 +166,7 @@ class APIv2GroupTest extends TestCase
         $this->assertEquals('Europe/Brussels', $group->timezone);
 
         // Group should now appear in the list of groups.
-        $response = $this->get('/api/v2/groups');
+        $response = $this->get('/api/v2/groups/names');
         $response->assertSuccessful();
         $json = json_decode($response->getContent(), true);
         $groups = $json['data'];
@@ -174,7 +174,7 @@ class APIv2GroupTest extends TestCase
 
         foreach ($groups as $group)
         {
-            if ($group['id'] == $idgroups)
+            if ($group == $group->name)
             {
                 $found = true;
             }

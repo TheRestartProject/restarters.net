@@ -110,7 +110,7 @@ export default {
       }
     },
     async list({commit}) {
-      let ret = await axios.get('/api/v2/groups')
+      let ret = await axios.get('/api/v2/groups/names')
       if (ret && ret.data) {
         commit('setList', {
           groups: ret.data.data

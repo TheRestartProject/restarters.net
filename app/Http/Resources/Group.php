@@ -113,6 +113,7 @@ class Group extends JsonResource
      *         description="The number of hosts of this group.",
      *         type="number",
      *     ),
+     */
 
     /**
      *     @OA\Property(
@@ -121,8 +122,17 @@ class Group extends JsonResource
      *         description="The number of restarters in this group.",
      *         type="number",
      *     ),
-
      */
+
+    /**
+     *     @OA\Property(
+     *         property="approved",
+     *         title="hosts",
+     *         description="Whether the group has been approved",
+     *         type="boolean",
+     *     ),
+     */
+
     /**
      *     @OA\Property(
      *          property="stats",
@@ -281,6 +291,7 @@ class Group extends JsonResource
             'location' => new GroupLocation($this),
             'networks' => $this->resource->networks,
             'timezone' => $this->timezone,
+            'approved' => $this->wordpress_post_id != null,
         ];
 
         $ret['hosts'] = $this->resource->all_confirmed_hosts_count;

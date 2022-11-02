@@ -243,11 +243,11 @@ class GroupController extends Controller
 
     /**
      * @OA\Get(
-     *      path="/api/v2/groups",
-     *      operationId="listGroup",
+     *      path="/api/v2/groups/names",
+     *      operationId="listGroupNames",
      *      tags={"Groups"},
-     *      summary="List Groups",
-     *      description="Returns a list of groups",
+     *      summary="List Group Names",
+     *      description="Returns a list of group namess",
      *      @OA\Response(
      *          response=200,
      *          description="Successful operation",
@@ -255,11 +255,9 @@ class GroupController extends Controller
      *              @OA\Property(
      *                property="data",
      *                title="data",
-     *                description="An array of groups",
+     *                description="An array of group names",
      *                type="array",
-     *                @OA\Items(
-     *                    ref="#/components/schemas/GroupSummary"
-     *                 )
+     *                @OA\Items(type="string")
      *              )
      *          )
      *       ),
@@ -269,9 +267,12 @@ class GroupController extends Controller
      *      ),
      *     )
      */
-    public static function listv2(Request $request) {
-        $groups = Group::all();
-        return \App\Http\Resources\GroupSummaryCollection::make($groups);
+    public static function listNamesv2(Request $request) {
+        // We only return the group id and name, for speed.
+        $groups = Group::select('idgroups', 'name')->get()->toArray();
+        return [
+            'data' => $groups
+        ];
     }
 
     /**
@@ -472,10 +473,6 @@ class GroupController extends Controller
      *                   ref="#/components/schemas/Group/properties/name",
      *                ),
      *                @OA\Property(
-     *                   property="area",
-     *                   ref="#/components/schemas/Group/properties/area"
-     *                ),
-     *                @OA\Property(
      *                   property="location",
      *                   ref="#/components/schemas/Group/properties/location",
      *                ),
@@ -658,7 +655,7 @@ class GroupController extends Controller
             // Notify the creator, as long as it's not the current user.
             $creator = User::find(UserGroups::where('group', $idGroup)->first()->user);
 
-            if ($creator->id != Auth::user()->id) {
+            if ($creator->id != $user->id) {
                 Notification::send($creator, new GroupConfirmed($group));
             }
 
