@@ -2,6 +2,7 @@ const {test, expect} = require('@playwright/test')
 const { login, createGroup, createEvent, approveEvent, addDevice } = require('./utils')
 
 test('Spare parts set as expected', async ({page, baseURL}) => {
+  test.slow()
   await login(page, baseURL)
   const groupid = await createGroup(page, baseURL)
   const eventid = await createEvent(page, baseURL, groupid, true)
@@ -13,6 +14,7 @@ test('Spare parts set as expected', async ({page, baseURL}) => {
 })
 
 test('Spare parts not set unexpectedly', async ({page, baseURL}) => {
+  test.slow()
   await login(page, baseURL)
   const groupid = await createGroup(page, baseURL)
   const eventid = await createEvent(page, baseURL, groupid, true)
