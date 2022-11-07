@@ -22,8 +22,8 @@ class Timezones extends Migration
 
         # The events table changes so that we have timestamp fields for start/end which are defined to be in UTC.
         Schema::table('events', function (Blueprint $table) {
-            $table->datetime('event_start_utc')->comment('Timestamp of event start in UTC')->nullable()->default(null)->index()->after('group');
-            $table->datetime('event_end_utc')->comment('Timestamp of event end in UTC')->nullable()->default(null)->index()->after('event_start_utc');
+//            $table->datetime('event_start_utc')->comment('Timestamp of event start in UTC')->nullable()->default(null)->index()->after('group');
+//            $table->datetime('event_end_utc')->comment('Timestamp of event end in UTC')->nullable()->default(null)->index()->after('event_start_utc');
             $table->string('timezone', 64)->comment('TZ database name')->nullable()->default(null)->after('event_end_utc');
             $table->date('event_date_old')->comment('Old data before RES-1624')->nullable()->default(null);
             $table->time('start_old')->comment('Old data before RES-1624')->nullable()->default(null);
