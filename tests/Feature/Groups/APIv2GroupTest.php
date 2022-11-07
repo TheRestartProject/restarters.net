@@ -172,9 +172,9 @@ class APIv2GroupTest extends TestCase
         $groups = $json['data'];
         $found = false;
 
-        foreach ($groups as $group)
+        foreach ($groups as $g)
         {
-            if ($group == $group['name'])
+            if ($group->name == $g['name'])
             {
                 $found = true;
             }
