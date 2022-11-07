@@ -209,7 +209,7 @@ exports.unfollowGroup = async function(page, idgroups) {
 
   await page.click('#groupactions .dropdown-toggle >> visible=true')
 
-  await page.click('#groupactions .dropdown-menu > li:nth-child(6) > .dropdown-item >> visible=true')
+  await page.click('#groupactions .dropdown-menu > li:nth-child(7) > .dropdown-item >> visible=true')
 
   await page.click('#confirmmodal .btn-primary')
 
