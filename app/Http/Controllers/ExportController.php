@@ -19,7 +19,15 @@ use Response;
 
 class ExportController extends Controller
 {
-    public function devices(Request $request)
+    public function devicesEvent(Request $request, $idevents = NULL) {
+        $this->devices($request, $idevents);
+    }
+
+    public function devicesGroup(Request $request, $idgroups = NULL) {
+        $this->devices($request, NULL, $idgroups);
+    }
+
+    public function devices(Request $request, $idevents = NULL, $idgroups = NULL)
     {
         // To not display column if the referring URL is therestartproject.org
         $host = parse_url(\Request::server('HTTP_REFERER'), PHP_URL_HOST);
@@ -30,6 +38,12 @@ class ExportController extends Controller
         ])
             ->join('events', 'events.idevents', '=', 'devices.event')
             ->join('groups', 'groups.idgroups', '=', 'events.group')
+            ->when($idevents != NULL, function($query) use ($idevents) {
+                return $query->where('events.idevents', $idevents);
+            })
+            ->when($idgroups != NULL, function($query) use ($idgroups) {
+                return $query->where('events.group', $idgroups);
+            })
             ->select('devices.*', 'groups.name AS group_name')->get();
 
         $displacementFactor = \App\Device::getDisplacementFactor();

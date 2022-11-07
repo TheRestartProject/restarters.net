@@ -48,7 +48,7 @@ class ExportTest extends TestCase
         $event2->wordpress_post_id = 100;
         $event2->save();
 
-        // Add a device for the first event.
+        // Add a device for the events.
         $device = factory(Device::class)->states('fixed')->create([
                                                                       'category' => 111,
                                                                       'category_creation' => 111,
@@ -77,11 +77,52 @@ class ExportTest extends TestCase
         // Export devices.
         $response = $this->get("/export/devices");
 
-        $filename = 'public/devices.csv';
+        $filename = public_path() . '/devices.csv';
         $fh = fopen($filename, 'r');
         fgetcsv($fh);
         $row2 = fgetcsv($fh);
         self::assertEquals(e($event1->getEventName()), e($row2[6]));
+        $row3 = fgetcsv($fh);
+        self::assertEquals(e($event2->getEventName()), e($row3[6]));
+
+        // Export devices for a particular event.
+        $response = $this->get("/export/devices/event/$idevents1");
+        $filename = public_path() . '/devices.csv';
+        $fh = fopen($filename, 'r');
+        fgetcsv($fh);
+        $row2 = fgetcsv($fh);
+        self::assertEquals(e($event1->getEventName()), e($row2[6]));
+        $row3 = fgetcsv($fh);
+        self::assertFalse($row3);
+
+        $response = $this->get("/export/devices/event/$idevents2");
+        $filename = public_path() . '/devices.csv';
+        $fh = fopen($filename, 'r');
+        fgetcsv($fh);
+        $row2 = fgetcsv($fh);
+        self::assertEquals(e($event2->getEventName()), e($row2[6]));
+        $row3 = fgetcsv($fh);
+        self::assertFalse($row3);
+
+        // Export devices for a particular group.
+        $response = $this->get("/export/devices/group/{$group1->idgroups}");
+        $filename = public_path() . '/devices.csv';
+        $fh = fopen($filename, 'r');
+        fgetcsv($fh);
+        $row2 = fgetcsv($fh);
+        self::assertEquals(e($event1->getEventName()), e($row2[6]));
+        $row3 = fgetcsv($fh);
+        self::assertFalse($row3);
+
+        $response = $this->get("/export/devices/group/{$group2->idgroups}");
+        $filename = public_path() . '/devices.csv';
+        $fh = fopen($filename, 'r');
+        fgetcsv($fh);
+        $row2 = fgetcsv($fh);
+        self::assertEquals(e($event2->getEventName()), e($row2[6]));
+        $row3 = fgetcsv($fh);
+        self::assertFalse($row3);
+
 
         // Export time volunteered - first as a web page.
         $response = $this->get("/reporting/time-volunteered?a");
