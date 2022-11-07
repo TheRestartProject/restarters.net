@@ -38,7 +38,7 @@ class WordpressEventPushTest extends TestCase
             'events_push_to_wordpress' => true,
         ]);
         $group = factory(Group::class)->create([
-                                                   'wordpress_post_id' => '99999',
+                                                   'approved' => true,
                                                ]);
         $restart->addGroup($group);
         $event = factory(Party::class)->create([
@@ -58,7 +58,7 @@ class WordpressEventPushTest extends TestCase
            'events_push_to_wordpress' => true,
         ]);
         $group = factory(Group::class)->create([
-                                                   'wordpress_post_id' => '99999',
+                                                   'approved' => true,
                                                ]);
         $network->addGroup($group);
         $event = factory(Party::class)->create([
@@ -91,7 +91,7 @@ class WordpressEventPushTest extends TestCase
         $handler->handle(new ApproveEvent($event));
 
         # Fake approval
-        $event->wordpress_post_id = 1;
+        $event->approved = true;
         $event->save();
 
         # Edit event.
@@ -120,7 +120,7 @@ class WordpressEventPushTest extends TestCase
             'name' => 'Repair Together',
         ]);
         $group = factory(Group::class)->create([
-                                                   'wordpress_post_id' => '99999',
+                                                   'approved' => true,
                                                ]);
         $repairTogether->addGroup($group);
         $event = factory(Party::class)->create(['group' => $group->idgroups]);
@@ -146,7 +146,7 @@ class WordpressEventPushTest extends TestCase
             'events_push_to_wordpress' => true,
         ]);
         $group = factory(Group::class)->create([
-                                                   'wordpress_post_id' => '99999',
+                                                   'approved' => true,
                                                ]);
         $restart->addGroup($group);
         $event = factory(Party::class)->create([
@@ -154,7 +154,7 @@ class WordpressEventPushTest extends TestCase
             'event_start_utc' => Carbon::parse('1pm tomorrow')->toIso8601String(),
             'event_end_utc' => Carbon::parse('3pm tomorrow')->toIso8601String()
         ]);
-        $event->wordpress_post_id = 100;
+        $event->approved = true;
         $event->save();
 
         $eventData = factory(Party::class)->raw();
@@ -178,11 +178,11 @@ class WordpressEventPushTest extends TestCase
             'events_push_to_wordpress' => false,
         ]);
         $group = factory(Group::class)->create([
-                                                   'wordpress_post_id' => '99999',
+                                                   'approved' => true,
                                                ]);
         $repairTogether->addGroup($group);
         $event = factory(Party::class)->create(['group' => $group->idgroups]);
-        $event->wordpress_post_id = 100;
+        $event->approved = true;
         $event->save();
 
         $eventData = factory(Party::class)->raw();
@@ -207,7 +207,7 @@ class WordpressEventPushTest extends TestCase
                                                        'events_push_to_wordpress' => true,
                                                    ]);
         $group = factory(Group::class)->create([
-            'wordpress_post_id' => null,
+                                                   'approved' => false,
                                                ]);
         $restart->addGroup($group);
         $event = factory(Party::class)->create([

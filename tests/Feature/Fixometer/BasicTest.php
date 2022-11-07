@@ -19,7 +19,7 @@ class BasicTest extends TestCase
     {
         // Create a past event with a fixed device.  This is shown on the Fixometer page as the latest data.
         $group = factory(Group::class)->create([
-                                                   'wordpress_post_id' => '99999'
+                                                   'approved' => true
                                                ]);
         $event = factory(Party::class)->create([
                                                    'group' => $group,

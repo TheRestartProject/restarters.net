@@ -40,7 +40,6 @@ class GroupCreateTest extends TestCase
 
         // Use an address which will fail to geocode.
         $this->assertNull($this->createGroup('Test Group', 'https://therestartproject.org', 'zzzzzzzzzzz123', 'Some text', false));
-        $this->assertContains(__('groups.geocode_failed'), $this->lastResponse->getContent());
     }
 
     public function testDuplicate()
@@ -182,7 +181,7 @@ class GroupCreateTest extends TestCase
         $this->get('/party')->assertDontSee(e($eventAttributes['venue']));
 
         // Now approve the group.
-        $group->wordpress_post_id = '99999';
+        $group->approved = true;
         $group->save();
 
         // Should now be visible.

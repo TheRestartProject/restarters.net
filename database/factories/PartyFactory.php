@@ -41,7 +41,7 @@ $factory->define(App\Party::class, function (Faker $faker, $attributes = []) {
 
 $factory->state(App\Party::class, 'moderated', function (Faker $faker) {
     return [
-        'wordpress_post_id' => $faker->randomNumber(),
+        'approved' => true
     ];
 });
 

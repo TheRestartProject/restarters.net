@@ -22,7 +22,7 @@ class BasicTest extends TestCase
         $group = factory(Group::class)->create([
                                                    'latitude' => 50.6325574,
                                                    'longitude' => 5.5796662,
-                                                   'wordpress_post_id' => '99999',
+                                                   'approved' => true,
                                                ]);
         $user = factory(User::class)->create([
                                                  'latitude' => 50.6325574,

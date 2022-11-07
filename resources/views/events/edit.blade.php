@@ -65,7 +65,7 @@
                     @else
                     :groups="{{ json_encode($user_groups, JSON_INVALID_UTF8_IGNORE) }}"
                     @endif
-                    :can-approve="<?php echo App\Helpers\Fixometer::userCanApproveEvent($formdata['idevents']) && !array_key_exists('wordpress_post_id', $formdata) ? 'true' : 'false' ?>"
+                    :can-approve="<?php echo App\Helpers\Fixometer::userCanApproveEvent($formdata['idevents']) && !$formdata['approved' ?>"
                 />
               </div>
           </div>

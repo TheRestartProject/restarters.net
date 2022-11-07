@@ -24,7 +24,7 @@ class InviteEventTest extends TestCase
         $this->withoutExceptionHandling();
 
         $group = factory(Group::class)->create([
-                                                   'wordpress_post_id' => '99999'
+                                                   'approved' => true
                                                ]);
         $event = factory(Party::class)->create([
                                                    'group' => $group,
@@ -80,7 +80,6 @@ class InviteEventTest extends TestCase
         $this->get('/logout');
         $this->actingAs($admin);
         $eventData = $event->getAttributes();
-        $eventData['wordpress_post_id'] = 100;
         $eventData['id'] = $event->idevents;
         $eventData['moderate'] = 'approve';
         $this->post('/party/edit/'.$event->idevents, $eventData);
@@ -123,7 +122,7 @@ class InviteEventTest extends TestCase
         $this->withoutExceptionHandling();
 
         $group = factory(Group::class)->create([
-                                                   'wordpress_post_id' => '99999'
+                                                   'approved' => true
                                                ]);
         $host = factory(User::class)->states('Host')->create();
         $event = factory(Party::class)->create([
@@ -347,7 +346,7 @@ class InviteEventTest extends TestCase
         $this->withoutExceptionHandling();
 
         $group = factory(Group::class)->create([
-                                                   'wordpress_post_id' => '99999'
+                                                   'approved' => true
                                                ]);
         $event = factory(Party::class)->create([
                                                    'group' => $group,

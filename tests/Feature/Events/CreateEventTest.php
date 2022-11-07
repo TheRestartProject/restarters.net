@@ -76,7 +76,7 @@ class CreateEventTest extends TestCase
         $this->actingAs($host);
 
         $group = factory(Group::class)->create([
-            'wordpress_post_id' => '99999'
+            'approved' => true
         ]);
         $group->addVolunteer($host);
         $group->makeMemberAHost($host);
@@ -349,7 +349,6 @@ class CreateEventTest extends TestCase
         // Approve the event
         $response = $this->post('/party/create/', $eventData);
         $event = Party::latest()->first();
-        $eventData['wordpress_post_id'] = 100;
         $eventData['id'] = $event->idevents;
         $eventData['moderate'] = 'approve';
         $response = $this->post('/party/edit/'.$event->idevents, $eventData);
@@ -404,7 +403,6 @@ class CreateEventTest extends TestCase
         // act
         $response = $this->post('/party/create/', $eventData);
         $event = Party::latest()->first();
-        $eventData['wordpress_post_id'] = 100;
         $eventData['id'] = $event->idevents;
         $eventData['moderate'] = 'approve';
         $response = $this->post('/party/edit/'.$event->idevents, $eventData);
@@ -464,7 +462,7 @@ class CreateEventTest extends TestCase
         $response = $this->get('/party/create');
         $this->get('/party/create')->assertStatus(200);
 
-        $eventAttributes = factory(Party::class)->raw(['group' => $group->idgroups, 'event_date' => '2000-01-01', 'wordpress_post_id' => '99999']);
+        $eventAttributes = factory(Party::class)->raw(['group' => $group->idgroups, 'event_date' => '2000-01-01', 'approved' => true]);
         $response = $this->post('/party/create/', $eventAttributes);
 
         // Find the event id
@@ -503,10 +501,10 @@ class CreateEventTest extends TestCase
         return [
             // Check the event has been approved (using the magic value of the WordPress post id used when WordPress is
             // not being used.
-            [true, 99999],
+            [true, true],
 
             // Check the event is not auto-approved by mistake.
-            [false, null],
+            [false, false],
         ];
     }
 
@@ -514,7 +512,7 @@ class CreateEventTest extends TestCase
      * @test
      **@dataProvider provider
      */
-    public function an_event_can_be_auto_approved($autoApprove, $wordpress_post_id)
+    public function an_event_can_be_auto_approved($autoApprove, $approved)
     {
         $network = factory(Network::class)->create([
             'auto_approve_events' => $autoApprove,
@@ -534,7 +532,7 @@ class CreateEventTest extends TestCase
 
         $party = $group->parties()->latest()->first();
         $this->assertEquals($idevents, $party->idevents);
-        $this->assertEquals($wordpress_post_id, $party->wordpress_post_id);
+        $this->assertEquals($approved, $party->approved);
     }
 
     /**
@@ -598,7 +596,7 @@ class CreateEventTest extends TestCase
         $restarter = factory(User::class)->states('Restarter')->create();
 
         $group = factory(Group::class)->create([
-            'wordpress_post_id' => '99999'
+            'approved' => true
         ]);
 
         $group->addVolunteer($host);
@@ -620,7 +618,6 @@ class CreateEventTest extends TestCase
         // Create and approve an event.
         $response = $this->post('/party/create/', $eventData);
         $event = Party::latest()->first();
-        $eventData['wordpress_post_id'] = 100;
         $eventData['id'] = $event->idevents;
         $eventData['moderate'] = 'approve';
         $response = $this->post('/party/edit/'.$event->idevents, $eventData);

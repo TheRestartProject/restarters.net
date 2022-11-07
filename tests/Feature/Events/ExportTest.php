@@ -40,12 +40,12 @@ class ExportTest extends TestCase
         // Create an event on each and approve it.
         $idevents1 = $this->createEvent($group1->idgroups, '2000-01-02');
         $event1 = Party::find($idevents1);
-        $event1->wordpress_post_id = 100;
+        $event1->approved = true;
         $event1->save();
 
         $idevents2 = $this->createEvent($group2->idgroups, '2000-01-01');
         $event2 = Party::find($idevents2);
-        $event2->wordpress_post_id = 100;
+        $event2->approved = true;
         $event2->save();
 
         // Add a device for the first event.

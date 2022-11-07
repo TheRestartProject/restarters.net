@@ -130,6 +130,7 @@ class GroupController extends Controller
                 $geocoded = $geocoder->geocode($location);
 
                 if (empty($geocoded)) {
+                    error_log("Geocode failed $location");
                     $response['danger'] = __('groups.geocode_failed');
                     \Sentry\CaptureMessage($response['danger']);
 
@@ -734,7 +735,7 @@ class GroupController extends Controller
                             'group_url' => url('/group/view/'.$id),
                         ]));
                     }
-                } elseif (! empty($group->wordpress_post_id)) {
+                } else {
                     event(new EditGroup($group, $data));
                 }
             }

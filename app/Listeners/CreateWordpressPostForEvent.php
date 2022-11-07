@@ -43,8 +43,9 @@ class CreateWordpressPostForEvent
             return;
         }
 
+        $theParty->update(['approve' => 'true']);
+
         if (! $theParty->shouldPushToWordpress()) {
-            $theParty->update(['wordpress_post_id' => '99999']);
             Log::info('Approved - but events for groups in this network are not published to WordPress');
 
             return;
