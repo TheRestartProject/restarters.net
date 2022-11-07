@@ -125,7 +125,7 @@ jobs:
       - run: sudo apt -y install nodejs
       - run: sudo rm /usr/local/bin/node
 
-      - run: cp .env.example .env
+      - run: if [ ! -f .env ]; then cp .env.example .env; fi
 
       # Need access to timezones.
       - run: mysql --host="127.0.0.1" -u root -ps3cr3t -e "GRANT SELECT ON mysql.time_zone_name TO 'restarters'@'%';"
@@ -204,7 +204,7 @@ jobs:
           command: git push https://heroku:$HEROKU_API_KEY@git.heroku.com/$HEROKU_APP_NAME.git ${CIRCLE_BRANCH}:master
       - run:
           name: Migrate DB
-          command: heroku run /app/php/bin/php /app/www/artisan migrate --app=${HEROKU_APP_NAME}
+          command: heroku run "echo yes | php artisan migrate" --app=${HEROKU_APP_NAME}
 workflows:
   deploy:
     jobs:
