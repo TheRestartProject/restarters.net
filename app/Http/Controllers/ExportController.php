@@ -20,11 +20,11 @@ use Response;
 class ExportController extends Controller
 {
     public function devicesEvent(Request $request, $idevents = NULL) {
-        $this->devices($request, $idevents);
+        return $this->devices($request, $idevents);
     }
 
     public function devicesGroup(Request $request, $idgroups = NULL) {
-        $this->devices($request, NULL, $idgroups);
+        return $this->devices($request, NULL, $idgroups);
     }
 
     public function devices(Request $request, $idevents = NULL, $idgroups = NULL)
@@ -52,6 +52,7 @@ class ExportController extends Controller
 
         // Create CSV
         $filename = base_path() . DIRECTORY_SEPARATOR . 'public' . DIRECTORY_SEPARATOR . 'devices.csv';
+        error_log("Exported to $filename");
         $file = fopen($filename, 'w+');
 
         // Do not include model column
