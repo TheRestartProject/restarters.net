@@ -17,7 +17,7 @@ class Timezones extends Migration
     {
         # Timezones for groups and events.
         Schema::table('groups', function (Blueprint $table) {
-            $table->string('timezone', 64)->comment('TZ database name')->nullable()->default(null);
+//            $table->string('timezone', 64)->comment('TZ database name')->nullable()->default(null);
         });
 
         # The events table changes so that we have timestamp fields for start/end which are defined to be in UTC.
