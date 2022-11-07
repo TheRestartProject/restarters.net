@@ -52,7 +52,6 @@ class ExportController extends Controller
 
         // Create CSV
         $filename = base_path() . DIRECTORY_SEPARATOR . 'public' . DIRECTORY_SEPARATOR . 'devices.csv';
-        error_log("Exported to $filename");
         $file = fopen($filename, 'w+');
 
         // Do not include model column
