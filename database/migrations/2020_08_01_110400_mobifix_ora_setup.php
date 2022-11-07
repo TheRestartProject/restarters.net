@@ -36,7 +36,7 @@ class MobifixOraSetup extends Migration
 
         Schema::create('fault_types_mobiles', function (Blueprint $table) {
             $table->increments('id');
-            $table->string('title', 255)->index();
+            $table->string('title', 255);
             $table->text('description')->default('');
             $table->string('regex', 255);
             $table->timestamps();

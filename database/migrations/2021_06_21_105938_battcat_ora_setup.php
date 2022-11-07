@@ -36,7 +36,7 @@ class BattcatOraSetup extends Migration
 
         Schema::create('fault_types_batteries', function (Blueprint $table) {
             $table->increments('id');
-            $table->string('title', 255)->index();
+            $table->string('title', 255);
             $table->text('description')->default('');
             $table->string('repair_status', 255);
             $table->timestamps();
