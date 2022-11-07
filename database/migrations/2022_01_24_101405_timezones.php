@@ -65,9 +65,9 @@ class Timezones extends Migration
         });
 
         Schema::table('events', function (Blueprint $table) {
-            $table->date('event_date')->virtualAs("DATE(CONVERT_TZ(event_start_utc, 'GMT', timezone))");
-            $table->time('start')->virtualAs("TIME(CONVERT_TZ(event_start_utc, 'GMT', timezone))");
-            $table->time('end')->virtualAs("TIME(CONVERT_TZ(event_end_utc, 'GMT', timezone))");
+//            $table->date('event_date')->virtualAs("DATE(CONVERT_TZ(event_start_utc, 'GMT', timezone))");
+//            $table->time('start')->virtualAs("TIME(CONVERT_TZ(event_start_utc, 'GMT', timezone))");
+//            $table->time('end')->virtualAs("TIME(CONVERT_TZ(event_end_utc, 'GMT', timezone))");
         });
     }
 
