@@ -150,5 +150,5 @@ return [
   'review_requested_permissions' => 'Désolé - vous n\'avez pas les autorisations nécessaires pour cette action.',
   'no_location' => '<b>Vous n\'avez pas actuellement de ville définie.  Vous pouvez en définir une dans <a href="/profil/edit">votre profil</a>.</b>',
   'you_have_joined' => 'Vous avez rejoint <a class="plain-link" href=":url">:name</a>',
-  'discourse_intro' => "Bonjour, il s’agit d’une discussion privée pour les personnes qui se sont portées volontaires pour l’événement<a href=\":url\">:name</a> organisé par <a href=\":groupurl\">:groupname</a> le :start to :end.\r\n\r\nNous pouvons utiliser ce fil de discussion avant l’événement pour discuter de la logistique, et après pour discuter des réparations que nous avons effectuées.\r\n\r\n<em>((Ceci est un message automatique.)</em>",
+  'discourse_intro' => "Bonjour, il s’agit d’une conversation privée pour les personnes qui se sont portées volontaires pour l’événement <a href=\":url\">:name</a> organisé par <a href=\":groupurl\">:groupname</a> le :start à :end.\r\n\r\nNous pouvons utiliser ce fil de discussion avant l’événement pour discuter de la logistique, et après pour discuter des réparations que nous avons effectuées.\r\n\r\n<em>(Ceci est un message automatique.)</em>",
 ];
