@@ -50,11 +50,10 @@ class Network extends Model
         return $events->flatten(1);
     }
 
-    public function logo()
+    public function logo($size)
     {
-        return $this->hasOne(\App\Xref::class, 'reference', 'id')
-            ->where('reference_type', config('restarters.xref_types.networks'))
-            ->where('object_type', 5);
+        $logo = preg_replace('/\\.([^.\\s]{3,4})$/', "-$size.$1", $this->logo);
+        return $logo;
     }
 
     public function groupsNotIn()

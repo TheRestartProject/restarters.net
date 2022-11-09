@@ -202,10 +202,10 @@ class GroupController extends Controller
                 } catch (QueryException $e) {
                     $errorCode = $e->errorInfo[1];
                     if ($errorCode == 1062) {
+                        // This is a legitimate user error, and will be displayed to them, so we don't need to log it.
                         $response['danger'] = __('groups.duplicate', [
                             'name' => $name,
                         ]);
-                        \Sentry\CaptureMessage($response['danger']);
                     } else {
                         $response['danger'] = __('groups.database_error');
                         \Sentry\CaptureMessage($response['danger']);
@@ -842,16 +842,18 @@ class GroupController extends Controller
                     'name' => $group->name,
                     'image' => (is_object($group_image) && is_object($group_image->image)) ?
                         asset('uploads/mid_'.$group_image->image->path) : null,
-                    'location' => rtrim($group->location),
+                    'location' => [
+                        'location' => rtrim($group->location),
+                        'country' => $group->country,
+                        'distance' => $distance,
+                    ],
                     'next_event' => $event ? $event->event_date_local : null,
                     'all_restarters_count' => $group->all_restarters_count,
                     'all_hosts_count' => $group->all_hosts_count,
                     'all_confirmed_restarters_count' => $group->all_confirmed_restarters_count,
                     'all_confirmed_hosts_count' => $group->all_confirmed_hosts_count,
                     'networks' => \Illuminate\Support\Arr::pluck($group->networks, 'id'),
-                    'country' => $group->country,
                     'group_tags' => $group->group_tags()->get()->pluck('id'),
-                    'distance' => $distance,
                     'following' => in_array($group->idgroups, $your_groupids),
                     'nearby' => in_array($group->idgroups, $nearby_groupids),
                 ];

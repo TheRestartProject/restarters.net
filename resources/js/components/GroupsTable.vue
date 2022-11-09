@@ -55,9 +55,9 @@
       </template>
       <template slot="cell(location)" slot-scope="data">
         <div class="d-none d-md-block">
-          {{ data.item.location.location }} <span class="text-muted small" v-if="data.item.location.distance">{{ distance(data.item.location.distance )}}&nbsp;km</span>
+          {{ data.item.location.location.location }} <span class="text-muted small" v-if="data.item.location.location.distance">{{ distance(data.item.location.location.distance )}}&nbsp;km</span>
           <br />
-          <span class="small text-muted">{{ data.item.location.country }}</span>
+          <span class="small text-muted">{{ data.item.location.location.country }}</span>
         </div>
       </template>
       <template slot="head(all_confirmed_hosts_count)">
@@ -211,7 +211,7 @@ export default {
         }
 
         if (this.searchCountry) {
-          match &= g.country && g.country.toLowerCase().indexOf(this.searchCountry.country.toLowerCase()) !== -1
+          match &= g.location && g.location.country && g.location.country.toLowerCase().indexOf(this.searchCountry.country.toLowerCase()) !== -1
         }
 
         if (this.searchTags) {

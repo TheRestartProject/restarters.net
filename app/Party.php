@@ -418,11 +418,6 @@ class Party extends Model implements Auditable
             });
     }
 
-    public function host()
-    {
-        return $this->hasOne(\App\Host::class, 'idgroups', 'group');
-    }
-
     // Doesn't work if called 'group' - I guess because a reserved SQL keyword.
     public function theGroup()
     {
@@ -514,10 +509,6 @@ class Party extends Model implements Auditable
         $date_now = Carbon::now();
         $start = new Carbon($this->event_start_utc);
         $end = new Carbon($this->event_end_utc);
-
-        // We have a hack (preserving old behaviour) to make events appear to start an hour before they actually do.
-        $start = $start->subHours(1);
-
         return $date_now->gte($start) && $date_now->lte($end);
     }
 
@@ -554,7 +545,7 @@ class Party extends Model implements Auditable
         ];
     }
 
-    public function getEventStats($eEmissionRatio = null, $uEmissionratio = null)
+    public function getEventStats($eEmissionRatio = null, $uEmissionratio = null, $includeFuture = false)
     {
         $displacementFactor = \App\Device::getDisplacementFactor();
         if (is_null($eEmissionRatio)) {
@@ -566,7 +557,8 @@ class Party extends Model implements Auditable
 
         $result = self::getEventStatsArrayKeys();
 
-        if (! empty($this->allDevices)) {
+        // Normally we only count stats for devices for events that have started or finished.
+        if (($includeFuture || $this->hasFinished() || $this->isInProgress()) && !empty($this->allDevices)) {
             foreach ($this->allDevices as $device) {
                 if ($device->deviceCategory->powered) {
                     $result['devices_powered']++;
@@ -611,16 +603,16 @@ class Party extends Model implements Auditable
                     }
                 }
             }
-
-            $result['co2_total'] = $result['co2_powered'] + $result['co2_unpowered'];
-            $result['waste_total'] = $result['waste_powered'] + $result['waste_unpowered'];
-            $result['participants'] = $this->pax ?? 0;
-            $result['volunteers'] = $this->volunteers ?? 0;
-            $result['invited'] = $this->allInvited->count();
-            $result['hours_volunteered'] = $this->hoursVolunteered();
-
-            return $result;
         }
+
+        $result['co2_total'] = $result['co2_powered'] + $result['co2_unpowered'];
+        $result['waste_total'] = $result['waste_powered'] + $result['waste_unpowered'];
+        $result['participants'] = $this->pax ?? 0;
+        $result['volunteers'] = $this->volunteers ?? 0;
+        $result['invited'] = $this->allInvited->count();
+        $result['hours_volunteered'] = $this->hoursVolunteered();
+
+        return $result;
     }
 
     public function devices()

@@ -69,8 +69,11 @@ class PartyController extends Controller
 
         // TODO LATER Consider whether these stats should be in the event or passed into the store.
         $thisone['stats'] = $event->getEventStats();
+
+        // These counts are separate from the list of participants - that list is of named individuals, but you
+        // can also just record a number, and that's what these are.
         $thisone['participants_count'] = $event->participants;
-        $thisone['volunteers_count'] = $event->allConfirmedVolunteers->count();
+        $thisone['volunteers_count'] = $event->volunteers;
 
         $thisone['isVolunteer'] = $event->isVolunteer();
         $thisone['requiresModeration'] = $event->requiresModerationByAdmin();
@@ -334,25 +337,10 @@ class PartyController extends Controller
                 $error = null;
             }
 
-            if (is_numeric($idParty)) {
-                return redirect('/party/edit/'.$idParty)->with('success', Lang::get($autoapprove ?
-                                    'events.created_success_message_autoapproved' : 'events.created_success_message'));
-            }
-
-            return view('events.create', [
-                'title' => 'New Party',
-                'gmaps' => true,
-                'allGroups' => $allGroups,
-                'response' => $response,
-                'error' => $error,
-                'udata' => $_POST,
-                'user' => Auth::user(),
-                'user_groups' => $groupsUserIsInChargeOf,
-                'selected_group_id' => $group_id,
-                'userInChargeOfMultipleGroups' => $userInChargeOfMultipleGroups,
-                'autoapprove' => $autoapprove,
-            ]);
+            return redirect('/party/edit/'.$idParty)->with('success', Lang::get($autoapprove ?
+                                'events.created_success_message_autoapproved' : 'events.created_success_message'));
         }
+
 
         return view('events.create', [
             'title' => 'New Party',
@@ -401,10 +389,10 @@ class PartyController extends Controller
                 $results = $this->geocoder->geocode($data['location']);
 
                 if (empty($results)) {
-                    $response['danger'] = 'Party could not be saved. Address not found.';
+                    $response['danger'] = __('events.address_error');
                     \Sentry\CaptureMessage($response['danger']);
-                    $party = $Party->findThis($id)[0];
-                    $audits = Party::findOrFail($id)->audits;
+                    $party = Party::findOrFail($id);
+                    $audits = $party->audits;
 
                     return view('events.edit', [ //party.edit
                       'gmaps' => true,
@@ -634,7 +622,7 @@ class PartyController extends Controller
         }
 
         // Items can be logged at any time.
-        $stats = $event->getEventStats();
+        $stats = $event->getEventStats(null, null, true);
 
         return view('events.view', [
             'gmaps' => true,
@@ -839,7 +827,7 @@ class PartyController extends Controller
             'success' => false,
         ];
 
-        if ((Fixometer::hasRole(Auth::user(), 'Host') && Fixometer::userHasEditPartyPermission($event_id, Auth::user()->id)) || Fixometer::hasRole(Auth::user(), 'Administrator')) {
+        if ((Fixometer::hasRole(Auth::user(), 'Host') || Fixometer::hasRole(Auth::user(), 'NetworkCoordinator') && Fixometer::userHasEditPartyPermission($event_id, Auth::user()->id)) || Fixometer::hasRole(Auth::user(), 'Administrator')) {
             Party::find($event_id)->update([
                 'pax' => $quantity,
             ]);
@@ -861,7 +849,7 @@ class PartyController extends Controller
             'success' => false,
         ];
 
-        if ((Fixometer::hasRole(Auth::user(), 'Host') && Fixometer::userHasEditPartyPermission($event_id, Auth::user()->id)) || Fixometer::hasRole(Auth::user(), 'Administrator')) {
+        if ((Fixometer::hasRole(Auth::user(), 'Host') || Fixometer::hasRole(Auth::user(), 'NetworkCoordinator') && Fixometer::userHasEditPartyPermission($event_id, Auth::user()->id)) || Fixometer::hasRole(Auth::user(), 'Administrator')) {
             Party::find($event_id)->update([
                 'volunteers' => $quantity,
             ]);

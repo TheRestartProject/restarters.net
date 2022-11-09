@@ -91,6 +91,7 @@ class CheckTranslations extends Command
             'resources/views/',               // Blade templates
             'resources/js/components/',       // Vue templates
             'resources/js/mixins/',           // Vue mixins (rare)
+            'app/',                           // Models (rare)
             'app/Notifications/',             // Email notifications
             'app/Http/Controllers/',          // Controllers (rarely)
             'app/Http/Middleware/',           // Middleware(rarely)
