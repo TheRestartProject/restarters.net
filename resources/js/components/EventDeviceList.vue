@@ -4,16 +4,13 @@
       <b-thead>
         <b-tr>
           <b-th>
+            {{ __('devices.item_type_short') }}
+          </b-th>
+          <b-th>
             {{ __('devices.category') }}
           </b-th>
           <b-th v-if="powered" class="d-none d-md-table-cell">
               {{ __('devices.brand') }}
-          </b-th>
-          <b-th v-if="powered">
-            {{ __('devices.model') }}
-          </b-th>
-          <b-th v-if="!powered">
-            {{ __('devices.item_type') }}
           </b-th>
           <b-td v-if="!powered" class="d-table-cell d-md-none" />
           <b-th class="d-none d-md-table-cell">
