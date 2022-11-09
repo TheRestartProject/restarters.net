@@ -130,7 +130,6 @@ class GroupController extends Controller
                 $geocoded = $geocoder->geocode($location);
 
                 if (empty($geocoded)) {
-                    error_log("Geocode failed $location");
                     $response['danger'] = __('groups.geocode_failed');
                     \Sentry\CaptureMessage($response['danger']);
 
