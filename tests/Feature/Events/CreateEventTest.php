@@ -188,6 +188,7 @@ class CreateEventTest extends TestCase
         }
 
         // Approve the event.
+        echo "Approve\n";
         $event->approve();
 
         // Approval should generate a notification to the host.
@@ -229,6 +230,7 @@ class CreateEventTest extends TestCase
         $response = $this->get('/group/join/' . $group->idgroups);
         $this->assertTrue($response->isRedirection());
 
+        echo "Get /party\n";
         $response = $this->get('/party');
 
         $props = $this->assertVueProperties($response, [

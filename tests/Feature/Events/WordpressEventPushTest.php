@@ -58,8 +58,9 @@ class WordpressEventPushTest extends TestCase
            'events_push_to_wordpress' => true,
         ]);
         $group = factory(Group::class)->create([
-                                                   'approved' => true,
-                                               ]);
+            'wordpress_post_id' => 1,
+            'approved' => true,
+        ]);
         $network->addGroup($group);
         $event = factory(Party::class)->create([
             'group' => $group->idgroups,
@@ -92,6 +93,7 @@ class WordpressEventPushTest extends TestCase
 
         # Fake approval
         $event->approved = true;
+        $event->wordpress_post_id = 1;
         $event->save();
 
         # Edit event.
@@ -146,6 +148,7 @@ class WordpressEventPushTest extends TestCase
             'events_push_to_wordpress' => true,
         ]);
         $group = factory(Group::class)->create([
+                                                   'wordpress_post_id' => 1,
                                                    'approved' => true,
                                                ]);
         $restart->addGroup($group);
@@ -154,6 +157,7 @@ class WordpressEventPushTest extends TestCase
             'event_start_utc' => Carbon::parse('1pm tomorrow')->toIso8601String(),
             'event_end_utc' => Carbon::parse('3pm tomorrow')->toIso8601String()
         ]);
+        $event->wordpress_post_id = 100;
         $event->approved = true;
         $event->save();
 

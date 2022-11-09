@@ -36,6 +36,7 @@ class Party extends Model implements Auditable
         'volunteers',
         'hours',
         'wordpress_post_id',
+        'approved',
         'created_at',
         'updated_at',
         'shareable_code',

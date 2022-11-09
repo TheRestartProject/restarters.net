@@ -32,6 +32,7 @@ class Group extends Model implements Auditable
         'free_text',
         'facebook',
         'wordpress_post_id',
+        'approved',
         'shareable_code',
         'network_id',
         'external_id',

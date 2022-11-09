@@ -43,7 +43,8 @@ class CreateWordpressPostForEvent
             return;
         }
 
-        $theParty->update(['approve' => 'true']);
+        $theParty->approved = true;
+        $theParty->save();
 
         if (! $theParty->shouldPushToWordpress()) {
             Log::info('Approved - but events for groups in this network are not published to WordPress');
