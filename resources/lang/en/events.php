@@ -153,5 +153,5 @@ return [
   'review_requested' => 'Thanks - all Restarters that attended have been sent a notification',
   'review_requested_permissions' => 'Sorry - you do not have the correct permissions for this action',
   'you_have_joined' => 'You have joined <a class="plain-link" href=":url">:name</a>',
-  'discourse_intro' => "This is the volunteer discussion for the <a href=\":url\">:name event</a> being held on :start to :end.\r\n\r\nWe can use this thread in advance of the event to discuss logistics, and afterwards to discuss the repairs that we did.",
+  'discourse_intro' => "This is a private discussion for those volunteering at the <a href=\":url\">:name event</a> being held by <a href=\":groupurl\">:groupname</a> on :start to :end.\r\n\r\nWe can use this thread in advance of the event to discuss logistics, and afterwards to discuss the repairs that we did.\r\n\r\n<em>(This is an automated message.)</em>",
 ];
