@@ -59,7 +59,7 @@ class CreateDiscourseThreadForEvent
                 ]);
 
                 // Construct an intro.
-                $group = $theParty->group;
+                $group = $theParty->theGroup;
                 $intro = __('events.discourse_intro', [
                     'name' => $theParty->venue,
                     'url' => url('/party/view/' . $theParty->idevents),
