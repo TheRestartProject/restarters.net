@@ -321,7 +321,12 @@ export default {
         switch (key) {
           case 'date_short':
           case 'date_long':
-            ret = new moment(b.event_start_utc).unix() - new moment(a.event_start_utc).unix()
+            if (this.past) {
+              // Show past events most recent first.
+              ret = new moment(a.event_start_utc).unix() - new moment(b.event_start_utc).unix()
+            } else {
+              ret = new moment(b.event_start_utc).unix() - new moment(a.event_start_utc).unix()
+            }
             break
           case 'title':
             const atitle = a.venue ? a.venue : a.location

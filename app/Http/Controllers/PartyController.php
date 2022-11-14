@@ -69,8 +69,11 @@ class PartyController extends Controller
 
         // TODO LATER Consider whether these stats should be in the event or passed into the store.
         $thisone['stats'] = $event->getEventStats();
+
+        // These counts are separate from the list of participants - that list is of named individuals, but you
+        // can also just record a number, and that's what these are.
         $thisone['participants_count'] = $event->participants;
-        $thisone['volunteers_count'] = $event->allConfirmedVolunteers->count();
+        $thisone['volunteers_count'] = $event->volunteers;
 
         $thisone['isVolunteer'] = $event->isVolunteer();
         $thisone['requiresModeration'] = $event->requiresModerationByAdmin();

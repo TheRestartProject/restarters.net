@@ -122,18 +122,37 @@ class NetworkController extends Controller
      *              type="boolean"
      *          )
      *      ),
+     *      @OA\Parameter(
+     *          name="includeDetails",
+     *          description="Include the details for each group.  This makes the call significantly slower.  Default false.",
+     *          required=false,
+     *          in="query",
+     *          @OA\Schema(
+     *              type="boolean"
+     *          )
+     *      ),
      *      @OA\Response(
      *          response=200,
      *          description="Successful operation",
      *          @OA\JsonContent(
      *              @OA\Property(
-     *                property="data",
-     *                title="data",
-     *                description="An array of groups",
-     *                type="array",
-     *                @OA\Items(
-     *                    ref="#/components/schemas/GroupSummary"
-     *                 )
+     *                  property="data",
+     *                  title="data",
+     *                  description="An array of groups",
+     *                  oneOf={
+     *                      @OA\Schema(
+     *                          type="array",
+     *                          @OA\Items(
+     *                            ref="#/components/schemas/GroupSummary"
+     *                          )
+     *                      ),
+     *                      @OA\Schema(
+     *                          type="array",
+     *                          @OA\Items(
+     *                            ref="#/components/schemas/Group"
+     *                          )
+     *                      ),
+     *                  },
      *              )
      *          )
      *       ),
@@ -160,7 +179,12 @@ class NetworkController extends Controller
             ->where('groups.updated_at', '>=', $start)
             ->where('groups.updated_at', '<=', $end)->get();
 
-        return \App\Http\Resources\GroupSummaryCollection::make($groups);
+
+        if ($request->get('includeDetails', false)) {
+            return \App\Http\Resources\GroupCollection::make($groups);
+        } else {
+            return \App\Http\Resources\GroupSummaryCollection::make($groups);
+        }
     }
 
     /**
@@ -168,7 +192,7 @@ class NetworkController extends Controller
      *      path="/api/v2/networks/{id}/events",
      *      operationId="getNetworkEvents",
      *      tags={"Networks"},
-     *      summary="Get Network Groups",
+     *      summary="Get Network Events",
      *      description="Returns list of events for a network.",
      *      @OA\Parameter(
      *          name="id",
@@ -199,6 +223,15 @@ class NetworkController extends Controller
      *              example="2022-09-18T12:30:00+00:00"
      *          )
      *      ),
+     *      @OA\Parameter(
+     *          name="includeDetails",
+     *          description="Include the details for each event.  This makes the call significantly slower.  Default false.",
+     *          required=false,
+     *          in="query",
+     *          @OA\Schema(
+     *              type="boolean"
+     *          )
+     *      ),
      *      @OA\Response(
      *          response=200,
      *          description="Successful operation",
@@ -207,10 +240,20 @@ class NetworkController extends Controller
      *                property="data",
      *                title="data",
      *                description="An array of events",
-     *                type="array",
-     *                @OA\Items(
-     *                    ref="#/components/schemas/EventSummary"
-     *                 )
+     *                oneOf={
+     *                      @OA\Schema(
+     *                          type="array",
+     *                          @OA\Items(
+     *                             ref="#/components/schemas/EventSummary"
+     *                          )
+     *                      ),
+     *                      @OA\Schema(
+     *                          type="array",
+     *                          @OA\Items(
+     *                             ref="#/components/schemas/Event"
+     *                          )
+     *                      ),
+     *                  },
      *              )
      *          )
      *       ),
@@ -242,6 +285,10 @@ class NetworkController extends Controller
             ->select('events.*')
             ->get();
 
-        return \App\Http\Resources\PartySummaryCollection::make($events);
+        if ($request->get('includeDetails', false)) {
+            return \App\Http\Resources\PartyCollection::make($events);
+        } else {
+            return \App\Http\Resources\PartySummaryCollection::make($events);
+        }
     }
 }
