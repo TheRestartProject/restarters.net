@@ -787,6 +787,7 @@ class ComposerStaticInitf57f72b7adaf50a29437647288004820
         'App\\Http\\Resources\\NetworkSummary' => __DIR__ . '/../..' . '/app/Http/Resources/NetworkSummary.php',
         'App\\Http\\Resources\\NetworkSummaryCollection' => __DIR__ . '/../..' . '/app/Http/Resources/NetworkSummaryCollection.php',
         'App\\Http\\Resources\\Party' => __DIR__ . '/../..' . '/app/Http/Resources/Party.php',
+        'App\\Http\\Resources\\PartyCollection' => __DIR__ . '/../..' . '/app/Http/Resources/PartyCollection.php',
         'App\\Http\\Resources\\PartySummary' => __DIR__ . '/../..' . '/app/Http/Resources/PartySummary.php',
         'App\\Http\\Resources\\PartySummaryCollection' => __DIR__ . '/../..' . '/app/Http/Resources/PartySummaryCollection.php',
         'App\\Images' => __DIR__ . '/../..' . '/app/Images.php',

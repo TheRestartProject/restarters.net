@@ -273,6 +273,15 @@
                         "schema": {
                             "type": "boolean"
                         }
+                    },
+                    {
+                        "name": "includeDetails",
+                        "in": "query",
+                        "description": "Include the details for each group.  This makes the call significantly slower.  Default false.",
+                        "required": false,
+                        "schema": {
+                            "type": "boolean"
+                        }
                     }
                 ],
                 "responses": {
@@ -285,10 +294,20 @@
                                         "data": {
                                             "title": "data",
                                             "description": "An array of groups",
-                                            "type": "array",
-                                            "items": {
-                                                "$ref": "#/components/schemas/GroupSummary"
-                                            }
+                                            "oneOf": [
+                                                {
+                                                    "type": "array",
+                                                    "items": {
+                                                        "$ref": "#/components/schemas/GroupSummary"
+                                                    }
+                                                },
+                                                {
+                                                    "type": "array",
+                                                    "items": {
+                                                        "$ref": "#/components/schemas/Group"
+                                                    }
+                                                }
+                                            ]
                                         }
                                     },
                                     "type": "object"
@@ -307,7 +326,7 @@
                 "tags": [
                     "Networks"
                 ],
-                "summary": "Get Network Groups",
+                "summary": "Get Network Events",
                 "description": "Returns list of events for a network.",
                 "operationId": "getNetworkEvents",
                 "parameters": [
@@ -339,6 +358,15 @@
                             "type": "string",
                             "example": "2022-09-18T12:30:00+00:00"
                         }
+                    },
+                    {
+                        "name": "includeDetails",
+                        "in": "query",
+                        "description": "Include the details for each event.  This makes the call significantly slower.  Default false.",
+                        "required": false,
+                        "schema": {
+                            "type": "boolean"
+                        }
                     }
                 ],
                 "responses": {
@@ -351,10 +379,20 @@
                                         "data": {
                                             "title": "data",
                                             "description": "An array of events",
-                                            "type": "array",
-                                            "items": {
-                                                "$ref": "#/components/schemas/EventSummary"
-                                            }
+                                            "oneOf": [
+                                                {
+                                                    "type": "array",
+                                                    "items": {
+                                                        "$ref": "#/components/schemas/EventSummary"
+                                                    }
+                                                },
+                                                {
+                                                    "type": "array",
+                                                    "items": {
+                                                        "$ref": "#/components/schemas/Event"
+                                                    }
+                                                }
+                                            ]
                                         }
                                     },
                                     "type": "object"
@@ -997,6 +1035,13 @@
                 "type": "object",
                 "xml": {
                     "name": "Event"
+                }
+            },
+            "EventCollection": {
+                "title": "EventCollection",
+                "description": "A collection of events.",
+                "xml": {
+                    "name": "EventCollection"
                 }
             },
             "EventSummary": {

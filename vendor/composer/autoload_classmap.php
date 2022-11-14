@@ -144,6 +144,7 @@ return array(
     'App\\Http\\Resources\\NetworkSummary' => $baseDir . '/app/Http/Resources/NetworkSummary.php',
     'App\\Http\\Resources\\NetworkSummaryCollection' => $baseDir . '/app/Http/Resources/NetworkSummaryCollection.php',
     'App\\Http\\Resources\\Party' => $baseDir . '/app/Http/Resources/Party.php',
+    'App\\Http\\Resources\\PartyCollection' => $baseDir . '/app/Http/Resources/PartyCollection.php',
     'App\\Http\\Resources\\PartySummary' => $baseDir . '/app/Http/Resources/PartySummary.php',
     'App\\Http\\Resources\\PartySummaryCollection' => $baseDir . '/app/Http/Resources/PartySummaryCollection.php',
     'App\\Images' => $baseDir . '/app/Images.php',
