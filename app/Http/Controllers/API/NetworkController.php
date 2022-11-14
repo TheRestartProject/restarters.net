@@ -192,7 +192,7 @@ class NetworkController extends Controller
      *      path="/api/v2/networks/{id}/events",
      *      operationId="getNetworkEvents",
      *      tags={"Networks"},
-     *      summary="Get Network Groups",
+     *      summary="Get Network Events",
      *      description="Returns list of events for a network.",
      *      @OA\Parameter(
      *          name="id",
@@ -225,7 +225,7 @@ class NetworkController extends Controller
      *      ),
      *      @OA\Parameter(
      *          name="includeDetails",
-     *          description="Include the details for each group.  This makes the call significantly slower.  Default false.",
+     *          description="Include the details for each event.  This makes the call significantly slower.  Default false.",
      *          required=false,
      *          in="query",
      *          @OA\Schema(
