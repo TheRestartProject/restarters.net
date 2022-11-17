@@ -241,7 +241,7 @@ class Network extends JsonResource
         return [
             'id' => $this->id,
             'name' => $this->name,
-            'logo' => $this->logo && is_object($this->logo) && is_object($this->logo->image) ? $this->logo->image->path : null,
+            'logo' => $this->logo,
             'description' => $this->description,
             'website' => $this->website,
             'shortname' => $this->shortname,
