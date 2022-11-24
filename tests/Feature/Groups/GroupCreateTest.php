@@ -3,6 +3,7 @@
 namespace Tests\Feature\Groups;
 
 use App\Group;
+use App\GroupTags;
 use App\Network;
 use App\Notifications\GroupConfirmed;
 use App\Party;
@@ -66,6 +67,7 @@ class GroupCreateTest extends TestCase
         $network->addGroup($group);
 
         $network2 = factory(Network::class)->create();
+        $tag = factory(GroupTags::class)->create();
 
         if ($role == 'NetworkCoordinator') {
             $network->addCoordinator($actas);
@@ -101,7 +103,8 @@ class GroupCreateTest extends TestCase
             'moderate' => 'approve',
             'area' => 'London',
             'postcode' => 'SW9 7QD',
-            'networks' => [ $network->id, $network2->id ],
+            'networks' => json_encode([ $network->id, $network2->id ]),
+            'tags' => json_encode([ $tag->id ]),
         ]);
 
         $response->assertSuccessful();
@@ -122,13 +125,15 @@ class GroupCreateTest extends TestCase
 
         $group->refresh();
         if ($role == 'NetworkCoordinator') {
-            // Attempt to edit the networks should be ignored.
+            // Attempt to edit the networks or tags should be ignored.
             $this->assertTrue($group->networks->contains($network));
             $this->assertFalse($group->networks->contains($network2));
+            $this->assertFalse($group->group_tags->contains($tag));
         } else if ($role == 'Administrator') {
-            // Administrators can edit networks.
+            // Administrators can edit networks and tags.
             $this->assertTrue($group->networks->contains($network));
             $this->assertTrue($group->networks->contains($network2));
+            $this->assertTrue($group->group_tags->contains($tag));
         }
     }
 

@@ -29,7 +29,12 @@ export default {
   state: {
     // List of groups indexed by group id.  Use object rather than array so that it's sparse.
     list: {},
+
+    // Groups requiring moderation.
     moderate: {},
+
+    // Group tags.
+    tags: {},
 
     // List of stats indexed by group id.
     stats: {}
@@ -40,6 +45,9 @@ export default {
     },
     list: state => {
       return Object.values(state.list)
+    },
+    listTags: state => {
+      return Object.values(state.tags)
     },
     getModerate: state => state.moderate,
     getStats: state => idgroups => {
@@ -57,6 +65,14 @@ export default {
       })
 
       state.list = list
+    },
+    setTags(state, params) {
+      let list = {}
+      params.tags.forEach(e => {
+        list[e.id] = e
+      })
+
+      state.tags = list
     },
     setModerate(state, params) {
       params.forEach(e => {
@@ -114,6 +130,14 @@ export default {
       if (ret && ret.data) {
         commit('setList', {
           groups: ret.data.data
+        })
+      }
+    },
+    async listTags({commit}) {
+      let ret = await axios.get('/api/v2/groups/tags')
+      if (ret && ret.data) {
+        commit('setTags', {
+          tags: ret.data.data
         })
       }
     },

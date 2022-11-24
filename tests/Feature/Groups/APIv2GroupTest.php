@@ -3,6 +3,7 @@
 namespace Tests\Feature;
 
 use App\Group;
+use App\GroupTags;
 use App\Network;
 use App\User;
 use Carbon\Carbon;
@@ -240,5 +241,22 @@ class APIv2GroupTest extends TestCase
             'location' => 'London',
             'description' => 'Some text.',
         ]);
+    }
+
+    public function testTags() {
+        $tag = factory(GroupTags::class)->create();
+        $response = $this->get('/api/v2/groups/tags', []);
+        $response->assertSuccessful();
+        $json = json_decode($response->getContent(), true);
+        self::assertEquals($tag->id, $json['data'][0]['id']);
+
+        $group = factory(Group::class)->create();
+        $tag = factory(GroupTags::class)->create();
+        $group->addTag($tag);
+
+        $response = $this->get("/api/v2/groups/{$group->idgroups}", []);
+        $response->assertSuccessful();
+        $json = json_decode($response->getContent(), true);
+        self::assertEquals($tag->id, $json['data']['tags'][0]['id']);
     }
 }

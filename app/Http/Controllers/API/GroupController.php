@@ -5,9 +5,11 @@ namespace App\Http\Controllers\API;
 use App\Events\ApproveGroup;
 use App\Events\EditGroup;
 use App\Group;
+use App\GroupTags;
 use App\Helpers\Fixometer;
 use App\Http\Controllers\Controller;
 use App\Http\Resources\PartySummaryCollection;
+use App\Http\Resources\TagCollection;
 use App\Network;
 use App\Notifications\AdminModerationGroup;
 use App\Notifications\GroupConfirmed;
@@ -256,6 +258,13 @@ class GroupController extends Controller
 
         return [
             'data' => $ret
+        ];
+    }
+
+    // TODO Add to OpenAPI.
+    public static function listTagsv2(Request $request) {
+        return [
+            'data' => TagCollection::make(GroupTags::all())
         ];
     }
 
@@ -625,9 +634,17 @@ class GroupController extends Controller
                 $networks = json_decode($networks);
                 $group->networks()->sync($networks);
             }
-        }
 
-        // TODO  tags
+            // We can update the tags.  The parameter is an array of ids.
+            // TODO The old code restricts updating tags to admins.  But I wonder if it should include
+            // networks coordinators too.
+            $tags = $request->tags;
+
+            if ($tags) {
+                $tags = json_decode($tags);
+                $group->group_tags()->sync($tags);
+            }
+        }
 
         if ($timezone != $old_zone) {
             // The timezone of the group has changed.  Update the zone of any future events.  This happens

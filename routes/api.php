@@ -72,6 +72,7 @@ Route::get('/timezones', [App\Http\Controllers\ApiController::class, 'timezones'
 Route::group(['prefix' => 'v2'], function() {
     Route::prefix('/groups')->group(function() {
         Route::get('/names', 'API\GroupController@listNamesv2');
+        Route::get('/tags', 'API\GroupController@listTagsv2');
         Route::get('{id}/events', 'API\GroupController@getEventsForGroupv2');
         Route::get('{id}', 'API\GroupController@getGroupv2');
         Route::post('', 'API\GroupController@createGroupv2');

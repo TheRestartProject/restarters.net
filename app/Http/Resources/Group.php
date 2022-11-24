@@ -135,6 +135,30 @@ class Group extends JsonResource
 
     /**
      *     @OA\Property(
+     *         property="networks",
+     *         title="networks",
+     *         description="An array of networks of which the group is a member.",
+     *         type="array",
+     *         @OA\Items(
+     *            ref="#/components/schemas/NetworkSummary"
+     *         )
+     *     )
+     */
+
+    /**
+     *     @OA\Property(
+     *         property="tags",
+     *         title="tags",
+     *         description="An array of tags which apply to the group.",
+     *         type="array",
+     *         @OA\Items(
+     *            ref="#/components/schemas/Tag"
+     *         )
+     *     )
+     */
+
+    /**
+     *     @OA\Property(
      *          property="stats",
      *          title="stats",
      *          description="An array of statistics about the activity of a group.",
@@ -289,7 +313,8 @@ class Group extends JsonResource
             'stats' => $stats,
             'updated_at' => Carbon::parse($this->updated_at)->toIso8601String(),
             'location' => new GroupLocation($this),
-            'networks' => $this->resource->networks,
+            'networks' => new NetworkSummaryCollection($this->networks),
+            'tags' => new TagCollection($this->group_tags),
             'timezone' => $this->timezone,
             'approved' => $this->wordpress_post_id != null,
         ];

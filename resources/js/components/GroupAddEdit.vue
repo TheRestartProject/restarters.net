@@ -1,8 +1,6 @@
 <template>
   <div>
     TODO Postcode/area for admins only
-    TODO Tags
-    TODO Networks
     <p v-if="creating">
       {{ __('groups.add_groups_content') }}
     </p>
@@ -79,20 +77,38 @@
           ref="image"
       />
       <b-card v-if="canApprove" no-body class="group-admin">
-        <b-card-title>
+        <b-card-header>
           <b-img src="/images/cog.svg" />
           {{ __('groups.group_admin_only') }}
-        </b-card-title>
+        </b-card-header>
         <b-card-body>
-          <div>
-            <label class="groups-networks-label" for="networks">
+          <div v-if="canNetwork">
+            <label for="networks">
               {{ __('networks.networks') }}
             </label>
             <multiselect
                 id="networks"
                 v-model="networkList"
-                :placeholder="__('networks.network')"
                 :options="networkOptions"
+                track-by="id"
+                label="name"
+                multiple
+                deselect-label=""
+                :taggable="false"
+                selectLabel=""
+                class="m-0 mb-1 mb-md-0"
+                allow-empty
+                :selectedLabel="__('partials.remove')"
+            />
+          </div>
+          <div class="mt-2" v-if="canNetwork">
+            <label for="tags">
+              {{ __('groups.group_tags') }}
+            </label>
+            <multiselect
+                id="tags"
+                v-model="tagList"
+                :options="tagOptions"
                 track-by="id"
                 label="name"
                 multiple
@@ -157,7 +173,6 @@ import GroupPhone from './GroupPhone'
 import GroupImage from './GroupImage'
 
 function geocodeableValidation () {
-  console.log("Validate location", this.lat, this.lng, this.lat !== null && this.lng !== null)
   return this.lat !== null && this.lng !== null
 }
 
@@ -209,7 +224,8 @@ export default {
       ready: false,
       approved: false,
       edited: false,
-      networkList: null
+      networkList: null,
+      tagList: null
     }
   },
   validations: {
@@ -273,6 +289,16 @@ export default {
         }
       }) : []
     },
+    tagOptions() {
+      const tags = this.$store.getters['groups/listTags']
+
+      return tags ? tags.map(n => {
+        return {
+          id: n.id,
+          name: n.name
+        }
+      }) : []
+    },
   },
   async mounted () {
     // Fetch the list of groups, so that we can ensure group names are unique.  No need to await because the check
@@ -298,12 +324,15 @@ export default {
       this.image = group.image
       this.approved = group.approved
       this.networkList = group.networks
-      console.log("Got group", group)
+      this.tagList = group.tags
     }
 
     if (this.canNetwork) {
       // Fetch the list of networks.
       this.$store.dispatch('networks/list')
+
+      // Fetch the list of tags.
+      this.$store.dispatch('groups/listTags')
     }
 
     this.ready = true
@@ -359,7 +388,8 @@ export default {
                 phone: this.phone,
                 image: this.image,
                 moderate: this.moderate,
-                networks: JSON.stringify(this.networkList.map(n => n.id))
+                networks: JSON.stringify(this.networkList.map(n => n.id)),
+                tags: JSON.stringify(this.tagList.map(n => n.id))
               })
 
               if (id) {
