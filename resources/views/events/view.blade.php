@@ -80,7 +80,7 @@
               $group_image->image->path;
           }
 
-          $discourseThread = $is_attending ? (env('DISCOURSE_URL').'/t/'.$event->discourse_thread) : null;
+          $discourseThread = ($is_attending && $event->discourse_thread) ? (env('DISCOURSE_URL').'/t/'.$event->discourse_thread) : null;
 
           $collected_images = [];
 

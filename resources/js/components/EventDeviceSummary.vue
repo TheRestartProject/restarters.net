@@ -2,22 +2,29 @@
   <transition name="recent">
     <b-tr v-if="!editing" :key="'summary-' + device.iddevices">
       <b-td>
+        <span v-if="device.item_type">
+          {{ device.item_type }}
+        </span>
+        <em v-else class="text-muted">
+          -
+        </em>
+      </b-td>
+      <b-td>
         <h3 class="noheader">
-          {{ translatedName }}
+          {{ translatedCategoryName }}
         </h3>
         <div class="d-block d-md-none">
           <div :class="badgeClass + ' d-block d-md-none'">
             {{ status }}
           </div>
-          <b-img v-if="sparePartsNeeded" src="/images/tick.svg" class="icon" />
+          <b-img v-if="sparePartsNeeded" src="/images/tick.svg" class="icon spare-parts" />
         </div>
       </b-td>
       <b-td class="d-none d-md-table-cell" v-if="powered">
           {{ device.brand }}
       </b-td>
-      <b-td v-if="powered">
-        {{ device.model }}
-        <div class="d-block d-md-none">
+      <b-td v-if="powered" class="d-block d-md-none">
+        <div>
           <span class="pl-0 pl-md-2 pr-2 clickme edit" @click="editDevice">
             <b-img class="icon edit" src="/icons/edit_ico_green.svg" />
           </span>
@@ -26,9 +33,8 @@
           </span>
         </div>
       </b-td>
-      <b-td v-if="!powered">
-        {{ device.item_type }}
-        <div class="d-block d-md-none">
+      <b-td v-if="!powered" class="d-block d-md-none">
+        <div>
           <span class="pl-0 pl-md-2 pr-2 clickme edit" @click="editDevice">
             <b-img class="icon" src="/icons/edit_ico_green.svg" />
           </span>
@@ -49,7 +55,7 @@
         </span>
       </b-td>
       <b-td class="text-center d-none d-md-table-cell">
-        <b-img v-if="sparePartsNeeded" src="/images/tick.svg" class="icon" />
+        <b-img v-if="sparePartsNeeded" src="/images/tick.svg" class="icon spare-parts-tick" />
       </b-td>
       <b-td v-if="canedit" class="text-right d-none d-md-table-cell">
         <div class="d-flex">
@@ -126,7 +132,7 @@ export default {
     }
   },
   computed: {
-    translatedName() {
+    translatedCategoryName() {
       return this.$lang.get('strings.' + this.device.category.name)
     },
     powered() {
