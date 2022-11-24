@@ -24,14 +24,9 @@
     </b-form-group>
     <b-form-group>
       <label for="group_postcode">{{ __('groups.postcode') }}:</label>
-      <b-input type="url" id="group_postcode" name="postcode" v-model="currentPostcode" :class="{ hasError: hasError }"/>
+      <b-input type="url" id="group_postcode" name="postcode" v-model="currentPostcode" :class="{ hasError: hasError }" :readonly="!canEditPostcode" />
       <small>{{ __('groups.groups_postcode_small') }}</small>
     </b-form-group>
-    <!-- TODO area should be admin only, in that section -->
-<!--    <b-form-group>-->
-<!--      <label for="group_area">{{ __('groups.area') }}:</label>-->
-<!--      <b-input type="url" id="group_area" name="area" v-model="currentArea" :class="{ hasError: hasError }"/>-->
-<!--    </b-form-group>-->
   </div>
 </template>
 <script>
@@ -82,6 +77,11 @@ export default {
       type: Boolean,
       required: false,
       default: false
+    },
+    canEditPostcode: {
+      type: Boolean,
+      required: false,
+      default: false
     }
   },
   components: {
@@ -92,22 +92,17 @@ export default {
       currentValue: null,
       location: null,
       currentPostcode: null,
-      currentArea: null,
       timer: null,
     }
   },
   mounted() {
     this.currentValue = this.value
     this.currentPostcode = this.postcode
-    this.currentArea = this.area
     this.$refs.autocomplete.update(this.currentValue)
   },
   watch: {
-    postcode(newVal) {
+    currentPostcode(newVal) {
       this.$emit('update:postcode', newVal)
-    },
-    area(newVal) {
-      this.$emit('update:area', newVal)
     },
   },
   methods: {

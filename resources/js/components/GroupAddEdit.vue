@@ -1,6 +1,5 @@
 <template>
   <div>
-    TODO Postcode/area for admins only
     <p v-if="creating">
       {{ __('groups.add_groups_content') }}
     </p>
@@ -37,9 +36,9 @@
         </b-form-group>
       </div>
       <!-- These are inputs for playwright testing. -->
-      <input type="text" id="lat" name="lat" v-model="lat" style="width: 1px; height: 1px; position: fixed; bottom: 0px; left: 0px;" />
-      <input type="text" id="lng" name="lng" v-model="lng"  style="width: 1px; height: 1px; position: fixed; bottom: 0px; left: 2px;" />
-      <input type="text" id="location" name="location" v-model="location"  style="width: 1px; height: 1px; position: fixed; bottom: 0px; left: 3px;" />
+      <input type="text" id="lat" name="lat" v-model="lat" style="width: 1px; height: 1px; position: fixed; bottom: 65px; left: 0px;" />
+      <input type="text" id="lng" name="lng" v-model="lng"  style="width: 1px; height: 1px; position: fixed; bottom: 65px; left: 2px;" />
+      <input type="text" id="location" name="location" v-model="location"  style="width: 1px; height: 1px; position: fixed; bottom: 65px; left: 4px;" />
 
       <GroupLocation
           :all-groups="groups"
@@ -47,7 +46,7 @@
           :lat.sync="lat"
           :lng.sync="lng"
           :postcode.sync="postcode"
-          :area.sync="area"
+          :can-edit-postcode="canApprove"
           class="group-location"
           :has-error="$v.location.$error"
           ref="location"
@@ -119,6 +118,12 @@
                 allow-empty
                 :selectedLabel="__('partials.remove')"
             />
+          </div>
+          <div class="mt-2">
+            <b-form-group>
+              <label for="group_area">{{ __('groups.area') }}:</label>
+              <b-input id="group_area" name="area" v-model="area" :class="{ hasError: hasError }" />
+            </b-form-group>
           </div>
           <div class="mt-2" v-if="!approved && canApprove">
             <b-form-group>

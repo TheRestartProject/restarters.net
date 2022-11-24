@@ -601,10 +601,10 @@ class GroupController extends Controller
             'phone' => $phone,
         ];
 
-        if (!$user->hasRole('Administrator') && !$user->hasRole('NetworkCoordinator')) {
+        if ($user->hasRole('Administrator') || $user->hasRole('NetworkCoordinator')) {
             // Not got permission to update these.
-            unset($data['area']);
-            unset($data['postcode']);
+            $data['area'] = $request->area;
+            $data['postcode'] = $request->postcode;
         }
 
         if (isset($_FILES) && !empty($_FILES)) {
