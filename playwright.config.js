@@ -58,7 +58,7 @@ const config = {
   },
 
   // Flakiness
-  timeout: 5 * 60 * 1000,
+  timeout: 10 * 60 * 1000,
   navigationTimeout: 30 * 1000
 };
 
