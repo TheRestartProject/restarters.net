@@ -76,50 +76,55 @@ class ExportTest extends TestCase
 
         // Export devices.
         $response = $this->get("/export/devices");
+        $header = $response->headers->get('content-disposition');
+        $filename = public_path() . '/' . substr($header, strpos($header, 'filename=') + 9);
 
-        $filename = public_path() . '/devices.csv';
         $fh = fopen($filename, 'r');
         fgetcsv($fh);
         $row2 = fgetcsv($fh);
-        self::assertEquals(e($event1->getEventName()), e($row2[6]));
+        self::assertEquals(e($event1->getEventName()), e($row2[7]));
         $row3 = fgetcsv($fh);
-        self::assertEquals(e($event2->getEventName()), e($row3[6]));
+        self::assertEquals(e($event2->getEventName()), e($row3[7]));
 
         // Export devices for a particular event.
         $response = $this->get("/export/devices/event/$idevents1");
-        $filename = public_path() . '/devices.csv';
+        $header = $response->headers->get('content-disposition');
+        $filename = public_path() . '/' . substr($header, strpos($header, 'filename=') + 9);
         $fh = fopen($filename, 'r');
         fgetcsv($fh);
         $row2 = fgetcsv($fh);
-        self::assertEquals(e($event1->getEventName()), e($row2[6]));
+        self::assertEquals(e($event1->getEventName()), e($row2[7]));
         $row3 = fgetcsv($fh);
         self::assertFalse($row3);
 
         $response = $this->get("/export/devices/event/$idevents2");
-        $filename = public_path() . '/devices.csv';
+        $header = $response->headers->get('content-disposition');
+        $filename = public_path() . '/' . substr($header, strpos($header, 'filename=') + 9);
         $fh = fopen($filename, 'r');
         fgetcsv($fh);
         $row2 = fgetcsv($fh);
-        self::assertEquals(e($event2->getEventName()), e($row2[6]));
+        self::assertEquals(e($event2->getEventName()), e($row2[7]));
         $row3 = fgetcsv($fh);
         self::assertFalse($row3);
 
         // Export devices for a particular group.
         $response = $this->get("/export/devices/group/{$group1->idgroups}");
-        $filename = public_path() . '/devices.csv';
+        $header = $response->headers->get('content-disposition');
+        $filename = public_path() . '/' . substr($header, strpos($header, 'filename=') + 9);
         $fh = fopen($filename, 'r');
         fgetcsv($fh);
         $row2 = fgetcsv($fh);
-        self::assertEquals(e($event1->getEventName()), e($row2[6]));
+        self::assertEquals(e($event1->getEventName()), e($row2[7]));
         $row3 = fgetcsv($fh);
         self::assertFalse($row3);
 
         $response = $this->get("/export/devices/group/{$group2->idgroups}");
-        $filename = public_path() . '/devices.csv';
+        $header = $response->headers->get('content-disposition');
+        $filename = public_path() . '/' . substr($header, strpos($header, 'filename=') + 9);
         $fh = fopen($filename, 'r');
         fgetcsv($fh);
         $row2 = fgetcsv($fh);
-        self::assertEquals(e($event2->getEventName()), e($row2[6]));
+        self::assertEquals(e($event2->getEventName()), e($row2[7]));
         $row3 = fgetcsv($fh);
         self::assertFalse($row3);
 

@@ -22,7 +22,7 @@
             {{ __('events.share_event_stats') }}
           </b-dropdown-item>
           <b-dropdown-item :href="'/export/devices/event/' + idevents">
-            {{ __('devices.export_device_data') }}
+            {{ __('devices.export_event_data') }}
           </b-dropdown-item>
         </div>
         <div v-else>

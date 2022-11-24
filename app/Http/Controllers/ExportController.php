@@ -9,9 +9,11 @@ use App\GroupTags;
 use App\GrouptagsGroups;
 use App\Helpers\Fixometer;
 use App\Helpers\SearchHelper;
+use App\Party;
 use App\Search;
 use App\UserGroups;
 use Auth;
+use Carbon\Carbon;
 use DateTime;
 use DB;
 use Illuminate\Http\Request;
@@ -51,12 +53,28 @@ class ExportController extends Controller
         $uEmissionratio = \App\Helpers\LcaStats::getEmissionRatioUnpowered();
 
         // Create CSV
-        $filename = base_path() . DIRECTORY_SEPARATOR . 'public' . DIRECTORY_SEPARATOR . 'devices.csv';
-        $file = fopen($filename, 'w+');
+        $filename = 'repair-data';
+
+        if ($idevents != NULL) {
+            $event = Party::findOrFail($idevents);
+            $eventName = $event->venue ? $event->venue : $event->location;
+            $eventName = iconv("UTF-8", "ISO-8859-9//TRANSLIT", $eventName);
+            $eventName = str_replace(' ', '-', $eventName);
+            $filename .= '-' . $eventName . '-' . (new Carbon($event->event_start_utc))->format('Y-m-d');
+        } else if ($idgroups != NULL) {
+            $group = Group::findOrFail($idgroups);
+            $groupName = iconv("UTF-8", "ISO-8859-9//TRANSLIT", $group->name);
+            $groupName = str_replace(' ', '-', $groupName);
+            $filename .= '-' . $groupName;
+        }
+
+        $filename .= '.csv';
+        $file = fopen(base_path() . DIRECTORY_SEPARATOR . 'public' . DIRECTORY_SEPARATOR . $filename, 'w+');
 
         // Do not include model column
         if ($host == 'therestartproject.org') {
             $columns = [
+                'Item Type',
                 'Product Category',
                 'Brand',
                 'Comments',
@@ -86,6 +104,7 @@ class ExportController extends Controller
                 }
 
                 fputcsv($file, [
+                    $device->item_type,
                     $device->deviceCategory->name,
                     $device->brand,
                     $device->problem,
@@ -100,6 +119,7 @@ class ExportController extends Controller
             }
         } else {
             $columns = [
+                'Item Type',
                 'Product Category',
                 'Brand',
                 'Model',
@@ -130,6 +150,7 @@ class ExportController extends Controller
                 }
 
                 fputcsv($file, [
+                    $device->item_type,
                     $device->deviceCategory->name,
                     $device->brand,
                     $device->model,
@@ -151,7 +172,7 @@ class ExportController extends Controller
             'Content-Type' => 'text/csv',
         ];
 
-        return Response::download($filename, 'devices.csv', $headers);
+        return Response::download(base_path() . DIRECTORY_SEPARATOR . 'public' . DIRECTORY_SEPARATOR . $filename, $filename, $headers);
     }
 
     /**
