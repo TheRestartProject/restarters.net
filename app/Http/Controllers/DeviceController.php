@@ -161,6 +161,7 @@ class DeviceController extends Controller
             $device[$i]->repaired_by = Auth::id();
 
             $device[$i]->save();
+            $device[$i]->refresh();
 
             event(new DeviceCreatedOrUpdated($device[$i]));
 
