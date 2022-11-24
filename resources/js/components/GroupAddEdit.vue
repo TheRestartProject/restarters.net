@@ -37,8 +37,8 @@
       </div>
       <!-- These are inputs for playwright testing. -->
       <input type="text" id="lat" name="lat" v-model="lat" style="width: 1px; height: 1px; position: fixed; bottom: 65px; left: 0px;" />
-      <input type="text" id="lng" name="lng" v-model="lng"  style="width: 1px; height: 1px; position: fixed; bottom: 65px; left: 2px;" />
-      <input type="text" id="location" name="location" v-model="location"  style="width: 1px; height: 1px; position: fixed; bottom: 65px; left: 4px;" />
+      <input type="text" id="lng" name="lng" v-model="lng"  style="width: 1px; height: 1px; position: fixed; bottom: 65px; left: 10px;" />
+      <input type="text" id="location" name="location" v-model="location"  style="width: 1px; height: 1px; position: fixed; bottom: 65px; left: 20px;" />
 
       <GroupLocation
           :all-groups="groups"
