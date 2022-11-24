@@ -18,7 +18,10 @@
             <div class="tab-content">
               <div class="tab-pane active" id="details">
                 <div class="vue">
-                  <GroupAddEditPage :idgroups="{{ $id }}" :can-approve="{{ (Auth::user()->hasRole('Administrator') || Auth::user()->hasRole('NetworkCoordinator')) ? "true" : "false" }}" />
+                  <GroupAddEditPage :idgroups="{{ $id }}"
+                                    :can-approve="{{ (Auth::user()->hasRole('Administrator') || Auth::user()->hasRole('NetworkCoordinator')) ? "true" : "false" }}"
+                                    :can-network="{{ Auth::user()->hasRole('Administrator') ? "true" : "false" }}"
+                  />
                 </div>
               </div>
               @if( $audits && App\Helpers\Fixometer::hasRole(Auth::user(), 'Administrator') )

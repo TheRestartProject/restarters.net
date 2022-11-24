@@ -6,6 +6,7 @@ import devicesModule from './devices';
 import eventsModule from './events';
 import groupsModule from './groups';
 import volunteersModule from './volunteers';
+import networksModule from './networks';
 
 Vue.use(Vuex);
 
@@ -16,6 +17,7 @@ export default new Vuex.Store({
     devices: devicesModule,
     events: eventsModule,
     groups: groupsModule,
-    volunteers: volunteersModule
+    volunteers: volunteersModule,
+    networks: networksModule,
   },
 });

@@ -617,7 +617,17 @@ class GroupController extends Controller
 
         $group->update($data);
 
-        // TODO Networks, tags
+        if (Fixometer::hasRole($user, 'Administrator')) {
+            // We can update the networks.  The parameter is an array of ids.
+            $networks = $request->networks;
+
+            if ($networks) {
+                $networks = json_decode($networks);
+                $group->networks()->sync($networks);
+            }
+        }
+
+        // TODO  tags
 
         if ($timezone != $old_zone) {
             // The timezone of the group has changed.  Update the zone of any future events.  This happens

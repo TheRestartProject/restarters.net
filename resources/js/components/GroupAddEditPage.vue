@@ -4,7 +4,7 @@
     <h1 v-else>{{ __('general.new_group') }}</h1>
     <b-card no-body class="box mt-4">
       <b-card-body class="p-4">
-        <GroupAddEdit :idgroups="idgroups" :can-approve="canApprove" />
+        <GroupAddEdit :idgroups="idgroups" :can-approve="canApprove" :can-network="canNetwork" />
       </b-card-body>
     </b-card>
   </div>
@@ -26,7 +26,12 @@ export default {
       type: Boolean,
       required: false,
       default: false
-    }
+    },
+    canNetwork: {
+      type: Boolean,
+      required: false,
+      default: false
+    },
   },
 }
 </script>

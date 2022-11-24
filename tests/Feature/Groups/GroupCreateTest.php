@@ -65,6 +65,8 @@ class GroupCreateTest extends TestCase
         $group = Group::find($idgroups);
         $network->addGroup($group);
 
+        $network2 = factory(Network::class)->create();
+
         if ($role == 'NetworkCoordinator') {
             $network->addCoordinator($actas);
         }
@@ -81,8 +83,14 @@ class GroupCreateTest extends TestCase
             ],
         ]);
 
-        $admin2 = factory(User::class)->state('Administrator')->create();
-        $this->actingAs($admin2);
+        // Log in as someone else with the same role so that the GroupConfirmed notification gets sent.
+        $actas2 = factory(User::class)->state($role)->create();
+
+        if ($role == 'NetworkCoordinator') {
+            $network->addCoordinator($actas2);
+        }
+
+        $this->actingAs($actas2);
 
         $response = $this->patch('/api/v2/groups/' . $idgroups, [
             'description' => 'Test',
@@ -92,7 +100,8 @@ class GroupCreateTest extends TestCase
             'free_text' => 'HQ',
             'moderate' => 'approve',
             'area' => 'London',
-            'postcode' => 'SW9 7QD'
+            'postcode' => 'SW9 7QD',
+            'networks' => [ $network->id, $network2->id ],
         ]);
 
         $response->assertSuccessful();
@@ -110,6 +119,17 @@ class GroupCreateTest extends TestCase
                 return true;
             }
         );
+
+        $group->refresh();
+        if ($role == 'NetworkCoordinator') {
+            // Attempt to edit the networks should be ignored.
+            $this->assertTrue($group->networks->contains($network));
+            $this->assertFalse($group->networks->contains($network2));
+        } else if ($role == 'Administrator') {
+            // Administrators can edit networks.
+            $this->assertTrue($group->networks->contains($network));
+            $this->assertTrue($group->networks->contains($network2));
+        }
     }
 
     public function testEventVisibility() {

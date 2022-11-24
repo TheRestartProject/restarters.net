@@ -39,9 +39,9 @@
         </b-form-group>
       </div>
       <!-- These are inputs for playwright testing. -->
-      <input type="text" id="lat" name="lat" v-model="lat" style="width: 1px; height: 1px;" />
-      <input type="text" id="lng" name="lng" v-model="lng"  style="width: 1px; height: 1px;" />
-      <input type="text" id="location" name="location" v-model="location"  style="width: 1px; height: 1px;" />
+      <input type="text" id="lat" name="lat" v-model="lat" style="width: 1px; height: 1px; position: fixed; bottom: 0px; left: 0px;" />
+      <input type="text" id="lng" name="lng" v-model="lng"  style="width: 1px; height: 1px; position: fixed; bottom: 0px; left: 2px;" />
+      <input type="text" id="location" name="location" v-model="location"  style="width: 1px; height: 1px; position: fixed; bottom: 0px; left: 3px;" />
 
       <GroupLocation
           :all-groups="groups"
@@ -78,18 +78,46 @@
           class="group-image"
           ref="image"
       />
+      <b-card v-if="canApprove" no-body class="group-admin">
+        <b-card-title>
+          <b-img src="/images/cog.svg" />
+          {{ __('groups.group_admin_only') }}
+        </b-card-title>
+        <b-card-body>
+          <div>
+            <label class="groups-networks-label" for="networks">
+              {{ __('networks.networks') }}
+            </label>
+            <multiselect
+                id="networks"
+                v-model="networkList"
+                :placeholder="__('networks.network')"
+                :options="networkOptions"
+                track-by="id"
+                label="name"
+                multiple
+                deselect-label=""
+                :taggable="false"
+                selectLabel=""
+                class="m-0 mb-1 mb-md-0"
+                allow-empty
+                :selectedLabel="__('partials.remove')"
+            />
+          </div>
+          <div class="mt-2" v-if="!approved && canApprove">
+            <b-form-group>
+              <label class="groups-tags-label" for="moderate">
+                {{ __('groups.approve_group') }}
+              </label>
+              <b-select v-model="moderate" name="moderate">
+                <option></option>
+                <option value="approve">Approve</option>
+              </b-select>
+            </b-form-group>
+          </div>
+        </b-card-body>
+      </b-card>
 
-      <div class="group-approve" v-if="!approved && canApprove">
-        <b-form-group>
-          <label class="groups-tags-label" for="moderate">
-            <b-img src="/images/cog.svg" />
-            {{ __('groups.approve_group') }}</label>
-          <b-select v-model="moderate" name="moderate">
-            <option></option>
-            <option value="approve">Approve</option>
-          </b-select>
-        </b-form-group>
-      </div>
       <div class="group-buttons text-right">
         <p v-if="edited" class="text-success font-weight-bold" v-html="__('groups.edit_succeeded')" />
         <div v-else-if="failed">
@@ -155,7 +183,12 @@ export default {
       type: Boolean,
       required: false,
       default: false
-    }
+    },
+    canNetwork: {
+      type: Boolean,
+      required: false,
+      default: false
+    },
   },
   data () {
     return {
@@ -175,7 +208,8 @@ export default {
       image: null,
       ready: false,
       approved: false,
-      edited: false
+      edited: false,
+      networkList: null
     }
   },
   validations: {
@@ -228,7 +262,17 @@ export default {
       return this.$lang.get('groups.duplicate', {
         name: this.name
       })
-    }
+    },
+    networkOptions() {
+      const networks = this.$store.getters['networks/list']
+
+      return networks ? networks.map(n => {
+        return {
+          id: n.id,
+          name: n.name
+        }
+      }) : []
+    },
   },
   async mounted () {
     // Fetch the list of groups, so that we can ensure group names are unique.  No need to await because the check
@@ -253,6 +297,13 @@ export default {
       this.lng = parseFloat(group.location.lng)
       this.image = group.image
       this.approved = group.approved
+      this.networkList = group.networks
+      console.log("Got group", group)
+    }
+
+    if (this.canNetwork) {
+      // Fetch the list of networks.
+      this.$store.dispatch('networks/list')
     }
 
     this.ready = true
@@ -307,7 +358,8 @@ export default {
                 timezone: this.timezone,
                 phone: this.phone,
                 image: this.image,
-                moderate: this.moderate
+                moderate: this.moderate,
+                networks: JSON.stringify(this.networkList.map(n => n.id))
               })
 
               if (id) {
@@ -426,7 +478,7 @@ export default {
     }
   }
 
-  .group-approve {
+  .group-admin {
     grid-row: 9 / 10;
     grid-column: 1 / 2;
 

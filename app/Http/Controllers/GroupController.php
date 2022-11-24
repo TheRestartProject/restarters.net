@@ -431,6 +431,7 @@ class GroupController extends Controller
             'id' => $id,
             'name' => $group->name,
             'audits' => $group->audits,
+            'networks' => Network::all()
         ]);
     }
 
