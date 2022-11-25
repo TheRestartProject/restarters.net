@@ -190,11 +190,8 @@ exports.addDevice = async function(page, baseURL, idevents, powered, photo, fixe
   await page.keyboard.press('Enter')
 
   if (fixed) {
-    // Tab to repair outcome and select fixed (first).
-    await page.keyboard.press('Tab')
-    await page.keyboard.press('Tab')
-    await page.keyboard.press('Tab')
-    await page.keyboard.press('Tab')
+    // Go to repair outcome and select fixed (first).
+    await page.locator('.repair-outcome input >> nth=0').click()
     await page.keyboard.press('Enter')
   }
 

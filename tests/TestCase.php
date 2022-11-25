@@ -70,14 +70,18 @@ abstract class TestCase extends BaseTestCase
         // Set up random auto increment values.  This avoids tests working because everything is 1.
         //
         // Some tables (e.g. network) have a tinyint as the ID, so we must be careful not to create values that
-        // overflow this.
+        // overflow this.  Also avoid the magic 29 value, which is a "superhero" user (see ExportController).
         $tables = DB::select('SHOW TABLES');
         foreach ($tables as $table)
         {
             foreach ($table as $field => $tablename) {
                 try {
+                    do {
+                        $val = rand(1, 100);
+                    } while ($val != 29);
+
                     // This will throw an exception if the table doesn't have auto increment.
-                    DB::update("ALTER TABLE $tablename AUTO_INCREMENT = " . rand(1, 100) . ";");
+                    DB::update("ALTER TABLE $tablename AUTO_INCREMENT = " . $val . ";");
                 } catch (\Exception $e) {
                 }
             }
