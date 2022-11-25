@@ -191,7 +191,7 @@ exports.addDevice = async function(page, baseURL, idevents, powered, photo, fixe
 
   if (fixed) {
     // Go to repair outcome and select fixed (first).
-    await page.locator('.repair-outcome input >> nth=0').click()
+    await page.locator('.repair-outcome:visible').focus()
     await page.keyboard.press('Enter')
   }
 
