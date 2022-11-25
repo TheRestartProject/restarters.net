@@ -210,7 +210,10 @@ jobs:
       # We're running against localhost.
       - run: sudo sed -i 's/APP_URL=.*$/APP_URL=http:\/\/localhost/g' /home/circleci/project/.env
       # Fix up Google key from CircleCI config.
-      - run: sudo echo GOOGLE_API_CONSOLE_KEY=$GOOGLE_API_CONSOLE_KEY >> /home/circleci/project/.env
+      - run: cp .env /tmp/.env
+      - run: echo "" >> /tmp/.env
+      - run: echo GOOGLE_API_CONSOLE_KEY=$GOOGLE_API_CONSOLE_KEY >> /tmp/.env
+      - run: sudo cp /tmp/.env /home/circleci/project/.env
 
       # Now run the tests.
       - run:
