@@ -78,7 +78,7 @@ abstract class TestCase extends BaseTestCase
                 try {
                     do {
                         $val = rand(1, 100);
-                    } while ($val != 29);
+                    } while ($val == 29);
 
                     // This will throw an exception if the table doesn't have auto increment.
                     DB::update("ALTER TABLE $tablename AUTO_INCREMENT = " . $val . ";");
@@ -189,6 +189,20 @@ abstract class TestCase extends BaseTestCase
         return $idgroups;
     }
 
+    public function createDevice($idevents, $type)
+    {
+        $deviceAttributes = factory(Device::class)->states($type)->raw();
+
+        $deviceAttributes['event_id'] = $idevents;
+        $deviceAttributes['quantity'] = 1;
+
+        $response = $this->post('/device/create', $deviceAttributes);
+        $iddevices = Device::latest()->first()->iddevices;
+        $this->assertNotNull($iddevices);
+
+        return $iddevices;
+    }
+
     public function createEvent($idgroups, $date)
     {
         // Create a party for the specific group.
@@ -213,20 +227,6 @@ abstract class TestCase extends BaseTestCase
         $idevents = substr($redirectTo, $p + 1);
 
         return $idevents;
-    }
-
-    public function createDevice($idevents, $type)
-    {
-        $deviceAttributes = factory(Device::class)->states($type)->raw();
-
-        $deviceAttributes['event_id'] = $idevents;
-        $deviceAttributes['quantity'] = 1;
-
-        $response = $this->post('/device/create', $deviceAttributes);
-        $iddevices = Device::latest()->first()->iddevices;
-        $this->assertNotNull($iddevices);
-
-        return $iddevices;
     }
 
     public function createJane()
