@@ -198,6 +198,8 @@ jobs:
       - run: sudo chown -R www-data:www-data /home/circleci/project
       - run: sudo /etc/init.d/php7.4-fpm start
       - run: sudo /etc/init.d/nginx start
+      - run: sed -i 's/APP_URL=.*$/APP_URL=http:\/\/localhost/g' .env
+
       # Now run the tests.
       - run:
           name: Playwright Tests

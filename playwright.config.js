@@ -49,6 +49,7 @@ const config = {
     // },
   ],
   testDir: 'tests/Integration',
+  outputDir: '/tmp/test-results',
 
   // Flakiness
   timeout: 10 * 60 * 1000,

@@ -1,3 +1,5 @@
+import axios from 'axios'
+
 export default {
   namespaced: true,
   state: {
@@ -23,6 +25,10 @@ export default {
   actions: {
     setApiToken ({commit}, params) {
       commit('setApiToken', params)
+
+      // Set this as a default header.  This means that subsequent axios requests will automatically include this header,
+      // which is used by the API auth guard to authenticate the user.
+      axios.defaults.headers.common.Authorization = 'Bearer ' + params.apiToken
     },
     setCSRF ({commit}, params) {
       commit('setCSRF', params)
