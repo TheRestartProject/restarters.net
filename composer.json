@@ -40,7 +40,8 @@
         "spinen/laravel-discourse-sso": "^2.0",
         "symfony/http-foundation": "^4.2.12",
         "twbs/bootstrap": "4.1.0",
-        "wouternl/laravel-drip": "^1.1"
+        "wouternl/laravel-drip": "^1.1",
+        "laravel/ui": "^2.0"
     },
     "require-dev": {
         "barryvdh/laravel-debugbar": "^3.6",
