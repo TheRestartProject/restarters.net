@@ -28,7 +28,7 @@ class RoleTest extends TestCase
 
         // Should see a list with edit links.
         $response = $this->get('/role');
-        $response->assertSee('<a href="/role/edit/3" title="edit role permissions">Host</a>');
+        $response->assertSee('<a href="/role/edit/3" title="edit role permissions">Host</a>', false);
 
         // Get Edit page.  Should see a list of permissions with permission 4 (Create Party).  Test environment
         // doesn't have permissions set up so just check existance.

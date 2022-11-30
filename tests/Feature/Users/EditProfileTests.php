@@ -167,8 +167,8 @@ class EditProfileTests extends TestCase
 
         // Check it shows.
         $response2 = $this->get('/profile/edit');
-        $response2->assertSee('selected>UT1</option>');
-        $response2->assertSee('selected>UT2</option>');
+        $response2->assertSee('selected>UT1</option>', false);
+        $response2->assertSee('selected>UT2</option>', false);
 
         // Should have promoted to host because we have a category 1 skill.
         $user->refresh();

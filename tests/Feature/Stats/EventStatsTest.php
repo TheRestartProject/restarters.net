@@ -168,16 +168,16 @@ class EventStatsTest extends StatsTestCase
         // Get the stats pages.
         $response = $this->get('/admin/stats/1');
         $response->assertSuccessful();
-        $response->assertSee('<span class="title">7</span>');
+        $response->assertSee('<span class="title">7</span>', false);
 
         $response = $this->get('/admin/stats/2');
         $response->assertSuccessful();
-        $response->assertSee('>27 kg<');
+        $response->assertSee('>27 kg<', false);
 
         // Get the wide stats page.
         $response = $this->get('/party/stats/' . $event->idevents . '/wide');
         $response->assertSuccessful();
-        $response->assertSee('<span id="ewaste-diverted-value">23</span>');
+        $response->assertSee('<span id="ewaste-diverted-value">23</span>', false);
 
         // Check that the search page loads.
         $this->loginAsTestUser(Role::ADMINISTRATOR);

@@ -64,7 +64,7 @@ class SkillsTest extends TestCase
 
         $this->loginAsTestUser(Role::ADMINISTRATOR);
         $response = $this->get('/skills/edit/' . $skill1->id);
-        $response->assertSee('name="skill-name"');
+        $response->assertSee('name="skill-name"', false);
 
         $response = $this->post('/skills/edit/' . $skill1->id, [
             'skill-name'  => 'UT2',

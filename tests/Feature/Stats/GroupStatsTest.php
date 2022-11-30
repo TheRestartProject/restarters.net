@@ -36,8 +36,8 @@ class GroupStatsTest extends StatsTestCase
 
         // Get the stats via the web page.
         $rsp = $this->get('/group/stats/' . $group->idgroups);
-        $rsp->assertSee('<h5>hours volunteered</h5>');
-        $rsp->assertSee('<span class="largetext">21</span>');
+        $rsp->assertSee('<h5>hours volunteered</h5>', false);
+        $rsp->assertSee('<span class="largetext">21</span>', false);
     }
 
     /** @test */

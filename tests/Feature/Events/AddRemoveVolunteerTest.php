@@ -203,6 +203,6 @@ class AddRemoveVolunteerTest extends TestCase
         // Should now see the group.
         $response = $this->get('/user/edit/' . $host->id);
         $response->assertStatus(200);
-        $response->assertSee('<option value="' . $idgroups . '" selected>Test Group0</option>');
+        $response->assertSee('<option value="' . $idgroups . '" selected>Test Group0</option>', false);
     }
 }
