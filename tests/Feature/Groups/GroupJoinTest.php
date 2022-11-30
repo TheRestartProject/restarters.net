@@ -74,10 +74,10 @@ class GroupJoinTest extends TestCase
             ->where('group', $group->idgroups)->first();
         $url = '/api/usersgroups/'.$userGroupAssociation->group.'?api_token=1234';
         $response = $this->call('DELETE', $url);
-        $response->assertSee('"success":true');
+        $response->assertSee('"success":true', false);
 
         // Try leaving again.
         $response = $this->call('DELETE', $url);
-        $response->assertSee('"success":true');
+        $response->assertSee('"success":true', false);
     }
 }

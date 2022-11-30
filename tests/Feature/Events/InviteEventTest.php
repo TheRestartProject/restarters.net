@@ -188,7 +188,7 @@ class InviteEventTest extends TestCase
 
         // Now accept the invitation.
         $response7 = $this->get('/party/view/'.$event->idevents);
-        $response7->assertSee('You&#039;ve been invited to join an event');
+        $response7->assertSee('You&#039;ve been invited to join an event', false);
         preg_match('/href="(\/party\/accept-invite.*?)"/', $response7->getContent(), $matches);
         if (count($matches) <= 0) {
             error_log("Invite failed " . $response7->getContent());
@@ -333,7 +333,7 @@ class InviteEventTest extends TestCase
         $rsp->assertSee(__('events.you_have_joined', [
             'url' => url("/party/view/{$event->idevents}"),
             'name' => $event->venue
-        ]));
+        ]), false);
 
         // Try with invalid code.
         $this->expectException(NotFoundHttpException::class);
