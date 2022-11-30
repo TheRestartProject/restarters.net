@@ -11,7 +11,7 @@
 |
 */
 
-Route::group(['middleware' => ['ensureAPIToken']], function () {
+Route::middleware('ensureAPIToken')->group(function () {
     Route::prefix('user')->group(function () {
         Route::get('/', 'HomeController@index');
         Route::get('reset', 'UserController@reset');
@@ -34,7 +34,7 @@ Route::group(['middleware' => ['ensureAPIToken']], function () {
 // We use the Laravel login route.
     Auth::routes();
 
-    Route::group(['middleware' => 'guest'], function ()
+    Route::middleware('guest')->group(function ()
     {
         Route::get('/', 'HomeController@index')->name('home');
     });
@@ -183,13 +183,13 @@ Route::group(['middleware' => ['ensureAPIToken']], function () {
         Route::get('/status', 'DustupOraController@status');
     });
 
-    Route::group(['middleware' => ['guest']], function () {
+    Route::middleware('guest')->group(function () {
         Route::get('/', 'HomeController@index')->name('home');
         Route::get('/about', 'HomeController@index')->name('home');
     });
 });
 
-Route::group(['middleware' => ['auth', 'verifyUserConsent', 'ensureAPIToken']], function () {
+Route::middleware('auth', 'verifyUserConsent', 'ensureAPIToken')->group(function () {
     //User Controller
     Route::prefix('profile')->group(function () {
         Route::get('/', 'UserController@index')->name('profile');
@@ -361,7 +361,7 @@ Route::group(['middleware' => ['auth', 'verifyUserConsent', 'ensureAPIToken']], 
     Route::get('/reporting/time-volunteered/{search}', 'ExportController@getTimeVolunteered');
 });
 
-Route::group(['middleware' => ['ensureAPIToken']], function () {
+Route::middleware('ensureAPIToken')->group(function () {
     Route::get('/party/invite/{code}', 'PartyController@confirmCodeInvite');
     Route::get('/group/invite/{code}', 'GroupController@confirmCodeInvite');
 

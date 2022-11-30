@@ -29,7 +29,7 @@ Route::get('/outbound/info/{type}/{id}/{format?}', function ($type, $id, $format
     return App\Http\Controllers\OutboundController::info($type, $id, $format);
 });
 
-Route::group(['middleware' => 'auth:api'], function () {
+Route::middleware('auth:api')->group(function () {
     Route::get('/users/me', 'ApiController@getUserInfo'); // Not used but worth keeping and tested.
     Route::get('/users', 'ApiController@getUserList');  // Not used but worth keeping and tested.
     Route::get('/users/changes', 'API\UserController@changes'); // Used by Zapier
@@ -69,7 +69,7 @@ Route::get('/talk/topics/{tag?}', 'API\DiscourseController@discussionTopics');
 Route::get('/timezones', [App\Http\Controllers\ApiController::class, 'timezones']);
 
 // We are working towards a new and more coherent API.
-Route::group(['prefix' => 'v2'], function() {
+Route::prefix('v2')->group(function() {
     Route::prefix('/groups')->group(function() {
         Route::get('{id}/events', 'API\GroupController@getEventsForGroupv2');
         Route::get('{id}', 'API\GroupController@getGroupv2');
@@ -87,7 +87,7 @@ Route::group(['prefix' => 'v2'], function() {
     });
 
     Route::prefix('/moderate')->group(function() {
-        Route::group(['middleware' => 'auth:api'], function ()
+        Route::middleware('auth:api')->group(function ()
         {
             Route::get('/groups', 'API\GroupController@moderateGroupsv2');
             Route::get('/events', 'API\EventController@moderateEventsv2');
