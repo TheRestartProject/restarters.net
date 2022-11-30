@@ -34,7 +34,7 @@
         <env name="CACHE_DRIVER" value="array"/>
         <env name="SESSION_DRIVER" value="array"/>
         <env name="QUEUE_CONNECTION" value="database"/>
-        <env name="MAIL_DRIVER" value="array"/>
+        <env name="MAIL_MAILER" value="array"/>
         <env name="DB_CONNECTION" value="mysql_testing"/>
         <env name="DB_TEST_DATABASE" value="restarters_db"/>
         <env name="DB_TEST_USERNAME" value="restarters"/>
