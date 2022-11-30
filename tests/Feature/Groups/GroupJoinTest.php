@@ -20,17 +20,17 @@ class GroupJoinTest extends TestCase
 
         $this->withoutExceptionHandling();
 
-        $group = factory(Group::class)->create();
-        $tag = factory(GroupTags::class)->create();
+        $group = Group::factory()->create();
+        $tag = GroupTags::factory()->create();
         $group->addTag($tag);
 
-        $host = factory(User::class)->states('Restarter')->create([
+        $host = User::factory()->restarter()->create([
           'api_token' => '1234',
         ]);
         $group->addVolunteer($host);
         $group->makeMemberAHost($host);
 
-        $user = factory(User::class)->states('Restarter')->create();
+        $user = User::factory()->restarter()->create();
         $this->actingAs($user);
 
         $this->followingRedirects();

@@ -144,58 +144,58 @@ class MobifixTest extends TestCase
         }
         $devs = array_keys($devs_in);
         // iddevices = 1 : 3 opinions with consensus : recat
-        factory(Mobifix::class, 3)->create(
+        Mobifix::factory()->count(3)->create(
                 [
                     'iddevices' => $devs[0],
                     'fault_type' => 'fault_type_1',
                 ]
         );
         // iddevices = 2 : 3 opinions with majority : recat
-        factory(Mobifix::class, 2)->create(
+        Mobifix::factory()->count(2)->create(
                 [
                     'iddevices' => $devs[1],
                     'fault_type' => 'fault_type_1',
                 ]
         );
-        factory(Mobifix::class, 1)->create(
+        Mobifix::factory()->count(1)->create(
                 [
                     'iddevices' => $devs[1],
                     'fault_type' => 'fault_type_2',
                 ]
         );
         // iddevices = 3 : 3 opinions split
-        factory(Mobifix::class, 1)->create(
+        Mobifix::factory()->count(1)->create(
                 [
                     'iddevices' => $devs[2],
                     'fault_type' => 'fault_type_1',
                 ]
         );
-        factory(Mobifix::class, 1)->create(
+        Mobifix::factory()->count(1)->create(
                 [
                     'iddevices' => $devs[2],
                     'fault_type' => 'fault_type_2',
                 ]
         );
-        factory(Mobifix::class, 1)->create(
+        Mobifix::factory()->count(1)->create(
                 [
                     'iddevices' => $devs[2],
                     'fault_type' => 'fault_type_3',
                 ]
         );
         // iddevices = 4 : 3 opinions adjudicated : recat
-        factory(Mobifix::class, 1)->create(
+        Mobifix::factory()->count(1)->create(
                 [
                     'iddevices' => $devs[3],
                     'fault_type' => 'fault_type_1',
                 ]
         );
-        factory(Mobifix::class, 1)->create(
+        Mobifix::factory()->count(1)->create(
                 [
                     'iddevices' => $devs[3],
                     'fault_type' => 'fault_type_2',
                 ]
         );
-        factory(Mobifix::class, 1)->create(
+        Mobifix::factory()->count(1)->create(
                 [
                     'iddevices' => $devs[3],
                     'fault_type' => 'fault_type_3',
@@ -204,27 +204,27 @@ class MobifixTest extends TestCase
         DB::update('INSERT INTO devices_faults_mobiles_adjudicated SET iddevices = '.$devs[3].", fault_type='fault_type_1'");
 
         // iddevices = 5 : 2 opinions with majority : recat
-        factory(Mobifix::class, 2)->create(
+        Mobifix::factory()->count(2)->create(
                 [
                     'iddevices' => $devs[4],
                     'fault_type' => 'fault_type_1',
                 ]
         );
         // iddevices = 6 : 2 opinions split
-        factory(Mobifix::class, 1)->create(
+        Mobifix::factory()->count(1)->create(
                 [
                     'iddevices' => $devs[5],
                     'fault_type' => 'fault_type_1',
                 ]
         );
-        factory(Mobifix::class, 1)->create(
+        Mobifix::factory()->count(1)->create(
                 [
                     'iddevices' => $devs[5],
                     'fault_type' => 'fault_type_2',
                 ]
         );
         // iddevices = 7 : 1 opinion
-        factory(Mobifix::class, 1)->create(
+        Mobifix::factory()->count(1)->create(
                 [
                     'iddevices' => $devs[6],
                     'fault_type' => 'fault_type_1',
@@ -265,7 +265,7 @@ class MobifixTest extends TestCase
 
     protected function _insert_mobifix_device($cat, $id, $problem, $fault_type = '')
     {
-        $device = factory(Device::class, 1)->states($cat)->create(
+        $device = Device::factory()->count(1)->cat()->create(
                 [
                     'problem' => $problem,
                     'fault_type' => $fault_type,

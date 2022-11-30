@@ -17,7 +17,7 @@ class GroupCreateTest extends TestCase
 {
     public function testCreate()
     {
-        $user = factory(User::class)->states('Administrator')->create([
+        $user = User::factory()->administrator()->create([
                                                                       'api_token' => '1234',
                                                                   ]);
         $this->actingAs($user);
@@ -74,10 +74,10 @@ class GroupCreateTest extends TestCase
     public function testApprove($role) {
         Notification::fake();
 
-        $actas = factory(User::class)->state($role)->create();
+        $actas = User::factory()->role()->create();
         $this->actingAs($actas);
 
-        $network = factory(Network::class)->create();
+        $network = Network::factory()->create();
         $idgroups = $this->createGroup('Test Group', 'https://therestartproject.org','London', 'Some text.', true, false);
         $group = Group::find($idgroups);
         $network->addGroup($group);
@@ -98,7 +98,7 @@ class GroupCreateTest extends TestCase
             ],
         ]);
 
-        $admin2 = factory(User::class)->state('Administrator')->create();
+        $admin2 = User::factory()->administrator()->create();
         $this->actingAs($admin2);
 
         $response = $this->post('/group/edit/'.$idgroups, [
@@ -131,23 +131,23 @@ class GroupCreateTest extends TestCase
 
     public function testEventVisibility() {
         // Create a network.
-        $network = factory(Network::class)->create();
+        $network = Network::factory()->create();
 
         // Create an unapproved group in that network.
-        $admin1 = factory(User::class)->state('Administrator')->create();
+        $admin1 = User::factory()->administrator()->create();
         $this->actingAs($admin1);
         $idgroups = $this->createGroup('Test Group', 'https://therestartproject.org', 'London', 'Some text.', true, false);
         $group = Group::find($idgroups);
         $network->addGroup($group);
 
         // Create a host for the group.
-        $host = factory(User::class)->states('Host')->create();
+        $host = User::factory()->host()->create();
         $group->addVolunteer($host);
         $group->makeMemberAHost($host);
         $this->actingAs($host);
 
         // Create an event on this as yet unapproved group.
-        $eventAttributes = factory(Party::class)->raw();
+        $eventAttributes = Party::factory()->raw();
         $eventAttributes['group'] = $idgroups;
         $eventAttributes['link'] = 'https://therestartproject.org/';
         $eventAttributes['event_start_utc'] = Carbon::parse('1pm tomorrow')->toIso8601String();
@@ -165,14 +165,14 @@ class GroupCreateTest extends TestCase
         $this->get('/party/group/' . $idgroups)->assertSee($eventAttributes['venue']);
 
         // And to a network coordinator
-        $coordinator = factory(User::class)->state('NetworkCoordinator')->create();
+        $coordinator = User::factory()->networkCoordinator()->create();
         $network->addCoordinator($coordinator);
         $this->actingAs($coordinator);
         $this->get('/party/view/'.$event->idevents)->assertSee($eventAttributes['venue']);
         $this->get('/party')->assertSee($eventAttributes['venue']);
 
         // This event should not be visible to a Restarter, as the group is not yet approved.
-        $restarter = factory(User::class)->states('Restarter')->create();
+        $restarter = User::factory()->restarter()->create();
         $this->actingAs($restarter);
         try {
             $this->get('/party/view/'.$event->idevents)->assertDontSee(e($eventAttributes['venue']));

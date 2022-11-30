@@ -14,7 +14,7 @@ class EventStatsTest extends StatsTestCase
     /** @test */
     public function an_event_with_no_devices_has_empty_stats()
     {
-        $event = factory(Party::class)->create();
+        $event = Party::factory()->create();
         $expect = \App\Party::getEventStatsArrayKeys();
         $expect['hours_volunteered'] = 21;
         $this->assertEquals($expect, $event->getEventStats());
@@ -26,8 +26,8 @@ class EventStatsTest extends StatsTestCase
         $this->_setupCategoriesWithUnpoweredWeights();
 
         // #1 add a powered non-misc device
-        $event = factory(Party::class)->create();
-        $device = factory(Device::class)->states('fixed')->create([
+        $event = Party::factory()->create();
+        $device = Device::factory()->fixed()->create([
             'category' => $this->_idPoweredNonMisc,
             'category_creation' => $this->_idPoweredNonMisc,
             'event' => $event->idevents,
@@ -49,7 +49,7 @@ class EventStatsTest extends StatsTestCase
         }
 
         // #2 add a powered misc device without estimate
-        $device = factory(Device::class)->states('fixed')->create([
+        $device = Device::factory()->fixed()->create([
             'category' => $this->_idPoweredMisc,
             'category_creation' => $this->_idPoweredMisc,
                                                                       'event' => $event->idevents,
@@ -66,7 +66,7 @@ class EventStatsTest extends StatsTestCase
         }
 
         // #3 add an unpowered non-misc device
-        $device = factory(Device::class)->states('fixed')->create([
+        $device = Device::factory()->fixed()->create([
             'category' => 5,
             'category_creation' => 5,
             'event' => $event->idevents,
@@ -86,7 +86,7 @@ class EventStatsTest extends StatsTestCase
         }
 
         // #4 add an unpowered misc device without estimate
-        $device = factory(Device::class)->states('fixed')->create([
+        $device = Device::factory()->fixed()->create([
             'category' => $this->_idUnpoweredMisc,
             'category_creation' => $this->_idUnpoweredMisc,
             'event' => $event->idevents,
@@ -103,7 +103,7 @@ class EventStatsTest extends StatsTestCase
         }
 
         // #5 add a powered misc device with estimate
-        $device = factory(Device::class)->states('fixed')->create([
+        $device = Device::factory()->fixed()->create([
             'category' => $this->_idPoweredMisc,
             'category_creation' => $this->_idPoweredMisc,
             'event' => $event->idevents,
@@ -124,7 +124,7 @@ class EventStatsTest extends StatsTestCase
         }
 
         // #6 add an unpowered misc device with estimate
-        $device = factory(Device::class)->states('fixed')->create([
+        $device = Device::factory()->fixed()->create([
             'category' => $this->_idUnpoweredMisc,
             'category_creation' => $this->_idUnpoweredMisc,
             'event' => $event->idevents,
@@ -145,7 +145,7 @@ class EventStatsTest extends StatsTestCase
         }
 
         // #7 add an unpowered non-misc device with estimate
-        $device = factory(Device::class)->states('fixed')->create([
+        $device = Device::factory()->fixed()->create([
             'category' => $this->_idUnpoweredMisc,
             'category_creation' => $this->_idUnpoweredMisc,
             'event' => $event->idevents,
@@ -194,10 +194,10 @@ class EventStatsTest extends StatsTestCase
     public function event_stats_for_upcoming_event() {
         $this->_setupCategoriesWithUnpoweredWeights();
 
-        $this->host = factory(User::class)->states('Administrator')->create();
+        $this->host = User::factory()->administrator()->create();
         $this->actingAs($this->host);
 
-        $this->group = factory(Group::class)->create();
+        $this->group = Group::factory()->create();
         $this->group->addVolunteer($this->host);
         $this->group->makeMemberAHost($this->host);
 
@@ -205,7 +205,7 @@ class EventStatsTest extends StatsTestCase
         $idevents = $this->createEvent($this->group->idgroups, 'tomorrow');
 
         // Add a fixed device.
-        $device = factory(Device::class)->states('fixed')->create([
+        $device = Device::factory()->fixed()->create([
                                                                       'category' => $this->_idUnpoweredMisc,
                                                                       'category_creation' => $this->_idUnpoweredMisc,
                                                                       'event' => $idevents,

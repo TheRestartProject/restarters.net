@@ -35,7 +35,7 @@ class StatsTestCase extends TestCase
         DB::statement('SET foreign_key_checks=0');
         Category::truncate();
         DB::statement('SET foreign_key_checks=1');
-        factory(Category::class)->create([
+        Category::factory()->create([
             'idcategories' => $this->_idPoweredNonMisc,
             'revision' => 1,
             'name' => 'powered non-misc',
@@ -43,7 +43,7 @@ class StatsTestCase extends TestCase
             'weight' => 4,
             'footprint' => 14.4,
         ]);
-        factory(Category::class)->create([
+        Category::factory()->create([
             'idcategories' => $this->_idPoweredMisc,
             'revision' => 1,
             'name' => 'powered misc',
@@ -51,7 +51,7 @@ class StatsTestCase extends TestCase
             'weight' => 0,
             'footprint' => 0,
         ]);
-        factory(Category::class)->create([
+        Category::factory()->create([
             'idcategories' => $this->_idUnpoweredNonMisc,
             'revision' => 1,
             'name' => 'unpowered non-misc',
@@ -59,7 +59,7 @@ class StatsTestCase extends TestCase
             'weight' => 5,
             'footprint' => 15.5,
         ]);
-        factory(Category::class)->create([
+        Category::factory()->create([
             'idcategories' => $this->_idUnpoweredMisc,
             'revision' => 1,
             'name' => 'unpowered misc',

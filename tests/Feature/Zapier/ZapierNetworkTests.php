@@ -49,17 +49,17 @@ class ZapierNetworkTests extends TestCase
         $this->withoutExceptionHandling();
 
         // arrange
-        $admin = factory(User::class)->states('Administrator')->create([
+        $admin = User::factory()->administrator()->create([
             'api_token' => '1234',
         ]);
         $this->actingAs($admin);
 
-        $network = factory(Network::class)->create([
+        $network = Network::factory()->create([
             'shortname' => 'restarters',
             'include_in_zapier' => true,
         ]);
 
-        $groupAttributes = factory(Group::class)->raw();
+        $groupAttributes = Group::factory()->raw();
         $groupAttributes['name'] = 'Lancaster Fixers';
 
         // act
@@ -79,17 +79,17 @@ class ZapierNetworkTests extends TestCase
         $this->withoutExceptionHandling();
 
         // arrange
-        $admin = factory(User::class)->states('Administrator')->create([
+        $admin = User::factory()->administrator()->create([
             'api_token' => '1234',
         ]);
         $this->actingAs($admin);
 
-        $network = factory(Network::class)->create([
+        $network = Network::factory()->create([
             'shortname' => 'restarters',
             'include_in_zapier' => false,
         ]);
 
-        $groupAttributes = factory(Group::class)->raw();
+        $groupAttributes = Group::factory()->raw();
         $groupAttributes['name'] = 'Ghent Fixers';
 
         // act
@@ -109,18 +109,18 @@ class ZapierNetworkTests extends TestCase
         $this->withoutExceptionHandling();
 
         // arrange
-        $admin = factory(User::class)->states('Administrator')->create([
+        $admin = User::factory()->administrator()->create([
             'api_token' => '1234',
         ]);
         $this->actingAs($admin);
 
-        $network = factory(Network::class)->create([
+        $network = Network::factory()->create([
             'shortname' => 'restart',
             'include_in_zapier' => true,
         ]);
 
         // act
-        $user = factory(User::class)->create([
+        $user = User::factory()->create([
             'repair_network' => $network->id,
         ]);
 
@@ -137,18 +137,18 @@ class ZapierNetworkTests extends TestCase
         $this->withoutExceptionHandling();
 
         // arrange
-        $admin = factory(User::class)->states('Administrator')->create([
+        $admin = User::factory()->administrator()->create([
             'api_token' => '1234',
         ]);
         $this->actingAs($admin);
 
-        $network = factory(Network::class)->create([
+        $network = Network::factory()->create([
             'shortname' => 'repairtogether',
             'include_in_zapier' => false,
         ]);
 
         // act
-        $user = factory(User::class)->create([
+        $user = User::factory()->create([
             'repair_network' => $network->id,
         ]);
 
@@ -165,18 +165,18 @@ class ZapierNetworkTests extends TestCase
         $this->withoutExceptionHandling();
 
         // arrange
-        $admin = factory(User::class)->states('Administrator')->create([
+        $admin = User::factory()->administrator()->create([
             'api_token' => '1234',
         ]);
         $this->actingAs($admin);
 
-        $network = factory(Network::class)->create([
+        $network = Network::factory()->create([
             'shortname' => 'restart',
             'include_in_zapier' => true,
         ]);
-        $group = factory(Group::class)->create();
+        $group = Group::factory()->create();
         $network->addGroup($group);
-        $user = factory(User::class)->create([
+        $user = User::factory()->create([
             'repair_network' => $network->id,
         ]);
 
@@ -196,22 +196,22 @@ class ZapierNetworkTests extends TestCase
         $this->withoutExceptionHandling();
 
         // arrange
-        $admin = factory(User::class)->states('Administrator')->create([
+        $admin = User::factory()->administrator()->create([
             'api_token' => '1234',
         ]);
         $this->actingAs($admin);
 
-        $network1 = factory(Network::class)->create([
+        $network1 = Network::factory()->create([
             'shortname' => 'restart',
             'include_in_zapier' => true,
         ]);
-        $network2 = factory(Network::class)->create([
+        $network2 = Network::factory()->create([
             'shortname' => 'repairtogether',
             'include_in_zapier' => false,
         ]);
-        $group = factory(Group::class)->create();
+        $group = Group::factory()->create();
         $network1->addGroup($group);
-        $user = factory(User::class)->create([
+        $user = User::factory()->create([
             'repair_network' => $network2->id,
         ]);
 

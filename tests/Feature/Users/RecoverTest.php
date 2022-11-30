@@ -25,7 +25,7 @@ class RecoverTest extends TestCase
 
     public function testRecover()
     {
-        $restarter = factory(User::class)->state('Restarter')->create([
+        $restarter = User::factory()->restarter()->create([
                                                                           'password' => Hash::make('passw0rd'),
                                                                       ]);
 

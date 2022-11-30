@@ -12,7 +12,7 @@ use Tests\TestCase;
 class DripEventTest extends TestCase
 {
     public function testFail() {
-        $user = factory(User::class)->create([]);
+        $user = User::factory()->create([]);
         $this->expectException(\Exception::class);
         \App\DripEvent::createOrUpdateSubscriber($user, true, $user->email, $user->email);
     }

@@ -33,14 +33,14 @@ class CoordinatorTest extends TestCase
     public function it_can_find_relevant_coordinators()
     {
         // arrange
-        $network = factory(Network::class)->create();
-        $group = factory(Group::class)->create();
-        $coordinator = factory(User::class)->state('NetworkCoordinator')->create();
+        $network = Network::factory()->create();
+        $group = Group::factory()->create();
+        $coordinator = User::factory()->networkCoordinator()->create();
 
         $network->addGroup($group);
         $network->addCoordinator($coordinator);
 
-        $event = factory(Party::class)->create(['group' => $group]);
+        $event = Party::factory()->create(['group' => $group]);
 
         // assert
         $coordinators = $event->associatedNetworkCoordinators();
@@ -52,9 +52,9 @@ class CoordinatorTest extends TestCase
     public function promote_to_coordinator()
     {
         // arrange
-        $network = factory(Network::class)->create();
-        $group = factory(Group::class)->create();
-        $coordinator = factory(User::class)->state('Restarter')->create();
+        $network = Network::factory()->create();
+        $group = Group::factory()->create();
+        $coordinator = User::factory()->restarter()->create();
         $network->addGroup($group);
 
         // Check we promote.
@@ -63,7 +63,7 @@ class CoordinatorTest extends TestCase
         self::assertEquals(Role::NETWORK_COORDINATOR, $coordinator->role);
 
         // Check we don't demote.
-        $admin = factory(User::class)->state('Administrator')->create();
+        $admin = User::factory()->administrator()->create();
         $network->addCoordinator($admin);
         $admin->refresh();
         self::assertEquals(Role::ADMINISTRATOR, $admin->role);

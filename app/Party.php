@@ -2,6 +2,7 @@
 
 namespace App;
 
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use App\Events\ApproveEvent;
 use App\EventUsers;
 use App\Helpers\Fixometer;
@@ -18,6 +19,8 @@ use OwenIt\Auditing\Contracts\Auditable;
 
 class Party extends Model implements Auditable
 {
+    use HasFactory;
+
     use SoftDeletes;
     use \OwenIt\Auditing\Auditable;
 

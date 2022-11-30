@@ -41,18 +41,18 @@ class DeleteEventTest extends TestCase
         $this->withoutExceptionHandling();
         Event::fake();
 
-        $admin = factory(User::class)->states('Administrator')->create([
+        $admin = User::factory()->administrator()->create([
                                                                            'api_token' => '1234',
                                                                        ]);
         $this->actingAs($admin);
 
         // Create an approved event.
-        $group = factory(Group::class)->create();
-        $event = factory(Party::class)->create(['wordpress_post_id' => 1, 'group' => $group->idgroups]);
+        $group = Group::factory()->create();
+        $event = Party::factory()->create(['wordpress_post_id' => 1, 'group' => $group->idgroups]);
         $event->save();
 
         // Add a volunteer so that we get some stats.
-        $user = factory(User::class)->states('Restarter')->create();
+        $user = User::factory()->restarter()->create();
         $this->actingAs($user);
         $response = $this->get('/party/join/'.$event->idevents);
         $this->assertTrue($response->isRedirection());
@@ -98,16 +98,16 @@ class DeleteEventTest extends TestCase
             case Role::NETWORK_COORDINATOR: $roleToCreate = 'NetworkCoordinator'; break;
             case Role::HOST: $roleToCreate = 'Host'; break;
         }
-        $host = factory(User::class)->states($roleToCreate)->create();
+        $host = User::factory()->roleToCreate()->create();
         $this->actingAs($host);
 
-        $group = factory(Group::class)->create([
+        $group = Group::factory()->create([
                                                    'wordpress_post_id' => '99999'
                                                ]);
         $group->addVolunteer($host);
         $group->makeMemberAHost($host);
 
-        $event = factory(Party::class)->create(['group' => $group->idgroups]);
+        $event = Party::factory()->create(['group' => $group->idgroups]);
         $event->save();
 
         // View the event
@@ -162,14 +162,14 @@ class DeleteEventTest extends TestCase
             $mock->shouldReceive('deletePost')->once();
         }));
 
-        $network = factory(Network::class)->create([
+        $network = Network::factory()->create([
             'events_push_to_wordpress' => true,
         ]);
-        $group = factory(Group::class)->create([
+        $group = Group::factory()->create([
             'wordpress_post_id' => '99999',
         ]);
         $network->addGroup($group);
-        $event = factory(Party::class)->create(['group' => $group->idgroups]);
+        $event = Party::factory()->create(['group' => $group->idgroups]);
         $event->wordpress_post_id = 100;
         $event->save();
 
@@ -184,7 +184,7 @@ class DeleteEventTest extends TestCase
         $this->withoutExceptionHandling();
         Notification::fake();
 
-        $admin = factory(User::class)->states('Administrator')->create();
+        $admin = User::factory()->administrator()->create();
         $preference = Preferences::where('slug', 'delete-event-notification')->get();
         $admin->preferences()->attach($preference);
 
@@ -193,14 +193,14 @@ class DeleteEventTest extends TestCase
             $mock->shouldReceive('deletePost')->andThrow(new \Exception);
         }));
 
-        $network = factory(Network::class)->create([
+        $network = Network::factory()->create([
             'events_push_to_wordpress' => true,
         ]);
-        $group = factory(Group::class)->create([
+        $group = Group::factory()->create([
                                                    'wordpress_post_id' => '99999',
                                                ]);
         $network->addGroup($group);
-        $event = factory(Party::class)->create(['group' => $group->idgroups]);
+        $event = Party::factory()->create(['group' => $group->idgroups]);
         $event->wordpress_post_id = 100;
         $event->save();
 
@@ -269,7 +269,7 @@ class DeleteEventTest extends TestCase
         $id = $this->createGroup();
         $group = Group::findOrFail($id);
 
-        $network = factory(Network::class)->create([
+        $network = Network::factory()->create([
            'events_push_to_wordpress' => false,
         ]);
         $network->addGroup($group);
@@ -281,7 +281,7 @@ class DeleteEventTest extends TestCase
             $this->createDevice($idevents, 'misc');
         }
 
-        $user = factory(User::class)->states($role)->create();
+        $user = User::factory()->role()->create();
 
         if ($role == 'NetworkCoordinator') {
             $network->addCoordinator($user);
@@ -312,12 +312,12 @@ class DeleteEventTest extends TestCase
     {
         Notification::fake();
 
-        $admin = factory(User::class)->states('Administrator')->create();
+        $admin = User::factory()->administrator()->create();
         $this->actingAs($admin);
         $id = $this->createGroup();
         $group = Group::find($id);
 
-        $network = factory(Network::class)->create([
+        $network = Network::factory()->create([
                                                        'events_push_to_wordpress' => false,
                                                    ]);
         $network->addGroup($group);
@@ -327,7 +327,7 @@ class DeleteEventTest extends TestCase
 
         // Add a restarter who is attending.
         $this->get('/logout');
-        $user = factory(User::class)->states('Restarter')->create();
+        $user = User::factory()->restarter()->create();
         $this->actingAs($user);
 
         // Join.  Should get redirected, and also prompted to follow the group (which we haven't).

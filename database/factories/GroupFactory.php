@@ -1,13 +1,24 @@
 <?php
 
-use Faker\Generator as Faker;
+namespace Database\Factories;
 
-$factory->define(App\Group::class, function (Faker $faker) {
-    return [
-        'name' => $faker->unique()->company,
-        'free_text' => $faker->sentence,
+use Illuminate\Database\Eloquent\Factories\Factory;
+
+class GroupFactory extends Factory
+{
+    /**
+     * Define the model's default state.
+     *
+     * @return array
+     */
+    public function definition()
+    {
+        return [
+        'name' => $this->faker->unique()->company,
+        'free_text' => $this->faker->sentence,
         'facebook' => '',
         'postcode' => '',
         'timezone' => 'Europe/London'
     ];
-});
+    }
+}

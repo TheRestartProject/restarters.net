@@ -2,11 +2,14 @@
 
 namespace App;
 
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use DB;
 use Illuminate\Database\Eloquent\Model;
 
 class Misccat extends Model
 {
+    use HasFactory;
+
     protected $table = 'devices_misc_opinions';
     protected $dateFormat = 'Y-m-d H:i';
     protected $primaryKey = 'id';

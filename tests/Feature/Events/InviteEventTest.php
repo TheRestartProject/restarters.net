@@ -23,20 +23,20 @@ class InviteEventTest extends TestCase
 
         $this->withoutExceptionHandling();
 
-        $group = factory(Group::class)->create([
+        $group = Group::factory()->create([
                                                    'wordpress_post_id' => '99999'
                                                ]);
-        $event = factory(Party::class)->create([
+        $event = Party::factory()->create([
                                                    'group' => $group,
                                                    'event_start_utc' => '2130-01-01T12:13:00+00:00',
                                                    'event_end_utc' => '2130-01-01T13:14:00+00:00',
                                                ]);
 
-        $host = factory(User::class)->states('Host')->create();
+        $host = User::factory()->host()->create();
         $this->actingAs($host);
 
         // Invite a user.
-        $user = factory(User::class)->states('Restarter')->create();
+        $user = User::factory()->restarter()->create();
 
         $response = $this->post('/party/invite', [
             'group_name' => $group->name,
@@ -76,7 +76,7 @@ class InviteEventTest extends TestCase
         ]);
 
         // Admin approves the event.
-        $admin = factory(User::class)->state('Administrator')->create();
+        $admin = User::factory()->administrator()->create();
         $this->get('/logout');
         $this->actingAs($admin);
         $eventData = $event->getAttributes();
@@ -122,11 +122,11 @@ class InviteEventTest extends TestCase
     {
         $this->withoutExceptionHandling();
 
-        $group = factory(Group::class)->create([
+        $group = Group::factory()->create([
                                                    'wordpress_post_id' => '99999'
                                                ]);
-        $host = factory(User::class)->states('Host')->create();
-        $event = factory(Party::class)->create([
+        $host = User::factory()->host()->create();
+        $event = Party::factory()->create([
                                                    'group' => $group,
                                                    'event_start_utc' => '2130-01-01T12:13:00+00:00',
                                                    'event_end_utc' => '2130-01-01T13:14:00+00:00',
@@ -147,7 +147,7 @@ class InviteEventTest extends TestCase
         $this->assertEquals([], $members);
 
         // User joins the group.
-        $user = factory(User::class)->states('Restarter')->create();
+        $user = User::factory()->restarter()->create();
         $this->get('/logout');
         $this->actingAs($user);
         $response2 = $this->get('/group/join/'.$group->idgroups);
@@ -214,9 +214,9 @@ class InviteEventTest extends TestCase
         Notification::fake();
         $this->withoutExceptionHandling();
 
-        $group = factory(Group::class)->create();
-        $host = factory(User::class)->states('Host')->create();
-        $event = factory(Party::class)->create([
+        $group = Group::factory()->create();
+        $host = User::factory()->host()->create();
+        $event = Party::factory()->create([
                                                    'group' => $group,
                                                    'event_start_utc' => '2130-01-01T12:13:00+00:00',
                                                    'event_end_utc' => '2130-01-01T13:14:00+00:00',
@@ -237,7 +237,7 @@ class InviteEventTest extends TestCase
         $this->assertEquals([], $members);
 
         // User joins the group.
-        $user = factory(User::class)->states('Restarter')->create();
+        $user = User::factory()->restarter()->create();
         $this->get('/logout');
         $this->actingAs($user);
         $response2 = $this->get('/group/join/'.$group->idgroups);
@@ -310,7 +310,7 @@ class InviteEventTest extends TestCase
 
     public function testInviteViaLink() {
         $this->loginAsTestUser(Role::ADMINISTRATOR);
-        $user = factory(User::class)->states('Restarter')->create([
+        $user = User::factory()->restarter()->create([
                                                                           'api_token' => '1234',
                                                                       ]);
 
@@ -346,20 +346,20 @@ class InviteEventTest extends TestCase
 
         $this->withoutExceptionHandling();
 
-        $group = factory(Group::class)->create([
+        $group = Group::factory()->create([
                                                    'wordpress_post_id' => '99999'
                                                ]);
-        $event = factory(Party::class)->create([
+        $event = Party::factory()->create([
                                                    'group' => $group,
                                                    'event_start_utc' => '2130-01-01T12:13:00+00:00',
                                                    'event_end_utc' => '2130-01-01T13:14:00+00:00',
                                                ]);
 
-        $host = factory(User::class)->states('Host')->create();
+        $host = User::factory()->host()->create();
         $this->actingAs($host);
 
         // Invite a user.
-        $user = factory(User::class)->states('Restarter')->create();
+        $user = User::factory()->restarter()->create();
 
         $response = $this->post('/party/invite', [
             'group_name' => $group->name,

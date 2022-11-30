@@ -32,7 +32,7 @@ class PasswordResetTest extends TestCase
         Notification::fake();
         Event::fake();
 
-        $restarter = factory(User::class)->states('Restarter')->create();
+        $restarter = User::factory()->restarter()->create();
 
         $response = $this->post('/user/recover', [
             'email' => $restarter->email

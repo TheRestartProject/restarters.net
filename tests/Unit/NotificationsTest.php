@@ -87,8 +87,8 @@ class NotificationsTest extends TestCase
 
         // Create users with specific ids because the notification outputs have a link to the preferences which
         // includes the id, so we need it not to change.
-        $this->useren = factory(User::class)->create(['language' => 'en', 'id' => 10001]);
-        $this->userfr = factory(User::class)->create(['language' => 'fr', 'id' => 10002]);
+        $this->useren = User::factory()->create(['language' => 'en', 'id' => 10001]);
+        $this->userfr = User::factory()->create(['language' => 'fr', 'id' => 10002]);
 
         // This is the output pasted in from testGenerateOutputs.
         $this->outputs = [];

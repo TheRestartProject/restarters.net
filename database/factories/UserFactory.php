@@ -1,8 +1,10 @@
 <?php
 
+namespace Database\Factories;
+
+use Illuminate\Database\Eloquent\Factories\Factory;
 use App\Role;
 use App\User;
-use Faker\Generator as Faker;
 use Illuminate\Support\Str;
 
 /*
@@ -16,50 +18,71 @@ use Illuminate\Support\Str;
 |
 */
 
-$factory->define(User::class, function (Faker $faker) {
-    return [
-        'name' => $faker->name,
-        'email' => $faker->unique()->safeEmail,
-        'username' => $faker->userName,
+class UserFactory extends Factory
+{
+    /**
+     * Define the model's default state.
+     *
+     * @return array
+     */
+    public function definition()
+    {
+        return [
+        'name' => $this->faker->name,
+        'email' => $this->faker->unique()->safeEmail,
+        'username' => $this->faker->userName,
         'password' => '$2y$10$TKh8H1.PfQx37YgCzwiKb.KjNyWgaHb9cbcoQgdIVFlYg7B77UdFm', // secret
         'remember_token' => Str::random(10),
         'consent_past_data' => new \DateTime(),
         'consent_future_data' => new \DateTime(),
         'consent_gdpr' => new \DateTime(),
         'number_of_logins' => 1,
-        'age' => $faker->year(),
-        'country' => $faker->countryCode,
+        'age' => $this->faker->year(),
+        'country' => $this->faker->countryCode,
         'role' => Role::RESTARTER,
         'invites' => 1,
         'repairdir_role' => Role::REPAIR_DIRECTORY_NONE,
         'api_token' => \Illuminate\Support\Str::random(60)
     ];
-});
+    }
 
-$factory->state(User::class, 'Restarter', function (Faker $faker) {
-    return [
+    public function restarter()
+    {
+        return $this->state(function () {
+            return [
         'role' => Role::RESTARTER,
         'username' => '',
     ];
-});
+        });
+    }
 
-$factory->state(User::class, 'Host', function (Faker $faker) {
-    return [
+    public function host()
+    {
+        return $this->state(function () {
+            return [
         'role' => Role::HOST,
         'username' => '',
     ];
-});
+        });
+    }
 
-$factory->state(User::class, 'Administrator', function (Faker $faker) {
-    return [
+    public function administrator()
+    {
+        return $this->state(function () {
+            return [
         'role' => Role::ADMINISTRATOR,
         'username' => '',
     ];
-});
+        });
+    }
 
-$factory->state(User::class, 'NetworkCoordinator', function (Faker $faker) {
-    return [
+    public function networkCoordinator()
+    {
+        return $this->state(function () {
+            return [
         'role' => Role::NETWORK_COORDINATOR,
         'username' => '',
     ];
-});
+        });
+    }
+}

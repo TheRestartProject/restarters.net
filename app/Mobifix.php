@@ -2,6 +2,7 @@
 
 namespace App;
 
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use DB;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Schema\Blueprint;
@@ -9,6 +10,8 @@ use Illuminate\Support\Facades\Schema;
 
 class Mobifix extends Model
 {
+    use HasFactory;
+
     protected $table = 'devices_faults_mobiles_opinions';
     protected $dateFormat = 'Y-m-d H:i';
     protected $primaryKey = 'id';

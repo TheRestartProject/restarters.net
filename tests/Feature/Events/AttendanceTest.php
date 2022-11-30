@@ -23,10 +23,10 @@ class AttendanceTest extends TestCase
     {
         parent::setUp();
 
-        $this->host = factory(User::class)->states('Administrator')->create();
+        $this->host = User::factory()->administrator()->create();
         $this->actingAs($this->host);
 
-        $this->group = factory(Group::class)->create();
+        $this->group = Group::factory()->create();
         $this->group->addVolunteer($this->host);
         $this->group->makeMemberAHost($this->host);
 

@@ -29,17 +29,17 @@ class GroupNetworkCreateTest extends TestCase
         $this->withoutExceptionHandling();
 
         // arrange
-        $admin = factory(User::class)->states('Administrator')->create([
+        $admin = User::factory()->administrator()->create([
             'api_token' => '1234',
         ]);
         $this->actingAs($admin);
 
-        $network = factory(Network::class)->create([
+        $network = Network::factory()->create([
             'shortname' => 'repairtogether',
             'include_in_zapier' => true,
         ]);
 
-        $groupAttributes = factory(Group::class)->raw();
+        $groupAttributes = Group::factory()->raw();
         $groupAttributes['name'] = 'Lancaster Fixers';
 
         // act
@@ -51,7 +51,7 @@ class GroupNetworkCreateTest extends TestCase
         $group = Group::where('name', 'Lancaster Fixers')->first();
         $this->assertTrue($group->isMemberOf($network));
 
-        $network1 = factory(Network::class)->create();
+        $network1 = Network::factory()->create();
         $this->assertFalse($group->isMemberOf($network1));
     }
 }
