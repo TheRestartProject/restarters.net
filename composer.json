@@ -60,12 +60,10 @@
             "app/Helpers/Fixometer.php",
             "app/Helpers/FixometerFile.php"
         ],
-        "classmap": [
-            "database/seeds",
-            "database/factories"
-        ],
         "psr-4": {
-            "App\\": "app/"
+            "App\\": "app/",
+            "Database\\Factories\\": "database/factories/",
+            "Database\\Seeders\\": "database/seeders/"
         }
     },
     "autoload-dev": {
