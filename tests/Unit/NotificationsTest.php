@@ -82,7 +82,7 @@ class NotificationsTest extends TestCase
 
     private $outputs = [];
 
-    protected function setup(): void {
+    protected function setUp(): void {
         parent::setUp();
 
         // Create users with specific ids because the notification outputs have a link to the preferences which
