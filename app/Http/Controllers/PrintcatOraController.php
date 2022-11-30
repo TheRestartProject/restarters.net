@@ -23,7 +23,7 @@ class PrintcatOraController extends Controller
     public function index(Request $request)
     {
         // PrintCat is now closed.
-        return redirect()->action('PrintcatOraController@status');
+        return redirect()->action([\App\Http\Controllers\PrintcatOraController::class, 'status']);
     }
 
     /**

@@ -23,7 +23,7 @@ class TabicatOraController extends Controller
     public function index(Request $request)
     {
         // TabiCat is now closed.
-        return redirect()->action('TabicatOraController@status');
+        return redirect()->action([\App\Http\Controllers\TabicatOraController::class, 'status']);
     }
 
     /**
