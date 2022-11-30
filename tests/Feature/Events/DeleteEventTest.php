@@ -94,11 +94,11 @@ class DeleteEventTest extends TestCase
         $this->withoutExceptionHandling();
 
         switch ($role) {
-            case Role::ADMINISTRATOR: $roleToCreate = 'Administrator'; break;
-            case Role::NETWORK_COORDINATOR: $roleToCreate = 'NetworkCoordinator'; break;
-            case Role::HOST: $roleToCreate = 'Host'; break;
+            case Role::ADMINISTRATOR: $roleToCreate = 'Administrator'; $host = User::factory()->administrator()->create(); break;
+            case Role::NETWORK_COORDINATOR: $roleToCreate = 'NetworkCoordinator'; $host = User::factory()->networkCoordinator()->create(); break;
+            case Role::HOST: $roleToCreate = 'Host'; $host = User::factory()->host()->create(); break;
         }
-        $host = User::factory()->roleToCreate()->create();
+
         $this->actingAs($host);
 
         $group = Group::factory()->create([

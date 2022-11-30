@@ -35,7 +35,16 @@ class AddRemoveVolunteerTest extends TestCase
                                                    'event_end_utc' => '2130-01-01T13:14:00+00:00',
                                                ]);
 
-        $host = User::factory()->role()->create();
+        switch ($role) {
+            case 'Administrator':
+                $host = User::factory()->administrator()->create();
+                break;
+            case 'NetworkCoordinator':
+                $host = User::factory()->networkCoordinator()->create();
+                break;
+            default:
+                self::assertTrue(false, "Unknown role $role");
+        }
 
         if ($role == 'NetworkCoordinator') {
             $network->addCoordinator($host);

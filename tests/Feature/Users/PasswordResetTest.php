@@ -24,7 +24,7 @@ class PasswordResetTest extends TestCase
             'email' => 'nobody@nowhere.com'
         ]);
 
-        $response->assertSeeText(__('passwords.user'));
+        $response->assertSeeText(__('passwords.user'), false);
     }
 
     public function testResetSuccess()

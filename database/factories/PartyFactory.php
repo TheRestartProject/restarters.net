@@ -39,6 +39,7 @@ class PartyFactory extends Factory
 
             $model->event_start_utc = $start->toIso8601String();
             $model->event_end_utc = $end->toIso8601String();
+            return $model;
         })->afterCreating(function ($model)
         {
             // We want to refresh the model before returning it.  This is so that we pick up the virtual columns.
