@@ -131,8 +131,8 @@ class ExportTest extends TestCase
 
         // Export time volunteered - first as a web page.
         $response = $this->get("/reporting/time-volunteered?a");
-        $response->assertSee(e($event1->getEventName()));
-        $response->assertSee(e($event2->getEventName()));
+        $response->assertSee($event1->getEventName());
+        $response->assertSee($event2->getEventName());
 
         // Now as a CSV.
         $response = $this->get("/export/time-volunteered?a");

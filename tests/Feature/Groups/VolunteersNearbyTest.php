@@ -49,9 +49,9 @@ class VolunteersNearbyTest extends TestCase
 
         // Should see the appropriate users in the list of nearby.
         $rsp = $this->get('/group/nearby/' . $group->idgroups);
-        $rsp->assertSee(e($user1->name));
-        $rsp->assertSee(e($user2->name));
-        $rsp->assertDontSee(e($user3->name));
+        $rsp->assertSee($user1->name);
+        $rsp->assertSee($user2->name);
+        $rsp->assertDontSee($user3->name);
 
         // Invite one of them.
         $rsp = $this->get('/group/nearbyinvite/' . $group->idgroups . '/' . $user1->id);

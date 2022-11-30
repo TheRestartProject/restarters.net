@@ -183,11 +183,11 @@ class EventStatsTest extends StatsTestCase
         $this->loginAsTestUser(Role::ADMINISTRATOR);
         $response = $this->get('/search');
         $response->assertSuccessful();
-        $response->assertSee(e($event->venue));
+        $response->assertSee($event->venue);
 
         $response = $this->get("/search?fltr=1&parties[]={$event->idevents}");
         $response->assertSee('id="key-stats"');
-        $response->assertSee(e($event->venue));
+        $response->assertSee($event->venue);
     }
 
     /** @test */
