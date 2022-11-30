@@ -480,20 +480,20 @@ class ExportController extends Controller
         //Creat new file and set headers
         $file_name = 'time_reporting.csv';
         $file = fopen($file_name, 'w+');
-        $file_headers = array(
+        $file_headers = [
             "Content-type" => "text/csv",
-        );
+        ];
 
         //Put stats in csv
-        $stats_headers = array('Hours Volunteered', 'Average age', 'Number of groups', 'Total number of users', 'Number of anonymous users');
-        fputcsv($file, array('Overall Stats:'));
+        $stats_headers = ['Hours Volunteered', 'Average age', 'Number of groups', 'Total number of users', 'Number of anonymous users'];
+        fputcsv($file, ['Overall Stats:']);
         fputcsv($file, $stats_headers);
-        fputcsv($file, array(number_format($data['hours_completed'], 0, '.', ','), 'N/A', $data['group_count'], $data['total_users'], $data['anonymous_users']));
-        fputcsv($file, array());
+        fputcsv($file, [number_format($data['hours_completed'], 0, '.', ','), 'N/A', $data['group_count'], $data['total_users'], $data['anonymous_users']]);
+        fputcsv($file, []);
 
         //Put breakdown by country in csv
-        $country_headers = array('Country name', 'Total hours');
-        fputcsv($file, array('Breakdown by country:'));
+        $country_headers = ['Country name', 'Total hours'];
+        fputcsv($file, ['Breakdown by country:']);
         fputcsv($file, $country_headers);
         foreach($data['country_hours_completed'] as $country_hours) {
             if(!is_null($country_hours->country)) {
@@ -501,13 +501,13 @@ class ExportController extends Controller
             } else {
                 $country = 'N/A';
             }
-            fputcsv($file, array($country, number_format($country_hours->hours/60/60, 0, '.', ',')));
+            fputcsv($file, [$country, number_format($country_hours->hours/60/60, 0, '.', ',')]);
         }
-        fputcsv($file, array());
+        fputcsv($file, []);
 
         //Put breakdown by city in csv
-        $city_headers = array('Town/city name', 'Total hours');
-        fputcsv($file, array('Breakdown by city:'));
+        $city_headers = ['Town/city name', 'Total hours'];
+        fputcsv($file, ['Breakdown by city:']);
         fputcsv($file, $city_headers);
         foreach($data['city_hours_completed'] as $city_hours) {
             if(!is_null($city_hours->location)) {
@@ -515,19 +515,19 @@ class ExportController extends Controller
             } else {
                 $city = 'N/A';
             }
-            fputcsv($file, array($city, number_format($city_hours->hours/60/60, 0, '.', ',')));
+            fputcsv($file, [$city, number_format($city_hours->hours/60/60, 0, '.', ',')]);
         }
-        fputcsv($file, array());
+        fputcsv($file, []);
 
         //Put users in csv
-        $users_headers = array('#', 'Hours', 'Event date', 'Restart group', 'Location');
-        fputcsv($file, array('Results:'));
+        $users_headers = ['#', 'Hours', 'Event date', 'Restart group', 'Location'];
+        fputcsv($file, ['Results:']);
         fputcsv($file, $users_headers);
         foreach($data['user_events'] as $ue) {
-            fputcsv($file, array($ue->id, date('H:i', strtotime($ue->end) - strtotime($ue->start)),
-                date('d/m/Y', strtotime($ue->event_date)), $ue->groupname, $ue->location));
+            fputcsv($file, [$ue->id, date('H:i', strtotime($ue->end) - strtotime($ue->start)),
+                date('d/m/Y', strtotime($ue->event_date)), $ue->groupname, $ue->location]);
         }
-        fputcsv($file, array());
+        fputcsv($file, []);
 
         //close file
         fclose($file);
