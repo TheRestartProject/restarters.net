@@ -9,7 +9,6 @@ class Misccat extends Model
 {
     protected $table = 'devices_misc_opinions';
     protected $dateFormat = 'Y-m-d H:i';
-    protected $dates = ['created_at', 'updated_at'];
     protected $primaryKey = 'id';
 
     /**
