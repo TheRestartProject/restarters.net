@@ -9,7 +9,7 @@ dependencies:
 jobs:
   build:
     docker:
-      - image: cimg/php:7.4.11-node
+      - image: cimg/php:8.1.12-node
         name: restarters.test
         environment:
           - DB_CONNECTION: mysql
@@ -124,7 +124,7 @@ jobs:
       - checkout
       - run: sudo apt update
       - run: sudo apt install dnsutils openssl zip unzip git libxml2-dev libzip-dev zlib1g-dev libcurl4-openssl-dev iputils-ping default-mysql-client vim libpng-dev libgmp-dev libjpeg-turbo8-dev
-      - run: sudo apt-get install php7.4-xmlrpc php7.4-intl php7.4-xdebug php7.4-xmlrpc php7.4-mbstring php7.4-simplexml php7.4-curl php7.4-zip python postgresql-client
+      - run: sudo apt-get install php-xmlrpc php8.1-intl php8.1-xdebug php8.1-mbstring php8.1-simplexml php8.1-curl php8.1-zip postgresql-client
 
       # We now need Node 14 for Playwright.
       - run: sudo curl -sL https://deb.nodesource.com/setup_14.x | sudo bash -
@@ -162,7 +162,7 @@ jobs:
       # ...and needs honeypot rate-limiting needs to be turned off.
       - run: sed -i 's/HONEYPOT_DISABLE=.*$/HONEYPOT_DISABLE=TRUE/g' .env
 
-      - run: wget https://getcomposer.org/composer-2.phar; rm -rf vendor; echo Y | php7.4 composer-2.phar install
+      - run: wget https://getcomposer.org/composer-2.phar; rm -rf vendor; echo Y | php8.1 composer-2.phar install
       - run: npm install
       - run: npx playwright install
       - run: npx playwright install-deps
