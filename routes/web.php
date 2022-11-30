@@ -30,6 +30,7 @@ use App\Http\Controllers\SkillsController;
 use App\Http\Controllers\StyleController;
 use App\Http\Controllers\TabicatOraController;
 use App\Http\Controllers\UserController;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
 
 /*

@@ -27,6 +27,7 @@ class WikiSyncStatus
 
 class User extends Authenticatable implements Auditable, HasLocalePreference
 {
+    use HasFactory;
     use Notifiable;
     use SoftDeletes;
     use \OwenIt\Auditing\Auditable;

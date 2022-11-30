@@ -35,7 +35,7 @@ class AppServiceProvider extends ServiceProvider
             }
         });
 
-        \Illuminate\Pagination\Paginator::useBootstrap();
+        \Illuminate\Pagination\Paginator::useBootstrapThree();
     }
 
     /**

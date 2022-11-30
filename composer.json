@@ -39,8 +39,7 @@
         "symfony/http-foundation": "^5.4",
         "twbs/bootstrap": "4.1.0",
         "wouternl/laravel-drip": "^1.1",
-        "laravel/ui": "^3.0",
-        "fakerphp/faker": "1.9.2"
+        "laravel/ui": "^3.0"
     },
     "require-dev": {
         "barryvdh/laravel-debugbar": "^3.6",
@@ -48,10 +47,10 @@
         "mockery/mockery": "^1.4.4",
         "nunomaduro/collision": "^5.10",
         "php-coveralls/php-coveralls": "^2.4",
-        "phpunit/phpunit": "^9.5.10",
+        "phpunit/phpunit": "^9.3.0",
         "squizlabs/php_codesniffer": "^3.6",
         "symfony/dom-crawler": "^5.4",
-        "fakerphp/faker": "^1.9.1",
+        "fakerphp/faker": "^1.20.0",
         "facade/ignition": "^2.5"
     },
     "autoload": {
