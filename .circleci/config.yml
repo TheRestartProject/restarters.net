@@ -162,7 +162,7 @@ jobs:
       # ...and needs honeypot rate-limiting needs to be turned off.
       - run: sed -i 's/HONEYPOT_DISABLE=.*$/HONEYPOT_DISABLE=TRUE/g' .env
 
-      - run: wget https://getcomposer.org/composer-2.phar -O composer.phar; rm -rf vendor; echo Y | php8.1 composer-2.phar install
+      - run: wget https://getcomposer.org/composer-2.phar -O composer.phar; rm -rf vendor; echo Y | php8.1 composer.phar install
       - run: npm install
       - run: npx playwright install
       - run: npx playwright install-deps
