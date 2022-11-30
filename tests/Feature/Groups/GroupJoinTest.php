@@ -65,7 +65,7 @@ class GroupJoinTest extends TestCase
         // Try again.
         $this->followingRedirects();
         $response = $this->get('/group/join/'.$group->idgroups);
-        $this->assertContains('You are already part of this group', $response->getContent());
+        $this->assertStringContainsString('You are already part of this group', $response->getContent());
 
         // Now leave via API.
         $response = $this->get('/logout');

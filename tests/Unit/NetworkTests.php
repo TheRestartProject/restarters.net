@@ -48,7 +48,7 @@ class NetworkTests extends TestCase
         $ids = $eventsRequiringModeration->pluck('idevents');
 
         // assert
-        $this->assertContains($event1->idevents, $ids);
-        $this->assertNotContains($event2->idevents, $ids);
+        $this->assertStringContainsString($event1->idevents, $ids);
+        $this->assertStringNotContainsString($event2->idevents, $ids);
     }
 }

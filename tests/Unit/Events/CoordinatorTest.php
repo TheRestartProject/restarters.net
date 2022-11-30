@@ -45,7 +45,7 @@ class CoordinatorTest extends TestCase
         // assert
         $coordinators = $event->associatedNetworkCoordinators();
 
-        $this->assertContains($coordinator->id, $coordinators->pluck('id'));
+        $this->assertStringContainsString($coordinator->id, $coordinators->pluck('id'));
     }
 
     /** @test */

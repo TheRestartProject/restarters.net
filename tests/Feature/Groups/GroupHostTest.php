@@ -49,7 +49,7 @@ class GroupHostTest extends TestCase
             $response = $this->get("/group/make-host/{$this->idgroups}/{$host->id}");
             $this->assertTrue(false);
         } catch (\Exception $e) {
-            $this->assertContains('Volunteer is not currently in this group', $e->getMessage());
+            $this->assertStringContainsString('Volunteer is not currently in this group', $e->getMessage());
         }
     }
 

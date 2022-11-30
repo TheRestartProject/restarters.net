@@ -40,7 +40,7 @@ class GroupCreateTest extends TestCase
 
         // Use an address which will fail to geocode.
         $this->assertNull($this->createGroup('Test Group', 'https://therestartproject.org', 'zzzzzzzzzzz123', 'Some text', false));
-        $this->assertContains(__('groups.geocode_failed'), $this->lastResponse->getContent());
+        $this->assertStringContainsString(__('groups.geocode_failed'), $this->lastResponse->getContent());
     }
 
     public function testDuplicate()
@@ -58,7 +58,7 @@ class GroupCreateTest extends TestCase
             'timezone' => 'Europe/London'
         ]);
 
-        $this->assertContains('That group name (Test Group0) already exists', $response->getContent());
+        $this->assertStringContainsString('That group name (Test Group0) already exists', $response->getContent());
     }
 
     public function roles() {
@@ -126,7 +126,7 @@ class GroupCreateTest extends TestCase
             }
         );
 
-        $this->assertContains('Group updated!', $response->getContent());
+        $this->assertStringContainsString('Group updated!', $response->getContent());
     }
 
     public function testEventVisibility() {

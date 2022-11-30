@@ -55,11 +55,11 @@ class InviteEventTest extends TestCase
                 ], $user->language), $mailData['subject']);
 
                 // Mail should mention the host, message, location and timezone.
-                self::assertContains($host->name, $mailData['introLines'][0]);
-                self::assertContains('creepy', $mailData['introLines'][2]);
-                self::assertContains($event->location, $mailData['introLines'][4]);
-                self::assertContains($event->timezone,  $mailData['introLines'][4]);
-                self::assertContains('/view/', $mailData['introLines'][4]);
+                self::assertStringContainsString($host->name, $mailData['introLines'][0]);
+                self::assertStringContainsString('creepy', $mailData['introLines'][2]);
+                self::assertStringContainsString($event->location, $mailData['introLines'][4]);
+                self::assertStringContainsString($event->timezone,  $mailData['introLines'][4]);
+                self::assertStringContainsString('/view/', $mailData['introLines'][4]);
                 return true;
             }
         );

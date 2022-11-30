@@ -37,7 +37,7 @@ class GroupEditTest extends TestCase
             'free_text' => 'HQ',
         ]);
 
-        $this->assertContains('Group updated!', $response->getContent());
+        $this->assertStringContainsString('Group updated!', $response->getContent());
 
         $this->assertEquals(1, count($group->group_tags));
         $this->assertEquals($tag->tag_name, $group->group_tags[0]->tag_name);
@@ -66,7 +66,7 @@ class GroupEditTest extends TestCase
             'free_text' => 'HQ',
         ]);
 
-        $this->assertContains(__('groups.geocode_failed'), $response->getContent());
+        $this->assertStringContainsString(__('groups.geocode_failed'), $response->getContent());
     }
 
     /** @test */

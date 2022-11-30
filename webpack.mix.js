@@ -36,6 +36,7 @@ mix.webpackConfig({
 // ], 'public/js/gdpr-cookie-notice.js');
 
 mix.js('resources/js/app.js', 'public/js')
+   .vue()
    .sass('resources/sass/app.scss', 'public/css')
    .browserSync({
         proxy: 'https://restarters.test'

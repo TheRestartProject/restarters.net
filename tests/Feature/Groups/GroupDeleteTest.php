@@ -23,14 +23,14 @@ class GroupDeleteTest extends TestCase
             $this->actingAs($user);
             $this->followingRedirects();
             $response = $this->get("/group/delete/$id");
-            $this->assertContains('Sorry, but you do not have the permissions to perform that action', $response->getContent());
+            $this->assertStringContainsString('Sorry, but you do not have the permissions to perform that action', $response->getContent());
         }
 
         $user = \App\User::factory()->administrator()->create();
         $this->actingAs($user);
         $this->followingRedirects();
         $response = $this->get("/group/delete/$id");
-        $this->assertContains(__('groups.delete_succeeded', [
+        $this->assertStringContainsString(__('groups.delete_succeeded', [
             'name' => $name,
         ]), $response->getContent());
     }
@@ -50,7 +50,7 @@ class GroupDeleteTest extends TestCase
         $this->actingAs($user);
         $this->followingRedirects();
         $response = $this->get("/group/delete/$id");
-        $this->assertContains(__('groups.delete_succeeded', [
+        $this->assertStringContainsString(__('groups.delete_succeeded', [
             'name' => $name,
         ]), $response->getContent());
     }
@@ -69,7 +69,7 @@ class GroupDeleteTest extends TestCase
         $this->actingAs($user);
         $this->followingRedirects();
         $response = $this->get("/group/delete/$id");
-        $this->assertContains('Sorry, but you do not have the permissions to perform that action.', $response->getContent());
+        $this->assertStringContainsString('Sorry, but you do not have the permissions to perform that action.', $response->getContent());
 
         // Delete the event - still shouldn't be deletable as a device exists.
         Party::find($idevents)->delete();
