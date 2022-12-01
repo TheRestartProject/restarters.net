@@ -19,7 +19,6 @@
         "doctrine/dbal": "^2.13",
         "egulias/email-validator": "2.1.25",
         "filp/whoops": "^2.14",
-        "fruitcake/laravel-cors": "^2.0",
         "guzzlehttp/guzzle": "^6.3.1|^7.0.1",
         "hieu-le/wordpress-xmlrpc-client": "~2.0",
         "intervention/image": "^2.7",
