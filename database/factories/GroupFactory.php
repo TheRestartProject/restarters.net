@@ -14,8 +14,8 @@ class GroupFactory extends Factory
     public function definition()
     {
         return [
-        'name' => $this->faker->unique()->company,
-        'free_text' => $this->faker->sentence,
+        'name' => $this->faker->unique()->company(),
+        'free_text' => $this->faker->sentence(),
         'facebook' => '',
         'postcode' => '',
         'timezone' => 'Europe/London'

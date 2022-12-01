@@ -63,8 +63,8 @@ class PartyFactory extends Factory
             {
                 return Group::factory()->create()->idgroups;
             },
-            'venue' => $this->faker->streetName,
-            'free_text' => $this->faker->paragraph,
+            'venue' => $this->faker->streetName(),
+            'free_text' => $this->faker->paragraph(),
             'timezone' => 'Europe/London'
         ];
     }

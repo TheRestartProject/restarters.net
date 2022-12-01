@@ -28,9 +28,9 @@ class UserFactory extends Factory
     public function definition()
     {
         return [
-        'name' => $this->faker->name,
-        'email' => $this->faker->unique()->safeEmail,
-        'username' => $this->faker->userName,
+        'name' => $this->faker->name(),
+        'email' => $this->faker->unique()->safeEmail(),
+        'username' => $this->faker->userName(),
         'password' => '$2y$10$TKh8H1.PfQx37YgCzwiKb.KjNyWgaHb9cbcoQgdIVFlYg7B77UdFm', // secret
         'remember_token' => Str::random(10),
         'consent_past_data' => new \DateTime(),
@@ -38,7 +38,7 @@ class UserFactory extends Factory
         'consent_gdpr' => new \DateTime(),
         'number_of_logins' => 1,
         'age' => $this->faker->year(),
-        'country' => $this->faker->countryCode,
+        'country' => $this->faker->countryCode(),
         'role' => Role::RESTARTER,
         'invites' => 1,
         'repairdir_role' => Role::REPAIR_DIRECTORY_NONE,

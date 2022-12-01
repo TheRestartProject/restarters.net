@@ -14,8 +14,8 @@ class GroupTagsFactory extends Factory
     public function definition()
     {
         return [
-        'tag_name' => $this->faker->word,
-        'description' => $this->faker->sentence,
+        'tag_name' => $this->faker->word(),
+        'description' => $this->faker->sentence(),
     ];
     }
 }
