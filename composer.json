@@ -38,7 +38,8 @@
         "symfony/http-foundation": "^5.4",
         "twbs/bootstrap": "4.1.0",
         "wouternl/laravel-drip": "^1.1",
-        "laravel/ui": "^3.0"
+        "laravel/ui": "^3.0",
+        "league/flysystem-aws-s3-v3": "^3.0"
     },
     "require-dev": {
         "barryvdh/laravel-debugbar": "^3.6",
