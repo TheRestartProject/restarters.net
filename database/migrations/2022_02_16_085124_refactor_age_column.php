@@ -2,7 +2,7 @@
 
 use Illuminate\Database\Migrations\Migration;
 
-class RefactorAgeColumn extends Migration
+return new class extends Migration
 {
     /**
      * Run the migrations.
@@ -29,4 +29,4 @@ class RefactorAgeColumn extends Migration
         DB::statement('ALTER TABLE `devices` DROP `age`');
         DB::statement('ALTER TABLE `devices` CHANGE `age_old` `age` VARCHAR(10)');
     }
-}
+};

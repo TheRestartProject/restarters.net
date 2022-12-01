@@ -6,7 +6,7 @@ use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 use App\Party;
 
-class Timezones extends Migration
+return new class extends Migration
 {
     /**
      * Run the migrations.
@@ -108,4 +108,4 @@ class Timezones extends Migration
             $table->dropColumn('end_old');
         });
     }
-}
+};

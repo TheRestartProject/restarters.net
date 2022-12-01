@@ -2,7 +2,7 @@
 
 use Illuminate\Database\Migrations\Migration;
 
-class UpdateLcaUnpoweredCategories extends Migration
+return new class extends Migration
 {
     /**
      * Run the migrations.
@@ -226,4 +226,4 @@ RIGHT JOIN `restarters.test`.categories c2 ON c2.idcategories = c1.idcategories
 
         DB::statement(DB::raw('UPDATE categories SET revision=1'));
     }
-}
+};

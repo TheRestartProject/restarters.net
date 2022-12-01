@@ -4,7 +4,7 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-class BattcatOraSetup extends Migration
+return new class extends Migration
 {
     /**
      * Run the migrations.
@@ -148,4 +148,4 @@ class BattcatOraSetup extends Migration
         Schema::dropIfExists('fault_types_batteries');
         Schema::dropIfExists('devices_battcat_ora');
     }
-}
+};
