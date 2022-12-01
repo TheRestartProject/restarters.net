@@ -110,4 +110,15 @@ class EventServiceProvider extends ServiceProvider
             Event::listen('Illuminate\Auth\Events\Login', \App\Listeners\LogInToWiki::class);
         }
     }
+
+    /**
+     * Determine if events and listeners should be automatically discovered.
+     *
+     * @return bool
+     */
+    public function shouldDiscoverEvents()
+    {
+        return false;
+    }
 }
+
