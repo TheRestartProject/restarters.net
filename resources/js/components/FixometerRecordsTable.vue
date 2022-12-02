@@ -95,7 +95,7 @@
 import { END_OF_LIFE, FIXED, REPAIRABLE } from '../constants'
 import moment from 'moment'
 import DeviceModel from './DeviceModel'
-import Vue       from 'vue'
+import Vue from 'vue'
 import lineClamp from 'vue-line-clamp'
 import ConfirmModal from './ConfirmModal'
 import EventDevice from './EventDevice'

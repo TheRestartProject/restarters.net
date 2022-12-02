@@ -1,3 +1,4 @@
+const path = require('path');
 let mix = require('laravel-mix');
 let webpack = require('webpack');
 const WebpackShellPlugin = require('webpack-shell-plugin-next');
@@ -49,3 +50,7 @@ mix.js('resources/global/js/app.js', 'public/global/js')
 
 mix.js('resources/wiki/js/wiki.js', 'public/js/wiki.js')
   .sass('resources/wiki/css/app.scss', 'public/css/wiki.css');
+
+mix.alias({
+    vue$: path.resolve(__dirname, 'node_modules/vue/dist/vue.esm.js'),
+})
