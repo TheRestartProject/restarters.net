@@ -138,7 +138,7 @@ class CreateEventTest extends TestCase
 
         if ($role != 'Host') {
             // Need to act as someone else.
-            $this->actingAs(User::factory()->role()->create());
+            $this->actingAs(User::factory()->{lcfirst($role)}()->create());
         }
 
         // Check the group page.

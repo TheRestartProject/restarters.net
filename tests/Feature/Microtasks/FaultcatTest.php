@@ -314,7 +314,7 @@ class FaultcatTest extends TestCase
 
     protected function _insert_faultcat_device($cat, $id, $problem, $fault_type = '')
     {
-        $device = Device::factory()->count(1)->cat()->create(
+        $device = Device::factory()->count(1)->{str_replace(' ', '_', lcfirst($cat))}()->create(
                 [
                     'problem' => $problem,
                     'fault_type' => $fault_type,

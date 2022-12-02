@@ -36,7 +36,7 @@ class GroupHostTest extends TestCase
      */
     public function testVolunteerNotInGroup($role)
     {
-        $user = User::factory()->role()->create();
+        $user = User::factory()->{lcfirst($role)}()->create();
         $this->actingAs($user);
 
         if ($role == 'NetworkCoordinator') {
@@ -58,7 +58,7 @@ class GroupHostTest extends TestCase
      */
     public function testMakeHost($role)
     {
-        $user = User::factory()->role()->create();
+        $user = User::factory()->{lcfirst($role)}()->create();
         $this->actingAs($user);
 
         if ($role == 'NetworkCoordinator') {

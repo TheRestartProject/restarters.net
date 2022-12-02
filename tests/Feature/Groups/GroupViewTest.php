@@ -91,7 +91,7 @@ class GroupViewTest extends TestCase
 
         // Only administrators can delete.
         foreach (['Restarter', 'Host', 'NetworkCoordinator'] as $role) {
-            $user = \App\User::factory()->role()->create();
+            $user = \App\User::factory()->{lcfirst($role)}()->create();
             $this->actingAs($user);
             $response = $this->get("/group/view/$id");
             $this->assertVueProperties($response, [

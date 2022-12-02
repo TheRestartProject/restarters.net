@@ -74,7 +74,7 @@ class GroupCreateTest extends TestCase
     public function testApprove($role) {
         Notification::fake();
 
-        $actas = User::factory()->role()->create();
+        $actas = User::factory()->{lcfirst($role)}()->create();
         $this->actingAs($actas);
 
         $network = Network::factory()->create();

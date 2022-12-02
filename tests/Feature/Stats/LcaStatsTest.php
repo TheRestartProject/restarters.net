@@ -169,7 +169,7 @@ class LcaStatsTest extends StatsTestCase
         $this->assertIsArray($result);
         $this->assertEquals(1, count($result));
         foreach ($expect as $k => $v) {
-            $this->assertEquals($v, round($result[0]->{$k}, 2), "Wrong value for $k => $v");
+            $this->assertEquals(round($v, 2), round($result[0]->{$k}, 2), "Wrong value for $k => $v");
         }
     }
 
@@ -297,7 +297,7 @@ class LcaStatsTest extends StatsTestCase
         $this->assertIsArray($result);
         $this->assertEquals(1, count($result));
         foreach ($expect as $k => $v) {
-            $this->assertEquals($v, round($result[0]->{$k}, 2), "Wrong value for $k => $v");
+            $this->assertEquals(round($v, 2), round($result[0]->{$k}, 2), "Wrong value for $k => $v");
         }
     }
 }

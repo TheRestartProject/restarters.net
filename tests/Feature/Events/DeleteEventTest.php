@@ -281,7 +281,7 @@ class DeleteEventTest extends TestCase
             $this->createDevice($idevents, 'misc');
         }
 
-        $user = User::factory()->role()->create();
+        $user = User::factory()->{lcfirst($role)}()->create();
 
         if ($role == 'NetworkCoordinator') {
             $network->addCoordinator($user);

@@ -37,7 +37,7 @@ class UserAdminTest extends TestCase
     public function testUsersPage($role, $cansee)
     {
         // Fetch the list of all users and check that we're in it.
-        $admin = User::factory()->role()->create();
+        $admin = User::factory()->{lcfirst($role)}()->create();
         $this->actingAs($admin);
 
         $response = $this->get('/user/all');

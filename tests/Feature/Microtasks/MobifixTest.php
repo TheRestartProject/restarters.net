@@ -265,7 +265,7 @@ class MobifixTest extends TestCase
 
     protected function _insert_mobifix_device($cat, $id, $problem, $fault_type = '')
     {
-        $device = Device::factory()->count(1)->cat()->create(
+        $device = Device::factory()->count(1)->{lcfirst($cat)}()->create(
                 [
                     'problem' => $problem,
                     'fault_type' => $fault_type,

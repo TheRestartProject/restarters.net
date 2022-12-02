@@ -19,7 +19,7 @@ class GroupDeleteTest extends TestCase
 
         // Only administrators can delete.
         foreach (['Restarter', 'Host', 'NetworkCoordinator'] as $role) {
-            $user = \App\User::factory()->role()->create();
+            $user = \App\User::factory()->{lcfirst($role)}()->create();
             $this->actingAs($user);
             $this->followingRedirects();
             $response = $this->get("/group/delete/$id");
