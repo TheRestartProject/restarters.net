@@ -294,7 +294,7 @@ class InviteEventTest extends TestCase
                 ], $host->language), $mailData['subject']);
 
                 // Mail should mention the venue.
-                self::assertRegexp('/' . $event->venue . '/', $mailData['introLines'][0]);
+                self::assertMatchesRegularExpression ('/' . $event->venue . '/', $mailData['introLines'][0]);
 
                 return true;
             }

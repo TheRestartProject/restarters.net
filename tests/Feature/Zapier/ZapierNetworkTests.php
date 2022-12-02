@@ -68,7 +68,7 @@ class ZapierNetworkTests extends TestCase
 
         // assert
         $response = $this->get('/api/groups/changes?api_token=1234');
-        $response->assertSee($group->name);
+        $response->assertSee($group->name, false);
     }
 
     //     When a new group is created that is in Repair Together network, it is not included in the Restart Zapier trigger
@@ -126,7 +126,7 @@ class ZapierNetworkTests extends TestCase
 
         // assert
         $response = $this->get('/api/users/changes?api_token=1234');
-        $response->assertSee($user->name);
+        $response->assertSee($user->name, false);
     }
 
     // When a new user is created that is in the Repair Together network, it is not included in the Restart Zapier trigger
@@ -154,7 +154,7 @@ class ZapierNetworkTests extends TestCase
 
         // assert
         $response = $this->get('/api/users/changes?api_token=1234');
-        $response->assertDontSee($user->name);
+        $response->assertDontSee($user->name, false);
     }
 
     // When a new user/group association is created for a user in the Restart network joining a group in the Restart network, it IS included in the Restart Zapier trigger
@@ -185,7 +185,7 @@ class ZapierNetworkTests extends TestCase
 
         // assert
         $response = $this->get('/api/usersgroups/changes?api_token=1234');
-        $response->assertSee($user->email);
+        $response->assertSee($user->email, false);
     }
 
     // When a new user/group association is created and either the user or the group is not in the Restart network, it isn't included in the Restart Zapier trigger

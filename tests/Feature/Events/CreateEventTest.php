@@ -199,7 +199,7 @@ class CreateEventTest extends TestCase
                 self::assertEquals(__('notifications.event_confirmed_subject', [], $host->language), $mailData['subject']);
 
                 // Mail should mention the venue.
-                self::assertRegexp('/' . $event->venue . '/', $mailData['introLines'][0]);
+                self::assertMatchesRegularExpression ('/' . $event->venue . '/', $mailData['introLines'][0]);
                 self::assertStringContainsString('#list-email-preferences', $mailData['outroLines'][0]);
 
                 return true;

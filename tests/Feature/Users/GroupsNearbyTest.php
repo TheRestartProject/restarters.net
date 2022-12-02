@@ -165,7 +165,7 @@ class GroupsNearbyTest extends TestCase
                 self::assertEquals(__('notifications.new_group_subject', [], $host->language), $mailData['subject']);
 
                 // Mail should mention the group name.
-                self::assertRegexp('/' . $group->name . '/', $mailData['introLines'][0]);
+                self::assertMatchesRegularExpression ('/' . $group->name . '/', $mailData['introLines'][0]);
 
                 return true;
             }
