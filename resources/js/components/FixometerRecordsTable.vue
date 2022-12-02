@@ -425,25 +425,25 @@ export default {
   text-transform: uppercase;
 }
 
-/deep/ .width10 {
+::v-deep .width10 {
   width: 10%;
 }
 
-/deep/ .width20 {
+::v-deep .width20 {
   width: 20%;
 }
 
-/deep/ .width90px {
+::v-deep .width90px {
   width: 90px;
 }
 
-/deep/ .table th {
+::v-deep .table th {
   padding: 5px;
 }
 
 
 @include media-breakpoint-down(sm) {
-  /deep/ .table {
+  ::v-deep .table {
     tr {
       display: grid;
       grid-template-columns: 1fr 1fr;
@@ -465,7 +465,7 @@ export default {
   }
 }
 
-/deep/ tr.b-table-details td {
+::v-deep tr.b-table-details td {
   padding: 0px;
 }
 

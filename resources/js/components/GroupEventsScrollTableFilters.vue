@@ -120,7 +120,7 @@ export default {
   padding: 0 10px;
 }
 
-/deep/ .datepicker {
+::v-deep .datepicker {
   & label {
     padding-bottom: 0;
     border: 0;

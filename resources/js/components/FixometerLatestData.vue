@@ -66,7 +66,7 @@ export default {
   height: 41px;
 }
 
-/deep/ a {
+::v-deep a {
   color: black;
   text-decoration: underline;
 }
