@@ -778,8 +778,7 @@ class GroupController extends Controller
         $group_tags = GrouptagsGroups::where('group', $id)->pluck('group_tag')->toArray();
         $group_networks = Group::find($id)->networks->pluck('id')->toArray();
 
-        // TODO The return value is ignored, but this may be a bug.
-        compact($audits = $Group->findOrFail($id)->audits);
+        $audits = $Group->findOrFail($id)->audits;
 
         return view('group.edit', [
             'response' => $response,

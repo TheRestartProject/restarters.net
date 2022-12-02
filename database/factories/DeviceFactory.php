@@ -102,7 +102,7 @@ class DeviceFactory extends Factory
         });
     }
 
-    public function laptopLarge()
+    public function laptop_large()
     {
         return $this->state(function () {
             return [
@@ -112,7 +112,7 @@ class DeviceFactory extends Factory
         });
     }
 
-    public function laptopMedium()
+    public function laptop_medium()
     {
         return $this->state(function () {
             return [
@@ -122,7 +122,7 @@ class DeviceFactory extends Factory
         });
     }
 
-    public function laptopSmall()
+    public function laptop_small()
     {
         return $this->state(function () {
             return [

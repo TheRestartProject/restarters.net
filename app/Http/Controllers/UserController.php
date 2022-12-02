@@ -455,7 +455,7 @@ class UserController extends Controller
     {
         $User = new User;
 
-        $recovery = $request->post('recovery');
+        $recovery = $request->recovery;
 
         if (!$recovery) {
             $valid_code = false;

@@ -203,7 +203,7 @@ abstract class TestCase extends BaseTestCase
 
     public function createDevice($idevents, $type)
     {
-        $deviceAttributes = Device::factory()->type()->raw();
+        $deviceAttributes = Device::factory()->{lcfirst($type)}()->raw();
 
         $deviceAttributes['event_id'] = $idevents;
         $deviceAttributes['quantity'] = 1;
