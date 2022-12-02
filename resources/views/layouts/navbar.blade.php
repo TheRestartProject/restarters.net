@@ -33,42 +33,42 @@
     <li style="flex-basis: 100%;">
 
         <a href="{{{ env('DISCOURSE_URL')}}}/session/sso?return_path={{{ env('DISCOURSE_URL') }}}" rel="noopener noreferrer">
-        @include('/images/navigation/talk-icon')
+        @include('svgs/navigation/talk-icon')
         <span>@lang('general.menu_discourse')</span>
     </a>
     </li>
 
     <li class="@if(Str::contains(url()->current(), route('devices'))) active @endif" style="flex-basis: 100%;">
     <a href="{{ route('devices') }}">
-        @include('/images/navigation/drill-icon')
+        @include('svgs/navigation/drill-icon')
         <span>@lang('general.menu_fixometer')</span>
     </a>
     </li>
 
     <li class="@if(Str::contains(url()->current(), route('events'))) active @endif" style="flex-basis: 100%;">
     <a href="{{ route('events') }}">
-        @include('/images/navigation/events-icon')
+        @include('svgs/navigation/events-icon')
         <span>@lang('general.menu_events')</span>
     </a>
     </li>
 
     <li class="@if(Str::contains(url()->current(), route('groups'))) active @endif" style="flex-basis: 100%;">
     <a href="{{ route('groups') }}">
-        @include('/images/navigation/groups-icon')
+        @include('svgs/navigation/groups-icon')
         <span>@lang('general.menu_groups')</span>
     </a>
     </li>
 
     <li style="flex-basis: 100%;">
         <a href="{{config('restarters.wiki.base_url') }}" rel="noopener noreferrer">
-        @include('/images/navigation/wiki-icon')
+        @include('svgs/navigation/wiki-icon')
         <span>@lang('general.menu_wiki')</span>
     </a>
     </li>
 
     <li class="@if(Str::contains(url()->current(), route('workbench')) || Str::contains(url()->current(), '/mobifix') || Str::contains(url()->current(), '/misccat') || Str::contains(url()->current(), '/faultcat') || Str::contains(url()->current(), '/printcat')) active @endif" style="flex-basis: 100%;">
         <a href="{{ route('workbench') }}" rel="noopener noreferrer">
-            @include('/images/navigation/workbench-icon')
+            @include('svgs/navigation/workbench-icon')
             <span>@lang('general.menu_workbench')</span>
         </a>
     </li>

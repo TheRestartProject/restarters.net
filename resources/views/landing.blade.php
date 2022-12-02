@@ -169,16 +169,16 @@
 
     <div class="landing-layout">
       <div class="landing-top-left">
-        @include('/images/navigation/drill-icon')
+        @include('svgs/navigation/drill-icon')
       </div>
       <div class="landing-top-middle">
         <h1>{{ __('landing.title') }}</h1>
       </div>
       <div class="landing-top-right">
-        @include('/images/navigation/wiki-icon')
+        @include('svgs/navigation/wiki-icon')
       </div>
       <div class="landing-middle-left">
-        @include('/images/navigation/groups-icon')
+        @include('svgs/navigation/groups-icon')
       </div>
       <div class="landing-middle-middle">
         <div class="textlarge">
@@ -186,10 +186,10 @@
         </div>
       </div>
       <div class="landing-middle-right">
-        @include('/images/navigation/talk-icon')
+        @include('svgs/navigation/talk-icon')
       </div>
       <div class="landing-bottom-left">
-        @include('/images/navigation/events-icon')
+        @include('svgs/navigation/events-icon')
       </div>
       <div class="landing-bottom-middle">
         <div>
@@ -198,7 +198,7 @@
         </div>
       </div>
       <div class="landing-bottom-right">
-        @include('/images/navigation/workbench-icon')
+        @include('svgs/navigation/workbench-icon')
       </div>
     </div>
 
