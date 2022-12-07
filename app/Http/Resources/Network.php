@@ -41,7 +41,7 @@ class Network extends JsonResource
      *     @OA\Property(
      *          property="logo",
      *          title="image",
-     *          description="URL of a logo for this network.  You should prefix this with /uploads before use.",
+     *          description="URL of a logo for this network.",
      *          format="string",
      *          example="/mid_1597853610178a4b76e4d666b2a7b32ee75d8a24c706f1cbf213970.png"
      *     )
@@ -241,7 +241,7 @@ class Network extends JsonResource
         return [
             'id' => $this->id,
             'name' => $this->name,
-            'logo' => public_path() . DIRECTORY_SEPARATOR . $this->logo,
+            'logo' => $this->logo ? ($request->root() . '/uploads/mid_' . $this->logo) : null,
             'description' => $this->description,
             'website' => $this->website,
             'shortname' => $this->shortname,
