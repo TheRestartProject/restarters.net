@@ -173,4 +173,52 @@ class EditTest extends TestCase
         $response3->assertSessionHas('message');
         $this->assertEquals('Thank you, the image has been deleted', \Session::get('message'));
     }
+
+    public function testNextSteps() {
+        $device_inputs = Device::factory()->raw([
+            'event_id' => $this->event->idevents,
+            'quantity' => 1,
+            'repair_status' => 2,
+        ]);
+        $rsp = $this->post('/device/create', $device_inputs);
+        self::assertTrue($rsp['success']);
+        $iddevices = $rsp['devices'][0]['iddevices'];
+        self::assertNotNull($iddevices);
+
+        # Edit the repair details to say more time needed
+        $atts = $device_inputs;
+        $atts['repair_details'] = 1;
+        $rsp = $this->post('/device/edit/' . $iddevices, $atts);
+        self::assertEquals('Device updated!', $rsp['success']);
+
+        # Check the resulting fields.
+        $device = Device::findOrFail($iddevices);
+        self::assertEquals(0, $device->professional_help);
+        self::assertEquals(0, $device->do_it_yourself);
+        self::assertEquals(1, $device->more_time_needed);
+
+        # Edit the repair details to say professional help needed.
+        $atts = $device_inputs;
+        $atts['repair_details'] = 2;
+        $rsp = $this->post('/device/edit/' . $iddevices, $atts);
+        self::assertEquals('Device updated!', $rsp['success']);
+
+        # Check the resulting fields.
+        $device = Device::findOrFail($iddevices);
+        self::assertEquals(1, $device->professional_help);
+        self::assertEquals(0, $device->do_it_yourself);
+        self::assertEquals(0, $device->more_time_needed);
+
+        # Edit the repair details to say DIY needed.
+        $atts = $device_inputs;
+        $atts['repair_details'] = 3;
+        $rsp = $this->post('/device/edit/' . $iddevices, $atts);
+        self::assertEquals('Device updated!', $rsp['success']);
+
+        # Check the resulting fields.
+        $device = Device::findOrFail($iddevices);
+        self::assertEquals(0, $device->professional_help);
+        self::assertEquals(1, $device->do_it_yourself);
+        self::assertEquals(0, $device->more_time_needed);
+    }
 }

@@ -264,8 +264,6 @@ class DeviceController extends Controller
                 $do_it_yourself = 0;
             }
 
-            $old_wiki = Device::find($id)->wiki;
-
             if ($spare_parts == 3) { // Third party
                 $spare_parts = 1;
                 $parts_provider = 2;
@@ -305,8 +303,8 @@ class DeviceController extends Controller
                 'parts_provider' => $parts_provider,
                 'repair_status' => $repair_status,
                 'more_time_needed' => $more_time_needed,
-                'do_it_yourself' => $professional_help,
-                'professional_help' => $do_it_yourself,
+                'professional_help' => $professional_help,
+                'do_it_yourself' => $do_it_yourself,
                 'wiki' => $wiki,
                 'estimate' => $estimate,
             ]);
