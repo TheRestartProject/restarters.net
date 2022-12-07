@@ -47,6 +47,10 @@ class APIv2NetworkTest extends TestCase
         $network = Network::first();
         self::assertNotNull($network);
 
+        // Ensure we have a logo to test retrieval.
+        $network->logo = '1590591632bedc48025b738e87fe674cf030e8c953ccdd91e914597.png';
+        $network->save();
+
         $response = $this->get('/api/v2/networks/' . $network->id);
         $response->assertSuccessful();
         $json = json_decode($response->getContent(), true)['data'];
@@ -54,6 +58,7 @@ class APIv2NetworkTest extends TestCase
         $this->assertEquals($network->name, $json['name']);
         $this->assertEquals($network->description, $json['description']);
         $this->assertEquals($network->website, $json['website']);
+        $this->assertEquals(public_path() . DIRECTORY_SEPARATOR . $network->logo, $json['logo']);
         $this->assertTrue(array_key_exists('stats', $json));
         $this->assertTrue(array_key_exists('default_language', $json));
     }

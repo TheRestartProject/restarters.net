@@ -241,7 +241,7 @@ class Network extends JsonResource
         return [
             'id' => $this->id,
             'name' => $this->name,
-            'logo' => $this->logo,
+            'logo' => public_path() . DIRECTORY_SEPARATOR . $this->logo,
             'description' => $this->description,
             'website' => $this->website,
             'shortname' => $this->shortname,
