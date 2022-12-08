@@ -146,8 +146,6 @@ body {
 
         span:first-child {
           &::before {
-            content: counter(chapter);
-
             width: 50px;
             height: 50px;
             background: $black;
@@ -161,9 +159,6 @@ body {
         }
 
         .mw-headline {
-          @extend .d-flex;
-          @extend .align-items-center;
-
           @include media-breakpoint-down(md) {
             font-size: 18px;
             font-weight: bold;
@@ -185,7 +180,7 @@ body {
       h3 {
         > span:first-child {
           &::before {
-            content: counter(chapter)"." counter(section)" ";
+            //content: counter(chapter)"." counter(section)" ";
             margin: 0;
             display: inline-block;
             margin-right: 40px;
@@ -194,11 +189,9 @@ body {
       }
 
       ul {
-        @extend .list-doodle;
-
         margin-left: 100px; // Override
         margin-bottom: 25px;
-        list-style: none;
+        list-style: outside disc url("data:image/svg+xml;charset=UTF-8,<svg width='8' height='16' version='1.1' xmlns='http://www.w3.org/2000/svg'><circle cx='4' cy='10.4' r='4' fill='#dee2e6'/></svg>");
 
         li {
           a {
