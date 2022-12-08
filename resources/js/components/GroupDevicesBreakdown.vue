@@ -99,7 +99,7 @@ export default {
 @import '~bootstrap/scss/variables';
 @import '~bootstrap/scss/mixins/_breakpoints';
 
-/deep/ .impact-stat-subtitle {
+::v-deep .impact-stat-subtitle {
   font-size: 80%;
 }
 
@@ -110,10 +110,5 @@ export default {
 .mobtitle {
   text-transform: uppercase;
   font-size: 18px;
-}
-
-// Some cluster names are a bit long in English, so make more space.
-/deep/ .ourtabs .nav-link {
-  padding-left: calc(5% + 1px) !important;
 }
 </style>
