@@ -134,9 +134,6 @@ body {
     }
 
     div:first-of-type {
-      @extend .d-flex;
-      @extend .align-items-center;
-
       min-height: 70px;
 
       h2 {
@@ -189,7 +186,6 @@ body {
       }
 
       ul {
-        margin-left: 100px; // Override
         margin-bottom: 25px;
         list-style: outside disc url("data:image/svg+xml;charset=UTF-8,<svg width='8' height='16' version='1.1' xmlns='http://www.w3.org/2000/svg'><circle cx='4' cy='10.4' r='4' fill='#dee2e6'/></svg>");
 
