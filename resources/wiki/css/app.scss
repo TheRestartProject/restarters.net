@@ -65,6 +65,45 @@ body {
     }
   }
 
+  h4 {
+    line-height: 0;
+    padding: 0;
+    margin-bottom: 5px;
+
+    span {
+      font-family: Asap;
+      font-size: 16px;
+      font-weight: normal;
+      font-stretch: normal;
+      text-decoration: underline;
+      font-style: normal;
+      line-height: 1.44;
+      letter-spacing: normal;
+
+      text-align: left;
+      color: $black;
+    }
+  }
+
+  h5 {
+    line-height: 0;
+    padding: 0;
+    margin-bottom: 5px;
+
+    span {
+      font-family: Asap;
+      font-size: 16px;
+      font-weight: normal;
+      font-stretch: normal;
+      text-decoration: none;
+      font-style: italic;
+      line-height: 1.44;
+      letter-spacing: normal;
+      text-align: left;
+      color: $black;
+    }
+  }
+
   .mw-collapsible {
     position: relative;
     padding: 0;
