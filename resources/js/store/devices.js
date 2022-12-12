@@ -211,7 +211,7 @@ export default {
       }
     },
     async addURL ({commit, rootGetters}, params) {
-      const ret = await axios.post('/device-url/', {
+      const ret = await axios.post('/device-url', {
         device_id: params.iddevices,
         url: params.url.url,
         source: params.url.source
