@@ -1,6 +1,7 @@
 {
   "env": {
-    "test": {
+//    TODO We don't want this in real production - need to copy in as part of CircleCI.
+    "production": {
       "plugins": [ "istanbul" ]
     }
   }

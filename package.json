@@ -8,7 +8,7 @@
         "hot": "mix watch --hot",
         "prod": "npm run production",
         "production": "mix --production",
-        "buildcover": "cross-env NODE_ENV=test node_modules/webpack/bin/webpack.js --no-progress --hide-modules --config=node_modules/laravel-mix/setup/webpack.config.js",
+        "buildcover": "export NODE_ENV=test; mix --production",
         "test": "playwright test"
     },
     "devDependencies": {
@@ -85,5 +85,10 @@
         "vue2-leaflet": "^2.5.2",
         "vuelidate": "^0.7.6",
         "vuex": "^3.5.1"
+    },
+    "nyc": {
+        "reporter": [
+            "lcov"
+        ]
     }
 }
