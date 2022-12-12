@@ -57,6 +57,11 @@
     <b-alert :show="missingCategory" variant="danger">
       <p>{{ __('events.form_error') }}</p>
     </b-alert>
+    <b-alert :show="axiosError !== null" variant="danger">
+      <p>
+        {{ axiosError }}
+      </p>
+    </b-alert>
     <div class="d-flex justify-content-center flex-wrap pt-4 pb-4">
       <b-btn variant="primary" class="mr-2" v-if="add" @click="addDevice">
         {{ __('partials.add_device') }}
@@ -180,7 +185,8 @@ export default {
   data () {
     return {
       currentDevice: {},
-      missingCategory: false
+      missingCategory: false,
+      axiosError: null,
     }
   },
   watch: {
@@ -316,71 +322,81 @@ export default {
       }
     },
     async addDevice () {
-      if (!this.currentDevice.category) {
-        this.missingCategory = true
-      } else {
-        this.missingCategory = false
+      try {
+        if (!this.currentDevice.category) {
+          this.missingCategory = true
+        } else {
+          this.missingCategory = false
 
-        const createdDevices = await this.$store.dispatch('devices/add', this.prepareDeviceForServer())
+          const createdDevices = await this.$store.dispatch('devices/add', this.prepareDeviceForServer())
 
-        if (this.currentDevice.urls) {
-          // We have some useful URLs.  Apply them to each of the created devices.
-          createdDevices.forEach(async (d) => {
-            this.currentDevice.urls.forEach(async (u) => {
-              await this.$store.dispatch('devices/addURL', {
-                iddevices: d.iddevices,
-                url: u
+          if (this.currentDevice.urls) {
+            // We have some useful URLs.  Apply them to each of the created devices.
+            createdDevices.forEach(async (d) => {
+              this.currentDevice.urls.forEach(async (u) => {
+                await this.$store.dispatch('devices/addURL', {
+                  iddevices: d.iddevices,
+                  url: u
+                })
               })
             })
+          }
+
+          this.$emit('close')
+        }
+      } catch (e) {
+        console.error('Edit failed', e)
+        this.axiosError = e
+      }
+    },
+    async saveDevice () {
+      try {
+        await this.$store.dispatch('devices/edit', this.prepareDeviceForServer())
+
+        // We need to update the useful URLs, which might have been added/edited/deleted from what we originally had.
+        this.currentDevice.urls.forEach(async (u) => {
+          if (!u.id) {
+            // This has no id, and hence is a new useful URL added in this edit.  Create it.
+            await this.$store.dispatch('devices/addURL', {
+              iddevices: this.device.iddevices,
+              url: u
+            })
+          } else {
+            // This has an id, and therefore already existed on the server.
+            const existing = this.device.urls.find(u2 => {
+              return u2.id === u.id
+            })
+
+            if (existing.url !== u.url || existing.source !== u.source) {
+              await this.$store.dispatch('devices/editURL', {
+                iddevices: this.device.iddevices,
+                url: u
+              })
+            }
+          }
+        })
+
+        // Now find any URLs which were present originally but are no longer present - these need to be deleted.
+        if (this.device.urls) {
+          this.device.urls.forEach(async (u) => {
+            const present = this.currentDevice.urls.find(u2 => {
+              return u2.id === u.id
+            })
+
+            if (!present) {
+              await this.$store.dispatch('devices/deleteURL', {
+                iddevices: this.device.iddevices,
+                url: u
+              })
+            }
           })
         }
 
         this.$emit('close')
+      } catch (e) {
+        console.error('Edit failed', e)
+        this.axiosError = e
       }
-    },
-    async saveDevice () {
-      await this.$store.dispatch('devices/edit', this.prepareDeviceForServer())
-
-      // We need to update the useful URLs, which might have been added/edited/deleted from what we originally had.
-      this.currentDevice.urls.forEach(async (u) => {
-        if (!u.id) {
-          // This has no id, and hence is a new useful URL added in this edit.  Create it.
-          await this.$store.dispatch('devices/addURL', {
-            iddevices: this.device.iddevices,
-            url: u
-          })
-        } else {
-          // This has an id, and therefore already existed on the server.
-          const existing = this.device.urls.find(u2 => {
-            return u2.id === u.id
-          })
-
-          if (existing.url !== u.url || existing.source !== u.source) {
-            await this.$store.dispatch('devices/editURL', {
-              iddevices: this.device.iddevices,
-              url: u
-            })
-          }
-        }
-      })
-
-      // Now find any URLs which were present originally but are no longer present - these need to be deleted.
-      if (this.device.urls) {
-        this.device.urls.forEach(async (u) => {
-          const present = this.currentDevice.urls.find(u2 => {
-            return u2.id === u.id
-          })
-
-          if (!present) {
-            await this.$store.dispatch('devices/deleteURL', {
-              iddevices: this.device.iddevices,
-              url: u
-            })
-          }
-        })
-      }
-
-      this.$emit('close')
     },
     prepareDeviceForServer () {
       // The device we send to the server is what is in currentDevice, with a couple of tweaks:
@@ -534,12 +550,12 @@ h3 {
   border: 3px solid red;
 }
 
-/deep/ .card .form-control:disabled {
+::v-deep .card .form-control:disabled {
   // Disabled is what happens for the view that people get if they can't edit the device.
   background-color: white;
 }
 
-/deep/ .form-text {
+::v-deep .form-text {
   line-height: 1rem;
 }
 </style>

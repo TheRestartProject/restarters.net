@@ -110,20 +110,20 @@ class BasicTest extends TestCase
 
         $response = $this->get('/export/devices');
 
-        $this->assertTrue($response->headers->get('content-disposition') == 'attachment; filename=devices.csv');
+        $this->assertEquals('attachment; filename=repair-data.csv', $response->headers->get('content-disposition'));
 
         // Bit hacky, but grab the file that was created.  Can't find a way to do this in Laravel easily, though it's
         // probably possible using mocking.
-        $filename = base_path() . DIRECTORY_SEPARATOR . 'public' . DIRECTORY_SEPARATOR . 'devices.csv';
+        $filename = base_path() . DIRECTORY_SEPARATOR . 'public' . DIRECTORY_SEPARATOR . 'repair-data.csv';
         $fh = fopen($filename, 'r');
 
         # Skip headers.
         fgetcsv($fh);
         $row2 = fgetcsv($fh);
         $row3 = fgetcsv($fh);
-        $this->assertEquals(0, $row2[9]);
         $this->assertEquals(0, $row2[10]);
-        $this->assertEquals(4, $row3[9]);
-        $this->assertEquals(7.2, $row3[10]);
+        $this->assertEquals(0, $row2[11]);
+        $this->assertEquals(4, $row3[10]);
+        $this->assertEquals(7.2, $row3[11]);
     }
 }
