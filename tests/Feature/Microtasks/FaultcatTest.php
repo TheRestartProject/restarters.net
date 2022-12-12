@@ -157,58 +157,58 @@ class FaultcatTest extends TestCase
         }
         $devs = array_keys($devs_in);
         // iddevices = 1 : 5 opinions with consensus
-        factory(Faultcat::class, 5)->create(
+        Faultcat::factory()->count(5)->create(
                 [
                     'iddevices' => $devs[0],
                     'fault_type' => 'fault_type_1',
                 ]
         );
         // iddevices = 2 : 5 opinions with majority
-        factory(Faultcat::class, 4)->create(
+        Faultcat::factory()->count(4)->create(
                 [
                     'iddevices' => $devs[1],
                     'fault_type' => 'fault_type_1',
                 ]
         );
-        factory(Faultcat::class, 1)->create(
+        Faultcat::factory()->count(1)->create(
                 [
                     'iddevices' => $devs[1],
                     'fault_type' => 'fault_type_2',
                 ]
         );
         // iddevices = 3 : 5 opinions split
-        factory(Faultcat::class, 2)->create(
+        Faultcat::factory()->count(2)->create(
                 [
                     'iddevices' => $devs[2],
                     'fault_type' => 'fault_type_1',
                 ]
         );
-        factory(Faultcat::class, 2)->create(
+        Faultcat::factory()->count(2)->create(
                 [
                     'iddevices' => $devs[2],
                     'fault_type' => 'fault_type_2',
                 ]
         );
-        factory(Faultcat::class, 1)->create(
+        Faultcat::factory()->count(1)->create(
                 [
                     'iddevices' => $devs[2],
                     'fault_type' => 'fault_type_3',
                 ]
         );
         // iddevices = 5 : 5 opinions adjudicated
-        factory(Faultcat::class, 2)->create(
+        Faultcat::factory()->count(2)->create(
                 [
                     'iddevices' => $devs[3],
                     'fault_type' => 'fault_type_1',
                 ]
         );
-        factory(Faultcat::class, 2)->create(
+        Faultcat::factory()->count(2)->create(
                 [
                     'iddevices' => $devs[3],
                     'fault_type' => 'fault_type_2',
                 ]
         );
-        factory(Faultcat::class, 1)->create(
+        Faultcat::factory()->count(1)->create(
                 [
                     'iddevices' => $devs[3],
                     'fault_type' => 'fault_type_3',
@@ -216,60 +216,60 @@ class FaultcatTest extends TestCase
         );
         DB::update('INSERT INTO devices_faults_adjudicated SET iddevices = '.$devs[3].", fault_type='fault_type_1'");
         // iddevices = 6 : 4 opinions with majority
-        factory(Faultcat::class, 3)->create(
+        Faultcat::factory()->count(3)->create(
                 [
                     'iddevices' => $devs[4],
                     'fault_type' => 'fault_type_1',
                 ]
         );
-        factory(Faultcat::class, 1)->create(
+        Faultcat::factory()->count(1)->create(
                 [
                     'iddevices' => $devs[4],
                     'fault_type' => 'fault_type_2',
                 ]
         );
         // iddevices = 7 : 4 opinions split
-        factory(Faultcat::class, 2)->create(
+        Faultcat::factory()->count(2)->create(
                 [
                     'iddevices' => $devs[5],
                     'fault_type' => 'fault_type_1',
                 ]
         );
-        factory(Faultcat::class, 2)->create(
+        Faultcat::factory()->count(2)->create(
                 [
                     'iddevices' => $devs[5],
                     'fault_type' => 'fault_type_2',
                 ]
         );
         // iddevices = 9 : 3 opinions with majority
-        factory(Faultcat::class, 3)->create(
+        Faultcat::factory()->count(3)->create(
                 [
                     'iddevices' => $devs[6],
                     'fault_type' => 'fault_type_1',
                 ]
         );
         // iddevices = 10 : 3 opinions split
-        factory(Faultcat::class, 2)->create(
+        Faultcat::factory()->count(2)->create(
                 [
                     'iddevices' => $devs[7],
                     'fault_type' => 'fault_type_1',
                 ]
         );
-        factory(Faultcat::class, 1)->create(
+        Faultcat::factory()->count(1)->create(
                 [
                     'iddevices' => $devs[7],
                     'fault_type' => 'fault_type_2',
                 ]
         );
         // iddevices = 11 : 2 opinions
-        factory(Faultcat::class, 2)->create(
+        Faultcat::factory()->count(2)->create(
                 [
                     'iddevices' => $devs[8],
                     'fault_type' => 'fault_type_1',
                 ]
         );
         // iddevices = 13 : 1 opinion
-        factory(Faultcat::class, 1)->create(
+        Faultcat::factory()->count(1)->create(
                 [
                     'iddevices' => $devs[9],
                     'fault_type' => 'fault_type_1',
@@ -314,7 +314,7 @@ class FaultcatTest extends TestCase
 
     protected function _insert_faultcat_device($cat, $id, $problem, $fault_type = '')
     {
-        $device = factory(Device::class, 1)->states($cat)->create(
+        $device = Device::factory()->count(1)->{str_replace(' ', '_', lcfirst($cat))}()->create(
                 [
                     'problem' => $problem,
                     'fault_type' => $fault_type,

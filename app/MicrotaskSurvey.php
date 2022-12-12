@@ -7,7 +7,6 @@ use Illuminate\Database\Eloquent\Model;
 class MicrotaskSurvey extends Model
 {
     protected $table = 'microtask_surveys';
-    protected $dates = ['created_at', 'updated_at'];
     protected $dateFormat = 'Y-m-d H:i';
     protected $primaryKey = 'id';
 

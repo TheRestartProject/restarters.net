@@ -534,12 +534,12 @@ h3 {
   border: 3px solid red;
 }
 
-/deep/ .card .form-control:disabled {
+::v-deep .card .form-control:disabled {
   // Disabled is what happens for the view that people get if they can't edit the device.
   background-color: white;
 }
 
-/deep/ .form-text {
+::v-deep .form-text {
   line-height: 1rem;
 }
 </style>

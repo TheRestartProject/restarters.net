@@ -19,11 +19,11 @@ class GroupEditTest extends TestCase
     {
         $this->withoutExceptionHandling();
 
-        $group = factory(Group::class)->create();
-        $tag = factory(GroupTags::class)->create();
+        $group = Group::factory()->create();
+        $tag = GroupTags::factory()->create();
         $group->addTag($tag);
 
-        $host = factory(User::class)->states('Host')->create();
+        $host = User::factory()->host()->create();
         $group->addVolunteer($host);
         $group->makeMemberAHost($host);
 
@@ -37,7 +37,7 @@ class GroupEditTest extends TestCase
             'free_text' => 'HQ',
         ]);
 
-        $this->assertContains('Group updated!', $response->getContent());
+        $this->assertStringContainsString('Group updated!', $response->getContent());
 
         $this->assertEquals(1, count($group->group_tags));
         $this->assertEquals($tag->tag_name, $group->group_tags[0]->tag_name);
@@ -48,11 +48,11 @@ class GroupEditTest extends TestCase
     {
         $this->withoutExceptionHandling();
 
-        $group = factory(Group::class)->create();
-        $tag = factory(GroupTags::class)->create();
+        $group = Group::factory()->create();
+        $tag = GroupTags::factory()->create();
         $group->addTag($tag);
 
-        $host = factory(User::class)->states('Host')->create();
+        $host = User::factory()->host()->create();
         $group->addVolunteer($host);
         $group->makeMemberAHost($host);
 
@@ -66,15 +66,15 @@ class GroupEditTest extends TestCase
             'free_text' => 'HQ',
         ]);
 
-        $this->assertContains(__('groups.geocode_failed'), $response->getContent());
+        $this->assertStringContainsString(__('groups.geocode_failed'), $response->getContent());
     }
 
     /** @test */
     public function image_upload() {
         Storage::fake('avatars');
-        $group = factory(Group::class)->create();
+        $group = Group::factory()->create();
 
-        $host = factory(User::class)->states('Host')->create();
+        $host = User::factory()->host()->create();
         $group->addVolunteer($host);
         $group->makeMemberAHost($host);
 

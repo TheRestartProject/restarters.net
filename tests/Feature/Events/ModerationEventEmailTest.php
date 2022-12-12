@@ -15,9 +15,9 @@ class ModerationEventEmailTest extends TestCase
     {
         Notification::fake();
 
-        $admins = factory(User::class, 5)->states('Administrator')->create();
+        $admins = User::factory()->count(5)->administrator()->create();
 
-        $event = factory(Party::class)->create();
+        $event = Party::factory()->create();
 
         $arr = [
             'event_venue' => $event->venue,

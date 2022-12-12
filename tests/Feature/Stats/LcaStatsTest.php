@@ -45,7 +45,7 @@ class LcaStatsTest extends StatsTestCase
         DB::statement("UPDATE categories SET weight=0, footprint=0 WHERE idcategories IN (' . $this->_idPoweredMisc . ',' . $this->_idUnpoweredMisc .')");
 
         // #1 add a powered non-misc device
-        factory(Device::class)->states('fixed')->create([
+        Device::factory()->fixed()->create([
             'category' => $this->_idPoweredNonMisc,
             'category_creation' => $this->_idPoweredNonMisc,
         ]);
@@ -63,7 +63,7 @@ class LcaStatsTest extends StatsTestCase
         }
 
         // #2 add a powered misc device
-        factory(Device::class)->states('fixed')->create([
+        Device::factory()->fixed()->create([
             'category' => $this->_idPoweredMisc,
             'category_creation' => $this->_idPoweredMisc,
         ]);
@@ -81,7 +81,7 @@ class LcaStatsTest extends StatsTestCase
         }
 
         // #3 add an unpowered non-misc device
-        factory(Device::class)->states('fixed')->create([
+        Device::factory()->fixed()->create([
             'category' => $this->_idUnpoweredNonMisc,
             'category_creation' => $this->_idUnpoweredNonMisc,
         ]);
@@ -99,7 +99,7 @@ class LcaStatsTest extends StatsTestCase
         }
 
         // #4 add an unpowered misc device without estimate
-        factory(Device::class)->states('fixed')->create([
+        Device::factory()->fixed()->create([
             'category' => $this->_idUnpoweredMisc,
             'category_creation' => $this->_idUnpoweredMisc,
         ]);
@@ -117,7 +117,7 @@ class LcaStatsTest extends StatsTestCase
         }
 
         // #5 add another powered non-misc device
-        factory(Device::class)->states('fixed')->create([
+        Device::factory()->fixed()->create([
             'category' => $this->_idPoweredNonMisc,
             'category_creation' => $this->_idPoweredNonMisc,
         ]);
@@ -135,7 +135,7 @@ class LcaStatsTest extends StatsTestCase
         }
 
         // #6 add a powered misc device with estimate
-        factory(Device::class)->states('fixed')->create([
+        Device::factory()->fixed()->create([
             'category' => $this->_idPoweredMisc,
             'category_creation' => $this->_idPoweredMisc,
             'estimate' => 1.23,
@@ -154,7 +154,7 @@ class LcaStatsTest extends StatsTestCase
         }
 
         // #6 add an unpowered non-misc device with estimate
-        factory(Device::class)->states('fixed')->create([
+        Device::factory()->fixed()->create([
             'category' => $this->_idUnpoweredNonMisc,
             'category_creation' => $this->_idUnpoweredNonMisc,
             'estimate' => 4.56,
@@ -169,7 +169,7 @@ class LcaStatsTest extends StatsTestCase
         $this->assertIsArray($result);
         $this->assertEquals(1, count($result));
         foreach ($expect as $k => $v) {
-            $this->assertEquals($v, round($result[0]->{$k}, 2), "Wrong value for $k => $v");
+            $this->assertEquals(round($v, 2), round($result[0]->{$k}, 2), "Wrong value for $k => $v");
         }
     }
 
@@ -180,12 +180,12 @@ class LcaStatsTest extends StatsTestCase
 
         DB::statement("UPDATE categories SET weight=0, footprint=0 WHERE idcategories IN (' . $this->_idPoweredMisc . ',' . $this->_idUnpoweredMisc .')");
 
-        $groupObj = factory(Group::class)->create();
+        $groupObj = Group::factory()->create();
         $group = $groupObj->idgroups;
-        $event = factory(Party::class)->create([ 'group' => $group ]);
+        $event = Party::factory()->create([ 'group' => $group ]);
 
         // #1 add a single powered non-misc device
-        factory(Device::class)->states('fixed')->create([
+        Device::factory()->fixed()->create([
             'category' => $this->_idPoweredNonMisc,
             'category_creation' => $this->_idPoweredNonMisc,
             'event' => $event->idevents,
@@ -204,7 +204,7 @@ class LcaStatsTest extends StatsTestCase
         }
 
         // #2 add a powered misc device
-        factory(Device::class)->states('fixed')->create([
+        Device::factory()->fixed()->create([
             'category' => $this->_idPoweredMisc,
             'category_creation' => $this->_idPoweredMisc,
             'event' => $event->idevents,
@@ -223,7 +223,7 @@ class LcaStatsTest extends StatsTestCase
         }
 
         // #3 add an unpowered non-misc device
-        factory(Device::class)->states('fixed')->create([
+        Device::factory()->fixed()->create([
             'category' => $this->_idUnpoweredNonMisc,
             'category_creation' => $this->_idUnpoweredNonMisc,
             'event' => $event->idevents,
@@ -242,7 +242,7 @@ class LcaStatsTest extends StatsTestCase
         }
 
         // #4 add an unpowered misc device
-        factory(Device::class)->states('fixed')->create([
+        Device::factory()->fixed()->create([
             'category' => $this->_idUnpoweredMisc,
             'category_creation' => $this->_idUnpoweredMisc,
             'event' => $event->idevents,
@@ -261,7 +261,7 @@ class LcaStatsTest extends StatsTestCase
         }
 
         // #5 add a powered misc device with estimate
-        $device = factory(Device::class)->states('fixed')->create([
+        $device = Device::factory()->fixed()->create([
             'category' => $this->_idPoweredMisc,
             'category_creation' => $this->_idPoweredMisc,
             'event' => $event->idevents,
@@ -281,7 +281,7 @@ class LcaStatsTest extends StatsTestCase
         }
 
         // #6 add a powered misc device with estimate
-        $device = factory(Device::class)->states('fixed')->create([
+        $device = Device::factory()->fixed()->create([
             'category' => $this->_idUnpoweredMisc,
             'category_creation' => $this->_idUnpoweredMisc,
             'event' => $event->idevents,
@@ -297,7 +297,7 @@ class LcaStatsTest extends StatsTestCase
         $this->assertIsArray($result);
         $this->assertEquals(1, count($result));
         foreach ($expect as $k => $v) {
-            $this->assertEquals($v, round($result[0]->{$k}, 2), "Wrong value for $k => $v");
+            $this->assertEquals(round($v, 2), round($result[0]->{$k}, 2), "Wrong value for $k => $v");
         }
     }
 }

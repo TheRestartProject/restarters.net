@@ -1,6 +1,6 @@
 <?php
 
-namespace Tests\Feature\Dashboard;
+namespace Tests\Feature\Style;
 
 use App\Group;
 use App\Party;
@@ -13,7 +13,7 @@ use Tests\TestCase;
 
 use function PHPUnit\Framework\assertEquals;
 
-class StyleTest extends TestCase
+class BasicTest extends TestCase
 {
     public function testPageLoads()
     {
@@ -27,6 +27,6 @@ class StyleTest extends TestCase
     public function testSearch() {
         $this->loginAsTestUser(Role::ADMINISTRATOR);
         $response = $this->get('/style/find');
-        $response->assertSee('&quot;buttons&quot;');
+        $response->assertSee('&quot;buttons&quot;', false);
     }
 }

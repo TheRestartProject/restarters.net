@@ -19,12 +19,12 @@ class BasicTest extends TestCase
     {
         // Test the dashboard page loads.  Most of the work is done inside Vue, so a basic test is just that the
         // Vue component exists.
-        $group = factory(Group::class)->create([
+        $group = Group::factory()->create([
                                                    'latitude' => 50.6325574,
                                                    'longitude' => 5.5796662,
                                                    'wordpress_post_id' => '99999',
                                                ]);
-        $user = factory(User::class)->create([
+        $user = User::factory()->create([
                                                  'latitude' => 50.6325574,
                                                  'longitude' => 5.5796662,
                                                  'location' => 'London'

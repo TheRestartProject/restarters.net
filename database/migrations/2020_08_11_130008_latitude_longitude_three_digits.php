@@ -4,7 +4,7 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-class LatitudeLongitudeThreeDigits extends Migration
+return new class extends Migration
 {
     /**
      * Run the migrations.
@@ -25,4 +25,4 @@ class LatitudeLongitudeThreeDigits extends Migration
     {
         DB::statement('ALTER TABLE `users` CHANGE `longitude` `longitude` DECIMAL(10,8), CHANGE `latitude` `latitude` DECIMAL(10,8) NULL DEFAULT NULL;');
     }
-}
+};

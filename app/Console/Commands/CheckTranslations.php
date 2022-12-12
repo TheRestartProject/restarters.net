@@ -38,7 +38,7 @@ class CheckTranslations extends Command
     public function handle()
     {
         // We want to scan all English translations.
-        $files = scandir(base_path() . '/resources/lang/en');
+        $files = scandir(base_path() . '/lang/en');
 
         foreach ($files as $file) {
             if ($file == '_json.php') {

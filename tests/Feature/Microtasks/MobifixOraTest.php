@@ -62,7 +62,7 @@ class MobifixOraTest extends TestCase
         $this->withSession([]);
         $this->_bypass_cta();
         for ($i = 1; $i <= count($data); $i++) {
-            // Illuminate\Foundation\Testing\TestResponse
+            // Illuminate\Testing\TestResponse
             $response = $this->get('/mobifixora');
             $seshids = $this->app['session']->get('mobifixora.exclusions');
             $this->assertEquals($i, count($seshids), 'mobifixora.exclusions wrong length');

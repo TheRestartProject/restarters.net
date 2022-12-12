@@ -37,7 +37,7 @@ class EditLanguageSettingsTest extends TestCase
         config(['discourse-api.api_key' => 'XXX']); // change XXX when testing against Discourse instance.
         config(['discourse-api.api_username' => 'neil']);
 
-        $user = factory(User::class)->create(['id' => 67]);
+        $user = User::factory()->create(['id' => 67]);
 
         // act
         $user->language = 'de';

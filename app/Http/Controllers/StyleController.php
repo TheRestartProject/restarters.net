@@ -14,7 +14,7 @@ class StyleController extends Controller
      */
     public function index(Request $request)
     {
-        return redirect()->action('HomeController@index');
+        return redirect()->action([\App\Http\Controllers\HomeController::class, 'index']);
     }
 
     public function guide(Request $request)

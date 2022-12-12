@@ -404,7 +404,7 @@ export default {
 @import '~bootstrap/scss/variables';
 @import '~bootstrap/scss/mixins/_breakpoints';
 
-/deep/ .hidecell {
+::v-deep .hidecell {
   display: none;
 
   @include media-breakpoint-up(md) {
@@ -412,27 +412,27 @@ export default {
   }
 }
 
-/deep/ .nounderline {
+::v-deep .nounderline {
   text-decoration: none !important;
 }
 
-/deep/ .icon {
+::v-deep .icon {
   width: 30px;
   height: 30px;
 }
 
-/deep/ {
+::v-deep {
   .datetd {
     width: 87px;
     min-height: 87px;
   }
 }
 
-/deep/ .table.b-table > thead > tr {
+::v-deep .table.b-table > thead > tr {
   background-position-x: center !important;
 }
 
-/deep/ .attending {
+::v-deep .attending {
   background-color: $brand-grey;
 
   .datetd {
@@ -451,7 +451,7 @@ export default {
 
 // The multiselect is used in a few places, and we have some inconsistencies in styling.  Here we force it to match
 // the behaviour of the inputs.
-/deep/ .multiselect {
+::v-deep .multiselect {
   &.multiselect--active {
     border: 0 !important;
 
@@ -468,7 +468,7 @@ export default {
   }
 }
 
-/deep/ td[aria-colindex="6"] {
+::v-deep td[aria-colindex="6"] {
   // Hack so we can get the cell warning full height.
   height: 1px;
 

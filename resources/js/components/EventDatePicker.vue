@@ -42,7 +42,7 @@ export default {
 @import '~bootstrap/scss/variables';
 @import '~bootstrap/scss/mixins/_breakpoints';
 
-/deep/ .datepicker {
+::v-deep .datepicker {
     margin: 0px;
 
     & label {
@@ -66,17 +66,17 @@ export default {
     }
 }
 
-/deep/ .d-none {
+::v-deep .d-none {
   display: none !important;
 }
 
-/deep/ .d-lg-flex {
+::v-deep .d-lg-flex {
   @include media-breakpoint-up(lg) {
     display: flex !important;
   }
 }
 
-/deep/ .focusfix:focus {
+::v-deep .focusfix:focus {
   margin-top: 2px;
   margin-left: 1px;
   margin-bottom: 1px;

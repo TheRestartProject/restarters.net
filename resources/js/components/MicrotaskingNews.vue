@@ -64,7 +64,7 @@ a {
 .content {
     border-top: 3px dashed black;
 
-    /deep/ a {
+    ::v-deep a {
         color: $black;
         text-decoration: underline !important;
 
@@ -73,7 +73,7 @@ a {
         }
     }
 
-    /deep/ ul {
+    ::v-deep ul {
         list-style-image: url('/images/arrow-right-doodle.svg');
     }
 }

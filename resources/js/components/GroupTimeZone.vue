@@ -60,7 +60,7 @@ export default {
 <style scoped lang="scss">
 @import 'resources/global/css/_variables';
 
-/deep/ .invalid input {
+::v-deep .invalid input {
   border: 2px solid $brand-danger;
 }
 </style>

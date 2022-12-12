@@ -25,7 +25,7 @@
                 <img id="faultcat" class="pull-right" src="{{ asset('/images/faultcat/099-smiling-cat-face-with-heart-eyes-64px.svg.png') }}" alt="smiling cat" width="48" height="48" />
             </div>
         </div>
-        <form id="save-demographics" action="{{ action('FaultcatController@storeDemographics') }}" method="POST">
+        <form id="save-demographics" action="{{ action([\App\Http\Controllers\FaultcatController::class, 'storeDemographics']) }}" method="POST">
             @csrf
         <div class="row problem panel p-2 mb-4 mx-1 mx-sm-0 notification">
             <div class="col">
