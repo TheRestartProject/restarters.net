@@ -70,7 +70,7 @@ class DeviceController extends Controller
     public function ajaxCreate(Request $request)
     {
         $rules = [
-            'category' => 'required|filled',
+            'category' => 'required|filled'
         ];
 
         $validator = Validator::make($request->all(), $rules);
@@ -78,6 +78,10 @@ class DeviceController extends Controller
         if ($validator->fails()) {
             return response()->json($validator->messages(), 200);
         }
+
+        $request->validate([
+                               'age' => 'nullable|numeric|max:500'
+                           ]);
 
         $category = $request->input('category');
         $weight = $request->filled('estimate') ? $request->input('estimate', 0) : 0;
@@ -236,6 +240,10 @@ class DeviceController extends Controller
         $event_id = $request->input('event_id');
         $wiki = $request->input('wiki');
         $estimate = $request->filled('estimate') ? $request->input('estimate', 0) : 0;
+
+        $request->validate([
+            'age' => 'nullable|numeric|max:500'
+        ]);
 
         if (empty($repair_status)) { //Override
             $repair_status = 0;
