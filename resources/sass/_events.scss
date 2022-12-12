@@ -340,6 +340,7 @@
         border-right: 1px solid $black;
         border-bottom: 1px solid $black;
         text-transform: uppercase;
+        height: 100%;
 
         &.smallpad {
             padding-left: calc(5% + 1px) !important;
@@ -352,6 +353,7 @@
         padding-left: calc(10% + 1px) !important;
         border-left: none;
         border-right: 1px solid $black;
+        height: 100%;
 
         &.smallpad {
             padding-left: calc(5% + 1px) !important;
