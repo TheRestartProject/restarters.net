@@ -175,7 +175,7 @@ class EditTest extends TestCase
     }
 
     public function testNextSteps() {
-        $device_inputs = Device::factory()->raw([
+        $device_inputs = factory(Device::class)->raw([
             'event_id' => $this->event->idevents,
             'quantity' => 1,
             'repair_status' => 2,
