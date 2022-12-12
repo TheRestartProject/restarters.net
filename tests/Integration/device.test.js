@@ -1,9 +1,14 @@
-const {test, expect} = require('@playwright/test')
+const { test, expect } = require("playwright-test-coverage");
 const { login, createGroup, createEvent, approveEvent, addDevice } = require('./utils')
+const v8toIstanbul = require('v8-to-istanbul');
+const fs = require('file-system');
 
 test('Spare parts set as expected', async ({page, baseURL}) => {
   test.slow()
-  await page.coverage.startJSCoverage();
+  await page.coverage.startJSCoverage({
+    reportAnonymousScripts: true,
+    resetOnNavigation: false
+  });
   await login(page, baseURL)
   const groupid = await createGroup(page, baseURL)
   const eventid = await createEvent(page, baseURL, groupid, true)
@@ -14,11 +19,14 @@ test('Spare parts set as expected', async ({page, baseURL}) => {
   await expect(await page.locator('.spare-parts-tick').count()).toEqual(2);
 
   const coverage = await page.coverage.stopJSCoverage();
+  console.log('Got coverage')
   for (const entry of coverage) {
+    const fn = entry.url.replace(/[^a-z0-9]/gi, '_').toLowerCase();
+    console.log(fn);
     const converter = v8toIstanbul('', 0, { source: entry.source });
     await converter.load();
     converter.applyCoverage(entry.functions);
-    console.log(JSON.stringify(converter.toIstanbul()));
+    await fs.writeFile(fn + '.json', JSON.stringify(converter.toIstanbul()));
   }
 })
 

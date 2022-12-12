@@ -164,7 +164,7 @@ jobs:
 
       - run: wget https://getcomposer.org/composer-1.phar; rm -rf vendor; php7.4 composer-1.phar install
       - run: npm install
-      - run: npm install v8-to-istanbul --save-dev
+      - run: npm i -D @playwright/test babel-plugin-istanbul nyc playwright-test-coverage
       - run: npx playwright install
       - run: npx playwright install-deps
       - run: npm install -D @playwright/test
@@ -194,10 +194,14 @@ jobs:
       # Zap groups set up by the UT; this can confuse Playwright tests.
       - run: mysql --host="127.0.0.1" -u root -ps3cr3t -e "use restarters_db;SET foreign_key_checks=0;DELETE FROM groups WHERE location IS NULL;SET foreign_key_checks=1;"
 
-      # Run the Playwright tests.
+      # Set up for the Playwright tests.
+      #
       # Ignore the return code from the tinker; the user might exist from the phpunit tests.  If it doesn't and
       # the create fails, the tests will fail too.
       - run: echo "App\User::create(['name'=>'Jane Bloggs','email'=>'jane@bloggs.net','password'=>Hash::make('passw0rd'),'role'=>2,'consent_past_data'=>'2021-01-01','consent_future_data'=>'2021-01-01','consent_gdpr'=>'2021-01-01']);" | php artisan tinker || true
-      - run: export NODE_OPTIONS=--max-old-space-size=8192;  npm rebuild node-sass; npm run prod
+      # We need a special coverage-enabled build.
+      - run: export NODE_OPTIONS=--max-old-space-size=8192;  npm rebuild node-sass; npm run buildcover
       - run: npx playwright install
-      - run: npx playwright test tests/Integration/device.test.js
+
+      # Now run the tests.
+      - run: npx playwright test -g 'Spare parts set as expected'
