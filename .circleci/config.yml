@@ -201,8 +201,8 @@ jobs:
       # the create fails, the tests will fail too.
       - run: echo "App\User::create(['name'=>'Jane Bloggs','email'=>'jane@bloggs.net','password'=>Hash::make('passw0rd'),'role'=>2,'consent_past_data'=>'2021-01-01','consent_future_data'=>'2021-01-01','consent_gdpr'=>'2021-01-01']);" | php artisan tinker || true
       # We need a special coverage-enabled build.
-      - run: export NODE_OPTIONS=--max-old-space-size=8192;  npm rebuild node-sass; npm run buildcover
       - run: npx playwright install
+      - run: export NODE_OPTIONS=--max-old-space-size=8192;  npm rebuild node-sass; npm run buildcover
 
       # Now run the tests.
       - run: npx playwright test -g 'Spare parts set as expected'
