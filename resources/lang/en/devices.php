@@ -5,6 +5,8 @@ return [
   'useful_repair_urls_explanation' => 'Useful repair URL',
   'devices' => 'Repairs',
   'export_device_data' => 'Export all data',
+  'export_event_data' => 'Export event data',
+  'export_group_data' => 'Export group data',
   'by_taxonomy' => 'By taxonomy',
   'by_date' => 'By date',
   'category' => 'Category',
