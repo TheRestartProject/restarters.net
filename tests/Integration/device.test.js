@@ -3,6 +3,7 @@ const { login, createGroup, createEvent, approveEvent, addDevice } = require('./
 
 test('Spare parts set as expected', async ({page, baseURL}) => {
   test.slow()
+  await page.coverage.startJSCoverage();
   await login(page, baseURL)
   const groupid = await createGroup(page, baseURL)
   const eventid = await createEvent(page, baseURL, groupid, true)
@@ -11,6 +12,14 @@ test('Spare parts set as expected', async ({page, baseURL}) => {
 
   // Should  see spare parts tick in summary.  Two copies because of mobile view.
   await expect(await page.locator('.spare-parts-tick').count()).toEqual(2);
+
+  const coverage = await page.coverage.stopJSCoverage();
+  for (const entry of coverage) {
+    const converter = v8toIstanbul('', 0, { source: entry.source });
+    await converter.load();
+    converter.applyCoverage(entry.functions);
+    console.log(JSON.stringify(converter.toIstanbul()));
+  }
 })
 
 test('Spare parts not set unexpectedly', async ({page, baseURL}) => {
