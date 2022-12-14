@@ -59,7 +59,7 @@ class APIv2NetworkTest extends TestCase
         $this->assertEquals($network->name, $json['name']);
         $this->assertEquals($network->description, $json['description']);
         $this->assertEquals($network->website, $json['website']);
-        $this->assertStringEndsWith('/mid_' . $network->logo, $json['logo']);
+        $this->assertStringEndsWith('/network_logos/' . $network->logo, $json['logo']);
         $this->assertTrue(array_key_exists('stats', $json));
         $this->assertTrue(array_key_exists('default_language', $json));
     }
