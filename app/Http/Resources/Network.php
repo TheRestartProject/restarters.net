@@ -241,7 +241,7 @@ class Network extends JsonResource
         return [
             'id' => $this->id,
             'name' => $this->name,
-            'logo' => $this->logo ? ($request->root() . '/uploads/mid_' . $this->logo) : null,
+            'logo' => $this->logo ? ($request->root() . '/uploads/network_logos/' . $this->logo) : null,
             'description' => $this->description,
             'website' => $this->website,
             'shortname' => $this->shortname,

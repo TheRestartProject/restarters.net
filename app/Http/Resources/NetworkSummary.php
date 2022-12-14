@@ -58,7 +58,7 @@ class NetworkSummary extends JsonResource
         return [
             'id' => $this->id,
             'name' => $this->name,
-            'logo' => $this->logo
+            'logo' => $this->logo ? ($request->root() . '/uploads/network_logos/' . $this->logo) : null,
         ];
     }
 }
