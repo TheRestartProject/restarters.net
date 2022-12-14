@@ -1,6 +1,6 @@
 <template>
   <div>
-    <div class="layout">
+    <div class="fgi-layout">
       <FixometerLatestData :latest-data="latestData" class="latest-data" />
       <StatsValue :count="Math.round(impactData.waste_total)"
                   icon="trash"
@@ -57,7 +57,7 @@ export default {
   border-top: 5px solid $black;
 }
 
-.layout {
+.fgi-layout {
   display: grid;
   grid-column-gap: 30px;
   grid-row-gap: 30px;

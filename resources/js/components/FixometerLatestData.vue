@@ -1,5 +1,5 @@
 <template>
-  <div class="layout md-primary-black">
+  <div class="fld-layout md-primary-black">
     <div class="title mb-2 ml-3">
       {{ __('devices.latest_data') }}
       <span class="icon mt-2 mb-2">
@@ -37,7 +37,7 @@ export default {
 @import '~bootstrap/scss/variables';
 @import '~bootstrap/scss/mixins/_breakpoints';
 
-.layout {
+.fld-layout {
   display: grid;
   align-items: center;
   padding: 5px;

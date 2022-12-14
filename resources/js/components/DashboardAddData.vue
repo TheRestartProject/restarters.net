@@ -14,7 +14,7 @@
           <p>
             {{ __('dashboard.see_your_impact') }}:
           </p>
-          <div class="layout">
+          <div class="dad-layout">
             <multiselect
                 class="groups"
                 v-model="groupValue"
@@ -135,7 +135,7 @@ a {
   border: 1px solid $black;
 }
 
-.layout {
+.dad-layout {
   display: grid;
   grid-template-rows: auto auto auto;
   grid-template-columns: auto;
