@@ -111,9 +111,4 @@ export default {
   text-transform: uppercase;
   font-size: 18px;
 }
-
-// Some cluster names are a bit long in English, so make more space.
-::v-deep .ourtabs .nav-link {
-  padding-left: calc(5% + 1px) !important;
-}
 </style>
