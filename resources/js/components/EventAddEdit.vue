@@ -5,7 +5,7 @@
     <input type="hidden" name="event_start_utc" :value="eventStartUtc" />
     <input type="hidden" name="event_end_utc" :value="eventEndUtc" />
 
-    <div class="layout">
+    <div class="eae-layout">
       <EventVenue
           class="flex-grow-1 event-venue"
           :venue.sync="eventVenue"
@@ -331,7 +331,7 @@ export default {
   border-radius: 0;
 }
 
-.layout {
+.eae-layout {
   display: grid;
   grid-column-gap: 40px;
 

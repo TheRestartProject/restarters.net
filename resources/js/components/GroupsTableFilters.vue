@@ -1,5 +1,5 @@
 <template>
-  <div class="layout">
+  <div class="gt-layout">
     <b-form-input
         v-model="searchName"
         type="search"
@@ -156,7 +156,7 @@ export default {
 @import '~bootstrap/scss/variables';
 @import '~bootstrap/scss/mixins/_breakpoints';
 
-.layout {
+.gt-layout {
   display: grid;
   grid-template-columns: 1fr;
   grid-template-rows: auto;
