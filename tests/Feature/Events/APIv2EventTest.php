@@ -71,6 +71,7 @@ class APIv2EventTest extends TestCase
         $json = json_decode($response->getContent(), true);
         self::assertEquals(1, count($json));
         self::assertEquals($id1, $json[0]['id']);
+        self::assertFalse($json[0]['approved']);
     }
 
 

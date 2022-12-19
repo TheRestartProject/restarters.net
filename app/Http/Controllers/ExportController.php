@@ -18,6 +18,7 @@ use DateTime;
 use DB;
 use Illuminate\Http\Request;
 use Response;
+use Illuminate\Database\Eloquent\Collection;
 
 class ExportController extends Controller
 {
@@ -71,6 +72,10 @@ class ExportController extends Controller
         $filename .= '.csv';
         $file = fopen(base_path() . DIRECTORY_SEPARATOR . 'public' . DIRECTORY_SEPARATOR . $filename, 'w+');
 
+        $me = auth()->user();
+        $amHost = $me->hasRole('Host');
+        $admin = $me->hasRole('Administrator');
+
         // Do not include model column
         if ($host == 'therestartproject.org') {
             $columns = [
@@ -90,32 +95,39 @@ class ExportController extends Controller
             fputcsv($file, $columns);
 
             foreach ($all_devices as $device) {
-                $wasteImpact = 0;
-                $co2Diverted = 0;
+                // We need to filter based on approved visibility:
+                // - where the group is approved, this event is visible
+                // - where the group is not approved, this event is visible to network coordinators or group hosts.
+                $group = Group::findOrFail(Party::findOrFail($device->event)->group);
 
-                if ($device->isFixed()) {
-                    if ($device->deviceCategory->powered) {
-                        $wasteImpact = $device->eWasteDiverted();
-                        $co2Diverted = $device->eCo2Diverted($eEmissionRatio, $displacementFactor);
-                    } else {
-                        $wasteImpact = $device->uWasteDiverted();
-                        $co2Diverted = $device->uCo2Diverted($uEmissionratio, $displacementFactor);
+                if ($group->approved || $admin || $me->isCoordinatorForGroup($group) || $amHost && Fixometer::userIsHostOfGroup($group->idgroups, $me->id)) {
+                    $wasteImpact = 0;
+                    $co2Diverted = 0;
+
+                    if ($device->isFixed()) {
+                        if ($device->deviceCategory->powered) {
+                            $wasteImpact = $device->eWasteDiverted();
+                            $co2Diverted = $device->eCo2Diverted($eEmissionRatio, $displacementFactor);
+                        } else {
+                            $wasteImpact = $device->uWasteDiverted();
+                            $co2Diverted = $device->uCo2Diverted($uEmissionratio, $displacementFactor);
+                        }
                     }
-                }
 
-                fputcsv($file, [
-                    $device->item_type,
-                    $device->deviceCategory->name,
-                    $device->brand,
-                    $device->problem,
-                    $device->getRepairStatus(),
-                    $device->getSpareParts(),
-                    $device->deviceEvent->getEventName(),
-                    $device->deviceEvent->theGroup->name,
-                    $device->deviceEvent->getFormattedLocalStart('Y-m-d'),
-                    $wasteImpact,
-                    $co2Diverted
-                ]);
+                    fputcsv($file, [
+                        $device->item_type,
+                        $device->deviceCategory->name,
+                        $device->brand,
+                        $device->problem,
+                        $device->getRepairStatus(),
+                        $device->getSpareParts(),
+                        $device->deviceEvent->getEventName(),
+                        $device->deviceEvent->theGroup->name,
+                        $device->deviceEvent->getFormattedLocalStart('Y-m-d'),
+                        $wasteImpact,
+                        $co2Diverted
+                    ]);
+                }
             }
         } else {
             $columns = [
@@ -136,33 +148,43 @@ class ExportController extends Controller
             fputcsv($file, $columns);
 
             foreach ($all_devices as $device) {
-                $wasteImpact = 0;
-                $co2Diverted = 0;
+                // We need to filter based on approved visibility:
+                // - where the group is approved, this event is visible
+                // - where the group is not approved, this event is visible to network coordinators or group hosts.
+                $group = Group::findOrFail(Party::findOrFail($device->event)->group);
 
-                if ($device->isFixed()) {
-                    if ($device->deviceCategory->powered) {
-                        $wasteImpact = $device->eWasteDiverted();
-                        $co2Diverted = $device->eCo2Diverted($eEmissionRatio, $displacementFactor);
-                    } else {
-                        $wasteImpact = $device->uWasteDiverted();
-                        $co2Diverted = $device->uCo2Diverted($uEmissionratio, $displacementFactor);
+                if ($group->approved || $admin || $me->isCoordinatorForGroup($group) || $amHost && Fixometer::userIsHostOfGroup($group->idgroups, $me->id)) {
+                    $wasteImpact = 0;
+                    $co2Diverted = 0;
+
+                    if ($device->isFixed())
+                    {
+                        if ($device->deviceCategory->powered)
+                        {
+                            $wasteImpact = $device->eWasteDiverted();
+                            $co2Diverted = $device->eCo2Diverted($eEmissionRatio, $displacementFactor);
+                        } else
+                        {
+                            $wasteImpact = $device->uWasteDiverted();
+                            $co2Diverted = $device->uCo2Diverted($uEmissionratio, $displacementFactor);
+                        }
                     }
-                }
 
-                fputcsv($file, [
-                    $device->item_type,
-                    $device->deviceCategory->name,
-                    $device->brand,
-                    $device->model,
-                    $device->problem,
-                    $device->getRepairStatus(),
-                    $device->getSpareParts(),
-                    $device->deviceEvent->getEventName(),
-                    $device->deviceEvent->theGroup->name,
-                    $device->deviceEvent->getFormattedLocalStart('Y-m-d'),
-                    $wasteImpact,
-                    $co2Diverted,
-                ]);
+                    fputcsv($file, [
+                        $device->item_type,
+                        $device->deviceCategory->name,
+                        $device->brand,
+                        $device->model,
+                        $device->problem,
+                        $device->getRepairStatus(),
+                        $device->getSpareParts(),
+                        $device->deviceEvent->getEventName(),
+                        $device->deviceEvent->theGroup->name,
+                        $device->deviceEvent->getFormattedLocalStart('Y-m-d'),
+                        $wasteImpact,
+                        $co2Diverted,
+                    ]);
+                }
             }
         }
 
@@ -205,7 +227,7 @@ class ExportController extends Controller
                     });
                     $k = implode(' ', $key);
                 });
-                $headers = array_merge(['Date', 'Venue', 'Group'], $statsKeys);
+                $headers = array_merge(['Date', 'Venue', 'Group', 'Approved'], $statsKeys);
 
                 // Send these to getEventStats() to speed things up a bit.
                 $eEmissionRatio = \App\Helpers\LcaStats::getEmissionRatioPowered();
@@ -223,6 +245,7 @@ class ExportController extends Controller
                         $party->getFormattedLocalStart(),
                         $party->getEventName(),
                         $party->theGroup && $party->theGroup->name ? $party->theGroup->name : '?',
+                        $party->approved ? 'true' : 'false',
                     ];
                     $PartyArray[$i] += $stats;
                 }
@@ -260,8 +283,14 @@ class ExportController extends Controller
         $all_group_tags = GroupTags::all();
 
         //Get all applicable groups
-        if (Fixometer::hasRole($user, 'Administrator')) {
+        if (Fixometer::hasRole($user, 'Administrator'))
+        {
             $all_groups = Group::all();
+        } else if (Fixometer::hasRole($user, 'NetworkCoordinator')) {
+            $all_groups = new Collection();
+            foreach ($user->networks as $network) {
+                $all_groups->merge($network->groups);
+            }
         } elseif (Fixometer::hasRole($user, 'Host')) {
             $host_groups = UserGroups::where('user', $user->id)->where('role', 3)->pluck('group')->toArray();
             $all_groups = Group::whereIn('groups.idgroups', $host_groups);
