@@ -7,6 +7,7 @@ use App\Device;
 use App\Group;
 use App\Helpers\RepairNetworkService;
 use App\Party;
+use App\Role;
 use App\User;
 use DB;
 use Hash;
@@ -83,7 +84,7 @@ class BasicTest extends TestCase
     }
 
     public function testExport() {
-        $this->loginAsTestUser();
+        $this->loginAsTestUser(Role::ADMINISTRATOR);
 
         DB::statement('SET foreign_key_checks=0');
         Category::truncate();
