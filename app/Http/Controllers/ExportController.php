@@ -11,6 +11,7 @@ use App\Helpers\Fixometer;
 use App\Helpers\SearchHelper;
 use App\Party;
 use App\Search;
+use App\User;
 use App\UserGroups;
 use Auth;
 use Carbon\Carbon;
@@ -73,8 +74,6 @@ class ExportController extends Controller
         $file = fopen(base_path() . DIRECTORY_SEPARATOR . 'public' . DIRECTORY_SEPARATOR . $filename, 'w+');
 
         $me = auth()->user();
-        $amHost = $me->hasRole('Host');
-        $admin = $me->hasRole('Administrator');
 
         // Do not include model column
         if ($host == 'therestartproject.org') {
@@ -95,12 +94,7 @@ class ExportController extends Controller
             fputcsv($file, $columns);
 
             foreach ($all_devices as $device) {
-                // We need to filter based on approved visibility:
-                // - where the group is approved, this event is visible
-                // - where the group is not approved, this event is visible to network coordinators or group hosts.
-                $group = Group::findOrFail(Party::findOrFail($device->event)->group);
-
-                if ($group->approved || $admin || $me->isCoordinatorForGroup($group) || $amHost && Fixometer::userIsHostOfGroup($group->idgroups, $me->id)) {
+                if (User::userCanSeeEvent($me, $event)) {
                     $wasteImpact = 0;
                     $co2Diverted = 0;
 
@@ -146,14 +140,12 @@ class ExportController extends Controller
             ];
 
             fputcsv($file, $columns);
+            $party = null;
 
             foreach ($all_devices as $device) {
-                // We need to filter based on approved visibility:
-                // - where the group is approved, this event is visible
-                // - where the group is not approved, this event is visible to network coordinators or group hosts.
-                $group = Group::findOrFail(Party::findOrFail($device->event)->group);
+                $party = !$party || $party->idevents != $device->event ? Party::findOrFail($device->event) : $party;
 
-                if ($group->approved || $admin || $me->isCoordinatorForGroup($group) || $amHost && Fixometer::userIsHostOfGroup($group->idgroups, $me->id)) {
+                if (User::userCanSeeEvent($me, $party)) {
                     $wasteImpact = 0;
                     $co2Diverted = 0;
 

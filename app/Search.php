@@ -44,21 +44,10 @@ class Search extends Model
         // We need to explicitly select what we want to return otherwise gtag.group might overwrite events.group.
         $events = $eventsQuery->select(['events.*', 'gtag.group_tag'])->get();
 
-        // We need to filter based on approved visibility:
-        // - where the group is approved, this event is visible
-        // - where the group is not approved, this event is visible to network coordinators or group hosts.
         $me = auth()->user();
-        $amHost = $me->hasRole('Host');
-        $admin = $me->hasRole('Administrator');
 
-        $events = $events->filter(function ($event) use ($me, $amHost, $admin) {
-            $group = Group::find($event['group']);
-
-            if ($group->approved || $admin || $me->isCoordinatorForGroup($group) || $amHost && Fixometer::userIsHostOfGroup($group->idgroups, $me->id)) {
-                return true;
-            }
-
-            return false;
+        $events = $events->filter(function ($event) use ($me) {
+            return User::userCanSeeEvent($me, $event);
         });
 
         return $events;
