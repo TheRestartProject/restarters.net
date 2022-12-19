@@ -56,7 +56,11 @@ Route::group(['middleware' => ['ensureAPIToken']], function () {
 
     // Device export is also called from https://therestartproject.org/download-dataset,
     // so we allow anonymous access.
-    Route::get('/export/devices', 'ExportController@devices');
+    Route::prefix('export')->group(function() {
+        Route::get('/devices/event/{id}', 'ExportController@devicesEvent');
+        Route::get('/devices/group/{id}', 'ExportController@devicesGroup');
+        Route::get('/devices', 'ExportController@devices');
+    });
 
     // Calendar routes do not require authentication.
     // (You would not be able to subscribe from a calendar application if they did.)

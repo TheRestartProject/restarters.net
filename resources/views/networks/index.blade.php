@@ -33,7 +33,7 @@
                     @foreach($yourNetworks as $network)
                         <tr>
                             <td>
-                                @php( $logo = $network->logo('_x100') )
+                                @php( $logo = $network->sizedLogo('_x100') )
                                 @if( $logo )
                                     <img style="width: auto; height:50px" src="{{ asset("/uploads/$logo") }}" alt="{{{ $network->name }}} logo">
                                 @else
@@ -79,7 +79,7 @@
                     @foreach($allNetworks as $network)
                         <tr>
                             <td>
-                              @php( $logo = $network->logo('_x100') )
+                              @php( $logo = $network->sizedLogo('_x100') )
                               @if( $logo )
                                 <img style="width: auto; height:50px" src="{{ asset("/uploads/$logo") }}" alt="{{{ $network->name }}} logo">
                               @else

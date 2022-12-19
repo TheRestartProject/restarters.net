@@ -159,7 +159,7 @@ exports.approveEvent = async function(page, baseURL, idevents) {
   await page.locator('text=Event details updated.')
 }
 
-exports.addDevice = async function(page, baseURL, idevents, powered, photo) {
+exports.addDevice = async function(page, baseURL, idevents, powered, photo, fixed, spareparts) {
   // Go to event edit page.
   await page.goto('/party/view/' + idevents)
 
@@ -175,6 +175,20 @@ exports.addDevice = async function(page, baseURL, idevents, powered, photo) {
   // Tab to category and select first.
   await page.keyboard.press('Tab')
   await page.keyboard.press('Enter')
+
+  if (fixed) {
+    // Tab to repair outcome and select fixed (first).
+    await page.keyboard.press('Tab')
+    await page.keyboard.press('Tab')
+    await page.keyboard.press('Tab')
+    await page.keyboard.press('Tab')
+    await page.keyboard.press('Enter')
+  }
+
+  if (spareparts) {
+    await page.locator('.spare-parts').click()
+    await page.keyboard.press('Enter')
+  }
 
   if (photo) {
     const [fileChooser] = await Promise.all([
@@ -202,6 +216,9 @@ exports.addDevice = async function(page, baseURL, idevents, powered, photo) {
     // Just dropzone
     await expect(page.locator('.device-photos:visible img')).toHaveCount(1)
   }
+
+  // Close the device edit.
+  await page.locator('.cancel').click()
 }
 
 exports.unfollowGroup = async function(page, idgroups) {
@@ -209,7 +226,7 @@ exports.unfollowGroup = async function(page, idgroups) {
 
   await page.click('#groupactions .dropdown-toggle >> visible=true')
 
-  await page.click('#groupactions .dropdown-menu > li:nth-child(6) > .dropdown-item >> visible=true')
+  await page.click('#groupactions .dropdown-menu > li:nth-child(7) > .dropdown-item >> visible=true')
 
   await page.click('#confirmmodal .btn-primary')
 

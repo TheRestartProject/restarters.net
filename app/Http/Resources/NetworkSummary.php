@@ -58,7 +58,7 @@ class NetworkSummary extends JsonResource
         return [
             'id' => $this->id,
             'name' => $this->name,
-            'logo' => $this->logo && is_object($this->logo) && is_object($this->logo->image) ? $this->logo->image->path : null
+            'logo' => $this->logo
         ];
     }
 }

@@ -58,9 +58,20 @@ class CreateDiscourseThreadForEvent
                     'username' => $host->username,
                 ]);
 
+                // Construct an intro.
+                $group = $theParty->theGroup;
+                $intro = __('events.discourse_intro', [
+                    'name' => $theParty->venue,
+                    'url' => url('/party/view/' . $theParty->idevents),
+                    'start' => $theParty->getFormattedLocalStart('D jS M, H:i'),
+                    'end' => $theParty->getFormattedLocalEnd('H:i'),
+                    'groupname' => $group->name,
+                    'groupurl' => url('/group/' . $group->id),
+                ], $host->language);
+
                 // See https://meta.discourse.org/t/private-message-send-api/27593/21.
                 $params = [
-                    'raw' => $theParty->free_text,
+                    'raw' => $intro,
                     'title' => $theParty->venue.' '.$theParty->event_date_local,
                     'target_usernames' => $host->username,
                     'archetype' => 'private_message',

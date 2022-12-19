@@ -50,7 +50,7 @@ class Network extends Model
         return $events->flatten(1);
     }
 
-    public function logo($size)
+    public function sizedLogo($size)
     {
         $logo = preg_replace('/\\.([^.\\s]{3,4})$/', "-$size.$1", $this->logo);
         return $logo;

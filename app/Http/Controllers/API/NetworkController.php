@@ -122,18 +122,37 @@ class NetworkController extends Controller
      *              type="boolean"
      *          )
      *      ),
+     *      @OA\Parameter(
+     *          name="includeDetails",
+     *          description="Include the details for each group.  This makes the call significantly slower.  Default false.",
+     *          required=false,
+     *          in="query",
+     *          @OA\Schema(
+     *              type="boolean"
+     *          )
+     *      ),
      *      @OA\Response(
      *          response=200,
      *          description="Successful operation",
      *          @OA\JsonContent(
      *              @OA\Property(
-     *                property="data",
-     *                title="data",
-     *                description="An array of groups",
-     *                type="array",
-     *                @OA\Items(
-     *                    ref="#/components/schemas/GroupSummary"
-     *                 )
+     *                  property="data",
+     *                  title="data",
+     *                  description="An array of groups",
+     *                  oneOf={
+     *                      @OA\Schema(
+     *                          type="array",
+     *                          @OA\Items(
+     *                            ref="#/components/schemas/GroupSummary"
+     *                          )
+     *                      ),
+     *                      @OA\Schema(
+     *                          type="array",
+     *                          @OA\Items(
+     *                            ref="#/components/schemas/Group"
+     *                          )
+     *                      ),
+     *                  },
      *              )
      *          )
      *       ),
@@ -160,7 +179,12 @@ class NetworkController extends Controller
             ->where('groups.updated_at', '>=', $start)
             ->where('groups.updated_at', '<=', $end)->get();
 
-        return \App\Http\Resources\GroupSummaryCollection::make($groups);
+
+        if ($request->get('includeDetails', false)) {
+            return \App\Http\Resources\GroupCollection::make($groups);
+        } else {
+            return \App\Http\Resources\GroupSummaryCollection::make($groups);
+        }
     }
 
     /**
@@ -168,7 +192,7 @@ class NetworkController extends Controller
      *      path="/api/v2/networks/{id}/events",
      *      operationId="getNetworkEvents",
      *      tags={"Networks"},
-     *      summary="Get Network Groups",
+     *      summary="Get Network Events",
      *      description="Returns list of events for a network.",
      *      @OA\Parameter(
      *          name="id",
@@ -180,7 +204,7 @@ class NetworkController extends Controller
      *          )
      *      ),
      *      @OA\Parameter(
-     *          name="updated_start",
+     *          name="start",
      *          description="The minimum start date for an event in ISO8601 format.  Inclusive.",
      *          required=false,
      *          in="query",
@@ -190,13 +214,42 @@ class NetworkController extends Controller
      *          )
      *      ),
      *      @OA\Parameter(
-     *          name="updated_end",
+     *          name="end",
      *          description="The maximum end date for an event in ISO8601 format.  Inclusive.",
      *          required=false,
      *          in="query",
      *          @OA\Schema(
      *              type="string",
      *              example="2022-09-18T12:30:00+00:00"
+     *          )
+     *      ),
+     *      @OA\Parameter(
+     *          name="updated_start",
+     *          description="The minimum start date for when an event was updated in ISO8601 format.  Useful if you need to only process events that have had recent changes.  Inclusive.",
+     *          required=false,
+     *          in="query",
+     *          @OA\Schema(
+     *              type="string",
+     *              example="2022-09-18T11:30:00+00:00"
+     *          )
+     *      ),
+     *      @OA\Parameter(
+     *          name="updated_end",
+     *          description="The maximum end date for when an event was updated in ISO8601 format.  Inclusive.",
+     *          required=false,
+     *          in="query",
+     *          @OA\Schema(
+     *              type="string",
+     *              example="2022-09-18T12:30:00+00:00"
+     *          )
+     *      ),
+     *      @OA\Parameter(
+     *          name="includeDetails",
+     *          description="Include the details for each event.  This makes the call significantly slower.  Default false.",
+     *          required=false,
+     *          in="query",
+     *          @OA\Schema(
+     *              type="boolean"
      *          )
      *      ),
      *      @OA\Response(
@@ -207,10 +260,20 @@ class NetworkController extends Controller
      *                property="data",
      *                title="data",
      *                description="An array of events",
-     *                type="array",
-     *                @OA\Items(
-     *                    ref="#/components/schemas/EventSummary"
-     *                 )
+     *                oneOf={
+     *                      @OA\Schema(
+     *                          type="array",
+     *                          @OA\Items(
+     *                             ref="#/components/schemas/EventSummary"
+     *                          )
+     *                      ),
+     *                      @OA\Schema(
+     *                          type="array",
+     *                          @OA\Items(
+     *                             ref="#/components/schemas/Event"
+     *                          )
+     *                      ),
+     *                  },
      *              )
      *          )
      *       ),
@@ -227,21 +290,29 @@ class NetworkController extends Controller
 
         // Get date filters.  We default to far past and far future so that we don't need multiple code branches.  We
         // don't need to validate the date format - if they put junk in then they'll get junk matches back.
-        $start = Carbon::parse($request->get('updated_start', '1970-01-01'))->setTimezone('UTC')->format('Y-m-d H:i:s');
-        $end = Carbon::parse($request->get('updated_end', '3000-01-01'))->setTimezone('UTC')->format('Y-m-d H:i:s');
+        $start = Carbon::parse($request->get('start', '1970-01-01'))->setTimezone('UTC')->toIso8601String();
+        $end = Carbon::parse($request->get('end', '3000-01-01'))->setTimezone('UTC')->toIso8601String();
+        $updated_start = Carbon::parse($request->get('updated_start', '1970-01-01'))->setTimezone('UTC')->format('Y-m-d H:i:s');
+        $updated_end = Carbon::parse($request->get('updated_end', '3000-01-01'))->setTimezone('UTC')->format('Y-m-d H:i:s');
 
         // We need to explicity select events.*, otherwise the updated_at values we get back are from the group_network
         // table, which is mightily confusing.  We only want to return approved events on approved groups.
         $events = Party::join('groups', 'groups.idgroups', '=', 'events.group')
             ->join('group_network', 'group_network.group_id', '=', 'groups.idgroups')
             ->where('group_network.network_id', $id)
-            ->where('events.updated_at', '>=', $start)
-            ->where('events.updated_at', '<=', $end)
+            ->where('events.start', '>=', $start)
+            ->where('events.end', '<=', $end)
+            ->where('events.updated_at', '>=', $updated_start)
+            ->where('events.updated_at', '<=', $updated_end)
             ->where('events.approved', true)
             ->where('groups.approved', true)
             ->select('events.*')
             ->get();
 
-        return \App\Http\Resources\PartySummaryCollection::make($events);
+        if ($request->get('includeDetails', false)) {
+            return \App\Http\Resources\PartyCollection::make($events);
+        } else {
+            return \App\Http\Resources\PartySummaryCollection::make($events);
+        }
     }
 }

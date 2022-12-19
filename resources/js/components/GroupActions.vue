@@ -17,6 +17,9 @@
         <b-dropdown-item  data-toggle="modal" data-target="#group-share-stats" v-if="canedit">
           {{ __('groups.share_group_stats') }}
         </b-dropdown-item>
+        <b-dropdown-item :href="'/export/devices/group/' + idgroups">
+          {{ __('devices.export_group_data') }}
+        </b-dropdown-item>
         <b-dropdown-item data-toggle="modal" @click="leaveGroup" v-if="ingroup" class="leavegroup">
           {{ __('groups.leave_group_button') }}
         </b-dropdown-item>
