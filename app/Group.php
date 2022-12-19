@@ -32,6 +32,7 @@ class Group extends Model implements Auditable
         'free_text',
         'facebook',
         'wordpress_post_id',
+        'approved',
         'shareable_code',
         'network_id',
         'external_id',
@@ -40,7 +41,7 @@ class Group extends Model implements Auditable
         'phone'
     ];
 
-    protected $appends = ['ShareableLink', 'approved', 'auto_approve'];
+    protected $appends = ['ShareableLink', 'auto_approve'];
 
     // The distance is not in the groups table; we add it on some queries from the select.
     private $distance = null;
@@ -407,7 +408,7 @@ class Group extends Model implements Auditable
     public function getNextUpcomingEvent()
     {
         $event = $this->parties()
-            ->whereNotNull('wordpress_post_id')
+            ->where('approved', true)
             ->where('event_start_utc', '>=', date('Y-m-d H:i:s'))
             ->orderBy('event_start_utc', 'asc');
 
@@ -418,14 +419,9 @@ class Group extends Model implements Auditable
         return $event->first();
     }
 
-    public function getApprovedAttribute()
-    {
-        return ! is_null($this->wordpress_post_id);
-    }
-
     public function scopeRequiresModeration($query)
     {
-        $query = $query->whereNull('wordpress_post_id');
+        $query = $query->where('approved', false);
         return $query;
     }
 
@@ -675,7 +671,7 @@ class Group extends Model implements Auditable
     }
 
     public function scopeUnapproved($query) {
-        return $query->whereNull('wordpress_post_id');
+        return $query->where('approved', false);
     }
 
     public function scopeUnapprovedVisibleTo($query, $user_id) {

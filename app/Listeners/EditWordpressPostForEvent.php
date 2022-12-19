@@ -37,15 +37,19 @@ class EditWordpressPostForEvent
         $data = $event->data;
 
         $theParty = Party::find($id);
+        echo "Found $id\n";
 
         if (! $theParty->shouldPushToWordpress()) {
+            echo "Not pushed\n";
             Log::info('Events for groups in this network are not published');
 
             return;
         }
 
         try {
+            echo "Post {$theParty->wordpress_post_id} will be updated\n";
             if (is_numeric($theParty->wordpress_post_id)) {
+                echo "Update it\n";
                 $startTimestamp = strtotime($theParty->event_start_utc);
                 $endTimestamp = strtotime($theParty->event_end_utc);
 
@@ -90,6 +94,8 @@ class EditWordpressPostForEvent
 
                 $content['custom_fields'] = $custom_fields;
                 $this->wpClient->editPost($theParty->wordpress_post_id, $content);
+            } else {
+                echo "Not numeric\n";
             }
         } catch (\Exception $e) {
             Log::error('An error occurred during Wordpress event update: '.$e->getMessage());

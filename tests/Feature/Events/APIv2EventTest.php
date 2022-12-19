@@ -84,7 +84,7 @@ class APIv2EventTest extends TestCase
         $idevents = $this->createEvent($idgroups, 'tomorrow');
 
         $party = Party::find($idevents);
-        $party->wordpress_post_id = 1234;
+        $party->approved = true;
         $party->save();
 
         $network = factory(Network::class)->create();

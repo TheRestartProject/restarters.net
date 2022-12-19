@@ -221,7 +221,7 @@
                   <label class="groups-tags-label" for="area">@lang('groups.area')</label>
                   <input type="text" name="area" class="form-control field" value="{{ $formdata->area }}" />
 
-                  @if( is_null($formdata->wordpress_post_id) )
+                  @if( !$formdata->approved) )
                     <br>
                     <label class="groups-tags-label" for="moderate">@lang('groups.approve_group')</label>
                     <select name="moderate" class="form-control field">

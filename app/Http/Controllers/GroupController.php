@@ -734,7 +734,7 @@ class GroupController extends Controller
                             'group_url' => url('/group/view/'.$id),
                         ]));
                     }
-                } elseif (! empty($group->wordpress_post_id)) {
+                } else {
                     event(new EditGroup($group, $data));
                 }
             }
