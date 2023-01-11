@@ -189,20 +189,6 @@ abstract class TestCase extends BaseTestCase
         return $idgroups;
     }
 
-    public function createDevice($idevents, $type)
-    {
-        $deviceAttributes = factory(Device::class)->states($type)->raw();
-
-        $deviceAttributes['event_id'] = $idevents;
-        $deviceAttributes['quantity'] = 1;
-
-        $response = $this->post('/device/create', $deviceAttributes);
-        $iddevices = Device::latest()->first()->iddevices;
-        $this->assertNotNull($iddevices);
-
-        return $iddevices;
-    }
-
     public function createEvent($idgroups, $date)
     {
         // Create a party for the specific group.
