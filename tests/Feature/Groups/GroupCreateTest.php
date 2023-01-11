@@ -66,8 +66,8 @@ class GroupCreateTest extends TestCase
         $group = Group::find($idgroups);
         $network->addGroup($group);
 
-        $network2 = factory(Network::class)->create();
-        $tag = factory(GroupTags::class)->create();
+        $network2 = Network::factory()->create();
+        $tag = GroupTags::factory()->create();
 
         if ($role == 'NetworkCoordinator') {
             $network->addCoordinator($actas);

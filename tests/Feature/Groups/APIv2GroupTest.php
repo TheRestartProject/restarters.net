@@ -97,7 +97,7 @@ class APIv2GroupTest extends TestCase
     public function testCreateGroupLoggedInWithoutToken()
     {
         // Logged in as a user should work, even if we don't use an API token.
-        $user = factory(User::class)->states('Administrator')->create([
+        $user = User::factory()->administrator()->create([
                                                                           'api_token' => null,
                                                                       ]);
         $this->actingAs($user);
@@ -116,11 +116,11 @@ class APIv2GroupTest extends TestCase
     public function testCreateGroupLoggedOutWithToken()
     {
         // Logged out should work if we use an API token.
-        $user = factory(User::class)->states('Administrator')->create([
+        $user = User::factory()->administrator()->create([
                                                                           'api_token' => '1234',
                                                                       ]);
         // Set a network on the user.
-        $network = factory(Network::class)->create([
+        $network = Network::factory()->create([
                                                        'shortname' => 'network',
                                                    ]);
         $user->repair_network = $network->id;
@@ -185,7 +185,7 @@ class APIv2GroupTest extends TestCase
 
     public function testCreateGroupGeocodeFailure()
     {
-        $user = factory(User::class)->states('Administrator')->create([
+        $user = User::factory()->administrator()->create([
                                                                           'api_token' => '1234',
                                                                       ]);
         $this->actingAs($user);
@@ -201,7 +201,7 @@ class APIv2GroupTest extends TestCase
 
     public function testCreateGroupInvalidTimezone()
     {
-        $user = factory(User::class)->states('Administrator')->create([
+        $user = User::factory()->administrator()->create([
                                                                           'api_token' => '1234',
                                                                       ]);
         $this->actingAs($user);
@@ -219,7 +219,7 @@ class APIv2GroupTest extends TestCase
     public function testCreateGroupDuplicate()
     {
         // Logged in as a user should work, even if we don't use an API token.
-        $user = factory(User::class)->states('Administrator')->create([
+        $user = User::factory()->administrator()->create([
                                                                           'api_token' => null,
                                                                       ]);
         $this->actingAs($user);
@@ -243,14 +243,14 @@ class APIv2GroupTest extends TestCase
     }
 
     public function testTags() {
-        $tag = factory(GroupTags::class)->create();
+        $tag = GroupTags::factory()->create();
         $response = $this->get('/api/v2/groups/tags', []);
         $response->assertSuccessful();
         $json = json_decode($response->getContent(), true);
         self::assertEquals($tag->id, $json['data'][0]['id']);
-
-        $group = factory(Group::class)->create();
-        $tag = factory(GroupTags::class)->create();
+        
+        $group = Group::factory()->create();
+        $tag = GroupTags::factory()->create();
         $group->addTag($tag);
 
         $response = $this->get("/api/v2/groups/{$group->idgroups}", []);
