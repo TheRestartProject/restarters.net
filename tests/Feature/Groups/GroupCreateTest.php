@@ -3,12 +3,14 @@
 namespace Tests\Feature\Groups;
 
 use App\Group;
+use App\GroupTags;
 use App\Network;
 use App\Notifications\GroupConfirmed;
 use App\Party;
 use App\Role;
 use App\User;
 use Carbon\Carbon;
+use Illuminate\Validation\ValidationException;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Tests\TestCase;
 use Illuminate\Support\Facades\Notification;
@@ -39,26 +41,8 @@ class GroupCreateTest extends TestCase
         $this->loginAsTestUser(Role::ADMINISTRATOR);
 
         // Use an address which will fail to geocode.
+        $this->expectException(ValidationException::class);
         $this->assertNull($this->createGroup('Test Group', 'https://therestartproject.org', 'zzzzzzzzzzz123', 'Some text', false));
-        $this->assertStringContainsString(__('groups.geocode_failed'), $this->lastResponse->getContent());
-    }
-
-    public function testDuplicate()
-    {
-        $this->loginAsTestUser(Role::ADMINISTRATOR);
-
-        // Test creating the same group twice.
-        $this->assertNotNull($this->createGroup());
-
-        $response = $this->post('/group/create', [
-            'name' => 'Test Group0',
-            'website' => 'https://therestartproject.org',
-            'location' => 'London',
-            'free_text' => 'Some text.',
-            'timezone' => 'Europe/London'
-        ]);
-
-        $this->assertStringContainsString('That group name (Test Group0) already exists', $response->getContent());
     }
 
     public function roles() {
@@ -82,6 +66,9 @@ class GroupCreateTest extends TestCase
         $group = Group::find($idgroups);
         $network->addGroup($group);
 
+        $network2 = Network::factory()->create();
+        $tag = GroupTags::factory()->create();
+
         if ($role == 'NetworkCoordinator') {
             $network->addCoordinator($actas);
         }
@@ -98,10 +85,16 @@ class GroupCreateTest extends TestCase
             ],
         ]);
 
-        $admin2 = User::factory()->administrator()->create();
-        $this->actingAs($admin2);
+        // Log in as someone else with the same role so that the GroupConfirmed notification gets sent.
+        $actas2 = User::factory()->$role()->create();
 
-        $response = $this->post('/group/edit/'.$idgroups, [
+        if ($role == 'NetworkCoordinator') {
+            $network->addCoordinator($actas2);
+        }
+
+        $this->actingAs($actas2);
+
+        $response = $this->patch('/api/v2/groups/' . $idgroups, [
             'description' => 'Test',
             'location' => 'London',
             'name' => $group->name,
@@ -109,8 +102,12 @@ class GroupCreateTest extends TestCase
             'free_text' => 'HQ',
             'moderate' => 'approve',
             'area' => 'London',
-            'postcode' => 'SW9 7QD'
+            'postcode' => 'SW9 7QD',
+            'networks' => json_encode([ $network->id, $network2->id ]),
+            'tags' => json_encode([ $tag->id ]),
         ]);
+
+        $response->assertSuccessful();
 
         Notification::assertSentTo(
             [$actas],
@@ -126,7 +123,18 @@ class GroupCreateTest extends TestCase
             }
         );
 
-        $this->assertStringContainsString('Group updated!', $response->getContent());
+        $group->refresh();
+        if ($role == 'NetworkCoordinator') {
+            // Attempt to edit the networks or tags should be ignored.
+            $this->assertTrue($group->networks->contains($network));
+            $this->assertFalse($group->networks->contains($network2));
+            $this->assertFalse($group->group_tags->contains($tag));
+        } else if ($role == 'Administrator') {
+            // Administrators can edit networks and tags.
+            $this->assertTrue($group->networks->contains($network));
+            $this->assertTrue($group->networks->contains($network2));
+            $this->assertTrue($group->group_tags->contains($tag));
+        }
     }
 
     public function testEventVisibility() {
@@ -189,26 +197,4 @@ class GroupCreateTest extends TestCase
         $this->get('/party/view/'.$event->idevents)->assertSee($eventAttributes['venue']);
         $this->get('/party')->assertSee($eventAttributes['venue']);
     }
-
-    public function testCreateTimezone()
-    {
-        $this->loginAsTestUser(Role::ADMINISTRATOR);
-
-        // Test creating the same group twice.
-        $response = $this->post('/group/create', [
-            'name' => 'Test Group0',
-            'website' => 'https://therestartproject.org',
-            'location' => 'London',
-            'free_text' => 'Some text.',
-            'timezone' => 'Asia/Samarkand'
-        ]);
-
-        $response->assertRedirect();
-        $redirectTo = $response->getTargetUrl();
-        $this->assertNotFalse(strpos($redirectTo, '/group/edit'));
-        $group = Group::latest()->first();
-        $this->assertEquals('Asia/Samarkand', $group->timezone);
-    }
-
-
 }

@@ -40,6 +40,7 @@
         "@sentry/tracing": "^6.7.2",
         "@sentry/vue": "^6.7.2",
         "ajv": "^6.12.3",
+        "babel-plugin-istanbul": "^6.1.1",
         "bootstrap-fileinput": "^4.4.9",
         "bootstrap-select": "^1.13.17",
         "bootstrap-tokenfield": "^0.12.0",

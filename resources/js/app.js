@@ -43,6 +43,7 @@ import EventPage from './components/EventPage.vue'
 import FixometerPage from './components/FixometerPage'
 import GroupsPage from './components/GroupsPage.vue'
 import GroupPage from './components/GroupPage.vue'
+import GroupAddEditPage from './components/GroupAddEditPage.vue'
 import GroupEventsPage from './components/GroupEventsPage.vue'
 import GroupEvents from './components/GroupEvents.vue'
 import GroupsRequiringModeration from './components/GroupsRequiringModeration'
@@ -1572,10 +1573,12 @@ jQuery(document).ready(function () {
         'fixometerpage': FixometerPage,
         'groupspage': GroupsPage,
         'grouppage': GroupPage,
+        'groupaddeditpage': GroupAddEditPage,
         'groupeventspage': GroupEventsPage,
         'groupevents': GroupEvents,
         'groupsrequiringmoderation': GroupsRequiringModeration,
         'microtaskingpage': MicrotaskingPage,
+
         'eventtimerangepicker': EventTimeRangePicker,
         'eventdatepicker': EventDatePicker,
         'venueaddress': VenueAddress,

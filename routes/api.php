@@ -74,8 +74,12 @@ Route::get('/timezones', [App\Http\Controllers\ApiController::class, 'timezones'
 // We are working towards a new and more coherent API.
 Route::prefix('v2')->group(function() {
     Route::prefix('/groups')->group(function() {
+        Route::get('/names', [API\GroupController::class, 'listNamesv2']);
+        Route::get('/tags', [API\GroupController::class, 'listTagsv2']);
         Route::get('{id}/events', [API\GroupController::class, 'getEventsForGroupv2']);
         Route::get('{id}', [API\GroupController::class, 'getGroupv2']);
+        Route::post('', [API\GroupController::class, 'createGroupv2']);
+        Route::patch('{id}', [API\GroupController::class, 'updateGroupv2']);
     });
 
     Route::prefix('/events')->group(function() {

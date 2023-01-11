@@ -9,6 +9,7 @@ use Carbon\Carbon;
 use DB;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Http\UploadedFile;
+use Illuminate\Validation\ValidationException;
 use Tests\TestCase;
 use Illuminate\Support\Facades\Storage;
 
@@ -29,7 +30,7 @@ class GroupEditTest extends TestCase
 
         $this->actingAs($host);
 
-        $response = $this->post('/group/edit/'.$group->idgroups, [
+        $response = $this->patch('/api/v2/groups/' . $group->idgroups, [
             'description' => 'Test',
             'location' => 'London',
             'name' => 'Test',
@@ -37,7 +38,7 @@ class GroupEditTest extends TestCase
             'free_text' => 'HQ',
         ]);
 
-        $this->assertStringContainsString('Group updated!', $response->getContent());
+        $response->assertSuccessful();
 
         $this->assertEquals(1, count($group->group_tags));
         $this->assertEquals($tag->tag_name, $group->group_tags[0]->tag_name);
@@ -58,15 +59,15 @@ class GroupEditTest extends TestCase
 
         $this->actingAs($host);
 
-        $response = $this->post('/group/edit/'.$group->idgroups, [
+        $this->expectException(ValidationException::class);
+
+        $this->patch('/api/v2/groups/' . $group->idgroups, [
             'description' => 'Test',
             'location' => 'zzzzzzzzzzzzz1234',
             'name' => 'Test',
             'website' => 'https://therestartproject.org',
             'free_text' => 'HQ',
         ]);
-
-        $this->assertStringContainsString(__('groups.geocode_failed'), $response->getContent());
     }
 
     /** @test */

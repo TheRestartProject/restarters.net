@@ -29,7 +29,12 @@ export default {
   state: {
     // List of groups indexed by group id.  Use object rather than array so that it's sparse.
     list: {},
+
+    // Groups requiring moderation.
     moderate: {},
+
+    // Group tags.
+    tags: {},
 
     // List of stats indexed by group id.
     stats: {}
@@ -40,6 +45,9 @@ export default {
     },
     list: state => {
       return Object.values(state.list)
+    },
+    listTags: state => {
+      return Object.values(state.tags)
     },
     getModerate: state => state.moderate,
     getStats: state => idgroups => {
@@ -53,10 +61,18 @@ export default {
     setList(state, params) {
       let list = {}
       params.groups.forEach(e => {
-        list[e.idgroups] = e
+        list[e.idgroups || e.id] = e
       })
 
       state.list = list
+    },
+    setTags(state, params) {
+      let list = {}
+      params.tags.forEach(e => {
+        list[e.id] = e
+      })
+
+      state.tags = list
     },
     setModerate(state, params) {
       params.forEach(e => {
@@ -107,6 +123,89 @@ export default {
 
       if (ret && ret.data) {
         commit('setModerate', ret.data)
+      }
+    },
+    async list({commit}) {
+      let ret = await axios.get('/api/v2/groups/names')
+      if (ret && ret.data) {
+        commit('setList', {
+          groups: ret.data.data
+        })
+      }
+    },
+    async listTags({commit}) {
+      let ret = await axios.get('/api/v2/groups/tags')
+      if (ret && ret.data) {
+        commit('setTags', {
+          tags: ret.data.data
+        })
+      }
+    },
+    async create({ rootGetters, commit }, params) {
+      let id = null
+      try {
+        const formData = new FormData()
+
+        for (var key in params) {
+          if (params[key]) {
+            formData.append(key, params[key]);
+          }
+        }
+
+        let ret = await axios.post('/api/v2/groups?api_token=' + rootGetters['auth/apiToken'], formData, {
+          headers: {
+            "Content-Type": "multipart/form-data",
+          },
+        })
+
+        if (ret && ret.data) {
+          id = ret.data.id
+        }
+      } catch (e) {
+        console.error("Group create failed", e)
+      }
+
+      return id
+    },
+    async edit({ rootGetters, commit }, params) {
+      let id = null
+      try {
+        const formData = new FormData()
+
+        for (var key in params) {
+          if (params[key]) {
+            formData.append(key, params[key]);
+          }
+        }
+
+        // We need to use a POST verb and override to a PATCH - see
+        // https://stackoverflow.com/questions/55116787/laravel-patch-request-doesnt-read-axios-form-data
+        formData.append('_method', 'PATCH');
+
+        let ret = await axios.post('/api/v2/groups/' + params.id + '?api_token=' + rootGetters['auth/apiToken'], formData, {
+          headers: {
+            "Content-Type": "multipart/form-data",
+          },
+        })
+
+        if (ret && ret.data) {
+          id = ret.data.id
+        }
+      } catch (e) {
+        console.error("Group edit failed", e)
+      }
+
+      return id
+    },
+    async fetch({ rootGetters, commit }, params) {
+      try {
+        let ret = await axios.get('/api/v2/groups/' + params.id + '?api_token=' + rootGetters['auth/apiToken'])
+
+        commit('set', ret.data.data)
+
+        return ret.data.data
+      } catch (e) {
+        console.error("Group fetch failed", e)
       }
     }
   },

@@ -70,14 +70,18 @@ abstract class TestCase extends BaseTestCase
         // Set up random auto increment values.  This avoids tests working because everything is 1.
         //
         // Some tables (e.g. network) have a tinyint as the ID, so we must be careful not to create values that
-        // overflow this.
+        // overflow this.  Also avoid the magic 29 value, which is a "superhero" user (see ExportController).
         $tables = DB::select('SHOW TABLES');
         foreach ($tables as $table)
         {
             foreach ($table as $field => $tablename) {
                 try {
+                    do {
+                        $val = rand(1, 100);
+                    } while ($val == 29);
+
                     // This will throw an exception if the table doesn't have auto increment.
-                    DB::update("ALTER TABLE $tablename AUTO_INCREMENT = " . rand(1, 100) . ";");
+                    DB::update("ALTER TABLE $tablename AUTO_INCREMENT = " . $val . ";");
                 } catch (\Exception $e) {
                 }
             }
@@ -130,7 +134,7 @@ abstract class TestCase extends BaseTestCase
     public function loginAsTestUser($role = Role::RESTARTER)
     {
         // This is testing the external interface, whereas actingAs() wouldn't be.
-        Auth::logout();
+        $response = $this->get('/logout');
         $response = $this->post('/user/register/', $this->userAttributes($role));
 
         $response->assertStatus(302);
@@ -138,26 +142,36 @@ abstract class TestCase extends BaseTestCase
 
         // Set the role.
         Auth::user()->role = $role;
+
+        // Ensure API token in case we need to make API calls.
+        Auth::user()->ensureAPIToken();
+
+        return Auth::user();
     }
 
     public function createGroup($name = 'Test Group', $website = 'https://therestartproject.org', $location = 'London', $text = 'Some text.', $assert = true, $approve = true)
     {
         $idgroups = null;
 
-        $this->lastResponse = $this->post('/group/create', [
-            'name' => $name.$this->groupCount++,
-            'website' => $website,
-            'location' => $location,
-            'free_text' => $text,
-            'timezone' => 'Europe/London'
+        // Get the dashboard.  This will ensure that we have set the repair_network on the user.
+        $this->get('/');
+
+        // We create groups using the API.
+        $user = Auth::user();
+
+        $this->lastResponse = $this->post('/api/v2/groups?api_token=' . $user->api_token, [
+             'name' => $name.$this->groupCount++,
+             'website' => $website,
+             'location' => $location,
+             'description' => $text,
+             'timezone' => 'Europe/London'
         ]);
 
         if ($assert) {
-            $this->assertTrue($this->lastResponse->isRedirection());
-            $redirectTo = $this->lastResponse->getTargetUrl();
-            $this->assertNotFalse(strpos($redirectTo, '/group/edit'));
-            $p = strrpos($redirectTo, '/');
-            $idgroups = substr($redirectTo, $p + 1);
+            $this->assertTrue($this->lastResponse->isSuccessful());
+            $json = json_decode($this->lastResponse->getContent(), true);
+            $this->assertTrue(array_key_exists('id', $json));
+            $idgroups = $json['id'];
 
             if ($approve) {
                 $group = Group::find($idgroups);

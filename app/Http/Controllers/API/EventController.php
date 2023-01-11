@@ -7,6 +7,7 @@ use App\Helpers\Fixometer;
 use App\Http\Controllers\Controller;
 use App\Invite;
 use App\Network;
+use Illuminate\Auth\AuthenticationException;
 use Notification;
 use App\Notifications\JoinGroup;
 use App\Party;
@@ -270,9 +271,27 @@ class EventController extends Controller
         return \App\Http\Resources\Party::make($party);
     }
 
+    private function getUser() {
+        // We want to allow this call to work if a) we are logged in as a user, or b) we have a valid API token.
+        //
+        // This is a slightly odd thing to do, but it is necessary to get both the PHPUnit tests and the
+        // real client use of the API to work.
+        $user = Auth::user();
+
+        if (!$user) {
+            $user = auth('api')->user();
+        }
+
+        if (!$user) {
+            throw new AuthenticationException();
+        }
+
+        return $user;
+    }
+
     public function moderateEventsv2(Request $request) {
         // Get the user that the API has been authenticated as.
-        $user = auth('api')->user();
+        $user = $this->getUser();
         $ret = [];
         $networks = [];
 

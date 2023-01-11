@@ -17,6 +17,7 @@ return [
   'no' => 'No',
   'country' => 'Country',
   'time_volunteered' => 'Time Volunteered',
+  'hours_volunteered' => 'Hours volunteered',
   'average_age' => 'Average age',
   'number_of_groups' => 'Number of groups',
   'total_number_of_users' => 'Total number of users',

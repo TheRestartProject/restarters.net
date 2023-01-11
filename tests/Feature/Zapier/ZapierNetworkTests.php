@@ -59,11 +59,19 @@ class ZapierNetworkTests extends TestCase
             'include_in_zapier' => true,
         ]);
 
-        $groupAttributes = Group::factory()->raw();
-        $groupAttributes['name'] = 'Lancaster Fixers';
+        // Get dashboard, which will set the repair_network in the logged in user.
+        $response = $this->get('/');
 
         // act
-        $response = $this->post('/group/create/', $groupAttributes);
+        $response = $this->post('/api/v2/groups', [
+            'name' => 'Lancaster Fixers',
+            'location' => 'Lancaster, UK',
+            'description' => 'A repair group',
+            'timezone' => 'Europe/London'
+        ]);
+
+        $response->assertSuccessful();
+
         $group = Group::all()->shift();
 
         // assert
@@ -89,11 +97,19 @@ class ZapierNetworkTests extends TestCase
             'include_in_zapier' => false,
         ]);
 
-        $groupAttributes = Group::factory()->raw();
-        $groupAttributes['name'] = 'Ghent Fixers';
+        // Get dashboard, which will set the repair_network in the logged in user.
+        $response = $this->get('/');
 
         // act
-        $response = $this->post('/group/create/', $groupAttributes);
+        $response = $this->post('/api/v2/groups', [
+            'name' => 'Ghent Fixers',
+            'location' => 'Ghent, Belgium',
+            'description' => 'A repair group',
+            'timezone' => 'Europe/Brussels'
+        ]);
+
+        $response->assertSuccessful();
+
         $group = Group::all()->shift();
 
         // assert

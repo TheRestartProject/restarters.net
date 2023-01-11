@@ -17,6 +17,7 @@ return [
   'no' => 'Non',
   'country' => 'Pays',
   'time_volunteered' => 'Temps de bénévolat',
+  'hours_volunteered' => 'Heures de bénévolat',
   'average_age' => 'Moyenne d\'âge',
   'number_of_groups' => 'Nombre de Repair Cafés',
   'total_number_of_users' => 'Nombre total d\'utilisateurs',

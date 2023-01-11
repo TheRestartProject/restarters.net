@@ -100,7 +100,7 @@ class Group extends JsonResource
      *     @OA\Property(
      *          property="timezone",
      *          title="timezone",
-     *          description="Timezone for this group.",
+     *          description="Timezone for this group.  If empty will inherit the timezone from the network.",
      *          format="string",
      *          example="Europe/London"
      *     )
@@ -113,6 +113,7 @@ class Group extends JsonResource
      *         description="The number of hosts of this group.",
      *         type="number",
      *     ),
+     */
 
     /**
      *     @OA\Property(
@@ -121,8 +122,41 @@ class Group extends JsonResource
      *         description="The number of restarters in this group.",
      *         type="number",
      *     ),
-
      */
+
+    /**
+     *     @OA\Property(
+     *         property="approved",
+     *         title="hosts",
+     *         description="Whether the group has been approved",
+     *         type="boolean",
+     *     ),
+     */
+
+    /**
+     *     @OA\Property(
+     *         property="networks",
+     *         title="networks",
+     *         description="An array of networks of which the group is a member.",
+     *         type="array",
+     *         @OA\Items(
+     *            ref="#/components/schemas/NetworkSummary"
+     *         )
+     *     )
+     */
+
+    /**
+     *     @OA\Property(
+     *         property="tags",
+     *         title="tags",
+     *         description="An array of tags which apply to the group.",
+     *         type="array",
+     *         @OA\Items(
+     *            ref="#/components/schemas/Tag"
+     *         )
+     *     )
+     */
+
     /**
      *     @OA\Property(
      *          property="stats",
@@ -279,8 +313,10 @@ class Group extends JsonResource
             'stats' => $stats,
             'updated_at' => Carbon::parse($this->updated_at)->toIso8601String(),
             'location' => new GroupLocation($this),
-            'networks' => $this->resource->networks,
+            'networks' => new NetworkSummaryCollection($this->networks),
+            'tags' => new TagCollection($this->group_tags),
             'timezone' => $this->timezone,
+            'approved' => $this->wordpress_post_id != null,
         ];
 
         $ret['hosts'] = $this->resource->all_confirmed_hosts_count;

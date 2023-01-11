@@ -191,13 +191,35 @@ jobs:
       # Coveralls is pernickety about the location it uploads from existing.
       - run: mkdir build; mkdir build/logs; php vendor/bin/php-coveralls -v -x tests/clover.xml
 
+      # Run the Playwright tests.
+      #
       # Zap groups set up by the UT; this can confuse Playwright tests.
       - run: mysql --host="127.0.0.1" -u root -ps3cr3t -e "use restarters_db;SET foreign_key_checks=0;DELETE FROM groups WHERE location IS NULL;SET foreign_key_checks=1;"
-
-      # Run the Playwright tests.
       # Ignore the return code from the tinker; the user might exist from the phpunit tests.  If it doesn't and
       # the create fails, the tests will fail too.
       - run: echo "App\User::create(['name'=>'Jane Bloggs','email'=>'jane@bloggs.net','password'=>Hash::make('passw0rd'),'role'=>2,'consent_past_data'=>'2021-01-01','consent_future_data'=>'2021-01-01','consent_gdpr'=>'2021-01-01']);" | php artisan tinker || true
+      # Build the web app.
       - run: export NODE_OPTIONS=--max-old-space-size=8192;  npm rebuild node-sass; npm run prod
       - run: npx playwright install
-      - run: npx playwright test
+      # Set up a real nginx/fpm server.  This improves the speed of the tests enormously as artisan serve uses the
+      # single-threaded php built-in web server.
+      - run: sudo apt-get install nginx php7.4-fpm
+      - run: sudo cp /home/circleci/project/.circleci/nginx.conf /etc/nginx/sites-available/default
+      - run: sudo chown -R www-data:www-data /home/circleci/project
+      - run: sudo /etc/init.d/php7.4-fpm start
+      - run: sudo /etc/init.d/nginx start
+      # We're running against localhost.
+      - run: sudo sed -i 's/APP_URL=.*$/APP_URL=http:\/\/localhost/g' /home/circleci/project/.env
+      # Fix up Google key from CircleCI config.
+      - run: cp .env /tmp/.env
+      - run: echo "" >> /tmp/.env
+      - run: echo GOOGLE_API_CONSOLE_KEY=$GOOGLE_API_CONSOLE_KEY >> /tmp/.env
+      - run: sudo cp /tmp/.env /home/circleci/project/.env
+
+      # Now run the tests.
+      - run:
+          name: Playwright Tests
+          no_output_timeout: 10m
+          command: npx playwright test --reporter=list
+
+
