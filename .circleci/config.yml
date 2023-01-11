@@ -203,10 +203,12 @@ jobs:
       - run: npx playwright install
       # Set up a real nginx/fpm server.  This improves the speed of the tests enormously as artisan serve uses the
       # single-threaded php built-in web server.
-      - run: sudo apt-get install nginx php7.4-fpm
+      - run: sudo apt-get install nginx php8.1-fpm php8.1-mysql php8.1-pdo
       - run: sudo cp /home/circleci/project/.circleci/nginx.conf /etc/nginx/sites-available/default
-      - run: sudo chown -R www-data:www-data /home/circleci/project
+      - run: sudo chmod 777 /var/run/php/php8.1-fpm.sock
+      - run: sudo sed -i 's/www-data/circleci/g' /etc/php/8.1/fpm/pool.d/www.conf
       - run: sudo /etc/init.d/php8.1-fpm start
+      - run: sudo sed -i 's/user .*;/user circleci;/g' /etc/nginx/nginx.conf
       - run: sudo /etc/init.d/nginx start
       # We're running against localhost.
       - run: sudo sed -i 's/APP_URL=.*$/APP_URL=http:\/\/localhost/g' /home/circleci/project/.env
@@ -215,6 +217,7 @@ jobs:
       - run: echo "" >> /tmp/.env
       - run: echo GOOGLE_API_CONSOLE_KEY=$GOOGLE_API_CONSOLE_KEY >> /tmp/.env
       - run: sudo cp /tmp/.env /home/circleci/project/.env
+      - run: sudo chown -R www-data:www-data /home/circleci/project
 
       # Now run the tests.
       - run:
