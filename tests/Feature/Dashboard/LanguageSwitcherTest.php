@@ -47,10 +47,10 @@ class LanguageSwitcherTest extends TestCase
         $_SERVER['HTTP_ACCEPT_LANGUAGE'] = 'de';
         $this->withSession([
                                'locale' => 'UT'
-                           ])->get('/workbench')->assertSee(' Deutsch</button>');
+                           ])->get('/workbench')->assertSee(' Deutsch</button>', false);
         $_SERVER['HTTP_ACCEPT_LANGUAGE'] = 'en';
         $this->withSession([
                                'locale' => 'UT'
-                           ])->get('/workbench')->assertSee(' English</button>');
+                           ])->get('/workbench')->assertSee(' English</button>', false);
     }
 }

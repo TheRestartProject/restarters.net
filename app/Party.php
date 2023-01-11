@@ -2,6 +2,7 @@
 
 namespace App;
 
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use App\Events\ApproveEvent;
 use App\EventUsers;
 use App\Helpers\Fixometer;
@@ -18,6 +19,8 @@ use OwenIt\Auditing\Contracts\Auditable;
 
 class Party extends Model implements Auditable
 {
+    use HasFactory;
+
     use SoftDeletes;
     use \OwenIt\Auditing\Auditable;
 
@@ -815,13 +818,11 @@ class Party extends Model implements Auditable
 
     // Timezone-aware, ISO8601 formatted.  These are unambiguous, e.g. for API results.
     public function getEventStartUtcAttribute() {
-        $start = Carbon::parse($this->attributes['event_start_utc'], 'UTC');
-        return $start->toIso8601String();
+        return array_key_exists('event_start_utc', $this->attributes) ? Carbon::parse($this->attributes['event_start_utc'], 'UTC')->toIso8601String() : null;
     }
 
     public function getEventEndUtcAttribute() {
-        $end = Carbon::parse($this->attributes['event_end_utc'], 'UTC');
-        return $end->toIso8601String();
+        return array_key_exists('event_end_utc', $this->attributes) ? Carbon::parse($this->attributes['event_end_utc'], 'UTC')->toIso8601String() : null;
     }
 
     // Mutators for previous event_date/start/end fields.  These are now superceded by the UTC fields and therefore

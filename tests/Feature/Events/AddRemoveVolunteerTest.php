@@ -26,16 +26,25 @@ class AddRemoveVolunteerTest extends TestCase
     {
         $this->withoutExceptionHandling();
 
-        $group = factory(Group::class)->create();
-        $network = factory(Network::class)->create();
+        $group = Group::factory()->create();
+        $network = Network::factory()->create();
         $network->addGroup($group);
-        $event = factory(Party::class)->create([
+        $event = Party::factory()->create([
                                                    'group' => $group,
                                                    'event_start_utc' => '2130-01-01T12:13:00+00:00',
                                                    'event_end_utc' => '2130-01-01T13:14:00+00:00',
                                                ]);
 
-        $host = factory(User::class)->states($role)->create();
+        switch ($role) {
+            case 'Administrator':
+                $host = User::factory()->administrator()->create();
+                break;
+            case 'NetworkCoordinator':
+                $host = User::factory()->networkCoordinator()->create();
+                break;
+            default:
+                self::assertTrue(false, "Unknown role $role");
+        }
 
         if ($role == 'NetworkCoordinator') {
             $network->addCoordinator($host);
@@ -43,7 +52,7 @@ class AddRemoveVolunteerTest extends TestCase
 
         $this->actingAs($host);
 
-        $restarter = factory(User::class)->states('Restarter')->create();
+        $restarter = User::factory()->restarter()->create();
 
         // Add an existing user
         $response = $this->put('/api/events/' . $event->idevents . '/volunteers', [
@@ -88,7 +97,7 @@ class AddRemoveVolunteerTest extends TestCase
                               ]);
 
         // Add an invited user
-        $restarter = factory(User::class)->states('Restarter')->create();
+        $restarter = User::factory()->restarter()->create();
         $response = $this->post('/party/invite', [
             'group_name' => $group->name,
             'event_id' => $event->idevents,
@@ -152,7 +161,7 @@ class AddRemoveVolunteerTest extends TestCase
     public function testAdminRemoveReaddHost() {
         $this->withoutExceptionHandling();
 
-        $host = factory(User::class)->states('Administrator')->create([
+        $host = User::factory()->administrator()->create([
           'api_token' => '1234',
         ]);
 
@@ -172,7 +181,7 @@ class AddRemoveVolunteerTest extends TestCase
         $this->assertTrue($ret['success']);
 
         // Admin re-add from user account page.
-        $admin = factory(User::class)->state('Administrator')->create();
+        $admin = User::factory()->administrator()->create();
         $this->actingAs($admin);
 
         $response = $this->get('/user/edit/' . $host->id);
@@ -203,6 +212,6 @@ class AddRemoveVolunteerTest extends TestCase
         // Should now see the group.
         $response = $this->get('/user/edit/' . $host->id);
         $response->assertStatus(200);
-        $response->assertSee('<option value="' . $idgroups . '" selected>Test Group0</option>');
+        $response->assertSee('<option value="' . $idgroups . '" selected>Test Group0</option>', false);
     }
 }

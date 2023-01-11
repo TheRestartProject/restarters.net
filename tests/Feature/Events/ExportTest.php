@@ -16,13 +16,13 @@ class ExportTest extends TestCase
 {
     public function testExport()
     {
-        $network = factory(Network::class)->create();
+        $network = Network::factory()->create();
 
-        $host = factory(User::class)->states('Administrator')->create();
+        $host = User::factory()->administrator()->create();
         $this->actingAs($host);
 
         // Create two groups.
-        $group1 = factory(Group::class)->create([
+        $group1 = Group::factory()->create([
             'name' => 'test1'
                                                 ]);
         $this->networkService = new RepairNetworkService();
@@ -30,7 +30,7 @@ class ExportTest extends TestCase
         $group1->addVolunteer($host);
         $group1->makeMemberAHost($host);
 
-        $group2 = factory(Group::class)->create([
+        $group2 = Group::factory()->create([
                                                     'name' => 'test2'
                                                 ]);
         $this->networkService->addGroupToNetwork($host, $group2, $network);
@@ -49,12 +49,12 @@ class ExportTest extends TestCase
         $event2->save();
 
         // Add a device for the events.
-        $device = factory(Device::class)->states('fixed')->create([
+        $device = Device::factory()->fixed()->create([
                                                                       'category' => 111,
                                                                       'category_creation' => 111,
                                                                       'event' => $idevents1,
                                                                   ]);
-        $device = factory(Device::class)->states('fixed')->create([
+        $device = Device::factory()->fixed()->create([
                                                                       'category' => 111,
                                                                       'category_creation' => 111,
                                                                       'event' => $idevents2,
@@ -131,8 +131,8 @@ class ExportTest extends TestCase
 
         // Export time volunteered - first as a web page.
         $response = $this->get("/reporting/time-volunteered?a");
-        $response->assertSee(e($event1->getEventName()));
-        $response->assertSee(e($event2->getEventName()));
+        $response->assertSee($event1->getEventName());
+        $response->assertSee($event2->getEventName());
 
         // Now as a CSV.
         $response = $this->get("/export/time-volunteered?a");

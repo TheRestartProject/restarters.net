@@ -19,11 +19,11 @@ class TooManyTest extends TestCase
     {
         Notification::fake();
 
-        $this->event = factory(Party::class)->create();
-        $this->admin = factory(User::class)->state('Administrator')->create();
+        $this->event = Party::factory()->create();
+        $this->admin = User::factory()->administrator()->create();
         $this->admin->addPreference('admin-abnormal-devices');
 
-        $this->device_inputs = factory(Device::class)->raw([
+        $this->device_inputs = Device::factory()->raw([
                                                                'event_id' => $this->event->idevents,
                                                                'quantity' => 1,
                                                                'category' => env('MISC_CATEGORY_ID_POWERED'),

@@ -15,7 +15,7 @@ class GroupStatsTest extends StatsTestCase
     /** @test */
     public function a_group_with_no_events_has_empty_stats()
     {
-        $group = factory(Group::class)->create()->first();
+        $group = Group::factory()->create()->first();
         $expect = \App\Group::getGroupStatsArrayKeys();
         $this->assertEquals($expect, $group->getGroupStats());
     }
@@ -23,8 +23,8 @@ class GroupStatsTest extends StatsTestCase
     /** @test */
     public function a_group_with_one_past_event_has_stats_for_that_event()
     {
-        $group = factory(Group::class)->create();
-        factory(Party::class)->states('moderated')->create([
+        $group = Group::factory()->create();
+        Party::factory()->moderated()->create([
             'event_start_utc' => '2000-01-01T10:15:05+05:00',
             'event_end_utc' => '2000-01-0113:45:05+05:00',
             'group' => $group->idgroups,
@@ -36,15 +36,15 @@ class GroupStatsTest extends StatsTestCase
 
         // Get the stats via the web page.
         $rsp = $this->get('/group/stats/' . $group->idgroups);
-        $rsp->assertSee('<h5>hours volunteered</h5>');
-        $rsp->assertSee('<span class="largetext">21</span>');
+        $rsp->assertSee('<h5>hours volunteered</h5>', false);
+        $rsp->assertSee('<span class="largetext">21</span>', false);
     }
 
     /** @test */
     public function a_group_with_mixed_devices_has_correct_stats()
     {
-        $group = factory(Group::class)->create();
-        $event = factory(Party::class)->states('moderated')->create([
+        $group = Group::factory()->create();
+        $event = Party::factory()->moderated()->create([
             'event_start_utc' => '2000-01-01T10:15:05+05:00',
             'event_end_utc' => '2000-01-0113:45:05+05:00',
             'group' => $group->idgroups,
@@ -53,7 +53,7 @@ class GroupStatsTest extends StatsTestCase
         $this->_setupCategoriesWithUnpoweredWeights();
 
         // #1 add a powered non-misc device
-        $device = factory(Device::class)->states('fixed')->create([
+        $device = Device::factory()->fixed()->create([
             'category' => $this->_idPoweredNonMisc,
             'category_creation' => $this->_idPoweredNonMisc,
             'event' => $event->idevents,
@@ -77,7 +77,7 @@ class GroupStatsTest extends StatsTestCase
         }
 
         // #2 add a powered misc device without estimate
-        $device = factory(Device::class)->states('fixed')->create([
+        $device = Device::factory()->fixed()->create([
             'category' => $this->_idPoweredMisc,
             'category_creation' => $this->_idPoweredMisc,
             'event' => $event->idevents,
@@ -94,7 +94,7 @@ class GroupStatsTest extends StatsTestCase
         }
 
         // #3 add an unpowered non-misc device
-        $device = factory(Device::class)->states('fixed')->create([
+        $device = Device::factory()->fixed()->create([
             'category' => 5,
             'category_creation' => 5,
             'event' => $event->idevents,
@@ -114,7 +114,7 @@ class GroupStatsTest extends StatsTestCase
         }
 
         // #4 add an unpowered misc device without estimate
-        $device = factory(Device::class)->states('fixed')->create([
+        $device = Device::factory()->fixed()->create([
             'category' => $this->_idUnpoweredMisc,
             'category_creation' => $this->_idUnpoweredMisc,
             'event' => $event->idevents,
@@ -131,7 +131,7 @@ class GroupStatsTest extends StatsTestCase
         }
 
         // #5 add a powered misc device with estimate
-        $device = factory(Device::class)->states('fixed')->create([
+        $device = Device::factory()->fixed()->create([
             'category' => $this->_idPoweredMisc,
             'category_creation' => $this->_idPoweredMisc,
             'event' => $event->idevents,
@@ -152,7 +152,7 @@ class GroupStatsTest extends StatsTestCase
         }
 
         // #6 add a powered misc device with estimate
-        $device = factory(Device::class)->states('fixed')->create([
+        $device = Device::factory()->fixed()->create([
             'category' => $this->_idUnpoweredMisc,
             'category_creation' => $this->_idUnpoweredMisc,
             'event' => $event->idevents,
@@ -173,7 +173,7 @@ class GroupStatsTest extends StatsTestCase
         }
 
         // #7 add an unpowered non-misc device with estimate
-        $device = factory(Device::class)->states('fixed')->create([
+        $device = Device::factory()->fixed()->create([
             'category' => $this->_idUnpoweredMisc,
             'category_creation' => $this->_idUnpoweredMisc,
             'event' => $event->idevents,
@@ -197,8 +197,8 @@ class GroupStatsTest extends StatsTestCase
     /** @test */
     public function two_groups_with_mixed_devices_have_correct_stats()
     {
-        $group1 = factory(Group::class)->create();
-        $event1 = factory(Party::class)->states('moderated')->create([
+        $group1 = Group::factory()->create();
+        $event1 = Party::factory()->moderated()->create([
             'event_start_utc' => '2000-01-01T10:15:05+05:00',
             'event_end_utc' => '2000-01-0113:45:05+05:00',
             'group' => $group1->idgroups,
@@ -207,35 +207,35 @@ class GroupStatsTest extends StatsTestCase
         $this->_setupCategoriesWithUnpoweredWeights();
 
         // #1 add a powered non-misc device
-        $device = factory(Device::class)->states('fixed')->create([
+        $device = Device::factory()->fixed()->create([
             'category' => $this->_idPoweredNonMisc,
             'category_creation' => $this->_idPoweredNonMisc,
             'event' => $event1->idevents,
         ]);
 
         // #2 add a powered misc device without estimate
-        $device = factory(Device::class)->states('fixed')->create([
+        $device = Device::factory()->fixed()->create([
             'category' => $this->_idPoweredMisc,
             'category_creation' => $this->_idPoweredMisc,
             'event' => $event1->idevents,
         ]);
 
         // #3 add an unpowered non-misc device
-        $device = factory(Device::class)->states('fixed')->create([
+        $device = Device::factory()->fixed()->create([
             'category' => 5,
             'category_creation' => 5,
             'event' => $event1->idevents,
         ]);
 
         // #4 add an unpowered misc device without estimate
-        $device = factory(Device::class)->states('fixed')->create([
+        $device = Device::factory()->fixed()->create([
             'category' => $this->_idUnpoweredMisc,
             'category_creation' => $this->_idUnpoweredMisc,
             'event' => $event1->idevents,
         ]);
 
         // #5 add a powered misc device with estimate
-        $device = factory(Device::class)->states('fixed')->create([
+        $device = Device::factory()->fixed()->create([
             'category' => $this->_idPoweredMisc,
             'category_creation' => $this->_idPoweredMisc,
             'event' => $event1->idevents,
@@ -243,7 +243,7 @@ class GroupStatsTest extends StatsTestCase
         ]);
 
         // #6 add a powered misc device with estimate
-        $device = factory(Device::class)->states('fixed')->create([
+        $device = Device::factory()->fixed()->create([
             'category' => $this->_idUnpoweredMisc,
             'category_creation' => $this->_idUnpoweredMisc,
             'event' => $event1->idevents,
@@ -273,27 +273,27 @@ class GroupStatsTest extends StatsTestCase
             $this->assertEquals($v, $result[$k], "Wrong value for $k => $v");
         }
 
-        $group2 = factory(Group::class)->create();
-        $event2 = factory(Party::class)->states('moderated')->create([
+        $group2 = Group::factory()->create();
+        $event2 = Party::factory()->moderated()->create([
             'event_start_utc' => '2000-01-01T10:15:05+05:00',
             'event_end_utc' => '2000-01-0113:45:05+05:00',
             'group' => $group2->idgroups,
         ]);
-        $event3 = factory(Party::class)->states('moderated')->create([
+        $event3 = Party::factory()->moderated()->create([
             'event_start_utc' => '2000-01-01T10:15:05+05:00',
             'event_end_utc' => '2000-01-0113:45:05+05:00',
             'group' => $group2->idgroups,
         ]);
 
         // #1 add a powered non-misc device
-        $device = factory(Device::class)->states('fixed')->create([
+        $device = Device::factory()->fixed()->create([
             'category' => $this->_idPoweredNonMisc,
             'category_creation' => $this->_idPoweredNonMisc,
             'event' => $event2->idevents,
         ]);
 
         // #2 add a powered misc device with estimate
-        $device = factory(Device::class)->states('fixed')->create([
+        $device = Device::factory()->fixed()->create([
             'category' => $this->_idPoweredMisc,
             'category_creation' => $this->_idPoweredMisc,
             'event' => $event2->idevents,
@@ -301,7 +301,7 @@ class GroupStatsTest extends StatsTestCase
         ]);
 
         // #3 add an unpowered misc device with estimate
-        $device = factory(Device::class)->states('fixed')->create([
+        $device = Device::factory()->fixed()->create([
             'category' => $this->_idUnpoweredMisc,
             'category_creation' => $this->_idUnpoweredMisc,
             'event' => $event3->idevents,
@@ -309,7 +309,7 @@ class GroupStatsTest extends StatsTestCase
         ]);
 
         // #7 add an unpowered non-misc device with estimate
-        $device = factory(Device::class)->states('fixed')->create([
+        $device = Device::factory()->fixed()->create([
             'category' => $this->_idUnpoweredMisc,
             'category_creation' => $this->_idUnpoweredMisc,
             'event' => $event3->idevents,
@@ -343,7 +343,7 @@ class GroupStatsTest extends StatsTestCase
     /** @test */
     public function get_of_stats_after_deletion() {
 
-        $admin = factory(User::class)->states('Administrator')->create([
+        $admin = User::factory()->administrator()->create([
                                                                            'api_token' => '1234',
                                                                        ]);
         $this->actingAs($admin);

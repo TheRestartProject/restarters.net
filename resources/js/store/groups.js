@@ -14,7 +14,7 @@ function newToOld(e) {
     name: e.name,
     location: e.location,
     country: e.country,
-    next_event: e.next_event ? new moment(e.next_event).format('Y-m-d') : null,
+    next_event: e.next_event ? new moment(e.next_event).format('Y-MM-DD') : null,
     all_confirmed_hosts_count: e.hosts,
     all_confirmed_restarters_count: e.restarters,
     image: e.image ? ('/uploads/mid_' + e.image) : null,

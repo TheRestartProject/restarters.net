@@ -7,7 +7,7 @@
   }
 
   .form-check-input:checked + .form-check-label::before {
-    background-image: url('../../svgs/check-tick.svg');
+    background-image: url('/images/svgs/check-tick.svg');
     background-color: $white;
     color: $white;
     background-repeat: no-repeat;

@@ -51,7 +51,7 @@ class MenusTest extends TestCase
      */
     public function testSections($role, $present)
     {
-        $user = factory(User::class)->states($role)->create();
+        $user = User::factory()->{lcfirst($role)}()->create();
         $this->actingAs($user);
 
         $response = $this->get('/user/menus');

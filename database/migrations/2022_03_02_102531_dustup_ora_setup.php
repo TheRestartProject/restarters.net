@@ -4,7 +4,7 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-class DustupOraSetup extends Migration
+return new class extends Migration
 {
     /**
      * Run the migrations.
@@ -221,4 +221,4 @@ class DustupOraSetup extends Migration
         Schema::dropIfExists('fault_types_vacuums');
         Schema::dropIfExists('devices_dustup_ora');
     }
-}
+};

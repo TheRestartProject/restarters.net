@@ -18,15 +18,15 @@ class BasicTest extends TestCase
     public function testPageLoads()
     {
         // Create a past event with a fixed device.  This is shown on the Fixometer page as the latest data.
-        $group = factory(Group::class)->create([
+        $group = Group::factory()->create([
                                                    'wordpress_post_id' => '99999'
                                                ]);
-        $event = factory(Party::class)->create([
+        $event = Party::factory()->create([
                                                    'group' => $group,
                                                    'event_start_utc' => '2000-01-01T12:13:00+00:00',
                                                    'event_end_utc' => '2000-01-01T13:14:00+00:00',
                                                ]);
-        $device = factory(Device::class)->states('fixed')->create([
+        $device = Device::factory()->fixed()->create([
                                                                       'category' => 111,
                                                                       'category_creation' => 111,
                                                                       'event' => $event->idevents,
@@ -88,7 +88,7 @@ class BasicTest extends TestCase
         DB::statement('SET foreign_key_checks=0');
         Category::truncate();
         DB::statement('SET foreign_key_checks=1');
-        factory(Category::class)->create([
+        Category::factory()->create([
                                              'idcategories' => 1,
                                              'revision' => 1,
                                              'name' => 'powered non-misc',
@@ -97,12 +97,12 @@ class BasicTest extends TestCase
                                              'footprint' => 14.4,
                                          ]);
 
-        factory(Device::class)->create([
+        Device::factory()->create([
                                                      'category' => 1,
                                                      'category_creation' => 1,
                                                      'repair_status' => 0
                                                  ]);
-        factory(Device::class)->create([
+        Device::factory()->create([
                                            'category' => 1,
                                            'category_creation' => 1,
                                            'repair_status' => env('DEVICE_FIXED')

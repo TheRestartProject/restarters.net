@@ -4,7 +4,7 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-class AlterUsersGroupsDefaultRoleToRestarter extends Migration
+return new class extends Migration
 {
     /**
      * Run the migrations.
@@ -27,4 +27,4 @@ class AlterUsersGroupsDefaultRoleToRestarter extends Migration
     {
         DB::statement("ALTER TABLE `users_groups` CHANGE `role` `role` TINYINT(4) NOT NULL DEFAULT '3'");
     }
-}
+};

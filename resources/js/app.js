@@ -16,7 +16,7 @@ require('./fixometer');
 require('leaflet');
 require('./constants');
 
-import Vue from 'vue';
+import Vue from 'vue'
 import { BootstrapVue, IconsPlugin } from 'bootstrap-vue'
 import store from './store'
 import {
@@ -33,6 +33,26 @@ import { Integrations } from "@sentry/tracing";
 
 import Vuelidate from 'vuelidate'
 Vue.use(Vuelidate)
+
+import LoginPage from './components/LoginPage.vue'
+import DashBoardPage from './components/DashboardPage.vue'
+import EventAddEditPage from './components/EventAddEditPage.vue'
+import EventAddEdit from './components/EventAddEdit.vue'
+import EventsRequiringModeration from './components/EventsRequiringModeration'
+import EventPage from './components/EventPage.vue'
+import FixometerPage from './components/FixometerPage'
+import GroupsPage from './components/GroupsPage.vue'
+import GroupPage from './components/GroupPage.vue'
+import GroupEventsPage from './components/GroupEventsPage.vue'
+import GroupEvents from './components/GroupEvents.vue'
+import GroupsRequiringModeration from './components/GroupsRequiringModeration'
+import MicrotaskingPage from './components/MicrotaskingPage'
+import EventTimeRangePicker from './components/EventTimeRangePicker'
+import EventDatePicker from './components/EventDatePicker'
+import VenueAddress from './components/VenueAddress.vue'
+import RichTextEditor from './components/RichTextEditor'
+import Notifications from './components/Notifications'
+import GroupTimeZone from './components/GroupTimeZone'
 
 // Without this, the default map marker doesn't appear in production.  Fairly well-known problem.
 // eslint-disable-next-line
@@ -1543,26 +1563,25 @@ jQuery(document).ready(function () {
       el: $(this).get(0),
       store: store,
       components: {
-        'loginpage': require('./components/LoginPage.vue'),
-        'dashboardpage': require('./components/DashboardPage.vue'),
-        'eventaddeditpage': require('./components/EventAddEditPage.vue'),
-        'eventaddedit': require('./components/EventAddEdit.vue'),
-        'eventsrequiringmoderation': require('./components/EventsRequiringModeration.vue'),
-        'eventpage': require('./components/EventPage.vue'),
-        'fixometerpage': require('./components/FixometerPage.vue'),
-        'groupspage': require('./components/GroupsPage.vue'),
-        'grouppage': require('./components/GroupPage.vue'),
-        'groupeventspage': require('./components/GroupEventsPage.vue'),
-        'groupevents': require('./components/GroupEvents.vue'),
-        'groupsrequiringmoderation': require('./components/GroupsRequiringModeration.vue'),
-        'microtaskingpage': require('./components/MicrotaskingPage.vue'),
-
-        'eventtimerangepicker': require('./components/EventTimeRangePicker.vue'),
-        'eventdatepicker': require('./components/EventDatePicker.vue'),
-        'venueaddress': require('./components/VenueAddress.vue'),
-        'richtexteditor': require('./components/RichTextEditor.vue'),
-        'notifications': require('./components/Notifications.vue'),
-        'grouptimezone': require('./components/GroupTimeZone.vue')
+        'loginpage' : LoginPage,
+        'dashboardpage': DashBoardPage,
+        'eventaddeditpage': EventAddEditPage,
+        'eventaddedit': EventAddEdit,
+        'eventsrequiringmoderation': EventsRequiringModeration,
+        'eventpage': EventPage,
+        'fixometerpage': FixometerPage,
+        'groupspage': GroupsPage,
+        'grouppage': GroupPage,
+        'groupeventspage': GroupEventsPage,
+        'groupevents': GroupEvents,
+        'groupsrequiringmoderation': GroupsRequiringModeration,
+        'microtaskingpage': MicrotaskingPage,
+        'eventtimerangepicker': EventTimeRangePicker,
+        'eventdatepicker': EventDatePicker,
+        'venueaddress': VenueAddress,
+        'richtexteditor': RichTextEditor,
+        'notifications': Notifications,
+        'grouptimezone': GroupTimeZone,
       }
     })
   })

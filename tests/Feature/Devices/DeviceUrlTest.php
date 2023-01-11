@@ -18,8 +18,8 @@ class DeviceUrlTest extends TestCase
         $this->loginAsTestUser(Role::ADMINISTRATOR);
 
         // Create an event with a device.
-        $this->event = factory(Party::class)->create();
-        $this->device_inputs = factory(Device::class)->raw([
+        $this->event = Party::factory()->create();
+        $this->device_inputs = Device::factory()->raw([
                                                                'event_id' => $this->event->idevents,
                                                                'quantity' => 1,
                                                            ]);

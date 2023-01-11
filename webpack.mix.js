@@ -1,6 +1,7 @@
+const path = require('path');
 let mix = require('laravel-mix');
 let webpack = require('webpack');
-const WebpackShellPlugin = require('webpack-shell-plugin');
+const WebpackShellPlugin = require('webpack-shell-plugin-next');
 require('laravel-mix-bundle-analyzer');
 
 if (!mix.inProduction()) {
@@ -12,7 +13,9 @@ if (!mix.inProduction()) {
 
 mix.webpackConfig({
     plugins: [
-        new webpack.IgnorePlugin(/^codemirror$/),
+        new webpack.IgnorePlugin({
+            resourceRegExp: /^codemirror$/
+        }),
         // Build a JS translation file that corresponds to our PHP lang/ folder.
         new WebpackShellPlugin({onBuildStart:['php artisan lang:js --no-lib --quiet resources/js/translations.js'], onBuildEnd:['php artisan translations:check']})
     ]
@@ -36,6 +39,7 @@ mix.webpackConfig({
 // ], 'public/js/gdpr-cookie-notice.js');
 
 mix.js('resources/js/app.js', 'public/js')
+   .vue()
    .sass('resources/sass/app.scss', 'public/css')
    .browserSync({
         proxy: 'https://restarters.test'
@@ -46,3 +50,7 @@ mix.js('resources/global/js/app.js', 'public/global/js')
 
 mix.js('resources/wiki/js/wiki.js', 'public/js/wiki.js')
   .sass('resources/wiki/css/app.scss', 'public/css/wiki.css');
+
+mix.alias({
+    vue$: path.resolve(__dirname, 'node_modules/vue/dist/vue.esm.js'),
+})

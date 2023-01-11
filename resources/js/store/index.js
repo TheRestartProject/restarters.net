@@ -1,4 +1,4 @@
-import Vue from "vue";
+import Vue from 'vue'
 import Vuex from "vuex";
 import authModule from './auth';
 import attendanceModule from './attendance';

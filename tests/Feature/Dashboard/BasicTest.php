@@ -29,10 +29,10 @@ class BasicTest extends TestCase
     public function testPageLoads($city, $country, $lat, $lng, $nearbyGroupCount)
     {
         // Test the dashboard page loads and shows a nearby group when relevant.
-        $user = factory(User::class)->states('Host')->create();
+        $user = User::factory()->host()->create();
         $this->actingAs($user);
 
-        $user = factory(User::class)->states('Restarter')->create();
+        $user = User::factory()->restarter()->create();
         $user->update([
             'location' => $city,
             'country' => $country,
@@ -85,12 +85,12 @@ class BasicTest extends TestCase
     }
 
     public function testUpcomingEvents() {
-        $host = factory(User::class)->states('Restarter')->create();
+        $host = User::factory()->restarter()->create();
 
         // Create an event.
         $this->loginAsTestUser(Role::ADMINISTRATOR);
 
-        $event = factory(Party::class)->create([
+        $event = Party::factory()->create([
                                                    'group' => $this->idgroups,
                                                    'event_start_utc' => '2130-01-01T12:13:00+00:00',
                                                    'event_end_utc' => '2130-01-01T13:14:00+00:00',
@@ -148,7 +148,7 @@ class BasicTest extends TestCase
         $this->assertEquals(99999, $initialEvents[0]['wordpress_post_id']);
 
         // Invite a second host to the group.
-        $host2 = factory(User::class)->states('Restarter')->create([
+        $host2 = User::factory()->restarter()->create([
             'location' => 'London',
             'latitude' => 51.5073509,
             'longitude' => -0.1277583
