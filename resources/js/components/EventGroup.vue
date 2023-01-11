@@ -67,7 +67,7 @@ export default {
 @import '~bootstrap/scss/variables';
 @import '~bootstrap/scss/mixins/_breakpoints';
 
-/deep/ .hasError {
+::v-deep .hasError {
   &.multiselect {
     border: 1px solid $brand-danger !important;
   }
@@ -76,7 +76,7 @@ export default {
   }
 }
 
-/deep/ .multiselect {
+::v-deep .multiselect {
   border: 1px solid $black !important;
   font-family: "Open Sans", "sans-serif" !important;
 

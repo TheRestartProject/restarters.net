@@ -206,7 +206,7 @@ export default {
   border-top: 5px solid $black;
 }
 
-/deep/ .fontsize {
+::v-deep .fontsize {
   //Override standard sizes for cosmetic purposes.
   font-size: 18px !important;
 }

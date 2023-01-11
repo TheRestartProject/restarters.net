@@ -22,11 +22,11 @@ class CountsTest extends TestCase
     public function it_can_check_if_event_counts_past()
     {
         // Create a group and an event on it.
-        $network = factory(Network::class)->create();
-        $group = factory(Group::class)->create();
+        $network = Network::factory()->create();
+        $group = Group::factory()->create();
         $network->addGroup($group);
 
-        $event = factory(Party::class)->create([
+        $event = Party::factory()->create([
             'group' => $group,
             'event_start_utc' => '2130-01-01T10:15:05+05:00',
             'event_end_utc' => '2130-01-01T13:45:05+05:00',
@@ -37,7 +37,7 @@ class CountsTest extends TestCase
         $this->assertEquals(0, count($event->devices));
 
         // Create a device on the event.
-        $device = factory(Device::class)->states('fixed', 'mobile')->create([
+        $device = Device::factory()->fixed()->mobile()->create([
             'event' => $event->idevents,
         ]);
 

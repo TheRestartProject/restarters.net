@@ -8,12 +8,13 @@ use App\Party;
 use App\User;
 use Carbon\Carbon;
 use DB;
+use http\Client\Request;
 use Tests\TestCase;
 
 class APIv2NetworkTest extends TestCase
 {
     public function testList() {
-        $user = factory(User::class)->states('Administrator')->create([
+        $user = User::factory()->administrator()->create([
                                                                           'api_token' => '1234',
                                                                       ]);
         $this->actingAs($user);
@@ -47,6 +48,10 @@ class APIv2NetworkTest extends TestCase
         $network = Network::first();
         self::assertNotNull($network);
 
+        // Ensure we have a logo to test retrieval.
+        $network->logo = '1590591632bedc48025b738e87fe674cf030e8c953ccdd91e914597.png';
+        $network->save();
+
         $response = $this->get('/api/v2/networks/' . $network->id);
         $response->assertSuccessful();
         $json = json_decode($response->getContent(), true)['data'];
@@ -54,6 +59,7 @@ class APIv2NetworkTest extends TestCase
         $this->assertEquals($network->name, $json['name']);
         $this->assertEquals($network->description, $json['description']);
         $this->assertEquals($network->website, $json['website']);
+        $this->assertStringEndsWith('/mid_' . $network->logo, $json['logo']);
         $this->assertTrue(array_key_exists('stats', $json));
         $this->assertTrue(array_key_exists('default_language', $json));
     }
@@ -63,11 +69,11 @@ class APIv2NetworkTest extends TestCase
      * @param $value
      */
     public function testListGroups($getNextEvent, $getDetails) {
-        $network = factory(Network::class)->create([
+        $network = Network::factory()->create([
                                                        'name' => 'Restart',
                                                        'events_push_to_wordpress' => true,
                                                    ]);
-        $group = factory(Group::class)->create([
+        $group = Group::factory()->create([
                                                    'location' => 'London',
                                                    'area' => 'London',
                                                    'country' => 'GB',
@@ -75,7 +81,7 @@ class APIv2NetworkTest extends TestCase
         $network->addGroup($group);
 
         // Create event for group
-        $event = factory(Party::class)->states('moderated')->create([
+        $event = Party::factory()->moderated()->create([
                                                                          'event_start_utc' => '2038-01-01T00:00:00Z',
                                                                          'event_end_utc' => '2038-01-01T02:00:00Z',
                                                                          'group' => $group->idgroups,
@@ -143,17 +149,17 @@ class APIv2NetworkTest extends TestCase
      * @param $value
      */
     public function testListEvents($getDetails) {
-        $network = factory(Network::class)->create([
+        $network = Network::factory()->create([
                                                        'name' => 'Restart',
                                                        'events_push_to_wordpress' => true,
                                                    ]);
-        $group = factory(Group::class)->create([
+        $group = Group::factory()->create([
                                                    'wordpress_post_id' => '99999',
                                                ]);
         $network->addGroup($group);
 
         // Create event for group
-        $event = factory(Party::class)->states('moderated')->create([
+        $event = Party::factory()->moderated()->create([
                                                                         'event_start_utc' => '2038-01-01T00:00:00Z',
                                                                         'event_end_utc' => '2038-01-01T02:00:00Z',
                                                                         'group' => $group->idgroups,

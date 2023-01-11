@@ -5,7 +5,7 @@
       <h1 class="ml-2 mr-2 align-self-center">{{ __('dashboard.title') }}</h1>
       <b-img-lazy fluid src="/images/confetti_doodle.svg" class="d-none d-md-block" />
     </div>
-    <div class="layout mt-4 mb-4">
+    <div class="dp-layout mt-4 mb-4">
       <DashboardBanner class="banner" />
       <div class="yourgroups">
         <DashboardYourGroups :newGroups="newGroups" :nearbyGroups="nearbyGroups" :location="location" />
@@ -112,7 +112,7 @@ export default {
 @import '~bootstrap/scss/variables';
 @import '~bootstrap/scss/mixins/_breakpoints';
 
-.layout {
+.dp-layout {
   display: grid;
   grid-template-rows: auto auto auto auto;
   grid-template-columns: 1fr;

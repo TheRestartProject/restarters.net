@@ -29,7 +29,7 @@ class GroupNetworkCreateTest extends TestCase
     {
         $this->withoutExceptionHandling();
 
-        $network = factory(Network::class)->create([
+        $network = Network::factory()->create([
             'shortname' => 'repairtogether',
             'include_in_zapier' => true,
         ]);
@@ -59,7 +59,7 @@ class GroupNetworkCreateTest extends TestCase
         $group = Group::where('name', 'Lancaster Fixers')->first();
         $this->assertTrue($group->isMemberOf($network));
 
-        $network1 = factory(Network::class)->create();
+        $network1 = Network::factory()->create();
         $this->assertFalse($group->isMemberOf($network1));
     }
 }

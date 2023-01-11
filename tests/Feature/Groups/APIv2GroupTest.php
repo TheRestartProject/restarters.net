@@ -22,9 +22,8 @@ class APIv2GroupTest extends TestCase
      *
      * @param $approve
      */
-    public function testGetGroup($approve)
-    {
-        $user = factory(User::class)->states('Administrator')->create([
+    public function testGetGroup($approve) {
+        $user = User::factory()->administrator()->create([
                                                                           'api_token' => '1234',
                                                                       ]);
         $this->actingAs($user);

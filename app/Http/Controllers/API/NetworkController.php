@@ -204,7 +204,7 @@ class NetworkController extends Controller
      *          )
      *      ),
      *      @OA\Parameter(
-     *          name="updated_start",
+     *          name="start",
      *          description="The minimum start date for an event in ISO8601 format.  Inclusive.",
      *          required=false,
      *          in="query",
@@ -214,8 +214,28 @@ class NetworkController extends Controller
      *          )
      *      ),
      *      @OA\Parameter(
-     *          name="updated_end",
+     *          name="end",
      *          description="The maximum end date for an event in ISO8601 format.  Inclusive.",
+     *          required=false,
+     *          in="query",
+     *          @OA\Schema(
+     *              type="string",
+     *              example="2022-09-18T12:30:00+00:00"
+     *          )
+     *      ),
+     *      @OA\Parameter(
+     *          name="updated_start",
+     *          description="The minimum start date for when an event was updated in ISO8601 format.  Useful if you need to only process events that have had recent changes.  Inclusive.",
+     *          required=false,
+     *          in="query",
+     *          @OA\Schema(
+     *              type="string",
+     *              example="2022-09-18T11:30:00+00:00"
+     *          )
+     *      ),
+     *      @OA\Parameter(
+     *          name="updated_end",
+     *          description="The maximum end date for when an event was updated in ISO8601 format.  Inclusive.",
      *          required=false,
      *          in="query",
      *          @OA\Schema(
@@ -270,16 +290,20 @@ class NetworkController extends Controller
 
         // Get date filters.  We default to far past and far future so that we don't need multiple code branches.  We
         // don't need to validate the date format - if they put junk in then they'll get junk matches back.
-        $start = Carbon::parse($request->get('updated_start', '1970-01-01'))->setTimezone('UTC')->format('Y-m-d H:i:s');
-        $end = Carbon::parse($request->get('updated_end', '3000-01-01'))->setTimezone('UTC')->format('Y-m-d H:i:s');
+        $start = Carbon::parse($request->get('start', '1970-01-01'))->setTimezone('UTC')->toIso8601String();
+        $end = Carbon::parse($request->get('end', '3000-01-01'))->setTimezone('UTC')->toIso8601String();
+        $updated_start = Carbon::parse($request->get('updated_start', '1970-01-01'))->setTimezone('UTC')->format('Y-m-d H:i:s');
+        $updated_end = Carbon::parse($request->get('updated_end', '3000-01-01'))->setTimezone('UTC')->format('Y-m-d H:i:s');
 
         // We need to explicity select events.*, otherwise the updated_at values we get back are from the group_network
         // table, which is mightily confusing.  We only want to return approved events on approved groups.
         $events = Party::join('groups', 'groups.idgroups', '=', 'events.group')
             ->join('group_network', 'group_network.group_id', '=', 'groups.idgroups')
             ->where('group_network.network_id', $id)
-            ->where('events.updated_at', '>=', $start)
-            ->where('events.updated_at', '<=', $end)
+            ->where('event_start_utc', '>=', $start)
+            ->where('event_end_utc', '<=', $end)
+            ->where('events.updated_at', '>=', $updated_start)
+            ->where('events.updated_at', '<=', $updated_end)
             ->whereNotNull('events.wordpress_post_id')
             ->whereNotNull('groups.wordpress_post_id')
             ->select('events.*')

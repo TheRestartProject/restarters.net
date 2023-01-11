@@ -68,7 +68,7 @@ export default {
   background-color: $brand-orange;
 }
 
-/deep/ a {
+::v-deep a {
   color: unset;
   text-decoration: underline;
 }

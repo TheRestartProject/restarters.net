@@ -9,7 +9,7 @@ dependencies:
 jobs:
   build:
     docker:
-      - image: cimg/php:7.4.11-node
+      - image: cimg/php:8.1.12-node
         name: restarters.test
         environment:
           - DB_CONNECTION: mysql
@@ -124,7 +124,8 @@ jobs:
       - checkout
       - run: sudo apt update
       - run: sudo apt install dnsutils openssl zip unzip git libxml2-dev libzip-dev zlib1g-dev libcurl4-openssl-dev iputils-ping default-mysql-client vim libpng-dev libgmp-dev libjpeg-turbo8-dev
-      - run: sudo apt-get install php7.4-xmlrpc php7.4-intl php7.4-xdebug php7.4-xmlrpc php7.4-mbstring php7.4-simplexml php7.4-curl php7.4-zip python postgresql-client
+      - run: sudo apt-get install php-xmlrpc php8.1-intl php8.1-xdebug php8.1-mbstring php8.1-simplexml php8.1-curl php8.1-zip postgresql-client php8.1-gd php8.1-xmlrpc
+      - run: sudo pecl install xdebug
 
       # We now need Node 14 for Playwright.
       - run: sudo curl -sL https://deb.nodesource.com/setup_14.x | sudo bash -
@@ -162,7 +163,7 @@ jobs:
       # ...and needs honeypot rate-limiting needs to be turned off.
       - run: sed -i 's/HONEYPOT_DISABLE=.*$/HONEYPOT_DISABLE=TRUE/g' .env
 
-      - run: wget https://getcomposer.org/composer-1.phar; rm -rf vendor; php7.4 composer-1.phar install
+      - run: wget https://getcomposer.org/composer-2.phar -O composer.phar; rm -rf vendor; echo Y | php8.1 composer.phar install
       - run: npm install
       - run: npx playwright install
       - run: npx playwright install-deps
@@ -171,7 +172,7 @@ jobs:
       - run: php artisan key:generate
       - run: php artisan migrate
 
-      - run: wget -O phpunit https://phar.phpunit.de/phpunit-7.phar ; chmod +x phpunit
+      - run: wget -O phpunit https://phar.phpunit.de/phpunit-9.phar ; chmod +x phpunit
 
       # The phpunit and playwright tests require an uploads directory in a slightly different place.  Not really
       # worth fixing.
@@ -184,7 +185,7 @@ jobs:
 
       # Run phpunit.  Discourse makes things slow, so up the timeout.
       - run:
-           command: export XDEBUG_MODE=coverage;./phpunit -d memory_limit=1024M --bootstrap vendor/autoload.php -dxdebug.coverage_enable=1 --coverage-clover tests/clover.xml --configuration ./phpunit.xml
+           command: export XDEBUG_MODE=coverage;./phpunit -d memory_limit=1024M --bootstrap vendor/autoload.php --coverage-clover tests/clover.xml --configuration ./phpunit.xml
            no_output_timeout: 45m
 
       # Coveralls is pernickety about the location it uploads from existing.

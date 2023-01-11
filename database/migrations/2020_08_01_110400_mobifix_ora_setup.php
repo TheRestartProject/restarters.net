@@ -4,7 +4,7 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-class MobifixOraSetup extends Migration
+return new class extends Migration
 {
     /**
      * Run the migrations.
@@ -248,4 +248,4 @@ class MobifixOraSetup extends Migration
         Schema::dropIfExists('fault_types_mobiles');
         Schema::dropIfExists('devices_mobifix_ora');
     }
-}
+};

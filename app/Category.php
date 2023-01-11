@@ -2,12 +2,15 @@
 
 namespace App;
 
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use App\Helpers\Fixometer;
 use DB;
 use Illuminate\Database\Eloquent\Model;
 
 class Category extends Model
 {
+    use HasFactory;
+
     protected $table = 'categories';
     private $revision = 2;
     protected $primaryKey = 'idcategories';

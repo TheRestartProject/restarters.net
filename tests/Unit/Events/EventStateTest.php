@@ -20,10 +20,10 @@ class EventStateTest extends TestCase
     {
         parent::setUp();
 
-        $this->host = factory(User::class)->states('Administrator')->create();
+        $this->host = User::factory()->administrator()->create();
         $this->actingAs($this->host);
 
-        $this->group = factory(Group::class)->create();
+        $this->group = Group::factory()->create();
         $this->group->addVolunteer($this->host);
         $this->group->makeMemberAHost($this->host);
     }
@@ -32,7 +32,7 @@ class EventStateTest extends TestCase
     public function it_is_active_during_an_event()
     {
         // arrange
-        $event = factory(Party::class)->create();
+        $event = Party::factory()->create();
         $event->event_start_utc = Carbon::now()->addHours(-1)->toIso8601String();
         $event->event_end_utc = Carbon::now()->addHours(2)->toIso8601String();
 
@@ -44,7 +44,7 @@ class EventStateTest extends TestCase
     public function it_is_active_at_the_start_time()
     {
         // arrange
-        $event = factory(Party::class)->create();
+        $event = Party::factory()->create();
         $event->event_start_utc = Carbon::now()->toIso8601String();
         $event->event_end_utc = Carbon::now()->addHours(3)->toIso8601String();
 
@@ -54,7 +54,7 @@ class EventStateTest extends TestCase
 
     /** @test */
     public function it_doesnt_start_an_hour_early() {
-        $event = factory(Party::class)->create();
+        $event = Party::factory()->create();
 
         $event->event_start_utc = Carbon::now()->addMinutes(30)->toIso8601String();
         $event->event_end_utc = Carbon::now()->addMinutes(90)->toIso8601String();
@@ -63,7 +63,7 @@ class EventStateTest extends TestCase
 
     /** @test */
     public function is_doesnt_start_too_soon() {
-        $event = factory(Party::class)->create();
+        $event = Party::factory()->create();
         $event->event_start_utc = Carbon::now()->addMinutes(65)->toIso8601String();
         $event->event_end_utc = Carbon::now()->addMinutes(90)->toIso8601String();
 

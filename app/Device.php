@@ -2,6 +2,7 @@
 
 namespace App;
 
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use App\Events\DeviceCreatedOrUpdated;
 use DB;
 use Illuminate\Database\Eloquent\Model;
@@ -10,6 +11,8 @@ use OwenIt\Auditing\Contracts\Auditable;
 
 class Device extends Model implements Auditable
 {
+    use HasFactory;
+
     const REPAIR_STATUS_FIXED = 1;
     const REPAIR_STATUS_REPAIRABLE = 2;
     const REPAIR_STATUS_ENDOFLIFE = 3;

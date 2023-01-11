@@ -360,21 +360,21 @@ export default {
   width: 20px;
 }
 
-/deep/ .image {
+::v-deep .image {
   width: 90px;
 }
 
-/deep/ .event {
+::v-deep .event {
   width: 8rem;
 }
 
-/deep/ .table.b-table > thead > tr {
+::v-deep .table.b-table > thead > tr {
   background-position-x: center !important;
 }
 
 // The multiselect is used in a few places, and we have some inconsistencies in styling.  Here we force it to match
 // the behaviour of the inputs.
-/deep/ .multiselect {
+::v-deep .multiselect {
   &.multiselect--active {
     border: 0 !important;
 
@@ -391,7 +391,7 @@ export default {
   }
 }
 
-/deep/ .hidecell {
+::v-deep .hidecell {
   display: none;
 
   @include media-breakpoint-up(md) {

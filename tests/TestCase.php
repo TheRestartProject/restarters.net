@@ -95,12 +95,12 @@ abstract class TestCase extends BaseTestCase
         $this->withoutExceptionHandling();
         app('honeypot')->disable();
 
-        factory(Category::class, 1)->states('Cat1')->create();
-        factory(Category::class, 1)->states('Cat2')->create();
-        factory(Category::class, 1)->states('Cat3')->create();
-        factory(Category::class, 1)->states('Mobile')->create();
-        factory(Category::class, 1)->states('Misc')->create();
-        factory(Category::class, 1)->states('Desktop computer')->create();
+        Category::factory()->count(1)->cat1()->create();
+        Category::factory()->count(1)->cat2()->create();
+        Category::factory()->count(1)->cat3()->create();
+        Category::factory()->count(1)->mobile()->create();
+        Category::factory()->count(1)->misc()->create();
+        Category::factory()->count(1)->desktopComputer()->create();
 
         // We manipulate some globals for image upload testing.
         \FixometerFile::$uploadTesting = FALSE;
@@ -206,7 +206,7 @@ abstract class TestCase extends BaseTestCase
     public function createEvent($idgroups, $date)
     {
         // Create a party for the specific group.
-        $eventAttributes = factory(Party::class)->raw();
+        $eventAttributes = Party::factory()->raw();
         $eventAttributes['group'] = $idgroups;
 
         $event_start = Carbon::createFromTimestamp(strtotime($date))->setTimezone('UTC');
@@ -229,9 +229,23 @@ abstract class TestCase extends BaseTestCase
         return $idevents;
     }
 
+    public function createDevice($idevents, $type)
+    {
+        $deviceAttributes = Device::factory()->{lcfirst($type)}()->raw();
+
+        $deviceAttributes['event_id'] = $idevents;
+        $deviceAttributes['quantity'] = 1;
+
+        $response = $this->post('/device/create', $deviceAttributes);
+        $iddevices = Device::latest()->first()->iddevices;
+        $this->assertNotNull($iddevices);
+
+        return $iddevices;
+    }
+
     public function createJane()
     {
-        $user = factory(User::class)->create([
+        $user = User::factory()->create([
             'name' => 'Jane Bloggs',
             'email' => 'jane@bloggs.net',
             'password' => Hash::make('passw0rd'),

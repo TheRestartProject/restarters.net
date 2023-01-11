@@ -14,7 +14,7 @@ class ProfileTest extends TestCase
 {
     public function testProfilePage()
     {
-        $user = factory(User::class)->states('Restarter')->create();
+        $user = User::factory()->restarter()->create();
 
         // When logged out should throw an exception.
         try {
@@ -39,11 +39,11 @@ class ProfileTest extends TestCase
     public function testEdit()
     {
         $GLOBALS['_FILES'] = [];
-        $user1 = factory(User::class)->states('Restarter')->create();
-        $user2 = factory(User::class)->states('Restarter')->create();
-        $host = factory(User::class)->states('Host')->create();
-        $nc = factory(User::class)->states('NetworkCoordinator')->create();
-        $admin = factory(User::class)->states('Administrator')->create();
+        $user1 = User::factory()->restarter()->create();
+        $user2 = User::factory()->restarter()->create();
+        $host = User::factory()->host()->create();
+        $nc = User::factory()->networkCoordinator()->create();
+        $admin = User::factory()->administrator()->create();
 
         $editdata = [
             'id' => $user1->id,
@@ -101,8 +101,8 @@ class ProfileTest extends TestCase
     public function testEditBadPassword()
     {
         $GLOBALS['_FILES'] = [];
-        $user1 = factory(User::class)->states('Restarter')->create();
-        $host = factory(User::class)->states('Host')->create();
+        $user1 = User::factory()->restarter()->create();
+        $host = User::factory()->host()->create();
 
         $editdata = [
             'id' => $user1->id,
@@ -126,7 +126,7 @@ class ProfileTest extends TestCase
     }
 
     public function testChangePassword() {
-        $user = factory(User::class)->states('Restarter')->create();
+        $user = User::factory()->restarter()->create();
         $user->setPassword(Hash::make('secret1'));
 
         $this->actingAs($user);
@@ -145,8 +145,8 @@ class ProfileTest extends TestCase
     }
 
     public function testRepairDirectoryRole() {
-        $user = factory(User::class)->states('Restarter')->create();
-        $admin = factory(User::class)->states('Administrator')->create([
+        $user = User::factory()->restarter()->create();
+        $admin = User::factory()->administrator()->create([
             'repairdir_role' => Role::REPAIR_DIRECTORY_SUPERADMIN
         ]);
 
@@ -161,7 +161,7 @@ class ProfileTest extends TestCase
     }
 
     public function testLanguage() {
-        $user = factory(User::class)->states('Restarter')->create();
+        $user = User::factory()->restarter()->create();
         $this->actingAs($user);
 
         $response = $this->post('/profile/edit-language', [
@@ -176,7 +176,7 @@ class ProfileTest extends TestCase
      * @dataProvider invitesProvider
      */
     public function testInvites($admin, $invites) {
-        $user = factory(User::class)->states('Restarter')->create();
+        $user = User::factory()->restarter()->create();
 
         $params = [];
 
@@ -209,7 +209,7 @@ class ProfileTest extends TestCase
     }
 
     public function testAPI() {
-        $user = factory(User::class)->states('Administrator')->create([
+        $user = User::factory()->administrator()->create([
                                                                       'api_token' => '1234',
                                                                   ]);
         $this->actingAs($user);

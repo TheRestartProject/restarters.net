@@ -20,11 +20,11 @@ class GroupEditTest extends TestCase
     {
         $this->withoutExceptionHandling();
 
-        $group = factory(Group::class)->create();
-        $tag = factory(GroupTags::class)->create();
+        $group = Group::factory()->create();
+        $tag = GroupTags::factory()->create();
         $group->addTag($tag);
 
-        $host = factory(User::class)->states('Host')->create();
+        $host = User::factory()->host()->create();
         $group->addVolunteer($host);
         $group->makeMemberAHost($host);
 
@@ -49,11 +49,11 @@ class GroupEditTest extends TestCase
     {
         $this->withoutExceptionHandling();
 
-        $group = factory(Group::class)->create();
-        $tag = factory(GroupTags::class)->create();
+        $group = Group::factory()->create();
+        $tag = GroupTags::factory()->create();
         $group->addTag($tag);
 
-        $host = factory(User::class)->states('Host')->create();
+        $host = User::factory()->host()->create();
         $group->addVolunteer($host);
         $group->makeMemberAHost($host);
 
@@ -73,9 +73,9 @@ class GroupEditTest extends TestCase
     /** @test */
     public function image_upload() {
         Storage::fake('avatars');
-        $group = factory(Group::class)->create();
+        $group = Group::factory()->create();
 
-        $host = factory(User::class)->states('Host')->create();
+        $host = User::factory()->host()->create();
         $group->addVolunteer($host);
         $group->makeMemberAHost($host);
 
