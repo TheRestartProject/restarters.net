@@ -10,7 +10,7 @@ use Carbon\Carbon;
 use DB;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Foundation\Testing\WithoutMiddleware;
-use Mediawiki\Api\Service\UserCreator;
+use Addwiki\Mediawiki\Api\Service\UserCreator;
 use Mockery;
 use Msurguy\Honeypot\HoneypotFacade as Honeypot;
 use Tests\TestCase;

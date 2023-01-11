@@ -36,7 +36,6 @@ class MediawikiServiceProvider extends ServiceProvider
             try {
                 Log::debug('Connect to Mediawiki');
                 $api = new MediawikiApi(env('WIKI_URL').'/api.php');
-                Log::debug('Log in');
                 $api->login(new ApiUser(env('WIKI_APIUSER'), env('WIKI_APIPASSWORD')));
                 Log::debug('...connected');
 
@@ -47,10 +46,7 @@ class MediawikiServiceProvider extends ServiceProvider
         });
 
         $this->app->bind(UserCreator::class, function ($app) {
-            $mw = $app->make(MediawikiFactory::class);
-            if ($mw) {
-                return $mw->newUserCreator();
-            }
+            return $app->make(MediawikiFactory::class)->newUserCreator();
         });
     }
 }
