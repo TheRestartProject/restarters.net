@@ -5,7 +5,7 @@
       <EventActions :idevents="idevents" :canedit="canedit" :candelete="candelete" :is-admin="isAdmin" :in-group="inGroup" :is-attending="isAttending" class="d-block d-md-none" />
     </div>
     <div class="border-top-very-thick border-bottom-thin mb-3">
-      <div class="layout mt-4 mb-3 mb-md-3">
+      <div class="eh-layout mt-4 mb-3 mb-md-3">
         <div class="bord d-flex">
           <div class="datebox">
             <span class="day align-top">{{ dayofmonth }}</span> <br />
@@ -153,7 +153,7 @@ export default {
   display: flex !important;
 }
 
-.layout {
+.eh-layout {
   display: grid;
   grid-template-columns: 1fr;
   grid-template-rows: auto auto;

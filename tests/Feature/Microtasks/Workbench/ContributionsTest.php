@@ -31,9 +31,9 @@ class ContributionsTest extends TestCase
         TabicatOra::truncate();
         BattcatOra::truncate();
 
-        $this->userWithContributions = factory(User::class)->state('Restarter')->create();
-        $this->anotherUserWithContributions = factory(User::class)->state('Restarter')->create();
-        $this->userNoContributions = factory(User::class)->state('Restarter')->create();
+        $this->userWithContributions = User::factory()->restarter()->create();
+        $this->anotherUserWithContributions = User::factory()->restarter()->create();
+        $this->userNoContributions = User::factory()->restarter()->create();
 
         // 3 contributions, 3 quests.
         FaultCat::insert([

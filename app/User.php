@@ -2,6 +2,7 @@
 
 namespace App;
 
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use App\Events\UserDeleted;
 use App\Events\UserUpdated;
 use App\Network;
@@ -17,6 +18,8 @@ use Illuminate\Contracts\Translation\HasLocalePreference;
 
 class WikiSyncStatus
 {
+    use HasFactory;
+
     const DoNotCreate = 0;
     const CreateAtLogin = 1;
     const Created = 2;
@@ -24,6 +27,7 @@ class WikiSyncStatus
 
 class User extends Authenticatable implements Auditable, HasLocalePreference
 {
+    use HasFactory;
     use Notifiable;
     use SoftDeletes;
     use \OwenIt\Auditing\Auditable;

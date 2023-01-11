@@ -114,21 +114,21 @@ export default {
 }
 </script>
 <style scoped lang="scss">
-/deep/ .marg {
+::v-deep .marg {
   margin: 2px !important;
   font-size: 15px !important;
   flex-shrink: 0;
 }
 
-/deep/ .input-group > .form-control {
+::v-deep .input-group > .form-control {
   width: 100%;
 }
 
-/deep/ span {
+::v-deep span {
   font-size: 16px;
 }
 
-/deep/ .vbst-item {
+::v-deep .vbst-item {
   div {
     line-height: 16px;
   }

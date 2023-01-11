@@ -4,7 +4,7 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-class AlterTableCharsets extends Migration
+return new class extends Migration
 {
     private $charset = 'utf8mb4';
     private $collate = 'utf8mb4_unicode_ci';
@@ -223,4 +223,4 @@ class AlterTableCharsets extends Migration
          * */
         ];
     }
-}
+};

@@ -19,18 +19,18 @@ class GroupDeleteTest extends TestCase
 
         // Only administrators can delete.
         foreach (['Restarter', 'Host', 'NetworkCoordinator'] as $role) {
-            $user = factory(\App\User::class)->states($role)->create();
+            $user = \App\User::factory()->{lcfirst($role)}()->create();
             $this->actingAs($user);
             $this->followingRedirects();
             $response = $this->get("/group/delete/$id");
-            $this->assertContains('Sorry, but you do not have the permissions to perform that action', $response->getContent());
+            $this->assertStringContainsString('Sorry, but you do not have the permissions to perform that action', $response->getContent());
         }
 
-        $user = factory(\App\User::class)->states('Administrator')->create();
+        $user = \App\User::factory()->administrator()->create();
         $this->actingAs($user);
         $this->followingRedirects();
         $response = $this->get("/group/delete/$id");
-        $this->assertContains(__('groups.delete_succeeded', [
+        $this->assertStringContainsString(__('groups.delete_succeeded', [
             'name' => $name,
         ]), $response->getContent());
     }
@@ -46,11 +46,11 @@ class GroupDeleteTest extends TestCase
         // Add an event with no devices - should still be able to delete.
         $this->createEvent($id, 'yesterday');
 
-        $user = factory(\App\User::class)->states('Administrator')->create();
+        $user = \App\User::factory()->administrator()->create();
         $this->actingAs($user);
         $this->followingRedirects();
         $response = $this->get("/group/delete/$id");
-        $this->assertContains(__('groups.delete_succeeded', [
+        $this->assertStringContainsString(__('groups.delete_succeeded', [
             'name' => $name,
         ]), $response->getContent());
     }
@@ -65,11 +65,11 @@ class GroupDeleteTest extends TestCase
         $idevents = $this->createEvent($id, 'yesterday');
         $iddevices = $this->createDevice($idevents, 'misc');
 
-        $user = factory(\App\User::class)->states('Administrator')->create();
+        $user = \App\User::factory()->administrator()->create();
         $this->actingAs($user);
         $this->followingRedirects();
         $response = $this->get("/group/delete/$id");
-        $this->assertContains('Sorry, but you do not have the permissions to perform that action.', $response->getContent());
+        $this->assertStringContainsString('Sorry, but you do not have the permissions to perform that action.', $response->getContent());
 
         // Delete the event - still shouldn't be deletable as a device exists.
         Party::find($idevents)->delete();
@@ -85,7 +85,7 @@ class GroupDeleteTest extends TestCase
         $this->assertNotNull($id);
 
         // Create a past event
-        $event = factory(Party::class)->states('moderated')->create([
+        $event = Party::factory()->moderated()->create([
                                                                         'event_start_utc' => '2000-01-01T10:15:05+05:00',
                                                                         'event_end_utc' => '2000-01-0113:45:05+05:00',
                                                                         'group' => $id,

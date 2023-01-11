@@ -2,11 +2,14 @@
 
 namespace App;
 
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use App\Group;
 use Illuminate\Database\Eloquent\Model;
 
 class Network extends Model
 {
+    use HasFactory;
+
     public function groups()
     {
         return $this->belongsToMany(Group::class, 'group_network', 'network_id', 'group_id');

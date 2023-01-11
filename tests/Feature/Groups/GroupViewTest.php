@@ -47,7 +47,7 @@ class GroupViewTest extends TestCase
         $this->assertNotNull($id);
 
         // Create a past event
-        $event = factory(Party::class)->states('moderated')->create([
+        $event = Party::factory()->moderated()->create([
                                                                         'event_start_utc' => '2000-01-01T10:15:05+05:00',
                                                                         'event_end_utc' => '2000-01-0113:45:05+05:00',
                                                                         'group' => $id,
@@ -64,7 +64,7 @@ class GroupViewTest extends TestCase
             ],
         ]);
 
-        $response = $this->post('/device/create', factory(Device::class)->raw([
+        $response = $this->post('/device/create', Device::factory()->raw([
                                                                                   'category' => env('MISC_CATEGORY_ID_POWERED'),
                                                                                   'category_creation' => env('MISC_CATEGORY_ID_POWERED'),
                                                                                   'event_id' => $event->idevents,
@@ -91,7 +91,7 @@ class GroupViewTest extends TestCase
 
         // Only administrators can delete.
         foreach (['Restarter', 'Host', 'NetworkCoordinator'] as $role) {
-            $user = factory(\App\User::class)->states($role)->create();
+            $user = \App\User::factory()->{lcfirst($role)}()->create();
             $this->actingAs($user);
             $response = $this->get("/group/view/$id");
             $this->assertVueProperties($response, [
@@ -121,7 +121,7 @@ class GroupViewTest extends TestCase
         $id = $this->createGroup();
         $this->assertNotNull($id);
 
-        factory(Party::class)->states('moderated')->create([
+        Party::factory()->moderated()->create([
                                                                     'event_start_utc' => Carbon::parse('1 hour ago')->toIso8601String(),
                                                                     'event_end_utc' => Carbon::parse('4pm tomorrow')->toIso8601String(),
                                                                     'group' => $id,

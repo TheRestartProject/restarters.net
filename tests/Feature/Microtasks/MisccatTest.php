@@ -41,7 +41,7 @@ class MisccatTest extends TestCase
             $this->assertGreaterThan(0, $iddevices[$i], 'fetch_misccat_record: 0 fetched for iddevices='.$i);
         }
 
-        $misccat = factory(Misccat::class, 3)->states('misc')->create([
+        $misccat = Misccat::factory()->count(3)->misc()->create([
             'iddevices' => 3,
         ]);
 
@@ -59,7 +59,7 @@ class MisccatTest extends TestCase
 
     protected function _insert_misccat_devices($num)
     {
-        $device = factory(Device::class, $num)->states('misccat')->create();
+        $device = Device::factory()->count($num)->misccat()->create();
         for ($i = 1; $i <= $num; $i++) {
             $this->assertDatabaseHas('devices', [
                 'iddevices' => $i,
@@ -118,20 +118,20 @@ class MisccatTest extends TestCase
 
     protected function _setup_data()
     {
-        factory(Category::class, 1)->states('Misc')->create();
-        factory(Category::class, 1)->states('Mobile')->create();
-        factory(Category::class, 1)->states('Cat1')->create();
-        factory(Category::class, 1)->states('Cat2')->create();
-        factory(Category::class, 1)->states('Cat3')->create();
+        Category::factory()->count(1)->misc()->create();
+        Category::factory()->count(1)->mobile()->create();
+        Category::factory()->count(1)->cat1()->create();
+        Category::factory()->count(1)->cat2()->create();
+        Category::factory()->count(1)->cat3()->create();
 
         $data = $this->_get_setup_data();
         foreach ($data as $elems) {
             foreach ($elems as $tablename => $records) {
                 foreach ($records as $record) {
                     if ($tablename == 'devices') {
-                        factory(Device::class, 1)->create($record);
+                        Device::factory()->count(1)->create($record);
                     } elseif ($tablename == 'devices_misc_opinions') {
-                        factory(Misccat::class, 1)->create($record);
+                        Misccat::factory()->count(1)->create($record);
                     } elseif ($tablename == 'devices_misc_adjudicated') {
                         DB::update('INSERT INTO devices_misc_adjudicated SET iddevices = '.$record['iddevices'].", category = '".$record['category']."'");
                     }

@@ -37,7 +37,7 @@ class EditProfileTests extends TestCase
         // arrange
         config(['restarters.features.discourse_integration' => true]);
 
-        $user = factory(User::class)->create(['id' => 1111177]);
+        $user = User::factory()->create(['id' => 1111177]);
 
         // act
         $user->email = 'foo@bario.com';
@@ -58,7 +58,7 @@ class EditProfileTests extends TestCase
         // arrange
         config(['restarters.features.discourse_integration' => true]);
 
-        $user = factory(User::class)->create();
+        $user = User::factory()->create();
 
         // act
         $user->name = 'Joe Bloggs';
@@ -74,7 +74,7 @@ class EditProfileTests extends TestCase
     {
         $this->withoutExceptionHandling();
 
-        $user = factory(User::class)->create();
+        $user = User::factory()->create();
         $userId = $user->id;
 
         $user->name = 'Joe Bloggs';
@@ -92,7 +92,7 @@ class EditProfileTests extends TestCase
     // Check that we can update the location.
     public function test_location_update()
     {
-        $user = factory(User::class)->create();
+        $user = User::factory()->create();
         $this->actingAs($user);
 
         $this->post('/profile/edit-info', [
@@ -137,7 +137,7 @@ class EditProfileTests extends TestCase
      * @dataProvider idProvider
      */
     public function test_tags_update($id) {
-        $user = factory(User::class)->create();
+        $user = User::factory()->create();
         $this->actingAs($user);
 
         $skill1 = Skills::create([
@@ -167,8 +167,8 @@ class EditProfileTests extends TestCase
 
         // Check it shows.
         $response2 = $this->get('/profile/edit');
-        $response2->assertSee('selected>UT1</option>');
-        $response2->assertSee('selected>UT2</option>');
+        $response2->assertSee('selected>UT1</option>', false);
+        $response2->assertSee('selected>UT2</option>', false);
 
         // Should have promoted to host because we have a category 1 skill.
         $user->refresh();
@@ -181,7 +181,7 @@ class EditProfileTests extends TestCase
      */
     public function image_upload($id) {
         Storage::fake('avatars');
-        $user = factory(User::class)->create();
+        $user = User::factory()->create();
         $this->actingAs($user);
 
         // Try with no file.

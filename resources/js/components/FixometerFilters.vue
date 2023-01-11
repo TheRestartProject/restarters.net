@@ -320,16 +320,16 @@ export default {
   background-color: $brand-grey-darker;
 }
 
-/deep/ .btn-link:hover {
+::v-deep .btn-link:hover {
   color: transparent;
 }
 
-/deep/ .btn:focus, .btn.focus {
+::v-deep .btn:focus, .btn.focus {
   outline: 0;
   -webkit-box-shadow: none
 }
 
-/deep/ legend {
+::v-deep legend {
   font-size: 16px;
   font-weight: bold;
   margin-bottom: 0px;
@@ -340,7 +340,7 @@ export default {
   padding: 0 10px;
 }
 
-/deep/ .datepicker {
+::v-deep .datepicker {
   & label {
     padding-bottom: 0;
     border: 0;

@@ -1,4 +1,4 @@
-var Vue = require('vue')
+import Vue from 'vue'
 Vue.use(require('vue-cookies'))
 
 export default {

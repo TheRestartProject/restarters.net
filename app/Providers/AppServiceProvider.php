@@ -34,6 +34,8 @@ class AppServiceProvider extends ServiceProvider
                 return false;
             }
         });
+
+        \Illuminate\Pagination\Paginator::useBootstrapThree();
     }
 
     /**

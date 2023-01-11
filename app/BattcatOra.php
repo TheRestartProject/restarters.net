@@ -9,7 +9,6 @@ class BattcatOra extends Model
 {
     protected $table = 'devices_faults_batteries_ora_opinions';
     protected $dateFormat = 'Y-m-d H:i';
-    protected $dates = ['created_at', 'updated_at'];
     protected $primaryKey = 'id';
 
     protected $sql;

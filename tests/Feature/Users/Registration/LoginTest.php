@@ -14,7 +14,7 @@ class LoginTest extends TestCase
 {
     public function testLogin()
     {
-        $restarter = factory(User::class)->state('Restarter')->create([
+        $restarter = User::factory()->restarter()->create([
             'password' => Hash::make('passw0rd'),
                                                                       ]);
 

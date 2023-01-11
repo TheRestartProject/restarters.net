@@ -1,6 +1,6 @@
 <template>
   <b-form-group>
-    <label htmlFor="event_name">{{ __('events.field_event_link') }}:</label>
+    <label for="event_link">{{ __('events.field_event_link') }}:</label>
     <b-input type="url" id="event_link" name="link" :placeholder="__('events.field_event_link_helper')"
              v-model="currentLink" :class="{ hasError: hasError }"/>
   </b-form-group>

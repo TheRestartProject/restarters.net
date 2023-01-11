@@ -2,6 +2,7 @@
 
 namespace App;
 
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use DB;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Lang;
@@ -10,6 +11,8 @@ use OwenIt\Auditing\Contracts\Auditable;
 
 class Group extends Model implements Auditable
 {
+    use HasFactory;
+
     use \OwenIt\Auditing\Auditable;
 
     protected $table = 'groups';

@@ -38,7 +38,7 @@ class CheckTranslations extends Command
     public function handle()
     {
         // We want to scan all English translations.
-        $files = scandir(base_path() . '/resources/lang/en');
+        $files = scandir(base_path() . '/lang/en');
 
         foreach ($files as $file) {
             if ($file == '_json.php') {
@@ -95,7 +95,8 @@ class CheckTranslations extends Command
             'app/Notifications/',             // Email notifications
             'app/Http/Controllers/',          // Controllers (rarely)
             'app/Http/Middleware/',           // Middleware(rarely)
-            'app/Services/'                   // Services(rarely)
+            'app/Services/',                  // Services(rarely)
+            'app/'                            // Models rarely)
                  ] as $loc) {
             $cmd = 'grep -r "' . addslashes($key) . '" ' . $loc . ' > /dev/null';
             system($cmd, $rc);

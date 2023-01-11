@@ -31,9 +31,9 @@ class NetworkCommandsTest extends TestCase {
         $this->artisan('network:create testname testshortname "test description" --website="https://therestartproject.org" --language=fr --timezone="Asia/Samarkand" --wordpress --zapier --drip --auto-approve-events')->assertExitCode(0);
         $network = Network::orderBy('id', 'desc')->first();
 
-        $group = factory(Group::class)->create();
+        $group = Group::factory()->create();
         $network->addGroup($group);
-        $user = factory(User::class)->states('Restarter')->create();
+        $user = User::factory()->restarter()->create();
 
         assertFalse($user->isCoordinatorForGroup($group));
         $this->artisan('network:coordinator:add ' . $network->name . ' ' . $user->email)->assertExitCode(0);
@@ -45,7 +45,7 @@ class NetworkCommandsTest extends TestCase {
         $this->artisan('network:create testname testshortname "test description" --website="https://therestartproject.org" --language=fr --timezone="Asia/Samarkand" --wordpress --zapier --drip --auto-approve-events')->assertExitCode(0);
         $network = Network::orderBy('id', 'desc')->first();
 
-        $group = factory(Group::class)->create();
+        $group = Group::factory()->create();
         $this->artisan('network:group:add "' . $network->name . '" "' . $group->name . '"')->assertExitCode(0);
         $group->refresh();
         $this->assertEquals($network->id, $group->networks->first()->id);

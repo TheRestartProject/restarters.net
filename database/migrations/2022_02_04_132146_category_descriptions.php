@@ -4,7 +4,7 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-class CategoryDescriptions extends Migration
+return new class extends Migration
 {
     /**
      * Run the migrations.
@@ -87,4 +87,4 @@ class CategoryDescriptions extends Migration
             $table->dropColumn('description_long');
         });
     }
-}
+};

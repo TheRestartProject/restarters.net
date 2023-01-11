@@ -88,7 +88,7 @@ table th {
 .dashbord {
     border-top: 3px dashed black;
 }
-/deep/ table {
+::v-deep table {
     border-collapse: separate;
     border-spacing: 0 9px;
 }
