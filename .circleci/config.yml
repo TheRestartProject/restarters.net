@@ -206,7 +206,7 @@ jobs:
       - run: sudo apt-get install nginx php7.4-fpm
       - run: sudo cp /home/circleci/project/.circleci/nginx.conf /etc/nginx/sites-available/default
       - run: sudo chown -R www-data:www-data /home/circleci/project
-      - run: sudo /etc/init.d/php7.4-fpm start
+      - run: sudo /etc/init.d/php8.1-fpm start
       - run: sudo /etc/init.d/nginx start
       # We're running against localhost.
       - run: sudo sed -i 's/APP_URL=.*$/APP_URL=http:\/\/localhost/g' /home/circleci/project/.env
