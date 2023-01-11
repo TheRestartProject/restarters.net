@@ -84,15 +84,15 @@ export default {
 }
 </script>
 <style scoped lang="scss">
-/deep/ .dz-progress {
+::v-deep(.dz-progress) {
   display: none !important;
 }
 
-/deep/ .dz-image {
+::v-deep(.dz-image) {
   border-radius: unset !important;
 }
 
-/deep/ .dz-image-preview {
+::v-deep(.dz-image-preview) {
   display: flex;
   justify-content: center;
 }

@@ -460,7 +460,7 @@ export default {
     grid-row: 4 / 5;
     grid-column: 1 / 2;
 
-    /deep/ .btn {
+    ::v-deep(.btn) {
       font-size: 16px;
     }
 
@@ -517,7 +517,7 @@ export default {
     grid-row: 9 / 10;
     grid-column: 1 / 2;
 
-    /deep/ .btn {
+    ::v-deep(.btn) {
       font-size: 16px;
     }
 
@@ -531,7 +531,7 @@ export default {
     grid-row: 9 / 10;
     grid-column: 1 / 2;
 
-    /deep/ .btn {
+    ::v-deep(.btn) {
       font-size: 16px;
     }
 
@@ -551,7 +551,7 @@ export default {
   }
 }
 
-/deep/ .form-control, /deep/ .custom-checkbox input {
+::v-deep(.form-control, .custom-checkbox input) {
   border: 2px solid $black !important;
 }
 
@@ -563,7 +563,7 @@ export default {
   margin-top: 2px;
 }
 
-/deep/ .hasError, /deep/ .card .form-control.hasError:focus {
+::v-deep(.hasError, /deep/ .card .form-control.hasError:focus) {
   border: 2px solid $brand-danger !important;
   margin: 0px !important;
 }
@@ -572,7 +572,7 @@ export default {
   font-size: 15px;
 }
 
-/deep/ .ql-toolbar button {
+::v-deep(.ql-toolbar button) {
   width: 30px !important;
 }
 </style>
