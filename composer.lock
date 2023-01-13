@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "8ef600633fb0a54d06e2810e92cc6125",
+    "content-hash": "17786bd8e692044f012b65d99a94bff7",
     "packages": [
         {
             "name": "addwiki/mediawiki-api",
@@ -3462,11 +3462,17 @@
         },
         {
             "name": "mariuzzo/laravel-js-localization",
-            "version": "dev-master",
+            "version": "v1.9.0",
             "source": {
                 "type": "git",
-                "url": "https://github.com/SanderSander/Laravel-JS-Localization",
-                "reference": "c675f0c27a11ce982330b4e0cb51b3c71931e04d"
+                "url": "https://github.com/rmariuzzo/Laravel-JS-Localization.git",
+                "reference": "12531672e995296e280378251efb37f3d1285693"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/rmariuzzo/Laravel-JS-Localization/zipball/12531672e995296e280378251efb37f3d1285693",
+                "reference": "12531672e995296e280378251efb37f3d1285693",
+                "shasum": ""
             },
             "require": {
                 "illuminate/config": "^4.2 || ^5.0 || ^6.0 || ^7.0 || ^8.0 || ^9.0",
@@ -3479,7 +3485,6 @@
                 "orchestra/testbench": "^2.2 || ^3.0 || ^4.0 || ^5.0 || ^6.0 || ^7.0",
                 "phpunit/phpunit": "^4.0 || ^5.0 || ^6.0 || ^7.0 || ^8.0 || ^9.0"
             },
-            "default-branch": true,
             "type": "library",
             "extra": {
                 "laravel": {
@@ -3493,11 +3498,7 @@
                     "Mariuzzo\\LaravelJsLocalization\\": "src/Mariuzzo/LaravelJsLocalization/"
                 }
             },
-            "autoload-dev": {
-                "psr-4": {
-                    "Mariuzzo\\LaravelJsLocalization\\": "tests/specs"
-                }
-            },
+            "notification-url": "https://packagist.org/downloads/",
             "license": [
                 "MIT"
             ],
@@ -3538,9 +3539,9 @@
             "description": "Laravel Localization in JavaScript",
             "homepage": "https://github.com/rmariuzzo/laravel-js-localization",
             "keywords": [
+                "JS",
                 "i18n",
                 "javascript",
-                "js",
                 "lang",
                 "laravel",
                 "laravel 5",
@@ -3550,7 +3551,7 @@
                 "issues": "https://github.com/rmariuzzo/laravel-js-localization/issues",
                 "source": "https://github.com/rmariuzzo/laravel-js-localization"
             },
-            "time": "2022-08-26T13:16:52+00:00"
+            "time": "2022-02-09T09:35:03+00:00"
         },
         {
             "name": "mcamara/laravel-localization",
@@ -12365,9 +12366,7 @@
     ],
     "aliases": [],
     "minimum-stability": "dev",
-    "stability-flags": {
-        "mariuzzo/laravel-js-localization": 20
-    },
+    "stability-flags": [],
     "prefer-stable": true,
     "prefer-lowest": false,
     "platform": {
