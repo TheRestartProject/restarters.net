@@ -5,7 +5,11 @@
     <div class="row justify-content-center">
       <div class="col-lg-12">
         <div class="vue">
-          <GroupAddEditPage />
+          <b-card no-body class="box mt-4">
+            <b-card-body class="p-4">
+              <GroupAddEditPage box />
+            </b-card-body>
+          </b-card>
         </div>
       </div>
     </div>

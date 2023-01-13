@@ -1,5 +1,7 @@
 <template>
-  <div>
+  <div v-if="ready">
+    <h1 v-if="idgroups">{{ __('groups.editing') }} <a class="headlink" :href="'/group/view/' + idgroups">{{ name }}</a></h1>
+    <h1 v-else>{{ __('general.new_group') }}</h1>
     <p v-if="creating">
       {{ __('groups.add_groups_content') }}
     </p>
@@ -7,7 +9,7 @@
       {{ __('groups.edit_group_text') }}
     </p>
 
-    <div class="layout" v-if="ready">
+    <div class="layout">
       <div class="flex-grow-1 group-name">
         <GroupName
             class=""
@@ -36,9 +38,9 @@
         </b-form-group>
       </div>
       <!-- These are inputs for playwright testing. -->
-      <input type="text" id="lat" name="lat" v-model="lat" style="width: 1px; height: 1px; position: fixed; bottom: 65px; left: 0px;" />
-      <input type="text" id="lng" name="lng" v-model="lng"  style="width: 1px; height: 1px; position: fixed; bottom: 65px; left: 10px;" />
-      <input type="text" id="location" name="location" v-model="location"  style="width: 1px; height: 1px; position: fixed; bottom: 65px; left: 20px;" />
+      <input type="text" id="lat" name="lat" v-model="lat" style="width: 1px; height: 1px; position: fixed; bottom: 65px; left: 0px; border: 0;" />
+      <input type="text" id="lng" name="lng" v-model="lng"  style="width: 1px; height: 1px; position: fixed; bottom: 65px; left: 10px; border: 0;" />
+      <input type="text" id="location" name="location" v-model="location"  style="width: 1px; height: 1px; position: fixed; bottom: 65px; left: 20px; border: 0;" />
 
       <GroupLocation
           :all-groups="groups"
@@ -122,7 +124,7 @@
           <div class="mt-2">
             <b-form-group>
               <label for="group_area">{{ __('groups.area') }}:</label>
-              <b-input id="group_area" name="area" v-model="area" :class="{ hasError: hasError }" />
+              <b-input id="group_area" name="area" v-model="area" />
             </b-form-group>
           </div>
           <div class="mt-2" v-if="!approved && canApprove">
@@ -574,5 +576,10 @@ export default {
 
 ::v-deep(.ql-toolbar button) {
   width: 30px !important;
+}
+
+.headlink {
+  color: unset;
+  text-decoration: underline;
 }
 </style>
