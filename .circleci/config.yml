@@ -203,10 +203,10 @@ jobs:
       - run: npx playwright install
       # Set up a real nginx/fpm server.  This improves the speed of the tests enormously as artisan serve uses the
       # single-threaded php built-in web server.
-      - run: sudo apt-get install nginx php7.4-fpm
+      - run: sudo apt-get install nginx php8.1-fpm
       - run: sudo cp /home/circleci/project/.circleci/nginx.conf /etc/nginx/sites-available/default
       - run: sudo chown -R www-data:www-data /home/circleci/project
-      - run: sudo /etc/init.d/php7.4-fpm start
+      - run: sudo /etc/init.d/php8.1-fpm start
       - run: sudo /etc/init.d/nginx start
       # We're running against localhost.
       - run: sudo sed -i 's/APP_URL=.*$/APP_URL=http:\/\/localhost/g' /home/circleci/project/.env
