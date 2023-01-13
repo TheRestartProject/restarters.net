@@ -499,6 +499,8 @@ class UserController extends Controller
                     \Sentry\CaptureMessage($response['danger']);
                 }
             }
+        } else {
+            $email = $user ? $user->email : null;
         }
 
         return view('auth.reset-password', [
