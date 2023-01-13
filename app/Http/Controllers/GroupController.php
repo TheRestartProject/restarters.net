@@ -295,7 +295,7 @@ class GroupController extends Controller
 
         if (empty($emails)) {
             \Sentry\CaptureMessage('You have not entered any emails!');
-            return redirect()->back()->with('warning', 'You have not entered any emails!');
+            return redirect()->back()->with('warning', __('groups.invite.no_emails'));
         }
 
         $invalid = [];
@@ -307,7 +307,9 @@ class GroupController extends Controller
         }
 
         if (count($invalid)) {
-            return redirect()->back()->with('warning', 'Invalid emails were entered, so no notifications were sent - please send your invitation again.  The invalid emails were: ' . implode(', ', $invalid));
+            return redirect()->back()->with('warning', __('groups.invite_invalid_emails', [
+                'emails' => implode(', ', $invalid)
+            ]));
         }
 
         $users = User::whereIn('email', $emails)->get();
@@ -376,11 +378,13 @@ class GroupController extends Controller
         }
 
         if (! isset($not_sent)) {
-            return redirect()->back()->with('success', 'Invites sent!');
+            return redirect()->back()->with('success', __('groups.invite_success'));
         }
 
         // Don't log to Sentry - legitimate user error.
-        return redirect()->back()->with('warning', 'Invites sent - apart from these ('.rtrim(implode(', ', $not_sent), ', ').') who have already joined the group, have already been sent an invite, or have not opted in to receive emails');
+        return redirect()->back()->with('warning', __('groups.invite_success_apart_from', [
+            'emails' => rtrim(implode(', ', $not_sent))
+        ]));
     }
 
     public function confirmInvite($group_id, $hash)
@@ -587,10 +591,10 @@ class GroupController extends Controller
                     'link' => url('/group/view/'.$group->idgroups),
                 ]));
         } catch (\Exception $e) {
-            $response['danger'] = 'Failed to follow this group';
+            $response['danger'] = __('groups.follow_group_error');
             \Sentry\CaptureMessage($response['danger']);
 
-            return redirect()->back()->with('response', $response)->with('warning', 'Failed to follow this group');
+            return redirect()->back()->with('response', $response)->with('warning', __('groups.follow_group_error'));
         }
     }
 
@@ -646,11 +650,13 @@ class GroupController extends Controller
 
             $group->makeMemberAHost($user);
 
-            return redirect()->back()->with('success', 'We have made '.$user->name.' a host for this group');
+            return redirect()->back()->with('success', __('groups.made_host', [
+                'name' => $user->name
+            ]));
         }
 
-        \Sentry\CaptureMessage('Sorry, you do not have permission to do this');
-        return redirect()->back()->with('warning', 'Sorry, you do not have permission to do this');
+        \Sentry\CaptureMessage(__('groups.permission'));
+        return redirect()->back()->with('warning', __('groups.permission'));
     }
 
     public function getRemoveVolunteer($group_id, $user_id, Request $request)
@@ -671,15 +677,21 @@ class GroupController extends Controller
             if (! is_null($userGroupAssociation)) {
                 $userGroupAssociation->delete();
 
-                return redirect()->back()->with('success', 'We have removed '.$user->name.' from this group');
+                return redirect()->back()->with('success', __('groups.volunteer_remove_success', [
+                    'name' => $user->name
+                ]));
             }
-            \Sentry\CaptureMessage('We are unable to remove from this group');
+            \Sentry\CaptureMessage(__('groups.volunteer_remove_error', [
+                'name' => $user->name
+            ]));
 
-            return redirect()->back()->with('warning', 'We are unable to remove '.$user->name.' from this group');
+            return redirect()->back()->with('warning', __('groups.volunteer_remove_error', [
+                'name' => $user->name
+            ]));
         }
 
-        \Sentry\CaptureMessage('Sorry, you do not have permission to do this');
-        return redirect()->back()->with('warning', 'Sorry, you do not have permission to do this');
+        \Sentry\CaptureMessage(__('groups.permission'));
+        return redirect()->back()->with('warning', __('groups.permission'));
     }
 
     public function volunteersNearby($groupid)

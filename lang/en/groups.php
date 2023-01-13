@@ -164,4 +164,13 @@ Learn how to use this group here: :help.',
   'group_requires_moderation' => 'Group requires moderation',
   'field_phone' => 'Phone number',
   'phone_small' => '(Optional)',
+  'invite_no_emails' => 'You have not entered any emails!',
+  'invite_invalid_emails' => 'Invalid emails were entered, so no notifications were sent - please send your invitation again.  The invalid emails were: :emails',
+  'invite_success' => 'Invites sent!',
+  'invite_success_apart_from' => 'Invites sent - apart from these (:emails) who have already joined the group, have already been sent an invite, or have not opted in to receive emails.',
+  'follow_group_error' => 'Failed to follow this group',
+  'made_host' => 'We have made :name a host for this group',
+  'permission' => 'Sorry, you do not have permission to do this',
+  'volunteer_remove_success' => 'We have removed :name from this group',
+  'volunteer_remove_error' => 'We are unable to remove :name from this group'
 ];

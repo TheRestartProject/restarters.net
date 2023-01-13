@@ -445,10 +445,10 @@ class DeviceController extends Controller
                 $Image = new FixometerFile;
                 $Image->deleteImage($idxref);
 
-                return redirect()->back()->with('message', 'Thank you, the image has been deleted');
+                return redirect()->back()->with('message', __('device.image_delete_success'));
             }
 
-            return redirect()->back()->with('message', 'Sorry, but the image can\'t be deleted');
+            return redirect()->back()->with('message', __('device.image_delete_error'));
         } else {
             // We are deleting a photo from a device which has not yet been added.
             //
@@ -457,7 +457,7 @@ class DeviceController extends Controller
             $Image = new FixometerFile;
             $Image->deleteImage($idxref);
 
-            return redirect()->back()->with('message', 'Thank you, the image has been deleted');
+            return redirect()->back()->with('message', __('device.image_delete_success'));
         }
     }
 }
