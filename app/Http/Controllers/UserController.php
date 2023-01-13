@@ -454,6 +454,7 @@ class UserController extends Controller
     public function reset(Request $request)
     {
         $User = new User;
+        $user = null;
 
         $recovery = $request->recovery;
 
