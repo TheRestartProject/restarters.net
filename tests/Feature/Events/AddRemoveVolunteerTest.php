@@ -107,7 +107,7 @@ class AddRemoveVolunteerTest extends TestCase
 
         $response->assertSessionHas('success');
         $response = $this->get('/party/view/'.$event->idevents);
-        $response->assertSee('Invites Sent!');
+        $response->assertSee('Invites sent!');
 
         $response = $this->put('/api/events/' . $event->idevents . '/volunteers', [
             'volunteer_email_address' => $restarter->email,

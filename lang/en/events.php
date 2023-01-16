@@ -160,8 +160,8 @@ return [
   'invite_noemails' => 'You have not entered any emails!',
   'invite_invalid' => 'Something went wrong - this invite is invalid or has expired',
   'invite_cancelled' => 'You are no longer attending this event.',
-  'image_delete_success' => 'Thank you, the image has been deleted',
-  'image_delete_error' => 'Sorry, but the image can\'t be deleted',
-  'delete_permission' => 'You do not have permission to delete this event',
-  'delete_success' => 'Event has been deleted',
+  'image_delete_success' => 'Thank you, the image has been deleted.',
+  'image_delete_error' => 'Sorry, but the image can\'t be deleted.',
+  'delete_permission' => 'You do not have permission to delete this event.',
+  'delete_success' => 'Event has been deleted.',
 ];

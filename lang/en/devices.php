@@ -86,5 +86,5 @@ return [
   'image_delete_error' => 'Sorry, but the image can\'t be deleted',
   'image_upload_error' => 'fail - image could not be uploaded',
   'device_delete_sucess' => 'Device has been deleted!',
-  'device_delete_permissions' => 'You do not have the right permissions for deleting a device',
+  'device_delete_permissions' => 'You do not have the right permissions for deleting a device.',
 ];
