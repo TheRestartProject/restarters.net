@@ -392,8 +392,8 @@ class GroupController extends Controller
         // Find user/group relationship based on the invitation hash.
         $user_group = UserGroups::where('status', $hash)->where('group', $group_id)->first();
         if (empty($user_group)) {
-            \Sentry\CaptureMessage('Something went wrong - this invite is invalid or has expired');
-            return redirect('/group/view/'.intval($group_id))->with('warning', 'Something went wrong - this invite is invalid or has expired');
+            \Sentry\CaptureMessage(__('groups.invite_invalid'));
+            return redirect('/group/view/'.intval($group_id))->with('warning', __('groups.invite_invalid'));
         }
 
         // Set user as confirmed member of group.
@@ -416,7 +416,7 @@ class GroupController extends Controller
             ]));
         }
 
-        return redirect('/group/view/'.$user_group->group)->with('success', 'Excellent! You have joined the group');
+        return redirect('/group/view/'.$user_group->group)->with('success', __('groups.invite_confirmed'));
     }
 
     public function edit(Request $request, $id, Geocoder $geocoder)

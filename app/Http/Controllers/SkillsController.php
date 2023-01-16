@@ -36,7 +36,7 @@ class SkillsController extends Controller
         'description' => $request->input('skill_desc'),
         ]);
 
-        return Redirect::to('skills/edit/'.$skill->id)->with('success', 'Skill successfully created!');
+        return Redirect::to('skills/edit/'.$skill->id)->with('success', __('skills.create_success'));
     }
 
     public function getEditSkill($id)
@@ -65,7 +65,7 @@ class SkillsController extends Controller
         'description' => $request->input('skill-description'),
         ]);
 
-        return Redirect::back()->with('success', 'Skill successfully updated!');
+        return Redirect::back()->with('success', __('skills.update_success'));
     }
 
     public function getDeleteSkill($id)
@@ -85,6 +85,6 @@ class SkillsController extends Controller
         }
 
         // Then redirect back
-        return Redirect::to('/skills')->with('success', 'Skill successfully deleted!');
+        return Redirect::to('/skills')->with('success', __('skills.delete_success'));
     }
 }
