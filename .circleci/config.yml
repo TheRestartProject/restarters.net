@@ -124,7 +124,7 @@ jobs:
       - checkout
       - run: sudo apt update
       - run: sudo apt install dnsutils openssl zip unzip git libxml2-dev libzip-dev zlib1g-dev libcurl4-openssl-dev iputils-ping default-mysql-client vim libpng-dev libgmp-dev libjpeg-turbo8-dev
-      - run: sudo apt-get install php-xmlrpc php8.1-intl php8.1-xdebug php8.1-mbstring php8.1-simplexml php8.1-curl php8.1-zip postgresql-client php8.1-gd php8.1-xmlrpc
+      - run: sudo apt-get install php-xmlrpc php8.1-intl php8.1-xdebug php8.1-mbstring php8.1-simplexml php8.1-curl php8.1-zip postgresql-client php8.1-gd php8.1-xmlrpc php8.1-mysql php-mysql
       - run: sudo pecl install xdebug
 
       # We now need Node 14 for Playwright.
@@ -203,9 +203,13 @@ jobs:
       - run: npx playwright install
       # Set up a real nginx/fpm server.  This improves the speed of the tests enormously as artisan serve uses the
       # single-threaded php built-in web server.
+      #
+      # We need to make sure we have permissions.
+      - run: sudo usermod -a -G www-data circleci
+      - run: sudo usermod -a -G circleci www-data
+      - run: chmod -R 770 /home/circleci/project/
       - run: sudo apt-get install nginx php8.1-fpm
       - run: sudo cp /home/circleci/project/.circleci/nginx.conf /etc/nginx/sites-available/default
-      - run: sudo chown -R www-data:www-data /home/circleci/project
       - run: sudo /etc/init.d/php8.1-fpm start
       - run: sudo /etc/init.d/nginx start
       # We're running against localhost.
