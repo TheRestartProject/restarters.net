@@ -402,7 +402,7 @@ export default {
               if (id) {
                 // Don't reload the page, because group approval is handled asynchronously, and hence the
                 // group approval status might not have been updated yet.  Handle this locally.
-                this.approved = this.moderate === 'approve'
+                this.approved = this.approved || this.moderate === 'approve'
                 this.edited = true
               } else {
                 this.failed = true
