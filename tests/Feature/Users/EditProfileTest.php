@@ -16,7 +16,7 @@ use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\Storage;
 use Tests\TestCase;
 
-class EditProfileTests extends TestCase
+class EditProfileTest extends TestCase
 {
     protected function setUp(): void
     {
@@ -212,6 +212,29 @@ class EditProfileTests extends TestCase
 
         // And again, which will test the case of overwriting.
         $response = $this->json('POST', '/profile/edit-photo', $params);
+        $this->assertTrue($response->isRedirection());
+        $response->assertSessionHas('message');
+    }
+
+    /**
+     * @test
+     */
+    public function edit_profile() {
+        $user = User::factory()->create();
+        $this->actingAs($user);
+
+        $userData = $user->getAttributes();
+
+        $response = $this->json('POST', '/profile/edit-info', []);
+        $errors = session('errors')->getMessages();
+        $this->assertEquals(4, count($errors));
+
+        $response = $this->json('POST', '/profile/edit-info', [
+            'name' => $userData['name'] . '1',
+            'age' =>  $userData['age']  + 1,
+            'email' => $userData['email'] . '1',
+            'country' => 'GBR',
+        ]);
         $this->assertTrue($response->isRedirection());
         $response->assertSessionHas('message');
     }
