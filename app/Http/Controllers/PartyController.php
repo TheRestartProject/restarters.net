@@ -87,12 +87,10 @@ class PartyController extends Controller
         $thisone['finished'] = $event->hasFinished();
         $thisone['inprogress'] = $event->isInProgress();
         $thisone['startingsoon'] = $event->isStartingSoon();
+        $thisone['approved'] = $event->approved ? true : false;
 
         if (!empty($event->wordpress_post_id)) {
-            $thisone['approved'] = true;
             $thisone['wordpress_post_id'] = $event->wordpress_post_id;
-        } else {
-            $thisone['approved'] = false;
         }
 
         return $thisone;
@@ -455,7 +453,7 @@ class PartyController extends Controller
 
                 if (isset($data['moderate']) && $data['moderate'] == 'approve') {
                     $event->approve();
-                } elseif (! empty($theParty->wordpress_post_id)) {
+                } else {
                     event(new EditEvent($event, $data));
                 }
 

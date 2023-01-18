@@ -129,7 +129,7 @@ class ImportGroups extends Command
                     $group->shareable_code = Fixometer::generateUniqueShareableCode(\App\Group::class, 'shareable_code');
 
                     // All these groups are approved.
-                    $group->wordpress_post_id = '99999';
+                    $group->approved = true;
 
                     $group->save();
 

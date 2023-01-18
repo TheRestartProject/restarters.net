@@ -40,8 +40,8 @@ class NetworkTests extends TestCase
         $start = Carbon::now()->addDays(1)->toIso8601String();
         $end = Carbon::now()->addDays(2)->toIso8601String();
 
-        $event1 = Party::factory()->create(['wordpress_post_id' => null, 'group' => $group1, 'event_start_utc' => $start, 'event_end_utc' => $end]);
-        $event2 = Party::factory()->create(['wordpress_post_id' => 1, 'group' => $group2, 'event_start_utc' => $start, 'event_end_utc' => $end]);
+        $event1 = Party::factory()->create(['approved' => false, 'group' => $group1, 'event_start_utc' => $start, 'event_end_utc' => $end]);
+        $event2 = Party::factory()->create(['approved' => true, 'group' => $group2, 'event_start_utc' => $start, 'event_end_utc' => $end]);
 
         // act
         $eventsRequiringModeration = $network->eventsRequiringModeration();

@@ -153,7 +153,7 @@ h3 {
 }
 
 ::v-deep a {
-  color: $brand;
+  color: black;
   text-decoration: underline;
 }
 

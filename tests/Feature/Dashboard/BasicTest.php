@@ -116,7 +116,6 @@ class BasicTest extends TestCase
         $this->assertEquals($event->idevents, $initialEvent['idevents']);
 
         $eventData = $event->getAttributes();
-        $eventData['wordpress_post_id'] = 100;
         $eventData['id'] = $event->idevents;
         $eventData['moderate'] = 'approve';
         $response1a = $this->post('/party/edit/'.$event->idevents, $eventData);
@@ -133,7 +132,7 @@ class BasicTest extends TestCase
         ]);
         $upcomingEvents = json_decode($props[1][':upcoming-events'], TRUE);
         $this->assertEquals($event->idevents, $upcomingEvents[0]['idevents']);
-        $this->assertEquals(99999, $upcomingEvents[0]['wordpress_post_id']);
+        $this->assertEquals(true, $upcomingEvents[0]['approved']);
 
         $response3 = $this->get('/party');
 
@@ -145,7 +144,7 @@ class BasicTest extends TestCase
         ]);
         $initialEvents = json_decode($props[1][':initial-events'], TRUE);
         $this->assertEquals($event->idevents, $initialEvents[0]['idevents']);
-        $this->assertEquals(99999, $initialEvents[0]['wordpress_post_id']);
+        $this->assertEquals(true, $initialEvents[0]['approved']);
 
         // Invite a second host to the group.
         $host2 = User::factory()->restarter()->create([
@@ -189,6 +188,6 @@ class BasicTest extends TestCase
         $initialEvents = json_decode($props[1][':initial-events'], TRUE);
         $this->assertEquals($event->idevents, $initialEvents[0]['idevents']);
         $this->assertTrue($initialEvents[0]['nearby']);
-        $this->assertEquals(99999, $initialEvents[0]['wordpress_post_id']);
+        $this->assertEquals(true, $initialEvents[0]['approved']);
     }
 }

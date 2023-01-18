@@ -48,7 +48,7 @@ class DeleteEventTest extends TestCase
 
         // Create an approved event.
         $group = Group::factory()->create();
-        $event = Party::factory()->create(['wordpress_post_id' => 1, 'group' => $group->idgroups]);
+        $event = Party::factory()->create(['wordpress_post_id' => 1, 'approved' => true, 'group' => $group->idgroups]);
         $event->save();
 
         // Add a volunteer so that we get some stats.
@@ -102,8 +102,9 @@ class DeleteEventTest extends TestCase
         $this->actingAs($host);
 
         $group = Group::factory()->create([
-                                                   'wordpress_post_id' => '99999'
-                                               ]);
+                                              'wordpress_post_id' => '1',
+                                              'approved' => true
+                                           ]);
         $group->addVolunteer($host);
         $group->makeMemberAHost($host);
 
@@ -166,11 +167,13 @@ class DeleteEventTest extends TestCase
             'events_push_to_wordpress' => true,
         ]);
         $group = Group::factory()->create([
-            'wordpress_post_id' => '99999',
+                                              'wordpress_post_id' => '1',
+                                              'approved' => true
         ]);
         $network->addGroup($group);
         $event = Party::factory()->create(['group' => $group->idgroups]);
         $event->wordpress_post_id = 100;
+        $event->approved = true;
         $event->save();
 
         // act
@@ -197,11 +200,13 @@ class DeleteEventTest extends TestCase
             'events_push_to_wordpress' => true,
         ]);
         $group = Group::factory()->create([
-                                                   'wordpress_post_id' => '99999',
-                                               ]);
+                                              'wordpress_post_id' => '1',
+                                              'approved' => true
+                                           ]);
         $network->addGroup($group);
         $event = Party::factory()->create(['group' => $group->idgroups]);
         $event->wordpress_post_id = 100;
+        $event->approved = true;
         $event->save();
 
         // act

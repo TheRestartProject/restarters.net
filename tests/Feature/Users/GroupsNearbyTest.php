@@ -37,11 +37,11 @@ class GroupsNearbyTest extends TestCase
     {
         $groupAttributes = Group::factory()->raw();
         $groupAttributes['name'] = 'Lancaster Fixers';
-        $groupAttributes['wordpress_post_id'] = '99999';
+        $groupAttributes['approved'] = true;
         $group = Group::factory()->create([
             'latitude' => -12.0464,
             'longitude' => -77.0428,
-            'wordpress_post_id' => '99999',
+            'approved' => true,
         ]);
         $user = User::factory()->create([
                                                  'latitude' => -12.0463,
@@ -72,7 +72,7 @@ class GroupsNearbyTest extends TestCase
         $group = Group::factory()->create([
                                                    'latitude' => -12.0464,
                                                    'longitude' => -77.0428,
-                                                   'wordpress_post_id' => '99999',
+                                                   'approved' => true,
                                                ]);
         $user = User::factory()->create([
                                                  'latitude' => -12.37,
@@ -94,7 +94,7 @@ class GroupsNearbyTest extends TestCase
         $group = Group::factory()->create([
                                                    'latitude' => -12.0464,
                                                    'longitude' => -77.0428,
-                                                   'wordpress_post_id' => '99999',
+                                                   'approved' => true,
                                                ]);
 
         $active = GroupTags::factory()->create([
