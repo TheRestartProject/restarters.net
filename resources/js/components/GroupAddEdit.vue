@@ -62,7 +62,7 @@
           v-if="lat || lng"
       />
       <GroupTimeZone
-          :timezone.sync="timezone"
+          :value.sync="timezone"
           class="group-timezone"
           :has-error="!timezoneValid"
           ref="timezone"
@@ -142,10 +142,10 @@
       </b-card>
 
       <div class="group-buttons text-right">
-        <p v-if="edited" class="text-success font-weight-bold" v-html="__('groups.edit_succeeded')" />
+        <p v-if="edited" class="text-success font-weight-bold" v-html="'<div>' + __('groups.edit_succeeded') + '</div>'" />
         <div v-else-if="failed">
-          <p v-if="creating" class="text-danger font-weight-bold" v-html="__('groups.create_failed')"/>
-          <p v-else class="text-danger font-weight-bold" v-html="__('groups.edit_failed')"/>
+          <p v-if="creating" class="text-danger font-weight-bold" v-html="'<div>' + __('groups.create_failed') + '</div>'"/>
+          <p v-else class="text-danger font-weight-bold" v-html="'<div>' + __('groups.edit_failed') + '</div>'"/>
         </div>
 
         <div class="d-flex justify-content-between flex-wrap" v-if="creating">
