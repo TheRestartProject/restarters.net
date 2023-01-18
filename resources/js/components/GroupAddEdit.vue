@@ -142,10 +142,10 @@
       </b-card>
 
       <div class="group-buttons text-right">
-        <p v-if="edited" class="text-success font-weight-bold" v-html="'<div>' + __('groups.edit_succeeded') + '</div>'" />
+        <p v-if="edited" class="mt-2 text-primary font-weight-bold" v-html="'<div>' + __('groups.edit_succeeded') + '</div>'" />
         <div v-else-if="failed">
-          <p v-if="creating" class="text-danger font-weight-bold" v-html="'<div>' + __('groups.create_failed') + '</div>'"/>
-          <p v-else class="text-danger font-weight-bold" v-html="'<div>' + __('groups.edit_failed') + '</div>'"/>
+          <p v-if="creating" class="mt-2 text-danger font-weight-bold" v-html="'<div>' + __('groups.create_failed') + '</div>'"/>
+          <p v-else class="mt-2 text-danger font-weight-bold" v-html="'<div>' + __('groups.edit_failed') + '</div>'"/>
         </div>
 
         <div class="d-flex justify-content-between flex-wrap" v-if="creating">
