@@ -25,7 +25,7 @@ class RecoverTest extends TestCase
 
     public function testRecover()
     {
-        $restarter = factory(User::class)->state('Restarter')->create([
+        $restarter = User::factory()->restarter()->create([
                                                                           'password' => Hash::make('passw0rd'),
                                                                       ]);
 
@@ -63,12 +63,12 @@ class RecoverTest extends TestCase
 
         // Now fetch the reset page - first in error.
         $response = $this->get('/user/reset');
-        $response->assertSee('The recovery code you\'re using is invalid');
+        $response->assertSee('The recovery code you\'re using is invalid', false);
         $response = $this->get(str_replace('recovery=', 'recovery=zz', $this->recovery));
-        $response->assertSee('The recovery code you\'re using is invalid');
+        $response->assertSee('The recovery code you\'re using is invalid', false);
 
         $response = $this->get($this->recovery);
-        $response->assertSee('id="confirm_password"');
+        $response->assertSee('id="confirm_password"', false);
 
         // Now submit the reset request - first in error.
         $response = $this->post($this->recovery, [
@@ -76,7 +76,7 @@ class RecoverTest extends TestCase
             'confirm_password' => "1234",
             'recovery' => null
         ]);
-        $response->assertSee('The recovery code you\'re using is invalid');
+        $response->assertSee('The recovery code you\'re using is invalid', false);
 
         $this->recoveryCode = $this->getCode($this->recovery);
 

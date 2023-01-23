@@ -37,16 +37,16 @@ class EventPermissionsTest extends TestCase
     public function it_can_check_if_admin_can_edit_all()
     {
         // arrange
-        $network = factory(Network::class)->create();
+        $network = Network::factory()->create();
 
-        $group = factory(Group::class)->create();
+        $group = Group::factory()->create();
         $network->addGroup($group);
 
-        $event = factory(Party::class)->create(['group' => $group]);
+        $event = Party::factory()->create(['group' => $group]);
 
-        $admin = factory(User::class)->state('Administrator')->create();
-        $coordinator = factory(User::class)->state('NetworkCoordinator')->create();
-        $host = factory(User::class)->state('Host')->create();
+        $admin = User::factory()->administrator()->create();
+        $coordinator = User::factory()->networkCoordinator()->create();
+        $host = User::factory()->host()->create();
 
         // assert
         $this->actingAs($admin);
@@ -65,17 +65,17 @@ class EventPermissionsTest extends TestCase
     public function it_can_check_if_coordinator_can_edit_for_network()
     {
         // arrange
-        $network = factory(Network::class)->create();
+        $network = Network::factory()->create();
 
-        $group = factory(Group::class)->create();
+        $group = Group::factory()->create();
         $network->addGroup($group);
 
-        $event = factory(Party::class)->create(['group' => $group]);
+        $event = Party::factory()->create(['group' => $group]);
 
-        $coordinator1 = factory(User::class)->state('NetworkCoordinator')->create();
+        $coordinator1 = User::factory()->networkCoordinator()->create();
         $network->addCoordinator($coordinator1);
-        $coordinator2 = factory(User::class)->state('NetworkCoordinator')->create();
-        $host = factory(User::class)->state('Host')->create();
+        $coordinator2 = User::factory()->networkCoordinator()->create();
+        $host = User::factory()->host()->create();
 
         // assert
         $this->actingAs($coordinator1);
@@ -92,14 +92,14 @@ class EventPermissionsTest extends TestCase
     public function it_can_check_if_host_can_edit_for_group()
     {
         // arrange
-        $network = factory(Network::class)->create();
+        $network = Network::factory()->create();
 
-        $group = factory(Group::class)->create();
+        $group = Group::factory()->create();
         $network->addGroup($group);
 
-        $event = factory(Party::class)->create(['group' => $group]);
+        $event = Party::factory()->create(['group' => $group]);
 
-        $host = factory(User::class)->state('Host')->create();
+        $host = User::factory()->host()->create();
         $group->addVolunteer($host);
         $group->makeMemberAHost($host);
 

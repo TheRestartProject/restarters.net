@@ -90,8 +90,6 @@ class EditWordpressPostForEvent
 
                 $content['custom_fields'] = $custom_fields;
                 $this->wpClient->editPost($theParty->wordpress_post_id, $content);
-            } else {
-                echo "Not numeric\n";
             }
         } catch (\Exception $e) {
             Log::error('An error occurred during Wordpress event update: '.$e->getMessage());

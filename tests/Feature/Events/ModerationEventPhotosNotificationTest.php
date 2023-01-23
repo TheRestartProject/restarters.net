@@ -95,7 +95,7 @@ class ModerationEventPhotosNotificationTest extends TestCase
     protected function init_event_and_dependencies()
     {
         /** @var User[] $admins */
-        $this->admins = factory(User::class, 5)->states('Administrator')->create();
+        $this->admins = User::factory()->count(5)->administrator()->create();
 
         // Set some locales.
         $locales = [
@@ -115,9 +115,9 @@ class ModerationEventPhotosNotificationTest extends TestCase
             $admin->addPreference('admin-moderate-event-photos');
         }
 
-        $this->restarter = factory(User::class)->states('Restarter')->create();
-        $this->group = factory(Group::class)->create();
-        $this->event = factory(Party::class)->create([
+        $this->restarter = User::factory()->restarter()->create();
+        $this->group = Group::factory()->create();
+        $this->event = Party::factory()->create([
             'group' => $this->group->getKey(),
         ]);
 

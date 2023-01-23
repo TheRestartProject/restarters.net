@@ -43,7 +43,7 @@ export default {
 }
 
 .icon {
-  width: 10px;
-  margin-bottom: 2px;
+  width: 10px !important;
+  margin-bottom: 2px !important;
 }
 </style>

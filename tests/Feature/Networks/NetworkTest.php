@@ -32,7 +32,7 @@ class NetworkTest extends TestCase
     {
         $this->withoutExceptionHandling();
 
-        $network = factory(Network::class)->create();
+        $network = Network::factory()->create();
 
         $this->assertNotNull($network);
     }
@@ -42,7 +42,7 @@ class NetworkTest extends TestCase
     {
         $this->withoutExceptionHandling();
 
-        $network = factory(Network::class)->create();
+        $network = Network::factory()->create();
         $network->name = 'Restart';
         $network->save();
 
@@ -54,11 +54,11 @@ class NetworkTest extends TestCase
     {
         $this->withoutExceptionHandling();
 
-        $restart = factory(Network::class)->create();
+        $restart = Network::factory()->create();
         $restart->name = 'Restart';
         $restart->save();
 
-        $repairTogether = factory(Network::class)->create();
+        $repairTogether = Network::factory()->create();
         $repairTogether->name = 'Repair Together';
         $repairTogether->save();
 
@@ -72,11 +72,11 @@ class NetworkTest extends TestCase
     {
         $this->withoutExceptionHandling();
 
-        $network = factory(Network::class)->create();
+        $network = Network::factory()->create();
         $network->name = 'Restart';
         $network->save();
 
-        $group = factory(Group::class)->create();
+        $group = Group::factory()->create();
         $group->name = 'Hackney Fixers';
         $group->save();
 
@@ -92,22 +92,22 @@ class NetworkTest extends TestCase
         $this->withoutExceptionHandling();
 
         // Given we're logged in as an admin
-        $admin = factory(User::class)->states('Administrator')->create();
+        $admin = User::factory()->administrator()->create();
         $this->actingAs($admin);
 
-        $group = factory(Group::class)->create([
+        $group = Group::factory()->create([
                                                    'latitude' => 51.5074,
                                                    'longitude' => -0.1278,
                                                ]);
 
-        $network = factory(Network::class)->create();
+        $network = Network::factory()->create();
 
         $this->networkService->addGroupToNetwork($admin, $group, $network);
 
         $this->assertTrue($network->containsGroup($group));
         $this->assertTrue($group->isMemberOf($network));
 
-        $event1 = factory(Party::class)->create([
+        $event1 = Party::factory()->create([
                                                     'group' => $group->idgroups,
                                                     'online' => 1,
                                                     'event_start_utc' => Carbon::parse(
@@ -116,7 +116,7 @@ class NetworkTest extends TestCase
                                                     'event_end_utc' => Carbon::parse('3pm yesterday')->toIso8601String()
                                                 ]);
 
-        $event2 = factory(Party::class)->create([
+        $event2 = Party::factory()->create([
                                                     'group' => $group->idgroups,
                                                     'online' => 1,
                                                     'event_start_utc' => Carbon::parse('1pm tomorrow')->toIso8601String(
@@ -125,7 +125,7 @@ class NetworkTest extends TestCase
                                                 ]);
 
         // Check the group shows up in the list of groups for this network.
-        $coordinator = factory(User::class)->states('NetworkCoordinator')->create([
+        $coordinator = User::factory()->networkCoordinator()->create([
                                                                                       'api_token' => '1234',
                                                                                   ]);
         $network->addCoordinator($coordinator);
@@ -177,11 +177,11 @@ class NetworkTest extends TestCase
     {
         $this->withoutExceptionHandling();
 
-        $host = factory(User::class)->states('Host')->create();
+        $host = User::factory()->host()->create();
         $this->actingAs($host);
 
-        $group = factory(Group::class)->create();
-        $network = factory(Network::class)->create();
+        $group = Group::factory()->create();
+        $network = Network::factory()->create();
 
         $this->expectException(\Exception::class);
         $this->networkService->addGroupToNetwork($host, $group, $network);
@@ -196,11 +196,11 @@ class NetworkTest extends TestCase
         $this->withoutExceptionHandling();
 
         // Given we're logged in as an admin
-        $admin = factory(User::class)->states('Administrator')->create();
+        $admin = User::factory()->administrator()->create();
         $this->actingAs($admin);
 
-        $network = factory(Network::class)->create();
-        $coordinator = factory(User::class)->states('NetworkCoordinator')->create();
+        $network = Network::factory()->create();
+        $coordinator = User::factory()->networkCoordinator()->create();
 
         // act
         $network->addCoordinator($coordinator);
@@ -212,12 +212,12 @@ class NetworkTest extends TestCase
     /** @test */
     public function network_stats_can_be_queried()
     {
-        $network = factory(Network::class)->create();
-        $coordinator = factory(User::class)->states('NetworkCoordinator')->create([
+        $network = Network::factory()->create();
+        $coordinator = User::factory()->networkCoordinator()->create([
                                                                                       'api_token' => '1234',
                                                                                   ]);
 
-        $group = factory(Group::class)->create();
+        $group = Group::factory()->create();
         $group->name = 'Hackney Fixers';
         $group->save();
 
@@ -235,14 +235,14 @@ class NetworkTest extends TestCase
     /** @test */
     public function network_page()
     {
-        $network = factory(Network::class)->create([
+        $network = Network::factory()->create([
                                                        'shortname' => 'restarters'
                                                    ]);
 
-        $coordinator = factory(User::class)->states('NetworkCoordinator')->create();
+        $coordinator = User::factory()->networkCoordinator()->create();
         $this->actingAs($coordinator);
 
-        $group = factory(Group::class)->create();
+        $group = Group::factory()->create();
         $group->save();
 
         // Not a coordinator yet.
@@ -256,11 +256,11 @@ class NetworkTest extends TestCase
         $response = $this->get('/networks');
         $response->assertDontSee(__('networks.index.your_networks_no_networks'));
         $response->assertDontSee(__('networks.index.all_networks_explainer'));
-        $response->assertSee(e($network->name));
+        $response->assertSee($network->name);
 
         // Coordinator should show on network page.
         $response = $this->get('/networks/' . $network->id);
-        $response->assertSee(e($coordinator->name));
+        $response->assertSee($coordinator->name);
 
         // Group should not show on network page yet.
         $response = $this->get('/group/network/' . $network->id);
@@ -285,8 +285,8 @@ class NetworkTest extends TestCase
 
         // Group should now show on network page and in encoded list of networks for a groiup.
         $response = $this->get('/group/network/' . $network->id);
-        $response->assertSee(htmlspecialchars($group->name, ENT_QUOTES));
-        $response->assertSee('&quot;networks&quot;:[' . $network->id . ']');
+        $response->assertSee($group->name);
+        $response->assertSee('&quot;networks&quot;:[' . $network->id . ']', false);
 
         // All networks list visible to admin.
         $this->loginAsTestUser(Role::ADMINISTRATOR);
@@ -299,7 +299,7 @@ class NetworkTest extends TestCase
     {
         $this->withoutExceptionHandling();
 
-        $admin = factory(User::class)->states('Administrator')->create();
+        $admin = User::factory()->administrator()->create();
         $this->actingAs($admin);
 
         $network = new Network();
@@ -315,7 +315,7 @@ class NetworkTest extends TestCase
         $response->assertRedirect();
 
         // Associate a group.
-        $group = factory(Group::class)->create();
+        $group = Group::factory()->create();
         $group->name = 'Hackney Fixers';
         $group->save();
 

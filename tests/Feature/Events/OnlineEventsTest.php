@@ -34,15 +34,15 @@ class OnlineEventsTest extends TestCase
         $this->withoutExceptionHandling();
 
         // arrange
-        $host = factory(User::class)->states('Host')->create();
+        $host = User::factory()->host()->create();
         $this->actingAs($host);
 
-        $group = factory(Group::class)->create();
+        $group = Group::factory()->create();
         $group->addVolunteer($host);
         $group->makeMemberAHost($host);
 
         // act
-        $eventAttributes = factory(Party::class)->raw(['online' => true]);
+        $eventAttributes = Party::factory()->raw(['online' => true]);
         $response = $this->post('/party/create/', $eventAttributes);
         $idevents = Party::latest()->first()->idevents;
 

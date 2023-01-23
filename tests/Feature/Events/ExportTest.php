@@ -21,15 +21,14 @@ class ExportTest extends TestCase
      */
     public function testExport($role)
     {
-        $network = factory(Network::class)->create();
+        $network = Network::factory()->create();
 
-        $admin = factory(User::class)->states('Administrator')->create();
-        $user = factory(User::class)->states($role)->create();
+        $host = User::factory()->administrator()->create();
+        $user = User::factory()->states($role)->create();
 
         if ($role == 'NetworkCoordinator') {
             $network->addCoordinator($user);
         }
-
 
         $this->actingAs($admin);
 
@@ -48,7 +47,7 @@ class ExportTest extends TestCase
         $group1->approved = true;
         $group1->save();
 
-        $group2 = factory(Group::class)->create([
+        $group2 = Group::factory()->create([
                                                     'name' => 'test2'
                                                 ]);
         $this->networkService->addGroupToNetwork($admin, $group2, $network);
@@ -76,11 +75,13 @@ class ExportTest extends TestCase
 
         // Create an event on each and approve it.
         $idevents1 = $this->createEvent($group1->idgroups, '2000-01-02');
+        self::assertNotNull($idevents1);
         $event1 = Party::find($idevents1);
         $event1->approved = true;
         $event1->save();
 
         $idevents2 = $this->createEvent($group2->idgroups, '2000-01-01');
+        self::assertNotNull($idevents2);
         $event2 = Party::find($idevents2);
         $event2->approved = true;
         $event2->save();
@@ -91,12 +92,12 @@ class ExportTest extends TestCase
         $event3->save();
 
         // Add a device for the events.
-        $device = factory(Device::class)->states('fixed')->create([
+        $device = Device::factory()->fixed()->create([
                                                                       'category' => 111,
                                                                       'category_creation' => 111,
                                                                       'event' => $idevents1,
                                                                   ]);
-        $device = factory(Device::class)->states('fixed')->create([
+        $device = Device::factory()->fixed()->create([
                                                                       'category' => 111,
                                                                       'category_creation' => 111,
                                                                       'event' => $idevents2,
@@ -218,8 +219,8 @@ class ExportTest extends TestCase
 
         // Export time volunteered - first as a web page.
         $response = $this->get("/reporting/time-volunteered?a");
-        $response->assertSee(e($event1->getEventName()));
-        $response->assertSee(e($event2->getEventName()));
+        $response->assertSee($event1->getEventName());
+        $response->assertSee($event2->getEventName());
 
         // Now as a CSV.
         $response = $this->get("/export/time-volunteered?a");

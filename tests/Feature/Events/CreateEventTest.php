@@ -55,7 +55,7 @@ class CreateEventTest extends TestCase
     {
         $this->withoutExceptionHandling();
 
-        $host = factory(User::class)->states('Host')->create();
+        $host = User::factory()->host()->create();
         $this->actingAs($host);
 
         $response = $this->get('/party/create');
@@ -72,11 +72,11 @@ class CreateEventTest extends TestCase
         $this->withoutExceptionHandling();
 
         // arrange
-        $host = factory(User::class)->states('Host')->create();
+        $host = User::factory()->host()->create();
         $this->actingAs($host);
 
-        $group = factory(Group::class)->create([
-            'approved' => true
+        $group = Group::factory()->create([
+          'approved' => true
         ]);
         $group->addVolunteer($host);
         $group->makeMemberAHost($host);
@@ -86,7 +86,7 @@ class CreateEventTest extends TestCase
         $this->get('/party/create')->assertStatus(200);
 
         // Create a party for the specific group.
-        $eventAttributes = factory(Party::class)->raw();
+        $eventAttributes = Party::factory()->raw();
         $eventAttributes['group'] = $group->idgroups;
         $eventAttributes['link'] = 'https://therestartproject.org/';
 
@@ -138,7 +138,7 @@ class CreateEventTest extends TestCase
 
         if ($role != 'Host') {
             // Need to act as someone else.
-            $this->actingAs(factory(User::class)->states($role)->create());
+            $this->actingAs(User::factory()->{lcfirst($role)}()->create());
         }
 
         // Check the group page.
@@ -199,7 +199,7 @@ class CreateEventTest extends TestCase
                 self::assertEquals(__('notifications.event_confirmed_subject', [], $host->language), $mailData['subject']);
 
                 // Mail should mention the venue.
-                self::assertRegexp('/' . $event->venue . '/', $mailData['introLines'][0]);
+                self::assertMatchesRegularExpression ('/' . $event->venue . '/', $mailData['introLines'][0]);
                 self::assertStringContainsString('#list-email-preferences', $mailData['outroLines'][0]);
 
                 return true;
@@ -268,15 +268,15 @@ class CreateEventTest extends TestCase
         $this->withoutExceptionHandling();
 
         // arrange
-        $host = factory(User::class)->states('Host')->create();
+        $host = User::factory()->host()->create();
         $this->actingAs($host);
 
-        $group = factory(Group::class)->create();
+        $group = Group::factory()->create();
         $group->addVolunteer($host);
         $group->makeMemberAHost($host);
 
         // act
-        $party = factory(Party::class)->create([
+        $party = Party::factory()->create([
            'group' => $group->idgroups,
            'latitude'=>'1',
            'longitude'=>'1',
@@ -295,11 +295,11 @@ class CreateEventTest extends TestCase
         Notification::fake();
 
         // Create some admins.
-        $admins = factory(User::class, 5)->states('Administrator')->create();
+        $admins = User::factory()->count(5)->administrator()->create();
 
         // Create a network with a group.
-        $network = factory(Network::class)->create();
-        $group = factory(Group::class)->create();
+        $network = Network::factory()->create();
+        $group = Group::factory()->create();
         $network->addGroup($group);
 
         // Make these admins coordinators of the network, so that they should get notified.
@@ -311,7 +311,7 @@ class CreateEventTest extends TestCase
         $this->actingAs($admins[0]);
 
         // Create an event.
-        $event = factory(Party::class)->raw();
+        $event = Party::factory()->raw();
         $event['group'] = $group->idgroups;
         $response = $this->post('/party/create/', $event);
         $response->assertStatus(302);
@@ -326,19 +326,19 @@ class CreateEventTest extends TestCase
     public function emails_sent_to_restarters_when_upcoming_event_approved()
     {
         $this->withoutExceptionHandling();
-        $admin = factory(User::class)->state('Administrator')->create();
+        $admin = User::factory()->administrator()->create();
         $this->actingAs($admin);
         // arrange
         Notification::fake();
 
-        $group = factory(Group::class)->create();
-        $host = factory(User::class)->state('Host')->create();
-        $restarter = factory(User::class)->state('Restarter')->create();
+        $group = Group::factory()->create();
+        $host = User::factory()->host()->create();
+        $restarter = User::factory()->restarter()->create();
         $group->addVolunteer($host);
         $group->makeMemberAHost($host);
         $group->addVolunteer($restarter);
 
-        $eventData = factory(Party::class)->raw([
+        $eventData = Party::factory()->raw([
             'group' => $group->idgroups,
             'event_start_utc' => '2100-01-01T10:15:05+05:00',
             'event_end_utc' => '2100-01-0113:45:05+05:00',
@@ -386,19 +386,19 @@ class CreateEventTest extends TestCase
     {
         $this->withoutExceptionHandling();
 
-        $admin = factory(User::class)->state('Administrator')->create();
+        $admin = User::factory()->administrator()->create();
         $this->actingAs($admin);
         // arrange
         Notification::fake();
 
-        $group = factory(Group::class)->create();
-        $host = factory(User::class)->state('Host')->create();
-        $restarter = factory(User::class)->state('Restarter')->create();
+        $group = Group::factory()->create();
+        $host = User::factory()->host()->create();
+        $restarter = User::factory()->restarter()->create();
         $group->addVolunteer($host);
         $group->makeMemberAHost($host);
         $group->addVolunteer($restarter);
 
-        $eventData = factory(Party::class)->raw(['group' => $group->idgroups, 'event_date' => '1930-01-01', 'latitude'=>'1', 'longitude'=>'1']);
+        $eventData = Party::factory()->raw(['group' => $group->idgroups, 'event_date' => '1930-01-01', 'latitude'=>'1', 'longitude'=>'1']);
 
         // act
         $response = $this->post('/party/create/', $eventData);
@@ -419,20 +419,20 @@ class CreateEventTest extends TestCase
         $this->withoutExceptionHandling();
         Notification::fake();
 
-        $network = factory(Network::class)->create();
-        $group = factory(Group::class)->create();
+        $network = Network::factory()->create();
+        $group = Group::factory()->create();
         $network->addGroup($group);
 
         // Make an admin who is also a network controller.
-        $admin = factory(User::class)->state('Administrator')->create();
+        $admin = User::factory()->administrator()->create();
         $admin->addPreference('admin-moderate-event');
         $network->addCoordinator($admin);
 
         // Make a separate network controller.
-        $coordinator = factory(User::class)->state('NetworkCoordinator')->create();
+        $coordinator = User::factory()->networkCoordinator()->create();
         $network->addCoordinator($coordinator);
 
-        $eventData = factory(Party::class)->raw(['group' => $group->idgroups]);
+        $eventData = Party::factory()->raw(['group' => $group->idgroups]);
 
         $this->actingAs($admin);
         $response = $this->post('/party/create/', $eventData);
@@ -451,10 +451,10 @@ class CreateEventTest extends TestCase
     {
         $this->withoutExceptionHandling();
 
-        $host = factory(User::class)->states('Host')->create();
+        $host = User::factory()->host()->create();
         $this->actingAs($host);
 
-        $group = factory(Group::class)->create();
+        $group = Group::factory()->create();
         $group->addVolunteer($host);
         $group->makeMemberAHost($host);
 
@@ -462,7 +462,7 @@ class CreateEventTest extends TestCase
         $response = $this->get('/party/create');
         $this->get('/party/create')->assertStatus(200);
 
-        $eventAttributes = factory(Party::class)->raw(['group' => $group->idgroups, 'event_date' => '2000-01-01', 'approved' => true]);
+        $eventAttributes = Party::factory()->raw(['group' => $group->idgroups, 'event_date' => '2000-01-01', 'approved' => true]);
         $response = $this->post('/party/create/', $eventAttributes);
 
         // Find the event id
@@ -514,14 +514,14 @@ class CreateEventTest extends TestCase
      */
     public function an_event_can_be_auto_approved($autoApprove, $approved)
     {
-        $network = factory(Network::class)->create([
+        $network = Network::factory()->create([
             'auto_approve_events' => $autoApprove,
         ]);
 
-        $host = factory(User::class)->states('Administrator')->create();
+        $host = User::factory()->administrator()->create();
         $this->actingAs($host);
 
-        $group = factory(Group::class)->create();
+        $group = Group::factory()->create();
         $this->networkService = new RepairNetworkService();
         $this->networkService->addGroupToNetwork($host, $group, $network);
         $group->addVolunteer($host);
@@ -539,10 +539,10 @@ class CreateEventTest extends TestCase
      * @test
      */
     public function a_past_event_is_not_upcoming() {
-        $host = factory(User::class)->states('Administrator')->create();
+        $host = User::factory()->administrator()->create();
         $this->actingAs($host);
 
-        $group = factory(Group::class)->create();
+        $group = Group::factory()->create();
         $group->addVolunteer($host);
         $group->makeMemberAHost($host);
 
@@ -563,10 +563,10 @@ class CreateEventTest extends TestCase
      * @test
      */
     public function a_future_event_is_upcoming() {
-        $host = factory(User::class)->states('Administrator')->create();
+        $host = User::factory()->administrator()->create();
         $this->actingAs($host);
 
-        $group = factory(Group::class)->create();
+        $group = Group::factory()->create();
         $group->addVolunteer($host);
         $group->makeMemberAHost($host);
 
@@ -590,13 +590,13 @@ class CreateEventTest extends TestCase
         Notification::fake();
         $this->withoutExceptionHandling();
 
-        $host = factory(User::class)->states('Host')->create();
+        $host = User::factory()->host()->create();
         $this->actingAs($host);
 
-        $restarter = factory(User::class)->states('Restarter')->create();
+        $restarter = User::factory()->restarter()->create();
 
-        $group = factory(Group::class)->create([
-            'approved' => true
+        $group = Group::factory()->create([
+          'approved' => true
         ]);
 
         $group->addVolunteer($host);
@@ -607,7 +607,7 @@ class CreateEventTest extends TestCase
         $response = $this->get("/group/remove-volunteer/{$group->idgroups}/{$restarter->id}");
         $response->assertSessionHas('success');
 
-        $eventData = factory(Party::class)->raw([
+        $eventData = Party::factory()->raw([
                                                     'group' => $group->idgroups,
                                                     'event_start_utc' => '2100-01-01T10:15:05+05:00',
                                                     'event_end_utc' => '2100-01-0113:45:05+05:00',
@@ -635,7 +635,7 @@ class CreateEventTest extends TestCase
         $this->loginAsTestUser(Role::ADMINISTRATOR);
         $idgroups = $this->createGroup();
 
-        $eventData = factory(Party::class)->raw([
+        $eventData = Party::factory()->raw([
                                                     'group' => $idgroups,
                                                     'location' => 'ForceGeocodeFailure',
                                                 ]);
@@ -654,17 +654,17 @@ class CreateEventTest extends TestCase
         $this->withoutExceptionHandling();
 
         // Create an admin
-        $admin = factory(User::class)->state('Administrator')->create();
+        $admin = User::factory()->administrator()->create();
         // Create a network with a group.
-        $network = factory(Network::class)->create();
-        $group = factory(Group::class)->create();
+        $network = Network::factory()->create();
+        $group = Group::factory()->create();
         $network->addGroup($group);
 
         // Make the admin coordinators of the network, so that they should get notified.
         $network->addCoordinator($admin);
 
         // Log in so that we can create an event.
-        $host = factory(User::class)->states('Host')->create();
+        $host = User::factory()->host()->create();
         $group->addVolunteer($host);
         $group->makeMemberAHost($host);
         $this->actingAs($host);
@@ -686,7 +686,7 @@ class CreateEventTest extends TestCase
 
         // Create an event.
         $initialQueueSize = \Illuminate\Support\Facades\Queue::size('database');
-        $event = factory(Party::class)->raw();
+        $event = Party::factory()->raw();
         $event['group'] = $group->idgroups;
         $response = $this->post('/party/create/', $event);
         $response->assertStatus(302);

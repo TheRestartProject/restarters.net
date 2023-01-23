@@ -15,13 +15,13 @@ class UserDeletedNotificationTest extends TestCase
         Notification::fake();
 
         /** @var User[] $admins */
-        $admins = factory(User::class, 5)->states('Administrator')->create();
+        $admins = User::factory()->count(5)->administrator()->create();
 
         foreach ($admins as $admin) {
             $admin->addPreference('admin-user-deleted');
         }
 
-        $restarter = factory(User::class)->states('Restarter')->create();
+        $restarter = User::factory()->restarter()->create();
         $restarter->delete();
 
         Notification::assertSentTo(

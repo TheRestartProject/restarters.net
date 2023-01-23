@@ -19,13 +19,13 @@ class NullProblemTest extends TestCase
         Device::truncate();
         DB::statement('SET foreign_key_checks=1');
 
-        $event = factory(Party::class)->create();
-        $this->device_inputs = factory(Device::class)->raw([
+        $event = Party::factory()->create();
+        $this->device_inputs = Device::factory()->raw([
                                                                'event_id' => $event->idevents,
                                                                'quantity' => 1,
                                                            ]);
 
-        $admin = factory(User::class)->state('Administrator')->create();
+        $admin = User::factory()->administrator()->create();
         $this->actingAs($admin);
 
         $this->withoutExceptionHandling();

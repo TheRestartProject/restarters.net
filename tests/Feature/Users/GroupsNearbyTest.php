@@ -20,13 +20,13 @@ class GroupsNearbyTest extends TestCase
 {
     public function testNoLocation()
     {
-        $user = factory(User::class)->create();
+        $user = User::factory()->create();
         $this->assertEquals(0, count($user->groupsNearby()));
     }
 
     public function testLocationNoGroups()
     {
-        $user = factory(User::class)->create([
+        $user = User::factory()->create([
             'latitude' => -12.0464,
             'longitude' => -77.0428,
         ]);
@@ -35,15 +35,15 @@ class GroupsNearbyTest extends TestCase
 
     public function testOneGroupNearby()
     {
-        $groupAttributes = factory(Group::class)->raw();
+        $groupAttributes = Group::factory()->raw();
         $groupAttributes['name'] = 'Lancaster Fixers';
         $groupAttributes['approved'] = true;
-        $group = factory(Group::class)->create([
+        $group = Group::factory()->create([
             'latitude' => -12.0464,
             'longitude' => -77.0428,
             'approved' => true,
         ]);
-        $user = factory(User::class)->create([
+        $user = User::factory()->create([
                                                  'latitude' => -12.0463,
                                                  'longitude' => -77.0427,
                                              ]);
@@ -54,11 +54,11 @@ class GroupsNearbyTest extends TestCase
 
     public function testDontShowUnlessApproved()
     {
-        $group = factory(Group::class)->create([
+        $group = Group::factory()->create([
                                                    'latitude' => -12.0464,
                                                    'longitude' => -77.0428,
                                                ]);
-        $user = factory(User::class)->create([
+        $user = User::factory()->create([
                                                  'latitude' => -12.37,
                                                  'longitude' => -77.37,
                                              ]);
@@ -69,12 +69,12 @@ class GroupsNearbyTest extends TestCase
 
     public function testCloseButNoCigar()
     {
-        $group = factory(Group::class)->create([
+        $group = Group::factory()->create([
                                                    'latitude' => -12.0464,
                                                    'longitude' => -77.0428,
                                                    'approved' => true,
                                                ]);
-        $user = factory(User::class)->create([
+        $user = User::factory()->create([
                                                  'latitude' => -12.37,
                                                  'longitude' => -77.37,
                                              ]);
@@ -91,13 +91,13 @@ class GroupsNearbyTest extends TestCase
     public function testInactive()
     {
         // Add a group with a tag.
-        $group = factory(Group::class)->create([
+        $group = Group::factory()->create([
                                                    'latitude' => -12.0464,
                                                    'longitude' => -77.0428,
                                                    'approved' => true,
                                                ]);
 
-        $active = factory(GroupTags::class)->create([
+        $active = GroupTags::factory()->create([
                                                           'id' => GroupTags::INACTIVE + 1,
                                                           'tag_name' => 'Not Inactive',
                                                       ]);
@@ -105,7 +105,7 @@ class GroupsNearbyTest extends TestCase
         $group->addTag($active);
 
         // Should find it nearby.
-        $user = factory(User::class)->create([
+        $user = User::factory()->create([
                                                  'latitude' => -12.0463,
                                                  'longitude' => -77.0427,
                                              ]);
@@ -113,7 +113,7 @@ class GroupsNearbyTest extends TestCase
         $this->assertEquals(1, count($groups));
 
         // Make the group inactive.
-        $inactive = factory(GroupTags::class)->create([
+        $inactive = GroupTags::factory()->create([
                                                           'id' => GroupTags::INACTIVE,
                                                           'tag_name' => 'Inactive',
                                                       ]);
@@ -129,23 +129,23 @@ class GroupsNearbyTest extends TestCase
         Notification::fake();
 
         // Create a user in London.
-        $user = factory(User::class)->create([
+        $user = User::factory()->create([
             'location' => 'London',
              'latitude' => 51.5072178,
              'longitude' => -0.1275862,
          ]);
 
-        $admin1 = factory(User::class)->state('Administrator')->create();
+        $admin1 = User::factory()->administrator()->create();
         $this->actingAs($admin1);
 
         $idgroups = $this->createGroup('Test Group');
         $group = Group::find($idgroups);
 
-        $admin2 = factory(User::class)->state('Administrator')->create();
+        $admin2 = User::factory()->administrator()->create();
         $this->actingAs($admin2);
 
         // Approve the group.
-        $response = $this->post('/group/edit/'.$idgroups, [
+        $this->patch('/api/v2/groups/' . $group->idgroups, [
             'description' => 'Test',
             'location' => 'London',
             'name' => $group->name,
@@ -154,7 +154,7 @@ class GroupsNearbyTest extends TestCase
             'moderate' => 'approve',
             'area' => 'London',
             'postcode' => 'SW9 7QD'
-        ]);
+        ])->assertSuccessful();
 
         // This should trigger a notification.
         Notification::assertSentTo(
@@ -165,7 +165,7 @@ class GroupsNearbyTest extends TestCase
                 self::assertEquals(__('notifications.new_group_subject', [], $host->language), $mailData['subject']);
 
                 // Mail should mention the group name.
-                self::assertRegexp('/' . $group->name . '/', $mailData['introLines'][0]);
+                self::assertMatchesRegularExpression ('/' . $group->name . '/', $mailData['introLines'][0]);
 
                 return true;
             }

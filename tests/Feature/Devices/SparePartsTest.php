@@ -15,8 +15,8 @@ class SparePartsTest extends TestCase
     {
         parent::setUp();
 
-        $event = factory(Party::class)->create();
-        $this->device_inputs = factory(Device::class)->raw([
+        $event = Party::factory()->create();
+        $this->device_inputs = Device::factory()->raw([
             'event_id' => $event->idevents,
             'quantity' => 1,
         ]);
@@ -25,7 +25,7 @@ class SparePartsTest extends TestCase
         $this->input_no_spare_parts_needed = 2;
         $this->input_spare_parts_from_third_party = 3;
 
-        $admin = factory(User::class)->state('Administrator')->create();
+        $admin = User::factory()->administrator()->create();
         $this->actingAs($admin);
 
         $this->withoutExceptionHandling();

@@ -42,13 +42,13 @@ class AnonymiseUsersForTest extends Command
 
         foreach ($users as $user) {
             echo "\nAnonymising #".$user->id;
-            $user->name = $faker->name;
-            $user->email = $faker->unique()->safeEmail;
-            $user->biography = $faker->text;
-            $username = $faker->username;
+            $user->name = $faker->name();
+            $user->email = $faker->unique()->safeEmail();
+            $user->biography = $faker->text();
+            $username = $faker->userName();
             $user->username = $username;
             $user->mediawiki = $username;
-            $user->location = $faker->city;
+            $user->location = $faker->city();
             $user->latitude = $faker->latitude();
             $user->longitude = $faker->longitude();
             $user->age = $faker->year(2000);

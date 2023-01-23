@@ -14,7 +14,7 @@ use Tests\TestCase;
 class APIv2NetworkTest extends TestCase
 {
     public function testList() {
-        $user = factory(User::class)->states('Administrator')->create([
+        $user = User::factory()->administrator()->create([
                                                                           'api_token' => '1234',
                                                                       ]);
         $this->actingAs($user);
@@ -69,11 +69,11 @@ class APIv2NetworkTest extends TestCase
      * @param $value
      */
     public function testListGroups($getNextEvent, $getDetails) {
-        $network = factory(Network::class)->create([
+        $network = Network::factory()->create([
                                                        'name' => 'Restart',
                                                        'events_push_to_wordpress' => true,
                                                    ]);
-        $group = factory(Group::class)->create([
+        $group = Group::factory()->create([
                                                    'location' => 'London',
                                                    'area' => 'London',
                                                    'country' => 'GB',
@@ -81,7 +81,7 @@ class APIv2NetworkTest extends TestCase
         $network->addGroup($group);
 
         // Create event for group
-        $event = factory(Party::class)->states('moderated')->create([
+        $event = Party::factory()->moderated()->create([
                                                                          'event_start_utc' => '2038-01-01T00:00:00Z',
                                                                          'event_end_utc' => '2038-01-01T02:00:00Z',
                                                                          'group' => $group->idgroups,
@@ -149,17 +149,17 @@ class APIv2NetworkTest extends TestCase
      * @param $value
      */
     public function testListEvents($getDetails) {
-        $network = factory(Network::class)->create([
+        $network = Network::factory()->create([
                                                        'name' => 'Restart',
                                                        'events_push_to_wordpress' => true,
                                                    ]);
-        $group = factory(Group::class)->create([
+        $group = Group::factory()->create([
                                                    'approved' => true,
                                                ]);
         $network->addGroup($group);
 
         // Create event for group
-        $event = factory(Party::class)->states('moderated')->create([
+        $event = Party::factory()->moderated()->create([
                                                                         'event_start_utc' => '2038-01-01T00:00:00Z',
                                                                         'event_end_utc' => '2038-01-01T02:00:00Z',
                                                                         'group' => $group->idgroups,

@@ -65,6 +65,45 @@ body {
     }
   }
 
+  h4 {
+    line-height: 0;
+    padding: 0;
+    margin-bottom: 5px;
+
+    span {
+      font-family: Asap;
+      font-size: 16px;
+      font-weight: normal;
+      font-stretch: normal;
+      text-decoration: underline;
+      font-style: normal;
+      line-height: 1.44;
+      letter-spacing: normal;
+
+      text-align: left;
+      color: $black;
+    }
+  }
+
+  h5 {
+    line-height: 0;
+    padding: 0;
+    margin-bottom: 5px;
+
+    span {
+      font-family: Asap;
+      font-size: 16px;
+      font-weight: normal;
+      font-stretch: normal;
+      text-decoration: none;
+      font-style: italic;
+      line-height: 1.44;
+      letter-spacing: normal;
+      text-align: left;
+      color: $black;
+    }
+  }
+
   .mw-collapsible {
     position: relative;
     padding: 0;
@@ -109,7 +148,7 @@ body {
         background-position: center;
         width: 15px;
         height: 8px;
-        background-image: url('../../global/svgs/dropdown-arrow-up.svg') !important;
+        background-image: url('/images/dropdown-arrow-up.svg') !important;
         border: 0;
         margin-left: 8px;
         transform: rotate(0deg) translateY(-50%);
@@ -134,9 +173,6 @@ body {
     }
 
     div:first-of-type {
-      @extend .d-flex;
-      @extend .align-items-center;
-
       min-height: 70px;
 
       h2 {
@@ -146,8 +182,6 @@ body {
 
         span:first-child {
           &::before {
-            content: counter(chapter);
-
             width: 50px;
             height: 50px;
             background: $black;
@@ -161,9 +195,6 @@ body {
         }
 
         .mw-headline {
-          @extend .d-flex;
-          @extend .align-items-center;
-
           @include media-breakpoint-down(md) {
             font-size: 18px;
             font-weight: bold;
@@ -185,7 +216,7 @@ body {
       h3 {
         > span:first-child {
           &::before {
-            content: counter(chapter)"." counter(section)" ";
+            //content: counter(chapter)"." counter(section)" ";
             margin: 0;
             display: inline-block;
             margin-right: 40px;
@@ -194,11 +225,8 @@ body {
       }
 
       ul {
-        @extend .list-doodle;
-
-        margin-left: 100px; // Override
         margin-bottom: 25px;
-        list-style: none;
+        list-style: outside disc url("data:image/svg+xml;charset=UTF-8,<svg width='8' height='16' version='1.1' xmlns='http://www.w3.org/2000/svg'><circle cx='4' cy='10.4' r='4' fill='#dee2e6'/></svg>");
 
         li {
           a {

@@ -17,7 +17,7 @@ class FaultcatController extends Controller
      */
     public function index(Request $request)
     {
-        return redirect()->action('FaultcatController@status')->withSuccess('done');
+        return redirect()->action([\App\Http\Controllers\FaultcatController::class, 'status'])->withSuccess('done');
     }
 
     public function demographics(Request $request)
@@ -65,7 +65,7 @@ class FaultcatController extends Controller
         }
 
         // Success or failure, let them carry on.
-        return redirect()->action('FaultcatController@index');
+        return redirect()->action([\App\Http\Controllers\FaultcatController::class, 'index']);
     }
 
     public function status(Request $request)

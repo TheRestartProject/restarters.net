@@ -130,7 +130,7 @@ class AccountCreationTest extends TestCase
     {
 
         // Check with a registered email.
-        $restarter = factory(User::class)->state('Restarter')->create();
+        $restarter = User::factory()->restarter()->create();
         $response = $this->post('user/register/check-valid-email', [
             'email' => $restarter->email,
         ]);

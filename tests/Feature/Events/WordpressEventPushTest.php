@@ -33,15 +33,15 @@ class WordpressEventPushTest extends TestCase
             $mock->shouldReceive('newPost')->once();
         }));
 
-        $restart = factory(Network::class)->create([
+        $restart = Network::factory()->create([
             'name' => 'Restart',
             'events_push_to_wordpress' => true,
         ]);
-        $group = factory(Group::class)->create([
-                                                   'approved' => true,
-                                               ]);
+        $group = Group::factory()->create([
+                                              'approved' => true,
+                                           ]);
         $restart->addGroup($group);
-        $event = factory(Party::class)->create([
+        $event = Party::factory()->create([
             'group' => $group->idgroups,
             'latitude' => 1,
             'longitude' => 1,
@@ -54,15 +54,15 @@ class WordpressEventPushTest extends TestCase
 
     /** @test */
     public function date_format_in_events() {
-        $network = factory(Network::class)->create([
+        $network = Network::factory()->create([
            'events_push_to_wordpress' => true,
         ]);
-        $group = factory(Group::class)->create([
-            'wordpress_post_id' => 1,
-            'approved' => true,
+        $group = Group::factory()->create([
+          'wordpress_post_id' => 1,
+          'approved' => true,
         ]);
         $network->addGroup($group);
-        $event = factory(Party::class)->create([
+        $event = Party::factory()->create([
             'group' => $group->idgroups,
             'event_start_utc' => Carbon::parse('1pm tomorrow')->toIso8601String(),
             'event_end_utc' => Carbon::parse('3pm tomorrow')->toIso8601String()
@@ -118,16 +118,16 @@ class WordpressEventPushTest extends TestCase
             $mock->shouldNotReceive('newPost');
         }));
 
-        $repairTogether = factory(Network::class)->create([
+        $repairTogether = Network::factory()->create([
             'name' => 'Repair Together',
         ]);
-        $group = factory(Group::class)->create([
-                                                   'approved' => true,
-                                               ]);
+        $group = Group::factory()->create([
+                                              'approved' => true,
+                                           ]);
         $repairTogether->addGroup($group);
-        $event = factory(Party::class)->create(['group' => $group->idgroups]);
+        $event = Party::factory()->create(['group' => $group->idgroups]);
 
-        $eventData = factory(Party::class)->raw();
+        $eventData = Party::factory()->raw();
         $eventData['moderate'] = 'approve';
         $eventData['latitude'] = '1';
         $eventData['longitude'] = '1';
@@ -143,16 +143,16 @@ class WordpressEventPushTest extends TestCase
             $mock->shouldReceive('editPost')->once();
         }));
 
-        $restart = factory(Network::class)->create([
+        $restart = Network::factory()->create([
             'name' => 'Restart',
             'events_push_to_wordpress' => true,
         ]);
-        $group = factory(Group::class)->create([
-                                                   'wordpress_post_id' => 1,
-                                                   'approved' => true,
-                                               ]);
+        $group = Group::factory()->create([
+                                              'wordpress_post_id' => 1,
+                                              'approved' => true,
+                                           ]);
         $restart->addGroup($group);
-        $event = factory(Party::class)->create([
+        $event = Party::factory()->create([
             'group' => $group->idgroups,
             'event_start_utc' => Carbon::parse('1pm tomorrow')->toIso8601String(),
             'event_end_utc' => Carbon::parse('3pm tomorrow')->toIso8601String()
@@ -161,7 +161,7 @@ class WordpressEventPushTest extends TestCase
         $event->approved = true;
         $event->save();
 
-        $eventData = factory(Party::class)->raw();
+        $eventData = Party::factory()->raw();
         $eventData['free_text'] = 'Some change';
         $eventData['latitude'] = '1';
         $eventData['longitude'] = '1';
@@ -177,19 +177,19 @@ class WordpressEventPushTest extends TestCase
             $mock->shouldNotReceive('editPost');
         }));
 
-        $repairTogether = factory(Network::class)->create([
+        $repairTogether = Network::factory()->create([
             'name' => 'Repair Together',
             'events_push_to_wordpress' => false,
         ]);
-        $group = factory(Group::class)->create([
-                                                   'approved' => true,
-                                               ]);
+        $group = Group::factory()->create([
+                                              'approved' => true,
+                                           ]);
         $repairTogether->addGroup($group);
-        $event = factory(Party::class)->create(['group' => $group->idgroups]);
+        $event = Party::factory()->create(['group' => $group->idgroups]);
         $event->approved = true;
         $event->save();
 
-        $eventData = factory(Party::class)->raw();
+        $eventData = Party::factory()->raw();
         $eventData['free_text'] = 'Some change';
         $eventData['latitude'] = '1';
         $eventData['longitude'] = '1';
@@ -206,15 +206,15 @@ class WordpressEventPushTest extends TestCase
             $mock->shouldNotReceive('editPost');
         }));
 
-        $restart = factory(Network::class)->create([
+        $restart = Network::factory()->create([
                                                        'name' => 'Restart',
                                                        'events_push_to_wordpress' => true,
                                                    ]);
-        $group = factory(Group::class)->create([
-                                                   'approved' => false,
-                                               ]);
+        $group = Group::factory()->create([
+                                              'approved' => false,
+                                        ]);
         $restart->addGroup($group);
-        $event = factory(Party::class)->create([
+        $event = Party::factory()->create([
                                                    'group' => $group->idgroups,
                                                    'latitude' => 1,
                                                    'longitude' => 1,
