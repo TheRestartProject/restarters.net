@@ -217,16 +217,16 @@
         },
         {
             "name": "aws/aws-sdk-php",
-            "version": "3.256.1",
+            "version": "3.257.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/aws/aws-sdk-php.git",
-                "reference": "d993c3aa72233186375f3ceb5811a30982fbcad8"
+                "reference": "26091e15fbc57e93f939ddfe0410161cd9fdbd54"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/aws/aws-sdk-php/zipball/d993c3aa72233186375f3ceb5811a30982fbcad8",
-                "reference": "d993c3aa72233186375f3ceb5811a30982fbcad8",
+                "url": "https://api.github.com/repos/aws/aws-sdk-php/zipball/26091e15fbc57e93f939ddfe0410161cd9fdbd54",
+                "reference": "26091e15fbc57e93f939ddfe0410161cd9fdbd54",
                 "shasum": ""
             },
             "require": {
@@ -305,9 +305,9 @@
             "support": {
                 "forum": "https://forums.aws.amazon.com/forum.jspa?forumID=80",
                 "issues": "https://github.com/aws/aws-sdk-php/issues",
-                "source": "https://github.com/aws/aws-sdk-php/tree/3.256.1"
+                "source": "https://github.com/aws/aws-sdk-php/tree/3.257.0"
             },
-            "time": "2023-01-10T19:20:06+00:00"
+            "time": "2023-01-12T19:23:11+00:00"
         },
         {
             "name": "barryvdh/laravel-translation-manager",
@@ -5551,16 +5551,16 @@
         },
         {
             "name": "ramsey/uuid",
-            "version": "4.7.1",
+            "version": "4.7.3",
             "source": {
                 "type": "git",
                 "url": "https://github.com/ramsey/uuid.git",
-                "reference": "a1acf96007170234a8399586a6e2ab8feba109d1"
+                "reference": "433b2014e3979047db08a17a205f410ba3869cf2"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/ramsey/uuid/zipball/a1acf96007170234a8399586a6e2ab8feba109d1",
-                "reference": "a1acf96007170234a8399586a6e2ab8feba109d1",
+                "url": "https://api.github.com/repos/ramsey/uuid/zipball/433b2014e3979047db08a17a205f410ba3869cf2",
+                "reference": "433b2014e3979047db08a17a205f410ba3869cf2",
                 "shasum": ""
             },
             "require": {
@@ -5627,7 +5627,7 @@
             ],
             "support": {
                 "issues": "https://github.com/ramsey/uuid/issues",
-                "source": "https://github.com/ramsey/uuid/tree/4.7.1"
+                "source": "https://github.com/ramsey/uuid/tree/4.7.3"
             },
             "funding": [
                 {
@@ -5639,7 +5639,7 @@
                     "type": "tidelift"
                 }
             ],
-            "time": "2022-12-31T22:20:34+00:00"
+            "time": "2023-01-12T18:13:24+00:00"
         },
         {
             "name": "sentry/sdk",
@@ -5700,16 +5700,16 @@
         },
         {
             "name": "sentry/sentry",
-            "version": "3.12.0",
+            "version": "3.12.1",
             "source": {
                 "type": "git",
                 "url": "https://github.com/getsentry/sentry-php.git",
-                "reference": "4902f43640963ed45517fd7c1da7fdd5511bb304"
+                "reference": "155bb9b78438999de4529d6f051465be15a58bc5"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/getsentry/sentry-php/zipball/4902f43640963ed45517fd7c1da7fdd5511bb304",
-                "reference": "4902f43640963ed45517fd7c1da7fdd5511bb304",
+                "url": "https://api.github.com/repos/getsentry/sentry-php/zipball/155bb9b78438999de4529d6f051465be15a58bc5",
+                "reference": "155bb9b78438999de4529d6f051465be15a58bc5",
                 "shasum": ""
             },
             "require": {
@@ -5788,7 +5788,7 @@
             ],
             "support": {
                 "issues": "https://github.com/getsentry/sentry-php/issues",
-                "source": "https://github.com/getsentry/sentry-php/tree/3.12.0"
+                "source": "https://github.com/getsentry/sentry-php/tree/3.12.1"
             },
             "funding": [
                 {
@@ -5800,7 +5800,7 @@
                     "type": "custom"
                 }
             ],
-            "time": "2022-11-22T10:57:08+00:00"
+            "time": "2023-01-12T12:24:27+00:00"
         },
         {
             "name": "sentry/sentry-laravel",
@@ -9268,16 +9268,16 @@
         },
         {
             "name": "zircote/swagger-php",
-            "version": "4.5.4",
+            "version": "4.6.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/zircote/swagger-php.git",
-                "reference": "09356f4d68d29bdf3254811fb2602a5d5d1788ea"
+                "reference": "ee8147745c92dd4404adb531751ce32676b888d4"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/zircote/swagger-php/zipball/09356f4d68d29bdf3254811fb2602a5d5d1788ea",
-                "reference": "09356f4d68d29bdf3254811fb2602a5d5d1788ea",
+                "url": "https://api.github.com/repos/zircote/swagger-php/zipball/ee8147745c92dd4404adb531751ce32676b888d4",
+                "reference": "ee8147745c92dd4404adb531751ce32676b888d4",
                 "shasum": ""
             },
             "require": {
@@ -9340,9 +9340,9 @@
             ],
             "support": {
                 "issues": "https://github.com/zircote/swagger-php/issues",
-                "source": "https://github.com/zircote/swagger-php/tree/4.5.4"
+                "source": "https://github.com/zircote/swagger-php/tree/4.6.0"
             },
-            "time": "2023-01-04T00:51:43+00:00"
+            "time": "2023-01-13T00:51:01+00:00"
         }
     ],
     "packages-dev": [

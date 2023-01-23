@@ -46,7 +46,7 @@ export default {
       this.$emit('update:valid', newValue)
     },
     currentValue(newValue) {
-      this.$emit('update:timezone', newValue)
+      this.$emit('update:value', newValue)
     }
   },
   async mounted() {

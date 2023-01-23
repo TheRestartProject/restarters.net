@@ -154,7 +154,7 @@ class APIv2NetworkTest extends TestCase
                                                        'events_push_to_wordpress' => true,
                                                    ]);
         $group = Group::factory()->create([
-                                                   'wordpress_post_id' => '99999',
+                                                   'approved' => true,
                                                ]);
         $network->addGroup($group);
 

@@ -316,7 +316,7 @@ class Group extends JsonResource
             'networks' => new NetworkSummaryCollection($this->networks),
             'tags' => new TagCollection($this->group_tags),
             'timezone' => $this->timezone,
-            'approved' => $this->wordpress_post_id != null,
+            'approved' => $this->approved,
         ];
 
         $ret['hosts'] = $this->resource->all_confirmed_hosts_count;

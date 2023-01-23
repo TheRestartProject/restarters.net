@@ -1,12 +1,11 @@
 <template>
   <div>
-    <h1 v-if="idgroups">{{ __('groups.editing') }}</h1>
-    <h1 v-else>{{ __('general.new_group') }}</h1>
-    <b-card no-body class="box mt-4">
+    <b-card no-body v-if="box" class="box mt-4">
       <b-card-body class="p-4">
         <GroupAddEdit :idgroups="idgroups" :can-approve="canApprove" :can-network="canNetwork" />
       </b-card-body>
     </b-card>
+    <GroupAddEdit :idgroups="idgroups" :can-approve="canApprove" :can-network="canNetwork" v-else />
   </div>
 </template>
 <script>
@@ -32,6 +31,11 @@ export default {
       required: false,
       default: false
     },
+    box: {
+      type: Boolean,
+      required: false,
+      default: false
+    }
   },
 }
 </script>

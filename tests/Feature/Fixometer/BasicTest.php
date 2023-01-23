@@ -19,8 +19,8 @@ class BasicTest extends TestCase
     {
         // Create a past event with a fixed device.  This is shown on the Fixometer page as the latest data.
         $group = Group::factory()->create([
-                                                   'wordpress_post_id' => '99999'
-                                               ]);
+                                              'approved' => true,
+                                          ]);
         $event = Party::factory()->create([
                                                    'group' => $group,
                                                    'event_start_utc' => '2000-01-01T12:13:00+00:00',

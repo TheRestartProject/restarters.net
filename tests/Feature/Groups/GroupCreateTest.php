@@ -190,7 +190,7 @@ class GroupCreateTest extends TestCase
         $this->get('/party')->assertDontSee($eventAttributes['venue']);
 
         // Now approve the group.
-        $group->wordpress_post_id = '99999';
+        $group->approved = true;
         $group->save();
 
         // Should now be visible.

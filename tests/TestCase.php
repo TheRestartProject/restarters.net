@@ -175,7 +175,7 @@ abstract class TestCase extends BaseTestCase
 
             if ($approve) {
                 $group = Group::find($idgroups);
-                $group->wordpress_post_id = '99999';
+                $group->approved = true;
                 $group->save();
             }
 

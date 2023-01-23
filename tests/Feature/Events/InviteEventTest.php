@@ -24,8 +24,8 @@ class InviteEventTest extends TestCase
         $this->withoutExceptionHandling();
 
         $group = Group::factory()->create([
-                                                   'wordpress_post_id' => '99999'
-                                               ]);
+                                              'approved' => true
+                                           ]);
         $event = Party::factory()->create([
                                                    'group' => $group,
                                                    'event_start_utc' => '2130-01-01T12:13:00+00:00',
@@ -80,7 +80,6 @@ class InviteEventTest extends TestCase
         $this->get('/logout');
         $this->actingAs($admin);
         $eventData = $event->getAttributes();
-        $eventData['wordpress_post_id'] = 100;
         $eventData['id'] = $event->idevents;
         $eventData['moderate'] = 'approve';
         $this->post('/party/edit/'.$event->idevents, $eventData);
@@ -123,8 +122,8 @@ class InviteEventTest extends TestCase
         $this->withoutExceptionHandling();
 
         $group = Group::factory()->create([
-                                                   'wordpress_post_id' => '99999'
-                                               ]);
+                                              'approved' => true
+                                           ]);
         $host = User::factory()->host()->create();
         $event = Party::factory()->create([
                                                    'group' => $group,
@@ -347,8 +346,8 @@ class InviteEventTest extends TestCase
         $this->withoutExceptionHandling();
 
         $group = Group::factory()->create([
-                                                   'wordpress_post_id' => '99999'
-                                               ]);
+                                              'approved' => true
+                                           ]);
         $event = Party::factory()->create([
                                                    'group' => $group,
                                                    'event_start_utc' => '2130-01-01T12:13:00+00:00',
