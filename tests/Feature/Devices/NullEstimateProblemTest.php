@@ -12,14 +12,14 @@ class NullEstimateProblemTest extends TestCase
 {
     public function testNullAge()
     {
-        $event = factory(Party::class)->create();
-        $this->device_inputs = factory(Device::class)->raw([
+        $event = Party::factory()->create();
+        $this->device_inputs = Device::factory()->raw([
                                                                'event_id' => $event->idevents,
                                                                'quantity' => 1,
                                                                'estimate' => null
                                                            ]);
 
-        $admin = factory(User::class)->state('Administrator')->create();
+        $admin = User::factory()->administrator()->create();
         $this->actingAs($admin);
         $this->post('/device/create', $this->device_inputs);
         $iddevices = Device::latest()->first()->iddevices;

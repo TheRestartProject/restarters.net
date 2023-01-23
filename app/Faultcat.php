@@ -2,6 +2,7 @@
 
 namespace App;
 
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use DB;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Schema\Blueprint;
@@ -9,9 +10,10 @@ use Illuminate\Support\Facades\Schema;
 
 class Faultcat extends Model
 {
+    use HasFactory;
+
     protected $table = 'devices_faults_opinions';
     protected $dateFormat = 'Y-m-d H:i';
-    protected $dates = ['created_at', 'updated_at'];
     protected $primaryKey = 'id';
 
     /**

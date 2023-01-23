@@ -124,7 +124,7 @@ import VenueAddress from './VenueAddress'
 import EventVenue from './EventVenue'
 import EventGroup from './EventGroup'
 import EventLink from './EventLink'
-import { required, minLength, url, helpers } from 'vuelidate/lib/validators'
+import { required, url, helpers } from 'vuelidate/lib/validators'
 import validationHelpers from '../mixins/validationHelpers'
 import moment from 'moment-timezone'
 
@@ -390,7 +390,7 @@ export default {
     grid-row: 7 / 8;
     grid-column: 1 / 2;
 
-    /deep/ .btn {
+    ::v-deep .btn {
       font-size: 16px;
     }
 
@@ -404,7 +404,7 @@ export default {
     grid-row: 8 / 9;
     grid-column: 1 / 2;
 
-    /deep/ .btn {
+    ::v-deep .btn {
       font-size: 16px;
     }
 
@@ -418,7 +418,7 @@ export default {
     grid-row: 9 / 10;
     grid-colum: 1 / 2;
 
-    /deep/ .btn {
+    ::v-deep .btn {
       font-size: 16px;
     }
 
@@ -438,7 +438,7 @@ export default {
   }
 }
 
-/deep/ .form-control, /deep/ .custom-checkbox input {
+::v-deep .form-control, ::v-deep .custom-checkbox input {
   border: 2px solid $black !important;
 }
 
@@ -450,7 +450,7 @@ export default {
   margin-top: 2px;
 }
 
-/deep/ .hasError, /deep/ .card .form-control.hasError:focus {
+::v-deep .hasError, ::v-deep .card .form-control.hasError:focus {
   border: 2px solid $brand-danger !important;
   margin: 0px !important;
 }
@@ -459,7 +459,7 @@ export default {
   font-size: 15px;
 }
 
-/deep/ .ql-toolbar button {
+::v-deep .ql-toolbar button {
   width: 30px !important;
 }
 </style>

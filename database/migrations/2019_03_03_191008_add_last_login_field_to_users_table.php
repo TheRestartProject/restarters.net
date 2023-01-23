@@ -5,7 +5,7 @@ use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
 
-class AddLastLoginFieldToUsersTable extends Migration
+return new class extends Migration
 {
     /**
      * Run the migrations.
@@ -32,4 +32,4 @@ class AddLastLoginFieldToUsersTable extends Migration
             $table->dropColumn('last_login_at');
         });
     }
-}
+};

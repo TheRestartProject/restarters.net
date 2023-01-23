@@ -10,7 +10,7 @@ use Carbon\Carbon;
 use DB;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Foundation\Testing\WithoutMiddleware;
-use Mediawiki\Api\Service\UserCreator;
+use Addwiki\Mediawiki\Api\Service\UserCreator;
 use Mockery;
 use Msurguy\Honeypot\HoneypotFacade as Honeypot;
 use Tests\TestCase;
@@ -38,7 +38,7 @@ class WikiLoginTests extends TestCase
         }));
 
         // Given we have a user with the flag set to sync them.
-        $user = factory(User::class)->create();
+        $user = User::factory()->create();
         $user->wiki_sync_status = WikiSyncStatus::CreateAtLogin;
         $user->save();
 
@@ -62,7 +62,7 @@ class WikiLoginTests extends TestCase
         }));
 
         // Given we have a user with the flag set to not create
-        $user = factory(User::class)->create();
+        $user = User::factory()->create();
         $user->wiki_sync_status = WikiSyncStatus::DoNotCreate;
         $user->save();
 
@@ -86,7 +86,7 @@ class WikiLoginTests extends TestCase
         }));
 
         // Given we have a user who has already been created in the wiki
-        $user = factory(User::class)->create();
+        $user = User::factory()->create();
         $user->wiki_sync_status = WikiSyncStatus::Created;
         $user->save();
 
@@ -109,7 +109,7 @@ class WikiLoginTests extends TestCase
         }));
 
         // Given we have a user who has already been created in the wiki
-        $user = factory(User::class)->create();
+        $user = User::factory()->create();
         $user->wiki_sync_status = WikiSyncStatus::Created;
         $user->save();
         $this->actingAs($user);

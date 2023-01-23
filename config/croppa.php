@@ -1,4 +1,4 @@
-<?php return array(
+<?php return [
 
     /*
     |-----------------------------------------------------------------------------
@@ -142,4 +142,4 @@
         'turquoise' => Bkwld\Croppa\Filters\TurquoiseWarhol::class,
     ],
 
-);
+];

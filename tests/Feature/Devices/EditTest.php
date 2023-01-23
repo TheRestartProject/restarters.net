@@ -15,9 +15,9 @@ class EditTest extends TestCase
     {
         parent::setUp();
 
-        $this->event = factory(Party::class)->create();
-        $this->admin = factory(User::class)->state('Administrator')->create();
-        $this->device_inputs = factory(Device::class)->raw([
+        $this->event = Party::factory()->create();
+        $this->admin = User::factory()->administrator()->create();
+        $this->device_inputs = Device::factory()->raw([
                                                                'event_id' => $this->event->idevents,
                                                                'quantity' => 1,
                                                            ]);
@@ -54,7 +54,7 @@ class EditTest extends TestCase
 
     public function testDeviceEditAddImage() {
         Storage::fake('avatars');
-        $user = factory(User::class)->states('Administrator')->create();
+        $user = User::factory()->administrator()->create();
         $this->actingAs($user);
 
         $rsp = $this->post('/device/create', $this->device_inputs);
@@ -120,7 +120,7 @@ class EditTest extends TestCase
 
     public function testDeviceAddAddImage() {
         Storage::fake('avatars');
-        $user = factory(User::class)->states('Administrator')->create();
+        $user = User::factory()->administrator()->create();
         $this->actingAs($user);
 
         // Use a negative id to indicate an Add.
@@ -175,7 +175,7 @@ class EditTest extends TestCase
     }
 
     public function testNextSteps() {
-        $device_inputs = factory(Device::class)->raw([
+        $device_inputs = Device::factory()->raw([
             'event_id' => $this->event->idevents,
             'quantity' => 1,
             'repair_status' => 2,

@@ -23,7 +23,7 @@ class BattcatOraController extends Controller
     public function index(Request $request)
     {
         // BattCat is now closed.
-        return redirect()->action('BattcatOraController@status');
+        return redirect()->action([\App\Http\Controllers\BattcatOraController::class, 'status']);
     }
 
     /**

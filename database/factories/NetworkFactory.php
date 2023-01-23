@@ -1,9 +1,20 @@
 <?php
 
-use Faker\Generator as Faker;
+namespace Database\Factories;
 
-$factory->define(App\Network::class, function (Faker $faker) {
-    return [
-        'name' => $faker->unique()->company,
+use Illuminate\Database\Eloquent\Factories\Factory;
+
+class NetworkFactory extends Factory
+{
+    /**
+     * Define the model's default state.
+     *
+     * @return array
+     */
+    public function definition()
+    {
+        return [
+        'name' => $this->faker->unique()->company(),
     ];
-});
+    }
+}

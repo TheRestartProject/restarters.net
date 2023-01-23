@@ -18,7 +18,7 @@ class ViewUsersTest extends TestCase
         DB::statement('SET foreign_key_checks=1');
 
         // Given we're logged in as an admin
-        $admin = factory(User::class)->states('Administrator')->create();
+        $admin = User::factory()->administrator()->create();
         $this->actingAs($admin);
     }
 
@@ -26,7 +26,7 @@ class ViewUsersTest extends TestCase
     public function an_admin_can_view_list_of_users()
     {
         // Given we have users in the database
-        $users = factory(User::class, 10)->create();
+        $users = User::factory()->count(10)->create();
 
         // When we visit the list of users
         $response = $this->get('/user/all');
@@ -39,7 +39,7 @@ class ViewUsersTest extends TestCase
     public function an_admin_can_see_how_many_total_users_in_the_list()
     {
         // Given we have users in the database
-        $users = factory(User::class, 41)->create();
+        $users = User::factory()->count(41)->create();
 
         // When we visit the list of users
         $response = $this->get('/user/all');
@@ -53,7 +53,7 @@ class ViewUsersTest extends TestCase
     {
         // Given we have a user who has just logged in
         $lastLogin = new \Carbon\Carbon();
-        $user = factory(User::class)->create([
+        $user = User::factory()->create([
             'updated_at' => $lastLogin,
         ]);
 
@@ -69,7 +69,7 @@ class ViewUsersTest extends TestCase
     {
         // Given we have a user who has just logged in
         $lastLogin = new \Carbon\Carbon();
-        $user = factory(User::class)->create([
+        $user = User::factory()->create([
             'updated_at' => $lastLogin,
         ]);
 
@@ -87,13 +87,13 @@ class ViewUsersTest extends TestCase
         $dateOfMostRecentLogin = new Carbon();
         $dateOfLeastRecentLogin = new Carbon('-1 year');
 
-        $userWithMostRecentLogin = factory(User::class)->create([
+        $userWithMostRecentLogin = User::factory()->create([
             'last_login_at' => $dateOfMostRecentLogin,
         ]);
-        $otherUsers = factory(User::class, 42)->create([
+        $otherUsers = User::factory()->count(42)->create([
             'last_login_at' => new Carbon('-1 month'),
         ]);
-        $userWithLeastRecentLogin = factory(User::class)->create([
+        $userWithLeastRecentLogin = User::factory()->create([
             'last_login_at' => $dateOfLeastRecentLogin,
         ]);
 

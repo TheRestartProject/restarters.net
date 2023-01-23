@@ -18,7 +18,7 @@ class CalendarTest extends TestCase
         parent::setUp();
 
         // Create a group, event, user.
-        $host = factory(User::class)->create([
+        $host = User::factory()->create([
                                                  'latitude' => 50.64,
                                                  'longitude' => 5.58,
                                                  'location' => 'London',
@@ -27,27 +27,27 @@ class CalendarTest extends TestCase
         $this->actingAs($host);
         $this->host = $host;
 
-        $group = factory(Group::class)->create([
+        $group = Group::factory()->create([
                                                    'latitude' => 50.63,
                                                    'longitude' => 5.57,
-                                                   'wordpress_post_id' => '99999',
+                                                   'approved' => true,
                                                    'area' => 'London'
                                                ]);
         $group->addVolunteer($host);
         $group->makeMemberAHost($host);
         $this->group = $group;
 
-        $group2 = factory(Group::class)->create([
+        $group2 = Group::factory()->create([
                                                    'latitude' => 1,
                                                    'longitude' => 2,
-                                                   'wordpress_post_id' => '99999',
+                                                   'approved' => true,
                                                ]);
         $this->group2 = $group2;
 
         $this->start = '2100-01-01T10:15:05+05:00';
         $this->end = '2100-01-0113:45:05+05:00';
 
-        $event = factory(Party::class)->create([
+        $event = Party::factory()->create([
                                                    'group' => $group->idgroups,
                                                    'latitude' => 50.645,
                                                    'longitude' => 5.575,

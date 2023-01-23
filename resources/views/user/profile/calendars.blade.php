@@ -45,7 +45,7 @@
         <select class="form-control select2-with-input-group" id="inputGroupSelect02">
         @php($first_option=null)
         @foreach ($all_group_areas as $area)
-            @if($loop->first)
+            @if(!$first_option)
             @php( $first_option = $area )
             @endif
             <option value="{{ $area }}">{{ $area }}</option>

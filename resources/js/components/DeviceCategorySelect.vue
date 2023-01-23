@@ -132,7 +132,7 @@ export default {
   width: 360px !important;
 }
 
-/deep/ .multiselect__tags {
+::v-deep .multiselect__tags {
   min-height: 43px;
 }
 </style>

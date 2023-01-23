@@ -152,8 +152,8 @@ h3 {
   font-weight: bold;
 }
 
-/deep/ a {
-  color: $brand;
+::v-deep a {
+  color: black;
   text-decoration: underline;
 }
 

@@ -2,11 +2,14 @@
 
 namespace App;
 
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use App\Group;
 use Illuminate\Database\Eloquent\Model;
 
 class Network extends Model
 {
+    use HasFactory;
+
     public function groups()
     {
         return $this->belongsToMany(Group::class, 'group_network', 'network_id', 'group_id');
@@ -44,7 +47,7 @@ class Network extends Model
         $events = collect([]);
 
         foreach ($groups as $group) {
-            $events->push($group->upcomingParties()->whereNull('wordpress_post_id')->whereNull('deleted_at'));
+            $events->push($group->upcomingParties()->where('approved', false)->whereNull('deleted_at'));
         }
 
         return $events->flatten(1);

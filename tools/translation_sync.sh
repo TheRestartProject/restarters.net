@@ -5,7 +5,7 @@ set -e
 
 php artisan translations:import
 php artisan translations:export --all
-php ./tools/php-cs-fixer.phar fix --config=.php-cs-fixer.dist.php resources/lang/
+php ./tools/php-cs-fixer.phar fix --config=.php-cs-fixer.dist.php lang/
 git diff resources/ > /tmp/translations.diff
 
 # Can't let grep set return code.
@@ -34,7 +34,7 @@ then
     export BRANCH=translations_`date -I`
     git branch $BRANCH
     git checkout $BRANCH
-    git add resources/lang
+    git add lang
     git commit -m "Update translations from live system"
 
     curl -s --user "api:$MAILGUN_KEY" \

@@ -99,25 +99,25 @@ export default {
 @import '~bootstrap/scss/variables';
 @import '~bootstrap/scss/mixins/_breakpoints';
 
-/deep/ .ql-editor,  /deep/ .ql-container {
+::v-deep .ql-editor,  ::v-deep .ql-container {
   min-height: 300px !important;
   max-height: 300px !important;
   height: 300px !important;
 }
 
-/deep/ .ql-header[value="4"]::before {
+::v-deep .ql-header[value="4"]::before {
   content: 'H4'
 }
 
-/deep/ .ql-header[value="5"]::before {
+::v-deep .ql-header[value="5"]::before {
   content: 'H5'
 }
 
-/deep/ .ql-header[value="6"]::before {
+::v-deep .ql-header[value="6"]::before {
   content: 'H6'
 }
 
-/deep/ .ql-snow .ql-editor {
+::v-deep .ql-snow .ql-editor {
   h4 {
     font-size: 1.5rem;
   }
@@ -130,13 +130,13 @@ export default {
 }
 
 .editorHasError {
-  /deep/ .ql-toolbar {
+  ::v-deep .ql-toolbar {
     border-top: 2px solid $brand-danger !important;
     border-left: 2px solid $brand-danger !important;
     border-right: 2px solid $brand-danger !important;
   }
 
-  /deep/ .ql-container {
+  ::v-deep .ql-container {
     border-bottom: 2px solid $brand-danger !important;
     border-left: 2px solid $brand-danger !important;
     border-right: 2px solid $brand-danger !important;

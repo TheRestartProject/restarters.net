@@ -59,14 +59,15 @@ export default {
 }
 
 .img {
-  height: 46px;
+  height: 38px;
+  margin-bottom: 13px;
 }
 
 .icon {
   height: 41px;
 }
 
-/deep/ a {
+::v-deep a {
   color: black;
   text-decoration: underline;
 }

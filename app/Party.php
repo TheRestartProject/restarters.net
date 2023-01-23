@@ -2,6 +2,7 @@
 
 namespace App;
 
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use App\Events\ApproveEvent;
 use App\EventUsers;
 use App\Helpers\Fixometer;
@@ -18,6 +19,8 @@ use OwenIt\Auditing\Contracts\Auditable;
 
 class Party extends Model implements Auditable
 {
+    use HasFactory;
+
     use SoftDeletes;
     use \OwenIt\Auditing\Auditable;
 
@@ -36,6 +39,7 @@ class Party extends Model implements Auditable
         'volunteers',
         'hours',
         'wordpress_post_id',
+        'approved',
         'created_at',
         'updated_at',
         'shareable_code',
@@ -98,6 +102,7 @@ class Party extends Model implements Auditable
                     `e`.`hours`,
                     `e`.`free_text`,
                     `e`.`wordpress_post_id`,
+                    `e`.`approved`,
                     `e`.`online`,
                     `e`.`discourse_thread`,
                     `g`.`name` AS `group_name`,
@@ -273,9 +278,8 @@ class Party extends Model implements Auditable
     }
 
     public function scopeApproved($query) {
-        // wordpress_post_id indicates event approval.
         $query = $query->undeleted();
-        $query = $query->whereNotNull('wordpress_post_id');
+        $query = $query->where('approved', true);
         return $query;
     }
 
@@ -376,7 +380,7 @@ class Party extends Model implements Auditable
         $exclude_group_ids = UserGroups::where('user', $user->id)->where('status', 1)->pluck('group')->toArray();
 
         // We also want to exclude any groups which are not yet approved.
-        $exclude_group_ids = array_merge($exclude_group_ids, Group::whereNull('wordpress_post_id')->pluck('idgroups')->toArray());
+        $exclude_group_ids = array_merge($exclude_group_ids, Group::where('approved', false)->pluck('idgroups')->toArray());
 
         return $this
       ->select(DB::raw('`events`.*, ( 6371 * acos( cos( radians('.$user->latitude.') ) * cos( radians( events.latitude ) ) * cos( radians( events.longitude ) - radians('.$user->longitude.') ) + sin( radians('.$user->latitude.') ) * sin( radians( events.latitude ) ) ) ) AS distance'))
@@ -395,7 +399,7 @@ class Party extends Model implements Auditable
     public function scopeRequiresModeration($query)
     {
         $query = $query->future();
-        $query = $query->whereNull('wordpress_post_id');
+        $query = $query->where('approved', false);
         return $query;
     }
 
@@ -709,7 +713,7 @@ class Party extends Model implements Auditable
 
     public function requiresModerationByAdmin()
     {
-        if (! is_null($this->wordpress_post_id)) {
+        if ($this->approved) {
             return false;
         }
 
@@ -815,13 +819,11 @@ class Party extends Model implements Auditable
 
     // Timezone-aware, ISO8601 formatted.  These are unambiguous, e.g. for API results.
     public function getEventStartUtcAttribute() {
-        $start = Carbon::parse($this->attributes['event_start_utc'], 'UTC');
-        return $start->toIso8601String();
+        return array_key_exists('event_start_utc', $this->attributes) ? Carbon::parse($this->attributes['event_start_utc'], 'UTC')->toIso8601String() : null;
     }
 
     public function getEventEndUtcAttribute() {
-        $end = Carbon::parse($this->attributes['event_end_utc'], 'UTC');
-        return $end->toIso8601String();
+        return array_key_exists('event_end_utc', $this->attributes) ? Carbon::parse($this->attributes['event_end_utc'], 'UTC')->toIso8601String() : null;
     }
 
     // Mutators for previous event_date/start/end fields.  These are now superceded by the UTC fields and therefore

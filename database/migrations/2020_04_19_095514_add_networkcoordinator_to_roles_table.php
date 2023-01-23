@@ -4,7 +4,7 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-class AddNetworkcoordinatorToRolesTable extends Migration
+return new class extends Migration
 {
     /**
      * Run the migrations.
@@ -27,4 +27,4 @@ class AddNetworkcoordinatorToRolesTable extends Migration
     {
         DB::delete("delete from roles where role = 'NetworkCoordinator'");
     }
-}
+};

@@ -2,7 +2,7 @@
 
 use Illuminate\Database\Migrations\Migration;
 
-class BattcatOraChanges extends Migration
+return new class extends Migration
 {
     /**
      * Run the migrations.
@@ -74,4 +74,4 @@ class BattcatOraChanges extends Migration
     public function down()
     {
     }
-}
+};

@@ -1,5 +1,5 @@
 # This is the docker for restarters.  It's used from docker-compose.
-FROM cimg/php:7.4.11-node
+FROM cimg/php:8.1.12-node
 
 # Set working directory to where we will run.
 WORKDIR /var/www
@@ -7,7 +7,7 @@ WORKDIR /var/www
 # Install dependencies
 RUN sudo apt-get update && \
     sudo apt install dnsutils openssl zip unzip git libxml2-dev libzip-dev zlib1g-dev libcurl4-openssl-dev iputils-ping default-mysql-client vim libpng-dev libgmp-dev libjpeg-turbo8-dev && \
-    sudo apt install php7.4-xmlrpc php7.4-intl php7.4-xdebug php7.4-xmlrpc php7.4-mbstring php7.4-simplexml php7.4-curl php7.4-zip python postgresql-client
+    sudo apt install php8.1-xmlrpc php8.1-intl php8.1-xdebug php8.1-xmlrpc php8.1-mbstring php8.1-simplexml php8.1-curl php8.1-zip python postgresql-client
 
 # Clear cache - reduces image size.
 RUN sudo apt-get clean && sudo rm -rf /var/lib/apt/lists/*

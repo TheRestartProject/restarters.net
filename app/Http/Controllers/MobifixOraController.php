@@ -25,7 +25,7 @@ class MobifixOraController extends Controller
         } else {
             $user = Microtask::getAnonUserCta($request);
             if ($user->action) {
-                return redirect()->action('MobifixOraController@cta', ['partner' => $partner]);
+                return redirect()->action([\App\Http\Controllers\MobifixOraController::class, 'cta'], ['partner' => $partner]);
             }
         }
         if ($request->has('id-ords')) {
@@ -48,7 +48,7 @@ class MobifixOraController extends Controller
         }
         $fault = $this->_fetchRecord($request);
         if (! $fault) {
-            return redirect()->action('MobifixOraController@status')->withSuccess('done');
+            return redirect()->action([\App\Http\Controllers\MobifixOraController::class, 'status'])->withSuccess('done');
         }
         $fault->translate = rawurlencode($fault->problem);
         $MobifixOra = new MobifixOra;
