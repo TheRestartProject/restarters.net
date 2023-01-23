@@ -1,6 +1,6 @@
 <template>
   <b-form-group>
-    <label for="group_phone">{{ __('groups.group_image') }}:</label>
+    <label for="dropzone">{{ __('groups.group_image') }}:</label>
     <div class="layout">
       <vue-dropzone ref="dropzone" id="dropzone" :options="dropzoneOptions"
                     class="ourdropzone" useCustomSlot
@@ -123,8 +123,8 @@ export default {
 
 
 .image {
-  width: 260px;
-  height: 260px;
+  width: 100px;
+  height: 100px;
   object-fit: cover;
 }
 </style>

@@ -456,6 +456,7 @@ class UserController extends Controller
     public function reset(Request $request)
     {
         $User = new User;
+        $user = null;
 
         $recovery = $request->recovery;
 
@@ -501,6 +502,8 @@ class UserController extends Controller
                     \Sentry\CaptureMessage($response['danger']);
                 }
             }
+        } else {
+            $email = $user ? $user->email : null;
         }
 
         return view('auth.reset-password', [

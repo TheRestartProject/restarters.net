@@ -47,8 +47,8 @@ class WordpressGroupPushTest extends TestCase
             'events_push_to_wordpress' => true,
         ]);
         $group = Group::factory()->create([
-                                                   'wordpress_post_id' => '99999',
-                                               ]);
+                                              'approved' => true,
+                                           ]);
         $network->addGroup($group);
 
         $groupData = Group::factory()->raw();
@@ -72,6 +72,7 @@ class WordpressGroupPushTest extends TestCase
         ]);
         $group = Group::factory()->create();
         $group->wordpress_post_id = 100;
+        $group->approved = true;
         $group->save();
         $network->addGroup($group);
 

@@ -74,7 +74,7 @@ class PartyFactory extends Factory
         return $this->state(function ()
         {
             return [
-                'wordpress_post_id' => $this->faker->randomNumber(),
+                'approved' => true
             ];
         });
     }

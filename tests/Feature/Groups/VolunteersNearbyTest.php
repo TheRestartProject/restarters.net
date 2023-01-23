@@ -17,11 +17,11 @@ class VolunteersNearbyTest extends TestCase
         // Create a group.
         $groupAttributes = Group::factory()->raw();
         $groupAttributes['name'] = 'Lancaster Fixers';
-        $groupAttributes['wordpress_post_id'] = '99999';
+        $groupAttributes['approved'] = true;
         $group = Group::factory()->create([
                                                    'latitude' => 51.5073510,
                                                    'longitude' => -0.1277584,
-                                                   'wordpress_post_id' => '99999',
+                                                   'approved' => true,
                                                ]);
 
         // Create two users nearby

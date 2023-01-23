@@ -21,8 +21,8 @@ class JoinEventTest extends TestCase
         $this->withoutExceptionHandling();
 
         $group = Group::factory()->create([
-                                                   'wordpress_post_id' => '99999'
-                                               ]);
+                                              'approved' => true
+                                           ]);
         $event = Party::factory()->create(['group' => $group->idgroups]);
 
         $user = User::factory()->restarter()->create();

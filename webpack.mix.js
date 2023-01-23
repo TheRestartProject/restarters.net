@@ -17,7 +17,7 @@ mix.webpackConfig({
             resourceRegExp: /^codemirror$/
         }),
         // Build a JS translation file that corresponds to our PHP lang/ folder.
-        new WebpackShellPlugin({onBuildStart:['php artisan lang:js --no-lib --quiet resources/js/translations.js'], onBuildEnd:['php artisan translations:check']})
+        new WebpackShellPlugin({onBuildStart:['php artisan lang:js --no-lib resources/js/translations.js'], onBuildEnd:['php artisan translations:check']})
     ]
 });
 /*

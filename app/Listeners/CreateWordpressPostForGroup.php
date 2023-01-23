@@ -41,8 +41,10 @@ class CreateWordpressPostForGroup
             return;
         }
 
+        $group->approved = true;
+        $group->save();
+
         if (! $group->eventsShouldPushToWordpress()) {
-            $group->update(['wordpress_post_id' => '99999']);
             Log::info('Approved - but groups in this network are not published to WordPress');
 
             return;
