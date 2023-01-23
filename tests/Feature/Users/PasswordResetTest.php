@@ -58,6 +58,10 @@ class PasswordResetTest extends TestCase
 
         $restarter->refresh();
 
+        // Get the reset page - should see corresponding email.
+        $response = $this->get ('/user/reset?recovery=' . $restarter->recovery);
+        $response->assertSee($restarter->email);
+
         // Invalid code
         $response = $this->post('/user/reset', [
             'recovery' => '',
