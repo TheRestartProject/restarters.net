@@ -23,8 +23,13 @@ class ExportTest extends TestCase
     {
         $network = Network::factory()->create();
 
-        $host = User::factory()->administrator()->create();
-        $user = User::factory()->states($role)->create();
+        $admin = User::factory()->administrator()->create();
+
+        switch ($role) {
+            case Role::ADMINISTRATOR: $user = User::factory()->administrator()->create(); break;
+            case Role::NETWORK_COORDINATOR: $user = User::factory()->networkCoordinator()->create(); break;
+            case Role::HOST: $user = User::factory()->host()->create(); break;
+        }
 
         if ($role == 'NetworkCoordinator') {
             $network->addCoordinator($user);
