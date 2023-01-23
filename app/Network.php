@@ -55,9 +55,8 @@ class Network extends Model
 
     public function sizedLogo($size)
     {
-        // Network logos are not currently sized.
-        #$logo = preg_replace('/\\.([^.\\s]{3,4})$/', "-$size.$1", $this->logo);
-        return $this->logo;
+        $logo = preg_replace('/\\.([^.\\s]{3,4})$/', "-$size.$1", $this->logo);
+        return $logo;
     }
 
     public function groupsNotIn()

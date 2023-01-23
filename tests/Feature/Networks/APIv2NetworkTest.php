@@ -48,8 +48,8 @@ class APIv2NetworkTest extends TestCase
         $network = Network::first();
         self::assertNotNull($network);
 
-        // Ensure we have a logo to test retrieval.
-        $network->logo = '1590591632bedc48025b738e87fe674cf030e8c953ccdd91e914597.png';
+        // Ensure we have a logo to test retrieval.  We store them in a network_logos subfolder.
+        $network->logo = 'network_logos/1590591632bedc48025b738e87fe674cf030e8c953ccdd91e914597.png';
         $network->save();
 
         $response = $this->get('/api/v2/networks/' . $network->id);
@@ -59,9 +59,20 @@ class APIv2NetworkTest extends TestCase
         $this->assertEquals($network->name, $json['name']);
         $this->assertEquals($network->description, $json['description']);
         $this->assertEquals($network->website, $json['website']);
-        $this->assertStringEndsWith('/network_logos/' . $network->logo, $json['logo']);
+        $this->assertStringEndsWith('/uploads/' . $network->logo, $json['logo']);
         $this->assertTrue(array_key_exists('stats', $json));
         $this->assertTrue(array_key_exists('default_language', $json));
+
+        $response = $this->get('/api/v2/networks');
+        $response->assertSuccessful();
+        $json = json_decode($response->getContent(), true)['data'];
+
+        foreach ($json as $n) {
+            if ($n['id'] == $network->id) {
+                $this->assertStringEndsWith('/uploads/' . $network->logo, $n['logo']);
+                break;
+            }
+        }
     }
 
     /**
