@@ -14,10 +14,11 @@
         }
     ],
     "require": {
-        "php": "^7.2.5|^8.0",
-        "illuminate/contracts": "^6.0",
-        "illuminate/pipeline": "^6.0",
-        "illuminate/support": "^6.0"
+        "php": "^8.0.2",
+        "illuminate/collections": "^9.0",
+        "illuminate/contracts": "^9.0",
+        "illuminate/pipeline": "^9.0",
+        "illuminate/support": "^9.0"
     },
     "autoload": {
         "psr-4": {
@@ -26,8 +27,11 @@
     },
     "extra": {
         "branch-alias": {
-            "dev-master": "6.x-dev"
+            "dev-master": "9.x-dev"
         }
+    },
+    "suggest": {
+        "illuminate/queue": "Required to use closures when chaining jobs (^7.0)."
     },
     "config": {
         "sort-packages": true

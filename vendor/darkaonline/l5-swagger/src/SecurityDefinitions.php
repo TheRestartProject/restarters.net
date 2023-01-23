@@ -2,70 +2,71 @@
 
 namespace L5Swagger;
 
+use Illuminate\Contracts\Filesystem\FileNotFoundException;
+use Illuminate\Filesystem\Filesystem;
 use Illuminate\Support\Collection;
 
 class SecurityDefinitions
 {
     /**
+     * @var array
+     */
+    protected $securitySchemesConfig;
+
+    /**
+     * @var array
+     */
+    protected $securityConfig;
+
+    /**
+     * SecurityDefinitions constructor.
+     *
+     * @param  array  $securitySchemesConfig
+     * @param  array  $securityConfig
+     */
+    public function __construct(array $securitySchemesConfig = [], array $securityConfig = [])
+    {
+        $this->securitySchemesConfig = $securitySchemesConfig;
+        $this->securityConfig = $securityConfig;
+    }
+
+    /**
      * Reads in the l5-swagger configuration and appends security settings to documentation.
      *
-     * @param string $filename The path to the generated json documentation
+     * @param  string  $filename  The path to the generated json documentation
+     *
+     * @throws FileNotFoundException
      */
-    public function generate($filename)
+    public function generate(string $filename): void
     {
-        $securityConfig = config('l5-swagger.security', []);
+        $fileSystem = new Filesystem();
 
-        if (is_array($securityConfig) && ! empty($securityConfig)) {
-            $documentation = collect(
-                json_decode(file_get_contents($filename))
-            );
+        $documentation = collect(
+            json_decode($fileSystem->get($filename))
+        );
 
-            $openApi3 = version_compare(config('l5-swagger.swagger_version'), '3.0', '>=');
-
-            $documentation = $openApi3 ?
-                $this->generateOpenApi($documentation, $securityConfig) :
-                $this->generateSwaggerApi($documentation, $securityConfig);
-
-            file_put_contents(
-                $filename,
-                $documentation->toJson(JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE)
-            );
+        if (is_array($this->securitySchemesConfig) && ! empty($this->securitySchemesConfig)) {
+            $documentation = $this->injectSecuritySchemes($documentation, $this->securitySchemesConfig);
         }
+
+        if (is_array($this->securityConfig) && ! empty($this->securityConfig)) {
+            $documentation = $this->injectSecurity($documentation, $this->securityConfig);
+        }
+
+        $fileSystem->put(
+            $filename,
+            $documentation->toJson(JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE)
+        );
     }
 
     /**
-     * Inject security settings for Swagger 1 & 2.
+     * Inject security schemes settings.
      *
-     * @param Collection $documentation The parse json
-     * @param array $securityConfig The security settings from l5-swagger
-     *
+     * @param  Collection  $documentation  The parse json
+     * @param  array  $config  The securityScheme settings from l5-swagger
      * @return Collection
      */
-    public function generateSwaggerApi(Collection $documentation, array $securityConfig)
-    {
-        $securityDefinitions = collect();
-        if ($documentation->has('securityDefinitions')) {
-            $securityDefinitions = collect($documentation->get('securityDefinitions'));
-        }
-
-        foreach ($securityConfig as $key => $cfg) {
-            $securityDefinitions->offsetSet($key, self::arrayToObject($cfg));
-        }
-
-        $documentation->offsetSet('securityDefinitions', $securityDefinitions);
-
-        return $documentation;
-    }
-
-    /**
-     * Inject security settings for OpenApi 3.
-     *
-     * @param Collection $documentation The parse json
-     * @param array $securityConfig The security settings from l5-swagger
-     *
-     * @return Collection
-     */
-    public function generateOpenApi(Collection $documentation, array $securityConfig)
+    protected function injectSecuritySchemes(Collection $documentation, array $config): Collection
     {
         $components = collect();
         if ($documentation->has('components')) {
@@ -77,8 +78,8 @@ class SecurityDefinitions
             $securitySchemes = collect($components->get('securitySchemes'));
         }
 
-        foreach ($securityConfig as $key => $cfg) {
-            $securitySchemes->offsetSet($key, self::arrayToObject($cfg));
+        foreach ($config as $key => $cfg) {
+            $securitySchemes->offsetSet($key, $this->arrayToObject($cfg));
         }
 
         $components->offsetSet('securitySchemes', $securitySchemes);
@@ -89,13 +90,39 @@ class SecurityDefinitions
     }
 
     /**
+     * Inject security settings.
+     *
+     * @param  Collection  $documentation  The parse json
+     * @param  array  $config  The security settings from l5-swagger
+     * @return Collection
+     */
+    protected function injectSecurity(Collection $documentation, array $config): Collection
+    {
+        $security = collect();
+        if ($documentation->has('security')) {
+            $security = collect($documentation->get('security'));
+        }
+
+        foreach ($config as $key => $cfg) {
+            if (! empty($cfg)) {
+                $security->put($key, $this->arrayToObject($cfg));
+            }
+        }
+
+        if ($security->count()) {
+            $documentation->offsetSet('security', $security);
+        }
+
+        return $documentation;
+    }
+
+    /**
      * Converts an array to an object.
      *
      * @param $array
-     *
      * @return object
      */
-    public static function arrayToObject($array)
+    protected function arrayToObject($array)
     {
         return json_decode(json_encode($array));
     }

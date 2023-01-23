@@ -3,15 +3,17 @@
 namespace Illuminate\Queue;
 
 use Illuminate\Contracts\Queue\Job as JobContract;
+use InvalidArgumentException;
+use Throwable;
 
 trait InteractsWithQueue
 {
     /**
      * The underlying queue job instance.
      *
-     * @var \Illuminate\Contracts\Queue\Job
+     * @var \Illuminate\Contracts\Queue\Job|null
      */
-    protected $job;
+    public $job;
 
     /**
      * Get the number of times the job has been attempted.
@@ -43,13 +45,17 @@ trait InteractsWithQueue
      */
     public function fail($exception = null)
     {
-        if ($this->job) {
-            $this->job->fail($exception);
+        if ($exception instanceof Throwable || is_null($exception)) {
+            if ($this->job) {
+                return $this->job->fail($exception);
+            }
+        } else {
+            throw new InvalidArgumentException('The fail method requires an instance of Throwable.');
         }
     }
 
     /**
-     * Release the job back into the queue.
+     * Release the job back into the queue after (n) seconds.
      *
      * @param  int  $delay
      * @return void

@@ -176,6 +176,14 @@ final class Scope
     }
 
     /**
+     * Get the user context.
+     */
+    public function getUser(): ?UserDataBag
+    {
+        return $this->user;
+    }
+
+    /**
      * Merges the given data in the user context.
      *
      * @param array<string, mixed>|UserDataBag $user The user data
@@ -408,12 +416,8 @@ final class Scope
      */
     public function getTransaction(): ?Transaction
     {
-        $span = $this->span;
-
-        if (null !== $span && null !== $span->getSpanRecorder() && !empty($span->getSpanRecorder()->getSpans())) {
-            // The first span in the recorder is considered to be a Transaction
-            /** @var Transaction */
-            return $span->getSpanRecorder()->getSpans()[0];
+        if (null !== $this->span) {
+            return $this->span->getTransaction();
         }
 
         return null;

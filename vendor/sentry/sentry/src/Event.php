@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Sentry;
 
-use Jean85\PrettyVersions;
 use Sentry\Context\OsContext;
 use Sentry\Context\RuntimeContext;
 use Sentry\Tracing\Span;
@@ -146,6 +145,14 @@ final class Event
     private $stacktrace;
 
     /**
+     * A place to stash data which is needed at some point in the SDK's
+     * event processing pipeline but which shouldn't get sent to Sentry.
+     *
+     * @var array<string, mixed>
+     */
+    private $sdkMetadata = [];
+
+    /**
      * @var string The Sentry SDK identifier
      */
     private $sdkIdentifier = Client::SDK_IDENTIFIER;
@@ -153,7 +160,7 @@ final class Event
     /**
      * @var string The Sentry SDK version
      */
-    private $sdkVersion;
+    private $sdkVersion = Client::SDK_VERSION;
 
     /**
      * @var EventType The type of the Event
@@ -164,7 +171,6 @@ final class Event
     {
         $this->id = $eventId ?? EventId::generate();
         $this->timestamp = microtime(true);
-        $this->sdkVersion = PrettyVersions::getVersion('sentry/sentry')->getPrettyVersion();
         $this->type = $eventType;
     }
 
@@ -671,6 +677,37 @@ final class Event
     public function getType(): EventType
     {
         return $this->type;
+    }
+
+    /**
+     * Sets the SDK metadata with the given name.
+     *
+     * @param string $name The name that uniquely identifies the SDK metadata
+     * @param mixed  $data The data of the SDK metadata
+     */
+    public function setSdkMetadata(string $name, $data): void
+    {
+        $this->sdkMetadata[$name] = $data;
+    }
+
+    /**
+     * Gets the SDK metadata.
+     *
+     * @return mixed
+     *
+     * @psalm-template T of string|null
+     *
+     * @psalm-param T $name
+     *
+     * @psalm-return (T is string ? mixed : array<string, mixed>|null)
+     */
+    public function getSdkMetadata(?string $name = null)
+    {
+        if (null !== $name) {
+            return $this->sdkMetadata[$name] ?? null;
+        }
+
+        return $this->sdkMetadata;
     }
 
     /**

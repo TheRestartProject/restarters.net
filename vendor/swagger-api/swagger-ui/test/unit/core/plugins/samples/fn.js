@@ -153,6 +153,23 @@ describe("sampleFromSchema", () => {
     expect(sampleFromSchema(definition, { includeReadOnly: true })).toEqual(expected)
   })
 
+
+
+  it("regex pattern test", function () {
+    let definition = {
+      type: "object",
+      properties: {
+        macAddress: {
+          type: "string",
+          pattern: "^([0-9A-Fa-f]{2}[:-]){5}([0-9A-Fa-f]{2})$"
+        }
+      }
+    }
+    const resp = sampleFromSchema(definition)
+
+    expect(new RegExp("^([0-9A-Fa-f]{2}[:-]){5}([0-9A-Fa-f]{2})$", "g").test(resp.macAddress)).toBe(true)
+  })
+
   it("returns object without deprecated fields for parameter", function () {
     let definition = {
       type: "object",
@@ -586,6 +603,133 @@ describe("sampleFromSchema", () => {
 
       expect(sampleFromSchema(definition)).toEqual(expected)
     })
+  })
+
+  describe("discriminator mapping example", () => {
+    it("returns an example where discriminated field is equal to mapping value", () => {
+      let definition = {
+        "type": "array",
+        "items": {
+          "oneOf": [
+            {
+              "required": [
+                "type"
+              ],
+              "type": "object",
+              "properties": {
+                "type": {
+                  "type": "string",
+                  "enum": [
+                    "TYPE1",
+                    "TYPE2"
+                  ]
+                }
+              },
+              "discriminator": {
+                "propertyName": "type",
+                "mapping": {
+                  "TYPE1": "#/components/schemas/FirstDto",
+                  "TYPE2": "#/components/schemas/SecondDto"
+                }
+              },
+              "$$ref": "examples/swagger-config.yaml#/components/schemas/FirstDto"
+            },
+            {
+              "required": [
+                "type"
+              ],
+              "type": "object",
+              "properties": {
+                "type": {
+                  "type": "string",
+                  "enum": [
+                    "TYPE1",
+                    "TYPE2"
+                  ]
+                }
+              },
+              "discriminator": {
+                "propertyName": "type",
+                "mapping": {
+                  "TYPE1": "#/components/schemas/FirstDto",
+                  "TYPE2": "#/components/schemas/SecondDto"
+                }
+              },
+              "$$ref": "examples/swagger-config.yaml#/components/schemas/SecondDto"
+            }
+          ]
+        }
+      }
+
+      let expected = [
+        {
+          "type": "TYPE1"
+        }, {
+          "type": "TYPE2"
+        }
+      ]
+
+      expect(sampleFromSchema(definition)).toEqual(expected)
+    })
+
+    it("should not throw if expected $$ref is missing, and should fallback to default behavior", () => {
+      let definition = {
+        "type": "array",
+        "items": {
+          "oneOf": [
+            {
+              "required": [
+                "type"
+              ],
+              "type": "object",
+              "properties": {
+                "type": {
+                  "type": "string",
+                  "enum": [
+                    "TYPE1",
+                    "TYPE2"
+                  ]
+                }
+              },
+              "discriminator": {
+                "propertyName": "type",
+                "mapping": {
+                  "TYPE1": "#/components/schemas/FirstDto",
+                  "TYPE2": "#/components/schemas/SecondDto"
+                }
+              },
+            },
+            {
+              "required": [
+                "type"
+              ],
+              "type": "object",
+              "properties": {
+                "type": {
+                  "type": "string",
+                  "enum": [
+                    "TYPE1",
+                    "TYPE2"
+                  ]
+                }
+              },
+              "discriminator": {
+                "propertyName": "type",
+                "mapping": {
+                  "TYPE1": "#/components/schemas/FirstDto",
+                  "TYPE2": "#/components/schemas/SecondDto"
+                }
+              },
+            }
+          ]
+        }
+      }
+
+      expect(() => {
+          sampleFromSchema(definition)
+      }).not.toThrow()
+    })
+
   })
 
   it("should use overrideExample when defined", () => {

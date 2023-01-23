@@ -21,11 +21,23 @@ class DiscoverEvents
      */
     public static function within($listenerPath, $basePath)
     {
-        return collect(static::getListenerEvents(
+        $listeners = collect(static::getListenerEvents(
             (new Finder)->files()->in($listenerPath), $basePath
-        ))->mapToDictionary(function ($event, $listener) {
-            return [$event => $listener];
-        })->all();
+        ));
+
+        $discoveredEvents = [];
+
+        foreach ($listeners as $listener => $events) {
+            foreach ($events as $event) {
+                if (! isset($discoveredEvents[$event])) {
+                    $discoveredEvents[$event] = [];
+                }
+
+                $discoveredEvents[$event][] = $listener;
+            }
+        }
+
+        return $discoveredEvents;
     }
 
     /**
@@ -53,13 +65,13 @@ class DiscoverEvents
             }
 
             foreach ($listener->getMethods(ReflectionMethod::IS_PUBLIC) as $method) {
-                if (! Str::is('handle*', $method->name) ||
+                if ((! Str::is('handle*', $method->name) && ! Str::is('__invoke', $method->name)) ||
                     ! isset($method->getParameters()[0])) {
                     continue;
                 }
 
                 $listenerEvents[$listener->name.'@'.$method->name] =
-                                Reflector::getParameterClassName($method->getParameters()[0]);
+                                Reflector::getParameterClassNames($method->getParameters()[0]);
             }
         }
 

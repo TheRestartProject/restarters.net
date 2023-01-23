@@ -2,19 +2,55 @@
 	MIT License http://www.opensource.org/licenses/mit-license.php
 	Author Tobias Koppers @sokra
 */
+
 "use strict";
 
-class RemoveEmptyChunksPlugin {
+const { STAGE_BASIC, STAGE_ADVANCED } = require("../OptimizationStages");
 
+/** @typedef {import("../Chunk")} Chunk */
+/** @typedef {import("../Compiler")} Compiler */
+
+class RemoveEmptyChunksPlugin {
+	/**
+	 * Apply the plugin
+	 * @param {Compiler} compiler the compiler instance
+	 * @returns {void}
+	 */
 	apply(compiler) {
-		compiler.plugin("compilation", (compilation) => {
-			compilation.plugin(["optimize-chunks-basic", "optimize-extracted-chunks-basic"], (chunks) => {
-				chunks.filter((chunk) => chunk.isEmpty() && !chunk.hasRuntime() && !chunk.hasEntryModule())
-					.forEach((chunk) => {
-						chunk.remove("empty");
-						chunks.splice(chunks.indexOf(chunk), 1);
-					});
-			});
+		compiler.hooks.compilation.tap("RemoveEmptyChunksPlugin", compilation => {
+			/**
+			 * @param {Iterable<Chunk>} chunks the chunks array
+			 * @returns {void}
+			 */
+			const handler = chunks => {
+				const chunkGraph = compilation.chunkGraph;
+				for (const chunk of chunks) {
+					if (
+						chunkGraph.getNumberOfChunkModules(chunk) === 0 &&
+						!chunk.hasRuntime() &&
+						chunkGraph.getNumberOfEntryModules(chunk) === 0
+					) {
+						compilation.chunkGraph.disconnectChunk(chunk);
+						compilation.chunks.delete(chunk);
+					}
+				}
+			};
+
+			// TODO do it once
+			compilation.hooks.optimizeChunks.tap(
+				{
+					name: "RemoveEmptyChunksPlugin",
+					stage: STAGE_BASIC
+				},
+				handler
+			);
+			compilation.hooks.optimizeChunks.tap(
+				{
+					name: "RemoveEmptyChunksPlugin",
+					stage: STAGE_ADVANCED
+				},
+				handler
+			);
 		});
 	}
 }

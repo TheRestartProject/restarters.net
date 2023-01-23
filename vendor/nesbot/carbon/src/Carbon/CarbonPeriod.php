@@ -24,11 +24,13 @@ use Carbon\Exceptions\UnreachableException;
 use Carbon\Traits\IntervalRounding;
 use Carbon\Traits\Mixin;
 use Carbon\Traits\Options;
+use Carbon\Traits\ToStringFormat;
 use Closure;
 use Countable;
 use DateInterval;
 use DatePeriod;
 use DateTime;
+use DateTimeImmutable;
 use DateTimeInterface;
 use DateTimeZone;
 use InvalidArgumentException;
@@ -174,6 +176,7 @@ class CarbonPeriod implements Iterator, Countable, JsonSerializable
         Mixin::mixin as baseMixin;
     }
     use Options;
+    use ToStringFormat;
 
     /**
      * Built-in filter for limit by recurrences.
@@ -1458,13 +1461,21 @@ class CarbonPeriod implements Iterator, Countable, JsonSerializable
      */
     public function toString()
     {
+        $format = $this->localToStringFormat ?? static::$toStringFormat;
+
+        if ($format instanceof Closure) {
+            return $format($this);
+        }
+
         $translator = ([$this->dateClass, 'getTranslator'])();
 
         $parts = [];
 
-        $format = !$this->startDate->isStartOfDay() || ($this->endDate && !$this->endDate->isStartOfDay())
-            ? 'Y-m-d H:i:s'
-            : 'Y-m-d';
+        $format = $format ?? (
+            !$this->startDate->isStartOfDay() || ($this->endDate && !$this->endDate->isStartOfDay())
+                ? 'Y-m-d H:i:s'
+                : 'Y-m-d'
+        );
 
         if ($this->recurrences !== null) {
             $parts[] = $this->translate('period_recurrences', [], $this->recurrences, $translator);
@@ -1507,9 +1518,9 @@ class CarbonPeriod implements Iterator, Countable, JsonSerializable
         if (!method_exists($className, 'instance')) {
             if (is_a($className, DatePeriod::class, true)) {
                 return new $className(
-                    $this->getStartDate(),
+                    $this->rawDate($this->getStartDate()),
                     $this->getDateInterval(),
-                    $this->getEndDate() ? $this->getIncludedEndDate() : $this->getRecurrences(),
+                    $this->getEndDate() ? $this->rawDate($this->getIncludedEndDate()) : $this->getRecurrences(),
                     $this->isStartExcluded() ? DatePeriod::EXCLUDE_START_DATE : 0
                 );
             }
@@ -1674,54 +1685,80 @@ class CarbonPeriod implements Iterator, Countable, JsonSerializable
             return $roundedValue;
         }
 
-        $first = \count($parameters) >= 1 ? $parameters[0] : null;
-        $second = \count($parameters) >= 2 ? $parameters[1] : null;
-
         switch ($method) {
             case 'start':
             case 'since':
-                return $this->setStartDate($first, $second);
+                self::setDefaultParameters($parameters, [
+                    [0, 'date', null],
+                ]);
+
+                return $this->setStartDate(...$parameters);
 
             case 'sinceNow':
-                return $this->setStartDate(new Carbon(), $first);
+                return $this->setStartDate(new Carbon(), ...$parameters);
 
             case 'end':
             case 'until':
-                return $this->setEndDate($first, $second);
+                self::setDefaultParameters($parameters, [
+                    [0, 'date', null],
+                ]);
+
+                return $this->setEndDate(...$parameters);
 
             case 'untilNow':
-                return $this->setEndDate(new Carbon(), $first);
+                return $this->setEndDate(new Carbon(), ...$parameters);
 
             case 'dates':
             case 'between':
-                return $this->setDates($first, $second);
+                self::setDefaultParameters($parameters, [
+                    [0, 'start', null],
+                    [1, 'end', null],
+                ]);
+
+                return $this->setDates(...$parameters);
 
             case 'recurrences':
             case 'times':
-                return $this->setRecurrences($first);
+                self::setDefaultParameters($parameters, [
+                    [0, 'recurrences', null],
+                ]);
+
+                return $this->setRecurrences(...$parameters);
 
             case 'options':
-                return $this->setOptions($first);
+                self::setDefaultParameters($parameters, [
+                    [0, 'options', null],
+                ]);
+
+                return $this->setOptions(...$parameters);
 
             case 'toggle':
-                return $this->toggleOptions($first, $second);
+                self::setDefaultParameters($parameters, [
+                    [0, 'options', null],
+                ]);
+
+                return $this->toggleOptions(...$parameters);
 
             case 'filter':
             case 'push':
-                return $this->addFilter($first, $second);
+                return $this->addFilter(...$parameters);
 
             case 'prepend':
-                return $this->prependFilter($first, $second);
+                return $this->prependFilter(...$parameters);
 
             case 'filters':
-                return $this->setFilters($first ?: []);
+                self::setDefaultParameters($parameters, [
+                    [0, 'filters', []],
+                ]);
+
+                return $this->setFilters(...$parameters);
 
             case 'interval':
             case 'each':
             case 'every':
             case 'step':
             case 'stepBy':
-                return $this->setDateInterval($first);
+                return $this->setDateInterval(...$parameters);
 
             case 'invert':
                 return $this->invertDateInterval();
@@ -1744,9 +1781,7 @@ class CarbonPeriod implements Iterator, Countable, JsonSerializable
                 return $this->setDateInterval((
                     // Override default P1D when instantiating via fluent setters.
                     [$this->isDefaultInterval ? new CarbonInterval('PT0S') : $this->dateInterval, $method]
-                )(
-                    \count($parameters) === 0 ? 1 : $first
-                ));
+                )(...$parameters));
         }
 
         if ($this->localStrictModeEnabled ?? Carbon::isStrictModeEnabled()) {
@@ -2617,5 +2652,35 @@ class CarbonPeriod implements Iterator, Countable, JsonSerializable
     private function isInfiniteDate($date): bool
     {
         return $date instanceof CarbonInterface && ($date->isEndOfTime() || $date->isStartOfTime());
+    }
+
+    private function rawDate($date): ?DateTimeInterface
+    {
+        if ($date === false || $date === null) {
+            return null;
+        }
+
+        if ($date instanceof CarbonInterface) {
+            return $date->isMutable()
+                ? $date->toDateTime()
+                : $date->toDateTimeImmutable();
+        }
+
+        if (\in_array(\get_class($date), [DateTime::class, DateTimeImmutable::class], true)) {
+            return $date;
+        }
+
+        $class = $date instanceof DateTime ? DateTime::class : DateTimeImmutable::class;
+
+        return new $class($date->format('Y-m-d H:i:s.u'), $date->getTimezone());
+    }
+
+    private static function setDefaultParameters(array &$parameters, array $defaults): void
+    {
+        foreach ($defaults as [$index, $name, $value]) {
+            if (!\array_key_exists($index, $parameters) && !\array_key_exists($name, $parameters)) {
+                $parameters[$index] = $value;
+            }
+        }
     }
 }

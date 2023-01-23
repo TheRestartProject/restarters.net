@@ -2,6 +2,26 @@
 
 ## Unreleased
 
+## 2.14.2
+
+- Fix extracting command input resulting in errors when calling Artisan commands programatically with `null` as an argument value (#589)
+
+## 2.14.1
+
+- Fix not setting the correct SDK ID and version when running the `sentry:test` command (#582)
+
+## 2.14.0
+
+- Fix not listening to queue events because `QueueManager` is registered as `queue` in the container and not by it's class name (#568)
+- Fix status code not populated on transaction if response did not inherit from `Illuminate\Http\Response` like `Illuminate\Http\JsonResponse` (#573)
+- Align Span Operations with new spec (#574)
+- Fix broken `SetRequestMiddleware` on Laravel < 6.0 (#575)
+- Also extract the authenticated user `email` and `username` attributes if available (#577)
+
+## 2.13.0
+
+- Only catch `BindingResolutionException` when trying to get the PSR-7 request object from the container
+
 ## 2.12.1
 
 - Fix incorrect `release` and `environment` values when using the `sentry:test` command

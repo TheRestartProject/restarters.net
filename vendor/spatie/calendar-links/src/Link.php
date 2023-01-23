@@ -42,7 +42,7 @@ class Link
         $this->title = $title;
         $this->allDay = $allDay;
 
-        if ($to < $from) {
+        if ($from > $to) {
             throw InvalidLink::negativeDateRange($from, $to);
         }
 
@@ -114,6 +114,10 @@ class Link
         return $this->formatWith(new Google());
     }
 
+    /**
+     * @param array<non-empty-string, non-empty-string> $options
+     * @return string
+     */
     public function ics(array $options = []): string
     {
         return $this->formatWith(new Ics($options));

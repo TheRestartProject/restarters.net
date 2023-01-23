@@ -25,7 +25,7 @@ import cssEscape from "css.escape"
 import getParameterSchema from "../helpers/get-parameter-schema"
 import randomBytes from "randombytes"
 import shaJs from "sha.js"
-import YAML from "js-yaml"
+import YAML, { JSON_SCHEMA } from "js-yaml"
 
 
 const DEFAULT_RESPONSE_KEY = "default"
@@ -605,18 +605,19 @@ export const validateParam = (param, value, { isOAS3 = false, bypassRequiredChec
 }
 
 const getXmlSampleSchema = (schema, config, exampleOverride) => {
-  if (schema && (!schema.xml || !schema.xml.name)) {
-    schema.xml = schema.xml || {}
-
+  if (schema && !schema.xml) {
+    schema.xml = {}
+  }
+  if (schema && !schema.xml.name) {
+    if (!schema.$$ref && (schema.type || schema.items || schema.properties || schema.additionalProperties)) {
+      return "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n<!-- XML example cannot be generated; root element name is undefined -->"
+    }
     if (schema.$$ref) {
       let match = schema.$$ref.match(/\S*\/(\S+)$/)
       schema.xml.name = match[1]
-    } else if (schema.type || schema.items || schema.properties || schema.additionalProperties) {
-      return "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n<!-- XML example cannot be generated; root element name is undefined -->"
-    } else {
-      return null
     }
   }
+
   return memoizedCreateXMLExample(schema, config, exampleOverride)
 }
 
@@ -651,7 +652,7 @@ const getYamlSampleSchema = (schema, config, contentType, exampleOverride) => {
     yamlString = YAML.dump(YAML.load(jsonExample), {
 
       lineWidth: -1 // don't generate line folds
-    })
+    }, { schema: JSON_SCHEMA })
     if(yamlString[yamlString.length - 1] === "\n") {
       yamlString = yamlString.slice(0, yamlString.length - 1)
     }

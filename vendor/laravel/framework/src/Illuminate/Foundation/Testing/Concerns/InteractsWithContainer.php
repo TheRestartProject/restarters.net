@@ -4,10 +4,19 @@ namespace Illuminate\Foundation\Testing\Concerns;
 
 use Closure;
 use Illuminate\Foundation\Mix;
+use Illuminate\Foundation\Vite;
+use Illuminate\Support\HtmlString;
 use Mockery;
 
 trait InteractsWithContainer
 {
+    /**
+     * The original Vite handler.
+     *
+     * @var \Illuminate\Foundation\Vite|null
+     */
+    protected $originalVite;
+
     /**
      * The original Laravel Mix handler.
      *
@@ -78,6 +87,100 @@ trait InteractsWithContainer
     }
 
     /**
+     * Instruct the container to forget a previously mocked / spied instance of an object.
+     *
+     * @param  string  $abstract
+     * @return $this
+     */
+    protected function forgetMock($abstract)
+    {
+        $this->app->forgetInstance($abstract);
+
+        return $this;
+    }
+
+    /**
+     * Register an empty handler for Vite in the container.
+     *
+     * @return $this
+     */
+    protected function withoutVite()
+    {
+        if ($this->originalVite == null) {
+            $this->originalVite = app(Vite::class);
+        }
+
+        $this->swap(Vite::class, new class
+        {
+            public function __invoke()
+            {
+                return '';
+            }
+
+            public function __call($name, $arguments)
+            {
+                return '';
+            }
+
+            public function __toString()
+            {
+                return '';
+            }
+
+            public function useIntegrityKey()
+            {
+                return $this;
+            }
+
+            public function useBuildDirectory()
+            {
+                return $this;
+            }
+
+            public function useHotFile()
+            {
+                return $this;
+            }
+
+            public function withEntryPoints()
+            {
+                return $this;
+            }
+
+            public function useScriptTagAttributes()
+            {
+                return $this;
+            }
+
+            public function useStyleTagAttributes()
+            {
+                return $this;
+            }
+
+            public function preloadedAssets()
+            {
+                return [];
+            }
+        });
+
+        return $this;
+    }
+
+    /**
+     * Restore Vite in the container.
+     *
+     * @return $this
+     */
+    protected function withVite()
+    {
+        if ($this->originalVite) {
+            $this->app->instance(Vite::class, $this->originalVite);
+        }
+
+        return $this;
+    }
+
+    /**
      * Register an empty handler for Laravel Mix in the container.
      *
      * @return $this
@@ -89,14 +192,14 @@ trait InteractsWithContainer
         }
 
         $this->swap(Mix::class, function () {
-            return '';
+            return new HtmlString('');
         });
 
         return $this;
     }
 
     /**
-     * Register an empty handler for Laravel Mix in the container.
+     * Restore Laravel Mix in the container.
      *
      * @return $this
      */

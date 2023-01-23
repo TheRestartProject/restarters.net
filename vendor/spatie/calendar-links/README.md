@@ -7,6 +7,8 @@
 [![Total Downloads](https://img.shields.io/packagist/dt/spatie/calendar-links.svg?style=flat-square)](https://packagist.org/packages/spatie/calendar-links)
 ![Test](https://github.com/spatie/calendar-links/workflows/Test/badge.svg)
 [![Quality Score](https://img.shields.io/scrutinizer/g/spatie/calendar-links.svg?style=flat-square)](https://scrutinizer-ci.com/g/spatie/calendar-links)
+![Type coverage](https://shepherd.dev/github/spatie/calendar-links/coverage.svg)
+![Psalm level](https://shepherd.dev/github/spatie/calendar-links/level.svg)
 
 
 Using this package you can generate links to add events to calendar systems. Here's a quick example:
@@ -79,7 +81,7 @@ echo $link->formatWith(new \Your\Generator());
 
 ## Package principles
 
-1. it should produce a small output (too keep pagesize small)
+1. it should produce a small output (to keep pagesize small)
 2. it should be fast (no any external heavy dependencies)
 3. all features should be supported by at least 2 generators (different services have different features)
 

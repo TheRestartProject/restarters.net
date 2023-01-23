@@ -4,7 +4,10 @@ namespace Illuminate\Foundation\Console;
 
 use Exception;
 use Illuminate\Console\Command;
+use Illuminate\Foundation\Events\MaintenanceModeDisabled;
+use Symfony\Component\Console\Attribute\AsCommand;
 
+#[AsCommand(name: 'up')]
 class UpCommand extends Command
 {
     /**
@@ -13,6 +16,17 @@ class UpCommand extends Command
      * @var string
      */
     protected $name = 'up';
+
+    /**
+     * The name of the console command.
+     *
+     * This name is used to identify the command during lazy loading.
+     *
+     * @var string|null
+     *
+     * @deprecated
+     */
+    protected static $defaultName = 'up';
 
     /**
      * The console command description.
@@ -29,21 +43,30 @@ class UpCommand extends Command
     public function handle()
     {
         try {
-            if (! file_exists(storage_path('framework/down'))) {
-                $this->comment('Application is already up.');
+            if (! $this->laravel->maintenanceMode()->active()) {
+                $this->components->info('Application is already up.');
 
-                return true;
+                return 0;
             }
 
-            unlink(storage_path('framework/down'));
+            $this->laravel->maintenanceMode()->deactivate();
 
-            $this->info('Application is now live.');
+            if (is_file(storage_path('framework/maintenance.php'))) {
+                unlink(storage_path('framework/maintenance.php'));
+            }
+
+            $this->laravel->get('events')->dispatch(new MaintenanceModeDisabled());
+
+            $this->components->info('Application is now live.');
         } catch (Exception $e) {
-            $this->error('Failed to disable maintenance mode.');
-
-            $this->error($e->getMessage());
+            $this->components->error(sprintf(
+                'Failed to disable maintenance mode: %s.',
+                $e->getMessage(),
+            ));
 
             return 1;
         }
+
+        return 0;
     }
 }

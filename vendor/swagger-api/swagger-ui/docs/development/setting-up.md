@@ -5,22 +5,10 @@ Swagger UI includes a development server that provides hot module reloading and 
 ### Prerequisites
 
 - git, any version
-- NPM >=6.12.x
 
-Generally, we recommend the following guidelines from [Node.js Releases](https://nodejs.org/en/about/releases/) to only use Active LTS or Maintenance LTS releases.
-
-Current Node.js:
-- Node.js 16.x
-- NPM >=7.10.x
-
-Current Node.js Active LTS:
-- Node.js 14.x
-- NPM >=6.12.x
-
-Current Node.js Maintenance LTS:
-- Node.js >=12.4
-- NPM >= 6.12.x
-
+SwaggerUI Node.js support closely follows [Node.js Release Statuses](https://nodejs.org/en/about/releases/)
+and is only expected to work on `Current`, `Active LTS` and `Maintanenace LTS` versions of Node.js.
+SwaggerUI may also work on `Pending` or `EOL` versions of Node.js, but it's not guaranteed.
 
 ### Steps
 
@@ -32,7 +20,7 @@ Current Node.js Maintenance LTS:
 
 ### Using your own local api definition with local dev build
 
-You can specify a local file in `dev-helpers/index.html` by changing the `url` parameter. This local file MUST be located in the `dev-helpers` directory or a subdirectory. As a convenience and best practice, we recommend that you create a subdirectory, `dev-helpers/examples`, which is already specified in `.gitignore`.
+You can specify a local file in `dev-helpers/swagger-initializer.js` by changing the `url` parameter. This local file MUST be located in the `dev-helpers` directory or a subdirectory. As a convenience and best practice, we recommend that you create a subdirectory, `dev-helpers/examples`, which is already specified in `.gitignore`.
 
 replace
 ```
@@ -44,7 +32,7 @@ with
 url: "./examples/your-local-api-definition.yaml",
 ```
 
-Files in `dev-helpers` should NOT be committed to git. The exception is if you are fixing something in `index.html` or `oauth2-redirect.html`, or introducing a new support file.
+Files in `dev-helpers` should NOT be committed to git. The exception is if you are fixing something in `index.html`, `oauth2-redirect.html`, `swagger-initializer.js`, or introducing a new support file.
 
 ## Bonus points
 

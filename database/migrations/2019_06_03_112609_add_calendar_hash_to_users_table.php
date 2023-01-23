@@ -5,7 +5,7 @@ use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Str;
 
-class AddCalendarHashToUsersTable extends Migration
+return new class extends Migration
 {
     /**
      * Run the migrations.
@@ -42,4 +42,4 @@ class AddCalendarHashToUsersTable extends Migration
             $table->dropColumn('calendar_hash');
         });
     }
-}
+};

@@ -2,7 +2,7 @@ import React, { PureComponent } from "react"
 import PropTypes from "prop-types"
 import { getList } from "core/utils"
 import { getExtensions, sanitizeUrl, escapeDeepLinkPath } from "core/utils"
-import { buildUrl } from "core/utils/url"
+import { safeBuildUrl } from "core/utils/url"
 import { Iterable, List } from "immutable"
 import ImPropTypes from "react-immutable-proptypes"
 
@@ -17,6 +17,7 @@ export default class Operation extends PureComponent {
 
     toggleShown: PropTypes.func.isRequired,
     onTryoutClick: PropTypes.func.isRequired,
+    onResetClick: PropTypes.func.isRequired,
     onCancelClick: PropTypes.func.isRequired,
     onExecute: PropTypes.func.isRequired,
 
@@ -48,6 +49,7 @@ export default class Operation extends PureComponent {
       request,
       toggleShown,
       onTryoutClick,
+      onResetClick,
       onCancelClick,
       onExecute,
       fn,
@@ -82,7 +84,7 @@ export default class Operation extends PureComponent {
       schemes
     } = op
 
-    const externalDocsUrl = externalDocs ? buildUrl(externalDocs.url, specSelectors.url(), { selectedServer: oas3Selectors.selectedServer() }) : ""
+    const externalDocsUrl = externalDocs ? safeBuildUrl(externalDocs.url, specSelectors.url(), { selectedServer: oas3Selectors.selectedServer() }) : ""
     let operation = operationProps.getIn(["op"])
     let responses = operation.get("responses")
     let parameters = getList(operation, ["parameters"])
@@ -112,6 +114,8 @@ export default class Operation extends PureComponent {
 
     let onChangeKey = [ path, method ] // Used to add values to _this_ operation ( indexed by path and method )
 
+    const validationErrors = specSelectors.validationErrors([path, method])
+
     return (
         <div className={deprecated ? "opblock opblock-deprecated" : isShown ? `opblock opblock-${method} is-open` : `opblock opblock-${method}`} id={escapeDeepLinkPath(isShownKey.join("-"))} >
           <OperationSummary operationProps={operationProps} isShown={isShown} toggleShown={toggleShown} getComponent={getComponent} authActions={authActions} authSelectors={authSelectors} specPath={specPath} />
@@ -133,9 +137,11 @@ export default class Operation extends PureComponent {
                 <div className="opblock-external-docs-wrapper">
                   <h4 className="opblock-title_normal">Find more details</h4>
                   <div className="opblock-external-docs">
-                    <span className="opblock-external-docs__description">
-                      <Markdown source={ externalDocs.description } />
-                    </span>
+                    {externalDocs.description &&
+                      <span className="opblock-external-docs__description">
+                        <Markdown source={ externalDocs.description } />
+                      </span> 
+                    }
                     <Link target="_blank" className="opblock-external-docs__link" href={sanitizeUrl(externalDocsUrl)}>{externalDocsUrl}</Link>
                   </div>
                 </div> : null
@@ -148,6 +154,7 @@ export default class Operation extends PureComponent {
                   operation={operation}
                   onChangeKey={onChangeKey}
                   onTryoutClick = { onTryoutClick }
+                  onResetClick = { onResetClick }
                   onCancelClick = { onCancelClick }
                   tryItOutEnabled = { tryItOutEnabled }
                   allowTryItOut={allowTryItOut}
@@ -185,6 +192,14 @@ export default class Operation extends PureComponent {
                              specActions={ specActions }
                              currentScheme={ operationScheme } />
                   </div> : null
+              }
+
+              { !tryItOutEnabled || !allowTryItOut || validationErrors.length <= 0 ? null : <div className="validation-errors errors-wrapper">
+                  Please correct the following validation errors and try again.
+                  <ul>
+                    { validationErrors.map((error, index) => <li key={index}> { error } </li>) }
+                  </ul>
+                </div>
               }
 
             <div className={(!tryItOutEnabled || !response || !allowTryItOut) ? "execute-wrapper" : "btn-group"}>

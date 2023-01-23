@@ -126,16 +126,16 @@ export default {
     }
 }
 
-/deep/ .open-quest {
+::v-deep .open-quest {
     margin-top: 30px;
 }
 
-/deep/ h3 {
+::v-deep h3 {
     font-size: 1.1em;
     font-weight: bold;
 }
 
-/deep/ .open-quest-body {
+::v-deep .open-quest-body {
     display: grid;
     grid-template-columns: 1fr;
     grid-template-rows: auto auto;

@@ -25,7 +25,7 @@ trait GuardHelpers
     protected $provider;
 
     /**
-     * Determine if current user is authenticated. If not, throw an exception.
+     * Determine if the current user is authenticated. If not, throw an exception.
      *
      * @return \Illuminate\Contracts\Auth\Authenticatable
      *
@@ -73,7 +73,7 @@ trait GuardHelpers
     /**
      * Get the ID for the currently authenticated user.
      *
-     * @return int|null
+     * @return int|string|null
      */
     public function id()
     {
@@ -91,6 +91,18 @@ trait GuardHelpers
     public function setUser(AuthenticatableContract $user)
     {
         $this->user = $user;
+
+        return $this;
+    }
+
+    /**
+     * Forget the current user.
+     *
+     * @return $this
+     */
+    public function forgetUser()
+    {
+        $this->user = null;
 
         return $this;
     }

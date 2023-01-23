@@ -21,20 +21,17 @@ use Symfony\Component\VarDumper\Cloner\Data;
 /**
  * @author Abdellatif Ait boudad <a.aitboudad@gmail.com>
  *
- * @final since Symfony 4.4
+ * @final
  */
 class TranslationDataCollector extends DataCollector implements LateDataCollectorInterface
 {
-    private $translator;
+    private DataCollectorTranslator $translator;
 
     public function __construct(DataCollectorTranslator $translator)
     {
         $this->translator = $translator;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function lateCollect()
     {
         $messages = $this->sanitizeCollectedMessages($this->translator->getCollectedMessages());
@@ -45,53 +42,33 @@ class TranslationDataCollector extends DataCollector implements LateDataCollecto
         $this->data = $this->cloneVar($this->data);
     }
 
-    /**
-     * {@inheritdoc}
-     *
-     * @param \Throwable|null $exception
-     */
-    public function collect(Request $request, Response $response/*, \Throwable $exception = null*/)
+    public function collect(Request $request, Response $response, \Throwable $exception = null)
     {
         $this->data['locale'] = $this->translator->getLocale();
         $this->data['fallback_locales'] = $this->translator->getFallbackLocales();
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function reset()
     {
         $this->data = [];
     }
 
-    /**
-     * @return array|Data
-     */
-    public function getMessages()
+    public function getMessages(): array|Data
     {
         return $this->data['messages'] ?? [];
     }
 
-    /**
-     * @return int
-     */
-    public function getCountMissings()
+    public function getCountMissings(): int
     {
         return $this->data[DataCollectorTranslator::MESSAGE_MISSING] ?? 0;
     }
 
-    /**
-     * @return int
-     */
-    public function getCountFallbacks()
+    public function getCountFallbacks(): int
     {
         return $this->data[DataCollectorTranslator::MESSAGE_EQUALS_FALLBACK] ?? 0;
     }
 
-    /**
-     * @return int
-     */
-    public function getCountDefines()
+    public function getCountDefines(): int
     {
         return $this->data[DataCollectorTranslator::MESSAGE_DEFINED] ?? 0;
     }
@@ -102,17 +79,14 @@ class TranslationDataCollector extends DataCollector implements LateDataCollecto
     }
 
     /**
-     * @internal since Symfony 4.2
+     * @internal
      */
     public function getFallbackLocales()
     {
         return (isset($this->data['fallback_locales']) && \count($this->data['fallback_locales']) > 0) ? $this->data['fallback_locales'] : [];
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function getName()
+    public function getName(): string
     {
         return 'translation';
     }

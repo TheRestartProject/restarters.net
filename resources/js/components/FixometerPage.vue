@@ -15,7 +15,7 @@
       </div>
     </div>
     <p>{{ __('devices.search_text') }}</p>
-    <div class="layout">
+    <div class="fp-layout">
       <FixometerFilters
           v-show="tabIndex === 0"
           :clusters="clusters"
@@ -377,7 +377,7 @@ export default {
   margin-bottom: 5px;
 }
 
-.layout {
+.fp-layout {
   display: grid;
   grid-template-columns: 1fr;
   grid-template-rows: auto auto;

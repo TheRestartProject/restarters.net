@@ -41,7 +41,7 @@ class MediawikiServiceProvider extends ServiceProvider
 
                 return new MediawikiFactory($api);
             } catch (\Exception $ex) {
-                Log::error('Failed to instantiation Wiki API classes: '.$ex->getMessage());
+                Log::error('Failed to instantiate Wiki API classes: '.$ex->getMessage());
             }
         });
 

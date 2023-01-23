@@ -1,65 +1,41 @@
-<?php namespace Bkwld\Croppa;
+<?php
 
-class ServiceProvider extends \Illuminate\Support\ServiceProvider {
+namespace Bkwld\Croppa;
 
-    /**
-     * Get the major Laravel version number
-     *
-     * @return integer
-     */
-    public function version() {
-        $app = $this->app;
-        if (defined(get_class($app).'::VERSION')) {
-            return intval($app::VERSION);
-        }
-
-        if (is_callable([$app, 'version'])) {
-            preg_match('/(\((\d+\.\d+\.\d+)\))/', $app->version(), $v);
-            if (isset($v[2])) {
-                return -intval($v[2]);
-            }
-        }
-
-        return null;
-    }
-
+class ServiceProvider extends \Illuminate\Support\ServiceProvider
+{
     /**
      * Register the service provider.
-     *
-     * @return void
      */
-    public function register() {
-
-        // Version specific registering
-        if (abs($this->version()) >= 5) {
-            $this->registerLaravel5Lumen();
-        }
-
+    public function register()
+    {
         // Bind the Croppa URL generator and parser
-        $this->app->singleton('Bkwld\Croppa\URL', function($app) {
+        $this->app->singleton('Bkwld\Croppa\URL', function ($app) {
             return new URL($this->getConfig());
         });
 
         // Handle the request for an image, this cooridnates the main logic
-        $this->app->singleton('Bkwld\Croppa\Handler', function($app) {
-            return new Handler($app['Bkwld\Croppa\URL'],
+        $this->app->singleton('Bkwld\Croppa\Handler', function ($app) {
+            return new Handler(
+                $app['Bkwld\Croppa\URL'],
                 $app['Bkwld\Croppa\Storage'],
                 $app['request'],
-                $this->getConfig());
+                $this->getConfig()
+            );
         });
 
         // Interact with the disk
-        $this->app->singleton('Bkwld\Croppa\Storage', function($app) {
+        $this->app->singleton('Bkwld\Croppa\Storage', function ($app) {
             return new Storage($app, $this->getConfig());
         });
 
         // API for use in apps
-        $this->app->singleton('Bkwld\Croppa\Helpers', function($app) {
+        $this->app->singleton('Bkwld\Croppa\Helpers', function ($app) {
             return new Helpers($app['Bkwld\Croppa\URL'], $app['Bkwld\Croppa\Storage'], $app['Bkwld\Croppa\Handler']);
         });
 
         // Register command to delte all crops
-        $this->app->singleton('Bkwld\Croppa\Commands\Purge', function($app) {
+        $this->app->singleton('Bkwld\Croppa\Commands\Purge', function ($app) {
             return new Commands\Purge($app['Bkwld\Croppa\Storage']);
         });
 
@@ -68,87 +44,28 @@ class ServiceProvider extends \Illuminate\Support\ServiceProvider {
     }
 
     /**
-     * Register specific logic for Laravel/Lumen 5. Merges package config with user config
-     *
-     * @return void
-     */
-    public function registerLaravel5Lumen() {
-        $this->mergeConfigFrom(__DIR__.'/../../config/config.php', 'croppa');
-    }
-
-
-    /**
      * Bootstrap the application events.
-     *
-     * @return void
      */
-    public function boot() {
-        // Version specific booting
-        if ($this->version() == 4) {
-            $this->bootLaravel4();
-        } else if ($this->version() >= 5) {
-            $this->bootLaravel();
-        } else if ($this->version() <= -5) {
-            $this->bootLumen();
-        } else {
-            throw new Exception('Unsupported Laravel version');
-        }
+    public function boot()
+    {
+        $this->publishes([__DIR__.'/../../config/config.php' => config_path('croppa.php')], 'croppa');
 
-        // Listen for Cropa style URLs, these are how Croppa gets triggered
-        if ($this->version() > 0) { // Laravel
-            $this->app['router']
-                ->get('{path}', 'Bkwld\Croppa\Handler@handle')
-                ->where('path', $this->app['Bkwld\Croppa\URL']->routePattern());
-        } else { // Lumen
-            $this->app->get('{path:'.$this->app['Bkwld\Croppa\URL']->routePattern().'}', [
-                'uses' => 'Bkwld\Croppa\Handler@handle',
-            ]);
-        }
+        $this->app['router']
+            ->get('{path}', 'Bkwld\Croppa\Handler@handle')
+            ->where('path', $this->app['Bkwld\Croppa\URL']->routePattern());
     }
 
     /**
-     * Boot specific logic for Laravel 4. Tells Laravel about the package for auto
-     * namespacing of config files
-     *
-     * @return void
-     */
-    public function bootLaravel4() {
-        $this->package('bkwld/croppa');
-    }
-
-    /**
-     * Boot specific logic for Laravel 5. Registers the config file for publishing
-     * to app directory
-     *
-     * @return void
-     */
-    public function bootLaravel() {
-        $this->publishes([
-            __DIR__.'/../../config/config.php' => config_path('croppa.php')
-        ], 'croppa');
-    }
-
-    /**
-     * Boot specific logic for Lumen. Load custom croppa config file
-     *
-     * @return void
-     */
-    public function bootLumen() {
-        $this->app->configure('croppa');
-    }
-
-    /**
-     * Get the configuration, which is keyed differently in L5 vs l4
+     * Get the configuration.
      *
      * @return array
      */
-    public function getConfig() {
-        $key = abs($this->version()) >= 5 ? 'croppa' : 'croppa::config';
-
-        $config = $this->app->make('config')->get($key);
+    public function getConfig()
+    {
+        $config = $this->app->make('config')->get('croppa');
 
         // Use Laravel's encryption key if instructed to
-        if (isset($config['signing_key']) && $config['signing_key'] == 'app.key') {
+        if (isset($config['signing_key']) && $config['signing_key'] === 'app.key') {
             $config['signing_key'] = $this->app->make('config')->get('app.key');
         }
 
@@ -160,7 +77,8 @@ class ServiceProvider extends \Illuminate\Support\ServiceProvider {
      *
      * @return array
      */
-    public function provides() {
+    public function provides()
+    {
         return [
             'Bkwld\Croppa\URL',
             'Bkwld\Croppa\Handler',

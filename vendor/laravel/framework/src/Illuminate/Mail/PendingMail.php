@@ -5,9 +5,12 @@ namespace Illuminate\Mail;
 use Illuminate\Contracts\Mail\Mailable as MailableContract;
 use Illuminate\Contracts\Mail\Mailer as MailerContract;
 use Illuminate\Contracts\Translation\HasLocalePreference;
+use Illuminate\Support\Traits\Conditionable;
 
 class PendingMail
 {
+    use Conditionable;
+
     /**
      * The mailer instance.
      *
@@ -114,22 +117,9 @@ class PendingMail
      * Send a new mailable message instance.
      *
      * @param  \Illuminate\Contracts\Mail\Mailable  $mailable
-     * @return mixed
+     * @return \Illuminate\Mail\SentMessage|null
      */
     public function send(MailableContract $mailable)
-    {
-        return $this->mailer->send($this->fill($mailable));
-    }
-
-    /**
-     * Send a mailable message immediately.
-     *
-     * @param  \Illuminate\Contracts\Mail\Mailable  $mailable
-     * @return mixed
-     *
-     * @deprecated Use send() instead.
-     */
-    public function sendNow(MailableContract $mailable)
     {
         return $this->mailer->send($this->fill($mailable));
     }
@@ -146,7 +136,7 @@ class PendingMail
     }
 
     /**
-     * Deliver the queued message after the given delay.
+     * Deliver the queued message after (n) seconds.
      *
      * @param  \DateTimeInterface|\DateInterval|int  $delay
      * @param  \Illuminate\Contracts\Mail\Mailable  $mailable
@@ -167,7 +157,7 @@ class PendingMail
     {
         return tap($mailable->to($this->to)
             ->cc($this->cc)
-            ->bcc($this->bcc), function ($mailable) {
+            ->bcc($this->bcc), function (MailableContract $mailable) {
                 if ($this->locale) {
                     $mailable->locale($this->locale);
                 }

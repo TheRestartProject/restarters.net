@@ -1,7 +1,6 @@
 import React from "react"
 import PropTypes from "prop-types"
 import ImPropTypes from "react-immutable-proptypes"
-import { Iterable } from "immutable"
 
 const Headers = ( { headers } )=>{
   return (
@@ -29,7 +28,7 @@ Duration.propTypes = {
 
 export default class LiveResponse extends React.Component {
   static propTypes = {
-    response: PropTypes.instanceOf(Iterable).isRequired,
+    response: ImPropTypes.map,
     path: PropTypes.string.isRequired,
     method: PropTypes.string.isRequired,
     displayRequestDuration: PropTypes.bool.isRequired,
@@ -78,8 +77,8 @@ export default class LiveResponse extends React.Component {
           ? <RequestSnippets request={ curlRequest }/>
           : <Curl request={ curlRequest } getConfigs={ getConfigs } />) }
         { url && <div>
-            <h4>Request URL</h4>
             <div className="request-url">
+              <h4>Request URL</h4>
               <pre className="microlight">{url}</pre>
             </div>
           </div>
@@ -129,10 +128,5 @@ export default class LiveResponse extends React.Component {
         </table>
       </div>
     )
-  }
-
-  static propTypes = {
-    getComponent: PropTypes.func.isRequired,
-    response: ImPropTypes.map
   }
 }

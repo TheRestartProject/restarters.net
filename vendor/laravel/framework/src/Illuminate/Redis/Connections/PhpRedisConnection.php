@@ -4,9 +4,8 @@ namespace Illuminate\Redis\Connections;
 
 use Closure;
 use Illuminate\Contracts\Redis\Connection as ConnectionContract;
-use Illuminate\Support\Str;
+use Illuminate\Support\Arr;
 use Redis;
-use RedisCluster;
 use RedisException;
 
 /**
@@ -14,6 +13,8 @@ use RedisException;
  */
 class PhpRedisConnection extends Connection implements ConnectionContract
 {
+    use PacksPhpRedisValues;
+
     /**
      * The connection creation callback.
      *
@@ -70,7 +71,7 @@ class PhpRedisConnection extends Connection implements ConnectionContract
     }
 
     /**
-     * Set the string value in argument as value of the key.
+     * Set the string value in the argument as the value of the key.
      *
      * @param  string  $key
      * @param  mixed  $value
@@ -219,7 +220,7 @@ class PhpRedisConnection extends Connection implements ConnectionContract
         $options = [];
 
         foreach (array_slice($dictionary, 0, 3) as $i => $value) {
-            if (in_array($value, ['nx', 'xx', 'ch', 'incr', 'NX', 'XX', 'CH', 'INCR'], true)) {
+            if (in_array($value, ['nx', 'xx', 'ch', 'incr', 'gt', 'lt', 'NX', 'XX', 'CH', 'INCR', 'GT', 'LT'], true)) {
                 $options[] = $value;
 
                 unset($dictionary[$i]);
@@ -240,7 +241,7 @@ class PhpRedisConnection extends Connection implements ConnectionContract
      */
     public function zrangebyscore($key, $min, $max, $options = [])
     {
-        if (isset($options['limit'])) {
+        if (isset($options['limit']) && Arr::isAssoc($options['limit'])) {
             $options['limit'] = [
                 $options['limit']['offset'],
                 $options['limit']['count'],
@@ -261,7 +262,7 @@ class PhpRedisConnection extends Connection implements ConnectionContract
      */
     public function zrevrangebyscore($key, $min, $max, $options = [])
     {
-        if (isset($options['limit'])) {
+        if (isset($options['limit']) && Arr::isAssoc($options['limit'])) {
             $options['limit'] = [
                 $options['limit']['offset'],
                 $options['limit']['count'],
@@ -304,7 +305,7 @@ class PhpRedisConnection extends Connection implements ConnectionContract
     }
 
     /**
-     * Scans the all keys based on options.
+     * Scans all keys based on options.
      *
      * @param  mixed  $cursor
      * @param  array  $options
@@ -317,7 +318,11 @@ class PhpRedisConnection extends Connection implements ConnectionContract
             $options['count'] ?? 10
         );
 
-        return empty($result) ? $result : [$cursor, $result];
+        if ($result === false) {
+            $result = [];
+        }
+
+        return $cursor === 0 && empty($result) ? false : [$cursor, $result];
     }
 
     /**
@@ -335,11 +340,15 @@ class PhpRedisConnection extends Connection implements ConnectionContract
             $options['count'] ?? 10
         );
 
-        return $result === false ? [0, []] : [$cursor, $result];
+        if ($result === false) {
+            $result = [];
+        }
+
+        return $cursor === 0 && empty($result) ? false : [$cursor, $result];
     }
 
     /**
-     * Scans the given set for all values based on options.
+     * Scans the given hash for all values based on options.
      *
      * @param  string  $key
      * @param  mixed  $cursor
@@ -353,7 +362,11 @@ class PhpRedisConnection extends Connection implements ConnectionContract
             $options['count'] ?? 10
         );
 
-        return $result === false ? [0, []] : [$cursor, $result];
+        if ($result === false) {
+            $result = [];
+        }
+
+        return $cursor === 0 && empty($result) ? false : [$cursor, $result];
     }
 
     /**
@@ -371,7 +384,11 @@ class PhpRedisConnection extends Connection implements ConnectionContract
             $options['count'] ?? 10
         );
 
-        return $result === false ? [0, []] : [$cursor, $result];
+        if ($result === false) {
+            $result = [];
+        }
+
+        return $cursor === 0 && empty($result) ? false : [$cursor, $result];
     }
 
     /**
@@ -476,17 +493,17 @@ class PhpRedisConnection extends Connection implements ConnectionContract
     /**
      * Flush the selected Redis database.
      *
-     * @return void
+     * @return mixed
      */
     public function flushdb()
     {
-        if (! $this->client instanceof RedisCluster) {
-            return $this->command('flushdb');
+        $arguments = func_get_args();
+
+        if (strtoupper((string) ($arguments[0] ?? null)) === 'ASYNC') {
+            return $this->command('flushdb', [true]);
         }
 
-        foreach ($this->client->_masters() as $master) {
-            $this->client->flushDb($master);
-        }
+        return $this->command('flushdb');
     }
 
     /**
@@ -506,14 +523,20 @@ class PhpRedisConnection extends Connection implements ConnectionContract
      * @param  string  $method
      * @param  array  $parameters
      * @return mixed
+     *
+     * @throws \RedisException
      */
     public function command($method, array $parameters = [])
     {
         try {
             return parent::command($method, $parameters);
         } catch (RedisException $e) {
-            if (Str::contains($e->getMessage(), 'went away')) {
-                $this->client = $this->connector ? call_user_func($this->connector) : $this->client;
+            foreach (['went away', 'socket', 'read error on connection'] as $errorMessage) {
+                if (str_contains($e->getMessage(), $errorMessage)) {
+                    $this->client = $this->connector ? call_user_func($this->connector) : $this->client;
+
+                    break;
+                }
             }
 
             throw $e;
@@ -528,19 +551,6 @@ class PhpRedisConnection extends Connection implements ConnectionContract
     public function disconnect()
     {
         $this->client->close();
-    }
-
-    /**
-     * Apply prefix to the given key if necessary.
-     *
-     * @param  string  $key
-     * @return string
-     */
-    private function applyPrefix($key)
-    {
-        $prefix = (string) $this->client->getOption(Redis::OPT_PREFIX);
-
-        return $prefix.$key;
     }
 
     /**

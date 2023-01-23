@@ -6,16 +6,14 @@ use Illuminate\Contracts\Container\BindingResolutionException;
 use Illuminate\Contracts\Routing\ResponseFactory as ResponseFactoryContract;
 use Illuminate\Contracts\Routing\UrlGenerator as UrlGeneratorContract;
 use Illuminate\Contracts\View\Factory as ViewFactoryContract;
+use Illuminate\Routing\Contracts\CallableDispatcher as CallableDispatcherContract;
 use Illuminate\Routing\Contracts\ControllerDispatcher as ControllerDispatcherContract;
 use Illuminate\Support\ServiceProvider;
 use Nyholm\Psr7\Factory\Psr17Factory;
-use Nyholm\Psr7\Response as NyholmPsrResponse;
+use Nyholm\Psr7\Response as PsrResponse;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
-use Symfony\Bridge\PsrHttpMessage\Factory\DiactorosFactory;
 use Symfony\Bridge\PsrHttpMessage\Factory\PsrHttpFactory;
-use Zend\Diactoros\Response as ZendPsrResponse;
-use Zend\Diactoros\ServerRequestFactory;
 
 class RoutingServiceProvider extends ServiceProvider
 {
@@ -32,6 +30,7 @@ class RoutingServiceProvider extends ServiceProvider
         $this->registerPsrRequest();
         $this->registerPsrResponse();
         $this->registerResponseFactory();
+        $this->registerCallableDispatcher();
         $this->registerControllerDispatcher();
     }
 
@@ -129,6 +128,8 @@ class RoutingServiceProvider extends ServiceProvider
      * Register a binding for the PSR-7 request implementation.
      *
      * @return void
+     *
+     * @throws \Illuminate\Contracts\Container\BindingResolutionException
      */
     protected function registerPsrRequest()
     {
@@ -140,10 +141,6 @@ class RoutingServiceProvider extends ServiceProvider
                     ->createRequest($app->make('request'));
             }
 
-            if (class_exists(ServerRequestFactory::class) && class_exists(DiactorosFactory::class)) {
-                return (new DiactorosFactory)->createRequest($app->make('request'));
-            }
-
             throw new BindingResolutionException('Unable to resolve PSR request. Please install the symfony/psr-http-message-bridge and nyholm/psr7 packages.');
         });
     }
@@ -152,16 +149,14 @@ class RoutingServiceProvider extends ServiceProvider
      * Register a binding for the PSR-7 response implementation.
      *
      * @return void
+     *
+     * @throws \Illuminate\Contracts\Container\BindingResolutionException
      */
     protected function registerPsrResponse()
     {
         $this->app->bind(ResponseInterface::class, function () {
-            if (class_exists(NyholmPsrResponse::class)) {
-                return new NyholmPsrResponse;
-            }
-
-            if (class_exists(ZendPsrResponse::class)) {
-                return new ZendPsrResponse;
+            if (class_exists(PsrResponse::class)) {
+                return new PsrResponse;
             }
 
             throw new BindingResolutionException('Unable to resolve PSR response. Please install the nyholm/psr7 package.');
@@ -177,6 +172,18 @@ class RoutingServiceProvider extends ServiceProvider
     {
         $this->app->singleton(ResponseFactoryContract::class, function ($app) {
             return new ResponseFactory($app[ViewFactoryContract::class], $app['redirect']);
+        });
+    }
+
+    /**
+     * Register the callable dispatcher.
+     *
+     * @return void
+     */
+    protected function registerCallableDispatcher()
+    {
+        $this->app->singleton(CallableDispatcherContract::class, function ($app) {
+            return new CallableDispatcher($app);
         });
     }
 

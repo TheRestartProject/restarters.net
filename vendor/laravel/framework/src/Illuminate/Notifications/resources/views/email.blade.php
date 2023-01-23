@@ -1,4 +1,4 @@
-@component('mail::message')
+<x-mail::message>
 {{-- Greeting --}}
 @if (! empty($greeting))
 # {{ $greeting }}
@@ -19,18 +19,14 @@
 {{-- Action Button --}}
 @isset($actionText)
 <?php
-    switch ($level) {
-        case 'success':
-        case 'error':
-            $color = $level;
-            break;
-        default:
-            $color = 'primary';
-    }
+    $color = match ($level) {
+        'success', 'error' => $level,
+        default => 'primary',
+    };
 ?>
-@component('mail::button', ['url' => $actionUrl, 'color' => $color])
+<x-mail::button :url="$actionUrl" :color="$color">
 {{ $actionText }}
-@endcomponent
+</x-mail::button>
 @endisset
 
 {{-- Outro Lines --}}
@@ -49,14 +45,14 @@
 
 {{-- Subcopy --}}
 @isset($actionText)
-@slot('subcopy')
+<x-slot:subcopy>
 @lang(
-    "If you’re having trouble clicking the \":actionText\" button, copy and paste the URL below\n".
+    "If you're having trouble clicking the \":actionText\" button, copy and paste the URL below\n".
     'into your web browser:',
     [
         'actionText' => $actionText,
     ]
 ) <span class="break-all">[{{ $displayableActionUrl }}]({{ $actionUrl }})</span>
-@endslot
+</x-slot:subcopy>
 @endisset
-@endcomponent
+</x-mail::message>

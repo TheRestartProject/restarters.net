@@ -220,6 +220,21 @@ describe("curlify", function () {
     expect(curlified).toEqual("curl -X 'POST' \\\n  'http://example.com' \\\n  -H 'content-type: multipart/form-data' \\\n  -F 'id=123' \\\n  -F 'file=@file.txt'")
   })
 
+  it("should print a curl with data-binary if body is instance of File and it is not a multipart form data request", function () {
+    let file = new win.File([""], "file.txt", { type: "" })
+
+    let req = {
+      url: "http://example.com",
+      method: "POST",
+      headers: { "content-type": "application/octet-stream" },
+      body: file
+    }
+
+    let curlified = curl(Im.fromJS(req))
+
+    expect(curlified).toEqual("curl -X 'POST' \\\n  'http://example.com' \\\n  -H 'content-type: application/octet-stream' \\\n  --data-binary '@file.txt'")
+  })
+
   it("prints a curl post statement from an object", function () {
     let req = {
       url: "http://example.com",
@@ -305,7 +320,7 @@ describe("curlify", function () {
   })
 
   describe("POST when header value is 'multipart/form-data' but header name is not 'content-type'", function () {
-    it("shoud print a proper curl as -d <data>, when file type is provided", function () {
+    it("should print a proper curl as -d <data>, when file type is provided", function () {
       let file = new win.File([""], "file.txt", { type: "text/plain" })
       // file.name = "file.txt"
       // file.type = "text/plain"
@@ -325,7 +340,7 @@ describe("curlify", function () {
       expect(curlified).toEqual("curl -X 'POST' \\\n  'http://example.com' \\\n  -H 'x-custom-name: multipart/form-data' \\\n  -d '{\n  \"id\": \"123\",\n  \"file\": {\n    \"name\": \"file.txt\",\n    \"type\": \"text/plain\"\n  }\n}'")
     })
 
-    it("shoud print a proper curl as -d <data>, no file type provided", function () {
+    it("should print a proper curl as -d <data>, no file type provided", function () {
       let file = new win.File([""], "file.txt")
       // file.name = "file.txt"
       // file.type = "text/plain"

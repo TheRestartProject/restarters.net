@@ -1,6 +1,6 @@
 <template>
   <div>
-    <div v-if="location" class="layout mb-2">
+    <div v-if="location" class="dng-layout mb-2">
       <div class="pic" />
       <!-- eslint-disable-next-line -->
       <div class="overlay">
@@ -55,7 +55,7 @@ export default {
 @import '~bootstrap/scss/variables';
 @import '~bootstrap/scss/mixins/_breakpoints';
 
-.layout {
+.dng-layout {
   display: grid;
   grid-template-columns: 1fr;
   grid-template-rows: auto auto auto auto;

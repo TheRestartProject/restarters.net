@@ -1,7 +1,7 @@
 'use strict';
 
-const PACKAGE_NAME = require('../../package.json').name,
-      PADDING      = (new Array(11)).join(' ');
+var PACKAGE_NAME = require('../../package.json').name,
+    PADDING      = (new Array(11)).join(' ');
 
 /**
  * Format a debug message

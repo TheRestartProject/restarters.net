@@ -5,7 +5,7 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-class SupportNonPoweredItems extends Migration
+return new class extends Migration
 {
     /**
      * Run the migrations.
@@ -81,4 +81,4 @@ class SupportNonPoweredItems extends Migration
         // Remove cluster for non-powered categories.
         DB::table('clusters')->where('name', 'Non-Powered Items')->delete();
     }
-}
+};

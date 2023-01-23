@@ -5,14 +5,20 @@ namespace Illuminate\Database\Eloquent\Relations;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\Concerns\ComparesRelatedModels;
+use Illuminate\Database\Eloquent\Relations\Concerns\InteractsWithDictionary;
 use Illuminate\Database\Eloquent\Relations\Concerns\SupportsDefaultModels;
 
 class BelongsTo extends Relation
 {
-    use SupportsDefaultModels;
+    use ComparesRelatedModels,
+        InteractsWithDictionary,
+        SupportsDefaultModels;
 
     /**
      * The child model instance of the relation.
+     *
+     * @var \Illuminate\Database\Eloquent\Model
      */
     protected $child;
 
@@ -36,13 +42,6 @@ class BelongsTo extends Relation
      * @var string
      */
     protected $relationName;
-
-    /**
-     * The count of self joins.
-     *
-     * @var int
-     */
-    protected static $selfJoinCount = 0;
 
     /**
      * Create a new belongs to relationship instance.
@@ -177,15 +176,19 @@ class BelongsTo extends Relation
         $dictionary = [];
 
         foreach ($results as $result) {
-            $dictionary[$result->getAttribute($owner)] = $result;
+            $attribute = $this->getDictionaryKey($result->getAttribute($owner));
+
+            $dictionary[$attribute] = $result;
         }
 
         // Once we have the dictionary constructed, we can loop through all the parents
         // and match back onto their children using these keys of the dictionary and
         // the primary key of the children to map them onto the correct instances.
         foreach ($models as $model) {
-            if (isset($dictionary[$model->{$foreign}])) {
-                $model->setRelation($relation, $dictionary[$model->{$foreign}]);
+            $attribute = $this->getDictionaryKey($model->{$foreign});
+
+            if (isset($dictionary[$attribute])) {
+                $model->setRelation($relation, $dictionary[$attribute]);
             }
         }
 
@@ -195,7 +198,7 @@ class BelongsTo extends Relation
     /**
      * Associate the model instance to the given parent.
      *
-     * @param  \Illuminate\Database\Eloquent\Model|int|string  $model
+     * @param  \Illuminate\Database\Eloquent\Model|int|string|null  $model
      * @return \Illuminate\Database\Eloquent\Model
      */
     public function associate($model)
@@ -206,7 +209,7 @@ class BelongsTo extends Relation
 
         if ($model instanceof Model) {
             $this->child->setRelation($this->relationName, $model);
-        } elseif ($this->child->isDirty($this->foreignKey)) {
+        } else {
             $this->child->unsetRelation($this->relationName);
         }
 
@@ -223,6 +226,16 @@ class BelongsTo extends Relation
         $this->child->setAttribute($this->foreignKey, null);
 
         return $this->child->setRelation($this->relationName, null);
+    }
+
+    /**
+     * Alias of "dissociate" method.
+     *
+     * @return \Illuminate\Database\Eloquent\Model
+     */
+    public function disassociate()
+    {
+        return $this->dissociate();
     }
 
     /**
@@ -266,16 +279,6 @@ class BelongsTo extends Relation
     }
 
     /**
-     * Get a relationship join table hash.
-     *
-     * @return string
-     */
-    public function getRelationCountHash()
-    {
-        return 'laravel_reserved_'.static::$selfJoinCount++;
-    }
-
-    /**
      * Determine if the related model has an auto-incrementing ID.
      *
      * @return bool
@@ -283,7 +286,7 @@ class BelongsTo extends Relation
     protected function relationHasIncrementingId()
     {
         return $this->related->getIncrementing() &&
-                                $this->related->getKeyType() === 'int';
+            in_array($this->related->getKeyType(), ['int', 'integer']);
     }
 
     /**
@@ -328,6 +331,16 @@ class BelongsTo extends Relation
     }
 
     /**
+     * Get the key value of the child's foreign key.
+     *
+     * @return mixed
+     */
+    public function getParentKey()
+    {
+        return $this->child->{$this->foreignKey};
+    }
+
+    /**
      * Get the associated key of the relationship.
      *
      * @return string
@@ -345,6 +358,17 @@ class BelongsTo extends Relation
     public function getQualifiedOwnerKeyName()
     {
         return $this->related->qualifyColumn($this->ownerKey);
+    }
+
+    /**
+     * Get the value of the model's associated key.
+     *
+     * @param  \Illuminate\Database\Eloquent\Model  $model
+     * @return mixed
+     */
+    protected function getRelatedKeyFrom(Model $model)
+    {
+        return $model->{$this->ownerKey};
     }
 
     /**

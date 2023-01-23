@@ -16,28 +16,30 @@ class Geocoder
 
     public function geocode($location)
     {
-        $json = file_get_contents('https://maps.googleapis.com/maps/api/geocode/json?address='.urlencode($location).'&key='.$this->googleKey());
+        if ($location != 'ForceGeocodeFailure') {
+            $json = file_get_contents('https://maps.googleapis.com/maps/api/geocode/json?address='.urlencode($location).'&key='.$this->googleKey());
 
-        if ($json) {
-            $res = json_decode($json);
+            if ($json) {
+                $res = json_decode($json);
 
-            if ($res && $res->results && count($res->results)) {
-                $decoded = json_decode($json)->results[0];
+                if ($res && $res->results && count($res->results)) {
+                    $decoded = json_decode($json)->results[0];
 
-                $latitude = $decoded->{'geometry'}->{'location'}->lat;
-                $longitude = $decoded->{'geometry'}->{'location'}->lng;
+                    $latitude = $decoded->{'geometry'}->{'location'}->lat;
+                    $longitude = $decoded->{'geometry'}->{'location'}->lng;
 
-                foreach ($decoded->{'address_components'} as $component) {
-                    if ($component->types && count($component->types) && $component->types[0] === 'country') {
-                        $country = $component->long_name;
+                    foreach ($decoded->{'address_components'} as $component) {
+                        if ($component->types && count($component->types) && $component->types[0] === 'country') {
+                            $country = $component->long_name;
+                        }
                     }
-                }
 
-                return [
-                    'latitude' => $latitude,
-                    'longitude' => $longitude,
-                    'country' => $country,
-                ];
+                    return [
+                        'latitude' => $latitude,
+                        'longitude' => $longitude,
+                        'country' => $country,
+                    ];
+                }
             }
         }
 

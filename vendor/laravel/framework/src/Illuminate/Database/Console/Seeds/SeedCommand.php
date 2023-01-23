@@ -6,8 +6,11 @@ use Illuminate\Console\Command;
 use Illuminate\Console\ConfirmableTrait;
 use Illuminate\Database\ConnectionResolverInterface as Resolver;
 use Illuminate\Database\Eloquent\Model;
+use Symfony\Component\Console\Attribute\AsCommand;
+use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputOption;
 
+#[AsCommand(name: 'db:seed')]
 class SeedCommand extends Command
 {
     use ConfirmableTrait;
@@ -18,6 +21,17 @@ class SeedCommand extends Command
      * @var string
      */
     protected $name = 'db:seed';
+
+    /**
+     * The name of the console command.
+     *
+     * This name is used to identify the command during lazy loading.
+     *
+     * @var string|null
+     *
+     * @deprecated
+     */
+    protected static $defaultName = 'db:seed';
 
     /**
      * The console command description.
@@ -49,13 +63,17 @@ class SeedCommand extends Command
     /**
      * Execute the console command.
      *
-     * @return void
+     * @return int
      */
     public function handle()
     {
         if (! $this->confirmToProceed()) {
-            return;
+            return 1;
         }
+
+        $this->components->info('Seeding database.');
+
+        $previousConnection = $this->resolver->getDefaultConnection();
 
         $this->resolver->setDefaultConnection($this->getDatabase());
 
@@ -63,7 +81,11 @@ class SeedCommand extends Command
             $this->getSeeder()->__invoke();
         });
 
-        $this->info('Database seeding completed successfully.');
+        if ($previousConnection) {
+            $this->resolver->setDefaultConnection($previousConnection);
+        }
+
+        return 0;
     }
 
     /**
@@ -73,9 +95,20 @@ class SeedCommand extends Command
      */
     protected function getSeeder()
     {
-        $class = $this->laravel->make($this->input->getOption('class'));
+        $class = $this->input->getArgument('class') ?? $this->input->getOption('class');
 
-        return $class->setContainer($this->laravel)->setCommand($this);
+        if (! str_contains($class, '\\')) {
+            $class = 'Database\\Seeders\\'.$class;
+        }
+
+        if ($class === 'Database\\Seeders\\DatabaseSeeder' &&
+            ! class_exists($class)) {
+            $class = 'DatabaseSeeder';
+        }
+
+        return $this->laravel->make($class)
+                        ->setContainer($this->laravel)
+                        ->setCommand($this);
     }
 
     /**
@@ -91,6 +124,18 @@ class SeedCommand extends Command
     }
 
     /**
+     * Get the console command arguments.
+     *
+     * @return array
+     */
+    protected function getArguments()
+    {
+        return [
+            ['class', InputArgument::OPTIONAL, 'The class name of the root seeder', null],
+        ];
+    }
+
+    /**
      * Get the console command options.
      *
      * @return array
@@ -98,10 +143,8 @@ class SeedCommand extends Command
     protected function getOptions()
     {
         return [
-            ['class', null, InputOption::VALUE_OPTIONAL, 'The class name of the root seeder', 'DatabaseSeeder'],
-
+            ['class', null, InputOption::VALUE_OPTIONAL, 'The class name of the root seeder', 'Database\\Seeders\\DatabaseSeeder'],
             ['database', null, InputOption::VALUE_OPTIONAL, 'The database connection to seed'],
-
             ['force', null, InputOption::VALUE_NONE, 'Force the operation to run when in production'],
         ];
     }

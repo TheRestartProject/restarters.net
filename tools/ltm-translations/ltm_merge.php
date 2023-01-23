@@ -86,7 +86,7 @@ function &connect($cfg)
  */
 function lang_files_FORGET_THIS()
 {
-    $root = '../../resources/lang';
+    $root = '../../lang';
     $langs = ['en', 'de', 'nl', 'nl-BE', 'fr', 'fr-BE', 'it', 'es'];
     foreach ($langs as $lang) {
         $file = "$root/$lang.json";

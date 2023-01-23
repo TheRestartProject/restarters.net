@@ -2,8 +2,17 @@
 
 namespace Illuminate\Foundation\Http\Middleware;
 
+use Closure;
+
 class TrimStrings extends TransformsRequest
 {
+    /**
+     * All of the registered skip callbacks.
+     *
+     * @var array
+     */
+    protected static $skipCallbacks = [];
+
     /**
      * The attributes that should not be trimmed.
      *
@@ -14,6 +23,24 @@ class TrimStrings extends TransformsRequest
     ];
 
     /**
+     * Handle an incoming request.
+     *
+     * @param  \Illuminate\Http\Request  $request
+     * @param  \Closure  $next
+     * @return mixed
+     */
+    public function handle($request, Closure $next)
+    {
+        foreach (static::$skipCallbacks as $callback) {
+            if ($callback($request)) {
+                return $next($request);
+            }
+        }
+
+        return parent::handle($request, $next);
+    }
+
+    /**
      * Transform the given value.
      *
      * @param  string  $key
@@ -22,10 +49,21 @@ class TrimStrings extends TransformsRequest
      */
     protected function transform($key, $value)
     {
-        if (in_array($key, $this->except, true)) {
+        if (in_array($key, $this->except, true) || ! is_string($value)) {
             return $value;
         }
 
-        return is_string($value) ? trim($value) : $value;
+        return preg_replace('~^[\s﻿​]+|[\s﻿​]+$~u', '', $value) ?? trim($value);
+    }
+
+    /**
+     * Register a callback that instructs the middleware to be skipped.
+     *
+     * @param  \Closure  $callback
+     * @return void
+     */
+    public static function skipWhen(Closure $callback)
+    {
+        static::$skipCallbacks[] = $callback;
     }
 }

@@ -5,7 +5,7 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-class AddDripPushColumnToNetworks extends Migration
+return new class extends Migration
 {
     /**
      * Run the migrations.
@@ -33,4 +33,4 @@ class AddDripPushColumnToNetworks extends Migration
             $table->dropColumn('users_push_to_drip');
         });
     }
-}
+};

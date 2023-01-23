@@ -14,9 +14,12 @@ class Ics implements Generator
     protected $dateFormat = 'Ymd';
     protected $dateTimeFormat = 'e:Ymd\THis';
 
-    /** @var array */
+    /** @var array<non-empty-string, non-empty-string> */
     protected $options = [];
 
+    /**
+     * @param array<non-empty-string, non-empty-string> $options
+     */
     public function __construct(array $options = [])
     {
         $this->options = $options;
@@ -27,7 +30,8 @@ class Ics implements Generator
     {
         $url = [
             'BEGIN:VCALENDAR',
-            'VERSION:2.0',
+            'VERSION:2.0', // @see https://datatracker.ietf.org/doc/html/rfc5545#section-3.7.4
+            'PRODID:Spatie calendar-links', // @see https://datatracker.ietf.org/doc/html/rfc5545#section-3.7.3
             'BEGIN:VEVENT',
             'UID:'.($this->options['UID'] ?? $this->generateEventUid($link)),
             'SUMMARY:'.$this->escapeString($link->title),
@@ -36,15 +40,17 @@ class Ics implements Generator
         $dateTimeFormat = $link->allDay ? $this->dateFormat : $this->dateTimeFormat;
 
         if ($link->allDay) {
+            $url[] = 'DTSTAMP;TZID='.$link->from->format($dateTimeFormat);
             $url[] = 'DTSTART:'.$link->from->format($dateTimeFormat);
             $url[] = 'DURATION:P'.(max(1, $link->from->diff($link->to)->days)).'D';
         } else {
+            $url[] = 'DTSTAMP;TZID='.$link->from->format($dateTimeFormat);
             $url[] = 'DTSTART;TZID='.$link->from->format($dateTimeFormat);
             $url[] = 'DTEND;TZID='.$link->to->format($dateTimeFormat);
         }
 
         if ($link->description) {
-            $url[] = 'DESCRIPTION:'.$this->escapeString($link->description);
+            $url[] = 'DESCRIPTION:'.$this->escapeString(strip_tags($link->description));
         }
         if ($link->address) {
             $url[] = 'LOCATION:'.$this->escapeString($link->address);

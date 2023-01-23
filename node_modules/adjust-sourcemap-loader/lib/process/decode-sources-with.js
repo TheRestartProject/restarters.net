@@ -1,7 +1,5 @@
 'use strict';
 
-var fs = require('fs');
-
 var getFieldAsFn = require('./get-field-as-fn');
 
 /**
@@ -46,11 +44,7 @@ function decodeSourcesWith(codecs, mustDecode) {
         }
         // non-string implies error
         if (typeof decoded !== 'string') {
-          return getNamedError('Decoder returned a truthy value but it is not a string file path:\n' + decoded);
-        }
-        // non-existant file implies error
-        else if (!fs.existsSync(decoded) || !fs.statSync(decoded).isFile()) {
-          return getNamedError('Cannot find file at absolute path:\n' + decoded);
+          return getNamedError('Decoder returned a truthy value but it is not a string:\n' + decoded);
         }
         // otherwise success
         else {

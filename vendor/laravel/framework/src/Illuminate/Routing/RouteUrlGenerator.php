@@ -4,7 +4,6 @@ namespace Illuminate\Routing;
 
 use Illuminate\Routing\Exceptions\UrlGenerationException;
 use Illuminate\Support\Arr;
-use Illuminate\Support\Str;
 
 class RouteUrlGenerator
 {
@@ -87,8 +86,8 @@ class RouteUrlGenerator
             $route
         ), $parameters);
 
-        if (preg_match('/\{.*?\}/', $uri)) {
-            throw UrlGenerationException::forMissingParameters($route);
+        if (preg_match_all('/{(.*?)}/', $uri, $matchedMissingParameters)) {
+            throw UrlGenerationException::forMissingParameters($route, $matchedMissingParameters[1]);
         }
 
         // Once we have ensured that there are no missing parameters in the URI we will encode
@@ -200,7 +199,7 @@ class RouteUrlGenerator
             // Reset only the numeric keys...
             $parameters = array_merge($parameters);
 
-            return (! isset($parameters[0]) && ! Str::endsWith($match[0], '?}'))
+            return (! isset($parameters[0]) && ! str_ends_with($match[0], '?}'))
                         ? $match[0]
                         : Arr::pull($parameters, 0);
         }, $path);

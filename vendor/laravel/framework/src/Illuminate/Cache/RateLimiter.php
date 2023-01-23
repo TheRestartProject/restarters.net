@@ -2,6 +2,7 @@
 
 namespace Illuminate\Cache;
 
+use Closure;
 use Illuminate\Contracts\Cache\Repository as Cache;
 use Illuminate\Support\InteractsWithTime;
 
@@ -17,6 +18,13 @@ class RateLimiter
     protected $cache;
 
     /**
+     * The configured limit object resolvers.
+     *
+     * @var array
+     */
+    protected $limiters = [];
+
+    /**
      * Create a new rate limiter instance.
      *
      * @param  \Illuminate\Contracts\Cache\Repository  $cache
@@ -28,6 +36,51 @@ class RateLimiter
     }
 
     /**
+     * Register a named limiter configuration.
+     *
+     * @param  string  $name
+     * @param  \Closure  $callback
+     * @return $this
+     */
+    public function for(string $name, Closure $callback)
+    {
+        $this->limiters[$name] = $callback;
+
+        return $this;
+    }
+
+    /**
+     * Get the given named rate limiter.
+     *
+     * @param  string  $name
+     * @return \Closure
+     */
+    public function limiter(string $name)
+    {
+        return $this->limiters[$name] ?? null;
+    }
+
+    /**
+     * Attempts to execute a callback if it's not limited.
+     *
+     * @param  string  $key
+     * @param  int  $maxAttempts
+     * @param  \Closure  $callback
+     * @param  int  $decaySeconds
+     * @return mixed
+     */
+    public function attempt($key, $maxAttempts, Closure $callback, $decaySeconds = 60)
+    {
+        if ($this->tooManyAttempts($key, $maxAttempts)) {
+            return false;
+        }
+
+        return tap($callback() ?: true, function () use ($key, $decaySeconds) {
+            $this->hit($key, $decaySeconds);
+        });
+    }
+
+    /**
      * Determine if the given key has been "accessed" too many times.
      *
      * @param  string  $key
@@ -36,10 +89,8 @@ class RateLimiter
      */
     public function tooManyAttempts($key, $maxAttempts)
     {
-        $key = $this->cleanRateLimiterKey($key);
-
         if ($this->attempts($key) >= $maxAttempts) {
-            if ($this->cache->has($key.':timer')) {
+            if ($this->cache->has($this->cleanRateLimiterKey($key).':timer')) {
                 return true;
             }
 
@@ -108,13 +159,25 @@ class RateLimiter
      * @param  int  $maxAttempts
      * @return int
      */
-    public function retriesLeft($key, $maxAttempts)
+    public function remaining($key, $maxAttempts)
     {
         $key = $this->cleanRateLimiterKey($key);
 
         $attempts = $this->attempts($key);
 
         return $maxAttempts - $attempts;
+    }
+
+    /**
+     * Get the number of retries left for the given key.
+     *
+     * @param  string  $key
+     * @param  int  $maxAttempts
+     * @return int
+     */
+    public function retriesLeft($key, $maxAttempts)
+    {
+        return $this->remaining($key, $maxAttempts);
     }
 
     /**
@@ -142,7 +205,7 @@ class RateLimiter
     {
         $key = $this->cleanRateLimiterKey($key);
 
-        return $this->cache->get($key.':timer') - $this->currentTime();
+        return max(0, $this->cache->get($key.':timer') - $this->currentTime());
     }
 
     /**

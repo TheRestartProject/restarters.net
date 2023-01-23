@@ -14,12 +14,16 @@
         }
     ],
     "require": {
-        "php": "^7.2.5|^8.0",
+        "php": "^8.0.2",
         "ext-json": "*",
-        "illuminate/session": "^6.0",
-        "illuminate/support": "^6.0",
-        "symfony/http-foundation": "^4.3.4",
-        "symfony/http-kernel": "^4.3.4"
+        "fruitcake/php-cors": "^1.2",
+        "illuminate/collections": "^9.0",
+        "illuminate/macroable": "^9.0",
+        "illuminate/session": "^9.0",
+        "illuminate/support": "^9.0",
+        "symfony/http-foundation": "^6.0",
+        "symfony/http-kernel": "^6.0",
+        "symfony/mime": "^6.0"
     },
     "autoload": {
         "psr-4": {
@@ -27,11 +31,12 @@
         }
     },
     "suggest": {
-        "ext-gd": "Required to use Illuminate\\Http\\Testing\\FileFactory::image()."
+        "ext-gd": "Required to use Illuminate\\Http\\Testing\\FileFactory::image().",
+        "guzzlehttp/guzzle": "Required to use the HTTP Client (^7.5)."
     },
     "extra": {
         "branch-alias": {
-            "dev-master": "6.x-dev"
+            "dev-master": "9.x-dev"
         }
     },
     "config": {

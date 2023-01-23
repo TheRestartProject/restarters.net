@@ -4,9 +4,7 @@
  */
 'use strict';
 
-var assign = require('lodash.assign');
-
-module.exports = assign(require('./lib/loader'), {
+module.exports = Object.assign(require('./lib/loader'), {
   moduleFilenameTemplate: require('./lib/module-filename-template'),
   codec                 : require('./codec')
 });

@@ -2,14 +2,26 @@
 
 namespace Illuminate\Support\Testing\Fakes;
 
+use Closure;
+use Illuminate\Contracts\Mail\Factory;
 use Illuminate\Contracts\Mail\Mailable;
 use Illuminate\Contracts\Mail\Mailer;
 use Illuminate\Contracts\Mail\MailQueue;
 use Illuminate\Contracts\Queue\ShouldQueue;
+use Illuminate\Support\Traits\ReflectsClosures;
 use PHPUnit\Framework\Assert as PHPUnit;
 
-class MailFake implements Mailer, MailQueue
+class MailFake implements Factory, Mailer, MailQueue
 {
+    use ReflectsClosures;
+
+    /**
+     * The mailer currently being used to send a message.
+     *
+     * @var string
+     */
+    protected $currentMailer;
+
     /**
      * All of the mailables that have been sent.
      *
@@ -27,12 +39,14 @@ class MailFake implements Mailer, MailQueue
     /**
      * Assert if a mailable was sent based on a truth-test callback.
      *
-     * @param  string  $mailable
+     * @param  string|\Closure  $mailable
      * @param  callable|int|null  $callback
      * @return void
      */
     public function assertSent($mailable, $callback = null)
     {
+        [$mailable, $callback] = $this->prepareMailableAndCallback($mailable, $callback);
+
         if (is_numeric($callback)) {
             return $this->assertSentTimes($mailable, $callback);
         }
@@ -58,25 +72,53 @@ class MailFake implements Mailer, MailQueue
      */
     protected function assertSentTimes($mailable, $times = 1)
     {
-        PHPUnit::assertTrue(
-            ($count = $this->sent($mailable)->count()) === $times,
+        $count = $this->sent($mailable)->count();
+
+        PHPUnit::assertSame(
+            $times, $count,
             "The expected [{$mailable}] mailable was sent {$count} times instead of {$times} times."
         );
     }
 
     /**
+     * Determine if a mailable was not sent or queued to be sent based on a truth-test callback.
+     *
+     * @param  string|\Closure  $mailable
+     * @param  callable|null  $callback
+     * @return void
+     */
+    public function assertNotOutgoing($mailable, $callback = null)
+    {
+        $this->assertNotSent($mailable, $callback);
+        $this->assertNotQueued($mailable, $callback);
+    }
+
+    /**
      * Determine if a mailable was not sent based on a truth-test callback.
      *
-     * @param  string  $mailable
+     * @param  string|\Closure  $mailable
      * @param  callable|null  $callback
      * @return void
      */
     public function assertNotSent($mailable, $callback = null)
     {
-        PHPUnit::assertTrue(
-            $this->sent($mailable, $callback)->count() === 0,
+        [$mailable, $callback] = $this->prepareMailableAndCallback($mailable, $callback);
+
+        PHPUnit::assertCount(
+            0, $this->sent($mailable, $callback),
             "The unexpected [{$mailable}] mailable was sent."
         );
+    }
+
+    /**
+     * Assert that no mailables were sent or queued to be sent.
+     *
+     * @return void
+     */
+    public function assertNothingOutgoing()
+    {
+        $this->assertNothingSent();
+        $this->assertNothingQueued();
     }
 
     /**
@@ -86,9 +128,9 @@ class MailFake implements Mailer, MailQueue
      */
     public function assertNothingSent()
     {
-        $mailableNames = collect($this->mailables)->map(function ($mailable) {
-            return get_class($mailable);
-        })->join(', ');
+        $mailableNames = collect($this->mailables)->map(
+            fn ($mailable) => get_class($mailable)
+        )->join(', ');
 
         PHPUnit::assertEmpty($this->mailables, 'The following mailables were sent unexpectedly: '.$mailableNames);
     }
@@ -96,12 +138,14 @@ class MailFake implements Mailer, MailQueue
     /**
      * Assert if a mailable was queued based on a truth-test callback.
      *
-     * @param  string  $mailable
+     * @param  string|\Closure  $mailable
      * @param  callable|int|null  $callback
      * @return void
      */
     public function assertQueued($mailable, $callback = null)
     {
+        [$mailable, $callback] = $this->prepareMailableAndCallback($mailable, $callback);
+
         if (is_numeric($callback)) {
             return $this->assertQueuedTimes($mailable, $callback);
         }
@@ -121,8 +165,10 @@ class MailFake implements Mailer, MailQueue
      */
     protected function assertQueuedTimes($mailable, $times = 1)
     {
-        PHPUnit::assertTrue(
-            ($count = $this->queued($mailable)->count()) === $times,
+        $count = $this->queued($mailable)->count();
+
+        PHPUnit::assertSame(
+            $times, $count,
             "The expected [{$mailable}] mailable was queued {$count} times instead of {$times} times."
         );
     }
@@ -130,14 +176,16 @@ class MailFake implements Mailer, MailQueue
     /**
      * Determine if a mailable was not queued based on a truth-test callback.
      *
-     * @param  string  $mailable
+     * @param  string|\Closure  $mailable
      * @param  callable|null  $callback
      * @return void
      */
     public function assertNotQueued($mailable, $callback = null)
     {
-        PHPUnit::assertTrue(
-            $this->queued($mailable, $callback)->count() === 0,
+        [$mailable, $callback] = $this->prepareMailableAndCallback($mailable, $callback);
+
+        PHPUnit::assertCount(
+            0, $this->queued($mailable, $callback),
             "The unexpected [{$mailable}] mailable was queued."
         );
     }
@@ -149,9 +197,9 @@ class MailFake implements Mailer, MailQueue
      */
     public function assertNothingQueued()
     {
-        $mailableNames = collect($this->queuedMailables)->map(function ($mailable) {
-            return get_class($mailable);
-        })->join(', ');
+        $mailableNames = collect($this->queuedMailables)->map(
+            fn ($mailable) => get_class($mailable)
+        )->join(', ');
 
         PHPUnit::assertEmpty($this->queuedMailables, 'The following mailables were queued unexpectedly: '.$mailableNames);
     }
@@ -159,23 +207,21 @@ class MailFake implements Mailer, MailQueue
     /**
      * Get all of the mailables matching a truth-test callback.
      *
-     * @param  string  $mailable
+     * @param  string|\Closure  $mailable
      * @param  callable|null  $callback
      * @return \Illuminate\Support\Collection
      */
     public function sent($mailable, $callback = null)
     {
+        [$mailable, $callback] = $this->prepareMailableAndCallback($mailable, $callback);
+
         if (! $this->hasSent($mailable)) {
             return collect();
         }
 
-        $callback = $callback ?: function () {
-            return true;
-        };
+        $callback = $callback ?: fn () => true;
 
-        return $this->mailablesOf($mailable)->filter(function ($mailable) use ($callback) {
-            return $callback($mailable);
-        });
+        return $this->mailablesOf($mailable)->filter(fn ($mailable) => $callback($mailable));
     }
 
     /**
@@ -192,23 +238,21 @@ class MailFake implements Mailer, MailQueue
     /**
      * Get all of the queued mailables matching a truth-test callback.
      *
-     * @param  string  $mailable
+     * @param  string|\Closure  $mailable
      * @param  callable|null  $callback
      * @return \Illuminate\Support\Collection
      */
     public function queued($mailable, $callback = null)
     {
+        [$mailable, $callback] = $this->prepareMailableAndCallback($mailable, $callback);
+
         if (! $this->hasQueued($mailable)) {
             return collect();
         }
 
-        $callback = $callback ?: function () {
-            return true;
-        };
+        $callback = $callback ?: fn () => true;
 
-        return $this->queuedMailablesOf($mailable)->filter(function ($mailable) use ($callback) {
-            return $callback($mailable);
-        });
+        return $this->queuedMailablesOf($mailable)->filter(fn ($mailable) => $callback($mailable));
     }
 
     /**
@@ -230,9 +274,7 @@ class MailFake implements Mailer, MailQueue
      */
     protected function mailablesOf($type)
     {
-        return collect($this->mailables)->filter(function ($mailable) use ($type) {
-            return $mailable instanceof $type;
-        });
+        return collect($this->mailables)->filter(fn ($mailable) => $mailable instanceof $type);
     }
 
     /**
@@ -243,9 +285,20 @@ class MailFake implements Mailer, MailQueue
      */
     protected function queuedMailablesOf($type)
     {
-        return collect($this->queuedMailables)->filter(function ($mailable) use ($type) {
-            return $mailable instanceof $type;
-        });
+        return collect($this->queuedMailables)->filter(fn ($mailable) => $mailable instanceof $type);
+    }
+
+    /**
+     * Get a mailer instance by name.
+     *
+     * @param  string|null  $name
+     * @return \Illuminate\Contracts\Mail\Mailer
+     */
+    public function mailer($name = null)
+    {
+        $this->currentMailer = $name;
+
+        return $this;
     }
 
     /**
@@ -257,6 +310,17 @@ class MailFake implements Mailer, MailQueue
     public function to($users)
     {
         return (new PendingMailFake($this))->to($users);
+    }
+
+    /**
+     * Begin the process of mailing a mailable class instance.
+     *
+     * @param  mixed  $users
+     * @return \Illuminate\Mail\PendingMail
+     */
+    public function cc($users)
+    {
+        return (new PendingMailFake($this))->cc($users);
     }
 
     /**
@@ -285,9 +349,9 @@ class MailFake implements Mailer, MailQueue
     /**
      * Send a new message using a view.
      *
-     * @param  string|array  $view
+     * @param  \Illuminate\Contracts\Mail\Mailable|string|array  $view
      * @param  array  $data
-     * @param  \Closure|string  $callback
+     * @param  \Closure|string|null  $callback
      * @return void
      */
     public function send($view, array $data = [], $callback = null)
@@ -296,9 +360,13 @@ class MailFake implements Mailer, MailQueue
             return;
         }
 
+        $view->mailer($this->currentMailer);
+
         if ($view instanceof ShouldQueue) {
             return $this->queue($view, $data);
         }
+
+        $this->currentMailer = null;
 
         $this->mailables[] = $view;
     }
@@ -316,6 +384,10 @@ class MailFake implements Mailer, MailQueue
             return;
         }
 
+        $view->mailer($this->currentMailer);
+
+        $this->currentMailer = null;
+
         $this->queuedMailables[] = $view;
     }
 
@@ -324,7 +396,7 @@ class MailFake implements Mailer, MailQueue
      *
      * @param  \DateTimeInterface|\DateInterval|int  $delay
      * @param  \Illuminate\Contracts\Mail\Mailable|string|array  $view
-     * @param  string  $queue
+     * @param  string|null  $queue
      * @return mixed
      */
     public function later($delay, $view, $queue = null)
@@ -340,5 +412,33 @@ class MailFake implements Mailer, MailQueue
     public function failures()
     {
         return [];
+    }
+
+    /**
+     * Infer mailable class using reflection if a typehinted closure is passed to assertion.
+     *
+     * @param  string|\Closure  $mailable
+     * @param  callable|null  $callback
+     * @return array
+     */
+    protected function prepareMailableAndCallback($mailable, $callback)
+    {
+        if ($mailable instanceof Closure) {
+            return [$this->firstClosureParameterType($mailable), $mailable];
+        }
+
+        return [$mailable, $callback];
+    }
+
+    /**
+     * Forget all of the resolved mailer instances.
+     *
+     * @return $this
+     */
+    public function forgetMailers()
+    {
+        $this->currentMailer = null;
+
+        return $this;
     }
 }

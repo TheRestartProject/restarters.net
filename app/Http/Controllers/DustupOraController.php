@@ -25,7 +25,7 @@ class DustupOraController extends Controller
     public function index(Request $request)
     {
         // DustUp is now closed.
-         return redirect()->action('DustupOraController@status');
+         return redirect()->action([\App\Http\Controllers\DustupOraController::class, 'status']);
     }
 
     /**

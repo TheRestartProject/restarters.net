@@ -17,7 +17,7 @@ use Tests\TestCase;
 class APIv2EventTest extends TestCase
 {
     public function testGetEventsForGroup() {
-        $user = factory(User::class)->states('Administrator')->create([
+        $user = User::factory()->administrator()->create([
                                                                           'api_token' => '1234',
                                                                       ]);
         $this->actingAs($user);
@@ -75,7 +75,7 @@ class APIv2EventTest extends TestCase
 
 
     public function testGetEventsForUnapprovedGroup() {
-        $user = factory(User::class)->states('Administrator')->create([
+        $user = User::factory()->administrator()->create([
                                                                           'api_token' => '1234',
                                                                       ]);
         $this->actingAs($user);
@@ -84,10 +84,10 @@ class APIv2EventTest extends TestCase
         $idevents = $this->createEvent($idgroups, 'tomorrow');
 
         $party = Party::find($idevents);
-        $party->wordpress_post_id = 1234;
+        $party->approved = true;
         $party->save();
 
-        $network = factory(Network::class)->create();
+        $network = Network::factory()->create();
         $network->addGroup(Group::find($idgroups));
 
         // Should not show in list of events.

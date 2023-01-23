@@ -2,10 +2,15 @@
 
 namespace Illuminate\Mail\Transport;
 
+use Aws\Exception\AwsException;
 use Aws\Ses\SesClient;
-use Swift_Mime_SimpleMessage;
+use Exception;
+use Symfony\Component\Mailer\Header\MetadataHeader;
+use Symfony\Component\Mailer\SentMessage;
+use Symfony\Component\Mailer\Transport\AbstractTransport;
+use Symfony\Component\Mime\Message;
 
-class SesTransport extends Transport
+class SesTransport extends AbstractTransport
 {
     /**
      * The Amazon SES instance.
@@ -32,31 +37,65 @@ class SesTransport extends Transport
     {
         $this->ses = $ses;
         $this->options = $options;
+
+        parent::__construct();
     }
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
-    public function send(Swift_Mime_SimpleMessage $message, &$failedRecipients = null)
+    protected function doSend(SentMessage $message): void
     {
-        $this->beforeSendPerformed($message);
+        $options = $this->options;
 
-        $result = $this->ses->sendRawEmail(
-            array_merge(
-                $this->options, [
-                    'Source' => key($message->getSender() ?: $message->getFrom()),
-                    'RawMessage' => [
-                        'Data' => $message->toString(),
-                    ],
-                ]
-            )
-        );
+        if ($message->getOriginalMessage() instanceof Message) {
+            foreach ($message->getOriginalMessage()->getHeaders()->all() as $header) {
+                if ($header instanceof MetadataHeader) {
+                    $options['Tags'][] = ['Name' => $header->getKey(), 'Value' => $header->getValue()];
+                }
+            }
+        }
 
-        $message->getHeaders()->addTextHeader('X-SES-Message-ID', $result->get('MessageId'));
+        try {
+            $result = $this->ses->sendRawEmail(
+                array_merge(
+                    $options, [
+                        'Source' => $message->getEnvelope()->getSender()->toString(),
+                        'Destinations' => collect($message->getEnvelope()->getRecipients())
+                                ->map
+                                ->toString()
+                                ->values()
+                                ->all(),
+                        'RawMessage' => [
+                            'Data' => $message->toString(),
+                        ],
+                    ]
+                )
+            );
+        } catch (AwsException $e) {
+            $reason = $e->getAwsErrorMessage() ?? $e->getMessage();
 
-        $this->sendPerformed($message);
+            throw new Exception(
+                sprintf('Request to AWS SES API failed. Reason: %s.', $reason),
+                is_int($e->getCode()) ? $e->getCode() : 0,
+                $e
+            );
+        }
 
-        return $this->numberOfRecipients($message);
+        $messageId = $result->get('MessageId');
+
+        $message->getOriginalMessage()->getHeaders()->addHeader('X-Message-ID', $messageId);
+        $message->getOriginalMessage()->getHeaders()->addHeader('X-SES-Message-ID', $messageId);
+    }
+
+    /**
+     * Get the string representation of the transport.
+     *
+     * @return string
+     */
+    public function __toString(): string
+    {
+        return 'ses';
     }
 
     /**

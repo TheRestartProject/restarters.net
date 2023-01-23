@@ -1,10 +1,15 @@
 {
   "name": "darkaonline/l5-swagger",
-  "description": "Swagger integration to Laravel 5",
+  "description": "OpenApi or Swagger integration to Laravel",
   "keywords": [
     "laravel",
     "swagger",
-    "api"
+    "api",
+    "OpenApi",
+    "specification",
+    "documentation",
+    "API",
+    "UI"
   ],
   "license": "MIT",
   "authors": [
@@ -15,19 +20,17 @@
   ],
   "require": {
     "php": "^7.2 || ^8.0",
-    "laravel/framework": "^6.0",
-    "zircote/swagger-php": "~2.0|3.*",
-    "swagger-api/swagger-ui": "^3.0",
-    "symfony/yaml": "^4.1 || ^5.0"
+    "laravel/framework": "^9.0 || >=8.40.0 || ^7.0",
+    "zircote/swagger-php": "^3.2 || ^4.0",
+    "swagger-api/swagger-ui": "^3.0 || ^4.0",
+    "symfony/yaml": "^5.0 || ^6.0",
+    "ext-json": "*"
   },
   "require-dev": {
-    "phpunit/phpunit": "8.*",
+    "phpunit/phpunit": "^9.5",
     "mockery/mockery": "1.*",
-    "orchestra/testbench": "4.*",
+    "orchestra/testbench": "7.* || ^6.15 || 5.*",
     "php-coveralls/php-coveralls": "^2.0"
-  },
-  "suggest": {
-    "zircote/swagger-php:~2.0": "!!! Require Swagger-PHP ~2.0 for @SWG annotations support !!!"
   },
   "autoload": {
     "psr-4": {
@@ -46,9 +49,15 @@
     "laravel": {
       "providers": [
         "L5Swagger\\L5SwaggerServiceProvider"
-      ]
+      ],
+      "aliases": {
+        "L5Swagger": "L5Swagger\\L5SwaggerFacade"
+      }
     }
   },
   "minimum-stability": "dev",
-  "prefer-stable": true
+  "prefer-stable": true,
+  "scripts": {
+    "phpunit": "vendor/bin/phpunit --testdox"
+  }
 }
