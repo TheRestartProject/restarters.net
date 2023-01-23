@@ -30,7 +30,7 @@ class CalendarTest extends TestCase
         $group = Group::factory()->create([
                                                    'latitude' => 50.63,
                                                    'longitude' => 5.57,
-                                                   'wordpress_post_id' => '99999',
+                                                   'approved' => true,
                                                    'area' => 'London'
                                                ]);
         $group->addVolunteer($host);
@@ -40,7 +40,7 @@ class CalendarTest extends TestCase
         $group2 = Group::factory()->create([
                                                    'latitude' => 1,
                                                    'longitude' => 2,
-                                                   'wordpress_post_id' => '99999',
+                                                   'approved' => true,
                                                ]);
         $this->group2 = $group2;
 

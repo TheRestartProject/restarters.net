@@ -107,8 +107,8 @@ class GroupTest extends TestCase
         ]);
 
         $group = Group::factory()->create([
-                                                   'wordpress_post_id' => '99999',
-                                               ]);
+                                              'approved' => true,
+                                           ]);
         $network1->addGroup($group);
         $network2->addGroup($group);
 

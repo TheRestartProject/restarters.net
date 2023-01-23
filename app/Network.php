@@ -47,7 +47,7 @@ class Network extends Model
         $events = collect([]);
 
         foreach ($groups as $group) {
-            $events->push($group->upcomingParties()->whereNull('wordpress_post_id')->whereNull('deleted_at'));
+            $events->push($group->upcomingParties()->where('approved', false)->whereNull('deleted_at'));
         }
 
         return $events->flatten(1);

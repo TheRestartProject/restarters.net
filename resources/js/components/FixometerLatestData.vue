@@ -59,7 +59,8 @@ export default {
 }
 
 .img {
-  height: 46px;
+  height: 38px;
+  margin-bottom: 13px;
 }
 
 .icon {

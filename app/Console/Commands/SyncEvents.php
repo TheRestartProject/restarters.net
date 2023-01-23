@@ -50,7 +50,7 @@ class SyncEvents extends Command
      */
     public function handle()
     {
-        $eventsQuery = Party::whereNotNull('wordpress_post_id')->where('wordpress_post_id', '<>', 99999);
+        $eventsQuery = Party::whereNotNull('wordpress_post_id')->where('approved', true);
         if (! is_null($this->option('datefrom'))) {
             $dateFrom = $this->option('datefrom');
             if (! $this->validateDate($dateFrom)) {

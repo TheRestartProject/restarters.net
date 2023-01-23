@@ -48,7 +48,7 @@ class SyncGroups extends Command
      */
     public function handle()
     {
-        $groups = Group::whereNotNull('wordpress_post_id')->where('wordpress_post_id', '<>', 99999)->get();
+        $groups = Group::where('approved', true)->whereNotNull('wordpress_post_id')->get();
 
         foreach ($groups as $group) {
             try {

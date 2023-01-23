@@ -304,8 +304,8 @@ class NetworkController extends Controller
             ->where('event_end_utc', '<=', $end)
             ->where('events.updated_at', '>=', $updated_start)
             ->where('events.updated_at', '<=', $updated_end)
-            ->whereNotNull('events.wordpress_post_id')
-            ->whereNotNull('groups.wordpress_post_id')
+            ->where('events.approved', true)
+            ->where('groups.approved', true)
             ->select('events.*')
             ->get();
 

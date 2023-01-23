@@ -145,7 +145,7 @@ class User extends Authenticatable implements Auditable, HasLocalePreference
             $q->whereNull('grouptags_groups.id');
 
             // Only show approved groups.
-            $q->whereNotNull('wordpress_post_id');
+            $q->where('approved', true);
         })->having('dist', '<=', $nearby)
             ->groupBy('idgroups');
 
