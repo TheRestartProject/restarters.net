@@ -26,9 +26,6 @@ class GroupSummary extends JsonResource
      *          format="int64",
      *          example=1
      *     )
-     */
-
-    /**
      *     @OA\Property(
      *          property="area",
      *          title="name",
@@ -36,9 +33,6 @@ class GroupSummary extends JsonResource
      *          format="string",
      *          example="Restarters HQ"
      *     )
-     */
-
-    /**
      *     @OA\Property(
      *          property="location",
      *          title="location",
@@ -46,9 +40,6 @@ class GroupSummary extends JsonResource
      *          format="object",
      *          ref="#/components/schemas/GroupLocation"
      *     )
-     */
-
-    /**
      *     @OA\Property(
      *          property="image",
      *          title="image",
@@ -56,18 +47,12 @@ class GroupSummary extends JsonResource
      *          format="string",
      *          example="/mid_1597853610178a4b76e4d666b2a7b32ee75d8a24c706f1cbf213970.png"
      *     )
-     */
-
-    /**
      *     @OA\Property(
      *          property="updated_at",
      *          title="updated_at",
      *          description="The last change to this group.  This includes changes which affect the stats.",
      *          format="date-time",
      *     )
-     */
-
-    /**
      *     @OA\Property(
      *          property="next_event",
      *          title="next_event",
