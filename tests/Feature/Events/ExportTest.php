@@ -38,7 +38,7 @@ class ExportTest extends TestCase
         $this->actingAs($admin);
 
         // Create three groups, two approved and one not.
-        $group1 = factory(Group::class)->create([
+        $group1 = Group::factory()->create([
             'name' => 'test1'
                                                 ]);
         $this->networkService = new RepairNetworkService();

@@ -147,8 +147,8 @@ class CalendarTest extends TestCase
     }
 
     public function testEventNotVisible() {
-        $host = factory(User::class)->create([
-                                                 'latitude' => 50.64,
+        $host = User::factory()->create([
+                                            'latitude' => 50.64,
                                                  'longitude' => 5.58,
                                                  'location' => 'London',
                                                  'calendar_hash' => \Str::random(15)
