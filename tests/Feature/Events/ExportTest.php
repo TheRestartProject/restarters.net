@@ -26,9 +26,9 @@ class ExportTest extends TestCase
         $admin = User::factory()->administrator()->create();
 
         switch ($role) {
-            case Role::ADMINISTRATOR: $user = User::factory()->administrator()->create(); break;
-            case Role::NETWORK_COORDINATOR: $user = User::factory()->networkCoordinator()->create(); break;
-            case Role::HOST: $user = User::factory()->host()->create(); break;
+            case 'Administrator': $user = User::factory()->administrator()->create(); break;
+            case 'NetworkCoordinator': $user = User::factory()->networkCoordinator()->create(); break;
+            case 'Host': $user = User::factory()->host()->create(); break;
         }
 
         if ($role == 'NetworkCoordinator') {
@@ -64,7 +64,7 @@ class ExportTest extends TestCase
         $group2->approved = true;
         $group2->save();
 
-        $group3 = factory(Group::class)->create([
+        $group3 = Group::factory()->create([
                                                     'name' => 'test3'
                                                 ]);
         $this->networkService->addGroupToNetwork($admin, $group3, $network);
@@ -107,7 +107,7 @@ class ExportTest extends TestCase
                                                                       'category_creation' => 111,
                                                                       'event' => $idevents2,
                                                                   ]);
-        $device = factory(Device::class)->states('fixed')->create([
+        $device = Device::factory()->fixed()->create([
                                                                       'category' => 111,
                                                                       'category_creation' => 111,
                                                                       'event' => $idevents3,
