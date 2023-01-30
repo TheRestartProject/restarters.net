@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "a0f3792e604575ab7063131172c890f7",
+    "content-hash": "1087038ea78e6372950dde4b5d2a11ca",
     "packages": [
         {
             "name": "addwiki/mediawiki-api",
@@ -375,16 +375,16 @@
         },
         {
             "name": "bkwld/croppa",
-            "version": "5.1.0",
+            "version": "6.0.1",
             "source": {
                 "type": "git",
                 "url": "https://github.com/BKWLD/croppa.git",
-                "reference": "67febc12e6e6290abb4bc6fd6d8dbec1793af54f"
+                "reference": "1dc063c3684019eeaa02b2175d43c0d997659b84"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/BKWLD/croppa/zipball/67febc12e6e6290abb4bc6fd6d8dbec1793af54f",
-                "reference": "67febc12e6e6290abb4bc6fd6d8dbec1793af54f",
+                "url": "https://api.github.com/repos/BKWLD/croppa/zipball/1dc063c3684019eeaa02b2175d43c0d997659b84",
+                "reference": "1dc063c3684019eeaa02b2175d43c0d997659b84",
                 "shasum": ""
             },
             "require": {
@@ -392,17 +392,16 @@
                 "illuminate/console": "^9.0",
                 "illuminate/routing": "^9.0",
                 "illuminate/support": "^9.0",
+                "intervention/image": "^2.7",
                 "league/flysystem": "^3.0",
                 "php": "^8.0.2",
                 "symfony/http-foundation": "^6.0",
-                "symfony/http-kernel": "^6.0",
-                "weotch/phpthumb": "^1.0.5"
-            },
-            "conflict": {
-                "league/flysystem-cached-adapter": "<1.0.2"
+                "symfony/http-kernel": "^6.0"
             },
             "require-dev": {
                 "mockery/mockery": "^1.4.4",
+                "nunomaduro/larastan": "^2.0",
+                "orchestra/testbench": "^7.5",
                 "phpunit/phpunit": "^9.5.10"
             },
             "suggest": {
@@ -412,16 +411,16 @@
             "extra": {
                 "laravel": {
                     "providers": [
-                        "Bkwld\\Croppa\\ServiceProvider"
+                        "Bkwld\\Croppa\\CroppaServiceProvider"
                     ],
                     "aliases": {
-                        "Croppa": "Bkwld\\Croppa\\Facade"
+                        "Croppa": "Bkwld\\Croppa\\Facades\\Croppa"
                     }
                 }
             },
             "autoload": {
-                "psr-0": {
-                    "Bkwld\\Croppa": "src/"
+                "psr-4": {
+                    "Bkwld\\Croppa\\": "src"
                 }
             },
             "notification-url": "https://packagist.org/downloads/",
@@ -431,14 +430,24 @@
             "authors": [
                 {
                     "name": "Robert Reinhard"
+                },
+                {
+                    "name": "Samuel De Backer"
                 }
             ],
             "description": "Image thumbnail creation through specially formatted URLs for Laravel",
+            "homepage": "https://github.com/bkwld/croppa",
+            "keywords": [
+                "image",
+                "laravel",
+                "resize",
+                "thumb"
+            ],
             "support": {
                 "issues": "https://github.com/BKWLD/croppa/issues",
-                "source": "https://github.com/BKWLD/croppa/tree/5.1.0"
+                "source": "https://github.com/BKWLD/croppa/tree/6.0.1"
             },
-            "time": "2022-05-13T00:11:04+00:00"
+            "time": "2022-05-30T09:25:12+00:00"
         },
         {
             "name": "brick/math",
@@ -9176,44 +9185,6 @@
             "time": "2022-06-03T18:03:27+00:00"
         },
         {
-            "name": "weotch/phpthumb",
-            "version": "1.0.5",
-            "source": {
-                "type": "git",
-                "url": "https://github.com/weotch/PHPThumb.git",
-                "reference": "f5c1d2ef2e9de3bded7483778618bf8cac2511c3"
-            },
-            "dist": {
-                "type": "zip",
-                "url": "https://api.github.com/repos/weotch/PHPThumb/zipball/f5c1d2ef2e9de3bded7483778618bf8cac2511c3",
-                "reference": "f5c1d2ef2e9de3bded7483778618bf8cac2511c3",
-                "shasum": ""
-            },
-            "replace": {
-                "dannytrue/phpthumb": "dev-master#2d8898f62e75a743e248dd5906a038d574e0dfe0"
-            },
-            "type": "library",
-            "autoload": {
-                "classmap": [
-                    "src/"
-                ]
-            },
-            "notification-url": "https://packagist.org/downloads/",
-            "license": [
-                "MIT"
-            ],
-            "authors": [
-                {
-                    "name": "Robert Reinhard"
-                }
-            ],
-            "description": "Fork of PHPThumb that adds auto-image rotation based on EXIF data and composer support",
-            "support": {
-                "source": "https://github.com/weotch/PHPThumb/tree/master"
-            },
-            "time": "2015-05-12T22:56:19+00:00"
-        },
-        {
             "name": "wouternl/laravel-drip",
             "version": "1.2.4",
             "source": {
@@ -11756,20 +11727,20 @@
         },
         {
             "name": "spatie/flare-client-php",
-            "version": "1.3.2",
+            "version": "1.3.4",
             "source": {
                 "type": "git",
                 "url": "https://github.com/spatie/flare-client-php.git",
-                "reference": "609903bd154ba3d71f5e23a91c3b431fa8f71868"
+                "reference": "cac56c8730032660f2ff23906b7018e93d8f2d3f"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/spatie/flare-client-php/zipball/609903bd154ba3d71f5e23a91c3b431fa8f71868",
-                "reference": "609903bd154ba3d71f5e23a91c3b431fa8f71868",
+                "url": "https://api.github.com/repos/spatie/flare-client-php/zipball/cac56c8730032660f2ff23906b7018e93d8f2d3f",
+                "reference": "cac56c8730032660f2ff23906b7018e93d8f2d3f",
                 "shasum": ""
             },
             "require": {
-                "illuminate/pipeline": "^8.0|^9.0",
+                "illuminate/pipeline": "^8.0|^9.0|^10.0",
                 "php": "^8.0",
                 "spatie/backtrace": "^1.2",
                 "symfony/http-foundation": "^5.0|^6.0",
@@ -11813,7 +11784,7 @@
             ],
             "support": {
                 "issues": "https://github.com/spatie/flare-client-php/issues",
-                "source": "https://github.com/spatie/flare-client-php/tree/1.3.2"
+                "source": "https://github.com/spatie/flare-client-php/tree/1.3.4"
             },
             "funding": [
                 {
@@ -11821,26 +11792,25 @@
                     "type": "github"
                 }
             ],
-            "time": "2022-12-26T14:36:46+00:00"
+            "time": "2023-01-23T15:31:39+00:00"
         },
         {
             "name": "spatie/ignition",
-            "version": "1.4.1",
+            "version": "1.4.3",
             "source": {
                 "type": "git",
                 "url": "https://github.com/spatie/ignition.git",
-                "reference": "dd3d456779108d7078baf4e43f8c2b937d9794a1"
+                "reference": "2cf3833220cfe8fcf639544f8d7067b6469a00b0"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/spatie/ignition/zipball/dd3d456779108d7078baf4e43f8c2b937d9794a1",
-                "reference": "dd3d456779108d7078baf4e43f8c2b937d9794a1",
+                "url": "https://api.github.com/repos/spatie/ignition/zipball/2cf3833220cfe8fcf639544f8d7067b6469a00b0",
+                "reference": "2cf3833220cfe8fcf639544f8d7067b6469a00b0",
                 "shasum": ""
             },
             "require": {
                 "ext-json": "*",
                 "ext-mbstring": "*",
-                "monolog/monolog": "^2.0",
                 "php": "^8.0",
                 "spatie/flare-client-php": "^1.1",
                 "symfony/console": "^5.4|^6.0",
@@ -11896,7 +11866,7 @@
                     "type": "github"
                 }
             ],
-            "time": "2022-08-26T11:51:15+00:00"
+            "time": "2023-01-23T15:28:32+00:00"
         },
         {
             "name": "spatie/laravel-ignition",

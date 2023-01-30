@@ -15,7 +15,7 @@
      *      string  IoC binding name of League\Flysystem\Filesystem
      *      string  IoC binding name of League\Flysystem\Cached\CachedAdapter
      */
-    'src_dir' => public_path().'/uploads',
+    'src_disk' => 'public_uploads',
 
     /**
      * The directory where cropped images should be saved. The route to the
@@ -26,7 +26,9 @@
      *      string  IoC binding name of League\Flysystem\Filesystem
      *      string  IoC binding name of League\Flysystem\Cached\CachedAdapter
      */
-    'crops_dir' => public_path().'/uploads',
+    'crops_dir' => 'public_uploads',
+
+    'crops_are_remote' => false,
 
     /**
      * Maximum number of sizes to allow for a particular source file. This is to
