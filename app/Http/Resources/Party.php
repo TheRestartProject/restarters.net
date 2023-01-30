@@ -26,9 +26,6 @@ class Party extends JsonResource
      *          format="int64",
      *          example=1
      *     )
-     */
-
-    /**
      *     @OA\Property(
      *          property="approved",
      *          title="approved",
@@ -46,9 +43,6 @@ class Party extends JsonResource
      *          format="date-time",
      *          example="2022-09-18T11:30:00+00:00"
      *     )
-     */
-
-    /**
      *     @OA\Property(
      *          property="end",
      *          title="end",
@@ -56,9 +50,6 @@ class Party extends JsonResource
      *          format="date-time",
      *          example="2022-09-18T12:30:00+00:00"
      *     )
-     */
-
-    /**
      *     @OA\Property(
      *          property="timezone",
      *          title="timezone",
@@ -66,9 +57,6 @@ class Party extends JsonResource
      *          format="string",
      *          example="Europe/London"
      *     )
-     */
-
-    /**
      *     @OA\Property(
      *          property="title",
      *          title="title",
@@ -76,9 +64,6 @@ class Party extends JsonResource
      *          format="string",
      *          example="Europe/London"
      *     )
-     */
-
-    /**
      *     @OA\Property(
      *          property="description",
      *          title="description",
@@ -86,9 +71,6 @@ class Party extends JsonResource
      *          format="string",
      *          example="Come along and we'll fix your broken electrical items."
      *     )
-     */
-
-    /**
      *     @OA\Property(
      *          property="location",
      *          title="location",
@@ -96,9 +78,6 @@ class Party extends JsonResource
      *          format="string",
      *          example="Europe/London"
      *     )
-     */
-
-    /**
      *     @OA\Property(
      *          property="lat",
      *          title="lat",
@@ -106,9 +85,6 @@ class Party extends JsonResource
      *          format="float",
      *          example="50.8113243"
      *     )
-     */
-
-    /**
      *     @OA\Property(
      *          property="online",
      *          title="online",
@@ -116,9 +92,6 @@ class Party extends JsonResource
      *          format="boolean",
      *          example="false"
      *     )
-     */
-
-    /**
      *     @OA\Property(
      *          property="lng",
      *          title="lng",
@@ -126,18 +99,12 @@ class Party extends JsonResource
      *          format="float",
      *          example="-1.0788839"
      *     )
-     */
-
-    /**
      *     @OA\Property(
      *          property="group",
      *          title="group",
      *          description="The group which is hosting this event.",
      *          ref="#/components/schemas/GroupSummary"
      *     )
-     */
-
-    /**
      *     @OA\Property(
      *          property="stats",
      *          title="stats",
@@ -252,9 +219,6 @@ class Party extends JsonResource
      *              type="number",
      *          ),
      *     )
-     */
-
-    /**
      *     @OA\Property(
      *          property="updated_at",
      *          title="updated_at",

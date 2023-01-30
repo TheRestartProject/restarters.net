@@ -915,7 +915,9 @@ class PartyController extends Controller
             }
 
             if (count($invalid)) {
-                return redirect()->back()->with('warning', 'Invalid emails were entered, so no notifications were sent - please send your invitation again.  The invalid emails were: ' . implode(', ', $invalid));
+                return redirect()->back()->with('warning', __('events.invite_invalid_emails', [
+                    'emails' => implode(', ', $invalid)
+                ]));
             } else {
                 $users = User::whereIn('email', $emails)->get();
 
@@ -996,17 +998,19 @@ class PartyController extends Controller
                 }
 
                 if (! isset($not_sent)) {
-                    return redirect()->back()->with('success', 'Invites Sent!');
+                    return redirect()->back()->with('success', __('events.invite_success'));
                 }
 
                 // Don't log to Sentry - legitimate user error.
-                return redirect()->back()->with('warning', 'Invites Sent - apart from these ('.implode(',', $not_sent).') who were already part of the event');
+                return redirect()->back()->with('warning', __('events.invite_invalid_emails', [
+                    'emails' => implode(', ', $not_sent)
+                ]));
             }
         }
 
-        \Sentry\CaptureMessage('You have not entered any emails!');
+        \Sentry\CaptureMessage(__('events.invite_noemails'));
 
-        return redirect()->back()->with('warning', 'You have not entered any emails!');
+        return redirect()->back()->with('warning', __('events.invite_noemails'));
     }
 
     public function confirmInvite($event_id, $hash)
@@ -1029,15 +1033,15 @@ class PartyController extends Controller
             return redirect('/party/view/'.$user_event->event);
         }
 
-        \Sentry\CaptureMessage('Something went wrong - this invite is invalid or has expired');
-        return redirect('/party/view/'.intval($event_id))->with('warning', 'Something went wrong - this invite is invalid or has expired');
+        \Sentry\CaptureMessage(__('events.invite_invalid'));
+        return redirect('/party/view/'.intval($event_id))->with('warning', __('events.invite_invalid'));
     }
 
     public function cancelInvite($event_id)
     {
         EventsUsers::where('user', Auth::user()->id)->where('event', $event_id)->delete();
 
-        return redirect('/party/view/'.intval($event_id))->with('success', 'You are no longer attending this event.');
+        return redirect('/party/view/'.intval($event_id))->with('success', __('events.invite_cancelled'));
     }
 
     public function imageUpload(Request $request, $id)
@@ -1079,11 +1083,11 @@ class PartyController extends Controller
             $Image = new FixometerFile;
             $Image->deleteImage($id, $path);
 
-            return redirect()->back()->with('success', 'Thank you, the image has been deleted');
+            return redirect()->back()->with('success', __('events.image_delete_success'));
         }
 
-        \Sentry\CaptureMessage('Sorry, but the image can\'t be deleted');
-        return redirect()->back()->with('warning', 'Sorry, but the image can\'t be deleted');
+        \Sentry\CaptureMessage(__('events.image_delete_error'));
+        return redirect()->back()->with('warning', __('events.image_delete_error'));
     }
 
     /*
@@ -1128,8 +1132,8 @@ class PartyController extends Controller
 
         if (! Fixometer::userHasEditPartyPermission($id) &&
             ! Fixometer::userIsHostOfGroup($event->group, Auth::user()->id)) {
-            \Sentry\CaptureMessage(__('You do not have permission to delete this event'));
-            return redirect()->back()->with('warning', 'You do not have permission to delete this event');
+            \Sentry\CaptureMessage(__('events.delete_permission'));
+            return redirect()->back()->with('warning', __('events.delete_permission'));
         }
 
         $event = Party::findOrFail($id);
@@ -1143,7 +1147,7 @@ class PartyController extends Controller
 
         Log::info('Event deleted');
 
-        return redirect('/party')->with('success', 'Event has been deleted');
+        return redirect('/party')->with('success', __('events.delete_success'));
     }
 
     /**

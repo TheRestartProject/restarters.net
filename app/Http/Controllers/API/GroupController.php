@@ -309,7 +309,7 @@ class GroupController extends Controller
     /**
      * @OA\Get(
      *      path="/api/v2/groups/{id}/events",
-     *      operationId="getGroup",
+     *      operationId="getGroupv2",
      *      tags={"Groups"},
      *      summary="Get Group",
      *      description="Returns the list of events for a group.",

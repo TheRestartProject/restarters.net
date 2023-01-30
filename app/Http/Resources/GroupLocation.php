@@ -25,27 +25,18 @@ class GroupLocation extends JsonResource
      *          format="string",
      *          example="London"
      *     )
-     */
-
-    /**
      *     @OA\Property(
      *          property="location",
      *          description="The location that this group is in.  Must be geocodable.",
      *          format="string",
      *          example="College Road, London NW10 5EX, UK"
      *     )
-     */
-
-    /**
      *     @OA\Property(
      *          property="country",
      *          description="The free-form country.",
      *          format="string",
      *          example="United Kingdom"
      *     )
-     */
-
-    /**
      *     @OA\Property(
      *          property="lat",
      *          title="lat",
@@ -53,9 +44,6 @@ class GroupLocation extends JsonResource
      *          format="float",
      *          example="50.8113243"
      *     )
-     */
-
-    /**
      *     @OA\Property(
      *          property="lng",
      *          title="lng",
@@ -63,9 +51,6 @@ class GroupLocation extends JsonResource
      *          format="float",
      *          example="-1.0788839"
      *     )
-     */
-
-    /**
      *     @OA\Property(
      *          property="postcode",
      *          title="postcode",
