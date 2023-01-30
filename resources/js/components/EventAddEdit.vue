@@ -280,12 +280,8 @@ export default {
       // We deliberately don't set the date above, because we don't want it set for event duplication.
       //
       // The date we get here is epoch.
-      const group = this.groups.find(g => g.idgroups === this.idgroups)
-
-      if (group) {
-        const m = moment.tz(this.initialEvent.event_start_utc, group.timezone)
-        this.eventDate = m.format('YYYY-MM-DD')
-      }
+      const m = moment.tz(this.initialEvent.event_start_utc, this.initialEvent.timezone)
+      this.eventDate = m.format('YYYY-MM-DD')
     }
 
     // If only one group, default to that.
