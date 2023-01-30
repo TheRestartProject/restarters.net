@@ -28,6 +28,15 @@
     </div>
 @endif
 
+@if(env('APP_SHOW_COMMUNITY_TEST'))
+  <style>
+    body {
+        background-image:url("data:image/svg+xml;utf8, <svg xmlns='http://www.w3.org/2000/svg' version='1.1' height='50px' width='120px'><text x='0' y='15' fill='lightgrey' font-size='20'>Test System</text></svg>") !important;
+        background-repeat: repeat !important;
+        background-color: none !important;
+    }
+  </style>
+@endif
 {{-- Left side of the Navigation --}}
 <ul class="nav-left d-flex justify-content-between w-100 pr-md-3" id="nav-left">
     <li style="flex-basis: 100%;">

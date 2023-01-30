@@ -186,7 +186,7 @@ class UserController extends Controller
 
         $user->save();
 
-        return redirect()->back()->with('message', 'User Profile Updated!');
+        return redirect()->back()->with('message', __('profile.profile_updated'));
     }
 
     public function postProfilePasswordEdit(Request $request)
@@ -294,7 +294,9 @@ class UserController extends Controller
         $user->delete(); // Will be anonymised automatically by event handlers
 
         if (Auth::id() !== $user_id) {
-            return redirect('user/all')->with('danger', $old_user_name.'\'s account has been soft deleted');
+            return redirect('user/all')->with('danger', __('profile.soft_deleted', [
+                'name' => $old_user_name
+            ]));
         } else {
             return redirect('login');
         }
@@ -355,10 +357,10 @@ class UserController extends Controller
             $file = new FixometerFile;
             $file->upload('profilePhoto', 'image', $id, env('TBL_USERS'), false, true);
 
-            return redirect()->back()->with('message', 'Profile Picture Updated!');
+            return redirect()->back()->with('message', __('profile.picture_success'));
         }
 
-        return redirect()->back()->with('error', 'Failed to upload profile picture!');
+        return redirect()->back()->with('error', __('profile.picture_error'));
     }
 
     public function postAdminEdit(Request $request)
@@ -394,7 +396,7 @@ class UserController extends Controller
         $user->preferences()->sync($request->input('preferences'));
         $user->permissions()->sync($request->input('permissions'));
 
-        return redirect()->back()->with('message', 'Admin settings updated');
+        return redirect()->back()->with('message', __('profile.admin_success'));
     }
 
     public function recover(Request $request)
@@ -454,6 +456,7 @@ class UserController extends Controller
     public function reset(Request $request)
     {
         $User = new User;
+        $user = null;
 
         $recovery = $request->recovery;
 
@@ -499,6 +502,8 @@ class UserController extends Controller
                     \Sentry\CaptureMessage($response['danger']);
                 }
             }
+        } else {
+            $email = $user ? $user->email : null;
         }
 
         return view('auth.reset-password', [
@@ -717,7 +722,7 @@ class UserController extends Controller
                     'originalData' => $data,
                   ]);
             } else {
-                return redirect()->back()->with('success', 'User Successfully Created!');
+                return redirect()->back()->with('success', __('profile.create_success'));
             }
         } else {
             header('Location: /user/forbidden');

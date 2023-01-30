@@ -66,7 +66,7 @@ class InviteEventTest extends TestCase
 
         $response->assertSessionHas('success');
         $response = $this->get('/party/view/'.$event->idevents);
-        $response->assertSee('Invites Sent!');
+        $response->assertSee('Invites sent!');
 
         // Check it's in the DB.
         $this->assertDatabaseHas('events_users', [

@@ -44,4 +44,9 @@ return [
   'password_changed' => 'User Password Updated!',
   'profile_updated' => 'User Profile Updated!',
   'preferences_updated' => 'User Preferences Updated!',
+  'soft_deleted' => ':name\'s account has been soft deleted.',
+  'picture_success' => 'Profile picture updated!',
+  'picture_error' => 'Failed to upload profile picture!',
+  'admin_success' => 'Admin settings updated',
+  'create_success' => 'User Successfully Created!',
 ];

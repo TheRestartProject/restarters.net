@@ -283,9 +283,9 @@ class NetworkTest extends TestCase
         ]);
         $response->assertRedirect();
 
-        // Group should now show on network page and in encoded list of networks for a groiup.
+        // Group should now show on network page and in encoded list of networks for a group.
         $response = $this->get('/group/network/' . $network->id);
-        $response->assertSee(htmlspecialchars($group->name, ENT_QUOTES));
+        $response->assertSee($group->name);
         $response->assertSee('&quot;networks&quot;:[' . $network->id . ']', false);
 
         // All networks list visible to admin.

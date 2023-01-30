@@ -25,9 +25,6 @@ class Tag extends JsonResource
      *          format="int64",
      *          example=1
      *     )
-     */
-
-    /**
      *     @OA\Property(
      *          property="name",
      *          title="name",
@@ -35,9 +32,6 @@ class Tag extends JsonResource
      *          format="string",
      *          example="Scotland"
      *     )
-     */
-
-    /**
      *     @OA\Property(
      *          property="description",
      *          title="description",

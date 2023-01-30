@@ -56,9 +56,9 @@ class CategoryController extends Controller
             'description_short' => $request->input('categories_desc')
             ]);
         } catch (\Exception $e) {
-            return redirect()->back()->with('danger', 'Category could not be updated!');
+            return redirect()->back()->with('danger', __('category.update_error'));
         }
 
-        return redirect()->back()->with('success', 'Category updated!');
+        return redirect()->back()->with('success', __('category.update_success'));
     }
 }

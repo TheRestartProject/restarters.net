@@ -44,4 +44,9 @@ return [
     'password_changed' => 'Mot de passe de l\'utilisateur mis à jour !',
     'profile_updated' => 'Profil de l\'utilisateur mis à jour !',
     'preferences_updated' => 'Mise à jour des préférences de l\'utilisateur !',
+    'soft_deleted' => 'Le compte de :name\ a été supprimé.',
+    'picture_success' => 'Mise à jour de la photo de profil!',
+    'picture_error' => 'Impossible de télécharger la photo de profil!',
+    'admin_success' => 'Paramètres d\'administration mis à jour',
+    'create_success' => 'Utilisateur créé avec succès!',
 ];

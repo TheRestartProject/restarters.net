@@ -12,7 +12,7 @@
         "addwiki/mediawiki-api": "~0.7.0",
         "addwiki/mediawiki-api-base": "~2.0",
         "barryvdh/laravel-translation-manager": "^0.6.2",
-        "bkwld/croppa": "^5.0",
+        "bkwld/croppa": "^6.0.1",
         "caseyamcl/guzzle_retry_middleware": "^2.6",
         "cweagans/composer-patches": "^1.7",
         "darkaonline/l5-swagger": "^8.0",
@@ -41,7 +41,7 @@
         "symfony/http-foundation": "^6.0",
         "symfony/mailgun-mailer": "^6.2",
         "twbs/bootstrap": "4.1.0",
-        "wouternl/laravel-drip": "^1.1"
+        "wouternl/laravel-drip": "^1.2.4"
     },
     "require-dev": {
         "barryvdh/laravel-debugbar": "^3.6",
