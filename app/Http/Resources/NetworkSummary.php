@@ -25,9 +25,6 @@ class NetworkSummary extends JsonResource
      *          format="int64",
      *          example=1
      *     )
-     */
-
-    /**
      *     @OA\Property(
      *          property="name",
      *          title="name",
@@ -35,9 +32,6 @@ class NetworkSummary extends JsonResource
      *          format="string",
      *          example="Default Network"
      *     )
-     */
-
-    /**
      *     @OA\Property(
      *          property="logo",
      *          title="image",

@@ -16,15 +16,6 @@ use Illuminate\Support\Str;
 use OwenIt\Auditing\Contracts\Auditable;
 use Illuminate\Contracts\Translation\HasLocalePreference;
 
-class WikiSyncStatus
-{
-    use HasFactory;
-
-    const DoNotCreate = 0;
-    const CreateAtLogin = 1;
-    const Created = 2;
-}
-
 class User extends Authenticatable implements Auditable, HasLocalePreference
 {
     use HasFactory;
