@@ -20,7 +20,7 @@ class BasicTest extends TestCase
         $idgroups = $this->createGroup();
         $group = Group::findOrFail($idgroups);
 
-        $host = factory(User::class)->state('Host')->create();
+        $host = User::factory()->host()->create();
 
         Notification::send($host, new NewGroupWithinRadius([
                                                                             'group_name' => $group->name,

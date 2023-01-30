@@ -1,7 +1,18 @@
 <?php
 
-use Faker\Generator as Faker;
+namespace Database\Factories;
 
-$factory->define(App\Mobifix::class, function (Faker $faker, $attributes) {
-    return [];
-});
+use Illuminate\Database\Eloquent\Factories\Factory;
+
+class MobifixFactory extends Factory
+{
+    /**
+     * Define the model's default state.
+     *
+     * @return array
+     */
+    public function definition()
+    {
+        return [];
+    }
+}

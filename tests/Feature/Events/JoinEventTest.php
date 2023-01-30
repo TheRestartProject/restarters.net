@@ -20,12 +20,12 @@ class JoinEventTest extends TestCase
     {
         $this->withoutExceptionHandling();
 
-        $group = factory(Group::class)->create([
-                                                   'wordpress_post_id' => '99999'
-                                               ]);
-        $event = factory(Party::class)->create(['group' => $group->idgroups]);
+        $group = Group::factory()->create([
+                                              'approved' => true
+                                           ]);
+        $event = Party::factory()->create(['group' => $group->idgroups]);
 
-        $user = factory(User::class)->states('Restarter')->create();
+        $user = User::factory()->restarter()->create();
         $this->actingAs($user);
 
         // Join.  Should get redirected, and also prompted to follow the group (which we haven't).
@@ -56,7 +56,7 @@ class JoinEventTest extends TestCase
     }
 
     public function testJoinInvalid() {
-        $user = factory(User::class)->states('Restarter')->create();
+        $user = User::factory()->restarter()->create();
         $this->actingAs($user);
 
         $response = $this->get('/party/join/-1');

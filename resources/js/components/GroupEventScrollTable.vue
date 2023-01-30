@@ -19,6 +19,8 @@
         :items="filteredItems"
         sort-null-last
         :sort-compare="sortCompare"
+        :sort-by="sortBy"
+        :sort-desc="sortDesc"
         sticky-header="50vh"
         responsive
         class="mt-2 pl-0 pl-md-3 pr-0 pr-md-3 pb-2 mb-2"
@@ -48,7 +50,7 @@
       <template slot="cell(title)" slot-scope="data" v-bind:addGroupName="addGroupName">
         <b><EventTitle :idevents="data.item.title.idevents" component="a" :href="'/party/view/' + data.item.title.idevents" /></b>
         <div class="hidecell">
-          <span v-if="addGroupName" class="small">
+          <span v-if="addGroupName && data.item.title.group" class="small">
             <a :href="'/group/view/' + data.item.title.group.idgroups">{{ data.item.title.group.name }}</a>
           </span>
         </div>
@@ -198,6 +200,16 @@ export default {
       type: Boolean,
       required: false,
       default: false
+    },
+    sortBy: {
+      type: String,
+      required: false,
+      default: 'date_long'
+    },
+    sortDesc: {
+      type: Boolean,
+      required: false,
+      default: true
     }
   },
   data () {
@@ -303,28 +315,48 @@ export default {
     sortCompare(aRow, bRow, key, sortDesc, formatter, compareOptions, compareLocale) {
       const a = aRow[key]
       const b = bRow[key]
+      let ret = 0
 
-      switch (key) {
-        case 'date_short':
-        case 'date_long':
-          return new moment(b.event_start_utc).unix() - new moment(a.event_start_utc).unix()
-        case 'title':
-          const atitle = a.venue ? a.venue : a.location
-          const btitle = b.venue ? b.venue : b.location
-          return atitle.toLowerCase().localeCompare(btitle.toLowerCase())
-        case 'participants_count':
-        case 'volunteers_count':
-        case 'waste':
-        case 'co2':
-        case 'fixed_devices':
-        case 'repairable_devices':
-        case 'dead_devices':
-        case 'invited':
-        case 'volunteers':
-          return parseInt(a['stats'][key]) - parseInt(b['stats'][key])
-        default:
-          return toString(a).localeCompare(toString(b), compareLocale, compareOptions)
+      try {
+        switch (key) {
+          case 'date_short':
+          case 'date_long':
+            if (this.past) {
+              // Show past events most recent first.
+              ret = new moment(a.event_start_utc).unix() - new moment(b.event_start_utc).unix()
+            } else {
+              ret = new moment(b.event_start_utc).unix() - new moment(a.event_start_utc).unix()
+            }
+            break
+          case 'title':
+            const atitle = a.venue ? a.venue : a.location
+            const btitle = b.venue ? b.venue : b.location
+            ret = atitle.toLowerCase().localeCompare(btitle.toLowerCase())
+            break
+          case 'participants_count':
+          case 'volunteers_count':
+          case 'waste':
+          case 'co2':
+          case 'fixed_devices':
+          case 'repairable_devices':
+          case 'dead_devices':
+          case 'invited':
+          case 'volunteers':
+            ret = parseInt(a['stats'][key]) - parseInt(b['stats'][key])
+            break
+          default:
+            ret = toString(a).localeCompare(toString(b), compareLocale, compareOptions)
+            break
+        }
+      } catch (e) {
+        console.error("Sort exception", e)
       }
+
+      if (!this.sortDesc) {
+        ret = -ret
+      }
+
+      return ret
     },
     stats(event) {
       return this.$store.getters['events/getStats'](event.idevents)
@@ -372,7 +404,7 @@ export default {
 @import '~bootstrap/scss/variables';
 @import '~bootstrap/scss/mixins/_breakpoints';
 
-/deep/ .hidecell {
+::v-deep .hidecell {
   display: none;
 
   @include media-breakpoint-up(md) {
@@ -380,27 +412,27 @@ export default {
   }
 }
 
-/deep/ .nounderline {
+::v-deep .nounderline {
   text-decoration: none !important;
 }
 
-/deep/ .icon {
+::v-deep .icon {
   width: 30px;
   height: 30px;
 }
 
-/deep/ {
+::v-deep {
   .datetd {
     width: 87px;
     min-height: 87px;
   }
 }
 
-/deep/ .table.b-table > thead > tr {
+::v-deep .table.b-table > thead > tr {
   background-position-x: center !important;
 }
 
-/deep/ .attending {
+::v-deep .attending {
   background-color: $brand-grey;
 
   .datetd {
@@ -419,7 +451,7 @@ export default {
 
 // The multiselect is used in a few places, and we have some inconsistencies in styling.  Here we force it to match
 // the behaviour of the inputs.
-/deep/ .multiselect {
+::v-deep .multiselect {
   &.multiselect--active {
     border: 0 !important;
 
@@ -436,7 +468,7 @@ export default {
   }
 }
 
-/deep/ td[aria-colindex="6"] {
+::v-deep td[aria-colindex="6"] {
   // Hack so we can get the cell warning full height.
   height: 1px;
 

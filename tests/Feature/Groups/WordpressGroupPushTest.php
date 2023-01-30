@@ -42,14 +42,16 @@ class WordpressGroupPushTest extends TestCase
             $mock->shouldReceive('handle')->once();
         }));
 
-        $network = factory(Network::class)->create([
+        $network = Network::factory()->create([
             'name' => 'Restart',
             'events_push_to_wordpress' => true,
         ]);
-        $group = factory(Group::class)->create();
+        $group = Group::factory()->create([
+                                              'approved' => true,
+                                           ]);
         $network->addGroup($group);
 
-        $groupData = factory(Group::class)->raw();
+        $groupData = Group::factory()->raw();
         $groupData['moderate'] = 'approve';
         $groupData['group_avatar'] = 'foo.png';
 
@@ -64,16 +66,17 @@ class WordpressGroupPushTest extends TestCase
             $mock->shouldReceive('editPost')->once();
         }));
 
-        $network = factory(Network::class)->create([
+        $network = Network::factory()->create([
             'name' => 'Restart',
             'events_push_to_wordpress' => true,
         ]);
-        $group = factory(Group::class)->create();
+        $group = Group::factory()->create();
         $group->wordpress_post_id = 100;
+        $group->approved = true;
         $group->save();
         $network->addGroup($group);
 
-        $groupData = factory(Group::class)->raw();
+        $groupData = Group::factory()->raw();
         $groupData['free_text'] = 'Some change';
         $groupData['website'] = 'https://foo.bar';
         $groupData['group_avatar'] = 'foo.png';

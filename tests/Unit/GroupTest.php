@@ -30,8 +30,8 @@ class GroupTest extends TestCase
     /** @test */
     public function can_add_volunteer_to_a_group()
     {
-        $group = factory(\App\Group::class)->create();
-        $volunteer = factory(\App\User::class)->create();
+        $group = \App\Group::factory()->create();
+        $volunteer = \App\User::factory()->create();
 
         $group->addVolunteer($volunteer);
 
@@ -43,9 +43,9 @@ class GroupTest extends TestCase
     public function ensure_user_is_removed_from_group_when_deleted()
     {
         /** @var Group $group */
-        $group = factory(Group::class)->create();
+        $group = Group::factory()->create();
         /** @var User $volunteer */
-        $volunteer = factory(User::class)->create();
+        $volunteer = User::factory()->create();
 
         $group->addVolunteer($volunteer);
         $volunteer->delete();
@@ -56,8 +56,8 @@ class GroupTest extends TestCase
     /** @test */
     public function it_can_set_a_host_group_member_as_host()
     {
-        $group = factory(\App\Group::class)->create();
-        $host = factory(\App\User::class)->states('Host')->create();
+        $group = \App\Group::factory()->create();
+        $host = \App\User::factory()->host()->create();
 
         $group->addVolunteer($host);
         $group->makeMemberAHost($host);
@@ -71,8 +71,8 @@ class GroupTest extends TestCase
     /** @test */
     public function it_can_set_a_restarter_group_member_as_host()
     {
-        $group = factory(\App\Group::class)->create();
-        $restarter = factory(\App\User::class)->states('Restarter')->create();
+        $group = \App\Group::factory()->create();
+        $restarter = \App\User::factory()->restarter()->create();
 
         $group->addVolunteer($restarter);
         $group->makeMemberAHost($restarter);
@@ -86,8 +86,8 @@ class GroupTest extends TestCase
     /** @test */
     public function it_can_have_a_tag_added()
     {
-        $group = factory(\App\Group::class)->create();
-        $tag1 = factory(\App\GroupTags::class)->create();
+        $group = \App\Group::factory()->create();
+        $tag1 = \App\GroupTags::factory()->create();
 
         $group->addTag($tag1);
 
@@ -99,14 +99,16 @@ class GroupTest extends TestCase
     /** @test */
     public function given_a_network_that_should_push_then_group_should_push()
     {
-        $network1 = factory(Network::class)->create([
+        $network1 = Network::factory()->create([
             'events_push_to_wordpress' => true,
         ]);
-        $network2 = factory(Network::class)->create([
+        $network2 = Network::factory()->create([
             'events_push_to_wordpress' => false,
         ]);
 
-        $group = factory(Group::class)->create();
+        $group = Group::factory()->create([
+                                              'approved' => true,
+                                           ]);
         $network1->addGroup($group);
         $network2->addGroup($group);
 
@@ -118,14 +120,14 @@ class GroupTest extends TestCase
     /** @test */
     public function given_no_network_that_should_push_then_group_should_not_push()
     {
-        $network1 = factory(Network::class)->create([
+        $network1 = Network::factory()->create([
             'events_push_to_wordpress' => false,
         ]);
-        $network2 = factory(Network::class)->create([
+        $network2 = Network::factory()->create([
             'events_push_to_wordpress' => false,
         ]);
 
-        $group = factory(Group::class)->create();
+        $group = Group::factory()->create();
         $network1->addGroup($group);
         $network2->addGroup($group);
 
@@ -139,14 +141,14 @@ class GroupTest extends TestCase
      * @dataProvider timezoneProvider
      */
     public function timezone_inheritance($group, $network1, $network2, $result, $exception) {
-        $network1 = factory(Network::class)->create([
+        $network1 = Network::factory()->create([
             'timezone' => $network1
         ]);
-        $network2 = factory(Network::class)->create([
+        $network2 = Network::factory()->create([
             'timezone' => $network2
         ]);
 
-        $group = factory(Group::class)->create([
+        $group = Group::factory()->create([
             'timezone' => $group
         ]);
         $network1->addGroup($group);
@@ -173,5 +175,14 @@ class GroupTest extends TestCase
             [ 'Europe/Brussels', NULL, 'Europe/Paris', 'Europe/Brussels', FALSE ],
             [ NULL, NULL, NULL, NULL, TRUE ],
         ];
+    }
+
+    public function can_store_phone() {
+        $group = Group::factory()->create([
+                                                   'phone' => 1234
+                                               ]);
+
+        $group2 = Group::find($group->id);
+        self::assertEquals(1234, $group2->phone);
     }
 }

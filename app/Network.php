@@ -2,11 +2,14 @@
 
 namespace App;
 
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use App\Group;
 use Illuminate\Database\Eloquent\Model;
 
 class Network extends Model
 {
+    use HasFactory;
+
     public function groups()
     {
         return $this->belongsToMany(Group::class, 'group_network', 'network_id', 'group_id');
@@ -30,6 +33,12 @@ class Network extends Model
     public function addCoordinator($coordinator)
     {
         $this->coordinators()->syncWithoutDetaching($coordinator->id);
+
+        // Set us to a network coordinator (but don't demote us from admin).
+        if ($coordinator->role != Role::ADMINISTRATOR) {
+            $coordinator->role = Role::NETWORK_COORDINATOR;
+            $coordinator->save();
+        }
     }
 
     public function eventsRequiringModeration()
@@ -38,17 +47,16 @@ class Network extends Model
         $events = collect([]);
 
         foreach ($groups as $group) {
-            $events->push($group->parties()->whereNull('wordpress_post_id')->whereNull('deleted_at')->get());
+            $events->push($group->upcomingParties()->where('approved', false)->whereNull('deleted_at'));
         }
 
         return $events->flatten(1);
     }
 
-    public function logo()
+    public function sizedLogo($size)
     {
-        return $this->hasOne(\App\Xref::class, 'reference', 'id')
-            ->where('reference_type', config('restarters.xref_types.networks'))
-            ->where('object_type', 5);
+        $logo = preg_replace('/\\.([^.\\s]{3,4})$/', "-$size.$1", $this->logo);
+        return $logo;
     }
 
     public function groupsNotIn()

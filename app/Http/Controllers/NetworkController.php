@@ -11,13 +11,6 @@ use Lang;
 
 class NetworkController extends Controller
 {
-    protected $crossReferenceTableId;
-
-    public function __construct()
-    {
-        $this->crossReferenceTableId = config('restarters.xref_types.networks');
-    }
-
     /**
      * Display a listing of the resource.
      *
@@ -55,11 +48,13 @@ class NetworkController extends Controller
      */
     public function show(Network $network)
     {
+        $user = Auth::user();
+
         $this->authorize('view', $network);
 
         $groupsForAssociating = [];
 
-        if (Auth::user()->can('associateGroups', $network)) {
+        if ($user->can('associateGroups', $network)) {
             $groupsForAssociating = $network->groupsNotIn()->sortBy('name');
         }
 
@@ -96,8 +91,18 @@ class NetworkController extends Controller
         $this->authorize('update', $network);
 
         if ($request->hasFile('network_logo')) {
-            $fileHelper = new FixometerFile;
-            $networkLogoFilename = $fileHelper->upload('network_logo', 'image', $network->id, $this->crossReferenceTableId, false, false, false, false);
+            // Save the file.
+            $path = $request->file('network_logo')->store('network_logos', [
+                'disk' => 'public_uploads',
+            ]);
+
+            // Store it in the network object.
+            if ($path) {
+                $network->logo = $path;
+                $network->save();
+            } else {
+                abort(500, 'Failed to save logo');
+            }
         }
 
         return redirect()->route('networks.edit', [$network]);

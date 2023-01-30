@@ -6,6 +6,8 @@ use App\EventsUsers;
 use App\Helpers\Fixometer;
 use App\Http\Controllers\Controller;
 use App\Invite;
+use App\Network;
+use Illuminate\Auth\AuthenticationException;
 use Notification;
 use App\Notifications\JoinGroup;
 use App\Party;
@@ -29,7 +31,8 @@ class EventController extends Controller
                   ->join('group_network', 'group_network.group_id', '=', 'groups.idgroups')
                   ->join('networks', 'networks.id', '=', 'group_network.network_id')
                   ->join('user_network', 'networks.id', '=', 'user_network.network_id')
-                  ->join('users', 'users.id', '=', 'user_network.user_id');
+                  ->join('users', 'users.id', '=', 'user_network.user_id')
+                  ->orderBy('event_start_utc', 'ASC');
 
         if (! empty($date_from) && ! empty($date_to)) {
             $start = Carbon\Carbon::parse($date_from, $timezone);
@@ -224,8 +227,91 @@ class EventController extends Controller
         ]);
     }
 
+    /**
+     * @OA\Get(
+     *      path="/api/v2/events/{id}",
+     *      operationId="getEvent",
+     *      tags={"Events"},
+     *      summary="Get Event",
+     *      description="Returns information about an event.",
+     *      @OA\Parameter(
+     *          name="id",
+     *          description="Event id",
+     *          required=true,
+     *          in="path",
+     *          @OA\Schema(
+     *              type="integer"
+     *          )
+     *      ),
+     *      @OA\Response(
+     *          response=200,
+     *          description="Successful operation",
+     *          @OA\JsonContent(
+     *              @OA\Property(
+     *                property="data",
+     *                title="data",
+     *                ref="#/components/schemas/Event"
+     *              )
+     *          )
+     *       ),
+     *      @OA\Response(
+     *          response=404,
+     *          description="Event not found",
+     *      ),
+     *     )
+     */
+
     public function getEventv2(Request $request, $idevents) {
         $party = Party::findOrFail($idevents);
+
+        if (!$party->theGroup->approved) {
+            abort(404);
+        }
+
         return \App\Http\Resources\Party::make($party);
+    }
+
+    private function getUser() {
+        // We want to allow this call to work if a) we are logged in as a user, or b) we have a valid API token.
+        //
+        // This is a slightly odd thing to do, but it is necessary to get both the PHPUnit tests and the
+        // real client use of the API to work.
+        $user = Auth::user();
+
+        if (!$user) {
+            $user = auth('api')->user();
+        }
+
+        if (!$user) {
+            throw new AuthenticationException();
+        }
+
+        return $user;
+    }
+
+    public function moderateEventsv2(Request $request) {
+        // Get the user that the API has been authenticated as.
+        $user = $this->getUser();
+        $ret = [];
+        $networks = [];
+
+        if ($user->hasRole('Administrator')) {
+            $networks = Network::all();
+        } else if ($user->hasRole('NetworkCoordinator')) {
+            $networks = $user->networks;
+        }
+
+        foreach ($networks as $network) {
+            foreach ($network->eventsRequiringModeration() as $event) {
+                $ret[] = \App\Http\Resources\Party::make($event);
+            }
+        }
+
+        // Sort $ret by ->sortBy('event_start_utc') ascending order of time
+        usort($ret, function($a, $b) {
+            return strtotime($a->resource->event_start_utc) - strtotime($b->resource->event_start_utc);
+        });
+
+        return response()->json($ret);
     }
 }

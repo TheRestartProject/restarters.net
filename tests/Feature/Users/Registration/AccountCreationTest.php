@@ -31,6 +31,11 @@ class AccountCreationTest extends TestCase
         $this->assertEquals(51.507, round($user->latitude, 3));
         $this->assertEquals(-0.128, round($user->longitude, 3));
 
+        // JS would load this.
+        $response = $this->get('/user/onboarding-complete');
+        $response->assertStatus(200);
+        $response->assertSee('true');
+
         // No notifications immediately after creation.
         $response2 = $this->get('/api/users/' . $user->id . '/notifications');
         $this->assertEquals([
@@ -125,7 +130,7 @@ class AccountCreationTest extends TestCase
     {
 
         // Check with a registered email.
-        $restarter = factory(User::class)->state('Restarter')->create();
+        $restarter = User::factory()->restarter()->create();
         $response = $this->post('user/register/check-valid-email', [
             'email' => $restarter->email,
         ]);
@@ -156,5 +161,15 @@ class AccountCreationTest extends TestCase
         $this->assertDatabaseHas('users', [
             'email' => $userAttributes['email'],
         ]);
+    }
+
+    public function testValidationFail()
+    {
+        $userAttributes = $this->userAttributes();
+        unset($userAttributes['consent_gdpr']);
+        $response = $this->post('/user/register/', $userAttributes);
+
+        $response->assertStatus(302);
+        $response->assertSessionHas('errors');
     }
 }

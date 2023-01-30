@@ -21,14 +21,14 @@ class InviteGroupTest extends TestCase
         Notification::fake();
         $this->withoutExceptionHandling();
 
-        $group = factory(Group::class)->create();
-        $host = factory(User::class)->states('Host')->create();
+        $group = Group::factory()->create();
+        $host = User::factory()->host()->create();
         $group->addVolunteer($host);
         $group->makeMemberAHost($host);
         $this->actingAs($host);
 
         // Invite a user.
-        $user = factory(User::class)->states('Restarter')->create();
+        $user = User::factory()->restarter()->create();
 
         $response = $this->post('/group/invite', [
             'group_name' => $group->name,
@@ -128,14 +128,14 @@ class InviteGroupTest extends TestCase
     }
 
     public function testInviteViaLink() {
-        $group = factory(Group::class)->create();
+        $group = Group::factory()->create();
 
         $unique_shareable_code = Fixometer::generateUniqueShareableCode(\App\Group::class, 'shareable_code');
         $group->update([
            'shareable_code' => $unique_shareable_code,
         ]);
 
-        $host = factory(User::class)->states('Host')->create();
+        $host = User::factory()->host()->create();
         $this->actingAs($host);
 
         $this->actingAs($host);
@@ -151,5 +151,29 @@ class InviteGroupTest extends TestCase
         $this->assertTrue($response->isRedirection());
         $redirectTo = $response->getTargetUrl();
         $this->assertNotFalse(strpos($redirectTo, '/user/register'));
+    }
+
+    public function testInviteInvalid()
+    {
+        Notification::fake();
+        $this->withoutExceptionHandling();
+
+        $group = Group::factory()->create();
+        $host = User::factory()->host()->create();
+        $group->addVolunteer($host);
+        $group->makeMemberAHost($host);
+        $this->actingAs($host);
+
+        // Invite a user.
+        $user = User::factory()->restarter()->create();
+
+        $response = $this->post('/group/invite', [
+            'group_name' => $group->name,
+            'group_id' => $group->idgroups,
+            'manual_invite_box' => '@invalidmail',
+            'message_to_restarters' => 'Join us, but not in a creepy zombie way',
+        ]);
+
+        $response->assertSessionHas('warning');
     }
 }

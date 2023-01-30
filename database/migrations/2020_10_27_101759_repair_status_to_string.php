@@ -4,7 +4,7 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-class RepairStatusToString extends Migration
+return new class extends Migration
 {
     /**
      * Run the migrations.
@@ -43,4 +43,4 @@ END
     {
         DB::unprepared('DROP FUNCTION IF EXISTS `REPAIR_STATUS_TO_STRING`');
     }
-}
+};

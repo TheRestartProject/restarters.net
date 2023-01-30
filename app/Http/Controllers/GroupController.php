@@ -65,7 +65,7 @@ class GroupController extends Controller
         $groups_near_you = array_column($user->groupsNearby(1000), 'idgroups');
 
         return view('group.index', [
-            'groups' => $this->expandGroups($groups, $your_groups, $groups_near_you),
+            'groups' => GroupController::expandGroups($groups, $your_groups, $groups_near_you),
             'your_area' => $user->location,
             'tab' => $tab,
             'network' => $network,
@@ -94,12 +94,8 @@ class GroupController extends Controller
         return $this->indexVariations('all', $id);
     }
 
-    public function create(Request $request, $networkId = null)
+    public function create(Request $request)
     {
-        $geocoder = new \App\Helpers\Geocoder();
-
-        $idGroup = false;
-
         $user = User::find(Auth::id());
 
         // Only administrators can add groups
@@ -107,141 +103,7 @@ class GroupController extends Controller
             return redirect('/user/forbidden');
         }
 
-        if ($request->isMethod('post') && ! empty($request->post())) {
-            $error = [];
-
-            $name = $request->input('name');
-            $website = $request->input('website');
-            $location = $request->input('location');
-            $text = $request->input('free_text');
-            $timezone = $request->input('timezone');
-
-            if (empty($name)) {
-                $error['name'] = 'Please input a name.';
-            }
-
-            if (! empty($location)) {
-                $geocoded = $geocoder->geocode($location);
-
-                if (empty($geocoded)) {
-                    $response['danger'] = __('groups.geocode_failed');
-                    \Sentry\CaptureMessage($response['danger']);
-
-                    return view('group.create', [
-                        'title' => 'New Group',
-                        'gmaps' => true,
-                        'response' => $response,
-                    ]);
-                }
-
-                $latitude = $geocoded['latitude'];
-                $longitude = $geocoded['longitude'];
-                $country = $geocoded['country'];
-            } else {
-                $latitude = null;
-                $longitude = null;
-                $country = null;
-            }
-
-            if (empty($error)) {
-                $data = [
-                    'name' => $name,
-                    'website' => $website,
-                    'location' => $location,
-                    'latitude' => $latitude,
-                    'longitude' => $longitude,
-                    'country' => $country,
-                    'free_text' => $text,
-                    'shareable_code' => Fixometer::generateUniqueShareableCode(\App\Group::class, 'shareable_code'),
-                    'timezone' => $timezone,
-                ];
-
-                try {
-                    $group = Group::create($data);
-                    $idGroup = $group->idgroups;
-
-                    $network = Network::find(session()->get('repair_network'));
-                    $network->addGroup($group);
-
-                    if (is_numeric($idGroup) && $idGroup !== false) {
-                        $idGroup = Group::find($idGroup);
-                        $idGroup = $idGroup->idgroups;
-
-                        $response['success'] = 'Group created correctly.';
-
-                        //Associate current logged in user as a host
-                        UserGroups::create([
-                            'user' => Auth::user()->id,
-                            'group' => $idGroup,
-                            'status' => 1,
-                            'role' => 3,
-                        ]);
-
-                        // Notify relevant admins
-                        $notify_admins = Fixometer::usersWhoHavePreference('admin-moderate-group');
-                        Notification::send($notify_admins, new AdminModerationGroup([
-                            'group_name' => $name,
-                            'group_url' => url('/group/edit/'.$idGroup),
-                        ]));
-
-                        if (isset($_FILES) && ! empty($_FILES)) {
-                            $file = new FixometerFile;
-                            $file->upload('file', 'image', $idGroup, env('TBL_GROUPS'), false, true);
-                        }
-                    } else {
-                        $response['danger'] = 'Group could <strong>not</strong> be created. Something went wrong with the database.';
-                        \Sentry\CaptureMessage($response['danger']);
-                    }
-                } catch (QueryException $e) {
-                    $errorCode = $e->errorInfo[1];
-                    if ($errorCode == 1062) {
-                        $response['danger'] = __('groups.duplicate', [
-                            'name' => $name,
-                        ]);
-                        \Sentry\CaptureMessage($response['danger']);
-                    } else {
-                        $response['danger'] = __('groups.database_error');
-                        \Sentry\CaptureMessage($response['danger']);
-                    }
-                }
-            } else {
-                $response['danger'] = __('groups.create_failed');
-                \Sentry\CaptureMessage($response['danger']);
-            }
-
-            if (! isset($response)) {
-                $response = null;
-            }
-
-            if (! isset($error)) {
-                $error = null;
-            }
-
-            if (! isset($_POST)) {
-                $udata = null;
-            } else {
-                $udata = $_POST;
-            }
-
-            if (is_numeric($idGroup) && $idGroup !== false) {
-                return redirect('/group/edit/'.$idGroup)->with('response', $response);
-            }
-
-            return view('group.create', [
-                'title' => 'New Group',
-                'gmaps' => true,
-                'response' => $response,
-                'error' => $error,
-                'udata' => $udata,
-                'selectedNetworkId' => $networkId,
-            ]);
-        }
-
-        return view('group.create', [
-            'title' => 'New Group',
-            'gmaps' => true,
-            'selectedNetworkId' => $networkId,
-        ]);
+        return view('group.create');
     }
 
     private function expandVolunteers($volunteers)
@@ -260,7 +122,9 @@ class GroupController extends Controller
                 }
 
                 $volunteer['fullName'] = $volunteer->name;
-                $volunteer['profilePath'] = '/uploads/thumbnail_'.$volunteer->volunteer->getProfile($volunteer->volunteer->id)->path;
+                $image = $volunteer->volunteer->getProfile($volunteer->volunteer->id)->path;
+                $image = $image ? "/uploads/thumbnail_$image" : "/images/placeholder-avatar.png";
+                $volunteer['profilePath'] = $image;
                 $ret[] = $volunteer;
             }
         }
@@ -386,8 +250,6 @@ class GroupController extends Controller
 
         foreach (array_merge($upcoming_events->all(), $active_events->all(), $past_events->all()) as $event) {
             $expanded_event = \App\Http\Controllers\PartyController::expandEvent($event, $group);
-            // TODO: here we seem to expect group to be the group id, not the group object.
-            // expandEvent seems to expect the object.
             $expanded_event['group'] = $event->group;
             $expanded_events[] = $expanded_event;
         }
@@ -419,7 +281,7 @@ class GroupController extends Controller
             'isCoordinatorForGroup' => $isCoordinatorForGroup,
             'user_groups' => $user_groups,
             'view_group' => $view_group,
-            'group_id' => $groupid,
+            'group_id' => $groupid
         ]);
     }
 
@@ -433,7 +295,21 @@ class GroupController extends Controller
 
         if (empty($emails)) {
             \Sentry\CaptureMessage('You have not entered any emails!');
-            return redirect()->back()->with('warning', 'You have not entered any emails!');
+            return redirect()->back()->with('warning', __('groups.invite.no_emails'));
+        }
+
+        $invalid = [];
+
+        foreach ($emails as $email) {
+            if (! filter_var($email, FILTER_VALIDATE_EMAIL)) {
+                $invalid[] = $email;
+            }
+        }
+
+        if (count($invalid)) {
+            return redirect()->back()->with('warning', __('groups.invite_invalid_emails', [
+                'emails' => implode(', ', $invalid)
+            ]));
         }
 
         $users = User::whereIn('email', $emails)->get();
@@ -502,11 +378,13 @@ class GroupController extends Controller
         }
 
         if (! isset($not_sent)) {
-            return redirect()->back()->with('success', 'Invites sent!');
+            return redirect()->back()->with('success', __('groups.invite_success'));
         }
 
         // Don't log to Sentry - legitimate user error.
-        return redirect()->back()->with('warning', 'Invites sent - apart from these ('.rtrim(implode(', ', $not_sent), ', ').') who have already joined the group, have already been sent an invite, or have not opted in to receive emails');
+        return redirect()->back()->with('warning', __('groups.invite_success_apart_from', [
+            'emails' => rtrim(implode(', ', $not_sent))
+        ]));
     }
 
     public function confirmInvite($group_id, $hash)
@@ -514,8 +392,8 @@ class GroupController extends Controller
         // Find user/group relationship based on the invitation hash.
         $user_group = UserGroups::where('status', $hash)->where('group', $group_id)->first();
         if (empty($user_group)) {
-            \Sentry\CaptureMessage('Something went wrong - this invite is invalid or has expired');
-            return redirect('/group/view/'.intval($group_id))->with('warning', 'Something went wrong - this invite is invalid or has expired');
+            \Sentry\CaptureMessage(__('groups.invite_invalid'));
+            return redirect('/group/view/'.intval($group_id))->with('warning', __('groups.invite_invalid'));
         }
 
         // Set user as confirmed member of group.
@@ -538,14 +416,12 @@ class GroupController extends Controller
             ]));
         }
 
-        return redirect('/group/view/'.$user_group->group)->with('success', 'Excellent! You have joined the group');
+        return redirect('/group/view/'.$user_group->group)->with('success', __('groups.invite_confirmed'));
     }
 
     public function edit(Request $request, $id, Geocoder $geocoder)
     {
         $user = Auth::user();
-        $Group = new Group;
-        $File = new FixometerFile;
 
         $group = Group::findOrFail($id);
         $is_host_of_group = Fixometer::userHasEditGroupPermission($id, $user->id);
@@ -555,202 +431,11 @@ class GroupController extends Controller
             abort(403);
         }
 
-        $networks = Network::all();
-
-        if ($request->isMethod('post') && ! empty($request->post())) {
-            $data = $request->post();
-
-            // Remove some inputs.  Probably these aren't present any more, but it does no harm to ensure that.
-            unset($data['files']);
-            unset($data['image']);
-
-            if (! empty($data['location'])) {
-                $geocoded = $geocoder->geocode($data['location']);
-
-                if (empty($geocoded)) {
-                    $response['danger'] = __('groups.geocode_failed');
-                    \Sentry\CaptureMessage($response['danger']);
-                    $group = Group::find($id);
-                    $images = $File->findImages(env('TBL_GROUPS'), $id);
-                    $tags = GroupTags::all();
-                    $group_tags = GrouptagsGroups::where('group', $id)->pluck('group_tag')->toArray();
-                    $group_networks = $group->networks->pluck('id')->toArray();
-
-                    if (! isset($images)) {
-                        $images = null;
-                    }
-
-                    return view('group.edit', [
-                        'response' => $response,
-                        'gmaps' => true,
-                        'title' => 'Edit Group '.$group->name,
-                        'formdata' => $group,
-                        'user' => $user,
-                        'images' => $images,
-                        'tags' => $tags,
-                        'group_tags' => $group_tags,
-                        'networks' => $networks,
-                        'group_networks' => $group_networks,
-                        'audits' => $group->audits,
-                    ]);
-                }
-
-                $latitude = $geocoded['latitude'];
-                $longitude = $geocoded['longitude'];
-                $country = $geocoded['country'];
-            } else {
-                $latitude = null;
-                $longitude = null;
-                $country = null;
-            }
-            $data['latitude'] = $latitude;
-            $data['longitude'] = $longitude;
-
-            //Validation
-            if (empty($data['name'])) {
-                return redirect()->back()->with('error', 'Group name must not be empty');
-            }
-
-            if (is_null($latitude) || is_null($longitude)) {
-                // TODO This case looks like it's worth considering.
-                //return redirect()->back()->with('error', 'Could not find group location - please try again!');
-            }
-
-            $old_zone = $group->timezone;
-            $update = [
-                'name' => $data['name'],
-                'website' => array_key_exists('website', $data) ? $data['website'] : null,
-                'free_text' => $data['free_text'],
-                'location' => array_key_exists('location', $data) ? $data['location'] : null,
-                'timezone' => array_key_exists('timezone', $data) ? $data['timezone'] : null,
-                'latitude' => $latitude,
-                'longitude' => $longitude,
-                'country' => $country,
-            ];
-
-            if ($user->hasRole('Administrator') || $user->hasRole('NetworkCoordinator')) {
-                $update['area'] = $data['area'];
-                $update['postcode'] = $data['postcode'];
-            }
-
-            $u = $group->update($update);
-
-            if ($update['timezone'] != $old_zone) {
-                // The timezone of the group has changed.  Update the zone of any future events.  This happens
-                // sometimes when a group is created and events are created before the group is approved (and therefore
-                // before the admin has a chance to set the zone on the group.
-                foreach ($group->upcomingParties() as $party) {
-                    $party->update([
-                        'timezone' => $update['timezone']
-                    ]);
-                }
-            }
-
-            if (Fixometer::hasRole($user, 'Administrator')) {
-                if (! empty($_POST['group_tags'])) {
-                    $Group->find($id)->group_tags()->sync($_POST['group_tags']);
-                } else {
-                    $Group->find($id)->group_tags()->sync([]);
-                }
-
-                if (! empty($request->input('group_networks'))) {
-                    Group::find($id)->networks()->sync($request->input('group_networks'));
-                } else {
-                    Group::find($id)->networks()->sync([]);
-                }
-            }
-
-            if (! $u) {
-                $response['danger'] = 'Something went wrong. Please check the data and try again.';
-                \Sentry\CaptureMessage($response['danger']);
-                echo $response['danger'];
-            } else {
-                $response['success'] = 'Group updated!';
-
-                if (isset($_FILES['file']) && ! empty($_FILES['file']) && $_FILES['file']['error'] != 4) {
-                    $existing_image = Fixometer::hasImage($id, 'groups', true);
-                    if (! empty($existing_image)) {
-                        // TODO This case looks like it's worth considering.
-                        //$Group = new Group;
-                        //$Group->removeImage($id, $existing_image[0]);
-                    }
-                    $file = new FixometerFile;
-                    $group_avatar = $file->upload('file', 'image', $id, env('TBL_GROUPS'), false, true);
-                    $group_avatar = env('UPLOADS_URL').'mid_'.$group_avatar;
-                } else {
-                    $existing_image = Fixometer::hasImage($id, 'groups', true);
-                    if (! empty($existing_image)) {
-                        $group_avatar = env('UPLOADS_URL').'mid_'.$existing_image[0]->path;
-                    } else {
-                        $group_avatar = 'null';
-                    }
-                }
-
-                // Now pass group avatar via the data array
-                $data['group_avatar'] = $group_avatar;
-
-                // Get group model to pass to event handler
-                $group = Group::find($id);
-
-                // Send WordPress Notification if group approved with POSTed data
-                if (isset($data['moderate']) && $data['moderate'] == 'approve') {
-                    event(new ApproveGroup($group, $data));
-
-                    // Notify the creator, as long as it's not the current user.
-                    $creator = User::find(UserGroups::where('group', $id)->first()->user);
-
-                    if ($creator->id != Auth::user()->id) {
-                        Notification::send($creator, new GroupConfirmed($group));
-                    }
-
-                    // Notify nearest users.
-                    if (! is_null($latitude) && ! is_null($longitude)) {
-                        $restarters_nearby = User::nearbyRestarters($latitude, $longitude, 25)
-                            ->orderBy('name', 'ASC')
-                            ->get();
-
-                        Notification::send($restarters_nearby, new NewGroupWithinRadius([
-                            'group_name' => $group->name,
-                            'group_url' => url('/group/view/'.$id),
-                        ]));
-                    }
-                } elseif (! empty($group->wordpress_post_id)) {
-                    event(new EditGroup($group, $data));
-                }
-            }
-        }
-
-        $group = $Group->findOne($id);
-
-        if (! isset($response)) {
-            $response = null;
-        }
-
-        $images = $File->findImages(env('TBL_GROUPS'), $id);
-
-        if (! isset($images)) {
-            $images = null;
-        }
-
-        $tags = GroupTags::all();
-        $group_tags = GrouptagsGroups::where('group', $id)->pluck('group_tag')->toArray();
-        $group_networks = Group::find($id)->networks->pluck('id')->toArray();
-
-        // TODO The return value is ignored, but this may be a bug.
-        compact($audits = $Group->findOrFail($id)->audits);
-
         return view('group.edit', [
-            'response' => $response,
-            'gmaps' => true,
-            'title' => 'Edit Group '.$group->name,
-            'formdata' => $group,
-            'user' => $user,
-            'images' => $images,
-            'tags' => $tags,
-            'group_tags' => $group_tags,
-            'networks' => $networks,
-            'group_networks' => $group_networks,
-            'audits' => $audits,
+            'id' => $id,
+            'name' => $group->name,
+            'audits' => $group->audits,
+            'networks' => Network::all()
         ]);
     }
 
@@ -791,7 +476,7 @@ class GroupController extends Controller
         }
     }
 
-    private function expandGroups($groups, $your_groupids, $nearby_groupids)
+    public static function expandGroups($groups, $your_groupids, $nearby_groupids)
     {
         $ret = [];
 
@@ -822,16 +507,18 @@ class GroupController extends Controller
                     'name' => $group->name,
                     'image' => (is_object($group_image) && is_object($group_image->image)) ?
                         asset('uploads/mid_'.$group_image->image->path) : null,
-                    'location' => rtrim($group->location),
+                    'location' => [
+                        'location' => rtrim($group->location),
+                        'country' => $group->country,
+                        'distance' => $distance,
+                    ],
                     'next_event' => $event ? $event->event_date_local : null,
                     'all_restarters_count' => $group->all_restarters_count,
                     'all_hosts_count' => $group->all_hosts_count,
                     'all_confirmed_restarters_count' => $group->all_confirmed_restarters_count,
                     'all_confirmed_hosts_count' => $group->all_confirmed_hosts_count,
                     'networks' => \Illuminate\Support\Arr::pluck($group->networks, 'id'),
-                    'country' => $group->country,
                     'group_tags' => $group->group_tags()->get()->pluck('id'),
-                    'distance' => $distance,
                     'following' => in_array($group->idgroups, $your_groupids),
                     'nearby' => in_array($group->idgroups, $nearby_groupids),
                 ];
@@ -904,10 +591,10 @@ class GroupController extends Controller
                     'link' => url('/group/view/'.$group->idgroups),
                 ]));
         } catch (\Exception $e) {
-            $response['danger'] = 'Failed to follow this group';
+            $response['danger'] = __('groups.follow_group_error');
             \Sentry\CaptureMessage($response['danger']);
 
-            return redirect()->back()->with('response', $response)->with('warning', 'Failed to follow this group');
+            return redirect()->back()->with('response', $response)->with('warning', __('groups.follow_group_error'));
         }
     }
 
@@ -963,11 +650,13 @@ class GroupController extends Controller
 
             $group->makeMemberAHost($user);
 
-            return redirect()->back()->with('success', 'We have made '.$user->name.' a host for this group');
+            return redirect()->back()->with('success', __('groups.made_host', [
+                'name' => $user->name
+            ]));
         }
 
-        \Sentry\CaptureMessage('Sorry, you do not have permission to do this');
-        return redirect()->back()->with('warning', 'Sorry, you do not have permission to do this');
+        \Sentry\CaptureMessage(__('groups.permission'));
+        return redirect()->back()->with('warning', __('groups.permission'));
     }
 
     public function getRemoveVolunteer($group_id, $user_id, Request $request)
@@ -988,15 +677,21 @@ class GroupController extends Controller
             if (! is_null($userGroupAssociation)) {
                 $userGroupAssociation->delete();
 
-                return redirect()->back()->with('success', 'We have removed '.$user->name.' from this group');
+                return redirect()->back()->with('success', __('groups.volunteer_remove_success', [
+                    'name' => $user->name
+                ]));
             }
-            \Sentry\CaptureMessage('We are unable to remove from this group');
+            \Sentry\CaptureMessage(__('groups.volunteer_remove_error', [
+                'name' => $user->name
+            ]));
 
-            return redirect()->back()->with('warning', 'We are unable to remove '.$user->name.' from this group');
+            return redirect()->back()->with('warning', __('groups.volunteer_remove_error', [
+                'name' => $user->name
+            ]));
         }
 
-        \Sentry\CaptureMessage('Sorry, you do not have permission to do this');
-        return redirect()->back()->with('warning', 'Sorry, you do not have permission to do this');
+        \Sentry\CaptureMessage(__('groups.permission'));
+        return redirect()->back()->with('warning', __('groups.permission'));
     }
 
     public function volunteersNearby($groupid)

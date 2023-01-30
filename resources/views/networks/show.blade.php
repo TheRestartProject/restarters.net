@@ -25,9 +25,9 @@
                     <div class="row">
                         <div class="col-lg-3 align-self-center" style="text-align:center">
                             <div class="network-icon">
-                                @php( $logo = $network->logo )
-                                @if( is_object($logo) && is_object($logo->image) )
-                                <img style="max-width: 100%; max-height:50px" src="{{ asset('/uploads/mid_'. $logo->image->path) }}" alt="{{{ $network->name }}} logo">
+                                @php( $logo = $network->sizedLogo('_x100') )
+                                @if( $logo )
+                                <img style="max-width: 100%; max-height:50px" src="{{ asset("/uploads/$logo") }}" alt="{{{ $network->name }}} logo">
                                 @else
                                 <img src="{{ url('/uploads/mid_1474993329ef38d3a4b9478841cc2346f8e131842fdcfd073b307.jpg') }}" alt="generic network logo">
                                 @endif
@@ -46,8 +46,8 @@
                             <div class="button-group button-group__r">
                                 @if( Auth::check() )
                                 <div class="dropdown">
-                                    <button class="btn btn-primary dropdown-toggle" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                                        Network actions
+                                    <button class="btn btn-primary dropdown-toggle text-uppercase" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                        {{ __('networks.general.actions') }}
                                     </button>
                                     <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
                                         <a class="dropdown-item" href="/group/network/{{ $network->id }}">@lang('networks.show.view_groups_menuitem')</a>
@@ -69,17 +69,17 @@
         <div class="row">
             <div class="col-lg-3">
 
-                <h2 id="about-grp">About</h2>
+                <h2 id="about-grp">{{ __('networks.general.about') }}</h2>
 
                 <div class="events__description">
                     <p>{!! Str::limit(strip_tags($network->description), 160, '...') !!}</p>
                     @if( strlen($network->description) > 160 )
-                    <button data-toggle="modal" data-target="#group-description"><span>Read more</span></button>
+                    <button data-toggle="modal" data-target="#group-description"><span>{{ __('partials.read_more') }}</span></button>
                     @endif
                 </div><!-- /events__description -->
 
 
-                <h2 id="volunteers">Coordinators</h2>
+                <h2 id="volunteers">{{ __('networks.general.coordinators') }}</h2>
 
                 <div class="tab">
 
@@ -99,35 +99,33 @@
             <div class="col-lg-9">
 
                 <section style="mt-40 mb-40">
-                    <h2>Groups</h2>
+                    <h2>{{ __('networks.general.groups') }}</h2>
 
                     <div class="panel">
                     <p>
-                        There are currently {{ $network->groups->count() }} groups in the {{ $network->name }} network. <a href="/group/network/{{ $network->id }}">View these groups</a>.
+                        {!! __('networks.general.count', [
+                            'count' => $network->groups->count(),
+                            'name' => $network->name,
+                            'id' => $network->id
+                        ]) !!}
                     </p>
                     </div>
 
                 </section>
 
-                <section class="mt-40">
-                    <h2>@lang('events.events_title_admin')</h2>
-                    <div class="table-responsive panel">
-                        <table class="table table-events table-striped" role="table">
-                            @include('events.tables.headers.head-events-admin-only', ['hide_invite' => true])
-                            <tbody>
-                                @if( count($network->eventsRequiringModeration()) > 0 )
-                                @foreach ($network->eventsRequiringModeration()->sortBy('event_start_utc') as $event)
-                                @include('partials.tables.row-events', ['show_invites_count' => false])
-                                @endforeach
-                                @else
-                                <tr>
-                                    <td colspan="13" align="center" class="p-3">@lang('events.moderation_none')</td>
-                                </tr>
-                                @endif
-                            </tbody>
-                        </table>
-                    </div>
-                </section>
+                <div class="vue-placeholder vue-placeholder-large">
+                    <div class="vue-placeholder-content">@lang('partials.loading')...</div>
+                </div>
+                <div class="vue">
+                    <GroupsRequiringModeration :networks="[{{ $network->id }}]" />
+                </div>
+
+                <div class="vue-placeholder vue-placeholder-large">
+                    <div class="vue-placeholder-large">@lang('partials.loading')...</div>
+                </div>
+                <div class="vue">
+                    <EventsRequiringModeration :networks="[{{ $network->id }}]" />
+                </div>
 
             </div>
         </div>

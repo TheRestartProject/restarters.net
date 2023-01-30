@@ -55,9 +55,9 @@
       </template>
       <template slot="cell(location)" slot-scope="data">
         <div class="d-none d-md-block">
-          {{ data.item.location.location }} <span class="text-muted small" v-if="data.item.location.distance">{{ distance(data.item.location.distance )}}&nbsp;km</span>
+          {{ data.item.location.location.location }} <span class="text-muted small" v-if="data.item.location.location.distance">{{ distance(data.item.location.location.distance )}}&nbsp;km</span>
           <br />
-          <span class="small text-muted">{{ data.item.location.country }}</span>
+          <span class="small text-muted">{{ data.item.location.location.country }}</span>
         </div>
       </template>
       <template slot="head(all_confirmed_hosts_count)">
@@ -83,7 +83,10 @@
         <span />
       </template>
       <template slot="cell(following)" slot-scope="data">
-        <b-btn variant="primary" class="text-nowrap mr-2" v-if="!data.item.following" :to="'/group/join/' + data.item.idgroups">
+        <div v-if="approve" class="cell-warning d-flex justify-content-around p-2">
+          <a :href="'/group/edit/' + data.item.idgroups">{{ __('groups.group_requires_moderation') }}</a>
+        </div>
+        <b-btn variant="primary" class="text-nowrap mr-2" v-else-if="!data.item.following" :to="'/group/join/' + data.item.idgroups">
           <span class="d-block d-md-none">
             {{ __('groups.join_group_button_mobile') }}
           </span>
@@ -156,6 +159,11 @@ export default {
       type: String,
       required: false,
       default: null
+    },
+    approve: {
+      type: Boolean,
+      required: false,
+      default: false
     }
   },
   data () {
@@ -203,7 +211,7 @@ export default {
         }
 
         if (this.searchCountry) {
-          match &= g.country && g.country.toLowerCase().indexOf(this.searchCountry.country.toLowerCase()) !== -1
+          match &= g.location && g.location.country && g.location.country.toLowerCase().indexOf(this.searchCountry.country.toLowerCase()) !== -1
         }
 
         if (this.searchTags) {
@@ -352,21 +360,21 @@ export default {
   width: 20px;
 }
 
-/deep/ .image {
+::v-deep .image {
   width: 90px;
 }
 
-/deep/ .event {
+::v-deep .event {
   width: 8rem;
 }
 
-/deep/ .table.b-table > thead > tr {
+::v-deep .table.b-table > thead > tr {
   background-position-x: center !important;
 }
 
 // The multiselect is used in a few places, and we have some inconsistencies in styling.  Here we force it to match
 // the behaviour of the inputs.
-/deep/ .multiselect {
+::v-deep .multiselect {
   &.multiselect--active {
     border: 0 !important;
 
@@ -383,7 +391,7 @@ export default {
   }
 }
 
-/deep/ .hidecell {
+::v-deep .hidecell {
   display: none;
 
   @include media-breakpoint-up(md) {

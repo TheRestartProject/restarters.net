@@ -16,7 +16,7 @@ export default {
       return state.devices[idevents]
     },
     imagesByDevice: state => (iddevices) => {
-      return state.images[iddevices]
+      return state.images[iddevices] || []
     }
   },
   mutations: {
@@ -113,7 +113,7 @@ export default {
     },
     removeImage(state, params) {
       Vue.set(state.images, params.iddevices, state.images[params.iddevices].filter(u => {
-        return u.idimages !== params.idimages
+        return u.idxref !== params.idxref
       }))
     },
   },
@@ -130,6 +130,12 @@ export default {
       let ret = await axios.post('/device/create', params, {
         headers: {
           'X-CSRF-TOKEN': rootGetters['auth/CSRF']
+        }
+      }).catch(function(error) {
+        if (error && error.response && error.response.data) {
+          throw new Error(error.response.data.message)
+        } else {
+          throw new Error('Unknown error')
         }
       })
 
@@ -159,6 +165,12 @@ export default {
       let ret = await axios.post('/device/edit/' + params.iddevices, params, {
         headers: {
           'X-CSRF-TOKEN': rootGetters['auth/CSRF']
+        }
+      }).catch(function(error) {
+        if (error && error.response && error.response.data) {
+          throw new Error(error.response.data.message)
+        } else {
+          throw new Error('Unknown error')
         }
       })
 
@@ -199,7 +211,7 @@ export default {
       }
     },
     async addURL ({commit, rootGetters}, params) {
-      const ret = await axios.post('/device-url/', {
+      const ret = await axios.post('/device-url', {
         device_id: params.iddevices,
         url: params.url.url,
         source: params.url.source
@@ -260,17 +272,19 @@ export default {
       commit('setImages', params)
     },
     async deleteImage({commit, rootGetters}, params) {
-      params.idimages = params.idxref
-      const url = '/device/image/delete/' + params.iddevices + '/' + params.idimages + '/' + params.path
-      const ret = await axios.get(url, {
-        headers: {
-          'X-CSRF-TOKEN': rootGetters['auth/CSRF']
-        }
-      })
+      console.log("Delete image", params)
+      if (params.iddevices && params.idxref) {
+        const url = '/device/image/delete/' + params.iddevices + '/' + params.idxref
+        const ret = await axios.get(url, {
+          headers: {
+            'X-CSRF-TOKEN': rootGetters['auth/CSRF']
+          }
+        })
 
-      // This isn't a proper API call, and returns success/failure via a redirect to another page.  Assume
-      // it works until we have a better API.
-      commit('removeImage', params)
+        // This isn't a proper API call, and returns success/failure via a redirect to another page.  Assume
+        // it works until we have a better API.
+        commit('removeImage', params)
+      }
     }
   },
 }

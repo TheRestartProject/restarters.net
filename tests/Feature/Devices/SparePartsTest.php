@@ -15,8 +15,8 @@ class SparePartsTest extends TestCase
     {
         parent::setUp();
 
-        $event = factory(Party::class)->create();
-        $this->device_inputs = factory(Device::class)->raw([
+        $event = Party::factory()->create();
+        $this->device_inputs = Device::factory()->raw([
             'event_id' => $event->idevents,
             'quantity' => 1,
         ]);
@@ -25,7 +25,7 @@ class SparePartsTest extends TestCase
         $this->input_no_spare_parts_needed = 2;
         $this->input_spare_parts_from_third_party = 3;
 
-        $admin = factory(User::class)->state('Administrator')->create();
+        $admin = User::factory()->administrator()->create();
         $this->actingAs($admin);
 
         $this->withoutExceptionHandling();
@@ -42,20 +42,24 @@ class SparePartsTest extends TestCase
         $device = Device::find($iddevices);
         $this->assertEquals(Device::SPARE_PARTS_NEEDED, $device->spare_parts);
         $this->assertEquals(Device::PARTS_PROVIDER_MANUFACTURER, $device->parts_provider);
+        $this->assertEquals(trans('partials.yes_manufacturer'), $device->getSpareParts());
+        $this->assertEquals(trans('partials.fixed'), $device->getRepairStatus());
     }
 
     /** @test */
     public function recording_spare_parts_from_third_party()
     {
-        $this->device_inputs['repair_status'] = Device::REPAIR_STATUS_FIXED;
+        $this->device_inputs['repair_status'] = Device::REPAIR_STATUS_REPAIRABLE;
         $this->device_inputs['spare_parts'] = $this->input_spare_parts_from_third_party;
 
         $response = $this->post('/device/create', $this->device_inputs);
         $iddevices = Device::latest()->first()->iddevices;
 
         $device = Device::find($iddevices);
+        $this->assertEquals(trans('partials.repairable'), $device->getRepairStatus());
         $this->assertEquals(Device::SPARE_PARTS_NEEDED, $device->spare_parts);
         $this->assertEquals(Device::PARTS_PROVIDER_THIRD_PARTY, $device->parts_provider);
+        $this->assertEquals(trans('partials.yes_third_party'), $device->getSpareParts());
     }
 
     /** @test */
@@ -70,6 +74,7 @@ class SparePartsTest extends TestCase
         $device = Device::find($iddevices);
         $this->assertEquals(Device::SPARE_PARTS_NOT_NEEDED, $device->spare_parts);
         $this->assertNull($device->parts_provider);
+        $this->assertEquals(trans('partials.no'), $device->getSpareParts());
     }
 
     /** @test */
@@ -84,6 +89,8 @@ class SparePartsTest extends TestCase
         $device = Device::find($iddevices);
         $this->assertEquals(Device::SPARE_PARTS_NEEDED, $device->spare_parts);
         $this->assertNull($device->parts_provider);
+        $this->assertEquals(trans('partials.end_of_life'), $device->getRepairStatus());
+
     }
 
     /** @test */

@@ -1,7 +1,7 @@
 <template>
   <div v-if="event">
     <EventHeading :idevents="idevents" :canedit="canedit" :candelete="candelete" :is-admin="isAdmin" :in-group="inGroup" :is-attending="isAttending" />
-    <div class="layout">
+    <div class="ep-layout">
       <div>
         <EventDetails class="pr-md-3" :idevents="idevents" :hosts="hosts" :calendar-links="calendarLinks" :is-attending="isAttending" :discourse-thread="discourseThread" />
         <EventDescription class="pr-md-3" :idevents="idevents" />
@@ -11,7 +11,7 @@
       </div>
     </div>
     <EventImages :images="images" v-if="images && images.length" />
-    <div v-if="inProgress || finished || startingSoon">
+    <div>
       <EventStats :idevents="idevents" />
       <EventDevices id="devices-section":idevents="idevents" :canedit="canedit || isAttending" :devices="devices" :clusters="clusters" :brands="brands" :barrier-list="barrierList" :itemTypes="itemTypes" />
     </div>
@@ -183,7 +183,7 @@ export default {
 @import '~bootstrap/scss/variables';
 @import '~bootstrap/scss/mixins/_breakpoints';
 
-.layout {
+.ep-layout {
   display: grid;
   grid-template-columns: 1fr;
   grid-template-rows: auto auto;

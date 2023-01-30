@@ -5,8 +5,97 @@ namespace App\Http\Resources;
 use Carbon\Carbon;
 use Illuminate\Http\Resources\Json\JsonResource;
 
+/**
+ * @OA\Schema(
+ *     title="EventSummary",
+ *     schema="EventSummary",
+ *     description="The basic information about an event.  For full information, fetch the event.",
+ *     @OA\Xml(
+ *         name="EventSummary"
+ *     ),
+ * )
+ */
+
 class PartySummary extends JsonResource
 {
+    /**
+     *     @OA\Property(
+     *          property="id",
+     *          title="id",
+     *          description="Unique identifier of this event",
+     *          format="int64",
+     *          example=1
+     *     )
+     *     @OA\Property(
+     *          property="start",
+     *          title="start",
+     *          description="Start time of the event in ISO8601 format.",
+     *          format="date-time",
+     *          example="2022-09-18T11:30:00+00:00"
+     *     )
+     *     @OA\Property(
+     *          property="end",
+     *          title="end",
+     *          description="End time of the event in ISO8601 format",
+     *          format="date-time",
+     *          example="2022-09-18T12:30:00+00:00"
+     *     )
+     *     @OA\Property(
+     *          property="timezone",
+     *          title="timezone",
+     *          description="Timezone in which the event is taking place.",
+     *          format="string",
+     *          example="Europe/London"
+     *     )
+     *     @OA\Property(
+     *          property="title",
+     *          title="title",
+     *          description="Title of the event",
+     *          format="string",
+     *          example="Europe/London"
+     *     )
+     *     @OA\Property(
+     *          property="location",
+     *          title="location",
+     *          description="Human-readable address of the event",
+     *          format="string",
+     *          example="Europe/London"
+     *     )
+     *     @OA\Property(
+     *          property="online",
+     *          title="online",
+     *          description="Whether this event is online (virtual).",
+     *          format="boolean",
+     *          example="false"
+     *     )
+     *     @OA\Property(
+     *          property="lat",
+     *          title="lat",
+     *          description="Latitude at which the event is taking place.  Only valid if online=false.",
+     *          format="float",
+     *          example="50.8113243"
+     *     )
+     *     @OA\Property(
+     *          property="lng",
+     *          title="lng",
+     *          description="Longitude at which the event is taking place.  Only valid if online=false.",
+     *          format="float",
+     *          example="-1.0788839"
+     *     )
+     *     @OA\Property(
+     *          property="group",
+     *          title="group",
+     *          description="The group which is hosting this event.",
+     *          ref="#/components/schemas/GroupSummary"
+     *     )
+     *     @OA\Property(
+     *          property="updated_at",
+     *          title="updated_at",
+     *          description="The last change to this group.  This includes changes which affect the stats.",
+     *          format="date-time",
+     *     )
+     */
+
     /**
      * Transform the resource into an array.
      *

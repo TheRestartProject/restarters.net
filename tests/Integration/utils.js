@@ -20,22 +20,35 @@ exports.login = login
 
 exports.createGroup = async function(page, baseURL) {
   // Go to groups page
-  await page.goto('/group')
+  await page.goto('/group', { timeout: 30000 })
 
   // Click on add a new group button
   await page.click('a[href="/group/create"]')
   // await page.goto(baseURL + '/group/create')
 
   // Name
-  await page.fill('#grp_name', faker.company.companyName())
+  await page.fill('#group_name', faker.company.companyName())
 
   // Type into the RTE
   await page.fill('.ql-editor', faker.lorem.sentence())
 
-  // Always say London for geocoding.
-  await page.fill('#autocomplete', 'London')
   await page.fill('.timezone', 'Europe/London')
 
+  // Always say London for geocoding.
+  //
+  // Google seems to block autocomplete when running on CircleCI (but not locally).  So we have to hack around that by
+  // setting some hidden inputs directly.
+  await page.fill('#lat', '51.5074', {
+    force: true,
+  })
+  await page.fill('#lng', '-0.1276' , {
+    force: true,
+  })
+  await page.fill('#location', 'London, UK' , {
+    force: true,
+  })
+
+  // Now create it.
   await page.click('button[type=submit]')
 
   // Should get redirected to Edit form.  We used to wait on #details, but this stopped working for reasons we don't
@@ -159,21 +172,64 @@ exports.approveEvent = async function(page, baseURL, idevents) {
   await page.locator('text=Event details updated.')
 }
 
-exports.addDevice = async function(page, baseURL, idevents, powered) {
+exports.addDevice = async function(page, baseURL, idevents, powered, photo, fixed, spareparts) {
   // Go to event edit page.
   await page.goto('/party/view/' + idevents)
 
-  await page.locator(powered ? '.add-powered-device-desktop' : '.add-unpowered-device-desktop').click()
+  var addsel = powered ? '.add-powered-device-desktop' : '.add-unpowered-device-desktop'
 
-  // Tab to category
+  // Get current device count.
+  await page.waitForSelector(addsel)
+  var current = await page.locator('h3:visible').count()
+
+  // Click the add button.
+  await page.locator(addsel).click()
+
+  // Tab to category and select first.
   await page.keyboard.press('Tab')
   await page.keyboard.press('Tab')
   await page.keyboard.press('Enter')
 
+  if (fixed) {
+    // Go to repair outcome and select fixed (first).
+    await page.locator('.repair-outcome:visible').focus()
+    await page.keyboard.press('Enter')
+  }
+
+  if (spareparts) {
+    await page.locator('.spare-parts').click()
+    await page.keyboard.press('Enter')
+  }
+
+  if (photo) {
+    const [fileChooser] = await Promise.all([
+      page.waitForEvent('filechooser'),
+
+      // Trigger file upload.
+      page.locator('.add-device .vue-dropzone:visible').click(),
+    ]);
+
+    await fileChooser.setFiles('public/images/community.jpg');
+  }
+
   await page.locator('text=Add item >> visible=true').click()
 
   // Wait for device to show.
-  await expect(page.locator('h3 >> text=Misc')).toHaveCount(2)
+  await expect(page.locator('h3:visible')).toHaveCount(current + 1)
+
+  // Check that the photo appears.
+  await page.locator('.edit:visible').click()
+
+  if (photo) {
+    // Should see the dropzone and uploaded photo.
+    await expect(page.locator('.device-photos:visible img')).toHaveCount(2)
+  } else {
+    // Just dropzone
+    await expect(page.locator('.device-photos:visible img')).toHaveCount(1)
+  }
+
+  // Close the device edit.
+  await page.locator('.cancel').click()
 }
 
 exports.unfollowGroup = async function(page, idgroups) {
@@ -181,7 +237,7 @@ exports.unfollowGroup = async function(page, idgroups) {
 
   await page.click('#groupactions .dropdown-toggle >> visible=true')
 
-  await page.click('#groupactions .dropdown-menu > li:nth-child(6) > .dropdown-item >> visible=true')
+  await page.click('#groupactions .dropdown-menu > li:nth-child(7) > .dropdown-item >> visible=true')
 
   await page.click('#confirmmodal .btn-primary')
 

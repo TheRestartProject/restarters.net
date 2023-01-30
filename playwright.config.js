@@ -20,6 +20,7 @@ const config = {
       name: 'Desktop Chromium',
       use: {
         browserName: 'chromium',
+        baseURL: 'http://localhost'
       },
     },
     // TODO The other browsers don't work reliably yet.
@@ -48,17 +49,12 @@ const config = {
     // },
   ],
   testDir: 'tests/Integration',
-
-  // We start Laravel to act as the server for these requests.
-  webServer: {
-    command: 'php artisan serve --host=0.0.0.0 --port=8000',
-    port: 8000,
-    timeout: 120 * 1000,
-    reuseExistingServer: !process.env.CI,
-  },
+  outputDir: '/tmp/test-results',
 
   // Flakiness
-  timeout: 45000
+  timeout: 10 * 60 * 1000,
+  navigationTimeout: 2 * 60 * 1000,
+  actionTimeout: 2 * 60 * 1000
 };
 
 module.exports = config;

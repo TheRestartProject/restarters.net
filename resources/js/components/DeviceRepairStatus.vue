@@ -3,6 +3,7 @@
     <multiselect
         :disabled="disabled"
         v-model="statusValue"
+        class="repair-outcome"
         :placeholder="__('devices.repair_outcome')"
         :options="statusOptions"
         track-by="id"
@@ -31,6 +32,7 @@
         :disabled="disabled"
         v-if="showParts"
         v-model="partsValue"
+        class="spare-parts"
         :placeholder="__('devices.spare_parts')"
         :options="partsOptions"
         :multiple="false"
@@ -106,8 +108,9 @@ export default {
   computed: {
     translatedBarriers() {
       return this.barrierList.map(b => {
-        b.barrier = this.$lang.get('strings.' + b.barrier)
-        return b
+        var newb = JSON.parse(JSON.stringify(b))
+        newb.barrier = this.$lang.get('strings.' + b.barrier)
+        return newb
       })
     },
     showSteps () {
@@ -204,8 +207,14 @@ export default {
     barriersValue: {
       get() {
         // We have an array of ids which we need to map to an array of options.
-        return this.barrierList.filter(b => {
+        var ret = this.barrierList.filter(b => {
           return this.barriers && this.barriers.indexOf(b.id) !== -1
+        })
+
+        return ret.map(b => {
+          return this.translatedBarriers.find(t => {
+            return t.id === b.id
+          })
         })
       },
       set(newval) {

@@ -6,6 +6,7 @@ use App\Group;
 use App\Helpers\Fixometer;
 use App\Network;
 use App\Party;
+use App\Role;
 use App\User;
 use DB;
 use Illuminate\Foundation\Testing\RefreshDatabase;
@@ -32,18 +33,40 @@ class CoordinatorTest extends TestCase
     public function it_can_find_relevant_coordinators()
     {
         // arrange
-        $network = factory(Network::class)->create();
-        $group = factory(Group::class)->create();
-        $coordinator = factory(User::class)->state('NetworkCoordinator')->create();
+        $network = Network::factory()->create();
+        $group = Group::factory()->create();
+        $coordinator = User::factory()->networkCoordinator()->create();
 
         $network->addGroup($group);
         $network->addCoordinator($coordinator);
 
-        $event = factory(Party::class)->create(['group' => $group]);
+        $event = Party::factory()->create(['group' => $group]);
 
         // assert
         $coordinators = $event->associatedNetworkCoordinators();
 
-        $this->assertContains($coordinator->id, $coordinators->pluck('id'));
+        $this->assertStringContainsString($coordinator->id, $coordinators->pluck('id'));
     }
+
+    /** @test */
+    public function promote_to_coordinator()
+    {
+        // arrange
+        $network = Network::factory()->create();
+        $group = Group::factory()->create();
+        $coordinator = User::factory()->restarter()->create();
+        $network->addGroup($group);
+
+        // Check we promote.
+        $network->addCoordinator($coordinator);
+        $coordinator->refresh();
+        self::assertEquals(Role::NETWORK_COORDINATOR, $coordinator->role);
+
+        // Check we don't demote.
+        $admin = User::factory()->administrator()->create();
+        $network->addCoordinator($admin);
+        $admin->refresh();
+        self::assertEquals(Role::ADMINISTRATOR, $admin->role);
+    }
+
 }

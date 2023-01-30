@@ -2,6 +2,7 @@
 
 namespace App;
 
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use App\Events\UserDeleted;
 use App\Events\UserUpdated;
 use App\Network;
@@ -15,15 +16,9 @@ use Illuminate\Support\Str;
 use OwenIt\Auditing\Contracts\Auditable;
 use Illuminate\Contracts\Translation\HasLocalePreference;
 
-class WikiSyncStatus
-{
-    const DoNotCreate = 0;
-    const CreateAtLogin = 1;
-    const Created = 2;
-}
-
 class User extends Authenticatable implements Auditable, HasLocalePreference
 {
+    use HasFactory;
     use Notifiable;
     use SoftDeletes;
     use \OwenIt\Auditing\Auditable;
@@ -141,7 +136,7 @@ class User extends Authenticatable implements Auditable, HasLocalePreference
             $q->whereNull('grouptags_groups.id');
 
             // Only show approved groups.
-            $q->whereNotNull('wordpress_post_id');
+            $q->where('approved', true);
         })->having('dist', '<=', $nearby)
             ->groupBy('idgroups');
 
@@ -409,35 +404,6 @@ class User extends Authenticatable implements Auditable, HasLocalePreference
             $this->role = Role::HOST;
             $this->save();
         }
-    }
-
-    /**
-     * Getter to display the user's repair network with options to provide the network name/slug
-     *
-     * NOT IN USE, decided on a more straightforward approach could be useful in the future
-     * @author Dean Appleton-Claydon
-     * @date   2019-03-22
-     * @param  bool $string
-     * @param  bool $slug
-     * @return mixed either string or int
-     */
-    public function getRepairNetwork($string = false, $slug = false)
-    {
-        if ($string) {
-            if ($this->repair_network === 2) {
-                $network = 'Repair Share';
-            } else {
-                $network = 'Restarters';
-            }
-
-            if ($slug) {
-                return Str::slug($network);
-            }
-
-            return $network;
-        }
-
-        return $this->repair_network;
     }
 
     public function groupTag()

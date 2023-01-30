@@ -124,7 +124,6 @@
                             <div class="form-group">
                                 <label for="gender">@lang('registration.gender'):</label>
                                 <input type="text" class="form-control field" id="gender" name="gender" value="{{{ old('gender') }}}">
-                                <div class="invalid-feedback">@lang('registration.gender_validation')</div>
                                 <small id="gender_help" class="form-text text-muted">@lang('registration.gender_help')</small>
                             </div>
                         </div>

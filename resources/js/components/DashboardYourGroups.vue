@@ -23,7 +23,7 @@
             <b-img src="/images/arrow-right-doodle-white.svg" />
             {{ translatedNewlyAdded }}
           </a>
-          <div class="layout">
+          <div class="dyg-layout">
             <div class="group-intro">
               <h3>
                 {{ __('dashboard.groups_heading') }}
@@ -75,7 +75,7 @@
             <div class="event-seeall">
               <div class="d-flex justify-content-end">
                 <a href="/party" class="mr-1">
-                  {{ __('dashboard.see_all_groups') }}
+                  {{ __('partials.see_all_events') }}
                 </a>
               </div>
             </div>
@@ -152,12 +152,12 @@ h3 {
   font-weight: bold;
 }
 
-/deep/ a {
-  color: $brand;
+::v-deep a {
+  color: black;
   text-decoration: underline;
 }
 
-.layout {
+.dyg-layout {
   display: grid;
   grid-template-columns: 1fr;
   grid-template-rows: auto auto auto 40px auto auto auto;

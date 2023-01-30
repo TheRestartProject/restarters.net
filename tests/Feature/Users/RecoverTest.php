@@ -15,9 +15,17 @@ use Tests\TestCase;
 
 class RecoverTest extends TestCase
 {
+    private function getCode($recovery) {
+        if (preg_match('/recovery=(.*?)($|&)/', $recovery, $matches)) {
+            return($matches[1]);
+        } else {
+            return(NULL);
+        }
+    }
+
     public function testRecover()
     {
-        $restarter = factory(User::class)->state('Restarter')->create([
+        $restarter = User::factory()->restarter()->create([
                                                                           'password' => Hash::make('passw0rd'),
                                                                       ]);
 
@@ -55,12 +63,12 @@ class RecoverTest extends TestCase
 
         // Now fetch the reset page - first in error.
         $response = $this->get('/user/reset');
-        $response->assertSee('The recovery code you\'re using is invalid');
-        $response = $this->get($this->recovery . 'zz');
-        $response->assertSee('The recovery code you\'re using is invalid');
+        $response->assertSee('The recovery code you\'re using is invalid', false);
+        $response = $this->get(str_replace('recovery=', 'recovery=zz', $this->recovery));
+        $response->assertSee('The recovery code you\'re using is invalid', false);
 
         $response = $this->get($this->recovery);
-        $response->assertSee('id="confirm_password"');
+        $response->assertSee('id="confirm_password"', false);
 
         // Now submit the reset request - first in error.
         $response = $this->post($this->recovery, [
@@ -68,10 +76,9 @@ class RecoverTest extends TestCase
             'confirm_password' => "1234",
             'recovery' => null
         ]);
-        $response->assertSee('The recovery code you\'re using is invalid');
+        $response->assertSee('The recovery code you\'re using is invalid', false);
 
-        $p = strrpos($this->recovery, '=');
-        $this->recoveryCode = substr($this->recovery, $p + 1);
+        $this->recoveryCode = $this->getCode($this->recovery);
 
         $response = $this->post($this->recovery, [
             'password' => "1234",
@@ -81,8 +88,7 @@ class RecoverTest extends TestCase
         $response->assertSee('The passwords do not match');
 
         // Now a successful reset, which redirects back to the login page.
-        $p = strrpos($this->recovery, '=');
-        $value = substr($this->recovery, $p + 1);
+        $value = $this->getCode($this->recovery);
 
         Event::fake([
                         PasswordChanged::class,

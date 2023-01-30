@@ -33,13 +33,12 @@
                     @foreach($yourNetworks as $network)
                         <tr>
                             <td>
-                                @php( $logo = $network->logo )
-                                @if( is_object($logo) && is_object($logo->image) )
-                                    <img style="width: auto; height:50px" src="{{ asset('/uploads/mid_'. $logo->image->path) }}" alt="{{{ $network->name }}} logo">
+                                @php( $logo = $network->sizedLogo('_x100') )
+                                @if( $logo )
+                                    <img style="width: auto; height:50px" src="{{ asset("/uploads/$logo") }}" alt="{{{ $network->name }}} logo">
                                 @else
                                     <img src="{{ url('/uploads/mid_1474993329ef38d3a4b9478841cc2346f8e131842fdcfd073b307.jpg') }}" alt="generic network logo">
                                 @endif
-    </div>
                             </td>
                             <td>
                                 <a href="/networks/{{$network->id}}">{{ $network->name }}</a>
@@ -80,13 +79,12 @@
                     @foreach($allNetworks as $network)
                         <tr>
                             <td>
-                                @php( $logo = $network->logo )
-                                @if( is_object($logo) && is_object($logo->image) )
-                                    <img style="width: auto; max-width: 100%; max-height:50px" src="{{ asset('/uploads/mid_'. $logo->image->path) }}" alt="{{{ $network->name }}} logo">
-                                @else
-                                    <img src="{{ url('/uploads/mid_1474993329ef38d3a4b9478841cc2346f8e131842fdcfd073b307.jpg') }}" alt="generic network logo">
-                                @endif
-    </div>
+                              @php( $logo = $network->sizedLogo('_x100') )
+                              @if( $logo )
+                                <img style="width: auto; height:50px" src="{{ asset("/uploads/$logo") }}" alt="{{{ $network->name }}} logo">
+                              @else
+                                <img src="{{ url('/uploads/mid_1474993329ef38d3a4b9478841cc2346f8e131842fdcfd073b307.jpg') }}" alt="generic network logo">
+                              @endif
                             </td>
                             <td>
                                 <a href="/networks/{{$network->id}}">{{ $network->name }}</a>

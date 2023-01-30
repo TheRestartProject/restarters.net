@@ -3,11 +3,8 @@
 namespace App\Http\Controllers;
 
 use App\Brands;
-use App\Category;
 use App\Cluster;
 use App\Device;
-use App\DeviceList;
-use App\DeviceUrl;
 use App\Events\DeviceCreatedOrUpdated;
 use App\EventsUsers;
 use App\Group;
@@ -16,6 +13,7 @@ use App\Notifications\AdminAbnormalDevices;
 use App\Party;
 use App\User;
 use App\UserGroups;
+use App\Xref;
 use Auth;
 use FixometerFile;
 use Illuminate\Http\Request;
@@ -72,7 +70,7 @@ class DeviceController extends Controller
     public function ajaxCreate(Request $request)
     {
         $rules = [
-            'category' => 'required|filled',
+            'category' => 'required|filled'
         ];
 
         $validator = Validator::make($request->all(), $rules);
@@ -80,6 +78,10 @@ class DeviceController extends Controller
         if ($validator->fails()) {
             return response()->json($validator->messages(), 200);
         }
+
+        $request->validate([
+                               'age' => 'nullable|numeric|max:500'
+                           ]);
 
         $category = $request->input('category');
         $weight = $request->filled('estimate') ? $request->input('estimate', 0) : 0;
@@ -95,6 +97,8 @@ class DeviceController extends Controller
         $quantity = $request->input('quantity');
         $event_id = $request->input('event_id');
         $barrier = $request->input('barrier');
+
+        $iddevices = $request->input('iddevices');
 
         // Get party for later
         $event = Party::find($event_id);
@@ -161,6 +165,7 @@ class DeviceController extends Controller
             $device[$i]->repaired_by = Auth::id();
 
             $device[$i]->save();
+            $device[$i]->refresh();
 
             event(new DeviceCreatedOrUpdated($device[$i]));
 
@@ -196,6 +201,19 @@ class DeviceController extends Controller
             }
 
             $device[$i]->barrier = $barriers;
+
+            if ($iddevices && $iddevices < 0) {
+                // We might have some photos uploaded for this device.  Record them against this device instance.
+                // Each instance of a device shares the same underlying photo file.
+                $File = new \FixometerFile;
+                $images = $File->findImages(env('TBL_DEVICES'), $iddevices);
+                foreach ($images as $image) {
+                    $xref = Xref::findOrFail($image->idxref);
+                    $xref->copy($device[$i]->iddevices);
+                }
+
+                $device[$i]->images = $device[$i]->getImages();
+            }
         }
         // end quantity loop
 
@@ -224,6 +242,10 @@ class DeviceController extends Controller
         $wiki = $request->input('wiki');
         $estimate = $request->filled('estimate') ? $request->input('estimate', 0) : 0;
 
+        $request->validate([
+            'age' => 'nullable|numeric|max:500'
+        ]);
+
         if (empty($repair_status)) { //Override
             $repair_status = 0;
         }
@@ -250,8 +272,6 @@ class DeviceController extends Controller
             } else {
                 $do_it_yourself = 0;
             }
-
-            $old_wiki = Device::find($id)->wiki;
 
             if ($spare_parts == 3) { // Third party
                 $spare_parts = 1;
@@ -292,8 +312,8 @@ class DeviceController extends Controller
                 'parts_provider' => $parts_provider,
                 'repair_status' => $repair_status,
                 'more_time_needed' => $more_time_needed,
-                'do_it_yourself' => $professional_help,
-                'professional_help' => $do_it_yourself,
+                'professional_help' => $professional_help,
+                'do_it_yourself' => $do_it_yourself,
                 'wiki' => $wiki,
                 'estimate' => $estimate,
             ]);
@@ -362,7 +382,7 @@ class DeviceController extends Controller
                                             ]);
                 }
 
-                return redirect('/party/view/'.$eventId)->with('success', 'Device has been deleted!');
+                return redirect('/party/view/'.$eventId)->with('success', __('devices.device_delete_sucess'));
             }
         }
 
@@ -370,8 +390,8 @@ class DeviceController extends Controller
             return response()->json(['success' => false]);
         }
 
-        \Sentry\CaptureMessage('You do not have the right permissions for deleting a device');
-        return redirect('/party/view/'.$eventId)->with('warning', 'You do not have the right permissions for deleting a device');
+        \Sentry\CaptureMessage(__('devices.device_delete_permissions'));
+        return redirect('/party/view/'.$eventId)->with('warning', __('devices.device_delete_permissions'));
     }
 
     public function imageUpload(Request $request, $id)
@@ -381,9 +401,24 @@ class DeviceController extends Controller
 
             if (isset($_FILES) && ! empty($_FILES)) {
                 $file = new FixometerFile;
-                $fn = $file->upload('file', 'image', $id, env('TBL_DEVICES'), true, false, true);
-                $device = Device::find($id);
-                $images = $device->getImages();
+
+                if ($id > 0) {
+                    // We are adding a photo to an existing device.
+                    $fn = $file->upload('file', 'image', $id, env('TBL_DEVICES'), true, false, true);
+                    $device = Device::find($id);
+                    $images = $device->getImages();
+                } else {
+                    // We are adding a photo for a device that hasn't yet been added.  Upload the file. We will add
+                    // them to the device once the device is created.
+                    $fn = $file->upload('file', 'image', $id, env('TBL_DEVICES'), true, false, true);
+
+                    if ($fn) {
+                        $File = new \FixometerFile;
+                        $images = $File->findImages(env('TBL_DEVICES'), $id);
+                    } else {
+                        return __('devices.image_upload_error');
+                    }
+                }
             }
 
             // Return the current set of images for this device so that the client doesn't need to merge.
@@ -393,23 +428,36 @@ class DeviceController extends Controller
                 'images' => $images,
             ]);
         } catch (\Exception $e) {
-            return 'fail - image could not be uploaded';
+            \Sentry\CaptureMessage("Image upload exception  " . $e->getMessage());
+            return __('devices.image_upload_error');
         }
     }
 
-    public function deleteImage($device_id, $id, $path)
+    public function deleteImage($device_id, $idxref)
     {
         $user = Auth::user();
 
-        $event_id = Device::find($device_id)->event;
-        $in_event = EventsUsers::where('event', $event_id)->where('user', Auth::user()->id)->first();
-        if (Fixometer::hasRole($user, 'Administrator') || is_object($in_event)) {
+        if ($device_id > 0) {
+            // We are deleting a photo from an existing device.
+            $event_id = Device::find($device_id)->event;
+            $in_event = EventsUsers::where('event', $event_id)->where('user', Auth::user()->id)->first();
+            if (Fixometer::hasRole($user, 'Administrator') || is_object($in_event)) {
+                $Image = new FixometerFile;
+                $Image->deleteImage($idxref);
+
+                return redirect()->back()->with('message', __('devices.image_delete_success'));
+            }
+
+            return redirect()->back()->with('message', __('devices.image_delete_error'));
+        } else {
+            // We are deleting a photo from a device which has not yet been added.
+            //
+            // There is a slight security issue here, in that one user could delete the photos from devices which
+            // are in the process of being added by another user.  The chances of this being a real issue are very low.
             $Image = new FixometerFile;
-            $Image->deleteImage($id, basename($path));
+            $Image->deleteImage($idxref);
 
-            return redirect()->back()->with('message', 'Thank you, the image has been deleted');
+            return redirect()->back()->with('message', __('devices.image_delete_success'));
         }
-
-        return redirect()->back()->with('message', 'Sorry, but the image can\'t be deleted');
     }
 }

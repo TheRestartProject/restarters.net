@@ -4,9 +4,11 @@ namespace Tests\Unit;
 
 use App\Group;
 use App\Party;
+use App\Role;
 use App\User;
 use Carbon\Carbon;
 use DB;
+use Illuminate\Validation\ValidationException;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Tests\TestCase;
 
@@ -17,11 +19,11 @@ class TimezoneTest extends TestCase
      * @dataProvider timezoneProvider
      */
     public function timezone_inheritance($event, $group, $result, $exception) {
-        $g = factory(Group::class)->create([
+        $g = Group::factory()->create([
                                                    'timezone' => $group
                                                ]);
 
-        $e = factory(Party::class)->create([
+        $e = Party::factory()->create([
            'timezone' => $event,
            'group' => $g->idgroups
         ]);
@@ -47,12 +49,12 @@ class TimezoneTest extends TestCase
     }
 
     public function testStartEnd() {
-        $g = factory(Group::class)->create([
+        $g = Group::factory()->create([
            'timezone' => 'Asia/Samarkand'
         ]);
 
         // Create an event in a different timezone, using local times.
-        $e = factory(Party::class)->create([
+        $e = Party::factory()->create([
             'group' => $g->idgroups,
             'event_start_utc' => '2021-02-01T10:15:05+05:00',
             'event_end_utc' => '2021-02-01T13:45:05+05:00',
@@ -72,26 +74,26 @@ class TimezoneTest extends TestCase
      */
     public function testOrder($date, $tz1, $start1, $end1, $tz2, $start2, $end2, $editstart2, $editend2) {
         // Two groups in different timezones.
-        $g1 = factory(Group::class)->create([
+        $g1 = Group::factory()->create([
                                                'timezone' => $tz1
                                            ]);
 
-        $g2 = factory(Group::class)->create([
+        $g2 = Group::factory()->create([
                                                'timezone' => $tz2
                                            ]);
 
         // Use Admins to avoid headers already sent problem.
-        $host1 = factory(User::class)->states('Administrator')->create();
+        $host1 = User::factory()->administrator()->create();
         $g1->addVolunteer($host1);
         $g1->makeMemberAHost($host1);
 
-        $host2 = factory(User::class)->states('Administrator')->create();
+        $host2 = User::factory()->administrator()->create();
         $g2->addVolunteer($host2);
         $g2->makeMemberAHost($host2);
 
         // Create an event for each.
         $this->actingAs($host1);
-        $event = factory(Party::class)->raw();
+        $event = Party::factory()->raw();
         unset($event['timezone']);
         $event['event_start_utc'] = (new \DateTime("$date $start1", new \DateTimeZone($tz1)))->format(\DateTimeInterface::ISO8601);
         $event['event_end_utc'] = (new \DateTime("$date $end1", new \DateTimeZone($tz1)))->format(\DateTimeInterface::ISO8601);
@@ -100,7 +102,7 @@ class TimezoneTest extends TestCase
         $response->assertStatus(302);
 
         $this->actingAs($host2);
-        $event = factory(Party::class)->raw();
+        $event = Party::factory()->raw();
         unset($event['timezone']);
         $event['group'] = $g2->idgroups;
         $event['event_start_utc'] = (new \DateTime("$date $start2", new \DateTimeZone($tz2)))->format(\DateTimeInterface::ISO8601);
@@ -113,12 +115,13 @@ class TimezoneTest extends TestCase
 
         $props = $this->assertVueProperties($response, [
             [],
+            [],
             [
                 'heading-level' => 'h2',
             ],
         ]);
 
-        $events = json_decode($props[1][':initial-events'], TRUE);
+        $events = json_decode($props[2][':initial-events'], TRUE);
 
         // Check the returned events:
         // - The events should be second first because that is the earliest actual time and therefore the soonest
@@ -182,17 +185,17 @@ class TimezoneTest extends TestCase
 
     public function testTimezoneChangeUpdatesFutureEvents() {
         // Create a group.
-        $g = factory(Group::class)->create([
+        $g = Group::factory()->create([
                                                'timezone' => 'Asia/Samarkand'
                                            ]);
 
-        $host = factory(User::class)->states('Restarter')->create();
+        $host = User::factory()->restarter()->create();
         $g->addVolunteer($host);
         $g->makeMemberAHost($host);
 
         // Create a future event - will inherit the group timezone.
         $this->actingAs($host);
-        $event = factory(Party::class)->raw();
+        $event = Party::factory()->raw();
         unset($event['timezone']);
 
         $event_start = Carbon::createFromTimestamp(time())->setTimezone('UTC')->addDay(2);;
@@ -210,10 +213,30 @@ class TimezoneTest extends TestCase
         // Now edit the group timezone as though we were an admin.  This expects some extra attributes.
         $atts = $g->getAttributes();
         $atts['timezone'] = 'Europe/London';
-        $this->post('/group/edit/'.$g->idgroups, $atts);
+        $this->patch('/api/v2/groups/' . $g->idgroups, $atts)->assertSuccessful();
 
         // This should have updated the timezone of the event.
         $party->refresh();
         self::assertEquals('Europe/London', $party->timezone);
+    }
+
+    public function testInvalidTimezones() {
+        $this->loginAsTestUser(Role::ADMINISTRATOR);
+
+        $g = Group::factory()->create([
+                                               'timezone' => 'Asia/Samarkand'
+                                           ]);
+
+        $host = User::factory()->restarter()->create();
+        $g->addVolunteer($host);
+        $g->makeMemberAHost($host);
+
+        $this->actingAs($host);
+        $event = Party::factory()->raw([
+                                                'timezone' => 'bad timezone'
+                                            ]);
+        $event['group'] = $g->idgroups;
+        $this->expectException(ValidationException::class);
+        $this->post('/party/create/', $event);
     }
 }

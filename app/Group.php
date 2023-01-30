@@ -2,9 +2,8 @@
 
 namespace App;
 
-use App\Network;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use DB;
-use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Lang;
 use Illuminate\Support\Facades\Log;
@@ -12,6 +11,8 @@ use OwenIt\Auditing\Contracts\Auditable;
 
 class Group extends Model implements Auditable
 {
+    use HasFactory;
+
     use \OwenIt\Auditing\Auditable;
 
     protected $table = 'groups';
@@ -34,14 +35,16 @@ class Group extends Model implements Auditable
         'free_text',
         'facebook',
         'wordpress_post_id',
+        'approved',
         'shareable_code',
         'network_id',
         'external_id',
         'devices_updated_at',
-        'timezone'
+        'timezone',
+        'phone'
     ];
 
-    protected $appends = ['ShareableLink', 'approved', 'auto_approve'];
+    protected $appends = ['ShareableLink', 'auto_approve'];
 
     // The distance is not in the groups table; we add it on some queries from the select.
     private $distance = null;
@@ -408,7 +411,7 @@ class Group extends Model implements Auditable
     public function getNextUpcomingEvent()
     {
         $event = $this->parties()
-            ->whereNotNull('wordpress_post_id')
+            ->where('approved', true)
             ->where('event_start_utc', '>=', date('Y-m-d H:i:s'))
             ->orderBy('event_start_utc', 'asc');
 
@@ -419,9 +422,10 @@ class Group extends Model implements Auditable
         return $event->first();
     }
 
-    public function getApprovedAttribute()
+    public function scopeRequiresModeration($query)
     {
-        return ! is_null($this->wordpress_post_id);
+        $query = $query->where('approved', false);
+        return $query;
     }
 
     public function networks()
@@ -434,8 +438,8 @@ class Group extends Model implements Auditable
         return $this->networks->contains($network);
     }
 
-    // If just one of the networks that the group is a member of
-    // should push to Wordpress, then we should push.
+    // If just one of the networks that the group is a member of should push to Wordpress, then we should push.
+    // If an group is not approved, then we should not push the events to Wordpress.
     public function eventsShouldPushToWordpress()
     {
         foreach ($this->networks as $network) {
@@ -458,11 +462,6 @@ class Group extends Model implements Auditable
         }
 
         return false;
-    }
-
-    public function getMaxUpdatedAtDevicesUpdatedAtAttribute()
-    {
-        return strtotime($this->updated_at) > strtotime($this->devices_updated_at) ? $this->updated_at : $this->devices_updated_at;
     }
 
     public function getAutoApproveAttribute()
@@ -672,5 +671,39 @@ class Group extends Model implements Auditable
     public function scopeMembersHosts($query) {
         $query = $query->membersJoined();
         return $query->where('users_groups.role', Role::HOST);
+    }
+
+    public function scopeUnapproved($query) {
+        return $query->where('approved', false);
+    }
+
+    public function scopeUnapprovedVisibleTo($query, $user_id) {
+        $u = User::findOrFail($user_id);
+        $unetworks = $u->networks;
+        $ret = [];
+
+        if ($u->hasRole('Administrator')) {
+            // Can see all.
+            $ret = $this->unapproved()->get();
+        } else if ($u->hasRole('NetworkCoordinator')) {
+            // Can see groups for this network.  Logic doesn't scale well, but we will have few unapproved
+            // groups at any one time.
+            $groups = $this->unapproved()->get();
+
+            foreach ($groups as $group) {
+                foreach ($group->networks as $network) {
+                    foreach ($unetworks as $user_network) {
+                        if ($network->idnetworks == $user_network->idnetworks) {
+                            $ret[] = $group;
+                            break;
+                        }
+                    }
+                }
+            }
+
+            $ret = array_unique($ret);
+        }
+
+        return $ret;
     }
 }

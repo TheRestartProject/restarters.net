@@ -22,14 +22,34 @@
 
       <?php
         $all_groups = $groups;
-        $can_create = App\Helpers\Fixometer::hasRole(Auth::user(), 'Administrator') || App\Helpers\Fixometer::hasRole(Auth::user(), 'Host');
+        $can_create = App\Helpers\Fixometer::hasRole(Auth::user(), 'Administrator') || App\Helpers\Fixometer::hasRole(Auth::user(), 'NetworkCoordinator') || App\Helpers\Fixometer::hasRole(Auth::user(), 'Host');
         $show_tags = App\Helpers\Fixometer::hasRole(Auth::user(), 'Administrator');
 
         $user = Auth::user();
         $myid = $user ? $user->id : null;
       ?>
 
-      <div class="vue-placeholder vue-placeholder-large">
+        @if ( App\Helpers\Fixometer::hasRole(Auth::user(), 'Administrator') || App\Helpers\Fixometer::hasRole(Auth::user(), 'NetworkCoordinator'))
+          <?php
+
+          // If we are a network coordinator, only show our network.
+          $ns = App\Helpers\Fixometer::hasRole($user, 'NetworkCoordinator') ? $user->networks : \App\Network::all();
+          $networkids = [];
+
+          foreach ($ns as $n) {
+            $networkids[] = $n->id;
+          }
+
+          ?>
+          <div class="vue-placeholder vue-placeholder-large">
+            <div class="vue-placeholder-content">@lang('partials.loading')...</div>
+          </div>
+          <div class="vue">
+            <GroupsRequiringModeration :networks="{{ json_encode($networkids) }}"/>
+          </div>
+        @endif
+
+        <div class="vue-placeholder vue-placeholder-large">
         <div class="vue-placeholder-content">@lang('partials.loading')...</div>
       </div>
 
