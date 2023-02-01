@@ -18,8 +18,8 @@
         "php": "^8.0.2",
         "ext-mbstring": "*",
         "ext-openssl": "*",
-        "brick/math": "^0.10.2",
-        "doctrine/inflector": "^2.0",
+        "brick/math": "^0.9.3|^0.10.2|^0.11",
+        "doctrine/inflector": "^2.0.5",
         "dragonmantank/cron-expression": "^3.3.2",
         "egulias/email-validator": "^3.2.1|^4.0",
         "fruitcake/php-cors": "^1.2",
@@ -140,7 +140,6 @@
         }
     },
     "suggest": {
-        "ext-bcmath": "Required to use the multiple_of validation rule.",
         "ext-ftp": "Required to use the Flysystem FTP driver.",
         "ext-gd": "Required to use Illuminate\\Http\\Testing\\FileFactory::image().",
         "ext-memcached": "Required to use the memcache cache driver.",
