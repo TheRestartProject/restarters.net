@@ -1,5 +1,5 @@
 <template>
-  <CollapsibleSection class="lineheight">
+  <CollapsibleSection>
     <template slot="title">
       {{ __('events.event_details') }}
     </template>
@@ -126,10 +126,6 @@ export default {
 
 .border-top-thick {
   border-top: 2px solid $black;
-}
-
-.lineheight {
-  line-height: 2;
 }
 
 h2 {
