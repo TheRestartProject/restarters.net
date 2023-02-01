@@ -280,7 +280,8 @@ export default {
       // We deliberately don't set the date above, because we don't want it set for event duplication.
       //
       // The date we get here is epoch.
-      this.eventDate = new Date(this.initialEvent.event_start_utc).toISOString().slice(0, 10)
+      const m = moment.tz(this.initialEvent.event_start_utc, this.initialEvent.timezone)
+      this.eventDate = m.format('YYYY-MM-DD')
     }
 
     // If only one group, default to that.
