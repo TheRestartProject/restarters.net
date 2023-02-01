@@ -1,12 +1,8 @@
 ---
-section: using-npm
 title: removal
+section: 7
 description: Cleaning the Slate
 ---
-
-# removal(7)
-
-## Cleaning the Slate
 
 ### Synopsis
 
@@ -32,8 +28,8 @@ continue reading.
 
 Note that this is only necessary for globally-installed packages.  Local
 installs are completely contained within a project's `node_modules`
-folder.  Delete that folder, and everything is gone less a package's
-install script is particularly ill-behaved).
+folder.  Delete that folder, and everything is gone unless a package's
+install script is particularly ill-behaved.
 
 This assumes that you installed node and npm in the default place.  If
 you configured node with a different `--prefix`, or installed npm with a
@@ -62,9 +58,7 @@ modules.  To track those down, you can do the following:
 find /usr/local/{lib/node,bin} -exec grep -l npm \{\} \; ;
 ```
 
-(This is also in the README file.)
-
 ### See also
 
-* [npm uninstall](/cli-commands/npm-uninstall)
-* [npm prune](/cli-commands/npm-prune)
+* [npm uninstall](/commands/npm-uninstall)
+* [npm prune](/commands/npm-prune)

@@ -112,7 +112,7 @@
                 ],
                 "summary": "Get Group",
                 "description": "Returns the list of events for a group.",
-                "operationId": "getGroup",
+                "operationId": "getGroupv2",
                 "parameters": [
                     {
                         "name": "id",
@@ -167,6 +167,84 @@
                     },
                     "404": {
                         "description": "Group not found"
+                    }
+                }
+            }
+        },
+        "/api/v2/groups": {
+            "post": {
+                "tags": [
+                    "Groups"
+                ],
+                "summary": "Create Group",
+                "description": "Creates a group.",
+                "operationId": "createGroup",
+                "parameters": [
+                    {
+                        "name": "api_token",
+                        "in": "query",
+                        "description": "A valid user API token",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "example": "1234"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "content": {
+                        "multipart/form-data": {
+                            "schema": {
+                                "required": [
+                                    "name",
+                                    "location",
+                                    "description"
+                                ],
+                                "properties": {
+                                    "name": {
+                                        "$ref": "#/components/schemas/Group/properties/name"
+                                    },
+                                    "location": {
+                                        "$ref": "#/components/schemas/Group/properties/location"
+                                    },
+                                    "phone": {
+                                        "$ref": "#/components/schemas/Group/properties/phone"
+                                    },
+                                    "website": {
+                                        "$ref": "#/components/schemas/Group/properties/website"
+                                    },
+                                    "description": {
+                                        "$ref": "#/components/schemas/Group/properties/description"
+                                    },
+                                    "timezone": {
+                                        "$ref": "#/components/schemas/Group/properties/timezone"
+                                    },
+                                    "image": {
+                                        "description": "Image for the group",
+                                        "type": "string",
+                                        "format": "binary"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Successful operation",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "data": {
+                                            "$ref": "#/components/schemas/Group"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
                     }
                 }
             }
@@ -477,7 +555,7 @@
                     },
                     "timezone": {
                         "title": "timezone",
-                        "description": "Timezone for this group.",
+                        "description": "Timezone for this group.  If empty will inherit the timezone from the network.",
                         "format": "string",
                         "example": "Europe/London"
                     },
@@ -490,6 +568,27 @@
                         "title": "hosts",
                         "description": "The number of restarters in this group.",
                         "type": "number"
+                    },
+                    "approved": {
+                        "title": "hosts",
+                        "description": "Whether the group has been approved",
+                        "type": "boolean"
+                    },
+                    "networks": {
+                        "title": "networks",
+                        "description": "An array of networks of which the group is a member.",
+                        "type": "array",
+                        "items": {
+                            "$ref": "#/components/schemas/NetworkSummary"
+                        }
+                    },
+                    "tags": {
+                        "title": "tags",
+                        "description": "An array of tags which apply to the group.",
+                        "type": "array",
+                        "items": {
+                            "$ref": "#/components/schemas/Tag"
+                        }
                     },
                     "stats": {
                         "title": "stats",
@@ -608,42 +707,6 @@
             "GroupLocation": {
                 "title": "GroupLocation",
                 "description": "The information about the location of a group.",
-                "properties": {
-                    "area": {
-                        "description": "The free-form area that this group is in.",
-                        "format": "string",
-                        "example": "London"
-                    },
-                    "location": {
-                        "description": "The location that this group is in.  Must be geocodable.",
-                        "format": "string",
-                        "example": "College Road, London NW10 5EX, UK"
-                    },
-                    "country": {
-                        "description": "The free-form country.",
-                        "format": "string",
-                        "example": "United Kingdom"
-                    },
-                    "lat": {
-                        "title": "lat",
-                        "description": "Latitude of the group.",
-                        "format": "float",
-                        "example": "50.8113243"
-                    },
-                    "lng": {
-                        "title": "lng",
-                        "description": "Longitude of the group.",
-                        "format": "float",
-                        "example": "-1.0788839"
-                    },
-                    "postcode": {
-                        "title": "postcode",
-                        "description": "The group postcode",
-                        "format": "string",
-                        "example": "SW9 7QD"
-                    }
-                },
-                "type": "object",
                 "xml": {
                     "name": "GroupLocation"
                 }
@@ -651,38 +714,6 @@
             "GroupSummary": {
                 "title": "GroupSummary",
                 "description": "The very basic information about a group.  For full information, fetch the group.",
-                "properties": {
-                    "id": {
-                        "title": "id",
-                        "description": "Unique identifier of this group",
-                        "format": "int64",
-                        "example": 1
-                    },
-                    "area": {
-                        "title": "name",
-                        "description": "Unique name of this group",
-                        "format": "string",
-                        "example": "Restarters HQ"
-                    },
-                    "location": {
-                        "$ref": "#/components/schemas/GroupLocation"
-                    },
-                    "image": {
-                        "title": "image",
-                        "description": "URL of an image for this group.  You should prefix this with /uploads before use.",
-                        "format": "string",
-                        "example": "/mid_1597853610178a4b76e4d666b2a7b32ee75d8a24c706f1cbf213970.png"
-                    },
-                    "updated_at": {
-                        "title": "updated_at",
-                        "description": "The last change to this group.  This includes changes which affect the stats.",
-                        "format": "date-time"
-                    },
-                    "next_event": {
-                        "$ref": "#/components/schemas/EventSummary"
-                    }
-                },
-                "type": "object",
                 "xml": {
                     "name": "GroupSummary"
                 }
@@ -690,165 +721,6 @@
             "Network": {
                 "title": "Network",
                 "description": "A network of Groups using the Restarters platform.",
-                "properties": {
-                    "id": {
-                        "title": "id",
-                        "description": "Unique identifier of this network",
-                        "format": "int64",
-                        "example": 1
-                    },
-                    "name": {
-                        "title": "name",
-                        "description": "Unique name of this network",
-                        "format": "string",
-                        "example": "Default Network"
-                    },
-                    "logo": {
-                        "title": "image",
-                        "description": "URL of a logo for this network.",
-                        "format": "string",
-                        "example": "/mid_1597853610178a4b76e4d666b2a7b32ee75d8a24c706f1cbf213970.png"
-                    },
-                    "description": {
-                        "title": "description",
-                        "description": "HTML description of the network.",
-                        "format": "string",
-                        "example": "<p>This is a description.</p>"
-                    },
-                    "website": {
-                        "title": "website",
-                        "description": "An URL for the networks's own separate website.",
-                        "format": "string",
-                        "example": "https://therestartproject.org"
-                    },
-                    "shortname": {
-                        "title": "shortname",
-                        "description": "A short name for the network..",
-                        "format": "string",
-                        "example": "resarters"
-                    },
-                    "default_language": {
-                        "title": "default_language",
-                        "description": "The default language for users in this network.",
-                        "format": "string",
-                        "example": "fr-BE"
-                    },
-                    "timezone": {
-                        "title": "timezone",
-                        "description": "Default timezone for this network.",
-                        "format": "string",
-                        "example": "Europe/London"
-                    },
-                    "stats": {
-                        "title": "stats",
-                        "description": "An array of statistics about the activity of a network.",
-                        "properties": {
-                            "co2_powered": {
-                                "title": "co2_powered",
-                                "description": "The amount of CO2 saved by repairing powered items.",
-                                "type": "number"
-                            },
-                            "co2_unpowered": {
-                                "title": "co2_unpowered",
-                                "description": "The amount of CO2 saved by repairing unpowered items.",
-                                "type": "number"
-                            },
-                            "co2_total": {
-                                "title": "co2_total",
-                                "description": "co2_powered + co2_unpowered",
-                                "type": "number"
-                            },
-                            "waste_powered": {
-                                "title": "waste_powered",
-                                "description": "The weight in kg of waste saved by repairing powered items.",
-                                "type": "number"
-                            },
-                            "waste_unpowered": {
-                                "title": "waste_unpowered",
-                                "description": "The weight in kg of waste saved by repairing unpowered items.",
-                                "type": "number"
-                            },
-                            "fixed_powered": {
-                                "title": "fixed_powered",
-                                "description": "The number of powered items which have been repaired.",
-                                "type": "number"
-                            },
-                            "fixed_unpowered": {
-                                "title": "fixed_unpowered",
-                                "description": "The number of unpowered items which have been repaired.",
-                                "type": "number"
-                            },
-                            "fixed_devices": {
-                                "title": "fixed_devices",
-                                "description": "fixed_powered + fixed_unpowered",
-                                "type": "number"
-                            },
-                            "repairable_devices": {
-                                "title": "repairable_devices",
-                                "description": "The number of devices which were capable of being repaired.",
-                                "type": "number"
-                            },
-                            "dead_devices": {
-                                "title": "dead_devices",
-                                "description": "The number of devices which were not capable of being repaired.",
-                                "type": "number"
-                            },
-                            "unknown_repair_status": {
-                                "title": "unknown_repair_status",
-                                "description": "The number of devices where the repair status was not known.",
-                                "type": "number"
-                            },
-                            "devices_powered": {
-                                "title": "devices_powered",
-                                "description": "The number of powered devices seen.",
-                                "type": "number"
-                            },
-                            "devices_unpowered": {
-                                "title": "devices_unpowered",
-                                "description": "The number of unpowered devices seen.",
-                                "type": "number"
-                            },
-                            "no_weight_powered": {
-                                "title": "no_weight_powered",
-                                "description": "The number of powered devices where no weight was provided.",
-                                "type": "number"
-                            },
-                            "no_weight_unpowered": {
-                                "title": "no_weight_unpowered",
-                                "description": "The number of unpowered devices where no weight was provided.",
-                                "type": "number"
-                            },
-                            "participants": {
-                                "title": "participants",
-                                "description": "The number of people who attended.",
-                                "type": "number"
-                            },
-                            "volunteers": {
-                                "title": "volunteers",
-                                "description": "The number of volunteer repairers.",
-                                "type": "number"
-                            },
-                            "hours_volunteered": {
-                                "title": "hours_volunteered",
-                                "description": "The estimated number of hours volunteered for this network.",
-                                "type": "number"
-                            },
-                            "events": {
-                                "title": "events",
-                                "description": "The number of events created by this network.",
-                                "type": "number"
-                            }
-                        },
-                        "type": "object",
-                        "format": "object"
-                    },
-                    "updated_at": {
-                        "title": "updated_at",
-                        "description": "The last change to this network.  This includes changes which affect the stats.",
-                        "format": "date-time"
-                    }
-                },
-                "type": "object",
                 "xml": {
                     "name": "Network"
                 }
@@ -856,27 +728,6 @@
             "NetworkSummary": {
                 "title": "NetworkSummary",
                 "description": "The summary information about a network.  For the full information, fetch the network.",
-                "properties": {
-                    "id": {
-                        "title": "id",
-                        "description": "Unique identifier of this network",
-                        "format": "int64",
-                        "example": 1
-                    },
-                    "name": {
-                        "title": "name",
-                        "description": "Unique name of this network",
-                        "format": "string",
-                        "example": "Default Network"
-                    },
-                    "logo": {
-                        "title": "image",
-                        "description": "URL of a logo for this network.  You should prefix this with /uploads before use.",
-                        "format": "string",
-                        "example": "/mid_1597853610178a4b76e4d666b2a7b32ee75d8a24c706f1cbf213970.png"
-                    }
-                },
-                "type": "object",
                 "xml": {
                     "name": "Network"
                 }
@@ -884,175 +735,6 @@
             "Event": {
                 "title": "Event",
                 "description": "The full information about an event.",
-                "properties": {
-                    "id": {
-                        "title": "id",
-                        "description": "Unique identifier of this event",
-                        "format": "int64",
-                        "example": 1
-                    },
-                    "start": {
-                        "title": "start",
-                        "description": "Start time of the event in ISO8601 format.",
-                        "format": "date-time",
-                        "example": "2022-09-18T11:30:00+00:00"
-                    },
-                    "end": {
-                        "title": "end",
-                        "description": "End time of the event in ISO8601 format",
-                        "format": "date-time",
-                        "example": "2022-09-18T12:30:00+00:00"
-                    },
-                    "timezone": {
-                        "title": "timezone",
-                        "description": "Timezone in which the event is taking place.",
-                        "format": "string",
-                        "example": "Europe/London"
-                    },
-                    "title": {
-                        "title": "title",
-                        "description": "Title of the event",
-                        "format": "string",
-                        "example": "Europe/London"
-                    },
-                    "description": {
-                        "title": "description",
-                        "description": "A description of the event.  May contain HTML",
-                        "format": "string",
-                        "example": "Come along and we'll fix your broken electrical items."
-                    },
-                    "location": {
-                        "title": "location",
-                        "description": "Human-readable address of the event",
-                        "format": "string",
-                        "example": "Europe/London"
-                    },
-                    "lat": {
-                        "title": "lat",
-                        "description": "Latitude at which the event is taking place.  Only valid if online=false.",
-                        "format": "float",
-                        "example": "50.8113243"
-                    },
-                    "online": {
-                        "title": "online",
-                        "description": "Whether this event is online (virtual).",
-                        "format": "boolean",
-                        "example": "false"
-                    },
-                    "lng": {
-                        "title": "lng",
-                        "description": "Longitude at which the event is taking place.  Only valid if online=false.",
-                        "format": "float",
-                        "example": "-1.0788839"
-                    },
-                    "group": {
-                        "$ref": "#/components/schemas/GroupSummary"
-                    },
-                    "stats": {
-                        "title": "stats",
-                        "description": "An array of statistics about the activity of an event.",
-                        "properties": {
-                            "co2_powered": {
-                                "title": "co2_powered",
-                                "description": "The amount of CO2 saved by repairing powered items.",
-                                "type": "number"
-                            },
-                            "co2_unpowered": {
-                                "title": "co2_unpowered",
-                                "description": "The amount of CO2 saved by repairing unpowered items.",
-                                "type": "number"
-                            },
-                            "co2_total": {
-                                "title": "co2_total",
-                                "description": "co2_powered + co2_unpowered",
-                                "type": "number"
-                            },
-                            "waste_powered": {
-                                "title": "waste_powered",
-                                "description": "The weight in kg of waste saved by repairing powered items.",
-                                "type": "number"
-                            },
-                            "waste_unpowered": {
-                                "title": "waste_unpowered",
-                                "description": "The weight in kg of waste saved by repairing unpowered items.",
-                                "type": "number"
-                            },
-                            "fixed_powered": {
-                                "title": "fixed_powered",
-                                "description": "The number of powered items which have been repaired.",
-                                "type": "number"
-                            },
-                            "fixed_unpowered": {
-                                "title": "fixed_unpowered",
-                                "description": "The number of unpowered items which have been repaired.",
-                                "type": "number"
-                            },
-                            "fixed_devices": {
-                                "title": "fixed_devices",
-                                "description": "fixed_powered + fixed_unpowered",
-                                "type": "number"
-                            },
-                            "repairable_devices": {
-                                "title": "repairable_devices",
-                                "description": "The number of devices which were capable of being repaired.",
-                                "type": "number"
-                            },
-                            "dead_devices": {
-                                "title": "dead_devices",
-                                "description": "The number of devices which were not capable of being repaired.",
-                                "type": "number"
-                            },
-                            "unknown_repair_status": {
-                                "title": "unknown_repair_status",
-                                "description": "The number of devices where the repair status was not known.",
-                                "type": "number"
-                            },
-                            "devices_powered": {
-                                "title": "devices_powered",
-                                "description": "The number of powered devices seen.",
-                                "type": "number"
-                            },
-                            "devices_unpowered": {
-                                "title": "devices_unpowered",
-                                "description": "The number of unpowered devices seen.",
-                                "type": "number"
-                            },
-                            "no_weight_powered": {
-                                "title": "no_weight_powered",
-                                "description": "The number of powered devices where no weight was provided.",
-                                "type": "number"
-                            },
-                            "no_weight_unpowered": {
-                                "title": "no_weight_unpowered",
-                                "description": "The number of unpowered devices where no weight was provided.",
-                                "type": "number"
-                            },
-                            "participants": {
-                                "title": "participants",
-                                "description": "The number of people who attended.",
-                                "type": "number"
-                            },
-                            "volunteers": {
-                                "title": "volunteers",
-                                "description": "The number of volunteer repairers.",
-                                "type": "number"
-                            },
-                            "hours_volunteered": {
-                                "title": "hours_volunteered",
-                                "description": "The estimated number of hours volunteered for this event.",
-                                "type": "number"
-                            }
-                        },
-                        "type": "object",
-                        "format": "object"
-                    },
-                    "updated_at": {
-                        "title": "updated_at",
-                        "description": "The last change to this group.  This includes changes which affect the stats.",
-                        "format": "date-time"
-                    }
-                },
-                "type": "object",
                 "xml": {
                     "name": "Event"
                 }
@@ -1067,71 +749,6 @@
             "EventSummary": {
                 "title": "EventSummary",
                 "description": "The basic information about an event.  For full information, fetch the event.",
-                "properties": {
-                    "id": {
-                        "title": "id",
-                        "description": "Unique identifier of this event",
-                        "format": "int64",
-                        "example": 1
-                    },
-                    "start": {
-                        "title": "start",
-                        "description": "Start time of the event in ISO8601 format.",
-                        "format": "date-time",
-                        "example": "2022-09-18T11:30:00+00:00"
-                    },
-                    "end": {
-                        "title": "end",
-                        "description": "End time of the event in ISO8601 format",
-                        "format": "date-time",
-                        "example": "2022-09-18T12:30:00+00:00"
-                    },
-                    "timezone": {
-                        "title": "timezone",
-                        "description": "Timezone in which the event is taking place.",
-                        "format": "string",
-                        "example": "Europe/London"
-                    },
-                    "title": {
-                        "title": "title",
-                        "description": "Title of the event",
-                        "format": "string",
-                        "example": "Europe/London"
-                    },
-                    "location": {
-                        "title": "location",
-                        "description": "Human-readable address of the event",
-                        "format": "string",
-                        "example": "Europe/London"
-                    },
-                    "online": {
-                        "title": "online",
-                        "description": "Whether this event is online (virtual).",
-                        "format": "boolean",
-                        "example": "false"
-                    },
-                    "lat": {
-                        "title": "lat",
-                        "description": "Latitude at which the event is taking place.  Only valid if online=false.",
-                        "format": "float",
-                        "example": "50.8113243"
-                    },
-                    "lng": {
-                        "title": "lng",
-                        "description": "Longitude at which the event is taking place.  Only valid if online=false.",
-                        "format": "float",
-                        "example": "-1.0788839"
-                    },
-                    "group": {
-                        "$ref": "#/components/schemas/GroupSummary"
-                    },
-                    "updated_at": {
-                        "title": "updated_at",
-                        "description": "The last change to this group.  This includes changes which affect the stats.",
-                        "format": "date-time"
-                    }
-                },
-                "type": "object",
                 "xml": {
                     "name": "EventSummary"
                 }
@@ -1141,6 +758,13 @@
                 "description": "A collection of event summaries.",
                 "xml": {
                     "name": "EventSummaryCollection"
+                }
+            },
+            "Tag": {
+                "title": "Tag",
+                "description": "A tag to record something about a group.",
+                "xml": {
+                    "name": "Network"
                 }
             }
         },

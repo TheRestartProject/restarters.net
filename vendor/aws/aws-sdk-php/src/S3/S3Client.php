@@ -301,7 +301,9 @@ class S3Client extends AwsClient implements S3ClientInterface
      * - bucket_endpoint: (bool) Set to true to send requests to a
      *   hardcoded bucket endpoint rather than create an endpoint as a result
      *   of injecting the bucket into the URL. This option is useful for
-     *   interacting with CNAME endpoints.
+     *   interacting with CNAME endpoints. Note: if you are using version 2.243.0
+     *   and above and do not expect the bucket name to appear in the host, you will
+     *   also need to set `use_path_style_endpoint` to `true`.
      * - calculate_md5: (bool) Set to false to disable calculating an MD5
      *   for all Amazon S3 signed uploads.
      * - s3_us_east_1_regional_endpoint:
@@ -896,8 +898,6 @@ class S3Client extends AwsClient implements S3ClientInterface
         $api['shapes']['ContentSHA256'] = ['type' => 'string'];
         $api['shapes']['PutObjectRequest']['members']['ContentSHA256'] = ['shape' => 'ContentSHA256'];
         $api['shapes']['UploadPartRequest']['members']['ContentSHA256'] = ['shape' => 'ContentSHA256'];
-        unset($api['shapes']['PutObjectRequest']['members']['ContentMD5']);
-        unset($api['shapes']['UploadPartRequest']['members']['ContentMD5']);
         $docs['shapes']['ContentSHA256']['append'] = $opt;
 
         // Add the SaveAs parameter.
@@ -932,9 +932,19 @@ class S3Client extends AwsClient implements S3ClientInterface
             "sa-east-1",
         ];
 
-        // Add a note that the ContentMD5 is optional.
+        // Add a note that the ContentMD5 is automatically computed, except for with PutObject and UploadPart
         $docs['shapes']['ContentMD5']['append'] = '<div class="alert alert-info">The value will be computed on '
             . 'your behalf.</div>';
+        $docs['shapes']['ContentMD5']['excludeAppend'] = ['PutObjectRequest', 'UploadPartRequest'];
+
+        //Add a note to ContentMD5 for PutObject and UploadPart that specifies the value is required
+        // When uploading to a bucket with object lock enabled and that it is not computed automatically
+        $objectLock = '<div class="alert alert-info">This value is required if uploading to a bucket '
+            . 'which has Object Lock enabled. It will not be calculated for you.</div>';
+        $docs['shapes']['ContentMD5']['appendOnly'] = [
+            'message' => $objectLock,
+            'shapes' => ['PutObjectRequest', 'UploadPartRequest']
+        ];
 
         return [
             new Service($api, ApiProvider::defaultProvider()),

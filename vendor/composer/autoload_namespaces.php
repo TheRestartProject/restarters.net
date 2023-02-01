@@ -11,5 +11,4 @@ return array(
     'Mcamara\\LaravelLocalization' => array($vendorDir . '/mcamara/laravel-localization/src'),
     'JShrink' => array($vendorDir . '/tedivm/jshrink/src'),
     'Detection' => array($vendorDir . '/mobiledetect/mobiledetectlib/namespaced'),
-    'Bkwld\\Croppa' => array($vendorDir . '/bkwld/croppa/src'),
 );

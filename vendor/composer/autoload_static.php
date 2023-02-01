@@ -215,6 +215,7 @@ class ComposerStaticInit8ed9c2cb711f4d0ecd3b893f827ac915
         'B' => 
         array (
             'Brick\\Math\\' => 11,
+            'Bkwld\\Croppa\\' => 13,
             'Barryvdh\\TranslationManager\\' => 28,
         ),
         'A' => 
@@ -419,8 +420,8 @@ class ComposerStaticInit8ed9c2cb711f4d0ecd3b893f827ac915
         ),
         'Psr\\Http\\Message\\' => 
         array (
-            0 => __DIR__ . '/..' . '/psr/http-message/src',
-            1 => __DIR__ . '/..' . '/psr/http-factory/src',
+            0 => __DIR__ . '/..' . '/psr/http-factory/src',
+            1 => __DIR__ . '/..' . '/psr/http-message/src',
         ),
         'Psr\\Http\\Client\\' => 
         array (
@@ -468,8 +469,8 @@ class ComposerStaticInit8ed9c2cb711f4d0ecd3b893f827ac915
         ),
         'Mediawiki\\Api\\' => 
         array (
-            0 => __DIR__ . '/..' . '/addwiki/mediawiki-api-base/src',
-            1 => __DIR__ . '/..' . '/addwiki/mediawiki-api/src',
+            0 => __DIR__ . '/..' . '/addwiki/mediawiki-api/src',
+            1 => __DIR__ . '/..' . '/addwiki/mediawiki-api-base/src',
         ),
         'Mariuzzo\\LaravelJsLocalization\\' => 
         array (
@@ -555,8 +556,8 @@ class ComposerStaticInit8ed9c2cb711f4d0ecd3b893f827ac915
         ),
         'Http\\Message\\' => 
         array (
-            0 => __DIR__ . '/..' . '/php-http/message-factory/src',
-            1 => __DIR__ . '/..' . '/php-http/message/src',
+            0 => __DIR__ . '/..' . '/php-http/message/src',
+            1 => __DIR__ . '/..' . '/php-http/message-factory/src',
         ),
         'Http\\Factory\\Guzzle\\' => 
         array (
@@ -674,6 +675,10 @@ class ComposerStaticInit8ed9c2cb711f4d0ecd3b893f827ac915
         array (
             0 => __DIR__ . '/..' . '/brick/math/src',
         ),
+        'Bkwld\\Croppa\\' => 
+        array (
+            0 => __DIR__ . '/..' . '/bkwld/croppa/src',
+        ),
         'Barryvdh\\TranslationManager\\' => 
         array (
             0 => __DIR__ . '/..' . '/barryvdh/laravel-translation-manager/src',
@@ -721,13 +726,6 @@ class ComposerStaticInit8ed9c2cb711f4d0ecd3b893f827ac915
                 0 => __DIR__ . '/..' . '/mobiledetect/mobiledetectlib/namespaced',
             ),
         ),
-        'B' => 
-        array (
-            'Bkwld\\Croppa' => 
-            array (
-                0 => __DIR__ . '/..' . '/bkwld/croppa/src',
-            ),
-        ),
     );
 
     public static $classMap = array (
@@ -769,7 +767,6 @@ class ComposerStaticInit8ed9c2cb711f4d0ecd3b893f827ac915
         'App\\Console\\Commands\\FixLatitudeLongitude' => __DIR__ . '/../..' . '/app/Console/Commands/FixLatitudeLongitude.php',
         'App\\Console\\Commands\\FixViews' => __DIR__ . '/../..' . '/app/Console/Commands/FixViews.php',
         'App\\Console\\Commands\\ImportGroups' => __DIR__ . '/../..' . '/app/Console/Commands/ImportGroups.php',
-        'App\\Console\\Commands\\ImportMRES' => __DIR__ . '/../..' . '/app/Console/Commands/ImportMRES.php',
         'App\\Console\\Commands\\LanguageSync' => __DIR__ . '/../..' . '/app/Console/Commands/LanguageSync.php',
         'App\\Console\\Commands\\MigrateWikiPasswords' => __DIR__ . '/../..' . '/app/Console/Commands/MigrateWikiPasswords.php',
         'App\\Console\\Commands\\NetworkCoordinator' => __DIR__ . '/../..' . '/app/Console/Commands/NetworkCoordinator.php',
@@ -983,6 +980,7 @@ class ComposerStaticInit8ed9c2cb711f4d0ecd3b893f827ac915
         'App\\UsersPermissions' => __DIR__ . '/../..' . '/app/UsersPermissions.php',
         'App\\UsersPreferences' => __DIR__ . '/../..' . '/app/UsersPreferences.php',
         'App\\UsersSkills' => __DIR__ . '/../..' . '/app/UsersSkills.php',
+        'App\\WikiSyncStatus' => __DIR__ . '/../..' . '/app/WikiSyncStatus.php',
         'App\\Xref' => __DIR__ . '/../..' . '/app/Xref.php',
         'Attribute' => __DIR__ . '/..' . '/symfony/polyfill-php80/Resources/stubs/Attribute.php',
         'Aws\\ACMPCA\\ACMPCAClient' => __DIR__ . '/..' . '/aws/aws-sdk-php/src/ACMPCA/ACMPCAClient.php',
@@ -1963,22 +1961,22 @@ class ComposerStaticInit8ed9c2cb711f4d0ecd3b893f827ac915
         'Barryvdh\\TranslationManager\\Models\\Translation' => __DIR__ . '/..' . '/barryvdh/laravel-translation-manager/src/Models/Translation.php',
         'Barryvdh\\TranslationManager\\TranslationServiceProvider' => __DIR__ . '/..' . '/barryvdh/laravel-translation-manager/src/TranslationServiceProvider.php',
         'Barryvdh\\TranslationManager\\Translator' => __DIR__ . '/..' . '/barryvdh/laravel-translation-manager/src/Translator.php',
-        'Bkwld\\Croppa\\Commands\\Purge' => __DIR__ . '/..' . '/bkwld/croppa/src/Bkwld/Croppa/Commands/Purge.php',
-        'Bkwld\\Croppa\\Exception' => __DIR__ . '/..' . '/bkwld/croppa/src/Bkwld/Croppa/Exception.php',
-        'Bkwld\\Croppa\\Facade' => __DIR__ . '/..' . '/bkwld/croppa/src/Bkwld/Croppa/Facade.php',
-        'Bkwld\\Croppa\\Filters\\BlackWhite' => __DIR__ . '/..' . '/bkwld/croppa/src/Bkwld/Croppa/Filters/BlackWhite.php',
-        'Bkwld\\Croppa\\Filters\\Blur' => __DIR__ . '/..' . '/bkwld/croppa/src/Bkwld/Croppa/Filters/Blur.php',
-        'Bkwld\\Croppa\\Filters\\Darkgray' => __DIR__ . '/..' . '/bkwld/croppa/src/Bkwld/Croppa/Filters/Darkgray.php',
-        'Bkwld\\Croppa\\Filters\\FilterInterface' => __DIR__ . '/..' . '/bkwld/croppa/src/Bkwld/Croppa/Filters/FilterInterface.php',
-        'Bkwld\\Croppa\\Filters\\Negative' => __DIR__ . '/..' . '/bkwld/croppa/src/Bkwld/Croppa/Filters/Negative.php',
-        'Bkwld\\Croppa\\Filters\\OrangeWarhol' => __DIR__ . '/..' . '/bkwld/croppa/src/Bkwld/Croppa/Filters/OrangeWarhol.php',
-        'Bkwld\\Croppa\\Filters\\TurquoiseWarhol' => __DIR__ . '/..' . '/bkwld/croppa/src/Bkwld/Croppa/Filters/TurquoiseWarhol.php',
-        'Bkwld\\Croppa\\Handler' => __DIR__ . '/..' . '/bkwld/croppa/src/Bkwld/Croppa/Handler.php',
-        'Bkwld\\Croppa\\Helpers' => __DIR__ . '/..' . '/bkwld/croppa/src/Bkwld/Croppa/Helpers.php',
-        'Bkwld\\Croppa\\Image' => __DIR__ . '/..' . '/bkwld/croppa/src/Bkwld/Croppa/Image.php',
-        'Bkwld\\Croppa\\ServiceProvider' => __DIR__ . '/..' . '/bkwld/croppa/src/Bkwld/Croppa/ServiceProvider.php',
-        'Bkwld\\Croppa\\Storage' => __DIR__ . '/..' . '/bkwld/croppa/src/Bkwld/Croppa/Storage.php',
-        'Bkwld\\Croppa\\URL' => __DIR__ . '/..' . '/bkwld/croppa/src/Bkwld/Croppa/URL.php',
+        'Bkwld\\Croppa\\Commands\\Purge' => __DIR__ . '/..' . '/bkwld/croppa/src/Commands/Purge.php',
+        'Bkwld\\Croppa\\CroppaServiceProvider' => __DIR__ . '/..' . '/bkwld/croppa/src/CroppaServiceProvider.php',
+        'Bkwld\\Croppa\\Exception' => __DIR__ . '/..' . '/bkwld/croppa/src/Exception.php',
+        'Bkwld\\Croppa\\Facades\\Croppa' => __DIR__ . '/..' . '/bkwld/croppa/src/Facades/Croppa.php',
+        'Bkwld\\Croppa\\Filters\\BlackWhite' => __DIR__ . '/..' . '/bkwld/croppa/src/Filters/BlackWhite.php',
+        'Bkwld\\Croppa\\Filters\\Blur' => __DIR__ . '/..' . '/bkwld/croppa/src/Filters/Blur.php',
+        'Bkwld\\Croppa\\Filters\\Darkgray' => __DIR__ . '/..' . '/bkwld/croppa/src/Filters/Darkgray.php',
+        'Bkwld\\Croppa\\Filters\\FilterInterface' => __DIR__ . '/..' . '/bkwld/croppa/src/Filters/FilterInterface.php',
+        'Bkwld\\Croppa\\Filters\\Negative' => __DIR__ . '/..' . '/bkwld/croppa/src/Filters/Negative.php',
+        'Bkwld\\Croppa\\Filters\\OrangeWarhol' => __DIR__ . '/..' . '/bkwld/croppa/src/Filters/OrangeWarhol.php',
+        'Bkwld\\Croppa\\Filters\\TurquoiseWarhol' => __DIR__ . '/..' . '/bkwld/croppa/src/Filters/TurquoiseWarhol.php',
+        'Bkwld\\Croppa\\Handler' => __DIR__ . '/..' . '/bkwld/croppa/src/Handler.php',
+        'Bkwld\\Croppa\\Helpers' => __DIR__ . '/..' . '/bkwld/croppa/src/Helpers.php',
+        'Bkwld\\Croppa\\Image' => __DIR__ . '/..' . '/bkwld/croppa/src/Image.php',
+        'Bkwld\\Croppa\\Storage' => __DIR__ . '/..' . '/bkwld/croppa/src/Storage.php',
+        'Bkwld\\Croppa\\URL' => __DIR__ . '/..' . '/bkwld/croppa/src/URL.php',
         'Brick\\Math\\BigDecimal' => __DIR__ . '/..' . '/brick/math/src/BigDecimal.php',
         'Brick\\Math\\BigInteger' => __DIR__ . '/..' . '/brick/math/src/BigInteger.php',
         'Brick\\Math\\BigNumber' => __DIR__ . '/..' . '/brick/math/src/BigNumber.php',
@@ -2638,8 +2636,6 @@ class ComposerStaticInit8ed9c2cb711f4d0ecd3b893f827ac915
         'Egulias\\EmailValidator\\Warning\\Warning' => __DIR__ . '/..' . '/egulias/email-validator/src/Warning/Warning.php',
         'Fruitcake\\Cors\\CorsService' => __DIR__ . '/..' . '/fruitcake/php-cors/src/CorsService.php',
         'Fruitcake\\Cors\\Exceptions\\InvalidOptionException' => __DIR__ . '/..' . '/fruitcake/php-cors/src/Exceptions/InvalidOptionException.php',
-        'GdReflectionLib' => __DIR__ . '/..' . '/weotch/phpthumb/src/thumb_plugins/gd_reflection.inc.php',
-        'GdThumb' => __DIR__ . '/..' . '/weotch/phpthumb/src/GdThumb.inc.php',
         'GrahamCampbell\\ResultType\\Error' => __DIR__ . '/..' . '/graham-campbell/result-type/src/Error.php',
         'GrahamCampbell\\ResultType\\Result' => __DIR__ . '/..' . '/graham-campbell/result-type/src/Result.php',
         'GrahamCampbell\\ResultType\\Success' => __DIR__ . '/..' . '/graham-campbell/result-type/src/Success.php',
@@ -3494,6 +3490,7 @@ class ComposerStaticInit8ed9c2cb711f4d0ecd3b893f827ac915
         'Illuminate\\Foundation\\Events\\LocaleUpdated' => __DIR__ . '/..' . '/laravel/framework/src/Illuminate/Foundation/Events/LocaleUpdated.php',
         'Illuminate\\Foundation\\Events\\MaintenanceModeDisabled' => __DIR__ . '/..' . '/laravel/framework/src/Illuminate/Foundation/Events/MaintenanceModeDisabled.php',
         'Illuminate\\Foundation\\Events\\MaintenanceModeEnabled' => __DIR__ . '/..' . '/laravel/framework/src/Illuminate/Foundation/Events/MaintenanceModeEnabled.php',
+        'Illuminate\\Foundation\\Events\\PublishingStubs' => __DIR__ . '/..' . '/laravel/framework/src/Illuminate/Foundation/Events/PublishingStubs.php',
         'Illuminate\\Foundation\\Events\\VendorTagPublished' => __DIR__ . '/..' . '/laravel/framework/src/Illuminate/Foundation/Events/VendorTagPublished.php',
         'Illuminate\\Foundation\\Exceptions\\Handler' => __DIR__ . '/..' . '/laravel/framework/src/Illuminate/Foundation/Exceptions/Handler.php',
         'Illuminate\\Foundation\\Exceptions\\RegisterErrorViewPaths' => __DIR__ . '/..' . '/laravel/framework/src/Illuminate/Foundation/Exceptions/RegisterErrorViewPaths.php',
@@ -3841,6 +3838,7 @@ class ComposerStaticInit8ed9c2cb711f4d0ecd3b893f827ac915
         'Illuminate\\Support\\DateFactory' => __DIR__ . '/..' . '/laravel/framework/src/Illuminate/Support/DateFactory.php',
         'Illuminate\\Support\\Enumerable' => __DIR__ . '/..' . '/laravel/framework/src/Illuminate/Collections/Enumerable.php',
         'Illuminate\\Support\\Env' => __DIR__ . '/..' . '/laravel/framework/src/Illuminate/Support/Env.php',
+        'Illuminate\\Support\\Exceptions\\MathException' => __DIR__ . '/..' . '/laravel/framework/src/Illuminate/Support/Exceptions/MathException.php',
         'Illuminate\\Support\\Facades\\App' => __DIR__ . '/..' . '/laravel/framework/src/Illuminate/Support/Facades/App.php',
         'Illuminate\\Support\\Facades\\Artisan' => __DIR__ . '/..' . '/laravel/framework/src/Illuminate/Support/Facades/Artisan.php',
         'Illuminate\\Support\\Facades\\Auth' => __DIR__ . '/..' . '/laravel/framework/src/Illuminate/Support/Facades/Auth.php',
@@ -4185,7 +4183,6 @@ class ComposerStaticInit8ed9c2cb711f4d0ecd3b893f827ac915
         'JmesPath\\TreeCompiler' => __DIR__ . '/..' . '/mtdowling/jmespath.php/src/TreeCompiler.php',
         'JmesPath\\TreeInterpreter' => __DIR__ . '/..' . '/mtdowling/jmespath.php/src/TreeInterpreter.php',
         'JmesPath\\Utils' => __DIR__ . '/..' . '/mtdowling/jmespath.php/src/Utils.php',
-        'JpgImageRotation' => __DIR__ . '/..' . '/weotch/phpthumb/src/thumb_plugins/jpg_rotate.inc.php',
         'L5Swagger\\ConfigFactory' => __DIR__ . '/..' . '/darkaonline/l5-swagger/src/ConfigFactory.php',
         'L5Swagger\\Console\\GenerateDocsCommand' => __DIR__ . '/..' . '/darkaonline/l5-swagger/src/Console/GenerateDocsCommand.php',
         'L5Swagger\\Exceptions\\L5SwaggerException' => __DIR__ . '/..' . '/darkaonline/l5-swagger/src/Exceptions/L5SwaggerException.php',
@@ -5072,6 +5069,7 @@ class ComposerStaticInit8ed9c2cb711f4d0ecd3b893f827ac915
         'PhpParser\\Lexer\\TokenEmulator\\MatchTokenEmulator' => __DIR__ . '/..' . '/nikic/php-parser/lib/PhpParser/Lexer/TokenEmulator/MatchTokenEmulator.php',
         'PhpParser\\Lexer\\TokenEmulator\\NullsafeTokenEmulator' => __DIR__ . '/..' . '/nikic/php-parser/lib/PhpParser/Lexer/TokenEmulator/NullsafeTokenEmulator.php',
         'PhpParser\\Lexer\\TokenEmulator\\NumericLiteralSeparatorEmulator' => __DIR__ . '/..' . '/nikic/php-parser/lib/PhpParser/Lexer/TokenEmulator/NumericLiteralSeparatorEmulator.php',
+        'PhpParser\\Lexer\\TokenEmulator\\ReadonlyFunctionTokenEmulator' => __DIR__ . '/..' . '/nikic/php-parser/lib/PhpParser/Lexer/TokenEmulator/ReadonlyFunctionTokenEmulator.php',
         'PhpParser\\Lexer\\TokenEmulator\\ReadonlyTokenEmulator' => __DIR__ . '/..' . '/nikic/php-parser/lib/PhpParser/Lexer/TokenEmulator/ReadonlyTokenEmulator.php',
         'PhpParser\\Lexer\\TokenEmulator\\ReverseEmulator' => __DIR__ . '/..' . '/nikic/php-parser/lib/PhpParser/Lexer/TokenEmulator/ReverseEmulator.php',
         'PhpParser\\Lexer\\TokenEmulator\\TokenEmulator' => __DIR__ . '/..' . '/nikic/php-parser/lib/PhpParser/Lexer/TokenEmulator/TokenEmulator.php',
@@ -5277,8 +5275,6 @@ class ComposerStaticInit8ed9c2cb711f4d0ecd3b893f827ac915
         'PhpParser\\Parser\\Tokens' => __DIR__ . '/..' . '/nikic/php-parser/lib/PhpParser/Parser/Tokens.php',
         'PhpParser\\PrettyPrinterAbstract' => __DIR__ . '/..' . '/nikic/php-parser/lib/PhpParser/PrettyPrinterAbstract.php',
         'PhpParser\\PrettyPrinter\\Standard' => __DIR__ . '/..' . '/nikic/php-parser/lib/PhpParser/PrettyPrinter/Standard.php',
-        'PhpThumb' => __DIR__ . '/..' . '/weotch/phpthumb/src/PhpThumb.inc.php',
-        'PhpThumbFactory' => __DIR__ . '/..' . '/weotch/phpthumb/src/ThumbLib.inc.php',
         'PhpToken' => __DIR__ . '/..' . '/symfony/polyfill-php80/Resources/stubs/PhpToken.php',
         'Psr\\Cache\\CacheException' => __DIR__ . '/..' . '/psr/cache/src/CacheException.php',
         'Psr\\Cache\\CacheItemInterface' => __DIR__ . '/..' . '/psr/cache/src/CacheItemInterface.php',
@@ -6831,7 +6827,6 @@ class ComposerStaticInit8ed9c2cb711f4d0ecd3b893f827ac915
         'Termwind\\ValueObjects\\Node' => __DIR__ . '/..' . '/nunomaduro/termwind/src/ValueObjects/Node.php',
         'Termwind\\ValueObjects\\Style' => __DIR__ . '/..' . '/nunomaduro/termwind/src/ValueObjects/Style.php',
         'Termwind\\ValueObjects\\Styles' => __DIR__ . '/..' . '/nunomaduro/termwind/src/ValueObjects/Styles.php',
-        'ThumbBase' => __DIR__ . '/..' . '/weotch/phpthumb/src/ThumbBase.inc.php',
         'TijsVerkoyen\\CssToInlineStyles\\CssToInlineStyles' => __DIR__ . '/..' . '/tijsverkoyen/css-to-inline-styles/src/CssToInlineStyles.php',
         'TijsVerkoyen\\CssToInlineStyles\\Css\\Processor' => __DIR__ . '/..' . '/tijsverkoyen/css-to-inline-styles/src/Css/Processor.php',
         'TijsVerkoyen\\CssToInlineStyles\\Css\\Property\\Processor' => __DIR__ . '/..' . '/tijsverkoyen/css-to-inline-styles/src/Css/Property/Processor.php',
