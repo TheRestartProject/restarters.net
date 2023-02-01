@@ -14,10 +14,10 @@ export default {
       }
 
       ret = this.$lang.choice(key, val, {
-        value: val
+        value: '<span class="text-brand-light font-weight-bold">' + val + '</span>'
       })
 
-      return '<span class="text-brand-light font-weight-bold">' + ret + '</span>'
+      return ret
     }
   }
 }
