@@ -13,7 +13,7 @@
     position: absolute;
     width: 30px;
     height: 30px;
-    background-image: url('/iamges/svgs/edit_icon.svg');
+    background-image: url('/images/edit_icon.svg');
     position: absolute;
     top: 50%;
     left: 50%;
@@ -25,7 +25,7 @@
     background: #000 !important;
 
     &::before {
-      background-image: url('/images//edit_icon_hover.svg');
+      background-image: url('/images/edit_icon_hover.svg');
     }
   }
 }
