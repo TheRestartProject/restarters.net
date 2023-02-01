@@ -53,11 +53,6 @@ class PartyController extends Controller
             // We are showing events for multiple groups and so we need to pass the relevant group, in order that
             // we can show the group name and link to it.
             $thisone['group'] = \App\Group::find($event->group);
-
-            $group_image = $thisone['group']->groupImage;
-            if (is_object($group_image) && is_object($group_image->image)) {
-                $thisone['group']['group_image'] = $group_image->image->path;
-            }
         }
 
         $thisone['attending'] = Auth::user() && $event->isBeingAttendedBy(Auth::user()->id);
