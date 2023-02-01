@@ -66,7 +66,7 @@ class InviteEventTest extends TestCase
 
         $response->assertSessionHas('success');
         $response = $this->get('/party/view/'.$event->idevents);
-        $response->assertSee('Invites Sent!');
+        $response->assertSee('Invites sent!');
 
         // Check it's in the DB.
         $this->assertDatabaseHas('events_users', [
@@ -115,6 +115,16 @@ class InviteEventTest extends TestCase
         $response5 = $this->get('/party');
         $events = $this->getVueProperties($response5)[1][':initial-events'];
         $this->assertNotFalse(strpos($events, '"attending":true'));
+
+        // Invite again - different code path when they're already there.
+        $response = $this->post('/party/invite', [
+            'group_name' => $group->name,
+            'event_id' => $event->idevents,
+            'manual_invite_box' => $user->email,
+            'message_to_restarters' => 'Join us, but not in a creepy zombie way',
+        ]);
+
+        $response->assertSessionHas('warning');
     }
 
     public function testInvitableUserPOV()
@@ -364,6 +374,66 @@ class InviteEventTest extends TestCase
             'group_name' => $group->name,
             'event_id' => $event->idevents,
             'manual_invite_box' => '@invalidmail',
+            'message_to_restarters' => 'Join us, but not in a creepy zombie way',
+        ]);
+
+        $response->assertSessionHas('warning');
+    }
+
+    public function testInviteNonUsers() {
+        Notification::fake();
+
+        $this->withoutExceptionHandling();
+
+        $group = Group::factory()->create([
+                                              'approved' => true
+                                          ]);
+        $event = Party::factory()->create([
+                                              'group' => $group,
+                                              'event_start_utc' => '2130-01-01T12:13:00+00:00',
+                                              'event_end_utc' => '2130-01-01T13:14:00+00:00',
+                                          ]);
+
+        $host = User::factory()->host()->create();
+        $this->actingAs($host);
+
+        // Invite a user.
+        $user = User::factory()->restarter()->create();
+
+        $response = $this->post('/party/invite', [
+            'group_name' => $group->name,
+            'event_id' => $event->idevents,
+            'manual_invite_box' => 'test@test.com',
+            'message_to_restarters' => 'Join us, but not in a creepy zombie way',
+        ]);
+
+        $response->assertSessionHas('success');
+    }
+
+    public function testInviteNoUsers() {
+        Notification::fake();
+
+        $this->withoutExceptionHandling();
+
+        $group = Group::factory()->create([
+                                              'approved' => true
+                                          ]);
+        $event = Party::factory()->create([
+                                              'group' => $group,
+                                              'event_start_utc' => '2130-01-01T12:13:00+00:00',
+                                              'event_end_utc' => '2130-01-01T13:14:00+00:00',
+                                          ]);
+
+        $host = User::factory()->host()->create();
+        $this->actingAs($host);
+
+        // Invite a user.
+        $user = User::factory()->restarter()->create();
+
+        $response = $this->post('/party/invite', [
+            'group_name' => $group->name,
+            'event_id' => $event->idevents,
+            'manual_invite_box' => '',
             'message_to_restarters' => 'Join us, but not in a creepy zombie way',
         ]);
 

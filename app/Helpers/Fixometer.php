@@ -77,11 +77,6 @@ class Fixometer
         return $feature === true;
     }
 
-    public static function dateFormat($timestamp)
-    {
-        return date('D, j M Y, H:i', $timestamp);
-    }
-
     public static function userHasViewPartyPermission($partyId, $userId = null)
     {
         $party = Party::findOrFail($partyId);

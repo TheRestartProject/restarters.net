@@ -1,6 +1,6 @@
 <aside class="widget widget__2">
     <h2>{{{ $title }}}</h2>
-    <p title="{{{ $co2 }}} kg of CO2">{{{ $equal_to }}} {{{ Str::plural($measure, $equal_to) }}}</p>
+    <p title="{{{ $co2 }}} kg of CO2">{{{ $equal_to }}} {{{ Str::plural($measure, floatval($equal_to)) }}}</p>
     <br>
     <div class="row row-compressed">
 

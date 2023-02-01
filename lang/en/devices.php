@@ -82,4 +82,9 @@ return [
   'tooltip_type_unpowered' => 'Add as much information about the type of item here as you can (e.g. \'Sofa\' or \'Denim jeans\')',
   'unknown_item_type' => 'You\'re creating a new item type. Are you sure an existing item type is not suitable?',
   'unknown_brand' => 'You\'re creating a new brand. Are you sure an existing brand is not suitable?',
+  'image_delete_success' => 'Thank you, the image has been deleted',
+  'image_delete_error' => 'Sorry, but the image can\'t be deleted',
+  'image_upload_error' => 'fail - image could not be uploaded',
+  'device_delete_sucess' => 'Device has been deleted!',
+  'device_delete_permissions' => 'You do not have the right permissions for deleting a device.',
 ];

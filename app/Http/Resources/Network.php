@@ -25,9 +25,6 @@ class Network extends JsonResource
      *          format="int64",
      *          example=1
      *     )
-     */
-
-    /**
      *     @OA\Property(
      *          property="name",
      *          title="name",
@@ -35,9 +32,6 @@ class Network extends JsonResource
      *          format="string",
      *          example="Default Network"
      *     )
-     */
-
-    /**
      *     @OA\Property(
      *          property="logo",
      *          title="image",
@@ -45,9 +39,6 @@ class Network extends JsonResource
      *          format="string",
      *          example="/mid_1597853610178a4b76e4d666b2a7b32ee75d8a24c706f1cbf213970.png"
      *     )
-     */
-
-    /**
      *     @OA\Property(
      *          property="description",
      *          title="description",
@@ -55,9 +46,6 @@ class Network extends JsonResource
      *          format="string",
      *          example="<p>This is a description.</p>"
      *     )
-     */
-
-    /**
      *     @OA\Property(
      *          property="website",
      *          title="website",
@@ -65,9 +53,6 @@ class Network extends JsonResource
      *          format="string",
      *          example="https://therestartproject.org"
      *     )
-     */
-
-    /**
      *     @OA\Property(
      *          property="shortname",
      *          title="shortname",
@@ -75,9 +60,6 @@ class Network extends JsonResource
      *          format="string",
      *          example="resarters"
      *     )
-     */
-
-    /**
      *     @OA\Property(
      *          property="default_language",
      *          title="default_language",
@@ -85,9 +67,6 @@ class Network extends JsonResource
      *          format="string",
      *          example="fr-BE"
      *     )
-     */
-
-    /**
      *     @OA\Property(
      *          property="timezone",
      *          title="timezone",
@@ -95,9 +74,6 @@ class Network extends JsonResource
      *          format="string",
      *          example="Europe/London"
      *     )
-     */
-
-    /**
      *     @OA\Property(
      *          property="stats",
      *          title="stats",
@@ -218,9 +194,6 @@ class Network extends JsonResource
      *              type="number",
      *          ),
      *     )
-     */
-
-    /**
      *     @OA\Property(
      *          property="updated_at",
      *          title="updated_at",
@@ -241,7 +214,7 @@ class Network extends JsonResource
         return [
             'id' => $this->id,
             'name' => $this->name,
-            'logo' => $this->logo ? ($request->root() . '/uploads/mid_' . $this->logo) : null,
+            'logo' => $this->logo ? ($request->root() . '/uploads/' . $this->logo) : null,
             'description' => $this->description,
             'website' => $this->website,
             'shortname' => $this->shortname,
