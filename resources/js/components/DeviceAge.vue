@@ -3,7 +3,7 @@
     <label class="text-bold">
       {{ __('devices.age') }}
     </label>
-    <b-input type="number" @change="$emit('update:age', parseFloat($event))" size="lg" class="marg p-1 text-center"  min="0" step="0.5" autocomplete="off" :value="age" :disabled="disabled" />
+    <b-input type="number" size="lg" class="marg p-1 text-center device-age-edit"  min="0" step="0.5" autocomplete="off" v-model="value" :disabled="disabled" />
     <span class="text-right mb-1">
       {{ __('devices.age_approx') }}
     </span>
@@ -34,6 +34,25 @@ export default {
       value: null
     }
   },
+  watch: {
+    age: {
+      handler: function (val) {
+        // Ensure we don't show 0.
+        this.value = val ? val : null
+      },
+      immediate: true
+    },
+    value(newVal) {
+      // ...even if we do store it as that.
+      this.$emit('update:age', newVal ? parseFloat(newVal) : 0)
+    }
+  },
+  methods: {
+    changeAge() {
+      this.$nextTick(() => {
+      })
+    }
+  }
 }
 </script>
 <style scoped lang="scss">
