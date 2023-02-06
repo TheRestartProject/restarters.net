@@ -51,9 +51,7 @@ class CreateWordpressPostForGroup
         }
 
         try {
-            if (isset($data['moderate']) && $data['moderate'] == 'approve') {
-                $this->createGroupOnWordpress($group);
-            }
+            $this->createGroupOnWordpress($group);
         } catch (\Exception $e) {
             Log::error('An error occurred during Wordpress group creation: '.$e->getMessage());
 
