@@ -228,7 +228,7 @@ exports.addDevice = async function(page, baseURL, idevents, powered, photo, fixe
   }
 
   // Age of device when editing is 0, which should show blank.
-  await expect(page.locator('.device-age-edit:visible')).innerText().includes('0').toBeFalsy()
+  await expect(page.locator('.device-age-edit:visible')).toHaveValue('')
 
   // Close the device edit.
   await page.locator('.cancel').click()
