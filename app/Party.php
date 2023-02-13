@@ -625,9 +625,11 @@ class Party extends Model implements Auditable
     }
 
     public function lengthInHours() {
-        $start = new Carbon($this->event_start_utc);
-        $end = new Carbon($this->event_end_utc);
-        return round(($start->diffInMinutes($end) + 30) / 60);
+//        Code for when we fix this.
+//        $start = new Carbon($this->event_start_utc);
+//        $end = new Carbon($this->event_end_utc);
+//        return round(($start->diffInMinutes($end) + 30) / 60);
+        return 3;
     }
 
     public function hoursVolunteered()

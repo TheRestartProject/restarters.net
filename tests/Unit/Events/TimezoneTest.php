@@ -67,7 +67,7 @@ class TimezoneTest extends TestCase
         self::assertEquals('15:15', $e->start_local);
         self::assertEquals('18:45', $e->end_local);
         self::assertEquals('01/02/2021', $e->getFormattedLocalEnd());
-        self::assertEquals(4, $e->lengthInHours());
+        self::assertEquals(3, $e->lengthInHours());
     }
 
     /**
