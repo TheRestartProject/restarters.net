@@ -13,11 +13,11 @@ export default {
         key = 'partials.emissions_equivalent_consume_low'
       }
 
-      ret = this.$lang.get(key, {
-        value: '<span class="text-brand-light font-weight-bold">' + val.toLocaleString() + '</span>'
+      ret = this.$lang.choice(key, val, {
+        value: '<span class="text-brand-light font-weight-bold">' + val + '</span>'
       })
 
-      return this.$lang.choice(ret, val)
+      return ret
     }
   }
 }

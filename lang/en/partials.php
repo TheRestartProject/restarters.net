@@ -64,7 +64,7 @@ return [
   'add_device_powered' => 'Add Powered Item',
   'add_device_unpowered' => 'Add Unpowered Item',
   'solution_text2' => 'Interesting case study to share?',
-  'emissions_equivalent_consume_low' => 'the same amount of emissions as<br /> watching :value hour of TV|the same amount of emissions as<br /> watching :value hours of TV',
+  'emissions_equivalent_consume_low' => 'the same amount of emissions as<br /> watching :value day of TV non-stop|the same amount of emissions as<br /> watching :value days of TV non-stop',
   'emissions_equivalent_consume_high' => 'the same amount of emissions as<br /> driving for :value km|the same amount of emissions as<br /> driving for :value km',
   'to_be_recycled' => ':value item to be recycled|:value items to be recycled',
   'to_be_repaired' => ':value item to be repaired|:value items to be repaired',

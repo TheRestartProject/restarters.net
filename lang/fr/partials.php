@@ -70,7 +70,7 @@ return [
   'are_you_sure' => 'Etes-vous sûr?',
   'close' => 'Fermer',
   'emissions_equivalent_consume_high' => 'La même quantité d\'émissions que<br /> conduire :value km|la même quantité d\'émissions que <br /> conduire :value km',
-  'emissions_equivalent_consume_low' => 'La même quantité d\'émissions que <br /> regarder :value heure la télévision|la même quantité d\'émissions que<br /> regarder :value heures la télévision',
+  'emissions_equivalent_consume_low' => 'La même quantité d\'émissions que <br /> regarder :value jour la télévision sans arrêt|la même quantité d\'émissions que<br /> regarder :value jours la télévision sans arrêt',
   'loading' => 'Téléchargement',
   'no_weight' => ':value objet(s) divers ou objet(s) non-électriques sans poids estimé(s)',
   'please_confirm' => 'Veuillez confirmer que vous souhaitez continuer.',
