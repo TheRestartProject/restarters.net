@@ -1,5 +1,5 @@
 <template>
-  <CollapsibleSection class="lineheight no-explict-width" collapsed>
+  <CollapsibleSection class="no-explict-width" collapsed>
     <template slot="title">
       {{ __('groups.about') }}
     </template>
@@ -54,10 +54,6 @@ export default {
 </script>
 <style scoped lang="scss">
 @import 'resources/global/css/_variables';
-
-.lineheight {
-  line-height: 2;
-}
 
 .readmore {
   white-space: pre-wrap !important;
