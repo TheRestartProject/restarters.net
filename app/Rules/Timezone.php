@@ -25,7 +25,7 @@ class Timezone implements Rule
      */
     public function passes($attribute, $value)
     {
-        return in_array($value, \DateTimeZone::listIdentifiers());
+        return in_array($value, \DateTimeZone::listIdentifiers(\DateTimeZone::ALL_WITH_BC));
     }
 
     /**

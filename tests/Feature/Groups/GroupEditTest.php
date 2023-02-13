@@ -123,5 +123,15 @@ class GroupEditTest extends TestCase
         $timezones = json_decode($response->getContent(), TRUE);
         self::assertGreaterThan(0, count($timezones));
         self::assertTrue(array_key_exists('name', $timezones[0]));
+
+        // Australia/Canberra is an outdated timezone; check it appears.
+        $found = false;
+        foreach ($timezones as $timezone) {
+            if ($timezone['name'] == 'Australia/Canberra') {
+                $found = true;
+            }
+        }
+
+        self::assertTrue($found);
     }
 }

@@ -258,4 +258,33 @@ class APIv2GroupTest extends TestCase
         $json = json_decode($response->getContent(), true);
         self::assertEquals($tag->id, $json['data']['tags'][0]['id']);
     }
+
+    public function testOutdated() {
+        // Check we can create a group with an outdated timezone.
+        $user = User::factory()->administrator()->create([
+                                                             'api_token' => '1234',
+                                                         ]);
+        // Set a network on the user.
+        $network = Network::factory()->create([
+                                                  'shortname' => 'network',
+                                              ]);
+        $user->repair_network = $network->id;
+        $user->save();
+
+        $response = $this->post(
+            '/api/v2/groups?api_token=1234',
+            [
+                'name' => 'Test Group',
+                'location' => 'London',
+                'description' => 'Some text.',
+                'timezone' => 'Australia/Canberra'
+            ]
+        );
+
+        $response->assertSuccessful();
+        $json = json_decode($response->getContent(), true);
+        $this->assertTrue(array_key_exists('id', $json));
+        $idgroups = $json['id'];
+        $this->assertGreaterThan(0, $idgroups);
+    }
 }

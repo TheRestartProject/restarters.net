@@ -720,7 +720,7 @@ class GroupController extends Controller
         $longitude = null;
         $country = null;
 
-        if ($timezone && !in_array($timezone, \DateTimeZone::listIdentifiers())) {
+        if ($timezone && !in_array($timezone, \DateTimeZone::listIdentifiers(\DateTimeZone::ALL_WITH_BC))) {
             throw ValidationException::withMessages(['location ' => __('partials.validate_timezone')]);
         }
 
