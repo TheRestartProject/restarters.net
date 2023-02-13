@@ -220,7 +220,7 @@ class Group extends JsonResource
      *          @OA\Property(
      *              property="volunteers",
      *              title="volunteers",
-     *              description="The number of volunteer repairers.",
+     *              description="The number of volunteers.",
      *              type="number",
      *          ),
      *          @OA\Property(
