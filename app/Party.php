@@ -388,6 +388,7 @@ class Party extends Model implements Auditable
         return $this
       ->select(DB::raw('`events`.*, ( 6371 * acos( cos( radians('.$user->latitude.') ) * cos( radians( events.latitude ) ) * cos( radians( events.longitude ) - radians('.$user->longitude.') ) + sin( radians('.$user->latitude.') ) * sin( radians( events.latitude ) ) ) ) AS distance'))
       ->join('groups', 'groups.idgroups', '=', 'events.group')
+      ->join('group_network', 'groups.idgroups', '=', 'group_network.group_id')
       ->join('networks', 'networks.id', '=', 'group_network.network_id')
       ->join('users_groups', 'users_groups.group', '=', 'groups.idgroups')
       ->where(function ($query) use ($exclude_group_ids) {
