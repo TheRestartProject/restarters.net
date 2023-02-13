@@ -65,7 +65,7 @@ label.form-check-label {
   border-right: none !important;
 
   .select2-selection__arrow b {
-    background-image: url('/images/svgs/dropdown-arrow.svg') !important;
+    background-image: url('/images/dropdown-arrow.svg') !important;
     background-repeat: no-repeat !important;
     border-width: 0 0 0 0 !important;
     left: -50%;
@@ -81,7 +81,7 @@ label.form-check-label {
 
 .select2-container--open {
   .select2-selection__arrow b {
-    background-image: url('/images/svgs/dropdown-arrow-up.svg') !important;
+    background-image: url('/images/dropdown-arrow-up.svg') !important;
   }
 }
 
@@ -130,7 +130,7 @@ label.form-check-label {
       border: 0;
       border-color: unset !important;
       border-style: unset !important;
-      background-image: url('/images/svgs/dropdown-arrow.svg');
+      background-image: url('/images/dropdown-arrow.svg');
       width: 14px !important;
       height: 8px !important;
       left: 10% !important;
@@ -216,7 +216,7 @@ select.form-control:not([class*="select2"]) {
   -moz-appearance: none;
   background-position: 96% 50%;
   background-repeat: no-repeat;
-  background-image: url('/images/svgs/dropdown-arrow.svg') !important;
+  background-image: url('/images/dropdown-arrow.svg') !important;
 }
 
 .custom-file-input ~ .custom-file-label::after {

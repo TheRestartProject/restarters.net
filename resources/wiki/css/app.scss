@@ -26,6 +26,26 @@ body {
   font-family: "Asap", sans-serif;
 }
 
+.main-page {
+  counter-reset: chapter 0;
+
+  .mw-collapsible {
+    h2::before {
+      content: counter(chapter);
+
+      width: 50px;
+      height: 50px;
+      background: $black;
+      color: $white;
+      text-align: center;
+      font-size: 36px;
+      display: inline-block;
+      padding: 4px;
+      margin-right: 12px;
+    }
+  }
+}
+
 .mw-parser-output {
   counter-reset: chapter 0 section 0;
 
