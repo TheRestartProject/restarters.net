@@ -121,8 +121,8 @@ export default {
 
       let ret = await axios.get('/api/v2/moderate/groups?api_token=' + apiToken)
 
-      if (ret && ret.data) {
-        commit('setModerate', ret.data)
+      if (ret && ret.data && ret.data.data) {
+        commit('setModerate', ret.data.data)
       }
     },
     async list({commit}) {

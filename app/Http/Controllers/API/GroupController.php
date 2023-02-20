@@ -469,7 +469,9 @@ class GroupController extends Controller
     public function moderateGroupsv2(Request $request) {
         $user = $this->getUser();
         $ret = \App\Http\Resources\GroupCollection::make(Group::unapprovedVisibleTo($user->id));
-        return response()->json($ret);
+        return response()->json([
+            'data' => $ret
+        ]);
     }
 
     /**

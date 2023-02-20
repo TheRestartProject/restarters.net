@@ -69,8 +69,8 @@ class APIv2EventTest extends TestCase
         $response = $this->get("/api/v2/moderate/events?api_token=1234");
         $response->assertSuccessful();
         $json = json_decode($response->getContent(), true);
-        self::assertEquals(1, count($json));
-        self::assertEquals($id1, $json[0]['id']);
+        self::assertEquals(1, count($json['data']));
+        self::assertEquals($id1, $json['data'][0]['id']);
     }
 
 

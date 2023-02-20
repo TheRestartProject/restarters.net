@@ -346,6 +346,8 @@ class EventController extends Controller
             return strtotime($a->resource->event_start_utc) - strtotime($b->resource->event_start_utc);
         });
 
-        return response()->json($ret);
+        return response()->json([
+            'data' => $ret
+        ]);
     }
 }
