@@ -89,10 +89,12 @@ abstract class TestCase extends BaseTestCase
             }
         }
 
-        $network = new Network();
-        $network->name = 'Restarters';
-        $network->shortname = 'restarters';
-        $network->save();
+        if (!Network::where('name', 'Restarters')->first()) {
+            $network = new Network();
+            $network->name = 'Restarters';
+            $network->shortname = 'restarters';
+            $network->save();
+        }
 
         $this->withoutExceptionHandling();
         app('honeypot')->disable();

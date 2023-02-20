@@ -349,7 +349,7 @@ class GroupController extends Controller
      *              @OA\Property(
      *                property="data",
      *                title="data",
-     *                description="An array of groups",
+     *                description="An array of events",
      *                type="array",
      *                @OA\Items(
      *                    ref="#/components/schemas/EventSummary"
@@ -432,7 +432,40 @@ class GroupController extends Controller
         return $user;
     }
 
-    // TODO Add to OpenAPI.
+    /**
+     * @OA\Get(
+     *      path="/api/v2/moderate/groups",
+     *      operationId="getGroupsModeratev2",
+     *      tags={"Groups"},
+     *      summary="Get Groups for Moderation",
+     *      description="Only available for Administrators and Network Coordinators. ",
+     *      @OA\Parameter(
+     *          name="api_token",
+     *          description="A valid user API token",
+     *          required=true,
+     *          in="query",
+     *          @OA\Schema(
+     *              type="string",
+     *              example="1234"
+     *          )
+     *      ),
+     *      @OA\Response(
+     *          response=200,
+     *          description="Successful operation",
+     *          @OA\JsonContent(
+     *              @OA\Property(
+     *                description="An array of groups",
+     *                type="array",
+     *                property="data",
+     *                title="data",
+     *                @OA\Items(
+     *                    ref="#/components/schemas/GroupSummary"
+     *                )
+     *             )
+     *          )
+     *       ),
+     *     )
+     */
     public function moderateGroupsv2(Request $request) {
         $user = $this->getUser();
         $ret = \App\Http\Resources\GroupCollection::make(Group::unapprovedVisibleTo($user->id));
