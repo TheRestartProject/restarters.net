@@ -94,6 +94,7 @@ class ExportController extends Controller
             fputcsv($file, $columns);
 
             foreach ($all_devices as $device) {
+                set_time_limit(60);
                 if (User::userCanSeeEvent($me, $event)) {
                     $wasteImpact = 0;
                     $co2Diverted = 0;
@@ -143,6 +144,7 @@ class ExportController extends Controller
             $party = null;
 
             foreach ($all_devices as $device) {
+                set_time_limit(60);
                 $party = !$party || $party->idevents != $device->event ? Party::findOrFail($device->event) : $party;
 
                 if (User::userCanSeeEvent($me, $party)) {
