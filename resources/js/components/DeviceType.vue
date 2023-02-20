@@ -5,7 +5,7 @@
       <b-img class="icon clickable" src="/icons/info_ico_black.svg" v-if="iconVariant === 'black'" />
       <b-img class="icon clickable" src="/icons/info_ico_green.svg" v-else />
     </div>
-    <p v-if="unknownType" class="pl-1 form-text">
+    <p v-if="!suppressTypeWarning && notASuggestion" class="pl-1 form-text">
       {{ __('devices.unknown_item_type' )}}
     </p>
   </div>
@@ -50,17 +50,7 @@ export default {
   },
   computed: {
     suggestions() {
-      let ret = []
-      let used = {}
-
-      this.itemTypes.filter(i => Boolean(i.powered) === Boolean(this.powered)).forEach(i => {
-        if (!(i.item_type in used)) {
-          used[i.item_type] = true
-          ret.push(i.item_type)
-        }
-      })
-
-      return ret
+      return this.itemTypes.map(i => i.item_type)
     },
     notASuggestion() {
       if (!this.currentType) {
@@ -76,9 +66,6 @@ export default {
       })
 
       return ret
-    },
-    unknownType() {
-      return !this.suppressTypeWarning && this.notASuggestion
     },
     translatedTooltip() {
       if (this.powered) {
@@ -118,21 +105,21 @@ export default {
 </script>
 <style scoped lang="scss">
 // Some card styles are getting in the way.
-/deep/ .marg {
+::v-deep .marg {
   margin: 2px !important;
   font-size: 15px !important;
   flex-shrink: 0;
 }
 
-/deep/ .input-group > .form-control {
+::v-deep .input-group > .form-control {
   width: 100%;
 }
 
-/deep/ span {
+::v-deep span {
   font-size: 16px;
 }
 
-/deep/ .vbst-item {
+::v-deep .vbst-item {
   div {
     line-height: 16px;
   }

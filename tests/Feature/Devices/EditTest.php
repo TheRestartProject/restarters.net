@@ -15,9 +15,9 @@ class EditTest extends TestCase
     {
         parent::setUp();
 
-        $this->event = factory(Party::class)->create();
-        $this->admin = factory(User::class)->state('Administrator')->create();
-        $this->device_inputs = factory(Device::class)->raw([
+        $this->event = Party::factory()->create();
+        $this->admin = User::factory()->administrator()->create();
+        $this->device_inputs = Device::factory()->raw([
                                                                'event_id' => $this->event->idevents,
                                                                'quantity' => 1,
                                                            ]);
@@ -54,7 +54,7 @@ class EditTest extends TestCase
 
     public function testDeviceEditAddImage() {
         Storage::fake('avatars');
-        $user = factory(User::class)->states('Administrator')->create();
+        $user = User::factory()->administrator()->create();
         $this->actingAs($user);
 
         $rsp = $this->post('/device/create', $this->device_inputs);
@@ -120,7 +120,7 @@ class EditTest extends TestCase
 
     public function testDeviceAddAddImage() {
         Storage::fake('avatars');
-        $user = factory(User::class)->states('Administrator')->create();
+        $user = User::factory()->administrator()->create();
         $this->actingAs($user);
 
         // Use a negative id to indicate an Add.
@@ -172,5 +172,53 @@ class EditTest extends TestCase
         $this->assertTrue($response3->isRedirection());
         $response3->assertSessionHas('message');
         $this->assertEquals('Thank you, the image has been deleted', \Session::get('message'));
+    }
+
+    public function testNextSteps() {
+        $device_inputs = Device::factory()->raw([
+            'event_id' => $this->event->idevents,
+            'quantity' => 1,
+            'repair_status' => 2,
+        ]);
+        $rsp = $this->post('/device/create', $device_inputs);
+        self::assertTrue($rsp['success']);
+        $iddevices = $rsp['devices'][0]['iddevices'];
+        self::assertNotNull($iddevices);
+
+        # Edit the repair details to say more time needed
+        $atts = $device_inputs;
+        $atts['repair_details'] = 1;
+        $rsp = $this->post('/device/edit/' . $iddevices, $atts);
+        self::assertEquals('Device updated!', $rsp['success']);
+
+        # Check the resulting fields.
+        $device = Device::findOrFail($iddevices);
+        self::assertEquals(0, $device->professional_help);
+        self::assertEquals(0, $device->do_it_yourself);
+        self::assertEquals(1, $device->more_time_needed);
+
+        # Edit the repair details to say professional help needed.
+        $atts = $device_inputs;
+        $atts['repair_details'] = 2;
+        $rsp = $this->post('/device/edit/' . $iddevices, $atts);
+        self::assertEquals('Device updated!', $rsp['success']);
+
+        # Check the resulting fields.
+        $device = Device::findOrFail($iddevices);
+        self::assertEquals(1, $device->professional_help);
+        self::assertEquals(0, $device->do_it_yourself);
+        self::assertEquals(0, $device->more_time_needed);
+
+        # Edit the repair details to say DIY needed.
+        $atts = $device_inputs;
+        $atts['repair_details'] = 3;
+        $rsp = $this->post('/device/edit/' . $iddevices, $atts);
+        self::assertEquals('Device updated!', $rsp['success']);
+
+        # Check the resulting fields.
+        $device = Device::findOrFail($iddevices);
+        self::assertEquals(0, $device->professional_help);
+        self::assertEquals(1, $device->do_it_yourself);
+        self::assertEquals(0, $device->more_time_needed);
     }
 }

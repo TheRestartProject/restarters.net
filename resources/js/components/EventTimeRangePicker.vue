@@ -127,11 +127,11 @@ export default {
 @import '~bootstrap/scss/functions';
 @import '~bootstrap/scss/variables';
 @import '~bootstrap/scss/mixins/_breakpoints';
-/deep/ label {
+::v-deep label {
   font-weight: normal;
 }
 
-/deep/ .time {
+::v-deep .time {
   width: 125px;
   margin: 1px;
 

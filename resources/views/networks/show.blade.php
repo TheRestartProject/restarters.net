@@ -25,7 +25,7 @@
                     <div class="row">
                         <div class="col-lg-3 align-self-center" style="text-align:center">
                             <div class="network-icon">
-                                @php( $logo = $network->logo('_x100') )
+                                @php( $logo = $network->sizedLogo('_x100') )
                                 @if( $logo )
                                 <img style="max-width: 100%; max-height:50px" src="{{ asset("/uploads/$logo") }}" alt="{{{ $network->name }}} logo">
                                 @else

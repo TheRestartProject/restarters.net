@@ -2,6 +2,9 @@
   "patches": {
     "addwiki/mediawiki-api-base": {
       "Make getClient public": "patches/mediawiki-api-base.patch"
+    },
+    "mariuzzo/laravel-js-localization": {
+      "Translation doesn't handle new lang folder location": "patches/laravel-translation.patch"
     }
   }
 }

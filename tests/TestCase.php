@@ -70,14 +70,18 @@ abstract class TestCase extends BaseTestCase
         // Set up random auto increment values.  This avoids tests working because everything is 1.
         //
         // Some tables (e.g. network) have a tinyint as the ID, so we must be careful not to create values that
-        // overflow this.
+        // overflow this.  Also avoid the magic 29 value, which is a "superhero" user (see ExportController).
         $tables = DB::select('SHOW TABLES');
         foreach ($tables as $table)
         {
             foreach ($table as $field => $tablename) {
                 try {
+                    do {
+                        $val = rand(1, 100);
+                    } while ($val == 29);
+
                     // This will throw an exception if the table doesn't have auto increment.
-                    DB::update("ALTER TABLE $tablename AUTO_INCREMENT = " . rand(1, 100) . ";");
+                    DB::update("ALTER TABLE $tablename AUTO_INCREMENT = " . $val . ";");
                 } catch (\Exception $e) {
                 }
             }
@@ -91,12 +95,12 @@ abstract class TestCase extends BaseTestCase
         $this->withoutExceptionHandling();
         app('honeypot')->disable();
 
-        factory(Category::class, 1)->states('Cat1')->create();
-        factory(Category::class, 1)->states('Cat2')->create();
-        factory(Category::class, 1)->states('Cat3')->create();
-        factory(Category::class, 1)->states('Mobile')->create();
-        factory(Category::class, 1)->states('Misc')->create();
-        factory(Category::class, 1)->states('Desktop computer')->create();
+        Category::factory()->count(1)->cat1()->create();
+        Category::factory()->count(1)->cat2()->create();
+        Category::factory()->count(1)->cat3()->create();
+        Category::factory()->count(1)->mobile()->create();
+        Category::factory()->count(1)->misc()->create();
+        Category::factory()->count(1)->desktopComputer()->create();
 
         // We manipulate some globals for image upload testing.
         \FixometerFile::$uploadTesting = FALSE;
@@ -130,7 +134,7 @@ abstract class TestCase extends BaseTestCase
     public function loginAsTestUser($role = Role::RESTARTER)
     {
         // This is testing the external interface, whereas actingAs() wouldn't be.
-        Auth::logout();
+        $response = $this->get('/logout');
         $response = $this->post('/user/register/', $this->userAttributes($role));
 
         $response->assertStatus(302);
@@ -138,30 +142,40 @@ abstract class TestCase extends BaseTestCase
 
         // Set the role.
         Auth::user()->role = $role;
+
+        // Ensure API token in case we need to make API calls.
+        Auth::user()->ensureAPIToken();
+
+        return Auth::user();
     }
 
     public function createGroup($name = 'Test Group', $website = 'https://therestartproject.org', $location = 'London', $text = 'Some text.', $assert = true, $approve = true)
     {
         $idgroups = null;
 
-        $this->lastResponse = $this->post('/group/create', [
-            'name' => $name.$this->groupCount++,
-            'website' => $website,
-            'location' => $location,
-            'free_text' => $text,
-            'timezone' => 'Europe/London'
+        // Get the dashboard.  This will ensure that we have set the repair_network on the user.
+        $this->get('/');
+
+        // We create groups using the API.
+        $user = Auth::user();
+
+        $this->lastResponse = $this->post('/api/v2/groups?api_token=' . $user->api_token, [
+             'name' => $name.$this->groupCount++,
+             'website' => $website,
+             'location' => $location,
+             'description' => $text,
+             'timezone' => 'Europe/London'
         ]);
 
         if ($assert) {
-            $this->assertTrue($this->lastResponse->isRedirection());
-            $redirectTo = $this->lastResponse->getTargetUrl();
-            $this->assertNotFalse(strpos($redirectTo, '/group/edit'));
-            $p = strrpos($redirectTo, '/');
-            $idgroups = substr($redirectTo, $p + 1);
+            $this->assertTrue($this->lastResponse->isSuccessful());
+            $json = json_decode($this->lastResponse->getContent(), true);
+            $this->assertTrue(array_key_exists('id', $json));
+            $idgroups = $json['id'];
 
             if ($approve) {
                 $group = Group::find($idgroups);
-                $group->wordpress_post_id = '99999';
+                $group->approved = true;
                 $group->save();
             }
 
@@ -178,7 +192,7 @@ abstract class TestCase extends BaseTestCase
     public function createEvent($idgroups, $date)
     {
         // Create a party for the specific group.
-        $eventAttributes = factory(Party::class)->raw();
+        $eventAttributes = Party::factory()->raw();
         $eventAttributes['group'] = $idgroups;
 
         $event_start = Carbon::createFromTimestamp(strtotime($date))->setTimezone('UTC');
@@ -203,7 +217,7 @@ abstract class TestCase extends BaseTestCase
 
     public function createDevice($idevents, $type)
     {
-        $deviceAttributes = factory(Device::class)->states($type)->raw();
+        $deviceAttributes = Device::factory()->{lcfirst($type)}()->raw();
 
         $deviceAttributes['event_id'] = $idevents;
         $deviceAttributes['quantity'] = 1;
@@ -217,7 +231,7 @@ abstract class TestCase extends BaseTestCase
 
     public function createJane()
     {
-        $user = factory(User::class)->create([
+        $user = User::factory()->create([
             'name' => 'Jane Bloggs',
             'email' => 'jane@bloggs.net',
             'password' => Hash::make('passw0rd'),

@@ -4,7 +4,7 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-class TabicatOraSetup extends Migration
+return new class extends Migration
 {
     /**
      * Run the migrations.
@@ -247,4 +247,4 @@ class TabicatOraSetup extends Migration
         Schema::dropIfExists('fault_types_tablets');
         Schema::dropIfExists('devices_tabicat_ora');
     }
-}
+};

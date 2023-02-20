@@ -25,8 +25,8 @@ class UserCommandsTest extends TestCase {
     }
 
     public function testMakeHost() {
-        $host = factory(User::class)->states('Host')->create();
-        $group = factory(Group::class)->create();
+        $host = User::factory()->host()->create();
+        $group = Group::factory()->create();
         assertFalse(Fixometer::userIsHostOfGroup($group->idgroups, $host->id));
         $this->artisan('user:makehost ' . escapeshellarg($host->email) . ' ' . escapeshellarg($group->name))->assertExitCode(0);
         assertTrue(Fixometer::userIsHostOfGroup($group->idgroups, $host->id));

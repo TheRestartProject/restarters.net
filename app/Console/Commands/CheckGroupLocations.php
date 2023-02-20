@@ -38,7 +38,7 @@ class CheckGroupLocations extends Command
      */
     public function handle()
     {
-        $groups = Group::whereNotNull('wordpress_post_id')->get();
+        $groups = Group::where('approved', true)->get();
         $geocoder = new \App\Helpers\Geocoder();
 
         foreach ($groups as $group) {

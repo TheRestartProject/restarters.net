@@ -16,7 +16,7 @@ class MobifixController extends Controller
      */
     public function index(Request $request)
     {
-        return redirect()->action('MobifixController@status')->withSuccess('done');
+        return redirect()->action([\App\Http\Controllers\MobifixController::class, 'status'])->withSuccess('done');
     }
 
     public function cta(Request $request)

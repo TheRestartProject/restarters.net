@@ -21,6 +21,9 @@
           <b-dropdown-item data-toggle="modal" data-target="#event-share-stats">
             {{ __('events.share_event_stats') }}
           </b-dropdown-item>
+          <b-dropdown-item :href="'/export/devices/event/' + idevents">
+            {{ __('devices.export_event_data') }}
+          </b-dropdown-item>
         </div>
         <div v-else>
           <b-dropdown-item data-toggle="modal" data-target="#event-invite-to" v-if="isAttending && upcoming && approved">

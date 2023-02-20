@@ -2,6 +2,7 @@
 
 namespace App;
 
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use App\Events\DeviceCreatedOrUpdated;
 use DB;
 use Illuminate\Database\Eloquent\Model;
@@ -10,6 +11,8 @@ use OwenIt\Auditing\Contracts\Auditable;
 
 class Device extends Model implements Auditable
 {
+    use HasFactory;
+
     const REPAIR_STATUS_FIXED = 1;
     const REPAIR_STATUS_REPAIRABLE = 2;
     const REPAIR_STATUS_ENDOFLIFE = 3;
@@ -404,12 +407,7 @@ class Device extends Model implements Auditable
     public static function getItemTypes()
     {
         // List the item types
-        $types = DB::table('devices')->whereNotNull('item_type')
-            ->select(['item_type', 'categories.name AS categoryname', 'categories.idcategories', 'categories.powered', DB::raw('COUNT(*) as count')])
-            ->join('categories', 'categories.idcategories', '=', 'devices.category')
-            ->groupBy(DB::raw('CONCAT(item_type, categoryname)'))
-            ->orderBy('count', 'desc')
-            ->get()->toArray();
+        $types = DB::table('devices')->whereNotNull('item_type')->select('item_type', DB::raw('COUNT(*) as count'))->groupBy('item_type')->orderBy('count', 'desc')->get()->toArray();
 
         return $types;
     }

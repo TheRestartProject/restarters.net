@@ -2,7 +2,7 @@
 
 use Illuminate\Database\Migrations\Migration;
 
-class FixCategoryNames extends Migration
+return new class extends Migration
 {
     /**
      * Run the migrations.
@@ -45,4 +45,4 @@ class FixCategoryNames extends Migration
             ]);
         }
     }
-}
+};

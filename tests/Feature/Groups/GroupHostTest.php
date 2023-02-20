@@ -19,7 +19,7 @@ class GroupHostTest extends TestCase
         $this->loginAsTestUser(Role::ADMINISTRATOR);
         $this->idgroups = $this->createGroup();
         $this->group = Group::find($this->idgroups);
-        $this->network = factory(Network::class)->create();
+        $this->network = Network::factory()->create();
         $this->network->addGroup($this->group);
         $this->assertNotNull($this->idgroups);
     }
@@ -36,20 +36,20 @@ class GroupHostTest extends TestCase
      */
     public function testVolunteerNotInGroup($role)
     {
-        $user = factory(User::class)->states($role)->create();
+        $user = User::factory()->{lcfirst($role)}()->create();
         $this->actingAs($user);
 
         if ($role == 'NetworkCoordinator') {
             $this->network->addCoordinator($user);
         }
 
-        $host = factory(User::class)->states('Host')->create();
+        $host = User::factory()->host()->create();
 
         try {
             $response = $this->get("/group/make-host/{$this->idgroups}/{$host->id}");
             $this->assertTrue(false);
         } catch (\Exception $e) {
-            $this->assertContains('Volunteer is not currently in this group', $e->getMessage());
+            $this->assertStringContainsString('Volunteer is not currently in this group', $e->getMessage());
         }
     }
 
@@ -58,14 +58,14 @@ class GroupHostTest extends TestCase
      */
     public function testMakeHost($role)
     {
-        $user = factory(User::class)->states($role)->create();
+        $user = User::factory()->{lcfirst($role)}()->create();
         $this->actingAs($user);
 
         if ($role == 'NetworkCoordinator') {
             $this->network->addCoordinator($user);
         }
 
-        $host = factory(User::class)->states('Host')->create();
+        $host = User::factory()->host()->create();
         $this->group->addVolunteer($host);
 
         $response = $this->get("/group/make-host/{$this->idgroups}/{$host->id}");
@@ -83,12 +83,12 @@ class GroupHostTest extends TestCase
 
     public function testHostMakeHost()
     {
-        $firsthost = factory(User::class)->states('Host')->create();
+        $firsthost = User::factory()->host()->create();
         $this->group->addVolunteer($firsthost);
         $this->group->makeMemberAHost($firsthost);
         $this->actingAs($firsthost);
 
-        $host = factory(User::class)->states('Host')->create();
+        $host = User::factory()->host()->create();
         $this->group->addVolunteer($host);
 
         $response = $this->get("/group/make-host/{$this->idgroups}/{$host->id}");
@@ -113,10 +113,10 @@ class GroupHostTest extends TestCase
 
     public function testIrrelevantHost()
     {
-        $firsthost = factory(User::class)->states('Host')->create();
+        $firsthost = User::factory()->host()->create();
         $this->actingAs($firsthost);
 
-        $host = factory(User::class)->states('Host')->create();
+        $host = User::factory()->host()->create();
         $this->group->addVolunteer($host);
 
         $response = $this->get("/group/make-host/{$this->idgroups}/{$host->id}");

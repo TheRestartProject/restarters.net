@@ -42,25 +42,24 @@ class Fixometer
         return Permissions::all();
     }
 
-    /** checks if user has a role **/
     public static function hasRole($user, $role)
     {
-        if (Auth::guest()) {
-            return false;
-        }
-
         if (is_null($user)) {
+            // Use currently logged in user.
             $user = Auth::user();
         }
 
-        $usersRole = $user->role()->first()->role;
-        if ($usersRole == 'Root') {
-            return true;
-        }
-        if ($usersRole == ucwords($role)) {
-            return true;
-        }
+        if ($user) {
+            $usersRole = $user->role()->first()->role;
 
+            if ($usersRole == 'Root') {
+                return true;
+            }
+
+            if ($usersRole == ucwords($role)) {
+                return true;
+            }
+        }
         return false;
     }
 
@@ -76,11 +75,6 @@ class Fixometer
     public static function featureIsEnabled($feature)
     {
         return $feature === true;
-    }
-
-    public static function dateFormat($timestamp)
-    {
-        return date('D, j M Y, H:i', $timestamp);
     }
 
     public static function userHasViewPartyPermission($partyId, $userId = null)

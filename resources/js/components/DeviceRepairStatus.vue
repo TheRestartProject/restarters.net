@@ -3,6 +3,7 @@
     <multiselect
         :disabled="disabled"
         v-model="statusValue"
+        class="repair-outcome"
         :placeholder="__('devices.repair_outcome')"
         :options="statusOptions"
         track-by="id"
@@ -31,6 +32,7 @@
         :disabled="disabled"
         v-if="showParts"
         v-model="partsValue"
+        class="spare-parts"
         :placeholder="__('devices.spare_parts')"
         :options="partsOptions"
         :multiple="false"

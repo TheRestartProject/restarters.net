@@ -270,6 +270,15 @@ class ApiController extends Controller
     }
 
     public function timezones() {
-        return response()->json(\DB::select("SELECT name FROM mysql.time_zone_name WHERE name NOT LIKE 'posix%' AND name NOT LIKE 'right%';"));
+        $zones = \DateTimeZone::listIdentifiers(\DateTimeZone::ALL_WITH_BC);
+        $ret = [];
+
+        foreach ($zones as $zone) {
+            $ret[] = [
+                'name' => $zone
+            ];
+        }
+
+        return response()->json($ret);
     }
 }

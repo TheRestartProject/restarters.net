@@ -131,6 +131,12 @@ export default {
         headers: {
           'X-CSRF-TOKEN': rootGetters['auth/CSRF']
         }
+      }).catch(function(error) {
+        if (error && error.response && error.response.data) {
+          throw new Error(error.response.data.message)
+        } else {
+          throw new Error('Unknown error')
+        }
       })
 
       if (ret && ret.data && ret.data.success && ret.data.devices) {
@@ -159,6 +165,12 @@ export default {
       let ret = await axios.post('/device/edit/' + params.iddevices, params, {
         headers: {
           'X-CSRF-TOKEN': rootGetters['auth/CSRF']
+        }
+      }).catch(function(error) {
+        if (error && error.response && error.response.data) {
+          throw new Error(error.response.data.message)
+        } else {
+          throw new Error('Unknown error')
         }
       })
 
@@ -199,7 +211,7 @@ export default {
       }
     },
     async addURL ({commit, rootGetters}, params) {
-      const ret = await axios.post('/device-url/', {
+      const ret = await axios.post('/device-url', {
         device_id: params.iddevices,
         url: params.url.url,
         source: params.url.source

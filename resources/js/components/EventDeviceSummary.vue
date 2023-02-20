@@ -17,7 +17,7 @@
           <div :class="badgeClass + ' d-block d-md-none'">
             {{ status }}
           </div>
-          <b-img v-if="sparePartsNeeded" src="/images/tick.svg" class="icon" />
+          <b-img v-if="sparePartsNeeded" src="/images/tick.svg" class="icon spare-parts" />
         </div>
       </b-td>
       <b-td class="d-none d-md-table-cell" v-if="powered">
@@ -55,7 +55,7 @@
         </span>
       </b-td>
       <b-td class="text-center d-none d-md-table-cell">
-        <b-img v-if="sparePartsNeeded" src="/images/tick.svg" class="icon" />
+        <b-img v-if="sparePartsNeeded" src="/images/tick.svg" class="icon spare-parts-tick" />
       </b-td>
       <b-td v-if="canedit" class="text-right d-none d-md-table-cell">
         <div class="d-flex">

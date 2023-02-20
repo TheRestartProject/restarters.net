@@ -4,7 +4,7 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-class DefaultVolunteersValue extends Migration
+return new class extends Migration
 {
     /**
      * Run the migrations.
@@ -29,4 +29,4 @@ class DefaultVolunteersValue extends Migration
             $table->integer('volunteers')->nullable()->change();
         });
     }
-}
+};

@@ -322,7 +322,7 @@ HAVING
 
     protected function _insert_device($cat, $problem, $repair_status)
     {
-        $device = factory(Device::class, 1)->states($cat)->create(
+        $device = Device::factory()->count(1)->cat()->create(
                 [
                     'problem' => $problem,
                     'repair_status' => $repair_status,

@@ -16,7 +16,7 @@ class MisccatController extends Controller
      */
     public function index(Request $request)
     {
-        return redirect()->action('MisccatController@status')->withSuccess('done');
+        return redirect()->action([\App\Http\Controllers\MisccatController::class, 'status'])->withSuccess('done');
     }
 
     public function cta(Request $request)

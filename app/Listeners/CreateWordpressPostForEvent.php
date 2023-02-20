@@ -43,8 +43,10 @@ class CreateWordpressPostForEvent
             return;
         }
 
+        $theParty->approved = true;
+        $theParty->save();
+
         if (! $theParty->shouldPushToWordpress()) {
-            $theParty->update(['wordpress_post_id' => '99999']);
             Log::info('Approved - but events for groups in this network are not published to WordPress');
 
             return;
@@ -67,36 +69,38 @@ class CreateWordpressPostForEvent
      */
     public function createEventOnWordpress($theParty): void
     {
-        $startTimestamp = strtotime($theParty->event_start_utc);
-        $endTimestamp = strtotime($theParty->event_end_utc);
+        if (!$theParty->wordpress_post_id) {
+            $startTimestamp = strtotime($theParty->event_start_utc);
+            $endTimestamp = strtotime($theParty->event_end_utc);
 
-        $group = Group::where('idgroups', $theParty->group)->first();
+            $group = Group::where('idgroups', $theParty->group)->first();
 
-        $custom_fields = [
-            ['key' => 'party_grouphash', 'value' => $theParty->group],
-            ['key' => 'party_venue', 'value' => $theParty->venue],
-            ['key' => 'party_location', 'value' => $theParty->location],
-            ['key' => 'party_time', 'value' => $theParty->getEventStartEndLocal()],
-            ['key' => 'party_groupcountry', 'value' => $group->country],
-            ['key' => 'party_groupcity', 'value' => $group->area],
-            ['key' => 'party_date', 'value' => $theParty->event_date_local],
-            ['key' => 'party_timestamp', 'value' => $startTimestamp],
-            ['key' => 'party_timestamp_end', 'value' => $endTimestamp],
-            ['key' => 'party_timezone', 'value' => $theParty->timezone],
-            ['key' => 'party_stats', 'value' => $theParty->idevents],
-            ['key' => 'party_lat', 'value' => $theParty->latitude],
-            ['key' => 'party_lon', 'value' => $theParty->longitude],
-            ['key' => 'party_online', 'value' => $theParty->online ?? 0],
-        ];
+            $custom_fields = [
+                ['key' => 'party_grouphash', 'value' => $theParty->group],
+                ['key' => 'party_venue', 'value' => $theParty->venue],
+                ['key' => 'party_location', 'value' => $theParty->location],
+                ['key' => 'party_time', 'value' => $theParty->getEventStartEndLocal()],
+                ['key' => 'party_groupcountry', 'value' => $group->country],
+                ['key' => 'party_groupcity', 'value' => $group->area],
+                ['key' => 'party_date', 'value' => $theParty->event_date_local],
+                ['key' => 'party_timestamp', 'value' => $startTimestamp],
+                ['key' => 'party_timestamp_end', 'value' => $endTimestamp],
+                ['key' => 'party_timezone', 'value' => $theParty->timezone],
+                ['key' => 'party_stats', 'value' => $theParty->idevents],
+                ['key' => 'party_lat', 'value' => $theParty->latitude],
+                ['key' => 'party_lon', 'value' => $theParty->longitude],
+                ['key' => 'party_online', 'value' => $theParty->online ?? 0],
+            ];
 
-        $content = [
-            'post_type' => 'party',
-            'custom_fields' => $custom_fields,
-        ];
+            $content = [
+                'post_type' => 'party',
+                'custom_fields' => $custom_fields,
+            ];
 
-        $party_name = !empty($theParty->venue) ? $theParty->venue : $theParty->location;
-        $wpid = $this->wpClient->newPost($party_name, $theParty->free_text, $content);
+            $party_name = !empty($theParty->venue) ? $theParty->venue : $theParty->location;
+            $wpid = $this->wpClient->newPost($party_name, $theParty->free_text, $content);
 
-        $theParty->update(['wordpress_post_id' => $wpid]);
+            $theParty->update(['wordpress_post_id' => $wpid]);
+        }
     }
 }

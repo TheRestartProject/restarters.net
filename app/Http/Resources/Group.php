@@ -25,9 +25,6 @@ class Group extends JsonResource
      *          format="int64",
      *          example=1
      *     )
-     */
-
-    /**
      *     @OA\Property(
      *          property="name",
      *          title="name",
@@ -35,9 +32,6 @@ class Group extends JsonResource
      *          format="string",
      *          example="Restarters HQ"
      *     )
-     */
-
-    /**
      *     @OA\Property(
      *          property="location",
      *          title="location",
@@ -45,9 +39,6 @@ class Group extends JsonResource
      *          format="object",
      *          ref="#/components/schemas/GroupLocation"
      *     )
-     */
-
-    /**
      *     @OA\Property(
      *          property="image",
      *          title="image",
@@ -55,9 +46,6 @@ class Group extends JsonResource
      *          format="string",
      *          example="/mid_1597853610178a4b76e4d666b2a7b32ee75d8a24c706f1cbf213970.png"
      *     )
-     */
-
-    /**
      *     @OA\Property(
      *          property="phone",
      *          title="phone",
@@ -65,9 +53,6 @@ class Group extends JsonResource
      *          format="string",
      *          example="07544 314678"
      *     )
-     */
-
-    /**
      *     @OA\Property(
      *          property="website",
      *          title="website",
@@ -75,9 +60,6 @@ class Group extends JsonResource
      *          format="string",
      *          example="https://therestartproject.org"
      *     )
-     */
-
-    /**
      *     @OA\Property(
      *          property="description",
      *          title="description",
@@ -85,45 +67,55 @@ class Group extends JsonResource
      *          format="string",
      *          example="<p>This is a description.</p>"
      *     )
-     */
-
-    /**
      *     @OA\Property(
      *          property="next_event",
      *          title="next_event",
      *          description="Next event for this group",
      *          ref="#/components/schemas/Event"
      *     )
-     */
-
-    /**
      *     @OA\Property(
      *          property="timezone",
      *          title="timezone",
-     *          description="Timezone for this group.",
+     *          description="Timezone for this group.  If empty will inherit the timezone from the network.",
      *          format="string",
      *          example="Europe/London"
      *     )
-     */
-
-    /**
      *     @OA\Property(
      *         property="hosts",
      *         title="hosts",
      *         description="The number of hosts of this group.",
      *         type="number",
      *     ),
-
-    /**
      *     @OA\Property(
      *         property="restarters",
      *         title="hosts",
      *         description="The number of restarters in this group.",
      *         type="number",
      *     ),
-
-     */
-    /**
+     *     @OA\Property(
+     *         property="approved",
+     *         title="hosts",
+     *         description="Whether the group has been approved",
+     *         type="boolean",
+     *     ),
+     *     @OA\Property(
+     *         property="networks",
+     *         title="networks",
+     *         description="An array of networks of which the group is a member.",
+     *         type="array",
+     *         @OA\Items(
+     *            ref="#/components/schemas/NetworkSummary"
+     *         )
+     *     )
+     *     @OA\Property(
+     *         property="tags",
+     *         title="tags",
+     *         description="An array of tags which apply to the group.",
+     *         type="array",
+     *         @OA\Items(
+     *            ref="#/components/schemas/Tag"
+     *         )
+     *     )
      *     @OA\Property(
      *          property="stats",
      *          title="stats",
@@ -228,7 +220,7 @@ class Group extends JsonResource
      *          @OA\Property(
      *              property="volunteers",
      *              title="volunteers",
-     *              description="The number of volunteer repairers.",
+     *              description="The number of volunteers.",
      *              type="number",
      *          ),
      *          @OA\Property(
@@ -244,9 +236,6 @@ class Group extends JsonResource
      *              type="number",
      *          ),
      *     )
-     */
-
-    /**
      *     @OA\Property(
      *          property="updated_at",
      *          title="updated_at",
@@ -279,8 +268,10 @@ class Group extends JsonResource
             'stats' => $stats,
             'updated_at' => Carbon::parse($this->updated_at)->toIso8601String(),
             'location' => new GroupLocation($this),
-            'networks' => $this->resource->networks,
+            'networks' => new NetworkSummaryCollection($this->networks),
+            'tags' => new TagCollection($this->group_tags),
             'timezone' => $this->timezone,
+            'approved' => $this->approved,
         ];
 
         $ret['hosts'] = $this->resource->all_confirmed_hosts_count;

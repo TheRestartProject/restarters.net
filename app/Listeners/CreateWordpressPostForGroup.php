@@ -41,17 +41,17 @@ class CreateWordpressPostForGroup
             return;
         }
 
+        $group->approved = true;
+        $group->save();
+
         if (! $group->eventsShouldPushToWordpress()) {
-            $group->update(['wordpress_post_id' => '99999']);
             Log::info('Approved - but groups in this network are not published to WordPress');
 
             return;
         }
 
         try {
-            if (isset($data['moderate']) && $data['moderate'] == 'approve') {
-                $this->createGroupOnWordpress($group);
-            }
+            $this->createGroupOnWordpress($group);
         } catch (\Exception $e) {
             Log::error('An error occurred during Wordpress group creation: '.$e->getMessage());
 
@@ -69,25 +69,27 @@ class CreateWordpressPostForGroup
      */
     public function createGroupOnWordpress($group): void
     {
-        $custom_fields = [
-            ['key' => 'group_city', 'value' => $group->area],
-            ['key' => 'group_country', 'value' => $group->country],
-            ['key' => 'group_website', 'value' => $group->website],
-            ['key' => 'group_hash', 'value' => $group->idgroups],
-            ['key' => 'group_avatar_url', 'value' => $group->groupImagePath()],
-            ['key' => 'group_latitude', 'value' => $group->latitude],
-            ['key' => 'group_longitude', 'value' => $group->longitude],
-        ];
+        if (!$group->wordpress_post_id) {
+            $custom_fields = [
+                ['key' => 'group_city', 'value' => $group->area],
+                ['key' => 'group_country', 'value' => $group->country],
+                ['key' => 'group_website', 'value' => $group->website],
+                ['key' => 'group_hash', 'value' => $group->idgroups],
+                ['key' => 'group_avatar_url', 'value' => $group->groupImagePath()],
+                ['key' => 'group_latitude', 'value' => $group->latitude],
+                ['key' => 'group_longitude', 'value' => $group->longitude],
+            ];
 
-        $content = [
-            'post_type' => 'group',
-            'post_title' => $group->name,
-            'post_content' => $group->free_text,
-            'custom_fields' => $custom_fields,
-        ];
+            $content = [
+                'post_type' => 'group',
+                'post_title' => $group->name,
+                'post_content' => $group->free_text,
+                'custom_fields' => $custom_fields,
+            ];
 
-        $wpid = $this->wpClient->newPost($group->name, $group->free_text, $content);
+            $wpid = $this->wpClient->newPost($group->name, $group->free_text, $content);
 
-        $group->update(['wordpress_post_id' => $wpid]);
+            $group->update(['wordpress_post_id' => $wpid]);
+        }
     }
 }

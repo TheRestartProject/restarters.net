@@ -34,7 +34,7 @@ class BrandsController extends Controller
         'brand_name' => $request->input('brand_name'),
         ]);
 
-        return Redirect::to('brands/edit/'.$brand->id)->with('success', 'Brand successfully created!');
+        return Redirect::to('brands/edit/'.$brand->id)->with('success', __('brands.create_success'));
     }
 
     public function getEditBrand($id)
@@ -61,7 +61,7 @@ class BrandsController extends Controller
         'brand_name' => $request->input('brand-name'),
         ]);
 
-        return Redirect::back()->with('success', 'Brand successfully updated!');
+        return Redirect::back()->with('success', __('brands.update_success'));
     }
 
     public function getDeleteBrand($id)
@@ -72,6 +72,6 @@ class BrandsController extends Controller
 
         Brands::find($id)->delete();
 
-        return Redirect::back()->with('message', 'Brand deleted!');
+        return Redirect::back()->with('message', __('brands.delete_success'));
     }
 }

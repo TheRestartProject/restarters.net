@@ -19,7 +19,7 @@ class GroupTagsController extends Controller
         $all_tags = GroupTags::all();
 
         return view('tags.index', [
-        'title' => 'Group Tags',
+        'title' => __('group-tags.title'),
         'tags' => $all_tags,
         ]);
     }
@@ -38,7 +38,7 @@ class GroupTagsController extends Controller
         'description' => $description,
         ]);
 
-        return Redirect::to('tags/edit/'.$group_tag->id)->with('success', 'Group Tag successfully created!');
+        return Redirect::to('tags/edit/'.$group_tag->id)->with('success', __('group-tags.create_success'));
     }
 
     public function getEditTag($id)
@@ -50,7 +50,7 @@ class GroupTagsController extends Controller
         $tag = GroupTags::find($id);
 
         return view('tags.edit', [
-        'title' => 'Edit Group Tag',
+        'title' => __('group-tags.edit_tag'),
         'tag'   => $tag,
         ]);
     }
@@ -69,7 +69,7 @@ class GroupTagsController extends Controller
         'description' => $description,
         ]);
 
-        return Redirect::back()->with('success', 'Group Tag successfully updated!');
+        return Redirect::back()->with('success', __('group-tags.update_success'));
     }
 
     public function getDeleteTag($id)
@@ -80,6 +80,6 @@ class GroupTagsController extends Controller
 
         GroupTags::find($id)->delete();
 
-        return Redirect::to('/tags')->with('success', 'Group Tag successfully deleted!');
+        return Redirect::to('/tags')->with('success', __('group-tags.delete_success'));
     }
 }

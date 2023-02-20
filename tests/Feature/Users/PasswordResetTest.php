@@ -24,7 +24,7 @@ class PasswordResetTest extends TestCase
             'email' => 'nobody@nowhere.com'
         ]);
 
-        $response->assertSeeText(__('passwords.user'));
+        $response->assertSeeText(__('passwords.user'), false);
     }
 
     public function testResetSuccess()
@@ -32,7 +32,7 @@ class PasswordResetTest extends TestCase
         Notification::fake();
         Event::fake();
 
-        $restarter = factory(User::class)->states('Restarter')->create();
+        $restarter = User::factory()->restarter()->create();
 
         $response = $this->post('/user/recover', [
             'email' => $restarter->email
@@ -57,6 +57,10 @@ class PasswordResetTest extends TestCase
         );
 
         $restarter->refresh();
+
+        // Get the reset page - should see corresponding email.
+        $response = $this->get ('/user/reset?recovery=' . $restarter->recovery);
+        $response->assertSee($restarter->email);
 
         // Invalid code
         $response = $this->post('/user/reset', [

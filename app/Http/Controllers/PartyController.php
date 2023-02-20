@@ -53,6 +53,11 @@ class PartyController extends Controller
             // We are showing events for multiple groups and so we need to pass the relevant group, in order that
             // we can show the group name and link to it.
             $thisone['group'] = \App\Group::find($event->group);
+
+            $group_image = $thisone['group']->groupImage;
+            if (is_object($group_image) && is_object($group_image->image)) {
+                $thisone['group']['group_image'] = $group_image->image->path;
+            }
         }
 
         $thisone['attending'] = Auth::user() && $event->isBeingAttendedBy(Auth::user()->id);
@@ -87,12 +92,10 @@ class PartyController extends Controller
         $thisone['finished'] = $event->hasFinished();
         $thisone['inprogress'] = $event->isInProgress();
         $thisone['startingsoon'] = $event->isStartingSoon();
+        $thisone['approved'] = $event->approved ? true : false;
 
         if (!empty($event->wordpress_post_id)) {
-            $thisone['approved'] = true;
             $thisone['wordpress_post_id'] = $event->wordpress_post_id;
-        } else {
-            $thisone['approved'] = false;
         }
 
         return $thisone;
@@ -186,7 +189,7 @@ class PartyController extends Controller
             // We might be passed a timezone; if not then use the timezone of the group.
             $timezone = $request->input('timezone', $groupobj->timezone);
 
-            if ($timezone && !in_array($timezone, \DateTimeZone::listIdentifiers())) {
+            if ($timezone && !in_array($timezone, \DateTimeZone::listIdentifiers(\DateTimeZone::ALL_WITH_BC))) {
                 $error['timezone'] = 'Please select a valid timezone.';
                 $response['warning'] = $error['timezone'];
             }
@@ -201,7 +204,7 @@ class PartyController extends Controller
                                    ],
                                    'timezone' => [
                                        function ($attribute, $value, $fail) use ($request) {
-                                           if ($request->filled('timezone') && !in_array($request->timezone, \DateTimeZone::listIdentifiers())) {
+                                           if ($request->filled('timezone') && !in_array($request->timezone, \DateTimeZone::listIdentifiers(\DateTimeZone::ALL_WITH_BC))) {
                                                $fail(__('partials.validate_timezone'));
                                            }
                                        },
@@ -401,7 +404,6 @@ class PartyController extends Controller
                       'allGroups' => $allGroups,
                       'formdata' => PartyController::expandEvent($party, NULL),
                       'remotePost' => null,
-                      'grouplist' => $Groups->findList(),
                       'user' => Auth::user(),
                       'user_groups' => $groupsUserIsInChargeOf,
                       'userInChargeOfMultipleGroups' => $userInChargeOfMultipleGroups,
@@ -455,7 +457,7 @@ class PartyController extends Controller
 
                 if (isset($data['moderate']) && $data['moderate'] == 'approve') {
                     $event->approve();
-                } elseif (! empty($theParty->wordpress_post_id)) {
+                } else {
                     event(new EditEvent($event, $data));
                 }
 
@@ -917,7 +919,9 @@ class PartyController extends Controller
             }
 
             if (count($invalid)) {
-                return redirect()->back()->with('warning', 'Invalid emails were entered, so no notifications were sent - please send your invitation again.  The invalid emails were: ' . implode(', ', $invalid));
+                return redirect()->back()->with('warning', __('events.invite_invalid_emails', [
+                    'emails' => implode(', ', $invalid)
+                ]));
             } else {
                 $users = User::whereIn('email', $emails)->get();
 
@@ -998,17 +1002,19 @@ class PartyController extends Controller
                 }
 
                 if (! isset($not_sent)) {
-                    return redirect()->back()->with('success', 'Invites Sent!');
+                    return redirect()->back()->with('success', __('events.invite_success'));
                 }
 
                 // Don't log to Sentry - legitimate user error.
-                return redirect()->back()->with('warning', 'Invites Sent - apart from these ('.implode(',', $not_sent).') who were already part of the event');
+                return redirect()->back()->with('warning', __('events.invite_invalid_emails', [
+                    'emails' => implode(', ', $not_sent)
+                ]));
             }
         }
 
-        \Sentry\CaptureMessage('You have not entered any emails!');
+        \Sentry\CaptureMessage(__('events.invite_noemails'));
 
-        return redirect()->back()->with('warning', 'You have not entered any emails!');
+        return redirect()->back()->with('warning', __('events.invite_noemails'));
     }
 
     public function confirmInvite($event_id, $hash)
@@ -1031,15 +1037,15 @@ class PartyController extends Controller
             return redirect('/party/view/'.$user_event->event);
         }
 
-        \Sentry\CaptureMessage('Something went wrong - this invite is invalid or has expired');
-        return redirect('/party/view/'.intval($event_id))->with('warning', 'Something went wrong - this invite is invalid or has expired');
+        \Sentry\CaptureMessage(__('events.invite_invalid'));
+        return redirect('/party/view/'.intval($event_id))->with('warning', __('events.invite_invalid'));
     }
 
     public function cancelInvite($event_id)
     {
         EventsUsers::where('user', Auth::user()->id)->where('event', $event_id)->delete();
 
-        return redirect('/party/view/'.intval($event_id))->with('success', 'You are no longer attending this event.');
+        return redirect('/party/view/'.intval($event_id))->with('success', __('events.invite_cancelled'));
     }
 
     public function imageUpload(Request $request, $id)
@@ -1081,11 +1087,11 @@ class PartyController extends Controller
             $Image = new FixometerFile;
             $Image->deleteImage($id, $path);
 
-            return redirect()->back()->with('success', 'Thank you, the image has been deleted');
+            return redirect()->back()->with('success', __('events.image_delete_success'));
         }
 
-        \Sentry\CaptureMessage('Sorry, but the image can\'t be deleted');
-        return redirect()->back()->with('warning', 'Sorry, but the image can\'t be deleted');
+        \Sentry\CaptureMessage(__('events.image_delete_error'));
+        return redirect()->back()->with('warning', __('events.image_delete_error'));
     }
 
     /*
@@ -1130,8 +1136,8 @@ class PartyController extends Controller
 
         if (! Fixometer::userHasEditPartyPermission($id) &&
             ! Fixometer::userIsHostOfGroup($event->group, Auth::user()->id)) {
-            \Sentry\CaptureMessage(__('You do not have permission to delete this event'));
-            return redirect()->back()->with('warning', 'You do not have permission to delete this event');
+            \Sentry\CaptureMessage(__('events.delete_permission'));
+            return redirect()->back()->with('warning', __('events.delete_permission'));
         }
 
         $event = Party::findOrFail($id);
@@ -1145,7 +1151,7 @@ class PartyController extends Controller
 
         Log::info('Event deleted');
 
-        return redirect('/party')->with('success', 'Event has been deleted');
+        return redirect('/party')->with('success', __('events.delete_success'));
     }
 
     /**

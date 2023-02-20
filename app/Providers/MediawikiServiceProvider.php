@@ -36,17 +36,21 @@ class MediawikiServiceProvider extends ServiceProvider
             try {
                 Log::debug('Connect to Mediawiki');
                 $api = new MediawikiApi(env('WIKI_URL').'/api.php');
+                Log::debug('Log in');
                 $api->login(new ApiUser(env('WIKI_APIUSER'), env('WIKI_APIPASSWORD')));
                 Log::debug('...connected');
 
                 return new MediawikiFactory($api);
             } catch (\Exception $ex) {
-                Log::error('Failed to instantiation Wiki API classes: '.$ex->getMessage());
+                Log::error('Failed to instantiate Wiki API classes: '.$ex->getMessage());
             }
         });
 
         $this->app->bind(UserCreator::class, function ($app) {
-            return $app->make(MediawikiFactory::class)->newUserCreator();
+            $mw = $app->make(MediawikiFactory::class);
+            if ($mw) {
+                return $mw->newUserCreator();
+            }
         });
     }
 }

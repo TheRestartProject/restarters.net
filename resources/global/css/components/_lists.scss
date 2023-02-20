@@ -1,11 +1,13 @@
-.list-doodle {
-  list-style-type: none;
-  margin: 0;
-  padding: 0;
-  margin-left: 35px;
+.mediawiki .main-page ul {
+  list-style-type: none !important;
+  margin: 0 !important;;
+  padding: 0 !important;;
+  margin-left: 35px !important;;
+  margin-bottom: 25px !important;
 
   li {
     position: relative;
+    list-style: none !important;
 
     &::before {
       content: '';
@@ -15,7 +17,7 @@
       width: 23px;
       color: white;
       font-weight: bold;
-      background-image: url('../../svgs/arrow-right-doodle.svg');
+      background-image: url('/images/arrow-right-doodle.svg');
       background-repeat: no-repeat;
       background-position: center;
       position: absolute;

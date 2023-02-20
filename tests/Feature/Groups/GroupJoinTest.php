@@ -20,17 +20,17 @@ class GroupJoinTest extends TestCase
 
         $this->withoutExceptionHandling();
 
-        $group = factory(Group::class)->create();
-        $tag = factory(GroupTags::class)->create();
+        $group = Group::factory()->create();
+        $tag = GroupTags::factory()->create();
         $group->addTag($tag);
 
-        $host = factory(User::class)->states('Restarter')->create([
+        $host = User::factory()->restarter()->create([
           'api_token' => '1234',
         ]);
         $group->addVolunteer($host);
         $group->makeMemberAHost($host);
 
-        $user = factory(User::class)->states('Restarter')->create();
+        $user = User::factory()->restarter()->create();
         $this->actingAs($user);
 
         $this->followingRedirects();
@@ -65,7 +65,7 @@ class GroupJoinTest extends TestCase
         // Try again.
         $this->followingRedirects();
         $response = $this->get('/group/join/'.$group->idgroups);
-        $this->assertContains('You are already part of this group', $response->getContent());
+        $this->assertStringContainsString('You are already part of this group', $response->getContent());
 
         // Now leave via API.
         $response = $this->get('/logout');
@@ -74,10 +74,10 @@ class GroupJoinTest extends TestCase
             ->where('group', $group->idgroups)->first();
         $url = '/api/usersgroups/'.$userGroupAssociation->group.'?api_token=1234';
         $response = $this->call('DELETE', $url);
-        $response->assertSee('"success":true');
+        $response->assertSee('"success":true', false);
 
         // Try leaving again.
         $response = $this->call('DELETE', $url);
-        $response->assertSee('"success":true');
+        $response->assertSee('"success":true', false);
     }
 }
