@@ -7,23 +7,24 @@
       <div class="br d-flex flex-column botwhite">
         <b-card no-body class="p-3 flex-grow-1 border-0">
           <h3 class="mt-2 mb-4">{{ __('devices.title_items') }}</h3>
+          <DeviceType class="mb-2" :type.sync="currentDevice.item_type"
+                      :icon-variant="add ? 'black' : 'brand'" :item-types="itemTypes" :disabled="disabled"
+                      :suppress-type-warning="suppressTypeWarning" :powered="powered"
+                      :unknown.sync="unknownItemType"
+          />
           <DeviceCategorySelect :class="{
             'mb-2': true,
-            'border-thick': missingCategory
-            'pulsate': pulsating,
-            }" :category.sync="currentDevice.category" :clusters="clusters" :powered="powered" :key="currentDevice.item_type"
-                                @open="pulsating = false"
-                                :icon-variant="add ? 'black' : 'brand'" :disabled="disabled" @changed="categoryChange"/>
-          <DeviceType v-if="!powered || aggregate" class="mb-2" :type.sync="currentDevice.item_type"
-                      :icon-variant="add ? 'black' : 'brand'" :item-types="itemTypes" :disabled="disabled"
-                      :suppress-type-warning="suppressTypeWarning" :powered="powered"/>
-          <div v-if="powered">
-            <DeviceBrand class="mb-2" :brand.sync="currentDevice.brand" :brands="brands" :disabled="disabled"
-                         :suppress-brand-warning="suppressBrandWarning"/>
-            <DeviceModel class="mb-2" :model.sync="currentDevice.model" :icon-variant="add ? 'black' : 'brand'"
-                         :disabled="disabled"/>
-          </div>
-          </div>
+            'border-thick': missingCategory,
+            'suggested': suggested,
+            }"
+            :category.sync="currentDevice.category" :clusters="clusters" :powered="powered" :key="currentDevice.item_type"
+            @open="suggested = false"
+            :icon-variant="add ? 'black' : 'brand'" :disabled="disabled" @changed="categoryChange"
+          />
+          <DeviceBrand class="mb-2" :brand.sync="currentDevice.brand" :brands="brands" :disabled="disabled"
+                       :suppress-brand-warning="suppressBrandWarning"/>
+          <DeviceModel class="mb-2" :model.sync="currentDevice.model" :icon-variant="add ? 'black' : 'brand'"
+                       :disabled="disabled"/>
           <DeviceWeight v-if="showWeight" :weight.sync="currentDevice.estimate" :disabled="disabled"/>
           <DeviceAge :age.sync="currentDevice.age" :disabled="disabled"/>
           <DeviceImages :idevents="idevents" :device="currentDevice" :add="add" :edit="edit" :disabled="disabled"
@@ -187,8 +188,10 @@ export default {
   data () {
     return {
       currentDevice: {},
-      missingCategory: false,
       axiosError: null,
+      missingCategory: false,
+      unknownItemType: false,
+      suggested: false
     }
   },
   watch: {
@@ -203,9 +206,9 @@ export default {
         this.currentDevice.category = newval.idcategories
 
         // Make it obvious that we have done this to encourage people to review it rather than ignore it.
-        this.pulsating = true
+        this.suggested = true
         setTimeout(() => {
-          this.pulsating = false
+          this.suggested = false
         }, 5000)
       } else {
         this.currentDevice.category = null
@@ -221,6 +224,52 @@ export default {
     },
     currentCategory () {
       return this.currentDevice ? this.currentDevice.category : null
+    },
+    suggestedCategory() {
+      let ret = null
+      if (this.currentDevice && this.currentDevice.item_type) {
+        // Some item types are the same as category names.
+        this.clusters.forEach((cluster) => {
+          cluster.categories.forEach((c) => {
+            const name = this.$lang.get('strings.' + c.name)
+            if (Boolean(c.powered) === Boolean(this.powered) && name.toLowerCase().indexOf(this.currentDevice.item_type.toLowerCase()) !== -1) {
+              ret = {
+                idcategories: c.idcategories,
+                categoryname: c.name,
+                powered: c.powered
+              }
+            }
+          })
+        })
+        if (!ret) {
+          // Now check the item types.  Stop at the first match, which is the most popular.
+          this.itemTypes.every(t => {
+            if (!ret && Boolean(t.powered) === Boolean(this.powered) && this.currentDevice.item_type === t.item_type) {
+              ret = t
+              return false
+            }
+            return true
+          })
+        }
+      }
+      return ret
+    },
+    suggestedCategoryId() {
+      return this.suggestedCategory ? this.suggestedCategory.idcategories : null
+    },
+    suggestedCategoryName() {
+      return this.suggestedCategory? this.suggestedCategory.categoryname : null
+    },
+    computedPowered() {
+      if (this.suggestedCategory) {
+        if (this.suggestedCategory.powered) {
+          return 'Powered'
+        } else {
+          return 'Unpowered'
+        }
+      } else {
+        return null
+      }
     },
     aggregate () {
       if (!this.currentCategory) {
@@ -431,7 +480,6 @@ export default {
       // TODO LATER The remove of the image should not happen until the edit completes.  At the moment we do it
       // immediately.  The way we set ids here is poor, but this is because the underlying API call for images
       // is weak.
-      console.log("Remove imnage", image, this.idtouse, this.device, this.currentDevice)
       this.$store.dispatch('devices/deleteImage', {
         iddevices: this.idtouse,
         idxref: image.idxref
@@ -448,6 +496,10 @@ export default {
 
       window.location = '/fixometer'
     },
+    categoryChange () {
+      // Any item type we might have is no longer valid.
+      this.currentDevice.item_type = null
+    }
   }
 }
 </script>
@@ -568,5 +620,10 @@ h3 {
 
 ::v-deep .form-text {
   line-height: 1rem;
+}
+
+::v-deep .suggested .multiselect {
+  border: 3px solid #222 !important;
+  width: calc(100% - 6px) !important;
 }
 </style>
