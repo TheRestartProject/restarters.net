@@ -119,7 +119,7 @@ class PartySummary extends JsonResource
             'lat' => $this->latitude,
             'lng' => $this->longitude,
             'group' => \App\Http\Resources\GroupSummary::make($this->theGroup),
-            'updated_at' => $this->updated_at->toIso8601String(),
+            'updated_at' => $this->updated_at->toIso8601String()
         ];
     }
 }

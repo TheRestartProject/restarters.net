@@ -172,6 +172,7 @@ jobs:
 
       - run: php artisan key:generate
       - run: php artisan migrate
+      - run: php artisan l5-swagger:generate
 
       - run: wget -O phpunit https://phar.phpunit.de/phpunit-9.phar ; chmod +x phpunit
 
