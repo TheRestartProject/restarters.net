@@ -3,6 +3,7 @@
 namespace App;
 
 use App\Device;
+use App\Helpers\Fixometer;
 use DB;
 use Illuminate\Database\Eloquent\Model;
 
@@ -41,7 +42,15 @@ class Search extends Model
         $eventsQuery->orderBy('events.event_start_utc', 'desc');
 
         // We need to explicitly select what we want to return otherwise gtag.group might overwrite events.group.
-        return $eventsQuery->select(['events.*', 'gtag.group_tag'])->get();
+        $events = $eventsQuery->select(['events.*', 'gtag.group_tag'])->get();
+
+        $me = auth()->user();
+
+        $events = $events->filter(function ($event) use ($me) {
+            return User::userCanSeeEvent($me, $event);
+        });
+
+        return $events;
     }
 
     public function deviceStatusCount($parties)

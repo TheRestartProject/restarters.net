@@ -106,7 +106,16 @@ class CalendarEventsController extends Controller
         $ical[] = 'PRODID:-//Restarters//NONSGML Events Calendar/EN';
 
         // loop over events
+        $me = auth()->user();
+
         foreach ($events as $event) {
+            // We need to filter by approval status.  If the event is not approved, we can only see it if we are
+            // an admin, network coordinator, or the host of the event.
+
+            if (!User::userCanSeeEvent($me, $event)) {
+                continue;
+            }
+
             if (! is_null($event->event_start_utc) ) {
                 $ical[] = 'BEGIN:VEVENT';
 
@@ -119,7 +128,16 @@ class CalendarEventsController extends Controller
                 $ical[] = 'DESCRIPTION:'.url('/party/view').'/'.$event->idevents;
                 $ical[] = "LOCATION:{$event->location}";
                 $ical[] = 'URL:'.url('/party/view').'/'.$event->idevents;
-                $ical[] = 'STATUS:CONFIRMED';
+
+                if ($event->cancelled) {
+                    $ical[] = 'STATUS:CANCELLED';
+                } else if ($event->approved && $event->theGroup->approved) {
+                    // Events are only confirmed once the event and the group are approved.
+                    $ical[] = 'STATUS:CONFIRMED';
+                } else {
+                    $ical[] = 'STATUS:TENTATIVE';
+                }
+
                 $ical[] = 'END:VEVENT';
             }
         }

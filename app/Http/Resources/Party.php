@@ -27,6 +27,16 @@ class Party extends JsonResource
      *          example=1
      *     )
      *     @OA\Property(
+     *          property="approved",
+     *          title="approved",
+     *          description="Whether this event has been approved.",
+     *          format="boolean",
+     *          example="false"
+     *     )
+     */
+
+    /**
+     *     @OA\Property(
      *          property="start",
      *          title="start",
      *          description="Start time of the event in ISO8601 format.",
@@ -228,6 +238,7 @@ class Party extends JsonResource
         // We return information which can be public, and we rename fields to look more consistent.
         return [
             'id' => $this->idevents,
+            'approved' => $this->approved ? true : false,
             'start' => $this->event_start_utc,
             'end' => $this->event_end_utc,
             'timezone' => $this->timezone,
