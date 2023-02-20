@@ -74,12 +74,6 @@
           $expanded_invited = $event->expandVolunteers($invited, $can_edit_event);
           $expanded_hosts = $event->expandVolunteers($hosts, $can_edit_event);
 
-          // Trigger expansion of group.
-          $group_image = $event->theGroup->groupImage;
-          if (is_object($group_image) && is_object($group_image->image)) {
-              $group_image->image->path;
-          }
-
           $discourseThread = ($is_attending && $event->discourse_thread) ? (env('DISCOURSE_URL').'/t/'.$event->discourse_thread) : null;
 
           $collected_images = [];

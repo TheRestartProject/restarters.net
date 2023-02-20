@@ -4,7 +4,7 @@ return [
   'login' => 'Connexion',
   'profile' => 'Votre profil',
   'other_profile' => 'profil',
-  'profile_content' => 'N\'hésitez pas à  partager quelques informations sur vous‐même, afin de vous connecter avec d\'autres organisateurs et réparateurs. Nous pourrons ainsi mieux connaître notre communauté.',
+  'profile_content' => 'N\'hésitez pas à  partager quelques informations sur vous‐même, afin de vous connecter avec d\'autres organisateurs et bénévoles réparateurs. Nous pourrons ainsi mieux connaître notre communauté.',
   'logout' => 'Se déconnecter',
   'new_group' => 'Créer un nouveau Repair Café',
   'alert_uptodate' => 'Merci ! Vous êtes à jour',

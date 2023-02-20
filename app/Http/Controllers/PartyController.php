@@ -53,6 +53,11 @@ class PartyController extends Controller
             // We are showing events for multiple groups and so we need to pass the relevant group, in order that
             // we can show the group name and link to it.
             $thisone['group'] = \App\Group::with('networks')->find($event->group);
+
+            $group_image = $thisone['group']->groupImage;
+            if (is_object($group_image) && is_object($group_image->image)) {
+                $thisone['group']['group_image'] = $group_image->image->path;
+            }
         }
 
         $thisone['attending'] = Auth::user() && $event->isBeingAttendedBy(Auth::user()->id);
@@ -184,7 +189,7 @@ class PartyController extends Controller
             // We might be passed a timezone; if not then use the timezone of the group.
             $timezone = $request->input('timezone', $groupobj->timezone);
 
-            if ($timezone && !in_array($timezone, \DateTimeZone::listIdentifiers())) {
+            if ($timezone && !in_array($timezone, \DateTimeZone::listIdentifiers(\DateTimeZone::ALL_WITH_BC))) {
                 $error['timezone'] = 'Please select a valid timezone.';
                 $response['warning'] = $error['timezone'];
             }
@@ -199,7 +204,7 @@ class PartyController extends Controller
                                    ],
                                    'timezone' => [
                                        function ($attribute, $value, $fail) use ($request) {
-                                           if ($request->filled('timezone') && !in_array($request->timezone, \DateTimeZone::listIdentifiers())) {
+                                           if ($request->filled('timezone') && !in_array($request->timezone, \DateTimeZone::listIdentifiers(\DateTimeZone::ALL_WITH_BC))) {
                                                $fail(__('partials.validate_timezone'));
                                            }
                                        },
@@ -400,7 +405,6 @@ class PartyController extends Controller
                       'allGroups' => $allGroups,
                       'formdata' => PartyController::expandEvent($party, NULL),
                       'remotePost' => null,
-                      'grouplist' => $Groups->findList(),
                       'user' => Auth::user(),
                       'user_groups' => $groupsUserIsInChargeOf,
                       'userInChargeOfMultipleGroups' => $userInChargeOfMultipleGroups,
