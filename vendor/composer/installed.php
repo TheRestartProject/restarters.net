@@ -3,7 +3,7 @@
         'name' => 'laravel/laravel',
         'pretty_version' => 'dev-develop',
         'version' => 'dev-develop',
-        'reference' => 'a6de74b453242eb2cb6f0e3fcca8714d7fd8d239',
+        'reference' => '49cbca4fb6f752c4b88d3ad75687cb0da2780269',
         'type' => 'project',
         'install_path' => __DIR__ . '/../../',
         'aliases' => array(),
@@ -529,7 +529,7 @@
         'laravel/laravel' => array(
             'pretty_version' => 'dev-develop',
             'version' => 'dev-develop',
-            'reference' => 'a6de74b453242eb2cb6f0e3fcca8714d7fd8d239',
+            'reference' => '49cbca4fb6f752c4b88d3ad75687cb0da2780269',
             'type' => 'project',
             'install_path' => __DIR__ . '/../../',
             'aliases' => array(),
@@ -926,8 +926,8 @@
         'psr/log-implementation' => array(
             'dev_requirement' => false,
             'provided' => array(
-                0 => '1.0|2.0|3.0',
-                1 => '1.0.0 || 2.0.0 || 3.0.0',
+                0 => '1.0.0 || 2.0.0 || 3.0.0',
+                1 => '1.0|2.0|3.0',
             ),
         ),
         'psr/simple-cache' => array(
@@ -978,6 +978,15 @@
             'reference' => '25c4faac19549ebfcd3a6a73732dddeb188eaf5a',
             'type' => 'library',
             'install_path' => __DIR__ . '/../ramsey/uuid',
+            'aliases' => array(),
+            'dev_requirement' => false,
+        ),
+        'rennokki/laravel-eloquent-query-cache' => array(
+            'pretty_version' => '3.3.1',
+            'version' => '3.3.1.0',
+            'reference' => 'b0814fec43dd82f718fd10c4b0a2c1e25e7705fb',
+            'type' => 'library',
+            'install_path' => __DIR__ . '/../rennokki/laravel-eloquent-query-cache',
             'aliases' => array(),
             'dev_requirement' => false,
         ),
