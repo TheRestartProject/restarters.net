@@ -52,7 +52,7 @@ class PartyController extends Controller
         if (is_null($group)) {
             // We are showing events for multiple groups and so we need to pass the relevant group, in order that
             // we can show the group name and link to it.
-            $thisone['group'] = \App\Group::find($event->group);
+            $thisone['group'] = \App\Group::with('networks')->find($event->group);
 
             $group_image = $thisone['group']->groupImage;
             if (is_object($group_image) && is_object($group_image->image)) {
@@ -137,7 +137,7 @@ class PartyController extends Controller
             }
 
             // ...and any other upcoming approved events
-            $other_upcoming_events = Party::future()->
+            $other_upcoming_events = Party::with('theGroup.networks')->future()->
                 whereNotIn('idevents', \Illuminate\Support\Arr::pluck($events, 'idevents'))->
                 get();
 
@@ -378,7 +378,8 @@ class PartyController extends Controller
             $images = null;
         }
 
-        $allGroups = Group::orderBy('name')->get();
+        // Fetch the nextwork here - avoids fetching for each group as we encode.
+        $allGroups = Group::with('networks')->orderBy('name')->get();
 
         if ($request->isMethod('post') && ! empty($request->post())) {
             $id = $request->post('id');

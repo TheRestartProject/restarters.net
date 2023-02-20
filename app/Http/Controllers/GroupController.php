@@ -51,7 +51,8 @@ class GroupController extends Controller
 
         // Look for groups we have joined, not just been invited to.  We have to explicitly test on deleted_at because
         // the normal filtering out of soft deletes won't happen for joins.
-        $your_groups =array_column(Group::join('users_groups', 'users_groups.group', '=', 'groups.idgroups')
+        $your_groups =array_column(Group::with(['networks'])
+            ->join('users_groups', 'users_groups.group', '=', 'groups.idgroups')
             ->leftJoin('events', 'events.group', '=', 'groups.idgroups')
             ->where('users_groups.user', $user->id)
             ->where('users_groups.status', 1)

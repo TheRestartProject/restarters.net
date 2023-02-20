@@ -52,6 +52,9 @@ class Party extends Model implements Auditable
     ];
     protected $hidden = ['created_at', 'deleted_at', 'frequency', 'group', 'group', 'user_id', 'wordpress_post_id', 'cancelled', 'devices_updated_at'];
 
+    // Eager-loading the group reduces N+1 queries.
+    protected $with = 'theGroup';
+
     // Append data to Model
     protected $appends = ['participants', 'ShareableLink', 'event_date_local', 'start_local', 'end_local'];
 
@@ -334,9 +337,9 @@ class Party extends Model implements Auditable
         // The queries here are not desperately efficient, but we're battling Eloquent a bit.  The data size is
         // low enough it's not really an issue.
         $this->defaultUserIds($userids);
-        $hostFor = Party::hostFor($userids);
-        $attending = Party::attendingOrAttended($userids);
-        $memberOf = Party::memberOfGroup($userids);
+        $hostFor = Party::with('theGroup.networks')->hostFor($userids);
+        $attending = Party::with('theGroup.networks')->attendingOrAttended($userids);
+        $memberOf = Party::with('theGroup.networks')->memberOfGroup($userids);
 
         // In theory $query could contain something other than all().
         return $query->whereIn('idevents', $hostFor->
@@ -385,6 +388,8 @@ class Party extends Model implements Auditable
         return $this
       ->select(DB::raw('`events`.*, ( 6371 * acos( cos( radians('.$user->latitude.') ) * cos( radians( events.latitude ) ) * cos( radians( events.longitude ) - radians('.$user->longitude.') ) + sin( radians('.$user->latitude.') ) * sin( radians( events.latitude ) ) ) ) AS distance'))
       ->join('groups', 'groups.idgroups', '=', 'events.group')
+      ->join('group_network', 'groups.idgroups', '=', 'group_network.group_id')
+      ->join('networks', 'networks.id', '=', 'group_network.network_id')
       ->join('users_groups', 'users_groups.group', '=', 'groups.idgroups')
       ->where(function ($query) use ($exclude_group_ids) {
           $query->whereNotIn('events.group', $exclude_group_ids)
