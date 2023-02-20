@@ -58,7 +58,7 @@
       </div>
       <div class="border-top-thin d-flex pt-1 pb-1" v-if="!event.online && event.location">
         <div class="mr-2">
-          <b-img-lazy src="/icons/map_marker_ico.svg" class="icon" />
+          <b-img src="/icons/map_marker_ico.svg" class="icon" />
         </div>
         <div class="justify-content-between w-100 d-flex flex-wrap">
           <div>
