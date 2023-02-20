@@ -227,8 +227,14 @@ exports.addDevice = async function(page, baseURL, idevents, powered, photo, fixe
     await expect(page.locator('.device-photos:visible img')).toHaveCount(1)
   }
 
+  // Age of device when editing is 0, which should show blank.
+  await expect(page.locator('.device-age-edit:visible')).toHaveValue('')
+
   // Close the device edit.
   await page.locator('.cancel').click()
+
+  // Age of device is 0, which should show as 0.
+  await expect(page.locator('.device-age-summary:visible')).toHaveText('-')
 }
 
 exports.unfollowGroup = async function(page, idgroups) {

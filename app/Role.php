@@ -4,6 +4,7 @@ namespace App;
 
 use DB;
 use Illuminate\Database\Eloquent\Model;
+use Rennokki\QueryCache\Traits\QueryCacheable;
 
 class Role extends Model
 {
@@ -21,6 +22,10 @@ class Role extends Model
 
     protected $table = 'roles';
     protected $primaryKey = 'idroles';
+
+    use QueryCacheable;
+
+    protected $cacheFor = 180; // 3 minutes
 
     /**
      * The attributes that are mass assignable.

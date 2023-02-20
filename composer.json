@@ -33,6 +33,7 @@
         "mcamara/laravel-localization": "^1.7",
         "msurguy/honeypot": "^1.1",
         "owen-it/laravel-auditing": "^12.1",
+        "rennokki/laravel-eloquent-query-cache": "^3.3",
         "sentry/sentry-laravel": "^2.11",
         "soundasleep/html2text": "^1.1",
         "spatie/calendar-links": "^1.6",
