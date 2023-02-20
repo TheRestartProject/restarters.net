@@ -5,6 +5,7 @@ namespace App;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use App\Events\UserDeleted;
 use App\Events\UserUpdated;
+use App\Helpers\Fixometer;
 use App\Network;
 use App\UserGroups;
 use App\UsersPermissions;
@@ -581,5 +582,24 @@ class User extends Authenticatable implements Auditable, HasLocalePreference
         // working.  So at the moment we are passing a locale explicitly in the translations in the notifications
         // to users (not admins).
         return $this->language;
+    }
+
+    public static function userCanSeeEvent($user, $event) {
+        // We need to filter based on approved visibility:
+        // - where the group is approved, this event is visible
+        // - where the group is not approved, this event is visible to network coordinators or group hosts.
+        $amHost = $user && $user->hasRole('Host');
+        $admin = $user && $user->hasRole('Administrator');
+
+        $group = Group::find($event->group);
+
+        if (($event->approved && $group->approved) ||
+            $admin ||
+            ($user && $user->isCoordinatorForGroup($group)) ||
+            ($amHost && $user && Fixometer::userIsHostOfGroup($group->idgroups, $user->id))) {
+            return true;
+        }
+
+        return false;
     }
 }

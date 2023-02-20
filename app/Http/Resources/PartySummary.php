@@ -27,6 +27,16 @@ class PartySummary extends JsonResource
      *          example=1
      *     )
      *     @OA\Property(
+     *          property="approved",
+     *          title="approved",
+     *          description="Whether this event has been approved.",
+     *          format="boolean",
+     *          example="false"
+     *     )
+     */
+
+    /**
+     *     @OA\Property(
      *          property="start",
      *          title="start",
      *          description="Start time of the event in ISO8601 format.",
@@ -110,6 +120,7 @@ class PartySummary extends JsonResource
         // peculiarity which I can't get to the bottom of.  So pull it from the resource.
         return [
             'id' => $this->idevents,
+            'approved' => $this->approved ? true : false,
             'start' => $this->event_start_utc,
             'end' => $this->event_end_utc,
             'timezone' => $this->timezone,
