@@ -27,7 +27,7 @@ class GroupSummary extends JsonResource
      *          example=1
      *     )
      *     @OA\Property(
-     *          property="area",
+     *          property="name",
      *          title="name",
      *          description="Unique name of this group",
      *          format="string",

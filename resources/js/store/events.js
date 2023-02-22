@@ -115,8 +115,8 @@ export default {
 
       let ret = await axios.get('/api/v2/moderate/events?api_token=' + apiToken)
 
-      if (ret && ret.data && ret.data.data) {
-        commit('setModerate', ret.data.data)
+      if (ret && ret.data) {
+        commit('setModerate', ret.data)
       }
     }
   },

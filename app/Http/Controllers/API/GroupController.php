@@ -243,7 +243,39 @@ class GroupController extends Controller
         ]);
     }
 
-    // TODO Add to OpenAPI.
+    /**
+     * @OA\Get(
+     *      path="/api/v2//groups/names",
+     *      operationId="getGroupListv2",
+     *      tags={"Groups"},
+     *      summary="Get list of group names",
+     *      @OA\Response(
+     *          response=200,
+     *          description="Successful operation",
+     *          @OA\JsonContent(
+     *             description="An array of groups",
+     *             type="array",
+     *             @OA\Items(
+     *                @OA\Property(
+     *                    property="id",
+     *                    title="id",
+     *                    description="Unique identifier of this group",
+     *                    format="int64",
+     *                    example=1
+     *                ),
+     *                @OA\Property(
+     *                    property="name",
+     *                    title="name",
+     *                    description="Unique name of this group",
+     *                    format="string",
+     *                    example="Restarters HQ"
+     *                )
+     *             )
+     *          )
+     *       ),
+     *     )
+     */
+
     public static function listNamesv2(Request $request) {
         // We only return the group id and name, for speed.
         $groups = Group::select('idgroups', 'name')->get();
@@ -453,14 +485,10 @@ class GroupController extends Controller
      *          response=200,
      *          description="Successful operation",
      *          @OA\JsonContent(
-     *              @OA\Property(
-     *                description="An array of groups",
-     *                type="array",
-     *                property="data",
-     *                title="data",
-     *                @OA\Items(
-     *                    ref="#/components/schemas/GroupSummary"
-     *                )
+     *             description="An array of groups",
+     *             type="array",
+     *             @OA\Items(
+     *                 ref="#/components/schemas/GroupSummary"
      *             )
      *          )
      *       ),
@@ -469,9 +497,7 @@ class GroupController extends Controller
     public function moderateGroupsv2(Request $request) {
         $user = $this->getUser();
         $ret = \App\Http\Resources\GroupCollection::make(Group::unapprovedVisibleTo($user->id));
-        return response()->json([
-            'data' => $ret
-        ]);
+        return response()->json($ret);
     }
 
     /**

@@ -271,7 +271,7 @@ class Group extends JsonResource
             'networks' => new NetworkSummaryCollection($this->networks),
             'tags' => new TagCollection($this->group_tags),
             'timezone' => $this->timezone,
-            'approved' => $this->approved,
+            'approved' => $this->approved ? true : false,
         ];
 
         $ret['hosts'] = $this->resource->all_confirmed_hosts_count;

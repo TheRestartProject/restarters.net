@@ -96,6 +96,12 @@ class Party extends JsonResource
      *          ref="#/components/schemas/GroupSummary"
      *     )
      *     @OA\Property(
+     *         property="approved",
+     *         title="hosts",
+     *         description="Whether the event has been approved",
+     *         type="boolean",
+     *     ),
+     *     @OA\Property(
      *          property="stats",
      *          title="stats",
      *          description="An array of statistics about the activity of an event.",
@@ -240,6 +246,7 @@ class Party extends JsonResource
             'description' => $this->free_text,
             'stats' => $this->resource->getEventStats(),
             'updated_at' => Carbon::parse($this->updated_at)->toIso8601String(),
+            'approved' => $this->approved ? true : false,
         ];
     }
 }

@@ -310,15 +310,11 @@ class EventController extends Controller
      *          response=200,
      *          description="Successful operation",
      *          @OA\JsonContent(
-     *              @OA\Property(
-     *                property="data",
-     *                title="data",
-     *                description="An array of events",
-     *                type="array",
-     *                @OA\Items(
-     *                    ref="#/components/schemas/EventSummary"
-     *                )
-     *              )
+     *             type="array",
+     *             description="An array of groups",
+     *             @OA\Items(
+     *                 ref="#/components/schemas/EventSummary"
+     *             )
      *          )
      *       ),
      *     )
@@ -346,8 +342,6 @@ class EventController extends Controller
             return strtotime($a->resource->event_start_utc) - strtotime($b->resource->event_start_utc);
         });
 
-        return response()->json([
-            'data' => $ret
-        ]);
+        return response()->json($ret);
     }
 }
