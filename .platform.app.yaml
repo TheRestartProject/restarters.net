@@ -33,7 +33,7 @@ relationships:
 
 variables:
   php:
-    extension: /app/.platform/xmlrpc.so
+    extension: /.platform/xmlrpc.so
 
 hooks:
   build: |
