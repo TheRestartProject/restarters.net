@@ -2,14 +2,24 @@
 
 use Illuminate\Support\Str;
 
-$config = new Platformsh\ConfigReader\Config();
+try {
+    $config = new Platformsh\ConfigReader\Config();
 
-if (!$config->isValidPlatform()) {
-    die("Not in a Platform.sh Environment.");
+    if (!$config->isValidPlatform()) {
+        die("Not in a Platform.sh Environment.");
+    }
+
+    $creds = $config->credentials('mysqldatabase');
+} catch (Exception $e) {
+    # This can happen during build phase.
+    $creds = [
+        'path' => '',
+        'username' => '',
+        'password' => '',
+        'host' => '',
+        'port' => '',
+    ];
 }
-
-$creds = $config->credentials('mysqldatabase');
-error_log("Creds " . var_export($creds, TRUE));
 
 return [
 
