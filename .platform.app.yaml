@@ -40,10 +40,12 @@ build:
 
 hooks:
   build: |
+    echo "Build hook"
     set -e
     cp .env.example .env
     sed -i 's/DB_USERNAME=.*$/DB_USERNAME=user/g' .env
     sed -i 's/DB_PASSWORD=.*$/DB_PASSWORD=/g' .env
+    grep DB_ .env
     composer install -n
     php artisan key:generate
     php artisan migrate
