@@ -3,7 +3,9 @@
 use Illuminate\Support\Str;
 
 $config = new Platformsh\ConfigReader\Config();
-error_log(var_export($config, true));
+$rels = json_decode(getenv("PLATFORM_RELATIONSHIPS"), true);
+
+error_log(var_export($rels, true));
 
 return [
 
