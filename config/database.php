@@ -2,6 +2,9 @@
 
 use Illuminate\Support\Str;
 
+$config = new Platformsh\ConfigReader\Config();
+error_log(var_export($config, true));
+
 return [
 
     /*

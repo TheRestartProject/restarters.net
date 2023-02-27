@@ -9,6 +9,7 @@
     "type": "project",
     "require": {
         "php": "^8.0",
+        "platformsh/config-reader": "^3.0",
         "addwiki/mediawiki-api": "~0.7.0",
         "addwiki/mediawiki-api-base": "~2.0",
         "barryvdh/laravel-translation-manager": "^0.6.2",

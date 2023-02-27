@@ -18,6 +18,16 @@ mounts:
   'public/uploads':
     source: local
     source_path: uploads
+  # Laravel uses a directory off the root called "storage" for logs and cache.
+  # We don't support specifying nested directories so make these directories
+  # flat beyond "shared:files"
+  "/storage/app/public": "shared:files/app-public"
+  "/storage/framework/views": "shared:files/framework-views"
+  "/storage/framework/sessions": "shared:files/framework-sessions"
+  "/storage/framework/cache": "shared:files/framework-cache"
+  "/storage/logs": "shared:files/logs"
+  # And another cache directory here.
+  "/bootstrap/cache": "shared:files/bootstrap_cache"
 
 # The size of the persistent disk of the application (in MB).
 disk: 2048
