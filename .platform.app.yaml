@@ -1,5 +1,5 @@
 # The name of this app. Must be unique within a project.
-name: restarters
+name: app
 
 # The runtime the application uses. The 'type' key defines the base container
 # image that will be used to run the application. There is a separate base
@@ -33,7 +33,7 @@ relationships:
 
 variables:
   php:
-    extension: .platform/xmlrpc.so
+    extension: /app/.platform/xmlrpc.so
 
 hooks:
   build: |
