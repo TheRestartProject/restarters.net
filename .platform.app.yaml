@@ -58,8 +58,6 @@ hooks:
     echo "Composer install"
     composer install -n
     echo "Composer installed"
-    php artisan key:generate
-    echo "Generated"
   deploy: |
     echo "Deploy"
     set -e
