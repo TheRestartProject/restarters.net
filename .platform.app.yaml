@@ -35,10 +35,19 @@ variables:
   php:
     extension: /app/xmlrpc.so
 
+dependencies:
+  php:
+    composer/composer: '^2'
+
+# Don't run composer because it won't work yet.
+build:
+  flavor: none
+
 hooks:
   build: |
     set -e
     cp .env.example .env
+    composer install -n
     php artisan key:generate
     php artisan migrate
   deploy: |
