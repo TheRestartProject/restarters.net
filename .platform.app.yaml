@@ -53,9 +53,9 @@ hooks:
     echo "Build hook"
     set -e
     cp .env.example .env
-    composer install -n
   deploy: |
     set -e
+    composer install -n
     php artisan key:generate
     php artisan migrate
 
