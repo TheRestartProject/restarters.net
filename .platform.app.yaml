@@ -56,7 +56,6 @@ hooks:
     mkdir env
     cp .env.example env/.env
     echo "Composer install"
-    mkdir /app/boostrap/cache
     composer install -n
     echo "Composer installed"
     php artisan key:generate
