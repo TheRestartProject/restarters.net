@@ -54,7 +54,7 @@ hooks:
     echo "Build hook"
     set -e
     mkdir env
-    cp .env.example env/.env
+    cp .env.example .env
     echo "Composer install"
     composer install -n
     echo "Composer installed"
