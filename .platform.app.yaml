@@ -31,6 +31,10 @@ relationships:
   mysqldatabase: 'dbmysql:mysql'
 
 
+variables:
+  php:
+    extension: /platform/spiffy.so
+
 hooks:
   build: |
     set -e
