@@ -51,15 +51,14 @@ build:
 
 hooks:
   build: |
-    echo "Build hook"
     set -e
     mkdir env
     cp .env.example .env
-    echo "Composer install"
     composer install -n
-    echo "Composer installed"
+    npm install
+    export NODE_OPTIONS=--max-old-space-size=8192;  npm rebuild node-sass; npm run prod
+
   deploy: |
-    echo "Deploy"
     set -e
     php artisan migrate
     echo "Migrated"
