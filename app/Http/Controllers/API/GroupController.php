@@ -253,22 +253,26 @@ class GroupController extends Controller
      *          response=200,
      *          description="Successful operation",
      *          @OA\JsonContent(
-     *             description="An array of groups",
-     *             type="array",
-     *             @OA\Items(
-     *                @OA\Property(
-     *                    property="id",
-     *                    title="id",
-     *                    description="Unique identifier of this group",
-     *                    format="int64",
-     *                    example=1
-     *                ),
-     *                @OA\Property(
-     *                    property="name",
-     *                    title="name",
-     *                    description="Unique name of this group",
-     *                    format="string",
-     *                    example="Restarters HQ"
+     *              @OA\Property(
+     *                property="data",
+     *                title="data",
+     *                description="An array of group tags",
+     *                type="array",
+     *                @OA\Items(
+     *                   @OA\Property(
+     *                       property="id",
+     *                       title="id",
+     *                       description="Unique identifier of this group",
+     *                       format="int64",
+     *                       example=1
+     *                   ),
+     *                   @OA\Property(
+     *                       property="name",
+     *                       title="name",
+     *                       description="Unique name of this group",
+     *                       format="string",
+     *                       example="Restarters HQ"
+     *                   )
      *                )
      *             )
      *          )
@@ -293,7 +297,25 @@ class GroupController extends Controller
         ];
     }
 
-    // TODO Add to OpenAPI.
+    /**
+     * @OA\Get(
+     *      path="/api/v2/groups/tags",
+     *      operationId="getGroupTagsv2",
+     *      tags={"Groups"},
+     *      summary="Get list of group tags",
+     *      @OA\Response(
+     *          response=200,
+     *          description="Successful operation",
+     *          @OA\JsonContent(
+     *              @OA\Property(
+     *                property="data",
+     *                title="data",
+     *                ref="#/components/schemas/Tag"
+     *              )
+     *          )
+     *       ),
+     *     )
+     */
     public static function listTagsv2(Request $request) {
         return [
             'data' => TagCollection::make(GroupTags::all())
