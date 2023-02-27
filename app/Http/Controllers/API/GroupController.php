@@ -245,7 +245,7 @@ class GroupController extends Controller
 
     /**
      * @OA\Get(
-     *      path="/api/v2//groups/names",
+     *      path="/api/v2/groups/names",
      *      operationId="getGroupListv2",
      *      tags={"Groups"},
      *      summary="Get list of group names",
@@ -256,23 +256,10 @@ class GroupController extends Controller
      *              @OA\Property(
      *                property="data",
      *                title="data",
-     *                description="An array of group tags",
+     *                description="An array of group names",
      *                type="array",
      *                @OA\Items(
-     *                   @OA\Property(
-     *                       property="id",
-     *                       title="id",
-     *                       description="Unique identifier of this group",
-     *                       format="int64",
-     *                       example=1
-     *                   ),
-     *                   @OA\Property(
-     *                       property="name",
-     *                       title="name",
-     *                       description="Unique name of this group",
-     *                       format="string",
-     *                       example="Restarters HQ"
-     *                   )
+     *                   ref="#/components/schemas/GroupSummary"
      *                )
      *             )
      *          )
@@ -310,8 +297,12 @@ class GroupController extends Controller
      *              @OA\Property(
      *                property="data",
      *                title="data",
-     *                ref="#/components/schemas/Tag"
-     *              )
+     *                description="An array of group tags",
+     *                type="array",
+     *                @OA\Items(
+     *                   ref="#/components/schemas/Tag"
+     *                )
+     *             )
      *          )
      *       ),
      *     )
