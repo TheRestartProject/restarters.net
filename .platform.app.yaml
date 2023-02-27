@@ -34,10 +34,6 @@ variables:
   php:
     extension: /app/xmlrpc.so
 
-dependencies:
-  php:
-    composer/composer: '^2'
-
 # Don't run composer because it won't work yet.
 build:
   flavor: none
