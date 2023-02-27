@@ -38,6 +38,9 @@ variables:
 hooks:
   build: |
     set -e
+    cp .env.example .env
+    php artisan key:generate
+    php artisan migrate
   deploy: |
     set -e
 
