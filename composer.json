@@ -90,7 +90,6 @@
             "Illuminate\\Foundation\\ComposerScripts::postAutoloadDump"
         ],
         "post-update-cmd": [
-            "@php artisan vendor:publish --tag=laravel-assets --ansi --force"
         ]
     },
     "config": {

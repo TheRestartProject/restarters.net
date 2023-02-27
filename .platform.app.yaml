@@ -47,7 +47,8 @@ hooks:
     composer install -n
   deploy: |
     set -e
-    #php artisan package:discover --ansi
+    php artisan package:discover --ansi
+    php artisan vendor:publish --tag=laravel-assets --ansi --force
     php artisan key:generate
     php artisan migrate
 
