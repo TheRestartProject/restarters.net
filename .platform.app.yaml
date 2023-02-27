@@ -55,13 +55,16 @@ hooks:
     set -e
     mkdir env
     cp .env.example env/.env
+    echo "Composer install"
     composer install -n
+    echo "Composer installed"
     php artisan key:generate
-    php artisan migrate
+    echo "Generated"
   deploy: |
+    echo "Deploy"
     set -e
-    #php artisan package:discover --ansi
-    #php artisan vendor:publish --tag=laravel-assets --ansi --force
+    php artisan migrate
+    echo "Migrated"
 
 web:
   locations:
