@@ -18,19 +18,9 @@ mounts:
   'public/uploads':
     source: local
     source_path: uploads
-  # Laravel uses a directory off the root called "storage" for logs and cache.
-  # We don't support specifying nested directories so make these directories
-  # flat beyond "shared:files"
-  "/storage/app/public": "shared:files/app-public"
-  "/storage/framework/views": "shared:files/framework-views"
-  "/storage/framework/sessions": "shared:files/framework-sessions"
-  "/storage/framework/cache": "shared:files/framework-cache"
-  "/storage/logs": "shared:files/logs"
-  # And another cache directory here.
-  "/bootstrap/cache": "shared:files/bootstrap_cache"
 
 # The size of the persistent disk of the application (in MB).
-disk: 2048
+disk: 20048
 
 # The relationships of the application with services or other applications.
 #
@@ -44,7 +34,8 @@ variables:
   php:
     extension: /app/xmlrpc.so
 
-# Don't run composer because it won't work yet.
+# Don't run composer early on in the build phase because it won't work yet.
+# TODO Surely that's not right, but I had trouble with accessing DB keys.
 build:
   flavor: none
 
