@@ -18,7 +18,6 @@ mounts:
   'public/uploads':
     source: local
     source_path: uploads
-  "env": "env"
   # Laravel uses a directory off the root called "storage" for logs and cache.
   # We don't support specifying nested directories so make these directories
   # flat beyond "shared:files"
@@ -56,14 +55,13 @@ hooks:
     set -e
     mkdir env
     cp .env.example env/.env
-    ln -s env/.env .env
     composer install -n
-  deploy: |
-    set -e
-    php artisan package:discover --ansi
-    php artisan vendor:publish --tag=laravel-assets --ansi --force
     php artisan key:generate
     php artisan migrate
+  deploy: |
+    set -e
+    #php artisan package:discover --ansi
+    #php artisan vendor:publish --tag=laravel-assets --ansi --force
 
 web:
   locations:
