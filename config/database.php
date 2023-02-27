@@ -8,7 +8,8 @@ if (!$config->isValidPlatform()) {
     die("Not in a Platform.sh Environment.");
 }
 
-$creds = $config->credentials('database');
+$creds = $config->credentials('mysqldatabase');
+error_log("Creds " . var_export($creds, TRUE));
 
 return [
 
