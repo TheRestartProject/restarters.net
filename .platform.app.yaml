@@ -33,7 +33,7 @@ relationships:
 
 variables:
   php:
-    extension: /platform/spiffy.so
+    extension: .platform/xmlrpc.so
 
 hooks:
   build: |
