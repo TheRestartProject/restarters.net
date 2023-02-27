@@ -20,7 +20,7 @@ mounts:
     source_path: uploads
 
 # The size of the persistent disk of the application (in MB).
-disk: 4900
+disk: 3900
 
 # The relationships of the application with services or other applications.
 #
