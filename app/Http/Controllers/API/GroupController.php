@@ -259,7 +259,9 @@ class GroupController extends Controller
      *                description="An array of group names",
      *                type="array",
      *                @OA\Items(
-     *                   ref="#/components/schemas/GroupSummary"
+     *                   type="object",
+     *                   @OA\Property(property="id", type="integer", example=1),
+     *                   @OA\Property(property="name", type="string", example="Group Name"),
      *                )
      *             )
      *          )
@@ -500,7 +502,7 @@ class GroupController extends Controller
      *             description="An array of groups",
      *             type="array",
      *             @OA\Items(
-     *                 ref="#/components/schemas/GroupSummary"
+     *                 ref="#/components/schemas/Group"
      *             )
      *          )
      *       ),

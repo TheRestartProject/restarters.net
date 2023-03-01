@@ -249,6 +249,7 @@ class Party extends JsonResource
             'stats' => $this->resource->getEventStats(),
             'updated_at' => Carbon::parse($this->updated_at)->toIso8601String(),
             'approved' => $this->approved ? true : false,
+            'full' => true,
         ];
     }
 }

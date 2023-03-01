@@ -313,7 +313,7 @@ class EventController extends Controller
      *             type="array",
      *             description="An array of groups",
      *             @OA\Items(
-     *                 ref="#/components/schemas/EventSummary"
+     *                 ref="#/components/schemas/Event"
      *             )
      *          )
      *       ),
