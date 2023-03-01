@@ -136,23 +136,20 @@ class NetworkController extends Controller
      *          description="Successful operation",
      *          @OA\JsonContent(
      *              @OA\Property(
-     *                  property="data",
-     *                  title="data",
-     *                  description="An array of groups",
-     *                  oneOf={
-     *                      @OA\Schema(
-     *                          type="array",
-     *                          @OA\Items(
-     *                            ref="#/components/schemas/GroupSummary"
-     *                          )
-     *                      ),
-     *                      @OA\Schema(
-     *                          type="array",
-     *                          @OA\Items(
-     *                            ref="#/components/schemas/Group"
-     *                          )
-     *                      ),
-     *                  },
+     *                 property="data",
+     *                 title="data",
+     *                 description="An array of groups",
+     *                 type="array",
+     *                 @OA\Items(
+     *                    oneOf={
+     *                        @OA\Schema(
+     *                          ref="#/components/schemas/GroupSummary"
+     *                        ),
+     *                        @OA\Schema(
+     *                          ref="#/components/schemas/Group"
+     *                        ),
+     *                    },
+     *                 )
      *              )
      *          )
      *       ),
@@ -260,20 +257,17 @@ class NetworkController extends Controller
      *                property="data",
      *                title="data",
      *                description="An array of events",
-     *                oneOf={
-     *                      @OA\Schema(
-     *                          type="array",
-     *                          @OA\Items(
-     *                             ref="#/components/schemas/EventSummary"
-     *                          )
-     *                      ),
-     *                      @OA\Schema(
-     *                          type="array",
-     *                          @OA\Items(
-     *                             ref="#/components/schemas/Event"
-     *                          )
-     *                      ),
-     *                  },
+     *                type="array",
+     *                @OA\Items(
+     *                    oneOf={
+     *                        @OA\Schema(
+     *                          ref="#/components/schemas/EventSummary"
+     *                        ),
+     *                        @OA\Schema(
+     *                          ref="#/components/schemas/Event"
+     *                        ),
+     *                    },
+     *                 )
      *              )
      *          )
      *       ),
