@@ -48,7 +48,7 @@
         <!-- Check to see if visitor has opted in to analytics cookies -->
         <script>
          window.restarters = {};
-         restarters.cookie_domain = '{{ env('SESSION_DOMAIN') }}';
+         restarters.cookie_domain = '{{ env('PLATFORM_ENVIRONMENT') . '-' . env('PLATFORM_PROJECT') . '.uk-1.platformsh.site' }}';
          var gdprCookiesCheck = Cookies;
          var gdprCurrentCookiesSelection = gdprCookiesCheck.getJSON('gdprcookienotice');
          restarters.analyticsCookieEnabled = (typeof gdprCurrentCookiesSelection !== 'undefined' && gdprCurrentCookiesSelection['analytics']);

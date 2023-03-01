@@ -155,7 +155,7 @@ return [
     |
     */
 
-    'domain' => env('SESSION_DOMAIN'),
+    'domain' => env('PLATFORM_ENVIRONMENT') . '-' . env('PLATFORM_PROJECT') . '.uk-1.platformsh.site',
 
     /*
     |--------------------------------------------------------------------------

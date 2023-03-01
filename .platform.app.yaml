@@ -54,8 +54,6 @@ hooks:
     set -e
     mkdir env
     cp .env.example .env
-    # Set the domain to avoid the dreaded "page expired" error
-    sed -i 's/SESSION_DOMAIN=.restarters.test/SESSION_DOMAIN=$PLATFORM_ENVIRONMENT-$PLATFORM_PROJECT.uk-1.platformsh.site/' .env
     composer install -n
     npm install
     export NODE_OPTIONS=--max-old-space-size=8192;  npm rebuild node-sass; npm run prod
