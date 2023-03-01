@@ -350,16 +350,34 @@ abstract class TestCase extends BaseTestCase
 
         if (strpos($uri, '/api/v2') === 0) {
             // Validate response against OpenAPI schema.
-            try {
-                $result = $this->OpenAPIValidator->validate($response->baseResponse, $uri, 'get');
-                $this->assertTrue($result);
-            } catch (ValidationException $e) {
-                if (strpos($e->getMessage(), 'Data must match exactly one schema') !== false) {
-                    // Ignore this - see https://github.com/thephpleague/openapi-psr7-validator/issues/170
-                } else {
-                    throw $e;
-                }
-            }
+            $result = $this->OpenAPIValidator->validate($response->baseResponse, $uri, 'get');
+            $this->assertTrue($result);
+        }
+
+        return $response;
+    }
+
+    public function patch($uri, array $params = [], $headers = [])
+    {
+        $response = parent::patch($uri, $params, $headers);
+
+        if (strpos($uri, '/api/v2') === 0) {
+            // Validate response against OpenAPI schema.
+            $result = $this->OpenAPIValidator->validate($response->baseResponse, $uri, 'patch');
+            $this->assertTrue($result);
+        }
+
+        return $response;
+    }
+
+    public function post($uri, array $params = [], $headers = [])
+    {
+        $response = parent::post($uri, $params, $headers);
+
+        if (strpos($uri, '/api/v2') === 0) {
+            // Validate response against OpenAPI schema.
+            $result = $this->OpenAPIValidator->validate($response->baseResponse, $uri, 'post');
+            $this->assertTrue($result);
         }
 
         return $response;
