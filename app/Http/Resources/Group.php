@@ -64,7 +64,7 @@ use Illuminate\Http\Resources\Json\JsonResource;
  *          property="next_event",
  *          title="next_event",
  *          description="Next event for this group",
- *          ref="#/components/schemas/Event"
+ *          ref="#/components/schemas/EventSummary"
  *     ),
  *     @OA\Property(
  *          property="timezone",
@@ -291,7 +291,8 @@ class Group extends JsonResource
                 'start' => $nextevent->event_start_utc,
                 'end' => $nextevent->event_end_utc,
                 'timezone' => $nextevent->timezone,
-                'title' => $nextevent->venue ?? $nextevent->location
+                'title' => $nextevent->venue ?? $nextevent->location,
+                'summary' => true
             ];
         }
 

@@ -44,14 +44,14 @@ use Illuminate\Http\Resources\Json\JsonResource;
  *          title="title",
  *          description="Title of the event",
  *          format="string",
- *          example="Europe/London"
+ *          example="Repair Cafe"
  *     ),
  *     @OA\Property(
  *          property="location",
  *          title="location",
  *          description="Human-readable address of the event",
  *          format="string",
- *          example="Europe/London"
+ *          example="Village Hall, Main Street, Anytown, UK"
  *     ),
  *     @OA\Property(
  *          property="online",

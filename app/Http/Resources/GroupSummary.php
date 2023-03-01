@@ -108,7 +108,8 @@ class GroupSummary extends JsonResource
                     'online' => $nextevent->online,
                     'lat' => $nextevent->latitude,
                     'lng' => $nextevent->longitude,
-                    'updated_at' => $nextevent->updated_at->toIso8601String()
+                    'updated_at' => $nextevent->updated_at->toIso8601String(),
+                    'summary' => true
                 ];
             }
         }
