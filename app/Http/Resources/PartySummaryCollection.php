@@ -9,11 +9,12 @@ use Illuminate\Http\Resources\Json\ResourceCollection;
  *     title="EventSummaryCollection",
  *     schema="EventSummaryCollection",
  *     description="A collection of event summaries.",
- *     @OA\Xml(
- *         name="EventSummaryCollection"
- *     ),
+ *     type="array",
+ *     @OA\Items(
+ *         ref="#/components/schemas/EventSummary"
+ *     )
  * )
- */
+*/
 
 class PartySummaryCollection extends ResourceCollection
 {

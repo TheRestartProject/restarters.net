@@ -10,58 +10,69 @@ use Illuminate\Http\Resources\Json\JsonResource;
  *     title="GroupSummary",
  *     schema="GroupSummary",
  *     description="The very basic information about a group.  For full information, fetch the group.",
- *     @OA\Xml(
- *         name="GroupSummary"
+ *     required={"id", "summary"},
+ *     @OA\Property(
+ *          property="id",
+ *          title="id",
+ *          description="Unique identifier of this group",
+ *          format="int64",
+ *          example=1
  *     ),
+ *     @OA\Property(
+ *          property="name",
+ *          title="name",
+ *          description="Unique name of this group",
+ *          format="string",
+ *          example="Restarters HQ"
+ *     ),
+ *     @OA\Property(
+ *          property="image",
+ *          title="image",
+ *          description="URL of an image for this group.  You should prefix this with /uploads before use.",
+ *          format="string",
+ *          example="/mid_1597853610178a4b76e4d666b2a7b32ee75d8a24c706f1cbf213970.png"
+ *     ),
+ *     @OA\Property(
+ *          property="location",
+ *          title="location",
+ *          description="The group's location",
+ *          format="object",
+ *          ref="#/components/schemas/GroupLocation"
+ *     ),
+ *     @OA\Property(
+ *         property="networks",
+ *         title="networks",
+ *         description="An array of networks of which the group is a member.",
+ *         type="array",
+ *         @OA\Items(
+ *            ref="#/components/schemas/NetworkSummary"
+ *         )
+ *     ),
+ *     @OA\Property(
+ *          property="updated_at",
+ *          title="updated_at",
+ *          description="The last change to this group.  This includes changes which affect the stats.",
+ *          format="date-time",
+ *     ),
+ *     @OA\Property(
+ *          property="next_event",
+ *          title="next_event",
+ *          description="The next event, if any, for this group.  Only present if includeNextEvent=true.",
+ *          format="object",
+ *          ref="#/components/schemas/EventSummary"
+ *     ),
+ *     @OA\Property(
+ *          property="summary",
+ *          title="summary",
+ *          description="Indicates that this is a summary result, not full group information.",
+ *          format="boolean",
+ *          example="true"
+ *     )
  * )
  */
 
 class GroupSummary extends JsonResource
 {
-    /**
-     *     @OA\Property(
-     *          property="id",
-     *          title="id",
-     *          description="Unique identifier of this group",
-     *          format="int64",
-     *          example=1
-     *     )
-     *     @OA\Property(
-     *          property="area",
-     *          title="name",
-     *          description="Unique name of this group",
-     *          format="string",
-     *          example="Restarters HQ"
-     *     )
-     *     @OA\Property(
-     *          property="location",
-     *          title="location",
-     *          description="The group's location",
-     *          format="object",
-     *          ref="#/components/schemas/GroupLocation"
-     *     )
-     *     @OA\Property(
-     *          property="image",
-     *          title="image",
-     *          description="URL of an image for this group.  You should prefix this with /uploads before use.",
-     *          format="string",
-     *          example="/mid_1597853610178a4b76e4d666b2a7b32ee75d8a24c706f1cbf213970.png"
-     *     )
-     *     @OA\Property(
-     *          property="updated_at",
-     *          title="updated_at",
-     *          description="The last change to this group.  This includes changes which affect the stats.",
-     *          format="date-time",
-     *     )
-     *     @OA\Property(
-     *          property="next_event",
-     *          title="next_event",
-     *          description="The next event, if any, for this group.  Only present if includeNextEvent=true.",
-     *          format="object",
-     *          ref="#/components/schemas/EventSummary"
-     *     )
-     */
-
     /**
      * Transform the resource into an array.
      *
@@ -74,9 +85,10 @@ class GroupSummary extends JsonResource
             'id' => $this->idgroups,
             'name' => $this->name,
             'image' => $this->groupImage && is_object($this->groupImage) && is_object($this->groupImage->image) ? $this->groupImage->image->path : null,
-            'updated_at' => Carbon::parse($this->updated_at)->toIso8601String(),
-            'networks' => $this->resource->networks,
             'location' => new GroupLocation($this),
+            'networks' => new NetworkSummaryCollection($this->resource->networks),
+            'updated_at' => Carbon::parse($this->updated_at)->toIso8601String(),
+            'summary' => true
         ];
 
         if ($request->get('includeNextEvent', false)) {
@@ -97,6 +109,7 @@ class GroupSummary extends JsonResource
                     'lat' => $nextevent->latitude,
                     'lng' => $nextevent->longitude,
                     'updated_at' => $nextevent->updated_at->toIso8601String(),
+                    'summary' => true
                 ];
             }
         }

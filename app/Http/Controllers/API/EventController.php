@@ -289,6 +289,36 @@ class EventController extends Controller
         return $user;
     }
 
+    /**
+     * @OA\Get(
+     *      path="/api/v2/moderate/events",
+     *      operationId="getEventsModeratev2",
+     *      tags={"Events"},
+     *      summary="Get Events for Moderation",
+     *      description="Only available for Administrators and Network Coordinators.",
+     *      @OA\Parameter(
+     *          name="api_token",
+     *          description="A valid user API token",
+     *          required=true,
+     *          in="query",
+     *          @OA\Schema(
+     *              type="string",
+     *              example="1234"
+     *          )
+     *      ),
+     *      @OA\Response(
+     *          response=200,
+     *          description="Successful operation",
+     *          @OA\JsonContent(
+     *             type="array",
+     *             description="An array of groups",
+     *             @OA\Items(
+     *                 ref="#/components/schemas/Event"
+     *             )
+     *          )
+     *       ),
+     *     )
+     */
     public function moderateEventsv2(Request $request) {
         // Get the user that the API has been authenticated as.
         $user = $this->getUser();
