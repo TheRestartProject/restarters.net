@@ -155,7 +155,7 @@ class Party extends Model implements Auditable
                     *,
 	`e`.`venue` AS `venue`, `e`.`link` AS `link`, `e`.`location` as `location`,
                     `g`.`name` AS group_name,
-                    UNIX_TIMESTAMP(e.`event_start_utc`) ) AS `event_timestamp`
+                    UNIX_TIMESTAMP(e.`event_start_utc`) AS `event_timestamp`
                 FROM `'.$this->table.'` AS `e`
 
                     INNER JOIN `groups` as `g` ON `e`.`group` = `g`.`idgroups`

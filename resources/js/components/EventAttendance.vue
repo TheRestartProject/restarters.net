@@ -15,14 +15,14 @@
           <div class="counts">
             <div v-if="!upcoming" class="count-participants">
               <b>
-                <b-img src="/icons/group_ico.svg" class="mr-2" />
+                <b-img src="/icons/group_ico.svg" class="mr-2 icon" />
                 {{ __('events.stat-0') }}
               </b>
               <EventAttendanceCount :count="event.participants" class="mt-2 mb-4" @change="changeParticipants($event)" :canedit="canedit" />
             </div>
             <div v-if="!upcoming" class="count-volunteers">
               <b>
-                <b-img src="/icons/volunteer_ico.svg" class="mr-2" />
+                <b-img src="/icons/volunteer_ico.svg" class="mr-2 icon" />
                 {{ __('events.stat-2') }}
               </b>
               <EventAttendanceCount :count="event.volunteers" class="mt-2"  @change="changeVolunteers($event)" :canedit="canedit" />

@@ -236,6 +236,7 @@ class Party extends JsonResource
         // We return information which can be public, and we rename fields to look more consistent.
         return [
             'id' => $this->idevents,
+            'approved' => $this->approved ? true : false,
             'start' => $this->event_start_utc,
             'end' => $this->event_end_utc,
             'timezone' => $this->timezone,
