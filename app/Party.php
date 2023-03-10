@@ -639,7 +639,7 @@ class Party extends Model implements Auditable
         return 3;
     }
 
-    public function hoursVolunteered($newVersion)
+    public function hoursVolunteered($newVersion = FALSE)
     {
         if (! $this->cancelled) {
             // Get difference in hours between start and end.  Make sure we round up.
