@@ -4,6 +4,18 @@ namespace App\Http\Resources;
 
 use Illuminate\Http\Resources\Json\ResourceCollection;
 
+/**
+ * @OA\Schema(
+ *     title="NetworkSummaryCollection",
+ *     schema="NetworkSummaryCollection",
+ *     description="A collection of network summaries.",
+ *     type="array",
+ *     @OA\Items(
+ *         ref="#/components/schemas/NetworkSummary"
+ *     )
+ * )
+*/
+
 class NetworkSummaryCollection extends ResourceCollection
 {
     /**

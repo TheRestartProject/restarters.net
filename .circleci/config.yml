@@ -122,6 +122,7 @@ jobs:
 
     steps:
       - checkout
+      - run: sudo bash -c "echo 'Acquire::Retries "3";' > /etc/apt/apt.conf.d/80-retries"
       - run: sudo apt update
       - run: sudo apt install dnsutils openssl zip unzip git libxml2-dev libzip-dev zlib1g-dev libcurl4-openssl-dev iputils-ping default-mysql-client vim libpng-dev libgmp-dev libjpeg-turbo8-dev
       - run: sudo apt-get install php-xmlrpc php8.1-intl php8.1-xdebug php8.1-mbstring php8.1-simplexml php8.1-curl php8.1-zip postgresql-client php8.1-gd php8.1-xmlrpc php8.1-mysql php-mysql
@@ -171,6 +172,7 @@ jobs:
 
       - run: php artisan key:generate
       - run: php artisan migrate
+      - run: php artisan l5-swagger:generate
 
       - run: wget -O phpunit https://phar.phpunit.de/phpunit-9.phar ; chmod +x phpunit
 

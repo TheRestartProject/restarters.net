@@ -243,7 +243,32 @@ class GroupController extends Controller
         ]);
     }
 
-    // TODO Add to OpenAPI.
+    /**
+     * @OA\Get(
+     *      path="/api/v2/groups/names",
+     *      operationId="getGroupListv2",
+     *      tags={"Groups"},
+     *      summary="Get list of group names",
+     *      @OA\Response(
+     *          response=200,
+     *          description="Successful operation",
+     *          @OA\JsonContent(
+     *              @OA\Property(
+     *                property="data",
+     *                title="data",
+     *                description="An array of group names",
+     *                type="array",
+     *                @OA\Items(
+     *                   type="object",
+     *                   @OA\Property(property="id", type="integer", example=1),
+     *                   @OA\Property(property="name", type="string", example="Group Name"),
+     *                )
+     *             )
+     *          )
+     *       ),
+     *     )
+     */
+
     public static function listNamesv2(Request $request) {
         // We only return the group id and name, for speed.
         $groups = Group::select('idgroups', 'name')->get();
@@ -261,7 +286,29 @@ class GroupController extends Controller
         ];
     }
 
-    // TODO Add to OpenAPI.
+    /**
+     * @OA\Get(
+     *      path="/api/v2/groups/tags",
+     *      operationId="getGroupTagsv2",
+     *      tags={"Groups"},
+     *      summary="Get list of group tags",
+     *      @OA\Response(
+     *          response=200,
+     *          description="Successful operation",
+     *          @OA\JsonContent(
+     *              @OA\Property(
+     *                property="data",
+     *                title="data",
+     *                description="An array of group tags",
+     *                type="array",
+     *                @OA\Items(
+     *                   ref="#/components/schemas/Tag"
+     *                )
+     *             )
+     *          )
+     *       ),
+     *     )
+     */
     public static function listTagsv2(Request $request) {
         return [
             'data' => TagCollection::make(GroupTags::all())
@@ -349,7 +396,7 @@ class GroupController extends Controller
      *              @OA\Property(
      *                property="data",
      *                title="data",
-     *                description="An array of groups",
+     *                description="An array of events",
      *                type="array",
      *                @OA\Items(
      *                    ref="#/components/schemas/EventSummary"
@@ -385,7 +432,6 @@ class GroupController extends Controller
         return PartySummaryCollection::make($parties);
     }
 
-    // TODO Add to OpenAPI.
     public function listVolunteers(Request $request, $idgroups) {
         $group = Group::findOrFail($idgroups);
 
@@ -432,7 +478,36 @@ class GroupController extends Controller
         return $user;
     }
 
-    // TODO Add to OpenAPI.
+    /**
+     * @OA\Get(
+     *      path="/api/v2/moderate/groups",
+     *      operationId="getGroupsModeratev2",
+     *      tags={"Groups"},
+     *      summary="Get Groups for Moderation",
+     *      description="Only available for Administrators and Network Coordinators. ",
+     *      @OA\Parameter(
+     *          name="api_token",
+     *          description="A valid user API token",
+     *          required=true,
+     *          in="query",
+     *          @OA\Schema(
+     *              type="string",
+     *              example="1234"
+     *          )
+     *      ),
+     *      @OA\Response(
+     *          response=200,
+     *          description="Successful operation",
+     *          @OA\JsonContent(
+     *             description="An array of groups",
+     *             type="array",
+     *             @OA\Items(
+     *                 ref="#/components/schemas/Group"
+     *             )
+     *          )
+     *       ),
+     *     )
+     */
     public function moderateGroupsv2(Request $request) {
         $user = $this->getUser();
         $ret = \App\Http\Resources\GroupCollection::make(Group::unapprovedVisibleTo($user->id));
@@ -570,7 +645,73 @@ class GroupController extends Controller
         ]);
     }
 
-    // TODO Add to OpenAPI
+    /**
+     * @OA\Patch(
+     *      path="/api/v2/groups/{id}",
+     *      operationId="editGroup",
+     *      tags={"Groups"},
+     *      summary="Edit Group",
+     *      description="Edit a group.",
+     *      @OA\Parameter(
+     *          name="api_token",
+     *          description="A valid user API token",
+     *          required=true,
+     *          in="query",
+     *          @OA\Schema(
+     *              type="string",
+     *              example="1234"
+     *          )
+     *      ),
+     *     @OA\RequestBody(
+     *         @OA\MediaType(
+     *             mediaType="multipart/form-data",
+     *             @OA\Schema(
+     *                required={"name","location","description"},
+     *                @OA\Property(
+     *                   property="name",
+     *                   ref="#/components/schemas/Group/properties/name",
+     *                ),
+     *                @OA\Property(
+     *                   property="location",
+     *                   ref="#/components/schemas/Group/properties/location",
+     *                ),
+     *                @OA\Property(
+     *                   property="phone",
+     *                   ref="#/components/schemas/Group/properties/phone"
+     *                ),
+     *                @OA\Property(
+     *                   property="website",
+     *                   ref="#/components/schemas/Group/properties/website"
+     *                ),
+     *                @OA\Property(
+     *                   property="description",
+     *                   ref="#/components/schemas/Group/properties/description",
+     *                ),
+     *                @OA\Property(
+     *                   property="timezone",
+     *                   ref="#/components/schemas/Group/properties/timezone"
+     *                ),
+     *                @OA\Property(
+     *                   description="Image for the group",
+     *                   property="image",
+     *                   type="string", format="binary"
+     *                 )
+     *             )
+     *         )
+     *    ),
+     *    @OA\Response(
+     *        response=200,
+     *        description="Successful operation",
+     *        @OA\JsonContent(
+     *            @OA\Property(
+     *              property="data",
+     *              title="data",
+     *              ref="#/components/schemas/Group"
+     *            )
+     *        ),
+     *     )
+     *  )
+     */
     public function updateGroupv2(Request $request, $idGroup) {
         $user = $this->getUser();
 

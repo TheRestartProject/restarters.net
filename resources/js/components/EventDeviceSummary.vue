@@ -43,8 +43,8 @@
           </span>
         </div>
       </b-td>
-      <b-td class="d-none d-md-table-cell">
-        {{ parseFloat(device.age) }}
+      <b-td class="d-none d-md-table-cell device-age-summary">
+        {{ parseFloat(device.age) ? parseFloat(device.age) : '-' }}
       </b-td>
       <b-td class="d-none d-md-table-cell">
         {{ device.shortProblem }}

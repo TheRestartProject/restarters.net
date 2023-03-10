@@ -18,6 +18,9 @@ class Group extends Model implements Auditable
     protected $table = 'groups';
     protected $primaryKey = 'idgroups';
 
+    // Eager-loading reduces N+1 queries.
+    protected $with = ['networks'];
+
     /**
      * The attributes that are mass assignable.
      *

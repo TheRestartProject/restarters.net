@@ -35,6 +35,8 @@ class CalendarTest extends TestCase
                                                ]);
         $group->addVolunteer($host);
         $group->makeMemberAHost($host);
+        $group->approved = true;
+        $group->save();
         $this->group = $group;
 
         $group2 = Group::factory()->create([
@@ -75,6 +77,7 @@ class CalendarTest extends TestCase
         $this->expectOutputRegex('/VEVENT/');
         $this->expectOutputString($this->start);
         $this->expectOutputString($this->end);
+        $this->expectOutputString('CONFIRMED');
 
         // Invalid hash.
         $this->expectException(\Exception::class);
@@ -117,5 +120,42 @@ class CalendarTest extends TestCase
 
         $this->expectException(NotFoundHttpException::class);
         $response = $this->get('/calendar/all-events/' . env('CALENDAR_HASH') . '1');
+    }
+
+    public function testCancelled() {
+        $this->event->cancelled = 1;
+        $this->event->save();
+        $response = $this->get('/calendar/user/' . $this->host->calendar_hash);
+        $response->assertStatus(200);
+        $this->expectOutputRegex('/CANCELLED/');
+    }
+
+    public function testEventNotApproved() {
+        $this->event->approved = false;
+        $this->event->save();
+        $response = $this->get('/calendar/user/' . $this->host->calendar_hash);
+        $response->assertStatus(200);
+        $this->expectOutputRegex('/TENTATIVE/');
+    }
+
+    public function testGroupNotApproved() {
+        $this->group->approved = false;
+        $this->group->save();
+        $response = $this->get('/calendar/user/' . $this->host->calendar_hash);
+        $response->assertStatus(200);
+        $this->expectOutputRegex('/TENTATIVE/');
+    }
+
+    public function testEventNotVisible() {
+        $host = User::factory()->create([
+                                            'latitude' => 50.64,
+                                                 'longitude' => 5.58,
+                                                 'location' => 'London',
+                                                 'calendar_hash' => \Str::random(15)
+                                             ]);
+        $this->actingAs($host);
+        $response = $this->get('/calendar/user/' . $host->calendar_hash);
+        $response->assertStatus(200);
+        $this->assertStringNotContainsString('/VEVENT/', $response->getContent());
     }
 }

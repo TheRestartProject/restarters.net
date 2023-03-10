@@ -4,6 +4,18 @@ namespace App\Http\Resources;
 
 use Illuminate\Http\Resources\Json\ResourceCollection;
 
+/**
+ * @OA\Schema(
+ *     title="TagCollection",
+ *     schema="TagCollection",
+ *     description="A collection of group tags.",
+ *     type="array",
+ *     @OA\Items(
+ *         ref="#/components/schemas/Tag"
+ *     )
+ * )
+ */
+
 class TagCollection extends ResourceCollection
 {
     /**
