@@ -81,6 +81,13 @@ use Illuminate\Http\Resources\Json\JsonResource;
  *          ref="#/components/schemas/GroupSummary"
  *     ),
  *     @OA\Property(
+ *          property="approved",
+ *          title="approved",
+ *          description="Whether this event has been approved.",
+ *          format="boolean",
+ *          example="false"
+ *     )
+ *     @OA\Property(
  *          property="updated_at",
  *          title="updated_at",
  *          description="The last change to this group.  This includes changes which affect the stats.",
@@ -93,13 +100,6 @@ use Illuminate\Http\Resources\Json\JsonResource;
  *          format="boolean",
  *          example="true"
  *     ),
- *     @OA\Property(
- *          property="approved",
- *          title="approved",
- *          description="Whether this event has been approved.",
- *          format="boolean",
- *          example="false"
- *     )
  * )
  */
 
