@@ -629,7 +629,7 @@ class Party extends Model implements Auditable
         return $this->hasMany(\App\Device::class, 'event', 'idevents');
     }
 
-    public function lengthInHours($newVersion) {
+    public function lengthInHours($newVersion = FALSE) {
         if ($newVersion) {
             $start = new Carbon($this->event_start_utc);
             $end = new Carbon($this->event_end_utc);
