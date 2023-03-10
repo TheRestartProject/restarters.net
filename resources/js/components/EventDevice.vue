@@ -241,17 +241,24 @@ export default {
             }
           })
         })
+
         if (!ret) {
           // Now check the item types.  Stop at the first match, which is the most popular.
           this.itemTypes.every(t => {
-            if (!ret && Boolean(t.powered) === Boolean(this.powered) && this.currentDevice.item_type === t.item_type) {
-              ret = t
+            if (!ret && Boolean(t.powered) === Boolean(this.powered) && this.currentDevice.item_type.toLowerCase() == t.item_type.toLowerCase()) {
+              ret = {
+                idcategories: t.idcategories,
+                categoryname: t.categoryname,
+                powered: t.powered
+              }
+
               return false
             }
             return true
           })
         }
       }
+
       return ret
     },
     suggestedCategoryId() {
