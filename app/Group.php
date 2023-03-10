@@ -265,7 +265,7 @@ class Group extends Model implements Auditable
         return \App\Party::getEventStatsArrayKeys() + ['parties' => 0];
     }
 
-    public function getGroupStats($eEmissionRatio = null, $uEmissionratio = null)
+    public function getGroupStats($eEmissionRatio = null, $uEmissionratio = null, $newVersion = false)
     {
         if (is_null($eEmissionRatio)) {
             $eEmissionRatio = \App\Helpers\LcaStats::getEmissionRatioPowered();
@@ -282,7 +282,7 @@ class Group extends Model implements Auditable
 
         // Rollup all events stats into stats for this group.
         foreach ($allPastEvents as $event) {
-            $eventStats = $event->getEventStats($eEmissionRatio, $uEmissionratio);
+            $eventStats = $event->getEventStats($eEmissionRatio, $uEmissionratio, false, $newVersion);
 
             foreach ($eventStats as $statKey => $statValue) {
                 $result[$statKey] += $statValue;

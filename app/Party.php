@@ -554,7 +554,7 @@ class Party extends Model implements Auditable
         ];
     }
 
-    public function getEventStats($eEmissionRatio = null, $uEmissionratio = null, $includeFuture = false)
+    public function getEventStats($eEmissionRatio = null, $uEmissionratio = null, $includeFuture = false, $newVersion = false)
     {
         $displacementFactor = \App\Device::getDisplacementFactor();
         if (is_null($eEmissionRatio)) {
@@ -619,7 +619,7 @@ class Party extends Model implements Auditable
         $result['participants'] = $this->pax ?? 0;
         $result['volunteers'] = $this->volunteers ?? 0;
         $result['invited'] = $this->allInvited->count();
-        $result['hours_volunteered'] = $this->hoursVolunteered();
+        $result['hours_volunteered'] = $this->hoursVolunteered($newVersion);
 
         return $result;
     }
@@ -629,21 +629,21 @@ class Party extends Model implements Auditable
         return $this->hasMany(\App\Device::class, 'event', 'idevents');
     }
 
-    public function lengthInHours() {
-//        Code for when we fix this.
-//        $start = new Carbon($this->event_start_utc);
-//        $end = new Carbon($this->event_end_utc);
-//        return round(($start->diffInMinutes($end) + 30) / 60);
+    public function lengthInHours($newVersion) {
+        if ($newVersion) {
+            $start = new Carbon($this->event_start_utc);
+            $end = new Carbon($this->event_end_utc);
+            return round(($start->diffInMinutes($end) + 30) / 60);
+        }
+
         return 3;
     }
 
-    public function hoursVolunteered()
+    public function hoursVolunteered($newVersion)
     {
         if (! $this->cancelled) {
             // Get difference in hours between start and end.  Make sure we round up.
-            $start = new Carbon($this->event_start_utc);
-            $end = new Carbon($this->event_end_utc);
-            $lengthOfEventInHours = $this->lengthInHours();
+            $lengthOfEventInHours = $this->lengthInHours($newVersion);
             $extraHostHours = 9;
             $hoursIfNoVolunteersRecorded = 12;
 
