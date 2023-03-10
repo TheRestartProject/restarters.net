@@ -17,7 +17,7 @@ use Illuminate\Http\Resources\Json\JsonResource;
  *          description="Unique identifier of this event",
  *          format="int64",
  *          example=1
-     *     )
+ *     ),
  *     @OA\Property(
  *          property="start",
  *          title="start",
@@ -86,7 +86,7 @@ use Illuminate\Http\Resources\Json\JsonResource;
  *          description="Whether this event has been approved.",
  *          format="boolean",
  *          example="false"
- *     )
+ *     ),
  *     @OA\Property(
  *          property="updated_at",
  *          title="updated_at",
@@ -99,7 +99,7 @@ use Illuminate\Http\Resources\Json\JsonResource;
  *          description="Indicates that this is a summary result, not full group information.",
  *          format="boolean",
  *          example="true"
- *     ),
+ *     )
  * )
  */
 
