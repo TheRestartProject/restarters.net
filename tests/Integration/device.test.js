@@ -4,10 +4,15 @@ const { login, createGroup, createEvent, approveEvent, addDevice } = require('./
 test('Spare parts set as expected', async ({page, baseURL}) => {
   test.slow()
   await login(page, baseURL)
+  expect(await page.screenshot()).toMatchSnapshot();
   const groupid = await createGroup(page, baseURL)
+  expect(await page.screenshot()).toMatchSnapshot();
   const eventid = await createEvent(page, baseURL, groupid, true)
+  expect(await page.screenshot()).toMatchSnapshot();
   await approveEvent(page, baseURL, eventid)
+  expect(await page.screenshot()).toMatchSnapshot();
   await addDevice(page, baseURL, eventid, true, false, true, true)
+  expect(await page.screenshot()).toMatchSnapshot();
 
   // Should  see spare parts tick in summary.  Two copies because of mobile view.
   await expect(await page.locator('.spare-parts-tick').count()).toEqual(2);
