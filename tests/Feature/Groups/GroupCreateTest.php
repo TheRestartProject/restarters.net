@@ -24,6 +24,9 @@ class GroupCreateTest extends TestCase
                                                                   ]);
         $this->actingAs($user);
 
+        $response = $this->get('/group/create');
+        $response->assertStatus(200);
+
         $idgroups = $this->createGroup();
         $this->assertNotNull($idgroups);
         $group = Group::find($idgroups);
@@ -34,6 +37,12 @@ class GroupCreateTest extends TestCase
         self::assertEquals(1, count($ret));
         self::assertEquals($idgroups, $ret[0]['idgroups']);
         self::assertEquals($group->name, $ret[0]['name']);
+    }
+
+    public function testCreateGroupAsRestarter() {
+        $this->loginAsTestUser(Role::RESTARTER);
+        $response = $this->get('/group/create');
+        $response->assertRedirect('/user/forbidden');
     }
 
     public function testCreateBadLocation()
