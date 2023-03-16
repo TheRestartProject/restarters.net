@@ -633,7 +633,7 @@ class Party extends Model implements Auditable
         if ($newVersion) {
             $start = new Carbon($this->event_start_utc);
             $end = new Carbon($this->event_end_utc);
-            return round(($start->diffInMinutes($end) + 30) / 60);
+            return ceil($start->diffInMinutes($end) / 60);
         }
 
         return 3;

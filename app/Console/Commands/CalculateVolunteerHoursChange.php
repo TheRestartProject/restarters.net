@@ -52,7 +52,7 @@ class CalculateVolunteerHoursChange extends Command
               -- Shorter than currently assumed 3 hours 
               WHERE TIMESTAMPDIFF(HOUR, event_start_utc, event_end_utc) < 3 
               -- Filter out groups with few events 
-              GROUP BY `group` HAVING count > 2 ORDER BY diff DESC ) t INNER JOIN groups ON t.group = groups.idgroups ORDER BY diff DESC"
+              GROUP BY `group` HAVING count > 2 ORDER BY diff DESC ) t INNER JOIN `groups` ON t.group = groups.idgroups ORDER BY diff DESC"
             )
         );
 
