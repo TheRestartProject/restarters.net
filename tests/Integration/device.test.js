@@ -2,6 +2,9 @@ const {test, expect} = require('@playwright/test')
 const { login, createGroup, createEvent, approveEvent, addDevice } = require('./utils')
 
 test('Spare parts set as expected', async ({page, baseURL}) => {
+  // Need to set faker seed so that we get the same data each time for the screenshot.
+  faker.seed(123);
+
   test.slow()
   await login(page, baseURL)
   expect(await page.screenshot()).toMatchSnapshot();

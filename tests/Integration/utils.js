@@ -27,10 +27,10 @@ exports.createGroup = async function(page, baseURL) {
   // await page.goto(baseURL + '/group/create')
 
   // Name
-  await page.fill('#group_name', 'faker.company.companyName()')
+  await page.fill('#group_name', faker.company.companyName())
 
   // Type into the RTE
-  await page.fill('.ql-editor', 'faker.lorem.sentence()')
+  await page.fill('.ql-editor', faker.lorem.sentence())
 
   await page.fill('.timezone', 'Europe/London')
 
@@ -72,7 +72,7 @@ exports.createEvent = async function(page, baseURL, idgroups) {
   await page.click('a[href="/party/create"]')
 
   // Venue name
-  await page.fill('#event_name', 'faker.company.companyName()')
+  await page.fill('#event_name', faker.company.companyName())
 
   // Select the group.  Bit hard to get the select to open, but tabbing from the previous field works.
   await page.click('#event_link')
@@ -80,7 +80,7 @@ exports.createEvent = async function(page, baseURL, idgroups) {
   await page.click('.multiselect__content-wrapper > .multiselect__content > .multiselect__element > .multiselect__option--highlight > span')
 
   // Type into the RTE
-  await page.fill('.ql-editor', 'faker.lorem.sentence()')
+  await page.fill('.ql-editor', faker.lorem.sentence())
 
   // Set a date.
   await page.click('#event_date button')
@@ -116,7 +116,7 @@ exports.createEvent = async function(page, baseURL, idgroups, past) {
   await page.click('a[href="/party/create"]')
 
   // Venue name
-  await page.fill('#event_name', 'faker.company.companyName()')
+  await page.fill('#event_name', faker.company.companyName())
 
   // Select the group.  Bit hard to get the select to open, but tabbing from the previous field works.
   await page.click('#event_link')
@@ -124,7 +124,7 @@ exports.createEvent = async function(page, baseURL, idgroups, past) {
   await page.click('.multiselect__content-wrapper > .multiselect__content > .multiselect__element > .multiselect__option--highlight > span')
 
   // Type into the RTE
-  await page.fill('.ql-editor', 'faker.lorem.sentence()')
+  await page.fill('.ql-editor', faker.lorem.sentence())
 
   // Set a date.
   await page.click('#event_date button')

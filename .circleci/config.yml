@@ -218,6 +218,8 @@ jobs:
       - run: echo "" >> /tmp/.env
       - run: echo GOOGLE_API_CONSOLE_KEY=$GOOGLE_API_CONSOLE_KEY >> /tmp/.env
       - run: sudo cp /tmp/.env /home/circleci/project/.env
+      # Clear out any user groups for the test user from earlier, so that it doesn't affect the screenshots.
+      - run: mysql --host="127.0.0.1" -u root -ps3cr3t -e "use restarters_db;DELETE FROM users_groups"
 
       # Now run the tests.
       - run:
