@@ -81,6 +81,13 @@ use Illuminate\Http\Resources\Json\JsonResource;
  *          ref="#/components/schemas/GroupSummary"
  *     ),
  *     @OA\Property(
+ *          property="approved",
+ *          title="approved",
+ *          description="Whether this event has been approved.",
+ *          format="boolean",
+ *          example="false"
+ *     ),
+ *     @OA\Property(
  *          property="updated_at",
  *          title="updated_at",
  *          description="The last change to this group.  This includes changes which affect the stats.",
@@ -92,7 +99,7 @@ use Illuminate\Http\Resources\Json\JsonResource;
  *          description="Indicates that this is a summary result, not full group information.",
  *          format="boolean",
  *          example="true"
- *     ),
+ *     )
  * )
  */
 
@@ -112,6 +119,7 @@ class PartySummary extends JsonResource
         // peculiarity which I can't get to the bottom of.  So pull it from the resource.
         return [
             'id' => $this->idevents,
+            'approved' => $this->approved ? true : false,
             'start' => $this->event_start_utc,
             'end' => $this->event_end_utc,
             'timezone' => $this->timezone,
