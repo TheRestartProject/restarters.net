@@ -902,7 +902,6 @@ class UserController extends Controller
         $validator = Validator::make($request->all(), $rules);
 
         if ($validator->fails()) {
-            error_log("Fails");
             return redirect()->back()->withErrors($validator)->withInput();
         }
 
