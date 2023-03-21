@@ -222,6 +222,16 @@ class ExportTest extends TestCase
             self::assertEquals(e($event3->getEventName()), e($row2[7]));
         }
 
+        // Export devices as though we are therestartproject.org, which for some reason doesn't contain the model
+        // column.
+        $response = $this->get("/export/devices/event/$idevents1", ['HTTP_REFERER' => 'http://therestartproject.org']);
+        $header = $response->headers->get('content-disposition');
+        $filename = public_path() . '/' . substr($header, strpos($header, 'filename=') + 9);
+        $fh = fopen($filename, 'r');
+        fgetcsv($fh);
+        $row2 = fgetcsv($fh);
+        self::assertEquals(11, count($row2));
+
         // Export time volunteered - first as a web page.
         $response = $this->get("/reporting/time-volunteered?a");
         $response->assertSee($event1->getEventName());
