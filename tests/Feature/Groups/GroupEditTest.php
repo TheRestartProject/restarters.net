@@ -4,6 +4,7 @@ namespace Tests\Feature;
 
 use App\Group;
 use App\GroupTags;
+use App\Role;
 use App\User;
 use Carbon\Carbon;
 use DB;
@@ -30,6 +31,9 @@ class GroupEditTest extends TestCase
 
         $this->actingAs($host);
 
+        $response = $this->get('/group/edit/' . $group->idgroups);
+        $response->assertStatus(200);
+
         $response = $this->patch('/api/v2/groups/' . $group->idgroups, [
             'description' => 'Test',
             'location' => 'London',
@@ -42,6 +46,14 @@ class GroupEditTest extends TestCase
 
         $this->assertEquals(1, count($group->group_tags));
         $this->assertEquals($tag->tag_name, $group->group_tags[0]->tag_name);
+    }
+
+    public function testEditGroupAsRestarter() {
+        $group = Group::factory()->create();
+
+        $this->loginAsTestUser(Role::RESTARTER);
+        $this->expectException(\Symfony\Component\HttpKernel\Exception\HttpException::class);
+        $this->get('/group/edit/' . $group->idgroups);
     }
 
     /** @test */

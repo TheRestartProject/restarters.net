@@ -4,6 +4,18 @@ namespace App\Http\Resources;
 
 use Illuminate\Http\Resources\Json\ResourceCollection;
 
+/**
+ * @OA\Schema(
+ *     title="GroupCollection",
+ *     schema="GroupCollection",
+ *     description="A collection of groups.",
+ *     type="array",
+ *     @OA\Items(
+ *         ref="#/components/schemas/Group"
+ *     )
+ * )
+*/
+
 class GroupCollection extends ResourceCollection
 {
     /**

@@ -33,7 +33,7 @@ class DashboardController extends Controller
 
         $expanded_events = [];
 
-        $upcoming_events = Party::futureForUser()->get();
+        $upcoming_events = Party::futureForUser()->get()->take(5);
 
         foreach ($upcoming_events as $event) {
             $expanded_event = \App\Http\Controllers\PartyController::expandEvent($event, null);
@@ -52,7 +52,7 @@ class DashboardController extends Controller
             ->orderBy('groups.name', 'ASC')
             ->groupBy('groups.idgroups', 'groups.name')
             ->select(['groups.idgroups', 'groups.name'])
-            ->take(3)
+            ->take(5)
             ->get();
 
         if ($your_groups) {
