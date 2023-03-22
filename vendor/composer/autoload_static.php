@@ -425,8 +425,8 @@ class ComposerStaticInitf657da3451727d69be6269822b9691c7
         ),
         'Psr\\Http\\Message\\' => 
         array (
-            0 => __DIR__ . '/..' . '/psr/http-message/src',
-            1 => __DIR__ . '/..' . '/psr/http-factory/src',
+            0 => __DIR__ . '/..' . '/psr/http-factory/src',
+            1 => __DIR__ . '/..' . '/psr/http-message/src',
         ),
         'Psr\\Http\\Client\\' => 
         array (
@@ -474,8 +474,8 @@ class ComposerStaticInitf657da3451727d69be6269822b9691c7
         ),
         'Mediawiki\\Api\\' => 
         array (
-            0 => __DIR__ . '/..' . '/addwiki/mediawiki-api-base/src',
-            1 => __DIR__ . '/..' . '/addwiki/mediawiki-api/src',
+            0 => __DIR__ . '/..' . '/addwiki/mediawiki-api/src',
+            1 => __DIR__ . '/..' . '/addwiki/mediawiki-api-base/src',
         ),
         'Mariuzzo\\LaravelJsLocalization\\' => 
         array (
@@ -561,8 +561,8 @@ class ComposerStaticInitf657da3451727d69be6269822b9691c7
         ),
         'Http\\Message\\' => 
         array (
-            0 => __DIR__ . '/..' . '/php-http/message-factory/src',
-            1 => __DIR__ . '/..' . '/php-http/message/src',
+            0 => __DIR__ . '/..' . '/php-http/message/src',
+            1 => __DIR__ . '/..' . '/php-http/message-factory/src',
         ),
         'Http\\Factory\\Guzzle\\' => 
         array (
