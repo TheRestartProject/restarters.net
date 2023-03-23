@@ -8,14 +8,28 @@ test('Spare parts set as expected', async ({page, baseURL}) => {
 
   test.slow()
   await login(page, baseURL)
+
+  await expect(page.locator('.vue-placeholder-content:visible')).toHaveCount(0);
   expect(await page.screenshot()).toMatchSnapshot({threshold:0.05});
+
   const groupid = await createGroup(page, baseURL)
+
+  await expect(page.locator('.vue-placeholder-content:visible')).toHaveCount(0);
   expect(await page.screenshot()).toMatchSnapshot({threshold:0.05});
+
   const eventid = await createEvent(page, baseURL, groupid, true)
+
+  await expect(page.locator('.vue-placeholder-content:visible')).toHaveCount(0);
   expect(await page.screenshot()).toMatchSnapshot({threshold:0.05});
+
   await approveEvent(page, baseURL, eventid)
+
+  await expect(page.locator('.vue-placeholder-content:visible')).toHaveCount(0);
   expect(await page.screenshot()).toMatchSnapshot({threshold:0.05});
+
   await addDevice(page, baseURL, eventid, true, false, true, true)
+
+  await expect(page.locator('.vue-placeholder-content:visible')).toHaveCount(0);
   expect(await page.screenshot()).toMatchSnapshot({threshold:0.05});
 
   // Should  see spare parts tick in summary.  Two copies because of mobile view.

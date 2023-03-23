@@ -11,6 +11,8 @@ test('Landing page has blurb', async ({page, baseURL}) => {
   await page.goto(baseURL)
   const legend = page.locator('h2').first()
   await expect(legend).toHaveText('Learn and share repair skills with others')
+
+  await expect(page.locator('.vue-placeholder-content:visible')).toHaveCount(0);
   expect(await page.screenshot()).toMatchSnapshot({threshold:0.05});
 })
 
