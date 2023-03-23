@@ -20,7 +20,7 @@ const config = {
       name: 'Desktop Chromium',
       use: {
         browserName: 'chromium',
-        baseURL: 'http://localhost:8000'
+        baseURL: 'http://restarters.test:8000'
       },
     },
     // TODO The other browsers don't work reliably yet.
