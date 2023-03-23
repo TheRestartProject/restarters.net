@@ -40,9 +40,17 @@ class GroupCreateTest extends TestCase
     }
 
     public function testCreateGroupAsRestarter() {
-        $this->loginAsTestUser(Role::RESTARTER);
+        // Restarters can create groups.  This wasn't true in the past and for backwards compatibility the act
+        // of creation should convert them into a host.
+        $user = $this->loginAsTestUser(Role::RESTARTER);
+        $this->assertFalse($user->hasRole(Role::HOST));
         $response = $this->get('/group/create');
-        $response->assertRedirect('/user/forbidden');
+        $response->assertSuccessful();
+        $idgroups = $this->createGroup();
+        $this->assertNotNull($idgroups);
+        $user->refresh();
+        $this->assertEquals(Role::HOST, $user->role);
+        $this->assertTrue($user->hasRole('Host'));
     }
 
     public function testCreateBadLocation()
