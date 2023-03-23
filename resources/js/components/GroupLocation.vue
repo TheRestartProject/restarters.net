@@ -2,16 +2,12 @@
   <div>
     <b-form-group>
       <label :for="$id('address-autocomplete')">{{ __('groups.location') }}:</label>
-      <vue-google-autocomplete
-          :id="$id('address-autocomplete')"
-          name="location"
-          classname="form-control group-location"
-          :placeholder="__('groups.groups_location_placeholder')"
-          @placechanged="placeChanged"
-          aria-describedby="locationHelpBlock"
-          types="geocode"
-          ref="autocomplete"
-          :class="{ hasError: hasError, 'm-0': true }"
+      <div
+        :id="inputid"
+        name="location"
+        aria-describedby="locationHelpBlock"
+        ref="autocomplete"
+        :class="{ hasError: hasError, 'p-0': true, 'm-0': true, 'form-control': true, 'group-location': true }"
       />
       <small id="locationHelpBlock">
       <span class="form-text text-danger" v-if="hasError">
@@ -31,8 +27,10 @@
 </template>
 <script>
 import Vue from 'vue'
-import VueGoogleAutocomplete from 'vue-google-autocomplete'
 import UniqueId from 'vue-unique-id';
+import mapboxgl from "mapbox-gl";
+import MapboxGeocoder from '@mapbox/mapbox-gl-geocoder';
+import '@mapbox/mapbox-gl-geocoder/dist/mapbox-gl-geocoder.css';
 
 Vue.use(UniqueId);
 
@@ -84,21 +82,51 @@ export default {
       default: false
     }
   },
-  components: {
-    VueGoogleAutocomplete
-  },
   data () {
     return {
       currentValue: null,
       location: null,
       currentPostcode: null,
       timer: null,
+      inputid: null
     }
   },
   mounted() {
-    this.currentValue = this.value
-    this.currentPostcode = this.postcode
-    this.$refs.autocomplete.update(this.currentValue)
+    try {
+      console.log('Mounted')
+      this.inputid = this.$id('address-autocomplete')
+      this.currentValue = this.value
+      this.currentPostcode = this.postcode
+      // this.$refs.autocomplete.update(this.currentValue)
+
+      this.wait
+      const token = document.getElementById('mapboxtoken')
+      console.log('token', token)
+
+      mapboxgl.accessToken = token.textContent;
+
+      var geocoder = new MapboxGeocoder({
+        accessToken: mapboxgl.accessToken,
+        types: 'country,region,place,postcode,locality,neighborhood',
+        placeholder: this.$lang.get('groups.groups_location_placeholder')
+      });
+
+      // Tick to pick up id value.
+      this.$nextTick(() => {
+        console.log('Add', '#' + this.inputid, document.getElementById(this.inputid).length)
+        geocoder.addTo('#' + this.inputid);
+        console.log('added')
+      })
+
+      geocoder.on('result', (e) => {
+        this.currentValue = e.result.place_name
+        this.$emit('update:value', e.result.place_name)
+        this.$emit('update:lat', e.result.center[1])
+        this.$emit('update:lng', e.result.center[0])
+      });
+    } catch (e) {
+      console.error('mount',e)
+    }
   },
   watch: {
     currentPostcode(newVal) {
@@ -107,11 +135,12 @@ export default {
   },
   methods: {
     placeChanged(addressData, placeResultData) {
-      this.currentValue = placeResultData.formatted_address
-      this.$emit('update:value', this.currentValue)
-      this.$emit('update:lat', addressData.latitude)
-      this.$emit('update:lng', addressData.longitude)
     },
   }
 }
 </script>
+<style scoped lang="scss">
+::v-deep(.mapboxgl-ctrl-geocoder) {
+  width: 100% !important;
+}
+</style>
