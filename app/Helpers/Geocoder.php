@@ -15,6 +15,7 @@ class Geocoder
             $addressCollection = $geocodeResponse->get();
             $address = $addressCollection->get(0);
             if ($address) {
+                echo "Geocoded $location to ".$address->getCoordinates()->getLatitude().','.$address->getCoordinates()->getLongitude()."\n";
                 return [
                     'latitude' => $address->getCoordinates()->getLatitude(),
                     'longitude' => $address->getCoordinates()->getLongitude(),
