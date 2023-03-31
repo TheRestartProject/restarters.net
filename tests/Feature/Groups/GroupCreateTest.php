@@ -44,6 +44,18 @@ class GroupCreateTest extends TestCase
         // of creation should convert them into a host.
         $user = $this->loginAsTestUser(Role::RESTARTER);
         $this->assertFalse($user->hasRole(Role::HOST));
+
+        // Should see create button.
+        $response = $this->get('/group');
+        $response->assertSuccessful();
+        $props = $this->assertVueProperties($response, [
+            [],
+            [
+                ':can-create' => 'true',
+            ],
+        ]);
+
+        // Should be able to create a group.
         $response = $this->get('/group/create');
         $response->assertSuccessful();
         $idgroups = $this->createGroup();
