@@ -554,7 +554,7 @@ class Party extends Model implements Auditable
         ];
     }
 
-    public function getEventStats($eEmissionRatio = null, $uEmissionratio = null, $includeFuture = false, $newVersion = false)
+    public function getEventStats($eEmissionRatio = null, $uEmissionratio = null, $includeFuture = false)
     {
         $displacementFactor = \App\Device::getDisplacementFactor();
         if (is_null($eEmissionRatio)) {
@@ -619,7 +619,7 @@ class Party extends Model implements Auditable
         $result['participants'] = $this->pax ?? 0;
         $result['volunteers'] = $this->volunteers ?? 0;
         $result['invited'] = $this->allInvited->count();
-        $result['hours_volunteered'] = $this->hoursVolunteered($newVersion);
+        $result['hours_volunteered'] = $this->hoursVolunteered();
 
         return $result;
     }
@@ -629,21 +629,17 @@ class Party extends Model implements Auditable
         return $this->hasMany(\App\Device::class, 'event', 'idevents');
     }
 
-    public function lengthInHours($newVersion = FALSE) {
-        if ($newVersion) {
-            $start = new Carbon($this->event_start_utc);
-            $end = new Carbon($this->event_end_utc);
-            return ceil($start->diffInMinutes($end) / 60);
-        }
-
-        return 3;
+    public function lengthInHours() {
+        $start = new Carbon($this->event_start_utc);
+        $end = new Carbon($this->event_end_utc);
+        return ceil($start->diffInMinutes($end) / 60);
     }
 
-    public function hoursVolunteered($newVersion = FALSE)
+    public function hoursVolunteered()
     {
         if (! $this->cancelled) {
             // Get difference in hours between start and end.  Make sure we round up.
-            $lengthOfEventInHours = $this->lengthInHours($newVersion);
+            $lengthOfEventInHours = $this->lengthInHours();
             $extraHostHours = 9;
             $hoursIfNoVolunteersRecorded = 12;
 
