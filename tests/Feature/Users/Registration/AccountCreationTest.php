@@ -84,10 +84,22 @@ class AccountCreationTest extends TestCase
         $response->assertStatus(302);
         $response->assertRedirect('dashboard');
 
-        $response = $this->post('/user/register/', $this->userAttributes());
+        // Also require my_name when logged in.
+        $response = $this->post('/user/register/', [
+            'age'                 => 1950,
+            'country'             => 'GBR',
+            'my_name'             => 'honeypot',
+            'my_time'             => time(),
+            'consent_gdpr'        => true,
+            'consent_past_data'   => true,
+            'consent_future_data' => true,
+        ]);
 
         $response->assertStatus(302);
-        $response->assertRedirect('');
+        $response->assertRedirect('dashboard');
+
+        \Auth::user()->refresh();
+        $this->assertEquals(1950, \Auth::user()->age);
     }
 
     public function testLogout()
