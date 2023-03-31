@@ -356,7 +356,6 @@ class Party extends Model implements Auditable
     public function scopeFutureForUser($query, $userids = null) {
         $this->defaultUserIds($userids);
         $query = $query->forUser(null)->future($userids)->reorder()->orderBy('event_start_utc', 'ASC');
-        error_log($query->toSql());
         return $query;
     }
 
