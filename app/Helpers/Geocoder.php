@@ -11,11 +11,10 @@ class Geocoder
     public function geocode($location)
     {
         if ($location != 'ForceGeocodeFailure') {
-            $geocodeResponse = app('geocoder')->geocodeQuery(GeocodeQuery::create($location)->withData('location_type', Mapbox::TYPE_PLACE));
+            $geocodeResponse = app('geocoder')->geocodeQuery(GeocodeQuery::create($location)->withData('location_type', [ Mapbox::TYPE_PLACE, Mapbox::TYPE_ADDRESS ]));
             $addressCollection = $geocodeResponse->get();
             $address = $addressCollection->get(0);
             if ($address) {
-                echo "Geocoded $location to ".$address->getCoordinates()->getLatitude().','.$address->getCoordinates()->getLongitude()."\n";
                 return [
                     'latitude' => $address->getCoordinates()->getLatitude(),
                     'longitude' => $address->getCoordinates()->getLongitude(),
