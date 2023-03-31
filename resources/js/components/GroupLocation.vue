@@ -93,19 +93,15 @@ export default {
   },
   mounted() {
     try {
-      console.log('Mounted')
       this.inputid = this.$id('address-autocomplete')
       this.currentValue = this.value
       this.currentPostcode = this.postcode
-      // this.$refs.autocomplete.update(this.currentValue)
 
-      this.wait
       const token = document.getElementById('mapboxtoken')
-      console.log('token', token)
 
       mapboxgl.accessToken = token.textContent;
 
-      var geocoder = new MapboxGeocoder({
+      this.geocoder = new MapboxGeocoder({
         accessToken: mapboxgl.accessToken,
         types: 'country,region,place,postcode,locality,neighborhood',
         placeholder: this.$lang.get('groups.groups_location_placeholder')
@@ -113,19 +109,17 @@ export default {
 
       // Tick to pick up id value.
       this.$nextTick(() => {
-        console.log('Add', '#' + this.inputid, document.getElementById(this.inputid).length)
-        geocoder.addTo('#' + this.inputid);
-        console.log('added')
+        this.geocoder.addTo('#' + this.inputid);
       })
 
-      geocoder.on('result', (e) => {
+      this.geocoder.on('result', (e) => {
         this.currentValue = e.result.place_name
         this.$emit('update:value', e.result.place_name)
         this.$emit('update:lat', e.result.center[1])
         this.$emit('update:lng', e.result.center[0])
       });
     } catch (e) {
-      console.error('mount',e)
+      console.error('Error setting up autocomplete',e)
     }
   },
   watch: {
@@ -133,10 +127,6 @@ export default {
       this.$emit('update:postcode', newVal)
     },
   },
-  methods: {
-    placeChanged(addressData, placeResultData) {
-    },
-  }
 }
 </script>
 <style scoped lang="scss">
