@@ -630,19 +630,15 @@ class Party extends Model implements Auditable
     }
 
     public function lengthInHours() {
-//        Code for when we fix this.
-//        $start = new Carbon($this->event_start_utc);
-//        $end = new Carbon($this->event_end_utc);
-//        return round(($start->diffInMinutes($end) + 30) / 60);
-        return 3;
+        $start = new Carbon($this->event_start_utc);
+        $end = new Carbon($this->event_end_utc);
+        return ceil($start->diffInMinutes($end) / 60);
     }
 
     public function hoursVolunteered()
     {
         if (! $this->cancelled) {
             // Get difference in hours between start and end.  Make sure we round up.
-            $start = new Carbon($this->event_start_utc);
-            $end = new Carbon($this->event_end_utc);
             $lengthOfEventInHours = $this->lengthInHours();
             $extraHostHours = 9;
             $hoursIfNoVolunteersRecorded = 12;
