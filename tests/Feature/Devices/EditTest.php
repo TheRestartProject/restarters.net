@@ -3,6 +3,8 @@
 namespace Tests\Feature;
 
 use App\Device;
+use App\Group;
+use App\Network;
 use App\Party;
 use App\User;
 use DB;
@@ -50,6 +52,39 @@ class EditTest extends TestCase
             'HTTP_X-Requested-With' => 'XMLHttpRequest'
         ]);
         self::assertFalse($rsp['success']);
+    }
+
+    public function testEditAsNetworkCoordinator()
+    {
+        $network = Network::factory()->create();
+        $group = Group::factory()->create();
+        $network->addGroup($group);
+
+        $event = Party::factory()->create(['group' => $group->idgroups]);
+        $event->wordpress_post_id = 100;
+        $event->approved = true;
+        $event->save();
+
+        // Make an admin who is also a network controller.
+        $coordinator = User::factory()->networkCoordinator()->create();
+        $network->addCoordinator($coordinator);
+        $this->actingAs($coordinator);
+
+        $device_inputs = Device::factory()->raw([
+                                                  'event_id' => $event->idevents,
+                                                  'quantity' => 1,
+                                              ]);
+
+        $rsp = $this->post('/device/create', $device_inputs);
+        self::assertTrue($rsp['success']);
+        $iddevices = $rsp['devices'][0]['iddevices'];
+        self::assertNotNull($iddevices);
+
+        # Edit the quantity.
+        $atts = $device_inputs;
+        $atts['quantity'] = 2;
+        $rsp = $this->post('/device/edit/' . $iddevices, $atts);
+        self::assertEquals('Device updated!', $rsp['success']);
     }
 
     public function testDeviceEditAddImage() {

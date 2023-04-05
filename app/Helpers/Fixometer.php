@@ -203,6 +203,7 @@ class Fixometer
         if (self::hasRole($user, 'Administrator')) {
             return true;
         }
+
         if (self::hasRole($user, 'NetworkCoordinator')) {
             $group = Party::find($eventId)->theGroup;
             foreach ($group->networks as $network) {
@@ -220,10 +221,20 @@ class Fixometer
         if (is_null($userId)) {
             $userId = Auth::user()->id;
         }
+        $user = User::find($userId);
 
         // Admins can do anything.
-        if (self::hasRole(Auth::user(), 'Administrator')) {
+        if (self::hasRole($user, 'Administrator')) {
             return true;
+        }
+
+        if (self::hasRole($user, 'NetworkCoordinator')) {
+            $group = Party::find($partyId)->theGroup;
+            foreach ($group->networks as $network) {
+                if ($network->coordinators->contains($user)) {
+                    return true;
+                }
+            }
         }
 
         // Hosts of a group can do anything with events from that group.
