@@ -4,6 +4,7 @@ namespace Tests\Feature;
 
 use App\EventsUsers;
 use App\Group;
+use App\Network;
 use App\Party;
 use App\User;
 use DB;
@@ -17,7 +18,10 @@ class CalendarTest extends TestCase
     {
         parent::setUp();
 
-        // Create a group, event, user.
+        // Create a network, group, event, user.
+        $network = Network::factory()->create();
+        $this->network = $network;
+
         $host = User::factory()->create([
                                                  'latitude' => 50.64,
                                                  'longitude' => 5.58,
@@ -33,6 +37,7 @@ class CalendarTest extends TestCase
                                                    'approved' => true,
                                                    'area' => 'London'
                                                ]);
+        $network->addGroup($group);
         $group->addVolunteer($host);
         $group->makeMemberAHost($host);
         $group->approved = true;
@@ -95,6 +100,20 @@ class CalendarTest extends TestCase
         // No events.
         $this->expectException(NotFoundHttpException::class);
         $response = $this->get('/calendar/group/' . $this->group2->idgroups);
+    }
+
+    public function testByNetwork() {
+        // One event.
+        $response = $this->get('/calendar/network/' . $this->network->id);
+        $response->assertStatus(200);
+        $this->expectOutputRegex('/VEVENT/');
+        $this->expectOutputString($this->start);
+        $this->expectOutputString($this->end);
+
+        // No events.
+        $network = Network::factory()->create();
+        $this->expectException(NotFoundHttpException::class);
+        $response = $this->get('/calendar/network/' . $network->id);
     }
 
     public function testByArea() {
