@@ -15,6 +15,7 @@ use App\Notifications\AdminModerationGroup;
 use App\Notifications\GroupConfirmed;
 use App\Notifications\NewGroupWithinRadius;
 use App\Party;
+use App\Role;
 use App\Rules\Timezone;
 use App\User;
 use App\UserGroups;
@@ -625,7 +626,7 @@ class GroupController extends Controller
                                'user' => $user->id,
                                'group' => $idGroup,
                                'status' => 1,
-                               'role' => 3,
+                               'role' => Role::HOST,
                            ]);
 
         if (isset($_FILES) && !empty($_FILES)) {

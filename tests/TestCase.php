@@ -188,14 +188,14 @@ abstract class TestCase extends BaseTestCase
             // Currently logged in user should be present, with status 1 = approved.
             $member = UserGroups::where('group', $idgroups)->first();
             $this->assertEquals(1, $member->status);
-            $this->assertEquals(3, $member->role);
+            $this->assertEquals(Role::HOST, $member->role);
             $this->assertEquals(Auth::user()->id, $member->user);
         }
 
         return $idgroups;
     }
 
-    public function createEvent($idgroups, $date)
+    public function createEvent($idgroups, $date, $assert = true, $approve = false)
     {
         // Create a party for the specific group.
         $eventAttributes = Party::factory()->raw();
@@ -204,19 +204,43 @@ abstract class TestCase extends BaseTestCase
         $event_start = Carbon::createFromTimestamp(strtotime($date))->setTimezone('UTC');
         $event_end = Carbon::createFromTimestamp(strtotime($date))->setTimezone('UTC')->addHour(2);
 
-        $eventAttributes['event_start_utc'] = $event_start->toIso8601String();
-        $eventAttributes['event_end_utc'] = $event_end->toIso8601String();
+        // We create groups using the API.
+        $user = Auth::user();
 
-        $response = $this->post('/party/create/', $eventAttributes);
+        $this->lastResponse = $this->post('/api/v2/events?api_token=' . $user->api_token, [
+            'groupid' => $idgroups,
+            'start' => $event_start->toIso8601String(),
+            'end' => $event_end->toIso8601String(),
+            'title' => $eventAttributes['venue'],
+            'location' => $eventAttributes['location'],
+            'description' => $eventAttributes['free_text'],
+            'timezone' => $eventAttributes['timezone']
+        ]);
+
+        if ($assert) {
+            $this->assertTrue($this->lastResponse->isSuccessful());
+            $json = json_decode($this->lastResponse->getContent(), true);
+            $this->assertTrue(array_key_exists('id', $json));
+            $idevents = $json['id'];
+
+            if ($approve) {
+                $party = Party::findOrFail($idevents);
+                $party->approved = true;
+                $party->save();
+            }
+
+            // Currently logged in user should be present, with status 1 = approved.
+            $member = EventsUsers::where('event', $idevents)->first();
+            $this->assertEquals(1, $member->status);
+            $this->assertEquals(Role::HOST, $member->role);
+            $this->assertEquals($user->id, $member->user);
+        }
 
         // Need to reformat start/end for row comparison.
         $eventAttributes['event_start_utc'] = $event_start->toDateTimeString();
         $eventAttributes['event_end_utc'] = $event_end->toDateTimeString();
 
         $this->assertDatabaseHas('events', $eventAttributes);
-        $redirectTo = $response->getTargetUrl();
-        $p = strrpos($redirectTo, '/');
-        $idevents = substr($redirectTo, $p + 1);
 
         return $idevents;
     }
