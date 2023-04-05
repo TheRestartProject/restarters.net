@@ -406,4 +406,22 @@ abstract class TestCase extends BaseTestCase
 
         return $response;
     }
+
+    /**
+     * Convert the internal attribute names to the names used in the v2 API.  We have this because some of the tests
+     * use getAttributes() for convenience, which returns the internal attribute names, and then calls the API with
+     * them.
+     *
+     * @param $atts
+     * @return void
+     */
+
+    public function eventAttributesToAPI($atts) {
+        $atts['title'] = $atts['venue'];
+        $atts['description'] = $atts['free_text'];
+        $atts['start'] = Carbon::parse($atts['event_start_utc'])->setTimezone('UTC')->toIso8601String();
+        $atts['end'] = Carbon::parse($atts['event_end_utc'])->setTimezone('UTC')->toIso8601String();
+
+        return $atts;
+    }
 }
