@@ -22,6 +22,13 @@
       </span>
       </small>
     </b-form-group>
+    <GroupLocationMap
+        :lat.sync="currentLat"
+        :lng.sync="currentLng"
+        class="group-locationmap"
+        ref="locationmap"
+        v-if="showMap"
+    />
     <b-form-group>
       <label for="group_postcode">{{ __('groups.postcode') }}:</label>
       <b-input id="group_postcode" name="postcode" v-model="currentPostcode" :class="{ hasError: hasError }" :readonly="!canEditPostcode" />
@@ -33,6 +40,7 @@
 import Vue from 'vue'
 import VueGoogleAutocomplete from 'vue-google-autocomplete'
 import UniqueId from 'vue-unique-id';
+import GroupLocationMap from './GroupLocationMap'
 
 Vue.use(UniqueId);
 
@@ -85,11 +93,15 @@ export default {
     }
   },
   components: {
-    VueGoogleAutocomplete
+    VueGoogleAutocomplete,
+    GroupLocationMap,
   },
   data () {
     return {
       currentValue: null,
+      showMap: false,
+      currentLat: null,
+      currentLng: null,
       location: null,
       currentPostcode: null,
       timer: null,
@@ -97,6 +109,9 @@ export default {
   },
   mounted() {
     this.currentValue = this.value
+    this.currentLat = this.lat
+    this.currentLng = this.lng
+    this.showMap = this.lat || this.lng
     this.currentPostcode = this.postcode
     this.$refs.autocomplete.update(this.currentValue)
   },
@@ -104,13 +119,20 @@ export default {
     currentPostcode(newVal) {
       this.$emit('update:postcode', newVal)
     },
+    currentLat(newVal) {
+      this.$emit('update:lat', newVal)
+    },
+    currentLng(newVal) {
+      this.$emit('update:lng', newVal)
+    },
   },
   methods: {
     placeChanged(addressData, placeResultData) {
       this.currentValue = placeResultData.formatted_address
+      this.currentLat = addressData.latitude
+      this.currentLng = addressData.longitude
+      this.showMap = true
       this.$emit('update:value', this.currentValue)
-      this.$emit('update:lat', addressData.latitude)
-      this.$emit('update:lng', addressData.longitude)
     },
   }
 }

@@ -53,14 +53,6 @@
           :has-error="$v.location.$error"
           ref="location"
       />
-      <GroupLocationMap
-          :lat="lat"
-          :lng="lng"
-          class="group-locationmap"
-          ref="locationmap"
-          :id="lat + ',' + lng"
-          v-if="lat || lng"
-      />
       <GroupTimeZone
           :value.sync="timezone"
           class="group-timezone"
@@ -174,7 +166,6 @@ import validationHelpers from '../mixins/validationHelpers'
 import GroupName from './GroupName'
 import GroupWebsite from './GroupWebsite'
 import GroupLocation from './GroupLocation'
-import GroupLocationMap from './GroupLocationMap'
 import GroupTimeZone from './GroupTimeZone'
 import GroupPhone from './GroupPhone'
 import GroupImage from './GroupImage'
@@ -190,7 +181,6 @@ export default {
     GroupName,
     GroupWebsite,
     GroupLocation,
-    GroupLocationMap,
     GroupPhone,
     GroupImage
   },
@@ -365,6 +355,8 @@ export default {
               website: this.website,
               description: this.description,
               location: this.location,
+              latitude: this.lat,
+              longitude: this.lng,
               postcode: this.postcode,
               area: this.area,
               timezone: this.timezone,
@@ -389,6 +381,8 @@ export default {
                 website: this.website,
                 description: this.description,
                 location: this.location,
+                latitude: this.lat,
+                longitude: this.lng,
                 postcode: this.postcode,
                 area: this.area,
                 timezone: this.timezone,
@@ -435,7 +429,7 @@ export default {
   grid-template-columns: 1fr;
 
   @include media-breakpoint-up(lg) {
-    grid-template-columns: 2fr 1.5fr 1fr;
+    grid-template-columns: 2fr 1.5fr;
   }
 
   .group-name {
@@ -461,24 +455,15 @@ export default {
   .group-location {
     grid-row: 4 / 5;
     grid-column: 1 / 2;
+    padding-top: 0.1rem;
 
     ::v-deep(.btn) {
       font-size: 16px;
     }
 
     @include media-breakpoint-up(lg) {
-      grid-row: 1 / 2;
-      grid-column: 2 / 3;
-    }
-  }
-
-  .group-locationmap {
-    grid-row: 5 / 6;
-    grid-column: 1 / 2;
-
-    @include media-breakpoint-up(lg) {
       grid-row: 1 / 4;
-      grid-column: 3 / 4;
+      grid-column: 2 / 3;
     }
   }
 
@@ -488,7 +473,7 @@ export default {
     margin-right: 2px;
 
     @include media-breakpoint-up(lg) {
-      grid-row: 2 / 3;
+      grid-row: 4 / 5;
       grid-column: 2 / 3;
     }
   }
@@ -499,7 +484,7 @@ export default {
     margin-right: 2px;
 
     @include media-breakpoint-up(lg) {
-      grid-row: 3 / 4;
+      grid-row: 5 / 6;
       grid-column: 2 / 3;
     }
   }
@@ -510,7 +495,7 @@ export default {
     margin-right: 2px;
 
     @include media-breakpoint-up(lg) {
-      grid-row: 4 / 5;
+      grid-row: 6 / 7;
       grid-column: 2 / 3;
     }
   }

@@ -1,20 +1,23 @@
 <template>
-  <l-map
-      class="map"
-      ref="group-map"
-      :zoom="11"
-      :center="[lat, lng]"
-      :style="'width: 100%; height: 200px'"
-  >
-    <l-tile-layer :url="tiles" :attribution="attribution" />
-    <l-marker :lat-lng="[lat, lng]" :interactive="false" />
-  </l-map>
+  <div>
+    {{ __('partials.dragmap') }}
+    <div ref="mapcontainer" :style="'width: 100%; height: ' + mapHeight + 'px'">
+      <DraggableMap
+          v-if="showMap && (lat || lng)"
+          :initial-lat="lat"
+          :initial-lng="lng"
+          :initial-zoom="11"
+          @lat-changed="$emit('update:lat', $event)"
+          @lng-changed="$emit('update:lng', $event)"
+      />
+    </div>
+  </div>
 </template>
 <script>
-import map from '../mixins/map'
+import DraggableMap from './DraggableMap'
 
 export default {
-  mixins: [ map ],
+  components: {DraggableMap},
   props: {
     lat: {
       type: Number,
@@ -27,5 +30,17 @@ export default {
       default: null
     },
   },
+  data () {
+    return {
+      mapHeight: null,
+      showMap: false,
+    }
+  },
+  mounted () {
+    this.mapHeight = this.$refs.mapcontainer.clientWidth
+    this.$nextTick(() => {
+      this.showMap = true
+    })
+  }
 }
 </script>

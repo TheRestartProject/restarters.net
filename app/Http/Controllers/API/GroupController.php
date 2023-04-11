@@ -852,13 +852,13 @@ class GroupController extends Controller
         $area = $request->input('area');
         $postcode = $request->input('postcode', '');
         $location = $request->input('location');
+        $latitude = $request->input('latitude', null);
+        $longitude = $request->input('longitude', null);
         $phone = $request->input('phone');
         $website = $request->input('website');
         $description = $request->input('description');
         $timezone = $request->input('timezone');
 
-        $latitude = null;
-        $longitude = null;
         $country = null;
 
         if ($timezone && !in_array($timezone, \DateTimeZone::listIdentifiers(\DateTimeZone::ALL_WITH_BC))) {
@@ -874,9 +874,13 @@ class GroupController extends Controller
                 throw ValidationException::withMessages(['location ' => __('groups.geocode_failed')]);
             }
 
-            $latitude = $geocoded['latitude'];
-            $longitude = $geocoded['longitude'];
             $country = $geocoded['country'];
+
+            if ($latitude == null || $longitude == null) {
+                // We have no lat/lng from the client, so use the geocoded location.
+                $latitude = $geocoded['latitude'];
+                $longitude = $geocoded['longitude'];
+            }
         }
 
         return array(
