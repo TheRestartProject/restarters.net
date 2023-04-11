@@ -26,6 +26,7 @@ jobs:
           - MYSQL_DATABASE: restarters_db
           - MYSQL_USER: restarters
           - MYSQL_PASSWORD: s3cr3t
+          - TZ: "UTC"
       - image: mcr.microsoft.com/playwright:focal
         environment:
           NODE_ENV: development
