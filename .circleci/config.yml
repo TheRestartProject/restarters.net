@@ -171,6 +171,9 @@ jobs:
       - run: npx playwright install-deps
       - run: npm install -D @playwright/test
 
+      # One of the migration scripts creates a function, and another creates a trigger.  Even though the function
+      # specifies DETERMINISTIC, we still seem to need to set this flag.
+      - run: mysql --host="127.0.0.1" -u root -ps3cr3t -e "SET GLOBAL log_bin_trust_function_creators = 1;"
       - run: php artisan key:generate
       - run: php artisan migrate
       - run: php artisan l5-swagger:generate
