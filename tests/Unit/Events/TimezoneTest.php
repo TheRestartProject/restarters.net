@@ -53,11 +53,12 @@ class TimezoneTest extends TestCase
            'timezone' => 'Asia/Samarkand'
         ]);
 
-        // Create an event in a different timezone, using local times.
+        // Create an event.  Starting with MySQL 8, any trailing timezone will be processed, whereas previously
+        // it was ignored.  So don't add one.
         $e = Party::factory()->create([
             'group' => $g->idgroups,
-            'event_start_utc' => '2021-02-01T10:15:05+05:00',
-            'event_end_utc' => '2021-02-01T13:45:05+05:00',
+            'event_start_utc' => '2021-02-01T10:15:05',
+            'event_end_utc' => '2021-02-01T13:45:05',
             'timezone' => NULL
         ]);
 

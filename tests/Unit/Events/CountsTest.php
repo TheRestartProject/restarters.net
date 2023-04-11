@@ -26,10 +26,12 @@ class CountsTest extends TestCase
         $group = Group::factory()->create();
         $network->addGroup($group);
 
+        // Create an event.  Starting with MySQL 8, any trailing timezone will be processed, whereas previously
+        // it was ignored.  So don't add one.
         $event = Party::factory()->create([
             'group' => $group,
-            'event_start_utc' => '2130-01-01T10:15:05+05:00',
-            'event_end_utc' => '2130-01-01T13:45:05+05:00',
+            'event_start_utc' => '2130-01-01T10:15:05',
+            'event_end_utc' => '2130-01-01T13:45:05',
         ]);
 
         // Delete all events - can hang around in the DB because the relation doesn't cascade the deletes.
