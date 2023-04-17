@@ -4,20 +4,20 @@
       <div class="action-text-left float-left d-flex flex-row">
         <div class="action-text mb-0">
           <div class='mb-2'>
-            <span class='badge badge-warning'>NEW!</span>
-            <strong>Are you a Paypal user? Help us maintain & improve this site &#128154;</strong>
+            <!-- <span class='badge badge-warning'>NEW!</span> -->
+            <strong>Help sustain this site today and double your impact 🤩</strong>
           </div>
           <p>
-            As people interested in repair, we all understand the importance of maintenance. It’s not always flashy,
-            but it is fundamental and Restarters.net is no exception. Right now, we’re asking you to help by making
-            a donation, if you can. Throughout August, <b>all donations will be doubled by Paypal Giving Fund</b>, so
-            there’s never been a better time to support us! Thank you &#128591;
+              Restarters.net is free to use, but not to run. We work hard to keep the lights on and
+              <a href="https://talk.restarters.net/t/restarters-net-software-updates-changelog/1511" target="_blank" rel="noopener">build improvements</a>.
+              Until 27 April, any donation you make to Restart will be <strong>doubled</strong> by The Big Give!
+              Please consider supporting us this week to help us make repair a reality and keep this site running.
           </p>
         </div>
       </div>
 
       <div class="float-right mt-3 mt-sm-0">
-          <a href='https://www.paypal.com/gb/fundraiser/charity/61071' class='btn btn-md btn-primary btn-block' title=''>Donate now</a>
+          <a href='https://tinyurl.com/restartersbiggive' class='btn btn-md btn-primary btn-block' target="_blank" rel="noopener" title=''>Donate</a>
       </div>
     </div>
   </b-alert>
@@ -30,7 +30,7 @@ export default {
     return {
       // Change this id to something unique each time you edit this - it's used to remember not to show dismissed
       // banners.
-      id: 'paypal',
+      id: 'biggive2023',
 
       // Change this to 'secondary' for yellow or 'danger' for pink.
       variant: 'secondary'
@@ -40,7 +40,7 @@ export default {
     bannerActive() {
       var now = moment()
 
-      return now.isBefore('2022-08-31 12:00')
+      return now.isAfter('2023-04-20 00:01') && now.isBefore('2023-04-27 23:59')
     },
     show() {
       let ret = true
