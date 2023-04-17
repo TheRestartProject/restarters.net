@@ -9,7 +9,7 @@
           </div>
           <p>
               Restarters.net is free to use, but not to run. We work hard to keep the lights on and
-              <a href="https://talk.restarters.net/t/restarters-net-software-updates-changelog/1511" target="_blank">build improvements</a>.
+              <a href="https://talk.restarters.net/t/restarters-net-software-updates-changelog/1511" target="_blank" rel="noopener">build improvements</a>.
               Until 27 April, any donation you make to Restart will be <strong>doubled</strong> by The Big Give!
               Please consider supporting us this week to help us make repair a reality and keep this site running.
           </p>
@@ -17,7 +17,7 @@
       </div>
 
       <div class="float-right mt-3 mt-sm-0">
-          <a href='https://tinyurl.com/restartersbiggive' class='btn btn-md btn-primary btn-block' target="_blank" title=''>Donate</a>
+          <a href='https://tinyurl.com/restartersbiggive' class='btn btn-md btn-primary btn-block' target="_blank" rel="noopener" title=''>Donate</a>
       </div>
     </div>
   </b-alert>
