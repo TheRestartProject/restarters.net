@@ -267,7 +267,7 @@ class Party extends Model implements Auditable
     public function scopeFuture($query) {
         // A future event is an event where the start time is greater than now.
         $query = $query->undeleted();
-        $query = $query->where('event_start_utc', '>', date('Y-m-d H:i:s'));
+        $query = $query->where('event_start_utc', '>', date('Y-m-d H:i:s'))->orderBy('event_start_utc','ASC');
         return $query;
     }
 
@@ -336,10 +336,15 @@ class Party extends Model implements Auditable
         //
         // The queries here are not desperately efficient, but we're battling Eloquent a bit.  The data size is
         // low enough it's not really an issue.
+        //
+        // The parent may want to specify an ORDER BY.  The parent can't use the reorder() method because it
+        // doesn't seem to go deep enough to penetrate a UNION query.  So we have to use reorder() here to strip out
+        // any ORDER BY introduced by other scopes, and then rely on the parent to specify an ORDER BY if they
+        // want one.
         $this->defaultUserIds($userids);
-        $hostFor = Party::with('theGroup.networks')->hostFor($userids);
-        $attending = Party::with('theGroup.networks')->attendingOrAttended($userids);
-        $memberOf = Party::with('theGroup.networks')->memberOfGroup($userids);
+        $hostFor = Party::with('theGroup.networks')->hostFor($userids)->reorder();
+        $attending = Party::with('theGroup.networks')->attendingOrAttended($userids)->reorder();
+        $memberOf = Party::with('theGroup.networks')->memberOfGroup($userids)->reorder();
 
         // In theory $query could contain something other than all().
         return $query->whereIn('idevents', $hostFor->
@@ -350,13 +355,13 @@ class Party extends Model implements Auditable
 
     public function scopeFutureForUser($query, $userids = null) {
         $this->defaultUserIds($userids);
-        $query = $query->forUser()->future($userids);
+        $query = $query->forUser(null)->future($userids)->reorder()->orderBy('event_start_utc', 'ASC');
         return $query;
     }
 
     public function scopePastForUser($query, $userids = null) {
         $this->defaultUserIds($userids);
-        $query = $query->forUser()->past($userids);
+        $query = $query->forUser(null)->past($userids)->reorder()->orderBy('event_start_utc', 'DESC');
         return $query;
     }
 
