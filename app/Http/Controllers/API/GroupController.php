@@ -15,6 +15,7 @@ use App\Notifications\AdminModerationGroup;
 use App\Notifications\GroupConfirmed;
 use App\Notifications\NewGroupWithinRadius;
 use App\Party;
+use App\Role;
 use App\Rules\Timezone;
 use App\User;
 use App\UserGroups;
@@ -582,8 +583,8 @@ class GroupController extends Controller
      *  )
      */
     public function createGroupv2(Request $request) {
-        // TODO Should we restrict group creation to non-Restarters?  The code in GroupController does.
         $user = $this->getUser();
+        $user->convertToHost();
 
         list($name, $area, $postcode, $location, $phone, $website, $description, $timezone, $latitude, $longitude, $country) = $this->validateGroupParams(
             $request,

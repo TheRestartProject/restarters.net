@@ -115,7 +115,7 @@ class PartyController extends Controller
             $group = Group::find($group_id);
         } else {
             // This is a logged-in user's events page.  We want all relevant events.
-            foreach (Party::forUser()->get() as $event) {
+            foreach (Party::forUser(null)->reorder()->orderBy('event_start_utc', 'DESC')->get() as $event) {
                 $e = \App\Http\Controllers\PartyController::expandEvent($event, NULL);
                 $events[] = $e;
             }

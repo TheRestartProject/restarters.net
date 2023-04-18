@@ -99,8 +99,8 @@ class GroupController extends Controller
     {
         $user = User::find(Auth::id());
 
-        // Only administrators can add groups
-        if (Fixometer::hasRole($user, 'Restarter')) {
+        // Anyone who is logged in can create a group.
+        if (!$user) {
             return redirect('/user/forbidden');
         }
 
