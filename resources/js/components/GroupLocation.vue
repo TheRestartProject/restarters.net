@@ -2,16 +2,12 @@
   <div>
     <b-form-group>
       <label :for="$id('address-autocomplete')">{{ __('groups.location') }}:</label>
-      <vue-google-autocomplete
-          :id="$id('address-autocomplete')"
-          name="location"
-          classname="form-control group-location"
-          :placeholder="__('groups.groups_location_placeholder')"
-          @placechanged="placeChanged"
-          aria-describedby="locationHelpBlock"
-          types="geocode"
-          ref="autocomplete"
-          :class="{ hasError: hasError, 'm-0': true }"
+      <div
+        :id="inputid"
+        name="location"
+        aria-describedby="locationHelpBlock"
+        ref="autocomplete"
+        :class="{ hasError: hasError, 'p-0': true, 'm-0': true, 'form-control': true, 'group-location': true }"
       />
       <small id="locationHelpBlock">
       <span class="form-text text-danger" v-if="hasError">
@@ -38,7 +34,6 @@
 </template>
 <script>
 import Vue from 'vue'
-import VueGoogleAutocomplete from 'vue-google-autocomplete'
 import UniqueId from 'vue-unique-id';
 import GroupLocationMap from './GroupLocationMap'
 
@@ -105,15 +100,42 @@ export default {
       location: null,
       currentPostcode: null,
       timer: null,
+      inputid: null
     }
   },
   mounted() {
-    this.currentValue = this.value
+    try {
+      this.inputid = this.$id('address-autocomplete')
+      this.currentValue = this.value
     this.currentLat = this.lat
     this.currentLng = this.lng
     this.showMap = this.lat || this.lng
-    this.currentPostcode = this.postcode
-    this.$refs.autocomplete.update(this.currentValue)
+      this.currentPostcode = this.postcode
+
+      const token = document.getElementById('mapboxtoken')
+
+      mapboxgl.accessToken = token.textContent;
+
+      this.geocoder = new MapboxGeocoder({
+        accessToken: mapboxgl.accessToken,
+        types: 'country,region,place,postcode,locality,neighborhood',
+        placeholder: this.$lang.get('groups.groups_location_placeholder')
+      });
+
+      // Tick to pick up id value.
+      this.$nextTick(() => {
+        this.geocoder.addTo('#' + this.inputid);
+      })
+
+      this.geocoder.on('result', (e) => {
+        this.currentValue = e.result.place_name
+        this.$emit('update:value', e.result.place_name)
+        this.$emit('update:lat', e.result.center[1])
+        this.$emit('update:lng', e.result.center[0])
+      });
+    } catch (e) {
+      console.error('Error setting up autocomplete',e)
+    }
   },
   watch: {
     currentPostcode(newVal) {
@@ -137,3 +159,8 @@ export default {
   }
 }
 </script>
+<style scoped lang="scss">
+::v-deep(.mapboxgl-ctrl-geocoder) {
+  width: 100% !important;
+}
+</style>

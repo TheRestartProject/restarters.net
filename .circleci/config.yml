@@ -217,6 +217,7 @@ jobs:
       - run: cp .env /tmp/.env
       - run: echo "" >> /tmp/.env
       - run: echo GOOGLE_API_CONSOLE_KEY=$GOOGLE_API_CONSOLE_KEY >> /tmp/.env
+      - run: echo MAPBOX_TOKEN=$MAPBOX_TOKEN >> /tmp/.env
       - run: sudo cp /tmp/.env /home/circleci/project/.env
 
       # Now run the tests.
