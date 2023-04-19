@@ -25,4 +25,20 @@ class Geocoder
 
         return false;
     }
+
+    public function reverseGeocode($lat, $lng)
+    {
+        $geocodeResponse = app('geocoder')->reverseQuery(ReverseQuery::fromCoordinates($lat, $lng));
+        $addressCollection = $geocodeResponse->get();
+        $address = $addressCollection->get(0);
+        if ($address) {
+            return [
+                'locality' => $address->getLocality(),
+                'latitude' => $address->getCoordinates()->getLatitude(),
+                'longitude' => $address->getCoordinates()->getLongitude()
+            ];
+        }
+
+        return null;
+    }
 }
