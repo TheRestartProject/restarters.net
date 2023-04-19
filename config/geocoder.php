@@ -59,7 +59,6 @@ return [
         Chain::class => [
             Mapbox::class => [
                 env('MAPBOX_TOKEN'),
-                'GB'
             ],
             GeoPlugin::class  => [],
         ],

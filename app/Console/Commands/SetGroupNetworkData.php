@@ -4,6 +4,7 @@ namespace App\Console\Commands;
 
 use App\Group;
 use App\Helpers\Geocoder;
+use App\Network;
 use Illuminate\Console\Command;
 
 class SetGroupNetworkData extends Command
@@ -13,7 +14,7 @@ class SetGroupNetworkData extends Command
      *
      * @var string
      */
-    protected $signature = 'remap:groupnetworkdata';
+    protected $signature = 'remap:groupnetworkdata {networkname}';
 
     /**
      * The console command description.
@@ -39,28 +40,34 @@ class SetGroupNetworkData extends Command
      */
     public function handle()
     {
-        $groups = (new Group)->findAll();
-
         $geocoder = new Geocoder();
+        $networkname = $this->argument('networkname');
 
-        foreach ($groups as $group) {
-            $this->info('Check group '.$group->id.' '.$group->name);
+        // Find or fail network
+        $network = Network::where('name', $networkname)->first();
 
-            if ($group->latitude || $group->longitude) {
-                $this->info("...geocode {$group->latitude}, {$group->longitude}");
-                $loc = $geocoder->reverseGeocode($group->latitude, $group->longitude);
+        if ($network) {
+            foreach ($network->groups as $group)
+            {
+                $this->info('Check group ' . $group->idgroups . ' ' . $group->name);
 
-                if ($loc) {
-                    $this->info('...found locality '.$loc['locality']);
-                    $g = Group::find($group->id);
-                    $g->latitude = $loc['latitude'];
-                    $g->longitude = $loc['longitude'];
-                    $g->network_data = [
-                        'place' => $loc['locality'],
-                    ];
-                    $g->save();
-                } else {
-                    $this->error($group->id.' '.$group->name." couldn't reverse geocode");
+                if ($group->latitude || $group->longitude)
+                {
+                    $this->info("...geocode {$group->latitude}, {$group->longitude}");
+                    $loc = $geocoder->reverseGeocode($group->latitude, $group->longitude);
+
+                    if ($loc && $loc['place']) {
+                        $this->info('...found place ' . $loc['place']);
+                        $g = Group::findOrFail($group->idgroups);
+                        $g->latitude = $loc['latitude'];
+                        $g->longitude = $loc['longitude'];
+                        $g->network_data = [
+                            'place' => $loc['place'],
+                        ];
+                        $g->save();
+                    } else {
+                        $this->error($group->id . ' ' . $group->name . " couldn't reverse geocode");
+                    }
                 }
             }
         }

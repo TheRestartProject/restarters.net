@@ -28,12 +28,12 @@ class Geocoder
 
     public function reverseGeocode($lat, $lng)
     {
-        $geocodeResponse = app('geocoder')->reverseQuery(ReverseQuery::fromCoordinates($lat, $lng));
+        $geocodeResponse = app('geocoder')->reverseQuery(ReverseQuery::fromCoordinates($lat, $lng)->withData('location_type', [ Mapbox::TYPE_PLACE ]));
         $addressCollection = $geocodeResponse->get();
         $address = $addressCollection->get(0);
         if ($address) {
             return [
-                'locality' => $address->getLocality(),
+                'place' => $address->getAdminLevels()->get(2)->getName(),
                 'latitude' => $address->getCoordinates()->getLatitude(),
                 'longitude' => $address->getCoordinates()->getLongitude()
             ];
