@@ -36,6 +36,9 @@
 import Vue from 'vue'
 import UniqueId from 'vue-unique-id';
 import GroupLocationMap from './GroupLocationMap'
+import mapboxgl from "mapbox-gl";
+import MapboxGeocoder from '@mapbox/mapbox-gl-geocoder';
+import '@mapbox/mapbox-gl-geocoder/dist/mapbox-gl-geocoder.css';
 
 Vue.use(UniqueId);
 
@@ -88,7 +91,6 @@ export default {
     }
   },
   components: {
-    VueGoogleAutocomplete,
     GroupLocationMap,
   },
   data () {
@@ -107,9 +109,9 @@ export default {
     try {
       this.inputid = this.$id('address-autocomplete')
       this.currentValue = this.value
-    this.currentLat = this.lat
-    this.currentLng = this.lng
-    this.showMap = this.lat || this.lng
+      this.currentLat = this.lat
+      this.currentLng = this.lng
+      this.showMap = this.lat || this.lng
       this.currentPostcode = this.postcode
 
       const token = document.getElementById('mapboxtoken')
@@ -129,9 +131,10 @@ export default {
 
       this.geocoder.on('result', (e) => {
         this.currentValue = e.result.place_name
+        this.currentLat = e.result.center[1]
+        this.currentLng = e.result.center[0]
         this.$emit('update:value', e.result.place_name)
-        this.$emit('update:lat', e.result.center[1])
-        this.$emit('update:lng', e.result.center[0])
+        this.showMap = true
       });
     } catch (e) {
       console.error('Error setting up autocomplete',e)
@@ -148,15 +151,6 @@ export default {
       this.$emit('update:lng', newVal)
     },
   },
-  methods: {
-    placeChanged(addressData, placeResultData) {
-      this.currentValue = placeResultData.formatted_address
-      this.currentLat = addressData.latitude
-      this.currentLng = addressData.longitude
-      this.showMap = true
-      this.$emit('update:value', this.currentValue)
-    },
-  }
 }
 </script>
 <style scoped lang="scss">
