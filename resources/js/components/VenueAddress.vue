@@ -160,13 +160,17 @@ export default {
 
       this.geocoder = new MapboxGeocoder({
         accessToken: mapboxgl.accessToken,
-        types: 'country,region,place,postcode,locality,neighborhood',
-        placeholder: this.$lang.get('events.field_venue_placeholder')
+        placeholder: this.$lang.get('events.field_venue_placeholder'),
+        proximity: 'ip'
       });
 
       // Tick to pick up id value.
       this.$nextTick(() => {
         this.geocoder.addTo('#' + this.inputid);
+
+        // setInput always opens the suggestions even though the second parameter is supposed to stop it doing so.
+        // So set the internal value.
+        this.geocoder._inputEl.value = this.currentValue
       })
 
       this.geocoder.on('result', (e) => {
