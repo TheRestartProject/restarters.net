@@ -407,10 +407,13 @@ class Device extends Model implements Auditable
     public static function getItemTypes()
     {
         // List the item types
-        $types = DB::table('devices')->
-            join('categories', 'devices.category', '=', 'categories.idcategories')->
-            whereNotNull('item_type')->
-            select('item_type', 'powered', 'idcategories', 'categories.name AS categoryname', DB::raw('COUNT(*) as count'))->groupBy('item_type')->orderBy('count', 'desc')->get()->toArray();
+        $types = DB::select(DB::raw("WITH ItemCounts AS (
+SELECT item_type, powered, idcategories, categories.name as categoryname, COUNT(*) AS count 
+FROM devices INNER JOIN categories ON devices.category = categories.idcategories 
+WHERE item_type IS NOT NULL GROUP BY item_type, categoryname
+)
+SELECT s.* FROM ItemCounts AS s JOIN (SELECT ItemCounts.item_type, MAX(ItemCounts.count) AS maxcount FROM ItemCounts GROUP BY ItemCounts.item_type) AS m
+ON s.item_type = m.item_type AND s.count = m.maxcount;"));
 
         return $types;
     }

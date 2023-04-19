@@ -19,7 +19,7 @@
             }"
             :category.sync="currentDevice.category" :clusters="clusters" :powered="powered" :key="currentDevice.item_type"
             @open="suggested = false"
-            :icon-variant="add ? 'black' : 'brand'" :disabled="disabled" @changed="categoryChange"
+            :icon-variant="add ? 'black' : 'brand'" :disabled="disabled"
           />
           <DeviceBrand class="mb-2" :brand.sync="currentDevice.brand" :brands="brands" :disabled="disabled"
                        :suppress-brand-warning="suppressBrandWarning"/>
@@ -503,10 +503,6 @@ export default {
 
       window.location = '/fixometer'
     },
-    categoryChange () {
-      // Any item type we might have is no longer valid.
-      this.currentDevice.item_type = null
-    }
   }
 }
 </script>
