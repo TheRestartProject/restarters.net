@@ -24,6 +24,9 @@ class GroupCreateTest extends TestCase
                                                                   ]);
         $this->actingAs($user);
 
+        $response = $this->get('/group/create');
+        $response->assertStatus(200);
+
         $idgroups = $this->createGroup();
         $this->assertNotNull($idgroups);
         $group = Group::find($idgroups);
@@ -34,6 +37,32 @@ class GroupCreateTest extends TestCase
         self::assertEquals(1, count($ret));
         self::assertEquals($idgroups, $ret[0]['idgroups']);
         self::assertEquals($group->name, $ret[0]['name']);
+    }
+
+    public function testCreateGroupAsRestarter() {
+        // Restarters can create groups.  This wasn't true in the past and for backwards compatibility the act
+        // of creation should convert them into a host.
+        $user = $this->loginAsTestUser(Role::RESTARTER);
+        $this->assertFalse($user->hasRole(Role::HOST));
+
+        // Should see create button.
+        $response = $this->get('/group');
+        $response->assertSuccessful();
+        $props = $this->assertVueProperties($response, [
+            [],
+            [
+                ':can-create' => 'true',
+            ],
+        ]);
+
+        // Should be able to create a group.
+        $response = $this->get('/group/create');
+        $response->assertSuccessful();
+        $idgroups = $this->createGroup();
+        $this->assertNotNull($idgroups);
+        $user->refresh();
+        $this->assertEquals(Role::HOST, $user->role);
+        $this->assertTrue($user->hasRole('Host'));
     }
 
     public function testCreateBadLocation()

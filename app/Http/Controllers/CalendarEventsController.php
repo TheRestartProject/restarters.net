@@ -3,10 +3,9 @@
 namespace App\Http\Controllers;
 
 use App\Group;
-use App\GrouptagsGroups;
-use App\Helpers\Fixometer;
 use App\Party;
 use App\User;
+use App\Network;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
@@ -58,6 +57,26 @@ class CalendarEventsController extends Controller
       ->groupBy('events.idevents')
       ->orderBy('events.event_start_utc', 'ASC')
       ->get();
+
+        if (empty($events) || !$events->count()) {
+            return abort(404, 'No events found.');
+        }
+
+        $this->exportCalendar($events);
+    }
+
+    public function allEventsByNetwork(Request $request, Network $network)
+    {
+        $events = Party::join('groups', 'groups.idgroups', '=', 'events.group')
+            ->join('group_network', 'group_network.group_id', '=', 'groups.idgroups')
+            ->where(function ($query) use ($network) {
+                $query->where('group_network.network_id', $network->id)
+                    ->whereNull('events.deleted_at');
+            })
+            ->select('events.*', 'groups.name')
+            ->groupBy('events.idevents')
+            ->orderBy('events.event_start_utc', 'ASC')
+            ->get();
 
         if (empty($events) || !$events->count()) {
             return abort(404, 'No events found.');

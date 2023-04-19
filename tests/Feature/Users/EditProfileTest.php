@@ -15,6 +15,7 @@ use Illuminate\Support\Facades\Config;
 use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\Storage;
 use Tests\TestCase;
+use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
 class EditProfileTest extends TestCase
 {
@@ -110,7 +111,9 @@ class EditProfileTest extends TestCase
         $good = Config::get('GOOGLE_API_CONSOLE_KEY');
         Config::set('GOOGLE_API_CONSOLE_KEY', 'zzz');
 
+        // Supply the id.
         $this->post('/profile/edit-info', [
+            'id' => $user->id,
             'name' => $user->name,
             'email' => $user->email,
             'age' => $user->age,
@@ -173,6 +176,10 @@ class EditProfileTest extends TestCase
         // Should have promoted to host because we have a category 1 skill.
         $user->refresh();
         self::assertEquals(Role::HOST, $user->role);
+
+        // Try to edit someone else's profile - should fail.
+        $this->expectException(NotFoundHttpException::class);
+        $response = $this->get('/profile/edit/' . ($user->id + 1));
     }
 
     /**

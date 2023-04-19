@@ -56,22 +56,22 @@ class SyncNetworkUsersToDiscourseGroup extends Command
         $network = Network::where('shortname', $networkName)->first();
         $discourseGroupName = $network->discourse_group;
 
-        $users = User::where('repair_network', $network->id)->get();
+        foreach ($network->groups as $group) {
+            $this->info("Check group {$group->name}");
+            $users = $group->membersJoined()->get();
+            $this->info("..." . $users->count() . " members");
 
-        $this->info("{$users->count()} users to sync to '{$discourseGroupName}' Discourse group.");
-
-        // Run the sync_sso method with them.
-        foreach ($users as $index => $user) {
-            $index++;
-            try {
-                $this->info("{$index}: Syncing {$user->name}");
-                $this->syncUserToGroup($user, $discourseGroupName);
-            } catch (\Exception $ex) {
-                $this->error($ex->getMessage());
+            foreach ($users as $user) {
+                try {
+                    $this->info("...syncing #{$user->id} {$user->name}");
+                    $this->syncUserToGroup($user, $discourseGroupName);
+                } catch (\Exception $ex) {
+                    $this->error($ex->getMessage());
+                }
+                // Sleep to avoid Discourse rate limiting of 60 requests per minute.
+                // See https://meta.discourse.org/t/global-rate-limits-and-throttling-in-discourse/78612
+                sleep(1);
             }
-            // Sleep to avoid Discourse rate limiting of 60 requests per minute.
-            // See https://meta.discourse.org/t/global-rate-limits-and-throttling-in-discourse/78612
-            sleep(1);
         }
     }
 
