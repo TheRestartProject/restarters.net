@@ -3,12 +3,16 @@
     <b-col md="7">
       <div class="form-group">
         <label :for="$id('address-autocomplete')">{{ __('events.field_event_venue') }}:</label>
-        <div
-            :id="inputid"
+        <vue-google-autocomplete
+            :id="$id('address-autocomplete')"
             name="location"
+            classname="form-control"
+            :placeholder="__('events.field_venue_placeholder')"
+            @placechanged="placeChanged"
             aria-describedby="locationHelpBlock"
+            types="geocode"
             ref="autocomplete"
-            :class="{ hasError: hasError, 'p-0': true, 'm-0': true, 'form-control': true, 'group-location': true }"
+            :class="{ hasError: hasError, 'm-0': true }"
         />
         <small id="locationHelpBlock">
           <span class="form-text text-danger" v-if="hasError">
@@ -39,11 +43,9 @@
 </template>
 <script>
 import Vue from 'vue'
+import VueGoogleAutocomplete from 'vue-google-autocomplete'
 import UniqueId from 'vue-unique-id';
 import map from '../mixins/map'
-import mapboxgl from "mapbox-gl";
-import MapboxGeocoder from '@mapbox/mapbox-gl-geocoder';
-import '@mapbox/mapbox-gl-geocoder/dist/mapbox-gl-geocoder.css';
 
 Vue.use(UniqueId);
 
@@ -86,12 +88,14 @@ export default {
       default: false
     }
   },
+  components: {
+    VueGoogleAutocomplete
+  },
   data () {
     return {
       currentValue: null,
       location: null,
       timer: null,
-      inputid: null
     }
   },
   computed: {
@@ -149,48 +153,20 @@ export default {
   },
   mounted() {
     this.currentValue = this.value
-
-    try {
-      this.inputid = this.$id('address-autocomplete')
-      this.currentValue = this.value
-
-      const token = document.getElementById('mapboxtoken')
-
-      mapboxgl.accessToken = token.textContent;
-
-      this.geocoder = new MapboxGeocoder({
-        accessToken: mapboxgl.accessToken,
-        placeholder: this.$lang.get('events.field_venue_placeholder'),
-        proximity: 'ip'
-      });
-
-      // Tick to pick up id value.
-      this.$nextTick(() => {
-        this.geocoder.addTo('#' + this.inputid);
-
-        // setInput always opens the suggestions even though the second parameter is supposed to stop it doing so.
-        // So set the internal value.
-        this.geocoder._inputEl.value = this.currentValue
-      })
-
-      this.geocoder.on('result', (e) => {
-        this.currentValue = e.result.place_name
-        this.$emit('update:value', e.result.place_name)
-        this.$emit('update:lat', e.result.center[1])
-        this.$emit('update:lng', e.result.center[0])
-      });
-    } catch (e) {
-      console.error('Error setting up autocomplete',e)
-    }
+    this.$refs.autocomplete.update(this.currentValue)
   },
   beforeDestroy () {
     clearTimeout(this.timer)
   },
   methods: {
+    placeChanged(addressData, placeResultData) {
+      this.currentValue = placeResultData.formatted_address
+      this.$emit('update:value', this.currentValue)
+      this.$emit('update:lat', addressData.latitude)
+      this.$emit('update:lng', addressData.longitude)
+    },
     useGroup() {
-      // Supposedly we can use setInput with a second parameter of false to avoid showing the autocomplete, but
-      // that doesn't seem to work.  So we use this method from https://github.com/mapbox/mapbox-gl-geocoder/issues/401.
-      this.geocoder._inputEl.value = this.groupLocation;
+      this.$refs.autocomplete.update(this.groupLocation)
       this.$emit('update:lat', parseFloat(this.groupLat))
       this.$emit('update:lng', parseFloat(this.groupLng))
     },
@@ -213,8 +189,3 @@ export default {
   }
 }
 </script>
-<style scoped lang="scss">
-::v-deep(.mapboxgl-ctrl-geocoder) {
-  width: 100% !important;
-}
-</style>

@@ -2,24 +2,44 @@
 
 namespace App\Helpers;
 
-use Geocoder\Query\GeocodeQuery;
-use Geocoder\Query\ReverseQuery;
-use Geocoder\Provider\Mapbox\Mapbox;
-
 class Geocoder
 {
+    public function __construct()
+    {
+    }
+
+    private function googleKey()
+    {
+        // We have this so that we can change the key in testing.
+        return config('GOOGLE_API_CONSOLE_KEY') ?? env('GOOGLE_API_CONSOLE_KEY');
+    }
+
     public function geocode($location)
     {
         if ($location != 'ForceGeocodeFailure') {
-            $geocodeResponse = app('geocoder')->geocodeQuery(GeocodeQuery::create($location)->withData('location_type', [ Mapbox::TYPE_PLACE, Mapbox::TYPE_ADDRESS ]));
-            $addressCollection = $geocodeResponse->get();
-            $address = $addressCollection->get(0);
-            if ($address) {
-                return [
-                    'latitude' => $address->getCoordinates()->getLatitude(),
-                    'longitude' => $address->getCoordinates()->getLongitude(),
-                    'country' => $address->getCountry()->getName()
-                ];
+            $json = file_get_contents('https://maps.googleapis.com/maps/api/geocode/json?address='.urlencode($location).'&key='.$this->googleKey());
+
+            if ($json) {
+                $res = json_decode($json);
+
+                if ($res && $res->results && count($res->results)) {
+                    $decoded = json_decode($json)->results[0];
+
+                    $latitude = $decoded->{'geometry'}->{'location'}->lat;
+                    $longitude = $decoded->{'geometry'}->{'location'}->lng;
+
+                    foreach ($decoded->{'address_components'} as $component) {
+                        if ($component->types && count($component->types) && $component->types[0] === 'country') {
+                            $country = $component->long_name;
+                        }
+                    }
+
+                    return [
+                        'latitude' => $latitude,
+                        'longitude' => $longitude,
+                        'country' => $country,
+                    ];
+                }
             }
         }
 
@@ -28,17 +48,10 @@ class Geocoder
 
     public function reverseGeocode($lat, $lng)
     {
-        $geocodeResponse = app('geocoder')->reverseQuery(ReverseQuery::fromCoordinates($lat, $lng)->withData('location_type', [ Mapbox::TYPE_PLACE ]));
-        $addressCollection = $geocodeResponse->get();
-        $address = $addressCollection->get(0);
-        if ($address) {
-            return [
-                'place' => $address->getAdminLevels()->get(2)->getName(),
-                'latitude' => $address->getCoordinates()->getLatitude(),
-                'longitude' => $address->getCoordinates()->getLongitude()
-            ];
-        }
+        $json = file_get_contents("https://maps.googleapis.com/maps/api/geocode/json?latlng=$lat,$lng&key=".$this->googleKey());
 
-        return null;
+        $decoded = json_decode($json)->results[0];
+
+        return $decoded;
     }
 }
