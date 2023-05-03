@@ -18,8 +18,8 @@ class ComposerStaticInitf657da3451727d69be6269822b9691c7
         '667aeda72477189d0494fecd327c3641' => __DIR__ . '/..' . '/symfony/var-dumper/Resources/functions/dump.php',
         'c964ee0ededf28c96ebd9db5099ef910' => __DIR__ . '/..' . '/guzzlehttp/promises/src/functions_include.php',
         '8825ede83f2f289127722d4e842cf7e8' => __DIR__ . '/..' . '/symfony/polyfill-intl-grapheme/bootstrap.php',
-        'b6b991a57620e2fb6b2f66f03fe9ddc2' => __DIR__ . '/..' . '/symfony/string/Resources/functions.php',
         '9c67151ae59aff4788964ce8eb2a0f43' => __DIR__ . '/..' . '/clue/stream-filter/src/functions_include.php',
+        'b6b991a57620e2fb6b2f66f03fe9ddc2' => __DIR__ . '/..' . '/symfony/string/Resources/functions.php',
         '8cff32064859f4559445b89279f3199c' => __DIR__ . '/..' . '/php-http/message/src/filters.php',
         '37a3dc5111fe8f707ab4c132ef1dbc62' => __DIR__ . '/..' . '/guzzlehttp/guzzle/src/functions_include.php',
         '09f6b20656683369174dd6fa83b7e5fb' => __DIR__ . '/..' . '/symfony/polyfill-uuid/bootstrap.php',
@@ -31,6 +31,7 @@ class ComposerStaticInitf657da3451727d69be6269822b9691c7
         'f0906e6318348a765ffb6eb24e0d0938' => __DIR__ . '/..' . '/laravel/framework/src/Illuminate/Foundation/helpers.php',
         '58571171fd5812e6e447dce228f52f4d' => __DIR__ . '/..' . '/laravel/framework/src/Illuminate/Support/helpers.php',
         'fb4ca2d97fe7ba6af750497425204e70' => __DIR__ . '/..' . '/sentry/sentry/src/functions.php',
+        'a16312f9300fed4a097923eacb0ba814' => __DIR__ . '/..' . '/igorw/get-in/src/get_in.php',
         'b067bc7112e384b61c701452d53a14a8' => __DIR__ . '/..' . '/mtdowling/jmespath.php/src/JmesPath.php',
         '8a9dc1de0ca7e01f3e08231539562f61' => __DIR__ . '/..' . '/aws/aws-sdk-php/src/functions.php',
         '801c31d8ed748cfa537fa45402288c95' => __DIR__ . '/..' . '/psy/psysh/src/functions.php',
@@ -171,6 +172,7 @@ class ComposerStaticInitf657da3451727d69be6269822b9691c7
             'Http\\Message\\' => 13,
             'Http\\Factory\\Guzzle\\' => 20,
             'Http\\Discovery\\' => 15,
+            'Http\\Client\\Curl\\' => 17,
             'Http\\Client\\Common\\' => 19,
             'Http\\Client\\' => 12,
             'HieuLe\\WordpressXmlrpcClient\\' => 29,
@@ -182,6 +184,13 @@ class ComposerStaticInitf657da3451727d69be6269822b9691c7
             'GuzzleHttp\\Promise\\' => 19,
             'GuzzleHttp\\' => 11,
             'GrahamCampbell\\ResultType\\' => 26,
+            'Geocoder\\Provider\\Mapbox\\' => 25,
+            'Geocoder\\Provider\\GoogleMaps\\' => 29,
+            'Geocoder\\Provider\\GeoPlugin\\' => 28,
+            'Geocoder\\Provider\\Chain\\' => 24,
+            'Geocoder\\Laravel\\' => 17,
+            'Geocoder\\Http\\' => 14,
+            'Geocoder\\' => 9,
         ),
         'F' => 
         array (
@@ -572,6 +581,10 @@ class ComposerStaticInitf657da3451727d69be6269822b9691c7
         array (
             0 => __DIR__ . '/..' . '/php-http/discovery/src',
         ),
+        'Http\\Client\\Curl\\' => 
+        array (
+            0 => __DIR__ . '/..' . '/php-http/curl-client/src',
+        ),
         'Http\\Client\\Common\\' => 
         array (
             0 => __DIR__ . '/..' . '/php-http/client-common/src',
@@ -603,6 +616,34 @@ class ComposerStaticInitf657da3451727d69be6269822b9691c7
         'GrahamCampbell\\ResultType\\' => 
         array (
             0 => __DIR__ . '/..' . '/graham-campbell/result-type/src',
+        ),
+        'Geocoder\\Provider\\Mapbox\\' => 
+        array (
+            0 => __DIR__ . '/..' . '/geocoder-php/mapbox-provider',
+        ),
+        'Geocoder\\Provider\\GoogleMaps\\' => 
+        array (
+            0 => __DIR__ . '/..' . '/geocoder-php/google-maps-provider',
+        ),
+        'Geocoder\\Provider\\GeoPlugin\\' => 
+        array (
+            0 => __DIR__ . '/..' . '/geocoder-php/geo-plugin-provider',
+        ),
+        'Geocoder\\Provider\\Chain\\' => 
+        array (
+            0 => __DIR__ . '/..' . '/geocoder-php/chain-provider',
+        ),
+        'Geocoder\\Laravel\\' => 
+        array (
+            0 => __DIR__ . '/..' . '/toin0u/geocoder-laravel/src',
+        ),
+        'Geocoder\\Http\\' => 
+        array (
+            0 => __DIR__ . '/..' . '/geocoder-php/common-http',
+        ),
+        'Geocoder\\' => 
+        array (
+            0 => __DIR__ . '/..' . '/willdurand/geocoder',
         ),
         'Fruitcake\\Cors\\' => 
         array (
@@ -778,7 +819,7 @@ class ComposerStaticInitf657da3451727d69be6269822b9691c7
         'App\\Console\\Commands\\NetworkCreate' => __DIR__ . '/../..' . '/app/Console/Commands/NetworkCreate.php',
         'App\\Console\\Commands\\NetworkGroup' => __DIR__ . '/../..' . '/app/Console/Commands/NetworkGroup.php',
         'App\\Console\\Commands\\PopulateUniqueCodeToEventsAndGroups' => __DIR__ . '/../..' . '/app/Console/Commands/PopulateUniqueCodeToEventsAndGroups.php',
-        'App\\Console\\Commands\\SetPostcodes' => __DIR__ . '/../..' . '/app/Console/Commands/SetPostcodes.php',
+        'App\\Console\\Commands\\SetPlaceNetworkData' => __DIR__ . '/../..' . '/app/Console/Commands/SetPlaceNetworkData.php',
         'App\\Console\\Commands\\SetRepairTogetherPasswords' => __DIR__ . '/../..' . '/app/Console/Commands/SetRepairTogetherPasswords.php',
         'App\\Console\\Commands\\SyncDiscourseGroups' => __DIR__ . '/../..' . '/app/Console/Commands/SyncDiscourseGroups.php',
         'App\\Console\\Commands\\SyncDiscourseUsernames' => __DIR__ . '/../..' . '/app/Console/Commands/SyncDiscourseUsernames.php',
@@ -2644,6 +2685,60 @@ class ComposerStaticInitf657da3451727d69be6269822b9691c7
         'Egulias\\EmailValidator\\Warning\\Warning' => __DIR__ . '/..' . '/egulias/email-validator/src/Warning/Warning.php',
         'Fruitcake\\Cors\\CorsService' => __DIR__ . '/..' . '/fruitcake/php-cors/src/CorsService.php',
         'Fruitcake\\Cors\\Exceptions\\InvalidOptionException' => __DIR__ . '/..' . '/fruitcake/php-cors/src/Exceptions/InvalidOptionException.php',
+        'Geocoder\\Assert' => __DIR__ . '/..' . '/willdurand/geocoder/Assert.php',
+        'Geocoder\\Collection' => __DIR__ . '/..' . '/willdurand/geocoder/Collection.php',
+        'Geocoder\\Dumper\\AbstractArrayDumper' => __DIR__ . '/..' . '/willdurand/geocoder/Dumper/AbstractArrayDumper.php',
+        'Geocoder\\Dumper\\AbstractDumper' => __DIR__ . '/..' . '/willdurand/geocoder/Dumper/AbstractDumper.php',
+        'Geocoder\\Dumper\\Dumper' => __DIR__ . '/..' . '/willdurand/geocoder/Dumper/Dumper.php',
+        'Geocoder\\Dumper\\GeoArray' => __DIR__ . '/..' . '/willdurand/geocoder/Dumper/GeoArray.php',
+        'Geocoder\\Dumper\\GeoJson' => __DIR__ . '/..' . '/willdurand/geocoder/Dumper/GeoJson.php',
+        'Geocoder\\Dumper\\Gpx' => __DIR__ . '/..' . '/willdurand/geocoder/Dumper/Gpx.php',
+        'Geocoder\\Dumper\\Kml' => __DIR__ . '/..' . '/willdurand/geocoder/Dumper/Kml.php',
+        'Geocoder\\Dumper\\Wkb' => __DIR__ . '/..' . '/willdurand/geocoder/Dumper/Wkb.php',
+        'Geocoder\\Dumper\\Wkt' => __DIR__ . '/..' . '/willdurand/geocoder/Dumper/Wkt.php',
+        'Geocoder\\Exception\\CollectionIsEmpty' => __DIR__ . '/..' . '/willdurand/geocoder/Exception/CollectionIsEmpty.php',
+        'Geocoder\\Exception\\Exception' => __DIR__ . '/..' . '/willdurand/geocoder/Exception/Exception.php',
+        'Geocoder\\Exception\\ExtensionNotLoaded' => __DIR__ . '/..' . '/willdurand/geocoder/Exception/ExtensionNotLoaded.php',
+        'Geocoder\\Exception\\FunctionNotFound' => __DIR__ . '/..' . '/willdurand/geocoder/Exception/FunctionNotFound.php',
+        'Geocoder\\Exception\\InvalidArgument' => __DIR__ . '/..' . '/willdurand/geocoder/Exception/InvalidArgument.php',
+        'Geocoder\\Exception\\InvalidCredentials' => __DIR__ . '/..' . '/willdurand/geocoder/Exception/InvalidCredentials.php',
+        'Geocoder\\Exception\\InvalidServerResponse' => __DIR__ . '/..' . '/willdurand/geocoder/Exception/InvalidServerResponse.php',
+        'Geocoder\\Exception\\LogicException' => __DIR__ . '/..' . '/willdurand/geocoder/Exception/LogicException.php',
+        'Geocoder\\Exception\\OutOfBounds' => __DIR__ . '/..' . '/willdurand/geocoder/Exception/OutOfBounds.php',
+        'Geocoder\\Exception\\ProviderNotRegistered' => __DIR__ . '/..' . '/willdurand/geocoder/Exception/ProviderNotRegistered.php',
+        'Geocoder\\Exception\\QuotaExceeded' => __DIR__ . '/..' . '/willdurand/geocoder/Exception/QuotaExceeded.php',
+        'Geocoder\\Exception\\UnsupportedOperation' => __DIR__ . '/..' . '/willdurand/geocoder/Exception/UnsupportedOperation.php',
+        'Geocoder\\Formatter\\StringFormatter' => __DIR__ . '/..' . '/willdurand/geocoder/Formatter/StringFormatter.php',
+        'Geocoder\\Geocoder' => __DIR__ . '/..' . '/willdurand/geocoder/Geocoder.php',
+        'Geocoder\\GeocoderTrait' => __DIR__ . '/..' . '/willdurand/geocoder/GeocoderTrait.php',
+        'Geocoder\\Http\\Provider\\AbstractHttpProvider' => __DIR__ . '/..' . '/geocoder-php/common-http/Provider/AbstractHttpProvider.php',
+        'Geocoder\\Laravel\\Exceptions\\InvalidDumperException' => __DIR__ . '/..' . '/toin0u/geocoder-laravel/src/Exceptions/InvalidDumperException.php',
+        'Geocoder\\Laravel\\Facades\\Geocoder' => __DIR__ . '/..' . '/toin0u/geocoder-laravel/src/Facades/Geocoder.php',
+        'Geocoder\\Laravel\\ProviderAndDumperAggregator' => __DIR__ . '/..' . '/toin0u/geocoder-laravel/src/ProviderAndDumperAggregator.php',
+        'Geocoder\\Laravel\\Providers\\GeocoderService' => __DIR__ . '/..' . '/toin0u/geocoder-laravel/src/Providers/GeocoderService.php',
+        'Geocoder\\Location' => __DIR__ . '/..' . '/willdurand/geocoder/Location.php',
+        'Geocoder\\Model\\Address' => __DIR__ . '/..' . '/willdurand/geocoder/Model/Address.php',
+        'Geocoder\\Model\\AddressBuilder' => __DIR__ . '/..' . '/willdurand/geocoder/Model/AddressBuilder.php',
+        'Geocoder\\Model\\AddressCollection' => __DIR__ . '/..' . '/willdurand/geocoder/Model/AddressCollection.php',
+        'Geocoder\\Model\\AdminLevel' => __DIR__ . '/..' . '/willdurand/geocoder/Model/AdminLevel.php',
+        'Geocoder\\Model\\AdminLevelCollection' => __DIR__ . '/..' . '/willdurand/geocoder/Model/AdminLevelCollection.php',
+        'Geocoder\\Model\\Bounds' => __DIR__ . '/..' . '/willdurand/geocoder/Model/Bounds.php',
+        'Geocoder\\Model\\Coordinates' => __DIR__ . '/..' . '/willdurand/geocoder/Model/Coordinates.php',
+        'Geocoder\\Model\\Country' => __DIR__ . '/..' . '/willdurand/geocoder/Model/Country.php',
+        'Geocoder\\ProviderAggregator' => __DIR__ . '/..' . '/willdurand/geocoder/ProviderAggregator.php',
+        'Geocoder\\Provider\\AbstractProvider' => __DIR__ . '/..' . '/willdurand/geocoder/Provider/AbstractProvider.php',
+        'Geocoder\\Provider\\Chain\\Chain' => __DIR__ . '/..' . '/geocoder-php/chain-provider/Chain.php',
+        'Geocoder\\Provider\\GeoPlugin\\GeoPlugin' => __DIR__ . '/..' . '/geocoder-php/geo-plugin-provider/GeoPlugin.php',
+        'Geocoder\\Provider\\GoogleMaps\\GoogleMaps' => __DIR__ . '/..' . '/geocoder-php/google-maps-provider/GoogleMaps.php',
+        'Geocoder\\Provider\\GoogleMaps\\Model\\GoogleAddress' => __DIR__ . '/..' . '/geocoder-php/google-maps-provider/Model/GoogleAddress.php',
+        'Geocoder\\Provider\\Mapbox\\Mapbox' => __DIR__ . '/..' . '/geocoder-php/mapbox-provider/Mapbox.php',
+        'Geocoder\\Provider\\Mapbox\\Model\\MapboxAddress' => __DIR__ . '/..' . '/geocoder-php/mapbox-provider/Model/MapboxAddress.php',
+        'Geocoder\\Provider\\Provider' => __DIR__ . '/..' . '/willdurand/geocoder/Provider/Provider.php',
+        'Geocoder\\Query\\GeocodeQuery' => __DIR__ . '/..' . '/willdurand/geocoder/Query/GeocodeQuery.php',
+        'Geocoder\\Query\\Query' => __DIR__ . '/..' . '/willdurand/geocoder/Query/Query.php',
+        'Geocoder\\Query\\ReverseQuery' => __DIR__ . '/..' . '/willdurand/geocoder/Query/ReverseQuery.php',
+        'Geocoder\\StatefulGeocoder' => __DIR__ . '/..' . '/willdurand/geocoder/StatefulGeocoder.php',
+        'Geocoder\\TimedGeocoder' => __DIR__ . '/..' . '/willdurand/geocoder/TimedGeocoder.php',
         'GrahamCampbell\\ResultType\\Error' => __DIR__ . '/..' . '/graham-campbell/result-type/src/Error.php',
         'GrahamCampbell\\ResultType\\Result' => __DIR__ . '/..' . '/graham-campbell/result-type/src/Result.php',
         'GrahamCampbell\\ResultType\\Success' => __DIR__ . '/..' . '/graham-campbell/result-type/src/Success.php',
@@ -2795,6 +2890,11 @@ class ComposerStaticInitf657da3451727d69be6269822b9691c7
         'Http\\Client\\Common\\Plugin\\SeekableBodyPlugin' => __DIR__ . '/..' . '/php-http/client-common/src/Plugin/SeekableBodyPlugin.php',
         'Http\\Client\\Common\\Plugin\\VersionBridgePlugin' => __DIR__ . '/..' . '/php-http/client-common/src/Plugin/VersionBridgePlugin.php',
         'Http\\Client\\Common\\VersionBridgeClient' => __DIR__ . '/..' . '/php-http/client-common/src/VersionBridgeClient.php',
+        'Http\\Client\\Curl\\Client' => __DIR__ . '/..' . '/php-http/curl-client/src/Client.php',
+        'Http\\Client\\Curl\\CurlPromise' => __DIR__ . '/..' . '/php-http/curl-client/src/CurlPromise.php',
+        'Http\\Client\\Curl\\MultiRunner' => __DIR__ . '/..' . '/php-http/curl-client/src/MultiRunner.php',
+        'Http\\Client\\Curl\\PromiseCore' => __DIR__ . '/..' . '/php-http/curl-client/src/PromiseCore.php',
+        'Http\\Client\\Curl\\ResponseBuilder' => __DIR__ . '/..' . '/php-http/curl-client/src/ResponseBuilder.php',
         'Http\\Client\\Exception' => __DIR__ . '/..' . '/php-http/httplug/src/Exception.php',
         'Http\\Client\\Exception\\HttpException' => __DIR__ . '/..' . '/php-http/httplug/src/Exception/HttpException.php',
         'Http\\Client\\Exception\\NetworkException' => __DIR__ . '/..' . '/php-http/httplug/src/Exception/NetworkException.php',

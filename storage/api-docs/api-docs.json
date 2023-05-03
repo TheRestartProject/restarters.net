@@ -265,6 +265,9 @@
                                         "description": "Image for the group",
                                         "type": "string",
                                         "format": "binary"
+                                    },
+                                    "network_data": {
+                                        "description": "Network-defined JSON data"
                                     }
                                 },
                                 "type": "object"
@@ -447,6 +450,9 @@
                                         "description": "Image for the group",
                                         "type": "string",
                                         "format": "binary"
+                                    },
+                                    "network_data": {
+                                        "description": "Network-defined JSON data"
                                     }
                                 },
                                 "type": "object"
@@ -817,6 +823,9 @@
                         "description": "Indicates that this is a full result, not summary group information.",
                         "format": "boolean",
                         "example": "true"
+                    },
+                    "network_data": {
+                        "description": "Network-defined JSON data"
                     },
                     "stats": {
                         "title": "stats",
@@ -1330,6 +1339,9 @@
                         "title": "hosts",
                         "description": "Whether the event has been approved",
                         "type": "boolean"
+                    },
+                    "network_data": {
+                        "description": "Network-defined JSON data"
                     },
                     "stats": {
                         "title": "stats",
