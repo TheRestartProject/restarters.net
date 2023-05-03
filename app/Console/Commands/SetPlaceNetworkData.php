@@ -3,25 +3,27 @@
 namespace App\Console\Commands;
 
 use App\Group;
-use App\Helpers\Geocoder;
 use App\Network;
+use Geocoder\Query\GeocodeQuery;
+use Geocoder\Query\ReverseQuery;
+use Geocoder\Provider\Mapbox\Mapbox;
 use Illuminate\Console\Command;
 
-class SetGroupNetworkData extends Command
+class SetPlaceNetworkData extends Command
 {
     /**
      * The name and signature of the console command.
      *
      * @var string
      */
-    protected $signature = 'remap:groupnetworkdata {networkname}';
+    protected $signature = 'set:networkdata:place {networkname}';
 
     /**
      * The console command description.
      *
      * @var string
      */
-    protected $description = 'Re-geocode group locations and set network-data';
+    protected $description = 'Set the place field in network_data';
 
     /**
      * Create a new command instance.
@@ -40,7 +42,6 @@ class SetGroupNetworkData extends Command
      */
     public function handle()
     {
-        $geocoder = new Geocoder();
         $networkname = $this->argument('networkname');
 
         // Find or fail network
@@ -54,13 +55,17 @@ class SetGroupNetworkData extends Command
                 if ($group->latitude || $group->longitude)
                 {
                     $this->info("...geocode {$group->latitude}, {$group->longitude}");
-                    $loc = $geocoder->reverseGeocode($group->latitude, $group->longitude);
+                    $loc = [];
+                    $geocodeResponse = app('geocoder')->reverseQuery(ReverseQuery::fromCoordinates($group->latitude, $group->longitude)->withData('location_type', [ Mapbox::TYPE_PLACE ])->withLocale($network->default_language));
+                    $addressCollection = $geocodeResponse->get();
+                    $address = $addressCollection->get(0);
+                    if ($address) {
+                        $loc['place'] = $address->getStreetName();
+                    }
 
                     if ($loc && $loc['place']) {
                         $this->info('...found place ' . $loc['place']);
                         $g = Group::findOrFail($group->idgroups);
-                        $g->latitude = $loc['latitude'];
-                        $g->longitude = $loc['longitude'];
                         $g->network_data = [
                             'place' => $loc['place'],
                         ];
