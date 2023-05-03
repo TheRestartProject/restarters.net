@@ -125,7 +125,7 @@ class GroupController extends Controller
                                       ],
                                       'created_at' => new \Carbon\Carbon($group->created_at),
                                       'updated_at' => new \Carbon\Carbon($group->max_updated_at_devices_updated_at),
-
+                                      'network_data' => $group->network_data
                                   ]);
 
                 foreach ($group->upcomingParties() as $event) {
@@ -565,7 +565,12 @@ class GroupController extends Controller
      *                   description="Image for the group",
      *                   property="image",
      *                   type="string", format="binary"
-     *                 )
+     *                ),
+     *                @OA\Property(
+     *                   description="Network-defined JSON data",
+     *                   property="network_data",
+     *                   @OA\Schema()
+     *                ),
      *             )
      *         )
      *    ),
@@ -586,7 +591,7 @@ class GroupController extends Controller
         $user = $this->getUser();
         $user->convertToHost();
 
-        list($name, $area, $postcode, $location, $phone, $website, $description, $timezone, $latitude, $longitude, $country) = $this->validateGroupParams(
+        list($name, $area, $postcode, $location, $phone, $website, $description, $timezone, $latitude, $longitude, $country, $network_data) = $this->validateGroupParams(
             $request,
             true
         );
@@ -604,6 +609,7 @@ class GroupController extends Controller
             'shareable_code' => Fixometer::generateUniqueShareableCode(\App\Group::class, 'shareable_code'),
             'timezone' => $timezone,
             'phone' => $phone,
+            'network_data' => $network_data,
         ];
 
         $group = Group::create($data);
@@ -696,7 +702,12 @@ class GroupController extends Controller
      *                   description="Image for the group",
      *                   property="image",
      *                   type="string", format="binary"
-     *                 )
+     *                 ),
+     *                @OA\Property(
+     *                   description="Network-defined JSON data",
+     *                   property="network_data",
+     *                   @OA\Schema()
+     *                ),
      *             )
      *         )
      *    ),
@@ -716,7 +727,7 @@ class GroupController extends Controller
     public function updateGroupv2(Request $request, $idGroup) {
         $user = $this->getUser();
 
-        list($name, $area, $postcode, $location, $phone, $website, $description, $timezone, $latitude, $longitude, $country) = $this->validateGroupParams(
+        list($name, $area, $postcode, $location, $phone, $website, $description, $timezone, $latitude, $longitude, $country, $network_data) = $this->validateGroupParams(
             $request,
             false
         );
@@ -741,6 +752,7 @@ class GroupController extends Controller
             'free_text' => $description,
             'timezone' => $timezone,
             'phone' => $phone,
+            'network_data' => $network_data,
         ];
 
         if ($user->hasRole('Administrator') || $user->hasRole('NetworkCoordinator')) {
@@ -857,6 +869,7 @@ class GroupController extends Controller
         $website = $request->input('website');
         $description = $request->input('description');
         $timezone = $request->input('timezone');
+        $network_data = $request->input('network_data');
 
         $latitude = null;
         $longitude = null;
@@ -891,7 +904,8 @@ class GroupController extends Controller
             $timezone,
             $latitude,
             $longitude,
-            $country
+            $country,
+            $network_data,
         );
     }
 }

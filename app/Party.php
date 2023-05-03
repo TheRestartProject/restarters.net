@@ -48,7 +48,8 @@ class Party extends Model implements Auditable
         'devices_updated_at',
         'link',
         'timezone',
-        'user_id'
+        'user_id',
+        'network_data',
     ];
     protected $hidden = ['created_at', 'deleted_at', 'frequency', 'group', 'group', 'user_id', 'wordpress_post_id', 'cancelled', 'devices_updated_at'];
 
@@ -57,6 +58,11 @@ class Party extends Model implements Auditable
 
     // Append data to Model
     protected $appends = ['participants', 'ShareableLink', 'event_date_local', 'start_local', 'end_local'];
+
+    protected $casts = [
+        // JSON fields in the database should be converted to/from arrays.
+        'network_data' => 'array'
+    ];
 
     //Getters
     public function findAllSearchable()
