@@ -44,10 +44,16 @@ class Group extends Model implements Auditable
         'external_id',
         'devices_updated_at',
         'timezone',
-        'phone'
+        'phone',
+        'network_data',
     ];
 
     protected $appends = ['ShareableLink', 'auto_approve'];
+
+    protected $casts = [
+        // JSON fields in the database should be converted to/from arrays.
+        'network_data' => 'array'
+    ];
 
     // The distance is not in the groups table; we add it on some queries from the select.
     private $distance = null;

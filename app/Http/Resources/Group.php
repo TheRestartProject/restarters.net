@@ -117,6 +117,11 @@ use Illuminate\Http\Resources\Json\JsonResource;
  *          example="true"
  *     ),
  *     @OA\Property(
+ *          description="Network-defined JSON data",
+ *          property="network_data",
+ *          @OA\Schema()
+ *     ),
+ *     @OA\Property(
  *          property="stats",
  *          title="stats",
  *          description="An array of statistics about the activity of a group.",
@@ -274,6 +279,7 @@ class Group extends JsonResource
             'tags' => new TagCollection($this->group_tags),
             'timezone' => $this->timezone,
             'approved' => $this->approved ? true : false,
+            'network_data' => $this->network_data,
             'full' => true
         ];
 

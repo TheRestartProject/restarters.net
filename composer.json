@@ -19,6 +19,7 @@
         "doctrine/dbal": "^2.13",
         "egulias/email-validator": "^3.0.0",
         "filp/whoops": "^2.14",
+        "geocoder-php/mapbox-provider": "^1.4",
         "guzzlehttp/guzzle": "^7.2",
         "hieu-le/wordpress-xmlrpc-client": "~2.0",
         "intervention/image": "^2.7",
@@ -41,6 +42,7 @@
         "symfony/http-client": "^6.2",
         "symfony/http-foundation": "^6.0",
         "symfony/mailgun-mailer": "^6.2",
+        "toin0u/geocoder-laravel": "^4.6",
         "twbs/bootstrap": "4.1.0",
         "wouternl/laravel-drip": "^1.2.4"
     },
