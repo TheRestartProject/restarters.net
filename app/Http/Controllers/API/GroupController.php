@@ -125,7 +125,7 @@ class GroupController extends Controller
                                       ],
                                       'created_at' => new \Carbon\Carbon($group->created_at),
                                       'updated_at' => new \Carbon\Carbon($group->max_updated_at_devices_updated_at),
-
+                                      'network_data' => $group->network_data
                                   ]);
 
                 foreach ($group->upcomingParties() as $event) {
