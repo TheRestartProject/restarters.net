@@ -37,6 +37,7 @@ class GroupCreateTest extends TestCase
         self::assertEquals(1, count($ret));
         self::assertEquals($idgroups, $ret[0]['idgroups']);
         self::assertEquals($group->name, $ret[0]['name']);
+        self::assertEquals('dummy', $ret[0]['network_data']['dummy']);
     }
 
     public function testCreateGroupAsRestarter() {

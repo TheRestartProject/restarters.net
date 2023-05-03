@@ -59,6 +59,9 @@ class APIv2GroupTest extends TestCase
         $this->assertEquals('London', $location['location']);
         $this->assertEquals('United Kingdom', $location['country']);
 
+        // Check the network data has been created as expected.
+        $this->assertEquals('dummy', $json['data']['network_data']['dummy']);
+
         // Test group moderation.
         $response = $this->get("/api/v2/moderate/groups?api_token=1234");
         $response->assertSuccessful();

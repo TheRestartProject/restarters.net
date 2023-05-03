@@ -170,7 +170,10 @@ abstract class TestCase extends BaseTestCase
              'website' => $website,
              'location' => $location,
              'description' => $text,
-             'timezone' => 'Europe/London'
+             'timezone' => 'Europe/London',
+             'network_data' => [
+                 'dummy' => 'dummy',
+             ]
         ]);
 
         if ($assert) {
