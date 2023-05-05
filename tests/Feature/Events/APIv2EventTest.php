@@ -102,9 +102,8 @@ class APIv2EventTest extends TestCase
         $json = json_decode($response->getContent(), true);
         self::assertEquals(0, count($json['data']));
 
-        // Nor be able to fetch individually.
-        $this->expectException(NotFoundHttpException::class);
+        // But we should be able to fetch individually.
         $response = $this->get("/api/v2/events/$idevents");
-
+        $response->assertSuccessful();
     }
 }

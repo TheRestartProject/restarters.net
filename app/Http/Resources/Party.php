@@ -245,7 +245,7 @@ class Party extends JsonResource
     public function toArray($request)
     {
         // We return information which can be public, and we rename fields to look more consistent.
-        return [
+        $ret = [
             'id' => $this->idevents,
             'start' => $this->event_start_utc,
             'end' => $this->event_end_utc,
@@ -261,8 +261,14 @@ class Party extends JsonResource
             'updated_at' => Carbon::parse($this->updated_at)->toIso8601String(),
             'approved' => $this->approved ? true : false,
             'network_data' => $this->network_data,
-            'link' => $this->link,
             'full' => true,
         ];
+
+        if ($this->link) {
+            // Don't return this unless present - the OpenAPI schema doesn't allow null values.
+            $ret['link'] = $this->link;
+        }
+
+        return $ret;
     }
 }

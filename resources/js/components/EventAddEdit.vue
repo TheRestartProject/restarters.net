@@ -181,8 +181,6 @@ export default {
   validations: {
     // We use vuelidate to validate the inputs.  If necessary we pass the relevant validation down to a child component,
     // which is responsible for setting the hasError class.
-    //
-    // These need to match PartyController::create.
     idgroups: {
       required
     },
