@@ -94,6 +94,11 @@ use Illuminate\Http\Resources\Json\JsonResource;
  *         type="boolean",
  *     ),
  *     @OA\Property(
+ *          description="Network-defined JSON data",
+ *          property="network_data",
+ *          @OA\Schema()
+ *     ),
+ *     @OA\Property(
  *          property="stats",
  *          title="stats",
  *          description="An array of statistics about the activity of an event.",
@@ -250,6 +255,7 @@ class Party extends JsonResource
             'stats' => $this->resource->getEventStats(),
             'updated_at' => Carbon::parse($this->updated_at)->toIso8601String(),
             'approved' => $this->approved ? true : false,
+            'network_data' => $this->network_data,
             'full' => true,
         ];
     }
