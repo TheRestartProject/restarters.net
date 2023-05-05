@@ -165,4 +165,7 @@ return [
   'delete_permission' => 'You do not have permission to delete this event.',
   'delete_success' => 'Event has been deleted.',
   'geocode_failed' => 'The address you entered could not be found. Please try a more general address.',
+  'create_failed' => 'Event could <strong>not</strong> be created. Please look at the reported errors, correct them, and try again.',
+  'edit_succeeded' => 'Event updated!',
+  'edit_failed' => 'Event could not be edited.',
 ];

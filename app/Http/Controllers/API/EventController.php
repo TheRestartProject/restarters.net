@@ -295,11 +295,6 @@ class EventController extends Controller
     {
         $party = Party::findOrFail($idevents);
 
-        if (!$party->theGroup->approved)
-        {
-            abort(404);
-        }
-
         return \App\Http\Resources\Party::make($party);
     }
 
@@ -445,6 +440,10 @@ class EventController extends Controller
      *                @OA\Property(
      *                   property="online",
      *                   ref="#/components/schemas/Event/properties/online",
+     *                ),
+     *                @OA\Property(
+     *                   property="link",
+     *                   ref="#/components/schemas/Event/properties/link",
      *                ),
      *             )
      *         )
@@ -612,6 +611,10 @@ class EventController extends Controller
      *                   property="online",
      *                   ref="#/components/schemas/Event/properties/online",
      *                ),
+     *                @OA\Property(
+     *                   property="link",
+     *                   ref="#/components/schemas/Event/properties/link",
+     *                ),
      *             )
      *         )
      *    ),
@@ -682,12 +685,11 @@ class EventController extends Controller
         // We don't validate max lengths of other strings, to avoid duplicating the length information both here
         // and in the migrations.  If we wanted to do that we should extract the length dynamically from the
         // schema, which is possible but not trivial.
-        if ($create)
-        {
+        if ($create) {
             $request->validate([
                                    'groupid' => 'required|integer',
-                                   'start' => ['required', 'date_format:Y-m-d\TH:i:sP'],
-                                   'end' => ['required', 'date_format:Y-m-d\TH:i:sP'],
+                                   'start' => ['required', 'date_format:Y-m-d\TH:i:sP,Y-m-d\TH:i:s\Z'],
+                                   'end' => ['required', 'date_format:Y-m-d\TH:i:sP,Y-m-d\TH:i:s\Z'],
                                    'title' => ['required', 'max:255'],
                                    'description' => ['required'],
                                    'location' => [
@@ -703,8 +705,8 @@ class EventController extends Controller
                                ]);
         } else {
             $request->validate([
-                                   'start' => ['required', 'date_format:Y-m-d\TH:i:sP'],
-                                   'end' => ['required', 'date_format:Y-m-d\TH:i:sP'],
+                                   'start' => ['required', 'date_format:Y-m-d\TH:i:sP,Y-m-d\TH:i:s\Z'],
+                                   'end' => ['required', 'date_format:Y-m-d\TH:i:sP,Y-m-d\TH:i:s\Z'],
                                    'title' => ['required', 'max:255'],
                                    'description' => ['required'],
                                    'location' => [

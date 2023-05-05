@@ -253,12 +253,12 @@ class Fixometer
 
     public static function userCanCreateEvents($user)
     {
-        if (Auth::guest()) {
-            return false;
-        }
-
         if (is_null($user)) {
             $user = Auth::user();
+        }
+
+        if (!$user) {
+            return false;
         }
 
         $usersRole = $user->role()->first()->role;

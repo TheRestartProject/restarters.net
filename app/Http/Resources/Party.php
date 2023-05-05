@@ -88,6 +88,12 @@ use Illuminate\Http\Resources\Json\JsonResource;
  *          ref="#/components/schemas/GroupSummary"
  *     ),
  *     @OA\Property(
+ *         property="link",
+ *         title="link",
+ *         description="Optional web link",
+ *         type="string",
+ *     ),
+ *     @OA\Property(
  *         property="approved",
  *         title="hosts",
  *         description="Whether the event has been approved",
@@ -241,7 +247,6 @@ class Party extends JsonResource
         // We return information which can be public, and we rename fields to look more consistent.
         return [
             'id' => $this->idevents,
-            'approved' => $this->approved ? true : false,
             'start' => $this->event_start_utc,
             'end' => $this->event_end_utc,
             'timezone' => $this->timezone,
@@ -256,6 +261,7 @@ class Party extends JsonResource
             'updated_at' => Carbon::parse($this->updated_at)->toIso8601String(),
             'approved' => $this->approved ? true : false,
             'network_data' => $this->network_data,
+            'link' => $this->link,
             'full' => true,
         ];
     }
