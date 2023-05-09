@@ -57,7 +57,6 @@ class Device extends Model implements Auditable
 
         static::deleting(function ($device) {
             $device->barriers()->detach();
-            $device->urls()->delete();
         });
     }
 
@@ -214,11 +213,6 @@ class Device extends Model implements Auditable
     public function deviceEvent()
     {
         return $this->hasOne(\App\Party::class, 'idevents', 'event');
-    }
-
-    public function urls()
-    {
-        return $this->hasMany(\App\DeviceUrl::class, 'device_id', 'iddevices');
     }
 
     public function barriers()

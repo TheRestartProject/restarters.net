@@ -13,7 +13,7 @@ return new class extends Migration
      */
     public function up()
     {
-        Schema::dropIfExists('devices_urls');
+        //
     }
 
     /**
@@ -23,12 +23,6 @@ return new class extends Migration
      */
     public function down()
     {
-        Schema::create('devices_urls', function (Blueprint $table) {
-            $table->increments('id');
-            $table->integer('device_id');
-            $table->foreign('device_id')->references('iddevices')->on('devices');
-            $table->string('url');
-            $table->tinyInteger('source')->nullable();
-        });
+        //
     }
 };
