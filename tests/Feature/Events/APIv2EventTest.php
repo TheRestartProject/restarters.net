@@ -2,6 +2,7 @@
 
 namespace Tests\Feature;
 
+use App\Device;
 use App\Group;
 use App\Network;
 use App\Party;
@@ -74,7 +75,6 @@ class APIv2EventTest extends TestCase
         self::assertFalse($json[0]['approved']);
     }
 
-
     public function testGetEventsForUnapprovedGroup() {
         $user = User::factory()->administrator()->create([
                                                                           'api_token' => '1234',
@@ -104,7 +104,48 @@ class APIv2EventTest extends TestCase
 
         // Nor be able to fetch individually.
         $this->expectException(NotFoundHttpException::class);
-        $response = $this->get("/api/v2/events/$idevents");
+        $this->get("/api/v2/events/$idevents");
+    }
 
+    public function testMaxUpdatedAt() {
+        $user = User::factory()->administrator()->create([
+                                                             'api_token' => '1234',
+                                                         ]);
+        $this->actingAs($user);
+
+        $idgroups = $this->createGroup('Test Group', 'https://therestartproject.org', 'London', 'Some text.', true, false);
+        $network = Network::factory()->create();
+        $network->addGroup(Group::find($idgroups));
+        $network->addCoordinator($user);
+
+        $idevents = $this->createEvent($idgroups, 'yesterday');
+        $device = Device::factory()->fixed()->create([
+                                                         'category' => 111,
+                                                         'category_creation' => 111,
+                                                         'event' => $idevents,
+                                                     ]);
+
+        // Sleep for a second so that the updated_at time on the event and group should not be the current time.
+        sleep(1);
+        $now = Carbon::now()->toIso8601String();
+
+        $response = $this->get("/api/v2/events/$idevents");
+        $response->assertSuccessful();
+        $json = json_decode($response->getContent(), true);
+        $eventUpdated = $json['data']['updated_at'];
+        $groupUpdated = $json['data']['group']['updated_at'];
+
+        // API v2 dates are ISO strings so we can just string compare.
+        self::assertTrue($eventUpdated == $groupUpdated);
+        self::assertFalse($eventUpdated == $now);
+
+        $response = $this->get("/api/events/network?api_token=1234");
+        $response->assertSuccessful();
+        $json = json_decode($response->getContent(), true);
+
+        // API v1 dates aren't as clear so format them for comparison.
+        $eventUpdated = (new Carbon($json[0]['updated_at']))->format('Y-m-d H:i:s');
+        $nowF = (new Carbon($now))->format('Y-m-d H:i:s');
+        self::assertFalse($eventUpdated == $nowF);
     }
 }
