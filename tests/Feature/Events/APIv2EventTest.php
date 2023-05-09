@@ -113,13 +113,12 @@ class APIv2EventTest extends TestCase
                                                          ]);
         $this->actingAs($user);
 
-        $idgroups = $this->createGroup('Test Group', 'https://therestartproject.org', 'London', 'Some text.', true, false);
+        $idgroups = $this->createGroup('Test Group', 'https://therestartproject.org', 'London', 'Some text.', true, true);
         $network = Network::factory()->create();
         $network->addGroup(Group::find($idgroups));
         $network->addCoordinator($user);
 
         $idevents = $this->createEvent($idgroups, 'yesterday');
-        Party::findOrFail($idevents)->approve();
         $device = Device::factory()->fixed()->create([
                                                          'category' => 111,
                                                          'category_creation' => 111,
