@@ -172,6 +172,7 @@ export default {
     },
     useGroup() {
       this.$refs.autocomplete.update(this.groupLocation)
+      this.$emit('update:value', this.groupLocation)
       this.$emit('update:lat', parseFloat(this.groupLat))
       this.$emit('update:lng', parseFloat(this.groupLng))
     },
