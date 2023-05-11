@@ -19,13 +19,14 @@ jobs:
           - DB_USERNAME: restarters
           - DB_PASSWORD: s3cr3t
           - TZ: "UTC"
-      - image: cimg/mysql:5.7.36
+      - image: circleci/mysql:8.0.25
         environment:
           # You can connect once ssh'd in using  mysql -u root -p -h 127.0.0.1
           - MYSQL_ROOT_PASSWORD: s3cr3t
           - MYSQL_DATABASE: restarters_db
           - MYSQL_USER: restarters
           - MYSQL_PASSWORD: s3cr3t
+          - TZ: "UTC"
       - image: mcr.microsoft.com/playwright:focal
         environment:
           NODE_ENV: development
@@ -170,6 +171,9 @@ jobs:
       - run: npx playwright install-deps
       - run: npm install -D @playwright/test
 
+      # One of the migration scripts creates a function, and another creates a trigger.  Even though the function
+      # specifies DETERMINISTIC, we still seem to need to set this flag.
+      - run: mysql --host="127.0.0.1" -u root -ps3cr3t -e "SET GLOBAL log_bin_trust_function_creators = 1;"
       - run: php artisan key:generate
       - run: php artisan migrate
       - run: php artisan l5-swagger:generate
@@ -196,7 +200,7 @@ jobs:
       # Run the Playwright tests.
       #
       # Zap groups set up by the UT; this can confuse Playwright tests.
-      - run: mysql --host="127.0.0.1" -u root -ps3cr3t -e "use restarters_db;SET foreign_key_checks=0;DELETE FROM groups WHERE location IS NULL;SET foreign_key_checks=1;"
+      - run: mysql --host="127.0.0.1" -u root -ps3cr3t -e "SET foreign_key_checks=0;DELETE FROM restarters_db.groups WHERE location IS NULL;SET foreign_key_checks=1;"
       # Ignore the return code from the tinker; the user might exist from the phpunit tests.  If it doesn't and
       # the create fails, the tests will fail too.
       - run: echo "App\User::create(['name'=>'Jane Bloggs','email'=>'jane@bloggs.net','password'=>Hash::make('passw0rd'),'role'=>2,'consent_past_data'=>'2021-01-01','consent_future_data'=>'2021-01-01','consent_gdpr'=>'2021-01-01']);" | php artisan tinker || true
