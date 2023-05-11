@@ -1,12 +1,12 @@
 <template>
   <div>
     <NetworkDataField v-for="key in Object.keys(currentNetworkData)" :key="'networkdata-' + key" :label="key" :value="currentNetworkData[key] ? currentNetworkData[key] : null" @update:value="update(key, $event)" class="mt-1" />
-    <b-btn v-if="!showAddNew" variant="link" @click="showAddNew = true" class="small pl-0">Add new field</b-btn>
-    <div v-if="showAddNew">
-      <label>New field name:</label>
+    <b-btn v-if="!showAddNew" variant="link" @click="showAddNew = true" class="small pl-0">{{ __('networks.edit.add_new_field') }}</b-btn>
+    <div v-if="showAddNew" class="mt-1">
+      <label>{{ __('networks.edit.new_field_name') }}:</label>
       <b-form-input v-model="newLabel" />
       <b-btn variant="primary" @click="addNew" class="mt-2">
-        Add field
+        {{ __('networks.edit.add_field') }}
       </b-btn>
     </div>
   </div>
