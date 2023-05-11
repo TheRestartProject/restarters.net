@@ -105,6 +105,12 @@ class InviteEventTest extends TestCase
         $this->assertNotFalse(strpos($events, '"attending":false'));
         $this->assertNotFalse(strpos($events, '"invitation"'));
 
+        // Run the background Discourse job so that the Discourse thread gets created.
+        if (config('restarters.features.discourse_integration'))
+        {
+            $this->artisan('discourse:syncgroups');
+        }
+
         // Now accept the invitation.
         $response4 = $this->get($invitation);
         $this->assertTrue($response4->isRedirection());
