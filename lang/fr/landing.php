@@ -16,7 +16,7 @@ return [
   'organise_publicise' => 'Faites connaître les événements de réparation et mesurez votre impact',
   'organise_start' => 'Commencez à vous organiser',
   'campaign' => 'Abaissez les barrières de la réparation',
-  'campaign_join' => 'Rejoignez le mouvement mondial pour le droit à la réparation',
+  'campaign_join' => 'Suivre le mouvement du droit à la réparation',
   'campaign_barriers' => 'Documentez les obstacles à la réparation',
   'campaign_data' => 'Analysez les données de réparation',
   'campaign_start' => 'Rejoignez le mouvement',
