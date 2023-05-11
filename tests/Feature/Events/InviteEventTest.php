@@ -2,9 +2,12 @@
 
 namespace Tests\Feature;
 
+use App\Events\ApproveEvent;
 use App\EventsUsers;
 use App\Group;
 use App\Helpers\Fixometer;
+use App\Listeners\CreateDiscourseThreadForEvent;
+use App\Listeners\CreateWordpressPostForEvent;
 use App\Notifications\RSVPEvent;
 use App\Party;
 use App\Role;
@@ -105,10 +108,13 @@ class InviteEventTest extends TestCase
         $this->assertNotFalse(strpos($events, '"attending":false'));
         $this->assertNotFalse(strpos($events, '"invitation"'));
 
-        // Run the background Discourse job so that the Discourse thread gets created.
         if (config('restarters.features.discourse_integration'))
         {
-            $this->artisan('discourse:syncgroups');
+            // This would normally get done by the background job, but doing it here means we'll exercise
+            // more Discourse paths when accepting the invitation.
+            $group->createDiscourseGroup();
+            $handler = app(\App\Listeners\CreateDiscourseThreadForEvent::class);
+            $handler->handle(new \App\Events\ApproveEvent($event));
         }
 
         // Now accept the invitation.

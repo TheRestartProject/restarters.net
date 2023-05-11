@@ -98,6 +98,7 @@ class CreateDiscourseThreadForEvent
                     // when they RSVP.
                     $json = json_decode($response->getBody(), true);
                     if (empty($json['topic_id'])) {
+                        Log::error('Topic id not found in create response ' . $response->getBody());
                         throw new \Exception('Topic id not found in create response');
                     }
 
