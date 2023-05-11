@@ -232,7 +232,7 @@ export default {
         this.clusters.forEach((cluster) => {
           cluster.categories.forEach((c) => {
             const name = this.$lang.get('strings.' + c.name)
-            if (Boolean(c.powered) === Boolean(this.powered) && name.toLowerCase().indexOf(this.currentDevice.item_type.toLowerCase()) !== -1) {
+            if (Boolean(c.powered) === Boolean(this.powered) && !name.toLowerCase().localeCompare(this.currentDevice.item_type.toLowerCase())) {
               ret = {
                 idcategories: c.idcategories,
                 categoryname: c.name,
