@@ -203,8 +203,9 @@ export default {
     },
     suggestedCategory(newval) {
       if (newval) {
-        // Don't override something that's already there, e.g. in edit.
-        if (!this.currentDevice.category) {
+        // For add we always want to use this - we get called multiple times as they type.
+        // For edit we probably don't, unless we have edited the category away.
+        if (this.add || !this.currentDevice.category) {
           this.currentDevice.category = newval.idcategories
 
           // Make it obvious that we have done this to encourage people to review it rather than ignore it.
@@ -261,6 +262,8 @@ export default {
           })
         }
       }
+
+      console.log("Returning", ret, this.currentDevice.item_type)
 
       return ret
     },
