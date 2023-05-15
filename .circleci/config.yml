@@ -186,7 +186,7 @@ jobs:
 
       # Add the config we need.
       - run: psql -h postgresql -U postgres -c "INSERT INTO api_keys (id, user_id, created_by_id, created_at, updated_at, allowed_ips, hidden, last_used_at, revoked_at, description, key_hash, truncated_key) VALUES (1, NULL, 1, '2021-10-25 13:56:20.033338', '2021-10-25 13:56:20.033338', NULL, false, NULL, NULL, 'Restarters', 'd89e9dfacfb611fbaf004807648187ce7ed474df44dcb0ada230fab5c8dd6a5b', '9fd7');" bitnami_discourse
-      - run: psql -h postgresql -U postgres -c "INSERT INTO site_settings (name, data_type, value, created_at, updated_at) VALUES ('personal_message_enabled_groups',3,10,NOW(),NOW());" bitnami_discourse
+      - run: php artisan discourse:setting personal_message_enabled_groups 10
 
       # Run phpunit.  Discourse makes things slow, so up the timeout.
       - run:
