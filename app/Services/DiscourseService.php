@@ -614,7 +614,7 @@ class DiscourseService
             "/admin/site_settings/{$setting}",
             [
                 'form_params' => [
-                    'value' => $value
+                    $setting => $value
                 ]
             ]
         );

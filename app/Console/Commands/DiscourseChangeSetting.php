@@ -64,6 +64,6 @@ class DiscourseChangeSetting extends Command
         $setting = $this->argument('setting');
         $value = $this->argument('value');
 
-        $this->discourseService->syncGroups();
+        $this->discourseService->setSetting($setting, $value);
     }
 }
