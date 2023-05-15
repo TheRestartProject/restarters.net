@@ -139,11 +139,19 @@ jobs:
       # Need access to timezones.
       - run: mysql --host="127.0.0.1" -u root -ps3cr3t -e "GRANT SELECT ON mysql.time_zone_name TO 'restarters'@'%';"
 
-      # We have Discourse on CircleCI.  Create Discourse API key.  We do this hackily in the DB because the Bitnami image
-      # doesn't expose an easy way to do it.
+      # We have Discourse on CircleCI.  Create Discourse API key.  We do this hackily because the Bitnami image
+      # doesn't expose an easy way to do it.  You can get the API key by:
+      # - Running Circle with SSH
+      # - Access the Postgres database in which Discourse stores its config using psql -h postgresql -U bn_discourse bitnami_discourse
+      # - SELECT * FROM api_keys;
+      #
+      # This should be d89e9dfacfb611fbaf004807648187ce7ed474df44dcb0ada230fab5c8dd6a5b.
+      # ...which is a hash of fb71f38ca2b8b7cd6a041e57fd8202c9937088f0ecae7db40722bd758dda92fc
+      #
+      # The hashed value is what we pass on the API calls.
       - run: sed -i 's/FEATURE__DISCOURSE_INTEGRATION=.*$/FEATURE__DISCOURSE_INTEGRATION=true/g' .env
       - run: sed -i 's/DISCOURSE_URL=.*$/DISCOURSE_URL=http:\/\/restarters_discourse/g' .env
-      - run: sed -i 's/DISCOURSE_APIKEY=.*$/DISCOURSE_APIKEY=fb71f38ca2b8b7cd6a041e57fd8202c9937088f0ecae7db40722bd758dda92fc/g' .env
+      - run: sed -i 's/DISCOURSE_APIKEY=.*$/DISCOURSE_APIKEY=d89e9dfacfb611fbaf004807648187ce7ed474df44dcb0ada230fab5c8dd6a5b/g' .env
       - run: sed -i 's/DISCOURSE_APIUSER=.*$/DISCOURSE_APIUSER=someuser/g' .env
 
       # ...and Mediawiki.
