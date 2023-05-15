@@ -20,6 +20,11 @@ use App\Notifications\JoinEvent;
 
 class InviteEventTest extends TestCase
 {
+    /**
+     * Test notification content.
+     *
+     * @return void
+     */
     public function testInvite()
     {
         Notification::fake();
@@ -28,32 +33,14 @@ class InviteEventTest extends TestCase
 
         $group = Group::factory()->create([
                                               'approved' => true
-                                           ]);
-
-        if (config('restarters.features.discourse_integration')) {
-            // This would normally get done by the background job, but doing it here means we'll exercise
-            // more Discourse paths when accepting the invitation.
-            $group->createDiscourseGroup();
-            $group->refresh();
-        }
-
+                                          ]);
         $event = Party::factory()->create([
-                                               'group' => $group,
-                                               'event_start_utc' => '2130-01-01T12:13:00+00:00',
-                                               'event_end_utc' => '2130-01-01T13:14:00+00:00',
-                                           ]);
+                                              'group' => $group,
+                                              'event_start_utc' => '2130-01-01T12:13:00+00:00',
+                                              'event_end_utc' => '2130-01-01T13:14:00+00:00',
+                                          ]);
 
         $host = User::factory()->host()->create();
-
-        if (config('restarters.features.discourse_integration')) {
-            // Similarly, make sure the user exists in Discourse and has a username.
-            $host->generateAndSetUsername();
-            $host->save();
-            $host->refresh();
-            $this->artisan('sync:discourseusernames')->assertExitCode(0);
-            $host->refresh();
-        }
-
         $this->actingAs($host);
 
         // Invite a user.
@@ -84,6 +71,42 @@ class InviteEventTest extends TestCase
                 return true;
             }
         );
+    }
+
+    public function testInviteReal()
+    {
+        $userAttributes = $this->userAttributes();
+        $response = $this->post('/user/register/', $userAttributes);
+
+        $response->assertStatus(302);
+        $response->assertRedirect('dashboard');
+        $this->assertDatabaseHas('users', [
+            'email' => $userAttributes['email'],
+        ]);
+
+        $host = User::latest()->first();
+
+        // Need to set the trust level for the user to be able to create a private message thread.
+
+
+        // Create group.
+        $idgroups = $this->createGroup();
+        $group = Group::findOrFail($idgroups);
+        $idevents = $this->createEvent($idgroups, 'tomorrow');
+        $event = Party::findOrFail($idevents);
+
+        // We want the event handler to kick in and synchronise to Discourse.
+        $this->artisan("queue:work --stop-when-empty");
+
+        // Invite a user.
+        $user = User::factory()->restarter()->create();
+
+        $response = $this->post('/party/invite', [
+            'group_name' => $group->name,
+            'event_id' => $event->idevents,
+            'manual_invite_box' => $user->email,
+            'message_to_restarters' => 'Join us, but not in a creepy zombie way',
+        ]);
 
         $response->assertSessionHas('success');
         $response = $this->get('/party/view/'.$event->idevents);
