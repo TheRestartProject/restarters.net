@@ -90,6 +90,8 @@ export default {
     currentType(newVal) {
       if (!newVal.length) {
         this.$emit('update:type', null)
+      } else {
+        this.$emit('update:type', newVal)
       }
     },
     unknownType(newVal) {

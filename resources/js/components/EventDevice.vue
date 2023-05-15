@@ -203,13 +203,16 @@ export default {
     },
     suggestedCategory(newval) {
       if (newval) {
-        this.currentDevice.category = newval.idcategories
+        // Don't override something that's already there, e.g. in edit.
+        if (!this.currentDevice.category) {
+          this.currentDevice.category = newval.idcategories
 
-        // Make it obvious that we have done this to encourage people to review it rather than ignore it.
-        this.suggested = true
-        setTimeout(() => {
-          this.suggested = false
-        }, 5000)
+          // Make it obvious that we have done this to encourage people to review it rather than ignore it.
+          this.suggested = true
+          setTimeout(() => {
+            this.suggested = false
+          }, 5000)
+        }
       } else {
         this.currentDevice.category = null
       }
