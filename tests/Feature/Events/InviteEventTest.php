@@ -29,13 +29,31 @@ class InviteEventTest extends TestCase
         $group = Group::factory()->create([
                                               'approved' => true
                                            ]);
+
+        if (config('restarters.features.discourse_integration')) {
+            // This would normally get done by the background job, but doing it here means we'll exercise
+            // more Discourse paths when accepting the invitation.
+            $group->createDiscourseGroup();
+            $group->refresh();
+        }
+
         $event = Party::factory()->create([
-                                                   'group' => $group,
-                                                   'event_start_utc' => '2130-01-01T12:13:00+00:00',
-                                                   'event_end_utc' => '2130-01-01T13:14:00+00:00',
-                                               ]);
+                                               'group' => $group,
+                                               'event_start_utc' => '2130-01-01T12:13:00+00:00',
+                                               'event_end_utc' => '2130-01-01T13:14:00+00:00',
+                                           ]);
 
         $host = User::factory()->host()->create();
+
+        if (config('restarters.features.discourse_integration')) {
+            // Similarly, make sure the user exists in Discourse and has a username.
+            $host->generateAndSetUsername();
+            $host->save();
+            $host->refresh();
+            $this->artisan('sync:discourseusernames')->assertExitCode(0);
+            $host->refresh();
+        }
+
         $this->actingAs($host);
 
         // Invite a user.
@@ -107,15 +125,6 @@ class InviteEventTest extends TestCase
         $events = $this->getVueProperties($response3)[1][':initial-events'];
         $this->assertNotFalse(strpos($events, '"attending":false'));
         $this->assertNotFalse(strpos($events, '"invitation"'));
-
-        if (config('restarters.features.discourse_integration'))
-        {
-            // This would normally get done by the background job, but doing it here means we'll exercise
-            // more Discourse paths when accepting the invitation.
-            $group->createDiscourseGroup();
-            $handler = app(\App\Listeners\CreateDiscourseThreadForEvent::class);
-            $handler->handle(new \App\Events\ApproveEvent($event));
-        }
 
         // Now accept the invitation.
         $response4 = $this->get($invitation);

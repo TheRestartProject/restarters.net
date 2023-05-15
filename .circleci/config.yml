@@ -147,11 +147,13 @@ jobs:
       #
       # This should be d89e9dfacfb611fbaf004807648187ce7ed474df44dcb0ada230fab5c8dd6a5b.
       # ...which is a hash of fb71f38ca2b8b7cd6a041e57fd8202c9937088f0ecae7db40722bd758dda92fc
+      # ...and that's what we need to use as the key.
       #
-      # The hashed value is what we pass on the API calls.
+      # Embarrassingly, I can no longer work out how I found the unhashed value.  But perhaps by installing the
+      # docker images locally and sniffing what API key was sent by the web client.
       - run: sed -i 's/FEATURE__DISCOURSE_INTEGRATION=.*$/FEATURE__DISCOURSE_INTEGRATION=true/g' .env
       - run: sed -i 's/DISCOURSE_URL=.*$/DISCOURSE_URL=http:\/\/restarters_discourse/g' .env
-      - run: sed -i 's/DISCOURSE_APIKEY=.*$/DISCOURSE_APIKEY=d89e9dfacfb611fbaf004807648187ce7ed474df44dcb0ada230fab5c8dd6a5b/g' .env
+      - run: sed -i 's/DISCOURSE_APIKEY=.*$/DISCOURSE_APIKEY=fb71f38ca2b8b7cd6a041e57fd8202c9937088f0ecae7db40722bd758dda92fc/g' .env
       - run: sed -i 's/DISCOURSE_APIUSER=.*$/DISCOURSE_APIUSER=someuser/g' .env
 
       # ...and Mediawiki.
