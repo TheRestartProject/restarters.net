@@ -736,5 +736,27 @@ class CreateEventTest extends TestCase
         self::assertEquals(2, count($groups));
         self::assertEquals($groupNotInNetwork->idgroups, $groups[0]['idgroups']);
         self::assertEquals($groupInNetwork->idgroups, $groups[1]['idgroups']);
+
+        // Create the event.
+        $eventAttributes = Party::factory()->raw();
+        $eventAttributes['group'] = $idgroup;
+
+        $event_start = Carbon::createFromTimestamp('tomorrow')->setTimezone('UTC');
+        $event_end = Carbon::createFromTimestamp('tomorrow')->setTimezone('UTC')->addHour(2);
+
+        $eventAttributes['event_start_utc'] = $event_start->toIso8601String();
+        $eventAttributes['event_end_utc'] = $event_end->toIso8601String();
+
+        $response = $this->post('/party/create/', $eventAttributes);
+        $response->assertRedirect();
+
+        // Should redirect to edit page.
+        $redirectTo = $response->getTargetUrl();
+        $p = strrpos($redirectTo, '/');
+        $idevents = substr($redirectTo, $p + 1);
+        self::assertNotNull($idevents);
+
+        $response = $this->get('/party/edit/'.$idevents);
+        $response->assertSuccessful();
     }
 }
