@@ -479,8 +479,7 @@ class EventController extends Controller
 
         if (!Fixometer::userCanCreateEvents($user))
         {
-            // REVIEW: This doesn't check that they are a host of this particular group.  That is existing logic.
-            // Should it?
+            // TODO: This doesn't check that they are a host of this particular group.
             abort(403);
         }
 
@@ -665,12 +664,6 @@ class EventController extends Controller
         }
 
         event(new EditEvent($party, $update));
-
-        if ($request->has('users')) {
-            // REVIEW Existing logic.  But is this needed?  If so we should put it in the OpenAPI spec.  But I
-            // think it's not used and can be retired.
-            (new Party)->createUserList($idEvents, $request->get('users'));
-        }
 
         return response()->json([
                                     'id' => $idEvents,
