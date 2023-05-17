@@ -170,6 +170,9 @@ class NetworkTest extends TestCase
         $this->assertEquals($event2->idevents, $events[1]['id']);
         $this->assertEquals($event2->free_text, $events[1]['description']);
         $this->assertEquals(1, $events[1]['online']);
+
+        // Basic check on date format.
+        $this->assertStringContainsString('T', (new Carbon($events[1]['updated_at']))->toIso8601String());
     }
 
     /** @test */
