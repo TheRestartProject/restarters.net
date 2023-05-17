@@ -336,7 +336,7 @@ export default {
       this.approved = group.approved
       this.networkList = group.networks
       this.tagList = group.tags
-      this.networkData = group.network_data
+      this.networkData = group.network_data ? group.network_data : {}
     }
 
     if (this.canNetwork) {
