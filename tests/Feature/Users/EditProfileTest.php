@@ -108,8 +108,8 @@ class EditProfileTest extends TestCase
         $this->assertEquals(51.507, round($user->latitude, 3));
         $this->assertEquals(-0.128, round($user->longitude, 3));
 
-        $good = Config::get('MAPBOX_TOKEN');
-        Config::set('MAPBOX_TOKEN', 'zzz');
+        $good = Config::get('GOOGLE_API_CONSOLE_KEY');
+        Config::set('GOOGLE_API_CONSOLE_KEY', 'zzz');
 
         // Supply the id.
         $this->post('/profile/edit-info', [
@@ -121,7 +121,7 @@ class EditProfileTest extends TestCase
             'townCity' => 'ZZZZ',
         ]);
 
-        Config::set('MAPBOX_TOKEN', $good);
+        Config::set('GOOGLE_API_CONSOLE_KEY', $good);
 
         $user = $user->fresh();
         $this->assertNull($user->latitude);

@@ -711,4 +711,30 @@ class CreateEventTest extends TestCase
         # Should have queued ApproveEvent.
         self::assertEquals(0, Queue::size('database'));
     }
+
+    /** @test */
+    public function network_coordinator_other_group() {
+        $network = Network::factory()->create();
+
+        // Create a group in the network.
+        $groupInNetwork = Group::factory()->create();
+        $network->addGroup($groupInNetwork);
+
+        $coordinator = User::factory()->networkCoordinator()->create();
+        $network->addCoordinator($coordinator);
+
+        $this->actingAs($coordinator);
+
+        // Create a group not in the network.
+        $idgroup = $this->createGroup();
+        $groupNotInNetwork = Group::findOrFail($idgroup);
+
+        // Both groups should show in the dropdown list for event creation.
+        $response = $this->get('/party/create');
+        $props = $this->getVueProperties($response);
+        $groups = json_decode($props[1][':groups'], TRUE);
+        self::assertEquals(2, count($groups));
+        self::assertEquals($groupNotInNetwork->idgroups, $groups[0]['idgroups']);
+        self::assertEquals($groupInNetwork->idgroups, $groups[1]['idgroups']);
+    }
 }

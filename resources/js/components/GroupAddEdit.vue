@@ -77,7 +77,7 @@
         <b-card-body>
           <div v-if="canNetwork">
             <label for="networks">
-              {{ __('networks.networks') }}
+              {{ __('networks.networks') }}:
             </label>
             <multiselect
                 id="networks"
@@ -96,7 +96,7 @@
           </div>
           <div class="mt-2" v-if="canNetwork">
             <label for="tags">
-              {{ __('groups.group_tags') }}
+              {{ __('groups.group_tags') }}:
             </label>
             <multiselect
                 id="tags"
@@ -130,6 +130,7 @@
               </b-select>
             </b-form-group>
           </div>
+          <NetworkData :network-data.sync="networkData" />
         </b-card-body>
       </b-card>
 
@@ -169,6 +170,7 @@ import GroupLocation from './GroupLocation'
 import GroupTimeZone from './GroupTimeZone'
 import GroupPhone from './GroupPhone'
 import GroupImage from './GroupImage'
+import NetworkData from './NetworkData'
 
 function geocodeableValidation () {
   return this.lat !== null && this.lng !== null
@@ -176,6 +178,7 @@ function geocodeableValidation () {
 
 export default {
   components: {
+    NetworkData,
     GroupTimeZone,
     RichTextEditor,
     GroupName,
@@ -222,7 +225,8 @@ export default {
       approved: false,
       edited: false,
       networkList: null,
-      tagList: null
+      tagList: null,
+      networkData: {}
     }
   },
   validations: {
@@ -322,6 +326,7 @@ export default {
       this.approved = group.approved
       this.networkList = group.networks
       this.tagList = group.tags
+      this.networkData = group.network_data ? group.network_data : {}
     }
 
     if (this.canNetwork) {
@@ -390,7 +395,8 @@ export default {
                 image: this.image,
                 moderate: this.moderate,
                 networks: JSON.stringify(this.networkList.map(n => n.id)),
-                tags: JSON.stringify(this.tagList.map(n => n.id))
+                tags: JSON.stringify(this.tagList.map(n => n.id)),
+                network_data: JSON.stringify(this.networkData)
               })
 
               if (id) {

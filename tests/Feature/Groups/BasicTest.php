@@ -38,7 +38,7 @@ class BasicTest extends TestCase
             [
                 // Can't assert on all-group-tags dev systems might have varying info.
                 'your-area' => 'London',
-                ':can-create' => 'false',
+                ':can-create' => 'true',
                 ':user-id' => $user->id,
                 'tab' => $tab,
                 ':network' => 'null',

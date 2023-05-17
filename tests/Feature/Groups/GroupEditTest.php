@@ -40,12 +40,21 @@ class GroupEditTest extends TestCase
             'name' => 'Test',
             'website' => 'https://therestartproject.org',
             'free_text' => 'HQ',
+            'network_data' => [
+                'no_dummy' => 'no_dummy'
+            ]
         ]);
 
         $response->assertSuccessful();
 
+        $group->refresh();
         $this->assertEquals(1, count($group->group_tags));
         $this->assertEquals($tag->tag_name, $group->group_tags[0]->tag_name);
+
+        // Network data should have changed.
+        $this->assertEquals($group->network_data, [
+            'no_dummy' => 'no_dummy'
+        ]);
     }
 
     public function testEditGroupAsRestarter() {

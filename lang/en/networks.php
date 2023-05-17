@@ -35,5 +35,8 @@ return [
   'edit' => [
     'label_logo' => 'Network logo',
     'button_save' => 'Save changes',
+    'add_new_field' => 'Add new field',
+    'new_field_name' => 'New field name',
+    'add_field' => 'Add field',
   ],
 ];
