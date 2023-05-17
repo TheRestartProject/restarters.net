@@ -17,7 +17,11 @@
                           <tr>
                             {{-- Some updated data is an array. --}}
                             @php($modified['new'] = is_array($modified['new']) ? json_encode($modified['new']) : $modified['new'])
+                            @if(gettype($modified) == 'string')
                             <td>@lang($type.'.'.$audit->event.'.modified.'.$attribute, $modified)</td>
+                            @else
+                            <td><?php echo $type.'.'.$audit->event.'.modified.'.$attribute . " " . json_encode($modified) ?></td>
+                            @endif
                           </tr>
                       @endforeach
                     </tbody>
