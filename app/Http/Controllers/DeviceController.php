@@ -301,7 +301,6 @@ class DeviceController extends Controller
 
             $Device->update([
                 'category' => $category,
-                'category_creation' => $category,
                 'brand' => $brand,
                 'item_type' => $item_type,
                 'model' => $model,

@@ -279,7 +279,7 @@ class Group extends JsonResource
             'tags' => new TagCollection($this->group_tags),
             'timezone' => $this->timezone,
             'approved' => $this->approved ? true : false,
-            'network_data' => $this->network_data,
+            'network_data' => gettype($this->network_data) == 'string' ? json_decode($this->network_data, true) : $this->network_data,
             'full' => true
         ];
 

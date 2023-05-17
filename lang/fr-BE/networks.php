@@ -4,6 +4,9 @@ return [
   'edit' => [
     'button_save' => 'Sauver les changements',
     'label_logo' => 'Logo du réseau',
+    'add_new_field' => 'Ajouter un nouveau champ',
+    'new_field_name' => 'Nouveau nom de champ',
+    'add_field' => 'Ajouter le champ',
   ],
   'general' => [
     'network' => 'Réseau',
