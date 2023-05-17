@@ -22,13 +22,6 @@
       </span>
       </small>
     </b-form-group>
-    <GroupLocationMap
-        :lat.sync="currentLat"
-        :lng.sync="currentLng"
-        class="group-locationmap"
-        ref="locationmap"
-        v-if="showMap"
-    />
     <b-form-group>
       <label for="group_postcode">{{ __('groups.postcode') }}:</label>
       <b-input id="group_postcode" name="postcode" v-model="currentPostcode" :class="{ hasError: hasError }" :readonly="!canEditPostcode" />
@@ -40,10 +33,6 @@
 import Vue from 'vue'
 import VueGoogleAutocomplete from 'vue-google-autocomplete'
 import UniqueId from 'vue-unique-id';
-import GroupLocationMap from './GroupLocationMap'
-import mapboxgl from "mapbox-gl";
-import MapboxGeocoder from '@mapbox/mapbox-gl-geocoder';
-import '@mapbox/mapbox-gl-geocoder/dist/mapbox-gl-geocoder.css';
 
 Vue.use(UniqueId);
 
@@ -96,14 +85,11 @@ export default {
     }
   },
   components: {
-    GroupLocationMap,
+    VueGoogleAutocomplete
   },
   data () {
     return {
       currentValue: null,
-      showMap: false,
-      currentLat: null,
-      currentLng: null,
       location: null,
       currentPostcode: null,
       timer: null,
@@ -111,46 +97,12 @@ export default {
   },
   mounted() {
     this.currentValue = this.value
-      this.currentLat = this.lat
-      this.currentLng = this.lng
-      this.showMap = this.lat || this.lng
     this.currentPostcode = this.postcode
-
-      const token = document.getElementById('mapboxtoken')
-
-      mapboxgl.accessToken = token.textContent;
-
-      this.geocoder = new MapboxGeocoder({
-        accessToken: mapboxgl.accessToken,
-        types: 'country,region,place,postcode,locality,neighborhood',
-        placeholder: this.$lang.get('groups.groups_location_placeholder')
-      });
-
-      // Tick to pick up id value.
-      this.$nextTick(() => {
-        this.geocoder.addTo('#' + this.inputid);
-      })
-
-      this.geocoder.on('result', (e) => {
-        this.currentValue = e.result.place_name
-        this.currentLat = e.result.center[1]
-        this.currentLng = e.result.center[0]
-        this.$emit('update:value', e.result.place_name)
-        this.showMap = true
-      });
-    } catch (e) {
-      console.error('Error setting up autocomplete',e)
-    }
+    this.$refs.autocomplete.update(this.currentValue)
   },
   watch: {
     currentPostcode(newVal) {
       this.$emit('update:postcode', newVal)
-    },
-    currentLat(newVal) {
-      this.$emit('update:lat', newVal)
-    },
-    currentLng(newVal) {
-      this.$emit('update:lng', newVal)
     },
   },
   methods: {
