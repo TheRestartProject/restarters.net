@@ -149,7 +149,7 @@ class TimezoneTest extends TestCase
         $eventData['id'] = $id2;
         $eventData['event_start_utc'] = Carbon::parse("$date $editstart2", $tz1)->setTimezone('UTC')->toIso8601String();
         $eventData['event_end_utc'] = Carbon::parse("$date $editend2", $tz1)->setTimezone('UTC')->toIso8601String();
-        $response2 = $this->post('/party/edit/'.$event->idevents, $eventData);
+        $response2 = $this->patch('/api/v2/events/'.$event->idevents, $this->eventAttributesToAPI($eventData));
         $event->refresh();
         $this->assertEquals($eventData['event_start_utc'], $event->event_start_utc);
         $this->assertEquals($eventData['event_end_utc'], $event->event_end_utc);

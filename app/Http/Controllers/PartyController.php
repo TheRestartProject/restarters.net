@@ -461,11 +461,6 @@ class PartyController extends Controller
                 } else {
                     event(new EditEvent($event, $data));
                 }
-
-                if (isset($_POST['users']) && ! empty($_POST['users'])) {
-                    $users = $_POST['users'];
-                    $Party->createUserList($id, $users);
-                }
             }
             if (Fixometer::hasRole($user, 'Host')) {
                 header('Location: /host?action=pe&code=200');

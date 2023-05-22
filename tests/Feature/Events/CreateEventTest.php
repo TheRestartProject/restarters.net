@@ -8,7 +8,6 @@ use App\Helpers\Geocoder;
 use App\Helpers\RepairNetworkService;
 use App\Network;
 use App\Notifications\AdminModerationEvent;
-use App\Notifications\JoinGroup;
 use App\Notifications\NotifyRestartersOfNewEvent;
 use App\Party;
 use App\Role;
@@ -19,6 +18,7 @@ use Illuminate\Support\Facades\Notification;
 use Illuminate\Support\Facades\Queue;
 use Tests\TestCase;
 use App\Notifications\EventConfirmed;
+use Illuminate\Validation\ValidationException;
 
 class GeocoderMock extends Geocoder
 {
@@ -351,7 +351,7 @@ class CreateEventTest extends TestCase
         $event = Party::latest()->first();
         $eventData['id'] = $event->idevents;
         $eventData['moderate'] = 'approve';
-        $response = $this->post('/party/edit/'.$event->idevents, $eventData);
+        $response1a = $this->patch('/api/v2/events/'.$event->idevents, $this->eventAttributesToAPI($eventData));
 
         // assert
         Notification::assertSentTo(
@@ -377,8 +377,8 @@ class CreateEventTest extends TestCase
         // Edit to a bad location for coverage.
         $eventData['id'] = $event->idevents;
         $eventData['location'] = 'ForceGeocodeFailure';
-        $response = $this->post('/party/edit/'.$event->idevents, $eventData);
-        $response->assertSee(__('events.address_error'));
+        $this->expectException(ValidationException::class);
+        $this->patch('/api/v2/events/'.$event->idevents, $this->eventAttributesToAPI($eventData));
     }
 
     /** @test */
@@ -403,9 +403,9 @@ class CreateEventTest extends TestCase
         // act
         $response = $this->post('/party/create/', $eventData);
         $event = Party::latest()->first();
-        $eventData['id'] = $event->idevents;
+        $eventData = $event->getAttributes();
         $eventData['moderate'] = 'approve';
-        $response = $this->post('/party/edit/'.$event->idevents, $eventData);
+        $response = $this->patch('/api/v2/events/'.$event->idevents, $this->eventAttributesToAPI($eventData));
 
         // assert
         Notification::assertNotSentTo(
@@ -710,5 +710,53 @@ class CreateEventTest extends TestCase
 
         # Should have queued ApproveEvent.
         self::assertEquals(0, Queue::size('database'));
+    }
+
+    /** @test */
+    public function network_coordinator_other_group() {
+        $network = Network::factory()->create();
+
+        // Create a group in the network.
+        $groupInNetwork = Group::factory()->create();
+        $network->addGroup($groupInNetwork);
+
+        $coordinator = User::factory()->networkCoordinator()->create();
+        $network->addCoordinator($coordinator);
+
+        $this->actingAs($coordinator);
+
+        // Create a group not in the network.
+        $idgroup = $this->createGroup();
+        $groupNotInNetwork = Group::findOrFail($idgroup);
+
+        // Both groups should show in the dropdown list for event creation.
+        $response = $this->get('/party/create');
+        $props = $this->getVueProperties($response);
+        $groups = json_decode($props[1][':groups'], TRUE);
+        self::assertEquals(2, count($groups));
+        self::assertEquals($groupNotInNetwork->idgroups, $groups[0]['idgroups']);
+        self::assertEquals($groupInNetwork->idgroups, $groups[1]['idgroups']);
+
+        // Create the event.
+        $eventAttributes = Party::factory()->raw();
+        $eventAttributes['group'] = $idgroup;
+
+        $event_start = Carbon::createFromTimestamp('tomorrow')->setTimezone('UTC');
+        $event_end = Carbon::createFromTimestamp('tomorrow')->setTimezone('UTC')->addHour(2);
+
+        $eventAttributes['event_start_utc'] = $event_start->toIso8601String();
+        $eventAttributes['event_end_utc'] = $event_end->toIso8601String();
+
+        $response = $this->post('/party/create/', $eventAttributes);
+        $response->assertRedirect();
+
+        // Should redirect to edit page.
+        $redirectTo = $response->getTargetUrl();
+        $p = strrpos($redirectTo, '/');
+        $idevents = substr($redirectTo, $p + 1);
+        self::assertNotNull($idevents);
+
+        $response = $this->get('/party/edit/'.$idevents);
+        $response->assertSuccessful();
     }
 }
