@@ -35,6 +35,12 @@ class AddUserToDiscourseGroup
         $repairGroup = $event->group;
         $user = $event->user;
 
+        if (!$user->username) {
+            $user->generateAndSetUsername();
+            $user->save();
+            $user->refresh();
+        }
+
         try {
             $discourseGroups = [];
             foreach ($repairGroup->networks as $network) {
