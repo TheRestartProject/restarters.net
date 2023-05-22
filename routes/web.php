@@ -268,11 +268,6 @@ Route::middleware('auth', 'verifyUserConsent', 'ensureAPIToken')->group(function
         Route::get('/host', [DashboardController::class, 'getHostDash']);
     });
 
-    //Device Controller
-    Route::resource('device-url', DeviceUrlController::class)->only([
-        'store', 'update', 'destroy'
-                                                               ]);
-
     Route::prefix('fixometer')->group(function () {
         Route::get('/', [DeviceController::class, 'index'])->name('devices');
     });

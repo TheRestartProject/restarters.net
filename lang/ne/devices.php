@@ -23,7 +23,4 @@ return [
   'repair_details' => 'Volgende stappen',
   'repair_status' => 'Herstel status',
   'to_date' => 'Tot',
-  'useful_repair_urls' => 'URL met nuttige herstelinfo gebruikt',
-  'useful_repair_urls_explanation' => 'Nuttige URL',
-  'useful_repair_urls_helper' => 'Geef de URL hier in',
 ];
