@@ -161,4 +161,5 @@ return [
   'image_delete_error' => 'Désolé, mais l\'image ne peut pas être supprimée.',
   'delete_permission' => 'Vous n\'avez pas la permission de supprimer cet événement',
   'delete_success' => 'L\'événement a été supprimé.',
+  'geocode_failed' => 'L\'adresse que vous avez encodée n\'a pas pu être trouvée. Veuillez essayer une adresse plus générale.',
 ];

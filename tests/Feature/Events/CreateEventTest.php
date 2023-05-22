@@ -8,7 +8,6 @@ use App\Helpers\Geocoder;
 use App\Helpers\RepairNetworkService;
 use App\Network;
 use App\Notifications\AdminModerationEvent;
-use App\Notifications\JoinGroup;
 use App\Notifications\NotifyRestartersOfNewEvent;
 use App\Party;
 use App\Role;
@@ -19,6 +18,7 @@ use Illuminate\Support\Facades\Notification;
 use Illuminate\Support\Facades\Queue;
 use Tests\TestCase;
 use App\Notifications\EventConfirmed;
+use Illuminate\Validation\ValidationException;
 
 class GeocoderMock extends Geocoder
 {
@@ -351,7 +351,7 @@ class CreateEventTest extends TestCase
         $event = Party::latest()->first();
         $eventData['id'] = $event->idevents;
         $eventData['moderate'] = 'approve';
-        $response = $this->post('/party/edit/'.$event->idevents, $eventData);
+        $response1a = $this->patch('/api/v2/events/'.$event->idevents, $this->eventAttributesToAPI($eventData));
 
         // assert
         Notification::assertSentTo(
@@ -377,8 +377,8 @@ class CreateEventTest extends TestCase
         // Edit to a bad location for coverage.
         $eventData['id'] = $event->idevents;
         $eventData['location'] = 'ForceGeocodeFailure';
-        $response = $this->post('/party/edit/'.$event->idevents, $eventData);
-        $response->assertSee(__('events.address_error'));
+        $this->expectException(ValidationException::class);
+        $this->patch('/api/v2/events/'.$event->idevents, $this->eventAttributesToAPI($eventData));
     }
 
     /** @test */
@@ -403,9 +403,9 @@ class CreateEventTest extends TestCase
         // act
         $response = $this->post('/party/create/', $eventData);
         $event = Party::latest()->first();
-        $eventData['id'] = $event->idevents;
+        $eventData = $event->getAttributes();
         $eventData['moderate'] = 'approve';
-        $response = $this->post('/party/edit/'.$event->idevents, $eventData);
+        $response = $this->patch('/api/v2/events/'.$event->idevents, $this->eventAttributesToAPI($eventData));
 
         // assert
         Notification::assertNotSentTo(
