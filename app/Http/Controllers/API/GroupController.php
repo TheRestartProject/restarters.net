@@ -86,6 +86,8 @@ class GroupController extends Controller
         // New Collection Instance
         $collection = collect([]);
 
+        $countries = array_flip(App\Helpers\Fixometer::getAllCountries());
+
         foreach ($groups as $group) {
             // If we have a bounding box, check that the group is within it.
             if (! $bbox || (
@@ -100,7 +102,7 @@ class GroupController extends Controller
                                       'timezone' => $group->timezone,
                                       'location' => [
                                           'value' => $group->location,
-                                          'country' => $group->country,
+                                          'country' => Fixometer::translateCountry($group->country, $countries),
                                           'latitude' => $group->latitude,
                                           'longitude' => $group->longitude,
                                           'area' => $group->area,
@@ -595,6 +597,10 @@ class GroupController extends Controller
             $request,
             true
         );
+
+        // Countries are stored in the database in English, but passed in as a country name.  So we need to reverse
+        // translate.
+        $country = Fixometer::unTranslateCountry($country);
 
         $data = [
             'name' => $name,
