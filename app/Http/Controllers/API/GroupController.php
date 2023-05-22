@@ -86,7 +86,7 @@ class GroupController extends Controller
         // New Collection Instance
         $collection = collect([]);
 
-        $countries = array_flip(App\Helpers\Fixometer::getAllCountries());
+        $countries = array_flip(\App\Helpers\Fixometer::getAllCountries());
 
         foreach ($groups as $group) {
             // If we have a bounding box, check that the group is within it.
@@ -598,10 +598,6 @@ class GroupController extends Controller
             true
         );
 
-        // Countries are stored in the database in English, but passed in as a country name.  So we need to reverse
-        // translate.
-        $country = Fixometer::unTranslateCountry($country);
-
         $data = [
             'name' => $name,
             'website' => $website,
@@ -896,6 +892,9 @@ class GroupController extends Controller
 
             $latitude = $geocoded['latitude'];
             $longitude = $geocoded['longitude'];
+
+            // Note that the country returned by the geocoder is already in English, which is what we need for the
+            // value in the database.
             $country = $geocoded['country'];
         }
 

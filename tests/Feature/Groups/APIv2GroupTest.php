@@ -318,5 +318,7 @@ class APIv2GroupTest extends TestCase
         $json = json_decode($response->getContent(), true);
         $location = $json['data']['location'];
         $this->assertEquals('Belgique', $location['country']);
+
+        // Create a group in
     }
 }

@@ -494,23 +494,6 @@ class Fixometer
         return $country;
     }
 
-    public static function unTranslateCountry($country) {
-        // Countries are stored in the DB as English names, so we need to translate them.
-        $countries = App\Helpers\Fixometer::getAllCountries('en');
-        $code = 'en';
-
-        foreach ($countries as $c => $name) {
-            if ($name == $country) {
-                $code = $c;
-                break;
-            }
-        }
-
-        $country = \Lang::get('countries.' . $code, [], 'en');
-
-        return $country;
-    }
-
     public static function skillCategories()
     {
         return [
