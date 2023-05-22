@@ -118,7 +118,7 @@ class BasicTest extends TestCase
         $eventData = $event->getAttributes();
         $eventData['id'] = $event->idevents;
         $eventData['moderate'] = 'approve';
-        $response1a = $this->post('/party/edit/'.$event->idevents, $eventData);
+        $response1a = $this->patch('/api/v2/events/'.$event->idevents, $this->eventAttributesToAPI($eventData));
 
         // Should now show as an upcoming event, both on dashboard page and events page.
         $this->actingAs($host);

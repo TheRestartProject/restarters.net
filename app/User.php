@@ -537,14 +537,12 @@ class User extends Authenticatable implements Auditable, HasLocalePreference
 
     public function groupsInChargeOf()
     {
-        $groupsUserIsInChargeOf = collect([]);
+        $groupsUserIsInChargeOf = Group::join('users_groups', 'groups.idgroups', '=', 'users_groups.group')
+            ->where('user', $this->id)
+            ->where('role', 3)
+            ->get();
 
-        if ($this->hasRole('Host')) {
-            $groupsUserIsInChargeOf = Group::join('users_groups', 'groups.idgroups', '=', 'users_groups.group')
-                                    ->where('user', $this->id)
-                                    ->where('role', 3)
-                                    ->get();
-        } elseif ($this->hasRole('NetworkCoordinator')) {
+        if ($this->hasRole('NetworkCoordinator')) {
             foreach ($this->networks as $network) {
                 foreach ($network->groups as $group) {
                     $groupsUserIsInChargeOf->push($group);
@@ -554,7 +552,7 @@ class User extends Authenticatable implements Auditable, HasLocalePreference
             $groupsUserIsInChargeOf = Group::all();
         }
 
-        return $groupsUserIsInChargeOf;
+        return $groupsUserIsInChargeOf->unique();
     }
 
     public function ensureAPIToken()

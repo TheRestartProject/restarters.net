@@ -84,6 +84,8 @@ Route::prefix('v2')->group(function() {
 
     Route::prefix('/events')->group(function() {
         Route::get('{id}', [API\EventController::class, 'getEventv2']);
+        Route::post('', [API\EventController::class, 'createEventv2']);
+        Route::patch('{id}', [API\EventController::class, 'updateEventv2']);
     });
 
     Route::prefix('/networks')->group(function() {

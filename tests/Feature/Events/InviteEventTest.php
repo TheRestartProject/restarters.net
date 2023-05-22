@@ -126,7 +126,7 @@ class InviteEventTest extends TestCase
         $eventData = $event->getAttributes();
         $eventData['id'] = $event->idevents;
         $eventData['moderate'] = 'approve';
-        $this->post('/party/edit/'.$event->idevents, $eventData);
+        $this->patch('/api/v2/events/'.$event->idevents, $this->eventAttributesToAPI($eventData));
 
         // As the user...
         $this->get('/logout');
