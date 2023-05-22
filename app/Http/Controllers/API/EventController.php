@@ -132,7 +132,7 @@ class EventController extends Controller
                 ],
                 'hours_volunteered' => $party->hoursVolunteered(),
                 'created_at' => new \Carbon\Carbon($party->created_at),
-                'updated_at' => new \Carbon\Carbon($party->max_updated_at_devices_updated_at),
+             'updated_at' => (new \Carbon\Carbon($party->max_updated_at_devices_updated_at)),
             ]);
 
             if (!empty($party->owner)) {

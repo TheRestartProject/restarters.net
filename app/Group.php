@@ -473,6 +473,11 @@ class Group extends Model implements Auditable
         return false;
     }
 
+    public function getMaxUpdatedAtDevicesUpdatedAtAttribute()
+    {
+        return strtotime($this->updated_at) > strtotime($this->devices_updated_at) ? $this->updated_at : $this->devices_updated_at;
+    }
+
     public function getAutoApproveAttribute()
     {
         // A group's events are auto-approved iff all the networks that the group belongs to are set to auto-approve
