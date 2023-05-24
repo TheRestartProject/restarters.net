@@ -409,6 +409,7 @@ class PartyController extends Controller
                       'userInChargeOfMultipleGroups' => $userInChargeOfMultipleGroups,
                       'audits' => $audits,
                       'response' => $response,
+                      'selected_group_id' => $party->group,
                   ]);
                 }
 
@@ -490,6 +491,7 @@ class PartyController extends Controller
                 'userInChargeOfMultipleGroups' => $userInChargeOfMultipleGroups,
                 'images' => $images,
                 'audits' => $audits,
+                'selected_group_id' => $party->group,
             ]);
         }
 
@@ -516,6 +518,7 @@ class PartyController extends Controller
             'user_groups' => $groupsUserIsInChargeOf,
             'userInChargeOfMultipleGroups' => $userInChargeOfMultipleGroups,
             'audits' => $audits,
+            'selected_group_id' => $party->group,
         ]);
     }
 
