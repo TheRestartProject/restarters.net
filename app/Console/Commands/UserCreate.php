@@ -92,6 +92,7 @@ class UserCreate extends Command
                 $this->info("User created #" . $user->id);
 
                 if (config('restarters.features.discourse_integration')) {
+                    $user->generateAndSetUsername();
                     $discourseService->syncSso($user);
                 }
             } else

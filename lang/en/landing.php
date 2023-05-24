@@ -16,7 +16,7 @@ return [
   'organise_publicise' => 'Publicise repair events and measure your impact',
   'organise_start' => 'Start organising',
   'campaign' => 'Bring down the barriers to repair',
-  'campaign_join' => 'Join the global Right to Repair movement',
+  'campaign_join' => 'Keep up with the global Right to Repair movement',
   'campaign_barriers' => 'Document the barriers to repair',
   'campaign_data' => 'Analyse repair data',
   'campaign_start' => 'Join the movement',
@@ -27,7 +27,7 @@ return [
   'network_events' => 'Display your groups and events on your website automatically',
   'network_record' => 'Allow your volunteers to easily record repair data',
   'network_impact' => 'Measure and track your network\'s overall impact',
-  'network_brand' => 'Custom-branding and localisation: user your logo and language',
+  'network_brand' => 'Custom-branding and localisation: use your logo and language',
   'network_power' => 'Help power the Right to Repair movement',
   'network_start' => 'Get in touch',
 ];

@@ -632,7 +632,7 @@ class GroupController extends Controller
                                'user' => $user->id,
                                'group' => $idGroup,
                                'status' => 1,
-                               'role' => 3,
+                               'role' => Role::HOST,
                            ]);
 
         if (isset($_FILES) && !empty($_FILES)) {

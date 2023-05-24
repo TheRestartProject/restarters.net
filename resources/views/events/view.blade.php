@@ -89,7 +89,6 @@
           foreach ($event->devices as $device) {
               $device->category = $device->deviceCategory;
               $device->shortProblem = $device->getShortProblem();
-              $device->urls;
 
               $barriers = [];
 

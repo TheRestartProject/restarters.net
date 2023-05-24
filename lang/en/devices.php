@@ -1,8 +1,6 @@
 <?php
 
 return [
-  'useful_repair_urls_helper' => 'Enter URL here',
-  'useful_repair_urls_explanation' => 'Useful repair URL',
   'devices' => 'Repairs',
   'export_device_data' => 'Export all data',
   'export_event_data' => 'Export event data',
@@ -24,12 +22,10 @@ return [
   'repairable' => 'Repairable',
   'age' => 'Age',
   'devices_description' => 'Description of problem/solution',
-  'useful_repair_urls' => 'URL of useful repair information used',
   'delete_device' => 'Delete device',
   'from_manufacturer' => 'From manufacturer',
   'from_third_party' => 'From third party',
   'devices_date' => 'Date',
-  'useful_repair_info' => 'Source of information',
   'event_info' => 'Event info',
   'fixometer' => 'Fixometer',
   'global_impact' => 'Our Global Impact',
