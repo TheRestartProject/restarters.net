@@ -162,4 +162,7 @@ return [
   'delete_permission' => 'Vous n\'avez pas la permission de supprimer cet événement',
   'delete_success' => 'L\'événement a été supprimé.',
   'geocode_failed' => 'L\'adresse que vous avez encodée n\'a pas pu être trouvée. Veuillez essayer une adresse plus générale.',
+  'create_failed' => 'L\'événement <strong>n\'a pas pu</strong> être créé. Veuillez regarder les erreurs, les corriger, et essayer à nouveau.',
+  'edit_succeeded' => 'L\'édition du l\'événement Café a réussi',
+  'edit_failed' => 'L\'événement n\'a pas pu être édité.',
 ];
