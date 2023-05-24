@@ -344,7 +344,6 @@ class PartyController extends Controller
                                 'events.created_success_message_autoapproved' : 'events.created_success_message'));
         }
 
-
         return view('events.create', [
             'title' => 'New Party',
             'gmaps' => true,
