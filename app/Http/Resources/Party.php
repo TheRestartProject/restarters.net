@@ -260,7 +260,7 @@ class Party extends JsonResource
             'stats' => $this->resource->getEventStats(),
             'updated_at' => Carbon::parse($this->updated_at)->toIso8601String(),
             'approved' => $this->approved ? true : false,
-            'network_data' => $this->network_data,
+            'network_data' => gettype($this->network_data) == 'string' ? json_decode($this->network_data, true) : $this->network_data,
             'full' => true,
         ];
 

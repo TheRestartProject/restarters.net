@@ -374,7 +374,8 @@ export default {
               area: this.area,
               timezone: this.timezone,
               phone: this.phone,
-              image: this.image
+              image: this.image,
+              network_data: JSON.stringify(this.networkData)
             })
 
             if (id) {

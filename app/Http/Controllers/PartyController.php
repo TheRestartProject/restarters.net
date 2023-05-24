@@ -559,6 +559,7 @@ class PartyController extends Controller
             'user_groups' => $groupsUserIsInChargeOf,
             'userInChargeOfMultipleGroups' => $userInChargeOfMultipleGroups,
             'duplicateFrom' => PartyController::expandEvent($party, NULL),
+            'selected_group_id' => $party->group,
         ]);
     }
 

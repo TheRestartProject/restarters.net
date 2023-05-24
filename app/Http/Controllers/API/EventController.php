@@ -421,6 +421,11 @@ class EventController extends Controller
      *                   property="link",
      *                   ref="#/components/schemas/Event/properties/link",
      *                ),
+     *                @OA\Property(
+     *                   description="Network-defined JSON data",
+     *                   property="network_data",
+     *                   @OA\Schema()
+     *                ),
      *             )
      *         )
      *    ),
@@ -441,7 +446,7 @@ class EventController extends Controller
     {
         $user = $this->getUser();
 
-        list($groupid, $start, $end, $title, $description, $location, $timezone, $latitude, $longitude, $online, $link) = $this->validateEventParams(
+        list($groupid, $start, $end, $title, $description, $location, $timezone, $latitude, $longitude, $online, $link, $network_data) = $this->validateEventParams(
             $request,
             true
         );
@@ -478,7 +483,8 @@ class EventController extends Controller
             'user_id' => $user->id,
             'created_at' => date('Y-m-d H:i:s'),
             'shareable_code' => Fixometer::generateUniqueShareableCode(\App\Party::class, 'shareable_code'),
-            'online' => $online
+            'online' => $online,
+            'network_data' => $network_data,
         ];
 
         $party = Party::create($data);
@@ -604,7 +610,7 @@ class EventController extends Controller
     {
         $user = $this->getUser();
 
-        list($groupid, $start, $end, $title, $description, $location, $timezone, $latitude, $longitude, $online, $link) = $this->validateEventParams(
+        list($groupid, $start, $end, $title, $description, $location, $timezone, $latitude, $longitude, $online, $link, $network_data) = $this->validateEventParams(
             $request,
             false
         );
@@ -626,7 +632,8 @@ class EventController extends Controller
             'location' => $location,
             'latitude' => $latitude,
             'longitude' => $longitude,
-            'timezone' => $timezone
+            'timezone' => $timezone,
+            'network_data' => $network_data,
         ];
 
         $party = Party::findOrFail($idEvents);
@@ -691,6 +698,7 @@ class EventController extends Controller
         $timezone = $request->input('timezone');
         $online = $request->input('online', false);
         $link = $request->input('link', null);
+        $network_data = $request->input('network_data');
 
         $latitude = null;
         $longitude = null;
@@ -723,6 +731,7 @@ class EventController extends Controller
             $longitude,
             $online,
             $link,
+            $network_data
         );
     }
 }

@@ -28,6 +28,7 @@
           @else
           :groups="{{ json_encode($user_groups, JSON_INVALID_UTF8_IGNORE) }}"
           @endif
+          :can-approve="{{ (App\Helpers\Fixometer::hasRole( Auth::user(), 'Administrator') || Auth::user()->isCoordinatorForGroup(Group::find($selected_group_id))) ? "true" : "false" }}"
       />
     </div>
 

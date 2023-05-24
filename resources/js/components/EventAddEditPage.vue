@@ -3,7 +3,7 @@
     <h1>{{ __('events.add_new_event') }}</h1>
     <b-card no-body class="box mt-4">
       <b-card-body class="p-4">
-        <EventAddEdit :duplicate-from="duplicateFrom" :idevents="idevents" :groups="groups" :csrf="csrf" />
+        <EventAddEdit :duplicate-from="duplicateFrom" :idevents="idevents" :groups="groups" :csrf="csrf" :can-approve="canApprove"/>
       </b-card-body>
     </b-card>
   </div>
@@ -29,6 +29,11 @@ export default {
     groups: {
       type: Array,
       required: true
+    },
+    canApprove: {
+      type: Boolean,
+      required: false,
+      default: false
     }
   },
 }
