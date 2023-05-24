@@ -54,6 +54,9 @@ class CreateDiscourseThreadForEvent
             try {
                 // We want the host to create the message, so use their username.  The API key should
                 // allow us to do this - see https://meta.discourse.org/t/how-can-an-api-user-create-posts-as-another-user/45968/3.
+                //
+                // Note that the Discourse instance is expected to be configured to allow this,
+                // by setting personal_message_enabled_groups to 10.
                 $client = app('discourse-client', [
                     'username' => $host->username,
                 ]);
@@ -98,6 +101,7 @@ class CreateDiscourseThreadForEvent
                     // when they RSVP.
                     $json = json_decode($response->getBody(), true);
                     if (empty($json['topic_id'])) {
+                        Log::error('Topic id not found in create response ' . $response->getBody());
                         throw new \Exception('Topic id not found in create response');
                     }
 

@@ -473,6 +473,11 @@ class Group extends Model implements Auditable
         return false;
     }
 
+    public function getMaxUpdatedAtDevicesUpdatedAtAttribute()
+    {
+        return strtotime($this->updated_at) > strtotime($this->devices_updated_at) ? $this->updated_at : $this->devices_updated_at;
+    }
+
     public function getAutoApproveAttribute()
     {
         // A group's events are auto-approved iff all the networks that the group belongs to are set to auto-approve
@@ -543,10 +548,10 @@ class Group extends Model implements Auditable
                     'username' => env('DISCOURSE_APIUSER'),
                 ]);
 
-                // Restricted characters allowed in name, and only 25 characters.
+                // Restricted characters allowed in name, and only 20 characters.  Leave 1 spare for uniqueness.
                 $name = str_replace(' ', '_', trim($this->name));
                 $name = preg_replace("/[^A-Za-z0-9]/", '', $name);
-                $name = substr($name, 0, 25);
+                $name = substr($name, 0, 19);
 
                 $params = [
                     'group' => [

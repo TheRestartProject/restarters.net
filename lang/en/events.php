@@ -164,4 +164,5 @@ return [
   'image_delete_error' => 'Sorry, but the image can\'t be deleted.',
   'delete_permission' => 'You do not have permission to delete this event.',
   'delete_success' => 'Event has been deleted.',
+  'geocode_failed' => 'The address you entered could not be found. Please try a more general address.',
 ];

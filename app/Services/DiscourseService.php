@@ -603,4 +603,24 @@ class DiscourseService
             }
         }
     }
+
+    public function setSetting($setting, $value)
+    {
+        Log::info("Set Discourse setting {$setting} to {$value}");
+
+        $client = app('discourse-client');
+        $response = $client->request(
+            'PUT',
+            "/admin/site_settings/{$setting}",
+            [
+                'form_params' => [
+                    $setting => $value
+                ]
+            ]
+        );
+
+        Log::info("Set Discourse setting {$setting} to {$value}");
+        Log::info('Response status: ' . $response->getStatusCode());
+        Log::info($response->getBody());
+    }
 }

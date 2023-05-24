@@ -133,22 +133,6 @@ class Party extends Model implements Auditable
         return $party;
     }
 
-    public function createUserList($party, $users)
-    {
-        /* reset user list **/
-        if (! self::deleteUserList($party)) {
-            return false;
-        }
-        $sql = 'INSERT INTO `events_users`(`event`, `user`) VALUES (:party, :user)';
-        foreach ($users as &$user) {
-            try {
-                DB::insert(DB::raw($sql), ['party' => $party, 'user' => $user]);
-            } catch (\Illuminate\Database\QueryException $e) {
-                dd($e);
-            }
-        }
-    }
-
     public function deleteUserList($party)
     {
         return DB::delete(DB::raw('DELETE FROM `events_users` WHERE `event` = :party'), ['party' => $party]);
@@ -786,6 +770,12 @@ class Party extends Model implements Auditable
         }
 
         return $coordinators;
+    }
+
+
+    public function getMaxUpdatedAtDevicesUpdatedAtAttribute()
+    {
+        return strtotime($this->updated_at) > strtotime($this->devices_updated_at) ? $this->updated_at : $this->devices_updated_at;
     }
 
     public function canDelete()

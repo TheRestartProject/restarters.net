@@ -114,7 +114,7 @@ class Fixometer
             }
         }
 
-        if (self::hasRole($user, 'Host') && self::userIsHostOfGroup($group->idgroups, $userId)) {
+        if (self::userIsHostOfGroup($group->idgroups, $userId)) {
             return true;
         }
 
@@ -124,6 +124,7 @@ class Fixometer
     public static function userHasEditPartyPermission($partyId, $userId = null)
     {
         $party = Party::findOrFail($partyId);
+        $group = $party->theGroup;
 
         if (is_null($userId)) {
             if (empty(Auth::user())) {
@@ -140,7 +141,6 @@ class Fixometer
         }
 
         if (self::hasRole($user, 'NetworkCoordinator')) {
-            $group = $party->theGroup;
             foreach ($group->networks as $network) {
                 if ($network->coordinators->contains($user)) {
                     return true;
@@ -148,13 +148,8 @@ class Fixometer
             }
         }
 
-        if (self::hasRole($user, 'Host')) {
-            $group_id_of_event = Party::where('idevents', $partyId)->value('group');
-            if (self::userIsHostOfGroup($group_id_of_event, $userId)) {
-                return true;
-            } elseif (empty(DB::table('events_users')->where('event', $partyId)->where('user', $user->id)->first())) {
-                return false;
-            }
+        if (self::userIsHostOfGroup($group->idgroups, $userId)) {
+            return true;
         }
 
         return false;

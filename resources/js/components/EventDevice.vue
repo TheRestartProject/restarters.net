@@ -7,20 +7,24 @@
       <div class="br d-flex flex-column botwhite">
         <b-card no-body class="p-3 flex-grow-1 border-0">
           <h3 class="mt-2 mb-4">{{ __('devices.title_items') }}</h3>
+          <DeviceType class="mb-2" :type.sync="currentDevice.item_type"
+                      :icon-variant="add ? 'black' : 'brand'" :item-types="itemTypes" :disabled="disabled"
+                      :suppress-type-warning="suppressTypeWarning" :powered="powered"
+                      :unknown.sync="unknownItemType"
+          />
           <DeviceCategorySelect :class="{
             'mb-2': true,
-            'border-thick': missingCategory
-            }" :category.sync="currentDevice.category" :clusters="clusters" :powered="powered"
-                                :icon-variant="add ? 'black' : 'brand'" :disabled="disabled" @changed="categoryChange"/>
-          <DeviceType v-if="!powered || aggregate" class="mb-2" :type.sync="currentDevice.item_type"
-                      :icon-variant="add ? 'black' : 'brand'" :item-types="itemTypes" :disabled="disabled"
-                      :suppress-type-warning="suppressTypeWarning" :powered="powered"/>
-          <div v-if="powered">
-            <DeviceBrand class="mb-2" :brand.sync="currentDevice.brand" :brands="brands" :disabled="disabled"
-                         :suppress-brand-warning="suppressBrandWarning"/>
-            <DeviceModel class="mb-2" :model.sync="currentDevice.model" :icon-variant="add ? 'black' : 'brand'"
-                         :disabled="disabled"/>
-          </div>
+            'border-thick': missingCategory,
+            'suggested': suggested,
+            }"
+            :category.sync="currentDevice.category" :clusters="clusters" :powered="powered" :key="currentDevice.item_type"
+            @open="suggested = false"
+            :icon-variant="add ? 'black' : 'brand'" :disabled="disabled"
+          />
+          <DeviceBrand class="mb-2" :brand.sync="currentDevice.brand" :brands="brands" :disabled="disabled"
+                       :suppress-brand-warning="suppressBrandWarning"/>
+          <DeviceModel class="mb-2" :model.sync="currentDevice.model" :icon-variant="add ? 'black' : 'brand'"
+                       :disabled="disabled"/>
           <DeviceWeight v-if="showWeight" :weight.sync="currentDevice.estimate" :disabled="disabled"/>
           <DeviceAge :age.sync="currentDevice.age" :disabled="disabled"/>
           <DeviceImages :idevents="idevents" :device="currentDevice" :add="add" :edit="edit" :disabled="disabled"
@@ -42,7 +46,6 @@
                          :disabled="disabled"/>
           <DeviceNotes :notes.sync="currentDevice.notes" class="mb-4" :icon-variant="add ? 'black' : 'brand'"
                        :disabled="disabled"/>
-          <DeviceUsefulUrls :device="device" :urls.sync="currentDevice.urls" class="mb-2" :disabled="disabled"/>
           <div class="d-flex">
             <b-form-checkbox v-model="wiki" class="form-check form-check-large ml-4"
                              :id="'wiki-' + (add ? '' : device.iddevices)" :disabled="disabled"/>
@@ -100,7 +103,6 @@ import DeviceType from './DeviceType'
 import DeviceRepairStatus from './DeviceRepairStatus'
 import DeviceProblem from './DeviceProblem'
 import DeviceNotes from './DeviceNotes'
-import DeviceUsefulUrls from './DeviceUsefulUrls'
 import DeviceQuantity from './DeviceQuantity'
 import FileUploader from './FileUploader'
 import DeviceImages from './DeviceImages'
@@ -112,7 +114,6 @@ export default {
     DeviceImages,
     FileUploader,
     DeviceQuantity,
-    DeviceUsefulUrls,
     DeviceNotes,
     DeviceProblem,
     DeviceRepairStatus,
@@ -184,8 +185,10 @@ export default {
   data () {
     return {
       currentDevice: {},
-      missingCategory: false,
       axiosError: null,
+      missingCategory: false,
+      unknownItemType: false,
+      suggested: false
     }
   },
   watch: {
@@ -193,6 +196,23 @@ export default {
       if (this.missingCategory && newval) {
         // Reset warning.
         this.missingCategory = false
+      }
+    },
+    suggestedCategory(newval) {
+      if (newval) {
+        // For add we always want to use this - we get called multiple times as they type.
+        // For edit we probably don't, unless we have edited the category away.
+        if (this.add || !this.currentDevice.category) {
+          this.currentDevice.category = newval.idcategories
+
+          // Make it obvious that we have done this to encourage people to review it rather than ignore it.
+          this.suggested = true
+          setTimeout(() => {
+            this.suggested = false
+          }, 5000)
+        }
+      } else {
+        this.currentDevice.category = null
       }
     }
   },
@@ -205,6 +225,61 @@ export default {
     },
     currentCategory () {
       return this.currentDevice ? this.currentDevice.category : null
+    },
+    suggestedCategory() {
+      let ret = null
+      if (this.currentDevice && this.currentDevice.item_type) {
+        // Some item types are the same as category names.
+        this.clusters.forEach((cluster) => {
+          cluster.categories.forEach((c) => {
+            const name = this.$lang.get('strings.' + c.name)
+            if (Boolean(c.powered) === Boolean(this.powered) && !name.toLowerCase().localeCompare(this.currentDevice.item_type.toLowerCase())) {
+              ret = {
+                idcategories: c.idcategories,
+                categoryname: c.name,
+                powered: c.powered
+              }
+            }
+          })
+        })
+
+        if (!ret) {
+          // Now check the item types.  Stop at the first match, which is the most popular.
+          this.itemTypes.every(t => {
+            if (!ret && Boolean(t.powered) === Boolean(this.powered) && this.currentDevice.item_type.toLowerCase() == t.item_type.toLowerCase()) {
+              ret = {
+                idcategories: t.idcategories,
+                categoryname: t.categoryname,
+                powered: t.powered
+              }
+
+              return false
+            }
+            return true
+          })
+        }
+      }
+
+      console.log("Returning", ret, this.currentDevice.item_type)
+
+      return ret
+    },
+    suggestedCategoryId() {
+      return this.suggestedCategory ? this.suggestedCategory.idcategories : null
+    },
+    suggestedCategoryName() {
+      return this.suggestedCategory? this.suggestedCategory.categoryname : null
+    },
+    computedPowered() {
+      if (this.suggestedCategory) {
+        if (this.suggestedCategory.powered) {
+          return 'Powered'
+        } else {
+          return 'Unpowered'
+        }
+      } else {
+        return null
+      }
     },
     aggregate () {
       if (!this.currentCategory) {
@@ -266,7 +341,6 @@ export default {
       problem: null,
       assessment: null,
       quantity: 1,
-      urls: []
     }
 
     if (this.device) {
@@ -327,19 +401,7 @@ export default {
         } else {
           this.missingCategory = false
 
-          const createdDevices = await this.$store.dispatch('devices/add', this.prepareDeviceForServer())
-
-          if (this.currentDevice.urls) {
-            // We have some useful URLs.  Apply them to each of the created devices.
-            createdDevices.forEach(async (d) => {
-              this.currentDevice.urls.forEach(async (u) => {
-                await this.$store.dispatch('devices/addURL', {
-                  iddevices: d.iddevices,
-                  url: u
-                })
-              })
-            })
-          }
+          const createdDevices = await this.$store.dispatch('devices/add', this.currentDevice)
 
           this.$emit('close')
         }
@@ -350,72 +412,17 @@ export default {
     },
     async saveDevice () {
       try {
-        await this.$store.dispatch('devices/edit', this.prepareDeviceForServer())
-
-        // We need to update the useful URLs, which might have been added/edited/deleted from what we originally had.
-        this.currentDevice.urls.forEach(async (u) => {
-          if (!u.id) {
-            // This has no id, and hence is a new useful URL added in this edit.  Create it.
-            await this.$store.dispatch('devices/addURL', {
-              iddevices: this.device.iddevices,
-              url: u
-            })
-          } else {
-            // This has an id, and therefore already existed on the server.
-            const existing = this.device.urls.find(u2 => {
-              return u2.id === u.id
-            })
-
-            if (existing.url !== u.url || existing.source !== u.source) {
-              await this.$store.dispatch('devices/editURL', {
-                iddevices: this.device.iddevices,
-                url: u
-              })
-            }
-          }
-        })
-
-        // Now find any URLs which were present originally but are no longer present - these need to be deleted.
-        if (this.device.urls) {
-          this.device.urls.forEach(async (u) => {
-            const present = this.currentDevice.urls.find(u2 => {
-              return u2.id === u.id
-            })
-
-            if (!present) {
-              await this.$store.dispatch('devices/deleteURL', {
-                iddevices: this.device.iddevices,
-                url: u
-              })
-            }
-          })
-        }
-
+        await this.$store.dispatch('devices/edit', this.currentDevice)
         this.$emit('close')
       } catch (e) {
         console.error('Edit failed', e)
         this.axiosError = e
       }
     },
-    prepareDeviceForServer () {
-      // The device we send to the server is what is in currentDevice, with a couple of tweaks:
-      // - The server takes the brand as a string rather than an id.
-      // - The server only supports a single useful URL on add, via the url and source parameters
-      // We map those here to keep the interface to the components neater.
-      let device = this.currentDevice
-
-      if (device.urls && device.urls.length) {
-        device.url = device.urls[0].url
-        device.source = device.urls[0].source
-      }
-
-      return device
-    },
     removeImage (image) {
       // TODO LATER The remove of the image should not happen until the edit completes.  At the moment we do it
       // immediately.  The way we set ids here is poor, but this is because the underlying API call for images
       // is weak.
-      console.log("Remove imnage", image, this.idtouse, this.device, this.currentDevice)
       this.$store.dispatch('devices/deleteImage', {
         iddevices: this.idtouse,
         idxref: image.idxref
@@ -432,10 +439,6 @@ export default {
 
       window.location = '/fixometer'
     },
-    categoryChange () {
-      // Any item type we might have is no longer valid.
-      this.currentDevice.item_type = null
-    }
   }
 }
 </script>
@@ -480,10 +483,6 @@ export default {
 
   @include media-breakpoint-down(sm) {
     grid-template-columns: 100%;
-  }
-
-  .useful-repair-urls .input-group .form-control {
-    border-radius: initial;
   }
 }
 
@@ -556,5 +555,10 @@ h3 {
 
 ::v-deep .form-text {
   line-height: 1rem;
+}
+
+::v-deep .suggested .multiselect {
+  border: 3px solid #222 !important;
+  width: calc(100% - 6px) !important;
 }
 </style>
