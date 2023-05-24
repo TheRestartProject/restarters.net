@@ -62,6 +62,84 @@
                         "description": "Event not found"
                     }
                 }
+            },
+            "patch": {
+                "tags": [
+                    "Events"
+                ],
+                "summary": "Edit Event",
+                "description": "Edits an event.",
+                "operationId": "editEvent",
+                "parameters": [
+                    {
+                        "name": "api_token",
+                        "in": "query",
+                        "description": "A valid user API token",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "example": "1234"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "content": {
+                        "multipart/form-data": {
+                            "schema": {
+                                "required": [
+                                    "start",
+                                    "end",
+                                    "title",
+                                    "description",
+                                    "location",
+                                    "lat",
+                                    "lng"
+                                ],
+                                "properties": {
+                                    "start": {
+                                        "$ref": "#/components/schemas/Event/properties/start"
+                                    },
+                                    "end": {
+                                        "$ref": "#/components/schemas/Event/properties/start"
+                                    },
+                                    "timezone": {
+                                        "$ref": "#/components/schemas/Event/properties/timezone"
+                                    },
+                                    "title": {
+                                        "$ref": "#/components/schemas/Event/properties/title"
+                                    },
+                                    "description": {
+                                        "$ref": "#/components/schemas/Event/properties/description"
+                                    },
+                                    "location": {
+                                        "$ref": "#/components/schemas/Event/properties/location"
+                                    },
+                                    "online": {
+                                        "$ref": "#/components/schemas/Event/properties/online"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Successful operation",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "data": {
+                                            "$ref": "#/components/schemas/Event"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                }
             }
         },
         "/api/v2/moderate/events": {
@@ -95,6 +173,92 @@
                                     "items": {
                                         "$ref": "#/components/schemas/Event"
                                     }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v2/events": {
+            "post": {
+                "tags": [
+                    "Events"
+                ],
+                "summary": "Create Event",
+                "description": "Creates an event.",
+                "operationId": "createEvent",
+                "parameters": [
+                    {
+                        "name": "api_token",
+                        "in": "query",
+                        "description": "A valid user API token",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "example": "1234"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "content": {
+                        "multipart/form-data": {
+                            "schema": {
+                                "required": [
+                                    "start",
+                                    "end",
+                                    "title",
+                                    "description",
+                                    "location",
+                                    "lat",
+                                    "lng"
+                                ],
+                                "properties": {
+                                    "groupid": {
+                                        "title": "id",
+                                        "description": "Unique identifier of the group to which the event belongs",
+                                        "format": "int64",
+                                        "example": 1
+                                    },
+                                    "start": {
+                                        "$ref": "#/components/schemas/Event/properties/start"
+                                    },
+                                    "end": {
+                                        "$ref": "#/components/schemas/Event/properties/start"
+                                    },
+                                    "timezone": {
+                                        "$ref": "#/components/schemas/Event/properties/timezone"
+                                    },
+                                    "title": {
+                                        "$ref": "#/components/schemas/Event/properties/title"
+                                    },
+                                    "description": {
+                                        "$ref": "#/components/schemas/Event/properties/description"
+                                    },
+                                    "location": {
+                                        "$ref": "#/components/schemas/Event/properties/location"
+                                    },
+                                    "online": {
+                                        "$ref": "#/components/schemas/Event/properties/online"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Successful operation",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "data": {
+                                            "$ref": "#/components/schemas/Event"
+                                        }
+                                    },
+                                    "type": "object"
                                 }
                             }
                         }

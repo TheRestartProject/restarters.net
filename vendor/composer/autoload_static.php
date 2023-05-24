@@ -434,8 +434,8 @@ class ComposerStaticInitf657da3451727d69be6269822b9691c7
         ),
         'Psr\\Http\\Message\\' => 
         array (
-            0 => __DIR__ . '/..' . '/psr/http-factory/src',
-            1 => __DIR__ . '/..' . '/psr/http-message/src',
+            0 => __DIR__ . '/..' . '/psr/http-message/src',
+            1 => __DIR__ . '/..' . '/psr/http-factory/src',
         ),
         'Psr\\Http\\Client\\' => 
         array (
@@ -810,6 +810,7 @@ class ComposerStaticInitf657da3451727d69be6269822b9691c7
         'App\\Console\\Commands\\CheckGroupLocations' => __DIR__ . '/../..' . '/app/Console/Commands/CheckGroupLocations.php',
         'App\\Console\\Commands\\CheckTranslations' => __DIR__ . '/../..' . '/app/Console/Commands/CheckTranslations.php',
         'App\\Console\\Commands\\CreateDiscourseGroups' => __DIR__ . '/../..' . '/app/Console/Commands/CreateDiscourseGroups.php',
+        'App\\Console\\Commands\\DiscourseChangeSetting' => __DIR__ . '/../..' . '/app/Console/Commands/DiscourseChangeSetting.php',
         'App\\Console\\Commands\\FixLatitudeLongitude' => __DIR__ . '/../..' . '/app/Console/Commands/FixLatitudeLongitude.php',
         'App\\Console\\Commands\\FixViews' => __DIR__ . '/../..' . '/app/Console/Commands/FixViews.php',
         'App\\Console\\Commands\\ImportGroups' => __DIR__ . '/../..' . '/app/Console/Commands/ImportGroups.php',
@@ -835,7 +836,6 @@ class ComposerStaticInitf657da3451727d69be6269822b9691c7
         'App\\Device' => __DIR__ . '/../..' . '/app/Device.php',
         'App\\DeviceBarrier' => __DIR__ . '/../..' . '/app/DeviceBarrier.php',
         'App\\DeviceList' => __DIR__ . '/../..' . '/app/DeviceList.php',
-        'App\\DeviceUrl' => __DIR__ . '/../..' . '/app/DeviceUrl.php',
         'App\\DripEvent' => __DIR__ . '/../..' . '/app/DripEvent.php',
         'App\\DustupOra' => __DIR__ . '/../..' . '/app/DustupOra.php',
         'App\\EventsUsers' => __DIR__ . '/../..' . '/app/EventsUsers.php',
@@ -887,7 +887,6 @@ class ComposerStaticInitf657da3451727d69be6269822b9691c7
         'App\\Http\\Controllers\\Controller' => __DIR__ . '/../..' . '/app/Http/Controllers/Controller.php',
         'App\\Http\\Controllers\\DashboardController' => __DIR__ . '/../..' . '/app/Http/Controllers/DashboardController.php',
         'App\\Http\\Controllers\\DeviceController' => __DIR__ . '/../..' . '/app/Http/Controllers/DeviceController.php',
-        'App\\Http\\Controllers\\DeviceUrlController' => __DIR__ . '/../..' . '/app/Http/Controllers/DeviceUrlController.php',
         'App\\Http\\Controllers\\DustupOraController' => __DIR__ . '/../..' . '/app/Http/Controllers/DustupOraController.php',
         'App\\Http\\Controllers\\ExportController' => __DIR__ . '/../..' . '/app/Http/Controllers/ExportController.php',
         'App\\Http\\Controllers\\FaultcatController' => __DIR__ . '/../..' . '/app/Http/Controllers/FaultcatController.php',
@@ -4985,6 +4984,7 @@ class ComposerStaticInitf657da3451727d69be6269822b9691c7
         'Nyholm\\Psr7\\Response' => __DIR__ . '/..' . '/nyholm/psr7/src/Response.php',
         'Nyholm\\Psr7\\ServerRequest' => __DIR__ . '/..' . '/nyholm/psr7/src/ServerRequest.php',
         'Nyholm\\Psr7\\Stream' => __DIR__ . '/..' . '/nyholm/psr7/src/Stream.php',
+        'Nyholm\\Psr7\\StreamTrait' => __DIR__ . '/..' . '/nyholm/psr7/src/StreamTrait.php',
         'Nyholm\\Psr7\\UploadedFile' => __DIR__ . '/..' . '/nyholm/psr7/src/UploadedFile.php',
         'Nyholm\\Psr7\\Uri' => __DIR__ . '/..' . '/nyholm/psr7/src/Uri.php',
         'OpenApi\\Analysers\\AnalyserInterface' => __DIR__ . '/..' . '/zircote/swagger-php/src/Analysers/AnalyserInterface.php',
