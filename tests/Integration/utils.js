@@ -187,6 +187,7 @@ exports.addDevice = async function(page, baseURL, idevents, powered, photo, fixe
 
   // Tab to category and select first.
   await page.keyboard.press('Tab')
+  await page.keyboard.press('Tab')
   await page.keyboard.press('Enter')
 
   if (fixed) {
