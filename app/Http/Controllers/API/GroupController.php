@@ -469,7 +469,7 @@ class GroupController extends Controller
         $user = Auth::user();
 
         if (!$user) {
-            $user = auth('api')->user();
+        $user = auth('api')->user();
         }
 
         if (!$user) {
