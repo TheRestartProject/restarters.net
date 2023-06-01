@@ -564,7 +564,12 @@ class Party extends Model implements Auditable
         // Normally we only count stats for devices for events that have started or finished.
         if (($includeFuture || $this->hasFinished() || $this->isInProgress()) && !empty($this->allDevices)) {
             foreach ($this->allDevices as $device) {
-                if ($device->deviceCategory->powered) {
+                // We cache the powered flag for a category to avoid many DB queries.
+                $powered = \Cache::remember('category-powered-' . $device->idcategories, 15, function() use ($device) {
+                    return $device->deviceCategory->powered;
+                });
+
+                if ($powered) {
                     $result['devices_powered']++;
 
                     if ($device->isFixed()) {
@@ -598,10 +603,14 @@ class Party extends Model implements Auditable
                 }
 
                 if ($device->isFixed()) {
-                    if ($device->deviceCategory->weight == 0 && $device->estimate == 0) {
-                        if ($device->deviceCategory->isMiscPowered()) {
+                    $category = \Cache::remember('category-' . $device->idcategories, 15, function() use ($device) {
+                        return $device->deviceCategory;
+                    });
+
+                    if ($category->weight == 0 && $device->estimate == 0) {
+                        if ($category->isMiscPowered()) {
                             $result['no_weight_powered']++;
-                        } elseif ($device->deviceCategory->isMiscUnpowered()) {
+                        } elseif ($category->isMiscUnpowered()) {
                             $result['no_weight_unpowered']++;
                         }
                     }
