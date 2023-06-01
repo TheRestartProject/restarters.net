@@ -136,7 +136,6 @@ class APIv2EventTest extends TestCase
         $groupUpdated = $json['data']['group']['updated_at'];
 
         // API v2 dates are ISO strings so we can just string compare.
-        echo "Compare $eventUpdated to $groupUpdated\n";
         self::assertTrue($eventUpdated == $groupUpdated);
         self::assertFalse($eventUpdated == $now);
 
