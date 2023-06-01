@@ -565,7 +565,7 @@ class Party extends Model implements Auditable
         if (($includeFuture || $this->hasFinished() || $this->isInProgress()) && !empty($this->allDevices)) {
             foreach ($this->allDevices as $device) {
                 // We cache the powered flag for a category to avoid many DB queries.
-                $powered = \Cache::remember('category-powered-' . $device->idcategories, 15, function() use ($device) {
+                $powered = \Cache::remember('category-powered-' . $device->category, 15, function() use ($device) {
                     return $device->deviceCategory->powered;
                 });
 
@@ -603,7 +603,7 @@ class Party extends Model implements Auditable
                 }
 
                 if ($device->isFixed()) {
-                    $category = \Cache::remember('category-' . $device->idcategories, 15, function() use ($device) {
+                    $category = \Cache::remember('category-' . $device->category, 15, function() use ($device) {
                         return $device->deviceCategory;
                     });
 

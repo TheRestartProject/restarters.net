@@ -228,10 +228,10 @@ class Device extends Model implements Auditable
         $footprint = 0;
 
         if ($this->isFixed()) {
-            if ($this->idcategories == env('MISC_CATEGORY_ID_POWERED') && $this->estimate > 0) {
+            if ($this->category == env('MISC_CATEGORY_ID_POWERED') && $this->estimate > 0) {
                 $footprint = $this->estimate * $emissionRatio;
             } else {
-                $footprint = \Cache::remember('category-' . $this->idcategories, 15, function() {
+                $footprint = \Cache::remember('category-' . $this->category, 15, function() {
                     return $this->deviceCategory;
                 })->footprint;
             }
@@ -267,15 +267,15 @@ class Device extends Model implements Auditable
     {
         $ewasteDiverted = 0;
 
-        $powered = \Cache::remember('category-powered-' . $this->idcategories, 15, function() {
+        $powered = \Cache::remember('category-powered-' . $this->category, 15, function() {
             return $this->deviceCategory->powered;
         });
 
         if ($this->isFixed() && $powered) {
-            if ($this->idcategories == env('MISC_CATEGORY_ID_POWERED') && $this->estimate > 0) {
+            if ($this->category == env('MISC_CATEGORY_ID_POWERED') && $this->estimate > 0) {
                 $ewasteDiverted = $this->estimate;
             } else {
-                $category = \Cache::remember('category-' . $this->idcategories, 15, function() {
+                $category = \Cache::remember('category-' . $this->category, 15, function() {
                     return $this->deviceCategory;
                 });
 
