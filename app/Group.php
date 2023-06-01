@@ -452,6 +452,16 @@ class Group extends Model implements Auditable
         return $autoapprove;
     }
 
+    public function getDistanceAttribute()
+    {
+        return $this->distance;
+    }
+
+    public function setDistanceAttribute($val)
+    {
+        $this->distance = $val;
+    }
+
     public function createDiscourseGroup() {
         // Get the host who created the group.
         $success = false;
