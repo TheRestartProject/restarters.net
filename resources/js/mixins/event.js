@@ -80,8 +80,5 @@ export default {
         return a.role === HOST || a.role === RESTARTER
       })
     },
-    volunteerCountMismatch() {
-      return this.volunteerCount !== this.volunteers.length
-    }
   }
 }

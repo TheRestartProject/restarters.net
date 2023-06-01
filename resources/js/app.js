@@ -283,24 +283,6 @@ function serialize(tokenfield) {
   return data;
 }
 
-// function initTokenfields() {
-//     if ( document.querySelectorAll('.tokenfield').length > 0 ) {
-//
-//         var tokens = document.querySelector('#prepopulate');
-//
-//         var tf = new Tokenfield({
-//             el: document.querySelector('.tokenfield')
-//         });
-//
-//         tf.on('change', function () {
-//             var out = JSON.stringify(serialize(tf), null, 2);
-//             tokens.value = out;
-//         });
-//
-//     }
-//
-// }
-
 var placeSearch, autocomplete;
 var componentForm = {
   street_number: 'short_name',
@@ -486,114 +468,6 @@ function initAutocomplete() {
           console.log('quantity updated');
         } else {
           alert('You are not a host of this event');
-        }
-      },
-      error: function(error) {
-        alert('Something has gone wrong');
-      }
-    });
-
-  }
-
-  var current_volunteers = parseInt(jQuery('#attended-counter').html());
-
-  function updateVolunteers() {
-
-    var quantity = $('#volunteer_qty').val();
-    var event_id = $('#event_id').val();
-
-    // Let's see whether there's been a manual change
-    if( quantity != current_volunteers ){
-      $("#warning_volunteers_message").fadeIn(200);
-    } else {
-      $("#warning_volunteers_message").hide();
-    }
-
-    $.ajax({
-      headers: {
-        'X-CSRF-TOKEN': $("input[name='_token']").val()
-      },
-      type: 'post',
-      url: '/party/update-volunteerquantity',
-      data: {quantity : quantity, event_id : event_id},
-      success: function(data) {
-        console.log('quantity updated');
-      },
-      error: function(error) {
-        console.log('fail');
-      }
-    });
-  }
-
-  function numericInputs() {
-
-    jQuery('.decrease').on('click', function (e) {
-
-      e.preventDefault();
-
-      var value = parseInt(jQuery(this).parent().find('input[type="number"]').val());
-
-      if (value > 0) {
-        jQuery(this).parent().find('input[type="number"]').val(value - 1);
-      }
-      updateParticipants();
-    });
-
-
-    jQuery('.increase').on('click', function (e) {
-
-      e.preventDefault();
-
-      var value = parseInt(jQuery(this).parent().find('input[type="number"]').val());
-
-      jQuery(this).parent().find('input[type="number"]').val(value + 1);
-      updateParticipants();
-    });
-
-    jQuery('.decreaseVolunteers').on('click', function (e) {
-
-      e.preventDefault();
-
-      var value = parseInt(jQuery(this).parent().find('input[type="number"]').val());
-      if (value > 0) {
-        jQuery(this).parent().find('input[type="number"]').val(value - 1);
-      }
-
-      updateVolunteers();
-
-    });
-
-    jQuery('.increaseVolunteers').on('click', function (e) {
-
-      e.preventDefault();
-
-      var value = parseInt(jQuery(this).parent().find('input[type="number"]').val());
-      jQuery(this).parent().find('input[type="number"]').val(value + 1);
-
-      updateVolunteers();
-
-    });
-  }
-
-  function removeUser() {
-
-    var id = jQuery(this).data('remove-volunteer');
-
-    $.ajax({
-      headers: {
-        'X-CSRF-TOKEN': $("input[name='_token']").val()
-      },
-      type: 'post',
-      url: '/party/remove-volunteer',
-      data: {
-        id : id,
-      },
-      datatype: 'json',
-      success: function(json) {
-        if( json.success ){
-          jQuery('.volunteer-' + id).fadeOut();
-        } else {
-          alert('Something has gone wrong');
         }
       },
       error: function(error) {
@@ -812,74 +686,16 @@ function initAutocomplete() {
 
   }
 
-  function customDates() {
-
-
-    if (jQuery('input[type="date"], .date, .date input').length > 0) {
-
-      jQuery('input[type="date"], .date, .date input').datetimepicker({
-        icons: {
-          time: "fa fa-clock-o",
-          date: "fa fa-calendar",
-          up: "fa fa-arrow-up",
-          down: "fa fa-arrow-down",
-          previous: 'fa fa-chevron-left',
-          next: 'fa fa-chevron-right',
-          today: 'fa fa-screenshot',
-          clear: 'fa fa-trash'
-        },
-        format: 'dd/mm/yyyy',
-        defaultDate: jQuery(this).val()
-      });
-      jQuery('.time').datetimepicker({
-        icons: {
-          time: "fa fa-clock-o",
-          date: "fa fa-calendar",
-          up: "fa fa-arrow-up",
-          down: "fa fa-arrow-down",
-          previous: 'fa fa-chevron-left',
-          next: 'fa fa-chevron-right',
-          today: 'fa fa-screenshot',
-          clear: 'fa fa-trash'
-        },
-        format: 'HH:mm',
-        defaultDate: jQuery(this).val()
-
-      });
-
-      jQuery('.from-date').datetimepicker({
-        useCurrent: false //Important! See issue #1075
-      });
-      jQuery('.to-date').datetimepicker({
-        useCurrent: false //Important! See issue #1075
-      });
-      jQuery(".from-date").on("dp.change", function (e) {
-        jQuery('.to-date').data("DateTimePicker").minDate(e.date);
-      });
-      jQuery(".to-date").on("dp.change", function (e) {
-        jQuery('.from-date').data("DateTimePicker").maxDate(e.date);
-      });
-    }
-
-  }
-
   Dropzone.autoDiscover = false;
   registration();
   onboarding();
-  //initTokenfields();
-  numericInputs();
   eventsMap();
   truncate();
   nestedTable();
   select2Fields();
-  //customDates();
 
   jQuery(function () {
 
-
-    // jQuery('.dropdown-menu').on('hidden.bs.collapse', function () {
-    //     console.log('eve');
-    // });
 
     jQuery('.users-list').find('[data-toggle="popover"]').popover();
 
@@ -897,20 +713,6 @@ function initAutocomplete() {
     jQuery('.table').find('[data-toggle="popover"]').on('click', function (e) {
       jQuery('.table').find('[data-toggle="popover"]').not(this).popover('hide');
     });
-
-    // jQuery(document).on('change', '.repair_status', function (e) {
-    //   $value = jQuery(this).val();
-    //   $field = jQuery(this).parents('td').find('.repair_details');
-    //   if( $value == 2 ){
-    //     $field.prop('disabled', false);
-    //     $field.parents('.repair-more').removeClass('d-none');
-    //   } else {
-    //     $field.val(0);
-    //     $field.trigger('change');
-    //     $field.prop('disabled', true);
-    //     $field.parents('.repair-more').addClass('d-none');
-    //   }
-    // });
 
     jQuery(document).on('change', '.category', function (e) {
       var $value = parseInt(jQuery(this).val());
@@ -945,16 +747,6 @@ function initAutocomplete() {
     if (window.location.hash === '#change-password' && jQuery('#list-account').length > 0) {
       jQuery('#list-account-list').tab('show');
     }
-
-
-    // jQuery('#collapseFilter').on('show.bs.collapse', function () {
-    //   jQuery('html').addClass('overflow-hidden');
-    // });
-    //
-    // jQuery('#collapseFilter').on('hidden.bs.collapse', function () {
-    //   jQuery('html').removeClass('overflow-hidden');
-    // });
-
   })
 
   jQuery(document).ready(function () {
@@ -1001,38 +793,6 @@ function initAutocomplete() {
   $('.multi-collapse-invite-modal').on('show.bs.collapse', function () {
       $('.toggle-modal-link').toggleClass('d-none');
   })
-
-  // $('#step-4-form').submit(function(e) {
-  //   e.preventDefault();
-  //
-  //   if ($('#consent1')["0"].checked && $('#consent2')["0"].checked) {
-  //
-  //     var step1 = $('#step-1-form').serialize();
-  //     var step2 = $('#step-2-form').serialize();
-  //     var step3 = $('#step-3-form').serialize();
-  //
-  //     $.ajax({
-  //         headers: {
-  //           'X-CSRF-TOKEN': $("input[name='_token']").val()
-  //         },
-  //         type: 'post',
-  //         url: '/user/register',
-  //         data: {step1 : step1, step2 : step2, step3 : step3},
-  //         success: function(data) {
-  //           if (data) {
-  //             window.location.replace(window.location.origin+"/login");
-  //           }
-  //         },
-  //         error: function(error) {
-  //           alert(error.message);
-  //         }
-  //     });
-  //
-  //   } else {
-  //     alert('You must consent to the use of your data in order to register');
-  //   }
-  //
-  // });
 
   $('#delete-form-submit').on('click', function(e) {
     e.preventDefault();
@@ -1348,17 +1108,6 @@ function initAutocomplete() {
     form.find(':input').attr("disabled", disabled);
   }
 
-  function updateEventStats(stats) {
-    $('#waste-insert').html(stats['waste_total']);
-    $('#co2-insert').html(stats['co2_total']);
-    $('#fixed-insert').html(stats['fixed_devices']);
-    $('#repair-insert').html(stats['repairable_devices']);
-    $('#dead-insert').html(stats['dead_devices']);
-    $('#devices-total').html(stats['devices_unpowered'] + stats['devices_powered']);
-    $('#devices-powered').html(stats['devices_powered']);
-    $('#devices-unpowered').html(stats['devices_unpowered']);
-  }
-
   $( document ).ready(function() {
 
     $("textarea#message_to_restarters[name=message_to_restarters]").on("keydown", function(event){
@@ -1366,17 +1115,6 @@ function initAutocomplete() {
         event.preventDefault();
         this.value = this.value + "\n";
       }
-    });
-
-    $('#participants_qty').on('change', function() {
-      updateParticipants();
-    });
-
-    $('#volunteer_qty').on('change', function() {
-
-      var value = parseInt(jQuery(this).parent().find('input[type="number"]').val());
-      updateVolunteers();
-
     });
 
     $('.ajax-delete-image').on('click', function (e) {
