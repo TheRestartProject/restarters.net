@@ -198,7 +198,7 @@ class AddRemoveVolunteerTest extends TestCase
         $response = $this->post('/profile/edit-admin-settings', [
             '_token' => $tokenValue,
             'id' => $host->id,
-            'user_role' => 2,
+            'user_role' => Role::ADMINISTRATOR,
             'assigned_groups' => [
                 $idgroups
             ],
