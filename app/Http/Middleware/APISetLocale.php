@@ -9,7 +9,7 @@ use Illuminate\Auth\Middleware\Authenticate;
  * This can be used by a client to set the locale for a request.  An example is when an API user wants to return
  * country names in a particular language.
  */
-class SetLocale extends Authenticate
+class APISetLocale extends Authenticate
 {
     public function handle($request, Closure $next, ...$guards)
     {

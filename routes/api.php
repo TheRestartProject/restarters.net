@@ -73,7 +73,7 @@ Route::get('/timezones', [App\Http\Controllers\ApiController::class, 'timezones'
 
 // We are working towards a new and more coherent API.
 Route::prefix('v2')->group(function() {
-    Route::middleware(\App\Http\Middleware\SetLocale::class)->group(function() {
+    Route::middleware(\App\Http\Middleware\APISetLocale::class)->group(function() {
         Route::prefix('/groups')->group(function() {
             Route::get('/names', [API\GroupController::class, 'listNamesv2']);
             Route::get('/tags', [API\GroupController::class, 'listTagsv2']);
