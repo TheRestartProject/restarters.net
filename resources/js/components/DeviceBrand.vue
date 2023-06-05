@@ -104,7 +104,7 @@ export default {
       this.brandValue = newVal
     },
     brandValue(newVal) {
-      if (newVal && UNKNOWN_STRINGS.includes(newVal)) {
+      if (newVal && UNKNOWN_STRINGS.includes(newVal.toLowerCase())) {
         newVal = null
       }
 

@@ -35,7 +35,7 @@ export default {
         return this.model
       },
       set(newVal) {
-        if (newVal && UNKNOWN_STRINGS.includes(newVal)) {
+        if (newVal && UNKNOWN_STRINGS.includes(newVal.toLowerCase())) {
           newVal = null
         }
 
