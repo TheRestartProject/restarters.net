@@ -380,9 +380,9 @@ class UserController extends Controller
             'role' => $request->input('user_role'),
         ]);
 
-        // If we are demoting from NetworkCoordinator to host, remove them from the list of coordinators for
+        // If we are demoting from NetworkCoordinator, remove them from the list of coordinators for
         // any networks they are currently coordinating.
-        if ($oldRole == Role::NETWORK_COORDINATOR && $user->role == Role::HOST) {
+        if ($oldRole == Role::NETWORK_COORDINATOR && ($user->role == Role::HOST) || $user->role == Role::RESTARTER) {
             $user->networks()->detach();
         }
 
