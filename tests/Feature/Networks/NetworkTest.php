@@ -300,10 +300,7 @@ class NetworkTest extends TestCase
         $admin = User::factory()->administrator()->create();
         $this->actingAs($admin);
 
-        $network = new Network();
-        $network->name = 'Restarters';
-        $network->shortname = 'restarters';
-        $network->save();
+        $network = Network::where('shortname', 'restarters')->first();
 
         $response = $this->get('/networks/' . $network->id . '/edit', $network->attributesToArray());
         $response->assertSuccessful();

@@ -9,6 +9,7 @@ use App\Network;
 use App\Notifications\AdminModerationEvent;
 use App\Notifications\NotifyRestartersOfNewEvent;
 use App\Party;
+use App\Role;
 use App\User;
 use DB;
 use Faker\Generator as Faker;
