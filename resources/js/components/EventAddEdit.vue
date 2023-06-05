@@ -100,7 +100,7 @@
           <span v-if="autoApprove">
             {{ __('events.before_submit_text_autoapproved') }}
           </span>
-          <span v-else>
+          <span v-else-if="moderate !== 'approve'">
             {{ __('events.before_submit_text') }}
           </span>
         </div>
