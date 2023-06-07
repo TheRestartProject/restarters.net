@@ -159,7 +159,7 @@ return [
     'NP' => 'Nepal',
     'NL' => 'Netherlands',
     'NC' => 'New Caledonia',
-    'NZ' => 'New Zealand',
+    'NZ' => 'Aotearoa New Zealand',
     'NI' => 'Nicaragua',
     'NE' => 'Niger',
     'NG' => 'Nigeria',
