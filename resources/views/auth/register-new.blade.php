@@ -111,7 +111,8 @@
                                 <div class="form-control form-control__select">
                                     <select id="country" name="country" required aria-required="true" class="field select2">
                                         <option value=""></option>
-                                        @foreach (App\Helpers\Fixometer::getAllCountries() as $country_code => $country_name)
+                                        <?php $countries = App\Helpers\Fixometer::getAllCountries(); asort($countries); ?>
+                                        @foreach ($countries as $country_code => $country_name)
                                           <option value="{{ $country_code }}" @if( old('country') == $country_code ) selected @endif>{{ $country_name }}</option>
                                         @endforeach
                                     </select>
