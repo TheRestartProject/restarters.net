@@ -22,7 +22,7 @@
       <div class="vue">
       <EventAddEditPage
           csrf="{{ csrf_token() }}"
-          :duplicate-from="<?php echo isset($duplicateFrom) ? e(json_encode($duplicateFrom, JSON_INVALID_UTF8_IGNORE)) : 'null'; ?>"
+          :duplicate-from="<?php echo isset($duplicateFrom) ? $duplicateFrom : 'null'; ?>"
           @if( App\Helpers\Fixometer::hasRole($user, 'Administrator') )
           :groups="{{ json_encode($allGroups, JSON_INVALID_UTF8_IGNORE) }}"
           @else

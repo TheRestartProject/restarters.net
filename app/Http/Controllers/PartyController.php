@@ -563,7 +563,7 @@ class PartyController extends Controller
             'user' => Auth::user(),
             'user_groups' => $groupsUserIsInChargeOf,
             'userInChargeOfMultipleGroups' => $userInChargeOfMultipleGroups,
-            'duplicateFrom' => PartyController::expandEvent($party, NULL),
+            'duplicateFrom' => $party->idevents,
         ]);
     }
 

@@ -17,7 +17,7 @@ export default {
   mixins: [ auth ],
   props: {
     duplicateFrom: {
-      type: Object,
+      type: Number,
       required: false,
       default: null
     },

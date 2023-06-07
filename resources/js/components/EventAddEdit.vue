@@ -95,12 +95,12 @@
           </b-btn>
         </div>
       </div>
-      <div  class="event-buttons button-group row text-right" v-else>
+      <div class="event-buttons button-group row text-right" v-else>
         <div class="offset-lg-3 col-lg-5 d-flex align-items-right justify-content-end text-right notice">
           <span v-if="autoApprove">
             {{ __('events.before_submit_text_autoapproved') }}
           </span>
-          <span v-else-if="moderate !== 'approve'">
+          <span v-else-if="canApprove && moderate !== 'approve'">
             {{ __('events.before_submit_text') }}
           </span>
         </div>
@@ -141,7 +141,7 @@ export default {
   mixins: [event, auth, validationHelpers],
   props: {
     duplicateFrom: {
-      type: Object,
+      type: Number,
       required: false,
       default: null
     },
@@ -251,7 +251,9 @@ export default {
     let setFrom = null
 
     if (this.duplicateFrom) {
-      setFrom = this.duplicateFrom
+      setFrom = await this.$store.dispatch('events/fetch', {
+        id: this.duplicateFrom
+      })
     } else if (this.idevents) {
       setFrom = await this.$store.dispatch('events/fetch', {
         id: this.idevents
