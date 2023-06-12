@@ -6,7 +6,6 @@ return [
   'rsvp_button' => 'Sorry, I can no longer attend',
   'pending_rsvp_message' => 'You have an invite pending for this event',
   'pending_rsvp_button' => 'I am attending',
-  'warning_volunteers_message' => 'Please note that the number of volunteers does not match the attendance record.  Do you need to add or remove volunteers?',
   'share_stats_header' => 'Share your stats',
   'share_stats_message' => 'Well done! On the :date at :event_name we were able to repair <strong>:number_devices devices</strong>. Help us spread the message by sharing your environmental impact on your website.',
   'headline_stats_dropdown' => 'Headline stats',

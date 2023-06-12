@@ -330,4 +330,35 @@ class APIv2GroupTest extends TestCase
             self::assertEquals($group2->idgroups, $json[0]['id']);
         }
     }
+
+    public function testLocales() {
+        $user = User::factory()->administrator()->create([
+            'api_token' => '1234',
+        ]);
+        $this->actingAs($user);
+
+        $idgroups = $this->createGroup(
+            'Test Group',
+            'https://therestartproject.org',
+            'Brussels, Belgium',
+            'Some text.',
+            true,
+        );
+
+        # Get in default locale - English.
+        $response = $this->get("/api/v2/groups/$idgroups");
+        $response->assertSuccessful();
+        $json = json_decode($response->getContent(), true);
+        $location = $json['data']['location'];
+        $this->assertEquals('Belgium', $location['country']);
+
+        // Get in Belgian French.
+        $response = $this->get("/api/v2/groups/$idgroups?locale=fr-BE");
+        $response->assertSuccessful();
+        $json = json_decode($response->getContent(), true);
+        $location = $json['data']['location'];
+        $this->assertEquals('Belgique', $location['country']);
+
+        // Create a group in
+    }
 }
