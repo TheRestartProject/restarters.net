@@ -133,22 +133,6 @@ class Party extends Model implements Auditable
         return $party;
     }
 
-    public function createUserList($party, $users)
-    {
-        /* reset user list **/
-        if (! self::deleteUserList($party)) {
-            return false;
-        }
-        $sql = 'INSERT INTO `events_users`(`event`, `user`) VALUES (:party, :user)';
-        foreach ($users as &$user) {
-            try {
-                DB::insert(DB::raw($sql), ['party' => $party, 'user' => $user]);
-            } catch (\Illuminate\Database\QueryException $e) {
-                dd($e);
-            }
-        }
-    }
-
     public function deleteUserList($party)
     {
         return DB::delete(DB::raw('DELETE FROM `events_users` WHERE `event` = :party'), ['party' => $party]);
@@ -580,7 +564,12 @@ class Party extends Model implements Auditable
         // Normally we only count stats for devices for events that have started or finished.
         if (($includeFuture || $this->hasFinished() || $this->isInProgress()) && !empty($this->allDevices)) {
             foreach ($this->allDevices as $device) {
-                if ($device->deviceCategory->powered) {
+                // We cache the powered flag for a category to avoid many DB queries.
+                $powered = \Cache::remember('category-powered-' . $device->category, 15, function() use ($device) {
+                    return $device->deviceCategory->powered;
+                });
+
+                if ($powered) {
                     $result['devices_powered']++;
 
                     if ($device->isFixed()) {
@@ -614,10 +603,14 @@ class Party extends Model implements Auditable
                 }
 
                 if ($device->isFixed()) {
-                    if ($device->deviceCategory->weight == 0 && $device->estimate == 0) {
-                        if ($device->deviceCategory->isMiscPowered()) {
+                    $category = \Cache::remember('category-' . $device->category, 15, function() use ($device) {
+                        return $device->deviceCategory;
+                    });
+
+                    if ($category->weight == 0 && $device->estimate == 0) {
+                        if ($category->isMiscPowered()) {
                             $result['no_weight_powered']++;
-                        } elseif ($device->deviceCategory->isMiscUnpowered()) {
+                        } elseif ($category->isMiscUnpowered()) {
                             $result['no_weight_unpowered']++;
                         }
                     }
@@ -786,6 +779,12 @@ class Party extends Model implements Auditable
         }
 
         return $coordinators;
+    }
+
+
+    public function getMaxUpdatedAtDevicesUpdatedAtAttribute()
+    {
+        return strtotime($this->updated_at) > strtotime($this->devices_updated_at) ? $this->updated_at : $this->devices_updated_at;
     }
 
     public function canDelete()

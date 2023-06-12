@@ -29,10 +29,8 @@ class EventController extends Controller
         $authenticatedUser = Auth::user();
 
         $groups = [];
-        foreach ($authenticatedUser->networks as $network)
-        {
-            foreach ($network->groups as $group)
-            {
+        foreach ($authenticatedUser->networks as $network) {
+            foreach ($network->groups as $group) {
                 $groups[] = $group;
             }
         }
@@ -43,8 +41,7 @@ class EventController extends Controller
             ->join('users', 'users.id', '=', 'user_network.user_id')
             ->orderBy('event_start_utc', 'ASC');
 
-        if (!empty($date_from) && !empty($date_to))
-        {
+        if (!empty($date_from) && !empty($date_to)) {
             $start = Carbon\Carbon::parse($date_from, $timezone);
             $start->setTimezone('UTC');
             $end = Carbon\Carbon::parse($date_to, $timezone);
@@ -54,36 +51,34 @@ class EventController extends Controller
         }
 
         $parties = $parties->where([
-                                       ['users.api_token', $authenticatedUser->api_token],
-                                   ])
+            ['users.api_token', $authenticatedUser->api_token],
+        ])
             ->select('events.*')
             ->get();
 
         // If no parties are found, through 404 error
-        if (empty($parties))
-        {
+        if (empty($parties)) {
             return abort(404, 'No Events found.');
         }
 
         $groups_array = collect([]);
-        foreach ($groups as $group)
-        {
+        foreach ($groups as $group) {
             $groupStats = $group->getGroupStats();
             $groups_array->push([
-                                    'id' => $group->idgroups,
-                                    'name' => $group->name,
-                                    'area' => $group->area,
-                                    'timezone' => $group->timezone,
-                                    'postcode' => $group->postcode,
-                                    'description' => $group->free_text,
-                                    'image_url' => $group->groupImagePath(),
-                                    'volunteers' => $group->volunteers,
-                                    'participants' => $groupStats['participants'],
-                                    'hours_volunteered' => $groupStats['hours_volunteered'],
-                                    'parties_thrown' => $groupStats['parties'],
-                                    'waste_prevented' => $groupStats['waste_total'],
-                                    'co2_emissions_prevented' => $groupStats['co2_total'],
-                                ]);
+                'id' => $group->idgroups,
+                'name' => $group->name,
+                'area' => $group->area,
+                'timezone' => $group->timezone,
+                'postcode' => $group->postcode,
+                'description' => $group->free_text,
+                'image_url' => $group->groupImagePath(),
+                'volunteers' => $group->volunteers,
+                'participants' => $groupStats['participants'],
+                'hours_volunteered' => $groupStats['hours_volunteered'],
+                'parties_thrown' => $groupStats['parties'],
+                'waste_prevented' => $groupStats['waste_total'],
+                'co2_emissions_prevented' => $groupStats['co2_total'],
+            ]);
         }
 
         $collection = collect([]);
@@ -92,58 +87,55 @@ class EventController extends Controller
         $eEmissionRatio = \App\Helpers\LcaStats::getEmissionRatioPowered();
         $uEmissionratio = \App\Helpers\LcaStats::getEmissionRatioUnpowered();
 
-        foreach ($parties as $key => $party)
-        {
-            $group = $groups_array->filter(function ($group) use ($party)
-            {
+        foreach ($parties as $key => $party) {
+            $group = $groups_array->filter(function ($group) use ($party) {
                 return $group['id'] == $party->group;
             })->first();
 
             $eventStats = $party->getEventStats($eEmissionRatio, $uEmissionratio);
             // Push Party to Collection
             $collection->push([
-                                  'id' => $party->idevents,
-                                  'group' => [$group],
-                                  'area' => $group['area'],
-                                  'postcode' => $group['postcode'],
-                                  'timezone' => $party->timezone,
-                                  'event_date' => $party->event_date_local,
-                                  'start_time' => $party->start_local,
-                                  'end_time' => $party->end_local,
-                                  'name' => $party->venue,
-                                  'link' => $party->link,
-                                  'online' => $party->online,
-                                  'location' => [
-                                      'value' => $party->location,
-                                      'latitude' => $party->latitude,
-                                      'longitude' => $party->longitude,
-                                      'area' => $group['area'],
-                                      'postcode' => $group['postcode'],
-                                  ],
-                                  'description' => $party->free_text,
-                                  'user' => $party_user = collect(),
-                                  'impact' => [
-                                      'participants' => $party->pax,
-                                      'volunteers' => $eventStats['volunteers'],
-                                      'waste_prevented' => $eventStats['waste_powered'],
-                                      'co2_emissions_prevented' => $eventStats['co2_powered'],
-                                      'devices_fixed' => $eventStats['fixed_devices'],
-                                      'devices_repairable' => $eventStats['repairable_devices'],
-                                      'devices_dead' => $eventStats['dead_devices'],
-                                  ],
-                                  'widgets' => [
-                                      'headline_stats' => url("/party/stats/{$party->idevents}/wide"),
-                                      'co2_equivalence_visualisation' => url(
-                                          "/outbound/info/party/{$party->idevents}/manufacture"
-                                      ),
-                                  ],
-                                  'hours_volunteered' => $party->hoursVolunteered(),
-                                  'created_at' => new \Carbon\Carbon($party->created_at),
-                                  'updated_at' => new \Carbon\Carbon($party->max_updated_at_devices_updated_at),
-                              ]);
+                'id' => $party->idevents,
+                'group' => [$group],
+                'area' => $group['area'],
+                'postcode' => $group['postcode'],
+                'timezone' => $party->timezone,
+                'event_date' => $party->event_date_local,
+                'start_time' => $party->start_local,
+                'end_time' => $party->end_local,
+                'name' => $party->venue,
+                'link' => $party->link,
+                'online' => $party->online,
+                'location' => [
+                    'value' => $party->location,
+                    'latitude' => $party->latitude,
+                    'longitude' => $party->longitude,
+                    'area' => $group['area'],
+                    'postcode' => $group['postcode'],
+                ],
+                'description' => $party->free_text,
+                'user' => $party_user = collect(),
+                'impact' => [
+                    'participants' => $party->pax,
+                    'volunteers' => $eventStats['volunteers'],
+                    'waste_prevented' => $eventStats['waste_powered'],
+                    'co2_emissions_prevented' => $eventStats['co2_powered'],
+                    'devices_fixed' => $eventStats['fixed_devices'],
+                    'devices_repairable' => $eventStats['repairable_devices'],
+                    'devices_dead' => $eventStats['dead_devices'],
+                ],
+                'widgets' => [
+                    'headline_stats' => url("/party/stats/{$party->idevents}/wide"),
+                    'co2_equivalence_visualisation' => url(
+                        "/outbound/info/party/{$party->idevents}/manufacture"
+                    ),
+                ],
+                'hours_volunteered' => $party->hoursVolunteered(),
+                'created_at' => new \Carbon\Carbon($party->created_at),
+             'updated_at' => (new \Carbon\Carbon($party->max_updated_at_devices_updated_at)),
+            ]);
 
-            if (!empty($party->owner))
-            {
+            if (!empty($party->owner)) {
                 $party_user->put('id', $party->owner->id);
                 $party_user->put('name', $party->owner->name);
             }
@@ -156,28 +148,23 @@ class EventController extends Controller
     {
         $party = Party::findOrFail($idevents);
 
-        if (!Fixometer::userHasEditPartyPermission($idevents))
-        {
+        if (!Fixometer::userHasEditPartyPermission($idevents)) {
             abort(403);
         }
 
         $volunteer_email_address = $request->input('volunteer_email_address');
 
         // Retrieve name if one exists.  If no name exists and user is null as well then this volunteer is anonymous.
-        if ($request->has('full_name'))
-        {
+        if ($request->has('full_name')) {
             $full_name = $request->input('full_name');
-        } else
-        {
+        } else {
             $full_name = null;
         }
 
         // User is null, this volunteer is either anonymous or no user exists.
-        if ($request->has('user') && $request->input('user') !== 'not-registered')
-        {
+        if ($request->has('user') && $request->input('user') !== 'not-registered') {
             $user = $request->input('user');
-        } else
-        {
+        } else {
             $user = null;
         }
 
@@ -189,54 +176,51 @@ class EventController extends Controller
             ->where('role', 4);
         $userWasInvited = $invitedUserQuery->count() == 1;
 
-        if ($userWasInvited)
-        {
+        if ($userWasInvited) {
             $invitedUser = $invitedUserQuery->first();
             $invitedUser->status = 1;
             $invitedUser->save();
-        } else
-        {
+        } else {
             // Let's add the volunteer.
             EventsUsers::create([
-                                    'event' => $idevents,
-                                    'user' => $user,
-                                    'status' => 1,
-                                    'role' => 4,
-                                    'full_name' => $full_name,
-                                ]);
+                'event' => $idevents,
+                'user' => $user,
+                'status' => 1,
+                'role' => 4,
+                'full_name' => $full_name,
+            ]);
         }
 
         $party->increment('volunteers');
 
-        if (!is_null($volunteer_email_address))
-        {
+        if (!is_null($volunteer_email_address)) {
             // Send email.
             $from = User::find(Auth::user()->id);
 
             $hash = substr(bin2hex(openssl_random_pseudo_bytes(32)), 0, 24);
-            $url = url('/user/register/' . $hash);
+            $url = url('/user/register/'.$hash);
 
             $invite = Invite::create([
-                                         'record_id' => $party->theGroup->idgroups,
-                                         'email' => $volunteer_email_address,
-                                         'hash' => $hash,
-                                         'type' => 'group',
-                                     ]);
+                'record_id' => $party->theGroup->idgroups,
+                'email' => $volunteer_email_address,
+                'hash' => $hash,
+                'type' => 'group',
+            ]);
 
             Notification::send(
                 $invite,
                 new JoinGroup([
-                                  'name' => $from->name,
-                                  'group' => $party->theGroup->name,
-                                  'url' => $url,
-                                  'message' => null,
-                              ])
+                    'name' => $from->name,
+                    'group' => $party->theGroup->name,
+                    'url' => $url,
+                    'message' => null,
+                ])
             );
         }
 
         return response()->json([
-                                    'success' => 'success'
-                                ]);
+            'success' => 'success'
+        ]);
     }
 
 
@@ -252,9 +236,9 @@ class EventController extends Controller
         $volunteers = $party->expandVolunteers($party->allConfirmedVolunteers()->get(), $showEmails);
 
         return response()->json([
-                                    'success' => 'success',
-                                    'volunteers' => $volunteers
-                                ]);
+            'success' => 'success',
+            'volunteers' => $volunteers
+        ]);
     }
 
     /**
@@ -306,13 +290,11 @@ class EventController extends Controller
         // real client use of the API to work.
         $user = Auth::user();
 
-        if (!$user)
-        {
+        if (!$user) {
             $user = auth('api')->user();
         }
 
-        if (!$user)
-        {
+        if (!$user) {
             throw new AuthenticationException();
         }
 
@@ -356,28 +338,22 @@ class EventController extends Controller
         $ret = [];
         $networks = [];
 
-        if ($user->hasRole('Administrator'))
-        {
+        if ($user->hasRole('Administrator')) {
             $networks = Network::all();
-        } else
-        {
-            if ($user->hasRole('NetworkCoordinator'))
-            {
+        } else {
+            if ($user->hasRole('NetworkCoordinator')) {
                 $networks = $user->networks;
             }
         }
 
-        foreach ($networks as $network)
-        {
-            foreach ($network->eventsRequiringModeration() as $event)
-            {
+        foreach ($networks as $network) {
+            foreach ($network->eventsRequiringModeration() as $event) {
                 $ret[] = \App\Http\Resources\Party::make($event);
             }
         }
 
         // Sort $ret by ->sortBy('event_start_utc') ascending order of time
-        usort($ret, function ($a, $b)
-        {
+        usort($ret, function ($a, $b) {
             return strtotime($a->resource->event_start_utc) - strtotime($b->resource->event_start_utc);
         });
 
@@ -476,10 +452,8 @@ class EventController extends Controller
         // allow it.
         $autoapprove = $group->auto_approve;
 
-        if (!Fixometer::userCanCreateEvents($user))
-        {
-            // REVIEW: This doesn't check that they are a host of this particular group.  That is existing logic.
-            // Should it?
+        if (!Fixometer::userCanCreateEvents($user)) {
+            // TODO: This doesn't check that they are a host of this particular group.
             abort(403);
         }
 
@@ -511,54 +485,49 @@ class EventController extends Controller
         $idParty = $party->idevents;
 
         EventsUsers::create([
-                                'event' => $idParty,
-                                'user' => $user->id,
-                                'status' => 1,
-                                'role' => Role::HOST,
-                            ]);
+            'event' => $idParty,
+            'user' => $user->id,
+            'status' => 1,
+            'role' => Role::HOST,
+        ]);
 
         $party->increment('volunteers');
 
         // Notify relevant users.
         $usersToNotify = Fixometer::usersWhoHavePreference('admin-moderate-event');
-        foreach ($party->associatedNetworkCoordinators() as $coordinator)
-        {
+        foreach ($party->associatedNetworkCoordinators() as $coordinator) {
             $usersToNotify->push($coordinator);
         }
 
         Notification::send(
             $usersToNotify->unique(),
             new AdminModerationEvent([
-                                         'event_venue' => $title,
-                                         'event_url' => url('/party/edit/' . $idParty),
-                                     ])
+                'event_venue' => $title,
+                'event_url' => url('/party/edit/'.$idParty),
+            ])
         );
 
-        if (isset($_FILES) && !empty($_FILES) && is_array($_FILES['file']['name']))
-        {
+        if (isset($_FILES) && !empty($_FILES) && is_array($_FILES['file']['name'])) {
             $File = new FixometerFile;
             $files = Fixometer::rearrange($_FILES['file']);
-            foreach ($files as $upload)
-            {
+            foreach ($files as $upload) {
                 $File->upload($upload, 'image', $idParty, env('TBL_EVENTS'));
             }
         }
 
-        if ($autoapprove)
-        {
+        if ($autoapprove) {
             Log::info("Auto-approve event $idParty");
             Party::find($idParty)->approve();
         }
 
-        if (isset($_FILES) && !empty($_FILES))
-        {
+        if (isset($_FILES) && !empty($_FILES)) {
             $file = new \FixometerFile();
             $file->upload('image', 'image', $idParty, env('TBL_EVENTS'), false, true, true);
         }
 
         return response()->json([
-                                    'id' => $idParty,
-                                ]);
+            'id' => $idParty,
+        ]);
     }
 
     /**
@@ -631,7 +600,8 @@ class EventController extends Controller
      *     )
      *  )
      */
-    public function updateEventv2(Request $request, $idEvents) {
+    public function updateEventv2(Request $request, $idEvents)
+    {
         $user = $this->getUser();
 
         list($groupid, $start, $end, $title, $description, $location, $timezone, $latitude, $longitude, $online, $link) = $this->validateEventParams(
@@ -669,15 +639,9 @@ class EventController extends Controller
 
         event(new EditEvent($party, $update));
 
-        if ($request->has('users')) {
-            // REVIEW Existing logic.  But is this needed?  If so we should put it in the OpenAPI spec.  But I
-            // think it's not used and can be retired.
-            (new Party)->createUserList($idEvents, $request->get('users'));
-        }
-
         return response()->json([
-                                    'id' => $idEvents,
-                                ]);
+            'id' => $idEvents,
+        ]);
     }
 
     private function validateEventParams(Request $request, $create): array
@@ -687,39 +651,35 @@ class EventController extends Controller
         // schema, which is possible but not trivial.
         if ($create) {
             $request->validate([
-                                   'groupid' => 'required|integer',
+                'groupid' => 'required|integer',
                                    'start' => ['required', 'date_format:Y-m-d\TH:i:sP,Y-m-d\TH:i:s\Z'],
                                    'end' => ['required', 'date_format:Y-m-d\TH:i:sP,Y-m-d\TH:i:s\Z'],
-                                   'title' => ['required', 'max:255'],
-                                   'description' => ['required'],
-                                   'location' => [
-                                       function ($attribute, $value, $fail) use ($request)
-                                       {
-                                           if (!$request->filled('online') && !$value)
-                                           {
-                                               $fail(__('events.validate_location'));
-                                           }
-                                       },
-                                   ],
-                                   'online' => ['boolean'],
-                               ]);
+                'title' => ['required', 'max:255'],
+                'description' => ['required'],
+                'location' => [
+                    function ($attribute, $value, $fail) use ($request) {
+                        if (!$request->filled('online') && !$value) {
+                            $fail(__('events.validate_location'));
+                        }
+                    },
+                ],
+                'online' => ['boolean'],
+            ]);
         } else {
             $request->validate([
                                    'start' => ['required', 'date_format:Y-m-d\TH:i:sP,Y-m-d\TH:i:s\Z'],
                                    'end' => ['required', 'date_format:Y-m-d\TH:i:sP,Y-m-d\TH:i:s\Z'],
-                                   'title' => ['required', 'max:255'],
-                                   'description' => ['required'],
-                                   'location' => [
-                                       function ($attribute, $value, $fail) use ($request)
-                                       {
-                                           if (!$request->filled('online') && !$value)
-                                           {
-                                               $fail(__('events.validate_location'));
-                                           }
-                                       },
-                                   ],
-                                   'online' => ['boolean'],
-                               ]);
+                'title' => ['required', 'max:255'],
+                'description' => ['required'],
+                'location' => [
+                    function ($attribute, $value, $fail) use ($request) {
+                        if (!$request->filled('online') && !$value) {
+                            $fail(__('events.validate_location'));
+                        }
+                    },
+                ],
+                'online' => ['boolean'],
+            ]);
         }
 
         $groupid = $request->input('groupid');
@@ -735,18 +695,15 @@ class EventController extends Controller
         $latitude = null;
         $longitude = null;
 
-        if ($timezone && !in_array($timezone, \DateTimeZone::listIdentifiers(\DateTimeZone::ALL_WITH_BC)))
-        {
+        if ($timezone && !in_array($timezone, \DateTimeZone::listIdentifiers(\DateTimeZone::ALL_WITH_BC))) {
             throw ValidationException::withMessages(['location ' => __('partials.validate_timezone')]);
         }
 
-        if (!empty($location))
-        {
+        if (!empty($location)) {
             $geocoder = new \App\Helpers\Geocoder();
             $geocoded = $geocoder->geocode($location);
 
-            if (empty($geocoded))
-            {
+            if (empty($geocoded)) {
                 throw ValidationException::withMessages(['location ' => __('groups.geocode_failed')]);
             }
 

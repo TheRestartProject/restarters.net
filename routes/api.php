@@ -73,33 +73,35 @@ Route::get('/timezones', [App\Http\Controllers\ApiController::class, 'timezones'
 
 // We are working towards a new and more coherent API.
 Route::prefix('v2')->group(function() {
-    Route::prefix('/groups')->group(function() {
-        Route::get('/names', [API\GroupController::class, 'listNamesv2']);
-        Route::get('/tags', [API\GroupController::class, 'listTagsv2']);
-        Route::get('{id}/events', [API\GroupController::class, 'getEventsForGroupv2']);
-        Route::get('{id}', [API\GroupController::class, 'getGroupv2']);
-        Route::post('', [API\GroupController::class, 'createGroupv2']);
-        Route::patch('{id}', [API\GroupController::class, 'updateGroupv2']);
-    });
+    Route::middleware(\App\Http\Middleware\APISetLocale::class)->group(function() {
+        Route::prefix('/groups')->group(function() {
+            Route::get('/names', [API\GroupController::class, 'listNamesv2']);
+            Route::get('/tags', [API\GroupController::class, 'listTagsv2']);
+            Route::get('{id}/events', [API\GroupController::class, 'getEventsForGroupv2']);
+            Route::get('{id}', [API\GroupController::class, 'getGroupv2']);
+            Route::post('', [API\GroupController::class, 'createGroupv2']);
+            Route::patch('{id}', [API\GroupController::class, 'updateGroupv2']);
+        });
 
-    Route::prefix('/events')->group(function() {
-        Route::get('{id}', [API\EventController::class, 'getEventv2']);
-        Route::post('', [API\EventController::class, 'createEventv2']);
-        Route::patch('{id}', [API\EventController::class, 'updateEventv2']);
-    });
+        Route::prefix('/events')->group(function() {
+            Route::get('{id}', [API\EventController::class, 'getEventv2']);
+            Route::post('', [API\EventController::class, 'createEventv2']);
+            Route::patch('{id}', [API\EventController::class, 'updateEventv2']);
+        });
 
-    Route::prefix('/networks')->group(function() {
-        Route::get('/', [API\NetworkController::class, 'getNetworksv2']);
-        Route::get('{id}', [API\NetworkController::class, 'getNetworkv2']);
-        Route::get('{id}/groups', [API\NetworkController::class, 'getNetworkGroupsv2']);
-        Route::get('{id}/events', [API\NetworkController::class, 'getNetworkEventsv2']);
-    });
+        Route::prefix('/networks')->group(function() {
+            Route::get('/', [API\NetworkController::class, 'getNetworksv2']);
+            Route::get('{id}', [API\NetworkController::class, 'getNetworkv2']);
+            Route::get('{id}/groups', [API\NetworkController::class, 'getNetworkGroupsv2']);
+            Route::get('{id}/events', [API\NetworkController::class, 'getNetworkEventsv2']);
+        });
 
-    Route::prefix('/moderate')->group(function() {
-        Route::middleware('auth:api')->group(function ()
-        {
-            Route::get('/groups', [API\GroupController::class, 'moderateGroupsv2']);
-            Route::get('/events', [API\EventController::class, 'moderateEventsv2']);
+        Route::prefix('/moderate')->group(function() {
+            Route::middleware('auth:api')->group(function ()
+            {
+                Route::get('/groups', [API\GroupController::class, 'moderateGroupsv2']);
+                Route::get('/events', [API\EventController::class, 'moderateEventsv2']);
+            });
         });
     });
 });

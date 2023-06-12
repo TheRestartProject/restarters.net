@@ -40,7 +40,7 @@ export default {
     bannerActive() {
       var now = moment()
 
-      return now.isAfter('2023-04-20 00:01') && now.isBefore('2023-04-27 23:59')
+      return now.isAfter('2023-04-20 12:00') && now.isBefore('2023-04-27 12:00')
     },
     show() {
       let ret = true

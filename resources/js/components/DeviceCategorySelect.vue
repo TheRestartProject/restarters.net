@@ -18,6 +18,7 @@
       ref="multiselect"
       @select=""
       :selectedLabel="allowEmpty ? __('partials.remove') : null"
+      @open="onOpen"
     >
     </multiselect>
     <div v-b-popover.html.left="__('devices.tooltip_category')" class="ml-3 mt-2">
@@ -28,7 +29,6 @@
   </div>
 </template>
 <script>
-
 import { CATEGORY_MISC } from '../constants'
 
 export default {
@@ -119,6 +119,19 @@ export default {
       }
 
       return ret
+    },
+  },
+  methods: {
+    onOpen() {
+      this.$emit('open')
+      const select = this.$refs.multiselect
+      let position = select.filteredOptions.findIndex(
+          option => option[select.trackBy] === select.value[select.trackBy]
+      )
+      select.pointerSet(position)
+      this.$nextTick(() => {
+        select.$refs.list.scrollTop = select.pointerPosition
+      })
     },
   }
 }

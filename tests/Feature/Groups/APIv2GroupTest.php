@@ -14,6 +14,7 @@ use Illuminate\Http\UploadedFile;
 use Symfony\Component\DomCrawler\Crawler;
 use Illuminate\Validation\ValidationException;
 use Tests\TestCase;
+use Auth;
 
 class APIv2GroupTest extends TestCase
 {
@@ -289,5 +290,75 @@ class APIv2GroupTest extends TestCase
         $this->assertTrue(array_key_exists('id', $json));
         $idgroups = $json['id'];
         $this->assertGreaterThan(0, $idgroups);
+    }
+
+    /**
+     * Network coordinators should see groups for approval, but only from their own networks.
+     *
+     * @dataProvider providerTrueFalse
+     *
+     * @return void
+     */
+    public function testNetworkCoordinatorApprove($first) {
+        $network1 = Network::factory()->create();
+        $group1 = Group::factory()->create();
+        $coordinator1 = User::factory()->networkCoordinator()->create([
+            'api_token' => '1234',
+        ]);
+        $network2 = Network::factory()->create();
+        $group2 = Group::factory()->create();
+        $coordinator2 = User::factory()->networkCoordinator()->create([
+            'api_token' => '5678',
+        ]);
+
+        $network1->addGroup($group1);
+        $network1->addCoordinator($coordinator1);
+        $network2->addGroup($group2);
+        $network2->addCoordinator($coordinator2);
+
+        if ($first) {
+            $response = $this->get("/api/v2/moderate/groups?api_token=1234");
+            $response->assertSuccessful();
+            $json = json_decode($response->getContent(), true);
+            self::assertEquals(1, count($json));
+            self::assertEquals($group1->idgroups, $json[0]['id']);
+        } else {
+            $response = $this->get("/api/v2/moderate/groups?api_token=5678");
+            $response->assertSuccessful();
+            $json = json_decode($response->getContent(), true);
+            self::assertEquals(1, count($json));
+            self::assertEquals($group2->idgroups, $json[0]['id']);
+        }
+    }
+
+    public function testLocales() {
+        $user = User::factory()->administrator()->create([
+            'api_token' => '1234',
+        ]);
+        $this->actingAs($user);
+
+        $idgroups = $this->createGroup(
+            'Test Group',
+            'https://therestartproject.org',
+            'Brussels, Belgium',
+            'Some text.',
+            true,
+        );
+
+        # Get in default locale - English.
+        $response = $this->get("/api/v2/groups/$idgroups");
+        $response->assertSuccessful();
+        $json = json_decode($response->getContent(), true);
+        $location = $json['data']['location'];
+        $this->assertEquals('Belgium', $location['country']);
+
+        // Get in Belgian French.
+        $response = $this->get("/api/v2/groups/$idgroups?locale=fr-BE");
+        $response->assertSuccessful();
+        $json = json_decode($response->getContent(), true);
+        $location = $json['data']['location'];
+        $this->assertEquals('Belgique', $location['country']);
+
+        // Create a group in
     }
 }
