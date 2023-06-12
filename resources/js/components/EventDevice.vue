@@ -25,7 +25,7 @@
                        :suppress-brand-warning="suppressBrandWarning"/>
           <DeviceModel class="mb-2" :model.sync="currentDevice.model" :icon-variant="add ? 'black' : 'brand'"
                        :disabled="disabled"/>
-          <DeviceWeight v-if="showWeight" :weight.sync="currentDevice.estimate" :disabled="disabled" :required="weightRequired" />
+          <DeviceWeight v-if="showWeight" :weight.sync="currentDevice.estimate" :disabled="disabled" :required="weightRequired" :error="missingWeight" />
           <DeviceAge :age.sync="currentDevice.age" :disabled="disabled"/>
           <DeviceImages :idevents="idevents" :device="currentDevice" :add="add" :edit="edit" :disabled="disabled"
                         class="mt-2" @remove="removeImage($event)"/>
@@ -378,7 +378,7 @@ export default {
     },
     async addDevice () {
       try {
-        if (this.weightRequired && this.currentDevice.weight == null) {
+        if (this.weightRequired && (isNaN(this.currentDevice.estimate) || this.currentDevice.estimate == null)) {
           this.missingWeight = true
         } else {
           this.missingWeight = false
@@ -401,7 +401,7 @@ export default {
     },
     async saveDevice () {
       try {
-        if (this.weightRequired && this.currentDevice.weight == null) {
+        if (this.weightRequired && (isNaN(this.currentDevice.estimate) || this.currentDevice.estimate == null)) {
           this.missingWeight = true
         } else {
           this.missingWeight = false

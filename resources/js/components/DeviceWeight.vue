@@ -3,7 +3,9 @@
     <label class="text-bold">
       {{ __('devices.weight') }}
     </label>
-    <b-input type="number" @change="$emit('update:weight', parseFloat($event))" size="lg" class="marg p-1 text-center"  min="0" step=".1" autocomplete="off" :value="weight" :disabled="disabled" />
+    <b-input type="number" @change="$emit('update:weight', parseFloat($event))" size="lg"
+             :class="{ marg: true, 'p-1': true, 'text-center': true, 'border-danger': error }" min="0" step=".1"
+             autocomplete="off" :value="weight" :disabled="disabled"/>
     <span class="text-right mb-1">
       {{ info }}
     </span>
@@ -31,9 +33,14 @@ export default {
     required: {
       type: Boolean,
       required: true,
-    }
+    },
+    error: {
+      type: Boolean,
+      required: false,
+      default: false
+    },
   },
-  data () {
+  data() {
     return {
       value: null
     }
@@ -50,6 +57,11 @@ export default {
 }
 </script>
 <style scoped lang="scss">
+@import 'resources/global/css/_variables';
+@import '~bootstrap/scss/functions';
+@import '~bootstrap/scss/variables';
+@import '~bootstrap/scss/mixins/_breakpoints';
+
 .marg {
   // Some card styles are getting in the way.
   margin: 2px !important;
@@ -57,5 +69,9 @@ export default {
 
 input {
   width: 81px;
+}
+
+::v-deep(input.border-danger) {
+  border: 2px solid $brand-danger !important;
 }
 </style>
