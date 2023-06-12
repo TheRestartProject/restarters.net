@@ -5,9 +5,6 @@
     </template>
     <template slot="content">
       <div class="mt-2">
-        <p v-if="!upcoming && volunteerCountMismatch" class="warningbox small text-danger p-1">
-          {{ __('events.warning_volunteers_message') }}
-        </p>
         <div :class="{
       attendance: true,
       upcoming: upcoming
