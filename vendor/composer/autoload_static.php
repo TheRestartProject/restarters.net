@@ -434,8 +434,8 @@ class ComposerStaticInitf657da3451727d69be6269822b9691c7
         ),
         'Psr\\Http\\Message\\' => 
         array (
-            0 => __DIR__ . '/..' . '/psr/http-message/src',
-            1 => __DIR__ . '/..' . '/psr/http-factory/src',
+            0 => __DIR__ . '/..' . '/psr/http-factory/src',
+            1 => __DIR__ . '/..' . '/psr/http-message/src',
         ),
         'Psr\\Http\\Client\\' => 
         array (
@@ -910,6 +910,7 @@ class ComposerStaticInitf657da3451727d69be6269822b9691c7
         'App\\Http\\Controllers\\TabicatOraController' => __DIR__ . '/../..' . '/app/Http/Controllers/TabicatOraController.php',
         'App\\Http\\Controllers\\UserController' => __DIR__ . '/../..' . '/app/Http/Controllers/UserController.php',
         'App\\Http\\Kernel' => __DIR__ . '/../..' . '/app/Http/Kernel.php',
+        'App\\Http\\Middleware\\APISetLocale' => __DIR__ . '/../..' . '/app/Http/Middleware/APISetLocale.php',
         'App\\Http\\Middleware\\AcceptUserInvites' => __DIR__ . '/../..' . '/app/Http/Middleware/AcceptUserInvites.php',
         'App\\Http\\Middleware\\Authenticate' => __DIR__ . '/../..' . '/app/Http/Middleware/Authenticate.php',
         'App\\Http\\Middleware\\CheckForRepairNetwork' => __DIR__ . '/../..' . '/app/Http/Middleware/CheckForRepairNetwork.php',

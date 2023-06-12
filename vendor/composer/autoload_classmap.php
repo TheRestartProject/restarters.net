@@ -141,6 +141,7 @@ return array(
     'App\\Http\\Controllers\\TabicatOraController' => $baseDir . '/app/Http/Controllers/TabicatOraController.php',
     'App\\Http\\Controllers\\UserController' => $baseDir . '/app/Http/Controllers/UserController.php',
     'App\\Http\\Kernel' => $baseDir . '/app/Http/Kernel.php',
+    'App\\Http\\Middleware\\APISetLocale' => $baseDir . '/app/Http/Middleware/APISetLocale.php',
     'App\\Http\\Middleware\\AcceptUserInvites' => $baseDir . '/app/Http/Middleware/AcceptUserInvites.php',
     'App\\Http\\Middleware\\Authenticate' => $baseDir . '/app/Http/Middleware/Authenticate.php',
     'App\\Http\\Middleware\\CheckForRepairNetwork' => $baseDir . '/app/Http/Middleware/CheckForRepairNetwork.php',

@@ -3,7 +3,7 @@
         'name' => 'laravel/laravel',
         'pretty_version' => 'dev-master',
         'version' => 'dev-master',
-        'reference' => '5bf5d607619a4bd3ef70a96c11c97324db6f340e',
+        'reference' => '2fe0898896e0901e7b85f8980f42ba704b4ab44a',
         'type' => 'project',
         'install_path' => __DIR__ . '/../../',
         'aliases' => array(),
@@ -589,7 +589,7 @@
         'laravel/laravel' => array(
             'pretty_version' => 'dev-master',
             'version' => 'dev-master',
-            'reference' => '5bf5d607619a4bd3ef70a96c11c97324db6f340e',
+            'reference' => '2fe0898896e0901e7b85f8980f42ba704b4ab44a',
             'type' => 'project',
             'install_path' => __DIR__ . '/../../',
             'aliases' => array(),
@@ -966,8 +966,8 @@
         'psr/http-factory-implementation' => array(
             'dev_requirement' => false,
             'provided' => array(
-                0 => '^1.0',
-                1 => '1.0',
+                0 => '1.0',
+                1 => '^1.0',
             ),
         ),
         'psr/http-message' => array(

@@ -1125,7 +1125,7 @@
                         "example": "College Road, London NW10 5EX, UK"
                     },
                     "country": {
-                        "description": "The free-form country.",
+                        "description": "The free-form country (translated if translations are available in the current language).",
                         "format": "string",
                         "example": "United Kingdom"
                     },
