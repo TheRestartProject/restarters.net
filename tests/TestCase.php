@@ -36,7 +36,7 @@ abstract class TestCase extends BaseTestCase
     use CreatesApplication;
 
     private $userCount = 0;
-    private $groupCount = 0;
+    public $groupCount = 0;
     private $DOM = null;
     public $lastResponse = null;
 

@@ -263,7 +263,7 @@ class Fixometer
             return true;
         }
 
-        $userIsHostOfAGroup = UserGroups::where('user', Auth::user()->id)
+        $userIsHostOfAGroup = UserGroups::where('user', $user->id)
             ->where('role', 3)
             ->count() > 0;
 
