@@ -373,10 +373,18 @@ class UserController extends Controller
 
         $user = User::find($user_id);
 
+        $oldRole = $user->role;
+
         // Set role for User
         $user->update([
-        'role' => $request->input('user_role'),
+            'role' => $request->input('user_role'),
         ]);
+
+        // If we are demoting from NetworkCoordinator, remove them from the list of coordinators for
+        // any networks they are currently coordinating.
+        if ($oldRole == Role::NETWORK_COORDINATOR && ($user->role == Role::HOST || $user->role == Role::RESTARTER)) {
+            $user->networks()->detach();
+        }
 
         // The user may have previously been removed from the group, which will mean they have an entry in
         // users_groups with deleted_at set.  Zap that if present so that sync() then works.  sync() doesn't
