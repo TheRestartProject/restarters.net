@@ -95,6 +95,9 @@ class BattcatOraTest extends TestCase
         // BattCat is closed - should redirect to status page.
         $response = $this->get('/battcat');
         $response->assertRedirect(url()->current().'/status');
+        $response = $this->get('/battcat/status');
+        $response->assertStatus(200);
+        $response->assertSee('BattCat Status');
     }
 
     /** @test */

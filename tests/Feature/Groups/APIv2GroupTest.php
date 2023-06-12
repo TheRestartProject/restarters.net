@@ -14,6 +14,7 @@ use Illuminate\Http\UploadedFile;
 use Symfony\Component\DomCrawler\Crawler;
 use Illuminate\Validation\ValidationException;
 use Tests\TestCase;
+use Auth;
 
 class APIv2GroupTest extends TestCase
 {
@@ -289,6 +290,45 @@ class APIv2GroupTest extends TestCase
         $this->assertTrue(array_key_exists('id', $json));
         $idgroups = $json['id'];
         $this->assertGreaterThan(0, $idgroups);
+    }
+
+    /**
+     * Network coordinators should see groups for approval, but only from their own networks.
+     *
+     * @dataProvider providerTrueFalse
+     *
+     * @return void
+     */
+    public function testNetworkCoordinatorApprove($first) {
+        $network1 = Network::factory()->create();
+        $group1 = Group::factory()->create();
+        $coordinator1 = User::factory()->networkCoordinator()->create([
+            'api_token' => '1234',
+        ]);
+        $network2 = Network::factory()->create();
+        $group2 = Group::factory()->create();
+        $coordinator2 = User::factory()->networkCoordinator()->create([
+            'api_token' => '5678',
+        ]);
+
+        $network1->addGroup($group1);
+        $network1->addCoordinator($coordinator1);
+        $network2->addGroup($group2);
+        $network2->addCoordinator($coordinator2);
+
+        if ($first) {
+            $response = $this->get("/api/v2/moderate/groups?api_token=1234");
+            $response->assertSuccessful();
+            $json = json_decode($response->getContent(), true);
+            self::assertEquals(1, count($json));
+            self::assertEquals($group1->idgroups, $json[0]['id']);
+        } else {
+            $response = $this->get("/api/v2/moderate/groups?api_token=5678");
+            $response->assertSuccessful();
+            $json = json_decode($response->getContent(), true);
+            self::assertEquals(1, count($json));
+            self::assertEquals($group2->idgroups, $json[0]['id']);
+        }
     }
 
     public function testLocales() {

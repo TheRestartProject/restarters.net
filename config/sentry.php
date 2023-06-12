@@ -54,4 +54,14 @@ return [
 
     'controllers_base_namespace' => env('SENTRY_CONTROLLERS_BASE_NAMESPACE', 'App\\Http\\Controllers'),
 
+    'before_send' => function (\Sentry\Event $event,  ?\Sentry\EventHint $hint): ?\Sentry\Event {
+        if ($hint !== null && $hint->exception !== null && str_contains($hint->exception->getMessage(), 'Could not reach the remote Mailgun server')) {
+            // This can happen if Mailgun is not available.  We send emails using queues, and therefore we will
+            // retry.  So we don't need to log the error to Sentry.
+            return null;
+        }
+
+        return $event;
+    },
+
 ];
