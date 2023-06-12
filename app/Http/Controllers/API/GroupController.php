@@ -102,7 +102,7 @@ class GroupController extends Controller
                                       'timezone' => $group->timezone,
                                       'location' => [
                                           'value' => $group->location,
-                                          'country' => Fixometer::translateCountry($group->country, $countries),
+                                          'country' => Fixometer::translateCountry($group->country_code, $countries),
                                           'latitude' => $group->latitude,
                                           'longitude' => $group->longitude,
                                           'area' => $group->area,
@@ -606,7 +606,7 @@ class GroupController extends Controller
             'postcode' => $postcode,
             'latitude' => $latitude,
             'longitude' => $longitude,
-            'country' => $country,
+            'country_code' => $country,
             'free_text' => $description,
             'shareable_code' => Fixometer::generateUniqueShareableCode(\App\Group::class, 'shareable_code'),
             'timezone' => $timezone,
@@ -750,7 +750,7 @@ class GroupController extends Controller
             'location' => $location,
             'latitude' => $latitude,
             'longitude' => $longitude,
-            'country' => $country,
+            'country_code' => $country,
             'free_text' => $description,
             'timezone' => $timezone,
             'phone' => $phone,
@@ -875,7 +875,7 @@ class GroupController extends Controller
 
         $latitude = null;
         $longitude = null;
-        $country = null;
+        $country_code = null;
 
         if ($timezone && !in_array($timezone, \DateTimeZone::listIdentifiers(\DateTimeZone::ALL_WITH_BC))) {
             throw ValidationException::withMessages(['location ' => __('partials.validate_timezone')]);
@@ -895,7 +895,7 @@ class GroupController extends Controller
 
             // Note that the country returned by the geocoder is already in English, which is what we need for the
             // value in the database.
-            $country = $geocoded['country'];
+            $country_code = $geocoded['country_code'];
         }
 
         return array(
@@ -909,7 +909,7 @@ class GroupController extends Controller
             $timezone,
             $latitude,
             $longitude,
-            $country,
+            $country_code,
             $network_data,
         );
     }

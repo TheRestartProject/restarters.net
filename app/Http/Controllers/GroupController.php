@@ -513,7 +513,7 @@ class GroupController extends Controller
                         asset('uploads/mid_'.$group_image->image->path) : null,
                     'location' => [
                         'location' => rtrim($group->location),
-                        'country' => Fixometer::translateCountry($group->country, $countries),
+                        'country' => Fixometer::translateCountry($group->country_code, $countries),
                         'distance' => $distance,
                     ],
                     'next_event' => $event ? $event->event_date_local : null,

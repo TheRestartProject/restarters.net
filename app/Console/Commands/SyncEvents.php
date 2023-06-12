@@ -3,6 +3,7 @@
 namespace App\Console\Commands;
 
 use App\Group;
+use App\Helpers\Fixometer;
 use App\Party;
 use DateTime;
 use Illuminate\Console\Command;
@@ -77,7 +78,7 @@ class SyncEvents extends Command
 
                 $custom_fields = [
                     ['key' => 'party_grouphash', 'value' => $event->group],
-                    ['key' => 'party_groupcountry', 'value' => $group->country],
+                    ['key' => 'party_groupcountry', 'value' => Fixometer::getCountryFromCountryCode($group->country_code)],
                     ['key' => 'party_groupcity', 'value' => $group->area],
                     ['key' => 'party_venue', 'value' => $event->venue],
                     ['key' => 'party_location', 'value' => $event->location],

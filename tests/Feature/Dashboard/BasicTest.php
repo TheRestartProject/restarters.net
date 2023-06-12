@@ -35,14 +35,14 @@ class BasicTest extends TestCase
         $user = User::factory()->restarter()->create();
         $user->update([
             'location' => $city,
-            'country' => $country,
+            'country_code' => $country,
             'latitude' => $lat,
             'longitude' => $lng,
             ]);
         $user->save();
         $user->refresh();
-        $this->assertEquals($user->country, $country);
-        $this->assertEquals($user->location, $city);
+        $this->assertEquals($country, $user->country_code);
+        $this->assertEquals($city, $user->location);
         $this->actingAs($user);
 
         $response = $this->get('/dashboard');

@@ -415,7 +415,7 @@ class ExportController extends Controller
 
         //country hours completed
         $country_hours_completed = clone $user_events;
-        $country_hours_completed = $country_hours_completed->groupBy('users.country')->select('users.country', DB::raw('SUM(TIMEDIFF(event_start_utc, event_end_utc)) as event_hours'));
+        $country_hours_completed = $country_hours_completed->groupBy('users.country_code')->select('users.country_code', DB::raw('SUM(TIMEDIFF(event_start_utc, event_end_utc)) as event_hours'));
         $all_country_hours_completed = $country_hours_completed->orderBy('event_hours', 'DESC')->get();
         $country_hours_completed = $country_hours_completed->orderBy('event_hours', 'DESC')->take(5)->get();
 

@@ -229,7 +229,7 @@ class MobifixOraTest extends TestCase
             ],
             ['id' => 'repaircafe_8243',
                 'data_provider' => 'repaircafe',
-                'country' => 'GBR',
+                'country' => 'GB',
                 'product_category' => 'Mobile',
                 'brand' => 'Sony',
                 'model' => 'Xperia XA',

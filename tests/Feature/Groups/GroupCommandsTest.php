@@ -22,7 +22,7 @@ class GroupCommandsTest extends TestCase {
         self::assertEquals('Test', $group->name);
         self::assertEquals('London', $group->location);
         self::assertEquals('SW9 7QD', $group->postcode);
-        self::assertEquals('UK', $group->country);
+        self::assertEquals('UK', $group->country_code);
         self::assertEquals('51.5073510', $group->latitude);
         self::assertEquals('-0.1277584', $group->longitude);
         self::assertEquals('https://therestartproject.org', $group->website);

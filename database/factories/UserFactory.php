@@ -38,7 +38,7 @@ class UserFactory extends Factory
         'consent_gdpr' => new \DateTime(),
         'number_of_logins' => 1,
         'age' => $this->faker->year(),
-        'country' => $this->faker->countryCode(),
+        'country_code' => $this->faker->countryCode(),
         'role' => Role::RESTARTER,
         'invites' => 1,
         'repairdir_role' => Role::REPAIR_DIRECTORY_NONE,

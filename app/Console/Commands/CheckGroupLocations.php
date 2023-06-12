@@ -19,7 +19,7 @@ class CheckGroupLocations extends Command
      *
      * @var string
      */
-    protected $description = 'Check that all gtroup locations are geocodeable';
+    protected $description = 'Check that all group locations are geocodeable';
 
     /**
      * Create a new command instance.

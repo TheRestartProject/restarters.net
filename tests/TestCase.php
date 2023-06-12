@@ -127,7 +127,7 @@ abstract class TestCase extends BaseTestCase
         $userAttributes['name'] = 'Test'.uniqid($this->userCount++, true);
         $userAttributes['email'] = $userAttributes['name'].'@restarters.dev';
         $userAttributes['age'] = '1982';
-        $userAttributes['country'] = 'GBR';
+        $userAttributes['country_code'] = 'GB';
         $userAttributes['password'] = 'letmein';
         $userAttributes['password_confirmation'] = 'letmein';
         $userAttributes['my_time'] = Carbon::now();
