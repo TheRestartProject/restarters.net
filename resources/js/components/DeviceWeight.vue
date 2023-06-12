@@ -5,7 +5,7 @@
     </label>
     <b-input type="number" @change="$emit('update:weight', parseFloat($event))" size="lg" class="marg p-1 text-center"  min="0" step=".1" autocomplete="off" :value="weight" :disabled="disabled" />
     <span class="text-right mb-1">
-      {{ __('devices.required_impact') }}
+      {{ info }}
     </span>
   </div>
 </template>
@@ -16,7 +16,7 @@ export default {
     weight: {
       type: Number,
       required: false,
-      default: 0
+      default: null
     },
     iconVariant: {
       type: String,
@@ -28,12 +28,25 @@ export default {
       required: false,
       default: false
     },
+    required: {
+      type: Boolean,
+      required: true,
+    }
   },
   data () {
     return {
       value: null
     }
   },
+  computed: {
+    info() {
+      if (this.required) {
+        return this.$lang.get('devices.required_impact')
+      } else {
+        return this.$lang.get('devices.optional_impact')
+      }
+    }
+  }
 }
 </script>
 <style scoped lang="scss">
