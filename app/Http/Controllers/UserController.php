@@ -382,7 +382,7 @@ class UserController extends Controller
 
         // If we are demoting from NetworkCoordinator, remove them from the list of coordinators for
         // any networks they are currently coordinating.
-        if ($oldRole == Role::NETWORK_COORDINATOR && ($user->role == Role::HOST) || $user->role == Role::RESTARTER) {
+        if ($oldRole == Role::NETWORK_COORDINATOR && ($user->role == Role::HOST || $user->role == Role::RESTARTER)) {
             $user->networks()->detach();
         }
 
