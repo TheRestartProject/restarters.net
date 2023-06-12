@@ -72,9 +72,13 @@
                 <h2 id="about-grp">{{ __('networks.general.about') }}</h2>
 
                 <div class="events__description">
-                    <p>{!! Str::limit(strip_tags($network->description), 160, '...') !!}</p>
-                    @if( strlen($network->description) > 160 )
-                    <button data-toggle="modal" data-target="#group-description"><span>{{ __('partials.read_more') }}</span></button>
+                    @if(strlen($network->description) <= 160)
+                        {!! $network->description !!}
+                    @else
+                        <p>{!! Str::limit(strip_tags($network->description), 160, '...') !!}</p>
+                        @if( strlen($network->description) > 160 )
+                        <button data-toggle="modal" data-target="#group-description"><span>{{ __('partials.read_more') }}</span></button>
+                        @endif
                     @endif
                 </div><!-- /events__description -->
 

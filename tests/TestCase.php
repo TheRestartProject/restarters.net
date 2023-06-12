@@ -94,6 +94,8 @@ abstract class TestCase extends BaseTestCase
             $network->name = 'Restarters';
             $network->shortname = 'restarters';
             $network->save();
+        } else {
+            error_log("Got network");
         }
 
         $this->withoutExceptionHandling();

@@ -4,6 +4,7 @@ namespace App\Http\Resources;
 
 use Carbon\Carbon;
 use Illuminate\Http\Resources\Json\JsonResource;
+use Illuminate\Support\Facades\Auth;
 
 /**
  * @OA\Schema(
@@ -24,7 +25,7 @@ use Illuminate\Http\Resources\Json\JsonResource;
  *     ),
  *     @OA\Property(
  *          property="country",
- *          description="The free-form country.",
+ *          description="The free-form country (translated if translations are available in the current language).",
  *          format="string",
  *          example="United Kingdom"
  *     ),
@@ -65,7 +66,7 @@ class GroupLocation extends JsonResource
             'location' => $this->location,
             'area' => $this->area,
             'postcode' => $this->postcode,
-            'country' => $this->country,
+            'country' => \App\Helpers\Fixometer::translateCountry($this->country),
             'lat' => $this->latitude,
             'lng' => $this->longitude,
         ];

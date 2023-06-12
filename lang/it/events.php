@@ -6,7 +6,6 @@ return [
   'rsvp_button' => 'Spiacente, non posso attendere oltre',
   'pending_rsvp_message' => 'Hai un invito in sospeso per questo evento',
   'pending_rsvp_button' => 'Sto assistendo',
-  'warning_volunteers_message' => 'Si noti che il numero di volontari non corrisponde alla registrazione di presenze. Devi aggiungere o rimuovere volontari?',
   'share_stats_header' => 'Condividi i tuoi risultati',
   'share_stats_message' => 'Molto bene! Il :date a :event_name siamo riusciti a riparare <strong> :number_devices dispositivi </strong>. Aiutaci a diffondere il messaggio condividendo il tuo impatto ambientale sul tuo sito web.',
   'headline_stats_dropdown' => 'Statistiche indice',

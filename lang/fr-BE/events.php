@@ -6,7 +6,6 @@ return [
   'rsvp_button' => 'Désolé, je ne peux plus participer',
   'pending_rsvp_message' => 'Vous avez une invitation en attente pour cet événement',
   'pending_rsvp_button' => 'Je participe',
-  'warning_volunteers_message' => 'Veuillez noter que le nombre de bénévoles ne correspond pas à la fiche de présence.  Avez-vous besoin d\'ajouter ou de supprimer des bénévoles?',
   'share_stats_header' => 'Partager vos statistiques',
   'share_stats_message' => 'Bien joué! Le :date à :event_name nous avons été capables de réparer <strong>:number_devices appareils</strong>. Aidez-nous à partager la nouvelle en partageant l\'impact environnemental sur votre site.',
   'headline_stats_dropdown' => 'Indice statistique',
