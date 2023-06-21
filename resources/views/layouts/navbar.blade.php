@@ -17,8 +17,8 @@
         <?php
         // We want to show the current branch.  This will only be set on development or staging environments.
         $branch = "Unknown branch";
-        if (is_dir('.git')) {
-            @exec('git branch | ' . "grep ' * '", $shellOutput);
+        if (is_dir(base_path() . '/.git')) {
+            exec('cd ' . base_path() . '; git branch | ' . "grep ' * '", $shellOutput);
             foreach ($shellOutput as $line) {
                 if (strpos($line, '* ') !== false) {
                     $branch = trim(strtolower(str_replace('* ', '', $line)));
