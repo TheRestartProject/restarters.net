@@ -609,6 +609,10 @@ class EventController extends Controller
             false
         );
 
+        if (!Fixometer::userHasEditPartyPermission($idEvents, $user->id)) {
+            abort(403);
+        }
+
         // Convert the timezone to UTC, because the timezone is not itself stored in the DB.
         $event_start_utc = Carbon::parse($start)->setTimezone('UTC')->toIso8601String();
         $event_end_utc = Carbon::parse($end)->setTimezone('UTC')->toIso8601String();
@@ -632,8 +636,7 @@ class EventController extends Controller
         $party = Party::findOrFail($idEvents);
         $party->update($update);
 
-        // REVIEW: In the old code we wouldn't generate EditEvent in the approval case.  But I think that was a bug.
-        if ($request->has('moderate') && $request->input('moderate') == 'approve') {
+        if ($request->has('moderate') && $request->input('moderate') == 'approve' && Fixometer::userCanApproveEvent($idEvents, $user->id)) {
             $party->approve();
         }
 

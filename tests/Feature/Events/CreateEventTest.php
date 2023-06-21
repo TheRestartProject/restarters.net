@@ -189,6 +189,7 @@ class CreateEventTest extends TestCase
 
         // Approve the event.
         $event->approve();
+        $this->artisan("queue:work --stop-when-empty");
 
         // Approval should generate a notification to the host.
         Notification::assertSentTo(
@@ -352,6 +353,7 @@ class CreateEventTest extends TestCase
         $eventData['id'] = $event->idevents;
         $eventData['moderate'] = 'approve';
         $response1a = $this->patch('/api/v2/events/'.$event->idevents, $this->eventAttributesToAPI($eventData));
+        $this->artisan("queue:work --stop-when-empty");
 
         // assert
         Notification::assertSentTo(
@@ -707,6 +709,7 @@ class CreateEventTest extends TestCase
         // Approval should generate a notification to the host which is also queued.
         $event = Party::latest()->first();
         $event->approve();
+        $this->artisan("queue:work --stop-when-empty");
 
         # Should have queued ApproveEvent.
         self::assertEquals(0, Queue::size('database'));
