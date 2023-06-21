@@ -16,14 +16,16 @@ return new class extends Migration
     {
         $countries = array_flip(App\Helpers\Fixometer::getAllCountries('en'));
 
-        // Users has country column which is a code, except for ; check the contents and rename it.
+        // Users has country column which is a code, except for GBR; fix the contents and rename it.
         DB::update(DB::raw("UPDATE users SET country = 'GB' WHERE country = 'GBR'"));
 
         Schema::table('users', function (Blueprint $table) {
             $table->renameColumn('country', 'country_code');
         });
 
-        // Change the groups table to have country_code, not country.
+        // Add country code to groups table - we leave the country field in place because it's used by
+        // e.g. ORA exports.  There is a scheduled job which updates the country field from the
+        // code.
         Schema::table('groups', function (Blueprint $table) {
             $table->string('country_code', 2)->after('area')->nullable();
         });
@@ -40,10 +42,6 @@ return new class extends Migration
                 $group->save();
             }
         }
-
-        Schema::table('groups', function (Blueprint $table) {
-            $table->dropColumn('country');
-        });
     }
 
     /**
