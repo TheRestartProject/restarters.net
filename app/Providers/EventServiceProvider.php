@@ -39,6 +39,7 @@ class EventServiceProvider extends ServiceProvider
         \App\Events\ApproveEvent::class => [
             \App\Listeners\CreateWordpressPostForEvent::class,
             \App\Listeners\CreateDiscourseThreadForEvent::class,
+            \App\Listeners\NotifyApprovedEvent::class
         ],
 
         \App\Events\EditEvent::class => [
