@@ -28,6 +28,7 @@
           @else
           :groups="{{ json_encode($user_groups, JSON_INVALID_UTF8_IGNORE) }}"
           @endif
+          :can-approve="<?php echo (App\Helpers\Fixometer::hasRole($user, 'Administrator') || App\Helpers\Fixometer::hasRole($user, 'NetworkCoordinator')) ? 'true' : 'false' ?>"
       />
     </div>
 
