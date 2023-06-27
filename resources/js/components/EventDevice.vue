@@ -25,7 +25,7 @@
                        :suppress-brand-warning="suppressBrandWarning"/>
           <DeviceModel class="mb-2" :model.sync="currentDevice.model" :icon-variant="add ? 'black' : 'brand'"
                        :disabled="disabled"/>
-          <DeviceWeight v-if="showWeight" :weight.sync="currentDevice.estimate" :disabled="disabled" :required="weightRequired" :error="missingWeight" />
+          <DeviceWeight v-if="showWeight" :weight.sync="currentDevice.estimate" :disabled="disabled" :required="weightRequired" />
           <DeviceAge :age.sync="currentDevice.age" :disabled="disabled"/>
           <DeviceImages :idevents="idevents" :device="currentDevice" :add="add" :edit="edit" :disabled="disabled"
                         class="mt-2" @remove="removeImage($event)"/>
@@ -187,7 +187,6 @@ export default {
       currentDevice: {},
       axiosError: null,
       missingCategory: false,
-      missingWeight: false,
       unknownItemType: false,
       suggested: false
     }
@@ -378,20 +377,14 @@ export default {
     },
     async addDevice () {
       try {
-        if (this.weightRequired && (isNaN(this.currentDevice.estimate) || this.currentDevice.estimate == null)) {
-          this.missingWeight = true
+        if (!this.currentDevice.category) {
+          this.missingCategory = true
         } else {
-          this.missingWeight = false
+          this.missingCategory = false
 
-          if (!this.currentDevice.category) {
-            this.missingCategory = true
-          } else {
-            this.missingCategory = false
+          const createdDevices = await this.$store.dispatch('devices/add', this.currentDevice)
 
-            const createdDevices = await this.$store.dispatch('devices/add', this.currentDevice)
-
-            this.$emit('close')
-          }
+          this.$emit('close')
         }
 
       } catch (e) {
@@ -401,13 +394,8 @@ export default {
     },
     async saveDevice () {
       try {
-        if (this.weightRequired && (isNaN(this.currentDevice.estimate) || this.currentDevice.estimate == null)) {
-          this.missingWeight = true
-        } else {
-          this.missingWeight = false
-          await this.$store.dispatch('devices/edit', this.currentDevice)
-          this.$emit('close')
-        }
+        await this.$store.dispatch('devices/edit', this.currentDevice)
+        this.$emit('close')
       } catch (e) {
         console.error('Edit failed', e)
         this.axiosError = e

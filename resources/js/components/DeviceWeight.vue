@@ -4,7 +4,7 @@
       {{ __('devices.weight') }}
     </label>
     <b-input type="number" @change="$emit('update:weight', parseFloat($event))" size="lg"
-             :class="{ marg: true, 'p-1': true, 'text-center': true, 'border-danger': error }" min="0" step=".1"
+             class="marg p-1 text-center" min="0" step=".1"
              autocomplete="off" :value="weight" :disabled="disabled"/>
     <span class="text-right mb-1">
       {{ info }}
@@ -33,11 +33,6 @@ export default {
     required: {
       type: Boolean,
       required: true,
-    },
-    error: {
-      type: Boolean,
-      required: false,
-      default: false
     },
   },
   data() {

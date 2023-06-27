@@ -48,7 +48,7 @@ return [
   'repair_outcome' => 'Résultat de la réparation?',
   'repair_source' => 'Source d\'information de la réparation',
   'required_impact' => 'kg - utilisé pour le calcul de l\'impact environnemental (obligatoire)',
-  'optional_impact' => 'kg - utilisé pour le calcul de l\'impact environnemental (facultatif)',
+  'optional_impact' => 'kg - utilisé pour affiner le calcul de l\'impact environnemental (facultatif)',
   'title_assessment' => 'Evaluation',
   'title_items' => 'Objet',
   'title_items_at_event' => 'Objets à cet événement',
