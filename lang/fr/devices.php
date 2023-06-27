@@ -47,7 +47,7 @@ return [
   'powered_items' => 'Appareils électriques',
   'repair_outcome' => 'Résultat de la réparation?',
   'repair_source' => 'Source d\'information de la réparation',
-  'required_impact' => 'kg - utilisé pour le calcul de l\'impact environnemental (obligatoire)',
+  'required_impact' => 'kg - nécessaire pour calculer l\'impact sur l\'environnement',
   'optional_impact' => 'kg - utilisé pour affiner le calcul de l\'impact environnemental (facultatif)',
   'title_assessment' => 'Evaluation',
   'title_items' => 'Objet',
