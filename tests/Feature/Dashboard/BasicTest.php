@@ -88,7 +88,7 @@ class BasicTest extends TestCase
         $host = User::factory()->restarter()->create();
 
         // Create an event.
-        $this->loginAsTestUser(Role::ADMINISTRATOR);
+        $admin = $this->loginAsTestUser(Role::ADMINISTRATOR);
 
         $event = Party::factory()->create([
                                                    'group' => $this->idgroups,
@@ -117,7 +117,9 @@ class BasicTest extends TestCase
         $eventData = $event->getAttributes();
         $eventData['id'] = $event->idevents;
         $eventData['moderate'] = 'approve';
-        $response1a = $this->patch('/api/v2/events/'.$event->idevents, $this->eventAttributesToAPI($eventData));
+        $response1a = $this->patch('/api/v2/events/'.$event->idevents . '?api_token=' . $admin->api_key, $this->eventAttributesToAPI($eventData));
+        $response1a->assertSuccessful();
+        $this->artisan("queue:work --stop-when-empty");
 
         // Should now show as an upcoming event, both on dashboard page and events page.
         $this->actingAs($host);
