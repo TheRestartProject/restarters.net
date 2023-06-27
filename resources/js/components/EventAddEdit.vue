@@ -1,5 +1,6 @@
 <template>
   <div>
+    <input type="hidden" name="idevents" :value="idevents" />
     <div class="eae-layout">
       <EventVenue
           class="flex-grow-1 event-venue"
@@ -80,7 +81,7 @@
           <p v-else class="mt-2 text-danger font-weight-bold" v-html="'<div>' + __('events.edit_failed') + '</div>'"/>
         </div>
       </div>
-      <b-alert v-if="justCreated" show variant="success" class="mt-2 mb-2 creation-message">
+      <b-alert v-if="justCreated" show variant="success" class="mt-2 mb-2 creation-message" :id="idevents">
         {{ creationMessage}}
       </b-alert>
       <div class="event-buttons button-group d-flex align-items-center justify-content-between" v-if="creating">

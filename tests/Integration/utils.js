@@ -97,14 +97,10 @@ exports.createEvent = async function(page, baseURL, idgroups) {
 
   await page.click('button[type=submit]')
 
-  // Should get redirected to Edit form.
-  await page.waitForURL('**/edit/**');
+  // Should see created message.
+  const created = await page.locator('.creation-message')
+  const id = await page.evaluate(el => el.id, created)
 
-  // Return id from URL
-  const p = page.url().lastIndexOf('/')
-  expect(p).toBeGreaterThan(0)
-
-  const id = page.url().substring(p + 1)
   return id
 }
 
