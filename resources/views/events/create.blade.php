@@ -28,6 +28,7 @@
           @else
           :groups="{{ json_encode($user_groups, JSON_INVALID_UTF8_IGNORE) }}"
           @endif
+          :can-approve="<?php echo App\Helpers\Fixometer::userCanApproveEvent(null, null, $selected_group_id) ? 'true' : 'false' ?>"
       />
     </div>
 
