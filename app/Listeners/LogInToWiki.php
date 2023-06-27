@@ -11,6 +11,7 @@ use Mediawiki\Api\ApiUser;
 use Mediawiki\Api\MediawikiApi;
 use Mediawiki\Api\Service\UserCreator;
 
+// Don't extend BaseEvent - we don't want to queue because this needs to happen before we return to the client.
 class LogInToWiki
 {
     // We use the Laravel hashed password as the mediawiki password.  This means we can log in to the wiki

@@ -116,6 +116,9 @@ abstract class TestCase extends BaseTestCase
         $this->processQueuedNotifications();
         $this->OpenAPIValidator = ValidatorBuilder::fromJson(storage_path('api-docs/api-docs.json'))->getValidator();
 
+        // Some tests may override the queue.
+        $queueManager = $this->app['queue'];
+        $queueManager->setDefaultDriver('database');
     }
 
     public function userAttributes()
