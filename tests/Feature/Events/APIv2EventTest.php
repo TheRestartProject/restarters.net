@@ -209,4 +209,82 @@ class APIv2EventTest extends TestCase
         ];
     }
 
+    public function testCreateEventGeocodeFailure()
+    {
+        $user = User::factory()->host()->create();
+
+        $response = $this->post('/api/v2/groups?api_token=' . $user->api_token, [
+            'name' => "Test Group",
+            'website' => 'https://therestartproject.org',
+            'location' => "London",
+            'description' => "Some text",
+            'timezone' => 'Europe/London',
+            'network_data' => [
+                'dummy' => 'dummy',
+            ]
+        ]);
+
+        $this->assertTrue($response->isSuccessful());
+        $json = json_decode($response->getContent(), true);
+        $this->assertTrue(array_key_exists('id', $json));
+        $idgroups = $json['id'];
+
+        $eventAttributes = Party::factory()->raw();
+        $eventAttributes['group'] = $idgroups;
+
+        $event_start = Carbon::createFromTimestamp(strtotime('tomorrow'))->setTimezone('UTC');
+        $event_end = Carbon::createFromTimestamp(strtotime('tomorrow'))->setTimezone('UTC')->addHour(2);
+
+        $this->expectException(ValidationException::class);
+
+        $response = $this->post('/api/v2/events?api_token=' . $user->api_token, [
+            'groupid' => $idgroups,
+            'start' => $event_start->toIso8601String(),
+            'end' => $event_end->toIso8601String(),
+            'title' => $eventAttributes['venue'],
+            'location' => 'ForceGeoCodeFailure',
+            'description' => $eventAttributes['free_text'],
+            'timezone' => $eventAttributes['timezone']
+        ]);
+    }
+
+    public function testCreateEventInvalidTimezone()
+    {
+        $user = User::factory()->host()->create();
+
+        $response = $this->post('/api/v2/groups?api_token=' . $user->api_token, [
+            'name' => "Test Group",
+            'website' => 'https://therestartproject.org',
+            'location' => "London",
+            'description' => "Some text",
+            'timezone' => 'Europe/London',
+            'network_data' => [
+                'dummy' => 'dummy',
+            ]
+        ]);
+
+        $this->assertTrue($response->isSuccessful());
+        $json = json_decode($response->getContent(), true);
+        $this->assertTrue(array_key_exists('id', $json));
+        $idgroups = $json['id'];
+
+        $eventAttributes = Party::factory()->raw();
+        $eventAttributes['group'] = $idgroups;
+
+        $event_start = Carbon::createFromTimestamp(strtotime('tomorrow'))->setTimezone('UTC');
+        $event_end = Carbon::createFromTimestamp(strtotime('tomorrow'))->setTimezone('UTC')->addHour(2);
+
+        $this->expectException(ValidationException::class);
+
+        $response = $this->post('/api/v2/events?api_token=' . $user->api_token, [
+            'groupid' => $idgroups,
+            'start' => $event_start->toIso8601String(),
+            'end' => $event_end->toIso8601String(),
+            'title' => $eventAttributes['venue'],
+            'location' => 'London',
+            'description' => $eventAttributes['free_text'],
+            'timezone' => 'invalidtimezone'
+        ]);
+    }
+
 }
