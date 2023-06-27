@@ -68,6 +68,8 @@ class ModerationEventPhotosNotificationTest extends TestCase
         $admins = $this->admins;
         $event = $this->event;
 
+        $this->artisan("queue:work --stop-when-empty");
+
         Notification::assertSentTo(
             $admins,
             AdminModerationEventPhotos::class,

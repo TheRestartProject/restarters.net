@@ -56,6 +56,7 @@ class WordpressGroupPushTest extends TestCase
         $groupData['group_avatar'] = 'foo.png';
 
         event(new ApproveGroup($group, $groupData));
+        $this->artisan("queue:work --stop-when-empty");
     }
 
     /** @test */
@@ -84,5 +85,6 @@ class WordpressGroupPushTest extends TestCase
         $groupData['longitude'] = '1';
 
         event(new EditGroup($group, $groupData));
+        $this->artisan("queue:work --stop-when-empty");
     }
 }

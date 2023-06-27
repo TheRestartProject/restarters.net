@@ -532,6 +532,7 @@ class CreateEventTest extends TestCase
 
         // Create the event
         $idevents = $this->createEvent($group->idgroups, '2000-01-01');
+        $this->artisan("queue:work --stop-when-empty");
 
         $party = $group->parties()->latest()->first();
         $this->assertEquals($idevents, $party->idevents);

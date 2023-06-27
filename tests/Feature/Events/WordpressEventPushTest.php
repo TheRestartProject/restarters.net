@@ -50,6 +50,8 @@ class WordpressEventPushTest extends TestCase
         ]);
 
         $event->approve();
+
+        $this->artisan("queue:work --stop-when-empty");
     }
 
     /** @test */
@@ -167,6 +169,8 @@ class WordpressEventPushTest extends TestCase
         $eventData['longitude'] = '1';
 
         event(new EditEvent($event, $eventData));
+
+        $this->artisan("queue:work --stop-when-empty");
     }
 
     /** @test */

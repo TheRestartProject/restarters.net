@@ -42,6 +42,7 @@ class EditLanguageSettingsTest extends TestCase
         // act
         $user->language = 'de';
         $user->save();
+        $this->artisan("queue:work --stop-when-empty");
 
         // assert
         Event::assertDispatched(UserLanguageUpdated::class);
