@@ -5,7 +5,7 @@ namespace App\Listeners;
 use App\Events\UserDeleted;
 use App\UserGroups;
 
-class RemoveSoftDeletedUserFromAllGroups
+class RemoveSoftDeletedUserFromAllGroups extends BaseEvent
 {
     /**
      * @param UserDeleted $event

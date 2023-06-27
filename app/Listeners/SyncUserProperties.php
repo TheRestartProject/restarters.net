@@ -6,7 +6,7 @@ use App\Events\UserEmailUpdated;
 use App\Events\UserLanguageUpdated;
 use App\Events\UserUpdated;
 
-class SyncUserProperties
+class SyncUserProperties extends BaseEvent
 {
     /**
      * Create the event listener.

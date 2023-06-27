@@ -10,7 +10,7 @@ use Mediawiki\Api\ApiUser;
 use Mediawiki\Api\FluentRequest;
 use Mediawiki\Api\MediawikiApi;
 
-class ChangeWikiPassword
+class ChangeWikiPassword extends BaseEvent
 {
     /**
      * Create the event listener.

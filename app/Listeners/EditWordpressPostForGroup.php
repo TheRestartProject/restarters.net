@@ -10,7 +10,7 @@ use HieuLe\WordpressXmlrpcClient\WordpressClient;
 use Illuminate\Support\Facades\Log;
 use Notification;
 
-class EditWordpressPostForGroup
+class EditWordpressPostForGroup extends BaseEvent
 {
     /**
      * Create the event listener.

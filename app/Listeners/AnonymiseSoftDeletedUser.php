@@ -4,7 +4,7 @@ namespace App\Listeners;
 
 use App\Events\UserDeleted;
 
-class AnonymiseSoftDeletedUser
+class AnonymiseSoftDeletedUser extends BaseEvent
 {
     /**
      * @param UserDeleted $event

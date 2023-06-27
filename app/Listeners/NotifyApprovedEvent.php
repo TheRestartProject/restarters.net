@@ -12,9 +12,8 @@ use Illuminate\Support\Facades\Log;
 use Notification;
 use App\Notifications\NotifyRestartersOfNewEvent;
 use App\Notifications\EventConfirmed;
-use Illuminate\Contracts\Queue\ShouldQueue;
 
-class NotifyApprovedEvent implements ShouldQueue
+class NotifyApprovedEvent extends BaseEvent
 {
     /**
      * Handle the event.

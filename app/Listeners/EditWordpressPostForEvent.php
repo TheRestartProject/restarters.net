@@ -11,7 +11,7 @@ use HieuLe\WordpressXmlrpcClient\WordpressClient;
 use Illuminate\Support\Facades\Log;
 use Notification;
 
-class EditWordpressPostForEvent
+class EditWordpressPostForEvent extends BaseEvent
 {
     protected $wpClient;
 
