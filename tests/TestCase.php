@@ -118,6 +118,20 @@ abstract class TestCase extends BaseTestCase
         $this->processQueuedNotifications();
         $this->OpenAPIValidator = ValidatorBuilder::fromJson(storage_path('api-docs/api-docs.json'))->getValidator();
 
+        // Clear any jobs queued in earlier tests.
+        $max = 1000;
+        do {
+            $job = Queue::pop('database');
+
+            if ($job) {
+                try {
+                    $job->fail('removed in UT');
+                } catch (\Exception $e) {}
+            }
+
+            $max--;
+        }
+        while (Queue::size() > 0 && $max > 0);
     }
 
     public function userAttributes()

@@ -5,6 +5,7 @@ namespace App\Providers;
 use App\Events\DeviceCreatedOrUpdated;
 use App\Events\EventDeleted;
 use App\Events\EventImagesUploaded;
+use App\Events\UserConfirmedEvent;
 use App\Events\UserDeleted;
 use App\Events\UserEmailUpdated;
 use App\Events\UserFollowedGroup;
@@ -12,6 +13,7 @@ use App\Events\UserLanguageUpdated;
 use App\Events\UserRegistered;
 use App\Events\UserUpdated;
 use App\Listeners\AddUserToDiscourseGroup;
+use App\Listeners\AddUserToDiscourseThreadForEvent;
 use App\Listeners\AnonymiseSoftDeletedUser;
 use App\Listeners\DeleteEventFromWordPress;
 use App\Listeners\DeviceUpdatedAt;
@@ -87,6 +89,10 @@ class EventServiceProvider extends ServiceProvider
         DeviceCreatedOrUpdated::class => [
             DeviceUpdatedAt::class,
         ],
+
+        UserConfirmedEvent::class => [
+            AddUserToDiscourseThreadForEvent::class
+        ]
     ];
 
     /**

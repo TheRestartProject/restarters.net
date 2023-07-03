@@ -2,22 +2,20 @@
 
 namespace Tests\Feature;
 
-use App\Events\ApproveEvent;
 use App\EventsUsers;
 use App\Group;
 use App\Helpers\Fixometer;
-use App\Listeners\CreateDiscourseThreadForEvent;
-use App\Listeners\CreateWordpressPostForEvent;
+use App\Listeners\AddUserToDiscourseThreadForEvent;
 use App\Notifications\RSVPEvent;
 use App\Party;
 use App\Role;
-use App\Services\DiscourseService;
 use App\User;
 use DB;
 use Illuminate\Support\Facades\Notification;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Tests\TestCase;
 use App\Notifications\JoinEvent;
+use Illuminate\Support\Facades\Queue;
 
 class InviteEventTest extends TestCase
 {
@@ -265,15 +263,7 @@ class InviteEventTest extends TestCase
 
     public function testInvitableNotifications()
     {
-        // We will be accepting an invitation which should trigger adding to the Discourse thread.  We need
-        // to do this here as the observer gets the Discourse service in its constructor.
-        $this->instance(
-            DiscourseService::class,
-            \Mockery::mock(DiscourseService::class, function ($mock) {
-                $mock->shouldReceive('addUserToPrivateMessage')->once();
-            })
-        );
-
+        Queue::fake();
         Notification::fake();
         $this->withoutExceptionHandling();
 
@@ -377,6 +367,12 @@ class InviteEventTest extends TestCase
         $response9 = $this->get('/party/get-group-emails-with-names/'.$event->idevents);
         $members = json_decode($response9->getContent());
         $this->assertEquals([], $members);
+
+        Queue::assertPushed(\Illuminate\Events\CallQueuedListener::class, function ($job) use ($event, $user) {
+            if ($job->class == AddUserToDiscourseThreadForEvent::class) {
+                return true;
+            }
+        });
     }
 
     public function testInviteViaLink() {

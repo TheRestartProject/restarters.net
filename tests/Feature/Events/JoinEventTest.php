@@ -2,14 +2,9 @@
 
 namespace Tests\Feature;
 
+use Illuminate\Support\Facades\Queue;
 use App\EventsUsers;
-use App\Group;
-use App\Helpers\Geocoder;
-use App\Network;
-use App\Notifications\AdminModerationEvent;
-use App\Notifications\NotifyRestartersOfNewEvent;
-use App\Party;
-use App\Services\DiscourseService;
+use App\Listeners\AddUserToDiscourseThreadForEvent;
 use App\User;
 use DB;
 use Illuminate\Support\Facades\Notification;
@@ -19,6 +14,8 @@ class JoinEventTest extends TestCase
 {
     public function testJoin()
     {
+        Queue::fake();
+
         $this->withoutExceptionHandling();
 
         $user = User::factory()->administrator()->create([
@@ -33,12 +30,6 @@ class JoinEventTest extends TestCase
         $event = \App\Party::find($idevents);
         $event->discourse_thread = 123;
         $event->save();
-        $this->instance(
-            DiscourseService::class,
-            \Mockery::mock(DiscourseService::class, function ($mock) {
-                $mock->shouldReceive('addUserToPrivateMessage')->once();
-            })
-        );
 
         // Join.  Should get redirected, and also prompted to follow the group (which we haven't).
         $user = User::factory()->restarter()->create();
@@ -67,6 +58,12 @@ class JoinEventTest extends TestCase
                 ':is-attending' => 'false',
             ],
         ]);
+
+        Queue::assertPushed(\Illuminate\Events\CallQueuedListener::class, function ($job) use ($event, $user) {
+            if ($job->class == AddUserToDiscourseThreadForEvent::class) {
+                return true;
+            }
+        });
     }
 
     public function testJoinInvalid() {

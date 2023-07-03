@@ -2,6 +2,8 @@
 
 namespace App\Observers;
 
+use App\Events\UserConfirmedEvent;
+use App\Events\UserLeftEvent;
 use App\EventsUsers;
 use App\Role;
 use App\Services\DiscourseService;
@@ -82,16 +84,6 @@ class EventsUsersObserver {
         $this->removed($event, $user);
     }
 
-    private function getHost($idevents) {
-        $hosts = User::join('events_users', 'events_users.user', '=', 'users.id')
-            ->where('events_users.event', $idevents)
-            ->where('events_users.role', Role::HOST)
-            ->select('users.*')
-            ->get();
-
-        return $hosts->count() ? $hosts[0] : null;
-    }
-
     /**
      * @param Party $event
      * @param User $user
@@ -100,20 +92,7 @@ class EventsUsersObserver {
     private function confirmed($event, $user): void
     {
         $event->increment('volunteers');
-
-        if ($user && $event->discourse_thread) {
-            // We need a host of the event to add the user to the thread.
-            // TODO Queue this.
-            $host = $this->getHost($event->idevents);
-
-            if ($host) {
-                $this->discourseService->addUserToPrivateMessage(
-                    $event->discourse_thread,
-                    $host->username,
-                    $user->username
-                );
-            }
-        }
+        event(new UserConfirmedEvent($event->idevents, $user ? $user->id : null));
     }
 
     /**
@@ -124,19 +103,6 @@ class EventsUsersObserver {
     private function removed($event, $user): void
     {
         $event->decrement('volunteers');
-
-        if ($user && $event->discourse_thread) {
-            // We need a host of the event to remove the user to the thread.
-            $host = $this->getHost($event->idevents);
-
-            if ($host) {
-                // TODO Queue this.
-//                $this->discourseService->addUserToPrivateMessage(
-//                    $event->discourse_thread,
-//                    $hosts[0]->username,
-//                    $user->username
-//                );
-            }
-        }
+        event(new UserLeftEvent($event->idevents, $user ? $user->id : null));
     }
 }
