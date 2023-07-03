@@ -49,6 +49,8 @@ class CheckTranslations extends Command
                 // This is probably a special case used for form validation.  It throws up many errors, and these
                 // are at best not visible and at worst not too bad given that they only occur in error cases.  So
                 // ignore it.
+            } else if ($file == 'countries.php') {
+                // This is a special case used for country names.
             } else if ($file == 'pagination.php') {
                 // This is probably a special case used for paging through data.
             } else if (strpos($file, '-audits')) {

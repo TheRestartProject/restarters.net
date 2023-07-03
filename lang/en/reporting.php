@@ -16,7 +16,6 @@ return [
   'yes' => 'Yes',
   'no' => 'No',
   'country' => 'Country',
-  'time_volunteered' => 'Time Volunteered',
   'hours_volunteered' => 'Hours volunteered',
   'average_age' => 'Average age',
   'number_of_groups' => 'Number of groups',
@@ -35,5 +34,4 @@ return [
   'event_date' => 'Event date',
   'event_name' => 'Event',
   'restart_group' => 'Group',
-  'export_csv' => 'Export to CSV',
 ];

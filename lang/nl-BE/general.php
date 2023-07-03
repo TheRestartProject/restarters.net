@@ -33,7 +33,6 @@ return [
   'save_repair_skills' => 'Competenties bewaren',
   'signmeup' => 'Registreer mij!',
   'therestartproject' => 'Restart Project',
-  'time_reporting' => 'Uren vrijwilligerswerk',
   'your_name' => 'Je naam',
   'your_name_validation' => 'Typ aub je naam',
   'your_repair_skills' => 'Je competenties',

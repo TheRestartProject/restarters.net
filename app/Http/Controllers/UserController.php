@@ -1124,9 +1124,6 @@ class UserController extends Controller
 
         if ($user->hasRole('Administrator') || $user->hasRole('Host')) {
             $items = [];
-            if ($user->hasRole('Administrator')) {
-                $items[Lang::get('general.time_reporting')] = url('/reporting/time-volunteered?a');
-            }
             $items[Lang::get('general.party_reporting')] = url('/search');
 
             $reportingMenu = [
