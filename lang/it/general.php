@@ -11,6 +11,7 @@ return [
   'alert_uptodate_text' => 'Non hai nessuna azione da fare ora.  Quando sara\' necessaria ti faremo sapere.',
   'general' => 'Generale',
   'reporting' => 'Reporting',
+  'time_reporting' => 'Ore di volontariato',
   'party_reporting' => 'Segnalazione eventi',
   'signmeup' => 'Fammi entrare!',
   'introduction_message' => 'Siamo una comunità globale di persone che aiutano gli altri a riparare i propri  dispositivi elettronici in eventi comunitari. Unisciti a noi!',

@@ -77,6 +77,10 @@ class CheckAuthService extends JsonResource
         if ($this->is_host || $this->is_admin) {
             $this->menu->get('reporting')->put('header', 'Reporting');
 
+            if ($this->is_admin) {
+                $this->menu->get('reporting')->put(Lang::get('general.time_reporting'), url('reporting/time-volunteered?a'));
+            }
+
             $this->menu->get('reporting')->put(Lang::get('general.party_reporting'), url('search'));
 
             $this->menu->get('reporting')->put('reporting_spacer', 'spacer');

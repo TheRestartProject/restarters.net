@@ -384,6 +384,9 @@ Route::middleware('auth', 'verifyUserConsent', 'ensureAPIToken')->group(function
 
     //Export Controller
     Route::get('/export/parties', [ExportController::class, 'parties']);
+    Route::get('/export/time-volunteered', [ExportController::class, 'exportTimeVolunteered']);
+    Route::get('/reporting/time-volunteered', [ExportController::class, 'getTimeVolunteered']);
+    Route::get('/reporting/time-volunteered/{search}', [ExportController::class, 'getTimeVolunteered']);
 });
 
 Route::middleware('ensureAPIToken')->group(function () {

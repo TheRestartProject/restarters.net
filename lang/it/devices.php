@@ -3,6 +3,7 @@
 return [
   'devices' => 'Dispositivo',
   'export_device_data' => 'Esporta dati del dispositivo',
+  'by_taxonomy' => 'Classificazione per',
   'by_date' => 'Fino a/Scadenza',
   'category' => 'Categoria',
   'group' => 'Gruppo',

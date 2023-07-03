@@ -707,7 +707,7 @@ class EventController extends Controller
             $geocoded = $geocoder->geocode($location);
 
             if (empty($geocoded)) {
-                throw ValidationException::withMessages(['location ' => __('events.geocode_failed')]);
+                throw ValidationException::withMessages(['location ' => __('groups.geocode_failed')]);
             }
 
             $latitude = $geocoded['latitude'];

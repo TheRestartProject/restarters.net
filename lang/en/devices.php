@@ -5,6 +5,7 @@ return [
   'export_device_data' => 'Export all data',
   'export_event_data' => 'Export event data',
   'export_group_data' => 'Export group data',
+  'by_taxonomy' => 'By taxonomy',
   'by_date' => 'By date',
   'category' => 'Category',
   'group' => 'Group',

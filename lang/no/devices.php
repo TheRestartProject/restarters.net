@@ -3,6 +3,7 @@
 return [
   'devices' => 'Devices',
   'export_device_data' => 'Export device data',
+  'by_taxonomy' => 'By taxonomy',
   'by_date' => 'By date',
   'various' => 'Various',
   'category' => 'Category',

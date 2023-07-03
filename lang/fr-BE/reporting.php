@@ -16,6 +16,7 @@ return [
   'yes' => 'Oui',
   'no' => 'Non',
   'country' => 'Pays',
+  'time_volunteered' => 'Temps de bénévolat',
   'hours_volunteered' => 'Heures de bénévolat',
   'average_age' => 'Moyenne d\'âge',
   'number_of_groups' => 'Nombre de Repair Cafés',
@@ -34,4 +35,5 @@ return [
   'event_date' => 'Date de l\'événement',
   'event_name' => 'Evénement',
   'restart_group' => 'Repair Café',
+  'export_csv' => 'Exporter en CSV',
 ];

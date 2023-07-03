@@ -231,6 +231,19 @@ class ExportTest extends TestCase
         fgetcsv($fh);
         $row2 = fgetcsv($fh);
         self::assertEquals(11, count($row2));
+
+        // Export time volunteered - first as a web page.
+        $response = $this->get("/reporting/time-volunteered?a");
+        $response->assertSee($event1->getEventName());
+        $response->assertSee($event2->getEventName());
+
+        // Now as a CSV.
+        $response = $this->get("/export/time-volunteered?a");
+        $filename = 'time_reporting.csv';
+        $fh = fopen($filename, 'r');
+        $row1 = fgetcsv($fh);
+        $row2 = fgetcsv($fh);
+        $this->assertEquals('Hours Volunteered', $row2[0]);
     }
 
     public function roleProvider() {

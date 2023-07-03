@@ -4,6 +4,7 @@ return [
   'by_date' => 'Op datum',
   'age' => 'Leeftijd',
   'brand' => 'Merk',
+  'by_taxonomy' => 'Op taxonomie',
   'category' => 'Categorie',
   'delete_device' => 'Toestel wissen',
   'devices' => 'Toestellen',

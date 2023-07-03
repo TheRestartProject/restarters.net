@@ -11,6 +11,7 @@ return [
   'alert_uptodate_text' => 'Vous n\'avez rien à faire. Quand vous devrez, nous vous préviendrons.',
   'general' => 'Général',
   'reporting' => 'Rapports',
+  'time_reporting' => 'Heures de bénévolat',
   'party_reporting' => 'Rapports d’événements',
   'signmeup' => 'Enregistrez‐moi!',
   'introduction_message' => 'Nous sommes une communauté de bénévoles à travers le monde qui aident les gens à réparer leurs appareils électroniques lors d\'événements communautaires. Rejoignez‐nous !',

@@ -5,6 +5,7 @@ return [
   'export_device_data' => 'Exporter les données des appareils',
   'export_event_data' => 'Exporter les données de l\'événement',
   'export_group_data' => 'Exporter les données du Repair Café',
+  'by_taxonomy' => 'Par taxonomie',
   'by_date' => 'Par date',
   'category' => 'Catégorie',
   'group' => 'Repair Café',
