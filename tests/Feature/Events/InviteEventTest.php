@@ -11,6 +11,7 @@ use App\Listeners\CreateWordpressPostForEvent;
 use App\Notifications\RSVPEvent;
 use App\Party;
 use App\Role;
+use App\Services\DiscourseService;
 use App\User;
 use DB;
 use Illuminate\Support\Facades\Notification;
@@ -264,17 +265,34 @@ class InviteEventTest extends TestCase
 
     public function testInvitableNotifications()
     {
+        // We will be accepting an invitation which should trigger adding to the Discourse thread.  We need
+        // to do this here as the observer gets the Discourse service in its constructor.
+        $this->instance(
+            DiscourseService::class,
+            \Mockery::mock(DiscourseService::class, function ($mock) {
+                $mock->shouldReceive('addUserToPrivateMessage')->once();
+            })
+        );
+
         Notification::fake();
         $this->withoutExceptionHandling();
 
-        $group = Group::factory()->create();
+        $user = User::factory()->administrator()->create([
+            'api_token' => '1234',
+        ]);
+        $this->actingAs($user);
+
+        $idgroups = $this->createGroup('Test Group', 'https://therestartproject.org', 'London', 'Some text.', true, true);
+        $idevents = $this->createEvent($idgroups, 'tomorrow');
+
+        // Joining should trigger adding to the Discourse thread.  Fake one.
+        $event = \App\Party::find($idevents);
+        $event->discourse_thread = 123;
+        $event->save();
+
+        $group = Group::find($idgroups);
         $host = User::factory()->host()->create();
-        $event = Party::factory()->create([
-                                                   'group' => $group,
-                                                   'event_start_utc' => '2130-01-01T12:13:00+00:00',
-                                                   'event_end_utc' => '2130-01-01T13:14:00+00:00',
-                                                   'user_id' => $host->id
-                                               ]);
+        $event = Party::find($idevents);
         EventsUsers::create([
                                 'event' => $event->getKey(),
                                 'user' => $host->getKey(),
@@ -327,7 +345,7 @@ class InviteEventTest extends TestCase
         $this->get('/logout');
         $this->actingAs($user);
 
-        // Now accept the invitation.
+        // Now accept the invitation, which should trigger adding to the Discourse thread.
         $eu = EventsUsers::where('user', '=', $user->id)->first();
         $invitation = '/party/accept-invite/' . $event->idevents . '/' . $eu->status;
 

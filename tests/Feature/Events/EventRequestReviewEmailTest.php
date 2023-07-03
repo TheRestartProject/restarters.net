@@ -75,8 +75,6 @@ class EventRequestReviewEmailTest extends TestCase
             'full_name' => null,
         ]);
 
-        $this->event->increment('volunteers');
-
         $this->assertTrue($this->group->isVolunteer($this->volunteer->getKey()));
         $this->assertTrue($this->event->isVolunteer($this->volunteer->getKey()));
     }

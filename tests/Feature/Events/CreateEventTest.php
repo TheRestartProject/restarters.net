@@ -11,6 +11,7 @@ use App\Notifications\AdminModerationEvent;
 use App\Notifications\NotifyRestartersOfNewEvent;
 use App\Party;
 use App\Role;
+use App\Services\DiscourseService;
 use App\User;
 use Carbon\Carbon;
 use DB;
@@ -455,11 +456,14 @@ class CreateEventTest extends TestCase
         $this->withoutExceptionHandling();
 
         $host = User::factory()->host()->create();
+        $host2 = User::factory()->host()->create();
         $this->actingAs($host);
 
         $group = Group::factory()->create();
         $group->addVolunteer($host);
         $group->makeMemberAHost($host);
+        $group->addVolunteer($host2);
+        $group->makeMemberAHost($host2);
 
         // Create the event
         $eventAttributes = Party::factory()->raw(['group' => $group->idgroups, 'event_date' => '2000-01-01', 'approved' => true]);
@@ -468,6 +472,15 @@ class CreateEventTest extends TestCase
 
         // Find the event id
         $party = $group->parties()->latest()->first();
+
+        // Add the second host.
+        $response = $this->put('/api/events/' . $party->idevents . '/volunteers?api_token=' . $host->api_token, [
+            'volunteer_email_address' => $host2->email,
+            'full_name' => $host2->name,
+            'user' => $host2->id,
+        ]);
+
+        $response->assertSuccessful();
 
         // Remove the host from the event
         $volunteer = EventsUsers::where('user', $host->id)->first();
@@ -485,8 +498,17 @@ class CreateEventTest extends TestCase
             ]
         ]);
 
-        // Assert we can add them back in.
-        $response = $this->put('/api/events/' . $party->idevents . '/volunteers', [
+        // Assert we can add them back in.  Adding to an event should trigger the add to the Discourse thread.
+        $this->instance(
+            DiscourseService::class,
+            \Mockery::mock(DiscourseService::class, function ($mock) {
+                $mock->shouldReceive('addUserToPrivateMessage')->once();
+            })
+        );
+        $party->discourse_thread = 123;
+        $party->save();
+
+        $response = $this->put('/api/events/' . $party->idevents . '/volunteers?api_token=' . $host->api_token, [
             'volunteer_email_address' => $host->email,
             'full_name' => $host->name,
             'user' => $host->id,
