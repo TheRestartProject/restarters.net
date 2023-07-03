@@ -120,6 +120,7 @@ class BasicTest extends TestCase
         $response1a = $this->patch('/api/v2/events/'.$event->idevents . '?api_token=' . $admin->api_key, $this->eventAttributesToAPI($eventData));
         $response1a->assertSuccessful();
         $this->artisan("queue:work --stop-when-empty");
+        $this->artisan("queue:work --stop-when-empty");
 
         // Should now show as an upcoming event, both on dashboard page and events page.
         $this->actingAs($host);
