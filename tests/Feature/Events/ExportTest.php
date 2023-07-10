@@ -76,6 +76,8 @@ class ExportTest extends TestCase
         $group3->approved = false;
         $group3->save();
 
+        $this->artisan("queue:work --stop-when-empty");
+
         $this->actingAs($user);
 
         // Create an event on each and approve it.
