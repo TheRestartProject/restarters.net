@@ -37,4 +37,16 @@ export const CATEGORY_MISC = 46
 
 export const UNKNOWN_STRINGS = [
     'unknown',
+    'n/a',
+    'not applicable',
+    '?',
+    '??',
+    '???',
+    '????',
+    'not known',
+    'don\'t know',
+    'unbranded',
+    'no brand',
+    'no model',
+    'none'
 ]
