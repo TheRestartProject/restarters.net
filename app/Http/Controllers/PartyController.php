@@ -730,7 +730,10 @@ class PartyController extends Controller
 
     public function cancelInvite($event_id)
     {
-        EventsUsers::where('user', Auth::user()->id)->where('event', $event_id)->delete();
+        // We have to do a loop to avoid the gotcha where bulk delete operations don't invoke observers.
+        foreach (EventsUsers::where('user', Auth::user()->id)->where('event', $event_id)->get() as $delete) {
+            $delete->delete();
+        };
 
         return redirect('/party/view/'.intval($event_id))->with('success', __('events.invite_cancelled'));
     }
@@ -831,7 +834,12 @@ class PartyController extends Controller
 
         Audits::where('auditable_type', \App\Party::class)->where('auditable_id', $id)->delete();
         Device::where('event', $id)->delete();
-        EventsUsers::where('event', $id)->delete();
+
+        // We have to do a loop to avoid the gotcha where bulk delete operations don't invoke observers.
+        foreach (EventsUsers::where('event', $id)->get() as $delete) {
+            $delete->delete();
+        };
+
         $event->delete();
 
         event(new EventDeleted($event));

@@ -2,6 +2,7 @@
 
 namespace Tests\Feature;
 
+use App\Listeners\RemoveUserFromDiscourseThreadForEvent;
 use Illuminate\Support\Facades\Queue;
 use App\EventsUsers;
 use App\Listeners\AddUserToDiscourseThreadForEvent;
@@ -30,6 +31,12 @@ class JoinEventTest extends TestCase
         $event = \App\Party::find($idevents);
         $event->discourse_thread = 123;
         $event->save();
+
+        Queue::assertPushed(\Illuminate\Events\CallQueuedListener::class, function ($job) use ($event, $user) {
+            if ($job->class == AddUserToDiscourseThreadForEvent::class) {
+                return true;
+            }
+        });
 
         // Join.  Should get redirected, and also prompted to follow the group (which we haven't).
         $user = User::factory()->restarter()->create();
@@ -60,7 +67,7 @@ class JoinEventTest extends TestCase
         ]);
 
         Queue::assertPushed(\Illuminate\Events\CallQueuedListener::class, function ($job) use ($event, $user) {
-            if ($job->class == AddUserToDiscourseThreadForEvent::class) {
+            if ($job->class == RemoveUserFromDiscourseThreadForEvent::class) {
                 return true;
             }
         });

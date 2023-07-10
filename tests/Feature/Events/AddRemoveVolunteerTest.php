@@ -5,6 +5,7 @@ namespace Tests\Feature;
 use App\EventsUsers;
 use App\Group;
 use App\Helpers\Geocoder;
+use App\Listeners\RemoveUserFromDiscourseThreadForEvent;
 use App\Network;
 use App\Notifications\AdminModerationEvent;
 use App\Notifications\NotifyRestartersOfNewEvent;
@@ -16,6 +17,7 @@ use Faker\Generator as Faker;
 use Illuminate\Support\Facades\Notification;
 use Symfony\Component\DomCrawler\Crawler;
 use Tests\TestCase;
+use Illuminate\Support\Facades\Queue;
 
 class AddRemoveVolunteerTest extends TestCase
 {
@@ -26,6 +28,7 @@ class AddRemoveVolunteerTest extends TestCase
     public function testAddRemove($role)
     {
         $this->withoutExceptionHandling();
+        Queue::fake();
 
         $group = Group::factory()->create();
         $network = Network::factory()->create();
@@ -96,6 +99,12 @@ class AddRemoveVolunteerTest extends TestCase
                                       ]
                                   ]
                               ]);
+
+        Queue::assertPushed(\Illuminate\Events\CallQueuedListener::class, function ($job) use ($event, $restarter) {
+            if ($job->class == RemoveUserFromDiscourseThreadForEvent::class) {
+                return true;
+            }
+        });
 
         // Add an invited user
         $restarter = User::factory()->restarter()->create();
