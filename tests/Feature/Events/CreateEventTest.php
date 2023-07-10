@@ -3,21 +3,21 @@
 namespace Tests\Feature;
 
 use App\Events\UserConfirmedEvent;
+use App\Events\UserLeftEvent;
 use App\EventsUsers;
 use App\Group;
 use App\Helpers\Geocoder;
 use App\Helpers\RepairNetworkService;
 use App\Listeners\AddUserToDiscourseThreadForEvent;
+use App\Listeners\RemoveUserFromDiscourseThreadForEvent;
 use App\Network;
 use App\Notifications\AdminModerationEvent;
-use App\Notifications\AdminUserDeleted;
 use App\Notifications\NotifyRestartersOfNewEvent;
 use App\Party;
 use App\Role;
 use App\Services\DiscourseService;
 use App\User;
 use Carbon\Carbon;
-use Cassandra\Exception\TruncateException;
 use DB;
 use Illuminate\Support\Facades\Notification;
 use Illuminate\Support\Facades\Queue;
@@ -493,6 +493,12 @@ class CreateEventTest extends TestCase
             'id' => $volunteer->idevents_users,
         ])->assertSee('true');
 
+        Queue::assertPushed(\Illuminate\Events\CallQueuedListener::class, function ($job) use ($party, $host) {
+            if ($job->class == RemoveUserFromDiscourseThreadForEvent::class) {
+                return true;
+            }
+        });
+
         // Assert that we see the host in the list of volunteers to add to the event.
         $response = $this->get('/api/groups/'. $group->idgroups . '/volunteers?api_token=' . $host->api_token);
         $response->assertJson([
@@ -529,11 +535,16 @@ class CreateEventTest extends TestCase
             DiscourseService::class,
             \Mockery::mock(DiscourseService::class, function ($mock) {
                 $mock->shouldReceive('addUserToPrivateMessage')->once();
+                $mock->shouldReceive('removeUserFromPrivateMessage')->once();
             })
         );
 
         $listener = app()->make(AddUserToDiscourseThreadForEvent::class);
         $event = new UserConfirmedEvent($party->idevents, $host->id);
+        $listener->handle($event);
+
+        $listener = app()->make(RemoveUserFromDiscourseThreadForEvent::class);
+        $event = new UserLeftEvent($party->idevents, $host->id);
         $listener->handle($event);
     }
 

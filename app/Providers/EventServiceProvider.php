@@ -10,10 +10,12 @@ use App\Events\UserDeleted;
 use App\Events\UserEmailUpdated;
 use App\Events\UserFollowedGroup;
 use App\Events\UserLanguageUpdated;
+use App\Events\UserLeftEvent;
 use App\Events\UserRegistered;
 use App\Events\UserUpdated;
 use App\Listeners\AddUserToDiscourseGroup;
 use App\Listeners\AddUserToDiscourseThreadForEvent;
+use App\Listeners\RemoveUserFromDiscourseThreadForEvent;
 use App\Listeners\AnonymiseSoftDeletedUser;
 use App\Listeners\DeleteEventFromWordPress;
 use App\Listeners\DeviceUpdatedAt;
@@ -92,6 +94,10 @@ class EventServiceProvider extends ServiceProvider
 
         UserConfirmedEvent::class => [
             AddUserToDiscourseThreadForEvent::class
+        ],
+
+        UserLeftEvent::class => [
+            RemoveUserFromDiscourseThreadForEvent::class
         ]
     ];
 
