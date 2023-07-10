@@ -86,8 +86,6 @@ class GroupController extends Controller
         // New Collection Instance
         $collection = collect([]);
 
-        $countries = array_flip(\App\Helpers\Fixometer::getAllCountries());
-
         foreach ($groups as $group) {
             // If we have a bounding box, check that the group is within it.
             if (! $bbox || (
@@ -102,7 +100,8 @@ class GroupController extends Controller
                                       'timezone' => $group->timezone,
                                       'location' => [
                                           'value' => $group->location,
-                                          'country' => Fixometer::translateCountry($group->country_code, $countries),
+                                          'country' => Fixometer::getCountryFromCountryCode($group->country_code),
+                                          'country_code' => $group->country_code,
                                           'latitude' => $group->latitude,
                                           'longitude' => $group->longitude,
                                           'area' => $group->area,

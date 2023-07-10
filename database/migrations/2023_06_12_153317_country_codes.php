@@ -51,6 +51,14 @@ return new class extends Migration
      */
     public function down()
     {
-        //
+        Schema::table('groups', function (Blueprint $table) {
+            $table->dropColumn('country_code');
+        });
+
+        Schema::table('users', function (Blueprint $table) {
+            $table->renameColumn('country_code', 'country');
+        });
+
+        DB::update(DB::raw("UPDATE users SET country = 'GBR' WHERE country = 'GB'"));
     }
 };
