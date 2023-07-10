@@ -108,7 +108,9 @@ export default {
         newVal = null
       }
 
-      this.$emit('update:brand', newVal)
+      this.$nextTick(() => {
+        this.$emit('update:brand', newVal)
+      })
     }
   },
   methods: {

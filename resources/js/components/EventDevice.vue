@@ -260,8 +260,6 @@ export default {
         }
       }
 
-      console.log("Returning", ret, this.currentDevice.item_type)
-
       return ret
     },
     suggestedCategoryId() {
