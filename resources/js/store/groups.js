@@ -24,6 +24,13 @@ function newToOld(e) {
   return ret
 }
 
+function getLocale() {
+  // The language is not yet migrated over to Vue, so pluck it from the DOM.
+  const el = document.getElementById('language-current')
+
+  return el.innerText.trim()
+}
+
 export default {
   namespaced: true,
   state: {
@@ -119,14 +126,14 @@ export default {
     async getModerationRequired({commit, rootGetters}, params) {
       const apiToken = rootGetters['auth/apiToken']
 
-      let ret = await axios.get('/api/v2/moderate/groups?api_token=' + apiToken)
+      let ret = await axios.get('/api/v2/moderate/groups?api_token=' + apiToken + '&locale=' + getLocale())
 
       if (ret && ret.data) {
         commit('setModerate', ret.data)
       }
     },
     async list({commit}) {
-      let ret = await axios.get('/api/v2/groups/names')
+      let ret = await axios.get('/api/v2/groups/names?locale=' + getLocale())
       if (ret && ret.data) {
         commit('setList', {
           groups: ret.data.data
@@ -134,7 +141,7 @@ export default {
       }
     },
     async listTags({commit}) {
-      let ret = await axios.get('/api/v2/groups/tags')
+      let ret = await axios.get('/api/v2/groups/tags?locale=\' + getLocale()')
       if (ret && ret.data) {
         commit('setTags', {
           tags: ret.data.data
@@ -199,7 +206,7 @@ export default {
     },
     async fetch({ rootGetters, commit }, params) {
       try {
-        let ret = await axios.get('/api/v2/groups/' + params.id + '?api_token=' + rootGetters['auth/apiToken'])
+        let ret = await axios.get('/api/v2/groups/' + params.id + '?api_token=' + rootGetters['auth/apiToken'] + '&locale=' + getLocale())
 
         commit('set', ret.data.data)
 
