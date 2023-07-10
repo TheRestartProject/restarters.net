@@ -21,6 +21,7 @@
         class="m-0 mb-1 mb-md-0"
         allow-empty
         :selectedLabel="__('partials.remove')"
+        open-direction="bottom"
     />
     <b-form-input
         v-model="searchLocation"
@@ -42,6 +43,7 @@
         class="m-0 mb-1 mb-md-0"
         allow-empty
         :selectedLabel="__('partials.remove')"
+        open-direction="bottom"
     />
     <multiselect
         v-model="searchNetwork"
@@ -57,6 +59,7 @@
         class="m-0 mb-1 mb-md-0"
         allow-empty
         :selectedLabel="__('partials.remove')"
+        open-direction="bottom"
     />
   </div>
 </template>
