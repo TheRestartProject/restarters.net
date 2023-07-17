@@ -196,6 +196,9 @@ jobs:
       # Coveralls is pernickety about the location it uploads from existing.
       - run: mkdir build; mkdir build/logs; php vendor/bin/php-coveralls -v -x tests/clover.xml
 
+      # Run the Jest tests.
+        - run: npm run jest
+
       # Run the Playwright tests.
       #
       # Zap groups set up by the UT; this can confuse Playwright tests.
