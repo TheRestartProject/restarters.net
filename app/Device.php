@@ -411,7 +411,7 @@ class Device extends Model implements Auditable
     public static function getItemTypes()
     {
         // List the item types
-        $types = DB::select(DB::raw("SELECT s.* FROM 
+        $types = DB::select(DB::raw("SELECT * FROM (SELECT DISTINCT s.* FROM 
 (SELECT item_type, powered, idcategories, categories.name as categoryname, COUNT(*) AS count 
 FROM devices INNER JOIN categories ON devices.category = categories.idcategories 
 WHERE item_type IS NOT NULL GROUP BY item_type, categoryname
@@ -422,7 +422,7 @@ JOIN
 FROM devices INNER JOIN categories ON devices.category = categories.idcategories 
 WHERE item_type IS NOT NULL GROUP BY item_type, categoryname) s
 GROUP BY s.item_type) AS m
-ON s.item_type = m.item_type AND s.count = m.maxcount;"));
+ON s.item_type = m.item_type AND s.count = m.maxcount) t GROUP BY item_type;"));
 
         return $types;
     }
