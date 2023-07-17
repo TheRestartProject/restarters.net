@@ -197,7 +197,7 @@ jobs:
       - run: mkdir build; mkdir build/logs; php vendor/bin/php-coveralls -v -x tests/clover.xml
 
       # Run the Jest tests.
-        - run: npm run jest
+      - run: npm run jest
 
       # Run the Playwright tests.
       #
