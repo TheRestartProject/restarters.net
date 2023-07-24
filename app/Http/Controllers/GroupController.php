@@ -115,6 +115,13 @@ class GroupController extends Controller
 
         // Get array of volunteer ids
         $volunteerIds = $volunteers->pluck('user')->toArray();
+        $users = User::whereIn('id', $volunteerIds)->get();
+
+        $volIx = [];
+        foreach ($users as $user) {
+            $volIx[$user->id] = $user;
+        }
+
         $volunteerSkills = UsersSkills::whereIn('user', $volunteerIds)->get();
 
         $ix = [];
@@ -128,7 +135,9 @@ class GroupController extends Controller
         }
 
         foreach ($volunteers as &$volunteer) {
-            $volunteer['volunteer'] = $volunteer->volunteer;
+            $volunteerObj = $volIx[$volunteer->user];
+
+            $volunteer['volunteer'] = $volunteerObj;
 
             if ($volunteer['volunteer']) {
                 if (array_key_exists($volunteer->user, $ix)) {
@@ -142,7 +151,7 @@ class GroupController extends Controller
                 }
 
                 $volunteer['fullName'] = $volunteer->name;
-                $image = $volunteer->volunteer->getProfile($volunteer->volunteer->id)->path;
+                $image = $volunteerObj->getProfile($volunteerObj->id)->path;
                 $image = $image ? "/uploads/thumbnail_$image" : "/images/placeholder-avatar.png";
                 $volunteer['profilePath'] = $image;
                 $ret[] = $volunteer;

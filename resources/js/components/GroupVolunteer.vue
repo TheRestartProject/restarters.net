@@ -84,11 +84,11 @@ export default {
       return this.volunteer.role === HOST
     },
     noskills() {
-      return !this.volunteer.volunteer.user_skills || !this.volunteer.volunteer.user_skills.length
+      return !this.volunteer.user_skills || !this.volunteer.user_skills.length
     },
     skillCount() {
       let ret = null
-      let skills = this.volunteer.volunteer.user_skills
+      let skills = this.volunteer.user_skills
       let len = skills && skills.length ? skills.length : 0
       ret = len + ' ' + this.$lang.choice('partials.skills', len)
       return ret
@@ -96,7 +96,7 @@ export default {
     skillList() {
       let ret = null
 
-      let skills = this.volunteer.volunteer.user_skills
+      let skills = this.volunteer.user_skills
 
       if (skills) {
         let names = []
