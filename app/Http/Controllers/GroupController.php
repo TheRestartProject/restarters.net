@@ -22,8 +22,10 @@ use App\Notifications\NewGroupWithinRadius;
 use App\Notifications\GroupConfirmed;
 use App\Party;
 use App\Role;
+use App\Skills;
 use App\User;
 use App\UserGroups;
+use App\UsersSkills;
 use Auth;
 use DB;
 use FixometerFile;
@@ -107,19 +109,36 @@ class GroupController extends Controller
         return view('group.create');
     }
 
-    private function expandVolunteers($volunteers)
+    private function expandVolunteers($volunteers, $allSkills)
     {
         $ret = [];
 
-        foreach ($volunteers as $volunteer) {
+        // Get array of volunteer ids
+        $volunteerIds = $volunteers->pluck('user')->toArray();
+        $volunteerSkills = UsersSkills::whereIn('user', $volunteerIds)->get();
+
+        $ix = [];
+
+        foreach ($volunteerSkills as $volunteerSkill) {
+            if (!array_key_exists($volunteerSkill->user, $ix)) {
+                $ix[$volunteerSkill->user] = [];
+            }
+
+            $ix[$volunteerSkill->user][] = $volunteerSkill->skill;
+        }
+
+        foreach ($volunteers as &$volunteer) {
             $volunteer['volunteer'] = $volunteer->volunteer;
 
             if ($volunteer['volunteer']) {
-                $volunteer['userSkills'] = $volunteer->volunteer->userSkills->all();
-
-                foreach ($volunteer['userSkills'] as $skill) {
-                    // Force expansion
-                    $skill->skillName->skill_name;
+                if (array_key_exists($volunteer->user, $ix)) {
+                    $skills = [];
+                    foreach ($ix[$volunteer->user] as $skill) {
+                        if (array_key_exists($skill, $allSkills)) {
+                            $skills[] = $allSkills[$skill];
+                        }
+                    }
+                    $volunteer['userSkills'] = $skills;
                 }
 
                 $volunteer['fullName'] = $volunteer->name;
@@ -257,7 +276,18 @@ class GroupController extends Controller
 
         $user_groups = UserGroups::where('user', Auth::user()->id)->count();
         $view_group = Group::find($groupid);
-        $view_group->allConfirmedVolunteers = $this->expandVolunteers($view_group->allConfirmedVolunteers);
+
+        // We extract some skills info in bulk to reduce the number of distinct queries on groups with many
+        // volunteers.
+        $allSkills = Skills::all()->all();
+        $ix = [];
+        foreach ($allSkills as $i => $skill) {
+            $ix[$skill->id] = $skill;
+            $ix[$skill->id]->skill_name;
+        }
+
+
+        $view_group->allConfirmedVolunteers = $this->expandVolunteers($view_group->allConfirmedVolunteers, $ix);
 
         $pendingInvite = UserGroups::where('group', $groupid)
         ->where('user', $user->id)
