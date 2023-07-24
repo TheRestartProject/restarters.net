@@ -138,7 +138,7 @@ class GroupController extends Controller
                             $skills[] = $allSkills[$skill];
                         }
                     }
-                    $volunteer['userSkills'] = $skills;
+                    $volunteer['user_skills'] = $skills;
                 }
 
                 $volunteer['fullName'] = $volunteer->name;
@@ -283,7 +283,7 @@ class GroupController extends Controller
         $ix = [];
         foreach ($allSkills as $i => $skill) {
             $ix[$skill->id] = $skill;
-            $ix[$skill->id]->skill_name;
+            $ix[$skill->id]->skillName;
         }
 
 

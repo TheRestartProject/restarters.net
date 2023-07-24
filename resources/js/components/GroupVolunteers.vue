@@ -13,9 +13,6 @@
             <a class="justify-content-end" href="#" data-toggle="modal" data-target="#invite-to-group">
               {{ __('groups.invite_to_group') }}
             </a>
-            <a class="justify-content-end" href="#" data-toggle="modal" data-target="#group-volunteers">
-              {{ translatedSeeAll }}
-            </a>
           </div>
         </div>
         <p v-else>
@@ -39,13 +36,6 @@ export default {
       type: Number,
       required: true
     }
-  },
-  computed: {
-    translatedSeeAll() {
-      return this.$lang.choice('groups.see_all_volunteers', this.volunteers.length, {
-        count: this.volunteers.length
-      })
-    },
   },
   created() {
     // The list of volunteers is passed from the server to the client via a prop on this component.  When we are created

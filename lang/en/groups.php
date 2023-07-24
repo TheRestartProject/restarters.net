@@ -91,7 +91,6 @@ return [
   'read_less' => '<img class="icon" src="/images/minus-icon.svg" style="width: 20px;" />&nbsp;READ LESS',
   'group_facts' => 'Group achievements',
   'events' => 'event|events',
-  'see_all_volunteers' => 'See all :count volunteer|See all :count volunteers',
   'no_volunteers' => 'There are no volunteers in this group',
   'remove_volunteer' => 'Remove Volunteer',
   'make_host' => 'Make Host',

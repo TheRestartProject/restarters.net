@@ -89,17 +89,19 @@ export default {
     skillCount() {
       let ret = null
       let skills = this.volunteer.volunteer.user_skills
-      ret = (skills && skills.length ? skills.length : '0') + ' ' + this.$lang.choice('partials.skills', skills.length)
+      let len = skills && skills.length ? skills.length : 0
+      ret = len + ' ' + this.$lang.choice('partials.skills', len)
       return ret
     },
     skillList() {
       let ret = null
+
       let skills = this.volunteer.volunteer.user_skills
 
       if (skills) {
         let names = []
         skills.forEach((s) => {
-          names.push(s.skill_name.skill_name)
+          names.push(s.skill_name)
         })
 
         ret = names.join(', ')
