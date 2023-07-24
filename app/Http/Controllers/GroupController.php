@@ -170,28 +170,54 @@ class GroupController extends Controller
 
         $Device->ofThisGroup($group->idgroups);
 
-        $clusters = [];
+        $counts = $Device->countByClustersYearStatus($group->idgroups);
+        $template = [
+            0 => (object)[
+                'counter' => 0,
+                'repair_status' => 1,
+            ],
+            1 => (object)[
+                'counter' => 0,
+                'repair_status' => 2,
+            ],
+            2 => (object)[
+                'counter' => 0,
+                'repair_status' => 3,
+            ],
+            'total' => 0
+        ];
 
-        for ($i = 1; $i <= 4; $i++) {
-            $cluster = $Device->countByCluster($i, $group->idgroups);
-            $total = 0;
-            foreach ($cluster as $state) {
-                $total += $state->counter;
-            }
-            $cluster['total'] = $total;
-            $clusters['all'][$i] = $cluster;
-        }
+        $clusters = [
+            'all' => [
+                1 => $template,
+                2 => $template,
+                3 => $template,
+                4 => $template,
+            ]
+        ];
 
-        for ($y = date('Y', time()); $y >= 2013; $y--) {
-            for ($i = 1; $i <= 4; $i++) {
-                $cluster = $Device->countByCluster($i, $group->idgroups, $y);
+        foreach ($counts as $count) {
+            $year = $count->year;
+            $cluster = $count->cluster;
+            $repair_status = $count->repair_status;
 
-                $total = 0;
-                foreach ($cluster as $state) {
-                    $total += $state->counter;
+            if ($repair_status && $cluster) {
+                if (array_key_exists($cluster, $clusters['all'])) {
+                    $clusters['all'][$cluster][$repair_status - 1]->counter += $count->counter;
+                    $clusters['all'][$cluster]['total'] += $count->counter;
+
+                    if (!array_key_exists($year, $clusters)) {
+                        $clusters[$year] = [
+                            1 => $template,
+                            2 => $template,
+                            3 => $template,
+                            4 => $template,
+                        ];
+                    }
+
+                    $clusters[$year][$cluster][$repair_status - 1]->counter += $count->counter;
+                    $clusters[$year][$cluster]['total'] += $count->counter;
                 }
-                $cluster['total'] = $total;
-                $clusters[$y][$i] = $cluster;
             }
         }
 
