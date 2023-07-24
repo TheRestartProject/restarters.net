@@ -789,9 +789,7 @@ class Party extends Model implements Auditable
 
     public function canDelete()
     {
-        $stats = $this->getEventStats();
-
-        return $stats['devices_powered'] == 0 && $stats['devices_unpowered'] == 0;
+        return Device::where('events', '=', $this->idevents)->first() !== null;
     }
 
     public function approve()
