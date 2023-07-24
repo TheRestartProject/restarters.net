@@ -286,7 +286,6 @@ class GroupController extends Controller
             $ix[$skill->id]->skillName;
         }
 
-
         $view_group->allConfirmedVolunteers = $this->expandVolunteers($view_group->allConfirmedVolunteers, $ix);
 
         $pendingInvite = UserGroups::where('group', $groupid)

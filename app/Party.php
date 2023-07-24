@@ -789,7 +789,7 @@ class Party extends Model implements Auditable
 
     public function canDelete()
     {
-        return Device::where('event', '=', $this->idevents)->first() !== null;
+        return !Device::where('event', '=', $this->idevents)->first();
     }
 
     public function approve()

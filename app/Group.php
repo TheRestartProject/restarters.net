@@ -224,8 +224,8 @@ class Group extends Model implements Auditable
     public function canDelete()
     {
         // Groups are deletable unless they have an event with a device.
-        return Party::withTrashed()->where('events.group', $this->idgroups)
-            ->join('devices', 'event', '=', 'events.idevents')->first() !== null;
+        return !Party::withTrashed()->where('events.group', $this->idgroups)
+            ->join('devices', 'event', '=', 'events.idevents')->first();
     }
 
     public static function getGroupStatsArrayKeys()
