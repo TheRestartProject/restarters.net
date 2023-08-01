@@ -30,7 +30,7 @@ return new class extends Migration
             $table->string('country_code', 2)->after('area')->nullable();
         });
 
-        $groups = DB::select(DB::raw('SELECT idgroups, country FROM groups'));
+        $groups = DB::select(DB::raw('SELECT idgroups, country FROM `groups`'));
 
         foreach ($groups as $g) {
             // Countries are stored in English.
