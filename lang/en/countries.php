@@ -119,7 +119,7 @@ return [
     'KE' => 'Kenya',
     'KI' => 'Kiribati',
     'KP' => "Korea, Democratic People's Republic of",
-    'KR' => 'Korea, Republic of',
+    'KR' => 'South Korea',
     'KW' => 'Kuwait',
     'KG' => 'Kyrgyzstan',
     'LA' => "Lao People's Democratic Republic",
