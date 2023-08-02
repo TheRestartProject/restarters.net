@@ -61,7 +61,7 @@ class ImportGroups extends Command
                     return iconv( "iso-8859-15", "UTF-8", $str );
                 }, $fields);
 
-                // Format is  'Name', 'Location', 'Postcode', 'Area', 'Country', 'Latitude', 'Longitude', 'Website', 'Phone', 'Networks', 'Description'.
+                // Format is  'Name', 'Location', 'Postcode', 'Area', 'CountryCode', 'Latitude', 'Longitude', 'Website', 'Phone', 'Networks', 'Description'.
 
                 $groupname = $fields[0];
                 $location = $fields[1];
@@ -122,7 +122,7 @@ class ImportGroups extends Command
                     $group->area = $area;
                     $group->latitude = $lat;
                     $group->longitude = $lng;
-                    $group->country = $country;
+                    $group->country_code = $country;
                     $group->website = $website;
                     $group->phone = $phone;
                     $group->free_text = $description;

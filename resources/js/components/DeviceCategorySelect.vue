@@ -29,7 +29,7 @@
   </div>
 </template>
 <script>
-import { CATEGORY_MISC } from '../constants'
+import { CATEGORY_MISC_POWERED, CATEGORY_MISC_UNPOWERED } from '../constants'
 
 export default {
   props: {
@@ -106,17 +106,15 @@ export default {
         }
       })
 
-      if (this.powered) {
-        ret.push({
-          cluster: '---',
-          categories: [
-            {
-              name: this.$lang.get('partials.category_none'),
-              value: CATEGORY_MISC,
-            }
-          ]
-        })
-      }
+      ret.push({
+        cluster: '---',
+        categories: [
+          {
+            name: this.$lang.get('partials.category_none'),
+            value: this.powered ? CATEGORY_MISC_POWERED : CATEGORY_MISC_UNPOWERED,
+          }
+        ]
+      })
 
       return ret
     },

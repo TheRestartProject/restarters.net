@@ -94,6 +94,8 @@ abstract class TestCase extends BaseTestCase
             $network->name = 'Restarters';
             $network->shortname = 'restarters';
             $network->save();
+        } else {
+            error_log("Got network");
         }
 
         $this->withoutExceptionHandling();
@@ -125,7 +127,7 @@ abstract class TestCase extends BaseTestCase
         $userAttributes['name'] = 'Test'.uniqid($this->userCount++, true);
         $userAttributes['email'] = $userAttributes['name'].'@restarters.dev';
         $userAttributes['age'] = '1982';
-        $userAttributes['country'] = 'GBR';
+        $userAttributes['country'] = 'GB';
         $userAttributes['password'] = 'letmein';
         $userAttributes['password_confirmation'] = 'letmein';
         $userAttributes['my_time'] = Carbon::now();

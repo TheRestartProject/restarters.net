@@ -480,6 +480,7 @@ class GroupController extends Controller
     public static function expandGroups($groups, $your_groupids, $nearby_groupids)
     {
         $ret = [];
+        $user = Auth::user();
 
         if ($groups) {
             foreach ($groups as $group) {
@@ -491,8 +492,8 @@ class GroupController extends Controller
                 $distance = null;
                 $grouplat = $group->latitude;
                 $grouplng = $group->longitude;
-                $userlat = Auth::user()->latitude;
-                $userlng = Auth::user()->longitude;
+                $userlat = $user->latitude;
+                $userlng = $user->longitude;
 
                 if ($grouplat !== null && $grouplng !== null && $userlat !== null && $userlng !== null) {
                     if ($grouplat == $userlat && $grouplng == $userlng) {
@@ -510,7 +511,8 @@ class GroupController extends Controller
                         asset('uploads/mid_'.$group_image->image->path) : null,
                     'location' => [
                         'location' => rtrim($group->location),
-                        'country' => $group->country,
+                        'country' => Fixometer::getCountryFromCountryCode($group->country_code),
+                        'country_code' => $group->country_code,
                         'distance' => $distance,
                     ],
                     'next_event' => $event ? $event->event_date_local : null,

@@ -194,7 +194,7 @@
                           N/A
                         @endif
                       </td>
-                      <td class="d-none d-sm-table-cell">{{ $u->country }}</td>
+                      <td class="d-none d-sm-table-cell">{{ \App\Helpers\Fixometer::getCountryFromCountryCode($u->country_code) }}</td>
                       <td class="d-none d-sm-table-cell text-center">
                         @if (isset($u->groups) && $u->groups->count() > 0)
                             <span class="popover-usergroups" data-toggle="popover" data-html="true" data-content="@include('partials.usergroups-popover')">{{ $u->groups->count() }}</span>

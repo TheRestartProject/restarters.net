@@ -30,18 +30,23 @@ class CalendarEventsController extends Controller
             throw new \Exception('No user calendar found for provided calendar hash');
         }
 
-        $events = Party::join('groups', 'groups.idgroups', '=', 'events.group')
-      ->join('users_groups', 'users_groups.group', '=', 'groups.idgroups')
-      ->join('events_users', 'events_users.event', '=', 'events.idevents')
-      ->whereNull('users_groups.deleted_at')
-      ->where(function ($query) use ($user) {
-          $query->where('events_users.user', $user->id)
-        ->orWhere('users_groups.user', $user->id);
-      })
-      ->select('events.*', 'groups.name')
-      ->groupBy('idevents')
-      ->orderBy('event_start_utc', 'ASC')
-      ->get();
+        // We use two separate queries because they are a lot more efficient in DB terms than using an OR clause.
+        $attendingEvents = Party::join('groups', 'groups.idgroups', '=', 'events.group')
+          ->join('users_groups', 'users_groups.group', '=', 'groups.idgroups')
+          ->join('events_users', 'events_users.event', '=', 'events.idevents')
+          ->where('events_users.user', $user->id)
+          ->whereNull('users_groups.deleted_at')
+          ->select('events.*', 'groups.name');
+
+        $groupEvents = Party::join('groups', 'groups.idgroups', '=', 'events.group')
+            ->join('users_groups', 'users_groups.group', '=', 'groups.idgroups')
+            ->join('events_users', 'events_users.event', '=', 'events.idevents')
+            ->where('users_groups.user', $user->id)
+            ->whereNull('users_groups.deleted_at')
+            ->select('events.*', 'groups.name');
+
+        // GROUP BY doesn't seem to be enough to get unique values, so do unique() on the results.
+        $events = $attendingEvents->union($groupEvents)->groupBy('idevents')->orderBy('event_start_utc', 'asc')->get()->unique();
 
         $this->exportCalendar($events);
     }

@@ -44,7 +44,7 @@ class PartyController extends Controller
         $this->discourseService = $discourseService;
     }
 
-    public static function expandEvent($event, $group = null)
+    public static function expandEvent($event, $group = null, $countries = null)
     {
         // Use attributesToArray rather than getAttributes so that our custom accessors are invoked.
         $thisone = $event->attributesToArray();
@@ -58,6 +58,9 @@ class PartyController extends Controller
             if (is_object($group_image) && is_object($group_image->image)) {
                 $thisone['group']['group_image'] = $group_image->image->path;
             }
+
+            // We need to translate the country in the group, because it is stored in
+            $thisone['group']['country'] = Fixometer::translateCountry($thisone['group']['country'], $countries);
         }
 
         $thisone['attending'] = Auth::user() && $event->isBeingAttendedBy(Auth::user()->id);
@@ -105,10 +108,12 @@ class PartyController extends Controller
     {
         $events = [];
 
+        $countries = array_flip(\App\Helpers\Fixometer::getAllCountries('en'));
+
         if (! is_null($group_id)) {
             // This is the page for a specific group's events.  We want all events for this group.
             foreach (Party::where('events.group', $group_id)->get() as $event) {
-                $e = \App\Http\Controllers\PartyController::expandEvent($event, NULL);
+                $e = \App\Http\Controllers\PartyController::expandEvent($event, NULL, $countries);
                 $events[] = $e;
             }
 
@@ -116,7 +121,7 @@ class PartyController extends Controller
         } else {
             // This is a logged-in user's events page.  We want all relevant events.
             foreach (Party::forUser(null)->reorder()->orderBy('event_start_utc', 'DESC')->get() as $event) {
-                $e = \App\Http\Controllers\PartyController::expandEvent($event, NULL);
+                $e = \App\Http\Controllers\PartyController::expandEvent($event, NULL, $countries);
                 $events[] = $e;
             }
 
@@ -128,7 +133,7 @@ class PartyController extends Controller
 
                 foreach ($upcoming_events_in_area as $event) {
                     if (Fixometer::userHasViewPartyPermission($event->idevents)) {
-                        $e = self::expandEvent($event, null);
+                        $e = self::expandEvent($event, null, $countries);
                         $e['nearby'] = true;
                         $e['all'] = true;
                         $events[] = $e;
@@ -143,7 +148,7 @@ class PartyController extends Controller
 
             foreach ($other_upcoming_events as $event) {
                 if (Fixometer::userHasViewPartyPermission($event->idevents)) {
-                    $e = self::expandEvent($event, NULL);
+                    $e = self::expandEvent($event, NULL, $countries);
                     $e['all'] = TRUE;
                     $events[] = $e;
                 }

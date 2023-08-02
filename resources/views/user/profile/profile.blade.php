@@ -28,7 +28,7 @@
                 <select id="country" name="country" required aria-required="true" class="field select2">
                     <option value=""></option>
                     @foreach (App\Helpers\Fixometer::getAllCountries() as $key => $value)
-                        @if ($user->country == $key)
+                        @if ($user->country_code == $key)
                         <option value="{{ $key }}" selected>{{ $value }}</option>
                         @else
                         <option value="{{ $key }}">{{ $value }}</option>

@@ -87,7 +87,7 @@ class AccountCreationTest extends TestCase
         // Also require my_name when logged in.
         $response = $this->post('/user/register/', [
             'age'                 => 1950,
-            'country'             => 'GBR',
+            'country'             => 'GB',
             'my_name'             => 'honeypot',
             'my_time'             => time(),
             'consent_gdpr'        => true,
