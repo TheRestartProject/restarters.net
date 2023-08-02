@@ -118,6 +118,73 @@ export default {
       if (ret && ret.data) {
         commit('setModerate', ret.data)
       }
+    },
+    async create({ rootGetters, commit }, params) {
+      let id = null
+      try {
+        const formData = new FormData()
+
+        for (var key in params) {
+          if (params[key]) {
+            formData.append(key, params[key]);
+          }
+        }
+
+        let ret = await axios.post('/api/v2/events?api_token=' + rootGetters['auth/apiToken'], formData, {
+          headers: {
+            "Content-Type": "multipart/form-data",
+          },
+        })
+
+        if (ret && ret.data) {
+          id = ret.data.id
+        }
+      } catch (e) {
+        console.error("Event create failed", e)
+      }
+
+      return id
+    },
+    async edit({ rootGetters, commit }, params) {
+      let id = null
+      try {
+        const formData = new FormData()
+
+        for (var key in params) {
+          if (params[key]) {
+            formData.append(key, params[key]);
+          }
+        }
+
+        // We need to use a POST verb and override to a PATCH - see
+        // https://stackoverflow.com/questions/55116787/laravel-patch-request-doesnt-read-axios-form-data
+        formData.append('_method', 'PATCH');
+
+        let ret = await axios.post('/api/v2/events/' + params.id + '?api_token=' + rootGetters['auth/apiToken'], formData, {
+          headers: {
+            "Content-Type": "multipart/form-data",
+          },
+        })
+
+        if (ret && ret.data) {
+          id = ret.data.id
+        }
+      } catch (e) {
+        console.error("Event edit failed", e)
+      }
+
+      return id
+    },
+    async fetch({ rootGetters, commit }, params) {
+      try {
+        let ret = await axios.get('/api/v2/events/' + params.id + '?api_token=' + rootGetters['auth/apiToken'])
+
+        commit('set', ret.data.data)
+
+        return ret.data.data
+      } catch (e) {
+        console.error("Events fetch failed", e)
+      }
     }
   },
 }

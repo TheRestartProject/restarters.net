@@ -59,7 +59,7 @@
               <div class="vue">
                 <EventAddEdit
                     csrf="{{ csrf_token() }}"
-                    :initial-event="<?php echo e(json_encode($formdata, JSON_INVALID_UTF8_IGNORE)); ?>"
+                    :idevents="{{ $formdata['idevents'] }}"
                     @if( App\Helpers\Fixometer::hasRole($user, 'Administrator') )
                     :groups="{{ json_encode($allGroups, JSON_INVALID_UTF8_IGNORE) }}"
                     @else

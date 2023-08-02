@@ -191,7 +191,8 @@ class GroupCreateTest extends TestCase
         $eventAttributes['event_start_utc'] = Carbon::parse('1pm tomorrow')->toIso8601String();
         $eventAttributes['event_end_utc'] = Carbon::parse('3pm tomorrow')->toIso8601String();
 
-        $this->post('/party/create/', $eventAttributes);
+        $response = $this->post('/api/v2/events?api_token=' . $host->api_token, $this->eventAttributesToAPI($eventAttributes));
+        $response->assertSuccessful();
         $event = Party::latest()->first();
         $this->assertEquals($host->id, $event->user_id);
 

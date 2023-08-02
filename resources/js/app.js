@@ -731,6 +731,34 @@ function initAutocomplete() {
       }
     });
 
+    function removeUser() {
+
+      var id = jQuery(this).data('remove-volunteer');
+
+      $.ajax({
+        headers: {
+          'X-CSRF-TOKEN': $("input[name='_token']").val()
+        },
+        type: 'post',
+        url: '/party/remove-volunteer',
+        data: {
+          id : id,
+        },
+        datatype: 'json',
+        success: function(json) {
+          if( json.success ){
+            jQuery('.volunteer-' + id).fadeOut();
+          } else {
+            alert('Something has gone wrong');
+          }
+        },
+        error: function(error) {
+          alert('Something has gone wrong');
+        }
+      });
+
+    }
+
     jQuery('.js-remove').on('click', removeUser);
     jQuery(document).on('click', '[data-toggle="lightbox"]', function (event) {
       event.preventDefault();
