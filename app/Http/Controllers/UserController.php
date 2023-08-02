@@ -157,7 +157,7 @@ class UserController extends Controller
         User::find($id)->update([
         'email'    => $request->input('email'),
         'name'     => $request->input('name'),
-        'country'  => $request->input('country'),
+        'country_code' => $request->input('country'),
         'location' => $request->input('townCity'),
         'age'      => $request->input('age'),
         'gender'   => $request->input('gender'),
@@ -171,7 +171,7 @@ class UserController extends Controller
         }
 
         if (! empty($user->location)) {
-            $geocoded = $geocoder->geocode("{$user->location}, {$user->country}");
+            $geocoded = $geocoder->geocode("{$user->location}, " . Fixometer::getCountryFromCountryCode($user->country_code));
             if (! empty($geocoded)) {
                 $user->latitude = $geocoded['latitude'];
                 $user->longitude = $geocoded['longitude'];
@@ -536,7 +536,7 @@ class UserController extends Controller
                 $user['permissions'] = $User->getRolePermissions($user->role);
                 $user['groups'] = $user->groups;
                 $user['lastLogin'] = $user->lastLogin();
-                $user['country'] = Fixometer::getCountryFromCountryCode($user->country);
+                $user['country'] = Fixometer::getCountryFromCountryCode($user->country_code);
 
                 return $user;
             });
@@ -607,7 +607,7 @@ class UserController extends Controller
                 $user['permissions'] = $User->getRolePermissions($user->role);
                 $user['groups'] = $user->groups;
                 $user['lastLogin'] = $user->lastLogin();
-                $user['country'] = Fixometer::getCountryFromCountryCode($user->country);
+                $user['country'] = Fixometer::getCountryFromCountryCode($user->country_code);
 
                 return $user;
             });
@@ -920,7 +920,7 @@ class UserController extends Controller
 
         if (Auth::check()) { //Existing users are to update
             $user = User::find(Auth::user()->id);
-            $user->country = $request->input('country');
+            $user->country_code = $request->input('country');
             $user->location = $request->input('city');
             $user->gender = $request->input('gender');
             $user->age = $request->input('age');
@@ -935,7 +935,7 @@ class UserController extends Controller
                 'role' => $role,
                 'recovery' => substr(bin2hex(openssl_random_pseudo_bytes(32)), 0, 24),
                 'recovery_expires' => strftime('%Y-%m-%d %X', time() + (24 * 60 * 60)),
-                'country' => $request->input('country'),
+                'country_code' => $request->input('country'),
                 'location' => $request->input('city'),
                 'gender' => $request->input('gender'),
                 'age' => $request->input('age'),
