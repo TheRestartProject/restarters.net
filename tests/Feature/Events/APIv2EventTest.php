@@ -6,6 +6,7 @@ use App\Device;
 use App\Group;
 use App\Network;
 use App\Party;
+use App\Role;
 use App\User;
 use Carbon\Carbon;
 use DB;
@@ -109,8 +110,8 @@ class APIv2EventTest extends TestCase
 
     public function testMaxUpdatedAt() {
         $user = User::factory()->administrator()->create([
-                                                             'api_token' => '1234',
-                                                         ]);
+            'api_token' => '1234',
+        ]);
         $this->actingAs($user);
 
         $idgroups = $this->createGroup('Test Group', 'https://therestartproject.org', 'London', 'Some text.', true, true);
@@ -120,10 +121,10 @@ class APIv2EventTest extends TestCase
 
         $idevents = $this->createEvent($idgroups, 'yesterday');
         $device = Device::factory()->fixed()->create([
-                                                         'category' => 111,
-                                                         'category_creation' => 111,
-                                                         'event' => $idevents,
-                                                     ]);
+            'category' => 111,
+            'category_creation' => 111,
+            'event' => $idevents,
+        ]);
 
         // Sleep for a second so that the updated_at time on the event and group should not be the current time.
         sleep(1);
@@ -148,4 +149,142 @@ class APIv2EventTest extends TestCase
         $nowF = (new Carbon($now))->format('Y-m-d H:i:s');
         self::assertFalse($eventUpdated == $nowF);
     }
+
+    /**
+     * @param $role
+     * @return void
+     * @dataProvider roleProvider
+     */
+    public function testCreateLoggedOutUsingKey($role) {
+        switch ($role) {
+            case 'Administrator': $user = User::factory()->administrator()->create(); break;
+            case 'NetworkCoordinator': $user = User::factory()->networkCoordinator()->create(); break;
+            case 'Host': $user = User::factory()->host()->create(); break;
+        }
+
+        $response = $this->post('/api/v2/groups?api_token=' . $user->api_token, [
+            'name' => "Test Group",
+            'website' => 'https://therestartproject.org',
+            'location' => "London",
+            'description' => "Some text",
+            'timezone' => 'Europe/London',
+            'network_data' => [
+                'dummy' => 'dummy',
+            ]
+        ]);
+
+        $this->assertTrue($response->isSuccessful());
+        $json = json_decode($response->getContent(), true);
+        $this->assertTrue(array_key_exists('id', $json));
+        $idgroups = $json['id'];
+
+        $eventAttributes = Party::factory()->raw();
+        $eventAttributes['group'] = $idgroups;
+
+        $event_start = Carbon::createFromTimestamp(strtotime('tomorrow'))->setTimezone('UTC');
+        $event_end = Carbon::createFromTimestamp(strtotime('tomorrow'))->setTimezone('UTC')->addHour(2);
+
+        $response = $this->post('/api/v2/events?api_token=' . $user->api_token, [
+            'groupid' => $idgroups,
+            'start' => $event_start->toIso8601String(),
+            'end' => $event_end->toIso8601String(),
+            'title' => $eventAttributes['venue'],
+            'location' => $eventAttributes['location'],
+            'description' => $eventAttributes['free_text'],
+            'timezone' => $eventAttributes['timezone']
+        ]);
+
+        self::assertTrue($response->isSuccessful());
+        $json = json_decode($response->getContent(), true);
+        self::assertTrue(array_key_exists('id', $json));
+        $idevents = $json['id'];
+        self::assertNotNull($idevents);
+    }
+
+    public function roleProvider() {
+        return [
+            [ 'Administrator' ],
+            [ 'NetworkCoordinator' ],
+            [ 'Host' ],
+        ];
+    }
+
+    public function testCreateEventGeocodeFailure()
+    {
+        $user = User::factory()->host()->create();
+
+        $response = $this->post('/api/v2/groups?api_token=' . $user->api_token, [
+            'name' => "Test Group",
+            'website' => 'https://therestartproject.org',
+            'location' => "London",
+            'description' => "Some text",
+            'timezone' => 'Europe/London',
+            'network_data' => [
+                'dummy' => 'dummy',
+            ]
+        ]);
+
+        $this->assertTrue($response->isSuccessful());
+        $json = json_decode($response->getContent(), true);
+        $this->assertTrue(array_key_exists('id', $json));
+        $idgroups = $json['id'];
+
+        $eventAttributes = Party::factory()->raw();
+        $eventAttributes['group'] = $idgroups;
+
+        $event_start = Carbon::createFromTimestamp(strtotime('tomorrow'))->setTimezone('UTC');
+        $event_end = Carbon::createFromTimestamp(strtotime('tomorrow'))->setTimezone('UTC')->addHour(2);
+
+        $this->expectException(ValidationException::class);
+
+        $response = $this->post('/api/v2/events?api_token=' . $user->api_token, [
+            'groupid' => $idgroups,
+            'start' => $event_start->toIso8601String(),
+            'end' => $event_end->toIso8601String(),
+            'title' => $eventAttributes['venue'],
+            'location' => 'ForceGeoCodeFailure',
+            'description' => $eventAttributes['free_text'],
+            'timezone' => $eventAttributes['timezone']
+        ]);
+    }
+
+    public function testCreateEventInvalidTimezone()
+    {
+        $user = User::factory()->host()->create();
+
+        $response = $this->post('/api/v2/groups?api_token=' . $user->api_token, [
+            'name' => "Test Group",
+            'website' => 'https://therestartproject.org',
+            'location' => "London",
+            'description' => "Some text",
+            'timezone' => 'Europe/London',
+            'network_data' => [
+                'dummy' => 'dummy',
+            ]
+        ]);
+
+        $this->assertTrue($response->isSuccessful());
+        $json = json_decode($response->getContent(), true);
+        $this->assertTrue(array_key_exists('id', $json));
+        $idgroups = $json['id'];
+
+        $eventAttributes = Party::factory()->raw();
+        $eventAttributes['group'] = $idgroups;
+
+        $event_start = Carbon::createFromTimestamp(strtotime('tomorrow'))->setTimezone('UTC');
+        $event_end = Carbon::createFromTimestamp(strtotime('tomorrow'))->setTimezone('UTC')->addHour(2);
+
+        $this->expectException(ValidationException::class);
+
+        $response = $this->post('/api/v2/events?api_token=' . $user->api_token, [
+            'groupid' => $idgroups,
+            'start' => $event_start->toIso8601String(),
+            'end' => $event_end->toIso8601String(),
+            'title' => $eventAttributes['venue'],
+            'location' => 'London',
+            'description' => $eventAttributes['free_text'],
+            'timezone' => 'invalidtimezone'
+        ]);
+    }
+
 }

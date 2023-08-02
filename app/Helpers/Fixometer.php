@@ -188,7 +188,7 @@ class Fixometer
         return false;
     }
 
-    public static function userCanApproveEvent($eventId, $userId = null)
+    public static function userCanApproveEvent($eventId, $userId = null, $groupId = null)
     {
         if (is_null($userId)) {
             $userId = Auth::user()->id;
@@ -200,7 +200,12 @@ class Fixometer
         }
 
         if (self::hasRole($user, 'NetworkCoordinator')) {
-            $group = Party::find($eventId)->theGroup;
+            if ($groupId) {
+                $group = Group::find($groupId);
+            } else {
+                $group = Party::find($eventId)->theGroup;
+            }
+
             foreach ($group->networks as $network) {
                 if ($network->coordinators->contains($user)) {
                     return true;
@@ -263,7 +268,7 @@ class Fixometer
             return true;
         }
 
-        $userIsHostOfAGroup = UserGroups::where('user', Auth::user()->id)
+        $userIsHostOfAGroup = UserGroups::where('user', $user->id)
             ->where('role', 3)
             ->count() > 0;
 

@@ -326,7 +326,6 @@ Route::middleware('auth', 'verifyUserConsent', 'ensureAPIToken')->group(function
         Route::get('/all-past', [PartyController::class, 'allPast'])->name('all-past-events');
         Route::get('/group/{group_id?}', [PartyController::class, 'index'])->name('group-events');
         Route::get('/create/{group_id?}', [PartyController::class, 'create']);
-        Route::post('/create', [PartyController::class, 'create']);
         Route::get('/edit/{id}', [PartyController::class, 'edit']);
         Route::post('/edit/{id}', [PartyController::class, 'edit']);
         Route::get('/duplicate/{id}', [PartyController::class, 'duplicate']);
