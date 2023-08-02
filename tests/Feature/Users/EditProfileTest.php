@@ -100,7 +100,7 @@ class EditProfileTest extends TestCase
             'name' => $user->name,
             'email' => $user->email,
             'age' => $user->age,
-            'country' => 'GBR',
+            'country' => 'GB',
             'townCity' => 'London',
         ]);
 
@@ -117,7 +117,7 @@ class EditProfileTest extends TestCase
             'name' => $user->name,
             'email' => $user->email,
             'age' => $user->age,
-            'country' => 'GBR',
+            'country' => 'GB',
             'townCity' => 'ZZZZ',
         ]);
 
@@ -240,7 +240,7 @@ class EditProfileTest extends TestCase
             'name' => $userData['name'] . '1',
             'age' =>  $userData['age']  + 1,
             'email' => $userData['email'] . '1',
-            'country' => 'GBR',
+            'country' => 'GB',
         ]);
         $this->assertTrue($response->isRedirection());
         $response->assertSessionHas('message');

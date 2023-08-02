@@ -33,7 +33,8 @@ export const PARTS_PROVIDER_THIRD_PARTY = 2
 export const USEFUL_URL_SOURCE_MANUFACTURER = 1
 export const USEFUL_URL_SOURCE_THIRD_PARTY = 2
 
-export const CATEGORY_MISC = 46
+export const CATEGORY_MISC_POWERED = 46
+export const CATEGORY_MISC_UNPOWERED = 50
 
 export const UNKNOWN_STRINGS = [
     'unknown',
