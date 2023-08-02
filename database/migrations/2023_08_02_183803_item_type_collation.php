@@ -13,7 +13,7 @@ return new class extends Migration
      */
     public function up()
     {
-        DB:statement(DB:raw("ALTER TABLE `devices` CHANGE `item_type` `item_type` VARCHAR(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_bin NULL DEFAULT NULL;"));
+        DB::statement(DB::raw("ALTER TABLE `devices` CHANGE `item_type` `item_type` VARCHAR(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_bin NULL DEFAULT NULL;"));
     }
 
     /**
@@ -23,6 +23,6 @@ return new class extends Migration
      */
     public function down()
     {
-        DB:statement(DB:raw("ALTER TABLE `devices` CHANGE `item_type` `item_type` VARCHAR(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL DEFAULT NULL;"));
+        DB::statement(DB::raw("ALTER TABLE `devices` CHANGE `item_type` `item_type` VARCHAR(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL DEFAULT NULL;"));
     }
 };
