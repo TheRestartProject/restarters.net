@@ -253,6 +253,7 @@ export default {
                 powered: t.powered
               }
 
+              console.log('Matched', t, this.itemTypes)
               return false
             }
             return true
