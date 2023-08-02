@@ -112,8 +112,7 @@ class BasicTest extends TestCase
         $response1b = $this->get('/party/edit/'.$event->idevents);
 
         $props = $this->getVueProperties($response1b);
-        $initialEvent = json_decode($props[1][':initial-event'], TRUE);
-        $this->assertEquals($event->idevents, $initialEvent['idevents']);
+        $this->assertEquals($event->idevents, json_decode($props[1][':idevents'], TRUE));
 
         $eventData = $event->getAttributes();
         $eventData['id'] = $event->idevents;

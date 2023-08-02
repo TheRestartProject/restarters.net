@@ -151,9 +151,14 @@ export default {
       groups: Object.values(groups)
     })
   },
-  mounted() {
-    this.currentValue = this.value
-    this.$refs.autocomplete.update(this.currentValue)
+  watch: {
+    value: {
+      handler: function (val) {
+        this.currentValue = val
+        this.$refs.autocomplete.update(this.currentValue)
+      },
+      immediate: true
+    },
   },
   beforeDestroy () {
     clearTimeout(this.timer)
@@ -167,6 +172,7 @@ export default {
     },
     useGroup() {
       this.$refs.autocomplete.update(this.groupLocation)
+      this.$emit('update:value', this.groupLocation)
       this.$emit('update:lat', parseFloat(this.groupLat))
       this.$emit('update:lng', parseFloat(this.groupLng))
     },
