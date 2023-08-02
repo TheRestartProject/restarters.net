@@ -34,7 +34,7 @@ class Group extends Model implements Auditable
         'postcode',
         'latitude',
         'longitude',
-        'country',
+        'country_code',
         'free_text',
         'facebook',
         'wordpress_post_id',

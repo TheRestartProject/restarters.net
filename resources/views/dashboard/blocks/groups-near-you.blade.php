@@ -37,7 +37,7 @@
                         @if (is_null(Auth::user()->location))
                             @lang('dashboard.groups_near_you_set_location', ['profile_url' => '/profile/edit/'.Auth::user()->id])
                         @else
-                            @lang('dashboard.groups_near_you_your_location_is', ['location' => Auth::user()->location.', '.Auth::user()->country])
+                            @lang('dashboard.groups_near_you_your_location_is', ['location' => Auth::user()->location.', '.\App\Helpers\Fixometer::getCountryFromCountryCode(Auth::user()->country_code)])
                         @endif
                         </p>
                         <p>

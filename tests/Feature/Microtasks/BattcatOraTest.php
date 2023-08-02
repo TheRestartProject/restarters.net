@@ -203,7 +203,7 @@ class BattcatOraTest extends TestCase
             [
                 'id_ords' => 'restart_11931',
                 'data_provider' => 'The Restart Project',
-                'country' => 'GBR',
+                'country' => 'GB',
                 'partner_product_category' => 'Laptop small',
                 'product_category' => 'Laptop',
                 'brand' => 'HP',
@@ -251,7 +251,7 @@ class BattcatOraTest extends TestCase
             [
                 'id_ords' => 'restart_17002',
                 'data_provider' => 'The Restart Project',
-                'country' => 'GBR',
+                'country' => 'GB',
                 'partner_product_category' => 'Vacuum',
                 'product_category' => 'Vacuum',
                 'brand' => 'Ilife',
@@ -267,7 +267,7 @@ class BattcatOraTest extends TestCase
             [
                 'id_ords' => 'restart_9918',
                 'data_provider' => 'The Restart Project',
-                'country' => 'GBR',
+                'country' => 'GB',
                 'partner_product_category' => 'Mobile',
                 'product_category' => 'Mobile',
                 'brand' => 'Samsung',

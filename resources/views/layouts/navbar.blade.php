@@ -17,8 +17,8 @@
         <?php
         // We want to show the current branch.  This will only be set on development or staging environments.
         $branch = "Unknown branch";
-        if (is_dir('.git')) {
-            @exec('git branch | ' . "grep ' * '", $shellOutput);
+        if (is_dir(base_path() . '/.git')) {
+            exec('cd ' . base_path() . '; git branch | ' . "grep ' * '", $shellOutput);
             foreach ($shellOutput as $line) {
                 if (strpos($line, '* ') !== false) {
                     $branch = trim(strtolower(str_replace('* ', '', $line)));
@@ -143,10 +143,6 @@
                   @if ( App\Helpers\Fixometer::hasRole(Auth::user(), 'Administrator') || App\Helpers\Fixometer::hasRole(Auth::user(), 'Host') )
                       <li><span><svg width="19" height="13" viewBox="0 0 15 11" xmlns="http://www.w3.org/2000/svg" fill-rule="evenodd" clip-rule="evenodd" stroke-linejoin="round" stroke-miterlimit="1.414"><g fill="#0394a6"><path d="M1.598 7.937a1.053 1.053 0 1 1 .438 2.06 1.053 1.053 0 0 1-.438-2.06zm2.403-4.869a1.224 1.224 0 0 1 .509 2.393 1.223 1.223 0 1 1-.509-2.393z"/><path d="M4.51 5.461L3.133 3.777.865 8.514l1.902.909L4.51 5.461z"/><path d="M3.991 5.241l1.249-1.68 3.131 3.637-.926 1.966-3.454-3.923z"/><path d="M9.389 9.035l2.77-5.008-1.611-1.054-2.578 4.47 1.419 1.592z"/><path d="M13.393.265l-.351-.188-4.009 2.706.024.394 4.001 2.159.335-.22V.265z"/><circle cx="8.371" cy="8.4" r="1.202"/><path d="M9.12 2.748a.229.229 0 1 1-.185.265.229.229 0 0 1 .185-.265zM13.124.04a.23.23 0 0 1 .08.451.23.23 0 0 1-.265-.186.228.228 0 0 1 .185-.265zm.001 4.868a.229.229 0 1 1 .08.45.229.229 0 0 1-.08-.45z"/></g></svg> @lang('general.reporting')</span>
                           <ul>
-                          @if ( App\Helpers\Fixometer::hasRole(Auth::user(), 'Administrator'))
-                              <!-- temporarily adding 'a' onto the query string to avoid bug on time reporting page -->
-                                  <li><a href="/reporting/time-volunteered?a">@lang('general.time_reporting')</a></li>
-                              @endif
                               <li><a href="/search">@lang('general.party_reporting')</a></li>
                           </ul>
                       </li>

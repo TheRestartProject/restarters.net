@@ -25,7 +25,7 @@
                        :suppress-brand-warning="suppressBrandWarning"/>
           <DeviceModel class="mb-2" :model.sync="currentDevice.model" :icon-variant="add ? 'black' : 'brand'"
                        :disabled="disabled"/>
-          <DeviceWeight v-if="showWeight" :weight.sync="currentDevice.estimate" :disabled="disabled"/>
+          <DeviceWeight v-if="showWeight" :weight.sync="currentDevice.estimate" :disabled="disabled" :required="weightRequired" />
           <DeviceAge :age.sync="currentDevice.age" :disabled="disabled"/>
           <DeviceImages :idevents="idevents" :device="currentDevice" :add="add" :edit="edit" :disabled="disabled"
                         class="mt-2" @remove="removeImage($event)"/>
@@ -90,7 +90,7 @@ import {
   END_OF_LIFE,
   SPARE_PARTS_MANUFACTURER,
   SPARE_PARTS_THIRD_PARTY,
-  CATEGORY_MISC, NEXT_STEPS_DIY, NEXT_STEPS_PROFESSIONAL, NEXT_STEPS_MORE_TIME,
+  CATEGORY_MISC_POWERED, CATEGORY_MISC_UNPOWERED, NEXT_STEPS_DIY, NEXT_STEPS_PROFESSIONAL, NEXT_STEPS_MORE_TIME,
   PARTS_PROVIDER_MANUFACTURER,
   PARTS_PROVIDER_THIRD_PARTY, SPARE_PARTS_NOT_NEEDED
 } from '../constants'
@@ -260,8 +260,6 @@ export default {
         }
       }
 
-      console.log("Returning", ret, this.currentDevice.item_type)
-
       return ret
     },
     suggestedCategoryId() {
@@ -281,33 +279,10 @@ export default {
         return null
       }
     },
-    aggregate () {
-      if (!this.currentCategory) {
-        return false
-      }
-
-      if (this.powered && this.currentCategory === CATEGORY_MISC) {
-        return true
-      }
-
-      let ret = false
-
-      this.clusters.forEach((cluster) => {
-        let categories = []
-
-        cluster.categories.forEach((c) => {
-          if (this.currentCategory === c.idcategories) {
-            ret = c.aggregate
-          }
-        })
-      })
-
-      return ret
-    },
     showWeight () {
       // Powered devices don't allow editing of the weight except for the "None of the above" category, whereas
       // unpowered do.
-      return !this.powered || (this.currentDevice && this.currentDevice.category === CATEGORY_MISC)
+      return !this.powered || (this.currentDevice && this.currentDevice.category === CATEGORY_MISC_POWERED)
     },
     wiki: {
       // Need to convert server's number to/from a boolean.
@@ -326,6 +301,12 @@ export default {
       // We don't want to show the warning if we have not changed the brand since it was last saved.
       return this.currentDevice && this.device && this.device.brand === this.currentDevice.brand
     },
+    weightRequired() {
+      // Weight is required (if shown) for misc (powered or unpowered).
+      return this.currentDevice &&
+          (this.powered && this.currentDevice.category === CATEGORY_MISC_POWERED ||
+            !this.powered && this.currentDevice.category === CATEGORY_MISC_UNPOWERED)
+    }
   },
   created () {
     // We take a copy of what's passed in so that we can then edit it in here before saving or cancelling.  We need
@@ -405,6 +386,7 @@ export default {
 
           this.$emit('close')
         }
+
       } catch (e) {
         console.error('Edit failed', e)
         this.axiosError = e

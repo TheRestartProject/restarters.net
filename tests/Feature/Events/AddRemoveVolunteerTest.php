@@ -9,6 +9,7 @@ use App\Network;
 use App\Notifications\AdminModerationEvent;
 use App\Notifications\NotifyRestartersOfNewEvent;
 use App\Party;
+use App\Role;
 use App\User;
 use DB;
 use Faker\Generator as Faker;
@@ -198,7 +199,7 @@ class AddRemoveVolunteerTest extends TestCase
         $response = $this->post('/profile/edit-admin-settings', [
             '_token' => $tokenValue,
             'id' => $host->id,
-            'user_role' => 2,
+            'user_role' => Role::ADMINISTRATOR,
             'assigned_groups' => [
                 $idgroups
             ],
