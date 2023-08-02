@@ -87,7 +87,7 @@ class APIv2NetworkTest extends TestCase
         $group = Group::factory()->create([
                                                    'location' => 'London',
                                                    'area' => 'London',
-                                                   'country' => 'GB',
+                                                   'country_code' => 'GB',
                                                ]);
         $network->addGroup($group);
 
@@ -112,7 +112,7 @@ class APIv2NetworkTest extends TestCase
         $this->assertTrue(array_key_exists('location', $json[0]));
         $location = $json[0]['location'];
         $this->assertEquals($group->location, $location['location']);
-        $this->assertEquals($group->country, $location['country']);
+        $this->assertEquals($group->country_code, $location['country_code']);
         $this->assertEquals($group->area, $location['area']);
         $this->assertEquals($group->latitude, $location['lat']);
         $this->assertEquals($group->longitude, $location['lng']);

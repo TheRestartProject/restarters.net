@@ -30,6 +30,12 @@ use Illuminate\Support\Facades\Auth;
  *          example="United Kingdom"
  *     ),
  *     @OA\Property(
+ *          property="country_code",
+ *          description="The two-letter ISO country code.",
+ *          format="string",
+ *          example="GB"
+ *     ),
+ *     @OA\Property(
  *          property="lat",
  *          title="lat",
  *          description="Latitude of the group.",
@@ -66,7 +72,8 @@ class GroupLocation extends JsonResource
             'location' => $this->location,
             'area' => $this->area,
             'postcode' => $this->postcode,
-            'country' => \App\Helpers\Fixometer::translateCountry($this->country),
+            'country' => \App\Helpers\Fixometer::getCountryFromCountryCode($this->country_code),
+            'country_code' => $this->country_code,
             'lat' => $this->latitude,
             'lng' => $this->longitude,
         ];

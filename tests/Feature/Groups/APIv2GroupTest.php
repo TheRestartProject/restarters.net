@@ -58,6 +58,7 @@ class APIv2GroupTest extends TestCase
         $this->assertTrue(array_key_exists('location', $json['data']));
         $location = $json['data']['location'];
         $this->assertEquals('London', $location['location']);
+        $this->assertEquals('GB', $location['country_code']);
         $this->assertEquals('United Kingdom', $location['country']);
 
         // Check the network data has been created as expected.

@@ -1,6 +1,5 @@
 <?php
 
-namespace Tests\Unit\t;
 
 use Tests\TestCase;
 
@@ -11,6 +10,6 @@ class GeocoderTest extends TestCase
         $ret = $geocoder->geocode('6 Canterbury Crescent, London SW9 7QD');
         $this->assertEquals(51.4643585, $ret['latitude']);
         $this->assertEquals(-0.1135401, $ret['longitude']);
-        $this->assertEquals('United Kingdom', $ret['country']);
+        $this->assertEquals('GB', $ret['country_code']);
     }
 }
