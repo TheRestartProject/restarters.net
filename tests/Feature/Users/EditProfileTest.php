@@ -118,7 +118,7 @@ class EditProfileTest extends TestCase
             'email' => $user->email,
             'age' => $user->age,
             'country' => 'GB',
-            'townCity' => 'ZZZZ',
+            'townCity' => 'zzzz$£QW$"zzzz',
         ]);
 
         Config::set('MAPBOX_TOKEN', $good);

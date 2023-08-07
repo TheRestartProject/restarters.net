@@ -63,7 +63,7 @@ class AccountCreationTest extends TestCase
         $good = Config::get('MAPBOX_TOKEN');
         Config::set('MAPBOX_TOKEN', 'zzz');
 
-        $userAttributes['city'] = 'zzzzzzz';
+        $userAttributes['city'] = 'zzzz$£QW$"zzzz';
         $response = $this->post('/user/register/', $userAttributes);
 
         Config::set('MAPBOX_TOKEN', $good);
