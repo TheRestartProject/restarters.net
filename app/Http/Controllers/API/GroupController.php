@@ -874,35 +874,22 @@ class GroupController extends Controller
         $timezone = $request->input('timezone');
         $network_data = $request->input('network_data');
 
-        $latitude = null;
-        $longitude = null;
-        $country_code = null;
-
         if ($timezone && !in_array($timezone, \DateTimeZone::listIdentifiers(\DateTimeZone::ALL_WITH_BC))) {
             throw ValidationException::withMessages(['location ' => __('partials.validate_timezone')]);
         }
 
-        if (!empty($location)) {
-            $geocoder = new \App\Helpers\Geocoder();
-            $geocoded = $geocoder->geocode($location);
+        // We need the country, which we get by geocoding the location..
+        $geocoder = new \App\Helpers\Geocoder();
+        $geocoded = $geocoder->geocode($location);
 
-            if (empty($geocoded))
-            {
-                throw ValidationException::withMessages(['location ' => __('groups.geocode_failed')]);
-            }
-
-            $country_code = $geocoded['country_code'];
-
-            if ($latitude == null || $longitude == null) {
-                // We have no lat/lng from the client, so use the geocoded location.
-                $latitude = $geocoded['latitude'];
-                $longitude = $geocoded['longitude'];
-            }
-
-            // Note that the country returned by the geocoder is already in English, which is what we need for the
-            // value in the database.
-            $country_code = $geocoded['country_code'];
+        if (empty($geocoded))
+        {
+            throw ValidationException::withMessages(['location ' => __('groups.geocode_failed')]);
         }
+
+        // Note that the country returned by the geocoder is already in English, which is what we need for the
+        // value in the database.
+        $country_code = $geocoded['country_code'];
 
         return array(
             $name,
