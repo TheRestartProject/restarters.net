@@ -72,7 +72,7 @@ services:
     volumes:
       # We share the current folder into /var/www.  This means code changes on the host will get picked up
       # by the client.
-      - ./:/var/www
+      - ./:/var/www:rw
       - ./php/local.ini:/usr/local/etc/php/conf.d/local.ini
     networks:
       - app-network
