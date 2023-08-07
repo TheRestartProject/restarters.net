@@ -3,6 +3,8 @@
 #
 # We install composer dependencies in here rather than during the build step so that if we switch branches
 # and restart the container, it works.
+service ssh start
+
 if [ ! -f .env ]
 then
  cp .env.example .env
@@ -28,9 +30,12 @@ sed -i 's/DISCOURSE_SECRET=.*$/DISCOURSE_SECRET=mustbetencharacters/g' .env
 sed -i 's/SESSION_DOMAIN=.*$/SESSION_DOMAIN=/g' phpunit.xml
 sed -i 's/DB_TEST_HOST=.*$/DB_TEST_HOST=restarters_db/g' phpunit.xml
 
+mkdir storage/framework/cache/data
 php artisan migrate
 npm install --legacy-peer-deps
 npm rebuild node-sass
+php artisan lang:js --no-lib resources/js/translations.js
+chmod -R 777 public
 
 npm run watch&
 php artisan key:generate
@@ -38,7 +43,7 @@ php artisan cache:clear
 php artisan config:clear
 
 # Ensure we have the admin user
-echo "User::create(['name'=>'Jane Bloggs','email'=>'jane@bloggs.net','password'=>Hash::make('passw0rd'),'role'=>2]);" | php artisan tinker
+echo "User::create(['name'=>'Jane Bloggs','email'=>'jane@bloggs.net','password'=>Hash::make('passw0rd'),'role'=>2,'consent_past_data'=>'2021-01-01','consent_future_data'=>'2021-01-01','consent_gdpr'=>'2021-01-01']);" | php artisan tinker
 
 php artisan serve --host=0.0.0.0 --port=80
 
