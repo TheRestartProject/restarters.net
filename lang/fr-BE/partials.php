@@ -87,4 +87,5 @@ return [
   'notification_greeting' => 'Bonjour !',
   'notification_footer' => 'Si vous souhaitez ne plus recevoir ces courriels, veuillez consulter <a href=":url">vos préférences</a> sur votre compte.',
   'validate_timezone' => 'Veuillez sélectionner un fuseau horaire valide.',
+  'dragmap' => 'Le marqueur de carte n\'est pas tout à fait correct ?  N\'hésitez pas à faire glisser le marqueur pour le corriger.',
 ];

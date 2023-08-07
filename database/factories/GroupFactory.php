@@ -14,11 +14,12 @@ class GroupFactory extends Factory
     public function definition()
     {
         return [
-        'name' => $this->faker->unique()->company(),
-        'free_text' => $this->faker->sentence(),
-        'facebook' => '',
-        'postcode' => '',
-        'timezone' => 'Europe/London'
-    ];
+            'name' => $this->faker->unique()->company(),
+            'free_text' => $this->faker->sentence(),
+            'facebook' => '',
+            'postcode' => '',
+            'timezone' => 'Europe/London',
+            'location' => 'International House, 3Space, 6 Canterbury Cres, London SW9 7QD',
+        ];
     }
 }

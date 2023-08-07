@@ -54,8 +54,8 @@
           ref="location"
       />
       <GroupLocationMap
-          :lat="lat"
-          :lng="lng"
+          :lat.sync="lat"
+          :lng.sync="lng"
           class="group-locationmap"
           ref="locationmap"
           :id="lat + ',' + lng"
@@ -336,6 +336,7 @@ export default {
       this.approved = group.approved
       this.networkList = group.networks
       this.tagList = group.tags
+      console.log('Network data from group', group.network_data)
       this.networkData = group.network_data ? group.network_data : {}
     }
 
@@ -370,6 +371,8 @@ export default {
               website: this.website,
               description: this.description,
               location: this.location,
+              latitude: this.lat,
+              longitude: this.lng,
               postcode: this.postcode,
               area: this.area,
               timezone: this.timezone,
@@ -394,6 +397,8 @@ export default {
                 website: this.website,
                 description: this.description,
                 location: this.location,
+                latitude: this.lat,
+                longitude: this.lng,
                 postcode: this.postcode,
                 area: this.area,
                 timezone: this.timezone,
