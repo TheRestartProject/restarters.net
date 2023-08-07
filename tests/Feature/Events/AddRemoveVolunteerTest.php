@@ -4,6 +4,7 @@ namespace Tests\Feature;
 
 use App\EventsUsers;
 use App\Group;
+use App\Helpers\Fixometer;
 use App\Helpers\Geocoder;
 use App\Listeners\RemoveUserFromDiscourseThreadForEvent;
 use App\Network;
@@ -25,7 +26,7 @@ class AddRemoveVolunteerTest extends TestCase
      * @dataProvider roleProvider
      */
 
-    public function testAddRemove($role)
+    public function testAddRemove($role, $addrole, $shouldBeHost)
     {
         $this->withoutExceptionHandling();
         Queue::fake();
@@ -56,7 +57,28 @@ class AddRemoveVolunteerTest extends TestCase
 
         $this->actingAs($host);
 
-        $restarter = User::factory()->restarter()->create();
+        switch ($addrole) {
+            case 'Administrator':
+                $restarter = User::factory()->administrator()->create();
+                break;
+            case 'NetworkCoordinator':
+                $restarter = User::factory()->networkCoordinator()->create();
+                break;
+            case 'HostThis':
+                $restarter = User::factory()->host()->create();
+                $group->addVolunteer($restarter);
+                $group->makeMemberAHost($restarter);
+                break;
+            case 'HostOther':
+                $restarter = User::factory()->host()->create();
+                $group2 = Group::factory()->create();
+                $group2->addVolunteer($restarter);
+                $group2->makeMemberAHost($restarter);
+                break;
+            case 'Restarter':
+                $restarter = User::factory()->restarter()->create();
+        }
+
 
         // Add an existing user
         $response = $this->put('/api/events/' . $event->idevents . '/volunteers', [
@@ -81,6 +103,15 @@ class AddRemoveVolunteerTest extends TestCase
                 ]
             ]
         ]);
+
+        // Check they are/are not a host.
+        $hostFor = Party::hostFor([$restarter->id])->get();
+
+        if ($shouldBeHost) {
+            $this->assertTrue($hostFor->contains($event));
+        } else {
+            $this->assertFalse($hostFor->contains($event));
+        }
 
         // Remove them
         $volunteer = EventsUsers::where('user', $restarter->id)->first();
@@ -163,8 +194,10 @@ class AddRemoveVolunteerTest extends TestCase
 
     public function roleProvider() {
         return [
-            [ 'Administrator' ],
-            [ 'NetworkCoordinator' ],
+            [ 'Administrator', 'Restarter', false ],
+            [ 'NetworkCoordinator', 'HostThis', true ],
+            [ 'NetworkCoordinator', 'HostOther', false ],
+            [ 'NetworkCoordinator', 'Administrator', false ],
         ];
     }
 
