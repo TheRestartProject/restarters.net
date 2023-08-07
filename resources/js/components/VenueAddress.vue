@@ -191,9 +191,6 @@ export default {
     } catch (e) {
       console.error('Error setting up autocomplete',e)
     }
-      },
-      immediate: true
-    },
   },
   beforeDestroy () {
     clearTimeout(this.timer)
