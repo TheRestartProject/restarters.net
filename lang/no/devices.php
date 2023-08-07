@@ -3,7 +3,6 @@
 return [
   'devices' => 'Devices',
   'export_device_data' => 'Export device data',
-  'by_taxonomy' => 'By taxonomy',
   'by_date' => 'By date',
   'various' => 'Various',
   'category' => 'Category',
@@ -23,9 +22,6 @@ return [
   'repairable' => 'Repairable',
   'age' => 'Age',
   'devices_description' => 'Description of problem/solution',
-  'useful_repair_urls' => 'URL of useful repair information used',
-  'useful_repair_urls_explanation' => 'Useful repair URL',
-  'useful_repair_urls_helper' => 'Enter URL here',
   'delete_device' => 'Delete device',
   'from_manufacturer' => 'From manufacturer',
   'from_third_party' => 'From third party',

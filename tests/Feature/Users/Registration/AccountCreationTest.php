@@ -60,13 +60,13 @@ class AccountCreationTest extends TestCase
         $userAttributes = $this->userAttributes();
 
         // Specify an invalid city and force geocoding to fail by invalidating the Google key.
-        $good = Config::get('GOOGLE_API_CONSOLE_KEY');
-        Config::set('GOOGLE_API_CONSOLE_KEY', 'zzz');
+        $good = Config::get('MAPBOX_TOKEN');
+        Config::set('MAPBOX_TOKEN', 'zzz');
 
-        $userAttributes['city'] = 'zzzzzzz';
+        $userAttributes['city'] = 'zzzz$£QW$"zzzz';
         $response = $this->post('/user/register/', $userAttributes);
 
-        Config::set('GOOGLE_API_CONSOLE_KEY', $good);
+        Config::set('MAPBOX_TOKEN', $good);
 
         $response->assertStatus(302);
         $response->assertRedirect('dashboard');
@@ -87,7 +87,7 @@ class AccountCreationTest extends TestCase
         // Also require my_name when logged in.
         $response = $this->post('/user/register/', [
             'age'                 => 1950,
-            'country'             => 'GBR',
+            'country'             => 'GB',
             'my_name'             => 'honeypot',
             'my_time'             => time(),
             'consent_gdpr'        => true,

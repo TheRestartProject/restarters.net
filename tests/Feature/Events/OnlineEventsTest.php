@@ -43,7 +43,8 @@ class OnlineEventsTest extends TestCase
 
         // act
         $eventAttributes = Party::factory()->raw(['online' => true]);
-        $response = $this->post('/party/create/', $eventAttributes);
+        $response = $this->post('/api/v2/events?api_token=' . $host->api_token, $this->eventAttributesToAPI($eventAttributes));
+        $response->assertSuccessful();
         $idevents = Party::latest()->first()->idevents;
 
         // assert

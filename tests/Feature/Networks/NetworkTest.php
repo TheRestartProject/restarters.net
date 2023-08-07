@@ -19,11 +19,6 @@ class NetworkTest extends TestCase
     protected function setUp(): void
     {
         parent::setUp();
-        DB::statement('SET foreign_key_checks=0');
-        Network::truncate();
-        DB::delete('delete from user_network');
-        DB::statement('SET foreign_key_checks=1');
-
         $this->networkService = new RepairNetworkService();
     }
 
@@ -98,6 +93,8 @@ class NetworkTest extends TestCase
         $group = Group::factory()->create([
                                                    'latitude' => 51.5074,
                                                    'longitude' => -0.1278,
+                                                   'country_code' => 'GB',
+                                                   'country' => 'United Kingdom',
                                                ]);
 
         $network = Network::factory()->create();
@@ -136,6 +133,8 @@ class NetworkTest extends TestCase
         $this->assertEquals(1, count($groups));
         $this->assertEquals($group->idgroups, $groups[0]['id']);
         $this->assertEquals($group->name, $groups[0]['name']);
+        $this->assertEquals($group->country, $groups[0]['location']['country']);
+        $this->assertEquals($group->country_code, $groups[0]['location']['country_code']);
 
         // Check that the event is listed.
         $this->assertEquals(1, count($groups[0]['past_parties']));
@@ -170,6 +169,9 @@ class NetworkTest extends TestCase
         $this->assertEquals($event2->idevents, $events[1]['id']);
         $this->assertEquals($event2->free_text, $events[1]['description']);
         $this->assertEquals(1, $events[1]['online']);
+
+        // Basic check on date format.
+        $this->assertStringContainsString('T', (new Carbon($events[1]['updated_at']))->toIso8601String());
     }
 
     /** @test */
@@ -302,10 +304,7 @@ class NetworkTest extends TestCase
         $admin = User::factory()->administrator()->create();
         $this->actingAs($admin);
 
-        $network = new Network();
-        $network->name = 'Restarters';
-        $network->shortname = 'restarters';
-        $network->save();
+        $network = Network::where('shortname', 'restarters')->first();
 
         $response = $this->get('/networks/' . $network->id . '/edit', $network->attributesToArray());
         $response->assertSuccessful();
@@ -326,5 +325,40 @@ class NetworkTest extends TestCase
         $response->assertRedirect();
         $this->assertTrue($network->containsGroup($group));
         $this->assertTrue($group->isMemberOf($network));
+    }
+
+    public function testRemoveNetworkCoordinatorByRole() {
+        $this->withoutExceptionHandling();
+
+        $network = Network::factory()->create();
+
+        $admin = User::factory()->administrator()->create();
+        $coordinator = User::factory()->networkCoordinator()->create();
+        $network->addCoordinator($coordinator);
+
+        $this->actingAs($admin);
+
+        $response = $this->get('/user/edit/' . $coordinator->id);
+        $response->assertStatus(200);
+
+        $crawler = new Crawler($response->getContent());
+
+        $tokens = $crawler->filter('input[name=_token]')->each(function (Crawler $node, $i) {
+            return $node;
+        });
+
+        $tokenValue = $tokens[0]->attr('value');
+
+        $response = $this->post('/profile/edit-admin-settings', [
+            '_token' => $tokenValue,
+            'id' => $coordinator->id,
+            'assigned_groups' => [],
+            'user_role' => Role::HOST,
+        ]);
+        $response->assertSessionHas('message');
+        $this->assertTrue($response->isRedirection());
+
+        // Demoting to host should remove as a network coordinator.
+        $this->assertFalse($network->coordinators->contains($coordinator));
     }
 }

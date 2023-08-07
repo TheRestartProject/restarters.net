@@ -35,11 +35,19 @@ export default {
       currentOnline: false
     }
   },
-  mounted() {
-    this.currentVenue = this.venue
-    this.currentOnline = this.online
-  },
   watch: {
+    venue: {
+      handler: function(newVal) {
+        this.currentVenue = newVal
+      },
+      immediate: true
+    },
+    online: {
+      handler: function(newVal) {
+        this.currentOnline = newVal
+      },
+      immediate: true
+    },
     currentVenue(newVal) {
       this.$emit('update:venue', newVal)
     },

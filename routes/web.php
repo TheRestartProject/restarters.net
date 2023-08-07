@@ -268,11 +268,6 @@ Route::middleware('auth', 'verifyUserConsent', 'ensureAPIToken')->group(function
         Route::get('/host', [DashboardController::class, 'getHostDash']);
     });
 
-    //Device Controller
-    Route::resource('device-url', DeviceUrlController::class)->only([
-        'store', 'update', 'destroy'
-                                                               ]);
-
     Route::prefix('fixometer')->group(function () {
         Route::get('/', [DeviceController::class, 'index'])->name('devices');
     });
@@ -331,7 +326,6 @@ Route::middleware('auth', 'verifyUserConsent', 'ensureAPIToken')->group(function
         Route::get('/all-past', [PartyController::class, 'allPast'])->name('all-past-events');
         Route::get('/group/{group_id?}', [PartyController::class, 'index'])->name('group-events');
         Route::get('/create/{group_id?}', [PartyController::class, 'create']);
-        Route::post('/create', [PartyController::class, 'create']);
         Route::get('/edit/{id}', [PartyController::class, 'edit']);
         Route::post('/edit/{id}', [PartyController::class, 'edit']);
         Route::get('/duplicate/{id}', [PartyController::class, 'duplicate']);
@@ -390,9 +384,6 @@ Route::middleware('auth', 'verifyUserConsent', 'ensureAPIToken')->group(function
 
     //Export Controller
     Route::get('/export/parties', [ExportController::class, 'parties']);
-    Route::get('/export/time-volunteered', [ExportController::class, 'exportTimeVolunteered']);
-    Route::get('/reporting/time-volunteered', [ExportController::class, 'getTimeVolunteered']);
-    Route::get('/reporting/time-volunteered/{search}', [ExportController::class, 'getTimeVolunteered']);
 });
 
 Route::middleware('ensureAPIToken')->group(function () {

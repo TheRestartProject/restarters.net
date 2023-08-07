@@ -99,8 +99,8 @@ class TimezoneTest extends TestCase
         $event['event_start_utc'] = (new \DateTime("$date $start1", new \DateTimeZone($tz1)))->format(\DateTimeInterface::ISO8601);
         $event['event_end_utc'] = (new \DateTime("$date $end1", new \DateTimeZone($tz1)))->format(\DateTimeInterface::ISO8601);
         $event['group'] = $g1->idgroups;
-        $response = $this->post('/party/create/', $event);
-        $response->assertStatus(302);
+        $response = $this->post('/api/v2/events?api_token=' . $host1->api_token, $this->eventAttributesToAPI($event));
+        $response->assertSuccessful();
 
         $this->actingAs($host2);
         $event = Party::factory()->raw();
@@ -108,8 +108,8 @@ class TimezoneTest extends TestCase
         $event['group'] = $g2->idgroups;
         $event['event_start_utc'] = (new \DateTime("$date $start2", new \DateTimeZone($tz2)))->format(\DateTimeInterface::ISO8601);
         $event['event_end_utc'] = (new \DateTime("$date $end2", new \DateTimeZone($tz2)))->format(\DateTimeInterface::ISO8601);
-        $response = $this->post('/party/create/', $event);
-        $response->assertStatus(302);
+        $response = $this->post('/api/v2/events?api_token=' . $host2->api_token, $this->eventAttributesToAPI($event));
+        $response->assertSuccessful();
 
         // Now get them and check the ordering works.
         $response = $this->get('/party');
@@ -149,7 +149,7 @@ class TimezoneTest extends TestCase
         $eventData['id'] = $id2;
         $eventData['event_start_utc'] = Carbon::parse("$date $editstart2", $tz1)->setTimezone('UTC')->toIso8601String();
         $eventData['event_end_utc'] = Carbon::parse("$date $editend2", $tz1)->setTimezone('UTC')->toIso8601String();
-        $response2 = $this->post('/party/edit/'.$event->idevents, $eventData);
+        $response2 = $this->patch('/api/v2/events/'.$event->idevents, $this->eventAttributesToAPI($eventData));
         $event->refresh();
         $this->assertEquals($eventData['event_start_utc'], $event->event_start_utc);
         $this->assertEquals($eventData['event_end_utc'], $event->event_end_utc);
@@ -205,8 +205,9 @@ class TimezoneTest extends TestCase
         $event['event_start_utc'] = $event_start;
         $event['event_end_utc'] = $event_end;
         $event['group'] = $g->idgroups;
-        $response = $this->post('/party/create/', $event);
-        $response->assertRedirect();
+        $response = $this->post('/api/v2/events?api_token=' . $host->api_token, $this->eventAttributesToAPI($event));
+        $response->assertSuccessful();
+        $idevents = Party::latest()->first()->idevents;
 
         $party = Party::latest()->first();
         self::assertEquals('Asia/Samarkand', $party->timezone);
@@ -219,25 +220,5 @@ class TimezoneTest extends TestCase
         // This should have updated the timezone of the event.
         $party->refresh();
         self::assertEquals('Europe/London', $party->timezone);
-    }
-
-    public function testInvalidTimezones() {
-        $this->loginAsTestUser(Role::ADMINISTRATOR);
-
-        $g = Group::factory()->create([
-                                               'timezone' => 'Asia/Samarkand'
-                                           ]);
-
-        $host = User::factory()->restarter()->create();
-        $g->addVolunteer($host);
-        $g->makeMemberAHost($host);
-
-        $this->actingAs($host);
-        $event = Party::factory()->raw([
-                                                'timezone' => 'bad timezone'
-                                            ]);
-        $event['group'] = $g->idgroups;
-        $this->expectException(ValidationException::class);
-        $this->post('/party/create/', $event);
     }
 }

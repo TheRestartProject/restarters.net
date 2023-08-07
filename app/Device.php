@@ -57,7 +57,6 @@ class Device extends Model implements Auditable
 
         static::deleting(function ($device) {
             $device->barriers()->detach();
-            $device->urls()->delete();
         });
     }
 
@@ -216,11 +215,6 @@ class Device extends Model implements Auditable
         return $this->hasOne(\App\Party::class, 'idevents', 'event');
     }
 
-    public function urls()
-    {
-        return $this->hasMany(\App\DeviceUrl::class, 'device_id', 'iddevices');
-    }
-
     public function barriers()
     {
         return $this->belongsToMany(\App\Barrier::class, 'devices_barriers', 'device_id', 'barrier_id');
@@ -234,10 +228,12 @@ class Device extends Model implements Auditable
         $footprint = 0;
 
         if ($this->isFixed()) {
-            if ($this->deviceCategory->isMiscPowered() && $this->estimate > 0) {
+            if ($this->category == env('MISC_CATEGORY_ID_POWERED') && $this->estimate > 0) {
                 $footprint = $this->estimate * $emissionRatio;
             } else {
-                $footprint = $this->deviceCategory->footprint;
+                $footprint = \Cache::remember('category-' . $this->category, 15, function() {
+                    return $this->deviceCategory;
+                })->footprint;
             }
         }
 
@@ -271,11 +267,19 @@ class Device extends Model implements Auditable
     {
         $ewasteDiverted = 0;
 
-        if ($this->isFixed() && $this->deviceCategory->isPowered()) {
-            if ($this->deviceCategory->isMiscPowered() && $this->estimate > 0) {
+        $powered = \Cache::remember('category-powered-' . $this->category, 15, function() {
+            return $this->deviceCategory->powered;
+        });
+
+        if ($this->isFixed() && $powered) {
+            if ($this->category == env('MISC_CATEGORY_ID_POWERED') && $this->estimate > 0) {
                 $ewasteDiverted = $this->estimate;
             } else {
-                $ewasteDiverted = $this->deviceCategory->weight;
+                $category = \Cache::remember('category-' . $this->category, 15, function() {
+                    return $this->deviceCategory;
+                });
+
+                $ewasteDiverted = $category->weight;
             }
         }
 
@@ -407,7 +411,18 @@ class Device extends Model implements Auditable
     public static function getItemTypes()
     {
         // List the item types
-        $types = DB::table('devices')->whereNotNull('item_type')->select('item_type', DB::raw('COUNT(*) as count'))->groupBy('item_type')->orderBy('count', 'desc')->get()->toArray();
+        $types = DB::select(DB::raw("SELECT s.* FROM 
+(SELECT item_type, powered, idcategories, categories.name as categoryname, COUNT(*) AS count 
+FROM devices INNER JOIN categories ON devices.category = categories.idcategories 
+WHERE item_type IS NOT NULL GROUP BY item_type, categoryname
+) s 
+JOIN 
+(SELECT item_type, MAX(count) AS maxcount FROM 
+(SELECT item_type, powered, idcategories, categories.name as categoryname, COUNT(*) AS count 
+FROM devices INNER JOIN categories ON devices.category = categories.idcategories 
+WHERE item_type IS NOT NULL GROUP BY item_type, categoryname) s
+GROUP BY s.item_type) AS m
+ON s.item_type = m.item_type AND s.count = m.maxcount;"));
 
         return $types;
     }

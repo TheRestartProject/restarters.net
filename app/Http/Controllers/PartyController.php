@@ -44,7 +44,7 @@ class PartyController extends Controller
         $this->discourseService = $discourseService;
     }
 
-    public static function expandEvent($event, $group = null)
+    public static function expandEvent($event, $group = null, $countries = null)
     {
         // Use attributesToArray rather than getAttributes so that our custom accessors are invoked.
         $thisone = $event->attributesToArray();
@@ -58,6 +58,9 @@ class PartyController extends Controller
             if (is_object($group_image) && is_object($group_image->image)) {
                 $thisone['group']['group_image'] = $group_image->image->path;
             }
+
+            // We need to translate the country in the group, because it is stored in
+            $thisone['group']['country'] = Fixometer::translateCountry($thisone['group']['country'], $countries);
         }
 
         $thisone['attending'] = Auth::user() && $event->isBeingAttendedBy(Auth::user()->id);
@@ -105,10 +108,12 @@ class PartyController extends Controller
     {
         $events = [];
 
+        $countries = array_flip(\App\Helpers\Fixometer::getAllCountries('en'));
+
         if (! is_null($group_id)) {
             // This is the page for a specific group's events.  We want all events for this group.
             foreach (Party::where('events.group', $group_id)->get() as $event) {
-                $e = \App\Http\Controllers\PartyController::expandEvent($event, NULL);
+                $e = \App\Http\Controllers\PartyController::expandEvent($event, NULL, $countries);
                 $events[] = $e;
             }
 
@@ -116,7 +121,7 @@ class PartyController extends Controller
         } else {
             // This is a logged-in user's events page.  We want all relevant events.
             foreach (Party::forUser(null)->reorder()->orderBy('event_start_utc', 'DESC')->get() as $event) {
-                $e = \App\Http\Controllers\PartyController::expandEvent($event, NULL);
+                $e = \App\Http\Controllers\PartyController::expandEvent($event, NULL, $countries);
                 $events[] = $e;
             }
 
@@ -128,7 +133,7 @@ class PartyController extends Controller
 
                 foreach ($upcoming_events_in_area as $event) {
                     if (Fixometer::userHasViewPartyPermission($event->idevents)) {
-                        $e = self::expandEvent($event, null);
+                        $e = self::expandEvent($event, null, $countries);
                         $e['nearby'] = true;
                         $e['all'] = true;
                         $events[] = $e;
@@ -143,7 +148,7 @@ class PartyController extends Controller
 
             foreach ($other_upcoming_events as $event) {
                 if (Fixometer::userHasViewPartyPermission($event->idevents)) {
-                    $e = self::expandEvent($event, NULL);
+                    $e = self::expandEvent($event, NULL, $countries);
                     $e['all'] = TRUE;
                     $events[] = $e;
                 }
@@ -177,173 +182,6 @@ class PartyController extends Controller
         }
 
         $allGroups = Group::orderBy('name')->get();
-
-        if ($request->isMethod('post')) {
-            $request->validate([
-                                   'group' => 'required'
-            ]);
-
-            $group = $request->input('group');
-            $groupobj = Group::where('idgroups', $group)->first();
-
-            // We might be passed a timezone; if not then use the timezone of the group.
-            $timezone = $request->input('timezone', $groupobj->timezone);
-
-            if ($timezone && !in_array($timezone, \DateTimeZone::listIdentifiers(\DateTimeZone::ALL_WITH_BC))) {
-                $error['timezone'] = 'Please select a valid timezone.';
-                $response['warning'] = $error['timezone'];
-            }
-
-            $request->validate([
-                                   'location' => [
-                                       function ($attribute, $value, $fail) use ($request) {
-                                           if (! $request->filled('online') && ! $value) {
-                                               $fail(__('events.validate_location'));
-                                           }
-                                       },
-                                   ],
-                                   'timezone' => [
-                                       function ($attribute, $value, $fail) use ($request) {
-                                           if ($request->filled('timezone') && !in_array($request->timezone, \DateTimeZone::listIdentifiers(\DateTimeZone::ALL_WITH_BC))) {
-                                               $fail(__('partials.validate_timezone'));
-                                           }
-                                       },
-                                   ]
-                               ]);
-
-            $event_start_utc = $request->input('event_start_utc');
-            $event_end_utc = $request->input('event_end_utc');
-
-            // Convert the timezone to UTC, because the timezone is not itself stored in the DB.
-            $event_start_utc = Carbon::parse($event_start_utc)->setTimezone('UTC')->toIso8601String();
-            $event_end_utc = Carbon::parse($event_end_utc)->setTimezone('UTC')->toIso8601String();
-
-            $error = [];
-
-            $latitude = null;
-            $longitude = null;
-
-            if ($request->filled('location')) {
-                $worked = false;
-
-                try {
-                    $results = $this->geocoder->geocode($request->get('location'));
-                    $worked = true;
-
-                    $latitude = $results['latitude'];
-                    $longitude = $results['longitude'];
-                } catch (\Exception $ex) {
-                    Log::error('An error occurred during geocoding: '.$ex->getMessage());
-                }
-
-                if ($request->get('location') == 'ForceGeocodeFailure' || !$worked) {
-                    $request->session()->put('danger', __('events.address_error'));
-
-                    return view('events.create', [
-                        'title' => 'New Party',
-                        'gmaps' => true,
-                        'allGroups' => $allGroups,
-                        'user' => Auth::user(),
-                        'user_groups' => $groupsUserIsInChargeOf,
-                        'selected_group_id' => $group_id,
-                        'autoapprove' => $autoapprove,
-                    ]);
-                }
-            }
-
-            $data['latitude'] = $latitude;
-            $data['longitude'] = $longitude;
-
-            $online = $request->has('online');
-            $free_text = $request->input('free_text');
-            $venue = $request->input('venue');
-            $location = $request->input('location');
-            $user_id = Auth::user()->id;
-            $link = $request->input('link');
-
-            // Check whether the event should be auto-approved, if all of the networks it belongs to
-            // allow it.
-            $autoapprove = $groupobj->auto_approve;
-
-            if (empty($error)) {
-                $hours = Carbon::parse($event_start_utc)->diffInHours(Carbon::parse($event_end_utc));
-
-                // No errors. We can proceed and create the Party.
-                //
-                // timezone needs to be the first attribute set, because it is used in mutators for later attributes.
-                $data = [
-                    'timezone' => $timezone,
-                    'event_start_utc' => $event_start_utc,
-                    'event_end_utc' => $event_end_utc,
-                    'free_text' => $free_text,
-                    'link' => $link,
-                    'venue' => $venue,
-                    'location' => $location,
-                    'latitude' => $latitude,
-                    'longitude' => $longitude,
-                    'group' => $group,
-                    'hours' => $hours,
-                    'user_id' => $user_id,
-                    'created_at' => date('Y-m-d H:i:s'),
-                    'shareable_code' => Fixometer::generateUniqueShareableCode(\App\Party::class, 'shareable_code'),
-                    'online' => $online
-                ];
-
-                $party = Party::create($data);
-                $idParty = $party->idevents;
-                if (is_numeric($idParty)) {
-                    EventsUsers::create([
-                        'event' => $idParty,
-                        'user' => Auth::user()->id,
-                        'status' => 1,
-                        'role' => 3,
-                    ]);
-
-                    Party::find($idParty)->increment('volunteers');
-
-                    // Notify relevant users
-                    $usersToNotify = Fixometer::usersWhoHavePreference('admin-moderate-event');
-                    foreach ($party->associatedNetworkCoordinators() as $coordinator) {
-                        $usersToNotify->push($coordinator);
-                    }
-                    Notification::send($usersToNotify->unique(), new AdminModerationEvent([
-                        'event_venue' => Party::find($idParty)->venue,
-                        'event_url' => url('/party/edit/'.$idParty),
-                    ]));
-
-                    /* let's create the image attachment! **/
-                    if (isset($_FILES) && ! empty($_FILES) && is_array($_FILES['file']['name'])) {
-                        $File = new FixometerFile;
-                        $files = Fixometer::rearrange($_FILES['file']);
-                        foreach ($files as $upload) {
-                            $File->upload($upload, 'image', $idParty, env('TBL_EVENTS'));
-                        }
-                    }
-
-                    if ($autoapprove) {
-                        Log::info("Auto-approve event $idParty");
-                        Party::find($idParty)->approve();
-                    }
-                } else {
-                    $response['danger'] = 'Party could <strong>not</strong> be created. Something went wrong with the database.';
-                    \Sentry\CaptureMessage($response['danger']);
-                }
-            } else {
-                $response['danger'] = 'Party could <strong>not</strong> be created. Please look at the reported errors, correct them, and try again.';
-                \Sentry\CaptureMessage($response['danger']);
-            }
-
-            if (! isset($response)) {
-                $response = null;
-            }
-            if (! isset($error)) {
-                $error = null;
-            }
-
-            return redirect('/party/edit/'.$idParty)->with('success', Lang::get($autoapprove ?
-                                'events.created_success_message_autoapproved' : 'events.created_success_message'));
-        }
-
 
         return view('events.create', [
             'title' => 'New Party',
@@ -380,124 +218,6 @@ class PartyController extends Controller
 
         // Fetch the nextwork here - avoids fetching for each group as we encode.
         $allGroups = Group::with('networks')->orderBy('name')->get();
-
-        if ($request->isMethod('post') && ! empty($request->post())) {
-            $id = $request->post('id');
-            $data = $request->post();
-            unset($data['files']);
-            unset($data['file']);
-            unset($data['users']);
-            unset($data['id']);
-
-            if (! empty($data['location'])) {
-                $results = $this->geocoder->geocode($data['location']);
-
-                if (empty($results)) {
-                    $response['danger'] = __('events.address_error');
-                    \Sentry\CaptureMessage($response['danger']);
-                    $party = Party::findOrFail($id);
-                    $audits = $party->audits;
-
-                    return view('events.edit', [ //party.edit
-                      'gmaps' => true,
-                      'images' => $images,
-                      'title' => 'Edit Party',
-                      'allGroups' => $allGroups,
-                      'formdata' => PartyController::expandEvent($party, NULL),
-                      'remotePost' => null,
-                      'user' => Auth::user(),
-                      'user_groups' => $groupsUserIsInChargeOf,
-                      'userInChargeOfMultipleGroups' => $userInChargeOfMultipleGroups,
-                      'audits' => $audits,
-                      'response' => $response,
-                  ]);
-                }
-
-                $latitude = $results['latitude'];
-                $longitude = $results['longitude'];
-            } else {
-                $latitude = null;
-                $longitude = null;
-            }
-            $data['latitude'] = $latitude;
-            $data['longitude'] = $longitude;
-
-            // We might have been passed a timezone; if not then inherit from the current value.
-            $timezone = $request->input('timezone', Party::find($id)->timezone);
-
-            // Convert the timezone to UTC, because the timezone is not itself stored in the DB.
-            $event_start_utc = Carbon::parse($request->input('event_start_utc'))->setTimezone('UTC')->toIso8601String();
-            $event_end_utc = Carbon::parse($request->input('event_end_utc'))->setTimezone('UTC')->toIso8601String();
-
-            $update = [
-                'event_start_utc' => $event_start_utc,
-                'event_end_utc' => $event_end_utc,
-                'free_text' => $data['free_text'],
-                'online' => $request->has('online'),
-                'group' => $data['group'],
-                'venue' => $data['venue'],
-                'link' => $request->has('link') ? $data['link'] : null,
-                'location' => $data['location'],
-                'latitude' => $latitude,
-                'longitude' => $longitude,
-                'timezone' => $timezone
-            ];
-
-            $u = Party::findOrFail($id)->update($update);
-
-            if (! $u) {
-                $response['danger'] = 'Something went wrong. Please check the data and try again.';
-                \Sentry\CaptureMessage($response['danger']);
-            } else {
-                $response['success'] = '<div class="row"><div class="col-md-8 col-lg-8 d-flex flex-column align-content-center">Event details updated.</div><div class="col-md-4 col-lg-4 text-right"><a href="/party/view/'.$id.'" class="btn btn-secondary">View event</a></div></div>';
-
-                $theParty = $Party->findThis($id)[0];
-
-                // If event has just been approved, email Restarters attached to group, and push to Wordpress.
-                $event = Party::find($id);
-
-                if (isset($data['moderate']) && $data['moderate'] == 'approve') {
-                    $event->approve();
-                } else {
-                    event(new EditEvent($event, $data));
-                }
-
-                if (isset($_POST['users']) && ! empty($_POST['users'])) {
-                    $users = $_POST['users'];
-                    $Party->createUserList($id, $users);
-                }
-            }
-            if (Fixometer::hasRole($user, 'Host')) {
-                header('Location: /host?action=pe&code=200');
-            }
-
-            if (! isset($images)) {
-                $images = null;
-            }
-
-            if (! isset($remotePost)) {
-                $remotePost = null;
-            }
-
-            $audits = Party::findOrFail($id)->audits;
-            $party = $Party->find($id);
-
-            return view('events.edit', [ //party.edit
-                'response' => $response,
-                'gmaps' => true,
-                'images' => $images,
-                'title' => 'Edit Party',
-                'allGroups' => $allGroups,
-                'formdata' => PartyController::expandEvent($party, NULL),
-                'remotePost' => $remotePost,
-                'grouplist' => $Groups->findList(),
-                'user' => Auth::user(),
-                'user_groups' => $groupsUserIsInChargeOf,
-                'userInChargeOfMultipleGroups' => $userInChargeOfMultipleGroups,
-                'images' => $images,
-                'audits' => $audits,
-            ]);
-        }
 
         $images = $File->findImages(env('TBL_EVENTS'), $id); //NB: File facade can't find findImages may need to add
 
@@ -563,7 +283,7 @@ class PartyController extends Controller
             'user' => Auth::user(),
             'user_groups' => $groupsUserIsInChargeOf,
             'userInChargeOfMultipleGroups' => $userInChargeOfMultipleGroups,
-            'duplicateFrom' => PartyController::expandEvent($party, NULL),
+            'duplicateFrom' => $party->idevents,
         ]);
     }
 

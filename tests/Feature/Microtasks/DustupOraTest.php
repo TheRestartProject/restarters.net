@@ -222,7 +222,7 @@ class DustupOraTest extends TestCase
             [
                 'id_ords' => 'restart_8563',
                 'data_provider' => 'The Restart Project',
-                'country' => 'GBR',
+                'country' => 'GB',
                 'partner_product_category' => 'Vacuum',
                 'product_category' => 'Vacuum',
                 'brand' => 'Dyson',
@@ -310,7 +310,7 @@ class DustupOraTest extends TestCase
             [
                 'id_ords' => 'rcwales_4125',
                 'data_provider' => 'Repair Cafe Wales',
-                'country' => 'GBR',
+                'country' => 'GB',
                 'partner_product_category' => 'Electrical ~ hoover',
                 'product_category' => 'Vacuum',
                 'brand' => 'Unknown',
@@ -332,7 +332,7 @@ class DustupOraTest extends TestCase
             [
                 'id_ords' => 'rcwales_3036',
                 'data_provider' => 'Repair Cafe Wales',
-                'country' => 'GBR',
+                'country' => 'GB',
                 'partner_product_category' => 'Electrical ~ vacuum cleaner',
                 'product_category' => 'Vacuum',
                 'brand' => 'Dyson',

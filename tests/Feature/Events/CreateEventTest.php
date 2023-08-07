@@ -8,7 +8,6 @@ use App\Helpers\Geocoder;
 use App\Helpers\RepairNetworkService;
 use App\Network;
 use App\Notifications\AdminModerationEvent;
-use App\Notifications\JoinGroup;
 use App\Notifications\NotifyRestartersOfNewEvent;
 use App\Party;
 use App\Role;
@@ -19,6 +18,7 @@ use Illuminate\Support\Facades\Notification;
 use Illuminate\Support\Facades\Queue;
 use Tests\TestCase;
 use App\Notifications\EventConfirmed;
+use Illuminate\Validation\ValidationException;
 
 class GeocoderMock extends Geocoder
 {
@@ -96,7 +96,8 @@ class CreateEventTest extends TestCase
         $eventAttributes['event_start_utc'] = $start->toIso8601String();
         $eventAttributes['event_end_utc'] = $end->toIso8601String();
 
-        $this->post('/party/create/', $eventAttributes);
+        $response = $this->post('/api/v2/events?api_token=' . $host->api_token, $this->eventAttributesToAPI($eventAttributes));
+        $response->assertSuccessful();
 
         // The event_start_utc and event_end_utc will be in the database, but not ISO8601 formatted - that is implicit.
         $eventAttributes['event_start_utc'] = Carbon::parse($eventAttributes['event_start_utc'])->setTimezone('UTC')->format('Y-m-d H:i:s');
@@ -112,10 +113,9 @@ class CreateEventTest extends TestCase
         self::assertEquals(1, $upcoming_events->count());
         self::assertEquals($event->idevents, $upcoming_events[0]->idevents);
 
-        // Check that we can view the event, and that it shows the creation success message.
+        // Check that we can view the event.
         $this->get('/party/view/'.$event->idevents)->
-            assertSee($eventAttributes['venue'])->
-            assertSee(__('events.created_success_message'));
+            assertSee($eventAttributes['venue']);
 
         // Check that the event appears in the API.
         $rsp = $this->get('/api/groups/' . $group->idgroups . '/events');
@@ -313,8 +313,8 @@ class CreateEventTest extends TestCase
         // Create an event.
         $event = Party::factory()->raw();
         $event['group'] = $group->idgroups;
-        $response = $this->post('/party/create/', $event);
-        $response->assertStatus(302);
+        $response = $this->post('/api/v2/events?api_token=' . $admins[0]->api_token, $this->eventAttributesToAPI($event));
+        $response->assertSuccessful();
 
         // Should have been sent to the admins.
         Notification::assertSentTo(
@@ -347,11 +347,12 @@ class CreateEventTest extends TestCase
         ]);
 
         // Approve the event
-        $response = $this->post('/party/create/', $eventData);
+        $response = $this->post('/api/v2/events?api_token=' . $admin->api_token, $this->eventAttributesToAPI($eventData));
+        $response->assertSuccessful();
         $event = Party::latest()->first();
         $eventData['id'] = $event->idevents;
         $eventData['moderate'] = 'approve';
-        $response = $this->post('/party/edit/'.$event->idevents, $eventData);
+        $response1a = $this->patch('/api/v2/events/'.$event->idevents, $this->eventAttributesToAPI($eventData));
 
         // assert
         Notification::assertSentTo(
@@ -377,8 +378,8 @@ class CreateEventTest extends TestCase
         // Edit to a bad location for coverage.
         $eventData['id'] = $event->idevents;
         $eventData['location'] = 'ForceGeocodeFailure';
-        $response = $this->post('/party/edit/'.$event->idevents, $eventData);
-        $response->assertSee(__('events.address_error'));
+        $this->expectException(ValidationException::class);
+        $this->patch('/api/v2/events/'.$event->idevents, $this->eventAttributesToAPI($eventData));
     }
 
     /** @test */
@@ -401,11 +402,12 @@ class CreateEventTest extends TestCase
         $eventData = Party::factory()->raw(['group' => $group->idgroups, 'event_date' => '1930-01-01', 'latitude'=>'1', 'longitude'=>'1']);
 
         // act
-        $response = $this->post('/party/create/', $eventData);
+        $response = $this->post('/api/v2/events?api_token=' . $admin->api_token, $this->eventAttributesToAPI($eventData));
+        $response->assertSuccessful();
         $event = Party::latest()->first();
-        $eventData['id'] = $event->idevents;
+        $eventData = $event->getAttributes();
         $eventData['moderate'] = 'approve';
-        $response = $this->post('/party/edit/'.$event->idevents, $eventData);
+        $response = $this->patch('/api/v2/events/'.$event->idevents, $this->eventAttributesToAPI($eventData));
 
         // assert
         Notification::assertNotSentTo(
@@ -435,7 +437,8 @@ class CreateEventTest extends TestCase
         $eventData = Party::factory()->raw(['group' => $group->idgroups]);
 
         $this->actingAs($admin);
-        $response = $this->post('/party/create/', $eventData);
+        $response = $this->post('/api/v2/events?api_token=' . $admin->api_token, $this->eventAttributesToAPI($eventData));
+        $response->assertSuccessful();
 
         // assert that the notification was sent to both the network coordinator, and the admin, and only once to each.
         Notification::assertSentToTimes(
@@ -459,11 +462,9 @@ class CreateEventTest extends TestCase
         $group->makeMemberAHost($host);
 
         // Create the event
-        $response = $this->get('/party/create');
-        $this->get('/party/create')->assertStatus(200);
-
         $eventAttributes = Party::factory()->raw(['group' => $group->idgroups, 'event_date' => '2000-01-01', 'approved' => true]);
-        $response = $this->post('/party/create/', $eventAttributes);
+        $response = $this->post('/api/v2/events?api_token=' . $host->api_token, $this->eventAttributesToAPI($eventAttributes));
+        $response->assertSuccessful();
 
         // Find the event id
         $party = $group->parties()->latest()->first();
@@ -616,33 +617,18 @@ class CreateEventTest extends TestCase
                                                 ]);
 
         // Create and approve an event.
-        $response = $this->post('/party/create/', $eventData);
+        $response = $this->post('/api/v2/events?api_token=' . $host->api_token, $this->eventAttributesToAPI($eventData));
+        $response->assertSuccessful();
+
         $event = Party::latest()->first();
         $eventData['id'] = $event->idevents;
         $eventData['moderate'] = 'approve';
-        $response = $this->post('/party/edit/'.$event->idevents, $eventData);
+        $this->patch('/api/v2/events/'.$event->idevents, $this->eventAttributesToAPI($eventData));
 
         // Shouldn't notify
         Notification::assertNotSentTo(
             [$restarter], NotifyRestartersOfNewEvent::class
         );
-    }
-
-    /**
-     * @test
-     */
-    public function invalid_location_fails() {
-        $this->loginAsTestUser(Role::ADMINISTRATOR);
-        $idgroups = $this->createGroup();
-
-        $eventData = Party::factory()->raw([
-                                                    'group' => $idgroups,
-                                                    'location' => 'ForceGeocodeFailure',
-                                                ]);
-
-        // A geocode failure should result in an error alert.
-        $response = $this->post('/party/create/', $eventData);
-        $response->assertSee('alert-danger');
     }
 
     /** @test */
@@ -688,8 +674,8 @@ class CreateEventTest extends TestCase
         $initialQueueSize = \Illuminate\Support\Facades\Queue::size('database');
         $event = Party::factory()->raw();
         $event['group'] = $group->idgroups;
-        $response = $this->post('/party/create/', $event);
-        $response->assertStatus(302);
+        $response = $this->post('/api/v2/events?api_token=' . $host->api_token, $this->eventAttributesToAPI($event));
+        $response->assertSuccessful();
 
         // Should have queued AdminModerationEvent.
         $queueSize = Queue::size();
@@ -736,5 +722,22 @@ class CreateEventTest extends TestCase
         self::assertEquals(2, count($groups));
         self::assertEquals($groupNotInNetwork->idgroups, $groups[0]['idgroups']);
         self::assertEquals($groupInNetwork->idgroups, $groups[1]['idgroups']);
+
+        // Create the event.
+        $eventAttributes = Party::factory()->raw();
+        $eventAttributes['group'] = $idgroup;
+
+        $event_start = Carbon::createFromTimestamp('tomorrow')->setTimezone('UTC');
+        $event_end = Carbon::createFromTimestamp('tomorrow')->setTimezone('UTC')->addHour(2);
+
+        $eventAttributes['event_start_utc'] = $event_start->toIso8601String();
+        $eventAttributes['event_end_utc'] = $event_end->toIso8601String();
+
+        $response = $this->post('/api/v2/events?api_token=' . $coordinator->api_token, $this->eventAttributesToAPI($eventAttributes));
+        $response->assertSuccessful();
+        $idevents = Party::latest()->first()->idevents;
+
+        $response = $this->get('/party/edit/'.$idevents);
+        $response->assertSuccessful();
     }
 }

@@ -192,7 +192,6 @@ class DeviceController extends Controller
             $device[$i]->idevents = $device[$i]->event;
             $device[$i]->category = $device[$i]->deviceCategory;
             $device[$i]->shortProblem = $device[$i]->getShortProblem();
-            $device[$i]->urls;
 
             $barriers = [];
 
@@ -338,7 +337,6 @@ class DeviceController extends Controller
             $device->category = $device->deviceCategory;
             $device->shortProblem = $device->getShortProblem();
             $device->images = $device->getImages();
-            $device->urls;
 
             $barriers = [];
 

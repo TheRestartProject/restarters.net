@@ -4,7 +4,6 @@ return [
   'by_date' => 'Op datum',
   'age' => 'Leeftijd',
   'brand' => 'Merk',
-  'by_taxonomy' => 'Op taxonomie',
   'category' => 'Categorie',
   'delete_device' => 'Toestel wissen',
   'devices' => 'Toestellen',
@@ -23,7 +22,4 @@ return [
   'repair_details' => 'Volgende stappen',
   'repair_status' => 'Herstel status',
   'to_date' => 'Tot',
-  'useful_repair_urls' => 'URL met nuttige herstelinfo gebruikt',
-  'useful_repair_urls_explanation' => 'Nuttige URL',
-  'useful_repair_urls_helper' => 'Geef de URL hier in',
 ];

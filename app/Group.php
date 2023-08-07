@@ -34,7 +34,7 @@ class Group extends Model implements Auditable
         'postcode',
         'latitude',
         'longitude',
-        'country',
+        'country_code',
         'free_text',
         'facebook',
         'wordpress_post_id',
@@ -152,29 +152,6 @@ class Group extends Model implements Auditable
             ORDER BY `g`.`name` ASC'));
         } catch (\Illuminate\Database\QueryException $e) {
             dd($e);
-        }
-    }
-
-    public function findOne($id)
-    {
-        //Took out GROUP BY `images`.`path` NB:Error message -> 'fixometer_laravel.images.idimages' isn't in GROUP BY
-        try {
-            $group = DB::select(DB::raw('SELECT * FROM `'.$this->table.'` AS `g`
-                LEFT JOIN (
-                    SELECT * FROM `images`
-                        INNER JOIN `xref` ON `xref`.`object` = `images`.`idimages`
-                        WHERE `xref`.`object_type` = 5
-                        AND `xref`.`reference_type` = '.env('TBL_GROUPS').'
-                        GROUP BY `images`.`path`
-                ) AS `xi`
-                ON `xi`.`reference` = `g`.`idgroups`
-                WHERE `id'.$this->table.'` = :id'), ['id' => $id]);
-        } catch (\Illuminate\Database\QueryException $e) {
-            dd($e);
-        }
-
-        if (! empty($group)) {
-            return $group[0];
         }
     }
 
@@ -371,17 +348,9 @@ class Group extends Model implements Auditable
      * @version 1.0.1
      * @return  [type]
      */
-    public function upcomingParties($exclude_parties = [])
+    public function upcomingParties()
     {
         $from = date('Y-m-d H:i:s');
-
-        if (! empty($exclude_parties)) {
-            return $this->parties()
-                ->where('event_end_utc', '>', $from)
-                ->whereNotIn('idevents', $exclude_parties)
-                ->get();
-        }
-
         return $this->parties()->where('event_end_utc', '>', $from)->get();
     }
 
@@ -394,17 +363,9 @@ class Group extends Model implements Auditable
      * @version 1.0.0
      * @return  [type]
      */
-    public function pastParties($exclude_parties = [])
+    public function pastParties()
     {
         $now = date('Y-m-d H:i:s');
-
-        if (! empty($exclude_parties)) {
-            return $this->parties()
-                ->where('event_end_utc', '<', $now)
-                ->whereNotIn('idevents', $exclude_parties)
-                ->get();
-        }
-
         return $this->parties()->where('event_end_utc', '<', $now)->get();
     }
 
@@ -429,12 +390,6 @@ class Group extends Model implements Auditable
         }
 
         return $event->first();
-    }
-
-    public function scopeRequiresModeration($query)
-    {
-        $query = $query->where('approved', false);
-        return $query;
     }
 
     public function networks()
@@ -471,6 +426,11 @@ class Group extends Model implements Auditable
         }
 
         return false;
+    }
+
+    public function getMaxUpdatedAtDevicesUpdatedAtAttribute()
+    {
+        return strtotime($this->updated_at) > strtotime($this->devices_updated_at) ? $this->updated_at : $this->devices_updated_at;
     }
 
     public function getAutoApproveAttribute()
@@ -543,10 +503,10 @@ class Group extends Model implements Auditable
                     'username' => env('DISCOURSE_APIUSER'),
                 ]);
 
-                // Restricted characters allowed in name, and only 25 characters.
+                // Restricted characters allowed in name, and only 20 characters.  Leave 1 spare for uniqueness.
                 $name = str_replace(' ', '_', trim($this->name));
                 $name = preg_replace("/[^A-Za-z0-9]/", '', $name);
-                $name = substr($name, 0, 25);
+                $name = substr($name, 0, 19);
 
                 $params = [
                     'group' => [
@@ -702,7 +662,7 @@ class Group extends Model implements Auditable
             foreach ($groups as $group) {
                 foreach ($group->networks as $network) {
                     foreach ($unetworks as $user_network) {
-                        if ($network->idnetworks == $user_network->idnetworks) {
+                        if ($network->id == $user_network->id) {
                             $ret[] = $group;
                             break;
                         }

@@ -64,50 +64,6 @@ exports.createGroup = async function(page, baseURL) {
   return id
 }
 
-exports.createEvent = async function(page, baseURL, idgroups) {
-  // Go to groups page
-  await page.goto('/group/view/' + idgroups)
-
-  // Click on Add New Event button
-  await page.click('a[href="/party/create"]')
-
-  // Venue name
-  await page.fill('#event_name', faker.company.companyName())
-
-  // Select the group.  Bit hard to get the select to open, but tabbing from the previous field works.
-  await page.click('#event_link')
-  await page.keyboard.press('Tab')
-  await page.click('.multiselect__content-wrapper > .multiselect__content > .multiselect__element > .multiselect__option--highlight > span')
-
-  // Type into the RTE
-  await page.fill('.ql-editor', faker.lorem.sentence())
-
-  // Set a date.
-  await page.click('#event_date button')
-  await page.click('#event_date .b-calendar-grid > .b-calendar-grid-body > .row:last-child .btn:last-child')
-
-  await page.click('#event_time input[name="start"]')
-  await page.fill('#event_time input[name="start"]', '13:00')
-
-  await page.click('#event_time input[name="end"]')
-  await page.fill('#event_time input[name="end"]', '14:00')
-
-  // Use group location.
-  await page.click('.event-address .btn-primary')
-
-  await page.click('button[type=submit]')
-
-  // Should get redirected to Edit form.
-  await page.waitForURL('**/edit/**');
-
-  // Return id from URL
-  const p = page.url().lastIndexOf('/')
-  expect(p).toBeGreaterThan(0)
-
-  const id = page.url().substring(p + 1)
-  return id
-}
-
 exports.createEvent = async function(page, baseURL, idgroups, past) {
   // Go to groups page
   await page.goto('/group/view/' + idgroups)
@@ -147,14 +103,10 @@ exports.createEvent = async function(page, baseURL, idgroups, past) {
 
   await page.click('button[type=submit]')
 
-  // Should get redirected to Edit form.
-  await page.waitForURL('**/edit/**');
+  // Should see created message.
+  const handle = await page.waitForSelector('.creation-message')
+  const id = await handle.getAttribute('id')
 
-  // Return id from URL
-  const p = page.url().lastIndexOf('/')
-  expect(p).toBeGreaterThan(0)
-
-  const id = page.url().substring(p + 1)
   return id
 }
 
@@ -186,6 +138,7 @@ exports.addDevice = async function(page, baseURL, idevents, powered, photo, fixe
   await page.locator(addsel).click()
 
   // Tab to category and select first.
+  await page.keyboard.press('Tab')
   await page.keyboard.press('Tab')
   await page.keyboard.press('Enter')
 

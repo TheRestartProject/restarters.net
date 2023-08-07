@@ -32,7 +32,7 @@ class ViewUsersTest extends TestCase
         $response = $this->get('/user/all');
 
         // Then the users should be in the list
-        $response->assertSeeText($users[0]->name);
+        $response->assertSeeText(e($users[0]->name));
     }
 
     /** @test */
