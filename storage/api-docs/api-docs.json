@@ -116,6 +116,9 @@
                                     },
                                     "online": {
                                         "$ref": "#/components/schemas/Event/properties/online"
+                                    },
+                                    "link": {
+                                        "$ref": "#/components/schemas/Event/properties/link"
                                     }
                                 },
                                 "type": "object"
@@ -240,6 +243,9 @@
                                     },
                                     "online": {
                                         "$ref": "#/components/schemas/Event/properties/online"
+                                    },
+                                    "link": {
+                                        "$ref": "#/components/schemas/Event/properties/link"
                                     }
                                 },
                                 "type": "object"
@@ -1129,6 +1135,11 @@
                         "format": "string",
                         "example": "United Kingdom"
                     },
+                    "country_code": {
+                        "description": "The two-letter ISO country code.",
+                        "format": "string",
+                        "example": "GB"
+                    },
                     "lat": {
                         "title": "lat",
                         "description": "Latitude of the group.",
@@ -1498,6 +1509,11 @@
                     },
                     "group": {
                         "$ref": "#/components/schemas/GroupSummary"
+                    },
+                    "link": {
+                        "title": "link",
+                        "description": "Optional web link",
+                        "type": "string"
                     },
                     "approved": {
                         "title": "hosts",
