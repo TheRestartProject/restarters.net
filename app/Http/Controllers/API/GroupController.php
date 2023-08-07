@@ -901,6 +901,7 @@ class GroupController extends Controller
                 // Note that the country returned by the geocoder is already in English, which is what we need for the
                 // value in the database.
                 $country_code = $geocoded['country_code'];
+            }
         }
 
         return array(
