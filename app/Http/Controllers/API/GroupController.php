@@ -882,9 +882,14 @@ class GroupController extends Controller
         $geocoder = new \App\Helpers\Geocoder();
         $geocoded = $geocoder->geocode($location);
 
-        if (empty($geocoded))
-        {
+        if (empty($geocoded)) {
             throw ValidationException::withMessages(['location ' => __('groups.geocode_failed')]);
+        }
+
+        if ($latitude == null || $longitude == null) {
+            // If the client didn't pass these values then grab them from the geocoded location.
+            $latitude = $geocoded['latitude'];
+            $longitude = $geocoded['longitude'];
         }
 
         // Note that the country returned by the geocoder is already in English, which is what we need for the
