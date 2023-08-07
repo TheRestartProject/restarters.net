@@ -14,11 +14,15 @@ class Geocoder
             $geocodeResponse = app('geocoder')->geocodeQuery(GeocodeQuery::create($location)->withData('location_type', [ Mapbox::TYPE_PLACE, Mapbox::TYPE_ADDRESS ]));
             $addressCollection = $geocodeResponse->get();
             $address = $addressCollection->get(0);
+
             if ($address) {
+                // We are returned the name, but we want the code.
+                $countries = array_flip(\App\Helpers\Fixometer::getAllCountries('en'));
+
                 return [
                     'latitude' => $address->getCoordinates()->getLatitude(),
                     'longitude' => $address->getCoordinates()->getLongitude(),
-                    'country' => $address->getCountry()->getName()
+                    'country_code' => $countries[$address->getCountry()->getName()]
                 ];
             }
         }
