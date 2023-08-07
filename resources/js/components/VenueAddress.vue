@@ -156,7 +156,7 @@ export default {
         // that doesn't seem to work.  So we use this method from https://github.com/mapbox/mapbox-gl-geocoder/issues/401.
         this.geocoder._inputEl.value = this.currentValue
       },
-      immediate: true
+      immediate: true,
     },
   },
   mounted() {
