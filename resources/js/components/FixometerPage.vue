@@ -77,7 +77,7 @@
               :group="group"
               :from_date="from_date"
               :to_date="to_date"
-              :total.sync="impactData.total_powered"
+              :total.sync="total_powered"
           />
         </b-tab>
         <b-tab title-item-class="w-50" title-link-class="smallpad" class="pt-2">
@@ -103,7 +103,7 @@
               :group="group"
               :from_date="from_date"
               :to_date="to_date"
-              :total.sync="impactData.total_unpowered"
+              :total.sync="total_unpowered"
           />
         </b-tab>
       </b-tabs>
