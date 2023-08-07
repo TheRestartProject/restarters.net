@@ -166,6 +166,7 @@ jobs:
 
       - run: wget https://getcomposer.org/composer-2.phar -O composer.phar; rm -rf vendor; echo Y | php8.1 composer.phar install
       - run: npm install
+      - run: php artisan lang:js --no-lib resources/js/translations.js
       - run: npx playwright install
       - run: npx playwright install-deps
       - run: npm install -D @playwright/test
