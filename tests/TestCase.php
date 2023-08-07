@@ -36,7 +36,7 @@ abstract class TestCase extends BaseTestCase
     use CreatesApplication;
 
     private $userCount = 0;
-    private $groupCount = 0;
+    public $groupCount = 0;
     private $DOM = null;
     public $lastResponse = null;
 
@@ -127,7 +127,7 @@ abstract class TestCase extends BaseTestCase
         $userAttributes['name'] = 'Test'.uniqid($this->userCount++, true);
         $userAttributes['email'] = $userAttributes['name'].'@restarters.dev';
         $userAttributes['age'] = '1982';
-        $userAttributes['country'] = 'GBR';
+        $userAttributes['country'] = 'GB';
         $userAttributes['password'] = 'letmein';
         $userAttributes['password_confirmation'] = 'letmein';
         $userAttributes['my_time'] = Carbon::now();
@@ -424,8 +424,22 @@ abstract class TestCase extends BaseTestCase
     public function eventAttributesToAPI($atts) {
         $atts['title'] = $atts['venue'];
         $atts['description'] = $atts['free_text'];
-        $atts['start'] = Carbon::parse($atts['event_start_utc'])->setTimezone('UTC')->toIso8601String();
-        $atts['end'] = Carbon::parse($atts['event_end_utc'])->setTimezone('UTC')->toIso8601String();
+
+        if (array_key_exists('event_start_utc', $atts)) {
+            $atts['start'] = Carbon::parse($atts['event_start_utc'])->setTimezone('UTC')->toIso8601String();
+            $atts['end'] = Carbon::parse($atts['event_end_utc'])->setTimezone('UTC')->toIso8601String();
+        } else {
+            // Fake an event that's two hours long.  This is necessary because PartyFactory->raw() doesn't
+            // invoke afterMaking.
+            $faker = \Faker\Factory::create();
+            $start = Carbon::parse($faker->iso8601());
+            $end = $start;
+            $end->addHours(2);
+            $atts['start'] = $start->toIso8601String();
+            $atts['end'] = $end->toIso8601String();
+        }
+
+        $atts['groupid'] = $atts['group'];
 
         return $atts;
     }

@@ -195,7 +195,7 @@ class TabicatOraTest extends TestCase
             [
                 'id_ords' => 'rcwales_1316',
                 'data_provider' => 'Repair Cafe Wales',
-                'country' => 'GBR',
+                'country' => 'GB',
                 'partner_product_category' => 'Electrical ~ acer tablet',
                 'product_category' => 'Tablet',
                 'brand' => 'acer tablet',
@@ -240,7 +240,7 @@ class TabicatOraTest extends TestCase
             [
                 'id_ords' => 'rcint_8243',
                 'data_provider' => 'Repair Café International',
-                'country' => 'GBR',
+                'country' => 'GB',
                 'partner_product_category' => 'Computers/phones ~ Tablet',
                 'product_category' => 'Tablet',
                 'brand' => 'Sony',
