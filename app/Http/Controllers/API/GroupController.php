@@ -891,17 +891,17 @@ class GroupController extends Controller
                 throw ValidationException::withMessages(['location ' => __('groups.geocode_failed')]);
             }
 
-            $country = $geocoded['country'];
+            $country_code = $geocoded['country_code'];
 
             if ($latitude == null || $longitude == null) {
                 // We have no lat/lng from the client, so use the geocoded location.
                 $latitude = $geocoded['latitude'];
                 $longitude = $geocoded['longitude'];
-
-                // Note that the country returned by the geocoder is already in English, which is what we need for the
-                // value in the database.
-                $country_code = $geocoded['country_code'];
             }
+
+            // Note that the country returned by the geocoder is already in English, which is what we need for the
+            // value in the database.
+            $country_code = $geocoded['country_code'];
         }
 
         return array(
