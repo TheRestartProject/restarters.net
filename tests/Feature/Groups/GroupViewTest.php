@@ -83,7 +83,7 @@ class GroupViewTest extends TestCase
         ]);
 
         # Check the device shows in the API.
-        $rsp2 = $this->get('/api/devices/1/10?sortBy=iddevices&sortDesc=asc&powered=true');
+        $rsp2 = $this->get('/api/devices/1/10?sortBy=iddevices&sortDesc=asc&powered=false');
         $ret = json_decode($rsp2->getContent(), true);
         self::assertEquals(1, $ret['count']);
         self::assertEquals(1, count($ret['items']));
