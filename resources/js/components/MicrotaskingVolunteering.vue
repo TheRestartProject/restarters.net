@@ -27,7 +27,7 @@
             <hr>
             </div>
 
-            <b-table-simple sticky-header="50vh" responsive class="pl-0 pr-0 pb-2 mb-2" table-class="m-0 leave-tables-alone">
+            <b-table-simple sticky-header="50vh" responsive class="pl-0 pr-0 pb-2 mb-2 bg-white p-2" table-class="m-0 leave-tables-alone">
                 <b-thead class="text-center">
                     <b-tr>
                     <b-th> </b-th>
@@ -110,7 +110,6 @@ export default {
   }
 }
 </script>
-
 <style scoped lang="scss">
 @import 'resources/global/css/_variables';
 @import '~bootstrap/scss/functions';
@@ -167,5 +166,9 @@ export default {
 
 .content {
     border-top: 3px dashed black;
+}
+
+.volunteering {
+  background-color: #ffbe5f;
 }
 </style>

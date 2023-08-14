@@ -3,16 +3,31 @@
 return [
   'title' => 'Data Workbench',
   'news' => [
-    'title' => 'Read about our recent findings',
-    'content' => 'Through our MobiFix quest, volunteers around the world helped us analyse Open Repair Alliance data on mobiles.
-                    <ul>
-                        <li><a href="https://openrepair.org/open-data/insights/mobiles" target="_blank" onclick="window.ga(\'send\', \'event\', \'microtasking\', \'news-click\', \'mobifix-openrepair-insights\')">Read the analysis</a> as prepared for a policy paper on smartphone lifetimes, and download the results yourself!</li>
-                    </ul>',
+      'title' => 'Ready about our recent award',
+      'content' =>
+      '
+       <p>
+            Every repair tells a story.  Ever since our first Restart Party, we\'ve believed that combining these stories
+            could tell us more about the world than any inidividual repair.  So, from day one we started recording 
+            every repair we attempted. 
+       </p>
+       <p>
+           Over the years we\'ve build Restarters.net for everyone to store this data and analyse the impact of repairs.
+           We\'ve worked with allies to create an open standard for recording repairs and made data tools available to communities
+           around the world.  And our insights have helped shape new Right to Repair laws in Europe.
+       </p>
+       <p>
+            <strong>You, our community</strong> have played a vital role at every stage, from recording repair data,
+            to completing online microtasks, to showing up at protests.  So, <strong>we\'re absolutely delighted
+            to tell you that we have all been awarded the European Unition Prize for Citizen Science - Digital 
+            Communities Award! <a href="https://therestartproject.org/data-and-insights/we-won-the-european-union-prize-for-citizen-science-digital-communities-award">Learn more</a>.
+            </strong>
+       </p>
+       '
   ],
   'volunteering' => [
     'title' => 'Volunteer from anywhere',
-    'content' => '<p>We collect data at community events.  But the raw data needs your help to become strong evidence for better products.  With your help, we can change the system.</p>
-<p>This is an easy way to make a difference, whether or not you can join us at our repair events.  Join us, and contribute as little or as much time and brain-power you can.  Most of the tasks here are OK for non-technical people.  And we\'re always here to help.</p>',
+    'content' => 'We occasionally run community quests to find more information in the repair data.  We do not have any live quests, but read more about our past work <a style="color:#212529;text-decoration:underline" href="https://therestartproject.org/data-and-insights/why-our-electronics-break/" target="_blank" onclick="window.ga(\'send\', \'event\', \'microtasking\', \'news-click\', \'mobifix-openrepair-insights\')">here</a>.',
     'number_of_tasks' => 'Number of tasks',
     'number_of_quests' => 'Number of quests',
     'all_volunteer_contributions' => 'Total volunteer contributions',
@@ -24,9 +39,12 @@ return [
     'try_quest' => 'Try :questname',
   ],
   'cta' => [
-    'title' => 'Help Now! MobiFix',
-    'description' => 'We see lots of smartphones at community repair events. But what’s causing them to break and what could make them easier to fix? Help us figure out the most common issues we see with smartphones with MobiFix!',
-    'get_involved' => 'Get involved',
+    'default' => [
+      'title' => 'Explore repair data',
+      'description' => '<p>Data on repair is logged in Restarters.net from community repair events around the world.  The repair data in the Fixometer is also combined with repair data from other repair networks as part of the <a target="_blank" style="color:#212529;text-decoration:underline" href="https://openrepair.org">Open Repair Alliance</a>.</p>',
+      'get_involved' => 'Get involved',
+      'short_description' => 'What are people trying to fix?  What are the barriers to repair?  Why not download the data and see what patterns you can find.',
+    ],
     'tabicat' => [
       'title' => 'Help Now! TabiCat',
       'description' => '<p>We see lots of tablets at community repair events. But what’s causing them to break and what could make them easier to fix? Help us figure out the most common issues we see with tablets with TabiCat!</p> <p>The repair data in TabiCat comes from around the world, via partners of the <a target="_blank" style="color:#212529;text-decoration:underline" href="https://openrepair.org">Open Repair Alliance</a>.</p>',
