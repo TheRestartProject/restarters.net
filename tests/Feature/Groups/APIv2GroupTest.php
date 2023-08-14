@@ -156,7 +156,7 @@ class APIv2GroupTest extends TestCase
                 'location' => 'London',
                 'description' => 'Some text.',
                 'timezone' => 'Europe/Brussels',
-                'info' => 'info@test.com'
+                'email' => 'info@test.com'
             ]
         );
 
