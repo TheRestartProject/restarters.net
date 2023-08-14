@@ -450,12 +450,12 @@ export default {
 
 .layout {
   display: grid;
-  grid-column-gap: 40px;
 
   grid-template-columns: 1fr;
 
   @include media-breakpoint-up(lg) {
-    grid-template-columns: 2fr 1.5fr 1fr;
+    grid-template-columns: 1fr 1fr;
+    grid-column-gap: 20px;
   }
 
   .group-name {
@@ -466,26 +466,30 @@ export default {
   .group-website {
     grid-row: 2 / 3;
     grid-column: 1 / 2;
-    margin-right: 2px;
   }
 
   .group-email {
     grid-row: 3 / 4;
     grid-column: 1 / 2;
-    margin-right: 2px;
+  }
+
+  .group-phone {
+    grid-row: 4 / 5;
+    grid-column: 1 / 2;
   }
 
   .group-description {
-    grid-row: 4 / 5;
+    grid-row: 5 / 6;
     grid-column: 1 / 2;
+  }
 
-    @include media-breakpoint-up(lg) {
-      grid-row: 4 / 8;
-    }
+  .group-image {
+    grid-row: 6 / 7;
+    grid-column: 1 / 2;
   }
 
   .group-location {
-    grid-row: 5 / 6;
+    grid-row: 7 / 8;
     grid-column: 1 / 2;
 
     ::v-deep(.btn) {
@@ -493,50 +497,27 @@ export default {
     }
 
     @include media-breakpoint-up(lg) {
-      grid-row: 1 / 2;
+      grid-row: 1 / 4;
       grid-column: 2 / 3;
     }
   }
 
   .group-locationmap {
-    grid-row: 6 / 7;
+    grid-row: 8 / 9;
     grid-column: 1 / 2;
 
     @include media-breakpoint-up(lg) {
-      grid-row: 1 / 4;
-      grid-column: 3 / 4;
+      grid-row: 3 / 5;
+      grid-column: 2 / 3;
     }
   }
 
   .group-timezone {
-    grid-row: 7 / 8;
-    grid-column: 1 / 2;
-    margin-right: 2px;
-
-    @include media-breakpoint-up(lg) {
-      grid-row: 2 / 3;
-      grid-column: 2 / 3;
-    }
-  }
-
-  .group-phone {
-    grid-row: 8 / 9;
-    grid-column: 1 / 2;
-    margin-right: 2px;
-
-    @include media-breakpoint-up(lg) {
-      grid-row: 3 / 4;
-      grid-column: 2 / 3;
-    }
-  }
-
-  .group-image {
     grid-row: 9 / 10;
     grid-column: 1 / 2;
-    margin-right: 2px;
 
     @include media-breakpoint-up(lg) {
-      grid-row: 4 / 5;
+      grid-row: 5 / 6;
       grid-column: 2 / 3;
     }
   }
@@ -550,8 +531,8 @@ export default {
     }
 
     @include media-breakpoint-up(lg) {
-      grid-row: 5 / 6;
-      grid-column: 2 / 4;
+      grid-row: 7 / 8;
+      grid-column: 1 / 3;
     }
   }
 
@@ -564,8 +545,8 @@ export default {
     }
 
     @include media-breakpoint-up(lg) {
-      grid-row: 7 / 8;
-      grid-column: 1 / 4;
+      grid-row: 8 / 9;
+      grid-column: 1 / 3;
     }
   }
 }
