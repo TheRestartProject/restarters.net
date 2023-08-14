@@ -25,6 +25,11 @@
           :website.sync="website"
           :has-error="$v.website.$error"
           ref="website"/>
+      <GroupEmail
+          class="flex-grow-1 group-email"
+          :email.sync="email"
+          :has-error="$v.email.$error"
+          ref="email"/>
       <div class="form-group group-description">
         <b-form-group>
           <label for="group_desc">{{ __('groups.groups_about_group') }}:</label>
@@ -170,10 +175,11 @@
 import group from '../mixins/group'
 import auth from '../mixins/auth'
 import RichTextEditor from './RichTextEditor'
-import { required, url, helpers } from 'vuelidate/lib/validators'
+import { required, url, email, helpers } from 'vuelidate/lib/validators'
 import validationHelpers from '../mixins/validationHelpers'
 import GroupName from './GroupName'
 import GroupWebsite from './GroupWebsite'
+import GroupEmail from './GroupEmail'
 import GroupLocation from './GroupLocation'
 import GroupLocationMap from './GroupLocationMap'
 import GroupTimeZone from './GroupTimeZone'
@@ -192,6 +198,7 @@ export default {
     RichTextEditor,
     GroupName,
     GroupWebsite,
+    GroupEmail,
     GroupLocation,
     GroupLocationMap,
     GroupPhone,
@@ -221,6 +228,7 @@ export default {
       location: null,
       phone: null,
       website: null,
+      email: null,
       timezone: null,
       timezoneValid: true,
       description: null,
@@ -255,6 +263,9 @@ export default {
     },
     website: {
       url
+    },
+    email: {
+      email
     }
   },
   computed: {
@@ -328,6 +339,7 @@ export default {
       this.area = group.location.area
       this.phone = group.phone
       this.website = group.website
+      this.email = group.email
       this.timezone = group.timezone
       this.description = group.description
       this.lat = parseFloat(group.location.lat)
@@ -368,6 +380,7 @@ export default {
             const id = await this.$store.dispatch('groups/create', {
               name: this.name,
               website: this.website,
+              email: this.email,
               description: this.description,
               location: this.location,
               postcode: this.postcode,
@@ -392,6 +405,7 @@ export default {
                 id: this.idgroups,
                 name: this.name,
                 website: this.website,
+                email: this.email,
                 description: this.description,
                 location: this.location,
                 postcode: this.postcode,
@@ -455,17 +469,23 @@ export default {
     margin-right: 2px;
   }
 
-  .group-description {
+  .group-email {
     grid-row: 3 / 4;
+    grid-column: 1 / 2;
+    margin-right: 2px;
+  }
+
+  .group-description {
+    grid-row: 4 / 5;
     grid-column: 1 / 2;
 
     @include media-breakpoint-up(lg) {
-      grid-row: 3 / 7;
+      grid-row: 4 / 8;
     }
   }
 
   .group-location {
-    grid-row: 4 / 5;
+    grid-row: 5 / 6;
     grid-column: 1 / 2;
 
     ::v-deep(.btn) {
@@ -479,7 +499,7 @@ export default {
   }
 
   .group-locationmap {
-    grid-row: 5 / 6;
+    grid-row: 6 / 7;
     grid-column: 1 / 2;
 
     @include media-breakpoint-up(lg) {
@@ -489,7 +509,7 @@ export default {
   }
 
   .group-timezone {
-    grid-row: 6 / 7;
+    grid-row: 7 / 8;
     grid-column: 1 / 2;
     margin-right: 2px;
 
@@ -500,7 +520,7 @@ export default {
   }
 
   .group-phone {
-    grid-row: 7 / 8;
+    grid-row: 8 / 9;
     grid-column: 1 / 2;
     margin-right: 2px;
 
@@ -511,7 +531,7 @@ export default {
   }
 
   .group-image {
-    grid-row: 8 / 9;
+    grid-row: 9 / 10;
     grid-column: 1 / 2;
     margin-right: 2px;
 
@@ -522,7 +542,7 @@ export default {
   }
 
   .group-admin {
-    grid-row: 9 / 10;
+    grid-row: 10 / 11;
     grid-column: 1 / 2;
 
     ::v-deep(.btn) {
@@ -536,7 +556,7 @@ export default {
   }
 
   .group-buttons {
-    grid-row: 9 / 10;
+    grid-row: 11 / 12;
     grid-column: 1 / 2;
 
     ::v-deep(.btn) {

@@ -20,6 +20,8 @@ return [
   'groups_about_group' => 'Tell us about your group',
   'groups_website' => 'Your website',
   'groups_website_small' => 'Don\'t have a website? Feel free to add a Facebook group or similar',
+  'groups_email' => 'Email address',
+  'groups_email_small' => 'A public contact email address for your group (optional)',
   'groups_group_small' => 'A couple of examples include \'Restarters Torino\' or \'Nottingham Fixers\'',
   'groups_location' => 'Location',
   'location' => 'Group location',

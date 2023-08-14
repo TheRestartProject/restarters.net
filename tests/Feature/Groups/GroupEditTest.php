@@ -155,4 +155,38 @@ class GroupEditTest extends TestCase
 
         self::assertTrue($found);
     }
+
+    /** @test */
+    public function edit_email()
+    {
+        $this->withoutExceptionHandling();
+
+        $group = Group::factory()->create();
+
+        $host = User::factory()->host()->create();
+        $group->addVolunteer($host);
+        $group->makeMemberAHost($host);
+
+        $this->actingAs($host);
+
+        $response = $this->get('/group/edit/' . $group->idgroups);
+        $response->assertStatus(200);
+
+        $response = $this->patch('/api/v2/groups/' . $group->idgroups, [
+            'description' => 'Test',
+            'location' => 'London',
+            'name' => 'Test',
+            'website' => 'https://therestartproject.org',
+            'free_text' => 'HQ',
+            'network_data' => [
+                'no_dummy' => 'no_dummy'
+            ],
+            'email' => 'info@test.com'
+        ]);
+
+        $response->assertSuccessful();
+
+        $group->refresh();
+        $this->assertEquals('info@test.com', $group->email);
+    }
 }
