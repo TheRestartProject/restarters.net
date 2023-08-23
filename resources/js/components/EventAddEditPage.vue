@@ -52,8 +52,8 @@ export default {
     return {
       currentid: null,
       currentdup: null,
-      event: null,
       bump: 1,
+      event: null,
       justCreated: false
     }
   },
@@ -67,7 +67,7 @@ export default {
         return null
       }
 
-      let title = this.event.venue ? this.event.venue : this.event.location
+      let title = this.event.title ? this.event.title : this.event.location
 
       // Escape it
       const div = document.createElement('div')
