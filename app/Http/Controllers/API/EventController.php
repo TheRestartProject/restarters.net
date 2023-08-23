@@ -161,9 +161,18 @@ class EventController extends Controller
             $full_name = null;
         }
 
-        // User is null, this volunteer is either anonymous or no user exists.
+        $eventRole = Role::RESTARTER;
+
         if ($request->has('user') && $request->input('user') !== 'not-registered') {
+            // User is null, this volunteer is either anonymous or no user exists.
             $user = $request->input('user');
+
+            if ($user) {
+                $u = User::find($user);
+
+                // A host of the group who is added to an event becomes a host of the event.
+                $eventRole = $u && Fixometer::userIsHostOfGroup($party->group, $user) ? Role::HOST : Role::RESTARTER;
+            }
         } else {
             $user = null;
         }
@@ -173,7 +182,7 @@ class EventController extends Controller
             ->where('user', $user)
             ->where('status', '<>', 1)
             ->whereNotNull('status')
-            ->where('role', 4);
+            ->where('role', $eventRole);
         $userWasInvited = $invitedUserQuery->count() == 1;
 
         if ($userWasInvited) {
@@ -186,12 +195,10 @@ class EventController extends Controller
                 'event' => $idevents,
                 'user' => $user,
                 'status' => 1,
-                'role' => 4,
+                'role' => $eventRole,
                 'full_name' => $full_name,
             ]);
         }
-
-        $party->increment('volunteers');
 
         if (!is_null($volunteer_email_address)) {
             // Send email.
@@ -496,8 +503,6 @@ class EventController extends Controller
             'status' => 1,
             'role' => Role::HOST,
         ]);
-
-        $party->increment('volunteers');
 
         // Notify relevant users.
         $usersToNotify = Fixometer::usersWhoHavePreference('admin-moderate-event');
