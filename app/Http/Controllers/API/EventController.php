@@ -171,7 +171,7 @@ class EventController extends Controller
                 $u = User::find($user);
 
                 // A host of the group who is added to an event becomes a host of the event.
-                $eventRole = $u && $u->role == Role::HOST && Fixometer::userIsHostOfGroup($party->group, $user) ? Role::HOST : Role::RESTARTER;
+                $eventRole = $u && Fixometer::userIsHostOfGroup($party->group, $user) ? Role::HOST : Role::RESTARTER;
             }
         } else {
             $user = null;
