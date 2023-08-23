@@ -33,6 +33,8 @@
           :to_date.sync="to_date"
           :start-expanded-items="startExpandedItems"
           :start-expanded-events="startExpandedEvents"
+          @expandItems="startExpandedItems = $event"
+          @expandEvents="startExpandedEvents = $event"
       />
       <FixometerFilters
           v-show="tabIndex === 1"
@@ -51,6 +53,8 @@
           :to_date.sync="to_date"
           :start-expanded-items="startExpandedItems"
           :start-expanded-events="startExpandedEvents"
+          @expandItems="startExpandedItems = $event"
+          @expandEvents="startExpandedEvents = $event"
       />
       <b-tabs class="ourtabs ourtabs-brand w-100 d-none d-md-block" v-model="tabIndex">
         <b-tab active title-item-class="w-50" title-link-class="smallpad" class="pt-2">
@@ -77,7 +81,7 @@
               :group="group"
               :from_date="from_date"
               :to_date="to_date"
-              :total.sync="impactData.total_powered"
+              :total.sync="total_powered"
           />
         </b-tab>
         <b-tab title-item-class="w-50" title-link-class="smallpad" class="pt-2">
@@ -96,6 +100,7 @@
               :barrier-list="barrierList"
               :itemTypes="itemTypes"
               :category="category_unpowered"
+              :model="model"
               :item_type="item_type"
               :comments="comments"
               :wiki="wiki"
@@ -103,7 +108,7 @@
               :group="group"
               :from_date="from_date"
               :to_date="to_date"
-              :total.sync="impactData.total_unpowered"
+              :total.sync="total_unpowered"
           />
         </b-tab>
       </b-tabs>
@@ -122,6 +127,8 @@
               :barrier-list="barrierList"
               :itemTypes="itemTypes"
               :category="category_powered"
+              :brand="brand"
+              :model="model"
               :item_type="item_type"
               :comments="comments"
               :wiki="wiki"
@@ -146,6 +153,7 @@
               :barrier-list="barrierList"
               :itemTypes="itemTypes"
               :category="category_unpowered"
+              :model="model"
               :item_type="item_type"
               :comments="comments"
               :wiki="wiki"
