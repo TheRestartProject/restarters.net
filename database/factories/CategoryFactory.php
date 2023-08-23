@@ -64,6 +64,7 @@ class CategoryFactory extends Factory
         'footprint' => 1,
         'weight' => 1,
         'aggregate' => 0,
+        'powered' => 0
     ];
         });
     }
@@ -78,6 +79,7 @@ class CategoryFactory extends Factory
         'footprint' => 2,
         'weight' => 2,
         'aggregate' => 0,
+        'powered' => 1
     ];
         });
     }
