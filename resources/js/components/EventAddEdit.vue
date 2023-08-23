@@ -317,9 +317,6 @@ export default {
   },
   methods: {
     async submit() {
-      // Events are created via form submission - we don't yet have an API call to do this over AJAX.  Therefore
-      // this page and the subcomponents have form inputs with suitable names.
-      //
       // Check the form is valid.
       this.$v.$touch()
 
