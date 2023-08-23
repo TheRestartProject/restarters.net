@@ -68,12 +68,9 @@ L.Icon.Default.mergeOptions({
 Vue.use(BootstrapVue)
 Vue.use(IconsPlugin)
 
-// Set up internationalisation.  translations.js is built in webpack.mix.js from the PHP lang folder.
-import lang from 'lang.js';
-import translations from './translations.js';
-const Lang = new lang()
-Lang.setFallback('en')
-Lang.setMessages(translations)
+import LangMixin from './mixins/lang'
+import { Lang } from './mixins/lang'
+Vue.mixin(LangMixin)
 
 window.Dropzone = require('dropzone');
 window.Tokenfield = require("tokenfield");
@@ -1276,36 +1273,6 @@ jQuery(document).ready(function () {
       return event
     }
   });
-
-  // Vue.
-  //
-  // Create a mixin for translation.
-  Vue.mixin({
-    computed: {
-      $lang() {
-        // We want this to be available in all components.
-        return Lang
-      }
-    },
-    methods: {
-      __(key) {
-        // This means we can use __('key') in Vue templates in the same way as we are used to in Laravel
-        // templates.
-        if (this.$lang.has(key)) {
-          return this.$lang.get(key)
-        } else {
-          Sentry.captureMessage("Missing translation " + key)
-        }
-      },
-      __(key, values) {
-        if (this.$lang.has(key)) {
-          return this.$lang.get(key, values)
-        } else {
-          Sentry.captureMessage("Missing translation " + key)
-        }
-      }
-    }
-  })
 
   // We use Leaflet
   Vue.use({

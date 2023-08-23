@@ -410,19 +410,48 @@ class Device extends Model implements Auditable
 
     public static function getItemTypes()
     {
-        // List the item types
-        $types = DB::select(DB::raw("SELECT s.* FROM 
-(SELECT item_type, powered, idcategories, categories.name as categoryname, COUNT(*) AS count 
-FROM devices INNER JOIN categories ON devices.category = categories.idcategories 
-WHERE item_type IS NOT NULL GROUP BY item_type, categoryname
-) s 
-JOIN 
-(SELECT item_type, MAX(count) AS maxcount FROM 
-(SELECT item_type, powered, idcategories, categories.name as categoryname, COUNT(*) AS count 
-FROM devices INNER JOIN categories ON devices.category = categories.idcategories 
-WHERE item_type IS NOT NULL GROUP BY item_type, categoryname) s
-GROUP BY s.item_type) AS m
-ON s.item_type = m.item_type AND s.count = m.maxcount;"));
+        // List the item types.
+        //
+        // This is a beast of a query, but the basic idea is to return a list of the categories most commonly
+        // used by the item types.
+        //
+        // ANY_VALUE is used to suppress errors when SQL mode is not set to ONLY_FULL_GROUP_BY.
+        $types = DB::select(DB::raw("
+            SELECT item_type,
+                   ANY_VALUE(powered)      AS powered,
+                   ANY_VALUE(idcategories) AS idcategories,
+                   ANY_VALUE(categoryname)
+            FROM   (SELECT DISTINCT s.*
+                    FROM   (SELECT item_type,
+                                   ANY_VALUE(powered)      AS powered,
+                                   ANY_VALUE(idcategories) AS idcategories,
+                                   categories.name         AS categoryname,
+                                   COUNT(*)                AS count
+                            FROM   devices
+                                   INNER JOIN categories
+                                           ON devices.category = categories.idcategories
+                            WHERE  item_type IS NOT NULL
+                            GROUP  BY categoryname,
+                                      item_type) s
+                           JOIN (SELECT item_type,
+                                        MAX(count) AS maxcount
+                                 FROM   (SELECT item_type               AS item_type,
+                                                ANY_VALUE(powered)      AS powered,
+                                                ANY_VALUE(idcategories) AS idcategories,
+                                                categories.name         AS categoryname,
+                                                COUNT(*)                AS count
+                                         FROM   devices
+                                                INNER JOIN categories
+                                                        ON devices.category =
+                                                           categories.idcategories
+                                         WHERE  item_type IS NOT NULL
+                                         GROUP  BY categoryname,
+                                                   item_type) s
+                                 GROUP  BY s.item_type) AS m
+                             ON s.item_type = m.item_type
+                                AND s.count = m.maxcount) t
+            GROUP BY t.item_type
+"));
 
         return $types;
     }
