@@ -242,6 +242,7 @@ class PartyController extends Controller
             'user_groups' => $groupsUserIsInChargeOf,
             'userInChargeOfMultipleGroups' => $userInChargeOfMultipleGroups,
             'audits' => $audits,
+            'selected_group_id' => $party->group,
         ]);
     }
 
@@ -284,6 +285,7 @@ class PartyController extends Controller
             'user_groups' => $groupsUserIsInChargeOf,
             'userInChargeOfMultipleGroups' => $userInChargeOfMultipleGroups,
             'duplicateFrom' => $party->idevents,
+            'selected_group_id' => $party->group,
         ]);
     }
 

@@ -75,110 +75,61 @@ class ExportController extends Controller
 
         $me = auth()->user();
 
-        // Do not include model column
-        if ($host == 'therestartproject.org') {
-            $columns = [
-                'Item Type',
-                'Product Category',
-                'Brand',
-                'Comments',
-                'Repair Status',
-                'Spare parts (needed/used)',
-                'Event',
-                'Group',
-                'Date',
-                'Waste Prevented',
-                'CO2 Prevented',
-            ];
+        $columns = [
+            'Item Type',
+            'Product Category',
+            'Brand',
+            'Model',
+            'Comments',
+            'Repair Status',
+            'Spare parts (needed/used)',
+            'Event',
+            'Group',
+            'Date',
+            'Waste Prevented',
+            'CO2 Prevented',
+            'Powered'
+        ];
 
-            fputcsv($file, $columns);
+        fputcsv($file, $columns);
+        $party = null;
 
-            foreach ($all_devices as $device) {
-                set_time_limit(60);
-                if (User::userCanSeeEvent($me, $event)) {
-                    $wasteImpact = 0;
-                    $co2Diverted = 0;
+        foreach ($all_devices as $device) {
+            set_time_limit(60);
+            $party = !$party || $party->idevents != $device->event ? Party::findOrFail($device->event) : $party;
 
-                    if ($device->isFixed()) {
-                        if ($device->deviceCategory->powered) {
-                            $wasteImpact = $device->eWasteDiverted();
-                            $co2Diverted = $device->eCo2Diverted($eEmissionRatio, $displacementFactor);
-                        } else {
-                            $wasteImpact = $device->uWasteDiverted();
-                            $co2Diverted = $device->uCo2Diverted($uEmissionratio, $displacementFactor);
-                        }
-                    }
+            if (User::userCanSeeEvent($me, $party)) {
+                $wasteImpact = 0;
+                $co2Diverted = 0;
 
-                    fputcsv($file, [
-                        $device->item_type,
-                        $device->deviceCategory->name,
-                        $device->brand,
-                        $device->problem,
-                        $device->getRepairStatus(),
-                        $device->getSpareParts(),
-                        $device->deviceEvent->getEventName(),
-                        $device->deviceEvent->theGroup->name,
-                        $device->deviceEvent->getFormattedLocalStart('Y-m-d'),
-                        $wasteImpact,
-                        $co2Diverted
-                    ]);
-                }
-            }
-        } else {
-            $columns = [
-                'Item Type',
-                'Product Category',
-                'Brand',
-                'Model',
-                'Comments',
-                'Repair Status',
-                'Spare parts (needed/used)',
-                'Event',
-                'Group',
-                'Date',
-                'Waste Prevented',
-                'CO2 Prevented',
-            ];
-
-            fputcsv($file, $columns);
-            $party = null;
-
-            foreach ($all_devices as $device) {
-                set_time_limit(60);
-                $party = !$party || $party->idevents != $device->event ? Party::findOrFail($device->event) : $party;
-
-                if (User::userCanSeeEvent($me, $party)) {
-                    $wasteImpact = 0;
-                    $co2Diverted = 0;
-
-                    if ($device->isFixed())
+                if ($device->isFixed())
+                {
+                    if ($device->deviceCategory->powered)
                     {
-                        if ($device->deviceCategory->powered)
-                        {
-                            $wasteImpact = $device->eWasteDiverted();
-                            $co2Diverted = $device->eCo2Diverted($eEmissionRatio, $displacementFactor);
-                        } else
-                        {
-                            $wasteImpact = $device->uWasteDiverted();
-                            $co2Diverted = $device->uCo2Diverted($uEmissionratio, $displacementFactor);
-                        }
+                        $wasteImpact = $device->eWasteDiverted();
+                        $co2Diverted = $device->eCo2Diverted($eEmissionRatio, $displacementFactor);
+                    } else
+                    {
+                        $wasteImpact = $device->uWasteDiverted();
+                        $co2Diverted = $device->uCo2Diverted($uEmissionratio, $displacementFactor);
                     }
-
-                    fputcsv($file, [
-                        $device->item_type,
-                        $device->deviceCategory->name,
-                        $device->brand,
-                        $device->model,
-                        $device->problem,
-                        $device->getRepairStatus(),
-                        $device->getSpareParts(),
-                        $device->deviceEvent->getEventName(),
-                        $device->deviceEvent->theGroup->name,
-                        $device->deviceEvent->getFormattedLocalStart('Y-m-d'),
-                        $wasteImpact,
-                        $co2Diverted,
-                    ]);
                 }
+
+                fputcsv($file, [
+                    $device->item_type,
+                    $device->deviceCategory->name,
+                    $device->brand,
+                    $device->model,
+                    $device->problem,
+                    $device->getRepairStatus(),
+                    $device->getSpareParts(),
+                    $device->deviceEvent->getEventName(),
+                    $device->deviceEvent->theGroup->name,
+                    $device->deviceEvent->getFormattedLocalStart('Y-m-d'),
+                    $wasteImpact,
+                    $co2Diverted,
+                    $device->deviceCategory->powered ? 'Powered' : 'Unpowered'
+                ]);
             }
         }
 
