@@ -52,7 +52,7 @@ class EditWordpressPostForEvent
                 $group = Group::where('idgroups', $theParty->group)->first();
 
                 $custom_fields = [
-                    ['key' => 'party_grouphash', 'value' => $data['group']],
+                    ['key' => 'party_grouphash', 'value' => $theParty->group],
                     ['key' => 'party_groupcountry', 'value' => Fixometer::getCountryFromCountryCode($group->country_code)],
                     ['key' => 'party_groupcity', 'value' => $group->area],
                     ['key' => 'party_venue', 'value' => $data['venue']],

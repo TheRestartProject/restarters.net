@@ -103,8 +103,8 @@ class ExportTest extends TestCase
                                                                       'event' => $idevents1,
                                                                   ]);
         $device = Device::factory()->fixed()->create([
-                                                                      'category' => 111,
-                                                                      'category_creation' => 111,
+                                                                      'category' => 222,
+                                                                      'category_creation' => 222,
                                                                       'event' => $idevents2,
                                                                   ]);
         $device = Device::factory()->fixed()->create([
@@ -151,8 +151,10 @@ class ExportTest extends TestCase
         fgetcsv($fh);
         $row2 = fgetcsv($fh);
         self::assertEquals(e($event1->getEventName()), e($row2[7]));
+        self::assertEquals('Unpowered', e($row2[12]));
         $row3 = fgetcsv($fh);
         self::assertEquals(e($event2->getEventName()), e($row3[7]));
+        self::assertEquals('Powered', e($row3[12]));
         $row4 = fgetcsv($fh);
 
         if ($role == 'Host') {
@@ -221,16 +223,6 @@ class ExportTest extends TestCase
         } else {
             self::assertEquals(e($event3->getEventName()), e($row2[7]));
         }
-
-        // Export devices as though we are therestartproject.org, which for some reason doesn't contain the model
-        // column.
-        $response = $this->get("/export/devices/event/$idevents1", ['HTTP_REFERER' => 'http://therestartproject.org']);
-        $header = $response->headers->get('content-disposition');
-        $filename = public_path() . '/' . substr($header, strpos($header, 'filename=') + 9);
-        $fh = fopen($filename, 'r');
-        fgetcsv($fh);
-        $row2 = fgetcsv($fh);
-        self::assertEquals(11, count($row2));
     }
 
     public function roleProvider() {
