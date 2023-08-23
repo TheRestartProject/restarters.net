@@ -47,10 +47,12 @@ export default {
     },
     dayofmonth() {
       // Local time.
+      moment.locale(this.$lang.getLocale())
       return this.event ? (new moment(this.event.event_date_local).format('DD')) : null
     },
     month() {
       // Local time.
+      moment.locale(this.$lang.getLocale())
       return this.event ? (new moment(this.event.event_date_local).format('MMM').toUpperCase()) : null
     },
     timezone() {
