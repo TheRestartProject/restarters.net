@@ -22,13 +22,13 @@
       <div class="vue">
       <EventAddEditPage
           csrf="{{ csrf_token() }}"
-          :duplicate-from="<?php echo isset($duplicateFrom) ? $duplicateFrom : 'null'; ?>"
+          :duplicate-from="<?php echo isset($duplicateFrom) ? e(json_encode($duplicateFrom, JSON_INVALID_UTF8_IGNORE)) : 'null'; ?>"
           @if( App\Helpers\Fixometer::hasRole($user, 'Administrator') )
           :groups="{{ json_encode($allGroups, JSON_INVALID_UTF8_IGNORE) }}"
           @else
           :groups="{{ json_encode($user_groups, JSON_INVALID_UTF8_IGNORE) }}"
           @endif
-          :can-approve="<?php echo (App\Helpers\Fixometer::hasRole($user, 'Administrator') || App\Helpers\Fixometer::hasRole($user, 'NetworkCoordinator')) ? 'true' : 'false' ?>"
+          :can-approve="{{ (App\Helpers\Fixometer::hasRole( Auth::user(), 'Administrator') || ($selected_group_id && Auth::user()->isCoordinatorForGroup(App\Group::find($selected_group_id)))) ? "true" : "false" }}"
       />
     </div>
 
