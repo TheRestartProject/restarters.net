@@ -33,6 +33,8 @@
           :to_date.sync="to_date"
           :start-expanded-items="startExpandedItems"
           :start-expanded-events="startExpandedEvents"
+          @expandItems="startExpandedItems = $event"
+          @expandEvents="startExpandedEvents = $event"
       />
       <FixometerFilters
           v-show="tabIndex === 1"
@@ -51,6 +53,8 @@
           :to_date.sync="to_date"
           :start-expanded-items="startExpandedItems"
           :start-expanded-events="startExpandedEvents"
+          @expandItems="startExpandedItems = $event"
+          @expandEvents="startExpandedEvents = $event"
       />
       <b-tabs class="ourtabs ourtabs-brand w-100 d-none d-md-block" v-model="tabIndex">
         <b-tab active title-item-class="w-50" title-link-class="smallpad" class="pt-2">
