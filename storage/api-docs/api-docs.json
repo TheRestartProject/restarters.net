@@ -246,6 +246,9 @@
                                     },
                                     "link": {
                                         "$ref": "#/components/schemas/Event/properties/link"
+                                    },
+                                    "network_data": {
+                                        "description": "Network-defined JSON data"
                                     }
                                 },
                                 "type": "object"
