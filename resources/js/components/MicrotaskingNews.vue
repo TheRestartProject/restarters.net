@@ -12,11 +12,11 @@
           </template>
 
           <template slot="content">
-            <div class="d-flex justify-content-between content pt-4">
-              <div class="embed-responsive embed-responsive-16by9 mr-4 w-50">
+            <div class="d-flex justify-content-lg-between flex-column flex-lg-row content pt-4">
+              <div class="embed-responsive embed-responsive-16by9 mr-4 w-100 w-lg-50">
                 <iframe class="embed-responsive-item" src="https://www.youtube.com/embed/svnC5QPK9mY"></iframe>
               </div>
-              <div v-html="__('microtasking.news.content')" class="pt-3 w-50" />
+              <div v-html="__('microtasking.news.content')" class="pt-3 w-100 w-lg-50" />
             </div>
           </template>
       </CollapsibleSection>

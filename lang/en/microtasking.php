@@ -3,7 +3,7 @@
 return [
   'title' => 'Data Workbench',
   'news' => [
-      'title' => 'Ready about our recent award',
+      'title' => 'Read about our recent award',
       'content' =>
       '
        <p>

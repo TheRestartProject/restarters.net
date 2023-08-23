@@ -13,9 +13,7 @@
               <div class="flex-grow-1">
                 <div v-html="translatedDescription" />
                 <div v-html="translatedShortDescription" />
-              </div>
-              <div style="align-self:center; justify-self:right" v-if="activeQuest !== 'default'">
-                <a :href="activeQuest" style="align-self: center" class="btn btn-primary pull-right">{{ translatedGetInvolved }}</a>
+                <a :href="activeQuest" style="align-self: center" class="btn btn-primary mt-2">{{ translatedGetInvolved }}</a>
               </div>
             </div>
         </template>
