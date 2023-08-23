@@ -250,6 +250,12 @@ export default {
     this.current_wiki = this.wiki
   },
   watch: {
+    startExpandedItems (newVal) {
+      this.expandedItems = newVal
+    },
+    startExpandedEvents (newVal) {
+      this.expandedEvents = newVal
+    },
     current_category(newVal) {
       this.$emit('update:category', newVal)
     },
@@ -281,9 +287,11 @@ export default {
   methods: {
     toggleItems() {
       this.expandedItems = !this.expandedItems
+      this.$emit('expandItems', this.expandedItems)
     },
     toggleEvents() {
       this.expandedEvents = !this.expandedEvents
+      this.$emit('expandEvents', this.expandedEvents)
     }
   }
 }

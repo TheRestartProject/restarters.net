@@ -1,0 +1,24 @@
+{
+//        "collectCoverage": true,
+//        "collectCoverageFrom": ["**/resources/js/components/*.{js,vue}", "!**/node_modules/**"]
+    "moduleFileExtensions": [
+        "js",
+        "json",
+        "vue"
+    ],
+        "transform": {
+        ".*\\.(vue)$": "@vue/vue2-jest",
+        "^.+\\.(js|jsx)$": "babel-jest"
+    },
+    "roots": [
+        "<rootDir>/resources/js/components"
+    ],
+    "modulePaths": [
+        "<rootDir>"
+    ],
+    "moduleDirectories": [
+        "node_modules"
+    ],
+    "setupFilesAfterEnv": ["<rootDir>/tests/jest.setup.js"],
+    "testEnvironment": "jsdom"
+}

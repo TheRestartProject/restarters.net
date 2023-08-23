@@ -2,15 +2,20 @@
 
 namespace Tests\Feature;
 
+use App\Events\UserConfirmedEvent;
+use App\Events\UserLeftEvent;
 use App\EventsUsers;
 use App\Group;
 use App\Helpers\Geocoder;
 use App\Helpers\RepairNetworkService;
+use App\Listeners\AddUserToDiscourseThreadForEvent;
+use App\Listeners\RemoveUserFromDiscourseThreadForEvent;
 use App\Network;
 use App\Notifications\AdminModerationEvent;
 use App\Notifications\NotifyRestartersOfNewEvent;
 use App\Party;
 use App\Role;
+use App\Services\DiscourseService;
 use App\User;
 use Carbon\Carbon;
 use DB;
@@ -453,13 +458,17 @@ class CreateEventTest extends TestCase
     public function a_host_can_be_added_later()
     {
         $this->withoutExceptionHandling();
+        Queue::fake();
 
         $host = User::factory()->host()->create();
+        $host2 = User::factory()->host()->create();
         $this->actingAs($host);
 
         $group = Group::factory()->create();
         $group->addVolunteer($host);
         $group->makeMemberAHost($host);
+        $group->addVolunteer($host2);
+        $group->makeMemberAHost($host2);
 
         // Create the event
         $eventAttributes = Party::factory()->raw(['group' => $group->idgroups, 'event_date' => '2000-01-01', 'approved' => true]);
@@ -469,11 +478,26 @@ class CreateEventTest extends TestCase
         // Find the event id
         $party = $group->parties()->latest()->first();
 
+        // Add the second host.
+        $response = $this->put('/api/events/' . $party->idevents . '/volunteers?api_token=' . $host->api_token, [
+            'volunteer_email_address' => $host2->email,
+            'full_name' => $host2->name,
+            'user' => $host2->id,
+        ]);
+
+        $response->assertSuccessful();
+
         // Remove the host from the event
         $volunteer = EventsUsers::where('user', $host->id)->first();
         $this->post('/party/remove-volunteer/', [
             'id' => $volunteer->idevents_users,
         ])->assertSee('true');
+
+        Queue::assertPushed(\Illuminate\Events\CallQueuedListener::class, function ($job) use ($party, $host) {
+            if ($job->class == RemoveUserFromDiscourseThreadForEvent::class) {
+                return true;
+            }
+        });
 
         // Assert that we see the host in the list of volunteers to add to the event.
         $response = $this->get('/api/groups/'. $group->idgroups . '/volunteers?api_token=' . $host->api_token);
@@ -486,7 +510,10 @@ class CreateEventTest extends TestCase
         ]);
 
         // Assert we can add them back in.
-        $response = $this->put('/api/events/' . $party->idevents . '/volunteers', [
+        $party->discourse_thread = 123;
+        $party->save();
+
+        $response = $this->put('/api/events/' . $party->idevents . '/volunteers?api_token=' . $host->api_token, [
             'volunteer_email_address' => $host->email,
             'full_name' => $host->name,
             'user' => $host->id,
@@ -495,6 +522,30 @@ class CreateEventTest extends TestCase
         $response->assertSuccessful();
         $rsp = json_decode($response->getContent(), TRUE);
         $this->assertEquals('success', $rsp['success']);
+
+        // Check the listener was queued to be called in the background.
+        Queue::assertPushed(\Illuminate\Events\CallQueuedListener::class, function ($job) use ($party, $host) {
+            if ($job->class == AddUserToDiscourseThreadForEvent::class) {
+                return true;
+            }
+        });
+
+        // Manually call the listener for coverage and check it calls through to Discourse.
+        $this->instance(
+            DiscourseService::class,
+            \Mockery::mock(DiscourseService::class, function ($mock) {
+                $mock->shouldReceive('addUserToPrivateMessage')->once();
+                $mock->shouldReceive('removeUserFromPrivateMessage')->once();
+            })
+        );
+
+        $listener = app()->make(AddUserToDiscourseThreadForEvent::class);
+        $event = new UserConfirmedEvent($party->idevents, $host->id);
+        $listener->handle($event);
+
+        $listener = app()->make(RemoveUserFromDiscourseThreadForEvent::class);
+        $event = new UserLeftEvent($party->idevents, $host->id);
+        $listener->handle($event);
     }
 
     public function provider()
@@ -634,6 +685,8 @@ class CreateEventTest extends TestCase
     /** @test */
     public function notifications_are_queued_as_expected()
     {
+        Notification::fake();
+
         // At the moment we are queueing (backgrounding) admin notifications but not user notifications.
         //
         // Don't call Notification::fake() - we want real notifications.
@@ -641,6 +694,7 @@ class CreateEventTest extends TestCase
 
         // Create an admin
         $admin = User::factory()->administrator()->create();
+
         // Create a network with a group.
         $network = Network::factory()->create();
         $group = Group::factory()->create();
@@ -655,47 +709,23 @@ class CreateEventTest extends TestCase
         $group->makeMemberAHost($host);
         $this->actingAs($host);
 
-        // Clear any jobs queued in earlier tests.
-        $max = 1000;
-        do {
-            $job = Queue::pop('database');
-
-            if ($job) {
-                try {
-                    $job->fail('removed in UT');
-                } catch (\Exception $e) {}
-            }
-
-            $max--;
-        }
-        while (Queue::size() > 0 && $max > 0);
-
         // Create an event.
-        $initialQueueSize = \Illuminate\Support\Facades\Queue::size('database');
         $event = Party::factory()->raw();
         $event['group'] = $group->idgroups;
         $response = $this->post('/api/v2/events?api_token=' . $host->api_token, $this->eventAttributesToAPI($event));
         $response->assertSuccessful();
 
-        // Should have queued AdminModerationEvent.
-        $queueSize = Queue::size();
-        self::assertGreaterThan($initialQueueSize, $queueSize);
+        Notification::assertSentTo(
+            [$admin], AdminModerationEvent::class
+        );
 
-        // Fail it.
-        $job = Queue::pop();
-        self::assertNotNull($job);
-        self::assertStringContainsString('AdminModerationEvent', $job->getRawBody());
-        try {
-            $job->fail('removed in UT');
-        } catch (\Exception $e) {}
-        self::assertEquals(0, Queue::size('database'));
-
-        // Approval should generate a notification to the host which is also queued.
+        // Approval should generate a notification to the host.
         $event = Party::latest()->first();
         $event->approve();
 
-        # Should have queued ApproveEvent.
-        self::assertEquals(0, Queue::size('database'));
+        Notification::assertSentTo(
+            [$host], EventConfirmed::class
+        );
     }
 
     /** @test */

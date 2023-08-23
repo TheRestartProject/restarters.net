@@ -242,6 +242,7 @@ class PartyController extends Controller
             'user_groups' => $groupsUserIsInChargeOf,
             'userInChargeOfMultipleGroups' => $userInChargeOfMultipleGroups,
             'audits' => $audits,
+            'selected_group_id' => $party->group,
         ]);
     }
 
@@ -284,6 +285,7 @@ class PartyController extends Controller
             'user_groups' => $groupsUserIsInChargeOf,
             'userInChargeOfMultipleGroups' => $userInChargeOfMultipleGroups,
             'duplicateFrom' => $party->idevents,
+            'selected_group_id' => $party->group,
         ]);
     }
 
@@ -418,15 +420,12 @@ class PartyController extends Controller
                                                               ]);
 
 
-                    $event->increment('volunteers');
-
                     $flashData = [];
                     if (! Auth::user()->isInGroup($event->theGroup->idgroups)) {
                         $flashData['prompt-follow-group'] = true;
                     }
 
                     $this->notifyHostsOfRsvp($user_event, $event_id);
-                    $this->addToDiscourseThread($event, Auth::user());
 
                     return redirect()->back()->with($flashData);
                 }
@@ -469,30 +468,6 @@ class PartyController extends Controller
                 ]));
             } catch (\Exception $ex) {
                 Log::error('An error occurred when trying to notify host of invitation confirmation: '.$ex->getMessage());
-            }
-        }
-    }
-
-    public function addToDiscourseThread($event, $user)
-    {
-        if ($event->discourse_thread) {
-            // We want a host of the event to add the user to the thread.
-            try {
-                $hosts = User::join('events_users', 'events_users.user', '=', 'users.id')
-                    ->where('events_users.event', $event->idevents)
-                    ->where('events_users.role', 3)
-                    ->select('users.*')
-                    ->get();
-            } catch (\Exception $e) {
-                $hosts = null;
-            }
-
-            if (! is_null($hosts) && count($hosts)) {
-                $this->discourseService->addUserToPrivateMessage(
-                    $event->discourse_thread,
-                    $hosts[0]->username,
-                    $user->username
-                );
             }
         }
     }
@@ -605,11 +580,6 @@ class PartyController extends Controller
                 $delete_user = $volunteer->delete();
 
                 if ($delete_user == 1) {
-                    //If the user accepted the invitation, we decrement
-                    if ($volunteer->status == 1) {
-                        Party::find($event_id)->decrement('volunteers');
-                    }
-
                     //Return JSON
                     $return = [
                         'success' => true,
@@ -750,10 +720,8 @@ class PartyController extends Controller
 
             // Increment volunteers column to include latest invite
             $event = Party::find($event_id);
-            $event->increment('volunteers');
 
             $this->notifyHostsOfRsvp($user_event, $event_id);
-            $this->addToDiscourseThread($event, Auth::user());
 
             return redirect('/party/view/'.$user_event->event);
         }
@@ -764,7 +732,10 @@ class PartyController extends Controller
 
     public function cancelInvite($event_id)
     {
-        EventsUsers::where('user', Auth::user()->id)->where('event', $event_id)->delete();
+        // We have to do a loop to avoid the gotcha where bulk delete operations don't invoke observers.
+        foreach (EventsUsers::where('user', Auth::user()->id)->where('event', $event_id)->get() as $delete) {
+            $delete->delete();
+        };
 
         return redirect('/party/view/'.intval($event_id))->with('success', __('events.invite_cancelled'));
     }
@@ -865,7 +836,12 @@ class PartyController extends Controller
 
         Audits::where('auditable_type', \App\Party::class)->where('auditable_id', $id)->delete();
         Device::where('event', $id)->delete();
-        EventsUsers::where('event', $id)->delete();
+
+        // We have to do a loop to avoid the gotcha where bulk delete operations don't invoke observers.
+        foreach (EventsUsers::where('event', $id)->get() as $delete) {
+            $delete->delete();
+        };
+
         $event->delete();
 
         event(new EventDeleted($event));
