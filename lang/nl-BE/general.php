@@ -22,7 +22,6 @@ return [
   'menu_wiki' => 'Wiki',
   'new_group' => 'Een nieuwe groep maken',
   'other_profile' => 'profiel',
-  'party_reporting' => 'Activiteitenverslagen',
   'please_select' => 'Selecteer iets aub',
   'profile' => 'Jouw profiel',
   'profile_content' => 'Schrijf hier wat info over jezelf. Zo leg je  makkelijker contact met andere  organisatoren en herstellers. Je info geeft ons ook meer inzicht in de Repair Community.',
