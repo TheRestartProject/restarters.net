@@ -25,10 +25,10 @@
       </b-td>
       <b-td v-if="powered" class="d-td-cell d-md-none">
         <div>
-          <span class="pl-0 pl-md-2 pr-2 clickme edit" @click="editDevice">
+          <span class="pl-0 pl-md-2 pr-4 clickme edit" @click="editDevice">
             <b-img class="icon edit" src="/icons/edit_ico_green.svg" />
           </span>
-          <span class="pl-2 pr-2 clickme" @click="deleteConfirm">
+          <span class="pr-2 clickme" @click="deleteConfirm">
             <b-img class="icon" src="/icons/delete_ico_red.svg" />
           </span>
         </div>

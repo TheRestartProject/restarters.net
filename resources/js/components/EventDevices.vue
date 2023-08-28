@@ -71,12 +71,12 @@
             </div>
           </template>
           <template slot="title-right">
-            <div class="d-flex text-brand small">
-              <div class="ml-2 mr-1 pt-1 lower small align-self-center">
+            <div class="d-flex text-brand small text-center">
+              <div class="ml-2 mr-1 pt-1 lower small">
                 <b-img src="/images/trash_brand.svg" class="icon" />
                 {{ Math.round(stats.waste_powered) }}
               </div>
-              <div class="ml-1 mr-1 lower pt-1 small align-self-center">
+              <div class="ml-1 mr-1 lower pt-1 small">
                 <b-img src="/images/co2_brand.svg" class="icon" />
                 {{ Math.round(stats.co2_powered) }}
               </div>
@@ -100,12 +100,12 @@
             </div>
           </template>
           <template slot="title-right">
-            <div class="d-flex text-brand small">
-              <div class="ml-2 mr-1 pt-1 lower small align-self-center">
+            <div class="d-flex text-brand small text-center">
+              <div class="ml-2 mr-1 pt-1 lower small">
                 <b-img src="/images/trash_brand.svg" class="icon" />
                 {{ Math.round(stats.waste_unpowered) }}
               </div>
-              <div class="ml-1 mr-1 lower pt-1 small align-self-center">
+              <div class="ml-1 mr-1 lower pt-1 small">
                 <b-img src="/images/co2_brand.svg" class="icon" />
                 {{ Math.round(stats.co2_unpowered) }}
               </div>
