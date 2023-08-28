@@ -111,7 +111,7 @@ class ExportTest extends TestCase
                                                                   ]);
 
         // Export parties.
-        $response = $this->get("/export/group/{$group1->idgroups}/events");
+        $response = $this->get("/export/groups/{$group1->idgroups}/events");
         $response->assertSuccessful();
         $filename = 'events.csv';
         $fh = fopen($filename, 'r');
@@ -120,7 +120,7 @@ class ExportTest extends TestCase
         self::assertEquals($event1->getEventName(), $row2[1]);
         self::assertEquals($group1->name, $row2[2]);
 
-        $response = $this->get("/export/group/{$group2->idgroups}/events");
+        $response = $this->get("/export/groups/{$group2->idgroups}/events");
         $response->assertSuccessful();
         $filename = 'events.csv';
         $fh = fopen($filename, 'r');
