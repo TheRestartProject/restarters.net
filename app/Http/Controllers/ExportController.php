@@ -153,7 +153,6 @@ class ExportController extends Controller
         $headers = [
                 __('groups.export.events.date'),
                 __('groups.export.events.event'),
-                __('groups.export.events.group'),
                 __('groups.export.events.volunteers'),
                 __('groups.export.events.participants'),
                 __('groups.export.events.items_total'),
@@ -162,6 +161,7 @@ class ExportController extends Controller
                 __('groups.export.events.items_end_of_life'),
                 __('groups.export.events.items_kg_waste_prevented'),
                 __('groups.export.events.items_kg_co2_prevent'),
+                __('groups.export.events.group'),
             ];
 
         // Send these to getEventStats() to speed things up a bit.
@@ -179,7 +179,6 @@ class ExportController extends Controller
             $PartyArray[] = [
                 $party->getFormattedLocalStart(),
                 $party->getEventName(),
-                $party->theGroup && $party->theGroup->name ? $party->theGroup->name : '?',
                 $party->volunteers,
                 $party->participants ? $party->participants : 0,
                 $stats['fixed_devices'] + $stats ['repairable_devices'] + $stats['dead_devices'],
@@ -188,6 +187,7 @@ class ExportController extends Controller
                 $stats['dead_devices'],
                 $stats['waste_powered'] + $stats['waste_unpowered'],
                 $stats['co2_powered'] + $stats['co2_unpowered'],
+                $party->theGroup && $party->theGroup->name ? $party->theGroup->name : '?',
             ];
         }
 
