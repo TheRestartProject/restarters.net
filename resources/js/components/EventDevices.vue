@@ -72,7 +72,7 @@
           </template>
           <template slot="title-right">
             <div class="d-flex text-brand small">
-              <div class="ml-2 mr-1 pt-1 lower align-self-center">
+              <div class="ml-2 mr-1 pt-1 lower small align-self-center">
                 <b-img src="/images/trash_brand.svg" class="icon" />
                 {{ Math.round(stats.waste_powered) }}
               </div>
@@ -95,13 +95,13 @@
           <template slot="title">
             <div class="d-flex justify-content-between small ml-1 align-self-center">
               <div>
-                <b>{{ __('partials.add_device_unpowered') }}</b>
+                <b>{{ __('devices.title_unpowered') }}</b>
               </div>
             </div>
           </template>
           <template slot="title-right">
             <div class="d-flex text-brand small">
-              <div class="ml-2 mr-1 pt-1 lower align-self-center">
+              <div class="ml-2 mr-1 pt-1 lower small align-self-center">
                 <b-img src="/images/trash_brand.svg" class="icon" />
                 {{ Math.round(stats.waste_unpowered) }}
               </div>

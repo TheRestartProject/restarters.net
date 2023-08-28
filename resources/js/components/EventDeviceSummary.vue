@@ -13,7 +13,7 @@
         <h3 class="noheader">
           {{ translatedCategoryName }}
         </h3>
-        <div class="d-block d-md-none">
+        <div class="d-td-cell d-md-none">
           <div :class="badgeClass + ' d-block d-md-none'">
             {{ status }}
           </div>
@@ -23,7 +23,7 @@
       <b-td class="d-none d-md-table-cell" v-if="powered">
           {{ device.brand }}
       </b-td>
-      <b-td v-if="powered" class="d-block d-md-none">
+      <b-td v-if="powered" class="d-td-cell d-md-none">
         <div>
           <span class="pl-0 pl-md-2 pr-2 clickme edit" @click="editDevice">
             <b-img class="icon edit" src="/icons/edit_ico_green.svg" />
@@ -33,7 +33,7 @@
           </span>
         </div>
       </b-td>
-      <b-td v-if="!powered" class="d-block d-md-none">
+      <b-td v-if="!powered" class="d-td-cell d-md-none">
         <div>
           <span class="pl-0 pl-md-2 pr-2 clickme edit" @click="editDevice">
             <b-img class="icon" src="/icons/edit_ico_green.svg" />
@@ -59,10 +59,10 @@
       </b-td>
       <b-td v-if="canedit" class="text-right d-none d-md-table-cell">
         <div class="d-flex">
-          <span class="pl-0 pl-md-2 pr-2 clickme edit" @click="editDevice">
+          <span class="pl-0 pl-md-2 pr-4 clickme edit" @click="editDevice">
             <b-img class="icon" src="/icons/edit_ico_green.svg" />
           </span>
-            <span class="pl-2 pr-2 clickme" @click="deleteConfirm">
+            <span class="pr-2 clickme" @click="deleteConfirm">
             <b-img class="icon" src="/icons/delete_ico_red.svg" />
           </span>
         </div>
