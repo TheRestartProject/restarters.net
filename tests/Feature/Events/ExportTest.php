@@ -68,11 +68,6 @@ class ExportTest extends TestCase
                                                     'name' => 'test3'
                                                 ]);
         $this->networkService->addGroupToNetwork($admin, $group3, $network);
-        if ($role == 'Host') {
-            $group3->addVolunteer($user);
-            $group3->makeMemberAHost($user);
-        }
-
         $group3->approved = false;
         $group3->save();
 
@@ -114,35 +109,25 @@ class ExportTest extends TestCase
                                                                       'category_creation' => 111,
                                                                       'event' => $idevents3,
                                                                   ]);
-        // Export parties.
-        $response = $this->get("/export/parties?fltr=dummy&parties[0]=$idevents1&parties[1]=$idevents2&parties[2]=$idevents3&from-date=&to-date=");
 
-        // Bit hacky, but grab the file that was created.  Can't find a way to do this in Laravel easily, though it's
-        // probably possible using mocking.
-        //
-        // TODO These files sometimes appear in public/ and sometimes don't.  Is this just an artefact of testing?
-        $filename = 'parties.csv';
+        // Export parties.
+        $response = $this->get("/export/group/{$group1->idgroups}/events");
+        $response->assertSuccessful();
+        $filename = 'events.csv';
         $fh = fopen($filename, 'r');
         fgetcsv($fh);
         $row2 = fgetcsv($fh);
-        self::assertEquals('true', e($row2[3]));
+        self::assertEquals($event1->getEventName(), $row2[1]);
         self::assertEquals($group1->name, $row2[2]);
-        $row3 = fgetcsv($fh);
-        self::assertEquals('true', e($row3[3]));
-        self::assertEquals($group2->name, $row3[2]);
 
-        // Should return the third event as it's for an unapproved group but we're a host.
-        $row4 = fgetcsv($fh);
-        self::assertEquals('true', e($row4[3]));
-        self::assertEquals($group3->name, $row4[2]);
-
-        if ($role == 'Host') {
-            // Now remove us as a host of the third group so that it's no longer included in exports.
-            $userGroupAssociation = UserGroups::where('user', $user->id)
-                ->where('group', $group3->idgroups)->first();
-            $userGroupAssociation->role = Role::RESTARTER;
-            $userGroupAssociation->save();
-        }
+        $response = $this->get("/export/group/{$group2->idgroups}/events");
+        $response->assertSuccessful();
+        $filename = 'events.csv';
+        $fh = fopen($filename, 'r');
+        fgetcsv($fh);
+        $row2 = fgetcsv($fh);
+        self::assertEquals($event2->getEventName(), $row2[1]);
+        self::assertEquals($group2->name, $row2[2]);
 
         // Export devices.
         $response = $this->get("/export/devices");

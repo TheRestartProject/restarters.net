@@ -92,6 +92,7 @@ Route::middleware('ensureAPIToken')->group(function () {
         Route::get('/devices/event/{id}', [ExportController::class, 'devicesEvent']);
         Route::get('/devices/group/{id}', [ExportController::class, 'devicesGroup']);
         Route::get('/devices', [ExportController::class, 'devices']);
+        Route::get('/groups/{id}/events', [ExportController::class, 'groupEvents']);
     });
 
     // Calendar routes do not require authentication.
@@ -377,9 +378,6 @@ Route::middleware('auth', 'verifyUserConsent', 'ensureAPIToken')->group(function
         Route::post('/edit/{id}', [GroupTagsController::class, 'postEditTag']);
         Route::get('/delete/{id}', [GroupTagsController::class, 'getDeleteTag']);
     });
-
-    //Export Controller
-    Route::get('/export/parties', [ExportController::class, 'parties']);
 });
 
 Route::middleware('ensureAPIToken')->group(function () {
