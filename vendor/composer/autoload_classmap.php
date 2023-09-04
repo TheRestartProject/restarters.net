@@ -45,6 +45,7 @@ return array(
     'App\\Console\\Commands\\FixViews' => $baseDir . '/app/Console/Commands/FixViews.php',
     'App\\Console\\Commands\\GroupCountryField' => $baseDir . '/app/Console/Commands/GroupCountryField.php',
     'App\\Console\\Commands\\ImportGroups' => $baseDir . '/app/Console/Commands/ImportGroups.php',
+    'App\\Console\\Commands\\ImportMRES' => $baseDir . '/app/Console/Commands/ImportMRES.php',
     'App\\Console\\Commands\\LanguageSync' => $baseDir . '/app/Console/Commands/LanguageSync.php',
     'App\\Console\\Commands\\MigrateWikiPasswords' => $baseDir . '/app/Console/Commands/MigrateWikiPasswords.php',
     'App\\Console\\Commands\\NetworkCoordinator' => $baseDir . '/app/Console/Commands/NetworkCoordinator.php',

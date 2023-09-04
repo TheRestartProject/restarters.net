@@ -428,6 +428,9 @@
                                     "website": {
                                         "$ref": "#/components/schemas/Group/properties/website"
                                     },
+                                    "email": {
+                                        "$ref": "#/components/schemas/Group/properties/email"
+                                    },
                                     "description": {
                                         "$ref": "#/components/schemas/Group/properties/description"
                                     },
@@ -612,6 +615,9 @@
                                     },
                                     "website": {
                                         "$ref": "#/components/schemas/Group/properties/website"
+                                    },
+                                    "email": {
+                                        "$ref": "#/components/schemas/Group/properties/email"
                                     },
                                     "description": {
                                         "$ref": "#/components/schemas/Group/properties/description"
@@ -944,6 +950,12 @@
                         "description": "An URL for the group's own separate website.",
                         "format": "string",
                         "example": "https://therestartproject.org"
+                    },
+                    "email": {
+                        "title": "email",
+                        "description": "Any email contact address for the group.",
+                        "format": "string",
+                        "example": "info@therestartproject.org"
                     },
                     "description": {
                         "title": "description",
