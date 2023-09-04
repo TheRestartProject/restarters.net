@@ -25,7 +25,7 @@
           <b-th class="d-none d-md-table-cell">
             {{ __('devices.spare_parts') }}
           </b-th>
-          <b-th v-if="canedit" class="d-none d-md-table-cell">
+          <b-th v-if="canedit">
           </b-th>
         </b-tr>
       </b-thead>
