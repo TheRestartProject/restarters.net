@@ -14,7 +14,6 @@
             <slot name="title" />
           </div>
           <div v-if="count" :class="{
-          'd-inline' : true,
           'd-md-none' : !alwaysShowCount,
           'text-muted' : true,
           'd-flex' : true,
@@ -24,9 +23,7 @@
           <span v-if="countBadge">
             &nbsp;<b-badge variant="primary" pill>{{ count }}</b-badge>
           </span>
-            <span v-else>
-            &nbsp;<span :class="countClass">({{ count }})</span>
-          </span>
+          <span v-else :class="countClass + ' ml-1'">({{ count }})</span>
           </div>
           <slot name="title-icon" />
         </div>

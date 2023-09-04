@@ -17,6 +17,14 @@
             {{ group.phone }}
           </a>
         </p>
+        <div class="d-flex pt-1 pb-1" v-if="group.email">
+          <div class="mr-2">
+            <b-img-lazy src="/images/mail_ico.svg" class="icon" />
+          </div>
+          <div>
+            <a :href="'mailto:' + group.email">{{ group.email }}</a>
+          </div>
+        </div>
         <div class="d-flex pt-1 pb-1" v-if="discourseGroup">
           <div class="mr-2">
             <b-img-lazy src="/icons/talk_ico.svg" class="icon" />

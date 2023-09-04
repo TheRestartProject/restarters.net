@@ -20,7 +20,7 @@ class BasicTest extends TestCase
             [],
             [
                 // Can't assert on total-contributions dev systems might have varying info.
-                'active-quest' => 'mobifixora',
+                'active-quest' => 'default',
                 ':current-user-quests' => '0',
                 ':current-user-contributions' => '0',
                 'see-all-topics-link' => env('DISCOURSE_URL').'/tag/workbench/l/latest',

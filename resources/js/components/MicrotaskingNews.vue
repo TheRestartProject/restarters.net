@@ -1,24 +1,25 @@
 <template>
     <div id="news">
-        <div class="d-none d-sm-block text-center">
-            <b-img id="news-image" src="/images/mobifix-treemap.png" />
-        </div>
-    <CollapsibleSection class="collapsible px-4 pb-4 pt-0 lineheight" :show-horizontal-rule="false">
+      <CollapsibleSection class="collapsible px-4 pb-4 pt-0 lineheight" :show-horizontal-rule="false">
 
-        <template slot="title">
-            <div class="mt-2">
-            {{ __('microtasking.news.title') }}
+          <template slot="title">
+              <div class="mt-2">
+              {{ __('microtasking.news.title') }}
+              </div>
+          </template>
+
+          <template slot="title-right">
+          </template>
+
+          <template slot="content">
+            <div class="d-flex justify-content-lg-between flex-column flex-lg-row content pt-4">
+              <div class="embed-responsive embed-responsive-16by9 mr-4 w-100 w-lg-50">
+                <iframe class="embed-responsive-item" src="https://www.youtube.com/embed/svnC5QPK9mY"></iframe>
+              </div>
+              <div v-html="__('microtasking.news.content')" class="pt-3 w-100 w-lg-50" />
             </div>
-        </template>
-
-        <template slot="title-right">
-            <b-img class="d-none d-sm-block ml-auto mt-2 doodle" src="/images/phone.svg" />
-        </template>
-
-        <template slot="content">
-            <div v-html="__('microtasking.news.content')" class="pt-3 content" />
-        </template>
-    </CollapsibleSection>
+          </template>
+      </CollapsibleSection>
     </div>
 </template>
 
@@ -29,7 +30,6 @@ export default {
     components: {CollapsibleSection},
 }
 </script>
-
 <style scoped lang="scss">
 @import 'resources/global/css/_variables';
 @import '~bootstrap/scss/functions';
@@ -46,10 +46,6 @@ export default {
 
 #news-image {
     width: 400px;
-}
-
-.collapsible {
-    background-color: #ffbe5f;
 }
 
 a {
@@ -82,7 +78,4 @@ a {
     background-size: auto 75px;
     height: 75px;
 }
-
-
 </style>
-</template>

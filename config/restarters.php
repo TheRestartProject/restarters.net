@@ -17,7 +17,7 @@ return [
 
     'microtasking' => [
         'discussion_tag' => env('MICROTASKING_DISCUSSION_TAG', 'workbench'),
-        'active_quest' => env('MICROTASKING_ACTIVE_QUEST', 'mobifixora'),
+        'active_quest' => env('MICROTASKING_ACTIVE_QUEST', 'default'),
     ],
 
     'xref_types' => [

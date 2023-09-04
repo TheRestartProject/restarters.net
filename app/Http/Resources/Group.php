@@ -54,6 +54,13 @@ use Illuminate\Http\Resources\Json\JsonResource;
  *          example="https://therestartproject.org"
  *     ),
  *     @OA\Property(
+ *          property="email",
+ *          title="email",
+ *          description="Any email contact address for the group.",
+ *          format="string",
+ *          example="info@therestartproject.org"
+ *     ),
+ *     @OA\Property(
  *          property="description",
  *          title="description",
  *          description="HTML description of the group.",
@@ -280,7 +287,8 @@ class Group extends JsonResource
             'timezone' => $this->timezone,
             'approved' => $this->approved ? true : false,
             'network_data' => gettype($this->network_data) == 'string' ? json_decode($this->network_data, true) : $this->network_data,
-            'full' => true
+            'full' => true,
+            'email' => $this->email,
         ];
 
         $ret['hosts'] = $this->resource->all_confirmed_hosts_count;
