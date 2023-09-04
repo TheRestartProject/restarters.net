@@ -145,78 +145,67 @@ class ExportController extends Controller
     /**
      * @return \Illuminate\Http\Response
      */
-    public function parties(Request $request)
+    public function groupEvents(Request $request, $idgroups)
     {
-        if ($request->has('fltr') && ! empty($request->input('fltr'))) {
-            $dropdowns = SearchHelper::getUserGroupsAndParties();
-            $filters = SearchHelper::getSearchFilters($request);
+        $group = Group::findOrFail($idgroups);
+        $parties = $group->parties()->undeleted()->get();
 
-            $Search = new Search;
-            $PartyList = $Search->parties(
-                $filters['searched_parties'],
-                $filters['searched_groups'],
-                $filters['from_date'],
-                $filters['to_date'],
-                $filters['group_tags'],
-                $dropdowns['allowed_parties']
-            );
+        $headers = [
+                __('groups.export.events.date'),
+                __('groups.export.events.event'),
+                __('groups.export.events.volunteers'),
+                __('groups.export.events.participants'),
+                __('groups.export.events.items_total'),
+                __('groups.export.events.items_fixed'),
+                __('groups.export.events.items_repairable'),
+                __('groups.export.events.items_end_of_life'),
+                __('groups.export.events.items_kg_waste_prevented'),
+                __('groups.export.events.items_kg_co2_prevent'),
+                __('groups.export.events.group'),
+            ];
 
-            if (count($PartyList) > 0) {
+        // Send these to getEventStats() to speed things up a bit.
+        $eEmissionRatio = \App\Helpers\LcaStats::getEmissionRatioPowered();
+        $uEmissionratio = \App\Helpers\LcaStats::getEmissionRatioUnpowered();
 
-                // prepare the column headers
-                $statsKeys = array_keys(\App\Party::getEventStatsArrayKeys());
-                array_walk($statsKeys, function (&$k) {
-                    $key = explode('_', $k);
-                    array_walk($key, function (&$v) {
-                        $v = str_replace('Waste', 'Weight', str_replace('Co2', 'CO2', ucfirst($v)));
-                    });
-                    $k = implode(' ', $key);
-                });
-                $headers = array_merge(['Date', 'Venue', 'Group', 'Approved'], $statsKeys);
+        // prepare the column values
+        $PartyArray = [];
+        foreach ($parties as $party) {
+            $stats = $party->getEventStats($eEmissionRatio, $uEmissionratio);
+            array_walk($stats, function (&$v) {
+                $v = round($v);
+            });
 
-                // Send these to getEventStats() to speed things up a bit.
-                $eEmissionRatio = \App\Helpers\LcaStats::getEmissionRatioPowered();
-                $uEmissionratio = \App\Helpers\LcaStats::getEmissionRatioUnpowered();
-
-                // prepare the column values
-                $PartyArray = [];
-                foreach ($PartyList as $i => $party) {
-                    $stats = $party->getEventStats($eEmissionRatio, $uEmissionratio);
-                    array_walk($stats, function (&$v) {
-                        $v = round($v);
-                    });
-
-                    $PartyArray[$i] = [
-                        $party->getFormattedLocalStart(),
-                        $party->getEventName(),
-                        $party->theGroup && $party->theGroup->name ? $party->theGroup->name : '?',
-                        $party->approved ? 'true' : 'false',
-                    ];
-                    $PartyArray[$i] += $stats;
-                }
-
-                // write content to file
-                $filename = 'parties.csv';
-
-                $file = fopen($filename, 'w+');
-                fputcsv($file, $headers);
-
-                foreach ($PartyArray as $d) {
-                    fputcsv($file, $d);
-                }
-                fclose($file);
-
-                $headers = [
-                    'Content-Type' => 'text/csv',
-                ];
-
-                return Response::download($filename, $filename, $headers);
-            }
-            // }
+            $PartyArray[] = [
+                $party->getFormattedLocalStart(),
+                $party->getEventName(),
+                $party->volunteers,
+                $party->participants ? $party->participants : 0,
+                $stats['fixed_devices'] + $stats ['repairable_devices'] + $stats['dead_devices'],
+                $stats['fixed_devices'],
+                $stats['repairable_devices'],
+                $stats['dead_devices'],
+                $stats['waste_powered'] + $stats['waste_unpowered'],
+                $stats['co2_powered'] + $stats['co2_unpowered'],
+                $party->theGroup && $party->theGroup->name ? $party->theGroup->name : '?',
+            ];
         }
 
-        return view('export.parties', [
-            'data' => ['No data to return'],
-        ]);
+        // write content to file
+        $filename = 'events.csv';
+
+        $file = fopen($filename, 'w+');
+        fputcsv($file, $headers);
+
+        foreach ($PartyArray as $d) {
+            fputcsv($file, $d);
+        }
+        fclose($file);
+
+        $headers = [
+            'Content-Type' => 'text/csv',
+        ];
+
+        return Response::download($filename, $filename, $headers);
     }
 }

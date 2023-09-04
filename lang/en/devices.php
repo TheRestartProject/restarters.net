@@ -4,7 +4,7 @@ return [
   'devices' => 'Repairs',
   'export_device_data' => 'Export all data',
   'export_event_data' => 'Export event data',
-  'export_group_data' => 'Export group data',
+  'export_group_data' => 'Download repair data',
   'by_date' => 'By date',
   'category' => 'Category',
   'group' => 'Group',
