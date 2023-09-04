@@ -8,6 +8,7 @@ use DB;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Str;
 use OwenIt\Auditing\Contracts\Auditable;
+use Cache;
 
 class Device extends Model implements Auditable
 {
@@ -416,42 +417,49 @@ class Device extends Model implements Auditable
         // used by the item types.
         //
         // ANY_VALUE is used to suppress errors when SQL mode is not set to ONLY_FULL_GROUP_BY.
-        $types = DB::select(DB::raw("
-            SELECT item_type,
-                   ANY_VALUE(powered)      AS powered,
-                   ANY_VALUE(idcategories) AS idcategories,
-                   ANY_VALUE(categoryname)
-            FROM   (SELECT DISTINCT s.*
-                    FROM   (SELECT item_type,
-                                   ANY_VALUE(powered)      AS powered,
-                                   ANY_VALUE(idcategories) AS idcategories,
-                                   categories.name         AS categoryname,
-                                   COUNT(*)                AS count
-                            FROM   devices
-                                   INNER JOIN categories
-                                           ON devices.category = categories.idcategories
-                            WHERE  item_type IS NOT NULL
-                            GROUP  BY categoryname,
-                                      item_type) s
-                           JOIN (SELECT item_type,
-                                        MAX(count) AS maxcount
-                                 FROM   (SELECT item_type               AS item_type,
-                                                ANY_VALUE(powered)      AS powered,
-                                                ANY_VALUE(idcategories) AS idcategories,
-                                                categories.name         AS categoryname,
-                                                COUNT(*)                AS count
-                                         FROM   devices
-                                                INNER JOIN categories
-                                                        ON devices.category =
-                                                           categories.idcategories
-                                         WHERE  item_type IS NOT NULL
-                                         GROUP  BY categoryname,
-                                                   item_type) s
-                                 GROUP  BY s.item_type) AS m
-                             ON s.item_type = m.item_type
-                                AND s.count = m.maxcount) t
-            GROUP BY t.item_type
-"));
+        //
+        // This is slow and the results don't change much, so we use a cache.
+        if (Cache::has('item_types')) {
+            $types = Cache::get('item_types');
+        } else {
+            $types = DB::select(DB::raw("
+                SELECT item_type,
+                       ANY_VALUE(powered)      AS powered,
+                       ANY_VALUE(idcategories) AS idcategories,
+                       ANY_VALUE(categoryname)
+                FROM   (SELECT DISTINCT s.*
+                        FROM   (SELECT item_type,
+                                       ANY_VALUE(powered)      AS powered,
+                                       ANY_VALUE(idcategories) AS idcategories,
+                                       categories.name         AS categoryname,
+                                       COUNT(*)                AS count
+                                FROM   devices
+                                       INNER JOIN categories
+                                               ON devices.category = categories.idcategories
+                                WHERE  item_type IS NOT NULL
+                                GROUP  BY categoryname,
+                                          item_type) s
+                               JOIN (SELECT item_type,
+                                            MAX(count) AS maxcount
+                                     FROM   (SELECT item_type               AS item_type,
+                                                    ANY_VALUE(powered)      AS powered,
+                                                    ANY_VALUE(idcategories) AS idcategories,
+                                                    categories.name         AS categoryname,
+                                                    COUNT(*)                AS count
+                                             FROM   devices
+                                                    INNER JOIN categories
+                                                            ON devices.category =
+                                                               categories.idcategories
+                                             WHERE  item_type IS NOT NULL
+                                             GROUP  BY categoryname,
+                                                       item_type) s
+                                     GROUP  BY s.item_type) AS m
+                                 ON s.item_type = m.item_type
+                                    AND s.count = m.maxcount) t
+                GROUP BY t.item_type
+            "));
+            \Cache::put('item_types', $types, 24 * 3600);
+        }
 
         return $types;
     }
