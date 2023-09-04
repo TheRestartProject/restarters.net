@@ -13,7 +13,7 @@
               <div class="flex-grow-1">
                 <div v-html="translatedDescription" />
                 <div v-html="translatedShortDescription" />
-                <a :href="activeQuest" style="align-self: center" class="btn btn-primary mt-2">{{ translatedGetInvolved }}</a>
+                <a href="https://openrepair.org/open-data/downloads/" style="align-self: center" class="btn btn-primary mt-2">{{ translatedGetInvolved }}</a>
               </div>
             </div>
         </template>
