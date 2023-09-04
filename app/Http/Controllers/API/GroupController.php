@@ -555,6 +555,10 @@ class GroupController extends Controller
      *                   ref="#/components/schemas/Group/properties/website"
      *                ),
      *                @OA\Property(
+     *                   property="email",
+     *                   ref="#/components/schemas/Group/properties/email"
+     *                ),
+     *                @OA\Property(
      *                   property="description",
      *                   ref="#/components/schemas/Group/properties/description",
      *                ),
@@ -592,7 +596,7 @@ class GroupController extends Controller
         $user = $this->getUser();
         $user->convertToHost();
 
-        list($name, $area, $postcode, $location, $phone, $website, $description, $timezone, $latitude, $longitude, $country, $network_data) = $this->validateGroupParams(
+        list($name, $area, $postcode, $location, $phone, $website, $description, $timezone, $latitude, $longitude, $country, $network_data, $email) = $this->validateGroupParams(
             $request,
             true
         );
@@ -611,6 +615,7 @@ class GroupController extends Controller
             'timezone' => $timezone,
             'phone' => $phone,
             'network_data' => $network_data,
+            'email' => $email,
         ];
 
         $group = Group::create($data);
@@ -692,6 +697,10 @@ class GroupController extends Controller
      *                   ref="#/components/schemas/Group/properties/website"
      *                ),
      *                @OA\Property(
+     *                   property="email",
+     *                   ref="#/components/schemas/Group/properties/email"
+     *                ),
+     *                @OA\Property(
      *                   property="description",
      *                   ref="#/components/schemas/Group/properties/description",
      *                ),
@@ -728,7 +737,7 @@ class GroupController extends Controller
     public function updateGroupv2(Request $request, $idGroup) {
         $user = $this->getUser();
 
-        list($name, $area, $postcode, $location, $phone, $website, $description, $timezone, $latitude, $longitude, $country, $network_data) = $this->validateGroupParams(
+        list($name, $area, $postcode, $location, $phone, $website, $description, $timezone, $latitude, $longitude, $country, $network_data, $email) = $this->validateGroupParams(
             $request,
             false
         );
@@ -754,6 +763,7 @@ class GroupController extends Controller
             'timezone' => $timezone,
             'phone' => $phone,
             'network_data' => $network_data,
+            'email' => $email,
         ];
 
         if ($user->hasRole('Administrator') || $user->hasRole('NetworkCoordinator')) {
@@ -871,6 +881,7 @@ class GroupController extends Controller
         $description = $request->input('description');
         $timezone = $request->input('timezone');
         $network_data = $request->input('network_data');
+        $email = $request->input('email');
 
         $latitude = null;
         $longitude = null;
@@ -910,6 +921,7 @@ class GroupController extends Controller
             $longitude,
             $country_code,
             $network_data,
+            $email,
         );
     }
 }
