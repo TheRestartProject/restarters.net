@@ -445,7 +445,7 @@ class DiscourseService
 
                             if ($d['owner'] && !$shouldBeOwner) {
                                 Log::info("Remove $discourseMember as admin of {$discourseId} {$discourseName}");
-                                $response = $client->request('DELETE', "/admin/groups/$discourseId/owners.json", [
+                                $response = $client->request('DELETE', "/groups/$discourseId/owners.json", [
                                     'form_params' => [
                                         'user_id' => $d['id']
                                     ]
@@ -461,7 +461,7 @@ class DiscourseService
                                 }
                             } else if (!$d['owner'] && $shouldBeOwner) {
                                 Log::info("Add $discourseMember as admin of {$discourseId} {$discourseName}");
-                                $response = $client->request('PUT', "/admin/groups/$discourseId/owners.json", [
+                                $response = $client->request('PUT', "/groups/$discourseId/owners.json", [
                                     'form_params' => [
                                         'group' => [
                                             'usernames' => $discourseMember
