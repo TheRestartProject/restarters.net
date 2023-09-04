@@ -27,6 +27,7 @@ class EventController extends Controller
     public function getEventsByUsersNetworks(Request $request, $date_from = null, $date_to = null, $timezone = 'UTC')
     {
         $authenticatedUser = Auth::user();
+        set_time_limit(240);
 
         $groups = [];
         foreach ($authenticatedUser->networks as $network) {
@@ -42,9 +43,9 @@ class EventController extends Controller
             ->orderBy('event_start_utc', 'ASC');
 
         if (!empty($date_from) && !empty($date_to)) {
-            $start = Carbon\Carbon::parse($date_from, $timezone);
+            $start = Carbon::parse($date_from, $timezone);
             $start->setTimezone('UTC');
-            $end = Carbon\Carbon::parse($date_to, $timezone);
+            $end = Carbon::parse($date_to, $timezone);
             $end->setTimezone('UTC');
             $parties = $parties->where('events.event_start_utc', '>=', $start->toIso8601String())
                 ->where('events.event_end_utc', '<=', $end->toIso8601String());
