@@ -1,7 +1,12 @@
 <template>
   <CollapsibleSection collapsed :count="volunteers.length">
     <template slot="title">
-      {{ __('groups.volunteers') }}
+      <span>
+        {{ __('groups.volunteers') }}
+        <span v-if="volunteers.length" class="font-weight-normal">
+          ({{ volunteers.length}})
+        </span>
+      </span>
     </template>
     <template slot="content">
       <div class="mt-2">
