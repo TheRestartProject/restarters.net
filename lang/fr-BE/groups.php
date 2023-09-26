@@ -97,7 +97,6 @@ return [
   'no_volunteers' => 'Il n\'y a pas de bénévoles dans ce repair café',
   'read_less' => '<img class="icon" src="/images/minus-icon.svg" style="width: 20px;" /> LIRE MOINS',
   'remove_volunteer' => 'Retirer bénévole',
-  'see_all_volunteers' => 'Voir :count bénévole(s)',
   'website' => 'Site web',
   'calendar_copy_description' => 'Ajouter tous les futurs  événements :group à votre calendrier Google/Outlook/Yahoo/Apple avec le lien suivant:',
   'calendar_copy_title' => 'Accéder à tous les événements dans votre calendrier',

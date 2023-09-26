@@ -158,6 +158,20 @@ class Device extends Model implements Auditable
         return DB::select(DB::raw($sql), ['cluster' => $cluster]);
     }
 
+    public function countByClustersYearStatus($group)
+    {
+        $sql = "SELECT cluster, YEAR(`event_start_utc`) AS year, `repair_status`, COUNT(*) AS `counter` FROM `devices` AS `d`
+            INNER JOIN `events` AS `e`
+            ON `d`.`event` = `e`.`idevents`
+            INNER JOIN `categories` AS `c`
+            ON `d`.`category` = `c`.`idcategories`
+            WHERE `e`.`group` = :group AND `event_start_utc` >= '2013-01-01'
+            GROUP BY `cluster`, YEAR(`event_start_utc`) , `repair_status`
+            ORDER BY `year` ASC, `repair_status` ASC;";
+
+        return DB::select(DB::raw($sql), ['group' => $group]);
+    }
+
     public function findMostSeen($status = null, $cluster = null, $group = null)
     {
         $sql = 'SELECT COUNT(`d`.`category`) AS `counter`, `c`.`name` FROM `'.$this->table.'` AS `d`
