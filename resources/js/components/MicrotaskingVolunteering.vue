@@ -27,7 +27,7 @@
             <hr>
             </div>
 
-            <b-table-simple sticky-header="50vh" responsive class="pl-0 pr-0 pb-2 mb-2" table-class="m-0 leave-tables-alone">
+            <b-table-simple sticky-header="50vh" responsive class="pl-0 pr-0 pb-2 mb-2 p-2" table-class="m-0 leave-tables-alone">
                 <b-thead class="text-center">
                     <b-tr>
                     <b-th> </b-th>
@@ -110,7 +110,6 @@ export default {
   }
 }
 </script>
-
 <style scoped lang="scss">
 @import 'resources/global/css/_variables';
 @import '~bootstrap/scss/functions';
@@ -118,12 +117,16 @@ export default {
 @import '~bootstrap/scss/mixins/_breakpoints';
 
 .volunteering {
-    background-color: $white;
     border: 1px solid $black;
+    background-color: $brand-orange !important;
 
-    @include media-breakpoint-up(md) {
+   .table-b-table-default {
+     background-color: $brand-orange !important;
+   }
+
+   @include media-breakpoint-up(md) {
         box-shadow: 5px 5px $black;
-    }
+   }
 }
 
 ::v-deep .open-quest {

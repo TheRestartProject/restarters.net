@@ -30,14 +30,14 @@ class Geocoder
 
                     foreach ($decoded->{'address_components'} as $component) {
                         if ($component->types && count($component->types) && $component->types[0] === 'country') {
-                            $country = $component->long_name;
+                            $country_code = $component->short_name;
                         }
                     }
 
                     return [
                         'latitude' => $latitude,
                         'longitude' => $longitude,
-                        'country' => $country,
+                        'country_code' => $country_code,
                     ];
                 }
             }

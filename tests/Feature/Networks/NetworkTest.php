@@ -93,6 +93,8 @@ class NetworkTest extends TestCase
         $group = Group::factory()->create([
                                                    'latitude' => 51.5074,
                                                    'longitude' => -0.1278,
+                                                   'country_code' => 'GB',
+                                                   'country' => 'United Kingdom',
                                                ]);
 
         $network = Network::factory()->create();
@@ -131,6 +133,8 @@ class NetworkTest extends TestCase
         $this->assertEquals(1, count($groups));
         $this->assertEquals($group->idgroups, $groups[0]['id']);
         $this->assertEquals($group->name, $groups[0]['name']);
+        $this->assertEquals($group->country, $groups[0]['location']['country']);
+        $this->assertEquals($group->country_code, $groups[0]['location']['country_code']);
 
         // Check that the event is listed.
         $this->assertEquals(1, count($groups[0]['past_parties']));

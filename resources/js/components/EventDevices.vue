@@ -28,7 +28,7 @@
             </template>
             <p v-html="__('devices.description_powered')" />
             <EventDeviceList :devices="powered" :powered="true" :canedit="canedit" :idevents="idevents" :brands="brands" :barrier-list="barrierList" :itemTypes="itemTypes" :clusters="clusters" />
-            <b-btn variant="primary" v-if="canedit" class="mb-4 ml-4 add-powered-device-desktop" @click="addingPowered = true">
+            <b-btn variant="primary" v-if="canedit" class="mb-4 ml-4 add-powered-device-desktop" @click="addPowered($event)">
               <b-img class="icon mb-1" src="/images/add-icon.svg" /> {{ __('partials.add_device_powered') }}
             </b-btn>
             <EventDevice v-if="addingPowered" :powered="true" :add="true" :edit="false" :clusters="clusters" :idevents="idevents" :brands="brands" :barrier-list="barrierList" :itemTypes="itemTypes" @close="addingPowered = false" />
@@ -54,7 +54,7 @@
             </template>
             <p v-html="__('devices.description_unpowered')" />
             <EventDeviceList :devices="unpowered" :powered="false" :canedit="canedit" :idevents="idevents" :brands="brands" :barrier-list="barrierList" :itemTypes="itemTypes" :clusters="clusters" />
-            <b-btn variant="primary" v-if="canedit" class="mb-4 ml-4 add-unpowered-device-desktop" @click="addingUnpowered = true">
+            <b-btn variant="primary" v-if="canedit" class="mb-4 ml-4 add-unpowered-device-desktop" @click="addUnpowered($event)">
               <b-img class="icon mb-1" src="/images/add-icon.svg" /> {{ __('partials.add_device_unpowered') }}
             </b-btn>
             <EventDevice v-if="addingUnpowered" :powered="false" :add="true" :edit="false" :clusters="clusters" :idevents="idevents" :event="event" :brands="brands" :barrier-list="barrierList" :itemTypes="itemTypes" @close="addingUnpowered = false"/>
@@ -71,12 +71,12 @@
             </div>
           </template>
           <template slot="title-right">
-            <div class="d-flex text-brand small">
-              <div class="ml-2 mr-1 pt-1 lower align-self-center">
+            <div class="d-flex text-brand small text-center">
+              <div class="ml-2 mr-1 pt-1 lower small">
                 <b-img src="/images/trash_brand.svg" class="icon" />
                 {{ Math.round(stats.waste_powered) }}
               </div>
-              <div class="ml-1 mr-1 lower pt-1 small align-self-center">
+              <div class="ml-1 mr-1 lower pt-1 small">
                 <b-img src="/images/co2_brand.svg" class="icon" />
                 {{ Math.round(stats.co2_powered) }}
               </div>
@@ -85,7 +85,7 @@
           <template slot="content">
             <p v-html="__('devices.description_powered')" />
             <EventDeviceList :devices="powered" :powered="true" :canedit="canedit" :idevents="idevents" :brands="brands" :barrier-list="barrierList" :itemTypes="itemTypes" :clusters="clusters" />
-            <b-btn variant="primary" v-if="canedit" class="mb-4 ml-4 add-powered-device-mobile" @click="addingPowered = true">
+            <b-btn variant="primary" v-if="canedit" class="mb-4 ml-4 add-powered-device-mobile" @click="addPowered($event)">
               <b-img class="icon mb-1" src="/images/add-icon.svg" /> {{ __('partials.add_device_powered') }}
             </b-btn>
             <EventDevice v-if="addingPowered" :powered="true" :add="true" :edit="false" :clusters="clusters" :idevents="idevents" :brands="brands" :barrier-list="barrierList" :itemTypes="itemTypes" @close="addingPowered = false" />
@@ -95,17 +95,17 @@
           <template slot="title">
             <div class="d-flex justify-content-between small ml-1 align-self-center">
               <div>
-                <b>{{ __('partials.add_device_unpowered') }}</b>
+                <b>{{ __('devices.title_unpowered') }}</b>
               </div>
             </div>
           </template>
           <template slot="title-right">
-            <div class="d-flex text-brand small">
-              <div class="ml-2 mr-1 pt-1 lower align-self-center">
+            <div class="d-flex text-brand small text-center">
+              <div class="ml-2 mr-1 pt-1 lower small">
                 <b-img src="/images/trash_brand.svg" class="icon" />
                 {{ Math.round(stats.waste_unpowered) }}
               </div>
-              <div class="ml-1 mr-1 lower pt-1 small align-self-center">
+              <div class="ml-1 mr-1 lower pt-1 small">
                 <b-img src="/images/co2_brand.svg" class="icon" />
                 {{ Math.round(stats.co2_unpowered) }}
               </div>
@@ -114,7 +114,7 @@
           <template slot="content">
             <p v-html="__('devices.description_unpowered')" />
             <EventDeviceList :devices="unpowered" :powered="false" :canedit="canedit" :idevents="idevents" :brands="brands" :barrier-list="barrierList" :itemTypes="itemTypes" :clusters="clusters" />
-            <b-btn variant="primary" v-if="canedit" class="mb-4 ml-4 add-unpowered-device-desktop" @click="addingUnpowered = true">
+            <b-btn variant="primary" v-if="canedit" class="mb-4 ml-4 add-unpowered-device-desktop" @click="addUnpowered($event)">
               <b-img class="icon mb-1" src="/images/add-icon.svg" /> {{ __('partials.add_device_unpowered') }}
             </b-btn>
             <EventDevice v-if="addingUnpowered" :powered="false" :add="true" :edit="false" :clusters="clusters" :idevents="idevents" :brands="brands" :barrier-list="barrierList" :itemTypes="itemTypes" @close="addingUnpowered = false" />
@@ -208,6 +208,24 @@ export default {
       idevents: this.idevents,
       devices: this.devices
     })
+  },
+  methods: {
+    async addPowered(event) {
+      this.addingPowered = true
+      await this.$nextTick()
+      event.target.scrollIntoView({
+        behavior: 'smooth',
+        block: 'start'
+      })
+    },
+    async addUnpowered(event) {
+      this.addingUnpowered = true
+      await this.$nextTick()
+      event.target.scrollIntoView({
+        behavior: 'smooth',
+        block: 'start'
+      })
+    }
   }
 }
 </script>

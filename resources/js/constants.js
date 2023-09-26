@@ -35,3 +35,16 @@ export const USEFUL_URL_SOURCE_THIRD_PARTY = 2
 
 export const CATEGORY_MISC_POWERED = 46
 export const CATEGORY_MISC_UNPOWERED = 50
+
+export const UNKNOWN_STRINGS = [
+    'unknown',
+    'n/a',
+    'not applicable',
+    '?',
+    'not known',
+    'don\'t know',
+    'unbranded',
+    'no brand',
+    'no model',
+    'none'
+]

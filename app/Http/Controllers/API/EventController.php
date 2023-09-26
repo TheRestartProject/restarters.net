@@ -27,6 +27,7 @@ class EventController extends Controller
     public function getEventsByUsersNetworks(Request $request, $date_from = null, $date_to = null, $timezone = 'UTC')
     {
         $authenticatedUser = Auth::user();
+        set_time_limit(240);
 
         $groups = [];
         foreach ($authenticatedUser->networks as $network) {
@@ -42,9 +43,9 @@ class EventController extends Controller
             ->orderBy('event_start_utc', 'ASC');
 
         if (!empty($date_from) && !empty($date_to)) {
-            $start = Carbon\Carbon::parse($date_from, $timezone);
+            $start = Carbon::parse($date_from, $timezone);
             $start->setTimezone('UTC');
-            $end = Carbon\Carbon::parse($date_to, $timezone);
+            $end = Carbon::parse($date_to, $timezone);
             $end->setTimezone('UTC');
             $parties = $parties->where('events.event_start_utc', '>=', $start->toIso8601String())
                 ->where('events.event_end_utc', '<=', $end->toIso8601String());
@@ -161,9 +162,18 @@ class EventController extends Controller
             $full_name = null;
         }
 
-        // User is null, this volunteer is either anonymous or no user exists.
+        $eventRole = Role::RESTARTER;
+
         if ($request->has('user') && $request->input('user') !== 'not-registered') {
+            // User is null, this volunteer is either anonymous or no user exists.
             $user = $request->input('user');
+
+            if ($user) {
+                $u = User::find($user);
+
+                // A host of the group who is added to an event becomes a host of the event.
+                $eventRole = $u && Fixometer::userIsHostOfGroup($party->group, $user) ? Role::HOST : Role::RESTARTER;
+            }
         } else {
             $user = null;
         }
@@ -173,7 +183,7 @@ class EventController extends Controller
             ->where('user', $user)
             ->where('status', '<>', 1)
             ->whereNotNull('status')
-            ->where('role', 4);
+            ->where('role', $eventRole);
         $userWasInvited = $invitedUserQuery->count() == 1;
 
         if ($userWasInvited) {
@@ -186,12 +196,10 @@ class EventController extends Controller
                 'event' => $idevents,
                 'user' => $user,
                 'status' => 1,
-                'role' => 4,
+                'role' => $eventRole,
                 'full_name' => $full_name,
             ]);
         }
-
-        $party->increment('volunteers');
 
         if (!is_null($volunteer_email_address)) {
             // Send email.
@@ -278,10 +286,6 @@ class EventController extends Controller
     public function getEventv2(Request $request, $idevents)
     {
         $party = Party::findOrFail($idevents);
-
-        if (!$party->theGroup->approved) {
-            abort(404);
-        }
 
         return \App\Http\Resources\Party::make($party);
     }
@@ -421,6 +425,15 @@ class EventController extends Controller
      *                   property="online",
      *                   ref="#/components/schemas/Event/properties/online",
      *                ),
+     *                @OA\Property(
+     *                   property="link",
+     *                   ref="#/components/schemas/Event/properties/link",
+     *                ),
+     *                @OA\Property(
+     *                   description="Network-defined JSON data",
+     *                   property="network_data",
+     *                   @OA\Schema()
+     *                ),
      *             )
      *         )
      *    ),
@@ -441,7 +454,7 @@ class EventController extends Controller
     {
         $user = $this->getUser();
 
-        list($groupid, $start, $end, $title, $description, $location, $timezone, $latitude, $longitude, $online, $link) = $this->validateEventParams(
+        list($groupid, $start, $end, $title, $description, $location, $timezone, $latitude, $longitude, $online, $link, $network_data) = $this->validateEventParams(
             $request,
             true
         );
@@ -478,7 +491,8 @@ class EventController extends Controller
             'user_id' => $user->id,
             'created_at' => date('Y-m-d H:i:s'),
             'shareable_code' => Fixometer::generateUniqueShareableCode(\App\Party::class, 'shareable_code'),
-            'online' => $online
+            'online' => $online,
+            'network_data' => $network_data,
         ];
 
         $party = Party::create($data);
@@ -490,8 +504,6 @@ class EventController extends Controller
             'status' => 1,
             'role' => Role::HOST,
         ]);
-
-        $party->increment('volunteers');
 
         // Notify relevant users.
         $usersToNotify = Fixometer::usersWhoHavePreference('admin-moderate-event');
@@ -580,6 +592,10 @@ class EventController extends Controller
      *                   property="online",
      *                   ref="#/components/schemas/Event/properties/online",
      *                ),
+     *                @OA\Property(
+     *                   property="link",
+     *                   ref="#/components/schemas/Event/properties/link",
+     *                ),
      *             )
      *         )
      *    ),
@@ -600,7 +616,7 @@ class EventController extends Controller
     {
         $user = $this->getUser();
 
-        list($groupid, $start, $end, $title, $description, $location, $timezone, $latitude, $longitude, $online, $link) = $this->validateEventParams(
+        list($groupid, $start, $end, $title, $description, $location, $timezone, $latitude, $longitude, $online, $link, $network_data) = $this->validateEventParams(
             $request,
             false
         );
@@ -622,7 +638,8 @@ class EventController extends Controller
             'location' => $location,
             'latitude' => $latitude,
             'longitude' => $longitude,
-            'timezone' => $timezone
+            'timezone' => $timezone,
+            'network_data' => $network_data,
         ];
 
         $party = Party::findOrFail($idEvents);
@@ -648,8 +665,8 @@ class EventController extends Controller
         if ($create) {
             $request->validate([
                 'groupid' => 'required|integer',
-                'start' => ['required', 'date_format:Y-m-d\TH:i:sP'],
-                'end' => ['required', 'date_format:Y-m-d\TH:i:sP'],
+                                   'start' => ['required', 'date_format:Y-m-d\TH:i:sP,Y-m-d\TH:i:s\Z'],
+                                   'end' => ['required', 'date_format:Y-m-d\TH:i:sP,Y-m-d\TH:i:s\Z'],
                 'title' => ['required', 'max:255'],
                 'description' => ['required'],
                 'location' => [
@@ -663,8 +680,8 @@ class EventController extends Controller
             ]);
         } else {
             $request->validate([
-                'start' => ['required', 'date_format:Y-m-d\TH:i:sP'],
-                'end' => ['required', 'date_format:Y-m-d\TH:i:sP'],
+                                   'start' => ['required', 'date_format:Y-m-d\TH:i:sP,Y-m-d\TH:i:s\Z'],
+                                   'end' => ['required', 'date_format:Y-m-d\TH:i:sP,Y-m-d\TH:i:s\Z'],
                 'title' => ['required', 'max:255'],
                 'description' => ['required'],
                 'location' => [
@@ -687,6 +704,7 @@ class EventController extends Controller
         $timezone = $request->input('timezone');
         $online = $request->input('online', false);
         $link = $request->input('link', null);
+        $network_data = $request->input('network_data');
 
         $latitude = null;
         $longitude = null;
@@ -719,6 +737,7 @@ class EventController extends Controller
             $longitude,
             $online,
             $link,
+            $network_data
         );
     }
 }

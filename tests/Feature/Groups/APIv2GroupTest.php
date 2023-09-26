@@ -35,7 +35,8 @@ class APIv2GroupTest extends TestCase
             'London',
             'Some text.',
             true,
-            $approve
+            $approve,
+            'info@test.com'
         );
 
         // Test invalid group id.
@@ -52,12 +53,14 @@ class APIv2GroupTest extends TestCase
         $response->assertSuccessful();
         $json = json_decode($response->getContent(), true);
         $this->assertEquals($idgroups, $json['data']['id']);
+        $this->assertEquals('info@test.com', $json['data']['email']);
         $this->assertTrue(array_key_exists('description', $json['data']));
         $this->assertTrue(array_key_exists('stats', $json['data']));
         $this->assertTrue(array_key_exists('updated_at', $json['data']));
         $this->assertTrue(array_key_exists('location', $json['data']));
         $location = $json['data']['location'];
         $this->assertEquals('London', $location['location']);
+        $this->assertEquals('GB', $location['country_code']);
         $this->assertEquals('United Kingdom', $location['country']);
 
         // Check the network data has been created as expected.
@@ -152,7 +155,8 @@ class APIv2GroupTest extends TestCase
                 'name' => 'Test Group',
                 'location' => 'London',
                 'description' => 'Some text.',
-                'timezone' => 'Europe/Brussels'
+                'timezone' => 'Europe/Brussels',
+                'email' => 'info@test.com'
             ]
         );
 
@@ -168,6 +172,7 @@ class APIv2GroupTest extends TestCase
         $this->assertEquals('Some text.', $group->free_text);
         $this->assertStringContainsString('.jpg', $group->groupImage->image->path);
         $this->assertEquals('Europe/Brussels', $group->timezone);
+        $this->assertEquals('info@test.com', $group->email);
 
         // Group should now appear in the list of groups.
         $response = $this->get('/api/v2/groups/names');

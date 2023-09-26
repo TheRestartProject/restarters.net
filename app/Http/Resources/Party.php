@@ -88,6 +88,12 @@ use Illuminate\Http\Resources\Json\JsonResource;
  *          ref="#/components/schemas/GroupSummary"
  *     ),
  *     @OA\Property(
+ *         property="link",
+ *         title="link",
+ *         description="Optional web link",
+ *         type="string",
+ *     ),
+ *     @OA\Property(
  *         property="approved",
  *         title="hosts",
  *         description="Whether the event has been approved",
@@ -239,9 +245,8 @@ class Party extends JsonResource
     public function toArray($request)
     {
         // We return information which can be public, and we rename fields to look more consistent.
-        return [
+        $ret = [
             'id' => $this->idevents,
-            'approved' => $this->approved ? true : false,
             'start' => $this->event_start_utc,
             'end' => $this->event_end_utc,
             'timezone' => $this->timezone,
@@ -255,8 +260,15 @@ class Party extends JsonResource
             'stats' => $this->resource->getEventStats(),
             'updated_at' => Carbon::parse($this->updated_at)->toIso8601String(),
             'approved' => $this->approved ? true : false,
-            'network_data' => $this->network_data,
+            'network_data' => gettype($this->network_data) == 'string' ? json_decode($this->network_data, true) : $this->network_data,
             'full' => true,
         ];
+
+        if ($this->link) {
+            // Don't return this unless present - the OpenAPI schema doesn't allow null values.
+            $ret['link'] = $this->link;
+        }
+
+        return $ret;
     }
 }

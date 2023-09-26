@@ -547,8 +547,6 @@ class GroupController extends Controller
         $user = Auth::user();
 
         if ($groups) {
-            $countries = array_flip(Fixometer::getAllCountries('en'));
-
             foreach ($groups as $group) {
                 $group_image = $group->groupImage;
 
@@ -577,7 +575,8 @@ class GroupController extends Controller
                         asset('uploads/mid_'.$group_image->image->path) : null,
                     'location' => [
                         'location' => rtrim($group->location),
-                        'country' => Fixometer::translateCountry($group->country, $countries),
+                        'country' => Fixometer::getCountryFromCountryCode($group->country_code),
+                        'country_code' => $group->country_code,
                         'distance' => $distance,
                     ],
                     'next_event' => $event ? $event->event_date_local : null,

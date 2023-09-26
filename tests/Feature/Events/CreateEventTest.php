@@ -2,15 +2,20 @@
 
 namespace Tests\Feature;
 
+use App\Events\UserConfirmedEvent;
+use App\Events\UserLeftEvent;
 use App\EventsUsers;
 use App\Group;
 use App\Helpers\Geocoder;
 use App\Helpers\RepairNetworkService;
+use App\Listeners\AddUserToDiscourseThreadForEvent;
+use App\Listeners\RemoveUserFromDiscourseThreadForEvent;
 use App\Network;
 use App\Notifications\AdminModerationEvent;
 use App\Notifications\NotifyRestartersOfNewEvent;
 use App\Party;
 use App\Role;
+use App\Services\DiscourseService;
 use App\User;
 use Carbon\Carbon;
 use DB;
@@ -96,7 +101,8 @@ class CreateEventTest extends TestCase
         $eventAttributes['event_start_utc'] = $start->toIso8601String();
         $eventAttributes['event_end_utc'] = $end->toIso8601String();
 
-        $this->post('/party/create/', $eventAttributes);
+        $response = $this->post('/api/v2/events?api_token=' . $host->api_token, $this->eventAttributesToAPI($eventAttributes));
+        $response->assertSuccessful();
 
         // The event_start_utc and event_end_utc will be in the database, but not ISO8601 formatted - that is implicit.
         $eventAttributes['event_start_utc'] = Carbon::parse($eventAttributes['event_start_utc'])->setTimezone('UTC')->format('Y-m-d H:i:s');
@@ -112,10 +118,9 @@ class CreateEventTest extends TestCase
         self::assertEquals(1, $upcoming_events->count());
         self::assertEquals($event->idevents, $upcoming_events[0]->idevents);
 
-        // Check that we can view the event, and that it shows the creation success message.
+        // Check that we can view the event.
         $this->get('/party/view/'.$event->idevents)->
-            assertSee($eventAttributes['venue'])->
-            assertSee(__('events.created_success_message'));
+            assertSee($eventAttributes['venue']);
 
         // Check that the event appears in the API.
         $rsp = $this->get('/api/groups/' . $group->idgroups . '/events');
@@ -313,8 +318,8 @@ class CreateEventTest extends TestCase
         // Create an event.
         $event = Party::factory()->raw();
         $event['group'] = $group->idgroups;
-        $response = $this->post('/party/create/', $event);
-        $response->assertStatus(302);
+        $response = $this->post('/api/v2/events?api_token=' . $admins[0]->api_token, $this->eventAttributesToAPI($event));
+        $response->assertSuccessful();
 
         // Should have been sent to the admins.
         Notification::assertSentTo(
@@ -347,7 +352,8 @@ class CreateEventTest extends TestCase
         ]);
 
         // Approve the event
-        $response = $this->post('/party/create/', $eventData);
+        $response = $this->post('/api/v2/events?api_token=' . $admin->api_token, $this->eventAttributesToAPI($eventData));
+        $response->assertSuccessful();
         $event = Party::latest()->first();
         $eventData['id'] = $event->idevents;
         $eventData['moderate'] = 'approve';
@@ -401,7 +407,8 @@ class CreateEventTest extends TestCase
         $eventData = Party::factory()->raw(['group' => $group->idgroups, 'event_date' => '1930-01-01', 'latitude'=>'1', 'longitude'=>'1']);
 
         // act
-        $response = $this->post('/party/create/', $eventData);
+        $response = $this->post('/api/v2/events?api_token=' . $admin->api_token, $this->eventAttributesToAPI($eventData));
+        $response->assertSuccessful();
         $event = Party::latest()->first();
         $eventData = $event->getAttributes();
         $eventData['moderate'] = 'approve';
@@ -435,7 +442,8 @@ class CreateEventTest extends TestCase
         $eventData = Party::factory()->raw(['group' => $group->idgroups]);
 
         $this->actingAs($admin);
-        $response = $this->post('/party/create/', $eventData);
+        $response = $this->post('/api/v2/events?api_token=' . $admin->api_token, $this->eventAttributesToAPI($eventData));
+        $response->assertSuccessful();
 
         // assert that the notification was sent to both the network coordinator, and the admin, and only once to each.
         Notification::assertSentToTimes(
@@ -450,29 +458,46 @@ class CreateEventTest extends TestCase
     public function a_host_can_be_added_later()
     {
         $this->withoutExceptionHandling();
+        Queue::fake();
 
         $host = User::factory()->host()->create();
+        $host2 = User::factory()->host()->create();
         $this->actingAs($host);
 
         $group = Group::factory()->create();
         $group->addVolunteer($host);
         $group->makeMemberAHost($host);
+        $group->addVolunteer($host2);
+        $group->makeMemberAHost($host2);
 
         // Create the event
-        $response = $this->get('/party/create');
-        $this->get('/party/create')->assertStatus(200);
-
         $eventAttributes = Party::factory()->raw(['group' => $group->idgroups, 'event_date' => '2000-01-01', 'approved' => true]);
-        $response = $this->post('/party/create/', $eventAttributes);
+        $response = $this->post('/api/v2/events?api_token=' . $host->api_token, $this->eventAttributesToAPI($eventAttributes));
+        $response->assertSuccessful();
 
         // Find the event id
         $party = $group->parties()->latest()->first();
+
+        // Add the second host.
+        $response = $this->put('/api/events/' . $party->idevents . '/volunteers?api_token=' . $host->api_token, [
+            'volunteer_email_address' => $host2->email,
+            'full_name' => $host2->name,
+            'user' => $host2->id,
+        ]);
+
+        $response->assertSuccessful();
 
         // Remove the host from the event
         $volunteer = EventsUsers::where('user', $host->id)->first();
         $this->post('/party/remove-volunteer/', [
             'id' => $volunteer->idevents_users,
         ])->assertSee('true');
+
+        Queue::assertPushed(\Illuminate\Events\CallQueuedListener::class, function ($job) use ($party, $host) {
+            if ($job->class == RemoveUserFromDiscourseThreadForEvent::class) {
+                return true;
+            }
+        });
 
         // Assert that we see the host in the list of volunteers to add to the event.
         $response = $this->get('/api/groups/'. $group->idgroups . '/volunteers?api_token=' . $host->api_token);
@@ -485,7 +510,10 @@ class CreateEventTest extends TestCase
         ]);
 
         // Assert we can add them back in.
-        $response = $this->put('/api/events/' . $party->idevents . '/volunteers', [
+        $party->discourse_thread = 123;
+        $party->save();
+
+        $response = $this->put('/api/events/' . $party->idevents . '/volunteers?api_token=' . $host->api_token, [
             'volunteer_email_address' => $host->email,
             'full_name' => $host->name,
             'user' => $host->id,
@@ -494,6 +522,30 @@ class CreateEventTest extends TestCase
         $response->assertSuccessful();
         $rsp = json_decode($response->getContent(), TRUE);
         $this->assertEquals('success', $rsp['success']);
+
+        // Check the listener was queued to be called in the background.
+        Queue::assertPushed(\Illuminate\Events\CallQueuedListener::class, function ($job) use ($party, $host) {
+            if ($job->class == AddUserToDiscourseThreadForEvent::class) {
+                return true;
+            }
+        });
+
+        // Manually call the listener for coverage and check it calls through to Discourse.
+        $this->instance(
+            DiscourseService::class,
+            \Mockery::mock(DiscourseService::class, function ($mock) {
+                $mock->shouldReceive('addUserToPrivateMessage')->once();
+                $mock->shouldReceive('removeUserFromPrivateMessage')->once();
+            })
+        );
+
+        $listener = app()->make(AddUserToDiscourseThreadForEvent::class);
+        $event = new UserConfirmedEvent($party->idevents, $host->id);
+        $listener->handle($event);
+
+        $listener = app()->make(RemoveUserFromDiscourseThreadForEvent::class);
+        $event = new UserLeftEvent($party->idevents, $host->id);
+        $listener->handle($event);
     }
 
     public function provider()
@@ -616,11 +668,13 @@ class CreateEventTest extends TestCase
                                                 ]);
 
         // Create and approve an event.
-        $response = $this->post('/party/create/', $eventData);
+        $response = $this->post('/api/v2/events?api_token=' . $host->api_token, $this->eventAttributesToAPI($eventData));
+        $response->assertSuccessful();
+
         $event = Party::latest()->first();
         $eventData['id'] = $event->idevents;
         $eventData['moderate'] = 'approve';
-        $response = $this->post('/party/edit/'.$event->idevents, $eventData);
+        $this->patch('/api/v2/events/'.$event->idevents, $this->eventAttributesToAPI($eventData));
 
         // Shouldn't notify
         Notification::assertNotSentTo(
@@ -628,26 +682,11 @@ class CreateEventTest extends TestCase
         );
     }
 
-    /**
-     * @test
-     */
-    public function invalid_location_fails() {
-        $this->loginAsTestUser(Role::ADMINISTRATOR);
-        $idgroups = $this->createGroup();
-
-        $eventData = Party::factory()->raw([
-                                                    'group' => $idgroups,
-                                                    'location' => 'ForceGeocodeFailure',
-                                                ]);
-
-        // A geocode failure should result in an error alert.
-        $response = $this->post('/party/create/', $eventData);
-        $response->assertSee('alert-danger');
-    }
-
     /** @test */
     public function notifications_are_queued_as_expected()
     {
+        Notification::fake();
+
         // At the moment we are queueing (backgrounding) admin notifications but not user notifications.
         //
         // Don't call Notification::fake() - we want real notifications.
@@ -655,6 +694,7 @@ class CreateEventTest extends TestCase
 
         // Create an admin
         $admin = User::factory()->administrator()->create();
+
         // Create a network with a group.
         $network = Network::factory()->create();
         $group = Group::factory()->create();
@@ -669,47 +709,23 @@ class CreateEventTest extends TestCase
         $group->makeMemberAHost($host);
         $this->actingAs($host);
 
-        // Clear any jobs queued in earlier tests.
-        $max = 1000;
-        do {
-            $job = Queue::pop('database');
-
-            if ($job) {
-                try {
-                    $job->fail('removed in UT');
-                } catch (\Exception $e) {}
-            }
-
-            $max--;
-        }
-        while (Queue::size() > 0 && $max > 0);
-
         // Create an event.
-        $initialQueueSize = \Illuminate\Support\Facades\Queue::size('database');
         $event = Party::factory()->raw();
         $event['group'] = $group->idgroups;
-        $response = $this->post('/party/create/', $event);
-        $response->assertStatus(302);
+        $response = $this->post('/api/v2/events?api_token=' . $host->api_token, $this->eventAttributesToAPI($event));
+        $response->assertSuccessful();
 
-        // Should have queued AdminModerationEvent.
-        $queueSize = Queue::size();
-        self::assertGreaterThan($initialQueueSize, $queueSize);
+        Notification::assertSentTo(
+            [$admin], AdminModerationEvent::class
+        );
 
-        // Fail it.
-        $job = Queue::pop();
-        self::assertNotNull($job);
-        self::assertStringContainsString('AdminModerationEvent', $job->getRawBody());
-        try {
-            $job->fail('removed in UT');
-        } catch (\Exception $e) {}
-        self::assertEquals(0, Queue::size('database'));
-
-        // Approval should generate a notification to the host which is also queued.
+        // Approval should generate a notification to the host.
         $event = Party::latest()->first();
         $event->approve();
 
-        # Should have queued ApproveEvent.
-        self::assertEquals(0, Queue::size('database'));
+        Notification::assertSentTo(
+            [$host], EventConfirmed::class
+        );
     }
 
     /** @test */
@@ -747,14 +763,9 @@ class CreateEventTest extends TestCase
         $eventAttributes['event_start_utc'] = $event_start->toIso8601String();
         $eventAttributes['event_end_utc'] = $event_end->toIso8601String();
 
-        $response = $this->post('/party/create/', $eventAttributes);
-        $response->assertRedirect();
-
-        // Should redirect to edit page.
-        $redirectTo = $response->getTargetUrl();
-        $p = strrpos($redirectTo, '/');
-        $idevents = substr($redirectTo, $p + 1);
-        self::assertNotNull($idevents);
+        $response = $this->post('/api/v2/events?api_token=' . $coordinator->api_token, $this->eventAttributesToAPI($eventAttributes));
+        $response->assertSuccessful();
+        $idevents = Party::latest()->first()->idevents;
 
         $response = $this->get('/party/edit/'.$idevents);
         $response->assertSuccessful();

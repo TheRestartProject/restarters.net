@@ -24,10 +24,13 @@ export default {
       currentLink: null,
     }
   },
-  mounted () {
-    this.currentLink = this.link
-  },
   watch: {
+    link: {
+      handler: function(newVal) {
+        this.currentLink = newVal
+      },
+      immediate: true
+    },
     currentLink(newVal) {
       this.$emit('update:link', newVal)
     },

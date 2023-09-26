@@ -86,8 +86,6 @@ class GroupController extends Controller
         // New Collection Instance
         $collection = collect([]);
 
-        $countries = array_flip(\App\Helpers\Fixometer::getAllCountries());
-
         foreach ($groups as $group) {
             // If we have a bounding box, check that the group is within it.
             if (! $bbox || (
@@ -102,7 +100,8 @@ class GroupController extends Controller
                                       'timezone' => $group->timezone,
                                       'location' => [
                                           'value' => $group->location,
-                                          'country' => Fixometer::translateCountry($group->country, $countries),
+                                          'country' => Fixometer::getCountryFromCountryCode($group->country_code),
+                                          'country_code' => $group->country_code,
                                           'latitude' => $group->latitude,
                                           'longitude' => $group->longitude,
                                           'area' => $group->area,
@@ -556,6 +555,10 @@ class GroupController extends Controller
      *                   ref="#/components/schemas/Group/properties/website"
      *                ),
      *                @OA\Property(
+     *                   property="email",
+     *                   ref="#/components/schemas/Group/properties/email"
+     *                ),
+     *                @OA\Property(
      *                   property="description",
      *                   ref="#/components/schemas/Group/properties/description",
      *                ),
@@ -593,7 +596,7 @@ class GroupController extends Controller
         $user = $this->getUser();
         $user->convertToHost();
 
-        list($name, $area, $postcode, $location, $phone, $website, $description, $timezone, $latitude, $longitude, $country, $network_data) = $this->validateGroupParams(
+        list($name, $area, $postcode, $location, $phone, $website, $description, $timezone, $latitude, $longitude, $country, $network_data, $email) = $this->validateGroupParams(
             $request,
             true
         );
@@ -606,12 +609,13 @@ class GroupController extends Controller
             'postcode' => $postcode,
             'latitude' => $latitude,
             'longitude' => $longitude,
-            'country' => $country,
+            'country_code' => $country,
             'free_text' => $description,
             'shareable_code' => Fixometer::generateUniqueShareableCode(\App\Group::class, 'shareable_code'),
             'timezone' => $timezone,
             'phone' => $phone,
             'network_data' => $network_data,
+            'email' => $email,
         ];
 
         $group = Group::create($data);
@@ -693,6 +697,10 @@ class GroupController extends Controller
      *                   ref="#/components/schemas/Group/properties/website"
      *                ),
      *                @OA\Property(
+     *                   property="email",
+     *                   ref="#/components/schemas/Group/properties/email"
+     *                ),
+     *                @OA\Property(
      *                   property="description",
      *                   ref="#/components/schemas/Group/properties/description",
      *                ),
@@ -729,7 +737,7 @@ class GroupController extends Controller
     public function updateGroupv2(Request $request, $idGroup) {
         $user = $this->getUser();
 
-        list($name, $area, $postcode, $location, $phone, $website, $description, $timezone, $latitude, $longitude, $country, $network_data) = $this->validateGroupParams(
+        list($name, $area, $postcode, $location, $phone, $website, $description, $timezone, $latitude, $longitude, $country, $network_data, $email) = $this->validateGroupParams(
             $request,
             false
         );
@@ -750,11 +758,12 @@ class GroupController extends Controller
             'location' => $location,
             'latitude' => $latitude,
             'longitude' => $longitude,
-            'country' => $country,
+            'country_code' => $country,
             'free_text' => $description,
             'timezone' => $timezone,
             'phone' => $phone,
             'network_data' => $network_data,
+            'email' => $email,
         ];
 
         if ($user->hasRole('Administrator') || $user->hasRole('NetworkCoordinator')) {
@@ -872,10 +881,11 @@ class GroupController extends Controller
         $description = $request->input('description');
         $timezone = $request->input('timezone');
         $network_data = $request->input('network_data');
+        $email = $request->input('email');
 
         $latitude = null;
         $longitude = null;
-        $country = null;
+        $country_code = null;
 
         if ($timezone && !in_array($timezone, \DateTimeZone::listIdentifiers(\DateTimeZone::ALL_WITH_BC))) {
             throw ValidationException::withMessages(['location ' => __('partials.validate_timezone')]);
@@ -895,7 +905,7 @@ class GroupController extends Controller
 
             // Note that the country returned by the geocoder is already in English, which is what we need for the
             // value in the database.
-            $country = $geocoded['country'];
+            $country_code = $geocoded['country_code'];
         }
 
         return array(
@@ -909,8 +919,9 @@ class GroupController extends Controller
             $timezone,
             $latitude,
             $longitude,
-            $country,
+            $country_code,
             $network_data,
+            $email,
         );
     }
 }

@@ -9,7 +9,7 @@
           size="lg"
           inputClass="marg form-control-lg fontsize"
           :disabled="disabled"
-          :placeholder="__('devices.brand')"
+          :placeholder="__('devices.brand_if_known')"
           @input="input"
       />
       <div />
@@ -21,6 +21,7 @@
 </template>
 <script>
 import VueTypeaheadBootstrap from 'vue-typeahead-bootstrap';
+import {UNKNOWN_STRINGS} from "../constants";
 
 export default {
   components: { VueTypeaheadBootstrap },
@@ -103,7 +104,13 @@ export default {
       this.brandValue = newVal
     },
     brandValue(newVal) {
-      this.$emit('update:brand', newVal)
+      if (newVal && UNKNOWN_STRINGS.includes(newVal.toLowerCase())) {
+        newVal = null
+      }
+
+      this.$nextTick(() => {
+        this.$emit('update:brand', newVal)
+      })
     }
   },
   methods: {
