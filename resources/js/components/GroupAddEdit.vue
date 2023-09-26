@@ -47,9 +47,6 @@
       <input type="text" id="lng" name="lng" v-model="lng"  style="width: 1px; height: 1px; position: fixed; bottom: 65px; left: 10px; border: 0;" />
       <input type="text" id="location" name="location" v-model="location"  style="width: 1px; height: 1px; position: fixed; bottom: 65px; left: 20px; border: 0;" />
 
-      <div class="address">
-        Address {{ location }},, {{ postcode }},  {{ lat }}, {{ lng }}
-      </div>
       <GroupLocation
           :all-groups="groups"
           :value.sync="location"
