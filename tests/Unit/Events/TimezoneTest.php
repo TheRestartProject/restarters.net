@@ -11,6 +11,9 @@ use DB;
 use Illuminate\Validation\ValidationException;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Tests\TestCase;
+use function PHPUnit\Framework\assertEquals;
+use function PHPUnit\Framework\assertNull;
+use Illuminate\Support\Facades\Artisan;
 
 class TimezoneTest extends TestCase
 {
@@ -220,5 +223,26 @@ class TimezoneTest extends TestCase
         // This should have updated the timezone of the event.
         $party->refresh();
         self::assertEquals('Europe/London', $party->timezone);
+    }
+
+    public function testCrystallise() {
+        // Create a past event and check that the scheduled command crystallises the timezone.
+        $g = Group::factory()->create([
+            'timezone' => 'Asia/Samarkand'
+        ]);
+
+        $e = Party::factory()->create([
+            'group' => $g->idgroups,
+            'event_start_utc' => '2021-02-01T10:15:05+05:00',
+            'event_end_utc' => '2021-02-01T13:45:05+05:00',
+            'timezone' => NULL
+        ]);
+
+        // We want to skip the accessor for this test.
+        assertNull($e->getAttributes()['timezone']);
+        Artisan::call('event:timezones');
+
+        $e->refresh();
+        assertEquals('Asia/Samarkand', $e->getAttributes()['timezone']);
     }
 }
