@@ -308,6 +308,12 @@ export default {
       }
 
       this.networkData = setFrom.network_data ? setFrom.network_data : {}
+
+      if (!this.creating) {
+        this.eventApproved = setFrom.approved
+      } else {
+        this.eventApproved = this.autoApprove
+      }
     }
 
     // If only one group, default to that.
