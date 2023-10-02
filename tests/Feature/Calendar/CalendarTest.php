@@ -73,6 +73,24 @@ class CalendarTest extends TestCase
                                 'full_name' => $host->name,
                             ]);
 
+
+        $event2 = Party::factory()->create([
+            'group' => $group->idgroups,
+            'latitude' => 50.645,
+            'longitude' => 5.575,
+            'event_start_utc' => $this->start,
+            'event_end_utc' => $this->end,
+        ]);
+
+        $event2->approve();
+
+        EventsUsers::create([
+            'event' => $event2->idevents,
+            'user' => $host->id,
+            'status' => 1,
+            'role' => 4,
+            'full_name' => $host->name,
+        ]);
     }
 
     public function testByUser() {

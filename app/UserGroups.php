@@ -112,4 +112,12 @@ class UserGroups extends Model implements Auditable
 
         return 'N/A';
     }
+
+    public function user() {
+        return $this->belongsTo(\App\User::class, 'user', 'id');
+    }
+
+    public function group() {
+        return $this->belongsTo(\App\Groups::class, 'group', 'idgroups');
+    }
 }

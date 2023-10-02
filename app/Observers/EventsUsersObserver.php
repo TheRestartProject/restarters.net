@@ -39,10 +39,11 @@ class EventsUsersObserver {
         
         if ($eu->status == 1) {
             // Confirmed.  Make sure they are on the thread.
-            $this->confirmed($event, $user);
+            $this->confirmed($event, $user, true);
         } else {
-            // Not confirmed.  Make sure they are not on the thread.
-            $this->removed($event, $user);
+            // Not confirmed.  Make sure they are not on the thread.  Don't change the count, as they shouldn't
+            // be on it anyway.
+            $this->removed($event, $user, false);
         }
     }
 
@@ -52,18 +53,22 @@ class EventsUsersObserver {
      * @param  \App\EventsUsers  $eu
      * @return void
      */
-    public function updated(EventsUsers $eu) {
+    public function updating(EventsUsers $eu) {
         $idevents = $eu->event;
         $event = \App\Party::find($idevents);
         $iduser = $eu->user;
         $user = $iduser ? User::find($iduser) : null;
 
-        if ($eu->status == 1) {
-            // Confirmed.  Make sure they are on the thread.
-            $this->confirmed($event, $user);
-        } else {
-            // Not confirmed.  Make sure they are not on the thread.
-            $this->removed($event, $user);
+        if ($eu->isDirty('status')) {
+            // The confirmed status has changed, so we need to update the thread.
+
+            if ($eu->status == 1) {
+                // Confirmed.  Make sure they are on the thread.
+                $this->confirmed($event, $user, true);
+            } else {
+                // Not confirmed.  Make sure they are not on the thread.
+                $this->removed($event, $user, true);
+            }
         }
     }
 
@@ -80,8 +85,8 @@ class EventsUsersObserver {
         $iduser = $eu->user;
         $user = $iduser ? User::find($iduser) : null;
 
-        // Make sure they are not on the thread.
-        $this->removed($event, $user);
+        // Make sure they are not on the thread.  If they were confirmed, we need to update the volunteer count.
+        $this->removed($event, $user, true, $eu->status == 1);
     }
 
     /**
@@ -89,9 +94,12 @@ class EventsUsersObserver {
      * @param User $user
      * @return void
      */
-    private function confirmed($event, $user): void
+    private function confirmed($event, $user, $count): void
     {
-        $event->increment('volunteers');
+        if ($count) {
+            $event->increment('volunteers');
+        }
+
         event(new UserConfirmedEvent($event->idevents, $user ? $user->id : null));
     }
 
@@ -100,9 +108,12 @@ class EventsUsersObserver {
      * @param User $user
      * @return void
      */
-    private function removed($event, $user): void
+    private function removed($event, $user, $count): void
     {
-        $event->decrement('volunteers');
+        if ($count) {
+            $event->decrement('volunteers');
+        }
+
         event(new UserLeftEvent($event->idevents, $user ? $user->id : null));
     }
 }
