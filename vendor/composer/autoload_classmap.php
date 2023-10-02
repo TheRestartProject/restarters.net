@@ -41,6 +41,7 @@ return array(
     'App\\Console\\Commands\\CheckGroupLocations' => $baseDir . '/app/Console/Commands/CheckGroupLocations.php',
     'App\\Console\\Commands\\CheckTranslations' => $baseDir . '/app/Console/Commands/CheckTranslations.php',
     'App\\Console\\Commands\\CreateDiscourseGroups' => $baseDir . '/app/Console/Commands/CreateDiscourseGroups.php',
+    'App\\Console\\Commands\\CrystalliseEventTimezone' => $baseDir . '/app/Console/Commands/CrystalliseEventTimezone.php',
     'App\\Console\\Commands\\DiscourseChangeSetting' => $baseDir . '/app/Console/Commands/DiscourseChangeSetting.php',
     'App\\Console\\Commands\\FixViews' => $baseDir . '/app/Console/Commands/FixViews.php',
     'App\\Console\\Commands\\FixVolunteerCount' => $baseDir . '/app/Console/Commands/FixVolunteerCount.php',

@@ -810,6 +810,7 @@ class ComposerStaticInitf657da3451727d69be6269822b9691c7
         'App\\Console\\Commands\\CheckGroupLocations' => __DIR__ . '/../..' . '/app/Console/Commands/CheckGroupLocations.php',
         'App\\Console\\Commands\\CheckTranslations' => __DIR__ . '/../..' . '/app/Console/Commands/CheckTranslations.php',
         'App\\Console\\Commands\\CreateDiscourseGroups' => __DIR__ . '/../..' . '/app/Console/Commands/CreateDiscourseGroups.php',
+        'App\\Console\\Commands\\CrystalliseEventTimezone' => __DIR__ . '/../..' . '/app/Console/Commands/CrystalliseEventTimezone.php',
         'App\\Console\\Commands\\DiscourseChangeSetting' => __DIR__ . '/../..' . '/app/Console/Commands/DiscourseChangeSetting.php',
         'App\\Console\\Commands\\FixViews' => __DIR__ . '/../..' . '/app/Console/Commands/FixViews.php',
         'App\\Console\\Commands\\FixVolunteerCount' => __DIR__ . '/../..' . '/app/Console/Commands/FixVolunteerCount.php',
