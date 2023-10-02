@@ -19,6 +19,7 @@ use Illuminate\Support\Facades\Notification;
 use Symfony\Component\DomCrawler\Crawler;
 use Tests\TestCase;
 use Illuminate\Support\Facades\Queue;
+use function PHPUnit\Framework\assertEquals;
 
 class AddRemoveVolunteerTest extends TestCase
 {
@@ -150,6 +151,10 @@ class AddRemoveVolunteerTest extends TestCase
         $response = $this->get('/party/view/'.$event->idevents);
         $response->assertSee('Invites sent!');
 
+        // Invited volunteers shouldn't affect the count.
+        $event->refresh();
+        assertEquals(0, $event->volunteers);
+
         $response = $this->put('/api/events/' . $event->idevents . '/volunteers', [
             'volunteer_email_address' => $restarter->email,
             'full_name' => $restarter->name,
@@ -165,6 +170,10 @@ class AddRemoveVolunteerTest extends TestCase
             'id' => $volunteer->idevents_users,
         ])->assertSee('true');
 
+        // Invited volunteers shouldn't affect the count.
+        $event->refresh();
+        assertEquals(0, $event->volunteers);
+
         // Add by name only
         $response = $this->put('/api/events/' . $event->idevents . '/volunteers', [
             'full_name' => 'Jo Bloggins',
@@ -178,6 +187,10 @@ class AddRemoveVolunteerTest extends TestCase
         $this->post('/party/remove-volunteer/', [
             'id' => $volunteer->idevents_users,
         ])->assertSee('true');
+
+        // Invited volunteers shouldn't affect the count.
+        $event->refresh();
+        assertEquals(0, $event->volunteers);
 
         // Add anonymous.
         $response = $this->put('/api/events/' . $event->idevents . '/volunteers', []);

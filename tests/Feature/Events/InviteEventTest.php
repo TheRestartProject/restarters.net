@@ -16,6 +16,7 @@ use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Tests\TestCase;
 use App\Notifications\JoinEvent;
 use Illuminate\Support\Facades\Queue;
+use function PHPUnit\Framework\assertEquals;
 
 class InviteEventTest extends TestCase
 {
@@ -70,6 +71,10 @@ class InviteEventTest extends TestCase
                 return true;
             }
         );
+
+        // Invited volunteers shouldn't update the count.
+        $event->refresh();
+        assertEquals(0, $event->volunteers);
     }
 
     public function testInviteReal()
@@ -93,6 +98,8 @@ class InviteEventTest extends TestCase
         $group = Group::findOrFail($idgroups);
         $idevents = $this->createEvent($idgroups, 'tomorrow');
         $event = Party::findOrFail($idevents);
+        $event->refresh();
+        assertEquals(1, $event->volunteers);
 
         // We want the event handler to kick in and synchronise to Discourse.
         $this->artisan("queue:work --stop-when-empty");
@@ -117,6 +124,10 @@ class InviteEventTest extends TestCase
             'event' => $event->idevents,
             'role' => 4,
         ]);
+
+        // Invited volunteers shouldn't update the count.
+        $event->refresh();
+        assertEquals(1, $event->volunteers);
 
         // Admin approves the event.
         $admin = User::factory()->administrator()->create();
@@ -159,6 +170,10 @@ class InviteEventTest extends TestCase
         $events = $this->getVueProperties($response5)[1][':initial-events'];
         $this->assertNotFalse(strpos($events, '"attending":true'));
 
+        // Count should now include them.
+        $event->refresh();
+        assertEquals(1, $event->volunteers);
+
         // Invite again - different code path when they're already there.
         $response = $this->post('/party/invite', [
             'group_name' => $group->name,
@@ -192,6 +207,9 @@ class InviteEventTest extends TestCase
                                 'full_name' => null,
                            ]);
         $this->actingAs($host);
+
+        $event->refresh();
+        assertEquals(1, $event->volunteers);
 
         // Should have no group members and therefore no invitable members.
         $response = $this->get('/party/get-group-emails-with-names/'.$event->idevents);
@@ -227,6 +245,10 @@ class InviteEventTest extends TestCase
 
         $response5->assertSessionHas('success');
 
+        // Invited volunteers shouldn't update the count.
+        $event->refresh();
+        assertEquals(1, $event->volunteers);
+
         // Invited member should not show up as invitable.
         $response6 = $this->get('/party/get-group-emails-with-names/'.$event->idevents);
         $members = json_decode($response6->getContent());
@@ -252,6 +274,10 @@ class InviteEventTest extends TestCase
         $this->assertTrue($response8->isRedirection());
         $redirectTo = $response8->getTargetUrl();
         $this->assertNotFalse(strpos($redirectTo, '/party/view/'.$event->idevents));
+
+        // Should now show.
+        $event->refresh();
+        assertEquals(2, $event->volunteers);
 
         // Now a group member and confirmed so should not show as invitable.
         $this->get('/logout');
@@ -385,11 +411,17 @@ class InviteEventTest extends TestCase
         $group = Group::findOrFail($idgroups);
         $idevents = $this->createEvent($idgroups, 'tomorrow');
         $event = Party::findOrFail($idevents);
+        assertEquals(1, $event->volunteers);
 
         $unique_shareable_code = Fixometer::generateUniqueShareableCode(\App\Party::class, 'shareable_code');
         $event->update([
                            'shareable_code' => $unique_shareable_code,
                        ]);
+
+
+        // Invited volunteers shouldn't update the count.
+        $event->refresh();
+        assertEquals(1, $event->volunteers);
 
         // Accept the invite via the code.
         $this->actingAs($user);
@@ -401,6 +433,11 @@ class InviteEventTest extends TestCase
             'url' => url("/party/view/{$event->idevents}"),
             'name' => $event->venue
         ]), false);
+
+
+        // Should now show.
+        $event->refresh();
+        assertEquals(2, $event->volunteers);
 
         // Try with invalid code.
         $this->expectException(NotFoundHttpException::class);
