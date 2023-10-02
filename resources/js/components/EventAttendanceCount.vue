@@ -42,7 +42,7 @@ export default {
     }
   },
   mounted() {
-    this.current = this.count !== null ? this.count : 0
+    this.current = this.count !== null ? Math.max(this.count, 0) : 0
   },
   methods: {
     inc() {
@@ -57,7 +57,14 @@ export default {
     },
     set() {
       // This is triggered on keyup as the change even doesn't fire while you're still in the field.
-      this.$emit('change', this.current)
+      this.current = parseInt(this.current)
+
+      if (this.current > 0) {
+        this.$emit('change', this.current)
+      } else {
+        // Don't allow them to type a negative value.
+        this.current = 0
+      }
     }
   }
 }
