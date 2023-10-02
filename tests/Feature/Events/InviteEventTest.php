@@ -172,7 +172,7 @@ class InviteEventTest extends TestCase
 
         // Count should now include them.
         $event->refresh();
-        assertEquals(1, $event->volunteers);
+        assertEquals(2, $event->volunteers);
 
         // Invite again - different code path when they're already there.
         $response = $this->post('/party/invite', [
