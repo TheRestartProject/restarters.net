@@ -39,21 +39,12 @@
                   {{ __('events.confirmed_none') }}
                 </p>
                 <hr />
-                <div v-if="upcoming" class="d-flex justify-content-end">
-                  <!-- TODO LATER In due course this modal should become Vue components.-->
-                  <a data-toggle="modal" data-target="#event-all-attended" href="#" class="mr-2">
-                    {{ __('events.see_all') }}
-                  </a>
-                </div>
-                <div v-else>
+                <div>
                   <div class="d-flex justify-content-between">
                     <b-btn variant="link" @click="addVolunteer">
                       {{ __('events.add_volunteer_modal_heading') }}
                     </b-btn>
                     <EventAddVolunteerModal :idevents="idevents" ref="addVolunteerModal" @hide="fetchVolunteers" />
-                  <b-btn variant="link" data-toggle="modal" data-target="#event-all-attended" href="#">
-                    {{ __('events.see_all') }}
-                    </b-btn>
                   </div>
                 </div>
               </b-tab>
@@ -72,9 +63,6 @@
                   <a data-toggle="modal" data-target="#event-invite-to" href="#" class="ml-2">
                     <img class="icon" src="/images/add-icon.svg" />
                     {{ __('events.invite_to_join') }}
-                  </a>
-                  <a data-toggle="modal" data-target="#event-all-volunteers" href="#" class="mr-2" v-if="invited.length">
-                    {{ __('events.see_all') }}
                   </a>
                 </div>
               </b-tab>
