@@ -31,11 +31,6 @@ export default {
       required: false,
       default: false
     },
-    itemTypes: {
-      type: Array,
-      required: false,
-      default: null
-    },
     suppressTypeWarning: {
       type: Boolean,
       required: false,
@@ -49,18 +44,21 @@ export default {
     }
   },
   computed: {
+    itemTypes() {
+      return this.$store.getters['items/list'];
+    },
     suggestions() {
-      return this.itemTypes.map(i => i.item_type)
+      return this.itemTypes.map(i => i.type)
     },
     notASuggestion() {
-      if (!this.currentType) {
+      if (!this.currentType || !this.itemTypes.length) {
         return false
       }
 
       let ret = true
 
       this.itemTypes.forEach(t => {
-        if (t.item_type === this.currentType) {
+        if (t.type === this.currentType) {
           ret = false
         }
       })
@@ -82,6 +80,9 @@ export default {
   },
   mounted() {
     this.currentType = this.type
+
+    // Fetch the item types.  We do this here because it's slow, and we don't want to block the page load.
+    this.$store.dispatch('items/fetch')
   },
   watch: {
     type(newVal) {

@@ -8,7 +8,7 @@
         <b-card no-body class="p-3 flex-grow-1 border-0">
           <h3 class="mt-2 mb-4">{{ __('devices.title_items') }}</h3>
           <DeviceType class="mb-2" :type.sync="currentDevice.item_type"
-                      :icon-variant="add ? 'black' : 'brand'" :item-types="itemTypes" :disabled="disabled"
+                      :icon-variant="add ? 'black' : 'brand'" :disabled="disabled"
                       :suppress-type-warning="suppressTypeWarning" :powered="powered"
                       :unknown.sync="unknownItemType"
           />
@@ -176,11 +176,6 @@ export default {
       required: false,
       default: null
     },
-    itemTypes: {
-      type: Array,
-      required: false,
-      default: null
-    },
   },
   data () {
     return {
@@ -217,6 +212,9 @@ export default {
     }
   },
   computed: {
+    itemTypes() {
+      return this.$store.getters['items/list'];
+    },
     idtouse() {
       return this.currentDevice ? this.currentDevice.iddevices : null
     },
@@ -226,14 +224,18 @@ export default {
     currentCategory () {
       return this.currentDevice ? this.currentDevice.category : null
     },
+    currentType() {
+      return this.currentDevice ? this.currentDevice.item_type : null
+    },
     suggestedCategory() {
       let ret = null
-      if (this.currentDevice && this.currentDevice.item_type) {
+
+      if (this.currentType) {
         // Some item types are the same as category names.
         this.clusters.forEach((cluster) => {
           cluster.categories.forEach((c) => {
             const name = this.$lang.get('strings.' + c.name)
-            if (Boolean(c.powered) === Boolean(this.powered) && !name.toLowerCase().localeCompare(this.currentDevice.item_type.toLowerCase())) {
+            if (Boolean(c.powered) === Boolean(this.powered) && !name.toLowerCase().localeCompare(this.currentType.toLowerCase())) {
               ret = {
                 idcategories: c.idcategories,
                 categoryname: c.name,
@@ -246,16 +248,16 @@ export default {
         if (!ret) {
           // Now check the item types.  Stop at the first match, which is the most popular.
           this.itemTypes.every(t => {
-            if (!ret && Boolean(t.powered) === Boolean(this.powered) && this.currentDevice.item_type.toLowerCase() == t.item_type.toLowerCase()) {
+            if (!ret && Boolean(t.powered) === Boolean(this.powered) && this.currentType.toLowerCase() == t.type.toLowerCase()) {
               ret = {
                 idcategories: t.idcategories,
                 categoryname: t.categoryname,
                 powered: t.powered
               }
 
-              console.log('Matched', t, this.itemTypes)
               return false
             }
+
             return true
           })
         }

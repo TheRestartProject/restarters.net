@@ -103,5 +103,7 @@ Route::prefix('v2')->group(function() {
                 Route::get('/events', [API\EventController::class, 'moderateEventsv2']);
             });
         });
+
+        Route::get('/items', [API\ItemController::class, 'listItemsv2']);
     });
 });

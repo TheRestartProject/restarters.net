@@ -431,10 +431,10 @@ class Device extends Model implements Auditable
         //
         // ANY_VALUE is used to suppress errors when SQL mode is not set to ONLY_FULL_GROUP_BY.
         $types = DB::select(DB::raw("
-            SELECT item_type,
+            SELECT TRIM(item_type) AS item_type,
                    ANY_VALUE(powered)      AS powered,
                    ANY_VALUE(idcategories) AS idcategories,
-                   ANY_VALUE(categoryname)
+                   ANY_VALUE(categoryname) AS categoryname
             FROM   (SELECT DISTINCT s.*
                     FROM   (SELECT item_type,
                                    ANY_VALUE(powered)      AS powered,
@@ -465,6 +465,7 @@ class Device extends Model implements Auditable
                              ON s.item_type = m.item_type
                                 AND s.count = m.maxcount) t
             GROUP BY t.item_type
+            HAVING LENGTH(item_type) > 0
 "));
 
         return $types;

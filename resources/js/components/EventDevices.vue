@@ -27,11 +27,11 @@
               </div>
             </template>
             <p v-html="__('devices.description_powered')" />
-            <EventDeviceList :devices="powered" :powered="true" :canedit="canedit" :idevents="idevents" :brands="brands" :barrier-list="barrierList" :itemTypes="itemTypes" :clusters="clusters" />
+            <EventDeviceList :devices="powered" :powered="true" :canedit="canedit" :idevents="idevents" :brands="brands" :barrier-list="barrierList" :clusters="clusters" />
             <b-btn variant="primary" v-if="canedit" class="mb-4 ml-4 add-powered-device-desktop" @click="addPowered($event)">
               <b-img class="icon mb-1" src="/images/add-icon.svg" /> {{ __('partials.add_device_powered') }}
             </b-btn>
-            <EventDevice v-if="addingPowered" :powered="true" :add="true" :edit="false" :clusters="clusters" :idevents="idevents" :brands="brands" :barrier-list="barrierList" :itemTypes="itemTypes" @close="addingPowered = false" />
+            <EventDevice v-if="addingPowered" :powered="true" :add="true" :edit="false" :clusters="clusters" :idevents="idevents" :brands="brands" :barrier-list="barrierList" @close="addingPowered = false" />
           </b-tab>
           <b-tab title-item-class="w-50" class="pt-2">
             <template slot="title">
@@ -53,11 +53,11 @@
               </div>
             </template>
             <p v-html="__('devices.description_unpowered')" />
-            <EventDeviceList :devices="unpowered" :powered="false" :canedit="canedit" :idevents="idevents" :brands="brands" :barrier-list="barrierList" :itemTypes="itemTypes" :clusters="clusters" />
+            <EventDeviceList :devices="unpowered" :powered="false" :canedit="canedit" :idevents="idevents" :brands="brands" :barrier-list="barrierList" :clusters="clusters" />
             <b-btn variant="primary" v-if="canedit" class="mb-4 ml-4 add-unpowered-device-desktop" @click="addUnpowered($event)">
               <b-img class="icon mb-1" src="/images/add-icon.svg" /> {{ __('partials.add_device_unpowered') }}
             </b-btn>
-            <EventDevice v-if="addingUnpowered" :powered="false" :add="true" :edit="false" :clusters="clusters" :idevents="idevents" :event="event" :brands="brands" :barrier-list="barrierList" :itemTypes="itemTypes" @close="addingUnpowered = false"/>
+            <EventDevice v-if="addingUnpowered" :powered="false" :add="true" :edit="false" :clusters="clusters" :idevents="idevents" :event="event" :brands="brands" :barrier-list="barrierList" @close="addingUnpowered = false"/>
           </b-tab>
         </b-tabs>
       </div>
@@ -84,11 +84,11 @@
           </template>
           <template slot="content">
             <p v-html="__('devices.description_powered')" />
-            <EventDeviceList :devices="powered" :powered="true" :canedit="canedit" :idevents="idevents" :brands="brands" :barrier-list="barrierList" :itemTypes="itemTypes" :clusters="clusters" />
+            <EventDeviceList :devices="powered" :powered="true" :canedit="canedit" :idevents="idevents" :brands="brands" :barrier-list="barrierList" :clusters="clusters" />
             <b-btn variant="primary" v-if="canedit" class="mb-4 ml-4 add-powered-device-mobile" @click="addPowered($event)">
               <b-img class="icon mb-1" src="/images/add-icon.svg" /> {{ __('partials.add_device_powered') }}
             </b-btn>
-            <EventDevice v-if="addingPowered" :powered="true" :add="true" :edit="false" :clusters="clusters" :idevents="idevents" :brands="brands" :barrier-list="barrierList" :itemTypes="itemTypes" @close="addingPowered = false" />
+            <EventDevice v-if="addingPowered" :powered="true" :add="true" :edit="false" :clusters="clusters" :idevents="idevents" :brands="brands" :barrier-list="barrierList" @close="addingPowered = false" />
           </template>
         </CollapsibleSection>
         <CollapsibleSection class="lineheight" collapsed :count="unpowered.length" always-show-count count-class="text-black font-weight-normal small">
@@ -113,11 +113,11 @@
           </template>
           <template slot="content">
             <p v-html="__('devices.description_unpowered')" />
-            <EventDeviceList :devices="unpowered" :powered="false" :canedit="canedit" :idevents="idevents" :brands="brands" :barrier-list="barrierList" :itemTypes="itemTypes" :clusters="clusters" />
+            <EventDeviceList :devices="unpowered" :powered="false" :canedit="canedit" :idevents="idevents" :brands="brands" :barrier-list="barrierList" :clusters="clusters" />
             <b-btn variant="primary" v-if="canedit" class="mb-4 ml-4 add-unpowered-device-desktop" @click="addUnpowered($event)">
               <b-img class="icon mb-1" src="/images/add-icon.svg" /> {{ __('partials.add_device_unpowered') }}
             </b-btn>
-            <EventDevice v-if="addingUnpowered" :powered="false" :add="true" :edit="false" :clusters="clusters" :idevents="idevents" :brands="brands" :barrier-list="barrierList" :itemTypes="itemTypes" @close="addingUnpowered = false" />
+            <EventDevice v-if="addingUnpowered" :powered="false" :add="true" :edit="false" :clusters="clusters" :idevents="idevents" :brands="brands" :barrier-list="barrierList" @close="addingUnpowered = false" />
           </template>
         </CollapsibleSection>
       </div>
@@ -161,11 +161,6 @@ export default {
       default: null
     },
     barrierList: {
-      type: Array,
-      required: false,
-      default: null
-    },
-    itemTypes: {
       type: Array,
       required: false,
       default: null
