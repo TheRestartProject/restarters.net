@@ -39,7 +39,13 @@ class ItemController extends Controller
      *     )
      */
     public static function listItemsv2(Request $request) {
-        $items = Device::getItemTypes();
+        // Item types don't change often, so we can cache them.
+        if (\Cache::has('item_types')) {
+            $items = \Cache::get('item_types');
+        } else {
+            $items = Device::getItemTypes();
+            \Cache::put('item_types', $items, 7200);
+        }
 
         return [
             'data' => ItemCollection::make($items)

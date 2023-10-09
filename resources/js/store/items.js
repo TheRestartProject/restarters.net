@@ -17,7 +17,7 @@ export default {
     mutations: {
         setList(state, list) {
             Vue.set(state, 'list', list)
-        },
+h        },
     },
     actions: {
         async fetch({ commit, state }) {
