@@ -16,11 +16,7 @@ export default {
     },
     mutations: {
         setList(state, list) {
-            state.list = []
-
-            list.forEach(e => {
-                state.list.push(e)
-            })
+            Vue.set(state, 'list', list)
         },
     },
     actions: {
