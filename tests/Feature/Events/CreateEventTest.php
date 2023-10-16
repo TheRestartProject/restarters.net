@@ -500,14 +500,10 @@ class CreateEventTest extends TestCase
         });
 
         // Assert that we see the host in the list of volunteers to add to the event.
-        $response = $this->get('/api/groups/'. $group->idgroups . '/volunteers?api_token=' . $host->api_token);
-        $response->assertJson([
-            [
-                'id' => $host->id,
-                'name' => $host->name,
-                'email' => $host->email
-            ]
-        ]);
+        $response = $this->get('/api/v2/groups/'. $group->idgroups . '/volunteers');
+        $vols = $response->json()['data'];
+        $this->assertEquals(2, count($vols));
+        $this->assertEquals($host2->id, $vols[1]['user']);
 
         // Assert we can add them back in.
         $party->discourse_thread = 123;

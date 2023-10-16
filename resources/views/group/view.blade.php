@@ -137,7 +137,6 @@
               :cluster-stats="{{ json_encode($cluster_stats, JSON_INVALID_UTF8_IGNORE) }}"
               :top-devices="{{ json_encode($top, JSON_INVALID_UTF8_IGNORE) }}"
               :events="{{ json_encode($expanded_events, JSON_INVALID_UTF8_IGNORE) }}"
-              :volunteers="{{ json_encode($view_group->allConfirmedVolunteers, JSON_INVALID_UTF8_IGNORE) }}"
               :canedit="{{ $can_edit_group ? 'true' : 'false' }}"
               :can-see-delete="{{ $can_see_delete ? 'true' : 'false' }}"
               :can-perform-delete="{{ $can_perform_delete ? 'true' : 'false' }}"

@@ -6,19 +6,19 @@ export default {
   namespaced: true,
   state: {
     // Array indexed by group id containing array of volunteers.
-    list: []
+    byGroup: []
   },
   getters: {
-    byEvent: state => groupID => {
-      return state.list[groupID]
+    byGroup: state => groupID => {
+      return state.byGroup[groupID]
     }
   },
   mutations: {
-    set(state, params) {
-      Vue.set(state.list, params.groupID, params.volunteers)
+    setGroup(state, params) {
+      Vue.set(state.byGroup, params.groupID, params.volunteers)
     },
-    remove(state, params) {
-      let newarr = state.list[params.groupID].filter((a) => {
+    removeFromGroup(state, params) {
+      let newarr = state.byGroup[params.groupID].filter((a) => {
         return a.user !== params.userId
       })
 
@@ -28,6 +28,14 @@ export default {
   actions: {
     set({commit}, params) {
       commit('set', params);
+    },
+    async fetchGroup({commit}, id) {
+      const ret = await axios.get('/api/v2/' + id + '/volunteers')
+      console.log('fetche', ret)
+      commit('set', {
+        groupID: id,
+        volunteers: response.data
+      })
     }
   },
 }
