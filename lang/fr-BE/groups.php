@@ -82,7 +82,7 @@ return [
   'past' => 'Passé',
   'read_more' => 'Lire plus',
   'share_group_stats' => 'Partager les statistiques du Repair Café',
-  'total_devices' => 'Total des appareils qui ont été pris en charge',
+  'total_devices' => 'Total des éléments qui ont été pris en charge',
   'participants' => 'Participants',
   'hours_volunteered' => 'Heures de bénévolat',
   'waste_prevented' => 'Déchets évités',
