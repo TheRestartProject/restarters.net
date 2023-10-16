@@ -157,7 +157,7 @@ return [
   'image_delete_error' => 'Sorry, but the image can\'t be deleted.',
   'delete_permission' => 'You do not have permission to delete this event.',
   'delete_success' => 'Event has been deleted.',
-  'geocode_failed' => 'The address you entered could not be found. Please try a more general address.',
+  'geocode_failed' => 'Location not found. If you are unable to find the location of your event, please try a more general location (such as village/town), or a specific street address, rather than a building name.',
   'create_failed' => 'Event could <strong>not</strong> be created. Please look at the reported errors, correct them, and try again.',
   'edit_succeeded' => 'Event updated!',
   'edit_failed' => 'Event could not be edited.',
