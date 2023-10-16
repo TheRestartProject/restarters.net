@@ -33,7 +33,7 @@ return [
   'volunteer_email_address' => 'Adresse e-mail du bénévole (optionnel)',
   'message_volunteer_email_address' => 'Ce champ invitera les bénévoles à rejoindre le Repair Café',
   'volunteer_attended_button' => 'Bénévoles présents',
-  'option_not_registered' => 'Pas enregistré sur le Fixometer',
+  'option_not_registered' => 'Pas enregistré sur ce site',
   'option_default' => '-- Sélectionner --',
   'events' => 'Evénements',
   'event' => 'Evénement',
