@@ -36,7 +36,7 @@
         </div>
       </div>
       <b-dropdown v-if="canedit" variant="none" ref="dropdown" class="edit-dropdown" no-caret>
-        <b-dropdown-item :href="'/group/make-host/' + idgroups + '/' + volunteer.user" v-if="volunteer.role === restarter">{{ __('groups.make_host') }}</b-dropdown-item>
+        <b-dropdown-item @click="makeVolunteerHost">{{ __('groups.make_host') }}</b-dropdown-item>
         <b-dropdown-item @click="removeVolunteer">{{ __('groups.remove_volunteer') }}</b-dropdown-item>
       </b-dropdown>
       <button class="dropdown-toggle d-none" />
@@ -121,11 +121,16 @@ export default {
       }
     },
     async removeVolunteer() {
-      console.log('Remove volunteer')
       try {
         await this.$store.dispatch('volunteers/remove', this.volunteer.id)
       } catch (e) {
-        console.log('Failed', e)
+        this.error = e.message
+      }
+    },
+    async makeVolunteerHost() {
+      try {
+        await this.$store.dispatch('volunteers/makehost', this.volunteer.id)
+      } catch (e) {
         this.error = e.message
       }
     },

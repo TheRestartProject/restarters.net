@@ -637,32 +637,6 @@ class GroupController extends Controller
         return 'Sorry, but the image can\'t be deleted';
     }
 
-    public function getMakeHost($group_id, $user_id, Request $request)
-    {
-        // Has current logged in user got permission to add host?
-        // - Is a host of the group.
-        // - Is a network coordinator of a network which the group is in.
-        // - Is an Administrator
-        $group = Group::findOrFail($group_id);
-        $loggedInUser = Auth::user();
-
-        if (($loggedInUser->hasRole('Host') && Fixometer::userIsHostOfGroup($group_id, $loggedInUser->id)) ||
-            $loggedInUser->isCoordinatorForGroup($group) ||
-            $loggedInUser->hasRole('Administrator')
-        ) {
-            $user = User::find($user_id);
-
-            $group->makeMemberAHost($user);
-
-            return redirect()->back()->with('success', __('groups.made_host', [
-                'name' => $user->name
-            ]));
-        }
-
-        \Sentry\CaptureMessage(__('groups.permission'));
-        return redirect()->back()->with('warning', __('groups.permission'));
-    }
-
     public function inviteNearbyRestarter($groupId, $userId)
     {
         $user_group = UserGroups::where('user', $userId)->where('group', $groupId)->first();

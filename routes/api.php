@@ -84,6 +84,7 @@ Route::prefix('v2')->group(function() {
             Route::get('{id}/volunteers', [API\GroupController::class, 'getVolunteersForGroupv2']);
             Route::middleware('auth:api')->group(function ()
             {
+                Route::patch('{id}/volunteers/{iduser}', [API\GroupController::class, 'patchVolunteerForGroupv2']);
                 Route::delete('{id}/volunteers/{iduser}', [API\GroupController::class, 'deleteVolunteerForGroupv2']);
             });
         });

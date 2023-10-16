@@ -37,28 +37,6 @@ class GroupHostTest extends TestCase
     /**
      * @dataProvider roleProvider
      */
-    public function testVolunteerNotInGroup($role)
-    {
-        $user = User::factory()->{lcfirst($role)}()->create();
-        $this->actingAs($user);
-
-        if ($role == 'NetworkCoordinator') {
-            $this->network->addCoordinator($user);
-        }
-
-        $host = User::factory()->host()->create();
-
-        try {
-            $response = $this->get("/group/make-host/{$this->idgroups}/{$host->id}");
-            $this->assertTrue(false);
-        } catch (\Exception $e) {
-            $this->assertStringContainsString('Volunteer is not currently in this group', $e->getMessage());
-        }
-    }
-
-    /**
-     * @dataProvider roleProvider
-     */
     public function testMakeHost($role)
     {
         $user = User::factory()->{lcfirst($role)}()->create();
@@ -92,8 +70,10 @@ class GroupHostTest extends TestCase
         $this->assertFalse($json['data'][1]['host']);
         $this->assertEquals(1, count($json['data'][1]['skills']));
 
-        $response = $this->get("/group/make-host/{$this->idgroups}/{$host->id}");
-        $response->assertSessionHas('success');
+        $response = $this->patch("/api/v2/groups/{$this->idgroups}/volunteers/{$host->id}?api_token=" . $user->api_token, [
+            'host' => true,
+        ]);
+        $response->assertSuccessful();
 
         $response = $this->get("/api/v2/groups/{$this->idgroups}/volunteers");
         $response->assertSuccessful();
@@ -122,8 +102,8 @@ class GroupHostTest extends TestCase
         $host = User::factory()->host()->create();
         $this->group->addVolunteer($host);
 
-        $response = $this->get("/group/make-host/{$this->idgroups}/{$host->id}");
-        $response->assertSessionHas('success');
+        $response = $this->patch("/api/v2/groups/{$this->idgroups}/volunteers/{$host->id}?api_token=" . $firsthost->api_token);
+        $response->assertSuccessful();
 
         // Remove them.
         $response = $this->delete("/api/v2/groups/{$this->idgroups}/volunteers/{$host->id}?api_token=" . $firsthost->api_token);
@@ -133,17 +113,5 @@ class GroupHostTest extends TestCase
         $this->actingAs($host);
         $this->expectException(AuthenticationException::class);
         $response = $this->delete("/api/v2/groups/{$this->idgroups}/volunteers/{$host->id}?api_token=" . $host->api_token);
-    }
-
-    public function testIrrelevantHost()
-    {
-        $firsthost = User::factory()->host()->create();
-        $this->actingAs($firsthost);
-
-        $host = User::factory()->host()->create();
-        $this->group->addVolunteer($host);
-
-        $response = $this->get("/group/make-host/{$this->idgroups}/{$host->id}");
-        $response->assertSessionHas('warning');
     }
 }

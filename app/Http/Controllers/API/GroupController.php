@@ -479,9 +479,44 @@ class GroupController extends Controller
         return VolunteerCollection::make($volunteers);
     }
 
-    public  function deleteVolunteerForGroupv2(Request $request, $id, $iduser)
+    /**
+     * @OA\Delete(
+     *      path="/api/v2/groups/{id}/volunteers/{iduser}",
+     *      operationId="deleteVolunteerForGroupv2",
+     *      tags={"Groups","Volunteers"},
+     *      summary="Delete Group Volunteer",
+     *      description="Removes a volunteer from a group",
+     *      @OA\Parameter(
+     *          name="id",
+     *          description="Group id",
+     *          required=true,
+     *          in="path",
+     *          @OA\Schema(
+     *              type="integer"
+     *          )
+     *      ),
+     *      @OA\Parameter(
+     *          name="iduser",
+     *          description="User id",
+     *          required=true,
+     *          in="path",
+     *          @OA\Schema(
+     *              type="integer"
+     *          )
+     *      ),
+     *      @OA\Response(
+     *          response=200,
+     *          description="Successful operation",
+     *       ),
+     *      @OA\Response(
+     *          response=404,
+     *          description="Group not found",
+     *      ),
+     *     )
+     */
+
+    public function deleteVolunteerForGroupv2(Request $request, $id, $iduser)
     {
-        error_log("Delete Volunteer for Group $id, $iduser");
         $user = $this->getUser();
 
         list($name, $area, $postcode, $location, $phone, $website, $description, $timezone, $latitude, $longitude, $country, $network_data, $email) = $this->validateGroupParams(
@@ -501,6 +536,68 @@ class GroupController extends Controller
 
         if (!is_null($userGroupAssociation)) {
             $userGroupAssociation->delete();
+        }
+    }
+
+    /**
+     * @OA\Patch(
+     *      path="/api/v2/groups/{id}/volunteers/{iduser}",
+     *      operationId="patchVolunteerForGroupv2",
+     *      tags={"Groups","Volunteers"},
+     *      summary="Modify Group Volunteer",
+     *      description="Modify a volunteer's status on a group",
+     *      @OA\Parameter(
+     *          name="id",
+     *          description="Group id",
+     *          required=true,
+     *          in="path",
+     *          @OA\Schema(
+     *              type="integer"
+     *          )
+     *      ),
+     *      @OA\Parameter(
+     *          name="host",
+     *          description="Host",
+     *          required=true,
+     *          in="path",
+     *          @OA\Schema(
+     *              type="boolean"
+     *          )
+     *      ),
+     *      @OA\Response(
+     *          response=200,
+     *          description="Successful operation",
+     *       ),
+     *      @OA\Response(
+     *          response=404,
+     *          description="Group not found",
+     *      ),
+     *     )
+     */
+
+    public function patchVolunteerForGroupv2(Request $request, $id, $iduser)
+    {
+        $user = $this->getUser();
+        $host = $request->get('host', false);
+
+        list($name, $area, $postcode, $location, $phone, $website, $description, $timezone, $latitude, $longitude, $country, $network_data, $email) = $this->validateGroupParams(
+            $request,
+            false
+        );
+
+        $group = Group::findOrFail($id);
+        $is_host_of_group = Fixometer::userHasEditGroupPermission($id, $user->id);
+        $isCoordinatorForGroup = $user->isCoordinatorForGroup($group);
+
+        if (!Fixometer::hasRole($user, 'Administrator') && !$is_host_of_group && !$isCoordinatorForGroup) {
+            throw new AuthenticationException();
+        }
+
+        $userGroupAssociation = UserGroups::where('group', $id)->where('user', $iduser)->first();
+
+        if (!is_null($userGroupAssociation)) {
+            $userGroupAssociation->role = $host ? Role::HOST : Role::RESTARTER;
+            $userGroupAssociation->save();
         }
     }
 

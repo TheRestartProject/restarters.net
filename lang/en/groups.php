@@ -168,7 +168,6 @@ Learn how to use this group here: :help.',
   'invite_invalid' => 'Something went wrong - this invite is invalid or has expired.',
   'invite_confirmed' => 'Excellent! You have joined the group.',
   'follow_group_error' => 'Failed to follow this group.',
-  'made_host' => 'We have made :name a host for this group.',
   'permission' => 'Sorry, you do not have permission to do this.',
   'volunteer_remove_success' => 'We have removed :name from this group.',
   'volunteer_remove_error' => 'We are unable to remove :name from this group.'

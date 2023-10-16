@@ -309,7 +309,6 @@ Route::middleware('auth', 'verifyUserConsent', 'ensureAPIToken')->group(function
         Route::get('/mine', [GroupController::class, 'mine']);
         Route::get('/nearby', [GroupController::class, 'nearby']);
         Route::get('/network/{id}', [GroupController::class, 'network']);
-        Route::get('/make-host/{group_id}/{user_id}', [GroupController::class, 'getMakeHost']);
         Route::get('/nearbyinvite/{groupId}/{userId}', [GroupController::class, 'inviteNearbyRestarter']);
         Route::get('/delete/{id}', [GroupController::class, 'delete']);
     });

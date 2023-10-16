@@ -31,6 +31,9 @@ export default {
 
       const vols = state.byGroup[vol.group].filter(v => v.id !== id)
       Vue.set(state.byGroup, vol.group, vols)
+    },
+    makeHost(state, id) {
+      state.listGroup[id].host = true
     }
   },
   actions: {
@@ -48,6 +51,13 @@ export default {
       const vol = this.state.volunteers.listGroup[id]
       const ret = await axios.delete('/api/v2/groups/' + vol.group + '/volunteers/' + vol.user)
       commit('removeVolunteer', id)
+    },
+    async makehost({commit, dispatch}, id) {
+      const vol = this.state.volunteers.listGroup[id]
+      const ret = await axios.patch('/api/v2/groups/' + vol.group + '/volunteers/' + vol.user, {
+        host: true
+      })
+      commit('makeHost', id)
     }
   },
 }
