@@ -7,24 +7,24 @@
           <div class="d-flex flex-column">
             <div :class="{
             lineheight: true,
-            'font-weight-bold': host,
+            'font-weight-bold': volunteer.host,
             'd-flex': true,
             'flex-wrap': true
-            }" :title="volunteer.volunteer.name">
+            }" :title="volunteer.name">
             <span class="pr-1 overflow-hidden ellipsis">
-              {{ volunteer.volunteer.name }}
+              {{ volunteer.name }}
             </span>
-              <span class="host" v-if="host">
+              <span class="host" v-if="volunteer.host">
               {{ __('partials.host') }}
             </span>
             </div>
-            <div :id="'skills-' + volunteer.volunteer.id" :class="{
+            <div :id="'skills-' + volunteer.id" :class="{
              'small': true,
              'd-flex': true,
              'clickme' : true,
              'text-muted': noskills
             }">
-              <div data-toggle="popover" data-placement="left" :data-content="skillList">
+              <div v-b-tooltip.hover :title="skillList">
                 <b-img-lazy src="/images/star.svg" :class="{
                    'star': true,
                    'mr-1': true,
@@ -55,12 +55,8 @@ import volunteers from '../store/volunteers'
 export default {
   components: {ConfirmModal},
   props: {
-    idgroups: {
+    id: {
       type: Number,
-      required: true
-    },
-    volunteer: {
-      type: Object,
       required: true
     },
     canedit: {
@@ -77,18 +73,18 @@ export default {
     }
   },
   computed: {
-    profile() {
-      return this.volunteer ? this.volunteer.profilePath : DEFAULT_PROFILE
+    volunteer() {
+      return this.$store.getters['volunteers/byIDGroup'](this.id)
     },
-    host() {
-      return this.volunteer.role === HOST
+    profile() {
+      return this.volunteer ? this.volunteer.image : DEFAULT_PROFILE
     },
     noskills() {
-      return !this.volunteer.user_skills || !this.volunteer.user_skills.length
+      return !this.volunteer.skills || !this.volunteer.skills.length
     },
     skillCount() {
       let ret = null
-      let skills = this.volunteer.user_skills
+      let skills = this.volunteer.skills
       let len = skills && skills.length ? skills.length : 0
       ret = len + ' ' + this.$lang.choice('partials.skills', len)
       return ret
@@ -96,12 +92,12 @@ export default {
     skillList() {
       let ret = null
 
-      let skills = this.volunteer.user_skills
+      let skills = this.volunteer.skills
 
       if (skills) {
         let names = []
         skills.forEach((s) => {
-          names.push(s.skill_name)
+          names.push(s.name)
         })
 
         ret = names.join(', ')

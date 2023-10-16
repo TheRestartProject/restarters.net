@@ -97,10 +97,12 @@ class Volunteer extends JsonResource
         $image = User::getProfile($this->user)->path;
         $image = $image ? "/uploads/thumbnail_$image" : "/images/placeholder-avatar.png";
 
+        $u = User::find($this->user);
+
         return [
             'id' => $this->idusers_groups, // When we write the v2 event volunteer code we'll need to change this.
             'user' => $this->user,
-            'name' => $this->name,
+            'name' => $u->name,
             'host' => $this->role == Role::HOST,
             'image' => $image,
             'skills' => SkillCollection::make($skills)
