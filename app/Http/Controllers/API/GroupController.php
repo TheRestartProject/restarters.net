@@ -10,6 +10,7 @@ use App\Helpers\Fixometer;
 use App\Http\Controllers\Controller;
 use App\Http\Resources\PartySummaryCollection;
 use App\Http\Resources\TagCollection;
+use App\Http\Resources\VolunteerCollection;
 use App\Network;
 use App\Notifications\AdminModerationGroup;
 use App\Notifications\GroupConfirmed;
@@ -434,32 +435,48 @@ class GroupController extends Controller
         return PartySummaryCollection::make($parties);
     }
 
-    public function listVolunteers(Request $request, $idgroups) {
+    /**
+     * @OA\Get(
+     *      path="/api/v2/groups/{id}/volunteers",
+     *      operationId="getVolunteersForGroupv2",
+     *      tags={"Groups","Volunteers"},
+     *      summary="Get Group Volunteers",
+     *      description="Returns the list of confirmed volunters for a group.",
+     *      @OA\Parameter(
+     *          name="id",
+     *          description="Group id",
+     *          required=true,
+     *          in="path",
+     *          @OA\Schema(
+     *              type="integer"
+     *          )
+     *      ),
+     *      @OA\Response(
+     *          response=200,
+     *          description="Successful operation",
+     *          @OA\JsonContent(
+     *              @OA\Property(
+     *                property="data",
+     *                title="data",
+     *                description="An array of volunteers",
+     *                type="array",
+     *                @OA\Items(
+     *                    ref="#/components/schemas/Volunteer"
+     *                )
+     *              )
+     *          )
+     *       ),
+     *      @OA\Response(
+     *          response=404,
+     *          description="Group not found",
+     *      ),
+     *     )
+     */
+
+    public static function getVolunteersForGroupv2($idgroups) {
         $group = Group::findOrFail($idgroups);
-
-        // Get the user that the API has been authenticated as.
-        $user = auth('api')->user();
-
-        if (!$user || !Fixometer::userHasEditGroupPermission($idgroups, $user->id)) {
-            // We require host permissions to view the list of volunteers.  At the moment this call is only used when
-            // adding volunteers, and this check means we don't have to worry about exposing sensitive data.
-            abort(403);
-        }
-
         $volunteers = $group->allConfirmedVolunteers()->get();
-
-        $ret = [];
-
-        foreach ($volunteers as $v) {
-            $volunteer = $v->volunteer;
-            $ret[] = [
-                'id' => $volunteer->id,
-                'name' => $volunteer->name,
-                'email'=> $volunteer->email
-            ];
-        }
-
-        return response()->json($ret);
+        return VolunteerCollection::make($volunteers);
     }
 
     private function getUser() {

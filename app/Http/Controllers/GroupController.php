@@ -109,58 +109,6 @@ class GroupController extends Controller
         return view('group.create');
     }
 
-    private function expandVolunteers($volunteers, $allSkills)
-    {
-        $ret = [];
-
-        // Get array of volunteer ids
-        $volunteerIds = $volunteers->pluck('user')->toArray();
-        $users = User::whereIn('id', $volunteerIds)->get();
-
-        $volIx = [];
-        foreach ($users as $user) {
-            $volIx[$user->id] = $user;
-        }
-
-        $volunteerSkills = UsersSkills::whereIn('user', $volunteerIds)->get();
-
-        $ix = [];
-
-        foreach ($volunteerSkills as $volunteerSkill) {
-            if (!array_key_exists($volunteerSkill->user, $ix)) {
-                $ix[$volunteerSkill->user] = [];
-            }
-
-            $ix[$volunteerSkill->user][] = $volunteerSkill->skill;
-        }
-
-        foreach ($volunteers as &$volunteer) {
-            $volunteerObj = $volIx[$volunteer->user];
-
-            $volunteer['volunteer'] = $volunteerObj;
-
-            if ($volunteer['volunteer']) {
-                if (array_key_exists($volunteer->user, $ix)) {
-                    $skills = [];
-                    foreach ($ix[$volunteer->user] as $skill) {
-                        if (array_key_exists($skill, $allSkills)) {
-                            $skills[] = $allSkills[$skill];
-                        }
-                    }
-                    $volunteer['user_skills'] = $skills;
-                }
-
-                $volunteer['fullName'] = $volunteer->name;
-                $image = $volunteerObj->getProfile($volunteerObj->id)->path;
-                $image = $image ? "/uploads/thumbnail_$image" : "/images/placeholder-avatar.png";
-                $volunteer['profilePath'] = $image;
-                $ret[] = $volunteer;
-            }
-        }
-
-        return $ret;
-    }
-
     public function view($groupid)
     {
         $user = User::find(Auth::id());
@@ -285,17 +233,6 @@ class GroupController extends Controller
 
         $user_groups = UserGroups::where('user', Auth::user()->id)->count();
         $view_group = Group::find($groupid);
-
-        // We extract some skills info in bulk to reduce the number of distinct queries on groups with many
-        // volunteers.
-        $allSkills = Skills::all()->all();
-        $ix = [];
-        foreach ($allSkills as $i => $skill) {
-            $ix[$skill->id] = $skill;
-            $ix[$skill->id]->skillName;
-        }
-
-        $view_group->allConfirmedVolunteers = $this->expandVolunteers($view_group->allConfirmedVolunteers, $ix);
 
         $pendingInvite = UserGroups::where('group', $groupid)
         ->where('user', $user->id)

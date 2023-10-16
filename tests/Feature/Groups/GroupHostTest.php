@@ -5,7 +5,9 @@ namespace Tests\Feature\Groups;
 use App\Group;
 use App\Network;
 use App\Role;
+use App\Skills;
 use App\User;
+use App\UsersSkills;
 use Tests\TestCase;
 
 class GroupHostTest extends TestCase
@@ -68,12 +70,45 @@ class GroupHostTest extends TestCase
         $host = User::factory()->host()->create();
         $this->group->addVolunteer($host);
 
+        $skill1 = Skills::create([
+            'skill_name'  => 'UT1',
+            'description' => 'Planning',
+            'category' => 1
+        ]);
+
+        UsersSkills::create([
+            'skill' => $skill1->id,
+            'user' => $host->id,
+        ]);
+
+        // Get the volunteers.  There will be an admin added by the createGroup() method, so the host we've just
+        // added will be the second.
+        $response = $this->get("/api/v2/groups/{$this->idgroups}/volunteers");
+        $response->assertSuccessful();
+        $json = json_decode($response->getContent(), true);
+        $this->assertEquals(2, count($json['data']));
+        $this->assertEquals($host->id, $json['data'][1]['user']);
+        $this->assertFalse($json['data'][1]['host']);
+        $this->assertEquals(1, count($json['data'][1]['skills']));
+
         $response = $this->get("/group/make-host/{$this->idgroups}/{$host->id}");
         $response->assertSessionHas('success');
+
+        $response = $this->get("/api/v2/groups/{$this->idgroups}/volunteers");
+        $response->assertSuccessful();
+        $json = json_decode($response->getContent(), true);
+        $this->assertEquals(2, count($json['data']));
+        $this->assertEquals($host->id, $json['data'][1]['user']);
+        $this->assertTrue($json['data'][1]['host']);
 
         // Remove them.
         $response = $this->get("/group/remove-volunteer/{$this->idgroups}/{$host->id}");
         $response->assertSessionHas('success');
+
+        $response = $this->get("/api/v2/groups/{$this->idgroups}/volunteers");
+        $response->assertSuccessful();
+        $json = json_decode($response->getContent(), true);
+        $this->assertEquals(1, count($json['data']));
 
         // Remove them again - should redirect back with warning.
         $response = $this->from('/')->get("/group/remove-volunteer/{$this->idgroups}/{$host->id}");
