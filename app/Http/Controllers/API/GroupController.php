@@ -479,6 +479,30 @@ class GroupController extends Controller
         return VolunteerCollection::make($volunteers);
     }
 
+    public  function deleteVolunteerForGroupv2(Request $request, $id, $iduser)
+    {
+        $user = $this->getUser();
+
+        list($name, $area, $postcode, $location, $phone, $website, $description, $timezone, $latitude, $longitude, $country, $network_data, $email) = $this->validateGroupParams(
+            $request,
+            false
+        );
+
+        $group = Group::findOrFail($id);
+        $is_host_of_group = Fixometer::userHasEditGroupPermission($id, $user->id);
+        $isCoordinatorForGroup = $user->isCoordinatorForGroup($group);
+
+        if (!Fixometer::hasRole($user, 'Administrator') && !$is_host_of_group && !$isCoordinatorForGroup) {
+            throw new AuthenticationException();
+        }
+
+        $userGroupAssociation = UserGroups::where('group', $id)->where('user', $iduser)->first();
+
+        if (!is_null($userGroupAssociation)) {
+            $userGroupAssociation->delete();
+        }
+    }
+
     private function getUser() {
         // We want to allow this call to work if a) we are logged in as a user, or b) we have a valid API token.
         //

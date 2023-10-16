@@ -9,6 +9,7 @@ use App\Skills;
 use App\User;
 use App\UsersSkills;
 use Tests\TestCase;
+use Illuminate\Auth\AuthenticationException;
 
 class GroupHostTest extends TestCase
 {
@@ -102,18 +103,13 @@ class GroupHostTest extends TestCase
         $this->assertTrue($json['data'][1]['host']);
 
         // Remove them.
-        $response = $this->get("/group/remove-volunteer/{$this->idgroups}/{$host->id}");
-        $response->assertSessionHas('success');
+        $response = $this->delete("/api/v2/groups/{$this->idgroups}/volunteers/{$host->id}?api_token=" . $host->api_token);
+        $response->assertSuccessful();
 
         $response = $this->get("/api/v2/groups/{$this->idgroups}/volunteers");
         $response->assertSuccessful();
         $json = json_decode($response->getContent(), true);
         $this->assertEquals(1, count($json['data']));
-
-        // Remove them again - should redirect back with warning.
-        $response = $this->from('/')->get("/group/remove-volunteer/{$this->idgroups}/{$host->id}");
-        $response->assertRedirect('/');
-        $response->assertSessionHas('warning');
     }
 
     public function testHostMakeHost()
@@ -130,20 +126,13 @@ class GroupHostTest extends TestCase
         $response->assertSessionHas('success');
 
         // Remove them.
-        $response = $this->get("/group/remove-volunteer/{$this->idgroups}/{$host->id}");
-        $response->assertSessionHas('success');
-
-        // Remove them again - should redirect back with warning.
-        $response = $this->from('/')->get("/group/remove-volunteer/{$this->idgroups}/{$host->id}");
-        $response->assertRedirect('/');
-        $response->assertSessionHas('warning');
+        $response = $this->delete("/api/v2/groups/{$this->idgroups}/volunteers/{$host->id}?api_token=" . $firsthost->api_token);
+        $response->assertSuccessful();
 
         // Removed host tries and fails to remove the first host.
-        $response = $this->get('/logout');
         $this->actingAs($host);
-        $response = $this->from('/')->get("/group/remove-volunteer/{$this->idgroups}/{$firsthost->id}");
-        $response->assertRedirect('/');
-        $response->assertSessionHas('warning');
+        $this->expectException(AuthenticationException::class);
+        $response = $this->delete("/api/v2/groups/{$this->idgroups}/volunteers/{$host->id}?api_token=" . $host->api_token);
     }
 
     public function testIrrelevantHost()

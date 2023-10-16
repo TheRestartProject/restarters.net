@@ -102,6 +102,7 @@ class Volunteer extends JsonResource
         return [
             'id' => $this->idusers_groups, // When we write the v2 event volunteer code we'll need to change this.
             'user' => $this->user,
+            'group' => $this->group,
             'name' => $u->name,
             'host' => $this->role == Role::HOST,
             'image' => $image,

@@ -77,10 +77,15 @@ Route::prefix('v2')->group(function() {
             Route::get('/names', [API\GroupController::class, 'listNamesv2']);
             Route::get('/tags', [API\GroupController::class, 'listTagsv2']);
             Route::get('{id}/events', [API\GroupController::class, 'getEventsForGroupv2']);
-            Route::get('{id}/volunteers', [API\GroupController::class, 'getVolunteersForGroupv2']);
             Route::get('{id}', [API\GroupController::class, 'getGroupv2']);
             Route::post('', [API\GroupController::class, 'createGroupv2']);
             Route::patch('{id}', [API\GroupController::class, 'updateGroupv2']);
+
+            Route::get('{id}/volunteers', [API\GroupController::class, 'getVolunteersForGroupv2']);
+            Route::middleware('auth:api')->group(function ()
+            {
+                Route::delete('{id}/volunteers/{iduser}', [API\GroupController::class, 'deleteVolunteerForGroupv2']);
+            });
         });
 
         Route::prefix('/events')->group(function() {

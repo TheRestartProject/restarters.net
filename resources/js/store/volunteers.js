@@ -36,6 +36,11 @@ export default {
         groupID: id,
         volunteers: ret.data.data
       })
+    },
+    async remove({commit, dispatch}, id) {
+      const vol = this.state.volunteers.list[id]
+      const ret = await axios.delete('/api/v2/groups/' + vol.groupid + '/volunteers/' + id)
+      await dispatch('fetchGroup', vol.groupid)
     }
   },
 }

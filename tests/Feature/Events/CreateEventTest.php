@@ -652,8 +652,8 @@ class CreateEventTest extends TestCase
         $group->addVolunteer($restarter);
 
         // Remove volunteer.
-        $response = $this->get("/group/remove-volunteer/{$group->idgroups}/{$restarter->id}");
-        $response->assertSessionHas('success');
+        $response = $this->delete("/api/v2/groups/{$group->idgroups}/volunteers/{$restarter->id}?api_token=" . $host->api_token);
+        $response->assertSuccessful();
 
         $eventData = Party::factory()->raw([
                                                     'group' => $group->idgroups,
