@@ -481,6 +481,7 @@ class GroupController extends Controller
 
     public  function deleteVolunteerForGroupv2(Request $request, $id, $iduser)
     {
+        error_log("Delete Volunteer for Group $id, $iduser");
         $user = $this->getUser();
 
         list($name, $area, $postcode, $location, $phone, $website, $description, $timezone, $latitude, $longitude, $country, $network_data, $email) = $this->validateGroupParams(

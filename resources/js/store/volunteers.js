@@ -14,7 +14,7 @@ export default {
       return state.byGroup[groupID]
     },
     byIDGroup: state => (id) => {
-        return state.listGroup[id]
+      return state.listGroup[id]
     }
   },
   mutations: {
@@ -25,6 +25,13 @@ export default {
         Vue.set(state.listGroup, volunteer.id, volunteer)
       })
     },
+    removeVolunteer(state, id) {
+      const vol = state.listGroup[id]
+      Vue.delete(state.listGroup, id)
+
+      const vols = state.byGroup[vol.group].filter(v => v.id !== id)
+      Vue.set(state.byGroup, vol.group, vols)
+    }
   },
   actions: {
     set({commit}, params) {
@@ -38,9 +45,9 @@ export default {
       })
     },
     async remove({commit, dispatch}, id) {
-      const vol = this.state.volunteers.list[id]
-      const ret = await axios.delete('/api/v2/groups/' + vol.groupid + '/volunteers/' + id)
-      await dispatch('fetchGroup', vol.groupid)
+      const vol = this.state.volunteers.listGroup[id]
+      const ret = await axios.delete('/api/v2/groups/' + vol.group + '/volunteers/' + vol.user)
+      commit('removeVolunteer', id)
     }
   },
 }

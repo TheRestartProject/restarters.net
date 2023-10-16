@@ -121,9 +121,11 @@ export default {
       }
     },
     async removeVolunteer() {
+      console.log('Remove volunteer')
       try {
         await this.$store.dispatch('volunteers/remove', this.volunteer.id)
       } catch (e) {
+        console.log('Failed', e)
         this.error = e.message
       }
     },
