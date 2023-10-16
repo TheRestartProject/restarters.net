@@ -138,8 +138,8 @@ class APIv2EventTest extends TestCase
         $groupUpdated = $json['data']['group']['updated_at'];
 
         // API v2 dates are ISO strings so we can just string compare.
-        self::assertTrue($eventUpdated == $groupUpdated);
-        self::assertFalse($eventUpdated == $now);
+        self::assertEquals($eventUpdated,$groupUpdated);
+        self::assertNotEquals($eventUpdated,$now);
 
         $response = $this->get("/api/events/network?api_token=1234");
         $response->assertSuccessful();
@@ -148,7 +148,7 @@ class APIv2EventTest extends TestCase
         // API v1 dates aren't as clear so format them for comparison.
         $eventUpdated = (new Carbon($json[0]['updated_at']))->format('Y-m-d H:i:s');
         $nowF = (new Carbon($now))->format('Y-m-d H:i:s');
-        self::assertFalse($eventUpdated == $nowF);
+        self::assertEquals($eventUpdated,$nowF);
     }
 
     /**
