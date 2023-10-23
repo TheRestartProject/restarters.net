@@ -85,7 +85,7 @@ return [
   'no_upcoming_events' => 'There are currently no upcoming events.',
   'no_past_events' => 'There are currently no past events for this group',
   'device_breakdown' => 'Device breakdown',
-  'total_devices' => 'Total devices worked on',
+  'total_devices' => 'Total items worked on',
   'most_repaired_devices' => 'Most repaired devices',
   'host' => 'Host',
   'website' => 'Website',
