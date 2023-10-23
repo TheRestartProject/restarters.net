@@ -43,6 +43,8 @@ class Kernel extends ConsoleKernel
             ->emailOutputTo(env('SEND_COMMAND_LOGS_TO'), 'tech@therestartproject.org');
 
         $schedule->command('groups:country')->hourly();
+
+        $schedule->command('event:timezones')->hourly();
     }
 
     /**

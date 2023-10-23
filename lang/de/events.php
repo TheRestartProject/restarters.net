@@ -33,7 +33,7 @@ return [
   'volunteer_email_address' => 'Volunteer\'s email address (optional)',
   'message_volunteer_email_address' => 'This field will invite the volunteer to join the group',
   'volunteer_attended_button' => 'Volunteer attended',
-  'option_not_registered' => 'Not registered on Fixometer',
+  'option_not_registered' => 'Not registered on here',
   'option_default' => '-- Select --',
   'events' => 'Events',
   'event' => 'Event',

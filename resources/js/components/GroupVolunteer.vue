@@ -2,7 +2,9 @@
   <div>
     <div class="pt-2 pb-2 blackbord d-flex justify-content-between">
       <div class="d-flex w-100">
-        <b-img-lazy :src="profile" class="profile mr-2" rounded="circle" @error.native="brokenProfileImage" />
+        <a :href="'/profile/' + volunteer.volunteer.id">
+          <b-img-lazy :src="profile" class="profile mr-2" rounded="circle" @error.native="brokenProfileImage" />
+        </a>
         <div class="namewidth flex-grow-1">
           <div class="d-flex flex-column">
             <div :class="{
@@ -11,9 +13,9 @@
             'd-flex': true,
             'flex-wrap': true
             }" :title="volunteer.volunteer.name">
-            <span class="pr-1 overflow-hidden ellipsis">
+            <a :href="'/profile/' + volunteer.volunteer.id" class="pr-1 overflow-hidden ellipsis text-black">
               {{ volunteer.volunteer.name }}
-            </span>
+            </a>
               <span class="host" v-if="host">
               {{ __('partials.host') }}
             </span>
@@ -84,22 +86,24 @@ export default {
       return this.volunteer.role === HOST
     },
     noskills() {
-      return !this.volunteer.volunteer.user_skills || !this.volunteer.volunteer.user_skills.length
+      return !this.volunteer.user_skills || !this.volunteer.user_skills.length
     },
     skillCount() {
       let ret = null
-      let skills = this.volunteer.volunteer.user_skills
-      ret = (skills && skills.length ? skills.length : '0') + ' ' + this.$lang.choice('partials.skills', skills.length)
+      let skills = this.volunteer.user_skills
+      let len = skills && skills.length ? skills.length : 0
+      ret = len + ' ' + this.$lang.choice('partials.skills', len)
       return ret
     },
     skillList() {
       let ret = null
-      let skills = this.volunteer.volunteer.user_skills
+
+      let skills = this.volunteer.user_skills
 
       if (skills) {
         let names = []
         skills.forEach((s) => {
-          names.push(s.skill_name.skill_name)
+          names.push(s.skill_name)
         })
 
         ret = names.join(', ')

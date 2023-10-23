@@ -211,8 +211,9 @@ class Group extends Model implements Auditable
     {
         return $this->allVolunteers()
             ->where(function ($query) {
-                $query->where('status', 1)
-                    ->orWhereNull('status');
+                $query->whereNull('deleted_at')
+                    ->where('status', 1)
+                        ->orWhereNull('status');
             });
     }
 
@@ -224,24 +225,8 @@ class Group extends Model implements Auditable
     public function canDelete()
     {
         // Groups are deletable unless they have an event with a device.
-        $ret = true;
-
-        $allEvents = Party::withTrashed()->where('events.group', $this->idgroups)
-            ->get();
-
-        // Send these to getEventStats() to speed things up a bit.
-        $eEmissionRatio = \App\Helpers\LcaStats::getEmissionRatioPowered();
-        $uEmissionratio = \App\Helpers\LcaStats::getEmissionRatioUnpowered();
-
-        foreach ($allEvents as $event) {
-            $stats = $event->getEventStats($eEmissionRatio, $uEmissionratio);
-
-            if ($stats['devices_powered'] || $stats['devices_unpowered']) {
-                $ret = false;
-            }
-        }
-
-        return $ret;
+        return !Party::withTrashed()->where('events.group', $this->idgroups)
+            ->join('devices', 'event', '=', 'events.idevents')->first();
     }
 
     public static function getGroupStatsArrayKeys()
