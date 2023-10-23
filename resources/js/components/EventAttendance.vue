@@ -40,7 +40,7 @@
                 </p>
                 <hr />
                 <div>
-                  <div class="d-flex justify-content-between">
+                  <div class="d-flex justify-content-between" v-if="!upcoming">
                     <b-btn variant="link" @click="addVolunteer">
                       {{ __('events.add_volunteer_modal_heading') }}
                     </b-btn>
