@@ -49,10 +49,20 @@
           $showCalendar = Auth::check() && (($group && $group->isVolunteer()) || App\Helpers\Fixometer::hasRole(Auth::user(), 'Administrator'));
 
           $device_stats = [
-              'fixed' => isset($group_device_count_status[0]) ? (int) $group_device_count_status[0]->counter : 0,
-              'repairable' => isset($group_device_count_status[1]) ? (int) $group_device_count_status[1]->counter : 0,
-              'dead' => isset($group_device_count_status[2]) ? (int) $group_device_count_status[2]->counter : 0,
-            ];
+              'fixed' => 0,
+              'repairable' => 0,
+              'dead' => 0
+          ];
+
+          foreach ($group_device_count_status as $count) {
+              if ($count->status == \App\Device::REPAIR_STATUS_FIXED) {
+                  $device_stats['fixed'] = $count->counter;
+              } else if ($count->status == \App\Device::REPAIR_STATUS_REPAIRABLE) {
+                  $device_stats['repairable'] = $count->counter;
+              } else if ($count->status == \App\Device::REPAIR_STATUS_ENDOFLIFE) {
+                  $device_stats['dead'] = $count->counter;
+              }
+          }
 
           $category_clusters = [
             1 => 'Computers and Home Office',
