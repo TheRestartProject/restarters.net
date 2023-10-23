@@ -93,6 +93,7 @@ Route::middleware('ensureAPIToken')->group(function () {
         Route::get('/devices/group/{id}', [ExportController::class, 'devicesGroup']);
         Route::get('/devices', [ExportController::class, 'devices']);
         Route::get('/groups/{id}/events', [ExportController::class, 'groupEvents']);
+        Route::get('/networks/{id}/events', [ExportController::class, 'networkEvents']);
     });
 
     // Calendar routes do not require authentication.
