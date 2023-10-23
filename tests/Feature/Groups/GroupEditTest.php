@@ -105,7 +105,7 @@ class GroupEditTest extends TestCase
         // We don't upload files in a standard Laravel way, so testing upload is a bit of a hack.
         $_SERVER['DOCUMENT_ROOT'] = getcwd();
         \FixometerFile::$uploadTesting = TRUE;
-        file_put_contents('/tmp/UT.jpg', file_get_contents('public/images/community.jpg'));
+        file_put_contents('/tmp/UT.jpg', file_get_contents(public_path() . '/images/community.jpg'));
 
         $_FILES = [
             'file' => [

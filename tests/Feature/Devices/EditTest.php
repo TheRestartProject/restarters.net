@@ -129,7 +129,7 @@ class EditTest extends TestCase
         self::assertEquals(1, count($ret['images']));
 
         // And again, which will test we can upload two.
-        file_put_contents('/tmp/UT2.jpg', file_get_contents('public/images/community.jpg'));
+        file_put_contents('/tmp/UT2.jpg', file_get_contents(public_path() .'/images/community.jpg'));
 
         $_FILES = [
             'file' => [
@@ -185,7 +185,7 @@ class EditTest extends TestCase
         self::assertEquals(1, count($ret['images']));
 
         // And again, which will test we can upload two.
-        file_put_contents('/tmp/UT2.jpg', file_get_contents('public/images/community.jpg'));
+        file_put_contents('/tmp/UT2.jpg', file_get_contents(public_path() .'/images/community.jpg'));
 
         $_FILES = [
             'file' => [
