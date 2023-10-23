@@ -51,7 +51,7 @@ class WordpressEventPushTest extends TestCase
 
         $event->approve();
 
-        $this->artisan('event:sync');
+        $this->artisan('sync:events');
     }
 
     /** @test */
