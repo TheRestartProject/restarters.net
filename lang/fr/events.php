@@ -154,7 +154,7 @@ return [
   'image_delete_error' => 'Désolé, mais l\'image ne peut pas être supprimée.',
   'delete_permission' => 'Vous n\'avez pas la permission de supprimer cet événement',
   'delete_success' => 'L\'événement a été supprimé.',
-  'geocode_failed' => 'L\'adresse que vous avez encodée n\'a pas pu être trouvée. Veuillez essayer une adresse plus générale.',
+  'geocode_failed' => 'Lieu non trouvé. Si vous ne parvenez pas à trouver le lieu où se trouve votre événement, essayez d\'indiquer un lieu plus général (tel qu\'un village ou une ville) ou une adresse spécifique, plutôt qu\'un nom de bâtiment.',
   'create_failed' => 'L\'événement <strong>n\'a pas pu</strong> être créé. Veuillez regarder les erreurs, les corriger, et essayer à nouveau.',
   'edit_succeeded' => 'L\'édition du l\'événement Café a réussi',
   'edit_failed' => 'L\'événement n\'a pas pu être édité.',
