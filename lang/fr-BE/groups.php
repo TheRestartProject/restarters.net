@@ -48,7 +48,7 @@ return [
   'edit_group' => 'Editer Repair Café',
   'edit_group_save_changes' => 'Sauvegarder',
   'edit_group_text' => 'Allez-y! Changez ou améliorez le profil de votre Repair Café',
-  'groups_location_small' => 'Ex: l\'endroit où les réparations ont lieu!',
+  'groups_location_small' => 'Le lieu ou la région où votre Repair Café opère',
   'group_image' => 'Image du Repair Café',
   'tag-1' => 'Tag 1',
   'tag-2' => 'Tag 2',
@@ -82,7 +82,7 @@ return [
   'past' => 'Passé',
   'read_more' => 'Lire plus',
   'share_group_stats' => 'Partager les statistiques du Repair Café',
-  'total_devices' => 'Total des appareils qui ont été pris en charge',
+  'total_devices' => 'Total des éléments qui ont été pris en charge',
   'participants' => 'Participants',
   'hours_volunteered' => 'Heures de bénévolat',
   'waste_prevented' => 'Déchets évités',
@@ -142,7 +142,7 @@ return [
   'delete_group_confirm' => 'Veuillez confirmer que vous voulez supprimer :name',
   'delete_succeeded' => 'Repair Café <strong>:name</strong> a été supprimé.',
   'duplicate' => 'Ce nom (:name) existe déjà.  Si c\'est le vôtre, veuillez vous rendre dans la page Repair Cafés, utiliser le menu et l\'éditer.',
-  'geocode_failed' => 'L\'adresse que vous avez encodée n\'a pas pu être trouvée. Veuillez essayer une adresse plus générale.',
+  'geocode_failed' => 'Lieu non trouvé. Si vous ne parvenez pas à trouver le lieu où se trouve votre Repair Café, essayez d\'indiquer un lieu plus général (tel qu\'un village ou une ville) ou une adresse spécifique, plutôt qu\'un nom de bâtiment.',
   'discourse_title' => 'Il s\'agit d\'un groupe de discussion pour tous ceux qui suivent le Repair Café :group.
 
 Vous trouverez la page principale du Repair Café ici : :link.

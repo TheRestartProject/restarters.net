@@ -56,7 +56,7 @@ return [
   'edit_group' => 'Edit group',
   'edit_group_save_changes' => 'Save changes',
   'edit_group_text' => 'Go ahead and change or improve your group\'s profile.',
-  'groups_location_small' => 'I.e the place where the fixing happens!',
+  'groups_location_small' => 'The venue or area where your group operates',
   'group_image' => 'Group image',
   'tag-1' => 'Tag 1',
   'tag-2' => 'Tag 2',
@@ -85,7 +85,7 @@ return [
   'no_upcoming_events' => 'There are currently no upcoming events.',
   'no_past_events' => 'There are currently no past events for this group',
   'device_breakdown' => 'Device breakdown',
-  'total_devices' => 'Total devices worked on',
+  'total_devices' => 'Total items worked on',
   'most_repaired_devices' => 'Most repaired devices',
   'host' => 'Host',
   'website' => 'Website',
@@ -144,7 +144,7 @@ return [
   'nearest_groups' => 'These are the groups that are within 50 km of :location',
   'nearest_groups_change' => '(change)',
   'invitation_pending' => 'You have an invitation to this group.  Please click <a href=":accept">here</a> if you would like to join.',
-  'geocode_failed' => 'The address you entered could not be found. Please try a more general address.',
+  'geocode_failed' => 'Location not found. If you are unable to find the location of your group, please try a more general location (such as village/town), or a specific street address, rather than a building name.',
   'discourse_title' => 'This is a discussion group for anyone who follows :group.
 
 Find the group\'s main page here: :link.

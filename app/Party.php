@@ -588,13 +588,13 @@ class Party extends Model implements Auditable
                 }
 
                 switch ($device->repair_status) {
-                    case 1:
+                    case Device::REPAIR_STATUS_FIXED:
                         $result['fixed_devices']++;
                         break;
-                    case 2:
+                    case Device::REPAIR_STATUS_REPAIRABLE:
                         $result['repairable_devices']++;
                         break;
-                    case 3:
+                    case Device::REPAIR_STATUS_ENDOFLIFE:
                         $result['dead_devices']++;
                         break;
                     default:
