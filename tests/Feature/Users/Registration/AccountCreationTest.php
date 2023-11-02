@@ -161,12 +161,14 @@ class AccountCreationTest extends TestCase
     public function testAdminCreate()
     {
         $this->loginAsTestUser(Role::ADMINISTRATOR);
+        $idgroups = $this->createGroup();
 
         $userAttributes = $this->userAttributes();
         $response = $this->post('/user/create', [
             'name' => $userAttributes['name'],
             'email' => $userAttributes['email'],
             'role' => Role::RESTARTER,
+            'groups' => [ $idgroups ]
         ]);
 
         $response->assertSee('User created correctly');
