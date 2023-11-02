@@ -23,7 +23,6 @@ return [
   'location' => 'Localisation du Repair Café',
   'groups_approval_text' => 'L\'ajout de repair cafés doit être approuvé par un administrateur',
   'group_tag' => 'Etiquette',
-  'group_tag2' => 'Etiquette du Repair Café',
   'group_admin_only' => 'Seulement administrateur',
   'group_tags' => 'Etiquettes du Repair Café',
   'approve_group' => 'Approuver Repair Café',

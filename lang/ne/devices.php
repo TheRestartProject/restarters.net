@@ -1,7 +1,6 @@
 <?php
 
 return [
-  'by_date' => 'Op datum',
   'age' => 'Leeftijd',
   'brand' => 'Merk',
   'category' => 'Categorie',
@@ -11,8 +10,6 @@ return [
   'export_device_data' => 'Exporteer de gegevens van de toestellen',
   'fixed' => 'Hersteld',
   'from_date' => 'Vanaf',
-  'from_manufacturer' => 'Van producent',
-  'from_third_party' => 'Van derde partij',
   'graphic-camera' => 'Camera',
   'graphic-comment' => 'Commentaar',
   'group' => 'Groep',

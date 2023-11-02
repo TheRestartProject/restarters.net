@@ -33,7 +33,6 @@ return [
   'group_admin_only' => 'Enkel voor beheerders',
   'group_image' => 'Afbeelding van de groep',
   'group_tag' => 'Label',
-  'group_tag2' => 'Groepslabel',
   'group_tags' => 'Groepslabels',
   'headline_stats_dropdown' => 'Statistieken op een rij',
   'headline_stats_message' => 'Deze widget toont de groepsstatistieken op een rij, bv het aantal deelnemers op je Repair Café, het aantal uren vrijwlligerswerk',

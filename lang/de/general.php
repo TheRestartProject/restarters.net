@@ -23,7 +23,6 @@ return [
   'email_alerts_text' => 'Please choose what kind of email updates you would like to receive. You can change these at any time. Our Privacy Policy is available <a href="https://therestartproject.org/data-and-privacy-policy/fixometer/" rel="noopener noreferrer" target="_blank">here</a>',
   'email_alerts_pref1' => 'I would like to receive The Restart Project monthly newsletter',
   'email_alerts_pref2' => 'I would like to receive email notifications about events or groups near me',
-  'filter-results' => 'Filter results',
   'menu_tools' => 'Community Tools',
   'menu_discourse' => 'Discussion',
   'menu_wiki' => 'Wiki',
@@ -34,6 +33,5 @@ return [
   'help_feedback_url' => 'https://talk.restarters.net/c/help',
   'faq_url' => 'https://therestartproject.org/faq',
   'restartproject_url' => 'https://therestartproject.org',
-  'please_select' => 'Please select',
   'calendar_feed_help_url' => '/t/fixometer-how-to-subscribe-to-a-calendar',
 ];

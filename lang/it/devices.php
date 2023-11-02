@@ -3,7 +3,6 @@
 return [
   'devices' => 'Dispositivo',
   'export_device_data' => 'Esporta dati del dispositivo',
-  'by_date' => 'Fino a/Scadenza',
   'category' => 'Categoria',
   'group' => 'Gruppo',
   'from_date' => 'Dalla data',
@@ -20,12 +19,9 @@ return [
   'age' => 'Eta\'',
   'devices_description' => 'Descrizione del problema o della soluzione',
   'delete_device' => 'Cancella dispositivo',
-  'from_manufacturer' => 'Dal produttore',
-  'from_third_party' => 'Da parti terze',
   'event_info' => 'Informazioni evento',
   'devices_date' => 'Data',
   'weight' => 'Peso',
   'required_impact' => 'kg - required for environmental impact calculation',
   'age_approx' => 'years - approximate, if known',
-  'repair_source' => 'Source of repair information',
 ];
