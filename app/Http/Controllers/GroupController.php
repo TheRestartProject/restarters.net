@@ -182,9 +182,6 @@ class GroupController extends Controller
 
         if ((isset($groupid) && is_numeric($groupid)) || in_array($groupid, $gids)) {
             $group = Group::where('idgroups', $groupid)->first();
-        } elseif (count($groups)) {
-            $group = $groups[0];
-            unset($groups[0]);
         }
 
         if (! $group) {
