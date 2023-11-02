@@ -23,6 +23,8 @@ class DiscourseTest extends TestCase {
 
         $this->artisan('network:create testname testshortname "test description" --website="https://therestartproject.org" --language=fr --timezone="Asia/Samarkand" --wordpress --zapier --drip --auto-approve-events')->assertExitCode(0);
         $network = Network::orderBy('id', 'desc')->first();
+        $network->discourse_group = 1234;
+        $network->save();
         $network->addGroup($group);
 
         $this->artisan('group:create_discourse_group')->assertExitCode(0);
