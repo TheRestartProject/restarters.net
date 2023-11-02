@@ -110,7 +110,6 @@ return [
 <p>For misc items, we apply a generic CO<sub>2</sub>e to weight ratio to estimate the impact of each successful repair.</p>
 <p><a href="https://talk.restarters.net/t/how-do-we-measure-the-environmental-impact-of-events/6077" target="_blank" rel="nofollow">Learn more about how we calculate impact here</a></p>',
   'delete_event' => 'Delete event',
-  'see_all' => 'See all',
   'confirmed_none' => 'There are no confirmed volunteers.',
   'invited_none' => 'There are no invited volunteers yet.',
   'view_map' => 'View map',
@@ -149,7 +148,6 @@ return [
   'discourse_intro' => "This is a private discussion for those volunteering at the <a href=\":url\">:name event</a> being held by <a href=\":groupurl\">:groupname</a> on :start to :end.\r\n\r\nWe can use this thread in advance of the event to discuss logistics, and afterwards to discuss the repairs that we did.\r\n\r\n<em>(This is an automated message.)</em>",
   'invite_invalid_emails' => 'Invalid emails were entered, so no notifications were sent - please send your invitation again.  The invalid emails were: :emails',
   'invite_success' => 'Invites sent!',
-  'invite_success_apart_from' => 'Invites Sent - apart from these (:emails) who were already part of the event.',
   'invite_noemails' => 'You have not entered any emails!',
   'invite_invalid' => 'Something went wrong - this invite is invalid or has expired',
   'invite_cancelled' => 'You are no longer attending this event.',
