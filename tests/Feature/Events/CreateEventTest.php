@@ -123,7 +123,7 @@ class CreateEventTest extends TestCase
             assertSee($eventAttributes['venue']);
 
         // Check that the event appears in the API.
-        $response = $this->get("/api/v2/groups/$idgroups/events");
+        $response = $this->get("/api/v2/groups/{$group->idgroups}/events");
         $response->assertSuccessful();
         $json = json_decode($response->getContent(), true);
         $this->assertEquals(1, count($json['data']));

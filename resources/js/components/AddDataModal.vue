@@ -23,11 +23,19 @@
     <div>
       <label for="items_cat" class="mt-2">{{ __('devices.add_data_group') }}:</label>
       <b-select v-model="groupId" :options="groupOptions" id="group_member" />
-      <label for="items_cat" class="mt-2">{{ __('devices.add_data_event') }}:</label>
-      <b-select v-model="eventId" :options="eventOptions" id="events" />
+      <b-alert v-if="groupId && !events.length && !fetching" variant="warning" class="mt-2" show>
+        {{ __('groups.create_group_first') }}
+      </b-alert>
+      <div v-else>
+        <label for="items_cat" class="mt-2">{{ __('devices.add_data_event') }}:</label>
+        <b-select v-model="eventId" :options="eventOptions" id="events" />
+      </div>
     </div>
     <template slot="modal-footer">
-      <b-button variant="primary" size="sm" @click="gotoEvent">
+      <b-button v-if="groupId && !events.length && !fetching" variant="primary" size="sm" @click="createEvent" :disabled="!groupId">
+        {{ __('events.create_event') }}
+      </b-button>
+      <b-button v-else variant="primary" size="sm" @click="gotoEvent">
         {{ __('devices.add_data_action_button') }}
       </b-button>
     </template>
@@ -42,6 +50,7 @@ export default {
       showModal: false,
       groupId: null,
       eventId: null,
+      fetching: false,
     }
   },
   computed: {
@@ -76,11 +85,17 @@ export default {
   watch: {
     groupId: {
       immediate: true,
-      handler: function (newVal) {
+      handler: async function (newVal) {
         if (newVal) {
-          this.$store.dispatch('events/fetchByGroup', {
+          this.fetching = true
+
+          await this.$store.dispatch('events/clear')
+
+          await this.$store.dispatch('events/fetchByGroup', {
             id: newVal
           })
+
+          this.fetching = false
         }
       }
     }
@@ -96,7 +111,10 @@ export default {
       if (this.eventId) {
         window.location = '/party/view/' + this.eventId + '#devices-section'
       }
-    }
+    },
+    createEvent() {
+      window.location = '/party/create/' + this.groupId
+    },
   }
 }
 </script>

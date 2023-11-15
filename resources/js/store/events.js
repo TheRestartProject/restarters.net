@@ -68,6 +68,9 @@ export default {
     }
   },
   mutations: {
+    clear(state) {
+      state.list = {}
+    },
     set(state, params) {
       // There is a separate store for devices.  Make sure we don't accidentally use the list of devices returned
       // on the object, because that isn't updated dynamically.
@@ -92,6 +95,9 @@ export default {
     },
   },
   actions: {
+    clear({commit}) {
+      commit('clear')
+    },
     set({commit}, params) {
       commit('set', params);
     },
@@ -189,7 +195,6 @@ export default {
     async fetchByGroup({ rootGetters, commit }, params) {
       try {
         let ret = await axios.get('/api/v2/groups/' + params.id + '/events?api_token=' + rootGetters['auth/apiToken'])
-        console.log('Fetch by groups', ret)
 
         commit('setList', {
           events: ret.data.data

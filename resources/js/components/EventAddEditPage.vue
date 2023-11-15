@@ -7,6 +7,7 @@
     <b-card no-body class="box mt-4">
       <b-card-body class="p-4">
         <EventAddEdit :duplicate-from="currentdup" :idevents="currentid" :groups="groups" :csrf="csrf"
+                      :create-group="createGroup"
                       @created="eventCreated" @edited="justCreated = false" :just-created="justCreated"
                       :can-approve="canApprove" :can-network="canNetwork"
                       :key="bump" />
@@ -47,6 +48,11 @@ export default {
       required: false,
       default: false
     },
+    createGroup: {
+      type: Number,
+      required: false,
+      default: null
+    }
   },
   data() {
     return {

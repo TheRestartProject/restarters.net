@@ -171,5 +171,6 @@ Learn how to use this group here: :help.',
   'made_host' => 'We have made :name a host for this group.',
   'permission' => 'Sorry, you do not have permission to do this.',
   'volunteer_remove_success' => 'We have removed :name from this group.',
-  'volunteer_remove_error' => 'We are unable to remove :name from this group.'
+  'volunteer_remove_error' => 'We are unable to remove :name from this group.',
+  'create_group_first' => 'Please first create an event in order to add repair data.',
 ];
