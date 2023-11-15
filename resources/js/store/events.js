@@ -185,6 +185,20 @@ export default {
       } catch (e) {
         console.error("Events fetch failed", e)
       }
+    },
+    async fetchByGroup({ rootGetters, commit }, params) {
+      try {
+        let ret = await axios.get('/api/v2/groups/' + params.id + '/events?api_token=' + rootGetters['auth/apiToken'])
+        console.log('Fetch by groups', ret)
+
+        commit('setList', {
+          events: ret.data.data
+        })
+
+        return ret.data.data
+      } catch (e) {
+        console.error("Events fetch by group failed", e)
+      }
     }
   },
 }

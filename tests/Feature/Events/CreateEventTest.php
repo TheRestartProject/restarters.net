@@ -123,20 +123,11 @@ class CreateEventTest extends TestCase
             assertSee($eventAttributes['venue']);
 
         // Check that the event appears in the API.
-        $rsp = $this->get('/api/groups/' . $group->idgroups . '/events');
-        $rsp->assertStatus(200);
-        $json = json_decode($rsp->getContent(), true);
-        $events = json_decode($json['events']);
-        self::assertEquals(1, count($events));
-        self::assertEquals($event->idevents, $events[0]->idevents);
-
-        $rsp = $this->get('/api/groups/' . $group->idgroups . '/events?format=location');
-        $rsp->assertStatus(200);
-        $json = json_decode($rsp->getContent(), true);
-        $events = json_decode($json['events']);
-        self::assertEquals(1, count($events));
-        self::assertEquals($event->idevents, $events[0]->id);
-        self::assertEquals($event->FriendlyLocation, $events[0]->location);
+        $response = $this->get("/api/v2/groups/$idgroups/events");
+        $response->assertSuccessful();
+        $json = json_decode($response->getContent(), true);
+        $this->assertEquals(1, count($json['data']));
+        $this->assertEquals($event->idevents, $json['data'][0]['id']);
 
         // Now check whether the event shows/doesn't show correctly for different user roles.
         list($role, $seeEvent, $canModerate) = $data;
