@@ -23,11 +23,10 @@
                     :barrier-list="{{ json_encode($barriers, JSON_INVALID_UTF8_IGNORE) }}"
                     :item-types="{{ json_encode($item_types, JSON_INVALID_UTF8_IGNORE) }}"
                     :is-admin="{{ App\Helpers\Fixometer::hasRole($user, 'Administrator') ? 'true' : 'false' }}"
+                    :user-groups="{{ json_encode($user_groups, JSON_INVALID_UTF8_IGNORE) }}"
                 />
             </div>
         </div>
 </section>
 
 @endsection
-
-@include('fixometer.add-data-modal')

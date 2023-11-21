@@ -174,4 +174,6 @@ Apprenez à utiliser ce groupe ici : :help.',
   'permission' => 'Désolé, vous n\'avez pas la permission de faire ça.',
   'volunteer_remove_success' => 'Nous avons retiré :name de ce Repair Café.',
   'volunteer_remove_error' => 'Nous ne sommes pas en mesure de supprimer :name de ce Repair Café.',
+  'create_event_first' => 'Veuillez d\'abord créer un événement afin d\'ajouter des données de réparation.',
+  'follow_group_first' => 'Les données de réparation sont ajoutées aux événements de réparation de la communauté. Veuillez d\'abord suivre un Repair Café, puis choisir un événement afin d\'ajouter des données de réparation.',
 ];

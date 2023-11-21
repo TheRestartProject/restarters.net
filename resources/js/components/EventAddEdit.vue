@@ -180,6 +180,11 @@ export default {
       required: false,
       default: false
     },
+    createGroup: {
+      type: Number,
+      required: false,
+      default: null
+    }
   },
   data () {
     return {
@@ -270,6 +275,8 @@ export default {
     // and so that as/when it changes then reactivity updates all the views.
     //
     // Further down the line this may change so that the data is obtained via an AJAX call and perhaps SSR.
+    this.idgroups = this.createGroup
+
     this.$store.dispatch('groups/setList', {
       groups: this.groups
     })
