@@ -11,10 +11,7 @@
       title-tag="h2"
   >
     <template slot="modal-title">
-      <div class="d-flex">
-        {{ __('devices.add_data_title') }}
-        <b-img src="/images/fixometer_doodle.svg" class="ml-4" />
-      </div>
+      {{ __('devices.add_data_title') }}
       <hr class="hr-dashed mb-25 mt-10">
     </template>
     <div>
