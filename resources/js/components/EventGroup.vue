@@ -10,6 +10,7 @@
         deselectLabel=""
         :placeholder="__('partials.please_choose')"
         :class="{ hasError: hasError }"
+        :disabled="disabled"
     />
     <input type="hidden" name="group" :value="currentIdGroups" />
   </b-form-group>
@@ -23,6 +24,11 @@ export default {
       default: null
     },
     hasError: {
+      type: Boolean,
+      required: false,
+      default: false
+    },
+    disabled: {
       type: Boolean,
       required: false,
       default: false
