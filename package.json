@@ -35,7 +35,7 @@
         "nyc": "^15.1.0",
         "playwright": "^1.14.1",
         "popper.js": "^1.14.4",
-        "postcss": "^8.2.8",
+        "postcss": "^8.4.31",
         "resolve-url-loader": "^5.0.0",
         "sass": "^1.56.1",
         "sass-loader": "^12.6.0",

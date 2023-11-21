@@ -1,20 +1,26 @@
 <template>
   <div class="w-100 device-select-row">
-    <vue-typeahead-bootstrap v-model="currentType" :maxMatches="5" :data="suggestions" :minMatchingChars="1" size="lg" inputClass="marg form-control-lg" :disabled="disabled" :placeholder="__('devices.item_type')" @hit="emit" />
+    <vue-typeahead-bootstrap ref="typeahead" v-model="currentType" :maxMatches="5" :data="suggestions"
+                             :minMatchingChars="1" size="lg" :inputClass="'marg form-control-lg theinput-' + uid" :disabled="disabled"
+                             :placeholder="__('devices.item_type')" @hit="emit"/>
     <div v-b-popover.html.left="translatedTooltip" class="ml-3 mt-2">
-      <b-img class="icon clickable" src="/icons/info_ico_black.svg" v-if="iconVariant === 'black'" />
-      <b-img class="icon clickable" src="/icons/info_ico_green.svg" v-else />
+      <b-img class="icon clickable" src="/icons/info_ico_black.svg" v-if="iconVariant === 'black'"/>
+      <b-img class="icon clickable" src="/icons/info_ico_green.svg" v-else/>
     </div>
     <p v-if="!suppressTypeWarning && notASuggestion" class="pl-1 form-text">
-      {{ __('devices.unknown_item_type' )}}
+      {{ __('devices.unknown_item_type') }}
     </p>
   </div>
 </template>
 <script>
-import VueTypeaheadBootstrap from 'vue-typeahead-bootstrap';
+import Vue from 'vue'
+import VueTypeaheadBootstrap from 'vue-typeahead-bootstrap'
+import UniqueId from 'vue-unique-id'
+
+Vue.use(UniqueId)
 
 export default {
-  components: { VueTypeaheadBootstrap },
+  components: {VueTypeaheadBootstrap},
   props: {
     type: {
       type: String,
@@ -38,7 +44,7 @@ export default {
     },
     powered: {
       // The server might return a number rather than a boolean.
-      type: [ Boolean, Number ],
+      type: [Boolean, Number],
       required: false,
       default: false
     }
@@ -73,13 +79,20 @@ export default {
       }
     }
   },
-  data () {
+  data() {
     return {
       currentType: null,
     }
   },
   mounted() {
-    this.currentType = this.type
+    // Focus on the input.  This is a bit hacky as the typeahead component doesn't expose the input element.  So we
+    // add our own class and then find it.
+    try {
+      this.currentType = this.type
+      document.getElementsByClassName('theinput-' + this.uid)[0].focus()
+    } catch (e){
+      console.error('Input focus failed', e)
+    }
 
     // Fetch the item types.  We do this here because it's slow, and we don't want to block the page load.
     this.$store.dispatch('items/fetch')

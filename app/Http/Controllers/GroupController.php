@@ -200,15 +200,15 @@ class GroupController extends Controller
 
         $counts = $Device->countByClustersYearStatus($group->idgroups);
         $template = [
-            0 => (object)[
+            0 => [
                 'counter' => 0,
                 'repair_status' => 1,
             ],
-            1 => (object)[
+            1 => [
                 'counter' => 0,
                 'repair_status' => 2,
             ],
-            2 => (object)[
+            2 => [
                 'counter' => 0,
                 'repair_status' => 3,
             ],
@@ -228,11 +228,12 @@ class GroupController extends Controller
             $year = $count->year;
             $cluster = $count->cluster;
             $repair_status = $count->repair_status;
+            $counter = $count->counter;
 
             if ($repair_status && $cluster) {
                 if (array_key_exists($cluster, $clusters['all'])) {
-                    $clusters['all'][$cluster][$repair_status - 1]->counter += $count->counter;
-                    $clusters['all'][$cluster]['total'] += $count->counter;
+                    $clusters['all'][$cluster][$repair_status - 1]['counter'] += $counter;
+                    $clusters['all'][$cluster]['total'] += $counter;
 
                     if (!array_key_exists($year, $clusters)) {
                         $clusters[$year] = [
@@ -243,8 +244,8 @@ class GroupController extends Controller
                         ];
                     }
 
-                    $clusters[$year][$cluster][$repair_status - 1]->counter += $count->counter;
-                    $clusters[$year][$cluster]['total'] += $count->counter;
+                    $clusters[$year][$cluster][$repair_status - 1]['counter'] += $counter;
+                    $clusters[$year][$cluster]['total'] += $counter;
                 }
             }
         }

@@ -27,9 +27,14 @@ export default {
       required: true
     }
   },
+  computed: {
+    total() {
+      return this.stats.fixed + this.stats.repairable + this.stats.dead
+    },
+  },
   methods: {
     pc(val) {
-      return this.stats.total ? (Math.round(10000 * val / this.stats.total) / 100) : 0
+      return this.total ? (Math.round(10000 * val / this.total) / 100) : 0
     },
     translate(category) {
       // Need to translate categories.  Might be null if there were no items.

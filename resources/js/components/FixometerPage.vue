@@ -202,6 +202,10 @@ export default {
     isAdmin: {
       type: Boolean,
       required: true
+    },
+    userGroups: {
+      type: Array,
+      required: true,
     }
   },
   data () {
@@ -256,7 +260,6 @@ export default {
 
     if (params.has('model')) {
       this.model = params.get('model')
-      console.log("Got modal ", this.model)
       this.startExpandedItems = true
     }
 
@@ -292,6 +295,10 @@ export default {
 
     this.total_powered = this.impactData.total_powered
     this.total_unpowered = this.impactData.total_unpowered
+
+    this.$store.dispatch('groups/setList', {
+      groups: this.userGroups
+    })
   },
   watch: {
     url(newVal) {
