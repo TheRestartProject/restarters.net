@@ -425,9 +425,7 @@ class DiscourseService
                                 Log::info("Add $discourseMember as admin of {$discourseId} {$discourseName}");
                                 $response = $client->request('PUT', "/admin/groups/$discourseId/owners.json", [
                                     'form_params' => [
-                                        'group' => [
-                                            'usernames' => $discourseMember
-                                        ]
+                                        'usernames' => $discourseMember
                                     ]
                                 ]);
 
