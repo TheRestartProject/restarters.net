@@ -429,12 +429,12 @@ class Device extends Model implements Auditable
         // This is a beast of a query, but the basic idea is to return a list of the categories most commonly
         // used by the item types.
         //
-        // ANY_VALUE is used to suppress errors when SQL mode is not set to ONLY_FULL_GROUP_BY.
+        // MAX is used to suppress errors when SQL mode is not set to ONLY_FULL_GROUP_BY.
         $types = DB::select(DB::raw("
-            SELECT TRIM(item_type),
+            SELECT TRIM(item_type) AS item_type,
                    MAX(powered)      AS powered,
                    MAX(idcategories) AS idcategories,
-                   MAX(categoryname)
+                   MAX(categoryname) AS categoryname
             FROM   (SELECT DISTINCT s.*
                     FROM   (SELECT item_type,
                                    MAX(powered)      AS powered,
