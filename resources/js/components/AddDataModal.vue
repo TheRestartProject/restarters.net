@@ -20,19 +20,25 @@
     <div>
       {{ __('devices.add_data_description') }}
     </div>
-    <div>
+    <b-alert v-if="!groups.length && !fetching" show variant="warning" class="mt-2">
+      {{ __('groups.follow_group_first') }}
+    </b-alert>
+    <div v-else>
       <label for="items_cat" class="mt-2">{{ __('devices.add_data_group') }}:</label>
       <b-select v-model="groupId" :options="groupOptions" id="group_member" />
       <b-alert v-if="groupId && !events.length && !fetching" variant="warning" class="mt-2" show>
-        {{ __('groups.create_group_first') }}
+        {{ __('groups.create_event_first') }}
       </b-alert>
       <div v-else>
         <label for="items_cat" class="mt-2">{{ __('devices.add_data_event') }}:</label>
-        <b-select v-model="eventId" :options="eventOptions" id="events" />
+        <b-select :disabled="fetching" v-model="eventId" :options="eventOptions" id="events" />
       </div>
     </div>
     <template slot="modal-footer">
-      <b-button v-if="groupId && !events.length && !fetching" variant="primary" size="sm" @click="createEvent" :disabled="!groupId">
+      <b-button v-if="!groups.length && !fetching" href="/group" variant="primary">
+        {{ __('dashboard.see_all_groups') }}
+      </b-button>
+      <b-button v-else-if="groupId && !events.length && !fetching" variant="primary" size="sm" @click="createEvent" :disabled="!groupId">
         {{ __('events.create_event') }}
       </b-button>
       <b-button v-else variant="primary" size="sm" @click="gotoEvent">
@@ -95,6 +101,12 @@ export default {
             id: newVal
           })
 
+          await this.$nextTick()
+
+          if (this.events.length) {
+            this.eventId = this.events[0].id
+          }
+
           this.fetching = false
         }
       }
@@ -103,6 +115,10 @@ export default {
   methods: {
     show() {
       this.showModal = true
+
+      if (this.groups.length) {
+        this.groupId = this.groups[0].idgroups
+      }
     },
     hide() {
       this.showModal = false

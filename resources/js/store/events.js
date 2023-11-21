@@ -79,7 +79,7 @@ export default {
     },
     setList(state, params) {
       params.events.forEach(e => {
-        Vue.set(state.list, e.idevents, e)
+        Vue.set(state.list, e.id, e)
       })
     },
     setModerate(state, params) {
