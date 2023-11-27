@@ -8,6 +8,7 @@ use App\Role;
 use App\Services\DiscourseService;
 use App\User;
 use Illuminate\Contracts\Queue\ShouldQueue;
+use Illuminate\Contracts\Queue\InteractsWithQueue;
 
 class AddUserToDiscourseThreadForEvent implements ShouldQueue {
     private $discourseService;
@@ -28,6 +29,14 @@ class AddUserToDiscourseThreadForEvent implements ShouldQueue {
     }
 
     public function handle(UserConfirmedEvent $e) {
+        // This call can block for a long time - add our own timeout so that we can fail it rather than block
+        // the whole queue.
+        pcntl_signal(SIGALRM, function () {
+            $this->fail();
+        });
+
+        pcntl_alarm(10);
+
         if ($e->iduser) {
             $event = Party::find($e->idevents);
             $user = User::find($e->iduser);
@@ -46,5 +55,7 @@ class AddUserToDiscourseThreadForEvent implements ShouldQueue {
                 }
             }
         }
+
+        pcntl_alarm(0);
     }
 }
