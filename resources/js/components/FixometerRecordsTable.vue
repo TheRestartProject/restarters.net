@@ -75,7 +75,6 @@
               :idevents="row.item.event"
               :brands="brands"
               :barrier-list="barrierList"
-              :itemTypes="itemTypes"
               :cancel-button="false"
               @close="closed(row)" />
         </template>
@@ -129,11 +128,6 @@ export default {
       default: null
     },
     barrierList: {
-      type: Array,
-      required: false,
-      default: null
-    },
-    itemTypes: {
       type: Array,
       required: false,
       default: null

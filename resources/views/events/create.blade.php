@@ -29,6 +29,7 @@
           :groups="{{ json_encode($user_groups, JSON_INVALID_UTF8_IGNORE) }}"
           @endif
           :can-approve="{{ (App\Helpers\Fixometer::hasRole( Auth::user(), 'Administrator') || ($selected_group_id && Auth::user()->isCoordinatorForGroup(App\Group::find($selected_group_id)))) ? "true" : "false" }}"
+          :create-group="{{ $selected_group_id ? $selected_group_id : 'null' }}"
       />
     </div>
 

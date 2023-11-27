@@ -22,7 +22,6 @@ return [
   'menu_wiki' => 'Wiki',
   'new_group' => 'Een nieuwe groep maken',
   'other_profile' => 'profiel',
-  'party_reporting' => 'Activiteitenverslagen',
   'please_select' => 'Selecteer iets aub',
   'profile' => 'Jouw profiel',
   'profile_content' => 'Geef aub wat info over jezelf. Zo kun je makkelijker in contact komen met andere organisatoren en herstellers. En het helpt ons om de gemeenschap beter te begrijpen.',

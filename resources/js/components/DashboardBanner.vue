@@ -1,23 +1,26 @@
-<template>
+<template xmlns="http://www.w3.org/1999/html">
   <b-alert :show="show" :variant="variant" dismissible class="information-alert" @dismissed="dismissed"  v-if="bannerActive">
     <div class="d-sm-flex flex-row justify-content-between align-items-center">
       <div class="action-text-left float-left d-flex flex-row">
         <div class="action-text mb-0">
           <div class='mb-2'>
             <!-- <span class='badge badge-warning'>NEW!</span> -->
-            <strong>Help sustain this site today and double your impact 🤩</strong>
+            <strong>Support our work!</strong>
           </div>
           <p>
-              Restarters.net is free to use, but not to run. We work hard to keep the lights on and
-              <a href="https://talk.restarters.net/t/restarters-net-software-updates-changelog/1511" target="_blank" rel="noopener">build improvements</a>.
-              Until 27 April, any donation you make to Restart will be <strong>doubled</strong> by The Big Give!
-              Please consider supporting us this week to help us make repair a reality and keep this site running.
+            We’re participating in the
+            <a href="https://www.avivacommunityfund.co.uk/p/the-restart-project-1" target="_blank" rel="noopener">Aviva crowdfunder</a>
+            this year. Until the end of 2023 every donation will be doubled!
+          </p>
+          <p>
+            Find out more about how your donation will support our work
+            <a href="https://talk.restarters.net/t/were-participating-in-the-aviva-crowdfunder/18990" target="_blank" rel="noopener">here</a>.
           </p>
         </div>
       </div>
 
       <div class="float-right mt-3 mt-sm-0">
-          <a href='https://tinyurl.com/restartersbiggive' class='btn btn-md btn-primary btn-block' target="_blank" rel="noopener" title=''>Donate</a>
+          <a href='https://www.avivacommunityfund.co.uk/p/the-restart-project-1' class='btn btn-md btn-primary btn-block' target="_blank" rel="noopener" title=''>Double your donation now</a>
       </div>
     </div>
   </b-alert>
@@ -30,7 +33,7 @@ export default {
     return {
       // Change this id to something unique each time you edit this - it's used to remember not to show dismissed
       // banners.
-      id: 'biggive2023',
+      id: 'aviva-crowdfunder-2023',
 
       // Change this to 'secondary' for yellow or 'danger' for pink.
       variant: 'secondary'
@@ -40,7 +43,7 @@ export default {
     bannerActive() {
       var now = moment()
 
-      return now.isAfter('2023-04-20 12:00') && now.isBefore('2023-04-27 12:00')
+      return now.isAfter('2023-11-27 00:00') && now.isBefore('2023-12-31 23:59')
     },
     show() {
       let ret = true

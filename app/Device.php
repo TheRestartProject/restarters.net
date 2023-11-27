@@ -429,14 +429,14 @@ class Device extends Model implements Auditable
         // This is a beast of a query, but the basic idea is to return a list of the categories most commonly
         // used by the item types.
         //
-        // ANY_VALUE is used to suppress errors when SQL mode is not set to ONLY_FULL_GROUP_BY.
+        // MAX is used to suppress errors when SQL mode is not set to ONLY_FULL_GROUP_BY.
         $types = DB::select(DB::raw("
-            SELECT item_type,
+            SELECT TRIM(item_type) AS item_type,
                    MAX(powered)      AS powered,
                    MAX(idcategories) AS idcategories,
-                   MAX(categoryname)
+                   MAX(categoryname) AS categoryname
             FROM   (SELECT DISTINCT s.*
-                    FROM   (SELECT item_type,
+                    FROM   (SELECT TRIM(item_type) AS item_type,
                                    MAX(powered)      AS powered,
                                    MAX(idcategories) AS idcategories,
                                    categories.name         AS categoryname,
@@ -446,10 +446,10 @@ class Device extends Model implements Auditable
                                            ON devices.category = categories.idcategories
                             WHERE  item_type IS NOT NULL
                             GROUP  BY categoryname,
-                                      item_type) s
-                           JOIN (SELECT item_type,
+                                      UPPER(item_type)) s
+                           JOIN (SELECT TRIM(item_type) AS item_type,
                                         MAX(count) AS maxcount
-                                 FROM   (SELECT item_type               AS item_type,
+                                 FROM   (SELECT TRIM(item_type)   AS item_type,
                                                 MAX(powered)      AS powered,
                                                 MAX(idcategories) AS idcategories,
                                                 categories.name         AS categoryname,
@@ -460,11 +460,12 @@ class Device extends Model implements Auditable
                                                            categories.idcategories
                                          WHERE  item_type IS NOT NULL
                                          GROUP  BY categoryname,
-                                                   item_type) s
-                                 GROUP  BY s.item_type) AS m
-                             ON s.item_type = m.item_type
+                                                   UPPER(item_type)) s
+                                 GROUP  BY UPPER(s.item_type)) AS m
+                             ON UPPER(s.item_type) = UPPER(m.item_type)
                                 AND s.count = m.maxcount) t
-            GROUP BY t.item_type
+            GROUP BY UPPER(t.item_type)
+            HAVING LENGTH(item_type) > 0
 "));
 
         return $types;

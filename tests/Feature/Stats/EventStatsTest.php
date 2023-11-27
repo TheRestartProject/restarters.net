@@ -178,16 +178,6 @@ class EventStatsTest extends StatsTestCase
         $response = $this->get('/party/stats/' . $event->idevents . '/wide');
         $response->assertSuccessful();
         $response->assertSee('<span id="ewaste-diverted-value">23</span>', false);
-
-        // Check that the search page loads.
-        $this->loginAsTestUser(Role::ADMINISTRATOR);
-        $response = $this->get('/search');
-        $response->assertSuccessful();
-        $response->assertSee($event->venue);
-
-        $response = $this->get("/search?fltr=1&parties[]={$event->idevents}");
-        $response->assertSee('id="key-stats"', false);
-        $response->assertSee($event->venue);
     }
 
     /** @test */
