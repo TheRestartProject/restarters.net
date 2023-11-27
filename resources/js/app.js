@@ -12,7 +12,6 @@ require('slick-carousel');
 require('ekko-lightbox');
 require('bootstrap4-datetimepicker');
 require('./misc/notifications');
-require('./fixometer');
 require('leaflet');
 require('./constants');
 

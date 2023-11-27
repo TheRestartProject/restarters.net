@@ -68,7 +68,7 @@
                     "Events"
                 ],
                 "summary": "Edit Event",
-                "description": "Edits an event.",
+                "description": "Edits an event.  The event of a group cannot be changed after creation.",
                 "operationId": "editEvent",
                 "parameters": [
                     {
@@ -658,6 +658,37 @@
                 }
             }
         },
+        "/api/v2/items": {
+            "get": {
+                "tags": [
+                    "Items"
+                ],
+                "summary": "Get list of items",
+                "operationId": "listItemsv2",
+                "responses": {
+                    "200": {
+                        "description": "Successful operation",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "data": {
+                                            "title": "data",
+                                            "description": "An array of items",
+                                            "type": "array",
+                                            "items": {
+                                                "$ref": "#/components/schemas/Item"
+                                            }
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
         "/api/v2/networks": {
             "get": {
                 "tags": [
@@ -1236,6 +1267,45 @@
                 "type": "array",
                 "items": {
                     "$ref": "#/components/schemas/GroupSummary"
+                }
+            },
+            "Item": {
+                "title": "Item",
+                "description": "An item which can be specified in a device",
+                "properties": {
+                    "type": {
+                        "title": "type",
+                        "description": "The name of the item",
+                        "format": "string",
+                        "example": "Laptop"
+                    },
+                    "powered": {
+                        "title": "powered",
+                        "description": "Whether the item is powered (true) or unpowered (false)",
+                        "format": "boolean",
+                        "example": "true"
+                    },
+                    "idcategories": {
+                        "title": "idcategories",
+                        "description": "The id of the category for this item",
+                        "format": "int64",
+                        "example": "16"
+                    },
+                    "categoryname": {
+                        "title": "categoryname",
+                        "description": "The name of the category for this item",
+                        "format": "string",
+                        "example": "Laptop medium"
+                    }
+                },
+                "type": "object"
+            },
+            "ItemCollection": {
+                "title": "ItemCollection",
+                "description": "A collection of items.",
+                "type": "array",
+                "items": {
+                    "$ref": "#/components/schemas/Item"
                 }
             },
             "Network": {

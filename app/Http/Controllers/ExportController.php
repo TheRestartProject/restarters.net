@@ -9,6 +9,7 @@ use App\GroupTags;
 use App\GrouptagsGroups;
 use App\Helpers\Fixometer;
 use App\Helpers\SearchHelper;
+use App\Network;
 use App\Party;
 use App\Search;
 use App\User;
@@ -75,20 +76,21 @@ class ExportController extends Controller
 
         $me = auth()->user();
 
+        // We can't put accented characters into a CSV file, so flatten them.
         $columns = [
-            'Item Type',
-            'Product Category',
-            'Brand',
-            'Model',
-            'Comments',
-            'Repair Status',
-            'Spare parts (needed/used)',
-            'Event',
-            'Group',
-            'Date',
-            'Waste Prevented',
-            'CO2 Prevented',
-            'Powered'
+            iconv('UTF-8', 'ASCII//TRANSLIT', __('devices.item_type_short')),
+            iconv('UTF-8', 'ASCII//TRANSLIT', __('devices.category')),
+            iconv('UTF-8', 'ASCII//TRANSLIT', __('devices.brand')),
+            iconv('UTF-8', 'ASCII//TRANSLIT', __('devices.model')),
+            iconv('UTF-8', 'ASCII//TRANSLIT', __('devices.title_assessment')),
+            iconv('UTF-8', 'ASCII//TRANSLIT', __('devices.repair_status')),
+            iconv('UTF-8', 'ASCII//TRANSLIT', __('devices.spare_parts')),
+            iconv('UTF-8', 'ASCII//TRANSLIT', __('events.event')),
+            iconv('UTF-8', 'ASCII//TRANSLIT', __('groups.group')),
+            iconv('UTF-8', 'ASCII//TRANSLIT', __('events.event_date')),
+            iconv('UTF-8', 'ASCII//TRANSLIT', __('events.stat-7')),
+            iconv('UTF-8', 'ASCII//TRANSLIT', __('events.stat-6')),
+            iconv('UTF-8', 'ASCII//TRANSLIT', ucfirst(__('devices.title_powered')))
         ];
 
         fputcsv($file, $columns);
@@ -145,78 +147,83 @@ class ExportController extends Controller
     /**
      * @return \Illuminate\Http\Response
      */
-    public function parties(Request $request)
+    public function groupEvents(Request $request, $idgroups)
     {
-        if ($request->has('fltr') && ! empty($request->input('fltr'))) {
-            $dropdowns = SearchHelper::getUserGroupsAndParties();
-            $filters = SearchHelper::getSearchFilters($request);
+        $group = Group::findOrFail($idgroups);
+        $parties = $group->parties()->undeleted()->get();
+        return $this->exportEvents($parties);
+    }
 
-            $Search = new Search;
-            $PartyList = $Search->parties(
-                $filters['searched_parties'],
-                $filters['searched_groups'],
-                $filters['from_date'],
-                $filters['to_date'],
-                $filters['group_tags'],
-                $dropdowns['allowed_parties']
-            );
+    public function networkEvents(Request $request, $id)
+    {
+        $network = Network::findOrFail($id);
+        $parties = collect([]);
 
-            if (count($PartyList) > 0) {
-
-                // prepare the column headers
-                $statsKeys = array_keys(\App\Party::getEventStatsArrayKeys());
-                array_walk($statsKeys, function (&$k) {
-                    $key = explode('_', $k);
-                    array_walk($key, function (&$v) {
-                        $v = str_replace('Waste', 'Weight', str_replace('Co2', 'CO2', ucfirst($v)));
-                    });
-                    $k = implode(' ', $key);
-                });
-                $headers = array_merge(['Date', 'Venue', 'Group', 'Approved'], $statsKeys);
-
-                // Send these to getEventStats() to speed things up a bit.
-                $eEmissionRatio = \App\Helpers\LcaStats::getEmissionRatioPowered();
-                $uEmissionratio = \App\Helpers\LcaStats::getEmissionRatioUnpowered();
-
-                // prepare the column values
-                $PartyArray = [];
-                foreach ($PartyList as $i => $party) {
-                    $stats = $party->getEventStats($eEmissionRatio, $uEmissionratio);
-                    array_walk($stats, function (&$v) {
-                        $v = round($v);
-                    });
-
-                    $PartyArray[$i] = [
-                        $party->getFormattedLocalStart(),
-                        $party->getEventName(),
-                        $party->theGroup && $party->theGroup->name ? $party->theGroup->name : '?',
-                        $party->approved ? 'true' : 'false',
-                    ];
-                    $PartyArray[$i] += $stats;
-                }
-
-                // write content to file
-                $filename = 'parties.csv';
-
-                $file = fopen($filename, 'w+');
-                fputcsv($file, $headers);
-
-                foreach ($PartyArray as $d) {
-                    fputcsv($file, $d);
-                }
-                fclose($file);
-
-                $headers = [
-                    'Content-Type' => 'text/csv',
-                ];
-
-                return Response::download($filename, $filename, $headers);
-            }
-            // }
+        foreach ($network->groups as $group) {
+            $parties = $parties->merge($group->parties()->undeleted()->get());
         }
 
-        return view('export.parties', [
-            'data' => ['No data to return'],
-        ]);
+        return $this->exportEvents($parties);
+    }
+
+    private function exportEvents($parties) {
+        // We can't put accented characters into a CSV file, so flatten them.
+        $headers = [
+            iconv('UTF-8', 'ASCII//TRANSLIT', __('groups.export.events.date')),
+            iconv('UTF-8', 'ASCII//TRANSLIT', __('groups.export.events.event')),
+            iconv('UTF-8', 'ASCII//TRANSLIT', __('groups.export.events.volunteers')),
+            iconv('UTF-8', 'ASCII//TRANSLIT', __('groups.export.events.participants')),
+            iconv('UTF-8', 'ASCII//TRANSLIT', __('groups.export.events.items_total')),
+            iconv('UTF-8', 'ASCII//TRANSLIT', __('groups.export.events.items_fixed')),
+            iconv('UTF-8', 'ASCII//TRANSLIT', __('groups.export.events.items_repairable')),
+            iconv('UTF-8', 'ASCII//TRANSLIT', __('groups.export.events.items_end_of_life')),
+            iconv('UTF-8', 'ASCII//TRANSLIT', __('groups.export.events.items_kg_waste_prevented')),
+            iconv('UTF-8', 'ASCII//TRANSLIT', __('groups.export.events.items_kg_co2_prevent')),
+            iconv('UTF-8', 'ASCII//TRANSLIT', __('groups.export.events.group'))
+        ];
+
+        // Send these to getEventStats() to speed things up a bit.
+        $eEmissionRatio = \App\Helpers\LcaStats::getEmissionRatioPowered();
+        $uEmissionratio = \App\Helpers\LcaStats::getEmissionRatioUnpowered();
+
+        // prepare the column values
+        $PartyArray = [];
+        foreach ($parties as $party) {
+            $stats = $party->getEventStats($eEmissionRatio, $uEmissionratio);
+            array_walk($stats, function (&$v) {
+                $v = round($v);
+            });
+
+            $PartyArray[] = [
+                $party->getFormattedLocalStart(),
+                $party->getEventName(),
+                $party->volunteers,
+                $party->participants ? $party->participants : 0,
+                $stats['fixed_devices'] + $stats ['repairable_devices'] + $stats['dead_devices'],
+                $stats['fixed_devices'],
+                $stats['repairable_devices'],
+                $stats['dead_devices'],
+                $stats['waste_powered'] + $stats['waste_unpowered'],
+                $stats['co2_powered'] + $stats['co2_unpowered'],
+                iconv('UTF-8', 'ASCII//TRANSLIT', $party->theGroup && $party->theGroup->name ? $party->theGroup->name : '?'),
+            ];
+        }
+
+        // write content to file
+        $filename = 'events.csv';
+
+        $file = fopen($filename, 'w+');
+        fputcsv($file, $headers);
+
+        foreach ($PartyArray as $d) {
+            fputcsv($file, $d);
+        }
+        fclose($file);
+
+        $headers = [
+            'Content-Type' => 'text/csv',
+        ];
+
+        return Response::download($filename, $filename, $headers);
     }
 }

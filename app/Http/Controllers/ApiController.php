@@ -50,43 +50,49 @@ class ApiController extends Controller
     {
         $result = [];
 
-        $Device = new Device;
+        if (\Cache::has('homepage_data')) {
+            $result = \Cache::get('homepage_data');
+        } else {
+            $Device = new Device;
 
-        $allparties = Party::past()->get();
+            $allparties = Party::past()->get();
 
-        $participants = 0;
-        $hours_volunteered = 0;
+            $participants = 0;
+            $hours_volunteered = 0;
 
-        foreach ($allparties as $party) {
-            $participants += $party->pax;
+            foreach ($allparties as $party) {
+                $participants += $party->pax;
 
-            $hours_volunteered += $party->hoursVolunteered();
+                $hours_volunteered += $party->hoursVolunteered();
+            }
+
+            $result['participants'] = $participants;
+            $result['hours_volunteered'] = $hours_volunteered;
+            $fixed = $Device->statusCount();
+            $result['items_fixed'] = count($fixed) ? $fixed[0]->counter : 0;
+
+            $stats = \App\Helpers\LcaStats::getWasteStats();
+            $result['waste_powered'] = round($stats[0]->powered_waste);
+            $result['waste_unpowered'] = round($stats[0]->unpowered_waste);
+            $result['waste_total'] = round($stats[0]->powered_waste + $stats[0]->unpowered_waste);
+            $result['co2_powered'] = round($stats[0]->powered_footprint);
+            $result['co2_unpowered'] = round($stats[0]->unpowered_footprint);
+            $result['co2_total'] = round($stats[0]->powered_footprint + $stats[0]->unpowered_footprint);
+
+            $devices = new Device;
+            $result['fixed_powered'] = $devices->fixedPoweredCount();
+            $result['fixed_unpowered'] = $devices->fixedUnpoweredCount();
+            $result['total_powered'] = $devices->poweredCount();
+            $result['total_unpowered'] = $devices->unpoweredCount();
+
+            // for backward compatibility (don't break therestartproject.org)
+            $result['weights'] = round($result['waste_total']);
+            $result['ewaste'] = round($result['waste_powered']);
+            $result['unpowered_waste'] = round($result['waste_unpowered']);
+            $result['emissions'] = round($result['co2_total']);
+
+            \Cache::put('homepage_data', $result, 43200);
         }
-
-        $result['participants'] = $participants;
-        $result['hours_volunteered'] = $hours_volunteered;
-        $fixed = $Device->statusCount();
-        $result['items_fixed'] = count($fixed) ? $fixed[0]->counter : 0;
-
-        $stats = \App\Helpers\LcaStats::getWasteStats();
-        $result['waste_powered'] = round($stats[0]->powered_waste);
-        $result['waste_unpowered'] = round($stats[0]->unpowered_waste);
-        $result['waste_total'] = round($stats[0]->powered_waste + $stats[0]->unpowered_waste);
-        $result['co2_powered'] = round($stats[0]->powered_footprint);
-        $result['co2_unpowered'] = round($stats[0]->unpowered_footprint);
-        $result['co2_total'] = round($stats[0]->powered_footprint + $stats[0]->unpowered_footprint);
-
-        $devices = new Device;
-        $result['fixed_powered'] = $devices->fixedPoweredCount();
-        $result['fixed_unpowered'] = $devices->fixedUnpoweredCount();
-        $result['total_powered'] = $devices->poweredCount();
-        $result['total_unpowered'] = $devices->unpoweredCount();
-
-        // for backward compatibility (don't break therestartproject.org)
-        $result['weights'] = round($result['waste_total']);
-        $result['ewaste'] = round($result['waste_powered']);
-        $result['unpowered_waste'] = round($result['waste_unpowered']);
-        $result['emissions'] = round($result['co2_total']);
 
         return response()
             ->json($result, 200);

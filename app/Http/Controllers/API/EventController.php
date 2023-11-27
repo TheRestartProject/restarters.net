@@ -548,7 +548,7 @@ class EventController extends Controller
      *      operationId="editEvent",
      *      tags={"Events"},
      *      summary="Edit Event",
-     *      description="Edits an event.",
+     *      description="Edits an event.  The event of a group cannot be changed after creation.",
      *      @OA\Parameter(
      *          name="api_token",
      *          description="A valid user API token",
