@@ -33,7 +33,7 @@ export default {
     return {
       // Change this id to something unique each time you edit this - it's used to remember not to show dismissed
       // banners.
-      id: 'biggive2023',
+      id: 'aviva-crowdfunder-2023',
 
       // Change this to 'secondary' for yellow or 'danger' for pink.
       variant: 'secondary'
