@@ -79,6 +79,12 @@ export default {
     },
     setList(state, params) {
       params.events.forEach(e => {
+        Vue.set(state.list, e.idevents, e)
+      })
+    },
+    setListNew(state, params) {
+      // This is used by API v2 calls.
+      params.events.forEach(e => {
         Vue.set(state.list, e.id, e)
       })
     },
@@ -196,7 +202,7 @@ export default {
       try {
         let ret = await axios.get('/api/v2/groups/' + params.id + '/events?api_token=' + rootGetters['auth/apiToken'])
 
-        commit('setList', {
+        commit('setListNew', {
           events: ret.data.data
         })
 
