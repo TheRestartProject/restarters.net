@@ -12,6 +12,7 @@ use Illuminate\Contracts\Queue\InteractsWithQueue;
 
 class AddUserToDiscourseThreadForEvent implements ShouldQueue {
     private $discourseService;
+    public $tries = 1;
 
     public function __construct(DiscourseService $discourseService)
     {
