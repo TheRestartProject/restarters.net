@@ -18,6 +18,7 @@
           :value.sync="idgroups"
           :has-error="$v.idgroups.$error"
           ref="eventGroup"
+          :disabled="!creating"
       />
       <div class="form-group event-description">
         <b-form-group>
