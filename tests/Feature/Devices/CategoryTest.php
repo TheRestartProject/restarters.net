@@ -2,6 +2,7 @@
 
 namespace Tests\Feature;
 
+use App\Category;
 use App\Device;
 use App\Party;
 use App\User;
@@ -34,5 +35,28 @@ class CategoryTest extends TestCase
 
         $device = Device::findOrFail($iddevices);
         self::assertEquals($device->category_creation, 11);
+    }
+
+    public function testListItems() {
+        $cat1 = Category::factory()->create([
+            'idcategories' => 444,
+            'revision' => 1,
+            'name' => 'Flat screen 22-24"',
+            'powered' => 1,
+        ]);
+
+        $dev1 = Device::factory()->fixed()->create([
+            'category' => $cat1,
+            'item_type' => 'flatscreen LCD'
+        ]);
+
+        $response = $this->get('/api/v2/items');
+        $response->assertSuccessful();
+        $json = json_decode($response->getContent(), true);
+        self::assertEquals(1, count($json['data']));
+        self::assertEquals('flatscreen LCD', $json['data'][0]['type']);
+        self::assertEquals(true, $json['data'][0]['powered']);
+        self::assertEquals(444, $json['data'][0]['idcategories']);
+        self::assertEquals('Flat screen 22-24"', $json['data'][0]['categoryname']);
     }
 }

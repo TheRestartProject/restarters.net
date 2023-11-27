@@ -365,7 +365,6 @@ class PartyController extends Controller
             'clusters' => $clusters,
             'device_images' => $device_images,
             'calendar_links' => $this->generateAddToCalendarLinks($event),
-            'item_types' => Device::getItemTypes(),
         ]);
     }
 
@@ -714,12 +713,9 @@ class PartyController extends Controller
 
         if (! empty($user_event)) {
             // Update event invite
-            EventsUsers::where('status', $hash)->where('event', $event_id)->update([
+            EventsUsers::where('status', $hash)->where('event', $event_id)->first()->update([
                 'status' => 1,
             ]);
-
-            // Increment volunteers column to include latest invite
-            $event = Party::find($event_id);
 
             $this->notifyHostsOfRsvp($user_event, $event_id);
 

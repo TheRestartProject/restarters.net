@@ -171,7 +171,7 @@ abstract class TestCase extends BaseTestCase
         return Auth::user();
     }
 
-    public function createGroup($name = 'Test Group', $website = 'https://therestartproject.org', $location = 'London', $text = 'Some text.', $assert = true, $approve = true)
+    public function createGroup($name = 'Test Group', $website = 'https://therestartproject.org', $location = 'London', $text = 'Some text.', $assert = true, $approve = true, $email = null)
     {
         $idgroups = null;
 
@@ -189,7 +189,8 @@ abstract class TestCase extends BaseTestCase
              'timezone' => 'Europe/London',
              'network_data' => [
                  'dummy' => 'dummy',
-             ]
+             ],
+            'email' => $email,
         ]);
 
         if ($assert) {

@@ -102,7 +102,7 @@ export default {
     grid-gap: 1.5em;
 
     @include media-breakpoint-up(md) {
-        grid-template-columns: 2fr 1fr;
+        grid-template-columns: 1fr 1fr;
         grid-template-rows: auto auto auto;
 
         #cta {
@@ -111,11 +111,11 @@ export default {
         }
 
         #volunteering {
-            grid-area: 2 / 1 / 3 / 2;
+            grid-area: 1 / 2 / 3 / 3;
         }
 
         #news {
-            grid-area: 1 / 2 / 3 / 3;
+            grid-area: 2 / 1 / 3 / 3;
             align-self: start;
         }
 

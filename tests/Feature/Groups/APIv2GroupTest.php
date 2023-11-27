@@ -15,6 +15,7 @@ use Symfony\Component\DomCrawler\Crawler;
 use Illuminate\Validation\ValidationException;
 use Tests\TestCase;
 use Auth;
+use function PHPUnit\Framework\assertEquals;
 
 class APIv2GroupTest extends TestCase
 {
@@ -35,7 +36,8 @@ class APIv2GroupTest extends TestCase
             'London',
             'Some text.',
             true,
-            $approve
+            $approve,
+            'info@test.com'
         );
 
         // Test invalid group id.
@@ -52,6 +54,7 @@ class APIv2GroupTest extends TestCase
         $response->assertSuccessful();
         $json = json_decode($response->getContent(), true);
         $this->assertEquals($idgroups, $json['data']['id']);
+        $this->assertEquals('info@test.com', $json['data']['email']);
         $this->assertTrue(array_key_exists('description', $json['data']));
         $this->assertTrue(array_key_exists('stats', $json['data']));
         $this->assertTrue(array_key_exists('updated_at', $json['data']));
@@ -153,7 +156,8 @@ class APIv2GroupTest extends TestCase
                 'name' => 'Test Group',
                 'location' => 'London',
                 'description' => 'Some text.',
-                'timezone' => 'Europe/Brussels'
+                'timezone' => 'Europe/Brussels',
+                'email' => 'info@test.com'
             ]
         );
 
@@ -169,6 +173,7 @@ class APIv2GroupTest extends TestCase
         $this->assertEquals('Some text.', $group->free_text);
         $this->assertStringContainsString('.jpg', $group->groupImage->image->path);
         $this->assertEquals('Europe/Brussels', $group->timezone);
+        $this->assertEquals('info@test.com', $group->email);
 
         // Group should now appear in the list of groups.
         $response = $this->get('/api/v2/groups/names');
@@ -361,5 +366,40 @@ class APIv2GroupTest extends TestCase
         $this->assertEquals('Belgique', $location['country']);
 
         // Create a group in
+    }
+
+    public function testEmptyNetworkData() {
+        $user = User::factory()->administrator()->create([
+            'api_token' => '1234',
+        ]);
+        $this->actingAs($user);
+
+        $idgroups = null;
+
+        // Get the dashboard.  This will ensure that we have set the repair_network on the user.
+        $this->get('/');
+
+        // We create groups using the API.
+        $user = Auth::user();
+
+        $this->lastResponse = $this->post('/api/v2/groups?api_token=' . $user->api_token, [
+            'name' => 'Test Group Empty',
+            'website' => 'https://therestartproject.org',
+            'location' => 'Brussels, Belgium',
+            'description' => 'Some text.',
+            'timezone' => 'Europe/London',
+            'network_data' => [],
+            'email' => null,
+        ]);
+
+        $this->assertTrue($this->lastResponse->isSuccessful());
+        $json = json_decode($this->lastResponse->getContent(), true);
+        $this->assertTrue(array_key_exists('id', $json));
+        $idgroups = $json['id'];
+
+        $response = $this->get("/api/v2/groups/$idgroups");
+        $response->assertSuccessful();
+        $json = json_decode($response->getContent(), true);
+        assertEquals(null, $json['data']['network_data']);
     }
 }

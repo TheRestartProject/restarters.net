@@ -132,6 +132,9 @@ class CalendarEventsController extends Controller
         // loop over events
         $me = auth()->user();
 
+        // We cache the group approval status to reduce DB queries.
+        $groupApproved = [];
+
         foreach ($events as $event) {
             // We need to filter by approval status.  If the event is not approved, we can only see it if we are
             // an admin, network coordinator, or the host of the event.
@@ -141,6 +144,12 @@ class CalendarEventsController extends Controller
             }
 
             if (! is_null($event->event_start_utc) ) {
+                if (!array_key_exists($event->group, $groupApproved)) {
+                    $group = Group::find($event->group);
+
+                    $groupApproved[$event->group] = $group ? $group->approved : false;
+                }
+
                 $ical[] = 'BEGIN:VEVENT';
 
                 $ical[] = 'TZID:' . $event->timezone;
@@ -155,7 +164,7 @@ class CalendarEventsController extends Controller
 
                 if ($event->cancelled) {
                     $ical[] = 'STATUS:CANCELLED';
-                } else if ($event->approved && $event->theGroup->approved) {
+                } else if ($event->approved && $groupApproved[$event->group]) {
                     // Events are only confirmed once the event and the group are approved.
                     $ical[] = 'STATUS:CONFIRMED';
                 } else {

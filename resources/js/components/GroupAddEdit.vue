@@ -25,6 +25,11 @@
           :website.sync="website"
           :has-error="$v.website.$error"
           ref="website"/>
+      <GroupEmail
+          class="flex-grow-1 group-email"
+          :email.sync="email"
+          :has-error="$v.email.$error"
+          ref="email"/>
       <div class="form-group group-description">
         <b-form-group>
           <label for="group_desc">{{ __('groups.groups_about_group') }}:</label>
@@ -170,10 +175,11 @@
 import group from '../mixins/group'
 import auth from '../mixins/auth'
 import RichTextEditor from './RichTextEditor'
-import { required, url, helpers } from 'vuelidate/lib/validators'
+import { required, url, email, helpers } from 'vuelidate/lib/validators'
 import validationHelpers from '../mixins/validationHelpers'
 import GroupName from './GroupName'
 import GroupWebsite from './GroupWebsite'
+import GroupEmail from './GroupEmail'
 import GroupLocation from './GroupLocation'
 import GroupLocationMap from './GroupLocationMap'
 import GroupTimeZone from './GroupTimeZone'
@@ -192,6 +198,7 @@ export default {
     RichTextEditor,
     GroupName,
     GroupWebsite,
+    GroupEmail,
     GroupLocation,
     GroupLocationMap,
     GroupPhone,
@@ -221,6 +228,7 @@ export default {
       location: null,
       phone: null,
       website: null,
+      email: null,
       timezone: null,
       timezoneValid: true,
       description: null,
@@ -255,6 +263,9 @@ export default {
     },
     website: {
       url
+    },
+    email: {
+      email
     }
   },
   computed: {
@@ -328,6 +339,7 @@ export default {
       this.area = group.location.area
       this.phone = group.phone
       this.website = group.website
+      this.email = group.email
       this.timezone = group.timezone
       this.description = group.description
       this.lat = parseFloat(group.location.lat)
@@ -368,6 +380,7 @@ export default {
             const id = await this.$store.dispatch('groups/create', {
               name: this.name,
               website: this.website,
+              email: this.email,
               description: this.description,
               location: this.location,
               postcode: this.postcode,
@@ -393,6 +406,7 @@ export default {
                 id: this.idgroups,
                 name: this.name,
                 website: this.website,
+                email: this.email,
                 description: this.description,
                 location: this.location,
                 postcode: this.postcode,
@@ -437,12 +451,12 @@ export default {
 
 .layout {
   display: grid;
-  grid-column-gap: 40px;
 
   grid-template-columns: 1fr;
 
   @include media-breakpoint-up(lg) {
-    grid-template-columns: 2fr 1.5fr 1fr;
+    grid-template-columns: 1fr 1fr;
+    grid-column-gap: 20px;
   }
 
   .group-name {
@@ -453,20 +467,30 @@ export default {
   .group-website {
     grid-row: 2 / 3;
     grid-column: 1 / 2;
-    margin-right: 2px;
+  }
+
+  .group-email {
+    grid-row: 3 / 4;
+    grid-column: 1 / 2;
+  }
+
+  .group-phone {
+    grid-row: 4 / 5;
+    grid-column: 1 / 2;
   }
 
   .group-description {
-    grid-row: 3 / 4;
+    grid-row: 5 / 6;
     grid-column: 1 / 2;
+  }
 
-    @include media-breakpoint-up(lg) {
-      grid-row: 3 / 7;
-    }
+  .group-image {
+    grid-row: 6 / 7;
+    grid-column: 1 / 2;
   }
 
   .group-location {
-    grid-row: 4 / 5;
+    grid-row: 7 / 8;
     grid-column: 1 / 2;
 
     ::v-deep(.btn) {
@@ -474,70 +498,33 @@ export default {
     }
 
     @include media-breakpoint-up(lg) {
-      grid-row: 1 / 2;
+      grid-row: 1 / 4;
       grid-column: 2 / 3;
     }
   }
 
   .group-locationmap {
-    grid-row: 5 / 6;
+    grid-row: 8 / 9;
     grid-column: 1 / 2;
 
     @include media-breakpoint-up(lg) {
-      grid-row: 1 / 4;
-      grid-column: 3 / 4;
+      grid-row: 3 / 5;
+      grid-column: 2 / 3;
     }
   }
 
   .group-timezone {
-    grid-row: 6 / 7;
+    grid-row: 9 / 10;
     grid-column: 1 / 2;
-    margin-right: 2px;
 
     @include media-breakpoint-up(lg) {
-      grid-row: 2 / 3;
-      grid-column: 2 / 3;
-    }
-  }
-
-  .group-phone {
-    grid-row: 7 / 8;
-    grid-column: 1 / 2;
-    margin-right: 2px;
-
-    @include media-breakpoint-up(lg) {
-      grid-row: 3 / 4;
-      grid-column: 2 / 3;
-    }
-  }
-
-  .group-image {
-    grid-row: 8 / 9;
-    grid-column: 1 / 2;
-    margin-right: 2px;
-
-    @include media-breakpoint-up(lg) {
-      grid-row: 4 / 5;
+      grid-row: 5 / 6;
       grid-column: 2 / 3;
     }
   }
 
   .group-admin {
-    grid-row: 9 / 10;
-    grid-column: 1 / 2;
-
-    ::v-deep(.btn) {
-      font-size: 16px;
-    }
-
-    @include media-breakpoint-up(lg) {
-      grid-row: 5 / 6;
-      grid-column: 2 / 4;
-    }
-  }
-
-  .group-buttons {
-    grid-row: 9 / 10;
+    grid-row: 10 / 11;
     grid-column: 1 / 2;
 
     ::v-deep(.btn) {
@@ -546,7 +533,21 @@ export default {
 
     @include media-breakpoint-up(lg) {
       grid-row: 7 / 8;
-      grid-column: 1 / 4;
+      grid-column: 1 / 3;
+    }
+  }
+
+  .group-buttons {
+    grid-row: 11 / 12;
+    grid-column: 1 / 2;
+
+    ::v-deep(.btn) {
+      font-size: 16px;
+    }
+
+    @include media-breakpoint-up(lg) {
+      grid-row: 8 / 9;
+      grid-column: 1 / 3;
     }
   }
 }

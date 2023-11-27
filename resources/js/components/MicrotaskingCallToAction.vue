@@ -10,13 +10,12 @@
 
         <template slot="content">
             <div class="content pt-3">
-                <div v-html="translatedDescription">
-                </div>
-                <div style="align-self:center; justify-self:right">
-                <a :href="activeQuest" style="align-self: center" class="btn btn-primary pull-right">{{ translatedGetInvolved }}</a>
-                </div>
+              <div class="flex-grow-1">
+                <div v-html="translatedDescription" />
+                <div v-html="translatedShortDescription" />
+                <a href="https://openrepair.org/open-data/downloads/" style="align-self: center" class="btn btn-primary mt-2">{{ translatedGetInvolved }}</a>
+              </div>
             </div>
-
         </template>
     </CollapsibleSection>
 </template>
@@ -38,6 +37,9 @@ export default {
     },
     translatedDescription() {
       return this.$lang.get('microtasking.cta.' + this.activeQuest + '.description')
+    },
+    translatedShortDescription() {
+      return this.$lang.get('microtasking.cta.' + this.activeQuest + '.short_description')
     },
     translatedGetInvolved() {
       return this.$lang.get('microtasking.cta.' + this.activeQuest + '.get_involved')
@@ -69,7 +71,7 @@ export default {
     grid-template-rows: auto auto;
 
     @include media-breakpoint-up(md) {
-        grid-template-columns: 2fr 1fr;
+        grid-template-columns: 2fr auto;
         grid-template-rows: 1fr;
     }
 }

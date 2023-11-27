@@ -158,6 +158,20 @@ class Device extends Model implements Auditable
         return DB::select(DB::raw($sql), ['cluster' => $cluster]);
     }
 
+    public function countByClustersYearStatus($group)
+    {
+        $sql = "SELECT cluster, YEAR(`event_start_utc`) AS year, `repair_status`, COUNT(*) AS `counter` FROM `devices` AS `d`
+            INNER JOIN `events` AS `e`
+            ON `d`.`event` = `e`.`idevents`
+            INNER JOIN `categories` AS `c`
+            ON `d`.`category` = `c`.`idcategories`
+            WHERE `e`.`group` = :group AND `event_start_utc` >= '2013-01-01'
+            GROUP BY `cluster`, YEAR(`event_start_utc`) , `repair_status`
+            ORDER BY `year` ASC, `repair_status` ASC;";
+
+        return DB::select(DB::raw($sql), ['group' => $group]);
+    }
+
     public function findMostSeen($status = null, $cluster = null, $group = null)
     {
         $sql = 'SELECT COUNT(`d`.`category`) AS `counter`, `c`.`name` FROM `'.$this->table.'` AS `d`
@@ -415,16 +429,16 @@ class Device extends Model implements Auditable
         // This is a beast of a query, but the basic idea is to return a list of the categories most commonly
         // used by the item types.
         //
-        // ANY_VALUE is used to suppress errors when SQL mode is not set to ONLY_FULL_GROUP_BY.
+        // MAX is used to suppress errors when SQL mode is not set to ONLY_FULL_GROUP_BY.
         $types = DB::select(DB::raw("
-            SELECT item_type,
-                   ANY_VALUE(powered)      AS powered,
-                   ANY_VALUE(idcategories) AS idcategories,
-                   ANY_VALUE(categoryname)
+            SELECT TRIM(item_type) AS item_type,
+                   MAX(powered)      AS powered,
+                   MAX(idcategories) AS idcategories,
+                   MAX(categoryname) AS categoryname
             FROM   (SELECT DISTINCT s.*
-                    FROM   (SELECT item_type,
-                                   ANY_VALUE(powered)      AS powered,
-                                   ANY_VALUE(idcategories) AS idcategories,
+                    FROM   (SELECT TRIM(item_type) AS item_type,
+                                   MAX(powered)      AS powered,
+                                   MAX(idcategories) AS idcategories,
                                    categories.name         AS categoryname,
                                    COUNT(*)                AS count
                             FROM   devices
@@ -432,12 +446,12 @@ class Device extends Model implements Auditable
                                            ON devices.category = categories.idcategories
                             WHERE  item_type IS NOT NULL
                             GROUP  BY categoryname,
-                                      item_type) s
-                           JOIN (SELECT item_type,
+                                      UPPER(item_type)) s
+                           JOIN (SELECT TRIM(item_type) AS item_type,
                                         MAX(count) AS maxcount
-                                 FROM   (SELECT item_type               AS item_type,
-                                                ANY_VALUE(powered)      AS powered,
-                                                ANY_VALUE(idcategories) AS idcategories,
+                                 FROM   (SELECT TRIM(item_type)   AS item_type,
+                                                MAX(powered)      AS powered,
+                                                MAX(idcategories) AS idcategories,
                                                 categories.name         AS categoryname,
                                                 COUNT(*)                AS count
                                          FROM   devices
@@ -446,11 +460,12 @@ class Device extends Model implements Auditable
                                                            categories.idcategories
                                          WHERE  item_type IS NOT NULL
                                          GROUP  BY categoryname,
-                                                   item_type) s
-                                 GROUP  BY s.item_type) AS m
-                             ON s.item_type = m.item_type
+                                                   UPPER(item_type)) s
+                                 GROUP  BY UPPER(s.item_type)) AS m
+                             ON UPPER(s.item_type) = UPPER(m.item_type)
                                 AND s.count = m.maxcount) t
-            GROUP BY t.item_type
+            GROUP BY UPPER(t.item_type)
+            HAVING LENGTH(item_type) > 0
 "));
 
         return $types;

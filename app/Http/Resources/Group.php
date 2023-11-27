@@ -54,6 +54,13 @@ use Illuminate\Http\Resources\Json\JsonResource;
  *          example="https://therestartproject.org"
  *     ),
  *     @OA\Property(
+ *          property="email",
+ *          title="email",
+ *          description="Any email contact address for the group.",
+ *          format="string",
+ *          example="info@therestartproject.org"
+ *     ),
+ *     @OA\Property(
  *          property="description",
  *          title="description",
  *          description="HTML description of the group.",
@@ -265,6 +272,13 @@ class Group extends JsonResource
         $stats['events'] = $stats['parties'];
         unset($stats['parties']);
 
+        $networkData = gettype($this->network_data) == 'string' ? json_decode($this->network_data, true) : $this->network_data;
+
+        if (getType($networkData) === 'array' && !count(array_keys($networkData))) {
+            // We don't want to return [] as the client expects an object, not an array.
+            $networkData = null;
+        }
+
         $ret = [
             'id' => $this->idgroups,
             'name' => $this->name,
@@ -279,8 +293,9 @@ class Group extends JsonResource
             'tags' => new TagCollection($this->group_tags),
             'timezone' => $this->timezone,
             'approved' => $this->approved ? true : false,
-            'network_data' => gettype($this->network_data) == 'string' ? json_decode($this->network_data, true) : $this->network_data,
-            'full' => true
+            'network_data' => $networkData,
+            'full' => true,
+            'email' => $this->email,
         ];
 
         $ret['hosts'] = $this->resource->all_confirmed_hosts_count;
