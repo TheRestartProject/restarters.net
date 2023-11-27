@@ -11,6 +11,7 @@
                       :icon-variant="add ? 'black' : 'brand'" :item-types="itemTypes" :disabled="disabled"
                       :suppress-type-warning="suppressTypeWarning" :powered="powered"
                       :unknown.sync="unknownItemType"
+                      :auto-focus="add"
           />
           <DeviceCategorySelect :class="{
             'mb-2': true,
