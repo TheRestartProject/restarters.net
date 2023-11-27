@@ -71,7 +71,6 @@
               :clusters="clusters"
               :brands="brands"
               :barrier-list="barrierList"
-              :itemTypes="itemTypes"
               :category="category_powered"
               :brand="brand"
               :model="model"
@@ -98,7 +97,6 @@
               :clusters="clusters"
               :brands="brands"
               :barrier-list="barrierList"
-              :itemTypes="itemTypes"
               :category="category_unpowered"
               :model="model"
               :item_type="item_type"
@@ -125,7 +123,6 @@
               :clusters="clusters"
               :brands="brands"
               :barrier-list="barrierList"
-              :itemTypes="itemTypes"
               :category="category_powered"
               :brand="brand"
               :model="model"
@@ -151,7 +148,6 @@
               :clusters="clusters"
               :brands="brands"
               :barrier-list="barrierList"
-              :itemTypes="itemTypes"
               :category="category_unpowered"
               :model="model"
               :item_type="item_type"
@@ -199,11 +195,6 @@ export default {
       default: null
     },
     barrierList: {
-      type: Array,
-      required: false,
-      default: null
-    },
-    itemTypes: {
       type: Array,
       required: false,
       default: null
