@@ -92,11 +92,12 @@ export default {
     }
   },
   mounted() {
+    this.currentType = this.type
+
     if (this.autoFocus) {
       // Focus on the input.  This is a bit hacky as the typeahead component doesn't expose the input element.  So we
       // add our own class and then find it.
       try {
-        this.currentType = this.type
         document.getElementsByClassName('theinput-' + this.uid)[0].focus()
       } catch (e){
         console.error('Input focus failed', e)
