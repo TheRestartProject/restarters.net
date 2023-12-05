@@ -25,7 +25,6 @@ use App\Http\Controllers\OutboundController;
 use App\Http\Controllers\PartyController;
 use App\Http\Controllers\PrintcatOraController;
 use App\Http\Controllers\RoleController;
-use App\Http\Controllers\SearchController;
 use App\Http\Controllers\SkillsController;
 use App\Http\Controllers\StyleController;
 use App\Http\Controllers\TabicatOraController;
@@ -93,6 +92,8 @@ Route::middleware('ensureAPIToken')->group(function () {
         Route::get('/devices/event/{id}', [ExportController::class, 'devicesEvent']);
         Route::get('/devices/group/{id}', [ExportController::class, 'devicesGroup']);
         Route::get('/devices', [ExportController::class, 'devices']);
+        Route::get('/groups/{id}/events', [ExportController::class, 'groupEvents']);
+        Route::get('/networks/{id}/events', [ExportController::class, 'networkEvents']);
     });
 
     // Calendar routes do not require authentication.
@@ -378,15 +379,6 @@ Route::middleware('auth', 'verifyUserConsent', 'ensureAPIToken')->group(function
         Route::post('/edit/{id}', [GroupTagsController::class, 'postEditTag']);
         Route::get('/delete/{id}', [GroupTagsController::class, 'getDeleteTag']);
     });
-
-    //Search Controller
-    Route::get('/search', [SearchController::class, 'index']);
-
-    //Export Controller
-    Route::get('/export/parties', [ExportController::class, 'parties']);
-    Route::get('/export/time-volunteered', [ExportController::class, 'exportTimeVolunteered']);
-    Route::get('/reporting/time-volunteered', [ExportController::class, 'getTimeVolunteered']);
-    Route::get('/reporting/time-volunteered/{search}', [ExportController::class, 'getTimeVolunteered']);
 });
 
 Route::middleware('ensureAPIToken')->group(function () {

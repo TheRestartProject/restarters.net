@@ -68,13 +68,10 @@ class ExportTest extends TestCase
                                                     'name' => 'test3'
                                                 ]);
         $this->networkService->addGroupToNetwork($admin, $group3, $network);
-        if ($role == 'Host') {
-            $group3->addVolunteer($user);
-            $group3->makeMemberAHost($user);
-        }
-
         $group3->approved = false;
         $group3->save();
+
+        $this->artisan("queue:work --stop-when-empty");
 
         $this->actingAs($user);
 
@@ -103,8 +100,8 @@ class ExportTest extends TestCase
                                                                       'event' => $idevents1,
                                                                   ]);
         $device = Device::factory()->fixed()->create([
-                                                                      'category' => 111,
-                                                                      'category_creation' => 111,
+                                                                      'category' => 222,
+                                                                      'category_creation' => 222,
                                                                       'event' => $idevents2,
                                                                   ]);
         $device = Device::factory()->fixed()->create([
@@ -112,35 +109,40 @@ class ExportTest extends TestCase
                                                                       'category_creation' => 111,
                                                                       'event' => $idevents3,
                                                                   ]);
-        // Export parties.
-        $response = $this->get("/export/parties?fltr=dummy&parties[0]=$idevents1&parties[1]=$idevents2&parties[2]=$idevents3&from-date=&to-date=");
 
-        // Bit hacky, but grab the file that was created.  Can't find a way to do this in Laravel easily, though it's
-        // probably possible using mocking.
-        //
-        // TODO These files sometimes appear in public/ and sometimes don't.  Is this just an artefact of testing?
-        $filename = 'parties.csv';
+        // Export parties.
+        $response = $this->get("/export/groups/{$group1->idgroups}/events");
+        $response->assertSuccessful();
+        $filename = 'events.csv';
         $fh = fopen($filename, 'r');
         fgetcsv($fh);
         $row2 = fgetcsv($fh);
-        self::assertEquals('true', e($row2[3]));
-        self::assertEquals($group1->name, $row2[2]);
-        $row3 = fgetcsv($fh);
-        self::assertEquals('true', e($row3[3]));
-        self::assertEquals($group2->name, $row3[2]);
+        self::assertEquals($event1->getEventName(), $row2[1]);
+        self::assertEquals($group1->name, $row2[10]);
 
-        // Should return the third event as it's for an unapproved group but we're a host.
-        $row4 = fgetcsv($fh);
-        self::assertEquals('true', e($row4[3]));
-        self::assertEquals($group3->name, $row4[2]);
+        $response = $this->get("/export/groups/{$group2->idgroups}/events");
+        $response->assertSuccessful();
+        $filename = 'events.csv';
+        $fh = fopen($filename, 'r');
+        fgetcsv($fh);
+        $row2 = fgetcsv($fh);
+        self::assertEquals($event2->getEventName(), $row2[1]);
+        self::assertEquals($group2->name, $row2[10]);
 
-        if ($role == 'Host') {
-            // Now remove us as a host of the third group so that it's no longer included in exports.
-            $userGroupAssociation = UserGroups::where('user', $user->id)
-                ->where('group', $group3->idgroups)->first();
-            $userGroupAssociation->role = Role::RESTARTER;
-            $userGroupAssociation->save();
-        }
+        $response = $this->get("/export/networks/{$network->id}/events");
+        $response->assertSuccessful();
+        $filename = 'events.csv';
+        $fh = fopen($filename, 'r');
+        fgetcsv($fh);
+        $row2 = fgetcsv($fh);
+        self::assertEquals($event1->getEventName(), $row2[1]);
+        self::assertEquals($group1->name, $row2[10]);
+        $row2 = fgetcsv($fh);
+        self::assertEquals($event2->getEventName(), $row2[1]);
+        self::assertEquals($group2->name, $row2[10]);
+        $row2 = fgetcsv($fh);
+        self::assertEquals($event3->getEventName(), $row2[1]);
+        self::assertEquals($group3->name, $row2[10]);
 
         // Export devices.
         $response = $this->get("/export/devices");
@@ -151,8 +153,10 @@ class ExportTest extends TestCase
         fgetcsv($fh);
         $row2 = fgetcsv($fh);
         self::assertEquals(e($event1->getEventName()), e($row2[7]));
+        self::assertEquals('Unpowered', e($row2[12]));
         $row3 = fgetcsv($fh);
         self::assertEquals(e($event2->getEventName()), e($row3[7]));
+        self::assertEquals('Powered', e($row3[12]));
         $row4 = fgetcsv($fh);
 
         if ($role == 'Host') {
@@ -221,29 +225,6 @@ class ExportTest extends TestCase
         } else {
             self::assertEquals(e($event3->getEventName()), e($row2[7]));
         }
-
-        // Export devices as though we are therestartproject.org, which for some reason doesn't contain the model
-        // column.
-        $response = $this->get("/export/devices/event/$idevents1", ['HTTP_REFERER' => 'http://therestartproject.org']);
-        $header = $response->headers->get('content-disposition');
-        $filename = public_path() . '/' . substr($header, strpos($header, 'filename=') + 9);
-        $fh = fopen($filename, 'r');
-        fgetcsv($fh);
-        $row2 = fgetcsv($fh);
-        self::assertEquals(11, count($row2));
-
-        // Export time volunteered - first as a web page.
-        $response = $this->get("/reporting/time-volunteered?a");
-        $response->assertSee($event1->getEventName());
-        $response->assertSee($event2->getEventName());
-
-        // Now as a CSV.
-        $response = $this->get("/export/time-volunteered?a");
-        $filename = 'time_reporting.csv';
-        $fh = fopen($filename, 'r');
-        $row1 = fgetcsv($fh);
-        $row2 = fgetcsv($fh);
-        $this->assertEquals('Hours Volunteered', $row2[0]);
     }
 
     public function roleProvider() {

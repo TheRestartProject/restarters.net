@@ -11,8 +11,6 @@ return [
   'alert_uptodate_text' => 'You have nothing to action now. When you do, we\'ll let you know.',
   'general' => 'General',
   'reporting' => 'Reporting',
-  'time_reporting' => 'Volunteer hours',
-  'party_reporting' => 'Event reporting',
   'signmeup' => 'Sign me up!',
   'introduction_message' => 'We are a global community of people who help others fix their electronics in community events. Join us!',
   'your_name' => 'Your name',

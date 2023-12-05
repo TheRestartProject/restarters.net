@@ -157,7 +157,7 @@ class UserController extends Controller
         User::find($id)->update([
         'email'    => $request->input('email'),
         'name'     => $request->input('name'),
-        'country'  => $request->input('country'),
+        'country_code' => $request->input('country'),
         'location' => $request->input('townCity'),
         'age'      => $request->input('age'),
         'gender'   => $request->input('gender'),
@@ -171,7 +171,7 @@ class UserController extends Controller
         }
 
         if (! empty($user->location)) {
-            $geocoded = $geocoder->geocode("{$user->location}, {$user->country}");
+            $geocoded = $geocoder->geocode("{$user->location}, " . Fixometer::getCountryFromCountryCode($user->country_code));
             if (! empty($geocoded)) {
                 $user->latitude = $geocoded['latitude'];
                 $user->longitude = $geocoded['longitude'];
@@ -373,10 +373,18 @@ class UserController extends Controller
 
         $user = User::find($user_id);
 
+        $oldRole = $user->role;
+
         // Set role for User
         $user->update([
-        'role' => $request->input('user_role'),
+            'role' => $request->input('user_role'),
         ]);
+
+        // If we are demoting from NetworkCoordinator, remove them from the list of coordinators for
+        // any networks they are currently coordinating.
+        if ($oldRole == Role::NETWORK_COORDINATOR && ($user->role == Role::HOST || $user->role == Role::RESTARTER)) {
+            $user->networks()->detach();
+        }
 
         // The user may have previously been removed from the group, which will mean they have an entry in
         // users_groups with deleted_at set.  Zap that if present so that sync() then works.  sync() doesn't
@@ -528,7 +536,7 @@ class UserController extends Controller
                 $user['permissions'] = $User->getRolePermissions($user->role);
                 $user['groups'] = $user->groups;
                 $user['lastLogin'] = $user->lastLogin();
-                $user['country'] = Fixometer::getCountryFromCountryCode($user->country);
+                $user['country'] = Fixometer::getCountryFromCountryCode($user->country_code);
 
                 return $user;
             });
@@ -599,7 +607,7 @@ class UserController extends Controller
                 $user['permissions'] = $User->getRolePermissions($user->role);
                 $user['groups'] = $user->groups;
                 $user['lastLogin'] = $user->lastLogin();
-                $user['country'] = Fixometer::getCountryFromCountryCode($user->country);
+                $user['country'] = Fixometer::getCountryFromCountryCode($user->country_code);
 
                 return $user;
             });
@@ -912,7 +920,7 @@ class UserController extends Controller
 
         if (Auth::check()) { //Existing users are to update
             $user = User::find(Auth::user()->id);
-            $user->country = $request->input('country');
+            $user->country_code = $request->input('country');
             $user->location = $request->input('city');
             $user->gender = $request->input('gender');
             $user->age = $request->input('age');
@@ -927,7 +935,7 @@ class UserController extends Controller
                 'role' => $role,
                 'recovery' => substr(bin2hex(openssl_random_pseudo_bytes(32)), 0, 24),
                 'recovery_expires' => strftime('%Y-%m-%d %X', time() + (24 * 60 * 60)),
-                'country' => $request->input('country'),
+                'country_code' => $request->input('country'),
                 'location' => $request->input('city'),
                 'gender' => $request->input('gender'),
                 'age' => $request->input('age'),
@@ -1116,9 +1124,6 @@ class UserController extends Controller
 
         if ($user->hasRole('Administrator') || $user->hasRole('Host')) {
             $items = [];
-            if ($user->hasRole('Administrator')) {
-                $items[Lang::get('general.time_reporting')] = url('/reporting/time-volunteered?a');
-            }
             $items[Lang::get('general.party_reporting')] = url('/search');
 
             $reportingMenu = [

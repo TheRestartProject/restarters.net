@@ -45,7 +45,7 @@ class EditWordpressPostForGroup extends BaseEvent
             if (is_numeric($group->wordpress_post_id)) {
                 $custom_fields = [
                     ['key' => 'group_city', 'value' => $group->area],
-                    ['key' => 'group_country', 'value' => $group->country],
+                    ['key' => 'group_country', 'value' => Fixometer::getCountryFromCountryCode($group->country_code)],
                     ['key' => 'group_website', 'value' => $data['website']],
                     ['key' => 'group_hash', 'value' => $id],
                     ['key' => 'group_avatar_url', 'value' => $data['group_avatar']],

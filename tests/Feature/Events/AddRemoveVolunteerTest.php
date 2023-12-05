@@ -4,17 +4,22 @@ namespace Tests\Feature;
 
 use App\EventsUsers;
 use App\Group;
+use App\Helpers\Fixometer;
 use App\Helpers\Geocoder;
+use App\Listeners\RemoveUserFromDiscourseThreadForEvent;
 use App\Network;
 use App\Notifications\AdminModerationEvent;
 use App\Notifications\NotifyRestartersOfNewEvent;
 use App\Party;
+use App\Role;
 use App\User;
 use DB;
 use Faker\Generator as Faker;
 use Illuminate\Support\Facades\Notification;
 use Symfony\Component\DomCrawler\Crawler;
 use Tests\TestCase;
+use Illuminate\Support\Facades\Queue;
+use function PHPUnit\Framework\assertEquals;
 
 class AddRemoveVolunteerTest extends TestCase
 {
@@ -22,9 +27,10 @@ class AddRemoveVolunteerTest extends TestCase
      * @dataProvider roleProvider
      */
 
-    public function testAddRemove($role)
+    public function testAddRemove($role, $addrole, $shouldBeHost)
     {
         $this->withoutExceptionHandling();
+        Queue::fake();
 
         $group = Group::factory()->create();
         $network = Network::factory()->create();
@@ -52,7 +58,28 @@ class AddRemoveVolunteerTest extends TestCase
 
         $this->actingAs($host);
 
-        $restarter = User::factory()->restarter()->create();
+        switch ($addrole) {
+            case 'Administrator':
+                $restarter = User::factory()->administrator()->create();
+                break;
+            case 'NetworkCoordinator':
+                $restarter = User::factory()->networkCoordinator()->create();
+                break;
+            case 'HostThis':
+                $restarter = User::factory()->host()->create();
+                $group->addVolunteer($restarter);
+                $group->makeMemberAHost($restarter);
+                break;
+            case 'HostOther':
+                $restarter = User::factory()->host()->create();
+                $group2 = Group::factory()->create();
+                $group2->addVolunteer($restarter);
+                $group2->makeMemberAHost($restarter);
+                break;
+            case 'Restarter':
+                $restarter = User::factory()->restarter()->create();
+        }
+
 
         // Add an existing user
         $response = $this->put('/api/events/' . $event->idevents . '/volunteers', [
@@ -78,6 +105,15 @@ class AddRemoveVolunteerTest extends TestCase
             ]
         ]);
 
+        // Check they are/are not a host.
+        $hostFor = Party::hostFor([$restarter->id])->get();
+
+        if ($shouldBeHost) {
+            $this->assertTrue($hostFor->contains($event));
+        } else {
+            $this->assertFalse($hostFor->contains($event));
+        }
+
         // Remove them
         $volunteer = EventsUsers::where('user', $restarter->id)->first();
         $this->post('/party/remove-volunteer/', [
@@ -96,6 +132,12 @@ class AddRemoveVolunteerTest extends TestCase
                                   ]
                               ]);
 
+        Queue::assertPushed(\Illuminate\Events\CallQueuedListener::class, function ($job) use ($event, $restarter) {
+            if ($job->class == RemoveUserFromDiscourseThreadForEvent::class) {
+                return true;
+            }
+        });
+
         // Add an invited user
         $restarter = User::factory()->restarter()->create();
         $response = $this->post('/party/invite', [
@@ -108,6 +150,10 @@ class AddRemoveVolunteerTest extends TestCase
         $response->assertSessionHas('success');
         $response = $this->get('/party/view/'.$event->idevents);
         $response->assertSee('Invites sent!');
+
+        // Invited volunteers shouldn't affect the count.
+        $event->refresh();
+        assertEquals(0, $event->volunteers);
 
         $response = $this->put('/api/events/' . $event->idevents . '/volunteers', [
             'volunteer_email_address' => $restarter->email,
@@ -124,6 +170,10 @@ class AddRemoveVolunteerTest extends TestCase
             'id' => $volunteer->idevents_users,
         ])->assertSee('true');
 
+        // Invited volunteers shouldn't affect the count.
+        $event->refresh();
+        assertEquals(0, $event->volunteers);
+
         // Add by name only
         $response = $this->put('/api/events/' . $event->idevents . '/volunteers', [
             'full_name' => 'Jo Bloggins',
@@ -137,6 +187,10 @@ class AddRemoveVolunteerTest extends TestCase
         $this->post('/party/remove-volunteer/', [
             'id' => $volunteer->idevents_users,
         ])->assertSee('true');
+
+        // Invited volunteers shouldn't affect the count.
+        $event->refresh();
+        assertEquals(0, $event->volunteers);
 
         // Add anonymous.
         $response = $this->put('/api/events/' . $event->idevents . '/volunteers', []);
@@ -153,8 +207,10 @@ class AddRemoveVolunteerTest extends TestCase
 
     public function roleProvider() {
         return [
-            [ 'Administrator' ],
-            [ 'NetworkCoordinator' ],
+            [ 'Administrator', 'Restarter', false ],
+            [ 'NetworkCoordinator', 'HostThis', true ],
+            [ 'NetworkCoordinator', 'HostOther', false ],
+            [ 'NetworkCoordinator', 'Administrator', false ],
         ];
     }
 
@@ -198,7 +254,7 @@ class AddRemoveVolunteerTest extends TestCase
         $response = $this->post('/profile/edit-admin-settings', [
             '_token' => $tokenValue,
             'id' => $host->id,
-            'user_role' => 2,
+            'user_role' => Role::ADMINISTRATOR,
             'assigned_groups' => [
                 $idgroups
             ],

@@ -22,8 +22,10 @@ use App\Notifications\NewGroupWithinRadius;
 use App\Notifications\GroupConfirmed;
 use App\Party;
 use App\Role;
+use App\Skills;
 use App\User;
 use App\UserGroups;
+use App\UsersSkills;
 use Auth;
 use DB;
 use FixometerFile;
@@ -107,23 +109,49 @@ class GroupController extends Controller
         return view('group.create');
     }
 
-    private function expandVolunteers($volunteers)
+    private function expandVolunteers($volunteers, $allSkills)
     {
         $ret = [];
 
-        foreach ($volunteers as $volunteer) {
-            $volunteer['volunteer'] = $volunteer->volunteer;
+        // Get array of volunteer ids
+        $volunteerIds = $volunteers->pluck('user')->toArray();
+        $users = User::whereIn('id', $volunteerIds)->get();
+
+        $volIx = [];
+        foreach ($users as $user) {
+            $volIx[$user->id] = $user;
+        }
+
+        $volunteerSkills = UsersSkills::whereIn('user', $volunteerIds)->get();
+
+        $ix = [];
+
+        foreach ($volunteerSkills as $volunteerSkill) {
+            if (!array_key_exists($volunteerSkill->user, $ix)) {
+                $ix[$volunteerSkill->user] = [];
+            }
+
+            $ix[$volunteerSkill->user][] = $volunteerSkill->skill;
+        }
+
+        foreach ($volunteers as &$volunteer) {
+            $volunteerObj = $volIx[$volunteer->user];
+
+            $volunteer['volunteer'] = $volunteerObj;
 
             if ($volunteer['volunteer']) {
-                $volunteer['userSkills'] = $volunteer->volunteer->userSkills->all();
-
-                foreach ($volunteer['userSkills'] as $skill) {
-                    // Force expansion
-                    $skill->skillName->skill_name;
+                if (array_key_exists($volunteer->user, $ix)) {
+                    $skills = [];
+                    foreach ($ix[$volunteer->user] as $skill) {
+                        if (array_key_exists($skill, $allSkills)) {
+                            $skills[] = $allSkills[$skill];
+                        }
+                    }
+                    $volunteer['user_skills'] = $skills;
                 }
 
                 $volunteer['fullName'] = $volunteer->name;
-                $image = $volunteer->volunteer->getProfile($volunteer->volunteer->id)->path;
+                $image = $volunteerObj->getProfile($volunteerObj->id)->path;
                 $image = $image ? "/uploads/thumbnail_$image" : "/images/placeholder-avatar.png";
                 $volunteer['profilePath'] = $image;
                 $ret[] = $volunteer;
@@ -170,28 +198,55 @@ class GroupController extends Controller
 
         $Device->ofThisGroup($group->idgroups);
 
-        $clusters = [];
+        $counts = $Device->countByClustersYearStatus($group->idgroups);
+        $template = [
+            0 => [
+                'counter' => 0,
+                'repair_status' => 1,
+            ],
+            1 => [
+                'counter' => 0,
+                'repair_status' => 2,
+            ],
+            2 => [
+                'counter' => 0,
+                'repair_status' => 3,
+            ],
+            'total' => 0
+        ];
 
-        for ($i = 1; $i <= 4; $i++) {
-            $cluster = $Device->countByCluster($i, $group->idgroups);
-            $total = 0;
-            foreach ($cluster as $state) {
-                $total += $state->counter;
-            }
-            $cluster['total'] = $total;
-            $clusters['all'][$i] = $cluster;
-        }
+        $clusters = [
+            'all' => [
+                1 => $template,
+                2 => $template,
+                3 => $template,
+                4 => $template,
+            ]
+        ];
 
-        for ($y = date('Y', time()); $y >= 2013; $y--) {
-            for ($i = 1; $i <= 4; $i++) {
-                $cluster = $Device->countByCluster($i, $group->idgroups, $y);
+        foreach ($counts as $count) {
+            $year = $count->year;
+            $cluster = $count->cluster;
+            $repair_status = $count->repair_status;
+            $counter = $count->counter;
 
-                $total = 0;
-                foreach ($cluster as $state) {
-                    $total += $state->counter;
+            if ($repair_status && $cluster) {
+                if (array_key_exists($cluster, $clusters['all'])) {
+                    $clusters['all'][$cluster][$repair_status - 1]['counter'] += $counter;
+                    $clusters['all'][$cluster]['total'] += $counter;
+
+                    if (!array_key_exists($year, $clusters)) {
+                        $clusters[$year] = [
+                            1 => $template,
+                            2 => $template,
+                            3 => $template,
+                            4 => $template,
+                        ];
+                    }
+
+                    $clusters[$year][$cluster][$repair_status - 1]['counter'] += $counter;
+                    $clusters[$year][$cluster]['total'] += $counter;
                 }
-                $cluster['total'] = $total;
-                $clusters[$y][$i] = $cluster;
             }
         }
 
@@ -231,7 +286,17 @@ class GroupController extends Controller
 
         $user_groups = UserGroups::where('user', Auth::user()->id)->count();
         $view_group = Group::find($groupid);
-        $view_group->allConfirmedVolunteers = $this->expandVolunteers($view_group->allConfirmedVolunteers);
+
+        // We extract some skills info in bulk to reduce the number of distinct queries on groups with many
+        // volunteers.
+        $allSkills = Skills::all()->all();
+        $ix = [];
+        foreach ($allSkills as $i => $skill) {
+            $ix[$skill->id] = $skill;
+            $ix[$skill->id]->skillName;
+        }
+
+        $view_group->allConfirmedVolunteers = $this->expandVolunteers($view_group->allConfirmedVolunteers, $ix);
 
         $pendingInvite = UserGroups::where('group', $groupid)
         ->where('user', $user->id)
@@ -483,8 +548,6 @@ class GroupController extends Controller
         $user = Auth::user();
 
         if ($groups) {
-            $countries = array_flip(Fixometer::getAllCountries('en'));
-
             foreach ($groups as $group) {
                 $group_image = $group->groupImage;
 
@@ -513,7 +576,8 @@ class GroupController extends Controller
                         asset('uploads/mid_'.$group_image->image->path) : null,
                     'location' => [
                         'location' => rtrim($group->location),
-                        'country' => Fixometer::translateCountry($group->country, $countries),
+                        'country' => Fixometer::getCountryFromCountryCode($group->country_code),
+                        'country_code' => $group->country_code,
                         'distance' => $distance,
                     ],
                     'next_event' => $event ? $event->event_date_local : null,

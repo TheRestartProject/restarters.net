@@ -136,6 +136,40 @@ class DiscourseService
         }
     }
 
+    public function removeUserFromPrivateMessage($threadid, $removeBy, $removeUser) {
+        if (! config('restarters.features.discourse_integration')) {
+            return;
+        }
+
+        Log::info("Remove user from private message $threadid, $removeBy, $removeUser");
+
+        $client = app('discourse-client', [
+            'username' => $removeBy,
+        ]);
+
+        $params = [
+            'username' => $removeUser,
+        ];
+
+        $endpoint = "/t/$threadid/remove-allowed-user";
+
+        Log::info('Removing from private message: '.json_encode($params));
+        $response = $client->request(
+            'PUT',
+            $endpoint,
+            [
+                'form_params' => $params,
+            ]
+        );
+
+        Log::info('Response status: '.$response->getStatusCode());
+        Log::info('Response body: '.$response->getBody());
+
+        if (! $response->getStatusCode() === 200) {
+            Log::error("Could not remove from private message ($threadid, $removeBy, $removeUser:".$response->getReasonPhrase());
+        }
+    }
+
     public function getAllUsers()
     {
         if (! config('restarters.features.discourse_integration')) {

@@ -110,7 +110,6 @@ class WordpressEventPushTest extends TestCase
             'event_end_utc' => Carbon::parse('4pm tomorrow')->toIso8601String(),
             'latitude' => 1,
             'longitude' => 2,
-            'group' => 3,
             'online' => FALSE,
             'venue' => 'Cloud 9',
             'location' => 'Cloud 10',

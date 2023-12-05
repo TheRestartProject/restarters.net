@@ -57,8 +57,6 @@ Route::middleware('auth:api')->group(function () {
     Route::delete('/usersgroups/{id}', [API\UserGroupsController::class, 'leave']); // Used by Vue client.
 });
 
-Route::get('/groups/{group}/events', [API\GroupController::class, 'getEventsForGroup']); // Used by old JS client.
-
 Route::get('/devices/{page}/{size}', [App\Http\Controllers\ApiController::class, 'getDevices']); // Used by Vue client.
 
 // Notifications info.  We don't authenticate this, as API keys don't exist for all users.  There's no real privacy
@@ -103,5 +101,7 @@ Route::prefix('v2')->group(function() {
                 Route::get('/events', [API\EventController::class, 'moderateEventsv2']);
             });
         });
+
+        Route::get('/items', [API\ItemController::class, 'listItemsv2']);
     });
 });

@@ -33,6 +33,8 @@
           :to_date.sync="to_date"
           :start-expanded-items="startExpandedItems"
           :start-expanded-events="startExpandedEvents"
+          @expandItems="startExpandedItems = $event"
+          @expandEvents="startExpandedEvents = $event"
       />
       <FixometerFilters
           v-show="tabIndex === 1"
@@ -51,6 +53,8 @@
           :to_date.sync="to_date"
           :start-expanded-items="startExpandedItems"
           :start-expanded-events="startExpandedEvents"
+          @expandItems="startExpandedItems = $event"
+          @expandEvents="startExpandedEvents = $event"
       />
       <b-tabs class="ourtabs ourtabs-brand w-100 d-none d-md-block" v-model="tabIndex">
         <b-tab active title-item-class="w-50" title-link-class="smallpad" class="pt-2">
@@ -67,7 +71,6 @@
               :clusters="clusters"
               :brands="brands"
               :barrier-list="barrierList"
-              :itemTypes="itemTypes"
               :category="category_powered"
               :brand="brand"
               :model="model"
@@ -77,7 +80,7 @@
               :group="group"
               :from_date="from_date"
               :to_date="to_date"
-              :total.sync="impactData.total_powered"
+              :total.sync="total_powered"
           />
         </b-tab>
         <b-tab title-item-class="w-50" title-link-class="smallpad" class="pt-2">
@@ -94,8 +97,8 @@
               :clusters="clusters"
               :brands="brands"
               :barrier-list="barrierList"
-              :itemTypes="itemTypes"
               :category="category_unpowered"
+              :model="model"
               :item_type="item_type"
               :comments="comments"
               :wiki="wiki"
@@ -103,7 +106,7 @@
               :group="group"
               :from_date="from_date"
               :to_date="to_date"
-              :total.sync="impactData.total_unpowered"
+              :total.sync="total_unpowered"
           />
         </b-tab>
       </b-tabs>
@@ -120,8 +123,9 @@
               :clusters="clusters"
               :brands="brands"
               :barrier-list="barrierList"
-              :itemTypes="itemTypes"
               :category="category_powered"
+              :brand="brand"
+              :model="model"
               :item_type="item_type"
               :comments="comments"
               :wiki="wiki"
@@ -144,8 +148,8 @@
               :clusters="clusters"
               :brands="brands"
               :barrier-list="barrierList"
-              :itemTypes="itemTypes"
               :category="category_unpowered"
+              :model="model"
               :item_type="item_type"
               :comments="comments"
               :wiki="wiki"
@@ -195,14 +199,13 @@ export default {
       required: false,
       default: null
     },
-    itemTypes: {
-      type: Array,
-      required: false,
-      default: null
-    },
     isAdmin: {
       type: Boolean,
       required: true
+    },
+    userGroups: {
+      type: Array,
+      required: true,
     }
   },
   data () {
@@ -257,7 +260,6 @@ export default {
 
     if (params.has('model')) {
       this.model = params.get('model')
-      console.log("Got modal ", this.model)
       this.startExpandedItems = true
     }
 
@@ -293,6 +295,10 @@ export default {
 
     this.total_powered = this.impactData.total_powered
     this.total_unpowered = this.impactData.total_unpowered
+
+    this.$store.dispatch('groups/setList', {
+      groups: this.userGroups
+    })
   },
   watch: {
     url(newVal) {

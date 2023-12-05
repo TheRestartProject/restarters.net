@@ -61,7 +61,7 @@ class DeleteEventTest extends TestCase
         $this->actingAs($admin);
         $response = $this->get("/api/group/{$group->idgroups}/stats?api_token=1234");
         $stats = json_decode($response->getContent(), true);
-        $this->assertEquals(9, $stats['num_hours_volunteered']);
+        $this->assertEquals(21, $stats['num_hours_volunteered']);
 
         // Now delete the event.
         $response = $this->post('/party/delete/'.$event->idevents);

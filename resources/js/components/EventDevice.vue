@@ -8,9 +8,10 @@
         <b-card no-body class="p-3 flex-grow-1 border-0">
           <h3 class="mt-2 mb-4">{{ __('devices.title_items') }}</h3>
           <DeviceType class="mb-2" :type.sync="currentDevice.item_type"
-                      :icon-variant="add ? 'black' : 'brand'" :item-types="itemTypes" :disabled="disabled"
+                      :icon-variant="add ? 'black' : 'brand'" :disabled="disabled"
                       :suppress-type-warning="suppressTypeWarning" :powered="powered"
                       :unknown.sync="unknownItemType"
+                      :auto-focus="add"
           />
           <DeviceCategorySelect :class="{
             'mb-2': true,
@@ -25,8 +26,8 @@
                        :suppress-brand-warning="suppressBrandWarning"/>
           <DeviceModel class="mb-2" :model.sync="currentDevice.model" :icon-variant="add ? 'black' : 'brand'"
                        :disabled="disabled"/>
-          <DeviceWeight v-if="showWeight" :weight.sync="currentDevice.estimate" :disabled="disabled"/>
           <DeviceAge :age.sync="currentDevice.age" :disabled="disabled"/>
+          <DeviceWeight v-if="showWeight" :weight.sync="currentDevice.estimate" :disabled="disabled" :required="weightRequired" />
           <DeviceImages :idevents="idevents" :device="currentDevice" :add="add" :edit="edit" :disabled="disabled"
                         class="mt-2" @remove="removeImage($event)"/>
         </b-card>
@@ -90,7 +91,7 @@ import {
   END_OF_LIFE,
   SPARE_PARTS_MANUFACTURER,
   SPARE_PARTS_THIRD_PARTY,
-  CATEGORY_MISC, NEXT_STEPS_DIY, NEXT_STEPS_PROFESSIONAL, NEXT_STEPS_MORE_TIME,
+  CATEGORY_MISC_POWERED, CATEGORY_MISC_UNPOWERED, NEXT_STEPS_DIY, NEXT_STEPS_PROFESSIONAL, NEXT_STEPS_MORE_TIME,
   PARTS_PROVIDER_MANUFACTURER,
   PARTS_PROVIDER_THIRD_PARTY, SPARE_PARTS_NOT_NEEDED
 } from '../constants'
@@ -176,11 +177,6 @@ export default {
       required: false,
       default: null
     },
-    itemTypes: {
-      type: Array,
-      required: false,
-      default: null
-    },
   },
   data () {
     return {
@@ -217,6 +213,9 @@ export default {
     }
   },
   computed: {
+    itemTypes() {
+      return this.$store.getters['items/list'];
+    },
     idtouse() {
       return this.currentDevice ? this.currentDevice.iddevices : null
     },
@@ -226,14 +225,18 @@ export default {
     currentCategory () {
       return this.currentDevice ? this.currentDevice.category : null
     },
+    currentType() {
+      return this.currentDevice ? this.currentDevice.item_type : null
+    },
     suggestedCategory() {
       let ret = null
-      if (this.currentDevice && this.currentDevice.item_type) {
+
+      if (this.currentType) {
         // Some item types are the same as category names.
         this.clusters.forEach((cluster) => {
           cluster.categories.forEach((c) => {
             const name = this.$lang.get('strings.' + c.name)
-            if (Boolean(c.powered) === Boolean(this.powered) && !name.toLowerCase().localeCompare(this.currentDevice.item_type.toLowerCase())) {
+            if (Boolean(c.powered) === Boolean(this.powered) && !name.toLowerCase().localeCompare(this.currentType.toLowerCase())) {
               ret = {
                 idcategories: c.idcategories,
                 categoryname: c.name,
@@ -246,7 +249,7 @@ export default {
         if (!ret) {
           // Now check the item types.  Stop at the first match, which is the most popular.
           this.itemTypes.every(t => {
-            if (!ret && Boolean(t.powered) === Boolean(this.powered) && this.currentDevice.item_type.toLowerCase() == t.item_type.toLowerCase()) {
+            if (!ret && Boolean(t.powered) === Boolean(this.powered) && this.currentType.toLowerCase() == t.type.toLowerCase()) {
               ret = {
                 idcategories: t.idcategories,
                 categoryname: t.categoryname,
@@ -255,12 +258,11 @@ export default {
 
               return false
             }
+
             return true
           })
         }
       }
-
-      console.log("Returning", ret, this.currentDevice.item_type)
 
       return ret
     },
@@ -281,33 +283,10 @@ export default {
         return null
       }
     },
-    aggregate () {
-      if (!this.currentCategory) {
-        return false
-      }
-
-      if (this.powered && this.currentCategory === CATEGORY_MISC) {
-        return true
-      }
-
-      let ret = false
-
-      this.clusters.forEach((cluster) => {
-        let categories = []
-
-        cluster.categories.forEach((c) => {
-          if (this.currentCategory === c.idcategories) {
-            ret = c.aggregate
-          }
-        })
-      })
-
-      return ret
-    },
     showWeight () {
       // Powered devices don't allow editing of the weight except for the "None of the above" category, whereas
       // unpowered do.
-      return !this.powered || (this.currentDevice && this.currentDevice.category === CATEGORY_MISC)
+      return !this.powered || (this.currentDevice && this.currentDevice.category === CATEGORY_MISC_POWERED)
     },
     wiki: {
       // Need to convert server's number to/from a boolean.
@@ -326,6 +305,12 @@ export default {
       // We don't want to show the warning if we have not changed the brand since it was last saved.
       return this.currentDevice && this.device && this.device.brand === this.currentDevice.brand
     },
+    weightRequired() {
+      // Weight is required (if shown) for misc (powered or unpowered).
+      return this.currentDevice &&
+          (this.powered && this.currentDevice.category === CATEGORY_MISC_POWERED ||
+            !this.powered && this.currentDevice.category === CATEGORY_MISC_UNPOWERED)
+    }
   },
   created () {
     // We take a copy of what's passed in so that we can then edit it in here before saving or cancelling.  We need
@@ -405,6 +390,7 @@ export default {
 
           this.$emit('close')
         }
+
       } catch (e) {
         console.error('Edit failed', e)
         this.axiosError = e

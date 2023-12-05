@@ -207,7 +207,9 @@ export default {
         }
 
         if (this.searchLocation) {
-          match &= g.location.toLowerCase().indexOf(this.searchLocation.toLowerCase()) !== -1
+          if (g.location && g.location.location) {
+            match &= g.location.location.toLowerCase().indexOf(this.searchLocation.toLowerCase()) !== -1
+          }
         }
 
         if (this.searchCountry) {

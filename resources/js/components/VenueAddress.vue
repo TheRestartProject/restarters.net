@@ -9,6 +9,7 @@
             classname="form-control"
             :placeholder="__('events.field_venue_placeholder')"
             @placechanged="placeChanged"
+            @change="resetValues"
             aria-describedby="locationHelpBlock"
             types="geocode"
             ref="autocomplete"
@@ -164,11 +165,20 @@ export default {
     clearTimeout(this.timer)
   },
   methods: {
-    placeChanged(addressData, placeResultData) {
+    async placeChanged(addressData, placeResultData) {
+      // nextTick which means the change event will get processed before we emit our new values.
+      await this.$nextTick()
       this.currentValue = placeResultData.formatted_address
       this.$emit('update:value', this.currentValue)
       this.$emit('update:lat', addressData.latitude)
       this.$emit('update:lng', addressData.longitude)
+    },
+    resetValues() {
+      // This means that if the input changes, we will assume it's invalid unless we subsequently (because of
+      // the nextTick above) get a valid placeChanged event.
+      this.$emit('update:value', null)
+      this.$emit('update:lat', null)
+      this.$emit('update:lng', null)
     },
     useGroup() {
       this.$refs.autocomplete.update(this.groupLocation)

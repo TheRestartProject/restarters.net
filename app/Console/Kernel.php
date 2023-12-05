@@ -41,6 +41,10 @@ class Kernel extends ConsoleKernel
             ->daily()
             ->sendOutputTo(storage_path().'/logs/discourse_usernames.log')
             ->emailOutputTo(env('SEND_COMMAND_LOGS_TO'), 'tech@therestartproject.org');
+
+        $schedule->command('groups:country')->hourly();
+
+        $schedule->command('event:timezones')->hourly();
     }
 
     /**

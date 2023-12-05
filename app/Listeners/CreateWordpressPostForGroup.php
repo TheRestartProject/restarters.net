@@ -72,7 +72,7 @@ class CreateWordpressPostForGroup extends BaseEvent
         if (!$group->wordpress_post_id) {
             $custom_fields = [
                 ['key' => 'group_city', 'value' => $group->area],
-                ['key' => 'group_country', 'value' => $group->country],
+                ['key' => 'group_country', 'value' => Fixometer::getCountryFromCountryCode($group->country_code)],
                 ['key' => 'group_website', 'value' => $group->website],
                 ['key' => 'group_hash', 'value' => $group->idgroups],
                 ['key' => 'group_avatar_url', 'value' => $group->groupImagePath()],

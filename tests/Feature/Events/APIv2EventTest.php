@@ -14,6 +14,7 @@ use Symfony\Component\DomCrawler\Crawler;
 use Illuminate\Validation\ValidationException;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Tests\TestCase;
+use function PHPUnit\Framework\assertEquals;
 
 class APIv2EventTest extends TestCase
 {
@@ -314,4 +315,22 @@ class APIv2EventTest extends TestCase
         ]);
     }
 
+    public function testEmptyNetworkData() {
+        $user = User::factory()->administrator()->create([
+            'api_token' => '1234',
+        ]);
+        $this->actingAs($user);
+
+        $idgroups = $this->createGroup();
+        $idevents = $this->createEvent($idgroups, 'tomorrow');
+
+        $party = Party::findOrFail($idevents);
+        $party->network_data = [];
+        $party->save();
+
+        $response = $this->get("/api/v2/events/$idevents");
+        $response->assertSuccessful();
+        $json = json_decode($response->getContent(), true);
+        assertEquals(null, $json['data']['network_data']);
+    }
 }

@@ -137,8 +137,7 @@ exports.addDevice = async function(page, baseURL, idevents, powered, photo, fixe
   // Click the add button.
   await page.locator(addsel).click()
 
-  // Tab to category and select first.
-  await page.keyboard.press('Tab')
+  // Item type is focused, so we just need one tab to get to the category.  Then seldct first.
   await page.keyboard.press('Tab')
   await page.keyboard.press('Enter')
 

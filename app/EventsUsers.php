@@ -38,6 +38,11 @@ class EventsUsers extends Model
         return $this->hasOne(\App\User::class, 'id', 'user');
     }
 
+    public function event()
+    {
+        return $this->hasOne(\App\Party::class, 'id', 'event');
+    }
+
     public function getFullName()
     {
         if (! is_null($this->full_name)) {

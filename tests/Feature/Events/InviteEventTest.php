@@ -2,12 +2,10 @@
 
 namespace Tests\Feature;
 
-use App\Events\ApproveEvent;
 use App\EventsUsers;
 use App\Group;
 use App\Helpers\Fixometer;
-use App\Listeners\CreateDiscourseThreadForEvent;
-use App\Listeners\CreateWordpressPostForEvent;
+use App\Listeners\AddUserToDiscourseThreadForEvent;
 use App\Notifications\RSVPEvent;
 use App\Party;
 use App\Role;
@@ -17,6 +15,8 @@ use Illuminate\Support\Facades\Notification;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Tests\TestCase;
 use App\Notifications\JoinEvent;
+use Illuminate\Support\Facades\Queue;
+use function PHPUnit\Framework\assertEquals;
 
 class InviteEventTest extends TestCase
 {
@@ -71,6 +71,10 @@ class InviteEventTest extends TestCase
                 return true;
             }
         );
+
+        // Invited volunteers shouldn't update the count.
+        $event->refresh();
+        assertEquals(0, $event->volunteers);
     }
 
     public function testInviteReal()
@@ -94,6 +98,8 @@ class InviteEventTest extends TestCase
         $group = Group::findOrFail($idgroups);
         $idevents = $this->createEvent($idgroups, 'tomorrow');
         $event = Party::findOrFail($idevents);
+        $event->refresh();
+        assertEquals(1, $event->volunteers);
 
         // We want the event handler to kick in and synchronise to Discourse.
         $this->artisan("queue:work --stop-when-empty");
@@ -118,6 +124,10 @@ class InviteEventTest extends TestCase
             'event' => $event->idevents,
             'role' => 4,
         ]);
+
+        // Invited volunteers shouldn't update the count.
+        $event->refresh();
+        assertEquals(1, $event->volunteers);
 
         // Admin approves the event.
         $admin = User::factory()->administrator()->create();
@@ -160,6 +170,10 @@ class InviteEventTest extends TestCase
         $events = $this->getVueProperties($response5)[1][':initial-events'];
         $this->assertNotFalse(strpos($events, '"attending":true'));
 
+        // Count should now include them.
+        $event->refresh();
+        assertEquals(2, $event->volunteers);
+
         // Invite again - different code path when they're already there.
         $response = $this->post('/party/invite', [
             'group_name' => $group->name,
@@ -193,6 +207,9 @@ class InviteEventTest extends TestCase
                                 'full_name' => null,
                            ]);
         $this->actingAs($host);
+
+        $event->refresh();
+        assertEquals(1, $event->volunteers);
 
         // Should have no group members and therefore no invitable members.
         $response = $this->get('/party/get-group-emails-with-names/'.$event->idevents);
@@ -228,6 +245,10 @@ class InviteEventTest extends TestCase
 
         $response5->assertSessionHas('success');
 
+        // Invited volunteers shouldn't update the count.
+        $event->refresh();
+        assertEquals(1, $event->volunteers);
+
         // Invited member should not show up as invitable.
         $response6 = $this->get('/party/get-group-emails-with-names/'.$event->idevents);
         $members = json_decode($response6->getContent());
@@ -254,6 +275,10 @@ class InviteEventTest extends TestCase
         $redirectTo = $response8->getTargetUrl();
         $this->assertNotFalse(strpos($redirectTo, '/party/view/'.$event->idevents));
 
+        // Should now show.
+        $event->refresh();
+        assertEquals(2, $event->volunteers);
+
         // Now a group member and confirmed so should not show as invitable.
         $this->get('/logout');
         $this->actingAs($host);
@@ -264,17 +289,26 @@ class InviteEventTest extends TestCase
 
     public function testInvitableNotifications()
     {
+        Queue::fake();
         Notification::fake();
         $this->withoutExceptionHandling();
 
-        $group = Group::factory()->create();
+        $user = User::factory()->administrator()->create([
+            'api_token' => '1234',
+        ]);
+        $this->actingAs($user);
+
+        $idgroups = $this->createGroup('Test Group', 'https://therestartproject.org', 'London', 'Some text.', true, true);
+        $idevents = $this->createEvent($idgroups, 'tomorrow');
+
+        // Joining should trigger adding to the Discourse thread.  Fake one.
+        $event = \App\Party::find($idevents);
+        $event->discourse_thread = 123;
+        $event->save();
+
+        $group = Group::find($idgroups);
         $host = User::factory()->host()->create();
-        $event = Party::factory()->create([
-                                                   'group' => $group,
-                                                   'event_start_utc' => '2130-01-01T12:13:00+00:00',
-                                                   'event_end_utc' => '2130-01-01T13:14:00+00:00',
-                                                   'user_id' => $host->id
-                                               ]);
+        $event = Party::find($idevents);
         EventsUsers::create([
                                 'event' => $event->getKey(),
                                 'user' => $host->getKey(),
@@ -327,7 +361,7 @@ class InviteEventTest extends TestCase
         $this->get('/logout');
         $this->actingAs($user);
 
-        // Now accept the invitation.
+        // Now accept the invitation, which should trigger adding to the Discourse thread.
         $eu = EventsUsers::where('user', '=', $user->id)->first();
         $invitation = '/party/accept-invite/' . $event->idevents . '/' . $eu->status;
 
@@ -359,6 +393,12 @@ class InviteEventTest extends TestCase
         $response9 = $this->get('/party/get-group-emails-with-names/'.$event->idevents);
         $members = json_decode($response9->getContent());
         $this->assertEquals([], $members);
+
+        Queue::assertPushed(\Illuminate\Events\CallQueuedListener::class, function ($job) use ($event, $user) {
+            if ($job->class == AddUserToDiscourseThreadForEvent::class) {
+                return true;
+            }
+        });
     }
 
     public function testInviteViaLink() {
@@ -371,11 +411,17 @@ class InviteEventTest extends TestCase
         $group = Group::findOrFail($idgroups);
         $idevents = $this->createEvent($idgroups, 'tomorrow');
         $event = Party::findOrFail($idevents);
+        assertEquals(1, $event->volunteers);
 
         $unique_shareable_code = Fixometer::generateUniqueShareableCode(\App\Party::class, 'shareable_code');
         $event->update([
                            'shareable_code' => $unique_shareable_code,
                        ]);
+
+
+        // Invited volunteers shouldn't update the count.
+        $event->refresh();
+        assertEquals(1, $event->volunteers);
 
         // Accept the invite via the code.
         $this->actingAs($user);
@@ -387,6 +433,11 @@ class InviteEventTest extends TestCase
             'url' => url("/party/view/{$event->idevents}"),
             'name' => $event->venue
         ]), false);
+
+
+        // Should now show.
+        $event->refresh();
+        assertEquals(2, $event->volunteers);
 
         // Try with invalid code.
         $this->expectException(NotFoundHttpException::class);

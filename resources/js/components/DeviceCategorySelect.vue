@@ -29,7 +29,7 @@
   </div>
 </template>
 <script>
-import { CATEGORY_MISC } from '../constants'
+import { CATEGORY_MISC_POWERED, CATEGORY_MISC_UNPOWERED } from '../constants'
 
 export default {
   props: {
@@ -83,6 +83,9 @@ export default {
         this.$emit('changed')
       }
     },
+    miscCat() {
+      return this.powered ? CATEGORY_MISC_POWERED : CATEGORY_MISC_UNPOWERED
+    },
     categoryOptions() {
       let ret = []
 
@@ -90,7 +93,10 @@ export default {
         let categories = []
 
         cluster.categories.forEach((c) => {
-          if ((this.powered && c.powered) || (!this.powered && !c.powered)) {
+          // Don't include the misc category - it gets added at the end, which encourages people to read the
+          // whole list before selecting it.
+          if (((c.idcategories !== this.miscCat) &&
+              ((this.powered && c.powered) || (!this.powered && !c.powered)))) {
             categories.push({
               name: this.$lang.get('strings.' + c.name),
               value: c.idcategories
@@ -106,17 +112,15 @@ export default {
         }
       })
 
-      if (this.powered) {
-        ret.push({
-          cluster: '---',
-          categories: [
-            {
-              name: this.$lang.get('partials.category_none'),
-              value: CATEGORY_MISC,
-            }
-          ]
-        })
-      }
+      ret.push({
+        cluster: '---',
+        categories: [
+          {
+            name: this.$lang.get('partials.category_none'),
+            value: this.miscCat,
+          }
+        ]
+      })
 
       return ret
     },

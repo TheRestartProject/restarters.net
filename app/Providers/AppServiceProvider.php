@@ -2,8 +2,10 @@
 
 namespace App\Providers;
 
+use App\EventsUsers;
 use App\Helpers\Geocoder;
 use App\Helpers\RobustTranslator;
+use App\Observers\EventsUsersObserver;
 use Auth;
 use Cache;
 use Illuminate\Support\ServiceProvider;
@@ -36,6 +38,8 @@ class AppServiceProvider extends ServiceProvider
         });
 
         \Illuminate\Pagination\Paginator::useBootstrapThree();
+
+        EventsUsers::observe(EventsUsersObserver::class);
     }
 
     /**

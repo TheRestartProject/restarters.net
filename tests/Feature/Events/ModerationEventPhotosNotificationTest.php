@@ -133,8 +133,6 @@ class ModerationEventPhotosNotificationTest extends TestCase
             'full_name' => null,
         ]);
 
-        $this->event->increment('volunteers');
-
         $this->assertTrue($this->group->isVolunteer($this->restarter->getKey()));
         $this->assertTrue($this->event->isVolunteer($this->restarter->getKey()));
     }

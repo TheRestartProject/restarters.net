@@ -114,7 +114,7 @@ class PrintcatOraTest extends TestCase
             [
                 'id_ords' => 'restart_2394',
                 'data_provider' => 'The Restart Project',
-                'country' => 'GBR',
+                'country' => 'GB',
                 'partner_product_category' => 'Printer/scanner',
                 'product_category' => 'Printer/scanner',
                 'brand' => 'Lexmark',
@@ -129,7 +129,7 @@ class PrintcatOraTest extends TestCase
             [
                 'id_ords' => 'rcwales_310',
                 'data_provider' => 'Repair Cafe Wales',
-                'country' => 'GBR',
+                'country' => 'GB',
                 'partner_product_category' => 'IT/Phone ~ Printer',
                 'product_category' => 'Printer/scanner',
                 'brand' => 'Unknown',
@@ -216,7 +216,7 @@ class PrintcatOraTest extends TestCase
             [
                 'id_ords' => 'rcwales_299',
                 'data_provider' => 'Repair Cafe Wales',
-                'country' => 'GBR',
+                'country' => 'GB',
                 'partner_product_category' => 'IT/Phone ~ Printer',
                 'product_category' => 'Printer/scanner',
                 'brand' => 'Unknown',

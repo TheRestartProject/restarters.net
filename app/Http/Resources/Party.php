@@ -245,6 +245,13 @@ class Party extends JsonResource
     public function toArray($request)
     {
         // We return information which can be public, and we rename fields to look more consistent.
+        $networkData = gettype($this->network_data) == 'string' ? json_decode($this->network_data, true) : $this->network_data;
+
+        if (getType($networkData) === 'array' && !count(array_keys($networkData))) {
+            // We don't want to return [] as the client expects an object, not an array.
+            $networkData = null;
+        }
+
         $ret = [
             'id' => $this->idevents,
             'start' => $this->event_start_utc,
@@ -260,7 +267,7 @@ class Party extends JsonResource
             'stats' => $this->resource->getEventStats(),
             'updated_at' => Carbon::parse($this->updated_at)->toIso8601String(),
             'approved' => $this->approved ? true : false,
-            'network_data' => $this->network_data,
+            'network_data' => $networkData,
             'full' => true,
         ];
 

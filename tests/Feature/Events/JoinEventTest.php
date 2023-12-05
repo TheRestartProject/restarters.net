@@ -2,33 +2,47 @@
 
 namespace Tests\Feature;
 
+use App\Listeners\RemoveUserFromDiscourseThreadForEvent;
+use Illuminate\Support\Facades\Queue;
 use App\EventsUsers;
-use App\Group;
-use App\Helpers\Geocoder;
-use App\Network;
-use App\Notifications\AdminModerationEvent;
-use App\Notifications\NotifyRestartersOfNewEvent;
-use App\Party;
+use App\Listeners\AddUserToDiscourseThreadForEvent;
 use App\User;
 use DB;
 use Illuminate\Support\Facades\Notification;
 use Tests\TestCase;
+use function PHPUnit\Framework\assertEquals;
 
 class JoinEventTest extends TestCase
 {
     public function testJoin()
     {
+        Queue::fake();
+
         $this->withoutExceptionHandling();
 
-        $group = Group::factory()->create([
-                                              'approved' => true
-                                           ]);
-        $event = Party::factory()->create(['group' => $group->idgroups]);
-
-        $user = User::factory()->restarter()->create();
+        $user = User::factory()->administrator()->create([
+            'api_token' => '1234',
+        ]);
         $this->actingAs($user);
 
+        $idgroups = $this->createGroup('Test Group', 'https://therestartproject.org', 'London', 'Some text.', true, true);
+        $idevents = $this->createEvent($idgroups, 'tomorrow');
+
+        // Joining should trigger adding to the Discourse thread.  Fake one.
+        $event = \App\Party::find($idevents);
+        $event->discourse_thread = 123;
+        assertEquals(1, $event->volunteers);
+        $event->save();
+
+        Queue::assertPushed(\Illuminate\Events\CallQueuedListener::class, function ($job) use ($event, $user) {
+            if ($job->class == AddUserToDiscourseThreadForEvent::class) {
+                return true;
+            }
+        });
+
         // Join.  Should get redirected, and also prompted to follow the group (which we haven't).
+        $user = User::factory()->restarter()->create();
+        $this->actingAs($user);
         $response = $this->get('/party/join/'.$event->idevents);
         $this->assertTrue($response->isRedirection());
         $response->assertSessionHas('prompt-follow-group');
@@ -44,6 +58,10 @@ class JoinEventTest extends TestCase
             ],
         ]);
 
+        // Should show in count
+        $event->refresh();
+        assertEquals(2, $event->volunteers);
+
         // Say we can't attend.
         $this->followingRedirects();
         $response = $this->get('/party/cancel-invite/'.$event->idevents);
@@ -53,6 +71,15 @@ class JoinEventTest extends TestCase
                 ':is-attending' => 'false',
             ],
         ]);
+
+        $event->refresh();
+        assertEquals(1, $event->volunteers);
+
+        Queue::assertPushed(\Illuminate\Events\CallQueuedListener::class, function ($job) use ($event, $user) {
+            if ($job->class == RemoveUserFromDiscourseThreadForEvent::class) {
+                return true;
+            }
+        });
     }
 
     public function testJoinInvalid() {

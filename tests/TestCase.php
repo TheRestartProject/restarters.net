@@ -94,6 +94,8 @@ abstract class TestCase extends BaseTestCase
             $network->name = 'Restarters';
             $network->shortname = 'restarters';
             $network->save();
+        } else {
+            error_log("Got network");
         }
 
         $this->withoutExceptionHandling();
@@ -119,6 +121,21 @@ abstract class TestCase extends BaseTestCase
         // Some tests may override the queue.
         $queueManager = $this->app['queue'];
         $queueManager->setDefaultDriver('database');
+
+        // Clear any jobs queued in earlier tests.
+        $max = 1000;
+        do {
+            $job = Queue::pop('database');
+
+            if ($job) {
+                try {
+                    $job->fail('removed in UT');
+                } catch (\Exception $e) {}
+            }
+
+            $max--;
+        }
+        while (Queue::size() > 0 && $max > 0);
     }
 
     public function userAttributes()
@@ -128,7 +145,7 @@ abstract class TestCase extends BaseTestCase
         $userAttributes['name'] = 'Test'.uniqid($this->userCount++, true);
         $userAttributes['email'] = $userAttributes['name'].'@restarters.dev';
         $userAttributes['age'] = '1982';
-        $userAttributes['country'] = 'GBR';
+        $userAttributes['country'] = 'GB';
         $userAttributes['password'] = 'letmein';
         $userAttributes['password_confirmation'] = 'letmein';
         $userAttributes['my_time'] = Carbon::now();
@@ -158,7 +175,7 @@ abstract class TestCase extends BaseTestCase
         return Auth::user();
     }
 
-    public function createGroup($name = 'Test Group', $website = 'https://therestartproject.org', $location = 'London', $text = 'Some text.', $assert = true, $approve = true)
+    public function createGroup($name = 'Test Group', $website = 'https://therestartproject.org', $location = 'London', $text = 'Some text.', $assert = true, $approve = true, $email = null)
     {
         $idgroups = null;
 
@@ -176,7 +193,8 @@ abstract class TestCase extends BaseTestCase
              'timezone' => 'Europe/London',
              'network_data' => [
                  'dummy' => 'dummy',
-             ]
+             ],
+            'email' => $email,
         ]);
 
         if ($assert) {
