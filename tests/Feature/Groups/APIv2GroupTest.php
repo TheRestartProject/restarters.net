@@ -4,6 +4,7 @@ namespace Tests\Feature;
 
 use App\Group;
 use App\GroupTags;
+use App\Helpers\RepairNetworkService;
 use App\Network;
 use App\User;
 use Carbon\Carbon;
@@ -401,5 +402,65 @@ class APIv2GroupTest extends TestCase
         $response->assertSuccessful();
         $json = json_decode($response->getContent(), true);
         assertEquals(null, $json['data']['network_data']);
+    }
+
+    public function testNetworkDataUpdatedAt() {
+        $user = User::factory()->administrator()->create([
+            'api_token' => '1234',
+        ]);
+        $this->actingAs($user);
+
+        $this->get('/');
+        $user = Auth::user();
+
+        $this->lastResponse = $this->post('/api/v2/groups?api_token=' . $user->api_token, [
+            'name' => 'Test Group Updated',
+            'website' => 'https://therestartproject.org',
+            'location' => 'Brussels, Belgium',
+            'description' => 'Some text.',
+            'timezone' => 'Europe/London',
+            'network_data' => [],
+            'email' => null,
+        ]);
+
+        $this->assertTrue($this->lastResponse->isSuccessful());
+        $json = json_decode($this->lastResponse->getContent(), true);
+        $this->assertTrue(array_key_exists('id', $json));
+        $idgroups = $json['id'];
+
+        $network = Network::factory()->create();
+
+        $group = Group::find($idgroups);
+        $this->networkService = new RepairNetworkService();
+        $this->networkService->addGroupToNetwork($user, $group, $network);
+
+        $now = Carbon::now()->toIso8601String();
+        sleep(1);
+
+        $response = $this->patch('/api/v2/groups/' . $idgroups, [
+            'network_data' => [
+                'foo' => 'bar',
+            ],
+        ]);
+
+        $response->assertSuccessful();
+
+        // Check the updated_at has been, well, updated.
+        $response = $this->get("/api/v2/groups/$idgroups");
+        $response->assertSuccessful();
+        $json = json_decode($response->getContent(), true);
+        $this->assertEquals($idgroups, $json['data']['id']);
+        $updated_at = $json['data']['updated_at'];
+        $this->assertNotEquals($now, $updated_at);
+
+        // Test the v1 API.
+        $network->addCoordinator($user);
+        $this->actingAs($user);
+
+        $response = $this->get('/api/groups/network?api_token=1234');
+        $groups = json_decode($response->getContent(), true);
+        $this->assertEquals(1, count($groups));
+        $this->assertEquals($idgroups, $groups[0]['id']);
+        $this->assertEquals((new Carbon($updated_at))->getTimestamp(), (new Carbon($groups[0]['updated_at']))->getTimestamp());
     }
 }
