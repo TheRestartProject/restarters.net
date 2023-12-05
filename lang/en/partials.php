@@ -66,6 +66,8 @@ return [
   'solution_text2' => 'Interesting case study to share?',
   'emissions_equivalent_consume_low' => "that's like growing :value tree seedling for 10 years|that's like growing :value tree seedlings for 10 years",
   'emissions_equivalent_consume_high' => "that's like planting around :value hectare of trees|that's like planting around :value hectares of trees",
+  'emissions_equivalent_consume_low_explanation' => 'Medium growth coniferous or deciduous trees, planted in an urban setting and grown for 10 years.',
+  'emissions_equivalent_consume_high_explanation' => 'Broadleaf tree seedlings grown in a plantation or woodlot in England for 1 year.',
   'to_be_recycled' => ':value item to be recycled|:value items to be recycled',
   'to_be_repaired' => ':value item to be repaired|:value items to be repaired',
   'no_weight' => ':value misc or unpowered item with no weight estimate|:value misc or unpowered items with no weight estimate',

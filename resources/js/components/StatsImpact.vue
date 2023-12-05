@@ -30,6 +30,7 @@
             :description="equivalent_consumer(Math.round(stats.co2_total))"
             unit="kg"
             class="impact-co2"
+            :popover="popover_consumer(Math.round(stats.co2_total))"
       />
     </div>
   </div>

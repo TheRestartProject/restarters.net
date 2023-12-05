@@ -19,6 +19,17 @@ export default {
       })
 
       return ret
+    },
+    popover_consumer(co2) {
+      let key
+
+      if (co2 >= 13501) {
+        key = 'partials.emissions_equivalent_consume_high_explanation'
+      }  else {
+        key = 'partials.emissions_equivalent_consume_low_explanation'
+      }
+
+      return this.$lang.get(key)
     }
   }
 }

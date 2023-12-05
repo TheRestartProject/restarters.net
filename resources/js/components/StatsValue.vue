@@ -15,7 +15,12 @@
       {{ percent }}%
     </div>
     <div class="impact-stat-subtitle" v-html="translatedSubtitle" />
-    <div v-if="description && count > 0" class="impact-stat-description pt-3 m-3" v-html="translatedDescription" />
+    <div class="impact-stat-description pt-3 m-3 d-flex" >
+      <span v-if="description && count > 0" v-html="translatedDescription" />
+      <span v-if="popover" v-b-popover.html="popover">
+      <b-img class="ml-2 icon-info clickable" src="/icons/info_ico_green.svg" />
+    </span>
+    </div>
     <div class="image d-flex justify-content-around" v-if="image">
       <b-img :src="image" />
     </div>
@@ -93,6 +98,11 @@ export default {
       default: false
     },
     image: {
+      type: String,
+      required: false,
+      default: null
+    },
+    popover: {
       type: String,
       required: false,
       default: null
