@@ -126,8 +126,8 @@ class APIv2EventTest extends TestCase
             'event' => $idevents,
         ]);
 
-        // Sleep for a second so that the updated_at time on the event and group should not be the current time.
-        sleep(1);
+        // Sleep for two seconds so that the updated_at time on the event and group should not be the current time.
+        sleep(2);
         $now = Carbon::now()->toIso8601String();
 
         $response = $this->get("/api/v2/events/$idevents");
@@ -136,18 +136,23 @@ class APIv2EventTest extends TestCase
         $eventUpdated = $json['data']['updated_at'];
         $groupUpdated = $json['data']['group']['updated_at'];
 
-        // API v2 dates are ISO strings so we can just string compare.
-        self::assertTrue($eventUpdated == $groupUpdated);
-        self::assertFalse($eventUpdated == $now);
+        // Both times should not be the time we started at.  They might be 1s different if we happened to hit
+        // the second boundary (which we have seen on CircleCI).
+        $this->assertNotEquals($now, $eventUpdated);
+        $this->assertNotEquals($now, $groupUpdated);
+
+        $eventUpdatedEpoch = (new Carbon($eventUpdated))->getTimestamp();
+        $groupUpdatedEpoch = (new Carbon($groupUpdated))->getTimestamp();
+        $this->assertTrue(abs($eventUpdatedEpoch - $groupUpdatedEpoch) <= 1);
 
         $response = $this->get("/api/events/network?api_token=1234");
         $response->assertSuccessful();
         $json = json_decode($response->getContent(), true);
 
         // API v1 dates aren't as clear so format them for comparison.
-        $eventUpdated = (new Carbon($json[0]['updated_at']))->format('Y-m-d H:i:s');
-        $nowF = (new Carbon($now))->format('Y-m-d H:i:s');
-        self::assertFalse($eventUpdated == $nowF);
+        $eventUpdatedEpoch = (new Carbon($json[0]['updated_at']))->getTimestamp();
+        $this->assertTrue(abs($eventUpdatedEpoch - $groupUpdatedEpoch) <= 1);
+        $this->assertNotEquals($now, (new Carbon($json[0]['updated_at']))->toIso8601String());
     }
 
     /**
