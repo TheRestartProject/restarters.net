@@ -4,10 +4,6 @@ namespace App;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use App\Events\ApproveEvent;
-use App\EventUsers;
-use App\Helpers\Fixometer;
-use App\Notifications\NotifyRestartersOfNewEvent;
-use App\Notifications\EventConfirmed;
 use Auth;
 use Carbon\Carbon;
 use DB;
@@ -794,35 +790,6 @@ class Party extends Model implements Auditable
 
     public function approve()
     {
-        $group = Group::findOrFail($this->group);
-
-        // Only send notifications if the event is in the future.
-        // We don't want to send emails to Restarters about past events being added.
-        if ($this->isUpcoming()) {
-            $group_restarters = $group->membersRestarters();
-
-            // If there are restarters against the group
-            if ($group_restarters->count()) {
-                // Send user a notification and email
-                Notification::send($group_restarters->get(), new NotifyRestartersOfNewEvent([
-                                                                                         'event_venue' => $this->venue,
-                                                                                         'event_url' => url('/party/view/'.$this->idevents),
-                                                                                         'event_group' => $group->name,
-                                                                                     ]));
-            }
-        }
-
-        // Notify the person who created it that it has now been approved.
-        $eu = EventsUsers::where('event', $this->idevents)->orderBy('idevents_users')->first();
-
-        if ($eu) {
-            $host = User::find($eu->user);
-
-            if ($host) {
-                Notification::send($host, new EventConfirmed($this));
-            }
-        }
-
         event(new ApproveEvent($this));
     }
 

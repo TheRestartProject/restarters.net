@@ -41,6 +41,7 @@ class GroupJoinTest extends TestCase
         }));
 
         $response = $this->get('/group/join/'.$group->idgroups);
+        $this->artisan("queue:work --stop-when-empty");
 
         Notification::assertSentTo(
             [$host],

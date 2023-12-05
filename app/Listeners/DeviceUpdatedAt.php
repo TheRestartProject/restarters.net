@@ -7,7 +7,7 @@ use App\Events\DeviceCreatedOrUpdated;
 use App\Group;
 use App\Party;
 
-class DeviceUpdatedAt
+class DeviceUpdatedAt extends BaseEvent
 {
     /**
      * Handle the event.

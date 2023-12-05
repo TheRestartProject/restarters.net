@@ -7,6 +7,7 @@ use Illuminate\Auth\Events\Logout;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
 
+// Don't extend BaseEvent - we don't want to queue because this needs to happen before we return to the client.
 class LogOutOfWiki
 {
     /**

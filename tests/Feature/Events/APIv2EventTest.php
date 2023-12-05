@@ -6,7 +6,6 @@ use App\Device;
 use App\Group;
 use App\Network;
 use App\Party;
-use App\Role;
 use App\User;
 use Carbon\Carbon;
 use DB;
@@ -208,6 +207,34 @@ class APIv2EventTest extends TestCase
             [ 'NetworkCoordinator' ],
             [ 'Host' ],
         ];
+    }
+
+    public function testEditForbidden() {
+        $user1 = User::factory()->host()->create([
+            'api_token' => '1234',
+        ]);
+
+        $this->actingAs($user1);
+
+        $idgroups = $this->createGroup();
+        $id1 = $this->createEvent($idgroups, 'tomorrow');
+
+        $user2 = User::factory()->host()->create([
+            'api_token' => '5678',
+        ]);
+
+        $this->actingAs($user2);
+        $this->expectException(\Symfony\Component\HttpKernel\Exception\HttpException::class);
+        $eventData = Party::factory()->raw([
+            'group' => $idgroups,
+            'event_start_utc' => '2100-01-01T10:15:05+05:00',
+            'event_end_utc' => '2100-01-0113:45:05+05:00',
+            'latitude'=>'1',
+            'longitude'=>'1'
+        ]);
+
+        $eventData['moderate'] = 'approve';
+        $this->patch('/api/v2/events/'.$id1, $this->eventAttributesToAPI($eventData));
     }
 
     public function testCreateEventGeocodeFailure()

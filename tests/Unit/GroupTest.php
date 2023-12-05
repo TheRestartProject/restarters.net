@@ -49,6 +49,7 @@ class GroupTest extends TestCase
 
         $group->addVolunteer($volunteer);
         $volunteer->delete();
+        $this->artisan("queue:work --stop-when-empty");
 
         $this->assertFalse($group->isVolunteer($volunteer->id));
     }

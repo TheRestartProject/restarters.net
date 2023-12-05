@@ -16,6 +16,7 @@ class EditEvent
     use Dispatchable, InteractsWithSockets, SerializesModels;
 
     public $party;
+    public $data;
 
     /**
      * Create a new event instance.
