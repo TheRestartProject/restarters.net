@@ -15,7 +15,7 @@
       {{ percent }}%
     </div>
     <div class="impact-stat-subtitle" v-html="translatedSubtitle" />
-    <div v-if="description" class="impact-stat-description pt-3 m-3" v-html="translatedDescription" />
+    <div v-if="description && count > 0" class="impact-stat-description pt-3 m-3" v-html="translatedDescription" />
     <div class="image d-flex justify-content-around" v-if="image">
       <b-img :src="image" />
     </div>
