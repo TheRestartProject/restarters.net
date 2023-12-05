@@ -15,8 +15,8 @@
       {{ percent }}%
     </div>
     <div class="impact-stat-subtitle" v-html="translatedSubtitle" />
-    <div class="impact-stat-description pt-3 m-3 d-flex" >
-      <span v-if="description && count > 0" v-html="translatedDescription" />
+    <div v-if="description && count > 0" class="impact-stat-description pt-3 m-3 d-flex" >
+      <span v-html="translatedDescription" />
       <span v-if="popover" v-b-popover.html="popover">
       <b-img class="ml-2 icon-info clickable" src="/icons/info_ico_green.svg" />
     </span>
