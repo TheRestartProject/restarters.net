@@ -86,4 +86,12 @@ return [
   'notification_greeting' => 'Hello!',
   'confirm' => 'Confirm',
   'validate_timezone' => 'Please select a valid timezone.',
+  'share_this' => 'Share this',
+  'download' => 'Download',
+  'share_modal_title' => 'Shareable Statistics',
+  'share_modal_intro1' => "We've saved",
+  'share_modal_intro2' => 'of CO2e',
+  'share_modal_intro3' => 'by repairing broken stuff',
+  'share_modal_like1' => "That's like growing about",
+  'share_modal_like2' => "tree seedlings for 10 years.*",
 ];
