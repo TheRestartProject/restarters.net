@@ -1,6 +1,6 @@
 <template>
   <b-modal
-      id="confirmmodal"
+      id="statsmodal"
       v-model="showModal"
       :title="translatedShareTitle"
       no-stacking
@@ -17,16 +17,16 @@
     </template>
     <template slot="modal-footer" slot-scope="{ ok, cancel }">
       <!-- eslint-disable-next-line -->
-      <b-button variant="white" @click="cancel" v-html="translatedCancel" />
+      <b-button variant="white" @click="cancel" v-html="translatedClose" />
       <!-- eslint-disable-next-line -->
-      <b-button variant="primary" @click="confirm" v-html="translatedDownload" />
+      <b-button variant="primary" @click="download" v-html="translatedDownload" />
     </template>
   </b-modal>
 </template>
 <script>
-
 const MARG = 10
 const RADIUS = 8
+const HECTARES = 13501
 
 export default {
   props: {
@@ -42,20 +42,34 @@ export default {
       ctx: null,
       width: 1080,
       height: 1080,
-      backgroundColor: '#0394a6',
       currentCount: null,
       bump: 1,
     }
   },
   computed: {
-    translatedCancel() {
-      return this.$lang.get('partials.cancel')
+    translatedClose() {
+      return this.$lang.get('partials.close')
     },
     translatedDownload() {
       return this.$lang.get('partials.download')
     },
     translatedShareTitle() {
       return this.$lang.get('partials.share_modal_title')
+    },
+    image: function() {
+      if (this.currentCount <= 210) {
+        return 'ImpactRange1'
+      } else if (this.currentCount <= 3300) {
+        return 'ImpactRange2'
+      } else if (this.currentCount <= 6000) {
+        return 'ImpactRange3'
+      } else if (this.currentCount < HECTARES) {
+        return 'ImpactRange4'
+      } else if (this.currentCount <= 192000) {
+        return 'ImpactRange5'
+      } else {
+        return 'ImpactRange6'
+      }
     },
   },
   watch: {
@@ -64,7 +78,7 @@ export default {
     },
     currentCount: function() {
       this.paint()
-    }
+    },
   },
   methods: {
     show() {
@@ -77,9 +91,16 @@ export default {
     hide() {
       this.showModal = false
     },
-    confirm() {
-      this.$emit('confirm')
-      this.hide()
+    download() {
+      try {
+        let link = document.createElement('a');
+        link.download = 'stats.png';
+        link.href = this.canvas.toDataURL()
+        link.click();
+        // this.hide()
+      } catch (e) {
+        console.error('Failed to download', e)
+      }
     },
     async paint() {
       try {
@@ -92,42 +113,56 @@ export default {
         const ctx = this.ctx
         ctx.font = "bold 55px Asap, sans-serif"
 
-        // Set background color
-        ctx.fillStyle = this.backgroundColor;
-        ctx.fillRect(0, 0, canvas.width, canvas.height);
+        // Add background.
+        this.insertImage(this.image, 0, 0, this.width, this.height, function() {
+          let x = 0
+          let y = 100
 
-        let x = 0
-        let y = 100
+          // Get length of the whole line including the kg value.
+          let str = this.currentCount + ' kg'
+          let text = this.$lang.get('partials.share_modal_intro1') + ' ' + str + ' ' + this.$lang.get('partials.share_modal_intro2')
 
-        // Get length of the whole line including the kg value.
-        let str = this.currentCount + ' kg'
-        let text = this.$lang.get('partials.share_modal_intro1') + ' ' + str + ' ' + this.$lang.get('partials.share_modal_intro2')
+          // Use the line height of this as our standard for moving down the image.
+          const lineHeight = ctx.measureText(text).emHeightAscent + ctx.measureText(str).emHeightDescent + MARG * 2
 
-        // Use the line height of this as our standard for moving down the image.
-        const lineHeight = ctx.measureText(text).emHeightAscent + ctx.measureText(str).emHeightDescent + MARG * 2
+          x = this.fillCentredText(this.$lang.get('partials.share_modal_intro1') + ' ', x, y, text)
+          x = this.fillWhiteBlackBox(str, x, y)
+          x = this.fillText(' ' + this.$lang.get('partials.share_modal_intro2'), x, y)
 
-        x = this.fillCentredText(this.$lang.get('partials.share_modal_intro1') + ' ', x, y, text)
-        x = this.fillWhiteBlackBox(str, x, y)
-        x = this.fillText(' ' + this.$lang.get('partials.share_modal_intro2'), x, y)
+          // Next line
+          y += lineHeight
 
-        // Next line
-        y += lineHeight
-        text = this.$lang.get('partials.share_modal_intro3')
-        x = this.fillCentredText(' ' + this.$lang.get('partials.share_modal_intro3'), x, y)
+          text = this.$lang.get('partials.share_modal_intro3')
+          x = this.fillCentredText(' ' + text, x, y)
 
-        // Space for graphical tilde.
-        y += lineHeight
-        y += lineHeight
+          // Wavy divider line.
+          y += 30
+          x = (canvas.width - 292 / 2) / 2
+          this.insertImage('WavyDividerLine', x, y, 292 / 2, 39 / 2)
+          y += 7
 
-        // That's like text
-        y += lineHeight
-        str = this.seedlings(this.currentCount)
-        text = this.$lang.get('partials.share_modal_like1') + ' '
-        x = this.fillCentredText(text, x, y, text + str)
-        x = this.fillWhiteBlackBox(str, x, y)
+          // That's like text
+          y += lineHeight
 
-        y += lineHeight
-        x = this.fillCentredText(this.$lang.get('partials.share_modal_like2'), x, y)
+          if (this.currentCount < HECTARES) {
+            str = this.seedlings(this.currentCount)
+            text = this.$lang.get('partials.share_modal_like1') + ' '
+          } else {
+            str = this.hectares(this.currentCount)
+            text = this.$lang.get('partials.share_modal_like3') + ' '
+          }
+
+          x = this.fillCentredText(text, x, y, text + str)
+          x = this.fillWhiteBlackBox(str, x, y)
+
+          y += lineHeight
+
+          if (this.currentCount < HECTARES) {
+            x = this.fillCentredText(this.$lang.choice('partials.share_modal_like2', str), x, y)
+          } else {
+            x = this.fillCentredText(this.$lang.choice('partials.share_modal_like4', str), x, y)
+          }
+        })
       } catch (e) {
         console.log('Paint error', e)
       }
@@ -135,6 +170,10 @@ export default {
     seedlings(val) {
       // 1 tree is 60 kg.
       return Math.round(val / 60)
+    },
+    hectares(val) {
+      // 1 hectare is 12000 kg.
+      return Math.round(val / 12000)
     },
     fillText(str, x, y, colour) {
       console.log('Fill', str, x, y, colour)
@@ -161,17 +200,32 @@ export default {
     fillWhiteBlackBox(str, x, y) {
       console.log('Fill white on black', str, x, y)
       const ctx = this.ctx
-      // ctx.roundRect(x, y - ctx.measureText(str).emHeightAscent - MARG, ctx.measureText(str).width + MARG * 2, ctx.measureText(str).emHeightAscent + ctx.measureText(str).emHeightDescent + MARG * 2, RADIUS)
-      // ctx.fill()
-      ctx.fillStyle = 'black';
-      ctx.fillRect(x, y - ctx.measureText(str).emHeightAscent - MARG, ctx.measureText(str).width + MARG * 2, ctx.measureText(str).emHeightAscent + ctx.measureText(str).emHeightDescent + MARG * 2)
+      ctx.roundRect(x, y - ctx.measureText(str).emHeightAscent - MARG, ctx.measureText(str).width + MARG * 2, ctx.measureText(str).emHeightAscent + ctx.measureText(str).emHeightDescent + MARG * 2, RADIUS)
+      ctx.fill()
+
+      // Looks like we need a beginPath() to prevent future calls to roundRect working on the same rectangle and
+      // therefore re-filling over what we've written.
+      ctx.beginPath()
 
       x += MARG
       x = this.fillText(str, x, y, 'white')
       x += MARG
 
       return x
-    }
+    },
+    insertImage(name, x, y, width, height, cb) {
+      const ctx = this.ctx
+      const img = new Image()
+      img.src = '/images/' + name + '.png'
+      img.onload = () => {
+        console.log('Loaded', img, x, y, width, height)
+        ctx.drawImage(img, x, y, width, height)
+
+        if (cb) {
+          setTimeout(cb.bind(this), 500)
+        }
+      }
+    },
   }
 }
 </script>

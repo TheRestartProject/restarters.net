@@ -91,7 +91,9 @@ return [
   'share_modal_title' => 'Shareable Statistics',
   'share_modal_intro1' => "We've saved",
   'share_modal_intro2' => 'of CO2e',
-  'share_modal_intro3' => 'by repairing broken stuff',
+  'share_modal_intro3' => 'by repairing broken stuff.',
   'share_modal_like1' => "That's like growing about",
-  'share_modal_like2' => "tree seedlings for 10 years.*",
+  'share_modal_like2' => "tree seedling for 10 years.*|tree seedlings for 10 years.*",
+  'share_modal_like3' => "That's like planting around",
+  'share_modal_like4' => "hectare of trees.*|hectares of trees.*",
 ];
