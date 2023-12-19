@@ -192,7 +192,7 @@ export default {
           let y = this.initialY
 
           // Get length of the whole line including the kg value.
-          let str = this.currentCount + ' kg'
+          let str = parseInt(this.currentCount).toLocaleString() + ' kg'
           let text = this.$lang.get('partials.share_modal_intro1') + ' ' + str + ' ' + this.$lang.get('partials.share_modal_intro2')
 
           // Use the line height of this as our standard for moving down the image.
@@ -257,11 +257,11 @@ export default {
     },
     seedlings(val) {
       // 1 tree is 60 kg.
-      return Math.round(val / 60)
+      return Math.round(val / 60).toLocaleString()
     },
     hectares(val) {
       // 1 hectare is 12000 kg.
-      return Math.round(val / 12000)
+      return Math.round(val / 12000).toLocaleString()
     },
     fillText(str, x, y, colour) {
       console.log('Fill', str, x, y, colour)
@@ -327,6 +327,10 @@ export default {
 }
 </script>
 <style scoped lang="scss">
+@import 'resources/global/css/_variables';
+@import '~bootstrap/scss/functions';
+@import '~bootstrap/scss/variables';
+@import '~bootstrap/scss/mixins/_breakpoints';
 
 .canvas {
   max-width: 100%;
@@ -341,6 +345,15 @@ export default {
   &.active {
     color: white !important;
     background-color: black !important;
+    box-shadow: 5px 5px 0 0 #222 !important;
+  }
+
+  &:not(.active) {
+    z-index: 10;
+  }
+
+  @include media-breakpoint-down(sm) {
+    font-size: 10px;
   }
 }
 
