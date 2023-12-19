@@ -40,6 +40,8 @@ class CheckTranslations extends Command
         // We want to scan all English translations.
         $files = scandir(base_path() . '/lang/en');
 
+        $count = 0;
+
         foreach ($files as $file) {
             if ($file == '_json.php') {
                 // This is a special case used for data from the DB.  Ignore it.
@@ -65,13 +67,17 @@ class CheckTranslations extends Command
                     foreach (['fr-BE', 'fr'] as $other) {
                         // First we want to check if the translation is used in the code.  If it's not, then we
                         // will want to remove it and it doesn't matter if it is not translated properly.
-                        if (!$this->usedInCode("$group.$key")) {
+                        if (strpos("$group.$key", 'groups.tag-') === 0) {
+                            // This is valid - it's used in a constructed way.
+                        } else if (!$this->usedInCode("$group.$key")) {
                             error_log("ERROR: translation key $group.$key not used in code so far as we can tell");
+                            $count++;
                         } else if (!\Lang::has("$group.$key", $other, false)) {
                             // This is an error. If the translated value would be different, then we need to translate
                             // it.  If it would be the same, then the code would work using fallbacks, but we translate
                             // it anyway so that this check doesn't give errors.
                             error_log("ERROR: translation key $group.$key not translated into $other, in English: $value");
+                            $count++;
                         } else {
                             // Occasionally we want to check whether the translated values are the same as the English
                             // ones.  This might either be legit (as above) or might be a cut & paste error.
@@ -80,12 +86,15 @@ class CheckTranslations extends Command
                             // json_encode for comparison as it may be a string or an array.
                             if (json_encode($translated) == json_encode($value)) {
 //                                error_log("ERROR translation key $group.$key in $other is the same as English, " . json_encode($value));
+//                                $count++;
                             }
                         }
                     }
                 }
             }
         }
+
+        return $count;
     }
 
     private function usedInCode($key) {

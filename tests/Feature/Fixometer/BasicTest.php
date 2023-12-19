@@ -38,12 +38,29 @@ class BasicTest extends TestCase
         $this->loginAsTestUser();
         $response = $this->get('/fixometer');
 
-        // No actual cluster info in test environment.
         $clusters = json_encode([
             [
                 'idclusters' => 1,
                 'name' => 'Computers and Home Office',
-                'categories' => [],
+                'categories' => [
+                    0 => [
+                        'idcategories' => 11,
+                        'name' => 'Desktop computer',
+                        'powered' => 1,
+                        'weight' => null,
+                        'footprint' => null,
+                        'footprint_reliability' => null,
+                        'lifecycle' => null,
+                        'lifecycle_reliability' => null,
+                        'extendend_lifecycle' => null,
+                        'extendend_lifecycle_reliability' => null,
+                        'revision' => 2,
+                        'cluster' => 1,
+                        'aggregate' => 0,
+                        'description_short' => '',
+                        'description_long' => '',
+                    ]
+                ]
             ],
             [
                 'idclusters' => 2,

@@ -1,7 +1,6 @@
 <?php
 
 return [
-  'by_date' => 'Op datum',
   'age' => 'Leeftijd',
   'brand' => 'Merk',
   'category' => 'Categorie',
@@ -11,8 +10,6 @@ return [
   'export_device_data' => 'Exporteer de gegevens van de toestellen',
   'fixed' => 'Hersteld',
   'from_date' => 'Vanaf',
-  'from_manufacturer' => 'Van producent',
-  'from_third_party' => 'Van derde partij',
   'graphic-camera' => 'Camera',
   'graphic-comment' => 'Commentaar',
   'group' => 'Groep',
@@ -27,7 +24,6 @@ return [
   'weight' => 'Gewicht',
   'required_impact' => 'kg - required for environmental impact calculation',
   'age_approx' => 'years - approximate, if known',
-  'repair_source' => 'Source of repair information',
   'description_powered' => 'Een elektrisch toestel is alles wat elektriciteit nodig heeft om te werken.',
   'description_unpowered' => 'Een niet-elektrisch voorwerp is alles wat geen elektriciteit nodig heeft om te werken.',
   'powered_items' => 'Elektrische toestellen',

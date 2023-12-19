@@ -21,7 +21,6 @@ return [
   'location' => 'Sede del gruppo',
   'groups_approval_text' => 'Le presentazioni dei gruppi devono essere approvate da un amministratore',
   'group_tag' => 'Etichetta',
-  'group_tag2' => 'Etichetta del gruppo',
   'group_admin_only' => 'Solo per Admin',
   'group_tags' => 'Etichette del gruppo',
   'approve_group' => 'Approva il gruppo',
