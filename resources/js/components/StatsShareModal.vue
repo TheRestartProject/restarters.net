@@ -10,10 +10,18 @@
     <template slot="default">
       For debugging, you can change the value.
       <b-form-input v-model="currentCount" class="mb-4" />
+      <b-button-group class="mb-4 buttons">
+        <b-button variant="primary" size="sm" @click="target = 'Instagram'">Instagram</b-button>
+        <b-button variant="primary" size="sm" @click="target = 'Facebook'">Facebook</b-button>
+        <b-button variant="primary" size="sm" @click="target = 'Twitter'">Twitter</b-button>
+        <b-button variant="primary" size="sm" @click="target = 'LinkedIn'">LinkedIn</b-button>
+      </b-button-group>
       <p>
         This image is {{ width }}x{{ height }} pixels.
       </p>
-      <canvas ref="canvas" :width="width" :height="height" class="canvas" :key="'canvas-' + bump" />
+      <div class="d-flex justify-content-around w-100">
+        <canvas ref="canvas" :width="width" :height="height" class="canvas" :key="'canvas-' + bump" />
+      </div>
     </template>
     <template slot="modal-footer" slot-scope="{ ok, cancel }">
       <!-- eslint-disable-next-line -->
@@ -40,17 +48,42 @@ export default {
       showModal: false,
       canvas: null,
       ctx: null,
-      width: 1080,
-      height: 1080,
       currentCount: null,
       bump: 1,
+      target: 'Instagram'
     }
   },
   computed: {
+    width() {
+      switch (this.target) {
+        case 'Instagram':
+          return 1080
+        case 'Facebook':
+          return 1200
+        case 'Twitter':
+          return 1600
+        case 'LinkedIn':
+          return 1200
+      }
+    },
+    height() {
+      switch (this.target) {
+        case 'Instagram':
+          return 1080
+        case 'Facebook':
+          return 630
+        case 'Twitter':
+          return 900
+        case 'LinkedIn':
+          return 627
+      }
+    },
     translatedClose() {
       return this.$lang.get('partials.close')
     },
     translatedDownload() {
+      // TODO Matomo logging.
+      // TODO Translations.
       return this.$lang.get('partials.download')
     },
     translatedShareTitle() {
@@ -79,6 +112,9 @@ export default {
     currentCount: function() {
       this.paint()
     },
+    target: function() {
+      this.paint()
+    }
   },
   methods: {
     show() {
@@ -232,5 +268,9 @@ export default {
 <style scoped lang="scss">
 .canvas {
   max-width: 100%;
+}
+
+::v-deep .buttons button {
+  font-size: 12px;
 }
 </style>
