@@ -103,5 +103,7 @@ Route::prefix('v2')->group(function() {
         });
 
         Route::get('/items', [API\ItemController::class, 'listItemsv2']);
+
+        Route::get('/alerts', [API\AlertController::class, 'listAlertsv2']);
     });
 });
