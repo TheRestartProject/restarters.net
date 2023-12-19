@@ -7,6 +7,7 @@ use Cookie;
 use Illuminate\Auth\Events\Login;
 use Illuminate\Http\Request;
 
+// Don't extend BaseEvent - we don't want to queue because this needs to happen before we return to the client.
 class LogSuccessfulLogin
 {
     /**

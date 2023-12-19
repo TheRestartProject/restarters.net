@@ -129,6 +129,21 @@ class ExportTest extends TestCase
         self::assertEquals($event2->getEventName(), $row2[1]);
         self::assertEquals($group2->name, $row2[10]);
 
+        $response = $this->get("/export/networks/{$network->id}/events");
+        $response->assertSuccessful();
+        $filename = 'events.csv';
+        $fh = fopen($filename, 'r');
+        fgetcsv($fh);
+        $row2 = fgetcsv($fh);
+        self::assertEquals($event1->getEventName(), $row2[1]);
+        self::assertEquals($group1->name, $row2[10]);
+        $row2 = fgetcsv($fh);
+        self::assertEquals($event2->getEventName(), $row2[1]);
+        self::assertEquals($group2->name, $row2[10]);
+        $row2 = fgetcsv($fh);
+        self::assertEquals($event3->getEventName(), $row2[1]);
+        self::assertEquals($group3->name, $row2[10]);
+
         // Export devices.
         $response = $this->get("/export/devices");
         $header = $response->headers->get('content-disposition');

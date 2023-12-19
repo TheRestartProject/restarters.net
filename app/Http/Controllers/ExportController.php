@@ -9,6 +9,7 @@ use App\GroupTags;
 use App\GrouptagsGroups;
 use App\Helpers\Fixometer;
 use App\Helpers\SearchHelper;
+use App\Network;
 use App\Party;
 use App\Search;
 use App\User;
@@ -75,20 +76,21 @@ class ExportController extends Controller
 
         $me = auth()->user();
 
+        // We can't put accented characters into a CSV file, so flatten them.
         $columns = [
-            'Item Type',
-            'Product Category',
-            'Brand',
-            'Model',
-            'Comments',
-            'Repair Status',
-            'Spare parts (needed/used)',
-            'Event',
-            'Group',
-            'Date',
-            'Waste Prevented',
-            'CO2 Prevented',
-            'Powered'
+            iconv('UTF-8', 'ASCII//TRANSLIT', __('devices.item_type_short')),
+            iconv('UTF-8', 'ASCII//TRANSLIT', __('devices.category')),
+            iconv('UTF-8', 'ASCII//TRANSLIT', __('devices.brand')),
+            iconv('UTF-8', 'ASCII//TRANSLIT', __('devices.model')),
+            iconv('UTF-8', 'ASCII//TRANSLIT', __('devices.title_assessment')),
+            iconv('UTF-8', 'ASCII//TRANSLIT', __('devices.repair_status')),
+            iconv('UTF-8', 'ASCII//TRANSLIT', __('devices.spare_parts')),
+            iconv('UTF-8', 'ASCII//TRANSLIT', __('events.event')),
+            iconv('UTF-8', 'ASCII//TRANSLIT', __('groups.group')),
+            iconv('UTF-8', 'ASCII//TRANSLIT', __('events.event_date')),
+            iconv('UTF-8', 'ASCII//TRANSLIT', __('events.stat-7')),
+            iconv('UTF-8', 'ASCII//TRANSLIT', __('events.stat-6')),
+            iconv('UTF-8', 'ASCII//TRANSLIT', ucfirst(__('devices.title_powered')))
         ];
 
         fputcsv($file, $columns);
@@ -149,20 +151,36 @@ class ExportController extends Controller
     {
         $group = Group::findOrFail($idgroups);
         $parties = $group->parties()->undeleted()->get();
+        return $this->exportEvents($parties);
+    }
 
+    public function networkEvents(Request $request, $id)
+    {
+        $network = Network::findOrFail($id);
+        $parties = collect([]);
+
+        foreach ($network->groups as $group) {
+            $parties = $parties->merge($group->parties()->undeleted()->get());
+        }
+
+        return $this->exportEvents($parties);
+    }
+
+    private function exportEvents($parties) {
+        // We can't put accented characters into a CSV file, so flatten them.
         $headers = [
-                __('groups.export.events.date'),
-                __('groups.export.events.event'),
-                __('groups.export.events.volunteers'),
-                __('groups.export.events.participants'),
-                __('groups.export.events.items_total'),
-                __('groups.export.events.items_fixed'),
-                __('groups.export.events.items_repairable'),
-                __('groups.export.events.items_end_of_life'),
-                __('groups.export.events.items_kg_waste_prevented'),
-                __('groups.export.events.items_kg_co2_prevent'),
-                __('groups.export.events.group'),
-            ];
+            iconv('UTF-8', 'ASCII//TRANSLIT', __('groups.export.events.date')),
+            iconv('UTF-8', 'ASCII//TRANSLIT', __('groups.export.events.event')),
+            iconv('UTF-8', 'ASCII//TRANSLIT', __('groups.export.events.volunteers')),
+            iconv('UTF-8', 'ASCII//TRANSLIT', __('groups.export.events.participants')),
+            iconv('UTF-8', 'ASCII//TRANSLIT', __('groups.export.events.items_total')),
+            iconv('UTF-8', 'ASCII//TRANSLIT', __('groups.export.events.items_fixed')),
+            iconv('UTF-8', 'ASCII//TRANSLIT', __('groups.export.events.items_repairable')),
+            iconv('UTF-8', 'ASCII//TRANSLIT', __('groups.export.events.items_end_of_life')),
+            iconv('UTF-8', 'ASCII//TRANSLIT', __('groups.export.events.items_kg_waste_prevented')),
+            iconv('UTF-8', 'ASCII//TRANSLIT', __('groups.export.events.items_kg_co2_prevent')),
+            iconv('UTF-8', 'ASCII//TRANSLIT', __('groups.export.events.group'))
+        ];
 
         // Send these to getEventStats() to speed things up a bit.
         $eEmissionRatio = \App\Helpers\LcaStats::getEmissionRatioPowered();
@@ -187,7 +205,7 @@ class ExportController extends Controller
                 $stats['dead_devices'],
                 $stats['waste_powered'] + $stats['waste_unpowered'],
                 $stats['co2_powered'] + $stats['co2_unpowered'],
-                $party->theGroup && $party->theGroup->name ? $party->theGroup->name : '?',
+                iconv('UTF-8', 'ASCII//TRANSLIT', $party->theGroup && $party->theGroup->name ? $party->theGroup->name : '?'),
             ];
         }
 

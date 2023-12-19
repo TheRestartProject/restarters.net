@@ -56,6 +56,7 @@ class InviteGroupTest extends TestCase
         // Create an event.  Should not generate a notification to users who are invited but not yet accepted.
         $idevents = $this->createEvent($group->idgroups, 'tomorrow');
         Party::find($idevents)->approve();
+        $this->artisan("queue:work --stop-when-empty");
 
         Notification::assertNotSentTo(
             [$user], NotifyRestartersOfNewEvent::class
@@ -121,6 +122,7 @@ class InviteGroupTest extends TestCase
         $this->actingAs($host);
         $idevents = $this->createEvent($group->idgroups, '+7 day');
         Party::find($idevents)->approve();
+        $this->artisan("queue:work --stop-when-empty");
 
         Notification::assertSentTo(
             [$user], NotifyRestartersOfNewEvent::class

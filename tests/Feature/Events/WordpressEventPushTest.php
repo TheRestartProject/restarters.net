@@ -18,12 +18,17 @@ use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Notification;
 use Mockery;
 use Tests\TestCase;
+use Illuminate\Support\Facades\Queue;
 
 class WordpressEventPushTest extends TestCase
 {
     protected function setUp(): void
     {
         parent::setUp();
+
+        // These tests are hard to get working with genuinely queued events, so use the sync queue.
+        $queueManager = $this->app['queue'];
+        $queueManager->setDefaultDriver('sync');
     }
 
     /** @test */

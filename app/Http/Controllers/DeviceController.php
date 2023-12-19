@@ -63,7 +63,6 @@ class DeviceController extends Controller
             'clusters' => $clusters,
             'barriers' => \App\Helpers\Fixometer::allBarriers(),
             'brands' => $brands,
-            'item_types' => Device::getItemTypes(),
         ]);
     }
 
@@ -170,10 +169,10 @@ class DeviceController extends Controller
             event(new DeviceCreatedOrUpdated($device[$i]));
 
             // Update barriers
-            if (isset($barrier) && ! empty($barrier) && $repair_status == 3) { // Only sync when repair status is end-of-life
+            if (isset($barrier) && ! empty($barrier) && $repair_status == Device::REPAIR_STATUS_ENDOFLIFE) {
                Device::find($device[$i]->iddevices)->barriers()->sync($barrier);
             } else {
-                Device::find($device[$i]->iddevices)->barriers()->sync([]);
+               Device::find($device[$i]->iddevices)->barriers()->sync([]);
             }
 
             // If the number of devices exceeds set amount then show the following message
@@ -195,8 +194,8 @@ class DeviceController extends Controller
 
             $barriers = [];
 
-            foreach ($device[$i]->barriers as $barrier) {
-                $barriers[] = $barrier->id;
+            foreach ($device[$i]->barriers as $b) {
+                $barriers[] = $b->id;
             }
 
             $device[$i]->barrier = $barriers;
@@ -340,8 +339,8 @@ class DeviceController extends Controller
 
             $barriers = [];
 
-            foreach ($device->barriers as $barrier) {
-                $barriers[] = $barrier->id;
+            foreach ($device->barriers as $b) {
+                $barriers[] = $b->id;
             }
 
             $device->barrier = $barriers;

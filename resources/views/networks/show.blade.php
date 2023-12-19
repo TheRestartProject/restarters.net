@@ -54,6 +54,7 @@
                                         @can('associateGroups', $network)
                                         <button data-toggle="modal" data-target="#network-add-group" class="dropdown-item">@lang('networks.show.add_groups_menuitem')</button>
                                         @endcan
+                                        <a class="dropdown-item" href="/export/networks/{{ $network->id }}/events">@lang('groups.export_event_list')</a>
                                     </div>
                                 </div>
                                 @endif

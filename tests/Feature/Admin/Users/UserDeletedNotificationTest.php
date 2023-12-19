@@ -24,6 +24,8 @@ class UserDeletedNotificationTest extends TestCase
         $restarter = User::factory()->restarter()->create();
         $restarter->delete();
 
+        $this->artisan("queue:work --stop-when-empty");
+
         Notification::assertSentTo(
             [$admins], AdminUserDeleted::class
         );

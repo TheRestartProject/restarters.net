@@ -91,7 +91,6 @@ class BasicTest extends TestCase
                 ':clusters' => $clusters,
                 ':brands' => '[]',
                 ':barrier-list' => '[{"id":1,"barrier":"Spare parts not available"},{"id":2,"barrier":"Spare parts too expensive"},{"id":3,"barrier":"No way to open the product"},{"id":4,"barrier":"Repair information not available"},{"id":5,"barrier":"Lack of equipment"}]',
-                ':item-types' => '[]',
                 ':is-admin' => 'false',
             ],
         ]);
