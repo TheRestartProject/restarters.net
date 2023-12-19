@@ -11,12 +11,12 @@
       For debugging, you can change the value.
       <b-form-input v-model="currentCount" class="mb-4" />
       <b-button-group class="mb-4 buttons">
-        <b-button variant="primary" size="sm" @click="target = 'Instagram'">Instagram</b-button>
-        <b-button variant="primary" size="sm" @click="target = 'Facebook'">Facebook</b-button>
-        <b-button variant="primary" size="sm" @click="target = 'Twitter'">Twitter</b-button>
-        <b-button variant="primary" size="sm" @click="target = 'LinkedIn'">LinkedIn</b-button>
+        <b-button variant="primary" :class="{ 'active': target === 'Instagram'}" size="sm" @click="target = 'Instagram'">Instagram</b-button>
+        <b-button variant="primary" :class="{ 'active': target === 'Facebook'}" size="sm" @click="target = 'Facebook'">Facebook</b-button>
+        <b-button variant="primary" :class="{ 'active': target === 'Twitter'}" size="sm" @click="target = 'Twitter'">Twitter</b-button>
+        <b-button variant="primary" :class="{ 'active': target === 'LinkedIn'}" size="sm" @click="target = 'LinkedIn'">LinkedIn</b-button>
       </b-button-group>
-      <p>
+      <p class="text-muted small">
         This image is {{ width }}x{{ height }} pixels.
       </p>
       <div class="d-flex justify-content-around w-100">
@@ -89,21 +89,58 @@ export default {
     translatedShareTitle() {
       return this.$lang.get('partials.share_modal_title')
     },
+    portrait() {
+      return this.target === 'Instagram'
+    },
     image: function() {
+      let ret = null
+
       if (this.currentCount <= 210) {
-        return 'ImpactRange1'
+        ret = 'ImpactRange1'
       } else if (this.currentCount <= 3300) {
-        return 'ImpactRange2'
+        ret = 'ImpactRange2'
       } else if (this.currentCount <= 6000) {
-        return 'ImpactRange3'
+        ret = 'ImpactRange3'
       } else if (this.currentCount < HECTARES) {
-        return 'ImpactRange4'
+        ret = 'ImpactRange4'
       } else if (this.currentCount <= 192000) {
-        return 'ImpactRange5'
+        ret = 'ImpactRange5'
       } else {
-        return 'ImpactRange6'
+        ret = 'ImpactRange6'
+      }
+
+      if (this.portrait) {
+        ret += 'Portrait'
+      } else {
+        ret += 'Landscape'
+      }
+
+      return ret
+    },
+    fontSize() {
+      switch (this.target) {
+        case 'Instagram':
+          return 55
+        case 'Facebook':
+          return 40
+        case 'Twitter':
+          return 52
+        case 'LinkedIn':
+          return 40
       }
     },
+    initialY() {
+      switch (this.target) {
+        case 'Instagram':
+          return 100
+        case 'Facebook':
+          return this.canvas.height / 5
+        case 'Twitter':
+          return this.canvas.height / 5
+        case 'LinkedIn':
+          return this.canvas.height / 5
+      }
+    }
   },
   watch: {
     count: function() {
@@ -147,12 +184,12 @@ export default {
         this.ctx = this.canvas.getContext('2d')
         const canvas = this.canvas
         const ctx = this.ctx
-        ctx.font = "bold 55px Asap, sans-serif"
+        ctx.font = "bold " + this.fontSize + "px Asap, sans-serif"
 
         // Add background.
         this.insertImage(this.image, 0, 0, this.width, this.height, function() {
           let x = 0
-          let y = 100
+          let y = this.initialY
 
           // Get length of the whole line including the kg value.
           let str = this.currentCount + ' kg'
@@ -169,13 +206,28 @@ export default {
           y += lineHeight
 
           text = this.$lang.get('partials.share_modal_intro3')
-          x = this.fillCentredText(' ' + text, x, y)
+          x = this.fillCentredText(text, x, y)
 
           // Wavy divider line.
-          y += 30
-          x = (canvas.width - 292 / 2) / 2
+          if (this.portrait) {
+            y += 30
+          } else {
+            y += canvas.height / 5
+          }
+
+          if (this.portrait) {
+            x = (canvas.width - 292 / 2) / 2
+          } else {
+            x = canvas.width / 20
+          }
+
           this.insertImage('WavyDividerLine', x, y, 292 / 2, 39 / 2)
-          y += 7
+
+          if (this.portrait) {
+            y += 7
+          } else {
+            y += canvas.height / 5
+          }
 
           // That's like text
           y += lineHeight
@@ -229,8 +281,17 @@ export default {
     fillCentredText(text, x, y, wholeLine) {
       console.log('Fill centred', text, x, y, wholeLine)
       const length = this.ctx.measureText(wholeLine ? wholeLine : text).width
-      x = (this.canvas.width - length) / 2;
+
+      if (this.portrait) {
+        // Text should be centred on portait images.
+        x = (this.canvas.width - length) / 2;
+      } else {
+        // Text should be left-aligned. on landscape images.
+        x = this.canvas.width / 40
+      }
+
       x = this.fillText(text, x, y)
+
       return x
     },
     fillWhiteBlackBox(str, x, y) {
@@ -266,11 +327,21 @@ export default {
 }
 </script>
 <style scoped lang="scss">
+
 .canvas {
   max-width: 100%;
 }
 
 ::v-deep .buttons button {
   font-size: 12px;
+
+  color: black !important;
+  background-color: white !important;
+
+  &.active {
+    color: white !important;
+    background-color: black !important;
+  }
 }
+
 </style>
