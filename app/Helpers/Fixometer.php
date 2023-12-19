@@ -179,6 +179,34 @@ class Fixometer
         return false;
     }
 
+    public static function userCanApproveEvent($eventId, $userId = null, $groupId = null)
+    {
+        if (is_null($userId)) {
+            $userId = Auth::user()->id;
+        }
+        $user = User::find($userId);
+
+        if (self::hasRole($user, 'Administrator')) {
+            return true;
+        }
+
+        if (self::hasRole($user, 'NetworkCoordinator')) {
+            if ($groupId) {
+                $group = Group::find($groupId);
+            } else {
+                $group = Party::find($eventId)->theGroup;
+            }
+
+            foreach ($group->networks as $network) {
+                if ($network->coordinators->contains($user)) {
+                    return true;
+                }
+            }
+        }
+
+        return false;
+    }
+
     public static function userHasEditEventsDevicesPermission($partyId, $userId = null)
     {
         if (is_null($userId)) {
