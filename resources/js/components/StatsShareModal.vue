@@ -83,7 +83,6 @@ export default {
       return this.$lang.get('partials.close')
     },
     translatedDownload() {
-      // TODO Matomo logging.
       // TODO Translations.
       return this.$lang.get('partials.download')
     },
@@ -158,6 +157,8 @@ export default {
     show() {
       this.showModal = true
       this.currentCount = this.count
+      const _paq = window._paq = window._paq || [];
+      _paq.push(['trackEvent', 'ShareStats', 'ClickedOnButton']);
     },
     shown() {
       this.paint()
@@ -167,6 +168,9 @@ export default {
     },
     download() {
       try {
+        const _paq = window._paq = window._paq || [];
+        _paq.push(['trackEvent', 'ShareStats', 'Download', this.target]);
+
         let link = document.createElement('a');
         link.download = 'stats.png';
         link.href = this.canvas.toDataURL()
@@ -255,7 +259,7 @@ export default {
             }
           })
         } catch (e) {
-          console.log('Paint error', e)
+          console.error('Paint error', e)
         }
 
         setTimeout(() => {
@@ -274,8 +278,6 @@ export default {
       return Math.round(val / 12000).toLocaleString()
     },
     fillText(str, x, y, colour) {
-      console.log('Fill', str, x, y, colour)
-      const canvas = this.canvas
       const ctx = this.ctx
 
       // Write the text.
@@ -285,11 +287,9 @@ export default {
 
       // Return where we're up to.
       x += ctx.measureText(str).width
-      console.log('Returning x', x)
       return x
     },
     fillCentredText(text, x, y, wholeLine) {
-      console.log('Fill centred', text, x, y, wholeLine)
       const length = this.ctx.measureText(wholeLine ? wholeLine : text).width
 
       if (this.portrait) {
@@ -305,7 +305,6 @@ export default {
       return x
     },
     fillWhiteBlackBox(str, x, y) {
-      console.log('Fill white on black', str, x, y)
       const ctx = this.ctx
       ctx.roundRect(x, y - ctx.measureText(str).emHeightAscent - MARG, ctx.measureText(str).width + MARG * 2, ctx.measureText(str).emHeightAscent + ctx.measureText(str).emHeightDescent + MARG * 2, RADIUS)
       ctx.fill()
@@ -325,7 +324,6 @@ export default {
       const img = new Image()
       img.src = '/images/' + name + '.png'
       img.onload = () => {
-        console.log('Loaded', img, x, y, width, height)
         ctx.drawImage(img, x, y, width, height)
 
         if (cb) {
