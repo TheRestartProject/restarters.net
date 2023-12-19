@@ -161,18 +161,28 @@ class AccountCreationTest extends TestCase
     public function testAdminCreate()
     {
         $this->loginAsTestUser(Role::ADMINISTRATOR);
+        $idgroups = $this->createGroup();
 
         $userAttributes = $this->userAttributes();
         $response = $this->post('/user/create', [
             'name' => $userAttributes['name'],
             'email' => $userAttributes['email'],
             'role' => Role::RESTARTER,
+            'groups' => [ $idgroups ]
         ]);
 
         $response->assertSee('User created correctly');
         $this->assertDatabaseHas('users', [
             'email' => $userAttributes['email'],
         ]);
+
+        // Create again - should fail.
+        $response = $this->post('/user/create', [
+            'name' => $userAttributes['name'],
+            'email' => $userAttributes['email'],
+            'role' => Role::RESTARTER,
+        ]);
+        $response->assertSee('alert-danger');
     }
 
     public function testValidationFail()
@@ -182,6 +192,31 @@ class AccountCreationTest extends TestCase
         $response = $this->post('/user/register/', $userAttributes);
 
         $response->assertStatus(302);
-        $response->assertSessionHas('errors');
+    }
+
+    /**
+     * @dataProvider missingProvider
+     */
+    public function testAdminCreateErrors($remove)
+    {
+        $this->loginAsTestUser(Role::ADMINISTRATOR);
+
+        $userAttributes = $this->userAttributes();
+        $atts =  [
+            'name' => $userAttributes['name'],
+            'email' => $userAttributes['email'],
+            'role' => Role::RESTARTER,
+        ];
+        unset($atts[$remove]);
+        $response = $this->post('/user/create', $atts);
+        $response->assertSee('alert-danger');
+    }
+
+    public function missingProvider() {
+        return [
+            [ 'email' ],
+            [ 'role' ],
+            [ 'name' ],
+        ];
     }
 }

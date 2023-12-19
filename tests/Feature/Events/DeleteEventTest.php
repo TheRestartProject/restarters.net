@@ -51,6 +51,11 @@ class DeleteEventTest extends TestCase
         $event = Party::factory()->create(['wordpress_post_id' => 1, 'approved' => true, 'group' => $group->idgroups]);
         $event->save();
 
+        // Check the outbound controller info works.
+        $response = $this->get("/outbound/info/party/{$event->idevents}");
+        $response->assertSuccessful();
+        $response->assertSeeText('or like the manufacture');
+
         // Add a volunteer so that we get some stats.
         $user = User::factory()->restarter()->create();
         $this->actingAs($user);

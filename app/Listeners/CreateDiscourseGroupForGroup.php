@@ -10,7 +10,7 @@ use App\UserGroups;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Lang;
 
-class CreateDiscourseGroupForGroup
+class CreateDiscourseGroupForGroup extends BaseEvent
 {
     /**
      * Create the event listener.

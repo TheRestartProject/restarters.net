@@ -1102,18 +1102,18 @@ class UserController extends Controller
                 $items['Users'] = route('users');
                 $items['Roles'] = route('roles');
                 $items[Lang::get('networks.general.networks')] = route('networks.index');
+            }
 
-                if ($user->hasPermission('verify-translation-access')) {
-                    $items['Translations'] = url('/translations/view/admin');
-                }
+            if ($user->hasPermission('verify-translation-access')) {
+                $items['Translations'] = url('/translations/view/admin');
+            }
 
-                if ($user->hasRole('NetworkCoordinator')) {
-                    if (count($user()->networks) == 1) {
-                        $network = Auth::user()->networks->first();
-                        $items[Lang::get('networks.general.particular_network', ['networkName' => $network->name])] = route('networks.show', $network->id);
-                    } else {
-                        $items[Lang::get('networks.general.networks')] = route('networks.index');
-                    }
+            if ($user->hasRole('NetworkCoordinator')) {
+                if (count($user->networks) == 1) {
+                    $network = Auth::user()->networks->first();
+                    $items[Lang::get('networks.general.particular_network', ['networkName' => $network->name])] = route('networks.show', $network->id);
+                } else {
+                    $items[Lang::get('networks.general.networks')] = route('networks.index');
                 }
             }
 

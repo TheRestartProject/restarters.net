@@ -8,6 +8,7 @@ use DB;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Str;
 use OwenIt\Auditing\Contracts\Auditable;
+use Cache;
 
 class Device extends Model implements Auditable
 {
@@ -430,43 +431,50 @@ class Device extends Model implements Auditable
         // used by the item types.
         //
         // MAX is used to suppress errors when SQL mode is not set to ONLY_FULL_GROUP_BY.
-        $types = DB::select(DB::raw("
+        //
+        // This is slow and the results don't change much, so we use a cache.
+        if (Cache::has('item_types')) {
+            $types = Cache::get('item_types');
+        } else {
+            $types = DB::select(DB::raw("
             SELECT TRIM(item_type) AS item_type,
                    MAX(powered)      AS powered,
                    MAX(idcategories) AS idcategories,
                    MAX(categoryname) AS categoryname
-            FROM   (SELECT DISTINCT s.*
+                FROM   (SELECT DISTINCT s.*
                     FROM   (SELECT TRIM(item_type) AS item_type,
                                    MAX(powered)      AS powered,
                                    MAX(idcategories) AS idcategories,
-                                   categories.name         AS categoryname,
-                                   COUNT(*)                AS count
-                            FROM   devices
-                                   INNER JOIN categories
-                                           ON devices.category = categories.idcategories
-                            WHERE  item_type IS NOT NULL
-                            GROUP  BY categoryname,
+                                       categories.name         AS categoryname,
+                                       COUNT(*)                AS count
+                                FROM   devices
+                                       INNER JOIN categories
+                                               ON devices.category = categories.idcategories
+                                WHERE  item_type IS NOT NULL
+                                GROUP  BY categoryname,
                                       UPPER(item_type)) s
                            JOIN (SELECT TRIM(item_type) AS item_type,
-                                        MAX(count) AS maxcount
+                                            MAX(count) AS maxcount
                                  FROM   (SELECT TRIM(item_type)   AS item_type,
                                                 MAX(powered)      AS powered,
                                                 MAX(idcategories) AS idcategories,
-                                                categories.name         AS categoryname,
-                                                COUNT(*)                AS count
-                                         FROM   devices
-                                                INNER JOIN categories
-                                                        ON devices.category =
-                                                           categories.idcategories
-                                         WHERE  item_type IS NOT NULL
-                                         GROUP  BY categoryname,
+                                                    categories.name         AS categoryname,
+                                                    COUNT(*)                AS count
+                                             FROM   devices
+                                                    INNER JOIN categories
+                                                            ON devices.category =
+                                                               categories.idcategories
+                                             WHERE  item_type IS NOT NULL
+                                             GROUP  BY categoryname,
                                                    UPPER(item_type)) s
                                  GROUP  BY UPPER(s.item_type)) AS m
                              ON UPPER(s.item_type) = UPPER(m.item_type)
-                                AND s.count = m.maxcount) t
+                                    AND s.count = m.maxcount) t
             GROUP BY UPPER(t.item_type)
             HAVING LENGTH(item_type) > 0
-"));
+            "));
+            \Cache::put('item_types', $types, 24 * 3600);
+        }
 
         return $types;
     }

@@ -63,15 +63,6 @@ class Fixometer
         return false;
     }
 
-    public static function barChartValue($portion, $total)
-    {
-        if ((int) $portion > 0) {
-            return round((($portion / $total) * 100), 2) - 15;
-        }
-
-        return -15;
-    }
-
     public static function featureIsEnabled($feature)
     {
         return $feature === true;
@@ -178,34 +169,6 @@ class Fixometer
         }
 
         if (self::hasRole($user, 'NetworkCoordinator')) {
-            foreach ($group->networks as $network) {
-                if ($network->coordinators->contains($user)) {
-                    return true;
-                }
-            }
-        }
-
-        return false;
-    }
-
-    public static function userCanApproveEvent($eventId, $userId = null, $groupId = null)
-    {
-        if (is_null($userId)) {
-            $userId = Auth::user()->id;
-        }
-        $user = User::find($userId);
-
-        if (self::hasRole($user, 'Administrator')) {
-            return true;
-        }
-
-        if (self::hasRole($user, 'NetworkCoordinator')) {
-            if ($groupId) {
-                $group = Group::find($groupId);
-            } else {
-                $group = Party::find($eventId)->theGroup;
-            }
-
             foreach ($group->networks as $network) {
                 if ($network->coordinators->contains($user)) {
                     return true;

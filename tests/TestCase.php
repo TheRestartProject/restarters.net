@@ -94,8 +94,6 @@ abstract class TestCase extends BaseTestCase
             $network->name = 'Restarters';
             $network->shortname = 'restarters';
             $network->save();
-        } else {
-            error_log("Got network");
         }
 
         $this->withoutExceptionHandling();
@@ -117,6 +115,10 @@ abstract class TestCase extends BaseTestCase
 
         $this->processQueuedNotifications();
         $this->OpenAPIValidator = ValidatorBuilder::fromJson(storage_path('api-docs/api-docs.json'))->getValidator();
+
+        // Some tests may override the queue.
+        $queueManager = $this->app['queue'];
+        $queueManager->setDefaultDriver('database');
 
         // Clear any jobs queued in earlier tests.
         $max = 1000;

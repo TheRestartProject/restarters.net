@@ -8,7 +8,7 @@ use App\Events\UserRegistered;
 use App\Services\DiscourseService;
 use Illuminate\Support\Facades\Log;
 
-class DiscourseUserEventSubscriber
+class DiscourseUserEventSubscriber extends BaseEvent
 {
     private $discourseClient;
     private $discourseService;

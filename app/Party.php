@@ -4,10 +4,6 @@ namespace App;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use App\Events\ApproveEvent;
-use App\EventUsers;
-use App\Helpers\Fixometer;
-use App\Notifications\NotifyRestartersOfNewEvent;
-use App\Notifications\EventConfirmed;
 use Auth;
 use Carbon\Carbon;
 use DB;
@@ -136,49 +132,6 @@ class Party extends Model implements Auditable
     public function deleteUserList($party)
     {
         return DB::delete(DB::raw('DELETE FROM `events_users` WHERE `event` = :party'), ['party' => $party]);
-    }
-
-    public function ofTheseGroups($groups = 'admin', $only_past = false, $devices = false)
-    {
-        //Tested
-        $sql = 'SELECT
-                    *,
-	`e`.`venue` AS `venue`, `e`.`link` AS `link`, `e`.`location` as `location`,
-                    `g`.`name` AS group_name,
-                    UNIX_TIMESTAMP(e.`event_start_utc`) AS `event_timestamp`
-                FROM `'.$this->table.'` AS `e`
-
-                    INNER JOIN `groups` as `g` ON `e`.`group` = `g`.`idgroups`
-
-                    LEFT JOIN (
-                        SELECT COUNT(`dv`.`iddevices`) AS `device_count`, `dv`.`event`
-                        FROM `devices` AS `dv`
-                        GROUP BY  `dv`.`event`
-                    ) AS `d` ON `d`.`event` = `e`.`idevents` ';
-        if (is_array($groups) && $groups != 'admin') {
-            $sql .= ' WHERE `e`.`group` IN ('.implode(', ', $groups).') ';
-        }
-
-        if ($only_past) {
-            $sql .= ' AND `e`.`event_end_utc` < NOW()';
-        }
-
-        $sql .= ' ORDER BY `e`.`event_start_utc` DESC';
-
-        try {
-            $parties = DB::select(DB::raw($sql));
-        } catch (\Illuminate\Database\QueryException $e) {
-            dd($e);
-        }
-
-        if ($devices) {
-            $devices = new Device;
-            foreach ($parties as $i => $party) {
-                $parties[$i]->devices = $devices->ofThisEvent($party->idevents);
-            }
-        }
-
-        return $parties;
     }
 
     public function ofThisGroup($group = 'admin', $only_past = false, $devices = false)
@@ -394,13 +347,6 @@ class Party extends Model implements Auditable
       ->groupBy('events.idevents')
       ->orderBy('events.event_start_utc', 'ASC')
       ->orderBy('distance', 'ASC');
-    }
-
-    public function scopeRequiresModeration($query)
-    {
-        $query = $query->future();
-        $query = $query->where('approved', false);
-        return $query;
     }
 
     public function allDevices()
@@ -714,19 +660,6 @@ class Party extends Model implements Auditable
         return $this->pax;
     }
 
-    public function checkForMissingData()
-    {
-        $participants_count = $this->participants;
-        $volunteers_count = $this->allConfirmedVolunteers->count();
-        $devices_count = $this->allDevices->count();
-
-        return [
-            'participants_count' => $participants_count,
-            'volunteers_count' => $volunteers_count,
-            'devices_count' => $devices_count,
-        ];
-    }
-
     public function requiresModerationByAdmin()
     {
         if ($this->approved) {
@@ -794,35 +727,6 @@ class Party extends Model implements Auditable
 
     public function approve()
     {
-        $group = Group::findOrFail($this->group);
-
-        // Only send notifications if the event is in the future.
-        // We don't want to send emails to Restarters about past events being added.
-        if ($this->isUpcoming()) {
-            $group_restarters = $group->membersRestarters();
-
-            // If there are restarters against the group
-            if ($group_restarters->count()) {
-                // Send user a notification and email
-                Notification::send($group_restarters->get(), new NotifyRestartersOfNewEvent([
-                                                                                         'event_venue' => $this->venue,
-                                                                                         'event_url' => url('/party/view/'.$this->idevents),
-                                                                                         'event_group' => $group->name,
-                                                                                     ]));
-            }
-        }
-
-        // Notify the person who created it that it has now been approved.
-        $eu = EventsUsers::where('event', $this->idevents)->orderBy('idevents_users')->first();
-
-        if ($eu) {
-            $host = User::find($eu->user);
-
-            if ($host) {
-                Notification::send($host, new EventConfirmed($this));
-            }
-        }
-
         event(new ApproveEvent($this));
     }
 

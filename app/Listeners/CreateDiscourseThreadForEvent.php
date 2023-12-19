@@ -8,7 +8,7 @@ use App\Party;
 use App\User;
 use Illuminate\Support\Facades\Log;
 
-class CreateDiscourseThreadForEvent
+class CreateDiscourseThreadForEvent extends BaseEvent
 {
     /**
      * Create the event listener.
