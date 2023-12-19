@@ -55,8 +55,9 @@ class WordpressEventPushTest extends TestCase
         ]);
 
         $event->approve();
-
         $this->artisan("queue:work --stop-when-empty");
+
+        $this->artisan('sync:events');
     }
 
     /** @test */

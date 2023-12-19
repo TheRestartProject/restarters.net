@@ -11,7 +11,6 @@ return [
   'create-new-skill' => 'Create new skill',
   'create-new-tag' => 'Create new tag',
   'create-new-brand' => 'Create new brand',
-  'name' => 'Name',
   'skills_modal_title' => 'Add new skill',
   'tags_modal_title' => 'Add new tag',
   'brand_modal_title' => 'Add new brand',

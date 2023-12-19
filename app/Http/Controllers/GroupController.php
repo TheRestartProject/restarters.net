@@ -182,9 +182,6 @@ class GroupController extends Controller
 
         if ((isset($groupid) && is_numeric($groupid)) || in_array($groupid, $gids)) {
             $group = Group::where('idgroups', $groupid)->first();
-        } elseif (count($groups)) {
-            $group = $groups[0];
-            unset($groups[0]);
         }
 
         if (! $group) {
@@ -666,15 +663,13 @@ class GroupController extends Controller
         }
     }
 
-    // TODO: This is not currently used, so far as I can tell, even though it's referenced from a route.  But
-    // something like this ought to exist, for when we Vue-ify the group edit page.
     public function imageUpload(Request $request, $id)
     {
         try {
             if (isset($_FILES) && ! empty($_FILES)) {
                 $existing_image = Fixometer::hasImage($id, 'groups', true);
                 if (! empty($existing_image)) {
-                    Fixometer::removeImage($id, env('TBL_GROUPS'), $existing_image[0]);
+                    Fixometer::removeImage($id, 'groups', $existing_image[0]);
                 }
                 $file = new FixometerFile;
                 $file->upload('file', 'image', $id, env('TBL_GROUPS'), false, true, true);

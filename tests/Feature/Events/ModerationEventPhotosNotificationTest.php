@@ -49,7 +49,7 @@ class ModerationEventPhotosNotificationTest extends TestCase
 
         $_SERVER['DOCUMENT_ROOT'] = getcwd();
         \FixometerFile::$uploadTesting = TRUE;
-        file_put_contents('/tmp/UT.jpg', file_get_contents('public/images/community.jpg'));
+        file_put_contents('/tmp/UT.jpg', file_get_contents(public_path() .'/images/community.jpg'));
 
         $_FILES = [
             'file' => [

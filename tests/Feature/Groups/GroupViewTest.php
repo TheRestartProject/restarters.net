@@ -18,19 +18,39 @@ class GroupViewTest extends TestCase
         $this->loginAsTestUser(Role::ADMINISTRATOR);
         $id = $this->createGroup();
         $this->assertNotNull($id);
+
+        // Create an event and a fixed device, as this will be used in stats info returned from GroupController.
+        // We want the fixed device to be in a category with a cluster.
+        $event = Party::factory()->create([
+            'group' => $id,
+            'event_start_utc' => Carbon::parse('1pm tomorrow')->toIso8601String(),
+            'event_end_utc' => Carbon::parse('3pm tomorrow')->toIso8601String()
+        ]);
+        $device = Device::factory()->fixed()->create([
+            'category' => 11,
+            'category_creation' => 11,
+            'event' => $event->idevents,
+        ]);
+
+        // View with id.
         $response = $this->get("/group/view/$id");
 
-        $this->assertVueProperties($response, [
+        $props = $this->assertVueProperties($response, [
             [],
             [
                 ':idgroups' => $id,
                 ':canedit' => 'true',
                 ':can-see-delete' => 'true',
-                ':can-perform-delete' => 'true',
-                ':top-devices' => '[]',
-                ':events' => '[]',
+                ':can-perform-delete' => 'false',
+                ':top-devices' => json_encode([
+                    [
+                        'counter' => 1,
+                        'name' => 'Desktop computer'
+                    ]
+                ]),
             ],
         ]);
+        $this->assertEquals(1, count(json_decode($props[1][':events'], TRUE)));
     }
 
     public function testInvalidGroup()
@@ -38,6 +58,13 @@ class GroupViewTest extends TestCase
         $this->loginAsTestUser(Role::RESTARTER);
         $this->expectException(NotFoundHttpException::class);
         $this->get('/group/view/undefined');
+    }
+
+    public function testInvalidGroup2()
+    {
+        $this->loginAsTestUser(Role::RESTARTER);
+        $this->expectException(NotFoundHttpException::class);
+        $this->get('/group/view/1');
     }
 
     public function testCanDelete()

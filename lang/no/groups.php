@@ -21,7 +21,6 @@ return [
   'location' => 'Group location',
   'groups_approval_text' => 'Group submissions need to be approved by an administrator',
   'group_tag' => 'Tag',
-  'group_tag2' => 'Group tag',
   'group_admin_only' => 'Admin only',
   'group_tags' => 'Group tags',
   'approve_group' => 'Approve group',
