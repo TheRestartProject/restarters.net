@@ -338,4 +338,22 @@ class APIv2EventTest extends TestCase
         $json = json_decode($response->getContent(), true);
         assertEquals(null, $json['data']['network_data']);
     }
+
+    public function testNetworkCoordinatorCanApprove() {
+        $network = Network::factory()->create();
+        $group = Group::factory()->create();
+        $network->addGroup($group);
+
+        $event = Party::factory()->create(['group' => $group->idgroups]);
+        $event->save();
+
+        $coordinator = User::factory()->networkCoordinator()->create();
+        $network->addCoordinator($coordinator);
+        $this->actingAs($coordinator);
+
+        $eventData = $event->getAttributes();
+        $eventData['moderate'] = 'approve';
+        $response = $this->patch('/api/v2/events/'.$event->idevents, $this->eventAttributesToAPI($eventData));
+        $response->assertSuccessful();
+    }
 }
