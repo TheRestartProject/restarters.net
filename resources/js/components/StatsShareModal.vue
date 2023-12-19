@@ -11,10 +11,10 @@
       For debugging, you can change the value.
       <b-form-input v-model="currentCount" class="mb-4" />
       <b-button-group class="mb-4 buttons">
-        <b-button variant="primary" :class="{ 'active': target === 'Instagram'}" size="sm" @click="target = 'Instagram'">Instagram</b-button>
-        <b-button variant="primary" :class="{ 'active': target === 'Facebook'}" size="sm" @click="target = 'Facebook'">Facebook</b-button>
-        <b-button variant="primary" :class="{ 'active': target === 'Twitter'}" size="sm" @click="target = 'Twitter'">Twitter</b-button>
-        <b-button variant="primary" :class="{ 'active': target === 'LinkedIn'}" size="sm" @click="target = 'LinkedIn'">LinkedIn</b-button>
+        <b-button :disabled="painting" variant="primary" :class="{ 'active': target === 'Instagram'}" size="sm" @click="target = 'Instagram'">Instagram</b-button>
+        <b-button :disabled="painting" variant="primary" :class="{ 'active': target === 'Facebook'}" size="sm" @click="target = 'Facebook'">Facebook</b-button>
+        <b-button :disabled="painting" variant="primary" :class="{ 'active': target === 'Twitter'}" size="sm" @click="target = 'Twitter'">Twitter</b-button>
+        <b-button :disabled="painting" variant="primary" :class="{ 'active': target === 'LinkedIn'}" size="sm" @click="target = 'LinkedIn'">LinkedIn</b-button>
       </b-button-group>
       <p class="text-muted small">
         This image is {{ width }}x{{ height }} pixels.
@@ -50,7 +50,8 @@ export default {
       ctx: null,
       currentCount: null,
       bump: 1,
-      target: 'Instagram'
+      target: 'Instagram',
+      painting: false
     }
   },
   computed: {
@@ -176,83 +177,92 @@ export default {
       }
     },
     async paint() {
-      try {
-        this.bump++
-        await this.$nextTick()
+      if (!this.painting) {
+        try {
+          this.painting = true
+          this.bump++
+          await this.$nextTick()
 
-        this.canvas = this.$refs.canvas
-        this.ctx = this.canvas.getContext('2d')
-        const canvas = this.canvas
-        const ctx = this.ctx
-        ctx.font = "bold " + this.fontSize + "px Asap, sans-serif"
+          this.canvas = this.$refs.canvas
+          this.ctx = this.canvas.getContext('2d')
+          const canvas = this.canvas
+          const ctx = this.ctx
+          ctx.font = "bold " + this.fontSize + "px Asap, sans-serif"
 
-        // Add background.
-        this.insertImage(this.image, 0, 0, this.width, this.height, function() {
-          let x = 0
-          let y = this.initialY
+          // Add background.
+          this.insertImage(this.image, 0, 0, this.width, this.height, function() {
+            let x = 0
+            let y = this.initialY
 
-          // Get length of the whole line including the kg value.
-          let str = parseInt(this.currentCount).toLocaleString() + ' kg'
-          let text = this.$lang.get('partials.share_modal_intro1') + ' ' + str + ' ' + this.$lang.get('partials.share_modal_intro2')
+            // Get length of the whole line including the kg value.
+            let str = parseInt(this.currentCount).toLocaleString() + ' kg'
+            let text = this.$lang.get('partials.share_modal_intro1') + ' ' + str + ' ' + this.$lang.get('partials.share_modal_intro2')
 
-          // Use the line height of this as our standard for moving down the image.
-          const lineHeight = ctx.measureText(text).emHeightAscent + ctx.measureText(str).emHeightDescent + MARG * 2
+            // Use the line height of this as our standard for moving down the image.
+            const lineHeight = ctx.measureText(text).emHeightAscent + ctx.measureText(str).emHeightDescent + MARG * 2
 
-          x = this.fillCentredText(this.$lang.get('partials.share_modal_intro1') + ' ', x, y, text)
-          x = this.fillWhiteBlackBox(str, x, y)
-          x = this.fillText(' ' + this.$lang.get('partials.share_modal_intro2'), x, y)
+            x = this.fillCentredText(this.$lang.get('partials.share_modal_intro1') + ' ', x, y, text)
+            x = this.fillWhiteBlackBox(str, x, y)
+            x = this.fillText(' ' + this.$lang.get('partials.share_modal_intro2'), x, y)
 
-          // Next line
-          y += lineHeight
+            // Next line
+            y += lineHeight
 
-          text = this.$lang.get('partials.share_modal_intro3')
-          x = this.fillCentredText(text, x, y)
+            text = this.$lang.get('partials.share_modal_intro3')
+            x = this.fillCentredText(text, x, y)
 
-          // Wavy divider line.
-          if (this.portrait) {
-            y += 30
-          } else {
-            y += canvas.height / 5
-          }
+            // Wavy divider line.
+            if (this.portrait) {
+              y += 30
+            } else {
+              y += canvas.height / 5
+            }
 
-          if (this.portrait) {
-            x = (canvas.width - 292 / 2) / 2
-          } else {
-            x = canvas.width / 20
-          }
+            if (this.portrait) {
+              x = (canvas.width - 292 / 2) / 2
+            } else {
+              x = canvas.width / 20
+            }
 
-          this.insertImage('WavyDividerLine', x, y, 292 / 2, 39 / 2)
+            this.insertImage('WavyDividerLine', x, y, 292 / 2, 39 / 2)
 
-          if (this.portrait) {
-            y += 7
-          } else {
-            y += canvas.height / 5
-          }
+            if (this.portrait) {
+              y += 7
+            } else {
+              y += canvas.height / 5
+            }
 
-          // That's like text
-          y += lineHeight
+            // That's like text
+            y += lineHeight
 
-          if (this.currentCount < HECTARES) {
-            str = this.seedlings(this.currentCount)
-            text = this.$lang.get('partials.share_modal_like1') + ' '
-          } else {
-            str = this.hectares(this.currentCount)
-            text = this.$lang.get('partials.share_modal_like3') + ' '
-          }
+            if (this.currentCount < HECTARES) {
+              str = this.seedlings(this.currentCount)
+              text = this.$lang.get('partials.share_modal_like1') + ' '
+            } else {
+              str = this.hectares(this.currentCount)
+              text = this.$lang.get('partials.share_modal_like3') + ' '
+            }
 
-          x = this.fillCentredText(text, x, y, text + str)
-          x = this.fillWhiteBlackBox(str, x, y)
+            x = this.fillCentredText(text, x, y, text + str)
+            x = this.fillWhiteBlackBox(str, x, y)
 
-          y += lineHeight
+            y += lineHeight
 
-          if (this.currentCount < HECTARES) {
-            x = this.fillCentredText(this.$lang.choice('partials.share_modal_like2', str), x, y)
-          } else {
-            x = this.fillCentredText(this.$lang.choice('partials.share_modal_like4', str), x, y)
-          }
-        })
-      } catch (e) {
-        console.log('Paint error', e)
+            if (this.currentCount < HECTARES) {
+              x = this.fillCentredText(this.$lang.choice('partials.share_modal_like2', str), x, y)
+            } else {
+              x = this.fillCentredText(this.$lang.choice('partials.share_modal_like4', str), x, y)
+            }
+          })
+        } catch (e) {
+          console.log('Paint error', e)
+        }
+
+        setTimeout(() => {
+          // Canvas fettling is not entirely synchronous, so you can get weird artifacts if you switch
+          // buttons too rapidly.  No easy way to fix this entirely, but this will help a lot.
+          this.painting = false
+        }, 2000)
       }
     },
     seedlings(val) {
@@ -354,6 +364,10 @@ export default {
 
   @include media-breakpoint-down(sm) {
     font-size: 10px;
+  }
+
+  @include media-breakpoint-down(xs) {
+    font-size: 8px;
   }
 }
 
