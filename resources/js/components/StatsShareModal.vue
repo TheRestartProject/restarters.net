@@ -105,15 +105,28 @@ export default {
       return this.getImage(this.currentCount)
     },
     fontSize() {
-      switch (this.target) {
-        case 'Instagram':
-          return 55
-        case 'Facebook':
-          return 40
-        case 'Twitter':
-          return 52
-        case 'LinkedIn':
-          return 40
+      if (this.portrait) {
+        switch (this.target) {
+          case 'Instagram':
+            return 55
+          case 'Facebook':
+            return 40
+          case 'Twitter':
+            return 52
+          case 'LinkedIn':
+            return 40
+        }
+      } else {
+        switch (this.target) {
+          case 'Instagram':
+            return 110
+          case 'Facebook':
+            return 50
+          case 'Twitter':
+            return 65
+          case 'LinkedIn':
+            return 45
+        }
       }
     },
     initialY() {
@@ -127,6 +140,9 @@ export default {
         case 'LinkedIn':
           return this.canvas.height / 5
       }
+    },
+    initialX() {
+      return this.portrait ? 0 : this.canvas.width / 20
     }
   },
   watch: {
@@ -170,7 +186,6 @@ export default {
           ret = 'ImpactRange1'
         } else if (thecount <= 3300) {
           ret = 'ImpactRange2'
-          count += 3
         } else if (thecount <= 6000) {
           ret = 'ImpactRange3'
           count = Math.ceil(count / 25)
@@ -225,67 +240,124 @@ export default {
 
           // Add background.
           this.insertImage(this.image, 0, 0, this.width, this.height, function() {
-            let x = 0
+            let x = this.initialX
             let y = this.initialY
 
             // Get length of the whole line including the kg value.
             let str = parseInt(this.currentCount).toLocaleString() + ' kg'
-            let text = this.$lang.get('partials.share_modal_intro1') + ' ' + str + ' ' + this.$lang.get('partials.share_modal_intro2')
+            let text = ''
 
             // Use the line height of this as our standard for moving down the image.
-            const lineHeight = ctx.measureText(text).emHeightAscent + ctx.measureText(str).emHeightDescent + MARG * 2
+            const lineHeight = ctx.measureText(
+                this.$lang.get('partials.share_modal_weve_saved') + str + this.$lang.get('partials.share_modal_of_co2')
+            ).emHeightAscent + ctx.measureText(str).emHeightDescent + MARG * 2
 
-            x = this.fillCentredText(this.$lang.get('partials.share_modal_intro1') + ' ', x, y, text)
-            x = this.fillWhiteBlackBox(str, x, y)
-            x = this.fillText(' ' + this.$lang.get('partials.share_modal_intro2'), x, y)
+            let wholeline
 
-            // Next line
-            y += lineHeight
+            if (this.portrait) {
+              wholeline = this.$lang.get('partials.share_modal_weve_saved') + str + this.$lang.get('partials.share_modal_of_co2')
+              x = this.fillCentredText(this.$lang.get('partials.share_modal_weve_saved') + ' ', x, y, wholeline)
+              x = this.fillWhiteBlackBox(str, x, y)
+              x = this.fillText(' ' + this.$lang.get('partials.share_modal_of_co2'), x, y)
 
-            text = this.$lang.get('partials.share_modal_intro3')
-            x = this.fillCentredText(text, x, y)
+              y += lineHeight
+
+              wholeline = this.$lang.get('partials.share_modal_by_repairing') + ' ' + this.$lang.get('partials.share_modal_broken_stuff')
+              x = this.fillCentredText(this.$lang.get('partials.share_modal_by_repairing') + ' ', x, y, wholeline)
+              x = this.fillText(this.$lang.get('partials.share_modal_broken_stuff'), x, y)
+            } else {
+              x = this.fillText(this.$lang.get('partials.share_modal_weve_saved') + ' ', x, y)
+              x = this.fillWhiteBlackBox(str, x, y)
+
+              y += lineHeight
+              x = this.initialX
+
+              x = this.fillText(this.$lang.get('partials.share_modal_of_co2'), x, y)
+              x = this.fillText(' ' + this.$lang.get('partials.share_modal_by_repairing'), x, y)
+
+              y += lineHeight
+              x = this.initialX
+
+              x = this.fillText(this.$lang.get('partials.share_modal_broken_stuff'), x, y)
+            }
 
             // Wavy divider line.
             if (this.portrait) {
-              y += 30
+              y += lineHeight / 2
             } else {
-              y += canvas.height / 5
+              if (this.target === 'Twitter') {
+                y = this.height / 2 - 39 + lineHeight / 2
+              } else {
+                y = this.height / 2 - 39 / 4
+              }
             }
 
             if (this.portrait) {
               x = (canvas.width - 292 / 2) / 2
             } else {
-              x = canvas.width / 20
+              x = this.initialX
             }
 
             this.insertImage('WavyDividerLine.png', x, y, 292 / 2, 39 / 2)
 
             if (this.portrait) {
-              y += 7
+              y += lineHeight + 39 / 4
             } else {
-              y += canvas.height / 5.5
+              if (this.target === 'Twitter') {
+                y += lineHeight + 39
+              } else {
+                y += lineHeight + 39
+              }
             }
-
-            // That's like text
-            y += lineHeight
 
             if (this.currentCount < HECTARES) {
               str = this.seedlings(this.currentCount).toLocaleString()
-              text = this.$lang.get('partials.share_modal_like1') + ' '
+
+              if (this.portrait) {
+                wholeline = this.$lang.get('partials.share_modal_thats_like') + ' ' +
+                    this.$lang.get('partials.share_modal_growing_about') + ' '
+                    str
+                x = this.fillCentredText(this.$lang.get('partials.share_modal_thats_like') + ' ', x, y, wholeline)
+                x = this.fillText(this.$lang.get('partials.share_modal_growing_about') + ' ', x, y)
+                x = this.fillWhiteBlackBox(str, x, y)
+                y += lineHeight
+                x = this.initialX
+                wholeline = this.$lang.choice('partials.share_modal_seedlings', str)
+                x = this.fillCentredText(this.$lang.choice('partials.share_modal_seedlings', str), x, y, wholeline)
+              } else {
+                x = this.fillText(this.$lang.get('partials.share_modal_thats_like'), x, y)
+                y += lineHeight
+                x = this.initialX
+                x = this.fillText(this.$lang.get('partials.share_modal_growing_about') + ' ', x, y)
+                x = this.fillWhiteBlackBox(str, x, y)
+                y += lineHeight
+                x = this.initialX
+                x = this.fillText(this.$lang.choice('partials.share_modal_seedlings', str), x, y)
+              }
             } else {
               str = this.hectares(this.currentCount).toLocaleString()
-              text = this.$lang.get('partials.share_modal_like3') + ' '
-            }
 
-            x = this.fillCentredText(text, x, y, text + str)
-            x = this.fillWhiteBlackBox(str, x, y)
-
-            y += lineHeight
-
-            if (this.currentCount < HECTARES) {
-              x = this.fillCentredText(this.$lang.choice('partials.share_modal_like2', str), x, y)
-            } else {
-              x = this.fillCentredText(this.$lang.choice('partials.share_modal_like4', str), x, y)
+              if (this.portrait) {
+                wholeline = this.$lang.get('partials.share_modal_thats_like') + ' ' +
+                    this.$lang.get('partials.share_modal_planting_around') + ' '
+                    str
+                x = this.fillCentredText(this.$lang.get('partials.share_modal_thats_like') + ' ', x, y, wholeline)
+                x = this.fillText(this.$lang.get('partials.share_modal_planting_arouund'), x, y)
+                x = this.fillWhiteBlackBox(str, x, y)
+                y += lineHeight
+                x = this.initialX
+                wholeline = this.$lang.choice('partials.share_modal_hectares', str)
+                x = this.fillCentredText(this.$lang.choice('partials.share_modal_hectares', str), x, y, wholeline)
+              } else {
+                x = this.fillText(this.$lang.get('partials.share_modal_thats_like'), x, y)
+                y += lineHeight
+                x = this.initialX
+                x = this.fillText(this.$lang.get('partials.share_modal_planting_around') + ' ', x, y)
+                x = this.fillWhiteBlackBox(str, x, y)
+                y += lineHeight
+                x = this.initialX
+                x = this.fillText(this.$lang.choice('partials.share_modal_hectares', str), x, y)
+              }
             }
           })
         } catch (e) {
@@ -301,11 +373,11 @@ export default {
     },
     seedlings(val) {
       // 1 tree is 60 kg.
-      return Math.ceil(val / 60)
+      return Math.floor(val / 60)
     },
     hectares(val) {
       // 1 hectare is 12000 kg.
-      return Math.ceil(val / 12000)
+      return Math.floor(val / 12000)
     },
     fillText(str, x, y, colour) {
       const ctx = this.ctx
