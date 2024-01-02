@@ -8,8 +8,17 @@
       size="md"
   >
     <template slot="default">
-      For debugging, you can change the value.
-      <b-form-input v-model="currentCount" class="mb-4" />
+      <div class="bg-danger mb-4 p-2">
+        <p class="text-white">
+          For debugging, you can change the value.
+        </p>
+        <b-form-input type="number" v-model="currentCount" class="mb-4" :disabled="painting" />
+        <div class="d-flex justify-content-between">
+          <b-btn variant="primary" @click="paint" :disabled="painting">Update</b-btn>
+          <b-btn variant="primary" @click="prev" :disabled="painting">Step to prev</b-btn>
+          <b-btn variant="primary" @click="next" :disabled="painting">Step to next</b-btn>
+        </div>
+      </div>
       <b-button-group class="mb-4 buttons">
         <b-button :disabled="painting" variant="primary" :class="{ 'active': target === 'Instagram'}" size="sm" @click="target = 'Instagram'">Instagram</b-button>
         <b-button :disabled="painting" variant="primary" :class="{ 'active': target === 'Facebook'}" size="sm" @click="target = 'Facebook'">Facebook</b-button>
@@ -93,29 +102,7 @@ export default {
       return this.target === 'Instagram'
     },
     image: function() {
-      let ret = null
-
-      if (this.currentCount <= 210) {
-        ret = 'ImpactRange1'
-      } else if (this.currentCount <= 3300) {
-        ret = 'ImpactRange2'
-      } else if (this.currentCount <= 6000) {
-        ret = 'ImpactRange3'
-      } else if (this.currentCount < HECTARES) {
-        ret = 'ImpactRange4'
-      } else if (this.currentCount <= 192000) {
-        ret = 'ImpactRange5'
-      } else {
-        ret = 'ImpactRange6'
-      }
-
-      if (this.portrait) {
-        ret += 'Portrait'
-      } else {
-        ret += 'Landscape'
-      }
-
-      return ret
+      return this.getImage(this.currentCount)
     },
     fontSize() {
       switch (this.target) {
@@ -146,9 +133,6 @@ export default {
     count: function() {
       this.currentCount = this.count
     },
-    currentCount: function() {
-      this.paint()
-    },
     target: function() {
       this.paint()
     }
@@ -165,6 +149,52 @@ export default {
     },
     hide() {
       this.showModal = false
+    },
+    getCount(count) {
+      count = parseInt(count)
+
+      if (count < HECTARES) {
+        return this.seedlings(count)
+      } else {
+        return this.hectares(count)
+      }
+    },
+    getImage(thecount) {
+      let ret = null
+
+      let count = this.getCount(thecount)
+      console.log('Tree/hect count', count)
+
+      if (count) {
+        if (thecount <= 210) {
+          ret = 'ImpactRange1'
+        } else if (thecount <= 3300) {
+          ret = 'ImpactRange2'
+          count += 3
+        } else if (thecount <= 6000) {
+          ret = 'ImpactRange3'
+          count = Math.ceil(count / 25)
+        } else if (thecount < HECTARES) {
+          ret = 'ImpactRange4'
+          count = Math.ceil((count - 100) / 25) + 4
+        } else if (thecount <= 192000) {
+          ret = 'ImpactRange5'
+        } else {
+          ret = 'ImpactRange6'
+          count += 14
+        }
+
+        if (this.portrait) {
+          ret += 'Square'
+        } else {
+          ret += 'Landscape'
+        }
+
+        ret += '-' + count + '.png'
+      }
+
+      console.log('Image is', thecount, count, ret)
+      return ret
     },
     download() {
       try {
@@ -228,22 +258,22 @@ export default {
               x = canvas.width / 20
             }
 
-            this.insertImage('WavyDividerLine', x, y, 292 / 2, 39 / 2)
+            this.insertImage('WavyDividerLine.png', x, y, 292 / 2, 39 / 2)
 
             if (this.portrait) {
               y += 7
             } else {
-              y += canvas.height / 5
+              y += canvas.height / 5.5
             }
 
             // That's like text
             y += lineHeight
 
             if (this.currentCount < HECTARES) {
-              str = this.seedlings(this.currentCount)
+              str = this.seedlings(this.currentCount).toLocaleString()
               text = this.$lang.get('partials.share_modal_like1') + ' '
             } else {
-              str = this.hectares(this.currentCount)
+              str = this.hectares(this.currentCount).toLocaleString()
               text = this.$lang.get('partials.share_modal_like3') + ' '
             }
 
@@ -271,11 +301,11 @@ export default {
     },
     seedlings(val) {
       // 1 tree is 60 kg.
-      return Math.round(val / 60).toLocaleString()
+      return Math.ceil(val / 60)
     },
     hectares(val) {
       // 1 hectare is 12000 kg.
-      return Math.round(val / 12000).toLocaleString()
+      return Math.ceil(val / 12000)
     },
     fillText(str, x, y, colour) {
       const ctx = this.ctx
@@ -322,7 +352,7 @@ export default {
     insertImage(name, x, y, width, height, cb) {
       const ctx = this.ctx
       const img = new Image()
-      img.src = '/images/' + name + '.png'
+      img.src = '/images/stats/' + name
       img.onload = () => {
         ctx.drawImage(img, x, y, width, height)
 
@@ -331,6 +361,24 @@ export default {
         }
       }
     },
+    next() {
+      let currentImage = this.getImage(this.currentCount)
+
+      while (currentImage === this.getImage(this.currentCount)) {
+        this.currentCount++
+      }
+
+      this.paint()
+    },
+    prev() {
+      let currentImage = this.getImage(this.currentCount)
+
+      while (currentImage === this.getImage(this.currentCount)) {
+        this.currentCount--
+      }
+
+      this.paint()
+    }
   }
 }
 </script>
