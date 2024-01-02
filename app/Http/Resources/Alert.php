@@ -10,7 +10,7 @@ use Illuminate\Http\Resources\Json\JsonResource;
  *     title="Alert",
  *     schema="Alert",
  *     description="An alert shown to users onsite.",
- *     required={"id", "title", "html"},
+ *     required={"id", "title", "html", "start", "end"},
  *     @OA\Property(
  *          property="id",
  *          title="id",
@@ -58,7 +58,7 @@ use Illuminate\Http\Resources\Json\JsonResource;
  *          description="Stop showing the alert at this time, in ISO8601 format.",
  *          format="date-time",
  *          example="2022-09-18T12:30:00+00:00"
- *     ),
+ *     )
  * )
  */
 class Alert extends JsonResource
