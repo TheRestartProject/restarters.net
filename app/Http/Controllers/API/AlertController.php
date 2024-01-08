@@ -4,7 +4,7 @@ namespace App\Http\Controllers\API;
 
 use App\Alert;
 use App\Http\Controllers\Controller;
-use App\Http\Resources\ItemCollection;
+use App\Http\Resources\AlertCollection;
 use Auth;
 use Carbon\Carbon;
 use Illuminate\Auth\AuthenticationException;
@@ -38,7 +38,7 @@ class AlertController extends Controller
      *       ),
      *     )
      */
-    public static function listAlertsv2(Request $request) {
+    public function listAlertsv2(Request $request) {
         // Alerts don't change often, so we can cache them.
         if (\Cache::has('alerts')) {
             $alerts = \Cache::get('alerts');
@@ -49,7 +49,7 @@ class AlertController extends Controller
         }
 
         return [
-            'data' => ItemCollection::make($alerts)
+            'data' => AlertCollection::make($alerts)
         ];
     }
 
@@ -120,10 +120,10 @@ class AlertController extends Controller
         $user = $this->getUser();
 
         if (!$user->hasRole('Administrator')) {
-            return abort(403, 'The authenticated user is not authorized to access this resource');
+            throw new AuthenticationException();
         }
 
-        list($id, $start, $end, $title, $html, $ctatitle, $ctalink) = $this->validateAlertParams($request, true);
+        list($start, $end, $title, $html, $ctatitle, $ctalink) = $this->validateAlertParams($request, true);
 
         $id = Alert::Create([
             'start' => $start,
@@ -136,6 +136,96 @@ class AlertController extends Controller
 
         return [
           'id' => $id
+        ];
+    }
+
+    /**
+     * @OA\Patch(
+     *      path="/api/v2/alerts/{id}",
+     *      operationId="updateAlert",
+     *      tags={"Alerts"},
+     *      summary="Edit Alert",
+     *      description="Edits an alert.",
+     *      @OA\Parameter(
+     *          name="api_token",
+     *          description="A valid user API token",
+     *          required=true,
+     *          in="query",
+     *          @OA\Schema(
+     *              type="string",
+     *              example="1234"
+     *          )
+     *      ),
+     *     @OA\RequestBody(
+     *         @OA\MediaType(
+     *             mediaType="multipart/form-data",
+     *             @OA\Schema(
+     *                required={"title","html","start","end"},
+     *                @OA\Property(
+     *                   property="title",
+     *                   ref="#/components/schemas/Alert/properties/title",
+     *                ),
+     *                @OA\Property(
+     *                   property="html",
+     *                   ref="#/components/schemas/Alert/properties/html",
+     *                ),
+     *                @OA\Property(
+     *                   property="start",
+     *                   ref="#/components/schemas/Alert/properties/start",
+     *                ),
+     *                @OA\Property(
+     *                   property="end",
+     *                   ref="#/components/schemas/Alert/properties/end",
+     *                ),
+     *                @OA\Property(
+     *                   property="ctatitle",
+     *                   ref="#/components/schemas/Alert/properties/ctalink",
+     *                ),
+     *                @OA\Property(
+     *                   property="ctalink",
+     *                   ref="#/components/schemas/Alert/properties/ctalink",
+     *                ),
+     *             )
+     *         )
+     *    ),
+     *    @OA\Response(
+     *        response=200,
+     *        description="Successful operation",
+     *        @OA\JsonContent(
+     *            @OA\Property(
+     *              property="id",
+     *              title="id",
+     *              ref="#/components/schemas/Alert/properties/id"
+     *            )
+     *        ),
+     *     )
+     *  )
+     */
+    public function updateAlertv2(Request $request, $id)
+    {
+        $user = $this->getUser();
+
+        if (!$user->hasRole('Administrator')) {
+            return abort(403, 'The authenticated user is not authorized to access this resource');
+        }
+
+        $alert = Alert::findOrFail($id);
+
+        list($start, $end, $title, $html, $ctatitle, $ctalink) = $this->validateAlertParams($request, true);
+
+        $alert->update([
+            'start' => $start,
+            'end' => $end,
+            'title' => $title,
+            'html' => $html,
+            'ctatitle' => $ctatitle,
+            'ctalink' => $ctalink
+        ]);
+
+        \Cache::clear('alerts');
+
+        return [
+            'id' => $id
         ];
     }
 
@@ -181,7 +271,6 @@ class AlertController extends Controller
             ]);
         }
 
-        $id = $request->input('id');
         $start = $request->input('start');
         $end = $request->input('end');
         $title = $request->input('title');
@@ -190,7 +279,6 @@ class AlertController extends Controller
         $ctalink = $request->input('ctalink', null);
 
         return [
-            $id,
             $start,
             $end,
             $title,
