@@ -269,6 +269,9 @@ export default {
         }
       }
     },
+    smallerFontSize() {
+      return Math.round(this.fontSize * 4 / 5)
+    },
     initialY() {
       switch (this.target) {
         case 'Instagram':
@@ -373,7 +376,7 @@ export default {
           this.canvas = this.$refs.canvas
           this.ctx = this.canvas.getContext('2d')
           const canvas = this.canvas
-          const ctx = this.ctx
+          let ctx = this.ctx
           ctx.font = "bold " + this.fontSize + "px Asap, sans-serif"
 
           // Add background.
@@ -386,7 +389,7 @@ export default {
             let text = ''
 
             // Use the line height of this as our standard for moving down the image.
-            const lineHeight = ctx.measureText(
+            let lineHeight = ctx.measureText(
                 this.$lang.get('partials.share_modal_weve_saved') + str + this.$lang.get('partials.share_modal_of_co2')
             ).emHeightAscent + ctx.measureText(str).emHeightDescent + MARG * 2
 
@@ -451,7 +454,12 @@ export default {
             const ix = this.rangeIndex(this.currentCount)
             str = this.getCount(this.currentCount).toLocaleString()
 
-            console.log('Unit', RANGES[ix][2], ix, RANGES[ix])
+            ctx.font = "bold " + this.smallerFontSize + "px Asap, sans-serif"
+
+            lineHeight = ctx.measureText(
+                this.$lang.get('partials.share_modal_weve_saved') + str + this.$lang.get('partials.share_modal_of_co2')
+            ).emHeightAscent + ctx.measureText(str).emHeightDescent + MARG * 2
+
             if (RANGES[ix][2] != 'Hectare') {
               if (this.portrait) {
                 wholeline = this.$lang.get('partials.share_modal_thats_like') + ' ' +
@@ -511,6 +519,7 @@ export default {
     },
     fillText(str, x, y, colour) {
       const ctx = this.ctx
+      console.log('text', str, ctx.font)
 
       // Write the text.
       ctx.fillStyle = colour || 'black'
