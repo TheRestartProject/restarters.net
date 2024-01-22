@@ -10,7 +10,7 @@ use Illuminate\Http\Resources\Json\ResourceCollection;
  *     schema="AlertCollection",
  *     description="A collection of Alerts.",
  *     type="array",
- *     @OA\Alerts(
+ *     @OA\Items(
  *         ref="#/components/schemas/Alert"
  *     )
  * )
