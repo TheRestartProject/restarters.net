@@ -22,6 +22,11 @@
     <div class="image d-flex justify-content-around" v-if="image">
       <b-img :src="image" />
     </div>
+    <div class="d-flex justify-content-end" v-if="share">
+      <b-btn href="#" variant="link" @click="shareThis" class="text-brand">
+        {{ __('partials.share_this') }}
+      </b-btn>
+    </div>
   </div>
 </template>
 <script>
@@ -104,6 +109,11 @@ export default {
       type: String,
       required: false,
       default: null
+    },
+    share: {
+      type: Boolean,
+      required: false,
+      default: false
     }
   },
   computed: {
@@ -128,6 +138,11 @@ export default {
     },
     printableCount() {
       return this.countIsNumber ? this.roundedCount.toLocaleString() : this.count
+    }
+  },
+  methods: {
+    shareThis() {
+      this.$emit('share')
     }
   }
 }
