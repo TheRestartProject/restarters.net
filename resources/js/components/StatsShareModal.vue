@@ -245,29 +245,40 @@ export default {
       return this.getImage(this.currentCount)
     },
     fontSize() {
+      let ret = null
+
       if (this.portrait) {
         switch (this.target) {
           case 'Instagram':
-            return 55
+            ret = 55
           case 'Facebook':
-            return 40
+            ret = 40
           case 'Twitter':
-            return 52
+            ret = 52
           case 'LinkedIn':
-            return 40
+            ret = 40
         }
       } else {
         switch (this.target) {
           case 'Instagram':
-            return 110
+            ret = 110
           case 'Facebook':
-            return 50
+            ret = 50
           case 'Twitter':
-            return 65
+            ret = 65
           case 'LinkedIn':
-            return 45
+            ret = 45
+        }
+
+        // If it's French, we need to reduce the font sizes a bit.
+        const locale = this.$lang.getLocale()
+
+        if (this.target !== 'Twitter' && (locale === 'fr' || locale === 'fr-BE')) {
+          ret = Math.round(ret * 4 / 5)
         }
       }
+
+      return ret
     },
     smallerFontSize() {
       return Math.round(this.fontSize * 4 / 5)
