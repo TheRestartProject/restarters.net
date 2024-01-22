@@ -247,6 +247,9 @@ export default {
     fontSize() {
       let ret = null
 
+      // We need to adjust the font sizes a bit based on locale.
+      const locale = this.$lang.getLocale()
+
       if (this.portrait) {
         switch (this.target) {
           case 'Instagram':
@@ -257,6 +260,12 @@ export default {
             ret = 52
           case 'LinkedIn':
             ret = 40
+        }
+
+        if (locale === 'fr' || locale === 'fr-BE') {
+          ret = Math.round(ret * 7 / 6)
+        } else if (locale === 'en') {
+          ret = Math.round(ret * 7 / 6)
         }
       } else {
         switch (this.target) {
@@ -270,11 +279,16 @@ export default {
             ret = 45
         }
 
-        // If it's French, we need to reduce the font sizes a bit.
-        const locale = this.$lang.getLocale()
-
-        if (this.target !== 'Twitter' && (locale === 'fr' || locale === 'fr-BE')) {
-          ret = Math.round(ret * 4 / 5)
+        if (locale === 'fr' || locale === 'fr-BE') {
+          if (this.target !== 'Twitter') {
+            ret = Math.round(ret * 6 / 7)
+          } else {
+            ret = Math.round(ret * 7 / 6)
+          }
+        } else if (locale === 'en') {
+          if (this.target === 'Twitter') {
+            ret = Math.round(ret * 4 / 3)
+          }
         }
       }
 
