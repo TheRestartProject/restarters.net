@@ -39,6 +39,13 @@ use Illuminate\Http\Resources\Json\JsonResource;
  *          example="Double Your Donation Now"
  *     ),
  *     @OA\Property(
+ *          property="variant",
+ *          title="variant",
+ *          description="(Optional) The alert variant (default is secondary).",
+ *          format="string",
+ *          example="secondary"
+ *     ),
+ *     @OA\Property(
  *          property="ctalink",
  *          title="ctalink",
  *          description="(Optional) The link for the button to direct to.",
@@ -79,6 +86,7 @@ class Alert extends JsonResource
             'ctalink' => $this->ctalink,
             'start' => Carbon::parse($this->start)->toIso8601String(),
             'end' => Carbon::parse($this->end)->toIso8601String(),
+            'variant' => $this->variant,
         ];
 
         return $ret;

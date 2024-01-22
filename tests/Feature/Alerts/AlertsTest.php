@@ -98,4 +98,23 @@ class AlertsTest extends TestCase
             [ Role::HOST, FALSE ],
         ];
     }
+
+    public function testArtisan() {
+        $this->artisan('alert:create', [
+            'title' => 'Test alert',
+            'html' => '<p>Test alert</p>',
+            'start' => 'today',
+            'end' => 'tomorrow',
+        ])->assertExitCode(0);
+
+        $response = $this->get('/api/v2/alerts');
+        $response->assertSuccessful();
+
+        $json = json_decode($response->getContent(), true);
+        self::assertEquals(1, count($json['data']));
+        self::assertEquals('Test alert', $json['data'][0]['title']);
+        self::assertEquals('<p>Test alert</p>', $json['data'][0]['html']);
+        self::assertEquals(date('Y-m-d') . 'T00:00:00+00:00', $json['data'][0]['start']);
+        self::assertEquals(date('Y-m-d', strtotime('+1 day')) . 'T00:00:00+00:00', $json['data'][0]['end']);
+    }
 }

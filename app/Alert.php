@@ -29,6 +29,7 @@ class Alert extends Model implements Auditable
         'ctatitle',
         'ctalink',
         'start',
-        'end'
+        'end',
+        'variant'
     ];
 }

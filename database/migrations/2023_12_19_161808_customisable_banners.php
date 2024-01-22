@@ -19,6 +19,7 @@ return new class extends Migration
             $table->text('html');
             $table->string('ctatitle')->nullable();
             $table->string('ctalink')->nullable();
+            $table->string('variant')->default('secondary');
             $table->timestamp('start');
             $table->timestamp('end');
             $table->timestamps();
