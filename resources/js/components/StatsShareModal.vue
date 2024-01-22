@@ -8,17 +8,17 @@
       size="md"
   >
     <template slot="default">
-      <div class="bg-danger mb-4 p-2">
-        <p class="text-white">
-          For debugging, you can change the value.
-        </p>
-        <b-form-input type="number" v-model="currentCount" class="mb-4" :disabled="painting" />
-        <div class="d-flex justify-content-between">
-          <b-btn variant="primary" @click="paint" :disabled="painting">Update</b-btn>
-          <b-btn variant="primary" @click="prev" :disabled="painting">Step to prev</b-btn>
-          <b-btn variant="primary" @click="next" :disabled="painting">Step to next</b-btn>
-        </div>
-      </div>
+<!--      <div class="bg-danger mb-4 p-2">-->
+<!--        <p class="text-white">-->
+<!--          For debugging, you can change the value.-->
+<!--        </p>-->
+<!--        <b-form-input type="number" v-model="currentCount" class="mb-4" :disabled="painting" />-->
+<!--        <div class="d-flex justify-content-between">-->
+<!--          <b-btn variant="primary" @click="paint" :disabled="painting">Update</b-btn>-->
+<!--          <b-btn variant="primary" @click="prev" :disabled="painting">Step to prev</b-btn>-->
+<!--          <b-btn variant="primary" @click="next" :disabled="painting">Step to next</b-btn>-->
+<!--        </div>-->
+<!--      </div>-->
       <div class="w-100 d-flex justify-content-around">
         <b-button-group class="mb-4 buttons">
           <b-button :disabled="painting" variant="primary" :class="{ 'active': target === 'Instagram'}" size="sm" @click="target = 'Instagram'">Instagram</b-button>
