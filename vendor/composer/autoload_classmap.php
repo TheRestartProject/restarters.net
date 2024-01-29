@@ -42,6 +42,7 @@ return array(
     'App\\Console\\Commands\\CreateDiscourseGroups' => $baseDir . '/app/Console/Commands/CreateDiscourseGroups.php',
     'App\\Console\\Commands\\CrystalliseEventTimezone' => $baseDir . '/app/Console/Commands/CrystalliseEventTimezone.php',
     'App\\Console\\Commands\\DiscourseChangeSetting' => $baseDir . '/app/Console/Commands/DiscourseChangeSetting.php',
+    'App\\Console\\Commands\\DiscourseCreateThread' => $baseDir . '/app/Console/Commands/DiscourseCreateThread.php',
     'App\\Console\\Commands\\FixViews' => $baseDir . '/app/Console/Commands/FixViews.php',
     'App\\Console\\Commands\\FixVolunteerCount' => $baseDir . '/app/Console/Commands/FixVolunteerCount.php',
     'App\\Console\\Commands\\GroupCountryField' => $baseDir . '/app/Console/Commands/GroupCountryField.php',
