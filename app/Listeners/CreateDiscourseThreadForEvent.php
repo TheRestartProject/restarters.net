@@ -76,7 +76,7 @@ class CreateDiscourseThreadForEvent extends BaseEvent
                 $params = [
                     'raw' => $intro,
                     'title' => $theParty->venue.' '.$theParty->event_date_local,
-                    'target_usernames' => $host->username,
+                    'target_recipients' => $host->username,
                     'archetype' => 'private_message',
                 ];
 
