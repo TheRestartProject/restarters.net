@@ -416,7 +416,7 @@ export default {
             // Use the line height of this as our standard for moving down the image.
             let lineHeight = ctx.measureText(
                 this.$lang.get('partials.share_modal_weve_saved') + str + this.$lang.get('partials.share_modal_of_co2')
-            ).emHeightAscent + ctx.measureText(str).emHeightDescent + MARG * 2
+            ).actualBoundingBoxAscent  + ctx.measureText(str).actualBoundingBoxDescent + MARG * 2
 
             let wholeline
 
@@ -483,7 +483,7 @@ export default {
 
             lineHeight = ctx.measureText(
                 this.$lang.get('partials.share_modal_weve_saved') + str + this.$lang.get('partials.share_modal_of_co2')
-            ).emHeightAscent + ctx.measureText(str).emHeightDescent + MARG * 2
+            ).actualBoundingBoxAscent  + ctx.measureText(str).actualBoundingBoxDescent + MARG * 2
 
             if (RANGES[ix][2] != 'Hectare') {
               if (this.portrait) {
@@ -572,7 +572,7 @@ export default {
     },
     fillWhiteBlackBox(str, x, y) {
       const ctx = this.ctx
-      ctx.roundRect(x, y - ctx.measureText(str).emHeightAscent - MARG, ctx.measureText(str).width + MARG * 2, ctx.measureText(str).emHeightAscent + ctx.measureText(str).emHeightDescent + MARG * 2, RADIUS)
+      ctx.roundRect(x, y - ctx.measureText(str).actualBoundingBoxAscent - MARG, ctx.measureText(str).width + MARG * 2, ctx.measureText(str).actualBoundingBoxAscent + ctx.measureText(str).actualBoundingBoxDescent + MARG * 2, RADIUS)
       ctx.fill()
 
       // Looks like we need a beginPath() to prevent future calls to roundRect working on the same rectangle and
