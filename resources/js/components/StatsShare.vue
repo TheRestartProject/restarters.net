@@ -304,11 +304,9 @@ export default {
       immediate: true
     },
     currentTarget() {
-      console.log('Target changed, paint')
       this.paint()
     },
     currentCount() {
-      console.log('Count changed, paint')
       this.paint()
     },
     painting: function(newVal) {
@@ -318,7 +316,6 @@ export default {
   mounted() {
     const _paq = window._paq = window._paq || [];
     _paq.push(['trackEvent', 'ShareStats', 'ClickedOnButton']);
-    console.log('Mounted', this.$props)
     this.paint()
   },
   methods: {
@@ -374,7 +371,6 @@ export default {
         link.download = 'stats.png';
         link.href = this.canvas.toDataURL()
         link.click();
-        // this.hide()
       } catch (e) {
         console.error('Failed to download', e)
       }
@@ -603,14 +599,6 @@ export default {
 
       this.paint()
     },
-    setCount(count) {
-      console.log('Set count', count)
-      this.currentCount = count
-      console.log('Set ok')
-    },
-    setTarget(target) {
-      this.currentTarget = target
-    }
   }
 }
 </script>
