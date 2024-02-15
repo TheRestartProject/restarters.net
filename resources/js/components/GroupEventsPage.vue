@@ -1,5 +1,6 @@
 <template>
   <div v-if="group">
+    <AlertBanner />
     <GroupEvents
         heading-level="h1"
         heading-sub-level="h2"
@@ -14,10 +15,11 @@
 <script>
 import GroupEvents from './GroupEvents'
 import auth from '../mixins/auth'
+import AlertBanner from './AlertBanner'
 
 export default {
   components: {
-    GroupEvents
+    GroupEvents, AlertBanner
   },
   mixins: [ auth ],
   props: {

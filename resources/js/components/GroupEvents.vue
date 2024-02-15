@@ -1,5 +1,6 @@
 <template>
   <div>
+    <AlertBanner />
     <CollapsibleSection class="lineheight" collapsed :count="upcomingOrActive.length" count-badge :heading-level="headingLevel">
       <template slot="title">
         <div class="d-flex justify-content-between w-100">
@@ -59,12 +60,14 @@ import moment from 'moment'
 import CalendarAddModal from './CalendarAddModal'
 import GroupEventsTab from './GroupEventsTab'
 import CollapsibleSection from './CollapsibleSection'
+import AlertBanner from './AlertBanner'
 
 export default {
   components: {
     CollapsibleSection,
     GroupEventsTab,
     CalendarAddModal,
+    AlertBanner,
   },
   mixins: [ group ],
   props: {
