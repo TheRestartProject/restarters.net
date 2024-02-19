@@ -148,8 +148,7 @@
       </b-card>
 
       <div class="group-buttons text-right">
-        <p v-if="edited" class="mt-2 text-primary font-weight-bold" v-html="'<div>' + __('groups.edit_succeeded') + '</div>'" />
-        <div v-else-if="failed">
+        <div v-if="failed">
           <p v-if="creating" class="mt-2 text-danger font-weight-bold" v-html="'<div>' + __('groups.create_failed') + '</div>'"/>
           <p v-else class="mt-2 text-danger font-weight-bold" v-html="'<div>' + __('groups.edit_failed') + '</div>'"/>
         </div>
@@ -158,14 +157,20 @@
           <div class="text-right flex-grow-1 mr-4">
             {{ __('groups.groups_approval_text') }}
           </div>
-          <b-btn variant="primary" class="break" type="submit" @click="submit">
-            {{ __('groups.create_group') }}
-          </b-btn>
+          <SpinButton
+              icon-name="save"
+              :label="__('groups.create_group')"
+              variant="primary"
+              @handle="submit"
+          />
         </div>
         <div class="d-flex justify-content-end" v-else>
-          <b-btn variant="primary" class="break submit" type="submit" @click="submit">
-            {{ __('groups.edit_group_save_changes') }}
-          </b-btn>
+          <SpinButton
+              icon-name="save"
+              :label="__('groups.edit_group_save_changes')"
+              variant="primary"
+              @handle="submit"
+          />
         </div>
       </div>
     </div>
@@ -186,6 +191,7 @@ import GroupTimeZone from './GroupTimeZone'
 import GroupPhone from './GroupPhone'
 import GroupImage from './GroupImage'
 import NetworkData from './NetworkData'
+import SpinButton from "./SpinButton.vue";
 
 function geocodeableValidation () {
   return this.lat !== null && this.lng !== null
@@ -202,7 +208,8 @@ export default {
     GroupLocation,
     GroupLocationMap,
     GroupPhone,
-    GroupImage
+    GroupImage,
+    SpinButton,
   },
   mixins: [group, auth, validationHelpers],
   props: {
@@ -362,7 +369,7 @@ export default {
     this.ready = true
   },
   methods: {
-    async submit () {
+    async submit (callback) {
       // Events are created via form submission - we don't yet have an API call to do this over AJAX.  Therefore
       // this page and the subcomponents have form inputs with suitable names.
       this.failed = false
@@ -432,6 +439,8 @@ export default {
           }
         }
       }
+
+      callback()
     }
   }
 }

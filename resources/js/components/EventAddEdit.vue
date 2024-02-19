@@ -85,8 +85,7 @@
         </b-form-group>
       </div>
       <div class="event-result text-right">
-        <p v-if="showEditedMessage" class="mt-2 text-primary font-weight-bold" v-html="'<div>' + __('events.edit_succeeded') + '</div>'" />
-        <div v-else-if="failed">
+        <div v-if="failed">
           <p v-if="creating" class="mt-2 text-danger font-weight-bold" v-html="'<div>' + __('events.create_failed') + '</div>'"/>
           <p v-else class="mt-2 text-danger font-weight-bold" v-html="'<div>' + __('events.edit_failed') + '</div>'"/>
         </div>
@@ -104,9 +103,12 @@
           </span>
         </div>
         <div class="col-lg-2 d-flex align-items-center justify-content-end mt-2 mt-lg-0">
-          <b-btn variant="primary" class="break" type="submit" @click="submit">
-            {{ __('events.create_event') }}
-          </b-btn>
+          <SpinButton
+              icon-name="save"
+              :label="__('events.create_event')"
+              variant="primary"
+              @handle="submit"
+          />
         </div>
       </div>
       <div class="event-buttons button-group d-flex align-items-center justify-content-between" v-else>
@@ -115,7 +117,7 @@
             <span v-if="autoApprove">
               {{ __('events.before_submit_text_autoapproved') }}
             </span>
-              <span v-else-if="!canApprove && moderate !== 'approve'">
+            <span v-else-if="!canApprove && moderate !== 'approve'">
               {{ __('events.before_submit_text') }}
             </span>
           </div>
@@ -124,9 +126,12 @@
           <b-btn :href="'/party/duplicate/' + idevents" variant="primary" size="md" class="mr-2 duplicate">
             {{ __('events.duplicate_event') }}
           </b-btn>
-          <b-btn variant="primary" class="break submit" type="submit" @click="submit">
-            {{ __('events.save_event') }}
-          </b-btn>
+          <SpinButton
+              icon-name="save"
+              :label="__('events.save_event')"
+              variant="primary"
+              @handle="submit"
+          />
         </div>
       </div>
     </div>
@@ -146,6 +151,7 @@ import { required, url, helpers } from 'vuelidate/lib/validators'
 import validationHelpers from '../mixins/validationHelpers'
 import moment from 'moment-timezone'
 import NetworkData from './NetworkData'
+import SpinButton from "./SpinButton.vue";
 
 function geocodeableValidation() {
   return this.lat !== null && this.lng !== null
@@ -154,7 +160,7 @@ function geocodeableValidation() {
 const timeValidator = helpers.regex('timeValidator', /^([0-1]?[0-9]|2[0-3]):[0-5][0-9]$/)
 
 export default {
-  components: {EventGroup, EventVenue, EventLink, VenueAddress, EventTimeRangePicker, EventDatePicker, RichTextEditor, NetworkData},
+  components: {EventGroup, EventVenue, EventLink, VenueAddress, EventTimeRangePicker, EventDatePicker, RichTextEditor, NetworkData, SpinButton,},
   mixins: [event, auth, validationHelpers],
   props: {
     duplicateFrom: {
@@ -330,7 +336,7 @@ export default {
     }
   },
   methods: {
-    async submit() {
+    async submit(callback) {
       // Check the form is valid.
       this.$v.$touch()
 
@@ -399,6 +405,8 @@ export default {
           }
         }
       }
+
+      callback()
     }
   }
 }

@@ -143,6 +143,5 @@ return [
   'delete_success' => 'L\'événement a été supprimé.',
   'geocode_failed' => 'Lieu non trouvé. Si vous ne parvenez pas à trouver le lieu où se trouve votre événement, essayez d\'indiquer un lieu plus général (tel qu\'un village ou une ville) ou une adresse spécifique, plutôt qu\'un nom de bâtiment.',
   'create_failed' => 'L\'événement <strong>n\'a pas pu</strong> être créé. Veuillez regarder les erreurs, les corriger, et essayer à nouveau.',
-  'edit_succeeded' => 'L\'édition du l\'événement Café a réussi',
   'edit_failed' => 'L\'événement n\'a pas pu être édité.',
 ];
