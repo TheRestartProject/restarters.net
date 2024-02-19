@@ -69,10 +69,6 @@ export default {
       required: true
     }
   },
-  data () {
-    return {
-    }
-  },
   created() {
     // Data is passed from the blade template to us via props.  We put it in the store for all components to use,
     // and so that as/when it changes then reactivity updates all the views.
