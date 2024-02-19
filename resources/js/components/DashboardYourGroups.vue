@@ -62,7 +62,7 @@
                   </p>
                 </div>
                 <div>
-                  <b-btn variant="primary" href="/party/create" class="text-nowrap">
+                  <b-btn variant="primary" href="/party/create" class="text-nowrap" v-if="amAHost">
                     {{ __('dashboard.add_event') }}
                   </b-btn>
                 </div>
@@ -91,6 +91,7 @@ import DashboardGroup from './DashboardGroup'
 import CollapsibleSection from './CollapsibleSection'
 import DashboardEvent from './DashboardEvent'
 import DashboardNoGroups from './DashboardNoGroups'
+import { HOST } from '../constants'
 
 export default {
   props: {
@@ -121,6 +122,19 @@ export default {
       return this.groups.filter(g => {
         return g.ingroup
       })
+    },
+    amAHost() {
+      let ret = false
+
+      this.myGroups.forEach(g => {
+        // Even if the user has Administrator role, their role on the group would be HOST or RESTARTER, not
+        // ADMINISTRATOR.
+        if (g.role === HOST) {
+          ret = true
+        }
+      })
+
+      return ret
     },
     events() {
       return this.$store.getters['events/getByGroup'](null).filter(e => e.upcoming).sort((a, b) => {
