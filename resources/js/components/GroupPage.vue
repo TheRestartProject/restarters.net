@@ -84,10 +84,6 @@ export default {
       type: Array,
       required: true
     },
-    volunteers: {
-      type: Array,
-      required: true
-    },
     canedit: {
       type: Boolean,
       required: false,
@@ -162,12 +158,10 @@ export default {
     //
     // Further down the line this may change so that the data is obtained via an AJAX call and perhaps SSR.
     // TODO LATER We add some properties to the group before adding it to the store.  These should move into
-    // computed properties once we have good access to the session on the client, and there should be a separate store
-    // for volunteers, shared between groups and events.
+    // computed properties once we have good access to the session on the client.
     this.initialGroup.idgroups = this.idgroups
     this.initialGroup.canedit = this.canedit
     this.initialGroup.ingroup = this.ingroup
-    this.initialGroup.volunteers = this.volunteers
 
     this.$store.dispatch('groups/set', this.initialGroup)
 
