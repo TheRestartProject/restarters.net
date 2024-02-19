@@ -6,7 +6,7 @@
         <b-img src="/images/fixometer_doodle.svg" class="ml-4 d-none d-md-block" />
       </div>
       <div>
-        <b-btn variant="primary" data-target="#add-device-modal" data-toggle="modal">
+        <b-btn variant="primary" @click="addData">
           {{ __('devices.add_data_button') }}
         </b-btn>
       </div>
@@ -19,8 +19,21 @@
       <b>{{ __('devices.huge_impact') }}</b>
       <span v-html="__('devices.impact_read_more')" />
     </p>
+    <AddDataModal ref="addData" />
   </div>
 </template>
+<script>
+import AddDataModal from "./AddDataModal";
+
+export default {
+  components: { AddDataModal },
+  methods: {
+    addData() {
+      this.$refs.addData.show()
+    }
+  }
+}
+</script>
 <style scoped lang="scss">
 @import 'resources/global/css/_variables';
 @import '~bootstrap/scss/functions';
@@ -30,5 +43,4 @@
 .border-top-very-thick {
   border-top: 5px solid $black;
 }
-
 </style>

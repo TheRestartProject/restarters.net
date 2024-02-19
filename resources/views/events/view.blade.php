@@ -138,7 +138,6 @@
             :clusters="{{ json_encode($expanded_clusters, JSON_INVALID_UTF8_IGNORE) }}"
             :brands="{{ json_encode($expanded_brands, JSON_INVALID_UTF8_IGNORE) }}"
             :barrier-list="{{ json_encode(App\Helpers\Fixometer::allBarriers(), JSON_INVALID_UTF8_IGNORE) }}"
-            :item-types="{{ json_encode($item_types, JSON_INVALID_UTF8_IGNORE) }}"
           />
         </div>
       </div>
@@ -152,8 +151,6 @@
   @include('includes.modals.event-invite-to')
   @include('includes.modals.event-description')
   @include('includes.modals.event-share-stats')
-  @include('includes.modals.event-all-volunteers')
-  @include('includes.modals.event-all-attended')
   @include('includes.modals.event-request-review')
 
 @endsection

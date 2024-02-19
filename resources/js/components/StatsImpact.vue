@@ -30,16 +30,23 @@
             :description="equivalent_consumer(Math.round(stats.co2_total))"
             unit="kg"
             class="impact-co2"
+            :popover="popover_consumer(Math.round(stats.co2_total))"
+            share
+            @share="share"
       />
+      <StatsShareModal
+        ref="shareModal"
+        :count="Math.round(stats.co2_total)" />
     </div>
   </div>
 </template>
 <script>
 import StatsValue from './StatsValue'
 import co2equivalent from '../mixins/co2equivalent'
+const StatsShareModal = () => import('./StatsShareModal')
 
 export default {
-  components: {StatsValue},
+  components: {StatsValue, StatsShareModal},
   mixins: [ co2equivalent ],
   props: {
     stats: {
@@ -87,6 +94,11 @@ export default {
 
         return intro + ' ' + first.join(', ') + ' ' + this.$lang.get('and') + ' ' + last + '.'
       }
+    }
+  },
+  methods: {
+    share() {
+      this.$refs.shareModal.show()
     }
   }
 }

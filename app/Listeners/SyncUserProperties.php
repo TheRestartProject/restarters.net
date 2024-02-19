@@ -6,6 +6,8 @@ use App\Events\UserEmailUpdated;
 use App\Events\UserLanguageUpdated;
 use App\Events\UserUpdated;
 
+// Don't extend BaseEvent - we don't want to queue because this breaks tests in a way that isn't obvious and isn't
+// worth fixing given how frequently this occurs.
 class SyncUserProperties
 {
     /**

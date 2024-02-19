@@ -12,9 +12,14 @@
         </div>
       </template>
       <template slot="title-right">
-        <b-btn variant="primary" href="/party/create" class="align-self-center text-nowrap" v-if="addButton">
-          {{ __('events.add_new_event') }}
-        </b-btn>
+        <div class="d-flex">
+          <b-btn variant="primary" :href="'/export/groups/' + idgroups + '/events'" class="align-self-center text-nowrap mr-2" v-if="addButton">
+            {{ __('groups.export_event_list') }}
+          </b-btn>
+          <b-btn variant="primary" href="/party/create" class="align-self-center text-nowrap" v-if="addButton">
+            {{ __('events.add_new_event') }}
+          </b-btn>
+        </div>
       </template>
       <template slot="content">
         <b-tabs class="ourtabs w-100">

@@ -11,7 +11,7 @@ use Carbon\Carbon;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Notification;
 
-class SendAdminModerateEventPhotosNotification
+class SendAdminModerateEventPhotosNotification extends BaseEvent
 {
     /**
      * Ensure uploads within this timespan (in minutes) will only result in one notification being sent

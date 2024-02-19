@@ -63,15 +63,6 @@ class Fixometer
         return false;
     }
 
-    public static function barChartValue($portion, $total)
-    {
-        if ((int) $portion > 0) {
-            return round((($portion / $total) * 100), 2) - 15;
-        }
-
-        return -15;
-    }
-
     public static function featureIsEnabled($feature)
     {
         return $feature === true;

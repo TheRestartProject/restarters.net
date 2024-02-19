@@ -15,9 +15,17 @@
       {{ percent }}%
     </div>
     <div class="impact-stat-subtitle" v-html="translatedSubtitle" />
-    <div v-if="description" class="impact-stat-description pt-3 m-3" v-html="translatedDescription" />
+    <div v-if="description && count > 0" class="impact-stat-description pt-3 m-3 d-flex" >
+      <span v-html="translatedDescription" />
+      <b-img v-if="popover" v-b-popover.html="popover" class="ml-2 icon-info clickable" src="/icons/info_ico_green.svg" />
+    </div>
     <div class="image d-flex justify-content-around" v-if="image">
       <b-img :src="image" />
+    </div>
+    <div class="d-flex justify-content-end" v-if="share">
+      <b-btn href="#" variant="link" @click="shareThis" class="text-brand">
+        {{ __('partials.share_this') }}
+      </b-btn>
     </div>
   </div>
 </template>
@@ -96,6 +104,16 @@ export default {
       type: String,
       required: false,
       default: null
+    },
+    popover: {
+      type: String,
+      required: false,
+      default: null
+    },
+    share: {
+      type: Boolean,
+      required: false,
+      default: false
     }
   },
   computed: {
@@ -120,6 +138,11 @@ export default {
     },
     printableCount() {
       return this.countIsNumber ? this.roundedCount.toLocaleString() : this.count
+    }
+  },
+  methods: {
+    shareThis() {
+      this.$emit('share')
     }
   }
 }

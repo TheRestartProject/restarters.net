@@ -35,6 +35,10 @@ class EditTest extends TestCase
         $iddevices = $rsp['devices'][0]['iddevices'];
         self::assertNotNull($iddevices);
 
+        # Add a barrier to repair - there was a bug in this case with quantity > 1.
+        $this->device_inputs['repair_status'] = Device::REPAIR_STATUS_ENDOFLIFE;
+        $this->device_inputs['barrier'] = [1];
+
         # Edit the quantity.
         $atts = $this->device_inputs;
         $atts['quantity'] = 2;
@@ -129,7 +133,7 @@ class EditTest extends TestCase
         self::assertEquals(1, count($ret['images']));
 
         // And again, which will test we can upload two.
-        file_put_contents('/tmp/UT2.jpg', file_get_contents('public/images/community.jpg'));
+        file_put_contents('/tmp/UT2.jpg', file_get_contents(public_path() .'/images/community.jpg'));
 
         $_FILES = [
             'file' => [
@@ -185,7 +189,7 @@ class EditTest extends TestCase
         self::assertEquals(1, count($ret['images']));
 
         // And again, which will test we can upload two.
-        file_put_contents('/tmp/UT2.jpg', file_get_contents('public/images/community.jpg'));
+        file_put_contents('/tmp/UT2.jpg', file_get_contents(public_path() .'/images/community.jpg'));
 
         $_FILES = [
             'file' => [
@@ -255,5 +259,18 @@ class EditTest extends TestCase
         self::assertEquals(0, $device->professional_help);
         self::assertEquals(1, $device->do_it_yourself);
         self::assertEquals(0, $device->more_time_needed);
+    }
+
+    public function testBarrierMultiple()
+    {
+        $atts = $this->device_inputs;
+        $atts['quantity'] = 2;
+        $atts['repair_status'] = Device::REPAIR_STATUS_ENDOFLIFE;
+        $atts['barrier'] = [1];
+
+        $rsp = $this->post('/device/create', $atts);
+        self::assertTrue($rsp['success']);
+        $iddevices = $rsp['devices'][0]['iddevices'];
+        self::assertNotNull($iddevices);
     }
 }

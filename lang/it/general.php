@@ -11,7 +11,6 @@ return [
   'alert_uptodate_text' => 'Non hai nessuna azione da fare ora.  Quando sara\' necessaria ti faremo sapere.',
   'general' => 'Generale',
   'reporting' => 'Reporting',
-  'party_reporting' => 'Segnalazione eventi',
   'signmeup' => 'Fammi entrare!',
   'introduction_message' => 'Siamo una comunità globale di persone che aiutano gli altri a riparare i propri  dispositivi elettronici in eventi comunitari. Unisciti a noi!',
   'your_name' => 'Tuo nome',
@@ -24,7 +23,6 @@ return [
   'email_alerts_text' => 'Scegli quale tipo di aggiornamenti e-mail desideri ricevere. Puoi cambiarli in qualsiasi momento. La nostra politica sulla privacy è disponibile <a href="https://therestartproject.org/data-and-privacy-policy/fixometer/" rel="noopener noreferrer" target="_blank"> qui </a>',
   'email_alerts_pref1' => 'Vorrei ricevere la newsletter mensile del Restart Project',
   'email_alerts_pref2' => 'Vorrei ricevere notifiche e-mail su eventi o gruppi vicino a me',
-  'filter-results' => 'Risultato del filtro',
   'menu_tools' => 'Strumenti per la comunità',
   'menu_discourse' => 'Discussione',
   'menu_wiki' => 'Wiki',
@@ -35,6 +33,5 @@ return [
   'help_feedback_url' => 'https://talk.restarters.net/c/help',
   'faq_url' => 'https://therestartproject.org/faq',
   'restartproject_url' => 'https://therestartproject.org',
-  'please_select' => 'Seleziona per favore',
   'calendar_feed_help_url' => '/t/fixometer-how-to-subscribe-to-a-calendar',
 ];

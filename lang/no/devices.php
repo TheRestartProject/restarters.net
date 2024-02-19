@@ -3,7 +3,6 @@
 return [
   'devices' => 'Devices',
   'export_device_data' => 'Export device data',
-  'by_date' => 'By date',
   'various' => 'Various',
   'category' => 'Category',
   'group' => 'Group',
@@ -23,10 +22,7 @@ return [
   'age' => 'Age',
   'devices_description' => 'Description of problem/solution',
   'delete_device' => 'Delete device',
-  'from_manufacturer' => 'From manufacturer',
-  'from_third_party' => 'From third party',
   'weight' => 'Weight',
   'required_impact' => 'kg - required for environmental impact calculation',
   'age_approx' => 'years - approximate, if known',
-  'repair_source' => 'Source of repair information',
 ];

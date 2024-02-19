@@ -23,11 +23,10 @@ class WordpressGroupPushTest extends TestCase
     protected function setUp(): void
     {
         parent::setUp();
-        DB::statement('SET foreign_key_checks=0');
-        User::truncate();
-        Group::truncate();
-        Party::truncate();
-        DB::statement('SET foreign_key_checks=1');
+
+        // These tests are hard to get working with genuinely queued events, so use the sync queue.
+        $queueManager = $this->app['queue'];
+        $queueManager->setDefaultDriver('sync');
     }
 
     /** @test */
@@ -56,6 +55,7 @@ class WordpressGroupPushTest extends TestCase
         $groupData['group_avatar'] = 'foo.png';
 
         event(new ApproveGroup($group, $groupData));
+        $this->artisan("queue:work --stop-when-empty");
     }
 
     /** @test */
@@ -84,5 +84,6 @@ class WordpressGroupPushTest extends TestCase
         $groupData['longitude'] = '1';
 
         event(new EditGroup($group, $groupData));
+        $this->artisan("queue:work --stop-when-empty");
     }
 }

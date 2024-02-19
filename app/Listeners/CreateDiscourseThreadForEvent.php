@@ -8,7 +8,7 @@ use App\Party;
 use App\User;
 use Illuminate\Support\Facades\Log;
 
-class CreateDiscourseThreadForEvent
+class CreateDiscourseThreadForEvent extends BaseEvent
 {
     /**
      * Create the event listener.
@@ -76,7 +76,7 @@ class CreateDiscourseThreadForEvent
                 $params = [
                     'raw' => $intro,
                     'title' => $theParty->venue.' '.$theParty->event_date_local,
-                    'target_usernames' => $host->username,
+                    'target_recipients' => $host->username,
                     'archetype' => 'private_message',
                 ];
 

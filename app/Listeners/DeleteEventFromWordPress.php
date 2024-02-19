@@ -9,7 +9,7 @@ use HieuLe\WordpressXmlrpcClient\WordpressClient;
 use Illuminate\Support\Facades\Log;
 use Notification;
 
-class DeleteEventFromWordPress
+class DeleteEventFromWordPress extends BaseEvent
 {
     protected $wpClient;
 

@@ -36,6 +36,7 @@ class CategoryFactory extends Factory
         'name' => 'Desktop computer',
         'revision' => 2,
         'aggregate' => 0,
+        'cluster' => 1
     ];
         });
     }

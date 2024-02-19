@@ -123,20 +123,11 @@ class CreateEventTest extends TestCase
             assertSee($eventAttributes['venue']);
 
         // Check that the event appears in the API.
-        $rsp = $this->get('/api/groups/' . $group->idgroups . '/events');
-        $rsp->assertStatus(200);
-        $json = json_decode($rsp->getContent(), true);
-        $events = json_decode($json['events']);
-        self::assertEquals(1, count($events));
-        self::assertEquals($event->idevents, $events[0]->idevents);
-
-        $rsp = $this->get('/api/groups/' . $group->idgroups . '/events?format=location');
-        $rsp->assertStatus(200);
-        $json = json_decode($rsp->getContent(), true);
-        $events = json_decode($json['events']);
-        self::assertEquals(1, count($events));
-        self::assertEquals($event->idevents, $events[0]->id);
-        self::assertEquals($event->FriendlyLocation, $events[0]->location);
+        $response = $this->get("/api/v2/groups/{$group->idgroups}/events");
+        $response->assertSuccessful();
+        $json = json_decode($response->getContent(), true);
+        $this->assertEquals(1, count($json['data']));
+        $this->assertEquals($event->idevents, $json['data'][0]['id']);
 
         // Now check whether the event shows/doesn't show correctly for different user roles.
         list($role, $seeEvent, $canModerate) = $data;
@@ -194,6 +185,7 @@ class CreateEventTest extends TestCase
 
         // Approve the event.
         $event->approve();
+        $this->artisan("queue:work --stop-when-empty");
 
         // Approval should generate a notification to the host.
         Notification::assertSentTo(
@@ -358,6 +350,7 @@ class CreateEventTest extends TestCase
         $eventData['id'] = $event->idevents;
         $eventData['moderate'] = 'approve';
         $response1a = $this->patch('/api/v2/events/'.$event->idevents, $this->eventAttributesToAPI($eventData));
+        $this->artisan("queue:work --stop-when-empty");
 
         // assert
         Notification::assertSentTo(
@@ -577,6 +570,7 @@ class CreateEventTest extends TestCase
 
         // Create the event
         $idevents = $this->createEvent($group->idgroups, '2000-01-01');
+        $this->artisan("queue:work --stop-when-empty");
 
         $party = $group->parties()->latest()->first();
         $this->assertEquals($idevents, $party->idevents);
@@ -718,6 +712,7 @@ class CreateEventTest extends TestCase
         // Approval should generate a notification to the host.
         $event = Party::latest()->first();
         $event->approve();
+        $this->artisan("queue:work --stop-when-empty");
 
         Notification::assertSentTo(
             [$host], EventConfirmed::class

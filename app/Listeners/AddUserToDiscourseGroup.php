@@ -7,7 +7,7 @@ use App\Notifications\NewDiscourseMember;
 use Illuminate\Support\Facades\Log;
 use Notification;
 
-class AddUserToDiscourseGroup
+class AddUserToDiscourseGroup extends BaseEvent
 {
     /**
      * Create the event listener.

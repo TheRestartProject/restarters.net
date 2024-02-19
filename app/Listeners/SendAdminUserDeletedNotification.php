@@ -7,7 +7,7 @@ use App\Helpers\Fixometer;
 use App\Notifications\AdminUserDeleted;
 use Illuminate\Support\Facades\Notification;
 
-class SendAdminUserDeletedNotification
+class SendAdminUserDeletedNotification extends BaseEvent
 {
     /**
      * @param UserDeleted $event

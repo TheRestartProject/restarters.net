@@ -54,44 +54,6 @@ class DiscourseService
         return $topics;
     }
 
-    public function getUserIdsByBadge($badgeId)
-    {
-        if (! config('restarters.features.discourse_integration')) {
-            return [];
-        }
-
-        $externalUserIds = [];
-
-        try {
-            $client = app('discourse-client');
-
-            $endpoint = "/user_badges.json?badge_id={$badgeId}";
-            $response = $client->request('GET', $endpoint);
-            if ($response->getStatusCode() == 404) {
-                Log::error("{$endpoint} not found");
-                throw new \Exception("{$endpoint} not found");
-            }
-            $discourseResult = json_decode($response->getBody());
-
-            $users = $discourseResult->users;
-
-            foreach ($users as $user) {
-                $endpoint = "/admin/users/{$user->id}.json";
-                $response = $client->request('GET', $endpoint);
-                $discourseResult = json_decode($response->getBody());
-                $externalUserIds[] = [
-                    'external_id' => $discourseResult->single_sign_on_record->external_id,
-                    'username' => $discourseResult->single_sign_on_record->external_username,
-                ];
-                $this->avoidRateLimiting();
-            }
-        } catch (\Exception $ex) {
-            Log::error('Error retrieving users by badge: '.$ex->getMessage());
-        }
-
-        return $externalUserIds;
-    }
-
     protected function avoidRateLimiting()
     {
         // Sleep to avoid Discourse rate limiting of 60 requests per minute.
@@ -463,9 +425,7 @@ class DiscourseService
                                 Log::info("Add $discourseMember as admin of {$discourseId} {$discourseName}");
                                 $response = $client->request('PUT', "/admin/groups/$discourseId/owners.json", [
                                     'form_params' => [
-                                        'group' => [
-                                            'usernames' => $discourseMember
-                                        ]
+                                        'usernames' => $discourseMember
                                     ]
                                 ]);
 

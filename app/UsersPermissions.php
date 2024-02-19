@@ -13,4 +13,6 @@ class UsersPermissions extends Model
      * @var array
      */
     protected $fillable = ['permission_id', 'user_id'];
+
+    public $timestamps = false;
 }

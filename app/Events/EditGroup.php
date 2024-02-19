@@ -16,6 +16,7 @@ class EditGroup
     use Dispatchable, InteractsWithSockets, SerializesModels;
 
     public $group;
+    public $data;
 
     /**
      * Create a new event instance.

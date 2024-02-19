@@ -71,7 +71,7 @@
     </b-tr>
     <b-tr v-else :key="'editing-' + device.iddevices">
       <b-td colspan="8" class="p-0">
-        <EventDevice :device="device" :powered="powered" :add="false" :edit="true" :clusters="clusters" :idevents="idevents" :brands="brands" :barrier-list="barrierList" :itemTypes="itemTypes" @close="close" />
+        <EventDevice :device="device" :powered="powered" :add="false" :edit="true" :clusters="clusters" :idevents="idevents" :brands="brands" :barrier-list="barrierList" @close="close" />
       </b-td>
     </b-tr>
   </transition>
@@ -115,11 +115,6 @@ export default {
       default: null
     },
     barrierList: {
-      type: Array,
-      required: false,
-      default: null
-    },
-    itemTypes: {
       type: Array,
       required: false,
       default: null
