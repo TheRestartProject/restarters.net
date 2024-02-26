@@ -103,5 +103,11 @@ Route::prefix('v2')->group(function() {
         });
 
         Route::get('/items', [API\ItemController::class, 'listItemsv2']);
+
+        Route::prefix('/devices')->group(function() {
+            Route::get('{id}', [API\DeviceController::class, 'getDevicev2']);
+            Route::post('', [API\DeviceController::class, 'createDevicev2']);
+            Route::patch('{id}', [API\DeviceController::class, 'updateDevicev2']);
+        });
     });
 });
