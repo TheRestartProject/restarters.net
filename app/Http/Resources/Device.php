@@ -173,8 +173,9 @@ class Device extends JsonResource
                 $ret['repair_status'] = 'End of life';
 
                 // The underlying DB might have multiple barriers, but we only support one across the API.
-                if (count($this->barriers)) {
-                    $ret['barrier'] = $this->barriers[0]->barrier;
+                foreach ($this->resource->barriers as $barrier) {
+                        $ret['barrier'] = $barrier->barrier;
+                        break;
                 }
                 break;
         }

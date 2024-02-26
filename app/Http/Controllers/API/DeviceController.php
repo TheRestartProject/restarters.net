@@ -189,6 +189,7 @@ class DeviceController extends Controller {
         $data = [
             'event' => $partyid,
             'category' => $category,
+            'category_creation' => $category,
             'item_type' => $item_type,
             'brand' => $brand,
             'model' => $model,
@@ -239,7 +240,7 @@ class DeviceController extends Controller {
                 'category' => 'required|integer',
                 'brand' => 'string',
                 'model' => 'string',
-                'age' => [ 'integer', 'max:500' ],
+                'age' => [ 'numeric', 'max:500' ],
                 'estimate' => [ 'numeric', 'min:0' ],
                 'problem' => 'string',
                 'notes' => 'string',
@@ -255,7 +256,7 @@ class DeviceController extends Controller {
                 'category' => 'required|integer',
                 'brand' => 'string',
                 'model' => 'string',
-                'age' => [ 'integer', 'max:500' ],
+                'age' => [ 'numeric', 'max:500' ],
                 'estimate' => [ 'numeric', 'min:0' ],
                 'problem' => 'string',
                 'notes' => 'string',
@@ -349,5 +350,23 @@ class DeviceController extends Controller {
             $do_it_yourself,
             $barrier
         );
+    }
+    private function getUser()
+    {
+        // We want to allow this call to work if a) we are logged in as a user, or b) we have a valid API token.
+        //
+        // This is a slightly odd thing to do, but it is necessary to get both the PHPUnit tests and the
+        // real client use of the API to work.
+        $user = Auth::user();
+
+        if (!$user) {
+            $user = auth('api')->user();
+        }
+
+        if (!$user) {
+            throw new AuthenticationException();
+        }
+
+        return $user;
     }
 }
