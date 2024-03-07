@@ -44,13 +44,13 @@ class Network extends Model
     public function eventsRequiringModeration()
     {
         $groups = $this->groups;
-        $events = collect([]);
+        $events = [];
 
         foreach ($groups as $group) {
-            $events->push($group->parties()->where('approved', false)->whereNull('deleted_at'));
+            $events = array_merge($events, $group->parties()->where('approved', false)->whereNull('deleted_at')->get()->all());
         }
 
-        return $events->flatten(1);
+        return $events;
     }
 
     public function sizedLogo($size)
