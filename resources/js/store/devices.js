@@ -31,7 +31,26 @@ export default {
         Vue.set(state.images, d.iddevices, d.images)
       })
     },
-    add (state, params) {
+    async add (state, params) {
+      const formData = new FormData()
+
+      for (var key in params) {
+        if (params[key]) {
+          formData.append(key, params[key]);
+        }
+      }
+
+      let ret = await axios.post('/api/v2/devices?api_token=' + rootGetters['auth/apiToken'], formData, {
+        headers: {
+          "Content-Type": "multipart/form-data",
+        },
+      })
+
+      console.log('Create device returned', ret)
+      if (ret && ret.data) {
+        id = ret.data.id
+      }
+
       let exists = false
 
       if (params.iddevices) {
