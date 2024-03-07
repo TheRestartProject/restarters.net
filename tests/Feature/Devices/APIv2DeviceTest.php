@@ -200,7 +200,7 @@ class APIv2DeviceTest extends TestCase
             ],
             [
                 Device::REPAIR_STATUS_ENDOFLIFE,
-                'End of life',
+                'End-of-life',
                 Device::SPARE_PARTS_NOT_NEEDED,
                 null,
                 null,
