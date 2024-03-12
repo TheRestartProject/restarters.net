@@ -20,6 +20,7 @@ use App\UsersSkills;
 use App\User;
 use App\UserGroups;
 use App\Xref;
+use App\Alert;
 use Auth;
 use Carbon\Carbon;
 use DB;
@@ -62,6 +63,7 @@ abstract class TestCase extends BaseTestCase
         Images::truncate();
         UsersSkills::truncate();
         Skills::truncate();
+        Alert::truncate();
         DB::statement('delete from audits');
         DB::delete('delete from user_network');
         DB::delete('delete from grouptags_groups');

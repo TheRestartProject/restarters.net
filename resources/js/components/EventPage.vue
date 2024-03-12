@@ -1,19 +1,22 @@
 <template>
-  <div v-if="event">
-    <EventHeading :idevents="idevents" :canedit="canedit" :candelete="candelete" :is-admin="isAdmin" :in-group="inGroup" :is-attending="isAttending" />
-    <div class="ep-layout">
-      <div>
-        <EventDetails class="pr-md-3" :idevents="idevents" :hosts="hosts" :calendar-links="calendarLinks" :is-attending="isAttending" :discourse-thread="discourseThread" />
-        <EventDescription class="pr-md-3" :idevents="idevents" />
+  <div>
+    <AlertBanner />
+    <div v-if="event">
+      <EventHeading :idevents="idevents" :canedit="canedit" :candelete="candelete" :is-admin="isAdmin" :in-group="inGroup" :is-attending="isAttending" />
+      <div class="ep-layout">
+        <div>
+          <EventDetails class="pr-md-3" :idevents="idevents" :hosts="hosts" :calendar-links="calendarLinks" :is-attending="isAttending" :discourse-thread="discourseThread" />
+          <EventDescription class="pr-md-3" :idevents="idevents" />
+        </div>
+        <div>
+          <EventAttendance class="pl-md-3" :idevents="idevents" :canedit="canedit" :invitations="invitations" />
+        </div>
       </div>
+      <EventImages :images="images" v-if="images && images.length" />
       <div>
-        <EventAttendance class="pl-md-3" :idevents="idevents" :canedit="canedit" :invitations="invitations" />
+        <EventStats :idevents="idevents" />
+        <EventDevices id="devices-section":idevents="idevents" :canedit="canedit || isAttending" :devices="devices" :clusters="clusters" :brands="brands" :barrier-list="barrierList" />
       </div>
-    </div>
-    <EventImages :images="images" v-if="images && images.length" />
-    <div>
-      <EventStats :idevents="idevents" />
-      <EventDevices id="devices-section":idevents="idevents" :canedit="canedit || isAttending" :devices="devices" :clusters="clusters" :brands="brands" :barrier-list="barrierList" />
     </div>
   </div>
 </template>
@@ -27,9 +30,10 @@ import EventImages from './EventImages'
 import EventStats from './EventStats'
 import EventDevices from './EventDevices'
 import auth from '../mixins/auth'
+import AlertBanner from './AlertBanner'
 
 export default {
-  components: {EventDevices, EventStats, EventImages, EventAttendance, EventDescription, EventDetails, EventHeading},
+  components: {EventDevices, EventStats, EventImages, EventAttendance, EventDescription, EventDetails, EventHeading, AlertBanner},
   mixins: [ event, auth ],
   props: {
     initialEvent: {
