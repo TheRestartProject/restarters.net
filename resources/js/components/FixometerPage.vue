@@ -1,5 +1,6 @@
 <template>
   <div class="mb-2">
+    <AlertBanner />
     <FixometerHeading />
     <FixometerGlobalImpact :latest-data="latestData" :impact-data="impactData" class="mt-4" />
     <hr class="mt-md-50 hr-dashed">
@@ -171,9 +172,11 @@ import FixometerRecordsTable from './FixometerRecordsTable'
 import FixometerFilters from './FixometerFilters'
 import CollapsibleSection from './CollapsibleSection'
 import auth from '../mixins/auth'
+import AlertBanner from './AlertBanner'
 
 export default {
-  components: {CollapsibleSection, FixometerFilters, FixometerRecordsTable, FixometerGlobalImpact, FixometerHeading},
+  components: {
+    CollapsibleSection, FixometerFilters, FixometerRecordsTable, FixometerGlobalImpact, FixometerHeading, AlertBanner},
   mixins: [ auth ],
   props: {
     latestData: {

@@ -12,7 +12,7 @@ use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Foundation\Testing\WithFaker;
 use Tests\TestCase;
 
-class NetworkTests extends TestCase
+class NetworkTest extends TestCase
 {
     protected function setUp(): void
     {
@@ -26,8 +26,7 @@ class NetworkTests extends TestCase
         DB::statement('SET foreign_key_checks=1');
     }
 
-    /** @test */
-    public function it_can_return_events_requiring_moderation()
+    public function testEventsRequiringModeration()
     {
         // arrange
         $network = Network::factory()->create();
@@ -43,12 +42,22 @@ class NetworkTests extends TestCase
         $event1 = Party::factory()->create(['approved' => false, 'group' => $group1, 'event_start_utc' => $start, 'event_end_utc' => $end]);
         $event2 = Party::factory()->create(['approved' => true, 'group' => $group2, 'event_start_utc' => $start, 'event_end_utc' => $end]);
 
+        // Past events should appear too.
+        $start = Carbon::now()->subDays(1)->toIso8601String();
+        $end = Carbon::now()->subDays(2)->toIso8601String();
+        $event3 = Party::factory()->create(['approved' => false, 'group' => $group1, 'event_start_utc' => $start, 'event_end_utc' => $end]);
+        $event4 = Party::factory()->create(['approved' => true, 'group' => $group2, 'event_start_utc' => $start, 'event_end_utc' => $end]);
+
         // act
-        $eventsRequiringModeration = $network->eventsRequiringModeration();
-        $ids = $eventsRequiringModeration->pluck('idevents');
+        $ids = [];
+        foreach ($network->eventsRequiringModeration() as $event) {
+            $ids[] = $event->idevents;
+        }
 
         // assert
-        $this->assertStringContainsString($event1->idevents, $ids);
-        $this->assertStringNotContainsString($event2->idevents, $ids);
+        $this->assertContains($event1->idevents, $ids);
+        $this->assertNotContains($event2->idevents, $ids);
+        $this->assertContains($event3->idevents, $ids);
+        $this->assertNotContains($event4->idevents, $ids);
     }
 }

@@ -23,7 +23,7 @@ export default {
         async fetch({ commit, state }) {
             // Item types don't change often, so only fetch if we don't have them in store.
             if (!state.fetching && !state.list.length) {
-                state.fetching = axios.get('/api/v2/items')
+                state.fetching = axios.get('/api/v2/alerts')
             }
 
             let ret = await state.fetching
