@@ -54,3 +54,6 @@ mix.js('resources/wiki/js/wiki.js', 'public/js/wiki.js')
 mix.alias({
     vue$: path.resolve(__dirname, 'node_modules/vue/dist/vue.esm.js'),
 })
+
+mix.copy('resources/js/components/StatsShare.vue', 'public/js/components/StatsShare.vue')
+mix.copy('resources/js/translations.js', 'public/js/translations.js')
