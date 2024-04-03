@@ -147,6 +147,10 @@ class EventController extends Controller
 
     public function addVolunteer(Request $request, $idevents)
     {
+        $request->validate([
+            'volunteer_email_address' => 'email',
+        ]);
+
         $party = Party::findOrFail($idevents);
 
         if (!Fixometer::userHasEditPartyPermission($idevents)) {

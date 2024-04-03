@@ -67,6 +67,7 @@ abstract class TestCase extends BaseTestCase
         DB::statement('delete from audits');
         DB::delete('delete from user_network');
         DB::delete('delete from grouptags_groups');
+        DB::delete('delete from failed_jobs');
         DB::table('notifications')->truncate();
         DB::statement('SET foreign_key_checks=1');
         DB::delete('delete from devices_faults_vacuums_ora_opinions');

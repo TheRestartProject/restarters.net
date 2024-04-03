@@ -32,6 +32,7 @@ use Illuminate\Support\Facades\Log;
 use Lang;
 use Notification;
 use Spatie\CalendarLinks\Link;
+use Spatie\ValidationRules\Rules\Delimited;
 
 class PartyController extends Controller
 {
@@ -593,6 +594,10 @@ class PartyController extends Controller
     public function postSendInvite(Request $request)
     {
         $from_id = Auth::id();
+        $request->validate([
+            'manual_invite_box' => [(new Delimited('email'))->min(1)],
+        ]);
+
         $group_name = $request->input('group_name');
         $event_id = $request->input('event_id');
 
