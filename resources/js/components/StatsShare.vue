@@ -386,10 +386,10 @@ export default {
           this.ctx = this.canvas.getContext('2d')
           const canvas = this.canvas
           let ctx = this.ctx
-          ctx.font = "bold " + this.fontSize + "px Asap, sans-serif"
 
           // Add background.
           this.insertImage(this.image, 0, 0, this.width, this.height, function() {
+            ctx.font = "bold " + this.fontSize + "px Asap, sans-serif"
             let x = this.initialX
             let y = this.initialY
 
