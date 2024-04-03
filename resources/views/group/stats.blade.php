@@ -21,14 +21,14 @@
       <div class="col">
           <h5>waste prevented</h5>
           <span class="largetext">
-              {{ number_format($waste_total, 0) }} kg
+              {{ number_format(round($waste_total), 0) }} kg
           </span>
       </div>
 
       <div class="col">
           <h5>CO<sub>2</sub> emission prevented</h5>
 
-          <span class="largetext">{{ number_format($co2_total, 0) }} kg</span>
+          <span class="largetext">{{ number_format(round($co2_total), 0) }} kg</span>
       </div>
 
   </div>
