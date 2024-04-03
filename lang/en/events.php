@@ -31,7 +31,7 @@ return [
   'share_stats_message' => 'Well done! On the :date at :event_name we were able to repair <strong>:number_devices devices</strong>. Help us spread the message by sharing your environmental impact on your website.',
   'embed_code_header' => 'Embed code',
   'infographic_message' => 'An infographic of an easy-to-understand equivalent of the CO<sub>2</sub> emissions that your group has prevented',
-  'headline_stats_message' => 'This widget shows the headline stats for your event e.g. the number of participants at your parties; the hours volunteered',
+  'headline_stats_message' => 'This widget shows the headline stats for your event e.g. the number of participants at your party; the hours volunteered',
   'invite_restarters_modal_heading' => 'Invite volunteers',
   'shareable_link' => 'Invite via shareable link',
   'email_invite' => 'Invite via email',
