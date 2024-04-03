@@ -43,8 +43,8 @@ class AlertController extends Controller
         if (\Cache::has('alerts')) {
             $alerts = \Cache::get('alerts');
         } else {
-            $alerts = Alert::whereDate('start', '<=', date('Y-m-d  H:i', strtotime(Carbon::now())))
-                ->whereDate('end', '>=', date('Y-m-d  H:i', strtotime(Carbon::now())))->get();
+            $now = Carbon::now()->setTimezone('UTC')->toDateTimeString();
+            $alerts = Alert::where('start', '<=', $now)->where('end', '>=', $now)->get();
             \Cache::put('alerts', $alerts, 7200);
         }
 
@@ -212,6 +212,7 @@ class AlertController extends Controller
         $alert = Alert::findOrFail($id);
 
         list($start, $end, $title, $html, $ctatitle, $ctalink) = $this->validateAlertParams($request, true);
+        echo "Start $start, $end";
 
         $alert->update([
             'start' => $start,
