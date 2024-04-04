@@ -14,7 +14,7 @@
 
       <div class="modal-body">
 
-        <p>@lang('events.share_stats_message', ['date' => $event->getFormattedLocalStart(), 'event_name' => $formdata->venue, 'number_devices' => count($formdata->devices)])</p>
+          <p>@lang('events.share_stats_message', ['date' => $event->getFormattedLocalStart(), 'event_name' => $formdata->venue, 'number_devices' => $stats['fixed_devices']])</p>
 
         <div id="accordionEvent" class="accordion__share mt-4">
 
