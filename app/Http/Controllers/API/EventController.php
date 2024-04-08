@@ -147,6 +147,10 @@ class EventController extends Controller
 
     public function addVolunteer(Request $request, $idevents)
     {
+        $request->validate([
+            'volunteer_email_address' => 'email',
+        ]);
+
         $party = Party::findOrFail($idevents);
 
         if (!Fixometer::userHasEditPartyPermission($idevents)) {
@@ -354,16 +358,17 @@ class EventController extends Controller
             }
         }
 
+        $events = [];
+
         foreach ($networks as $network) {
-            foreach ($network->eventsRequiringModeration() as $event) {
-                $ret[] = \App\Http\Resources\Party::make($event);
-            }
+            $events = array_merge($events, $network->eventsRequiringModeration());
         }
 
-        // Sort $ret by ->sortBy('event_start_utc') ascending order of time
-        usort($ret, function ($a, $b) {
-            return strtotime($a->resource->event_start_utc) - strtotime($b->resource->event_start_utc);
+        usort($events, function ($a, $b) {
+            return strtotime($a->event_start_utc) - strtotime($b->event_start_utc);
         });
+
+        $ret = \App\Http\Resources\Party::collection(collect($events));
 
         return response()->json($ret);
     }

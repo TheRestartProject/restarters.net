@@ -6,7 +6,7 @@
       <b-img-lazy fluid src="/images/confetti_doodle.svg" class="d-none d-md-block" />
     </div>
     <div class="dp-layout mt-4 mb-4">
-      <DashboardBanner class="banner" />
+      <AlertBanner class="banner" />
       <div class="yourgroups">
         <DashboardYourGroups :newGroups="newGroups" :nearbyGroups="nearbyGroups" :location="location" />
       </div>
@@ -23,14 +23,14 @@
 </template>
 <script>
 import auth from '../mixins/auth'
-import DashboardBanner from './DashboardBanner'
+import AlertBanner from './AlertBanner'
 import DashboardYourGroups from './DashboardYourGroups'
 import DashboardRightSidebar from './DashboardRightSidebar'
 import DiscourseDiscussion from './DiscourseDiscussion'
 import DashboardAddData from './DashboardAddData'
 
 export default {
-  components: {DashboardAddData, DashboardYourGroups,DashboardRightSidebar,DashboardBanner,DiscourseDiscussion},
+  components: {DashboardAddData, DashboardYourGroups,DashboardRightSidebar,AlertBanner,DiscourseDiscussion},
   mixins: [ auth ],
   props: {
     yourGroups: {
@@ -67,10 +67,6 @@ export default {
     newGroups: {
       type: Array,
       required: true
-    }
-  },
-  data () {
-    return {
     }
   },
   created() {
