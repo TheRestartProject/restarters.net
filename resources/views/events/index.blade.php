@@ -93,6 +93,7 @@
             add-group-name
             show-other
             location="{{ Auth::user()->location ?? '' }}"
+            banner
         />
       </div>
       @else

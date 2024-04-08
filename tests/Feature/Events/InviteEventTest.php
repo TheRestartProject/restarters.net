@@ -17,6 +17,7 @@ use Tests\TestCase;
 use App\Notifications\JoinEvent;
 use Illuminate\Support\Facades\Queue;
 use function PHPUnit\Framework\assertEquals;
+use Illuminate\Validation\ValidationException;
 
 class InviteEventTest extends TestCase
 {
@@ -444,37 +445,6 @@ class InviteEventTest extends TestCase
         $rsp = $this->get('/party/invite/' . $unique_shareable_code . '1');
     }
 
-    public function testInviteInvalid()
-    {
-        Notification::fake();
-
-        $this->withoutExceptionHandling();
-
-        $group = Group::factory()->create([
-                                              'approved' => true
-                                           ]);
-        $event = Party::factory()->create([
-                                                   'group' => $group,
-                                                   'event_start_utc' => '2130-01-01T12:13:00+00:00',
-                                                   'event_end_utc' => '2130-01-01T13:14:00+00:00',
-                                               ]);
-
-        $host = User::factory()->host()->create();
-        $this->actingAs($host);
-
-        // Invite a user.
-        $user = User::factory()->restarter()->create();
-
-        $response = $this->post('/party/invite', [
-            'group_name' => $group->name,
-            'event_id' => $event->idevents,
-            'manual_invite_box' => '@invalidmail',
-            'message_to_restarters' => 'Join us, but not in a creepy zombie way',
-        ]);
-
-        $response->assertSessionHas('warning');
-    }
-
     public function testInviteNonUsers() {
         Notification::fake();
 
@@ -525,13 +495,47 @@ class InviteEventTest extends TestCase
         // Invite a user.
         $user = User::factory()->restarter()->create();
 
+        $this->expectException(ValidationException::class);
+
         $response = $this->post('/party/invite', [
             'group_name' => $group->name,
             'event_id' => $event->idevents,
             'manual_invite_box' => '',
             'message_to_restarters' => 'Join us, but not in a creepy zombie way',
         ]);
+    }
 
-        $response->assertSessionHas('warning');
+    /**
+     * @dataProvider invalidEmailProvider
+     */
+    public function testInviteInvalidEmail($email, $valid)
+    {
+        $this->loginAsTestUser(Role::ADMINISTRATOR);
+
+        $idgroups = $this->createGroup();
+        $group = Group::findOrFail($idgroups);
+        $idevents = $this->createEvent($idgroups, 'tomorrow');
+        $event = Party::findOrFail($idevents);
+
+        if (!$valid) {
+            $this->expectException(ValidationException::class);
+        }
+
+        $this->post('/party/invite', [
+            'group_name' => $group->name,
+            'event_id' => $event->idevents,
+            'manual_invite_box' => $email,
+            'message_to_restarters' => 'Join us, but not in a creepy zombie way',
+        ]);
+    }
+
+    public function invalidEmailProvider()
+    {
+        return [
+            ['test@test.com', true],
+            ['invalidmail', false],
+            ['invalidmail@', false],
+            ['test@test.com, invalidmail', false]
+        ];
     }
 }

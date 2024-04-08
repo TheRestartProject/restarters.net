@@ -34,6 +34,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Log;
 use Notification;
+use Spatie\ValidationRules\Rules\Delimited;
 
 class GroupController extends Controller
 {
@@ -287,6 +288,10 @@ class GroupController extends Controller
 
     public function postSendInvite(Request $request)
     {
+        $request->validate([
+            'manual_invite_box' => [(new Delimited('email'))->min(1)],
+        ]);
+
         $from_id = Auth::id();
         $group_name = $request->input('group_name');
         $group_id = $request->input('group_id');
