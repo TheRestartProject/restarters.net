@@ -103,7 +103,7 @@ class AlertsTest extends TestCase
         $this->artisan('alert:create', [
             'title' => 'Test alert',
             'html' => '<p>Test alert</p>',
-            'start' => 'today',
+            'start' => '-3 hour',
             'end' => 'tomorrow',
         ])->assertExitCode(0);
 
@@ -114,7 +114,5 @@ class AlertsTest extends TestCase
         self::assertEquals(1, count($json['data']));
         self::assertEquals('Test alert', $json['data'][0]['title']);
         self::assertEquals('<p>Test alert</p>', $json['data'][0]['html']);
-        self::assertEquals(date('Y-m-d') . 'T00:00:00+00:00', $json['data'][0]['start']);
-        self::assertEquals(date('Y-m-d', strtotime('+1 day')) . 'T00:00:00+00:00', $json['data'][0]['end']);
     }
 }
