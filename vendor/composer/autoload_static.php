@@ -100,6 +100,8 @@ class ComposerStaticInitf657da3451727d69be6269822b9691c7
             'Symfony\\Component\\Console\\' => 26,
             'Symfony\\Bridge\\PsrHttpMessage\\' => 30,
             'Spinen\\Discourse\\' => 17,
+            'Spatie\\ValidationRules\\Database\\Factories\\' => 42,
+            'Spatie\\ValidationRules\\' => 23,
             'Spatie\\CalendarLinks\\' => 21,
             'Soundasleep\\' => 12,
             'Sentry\\' => 7,
@@ -395,6 +397,14 @@ class ComposerStaticInitf657da3451727d69be6269822b9691c7
         'Spinen\\Discourse\\' => 
         array (
             0 => __DIR__ . '/..' . '/spinen/laravel-discourse-sso/src',
+        ),
+        'Spatie\\ValidationRules\\Database\\Factories\\' => 
+        array (
+            0 => __DIR__ . '/..' . '/spatie/laravel-validation-rules/database/factories',
+        ),
+        'Spatie\\ValidationRules\\' => 
+        array (
+            0 => __DIR__ . '/..' . '/spatie/laravel-validation-rules/src',
         ),
         'Spatie\\CalendarLinks\\' => 
         array (
@@ -799,12 +809,14 @@ class ComposerStaticInitf657da3451727d69be6269822b9691c7
         'AWS\\CRT\\OptionValue' => __DIR__ . '/..' . '/aws/aws-crt-php/src/AWS/CRT/Options.php',
         'AWS\\CRT\\Options' => __DIR__ . '/..' . '/aws/aws-crt-php/src/AWS/CRT/Options.php',
         'App\\Admin' => __DIR__ . '/../..' . '/app/Admin.php',
+        'App\\Alert' => __DIR__ . '/../..' . '/app/Alert.php',
         'App\\Audits' => __DIR__ . '/../..' . '/app/Audits.php',
         'App\\Barrier' => __DIR__ . '/../..' . '/app/Barrier.php',
         'App\\BattcatOra' => __DIR__ . '/../..' . '/app/BattcatOra.php',
         'App\\Brands' => __DIR__ . '/../..' . '/app/Brands.php',
         'App\\Category' => __DIR__ . '/../..' . '/app/Category.php',
         'App\\Cluster' => __DIR__ . '/../..' . '/app/Cluster.php',
+        'App\\Console\\Commands\\AlertCreate' => __DIR__ . '/../..' . '/app/Console/Commands/AlertCreate.php',
         'App\\Console\\Commands\\AnonymiseUsersForTest' => __DIR__ . '/../..' . '/app/Console/Commands/AnonymiseUsersForTest.php',
         'App\\Console\\Commands\\CheckGroupLocations' => __DIR__ . '/../..' . '/app/Console/Commands/CheckGroupLocations.php',
         'App\\Console\\Commands\\CheckTranslations' => __DIR__ . '/../..' . '/app/Console/Commands/CheckTranslations.php',
@@ -834,6 +846,7 @@ class ComposerStaticInitf657da3451727d69be6269822b9691c7
         'App\\Console\\Commands\\UserCreate' => __DIR__ . '/../..' . '/app/Console/Commands/UserCreate.php',
         'App\\Console\\Commands\\UserMakeHost' => __DIR__ . '/../..' . '/app/Console/Commands/UserMakeHost.php',
         'App\\Console\\Commands\\WordpressCreateEvent' => __DIR__ . '/../..' . '/app/Console/Commands/WordpressCreateEvent.php',
+        'App\\Console\\Commands\\WordpressCreateEventMissing' => __DIR__ . '/../..' . '/app/Console/Commands/WordpressCreateEventMissing.php',
         'App\\Console\\Commands\\WordpressCreateGroup' => __DIR__ . '/../..' . '/app/Console/Commands/WordpressCreateGroup.php',
         'App\\Console\\Kernel' => __DIR__ . '/../..' . '/app/Console/Kernel.php',
         'App\\Device' => __DIR__ . '/../..' . '/app/Device.php',
@@ -871,6 +884,7 @@ class ComposerStaticInitf657da3451727d69be6269822b9691c7
         'App\\Helpers\\Microtask' => __DIR__ . '/../..' . '/app/Helpers/Microtask.php',
         'App\\Helpers\\RepairNetworkService' => __DIR__ . '/../..' . '/app/Helpers/RepairNetworkService.php',
         'App\\Helpers\\RobustTranslator' => __DIR__ . '/../..' . '/app/Helpers/RobustTranslator.php',
+        'App\\Http\\Controllers\\API\\AlertController' => __DIR__ . '/../..' . '/app/Http/Controllers/API/AlertController.php',
         'App\\Http\\Controllers\\API\\DiscourseController' => __DIR__ . '/../..' . '/app/Http/Controllers/API/DiscourseController.php',
         'App\\Http\\Controllers\\API\\EventController' => __DIR__ . '/../..' . '/app/Http/Controllers/API/EventController.php',
         'App\\Http\\Controllers\\API\\GroupController' => __DIR__ . '/../..' . '/app/Http/Controllers/API/GroupController.php',
@@ -932,6 +946,8 @@ class ComposerStaticInitf657da3451727d69be6269822b9691c7
         'App\\Http\\Middleware\\VerifyCsrfToken' => __DIR__ . '/../..' . '/app/Http/Middleware/VerifyCsrfToken.php',
         'App\\Http\\Middleware\\VerifyTranslationAccess' => __DIR__ . '/../..' . '/app/Http/Middleware/VerifyTranslationAccess.php',
         'App\\Http\\Middleware\\VerifyUserConsent' => __DIR__ . '/../..' . '/app/Http/Middleware/VerifyUserConsent.php',
+        'App\\Http\\Resources\\Alert' => __DIR__ . '/../..' . '/app/Http/Resources/Alert.php',
+        'App\\Http\\Resources\\AlertCollection' => __DIR__ . '/../..' . '/app/Http/Resources/AlertCollection.php',
         'App\\Http\\Resources\\Group' => __DIR__ . '/../..' . '/app/Http/Resources/Group.php',
         'App\\Http\\Resources\\GroupCollection' => __DIR__ . '/../..' . '/app/Http/Resources/GroupCollection.php',
         'App\\Http\\Resources\\GroupLocation' => __DIR__ . '/../..' . '/app/Http/Resources/GroupLocation.php',
@@ -5917,6 +5933,14 @@ class ComposerStaticInitf657da3451727d69be6269822b9691c7
         'Spatie\\CalendarLinks\\Generators\\WebOutlook' => __DIR__ . '/..' . '/spatie/calendar-links/src/Generators/WebOutlook.php',
         'Spatie\\CalendarLinks\\Generators\\Yahoo' => __DIR__ . '/..' . '/spatie/calendar-links/src/Generators/Yahoo.php',
         'Spatie\\CalendarLinks\\Link' => __DIR__ . '/..' . '/spatie/calendar-links/src/Link.php',
+        'Spatie\\ValidationRules\\Database\\Factories\\UserFactory' => __DIR__ . '/..' . '/spatie/laravel-validation-rules/database/factories/UserFactory.php',
+        'Spatie\\ValidationRules\\Rules\\Authorized' => __DIR__ . '/..' . '/spatie/laravel-validation-rules/src/Rules/Authorized.php',
+        'Spatie\\ValidationRules\\Rules\\CountryCode' => __DIR__ . '/..' . '/spatie/laravel-validation-rules/src/Rules/CountryCode.php',
+        'Spatie\\ValidationRules\\Rules\\Currency' => __DIR__ . '/..' . '/spatie/laravel-validation-rules/src/Rules/Currency.php',
+        'Spatie\\ValidationRules\\Rules\\Delimited' => __DIR__ . '/..' . '/spatie/laravel-validation-rules/src/Rules/Delimited.php',
+        'Spatie\\ValidationRules\\Rules\\Enum' => __DIR__ . '/..' . '/spatie/laravel-validation-rules/src/Rules/Enum.php',
+        'Spatie\\ValidationRules\\Rules\\ModelsExist' => __DIR__ . '/..' . '/spatie/laravel-validation-rules/src/Rules/ModelsExist.php',
+        'Spatie\\ValidationRules\\ValidationRulesServiceProvider' => __DIR__ . '/..' . '/spatie/laravel-validation-rules/src/ValidationRulesServiceProvider.php',
         'Spinen\\Discourse\\Controllers\\SsoController' => __DIR__ . '/..' . '/spinen/laravel-discourse-sso/src/Controllers/SsoController.php',
         'Spinen\\Discourse\\Listeners\\LogoutDiscourseUser' => __DIR__ . '/..' . '/spinen/laravel-discourse-sso/src/Listeners/LogoutDiscourseUser.php',
         'Spinen\\Discourse\\SsoServiceProvider' => __DIR__ . '/..' . '/spinen/laravel-discourse-sso/src/SsoServiceProvider.php',

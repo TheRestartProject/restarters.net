@@ -46,6 +46,8 @@ return array(
     'Symfony\\Component\\Console\\' => array($vendorDir . '/symfony/console'),
     'Symfony\\Bridge\\PsrHttpMessage\\' => array($vendorDir . '/symfony/psr-http-message-bridge'),
     'Spinen\\Discourse\\' => array($vendorDir . '/spinen/laravel-discourse-sso/src'),
+    'Spatie\\ValidationRules\\Database\\Factories\\' => array($vendorDir . '/spatie/laravel-validation-rules/database/factories'),
+    'Spatie\\ValidationRules\\' => array($vendorDir . '/spatie/laravel-validation-rules/src'),
     'Spatie\\CalendarLinks\\' => array($vendorDir . '/spatie/calendar-links/src'),
     'Soundasleep\\' => array($vendorDir . '/soundasleep/html2text/src'),
     'Sentry\\' => array($vendorDir . '/sentry/sentry/src'),

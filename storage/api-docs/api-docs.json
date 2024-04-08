@@ -23,6 +23,183 @@
         }
     ],
     "paths": {
+        "/api/v2/alerts": {
+            "get": {
+                "tags": [
+                    "Alerts"
+                ],
+                "summary": "Get list of active alerts",
+                "operationId": "listAlertsv2",
+                "responses": {
+                    "200": {
+                        "description": "Successful operation",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "data": {
+                                            "title": "data",
+                                            "description": "An array of alerts",
+                                            "type": "array",
+                                            "items": {
+                                                "$ref": "#/components/schemas/Alert"
+                                            }
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                }
+            },
+            "put": {
+                "tags": [
+                    "Alerts"
+                ],
+                "summary": "Create Alert",
+                "description": "Creates an alert.",
+                "operationId": "createAlert",
+                "parameters": [
+                    {
+                        "name": "api_token",
+                        "in": "query",
+                        "description": "A valid user API token",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "example": "1234"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "content": {
+                        "multipart/form-data": {
+                            "schema": {
+                                "required": [
+                                    "title",
+                                    "html",
+                                    "start",
+                                    "end"
+                                ],
+                                "properties": {
+                                    "title": {
+                                        "$ref": "#/components/schemas/Alert/properties/title"
+                                    },
+                                    "html": {
+                                        "$ref": "#/components/schemas/Alert/properties/html"
+                                    },
+                                    "start": {
+                                        "$ref": "#/components/schemas/Alert/properties/start"
+                                    },
+                                    "end": {
+                                        "$ref": "#/components/schemas/Alert/properties/end"
+                                    },
+                                    "ctatitle": {
+                                        "$ref": "#/components/schemas/Alert/properties/ctalink"
+                                    },
+                                    "ctalink": {
+                                        "$ref": "#/components/schemas/Alert/properties/ctalink"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Successful operation",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "id": {
+                                            "$ref": "#/components/schemas/Alert/properties/id"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v2/alerts/{id}": {
+            "patch": {
+                "tags": [
+                    "Alerts"
+                ],
+                "summary": "Edit Alert",
+                "description": "Edits an alert.",
+                "operationId": "updateAlert",
+                "parameters": [
+                    {
+                        "name": "api_token",
+                        "in": "query",
+                        "description": "A valid user API token",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "example": "1234"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "content": {
+                        "multipart/form-data": {
+                            "schema": {
+                                "required": [
+                                    "title",
+                                    "html",
+                                    "start",
+                                    "end"
+                                ],
+                                "properties": {
+                                    "title": {
+                                        "$ref": "#/components/schemas/Alert/properties/title"
+                                    },
+                                    "html": {
+                                        "$ref": "#/components/schemas/Alert/properties/html"
+                                    },
+                                    "start": {
+                                        "$ref": "#/components/schemas/Alert/properties/start"
+                                    },
+                                    "end": {
+                                        "$ref": "#/components/schemas/Alert/properties/end"
+                                    },
+                                    "ctatitle": {
+                                        "$ref": "#/components/schemas/Alert/properties/ctalink"
+                                    },
+                                    "ctalink": {
+                                        "$ref": "#/components/schemas/Alert/properties/ctalink"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Successful operation",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "id": {
+                                            "$ref": "#/components/schemas/Alert/properties/id"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
         "/api/v2/events/{id}": {
             "get": {
                 "tags": [
@@ -941,6 +1118,75 @@
     },
     "components": {
         "schemas": {
+            "Alert": {
+                "title": "Alert",
+                "description": "An alert shown to users onsite.",
+                "required": [
+                    "id",
+                    "title",
+                    "html",
+                    "start",
+                    "end"
+                ],
+                "properties": {
+                    "id": {
+                        "title": "id",
+                        "description": "Unique identifier of this alert",
+                        "format": "int64",
+                        "example": 1
+                    },
+                    "title": {
+                        "title": "title",
+                        "description": "The title of this alert",
+                        "format": "string",
+                        "example": "Support our work!"
+                    },
+                    "html": {
+                        "title": "html",
+                        "description": "HTML body of the alert",
+                        "format": "string"
+                    },
+                    "ctatitle": {
+                        "title": "ctatitle",
+                        "description": "(Optional) The text for a Call To Action button.",
+                        "format": "string",
+                        "example": "Double Your Donation Now"
+                    },
+                    "variant": {
+                        "title": "variant",
+                        "description": "(Optional) The alert variant (default is secondary).",
+                        "format": "string",
+                        "example": "secondary"
+                    },
+                    "ctalink": {
+                        "title": "ctalink",
+                        "description": "(Optional) The link for the button to direct to.",
+                        "format": "string",
+                        "example": "https://www.paypal.com/gb/fundraiser/charity/61071"
+                    },
+                    "start": {
+                        "title": "start",
+                        "description": "Start showing the alert at this time, in ISO8601 format.",
+                        "format": "date-time",
+                        "example": "2022-09-18T11:30:00+00:00"
+                    },
+                    "end": {
+                        "title": "end",
+                        "description": "Stop showing the alert at this time, in ISO8601 format.",
+                        "format": "date-time",
+                        "example": "2022-09-18T12:30:00+00:00"
+                    }
+                },
+                "type": "object"
+            },
+            "AlertCollection": {
+                "title": "AlertCollection",
+                "description": "A collection of Alerts.",
+                "type": "array",
+                "items": {
+                    "$ref": "#/components/schemas/Alert"
+                }
+            },
             "Group": {
                 "title": "Group",
                 "description": "A Group of Restarters, who organise events.",

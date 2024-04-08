@@ -4,5 +4,7 @@
     "/js/wiki.js": "/js/wiki.js",
     "/global/css/app.css": "/global/css/app.css",
     "/css/app.css": "/css/app.css",
-    "/css/wiki.css": "/css/wiki.css"
+    "/css/wiki.css": "/css/wiki.css",
+    "/js/components/StatsShare.vue": "/js/components/StatsShare.vue",
+    "/js/translations.js": "/js/translations.js"
 }
