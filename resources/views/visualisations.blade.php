@@ -6,6 +6,8 @@
     @include('partials.visualisations.consume')
   @elseif( $format == 'manufacture' )
     @include('partials.visualisations.manufacture')
+  @elseif( $format == 'leaf' )
+    @include('partials.visualisations.leaf')
   @endif
   
 </body>

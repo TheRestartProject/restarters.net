@@ -30,11 +30,11 @@
 
                   <div class="form-group">
                       <label for="event_headline_stats_embed">@lang('events.embed_code_header'):</label>
-                      <input type="text" class="form-control field" id="event_headline_stats_embed" value='<iframe src="{{{ env('APP_URL') }}}/party/stats/{{{ $formdata->id }}}/wide" frameborder="0" width="100%" height="115"></iframe>'>
+                      <input type="text" class="form-control field" id="event_headline_stats_embed" value='<iframe src="{{{ env('APP_URL') }}}/party/stats/{{{ $formdata->id }}}/wide" frameborder="0" width="700" height="370"></iframe>'>
                   </div>
                   <small class="after-offset">@lang('events.headline_stats_message')</small>
 
-                  <iframe src="{{{ env('APP_URL') }}}/party/stats/{{{ $formdata->id }}}/wide" frameborder="0" width="100%" height="115" id="headlineStats" class="form-control"></iframe>
+                  <iframe src="{{{ env('APP_URL') }}}/party/stats/{{{ $formdata->id }}}/wide" frameborder="0" width="700" height="370" id="headlineStats" class="form-control"></iframe>
 
               </div>
             </div>
@@ -55,20 +55,11 @@
 
                   <div class="form-group">
                       <label for="event_co2_stats_embed">@lang('events.embed_code_header'):</label>
-                      <input type="text" class="form-control field" id="event_co2_stats_embed" value='<iframe src="{{{ env('APP_URL') }}}/outbound/info/party/{{{ $formdata->id }}}/manufacture" frameborder="0" width="700" height="850"></iframe>'>
+                      <input type="text" class="form-control field" id="event_co2_stats_embed" value='<iframe src="{{{ env('APP_URL') }}}/outbound/info/party/{{{ $formdata->id }}}/leaf" frameborder="0" width="700" height="370"></iframe>'>
                   </div>
 
                   <div class="embed-responsive embed-responsive-21by9">
-                    <iframe src="{{{ env('APP_URL') }}}/outbound/info/party/{{{ $formdata->id }}}/manufacture" frameborder="0" width="700" height="850" class="form-control embed-responsive-item"></iframe>
-                  </div>
-
-                  <div class="form-group">
-                      <label for="event_co2_stats_embed">@lang('events.embed_code_header'):</label>
-                      <input type="text" class="form-control field" id="event_co2_stats_embed" value='<iframe src="{{{ env('APP_URL') }}}/outbound/info/party/{{{ $formdata->id }}}/consume" frameborder="0" width="700" height="850"></iframe>'>
-                  </div>
-
-                  <div class="embed-responsive embed-responsive-21by9">
-                    <iframe src="{{{ env('APP_URL') }}}/outbound/info/party/{{{ $formdata->id }}}/consume" frameborder="0" width="700" height="850" class="form-control embed-responsive-item"></iframe>
+                    <iframe src="{{{ env('APP_URL') }}}/outbound/info/party/{{{ $formdata->id }}}/leaf" frameborder="0" width="700" height="370" class="form-control embed-responsive-item"></iframe>
                   </div>
 
               </div>
