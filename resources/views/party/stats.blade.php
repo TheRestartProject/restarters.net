@@ -22,7 +22,7 @@
         <div class="footprint">
             <div style="line-height:10px;margin-bottom:10px;">
             <span id="co2-diverted-value"><?php echo number_format(round($party['co2_total']), 0); ?></span>
-            <span class="subtext">kg of CO<sub>2</sub></span>
+            <span class="subtext">kg of CO<sub>2</sub>e</span>
             </div>
             <div style="line-height:10px">
             <span id="ewaste-diverted-value"><?php echo number_format(round($party['waste_total']), 0); ?></span>
