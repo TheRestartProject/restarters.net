@@ -398,9 +398,14 @@ export default {
             let text = ''
 
             // Use the line height of this as our standard for moving down the image.
-            let lineHeight = ctx.measureText(
-                this.$lang.get('partials.share_modal_weve_saved') + str + this.$lang.get('partials.share_modal_of_co2')
-            ).emHeightAscent + ctx.measureText(str).emHeightDescent + MARG * 2
+            //
+            // Older browsers don't support emHeight*
+            let measure1 = ctx.measureText(this.$lang.get('partials.share_modal_weve_saved') + str + this.$lang.get('partials.share_modal_of_co2'))
+            let measure2 = ctx.measureText(str)
+            let asc = measure1.emHeightAscent ? 'emHeightAscent' : 'actualBoundingBoxAscent'
+            let desc = measure1.emHeightDescent ? 'emHeightDescent' : 'actualBoundingBoxDescent'
+            let lineHeight = measure1[asc] + measure2[desc] + MARG * 2
+            console.log('Line height', lineHeight)
 
             let wholeline
 
@@ -465,9 +470,12 @@ export default {
 
             ctx.font = "bold " + this.smallerFontSize + "px Asap, sans-serif"
 
-            lineHeight = ctx.measureText(
-                this.$lang.get('partials.share_modal_weve_saved') + str + this.$lang.get('partials.share_modal_of_co2')
-            ).emHeightAscent + ctx.measureText(str).emHeightDescent + MARG * 2
+            // Older browsers don't support emHeight*
+            measure1 = ctx.measureText(this.$lang.get('partials.share_modal_weve_saved') + str + this.$lang.get('partials.share_modal_of_co2'))
+            measure2 = ctx.measureText(str)
+            asc = measure1.emHeightAscent ? 'emHeightAscent' : 'actualBoundingBoxAscent'
+            desc = measure1.emHeightDescent ? 'emHeightDescent' : 'actualBoundingBoxDescent'
+            lineHeight = measure1[asc] + measure2[desc] + MARG * 2
 
             if (RANGES[ix][2] != 'Hectare') {
               if (this.portrait) {
@@ -533,6 +541,7 @@ export default {
       // Write the text.
       ctx.fillStyle = colour || 'black'
       ctx.strokeStyle = colour || 'black'
+      console.log('Fill', str, x, y)
       ctx.fillText(str, x, y)
 
       // Return where we're up to.
@@ -556,7 +565,14 @@ export default {
     },
     fillWhiteBlackBox(str, x, y) {
       const ctx = this.ctx
-      ctx.roundRect(x, y - ctx.measureText(str).emHeightAscent - MARG, ctx.measureText(str).width + MARG * 2, ctx.measureText(str).emHeightAscent + ctx.measureText(str).emHeightDescent + MARG * 2, RADIUS)
+
+      if (ctx.roundRect) {
+        ctx.roundRect(x, y - ctx.measureText(str).emHeightAscent - MARG, ctx.measureText(str).width + MARG * 2, ctx.measureText(str).emHeightAscent + ctx.measureText(str).emHeightDescent + MARG * 2, RADIUS)
+      } else {
+        // Older browsers.
+        ctx.rect(x, y - ctx.measureText(str).emHeightAscent - MARG, ctx.measureText(str).width + MARG * 2, ctx.measureText(str).emHeightAscent + ctx.measureText(str).emHeightDescent + MARG * 2)
+      }
+
       ctx.fill()
 
       // Looks like we need a beginPath() to prevent future calls to roundRect working on the same rectangle and
