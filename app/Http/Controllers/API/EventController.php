@@ -148,7 +148,7 @@ class EventController extends Controller
     public function addVolunteer(Request $request, $idevents)
     {
         $request->validate([
-            'volunteer_email_address' => 'email',
+            'volunteer_email_address' => ['nullable', 'email'],
         ]);
 
         $party = Party::findOrFail($idevents);
