@@ -177,6 +177,7 @@ class AddRemoveVolunteerTest extends TestCase
         // Add by name only
         $response = $this->put('/api/events/' . $event->idevents . '/volunteers', [
             'full_name' => 'Jo Bloggins',
+            'volunteer_email_address' => NULL,
         ]);
 
         $response->assertSuccessful();
