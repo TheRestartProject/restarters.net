@@ -189,7 +189,7 @@ class DeviceController extends Controller {
         $data = [
             'event' => $partyid,
             'category' => $category,
-            'category_creation' => $category,
+            'category_creation' => $category,  // We don't expose this over the API but we record it in case it changes.
             'item_type' => $item_type,
             'brand' => $brand,
             'model' => $model,
@@ -228,6 +228,172 @@ class DeviceController extends Controller {
         ]);
     }
 
+    /**
+     * @OA\Patch(
+     *      path="/api/v2/devices/{id}",
+     *      operationId="editDevice",
+     *      tags={"Devices"},
+     *      summary="Edit Device",
+     *      description="Edits a device.",
+     *      @OA\Parameter(
+     *          name="api_token",
+     *          description="A valid user API token",
+     *          required=true,
+     *          in="query",
+     *          @OA\Schema(
+     *              type="string",
+     *              example="1234"
+     *          )
+     *      ),
+     *     @OA\RequestBody(
+     *         @OA\MediaType(
+     *             mediaType="multipart/form-data",
+     *             @OA\Schema(
+     *                required={"category","item_type"},
+     *                @OA\Property(
+     *                   property="eventid",
+     *                   title="id",
+     *                   description="Unique identifier of the event to which the device belongs",
+     *                   format="int64",
+     *                   example=1
+     *                ),
+     *                @OA\Property(
+     *                   property="category",
+     *                   ref="#/components/schemas/Device/properties/category",
+     *                ),
+     *                @OA\Property(
+     *                   property="item_type",
+     *                   ref="#/components/schemas/Device/properties/item_type",
+     *                ),
+     *                @OA\Property(
+     *                   property="brand",
+     *                   ref="#/components/schemas/Device/properties/brand",
+     *                ),
+     *                @OA\Property(
+     *                   property="model",
+     *                   ref="#/components/schemas/Device/properties/model",
+     *                ),
+     *                @OA\Property(
+     *                   property="age",
+     *                   ref="#/components/schemas/Device/properties/age",
+     *                ),
+     *                @OA\Property(
+     *                   property="estimate",
+     *                   ref="#/components/schemas/Device/properties/estimate",
+     *                ),
+     *                @OA\Property(
+     *                   property="problem",
+     *                   ref="#/components/schemas/Device/properties/problem",
+     *                ),
+     *                @OA\Property(
+     *                   property="notes",
+     *                   ref="#/components/schemas/Device/properties/notes",
+     *                ),
+     *                @OA\Property(
+     *                    property="repair_status",
+     *                    ref="#/components/schemas/Device/properties/repair_status",
+     *                ),
+     *                @OA\Property(
+     *                    property="next_steps",
+     *                    ref="#/components/schemas/Device/properties/next_steps",
+     *                ),
+     *                @OA\Property(
+     *                     property="spare_parts",
+     *                     ref="#/components/schemas/Device/properties/spare_parts",
+     *                 ),
+     *                @OA\Property(
+     *                    property="case_study",
+     *                    ref="#/components/schemas/Device/properties/case_study",
+     *                ),
+     *                @OA\Property(
+     *                     property="barrier",
+     *                     ref="#/components/schemas/Device/properties/barrier",
+     *                ),
+     *             )
+     *         )
+     *    ),
+     *    @OA\Response(
+     *        response=200,
+     *        description="Successful operation",
+     *        @OA\JsonContent(
+     *            @OA\Property(
+     *              property="data",
+     *              title="data",
+     *              ref="#/components/schemas/Device"
+     *            )
+     *        ),
+     *     )
+     *  )
+     */
+    public function updateDevicev2(Request $request, $iddevices)
+    {
+        $user = $this->getUser();
+
+        list($partyid,
+            $category,
+            $item_type,
+            $brand,
+            $model,
+            $age,
+            $estimate,
+            $problem,
+            $notes,
+            $case_study,
+            $repair_status,
+            $spare_parts,
+            $parts_provider,
+            $professional_help,
+            $more_time_needed,
+            $do_it_yourself,
+            $barrier
+            ) = $this->validateDeviceParams($request,false);
+
+        Party::findOrFail($partyid);
+
+        if (!Fixometer::userHasEditEventsDevicesPermission($partyid, $user->id)) {
+            // Only hosts can add devices to events.
+            abort(403);
+        }
+
+        $data = [
+            'event' => $partyid,
+            'category' => $category,
+            'item_type' => $item_type,
+            'brand' => $brand,
+            'model' => $model,
+            'age' => $age,
+            'estimate' => $estimate,
+            'problem' => $problem,
+            'notes' => $notes,
+            'wiki' => $case_study,
+            'repair_status' => $repair_status,
+            'spare_parts' => $spare_parts,
+            'parts_provider' => $parts_provider,
+            'professional_help' => $professional_help,
+            'more_time_needed' => $more_time_needed,
+            'do_it_yourself' => $do_it_yourself,
+            'repaired_by' => $user->id,
+        ];
+
+        $device = Device::findOrFail($iddevices);
+        $device->update($data);
+
+        event(new DeviceCreatedOrUpdated($device));
+
+        if ($barrier) {
+            DeviceBarrier::updateOrCreate([
+                'device_id' => $iddevices,
+                'barrier_id' => $barrier
+            ]);
+        }
+
+        // TODO Images - probably a separate API Call.
+
+        return response()->json([
+            'id' => $iddevices,
+        ]);
+    }
+
     private function validateDeviceParams(Request $request, $create): array
     {
         // We don't validate max lengths of other strings, to avoid duplicating the length information both here
@@ -244,11 +410,11 @@ class DeviceController extends Controller {
                 'estimate' => [ 'numeric', 'min:0' ],
                 'problem' => 'string',
                 'notes' => 'string',
-                'repair_status' => [ 'string', 'in:Fixed,Repairable,End-of-life' ],
+                'repair_status' => [ 'string', 'in:Fixed,Repairable,End of life' ],
                 'next_steps' => [ 'string', 'in:More time needed,Professional help,Do it yourself' ],
                 'spare_parts' => [ 'string', 'in:No,Manufacturer,Third party' ],
                 'case_study' => ['boolean'],
-                'barrier' => [ 'string', 'in:Spare parts not available,Spare parts too expensive,No way to open the product,Repair information not available,Lack of equipment' ],
+                'barrier' => [ 'string', 'nullable', 'in:Spare parts not available,Spare parts too expensive,No way to open the product,Repair information not available,Lack of equipment' ],
             ]);
         } else {
             $request->validate([
@@ -260,7 +426,7 @@ class DeviceController extends Controller {
                 'estimate' => [ 'numeric', 'min:0' ],
                 'problem' => 'string',
                 'notes' => 'string',
-                'repair_status' => [ 'string', 'in:Fixed,Repairable,End-of-life' ],
+                'repair_status' => [ 'string', 'in:Fixed,Repairable,End of life' ],
                 'next_steps' => [ 'string', 'in:More time needed,Professional help,Do it yourself' ],
                 'spare_parts' => [ 'string', 'in:No,Manufacturer,Third party' ],
                 'case_study' => ['boolean'],
@@ -270,6 +436,7 @@ class DeviceController extends Controller {
 
         $partyid = $request->input('eventid');
         $category = $request->input('category');
+        $category_creation = $request->input('category_creation');
         $item_type = $request->input('item_type');
         $brand = $request->input('brand');
         $model = $request->input('model');
@@ -278,6 +445,7 @@ class DeviceController extends Controller {
         $problem = $request->input('problem');
         $notes = $request->input('notes');
         $case_study = $request->input('case_study');
+        $repair_status = $request->input('repair_status');
 
         // Our database has a slightly complex structure for historical reasons, so we need to map some input
         // values to the underlying fields.  This keeps the API clean.
@@ -290,7 +458,7 @@ class DeviceController extends Controller {
         $do_it_yourself = 0;
         $barrier = 0;
 
-        switch ($request->input('repair_status')) {
+        switch ($repair_status) {
             case 'Fixed':
                 $repair_status = Device::REPAIR_STATUS_FIXED;
                 break;
@@ -325,9 +493,20 @@ class DeviceController extends Controller {
                 break;
             case 'End of life':
                 $repair_status = Device::REPAIR_STATUS_ENDOFLIFE;
+                $barrierInput = $request->input('barrier');
+
+                if (!$barrierInput) {
+                    throw ValidationException::withMessages(['barrier' => ['Barrier is required for End of life devices']]);
+                }
 
                 // Look up the barrier.
-                $barrier = Barrier::firstOrFail()->where('barrier', $request->input('barrier'))->id;
+                $barrierEnt = Barrier::firstOrFail()->where('barrier', $barrierInput)->get();
+                $barrier = $barrierEnt->toArray()[0]['id'];
+
+                if (!$barrier) {
+                    throw ValidationException::withMessages(['barrier' => ['Invalid barrier supplied']]);
+                }
+
                 break;
         }
 

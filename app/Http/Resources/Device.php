@@ -26,6 +26,13 @@ use Illuminate\Http\Resources\Json\JsonResource;
  *          example="16"
  *     ),
  *     @OA\Property(
+ *           property="category_creation",
+ *           title="category_creation",
+ *           description="The id of the category to which this item belonged at the time of creation (if different).",
+ *           format="int64",
+ *           example="16"
+ *      ),
+ *     @OA\Property(
  *          property="item_type",
  *          title="item_type",
  *          description="The name of the item.",

@@ -124,6 +124,7 @@ class APIv2DeviceTest extends TestCase
             'item_type' => 'Test item type',
             'repair_status' => $repair_status_str,
             'parts_provider' => $parts_provider,
+            'barrier' => $barrierstr,
         ];
 
         if ($next_steps_str) {
@@ -200,7 +201,7 @@ class APIv2DeviceTest extends TestCase
             ],
             [
                 Device::REPAIR_STATUS_ENDOFLIFE,
-                'End-of-life',
+                'End of life',
                 Device::SPARE_PARTS_NOT_NEEDED,
                 null,
                 null,
