@@ -1,5 +1,6 @@
 <template>
 <div>
+    <AlertBanner />
     <h1 class="d-flex justify-content-between">
         <div class="d-flex">
             <div class="mt-2">
@@ -33,16 +34,16 @@
     </div>
 </div>
 </template>
-
 <script>
 import MicrotaskingCallToAction from './MicrotaskingCallToAction'
 import MicrotaskingVolunteering from './MicrotaskingVolunteering'
 import MicrotaskingNews from './MicrotaskingNews'
 import auth from '../mixins/auth'
 import DiscourseDiscussion from './DiscourseDiscussion'
+import AlertBanner from "./AlertBanner";
 
 export default {
-  components: {MicrotaskingCallToAction, MicrotaskingVolunteering, DiscourseDiscussion, MicrotaskingNews},
+  components: {MicrotaskingCallToAction, MicrotaskingVolunteering, DiscourseDiscussion, MicrotaskingNews, AlertBanner},
   mixins: [ auth ],
   props: {
     activeQuest: {

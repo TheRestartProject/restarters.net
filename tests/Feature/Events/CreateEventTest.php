@@ -765,4 +765,55 @@ class CreateEventTest extends TestCase
         $response = $this->get('/party/edit/'.$idevents);
         $response->assertSuccessful();
     }
+
+    /**
+     * @dataProvider invalidEmailProvider
+     */
+    public function an_invalid_email_is_trapped($email, $valid)
+    {
+        $this->withoutExceptionHandling();
+        Queue::fake();
+
+        $host = User::factory()->host()->create();
+        $host2 = User::factory()->host()->create();
+        $this->actingAs($host);
+
+        $group = Group::factory()->create();
+        $group->addVolunteer($host);
+        $group->makeMemberAHost($host);
+        $group->addVolunteer($host2);
+        $group->makeMemberAHost($host2);
+
+        // Create the event
+        $eventAttributes = Party::factory()->raw([
+            'group' => $group->idgroups, 'event_date' => '2000-01-01', 'approved' => true
+        ]);
+
+        $response = $this->post('/api/v2/events?api_token='.$host->api_token,
+            $this->eventAttributesToAPI($eventAttributes));
+        $response->assertSuccessful();
+
+        // Find the event id
+        $party = $group->parties()->latest()->first();
+
+        if (!$valid) {
+            $this->expectException(ValidationException::class);
+        }
+
+        $this->put('/api/events/'.$party->idevents.'/volunteers?api_token='.$host->api_token, [
+            'volunteer_email_address' => $email,
+            'full_name' => $host2->name,
+            'user' => $host2->id,
+        ]);
+    }
+
+    public function invalidEmailProvider()
+    {
+        return [
+            ['test@test.com', true],
+            ['invalidmail', false],
+            ['invalidmail@', false],
+            ['test@test.com, invalidmail', false]
+        ];
+    }
 }

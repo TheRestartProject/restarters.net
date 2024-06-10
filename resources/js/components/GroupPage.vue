@@ -1,5 +1,6 @@
 <template>
   <div v-if="group">
+    <AlertBanner />
     <div class="alert alert-success" v-if="haveLeft" v-html="translatedHaveLeft" />
     <GroupHeading
         :idgroups="idgroups"
@@ -57,6 +58,7 @@ import GroupEvents from './GroupEvents'
 import GroupDevicesWorkedOn from './GroupDevicesWorkedOn'
 import GroupDevicesMostRepaired from './GroupDevicesMostRepaired'
 import GroupDevicesBreakdown from './GroupDevicesBreakdown'
+import AlertBanner from './AlertBanner'
 import auth from '../mixins/auth'
 
 export default {
@@ -68,7 +70,8 @@ export default {
     GroupStats,
     GroupVolunteers,
     GroupDescription,
-    GroupHeading
+    GroupHeading,
+    AlertBanner
   },
   mixins: [ auth ],
   props: {

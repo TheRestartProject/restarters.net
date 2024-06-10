@@ -12,7 +12,7 @@ return [
   'co2_equivalence_visualisation_dropdown' => 'CO<sub>2</sub> equivalence visualisation',
   'embed_code_header' => 'Embed code',
   'infographic_message' => 'An infographic of an easy-to-understand equivalent of the CO<sub>2</sub> emissions that your group has prevented',
-  'headline_stats_message' => 'This widget shows the headline stats for your event e.g. the number of participants at your parties; the hours volunteered',
+  'headline_stats_message' => 'This widget shows the headline stats for your event e.g. the number of participants; the hours volunteered',
   'invite_restarters_modal_heading' => 'Invite volunteers to the event',
   'send_invites_to_restarters_tickbox' => 'Add invites for group members. Members marked with a ⚠ will be invited but won\'t be sent an email due to their notification settings.',
   'manual_invite_box' => 'Send invites to',

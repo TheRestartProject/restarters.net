@@ -104,6 +104,12 @@ Route::prefix('v2')->group(function() {
 
         Route::get('/items', [API\ItemController::class, 'listItemsv2']);
 
+        Route::prefix('/alerts')->group(function() {
+            Route::get('/', [API\AlertController::class, 'listAlertsv2']);
+            Route::put('/', [API\AlertController::class, 'addAlertv2']);
+            Route::patch('/{id}', [API\AlertController::class, 'updateAlertv2']);
+        });
+
         Route::prefix('/devices')->group(function() {
             Route::get('{id}', [API\DeviceController::class, 'getDevicev2']);
             Route::post('', [API\DeviceController::class, 'createDevicev2']);

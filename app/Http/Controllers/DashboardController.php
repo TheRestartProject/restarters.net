@@ -51,7 +51,7 @@ class DashboardController extends Controller
             ->whereNull('users_groups.deleted_at')
             ->orderBy('groups.name', 'ASC')
             ->groupBy('groups.idgroups', 'groups.name')
-            ->select(['groups.idgroups', 'groups.name'])
+            ->select(['groups.idgroups', 'groups.name', 'users_groups.role'])
             ->take(5)
             ->get();
 

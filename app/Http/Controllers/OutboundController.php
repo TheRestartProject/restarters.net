@@ -104,6 +104,11 @@ class OutboundController extends Controller
                     $title = 'Like manufacturing';
                     $measure = 'half car';
                     $equal_to = round($co2 / 3000);
+                } elseif ($format == 'leaf') { // Display new sapling / hectare stats.
+                    // All constructed in Vue.  We pass the raw CO2 value.
+                    $title = '';
+                    $measure = '';
+                    $equal_to = $co2;
                 } else { // Display sofa
                     $title = 'Like manufacturing';
                     $measure = 'sofa';
