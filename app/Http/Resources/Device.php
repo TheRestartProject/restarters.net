@@ -19,6 +19,13 @@ use Illuminate\Http\Resources\Json\JsonResource;
  *          example=1
  *     ),
  *     @OA\Property(
+ *           property="eventid",
+ *           title="eventid",
+ *           description="The event to which this device belongs.",
+ *           format="int64",
+ *           example=1
+ *      ),
+ *     @OA\Property(
  *          property="category",
  *          title="category",
  *          description="The id of the category to which this item belongs.",
@@ -138,6 +145,7 @@ class Device extends JsonResource
     {
         $ret = [
             'id' => intval($this->iddevices),
+            'eventid' => intval($this->event),
             'category' => intval($this->category),
             'item_type' => $this->item_type,
             'brand' => $this->brand,
@@ -155,36 +163,36 @@ class Device extends JsonResource
         // There is mirror code in API\DeviceController.
         switch ($this->repair_status) {
             case \App\Device::REPAIR_STATUS_FIXED:
-                $ret['repair_status'] = 'Fixed';
+                $ret['repair_status'] = \App\Device::REPAIR_STATUS_FIXED_STR;
                 break;
             case \App\Device::REPAIR_STATUS_REPAIRABLE:
-                $ret['repair_status'] = 'Repairable';
-
-                if ($this->more_time_needed) {
-                    $ret['next_steps'] = 'More time needed';
-                } else if ($this->professional_help) {
-                    $ret['next_steps'] = 'Professional help';
-                } else if ($this->do_it_yourself) {
-                    $ret['next_steps'] = 'Do it yourself';
-                }
-
-                if ($this->parts_provider == \App\Device::PARTS_PROVIDER_MANUFACTURER) {
-                    $ret['spare_parts'] = 'Manufacturer';
-                } else if ($this->parts_provider == \App\Device::PARTS_PROVIDER_THIRD_PARTY) {
-                    $ret['spare_parts'] = 'Third party';
-                } else {
-                    $ret['spare_parts'] = 'No';
-                }
+                $ret['repair_status'] = \App\Device::REPAIR_STATUS_REPAIRABLE_STR;
                 break;
             case \App\Device::REPAIR_STATUS_ENDOFLIFE:
-                $ret['repair_status'] = 'End of life';
-
-                // The underlying DB might have multiple barriers, but we only support one across the API.
-                foreach ($this->resource->barriers as $barrier) {
-                        $ret['barrier'] = $barrier->barrier;
-                        break;
-                }
+                $ret['repair_status'] = \App\Device::REPAIR_STATUS_ENDOFLIFE_STR;
                 break;
+        }
+
+        if ($this->more_time_needed) {
+            $ret['next_steps'] = \App\Device::NEXT_STEPS_MORE_TIME_NEEDED_STR;
+        } else if ($this->professional_help) {
+            $ret['next_steps'] = \App\Device::NEXT_STEPS_PROFESSIONAL_HELP_STR;
+        } else if ($this->do_it_yourself) {
+            $ret['next_steps'] = \App\Device::NEXT_STEPS_DO_IT_YOURSELF_STR;
+        }
+
+        if ($this->parts_provider == \App\Device::PARTS_PROVIDER_MANUFACTURER) {
+            $ret['spare_parts'] = \App\Device::PARTS_PROVIDER_MANUFACTURER_STR;
+        } else if ($this->parts_provider == \App\Device::PARTS_PROVIDER_THIRD_PARTY) {
+            $ret['spare_parts'] = \App\Device::PARTS_PROVIDER_THIRD_PARTY_STR;
+        } else {
+            $ret['spare_parts'] = \App\Device::PARTS_PROVIDER_NO_STR;
+        }
+
+        // The underlying DB might have multiple barriers, but we only support one across the API.
+        foreach ($this->resource->barriers as $barrier) {
+            $ret['barrier'] = $barrier->barrier;
+            break;
         }
 
         return $ret;

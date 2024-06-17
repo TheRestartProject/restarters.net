@@ -6,6 +6,7 @@ use App\Barrier;
 use App\Device;
 use App\DeviceBarrier;
 use App\Events\DeviceCreatedOrUpdated;
+use App\EventsUsers;
 use App\Helpers\Fixometer;
 use App\Http\Controllers\Controller;
 use App\Party;
@@ -47,7 +48,7 @@ class DeviceController extends Controller {
      *       ),
      *      @OA\Response(
      *          response=404,
-     *          description="Event not found",
+     *          description="Device not found",
      *      ),
      *     )
      */
@@ -394,6 +395,51 @@ class DeviceController extends Controller {
         ]);
     }
 
+    /**
+     * @OA\Delete(
+     *      path="/api/v2/devices/{id}",
+     *      operationId="deleteDevice",
+     *      tags={"Devices"},
+     *      summary="Delete Device",
+     *      description="Deletes a device.",
+     *      @OA\Parameter(
+     *          name="id",
+     *          description="Device id",
+     *          required=true,
+     *          in="path",
+     *          @OA\Schema(
+     *              type="integer"
+     *          )
+     *      ),
+     *      @OA\Response(
+     *          response=200,
+     *          description="Successful operation",
+     *       ),
+     *      @OA\Response(
+     *          response=404,
+     *          description="Device not found",
+     *      ),
+     *     )
+     */
+
+    public function deleteDevicev2(Request $request, $iddevices)
+    {
+        $user = $this->getUser();
+
+        $device = Device::findOrFail($iddevices);
+
+        if (!Fixometer::userHasEditEventsDevicesPermission($device->event, $user->id)) {
+            // Only hosts can delete devices for events.
+            abort(403);
+        }
+
+        $device->delete();
+
+        return response()->json([
+            'id' => $iddevices,
+        ]);
+    }
+
     private function validateDeviceParams(Request $request, $create): array
     {
         // We don't validate max lengths of other strings, to avoid duplicating the length information both here
@@ -408,7 +454,7 @@ class DeviceController extends Controller {
                 'model' => 'string',
                 'age' => [ 'numeric', 'max:500' ],
                 'estimate' => [ 'numeric', 'min:0' ],
-                'problem' => 'string',
+                'problem' => [ 'string', 'nullable' ],
                 'notes' => 'string',
                 'repair_status' => [ 'string', 'in:Fixed,Repairable,End of life' ],
                 'next_steps' => [ 'string', 'in:More time needed,Professional help,Do it yourself' ],
@@ -424,8 +470,7 @@ class DeviceController extends Controller {
                 'model' => 'string',
                 'age' => [ 'numeric', 'max:500' ],
                 'estimate' => [ 'numeric', 'min:0' ],
-                'problem' => 'string',
-                'notes' => 'string',
+                'problem' => [ 'string', 'nullable' ],                'notes' => 'string',
                 'repair_status' => [ 'string', 'in:Fixed,Repairable,End of life' ],
                 'next_steps' => [ 'string', 'in:More time needed,Professional help,Do it yourself' ],
                 'spare_parts' => [ 'string', 'in:No,Manufacturer,Third party' ],
@@ -436,7 +481,6 @@ class DeviceController extends Controller {
 
         $partyid = $request->input('eventid');
         $category = $request->input('category');
-        $category_creation = $request->input('category_creation');
         $item_type = $request->input('item_type');
         $brand = $request->input('brand');
         $model = $request->input('model');
@@ -446,11 +490,13 @@ class DeviceController extends Controller {
         $notes = $request->input('notes');
         $case_study = $request->input('case_study');
         $repair_status = $request->input('repair_status');
+        $barrierInput = $request->input('barrier');
 
         // Our database has a slightly complex structure for historical reasons, so we need to map some input
         // values to the underlying fields.  This keeps the API clean.
         //
         // There is mirror code in Resources\Device.
+        $problem = $problem ? $problem : '';
         $spare_parts = Device::SPARE_PARTS_UNKNOWN;
         $parts_provider = NULL;
         $professional_help = 0;
@@ -459,58 +505,64 @@ class DeviceController extends Controller {
         $barrier = 0;
 
         switch ($repair_status) {
-            case 'Fixed':
+            case Device::REPAIR_STATUS_FIXED_STR:
                 $repair_status = Device::REPAIR_STATUS_FIXED;
                 break;
-            case 'Repairable':
-                switch ($request->input('next_steps')) {
-                    case 'More time needed':
-                        $more_time_needed = 1;
-                        break;
-                    case 'Professional help':
-                        $professional_help = 1;
-                        break;
-                    case 'Do it yourself':
-                        $do_it_yourself = 1;
-                        break;
-                }
-
-                switch ($request->input('spare_parts')) {
-                    case 'No':
-                        $spare_parts = Device::SPARE_PARTS_NOT_NEEDED;
-                        break;
-                    case 'Manufacturer':
-                        $spare_parts = Device::SPARE_PARTS_NEEDED;
-                        $parts_provider = Device::PARTS_PROVIDER_MANUFACTURER;
-                        break;
-                    case 'Third party':
-                        $spare_parts = Device::SPARE_PARTS_NEEDED;
-                        $parts_provider = Device::PARTS_PROVIDER_THIRD_PARTY;
-                        break;
-                }
-
+            case Device::REPAIR_STATUS_REPAIRABLE_STR:
                 $repair_status = Device::REPAIR_STATUS_REPAIRABLE;
                 break;
-            case 'End of life':
+            case Device::REPAIR_STATUS_ENDOFLIFE_STR:
                 $repair_status = Device::REPAIR_STATUS_ENDOFLIFE;
-                $barrierInput = $request->input('barrier');
 
                 if (!$barrierInput) {
                     throw ValidationException::withMessages(['barrier' => ['Barrier is required for End of life devices']]);
                 }
 
-                // Look up the barrier.
-                $barrierEnt = Barrier::firstOrFail()->where('barrier', $barrierInput)->get();
-                $barrier = $barrierEnt->toArray()[0]['id'];
-
-                if (!$barrier) {
-                    throw ValidationException::withMessages(['barrier' => ['Invalid barrier supplied']]);
-                }
-
                 break;
         }
 
-        return array(
+        if ($barrierInput) {
+            // Look up the barrier.
+            $barrierEnt = Barrier::firstOrFail()->where('barrier', $barrierInput)->get();
+            $barrier = $barrierEnt->toArray()[0]['id'];
+
+            if (!$barrier) {
+                throw ValidationException::withMessages(['barrier' => ['Invalid barrier supplied']]);
+            }
+        }
+
+        // We can provide next_steps and spare_parts for any status - this is for recording historical information.
+        if ($request->has('next_steps')) {
+            switch ($request->input('next_steps')) {
+                case Device::NEXT_STEPS_MORE_TIME_NEEDED_STR:
+                    $more_time_needed = 1;
+                    break;
+                case Device::NEXT_STEPS_PROFESSIONAL_HELP_STR:
+                    $professional_help = 1;
+                    break;
+                case Device::NEXT_STEPS_DO_IT_YOURSELF_STR:
+                    $do_it_yourself = 1;
+                    break;
+            }
+        }
+
+        if ($request->has('spare_parts')) {
+            switch ($request->input('spare_parts')) {
+                case Device::PARTS_PROVIDER_NO_STR:
+                    $spare_parts = Device::SPARE_PARTS_NOT_NEEDED;
+                    break;
+                case Device::PARTS_PROVIDER_MANUFACTURER_STR:
+                    $spare_parts = Device::SPARE_PARTS_NEEDED;
+                    $parts_provider = Device::PARTS_PROVIDER_MANUFACTURER;
+                    break;
+                case Device::PARTS_PROVIDER_THIRD_PARTY_STR:
+                    $spare_parts = Device::SPARE_PARTS_NEEDED;
+                    $parts_provider = Device::PARTS_PROVIDER_THIRD_PARTY;
+                    break;
+            }
+        }
+
+        return [
             $partyid,
             $category,
             $item_type,
@@ -528,7 +580,7 @@ class DeviceController extends Controller {
             $more_time_needed,
             $do_it_yourself,
             $barrier
-        );
+        ];
     }
     private function getUser()
     {

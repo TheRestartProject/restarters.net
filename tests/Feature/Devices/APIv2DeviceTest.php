@@ -28,13 +28,36 @@ class APIv2DeviceTest extends TestCase
      *
      * @dataProvider providerDevice
      */
-    public function testGetDevice($repair_status, $repair_status_str, $spare_parts, $parts_provider, $parts_provider_str, $barrierid, $barrierstr, $professional_help, $more_time_needed, $do_it_yourself, $next_steps_str) {
+    public function testGetDevice($repair_status_str, $parts_provider_str, $barrierstr, $next_steps_str) {
         $this->loginAsTestUser(Role::ADMINISTRATOR);
         $idGroup = $this->createGroup();
         $this->assertNotNull($idGroup);
 
         $idEvents = $this->createEvent($idGroup, 'yesterday');
         $this->assertNotNull($idEvents);
+
+        switch ($repair_status_str) {
+            case Device::REPAIR_STATUS_FIXED_STR:
+                $repair_status = Device::REPAIR_STATUS_FIXED;
+                break;
+            case Device::REPAIR_STATUS_REPAIRABLE_STR:
+                $repair_status = Device::REPAIR_STATUS_REPAIRABLE;
+                break;
+            case Device::REPAIR_STATUS_ENDOFLIFE_STR:
+                $repair_status = Device::REPAIR_STATUS_ENDOFLIFE;
+                break;
+        }
+
+        switch ($parts_provider_str) {
+            case Device::PARTS_PROVIDER_NO_STR:
+                $parts_provider = 0;
+                break;
+            case Device::PARTS_PROVIDER_THIRD_PARTY_STR:
+                $parts_provider = Device::PARTS_PROVIDER_THIRD_PARTY;
+                break;
+            case Device::PARTS_PROVIDER_MANUFACTURER_STR:
+                $parts_provider = Device::PARTS_PROVIDER_MANUFACTURER;
+        }
 
         $device = Device::create([
             'event' => $idEvents,
@@ -48,22 +71,11 @@ class APIv2DeviceTest extends TestCase
             'estimate' => 100.00,
             'item_type' => 'Test item type',
             'repair_status' => $repair_status,
-            'spare_parts' => $spare_parts,
             'parts_provider' => $parts_provider,
-            'professional_help' => $professional_help,
-            'more_time_needed' => $more_time_needed,
-            'do_it_yourself' => $do_it_yourself,
         ]);
 
         $iddevices = $device->iddevices;
         $this->assertNotNull($iddevices);
-
-        if ($barrierid) {
-            DeviceBarrier::create([
-                'device_id' => $iddevices,
-                'barrier_id' => $barrierid,
-            ]);
-        }
 
         // Test invalid device id.
         try {
@@ -86,11 +98,11 @@ class APIv2DeviceTest extends TestCase
         $this->assertEquals('Test notes', $json['data']['notes']);
         $this->assertEquals($repair_status_str, $json['data']['repair_status']);
 
-        if ($parts_provider) {
+        if ($parts_provider_str) {
             $this->assertEquals($parts_provider_str, $json['data']['spare_parts']);
         }
 
-        if ($barrierid) {
+        if ($barrierstr) {
             $this->assertEquals($barrierstr, $json['data']['barrier']);
         }
 
@@ -104,7 +116,7 @@ class APIv2DeviceTest extends TestCase
      *
      * @dataProvider providerDevice
      */
-    public function testCreate($repair_status, $repair_status_str, $spare_parts, $parts_provider, $parts_provider_str, $barrierid, $barrierstr, $professional_help, $more_time_needed, $do_it_yourself, $next_steps_str) {
+    public function testCreate($repair_status_str, $parts_provider_str, $barrierstr, $next_steps_str) {
         $this->loginAsTestUser(Role::ADMINISTRATOR);
         $idGroup = $this->createGroup();
         $this->assertNotNull($idGroup);
@@ -123,7 +135,7 @@ class APIv2DeviceTest extends TestCase
             'estimate' => 100.00,
             'item_type' => 'Test item type',
             'repair_status' => $repair_status_str,
-            'parts_provider' => $parts_provider,
+            'parts_provider' => $parts_provider_str,
             'barrier' => $barrierstr,
         ];
 
@@ -157,11 +169,11 @@ class APIv2DeviceTest extends TestCase
         $this->assertEquals('Test notes', $json['data']['notes']);
         $this->assertEquals($repair_status_str, $json['data']['repair_status']);
 
-        if ($parts_provider) {
+        if ($parts_provider_str) {
             $this->assertEquals($parts_provider_str, $json['data']['spare_parts']);
         }
 
-        if ($barrierid) {
+        if ($barrierstr) {
             $this->assertEquals($barrierstr, $json['data']['barrier']);
         }
 
@@ -172,45 +184,28 @@ class APIv2DeviceTest extends TestCase
 
     public function providerDevice()
     {
+        // TODO Neil - I am not confident that I know the valid combinations of repair status/parts provider/
+        // barrier/next steps.
+        //
+        // Please can you consider which values we should be supporting?
         return [
             [
-                Device::REPAIR_STATUS_FIXED,
-                'Fixed',
-                Device::SPARE_PARTS_NOT_NEEDED,
+                Device::REPAIR_STATUS_FIXED_STR,
+                Device::PARTS_PROVIDER_NO_STR,
                 null,
                 null,
-                0,
-                null,
-                0,
-                0,
-                0,
-                null
             ],
             [
-                Device::REPAIR_STATUS_REPAIRABLE,
-                'Repairable',
-                Device::SPARE_PARTS_NEEDED,
-                Device::PARTS_PROVIDER_THIRD_PARTY,
-                'Third party',
-                0,
-                null,
-                1,
-                0,
-                0,
-                'Professional help'
+                Device::REPAIR_STATUS_REPAIRABLE_STR,
+                Device::PARTS_PROVIDER_THIRD_PARTY_STR,
+                Device::BARRIER_SPARE_PARTS_NOT_AVAILABLE_STR,
+                Device::NEXT_STEPS_PROFESSIONAL_HELP_STR,
             ],
             [
-                Device::REPAIR_STATUS_ENDOFLIFE,
-                'End of life',
-                Device::SPARE_PARTS_NOT_NEEDED,
+                Device::REPAIR_STATUS_ENDOFLIFE_STR,
+                Device::PARTS_PROVIDER_NO_STR,
+                Device::BARRIER_SPARE_PARTS_NOT_AVAILABLE_STR,
                 null,
-                null,
-                1,
-                'Spare parts not available',
-                0,
-                0,
-                0,
-                null
             ],
         ];
     }
