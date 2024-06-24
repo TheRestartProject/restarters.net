@@ -2,6 +2,22 @@ import Vue from 'vue'
 
 const axios = require('axios')
 
+function newToOld(d) {
+  // We are in the frustrating position of having a half-written new API with sensible field names, but existing
+  // Vue components that expect old-style field names.  We therefore sometimes need to convert the new API data
+  // back into the old format which is expected.  In some bright future where we have shifted over to using the
+  // new API completely, we can then migrate the Vue components to use the new field names and retire this function.
+  // Similar code in event and group store.
+  let ret = d
+
+  d.iddevices = d.id
+  delete d.id
+  d.idevents=  d.eventid
+  delete d.eventid
+
+  return ret
+}
+
 export default {
   namespaced: true,
   state: {
@@ -31,8 +47,10 @@ export default {
         Vue.set(state.images, d.iddevices, d.images)
       })
     },
-    add (state, params) {
+    add (state, device) {
       let exists = false
+
+      const params = newToOld(device)
 
       if (params.iddevices) {
         if (!state.devices[params.idevents]) {
@@ -43,7 +61,11 @@ export default {
           if (d.iddevices === params.iddevices) {
             // Found it there already.
             Vue.set(state.devices[params.idevents], i, params)
-            Vue.set(state.images, params.iddevices, params.images)
+
+            if (params.images) {
+              Vue.set(state.images, params.iddevices, params.images)
+            }
+
             exists = true
           }
         })
@@ -52,8 +74,13 @@ export default {
       if (!exists) {
         // Append the new device to the existing list.
         state.devices[params.idevents].push(params)
-        Vue.set(state.images, params.iddevices, params.images)
+
+        if (params.images) {
+          Vue.set(state.images, params.iddevices, params.images)
+        }
       }
+
+      return params
     },
     remove (state, params) {
       if (state.devices[params.idevents]) {
@@ -127,6 +154,9 @@ export default {
     async add ({commit, dispatch, rootGetters}, params) {
       const formData = new FormData()
 
+      params['eventid'] = params['event_id']
+      delete params['event_id']
+
       for (var key in params) {
         if (params[key]) {
           formData.append(key, params[key]);
@@ -139,22 +169,22 @@ export default {
         },
       })
 
-      console.log('Create device returned', ret)
       let id = null
 
       if (ret && ret.data) {
         id = ret.data.id
       }
 
+      let created = null
+
       if (ret && ret.data && ret.data.device) {
         // We have been returned the device object from the server.  Add it into the store, and lo!  All our
         // stats and views will update.
-        const created = ret.data.device
         commit('add', ret.data.device)
 
         // Update our stats
         dispatch('events/setStats', {
-          idevents: params.event_id,
+          idevents: params.eventid,
           stats: ret.data.stats
         }, {
           root: true

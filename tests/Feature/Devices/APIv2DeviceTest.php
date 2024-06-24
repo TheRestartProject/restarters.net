@@ -114,7 +114,7 @@ class APIv2DeviceTest extends TestCase
         $response->assertSuccessful();
         $json = json_decode($response->getContent(), true);
         $this->assertEquals($iddevices, $json['data']['id']);
-        $this->assertEquals(11, $json['data']['category']);
+        $this->assertEquals(11, $json['data']['category']['id']);
         $this->assertEquals('Test item type', $json['data']['item_type']);
         $this->assertEquals('Test brand', $json['data']['brand']);
         $this->assertEquals('Test model', $json['data']['model']);
@@ -186,7 +186,7 @@ class APIv2DeviceTest extends TestCase
         $response->assertSuccessful();
         $json = json_decode($response->getContent(), true);
         $this->assertEquals($iddevices, $json['data']['id']);
-        $this->assertEquals(11, $json['data']['category']);
+        $this->assertEquals(11, $json['data']['category']['id']);
         $this->assertEquals('Test item type', $json['data']['item_type']);
         $this->assertEquals('Test brand', $json['data']['brand']);
         $this->assertEquals('Test model', $json['data']['model']);

@@ -386,7 +386,7 @@ export default {
         } else {
           this.missingCategory = false
 
-          const createdDevices = await this.$store.dispatch('devices/add', this.currentDevice)
+          await this.$store.dispatch('devices/add', this.currentDevice)
 
           this.$emit('close')
         }

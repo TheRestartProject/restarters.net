@@ -2,7 +2,6 @@
 
 namespace App\Http\Resources;
 
-use App\DeviceBarrier;
 use Illuminate\Http\Resources\Json\JsonResource;
 
 /**
@@ -28,7 +27,7 @@ use Illuminate\Http\Resources\Json\JsonResource;
  *     @OA\Property(
  *          property="category",
  *          title="category",
- *          description="The id of the category to which this item belongs.",
+ *          description="The category to which this item belongs.",
  *          format="int64",
  *          example="16"
  *     ),
@@ -194,6 +193,9 @@ class Device extends JsonResource
             $ret['barrier'] = $barrier->barrier;
             break;
         }
+
+        $category = \App\Category::find($this->category);
+        $ret['category']= \App\Http\Resources\Category::make($category);
 
         return $ret;
     }

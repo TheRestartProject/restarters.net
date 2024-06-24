@@ -31,7 +31,7 @@
             <b-btn variant="primary" v-if="canedit" class="mb-4 ml-4 add-powered-device-desktop" @click="addPowered($event)">
               <b-img class="icon mb-1" src="/images/add-icon.svg" /> {{ __('partials.add_device_powered') }}
             </b-btn>
-            <EventDevice v-if="addingPowered" :powered="true" :add="true" :edit="false" :clusters="clusters" :idevents="idevents" :brands="brands" :barrier-list="barrierList" @close="addingPowered = false" />
+            <EventDevice v-if="addingPowered" :powered="true" :add="true" :edit="false" :clusters="clusters" :idevents="idevents" :brands="brands" :barrier-list="barrierList" @close="closePowered" />
           </b-tab>
           <b-tab title-item-class="w-50" class="pt-2">
             <template slot="title">
@@ -57,7 +57,7 @@
             <b-btn variant="primary" v-if="canedit" class="mb-4 ml-4 add-unpowered-device-desktop" @click="addUnpowered($event)">
               <b-img class="icon mb-1" src="/images/add-icon.svg" /> {{ __('partials.add_device_unpowered') }}
             </b-btn>
-            <EventDevice v-if="addingUnpowered" :powered="false" :add="true" :edit="false" :clusters="clusters" :idevents="idevents" :event="event" :brands="brands" :barrier-list="barrierList" @close="addingUnpowered = false"/>
+            <EventDevice v-if="addingUnpowered" :powered="false" :add="true" :edit="false" :clusters="clusters" :idevents="idevents" :event="event" :brands="brands" :barrier-list="barrierList" @close="closeUnpowered"/>
           </b-tab>
         </b-tabs>
       </div>
@@ -220,6 +220,12 @@ export default {
         behavior: 'smooth',
         block: 'start'
       })
+    },
+    closePowered() {
+      this.addingPowered = false
+    },
+    closeUnpowered() {
+      this.addingUnpowered = false
     }
   }
 }

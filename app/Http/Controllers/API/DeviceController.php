@@ -499,12 +499,12 @@ class DeviceController extends Controller {
         $item_type = $request->input('item_type');
         $brand = $request->input('brand');
         $model = $request->input('model');
-        $age = $request->input('age');
-        $estimate = $request->input('estimate');
+        $age = $request->input('age') || 0;
+        $estimate = $request->input('estimate') || 0;
         $problem = $request->input('problem');
         $notes = $request->input('notes');
         $case_study = $request->input('case_study');
-        $repair_status = $request->input('repair_status');
+        $repair_status = $request->input('repair_status') || 0;
         $barrierInput = $request->input('barrier');
 
         // Our database has a slightly complex structure for historical reasons, so we need to map some input
