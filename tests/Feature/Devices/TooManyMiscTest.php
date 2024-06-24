@@ -32,7 +32,6 @@ class TooManyMiscTest extends TestCase
         $this->actingAs($this->admin);
 
         for ($i = 0; $i < $count; $i++) {
-            echo "Create $i of $count\n";
             $iddevices = $this->createDevice($this->event->idevents, 'misc');
             $this->assertNotNull($iddevices);
         }

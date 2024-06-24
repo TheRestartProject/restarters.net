@@ -31,26 +31,7 @@ export default {
         Vue.set(state.images, d.iddevices, d.images)
       })
     },
-    async add (state, params) {
-      const formData = new FormData()
-
-      for (var key in params) {
-        if (params[key]) {
-          formData.append(key, params[key]);
-        }
-      }
-
-      let ret = await axios.post('/api/v2/devices?api_token=' + rootGetters['auth/apiToken'], formData, {
-        headers: {
-          "Content-Type": "multipart/form-data",
-        },
-      })
-
-      console.log('Create device returned', ret)
-      if (ret && ret.data) {
-        id = ret.data.id
-      }
-
+    add (state, params) {
       let exists = false
 
       if (params.iddevices) {
@@ -144,32 +125,34 @@ export default {
       commit('set', params)
     },
     async add ({commit, dispatch, rootGetters}, params) {
-      let created = null
+      const formData = new FormData()
 
-      let ret = await axios.post('/device/create', params, {
+      for (var key in params) {
+        if (params[key]) {
+          formData.append(key, params[key]);
+        }
+      }
+
+      let ret = await axios.post('/api/v2/devices?api_token=' + rootGetters['auth/apiToken'], formData, {
         headers: {
-          'X-CSRF-TOKEN': rootGetters['auth/CSRF']
-        }
-      }).catch(function(error) {
-        if (error && error.response && error.response.data) {
-          throw new Error(error.response.data.message)
-        } else {
-          throw new Error('Unknown error')
-        }
+          "Content-Type": "multipart/form-data",
+        },
       })
 
-      if (ret && ret.data && ret.data.success && ret.data.devices) {
-        // We have been returned the device objects from the server.  Add them into the store, and lo!  All our
-        // stats and views will update.
-        created = ret.data.devices
+      console.log('Create device returned', ret)
+      let id = null
 
-        created.forEach(d => {
-          commit('add', d)
-        })
+      if (ret && ret.data) {
+        id = ret.data.id
+      }
+
+      if (ret && ret.data && ret.data.device) {
+        // We have been returned the device object from the server.  Add it into the store, and lo!  All our
+        // stats and views will update.
+        const created = ret.data.device
+        commit('add', ret.data.device)
 
         // Update our stats
-        // TODO LATER There are some uses of event_id in the server which should really be idevents for
-        // consistency.
         dispatch('events/setStats', {
           idevents: params.event_id,
           stats: ret.data.stats

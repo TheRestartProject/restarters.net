@@ -422,8 +422,6 @@ export default {
         iddevices: this.device.iddevices,
         idevents: this.idevents
       })
-
-      window.location = '/fixometer'
     },
   }
 }

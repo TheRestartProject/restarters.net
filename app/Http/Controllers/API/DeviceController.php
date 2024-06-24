@@ -235,9 +235,12 @@ class DeviceController extends Controller {
         }
 
         // TODO Images - probably a separate API Call.
+        // We return the device and the stats to save the client another API call to update its store.
 
         return response()->json([
             'id' => $idDevice,
+            'device' => \App\Http\Resources\Device::make($device),
+            'stats' => $event->getEventStats()
         ]);
     }
 

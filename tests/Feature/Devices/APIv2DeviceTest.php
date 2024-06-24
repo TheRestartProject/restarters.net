@@ -180,6 +180,7 @@ class APIv2DeviceTest extends TestCase
         $this->assertTrue(array_key_exists('id', $json));
         $iddevices = $json['id'];
         $this->assertNotNull($iddevices);
+        $this->assertEquals($iddevices, $json['device']['id']);
 
         $response = $this->get("/api/v2/devices/$iddevices");
         $response->assertSuccessful();
