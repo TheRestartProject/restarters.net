@@ -269,7 +269,7 @@ abstract class TestCase extends BaseTestCase
         return $idevents;
     }
 
-    public function createDevice($idevents, $type, $barrierstr = null, $age = 1.5, $estimate = 100, $problem = '', $repair_status = NULL, $next_steps = NULL, $spare_parts = NULL)
+    public function createDevice($idevents, $type, $barrierstr = null, $age = 1.5, $estimate = 100, $problem = '', $repair_status = NULL, $next_steps = NULL, $spare_parts = NULL, $category = NULL)
     {
         // Many tests use $type to create a device from DeviceFactory.
         $deviceAttributes = Device::factory()->{lcfirst($type)}()->raw();
@@ -317,6 +317,10 @@ abstract class TestCase extends BaseTestCase
 
         if ($spare_parts) {
             $params['spare_parts'] = $spare_parts;
+        }
+
+        if ($category) {
+            $params['category'] = $category;
         }
 
         $response = $this->post('/api/v2/devices', $params);

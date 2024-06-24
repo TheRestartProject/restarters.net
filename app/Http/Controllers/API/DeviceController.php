@@ -6,9 +6,9 @@ use App\Barrier;
 use App\Device;
 use App\DeviceBarrier;
 use App\Events\DeviceCreatedOrUpdated;
-use App\EventsUsers;
 use App\Helpers\Fixometer;
 use App\Http\Controllers\Controller;
+use App\Notifications\AdminAbnormalDevices;
 use App\Party;
 use Illuminate\Auth\AuthenticationException;
 use Illuminate\Validation\ValidationException;
@@ -17,6 +17,7 @@ use Auth;
 use Illuminate\Http\Request;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\DB;
 
 class DeviceController extends Controller {
     /**
@@ -161,7 +162,7 @@ class DeviceController extends Controller {
     {
         $user = $this->getUser();
 
-        list($partyid,
+        list($eventid,
             $category,
             $item_type,
             $brand,
@@ -180,15 +181,15 @@ class DeviceController extends Controller {
             $barrier
         ) = $this->validateDeviceParams($request,true);
 
-        Party::findOrFail($partyid);
+        $event = Party::findOrFail($eventid);
 
-        if (!Fixometer::userHasEditEventsDevicesPermission($partyid, $user->id)) {
+        if (!Fixometer::userHasEditEventsDevicesPermission($eventid, $user->id)) {
             // Only hosts can add devices to events.
             abort(403);
         }
 
         $data = [
-            'event' => $partyid,
+            'event' => $eventid,
             'category' => $category,
             'category_creation' => $category,  // We don't expose this over the API but we record it in case it changes.
             'item_type' => $item_type,
@@ -219,6 +220,17 @@ class DeviceController extends Controller {
                     'device_id' => $idDevice,
                     'barrier_id' => $barrier
                 ]);
+            }
+
+            // If the number of devices exceeds set amount then notify admins.
+            $deviceMiscCount = DB::table('devices')->where('category', env('MISC_CATEGORY_ID_POWERED'))->where('event', $eventid)->count() +
+                DB::table('devices')->where('category', env('MISC_CATEGORY_ID_UNPOWERED'))->where('event', $eventid)->count();
+            if ($deviceMiscCount == env('DEVICE_ABNORMAL_MISC_COUNT', 5)) {
+                $notify_users = Fixometer::usersWhoHavePreference('admin-abnormal-devices');
+                Notification::send($notify_users, new AdminAbnormalDevices([
+                    'event_venue' => $event->getEventName(),
+                    'event_url' => url('/party/edit/'.$eventid),
+                ]));
             }
         }
 
@@ -330,7 +342,7 @@ class DeviceController extends Controller {
     {
         $user = $this->getUser();
 
-        list($partyid,
+        list($eventid,
             $category,
             $item_type,
             $brand,
@@ -349,15 +361,15 @@ class DeviceController extends Controller {
             $barrier
             ) = $this->validateDeviceParams($request,false);
 
-        Party::findOrFail($partyid);
+        Party::findOrFail($eventid);
 
-        if (!Fixometer::userHasEditEventsDevicesPermission($partyid, $user->id)) {
+        if (!Fixometer::userHasEditEventsDevicesPermission($eventid, $user->id)) {
             // Only hosts can add devices to events.
             abort(403);
         }
 
         $data = [
-            'event' => $partyid,
+            'event' => $eventid,
             'category' => $category,
             'item_type' => $item_type,
             'brand' => $brand,
@@ -479,7 +491,7 @@ class DeviceController extends Controller {
             ]);
         }
 
-        $partyid = $request->input('eventid');
+        $eventid = $request->input('eventid');
         $category = $request->input('category');
         $item_type = $request->input('item_type');
         $brand = $request->input('brand');
@@ -553,17 +565,25 @@ class DeviceController extends Controller {
                     break;
                 case Device::PARTS_PROVIDER_MANUFACTURER_STR:
                     $spare_parts = Device::SPARE_PARTS_NEEDED;
-                    $parts_provider = Device::PARTS_PROVIDER_MANUFACTURER;
+
+                    if ($repair_status != Device::REPAIR_STATUS_ENDOFLIFE) {
+                        // If it is end of life we record that the parts are needed, but there is no provider.
+                        $parts_provider = Device::PARTS_PROVIDER_MANUFACTURER;
+                    }
                     break;
                 case Device::PARTS_PROVIDER_THIRD_PARTY_STR:
                     $spare_parts = Device::SPARE_PARTS_NEEDED;
-                    $parts_provider = Device::PARTS_PROVIDER_THIRD_PARTY;
+
+                    if ($repair_status != Device::REPAIR_STATUS_ENDOFLIFE) {
+                        // If it is end of life we record that the parts are needed, but there is no provider.
+                        $parts_provider = Device::PARTS_PROVIDER_THIRD_PARTY;
+                    }
                     break;
             }
         }
 
         return [
-            $partyid,
+            $eventid,
             $category,
             $item_type,
             $brand,
@@ -582,6 +602,7 @@ class DeviceController extends Controller {
             $barrier
         ];
     }
+
     private function getUser()
     {
         // We want to allow this call to work if a) we are logged in as a user, or b) we have a valid API token.

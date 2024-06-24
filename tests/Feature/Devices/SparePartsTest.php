@@ -98,14 +98,12 @@ class SparePartsTest extends TestCase
     /** @test */
     public function recording_no_spare_parts_related_barrier()
     {
-        $this->device_inputs['repair_status'] = Device::REPAIR_STATUS_ENDOFLIFE;
-        $this->device_inputs['barrier'] = [4];
-
-        $response = $this->post('/device/create', $this->device_inputs);
-        $iddevices = Device::latest()->first()->iddevices;
+        $iddevices = $this->createDevice($this->event->idevents,
+            'misc', Device::BARRIER_REPAIR_INFORMATION_NOT_AVAILABLE_STR, 1.5, 100, '',
+            Device::REPAIR_STATUS_ENDOFLIFE_STR, null, Device::PARTS_PROVIDER_MANUFACTURER_STR);
 
         $device = Device::find($iddevices);
-        $this->assertEquals(Device::SPARE_PARTS_NOT_NEEDED, $device->spare_parts);
+        $this->assertEquals(1, $device->spare_parts);
         $this->assertNull($device->parts_provider);
     }
 }

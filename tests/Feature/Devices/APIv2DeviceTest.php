@@ -25,6 +25,8 @@ class APIv2DeviceTest extends TestCase
 {
     /**
      * Test that a device we create directly in the DB retrieves as expected over the API.
+     * This logic duplicates that in DeviceController, but it's worth testing to make sure that the API is
+     * behaving as we'd expect from the DB entries.
      *
      * @dataProvider providerDevice
      */
@@ -59,6 +61,18 @@ class APIv2DeviceTest extends TestCase
                 $parts_provider = Device::PARTS_PROVIDER_MANUFACTURER;
         }
 
+        switch ($next_steps_str) {
+            case Device::NEXT_STEPS_MORE_TIME_NEEDED_STR:
+                $more_time_needed = 1;
+                break;
+            case Device::NEXT_STEPS_PROFESSIONAL_HELP_STR:
+                $professional_help = 1;
+                break;
+            case Device::NEXT_STEPS_DO_IT_YOURSELF_STR:
+                $do_it_yourself = 1;
+                break;
+        }
+
         $device = Device::create([
             'event' => $idEvents,
             'category' => 11,
@@ -72,10 +86,22 @@ class APIv2DeviceTest extends TestCase
             'item_type' => 'Test item type',
             'repair_status' => $repair_status,
             'parts_provider' => $parts_provider,
+            'more_time_needed' => $more_time_needed ?? 0,
+            'professional_help' => $professional_help ?? 0,
+            'do_it_yourself' => $do_it_yourself ?? 0,
         ]);
 
         $iddevices = $device->iddevices;
         $this->assertNotNull($iddevices);
+
+        if ($barrierstr) {
+            $barrier = DB::table('barriers')->where('barrier', $barrierstr)->first()->id;
+
+            DeviceBarrier::create([
+                'device_id' => $iddevices,
+                'barrier_id' => $barrier
+            ]);
+        }
 
         // Test invalid device id.
         try {
@@ -187,7 +213,7 @@ class APIv2DeviceTest extends TestCase
         // TODO Neil - I am not confident that I know the valid combinations of repair status/parts provider/
         // barrier/next steps.
         //
-        // Please can you consider which values we should be supporting?
+        // Please can you consider which values we should be testing here?
         return [
             [
                 Device::REPAIR_STATUS_FIXED_STR,
