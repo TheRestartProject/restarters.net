@@ -10,10 +10,22 @@ function newToOld(d) {
   // Similar code in event and group store.
   let ret = d
 
-  d.iddevices = d.id
-  delete d.id
-  d.idevents=  d.eventid
-  delete d.eventid
+  ret.iddevices = d.id
+  delete ret.id
+  ret.idevents=  d.eventid
+  delete ret.eventid
+
+  return ret
+}
+
+function oldToNew(d) {
+  let ret = d
+
+  ret.id = d.iddevices
+  delete ret.iddevices
+  ret.eventid = d.event_id
+  delete ret.event_id
+  ret.category = d.device_category.idcategories
 
   return ret
 }
@@ -51,6 +63,7 @@ export default {
       let exists = false
 
       const params = newToOld(device)
+      console.log('Add', params, device)
 
       if (params.iddevices) {
         if (!state.devices[params.idevents]) {
@@ -194,26 +207,30 @@ export default {
       return created
     },
     async edit ({commit, dispatch, rootGetters}, params) {
-      let ret = await axios.post('/device/edit/' + params.iddevices, params, {
+      const formData = new FormData()
+
+      params = oldToNew(params)
+
+      for (var key in params) {
+        if (params[key]) {
+          formData.append(key, params[key]);
+        }
+      }
+
+      let ret = await axios.post('/api/v2/devices/' + params.id + '?api_token=' + rootGetters['auth/apiToken'] + '&_method=PATCH', formData, {
         headers: {
-          'X-CSRF-TOKEN': rootGetters['auth/CSRF']
-        }
-      }).catch(function(error) {
-        if (error && error.response && error.response.data) {
-          throw new Error(error.response.data.message)
-        } else {
-          throw new Error('Unknown error')
-        }
+          "Content-Type": "multipart/form-data",
+        },
       })
 
-      if (ret && ret.data && ret.data.success && ret.data.device) {
-        // We have been returned the device objects from the server.  Add them into the store, and lo!  All our
+      if (ret && ret.data && ret.data.device) {
+        // We have been returned the device object from the server.  Update it in the store, and lo!  All our
         // stats and views will update.
         commit('add', ret.data.device)
 
         // Update our stats
         dispatch('events/setStats', {
-          idevents: params.event_id,
+          idevents: params.eventid,
           stats: ret.data.stats
         }, {
           root: true
@@ -221,26 +238,19 @@ export default {
       }
     },
     async delete ({commit, dispatch, rootGetters}, params) {
-      const ret = await axios.get('/device/delete/' + params.iddevices, {
-        headers: {
-          'X-CSRF-TOKEN': rootGetters['auth/CSRF']
-        }
-      })
+      let ret = await axios.delete('/api/v2/devices/' + params.iddevices + '?api_token=' + rootGetters['auth/apiToken'])
 
       console.log("Delete device returned", ret)
-      if (ret && ret.data && ret.data.success) {
-        commit('remove', params)
 
-        // Update our stats
-        dispatch('events/setStats', {
-          idevents: params.idevents,
-          stats: ret.data.stats
-        }, {
-          root: true
-        })
-      } else {
-        throw 'Server request failed'
-      }
+      commit('remove', params)
+
+      // Update our stats
+      dispatch('events/setStats', {
+        idevents: params.idevents,
+        stats: ret.data.stats
+      }, {
+        root: true
+      })
     },
     async addURL ({commit, rootGetters}, params) {
       const ret = await axios.post('/device-url', {

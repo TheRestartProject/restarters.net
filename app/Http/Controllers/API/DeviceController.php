@@ -364,7 +364,7 @@ class DeviceController extends Controller {
             $barrier
             ) = $this->validateDeviceParams($request,false);
 
-        Party::findOrFail($eventid);
+        $event = Party::findOrFail($eventid);
 
         if (!Fixometer::userHasEditEventsDevicesPermission($eventid, $user->id)) {
             // Only hosts can add devices to events.
@@ -407,6 +407,8 @@ class DeviceController extends Controller {
 
         return response()->json([
             'id' => $iddevices,
+            'device' => \App\Http\Resources\Device::make($device),
+            'stats' => $event->getEventStats()
         ]);
     }
 
@@ -442,6 +444,7 @@ class DeviceController extends Controller {
         $user = $this->getUser();
 
         $device = Device::findOrFail($iddevices);
+        $eventid = $device->event;
 
         if (!Fixometer::userHasEditEventsDevicesPermission($device->event, $user->id)) {
             // Only hosts can delete devices for events.
@@ -450,8 +453,11 @@ class DeviceController extends Controller {
 
         $device->delete();
 
+        $event = Party::findOrFail($eventid);
+
         return response()->json([
             'id' => $iddevices,
+            'stats' => $event->getEventStats()
         ]);
     }
 
@@ -485,12 +491,13 @@ class DeviceController extends Controller {
                 'model' => 'string',
                 'age' => [ 'numeric', 'max:500' ],
                 'estimate' => [ 'numeric', 'min:0' ],
-                'problem' => [ 'string', 'nullable' ],                'notes' => 'string',
+                'problem' => [ 'string', 'nullable' ],
+                'notes' => 'string',
                 'repair_status' => [ 'string', 'in:Fixed,Repairable,End of life' ],
                 'next_steps' => [ 'string', 'in:More time needed,Professional help,Do it yourself' ],
                 'spare_parts' => [ 'string', 'in:No,Manufacturer,Third party' ],
                 'case_study' => ['boolean'],
-                'barrier' => [ 'string', 'in:Spare parts not available,Spare parts too expensive,No way to open the product,Repair information not available,Lack of equipment' ],
+                'barrier' => [ 'string','nullable', 'in:Spare parts not available,Spare parts too expensive,No way to open the product,Repair information not available,Lack of equipment' ],
             ]);
         }
 
