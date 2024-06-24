@@ -15,15 +15,37 @@ class Device extends Model implements Auditable
     use HasFactory;
 
     const REPAIR_STATUS_FIXED = 1;
+    const REPAIR_STATUS_FIXED_STR = 'Fixed';
     const REPAIR_STATUS_REPAIRABLE = 2;
+    const REPAIR_STATUS_REPAIRABLE_STR = 'Repairable';
     const REPAIR_STATUS_ENDOFLIFE = 3;
+    const REPAIR_STATUS_ENDOFLIFE_STR = 'End of life';
 
     const SPARE_PARTS_NEEDED = 1;
     const SPARE_PARTS_NOT_NEEDED = 2;
     const SPARE_PARTS_UNKNOWN = 0;
 
     const PARTS_PROVIDER_MANUFACTURER = 1;
+    const PARTS_PROVIDER_MANUFACTURER_STR = 'Manufacturer';
     const PARTS_PROVIDER_THIRD_PARTY = 2;
+    const PARTS_PROVIDER_THIRD_PARTY_STR = 'Third party';
+    const PARTS_PROVIDER_NO_STR = 'No';
+
+    const BARRIER_SPARE_PARTS_NOT_AVAILABLE = 1;
+    const BARRIER_SPARE_PARTS_NOT_AVAILABLE_STR = 'Spare parts not available';
+    const BARRIER_SPARE_PARTS_TOO_EXPENSIVE = 2;
+    const BARRIER_SPARE_PARTS_TOO_EXPENSIVE_STR = 'Spare parts too expensive';
+    const BARRIER_NO_WAY_TO_OPEN_THE_PRODUCT = 3;
+    const BARRIER_NO_WAY_TO_OPEN_THE_PRODUCT_STR = 'No way to open the product';
+    const BARRIER_REPAIR_INFORMATION_NOT_AVAILABLE = 4;
+    const BARRIER_REPAIR_INFORMATION_NOT_AVAILABLE_STR = 'Repair information not available';
+    const BARRIER_LACK_OF_EQUIPMENT = 5;
+    const BARRIER_LACK_OF_EQUIPMENT_STR = 'Lack of equpment';
+
+    const NEXT_STEPS_MORE_TIME_NEEDED_STR = 'More time needed';
+    const NEXT_STEPS_PROFESSIONAL_HELP_STR = 'Professional help';
+    const NEXT_STEPS_DO_IT_YOURSELF_STR = 'Do it yourself';
+
 
     use \OwenIt\Auditing\Auditable;
     protected $table = 'devices';

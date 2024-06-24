@@ -10,6 +10,7 @@ use App\User;
 use DB;
 use Illuminate\Support\Facades\Storage;
 use Tests\TestCase;
+use Illuminate\Database\Eloquent\ModelNotFoundException;
 
 class EditTest extends TestCase
 {
@@ -19,10 +20,6 @@ class EditTest extends TestCase
 
         $this->event = Party::factory()->create();
         $this->admin = User::factory()->administrator()->create();
-        $this->device_inputs = Device::factory()->raw([
-                                                               'event_id' => $this->event->idevents,
-                                                               'quantity' => 1,
-                                                           ]);
         $this->actingAs($this->admin);
 
         $this->withoutExceptionHandling();
@@ -30,32 +27,27 @@ class EditTest extends TestCase
 
     public function testEdit()
     {
-        $rsp = $this->post('/device/create', $this->device_inputs);
-        self::assertTrue($rsp['success']);
-        $iddevices = $rsp['devices'][0]['iddevices'];
-        self::assertNotNull($iddevices);
+        $iddevices = $this->createDevice($this->event->idevents, 'misc');
 
         # Add a barrier to repair - there was a bug in this case with quantity > 1.
-        $this->device_inputs['repair_status'] = Device::REPAIR_STATUS_ENDOFLIFE;
-        $this->device_inputs['barrier'] = [1];
+        $iddevices = $this->createDevice($this->event->idevents, 'misc', Device::BARRIER_SPARE_PARTS_NOT_AVAILABLE_STR);
 
-        # Edit the quantity.
-        $atts = $this->device_inputs;
-        $atts['quantity'] = 2;
-        $rsp = $this->post('/device/edit/' . $iddevices, $atts);
-        self::assertEquals('Device updated!', $rsp['success']);
+        # Edit the problem.
+        $atts = $this->getDevice($iddevices);
+        $atts['problem'] = 'New problem';
+
+        $response = $this->patch("/api/v2/devices/$iddevices", $atts);
+        $response->assertSuccessful();
+
+        $atts = $this->getDevice($iddevices);
+        $this->assertEquals('New problem', $atts['problem']);
 
         # Delete the device.
-        $rsp = $this->get('/device/delete/' . $iddevices, [
-            'HTTP_X-Requested-With' => 'XMLHttpRequest'
-        ]);
-        self::assertTrue($rsp['success']);
+        $this->deleteDevice($iddevices);
 
         # Delete again - should fail.
-        $rsp = $this->get('/device/delete/' . $iddevices, [
-            'HTTP_X-Requested-With' => 'XMLHttpRequest'
-        ]);
-        self::assertFalse($rsp['success']);
+        $this->expectException(ModelNotFoundException::class);
+        $this->deleteDevice($iddevices);
     }
 
     public function testEditAsNetworkCoordinator()
@@ -74,21 +66,14 @@ class EditTest extends TestCase
         $network->addCoordinator($coordinator);
         $this->actingAs($coordinator);
 
-        $device_inputs = Device::factory()->raw([
-                                                  'event_id' => $event->idevents,
-                                                  'quantity' => 1,
-                                              ]);
+        $iddevices = $this->createDevice($event->idevents, 'misc');
 
-        $rsp = $this->post('/device/create', $device_inputs);
-        self::assertTrue($rsp['success']);
-        $iddevices = $rsp['devices'][0]['iddevices'];
-        self::assertNotNull($iddevices);
+        # Edit the problem.
+        $atts = $this->getDevice($iddevices);
+        $atts['problem'] = 'New problem';
 
-        # Edit the quantity.
-        $atts = $device_inputs;
-        $atts['quantity'] = 2;
-        $rsp = $this->post('/device/edit/' . $iddevices, $atts);
-        self::assertEquals('Device updated!', $rsp['success']);
+        $response = $this->patch("/api/v2/devices/$iddevices", $atts);
+        $response->assertSuccessful();
     }
 
     public function testDeviceEditAddImage() {
@@ -96,10 +81,7 @@ class EditTest extends TestCase
         $user = User::factory()->administrator()->create();
         $this->actingAs($user);
 
-        $rsp = $this->post('/device/create', $this->device_inputs);
-        self::assertTrue($rsp['success']);
-        $iddevices = $rsp['devices'][0]['iddevices'];
-        self::assertNotNull($iddevices);
+        $iddevices = $this->createDevice($this->event->idevents, 'misc');
 
         // Try with no file.
         $response = $this->json('POST', '/device/image-upload/' . $iddevices, []);
@@ -214,21 +196,13 @@ class EditTest extends TestCase
     }
 
     public function testNextSteps() {
-        $device_inputs = Device::factory()->raw([
-            'event_id' => $this->event->idevents,
-            'quantity' => 1,
-            'repair_status' => 2,
-        ]);
-        $rsp = $this->post('/device/create', $device_inputs);
-        self::assertTrue($rsp['success']);
-        $iddevices = $rsp['devices'][0]['iddevices'];
-        self::assertNotNull($iddevices);
+        $iddevices = $this->createDevice($this->event->idevents, 'misc');
 
         # Edit the repair details to say more time needed
-        $atts = $device_inputs;
-        $atts['repair_details'] = 1;
-        $rsp = $this->post('/device/edit/' . $iddevices, $atts);
-        self::assertEquals('Device updated!', $rsp['success']);
+        $atts = $this->getDevice($iddevices);
+        $atts['next_steps'] = Device::NEXT_STEPS_MORE_TIME_NEEDED_STR;
+        $response = $this->patch("/api/v2/devices/$iddevices", $atts);
+        $response->assertSuccessful();
 
         # Check the resulting fields.
         $device = Device::findOrFail($iddevices);
@@ -237,10 +211,10 @@ class EditTest extends TestCase
         self::assertEquals(1, $device->more_time_needed);
 
         # Edit the repair details to say professional help needed.
-        $atts = $device_inputs;
-        $atts['repair_details'] = 2;
-        $rsp = $this->post('/device/edit/' . $iddevices, $atts);
-        self::assertEquals('Device updated!', $rsp['success']);
+        $atts = $this->getDevice($iddevices);
+        $atts['next_steps'] = Device::NEXT_STEPS_PROFESSIONAL_HELP_STR;
+        $response = $this->patch("/api/v2/devices/$iddevices", $atts);
+        $response->assertSuccessful();
 
         # Check the resulting fields.
         $device = Device::findOrFail($iddevices);
@@ -249,28 +223,15 @@ class EditTest extends TestCase
         self::assertEquals(0, $device->more_time_needed);
 
         # Edit the repair details to say DIY needed.
-        $atts = $device_inputs;
-        $atts['repair_details'] = 3;
-        $rsp = $this->post('/device/edit/' . $iddevices, $atts);
-        self::assertEquals('Device updated!', $rsp['success']);
+        $atts = $this->getDevice($iddevices);
+        $atts['next_steps'] = Device::NEXT_STEPS_DO_IT_YOURSELF_STR;
+        $response = $this->patch("/api/v2/devices/$iddevices", $atts);
+        $response->assertSuccessful();
 
         # Check the resulting fields.
         $device = Device::findOrFail($iddevices);
         self::assertEquals(0, $device->professional_help);
         self::assertEquals(1, $device->do_it_yourself);
         self::assertEquals(0, $device->more_time_needed);
-    }
-
-    public function testBarrierMultiple()
-    {
-        $atts = $this->device_inputs;
-        $atts['quantity'] = 2;
-        $atts['repair_status'] = Device::REPAIR_STATUS_ENDOFLIFE;
-        $atts['barrier'] = [1];
-
-        $rsp = $this->post('/device/create', $atts);
-        self::assertTrue($rsp['success']);
-        $iddevices = $rsp['devices'][0]['iddevices'];
-        self::assertNotNull($iddevices);
     }
 }

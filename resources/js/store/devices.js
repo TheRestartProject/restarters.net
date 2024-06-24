@@ -2,6 +2,34 @@ import Vue from 'vue'
 
 const axios = require('axios')
 
+function newToOld(d) {
+  // We are in the frustrating position of having a half-written new API with sensible field names, but existing
+  // Vue components that expect old-style field names.  We therefore sometimes need to convert the new API data
+  // back into the old format which is expected.  In some bright future where we have shifted over to using the
+  // new API completely, we can then migrate the Vue components to use the new field names and retire this function.
+  // Similar code in event and group store.
+  let ret = d
+
+  ret.iddevices = d.id
+  delete ret.id
+  ret.idevents=  d.eventid
+  delete ret.eventid
+
+  return ret
+}
+
+function oldToNew(d) {
+  let ret = d
+
+  ret.id = d.iddevices
+  delete ret.iddevices
+  ret.eventid = d.event_id
+  delete ret.event_id
+  ret.category = d.device_category.idcategories
+
+  return ret
+}
+
 export default {
   namespaced: true,
   state: {
@@ -31,8 +59,11 @@ export default {
         Vue.set(state.images, d.iddevices, d.images)
       })
     },
-    add (state, params) {
+    add (state, device) {
       let exists = false
+
+      const params = newToOld(device)
+      console.log('Add', params, device)
 
       if (params.iddevices) {
         if (!state.devices[params.idevents]) {
@@ -43,7 +74,11 @@ export default {
           if (d.iddevices === params.iddevices) {
             // Found it there already.
             Vue.set(state.devices[params.idevents], i, params)
-            Vue.set(state.images, params.iddevices, params.images)
+
+            if (params.images) {
+              Vue.set(state.images, params.iddevices, params.images)
+            }
+
             exists = true
           }
         })
@@ -52,8 +87,13 @@ export default {
       if (!exists) {
         // Append the new device to the existing list.
         state.devices[params.idevents].push(params)
-        Vue.set(state.images, params.iddevices, params.images)
+
+        if (params.images) {
+          Vue.set(state.images, params.iddevices, params.images)
+        }
       }
+
+      return params
     },
     remove (state, params) {
       if (state.devices[params.idevents]) {
@@ -125,34 +165,39 @@ export default {
       commit('set', params)
     },
     async add ({commit, dispatch, rootGetters}, params) {
-      let created = null
+      const formData = new FormData()
 
-      let ret = await axios.post('/device/create', params, {
+      params['eventid'] = params['event_id']
+      delete params['event_id']
+
+      for (var key in params) {
+        if (params[key]) {
+          formData.append(key, params[key]);
+        }
+      }
+
+      let ret = await axios.post('/api/v2/devices?api_token=' + rootGetters['auth/apiToken'], formData, {
         headers: {
-          'X-CSRF-TOKEN': rootGetters['auth/CSRF']
-        }
-      }).catch(function(error) {
-        if (error && error.response && error.response.data) {
-          throw new Error(error.response.data.message)
-        } else {
-          throw new Error('Unknown error')
-        }
+          "Content-Type": "multipart/form-data",
+        },
       })
 
-      if (ret && ret.data && ret.data.success && ret.data.devices) {
-        // We have been returned the device objects from the server.  Add them into the store, and lo!  All our
-        // stats and views will update.
-        created = ret.data.devices
+      let id = null
 
-        created.forEach(d => {
-          commit('add', d)
-        })
+      if (ret && ret.data) {
+        id = ret.data.id
+      }
+
+      let created = null
+
+      if (ret && ret.data && ret.data.device) {
+        // We have been returned the device object from the server.  Add it into the store, and lo!  All our
+        // stats and views will update.
+        commit('add', ret.data.device)
 
         // Update our stats
-        // TODO LATER There are some uses of event_id in the server which should really be idevents for
-        // consistency.
         dispatch('events/setStats', {
-          idevents: params.event_id,
+          idevents: params.eventid,
           stats: ret.data.stats
         }, {
           root: true
@@ -162,26 +207,30 @@ export default {
       return created
     },
     async edit ({commit, dispatch, rootGetters}, params) {
-      let ret = await axios.post('/device/edit/' + params.iddevices, params, {
+      const formData = new FormData()
+
+      params = oldToNew(params)
+
+      for (var key in params) {
+        if (params[key]) {
+          formData.append(key, params[key]);
+        }
+      }
+
+      let ret = await axios.post('/api/v2/devices/' + params.id + '?api_token=' + rootGetters['auth/apiToken'] + '&_method=PATCH', formData, {
         headers: {
-          'X-CSRF-TOKEN': rootGetters['auth/CSRF']
-        }
-      }).catch(function(error) {
-        if (error && error.response && error.response.data) {
-          throw new Error(error.response.data.message)
-        } else {
-          throw new Error('Unknown error')
-        }
+          "Content-Type": "multipart/form-data",
+        },
       })
 
-      if (ret && ret.data && ret.data.success && ret.data.device) {
-        // We have been returned the device objects from the server.  Add them into the store, and lo!  All our
+      if (ret && ret.data && ret.data.device) {
+        // We have been returned the device object from the server.  Update it in the store, and lo!  All our
         // stats and views will update.
         commit('add', ret.data.device)
 
         // Update our stats
         dispatch('events/setStats', {
-          idevents: params.event_id,
+          idevents: params.eventid,
           stats: ret.data.stats
         }, {
           root: true
@@ -189,26 +238,19 @@ export default {
       }
     },
     async delete ({commit, dispatch, rootGetters}, params) {
-      const ret = await axios.get('/device/delete/' + params.iddevices, {
-        headers: {
-          'X-CSRF-TOKEN': rootGetters['auth/CSRF']
-        }
-      })
+      let ret = await axios.delete('/api/v2/devices/' + params.iddevices + '?api_token=' + rootGetters['auth/apiToken'])
 
       console.log("Delete device returned", ret)
-      if (ret && ret.data && ret.data.success) {
-        commit('remove', params)
 
-        // Update our stats
-        dispatch('events/setStats', {
-          idevents: params.idevents,
-          stats: ret.data.stats
-        }, {
-          root: true
-        })
-      } else {
-        throw 'Server request failed'
-      }
+      commit('remove', params)
+
+      // Update our stats
+      dispatch('events/setStats', {
+        idevents: params.idevents,
+        stats: ret.data.stats
+      }, {
+        root: true
+      })
     },
     async addURL ({commit, rootGetters}, params) {
       const ret = await axios.post('/device-url', {

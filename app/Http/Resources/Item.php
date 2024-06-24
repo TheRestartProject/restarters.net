@@ -8,7 +8,7 @@ use Illuminate\Http\Resources\Json\JsonResource;
  * @OA\Schema(
  *     title="Item",
  *     schema="Item",
- *     description="An item which can be specified in a device",
+ *     description="An item which can be specified in a Device",
  *     @OA\Property(
  *          property="type",
  *          title="type",
