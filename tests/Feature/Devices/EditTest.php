@@ -3,13 +3,18 @@
 namespace Tests\Feature;
 
 use App\Device;
+use App\Events\DeviceCreatedOrUpdated;
+use App\EventsUsers;
 use App\Group;
+use App\Listeners\DeviceUpdatedAt;
 use App\Network;
 use App\Party;
+use App\Role;
 use App\User;
 use DB;
 use Illuminate\Support\Facades\Storage;
 use Tests\TestCase;
+use Illuminate\Support\Facades\Queue;
 
 class EditTest extends TestCase
 {
@@ -272,5 +277,28 @@ class EditTest extends TestCase
         self::assertTrue($rsp['success']);
         $iddevices = $rsp['devices'][0]['iddevices'];
         self::assertNotNull($iddevices);
+    }
+
+    public function testQueuedJobForDeletedEvent()
+    {
+        $this->loginAsTestUser(Role::ADMINISTRATOR);
+        $id = $this->createGroup();
+        $this->assertNotNull($id);
+
+        $idevents = $this->createEvent($id, 'yesterday');
+        $iddevices = $this->createDevice($idevents, 'misc');
+        $device = Device::find($iddevices);
+
+        $job = new DeviceCreatedOrUpdated($device);
+
+        # Delete the event and device from the DB.
+        EventsUsers::where('event', $idevents)->forcedelete();
+        Device::where('iddevices', $iddevices)->forcedelete();
+        Party::where('idevents', $idevents)->forcedelete();
+
+        $handler = new DeviceUpdatedAt();
+        $handler->handle($job);
+
+        $this->assertTrue(false);
     }
 }
