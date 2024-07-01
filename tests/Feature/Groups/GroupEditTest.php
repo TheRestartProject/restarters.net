@@ -4,6 +4,7 @@ namespace Tests\Feature;
 
 use App\Group;
 use App\GroupTags;
+use App\Network;
 use App\Role;
 use App\User;
 use Carbon\Carbon;
@@ -188,5 +189,34 @@ class GroupEditTest extends TestCase
 
         $group->refresh();
         $this->assertEquals('info@test.com', $group->email);
+    }
+
+    public function testEditAsNetworkCoordinator() {
+        $network = Network::factory()->create();
+        $coordinator = User::factory()->restarter()->create();
+        $network->addCoordinator($coordinator);
+        $coordinator->refresh();
+        $this->actingAs($coordinator);
+
+        $idgroups = $this->createGroup(
+            'Test Group',
+            'https://therestartproject.org',
+            'London',
+            'Some text.',
+            true,
+            false,
+            'info@test.com'
+        );
+
+        $response = $this->get('/group/edit/' . $idgroups);
+        $response->assertStatus(200);
+
+        // Shouldn't be able to approve the group, as it has not yet been put in our network (by an admin).
+        $this->assertVueProperties($response, [
+            [],
+            [
+                ':can-approve' => 'false',
+            ],
+        ]);
     }
 }

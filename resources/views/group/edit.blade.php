@@ -19,7 +19,7 @@
               <div class="tab-pane active" id="details">
                 <div class="vue">
                   <GroupAddEditPage :idgroups="{{ $id }}"
-                                    :can-approve="{{ (Auth::user()->hasRole('Administrator') || Auth::user()->hasRole('NetworkCoordinator')) ? "true" : "false" }}"
+                                    :can-approve="{{ $can_approve ? "true": "false" }}"
                                     :can-network="{{ Auth::user()->hasRole('Administrator') ? "true" : "false" }}"
                   />
                 </div>
