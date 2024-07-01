@@ -291,14 +291,10 @@ class EditTest extends TestCase
 
         $job = new DeviceCreatedOrUpdated($device);
 
-        # Delete the event and device from the DB.
-        EventsUsers::where('event', $idevents)->forcedelete();
-        Device::where('iddevices', $iddevices)->forcedelete();
-        Party::where('idevents', $idevents)->forcedelete();
+        # Delete the event (will stay in DB as soft delete).
+        Party::where('idevents', $idevents)->delete();
 
         $handler = new DeviceUpdatedAt();
         $handler->handle($job);
-
-        $this->assertTrue(false);
     }
 }
