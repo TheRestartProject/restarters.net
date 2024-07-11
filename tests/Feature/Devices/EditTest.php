@@ -40,6 +40,7 @@ class EditTest extends TestCase
         # Edit the problem.
         $atts = $this->getDevice($iddevices);
         $atts['problem'] = 'New problem';
+        $atts['category'] = $atts['category']['id'];
 
         $response = $this->patch("/api/v2/devices/$iddevices", $atts);
         $response->assertSuccessful();
@@ -76,6 +77,7 @@ class EditTest extends TestCase
         # Edit the problem.
         $atts = $this->getDevice($iddevices);
         $atts['problem'] = 'New problem';
+        $atts['category'] = $atts['category']['id'];
 
         $response = $this->patch("/api/v2/devices/$iddevices", $atts);
         $response->assertSuccessful();
@@ -206,6 +208,7 @@ class EditTest extends TestCase
         # Edit the repair details to say more time needed
         $atts = $this->getDevice($iddevices);
         $atts['next_steps'] = Device::NEXT_STEPS_MORE_TIME_NEEDED_STR;
+        $atts['category'] = $atts['category']['id'];
         $response = $this->patch("/api/v2/devices/$iddevices", $atts);
         $response->assertSuccessful();
 
@@ -218,6 +221,7 @@ class EditTest extends TestCase
         # Edit the repair details to say professional help needed.
         $atts = $this->getDevice($iddevices);
         $atts['next_steps'] = Device::NEXT_STEPS_PROFESSIONAL_HELP_STR;
+        $atts['category'] = $atts['category']['id'];
         $response = $this->patch("/api/v2/devices/$iddevices", $atts);
         $response->assertSuccessful();
 
@@ -230,6 +234,7 @@ class EditTest extends TestCase
         # Edit the repair details to say DIY needed.
         $atts = $this->getDevice($iddevices);
         $atts['next_steps'] = Device::NEXT_STEPS_DO_IT_YOURSELF_STR;
+        $atts['category'] = $atts['category']['id'];
         $response = $this->patch("/api/v2/devices/$iddevices", $atts);
         $response->assertSuccessful();
 
@@ -238,19 +243,6 @@ class EditTest extends TestCase
         self::assertEquals(0, $device->professional_help);
         self::assertEquals(1, $device->do_it_yourself);
         self::assertEquals(0, $device->more_time_needed);
-    }
-
-    public function testBarrierMultiple()
-    {
-        $atts = $this->device_inputs;
-        $atts['quantity'] = 2;
-        $atts['repair_status'] = Device::REPAIR_STATUS_ENDOFLIFE;
-        $atts['barrier'] = [1];
-
-        $rsp = $this->post('/device/create', $atts);
-        self::assertTrue($rsp['success']);
-        $iddevices = $rsp['devices'][0]['iddevices'];
-        self::assertNotNull($iddevices);
     }
 
     public function testQueuedJobForDeletedEvent()

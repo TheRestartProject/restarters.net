@@ -38,6 +38,7 @@ class NullEstimateProblemTest extends TestCase
         // which can either mean "age not known" or "age < 1 year".
         $atts = $this->getDevice($iddevices);
         $atts['estimate'] = null;
+        $atts['category'] = $atts['category']['id'];
         $this->expectException(ValidationException::class);
         $response = $this->patch("/api/v2/devices/$iddevices", $atts);
     }
