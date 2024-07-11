@@ -52,9 +52,11 @@ const config = {
   outputDir: '/tmp/test-results',
 
   // Flakiness
-  timeout: 10 * 60 * 1000,
+  // Timeout per test - needs to be less than 10 minutes to avoid Circle CI timeout kicking in.
+  timeout: 5 * 60 * 1000,
   navigationTimeout: 2 * 60 * 1000,
-  actionTimeout: 2 * 60 * 1000
+  actionTimeout: 2 * 60 * 1000,
+  retries: 2
 };
 
 module.exports = config;
