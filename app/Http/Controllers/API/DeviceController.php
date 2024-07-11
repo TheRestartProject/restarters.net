@@ -507,6 +507,7 @@ class DeviceController extends Controller {
         $brand = $request->input('brand');
         $model = $request->input('model');
         $age = $request->input('age');
+        $age = $age ? $age : 0;
         $estimate = $request->input('estimate');
         $estimate = $estimate ? $estimate : 0;
         $problem = $request->input('problem');
@@ -541,6 +542,9 @@ class DeviceController extends Controller {
                     throw ValidationException::withMessages(['barrier' => ['Barrier is required for End of life devices']]);
                 }
 
+                break;
+            default:
+                $repair_status = 0;
                 break;
         }
 

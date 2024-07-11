@@ -188,8 +188,12 @@ export default {
     }
   },
   watch: {
+    device(newval) {
+      console.log('Device changed', newval)
+      this.updateCurrentDevice(newval)
+    },
     currentCategory (newval) {
-      if (this.missingCategory && newval) {
+      if (this.missingCategory && newval && newval.value) {
         // Reset warning.
         this.missingCategory = false
       }
@@ -329,19 +333,7 @@ export default {
     }
 
     if (this.device) {
-      // Take a deep clone because we're messing with arrays.
-      this.currentDevice = {...this.currentDevice, ...JSON.parse(JSON.stringify(this.device))}
-
-      // Some values we need to munge back to the id for our selects.
-      if (this.currentDevice.category) {
-        this.currentDevice.category = this.currentDevice.category.idcategories
-      }
-
-      this.currentDevice.estimate = parseFloat(this.currentDevice.estimate)
-      this.currentDevice.age = parseFloat(this.currentDevice.age)
-
-      this.nextSteps()
-      this.partsProvider()
+      this.updateCurrentDevice(this.device)
     }
 
     if (this.add) {
@@ -352,6 +344,27 @@ export default {
     }
   },
   methods: {
+    updateCurrentDevice(device) {
+      // Take a deep clone because we're messing with arrays.
+      this.currentDevice = {...this.currentDevice, ...JSON.parse(JSON.stringify(device))}
+
+      // Some values we need to munge back to the id for our selects.  This is a bit ugly because we have two lots
+      // of field names, depending on which API we're using.
+      console.log('updateCurrentDevice', JSON.stringify(this.currentDevice.category))
+      if (typeof this.currentDevice.category === 'object') {
+        if (this.currentDevice.category.idcategories) {
+          this.currentDevice.category = this.currentDevice.category.idcategories
+        } else {
+          this.currentDevice.category = this.currentDevice.category.id
+        }
+      }
+
+      this.currentDevice.estimate = parseFloat(this.currentDevice.estimate)
+      this.currentDevice.age = parseFloat(this.currentDevice.age)
+
+      this.nextSteps()
+      this.partsProvider()
+    },
     cancel () {
       this.$emit('close')
     },

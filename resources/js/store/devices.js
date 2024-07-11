@@ -25,7 +25,18 @@ function oldToNew(d) {
   delete ret.iddevices
   ret.eventid = d.event_id
   delete ret.event_id
-  ret.category = d.device_category.idcategories
+
+  switch (d.spare_parts) {
+    case 1: ret.spare_parts = 'Manufacturer'; break
+    case 2: ret.spare_parts = 'Third party'; break
+    default:ret.spare_parts = 'No'; break
+  }
+
+  switch (d.repair_status) {
+    case 1: ret.repair_status = 'Fixed'; break;
+    case 2: ret.repair_status = 'Repairable'; break;
+    case 3: ret.repair_status = 'End of life'; break
+  }
 
   return ret
 }

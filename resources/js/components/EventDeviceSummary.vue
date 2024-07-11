@@ -71,7 +71,7 @@
     </b-tr>
     <b-tr v-else :key="'editing-' + device.iddevices">
       <b-td colspan="8" class="p-0">
-        <EventDevice :device="device" :powered="powered" :add="false" :edit="true" :clusters="clusters" :idevents="idevents" :brands="brands" :barrier-list="barrierList" @close="close" />
+        <EventDevice :key='bump' :device="device" :powered="powered" :add="false" :edit="true" :clusters="clusters" :idevents="idevents" :brands="brands" :barrier-list="barrierList" @close="close" />
       </b-td>
     </b-tr>
   </transition>
@@ -123,7 +123,8 @@ export default {
   data () {
     return {
       editing: false,
-      saveScroll: null
+      saveScroll: null,
+      bump: 0,
     }
   },
   computed: {
@@ -182,6 +183,7 @@ export default {
     },
     close() {
       this.editing = false
+      this.bump++
       window.scrollY = this.saveScroll
     }
   }
