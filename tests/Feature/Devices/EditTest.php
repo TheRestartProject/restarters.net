@@ -3,13 +3,18 @@
 namespace Tests\Feature;
 
 use App\Device;
+use App\Events\DeviceCreatedOrUpdated;
+use App\EventsUsers;
 use App\Group;
+use App\Listeners\DeviceUpdatedAt;
 use App\Network;
 use App\Party;
+use App\Role;
 use App\User;
 use DB;
 use Illuminate\Support\Facades\Storage;
 use Tests\TestCase;
+use Illuminate\Support\Facades\Queue;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 
 class EditTest extends TestCase
@@ -233,5 +238,37 @@ class EditTest extends TestCase
         self::assertEquals(0, $device->professional_help);
         self::assertEquals(1, $device->do_it_yourself);
         self::assertEquals(0, $device->more_time_needed);
+    }
+
+    public function testBarrierMultiple()
+    {
+        $atts = $this->device_inputs;
+        $atts['quantity'] = 2;
+        $atts['repair_status'] = Device::REPAIR_STATUS_ENDOFLIFE;
+        $atts['barrier'] = [1];
+
+        $rsp = $this->post('/device/create', $atts);
+        self::assertTrue($rsp['success']);
+        $iddevices = $rsp['devices'][0]['iddevices'];
+        self::assertNotNull($iddevices);
+    }
+
+    public function testQueuedJobForDeletedEvent()
+    {
+        $this->loginAsTestUser(Role::ADMINISTRATOR);
+        $id = $this->createGroup();
+        $this->assertNotNull($id);
+
+        $idevents = $this->createEvent($id, 'yesterday');
+        $iddevices = $this->createDevice($idevents, 'misc');
+        $device = Device::find($iddevices);
+
+        $job = new DeviceCreatedOrUpdated($device);
+
+        # Delete the event (will stay in DB as soft delete).
+        Party::where('idevents', $idevents)->delete();
+
+        $handler = new DeviceUpdatedAt();
+        $handler->handle($job);
     }
 }
