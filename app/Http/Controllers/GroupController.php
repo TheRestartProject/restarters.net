@@ -503,7 +503,9 @@ class GroupController extends Controller
             'id' => $id,
             'name' => $group->name,
             'audits' => $group->audits,
-            'networks' => Network::all()
+            'networks' => Network::all(),
+            'can_approve' => Fixometer::hasRole($user, 'Administrator') ||
+                Fixometer::hasRole($user, 'NetworkCoordinator') && $isCoordinatorForGroup
         ]);
     }
 
