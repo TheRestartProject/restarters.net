@@ -211,29 +211,131 @@ class APIv2DeviceTest extends TestCase
 
     public function providerDevice()
     {
-        // TODO Neil - I am not confident that I know the valid combinations of repair status/parts provider/
-        // barrier/next steps.
+        // Possible combinations of inputs for repair status, spare parts, next steps and barriers to repair fields.
         //
-        // Please can you consider which values we should be testing here?
+        // | Status      | Spare parts required?              | Next steps        | Barriers to repair               |
+        // |-------------+------------------------------------+-------------------+----------------------------------|
+        // | Fixed       | Parts required - from 3rd party    | null              | null                             |
+        // | Fixed       | Parts required - from manufacturer | null              | null                             |
+        // | Fixed       | No spare parts required            | null              | null                             |
+        // | Repairable  | Parts required - from 3rd party    | More time needed  | null                             |
+        // | Repairable  | Parts required - from manufacturer | More time needed  | null                             |
+        // | Repairable  | No spare parts required            | More time needed  | null                             |
+        // | Repairable  | Parts required - from 3rd party    | Professional help | null                             |
+        // | Repairable  | Parts required - from manufacturer | Professional help | null                             |
+        // | Repairable  | No spare parts required            | Professional help | null                             |
+        // | Repairable  | Parts required - from 3rd party    | Do it yourself    | null                             |
+        // | Repairable  | Parts required - from manufacturer | Do it yourself    | null                             |
+        // | Repairable  | No spare parts required            | Do it yourself    | null                             |
+        // | End-of-life | null                               | null              | Spare parts not available        |
+        // | End-of-life | null                               | null              | Spare parts too expensive        |
+        // | End-of-life | null                               | null              | No way to open the product       |
+        // | End-of-life | null                               | null              | Repair information not available |
+        // | End-of-life | null                               | null              | Lack of equipment                |
+
         return [
+            [
+                Device::REPAIR_STATUS_FIXED_STR,
+                Device::PARTS_PROVIDER_THIRD_PARTY_STR,
+                null,
+                null
+            ],
+            [
+                Device::REPAIR_STATUS_FIXED_STR,
+                Device::PARTS_PROVIDER_MANUFACTURER_STR,
+                null,
+                null
+            ],
             [
                 Device::REPAIR_STATUS_FIXED_STR,
                 Device::PARTS_PROVIDER_NO_STR,
                 null,
-                null,
+                null
             ],
             [
                 Device::REPAIR_STATUS_REPAIRABLE_STR,
                 Device::PARTS_PROVIDER_THIRD_PARTY_STR,
-                Device::BARRIER_SPARE_PARTS_NOT_AVAILABLE_STR,
+                Device::NEXT_STEPS_MORE_TIME_NEEDED_STR,
+                null
+            ],
+            [
+                Device::REPAIR_STATUS_REPAIRABLE_STR,
+                Device::PARTS_PROVIDER_MANUFACTURER_STR,
+                Device::NEXT_STEPS_MORE_TIME_NEEDED_STR,
+                null
+            ],
+            [
+                Device::REPAIR_STATUS_REPAIRABLE_STR,
+                Device::PARTS_PROVIDER_NO_STR,
+                Device::NEXT_STEPS_MORE_TIME_NEEDED_STR,
+                null
+            ],
+            [
+                Device::REPAIR_STATUS_REPAIRABLE_STR,
+                Device::PARTS_PROVIDER_THIRD_PARTY_STR,
                 Device::NEXT_STEPS_PROFESSIONAL_HELP_STR,
+                null
+            ],
+            [
+                Device::REPAIR_STATUS_REPAIRABLE_STR,
+                Device::PARTS_PROVIDER_MANUFACTURER_STR,
+                Device::NEXT_STEPS_PROFESSIONAL_HELP_STR,
+                null
+            ],
+            [
+                Device::REPAIR_STATUS_REPAIRABLE_STR,
+                Device::PARTS_PROVIDER_NO_STR,
+                Device::NEXT_STEPS_PROFESSIONAL_HELP_STR,
+                null
+            ],
+            [
+                Device::REPAIR_STATUS_REPAIRABLE_STR,
+                Device::PARTS_PROVIDER_THIRD_PARTY_STR,
+                Device::NEXT_STEPS_DO_IT_YOURSELF_STR,
+                null
+            ],
+            [
+                Device::REPAIR_STATUS_REPAIRABLE_STR,
+                Device::PARTS_PROVIDER_MANUFACTURER_STR,
+                Device::NEXT_STEPS_DO_IT_YOURSELF_STR,
+                null
+            ],
+            [
+                Device::REPAIR_STATUS_REPAIRABLE_STR,
+                Device::PARTS_PROVIDER_NO_STR,
+                Device::NEXT_STEPS_DO_IT_YOURSELF_STR,
+                null
             ],
             [
                 Device::REPAIR_STATUS_ENDOFLIFE_STR,
-                Device::PARTS_PROVIDER_NO_STR,
-                Device::BARRIER_SPARE_PARTS_NOT_AVAILABLE_STR,
                 null,
+                null,
+                Device::BARRIER_SPARE_PARTS_NOT_AVAILABLE_STR
             ],
+            [
+                Device::REPAIR_STATUS_ENDOFLIFE_STR,
+                null,
+                null,
+                Device::BARRIER_SPARE_PARTS_TOO_EXPENSIVE_STR
+            ],
+            [
+                Device::REPAIR_STATUS_ENDOFLIFE_STR,
+                null,
+                null,
+                Device::BARRIER_NO_WAY_TO_OPEN_THE_PRODUCT_STR
+            ],
+            [
+                Device::REPAIR_STATUS_ENDOFLIFE_STR,
+                null,
+                null,
+                Device::BARRIER_REPAIR_INFORMATION_NOT_AVAILABLE_STR
+            ],
+            [
+                Device::REPAIR_STATUS_ENDOFLIFE_STR,
+                null,
+                null,
+                Device::BARRIER_LACK_OF_EQUIPMENT_STR
+            ]
         ];
     }
 }
