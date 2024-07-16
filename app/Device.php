@@ -40,7 +40,7 @@ class Device extends Model implements Auditable
     const BARRIER_REPAIR_INFORMATION_NOT_AVAILABLE = 4;
     const BARRIER_REPAIR_INFORMATION_NOT_AVAILABLE_STR = 'Repair information not available';
     const BARRIER_LACK_OF_EQUIPMENT = 5;
-    const BARRIER_LACK_OF_EQUIPMENT_STR = 'Lack of equpment';
+    const BARRIER_LACK_OF_EQUIPMENT_STR = 'Lack of equipment';
 
     const NEXT_STEPS_MORE_TIME_NEEDED_STR = 'More time needed';
     const NEXT_STEPS_PROFESSIONAL_HELP_STR = 'Professional help';

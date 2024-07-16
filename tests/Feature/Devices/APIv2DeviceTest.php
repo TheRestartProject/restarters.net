@@ -85,7 +85,7 @@ class APIv2DeviceTest extends TestCase
             'estimate' => 100.00,
             'item_type' => 'Test item type',
             'repair_status' => $repair_status,
-            'parts_provider' => $parts_provider,
+            'parts_provider' => $parts_provider_str,
             'more_time_needed' => $more_time_needed ?? 0,
             'professional_help' => $professional_help ?? 0,
             'do_it_yourself' => $do_it_yourself ?? 0,
