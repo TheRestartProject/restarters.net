@@ -2,6 +2,7 @@
 
 namespace App\Http\Resources;
 
+use App\Party;
 use Illuminate\Http\Resources\Json\JsonResource;
 
 /**
@@ -23,7 +24,42 @@ use Illuminate\Http\Resources\Json\JsonResource;
  *           description="The event to which this device belongs.",
  *           format="int64",
  *           example=1
- *      ),
+ *     ),
+ *     @OA\Property(
+ *            property="eventtitle",
+ *            title="eventtitle",
+ *            description="Title of the event.  Provided for convenience to avoid extra API calls.",
+ *            format="string",
+ *            example="Europe/London"
+ *     ),
+ *     @OA\Property(
+ *            property="groupid",
+ *            title="groupid",
+ *            description="The group to which this device belongs.",
+ *            format="int64",
+ *            example=1
+ *     ),
+ *     @OA\Property(
+ *           property="groupname",
+ *           title="groupname",
+ *           description="Name of the group. Provided for convenience to avoid extra API calls.",
+ *           format="string",
+ *           example="Restarters HQ"
+ *     ),
+ *     @OA\Property(
+ *           property="created_at",
+ *           title="created_at",
+ *           description="When this device was first added",
+ *           format="date-time",
+ *           example="2022-09-18T11:30:00+00:00"
+ *     ),
+ *     @OA\Property(
+ *            property="updated_at",
+ *            title="updated_at",
+ *            description="When this device was last updated",
+ *            format="date-time",
+ *            example="2022-09-18T11:30:00+00:00"
+ *     ),
  *     @OA\Property(
  *          property="category",
  *          title="category",
@@ -84,6 +120,13 @@ use Illuminate\Http\Resources\Json\JsonResource;
  *          example="The power switch was broken."
  *     ),
  *     @OA\Property(
+ *           property="shortProblem",
+ *           title="shortProblem",
+ *           description="Shortened version of the of the problem/solution field.",
+ *           format="string",
+ *           example="The power switch was broken."
+ *      ),
+ *     @OA\Property(
  *          property="notes",
  *          title="notes",
  *          description="Notes - repair difficulties, owner's perception of problem etc",
@@ -142,9 +185,15 @@ class Device extends JsonResource
      */
     public function toArray($request)
     {
+        $event = \App\Party::find($this->event);
+        $group = $event ? \App\Group::find($event->group) : NULL;
+
         $ret = [
             'id' => intval($this->iddevices),
             'eventid' => intval($this->event),
+            'eventtitle' => $event ? $event->title : NULL,
+            'groupid' => $event ? intval($event->group) : NULL,
+            'groupname' => $group ? $group->name : NULL,
             'category' => intval($this->category),
             'item_type' => $this->item_type,
             'brand' => $this->brand,
@@ -152,8 +201,11 @@ class Device extends JsonResource
             'age' => floatval($this->age),
             'estimate' => floatval($this->estimate),
             'problem' => $this->problem,
+            'short_problem' => $this->getShortProblem(),
             'notes' => $this->notes,
             'case_study' => intval($this->case_study) ? true : false,
+            'created_at' => $this->created_at->toIso8601String(),
+            'updated_at' => $this->created_at->toIso8601String(),
         ];
 
         // Our database has a slightly complex structure for historical reasons, so we need to map some underlying

@@ -2,168 +2,108 @@ import Vue from 'vue'
 
 const axios = require('axios')
 
-function newToOld(d) {
-  // We are in the frustrating position of having a half-written new API with sensible field names, but existing
-  // Vue components that expect old-style field names.  We therefore sometimes need to convert the new API data
-  // back into the old format which is expected.  In some bright future where we have shifted over to using the
-  // new API completely, we can then migrate the Vue components to use the new field names and retire this function.
-  // Similar code in event and group store.
-  let ret = d
-
-  ret.iddevices = d.id
-  delete ret.id
-  ret.idevents=  d.eventid
-  delete ret.eventid
-
-  return ret
-}
-
-function oldToNew(d) {
-  let ret = d
-
-  ret.id = d.iddevices
-  delete ret.iddevices
-  ret.eventid = d.event_id
-  delete ret.event_id
-
-  switch (d.spare_parts) {
-    case 1: ret.spare_parts = 'Manufacturer'; break
-    case 2: ret.spare_parts = 'Third party'; break
-    default:ret.spare_parts = 'No'; break
-  }
-
-  switch (d.repair_status) {
-    case 1: ret.repair_status = 'Fixed'; break;
-    case 2: ret.repair_status = 'Repairable'; break;
-    case 3: ret.repair_status = 'End of life'; break
-  }
-
-  return ret
-}
-
 export default {
   namespaced: true,
   state: {
-    // Object indexed by event id containing array of devices.  Use object rather than array so that it's sparse.
-    devices: {},
+    // Object indexed by event id containing array of device ids.  Use object rather than array so that it's sparse.
+    devicesByEvent: {},
+
+    // Object indexed by device id.
+    devicesById: {},
 
     // Object indexed by device id containing list of images.
     images: {}
   },
   getters: {
-    byEvent: state => idevents => {
-      return state.devices[idevents]
+    byId: state => (id) => {
+      return state.devicesById[id]
     },
-    imagesByDevice: state => (iddevices) => {
-      return state.images[iddevices] || []
+    byEvent: state => eventid => {
+      return state.devicesByEvent[eventid]
+    },
+    imagesByDevice: state => (id) => {
+      return state.images[id] || []
     }
   },
   mutations: {
     clear(state) {
-      state.devices = {}
+      state.devicesByEvent = {}
+      state.devicesById = {}
       state.images = {}
     },
-    set (state, params) {
-      Vue.set(state.devices, params.idevents, params.devices)
+    setForEvent (state, params) {
+      // Extract id from params.devices
+      Vue.set(state.devicesByEvent, params.eventid, [])
 
       params.devices.forEach(d => {
-        Vue.set(state.images, d.iddevices, d.images)
+        Vue.set(state.devicesById, d.id, d)
+        Vue.set(state.images, d.id, d.images)
+        state.devicesByEvent[d.eventid].push(d.id)
       })
     },
-    add (state, device) {
+    add (state, params) {
       let exists = false
 
-      const params = newToOld(device)
-      console.log('Add', params, device)
-
-      if (params.iddevices) {
-        if (!state.devices[params.idevents]) {
-          Vue.set(state.devices, params.idevents, [])
+      if (params.id) {
+        if (!state.devicesByEvent[params.eventid]) {
+          Vue.set(state.devicesByEvent, params.eventid, [])
         }
 
-        state.devices[params.idevents].forEach((d, i) => {
-          if (d.iddevices === params.iddevices) {
-            // Found it there already.
-            Vue.set(state.devices[params.idevents], i, params)
-
-            if (params.images) {
-              Vue.set(state.images, params.iddevices, params.images)
-            }
-
-            exists = true
-          }
-        })
-      }
-
-      if (!exists) {
-        // Append the new device to the existing list.
-        state.devices[params.idevents].push(params)
+        // If not already in the list for the event, add it.
+        if (!state.devicesByEvent[params.eventid].includes(params.id)) {
+          state.devicesByEvent[params.eventid].push(params.id)
+        }
 
         if (params.images) {
-          Vue.set(state.images, params.iddevices, params.images)
+          Vue.set(state.images, params.id, params.images)
         }
+
+        Vue.set(state.devicesById, params.id, params)
       }
 
       return params
     },
     remove (state, params) {
-      if (state.devices[params.idevents]) {
-        let newarr = state.devices[params.idevents].filter((a) => {
-          return a.iddevices !== params.iddevices
+      if (state.devicesByEvent[params.eventid]) {
+        let newarr = state.devicesByEvent[params.eventid].filter((a) => {
+          return a.id !== params.id
         })
 
-        Vue.set(state.devices, params.idevents, newarr)
-        Vue.delete(state.images, params.iddevices)
+        Vue.set(state.devicesByEvent, params.eventid, newarr)
       }
+
+      Vue.delete(state.images, params.id)
+      Vue.delete(state.devicesById, params.id)
     },
     addURL(state, params) {
-      // Fix the device.  This isn't very efficient but the numbers involved are never very large.
-      for (let idevents in state.devices) {
-        const devices = state.devices[idevents]
+      const device = state.devicesById[params.id]
 
-        for (let dix = 0; dix < state.devices[idevents].length; dix++) {
-          const device = devices[dix]
+      let exists = device.urls.findIndex(u => {
+        return u.id === params.id
+      })
 
-          if (params.device_id === device.iddevices) {
-            let exists = device.urls.findIndex(u => {
-              return u.id === params.id
-            })
-
-            if (exists !== -1) {
-              device.urls[exists] = params.url
-            } else {
-              device.urls.push(params.url)
-            }
-
-            devices[dix] = device
-            Vue.set(state.devices, idevents, devices)
-          }
-        }
+      if (exists !== -1) {
+        device.urls[exists] = params.url
+      } else {
+        device.urls.push(params.url)
       }
+
+      Vue.set(state.devicesById, params.id, device)
     },
     removeURL(state, params) {
-      for (let idevents in state.devices) {
-        const devices = state.devices[idevents]
+      const device = state.devicesById[params.id]
 
-        for (let dix = 0; dix < state.devices[idevents].length; dix++) {
-          const device = devices[dix]
+        device.urls = device.urls.filter(u => {
+          return u.id !== params.url.id
+        })
 
-          if (params.device_id === device.iddevices) {
-            device.urls = device.urls.filter(u => {
-              return u.id !== params.url.id
-            })
-
-            devices[dix] = device
-            Vue.set(state.devices, idevents, devices)
-          }
-        }
-      }
+      Vue.set(state.devicesById, params.id, device)
     },
     setImages(state, params) {
-      Vue.set(state.images, params.iddevices, params.images)
+      Vue.set(state.images, params.id, params.images)
     },
     removeImage(state, params) {
-      Vue.set(state.images, params.iddevices, state.images[params.iddevices].filter(u => {
+      Vue.set(state.images, params.id, state.images[params.id].filter(u => {
         return u.idxref !== params.idxref
       }))
     },
@@ -172,8 +112,8 @@ export default {
     clear({commit}) {
       commit('clear')
     },
-    set ({commit}, params) {
-      commit('set', params)
+    setForEvent ({commit}, params) {
+      commit('setForEvent', params)
     },
     async add ({commit, dispatch, rootGetters}, params) {
       const formData = new FormData()
@@ -220,8 +160,6 @@ export default {
     async edit ({commit, dispatch, rootGetters}, params) {
       const formData = new FormData()
 
-      params = oldToNew(params)
-
       for (var key in params) {
         if (params[key]) {
           formData.append(key, params[key]);
@@ -248,16 +186,19 @@ export default {
         })
       }
     },
-    async delete ({commit, dispatch, rootGetters}, params) {
-      let ret = await axios.delete('/api/v2/devices/' + params.iddevices + '?api_token=' + rootGetters['auth/apiToken'])
+    async delete ({commit, dispatch, rootGetters}, id) {
+      const device = state.devicesById[id]
+      const eventid = device.eventid
+
+      let ret = await axios.delete('/api/v2/devices/' + id + '?api_token=' + rootGetters['auth/apiToken'])
 
       console.log("Delete device returned", ret)
 
-      commit('remove', params)
+      commit('remove', id)
 
       // Update our stats
       dispatch('events/setStats', {
-        idevents: params.idevents,
+        idevents: eventid,
         stats: ret.data.stats
       }, {
         root: true
@@ -265,7 +206,7 @@ export default {
     },
     async addURL ({commit, rootGetters}, params) {
       const ret = await axios.post('/device-url', {
-        device_id: params.iddevices,
+        device_id: params.id,
         url: params.url.url,
         source: params.url.source
       }, {
@@ -283,7 +224,7 @@ export default {
         }
 
         commit('addURL', {
-          device_id: params.iddevices,
+          device_id: params.id,
           url: newurl
         })
       }
@@ -301,7 +242,7 @@ export default {
       if (ret && ret.data && ret.data.success) {
         // Update our store with the new URL.
         commit('addURL', {
-          device_id: params.iddevices,
+          device_id: params.id,
           url: params.url
         })
       }
@@ -316,7 +257,7 @@ export default {
       if (ret && ret.data && ret.data.success) {
         // Update our store with the new URL.
         commit('removeURL', {
-          device_id: params.iddevices,
+          device_id: params.id,
           url: params.url,
         })
       }
@@ -326,8 +267,8 @@ export default {
     },
     async deleteImage({commit, rootGetters}, params) {
       console.log("Delete image", params)
-      if (params.iddevices && params.idxref) {
-        const url = '/device/image/delete/' + params.iddevices + '/' + params.idxref
+      if (params.id && params.idxref) {
+        const url = '/device/image/delete/' + params.id + '/' + params.idxref
         const ret = await axios.get(url, {
           headers: {
             'X-CSRF-TOKEN': rootGetters['auth/CSRF']

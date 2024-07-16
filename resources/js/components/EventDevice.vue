@@ -28,7 +28,7 @@
                        :disabled="disabled"/>
           <DeviceAge :age.sync="currentDevice.age" :disabled="disabled"/>
           <DeviceWeight v-if="showWeight" :weight.sync="currentDevice.estimate" :disabled="disabled" :required="weightRequired" />
-          <DeviceImages :idevents="idevents" :device="currentDevice" :add="add" :edit="edit" :disabled="disabled"
+          <DeviceImages :device="currentDevice" :add="add" :edit="edit" :disabled="disabled"
                         class="mt-2" @remove="removeImage($event)"/>
         </b-card>
       </div>
@@ -49,8 +49,8 @@
                        :disabled="disabled"/>
           <div class="d-flex">
             <b-form-checkbox v-model="wiki" class="form-check form-check-large ml-4"
-                             :id="'wiki-' + (add ? '' : device.iddevices)" :disabled="disabled"/>
-            <label :for="'wiki-' + (add ? '' : device.iddevices)">
+                             :id="'wiki-' + (add ? '' : device.id)" :disabled="disabled"/>
+            <label :for="'wiki-' + (add ? '' : device.id)">
               {{ __('partials.solution_text2') }}
             </label>
           </div>
@@ -127,12 +127,12 @@ export default {
   },
   mixins: [event],
   props: {
-    device: {
-      type: Object,
+    id: {
+      type: Number,
       required: false,
       default: null
     },
-    idevents: {
+    eventid: {
       type: Number,
       required: true
     },
@@ -217,11 +217,14 @@ export default {
     }
   },
   computed: {
+    device() {
+      return this.id ? this.$store.getters['devices/byId'](this.id) : null
+    },
     itemTypes() {
       return this.$store.getters['items/list'];
     },
     idtouse() {
-      return this.currentDevice ? this.currentDevice.iddevices : null
+      return this.currentDevice ? this.currentDevice.id : null
     },
     disabled () {
       return !this.edit && !this.add
@@ -319,7 +322,7 @@ export default {
   created () {
     // We take a copy of what's passed in so that we can then edit it in here before saving or cancelling.  We need
     this.currentDevice = {
-      event_id: this.idevents,
+      event_id: this.eventid,
       category: null,
       brand: null,
       model: null,
@@ -340,7 +343,7 @@ export default {
       // Use a -ve id to give us something to track uploaded photos against.
       //
       // Need to ensure this isn't too large as the xref table has an int value.
-      this.currentDevice.iddevices = -Math.round(new Date().getTime() / 1000)
+      this.currentDevice.id = -Math.round(new Date().getTime() / 1000)
     }
   },
   methods: {
@@ -423,7 +426,7 @@ export default {
       // immediately.  The way we set ids here is poor, but this is because the underlying API call for images
       // is weak.
       this.$store.dispatch('devices/deleteImage', {
-        iddevices: this.idtouse,
+        id: this.idtouse,
         idxref: image.idxref
       })
     },
@@ -431,10 +434,7 @@ export default {
       this.$refs.confirm.show()
     },
     deleteDevice () {
-      this.$store.dispatch('devices/delete', {
-        iddevices: this.device.iddevices,
-        idevents: this.idevents
-      })
+      this.$store.dispatch('devices/delete', this.id)
     },
   }
 }

@@ -87,18 +87,7 @@
           $expanded_devices = [];
 
           foreach ($event->devices as $device) {
-              $device->category = $device->deviceCategory;
-              $device->shortProblem = $device->getShortProblem();
-
-              $barriers = [];
-
-              foreach ($device->barriers as $barrier) {
-                  $barriers[] = $barrier->id;
-              }
-
-              $device->barrier = $barriers;
-              $device->images = $device->getImages();
-              $expanded_devices[] = $device;
+            $expanded_devices[] = (new \App\Http\Resources\Device($device))->resolve();
           }
 
           $expanded_clusters = [];

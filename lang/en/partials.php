@@ -60,7 +60,7 @@ return [
   'hot_topics' => 'Hot topics',
   'hot_topics_text' => 'Join in on the latest hot topics on repair at Restarters Talk.',
   'hot_topics_link' => 'All weekly hot topics',
-  'choose_barriers' => 'Choose barriers to repair',
+  'choose_barriers' => 'Choose barrier to repair',
   'add_device_powered' => 'Add Powered Item',
   'add_device_unpowered' => 'Add Unpowered Item',
   'solution_text2' => 'Interesting case study to share?',

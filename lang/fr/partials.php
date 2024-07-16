@@ -60,7 +60,7 @@ return [
   'hot_topics' => 'Sujets d\'actualité',
   'hot_topics_link' => 'Tous les derniers sujets d\'actualités',
   'hot_topics_text' => 'Prenez part au dernier sujet d\'actualité de réparation sur Restarters Talk',
-  'choose_barriers' => 'Choisir les freins à la réparation',
+  'choose_barriers' => 'Choisir le frein à la réparation',
   'solution_text2' => 'Cas d\'étude intéressant à partager?',
   'quantity' => 'Quantité',
   'cancel' => 'Annuler',
