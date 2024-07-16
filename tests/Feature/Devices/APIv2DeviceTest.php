@@ -30,7 +30,7 @@ class APIv2DeviceTest extends TestCase
      *
      * @dataProvider providerDevice
      */
-    public function testGetDevice($repair_status_str, $parts_provider_str, $barrierstr, $next_steps_str) {
+    public function testGetDevice($repair_status_str, $parts_provider_str, $next_steps_str, $barrierstr) {
         $this->loginAsTestUser(Role::ADMINISTRATOR);
         $idGroup = $this->createGroup();
         $this->assertNotNull($idGroup);
@@ -142,7 +142,7 @@ class APIv2DeviceTest extends TestCase
      *
      * @dataProvider providerDevice
      */
-    public function testCreate($repair_status_str, $parts_provider_str, $barrierstr, $next_steps_str) {
+    public function testCreate($repair_status_str, $parts_provider_str, $next_steps_str, $barrierstr) {
         $this->loginAsTestUser(Role::ADMINISTRATOR);
         $idGroup = $this->createGroup();
         $this->assertNotNull($idGroup);

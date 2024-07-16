@@ -110,7 +110,7 @@ class GroupViewTest extends TestCase
         $ret = json_decode($rsp2->getContent(), true);
         self::assertEquals(1, $ret['count']);
         self::assertEquals(1, count($ret['items']));
-        self::assertEquals($event->idevents, $ret['items'][0]['event']);
+        self::assertEquals($event->idevents, $ret['items'][0]['eventid']);
 
         // Only administrators can delete.
         foreach (['Restarter', 'Host', 'NetworkCoordinator'] as $role) {
