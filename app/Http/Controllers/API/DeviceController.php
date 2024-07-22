@@ -537,11 +537,6 @@ class DeviceController extends Controller {
                 break;
             case Device::REPAIR_STATUS_ENDOFLIFE_STR:
                 $repair_status = Device::REPAIR_STATUS_ENDOFLIFE;
-
-                if (!$barrierInput) {
-                    throw ValidationException::withMessages(['barrier' => ['Barrier is required for End of life devices']]);
-                }
-
                 break;
             default:
                 $repair_status = 0;

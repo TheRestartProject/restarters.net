@@ -74,12 +74,12 @@ import {
 export default {
   props: {
     status: {
-      type: Number,
+      type: String,
       required: false,
       default: null
     },
     parts: {
-      type: Number,
+      type: String,
       required: false,
       default: null
     },
@@ -129,7 +129,7 @@ export default {
     statusValue: {
       get() {
         return this.statusOptions.find(o => {
-          return o.id === this.status
+          return o.text === this.status
         })
       },
       set(newval) {

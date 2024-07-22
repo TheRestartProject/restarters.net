@@ -29,6 +29,7 @@ class Device extends Model implements Auditable
     const PARTS_PROVIDER_MANUFACTURER_STR = 'Manufacturer';
     const PARTS_PROVIDER_THIRD_PARTY = 2;
     const PARTS_PROVIDER_THIRD_PARTY_STR = 'Third party';
+    const PARTS_PROVIDER_NO = 0;
     const PARTS_PROVIDER_NO_STR = 'No';
 
     const BARRIER_SPARE_PARTS_NOT_AVAILABLE = 1;

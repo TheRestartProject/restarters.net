@@ -232,11 +232,11 @@ class Device extends JsonResource
             $ret['next_steps'] = \App\Device::NEXT_STEPS_DO_IT_YOURSELF_STR;
         }
 
-        if ($this->parts_provider == \App\Device::PARTS_PROVIDER_MANUFACTURER) {
+        if ($this->parts_provider === \App\Device::PARTS_PROVIDER_MANUFACTURER) {
             $ret['spare_parts'] = \App\Device::PARTS_PROVIDER_MANUFACTURER_STR;
-        } else if ($this->parts_provider == \App\Device::PARTS_PROVIDER_THIRD_PARTY) {
+        } else if ($this->parts_provider === \App\Device::PARTS_PROVIDER_THIRD_PARTY) {
             $ret['spare_parts'] = \App\Device::PARTS_PROVIDER_THIRD_PARTY_STR;
-        } else {
+        } else if ($this->parts_provider === \App\Device::PARTS_PROVIDER_NO) {
             $ret['spare_parts'] = \App\Device::PARTS_PROVIDER_NO_STR;
         }
 

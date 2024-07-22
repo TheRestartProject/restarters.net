@@ -35,7 +35,7 @@
       <div class="d-flex flex-column botwhite">
         <b-card no-body class="p-3 flex-grow-1 border-0">
           <h3 class="mt-2 mb-4">{{ __('devices.title_repair') }}</h3>
-          <DeviceRepairStatus :status.sync="currentDevice.repair_status" :steps.sync="currentDevice.repair_details"
+          <DeviceRepairStatus :status.sync="currentDevice.repair_status" :steps.sync="currentDevice.next_steps"
                               :parts.sync="currentDevice.spare_parts" :barriers.sync="currentDevice.barrier"
                               :barrierList="barrierList" :disabled="disabled"/>
         </b-card>
@@ -86,9 +86,6 @@
 <script>
 import event from '../mixins/event'
 import {
-  FIXED,
-  REPAIRABLE,
-  END_OF_LIFE,
   SPARE_PARTS_MANUFACTURER,
   SPARE_PARTS_THIRD_PARTY,
   CATEGORY_MISC_POWERED, CATEGORY_MISC_UNPOWERED, NEXT_STEPS_DIY, NEXT_STEPS_PROFESSIONAL, NEXT_STEPS_MORE_TIME,
@@ -192,12 +189,6 @@ export default {
       console.log('Device changed', newval)
       this.updateCurrentDevice(newval)
     },
-    currentCategory (newval) {
-      if (this.missingCategory && newval && newval.value) {
-        // Reset warning.
-        this.missingCategory = false
-      }
-    },
     suggestedCategory(newval) {
       if (newval) {
         // For add we always want to use this - we get called multiple times as they type.
@@ -273,23 +264,6 @@ export default {
 
       return ret
     },
-    suggestedCategoryId() {
-      return this.suggestedCategory ? this.suggestedCategory.idcategories : null
-    },
-    suggestedCategoryName() {
-      return this.suggestedCategory? this.suggestedCategory.categoryname : null
-    },
-    computedPowered() {
-      if (this.suggestedCategory) {
-        if (this.suggestedCategory.powered) {
-          return 'Powered'
-        } else {
-          return 'Unpowered'
-        }
-      } else {
-        return null
-      }
-    },
     showWeight () {
       // Powered devices don't allow editing of the weight except for the "None of the above" category, whereas
       // unpowered do.
@@ -327,7 +301,6 @@ export default {
       brand: null,
       model: null,
       age: null,
-      repair_details: null,
       repair_status: null,
       spare_parts: null,
       problem: null,
@@ -353,7 +326,6 @@ export default {
 
       // Some values we need to munge back to the id for our selects.  This is a bit ugly because we have two lots
       // of field names, depending on which API we're using.
-      console.log('updateCurrentDevice', JSON.stringify(this.currentDevice.category))
       if (typeof this.currentDevice.category === 'object') {
         if (this.currentDevice.category.idcategories) {
           this.currentDevice.category = this.currentDevice.category.idcategories
@@ -365,35 +337,15 @@ export default {
       this.currentDevice.estimate = parseFloat(this.currentDevice.estimate)
       this.currentDevice.age = parseFloat(this.currentDevice.age)
 
-      this.nextSteps()
       this.partsProvider()
     },
     cancel () {
       this.$emit('close')
     },
-    nextSteps () {
-      // The next step value is held in multiple properties of the object.
-      if (this.currentDevice.do_it_yourself) {
-        this.currentDevice.repair_details = NEXT_STEPS_DIY
-      } else if (this.currentDevice.professional_help) {
-        this.currentDevice.repair_details = NEXT_STEPS_PROFESSIONAL
-      } else if (this.currentDevice.more_time_needed) {
-        this.currentDevice.repair_details = NEXT_STEPS_MORE_TIME
-      } else {
-        this.currentDevice.repair_details = null
-      }
-    },
     partsProvider () {
-      // Third part parts are indicated via the parts provider field.
-      if (!this.currentDevice.spare_parts) {
-        return null
-      } else if (this.currentDevice.spare_parts === SPARE_PARTS_NOT_NEEDED) {
-        this.currentDevice.spare_parts = SPARE_PARTS_NOT_NEEDED
-      } else if (this.currentDevice.parts_provider === PARTS_PROVIDER_THIRD_PARTY) {
-        this.currentDevice.spare_parts = SPARE_PARTS_THIRD_PARTY
-      } else {
-        this.currentDevice.spare_parts = SPARE_PARTS_MANUFACTURER
-      }
+      // Third party parts are indicated via the parts provider field.
+      console.log('partsProvider', this.currentDevice.spare_parts, SPARE_PARTS_NOT_NEEDED, PARTS_PROVIDER_THIRD_PARTY)
+      return this.currentDevice.spare_parts ? this.currentDevice.spare_parts : null
     },
     async addDevice () {
       try {

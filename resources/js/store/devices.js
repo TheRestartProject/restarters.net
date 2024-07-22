@@ -63,17 +63,19 @@ export default {
 
       return params
     },
-    remove (state, params) {
-      if (state.devicesByEvent[params.eventid]) {
-        let newarr = state.devicesByEvent[params.eventid].filter((a) => {
-          return a.id !== params.id
+    remove (state, id) {
+      const device = state.devicesById[id]
+
+      if (state.devicesByEvent[device.eventid]) {
+        let newarr = state.devicesByEvent[device.eventid].filter((a) => {
+          return a.id !== id
         })
 
-        Vue.set(state.devicesByEvent, params.eventid, newarr)
+        Vue.set(state.devicesByEvent, device.eventid, newarr)
       }
 
-      Vue.delete(state.images, params.id)
-      Vue.delete(state.devicesById, params.id)
+      Vue.delete(state.images, id)
+      Vue.delete(state.devicesById, id)
     },
     addURL(state, params) {
       const device = state.devicesById[params.id]
@@ -187,7 +189,7 @@ export default {
       }
     },
     async delete ({commit, dispatch, rootGetters}, id) {
-      const device = state.devicesById[id]
+      const device = rootGetters['devices/byId'](id)
       const eventid = device.eventid
 
       let ret = await axios.delete('/api/v2/devices/' + id + '?api_token=' + rootGetters['auth/apiToken'])
