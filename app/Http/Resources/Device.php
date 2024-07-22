@@ -232,12 +232,26 @@ class Device extends JsonResource
             $ret['next_steps'] = \App\Device::NEXT_STEPS_DO_IT_YOURSELF_STR;
         }
 
-        if ($this->parts_provider === \App\Device::PARTS_PROVIDER_MANUFACTURER) {
-            $ret['spare_parts'] = \App\Device::PARTS_PROVIDER_MANUFACTURER_STR;
-        } else if ($this->parts_provider === \App\Device::PARTS_PROVIDER_THIRD_PARTY) {
-            $ret['spare_parts'] = \App\Device::PARTS_PROVIDER_THIRD_PARTY_STR;
-        } else if ($this->parts_provider === \App\Device::PARTS_PROVIDER_NO) {
+        if ($this->spare_parts === \App\Device::SPARE_PARTS_NOT_NEEDED) {
             $ret['spare_parts'] = \App\Device::PARTS_PROVIDER_NO_STR;
+        } else if ($this->spare_parts === null) {
+            $ret['spare_parts'] = null;
+        } else {
+            if ($this->parts_provider === \App\Device::PARTS_PROVIDER_MANUFACTURER) {
+                $ret['spare_parts'] = \App\Device::PARTS_PROVIDER_MANUFACTURER_STR;
+            } else if ($this->parts_provider === \App\Device::PARTS_PROVIDER_THIRD_PARTY) {
+                $ret['spare_parts'] = \App\Device::PARTS_PROVIDER_THIRD_PARTY_STR;
+            }
+        }
+
+        if ($this->professional_help) {
+            $ret['next_steps'] = \App\Device::NEXT_STEPS_PROFESSIONAL_HELP_STR;
+        } else if ($this->do_it_yourself) {
+            $ret['next_steps'] = \App\Device::NEXT_STEPS_DO_IT_YOURSELF_STR;
+        } else if ($this->more_time_needed) {
+            $ret['next_steps'] = \App\Device::NEXT_STEPS_MORE_TIME_NEEDED_STR;
+        } else {
+            $ret['next_steps'] = null;
         }
 
         // The underlying DB might have multiple barriers, but we only support one across the API.

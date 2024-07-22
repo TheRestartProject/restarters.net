@@ -53,12 +53,20 @@ class APIv2DeviceTest extends TestCase
         switch ($parts_provider_str) {
             case Device::PARTS_PROVIDER_NO_STR:
                 $parts_provider = 0;
+                $spare_parts = Device::SPARE_PARTS_NOT_NEEDED;
                 break;
             case Device::PARTS_PROVIDER_THIRD_PARTY_STR:
                 $parts_provider = Device::PARTS_PROVIDER_THIRD_PARTY;
+                $spare_parts = Device::SPARE_PARTS_NEEDED;
                 break;
             case Device::PARTS_PROVIDER_MANUFACTURER_STR:
                 $parts_provider = Device::PARTS_PROVIDER_MANUFACTURER;
+                $spare_parts = Device::SPARE_PARTS_NEEDED;
+                break;
+            default: {
+                $spare_parts = Device::SPARE_PARTS_UNKNOWN;
+                $parts_provider = null;
+            }
         }
 
         switch ($next_steps_str) {
@@ -85,7 +93,8 @@ class APIv2DeviceTest extends TestCase
             'estimate' => 100.00,
             'item_type' => 'Test item type',
             'repair_status' => $repair_status,
-            'parts_provider' => $parts_provider_str,
+            'spare_parts' => $spare_parts,
+            'parts_provider' => $parts_provider,
             'more_time_needed' => $more_time_needed ?? 0,
             'professional_help' => $professional_help ?? 0,
             'do_it_yourself' => $do_it_yourself ?? 0,
@@ -165,12 +174,12 @@ class APIv2DeviceTest extends TestCase
             'barrier' => $barrierstr,
         ];
 
-        if ($next_steps_str) {
-            $params['next_steps'] = $next_steps_str;
-        }
-
         if ($parts_provider_str) {
             $params['spare_parts'] = $parts_provider_str;
+        }
+
+        if ($next_steps_str) {
+            $params['next_steps'] = $next_steps_str;
         }
 
         $response = $this->post('/api/v2/devices', $params);
