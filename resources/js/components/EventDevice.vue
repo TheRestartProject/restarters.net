@@ -36,7 +36,7 @@
         <b-card no-body class="p-3 flex-grow-1 border-0">
           <h3 class="mt-2 mb-4">{{ __('devices.title_repair') }}</h3>
           <DeviceRepairStatus :status.sync="currentDevice.repair_status" :steps.sync="currentDevice.next_steps"
-                              :parts.sync="currentDevice.spare_parts" :barriers.sync="currentDevice.barrier"
+                              :parts.sync="currentDevice.spare_parts" :barrier.sync="currentDevice.barrier"
                               :barrierList="barrierList" :disabled="disabled"/>
         </b-card>
       </div>

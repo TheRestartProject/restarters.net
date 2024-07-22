@@ -397,7 +397,9 @@ class DeviceController extends Controller {
         event(new DeviceCreatedOrUpdated($device));
 
         if ($barrier) {
-            DeviceBarrier::updateOrCreate([
+            // We only allow one barrier now, so delete any old ones.
+            DeviceBarrier::where('device_id', $iddevices)->delete();
+            DeviceBarrier::create([
                 'device_id' => $iddevices,
                 'barrier_id' => $barrier
             ]);

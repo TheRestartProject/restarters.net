@@ -46,18 +46,16 @@
     <multiselect
         :disabled="disabled"
         v-if="showBarriers"
-        v-model="barriersValue"
+        v-model="barrierValue"
         :placeholder="__('partials.choose_barriers')"
-        :options="translatedBarriers"
-        :multiple="true"
+        :options="barriersOptions"
+        :multiple="false"
         :allow-empty="false"
         deselect-label=""
         track-by="id"
-        label="barrier"
+        label="text"
         :taggable="false"
         selectLabel=""
-        selectedLabel=""
-        :allowEmpty="true"
     />
   </div>
 </template>
@@ -84,16 +82,14 @@ export default {
       default: null
     },
     steps: {
-      type: Number,
+      type: String,
       required: false,
       default: null
     },
-    barriers: {
-      type: Array,
+    barrier: {
+      type: String,
       required: false,
-      default: function() {
-        return []
-      }
+      default: null
     },
     barrierList: {
       type: Array,
@@ -106,13 +102,6 @@ export default {
     },
   },
   computed: {
-    translatedBarriers() {
-      return this.barrierList.map(b => {
-        var newb = JSON.parse(JSON.stringify(b))
-        newb.barrier = this.$lang.get('strings.' + b.barrier)
-        return newb
-      })
-    },
     showSteps () {
       return this.status === REPAIRABLE
     },
@@ -129,11 +118,11 @@ export default {
     statusValue: {
       get() {
         return this.statusOptions.find(o => {
-          return o.text === this.status
+          return o.id === this.status
         })
       },
       set(newval) {
-        this.$emit('update:status', newval.id)
+        this.$emit('update:status', newval.text)
       }
     },
     statusOptions () {
@@ -204,22 +193,24 @@ export default {
         }
       ]
     },
-    barriersValue: {
-      get() {
-        // We have an array of ids which we need to map to an array of options.
-        var ret = this.barrierList.filter(b => {
-          return this.barriers && this.barriers.indexOf(b.id) !== -1
-        })
+    barriersOptions() {
+      return this.barrierList.map(b => {
+        var newb = {
+          id: b.barrier,
+          text: this.$lang.get('strings.' + b.barrier)
+        }
 
-        return ret.map(b => {
-          return this.translatedBarriers.find(t => {
-            return t.id === b.id
-          })
+        return newb
+      })
+    },
+    barrierValue: {
+      get() {
+        return this.barriersOptions.find(o => {
+          return o.id === this.barrier
         })
       },
       set(newval) {
-        // We have an array of options we want to emit as an array of ids.
-        this.$emit('update:barriers', newval.map(o => o.id))
+        this.$emit('update:barrier', newval.id)
       }
     },
   }
