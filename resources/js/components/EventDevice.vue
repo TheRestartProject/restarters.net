@@ -379,7 +379,7 @@ export default {
       // is weak.
       this.$store.dispatch('devices/deleteImage', {
         id: this.idtouse,
-        idxref: image.idxref
+        idxref: image.idxref,
       })
     },
     confirmDeleteDevice () {

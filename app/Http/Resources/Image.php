@@ -38,7 +38,8 @@ class Image extends JsonResource
     {
         return [
             'id' => $this->idimages,
-            'path' => url($this->path)
+            'idxref' => $this->idxref,
+            'path' => $this->path
         ];
     }
 }
