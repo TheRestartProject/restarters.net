@@ -468,7 +468,7 @@ class DeviceController extends Controller {
         if ($create) {
             $request->validate([
                 'eventid' => 'required|integer',
-                'item_type' => 'required|string',
+                'item_type' => 'string',  // Some of the tests, at least, treat this as optional.
                 'category' => 'required|integer',
                 'brand' => 'string',
                 'model' => 'string',
@@ -484,7 +484,7 @@ class DeviceController extends Controller {
             ]);
         } else {
             $request->validate([
-                'item_type' => 'required|string',
+                'item_type' => 'string',  // Some of the tests, at least, treat this as optional.
                 'category' => 'required|integer',
                 'brand' => 'string',
                 'model' => 'string',

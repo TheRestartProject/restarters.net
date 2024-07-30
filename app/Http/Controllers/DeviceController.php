@@ -77,7 +77,7 @@ class DeviceController extends Controller
                 if ($id > 0) {
                     // We are adding a photo to an existing device.
                     $fn = $file->upload('file', 'image', $id, env('TBL_DEVICES'), true, false, true);
-                    $device = Device::find($id);
+                    $device = Device::findOrFail($id);
                     $images = $device->getImages();
                 } else {
                     // We are adding a photo for a device that hasn't yet been added.  Upload the file. We will add
