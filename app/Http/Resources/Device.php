@@ -172,6 +172,15 @@ use Illuminate\Http\Resources\Json\JsonResource;
  *          enum={"Spare parts not available", "Spare parts too expensive", "No way to open the product", "Repair information not available", "Lack of equipment"},
  *          example="Spare parts too expensive"
  *     ),
+ *     @OA\Property(
+ *         property="images",
+ *         title="images",
+ *         description="Any images associated with this devices",
+ *         type="array",
+ *         @OA\Items(
+ *           ref="#/components/schemas/Image"
+ *         )
+ *     ),
  * )
  */
 
@@ -262,6 +271,9 @@ class Device extends JsonResource
 
         $category = \App\Category::find($this->category);
         $ret['category']= \App\Http\Resources\Category::make($category);
+
+        $images = $this->resource->getImages();
+        $ret['images'] = \App\Http\Resources\Image::collection($images);
 
         return $ret;
     }
