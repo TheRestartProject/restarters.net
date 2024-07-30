@@ -234,7 +234,6 @@ class DeviceController extends Controller {
             }
         }
 
-        // TODO Images - probably a separate API Call.
         // We return the device and the stats to save the client another API call to update its store.
 
         return response()->json([
@@ -404,8 +403,6 @@ class DeviceController extends Controller {
                 'barrier_id' => $barrier
             ]);
         }
-
-        // TODO Images - probably a separate API Call.
 
         return response()->json([
             'id' => $iddevices,
