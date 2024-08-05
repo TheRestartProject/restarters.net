@@ -10,7 +10,7 @@ use DB;
 use Illuminate\Support\Facades\Notification;
 use Tests\TestCase;
 
-class TooManyTest extends TestCase
+class TooManyMiscTest extends TestCase
 {
     /**
      * @dataProvider provider
@@ -32,8 +32,8 @@ class TooManyTest extends TestCase
         $this->actingAs($this->admin);
 
         for ($i = 0; $i < $count; $i++) {
-            $rsp = $this->post('/device/create', $this->device_inputs);
-            self::assertTrue($rsp['success']);
+            $iddevices = $this->createDevice($this->event->idevents, 'misc');
+            $this->assertNotNull($iddevices);
         }
 
         if ($notif) {

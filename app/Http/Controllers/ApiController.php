@@ -263,15 +263,15 @@ class ApiController extends Controller
             ->take($size)
             ->get();
 
-        foreach ($items as &$item) {
-            $item['shortProblem'] = $item->getShortProblem();
-            $item['images'] = $item->getImages();
-            $item['category'] = $item['deviceCategory'];
+        $item_data = [];
+
+        foreach ($items as $item) {
+            $item_data[] = (new \App\Http\Resources\Device($item))->resolve();
         }
 
         return response()->json([
             'count' => $count,
-            'items' => $items,
+            'items' => $item_data,
         ]);
     }
 

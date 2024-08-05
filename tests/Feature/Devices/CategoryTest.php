@@ -14,27 +14,40 @@ class CategoryTest extends TestCase
     public function testCategoryChange()
     {
         $event = Party::factory()->create();
-        $this->device_inputs = Device::factory()->raw([
-                                                          'event_id' => $event->idevents,
-                                                          'category' => 11,
-                                                          'category_creation' => 11,
-                                                          'quantity' => 1,
-                                                      ]);
 
         $admin = User::factory()->administrator()->create();
         $this->actingAs($admin);
 
-        $this->post('/device/create', $this->device_inputs);
+        $rsp = $this->post('/api/v2/devices', [
+            'eventid' => $event->idevents,
+            'category' => 11,
+            'category_creation' => 11,
+            'age' => 1.5,
+            'estimate' => 100.00,
+            'item_type' => 'Test item type',
+            'repair_status' => 'Fixed',
+        ]);
+        $rsp->assertSuccessful();
+
         $iddevices = Device::latest()->first()->iddevices;
 
         $this->device_inputs['category'] = 46;
         unset($this->device_inputs['category_creation']);
 
-        $rsp = $this->post('/device/edit/' . $iddevices, $this->device_inputs);
-        self::assertEquals('Device updated!', $rsp['success']);
+        $rsp = $this->patch('/api/v2/devices/' . $iddevices, [
+            'eventid' => $event->idevents,
+            'category' => 46,
+            'age' => 1.5,
+            'estimate' => 100.00,
+            'item_type' => 'Test item type',
+            'repair_status' => 'Fixed',
+        ]);
+
+        $rsp->assertSuccessful();
 
         $device = Device::findOrFail($iddevices);
         self::assertEquals($device->category_creation, 11);
+        self::assertEquals($device->category, 46);
     }
 
     public function testListItems() {

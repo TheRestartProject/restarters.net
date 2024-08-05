@@ -91,14 +91,10 @@ class GroupViewTest extends TestCase
             ],
         ]);
 
-        $response = $this->post('/device/create', Device::factory()->raw([
-                                                                                  'category' => env('MISC_CATEGORY_ID_POWERED'),
-                                                                                  'category_creation' => env('MISC_CATEGORY_ID_POWERED'),
-                                                                                  'event_id' => $event->idevents,
-                                                                                  'quantity' => 1,
-                                                                                  'repair_status' => Device::REPAIR_STATUS_FIXED,
-                                                                                  'category' => 111
-                                                                              ]));
+        $iddevices = $this->createDevice($event->idevents,
+            'misc', null, 1.5, 0, '',
+            Device::REPAIR_STATUS_FIXED_STR, null, null, 111);
+
         $response = $this->get("/group/view/$id");
         $this->assertVueProperties($response, [
             [],
@@ -114,7 +110,7 @@ class GroupViewTest extends TestCase
         $ret = json_decode($rsp2->getContent(), true);
         self::assertEquals(1, $ret['count']);
         self::assertEquals(1, count($ret['items']));
-        self::assertEquals($event->idevents, $ret['items'][0]['event']);
+        self::assertEquals($event->idevents, $ret['items'][0]['eventid']);
 
         // Only administrators can delete.
         foreach (['Restarter', 'Host', 'NetworkCoordinator'] as $role) {
