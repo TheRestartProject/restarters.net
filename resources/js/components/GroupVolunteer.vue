@@ -16,7 +16,7 @@
             <span class="pr-1 overflow-hidden ellipsis">
               {{ volunteer.name }}
             </span>
-              <span class="host" v-if="host">
+              <span class="host" v-if="volunteer.host">
               {{ __('partials.host') }}
             </span>
             </div>
@@ -38,7 +38,7 @@
         </div>
       </div>
       <b-dropdown v-if="canedit" variant="none" ref="dropdown" class="edit-dropdown" no-caret>
-        <b-dropdown-item @click="makeVolunteerHost">{{ __('groups.make_host') }}</b-dropdown-item>
+        <b-dropdown-item v-if="!volunteer.host" @click="makeVolunteerHost">{{ __('groups.make_host') }}</b-dropdown-item>
         <b-dropdown-item @click="removeVolunteer">{{ __('groups.remove_volunteer') }}</b-dropdown-item>
       </b-dropdown>
       <button class="dropdown-toggle d-none" />
@@ -47,6 +47,7 @@
       {{ __('partials.something_wrong') }}: {{ error }}
     </b-alert>
     <ConfirmModal @confirm="remove" ref="confirm" />
+    <ConfirmModal @confirm="removeVolunteerConfirmed" ref="removeVolunteerConfirm" />
   </div>
 </template>
 <script>
@@ -122,7 +123,10 @@ export default {
         this.error = e.message
       }
     },
-    async removeVolunteer() {
+    removeVolunteer() {
+      this.$refs.removeVolunteerConfirm.show()
+    },
+    async removeVolunteerConfirmed() {
       try {
         await this.$store.dispatch('volunteers/remove', this.volunteer.id)
       } catch (e) {
