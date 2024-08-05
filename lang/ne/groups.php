@@ -5,8 +5,6 @@ return [
   'add_groups' => 'Een groep toevoegen',
   'add_groups_content' => 'Vertel ons wat meer over je groep. Zo kunnen we pagina voor je aanmaken en je helpen om vrijwilligers en deelnemers te bereiken.',
   'all_groups' => 'Alle groepen',
-  'all_volunteers_group_name_header' => 'Alle vrijwilligers van :group',
-  'all_volunteers_group_name_message' => 'Hier vind je de lijst van de vrijwilligers die aan je groep verbonden zijn en van hun competenties.',
   'approve_group' => 'Groep goedkeuren',
   'area' => 'Gebied',
   'co2_equivalence_visualisation_dropdown' => 'Visualisatie van het equivalent  CO<sub>2</sub>',
