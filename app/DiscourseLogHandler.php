@@ -6,7 +6,7 @@ use Monolog\Logger;
 use Monolog\Handler\RotatingFileHandler;
 use Monolog\Formatter\LineFormatter;
 
-class DiscourseLogger
+class DiscourseLogHandler
 {
     /**
      * Create a custom Monolog instance.
@@ -25,15 +25,8 @@ class DiscourseLogger
             0775
         );
 
-        // Custom formatter for better readability
-        $formatter = new LineFormatter(null, null, true, true);
-        $handler->setFormatter($formatter);
+        $handler->setFilenameFormat('{filename}-{date}.log', 'Y-m-d');
 
-        // Compress rotated log files
-        $handler->setFilenameFormat('{filename}-{date}.log.gz', 'Y-m-d');
-
-        $logger->pushHandler($handler);
-
-        return $logger;
+        return $handler;
     }
 }
