@@ -153,13 +153,9 @@ exports.addDevice = async function(page, baseURL, idevents, powered, photo, fixe
   }
 
   if (photo) {
-    const [fileChooser] = await Promise.all([
-      page.waitForEvent('filechooser'),
-
-      // Trigger file upload.
-      page.locator('.add-device .vue-dropzone:visible').click(),
-    ]);
-
+    const fileChooserPromise = page.waitForEvent('filechooser')
+    page.locator('.add-device .vue-dropzone:visible').click()
+    const fileChooser = await fileChooserPromise;
     await fileChooser.setFiles('public/images/community.jpg');
   }
 
