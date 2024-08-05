@@ -79,7 +79,7 @@ class DiscourseServiceProvider extends ServiceProvider
     {
         if (! $this->logger) {
             $this->logger = with(new \Monolog\Logger('discourse-api'))->pushHandler(
-                new \App\Logging\DiscourseLogger([
+                new \App\DiscourseLogger([
                     'path' => storage_path('logs/discourse-api.log'),
                     'days' => 14,
                 ])

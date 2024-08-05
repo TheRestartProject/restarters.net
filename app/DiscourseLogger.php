@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Logging;
+namespace App;
 
 use Monolog\Logger;
 use Monolog\Handler\RotatingFileHandler;
