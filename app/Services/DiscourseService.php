@@ -423,7 +423,7 @@ class DiscourseService
                                 }
                             } else if (!$d['owner'] && $shouldBeOwner) {
                                 Log::info("Add $discourseMember as admin of {$discourseId} {$discourseName}");
-                                $response = $client->request('PUT', "/admin/groups/$discourseId/owners.json", [
+                                $response = $client->request('PUT', "/groups/$discourseId/owners.json", [
                                     'form_params' => [
                                         'usernames' => $discourseMember
                                     ]
@@ -465,7 +465,7 @@ class DiscourseService
                             // We add these one by one, rather than in a single call.  This is because if our Restarters
                             // usernames don't match the Discourse ones, e.g. due to anonymisation, then the single
                             // call would fail.
-                            $response = $client->request('PUT', "/admin/groups/$discourseId/members.json", [
+                            $response = $client->request('PUT', "/groups/$discourseId/members.json", [
                                 'form_params' => [
                                     'usernames' => $restartersMember
                                 ]
@@ -482,7 +482,7 @@ class DiscourseService
                                 $this->syncSso($u);
 
                                 // Now try again to add.  If this fails we'll pick it up again next time through.
-                                $response = $client->request('PUT', "/admin/groups/$discourseId/members.json", [
+                                $response = $client->request('PUT', "/groups/$discourseId/members.json", [
                                     'form_params' => [
                                         'usernames' => $restartersMember
                                     ]
