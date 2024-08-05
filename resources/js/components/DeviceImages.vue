@@ -20,7 +20,8 @@ export default {
   props: {
     id: {
       type: Number,
-      required: true,
+      required: false,
+      default: null
     },
     add: {
       type: Boolean,
@@ -40,7 +41,8 @@ export default {
   },
   data () {
     return {
-      maxFiles: 5
+      maxFiles: 5,
+      imagesDuringCreation: null,
     }
   },
   computed: {
@@ -50,20 +52,21 @@ export default {
       if (this.id) {
         return this.$store.getters['devices/imagesByDevice'](this.id)
       } else {
-        return []
+        return this.imagesDuringCreation || []
       }
     },
     uploadURL() {
-      return '/device/image-upload/' + this.id
+      return '/device/image-upload/' + (this.id ? this.id : 0)
     }
   },
   methods: {
     uploaded(images) {
-      // We have uploaded some images.  Add them to the store.
-      this.$store.dispatch('devices/setImages', {
-        id: this.id,
-        images: images
-      })
+      if (this.id) {
+        // We have uploaded some images.  Fetch the device to reflect the new images.Add them to the store.
+        this.$store.dispatch('devices/fetch', this.id)
+      } else {
+        this.imagesDuringCreation = images
+      }
     }
   }
 }

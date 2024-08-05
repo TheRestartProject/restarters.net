@@ -373,14 +373,16 @@ export default {
         this.axiosError = e
       }
     },
-    removeImage (image) {
+    async removeImage (image) {
       // TODO LATER The remove of the image should not happen until the edit completes.  At the moment we do it
       // immediately.  The way we set ids here is poor, but this is because the underlying API call for images
       // is weak.
-      this.$store.dispatch('devices/deleteImage', {
+      await this.$store.dispatch('devices/deleteImage', {
         id: this.idtouse,
         idxref: image.idxref,
       })
+
+      this.$store.dispatch('devices/fetch', this.id)
     },
     confirmDeleteDevice () {
       this.$refs.confirm.show()

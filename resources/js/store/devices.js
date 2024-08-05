@@ -10,9 +10,6 @@ export default {
 
     // Object indexed by device id.
     devicesById: {},
-
-    // Object indexed by device id containing list of images.
-    images: {}
   },
   getters: {
     byId: state => (id) => {
@@ -22,14 +19,14 @@ export default {
       return state.devicesByEvent[eventid]
     },
     imagesByDevice: state => (id) => {
-      return state.images[id] || []
+      console.log('ImagesByDevice', id, state.devicesById[id])
+      return state.devicesById[id] ? state.devicesById[id].images : []
     }
   },
   mutations: {
     clear(state) {
       state.devicesByEvent = {}
       state.devicesById = {}
-      state.images = {}
     },
     setForEvent (state, params) {
       // Extract id from params.devices
@@ -37,7 +34,6 @@ export default {
 
       params.devices.forEach(d => {
         Vue.set(state.devicesById, d.id, d)
-        Vue.set(state.images, d.id, d.images)
         state.devicesByEvent[d.eventid].push(d.id)
       })
     },
@@ -54,11 +50,9 @@ export default {
           state.devicesByEvent[params.eventid].push(params.id)
         }
 
-        if (params.images) {
-          Vue.set(state.images, params.id, params.images)
-        }
-
         Vue.set(state.devicesById, params.id, params)
+        console.log('Set images', params.images)
+        // Vue.set(state.devicesById[params.id], 'images', params.images)
       }
 
       return params
@@ -74,7 +68,6 @@ export default {
         Vue.set(state.devicesByEvent, device.eventid, newarr)
       }
 
-      Vue.delete(state.images, id)
       Vue.delete(state.devicesById, id)
     },
     addURL(state, params) {
@@ -101,18 +94,19 @@ export default {
 
       Vue.set(state.devicesById, params.id, device)
     },
-    setImages(state, params) {
-      Vue.set(state.images, params.id, params.images)
-    },
-    removeImage(state, params) {
-      Vue.set(state.images, params.id, state.images[params.id].filter(u => {
-        return u.idxref !== params.idxref
-      }))
-    },
   },
   actions: {
     clear({commit}) {
       commit('clear')
+    },
+    async fetch({commit}, id) {
+      console.log('Fetch', id)
+      const ret = await axios.get('/api/v2/devices/' + id)
+      console.log('Fetch returned', ret)
+
+      if (ret && ret.data && ret.data.data) {
+        commit('add', ret.data.data)
+      }
     },
     setForEvent ({commit}, params) {
       commit('setForEvent', params)
@@ -264,11 +258,7 @@ export default {
         })
       }
     },
-    setImages({commit}, params) {
-      commit('setImages', params)
-    },
     async deleteImage({commit, rootGetters}, params) {
-      console.log("Delete image", params)
       if (params.id && params.idxref) {
         const url = '/device/image/delete/' + params.id + '/' + params.idxref
         const ret = await axios.get(url, {
@@ -276,11 +266,7 @@ export default {
             'X-CSRF-TOKEN': rootGetters['auth/CSRF']
           }
         })
-
-        // This isn't a proper API call, and returns success/failure via a redirect to another page.  Assume
-        // it works until we have a better API.
-        commit('removeImage', params)
-      }
+     }
     }
   },
 }
