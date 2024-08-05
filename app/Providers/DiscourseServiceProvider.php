@@ -7,7 +7,6 @@ use GuzzleHttp\Client;
 use GuzzleHttp\HandlerStack;
 use GuzzleRetry\GuzzleRetryMiddleware;
 use Illuminate\Support\ServiceProvider;
-use \App\Logging\DiscourseLogger;
 
 class DiscourseServiceProvider extends ServiceProvider
 {
@@ -80,7 +79,7 @@ class DiscourseServiceProvider extends ServiceProvider
     {
         if (! $this->logger) {
             $this->logger = with(new \Monolog\Logger('discourse-api'))->pushHandler(
-                new DiscourseLogger([
+                new \App\Logging\DiscourseLogger([
                     'path' => storage_path('logs/discourse-api.log'),
                     'days' => 14,
                 ])
