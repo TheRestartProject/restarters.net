@@ -114,4 +114,35 @@ class GroupHostTest extends TestCase
         $this->expectException(AuthenticationException::class);
         $response = $this->delete("/api/v2/groups/{$this->idgroups}/volunteers/{$host->id}?api_token=" . $host->api_token);
     }
+
+    public function providerTrueFalse()
+    {
+        return [
+            [false],
+            [true],
+        ];
+    }
+
+    /**
+     * @dataProvider providerTrueFalse
+     */
+    public function testNetworkCoordinatorDemoteHost($addToNetwork) {
+        $host = User::factory()->host()->create();
+        $this->group->addVolunteer($host);
+        $this->group->makeMemberAHost($host);
+
+        $coordinator = User::factory()->networkCoordinator()->create();
+
+        if ($addToNetwork) {
+            $this->network->addCoordinator($coordinator);
+        } else {
+            $this->expectException(AuthenticationException::class);
+        }
+
+        $response = $this->patch("/api/v2/groups/{$this->idgroups}/volunteers/{$host->id}?api_token=".$coordinator->api_token, [
+            'host' => true,
+        ]);
+
+        $response->assertSuccessful();
+    }
 }

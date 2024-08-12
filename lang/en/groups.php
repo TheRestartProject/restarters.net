@@ -89,6 +89,7 @@ return [
   'events' => 'event|events',
   'no_volunteers' => 'There are no volunteers in this group',
   'remove_volunteer' => 'Remove Volunteer',
+  'remove_host_role' => 'Remove Host role',
   'make_host' => 'Make Host',
   'not_counting' => 'Not counting toward this group\'s environmental impact is|Not counting toward this group\'s environmental impact are',
   'calendar_copy_title' => 'Access all group events in your personal calendar',

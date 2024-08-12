@@ -11,6 +11,9 @@ export default {
     canedit() {
       return this.group ? this.group.canedit : false
     },
+    candemote() {
+      return this.group ? this.group.candemote : false
+    },
     ingroup() {
       return this.group ? this.group.ingroup : false
     }

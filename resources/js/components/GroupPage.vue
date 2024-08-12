@@ -92,6 +92,11 @@ export default {
       required: false,
       default: false
     },
+    candemote: {
+      type: Boolean,
+      required: false,
+      default: false
+    },
     canSeeDelete: {
       type: Boolean,
       required: false,
@@ -164,6 +169,7 @@ export default {
     // computed properties once we have good access to the session on the client.
     this.initialGroup.idgroups = this.idgroups
     this.initialGroup.canedit = this.canedit
+    this.initialGroup.candemote = this.candemote
     this.initialGroup.ingroup = this.ingroup
 
     this.$store.dispatch('groups/set', this.initialGroup)
