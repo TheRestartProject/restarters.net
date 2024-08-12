@@ -45,8 +45,6 @@ class Kernel extends ConsoleKernel
         $schedule->command('groups:country')->hourly();
 
         $schedule->command('event:timezones')->hourly();
-
-        $schedule->command('discourselogs:clean')->daily();
     }
 
     /**
