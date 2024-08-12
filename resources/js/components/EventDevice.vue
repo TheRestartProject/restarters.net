@@ -28,7 +28,7 @@
                        :disabled="disabled"/>
           <DeviceAge :age.sync="currentDevice.age" :disabled="disabled"/>
           <DeviceWeight v-if="showWeight" :weight.sync="currentDevice.estimate" :disabled="disabled" :required="weightRequired" />
-          <DeviceImages :id="id" :add="add" :edit="edit" :disabled="disabled"
+          <DeviceImages :id="id" v-if="edit" :add="add" :edit="edit" :disabled="disabled"
                         class="mt-2" @remove="removeImage($event)"/>
         </b-card>
       </div>
@@ -344,7 +344,6 @@ export default {
     },
     partsProvider () {
       // Third party parts are indicated via the parts provider field.
-      console.log('partsProvider', this.currentDevice.spare_parts, SPARE_PARTS_NOT_NEEDED, PARTS_PROVIDER_THIRD_PARTY)
       return this.currentDevice.spare_parts ? this.currentDevice.spare_parts : null
     },
     async addDevice () {
