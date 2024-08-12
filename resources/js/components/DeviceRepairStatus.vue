@@ -122,7 +122,7 @@ export default {
         })
       },
       set(newval) {
-        this.$emit('update:status', newval.text)
+        this.$emit('update:status', newval.id)
       }
     },
     statusOptions () {
