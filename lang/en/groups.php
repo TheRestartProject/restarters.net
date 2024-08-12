@@ -82,7 +82,6 @@ return [
   'device_breakdown' => 'Device breakdown',
   'total_devices' => 'Total items worked on',
   'most_repaired_devices' => 'Most repaired devices',
-  'host' => 'Host',
   'website' => 'Website',
   'about_none' => 'There is no description for this group yet.',
   'read_less' => '<img class="icon" src="/images/minus-icon.svg" style="width: 20px;" />&nbsp;READ LESS',
