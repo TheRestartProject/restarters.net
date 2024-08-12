@@ -34,11 +34,7 @@
   @endif
 
   @if( isset($type) )
-    @if( $type == 'group' && ( App\Helpers\Fixometer::hasRole( Auth::user(), 'Administrator' ) || $is_host_of_group ) )
-      <td>
-        @include('partials.volunteer-dropdown')
-      </td>
-    @elseif( $type != 'group' && ( ( App\Helpers\Fixometer::hasRole(Auth::user(), 'Host') && App\Helpers\Fixometer::userHasEditPartyPermission($formdata->id, Auth::user()->id) ) || App\Helpers\Fixometer::hasRole(Auth::user(), 'Administrator') ) )
+    @if( $type != 'group' && ( ( App\Helpers\Fixometer::hasRole(Auth::user(), 'Host') && App\Helpers\Fixometer::userHasEditPartyPermission($formdata->id, Auth::user()->id) ) || App\Helpers\Fixometer::hasRole(Auth::user(), 'Administrator') ) )
       <td align="right">
         <a href="#" class="users-list__remove js-remove" data-remove-volunteer="{{ $volunteer->idevents_users }}" data-type="{{{ $type }}}">@lang('partials.remove_volunteer')</a>
       </td>
