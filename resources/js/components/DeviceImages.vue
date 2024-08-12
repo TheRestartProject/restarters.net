@@ -5,7 +5,7 @@
         {{ __('devices.images') }}
       </label>
       <div class="d-flex flex-wrap device-photos dropzone-previews">
-        <FileUploader :url="uploadURL" v-if="edit && !disabled && images.length < maxFiles" previews-container=".device-photos" @uploaded="uploaded($event)" :max-files="maxFiles" />
+        <FileUploader :url="uploadURL" v-if="(edit || add) && !disabled && images.length < maxFiles" previews-container=".device-photos" @uploaded="uploaded($event)" :max-files="maxFiles" />
         <DeviceImage v-for="image in images" :key="'img-' + image.path" :image="image" @remove="$emit('remove', image)" :disabled="disabled" />
       </div>
     </div>
@@ -49,7 +49,7 @@ export default {
     images() {
       // TODO LATER The images are currently added/removed/deleted immediately, and so we get them from the store.
       // This should be deferred until the save.
-      if (this.id) {
+      if (this.id > 0) {
         return this.$store.getters['devices/imagesByDevice'](this.id)
       } else {
         return this.imagesDuringCreation || []
@@ -61,7 +61,7 @@ export default {
   },
   methods: {
     uploaded(images) {
-      if (this.id) {
+      if (this.id > 0) {
         // We have uploaded some images.  Fetch the device to reflect the new images.Add them to the store.
         this.$store.dispatch('devices/fetch', this.id)
       } else {

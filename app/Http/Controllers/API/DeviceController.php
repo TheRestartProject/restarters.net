@@ -10,6 +10,7 @@ use App\Helpers\Fixometer;
 use App\Http\Controllers\Controller;
 use App\Notifications\AdminAbnormalDevices;
 use App\Party;
+use App\Xref;
 use Illuminate\Auth\AuthenticationException;
 use Illuminate\Validation\ValidationException;
 use Notification;
@@ -181,6 +182,10 @@ class DeviceController extends Controller {
             $barrier
         ) = $this->validateDeviceParams($request,true);
 
+        // We may have uploaded photos before creation, and we have a draft id which allows us to patch that
+        // up.
+        $draftId = $request->input('id');
+
         $event = Party::findOrFail($eventid);
 
         if (!Fixometer::userHasEditEventsDevicesPermission($eventid, $user->id)) {
@@ -220,6 +225,15 @@ class DeviceController extends Controller {
                     'device_id' => $idDevice,
                     'barrier_id' => $barrier
                 ]);
+            }
+
+            // We might have some photos uploaded for this device.  Record them against this device instance.
+            // Each instance of a device shares the same underlying photo file.
+            $File = new \FixometerFile;
+            $images = $File->findImages(env('TBL_DEVICES'), $draftId);
+            foreach ($images as $image) {
+                $xref = Xref::findOrFail($image->idxref);
+                $xref->copy($idDevice);
             }
 
             // If the number of devices exceeds set amount then notify admins.
@@ -467,6 +481,7 @@ class DeviceController extends Controller {
         // schema, which is possible but not trivial.
         if ($create) {
             $request->validate([
+                'id' => 'required|integer',
                 'eventid' => 'required|integer',
                 'item_type' => 'string',  // Some of the tests, at least, treat this as optional.
                 'category' => 'required|integer',

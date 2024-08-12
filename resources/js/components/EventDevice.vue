@@ -28,7 +28,7 @@
                        :disabled="disabled"/>
           <DeviceAge :age.sync="currentDevice.age" :disabled="disabled"/>
           <DeviceWeight v-if="showWeight" :weight.sync="currentDevice.estimate" :disabled="disabled" :required="weightRequired" />
-          <DeviceImages :id="id" v-if="edit" :add="add" :edit="edit" :disabled="disabled"
+          <DeviceImages :id="idtouse" :add="add" :edit="edit" :disabled="disabled"
                         class="mt-2" @remove="removeImage($event)"/>
         </b-card>
       </div>
