@@ -498,11 +498,6 @@ class GroupController extends Controller
     {
         $user = $this->getUser();
 
-        list($name, $area, $postcode, $location, $phone, $website, $description, $timezone, $latitude, $longitude, $country, $network_data, $email) = $this->validateGroupParams(
-            $request,
-            false
-        );
-
         $group = Group::findOrFail($id);
         $is_host_of_group = Fixometer::userHasEditGroupPermission($id, $user->id);
         $isCoordinatorForGroup = $user->isCoordinatorForGroup($group);
@@ -558,11 +553,6 @@ class GroupController extends Controller
     {
         $user = $this->getUser();
         $host = $request->get('host', false);
-
-        list($name, $area, $postcode, $location, $phone, $website, $description, $timezone, $latitude, $longitude, $country, $network_data, $email) = $this->validateGroupParams(
-            $request,
-            false
-        );
 
         $group = Group::findOrFail($id);
         $is_host_of_group = Fixometer::userHasEditGroupPermission($id, $user->id);
