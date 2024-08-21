@@ -193,7 +193,9 @@ class CreateEventTest extends TestCase
             EventConfirmed::class,
             function ($notification, $channels, $host) use ($event) {
                 $mailData = $notification->toMail($host)->toArray();
-                self::assertEquals(__('notifications.event_confirmed_subject', [], $host->language), $mailData['subject']);
+                self::assertEquals(__('notifications.event_confirmed_subject', [
+                    ''
+                    ], $host->language) . ' ', $mailData['subject']);
 
                 // Mail should mention the venue.
                 self::assertMatchesRegularExpression ('/' . $event->venue . '/', $mailData['introLines'][0]);
@@ -363,7 +365,8 @@ class CreateEventTest extends TestCase
             function ($notification, $channels, $user) use ($group, $host) {
                 $mailData = $notification->toMail($host)->toArray();
                 self::assertEquals(__('notifications.new_event_subject', [
-                    'name' => $group->name
+                    'name' => $group->name,
+                    'time' => '2020/01/01'
                 ], $user->language), $mailData['subject']);
                 return true;
             }
