@@ -69,6 +69,7 @@ class NotificationsTest extends TestCase
         'event_venue' => 'Event Venue',
         'event_url' => 'https://eventurl',
         'event_id' => 123,
+        'event_start' => '2020/01/01',
         'group_name' => 'Group Name',
         'group_url' => 'https://groupurl',
         'group' => 'Group Name2',
@@ -701,7 +702,7 @@ class NotificationsTest extends TestCase
         $this->outputs[\App\Notifications\NotifyRestartersOfNewEvent::class]['mail'] = [];
         $this->outputs[\App\Notifications\NotifyRestartersOfNewEvent::class]['mail']['en'] = [];
         $this->outputs[\App\Notifications\NotifyRestartersOfNewEvent::class]['mail']['en']['level'] = 'info';
-        $this->outputs[\App\Notifications\NotifyRestartersOfNewEvent::class]['mail']['en']['subject'] = 'New event for Event Group';
+        $this->outputs[\App\Notifications\NotifyRestartersOfNewEvent::class]['mail']['en']['subject'] = 'New event for Event Group at 2020/01/01';
         $this->outputs[\App\Notifications\NotifyRestartersOfNewEvent::class]['mail']['en']['greeting'] = 'Hello!';
         $this->outputs[\App\Notifications\NotifyRestartersOfNewEvent::class]['mail']['en']['salutation'] = NULL;
         $this->outputs[\App\Notifications\NotifyRestartersOfNewEvent::class]['mail']['en']['introLines'] = [];
@@ -713,7 +714,7 @@ class NotificationsTest extends TestCase
         $this->outputs[\App\Notifications\NotifyRestartersOfNewEvent::class]['mail']['en']['displayableActionUrl'] = 'https://eventurl';
         $this->outputs[\App\Notifications\NotifyRestartersOfNewEvent::class]['mail']['fr'] = [];
         $this->outputs[\App\Notifications\NotifyRestartersOfNewEvent::class]['mail']['fr']['level'] = 'info';
-        $this->outputs[\App\Notifications\NotifyRestartersOfNewEvent::class]['mail']['fr']['subject'] = 'Nouvel événement pour Event Group';
+        $this->outputs[\App\Notifications\NotifyRestartersOfNewEvent::class]['mail']['fr']['subject'] = 'Nouvel événement pour Event Group le 2020/01/01';
         $this->outputs[\App\Notifications\NotifyRestartersOfNewEvent::class]['mail']['fr']['greeting'] = 'Bonjour !';
         $this->outputs[\App\Notifications\NotifyRestartersOfNewEvent::class]['mail']['fr']['salutation'] = NULL;
         $this->outputs[\App\Notifications\NotifyRestartersOfNewEvent::class]['mail']['fr']['introLines'] = [];
