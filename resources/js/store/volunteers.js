@@ -34,6 +34,9 @@ export default {
     },
     makeHost(state, id) {
       state.listGroup[id].host = true
+    },
+    removeHost(state, id) {
+      state.listGroup[id].host = false
     }
   },
   actions: {
@@ -58,6 +61,13 @@ export default {
         host: true
       })
       commit('makeHost', id)
+    },
+    async removehost({commit, dispatch}, id) {
+      const vol = this.state.volunteers.listGroup[id]
+      const ret = await axios.patch('/api/v2/groups/' + vol.group + '/volunteers/' + vol.user, {
+        host: false
+      })
+      commit('removeHost', id)
     }
   },
 }

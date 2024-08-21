@@ -38,6 +38,7 @@
         </div>
       </div>
       <b-dropdown v-if="canedit" variant="none" ref="dropdown" class="edit-dropdown" no-caret>
+        <b-dropdown-item v-if="volunteer.host && candemote" @click="removeHostRole">{{ __('groups.remove_host_role') }}</b-dropdown-item>
         <b-dropdown-item v-if="!volunteer.host" @click="makeVolunteerHost">{{ __('groups.make_host') }}</b-dropdown-item>
         <b-dropdown-item @click="removeVolunteer">{{ __('groups.remove_volunteer') }}</b-dropdown-item>
       </b-dropdown>
@@ -63,6 +64,11 @@ export default {
       required: true
     },
     canedit: {
+      type: Boolean,
+      required: false,
+      default: false
+    },
+    candemote: {
       type: Boolean,
       required: false,
       default: false
@@ -136,6 +142,13 @@ export default {
     async makeVolunteerHost() {
       try {
         await this.$store.dispatch('volunteers/makehost', this.volunteer.id)
+      } catch (e) {
+        this.error = e.message
+      }
+    },
+    async removeHostRole() {
+      try {
+        await this.$store.dispatch('volunteers/removehost', this.volunteer.id)
       } catch (e) {
         this.error = e.message
       }

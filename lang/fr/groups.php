@@ -88,6 +88,7 @@ return [
   'events' => 'évenement|évenements',
   'group_facts' => 'Réalisations du Repair Café',
   'make_host' => 'Nommer organisateur',
+  'remove_host_role' => 'Retirer rôle d\'organisateur',
   'not_counting' => 'L\'impact environnemental de ce Repair Café n\'est pas pris en compte',
   'no_volunteers' => 'Il n\'y a pas de bénévoles dans ce repair café',
   'read_less' => '<img class="icon" src="/images/minus-icon.svg" style="width: 20px;" /> LIRE MOINS',

@@ -43,6 +43,7 @@
           }
 
           $can_edit_group = App\Helpers\Fixometer::hasRole($user, 'Administrator') || $isCoordinatorForGroup || $is_host_of_group;
+          $can_demote = App\Helpers\Fixometer::hasRole($user, 'Administrator') || $isCoordinatorForGroup;
           $can_see_delete = App\Helpers\Fixometer::hasRole($user, 'Administrator');
           $can_perform_delete = $can_see_delete && $group->canDelete();
 
@@ -148,6 +149,7 @@
               :top-devices="{{ json_encode($top, JSON_INVALID_UTF8_IGNORE) }}"
               :events="{{ json_encode($expanded_events, JSON_INVALID_UTF8_IGNORE) }}"
               :canedit="{{ $can_edit_group ? 'true' : 'false' }}"
+              :candemote="{{ $can_demote ? 'true' : 'false' }}"
               :can-see-delete="{{ $can_see_delete ? 'true' : 'false' }}"
               :can-perform-delete="{{ $can_perform_delete ? 'true' : 'false' }}"
               calendar-copy-url="{{ $showCalendar ? url("/calendar/group/{$group->idgroups}") : '' }}"

@@ -12,7 +12,7 @@
       <div class="mt-2">
         <div v-if="volunteers.length">
           <div class="maxheight" :key="'confirm-' + volunteers.length">
-            <GroupVolunteer v-for="a in volunteers" :key="'group-' + a.id" :id="a.id" :canedit="canedit" />
+            <GroupVolunteer v-for="a in volunteers" :key="'group-' + a.id" :id="a.id" :canedit="canedit" :candemote="candemote" />
           </div>
           <div class="d-flex justify-content-between">
             <a class="justify-content-end" href="#" data-toggle="modal" data-target="#invite-to-group">
