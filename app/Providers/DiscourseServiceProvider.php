@@ -7,6 +7,7 @@ use GuzzleHttp\Client;
 use GuzzleHttp\HandlerStack;
 use GuzzleRetry\GuzzleRetryMiddleware;
 use Illuminate\Support\ServiceProvider;
+use Illuminate\Support\Facades\Log;
 
 class DiscourseServiceProvider extends ServiceProvider
 {
@@ -70,19 +71,8 @@ class DiscourseServiceProvider extends ServiceProvider
     private function createGuzzleLoggingMiddleware(string $messageFormat)
     {
         return \GuzzleHttp\Middleware::log(
-            $this->getLogger(),
+            Log::channel('discourse'),
             new \GuzzleHttp\MessageFormatter($messageFormat)
         );
-    }
-
-    private function getLogger()
-    {
-        if (! $this->logger) {
-            $this->logger = with(new \Monolog\Logger('discourse-api'))->pushHandler(
-                new \Monolog\Handler\RotatingFileHandler(storage_path('logs/discourse-api.log'))
-            );
-        }
-
-        return $this->logger;
     }
 }
