@@ -366,7 +366,7 @@ class CreateEventTest extends TestCase
                 $mailData = $notification->toMail($host)->toArray();
                 self::assertEquals(__('notifications.new_event_subject', [
                     'name' => $group->name,
-                    'time' => '2020/01/01'
+                    'time' => '2100-01-01 05:15'
                 ], $user->language), $mailData['subject']);
                 return true;
             }
