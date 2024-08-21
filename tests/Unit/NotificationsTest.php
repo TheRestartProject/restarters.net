@@ -69,6 +69,7 @@ class NotificationsTest extends TestCase
         'event_venue' => 'Event Venue',
         'event_url' => 'https://eventurl',
         'event_id' => 123,
+        'event_start' => '2020/01/01',
         'group_name' => 'Group Name',
         'group_url' => 'https://groupurl',
         'group' => 'Group Name2',
