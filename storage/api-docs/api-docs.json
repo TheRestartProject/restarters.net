@@ -713,6 +713,129 @@
                 }
             }
         },
+        "/api/v2/groups/{id}/volunteers": {
+            "get": {
+                "tags": [
+                    "Groups",
+                    "Volunteers"
+                ],
+                "summary": "Get Group Volunteers",
+                "description": "Returns the list of confirmed volunters for a group.",
+                "operationId": "getVolunteersForGroupv2",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "Group id",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Successful operation",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "data": {
+                                            "title": "data",
+                                            "description": "An array of volunteers",
+                                            "type": "array",
+                                            "items": {
+                                                "$ref": "#/components/schemas/Volunteer"
+                                            }
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Group not found"
+                    }
+                }
+            }
+        },
+        "/api/v2/groups/{id}/volunteers/{iduser}": {
+            "delete": {
+                "tags": [
+                    "Groups",
+                    "Volunteers"
+                ],
+                "summary": "Delete Group Volunteer",
+                "description": "Removes a volunteer from a group",
+                "operationId": "deleteVolunteerForGroupv2",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "Group id",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    },
+                    {
+                        "name": "iduser",
+                        "in": "path",
+                        "description": "User id",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Successful operation"
+                    },
+                    "404": {
+                        "description": "Group not found"
+                    }
+                }
+            },
+            "patch": {
+                "tags": [
+                    "Groups",
+                    "Volunteers"
+                ],
+                "summary": "Modify Group Volunteer",
+                "description": "Modify a volunteer's status on a group",
+                "operationId": "patchVolunteerForGroupv2",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "Group id",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    },
+                    {
+                        "name": "host",
+                        "in": "path",
+                        "description": "Host",
+                        "required": true,
+                        "schema": {
+                            "type": "boolean"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Successful operation"
+                    },
+                    "404": {
+                        "description": "Group not found"
+                    }
+                }
+            }
+        },
         "/api/v2/moderate/groups": {
             "get": {
                 "tags": [
@@ -2067,6 +2190,45 @@
                     "$ref": "#/components/schemas/EventSummary"
                 }
             },
+            "Skill": {
+                "title": "Skill",
+                "description": "A skill possessed by a volunteer.",
+                "properties": {
+                    "id": {
+                        "title": "id",
+                        "description": "Unique identifier of this skill",
+                        "format": "int64",
+                        "example": 1
+                    },
+                    "name": {
+                        "title": "name",
+                        "description": "Name of this skill",
+                        "format": "string",
+                        "example": "First aid"
+                    },
+                    "description": {
+                        "title": "description",
+                        "description": "Optional description of this skill",
+                        "format": "string",
+                        "example": "This is for qualified First Aiders to identify themselves to event organisers"
+                    },
+                    "category": {
+                        "title": "category",
+                        "description": "Category of this skill",
+                        "format": "int64",
+                        "example": 1
+                    }
+                },
+                "type": "object"
+            },
+            "SkillCollection": {
+                "title": "SkillCollection",
+                "description": "A collection of volunteer skills.",
+                "type": "array",
+                "items": {
+                    "$ref": "#/components/schemas/Skill"
+                }
+            },
             "Tag": {
                 "title": "Tag",
                 "description": "A tag to record something about a group.",
@@ -2098,6 +2260,51 @@
                 "type": "array",
                 "items": {
                     "$ref": "#/components/schemas/Tag"
+                }
+            },
+            "Volunteer": {
+                "title": "Volunteer",
+                "description": "A volunteer on a group or event.",
+                "properties": {
+                    "id": {
+                        "title": "id",
+                        "description": "Unique identifier of this record (i.e. the event/group and user combination)",
+                        "format": "int64",
+                        "example": 1
+                    },
+                    "user": {
+                        "title": "user",
+                        "description": "Unique identifier of this volunteer's user record",
+                        "format": "int64",
+                        "example": 2
+                    },
+                    "name": {
+                        "title": "name",
+                        "description": "The volunteer's name",
+                        "format": "string",
+                        "example": "Sam"
+                    },
+                    "host": {
+                        "title": "host",
+                        "description": "Whether the volunteer is a host of the event/group",
+                        "format": "boolean",
+                        "example": "false"
+                    },
+                    "image": {
+                        "title": "image",
+                        "description": "URL of an image for this user.  You should prefix this with /uploads before use.",
+                        "format": "string",
+                        "example": "/mid_1597853610178a4b76e4d666b2a7b32ee75d8a24c706f1cbf213970.png"
+                    }
+                },
+                "type": "object"
+            },
+            "VolunteerCollection": {
+                "title": "VolunteerCollection",
+                "description": "A collection of volunteers for a group or event.",
+                "type": "array",
+                "items": {
+                    "$ref": "#/components/schemas/Volunteer"
                 }
             }
         },
