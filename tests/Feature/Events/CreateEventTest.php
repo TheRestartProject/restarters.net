@@ -191,11 +191,11 @@ class CreateEventTest extends TestCase
         Notification::assertSentTo(
             [$host],
             EventConfirmed::class,
-            function ($notification, $channels, $host) use ($event) {
+            function ($notification, $channels, $host) use ($event, $start) {
                 $mailData = $notification->toMail($host)->toArray();
                 self::assertEquals(__('notifications.event_confirmed_subject', [
-                    ''
-                    ], $host->language) . ' ', $mailData['subject']);
+                    'time' => $start->format('Y-m-d H:i')
+                    ], $host->language), $mailData['subject']);
 
                 // Mail should mention the venue.
                 self::assertMatchesRegularExpression ('/' . $event->venue . '/', $mailData['introLines'][0]);

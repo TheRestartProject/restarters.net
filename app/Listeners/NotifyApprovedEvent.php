@@ -48,7 +48,7 @@ class NotifyApprovedEvent extends BaseEvent
                     'event_venue' => $theParty->venue,
                     'event_url' => url('/party/view/' . $partyId),
                     'event_group' => $group->name,
-                    'event_start' => $theParty->start_local,
+                    'event_start' => $theParty->event_date_local . ' ' . $theParty->start_local,
                 ]));
             }
         }

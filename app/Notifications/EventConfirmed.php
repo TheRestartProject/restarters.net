@@ -43,7 +43,7 @@ class EventConfirmed extends BaseNotification
 
         return (new MailMessage)
             ->subject(__('notifications.event_confirmed_subject', [
-                'time' => $this->party->start_local
+                'time' => $this->party->event_date_local . ' ' . $this->party->start_local
             ], $locale))
             ->greeting(__('notifications.greeting', [], $locale))
             ->line(
