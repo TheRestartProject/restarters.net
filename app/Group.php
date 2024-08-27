@@ -47,6 +47,7 @@ class Group extends Model implements Auditable
         'phone',
         'network_data',
         'email',
+        'archived_at'
     ];
 
     protected $appends = ['ShareableLink', 'auto_approve'];
