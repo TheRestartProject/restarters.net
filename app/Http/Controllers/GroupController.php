@@ -366,20 +366,6 @@ class GroupController extends Controller
             return redirect()->back()->with('warning', __('groups.invite.no_emails'));
         }
 
-        $invalid = [];
-
-        foreach ($emails as $email) {
-            if (! filter_var($email, FILTER_VALIDATE_EMAIL)) {
-                $invalid[] = $email;
-            }
-        }
-
-        if (count($invalid)) {
-            return redirect()->back()->with('warning', __('groups.invite_invalid_emails', [
-                'emails' => implode(', ', $invalid)
-            ]));
-        }
-
         $users = User::whereIn('email', $emails)->get();
 
         $non_users = array_diff($emails, User::whereIn('email', $emails)->pluck('email')->toArray());
@@ -928,14 +914,10 @@ class GroupController extends Controller
                         'url' => $url,
                         'message' => null,
                     ], $user));
-                } else {
-                    $not_sent[] = $user->email;
                 }
             } catch (\Exception $ex) {
                 Log::error('An error occurred while sending invitation to nearby Restarter:'.$ex->getMessage());
             }
-        } else { // already a confirmed member of the group or been sent an invite
-            $not_sent[] = $user->email;
         }
 
         return redirect('/group/nearby/'.intval($groupId))->with('success', $user->name.' has been invited');

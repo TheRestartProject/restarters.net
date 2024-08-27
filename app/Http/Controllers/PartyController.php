@@ -605,106 +605,84 @@ class PartyController extends Controller
         $message = $request->input('message_to_restarters');
 
         if (! empty($emails)) {
-            $invalid = [];
+            $users = User::whereIn('email', $emails)->get();
 
-            foreach ($emails as $email) {
-                if (! filter_var($email, FILTER_VALIDATE_EMAIL)) {
-                    $invalid[] = $email;
-                }
-            }
+            $non_users = array_diff($emails, User::whereIn('email', $emails)->pluck('email')->toArray());
+            $from = User::find($from_id);
 
-            if (count($invalid)) {
-                return redirect()->back()->with('warning', __('events.invite_invalid_emails', [
-                    'emails' => implode(', ', $invalid)
-                ]));
-            } else {
-                $users = User::whereIn('email', $emails)->get();
+            foreach ($users as $user) {
+                $user_event = EventsUsers::where('user', $user->id)->where('event', $event_id)->first();
 
-                $non_users = array_diff($emails, User::whereIn('email', $emails)->pluck('email')->toArray());
-                $from = User::find($from_id);
+                if (is_null($user_event) || $user_event->status != '1') {
+                    $hash = substr(bin2hex(openssl_random_pseudo_bytes(32)), 0, 24);
+                    $url = url('/party/accept-invite/'.$event_id.'/'.$hash);
 
-                foreach ($users as $user) {
-                    $user_event = EventsUsers::where('user', $user->id)->where('event', $event_id)->first();
-
-                    if (is_null($user_event) || $user_event->status != '1') {
-                        $hash = substr(bin2hex(openssl_random_pseudo_bytes(32)), 0, 24);
-                        $url = url('/party/accept-invite/'.$event_id.'/'.$hash);
-
-                        if (! is_null($user_event)) {
-                            $user_event->update([
-                                                    'status' => $hash,
-                                                ]);
-                        } else {
-                            EventsUsers::create([
-                                                    'user' => $user->id,
-                                                    'event' => $event_id,
-                                                    'status' => $hash,
-                                                    'role' => 4,
-                                                ]);
-                        }
-
-                        $event = Party::find($event_id);
-
-                        $arr = [
-                            'name' => $from->name,
-                            'group' => $group_name,
-                            'url' => $url,
-                            'view_url' => url('/party/view/'.$event->idevents),
-                            'message' => $message,
-                            'event' => $event,
-                        ];
-
-                        // Get Creator of Event
-                        if (! empty($userCreator = User::find($event->user_id))) {
-                            $event_details = [
-                                'event_venue' => $event->venue,
-                                'event_url' => url('/party/edit/'.$event->idevents),
-                            ];
-                        }
-
-                        // Send Invites
-                        Notification::send($user, new JoinEvent($arr, $user));
+                    if (! is_null($user_event)) {
+                        $user_event->update([
+                                                'status' => $hash,
+                                            ]);
                     } else {
-                        $not_sent[] = $user->email;
+                        EventsUsers::create([
+                                                'user' => $user->id,
+                                                'event' => $event_id,
+                                                'status' => $hash,
+                                                'role' => 4,
+                                            ]);
                     }
+
+                    $event = Party::find($event_id);
+
+                    $arr = [
+                        'name' => $from->name,
+                        'group' => $group_name,
+                        'url' => $url,
+                        'view_url' => url('/party/view/'.$event->idevents),
+                        'message' => $message,
+                        'event' => $event,
+                    ];
+
+                    // Send Invites
+                    Notification::send($user, new JoinEvent($arr, $user));
+                } else {
+                    $not_sent[] = $user->email;
                 }
-
-                if (! empty($non_users)) {
-                    foreach ($non_users as $non_user) {
-                        $hash = substr(bin2hex(openssl_random_pseudo_bytes(32)), 0, 24);
-                        $url = url('/user/register/'.$hash);
-
-                        $invite = Invite::create([
-                                                     'record_id' => $event_id,
-                                                     'email' => $non_user,
-                                                     'hash' => $hash,
-                                                     'type' => 'event',
-                                                 ]);
-
-                        $event = Party::find($event_id);
-
-                        $arr = [
-                            'name' => $from->name,
-                            'group' => $group_name,
-                            'url' => $url,
-                            'view_url' => url('/party/view/'.$event->idevents),
-                            'message' => $message,
-                            'event' => $event,
-                        ];
-
-                        Notification::send($invite, new JoinEvent($arr));
-                    }
-                }
-
-                if (! isset($not_sent)) {
-                    return redirect()->back()->with('success', __('events.invite_success'));
-                }
-
-                // Don't log to Sentry - legitimate user error.
-                return redirect()->back()->with('warning', __('events.invite_invalid_emails', [
-                    'emails' => implode(', ', $not_sent)
-                ]));
             }
+
+            if (! empty($non_users)) {
+                foreach ($non_users as $non_user) {
+                    $hash = substr(bin2hex(openssl_random_pseudo_bytes(32)), 0, 24);
+                    $url = url('/user/register/'.$hash);
+
+                    $invite = Invite::create([
+                                                 'record_id' => $event_id,
+                                                 'email' => $non_user,
+                                                 'hash' => $hash,
+                                                 'type' => 'event',
+                                             ]);
+
+                    $event = Party::find($event_id);
+
+                    $arr = [
+                        'name' => $from->name,
+                        'group' => $group_name,
+                        'url' => $url,
+                        'view_url' => url('/party/view/'.$event->idevents),
+                        'message' => $message,
+                        'event' => $event,
+                    ];
+
+                    Notification::send($invite, new JoinEvent($arr));
+                }
+            }
+
+            if (! isset($not_sent)) {
+                return redirect()->back()->with('success', __('events.invite_success'));
+            }
+
+            // Don't log to Sentry - legitimate user error.
+            return redirect()->back()->with('warning', __('events.invite_invalid_emails', [
+                'emails' => implode(', ', $not_sent)
+            ]));
         }
 
         \Sentry\CaptureMessage(__('events.invite_noemails'));
