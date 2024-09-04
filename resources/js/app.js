@@ -53,6 +53,7 @@ import VenueAddress from './components/VenueAddress.vue'
 import RichTextEditor from './components/RichTextEditor'
 import Notifications from './components/Notifications'
 import GroupTimeZone from './components/GroupTimeZone'
+import StatsShare  from './components/StatsShare.vue'
 
 // Without this, the default map marker doesn't appear in production.  Fairly well-known problem.
 // eslint-disable-next-line
@@ -782,7 +783,7 @@ function initAutocomplete() {
   jQuery(document).ready(function () {
     groupsMap();
 
-    if (window.gdprCookieNotice) {
+    if (window.gdprCookieNotice && !window.noCookieNotice) {
       gdprCookieNotice({
         locale: 'en',
         timeout: 500, //Time until the cookie bar appears
@@ -1298,6 +1299,7 @@ jQuery(document).ready(function () {
   // resources/js/components.  Lower level components can be included from within those as normal;
   // they don't need listing here.
   $(".vue").each(function(index) {
+    console.log('Create vue', $(this).get(0))
     new Vue({
       el: $(this).get(0),
       store: store,
@@ -1323,6 +1325,7 @@ jQuery(document).ready(function () {
         'richtexteditor': RichTextEditor,
         'notifications': Notifications,
         'grouptimezone': GroupTimeZone,
+        'statsshare': StatsShare,
       }
     })
   })

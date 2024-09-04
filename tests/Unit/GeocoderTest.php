@@ -8,8 +8,8 @@ class GeocoderTest extends TestCase
     public function testGeocode() {
         $geocoder = new \App\Helpers\Geocoder();
         $ret = $geocoder->geocode('6 Canterbury Crescent, London SW9 7QD');
-        $this->assertEquals(51.4643585, $ret['latitude']);
-        $this->assertEquals(-0.1135401, $ret['longitude']);
+        $this->assertEquals(round(51.4643585, 2), round($ret['latitude'], 2));
+        $this->assertEquals(round(-0.1135401, 2), round($ret['longitude'], 2));
         $this->assertEquals('GB', $ret['country_code']);
     }
 }

@@ -8,11 +8,13 @@ use App\Notifications\NewGroupMember;
 use App\Helpers\Fixometer;
 use App\Notifications\NotifyRestartersOfNewEvent;
 use App\Party;
+use App\Role;
 use App\User;
 use DB;
 use Illuminate\Support\Facades\Notification;
 use Tests\TestCase;
 use Auth;
+use Illuminate\Validation\ValidationException;
 
 class InviteGroupTest extends TestCase
 {
@@ -155,27 +157,35 @@ class InviteGroupTest extends TestCase
         $this->assertNotFalse(strpos($redirectTo, '/user/register'));
     }
 
-    public function testInviteInvalid()
+    /**
+     * @dataProvider invalidEmailProvider
+     */
+    public function testInviteInvalidEmail($email, $valid)
     {
-        Notification::fake();
-        $this->withoutExceptionHandling();
+        $this->loginAsTestUser(Role::ADMINISTRATOR);
 
-        $group = Group::factory()->create();
-        $host = User::factory()->host()->create();
-        $group->addVolunteer($host);
-        $group->makeMemberAHost($host);
-        $this->actingAs($host);
+        $idgroups = $this->createGroup();
+        $group = Group::findOrFail($idgroups);
 
-        // Invite a user.
-        $user = User::factory()->restarter()->create();
+        if (!$valid) {
+            $this->expectException(ValidationException::class);
+        }
 
-        $response = $this->post('/group/invite', [
+        $this->post('/group/invite', [
             'group_name' => $group->name,
             'group_id' => $group->idgroups,
-            'manual_invite_box' => '@invalidmail',
+            'manual_invite_box' => $email,
             'message_to_restarters' => 'Join us, but not in a creepy zombie way',
         ]);
+    }
 
-        $response->assertSessionHas('warning');
+    public function invalidEmailProvider()
+    {
+        return [
+            ['test@test.com', true],
+            ['invalidmail', false],
+            ['invalidmail@', false],
+            ['test@test.com, invalidmail', false]
+        ];
     }
 }

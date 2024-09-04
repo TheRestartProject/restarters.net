@@ -38,6 +38,7 @@
         "sentry/sentry-laravel": "^2.11",
         "soundasleep/html2text": "^1.1",
         "spatie/calendar-links": "^1.6",
+        "spatie/laravel-validation-rules": "^3.4",
         "spinen/laravel-discourse-sso": "^2.6",
         "symfony/http-client": "^6.2",
         "symfony/http-foundation": "^6.0",
