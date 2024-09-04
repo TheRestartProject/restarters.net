@@ -15,7 +15,7 @@
       :type="type"
       @click="onClick"
   >
-    <v-icon :name="computedIconData.name" :class="computedIconData.class"/>
+    <v-icon :name="computedIconData.name" :class="computedIconData.class" :spin="loading" />
     <span v-if="label" class="ml-1">
       {{ label }}
     </span>
@@ -24,7 +24,7 @@
 <script>
 // Originally derived from https://github.com/Freegle/iznik-nuxt3/blob/master/components/SpinButton.vue
 // Backported to Vue2.  Confirm and offline function removed for now.
-import VIcon from 'vue-awesome/components/Icon.vue'
+import VIcon from 'vue-awesome/components/Icon'
 
 const SPINNER_COLOR = {
   primary: 'text-black',
@@ -112,7 +112,7 @@ export default {
     computedIconData() {
       if (this.loading) {
         return {
-          class: `fa-spin ${this.iconClass} ${this.spinColorClass}`,
+          class: `${this.iconClass} ${this.spinColorClass}`,
           name: 'sync',
         }
       }

@@ -72,7 +72,7 @@ import LangMixin from './mixins/lang'
 import { Lang } from './mixins/lang'
 Vue.mixin(LangMixin)
 
-const Icon = require('vue-awesome/components/Icon.vue')
+const Icon = require('vue-awesome/components/Icon')
 require('vue-awesome/icons/sync')
 require('vue-awesome/icons/save')
 require('vue-awesome/icons/check')
