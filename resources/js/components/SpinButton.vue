@@ -15,7 +15,8 @@
       :type="type"
       @click="onClick"
   >
-    <v-icon :name="computedIconData.name" :class="computedIconData.class" :spin="loading" />
+    <v-icon :name="computedIconData.name" :class="computedIconData.class" v-if="!loading" />
+    <span v-else class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
     <span v-if="label" class="ml-1">
       {{ label }}
     </span>
@@ -110,13 +111,6 @@ export default {
   },
   computed: {
     computedIconData() {
-      if (this.loading) {
-        return {
-          class: `${this.iconClass} ${this.spinColorClass}`,
-          name: 'sync',
-        }
-      }
-
       if (this.done && this.doneIcon) {
         return {
           class: this.iconClass,
