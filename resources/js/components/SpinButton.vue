@@ -112,10 +112,11 @@ export default {
     computedIconData() {
       if (this.loading) {
         return {
-          class: `fa-spin fa-fw ${this.spinColorClass}`,
+          class: `fa-spin ${this.iconClass} ${this.spinColorClass}`,
           name: 'sync',
         }
       }
+
       if (this.done && this.doneIcon) {
         return {
           class: this.iconClass,
@@ -147,9 +148,6 @@ export default {
           this.done = true
           setTimeout(() => {
             this.done = false
-
-            // Blur so that the button doesn't stay focused and therefore e.g. black.
-            this.$refs.btn.blur()
           }, this.timeout)
         }
       })
@@ -167,6 +165,8 @@ export default {
     },
     onClick() {
       if (!this.loading) {
+        // Blur so that the button doesn't stay focused and therefore e.g. black.
+        this.$refs.btn.blur()
         this.done = false
         this.loading = true
         this.$emit('handle', this.finishSpinner)
