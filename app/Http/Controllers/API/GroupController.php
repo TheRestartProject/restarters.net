@@ -716,14 +716,14 @@ class GroupController extends Controller
      *                   description="Network-defined JSON data",
      *                   property="network_data",
      *                   @OA\Schema()
-     *                )
-     *               @OA\Property(
+     *                ),
+     *                @OA\Property(
      *                   property="archived_at",
      *                   title="archived_at",
      *                   description="If present, this group has been archived and is no longer active.",
      *                   format="date-time",
-     *                 )
-     *              )
+     *                )
+     *            )
      *         )
      *    ),
      *    @OA\Response(
