@@ -19,7 +19,8 @@ class NotifyRestartersOfNewEvent extends BaseNotification
         return (new MailMessage)
             ->subject(
                 __('notifications.new_event_subject', [
-                    'name' => $this->arr['event_group']
+                    'name' => $this->arr['event_group'],
+                    'time' => $this->arr['event_start']
                 ], $locale)
             )
             ->greeting(__('notifications.greeting', [], $locale))

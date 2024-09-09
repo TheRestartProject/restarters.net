@@ -6,15 +6,13 @@ export default {
       return this.$store.getters['groups/get'](this.idgroups)
     },
     volunteers() {
-      let ret = []
-      if (this.group && this.group.volunteers) {
-        ret = this.group.volunteers
-      }
-
-      return ret
+      return this.$store.getters['volunteers/byGroup'](this.idgroups)
     },
     canedit() {
       return this.group ? this.group.canedit : false
+    },
+    candemote() {
+      return this.group ? this.group.candemote : false
     },
     ingroup() {
       return this.group ? this.group.ingroup : false

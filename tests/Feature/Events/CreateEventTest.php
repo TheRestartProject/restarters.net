@@ -191,9 +191,11 @@ class CreateEventTest extends TestCase
         Notification::assertSentTo(
             [$host],
             EventConfirmed::class,
-            function ($notification, $channels, $host) use ($event) {
+            function ($notification, $channels, $host) use ($event, $start) {
                 $mailData = $notification->toMail($host)->toArray();
-                self::assertEquals(__('notifications.event_confirmed_subject', [], $host->language), $mailData['subject']);
+                self::assertEquals(__('notifications.event_confirmed_subject', [
+                    'time' => $start->format('Y-m-d H:i')
+                    ], $host->language), $mailData['subject']);
 
                 // Mail should mention the venue.
                 self::assertMatchesRegularExpression ('/' . $event->venue . '/', $mailData['introLines'][0]);
@@ -363,7 +365,8 @@ class CreateEventTest extends TestCase
             function ($notification, $channels, $user) use ($group, $host) {
                 $mailData = $notification->toMail($host)->toArray();
                 self::assertEquals(__('notifications.new_event_subject', [
-                    'name' => $group->name
+                    'name' => $group->name,
+                    'time' => '2100-01-01 05:15'
                 ], $user->language), $mailData['subject']);
                 return true;
             }
@@ -493,14 +496,10 @@ class CreateEventTest extends TestCase
         });
 
         // Assert that we see the host in the list of volunteers to add to the event.
-        $response = $this->get('/api/groups/'. $group->idgroups . '/volunteers?api_token=' . $host->api_token);
-        $response->assertJson([
-            [
-                'id' => $host->id,
-                'name' => $host->name,
-                'email' => $host->email
-            ]
-        ]);
+        $response = $this->get('/api/v2/groups/'. $group->idgroups . '/volunteers');
+        $vols = $response->json()['data'];
+        $this->assertEquals(2, count($vols));
+        $this->assertEquals($host2->id, $vols[1]['user']);
 
         // Assert we can add them back in.
         $party->discourse_thread = 123;
@@ -650,8 +649,8 @@ class CreateEventTest extends TestCase
         $group->addVolunteer($restarter);
 
         // Remove volunteer.
-        $response = $this->get("/group/remove-volunteer/{$group->idgroups}/{$restarter->id}");
-        $response->assertSessionHas('success');
+        $response = $this->delete("/api/v2/groups/{$group->idgroups}/volunteers/{$restarter->id}?api_token=" . $host->api_token);
+        $response->assertSuccessful();
 
         $eventData = Party::factory()->raw([
                                                     'group' => $group->idgroups,

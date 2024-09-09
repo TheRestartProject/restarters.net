@@ -49,10 +49,13 @@ export default {
       user: null,
       fullName: null,
       volunteerEmailAddress: null,
-      groupVolunteers: []
+      groupId: null,
     }
   },
   computed: {
+    groupVolunteers() {
+      return this.groupId ? this.$store.getters['volunteers/byGroup'](this.groupId) : []
+    },
     options() {
       const ret = [
         {
@@ -63,7 +66,7 @@ export default {
 
       this.groupVolunteers.forEach((v) => {
         ret.push({
-          value: v.id,
+          value: v.user,
           text: v.name
         })
       })
@@ -110,14 +113,12 @@ export default {
   methods: {
     async show() {
       // Get the list of volunteers.
-      // TODO We don't handle failures very well.  One way to do this is to move the axios requests into store actions,
-      // which we will do at some point, and then have a generic "something went wrong" popup to alert the user, as
-      // well as Sentry to alert us.
-      const ret = await axios.get('/api/groups/' + this.event.group.idgroups + '/volunteers?api_token=' + this.apiToken)
+      const event = await this.$store.dispatch('events/fetch', {
+        id: this.idevents
+      })
 
-      if (ret && ret.data) {
-        this.groupVolunteers = ret.data
-      }
+      this.groupId = event.group.id
+      await this.$store.dispatch('volunteers/fetchGroup', this.groupId)
 
       this.showModal = true
     },
