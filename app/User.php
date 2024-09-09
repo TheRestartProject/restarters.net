@@ -135,6 +135,7 @@ class User extends Authenticatable implements Auditable, HasLocalePreference
             $join->on('group_tag', '=', DB::raw(GroupTags::INACTIVE));
         })->where(function ($q) {
             $q->whereNull('grouptags_groups.id');
+            $q->whereNull('archived_at');
 
             // Only show approved groups.
             $q->where('approved', true);

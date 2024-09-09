@@ -41,6 +41,11 @@ class EditWordpressPostForGroup extends BaseEvent
             return;
         }
 
+        if ($group->group->archived_at) {
+            // Suppress notifications for archived groups.
+            return;
+        }
+
         try {
             if (is_numeric($group->wordpress_post_id)) {
                 $custom_fields = [

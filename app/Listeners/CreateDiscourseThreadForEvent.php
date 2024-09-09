@@ -43,6 +43,11 @@ class CreateDiscourseThreadForEvent extends BaseEvent
             return;
         }
 
+        if ($theParty->group->archived_at) {
+            // Suppress notifications for archived groups.
+            return;
+        }
+
         // Get the user who created the event.
         $users = EventsUsers::where('event', $partyId)->get();
 
