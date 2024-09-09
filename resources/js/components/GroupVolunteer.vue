@@ -2,7 +2,7 @@
   <div>
     <div class="pt-2 pb-2 blackbord d-flex justify-content-between">
       <div class="d-flex w-100">
-        <a :href="'/profile/' + volunteer.id">
+        <a :href="'/profile/' + volunteer.user">
           <b-img-lazy :src="profile" class="profile mr-2" rounded="circle" @error.native="brokenProfileImage" />
         </a>
         <div class="namewidth flex-grow-1">
@@ -13,14 +13,14 @@
             'd-flex': true,
             'flex-wrap': true
             }" :title="volunteer.name">
-            <span class="pr-1 overflow-hidden ellipsis">
+            <a :href="'/profile/' + volunteer.user" class="pr-1 overflow-hidden ellipsis text-black">
               {{ volunteer.name }}
-            </span>
+            </a>
               <span class="host" v-if="volunteer.host">
               {{ __('partials.host') }}
             </span>
             </div>
-            <div :id="'skills-' + volunteer.id" :class="{
+            <div :id="'skills-' + volunteer.user" :class="{
              'small': true,
              'd-flex': true,
              'clickme' : true,
