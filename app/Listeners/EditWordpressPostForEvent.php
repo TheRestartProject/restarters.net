@@ -44,7 +44,7 @@ class EditWordpressPostForEvent extends BaseEvent
             return;
         }
 
-        if ($theParty->group->archived_at) {
+        if ($theParty->theGroup->archived_at) {
             // Suppress notifications for archived groups.
             return;
         }

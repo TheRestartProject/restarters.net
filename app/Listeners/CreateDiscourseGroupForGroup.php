@@ -34,7 +34,7 @@ class CreateDiscourseGroupForGroup extends BaseEvent
             return;
         }
 
-        if ($event->group->archived_at) {
+        if ($event->theGroup->archived_at) {
             // Suppress notifications for archived groups.
             return;
         }

@@ -35,7 +35,7 @@ class DeleteEventFromWordPress extends BaseEvent
 
         $repairEvent = $event->repairEvent;
 
-        if ($repairEvent->group->archived_at) {
+        if ($repairEvent->theGroup->archived_at) {
             // Suppress notifications for archived groups.
             return;
         }

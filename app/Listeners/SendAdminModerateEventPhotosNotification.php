@@ -41,7 +41,7 @@ class SendAdminModerateEventPhotosNotification extends BaseEvent
         $this->event = $event;
         $this->party = $event->party;
 
-        if ($this->party->group->archived_at) {
+        if ($this->party->theGroup->archived_at) {
             // Suppress notifications for archived groups.
             return;
         }
