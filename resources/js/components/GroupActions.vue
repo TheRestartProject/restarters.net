@@ -32,7 +32,7 @@
         <b-dropdown-item v-if="canSeeDelete && !canPerformDelete" disabled>
           {{ __('groups.delete_group') }}
         </b-dropdown-item>
-        <b-dropdown-item @click="archiveGroup" v-if="canPerformArchive">
+        <b-dropdown-item @click="archiveGroup" v-if="canPerformArchive" :disabled="group.archived_at">
           {{ __('groups.archive_group') }}
         </b-dropdown-item>
       </b-dropdown>
@@ -116,10 +116,10 @@ export default {
       window.location = '/group/delete/' + this.idgroups
     },
     async archiveConfirmed() {
-      await this.$store.dispatch('groups/edit', {
-        id: this.idgroups,
-        archived_at: (new Date()).toISOString(),
-      })
+      const group = this.group
+      group.id = this.idgroups
+      group.archived_at = (new Date()).toISOString()
+      await this.$store.dispatch('groups/edit', group)
 
       await this.$store.dispatch('groups/fetch', {
         id: this.idgroups

@@ -244,7 +244,8 @@ export default {
       edited: false,
       networkList: null,
       tagList: null,
-      networkData: {}
+      networkData: {},
+      archived_at: null,
     }
   },
   validations: {
@@ -349,6 +350,7 @@ export default {
       this.networkList = group.networks
       this.tagList = group.tags
       this.networkData = group.network_data ? group.network_data : {}
+      this.archived_at = group.archived_at
     }
 
     if (this.canNetwork) {
@@ -417,7 +419,8 @@ export default {
                 moderate: this.moderate,
                 networks: JSON.stringify(this.networkList.map(n => n.id)),
                 tags: JSON.stringify(this.tagList.map(n => n.id)),
-                network_data: JSON.stringify(this.networkData)
+                network_data: JSON.stringify(this.networkData),
+                archived_at: this.archived_at,
               })
 
               if (id) {

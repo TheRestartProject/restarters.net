@@ -139,6 +139,8 @@ return [
   'edit_failed' => 'Group could not be edited.',
   'delete_group' => 'Delete group',
   'archive_group' => 'Archive group',
+  'archived_group' => 'Archived',
+  'archived_group_title' => 'This group was archived on :date.',
   'delete_group_confirm' => 'Please confirm that you want to delete :name.',
   'archive_group_confirm' => 'Please confirm that you want to archive :name.',
   'delete_succeeded' => 'Group <strong>:name</strong> has been deleted.',
