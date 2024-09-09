@@ -529,7 +529,5 @@ class APIv2GroupTest extends TestCase
         $json = json_decode($response->getContent(), true);
         $groups = $json['data'];
         $this->assertGroupFound($groups, $idgroups, false);
-
-        $this->assertTrue(false);
     }
 }
