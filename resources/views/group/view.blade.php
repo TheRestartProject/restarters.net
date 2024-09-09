@@ -45,6 +45,7 @@
           $can_edit_group = App\Helpers\Fixometer::hasRole($user, 'Administrator') || $isCoordinatorForGroup || $is_host_of_group;
           $can_see_delete = App\Helpers\Fixometer::hasRole($user, 'Administrator');
           $can_perform_delete = $can_see_delete && $group->canDelete();
+          $can_perform_archive = App\Helpers\Fixometer::hasRole($user, 'Administrator') || $isCoordinatorForGroup;
 
           $showCalendar = Auth::check() && (($group && $group->isVolunteer()) || App\Helpers\Fixometer::hasRole(Auth::user(), 'Administrator'));
 
@@ -151,6 +152,7 @@
               :canedit="{{ $can_edit_group ? 'true' : 'false' }}"
               :can-see-delete="{{ $can_see_delete ? 'true' : 'false' }}"
               :can-perform-delete="{{ $can_perform_delete ? 'true' : 'false' }}"
+              :can-perform-archive="{{ $can_perform_archive ? 'true' : 'false' }}"
               calendar-copy-url="{{ $showCalendar ? url("/calendar/group/{$group->idgroups}") : '' }}"
               calendar-edit-url="{{ $showCalendar ? url("/profile/edit/{$user->id}#list-calendar-links") : '' }}"
               :ingroup="{{ $in_group ? 'true' : 'false' }}"

@@ -32,6 +32,9 @@
         <b-dropdown-item v-if="canSeeDelete && !canPerformDelete" disabled>
           {{ __('groups.delete_group') }}
         </b-dropdown-item>
+        <b-dropdown-item @click="archiveGroup" v-if="canPerformArchive">
+          {{ __('groups.archive_group') }}
+        </b-dropdown-item>
       </b-dropdown>
     </div>
     <div v-else>
@@ -52,6 +55,9 @@
     </div>
     <ConfirmModal :key="'leavegroupmodal-' + idgroups" ref="confirmLeave" @confirm="leaveConfirmed" :message="__('groups.leave_group_confirm')" />
     <ConfirmModal :key="'deletegroupmodal-' + idgroups" ref="confirmDelete" @confirm="deleteConfirmed" :message="__('groups.delete_group_confirm', {
+      name: group.name
+    })" />
+    <ConfirmModal :key="'archivegroupmodal-' + idgroups" ref="confirmArchive" @confirm="archiveConfirmed" :message="__('groups.archive_group_confirm', {
       name: group.name
     })" />
   </div>
@@ -78,6 +84,11 @@ export default {
       required: false,
       default: false
     },
+    canPerformArchive: {
+      type: Boolean,
+      required: false,
+      default: false
+    },
   },
   computed: {
     group() {
@@ -98,8 +109,21 @@ export default {
     deleteGroup() {
       this.$refs.confirmDelete.show()
     },
+    archiveGroup() {
+      this.$refs.confirmArchive.show()
+    },
     async deleteConfirmed() {
       window.location = '/group/delete/' + this.idgroups
+    },
+    async archiveConfirmed() {
+      await this.$store.dispatch('groups/edit', {
+        id: this.idgroups,
+        archived_at: (new Date()).toISOString(),
+      })
+
+      await this.$store.dispatch('groups/fetch', {
+        id: this.idgroups
+      })
     }
   }
 }
