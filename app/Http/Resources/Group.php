@@ -253,7 +253,7 @@ use Illuminate\Http\Resources\Json\JsonResource;
  *          title="updated_at",
  *          description="The last change to this group.  This includes changes which affect the stats.",
  *          format="date-time",
- *     )
+ *     ),
  *     @OA\Property(
  *          property="archived_at",
  *          title="archived_at",
