@@ -72,6 +72,12 @@ import LangMixin from './mixins/lang'
 import { Lang } from './mixins/lang'
 Vue.mixin(LangMixin)
 
+const Icon = require('vue-awesome/components/Icon')
+require('vue-awesome/icons/sync')
+require('vue-awesome/icons/save')
+require('vue-awesome/icons/check')
+Vue.component('v-icon', Icon)
+
 window.Dropzone = require('dropzone');
 window.Tokenfield = require("tokenfield");
 
@@ -1293,7 +1299,6 @@ jQuery(document).ready(function () {
   // resources/js/components.  Lower level components can be included from within those as normal;
   // they don't need listing here.
   $(".vue").each(function(index) {
-    console.log('Create vue', $(this).get(0))
     new Vue({
       el: $(this).get(0),
       store: store,
