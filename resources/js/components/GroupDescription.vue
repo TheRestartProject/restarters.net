@@ -4,6 +4,7 @@
       {{ __('groups.about') }}
     </template>
     <template slot="content">
+      <GroupArchivedBadge :idgroups="idgroups" v-if="idgroups" />
       <div class="d-flex flex-column justify-content-between">
         <div>
           <p v-if="!group.free_text" class="text-muted">
@@ -43,9 +44,10 @@ import group from '../mixins/group'
 import ExternalLink from './ExternalLink'
 import CollapsibleSection from './CollapsibleSection'
 import ReadMore from './ReadMore'
+import GroupArchivedBadge from "./GroupArchivedBadge.vue";
 
 export default {
-  components: {ReadMore, CollapsibleSection, ExternalLink},
+  components: {GroupArchivedBadge, ReadMore, CollapsibleSection, ExternalLink},
   mixins: [ map, group ],
   props: {
     idgroups: {

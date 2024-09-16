@@ -67,7 +67,13 @@ use Illuminate\Http\Resources\Json\JsonResource;
  *          description="Indicates that this is a summary result, not full group information.",
  *          format="boolean",
  *          example="true"
- *     )
+ *     ),
+ *     @OA\Property(
+ *          property="archived_at",
+ *          title="archived_at",
+ *          description="If present, this group has been archived and is no longer active.",
+ *          format="date-time",
+ *     ),
  * )
  */
 
@@ -88,6 +94,7 @@ class GroupSummary extends JsonResource
             'location' => new GroupLocation($this),
             'networks' => new NetworkSummaryCollection($this->resource->networks),
             'updated_at' => Carbon::parse($this->updated_at)->toIso8601String(),
+            'archived_at' => $this->archived_at ? Carbon::parse($this->archived_at)->toIso8601String() : null,
             'summary' => true
         ];
 

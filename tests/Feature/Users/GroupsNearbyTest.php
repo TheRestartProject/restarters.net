@@ -90,19 +90,11 @@ class GroupsNearbyTest extends TestCase
 
     public function testInactive()
     {
-        // Add a group with a tag.
         $group = Group::factory()->create([
                                                    'latitude' => -12.0464,
                                                    'longitude' => -77.0428,
                                                    'approved' => true,
                                                ]);
-
-        $active = GroupTags::factory()->create([
-                                                          'id' => GroupTags::INACTIVE + 1,
-                                                          'tag_name' => 'Not Inactive',
-                                                      ]);
-
-        $group->addTag($active);
 
         // Should find it nearby.
         $user = User::factory()->create([
@@ -112,13 +104,9 @@ class GroupsNearbyTest extends TestCase
         $groups = $user->groupsNearby();
         $this->assertEquals(1, count($groups));
 
-        // Make the group inactive.
-        $inactive = GroupTags::factory()->create([
-                                                          'id' => GroupTags::INACTIVE,
-                                                          'tag_name' => 'Inactive',
-                                                      ]);
-
-        $group->addTag($inactive);
+        // Make the group inactive, i.e. archived.
+        $group->archived_at = Carbon::now();
+        $group->save();
 
         // Should no longer show up.
         $groups = $user->groupsNearby();

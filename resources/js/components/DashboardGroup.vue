@@ -5,6 +5,7 @@
         <b-img-lazy :src="groupImage" class="profile mr-2" @error.native="brokenProfileImage" />
         <div class="d-flex flex-column justify-content-center">
           <a :href="'/group/view/' + group.idgroups">{{ group.name }}</a>
+          <GroupArchivedBadge :idgroups="group.idgroups" />
         </div>
       </div>
       <div>
@@ -18,8 +19,10 @@
 </template>
 <script>
 import { DEFAULT_PROFILE } from '../constants'
+import GroupArchivedBadge from "./GroupArchivedBadge.vue";
 
 export default {
+  components: {GroupArchivedBadge},
   props: {
     group: {
       type: Object,

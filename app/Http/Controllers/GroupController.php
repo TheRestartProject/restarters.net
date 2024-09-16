@@ -35,6 +35,7 @@ use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Log;
 use Notification;
 use Spatie\ValidationRules\Rules\Delimited;
+use Carbon\Carbon;
 
 class GroupController extends Controller
 {
@@ -530,6 +531,7 @@ class GroupController extends Controller
                     'group_tags' => $group->group_tags()->get()->pluck('id'),
                     'following' => in_array($group->idgroups, $your_groupids),
                     'nearby' => in_array($group->idgroups, $nearby_groupids),
+                    'archived_at' => $group->archived_at ? Carbon::parse($group->archived_at)->toIso8601String() : null
                 ];
             }
         }
