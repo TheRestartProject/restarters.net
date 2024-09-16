@@ -115,5 +115,12 @@ Route::prefix('v2')->group(function() {
             Route::put('/', [API\AlertController::class, 'addAlertv2']);
             Route::patch('/{id}', [API\AlertController::class, 'updateAlertv2']);
         });
+
+        Route::prefix('/devices')->group(function() {
+            Route::get('{id}', [API\DeviceController::class, 'getDevicev2']);
+            Route::post('', [API\DeviceController::class, 'createDevicev2']);
+            Route::patch('{id}', [API\DeviceController::class, 'updateDevicev2']);
+            Route::delete('{id}', [API\DeviceController::class, 'deleteDevicev2']);
+        });
     });
 });

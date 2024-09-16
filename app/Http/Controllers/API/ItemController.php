@@ -20,7 +20,7 @@ class ItemController extends Controller
      *      path="/api/v2/items",
      *      operationId="listItemsv2",
      *      tags={"Items"},
-     *      summary="Get list of items",
+     *      summary="Get suggested list of items which could be used in a Device.",
      *      @OA\Response(
      *          response=200,
      *          description="Successful operation",

@@ -22,9 +22,9 @@
         <template slot="cell(device_category.name)" slot-scope="data">
           {{ __('strings.' + data.item.category.name) }}
         </template>
-        <template slot="cell(shortProblem)" slot-scope="data">
+        <template slot="cell(short_problem)" slot-scope="data">
           <div v-line-clamp="3">
-            {{ data.item.shortProblem }}
+            {{ data.item.short_problem }}
           </div>
         </template>
         <template slot="cell(brand)" slot-scope="data">
@@ -48,7 +48,7 @@
             {{ showStatus(data) }}
           </div>
         </template>
-        <template slot="cell(device_event.event_start_utc)" slot-scope="data">
+        <template slot="cell(created_at)" slot-scope="data">
           {{ formatDate(data) }}
         </template>
         <template slot="cell(show_details)" slot-scope="row">
@@ -56,7 +56,7 @@
             <span class="pl-0 pl-md-2 pr-2 clickme" @click="row.toggleDetails">
               <b-img class="icon" src="/icons/edit_ico_green.svg" />
             </span>
-            <ConfirmModal :key="'modal-' + row.item.iddevices" ref="confirmDelete" @confirm="deleteConfirmed(row.item)" :message="__('devices.confirm_delete')" />
+            <ConfirmModal :key="'modal-' + row.item.id" ref="confirmDelete" @confirm="deleteConfirmed(row.item)" :message="__('devices.confirm_delete')" />
           </div>
           <div v-else class="text-md-right">
             <span class="pl-0 pl-md-2 pr-2 clickme" @click="row.toggleDetails">
@@ -72,7 +72,7 @@
               :edit="isAdmin"
               :delete-button="true"
               :clusters="clusters"
-              :idevents="row.item.event"
+              :eventid="row.item.event"
               :brands="brands"
               :barrier-list="barrierList"
               :cancel-button="false"
@@ -219,8 +219,8 @@ export default {
         ret.push({key: 'brand', label: this.__('devices.brand'), sortable: true, thClass: 'd-none d-md-table-cell', tdClass: 'd-none d-md-table-cell'})
       }
 
-      ret.push({key: 'shortProblem', label: this.__('devices.assessment'), thClass: 'width10 d-none d-md-table-cell', tdClass: 'width10 d-none d-md-table-cell'})
-      ret.push({key: 'device_event.the_group.name', label: this.__('devices.group'), sortable: true, thClass: 'd-none d-md-table-cell', tdClass: 'd-none d-md-table-cell'})
+      ret.push({key: 'short_problem', label: this.__('devices.assessment'), thClass: 'width10 d-none d-md-table-cell', tdClass: 'width10 d-none d-md-table-cell'})
+      ret.push({key: 'groupname', label: this.__('devices.group'), sortable: true, thClass: 'd-none d-md-table-cell', tdClass: 'd-none d-md-table-cell'})
       ret.push({
         key: 'repair_status',
         label: this.__('devices.status'),
@@ -229,7 +229,7 @@ export default {
         sortable: true
       })
       ret.push({
-        key: 'device_event.event_date',
+        key: 'created_at',
         label: this.__('devices.devices_date'),
         thClass: 'width90px',
         tdClass: 'width90px',
@@ -299,14 +299,6 @@ export default {
       let sortBy = 'event_start_utc'
       let sortDesc = ctx.sortBy ? (ctx.sortDesc ? 'DESC' : 'ASC') : 'DESC'
 
-      if (ctx.sortBy) {
-        // We have to munge what the table gives us a bit to match what the server can query.
-        sortBy = ctx.sortBy
-            .replace('device_event.the_group.', 'groups.')
-            .replace('device_event.', 'events.')
-            .replace('device_category.', 'categories.')
-      }
-
       axios.get('/api/devices/' + ctx.currentPage + '/' + ctx.perPage, {
         params: {
           sortBy: sortBy,
@@ -338,10 +330,8 @@ export default {
               await this.$store.dispatch('devices/clear')
 
               ret.data.items.forEach(item => {
-                item.idevents = item.event
-
-                this.$store.dispatch('devices/set', {
-                  idevents: item.event,
+                this.$store.dispatch('devices/setForEvent', {
+                  eventid: item.eventid,
                   devices: [ item ]
                 })
               })
@@ -380,17 +370,14 @@ export default {
       }
     },
     formatDate (data) {
-      return new moment(data.item.device_event.event_start_utc).format('DD/MM/YYYY')
+      return new moment(data.item.created_at).format('DD/MM/YYYY')
     },
     deleteConfirm() {
       this.$refs.confirmDelete.show()
     },
     async deleteConfirmed(device) {
       console.log("Delete", device)
-      await this.$store.dispatch('devices/delete', {
-        iddevices: device.iddevices,
-        idevents: device.event
-      })
+      await this.$store.dispatch('devices/delete', device.id)
 
       this.$root.$emit('bv::refresh::table', this.tableId)
     },
