@@ -135,14 +135,16 @@ export default {
         }, this.minimumSpinTime)
       })
     },
-    finishSpinner() {
+    finishSpinner(success) {
       clearTimeout(this.timer)
       this.cancelLoading().then(() => {
-        if (this.doneIcon) {
+        if (success && this.doneIcon) {
           this.done = true
           setTimeout(() => {
             this.done = false
           }, this.timeout)
+        } else {
+          this.done = false
         }
       })
     },
@@ -164,7 +166,7 @@ export default {
         this.done = false
         this.loading = true
         this.$emit('handle', this.finishSpinner)
-        this.timer = setTimeout(forgottenCallback, 20 * 1000)
+        this.timer = setTimeout(this.forgottenCallback, 20 * 1000)
       }
     }
   },

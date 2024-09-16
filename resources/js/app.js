@@ -1299,7 +1299,6 @@ jQuery(document).ready(function () {
   // resources/js/components.  Lower level components can be included from within those as normal;
   // they don't need listing here.
   $(".vue").each(function(index) {
-    console.log('Create vue', $(this).get(0))
     new Vue({
       el: $(this).get(0),
       store: store,

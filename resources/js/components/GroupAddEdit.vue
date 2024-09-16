@@ -374,6 +374,7 @@ export default {
       // this page and the subcomponents have form inputs with suitable names.
       this.failed = false
       this.edited = false
+      let success = false
 
       this.$v.$touch()
 
@@ -401,6 +402,7 @@ export default {
             if (id) {
               // Success.  Go to the edit page.
               window.location = '/group/edit/' + id
+              success = true
             } else {
               this.failed = true
             }
@@ -432,6 +434,7 @@ export default {
                 // group approval status might not have been updated yet.  Handle this locally.
                 this.approved = this.approved || this.moderate === 'approve'
                 this.edited = true
+                success = true
               } else {
                 this.failed = true
               }
@@ -440,7 +443,7 @@ export default {
         }
       }
 
-      callback()
+      callback(success)
     }
   }
 }

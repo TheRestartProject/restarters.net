@@ -339,12 +339,11 @@ export default {
     async submit(callback) {
       // Check the form is valid.
       this.$v.$touch()
+      let success = false
 
       if (this.$v.$invalid) {
         // It's not - prevent the submit.
-        console.log("Not valid", this.$v)
-        e.preventDefault()
-
+        console.log("Not valid event", this.$v)
         this.validationFocusFirstError()
       } else {
         if (this.creating) {
@@ -364,6 +363,7 @@ export default {
           if (id) {
             // Success.  Emitting this event will cause the parent to re-render us in the edit view
             this.$emit('created', id)
+            success = true
           } else {
             this.failed = true
           }
@@ -399,6 +399,8 @@ export default {
               if (this.moderate == 'approve') {
                 this.eventApproved = true
               }
+
+              success = true
             } else {
               this.failed = true
             }
@@ -406,7 +408,7 @@ export default {
         }
       }
 
-      callback()
+      callback(success)
     }
   }
 }
