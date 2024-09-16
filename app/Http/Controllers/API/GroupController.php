@@ -238,12 +238,26 @@ class GroupController extends Controller
      *              @OA\Property(
      *                property="data",
      *                title="data",
-     *                description="An array of group names",
+     *                description="An array of basic group info",
      *                type="array",
      *                @OA\Items(
      *                   type="object",
      *                   @OA\Property(property="id", type="integer", example=1),
      *                   @OA\Property(property="name", type="string", example="Group Name"),
+     *                   @OA\Property(
+     *                     property="lat",
+     *                     title="lat",
+     *                     description="Latitude of the group.",
+     *                     format="float",
+     *                     example="50.8113243"
+     *                  ),
+     *                  @OA\Property(
+     *                     property="lng",
+     *                     title="lng",
+     *                     description="Longitude of the group.",
+     *                     format="float",
+     *                     example="-1.0788839"
+     *                  ),
      *                )
      *             )
      *          )
@@ -252,14 +266,27 @@ class GroupController extends Controller
      */
 
     public static function listNamesv2(Request $request) {
-        // We only return the group id and name, for speed.
-        $groups = Group::select('idgroups', 'name')->get();
+        $request->validate([
+            'archived' => ['string', 'in:true,false'],
+        ]);
+
+        // We only return a small number of attributes, for speed.
+        $query = Group::select('idgroups', 'name', 'latitude', 'longitude', 'archived_at');
+
+        if (!$request->has('archived') || $request->get('archived') == 'false') {
+            $query = $query->whereNull('archived_at');
+        }
+
+        $groups = $query->get();
         $ret = [];
 
         foreach ($groups as $group) {
             $ret[] = [
                 'id' => $group->idgroups,
                 'name' => $group->name,
+                'lat' => $group->latitude,
+                'lng' => $group->longitude,
+                'archived_at' => $group->archived_at ? Carbon::parse($group->archived_at)->toIso8601String() : null
             ];
         }
 

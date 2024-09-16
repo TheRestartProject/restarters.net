@@ -42,41 +42,14 @@
           <b class="text-uppercase d-block d-lg-none">{{ __('groups.groups_title2_mobile') }}</b>
           <b class="text-uppercase d-none d-lg-block">{{ __('groups.groups_title2') }}</b>
         </template>
-        <div v-if="nearbyGroups.length">
-          <p class="mt-1">
-            {{ nearestGroups }}
-            <a href="/profile/edit" class="small">{{ __('groups.nearest_groups_change') }}</a>.
-          </p>
-          <GroupsTable
-              :groups="nearbyGroups"
-              class="mt-3"
-              :tab="currentTab"
-              @all="currentTab = 2"
-              your-area="yourArea"
-          />
-        </div>
-        <div v-else class="mt-2 mb-2 text-center">
-          <div v-if="yourArea" v-html="__('groups.no_groups_nearest_with_location')" />
-          <div v-else v-html="__('groups.no_groups_nearest_no_location')" />
-        </div>
+        TODO show something.
       </b-tab>
       <b-tab class="pt-2" lazy>
         <template slot="title">
           <b class="text-uppercase d-block d-md-none">{{ __('groups.all_groups_mobile') }}</b>
           <b class="text-uppercase d-none d-md-block">{{ __('groups.all_groups') }}</b>
         </template>
-        <GroupsTable
-            :groups="groups"
-            class="mt-3"
-            count
-            search
-            :networks="networks"
-            :network="network"
-            :all-group-tags="allGroupTags"
-            :show-tags="showTags"
-            :tab="currentTab"
-            your-area="yourArea"
-        />
+        <GroupMapAndList :initial-bounds="[ [ -62.26792262941758, -389.53125 ], [ 86.57422361983717, 389.53125 ] ]" />
       </b-tab>
     </b-tabs>
   </div>
@@ -84,9 +57,10 @@
 <script>
 import GroupsTable from './GroupsTable'
 import auth from '../mixins/auth'
+import GroupMapAndList from "./GroupMapAndList.vue";
 
 export default {
-  components: {GroupsTable},
+  components: {GroupMapAndList, GroupsTable},
   mixins: [ auth ],
   props: {
     network: {
@@ -98,11 +72,6 @@ export default {
       type: String,
       required: false,
       default: 'mine'
-    },
-    allGroups: {
-      type: Array,
-      required: false,
-      default: null
     },
     yourArea: {
       type: String,
@@ -151,13 +120,6 @@ export default {
         return g.following
       })
     },
-    nearbyGroups() {
-      return this.groups.filter(g => {
-        return g.nearby && !g.following
-      }).sort((a, b) => {
-        return a.distance - b.distance
-      })
-    },
     nearestGroups() {
       return this.$lang.get('groups.nearest_groups', {
         location: this.yourArea
@@ -187,14 +149,6 @@ export default {
     }
   },
   created() {
-    // Data is passed from the blade template to us via props.  We put it in the store for all components to use,
-    // and so that as/when it changes then reactivity updates all the views.
-    //
-    // Further down the line this may change so that the data is obtained via an AJAX call and perhaps SSR.
-    this.$store.dispatch('groups/setList', {
-      groups: Object.values(this.allGroups)
-    })
-
     // We have three tabs, and might be asked to start on a specific one.
     switch (this.tab) {
       case 'nearby':

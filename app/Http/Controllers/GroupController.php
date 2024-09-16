@@ -43,18 +43,13 @@ class GroupController extends Controller
         //Get current logged in user
         $user = Auth::user();
 
-        // Get all groups
-        $groups = Group::with(['networks'])
-            ->orderBy('name', 'ASC')
-            ->get();
-
         // Get all group tags
         $all_group_tags = GroupTags::all();
         $networks = Network::all();
 
         // Look for groups we have joined, not just been invited to.  We have to explicitly test on deleted_at because
         // the normal filtering out of soft deletes won't happen for joins.
-        $your_groups =array_column(Group::with(['networks'])
+        $your_groups = array_column(Group::with(['networks'])
             ->join('users_groups', 'users_groups.group', '=', 'groups.idgroups')
             ->leftJoin('events', 'events.group', '=', 'groups.idgroups')
             ->where('users_groups.user', $user->id)
@@ -65,11 +60,15 @@ class GroupController extends Controller
             ->get()
             ->toArray(), 'idgroups');
 
-        // We pass a high limit to the groups nearby; there is a distance limit which will normally kick in first.
-        $groups_near_you = array_column($user->groupsNearby(1000), 'idgroups');
+        // We only get your own groups.  If nearby or all groups are shown they'll be fetched over
+        // the API.  This keeps it quicker.
+        $groups = Group::with(['networks'])
+            ->whereIn('groups.idgroups', $your_groups)
+            ->orderBy('name', 'ASC')
+            ->get();
 
         return view('group.index', [
-            'groups' => GroupController::expandGroups($groups, $your_groups, $groups_near_you),
+            'groups' => GroupController::expandGroups($groups, $your_groups),
             'your_area' => $user->location,
             'tab' => $tab,
             'network' => $network,
@@ -483,7 +482,7 @@ class GroupController extends Controller
         }
     }
 
-    public static function expandGroups($groups, $your_groupids, $nearby_groupids)
+    public static function expandGroups($groups, $your_groupids)
     {
         $ret = [];
         $user = Auth::user();
@@ -529,7 +528,7 @@ class GroupController extends Controller
                     'networks' => \Illuminate\Support\Arr::pluck($group->networks, 'id'),
                     'group_tags' => $group->group_tags()->get()->pluck('id'),
                     'following' => in_array($group->idgroups, $your_groupids),
-                    'nearby' => in_array($group->idgroups, $nearby_groupids),
+                    'archived_at' => $group->archived_at ? Carbon::parse($group->archived_at)->toIso8601String() : null
                 ];
             }
         }

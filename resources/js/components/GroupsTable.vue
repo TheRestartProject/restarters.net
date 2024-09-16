@@ -36,6 +36,7 @@
       />
     </div>
     <hr class="d-block d-md-none" />
+    {{ itemsToShow.length }} of {{ items.length }} shown
     <b-table :fields="fields" :items="itemsToShow" sort-null-last thead-tr-class="d-none d-md-table-row" :sort-compare="sortCompare">
       <template slot="head(group_image)">
         <span />
@@ -54,7 +55,7 @@
         <b-img src="/icons/map_marker_ico.svg" class="mt-3 icon " />
       </template>
       <template slot="cell(location)" slot-scope="data">
-        <div class="d-none d-md-block">
+        <div class="d-none d-md-block" v-if="data.item.location && data.item.location.location">
           {{ data.item.location.location.location }} <span class="text-muted small" v-if="data.item.location.location.distance">{{ distance(data.item.location.location.distance )}}&nbsp;km</span>
           <br />
           <span class="small text-muted">{{ data.item.location.location.country }}</span>
