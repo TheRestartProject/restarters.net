@@ -8,11 +8,12 @@
         :bounds.sync="bounds"
         @groups="groupsChanged($event)"
     />
+    TODO Loading indicator
     <GroupsTable
-      :groups="groupsInBounds"
+      :groupids="groupidsInBounds"
       class="mt-3"
       count
-      v-if="groupsInBounds.length"
+      v-if="groupidsInBounds.length"
       your-area="yourArea"
     />
   </div>
@@ -56,26 +57,9 @@ export default {
       // TODO
       return []
     },
-    groupsInBounds() {
-      return this.$store.getters['groups/list'].filter(group => this.groupidsInBounds.includes(group.id))
-    },
   },
   mounted() {
     // The list of groups will be fetched within GroupMap, so no need to fetch it here.
-  },
-  watch: {
-    groupidsInBounds(newVal) {
-      // TODO Fetch all the groups.  This will be slow - we may need a better API.
-      console.log('Group ids in bounds changed', newVal)
-      newVal.forEach(groupid => {
-        if (!this.$store.getters['groups/get'](groupid)) {
-          console.log('Fetch', groupid)
-          this.$store.dispatch('groups/fetch', {
-            id: groupid
-          })
-        }
-      })
-    },
   },
   methods: {
     groupsChanged(groupids) {

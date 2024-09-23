@@ -63,7 +63,7 @@ export default {
   },
   mutations: {
     set(state, params) {
-      Vue.set(state.list, params.idgroups, params)
+      Vue.set(state.list, params.id, params)
     },
     setList(state, params) {
       let list = {}
@@ -132,9 +132,20 @@ export default {
         commit('setModerate', ret.data)
       }
     },
-    async list({commit}) {
-      let ret = await axios.get('/api/v2/groups/names?locale=' + getLocale())
-      if (ret && ret.data) {
+    async list({commit}, params) {
+      let url
+
+      if (params && params.details) {
+        // We want more details.
+        url = '/api/v2/groups/summary?locale=' + getLocale() + '&includeNextEvent=true&includeCounts=true'
+      } else {
+        // Just the name and lat/lng.
+        url = '/api/v2/groups/names?locale=' + getLocale()
+      }
+
+      let ret = await axios.get(url)
+
+      if (ret) {
         commit('setList', {
           groups: ret.data.data
         })

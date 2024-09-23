@@ -231,6 +231,15 @@ class GroupController extends Controller
      *      operationId="getGroupListv2",
      *      tags={"Groups"},
      *      summary="Get list of group names",
+     *      @OA\Parameter(
+     *          name="archived",
+     *          description="Include archived groups",
+     *          required=false,
+     *          in="path",
+     *          @OA\Schema(
+     *              type="boolean"
+     *          )
+     *      ),
      *      @OA\Response(
      *          response=200,
      *          description="Successful operation",
@@ -292,6 +301,77 @@ class GroupController extends Controller
 
         return [
             'data' => $ret
+        ];
+    }
+
+    /**
+     * @OA\Get(
+     *      path="/api/v2/groups/summary",
+     *      operationId="getGroupSummariesv2",
+     *      tags={"Groups"},
+     *      summary="Get list of groups with summary information",
+     *      @OA\Parameter(
+     *          name="archived",
+     *          description="Include archived groups",
+     *          required=false,
+     *          in="path",
+     *          @OA\Schema(
+     *              type="boolean"
+     *          )
+     *      ),
+     *      @OA\Parameter(
+     *          name="includeNextEvent",
+     *          description="Include the next event for the group.  This makes the call slower.  Default false.",
+     *          required=false,
+     *          in="query",
+     *          @OA\Schema(
+     *              type="boolean"
+     *          )
+     *      ),
+     *      @OA\Parameter(
+     *          name="includeCounts",
+     *          description="Include the counts of hosts and restarters.  This makes the call slower.  Default false.",
+     *          required=false,
+     *          in="query",
+     *          @OA\Schema(
+     *              type="boolean"
+     *          )
+     *      ),
+     *      @OA\Response(
+     *          response=200,
+     *          description="Successful operation",
+     *          @OA\JsonContent(
+     *              @OA\Property(
+     *                property="data",
+     *                title="data",
+     *                description="An array of events",
+     *                type="array",
+     *                @OA\Items(
+     *                    @OA\Schema(
+     *                       ref="#/components/schemas/GroupSummary"
+     *                    ),
+     *                 )
+     *              )
+     *          )
+     *       ),
+     *     )
+     */
+
+    public static function listSummaryv2(Request $request) {
+        $request->validate([
+            'archived' => ['string', 'in:true,false'],
+        ]);
+
+        $query = Group::all();
+
+        if (!$request->has('archived') || $request->get('archived') == 'false') {
+            $query = $query->whereNull('archived_at');
+        }
+
+        $groups = $query->all();
+
+        return [
+            'data' => \App\Http\Resources\GroupSummaryCollection::make($groups)
         ];
     }
 

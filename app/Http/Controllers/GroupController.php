@@ -60,15 +60,8 @@ class GroupController extends Controller
             ->get()
             ->toArray(), 'idgroups');
 
-        // We only get your own groups.  If nearby or all groups are shown they'll be fetched over
-        // the API.  This keeps it quicker.
-        $groups = Group::with(['networks'])
-            ->whereIn('groups.idgroups', $your_groups)
-            ->orderBy('name', 'ASC')
-            ->get();
-
         return view('group.index', [
-            'groups' => GroupController::expandGroups($groups, $your_groups),
+            'your_groups' => $your_groups,
             'your_area' => $user->location,
             'tab' => $tab,
             'network' => $network,

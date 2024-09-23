@@ -27,7 +27,7 @@
         <div class="pt-2 pb-2">
           <div v-if="yourGroups.length">
             <GroupsTable
-                :groups="yourGroups"
+                :groupids="yourGroups"
                 class="mt-3"
                 :tab="currentTab"
                 @nearest="currentTab = 1"
@@ -73,6 +73,10 @@ export default {
       required: false,
       default: 'mine'
     },
+    yourGroups: {
+      type: Array,
+      required: true
+    },
     yourArea: {
       type: String,
       required: false,
@@ -97,6 +101,7 @@ export default {
       type: Array,
       required: true
     },
+    // TODO Check whether all these parameters are now used or can be removed
     allGroupTags: {
       type: Array,
       required: true
@@ -115,11 +120,6 @@ export default {
         return a.name.localeCompare(b.name)
       }) : []
     },
-    yourGroups() {
-      return this.groups.filter(g => {
-        return g.following
-      })
-    },
     nearestGroups() {
       return this.$lang.get('groups.nearest_groups', {
         location: this.yourArea
@@ -127,25 +127,48 @@ export default {
     }
   },
   watch: {
-    currentTab(newVal) {
-      // We want to update the URL in the browser.  In a full app this would be done by the router, but hack it in
-      // here.
-      try {
-        let tag = '';
+    currentTab: {
+      handler: function (newVal) {
+        // We want to update the URL in the browser.  In a full app this would be done by the router, but hack it in
+        // here.
+        try {
+          let tag = '';
 
-        switch (newVal) {
-          case 1: tag = 'nearby'; break;
-          case 2: tag = 'all'; break;
-          default: tag = 'mine'; break;
-        }
+          switch (newVal) {
+            case 1:
+              tag = 'nearby';
+              break;
+            case 2:
+              tag = 'all';
+              break;
+            default:
+              tag = 'mine';
+              break;
+          }
 
-        if (!this.network) {
-          // If we are vieiwng a specific network, don't mess with the URL as it's confusing.
-          window.history.pushState(null, "Groups", "/group/" + tag);
+          if (!this.network) {
+            // If we are vieiwng a specific network, don't mess with the URL as it's confusing.
+            window.history.pushState(null, "Groups", "/group/" + tag);
+          }
+
+          // We want to make sure we have the groups in store.
+          // - For the Your or Nearby tabs, we list all the groups in summary form (which is quick) and
+          //   then in GroupsTable we will fetch any groups where we need to display the detail.
+          // - For the App groups tab, we list all the groups with full details (which is slow).  This is
+          //   because fetching each group individually via the API in GroupsTable would be much slower and
+          //   hit API throttling.
+          if (newVal == 2) {
+            this.$store.dispatch('groups/list', {
+              details: true
+            })
+          } else {
+            this.$store.dispatch('groups/list')
+          }
+        } catch (e) {
+          console.error("Failed to update URL")
         }
-      } catch (e) {
-        console.error("Failed to update URL")
-      }
+      },
+      immediate: true
     }
   },
   created() {

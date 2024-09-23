@@ -62,6 +62,18 @@ use Illuminate\Http\Resources\Json\JsonResource;
  *          ref="#/components/schemas/EventSummary"
  *     ),
  *     @OA\Property(
+ *         property="hosts",
+ *         title="hosts",
+ *         description="The number of hosts of this group (if requested via API call flag).",
+ *         type="number",
+ *     ),
+ *     @OA\Property(
+ *         property="restarters",
+ *         title="hosts",
+ *         description="The number of restarters in this group (if requested via API call flag).",
+ *         type="number",
+ *     ),
+ *     @OA\Property(
  *          property="summary",
  *          title="summary",
  *          description="Indicates that this is a summary result, not full group information.",
@@ -90,6 +102,11 @@ class GroupSummary extends JsonResource
             'updated_at' => Carbon::parse($this->updated_at)->toIso8601String(),
             'summary' => true
         ];
+
+        if ($request->get('includeCounts', false)) {
+            $ret['hosts'] = $this->resource->all_confirmed_hosts_count;
+            $ret['restarters'] = $this->resource->all_confirmed_restarters_count;
+        }
 
         if ($request->get('includeNextEvent', false)) {
             // Get next approved event for group.

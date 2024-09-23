@@ -85,13 +85,10 @@ export default {
   },
   created() {
     this.bounds = this.initialBounds
-    this.$store.dispatch('groups/list')
-  }
-  ,
+  },
   beforeUnmount() {
     this.destroyed = true
-  }
-  ,
+  },
   methods: {
     async ready() {
       const self = this
@@ -168,7 +165,10 @@ export default {
           // We need to update the parent about our zoom level and whether we are showing the posts or groups.
           this.bounds = this.mapObject.getBounds()
 
-          const groupsInBounds = this.allGroups.filter(group => this.bounds.contains(new L.LatLng(group.lat, group.lng)))
+          const groupsInBounds = this.allGroups.filter(group =>
+              group.location &&
+              (group.location.lat || group.location.lng) &&
+              this.bounds.contains(new L.LatLng(group.location.lat, group.location.lng)))
 
           this.$emit(
               'groups',
