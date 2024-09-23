@@ -163,12 +163,23 @@ export default {
       try {
         if (this.mapObject) {
           // We need to update the parent about our zoom level and whether we are showing the posts or groups.
-          this.bounds = this.mapObject.getBounds()
+          const bounds = this.mapObject.getBounds()
+          this.bounds = bounds
+          let groupsInBounds = []
 
-          const groupsInBounds = this.allGroups.filter(group =>
-              group.location &&
-              (group.location.lat || group.location.lng) &&
-              this.bounds.contains(new L.LatLng(group.location.lat, group.location.lng)))
+          if (this.bounds) {
+            groupsInBounds = this.allGroups.filter(function (group) {
+              // We might either have the group names format (lat/lng at the top level) or the group summary format
+              // (lat/lng in location).
+              if (group.location) {
+                return (group.location.lat || group.location.lng) &&
+                    bounds.contains(new L.LatLng(group.location.lat, group.location.lng))
+              } else {
+                return (group.lat || group.lng) &&
+                    bounds.contains(new L.LatLng(group.lat, group.lng))
+              }
+            })
+          }
 
           this.$emit(
               'groups',

@@ -42,7 +42,13 @@
           <b class="text-uppercase d-block d-lg-none">{{ __('groups.groups_title2_mobile') }}</b>
           <b class="text-uppercase d-none d-lg-block">{{ __('groups.groups_title2') }}</b>
         </template>
-        TODO show something.
+        <div v-if="nearbyGroups.length">
+          <GroupMapAndList :initial-bounds="nearbyGroups" />
+        </div>
+        <div v-else class="mt-2 mb-2 text-center">
+          <div v-if="yourArea" v-html="__('groups.no_groups_nearest_with_location')" />
+          <div v-else v-html="__('groups.no_groups_nearest_no_location')" />
+        </div>
       </b-tab>
       <b-tab class="pt-2" lazy>
         <template slot="title">
@@ -77,7 +83,21 @@ export default {
       type: Array,
       required: true
     },
+    nearbyGroups: {
+      type: Array,
+      required: true
+    },
     yourArea: {
+      type: String,
+      required: false,
+      default: null
+    },
+    yourLat: {
+      type: String,
+      required: false,
+      default: null
+    },
+    yourLng: {
       type: String,
       required: false,
       default: null

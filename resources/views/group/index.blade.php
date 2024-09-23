@@ -58,7 +58,10 @@
         <GroupsPage
           csrf="{{ csrf_token() }}"
           :your-groups="{{ json_encode($your_groups, JSON_INVALID_UTF8_IGNORE) }}"
+          :nearby-groups="{{ json_encode($nearby_groups, JSON_INVALID_UTF8_IGNORE) }}"
           your-area="{{ $your_area }}"
+          your-lat="{{ $your_lat }}"
+          your-lng="{{ $your_lng }}"
           :can-create="{{ $can_create ? 'true' : 'false' }}"
           :user-id="{{ $myid }}"
           tab="{{ $tab }}"

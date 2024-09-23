@@ -2,7 +2,7 @@
   <div v-if="loaded && groups.length">
     <h2 class="mt-4">{{ __('groups.groups_title_admin') }}</h2>
     <section class="table-section" id="groups-1">
-<!--      TODO-->
+      TODO
 <!--      <GroupsTable :groups="groups" approve />-->
     </section>
   </div>

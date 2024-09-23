@@ -60,9 +60,40 @@ class GroupController extends Controller
             ->get()
             ->toArray(), 'idgroups');
 
+        $nearby_groups = [];
+
+        if ($user->latitude || $user->longitude) {
+            // We pass a high limit to the groups nearby; there is a distance limit which will normally kick in first.
+            $nearby_groups = $user->groupsNearby(1000);
+
+            // Now find the lat/lng bounding box which contains these groups.
+            $min_lat = 90;
+            $max_lat = -90;
+            $min_lng = 180;
+            $max_lng = -180;
+
+            foreach ($nearby_groups as $group) {
+                if ($group->latitude < $min_lat) {
+                    $min_lat = $group->latitude;
+                }
+                if ($group->latitude > $max_lat) {
+                    $max_lat = $group->latitude;
+                }
+                if ($group->longitude < $min_lng) {
+                    $min_lng = $group->longitude;
+                }
+                if ($group->longitude > $max_lng) {
+                    $max_lng = $group->longitude;
+                }
+            }
+        }
+
         return view('group.index', [
             'your_groups' => $your_groups,
+            'nearby_groups' => [ [ $min_lat, $min_lng ], [ $max_lat, $max_lng ] ],
             'your_area' => $user->location,
+            'your_lat' => $user->latitude,
+            'your_lng' => $user->longitude,
             'tab' => $tab,
             'network' => $network,
             'networks' => $networks,
