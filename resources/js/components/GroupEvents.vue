@@ -3,22 +3,27 @@
     <AlertBanner v-if="banner" />
     <CollapsibleSection class="lineheight" collapsed :count="upcomingOrActive.length" count-badge :heading-level="headingLevel">
       <template slot="title">
-        <div class="d-flex justify-content-between w-100">
-        <div>
-          <span v-if="group">{{ group.name }}</span> {{ translatedTitle }}
-          <b-btn v-if="calendarCopyUrl" class="ml-2" variant="primary" @click="showCalendar">
-            <b-img-lazy src="/images/subs_cal_ico.svg" />
-          </b-btn>
-        </div>
+        <div class="d-flex flex-wrap flex-column flex-md-row">
+          <div v-if="group">{{ group.name }}</div> {{ translatedTitle }}
+          <div>
+            <b-btn v-if="calendarCopyUrl" class="ml-0 ml-md-2" variant="primary" @click="showCalendar">
+              <b-img-lazy src="/images/subs_cal_ico.svg" />
+            </b-btn>
+          </div>
         </div>
       </template>
       <template slot="title-right">
-        <div class="d-flex">
-          <b-btn variant="primary" :href="'/export/groups/' + idgroups + '/events'" class="align-self-center text-nowrap mr-2" v-if="addButton">
+        <div class="d-flex flex-wrap w-100 justify-content-end mt-1 mt-md-0">
+          <b-btn variant="primary" :href="'/export/groups/' + idgroups + '/events'" class="d-none d-md-block align-self-center text-nowrap mr-2" v-if="addButton">
             {{ __('groups.export_event_list') }}
           </b-btn>
-          <b-btn variant="primary" href="/party/create" class="align-self-center text-nowrap" v-if="addButton">
-            {{ __('events.add_new_event') }}
+          <b-btn variant="primary" href="/party/create" class="align-self-center text-nowrap mr-2 mr-md-0" v-if="addButton">
+            <span class="d-none d-md-block">
+              {{ __('events.add_new_event') }}
+            </span>
+            <span class="d-block d-md-none">
+              {{ __('dashboard.add_event') }}
+            </span>
           </b-btn>
         </div>
       </template>
