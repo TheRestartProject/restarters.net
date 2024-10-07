@@ -68,9 +68,9 @@ class Fixometer
         return $feature === true;
     }
 
-    public static function userHasViewPartyPermission($partyId, $userId = null)
+    public static function userHasViewPartyPermission($partyId, $userId = null, $party = null)
     {
-        $party = Party::findOrFail($partyId);
+        $party = $party ? $party : Party::findOrFail($partyId);
         $group = $party->theGroup;
 
         if ($group->approved) {
