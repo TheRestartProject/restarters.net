@@ -192,6 +192,23 @@ class APIv2GroupTest extends TestCase
         }
 
         $this->assertTrue($found);
+
+        // Group should now appear in the list of groups.
+        $response = $this->get('/api/v2/groups/summary');
+        $response->assertSuccessful();
+        $json = json_decode($response->getContent(), true);
+        $groups = $json['data'];
+        $found = false;
+
+        foreach ($groups as $g)
+        {
+            if ($group->name == $g['name'])
+            {
+                $found = true;
+            }
+        }
+
+        $this->assertTrue($found);
     }
 
     public function testCreateGroupGeocodeFailure()

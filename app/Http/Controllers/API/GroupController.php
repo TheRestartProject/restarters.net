@@ -231,6 +231,15 @@ class GroupController extends Controller
      *      operationId="getGroupListv2",
      *      tags={"Groups"},
      *      summary="Get list of group names",
+     *      @OA\Parameter(
+     *          name="archived",
+     *          description="Include archived groups",
+     *          required=false,
+     *          in="path",
+     *          @OA\Schema(
+     *              type="boolean"
+     *          )
+     *      ),
      *      @OA\Response(
      *          response=200,
      *          description="Successful operation",
@@ -238,12 +247,26 @@ class GroupController extends Controller
      *              @OA\Property(
      *                property="data",
      *                title="data",
-     *                description="An array of group names",
+     *                description="An array of basic group info",
      *                type="array",
      *                @OA\Items(
      *                   type="object",
      *                   @OA\Property(property="id", type="integer", example=1),
      *                   @OA\Property(property="name", type="string", example="Group Name"),
+     *                   @OA\Property(
+     *                     property="lat",
+     *                     title="lat",
+     *                     description="Latitude of the group.",
+     *                     format="float",
+     *                     example="50.8113243"
+     *                  ),
+     *                  @OA\Property(
+     *                     property="lng",
+     *                     title="lng",
+     *                     description="Longitude of the group.",
+     *                     format="float",
+     *                     example="-1.0788839"
+     *                  ),
      *                )
      *             )
      *          )
@@ -252,19 +275,103 @@ class GroupController extends Controller
      */
 
     public static function listNamesv2(Request $request) {
-        // We only return the group id and name, for speed.
-        $groups = Group::select('idgroups', 'name')->get();
+        $request->validate([
+            'archived' => ['string', 'in:true,false'],
+        ]);
+
+        // We only return a small number of attributes, for speed.
+        $query = Group::select('idgroups', 'name', 'latitude', 'longitude', 'archived_at');
+
+        if (!$request->has('archived') || $request->get('archived') == 'false') {
+            $query = $query->whereNull('archived_at');
+        }
+
+        $groups = $query->get();
         $ret = [];
 
         foreach ($groups as $group) {
             $ret[] = [
                 'id' => $group->idgroups,
                 'name' => $group->name,
+                'lat' => $group->latitude,
+                'lng' => $group->longitude,
+                'archived_at' => $group->archived_at ? Carbon::parse($group->archived_at)->toIso8601String() : null
             ];
         }
 
         return [
             'data' => $ret
+        ];
+    }
+
+    /**
+     * @OA\Get(
+     *      path="/api/v2/groups/summary",
+     *      operationId="getGroupSummariesv2",
+     *      tags={"Groups"},
+     *      summary="Get list of groups with summary information",
+     *      @OA\Parameter(
+     *          name="archived",
+     *          description="Include archived groups",
+     *          required=false,
+     *          in="path",
+     *          @OA\Schema(
+     *              type="boolean"
+     *          )
+     *      ),
+     *      @OA\Parameter(
+     *          name="includeNextEvent",
+     *          description="Include the next event for the group.  This makes the call slower.  Default false.",
+     *          required=false,
+     *          in="query",
+     *          @OA\Schema(
+     *              type="boolean"
+     *          )
+     *      ),
+     *      @OA\Parameter(
+     *          name="includeCounts",
+     *          description="Include the counts of hosts and restarters.  This makes the call slower.  Default false.",
+     *          required=false,
+     *          in="query",
+     *          @OA\Schema(
+     *              type="boolean"
+     *          )
+     *      ),
+     *      @OA\Response(
+     *          response=200,
+     *          description="Successful operation",
+     *          @OA\JsonContent(
+     *              @OA\Property(
+     *                property="data",
+     *                title="data",
+     *                description="An array of events",
+     *                type="array",
+     *                @OA\Items(
+     *                    @OA\Schema(
+     *                       ref="#/components/schemas/GroupSummary"
+     *                    ),
+     *                 )
+     *              )
+     *          )
+     *       ),
+     *     )
+     */
+
+    public static function listSummaryv2(Request $request) {
+        $request->validate([
+            'archived' => ['string', 'in:true,false'],
+        ]);
+
+        $query = Group::all();
+
+        if (!$request->has('archived') || $request->get('archived') == 'false') {
+            $query = $query->whereNull('archived_at');
+        }
+
+        $groups = $query->all();
+
+        return [
+            'data' => \App\Http\Resources\GroupSummaryCollection::make($groups)
         ];
     }
 

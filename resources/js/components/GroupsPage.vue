@@ -27,7 +27,7 @@
         <div class="pt-2 pb-2">
           <div v-if="yourGroups.length">
             <GroupsTable
-                :groups="yourGroups"
+                :groupids="yourGroups"
                 class="mt-3"
                 :tab="currentTab"
                 @nearest="currentTab = 1"
@@ -43,17 +43,7 @@
           <b class="text-uppercase d-none d-lg-block">{{ __('groups.groups_title2') }}</b>
         </template>
         <div v-if="nearbyGroups.length">
-          <p class="mt-1">
-            {{ nearestGroups }}
-            <a href="/profile/edit" class="small">{{ __('groups.nearest_groups_change') }}</a>.
-          </p>
-          <GroupsTable
-              :groups="nearbyGroups"
-              class="mt-3"
-              :tab="currentTab"
-              @all="currentTab = 2"
-              your-area="yourArea"
-          />
+          <GroupMapAndList :initial-bounds="nearbyGroups" />
         </div>
         <div v-else class="mt-2 mb-2 text-center">
           <div v-if="yourArea" v-html="__('groups.no_groups_nearest_with_location')" />
@@ -65,18 +55,7 @@
           <b class="text-uppercase d-block d-md-none">{{ __('groups.all_groups_mobile') }}</b>
           <b class="text-uppercase d-none d-md-block">{{ __('groups.all_groups') }}</b>
         </template>
-        <GroupsTable
-            :groups="groups"
-            class="mt-3"
-            count
-            search
-            :networks="networks"
-            :network="network"
-            :all-group-tags="allGroupTags"
-            :show-tags="showTags"
-            :tab="currentTab"
-            your-area="yourArea"
-        />
+        <GroupMapAndList :initial-bounds="[ [ -62.26792262941758, -389.53125 ], [ 86.57422361983717, 389.53125 ] ]" />
       </b-tab>
     </b-tabs>
   </div>
@@ -84,9 +63,10 @@
 <script>
 import GroupsTable from './GroupsTable'
 import auth from '../mixins/auth'
+import GroupMapAndList from "./GroupMapAndList.vue";
 
 export default {
-  components: {GroupsTable},
+  components: {GroupMapAndList, GroupsTable},
   mixins: [ auth ],
   props: {
     network: {
@@ -99,12 +79,25 @@ export default {
       required: false,
       default: 'mine'
     },
-    allGroups: {
+    yourGroups: {
       type: Array,
+      required: true
+    },
+    nearbyGroups: {
+      type: Array,
+      required: true
+    },
+    yourArea: {
+      type: String,
       required: false,
       default: null
     },
-    yourArea: {
+    yourLat: {
+      type: String,
+      required: false,
+      default: null
+    },
+    yourLng: {
       type: String,
       required: false,
       default: null
@@ -128,6 +121,7 @@ export default {
       type: Array,
       required: true
     },
+    // TODO Check whether all these parameters are now used or can be removed
     allGroupTags: {
       type: Array,
       required: true
@@ -146,18 +140,6 @@ export default {
         return a.name.localeCompare(b.name)
       }) : []
     },
-    yourGroups() {
-      return this.groups.filter(g => {
-        return g.following
-      })
-    },
-    nearbyGroups() {
-      return this.groups.filter(g => {
-        return g.nearby && !g.following
-      }).sort((a, b) => {
-        return a.distance - b.distance
-      })
-    },
     nearestGroups() {
       return this.$lang.get('groups.nearest_groups', {
         location: this.yourArea
@@ -165,36 +147,51 @@ export default {
     }
   },
   watch: {
-    currentTab(newVal) {
-      // We want to update the URL in the browser.  In a full app this would be done by the router, but hack it in
-      // here.
-      try {
-        let tag = '';
+    currentTab: {
+      handler: function (newVal) {
+        // We want to update the URL in the browser.  In a full app this would be done by the router, but hack it in
+        // here.
+        try {
+          let tag = '';
 
-        switch (newVal) {
-          case 1: tag = 'nearby'; break;
-          case 2: tag = 'all'; break;
-          default: tag = 'mine'; break;
-        }
+          switch (newVal) {
+            case 1:
+              tag = 'nearby';
+              break;
+            case 2:
+              tag = 'all';
+              break;
+            default:
+              tag = 'mine';
+              break;
+          }
 
-        if (!this.network) {
-          // If we are vieiwng a specific network, don't mess with the URL as it's confusing.
-          window.history.pushState(null, "Groups", "/group/" + tag);
+          if (!this.network) {
+            // If we are vieiwng a specific network, don't mess with the URL as it's confusing.
+            window.history.pushState(null, "Groups", "/group/" + tag);
+          }
+
+          // We want to make sure we have the groups in store.
+          // - For the Your or Nearby tabs, we list all the groups in summary form (which is quick) and
+          //   then in GroupsTable we will fetch any groups where we need to display the detail.
+          // - For the App groups tab, we list all the groups with full details (which is slow).  This is
+          //   because fetching each group individually via the API in GroupsTable would be much slower and
+          //   hit API throttling.
+          if (newVal == 2) {
+            this.$store.dispatch('groups/list', {
+              details: true
+            })
+          } else {
+            this.$store.dispatch('groups/list')
+          }
+        } catch (e) {
+          console.error("Failed to update URL")
         }
-      } catch (e) {
-        console.error("Failed to update URL")
-      }
+      },
+      immediate: true
     }
   },
   created() {
-    // Data is passed from the blade template to us via props.  We put it in the store for all components to use,
-    // and so that as/when it changes then reactivity updates all the views.
-    //
-    // Further down the line this may change so that the data is obtained via an AJAX call and perhaps SSR.
-    this.$store.dispatch('groups/setList', {
-      groups: Object.values(this.allGroups)
-    })
-
     // We have three tabs, and might be asked to start on a specific one.
     switch (this.tab) {
       case 'nearby':
