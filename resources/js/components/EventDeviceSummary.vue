@@ -23,7 +23,7 @@
       <b-td class="d-none d-md-table-cell" v-if="powered">
           {{ device.brand }}
       </b-td>
-      <b-td v-if="powered" class="d-td-cell d-md-none">
+      <b-td v-if="canedit && powered" class="d-td-cell d-md-none">
         <div>
           <span class="pl-0 pl-md-2 pr-4 clickme edit" @click="editDevice">
             <b-img class="icon edit" src="/icons/edit_ico_green.svg" />
@@ -33,7 +33,7 @@
           </span>
         </div>
       </b-td>
-      <b-td v-if="!powered" class="d-td-cell d-md-none">
+      <b-td v-if="canedit && !powered" class="d-td-cell d-md-none">
         <div>
           <span class="pl-0 pl-md-2 pr-2 clickme edit" @click="editDevice">
             <b-img class="icon" src="/icons/edit_ico_green.svg" />
