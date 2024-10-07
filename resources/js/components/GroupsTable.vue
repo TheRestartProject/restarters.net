@@ -79,7 +79,6 @@
 <script>
 import { DATE_FORMAT, DEFAULT_PROFILE } from '../constants'
 import moment from 'moment'
-import GroupsTableFilters from './GroupsTableFilters'
 import ConfirmModal from './ConfirmModal'
 import InfiniteLoading from 'vue-infinite-loading'
 
@@ -87,7 +86,6 @@ import InfiniteLoading from 'vue-infinite-loading'
 export default {
   components: {
     ConfirmModal,
-    GroupsTableFilters,
     InfiniteLoading
   },
   props: {
