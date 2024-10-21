@@ -9,7 +9,7 @@
       'justify-content-between': true,
       }" @click="toggle">
       <div class="d-flex w-100 justify-content-between align-items-center">
-        <div class="d-flex flex-row w-100">
+        <div class="d-flex flex-row flex-wrap w-100">
           <div class="d-flex flex-column justify-content-center">
             <slot name="title" />
           </div>
