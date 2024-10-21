@@ -63,17 +63,6 @@ class SerializableClosure
     }
 
     /**
-     * Create a new unsigned serializable closure instance.
-     *
-     * @param  Closure  $closure
-     * @return \Laravel\SerializableClosure\UnsignedSerializableClosure
-     */
-    public static function unsigned(Closure $closure)
-    {
-        return new UnsignedSerializableClosure($closure);
-    }
-
-    /**
      * Sets the serializable closure secret key.
      *
      * @param  string|null  $secret

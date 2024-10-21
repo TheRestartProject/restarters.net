@@ -4,10 +4,11 @@ var utils = require('./../utils');
 var transformData = require('./transformData');
 var isCancel = require('../cancel/isCancel');
 var defaults = require('../defaults');
-var Cancel = require('../cancel/Cancel');
+var CanceledError = require('../cancel/CanceledError');
+var normalizeHeaderName = require('../helpers/normalizeHeaderName');
 
 /**
- * Throws a `Cancel` if cancellation has been requested.
+ * Throws a `CanceledError` if cancellation has been requested.
  */
 function throwIfCancellationRequested(config) {
   if (config.cancelToken) {
@@ -15,7 +16,7 @@ function throwIfCancellationRequested(config) {
   }
 
   if (config.signal && config.signal.aborted) {
-    throw new Cancel('canceled');
+    throw new CanceledError();
   }
 }
 
@@ -36,8 +37,12 @@ module.exports = function dispatchRequest(config) {
     config,
     config.data,
     config.headers,
+    null,
     config.transformRequest
   );
+
+  normalizeHeaderName(config.headers, 'Accept');
+  normalizeHeaderName(config.headers, 'Content-Type');
 
   // Flatten headers
   config.headers = utils.merge(
@@ -63,6 +68,7 @@ module.exports = function dispatchRequest(config) {
       config,
       response.data,
       response.headers,
+      response.status,
       config.transformResponse
     );
 
@@ -77,6 +83,7 @@ module.exports = function dispatchRequest(config) {
           config,
           reason.response.data,
           reason.response.headers,
+          reason.response.status,
           config.transformResponse
         );
       }

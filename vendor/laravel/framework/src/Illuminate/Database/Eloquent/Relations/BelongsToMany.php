@@ -688,8 +688,8 @@ class BelongsToMany extends Relation
             return $this->getRelated()->newCollection();
         }
 
-        return $this->whereKey(
-            $this->parseIds($ids)
+        return $this->whereIn(
+            $this->getRelated()->getQualifiedKeyName(), $this->parseIds($ids)
         )->get($columns);
     }
 
@@ -1153,6 +1153,8 @@ class BelongsToMany extends Relation
      */
     public function touch()
     {
+        $key = $this->getRelated()->getKeyName();
+
         $columns = [
             $this->related->getUpdatedAtColumn() => $this->related->freshTimestampString(),
         ];
@@ -1161,7 +1163,7 @@ class BelongsToMany extends Relation
         // the related model's timestamps, to make sure these all reflect the changes
         // to the parent models. This will help us keep any caching synced up here.
         if (count($ids = $this->allRelatedIds()) > 0) {
-            $this->getRelated()->newQueryWithoutRelationships()->whereKey($ids)->update($columns);
+            $this->getRelated()->newQueryWithoutRelationships()->whereIn($key, $ids)->update($columns);
         }
     }
 

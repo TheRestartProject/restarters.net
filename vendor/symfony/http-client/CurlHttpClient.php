@@ -197,14 +197,8 @@ final class CurlHttpClient implements HttpClientInterface, LoggerAwareInterface,
         if (\extension_loaded('zlib') && !isset($options['normalized_headers']['accept-encoding'])) {
             $options['headers'][] = 'Accept-Encoding: gzip'; // Expose only one encoding, some servers mess up when more are provided
         }
-        $body = $options['body'];
 
-        foreach ($options['headers'] as $i => $header) {
-            if (\is_string($body) && '' !== $body && 0 === stripos($header, 'Content-Length: ')) {
-                // Let curl handle Content-Length headers
-                unset($options['headers'][$i]);
-                continue;
-            }
+        foreach ($options['headers'] as $header) {
             if (':' === $header[-2] && \strlen($header) - 2 === strpos($header, ': ')) {
                 // curl requires a special syntax to send empty headers
                 $curlopts[\CURLOPT_HTTPHEADER][] = substr_replace($header, ';', -2);
@@ -220,7 +214,7 @@ final class CurlHttpClient implements HttpClientInterface, LoggerAwareInterface,
             }
         }
 
-        if (!\is_string($body)) {
+        if (!\is_string($body = $options['body'])) {
             if (\is_resource($body)) {
                 $curlopts[\CURLOPT_INFILE] = $body;
             } else {
@@ -232,16 +226,15 @@ final class CurlHttpClient implements HttpClientInterface, LoggerAwareInterface,
             }
 
             if (isset($options['normalized_headers']['content-length'][0])) {
-                $curlopts[\CURLOPT_INFILESIZE] = (int) substr($options['normalized_headers']['content-length'][0], \strlen('Content-Length: '));
-            }
-            if (!isset($options['normalized_headers']['transfer-encoding'])) {
-                $curlopts[\CURLOPT_HTTPHEADER][] = 'Transfer-Encoding:'.(isset($curlopts[\CURLOPT_INFILESIZE]) ? '' : ' chunked');
+                $curlopts[\CURLOPT_INFILESIZE] = substr($options['normalized_headers']['content-length'][0], \strlen('Content-Length: '));
+            } elseif (!isset($options['normalized_headers']['transfer-encoding'])) {
+                $curlopts[\CURLOPT_HTTPHEADER][] = 'Transfer-Encoding: chunked'; // Enable chunked request bodies
             }
 
             if ('POST' !== $method) {
                 $curlopts[\CURLOPT_UPLOAD] = true;
 
-                if (!isset($options['normalized_headers']['content-type']) && 0 !== ($curlopts[\CURLOPT_INFILESIZE] ?? null)) {
+                if (!isset($options['normalized_headers']['content-type'])) {
                     $curlopts[\CURLOPT_HTTPHEADER][] = 'Content-Type: application/x-www-form-urlencoded';
                 }
             }

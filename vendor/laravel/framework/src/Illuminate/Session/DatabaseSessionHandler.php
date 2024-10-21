@@ -242,7 +242,7 @@ class DatabaseSessionHandler implements ExistenceAwareInterface, SessionHandlerI
     /**
      * Get the IP address for the current request.
      *
-     * @return string|null
+     * @return string
      */
     protected function ipAddress()
     {

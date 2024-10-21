@@ -3,7 +3,7 @@
 /*
  * This file is part of Psy Shell.
  *
- * (c) 2012-2023 Justin Hileman
+ * (c) 2012-2022 Justin Hileman
  *
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
@@ -63,7 +63,7 @@ class SignatureFormatter implements ReflectorFormatter
     /**
      * Print the signature name.
      *
-     * @param \ReflectionClass|ReflectionClassConstant|\ReflectionClassConstant|\ReflectionFunctionAbstract $reflector
+     * @param \Reflector $reflector
      *
      * @return string Formatted name
      */
@@ -75,7 +75,7 @@ class SignatureFormatter implements ReflectorFormatter
     /**
      * Print the method, property or class modifiers.
      *
-     * @param \ReflectionMethod|\ReflectionProperty|\ReflectionClass $reflector
+     * @param \Reflector $reflector
      *
      * @return string Formatted modifiers
      */
@@ -173,6 +173,8 @@ class SignatureFormatter implements ReflectorFormatter
      * Helper for getting output style for a given value's type.
      *
      * @param mixed $value
+     *
+     * @return string
      */
     private static function getTypeStyle($value): string
     {
@@ -322,6 +324,8 @@ class SignatureFormatter implements ReflectorFormatter
      * Print function param or return type(s).
      *
      * @param \ReflectionType $type
+     *
+     * @return string
      */
     private static function formatReflectionType(\ReflectionType $type = null): string
     {

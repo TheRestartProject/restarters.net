@@ -3,7 +3,7 @@
 /*
  * This file is part of Psy Shell.
  *
- * (c) 2012-2023 Justin Hileman
+ * (c) 2012-2022 Justin Hileman
  *
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
@@ -90,6 +90,8 @@ class Presenter
      * Present a reference to the value.
      *
      * @param mixed $value
+     *
+     * @return string
      */
     public function presentRef($value): string
     {
@@ -104,6 +106,8 @@ class Presenter
      * @param mixed $value
      * @param int   $depth   (default: null)
      * @param int   $options One of Presenter constants
+     *
+     * @return string
      */
     public function present($value, int $depth = null, int $options = 0): string
     {

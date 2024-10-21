@@ -12,7 +12,7 @@ class AsStringable implements Castable
      * Get the caster class to use when casting from / to this cast target.
      *
      * @param  array  $arguments
-     * @return CastsAttributes<\Illuminate\Support\Stringable, string|\Stringable>
+     * @return object|string
      */
     public static function castUsing(array $arguments)
     {

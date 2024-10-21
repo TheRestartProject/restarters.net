@@ -2498,7 +2498,7 @@ class Builder implements BuilderContract
     /**
      * Lock the selected rows in the table for updating.
      *
-     * @return $this
+     * @return \Illuminate\Database\Query\Builder
      */
     public function lockForUpdate()
     {
@@ -2508,7 +2508,7 @@ class Builder implements BuilderContract
     /**
      * Share lock the selected rows in the table.
      *
-     * @return $this
+     * @return \Illuminate\Database\Query\Builder
      */
     public function sharedLock()
     {

@@ -54,6 +54,6 @@ class Pipeline extends BasePipeline
             $response->withException($e);
         }
 
-        return $this->handleCarry($response);
+        return $response;
     }
 }

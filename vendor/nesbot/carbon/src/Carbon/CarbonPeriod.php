@@ -256,13 +256,6 @@ class CarbonPeriod implements Iterator, Countable, JsonSerializable
     protected $dateInterval;
 
     /**
-     * True once __construct is finished.
-     *
-     * @var bool
-     */
-    protected $constructed = false;
-
-    /**
      * Whether current date interval was set by default.
      *
      * @var bool
@@ -702,8 +695,6 @@ class CarbonPeriod implements Iterator, Countable, JsonSerializable
         if ($this->options === null) {
             $this->setOptions(0);
         }
-
-        $this->constructed = true;
     }
 
     /**
@@ -714,17 +705,6 @@ class CarbonPeriod implements Iterator, Countable, JsonSerializable
     public function copy()
     {
         return clone $this;
-    }
-
-    /**
-     * Prepare the instance to be set (self if mutable to be mutated,
-     * copy if immutable to generate a new instance).
-     *
-     * @return static
-     */
-    protected function copyIfImmutable()
-    {
-        return $this;
     }
 
     /**
@@ -818,7 +798,7 @@ class CarbonPeriod implements Iterator, Countable, JsonSerializable
      *
      * @param string $dateClass
      *
-     * @return static
+     * @return $this
      */
     public function setDateClass(string $dateClass)
     {
@@ -826,16 +806,15 @@ class CarbonPeriod implements Iterator, Countable, JsonSerializable
             throw new NotACarbonClassException($dateClass);
         }
 
-        $self = $this->copyIfImmutable();
-        $self->dateClass = $dateClass;
+        $this->dateClass = $dateClass;
 
         if (is_a($dateClass, Carbon::class, true)) {
-            $self->options = $self->options & ~static::IMMUTABLE;
+            $this->toggleOptions(static::IMMUTABLE, false);
         } elseif (is_a($dateClass, CarbonImmutable::class, true)) {
-            $self->options = $self->options | static::IMMUTABLE;
+            $this->toggleOptions(static::IMMUTABLE, true);
         }
 
-        return $self;
+        return $this;
     }
 
     /**
@@ -855,7 +834,7 @@ class CarbonPeriod implements Iterator, Countable, JsonSerializable
      *
      * @throws InvalidIntervalException
      *
-     * @return static
+     * @return $this
      */
     public function setDateInterval($interval)
     {
@@ -867,24 +846,25 @@ class CarbonPeriod implements Iterator, Countable, JsonSerializable
             throw new InvalidIntervalException('Empty interval is not accepted.');
         }
 
-        $self = $this->copyIfImmutable();
-        $self->dateInterval = $interval;
+        $this->dateInterval = $interval;
 
-        $self->isDefaultInterval = false;
+        $this->isDefaultInterval = false;
 
-        $self->handleChangedParameters();
+        $this->handleChangedParameters();
 
-        return $self;
+        return $this;
     }
 
     /**
      * Invert the period date interval.
      *
-     * @return static
+     * @return $this
      */
     public function invertDateInterval()
     {
-        return $this->setDateInterval($this->dateInterval->invert());
+        $interval = $this->dateInterval->invert();
+
+        return $this->setDateInterval($interval);
     }
 
     /**
@@ -893,11 +873,14 @@ class CarbonPeriod implements Iterator, Countable, JsonSerializable
      * @param DateTime|DateTimeInterface|string      $start
      * @param DateTime|DateTimeInterface|string|null $end
      *
-     * @return static
+     * @return $this
      */
     public function setDates($start, $end)
     {
-        return $this->setStartDate($start)->setEndDate($end);
+        $this->setStartDate($start);
+        $this->setEndDate($end);
+
+        return $this;
     }
 
     /**
@@ -907,7 +890,7 @@ class CarbonPeriod implements Iterator, Countable, JsonSerializable
      *
      * @throws InvalidArgumentException
      *
-     * @return static
+     * @return $this
      */
     public function setOptions($options)
     {
@@ -915,12 +898,11 @@ class CarbonPeriod implements Iterator, Countable, JsonSerializable
             throw new InvalidPeriodParameterException('Invalid options.');
         }
 
-        $self = $this->copyIfImmutable();
-        $self->options = $options ?: 0;
+        $this->options = $options ?: 0;
 
-        $self->handleChangedParameters();
+        $this->handleChangedParameters();
 
-        return $self;
+        return $this;
     }
 
     /**
@@ -941,7 +923,7 @@ class CarbonPeriod implements Iterator, Countable, JsonSerializable
      *
      * @throws \InvalidArgumentException
      *
-     * @return static
+     * @return $this
      */
     public function toggleOptions($options, $state = null)
     {
@@ -961,7 +943,7 @@ class CarbonPeriod implements Iterator, Countable, JsonSerializable
      *
      * @param bool $state
      *
-     * @return static
+     * @return $this
      */
     public function excludeStartDate($state = true)
     {
@@ -973,7 +955,7 @@ class CarbonPeriod implements Iterator, Countable, JsonSerializable
      *
      * @param bool $state
      *
-     * @return static
+     * @return $this
      */
     public function excludeEndDate($state = true)
     {
@@ -1117,18 +1099,17 @@ class CarbonPeriod implements Iterator, Countable, JsonSerializable
      * @param callable $callback
      * @param string   $name
      *
-     * @return static
+     * @return $this
      */
     public function addFilter($callback, $name = null)
     {
-        $self = $this->copyIfImmutable();
-        $tuple = $self->createFilterTuple(\func_get_args());
+        $tuple = $this->createFilterTuple(\func_get_args());
 
-        $self->filters[] = $tuple;
+        $this->filters[] = $tuple;
 
-        $self->handleChangedParameters();
+        $this->handleChangedParameters();
 
-        return $self;
+        return $this;
     }
 
     /**
@@ -1139,18 +1120,17 @@ class CarbonPeriod implements Iterator, Countable, JsonSerializable
      * @param callable $callback
      * @param string   $name
      *
-     * @return static
+     * @return $this
      */
     public function prependFilter($callback, $name = null)
     {
-        $self = $this->copyIfImmutable();
-        $tuple = $self->createFilterTuple(\func_get_args());
+        $tuple = $this->createFilterTuple(\func_get_args());
 
-        array_unshift($self->filters, $tuple);
+        array_unshift($this->filters, $tuple);
 
-        $self->handleChangedParameters();
+        $this->handleChangedParameters();
 
-        return $self;
+        return $this;
     }
 
     /**
@@ -1158,25 +1138,24 @@ class CarbonPeriod implements Iterator, Countable, JsonSerializable
      *
      * @param callable|string $filter
      *
-     * @return static
+     * @return $this
      */
     public function removeFilter($filter)
     {
-        $self = $this->copyIfImmutable();
         $key = \is_callable($filter) ? 0 : 1;
 
-        $self->filters = array_values(array_filter(
+        $this->filters = array_values(array_filter(
             $this->filters,
             function ($tuple) use ($key, $filter) {
                 return $tuple[$key] !== $filter;
             }
         ));
 
-        $self->updateInternalState();
+        $this->updateInternalState();
 
-        $self->handleChangedParameters();
+        $this->handleChangedParameters();
 
-        return $self;
+        return $this;
     }
 
     /**
@@ -1214,41 +1193,39 @@ class CarbonPeriod implements Iterator, Countable, JsonSerializable
      *
      * @param array $filters
      *
-     * @return static
+     * @return $this
      */
     public function setFilters(array $filters)
     {
-        $self = $this->copyIfImmutable();
-        $self->filters = $filters;
+        $this->filters = $filters;
 
-        $self->updateInternalState();
+        $this->updateInternalState();
 
-        $self->handleChangedParameters();
+        $this->handleChangedParameters();
 
-        return $self;
+        return $this;
     }
 
     /**
      * Reset filters stack.
      *
-     * @return static
+     * @return $this
      */
     public function resetFilters()
     {
-        $self = $this->copyIfImmutable();
-        $self->filters = [];
+        $this->filters = [];
 
-        if ($self->endDate !== null) {
-            $self->filters[] = [static::END_DATE_FILTER, null];
+        if ($this->endDate !== null) {
+            $this->filters[] = [static::END_DATE_FILTER, null];
         }
 
-        if ($self->recurrences !== null) {
-            $self->filters[] = [static::RECURRENCES_FILTER, null];
+        if ($this->recurrences !== null) {
+            $this->filters[] = [static::RECURRENCES_FILTER, null];
         }
 
-        $self->handleChangedParameters();
+        $this->handleChangedParameters();
 
-        return $self;
+        return $this;
     }
 
     /**
@@ -1258,7 +1235,7 @@ class CarbonPeriod implements Iterator, Countable, JsonSerializable
      *
      * @throws InvalidArgumentException
      *
-     * @return static
+     * @return $this
      */
     public function setRecurrences($recurrences)
     {
@@ -1270,17 +1247,15 @@ class CarbonPeriod implements Iterator, Countable, JsonSerializable
             return $this->removeFilter(static::RECURRENCES_FILTER);
         }
 
-        /** @var self $self */
-        $self = $this->copyIfImmutable();
-        $self->recurrences = $recurrences === INF ? INF : (int) $recurrences;
+        $this->recurrences = $recurrences === INF ? INF : (int) $recurrences;
 
-        if (!$self->hasFilter(static::RECURRENCES_FILTER)) {
-            return $self->addFilter(static::RECURRENCES_FILTER);
+        if (!$this->hasFilter(static::RECURRENCES_FILTER)) {
+            return $this->addFilter(static::RECURRENCES_FILTER);
         }
 
-        $self->handleChangedParameters();
+        $this->handleChangedParameters();
 
-        return $self;
+        return $this;
     }
 
     /**
@@ -1291,7 +1266,7 @@ class CarbonPeriod implements Iterator, Countable, JsonSerializable
      *
      * @throws InvalidPeriodDateException
      *
-     * @return static
+     * @return $this
      */
     public function setStartDate($date, $inclusive = null)
     {
@@ -1299,14 +1274,13 @@ class CarbonPeriod implements Iterator, Countable, JsonSerializable
             throw new InvalidPeriodDateException('Invalid start date.');
         }
 
-        $self = $this->copyIfImmutable();
-        $self->startDate = $date;
+        $this->startDate = $date;
 
         if ($inclusive !== null) {
-            $self = $self->toggleOptions(static::EXCLUDE_START_DATE, !$inclusive);
+            $this->toggleOptions(static::EXCLUDE_START_DATE, !$inclusive);
         }
 
-        return $self;
+        return $this;
     }
 
     /**
@@ -1317,7 +1291,7 @@ class CarbonPeriod implements Iterator, Countable, JsonSerializable
      *
      * @throws \InvalidArgumentException
      *
-     * @return static
+     * @return $this
      */
     public function setEndDate($date, $inclusive = null)
     {
@@ -1329,20 +1303,19 @@ class CarbonPeriod implements Iterator, Countable, JsonSerializable
             return $this->removeFilter(static::END_DATE_FILTER);
         }
 
-        $self = $this->copyIfImmutable();
-        $self->endDate = $date;
+        $this->endDate = $date;
 
         if ($inclusive !== null) {
-            $self = $self->toggleOptions(static::EXCLUDE_END_DATE, !$inclusive);
+            $this->toggleOptions(static::EXCLUDE_END_DATE, !$inclusive);
         }
 
-        if (!$self->hasFilter(static::END_DATE_FILTER)) {
-            return $self->addFilter(static::END_DATE_FILTER);
+        if (!$this->hasFilter(static::END_DATE_FILTER)) {
+            return $this->addFilter(static::END_DATE_FILTER);
         }
 
-        $self->handleChangedParameters();
+        $this->handleChangedParameters();
 
-        return $self;
+        return $this;
     }
 
     /**
@@ -1827,19 +1800,18 @@ class CarbonPeriod implements Iterator, Countable, JsonSerializable
      */
     public function setTimezone($timezone)
     {
-        $self = $this->copyIfImmutable();
-        $self->tzName = $timezone;
-        $self->timezone = $timezone;
+        $this->tzName = $timezone;
+        $this->timezone = $timezone;
 
-        if ($self->startDate) {
-            $self = $self->setStartDate($self->startDate->setTimezone($timezone));
+        if ($this->startDate) {
+            $this->setStartDate($this->startDate->setTimezone($timezone));
         }
 
-        if ($self->endDate) {
-            $self = $self->setEndDate($self->endDate->setTimezone($timezone));
+        if ($this->endDate) {
+            $this->setEndDate($this->endDate->setTimezone($timezone));
         }
 
-        return $self;
+        return $this;
     }
 
     /**
@@ -1851,19 +1823,18 @@ class CarbonPeriod implements Iterator, Countable, JsonSerializable
      */
     public function shiftTimezone($timezone)
     {
-        $self = $this->copyIfImmutable();
-        $self->tzName = $timezone;
-        $self->timezone = $timezone;
+        $this->tzName = $timezone;
+        $this->timezone = $timezone;
 
-        if ($self->startDate) {
-            $self = $self->setStartDate($self->startDate->shiftTimezone($timezone));
+        if ($this->startDate) {
+            $this->setStartDate($this->startDate->shiftTimezone($timezone));
         }
 
-        if ($self->endDate) {
-            $self = $self->setEndDate($self->endDate->shiftTimezone($timezone));
+        if ($this->endDate) {
+            $this->setEndDate($this->endDate->shiftTimezone($timezone));
         }
 
-        return $self;
+        return $this;
     }
 
     /**
@@ -2242,18 +2213,19 @@ class CarbonPeriod implements Iterator, Countable, JsonSerializable
      * @param float|int|string|\DateInterval|null $precision
      * @param string                              $function
      *
-     * @return static
+     * @return $this
      */
     public function roundUnit($unit, $precision = 1, $function = 'round')
     {
-        $self = $this->copyIfImmutable();
-        $self = $self->setStartDate($self->getStartDate()->roundUnit($unit, $precision, $function));
+        $this->setStartDate($this->getStartDate()->roundUnit($unit, $precision, $function));
 
-        if ($self->endDate) {
-            $self = $self->setEndDate($self->getEndDate()->roundUnit($unit, $precision, $function));
+        if ($this->endDate) {
+            $this->setEndDate($this->getEndDate()->roundUnit($unit, $precision, $function));
         }
 
-        return $self->setDateInterval($self->getDateInterval()->roundUnit($unit, $precision, $function));
+        $this->setDateInterval($this->getDateInterval()->roundUnit($unit, $precision, $function));
+
+        return $this;
     }
 
     /**
@@ -2262,7 +2234,7 @@ class CarbonPeriod implements Iterator, Countable, JsonSerializable
      * @param string                              $unit
      * @param float|int|string|\DateInterval|null $precision
      *
-     * @return static
+     * @return $this
      */
     public function floorUnit($unit, $precision = 1)
     {
@@ -2275,7 +2247,7 @@ class CarbonPeriod implements Iterator, Countable, JsonSerializable
      * @param string                              $unit
      * @param float|int|string|\DateInterval|null $precision
      *
-     * @return static
+     * @return $this
      */
     public function ceilUnit($unit, $precision = 1)
     {
@@ -2288,7 +2260,7 @@ class CarbonPeriod implements Iterator, Countable, JsonSerializable
      * @param float|int|string|\DateInterval|null $precision
      * @param string                              $function
      *
-     * @return static
+     * @return $this
      */
     public function round($precision = null, $function = 'round')
     {
@@ -2303,7 +2275,7 @@ class CarbonPeriod implements Iterator, Countable, JsonSerializable
      *
      * @param float|int|string|\DateInterval|null $precision
      *
-     * @return static
+     * @return $this
      */
     public function floor($precision = null)
     {
@@ -2315,7 +2287,7 @@ class CarbonPeriod implements Iterator, Countable, JsonSerializable
      *
      * @param float|int|string|\DateInterval|null $precision
      *
-     * @return static
+     * @return $this
      */
     public function ceil($precision = null)
     {
@@ -2504,9 +2476,9 @@ class CarbonPeriod implements Iterator, Countable, JsonSerializable
     protected function handleChangedParameters()
     {
         if (($this->getOptions() & static::IMMUTABLE) && $this->dateClass === Carbon::class) {
-            $this->dateClass = CarbonImmutable::class;
+            $this->setDateClass(CarbonImmutable::class);
         } elseif (!($this->getOptions() & static::IMMUTABLE) && $this->dateClass === CarbonImmutable::class) {
-            $this->dateClass = Carbon::class;
+            $this->setDateClass(Carbon::class);
         }
 
         $this->validationResult = null;

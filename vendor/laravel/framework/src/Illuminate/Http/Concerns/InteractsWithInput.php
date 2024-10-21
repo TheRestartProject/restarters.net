@@ -246,7 +246,7 @@ trait InteractsWithInput
     }
 
     /**
-     * Determine if the given input key is an empty string for "filled".
+     * Determine if the given input key is an empty string for "has".
      *
      * @param  string  $key
      * @return bool
@@ -590,7 +590,7 @@ trait InteractsWithInput
      * Retrieve a parameter item from a given source.
      *
      * @param  string  $source
-     * @param  string|null  $key
+     * @param  string  $key
      * @param  string|array|null  $default
      * @return string|array|null
      */
@@ -610,7 +610,7 @@ trait InteractsWithInput
     /**
      * Dump the request items and end the script.
      *
-     * @param  mixed  ...$keys
+     * @param  mixed  $keys
      * @return never
      */
     public function dd(...$keys)

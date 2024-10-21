@@ -19,7 +19,7 @@ class PreventRequestsDuringMaintenance
     /**
      * The URIs that should be accessible while maintenance mode is enabled.
      *
-     * @var array<int, string>
+     * @var array
      */
     protected $except = [];
 

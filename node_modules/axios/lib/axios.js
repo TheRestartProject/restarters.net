@@ -5,7 +5,7 @@ var bind = require('./helpers/bind');
 var Axios = require('./core/Axios');
 var mergeConfig = require('./core/mergeConfig');
 var defaults = require('./defaults');
-
+var formDataToJSON = require('./helpers/formDataToJSON');
 /**
  * Create an instance of Axios
  *
@@ -37,10 +37,17 @@ var axios = createInstance(defaults);
 axios.Axios = Axios;
 
 // Expose Cancel & CancelToken
-axios.Cancel = require('./cancel/Cancel');
+axios.CanceledError = require('./cancel/CanceledError');
 axios.CancelToken = require('./cancel/CancelToken');
 axios.isCancel = require('./cancel/isCancel');
 axios.VERSION = require('./env/data').version;
+axios.toFormData = require('./helpers/toFormData');
+
+// Expose AxiosError class
+axios.AxiosError = require('../lib/core/AxiosError');
+
+// alias for CanceledError for backward compatibility
+axios.Cancel = axios.CanceledError;
 
 // Expose all/spread
 axios.all = function all(promises) {
@@ -50,6 +57,10 @@ axios.spread = require('./helpers/spread');
 
 // Expose isAxiosError
 axios.isAxiosError = require('./helpers/isAxiosError');
+
+axios.formToJSON = function(thing) {
+  return formDataToJSON(utils.isHTMLForm(thing) ? new FormData(thing) : thing);
+};
 
 module.exports = axios;
 

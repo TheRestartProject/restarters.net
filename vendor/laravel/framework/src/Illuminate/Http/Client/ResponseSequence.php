@@ -143,11 +143,11 @@ class ResponseSequence
      */
     public function __invoke()
     {
-        if ($this->failWhenEmpty && $this->isEmpty()) {
+        if ($this->failWhenEmpty && count($this->responses) === 0) {
             throw new OutOfBoundsException('A request was made, but the response sequence is empty.');
         }
 
-        if (! $this->failWhenEmpty && $this->isEmpty()) {
+        if (! $this->failWhenEmpty && count($this->responses) === 0) {
             return value($this->emptyResponse ?? Factory::response());
         }
 

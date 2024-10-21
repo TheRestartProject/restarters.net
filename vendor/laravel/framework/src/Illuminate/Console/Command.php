@@ -16,7 +16,6 @@ class Command extends SymfonyCommand
         Concerns\HasParameters,
         Concerns\InteractsWithIO,
         Concerns\InteractsWithSignals,
-        Concerns\PromptsForMissingInput,
         Macroable;
 
     /**

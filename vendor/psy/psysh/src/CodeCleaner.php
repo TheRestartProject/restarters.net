@@ -3,7 +3,7 @@
 /*
  * This file is part of Psy Shell.
  *
- * (c) 2012-2023 Justin Hileman
+ * (c) 2012-2022 Justin Hileman
  *
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
@@ -18,7 +18,6 @@ use Psy\CodeCleaner\AbstractClassPass;
 use Psy\CodeCleaner\AssignThisVariablePass;
 use Psy\CodeCleaner\CalledClassPass;
 use Psy\CodeCleaner\CallTimePassByReferencePass;
-use Psy\CodeCleaner\CodeCleanerPass;
 use Psy\CodeCleaner\EmptyArrayDimFetchPass;
 use Psy\CodeCleaner\ExitPass;
 use Psy\CodeCleaner\FinalClassPass;
@@ -83,6 +82,8 @@ class CodeCleaner
 
     /**
      * Check whether this CodeCleaner is in YOLO mode.
+     *
+     * @return bool
      */
     public function yolo(): bool
     {
@@ -92,7 +93,7 @@ class CodeCleaner
     /**
      * Get default CodeCleaner passes.
      *
-     * @return CodeCleanerPass[]
+     * @return array
      */
     private function getDefaultPasses(): array
     {
@@ -149,7 +150,7 @@ class CodeCleaner
      * This list should stay in sync with the "rewriting shenanigans" in
      * getDefaultPasses above.
      *
-     * @return CodeCleanerPass[]
+     * @return array
      */
     private function getYoloPasses(): array
     {
@@ -239,6 +240,8 @@ class CodeCleaner
      * Check whether a given backtrace frame is a call to Psy\debug.
      *
      * @param array $stackFrame
+     *
+     * @return bool
      */
     private static function isDebugCall(array $stackFrame): bool
     {
@@ -285,6 +288,8 @@ class CodeCleaner
      * Set the current local namespace.
      *
      * @param array|null $namespace (default: null)
+     *
+     * @return array|null
      */
     public function setNamespace(array $namespace = null)
     {
@@ -364,6 +369,8 @@ class CodeCleaner
      *
      * @param \PhpParser\Error $e
      * @param string           $code
+     *
+     * @return bool
      */
     private function parseErrorIsUnclosedString(\PhpParser\Error $e, string $code): bool
     {
