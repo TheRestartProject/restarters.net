@@ -157,7 +157,7 @@ export default {
   }
 
   @include media-breakpoint-down(sm) {
-    grid-template-columns: 100%;
+    grid-template-columns: 100% !important;
   }
 }
 
