@@ -123,31 +123,44 @@ class User extends Authenticatable implements Auditable, HasLocalePreference
      */
     public function groupsNearby($numberOfGroups = 10, $createdSince = null, $nearby = self::NEARBY_KM)
     {
-        if (is_null($this->latitude) || is_null($this->longitude)) {
-            return [];
+        $groups = null;
+
+        if (!is_null($this->latitude) && !is_null($this->longitude)) {
+            $groupsNearbyQuery = Group::select(
+                DB::raw('*, ( 6371 * acos( cos( radians('.$this->latitude.') ) * cos( radians( latitude ) ) * cos( radians( longitude ) - radians('.$this->longitude.') ) + sin( radians('.$this->latitude.') ) * sin( radians( latitude ) ) ) ) AS dist')
+            )->leftJoin('grouptags_groups', function ($join) {
+                // Exclude any groups tagged with the special value of 10, which is 'Inactive'.
+                $join->on('group', '=', 'idgroups');
+                $join->on('group_tag', '=', DB::raw(GroupTags::INACTIVE));
+            })->where(function ($q) {
+                $q->whereNull('grouptags_groups.id');
+
+                // Only show approved groups.
+                $q->where('approved', true);
+            })->having('dist', '<=', $nearby)
+                ->groupBy('idgroups');
+
+            if ($createdSince) {
+                $groupsNearbyQuery->whereDate('created_at', '>=', date('Y-m-d', strtotime($createdSince)));
+            }
+
+            $groups = $groupsNearbyQuery->orderBy('dist', 'ASC')
+                ->take($numberOfGroups)
+                ->get();
+        } else if ($this->country_code) {
+            // We have no city, but we do have a country.  So all groups with this country code are nearby.
+            $groupsInCountry = Group::where('country_code', $this->country_code)
+                ->where('approved', true);
+
+            if ($createdSince) {
+                $groupsInCountry->whereDate('created_at', '>=', date('Y-m-d', strtotime($createdSince)));
+            }
+
+            $groups = $groupsInCountry
+                ->orderBy('name', 'ASC')
+                ->take($numberOfGroups)
+                ->get();
         }
-
-        $groupsNearbyQuery = Group::select(
-            DB::raw('*, ( 6371 * acos( cos( radians('.$this->latitude.') ) * cos( radians( latitude ) ) * cos( radians( longitude ) - radians('.$this->longitude.') ) + sin( radians('.$this->latitude.') ) * sin( radians( latitude ) ) ) ) AS dist')
-        )->leftJoin('grouptags_groups', function ($join) {
-            // Exclude any groups tagged with the special value of 10, which is 'Inactive'.
-            $join->on('group', '=', 'idgroups');
-            $join->on('group_tag', '=', DB::raw(GroupTags::INACTIVE));
-        })->where(function ($q) {
-            $q->whereNull('grouptags_groups.id');
-
-            // Only show approved groups.
-            $q->where('approved', true);
-        })->having('dist', '<=', $nearby)
-            ->groupBy('idgroups');
-
-        if ($createdSince) {
-            $groupsNearbyQuery->whereDate('created_at', '>=', date('Y-m-d', strtotime($createdSince)));
-        }
-
-        $groups = $groupsNearbyQuery->orderBy('dist', 'ASC')
-            ->take($numberOfGroups)
-            ->get();
 
         // Expand the image
         $groupsNearby = [];

@@ -50,13 +50,6 @@
           <div v-else v-html="__('groups.no_groups_nearest_no_location')" />
         </div>
       </b-tab>
-      <b-tab class="pt-2" lazy>
-        <template slot="title">
-          <b class="text-uppercase d-block d-md-none">{{ __('groups.all_groups_mobile') }}</b>
-          <b class="text-uppercase d-none d-md-block">{{ __('groups.all_groups') }}</b>
-        </template>
-        <GroupMapAndList :initial-bounds="[ [ -62.26792262941758, -389.53125 ], [ 86.57422361983717, 389.53125 ] ]" />
-      </b-tab>
     </b-tabs>
   </div>
 </template>
@@ -156,7 +149,7 @@ export default {
 
           switch (newVal) {
             case 1:
-              tag = 'nearby';
+              tag = 'other';
               break;
             case 2:
               tag = 'all';
@@ -172,12 +165,12 @@ export default {
           }
 
           // We want to make sure we have the groups in store.
-          // - For the Your or Nearby tabs, we list all the groups in summary form (which is quick) and
+          // - For the Your tab, we list all the groups in summary form (which is quick) and
           //   then in GroupsTable we will fetch any groups where we need to display the detail.
-          // - For the App groups tab, we list all the groups with full details (which is slow).  This is
+          // - For the Other groups tab, we list all the groups with full details (which is slow).  This is
           //   because fetching each group individually via the API in GroupsTable would be much slower and
           //   hit API throttling.
-          if (newVal == 2) {
+          if (newVal == 1) {
             this.$store.dispatch('groups/list', {
               details: true
             })
@@ -192,14 +185,13 @@ export default {
     }
   },
   created() {
-    // We have three tabs, and might be asked to start on a specific one.
+    // We have two tabs, but we want to support old URLs for backwards compatibility.
     switch (this.tab) {
-      case 'nearby':
-        this.currentTab = 1;
-        break;
       case 'all':
       case 'network':
-        this.currentTab = 2;
+      case 'nearby':
+      case 'other':
+        this.currentTab = 1;
         break;
       default:
         this.currentTab = 0;

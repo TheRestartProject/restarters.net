@@ -158,7 +158,6 @@ export default {
         const group = this.$store.getters['groups/get'](g.id)
 
         if (!group || !group.location) {
-          console.log('Need to fetch', g, group)
           await this.$store.dispatch('groups/fetch', {
             id: g.id
           })

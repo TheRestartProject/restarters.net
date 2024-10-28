@@ -309,6 +309,7 @@ Route::middleware('auth', 'verifyUserConsent', 'ensureAPIToken')->group(function
         Route::get('/all', [GroupController::class, 'all']);
         Route::get('/mine', [GroupController::class, 'mine']);
         Route::get('/nearby', [GroupController::class, 'nearby']);
+        Route::get('/other', [GroupController::class, 'nearby']);
         Route::get('/network/{id}', [GroupController::class, 'network']);
         Route::get('/nearbyinvite/{groupId}/{userId}', [GroupController::class, 'inviteNearbyRestarter']);
         Route::get('/delete/{id}', [GroupController::class, 'delete']);

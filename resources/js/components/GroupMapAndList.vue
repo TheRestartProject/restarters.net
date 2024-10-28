@@ -8,7 +8,6 @@
         :bounds.sync="bounds"
         @groups="groupsChanged($event)"
     />
-    TODO Loading indicator
     <GroupsTable
       :groupids="groupidsInBounds"
       class="mt-3"

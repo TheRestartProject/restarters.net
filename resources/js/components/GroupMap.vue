@@ -13,19 +13,22 @@
         @moveend="idle"
         @dragend="dragEnd"
     >
-      <l-marker v-for="group in allGroups" :lat-lng="[group.lat, group.lng]" :interactive="false"/>
-      <l-tile-layer :url="tiles" :attribution="attribution"/>
+      <GroupMarker :key='"marker-" + group.id' v-for="group in allGroups" :id="group.id" />
+      <l-tile-layer :url="tiles" :attribution="attribution" />
     </l-map>
   </div>
 </template>
 <script>
 import map from '../mixins/map'
 import {Geocoder, Photon} from 'leaflet-control-geocoder/dist/Control.Geocoder.js'
+import GroupMarker from './GroupMarker.vue'
 
 // TODO Clustering?
 
 export default {
-  components: {},
+  components: {
+    GroupMarker,
+  },
   mixins: [map],
   props: {
     initialBounds: {

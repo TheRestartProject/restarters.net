@@ -61,17 +61,16 @@ class GroupController extends Controller
             ->toArray(), 'idgroups');
 
         $nearby_groups = [];
+        $min_lat = 90;
+        $max_lat = -90;
+        $min_lng = 180;
+        $max_lng = -180;
 
-        if ($user->latitude || $user->longitude) {
+        if ($user->latitude || $user->longitude || $user->country_code) {
             // We pass a high limit to the groups nearby; there is a distance limit which will normally kick in first.
             $nearby_groups = $user->groupsNearby(1000);
 
             // Now find the lat/lng bounding box which contains these groups.
-            $min_lat = 90;
-            $max_lat = -90;
-            $min_lng = 180;
-            $max_lng = -180;
-
             foreach ($nearby_groups as $group) {
                 if ($group->latitude < $min_lat) {
                     $min_lat = $group->latitude;

@@ -63,7 +63,7 @@ export default {
   },
   mutations: {
     set(state, params) {
-      Vue.set(state.list, params.id, params)
+      Vue.set(state.list, params.id || params.idgroups, params)
     },
     setList(state, params) {
       let list = {}
@@ -216,6 +216,7 @@ export default {
       return id
     },
     async fetch({ rootGetters, commit }, params) {
+      // TODO Handle fetching case.
       try {
         let ret = await axios.get('/api/v2/groups/' + params.id + '?api_token=' + rootGetters['auth/apiToken'] + '&locale=' + getLocale())
 
