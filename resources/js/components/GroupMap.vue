@@ -45,6 +45,11 @@ export default {
       required: false,
       default: 15,
     },
+    network: {
+      type: Number,
+      required: false,
+      default: null,
+    },
   },
   setup(props) {
     const miscStore = useMiscStore()
@@ -83,7 +88,21 @@ export default {
       }
     },
     allGroups() {
-      return this.$store.getters['groups/list']
+      const groups = this.$store.getters['groups/list']
+      return groups.filter((g) => {
+        if (!this.network) {
+          return true
+        }
+
+        let found = false
+        g.networks.forEach((n) => {
+          if (n.id === this.network) {
+            found = true
+          }
+        })
+
+        return found
+      })
     },
   },
   created() {

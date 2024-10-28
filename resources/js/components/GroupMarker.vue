@@ -1,6 +1,6 @@
 <template>
   <div v-if="group">
-    <l-marker :lat-lng="[group.lat, group.lng]" :interactive="false" :options="{
+    <l-marker :lat-lng="[lat, lng]" :interactive="false" :options="{
       title: group.name + ' - ' + __('groups.marker_title')
     }" @click="openModal" />
     <GroupInfoModal v-if="showModal" ref="modal" :id="group.id" @close="showModal = false "/>
@@ -28,6 +28,12 @@ export default {
     group() {
       return this.$store.getters['groups/get'](this.id)
     },
+    lat() {
+      return this.group.location ? this.group.location.lat : this.group.lat
+    },
+    lng() {
+      return this.group.location ? this.group.location.lng : this.group.lng
+    }
   },
   methods: {
     openModal() {

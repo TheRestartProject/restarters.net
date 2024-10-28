@@ -6,6 +6,7 @@
         :min-zoom="minZoom"
         :max-zoom="maxZoom"
         :bounds.sync="bounds"
+        :network="network"
         @groups="groupsChanged($event)"
     />
     <GroupsTable
@@ -42,6 +43,16 @@ export default {
       required: false,
       default: MAX_MAP_ZOOM,
     },
+    network: {
+      type: Number,
+      required: false,
+      default: null,
+    },
+    fetchGroups: {
+      type: Boolean,
+      required: false,
+      default: true,
+    },
   },
   data() {
     return {
@@ -51,14 +62,14 @@ export default {
       bounds: null,
     }
   },
-  computed: {
-    closestGroups() {
-      // TODO
-      return []
-    },
-  },
   mounted() {
-    // The list of groups will be fetched within GroupMap, so no need to fetch it here.
+    if (this.fetchGroups) {
+      this.$store.dispatch('groups/list', {
+        details: true
+      })
+    } else {
+      // The list of groups will be fetched within GroupMap, so no need to fetch it here.
+    }
   },
   methods: {
     groupsChanged(groupids) {
