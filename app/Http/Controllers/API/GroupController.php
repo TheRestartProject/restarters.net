@@ -280,11 +280,7 @@ class GroupController extends Controller
         ]);
 
         // We only return a small number of attributes, for speed.
-        $query = Group::select('idgroups', 'name', 'latitude', 'longitude', 'archived_at');
-
-        if (!$request->has('archived') || $request->get('archived') == 'false') {
-            $query = $query->whereNull('archived_at');
-        }
+        $query = Group::select('idgroups', 'name', 'latitude', 'longitude');
 
         $groups = $query->get();
         $ret = [];
@@ -295,7 +291,6 @@ class GroupController extends Controller
                 'name' => $group->name,
                 'lat' => $group->latitude,
                 'lng' => $group->longitude,
-                'archived_at' => $group->archived_at ? Carbon::parse($group->archived_at)->toIso8601String() : null
             ];
         }
 
@@ -372,10 +367,6 @@ class GroupController extends Controller
         ]);
 
         $query = Group::all();
-
-        if (!$request->has('archived') || $request->get('archived') == 'false') {
-            $query = $query->whereNull('archived_at');
-        }
 
         $groups = $query->all();
 

@@ -93,7 +93,7 @@ class GroupController extends Controller
             'your_area' => $user->location,
             'your_lat' => $user->latitude,
             'your_lng' => $user->longitude,
-            'tab' => $tab,
+            'tab' => (!$tab || $tab === $mine) ? 'mine' : 'other',
             'network' => $network,
             'networks' => $networks,
             'all_group_tags' => $all_group_tags,
@@ -551,7 +551,6 @@ class GroupController extends Controller
                     'networks' => \Illuminate\Support\Arr::pluck($group->networks, 'id'),
                     'group_tags' => $group->group_tags()->get()->pluck('id'),
                     'following' => in_array($group->idgroups, $your_groupids),
-                    'archived_at' => $group->archived_at ? Carbon::parse($group->archived_at)->toIso8601String() : null
                 ];
             }
         }

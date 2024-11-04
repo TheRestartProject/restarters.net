@@ -41,7 +41,6 @@ return [
   'message_example_text' => '<voeg hier eventueel een eigen bericht toe>',
   'message_header' => 'Uitnodiging',
   'restarter_column_table' => 'Restarter',
-  'search_name' => 'Naam zoeken',
   'send_invite_button' => 'Uitnodigingen versturen',
   'share_stats_header' => 'Je statistieken delen',
   'share_stats_message' => 'Door kapotte toestellen te repareren heeft :group heel wat CO<sub>2</sub> uitstoot en afval vermeden. Help ons om dit goede nieuws te verspreiden en deel het op je website.',
