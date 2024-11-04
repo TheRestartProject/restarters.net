@@ -159,7 +159,8 @@ export default {
 
         if (!group || !group.location) {
           await this.$store.dispatch('groups/fetch', {
-            id: g.id
+            id: g.id,
+            includeStats: false
           })
         }
       })

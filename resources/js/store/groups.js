@@ -218,7 +218,13 @@ export default {
     async fetch({ rootGetters, commit }, params) {
       // TODO Handle fetching case.
       try {
-        let ret = await axios.get('/api/v2/groups/' + params.id + '?api_token=' + rootGetters['auth/apiToken'] + '&locale=' + getLocale())
+        let url = '/api/v2/groups/' + params.id + '?api_token=' + rootGetters['auth/apiToken'] + '&locale=' + getLocale()
+
+        if (params.hasOwnProperty('includeStats')) {
+           url += '&includeStats=' + params.includeStats
+        }
+
+        let ret = await axios.get(url)
 
         commit('set', ret.data.data)
 

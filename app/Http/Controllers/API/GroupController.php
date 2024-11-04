@@ -337,6 +337,15 @@ class GroupController extends Controller
      *              type="boolean"
      *          )
      *      ),
+     *      @OA\Parameter(
+     *          name="includeCounts",
+     *          description="Include impact stats.  This makes the call slower.  Default true.",
+     *          required=false,
+     *          in="query",
+     *          @OA\Schema(
+     *              type="boolean"
+     *          )
+     *      ),
      *      @OA\Response(
      *          response=200,
      *          description="Successful operation",
