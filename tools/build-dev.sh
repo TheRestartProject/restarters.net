@@ -53,6 +53,12 @@ chown -R www-data node_modules # needed?
 echo -e "\nDone."
 fi
 
+if [[ $ALL || $BUILD_TRANSLATIONS ]]; then
+banner "Building translations"
+php artisan lang:js --no-lib resources/js/translations.js
+echo -e "\nDone."
+fi
+
 if [[ $ALL || $BUILD_ASSETS ]]; then
 banner "Building assets"
 NODE_OPTIONS=--max-old-space-size=8192
