@@ -4,6 +4,7 @@ namespace App\Http\Resources;
 
 use Carbon\Carbon;
 use Illuminate\Http\Resources\Json\JsonResource;
+use Cache;
 
 /**
  * @OA\Schema(
@@ -109,26 +110,46 @@ class GroupSummary extends JsonResource
         }
 
         if ($request->get('includeNextEvent', false)) {
-            // Get next approved event for group.
-            $nextevent = \App\Group::find($this->idgroups)->getNextUpcomingEvent();
+            // Get next approved event for group.  We cache all upcoming events to speed up the case where we
+            // are fetching many groups.
+            if (Cache::has('future_events')) {
+                $upcoming = Cache::get('future_events');
+            } else {
+                $future = \App\Party::future();
 
-            if ($nextevent) {
-                // Using the resource for the nested event causes infinite loops.  Just add the model attributes we
-                // need directly.
-                $ret['next_event'] = [
-                    'id' => $nextevent->idevents,
-                    'start' => $nextevent->event_start_utc,
-                    'end' => $nextevent->event_end_utc,
-                    'timezone' => $nextevent->timezone,
-                    'title' => $nextevent->venue ?? $nextevent->location,
-                    'location' => $nextevent->location,
-                    'online' => $nextevent->online,
-                    'lat' => $nextevent->latitude,
-                    'lng' => $nextevent->longitude,
-                    'updated_at' => $nextevent->updated_at->toIso8601String(),
-                    'summary' => true
-                ];
+                // Can't serialise the whole event, and we only need a few fields.
+                $upcoming = [];
+
+                foreach ($future as $event) {
+                    $upcoming[] = [
+                        'id' => $event->idevents,
+                        'start' => $event->event_start_utc,
+                        'end' => $event->event_end_utc,
+                        'timezone' => $event->timezone,
+                        'title' => $event->venue ?? $event->location,
+                        'location' => $event->location,
+                        'online' => $event->online,
+                        'lat' => $event->latitude,
+                        'lng' => $event->longitude,
+                        'updated_at' => $event->updated_at->toIso8601String(),
+                        'summary' => true
+                    ];
+                }
+
+                Cache::put('future_events', $upcoming, 60);
             }
+
+            // Find the next event for this group.
+            $nextevent = null;
+
+            foreach ($upcoming as $event) {
+                if ($event->group_id == $this->idgroups) {
+                    $nextevent = $event;
+                    break;
+                }
+            }
+
+           $ret['next_event'] = $nextevent;
         }
 
         return($ret);
