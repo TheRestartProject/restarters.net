@@ -93,7 +93,7 @@ class GroupController extends Controller
             'your_area' => $user->location,
             'your_lat' => $user->latitude,
             'your_lng' => $user->longitude,
-            'tab' => (!$tab || $tab === $mine) ? 'mine' : 'other',
+            'tab' => (!$tab || $tab === 'mine') ? 'mine' : 'other',
             'network' => $network,
             'networks' => $networks,
             'all_group_tags' => $all_group_tags,
