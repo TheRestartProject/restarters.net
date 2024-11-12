@@ -1,7 +1,9 @@
 <template>
   <div>
     <p v-if="count" v-html="translatedGroupCount" />
-    <b-table :fields="fields" :items="itemsToShow" sort-null-last thead-tr-class="d-none d-md-table-row" :sort-compare="sortCompare">
+    <b-table :fields="fields" :items="itemsToShow" sort-null-last thead-tr-class="d-none d-md-table-row" :sort-compare="sortCompare"
+             @row-hovered="rowHovered" @row-unhovered="rowUnhovered"
+    >
       <template slot="head(group_image)">
         <span />
       </template>
@@ -51,7 +53,7 @@
         <div v-if="approve" class="cell-warning d-flex justify-content-around p-2">
           <a :href="'/group/edit/' + data.item.id">{{ __('groups.group_requires_moderation') }}</a>
         </div>
-        <b-btn variant="primary" class="text-nowrap mr-2" v-else-if="!data.item.following" :to="'/group/join/' + data.item.id">
+        <b-btn variant="primary" class="text-nowrap mr-2" v-else-if="!yourGroup(data.item.id)" :to="'/group/join/' + data.item.id">
           <span class="d-block d-md-none">
             {{ __('groups.join_group_button_mobile') }}
           </span>
@@ -108,6 +110,11 @@ export default {
       required: false,
       default: null
     },
+    yourGroups: {
+      type: Array,
+      required: false,
+      default: () => [],
+    },
     approve: {
       type: Boolean,
       required: false,
@@ -140,7 +147,13 @@ export default {
       return ret
     },
     itemsToShow() {
-      return this.items.slice(0, this.show)
+      const items = this.items.slice(0, this.show)
+
+      items.sort((a, b) => {
+        return a.name.localeCompare(b.name)
+      })
+
+      return items
     },
     translatedGroupCount() {
       return this.$lang.choice('groups.group_count', this.items.length, {
@@ -227,8 +240,17 @@ export default {
       } else {
         return Math.round(dist)
       }
+    },
+    yourGroup(id) {
+      return this.yourGroups.includes(id)
+    },
+    rowHovered(item, index, event) {
+      this.$emit('update:hover', item.id)
+    },
+    rowUnhovered(item, index, event) {
+      this.$emit('update:hover', null)
     }
-  }
+  },
 }
 </script>
 <style scoped lang="scss">

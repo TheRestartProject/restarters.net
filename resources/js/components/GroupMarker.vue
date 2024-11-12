@@ -1,8 +1,13 @@
 <template>
   <div v-if="group">
-    <l-marker :lat-lng="[lat, lng]" :interactive="false" :options="{
-      title: group.name + ' - ' + __('groups.marker_title')
-    }" @click="openModal" />
+    <l-marker
+        :lat-lng="[lat, lng]" :interactive="false" :options="{
+          title: group.name + ' - ' + __('groups.marker_title'),
+        }" :icon="icon"
+        @click="openModal"
+        @mouseover="hover = true"
+        @mouseout="hover = false"
+    />
     <GroupInfoModal v-if="showModal" ref="modal" :id="group.id" @close="showModal = false "/>
   </div>
 </template>
@@ -18,13 +23,37 @@ export default {
       type: Number,
       required: true,
     },
+    highlight: {
+      type: Boolean,
+      required: false,
+      default: false,
+    },
+    hover: {
+      type: Boolean,
+      required: false,
+      default: false,
+    }
   },
   data() {
     return {
-      showModal: false
+      showModal: false,
+      hover: false
     }
   },
   computed: {
+    icon() {
+      let icon = "/images/vendor/leaflet/dist/marker-icon.png"
+
+      if (this.hover) {
+        icon = "/images/vendor/leaflet/dist/marker-icon-red.png"
+      } else if (this.highlight) {
+        icon = "/images/vendor/leaflet/dist/marker-icon-green.png"
+      }
+
+      return L.icon({
+        iconUrl: icon,
+      })
+    },
     group() {
       return this.$store.getters['groups/get'](this.id)
     },

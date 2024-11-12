@@ -43,7 +43,7 @@
           <b class="text-uppercase d-none d-lg-block">{{ __('groups.groups_title2') }}</b>
         </template>
         <div v-if="nearbyGroups.length">
-          <GroupMapAndList :initial-bounds="nearbyGroups" />
+          <GroupMapAndList :initial-bounds="nearbyGroups" :yourGroups="yourGroups"/>
         </div>
         <div v-else class="mt-2 mb-2 text-center">
           <div v-if="yourArea" v-html="__('groups.no_groups_nearest_with_location')" />
@@ -165,18 +165,9 @@ export default {
           }
 
           // We want to make sure we have the groups in store.
-          // - For the Your tab, we list all the groups in summary form (which is quick) and
-          //   then in GroupsTable we will fetch any groups where we need to display the detail.
-          // - For the Other groups tab, we list all the groups with full details (which is slow).  This is
-          //   because fetching each group individually via the API in GroupsTable would be much slower and
-          //   hit API throttling.
-          if (newVal == 1) {
-            this.$store.dispatch('groups/list', {
-              details: true
-            })
-          } else {
-            this.$store.dispatch('groups/list')
-          }
+          this.$store.dispatch('groups/list', {
+            details: true
+          })
         } catch (e) {
           console.error("Failed to update URL")
         }

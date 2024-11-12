@@ -48,6 +48,7 @@
     "dependencies": {
         "@sentry/tracing": "^6.7.2",
         "@sentry/vue": "^6.7.2",
+        "@vectorial1024/leaflet-color-markers": "^2.0.4",
         "ajv": "^6.12.3",
         "babel-plugin-istanbul": "^6.1.1",
         "bootstrap-fileinput": "^4.4.9",
@@ -68,6 +69,7 @@
         "js-cookie": "^2.2.0",
         "lang.js": "^1.1.14",
         "leaflet": "^1.4.0",
+        "leaflet-control-geocoder": "^2.4.0",
         "moment": "^2.29.4",
         "moment-timezone": "^0.5.35",
         "npm": "^9.4.0",

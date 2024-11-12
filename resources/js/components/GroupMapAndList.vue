@@ -1,5 +1,6 @@
 <template>
   <div>
+    Hover: {{ hover }}
     <GroupMap
         v-model:ready="mapready"
         :initial-bounds="initialBounds"
@@ -7,6 +8,8 @@
         :max-zoom="maxZoom"
         :bounds.sync="bounds"
         :network="network"
+        :your-groups="yourGroups"
+        :hover="hover"
         @groups="groupsChanged($event)"
     />
     <GroupsTable
@@ -15,6 +18,8 @@
       count
       v-if="groupidsInBounds.length"
       your-area="yourArea"
+      :your-groups="yourGroups"
+      :hover.sync="hover"
     />
   </div>
 </template>
@@ -53,6 +58,11 @@ export default {
       required: false,
       default: true,
     },
+    yourGroups: {
+      type: Array,
+      required: false,
+      default: () => [],
+    },
   },
   data() {
     return {
@@ -60,6 +70,7 @@ export default {
       groupidsInBounds: [],
       mapready: false,
       bounds: null,
+      hover: null,
     }
   },
   mounted() {

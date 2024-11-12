@@ -13,7 +13,7 @@
         @moveend="idle"
         @dragend="dragEnd"
     >
-      <GroupMarker :key='"marker-" + group.id' v-for="group in allGroups" :id="group.id" />
+      <GroupMarker :key='"marker-" + group.id' v-for="group in allGroups" :id="group.id" :highlight="yourGroup(group.id)" :hover="group.id === hover" />
       <l-tile-layer :url="tiles" :attribution="attribution" />
     </l-map>
   </div>
@@ -22,8 +22,6 @@
 import map from '../mixins/map'
 import {Geocoder, Photon} from 'leaflet-control-geocoder/dist/Control.Geocoder.js'
 import GroupMarker from './GroupMarker.vue'
-
-// TODO Clustering?
 
 export default {
   components: {
@@ -50,6 +48,16 @@ export default {
       required: false,
       default: null,
     },
+    yourGroups: {
+      type: Array,
+      required: false,
+      default: () => [],
+    },
+    hover: {
+      type: Number,
+      required: false,
+      default: null,
+    }
   },
   setup(props) {
     const miscStore = useMiscStore()
@@ -74,6 +82,7 @@ export default {
       mapIdle: 0,
       center: null,
       bounds: null,
+      zoomedToGroups: false
     }
   },
   computed: {
@@ -111,6 +120,17 @@ export default {
   beforeUnmount() {
     this.destroyed = true
   },
+  watch: {
+    allGroups: {
+      handler(newVal, oldVal) {
+        if (!oldVal.length && newVal.length) {
+          this.zoomToGroups()
+        }
+      },
+      deep: true,
+      immediate: true,
+    }
+  },
   methods: {
     async ready() {
       const self = this
@@ -120,8 +140,6 @@ export default {
 
       if (this.mapObject) {
         try {
-          this.mapObject.fitBounds(this.initialBounds)
-
           new Geocoder({
             placeholder: 'Search for a place...',
             defaultMarkGeocode: false,
@@ -181,10 +199,10 @@ export default {
     idle() {
       this.mapObject = this.$refs.map.mapObject
       this.mapIdle++
+      this.zoomToGroups()
 
       try {
         if (this.mapObject) {
-          // We need to update the parent about our zoom level and whether we are showing the posts or groups.
           const bounds = this.mapObject.getBounds()
           this.bounds = bounds
           let groupsInBounds = []
@@ -215,23 +233,54 @@ export default {
       } catch (e) {
         console.error('Error in map idle', e)
       }
-    }
-    ,
+    },
     toJSON(bounds) {
       return [
         [bounds.getSouthWest().lat, bounds.getSouthWest().lng],
         [bounds.getNorthEast().lat, bounds.getNorthEast().lng],
       ]
-    }
-    ,
+    },
     dragEnd(e) {
       this.moved = true
       this.$emit('update:moved', true)
       this.idle()
+    },
+    zoomToGroups() {
+      if (!this.zoomedToGroups && this.mapObject && this.allGroups.length) {
+        const center = this.mapObject.getCenter()
+
+        this.zoomedToGroups = true
+
+        // Find the smallest box which contains 5 groups around the center.
+        const groups = this.allGroups
+
+        // Find the 5 closest groups.
+        const closest = groups
+            .map((group) => {
+              const lat = group.location.lat || group.lat
+              const lng = group.location.lng || group.lng
+              const distance = Math.sqrt((lat - center.lat) ** 2 + (lng - center.lng) ** 2)
+              return { group, distance }
+            })
+            .sort((a, b) => a.distance - b.distance)
+            .slice(0, 5)
+            .map((a) => a.group)
+
+        // Get the bounding box containing these groups.
+        const bounds = new L.LatLngBounds()
+        closest.forEach((group) => {
+          const lat = group.location.lat || group.lat
+          const lng = group.location.lng || group.lng
+          bounds.extend(new L.LatLng(lat, lng))
+        })
+
+        this.bounds = bounds
+      }
+    },
+    yourGroup(id) {
+      return this.yourGroups.includes(id)
     }
-    ,
-  }
-  ,
+  },
 }
 </script>
 <style scoped lang="scss">

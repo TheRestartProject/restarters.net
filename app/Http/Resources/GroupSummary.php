@@ -115,7 +115,7 @@ class GroupSummary extends JsonResource
             if (Cache::has('future_events')) {
                 $upcoming = Cache::get('future_events');
             } else {
-                $future = \App\Party::future();
+                $future = \App\Party::future()->get();
 
                 // Can't serialise the whole event, and we only need a few fields.
                 $upcoming = [];
@@ -123,6 +123,7 @@ class GroupSummary extends JsonResource
                 foreach ($future as $event) {
                     $upcoming[] = [
                         'id' => $event->idevents,
+                        'group_id' => $event->group,
                         'start' => $event->event_start_utc,
                         'end' => $event->event_end_utc,
                         'timezone' => $event->timezone,
@@ -143,7 +144,7 @@ class GroupSummary extends JsonResource
             $nextevent = null;
 
             foreach ($upcoming as $event) {
-                if ($event->group_id == $this->idgroups) {
+                if ($event['group_id'] == $this->idgroups) {
                     $nextevent = $event;
                     break;
                 }
