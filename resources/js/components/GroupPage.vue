@@ -7,9 +7,9 @@
         :canedit="canedit"
         :can-see-delete="canSeeDelete"
         :can-perform-delete="canPerformDelete"
+        :can-perform-archive="canPerformArchive"
         :ingroup="ingroup"
         @left="haveLeft = true"
-
     />
 
     <div class="d-flex flex-wrap">
@@ -103,6 +103,11 @@ export default {
       default: false
     },
     canPerformDelete: {
+      type: Boolean,
+      required: false,
+      default: false
+    },
+    canPerformArchive: {
       type: Boolean,
       required: false,
       default: false

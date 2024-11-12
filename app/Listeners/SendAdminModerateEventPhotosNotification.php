@@ -41,6 +41,11 @@ class SendAdminModerateEventPhotosNotification extends BaseEvent
         $this->event = $event;
         $this->party = $event->party;
 
+        if ($this->party->theGroup->archived_at) {
+            // Suppress notifications for archived groups.
+            return;
+        }
+
         Fixometer::usersWhoHavePreference('admin-moderate-event-photos')->each(function (User $user) {
             if ($this->shouldSendNotification($user)) {
                 $user->notify(new AdminModerationEventPhotos([

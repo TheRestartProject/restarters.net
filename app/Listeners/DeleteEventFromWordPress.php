@@ -35,6 +35,11 @@ class DeleteEventFromWordPress extends BaseEvent
 
         $repairEvent = $event->repairEvent;
 
+        if ($repairEvent->theGroup->archived_at) {
+            // Suppress notifications for archived groups.
+            return;
+        }
+
         try {
             if ($repairEvent->shouldPushToWordPress() && ! empty($repairEvent->wordpress_post_id)) {
                 $this->wpClient->deletePost($repairEvent->wordpress_post_id);
