@@ -489,6 +489,11 @@ class APIv2GroupTest extends TestCase
             'info@test.com'
         );
 
+        $group = Group::find($idgroups);
+
+        $network = Network::factory()->create();
+        $network->addGroup($group);
+
         // Get group - archived_at should not be set.
         $response = $this->get("/api/v2/groups/$idgroups");
         $response->assertSuccessful();
@@ -499,6 +504,7 @@ class APIv2GroupTest extends TestCase
         // Patch the group to set it.
         $response = $this->patch('/api/v2/groups/' . $idgroups, [
             'archived_at' => '2022-01-01',
+            'description' => 'Some text.'
         ]);
         $response->assertSuccessful();
 
@@ -508,6 +514,7 @@ class APIv2GroupTest extends TestCase
         $json = json_decode($response->getContent(), true);
         $this->assertEquals($idgroups, $json['data']['id']);
         $this->assertEquals('2022-01-01T00:00:00+00:00', $json['data']['archived_at']);
+        $this->assertEquals('Some text.', $json['data']['description']);
 
         // Group shouldn't appear in the list of groups by default.
         $response = $this->get('/api/v2/groups/names');
@@ -529,5 +536,17 @@ class APIv2GroupTest extends TestCase
         $json = json_decode($response->getContent(), true);
         $groups = $json['data'];
         $this->assertGroupFound($groups, $idgroups, false);
+
+        $response = $this->get("/api/v2/networks/{$network->id}/groups");
+        $response->assertSuccessful();
+        $json = json_decode($response->getContent(), true);
+        $groups = $json['data'];
+        $this->assertGroupFound($groups, $idgroups, false);
+
+        $response = $this->get("/api/v2/networks/{$network->id}/groups?archived=true");
+        $response->assertSuccessful();
+        $json = json_decode($response->getContent(), true);
+        $groups = $json['data'];
+        $this->assertGroupFound($groups, $idgroups, true);
     }
 }
