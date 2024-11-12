@@ -163,11 +163,6 @@ export default {
             // If we are vieiwng a specific network, don't mess with the URL as it's confusing.
             window.history.pushState(null, "Groups", "/group/" + tag);
           }
-
-          // We want to make sure we have the groups in store.
-          this.$store.dispatch('groups/list', {
-            details: true
-          })
         } catch (e) {
           console.error("Failed to update URL")
         }

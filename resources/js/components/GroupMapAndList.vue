@@ -53,11 +53,6 @@ export default {
       required: false,
       default: null,
     },
-    fetchGroups: {
-      type: Boolean,
-      required: false,
-      default: true,
-    },
     yourGroups: {
       type: Array,
       required: false,
@@ -74,13 +69,9 @@ export default {
     }
   },
   mounted() {
-    if (this.fetchGroups) {
-      this.$store.dispatch('groups/list', {
-        details: true
-      })
-    } else {
-      // The list of groups will be fetched within GroupMap, so no need to fetch it here.
-    }
+    this.$store.dispatch('groups/list', {
+      details: true
+    })
   },
   methods: {
     groupsChanged(groupids) {
