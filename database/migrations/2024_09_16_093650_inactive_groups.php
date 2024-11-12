@@ -22,6 +22,7 @@ return new class extends Migration
             $group->archived_at = $group->updated_at;
 
             // Remove [INACTIVE] from the group name - this is now indicated via archived_at.
+            $group->name = str_replace('[INACTIVE] ', '', $group->name);
             $group->name = str_replace('[INACTIVE]', '', $group->name);
             $group->save();
         }

@@ -131,6 +131,15 @@ class NetworkController extends Controller
      *              type="boolean"
      *          )
      *      ),
+     *      @OA\Parameter(
+     *          name="includeArchived",
+     *          description="Include archived groups",
+     *          required=false,
+     *          in="query",
+     *          @OA\Schema(
+     *              type="boolean"
+     *          )
+     *      ),
      *      @OA\Response(
      *          response=200,
      *          description="Successful operation",
@@ -176,7 +185,7 @@ class NetworkController extends Controller
             ->where('groups.updated_at', '>=', $start)
             ->where('groups.updated_at', '<=', $end);
 
-        if (!$request->has('archived') || $request->get('archived') == 'false') {
+        if (!$request->has('includeArchived') || $request->get('includeArchived') == 'false') {
             $query = $query->whereNull('archived_at');
         }
 

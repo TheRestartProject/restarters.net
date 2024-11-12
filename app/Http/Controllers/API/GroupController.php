@@ -232,7 +232,7 @@ class GroupController extends Controller
      *      tags={"Groups"},
      *      summary="Get list of group names",
      *      @OA\Parameter(
-     *          name="archived",
+     *          name="includeArchived",
      *          description="Include archived groups",
      *          required=false,
      *          in="query",
@@ -262,13 +262,13 @@ class GroupController extends Controller
 
     public static function listNamesv2(Request $request) {
         $request->validate([
-            'archived' => ['string', 'in:true,false'],
+            'includeArchived' => ['string', 'in:true,false'],
         ]);
 
         // We only return the group id and name, for speed.
         $query = Group::select('idgroups', 'name', 'archived_at');
 
-        if (!$request->has('archived') || $request->get('archived') == 'false') {
+        if (!$request->has('includeArchived') || $request->get('includeArchived') == 'false') {
             $query = $query->whereNull('archived_at');
         }
 

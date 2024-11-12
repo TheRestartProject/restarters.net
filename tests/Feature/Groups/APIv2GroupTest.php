@@ -524,14 +524,14 @@ class APIv2GroupTest extends TestCase
 
         $this->assertGroupFound($groups, $idgroups, false);
 
-        $response = $this->get('/api/v2/groups/names?archived=true');
+        $response = $this->get('/api/v2/groups/names?includeArchived=true');
         $response->assertSuccessful();
         $json = json_decode($response->getContent(), true);
         $groups = $json['data'];
         $ix = $this->assertGroupFound($groups, $idgroups, true);
         $this->assertEquals('2022-01-01T00:00:00+00:00', $groups[$ix]['archived_at']);
 
-        $response = $this->get('/api/v2/groups/names?archived=false');
+        $response = $this->get('/api/v2/groups/names?includeArchived=false');
         $response->assertSuccessful();
         $json = json_decode($response->getContent(), true);
         $groups = $json['data'];
@@ -543,7 +543,7 @@ class APIv2GroupTest extends TestCase
         $groups = $json['data'];
         $this->assertGroupFound($groups, $idgroups, false);
 
-        $response = $this->get("/api/v2/networks/{$network->id}/groups?archived=true");
+        $response = $this->get("/api/v2/networks/{$network->id}/groups?includeArchived=true");
         $response->assertSuccessful();
         $json = json_decode($response->getContent(), true);
         $groups = $json['data'];
