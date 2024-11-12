@@ -124,7 +124,6 @@ return [
   'groups_postcode_small' => '(Optionnel)',
   'postcode' => 'Code postal du Repair Café',
   'create_failed' => 'Le Repair Café <strong>n\'a pas pu</strong> être créé. Veuillez regarder les erreurs, les corriger, et essayer à nouveau.',
-  'edit_succeeded' => 'L\'édition du Repair Café a réussi',
   'edit_failed' => 'Le Repair Café n\'a pas pu être édité.',
   'delete_group' => 'Supprimer Repair Café',
   'delete_group_confirm' => 'Veuillez confirmer que vous voulez supprimer :name',

@@ -122,7 +122,6 @@ return [
   'groups_postcode_small' => '(Optional)',
   'duplicate' => 'That group name (:name) already exists.  If it\'s yours, please go to the Groups page using the menu and edit it.',
   'create_failed' => 'Group could <strong>not</strong> be created. Please look at the reported errors, correct them, and try again.',
-  'edit_succeeded' => 'Group updated!',
   'edit_failed' => 'Group could not be edited.',
   'delete_group' => 'Delete group',
   'delete_group_confirm' => 'Please confirm that you want to delete :name.',
