@@ -3,7 +3,7 @@
     <template slot="title">
       <span>
         {{ __('groups.volunteers') }}
-        <span v-if="volunteers.length" class="font-weight-normal">
+        <span v-if="volunteers.length" class="font-weight-normal d-none d-md-inline">
           ({{ volunteers.length}})
         </span>
       </span>
