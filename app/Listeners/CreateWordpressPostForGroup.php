@@ -41,6 +41,11 @@ class CreateWordpressPostForGroup extends BaseEvent
             return;
         }
 
+        if ($group->archived_at) {
+            // Suppress notifications for archived groups.
+            return;
+        }
+
         $group->approved = true;
         $group->save();
 
