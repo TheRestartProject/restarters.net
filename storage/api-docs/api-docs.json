@@ -459,6 +459,17 @@
                 ],
                 "summary": "Get list of group names",
                 "operationId": "getGroupListv2",
+                "parameters": [
+                    {
+                        "name": "includeArchived",
+                        "in": "query",
+                        "description": "Include archived groups",
+                        "required": false,
+                        "schema": {
+                            "type": "boolean"
+                        }
+                    }
+                ],
                 "responses": {
                     "200": {
                         "description": "Successful operation",
@@ -621,6 +632,11 @@
                                     },
                                     "network_data": {
                                         "description": "Network-defined JSON data"
+                                    },
+                                    "archived_at": {
+                                        "title": "archived_at",
+                                        "description": "If present, this group has been archived and is no longer active.",
+                                        "format": "date-time"
                                     }
                                 },
                                 "type": "object"
@@ -1100,6 +1116,15 @@
                         "schema": {
                             "type": "boolean"
                         }
+                    },
+                    {
+                        "name": "includeArchived",
+                        "in": "query",
+                        "description": "Include archived groups",
+                        "required": false,
+                        "schema": {
+                            "type": "boolean"
+                        }
                     }
                 ],
                 "responses": {
@@ -1519,6 +1544,11 @@
                         "title": "updated_at",
                         "description": "The last change to this group.  This includes changes which affect the stats.",
                         "format": "date-time"
+                    },
+                    "archived_at": {
+                        "title": "archived_at",
+                        "description": "If present, this group has been archived and is no longer active.",
+                        "format": "date-time"
                     }
                 },
                 "type": "object"
@@ -1626,6 +1656,11 @@
                         "description": "Indicates that this is a summary result, not full group information.",
                         "format": "boolean",
                         "example": "true"
+                    },
+                    "archived_at": {
+                        "title": "archived_at",
+                        "description": "If present, this group has been archived and is no longer active.",
+                        "format": "date-time"
                     }
                 },
                 "type": "object"
