@@ -34,12 +34,13 @@ class CreateDiscourseGroupForGroup extends BaseEvent
             return;
         }
 
-        if ($event->theGroup->archived_at) {
+        $group = $event->group;
+
+        if ($group->archived_at) {
             // Suppress notifications for archived groups.
             return;
         }
 
-        $group = $event->group;
         $group->createDiscourseGroup();
     }
 }
