@@ -20,7 +20,8 @@
 </template>
 <script>
 import map from '../mixins/map'
-import {Geocoder, Photon} from 'leaflet-control-geocoder/dist/Control.Geocoder.js'
+import { Geocoder } from 'leaflet-control-geocoder/src/control'
+import { Photon } from 'leaflet-control-geocoder/src/geocoders/photon'
 import GroupMarker from './GroupMarker.vue'
 
 export default {
@@ -57,20 +58,6 @@ export default {
       type: Number,
       required: false,
       default: null,
-    }
-  },
-  setup(props) {
-    const miscStore = useMiscStore()
-    const groupStore = useGroupStore()
-    const messageStore = useMessageStore()
-    const isochroneStore = useIsochroneStore()
-
-    return {
-      miscStore,
-      groupStore,
-      messageStore,
-      isochroneStore,
-      Wkt,
     }
   },
   data() {
@@ -144,7 +131,6 @@ export default {
             placeholder: 'Search for a place...',
             defaultMarkGeocode: false,
             geocoder: new Photon({
-              // TODO Set geocoder bounding box from initialBounds.
               nameProperties: [
                 'name',
                 'street',
@@ -153,7 +139,7 @@ export default {
                 'town',
                 'city',
               ],
-              serviceUrl: 'https://geocode.ilovefreegle.org/api' // TODO Probably not.,
+              serviceUrl: 'https://photon.komoot.io/api'
             }),
             collapsed: false,
           })
@@ -161,40 +147,22 @@ export default {
                 if (e && e.geocode && e.geocode.bbox) {
                   // Empty out the query box so that the dropdown closes.  Note that "this" is the control object,
                   // which is why this isn't in a separate method.
-                  console.log('Search for place', e)
                   this.moved = true
                   this.setQuery('')
 
-                  // If we don't find anything at this location we will want to zoom out.
-                  // TODO Make this work a la Freegle.
-                  self.shownMany = false
+                  self.mapObject.flyToBounds(e.geocode.bbox)
 
-                  // For some reason we need to take a copy of the latlng bounds in the event before passing it to
-                  // flyToBounds.
-                  const flyTo = e.geocode.bbox
-                  const L = await import('leaflet/dist/leaflet-src.esm')
-                  const newBounds = new L.LatLngBounds(
-                      new L.LatLng(
-                          flyTo.getSouthWest().lat,
-                          flyTo.getSouthWest().lng
-                      ),
-                      new L.LatLng(
-                          flyTo.getNorthEast().lat,
-                          flyTo.getNorthEast().lng
-                      )
-                  )
-                  // Move the map to the location we've found.
-                  self.$refs.map.mapObject.flyToBounds(newBounds)
                   self.$emit('searched')
                 }
               })
               .addTo(this.mapObject)
-          console.log('Added geocoder')
         } catch (e) {
           // This is usually caused by leaflet.
           console.log('Ignore leaflet exception', e)
         }
       }
+
+      this.idle()
     },
     idle() {
       this.mapObject = this.$refs.map.mapObject
@@ -275,6 +243,7 @@ export default {
         })
 
         this.bounds = bounds
+        this.mapObject.fitToBounds(bounds)
       }
     },
     yourGroup(id) {

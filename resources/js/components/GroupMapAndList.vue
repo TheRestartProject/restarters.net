@@ -5,27 +5,28 @@
         <v-icon name="sync" scale=4 class="fa-spin" />
       </div>
     </div>
-    <GroupMap
-        v-else
-        v-model:ready="mapready"
-        :initial-bounds="initialBounds"
-        :min-zoom="minZoom"
-        :max-zoom="maxZoom"
-        :bounds.sync="bounds"
-        :network="network"
-        :your-groups="yourGroups"
-        :hover="hover"
-        @groups="groupsChanged($event)"
-    />
-    <GroupsTable
-      :groupids="groupidsInBounds"
-      class="mt-3"
-      count
-      v-if="groupidsInBounds.length"
-      your-area="yourArea"
-      :your-groups="yourGroups"
-      :hover.sync="hover"
-    />
+    <div v-else>
+      <GroupMap
+          v-model:ready="mapready"
+          :initial-bounds="initialBounds"
+          :min-zoom="minZoom"
+          :max-zoom="maxZoom"
+          :bounds.sync="bounds"
+          :network="network"
+          :your-groups="yourGroups"
+          :hover="hover"
+          @groups="groupsChanged($event)"
+      />
+      <GroupsTable
+          :groupids="groupidsInBounds"
+          class="mt-3"
+          count
+          v-if="groupidsInBounds.length"
+          your-area="yourArea"
+          :your-groups="yourGroups"
+          :hover.sync="hover"
+      />
+    </div>
   </div>
 </template>
 <script>
