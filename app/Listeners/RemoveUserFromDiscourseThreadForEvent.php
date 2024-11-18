@@ -32,7 +32,7 @@ class RemoveUserFromDiscourseThreadForEvent implements ShouldQueue {
             $event = Party::find($e->idevents);
             $user = User::find($e->iduser);
 
-            if ($event->theGroup->archived_at) {
+            if ($event && $event->theGroup->archived_at) {
                 // Suppress notifications for archived groups.
                 return;
             }
