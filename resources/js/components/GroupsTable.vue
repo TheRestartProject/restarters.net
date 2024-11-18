@@ -88,7 +88,7 @@ import InfiniteLoading from 'vue-infinite-loading'
 
 
 export default {
-  components: {GroupArchivedBadge, ConfirmModal, GroupsTableFilters},
+  components: {GroupArchivedBadge, ConfirmModal},
   props: {
     groupids: {
       type: Array,
