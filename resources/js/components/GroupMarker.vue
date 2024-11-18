@@ -5,8 +5,8 @@
           title: group.name + ' - ' + __('groups.marker_title'),
         }" :icon="icon"
         @click="openModal"
-        @mouseover="hover = true"
-        @mouseout="hover = false"
+        @mouseover="hovering = true"
+        @mouseout="hovering = false"
     />
     <GroupInfoModal v-if="showModal" ref="modal" :id="group.id" @close="showModal = false "/>
   </div>
@@ -37,14 +37,19 @@ export default {
   data() {
     return {
       showModal: false,
-      hover: false
+      hovering: false
+    }
+  },
+  watch: {
+    hover(val) {
+      this.hovering = val
     }
   },
   computed: {
     icon() {
       let icon = "/images/vendor/leaflet/dist/marker-icon.png"
 
-      if (this.hover) {
+      if (this.hovering) {
         icon = "/images/vendor/leaflet/dist/marker-icon-red.png"
       } else if (this.highlight) {
         icon = "/images/vendor/leaflet/dist/marker-icon-green.png"

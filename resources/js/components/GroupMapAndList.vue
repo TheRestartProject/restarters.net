@@ -1,7 +1,12 @@
 <template>
   <div>
-    Hover: {{ hover }}
+    <div class="loader d-flex justify-content-around" v-if="loading">
+      <div class="d-flex flex-column justify-content-around">
+        <v-icon name="sync" scale=4 class="fa-spin" />
+      </div>
+    </div>
     <GroupMap
+        v-else
         v-model:ready="mapready"
         :initial-bounds="initialBounds"
         :min-zoom="minZoom"
@@ -27,11 +32,13 @@
 import {MAX_MAP_ZOOM, MIN_MAP_ZOOM} from "../constants";
 import GroupMap from "./GroupMap";
 import GroupsTable from "./GroupsTable.vue";
+import VIcon from 'vue-awesome/components/Icon'
 
 export default {
   components: {
     GroupsTable,
     GroupMap,
+    VIcon,
   },
   props: {
     initialBounds: {
@@ -66,12 +73,15 @@ export default {
       mapready: false,
       bounds: null,
       hover: null,
+      loading: true
     }
   },
-  mounted() {
-    this.$store.dispatch('groups/list', {
+  async mounted() {
+    await this.$store.dispatch('groups/list', {
       details: true
     })
+
+    this.loading = false
   },
   methods: {
     groupsChanged(groupids) {
@@ -80,3 +90,12 @@ export default {
   },
 }
 </script>
+<style scoped lang="scss">
+.loader {
+  height: 400px;
+  width: 100%;
+  opacity: .1;
+  pointer-events: none;
+  color: lightgrey;
+}
+</style>
