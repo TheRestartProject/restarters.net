@@ -183,6 +183,17 @@ export default {
         this.currentTab = 0;
         break;
     }
+  },
+  mounted() {
+    if (this.currentTab === 0) {
+      // Fetch our own groups.  We fetch them individually because there aren't that many.
+      this.yourGroups.forEach((g) => {
+        this.$store.dispatch('groups/fetch', {
+          id: g,
+          includeStats: false
+        })
+      })
+    }
   }
 }
 </script>
