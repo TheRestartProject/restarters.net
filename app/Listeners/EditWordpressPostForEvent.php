@@ -44,6 +44,11 @@ class EditWordpressPostForEvent extends BaseEvent
             return;
         }
 
+        if ($theParty->theGroup->archived_at) {
+            // Suppress notifications for archived groups.
+            return;
+        }
+
         try {
             if (is_numeric($theParty->wordpress_post_id)) {
                 $startTimestamp = strtotime($theParty->event_start_utc);

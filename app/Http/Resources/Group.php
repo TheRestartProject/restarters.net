@@ -253,6 +253,12 @@ use Illuminate\Http\Resources\Json\JsonResource;
  *          title="updated_at",
  *          description="The last change to this group.  This includes changes which affect the stats.",
  *          format="date-time",
+ *     ),
+ *     @OA\Property(
+ *          property="archived_at",
+ *          title="archived_at",
+ *          description="If present, this group has been archived and is no longer active.",
+ *          format="date-time",
  *     )
  * )
 */
@@ -298,6 +304,7 @@ class Group extends JsonResource
             'network_data' => $networkData,
             'full' => true,
             'email' => $this->email,
+            'archived_at' => $this->archived_at ? Carbon::parse($this->archived_at)->toIso8601String() : null
         ];
 
         $ret['hosts'] = $this->resource->all_confirmed_hosts_count;

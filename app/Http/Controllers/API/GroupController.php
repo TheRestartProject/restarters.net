@@ -232,10 +232,10 @@ class GroupController extends Controller
      *      tags={"Groups"},
      *      summary="Get list of group names",
      *      @OA\Parameter(
-     *          name="archived",
+     *          name="includeArchived",
      *          description="Include archived groups",
      *          required=false,
-     *          in="path",
+     *          in="query",
      *          @OA\Schema(
      *              type="boolean"
      *          )
@@ -285,11 +285,15 @@ class GroupController extends Controller
 
     public static function listNamesv2(Request $request) {
         $request->validate([
-            'archived' => ['string', 'in:true,false'],
+            'includeArchived' => ['string', 'in:true,false'],
         ]);
 
         // We only return a small number of attributes, for speed.
-        $query = Group::select('idgroups', 'name', 'latitude', 'longitude');
+        $query = Group::select('idgroups', 'name', 'latitude', 'longitude', 'archived_at');
+
+        if (!$request->has('includeArchived') || $request->get('includeArchived') == 'false') {
+            $query = $query->whereNull('archived_at');
+        }
 
         $groups = $query->get();
         $ret = [];
@@ -300,6 +304,7 @@ class GroupController extends Controller
                 'name' => $group->name,
                 'lat' => $group->latitude,
                 'lng' => $group->longitude,
+                'archived_at' => $group->archived_at ? Carbon::parse($group->archived_at)->toIso8601String() : null
             ];
         }
 
@@ -942,7 +947,13 @@ class GroupController extends Controller
      *                   property="network_data",
      *                   @OA\Schema()
      *                ),
-     *             )
+     *                @OA\Property(
+     *                   property="archived_at",
+     *                   title="archived_at",
+     *                   description="If present, this group has been archived and is no longer active.",
+     *                   format="date-time",
+     *                )
+     *            )
      *         )
      *    ),
      *    @OA\Response(
@@ -961,7 +972,9 @@ class GroupController extends Controller
     public function updateGroupv2(Request $request, $idGroup) {
         $user = $this->getUser();
 
-        list($name, $area, $postcode, $location, $phone, $website, $description, $timezone, $latitude, $longitude, $country, $network_data, $email) = $this->validateGroupParams(
+        list($name, $area, $postcode, $location, $phone, $website, $description, $timezone,
+            $latitude, $longitude, $country, $network_data, $email,
+            $archived_at) = $this->validateGroupParams(
             $request,
             false
         );
@@ -990,10 +1003,11 @@ class GroupController extends Controller
             'email' => $email,
         ];
 
-        if ($user->hasRole('Administrator') || $user->hasRole('NetworkCoordinator')) {
-            // Not got permission to update these.
-            $data['area'] = $request->area;
-            $data['postcode'] = $request->postcode;
+        if ($user->hasRole('Administrator') || ($user->hasRole('NetworkCoordinator') && $isCoordinatorForGroup)) {
+            // Got permission to update these.
+            $data['area'] = $area;
+            $data['postcode'] = $postcode;
+            $data['archived_at'] = $archived_at;
         }
 
         if (isset($_FILES) && !empty($_FILES)) {
@@ -1093,6 +1107,7 @@ class GroupController extends Controller
             $request->validate([
                                    'name' => ['max:255'],
                                    'location' => ['max:255'],
+                                   'archived_at' => ['date'],
                                ]);
         }
 
@@ -1106,6 +1121,7 @@ class GroupController extends Controller
         $timezone = $request->input('timezone');
         $network_data = $request->input('network_data');
         $email = $request->input('email');
+        $archived_at = $request->input('archived_at');
 
         $latitude = null;
         $longitude = null;
@@ -1146,6 +1162,7 @@ class GroupController extends Controller
             $country_code,
             $network_data,
             $email,
+            $archived_at
         );
     }
 }

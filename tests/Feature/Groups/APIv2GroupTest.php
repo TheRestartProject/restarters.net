@@ -181,17 +181,7 @@ class APIv2GroupTest extends TestCase
         $response->assertSuccessful();
         $json = json_decode($response->getContent(), true);
         $groups = $json['data'];
-        $found = false;
-
-        foreach ($groups as $g)
-        {
-            if ($group->name == $g['name'])
-            {
-                $found = true;
-            }
-        }
-
-        $this->assertTrue($found);
+        $this->assertGroupFound($groups, $idgroups, true);
 
         // Group should now appear in the list of groups.
         $response = $this->get('/api/v2/groups/summary');
@@ -209,6 +199,22 @@ class APIv2GroupTest extends TestCase
         }
 
         $this->assertTrue($found);
+    }
+
+    private function assertGroupFound($groups, $id, $shouldBeFound) {
+        $ix = 0;
+        $found = false;
+
+        foreach ($groups as $g) {
+            if ($g['id'] == $id) {
+                $found = true;
+            } else {
+                $ix++;
+            }
+        }
+
+        $this->assertEquals($shouldBeFound, $found);
+        return $ix;
     }
 
     public function testCreateGroupGeocodeFailure()
@@ -479,5 +485,85 @@ class APIv2GroupTest extends TestCase
         $this->assertEquals(1, count($groups));
         $this->assertEquals($idgroups, $groups[0]['id']);
         $this->assertEquals((new Carbon($updated_at))->getTimestamp(), (new Carbon($groups[0]['updated_at']))->getTimestamp());
+    }
+
+    public function testArchived() {
+        $user = User::factory()->administrator()->create([
+            'api_token' => '1234',
+        ]);
+        $this->actingAs($user);
+
+        $this->get('/');
+        $user = Auth::user();
+
+        $idgroups = $this->createGroup(
+            'Test Group',
+            'https://therestartproject.org',
+            'London',
+            'Some text.',
+            true,
+            true,
+            'info@test.com'
+        );
+
+        $group = Group::find($idgroups);
+
+        $network = Network::factory()->create();
+        $network->addGroup($group);
+
+        // Get group - archived_at should not be set.
+        $response = $this->get("/api/v2/groups/$idgroups");
+        $response->assertSuccessful();
+        $json = json_decode($response->getContent(), true);
+        $this->assertEquals($idgroups, $json['data']['id']);
+        $this->assertNull($json['data']['archived_at']);
+
+        // Patch the group to set it.
+        $response = $this->patch('/api/v2/groups/' . $idgroups, [
+            'archived_at' => '2022-01-01',
+            'description' => 'Some text.'
+        ]);
+        $response->assertSuccessful();
+
+        // Get it back - should be set.
+        $response = $this->get("/api/v2/groups/$idgroups");
+        $response->assertSuccessful();
+        $json = json_decode($response->getContent(), true);
+        $this->assertEquals($idgroups, $json['data']['id']);
+        $this->assertEquals('2022-01-01T00:00:00+00:00', $json['data']['archived_at']);
+        $this->assertEquals('Some text.', $json['data']['description']);
+
+        // Group shouldn't appear in the list of groups by default.
+        $response = $this->get('/api/v2/groups/names');
+        $response->assertSuccessful();
+        $json = json_decode($response->getContent(), true);
+        $groups = $json['data'];
+
+        $this->assertGroupFound($groups, $idgroups, false);
+
+        $response = $this->get('/api/v2/groups/names?includeArchived=true');
+        $response->assertSuccessful();
+        $json = json_decode($response->getContent(), true);
+        $groups = $json['data'];
+        $ix = $this->assertGroupFound($groups, $idgroups, true);
+        $this->assertEquals('2022-01-01T00:00:00+00:00', $groups[$ix]['archived_at']);
+
+        $response = $this->get('/api/v2/groups/names?includeArchived=false');
+        $response->assertSuccessful();
+        $json = json_decode($response->getContent(), true);
+        $groups = $json['data'];
+        $this->assertGroupFound($groups, $idgroups, false);
+
+        $response = $this->get("/api/v2/networks/{$network->id}/groups");
+        $response->assertSuccessful();
+        $json = json_decode($response->getContent(), true);
+        $groups = $json['data'];
+        $this->assertGroupFound($groups, $idgroups, false);
+
+        $response = $this->get("/api/v2/networks/{$network->id}/groups?includeArchived=true");
+        $response->assertSuccessful();
+        $json = json_decode($response->getContent(), true);
+        $groups = $json['data'];
+        $this->assertGroupFound($groups, $idgroups, true);
     }
 }

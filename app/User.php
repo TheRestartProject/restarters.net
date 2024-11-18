@@ -128,12 +128,8 @@ class User extends Authenticatable implements Auditable, HasLocalePreference
         if (!is_null($this->latitude) && !is_null($this->longitude)) {
             $groupsNearbyQuery = Group::select(
                 DB::raw('*, ( 6371 * acos( cos( radians('.$this->latitude.') ) * cos( radians( latitude ) ) * cos( radians( longitude ) - radians('.$this->longitude.') ) + sin( radians('.$this->latitude.') ) * sin( radians( latitude ) ) ) ) AS dist')
-            )->leftJoin('grouptags_groups', function ($join) {
-                // Exclude any groups tagged with the special value of 10, which is 'Inactive'.
-                $join->on('group', '=', 'idgroups');
-                $join->on('group_tag', '=', DB::raw(GroupTags::INACTIVE));
-            })->where(function ($q) {
-                $q->whereNull('grouptags_groups.id');
+        )->where(function ($q) {
+            $q->whereNull('archived_at');
 
                 // Only show approved groups.
                 $q->where('approved', true);

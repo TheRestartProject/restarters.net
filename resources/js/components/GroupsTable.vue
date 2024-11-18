@@ -16,6 +16,7 @@
       </template>
       <template slot="cell(group_name)" slot-scope="data">
         <a :href="'/group/view/' + data.item.id">{{ data.item.name }}</a>
+        <GroupArchivedBadge :idgroups="data.item.id" />
       </template>
       <template slot="head(location)">
         <b-img src="/icons/map_marker_ico.svg" class="mt-3 icon " />
@@ -82,14 +83,12 @@
 import { DATE_FORMAT, DEFAULT_PROFILE } from '../constants'
 import moment from 'moment'
 import ConfirmModal from './ConfirmModal'
+import GroupArchivedBadge from "./GroupArchivedBadge.vue";
 import InfiniteLoading from 'vue-infinite-loading'
 
 
 export default {
-  components: {
-    ConfirmModal,
-    InfiniteLoading
-  },
+  components: {GroupArchivedBadge, ConfirmModal, GroupsTableFilters},
   props: {
     groupids: {
       type: Array,
