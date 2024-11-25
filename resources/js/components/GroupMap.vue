@@ -214,36 +214,40 @@ export default {
       this.idle()
     },
     zoomToGroups() {
-      if (!this.zoomedToGroups && this.mapObject && this.allGroups.length) {
-        const center = this.mapObject.getCenter()
+      try {
+        if (!this.zoomedToGroups && this.mapObject && this.allGroups.length) {
+          const center = this.mapObject.getCenter()
 
-        this.zoomedToGroups = true
+          this.zoomedToGroups = true
 
-        // Find the smallest box which contains 5 groups around the center.
-        const groups = this.allGroups
+          // Find the smallest box which contains 5 groups around the center.
+          const groups = this.allGroups
 
-        // Find the 5 closest groups.
-        const closest = groups
-            .map((group) => {
-              const lat = group.location.lat || group.lat
-              const lng = group.location.lng || group.lng
-              const distance = Math.sqrt((lat - center.lat) ** 2 + (lng - center.lng) ** 2)
-              return { group, distance }
-            })
-            .sort((a, b) => a.distance - b.distance)
-            .slice(0, 5)
-            .map((a) => a.group)
+          // Find the 5 closest groups.
+          const closest = groups
+              .map((group) => {
+                const lat = group.location.lat || group.lat
+                const lng = group.location.lng || group.lng
+                const distance = Math.sqrt((lat - center.lat) ** 2 + (lng - center.lng) ** 2)
+                return { group, distance }
+              })
+              .sort((a, b) => a.distance - b.distance)
+              .slice(0, 5)
+              .map((a) => a.group)
 
-        // Get the bounding box containing these groups.
-        const bounds = new L.LatLngBounds()
-        closest.forEach((group) => {
-          const lat = group.location.lat || group.lat
-          const lng = group.location.lng || group.lng
-          bounds.extend(new L.LatLng(lat, lng))
-        })
+          // Get the bounding box containing these groups.
+          const bounds = new L.LatLngBounds()
+          closest.forEach((group) => {
+            const lat = group.location.lat || group.lat
+            const lng = group.location.lng || group.lng
+            bounds.extend(new L.LatLng(lat, lng))
+          })
 
-        this.bounds = bounds
-        this.mapObject.fitToBounds(bounds)
+          this.bounds = bounds
+          this.mapObject.flyToBounds(bounds)
+        }
+      } catch (e) {
+        console.error('Zoom to groups error', e)
       }
     },
     yourGroup(id) {
