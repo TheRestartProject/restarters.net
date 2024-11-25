@@ -123,27 +123,40 @@ class User extends Authenticatable implements Auditable, HasLocalePreference
      */
     public function groupsNearby($numberOfGroups = 10, $createdSince = null, $nearby = self::NEARBY_KM)
     {
-        if (is_null($this->latitude) || is_null($this->longitude)) {
-            return [];
-        }
+        $groups = null;
 
-        $groupsNearbyQuery = Group::select(
-            DB::raw('*, ( 6371 * acos( cos( radians('.$this->latitude.') ) * cos( radians( latitude ) ) * cos( radians( longitude ) - radians('.$this->longitude.') ) + sin( radians('.$this->latitude.') ) * sin( radians( latitude ) ) ) ) AS dist')
+        if (!is_null($this->latitude) && !is_null($this->longitude)) {
+            $groupsNearbyQuery = Group::select(
+                DB::raw('*, ( 6371 * acos( cos( radians('.$this->latitude.') ) * cos( radians( latitude ) ) * cos( radians( longitude ) - radians('.$this->longitude.') ) + sin( radians('.$this->latitude.') ) * sin( radians( latitude ) ) ) ) AS dist')
         )->where(function ($q) {
             $q->whereNull('archived_at');
 
-            // Only show approved groups.
-            $q->where('approved', true);
-        })->having('dist', '<=', $nearby)
-            ->groupBy('idgroups');
+                // Only show approved groups.
+                $q->where('approved', true);
+            })->having('dist', '<=', $nearby)
+                ->groupBy('idgroups');
 
-        if ($createdSince) {
-            $groupsNearbyQuery->whereDate('created_at', '>=', date('Y-m-d', strtotime($createdSince)));
+            if ($createdSince) {
+                $groupsNearbyQuery->whereDate('created_at', '>=', date('Y-m-d', strtotime($createdSince)));
+            }
+
+            $groups = $groupsNearbyQuery->orderBy('dist', 'ASC')
+                ->take($numberOfGroups)
+                ->get();
+        } else if ($this->country_code) {
+            // We have no city, but we do have a country.  So all groups with this country code are nearby.
+            $groupsInCountry = Group::where('country_code', $this->country_code)
+                ->where('approved', true);
+
+            if ($createdSince) {
+                $groupsInCountry->whereDate('created_at', '>=', date('Y-m-d', strtotime($createdSince)));
+            }
+
+            $groups = $groupsInCountry
+                ->orderBy('name', 'ASC')
+                ->take($numberOfGroups)
+                ->get();
         }
-
-        $groups = $groupsNearbyQuery->orderBy('dist', 'ASC')
-            ->take($numberOfGroups)
-            ->get();
 
         // Expand the image
         $groupsNearby = [];

@@ -177,6 +177,7 @@ export default {
     this.initialGroup.candemote = this.candemote
     this.initialGroup.ingroup = this.ingroup
 
+    console.log('Group page initial group', this.initialGroup)
     this.$store.dispatch('groups/set', this.initialGroup)
 
     this.events.forEach(e => {
