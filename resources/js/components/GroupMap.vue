@@ -243,7 +243,7 @@ export default {
             bounds.extend(new L.LatLng(lat, lng))
           })
 
-          this.bounds = bounds
+          this.bounds = bounds.pad(0.1)
           this.mapObject.flyToBounds(bounds)
         }
       } catch (e) {
