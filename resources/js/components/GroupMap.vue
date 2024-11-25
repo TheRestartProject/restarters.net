@@ -244,7 +244,7 @@ export default {
           })
 
           this.bounds = bounds.pad(0.1)
-          this.mapObject.flyToBounds(bounds)
+          this.mapObject.flyToBounds(this.bounds)
         }
       } catch (e) {
         console.error('Zoom to groups error', e)
