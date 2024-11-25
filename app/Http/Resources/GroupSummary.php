@@ -103,7 +103,7 @@ class GroupSummary extends JsonResource
         $ret = [
             'id' => $this->idgroups,
             'name' => $this->name,
-            'image' => $this->groupImage && is_object($this->groupImage) && is_object($this->groupImage->image) ? $this->groupImage->image->path : null,
+            'image' => $this->image,
             'location' => new GroupLocation($this),
             'networks' => new NetworkSummaryCollection($this->resource->networks),
             'updated_at' => Carbon::parse($this->updated_at)->toIso8601String(),

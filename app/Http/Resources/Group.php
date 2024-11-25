@@ -290,7 +290,7 @@ class Group extends JsonResource
         $ret = [
             'id' => $this->idgroups,
             'name' => $this->name,
-            'image' => $this->groupImage && is_object($this->groupImage) && is_object($this->groupImage->image) ? $this->groupImage->image->path : null,
+            'image' => $this->image,
             'website' => $this->website,
             'phone' => $this->phone,
             'description' => $this->free_text,
