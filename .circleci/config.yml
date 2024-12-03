@@ -37,8 +37,6 @@ jobs:
           - MARIADB_PORT_NUMBER=3307
           - MARIADB_USER=bn_mediawiki
           - MARIADB_DATABASE=bitnami_mediawiki
-        healthcheck:
-          test: netstat -an | grep 3307 > /dev/null; if [ 0 != $? ]; then exit 1; fi;
       - image: 'bitnami/mediawiki:1'
         name: mediawiki
         labels:
@@ -53,9 +51,10 @@ jobs:
           - MEDIAWIKI_HOST=mediawiki
           - TZ: "UTC"
         depends_on:
-          - mariadb:
-              condition: service_healthy
-        restart: unless-stopped
+          - mariadb
+        entrypoint:
+            - until nc -z mariadb 3306; do sleep 1; done
+            - /entrypoint.sh
       - image: 'docker.io/bitnami/postgresql:11'
         name: postgresql
 # No volumes on CircleCI
