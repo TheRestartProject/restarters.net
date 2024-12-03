@@ -42,11 +42,10 @@ jobs:
         labels:
           kompose.service.type: nodeport
         environment:
-          - MARIADB_HOST=mariadb
-          - MARIADB_PORT_NUMBER=3307
+          - MEDIAWIKI_DATABASE_HOST=mariadb
+          - MEDIAWIKI_DATABASE_PORT_NUMBER=3307
           - MEDIAWIKI_DATABASE_USER=bn_mediawiki
           - MEDIAWIKI_DATABASE_NAME=bitnami_mediawiki
-          - MEDIAWIKI_DATABASE_PORT_NUMBER=3307
           - ALLOW_EMPTY_PASSWORD=yes
           - MEDIAWIKI_EXTERNAL_HTTP_PORT_NUMBER=8080
           - MEDIAWIKI_HOST=mediawiki
