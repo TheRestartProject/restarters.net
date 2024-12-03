@@ -34,7 +34,7 @@ jobs:
         name: mariadb
         environment:
           - ALLOW_EMPTY_PASSWORD=yes
-          - MYSQL_TCP_PORT=3307
+          - MARIADB_PORT_NUMBER=3307
           - MARIADB_USER=bn_mediawiki
           - MARIADB_DATABASE=bitnami_mediawiki
       - image: 'bitnami/mediawiki:1'
