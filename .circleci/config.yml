@@ -53,8 +53,7 @@ jobs:
         depends_on:
           - mariadb
         entrypoint:
-            - until nc -z mariadb 3306; do sleep 1; done
-            - /entrypoint.sh
+            - sleep 60; /entrypoint.sh
       - image: 'docker.io/bitnami/postgresql:11'
         name: postgresql
 # No volumes on CircleCI
