@@ -17,7 +17,7 @@
         <div class="pl-md-4 d-flex w-xs-100 w-md-50 maybeborder pt-3 p-md-0 d-flex flex-column justify-content-center">
           <div class="d-flex justify-content-between w-100">
             <div class="flex-wrap">
-              <b>{{ group.location }}</b> <br/>
+              <b>{{ location }}</b> <br/>
               <ExternalLink v-if="group.website" :href="group.website">{{ __('groups.website') }}</ExternalLink>
             </div>
             <GroupActions :idgroups="idgroups" :can-see-delete="canSeeDelete" :can-perform-delete="canPerformDelete"
@@ -63,6 +63,20 @@ export default {
     groupImage() {
       return this.group && this.group.group_image && this.group.group_image.image ? ('/uploads/mid_' + this.group.group_image.image.path) : DEFAULT_PROFILE
     },
+    location() {
+      // This is a bit of finagling to deal with us not yet having full use of APIs in the client.
+      let ret = null
+
+      if (this.group) {
+        if (typeof this.group.location === 'string') {
+          ret = this.group.location
+        } else {
+          ret = this.group.location.name
+        }
+      }
+
+      return ret
+    }
   },
   methods: {
     brokenGroupImage(event) {
