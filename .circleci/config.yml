@@ -38,11 +38,7 @@ jobs:
           - MARIADB_USER=bn_mediawiki
           - MARIADB_DATABASE=bitnami_mediawiki
         healthcheck:
-          test: [ "CMD", "healthcheck.sh", "--connect", "--innodb_initialized" ]
-          start_period: 10s
-          interval: 10s
-          timeout: 5s
-          retries: 3
+          test: netstat -an | grep 3307 > /dev/null; if [ 0 != $? ]; then exit 1; fi;
       - image: 'bitnami/mediawiki:1'
         name: mediawiki
         labels:
