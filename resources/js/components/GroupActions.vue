@@ -120,6 +120,10 @@ export default {
       group.id = this.idgroups
       group.archived_at = (new Date()).toISOString()
       group.description = group.free_text
+
+      // Make sure we don't stomp on the networks.
+      delete group.networks
+
       await this.$store.dispatch('groups/edit', group)
 
       await this.$store.dispatch('groups/fetch', {
