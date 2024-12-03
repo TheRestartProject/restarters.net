@@ -55,7 +55,7 @@ jobs:
         entrypoint:
           - /bin/bash
           - -c
-          - apt install -y netcat; until nc -z mariadb 3306; do sleep 1; done; /opt/bitnami/scripts/mediawiki/entrypoint.sh "/opt/bitnami/scripts/apache/run.sh"
+          - sudo apt install -y netcat; until nc -z mariadb 3306; do sleep 1; done; /opt/bitnami/scripts/mediawiki/entrypoint.sh "/opt/bitnami/scripts/apache/run.sh"
       - image: 'docker.io/bitnami/postgresql:11'
         name: postgresql
 # No volumes on CircleCI
