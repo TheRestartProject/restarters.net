@@ -55,6 +55,7 @@ jobs:
         depends_on:
           - mariadb:
               condition: service_healthy
+        restart: unless-stopped
       - image: 'docker.io/bitnami/postgresql:11'
         name: postgresql
 # No volumes on CircleCI
