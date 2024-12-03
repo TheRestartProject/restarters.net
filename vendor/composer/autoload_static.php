@@ -846,6 +846,7 @@ class ComposerStaticInitf657da3451727d69be6269822b9691c7
         'App\\Console\\Commands\\UserCreate' => __DIR__ . '/../..' . '/app/Console/Commands/UserCreate.php',
         'App\\Console\\Commands\\UserMakeHost' => __DIR__ . '/../..' . '/app/Console/Commands/UserMakeHost.php',
         'App\\Console\\Commands\\WordpressCreateEvent' => __DIR__ . '/../..' . '/app/Console/Commands/WordpressCreateEvent.php',
+        'App\\Console\\Commands\\WordpressCreateEventFailed' => __DIR__ . '/../..' . '/app/Console/Commands/WordpressCreateEventFailed.php',
         'App\\Console\\Commands\\WordpressCreateEventMissing' => __DIR__ . '/../..' . '/app/Console/Commands/WordpressCreateEventMissing.php',
         'App\\Console\\Commands\\WordpressCreateGroup' => __DIR__ . '/../..' . '/app/Console/Commands/WordpressCreateGroup.php',
         'App\\Console\\Kernel' => __DIR__ . '/../..' . '/app/Console/Kernel.php',

@@ -67,6 +67,7 @@ return array(
     'App\\Console\\Commands\\UserCreate' => $baseDir . '/app/Console/Commands/UserCreate.php',
     'App\\Console\\Commands\\UserMakeHost' => $baseDir . '/app/Console/Commands/UserMakeHost.php',
     'App\\Console\\Commands\\WordpressCreateEvent' => $baseDir . '/app/Console/Commands/WordpressCreateEvent.php',
+    'App\\Console\\Commands\\WordpressCreateEventFailed' => $baseDir . '/app/Console/Commands/WordpressCreateEventFailed.php',
     'App\\Console\\Commands\\WordpressCreateEventMissing' => $baseDir . '/app/Console/Commands/WordpressCreateEventMissing.php',
     'App\\Console\\Commands\\WordpressCreateGroup' => $baseDir . '/app/Console/Commands/WordpressCreateGroup.php',
     'App\\Console\\Kernel' => $baseDir . '/app/Console/Kernel.php',
