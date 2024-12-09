@@ -117,6 +117,22 @@ class DiscourseUserEventSubscriber extends BaseEvent
         }
     }
 
+    public function onUserDeleted(UserDeleted $event)
+    {
+        if (config('restarters.features.discourse_integration') === true)
+        {
+            $user = $event->user;
+
+            try
+            {
+                $this->discourseService->anonymise($user);
+            } catch (\Exception $ex)
+            {
+                Log::error('Could not anonymise ' . $user->id . ' on Discourse: ' . $ex->getMessage());
+            }
+        }
+    }
+
     /**
      * Register the listeners for the subscriber.
      *
@@ -138,6 +154,11 @@ class DiscourseUserEventSubscriber extends BaseEvent
         $events->listen(
             \App\Events\UserRegistered::class,
             'App\Listeners\DiscourseUserEventSubscriber@onUserRegistered'
+        );
+
+        $events->listen(
+            \App\Events\UserDeleted::class,
+            'App\Listeners\DiscourseUserEventSubscriber@onUserDeleted'
         );
     }
 }

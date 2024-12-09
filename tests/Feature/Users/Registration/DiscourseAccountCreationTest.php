@@ -16,7 +16,7 @@ use Mockery;
 use Tests\TestCase;
 use Tests\Feature\MockInterface;
 
-class DiscourseAccountCreationTests extends TestCase
+class DiscourseAccountCreationTest extends TestCase
 {
     /** @test */
     public function user_registration_triggers_user_registered_event()
