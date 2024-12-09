@@ -3,8 +3,10 @@
 namespace Tests\Feature;
 
 use App\Events\UserDeleted;
+use App\Events\UserLanguageUpdated;
 use App\Events\UserRegistered;
 use App\Listeners\AddUserToDiscourseGroup;
+use App\Listeners\AnonymiseSoftDeletedUser;
 use App\Listeners\DiscourseUserEventSubscriber;
 use App\Providers\DiscourseServiceProvider;
 use App\Role;
@@ -17,28 +19,39 @@ use Illuminate\Support\Facades\Log;
 use Mockery;
 use Tests\TestCase;
 use Tests\Feature\MockInterface;
+use Illuminate\Support\Facades\Artisan;
 
 class DiscourseAccountDeletionTest extends TestCase
 {
     /** @test */
     public function user_deletion_triggers_anonymise()
     {
-        // Soft-deleting a user should trigger a call to the method which will anonymise the user on Discourse.
         config('restarters.features.discourse_integration', true);
-        $this->instance(DiscourseUserEventSubscriber::class, Mockery::mock(DiscourseUserEventSubscriber::class, function ($mock) {
-            $mock->shouldReceive('onUserDeleted')->once();
-        }));
 
-        Event::fake();
+        // We can check that AnonymiseSoftDeletedUser is attached to the UserDeleted event.
+        // I don't know how to check that DiscourseUserEventSubscriber is attached.
+        $this->assertListenerIsAttachedToEvent(AnonymiseSoftDeletedUser::class, UserDeleted::class);
 
         $user = User::factory()->restarter()->create();
         $this->loginAsTestUser(Role::ADMINISTRATOR);
+
+        // Get the Discourse user created.
+        $this->artisan("queue:work --stop-when-empty");
+
+        $user->refresh();
+        $this->assertNotEquals('', $user->username);
+
         $response = $this->post('/user/soft-delete', [
             'id' => $user->id
         ]);
         $response->assertSessionHas('danger');
         $this->assertTrue($response->isRedirection());
 
-        Event::assertDispatched(UserDeleted::class);
+        // Process the events.  We can't assert on methods being called because they are backgrounded.
+        $this->artisan("queue:work --stop-when-empty");
+
+        // The Discourse anonymisation should have removed the username.
+        $user->refresh();
+        $this->assertEquals('', $user->username);
     }
 }

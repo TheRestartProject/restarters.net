@@ -5,6 +5,7 @@ namespace App\Listeners;
 use App\Events\UserEmailUpdated;
 use App\Events\UserLanguageUpdated;
 use App\Events\UserRegistered;
+use App\Events\UserDeleted;
 use App\Services\DiscourseService;
 use Illuminate\Support\Facades\Log;
 
@@ -126,6 +127,8 @@ class DiscourseUserEventSubscriber extends BaseEvent
             try
             {
                 $this->discourseService->anonymise($user);
+                $user->username = null;
+                $user->save();
             } catch (\Exception $ex)
             {
                 Log::error('Could not anonymise ' . $user->id . ' on Discourse: ' . $ex->getMessage());
@@ -140,25 +143,11 @@ class DiscourseUserEventSubscriber extends BaseEvent
      */
     public function subscribe($events)
     {
-        // We subscribe to all the events irrespective of whether the feature is enabled so that we can test them.
-        $events->listen(
-            \App\Events\UserEmailUpdated::class,
-            'App\Listeners\DiscourseUserEventSubscriber@onUserEmailUpdated'
-        );
-
-        $events->listen(
-            \App\Events\UserLanguageUpdated::class,
-            'App\Listeners\DiscourseUserEventSubscriber@onUserLanguageUpdated'
-        );
-
-        $events->listen(
-            \App\Events\UserRegistered::class,
-            'App\Listeners\DiscourseUserEventSubscriber@onUserRegistered'
-        );
-
-        $events->listen(
-            \App\Events\UserDeleted::class,
-            'App\Listeners\DiscourseUserEventSubscriber@onUserDeleted'
-        );
+        return [
+            \App\Events\UserEmailUpdated::class => 'onUserEmailUpdated',
+            \App\Events\UserLanguageUpdated::class => 'onUserLanguageUpdated',
+            \App\Events\UserRegistered::class => 'onUserRegistered',
+            \App\Events\UserDeleted::class => 'onUserDeleted'
+        ];
     }
 }

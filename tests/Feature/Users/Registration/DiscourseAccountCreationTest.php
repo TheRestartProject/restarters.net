@@ -68,6 +68,7 @@ class DiscourseAccountCreationTest extends TestCase
             );
 
             $json = json_decode($response->getBody()->getContents(), true);
+            error_log("Debugging: Discourse response: " . print_r($json, true));
             $this->assertEquals($atts['name'], $json['user']['username']);
         } else {
             $this->assertTrue(true);
