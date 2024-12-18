@@ -143,11 +143,25 @@ class DiscourseUserEventSubscriber extends BaseEvent
      */
     public function subscribe($events)
     {
-        return [
-            \App\Events\UserEmailUpdated::class => 'onUserEmailUpdated',
-            \App\Events\UserLanguageUpdated::class => 'onUserLanguageUpdated',
-            \App\Events\UserRegistered::class => 'onUserRegistered',
-            \App\Events\UserDeleted::class => 'onUserDeleted'
-        ];
+        // We subscribe to all the events irrespective of whether the feature is enabled so that we can test them.
+        $events->listen(
+            \App\Events\UserEmailUpdated::class,
+            'App\Listeners\DiscourseUserEventSubscriber@onUserEmailUpdated'
+        );
+
+        $events->listen(
+            \App\Events\UserLanguageUpdated::class,
+            'App\Listeners\DiscourseUserEventSubscriber@onUserLanguageUpdated'
+        );
+
+        $events->listen(
+            \App\Events\UserRegistered::class,
+            'App\Listeners\DiscourseUserEventSubscriber@onUserRegistered'
+        );
+
+        $events->listen(
+            \App\Events\UserDeleted::class,
+            'App\Listeners\DiscourseUserEventSubscriber@onUserDeleted'
+        );
     }
 }
