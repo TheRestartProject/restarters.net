@@ -617,4 +617,41 @@ class DiscourseService
         Log::info('Response status: ' . $response->getStatusCode());
         Log::info($response->getBody());
     }
+
+    public function anonymise($user)
+    {
+        Log::info("Anonymise {$user->id}");
+        $client = app('discourse-client');
+
+        // Get Discourse user id
+        $endpoint = "/users/by-external/{$user->id}.json";
+
+        $response = $client->request(
+            'GET',
+            $endpoint
+        );
+
+        $json = json_decode($response->getBody()->getContents(), true);
+        if (empty($json['user'])) {
+            throw new \Exception("User {$user->id} not found in Discourse");
+        }
+
+        $discourseUserId = $json['user']['id'];
+
+        if ($discourseUserId) {
+            $response = $client->request(
+                'PUT',
+                "/admin/users/$discourseUserId/anonymize.json"
+            );
+
+            $json = json_decode($response->getBody()->getContents(), true);
+
+            if (empty($json['success'])) {
+                throw new \Exception("Failed to anonymise user {$user->id}");
+            }
+        }
+
+        Log::info('Response status: ' . $response->getStatusCode());
+        Log::info($response->getBody());
+    }
 }
