@@ -47,13 +47,6 @@
                          :disabled="disabled"/>
           <DeviceNotes :notes.sync="currentDevice.notes" class="mb-4" :icon-variant="add ? 'black' : 'brand'"
                        :disabled="disabled"/>
-          <div class="d-flex">
-            <b-form-checkbox v-model="wiki" class="form-check form-check-large ml-4"
-                             :id="'wiki-' + (add ? '' : device.id)" :disabled="disabled"/>
-            <label :for="'wiki-' + (add ? '' : device.id)">
-              {{ __('partials.solution_text2') }}
-            </label>
-          </div>
         </b-card>
       </div>
     </div>
@@ -268,15 +261,6 @@ export default {
       // Powered devices don't allow editing of the weight except for the "None of the above" category, whereas
       // unpowered do.
       return !this.powered || (this.currentDevice && this.currentDevice.category === CATEGORY_MISC_POWERED)
-    },
-    wiki: {
-      // Need to convert server's number to/from a boolean.
-      get () {
-        return !!this.currentDevice.wiki
-      },
-      set (newval) {
-        this.currentDevice.wiki = newval
-      }
     },
     suppressTypeWarning () {
       // We don't want to show the warning if we have not changed the type since it was last saved.

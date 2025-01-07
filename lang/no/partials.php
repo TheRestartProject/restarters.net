@@ -56,6 +56,5 @@ return [
   'add_a_device' => 'Add a device',
   'event_requires_moderation_by_an_admin' => 'Event requires moderation by an admin',
   'save' => 'Save item',
-  'solution_text2' => 'Interesting case study to share?',
   'cancel' => 'Cancel',
 ];

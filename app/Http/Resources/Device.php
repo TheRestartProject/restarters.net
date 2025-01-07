@@ -158,13 +158,6 @@ use Illuminate\Http\Resources\Json\JsonResource;
  *           example="Manufacturer"
  *     ),
  *     @OA\Property(
- *          property="case_study",
- *          title="case_study",
- *          description="Whether this item is an interesting case study.",
- *          format="boolean",
- *          example="true"
- *     ),
- *     @OA\Property(
  *          property="barrier",
  *          title="barrier",
  *          description="Iff repair_status is 'End of life',  the primary barrier to repair.",
@@ -212,7 +205,6 @@ class Device extends JsonResource
             'problem' => $this->problem,
             'short_problem' => $this->getShortProblem(),
             'notes' => $this->notes,
-            'case_study' => intval($this->case_study) ? true : false,
             'created_at' => $this->created_at->toIso8601String(),
             'updated_at' => $this->created_at->toIso8601String(),
         ];

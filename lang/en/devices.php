@@ -66,7 +66,6 @@ return [
   'assessment' => 'Assessment',
   'item_and_repair_info' => 'Item & Repair Info',
   'search_assessment_comments' => 'Assessment',
-  'interesting_case_study' => 'Interesting case study',
   'tooltip_type' => 'Add as much information about the type of item here as you can (e.g. `Denim jeans` or ‘Sofa’)',
   'add_data_group' => 'Please select a group',
   'add_data_event' => 'Please select an event',

@@ -60,6 +60,5 @@ admin',
   'hot_topics' => 'Argomenti piu\' seguiti',
   'hot_topics_link' => 'Argomenti piu\' seguiti della settimana',
   'hot_topics_text' => 'Unisciti alla conversazione su gli argomenti piu\' seguiti della settimana',
-  'solution_text2' => 'Interesting case study to share?',
   'cancel' => 'Cancel',
 ];

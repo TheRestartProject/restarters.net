@@ -58,6 +58,5 @@ return [
   'yes_third_party' => 'Ja - van een derde partij',
   'your_recent_events' => 'Je meest recente activiteiten',
   'your_recent_events_txt1' => 'Dit zijn activiteiten waarop je antwoordde of waaraan je werd toegevoegd door een organisator',
-  'solution_text2' => 'Interesting case study to share?',
   'cancel' => 'Cancel',
 ];

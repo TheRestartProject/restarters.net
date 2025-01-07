@@ -136,10 +136,6 @@ class DeviceController extends Controller {
      *                     ref="#/components/schemas/Device/properties/spare_parts",
      *                 ),
      *                @OA\Property(
-     *                    property="case_study",
-     *                    ref="#/components/schemas/Device/properties/case_study",
-     *                ),
-     *                @OA\Property(
      *                     property="barrier",
      *                     ref="#/components/schemas/Device/properties/barrier",
      *                ),
@@ -172,7 +168,6 @@ class DeviceController extends Controller {
             $estimate,
             $problem,
             $notes,
-            $case_study,
             $repair_status,
             $spare_parts,
             $parts_provider,
@@ -204,7 +199,6 @@ class DeviceController extends Controller {
             'estimate' => $estimate,
             'problem' => $problem,
             'notes' => $notes,
-            'wiki' => $case_study,
             'repair_status' => $repair_status,
             'spare_parts' => $spare_parts,
             'parts_provider' => $parts_provider,
@@ -331,10 +325,6 @@ class DeviceController extends Controller {
      *                     ref="#/components/schemas/Device/properties/spare_parts",
      *                 ),
      *                @OA\Property(
-     *                    property="case_study",
-     *                    ref="#/components/schemas/Device/properties/case_study",
-     *                ),
-     *                @OA\Property(
      *                     property="barrier",
      *                     ref="#/components/schemas/Device/properties/barrier",
      *                ),
@@ -367,7 +357,6 @@ class DeviceController extends Controller {
             $estimate,
             $problem,
             $notes,
-            $case_study,
             $repair_status,
             $spare_parts,
             $parts_provider,
@@ -394,7 +383,6 @@ class DeviceController extends Controller {
             'estimate' => $estimate,
             'problem' => $problem,
             'notes' => $notes,
-            'wiki' => $case_study,
             'repair_status' => $repair_status,
             'spare_parts' => $spare_parts,
             'parts_provider' => $parts_provider,
@@ -494,7 +482,6 @@ class DeviceController extends Controller {
                 'repair_status' => [ 'string', 'in:Fixed,Repairable,End of life' ],
                 'next_steps' => [ 'string', 'in:More time needed,Professional help,Do it yourself', 'nullable' ],
                 'spare_parts' => [ 'string', 'in:No,Manufacturer,Third party' ],
-                'case_study' => ['boolean'],
                 'barrier' => [ 'string', 'nullable', 'in:Spare parts not available,Spare parts too expensive,No way to open the product,Repair information not available,Lack of equipment' ],
             ]);
         } else {
@@ -510,7 +497,6 @@ class DeviceController extends Controller {
                 'repair_status' => [ 'string', 'in:Fixed,Repairable,End of life' ],
                 'next_steps' => [ 'string', 'in:More time needed,Professional help,Do it yourself', 'nullable' ],
                 'spare_parts' => [ 'string', 'in:No,Manufacturer,Third party' ],
-                'case_study' => ['boolean'],
                 'barrier' => [ 'string','nullable', 'in:Spare parts not available,Spare parts too expensive,No way to open the product,Repair information not available,Lack of equipment' ],
             ]);
         }
@@ -526,7 +512,6 @@ class DeviceController extends Controller {
         $estimate = $estimate ? $estimate : 0;
         $problem = $request->input('problem');
         $notes = $request->input('notes');
-        $case_study = $request->input('case_study');
         $repair_status = $request->input('repair_status');
         $barrierInput = $request->input('barrier');
 
@@ -616,7 +601,6 @@ class DeviceController extends Controller {
             $estimate,
             $problem,
             $notes,
-            $case_study,
             $repair_status,
             $spare_parts,
             $parts_provider,
