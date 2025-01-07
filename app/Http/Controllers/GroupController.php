@@ -35,6 +35,7 @@ use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Log;
 use Notification;
 use Spatie\ValidationRules\Rules\Delimited;
+use Carbon\Carbon;
 
 class GroupController extends Controller
 {
@@ -108,58 +109,6 @@ class GroupController extends Controller
         }
 
         return view('group.create');
-    }
-
-    private function expandVolunteers($volunteers, $allSkills)
-    {
-        $ret = [];
-
-        // Get array of volunteer ids
-        $volunteerIds = $volunteers->pluck('user')->toArray();
-        $users = User::whereIn('id', $volunteerIds)->get();
-
-        $volIx = [];
-        foreach ($users as $user) {
-            $volIx[$user->id] = $user;
-        }
-
-        $volunteerSkills = UsersSkills::whereIn('user', $volunteerIds)->get();
-
-        $ix = [];
-
-        foreach ($volunteerSkills as $volunteerSkill) {
-            if (!array_key_exists($volunteerSkill->user, $ix)) {
-                $ix[$volunteerSkill->user] = [];
-            }
-
-            $ix[$volunteerSkill->user][] = $volunteerSkill->skill;
-        }
-
-        foreach ($volunteers as &$volunteer) {
-            $volunteerObj = $volIx[$volunteer->user];
-
-            $volunteer['volunteer'] = $volunteerObj;
-
-            if ($volunteer['volunteer']) {
-                if (array_key_exists($volunteer->user, $ix)) {
-                    $skills = [];
-                    foreach ($ix[$volunteer->user] as $skill) {
-                        if (array_key_exists($skill, $allSkills)) {
-                            $skills[] = $allSkills[$skill];
-                        }
-                    }
-                    $volunteer['user_skills'] = $skills;
-                }
-
-                $volunteer['fullName'] = $volunteer->name;
-                $image = $volunteerObj->getProfile($volunteerObj->id)->path;
-                $image = $image ? "/uploads/thumbnail_$image" : "/images/placeholder-avatar.png";
-                $volunteer['profilePath'] = $image;
-                $ret[] = $volunteer;
-            }
-        }
-
-        return $ret;
     }
 
     public function view($groupid)
@@ -285,17 +234,6 @@ class GroupController extends Controller
         $user_groups = UserGroups::where('user', Auth::user()->id)->count();
         $view_group = Group::find($groupid);
 
-        // We extract some skills info in bulk to reduce the number of distinct queries on groups with many
-        // volunteers.
-        $allSkills = Skills::all()->all();
-        $ix = [];
-        foreach ($allSkills as $i => $skill) {
-            $ix[$skill->id] = $skill;
-            $ix[$skill->id]->skillName;
-        }
-
-        $view_group->allConfirmedVolunteers = $this->expandVolunteers($view_group->allConfirmedVolunteers, $ix);
-
         $pendingInvite = UserGroups::where('group', $groupid)
         ->where('user', $user->id)
         ->where(function ($query) {
@@ -364,20 +302,6 @@ class GroupController extends Controller
         if (empty($emails)) {
             \Sentry\CaptureMessage('You have not entered any emails!');
             return redirect()->back()->with('warning', __('groups.invite.no_emails'));
-        }
-
-        $invalid = [];
-
-        foreach ($emails as $email) {
-            if (! filter_var($email, FILTER_VALIDATE_EMAIL)) {
-                $invalid[] = $email;
-            }
-        }
-
-        if (count($invalid)) {
-            return redirect()->back()->with('warning', __('groups.invite_invalid_emails', [
-                'emails' => implode(', ', $invalid)
-            ]));
         }
 
         $users = User::whereIn('email', $emails)->get();
@@ -593,6 +517,7 @@ class GroupController extends Controller
                     'group_tags' => $group->group_tags()->get()->pluck('id'),
                     'following' => in_array($group->idgroups, $your_groupids),
                     'nearby' => in_array($group->idgroups, $nearby_groupids),
+                    'archived_at' => $group->archived_at ? Carbon::parse($group->archived_at)->toIso8601String() : null
                 ];
             }
         }
@@ -703,196 +628,6 @@ class GroupController extends Controller
         return 'Sorry, but the image can\'t be deleted';
     }
 
-    public function getMakeHost($group_id, $user_id, Request $request)
-    {
-        // Has current logged in user got permission to add host?
-        // - Is a host of the group.
-        // - Is a network coordinator of a network which the group is in.
-        // - Is an Administrator
-        $group = Group::findOrFail($group_id);
-        $loggedInUser = Auth::user();
-
-        if (($loggedInUser->hasRole('Host') && Fixometer::userIsHostOfGroup($group_id, $loggedInUser->id)) ||
-            $loggedInUser->isCoordinatorForGroup($group) ||
-            $loggedInUser->hasRole('Administrator')
-        ) {
-            $user = User::find($user_id);
-
-            $group->makeMemberAHost($user);
-
-            return redirect()->back()->with('success', __('groups.made_host', [
-                'name' => $user->name
-            ]));
-        }
-
-        \Sentry\CaptureMessage(__('groups.permission'));
-        return redirect()->back()->with('warning', __('groups.permission'));
-    }
-
-    public function getRemoveVolunteer($group_id, $user_id, Request $request)
-    {
-        //Has current logged in user got permission to remove volunteer
-        $group = Group::findOrFail($group_id);
-        $loggedInUser = Auth::user();
-
-        if ((Fixometer::hasRole($loggedInUser, 'Host') && Fixometer::userIsHostOfGroup($group_id, Auth::id())) ||
-            $loggedInUser->isCoordinatorForGroup($group) ||
-            Fixometer::hasRole($loggedInUser, 'Administrator')) {
-            // Retrieve user
-            $user = User::find($user_id);
-
-            //Let's delete the user
-            $userGroupAssociation = UserGroups::where('user', $user_id)->where('group', $group_id)->first();
-
-            if (! is_null($userGroupAssociation)) {
-                $userGroupAssociation->delete();
-
-                return redirect()->back()->with('success', __('groups.volunteer_remove_success', [
-                    'name' => $user->name
-                ]));
-            }
-            \Sentry\CaptureMessage(__('groups.volunteer_remove_error', [
-                'name' => $user->name
-            ]));
-
-            return redirect()->back()->with('warning', __('groups.volunteer_remove_error', [
-                'name' => $user->name
-            ]));
-        }
-
-        \Sentry\CaptureMessage(__('groups.permission'));
-        return redirect()->back()->with('warning', __('groups.permission'));
-    }
-
-    public function volunteersNearby($groupid)
-    {
-        $user = User::find(Auth::id());
-
-        //Object Instances
-        $Group = new Group;
-        $User = new User;
-        $Party = new Party;
-        $Device = new Device;
-        $groups = $Group->ofThisUser($user->id);
-
-        // get list of ids to check in if condition
-        $gids = [];
-        foreach ($groups as $group) {
-            $gids[] = $group->idgroups;
-        }
-
-        if ((isset($groupid) && is_numeric($groupid)) || in_array($groupid, $gids)) {
-            $group = Group::where('idgroups', $groupid)->first();
-        } else {
-            $group = $groups[0];
-            unset($groups[0]);
-        }
-
-        if (! is_null($group->latitude) && ! is_null($group->longitude)) {
-            $restarters_nearby = User::nearbyRestarters($group->latitude, $group->longitude, 20)->orderBy('name', 'ASC')->get();
-            foreach ($restarters_nearby as $restarter) {
-                $membership = UserGroups::where('user', $restarter->id)->where('group', $groupid)->first();
-                $restarter->notAMember = $membership == null;
-                $restarter->hasPendingInvite = ! empty(UserGroups::where('group', $groupid)
-                    ->where('user', $restarter->id)
-                    ->where(function ($query) {
-                        $query->where('status', '<>', '1')
-                            ->whereNotNull('status');
-                    })->first());
-            }
-        } else {
-            $restarters_nearby = null;
-        }
-
-        $allPastEvents = Party::past()
-            ->with('devices.deviceCategory')
-            ->forGroup($group->idgroups)
-            ->get();
-
-        $clusters = [];
-
-        for ($i = 1; $i <= 4; $i++) {
-            $cluster = $Device->countByCluster($i, $group->idgroups);
-            $total = 0;
-            foreach ($cluster as $state) {
-                $total += $state->counter;
-            }
-            $cluster['total'] = $total;
-            $clusters['all'][$i] = $cluster;
-        }
-
-        for ($y = date('Y', time()); $y >= 2013; $y--) {
-            for ($i = 1; $i <= 4; $i++) {
-                $cluster = $Device->countByCluster($i, $group->idgroups, $y);
-
-                $total = 0;
-                foreach ($cluster as $state) {
-                    $total += $state->counter;
-                }
-                $cluster['total'] = $total;
-                $clusters[$y][$i] = $cluster;
-            }
-        }
-
-        if (! isset($response)) {
-            $response = null;
-        }
-
-        //Event tabs
-        $upcoming_events = Party::futureForUser()
-            ->forGroup($group->idgroups)
-            ->take(5)
-            ->get();
-
-        $past_events = Party::past()
-            ->forGroup($group->idgroups)
-            ->take(5)
-            ->get();
-
-        //Checking user for validatity
-        $in_group = ! empty(UserGroups::where('group', $groupid)
-            ->where('user', $user->id)
-            ->where(function ($query) {
-                $query->where('status', '1')
-                    ->orWhereNull('status');
-            })->first());
-
-        $is_host_of_group = Fixometer::userHasEditGroupPermission($groupid, $user->id);
-
-        $user_groups = UserGroups::where('user', Auth::user()->id)->count();
-        $view_group = Group::find($groupid);
-
-        $pendingInvite = UserGroups::where('group', $groupid)
-            ->where('user', $user->id)
-            ->where(function ($query) {
-                $query->where('status', '<>', '1')
-                    ->whereNotNull('status');
-            })->first();
-        $hasPendingInvite = ! empty($pendingInvite) ? $pendingInvite['status'] : false;
-
-        return view('group.nearby', [ //host.index
-            'title' => 'Host Dashboard',
-            'has_pending_invite' => $hasPendingInvite,
-            'response' => $response,
-            'grouplist' => $Group->findList(),
-            'userGroups' => $groups,
-            'group' => $group,
-            'profile' => $User->getProfile($user->id),
-            'upcomingparties' => $Party->findNextParties($group->idgroups),
-            'allparties' => $allPastEvents,
-            'devices' => $Device->ofThisGroup($group->idgroups),
-            'user' => $user,
-            'upcoming_events' => $upcoming_events,
-            'past_events' => $past_events,
-            'in_group' => $in_group,
-            'is_host_of_group' => $is_host_of_group,
-            'user_groups' => $user_groups,
-            'view_group' => $view_group,
-            'group_id' => $groupid,
-            'restarters_nearby' => $restarters_nearby,
-        ]);
-    }
-
     public function inviteNearbyRestarter($groupId, $userId)
     {
         $user_group = UserGroups::where('user', $userId)->where('group', $groupId)->first();
@@ -928,14 +663,10 @@ class GroupController extends Controller
                         'url' => $url,
                         'message' => null,
                     ], $user));
-                } else {
-                    $not_sent[] = $user->email;
                 }
             } catch (\Exception $ex) {
                 Log::error('An error occurred while sending invitation to nearby Restarter:'.$ex->getMessage());
             }
-        } else { // already a confirmed member of the group or been sent an invite
-            $not_sent[] = $user->email;
         }
 
         return redirect('/group/nearby/'.intval($groupId))->with('success', $user->name.' has been invited');

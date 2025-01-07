@@ -148,8 +148,7 @@
       </b-card>
 
       <div class="group-buttons text-right">
-        <p v-if="edited" class="mt-2 text-primary font-weight-bold" v-html="'<div>' + __('groups.edit_succeeded') + '</div>'" />
-        <div v-else-if="failed">
+        <div v-if="failed">
           <p v-if="creating" class="mt-2 text-danger font-weight-bold" v-html="'<div>' + __('groups.create_failed') + '</div>'"/>
           <p v-else class="mt-2 text-danger font-weight-bold" v-html="'<div>' + __('groups.edit_failed') + '</div>'"/>
         </div>
@@ -158,14 +157,20 @@
           <div class="text-right flex-grow-1 mr-4">
             {{ __('groups.groups_approval_text') }}
           </div>
-          <b-btn variant="primary" class="break" type="submit" @click="submit">
-            {{ __('groups.create_group') }}
-          </b-btn>
+          <SpinButton
+              icon-name="save"
+              :label="__('groups.create_group')"
+              variant="primary"
+              @handle="submit"
+          />
         </div>
         <div class="d-flex justify-content-end" v-else>
-          <b-btn variant="primary" class="break submit" type="submit" @click="submit">
-            {{ __('groups.edit_group_save_changes') }}
-          </b-btn>
+          <SpinButton
+              icon-name="save"
+              :label="__('groups.edit_group_save_changes')"
+              variant="primary"
+              @handle="submit"
+          />
         </div>
       </div>
     </div>
@@ -186,6 +191,7 @@ import GroupTimeZone from './GroupTimeZone'
 import GroupPhone from './GroupPhone'
 import GroupImage from './GroupImage'
 import NetworkData from './NetworkData'
+import SpinButton from "./SpinButton.vue";
 
 function geocodeableValidation () {
   return this.lat !== null && this.lng !== null
@@ -202,7 +208,8 @@ export default {
     GroupLocation,
     GroupLocationMap,
     GroupPhone,
-    GroupImage
+    GroupImage,
+    SpinButton,
   },
   mixins: [group, auth, validationHelpers],
   props: {
@@ -244,7 +251,8 @@ export default {
       edited: false,
       networkList: null,
       tagList: null,
-      networkData: {}
+      networkData: {},
+      archived_at: null,
     }
   },
   validations: {
@@ -349,6 +357,7 @@ export default {
       this.networkList = group.networks
       this.tagList = group.tags
       this.networkData = group.network_data ? group.network_data : {}
+      this.archived_at = group.archived_at
     }
 
     if (this.canNetwork) {
@@ -362,11 +371,12 @@ export default {
     this.ready = true
   },
   methods: {
-    async submit () {
+    async submit (callback) {
       // Events are created via form submission - we don't yet have an API call to do this over AJAX.  Therefore
       // this page and the subcomponents have form inputs with suitable names.
       this.failed = false
       this.edited = false
+      let success = false
 
       this.$v.$touch()
 
@@ -394,6 +404,7 @@ export default {
             if (id) {
               // Success.  Go to the edit page.
               window.location = '/group/edit/' + id
+              success = true
             } else {
               this.failed = true
             }
@@ -417,7 +428,8 @@ export default {
                 moderate: this.moderate,
                 networks: JSON.stringify(this.networkList.map(n => n.id)),
                 tags: JSON.stringify(this.tagList.map(n => n.id)),
-                network_data: JSON.stringify(this.networkData)
+                network_data: JSON.stringify(this.networkData),
+                archived_at: this.archived_at,
               })
 
               if (id) {
@@ -425,6 +437,7 @@ export default {
                 // group approval status might not have been updated yet.  Handle this locally.
                 this.approved = this.approved || this.moderate === 'approve'
                 this.edited = true
+                success = true
               } else {
                 this.failed = true
               }
@@ -432,6 +445,8 @@ export default {
           }
         }
       }
+
+      callback(success)
     }
   }
 }

@@ -3,7 +3,7 @@
     <template slot="title">
       <span>
         {{ __('groups.volunteers') }}
-        <span v-if="volunteers.length" class="font-weight-normal">
+        <span v-if="volunteers.length" class="font-weight-normal d-none d-md-inline">
           ({{ volunteers.length}})
         </span>
       </span>
@@ -12,7 +12,7 @@
       <div class="mt-2">
         <div v-if="volunteers.length">
           <div class="maxheight" :key="'confirm-' + volunteers.length">
-            <GroupVolunteer v-for="a in volunteers" :key="'group-' + a.idusers_groups" :volunteer="a" :canedit="canedit" v-if="!a.deleted_at" :idgroups="idgroups" />
+            <GroupVolunteer v-for="a in volunteers" :key="'group-' + a.id" :id="a.id" :canedit="canedit" :candemote="candemote" />
           </div>
           <div class="d-flex justify-content-between">
             <a class="justify-content-end" href="#" data-toggle="modal" data-target="#invite-to-group">
@@ -42,21 +42,10 @@ export default {
       required: true
     }
   },
-  created() {
-    // The list of volunteers is passed from the server to the client via a prop on this component.  When we are created
-    // we put it in the store.  From then on we get the data from the store so that we get reactivity.
-    //
-    // Further down the line this initial data might be provided either by an API call from the client to the server,
-    // or from Vue server-side rendering, where the whole initial state is passed to the client.
-    //
-    // Similarly the group should be in the store and passed just by id, but we haven't introduced a group store yet.
-    this.$store.dispatch('volunteers/set', {
-      idgroups: this.idgroups,
-      volunteers: this.volunteers
-    })
+  mounted() {
+    // Get the list of group volunteers
+    this.$store.dispatch('volunteers/fetchGroup', this.idgroups)
   },
-  methods: {
-  }
 }
 </script>
 <style scoped lang="scss">

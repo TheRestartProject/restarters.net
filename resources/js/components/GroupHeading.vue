@@ -2,12 +2,14 @@
   <div>
     <div class="d-flex justify-content-between mb-3">
       <h1 class="d-block d-md-none">{{ __('groups.groups') }}</h1>
-      <GroupActions :idgroups="idgroups" :can-see-delete="canSeeDelete" :can-perform-delete="canPerformDelete" class="d-block d-md-none" @left="$emit('left')" />
+      <GroupActions :idgroups="idgroups" :can-see-delete="canSeeDelete" :can-perform-delete="canPerformDelete"
+                    :can-perform-archive="canPerformArchive"
+                    class="d-block d-md-none" @left="$emit('left')"/>
     </div>
     <div class="border-top-very-thick border-bottom-thin mb-3">
       <div class="d-flex flex-wrap mt-4 mb-3 mb-md-3">
         <div class="bord d-flex w-xs-100 w-md-50">
-          <b-img @error="brokenGroupImage" :src="groupImage" class="groupImage align-self-start mr-4 mb-3" />
+          <b-img @error="brokenGroupImage" :src="groupImage" class="groupImage align-self-start mr-4 mb-3"/>
           <h1>
             {{ group.name }}
           </h1>
@@ -15,10 +17,12 @@
         <div class="pl-md-4 d-flex w-xs-100 w-md-50 maybeborder pt-3 p-md-0 d-flex flex-column justify-content-center">
           <div class="d-flex justify-content-between w-100">
             <div class="flex-wrap">
-              <b>{{ group.location }}</b> <br />
+              <b>{{ location }}</b> <br/>
               <ExternalLink v-if="group.website" :href="group.website">{{ __('groups.website') }}</ExternalLink>
             </div>
-            <GroupActions :idgroups="idgroups" :can-see-delete="canSeeDelete" :can-perform-delete="canPerformDelete" class="d-none d-md-block" @left="$emit('left')" />
+            <GroupActions :idgroups="idgroups" :can-see-delete="canSeeDelete" :can-perform-delete="canPerformDelete"
+                          :can-perform-archive="canPerformArchive"
+                          class="d-none d-md-block" @left="$emit('left')"/>
           </div>
         </div>
       </div>
@@ -26,7 +30,7 @@
   </div>
 </template>
 <script>
-import { DEFAULT_PROFILE } from '../constants'
+import {DEFAULT_PROFILE} from '../constants'
 import group from '../mixins/group'
 import GroupActions from './GroupActions'
 import ExternalLink from './ExternalLink'
@@ -49,11 +53,30 @@ export default {
       required: false,
       default: false
     },
+    canPerformArchive: {
+      type: Boolean,
+      required: false,
+      default: false
+    },
   },
   computed: {
     groupImage() {
       return this.group && this.group.group_image && this.group.group_image.image ? ('/uploads/mid_' + this.group.group_image.image.path) : DEFAULT_PROFILE
     },
+    location() {
+      // This is a bit of finagling to deal with us not yet having full use of APIs in the client.
+      let ret = null
+
+      if (this.group) {
+        if (typeof this.group.location === 'string') {
+          ret = this.group.location
+        } else {
+          ret = this.group.location.name
+        }
+      }
+
+      return ret
+    }
   },
   methods: {
     brokenGroupImage(event) {

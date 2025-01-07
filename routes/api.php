@@ -43,7 +43,6 @@ Route::middleware('auth:api')->group(function () {
 
         Route::get('/', [API\GroupController::class, 'getGroupList']); // Not used but worth keeping and tested.
         Route::get('/changes', [API\GroupController::class, 'getGroupChanges']); // Used by Zapier
-        Route::get('{id}/volunteers', [API\GroupController::class, 'listVolunteers']);
         Route::get('/network/', [API\GroupController::class, 'getGroupsByUsersNetworks']); // Used by Repair Together.
     });
 
@@ -79,6 +78,13 @@ Route::prefix('v2')->group(function() {
             Route::get('{id}', [API\GroupController::class, 'getGroupv2']);
             Route::post('', [API\GroupController::class, 'createGroupv2']);
             Route::patch('{id}', [API\GroupController::class, 'updateGroupv2']);
+
+            Route::get('{id}/volunteers', [API\GroupController::class, 'getVolunteersForGroupv2']);
+            Route::middleware('auth:api')->group(function ()
+            {
+                Route::patch('{id}/volunteers/{iduser}', [API\GroupController::class, 'patchVolunteerForGroupv2']);
+                Route::delete('{id}/volunteers/{iduser}', [API\GroupController::class, 'deleteVolunteerForGroupv2']);
+            });
         });
 
         Route::prefix('/events')->group(function() {

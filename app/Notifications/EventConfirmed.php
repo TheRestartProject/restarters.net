@@ -42,7 +42,9 @@ class EventConfirmed extends BaseNotification
         $url = url('/party/view/' . $this->party->idevents);
 
         return (new MailMessage)
-            ->subject(__('notifications.event_confirmed_subject', [], $locale))
+            ->subject(__('notifications.event_confirmed_subject', [
+                'time' => $this->party->event_date_local . ' ' . $this->party->start_local
+            ], $locale))
             ->greeting(__('notifications.greeting', [], $locale))
             ->line(
                 __('notifications.event_confirmed_line1', [

@@ -31,9 +31,15 @@ class AddUserToDiscourseGroup extends BaseEvent
             return;
         }
 
-        // add user to the network groups for the group the user followed.
         $repairGroup = $event->group;
         $user = $event->user;
+	
+        if ($repairGroup->archived_at) {
+            // Suppress notifications for archived groups.
+            return;
+        }
+
+        // add user to the network groups for the group the user followed.
 
         if (!$user->username) {
             $user->generateAndSetUsername();

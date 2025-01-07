@@ -131,6 +131,15 @@ class NetworkController extends Controller
      *              type="boolean"
      *          )
      *      ),
+     *      @OA\Parameter(
+     *          name="includeArchived",
+     *          description="Include archived groups",
+     *          required=false,
+     *          in="query",
+     *          @OA\Schema(
+     *              type="boolean"
+     *          )
+     *      ),
      *      @OA\Response(
      *          response=200,
      *          description="Successful operation",
@@ -171,11 +180,16 @@ class NetworkController extends Controller
 
         // We use a query rather than $network->groups so that the filtering by date is done in the database rather
         // than getting all groups and filtering in PHP.  This is faster.
-        $groups = Group::join('group_network', 'group_network.group_id', '=', 'groups.idgroups')
+        $query = Group::join('group_network', 'group_network.group_id', '=', 'groups.idgroups')
             ->where('group_network.network_id', $id)
             ->where('groups.updated_at', '>=', $start)
-            ->where('groups.updated_at', '<=', $end)->get();
+            ->where('groups.updated_at', '<=', $end);
 
+        if (!$request->has('includeArchived') || $request->get('includeArchived') == 'false') {
+            $query = $query->whereNull('archived_at');
+        }
+
+        $groups = $query->get();
 
         if ($request->get('includeDetails', false)) {
             return \App\Http\Resources\GroupCollection::make($groups);

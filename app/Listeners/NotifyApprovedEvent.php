@@ -35,6 +35,11 @@ class NotifyApprovedEvent extends BaseEvent
 
         $group = Group::findOrFail($theParty->group);
 
+        if ($group->archived_at) {
+            // Suppress notifications for archived groups.
+            return;
+        }
+
         // Only send notifications if the event is in the future.
         // We don't want to send emails to Restarters about past events being added.
         if ($theParty->isUpcoming()) {
@@ -48,6 +53,7 @@ class NotifyApprovedEvent extends BaseEvent
                     'event_venue' => $theParty->venue,
                     'event_url' => url('/party/view/' . $partyId),
                     'event_group' => $group->name,
+                    'event_start' => $theParty->event_date_local . ' ' . $theParty->start_local,
                 ]));
             }
         }

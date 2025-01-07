@@ -10,6 +10,7 @@ use App\Helpers\Fixometer;
 use App\Http\Controllers\Controller;
 use App\Http\Resources\PartySummaryCollection;
 use App\Http\Resources\TagCollection;
+use App\Http\Resources\VolunteerCollection;
 use App\Network;
 use App\Notifications\AdminModerationGroup;
 use App\Notifications\GroupConfirmed;
@@ -230,6 +231,15 @@ class GroupController extends Controller
      *      operationId="getGroupListv2",
      *      tags={"Groups"},
      *      summary="Get list of group names",
+     *      @OA\Parameter(
+     *          name="includeArchived",
+     *          description="Include archived groups",
+     *          required=false,
+     *          in="query",
+     *          @OA\Schema(
+     *              type="boolean"
+     *          )
+     *      ),
      *      @OA\Response(
      *          response=200,
      *          description="Successful operation",
@@ -251,14 +261,25 @@ class GroupController extends Controller
      */
 
     public static function listNamesv2(Request $request) {
+        $request->validate([
+            'includeArchived' => ['string', 'in:true,false'],
+        ]);
+
         // We only return the group id and name, for speed.
-        $groups = Group::select('idgroups', 'name')->get();
+        $query = Group::select('idgroups', 'name', 'archived_at');
+
+        if (!$request->has('includeArchived') || $request->get('includeArchived') == 'false') {
+            $query = $query->whereNull('archived_at');
+        }
+
+        $groups = $query->get();
         $ret = [];
 
         foreach ($groups as $group) {
             $ret[] = [
                 'id' => $group->idgroups,
                 'name' => $group->name,
+                'archived_at' => $group->archived_at ? Carbon::parse($group->archived_at)->toIso8601String() : null
             ];
         }
 
@@ -413,32 +434,160 @@ class GroupController extends Controller
         return PartySummaryCollection::make($parties);
     }
 
-    public function listVolunteers(Request $request, $idgroups) {
+    /**
+     * @OA\Get(
+     *      path="/api/v2/groups/{id}/volunteers",
+     *      operationId="getVolunteersForGroupv2",
+     *      tags={"Groups","Volunteers"},
+     *      summary="Get Group Volunteers",
+     *      description="Returns the list of confirmed volunters for a group.",
+     *      @OA\Parameter(
+     *          name="id",
+     *          description="Group id",
+     *          required=true,
+     *          in="path",
+     *          @OA\Schema(
+     *              type="integer"
+     *          )
+     *      ),
+     *      @OA\Response(
+     *          response=200,
+     *          description="Successful operation",
+     *          @OA\JsonContent(
+     *              @OA\Property(
+     *                property="data",
+     *                title="data",
+     *                description="An array of volunteers",
+     *                type="array",
+     *                @OA\Items(
+     *                    ref="#/components/schemas/Volunteer"
+     *                )
+     *              )
+     *          )
+     *       ),
+     *      @OA\Response(
+     *          response=404,
+     *          description="Group not found",
+     *      ),
+     *     )
+     */
+
+    public static function getVolunteersForGroupv2($idgroups) {
         $group = Group::findOrFail($idgroups);
-
-        // Get the user that the API has been authenticated as.
-        $user = auth('api')->user();
-
-        if (!$user || !Fixometer::userHasEditGroupPermission($idgroups, $user->id)) {
-            // We require host permissions to view the list of volunteers.  At the moment this call is only used when
-            // adding volunteers, and this check means we don't have to worry about exposing sensitive data.
-            abort(403);
-        }
-
         $volunteers = $group->allConfirmedVolunteers()->get();
+        return VolunteerCollection::make($volunteers);
+    }
 
-        $ret = [];
+    /**
+     * @OA\Delete(
+     *      path="/api/v2/groups/{id}/volunteers/{iduser}",
+     *      operationId="deleteVolunteerForGroupv2",
+     *      tags={"Groups","Volunteers"},
+     *      summary="Delete Group Volunteer",
+     *      description="Removes a volunteer from a group",
+     *      @OA\Parameter(
+     *          name="id",
+     *          description="Group id",
+     *          required=true,
+     *          in="path",
+     *          @OA\Schema(
+     *              type="integer"
+     *          )
+     *      ),
+     *      @OA\Parameter(
+     *          name="iduser",
+     *          description="User id",
+     *          required=true,
+     *          in="path",
+     *          @OA\Schema(
+     *              type="integer"
+     *          )
+     *      ),
+     *      @OA\Response(
+     *          response=200,
+     *          description="Successful operation",
+     *       ),
+     *      @OA\Response(
+     *          response=404,
+     *          description="Group not found",
+     *      ),
+     *     )
+     */
 
-        foreach ($volunteers as $v) {
-            $volunteer = $v->volunteer;
-            $ret[] = [
-                'id' => $volunteer->id,
-                'name' => $volunteer->name,
-                'email'=> $volunteer->email
-            ];
+    public function deleteVolunteerForGroupv2(Request $request, $id, $iduser)
+    {
+        $user = $this->getUser();
+
+        $group = Group::findOrFail($id);
+        $is_host_of_group = Fixometer::userHasEditGroupPermission($id, $user->id);
+        $isCoordinatorForGroup = $user->isCoordinatorForGroup($group);
+
+        if (!Fixometer::hasRole($user, 'Administrator') && !$is_host_of_group && !$isCoordinatorForGroup) {
+            throw new AuthenticationException();
         }
 
-        return response()->json($ret);
+        $userGroupAssociation = UserGroups::where('group', $id)->where('user', $iduser)->first();
+
+        if (!is_null($userGroupAssociation)) {
+            $userGroupAssociation->delete();
+        }
+    }
+
+    /**
+     * @OA\Patch(
+     *      path="/api/v2/groups/{id}/volunteers/{iduser}",
+     *      operationId="patchVolunteerForGroupv2",
+     *      tags={"Groups","Volunteers"},
+     *      summary="Modify Group Volunteer",
+     *      description="Modify a volunteer's status on a group",
+     *      @OA\Parameter(
+     *          name="id",
+     *          description="Group id",
+     *          required=true,
+     *          in="path",
+     *          @OA\Schema(
+     *              type="integer"
+     *          )
+     *      ),
+     *      @OA\Parameter(
+     *          name="host",
+     *          description="Host",
+     *          required=true,
+     *          in="path",
+     *          @OA\Schema(
+     *              type="boolean"
+     *          )
+     *      ),
+     *      @OA\Response(
+     *          response=200,
+     *          description="Successful operation",
+     *       ),
+     *      @OA\Response(
+     *          response=404,
+     *          description="Group not found",
+     *      ),
+     *     )
+     */
+
+    public function patchVolunteerForGroupv2(Request $request, $id, $iduser)
+    {
+        $user = $this->getUser();
+        $host = $request->get('host', false);
+
+        $group = Group::findOrFail($id);
+        $is_host_of_group = Fixometer::userHasEditGroupPermission($id, $user->id);
+        $isCoordinatorForGroup = $user->isCoordinatorForGroup($group);
+
+        if (!Fixometer::hasRole($user, 'Administrator') && !$is_host_of_group && !$isCoordinatorForGroup) {
+            throw new AuthenticationException();
+        }
+
+        $userGroupAssociation = UserGroups::where('group', $id)->where('user', $iduser)->first();
+
+        if (!is_null($userGroupAssociation)) {
+            $userGroupAssociation->role = $host ? Role::HOST : Role::RESTARTER;
+            $userGroupAssociation->save();
+        }
     }
 
     private function getUser() {
@@ -697,7 +846,13 @@ class GroupController extends Controller
      *                   property="network_data",
      *                   @OA\Schema()
      *                ),
-     *             )
+     *                @OA\Property(
+     *                   property="archived_at",
+     *                   title="archived_at",
+     *                   description="If present, this group has been archived and is no longer active.",
+     *                   format="date-time",
+     *                )
+     *            )
      *         )
      *    ),
      *    @OA\Response(
@@ -716,7 +871,9 @@ class GroupController extends Controller
     public function updateGroupv2(Request $request, $idGroup) {
         $user = $this->getUser();
 
-        list($name, $area, $postcode, $location, $phone, $website, $description, $timezone, $latitude, $longitude, $country, $network_data, $email) = $this->validateGroupParams(
+        list($name, $area, $postcode, $location, $phone, $website, $description, $timezone,
+            $latitude, $longitude, $country, $network_data, $email,
+            $archived_at) = $this->validateGroupParams(
             $request,
             false
         );
@@ -745,10 +902,11 @@ class GroupController extends Controller
             'email' => $email,
         ];
 
-        if ($user->hasRole('Administrator') || $user->hasRole('NetworkCoordinator')) {
-            // Not got permission to update these.
-            $data['area'] = $request->area;
-            $data['postcode'] = $request->postcode;
+        if ($user->hasRole('Administrator') || ($user->hasRole('NetworkCoordinator') && $isCoordinatorForGroup)) {
+            // Got permission to update these.
+            $data['area'] = $area;
+            $data['postcode'] = $postcode;
+            $data['archived_at'] = $archived_at;
         }
 
         if (isset($_FILES) && !empty($_FILES)) {
@@ -848,6 +1006,7 @@ class GroupController extends Controller
             $request->validate([
                                    'name' => ['max:255'],
                                    'location' => ['max:255'],
+                                   'archived_at' => ['date'],
                                ]);
         }
 
@@ -861,6 +1020,7 @@ class GroupController extends Controller
         $timezone = $request->input('timezone');
         $network_data = $request->input('network_data');
         $email = $request->input('email');
+        $archived_at = $request->input('archived_at');
 
         $latitude = null;
         $longitude = null;
@@ -901,6 +1061,7 @@ class GroupController extends Controller
             $country_code,
             $network_data,
             $email,
+            $archived_at
         );
     }
 }
