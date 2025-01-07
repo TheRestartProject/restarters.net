@@ -12,8 +12,7 @@ const config = {
   workers: 1,
 
   use: {
-    // Always record traces, so that we can check the success ones.
-    trace: 'on',
+    trace: 'on-first-retry',
   },
   projects: [
     {
