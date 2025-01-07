@@ -467,39 +467,21 @@ class DeviceController extends Controller {
         // We don't validate max lengths of other strings, to avoid duplicating the length information both here
         // and in the migrations.  If we wanted to do that we should extract the length dynamically from the
         // schema, which is possible but not trivial.
-        if ($create) {
-            $request->validate([
-                'eventid' => 'required|integer',
-                'item_type' => 'string',  // Some of the tests, at least, treat this as optional.
-                'category' => 'required|integer',
-                'brand' => 'string',
-                'model' => 'string',
-                'age' => [ 'numeric', 'max:500' ],
-                'estimate' => [ 'numeric', 'min:0' ],
-                'problem' => [ 'string', 'nullable' ],
-                'notes' => 'string',
-                'repair_status' => [ 'string', 'in:Fixed,Repairable,End of life' ],
-                'next_steps' => [ 'string', 'in:More time needed,Professional help,Do it yourself', 'nullable' ],
-                'spare_parts' => [ 'string', 'in:No,Manufacturer,Third party' ],
-                'barrier' => [ 'string', 'nullable', 'in:Spare parts not available,Spare parts too expensive,No way to open the product,Repair information not available,Lack of equipment' ],
-            ]);
-        } else {
-            $request->validate([
-                'id' => 'required|integer',
-                'item_type' => 'string',  // Some of the tests, at least, treat this as optional.
-                'category' => 'required|integer',
-                'brand' => 'string',
-                'model' => 'string',
-                'age' => [ 'numeric', 'max:500' ],
-                'estimate' => [ 'numeric', 'min:0' ],
-                'problem' => [ 'string', 'nullable' ],
-                'notes' => 'string',
-                'repair_status' => [ 'string', 'in:Fixed,Repairable,End of life' ],
-                'next_steps' => [ 'string', 'in:More time needed,Professional help,Do it yourself', 'nullable' ],
-                'spare_parts' => [ 'string', 'in:No,Manufacturer,Third party' ],
-                'barrier' => [ 'string','nullable', 'in:Spare parts not available,Spare parts too expensive,No way to open the product,Repair information not available,Lack of equipment' ],
-            ]);
-        }
+        $request->validate([
+            'eventid' => 'required|integer',
+            'item_type' => 'string',  // Some of the tests, at least, treat this as optional.
+            'category' => 'required|integer',
+            'brand' => 'string',
+            'model' => 'string',
+            'age' => [ 'numeric', 'max:500' ],
+            'estimate' => [ 'numeric', 'min:0' ],
+            'problem' => [ 'string', 'nullable' ],
+            'notes' => 'string',
+            'repair_status' => [ 'string', 'in:Fixed,Repairable,End of life' ],
+            'next_steps' => [ 'string', 'in:More time needed,Professional help,Do it yourself', 'nullable' ],
+            'spare_parts' => [ 'string', 'in:No,Manufacturer,Third party' ],
+            'barrier' => [ 'string', 'nullable', 'in:Spare parts not available,Spare parts too expensive,No way to open the product,Repair information not available,Lack of equipment' ],
+        ]);
 
         $eventid = $request->input('eventid');
         $category = $request->input('category');
