@@ -51,7 +51,6 @@ return [
   'least_repaired' => 'Meno riparato',
   'most_repaired' => 'Piu\' riparato',
   'most_seen' => 'Piu\' visto',
-  'solution_text' => 'I commenti della soluzione potrebbero aiutare i Restarters a lavorare su un dispositivo simile in futuro? O è un qualcosa di divertente?',
   'no_devices_added' => 'Nessun dispositivo aggiunto',
   'add_a_device' => 'Aggiungi un dispositivo',
   'event_requires_moderation_by_an_admin' => 'L\'evento richiede la moderazione di un 

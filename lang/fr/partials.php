@@ -52,7 +52,6 @@ return [
   'least_repaired' => 'Dernier réparé',
   'most_repaired' => 'Les plus réparés',
   'most_seen' => 'Les plus vus',
-  'solution_text' => 'Est-ce que la solution en commentaire aide un réparateur à travailler sur un cas similiaire? Ou est-ce une étude de cas amusante?',
   'no_devices_added' => 'Pas d\'appareils ajoutés',
   'add_a_device' => 'Ajouter un appareil',
   'event_requires_moderation_by_an_admin' => 'L\'événement nécessite l\'approbation d\'un administrateur',

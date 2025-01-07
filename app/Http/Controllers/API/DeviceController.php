@@ -469,7 +469,6 @@ class DeviceController extends Controller {
         // schema, which is possible but not trivial.
         if ($create) {
             $request->validate([
-                'id' => 'required|integer',
                 'eventid' => 'required|integer',
                 'item_type' => 'string',  // Some of the tests, at least, treat this as optional.
                 'category' => 'required|integer',
@@ -486,6 +485,7 @@ class DeviceController extends Controller {
             ]);
         } else {
             $request->validate([
+                'id' => 'required|integer',
                 'item_type' => 'string',  // Some of the tests, at least, treat this as optional.
                 'category' => 'required|integer',
                 'brand' => 'string',

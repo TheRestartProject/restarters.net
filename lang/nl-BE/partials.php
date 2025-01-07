@@ -46,7 +46,6 @@ return [
   'save' => 'Toestel opslaan',
   'see_all_events' => 'Alle activiteiten bekijken',
   'see_more_posts' => 'Meer posts bekijken',
-  'solution_text' => 'Is je oplossing nuttig voor andere Restarters die een gelijkaardig toestel proberen te herstellen? Of is het een leuke case study?',
   'update' => 'Updaten',
   'view_the_materials' => 'Tips en info bekijken',
   'welcome_text' => 'We geven info en tips over het organiseren van repareer activiteiten en helpen je om je competenties te delen.',
