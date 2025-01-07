@@ -56,13 +56,6 @@
               </b-form-group>
               <div />
             </div>
-            <div class="w-100 device-select-row">
-              <div class="d-flex">
-                <b-form-checkbox v-model="current_wiki" size="lg" />
-                <label class="mt-1">{{ __('devices.interesting_case_study') }}</label>
-              </div>
-              <div />
-            </div>
           </b-card-body>
         </b-card>
       </b-collapse>

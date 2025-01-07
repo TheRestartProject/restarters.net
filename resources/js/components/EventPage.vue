@@ -142,8 +142,8 @@ export default {
     })
 
     if (this.devices && this.devices.length) {
-      this.$store.dispatch('devices/set', {
-        idevents: this.idevents,
+      this.$store.dispatch('devices/setForEvent', {
+        eventid: this.idevents,
         devices: this.devices
       })
     }

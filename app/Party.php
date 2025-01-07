@@ -47,7 +47,7 @@ class Party extends Model implements Auditable
         'user_id',
         'network_data',
     ];
-    protected $hidden = ['created_at', 'deleted_at', 'frequency', 'group', 'group', 'user_id', 'wordpress_post_id', 'cancelled', 'devices_updated_at'];
+    protected $hidden = ['created_at', 'deleted_at', 'frequency', 'group', 'user_id', 'wordpress_post_id', 'cancelled', 'devices_updated_at'];
 
     // Eager-loading the group reduces N+1 queries.
     protected $with = 'theGroup';

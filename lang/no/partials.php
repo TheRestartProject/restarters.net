@@ -51,11 +51,9 @@ return [
   'least_repaired' => 'Least repaired',
   'most_repaired' => 'Most repaired',
   'most_seen' => 'Most seen',
-  'solution_text' => 'Could the solution comments help Restarters working on a similar device in future?  Or is it a fun case study?',
   'no_devices_added' => 'No devices added',
   'add_a_device' => 'Add a device',
   'event_requires_moderation_by_an_admin' => 'Event requires moderation by an admin',
   'save' => 'Save item',
-  'solution_text2' => 'Interesting case study to share?',
   'cancel' => 'Cancel',
 ];

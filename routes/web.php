@@ -279,9 +279,6 @@ Route::middleware('auth', 'verifyUserConsent', 'ensureAPIToken')->group(function
             return redirect('/fixometer');
         });
         Route::get('/search', [DeviceController::class, 'search']);
-        Route::post('/edit/{id}', [DeviceController::class, 'ajaxEdit']);
-        Route::post('/create', [DeviceController::class, 'ajaxCreate']);
-        Route::get('/delete/{id}', [DeviceController::class, 'delete']);
         Route::post('/image-upload/{id}', [DeviceController::class, 'imageUpload']);
         Route::get('/image/delete/{iddevices}/{idxref}', [DeviceController::class, 'deleteImage']);
     });

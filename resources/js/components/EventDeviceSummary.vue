@@ -1,13 +1,17 @@
 <template>
   <transition name="recent">
-    <b-tr v-if="!editing" :key="'summary-' + device.iddevices">
-      <b-td>
+    <b-tr v-if="!editing" :key="'summary-' + device.id">
+      <b-td class="refcell">
         <span v-if="device.item_type">
           {{ device.item_type }}
         </span>
         <em v-else class="text-muted">
           -
         </em>
+        <span v-if="device.reference" class="ref text-muted">
+          <br />
+          {{ device.reference }}
+        </span>
       </b-td>
       <b-td>
         <h3 class="noheader">
@@ -47,7 +51,7 @@
         {{ parseFloat(device.age) ? parseFloat(device.age) : '-' }}
       </b-td>
       <b-td class="d-none d-md-table-cell">
-        {{ device.shortProblem }}
+        {{ device.short_problem }}
       </b-td>
       <b-td class="d-none d-md-table-cell">
         <span :class="badgeClass">
@@ -66,12 +70,12 @@
             <b-img class="icon" src="/icons/delete_ico_red.svg" />
           </span>
         </div>
-        <ConfirmModal :key="'modal-' + device.iddevices" ref="confirmDelete" @confirm="deleteConfirmed" :message="__('devices.confirm_delete')" />
+        <ConfirmModal :key="'modal-' + id" ref="confirmDelete" @confirm="deleteConfirmed" :message="__('devices.confirm_delete')" />
       </b-td>
     </b-tr>
-    <b-tr v-else :key="'editing-' + device.iddevices">
+    <b-tr v-else :key="'editing-' + id">
       <b-td colspan="8" class="p-0">
-        <EventDevice :device="device" :powered="powered" :add="false" :edit="true" :clusters="clusters" :idevents="idevents" :brands="brands" :barrier-list="barrierList" @close="close" />
+        <EventDevice :key='bump' :id="id" :powered="powered" :add="false" :edit="true" :clusters="clusters" :eventid="idevents" :brands="brands" :barrier-list="barrierList" @close="close" />
       </b-td>
     </b-tr>
   </transition>
@@ -90,8 +94,8 @@ export default {
       type: Number,
       required: true
     },
-    device: {
-      type: Object,
+    id: {
+      type: Number,
       required: true
     },
     canedit: {
@@ -123,10 +127,14 @@ export default {
   data () {
     return {
       editing: false,
-      saveScroll: null
+      saveScroll: null,
+      bump: 0,
     }
   },
   computed: {
+    device() {
+      return this.id ? this.$store.getters['devices/byId'](this.id) : null
+    },
     translatedCategoryName() {
       return this.$lang.get('strings.' + this.device.category.name)
     },
@@ -162,10 +170,7 @@ export default {
       this.$refs.confirmDelete.show()
     },
     deleteConfirmed() {
-      this.$store.dispatch('devices/delete', {
-        iddevices: this.device.iddevices,
-        idevents: this.idevents
-      })
+      this.$store.dispatch('devices/delete', this.device.id)
     },
     editDevice() {
       // When we are editing, the original row disappears to be replaced by a new row containing just the editable
@@ -182,6 +187,7 @@ export default {
     },
     close() {
       this.editing = false
+      this.bump++
       window.scrollY = this.saveScroll
     }
   }
@@ -221,5 +227,13 @@ export default {
   font-size: small;
   line-height: 2;
   text-transform: uppercase;
+}
+
+.refcell {
+  line-height: normal;
+
+  .ref {
+    font-size: 60%;
+  }
 }
 </style>
