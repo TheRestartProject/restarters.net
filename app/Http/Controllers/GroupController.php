@@ -423,10 +423,12 @@ class GroupController extends Controller
             abort(403);
         }
 
+        // Only return the most recent 100 audits - returning too many is too much for the client, and usually.
+        // we're only interested in the most recent events.
         return view('group.edit', [
             'id' => $id,
             'name' => $group->name,
-            'audits' => $group->audits,
+            'audits' => $group->audits->sortByDesc('id')->take(100),
             'networks' => Network::all(),
             'can_approve' => Fixometer::hasRole($user, 'Administrator') ||
                 Fixometer::hasRole($user, 'NetworkCoordinator') && $isCoordinatorForGroup
