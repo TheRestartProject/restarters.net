@@ -127,8 +127,6 @@ class DiscourseUserEventSubscriber extends BaseEvent
             try
             {
                 $this->discourseService->anonymise($user);
-                $user->username = null;
-                $user->save();
             } catch (\Exception $ex)
             {
                 Log::error('Could not anonymise ' . $user->id . ' on Discourse: ' . $ex->getMessage());

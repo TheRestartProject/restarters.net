@@ -649,6 +649,10 @@ class DiscourseService
             if (empty($json['success'])) {
                 throw new \Exception("Failed to anonymise user {$user->id}");
             }
+
+            // Store the newly anonymised username.
+            $user->username = $json['username'];
+            $user->save();
         }
 
         Log::info('Response status: ' . $response->getStatusCode());
