@@ -19,7 +19,7 @@
         "@vue/vue2-jest": "^28.1.0",
         "axios": "^0.28",
         "babel-jest": "^28.1.0",
-        "bootstrap": "^5.0.0",
+        "bootstrap": "^4.6.1",
         "browser-sync": "^2.27.11",
         "browser-sync-webpack-plugin": "^2.3.0",
         "faker": "^5.5.3",
