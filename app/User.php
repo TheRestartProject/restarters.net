@@ -361,7 +361,6 @@ class User extends Authenticatable implements Auditable, HasLocalePreference
     {
         $this->name = 'Deleted User';
         $this->email = $this->id.'@deleted.invalid';
-        $this->username = $this->id.'-deleted';
 
         // TODO: country, city, gender, age, also required?
         return $this;
