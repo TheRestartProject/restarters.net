@@ -573,6 +573,7 @@ class GroupController extends Controller
     {
         $user = $this->getUser();
         $host = $request->get('host', false);
+        $volunteer = User::findOrFail($iduser);
 
         $group = Group::findOrFail($id);
         $is_host_of_group = Fixometer::userHasEditGroupPermission($id, $user->id);
@@ -587,6 +588,11 @@ class GroupController extends Controller
         if (!is_null($userGroupAssociation)) {
             $userGroupAssociation->role = $host ? Role::HOST : Role::RESTARTER;
             $userGroupAssociation->save();
+
+            if ($host) {
+                $group->refresh();
+                $group->makeMemberAHost($volunteer);
+            }
         }
     }
 

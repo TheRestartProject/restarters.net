@@ -46,7 +46,8 @@ class GroupHostTest extends TestCase
             $this->network->addCoordinator($user);
         }
 
-        $host = User::factory()->host()->create();
+        $host = User::factory()->create();
+        $this->assertEquals(Role::RESTARTER, $host->role);
         $this->group->addVolunteer($host);
 
         $skill1 = Skills::create([
@@ -74,6 +75,8 @@ class GroupHostTest extends TestCase
             'host' => true,
         ]);
         $response->assertSuccessful();
+        $host->refresh();
+        $this->assertEquals(Role::HOST, $host->role);
 
         $response = $this->get("/api/v2/groups/{$this->idgroups}/volunteers");
         $response->assertSuccessful();
