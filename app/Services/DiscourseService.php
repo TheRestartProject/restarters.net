@@ -253,6 +253,7 @@ class DiscourseService
 
                         if ($response->getStatusCode() === 200) {
                             Log::debug("...rename to $shouldBeDiscourseName$unique succeeded");
+                            $discourseName = $shouldBeDiscourseName;
                         } else {
                             if (strpos($response->getBody(), 'Name has already been taken') !== false) {
                                 // Discourse sometimes seems to have groups stuck in a bad state which are not accessible.
@@ -263,6 +264,7 @@ class DiscourseService
                                 // So skip over it and retry creation with a different name.
                                 $retry = true;
                                 $unique = $unique ? ($unique + 1) : 1;
+                                Log::debug("...name already taken, try $shouldBeDiscourseName$unique");
                             } else {
                                 Log::error("Could not rename group $restartId from $currentDiscourseName to $shouldBeDiscourseName$unique: ".$response->getReasonPhrase());
                             }
