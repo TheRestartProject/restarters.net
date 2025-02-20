@@ -490,10 +490,7 @@ class Group extends Model implements Auditable
                     'username' => env('DISCOURSE_APIUSER'),
                 ]);
 
-                // Restricted characters allowed in name, and only 20 characters.  Leave 1 spare for uniqueness.
-                $name = str_replace(' ', '_', trim($this->name));
-                $name = preg_replace("/[^A-Za-z0-9]/", '', $name);
-                $name = substr($name, 0, 19);
+                $name = $this->getDiscourseGroupName($unique);
 
                 $params = [
                     'group' => [
@@ -661,5 +658,22 @@ class Group extends Model implements Auditable
         }
 
         return $ret;
+    }
+
+    /**
+     * Get a name for the Discourse group.
+     *
+     * @return string
+     */
+    public function getDiscourseGroupName($unique)
+    {
+        // Restricted characters allowed in name, and only 20 characters.
+        //
+        // Leave 1 spare for uniqueness.
+        $name = str_replace(' ', '_', trim($this->name));
+        $name = preg_replace("/[^A-Za-z0-9]/", '', $name);
+        $name = substr($name, 0, 19);
+
+        return $name . $unique;
     }
 }
