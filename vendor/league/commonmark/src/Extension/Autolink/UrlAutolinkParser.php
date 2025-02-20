@@ -22,16 +22,22 @@ final class UrlAutolinkParser implements InlineParserInterface
 {
     private const ALLOWED_AFTER = [null, ' ', "\t", "\n", "\x0b", "\x0c", "\x0d", '*', '_', '~', '('];
 
-    // RegEx adapted from https://github.com/symfony/symfony/blob/4.2/src/Symfony/Component/Validator/Constraints/UrlValidator.php
+    // RegEx adapted from https://github.com/symfony/symfony/blob/6.3/src/Symfony/Component/Validator/Constraints/UrlValidator.php
     private const REGEX = '~
         (
             # Must start with a supported scheme + auth, or "www"
             (?:
-                (?:%s)://                                 # protocol
-                (?:([\.\pL\pN-]+:)?([\.\pL\pN-]+)@)?      # basic auth
+                (?:%s)://                                                                            # protocol
+                (?:(?:(?:[\_\.\pL\pN-]|%%[0-9A-Fa-f]{2})+:)?((?:[\_\.\pL\pN-]|%%[0-9A-Fa-f]{2})+)@)? # basic auth
             |www\.)
             (?:
-                (?:[\pL\pN\pS\-\.])+(?:\.?(?:[\pL\pN]|xn\-\-[\pL\pN-]+)+\.?) # a domain name
+                (?:
+                    (?:xn--[a-z0-9-]++\.)*+xn--[a-z0-9-]++            # a domain name using punycode
+                        |
+                    (?:[\pL\pN\pS\pM\-\_]++\.){1,127}[\pL\pN\pM]++    # a multi-level domain name; total length must be 253 bytes or less
+                        |
+                    [a-z0-9\-\_]++                                    # a single-level domain name
+                )\.?
                     |                                                 # or
                 \d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}                    # an IP address
                     |                                                 # or
@@ -40,9 +46,9 @@ final class UrlAutolinkParser implements InlineParserInterface
                 \]  # an IPv6 address
             )
             (?::[0-9]+)?                              # a port (optional)
-            (?:/ (?:[\pL\pN\-._\~!$&\'()*+,;=:@]|%%[0-9A-Fa-f]{2})* )*      # a path
-            (?:\? (?:[\pL\pN\-._\~!$&\'()*+,;=:@/?]|%%[0-9A-Fa-f]{2})* )?   # a query (optional)
-            (?:\# (?:[\pL\pN\-._\~!$&\'()*+,;=:@/?]|%%[0-9A-Fa-f]{2})* )?   # a fragment (optional)
+            (?:/ (?:[\pL\pN\-._\~!$&\'()*+,;=:@]|%%[0-9A-Fa-f]{2})* )*        # a path
+            (?:\? (?:[\pL\pN\-._\~!$&\'\[\]()*+,;=:@/?]|%%[0-9A-Fa-f]{2})* )? # a query (optional)
+            (?:\# (?:[\pL\pN\-._\~!$&\'()*+,;=:@/?]|%%[0-9A-Fa-f]{2})* )?     # a fragment (optional)
         )~ixu';
 
     /**
@@ -50,21 +56,32 @@ final class UrlAutolinkParser implements InlineParserInterface
      *
      * @psalm-readonly
      */
-    private array $prefixes = ['www'];
+    private array $prefixes = ['www.'];
 
-    /** @psalm-readonly */
+    /**
+     * @psalm-var non-empty-string
+     *
+     * @psalm-readonly
+     */
     private string $finalRegex;
+
+    private string $defaultProtocol;
 
     /**
      * @param array<int, string> $allowedProtocols
      */
-    public function __construct(array $allowedProtocols = ['http', 'https', 'ftp'])
+    public function __construct(array $allowedProtocols = ['http', 'https', 'ftp'], string $defaultProtocol = 'http')
     {
+        /**
+         * @psalm-suppress PropertyTypeCoercion
+         */
         $this->finalRegex = \sprintf(self::REGEX, \implode('|', $allowedProtocols));
 
         foreach ($allowedProtocols as $protocol) {
             $this->prefixes[] = $protocol . '://';
         }
+
+        $this->defaultProtocol = $defaultProtocol;
     }
 
     public function getMatchDefinition(): InlineParserMatch
@@ -107,9 +124,9 @@ final class UrlAutolinkParser implements InlineParserInterface
 
         $cursor->advanceBy(\mb_strlen($url, 'UTF-8'));
 
-        // Auto-prefix 'http://' onto 'www' URLs
+        // Auto-prefix 'http(s)://' onto 'www' URLs
         if (\substr($url, 0, 4) === 'www.') {
-            $inlineContext->getContainer()->appendChild(new Link('http://' . $url, $url));
+            $inlineContext->getContainer()->appendChild(new Link($this->defaultProtocol . '://' . $url, $url));
 
             return true;
         }
