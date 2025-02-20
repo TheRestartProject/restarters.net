@@ -231,16 +231,15 @@ class DiscourseService
                 $discourseId = $discourseResult['group']['id'];
                 Log::debug("Sync members for Restarters group $restartId, {$group->discourse_group}, Discourse group $discourseId");
 
-                // Check that the Dicourse group doesn't need renaming.
-                $shouldBeDiscourseName = $group->getDiscourseGroupName();
+                // Check that the Discourse group doesn't need renaming.
+                $unique = '';
+                $shouldBeDiscourseName = $group->getDiscourseGroupName($unique);
                 $currentDiscourseName = $discourseResult['group']['name'];
 
                 // We might have a uniqueness suffix.  Check that the name either matches exactly or matches except
                 // the last character of currentDiscourseName
                 if ($currentDiscourseName != $shouldBeDiscourseName && $currentDiscourseName != substr($shouldBeDiscourseName, 0, -1)) {
                     Log::debug("Rename Discourse group $currentDiscourseName to $shouldBeDiscourseName");
-                    $unique = '';
-
                     do {
                         $retry = false;
 

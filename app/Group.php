@@ -490,7 +490,7 @@ class Group extends Model implements Auditable
                     'username' => env('DISCOURSE_APIUSER'),
                 ]);
 
-                $name = $this->getDiscourseGroupName();
+                $name = $this->getDiscourseGroupName($unique);
 
                 $params = [
                     'group' => [
@@ -665,7 +665,7 @@ class Group extends Model implements Auditable
      *
      * @return string
      */
-    public function getDiscourseGroupName()
+    public function getDiscourseGroupName($unique)
     {
         // Restricted characters allowed in name, and only 20 characters.
         //
