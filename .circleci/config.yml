@@ -107,7 +107,7 @@ jobs:
 #    networks:
 #      - app-network
 
-      - image: docker.io/bitnami/discourse:2
+      - image: docker.io/bitnami/discourse:latest
         name: restarters_discourse_sidekiq
         depends_on:
           - restarters_discourse
