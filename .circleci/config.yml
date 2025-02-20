@@ -232,6 +232,8 @@ jobs:
       - run: echo GOOGLE_API_CONSOLE_KEY=$GOOGLE_API_CONSOLE_KEY >> /tmp/.env
       - run: echo MAPBOX_TOKEN=$MAPBOX_TOKEN >> /tmp/.env
       - run: sudo cp /tmp/.env /home/circleci/project/.env
+      # Comment out throttle:api in App/Http/Kernel.php otherwise it kicks in during Playwright tests.
+      - run: sudo sed -i 's/.throttle:api.,//g' /home/circleci/project/app/Http/Kernel.php
 
       # Now run the tests.
       - run:
