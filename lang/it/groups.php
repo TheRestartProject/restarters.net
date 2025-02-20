@@ -4,7 +4,6 @@ return [
   'group' => 'Gruppo',
   'groups' => 'Gruppi',
   'all_groups' => 'Tutti i gruppi',
-  'search_name' => 'Cerca nome',
   'add_groups' => 'Aggiungi un gruppo',
   'add_groups_content' => 'Raccontaci di più sul tuo gruppo, in modo che possiamo creare una pagina per te e aiutarti a trovare volontari e partecipanti.',
   'create_groups' => 'Crea nuovo gruppo',
