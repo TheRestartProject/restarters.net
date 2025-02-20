@@ -254,6 +254,8 @@ class DiscourseService
                         if ($response->getStatusCode() === 200) {
                             Log::debug("...rename to $shouldBeDiscourseName$unique succeeded");
                             $discourseName = $shouldBeDiscourseName;
+                            $group->discourse_group = $shouldBeDiscourseName;
+                            $group->save();
                         } else {
                             if (strpos($response->getBody(), 'Name has already been taken') !== false) {
                                 // Discourse sometimes seems to have groups stuck in a bad state which are not accessible.
