@@ -140,6 +140,26 @@ class NetworkController extends Controller
      *              type="boolean"
      *          )
      *      ),
+     *      @OA\Parameter(
+     *          name="updated_start",
+     *          description="The minimum start date for when an event was updated in ISO8601 format.  Useful if you need to only process events that have had recent changes.  Inclusive.",
+     *          required=false,
+     *          in="query",
+     *          @OA\Schema(
+     *              type="string",
+     *              example="2022-09-18T11:30:00+00:00"
+     *          )
+     *      ),
+     *      @OA\Parameter(
+     *          name="updated_end",
+     *          description="The maximum end date for when an event was updated in ISO8601 format.  Inclusive.",
+     *          required=false,
+     *          in="query",
+     *          @OA\Schema(
+     *              type="string",
+     *              example="2022-09-18T12:30:00+00:00"
+     *          )
+     *      ),
      *      @OA\Response(
      *          response=200,
      *          description="Successful operation",
