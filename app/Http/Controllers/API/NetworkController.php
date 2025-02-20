@@ -142,7 +142,7 @@ class NetworkController extends Controller
      *      ),
      *      @OA\Parameter(
      *          name="updated_start",
-     *          description="The minimum start date for when a group was updated in ISO8601 format.  Useful if you need to only process events that have had recent changes.  Inclusive.",
+     *          description="The minimum start date for when a group was updated in ISO8601 format.  Useful if you need to only process groups that have had recent changes.  Inclusive.",
      *          required=false,
      *          in="query",
      *          @OA\Schema(
