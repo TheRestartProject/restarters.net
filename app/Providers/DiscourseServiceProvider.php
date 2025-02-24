@@ -46,6 +46,8 @@ class DiscourseServiceProvider extends ServiceProvider
                 ],
                 'http_errors' => false,
                 'handler' => $stack,
+                'timeout' => 5,
+                'connect_timeout' => 5
             ]);
         });
 

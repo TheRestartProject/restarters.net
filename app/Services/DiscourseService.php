@@ -231,6 +231,49 @@ class DiscourseService
                 $discourseId = $discourseResult['group']['id'];
                 Log::debug("Sync members for Restarters group $restartId, {$group->discourse_group}, Discourse group $discourseId");
 
+                // Check that the Discourse group doesn't need renaming.
+                $unique = '';
+                $shouldBeDiscourseName = $group->getDiscourseGroupName($unique);
+                $currentDiscourseName = $discourseResult['group']['name'];
+
+                // We might have a uniqueness suffix.  Check that the name either matches exactly or matches except
+                // the last character of currentDiscourseName
+                if ($currentDiscourseName != $shouldBeDiscourseName && $currentDiscourseName != substr($shouldBeDiscourseName, 0, -1)) {
+                    Log::debug("Rename Discourse group $currentDiscourseName to $shouldBeDiscourseName");
+                    do {
+                        $retry = false;
+
+                        $response = $client->request('PUT', "/g/$discourseId.json", [
+                            'form_params' => [
+                                'group' => [
+                                    'name' => "$shouldBeDiscourseName$unique"
+                                ]
+                            ]
+                        ]);
+
+                        if ($response->getStatusCode() === 200) {
+                            Log::debug("...rename to $shouldBeDiscourseName$unique succeeded");
+                            $discourseName = $shouldBeDiscourseName;
+                            $group->discourse_group = $shouldBeDiscourseName;
+                            $group->save();
+                        } else {
+                            if (strpos($response->getBody(), 'Name has already been taken') !== false) {
+                                // Discourse sometimes seems to have groups stuck in a bad state which are not accessible.
+                                // This may be a consequence of testing with multiple Restarters instances against the same
+                                // Discourse instance.
+                                //
+                                // This can result in a create failure, and a group which we cannot then locate to delete.
+                                // So skip over it and retry creation with a different name.
+                                $retry = true;
+                                $unique = $unique ? ($unique + 1) : 1;
+                                Log::debug("...name already taken, try $shouldBeDiscourseName$unique");
+                            } else {
+                                Log::error("Could not rename group $restartId from $currentDiscourseName to $shouldBeDiscourseName$unique: ".$response->getReasonPhrase());
+                            }
+                        }
+                    } while ($retry);
+                }
+
                 if ($discourseResult['group']['messageable_level'] != 4) {
                     Log::debug("Update messageable_level for Restarters group $restartId, {$group->discourse_group}, Discourse group $discourseId");
                     $gData = $discourseResult['group'];
@@ -497,6 +540,9 @@ class DiscourseService
                         }
                     }
                 }
+            } else {
+                Log::error("Failed to get group $discourseName");
+                \Sentry\CaptureMessage("Failed to find group $discourseName on Discourse, Restarters group $restartId");
             }
         }
     }
@@ -614,6 +660,47 @@ class DiscourseService
         );
 
         Log::info("Set Discourse setting {$setting} to {$value}");
+        Log::info('Response status: ' . $response->getStatusCode());
+        Log::info($response->getBody());
+    }
+
+    public function anonymise($user)
+    {
+        Log::info("Anonymise {$user->id}");
+        $client = app('discourse-client');
+
+        // Get Discourse user id
+        $endpoint = "/users/by-external/{$user->id}.json";
+
+        $response = $client->request(
+            'GET',
+            $endpoint
+        );
+
+        $json = json_decode($response->getBody()->getContents(), true);
+        if (empty($json['user'])) {
+            throw new \Exception("User {$user->id} not found in Discourse");
+        }
+
+        $discourseUserId = $json['user']['id'];
+
+        if ($discourseUserId) {
+            $response = $client->request(
+                'PUT',
+                "/admin/users/$discourseUserId/anonymize.json"
+            );
+
+            $json = json_decode($response->getBody()->getContents(), true);
+
+            if (empty($json['success'])) {
+                throw new \Exception("Failed to anonymise user {$user->id}");
+            }
+
+            // Store the newly anonymised username.
+            $user->username = $json['username'];
+            $user->save();
+        }
+
         Log::info('Response status: ' . $response->getStatusCode());
         Log::info($response->getBody());
     }

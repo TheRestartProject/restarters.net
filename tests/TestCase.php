@@ -30,6 +30,9 @@ use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\Queue;
 use Symfony\Component\DomCrawler\Crawler;
 use Osteel\OpenApi\Testing\ValidatorBuilder;
+use Osteel\OpenApi\Testing\Exceptions\ValidationException;
+use ReflectionFunction;
+use Illuminate\Events\Dispatcher;
 
 abstract class TestCase extends BaseTestCase
 {
@@ -526,5 +529,23 @@ abstract class TestCase extends BaseTestCase
         $atts['groupid'] = $atts['group'];
 
         return $atts;
+    }
+
+    public function assertListenerIsAttachedToEvent($listener, $event)
+    {
+        $dispatcher = app(Dispatcher::class);
+
+        foreach ($dispatcher->getListeners(is_object($event) ? get_class($event) : $event) as $listenerClosure) {
+            $reflection = new ReflectionFunction($listenerClosure);
+            $listenerClass = $reflection->getStaticVariables()['listener'];
+
+            if ($listenerClass === $listener) {
+                $this->assertTrue(true);
+
+                return;
+            }
+        }
+
+        $this->assertTrue(false, sprintf('Event %s does not have the %s listener attached to it', $event, $listener));
     }
 }
