@@ -8,7 +8,7 @@ function newToOld(e) {
   // Vue components that expect old-style field names.  We therefore sometimes need to convert the new API data
   // back into the old format which is expected.  In some bright future where we have shifted over to using the
   // new API completely, we can then migrate the Vue components to use the new field names and retire this function.
-  // Similar code in group store.
+  // Similar code in device and group store.
   let ret = {
     idevents: e.id,
     venue: e.title,

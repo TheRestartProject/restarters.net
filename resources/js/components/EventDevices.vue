@@ -31,7 +31,7 @@
             <b-btn variant="primary" v-if="canedit" class="mb-4 ml-4 add-powered-device-desktop" @click="addPowered($event)">
               <b-img class="icon mb-1" src="/images/add-icon.svg" /> {{ __('partials.add_device_powered') }}
             </b-btn>
-            <EventDevice v-if="addingPowered" :powered="true" :add="true" :edit="false" :clusters="clusters" :idevents="idevents" :brands="brands" :barrier-list="barrierList" @close="addingPowered = false" />
+            <EventDevice v-if="addingPowered" :powered="true" :add="true" :edit="false" :clusters="clusters" :eventid="idevents" :brands="brands" :barrier-list="barrierList" @close="closePowered" />
           </b-tab>
           <b-tab title-item-class="w-50" class="pt-2">
             <template slot="title">
@@ -57,7 +57,7 @@
             <b-btn variant="primary" v-if="canedit" class="mb-4 ml-4 add-unpowered-device-desktop" @click="addUnpowered($event)">
               <b-img class="icon mb-1" src="/images/add-icon.svg" /> {{ __('partials.add_device_unpowered') }}
             </b-btn>
-            <EventDevice v-if="addingUnpowered" :powered="false" :add="true" :edit="false" :clusters="clusters" :idevents="idevents" :event="event" :brands="brands" :barrier-list="barrierList" @close="addingUnpowered = false"/>
+            <EventDevice v-if="addingUnpowered" :powered="false" :add="true" :edit="false" :clusters="clusters" :eventid="idevents" :event="event" :brands="brands" :barrier-list="barrierList" @close="closeUnpowered"/>
           </b-tab>
         </b-tabs>
       </div>
@@ -88,7 +88,7 @@
             <b-btn variant="primary" v-if="canedit" class="mb-4 ml-4 add-powered-device-mobile" @click="addPowered($event)">
               <b-img class="icon mb-1" src="/images/add-icon.svg" /> {{ __('partials.add_device_powered') }}
             </b-btn>
-            <EventDevice v-if="addingPowered" :powered="true" :add="true" :edit="false" :clusters="clusters" :idevents="idevents" :brands="brands" :barrier-list="barrierList" @close="addingPowered = false" />
+            <EventDevice v-if="addingPowered" :powered="true" :add="true" :edit="false" :clusters="clusters" :eventid="idevents" :brands="brands" :barrier-list="barrierList" @close="addingPowered = false" />
           </template>
         </CollapsibleSection>
         <CollapsibleSection class="lineheight" collapsed :count="unpowered.length" always-show-count count-class="text-black font-weight-normal small">
@@ -117,7 +117,7 @@
             <b-btn variant="primary" v-if="canedit" class="mb-4 ml-4 add-unpowered-device-desktop" @click="addUnpowered($event)">
               <b-img class="icon mb-1" src="/images/add-icon.svg" /> {{ __('partials.add_device_unpowered') }}
             </b-btn>
-            <EventDevice v-if="addingUnpowered" :powered="false" :add="true" :edit="false" :clusters="clusters" :idevents="idevents" :brands="brands" :barrier-list="barrierList" @close="addingUnpowered = false" />
+            <EventDevice v-if="addingUnpowered" :powered="false" :add="true" :edit="false" :clusters="clusters" :eventid="idevents" :brands="brands" :barrier-list="barrierList" @close="addingUnpowered = false" />
           </template>
         </CollapsibleSection>
       </div>
@@ -177,7 +177,18 @@ export default {
       return this.$store.getters['events/getStats'](this.idevents)
     },
     allDevices() {
-      return this.$store.getters['devices/byEvent'](this.idevents) || []
+      console.log('All devices', this.$store.getters['devices/byEvent'](this.idevents) || [])
+      const deviceIds = this.$store.getters['devices/byEvent'](this.idevents) || []
+      const devices = []
+
+      deviceIds.forEach((id) => {
+        const device = this.$store.getters['devices/byId'](id)
+        if (device) {
+          devices.push(device)
+        }
+      })
+
+      return devices
     },
     powered() {
       return this.allDevices.filter((d) => {
@@ -199,8 +210,8 @@ export default {
     //
     // Further down the line this initial data might be provided either by an API call from the client to the server,
     // or from Vue server-side rendering, where the whole initial state is passed to the client.
-    this.$store.dispatch('devices/set', {
-      idevents: this.idevents,
+    this.$store.dispatch('devices/setForEvent', {
+      eventid: this.idevents,
       devices: this.devices
     })
   },
@@ -220,6 +231,12 @@ export default {
         behavior: 'smooth',
         block: 'start'
       })
+    },
+    closePowered() {
+      this.addingPowered = false
+    },
+    closeUnpowered() {
+      this.addingUnpowered = false
     }
   }
 }

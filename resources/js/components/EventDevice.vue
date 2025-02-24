@@ -28,15 +28,15 @@
                        :disabled="disabled"/>
           <DeviceAge :age.sync="currentDevice.age" :disabled="disabled"/>
           <DeviceWeight v-if="showWeight" :weight.sync="currentDevice.estimate" :disabled="disabled" :required="weightRequired" />
-          <DeviceImages :idevents="idevents" :device="currentDevice" :add="add" :edit="edit" :disabled="disabled"
+          <DeviceImages :id="idtouse" :add="add" :edit="edit" :disabled="disabled"
                         class="mt-2" @remove="removeImage($event)"/>
         </b-card>
       </div>
       <div class="d-flex flex-column botwhite">
         <b-card no-body class="p-3 flex-grow-1 border-0">
           <h3 class="mt-2 mb-4">{{ __('devices.title_repair') }}</h3>
-          <DeviceRepairStatus :status.sync="currentDevice.repair_status" :steps.sync="currentDevice.repair_details"
-                              :parts.sync="currentDevice.spare_parts" :barriers.sync="currentDevice.barrier"
+          <DeviceRepairStatus :status.sync="currentDevice.repair_status" :steps.sync="currentDevice.next_steps"
+                              :parts.sync="currentDevice.spare_parts" :barrier.sync="currentDevice.barrier"
                               :barrierList="barrierList" :disabled="disabled"/>
         </b-card>
       </div>
@@ -47,13 +47,6 @@
                          :disabled="disabled"/>
           <DeviceNotes :notes.sync="currentDevice.notes" class="mb-4" :icon-variant="add ? 'black' : 'brand'"
                        :disabled="disabled"/>
-          <div class="d-flex">
-            <b-form-checkbox v-model="wiki" class="form-check form-check-large ml-4"
-                             :id="'wiki-' + (add ? '' : device.iddevices)" :disabled="disabled"/>
-            <label :for="'wiki-' + (add ? '' : device.iddevices)">
-              {{ __('partials.solution_text2') }}
-            </label>
-          </div>
         </b-card>
       </div>
     </div>
@@ -86,9 +79,6 @@
 <script>
 import event from '../mixins/event'
 import {
-  FIXED,
-  REPAIRABLE,
-  END_OF_LIFE,
   SPARE_PARTS_MANUFACTURER,
   SPARE_PARTS_THIRD_PARTY,
   CATEGORY_MISC_POWERED, CATEGORY_MISC_UNPOWERED, NEXT_STEPS_DIY, NEXT_STEPS_PROFESSIONAL, NEXT_STEPS_MORE_TIME,
@@ -127,12 +117,12 @@ export default {
   },
   mixins: [event],
   props: {
-    device: {
-      type: Object,
+    id: {
+      type: Number,
       required: false,
       default: null
     },
-    idevents: {
+    eventid: {
       type: Number,
       required: true
     },
@@ -188,11 +178,9 @@ export default {
     }
   },
   watch: {
-    currentCategory (newval) {
-      if (this.missingCategory && newval) {
-        // Reset warning.
-        this.missingCategory = false
-      }
+    device(newval) {
+      console.log('Device changed', newval)
+      this.updateCurrentDevice(newval)
     },
     suggestedCategory(newval) {
       if (newval) {
@@ -213,11 +201,14 @@ export default {
     }
   },
   computed: {
+    device() {
+      return this.id ? this.$store.getters['devices/byId'](this.id) : null
+    },
     itemTypes() {
       return this.$store.getters['items/list'];
     },
     idtouse() {
-      return this.currentDevice ? this.currentDevice.iddevices : null
+      return this.currentDevice ? this.currentDevice.id : null
     },
     disabled () {
       return !this.edit && !this.add
@@ -266,36 +257,10 @@ export default {
 
       return ret
     },
-    suggestedCategoryId() {
-      return this.suggestedCategory ? this.suggestedCategory.idcategories : null
-    },
-    suggestedCategoryName() {
-      return this.suggestedCategory? this.suggestedCategory.categoryname : null
-    },
-    computedPowered() {
-      if (this.suggestedCategory) {
-        if (this.suggestedCategory.powered) {
-          return 'Powered'
-        } else {
-          return 'Unpowered'
-        }
-      } else {
-        return null
-      }
-    },
     showWeight () {
       // Powered devices don't allow editing of the weight except for the "None of the above" category, whereas
       // unpowered do.
       return !this.powered || (this.currentDevice && this.currentDevice.category === CATEGORY_MISC_POWERED)
-    },
-    wiki: {
-      // Need to convert server's number to/from a boolean.
-      get () {
-        return !!this.currentDevice.wiki
-      },
-      set (newval) {
-        this.currentDevice.wiki = newval
-      }
     },
     suppressTypeWarning () {
       // We don't want to show the warning if we have not changed the type since it was last saved.
@@ -315,12 +280,11 @@ export default {
   created () {
     // We take a copy of what's passed in so that we can then edit it in here before saving or cancelling.  We need
     this.currentDevice = {
-      event_id: this.idevents,
+      event_id: this.eventid,
       category: null,
       brand: null,
       model: null,
       age: null,
-      repair_details: null,
       repair_status: null,
       spare_parts: null,
       problem: null,
@@ -329,55 +293,42 @@ export default {
     }
 
     if (this.device) {
-      // Take a deep clone because we're messing with arrays.
-      this.currentDevice = {...this.currentDevice, ...JSON.parse(JSON.stringify(this.device))}
-
-      // Some values we need to munge back to the id for our selects.
-      if (this.currentDevice.category) {
-        this.currentDevice.category = this.currentDevice.category.idcategories
-      }
-
-      this.currentDevice.estimate = parseFloat(this.currentDevice.estimate)
-      this.currentDevice.age = parseFloat(this.currentDevice.age)
-
-      this.nextSteps()
-      this.partsProvider()
+      this.updateCurrentDevice(this.device)
     }
 
     if (this.add) {
       // Use a -ve id to give us something to track uploaded photos against.
       //
       // Need to ensure this isn't too large as the xref table has an int value.
-      this.currentDevice.iddevices = -Math.round(new Date().getTime() / 1000)
+      this.currentDevice.id = -Math.round(new Date().getTime() / 1000)
     }
   },
   methods: {
+    updateCurrentDevice(device) {
+      // Take a deep clone because we're messing with arrays.
+      this.currentDevice = {...this.currentDevice, ...JSON.parse(JSON.stringify(device))}
+
+      // Some values we need to munge back to the id for our selects.  This is a bit ugly because we have two lots
+      // of field names, depending on which API we're using.
+      if (typeof this.currentDevice.category === 'object') {
+        if (this.currentDevice.category.idcategories) {
+          this.currentDevice.category = this.currentDevice.category.idcategories
+        } else {
+          this.currentDevice.category = this.currentDevice.category.id
+        }
+      }
+
+      this.currentDevice.estimate = parseFloat(this.currentDevice.estimate)
+      this.currentDevice.age = parseFloat(this.currentDevice.age)
+
+      this.partsProvider()
+    },
     cancel () {
       this.$emit('close')
     },
-    nextSteps () {
-      // The next step value is held in multiple properties of the object.
-      if (this.currentDevice.do_it_yourself) {
-        this.currentDevice.repair_details = NEXT_STEPS_DIY
-      } else if (this.currentDevice.professional_help) {
-        this.currentDevice.repair_details = NEXT_STEPS_PROFESSIONAL
-      } else if (this.currentDevice.more_time_needed) {
-        this.currentDevice.repair_details = NEXT_STEPS_MORE_TIME
-      } else {
-        this.currentDevice.repair_details = null
-      }
-    },
     partsProvider () {
-      // Third part parts are indicated via the parts provider field.
-      if (!this.currentDevice.spare_parts) {
-        return null
-      } else if (this.currentDevice.spare_parts === SPARE_PARTS_NOT_NEEDED) {
-        this.currentDevice.spare_parts = SPARE_PARTS_NOT_NEEDED
-      } else if (this.currentDevice.parts_provider === PARTS_PROVIDER_THIRD_PARTY) {
-        this.currentDevice.spare_parts = SPARE_PARTS_THIRD_PARTY
-      } else {
-        this.currentDevice.spare_parts = SPARE_PARTS_MANUFACTURER
-      }
+      // Third party parts are indicated via the parts provider field.
+      return this.currentDevice.spare_parts ? this.currentDevice.spare_parts : null
     },
     async addDevice () {
       try {
@@ -386,7 +337,7 @@ export default {
         } else {
           this.missingCategory = false
 
-          const createdDevices = await this.$store.dispatch('devices/add', this.currentDevice)
+          await this.$store.dispatch('devices/add', this.currentDevice)
 
           this.$emit('close')
         }
@@ -405,25 +356,22 @@ export default {
         this.axiosError = e
       }
     },
-    removeImage (image) {
+    async removeImage (image) {
       // TODO LATER The remove of the image should not happen until the edit completes.  At the moment we do it
       // immediately.  The way we set ids here is poor, but this is because the underlying API call for images
       // is weak.
-      this.$store.dispatch('devices/deleteImage', {
-        iddevices: this.idtouse,
-        idxref: image.idxref
+      await this.$store.dispatch('devices/deleteImage', {
+        id: this.idtouse,
+        idxref: image.idxref,
       })
+
+      this.$store.dispatch('devices/fetch', this.id)
     },
     confirmDeleteDevice () {
       this.$refs.confirm.show()
     },
     deleteDevice () {
-      this.$store.dispatch('devices/delete', {
-        iddevices: this.device.iddevices,
-        idevents: this.idevents
-      })
-
-      window.location = '/fixometer'
+      this.$store.dispatch('devices/delete', this.id)
     },
   }
 }
