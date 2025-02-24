@@ -272,18 +272,83 @@ abstract class TestCase extends BaseTestCase
         return $idevents;
     }
 
-    public function createDevice($idevents, $type)
+    public function createDevice($idevents, $type, $barrierstr = null, $age = 1.5, $estimate = 100, $problem = '', $repair_status = NULL, $next_steps = NULL, $spare_parts = NULL, $category = NULL)
     {
+        // Many tests use $type to create a device from DeviceFactory.
         $deviceAttributes = Device::factory()->{lcfirst($type)}()->raw();
 
-        $deviceAttributes['event_id'] = $idevents;
-        $deviceAttributes['quantity'] = 1;
+        if (array_key_exists('problem', $deviceAttributes)) {
+            $problem = $deviceAttributes['problem'];
+        }
 
-        $response = $this->post('/device/create', $deviceAttributes);
-        $iddevices = Device::latest()->first()->iddevices;
+        // The v2 API takes the repair stats as a string
+        if (!$repair_status) {
+            $rs = array_key_exists('repair_status', $deviceAttributes) ? $deviceAttributes['repair_status'] : Device::REPAIR_STATUS_REPAIRABLE;
+
+            switch ($rs) {
+                case Device::REPAIR_STATUS_FIXED:
+                    $repair_status = Device::REPAIR_STATUS_FIXED_STR;
+                    break;
+                case Device::REPAIR_STATUS_REPAIRABLE:
+                    $repair_status = Device::REPAIR_STATUS_REPAIRABLE_STR;
+                    break;
+                case Device::REPAIR_STATUS_ENDOFLIFE:
+                    $repair_status = Device::REPAIR_STATUS_ENDOFLIFE_STR;
+                    break;
+                default:
+                    $this->assertTrue(false);
+            }
+        }
+
+        $params = [
+            'eventid' => $idevents,
+            'category' => $deviceAttributes['category'],
+            'problem' =>  $problem,
+            'notes' => 'Test notes',
+            'brand' => 'Test brand',
+            'model' => 'Test model',
+            'age' => $age,
+            'estimate' => $estimate,
+            'item_type' => 'Test item type',
+            'repair_status' => $repair_status,
+            'barrier' => $barrierstr,
+        ];
+
+        if ($next_steps) {
+            $params['next_steps'] = $next_steps;
+        }
+
+        if ($spare_parts) {
+            $params['spare_parts'] = $spare_parts;
+        }
+
+        if ($category) {
+            $params['category'] = $category;
+        }
+
+        $response = $this->post('/api/v2/devices', $params);
+
+        $this->assertTrue($response->isSuccessful());
+        $json = json_decode($response->getContent(), true);
+        $this->assertTrue(array_key_exists('id', $json));
+        $iddevices = $json['id'];
         $this->assertNotNull($iddevices);
 
         return $iddevices;
+    }
+
+    public function getDevice($iddevices) {
+        $response = $this->get("/api/v2/devices/$iddevices");
+        $response->assertSuccessful();
+        $json = json_decode($response->getContent(), true);
+        $atts = $json['data'];
+        return $atts;
+    }
+
+    public function deleteDevice($iddevices)
+    {
+        $response = $this->delete("/api/v2/devices/$iddevices");
+        $this->assertTrue($response->isSuccessful());
     }
 
     public function createJane()

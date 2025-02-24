@@ -63,7 +63,6 @@ return [
   'status' => 'Statut',
   'latest_data' => 'Dernières données',
   'assessment' => 'Evaluation',
-  'interesting_case_study' => 'Cas d\'étude intéressant',
   'item_and_repair_info' => 'Appareils et informations de réparation',
   'search_assessment_comments' => 'Evaluation',
   'table_intro' => 'Cliquez sur la ligne pour plus de détails.  Cliquez sur l\'en-tête d\'une colonne pour trier par cette colonne - cliquez à nouveau pour inverser l\'ordre de tri.',
@@ -79,6 +78,4 @@ return [
   'image_delete_success' => 'Merci, l\'image a été supprimée',
   'image_delete_error' => 'Désolé, mais l\'image ne peut pas être supprimée.',
   'image_upload_error' => 'fail - l\'image n\'a pas pu être téléchargée',
-  'device_delete_sucess' => 'L\'appareil a été supprimé!',
-  'device_delete_permissions' => 'Vous n\'avez pas les autorisations nécessaires pour supprimer un appareil.',
 ];
