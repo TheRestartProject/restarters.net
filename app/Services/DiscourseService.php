@@ -222,235 +222,214 @@ class DiscourseService
             $group = Group::find($restartId);
             $discourseName = $group->discourse_group;
 
-            $response = $client->request('GET', "/g/$discourseName.json");
+            if ($discourseName) {
+                $response = $client->request('GET', "/g/$discourseName.json");
 
-            if ($response->getStatusCode() == 200)
-            {
-                $discourseResult = json_decode($response->getBody(), true);
-
-                $discourseId = $discourseResult['group']['id'];
-                Log::debug("Sync members for Restarters group $restartId, {$group->discourse_group}, Discourse group $discourseId");
-
-                // Check that the Discourse group doesn't need renaming.
-                $unique = '';
-                $shouldBeDiscourseName = $group->getDiscourseGroupName($unique);
-                $currentDiscourseName = $discourseResult['group']['name'];
-
-                // We might have a uniqueness suffix.  Check that the name either matches exactly or matches except
-                // the last character of currentDiscourseName
-                if ($currentDiscourseName != $shouldBeDiscourseName && $currentDiscourseName != substr($shouldBeDiscourseName, 0, -1)) {
-                    Log::debug("Rename Discourse group $currentDiscourseName to $shouldBeDiscourseName");
-                    do {
-                        $retry = false;
-
-                        $response = $client->request('PUT', "/g/$discourseId.json", [
-                            'form_params' => [
-                                'group' => [
-                                    'name' => "$shouldBeDiscourseName$unique"
-                                ]
-                            ]
-                        ]);
-
-                        if ($response->getStatusCode() === 200) {
-                            Log::debug("...rename to $shouldBeDiscourseName$unique succeeded");
-                            $discourseName = $shouldBeDiscourseName;
-                            $group->discourse_group = $shouldBeDiscourseName;
-                            $group->save();
-                        } else {
-                            if (strpos($response->getBody(), 'Name has already been taken') !== false) {
-                                // Discourse sometimes seems to have groups stuck in a bad state which are not accessible.
-                                // This may be a consequence of testing with multiple Restarters instances against the same
-                                // Discourse instance.
-                                //
-                                // This can result in a create failure, and a group which we cannot then locate to delete.
-                                // So skip over it and retry creation with a different name.
-                                $retry = true;
-                                $unique = $unique ? ($unique + 1) : 1;
-                                Log::debug("...name already taken, try $shouldBeDiscourseName$unique");
-                            } else {
-                                Log::error("Could not rename group $restartId from $currentDiscourseName to $shouldBeDiscourseName$unique: ".$response->getReasonPhrase());
-                            }
-                        }
-                    } while ($retry);
-                }
-
-                if ($discourseResult['group']['messageable_level'] != 4) {
-                    Log::debug("Update messageable_level for Restarters group $restartId, {$group->discourse_group}, Discourse group $discourseId");
-                    $gData = $discourseResult['group'];
-                    $gData['messageable_level'] = 4;
-                    $response = $client->request('PUT', "/g/$discourseId.json", [
-                        'form_params' => [
-                            'group' => $gData
-                        ]
-                    ]);
-
-                    if ($response->getStatusCode() === 200) {
-                        Log::debug("...succeeded");
-                    } else {
-                        Log::debug("...failed with " . $response->getStatusCode() . ", " . $response->getBody());
-                    }
-                }
-
-                if ($group->groupimage && $group->groupimage->idimages) {
-                    // Check if the flair_url needs updating.  This keeps the logo in sync with changes on Restarters.
-                    Log::debug("Check Discourse logo {$group->discourse_logo} vs {$group->groupimage->idimages}");
-                    if (!$group->discourse_logo || $group->discourse_logo != $group->groupimage->image->idimages) {
-                        // We need to update it.  To do that, we first have to upload the image file to Discourse.
-                        Log::debug("Need to update flair_url with ". $group->groupImagePath());
-
-                        // Upload an image.  We need the MIME type of the file.
-                        $fh = fopen(public_path('uploads/mid_' . $group->groupImage->image->path),'r');
-
-                        $data = [
-                            [
-                                'name' => 'upload_type',
-                                'contents' => 'group_flair'
-                            ],
-                            [
-                                'name' => 'type',
-                                'contents' => mime_content_type($fh)
-                            ],
-                            [
-                                'name' => 'sha1_checksum',
-                                'contents' => sha1_file($group->groupImagePath())
-                            ],
-                            [
-                                'name' => 'file',
-                                'contents' => file_get_contents($group->groupImagePath()),
-                                'filename' => 'GroupLogo' . $idgroups
-                            ]
-                        ];
-
-                        $response = $client->request('POST', '/uploads.json', [
-                            'multipart' => $data
-                        ]);
-
-                        Log::debug("Response from upload ". $response->getStatusCode() . " " . $response->getBody());
-
-                        if ($response->getStatusCode() === 200) {
-                            // Now we can update the group to use it.
-                            $rsp = json_decode($response->getBody(), TRUE);
-
-                            if ($rsp && array_key_exists('id', $rsp)) {
-                                $uploadId = $rsp['id'];
-                                $response = $client->request('PUT', "/g/$discourseId.json", [
-                                    'form_params' => [
-                                        'group' => [
-                                            'flair_upload_id' => $uploadId
-                                        ]
-                                    ]
-                                ]);
-
-                                Log::debug("Response from flair_url update " . $response->getBody());
-
-                                if ($response->getStatusCode() === 200) {
-                                    // Update the group to record that we've uploaded, then we'll skip this next time
-                                    // through.
-                                    Log::debug("Updated flair url OK for {$discourseId} to {$group->groupimage->idimages}");
-                                    $group->discourse_logo = $group->groupimage->image->idimages;
-                                    $group->save();
-                                    Log::debug("...saved update to group");
-                                } else {
-                                    Log::error("Failed to update flair url");
-                                    throw new \Exception("Failed to update flair url for {$discourseId}");
-                                }
-                            } else {
-                                Log::error("Failed to upload group logo for {$discourseId}");
-                                throw new \Exception("Failed to upload group logo for {$discourseId}");
-                            }
-                        }
-                    }
-                }
-
-                // TODO The Discourse API accepts up to around 1000 as the limit.  This is plenty for now, but
-                // we will assert below if it turns out not to be in future.
-                $limit = 1000;
-
-                $response = $client->request('GET', "/groups/$discourseName/members.json?limit=$limit");
-
-                Log::info('Response status: ' . $response->getStatusCode());
-
-                if ($response->getStatusCode() != 200)
+                if ($response->getStatusCode() == 200)
                 {
-                    Log::error("Failed to get list of members for {$discourseId}");
-                    throw new \Exception("Failed to get list of members for {$discourseId}");
-                } else {
                     $discourseResult = json_decode($response->getBody(), true);
-                    $total = $discourseResult['meta']['total'];
-                    Log::debug("Total $total");
 
-                    if ($total > $limit)
-                    {
-                        Log::error("Group $discourseId too large at $total");
-                        throw new \Exception("Group $discourseId too large at $total");
-                    }
+                    $discourseId = $discourseResult['group']['id'];
+                    Log::debug("Sync members for Restarters group $restartId, {$group->discourse_group}, Discourse group $discourseId");
 
-                    // Save off the members and whether they're an admin.
-                    $discourseMembers = [];
+                    // Check that the Discourse group doesn't need renaming.
+                    $unique = '';
+                    $shouldBeDiscourseName = $group->getDiscourseGroupName($unique);
+                    $currentDiscourseName = $discourseResult['group']['name'];
 
-                    foreach ($discourseResult['members'] as $d) {
-                        $discourseMembers[$d['username']] = $d;
-                        $discourseMembers[$d['username']]['owner'] = false;
-                    }
+                    // We might have a uniqueness suffix.  Check that the name either matches exactly or matches except
+                    // the last character of currentDiscourseName
+                    if ($currentDiscourseName != $shouldBeDiscourseName && substr($currentDiscourseName, 0, -1) != $shouldBeDiscourseName) {
+                        Log::debug("Rename Discourse group $currentDiscourseName to $shouldBeDiscourseName");
+                        do {
+                            $retry = false;
 
-                    foreach ($discourseResult['owners'] as $d) {
-                        $discourseMembers[$d['username']] = $d;
-                        $discourseMembers[$d['username']]['owner'] = true;
-                    }
-
-                    $restartersMembersUGs = UserGroups::where('group', $restartId)->where('status', '=', 1)->whereNull('deleted_at')->get();
-
-                    $restartersMembers = [];
-
-                    foreach ($restartersMembersUGs as $r) {
-                        $u = User::find($r->user);
-
-                        if (!strlen($u->username)) {
-                            // No current user.  Create one.
-                            $u->generateAndSetUsername();
-                            $u->save();
-                            $u->refresh();
-                            $this->syncSso($u);
-                        }
-
-                        $restartersMembers[$u->username] = $r;
-                    }
-
-                    Log::debug(
-                        count($discourseMembers) . " Discourse members vs " . count(
-                            $restartersMembers
-                        ) . " on Restarters"
-                    );
-                    Log::debug("Discourse Members " . json_encode($discourseMembers));
-                    Log::debug("Restarter Members " . json_encode($restartersMembers));
-
-                    foreach ($discourseMembers as $discourseMember => $d) {
-                        if (!array_key_exists($discourseMember, $restartersMembers)) {
-                            Log::debug("Remove user $discourseMember from Discourse group $discourseName");
-
-                            $response = $client->request('DELETE', "/admin/groups/$discourseId/members.json", [
+                            $response = $client->request('PUT', "/g/$discourseId.json", [
                                 'form_params' => [
-                                    'user_id' => $d['id']
+                                    'group' => [
+                                        'name' => "$shouldBeDiscourseName$unique"
+                                    ]
                                 ]
                             ]);
 
-                            Log::info('Response status: ' . $response->getStatusCode());
-                            Log::debug($response->getBody());
-
-                            if ($response->getStatusCode() != 200)
-                            {
-                                Log::error("Failed to remove member $discourseMember for {$discourseId} {$discourseName}");
-                                throw new \Exception("Failed to remove member $discourseMember for {$discourseId} {$discourseName}");
+                            if ($response->getStatusCode() === 200) {
+                                Log::debug("...rename to $shouldBeDiscourseName$unique succeeded");
+                                $discourseName = $shouldBeDiscourseName;
+                                $group->discourse_group = $shouldBeDiscourseName;
+                                $group->save();
+                            } else {
+                                if (strpos($response->getBody(), 'Name has already been taken') !== false) {
+                                    // Discourse sometimes seems to have groups stuck in a bad state which are not accessible.
+                                    // This may be a consequence of testing with multiple Restarters instances against the same
+                                    // Discourse instance.
+                                    //
+                                    // This can result in a create failure, and a group which we cannot then locate to delete.
+                                    // So skip over it and retry creation with a different name.
+                                    $retry = true;
+                                    $unique = $unique ? ($unique + 1) : 1;
+                                    Log::debug("...name already taken, try $shouldBeDiscourseName$unique");
+                                } else {
+                                    Log::error("Could not rename group $restartId from $currentDiscourseName to $shouldBeDiscourseName$unique: ".$response->getReasonPhrase());
+                                }
                             }
-                        } else {
-                            // See whether the owner status on Discourse matches the status on Restarters.
-                            $role = $restartersMembers[$discourseMember]->role;
-                            $shouldBeOwner = $role == Role::HOST;
-                            Log::debug("Role for $discourseMember is $role, should be admin? $shouldBeOwner");
+                        } while ($retry);
+                    }
 
-                            if ($d['owner'] && !$shouldBeOwner) {
-                                Log::info("Remove $discourseMember as admin of {$discourseId} {$discourseName}");
-                                $response = $client->request('DELETE', "/admin/groups/$discourseId/owners.json", [
+                    if ($discourseResult['group']['messageable_level'] != 4) {
+                        Log::debug("Update messageable_level for Restarters group $restartId, {$group->discourse_group}, Discourse group $discourseId");
+                        $gData = $discourseResult['group'];
+                        $gData['messageable_level'] = 4;
+                        $response = $client->request('PUT', "/g/$discourseId.json", [
+                            'form_params' => [
+                                'group' => $gData
+                            ]
+                        ]);
+
+                        if ($response->getStatusCode() === 200) {
+                            Log::debug("...succeeded");
+                        } else {
+                            Log::debug("...failed with " . $response->getStatusCode() . ", " . $response->getBody());
+                        }
+                    }
+
+                    if ($group->groupimage && $group->groupimage->idimages) {
+                        // Check if the flair_url needs updating.  This keeps the logo in sync with changes on Restarters.
+                        Log::debug("Check Discourse logo {$group->discourse_logo} vs {$group->groupimage->idimages}");
+                        if (!$group->discourse_logo || $group->discourse_logo != $group->groupimage->image->idimages) {
+                            // We need to update it.  To do that, we first have to upload the image file to Discourse.
+                            Log::debug("Need to update flair_url with ". $group->groupImagePath());
+
+                            // Upload an image.  We need the MIME type of the file.
+                            $fh = fopen(public_path('uploads/mid_' . $group->groupImage->image->path),'r');
+
+                            $data = [
+                                [
+                                    'name' => 'upload_type',
+                                    'contents' => 'group_flair'
+                                ],
+                                [
+                                    'name' => 'type',
+                                    'contents' => mime_content_type($fh)
+                                ],
+                                [
+                                    'name' => 'sha1_checksum',
+                                    'contents' => sha1_file($group->groupImagePath())
+                                ],
+                                [
+                                    'name' => 'file',
+                                    'contents' => file_get_contents($group->groupImagePath()),
+                                    'filename' => 'GroupLogo' . $idgroups
+                                ]
+                            ];
+
+                            $response = $client->request('POST', '/uploads.json', [
+                                'multipart' => $data
+                            ]);
+
+                            Log::debug("Response from upload ". $response->getStatusCode() . " " . $response->getBody());
+
+                            if ($response->getStatusCode() === 200) {
+                                // Now we can update the group to use it.
+                                $rsp = json_decode($response->getBody(), TRUE);
+
+                                if ($rsp && array_key_exists('id', $rsp)) {
+                                    $uploadId = $rsp['id'];
+                                    $response = $client->request('PUT', "/g/$discourseId.json", [
+                                        'form_params' => [
+                                            'group' => [
+                                                'flair_upload_id' => $uploadId
+                                            ]
+                                        ]
+                                    ]);
+
+                                    Log::debug("Response from flair_url update " . $response->getBody());
+
+                                    if ($response->getStatusCode() === 200) {
+                                        // Update the group to record that we've uploaded, then we'll skip this next time
+                                        // through.
+                                        Log::debug("Updated flair url OK for {$discourseId} to {$group->groupimage->idimages}");
+                                        $group->discourse_logo = $group->groupimage->image->idimages;
+                                        $group->save();
+                                        Log::debug("...saved update to group");
+                                    } else {
+                                        Log::error("Failed to update flair url");
+                                        throw new \Exception("Failed to update flair url for {$discourseId}");
+                                    }
+                                } else {
+                                    Log::error("Failed to upload group logo for {$discourseId}");
+                                    throw new \Exception("Failed to upload group logo for {$discourseId}");
+                                }
+                            }
+                        }
+                    }
+
+                    // TODO The Discourse API accepts up to around 1000 as the limit.  This is plenty for now, but
+                    // we will assert below if it turns out not to be in future.
+                    $limit = 1000;
+
+                    $response = $client->request('GET', "/groups/$discourseName/members.json?limit=$limit");
+
+                    Log::info('Response status: ' . $response->getStatusCode());
+
+                    if ($response->getStatusCode() != 200)
+                    {
+                        Log::error("Failed to get list of members for {$discourseId}");
+                        throw new \Exception("Failed to get list of members for {$discourseId}");
+                    } else {
+                        $discourseResult = json_decode($response->getBody(), true);
+                        $total = $discourseResult['meta']['total'];
+                        Log::debug("Total $total");
+
+                        if ($total > $limit)
+                        {
+                            Log::error("Group $discourseId too large at $total");
+                            throw new \Exception("Group $discourseId too large at $total");
+                        }
+
+                        // Save off the members and whether they're an admin.
+                        $discourseMembers = [];
+
+                        foreach ($discourseResult['members'] as $d) {
+                            $discourseMembers[$d['username']] = $d;
+                            $discourseMembers[$d['username']]['owner'] = false;
+                        }
+
+                        foreach ($discourseResult['owners'] as $d) {
+                            $discourseMembers[$d['username']] = $d;
+                            $discourseMembers[$d['username']]['owner'] = true;
+                        }
+
+                        $restartersMembersUGs = UserGroups::where('group', $restartId)->where('status', '=', 1)->whereNull('deleted_at')->get();
+
+                        $restartersMembers = [];
+
+                        foreach ($restartersMembersUGs as $r) {
+                            $u = User::find($r->user);
+
+                            if (!strlen($u->username)) {
+                                // No current user.  Create one.
+                                $u->generateAndSetUsername();
+                                $u->save();
+                                $u->refresh();
+                                $this->syncSso($u);
+                            }
+
+                            $restartersMembers[$u->username] = $r;
+                        }
+
+                        Log::debug(
+                            count($discourseMembers) . " Discourse members vs " . count(
+                                $restartersMembers
+                            ) . " on Restarters"
+                        );
+                        Log::debug("Discourse Members " . json_encode($discourseMembers));
+                        Log::debug("Restarter Members " . json_encode($restartersMembers));
+
+                        foreach ($discourseMembers as $discourseMember => $d) {
+                            if (!array_key_exists($discourseMember, $restartersMembers)) {
+                                Log::debug("Remove user $discourseMember from Discourse group $discourseName");
+
+                                $response = $client->request('DELETE', "/admin/groups/$discourseId/members.json", [
                                     'form_params' => [
                                         'user_id' => $d['id']
                                     ]
@@ -461,88 +440,111 @@ class DiscourseService
 
                                 if ($response->getStatusCode() != 200)
                                 {
-                                    Log::error("Failed to remove $discourseMember as owner of {$discourseId} {$discourseName}");
-                                    #throw new \Exception("Failed to remove $discourseMember as owner of {$discourseId} {$discourseName}");
+                                    Log::error("Failed to remove member $discourseMember for {$discourseId} {$discourseName}");
+                                    throw new \Exception("Failed to remove member $discourseMember for {$discourseId} {$discourseName}");
                                 }
-                            } else if (!$d['owner'] && $shouldBeOwner) {
-                                Log::info("Add $discourseMember as admin of {$discourseId} {$discourseName}");
-                                $response = $client->request('PUT', "/groups/$discourseId/owners.json", [
-                                    'form_params' => [
-                                        'usernames' => $discourseMember
-                                    ]
-                                ]);
+                            } else {
+                                // See whether the owner status on Discourse matches the status on Restarters.
+                                $role = $restartersMembers[$discourseMember]->role;
+                                $shouldBeOwner = $role == Role::HOST;
+                                Log::debug("Role for $discourseMember is $role, should be admin? $shouldBeOwner");
 
-                                Log::info('Response status: ' . $response->getStatusCode());
-                                Log::debug($response->getBody());
+                                if ($d['owner'] && !$shouldBeOwner) {
+                                    Log::info("Remove $discourseMember as admin of {$discourseId} {$discourseName}");
+                                    $response = $client->request('DELETE', "/admin/groups/$discourseId/owners.json", [
+                                        'form_params' => [
+                                            'user_id' => $d['id']
+                                        ]
+                                    ]);
 
-                                if ($response->getStatusCode() != 200)
-                                {
-                                    Log::error("Failed to add $discourseMember as owner of {$discourseId} {$discourseName}");
-                                    throw new \Exception("Failed to add $discourseMember as owner of {$discourseId} {$discourseName}");
+                                    Log::info('Response status: ' . $response->getStatusCode());
+                                    Log::debug($response->getBody());
+
+                                    if ($response->getStatusCode() != 200)
+                                    {
+                                        Log::error("Failed to remove $discourseMember as owner of {$discourseId} {$discourseName}");
+                                        #throw new \Exception("Failed to remove $discourseMember as owner of {$discourseId} {$discourseName}");
+                                    }
+                                } else if (!$d['owner'] && $shouldBeOwner) {
+                                    Log::info("Add $discourseMember as admin of {$discourseId} {$discourseName}");
+                                    $response = $client->request('PUT', "/groups/$discourseId/owners.json", [
+                                        'form_params' => [
+                                            'usernames' => $discourseMember
+                                        ]
+                                    ]);
+
+                                    Log::info('Response status: ' . $response->getStatusCode());
+                                    Log::debug($response->getBody());
+
+                                    if ($response->getStatusCode() != 200)
+                                    {
+                                        Log::error("Failed to add $discourseMember as owner of {$discourseId} {$discourseName}");
+                                        throw new \Exception("Failed to add $discourseMember as owner of {$discourseId} {$discourseName}");
+                                    }
                                 }
-                            }
 
-                            if ($restartersMembers[$discourseMember]->role == Role::HOST && $d['trust_level'] == 0) {
-                                Log::info("$discourseMember is on trust_level 0, promote");
-                                $response = $client->request('PUT', "/admin/users/{$d['id']}/trust_level.json", [
-                                    'form_params' => [
-                                        'level' => 1
-                                    ]
-                                ]);
+                                if ($restartersMembers[$discourseMember]->role == Role::HOST && $d['trust_level'] == 0) {
+                                    Log::info("$discourseMember is on trust_level 0, promote");
+                                    $response = $client->request('PUT', "/admin/users/{$d['id']}/trust_level.json", [
+                                        'form_params' => [
+                                            'level' => 1
+                                        ]
+                                    ]);
 
-                                Log::info('Response status: ' . $response->getStatusCode());
-                                Log::debug($response->getBody());
+                                    Log::info('Response status: ' . $response->getStatusCode());
+                                    Log::debug($response->getBody());
 
-                                if ($response->getStatusCode() != 200) {
-                                    Log::error("Failed to promote $discourseMember to trust level 1");
-                                    throw new \Exception("Failed to promote $discourseMember to trust level 1");
+                                    if ($response->getStatusCode() != 200) {
+                                        Log::error("Failed to promote $discourseMember to trust level 1");
+                                        throw new \Exception("Failed to promote $discourseMember to trust level 1");
+                                    }
                                 }
                             }
                         }
-                    }
 
-                    foreach ($restartersMembers as $restartersMember => $r) {
-                        if (!array_key_exists($restartersMember, $discourseMembers)) {
-                            Log::debug("Add Restarter user $restartersMember to Discourse group $discourseName");
+                        foreach ($restartersMembers as $restartersMember => $r) {
+                            if (!array_key_exists($restartersMember, $discourseMembers)) {
+                                Log::debug("Add Restarter user $restartersMember to Discourse group $discourseName");
 
-                            // We add these one by one, rather than in a single call.  This is because if our Restarters
-                            // usernames don't match the Discourse ones, e.g. due to anonymisation, then the single
-                            // call would fail.
-                            $response = $client->request('PUT', "/groups/$discourseId/members.json", [
-                                'form_params' => [
-                                    'usernames' => $restartersMember
-                                ]
-                            ]);
-
-                            Log::debug('Response status: ' . $response->getStatusCode());
-                            Log::debug($response->getBody());
-
-                            if ($response->getStatusCode() == 400) {
-                                // This happens if the user doesn't exist on Discourse.  That can happen for historical
-                                // reasons, or failures during user creation.  Try to create them.
-                                Log::info('Create missing member on Discourse ' . $restartersMember);
-                                $u = User::where('username', $restartersMember)->first();
-                                $this->syncSso($u);
-
-                                // Now try again to add.  If this fails we'll pick it up again next time through.
+                                // We add these one by one, rather than in a single call.  This is because if our Restarters
+                                // usernames don't match the Discourse ones, e.g. due to anonymisation, then the single
+                                // call would fail.
                                 $response = $client->request('PUT', "/groups/$discourseId/members.json", [
                                     'form_params' => [
                                         'usernames' => $restartersMember
                                     ]
                                 ]);
-                            } else if ($response->getStatusCode() != 200)
-                            {
-                                Log::error("Failed to add member for {$discourseId} {$discourseName}");
-                            } else
-                            {
-                                Log::info("Added Restarter user $restartersMember to Discourse group $discourseName");
+
+                                Log::debug('Response status: ' . $response->getStatusCode());
+                                Log::debug($response->getBody());
+
+                                if ($response->getStatusCode() == 400) {
+                                    // This happens if the user doesn't exist on Discourse.  That can happen for historical
+                                    // reasons, or failures during user creation.  Try to create them.
+                                    Log::info('Create missing member on Discourse ' . $restartersMember);
+                                    $u = User::where('username', $restartersMember)->first();
+                                    $this->syncSso($u);
+
+                                    // Now try again to add.  If this fails we'll pick it up again next time through.
+                                    $response = $client->request('PUT', "/groups/$discourseId/members.json", [
+                                        'form_params' => [
+                                            'usernames' => $restartersMember
+                                        ]
+                                    ]);
+                                } else if ($response->getStatusCode() != 200)
+                                {
+                                    Log::error("Failed to add member for {$discourseId} {$discourseName}");
+                                } else
+                                {
+                                    Log::info("Added Restarter user $restartersMember to Discourse group $discourseName");
+                                }
                             }
                         }
                     }
+                } else {
+                    Log::error("Failed to get group $discourseName");
+                    \Sentry\CaptureMessage("Failed to find group $discourseName on Discourse, Restarters group $restartId");
                 }
-            } else {
-                Log::error("Failed to get group $discourseName");
-                \Sentry\CaptureMessage("Failed to find group $discourseName on Discourse, Restarters group $restartId");
             }
         }
     }
