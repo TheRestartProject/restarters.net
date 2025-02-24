@@ -239,7 +239,7 @@ class DiscourseService
 
                     // We might have a uniqueness suffix.  Check that the name either matches exactly or matches except
                     // the last character of currentDiscourseName
-                    if ($currentDiscourseName != $shouldBeDiscourseName && $currentDiscourseName != substr($shouldBeDiscourseName, 0, -1)) {
+                    if ($currentDiscourseName != $shouldBeDiscourseName && substr($currentDiscourseName, 0, -1) != $shouldBeDiscourseName) {
                         Log::debug("Rename Discourse group $currentDiscourseName to $shouldBeDiscourseName");
                         do {
                             $retry = false;
