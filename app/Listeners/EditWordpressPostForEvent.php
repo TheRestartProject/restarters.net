@@ -38,6 +38,12 @@ class EditWordpressPostForEvent extends BaseEvent
 
         $theParty = Party::find($id);
 
+        if (! $theParty) {
+            Log::info('Event no longer exists');
+
+            return;
+        }
+
         if (! $theParty->shouldPushToWordpress()) {
             Log::info('Events for groups in this network are not published');
 
