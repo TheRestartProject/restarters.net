@@ -5,7 +5,7 @@ This document describes how to set up and use the development environment for th
 ## Prerequisites
 
 - [Docker](https://docs.docker.com/get-docker/)
-- [Docker Compose](https://docs.docker.com/compose/install/)
+- [Docker Compose](https://docs.docker.com/compose/install/) (included with Docker Desktop)
 
 No other dependencies are required on your host machine!
 
@@ -80,6 +80,12 @@ The `dev.sh` script provides several commands to help with development:
 
 The development environment is configured to use your host user's UID and GID inside the container. This ensures that files created by the container have the correct permissions on your host machine, regardless of whether you're using Linux, macOS, or Windows with WSL.
 
+The script automatically detects your user ID and group ID and passes them to the Docker containers, so you shouldn't encounter permission issues.
+
+## Compatibility
+
+The development environment works with both older versions of Docker that use `docker-compose` as a separate command and newer versions that use `docker compose` as a subcommand. The `dev.sh` script automatically detects which command to use.
+
 ## Customizing the Environment
 
 You can customize the environment by editing the following files:
@@ -115,9 +121,19 @@ If you encounter file permission issues, you can try the following:
 If you need to rebuild the containers:
 
 ```bash
+# For newer Docker versions
+docker compose -f docker-compose.dev.yml down --rmi all
+
+# For older Docker versions
 docker-compose -f docker-compose.dev.yml down --rmi all
+
+# Then start again
 ./dev.sh up
 ```
+
+### Error Messages
+
+If you encounter errors when running any of the commands, the `dev.sh` script will display an error message and exit with a non-zero status code. This makes it easier to identify and fix issues.
 
 ## Additional Information
 

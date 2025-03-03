@@ -35,26 +35,68 @@ check_running() {
     fi
 }
 
+# Function to determine which docker compose command to use
+docker_compose_cmd() {
+    if command -v docker-compose &> /dev/null; then
+        docker-compose "$@"
+    else
+        docker compose "$@"
+    fi
+}
+
+# Set user ID and group ID for container
+set_user_ids() {
+    # Default to 1000 if id command fails
+    USER_ID=$(id -u 2>/dev/null || echo 1000)
+    GROUP_ID=$(id -g 2>/dev/null || echo 1000)
+    USER_NAME=$(id -un 2>/dev/null || echo developer)
+    
+    export DOCKER_UID=$USER_ID
+    export DOCKER_GID=$GROUP_ID
+    export DOCKER_USER=$USER_NAME
+}
+
 # Main command handling
 case "$1" in
     up)
         echo "Starting Restarters development environment..."
-        export UID=$(id -u)
-        export USER=$(id -un)
-        docker-compose -f docker-compose.dev.yml up -d
-        echo "Containers started. You can access the application at http://localhost:8001"
+        set_user_ids
+        
+        # Run docker compose and check if it succeeded
+        if docker_compose_cmd -f docker-compose.dev.yml up -d; then
+            echo "Containers started successfully."
+            echo "You can access the application at http://localhost:8001"
+            echo "Run './dev.sh setup' to initialize the application."
+        else
+            echo "Failed to start containers. Check the error messages above."
+            exit 1
+        fi
         ;;
     down)
         echo "Stopping Restarters development environment..."
-        docker-compose -f docker-compose.dev.yml down
+        if docker_compose_cmd -f docker-compose.dev.yml down; then
+            echo "Containers stopped successfully."
+        else
+            echo "Failed to stop containers. Check the error messages above."
+            exit 1
+        fi
         ;;
     restart)
         echo "Restarting Restarters development environment..."
-        docker-compose -f docker-compose.dev.yml down
-        export UID=$(id -u)
-        export USER=$(id -un)
-        docker-compose -f docker-compose.dev.yml up -d
-        echo "Containers restarted. You can access the application at http://localhost:8001"
+        set_user_ids
+        
+        if docker_compose_cmd -f docker-compose.dev.yml down; then
+            if docker_compose_cmd -f docker-compose.dev.yml up -d; then
+                echo "Containers restarted successfully."
+                echo "You can access the application at http://localhost:8001"
+            else
+                echo "Failed to start containers. Check the error messages above."
+                exit 1
+            fi
+        else
+            echo "Failed to stop containers. Check the error messages above."
+            exit 1
+        fi
         ;;
     bash)
         check_running
@@ -84,7 +126,12 @@ case "$1" in
         ;;
     setup)
         check_running
-        docker exec -it restarters-app bash /var/www/docker/startup.sh
+        if docker exec -it restarters-app bash /var/www/docker/startup.sh; then
+            echo "Setup completed successfully."
+        else
+            echo "Setup failed. Check the error messages above."
+            exit 1
+        fi
         ;;
     help|*)
         show_help
