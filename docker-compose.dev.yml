@@ -7,8 +7,8 @@ services:
       context: .
       dockerfile: Dockerfile.dev
       args:
-        user: ${DOCKER_USER:-developer}
-        uid: ${DOCKER_UID:-1000}
+        user: ${USER}
+        uid: ${UID:-1000}
     container_name: restarters-app
     restart: unless-stopped
     working_dir: /var/www
@@ -38,7 +38,7 @@ services:
 
   # MySQL Database
   db:
-    image: mysql:5.7
+    image: mariadb:10.6  # MariaDB has better cross-platform support
     container_name: restarters-db
     restart: unless-stopped
     environment:
@@ -50,7 +50,8 @@ services:
       SERVICE_NAME: mysql
     volumes:
       - restarters-mysql:/var/lib/mysql
-      - ./mysql/my.cnf:/etc/mysql/my.cnf
+      # Comment out the my.cnf mount if it causes issues
+      # - ./mysql/my.cnf:/etc/mysql/my.cnf
     ports:
       - "3306:3306"
     networks:
@@ -66,7 +67,7 @@ services:
 
   # phpMyAdmin
   phpmyadmin:
-    image: phpmyadmin/phpmyadmin
+    image: phpmyadmin/phpmyadmin:latest
     container_name: restarters-phpmyadmin
     restart: unless-stopped
     ports:
@@ -81,7 +82,7 @@ services:
 
   # MailHog for email testing
   mailhog:
-    image: mailhog/mailhog
+    image: ${MAILHOG_IMAGE:-mailhog/mailhog}  # Use environment variable to select image
     container_name: restarters-mailhog
     logging:
       driver: 'none'  # disable saving logs
