@@ -24,6 +24,7 @@ show_help() {
     echo "  logs              Show logs from the app container"
     echo "  setup             Run the initial setup script"
     echo "  rebuild           Rebuild containers from scratch"
+    echo "  troubleshoot      Run troubleshooting steps"
     echo "  help              Show this help message"
     echo ""
 }
@@ -118,6 +119,41 @@ case "$1" in
         docker_compose_cmd -f docker-compose.dev.yml build --no-cache
         docker_compose_cmd -f docker-compose.dev.yml up -d
         echo "Containers rebuilt and started. You can access the application at http://localhost:8001"
+        ;;
+    troubleshoot)
+        echo "Running troubleshooting steps..."
+        
+        # Step 1: Check Docker and Docker Compose versions
+        echo "=== Docker Version ==="
+        docker --version
+        echo ""
+        
+        # Step 2: Check running containers
+        echo "=== Running Containers ==="
+        docker ps
+        echo ""
+        
+        # Step 3: Check container logs
+        echo "=== Container Logs (last 20 lines) ==="
+        docker logs --tail 20 restarters-app
+        echo ""
+        
+        # Step 4: Check database connection
+        echo "=== Database Connection Test ==="
+        docker exec restarters-app bash -c "php -r \"try { new PDO('mysql:host=restarters_db;dbname=restarters_db_test', 'restarters', 's3cr3t'); echo 'Connection successful!\n'; } catch (PDOException \$e) { echo 'Connection failed: ' . \$e->getMessage() . \n'; }\""
+        echo ""
+        
+        # Step 5: Check PHP extensions
+        echo "=== PHP Extensions ==="
+        docker exec restarters-app php -m
+        echo ""
+        
+        # Step 6: Check file permissions
+        echo "=== File Permissions ==="
+        docker exec restarters-app ls -la /var/www
+        echo ""
+        
+        echo "Troubleshooting complete. If issues persist, try './dev.sh rebuild' to rebuild the containers."
         ;;
     help|*)
         show_help

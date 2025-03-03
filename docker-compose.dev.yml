@@ -14,10 +14,17 @@ services:
     working_dir: /var/www
     volumes:
       - ./:/var/www:cached
+    environment:
+      DB_CONNECTION: mysql
+      DB_HOST: restarters_db
+      DB_PORT: 3306
+      DB_DATABASE: restarters_db_test
+      DB_USERNAME: restarters
+      DB_PASSWORD: s3cr3t
     networks:
       - restarters-network
     depends_on:
-      - db
+      - restarters_db
       - redis
       - mailhog
 
@@ -37,9 +44,9 @@ services:
       - app
 
   # MySQL Database
-  db:
+  restarters_db:
     image: mariadb:10.6  # MariaDB has better cross-platform support
-    container_name: restarters-db
+    container_name: restarters_db
     restart: unless-stopped
     environment:
       MYSQL_DATABASE: ${DB_DATABASE:-restarters_db_test}
@@ -74,11 +81,11 @@ services:
       - "8002:80"
     environment:
       - PMA_ARBITRARY=1
-      - PMA_HOST=db
+      - PMA_HOST=restarters_db
     networks:
       - restarters-network
     depends_on:
-      - db
+      - restarters_db
 
   # MailHog for email testing
   mailhog:
