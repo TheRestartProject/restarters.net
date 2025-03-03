@@ -17,17 +17,27 @@ No other dependencies are required on your host machine!
    cd restarters.net
    ```
 
-2. Start the development environment:
+2. Run the setup script:
    ```bash
-   ./dev.sh up
+   ./setup-dev-env.sh
    ```
 
-3. Run the setup script:
+   This will:
+   - Set up the necessary files and directories
+   - Build and start the Docker containers
+   - Automatically run the initialization process
+
+3. Monitor the initialization progress:
    ```bash
-   ./dev.sh setup
+   ./dev.sh logs
    ```
 
-4. Access the application:
+4. Check the initialization status:
+   ```bash
+   ./dev.sh status
+   ```
+
+5. Once initialization is complete, access the application:
    - Web application: http://localhost:8001
    - phpMyAdmin: http://localhost:8002
    - MailHog (for email testing): http://localhost:8025
@@ -69,15 +79,30 @@ The `dev.sh` script provides several commands to help with development:
 # Show logs from the app container
 ./dev.sh logs
 
-# Run the initial setup script
-./dev.sh setup
+# Check initialization status
+./dev.sh status
 
 # Rebuild containers from scratch
 ./dev.sh rebuild
 
+# Run troubleshooting steps
+./dev.sh troubleshoot
+
 # Show help
 ./dev.sh help
 ```
+
+## Automatic Initialization
+
+The development environment is configured to automatically run the initialization process when the containers start. This includes:
+
+1. Setting up the database connection
+2. Installing Composer dependencies
+3. Running database migrations
+4. Installing NPM dependencies
+5. Creating the admin user
+
+You can monitor the progress of the initialization with `./dev.sh logs` and check its status with `./dev.sh status`.
 
 ## Cross-Platform Compatibility
 
@@ -102,8 +127,25 @@ You can customize the environment by editing the following files:
 - `Dockerfile.dev`: PHP application container configuration
 - `docker/php/php.ini`: PHP configuration
 - `docker/nginx/restarters.conf`: Nginx configuration
+- `docker/startup.sh`: Initialization script
 
 ## Troubleshooting
+
+### Checking Initialization Status
+
+If you're unsure whether the initialization process has completed:
+
+```bash
+./dev.sh status
+```
+
+### Viewing Logs
+
+To see what's happening during initialization:
+
+```bash
+./dev.sh logs
+```
 
 ### File Permission Issues
 
@@ -139,13 +181,15 @@ If you encounter issues related to container architecture:
    docker info
    ```
 
-### Container Issues
+### Running Diagnostics
 
-If you need to rebuild the containers:
+If you're experiencing issues, run the troubleshooting command:
 
 ```bash
-./dev.sh rebuild
+./dev.sh troubleshoot
 ```
+
+This will run a series of diagnostic checks and display the results.
 
 ## Additional Information
 

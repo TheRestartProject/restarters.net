@@ -54,8 +54,14 @@ RUN mkdir -p /usr/local/etc/php/conf.d
 # Copy custom php.ini settings if the file exists
 COPY docker/php/php.ini /usr/local/etc/php/conf.d/custom.ini
 
+# Create entrypoint script
+COPY docker/entrypoint.sh /usr/local/bin/entrypoint.sh
+RUN chmod +x /usr/local/bin/entrypoint.sh
+
 # Switch to non-root user
 USER $user
 
 EXPOSE 9000
+
+ENTRYPOINT ["/usr/local/bin/entrypoint.sh"]
 CMD ["php-fpm"] 

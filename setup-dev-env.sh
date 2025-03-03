@@ -3,6 +3,7 @@
 # Make sure scripts are executable
 chmod +x dev.sh
 chmod +x docker/startup.sh
+chmod +x docker/entrypoint.sh
 
 # Check if Docker is installed
 if ! command -v docker &> /dev/null; then
@@ -36,15 +37,14 @@ fi
 # Start the development environment
 ./dev.sh rebuild
 
-# Wait for containers to be ready
-echo "Waiting for containers to be ready..."
-sleep 10
-
-# Run the setup script
-./dev.sh setup
-
 echo ""
-echo "Setup complete! You can now access the application at http://localhost:8001"
+echo "Containers are starting up and initialization is running automatically."
+echo "This process may take several minutes to complete."
+echo ""
+echo "You can monitor the progress with:"
+echo "  ./dev.sh logs"
+echo ""
+echo "Once initialization is complete, you can access the application at http://localhost:8001"
 echo "Admin user: jane@bloggs.net / passw0rd"
 echo ""
 echo "If you encounter any issues, run './dev.sh troubleshoot' to diagnose problems."

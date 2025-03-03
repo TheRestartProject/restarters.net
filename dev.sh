@@ -22,9 +22,9 @@ show_help() {
     echo "  npm [cmd]         Run an NPM command"
     echo "  test              Run PHPUnit tests"
     echo "  logs              Show logs from the app container"
-    echo "  setup             Run the initial setup script"
     echo "  rebuild           Rebuild containers from scratch"
     echo "  troubleshoot      Run troubleshooting steps"
+    echo "  status            Check the status of the initialization"
     echo "  help              Show this help message"
     echo ""
 }
@@ -69,7 +69,9 @@ case "$1" in
         echo "Starting Restarters development environment..."
         set_env_vars
         docker_compose_cmd -f docker-compose.dev.yml up -d
-        echo "Containers started. You can access the application at http://localhost:8001"
+        echo "Containers started. Initialization is running automatically."
+        echo "You can monitor the progress with: ./dev.sh logs"
+        echo "Once initialization is complete, you can access the application at http://localhost:8001"
         ;;
     down)
         echo "Stopping Restarters development environment..."
@@ -80,7 +82,8 @@ case "$1" in
         docker_compose_cmd -f docker-compose.dev.yml down
         set_env_vars
         docker_compose_cmd -f docker-compose.dev.yml up -d
-        echo "Containers restarted. You can access the application at http://localhost:8001"
+        echo "Containers restarted. Initialization is running automatically."
+        echo "You can monitor the progress with: ./dev.sh logs"
         ;;
     bash)
         check_running
@@ -108,17 +111,26 @@ case "$1" in
     logs)
         docker logs --follow restarters-app
         ;;
-    setup)
-        check_running
-        docker exec -it restarters-app bash /var/www/docker/startup.sh
-        ;;
     rebuild)
         echo "Rebuilding containers from scratch..."
         docker_compose_cmd -f docker-compose.dev.yml down -v --rmi all
         set_env_vars
         docker_compose_cmd -f docker-compose.dev.yml build --no-cache
         docker_compose_cmd -f docker-compose.dev.yml up -d
-        echo "Containers rebuilt and started. You can access the application at http://localhost:8001"
+        echo "Containers rebuilt and started. Initialization is running automatically."
+        echo "You can monitor the progress with: ./dev.sh logs"
+        ;;
+    status)
+        check_running
+        echo "Checking initialization status..."
+        if docker exec restarters-app test -f /var/www/storage/framework/initialized; then
+            echo "✅ Initialization complete! The application is ready to use."
+            echo "You can access the application at http://localhost:8001"
+            echo "Admin user: jane@bloggs.net / passw0rd"
+        else
+            echo "⏳ Initialization is still in progress."
+            echo "You can monitor the progress with: ./dev.sh logs"
+        fi
         ;;
     troubleshoot)
         echo "Running troubleshooting steps..."
@@ -151,6 +163,15 @@ case "$1" in
         # Step 6: Check file permissions
         echo "=== File Permissions ==="
         docker exec restarters-app ls -la /var/www
+        echo ""
+        
+        # Step 7: Check initialization status
+        echo "=== Initialization Status ==="
+        if docker exec restarters-app test -f /var/www/storage/framework/initialized; then
+            echo "✅ Initialization complete!"
+        else
+            echo "⏳ Initialization is still in progress or has failed."
+        fi
         echo ""
         
         echo "Troubleshooting complete. If issues persist, try './dev.sh rebuild' to rebuild the containers."

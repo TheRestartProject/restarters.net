@@ -21,12 +21,18 @@ services:
       DB_DATABASE: restarters_db_test
       DB_USERNAME: restarters
       DB_PASSWORD: s3cr3t
+      WAIT_FOR_DB: "true"
     networks:
       - restarters-network
     depends_on:
       - restarters_db
       - redis
       - mailhog
+    healthcheck:
+      test: ["CMD", "php", "-r", "if(file_exists('/var/www/storage/framework/down')) exit(1);"]
+      interval: 10s
+      timeout: 5s
+      retries: 3
 
   # Nginx Service
   nginx:
@@ -63,6 +69,11 @@ services:
       - "3306:3306"
     networks:
       - restarters-network
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "root", "-p${DB_PASSWORD:-s3cr3t}"]
+      interval: 10s
+      timeout: 5s
+      retries: 3
 
   # Redis
   redis:
@@ -71,6 +82,11 @@ services:
     restart: unless-stopped
     networks:
       - restarters-network
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 3
 
   # phpMyAdmin
   phpmyadmin:
