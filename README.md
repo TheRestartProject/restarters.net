@@ -13,6 +13,21 @@ It combines together three core modules:
 * Restarters Wiki - a collectively produced knowledge base of advice and support
   for community repair
 
+## Development Environment
+
+We provide a Docker-based development environment that makes it easy to get started:
+
+```bash
+# Clone the repository
+git clone https://github.com/TheRestartProject/restarters.net.git
+cd restarters.net
+
+# Run the setup script
+./dev.sh setup
+```
+
+For more detailed instructions, see the [DEVELOPMENT.md](DEVELOPMENT.md) file.
+
 ## Roadmap
 
 Our roadmap is on restarters.net itself - you can register at

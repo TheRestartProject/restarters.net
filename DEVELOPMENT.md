@@ -19,7 +19,7 @@ No other dependencies are required on your host machine!
 
 2. Run the setup script:
    ```bash
-   ./setup-dev-env.sh
+   ./dev.sh setup
    ```
 
    This will:
@@ -32,15 +32,39 @@ No other dependencies are required on your host machine!
    ./dev.sh logs
    ```
 
-4. Check the initialization status:
-   ```bash
-   ./dev.sh status
-   ```
-
-5. Once initialization is complete, access the application:
+4. Once initialization is complete, access the application:
    - Web application: http://localhost:8001
    - phpMyAdmin: http://localhost:8002
    - MailHog (for email testing): http://localhost:8025
+
+## Setup Options
+
+The setup command supports several options:
+
+```bash
+./dev.sh setup [options]
+```
+
+Options:
+- `--dev`: Setup development environment (default)
+- `--prod`: Setup production environment
+- `--rebuild`: Rebuild containers from scratch
+- `--force`: Force initialization even if already initialized
+
+Examples:
+```bash
+# Setup development environment (default)
+./dev.sh setup
+
+# Setup production environment
+./dev.sh setup --prod
+
+# Rebuild development environment from scratch
+./dev.sh setup --rebuild
+
+# Force reinitialization of development environment
+./dev.sh setup --force
+```
 
 ## Default Admin User
 

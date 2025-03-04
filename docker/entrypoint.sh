@@ -1,21 +1,39 @@
 #!/bin/bash
 set -e
 
-# Run the startup script if it exists
+# Source the utility functions
+source "$(dirname "$0")/bash_utils.sh"
+
+# Check if we need to run the initialization
 if [ -f /var/www/docker/startup.sh ]; then
-    echo "Running startup script..."
-    bash /var/www/docker/startup.sh
+    # Check if we've already initialized
+    if [ -f /var/www/storage/framework/initialized ] && [ "${FORCE_INIT}" != "true" ]; then
+        log_info "Application already initialized. Skipping initialization."
+    else
+        log_info "Running startup script..."
+        bash /var/www/docker/startup.sh || {
+            log_error "Startup script failed. Check the logs for details."
+            exit 1
+        }
+    fi
 else
-    echo "Startup script not found. Skipping initialization."
+    log_warn "Startup script not found. Skipping initialization."
 fi
 
 # Check if the command is php-fpm
 if [ "$1" = "php-fpm" ]; then
     # Make sure our script is executable
-    chmod +x /var/www/docker/run-services.sh
-    # Execute our custom script that runs both webpack and php-fpm
-    exec /var/www/docker/run-services.sh
+    if [ -f /var/www/docker/run-services.sh ]; then
+        chmod +x /var/www/docker/run-services.sh
+        # Execute our custom script that runs both webpack and php-fpm
+        log_info "Starting services with run-services.sh..."
+        exec /var/www/docker/run-services.sh
+    else
+        log_warn "run-services.sh not found. Starting PHP-FPM directly..."
+        exec php-fpm
+    fi
 else
     # Execute the original command
+    log_info "Executing command: $@"
     exec "$@"
 fi 
