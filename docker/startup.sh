@@ -9,17 +9,12 @@ if [ ! -f .env ]; then
     echo "Created .env file from .env.example"
 fi
 
-# Update database connection in .env
-sed -i 's/DB_HOST=.*$/DB_HOST=restarters_db/g' .env
-sed -i 's/DB_DATABASE=.*$/DB_DATABASE=restarters_db_test/g' .env
-sed -i 's/DB_USERNAME=.*$/DB_USERNAME=restarters/g' .env
-sed -i 's/DB_PASSWORD=.*$/DB_PASSWORD=s3cr3t/g' .env
-
 # Wait for database to be ready if WAIT_FOR_DB is set
 if [ "${WAIT_FOR_DB}" = "true" ]; then
     echo "Waiting for database connection..."
     max_tries=30
     tries=0
+    # TODO: Use .env variables instead of hardcoding them
     while ! mysql -h restarters_db -u restarters -ps3cr3t -e "SELECT 1" >/dev/null 2>&1; do
         tries=$((tries + 1))
         if [ $tries -gt $max_tries ]; then

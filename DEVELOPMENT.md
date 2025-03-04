@@ -193,4 +193,16 @@ This will run a series of diagnostic checks and display the results.
 
 ## Additional Information
 
-For more information about the Restarters project, please refer to the main [README.md](README.md) file. 
+For more information about the Restarters project, please refer to the main [README.md](README.md) file.
+
+## Docker Development Environment
+
+### Webpack Dev Server
+
+The Docker development environment automatically runs the webpack dev server (`npm run watch`) in the background when the container starts. This allows for hot reloading of frontend assets while the PHP-FPM server is running.
+
+If you need to restart the webpack dev server, you can do so by running:
+
+```bash
+docker exec -it restarters-app bash -c "cd /var/www && npm run watch"
+``` 
