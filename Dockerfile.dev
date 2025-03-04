@@ -18,7 +18,8 @@ RUN apt-get update && apt-get install -y \
     libgmp-dev \
     libjpeg62-turbo-dev \
     libpq-dev \
-    vim
+    vim \
+    procps
 
 # Install Node.js and npm (using NodeSource repository for cross-platform compatibility)
 RUN curl -fsSL https://deb.nodesource.com/setup_18.x | bash - \

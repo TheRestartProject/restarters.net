@@ -9,9 +9,14 @@ trap cleanup EXIT INT TERM
 
 cleanup() {
     log_info "Cleaning up..."
-    if [ -n "$WEBPACK_PID" ] && ps -p $WEBPACK_PID > /dev/null; then
-        log_info "Stopping webpack dev server..."
-        kill $WEBPACK_PID || log_warn "Failed to kill webpack process"
+    if [ -n "$WEBPACK_PID" ]; then
+        # Check if process exists using kill -0 instead of ps
+        if kill -0 $WEBPACK_PID 2>/dev/null; then
+            log_info "Stopping webpack dev server..."
+            kill $WEBPACK_PID || log_warn "Failed to kill webpack process"
+        else
+            log_warn "Webpack process is not running"
+        fi
     fi
     log_info "Cleanup complete"
 }
@@ -21,9 +26,9 @@ log_info "Starting webpack dev server..."
 cd /var/www && npm run watch &
 WEBPACK_PID=$!
 
-# Check if webpack started successfully
+# Check if webpack started successfully using kill -0 instead of ps
 sleep 2
-if ! ps -p $WEBPACK_PID > /dev/null; then
+if ! kill -0 $WEBPACK_PID 2>/dev/null; then
     log_error "Webpack dev server failed to start"
     exit 1
 fi
