@@ -312,7 +312,7 @@ case "$1" in
         
         # Step 4: Check database connection
         log_info "=== Database Connection Test ==="
-        docker exec restarters-app bash -c "php -r \"try { new PDO('mysql:host=restarters_db;dbname=restarters_db_test', 'restarters', 's3cr3t'); echo 'Connection successful!\n'; } catch (PDOException \$e) { echo 'Connection failed: ' . \$e->getMessage() . \n'; }\""
+        docker exec restarters-app php /var/www/docker/php/db-test.php
         echo ""
         
         # Step 5: Check PHP extensions
