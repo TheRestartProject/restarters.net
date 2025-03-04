@@ -48,6 +48,8 @@ RUN mkdir -p /home/$user/.composer && \
 # Set working directory
 WORKDIR /var/www
 
+RUN git config --system --add safe.directory /var/www
+
 # Create directory for custom PHP configuration
 RUN mkdir -p /usr/local/etc/php/conf.d
 
