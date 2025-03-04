@@ -218,6 +218,12 @@ setup() {
 
         log_info "Rebuilding containers..."
         run_compose $ENV build --no-cache
+
+        log_info "Removing .env file..."
+        rm -f .env
+
+        log_info "Creating new .env file..."
+        cp .env.example .env
     fi
 
     # Start the containers
