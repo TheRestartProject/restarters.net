@@ -56,8 +56,10 @@ check_running() {
 # Set environment variables for Docker
 set_env_vars() {
     # Get current user ID and username
-    export UID=$(id -u)
+    export USER_ID=$(id -u)
+    log_info "User ID: $USER_ID"
     export USER=$(id -un)
+    log_info "User: $USER"
     
     # Detect architecture and set appropriate image for MailHog
     ARCH=$(uname -m)
