@@ -46,8 +46,7 @@ The setup command supports several options:
 ```
 
 Options:
-- `--dev`: Setup development environment (default)
-- `--prod`: Setup production environment
+- `--prod`: Setup production environment (default is development)
 - `--rebuild`: Rebuild containers from scratch
 - `--force`: Force initialization even if already initialized
 
@@ -106,7 +105,7 @@ The `dev.sh` script provides several commands to help with development:
 # Check initialization status
 ./dev.sh status
 
-# Rebuild containers from scratch
+# Rebuild containers from scratch but only in Dev mode
 ./dev.sh rebuild
 
 # Run troubleshooting steps
