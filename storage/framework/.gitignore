@@ -1,6 +1,7 @@
 compiled.php
 config.php
 down
+initialized
 events.scanned.php
 maintenance.php
 routes.php
