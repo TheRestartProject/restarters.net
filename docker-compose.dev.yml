@@ -6,9 +6,6 @@ services:
     build:
       context: .
       dockerfile: Dockerfile.dev
-      args:
-        user: ${USER}
-        uid: ${USER_ID:-1000}
     container_name: restarters-app
     restart: unless-stopped
     working_dir: /var/www
