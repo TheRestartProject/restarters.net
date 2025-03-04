@@ -47,6 +47,11 @@ RUN mkdir -p /usr/local/etc/php/conf.d
 # Copy custom php.ini settings if the file exists
 COPY docker/php/php.ini /usr/local/etc/php/conf.d/custom.ini
 
+# Set proper permissions for Laravel storage directories
+RUN mkdir -p /var/www/storage/logs /var/www/storage/framework/cache /var/www/storage/framework/sessions /var/www/storage/framework/views \
+    && chown -R www-data:www-data /var/www/storage \
+    && chmod -R 775 /var/www/storage
+
 EXPOSE 9000
 
 ENTRYPOINT ["/var/www/docker/entrypoint.sh"]

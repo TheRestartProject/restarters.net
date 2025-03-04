@@ -4,6 +4,12 @@ set -e
 # Source the utility functions
 source "$(dirname "$0")/bash_utils.sh"
 
+# Ensure proper permissions for Laravel storage directories
+log_info "Setting proper permissions for storage directories..."
+mkdir -p /var/www/storage/logs /var/www/storage/framework/cache /var/www/storage/framework/sessions /var/www/storage/framework/views
+chown -R www-data:www-data /var/www/storage
+chmod -R 775 /var/www/storage
+
 # Check if we need to run the initialization
 if [ -f /var/www/docker/startup.sh ]; then
     # Check if we've already initialized
