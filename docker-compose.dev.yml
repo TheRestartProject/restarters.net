@@ -19,6 +19,7 @@ services:
       DB_USERNAME: restarters
       DB_PASSWORD: s3cr3t
       WAIT_FOR_DB: "true"
+      FORCE_INIT: "${FORCE_INIT:-false}"
     networks:
       - restarters-network
     depends_on:

@@ -148,12 +148,22 @@ setup() {
 
     # Stop any running containers
     if [ "$REBUILD" = true ]; then
+        export FORCE_INIT=true
+
         log_info "Stopping and removing existing containers..."
         if [ "$ENV" = "dev" ]; then
-            docker_compose_cmd -f docker-compose.dev.yml down -v
+            docker_compose_cmd -f docker-compose.dev.yml down -v --rmi all
+
+            log_info "Rebuilding containers..."
+            docker_compose_cmd -f docker-compose.dev.yml build --no-cache
+
         else
-            docker_compose_cmd down -v
+            docker_compose_cmd down -v --rmi all
+    
+            log_info "Rebuilding containers..."
+            docker_compose_cmd build --no-cache
         fi
+
     fi
 
     # Start the containers
@@ -244,6 +254,8 @@ case "$1" in
         log_info "Rebuilding containers from scratch..."
         docker_compose_cmd -f docker-compose.dev.yml down -v --rmi all
         set_env_vars
+        export FORCE_INIT=true
+        log_info "Force initialization enabled for rebuild"
         docker_compose_cmd -f docker-compose.dev.yml build --no-cache
         docker_compose_cmd -f docker-compose.dev.yml up -d
         log_info "Containers rebuilt and started. Initialization is running automatically."
