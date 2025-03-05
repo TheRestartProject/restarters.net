@@ -51,8 +51,9 @@ RUN groupadd -g ${GROUP_ID} hostgroup || \
     # but make files owned by www-data:hostgroup
     mkdir -p /var/www/storage/logs /var/www/storage/framework/cache \
         /var/www/storage/framework/sessions /var/www/storage/framework/views \
-        /var/www/bootstrap/cache && \
-    chown -R www-data:hostgroup /var/www/storage /var/www/bootstrap/cache
+        /var/www/bootstrap/cache /var/www/public && \
+    chown -R www-data:hostgroup /var/www/storage /var/www/bootstrap/cache && \
+    find /var/www/public -type d -exec chmod 777 {} +
 
 RUN git config --system --add safe.directory /var/www
 

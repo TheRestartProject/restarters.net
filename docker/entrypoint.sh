@@ -18,8 +18,10 @@ fix_permissions() {
 
     # Fix the ownership of critical directories
     log_info "Ensuring proper permissions for Laravel directories"
-    mkdir -p /var/www/storage/framework /var/www/storage/logs /var/www/bootstrap/cache
+    mkdir -p /var/www/storage/framework /var/www/storage/logs /var/www/bootstrap/cache /var/www/public
     chown -R www-data:hostgroup /var/www/storage /var/www/bootstrap/cache
+    # Ensure the public subdirectories are writable by the www-data users and hostgroup
+    find /var/www/public -type d -exec chmod 777 {} +
 }
 
 # Fix permissions on startup
