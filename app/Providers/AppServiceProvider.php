@@ -29,6 +29,11 @@ class AppServiceProvider extends ServiceProvider
 
         Schema::defaultStringLength(191);
 
+        // Force HTTPS for all URLs when APP_URL is set to HTTPS
+        if (parse_url(config('app.url'), PHP_URL_SCHEME) === 'https') {
+            \URL::forceScheme('https');
+        }
+
         // Don't create Audit entries when nothing that we want to audit has changed.
         // see: https://github.com/owen-it/laravel-auditing/issues/263#issuecomment-330695869
         Audit::creating(function (Audit $model) {
