@@ -55,6 +55,9 @@ check_running() {
 
 # Set environment variables for Docker
 set_env_vars() {
+    export GROUP_ID=$(id -g)
+    log_info "Using GROUP_ID: $GROUP_ID"
+
     # Detect architecture and set appropriate image for MailHog
     ARCH=$(uname -m)
     if [ "$ARCH" = "arm64" ] || [ "$ARCH" = "aarch64" ]; then

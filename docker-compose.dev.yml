@@ -6,6 +6,8 @@ services:
     build:
       context: .
       dockerfile: Dockerfile.dev
+      args:
+        GROUP_ID: ${GROUP_ID:-1000}
     container_name: restarters-app
     restart: unless-stopped
     working_dir: /var/www
@@ -20,6 +22,7 @@ services:
       DB_PASSWORD: s3cr3t
       WAIT_FOR_DB: "true"
       FORCE_INIT: "${FORCE_INIT:-false}"
+      HOST_GROUP_ID: ${GROUP_ID:-1000}
     networks:
       - restarters-network
     depends_on:

@@ -39,6 +39,21 @@ COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
 # Set working directory
 WORKDIR /var/www
 
+# Create a non-root user with configurable UID/GID
+ARG GROUP_ID=1000
+
+# Create a new group with host GID and add www-data to it
+RUN groupadd -g ${GROUP_ID} hostgroup || \
+    # If group already exists with this GID, use a different approach
+    (groupmod -n hostgroup $(getent group ${GROUP_ID} | cut -d: -f1)) && \
+    usermod -a -G hostgroup www-data && \
+    # Keep www-data UID/GID for system consistency
+    # but make files owned by www-data:hostgroup
+    mkdir -p /var/www/storage/logs /var/www/storage/framework/cache \
+        /var/www/storage/framework/sessions /var/www/storage/framework/views \
+        /var/www/bootstrap/cache && \
+    chown -R www-data:hostgroup /var/www/storage /var/www/bootstrap/cache
+
 RUN git config --system --add safe.directory /var/www
 
 # Create directory for custom PHP configuration
@@ -46,11 +61,6 @@ RUN mkdir -p /usr/local/etc/php/conf.d
 
 # Copy custom php.ini settings if the file exists
 COPY docker/php/php.ini /usr/local/etc/php/conf.d/custom.ini
-
-# Set proper permissions for Laravel storage directories
-RUN mkdir -p /var/www/storage/logs /var/www/storage/framework/cache /var/www/storage/framework/sessions /var/www/storage/framework/views \
-    && chown -R www-data:www-data /var/www/storage \
-    && chmod -R 775 /var/www/storage
 
 EXPOSE 9000
 
