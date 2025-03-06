@@ -50,7 +50,11 @@ return new class extends Migration
         // For each table, rename to 'archived__' + table name.
         // Using two underscores triggers phpMyAdmin table grouping.
         foreach ($this->tables as $table) {
-            Schema::rename($table, 'archived__' . $table);
+            try {
+                Schema::rename($table, 'archived__' . $table);
+            } catch (Exception $e) {
+                // Ignore if table does not exist
+            }
         }
     }
 
@@ -63,7 +67,11 @@ return new class extends Migration
     {
         // For each table, rename back to original name
         foreach ($this->tables as $table) {
-            Schema::rename('archived__' . $table, $table);
+            try {
+                Schema::rename('archived__' . $table, $table);
+            } catch (Exception $e) {
+                // Ignore if table does not exist
+            }
         }
     }
 };
