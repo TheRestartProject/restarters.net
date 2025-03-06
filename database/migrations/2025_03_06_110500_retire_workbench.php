@@ -53,7 +53,8 @@ return new class extends Migration
             try {
                 Schema::rename($table, 'archived__' . $table);
             } catch (Exception $e) {
-                // Ignore if table does not exist
+                // Ignore if table does not exist.  Some such tables exist on the live system but aren't in
+                // migrations and therefore don't exist in CircleCI.
             }
         }
     }

@@ -44,6 +44,7 @@ class LanguageSwitcherTest extends TestCase
     public function testMiddlewareHeader()
     {
         // Passing get headers doesn't seem to be working, but this'll do.
+        $this->loginAsTestUser(Role::ADMINISTRATOR);
         $_SERVER['HTTP_ACCEPT_LANGUAGE'] = 'de';
         $this->withSession([
                                'locale' => 'UT'
