@@ -29,7 +29,7 @@ return [
   'global_impact' => 'Our Global Impact',
   'group_prevented' => 'prevented <a href="/party/view/:idevents">:amount kg</a> of waste!',
   'huge_impact' => 'Repairers around the world are having a huge impact!',
-  'impact_read_more' => '<a target="_blank" href="https://therestartproject.org/faq">Read more</a> about how we assess our impact on the environment. You can make our impact go even further. Help us understand what else this data tells us and what changes we should campaign for over at our <a href="/workbench">Data Workbench</a>.',
+  'impact_read_more' => '<a target="_blank" href="https://therestartproject.org/faq">Read more</a> about how we assess our impact on the environment.',
   'add_data_button' => 'Add Data',
   'add_data_title' => 'Add Data',
   'add_data_description' => 'Adding repair data helps show the impact of repair.',

@@ -45,16 +45,6 @@ class AccountCreationTest extends TestCase
                             ], json_decode($response2->getContent(), TRUE));
     }
 
-    public function testWorkbenchThenRegister()
-    {
-        $this->get('/workbench');
-        $userAttributes = $this->userAttributes();
-        $response = $this->post('/user/register/', $userAttributes);
-
-        $response->assertStatus(302);
-        $response->assertRedirect('workbench');
-    }
-
     public function testRegisterInvalidAddress()
     {
         $userAttributes = $this->userAttributes();
