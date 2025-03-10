@@ -134,8 +134,8 @@ jobs:
       - run: sudo apt-get install php-xmlrpc php8.1-intl php8.1-xdebug php8.1-mbstring php8.1-simplexml php8.1-curl php8.1-zip postgresql-client php8.1-gd php8.1-xmlrpc php8.1-mysql php-mysql
       - run: sudo pecl install xdebug
 
-      # We now need Node 14 for Playwright.
-      - run: sudo curl -sL https://deb.nodesource.com/setup_14.x | sudo bash -
+      # We now need Node 18 for Playwright.
+      - run: sudo curl -sL https://deb.nodesource.com/setup_18.x | sudo bash -
       - run: sudo apt update
       - run: sudo apt -y install nodejs
       - run: sudo rm /usr/local/bin/node
