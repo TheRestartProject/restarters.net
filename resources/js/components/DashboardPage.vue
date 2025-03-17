@@ -12,6 +12,12 @@
       </div>
       <DashboardAddData class="adddata justify-self-end" />
       <DashboardRightSidebar class="sidebar" />
+      <DiscourseDiscussion
+          class="discourse"
+          :see-all-topics-link="seeAllTopicsLink"
+          :discourse-base-url="discourseBaseUrl"
+          :is-logged-in="isLoggedIn"
+      />
     </div>
   </div>
 </template>
@@ -20,10 +26,11 @@ import auth from '../mixins/auth'
 import AlertBanner from './AlertBanner'
 import DashboardYourGroups from './DashboardYourGroups'
 import DashboardRightSidebar from './DashboardRightSidebar'
+import DiscourseDiscussion from './DiscourseDiscussion'
 import DashboardAddData from './DashboardAddData'
 
 export default {
-  components: {DashboardAddData, DashboardYourGroups,DashboardRightSidebar,AlertBanner},
+  components: {DashboardAddData, DashboardYourGroups,DashboardRightSidebar,AlertBanner,DiscourseDiscussion},
   mixins: [ auth ],
   props: {
     yourGroups: {
