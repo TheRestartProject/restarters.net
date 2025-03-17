@@ -61,12 +61,12 @@ class ExportController extends Controller
         if ($idevents != NULL) {
             $event = Party::findOrFail($idevents);
             $eventName = $event->venue ? $event->venue : $event->location;
-            $eventName = iconv("UTF-8", "ISO-8859-9//TRANSLIT", $eventName);
+            $eventName = @iconv("UTF-8", "ISO-8859-9//TRANSLIT", $eventName);
             $eventName = str_replace(' ', '-', $eventName);
             $filename .= '-' . $eventName . '-' . (new Carbon($event->event_start_utc))->format('Y-m-d');
         } else if ($idgroups != NULL) {
             $group = Group::findOrFail($idgroups);
-            $groupName = iconv("UTF-8", "ISO-8859-9//TRANSLIT", $group->name);
+            $groupName = @iconv("UTF-8", "ISO-8859-9//TRANSLIT", $group->name);
             $groupName = str_replace(' ', '-', $groupName);
             $filename .= '-' . $groupName;
         }
