@@ -287,14 +287,33 @@ class CreateEventTest extends TestCase
         $response->assertSee($party->description);
     }
 
-    /** @test */
-    public function emails_sent_when_created()
+
+    public function providerTrueFalse()
+    {
+        return [
+            [false],
+            [true],
+        ];
+    }
+
+    /**
+     * @test
+     *
+     * @dataProvider providerTrueFalse
+     */
+    public function emails_sent_when_created($notify)
     {
         $this->withoutExceptionHandling();
         Notification::fake();
 
         // Create some admins.
         $admins = User::factory()->count(5)->administrator()->create();
+
+        if ($notify) {
+            foreach ($admins as $admin) {
+                $admin->addPreference('admin-moderate-event');
+            }
+        }
 
         // Create a network with a group.
         $network = Network::factory()->create();
@@ -315,10 +334,17 @@ class CreateEventTest extends TestCase
         $response = $this->post('/api/v2/events?api_token=' . $admins[0]->api_token, $this->eventAttributesToAPI($event));
         $response->assertSuccessful();
 
-        // Should have been sent to the admins.
-        Notification::assertSentTo(
-           [$admins], AdminModerationEvent::class
-        );
+        if ($notify) {
+            // Should have been sent to the admins.
+            Notification::assertSentTo(
+                [$admins], AdminModerationEvent::class
+            );
+        } else {
+            // Shouldn't.
+            Notification::assertNotSentTo(
+                [$admins], AdminModerationEvent::class
+            );
+        }
     }
 
     /** @test */
@@ -675,8 +701,12 @@ class CreateEventTest extends TestCase
         );
     }
 
-    /** @test */
-    public function notifications_are_queued_as_expected()
+    /**
+     * @test
+     *
+     * @dataProvider providerTrueFalse
+     */
+    public function notifications_are_queued_as_expected($notify)
     {
         Notification::fake();
 
@@ -693,8 +723,11 @@ class CreateEventTest extends TestCase
         $group = Group::factory()->create();
         $network->addGroup($group);
 
-        // Make the admin coordinators of the network, so that they should get notified.
+        // Make the admin coordinators of the network, and decided whether they should get notified.
         $network->addCoordinator($admin);
+        if ($notify) {
+            $admin->addPreference('admin-moderate-event');
+        }
 
         // Log in so that we can create an event.
         $host = User::factory()->host()->create();
@@ -708,9 +741,15 @@ class CreateEventTest extends TestCase
         $response = $this->post('/api/v2/events?api_token=' . $host->api_token, $this->eventAttributesToAPI($event));
         $response->assertSuccessful();
 
-        Notification::assertSentTo(
-            [$admin], AdminModerationEvent::class
-        );
+        if ($notify) {
+            Notification::assertSentTo(
+                [$admin], AdminModerationEvent::class
+            );
+        } else {
+            Notification::assertNotSentTo(
+                [$admin], AdminModerationEvent::class
+            );
+        }
 
         // Approval should generate a notification to the host.
         $event = Party::latest()->first();
