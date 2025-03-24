@@ -46,7 +46,6 @@ import GroupAddEditPage from './components/GroupAddEditPage.vue'
 import GroupEventsPage from './components/GroupEventsPage.vue'
 import GroupEvents from './components/GroupEvents.vue'
 import GroupsRequiringModeration from './components/GroupsRequiringModeration'
-import MicrotaskingPage from './components/MicrotaskingPage'
 import EventTimeRangePicker from './components/EventTimeRangePicker'
 import EventDatePicker from './components/EventDatePicker'
 import VenueAddress from './components/VenueAddress.vue'
@@ -1316,7 +1315,6 @@ jQuery(document).ready(function () {
         'groupeventspage': GroupEventsPage,
         'groupevents': GroupEvents,
         'groupsrequiringmoderation': GroupsRequiringModeration,
-        'microtaskingpage': MicrotaskingPage,
 
         'eventtimerangepicker': EventTimeRangePicker,
         'eventdatepicker': EventDatePicker,
