@@ -12,6 +12,7 @@ return [
   'general' => 'Général',
   'reporting' => 'Rapports',
   'signmeup' => 'Enregistrez‐moi!',
+  'party_reporting' => 'Rapports d’événements',
   'introduction_message' => 'Nous sommes une communauté de bénévoles à travers le monde qui aident les gens à réparer leurs appareils électroniques lors d\'événements communautaires. Rejoignez‐nous !',
   'your_name' => 'Prénom & Nom',
   'your_name_validation' => 'Veuillez taper une adresse e-mail valide',
