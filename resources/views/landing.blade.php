@@ -197,9 +197,6 @@
           <a href="/login" class="btn btn-primary ml-3">{{ __('landing.login') }}</a>
         </div>
       </div>
-      <div class="landing-bottom-right">
-        @include('svgs/navigation/workbench-icon')
-      </div>
     </div>
 
     <div class="row mt-5">

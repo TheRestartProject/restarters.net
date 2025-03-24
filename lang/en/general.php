@@ -37,5 +37,4 @@ return [
   'menu_fixometer' => 'Fixometer',
   'menu_events' => 'Events',
   'menu_groups' => 'Groups',
-  'menu_workbench' => 'Workbench',
 ];

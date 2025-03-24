@@ -9,7 +9,6 @@
     <testsuite name="Feature">
       <directory suffix=".php">./tests/Feature</directory>
       <exclude>./tests/Feature/Admin/Users/WikiLoginTests.php</exclude>
-      <exclude>./tests/Feature/Microtasks/ExampleTest.php</exclude>
       <exclude>./tests/Feature/Stats/StatsTestCase.php</exclude>
       <exclude>./tests/Feature/StyleTest.php</exclude>
       <exclude>./tests/Feature/Users/Registration/DiscourseAccountCreationTests.php</exclude>

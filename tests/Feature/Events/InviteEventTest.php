@@ -150,7 +150,7 @@ class InviteEventTest extends TestCase
         // We should see that we have been invited.
         $response2 = $this->get('/party/view/'.$event->idevents);
         $response2->assertSee(__('events.pending_rsvp_message'));
-        preg_match('/href="(\/party\/accept-invite.*?)"/', $response2->getContent(), $matches);
+        preg_match('/href="(\/party\/accept-invite\/' . $event->idevents . '\/.*?)"/', $response2->getContent(), $matches);
         $this->assertGreaterThan(0, count($matches));
         $invitation = $matches[1];
 
