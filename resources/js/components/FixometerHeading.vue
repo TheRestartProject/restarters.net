@@ -16,8 +16,7 @@
       {{ __('devices.global_impact') }}
     </h2>
     <p>
-      <b>{{ __('devices.huge_impact') }}</b>
-      <span v-html="__('devices.impact_read_more')" />
+      <b v-html="__('devices.huge_impact')" />
     </p>
     <AddDataModal ref="addData" />
   </div>

@@ -42,7 +42,7 @@ export default {
   align-items: center;
   padding: 5px;
   grid-template-columns: 1fr;
-  grid-template-rows: 55px 54px auto;
+  grid-template-rows: 55px 54px fit-content;
   background-color: $brand-light;
   color: black;
   border: 1px solid black;

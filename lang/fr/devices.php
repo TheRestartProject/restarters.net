@@ -33,7 +33,6 @@ return [
   'global_impact' => 'Notre impact global',
   'group_prevented' => ':amount Kg de déchets évités',
   'huge_impact' => 'Les réparateurs du monde entier ont un immense impact !',
-  'impact_read_more' => '<a target="_blank" href="https://therestartproject.org/faq">lire plus</a> sur la façon dont nous évaluons notre impact sur l\'environnement',
   'search_text' => 'Parcourez  notre base de données de réparation',
   'repair_records' => 'Données de réparation',
   'age_approx' => 'Années, approximatif si connu',
