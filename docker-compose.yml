@@ -1,15 +1,11 @@
-# This is a Docker Compose development environment for Restarters.  It allows you to run a development environment
-# locally.  You'll get:
-# - a web server on http://www.example.com:8001 which serves up restarters.  Admin user is jane@bloggs.net/passw0rd.
-# - phpMyAdmin on http://www.example.com:8002.  Use host restarters_db, user root/s3cr3t
-# - Discourse on http://www.example.com:8003.  User is someuser/mustbetencharacters; see below about hostname.
-# - Mailhog on http://localhost:8025.
+# Core docker-compose file for Restarters development environment
+# Core Services:
+# - Restarters web server: http://www.example.com:8001 (Admin: jane@bloggs.net/passw0rd)
+# - A Database: Exposed on port 3306 internally
 #
 # TODO The domain name could be better but needs some configuration on the Discourse images which is hard.
 # TODO It doesn't yet include the wiki.
 # TODO If your host is Linux, this probably only works if you run as root.
-# TODO This is stock Discourse - no theme.  Would be nice to have the theme, but that doesn't matter so far as
-# testing the integration.
 #
 # On the machine where you will be using your browser to access the Restarters / Discourse sites once set up on Docker,
 # add a record to your hosts file to point the domain www.example.com to the machine.
@@ -37,17 +33,6 @@
 # after changing this configuration):
 # - docker-compose down -v --rmi all --remove-orphans
 #
-# Discourse will be set up with an API key of 9fd72d4c45226cbf7a540af3cb49ee2e2da034b1984881b13743a3f2e071be29.  If
-# you need to recreate this, then:
-# - Log in to http://www.example.com:8003 using someuser/mustbetencharacters
-# - Go to http://www.example.com:8003/admin/api/keys/new and create an API key for all users with all scope.
-# Then put it in .env as DISCOURSE_APIKEY.
-# - Go to http://www.example.com:8003/admin/site_settings/category/login?filter= and
-#   - set the discourse connect url to http://www.example.com:8001/discourse/sso
-#   - enable discourse connect
-#   - enable discourse connect provider
-#   - set the discourse connect secret to mustbetencharacters (should match DISCOURSE_SECRET in .env).
-# This is automated in a different way in CircleCI - see config.yml.
 
 version: '3'
 services:
