@@ -51,56 +51,33 @@
 
 version: '3'
 services:
-
   restarters:
+    environment:
+      MAIL_HOST: restarters_mailhog
+      MAIL_PORT: 1025
+
+  phpmyadmin:
     depends_on:
       - restarters_db
-    build:
-      context: .
-      dockerfile: Dockerfile
-    image: php:7.4
-    user: root
-    container_name: restarters
+    image: phpmyadmin
+    container_name: restarters_phpmyadmin
     restart: unless-stopped
-    tty: true
     ports:
-      - "8001:80"
+      - 8002:80
     environment:
-      SERVICE_NAME: restarters
-      SERVICE_TAGS: dev
-    working_dir: /var/www
-    volumes:
-      # We share the current folder into /var/www.  This means code changes on the host will get picked up
-      # by the client.
-      - ./:/var/www:rw
-      - ./php/local.ini:/usr/local/etc/php/conf.d/local.ini
+      - PMA_ARBITRARY=1
+      - PMA_HOST=restarters_db
+#      - PMA_USER=root
+#      - PMA_PASSWORD=s3cr3t
     networks:
       - app-network
-
-  restarters_db:
-    image: mysql:5.7.33
-    container_name: restarters_db
-    restart: unless-stopped
-    tty: true
-    expose:
-      - "3306"
-    environment:
-      MYSQL_DATABASE: restarters_db_test
-      MYSQL_ROOT_PASSWORD: s3cr3t
-      MYSQL_USER: restarters
-      MYSQL_PASSWORD: s3cr3t
-      SERVICE_TAGS: dev
-      SERVICE_NAME: mysql
-    volumes:
-      - dbdata:/var/lib/mysql
-      - ./mysql/my.cnf:/etc/mysql/my.cnf
+  mailhog:
+    image: mailhog/mailhog
+    container_name: restarters_mailhog
+    logging:
+      driver: 'none'  # disable saving logs
+    ports:
+      - 1025:1025 # smtp server
+      - 8025:8025 # web ui
     networks:
       - app-network
-
-networks:
-  app-network:
-    driver: bridge
-
-volumes:
-  dbdata:
-    driver: local

@@ -53,54 +53,92 @@ version: '3'
 services:
 
   restarters:
-    depends_on:
-      - restarters_db
-    build:
-      context: .
-      dockerfile: Dockerfile
-    image: php:7.4
-    user: root
-    container_name: restarters
-    restart: unless-stopped
-    tty: true
+    environment:
+      DISCOURSE_URL: http://restarters_discourse:80
+      DISCOURSE_SECRET: mustbetencharacters
+
+  # From here, it's stuff that Discourse needs.
+  #
+  # The other Docker images hardcode the name of the postgresql server in some places, so we can't prefix that.
+  #
+  # If you want to connect to the database that Discourse uses, you can do this from the restarters container using:
+  # psql -h postgresql -U bn_discourse -p 5432 -w bitnami_discourse
+  postgresql:
+    image: docker.io/bitnami/postgresql:11
+    container_name: postgresql
+    volumes:
+      - 'postgresql_data:/bitnami/postgresql'
+    environment:
+      - ALLOW_EMPTY_PASSWORD=yes
+      - POSTGRESQL_USERNAME=bn_discourse
+      - POSTGRESQL_DATABASE=bitnami_discourse
+    networks:
+      - app-network
+
+  restarters_discourse_redis:
+    image: docker.io/bitnami/redis:6.0
+    container_name: restarters_discourse_redis
+    environment:
+      - ALLOW_EMPTY_PASSWORD=yes
+    volumes:
+      - 'redis_data:/bitnami/discourse'
+    networks:
+      - app-network
+
+  restarters_discourse:
+    image: docker.io/bitnami/discourse:2
+    container_name: restarters_discourse
     ports:
-      - "8001:80"
-    environment:
-      SERVICE_NAME: restarters
-      SERVICE_TAGS: dev
-    working_dir: /var/www
+      - '8003:80'
     volumes:
-      # We share the current folder into /var/www.  This means code changes on the host will get picked up
-      # by the client.
-      - ./:/var/www:rw
-      - ./php/local.ini:/usr/local/etc/php/conf.d/local.ini
+      - 'discourse_data:/bitnami/discourse'
+    depends_on:
+      - postgresql
+      - restarters_discourse_redis
+    environment:
+      - ALLOW_EMPTY_PASSWORD=yes
+      - DISCOURSE_USERNAME=someuser
+      - DISCOURSE_PASSWORD=mustbetencharacters
+      - DISCOURSE_HOST=www.example.com:8003 # You should have set this in hosts.
+      - DISCOURSE_PORT_NUMBER=80
+      - DISCOURSE_DATABASE_HOST=postgresql
+      - DISCOURSE_DATABASE_PORT_NUMBER=5432
+      - DISCOURSE_DATABASE_USER=bn_discourse
+      - DISCOURSE_DATABASE_NAME=bitnami_discourse
+      - DISCOURSE_REDIS_HOST=restarters_discourse_redis
+      - DISCOURSE_REDIS_PORT_NUMBER=6379
+      - POSTGRESQL_CLIENT_POSTGRES_USER=postgres
+      - POSTGRESQL_CLIENT_CREATE_DATABASE_NAME=bitnami_discourse
+      - POSTGRESQL_CLIENT_CREATE_DATABASE_EXTENSIONS=hstore,pg_trgm
     networks:
       - app-network
 
-  restarters_db:
-    image: mysql:5.7.33
-    container_name: restarters_db
-    restart: unless-stopped
-    tty: true
-    expose:
-      - "3306"
-    environment:
-      MYSQL_DATABASE: restarters_db_test
-      MYSQL_ROOT_PASSWORD: s3cr3t
-      MYSQL_USER: restarters
-      MYSQL_PASSWORD: s3cr3t
-      SERVICE_TAGS: dev
-      SERVICE_NAME: mysql
+  sidekiq:
+    image: docker.io/bitnami/discourse:2
+    container_name: restarters_discourse_sidekiq
+    depends_on:
+      - restarters_discourse
     volumes:
-      - dbdata:/var/lib/mysql
-      - ./mysql/my.cnf:/etc/mysql/my.cnf
+      - 'sidekiq_data:/bitnami/discourse'
+    command: /opt/bitnami/scripts/discourse-sidekiq/run.sh
+    environment:
+      - ALLOW_EMPTY_PASSWORD=yes
+      - DISCOURSE_HOST=www.example.com
+      - DISCOURSE_DATABASE_HOST=postgresql
+      - DISCOURSE_DATABASE_PORT_NUMBER=5432
+      - DISCOURSE_DATABASE_USER=bn_discourse
+      - DISCOURSE_DATABASE_NAME=bitnami_discourse
+      - DISCOURSE_REDIS_HOST=restarters_discourse_redis
+      - DISCOURSE_REDIS_PORT_NUMBER=6379
     networks:
       - app-network
-
-networks:
-  app-network:
-    driver: bridge
 
 volumes:
-  dbdata:
+  postgresql_data:
+    driver: local
+  redis_data:
+    driver: local
+  discourse_data:
+    driver: local
+  sidekiq_data:
     driver: local
