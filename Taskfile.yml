@@ -140,3 +140,37 @@ tasks:
 
     cmds:
       - docker compose {{ index .COMPOSE_FILES .STACK }} restart
+
+
+  docker:logs:
+    desc: Show the logs of the main restarters app.
+    cmds:
+      - cmd: docker logs -f restarters
+        ignore_error: true
+
+
+  docker:shell:
+    desc: Open a shell into the restarters container.
+    cmds:
+      - cmd: docker exec -it restarters bash
+        ignore_error: true
+
+  docker:run:bash:
+    desc: Run a bash command in the restarters container.
+    summary: |
+      Run a bash command in the restarters container. To pass the arguments, use the -- flag.
+      For example, to run the ls command, use:
+      task docker:run:bash -- ls -la
+
+    cmds:
+      - docker exec -it restarters bash -c "{{ .CLI_ARGS }}"
+
+  docker:run:artisan:
+    desc: Run an artisan command in the restarters container.
+    summary: |
+      Run an artisan command in the restarters container. To pass the arguments, use the -- flag.
+      For example, to run the migrate command, use:
+      task docker:run:artisan -- migrate
+
+    cmds:
+      - docker exec -it restarters php artisan "{{ .CLI_ARGS }}"
