@@ -7,6 +7,8 @@ dotenv:
   - .env
 
 vars:
+  DOCKER_CMD:
+    sh: command -v docker-compose &> /dev/null && echo "docker-compose" || echo "docker compose"
   COMPOSE_FILES:
     map:
       all: "-f docker-compose.yml -f docker-compose.discourse.yml -f docker-compose.dev.yml"
@@ -26,7 +28,7 @@ tasks:
       Start the base stack of Docker containers.
       This includes the Restarters app and the database.
     cmds:
-      - docker compose up -d
+      - '{{.DOCKER_CMD}} up -d'
 
   docker:up-*:
     desc: Start Docker containers (Usage - task docker:up-[dev|discourse|all])
@@ -50,7 +52,7 @@ tasks:
       STACK: "{{index .MATCH 0}}"
 
     cmds:
-      - docker compose {{ index .COMPOSE_FILES .STACK }} up -d
+      - '{{.DOCKER_CMD}} {{ index .COMPOSE_FILES .STACK }} up -d'
 
   
   docker:down:
@@ -59,7 +61,7 @@ tasks:
       Stop the base stack of Docker containers.
       This includes the Restarters app and the database.
     cmds:
-      - docker compose down
+      - '{{.DOCKER_CMD}} down'
 
   docker:down-*:
     desc: Stop Docker containers (Usage - task docker:down-[dev|discourse|all])
@@ -79,7 +81,7 @@ tasks:
     vars: *STACK_VARS
 
     cmds:
-      - docker compose {{ index .COMPOSE_FILES .STACK }} down
+      - '{{.DOCKER_CMD}} {{ index .COMPOSE_FILES .STACK }} down'
 
 
   docker:rebuild:
@@ -88,8 +90,8 @@ tasks:
       Rebuild the base stack of Docker containers.
       This includes the Restarters app and the database.
     cmds:
-      - docker compose down -v --rmi all
-      - docker compose up -d
+      - '{{.DOCKER_CMD}} down -v --rmi all'
+      - '{{.DOCKER_CMD}} up -d'
 
   docker:rebuild-*:
     desc: Rebuild Docker containers (Usage - task docker:rebuild-[dev|discourse|all])
@@ -109,8 +111,8 @@ tasks:
     vars: *STACK_VARS
 
     cmds:
-      - docker compose {{ index .COMPOSE_FILES .STACK }} down -v --rmi all
-      - docker compose {{ index .COMPOSE_FILES .STACK }} up -d
+      - '{{.DOCKER_CMD}} {{ index .COMPOSE_FILES .STACK }} down -v --rmi all'
+      - '{{.DOCKER_CMD}} {{ index .COMPOSE_FILES .STACK }} up -d'
 
   
   docker:restart:
@@ -119,7 +121,7 @@ tasks:
       Restart the base stack of Docker containers.
       This includes the Restarters app and the database.
     cmds:
-      - docker compose restart
+      - '{{.DOCKER_CMD}} restart'
 
   docker:restart-*:
     desc: Restart Docker containers (Usage - task docker:restart-[dev|discourse|all])
@@ -139,7 +141,7 @@ tasks:
     vars: *STACK_VARS
 
     cmds:
-      - docker compose {{ index .COMPOSE_FILES .STACK }} restart
+      - '{{.DOCKER_CMD}} {{ index .COMPOSE_FILES .STACK }} restart'
 
 
   docker:logs:
