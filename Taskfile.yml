@@ -41,12 +41,12 @@ tasks:
       If you want to start all containers, use:
       task docker:up-all
 
-    requires:
+    requires: &STACK_REQUIRES
       vars:
         - name: STACK
           enum: [dev, discourse, all]
     
-    vars:
+    vars: &STACK_VARS
       STACK: "{{index .MATCH 0}}"
 
     cmds:
@@ -74,13 +74,9 @@ tasks:
       If you want to stop all containers, use:
       task docker:down-all
 
-    requires:
-      vars:
-        - name: STACK
-          enum: [dev, discourse, all]
+    requires: *STACK_REQUIRES
     
-    vars:
-      STACK: "{{index .MATCH 0}}"
+    vars: *STACK_VARS
 
     cmds:
       - docker compose {{ index .COMPOSE_FILES .STACK }} down
@@ -108,13 +104,9 @@ tasks:
       To rebuild all containers, use:
       task docker:rebuild-all
 
-    requires:
-      vars:
-        - name: STACK
-          enum: [dev, discourse, all]
+    requires: *STACK_REQUIRES
     
-    vars:
-      STACK: "{{index .MATCH 0}}"
+    vars: *STACK_VARS
 
     cmds:
       - docker compose {{ index .COMPOSE_FILES .STACK }} down -v --rmi all
