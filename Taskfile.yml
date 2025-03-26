@@ -1,0 +1,30 @@
+# https://taskfile.dev
+
+version: "3"
+
+# Load environment-specific .env file
+dotenv:
+  - .env
+
+tasks:
+  # Default task
+  default:
+    desc: List all tasks
+    cmds:
+      - task --list
+
+  docker:up:
+    desc: Start Base Docker containers (Usage - task docker:up)
+    summary: |
+      Start the base stack of Docker containers.
+      This includes the Restarters app and the database.
+    cmds:
+      - docker compose up -d
+
+  docker:down:
+    desc: Stop Base Docker containers (Usage - task docker:down)
+    summary: |
+      Stop the base stack of Docker containers.
+      This includes the Restarters app and the database.
+    cmds:
+      - docker compose down
