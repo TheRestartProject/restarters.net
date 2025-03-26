@@ -6,6 +6,13 @@ version: "3"
 dotenv:
   - .env
 
+vars:
+  COMPOSE_FILES:
+    map:
+      all: "-f docker-compose.yml -f docker-compose.discourse.yml -f docker-compose.dev.yml"
+      discourse: "-f docker-compose.yml -f docker-compose.discourse.yml"
+      dev: "-f docker-compose.yml -f docker-compose.dev.yml"
+
 tasks:
   # Default task
   default:
@@ -21,6 +28,31 @@ tasks:
     cmds:
       - docker compose up -d
 
+  docker:up-*:
+    desc: Start Docker containers (Usage - task docker:up-[dev|discourse|all])
+    summary: |
+      Start a set of Docker containers at a given time. This will always start the base services.
+      For example, to include PHPMyAdmin and Mailhog, use:
+      task docker:up-dev
+
+      To include the Discourse set of containers, use:
+      task docker:up-discourse
+
+      If you want to start all containers, use:
+      task docker:up-all
+
+    requires:
+      vars:
+        - name: STACK
+          enum: [dev, discourse, all]
+    
+    vars:
+      STACK: "{{index .MATCH 0}}"
+
+    cmds:
+      - docker compose {{ index .COMPOSE_FILES .STACK }} up -d
+
+  
   docker:down:
     desc: Stop Base Docker containers (Usage - task docker:down)
     summary: |
@@ -28,3 +60,28 @@ tasks:
       This includes the Restarters app and the database.
     cmds:
       - docker compose down
+
+  docker:down-*:
+    desc: Stop Docker containers (Usage - task docker:down-[dev|discourse|all])
+    summary: |
+      Stop a set of Docker containers at a given time. This will always stop the base services.
+      For example, to include PHPMyAdmin and Mailhog, use:
+      task docker:down-dev
+
+      To include the Discourse set of containers, use:
+      task docker:down-discourse
+
+      If you want to stop all containers, use:
+      task docker:down-all
+
+    requires:
+      vars:
+        - name: STACK
+          enum: [dev, discourse, all]
+    
+    vars:
+      STACK: "{{index .MATCH 0}}"
+
+    cmds:
+      - docker compose {{ index .COMPOSE_FILES .STACK }} down
+
