@@ -111,3 +111,32 @@ tasks:
     cmds:
       - docker compose {{ index .COMPOSE_FILES .STACK }} down -v --rmi all
       - docker compose {{ index .COMPOSE_FILES .STACK }} up -d
+
+  
+  docker:restart:
+    desc: Restart Docker containers (Usage - task docker:restart)
+    summary: |
+      Restart the base stack of Docker containers.
+      This includes the Restarters app and the database.
+    cmds:
+      - docker compose restart
+
+  docker:restart-*:
+    desc: Restart Docker containers (Usage - task docker:restart-[dev|discourse|all])
+    summary: |
+      Restart a set of Docker containers at a given time. This will always restart the base services.
+      For example, to restart the development stack, use:
+      task docker:restart-dev
+
+      To restart the discourse stack, use:
+      task docker:restart-discourse
+
+      To restart all containers, use:
+      task docker:restart-all
+
+    requires: *STACK_REQUIRES
+    
+    vars: *STACK_VARS
+
+    cmds:
+      - docker compose {{ index .COMPOSE_FILES .STACK }} restart
