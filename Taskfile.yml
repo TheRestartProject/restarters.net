@@ -85,3 +85,37 @@ tasks:
     cmds:
       - docker compose {{ index .COMPOSE_FILES .STACK }} down
 
+
+  docker:rebuild:
+    desc: Rebuild Docker containers (Usage - task docker:rebuild)
+    summary: |
+      Rebuild the base stack of Docker containers.
+      This includes the Restarters app and the database.
+    cmds:
+      - docker compose down -v --rmi all
+      - docker compose up -d
+
+  docker:rebuild-*:
+    desc: Rebuild Docker containers (Usage - task docker:rebuild-[dev|discourse|all])
+    summary: |
+      Rebuild a set of Docker containers at a given time. This will always rebuild the base services.
+      For example, to rebuild the development stack, use:
+      task docker:rebuild-dev
+
+      To rebuild the discourse stack, use:
+      task docker:rebuild-discourse
+
+      To rebuild all containers, use:
+      task docker:rebuild-all
+
+    requires:
+      vars:
+        - name: STACK
+          enum: [dev, discourse, all]
+    
+    vars:
+      STACK: "{{index .MATCH 0}}"
+
+    cmds:
+      - docker compose {{ index .COMPOSE_FILES .STACK }} down -v --rmi all
+      - docker compose {{ index .COMPOSE_FILES .STACK }} up -d
