@@ -38,6 +38,8 @@
           <DeviceRepairStatus :status.sync="currentDevice.repair_status" :steps.sync="currentDevice.next_steps"
                               :parts.sync="currentDevice.spare_parts" :barrier.sync="currentDevice.barrier"
                               :barrierList="barrierList" :disabled="disabled"/>
+          <DeviceReference :reference.sync="currentDevice.reference" class="mb-4" :icon-variant="add ? 'black' : 'brand'"
+                           :disabled="disabled"/>
         </b-card>
       </div>
       <div class="bl d-flex flex-column botwhite">
@@ -95,6 +97,7 @@ import DeviceRepairStatus from './DeviceRepairStatus'
 import DeviceProblem from './DeviceProblem'
 import DeviceNotes from './DeviceNotes'
 import DeviceQuantity from './DeviceQuantity'
+import DeviceReference from './DeviceReference'
 import FileUploader from './FileUploader'
 import DeviceImages from './DeviceImages'
 import ConfirmModal from './ConfirmModal'
@@ -113,7 +116,8 @@ export default {
     DeviceWeight,
     DeviceModel,
     DeviceBrand,
-    DeviceCategorySelect
+    DeviceCategorySelect,
+    DeviceReference,
   },
   mixins: [event],
   props: {
@@ -290,6 +294,7 @@ export default {
       problem: null,
       assessment: null,
       quantity: 1,
+      reference: null,
     }
 
     if (this.device) {

@@ -78,4 +78,5 @@ return [
   'image_delete_success' => 'Merci, l\'image a été supprimée',
   'image_delete_error' => 'Désolé, mais l\'image ne peut pas être supprimée.',
   'image_upload_error' => 'fail - l\'image n\'a pas pu être téléchargée',
+  'reference' => 'Référence',
 ];
