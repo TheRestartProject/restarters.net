@@ -114,6 +114,11 @@ export default {
       type: Boolean,
       required: false,
       default: false
+    },
+    roundTo: {
+      type: Number,
+      required: false,
+      default: 0
     }
   },
   computed: {
@@ -134,7 +139,11 @@ export default {
       return this.translate ? this.$lang.get(this.description) : this.description
     },
     roundedCount() {
-      return this.countIsNumber ? Math.round(this.count) : this.count
+      if (this.roundTo) {
+        return Math.round(this.count * Math.pow(10, this.roundTo)) / Math.pow(10, this.roundTo)
+      } else {
+        return this.countIsNumber ? Math.round(this.count) : this.count
+      }
     },
     printableCount() {
       return this.countIsNumber ? this.roundedCount.toLocaleString() : this.count

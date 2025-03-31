@@ -337,11 +337,18 @@ export default {
         } else {
           this.missingCategory = false
 
-          await this.$store.dispatch('devices/add', this.currentDevice)
+          // The API only creates a single device, so we loop on the client to create multiple.
+          let toAdd = this.currentDevice
+          toAdd = JSON.parse(JSON.stringify(toAdd))
 
+          for (let i = 0; i < this.currentDevice.quantity; i++) {
+            toAdd.id = this.currentDevice.id--
+            await this.$store.dispatch('devices/add', toAdd)
+          }
+
+          console.log('Close')
           this.$emit('close')
         }
-
       } catch (e) {
         console.error('Edit failed', e)
         this.axiosError = e
