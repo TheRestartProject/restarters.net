@@ -338,13 +338,15 @@ export default {
           this.missingCategory = false
 
           // The API only creates a single device, so we loop on the client to create multiple.
-          const toAdd = JSON.parse(JSON.stringify(this.currentDevice))
+          let toAdd = this.currentDevice
+          toAdd = JSON.parse(JSON.stringify(toAdd))
 
           for (let i = 0; i < this.currentDevice.quantity; i++) {
-            toAdd.eventid = this.eventid
+            toAdd.id = this.currentDevice.id--
             await this.$store.dispatch('devices/add', toAdd)
           }
 
+          console.log('Close')
           this.$emit('close')
         }
       } catch (e) {
