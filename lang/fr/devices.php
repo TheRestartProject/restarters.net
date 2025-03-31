@@ -33,6 +33,7 @@ return [
   'global_impact' => 'Notre impact global',
   'group_prevented' => ':amount Kg de déchets évités',
   'huge_impact' => 'Les réparateurs du monde entier ont un immense impact !',
+  'huge_impact_2' => 'Recherchez vos données de réparation ci-dessous et faites-vous une idée de l\'impact de la réparation ainsi que des obstacles auxquels nous sommes confrontés lorsque nous réparons.  Vous pouvez nous aider à comprendre ce que ces données nous apprennent d\'autre et quels changements nous devrions préconiser dans la <a href="https://talk.restarters.net/c/right-to-repair/repair-data/25">discussion sur les données de réparation</a> de notre forum.',
   'search_text' => 'Parcourez  notre base de données de réparation',
   'repair_records' => 'Données de réparation',
   'age_approx' => 'Années, approximatif si connu',
