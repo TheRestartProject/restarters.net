@@ -512,8 +512,15 @@ class EventController extends Controller
 
         // Notify relevant users.
         $usersToNotify = Fixometer::usersWhoHavePreference('admin-moderate-event');
+
         foreach ($party->associatedNetworkCoordinators() as $coordinator) {
-            $usersToNotify->push($coordinator);
+            // If the user is an admin, we allow them to turn off the notification.
+            // Network coordinators must always receive them, for fear of events languishing unapproved.
+            // So only add network coordinators who aren't admins, and rely on usersWhoHavePreference to have
+            // added relevant admins.
+            if (!$coordinator->hasRole('Administrator')) {
+                $usersToNotify->push($coordinator);
+            }
         }
 
         Notification::send(
