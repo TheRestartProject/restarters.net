@@ -194,7 +194,7 @@ class CreateEventTest extends TestCase
             function ($notification, $channels, $host) use ($event, $start) {
                 $mailData = $notification->toMail($host)->toArray();
                 self::assertEquals(__('notifications.event_confirmed_subject', [
-                    'time' => $start->format('Y-m-d H:i')
+                    'time' => $event->event_date_local . ' ' . $event->start_local
                     ], $host->language), $mailData['subject']);
 
                 // Mail should mention the venue.
