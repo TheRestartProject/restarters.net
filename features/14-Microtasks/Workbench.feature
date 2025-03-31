@@ -1,2 +1,0 @@
-Feature: Workbench dashboard
-

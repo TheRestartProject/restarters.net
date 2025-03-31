@@ -44,13 +44,14 @@ class LanguageSwitcherTest extends TestCase
     public function testMiddlewareHeader()
     {
         // Passing get headers doesn't seem to be working, but this'll do.
+        $this->loginAsTestUser(Role::ADMINISTRATOR);
         $_SERVER['HTTP_ACCEPT_LANGUAGE'] = 'de';
         $this->withSession([
                                'locale' => 'UT'
-                           ])->get('/workbench')->assertSee(' Deutsch</button>', false);
+                           ])->get('/fixometer')->assertSee(' Deutsch</button>', false);
         $_SERVER['HTTP_ACCEPT_LANGUAGE'] = 'en';
         $this->withSession([
                                'locale' => 'UT'
-                           ])->get('/workbench')->assertSee(' English</button>', false);
+                           ])->get('/fixometer')->assertSee(' English</button>', false);
     }
 }
