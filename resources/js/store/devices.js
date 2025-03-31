@@ -38,8 +38,6 @@ export default {
       })
     },
     add (state, params) {
-      let exists = false
-
       if (params.id) {
         if (!state.devicesByEvent[params.eventid]) {
           Vue.set(state.devicesByEvent, params.eventid, [])
@@ -52,7 +50,6 @@ export default {
 
         Vue.set(state.devicesById, params.id, params)
         console.log('Set images', params.images)
-        // Vue.set(state.devicesById[params.id], 'images', params.images)
       }
 
       return params
@@ -114,8 +111,10 @@ export default {
     async add ({commit, dispatch, rootGetters}, params) {
       const formData = new FormData()
 
-      params['eventid'] = params['event_id']
-      delete params['event_id']
+      if (params.event_id) {
+        params['eventid'] = params['event_id']
+        delete params['event_id']
+      }
 
       for (var key in params) {
         if (params[key]) {
