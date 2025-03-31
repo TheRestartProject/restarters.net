@@ -6,6 +6,7 @@ use App\Events\UserConfirmedEvent;
 use App\Events\UserLeftEvent;
 use App\EventsUsers;
 use App\Group;
+use App\Helpers\Fixometer;
 use App\Helpers\Geocoder;
 use App\Helpers\RepairNetworkService;
 use App\Listeners\AddUserToDiscourseThreadForEvent;
@@ -312,6 +313,13 @@ class CreateEventTest extends TestCase
         if ($notify) {
             foreach ($admins as $admin) {
                 $admin->addPreference('admin-moderate-event');
+                $admin->refresh();
+            }
+        } else {
+            // Remove any users with notification preference, which might confuse things.
+            $otheradmins = Fixometer::usersWhoHavePreference('admin-moderate-event');
+            foreach ($otheradmins as $user) {
+                $user->delete();
             }
         }
 
@@ -319,6 +327,9 @@ class CreateEventTest extends TestCase
         $network = Network::factory()->create();
         $group = Group::factory()->create();
         $network->addGroup($group);
+
+        // Remove any other coordinators of the network.
+        $network->coordinators()->delete();
 
         // Make these admins coordinators of the network, so that they should get notified.
         foreach ($admins as $admin) {
