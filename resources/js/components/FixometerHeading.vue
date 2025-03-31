@@ -17,6 +17,7 @@
     </h2>
     <p>
       <b v-html="__('devices.huge_impact')" />
+      <span v-html="__('devices.huge_impact_2')" />
     </p>
     <AddDataModal ref="addData" />
   </div>
