@@ -2,28 +2,31 @@
   <div>
     <div class="fgi-layout">
       <FixometerLatestData :latest-data="latestData" class="latest-data" />
-      <StatsValue :count="Math.round(impactData.waste_total)"
+      <StatsValue :count="Math.round(impactData.waste_total / 1000)"
                   icon="trash"
                   size="md"
                   title="partials.waste_prevented"
-                  unit="kg"
+                  unit="tonnes"
                   class="impact-waste"
       />
-      <StatsValue :count="Math.round(impactData.co2_total)"
+      <StatsValue :count="Math.round(impactData.co2_total / 1000)"
                   icon="cloud_empty"
                   size="lg"
                   title="partials.co2"
                   :description="equivalent_consumer(Math.round(impactData.co2_total))"
-                  unit="kg"
+                  unit="tonnes"
                   class="impact-co2"
       />
 <!--      Image disabled as needs a new version from designer.-->
 <!--      image="/images/CO2_driving.png"-->
 
       <StatsValue :count="impactData.participants" icon="participants" size="md" title="groups.participants" class="impact-participants" />
-      <StatsValue :count="impactData.hours_volunteered" icon="clock" size="md" title="groups.hours_volunteered" class="impact-hours-volunteered" />
+      <StatsValue :count="Math.round(10 * impactData.hours_volunteered / 8766) / 10" :round-to="1" icon="clock" size="md" title="groups.years_volunteered" class="impact-hours-volunteered" />
       <StatsValue :count="impactData.fixed_powered" icon="powered" size="md" title="devices.powered_items" class="impact-powered" />
       <StatsValue :count="impactData.fixed_unpowered" icon="unpowered" size="md" title="devices.unpowered_items" class="impact-unpowered" />
+    </div>
+    <div class="d-flex justify-content-end small mt-3">
+      {{ __('partials.impact_estimates') }}
     </div>
   </div>
 </template>
@@ -45,6 +48,9 @@ export default {
     }
   },
   components: {FixometerLatestData, StatsValue},
+  mounted() {
+    console.log('Impact data', this.impactData, Math.round(10 * this.impactData.hours_volunteered / 8766) / 10)
+  }
 }
 </script>
 <style scoped lang="scss">

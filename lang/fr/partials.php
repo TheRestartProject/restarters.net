@@ -13,7 +13,7 @@ return [
   'how_to_host_an_event_text' => 'Forts de plusieurs années d\'expérience, nous vous offrons la recette de l\'organisation d\'événements communautaires de réparation. Découvrez également notre forum pour le soutien entre pairs.',
   'view_the_materials' => 'Voir les ressources',
   'waste_prevented' => 'Déchets évités',
-  'co2' => 'Émissions de CO<sub>2</sub> évitées',
+  'co2' => 'Estimation des émissions de CO<sub>2</sub> évitées',
   'restarters_in_your_area' => 'Bénévoles dans votre région',
   'information_up_to_date' => 'Tenez votre Repair Café informé!',
   'information_up_to_date_text' => 'Un profil à jour aide à recruter plus de bénévoles. Assurez-vous d\'être bien relié à votre site web ou page sur les réseaux sociaux.',
@@ -99,4 +99,5 @@ return [
   'share_modal_seedlings' => "plant d’arbre pendant 10 ans.*|plants d’arbres pour 10 ans.*",
   'share_modal_planting_around' => "planter environ",
   'share_modal_hectares' => "hectare d’arbres.*|hectares d’arbres.*",
+  'impact_estimates' => 'Les chiffres relatifs à l\'impact sont des estimations basées sur les données saisies par les groupes dans Restarters.net.',
 ];
