@@ -32,11 +32,50 @@
 # If you want to remove everything to free up disk space or force a complete rebuild (e.g. as a sanity check
 # after changing this configuration):
 # - docker-compose down -v --rmi all --remove-orphans
+# ------------------------------------------------------------
+# Development services extension for docker-compose
+# Additional Services:
+# - phpMyAdmin: http://www.example.com:8002 (Use host: restarters_db, user: root/s3cr3t)
+# - Mailhog: http://localhost:8025 (SMTP server on port 1025)
 #
+# Development Tools:
+# - phpMyAdmin: Database management interface
+#   - Access at http://www.example.com:8002
+#   - Use host: restarters_db, username: root, password: s3cr3t
+#
+# - Mailhog: Email testing tool
+#   - Web interface: http://localhost:8025
+#   - SMTP server: localhost:1025
+#   - All emails from the application will be caught here
+# ------------------------------------------------------------
+# Discourse services extension for docker-compose
+# Additional Services:
+# - Discourse: http://www.example.com:8003 (User: someuser/mustbetencharacters)
+# - PostgreSQL: Internal database for Discourse
+# - Redis: Cache server for Discourse
+# - Sidekiq: Background job processor for Discourse
+#
+# Initial Discourse Setup:
+# 1. Log in to http://www.example.com:8003 using someuser/mustbetencharacters
+# 2. Create API key at /admin/api/keys/new for all users with all scope
+# 3. Add key to .env as DISCOURSE_APIKEY
+# 4. Go to http://www.example.com:8003/admin/site_settings/category/login?filter=
+# 5. Set discourse connect url to http://www.example.com:8001/discourse/sso
+# 6. Enable discourse connect and discourse connect provider
+# 7. Set discourse connect secret to match DISCOURSE_SECRET in .env
+# This is automated in a different way in CircleCI - see config.yml.
+#
+# Database Access:
+# To connect to Discourse's PostgreSQL database from the restarters container:
+# psql -h postgresql -U bn_discourse -p 5432 -w bitnami_discourse
+#
+# TODO This is stock Discourse - no theme.  Would be nice to have the theme, but that doesn't matter so far as
+# testing the integration.
 
 version: '3'
-services:
 
+services:
+  # Core services - always enabled
   restarters:
     depends_on:
       - restarters_db
@@ -82,10 +121,128 @@ services:
     networks:
       - app-network
 
+  # Development services
+  phpmyadmin:
+    profiles: ["dev"]
+    depends_on:
+      - restarters_db
+    image: phpmyadmin
+    container_name: restarters_phpmyadmin
+    restart: unless-stopped
+    ports:
+      - 8002:80
+    environment:
+      - PMA_ARBITRARY=1
+      - PMA_HOST=restarters_db
+#      - PMA_USER=root
+#      - PMA_PASSWORD=s3cr3t
+    networks:
+      - app-network
+      
+  mailhog:
+    profiles: ["dev"]
+    image: mailhog/mailhog
+    container_name: restarters_mailhog
+    logging:
+      driver: 'none'  # disable saving logs
+    ports:
+      - 1025:1025 # smtp server
+      - 8025:8025 # web ui
+    networks:
+      - app-network
+
+  # From here, it's stuff that Discourse needs.
+  #
+  # The other Docker images hardcode the name of the postgresql server in some places, so we can't prefix that.
+  #
+  # If you want to connect to the database that Discourse uses, you can do this from the restarters container using:
+  # psql -h postgresql -U bn_discourse -p 5432 -w bitnami_discourse
+  postgresql:
+    profiles: ["discourse"]
+    image: docker.io/bitnami/postgresql:11
+    container_name: postgresql
+    volumes:
+      - 'postgresql_data:/bitnami/postgresql'
+    environment:
+      - ALLOW_EMPTY_PASSWORD=yes
+      - POSTGRESQL_USERNAME=bn_discourse
+      - POSTGRESQL_DATABASE=bitnami_discourse
+    networks:
+      - app-network
+
+  restarters_discourse_redis:
+    profiles: ["discourse"]
+    image: docker.io/bitnami/redis:6.0
+    container_name: restarters_discourse_redis
+    environment:
+      - ALLOW_EMPTY_PASSWORD=yes
+    volumes:
+      - 'redis_data:/bitnami/discourse'
+    networks:
+      - app-network
+
+  restarters_discourse:
+    profiles: ["discourse"]
+    image: docker.io/bitnami/discourse:2
+    container_name: restarters_discourse
+    ports:
+      - '8003:80'
+    volumes:
+      - 'discourse_data:/bitnami/discourse'
+    depends_on:
+      - postgresql
+      - restarters_discourse_redis
+    environment:
+      - ALLOW_EMPTY_PASSWORD=yes
+      - DISCOURSE_USERNAME=someuser
+      - DISCOURSE_PASSWORD=mustbetencharacters
+      - DISCOURSE_HOST=www.example.com:8003 # You should have set this in hosts.
+      - DISCOURSE_PORT_NUMBER=80
+      - DISCOURSE_DATABASE_HOST=postgresql
+      - DISCOURSE_DATABASE_PORT_NUMBER=5432
+      - DISCOURSE_DATABASE_USER=bn_discourse
+      - DISCOURSE_DATABASE_NAME=bitnami_discourse
+      - DISCOURSE_REDIS_HOST=restarters_discourse_redis
+      - DISCOURSE_REDIS_PORT_NUMBER=6379
+      - POSTGRESQL_CLIENT_POSTGRES_USER=postgres
+      - POSTGRESQL_CLIENT_CREATE_DATABASE_NAME=bitnami_discourse
+      - POSTGRESQL_CLIENT_CREATE_DATABASE_EXTENSIONS=hstore,pg_trgm
+    networks:
+      - app-network
+
+  sidekiq:
+    profiles: ["discourse"]
+    image: docker.io/bitnami/discourse:2
+    container_name: restarters_discourse_sidekiq
+    depends_on:
+      - restarters_discourse
+    volumes:
+      - 'sidekiq_data:/bitnami/discourse'
+    command: /opt/bitnami/scripts/discourse-sidekiq/run.sh
+    environment:
+      - ALLOW_EMPTY_PASSWORD=yes
+      - DISCOURSE_HOST=www.example.com
+      - DISCOURSE_DATABASE_HOST=postgresql
+      - DISCOURSE_DATABASE_PORT_NUMBER=5432
+      - DISCOURSE_DATABASE_USER=bn_discourse
+      - DISCOURSE_DATABASE_NAME=bitnami_discourse
+      - DISCOURSE_REDIS_HOST=restarters_discourse_redis
+      - DISCOURSE_REDIS_PORT_NUMBER=6379
+    networks:
+      - app-network
+
 networks:
   app-network:
     driver: bridge
 
 volumes:
   dbdata:
+    driver: local
+  postgresql_data:
+    driver: local
+  redis_data:
+    driver: local
+  discourse_data:
+    driver: local
+  sidekiq_data:
     driver: local

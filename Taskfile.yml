@@ -9,11 +9,11 @@ dotenv:
 vars:
   DOCKER_CMD:
     sh: command -v docker-compose &> /dev/null && echo "docker-compose" || echo "docker compose"
-  COMPOSE_FILES:
+  COMPOSE_PROFILES:
     map:
-      all: "-f docker-compose.yml -f docker-compose.discourse.yml -f docker-compose.dev.yml"
-      discourse: "-f docker-compose.yml -f docker-compose.discourse.yml"
-      dev: "-f docker-compose.yml -f docker-compose.dev.yml"
+      all: "'*'"
+      discourse: "discourse"
+      dev: "dev"
 
 tasks:
   # Default task
@@ -43,16 +43,16 @@ tasks:
       If you want to start all containers, use:
       task docker:up-all
 
-    requires: &STACK_REQUIRES
+    requires: &PROFILE_REQUIRES
       vars:
-        - name: STACK
+        - name: PROFILE
           enum: [dev, discourse, all]
     
-    vars: &STACK_VARS
-      STACK: "{{index .MATCH 0}}"
+    vars: &PROFILE_VARS
+      PROFILE: "{{index .MATCH 0}}"
 
     cmds:
-      - '{{.DOCKER_CMD}} {{ index .COMPOSE_FILES .STACK }} up -d'
+      - '{{.DOCKER_CMD}} --profile {{ index .COMPOSE_PROFILES .PROFILE }} up -d'
 
   
   docker:down:
@@ -76,12 +76,12 @@ tasks:
       If you want to stop all containers, use:
       task docker:down-all
 
-    requires: *STACK_REQUIRES
+    requires: *PROFILE_REQUIRES
     
-    vars: *STACK_VARS
+    vars: *PROFILE_VARS
 
     cmds:
-      - '{{.DOCKER_CMD}} {{ index .COMPOSE_FILES .STACK }} down'
+      - '{{.DOCKER_CMD}} --profile {{ index .COMPOSE_PROFILES .PROFILE }} down'
 
 
   docker:rebuild:
@@ -106,19 +106,19 @@ tasks:
       To rebuild all containers, use:
       task docker:rebuild-all
 
-    requires: *STACK_REQUIRES
+    requires: *PROFILE_REQUIRES
     
-    vars: *STACK_VARS
+    vars: *PROFILE_VARS
 
     cmds:
-      - '{{.DOCKER_CMD}} {{ index .COMPOSE_FILES .STACK }} down -v --rmi all'
-      - '{{.DOCKER_CMD}} {{ index .COMPOSE_FILES .STACK }} up -d'
+      - '{{.DOCKER_CMD}} --profile {{ index .COMPOSE_PROFILES .PROFILE }} down -v --rmi all'
+      - '{{.DOCKER_CMD}} --profile {{ index .COMPOSE_PROFILES .PROFILE }} up -d'
 
   
   docker:restart:
     desc: Restart Docker containers (Usage - task docker:restart)
     summary: |
-      Restart the base stack of Docker containers.
+      Restart the base set of Docker containers.
       This includes the Restarters app and the database.
     cmds:
       - '{{.DOCKER_CMD}} restart'
@@ -136,12 +136,12 @@ tasks:
       To restart all containers, use:
       task docker:restart-all
 
-    requires: *STACK_REQUIRES
+    requires: *PROFILE_REQUIRES
     
-    vars: *STACK_VARS
+    vars: *PROFILE_VARS
 
     cmds:
-      - '{{.DOCKER_CMD}} {{ index .COMPOSE_FILES .STACK }} restart'
+      - '{{.DOCKER_CMD}} --profile {{ index .COMPOSE_PROFILES .PROFILE }} restart'
 
 
   docker:logs:
