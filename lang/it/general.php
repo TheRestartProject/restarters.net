@@ -10,7 +10,6 @@ return [
   'alert_uptodate' => 'Grazie!  Ora sei aggiornato.',
   'alert_uptodate_text' => 'Non hai nessuna azione da fare ora.  Quando sara\' necessaria ti faremo sapere.',
   'general' => 'Generale',
-  'reporting' => 'Reporting',
   'signmeup' => 'Fammi entrare!',
   'introduction_message' => 'Siamo una comunità globale di persone che aiutano gli altri a riparare i propri  dispositivi elettronici in eventi comunitari. Unisciti a noi!',
   'your_name' => 'Tuo nome',

@@ -6,7 +6,7 @@ export default {
       return this.$store.getters['groups/get'](this.idgroups)
     },
     volunteers() {
-      return this.$store.getters['volunteers/byGroup'](this.idgroups)
+      return this.$store.getters['volunteers/byGroup'](this.idgroups) || []
     },
     canedit() {
       return this.group ? this.group.canedit : false

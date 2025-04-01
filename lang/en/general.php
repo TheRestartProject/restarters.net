@@ -1,7 +1,6 @@
 <?php
 
 return [
-  'reporting' => 'Reporting',
   'general' => 'General',
   'menu_tools' => 'Community Tools',
   'menu_other' => 'Other Links',
