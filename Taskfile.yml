@@ -1,0 +1,178 @@
+# https://taskfile.dev
+
+version: "3"
+
+# Load environment-specific .env file
+dotenv:
+  - .env
+
+vars:
+  DOCKER_CMD:
+    sh: command -v docker-compose &> /dev/null && echo "docker-compose" || echo "docker compose"
+  COMPOSE_PROFILES:
+    map:
+      all: "'*'"
+      discourse: "discourse"
+      dev: "dev"
+
+tasks:
+  # Default task
+  default:
+    desc: List all tasks
+    cmds:
+      - task --list
+
+  docker:up:
+    desc: Start Base Docker containers (Usage - task docker:up)
+    summary: |
+      Start the base stack of Docker containers.
+      This includes the Restarters app and the database.
+    cmds:
+      - '{{.DOCKER_CMD}} up -d'
+
+  docker:up-*:
+    desc: Start Docker containers (Usage - task docker:up-[dev|discourse|all])
+    summary: |
+      Start a set of Docker containers at a given time. This will always start the base services.
+      For example, to include PHPMyAdmin and Mailhog, use:
+      task docker:up-dev
+
+      To include the Discourse set of containers, use:
+      task docker:up-discourse
+
+      If you want to start all containers, use:
+      task docker:up-all
+
+    requires: &PROFILE_REQUIRES
+      vars:
+        - name: PROFILE
+          enum: [dev, discourse, all]
+    
+    vars: &PROFILE_VARS
+      PROFILE: "{{index .MATCH 0}}"
+
+    cmds:
+      - '{{.DOCKER_CMD}} --profile {{ index .COMPOSE_PROFILES .PROFILE }} up -d'
+
+  
+  docker:down:
+    desc: Stop Base Docker containers (Usage - task docker:down)
+    summary: |
+      Stop the base stack of Docker containers.
+      This includes the Restarters app and the database.
+    cmds:
+      - '{{.DOCKER_CMD}} down'
+
+  docker:down-*:
+    desc: Stop Docker containers (Usage - task docker:down-[dev|discourse|all])
+    summary: |
+      Stop a set of Docker containers at a given time. This will always stop the base services.
+      For example, to include PHPMyAdmin and Mailhog, use:
+      task docker:down-dev
+
+      To include the Discourse set of containers, use:
+      task docker:down-discourse
+
+      If you want to stop all containers, use:
+      task docker:down-all
+
+    requires: *PROFILE_REQUIRES
+    
+    vars: *PROFILE_VARS
+
+    cmds:
+      - '{{.DOCKER_CMD}} --profile {{ index .COMPOSE_PROFILES .PROFILE }} down'
+
+
+  docker:rebuild:
+    desc: Rebuild Docker containers (Usage - task docker:rebuild)
+    summary: |
+      Rebuild the base stack of Docker containers.
+      This includes the Restarters app and the database.
+    cmds:
+      - '{{.DOCKER_CMD}} down -v --rmi all'
+      - '{{.DOCKER_CMD}} up -d'
+
+  docker:rebuild-*:
+    desc: Rebuild Docker containers (Usage - task docker:rebuild-[dev|discourse|all])
+    summary: |
+      Rebuild a set of Docker containers at a given time. This will always rebuild the base services.
+      For example, to rebuild the development stack, use:
+      task docker:rebuild-dev
+
+      To rebuild the discourse stack, use:
+      task docker:rebuild-discourse
+
+      To rebuild all containers, use:
+      task docker:rebuild-all
+
+    requires: *PROFILE_REQUIRES
+    
+    vars: *PROFILE_VARS
+
+    cmds:
+      - '{{.DOCKER_CMD}} --profile {{ index .COMPOSE_PROFILES .PROFILE }} down -v --rmi all'
+      - '{{.DOCKER_CMD}} --profile {{ index .COMPOSE_PROFILES .PROFILE }} up -d'
+
+  
+  docker:restart:
+    desc: Restart Docker containers (Usage - task docker:restart)
+    summary: |
+      Restart the base set of Docker containers.
+      This includes the Restarters app and the database.
+    cmds:
+      - '{{.DOCKER_CMD}} restart'
+
+  docker:restart-*:
+    desc: Restart Docker containers (Usage - task docker:restart-[dev|discourse|all])
+    summary: |
+      Restart a set of Docker containers at a given time. This will always restart the base services.
+      For example, to restart the development stack, use:
+      task docker:restart-dev
+
+      To restart the discourse stack, use:
+      task docker:restart-discourse
+
+      To restart all containers, use:
+      task docker:restart-all
+
+    requires: *PROFILE_REQUIRES
+    
+    vars: *PROFILE_VARS
+
+    cmds:
+      - '{{.DOCKER_CMD}} --profile {{ index .COMPOSE_PROFILES .PROFILE }} restart'
+
+
+  docker:logs:
+    desc: Show the logs of the main restarters app.
+    cmds:
+      - cmd: docker logs -f restarters
+        ignore_error: true
+
+
+  docker:shell:
+    desc: Open a shell into the restarters container.
+    cmds:
+      - cmd: docker exec -it restarters bash
+        ignore_error: true
+
+  docker:run:bash:
+    desc: Run a bash command in the restarters container.
+    summary: |
+      Run a bash command in the restarters container. To pass the arguments, use the -- flag.
+      For example, to run the ls command, use:
+      task docker:run:bash -- ls -la
+
+    cmds:
+      - docker exec -it restarters bash -c "{{ .CLI_ARGS }}"
+
+  docker:run:artisan:
+    desc: Run an artisan command in the restarters container.
+    summary: |
+      Run an artisan command in the restarters container. To pass the arguments, use the -- flag.
+      For example, to run the migrate command, use:
+      task docker:run:artisan -- migrate
+
+    cmds:
+      - docker exec -it restarters php artisan "{{ .CLI_ARGS }}"
