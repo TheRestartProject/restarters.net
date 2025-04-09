@@ -1,5 +1,5 @@
 # This is the docker for restarters.  It's used from docker-compose.
-FROM cimg/php:8.1.12-node
+FROM php:8.2-fpm
 
 # Set working directory to where we will run.
 WORKDIR /var/www
@@ -17,9 +17,6 @@ COPY . /var/www/
 
 # Copy composer.lock and composer.json from the codebase to where we will install and run.
 COPY composer.lock composer.json /var/www/
-
-# Grant permissions to /var/www so we can put files in it.
-RUN sudo chown -R circleci:circleci /var/www
 
 # Install composer.  Don't run composer install yet - see docker_run.sh
 RUN wget https://getcomposer.org/composer-1.phar
