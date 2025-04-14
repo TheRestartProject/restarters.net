@@ -19,13 +19,6 @@ jobs:
           - DB_USERNAME: {$MYSQL_USER}
           - DB_PASSWORD: {$MYSQL_PASSWORD}
           - TZ: "UTC"
-      - image: cimg/mysql:5.7.36
-        environment:
-          # You can connect once ssh'd in using  mysql -u root -p -h 127.0.0.1
-          - MYSQL_ROOT_PASSWORD: ${MYSQL_PASSWORD}
-          - MYSQL_DATABASE: ${MYSQL_DATABASE}
-          - MYSQL_USER: ${MYSQL_USER}
-          - MYSQL_PASSWORD: ${MYSQL_PASSWORD}
       - image: mcr.microsoft.com/playwright:focal
         environment:
           NODE_ENV: development
@@ -58,33 +51,33 @@ jobs:
           - sleep 60; /opt/bitnami/scripts/mediawiki/entrypoint.sh "/opt/bitnami/scripts/apache/run.sh"
       - image: 'docker.io/bitnami/postgresql:11'
         name: postgresql
-# No volumes on CircleCI
-#        volumes:
-#          - 'postgresql_data:/bitnami/postgresql'
+        # No volumes on CircleCI
+        #        volumes:
+        #          - 'postgresql_data:/bitnami/postgresql'
         environment:
           - ALLOW_EMPTY_PASSWORD=yes
           - POSTGRESQL_USERNAME=bn_discourse
           - POSTGRESQL_DATABASE=bitnami_discourse
-# No networks on CircleCI
-#    networks:
-#      - app-network
+      # No networks on CircleCI
+      #    networks:
+      #      - app-network
 
       - image: docker.io/bitnami/redis:6.0
         name: restarters_discourse_redis
         environment:
           - ALLOW_EMPTY_PASSWORD=yes
-#        volumes:
-#          - 'redis_data:/bitnami/discourse'
-#        networks:
-#          - app-network
+      #        volumes:
+      #          - 'redis_data:/bitnami/discourse'
+      #        networks:
+      #          - app-network
 
       - image: docker.io/bitnami/discourse:2
         name: restarters_discourse
-# No ports on CircleCI
-#        ports:
-#          - '8003:80'
-#        volumes:
-#          - 'discourse_data:/bitnami/discourse'
+        # No ports on CircleCI
+        #        ports:
+        #          - '8003:80'
+        #        volumes:
+        #          - 'discourse_data:/bitnami/discourse'
         depends_on:
           - postgresql
           - restarters_discourse_redis
@@ -104,15 +97,15 @@ jobs:
           - POSTGRESQL_CLIENT_CREATE_DATABASE_NAME=bitnami_discourse
           - POSTGRESQL_CLIENT_CREATE_DATABASE_EXTENSIONS=hstore,pg_trgm
           - DISCOURSE_EXTRA_CONF_CONTENT=personal_message_enabled_groups \= 10
-#    networks:
-#      - app-network
+      #    networks:
+      #      - app-network
 
       - image: docker.io/bitnami/discourse:latest
         name: restarters_discourse_sidekiq
         depends_on:
           - restarters_discourse
-#        volumes:
-#          - 'sidekiq_data:/bitnami/discourse'
+        #        volumes:
+        #          - 'sidekiq_data:/bitnami/discourse'
         command: /opt/bitnami/scripts/discourse-sidekiq/run.sh
         environment:
           - ALLOW_EMPTY_PASSWORD=yes
@@ -123,8 +116,8 @@ jobs:
           - DISCOURSE_DATABASE_NAME=bitnami_discourse
           - DISCOURSE_REDIS_HOST=restarters_discourse_redis
           - DISCOURSE_REDIS_PORT_NUMBER=6379
-#        networks:
-#          - app-network
+    #        networks:
+    #          - app-network
 
     steps:
       - checkout
@@ -201,8 +194,8 @@ jobs:
 
       # Run phpunit.  Discourse makes things slow, so up the timeout.
       - run:
-           command: export XDEBUG_MODE=coverage;./phpunit -d memory_limit=1024M --bootstrap vendor/autoload.php --coverage-clover tests/clover.xml --configuration ./phpunit.xml
-           no_output_timeout: 45m
+          command: export XDEBUG_MODE=coverage;./phpunit -d memory_limit=1024M --bootstrap vendor/autoload.php --coverage-clover tests/clover.xml --configuration ./phpunit.xml
+          no_output_timeout: 45m
 
       # Coveralls is pernickety about the location it uploads from existing.
       - run: mkdir build; mkdir build/logs; php vendor/bin/php-coveralls -v -x tests/clover.xml
