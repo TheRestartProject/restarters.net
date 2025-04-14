@@ -33,12 +33,12 @@
 # after changing this configuration):
 # - docker-compose down -v --rmi all --remove-orphans
 # ------------------------------------------------------------
-# Development services extension for docker-compose
+# Debug services extension for docker-compose
 # Additional Services:
 # - phpMyAdmin: http://www.example.com:8002 (Use host: restarters_db, user: root/s3cr3t)
 # - Mailhog: http://localhost:8025 (SMTP server on port 1025)
 #
-# Development Tools:
+# Debug Tools:
 # - phpMyAdmin: Database management interface
 #   - Access at http://www.example.com:8002
 #   - Use host: restarters_db, username: root, password: s3cr3t
@@ -77,6 +77,7 @@ version: '3'
 services:
   # Core services - always enabled
   restarters:
+    profiles: ["core", "debug", "discourse"]
     depends_on:
       - restarters_db
     build:
@@ -102,6 +103,7 @@ services:
       - app-network
 
   restarters_db:
+    profiles: ["core", "debug", "discourse"]
     image: mysql:5.7.33
     container_name: restarters_db
     restart: unless-stopped
@@ -121,9 +123,9 @@ services:
     networks:
       - app-network
 
-  # Development services
+  # Debug services
   phpmyadmin:
-    profiles: ["dev"]
+    profiles: ["debug"]
     depends_on:
       - restarters_db
     image: phpmyadmin
@@ -140,7 +142,7 @@ services:
       - app-network
       
   mailhog:
-    profiles: ["dev"]
+    profiles: ["debug"]
     image: mailhog/mailhog
     container_name: restarters_mailhog
     logging:

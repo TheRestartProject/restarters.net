@@ -11,7 +11,7 @@ This guide will help you set up a local development environment for the Restarte
     - [4. Initial Setup](#4-initial-setup)
     - [5. Accessing the Application](#5-accessing-the-application)
   - [Common Tasks](#common-tasks)
-    - [Running Commands in the Container](#running-commands-in-the-container)
+    - [Running Commands in the Core Application Container](#running-commands-in-the-core-application-container)
     - [Stopping the Environment](#stopping-the-environment)
     - [Rebuilding Containers](#rebuilding-containers)
 ****
@@ -53,20 +53,20 @@ You may need to adjust the following settings in your `.env` file:
 
 ### 3. Starting the Development Environment
 
-The development environment includes several optional services that can be enabled through profiles:
+The development environment includes several optional components that can be enabled:
 
 - **Core**: Restarters web application and MySQL database
-- **Development**: Adds phpMyAdmin and Mailhog
+- **Debug Tools**: Adds phpMyAdmin and Mailhog for debugging and testing
 - **Discourse**: Adds Discourse forum with its required services (PostgreSQL, Redis, Sidekiq) 
 
 The project includes a Taskfile that provides convenient commands for managing Docker:
 
 ```bash
-# Start the basic environment (app + database)
+# Start the core environment (app + database only)
 task docker:up
 
-# Start with development tools (PHPMyAdmin, Mailhog)
-task docker:up-dev
+# Start with debug tools (phpMyAdmin, Mailhog)
+task docker:up-debug
 
 # Start with Discourse integration
 task docker:up-discourse
@@ -77,7 +77,7 @@ task docker:up-all
 
 ### 4. Initial Setup
 
-The Docker container will automatically:
+The core application container will automatically:
 
 1. Install Composer dependencies
 2. Run database migrations
@@ -109,7 +109,7 @@ Once setup is complete:
 
 ## Common Tasks
 
-### Running Commands in the Container
+### Running Commands in the Core Application Container
 
 ```bash
 # Open a shell in the container
@@ -125,11 +125,14 @@ task docker:run:artisan -- [command]
 ### Stopping the Environment
 
 ```bash
-# Stop basic environment
-task docker:down
+# Stop the core services
+task docker:down-core
 
-# Stop with development tools
-task docker:down-dev
+# Stop with the debug tools
+task docker:down-debug
+
+# Stop with Discourse
+task docker:down-discourse
 
 # Stop all containers
 task docker:down-all
@@ -140,8 +143,15 @@ task docker:down-all
 If you need to completely rebuild. This will remove all containers, volumes, networks, and images.
 
 ```bash
-task docker:rebuild
+# Rebuild the core services
+task docker:rebuild-core
 
-# Using specific profile
-task docker:rebuild-dev
+# Rebuild with the debug tools
+task docker:rebuild-debug
+
+# Rebuild with Discourse
+task docker:rebuild-discourse
+
+# Rebuild all services
+task docker:rebuild-all
 ```
