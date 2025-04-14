@@ -13,19 +13,19 @@ jobs:
         name: restarters.test
         environment:
           - DB_CONNECTION: mysql
-          - DB_HOST: 127.0.0.1
-          - DB_PORT: 3306
-          - DB_DATABASE: restarters_db
-          - DB_USERNAME: restarters
-          - DB_PASSWORD: s3cr3t
+          - DB_HOST: ${MYSQL_HOST}
+          - DB_PORT: ${MYSQL_PORT}
+          - DB_DATABASE: {$MYSQL_DATABASE}
+          - DB_USERNAME: {$MYSQL_USER}
+          - DB_PASSWORD: {$MYSQL_PASSWORD}
           - TZ: "UTC"
       - image: cimg/mysql:5.7.36
         environment:
           # You can connect once ssh'd in using  mysql -u root -p -h 127.0.0.1
-          - MYSQL_ROOT_PASSWORD: s3cr3t
-          - MYSQL_DATABASE: restarters_db
-          - MYSQL_USER: restarters
-          - MYSQL_PASSWORD: s3cr3t
+          - MYSQL_ROOT_PASSWORD: ${MYSQL_PASSWORD}
+          - MYSQL_DATABASE: ${MYSQL_DATABASE}
+          - MYSQL_USER: ${MYSQL_USER}
+          - MYSQL_PASSWORD: ${MYSQL_PASSWORD}
       - image: mcr.microsoft.com/playwright:focal
         environment:
           NODE_ENV: development
@@ -143,13 +143,17 @@ jobs:
       - run: cp .env.example .env
 
       # Need access to timezones.
-      - run: mysql --host="127.0.0.1" -u root -ps3cr3t -e "GRANT SELECT ON mysql.time_zone_name TO 'restarters'@'%';"
+      #- run: mysql --host="127.0.0.1" -u root -ps3cr3t -e "GRANT SELECT ON mysql.time_zone_name TO 'restarters'@'%';"
 
       # We have Discourse on CircleCI.  The API key is inserted using psql below.
       - run: sed -i 's/FEATURE__DISCOURSE_INTEGRATION=.*$/FEATURE__DISCOURSE_INTEGRATION=true/g' .env
       - run: sed -i 's/DISCOURSE_URL=.*$/DISCOURSE_URL=http:\/\/restarters_discourse/g' .env
       - run: sed -i 's/DISCOURSE_APIKEY=.*$/DISCOURSE_APIKEY=fb71f38ca2b8b7cd6a041e57fd8202c9937088f0ecae7db40722bd758dda92fc/g' .env
       - run: sed -i 's/DISCOURSE_APIUSER=.*$/DISCOURSE_APIUSER=someuser/g' .env
+
+      # MySQL details from environment variables.
+      - run: sed -i 's/DB_HOST=.*$/DB_HOST=user/g' .env
+
 
       # ...and Mediawiki.
       # Disable wiki as problems getting that running.
