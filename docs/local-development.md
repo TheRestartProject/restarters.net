@@ -8,20 +8,12 @@ This guide will help you set up a local development environment for the Restarte
     - [1. Clone the Repository](#1-clone-the-repository)
     - [2. Environment Configuration](#2-environment-configuration)
     - [3. Starting the Development Environment](#3-starting-the-development-environment)
-      - [Using Task (Recommended)](#using-task-recommended)
-      - [Using Docker Compose Directly](#using-docker-compose-directly)
     - [4. Initial Setup](#4-initial-setup)
     - [5. Accessing the Application](#5-accessing-the-application)
   - [Common Tasks](#common-tasks)
     - [Running Commands in the Container](#running-commands-in-the-container)
-      - [Using Task](#using-task)
-      - [Using Docker Directly](#using-docker-directly)
     - [Stopping the Environment](#stopping-the-environment)
-      - [Using Task](#using-task-1)
-      - [Using Docker Compose](#using-docker-compose)
     - [Rebuilding Containers](#rebuilding-containers)
-      - [Using Task](#using-task-2)
-      - [Using Docker Compose](#using-docker-compose-1)
 ****
 
 ## Prerequisites
@@ -30,7 +22,7 @@ Before you begin, ensure you have the following installed:
 
 - [Docker](https://docs.docker.com/get-docker/) (newer versions already include Docker Compose)
   - [Docker Compose](https://docs.docker.com/compose/install/) (only needed for older Docker versions)
-- [Task](https://taskfile.dev/installation/) (optional but recommended)
+- [Task](https://taskfile.dev/installation/)
 
 > [!NOTE]
 > The `Taskfile` will automatically detect your Docker version and use the appropriate command (`docker-compose` or `docker compose`).
@@ -64,8 +56,6 @@ The development environment includes several optional services that can be enabl
 - **Development**: Adds phpMyAdmin and Mailhog
 - **Discourse**: Adds Discourse forum with its required services (PostgreSQL, Redis, Sidekiq) 
 
-#### Using Task (Recommended)
-
 The project includes a Taskfile that provides convenient commands for managing Docker:
 
 ```bash
@@ -82,24 +72,6 @@ task docker:up-discourse
 task docker:up-all
 ```
 
-#### Using Docker Compose Directly
-
-If you don't have Task installed:
-
-```bash
-# Start the basic environment
-docker compose up -d
-
-# Start with development tools
-docker compose --profile dev up -d
-
-# Start with Discourse
-docker compose --profile discourse up -d
-
-# Start all services
-docker compose --profile '*' up -d
-```
-
 ### 4. Initial Setup
 
 The Docker container will automatically:
@@ -113,11 +85,7 @@ The Docker container will automatically:
 You can monitor the progress by checking the container logs:
 
 ```bash
-# Using Task
 task docker:logs
-
-# Or using Docker
-docker logs -f restarters
 ```
 
 ### 5. Accessing the Application
@@ -140,11 +108,6 @@ Once setup is complete:
 
 ### Running Commands in the Container
 
-> [!IMPORTANT]
-> Depending on the Docker version you have installed you may need to substitute the  `docker compose` with `docker-compose`
-
-#### Using Task
-
 ```bash
 # Open a shell in the container
 task docker:shell
@@ -156,22 +119,7 @@ task docker:run:bash -- [command]
 task docker:run:artisan -- [command]
 ```
 
-#### Using Docker Directly
-
-```bash
-# Open a shell
-docker exec -it restarters bash
-
-# Run a bash command
-docker exec -it restarters bash -c "[command]"
-
-# Run an artisan command
-docker exec -it restarters php artisan [command]
-```
-
 ### Stopping the Environment
-
-#### Using Task
 
 ```bash
 # Stop basic environment
@@ -184,43 +132,13 @@ task docker:down-dev
 task docker:down-all
 ```
 
-#### Using Docker Compose
-
-```bash
-# Stop basic environment
-docker compose down
-
-# Stop with specific set of containers
-docker compose --profile dev down
-
-# Stop all containers
-docker compose --profile '*'
-```
-
 ### Rebuilding Containers
 
 If you need to completely rebuild. This will remove all containers, volumes, networks, and images.
 
-#### Using Task
 ```bash
-# Using Task
 task docker:rebuild
 
 # Using specific profile
 task docker:rebuild-dev
-```
-
-#### Using Docker Compose
-```bash
-# Using Docker Compose
-docker compose down -v --rmi all
-docker compose up -d
-
-# Using specific profile
-docker compose --profile dev down -v --rmi all
-docker compose --profile dev up -d
-
-# Using all profiles
-docker compose --profile '*' down -v --rmi all
-docker compose --profile '*' up -d
 ```
