@@ -145,8 +145,11 @@ jobs:
       - run: sed -i 's/DISCOURSE_APIUSER=.*$/DISCOURSE_APIUSER=someuser/g' .env
 
       # MySQL details from environment variables.
-      - run: sed -i 's/DB_HOST=.*$/DB_HOST=user/g' .env
-
+      - run: sed -i 's/DB_HOST=.*$/DB_HOST='"$DB_HOST"'/g' .env
+      - run: sed -i 's/DB_PORT=.*$/DB_PORT='"$DB_PORT"'/g' .env
+      - run: sed -i 's/DB_DATABASE=.*$/DB_DATABASE='"$DB_DATABASE"'/g' .env
+      - run: sed -i 's/DB_USERNAME=.*$/DB_USERNAME='"$DB_USERNAME"'/g' .env
+      - run: sed -i 's/DB_PASSWORD=.*$/DB_PASSWORD='"$DB_PASSWORD"'/g' .env
 
       # ...and Mediawiki.
       # Disable wiki as problems getting that running.
