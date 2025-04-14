@@ -141,7 +141,7 @@ Once setup is complete:
 ### Running Commands in the Container
 
 > [!IMPORTANT]
-> Depending on the Docker version you have installed you may need to substitue the  `docker compose` with `docker-compose`
+> Depending on the Docker version you have installed you may need to substitute the  `docker compose` with `docker-compose`
 
 #### Using Task
 
