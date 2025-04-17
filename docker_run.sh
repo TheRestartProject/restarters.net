@@ -10,7 +10,7 @@ then
 fi
 
 rm -rf vendor
-php composer.phar install
+composer install
 
 # Point at the DB server
 sed -i 's/DB_HOST=.*$/DB_HOST=restarters_db/g' .env

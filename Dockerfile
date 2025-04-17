@@ -26,7 +26,7 @@ RUN install-php-extensions \
     gd
 
 # Install composer.  Don't run composer install yet - see docker_run.sh
-RUN wget https://getcomposer.org/composer-1.phar
+COPY --from=composer/composer:2-bin /composer /usr/bin/composer
 
 # Set working directory to where we will run.
 WORKDIR /var/www
