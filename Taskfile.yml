@@ -107,7 +107,7 @@ tasks:
 
     cmds:
       - '{{.DOCKER_CMD}} --profile {{ index .COMPOSE_PROFILES .PROFILE }} down -v --rmi all'
-      - '{{.DOCKER_CMD}} --profile {{ index .COMPOSE_PROFILES .PROFILE }} up -d'
+      - task docker:up-{{ .PROFILE }}
 
   docker:restart-*:
     desc: Restart Docker containers for a given profile (Usage - task docker:restart-[core|debug|discourse|all])
@@ -130,6 +130,7 @@ tasks:
     vars: *PROFILE_VARS
 
     cmds:
+      - task env:generate
       - '{{.DOCKER_CMD}} --profile {{ index .COMPOSE_PROFILES .PROFILE }} restart'
 
 
