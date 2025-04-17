@@ -1,9 +1,6 @@
 # This is the docker for restarters.  It's used from docker-compose.
 FROM php:8.2-fpm
 
-# Set working directory to where we will run.
-WORKDIR /var/www
-
 # Install dependencies
 RUN apt-get update && \
     apt-get install -y --no-install-recommends \
@@ -28,14 +25,14 @@ RUN install-php-extensions \
     intl \
     gd
 
-# Copy the code
-COPY . /var/www/
-
-# Copy composer.lock and composer.json from the codebase to where we will install and run.
-COPY composer.lock composer.json /var/www/
-
 # Install composer.  Don't run composer install yet - see docker_run.sh
 COPY --from=composer/composer:2-bin /composer /usr/bin/composer
+
+# Set working directory to where we will run.
+WORKDIR /var/www
+
+# Copy the code
+COPY . ./
 
 # Expose port 9000, which is our PHP FPM port referenced from nginx.conf.
 EXPOSE 9000
