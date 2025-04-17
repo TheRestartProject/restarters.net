@@ -2,9 +2,12 @@
 
 version: "3"
 
-# Load environment-specific .env file
+# Load environment-specific .env files
+# Variables from files listed first take precedence over those in later files
+# when the same variable is defined in multiple files
 dotenv:
-  - .env
+  - .env.docker
+  - .env.base
 
 vars:
   DOCKER_CMD:
@@ -22,6 +25,13 @@ tasks:
     desc: List all tasks
     cmds:
       - task --list
+
+  env:generate:
+    desc: |
+      Generate a .env file from .env.template by substituting environment variables loaded 
+      from dotenv files via Task's dotenv feature.
+    cmds:
+      - envsubst < .env.template > .env
 
   # Docker container management tasks
   docker:up-*:
@@ -49,6 +59,7 @@ tasks:
       PROFILE: "{{index .MATCH 0}}"
 
     cmds:
+      - task env:generate
       - '{{.DOCKER_CMD}} --profile {{ index .COMPOSE_PROFILES .PROFILE }} up -d'
 
   docker:down-*:

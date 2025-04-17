@@ -98,16 +98,16 @@ services:
   restarters_db:
     profiles: ["core", "debug", "discourse"]
     image: mysql:5.7.33
-    container_name: restarters_db
+    container_name: ${MYSQL_CONTAINER_NAME}
     restart: unless-stopped
     tty: true
     expose:
       - "3306"
     environment:
-      MYSQL_DATABASE: restarters_db_test
-      MYSQL_ROOT_PASSWORD: s3cr3t
-      MYSQL_USER: restarters
-      MYSQL_PASSWORD: s3cr3t
+      MYSQL_DATABASE: ${MYSQL_DATABASE}
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
+      MYSQL_USER: ${MYSQL_USER}
+      MYSQL_PASSWORD: ${MYSQL_PASSWORD}
       SERVICE_TAGS: dev
       SERVICE_NAME: mysql
     volumes:
