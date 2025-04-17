@@ -135,8 +135,6 @@ services:
     environment:
       - PMA_ARBITRARY=1
       - PMA_HOST=restarters_db
-#      - PMA_USER=root
-#      - PMA_PASSWORD=s3cr3t
     networks:
       - app-network
       
