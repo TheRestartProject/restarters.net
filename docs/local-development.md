@@ -63,7 +63,7 @@ The project includes a Taskfile that provides convenient commands for managing D
 
 ```bash
 # Start the core environment (app + database only)
-task docker:up
+task docker:up-core
 
 # Start with debug tools (phpMyAdmin, Mailhog)
 task docker:up-debug
