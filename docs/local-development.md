@@ -38,18 +38,22 @@ cd restarters.net
 
 ### 2. Environment Configuration
 
-Copy the example environment file:
+The application environment is automatically configured when using Task commands to start the development environment. This standard process:
 
-```bash
-cp .env.example .env
-```
+1. Loads environment variables from `.env.docker` and `.env.base` files
+2. Creates a `.env` file from the `.env.template` by substituting these environment variables
 
-You may need to adjust the following settings in your `.env` file:
-- The `APP_KEY` will be auto-generated during setup
+There's no need to manually copy or create environment files, as the `docker:up-*` and `docker:restart-*` commands handle this automatically.
+
+For custom environment settings:
+- Modify the auto-generated `.env` file for temporary changes
+  - ⚠️ If you restart the docker environment, then the `.env` file changes will be lost
+- Modify the `.env.docker` file to change the DB credentials and configuration
+- Modify the `.env.base` file to change all other environment variables
+- ⚠️ If you need to add or remove environment variables, then make sure to update the `.env.template` file as well as the `.env.docker` and/or `.env.base` files
+
 > [!NOTE]
-> This is only required if another service is already running on the port `8001`
-- Set `APP_URL` to `http://localhost:<AVAILABLE_PORT>`
-  - You will need to change the port in the `docker-compose.yml` file to match the port you are using.
+> If you want to run the application outside of Docker then run `cp .env.base .env` as using `task env:generate` will generate a `.env` file that is used by the Docker containers.
 
 ### 3. Starting the Development Environment
 
