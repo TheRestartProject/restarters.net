@@ -637,7 +637,6 @@ class GroupController extends Controller
      * @author Christopher Kelker - @date 2019-03-25
      * @editor  Christopher Kelker
      * @version 1.0.0
-     * @param   Request     $request
      * @param   [type]      $code
      * @return  [type]
      */

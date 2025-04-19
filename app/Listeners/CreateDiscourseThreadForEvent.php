@@ -22,9 +22,6 @@ class CreateDiscourseThreadForEvent extends BaseEvent
 
     /**
      * Handle the event.
-     *
-     * @param  ApproveEvent  $event
-     * @return void
      */
     public function handle(ApproveEvent $event): void
     {

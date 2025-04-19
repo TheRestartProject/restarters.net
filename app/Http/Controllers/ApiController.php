@@ -185,9 +185,6 @@ class ApiController extends Controller
 
     /**
      * List/search devices.
-     *
-     * @param  Request  $request
-     * @return Response
      */
     public static function getDevices(Request $request, $page, $size): JsonResponse
     {

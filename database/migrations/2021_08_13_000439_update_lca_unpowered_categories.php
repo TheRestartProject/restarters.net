@@ -26,8 +26,6 @@ c1.footprint as footprint_new,
 c2.footprint as footprint_old
 FROM `restarters_db_test`.categories c1
 RIGHT JOIN `restarters.test`.categories c2 ON c2.idcategories = c1.idcategories
-     *
-     * @return void
      */
     public function up(): void
     {
@@ -154,8 +152,6 @@ RIGHT JOIN `restarters.test`.categories c2 ON c2.idcategories = c1.idcategories
 
     /**
      * Reverse the migrations.
-     *
-     * @return void
      */
     public function down(): void
     {

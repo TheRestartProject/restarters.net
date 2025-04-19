@@ -159,7 +159,6 @@ class APIv2EventTest extends TestCase
 
     /**
      * @param $role
-     * @return void
      * @dataProvider roleProvider
      */
     public function testCreateLoggedOutUsingKey($role): void {

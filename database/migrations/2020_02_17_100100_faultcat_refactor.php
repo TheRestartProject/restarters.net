@@ -11,8 +11,6 @@ return new class extends Migration
      *
      * Includes missed migrations for tables
      * `devices_faults` and `devices_faults_opinions`.
-     *
-     * @return void
      */
     public function up(): void
     {
@@ -81,8 +79,6 @@ return new class extends Migration
      * Reverse the migrations.
      *
      * DO NOT DROP `devices_faults` or `devices_faults_opinions`.
-     *
-     * @return void
      */
     public function down(): void
     {

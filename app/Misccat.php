@@ -30,8 +30,6 @@ class Misccat extends Model
      * The list of excluded iddevices is because those records have
      * useless problem text:
      * "Like all data in Y1, this data is an estimate based on participation"
-     *
-     * @return array
      */
     public function fetchMisc(): array
     {

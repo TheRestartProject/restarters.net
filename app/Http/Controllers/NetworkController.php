@@ -15,8 +15,6 @@ class NetworkController extends Controller
 {
     /**
      * Display a listing of the resource.
-     *
-     * @return \Illuminate\Http\Response
      */
     public function index(): View
     {
@@ -44,9 +42,6 @@ class NetworkController extends Controller
 
     /**
      * Display the specified network.
-     *
-     * @param  \App\Network  $network
-     * @return \Illuminate\Http\Response
      */
     public function show(Network $network): View
     {
@@ -68,9 +63,6 @@ class NetworkController extends Controller
 
     /**
      * Show the form for editing the specified resource.
-     *
-     * @param  \App\Network  $network
-     * @return \Illuminate\Http\Response
      */
     public function edit(Network $network): View
     {
@@ -83,10 +75,6 @@ class NetworkController extends Controller
 
     /**
      * Update the specified resource in storage.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @param  \App\Network  $network
-     * @return \Illuminate\Http\Response
      */
     public function update(Request $request, Network $network): RedirectResponse
     {
@@ -112,9 +100,6 @@ class NetworkController extends Controller
 
     /**
      * Associate groups to the specified network.
-     *
-     * @param  \App\Network  $network
-     * @return \Illuminate\Http\Response
      */
     public function associateGroup(Request $request, Network $network): RedirectResponse
     {

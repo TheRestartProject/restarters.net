@@ -11,9 +11,6 @@ class DeviceUpdatedAt extends BaseEvent
 {
     /**
      * Handle the event.
-     *
-     * @param  DeviceCreatedOrUpdated  $event
-     * @return void
      */
     public function handle(DeviceCreatedOrUpdated $event): void
     {

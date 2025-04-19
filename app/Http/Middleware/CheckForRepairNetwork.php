@@ -18,9 +18,6 @@ class CheckForRepairNetwork
      * on the website
      * @author Dean Appleton-Claydon
      * @date   2019-03-20
-     * @param  \Illuminate\Http\Request  $request
-     * @param  \Closure  $next
-     * @return mixed
      */
     public function handle(Request $request, Closure $next): Response
     {

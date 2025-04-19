@@ -10,7 +10,6 @@ class NewDiscourseMember extends BaseNotification
      * Get the mail representation of the notification.
      *
      * @param mixed $notifiable
-     * @return \Illuminate\Notifications\Messages\MailMessage
      */
     public function toMail($notifiable): MailMessage
     {
@@ -37,7 +36,6 @@ class NewDiscourseMember extends BaseNotification
      * Get the array representation of the notification.
      *
      * @param mixed $notifiable
-     * @return array
      */
     public function toArray($notifiable): array
     {

@@ -23,8 +23,6 @@ class InviteEventTest extends TestCase
 {
     /**
      * Test notification content.
-     *
-     * @return void
      */
     public function testInvite(): void
     {

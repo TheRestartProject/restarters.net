@@ -49,7 +49,6 @@ class LoginController extends Controller
     /**
      * Override login from AuthenticateUsers
      *
-     * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\RedirectResponse|\Illuminate\Http\Response|\Illuminate\Http\JsonResponse
      *
      * @throws \Illuminate\Validation\ValidationException
@@ -83,9 +82,6 @@ class LoginController extends Controller
 
     /**
      * Override validateLogin from AuthenticateUsers
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @return void
      */
     protected function validateLogin(Request $request): void
     {
@@ -105,8 +101,6 @@ class LoginController extends Controller
 
     /**
      * Override showLoginForm from AuthenticateUsers
-     *
-     * @return \Illuminate\Http\Response
      */
     public function showLoginForm(): View
     {

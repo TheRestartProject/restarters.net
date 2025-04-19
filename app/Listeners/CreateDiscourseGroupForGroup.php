@@ -24,9 +24,6 @@ class CreateDiscourseGroupForGroup extends BaseEvent
 
     /**
      * Handle the event.
-     *
-     * @param  ApproveGroup  $event
-     * @return void
      */
     public function handle(ApproveGroup $event): void
     {

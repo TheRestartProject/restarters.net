@@ -14,10 +14,6 @@ class DiscourseController extends Controller
 {
     /**
      * Get top Talk topics.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @param string $tag
-     * @return \Illuminate\Http\Response
      */
     public function discussionTopics(Request $request, DiscourseService $discourseService, string $tag = NULL): JsonResponse
     {

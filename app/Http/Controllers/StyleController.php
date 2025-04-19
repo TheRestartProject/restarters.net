@@ -11,8 +11,6 @@ class StyleController extends Controller
 {
     /**
      * Nothing to see here.
-     *
-     * @return \Illuminate\Http\Response
      */
     public function index(Request $request): RedirectResponse
     {

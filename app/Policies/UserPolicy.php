@@ -16,7 +16,6 @@ class UserPolicy
      *
      * @param  \App\User  $user
      * @param  \App\User  $user
-     * @param  int  $role
      * @return mixed
      */
     public function changeRepairDirRole(User $perpetrator, User $victim, int $role)
@@ -53,7 +52,6 @@ class UserPolicy
     /**
      * Determine whether this user can view the Repair Directory settings for users
      *
-     * @param  \App\User  $user
      * @return mixed
      */
     public function viewRepairDirectorySettings(User $user)
@@ -64,7 +62,6 @@ class UserPolicy
     /**
      * Determine whether this user can see the Admin menu.
      *
-     * @param  \App\User  $user
      * @return mixed
      */
     public function viewAdminMenu(User $user)
@@ -79,7 +76,6 @@ class UserPolicy
     /**
      * Determine whether this user can access the Repair Directory via the menu.
      *
-     * @param  \App\User  $user
      * @return mixed
      */
     public function accessRepairDirectory(User $user)

@@ -25,9 +25,6 @@ class DeleteEventFromWordPress extends BaseEvent
 
     /**
      * Handle the event.
-     *
-     * @param  EventDeleted  $event
-     * @return void
      */
     public function handle(EventDeleted $event): void
     {
