@@ -740,7 +740,7 @@ class EventController extends Controller
             $longitude = $geocoded['longitude'];
         }
 
-        return array(
+        return [
             $groupid,
             $start,
             $end,
@@ -753,6 +753,6 @@ class EventController extends Controller
             $online,
             $link,
             $network_data
-        );
+        ];
     }
 }

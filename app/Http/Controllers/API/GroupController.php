@@ -1053,7 +1053,7 @@ class GroupController extends Controller
             $country_code = $geocoded['country_code'];
         }
 
-        return array(
+        return [
             $name,
             $area,
             $postcode,
@@ -1068,6 +1068,6 @@ class GroupController extends Controller
             $network_data,
             $email,
             $archived_at
-        );
+        ];
     }
 }
