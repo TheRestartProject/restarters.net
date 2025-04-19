@@ -13,7 +13,7 @@ return new class extends Migration
      *
      * @return void
      */
-    public function up()
+    public function up(): void
     {
         // This is the default 'Restarters' network - that which
         // groups will be a member of by default, if not part of
@@ -37,7 +37,7 @@ return new class extends Migration
      *
      * @return void
      */
-    public function down()
+    public function down(): void
     {
         DB::table('networks')->where('id', 1)->delete();
     }

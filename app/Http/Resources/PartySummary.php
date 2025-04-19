@@ -111,7 +111,7 @@ class PartySummary extends JsonResource
      * @param  \Illuminate\Http\Request  $request
      * @return array
      */
-    public function toArray($request)
+    public function toArray($request): array
     {
         // We return information which can be public, and we rename fields to look more consistent.
         //

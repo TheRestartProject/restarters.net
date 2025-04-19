@@ -2,6 +2,8 @@
 
 namespace App\Http\Middleware;
 
+use Symfony\Component\HttpFoundation\Response;
+use Illuminate\Http\Request;
 use App\User;
 use Auth;
 use Closure;
@@ -15,7 +17,7 @@ class VerifyUserConsent
      * @param  \Closure  $next
      * @return mixed
      */
-    public function handle($request, Closure $next)
+    public function handle(Request $request, Closure $next): Response
     {
         if (Auth::check() && Auth::user()->hasUserGivenConsent()) {
             return $next($request);

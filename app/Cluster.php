@@ -2,6 +2,7 @@
 
 namespace App;
 
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Model;
 
 class Cluster extends Model
@@ -23,7 +24,7 @@ class Cluster extends Model
      */
     protected $hidden = [];
 
-    public function categories()
+    public function categories(): HasMany
     {
         return $this->hasMany(\App\Category::class, 'cluster', 'idclusters');
     }

@@ -272,7 +272,7 @@ class Group extends JsonResource
      * @param  \Illuminate\Http\Request  $request
      * @return array
      */
-    public function toArray($request)
+    public function toArray($request): array
     {
         $stats = $this->resource->getGroupStats();
         $stats['events'] = $stats['parties'];

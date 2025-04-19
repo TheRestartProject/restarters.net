@@ -58,7 +58,7 @@ class SyncDiscourseUsernames extends Command
      *
      * @return mixed
      */
-    public function handle()
+    public function handle(): void
     {
         $usersFoundInRestarters = 0;
         $updatedUsers = 0;

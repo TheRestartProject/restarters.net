@@ -21,7 +21,7 @@ class TimezoneTest extends TestCase
      * @test
      * @dataProvider timezoneProvider
      */
-    public function timezone_inheritance($event, $group, $result, $exception) {
+    public function timezone_inheritance($event, $group, $result, $exception): void {
         $g = Group::factory()->create([
                                                    'timezone' => $group
                                                ]);
@@ -51,7 +51,7 @@ class TimezoneTest extends TestCase
         ];
     }
 
-    public function testStartEnd() {
+    public function testStartEnd(): void {
         $g = Group::factory()->create([
            'timezone' => 'Europe/London'
         ]);
@@ -76,7 +76,7 @@ class TimezoneTest extends TestCase
     /**
      * @dataProvider timesProvider
      */
-    public function testOrder($date, $tz1, $start1, $end1, $tz2, $start2, $end2, $editstart2, $editend2) {
+    public function testOrder($date, $tz1, $start1, $end1, $tz2, $start2, $end2, $editstart2, $editend2): void {
         // Two groups in different timezones.
         $g1 = Group::factory()->create([
                                                'timezone' => $tz1
@@ -169,25 +169,25 @@ class TimezoneTest extends TestCase
         ];
     }
 
-    public function testOldDateFieldException() {
+    public function testOldDateFieldException(): void {
         $this->expectException(\Exception::class);
         $p = new Party();
         $p->event_date = '1970-01-01';
     }
 
-    public function testOldStartFieldException() {
+    public function testOldStartFieldException(): void {
         $this->expectException(\Exception::class);
         $p = new Party();
         $p->start = '10:00';
     }
 
-    public function testOldEndFieldException() {
+    public function testOldEndFieldException(): void {
         $this->expectException(\Exception::class);
         $p = new Party();
         $p->end = '10:00';
     }
 
-    public function testTimezoneChangeUpdatesFutureEvents() {
+    public function testTimezoneChangeUpdatesFutureEvents(): void {
         // Create a group.
         $g = Group::factory()->create([
                                                'timezone' => 'Asia/Samarkand'
@@ -225,7 +225,7 @@ class TimezoneTest extends TestCase
         self::assertEquals('Europe/London', $party->timezone);
     }
 
-    public function testCrystallise() {
+    public function testCrystallise(): void {
         // Create a past event and check that the scheduled command crystallises the timezone.
         $g = Group::factory()->create([
             'timezone' => 'Asia/Samarkand'

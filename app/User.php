@@ -2,6 +2,9 @@
 
 namespace App;
 
+use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\HasOne;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use App\Events\UserDeleted;
 use App\Events\UserUpdated;
@@ -70,7 +73,7 @@ class User extends Authenticatable implements Auditable, HasLocalePreference
         'deleted' => UserDeleted::class,
     ];
 
-    public function role()
+    public function role(): HasOne
     {
         return $this->hasOne(\App\Role::class, 'idroles', 'role');
     }
@@ -81,19 +84,19 @@ class User extends Authenticatable implements Auditable, HasLocalePreference
         return $this->repairdir_role ? $this->repairdir_role : Role::REPAIR_DIRECTORY_NONE;
     }
 
-    public function userSkills()
+    public function userSkills(): HasMany
     {
         return $this->hasMany(\App\UsersSkills::class, 'user', 'id');
     }
 
-    public function skills()
+    public function skills(): BelongsToMany
     {
         return $this->belongsToMany(\App\Skills::class, 'users_skills', 'user', 'skill');
     }
 
     // This is an incorrect relationship, but leaving it here for now as it is used in a strange way in two legacy places and apparently working in those instances somehow.
     // Use skills() for correct belongsToMany relationship.
-    public function skillsold()
+    public function skillsold(): BelongsToMany
     {
         return $this->belongsToMany(\App\UsersSkills::class, 'users_skills', 'user', 'skill');
     }
@@ -110,7 +113,7 @@ class User extends Authenticatable implements Auditable, HasLocalePreference
         }
     }
 
-    public function groups()
+    public function groups(): BelongsToMany
     {
         return $this->belongsToMany(\App\Group::class, 'users_groups', 'user', 'group');
     }
@@ -165,12 +168,12 @@ class User extends Authenticatable implements Auditable, HasLocalePreference
         return $groupsNearby;
     }
 
-    public function preferences()
+    public function preferences(): BelongsToMany
     {
         return $this->belongsToMany(self::class, 'users_preferences', 'user_id', 'preference_id');
     }
 
-    public function permissions()
+    public function permissions(): BelongsToMany
     {
         return $this->belongsToMany(self::class, 'users_permissions', 'user_id', 'permission_id');
     }
@@ -402,7 +405,7 @@ class User extends Authenticatable implements Auditable, HasLocalePreference
         }
     }
 
-    public function groupTag()
+    public function groupTag(): HasOne
     {
         return $this->hasOne(GroupTags::class, 'id', 'access_group_tag_id');
     }
@@ -512,7 +515,7 @@ class User extends Authenticatable implements Auditable, HasLocalePreference
         return $this->networks->contains($network);
     }
 
-    public function networks()
+    public function networks(): BelongsToMany
     {
         return $this->belongsToMany(Network::class, 'user_network', 'user_id', 'network_id');
     }

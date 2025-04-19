@@ -11,7 +11,7 @@ return new class extends Migration
      *
      * @return void
      */
-    public function up()
+    public function up(): void
     {
         if (! Schema::hasColumn('devices', 'repair_status_str')) {
             Schema::table('devices', function (Blueprint $table) {
@@ -58,7 +58,7 @@ END;
      *
      * @return void
      */
-    public function down()
+    public function down(): void
     {
         DB::unprepared('DROP TRIGGER IF EXISTS `repair_status_str_in`');
         DB::unprepared('DROP TRIGGER IF EXISTS `repair_status_str_up`');

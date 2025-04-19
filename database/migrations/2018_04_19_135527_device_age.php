@@ -11,7 +11,7 @@ return new class extends Migration
      *
      * @return void
      */
-    public function up()
+    public function up(): void
     {
         DB::statement('ALTER TABLE `devices`
                          ADD COLUMN `age` VARCHAR(255) NULL COMMENT "// kept as  free text to capture data type after research" AFTER `model`;'
@@ -23,7 +23,7 @@ return new class extends Migration
      *
      * @return void
      */
-    public function down()
+    public function down(): void
     {
         //
     }

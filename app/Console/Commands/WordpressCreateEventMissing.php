@@ -37,7 +37,7 @@ class WordpressCreateEventMissing extends Command
      *
      * @return mixed
      */
-    public function handle()
+    public function handle(): void
     {
         $events = Party::future()->where('approved', true)->where('wordpress_post_id', null)->get();
 

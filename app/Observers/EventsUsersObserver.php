@@ -30,7 +30,7 @@ class EventsUsersObserver {
      * @param  \App\EventsUsers  $eu
      * @return void
      */
-    public function created(EventsUsers $eu)
+    public function created(EventsUsers $eu): void
     {
         $idevents = $eu->event;
         $event = \App\Party::find($idevents);
@@ -78,7 +78,7 @@ class EventsUsersObserver {
      * @param  \App\EventsUsers  $eu
      * @return void
      */
-    public function deleted(EventsUsers $eu)
+    public function deleted(EventsUsers $eu): void
     {
         $idevents = $eu->event;
         $event = \App\Party::find($idevents);

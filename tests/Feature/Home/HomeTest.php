@@ -13,7 +13,7 @@ class HomeTest extends TestCase
     /**
      * @dataProvider landingPagesProvider
      */
-    public function testLoggedOut($url)
+    public function testLoggedOut($url): void
     {
         $response = $this->get($url);
         $response->assertSuccessful();
@@ -29,7 +29,7 @@ class HomeTest extends TestCase
         ];
     }
 
-    public function testLoggedIn() {
+    public function testLoggedIn(): void {
         $this->loginAsTestUser(Role::RESTARTER);
         $response = $this->get('/user');
         $response->assertRedirect(RouteServiceProvider::HOME);

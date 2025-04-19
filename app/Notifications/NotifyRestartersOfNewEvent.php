@@ -12,7 +12,7 @@ class NotifyRestartersOfNewEvent extends BaseNotification
      * @param mixed $notifiable
      * @return \Illuminate\Notifications\Messages\MailMessage
      */
-    public function toMail($notifiable)
+    public function toMail($notifiable): MailMessage
     {
         $locale = $notifiable->language;
 
@@ -43,7 +43,7 @@ class NotifyRestartersOfNewEvent extends BaseNotification
      * @param mixed $notifiable
      * @return array
      */
-    public function toArray($notifiable)
+    public function toArray($notifiable): array
     {
         return [
             'title' => __('notifications.new_event_title', [

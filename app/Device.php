@@ -2,6 +2,8 @@
 
 namespace App;
 
+use Illuminate\Database\Eloquent\Relations\HasOne;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use App\Events\DeviceCreatedOrUpdated;
 use DB;
@@ -243,17 +245,17 @@ class Device extends Model implements Auditable
         }
     }
 
-    public function deviceCategory()
+    public function deviceCategory(): HasOne
     {
         return $this->hasOne(\App\Category::class, 'idcategories', 'category');
     }
 
-    public function deviceEvent()
+    public function deviceEvent(): HasOne
     {
         return $this->hasOne(\App\Party::class, 'idevents', 'event');
     }
 
-    public function barriers()
+    public function barriers(): BelongsToMany
     {
         return $this->belongsToMany(\App\Barrier::class, 'devices_barriers', 'device_id', 'barrier_id');
     }

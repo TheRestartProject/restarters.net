@@ -2,6 +2,8 @@
 
 namespace App;
 
+use Illuminate\Database\Eloquent\Relations\HasOne;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use DB;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
@@ -89,7 +91,7 @@ class UserGroups extends Model implements Auditable
     }
 
     //Table Relations
-    public function volunteer()
+    public function volunteer(): HasOne
     {
         return $this->hasOne(\App\User::class, 'id', 'user');
     }
@@ -113,11 +115,11 @@ class UserGroups extends Model implements Auditable
         return 'N/A';
     }
 
-    public function user() {
+    public function user(): BelongsTo {
         return $this->belongsTo(\App\User::class, 'user', 'id');
     }
 
-    public function group() {
+    public function group(): BelongsTo {
         return $this->belongsTo(\App\Groups::class, 'group', 'idgroups');
     }
 }

@@ -31,7 +31,7 @@ class EditWordpressPostForEvent extends BaseEvent
      * @param  EditEvent  $event
      * @return void
      */
-    public function handle(EditEvent $event)
+    public function handle(EditEvent $event): void
     {
         $id = $event->party->idevents;
         $data = $event->data;

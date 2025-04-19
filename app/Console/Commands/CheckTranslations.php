@@ -35,7 +35,7 @@ class CheckTranslations extends Command
      *
      * @return mixed
      */
-    public function handle()
+    public function handle(): int
     {
         // We want to scan all English translations.
         $files = scandir(base_path() . '/lang/en');

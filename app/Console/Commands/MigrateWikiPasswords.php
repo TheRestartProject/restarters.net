@@ -36,7 +36,7 @@ class MigrateWikiPasswords extends Command
      *
      * @return mixed
      */
-    public function handle()
+    public function handle(): void
     {
         $users = User::whereNotNull('mediawiki')->whereNull('deleted_at')->get();
 

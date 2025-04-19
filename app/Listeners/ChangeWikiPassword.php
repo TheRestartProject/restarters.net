@@ -28,7 +28,7 @@ class ChangeWikiPassword extends BaseEvent
      * @param  PasswordChanged  $event
      * @return void
      */
-    public function handle(PasswordChanged $event)
+    public function handle(PasswordChanged $event): void
     {
         $user = $event->user;
         $oldpw = $event->oldPassword;

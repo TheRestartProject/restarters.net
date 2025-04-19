@@ -30,7 +30,7 @@ class EditProfileTest extends TestCase
     /** @test */
     // The assertion just tells us that the event is dispatched, not much else.
     // In order to actually check it worked, we need to look at Discourse.
-    public function email_address_update_triggers_discourse_sync()
+    public function email_address_update_triggers_discourse_sync(): void
     {
         $this->withoutExceptionHandling();
         Event::fake();
@@ -71,7 +71,7 @@ class EditProfileTest extends TestCase
 
     /** test */
     // Check that we can have three digit lat/lngs.
-    public function test_three_digit_lat_lng()
+    public function test_three_digit_lat_lng(): void
     {
         $this->withoutExceptionHandling();
 
@@ -91,7 +91,7 @@ class EditProfileTest extends TestCase
 
     /** test */
     // Check that we can update the location.
-    public function test_location_update()
+    public function test_location_update(): void
     {
         $user = User::factory()->create();
         $this->actingAs($user);
@@ -139,7 +139,7 @@ class EditProfileTest extends TestCase
      * @test
      * @dataProvider idProvider
      */
-    public function test_tags_update($id) {
+    public function test_tags_update($id): void {
         $user = User::factory()->create();
         $this->actingAs($user);
 
@@ -186,7 +186,7 @@ class EditProfileTest extends TestCase
      * @test
      * @dataProvider idProvider
      */
-    public function image_upload($id) {
+    public function image_upload($id): void {
         Storage::fake('avatars');
         $user = User::factory()->create();
         $this->actingAs($user);
@@ -226,7 +226,7 @@ class EditProfileTest extends TestCase
     /**
      * @test
      */
-    public function edit_profile() {
+    public function edit_profile(): void {
         $user = User::factory()->create();
         $this->actingAs($user);
 

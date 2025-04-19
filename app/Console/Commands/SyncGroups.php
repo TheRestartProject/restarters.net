@@ -47,7 +47,7 @@ class SyncGroups extends Command
      *
      * @return mixed
      */
-    public function handle()
+    public function handle(): void
     {
         $groups = Group::where('approved', true)->whereNotNull('wordpress_post_id')->get();
 

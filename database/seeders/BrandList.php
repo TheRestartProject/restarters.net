@@ -12,7 +12,7 @@ class BrandList extends Seeder
      *
      * @return void
      */
-    public function run()
+    public function run(): void
     {
         DB::table('brands')->truncate();
 

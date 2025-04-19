@@ -25,7 +25,7 @@ class AddUserToDiscourseGroup extends BaseEvent
      * @param  UserFollowedGroup  $event
      * @return void
      */
-    public function handle(UserFollowedGroup $event)
+    public function handle(UserFollowedGroup $event): void
     {
         if (! config('restarters.features.discourse_integration')) {
             return;

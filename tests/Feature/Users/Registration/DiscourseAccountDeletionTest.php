@@ -24,7 +24,7 @@ use Illuminate\Support\Facades\Artisan;
 class DiscourseAccountDeletionTest extends TestCase
 {
     /** @test */
-    public function user_deletion_triggers_anonymise()
+    public function user_deletion_triggers_anonymise(): void
     {
         if (config('restarters.features.discourse_integration')) {
             // TODO Not working and agreed to disable for now.

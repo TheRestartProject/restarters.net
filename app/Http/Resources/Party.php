@@ -242,7 +242,7 @@ class Party extends JsonResource
      * @param  \Illuminate\Http\Request  $request
      * @return array
      */
-    public function toArray($request)
+    public function toArray($request): array
     {
         // We return information which can be public, and we rename fields to look more consistent.
         $networkData = gettype($this->network_data) == 'string' ? json_decode($this->network_data, true) : $this->network_data;

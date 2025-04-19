@@ -15,7 +15,7 @@ class TooManyMiscTest extends TestCase
     /**
      * @dataProvider provider
      */
-    public function testTooMany($count, $notif)
+    public function testTooMany($count, $notif): void
     {
         Notification::fake();
 

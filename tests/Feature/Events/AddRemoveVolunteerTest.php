@@ -27,7 +27,7 @@ class AddRemoveVolunteerTest extends TestCase
      * @dataProvider roleProvider
      */
 
-    public function testAddRemove($role, $addrole, $shouldBeHost)
+    public function testAddRemove($role, $addrole, $shouldBeHost): void
     {
         $this->withoutExceptionHandling();
         Queue::fake();
@@ -215,7 +215,7 @@ class AddRemoveVolunteerTest extends TestCase
         ];
     }
 
-    public function testAdminRemoveReaddHost() {
+    public function testAdminRemoveReaddHost(): void {
         $this->withoutExceptionHandling();
 
         $host = User::factory()->administrator()->create([

@@ -14,7 +14,7 @@ return new class extends Migration
      *
      * @return void
      */
-    public function up()
+    public function up(): void
     {
         if (Schema::hasTable('devices_faults')) {
             Schema::rename('devices_faults', 'devices_faults_events');
@@ -84,7 +84,7 @@ return new class extends Migration
      *
      * @return void
      */
-    public function down()
+    public function down(): void
     {
         Schema::dropIfExists('devices_faults_adjudicated');
 

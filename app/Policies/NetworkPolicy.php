@@ -17,7 +17,7 @@ class NetworkPolicy
      * @param  \App\Network  $network
      * @return mixed
      */
-    public function view(User $user, Network $network)
+    public function view(User $user, Network $network): bool
     {
         if ($user->hasRole('Administrator')) {
             return true;
@@ -36,7 +36,7 @@ class NetworkPolicy
      * @param  \App\User  $user
      * @return mixed
      */
-    public function create(User $user)
+    public function create(User $user): bool
     {
         if ($user->hasRole('Administrator')) {
             return true;
@@ -50,7 +50,7 @@ class NetworkPolicy
      * @param  \App\Network  $network
      * @return mixed
      */
-    public function update(User $user, Network $network)
+    public function update(User $user, Network $network): bool
     {
         if ($user->hasRole('Administrator')) {
             return true;
@@ -89,7 +89,7 @@ class NetworkPolicy
      * @param  \App\Network  $network
      * @return mixed
      */
-    public function delete(User $user, Network $network)
+    public function delete(User $user, Network $network): bool
     {
         if ($user->hasRole('Administrator')) {
             return true;
@@ -103,7 +103,7 @@ class NetworkPolicy
      * @param  \App\Network  $network
      * @return mixed
      */
-    public function restore(User $user, Network $network)
+    public function restore(User $user, Network $network): bool
     {
         if ($user->hasRole('Administrator')) {
             return true;
@@ -117,7 +117,7 @@ class NetworkPolicy
      * @param  \App\Network  $network
      * @return mixed
      */
-    public function forceDelete(User $user, Network $network)
+    public function forceDelete(User $user, Network $network): bool
     {
         if ($user->hasRole('Administrator')) {
             return true;

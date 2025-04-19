@@ -45,7 +45,7 @@ return new class extends Migration
         'microtask_surveys',
     ];
 
-    public function up()
+    public function up(): void
     {
         // For each table, rename to 'archived__' + table name.
         // Using two underscores triggers phpMyAdmin table grouping.
@@ -64,7 +64,7 @@ return new class extends Migration
      *
      * @return void
      */
-    public function down()
+    public function down(): void
     {
         // For each table, rename back to original name
         foreach ($this->tables as $table) {

@@ -12,7 +12,7 @@ return new class extends Migration
      *
      * @return void
      */
-    public function up()
+    public function up(): void
     {
         // New cluster for non-powered categories.
         DB::table('clusters')->insert([
@@ -63,7 +63,7 @@ return new class extends Migration
      *
      * @return void
      */
-    public function down()
+    public function down(): void
     {
         Schema::table('devices', function (Blueprint $table) {
             $table->dropColumn('item_type');

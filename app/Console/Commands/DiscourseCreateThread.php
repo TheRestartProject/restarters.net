@@ -42,7 +42,7 @@ class DiscourseCreateThread extends Command
      *
      * @return mixed
      */
-    public function handle(DiscourseService $discourseService)
+    public function handle(DiscourseService $discourseService): void
     {
         $id = $this->argument('partyid');
 

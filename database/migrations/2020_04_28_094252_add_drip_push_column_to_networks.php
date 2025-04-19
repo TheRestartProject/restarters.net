@@ -12,7 +12,7 @@ return new class extends Migration
      *
      * @return void
      */
-    public function up()
+    public function up(): void
     {
         Schema::table('networks', function (Blueprint $table) {
             $table->boolean('users_push_to_drip')->nullable(false)->default(false)
@@ -27,7 +27,7 @@ return new class extends Migration
      *
      * @return void
      */
-    public function down()
+    public function down(): void
     {
         Schema::table('networks', function (Blueprint $table) {
             $table->dropColumn('users_push_to_drip');

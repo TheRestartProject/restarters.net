@@ -2,6 +2,7 @@
 
 namespace App;
 
+use Illuminate\Database\Eloquent\Relations\HasOne;
 use DB;
 use Illuminate\Database\Eloquent\Model;
 
@@ -70,7 +71,7 @@ class Xref extends Model
         }
     }
 
-    public function image()
+    public function image(): HasOne
     {
         return $this->hasOne(\App\Images::class, 'idimages', 'object');
     }

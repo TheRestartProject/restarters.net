@@ -8,14 +8,14 @@ use View;
 
 class AgentServiceProvider extends ServiceProvider
 {
-    public function boot()
+    public function boot(): void
     {
         $agent = new Agent();
 
         View::share('agent', $agent);
     }
 
-    public function register()
+    public function register(): void
     {
         //
     }

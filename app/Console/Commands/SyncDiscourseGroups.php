@@ -38,7 +38,7 @@ class SyncDiscourseGroups extends Command
      *
      * @return mixed
      */
-    public function handle()
+    public function handle(): void
     {
         $this->discourseService->syncGroups();
     }

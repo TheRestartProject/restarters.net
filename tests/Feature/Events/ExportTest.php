@@ -19,7 +19,7 @@ class ExportTest extends TestCase
     /**
      * @dataProvider roleProvider
      */
-    public function testExport($role)
+    public function testExport($role): void
     {
         $network = Network::factory()->create();
 

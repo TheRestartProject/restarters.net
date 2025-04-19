@@ -37,7 +37,7 @@ class WordpressCreateGroup extends Command
      *
      * @return mixed
      */
-    public function handle()
+    public function handle(): void
     {
         $id = $this->argument('id');
         $group = Group::findOrFail($id);

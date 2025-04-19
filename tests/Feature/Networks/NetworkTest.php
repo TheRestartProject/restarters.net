@@ -23,7 +23,7 @@ class NetworkTest extends TestCase
     }
 
     /** @test */
-    public function network_can_be_created()
+    public function network_can_be_created(): void
     {
         $this->withoutExceptionHandling();
 
@@ -33,7 +33,7 @@ class NetworkTest extends TestCase
     }
 
     /** @test */
-    public function network_can_be_edited()
+    public function network_can_be_edited(): void
     {
         $this->withoutExceptionHandling();
 
@@ -45,7 +45,7 @@ class NetworkTest extends TestCase
     }
 
     /** @test */
-    public function networks_can_be_queried()
+    public function networks_can_be_queried(): void
     {
         $this->withoutExceptionHandling();
 
@@ -63,7 +63,7 @@ class NetworkTest extends TestCase
     }
 
     /** @test */
-    public function groups_can_be_associated_to_network()
+    public function groups_can_be_associated_to_network(): void
     {
         $this->withoutExceptionHandling();
 
@@ -82,7 +82,7 @@ class NetworkTest extends TestCase
     }
 
     /** @test */
-    public function admins_can_associate_group_to_network()
+    public function admins_can_associate_group_to_network(): void
     {
         $this->withoutExceptionHandling();
 
@@ -175,7 +175,7 @@ class NetworkTest extends TestCase
     }
 
     /** @test */
-    public function non_admins_cant_associate_group_to_network()
+    public function non_admins_cant_associate_group_to_network(): void
     {
         $this->withoutExceptionHandling();
 
@@ -193,7 +193,7 @@ class NetworkTest extends TestCase
     }
 
     /** @test */
-    public function user_can_be_set_as_coordinator_of_network()
+    public function user_can_be_set_as_coordinator_of_network(): void
     {
         $this->withoutExceptionHandling();
 
@@ -212,7 +212,7 @@ class NetworkTest extends TestCase
     }
 
     /** @test */
-    public function network_stats_can_be_queried()
+    public function network_stats_can_be_queried(): void
     {
         $network = Network::factory()->create();
         $coordinator = User::factory()->networkCoordinator()->create([
@@ -235,7 +235,7 @@ class NetworkTest extends TestCase
     }
 
     /** @test */
-    public function network_page()
+    public function network_page(): void
     {
         $network = Network::factory()->create([
                                                        'shortname' => 'restarters'
@@ -297,7 +297,7 @@ class NetworkTest extends TestCase
     }
 
     /** @test */
-    public function admins_can_edit()
+    public function admins_can_edit(): void
     {
         $this->withoutExceptionHandling();
 
@@ -327,7 +327,7 @@ class NetworkTest extends TestCase
         $this->assertTrue($group->isMemberOf($network));
     }
 
-    public function testRemoveNetworkCoordinatorByRole() {
+    public function testRemoveNetworkCoordinatorByRole(): void {
         $this->withoutExceptionHandling();
 
         $network = Network::factory()->create();

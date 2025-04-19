@@ -39,7 +39,7 @@ class ModerationEventPhotosNotificationTest extends TestCase
     protected $group;
 
     /** @test */
-    public function a_moderation_notification_is_sent_to_admins_when_event_photos_are_uploaded()
+    public function a_moderation_notification_is_sent_to_admins_when_event_photos_are_uploaded(): void
     {
         Notification::fake();
 

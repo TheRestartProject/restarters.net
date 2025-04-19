@@ -12,7 +12,7 @@ class ResetPassword extends BaseNotification
      * @param mixed $notifiable
      * @return array
      */
-    public function via($notifiable)
+    public function via($notifiable): array
     {
         return ['mail'];
     }
@@ -23,7 +23,7 @@ class ResetPassword extends BaseNotification
      * @param mixed $notifiable
      * @return \Illuminate\Notifications\Messages\MailMessage
      */
-    public function toMail($notifiable)
+    public function toMail($notifiable): MailMessage
     {
         $locale = $notifiable->language;
 
@@ -41,7 +41,7 @@ class ResetPassword extends BaseNotification
      * @param mixed $notifiable
      * @return array
      */
-    public function toArray($notifiable)
+    public function toArray($notifiable): array
     {
         return [
 

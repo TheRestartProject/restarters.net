@@ -36,7 +36,7 @@ class CheckGroupLocations extends Command
      *
      * @return mixed
      */
-    public function handle()
+    public function handle(): void
     {
         $groups = Group::where('approved', true)->get();
         $geocoder = new \App\Helpers\Geocoder();

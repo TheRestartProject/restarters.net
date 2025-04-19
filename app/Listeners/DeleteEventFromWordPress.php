@@ -29,7 +29,7 @@ class DeleteEventFromWordPress extends BaseEvent
      * @param  EventDeleted  $event
      * @return void
      */
-    public function handle(EventDeleted $event)
+    public function handle(EventDeleted $event): void
     {
         // Slightly confusing name clash - usually we refer to community repair events as 'events' in the system.  Here explicitly calling it repairEvent.
 

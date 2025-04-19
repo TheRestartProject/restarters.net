@@ -13,7 +13,7 @@ class DeviceFactory extends Factory
      *
      * @return array
      */
-    public function definition()
+    public function definition(): array
     {
         return [
         'event' => Party::factory()->create()->idevents,

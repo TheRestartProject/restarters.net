@@ -37,7 +37,7 @@ class GroupHostTest extends TestCase
     /**
      * @dataProvider roleProvider
      */
-    public function testMakeHost($role)
+    public function testMakeHost($role): void
     {
         $user = User::factory()->{lcfirst($role)}()->create();
         $this->actingAs($user);
@@ -95,7 +95,7 @@ class GroupHostTest extends TestCase
         $this->assertEquals(1, count($json['data']));
     }
 
-    public function testHostMakeHost()
+    public function testHostMakeHost(): void
     {
         $firsthost = User::factory()->host()->create();
         $this->group->addVolunteer($firsthost);
@@ -129,7 +129,7 @@ class GroupHostTest extends TestCase
     /**
      * @dataProvider providerTrueFalse
      */
-    public function testNetworkCoordinatorDemoteHost($addToNetwork) {
+    public function testNetworkCoordinatorDemoteHost($addToNetwork): void {
         $host = User::factory()->host()->create();
         $this->group->addVolunteer($host);
         $this->group->makeMemberAHost($host);

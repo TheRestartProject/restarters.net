@@ -11,7 +11,7 @@ return new class extends Migration
      *
      * @return void
      */
-    public function up()
+    public function up(): void
     {
         Schema::table('networks', function (Blueprint $table) {
             $table->boolean('auto_approve_events')->default(false);
@@ -30,7 +30,7 @@ return new class extends Migration
      *
      * @return void
      */
-    public function down()
+    public function down(): void
     {
         Schema::table('networks', function (Blueprint $table) {
             $table->dropColumn('auto_approve_events');

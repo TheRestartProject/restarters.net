@@ -40,7 +40,7 @@ class AlertCreate extends Command
      *
      * @return mixed
      */
-    public function handle()
+    public function handle(): void
     {
         $title = trim($this->argument('title'));
         $html = trim($this->argument('html'));

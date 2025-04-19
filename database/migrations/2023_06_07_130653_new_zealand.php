@@ -11,7 +11,7 @@ return new class extends Migration
      *
      * @return void
      */
-    public function up()
+    public function up(): void
     {
         DB::statement(DB::raw("update `groups` set country = 'Aotearoa New Zealand' where country = 'New Zealand';"));
     }
@@ -21,7 +21,7 @@ return new class extends Migration
      *
      * @return void
      */
-    public function down()
+    public function down(): void
     {
         DB::statement(DB::raw("update `groups` set country = 'New Zealand' where country = 'Aotearoa New Zealand';"));
     }
