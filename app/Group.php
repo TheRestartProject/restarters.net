@@ -2,6 +2,7 @@
 
 namespace App;
 
+use App\User;
 use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
@@ -272,7 +273,7 @@ class Group extends Model implements Auditable
      *
      * @param \App\User $volunteer A registered user.
      */
-    public function addVolunteer($volunteer)
+    public function addVolunteer(User $volunteer)
     {
         UserGroups::updateOrCreate([
             'user' => $volunteer->id,
@@ -318,7 +319,7 @@ class Group extends Model implements Auditable
      * @param int|null $user_id
      * @return bool
      */
-    public function isVolunteer($user_id = null)
+    public function isVolunteer(?int $user_id = null): bool
     {
         $attributes = ['user' => $user_id ?: auth()->id()];
 
@@ -668,7 +669,7 @@ class Group extends Model implements Auditable
      *
      * @return string
      */
-    public function getDiscourseGroupName($unique)
+    public function getDiscourseGroupName($unique): string
     {
         // Restricted characters allowed in name, and only 20 characters.
         //

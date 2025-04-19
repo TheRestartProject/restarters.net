@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\API;
 
+use Illuminate\Http\JsonResponse;
 use App\Http\Controllers\Controller;
 use App\Services\DiscourseService;
 use App\User;
@@ -18,7 +19,7 @@ class DiscourseController extends Controller
      * @param string $tag
      * @return \Illuminate\Http\Response
      */
-    public function discussionTopics(Request $request, DiscourseService $discourseService, $tag = NULL)
+    public function discussionTopics(Request $request, DiscourseService $discourseService, string $tag = NULL): JsonResponse
     {
         $topics = [];
 

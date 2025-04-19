@@ -199,7 +199,7 @@ class ProfileTest extends TestCase
         $this->assertEquals($invites, $user->invites);
     }
 
-    public function invitesProvider() {
+    public function invitesProvider(): array {
         return [
             [ FALSE, 0 ],
             [ FALSE, 1 ],

@@ -23,7 +23,7 @@ class Timezone implements Rule
      * @param  mixed  $value
      * @return bool
      */
-    public function passes($attribute, $value)
+    public function passes(string $attribute, $value): bool
     {
         return in_array($value, \DateTimeZone::listIdentifiers(\DateTimeZone::ALL_WITH_BC));
     }
@@ -33,7 +33,7 @@ class Timezone implements Rule
      *
      * @return string
      */
-    public function message()
+    public function message(): string
     {
         return __('partials.validate_timezone');
     }

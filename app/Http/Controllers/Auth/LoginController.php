@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Auth;
 
+use Illuminate\View\View;
 use App\Device;
 use App\Helpers\Fixometer;
 use App\Http\Controllers\Controller;
@@ -86,7 +87,7 @@ class LoginController extends Controller
      * @param  \Illuminate\Http\Request  $request
      * @return void
      */
-    protected function validateLogin(Request $request)
+    protected function validateLogin(Request $request): void
     {
         if (env('HONEYPOT_DISABLE', false)) {
             // This is used in Playwright testing where we get many requests in a short time.
@@ -107,7 +108,7 @@ class LoginController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function showLoginForm()
+    public function showLoginForm(): View
     {
         $stats = Fixometer::loginRegisterStats();
 

@@ -246,7 +246,7 @@ class CreateEventTest extends TestCase
         $this->assertEquals(false, array_key_exists('nearby', $events[0]));
     }
 
-    public function roles()
+    public function roles(): array
     {
         return [
             // Hosts can see but not moderate.
@@ -289,7 +289,7 @@ class CreateEventTest extends TestCase
     }
 
 
-    public function providerTrueFalse()
+    public function providerTrueFalse(): array
     {
         return [
             [false],
@@ -856,7 +856,7 @@ class CreateEventTest extends TestCase
         ]);
     }
 
-    public function invalidEmailProvider()
+    public function invalidEmailProvider(): array
     {
         return [
             ['test@test.com', true],

@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\API;
 
+use Illuminate\Http\JsonResponse;
 use App\Events\ApproveGroup;
 use App\Events\EditGroup;
 use App\Group;
@@ -60,7 +61,7 @@ class GroupController extends Controller
         return response()->json($groupChanges);
     }
 
-    public static function getGroupsByUsersNetworks(Request $request)
+    public static function getGroupsByUsersNetworks(Request $request): JsonResponse
     {
         $authenticatedUser = Auth::user();
 
@@ -213,7 +214,7 @@ class GroupController extends Controller
         return $groupChange;
     }
 
-    public static function getGroupList()
+    public static function getGroupList(): JsonResponse
     {
         $groups = Group::orderBy('created_at', 'desc');
 
@@ -644,7 +645,7 @@ class GroupController extends Controller
      *       ),
      *     )
      */
-    public function moderateGroupsv2(Request $request) {
+    public function moderateGroupsv2(Request $request): JsonResponse {
         $user = $this->getUser();
         $ret = \App\Http\Resources\GroupCollection::make(Group::unapprovedVisibleTo($user->id));
         return response()->json($ret);
@@ -726,7 +727,7 @@ class GroupController extends Controller
      *     )
      *  )
      */
-    public function createGroupv2(Request $request) {
+    public function createGroupv2(Request $request): JsonResponse {
         $user = $this->getUser();
         $user->convertToHost();
 
@@ -874,7 +875,7 @@ class GroupController extends Controller
      *     )
      *  )
      */
-    public function updateGroupv2(Request $request, $idGroup) {
+    public function updateGroupv2(Request $request, $idGroup): JsonResponse {
         $user = $this->getUser();
 
         list($name, $area, $postcode, $location, $phone, $website, $description, $timezone,

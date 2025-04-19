@@ -19,7 +19,7 @@ class UserPolicy
      * @param  int  $role
      * @return mixed
      */
-    public function changeRepairDirRole(User $perpetrator, User $victim, $role)
+    public function changeRepairDirRole(User $perpetrator, User $victim, int $role)
     {
         // We have rules for whether you can change the Repair Directory role.  Code is structured for readability
         // of these rules, rather than a single big if.

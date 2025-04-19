@@ -179,7 +179,7 @@ class InviteGroupTest extends TestCase
         ]);
     }
 
-    public function invalidEmailProvider()
+    public function invalidEmailProvider(): array
     {
         return [
             ['test@test.com', true],

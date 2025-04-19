@@ -43,7 +43,7 @@ class TimezoneTest extends TestCase
         }
     }
 
-    public function timezoneProvider() {
+    public function timezoneProvider(): array {
         return [
             [ NULL, 'Asia/Samarkand', 'Asia/Samarkand', FALSE ],
             [ 'Asia/Samarkand', NULL, 'Asia/Samarkand', FALSE ],
@@ -158,7 +158,7 @@ class TimezoneTest extends TestCase
         $this->assertEquals($eventData['event_end_utc'], $event->event_end_utc);
     }
 
-    public function timesProvider() {
+    public function timesProvider(): array {
         // The first event must be chronologically later than the second event once timezones are considered.
         return [
             [ '2037-01-15', 'Europe/London', '12:00:00', '12:00:00', 'Europe/Brussels', '12:00:00', '13:00:00', '13:00:00', '14:00:00' ],
