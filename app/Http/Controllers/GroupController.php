@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use Illuminate\Http\RedirectResponse;
 use App\Device;
 use App\Events\ApproveGroup;
 use App\Events\EditGroup;
@@ -287,7 +288,7 @@ class GroupController extends Controller
         ]);
     }
 
-    public function postSendInvite(Request $request)
+    public function postSendInvite(Request $request): RedirectResponse
     {
         $request->validate([
             'manual_invite_box' => [(new Delimited('email'))->min(1)],
@@ -379,7 +380,7 @@ class GroupController extends Controller
         ]));
     }
 
-    public function confirmInvite($group_id, $hash)
+    public function confirmInvite($group_id, $hash): RedirectResponse
     {
         // Find user/group relationship based on the invitation hash.
         $user_group = UserGroups::where('status', $hash)->where('group', $group_id)->first();
@@ -435,7 +436,7 @@ class GroupController extends Controller
         ]);
     }
 
-    public function delete($id)
+    public function delete($id): RedirectResponse
     {
         $group = Group::where('idgroups', $id)->first();
 
@@ -541,7 +542,7 @@ class GroupController extends Controller
         return view('group.stats', $groupStats);
     }
 
-    public function getJoinGroup($group_id)
+    public function getJoinGroup($group_id): RedirectResponse
     {
         $user_id = Auth::id();
         $alreadyInGroup = UserGroups::where('group', $group_id)
@@ -640,7 +641,7 @@ class GroupController extends Controller
      * @param   [type]      $code
      * @return  [type]
      */
-    public function confirmCodeInvite(Request $request, $code)
+    public function confirmCodeInvite(Request $request, $code): RedirectResponse
     {
         // Variables
         $group = Group::where('shareable_code', $code)->first();

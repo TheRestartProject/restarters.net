@@ -13,7 +13,7 @@ class PartyFactory extends Factory
      *
      * @return $this
      */
-    public function configure()
+    public function configure(): static
     {
         return $this->afterMaking(function ($model)
         {

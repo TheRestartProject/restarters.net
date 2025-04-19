@@ -53,7 +53,7 @@ class EventsUsersObserver {
      * @param  \App\EventsUsers  $eu
      * @return void
      */
-    public function updating(EventsUsers $eu) {
+    public function updating(EventsUsers $eu): void {
         $idevents = $eu->event;
         $event = \App\Party::find($idevents);
         $iduser = $eu->user;
@@ -94,7 +94,7 @@ class EventsUsersObserver {
      * @param User $user
      * @return void
      */
-    private function confirmed($event, $user, $count): void
+    private function confirmed(Party $event, User $user, $count): void
     {
         if ($count) {
             $event->increment('volunteers');
@@ -108,7 +108,7 @@ class EventsUsersObserver {
      * @param User $user
      * @return void
      */
-    private function removed($event, $user, $count): void
+    private function removed(Party $event, User $user, $count): void
     {
         if ($count) {
             $event->decrement('volunteers');

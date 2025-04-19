@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use Illuminate\View\View;
 use App\Group;
 use App\Party;
 use App\User;
@@ -81,7 +82,7 @@ class DashboardController extends Controller
         );
     }
 
-    public function getHostDash()
+    public function getHostDash(): View
     {
         return view('dashboard.host');
     }

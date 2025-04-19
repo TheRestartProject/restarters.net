@@ -124,7 +124,7 @@ class User extends Authenticatable implements Auditable, HasLocalePreference
      * @param int $numberOfGroups How many groups to return
      * @param string String of minimum creation date
      */
-    public function groupsNearby($numberOfGroups = 10, $createdSince = null, $nearby = self::NEARBY_KM)
+    public function groupsNearby(int $numberOfGroups = 10, $createdSince = null, $nearby = self::NEARBY_KM)
     {
         if (is_null($this->latitude) || is_null($this->longitude)) {
             return [];
@@ -352,7 +352,7 @@ class User extends Authenticatable implements Auditable, HasLocalePreference
     /**
      * @return Date when the user last logged in
      */
-    public function lastLogin()
+    public function lastLogin(): Date
     {
         return new \Carbon\Carbon($this->last_login_at);
     }
@@ -572,7 +572,7 @@ class User extends Authenticatable implements Auditable, HasLocalePreference
      *
      * @return string
      */
-    public function preferredLocale()
+    public function preferredLocale(): string
     {
         // TODO Use of preferredLocale should mean we don't have to explicitly pass the locale.  But that isn't
         // working.  So at the moment we are passing a locale explicitly in the translations in the notifications

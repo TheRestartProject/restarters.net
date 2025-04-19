@@ -2,6 +2,7 @@
 
 namespace App\Http\Resources;
 
+use Illuminate\Http\Request;
 use App\Role;
 use App\Skills;
 use App\User;
@@ -68,7 +69,7 @@ class Volunteer extends JsonResource
      * @param  \Illuminate\Http\Request  $request
      * @return array
      */
-    public function toArray($request): array
+    public function toArray(Request $request): array
     {
         if (\Cache::has('all_skills')) {
             $allSkills = \Cache::get('all_skills');

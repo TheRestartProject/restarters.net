@@ -383,7 +383,7 @@ class Party extends Model implements Auditable
      * @param string $format
      * @return false|string
      */
-    public function getFormattedLocalStart($format = 'd/m/Y')
+    public function getFormattedLocalStart(string $format = 'd/m/Y')
     {
         $dt = new Carbon($this->event_start_utc);
         $dt->setTimezone($this->timezone);
@@ -396,7 +396,7 @@ class Party extends Model implements Auditable
      * @param string $format
      * @return false|string
      */
-    public function getFormattedLocalEnd($format = 'd/m/Y')
+    public function getFormattedLocalEnd(string $format = 'd/m/Y')
     {
         $dt = new Carbon($this->event_end_utc);
         $dt->setTimezone($this->timezone);
@@ -446,7 +446,7 @@ class Party extends Model implements Auditable
      * @date   2019-06-13T15:48:05+010
      * @return bool
      */
-    public function isStartingSoon()
+    public function isStartingSoon(): bool
     {
         $start = new Carbon($this->event_start_utc);
 
@@ -629,7 +629,7 @@ class Party extends Model implements Auditable
      * @param int|null $user_id
      * @return bool
      */
-    public function isVolunteer($user_id = null)
+    public function isVolunteer(?int $user_id = null): bool
     {
         return $this->allConfirmedVolunteers
             ->contains('user', $user_id ?: auth()->id());

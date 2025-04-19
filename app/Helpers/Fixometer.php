@@ -641,7 +641,7 @@ class Fixometer
      * @param $slug
      * @return Collection
      */
-    public static function usersWhoHavePreference($slug)
+    public static function usersWhoHavePreference($slug): Collection
     {
         return User::join('users_preferences', 'users_preferences.user_id', '=', 'users.id')
             ->join('preferences', 'preferences.id', '=', 'users_preferences.preference_id')

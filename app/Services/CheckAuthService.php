@@ -2,6 +2,7 @@
 
 namespace App\Services;
 
+use Illuminate\Http\Request;
 use App\Helpers\Fixometer;
 use App\User;
 use Cookie;
@@ -89,7 +90,7 @@ class CheckAuthService extends JsonResource
      * @param  \Illuminate\Http\Request  $request
      * @return array
      */
-    public function toArray($request): array
+    public function toArray(Request $request): array
     {
         return [
             'authenticated' => $this->authenticated,

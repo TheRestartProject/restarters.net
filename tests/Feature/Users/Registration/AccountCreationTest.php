@@ -202,7 +202,7 @@ class AccountCreationTest extends TestCase
         $response->assertSee('alert-danger');
     }
 
-    public function missingProvider() {
+    public function missingProvider(): array {
         return [
             [ 'email' ],
             [ 'role' ],

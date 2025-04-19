@@ -2,6 +2,8 @@
 
 namespace App\Http\Controllers;
 
+use Illuminate\View\View;
+use Illuminate\Http\RedirectResponse;
 use App\Group;
 use App\Network;
 use Auth;
@@ -16,7 +18,7 @@ class NetworkController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function index()
+    public function index(): View
     {
         $user = Auth::user();
 
@@ -46,7 +48,7 @@ class NetworkController extends Controller
      * @param  \App\Network  $network
      * @return \Illuminate\Http\Response
      */
-    public function show(Network $network)
+    public function show(Network $network): View
     {
         $user = Auth::user();
 
@@ -70,7 +72,7 @@ class NetworkController extends Controller
      * @param  \App\Network  $network
      * @return \Illuminate\Http\Response
      */
-    public function edit(Network $network)
+    public function edit(Network $network): View
     {
         $this->authorize('update', $network);
 
@@ -86,7 +88,7 @@ class NetworkController extends Controller
      * @param  \App\Network  $network
      * @return \Illuminate\Http\Response
      */
-    public function update(Request $request, Network $network)
+    public function update(Request $request, Network $network): RedirectResponse
     {
         $this->authorize('update', $network);
 
@@ -114,7 +116,7 @@ class NetworkController extends Controller
      * @param  \App\Network  $network
      * @return \Illuminate\Http\Response
      */
-    public function associateGroup(Request $request, Network $network)
+    public function associateGroup(Request $request, Network $network): RedirectResponse
     {
         $this->authorize('associateGroups', $network);
 

@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\API;
 
+use Illuminate\Http\JsonResponse;
 use App\Events\EditEvent;
 use App\EventsUsers;
 use App\Group;
@@ -145,7 +146,7 @@ class EventController extends Controller
         return $collection;
     }
 
-    public function addVolunteer(Request $request, $idevents)
+    public function addVolunteer(Request $request, $idevents): JsonResponse
     {
         $request->validate([
             'volunteer_email_address' => ['nullable', 'email'],
@@ -236,7 +237,7 @@ class EventController extends Controller
     }
 
 
-    public function listVolunteers(Request $request, $idevents)
+    public function listVolunteers(Request $request, $idevents): JsonResponse
     {
         $party = Party::findOrFail($idevents);
 
@@ -455,7 +456,7 @@ class EventController extends Controller
      *     )
      *  )
      */
-    public function createEventv2(Request $request)
+    public function createEventv2(Request $request): JsonResponse
     {
         $user = $this->getUser();
 
@@ -624,7 +625,7 @@ class EventController extends Controller
      *     )
      *  )
      */
-    public function updateEventv2(Request $request, $idEvents)
+    public function updateEventv2(Request $request, $idEvents): JsonResponse
     {
         $user = $this->getUser();
 

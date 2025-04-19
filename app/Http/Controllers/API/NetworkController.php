@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\API;
 
+use Illuminate\Http\JsonResponse;
 use App\Group;
 use App\Http\Controllers\Controller;
 use App\Network;
@@ -13,7 +14,7 @@ use Illuminate\Support\Facades\DB;
 
 class NetworkController extends Controller
 {
-    public function stats(Network $network)
+    public function stats(Network $network): JsonResponse
     {
         if (! Auth::user()->can('view', $network)) {
             abort(403, 'You do not have access to this network');

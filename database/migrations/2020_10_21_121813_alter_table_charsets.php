@@ -138,7 +138,7 @@ return new class extends Migration
      *
      * @return void
      */
-    private function _report($prefix = '', $suffix = '')
+    private function _report($prefix = '', $suffix = ''): void
     {
         $tables = $this->_dataTables();
         $format = 'SELECT

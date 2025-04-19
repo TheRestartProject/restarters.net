@@ -75,7 +75,7 @@ class GroupCreateTest extends TestCase
         $this->assertNull($this->createGroup('Test Group', 'https://therestartproject.org', 'zzzzzzzzzzz123', 'Some text', false));
     }
 
-    public function roles() {
+    public function roles(): array {
         return [
             [ 'Administrator'],
             [ 'NetworkCoordinator' ]

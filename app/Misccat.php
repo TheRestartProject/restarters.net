@@ -33,7 +33,7 @@ class Misccat extends Model
      *
      * @return array
      */
-    public function fetchMisc()
+    public function fetchMisc(): array
     {
         return DB::select(
             "
