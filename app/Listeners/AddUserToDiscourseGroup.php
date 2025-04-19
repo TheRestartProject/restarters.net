@@ -21,9 +21,6 @@ class AddUserToDiscourseGroup extends BaseEvent
 
     /**
      * Handle the event.
-     *
-     * @param  UserFollowedGroup  $event
-     * @return void
      */
     public function handle(UserFollowedGroup $event): void
     {

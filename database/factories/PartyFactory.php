@@ -10,8 +10,6 @@ class PartyFactory extends Factory
 {
     /**
      * Configure the model factory.
-     *
-     * @return $this
      */
     public function configure(): static
     {
@@ -50,8 +48,6 @@ class PartyFactory extends Factory
 
     /**
      * Define the model's default state.
-     *
-     * @return array
      */
     public function definition(): array
     {

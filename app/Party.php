@@ -380,7 +380,6 @@ class Party extends Model implements Auditable
     /**
      * Return formatted date, in timezone of event.
      *
-     * @param string $format
      * @return false|string
      */
     public function getFormattedLocalStart(string $format = 'd/m/Y')
@@ -393,7 +392,6 @@ class Party extends Model implements Auditable
     /**
      * Return formatted date, in timezone of event.
      *
-     * @param string $format
      * @return false|string
      */
     public function getFormattedLocalEnd(string $format = 'd/m/Y')
@@ -444,7 +442,6 @@ class Party extends Model implements Auditable
      * If the event is of today, is not in progress and has not finished = true.
      * @author Christopher Kelker
      * @date   2019-06-13T15:48:05+010
-     * @return bool
      */
     public function isStartingSoon(): bool
     {
@@ -625,10 +622,6 @@ class Party extends Model implements Auditable
         return '';
     }
 
-    /**
-     * @param int|null $user_id
-     * @return bool
-     */
     public function isVolunteer(?int $user_id = null): bool
     {
         return $this->allConfirmedVolunteers

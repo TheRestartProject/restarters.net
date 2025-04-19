@@ -92,8 +92,6 @@ class UserGroupsController extends Controller
     /**
      * Leave the specified group.
      *
-     * @param  \Illuminate\Http\Request  $request
-     * @param  int  $id
      * @return \Illuminate\Http\Response
      */
     public function leave(Request $request, int $id)

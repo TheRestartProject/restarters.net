@@ -22,9 +22,6 @@ class LogOutOfWiki
 
     /**
      * Handle the event.
-     *
-     * @param  Logout  $event
-     * @return void
      */
     public function handle(Logout $event): void
     {

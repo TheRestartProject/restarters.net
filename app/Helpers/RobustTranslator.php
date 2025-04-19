@@ -8,10 +8,7 @@ use Illuminate\Translation\Translator as BaseTranslator;
 class RobustTranslator extends BaseTranslator
 {
     /**
-     * @param string $key
-     * @param array $replace
      * @param null $locale
-     * @param bool $fallback
      *
      * @return array|null|string|void
      */

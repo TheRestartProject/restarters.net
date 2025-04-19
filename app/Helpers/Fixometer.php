@@ -639,7 +639,6 @@ class Fixometer
      * Returns users who have a particular preference by slug
      *
      * @param $slug
-     * @return Collection
      */
     public static function usersWhoHavePreference($slug): Collection
     {

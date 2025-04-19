@@ -315,10 +315,6 @@ class Group extends Model implements Auditable
         return '';
     }
 
-    /**
-     * @param int|null $user_id
-     * @return bool
-     */
     public function isVolunteer(?int $user_id = null): bool
     {
         $attributes = ['user' => $user_id ?: auth()->id()];
@@ -666,8 +662,6 @@ class Group extends Model implements Auditable
 
     /**
      * Get a name for the Discourse group.
-     *
-     * @return string
      */
     public function getDiscourseGroupName($unique): string
     {

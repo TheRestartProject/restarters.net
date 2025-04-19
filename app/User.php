@@ -569,8 +569,6 @@ class User extends Authenticatable implements Auditable, HasLocalePreference
 
     /**
      * Get the user's preferred locale.  This is automatically used by email notifications.
-     *
-     * @return string
      */
     public function preferredLocale(): string
     {

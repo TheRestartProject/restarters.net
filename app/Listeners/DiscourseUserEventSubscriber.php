@@ -137,8 +137,6 @@ class DiscourseUserEventSubscriber extends BaseEvent
 
     /**
      * Register the listeners for the subscriber.
-     *
-     * @param  \Illuminate\Events\Dispatcher  $events
      */
     public function subscribe(Dispatcher $events)
     {

@@ -309,8 +309,6 @@ class APIv2GroupTest extends TestCase
      * Network coordinators should see groups for approval, but only from their own networks.
      *
      * @dataProvider providerTrueFalse
-     *
-     * @return void
      */
     public function testNetworkCoordinatorApprove($first): void {
         $network1 = Network::factory()->create();
