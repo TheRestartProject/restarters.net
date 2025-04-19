@@ -13,7 +13,7 @@ return new class extends Migration
      *
      * @return void
      */
-    public function up()
+    public function up(): void
     {
         # Timezones for groups and events.
         Schema::table('groups', function (Blueprint $table) {
@@ -76,7 +76,7 @@ return new class extends Migration
      *
      * @return void
      */
-    public function down()
+    public function down(): void
     {
         # Restore the event_date/state/end fields.
         Schema::table('events', function (Blueprint $table) {

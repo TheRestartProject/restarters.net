@@ -11,7 +11,7 @@ return new class extends Migration
      *
      * @return void
      */
-    public function up()
+    public function up(): void
     {
         // Additional preferences
         DB::table('preferences')->insert([
@@ -73,7 +73,7 @@ return new class extends Migration
      *
      * @return void
      */
-    public function down()
+    public function down(): void
     {
         DB::table('users_preferences')->delete();
         DB::table('preferences')->truncate();

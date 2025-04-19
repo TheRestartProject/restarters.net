@@ -11,7 +11,7 @@ return new class extends Migration
      *
      * @return void
      */
-    public function up()
+    public function up(): void
     {
         DB::statement('ALTER TABLE `users` CHANGE `longitude` `longitude` DECIMAL(10,7), CHANGE `latitude` `latitude` DECIMAL(10,7) NULL DEFAULT NULL;');
     }
@@ -21,7 +21,7 @@ return new class extends Migration
      *
      * @return void
      */
-    public function down()
+    public function down(): void
     {
         DB::statement('ALTER TABLE `users` CHANGE `longitude` `longitude` DECIMAL(10,8), CHANGE `latitude` `latitude` DECIMAL(10,8) NULL DEFAULT NULL;');
     }

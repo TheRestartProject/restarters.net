@@ -11,7 +11,7 @@ use Tests\TestCase;
 
 class CategoryTest extends TestCase
 {
-    public function testCategoryChange()
+    public function testCategoryChange(): void
     {
         $event = Party::factory()->create();
 
@@ -50,7 +50,7 @@ class CategoryTest extends TestCase
         self::assertEquals($device->category, 46);
     }
 
-    public function testListItems() {
+    public function testListItems(): void {
         $cat1 = Category::factory()->create([
             'idcategories' => 444,
             'revision' => 1,

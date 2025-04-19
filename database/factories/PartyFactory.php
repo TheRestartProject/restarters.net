@@ -53,7 +53,7 @@ class PartyFactory extends Factory
      *
      * @return array
      */
-    public function definition()
+    public function definition(): array
     {
         return [
             // Need to force the location otherwise the random one may not be geocodable and therefore the event may not

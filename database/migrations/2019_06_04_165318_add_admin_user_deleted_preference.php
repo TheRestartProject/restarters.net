@@ -11,7 +11,7 @@ return new class extends Migration
      *
      * @return void
      */
-    public function up()
+    public function up(): void
     {
         DB::table('preferences')->insert([
             'name' => 'Admin User Deleted',
@@ -25,7 +25,7 @@ return new class extends Migration
      *
      * @return void
      */
-    public function down()
+    public function down(): void
     {
         $id = DB::table('preferences')->where('slug', 'admin-user-deleted')->pluck('id');
         DB::table('users_preferences')->where('preference_id', $id)->delete();

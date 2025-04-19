@@ -185,7 +185,7 @@ class Device extends JsonResource
      * @param  \Illuminate\Http\Request  $request
      * @return array
      */
-    public function toArray($request)
+    public function toArray($request): array
     {
         $event = \App\Party::find($this->event);
         $group = $event ? \App\Group::find($event->group) : NULL;

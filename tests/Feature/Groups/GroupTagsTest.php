@@ -15,7 +15,7 @@ use Tests\TestCase;
 
 class GroupTagsTest extends TestCase
 {
-    public function testList()
+    public function testList(): void
     {
         $admin = $this->loginAsTestUser(Role::RESTARTER);
         $response = $this->get('/tags');
@@ -29,7 +29,7 @@ class GroupTagsTest extends TestCase
         $response->assertSeeText($tag->tag_name);
     }
 
-    public function testCreate()
+    public function testCreate(): void
     {
         $tag = GroupTags::factory()->create();
 
@@ -50,7 +50,7 @@ class GroupTagsTest extends TestCase
         $response->assertSessionHas('success');
     }
 
-    public function testGetEdit()
+    public function testGetEdit(): void
     {
         $tag = GroupTags::factory()->create();
 
@@ -65,7 +65,7 @@ class GroupTagsTest extends TestCase
         $response->assertSeeText($tag->tag_name);
     }
 
-    public function testEdit()
+    public function testEdit(): void
     {
         $tag = GroupTags::factory()->create();
 
@@ -86,7 +86,7 @@ class GroupTagsTest extends TestCase
         $response->assertSessionHas('success');
     }
 
-    public function testDelete() {
+    public function testDelete(): void {
         $tag = GroupTags::factory()->create();
 
         $admin = $this->loginAsTestUser(Role::RESTARTER);

@@ -12,7 +12,7 @@ use Illuminate\Support\Facades\Hash;
 
 class ProfileTest extends TestCase
 {
-    public function testProfilePage()
+    public function testProfilePage(): void
     {
         $user = User::factory()->restarter()->create();
 
@@ -36,7 +36,7 @@ class ProfileTest extends TestCase
         $response->assertSee(__('profile.my_skills'));
     }
 
-    public function testEdit()
+    public function testEdit(): void
     {
         $GLOBALS['_FILES'] = [];
         $user1 = User::factory()->restarter()->create();
@@ -98,7 +98,7 @@ class ProfileTest extends TestCase
         $response->assertSee('Edit User');
     }
 
-    public function testEditBadPassword()
+    public function testEditBadPassword(): void
     {
         $GLOBALS['_FILES'] = [];
         $user1 = User::factory()->restarter()->create();
@@ -119,13 +119,13 @@ class ProfileTest extends TestCase
         $response->assertSee('The passwords are not identical!');
     }
 
-    public function testBadMediaWikiId()
+    public function testBadMediaWikiId(): void
     {
         $this->expectException(NotFoundHttpException::class);
         $this->get('/user/thumbnail?wiki_username=invalid');
     }
 
-    public function testChangePassword() {
+    public function testChangePassword(): void {
         $user = User::factory()->restarter()->create();
         $user->setPassword(Hash::make('secret1'));
 
@@ -144,7 +144,7 @@ class ProfileTest extends TestCase
         $this->assertEquals(__('profile.password_changed'), \Session::get('message'));
     }
 
-    public function testRepairDirectoryRole() {
+    public function testRepairDirectoryRole(): void {
         $user = User::factory()->restarter()->create();
         $admin = User::factory()->administrator()->create([
             'repairdir_role' => Role::REPAIR_DIRECTORY_SUPERADMIN
@@ -160,7 +160,7 @@ class ProfileTest extends TestCase
         $this->assertEquals(__('profile.profile_updated'), \Session::get('message'));
     }
 
-    public function testLanguage() {
+    public function testLanguage(): void {
         $user = User::factory()->restarter()->create();
         $this->actingAs($user);
 
@@ -175,7 +175,7 @@ class ProfileTest extends TestCase
     /**
      * @dataProvider invitesProvider
      */
-    public function testInvites($admin, $invites) {
+    public function testInvites($admin, $invites): void {
         $user = User::factory()->restarter()->create();
 
         $params = [];
@@ -208,7 +208,7 @@ class ProfileTest extends TestCase
         ];
     }
 
-    public function testAPI() {
+    public function testAPI(): void {
         $user = User::factory()->administrator()->create([
                                                                       'api_token' => '1234',
                                                                   ]);

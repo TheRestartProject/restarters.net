@@ -42,7 +42,7 @@ class UserCreate extends Command
      *
      * @return mixed
      */
-    public function handle(DiscourseService $discourseService)
+    public function handle(DiscourseService $discourseService): void
     {
         $name = $this->argument('name');
         $email = $this->argument('email');

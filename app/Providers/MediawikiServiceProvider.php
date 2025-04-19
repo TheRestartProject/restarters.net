@@ -16,7 +16,7 @@ class MediawikiServiceProvider extends ServiceProvider
      *
      * @return void
      */
-    public function boot()
+    public function boot(): void
     {
         //
     }
@@ -26,7 +26,7 @@ class MediawikiServiceProvider extends ServiceProvider
      *
      * @return void
      */
-    public function register()
+    public function register(): void
     {
         if (env('FEATURE__WIKI_INTEGRATION') === false) {
             return;

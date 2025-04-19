@@ -16,7 +16,7 @@ use Auth;
 
 class GroupCountryTest extends TestCase
 {
-    public function testSync() {
+    public function testSync(): void {
         $this->withoutExceptionHandling();
 
         $group = Group::factory()->create();

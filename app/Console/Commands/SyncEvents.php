@@ -49,7 +49,7 @@ class SyncEvents extends Command
      *
      * @return mixed
      */
-    public function handle()
+    public function handle(): void
     {
         $eventsQuery = Party::whereNotNull('wordpress_post_id')->where('approved', true);
         if (! is_null($this->option('datefrom'))) {

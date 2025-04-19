@@ -12,18 +12,18 @@ use Tests\TestCase;
 
 class RoleTest extends TestCase
 {
-    public function testLoggedOut() {
+    public function testLoggedOut(): void {
         $this->expectException(AuthenticationException::class);
         $response = $this->get('/role');
     }
 
-    public function testNotAdmin() {
+    public function testNotAdmin(): void {
         $this->loginAsTestUser(Role::RESTARTER);
         $response = $this->get('/role');
         $response->assertRedirect(RouteServiceProvider::HOME);
     }
 
-    public function testBasic() {
+    public function testBasic(): void {
         $this->loginAsTestUser(Role::ADMINISTRATOR);
 
         // Should see a list with edit links.

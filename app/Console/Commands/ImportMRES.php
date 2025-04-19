@@ -40,7 +40,7 @@ class ImportMRES extends Command
      *
      * @return mixed
      */
-    public function handle()
+    public function handle(): void
     {
         $input = $this->argument('input');
 

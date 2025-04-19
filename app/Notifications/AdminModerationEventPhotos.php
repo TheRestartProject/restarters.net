@@ -12,7 +12,7 @@ class AdminModerationEventPhotos extends BaseNotification
      * @param mixed $notifiable
      * @return \Illuminate\Notifications\Messages\MailMessage
      */
-    public function toMail($notifiable)
+    public function toMail($notifiable): MailMessage
     {
         $locale = $notifiable->language;
         return (new MailMessage)
@@ -46,7 +46,7 @@ class AdminModerationEventPhotos extends BaseNotification
      * @param mixed $notifiable
      * @return array
      */
-    public function toArray($notifiable)
+    public function toArray($notifiable): array
     {
         $locale = $notifiable->language;
         return [

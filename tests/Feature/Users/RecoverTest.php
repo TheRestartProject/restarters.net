@@ -23,7 +23,7 @@ class RecoverTest extends TestCase
         }
     }
 
-    public function testRecover()
+    public function testRecover(): void
     {
         $restarter = User::factory()->restarter()->create([
                                                                           'password' => Hash::make('passw0rd'),

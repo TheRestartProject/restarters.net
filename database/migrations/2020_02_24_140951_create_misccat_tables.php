@@ -11,7 +11,7 @@ return new class extends Migration
      *
      * @return void
      */
-    public function up()
+    public function up(): void
     {
         Schema::create('devices_misc_opinions', function (Blueprint $table) {
             $table->increments('id');
@@ -42,7 +42,7 @@ return new class extends Migration
      *
      * @return void
      */
-    public function down()
+    public function down(): void
     {
         Schema::dropIfExists('devices_misc_opinions');
         Schema::dropIfExists('devices_misc_adjudicated');

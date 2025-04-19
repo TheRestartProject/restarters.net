@@ -11,7 +11,7 @@ return new class extends Migration
      *
      * @return void
      */
-    public function up()
+    public function up(): void
     {
         DB::unprepared('DROP FUNCTION IF EXISTS `REPAIR_STATUS_TO_STRING`');
         // Might need to set definer
@@ -39,7 +39,7 @@ END
      *
      * @return void
      */
-    public function down()
+    public function down(): void
     {
         DB::unprepared('DROP FUNCTION IF EXISTS `REPAIR_STATUS_TO_STRING`');
     }

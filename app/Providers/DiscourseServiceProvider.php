@@ -22,7 +22,7 @@ class DiscourseServiceProvider extends ServiceProvider
 
     private $logger = null;
 
-    public function register()
+    public function register(): void
     {
         // We need to register the service whether or not the feature is turned on, so that we can mock it in testing.
 

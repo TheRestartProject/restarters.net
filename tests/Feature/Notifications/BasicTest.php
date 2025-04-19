@@ -15,7 +15,7 @@ use Tests\TestCase;
 
 class BasicTest extends TestCase
 {
-    public function testNotificationsPage() {
+    public function testNotificationsPage(): void {
         $this->loginAsTestUser(Role::ADMINISTRATOR);
         $idgroups = $this->createGroup();
         $group = Group::findOrFail($idgroups);

@@ -26,7 +26,7 @@ class LogOutOfWiki
      * @param  Logout  $event
      * @return void
      */
-    public function handle(Logout $event)
+    public function handle(Logout $event): void
     {
         $user = $event->user;
 

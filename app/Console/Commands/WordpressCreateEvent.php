@@ -37,7 +37,7 @@ class WordpressCreateEvent extends Command
      *
      * @return mixed
      */
-    public function handle()
+    public function handle(): void
     {
         $id = $this->argument('id');
         $event = Party::findOrFail($id);

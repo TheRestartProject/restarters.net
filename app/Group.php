@@ -2,6 +2,9 @@
 
 namespace App;
 
+use Illuminate\Database\Eloquent\Relations\HasOne;
+use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use DB;
 use Illuminate\Database\Eloquent\Model;
@@ -95,7 +98,7 @@ class Group extends Model implements Auditable
 
     // NGM: when tests in place, this method name should be changed to just `tags`.
     // It's on a group, the group_ prefix is superfluous.
-    public function group_tags()
+    public function group_tags(): BelongsToMany
     {
         return $this->belongsToMany(\App\GroupTags::class, 'grouptags_groups', 'group', 'group_tag');
     }
@@ -176,22 +179,22 @@ class Group extends Model implements Auditable
                 ORDER BY `g`.`name` ASC'), ['id' => $id]);
     }
 
-    public function groupImage()
+    public function groupImage(): HasOne
     {
         return $this->hasOne(\App\Xref::class, 'reference', 'idgroups')->where('reference_type', env('TBL_GROUPS'))->where('object_type', 5);
     }
 
-    public function allHosts()
+    public function allHosts(): HasMany
     {
         return $this->hasMany(\App\UserGroups::class, 'group', 'idgroups')->where('role', Role::HOST);
     }
 
-    public function allRestarters()
+    public function allRestarters(): HasMany
     {
         return $this->hasMany(\App\UserGroups::class, 'group', 'idgroups')->where('role', Role::RESTARTER);
     }
 
-    public function allVolunteers()
+    public function allVolunteers(): HasMany
     {
         return $this->hasMany(\App\UserGroups::class, 'group', 'idgroups')->orderBy('role', 'ASC');
     }
@@ -322,7 +325,7 @@ class Group extends Model implements Auditable
         return $this->allConfirmedVolunteers()->where($attributes)->exists();
     }
 
-    public function parties()
+    public function parties(): HasMany
     {
         return $this->hasMany(Party::class, 'group', 'idgroups');
     }
@@ -379,7 +382,7 @@ class Group extends Model implements Auditable
         return $event->first();
     }
 
-    public function networks()
+    public function networks(): BelongsToMany
     {
         return $this->belongsToMany(Network::class, 'group_network', 'group_id', 'network_id');
     }

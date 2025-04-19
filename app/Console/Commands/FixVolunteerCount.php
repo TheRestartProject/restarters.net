@@ -27,7 +27,7 @@ class FixVolunteerCount extends Command
      *
      * @return mixed
      */
-    public function handle()
+    public function handle(): void
     {
         $events = Party::all();
 

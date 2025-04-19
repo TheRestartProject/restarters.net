@@ -27,7 +27,7 @@ class AnonymiseUsersForTest extends Command
      *
      * @return mixed
      */
-    public function handle()
+    public function handle(): void
     {
         if (env('APP_ENV') !== 'local') {
             $this->error('This command is only designed to be run during local development.');

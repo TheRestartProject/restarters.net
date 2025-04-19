@@ -11,7 +11,7 @@ use Tests\TestCase;
 
 class DripEventTest extends TestCase
 {
-    public function testFail() {
+    public function testFail(): void {
         $user = User::factory()->create([]);
         $this->expectException(\Exception::class);
         \App\DripEvent::createOrUpdateSubscriber($user, true, $user->email, $user->email);

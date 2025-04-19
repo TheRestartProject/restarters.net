@@ -36,7 +36,7 @@ class SendAdminModerateEventPhotosNotification extends BaseEvent
     /**
      * @param EventImagesUploaded $event
      */
-    public function handle(EventImagesUploaded $event)
+    public function handle(EventImagesUploaded $event): void
     {
         $this->event = $event;
         $this->party = $event->party;

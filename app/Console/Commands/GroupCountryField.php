@@ -27,7 +27,7 @@ class GroupCountryField extends Command
      *
      * @return mixed
      */
-    public function handle()
+    public function handle(): void
     {
         $groups = Group::all();
 

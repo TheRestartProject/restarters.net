@@ -38,7 +38,7 @@ class ImportGroups extends Command
      *
      * @return mixed
      */
-    public function handle()
+    public function handle(): void
     {
         $input = $this->argument('input');
         $inputFile = fopen($input, 'r');

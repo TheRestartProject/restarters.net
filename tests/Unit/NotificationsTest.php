@@ -800,7 +800,7 @@ class NotificationsTest extends TestCase
     }
 
     // Generate all the actual outputs.  Useful when maintaining this test.
-    public function testGenerateOutputs()
+    public function testGenerateOutputs(): void
     {
         foreach ($this->classes as $class)
         {
@@ -832,7 +832,7 @@ class NotificationsTest extends TestCase
     }
 
     // Test all the notifications generate the expected outputs.
-    public function testCompareOutputs()
+    public function testCompareOutputs(): void
     {
         foreach ($this->classes as $class)
         {

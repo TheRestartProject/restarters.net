@@ -2,6 +2,9 @@
 
 namespace App;
 
+use Illuminate\Database\Eloquent\Relations\HasOne;
+use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use App\Events\ApproveEvent;
 use Auth;
@@ -349,17 +352,17 @@ class Party extends Model implements Auditable
       ->orderBy('distance', 'ASC');
     }
 
-    public function allDevices()
+    public function allDevices(): HasMany
     {
         return $this->hasMany(\App\Device::class, 'event', 'idevents')->join('categories', 'categories.idcategories', '=', 'devices.category');
     }
 
-    public function allInvited()
+    public function allInvited(): HasMany
     {
         return $this->hasMany(\App\EventsUsers::class, 'event', 'idevents')->where('status', '!=', 1);
     }
 
-    public function allConfirmedVolunteers()
+    public function allConfirmedVolunteers(): HasMany
     {
         return $this->hasMany(EventsUsers::class, 'event', 'idevents')
             ->where(function ($query) {
@@ -369,7 +372,7 @@ class Party extends Model implements Auditable
     }
 
     // Doesn't work if called 'group' - I guess because a reserved SQL keyword.
-    public function theGroup()
+    public function theGroup(): HasOne
     {
         return $this->hasOne(\App\Group::class, 'idgroups', 'group');
     }
@@ -574,7 +577,7 @@ class Party extends Model implements Auditable
         return $result;
     }
 
-    public function devices()
+    public function devices(): HasMany
     {
         return $this->hasMany(\App\Device::class, 'event', 'idevents');
     }
@@ -650,7 +653,7 @@ class Party extends Model implements Auditable
      * @version 1.0.0
      * @return  [type]
      */
-    public function owner()
+    public function owner(): BelongsTo
     {
         return $this->belongsTo(User::class, 'user_id', 'id');
     }

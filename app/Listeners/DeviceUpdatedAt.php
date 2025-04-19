@@ -15,7 +15,7 @@ class DeviceUpdatedAt extends BaseEvent
      * @param  DeviceCreatedOrUpdated  $event
      * @return void
      */
-    public function handle(DeviceCreatedOrUpdated $event)
+    public function handle(DeviceCreatedOrUpdated $event): void
     {
         // We've been passed a device id, and we want to record in the event and group that the devices have been
         // updated.

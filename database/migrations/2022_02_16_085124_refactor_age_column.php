@@ -9,7 +9,7 @@ return new class extends Migration
      *
      * @return void
      */
-    public function up()
+    public function up(): void
     {
         DB::statement('ALTER TABLE `devices`  ADD `age_old` VARCHAR(10) AFTER `age`');
         DB::statement('UPDATE devices SET `age_old` = `age`');
@@ -24,7 +24,7 @@ return new class extends Migration
      *
      * @return void
      */
-    public function down()
+    public function down(): void
     {
         DB::statement('ALTER TABLE `devices` DROP `age`');
         DB::statement('ALTER TABLE `devices` CHANGE `age_old` `age` VARCHAR(10)');

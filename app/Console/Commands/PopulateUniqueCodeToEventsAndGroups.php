@@ -28,7 +28,7 @@ class PopulateUniqueCodeToEventsAndGroups extends Command
      *
      * @return mixed
      */
-    public function handle()
+    public function handle(): void
     {
         $groups = Group::whereNull('shareable_code')
                     ->get();

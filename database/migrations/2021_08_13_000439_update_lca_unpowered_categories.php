@@ -29,7 +29,7 @@ RIGHT JOIN `restarters.test`.categories c2 ON c2.idcategories = c1.idcategories
      *
      * @return void
      */
-    public function up()
+    public function up(): void
     {
         DB::statement('SET foreign_key_checks=0');
         DB::table('categories')->insert([
@@ -157,7 +157,7 @@ RIGHT JOIN `restarters.test`.categories c2 ON c2.idcategories = c1.idcategories
      *
      * @return void
      */
-    public function down()
+    public function down(): void
     {
         DB::statement('SET foreign_key_checks=0');
         DB::table('categories')->where('idcategories', 6)->delete();

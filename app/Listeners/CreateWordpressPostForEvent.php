@@ -31,7 +31,7 @@ class CreateWordpressPostForEvent extends BaseEvent
      * @param  ApproveEvent  $event
      * @return void
      */
-    public function handle(ApproveEvent $event)
+    public function handle(ApproveEvent $event): void
     {
         $partyId = $event->party->idevents;
 

@@ -12,7 +12,7 @@ class JoinEvent extends BaseNotification
      * @param mixed $notifiable
      * @return array
      */
-    public function via($notifiable)
+    public function via($notifiable): array
     {
         if ($notifiable == null)
         {
@@ -43,7 +43,7 @@ class JoinEvent extends BaseNotification
      * @param mixed $notifiable
      * @return \Illuminate\Notifications\Messages\MailMessage
      */
-    public function toMail($notifiable)
+    public function toMail($notifiable): MailMessage
     {
         $locale = $notifiable->language;
         $subject = __('notifications.join_event_subject', [
@@ -131,7 +131,7 @@ class JoinEvent extends BaseNotification
      * @param mixed $notifiable
      * @return array
      */
-    public function toArray($notifiable)
+    public function toArray($notifiable): array
     {
         return [
             'title' => __('notifications.join_event_title', [], $notifiable->locale),

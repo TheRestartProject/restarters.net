@@ -15,7 +15,7 @@ class BasicTest extends TestCase
     /**
      * @dataProvider tabProvider
      */
-    public function testPageLoads($url, $tab)
+    public function testPageLoads($url, $tab): void
     {
         // Test the dashboard page loads.  Most of the work is done inside Vue, so a basic test is just that the
         // Vue component exists.

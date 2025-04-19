@@ -40,7 +40,7 @@ class SetPlaceNetworkData extends Command
      *
      * @return mixed
      */
-    public function handle()
+    public function handle(): void
     {
         $networkname = $this->argument('networkname');
 

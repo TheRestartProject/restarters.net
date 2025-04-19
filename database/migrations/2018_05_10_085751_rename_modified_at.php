@@ -11,7 +11,7 @@ return new class extends Migration
      *
      * @return void
      */
-    public function up()
+    public function up(): void
     {
         Schema::table('groups', function (Blueprint $table) {
             $table->renameColumn('modified_at', 'updated_at');
@@ -32,7 +32,7 @@ return new class extends Migration
      *
      * @return void
      */
-    public function down()
+    public function down(): void
     {
         Schema::table('groups', function (Blueprint $table) {
             $table->renameColumn('updated_at', 'modified_at');

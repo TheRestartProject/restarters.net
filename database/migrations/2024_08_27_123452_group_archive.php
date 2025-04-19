@@ -11,7 +11,7 @@ return new class extends Migration
      *
      * @return void
      */
-    public function up()
+    public function up(): void
     {
         Schema::table('groups', function (Blueprint $table) {
             $table->date('archived_at')->default(null)->nullable()->comment('Date the group was archived');
@@ -23,7 +23,7 @@ return new class extends Migration
      *
      * @return void
      */
-    public function down()
+    public function down(): void
     {
         Schema::table('groups', function (Blueprint $table) {
             $table->dropColumn('archived_at');

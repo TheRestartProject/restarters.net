@@ -37,7 +37,7 @@ class NetworkCreate extends Command
      *
      * @return mixed
      */
-    public function handle()
+    public function handle(): void
     {
         $name = $this->argument('name');
         $shortname = $this->argument('shortname');

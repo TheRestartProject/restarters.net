@@ -26,7 +26,7 @@ class NetworkTest extends TestCase
         DB::statement('SET foreign_key_checks=1');
     }
 
-    public function testEventsRequiringModeration()
+    public function testEventsRequiringModeration(): void
     {
         // arrange
         $network = Network::factory()->create();

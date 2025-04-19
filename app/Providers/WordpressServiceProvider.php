@@ -13,7 +13,7 @@ class WordpressServiceProvider extends ServiceProvider
      *
      * @return void
      */
-    public function boot()
+    public function boot(): void
     {
         //
     }
@@ -23,7 +23,7 @@ class WordpressServiceProvider extends ServiceProvider
      *
      * @return void
      */
-    public function register()
+    public function register(): void
     {
         $this->app->singleton(WordpressClient::class, function () {
             try {

@@ -2,6 +2,8 @@
 
 namespace App\Http\Middleware;
 
+use Symfony\Component\HttpFoundation\Response;
+use Illuminate\Http\Request;
 use Closure;
 
 class HttpsProtocol
@@ -13,7 +15,7 @@ class HttpsProtocol
      * @param  \Closure  $next
      * @return mixed
      */
-    public function handle($request, Closure $next)
+    public function handle(Request $request, Closure $next): Response
     {
         if (! $request->secure() && (env('APP_ENV') === 'development' || env('APP_ENV') === 'production')) {
             return redirect()->secure($request->getRequestUri(), 301);

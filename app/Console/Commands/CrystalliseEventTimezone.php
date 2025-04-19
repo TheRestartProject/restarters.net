@@ -39,7 +39,7 @@ class CrystalliseEventTimezone extends Command
      *
      * @return mixed
      */
-    public function handle()
+    public function handle(): void
     {
         $events = Party::past()->where('timezone', null)->get();
 

@@ -41,7 +41,7 @@ class UserMakeHost extends Command
      *
      * @return mixed
      */
-    public function handle()
+    public function handle(): void
     {
         $email = $this->argument('email');
         $groupname = $this->argument('groupname');
