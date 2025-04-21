@@ -12,7 +12,7 @@ class RobustTranslator extends BaseTranslator
      *
      * @return array|null|string|void
      */
-    public function get(string $key, array $replace = [], $locale = null, bool $fallback = true)
+    public function get($key, array $replace = [], $locale = null, $fallback = true)
     {
         $translation = parent::get($key, $replace, $locale, $fallback);
 

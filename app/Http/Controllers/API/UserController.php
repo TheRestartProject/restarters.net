@@ -62,7 +62,6 @@ class UserController extends Controller
             'updated_at',
             'deleted_at',
             'api_token',
-            'drip_subscriber_id',
             'recovery',
             'recovery_expires',
             'calendar_hash',

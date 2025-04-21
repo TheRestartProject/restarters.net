@@ -13,7 +13,7 @@ class NetworkCreate extends Command
      *
      * @var string
      */
-    protected $signature = 'network:create {name} {shortname} {description} {--website=} {--language=en} {--timezone=Europe/London} {--wordpress} {--zapier} {--drip} {--auto-approve-events}';
+    protected $signature = 'network:create {name} {shortname} {description} {--website=} {--language=en} {--timezone=Europe/London} {--wordpress} {--zapier} {--auto-approve-events}';
 
     /**
      * The console command description.
@@ -45,7 +45,6 @@ class NetworkCreate extends Command
         $timezone = $this->option('timezone');
         $wordpress = $this->option('wordpress');
         $zapier = $this->option('zapier');
-        $drip = $this->option('drip');
         $autoApproveEvents = $this->option('auto-approve-events');
 
         $network = new Network();
@@ -57,7 +56,6 @@ class NetworkCreate extends Command
         $network->timezone = $timezone;
         $network->events_push_to_wordpress = $wordpress;
         $network->include_in_zapier = $zapier;
-        $network->users_push_to_drip = $drip;
         $network->auto_approve_events = $autoApproveEvents;
 
         if ($network->save()) {

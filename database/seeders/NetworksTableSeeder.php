@@ -24,7 +24,6 @@ class NetworksTableSeeder extends Seeder
             'timezone' => 'Europe/Brussels',
             'events_push_to_wordpress' => false,
             'include_in_zapier' => false,
-            'users_push_to_drip' => false,
             'shortname' => 'repairshare',
             'created_at' => Carbon::now(),
         ]);
@@ -37,7 +36,6 @@ class NetworksTableSeeder extends Seeder
             'timezone' => 'Europe/Brussels',
             'events_push_to_wordpress' => false,
             'include_in_zapier' => false,
-            'users_push_to_drip' => false,
             'shortname' => 'repairtogether',
             'created_at' => Carbon::now(),
         ]);

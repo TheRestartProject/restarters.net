@@ -7,7 +7,6 @@ use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\JsonResponse;
 use App;
 use App\Device;
-use App\DripEvent;
 use App\Events\PasswordChanged;
 use App\Events\UserLanguageUpdated;
 use App\Events\UserRegistered;
@@ -167,10 +166,6 @@ class UserController extends Controller
 
         $user = User::find($id);
 
-        if ($user->isDripSubscriber()) {
-            DripEvent::createOrUpdateSubscriber($user, true, auth()->user()->email, request()->input('email'));
-        }
-
         if (! empty($user->location)) {
             $geocoded = $geocoder->geocode("{$user->location}, " . Fixometer::getCountryFromCountryCode($user->country_code));
             if (! empty($geocoded)) {
@@ -287,10 +282,6 @@ class UserController extends Controller
         $user = User::find($id);
         $old_user_name = $user->name;
         $user_id = $user->id;
-
-        if ($user->isDripSubscriber()) {
-            $user->drip_subscriber_id = null;
-        }
 
         $user->delete(); // Will be anonymised automatically by event handlers
 
@@ -957,15 +948,6 @@ class UserController extends Controller
             $user->newsletter = 1;
         } else {
             $subscribed = false;
-        }
-
-        if (env('DRIP_API_TOKEN') !== null && env('DRIP_API_TOKEN') !== '') {
-            $activeRepairNetworkId = session()->get('repair_network');
-            $network = Network::find($activeRepairNetworkId);
-            if (! is_null($network) && $network->users_push_to_drip) {
-                $drip_subscribe_user = DripEvent::createOrUpdateSubscriber($user, $subscribed);
-                $user->drip_subscriber_id = $drip_subscribe_user->id;
-            }
         }
 
         // 'invites' refers to receiving notifications about groups or events near the user.

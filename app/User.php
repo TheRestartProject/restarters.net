@@ -40,7 +40,7 @@ class User extends Authenticatable implements Auditable, HasLocalePreference
      * @var array
      */
     protected $fillable = [
-        'name', 'email', 'password', 'role', 'recovery', 'recovery_expires', 'language', 'repair_network', 'location', 'age', 'gender', 'country_code', 'newsletter', 'drip_subscriber_id', 'invites', 'biography', 'consent_future_data', 'consent_past_data', 'consent_gdpr', 'number_of_logins', 'latitude', 'longitude', 'last_login_at', 'api_token', 'access_group_tag_id', 'calendar_hash', 'repairdir_role', 'mediawiki', 'username',
+        'name', 'email', 'password', 'role', 'recovery', 'recovery_expires', 'language', 'repair_network', 'location', 'age', 'gender', 'country_code', 'newsletter', 'invites', 'biography', 'consent_future_data', 'consent_past_data', 'consent_gdpr', 'number_of_logins', 'latitude', 'longitude', 'last_login_at', 'api_token', 'access_group_tag_id', 'calendar_hash', 'repairdir_role', 'mediawiki', 'username',
     ];
 
     /**
@@ -439,11 +439,6 @@ class User extends Authenticatable implements Auditable, HasLocalePreference
         }
 
         $this->username = $username;
-    }
-
-    public function isDripSubscriber()
-    {
-        return ! is_null($this->drip_subscriber_id);
     }
 
     public function isRepairDirectoryNone()

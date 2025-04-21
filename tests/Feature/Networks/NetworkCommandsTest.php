@@ -13,7 +13,7 @@ use function PHPUnit\Framework\assertTrue;
 
 class NetworkCommandsTest extends TestCase {
     public function testCreate(): void {
-        $this->artisan('network:create testname testshortname "test description" --website="https://therestartproject.org" --language=fr --timezone="Asia/Samarkand" --wordpress --zapier --drip --auto-approve-events')->assertExitCode(0);
+        $this->artisan('network:create testname testshortname "test description" --website="https://therestartproject.org" --language=fr --timezone="Asia/Samarkand" --wordpress --zapier --auto-approve-events')->assertExitCode(0);
         $network = Network::orderBy('id', 'desc')->first();
         $this->assertEquals('testname', $network->name);
         $this->assertEquals('testshortname', $network->shortname);
@@ -23,12 +23,11 @@ class NetworkCommandsTest extends TestCase {
         $this->assertEquals('Asia/Samarkand', $network->timezone);
         $this->assertEquals(true, $network->events_push_to_wordpress);
         $this->assertEquals(true, $network->include_in_zapier);
-        $this->assertEquals(true, $network->users_push_to_drip);
         $this->assertEquals(true, $network->auto_approve_events);
     }
 
     public function testNetworkCoordinator(): void {
-        $this->artisan('network:create testname testshortname "test description" --website="https://therestartproject.org" --language=fr --timezone="Asia/Samarkand" --wordpress --zapier --drip --auto-approve-events')->assertExitCode(0);
+        $this->artisan('network:create testname testshortname "test description" --website="https://therestartproject.org" --language=fr --timezone="Asia/Samarkand" --wordpress --zapier --auto-approve-events')->assertExitCode(0);
         $network = Network::orderBy('id', 'desc')->first();
 
         $group = Group::factory()->create();
@@ -42,7 +41,7 @@ class NetworkCommandsTest extends TestCase {
     }
 
     public function testAddGroup(): void {
-        $this->artisan('network:create testname testshortname "test description" --website="https://therestartproject.org" --language=fr --timezone="Asia/Samarkand" --wordpress --zapier --drip --auto-approve-events')->assertExitCode(0);
+        $this->artisan('network:create testname testshortname "test description" --website="https://therestartproject.org" --language=fr --timezone="Asia/Samarkand" --wordpress --zapier --auto-approve-events')->assertExitCode(0);
         $network = Network::orderBy('id', 'desc')->first();
 
         $group = Group::factory()->create();
