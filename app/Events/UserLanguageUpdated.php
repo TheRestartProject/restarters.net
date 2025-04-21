@@ -32,6 +32,8 @@ class UserLanguageUpdated
      */
     public function broadcastOn(): array
     {
-        return new PrivateChannel('channel-name');
+        return [
+            new PrivateChannel('channel-name'),
+        ];
     }
 }
