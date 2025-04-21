@@ -12,7 +12,7 @@ use Tests\TestCase;
 
 class LoginTest extends TestCase
 {
-    public function testLogin()
+    public function testLogin(): void
     {
         $restarter = User::factory()->restarter()->create([
             'password' => Hash::make('passw0rd'),

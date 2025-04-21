@@ -11,10 +11,8 @@ return new class extends Migration
 
     /**
      * Run the migrations.
-     *
-     * @return void
      */
-    public function up()
+    public function up(): void
     {
         Log::info('START MIGRATE AlterTableCharsets');
 
@@ -32,10 +30,8 @@ return new class extends Migration
 
     /**
      * Reverse the migrations.
-     *
-     * @return void
      */
-    public function down()
+    public function down(): void
     {
         $tables = $this->_tableCharsets();
         foreach ($tables as $table) {
@@ -135,10 +131,8 @@ return new class extends Migration
 
     /**
      * Report char issues.
-     *
-     * @return void
      */
-    private function _report($prefix = '', $suffix = '')
+    private function _report($prefix = '', $suffix = ''): void
     {
         $tables = $this->_dataTables();
         $format = 'SELECT
@@ -151,7 +145,7 @@ return new class extends Migration
             $key = $fields['key'];
             foreach ($fields['fields'] as $field) {
                 $qry = sprintf($format, $table, $field, $key);
-                $result = DB::select(DB::raw($qry));
+                $result = DB::select($qry);
                 $log = [];
                 foreach ($result as $v) {
                     $log[$v->id] = $v->val;

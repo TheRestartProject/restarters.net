@@ -9,11 +9,11 @@ use DB;
 use Tests\TestCase;
 
 class DiscourseTest extends TestCase {
-    public function testSyncDiscourseUsernames() {
+    public function testSyncDiscourseUsernames(): void {
         $this->artisan('sync:discourseusernames')->assertExitCode(0);
     }
 
-    public function testDiscourseSyncGroups() {
+    public function testDiscourseSyncGroups(): void {
         $user = User::factory()->administrator()->create([
             'api_token' => '1234',
         ]);
@@ -21,7 +21,7 @@ class DiscourseTest extends TestCase {
         $idgroups = $this->createGroup();
         $group = Group::findOrFail($idgroups);
 
-        $this->artisan('network:create testname testshortname "test description" --website="https://therestartproject.org" --language=fr --timezone="Asia/Samarkand" --wordpress --zapier --drip --auto-approve-events')->assertExitCode(0);
+        $this->artisan('network:create testname testshortname "test description" --website="https://therestartproject.org" --language=fr --timezone="Asia/Samarkand" --wordpress --zapier --auto-approve-events')->assertExitCode(0);
         $network = Network::orderBy('id', 'desc')->first();
         $network->discourse_group = 1234;
         $network->save();

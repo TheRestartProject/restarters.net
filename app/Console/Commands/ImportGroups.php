@@ -35,10 +35,8 @@ class ImportGroups extends Command
 
     /**
      * Execute the console command.
-     *
-     * @return mixed
      */
-    public function handle()
+    public function handle(): void
     {
         $input = $this->argument('input');
         $inputFile = fopen($input, 'r');

@@ -18,7 +18,7 @@ class AlertsTest extends TestCase
         Cache::clear('alerts');
     }
 
-    public function testListNonePresent()
+    public function testListNonePresent(): void
     {
         // List - no alerts present.
         $response = $this->get('/api/v2/alerts');
@@ -31,7 +31,7 @@ class AlertsTest extends TestCase
     /**
      * @dataProvider roleProvider
      */
-    public function testCreate($role, $allowed) {
+    public function testCreate($role, $allowed): void {
         $user = null;
         $tokenstr = null;
 
@@ -89,7 +89,7 @@ class AlertsTest extends TestCase
         }
     }
 
-    public function roleProvider() {
+    public function roleProvider(): array {
         return [
             [ Role::GUSET, FALSE ],
             [ Role::RESTARTER, FALSE ],
@@ -99,7 +99,7 @@ class AlertsTest extends TestCase
         ];
     }
 
-    public function testArtisan() {
+    public function testArtisan(): void {
         $this->artisan('alert:create', [
             'title' => 'Test alert',
             'html' => '<p>Test alert</p>',

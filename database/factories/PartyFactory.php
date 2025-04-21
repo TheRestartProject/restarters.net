@@ -10,10 +10,8 @@ class PartyFactory extends Factory
 {
     /**
      * Configure the model factory.
-     *
-     * @return $this
      */
-    public function configure()
+    public function configure(): static
     {
         return $this->afterMaking(function ($model)
         {
@@ -50,10 +48,8 @@ class PartyFactory extends Factory
 
     /**
      * Define the model's default state.
-     *
-     * @return array
      */
-    public function definition()
+    public function definition(): array
     {
         return [
             // Need to force the location otherwise the random one may not be geocodable and therefore the event may not

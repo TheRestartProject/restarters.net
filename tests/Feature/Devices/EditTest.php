@@ -30,7 +30,7 @@ class EditTest extends TestCase
         $this->withoutExceptionHandling();
     }
 
-    public function testEdit()
+    public function testEdit(): void
     {
         $iddevices = $this->createDevice($this->event->idevents, 'misc');
 
@@ -56,7 +56,7 @@ class EditTest extends TestCase
         $this->deleteDevice($iddevices);
     }
 
-    public function testEditAsNetworkCoordinator()
+    public function testEditAsNetworkCoordinator(): void
     {
         $network = Network::factory()->create();
         $group = Group::factory()->create();
@@ -83,7 +83,7 @@ class EditTest extends TestCase
         $response->assertSuccessful();
     }
 
-    public function testDeviceEditAddImage() {
+    public function testDeviceEditAddImage(): void {
         Storage::fake('avatars');
         $user = User::factory()->administrator()->create();
         $this->actingAs($user);
@@ -146,7 +146,7 @@ class EditTest extends TestCase
         $this->assertEquals('Thank you, the image has been deleted', \Session::get('message'));
     }
 
-    public function testDeviceAddAddImage() {
+    public function testDeviceAddAddImage(): void {
         Storage::fake('avatars');
         $user = User::factory()->administrator()->create();
         $this->actingAs($user);
@@ -202,7 +202,7 @@ class EditTest extends TestCase
         $this->assertEquals('Thank you, the image has been deleted', \Session::get('message'));
     }
 
-    public function testNextSteps() {
+    public function testNextSteps(): void {
         $iddevices = $this->createDevice($this->event->idevents, 'misc');
 
         # Edit the repair details to say more time needed
@@ -245,7 +245,7 @@ class EditTest extends TestCase
         self::assertEquals(0, $device->more_time_needed);
     }
 
-    public function testQueuedJobForDeletedEvent()
+    public function testQueuedJobForDeletedEvent(): void
     {
         $this->loginAsTestUser(Role::ADMINISTRATOR);
         $id = $this->createGroup();

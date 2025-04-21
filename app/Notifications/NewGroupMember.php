@@ -10,9 +10,8 @@ class NewGroupMember extends BaseNotification
      * Get the mail representation of the notification.
      *
      * @param mixed $notifiable
-     * @return \Illuminate\Notifications\Messages\MailMessage
      */
-    public function toMail($notifiable)
+    public function toMail($notifiable): MailMessage
     {
         $locale = $notifiable->language;
 
@@ -41,9 +40,8 @@ class NewGroupMember extends BaseNotification
      * Get the array representation of the notification.
      *
      * @param mixed $notifiable
-     * @return array
      */
-    public function toArray($notifiable)
+    public function toArray($notifiable): array
     {
         return [
             'title' => __('notifications.new_member_title', [

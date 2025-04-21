@@ -12,7 +12,7 @@ use Tests\TestCase;
 
 class GroupViewTest extends TestCase
 {
-    public function testBasic()
+    public function testBasic(): void
     {
         // Check we can create a group and view it.
         $this->loginAsTestUser(Role::ADMINISTRATOR);
@@ -53,21 +53,21 @@ class GroupViewTest extends TestCase
         $this->assertEquals(1, count(json_decode($props[1][':events'], TRUE)));
     }
 
-    public function testInvalidGroup()
+    public function testInvalidGroup(): void
     {
         $this->loginAsTestUser(Role::RESTARTER);
         $this->expectException(NotFoundHttpException::class);
         $this->get('/group/view/undefined');
     }
 
-    public function testInvalidGroup2()
+    public function testInvalidGroup2(): void
     {
         $this->loginAsTestUser(Role::RESTARTER);
         $this->expectException(NotFoundHttpException::class);
         $this->get('/group/view/1');
     }
 
-    public function testCanDelete()
+    public function testCanDelete(): void
     {
         $this->loginAsTestUser(Role::ADMINISTRATOR);
         $id = $this->createGroup();
@@ -139,7 +139,7 @@ class GroupViewTest extends TestCase
         }
     }
 
-    public function testInProgressVisible() {
+    public function testInProgressVisible(): void {
         $this->loginAsTestUser(Role::ADMINISTRATOR);
         $id = $this->createGroup();
         $this->assertNotNull($id);

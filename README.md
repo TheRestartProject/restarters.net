@@ -51,5 +51,3 @@ by the Shuttleworth Foundation, and by Nesta and the Department for Digital,
 Culture, Media & Sport.  
 
 [![CircleCI](https://circleci.com/gh/TheRestartProject/restarters.net/tree/develop.svg?style=svg)](https://circleci.com/gh/TheRestartProject/restarters.net/?branch=develop)
-
-[![Coverage Status](https://coveralls.io/repos/github/TheRestartProject/restarters.net/badge.svg?branch=master)](https://coveralls.io/github/TheRestartProject/restarters.net?branch=master)

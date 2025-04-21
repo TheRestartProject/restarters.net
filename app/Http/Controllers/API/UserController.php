@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\API;
 
+use Illuminate\Http\JsonResponse;
 use App\Http\Controllers\Controller;
 use App\User;
 use Auth;
@@ -61,7 +62,6 @@ class UserController extends Controller
             'updated_at',
             'deleted_at',
             'api_token',
-            'drip_subscriber_id',
             'recovery',
             'recovery_expires',
             'calendar_hash',
@@ -91,12 +91,8 @@ class UserController extends Controller
 
     /**
      * Get notification counts for a user.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
      */
-    public function notifications(Request $request, $id)
+    public function notifications(Request $request, int $id): JsonResponse
     {
         $user = User::findOrFail($id);
         $restartersNotifications = $user->unReadNotifications->count();

@@ -30,7 +30,7 @@ class CoordinatorTest extends TestCase
     }
 
     /** @test */
-    public function it_can_find_relevant_coordinators()
+    public function it_can_find_relevant_coordinators(): void
     {
         // arrange
         $network = Network::factory()->create();
@@ -49,7 +49,7 @@ class CoordinatorTest extends TestCase
     }
 
     /** @test */
-    public function promote_to_coordinator()
+    public function promote_to_coordinator(): void
     {
         // arrange
         $network = Network::factory()->create();

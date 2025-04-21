@@ -2,6 +2,7 @@
 
 namespace App;
 
+use Illuminate\Database\Eloquent\Relations\HasOne;
 use DB;
 use Illuminate\Database\Eloquent\Model;
 
@@ -25,7 +26,7 @@ class UsersSkills extends Model
     public $timestamps = false;
 
     //Table Relations
-    public function skillName()
+    public function skillName(): HasOne
     {
         return $this->hasOne(\App\Skills::class, 'id', 'skill');
     }

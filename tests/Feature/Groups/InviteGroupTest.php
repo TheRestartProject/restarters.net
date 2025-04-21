@@ -18,7 +18,7 @@ use Illuminate\Validation\ValidationException;
 
 class InviteGroupTest extends TestCase
 {
-    public function testInvite()
+    public function testInvite(): void
     {
         Notification::fake();
         $this->withoutExceptionHandling();
@@ -131,7 +131,7 @@ class InviteGroupTest extends TestCase
         );
     }
 
-    public function testInviteViaLink() {
+    public function testInviteViaLink(): void {
         $group = Group::factory()->create();
 
         $unique_shareable_code = Fixometer::generateUniqueShareableCode(\App\Group::class, 'shareable_code');
@@ -160,7 +160,7 @@ class InviteGroupTest extends TestCase
     /**
      * @dataProvider invalidEmailProvider
      */
-    public function testInviteInvalidEmail($email, $valid)
+    public function testInviteInvalidEmail($email, $valid): void
     {
         $this->loginAsTestUser(Role::ADMINISTRATOR);
 
@@ -179,7 +179,7 @@ class InviteGroupTest extends TestCase
         ]);
     }
 
-    public function invalidEmailProvider()
+    public function invalidEmailProvider(): array
     {
         return [
             ['test@test.com', true],
@@ -189,7 +189,7 @@ class InviteGroupTest extends TestCase
         ];
     }
 
-    public function testInviteNearby() {
+    public function testInviteNearby(): void {
         $this->loginAsTestUser(Role::ADMINISTRATOR);
 
         $idgroups = $this->createGroup();

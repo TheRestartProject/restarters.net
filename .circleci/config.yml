@@ -200,9 +200,6 @@ jobs:
            command: export XDEBUG_MODE=coverage;./phpunit -d memory_limit=1024M --bootstrap vendor/autoload.php --coverage-clover tests/clover.xml --configuration ./phpunit.xml
            no_output_timeout: 45m
 
-      # Coveralls is pernickety about the location it uploads from existing.
-      - run: mkdir build; mkdir build/logs; php vendor/bin/php-coveralls -v -x tests/clover.xml
-
       # Run the Jest tests.
       - run: npm run jest
 

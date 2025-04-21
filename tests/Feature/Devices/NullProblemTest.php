@@ -27,7 +27,7 @@ class NullProblemTest extends TestCase
     }
 
     /** @test */
-    public function null_problem_mapped_to_empty_string()
+    public function null_problem_mapped_to_empty_string(): void
     {
         $iddevices = $this->createDevice($this->event->idevents, 'misc', null, 1, 100, null);
         $iddevices = Device::latest()->first()->iddevices;

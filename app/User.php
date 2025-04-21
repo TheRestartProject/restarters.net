@@ -2,6 +2,9 @@
 
 namespace App;
 
+use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\HasOne;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use App\Events\UserDeleted;
 use App\Events\UserUpdated;
@@ -37,7 +40,7 @@ class User extends Authenticatable implements Auditable, HasLocalePreference
      * @var array
      */
     protected $fillable = [
-        'name', 'email', 'password', 'role', 'recovery', 'recovery_expires', 'language', 'repair_network', 'location', 'age', 'gender', 'country_code', 'newsletter', 'drip_subscriber_id', 'invites', 'biography', 'consent_future_data', 'consent_past_data', 'consent_gdpr', 'number_of_logins', 'latitude', 'longitude', 'last_login_at', 'api_token', 'access_group_tag_id', 'calendar_hash', 'repairdir_role', 'mediawiki', 'username',
+        'name', 'email', 'password', 'role', 'recovery', 'recovery_expires', 'language', 'repair_network', 'location', 'age', 'gender', 'country_code', 'newsletter', 'invites', 'biography', 'consent_future_data', 'consent_past_data', 'consent_gdpr', 'number_of_logins', 'latitude', 'longitude', 'last_login_at', 'api_token', 'access_group_tag_id', 'calendar_hash', 'repairdir_role', 'mediawiki', 'username',
     ];
 
     /**
@@ -70,7 +73,7 @@ class User extends Authenticatable implements Auditable, HasLocalePreference
         'deleted' => UserDeleted::class,
     ];
 
-    public function role()
+    public function role(): HasOne
     {
         return $this->hasOne(\App\Role::class, 'idroles', 'role');
     }
@@ -81,19 +84,19 @@ class User extends Authenticatable implements Auditable, HasLocalePreference
         return $this->repairdir_role ? $this->repairdir_role : Role::REPAIR_DIRECTORY_NONE;
     }
 
-    public function userSkills()
+    public function userSkills(): HasMany
     {
         return $this->hasMany(\App\UsersSkills::class, 'user', 'id');
     }
 
-    public function skills()
+    public function skills(): BelongsToMany
     {
         return $this->belongsToMany(\App\Skills::class, 'users_skills', 'user', 'skill');
     }
 
     // This is an incorrect relationship, but leaving it here for now as it is used in a strange way in two legacy places and apparently working in those instances somehow.
     // Use skills() for correct belongsToMany relationship.
-    public function skillsold()
+    public function skillsold(): BelongsToMany
     {
         return $this->belongsToMany(\App\UsersSkills::class, 'users_skills', 'user', 'skill');
     }
@@ -110,7 +113,7 @@ class User extends Authenticatable implements Auditable, HasLocalePreference
         }
     }
 
-    public function groups()
+    public function groups(): BelongsToMany
     {
         return $this->belongsToMany(\App\Group::class, 'users_groups', 'user', 'group');
     }
@@ -121,14 +124,14 @@ class User extends Authenticatable implements Auditable, HasLocalePreference
      * @param int $numberOfGroups How many groups to return
      * @param string String of minimum creation date
      */
-    public function groupsNearby($numberOfGroups = 10, $createdSince = null, $nearby = self::NEARBY_KM)
+    public function groupsNearby(int $numberOfGroups = 10, $createdSince = null, $nearby = self::NEARBY_KM)
     {
         if (is_null($this->latitude) || is_null($this->longitude)) {
             return [];
         }
 
         $groupsNearbyQuery = Group::select(
-            DB::raw('*, ( 6371 * acos( cos( radians('.$this->latitude.') ) * cos( radians( latitude ) ) * cos( radians( longitude ) - radians('.$this->longitude.') ) + sin( radians('.$this->latitude.') ) * sin( radians( latitude ) ) ) ) AS dist')
+            '*, ( 6371 * acos( cos( radians('.$this->latitude.' ) * cos( radians( latitude ) ) * cos( radians( longitude ) - radians('.$this->longitude.') ) + sin( radians('.$this->latitude.') ) * sin( radians( latitude ) ) ) ) AS dist'
         )->where(function ($q) {
             $q->whereNull('archived_at');
 
@@ -165,12 +168,12 @@ class User extends Authenticatable implements Auditable, HasLocalePreference
         return $groupsNearby;
     }
 
-    public function preferences()
+    public function preferences(): BelongsToMany
     {
         return $this->belongsToMany(self::class, 'users_preferences', 'user_id', 'preference_id');
     }
 
-    public function permissions()
+    public function permissions(): BelongsToMany
     {
         return $this->belongsToMany(self::class, 'users_permissions', 'user_id', 'permission_id');
     }
@@ -187,18 +190,18 @@ class User extends Authenticatable implements Auditable, HasLocalePreference
 
     public function getRolePermissions($role)
     {
-        return DB::select(DB::raw('SELECT p.idpermissions, p.permission, r.idroles, r.role FROM permissions AS p
+        return DB::select('SELECT p.idpermissions, p.permission, r.idroles, r.role FROM permissions AS p
                 INNER JOIN roles_permissions AS rp ON rp.permission = p.idpermissions
                 INNER JOIN roles AS r ON rp.role= r.idroles
-                WHERE r.role = :role'), ['role' => $role]);
+                WHERE r.role = :role', ['role' => $role]);
     }
 
     public function getUserGroups($user)
     {
-        return DB::select(DB::raw('SELECT * FROM `'.$this->table.'` AS `u`
+        return DB::select('SELECT * FROM `'.$this->table.'` AS `u`
                 INNER JOIN `users_groups` AS `ug` ON `ug`.`user` = `u`.`id`
                 INNER JOIN `groups` AS `g` ON `ug`.`group` = `g`.`idgroups`
-                WHERE `u`.`id` = :id'), ['id' => $user]);
+                WHERE `u`.`id` = :id', ['id' => $user]);
     }
 
     // Setters
@@ -238,7 +241,7 @@ class User extends Authenticatable implements Auditable, HasLocalePreference
     //     $sql .= implode(' AND ', $clauses);
     //
     //     try {
-    //       return DB::select(DB::raw($sql), $params);
+    //       return DB::select($sql, $params);
     //     } catch (\Illuminate\Database\QueryException $e) {
     //       return false;
     //     }
@@ -249,9 +252,9 @@ class User extends Authenticatable implements Auditable, HasLocalePreference
         //Tested!
 
         if (! $eloquent) {
-            $Users = DB::select(DB::raw('SELECT users.id AS id, users.name, users.email, roles.role FROM users
+            $Users = DB::select('SELECT users.id AS id, users.name, users.email, roles.role FROM users
                   INNER JOIN roles ON roles.idroles = users.role WHERE users.deleted_at IS NULL
-                  ORDER BY users.id ASC')); //INNER JOIN sessions ON sessions.user = users.id, UNIX_TIMESTAMP(sessions.modified_at) AS modified_at
+                  ORDER BY users.id ASC'); //INNER JOIN sessions ON sessions.user = users.id, UNIX_TIMESTAMP(sessions.modified_at) AS modified_at
 
             if (is_array($Users)) {
                 $User = new self;
@@ -269,7 +272,7 @@ class User extends Authenticatable implements Auditable, HasLocalePreference
     public function partyEligible()
     {
         //Tested!
-        return DB::select(DB::raw('SELECT
+        return DB::select('SELECT
                   users.id AS id,
                   users.name,
                   users.email,
@@ -277,12 +280,12 @@ class User extends Authenticatable implements Auditable, HasLocalePreference
               FROM '.$this->table.'
               INNER JOIN roles ON roles.idroles = users.role
               WHERE users.role > 1
-              ORDER BY users.name ASC'));
+              ORDER BY users.name ASC');
     }
 
     public function inGroup($group)
     {
-        return DB::select(DB::raw('SELECT
+        return DB::select('SELECT
                     users.id AS id,
                     users.name,
                     users.email,
@@ -292,7 +295,7 @@ class User extends Authenticatable implements Auditable, HasLocalePreference
                 WHERE users.role > 1
                     AND users.id IN
                         (SELECT `user` FROM users_groups WHERE `group` = :group)
-                ORDER BY users.name ASC'), ['group' => $group]);
+                ORDER BY users.name ASC', ['group' => $group]);
     }
 
     public function isInGroup($groupId)
@@ -309,14 +312,14 @@ class User extends Authenticatable implements Auditable, HasLocalePreference
     {
         //Tested!
 
-        $r = DB::select(DB::raw('SELECT COUNT(id) AS emails FROM '.$this->table.' WHERE email = :email'), ['email' => $email]);
+        $r = DB::select('SELECT COUNT(id AS emails FROM '.$this->table.' WHERE email = :email', ['email' => $email]);
 
         return ($r[0]->emails > 0) ? false : true;
     }
 
     public function scopeNearbyRestarters($query, $latitude, $longitude, $radius = 20)
     {
-        return $query->select(DB::raw('*, ( 6371 * acos( cos( radians('.$latitude.') ) * cos( radians( latitude ) ) * cos( radians( longitude ) - radians('.$longitude.') ) + sin( radians('.$latitude.') ) * sin( radians( latitude ) ) ) ) AS distance'))
+        return $query->select('*, ( 6371 * acos( cos( radians('.$latitude.' ) * cos( radians( latitude ) ) * cos( radians( longitude ) - radians('.$longitude.') ) + sin( radians('.$latitude.') ) * sin( radians( latitude ) ) ) ) AS distance')
                         ->whereNotNull('location')
                           ->whereNotNull('latitude')
                             ->whereNotNull('longitude')
@@ -349,7 +352,7 @@ class User extends Authenticatable implements Auditable, HasLocalePreference
     /**
      * @return Date when the user last logged in
      */
-    public function lastLogin()
+    public function lastLogin(): Date
     {
         return new \Carbon\Carbon($this->last_login_at);
     }
@@ -402,7 +405,7 @@ class User extends Authenticatable implements Auditable, HasLocalePreference
         }
     }
 
-    public function groupTag()
+    public function groupTag(): HasOne
     {
         return $this->hasOne(GroupTags::class, 'id', 'access_group_tag_id');
     }
@@ -436,11 +439,6 @@ class User extends Authenticatable implements Auditable, HasLocalePreference
         }
 
         $this->username = $username;
-    }
-
-    public function isDripSubscriber()
-    {
-        return ! is_null($this->drip_subscriber_id);
     }
 
     public function isRepairDirectoryNone()
@@ -512,7 +510,7 @@ class User extends Authenticatable implements Auditable, HasLocalePreference
         return $this->networks->contains($network);
     }
 
-    public function networks()
+    public function networks(): BelongsToMany
     {
         return $this->belongsToMany(Network::class, 'user_network', 'user_id', 'network_id');
     }
@@ -566,10 +564,8 @@ class User extends Authenticatable implements Auditable, HasLocalePreference
 
     /**
      * Get the user's preferred locale.  This is automatically used by email notifications.
-     *
-     * @return string
      */
-    public function preferredLocale()
+    public function preferredLocale(): string
     {
         // TODO Use of preferredLocale should mean we don't have to explicitly pass the locale.  But that isn't
         // working.  So at the moment we are passing a locale explicitly in the translations in the notifications

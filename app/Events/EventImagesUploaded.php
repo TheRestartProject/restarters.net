@@ -19,11 +19,7 @@ class EventImagesUploaded
      */
     public $auth_user_id;
 
-    /**
-     * @param Party $party
-     * @param int $auth_user_id
-     */
-    public function __construct(Party $party, $auth_user_id)
+    public function __construct(Party $party, int $auth_user_id)
     {
         $this->party = $party;
         $this->auth_user_id = $auth_user_id;

@@ -26,10 +26,8 @@ class SetRepairTogetherPasswords extends Command
 
     /**
      * Execute the console command.
-     *
-     * @return mixed
      */
-    public function handle()
+    public function handle(): void
     {
         $users = User::where('repair_network', 3)
                ->where('password', '')

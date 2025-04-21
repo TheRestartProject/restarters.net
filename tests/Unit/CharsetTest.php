@@ -22,7 +22,7 @@ class CharsetTest extends TestCase
     }
 
     /** @test */
-    public function test_charset_db_insert()
+    public function test_charset_db_insert(): void
     {
         DB::statement('SET foreign_key_checks=0');
 

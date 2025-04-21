@@ -5,7 +5,7 @@ return [
   'login' => 'Login',
   'delete_account' => 'Delete account',
   'failed' => 'Either this email address isn\'t registered on the system or the password is incorrect.',
-  'throttle' => 'Too many login attempts. Please try again in :seconds seconds.',
+  
   'email_address' => 'Email address',
   'sign_in' => 'I remembered.  Let me sign in',
   'forgotten_pw' => 'Forgotten your password?',

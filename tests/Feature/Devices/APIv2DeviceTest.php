@@ -30,7 +30,7 @@ class APIv2DeviceTest extends TestCase
      *
      * @dataProvider providerDevice
      */
-    public function testGetDevice($repair_status_str, $parts_provider_str, $next_steps_str, $barrierstr) {
+    public function testGetDevice($repair_status_str, $parts_provider_str, $next_steps_str, $barrierstr): void {
         $this->loginAsTestUser(Role::ADMINISTRATOR);
         $idGroup = $this->createGroup();
         $this->assertNotNull($idGroup);
@@ -151,7 +151,7 @@ class APIv2DeviceTest extends TestCase
      *
      * @dataProvider providerDevice
      */
-    public function testCreate($repair_status_str, $parts_provider_str, $next_steps_str, $barrierstr) {
+    public function testCreate($repair_status_str, $parts_provider_str, $next_steps_str, $barrierstr): void {
         $this->loginAsTestUser(Role::ADMINISTRATOR);
         $idGroup = $this->createGroup();
         $this->assertNotNull($idGroup);
@@ -218,7 +218,7 @@ class APIv2DeviceTest extends TestCase
         }
     }
 
-    public function providerDevice()
+    public function providerDevice(): array
     {
         // Possible combinations of inputs for repair status, spare parts, next steps and barriers to repair fields.
         //

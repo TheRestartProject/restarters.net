@@ -19,7 +19,7 @@ class CountsTest extends TestCase
     // Event counts should only include events in the past.
 
     /** @test */
-    public function it_can_check_if_event_counts_past()
+    public function it_can_check_if_event_counts_past(): void
     {
         // Create a group and an event on it.
         $network = Network::factory()->create();

@@ -2,6 +2,8 @@
 
 namespace App;
 
+use Illuminate\Database\Eloquent\Relations\HasOne;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use App\Events\DeviceCreatedOrUpdated;
 use DB;
@@ -96,7 +98,7 @@ class Device extends Model implements Auditable
     public function ofThisEvent($event)
     {
         //Tested
-        return DB::select(DB::raw('SELECT * FROM `'.$this->table.'` AS `d`
+        return DB::select("SELECT * FROM `{$this->table}` AS `d`
                 INNER JOIN `categories` AS `c` ON `c`.`idcategories` = `d`.`category`
                 LEFT JOIN (
                   SELECT * FROM xref
@@ -104,22 +106,22 @@ class Device extends Model implements Auditable
                     WHERE object_type = '.env('TBL_IMAGES').' AND reference_type = '.env('TBL_DEVICES').'
                   ) AS i ON i.reference = d.iddevices
 
-                WHERE `event` = :event'), ['event' => $event]);
+                WHERE `event` = :event", ['event' => $event]);
     }
 
     public function ofThisGroup($group)
     {
         //Tested
-        return DB::select(DB::raw('SELECT * FROM `'.$this->table.'` AS `d`
+        return DB::select("SELECT * FROM `{$this->table}` AS `d`
                 INNER JOIN `categories` AS `c` ON `c`.`idcategories` = `d`.`category`
                 INNER JOIN `events` AS `e` ON `e`.`idevents` = `d`.`event`
-                WHERE `group` = :group'), ['group' => $group]);
+                WHERE `group` = :group", ['group' => $group]);
     }
 
     public function statusCount($g = null, $year = null)
     {
-        $sql = 'SELECT COUNT(*) AS `counter`, `d`.`repair_status` AS `status`, `d`.`event`
-                FROM `'.$this->table.'` AS `d`';
+        $sql = "SELECT COUNT(*) AS `counter`, `d`.`repair_status` AS `status`, `d`.`event`
+                FROM `{$this->table}` AS `d`";
 
         $sql .= ' INNER JOIN `events` AS `e` ON `e`.`idevents` = `d`.`event` ';
         $sql .= ' WHERE `repair_status` > 0 ';
@@ -141,14 +143,14 @@ class Device extends Model implements Auditable
         }
 
         if (! is_null($g) && is_numeric($g) && is_null($year)) {
-            return DB::select(DB::raw($sql), ['g' => $g]);
+            return DB::select($sql, ['g' => $g]);
         } elseif (! is_null($year) && is_numeric($year) && is_null($g)) {
-            return DB::select(DB::raw($sql), ['year' => $year]);
+            return DB::select($sql, ['year' => $year]);
         } elseif (! is_null($year) && is_numeric($year) && ! is_null($g) && is_numeric($g)) {
-            return DB::select(DB::raw($sql), ['year' => $year, 'g' => $g]);
+            return DB::select($sql, ['year' => $year, 'g' => $g]);
         }
 
-        return DB::select(DB::raw($sql));
+        return DB::select($sql);
     }
 
     public function countByCluster($cluster, $group = null, $year = null)
@@ -172,14 +174,14 @@ class Device extends Model implements Auditable
                 ';
 
         if (! is_null($group) && is_numeric($group) && is_null($year)) {
-            return DB::select(DB::raw($sql), ['group' => $group, 'cluster' => $cluster]);
+            return DB::select($sql, ['group' => $group, 'cluster' => $cluster]);
         } elseif (! is_null($year) && is_numeric($year) && is_null($group)) {
-            return DB::select(DB::raw($sql), ['year' => $year, 'cluster' => $cluster]);
+            return DB::select($sql, ['year' => $year, 'cluster' => $cluster]);
         } elseif (! is_null($year) && is_numeric($year) && ! is_null($group) && is_numeric($group)) {
-            return DB::select(DB::raw($sql), ['year' => $year, 'group' => $group, 'cluster' => $cluster]);
+            return DB::select($sql, ['year' => $year, 'group' => $group, 'cluster' => $cluster]);
         }
 
-        return DB::select(DB::raw($sql), ['cluster' => $cluster]);
+        return DB::select($sql, ['cluster' => $cluster]);
     }
 
     public function countByClustersYearStatus($group)
@@ -193,7 +195,7 @@ class Device extends Model implements Auditable
             GROUP BY `cluster`, YEAR(`event_start_utc`) , `repair_status`
             ORDER BY `year` ASC, `repair_status` ASC;";
 
-        return DB::select(DB::raw($sql), ['group' => $group]);
+        return DB::select($sql, ['group' => $group]);
     }
 
     public function findMostSeen($status = null, $cluster = null, $group = null)
@@ -222,38 +224,38 @@ class Device extends Model implements Auditable
 
         if (! is_null($cluster) && is_numeric($cluster)) {
             if (! is_null($group) && is_numeric($group) && is_null($status)) {
-                return DB::select(DB::raw($sql), ['group' => $group, 'cluster' => $cluster]);
+                return DB::select($sql, ['group' => $group, 'cluster' => $cluster]);
             } elseif (! is_null($status) && is_numeric($status) && is_null($group)) {
-                return DB::select(DB::raw($sql), ['status' => $status, 'cluster' => $cluster]);
+                return DB::select($sql, ['status' => $status, 'cluster' => $cluster]);
             } elseif (! is_null($status) && is_numeric($status) && ! is_null($group) && is_numeric($group)) {
-                return DB::select(DB::raw($sql), ['status' => $status, 'group' => $group, 'cluster' => $cluster]);
+                return DB::select($sql, ['status' => $status, 'group' => $group, 'cluster' => $cluster]);
             }
 
-            return DB::select(DB::raw($sql), ['cluster' => $cluster]);
+            return DB::select($sql, ['cluster' => $cluster]);
         } else {
             if (! is_null($group) && is_numeric($group) && is_null($status)) {
-                return DB::select(DB::raw($sql), ['group' => $group]);
+                return DB::select($sql, ['group' => $group]);
             } elseif (! is_null($status) && is_numeric($status) && is_null($group)) {
-                return DB::select(DB::raw($sql), ['status' => $status]);
+                return DB::select($sql, ['status' => $status]);
             } elseif (! is_null($status) && is_numeric($status) && ! is_null($group) && is_numeric($group)) {
-                return DB::select(DB::raw($sql), ['status' => $status, 'group' => $group]);
+                return DB::select($sql, ['status' => $status, 'group' => $group]);
             }
 
-            return DB::select(DB::raw($sql));
+            return DB::select($sql);
         }
     }
 
-    public function deviceCategory()
+    public function deviceCategory(): HasOne
     {
         return $this->hasOne(\App\Category::class, 'idcategories', 'category');
     }
 
-    public function deviceEvent()
+    public function deviceEvent(): HasOne
     {
         return $this->hasOne(\App\Party::class, 'idevents', 'event');
     }
 
-    public function barriers()
+    public function barriers(): BelongsToMany
     {
         return $this->belongsToMany(\App\Barrier::class, 'devices_barriers', 'device_id', 'barrier_id');
     }
@@ -459,7 +461,7 @@ class Device extends Model implements Auditable
         if (Cache::has('item_types')) {
             $types = Cache::get('item_types');
         } else {
-            $types = DB::select(DB::raw("
+            $types = DB::select("
             SELECT TRIM(item_type) AS item_type,
                    MAX(powered)      AS powered,
                    MAX(idcategories) AS idcategories,
@@ -495,7 +497,7 @@ class Device extends Model implements Auditable
                                     AND s.count = m.maxcount) t
             GROUP BY UPPER(t.item_type)
             HAVING LENGTH(item_type) > 0
-            "));
+            ");
             \Cache::put('item_types', $types, 24 * 3600);
         }
 

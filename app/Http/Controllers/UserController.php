@@ -2,9 +2,11 @@
 
 namespace App\Http\Controllers;
 
+use Illuminate\View\View;
+use Illuminate\Http\RedirectResponse;
+use Illuminate\Http\JsonResponse;
 use App;
 use App\Device;
-use App\DripEvent;
 use App\Events\PasswordChanged;
 use App\Events\UserLanguageUpdated;
 use App\Events\UserRegistered;
@@ -47,10 +49,8 @@ class UserController extends Controller
 {
     /**
      * Show the application dashboard.
-     *
-     * @return \Illuminate\Http\Response
      */
-    public function index($id = null)
+    public function index($id = null): View
     {
         if (is_null($id)) {
             $id = Auth::id();
@@ -67,7 +67,7 @@ class UserController extends Controller
         ]);
     }
 
-    public function getProfileEdit($id = null)
+    public function getProfileEdit($id = null): View
     {
         if (is_null($id)) {
             $user = Auth::user();
@@ -122,7 +122,7 @@ class UserController extends Controller
         ]);
     }
 
-    public function getNotifications()
+    public function getNotifications(): View
     {
         $user = Auth::user();
         $notifications = $user->notifications()->paginate(10);
@@ -133,7 +133,7 @@ class UserController extends Controller
         ]);
     }
 
-    public function postProfileInfoEdit(Request $request, App\Helpers\Geocoder $geocoder)
+    public function postProfileInfoEdit(Request $request, App\Helpers\Geocoder $geocoder): RedirectResponse
     {
         $rules = [
         'name'            => 'required|string|max:255',
@@ -166,10 +166,6 @@ class UserController extends Controller
 
         $user = User::find($id);
 
-        if ($user->isDripSubscriber()) {
-            DripEvent::createOrUpdateSubscriber($user, true, auth()->user()->email, request()->input('email'));
-        }
-
         if (! empty($user->location)) {
             $geocoded = $geocoder->geocode("{$user->location}, " . Fixometer::getCountryFromCountryCode($user->country_code));
             if (! empty($geocoded)) {
@@ -189,7 +185,7 @@ class UserController extends Controller
         return redirect()->back()->with('message', __('profile.profile_updated'));
     }
 
-    public function postProfilePasswordEdit(Request $request)
+    public function postProfilePasswordEdit(Request $request): RedirectResponse
     {
         if ($request->input('id') !== null) {
             $id = $request->input('id');
@@ -221,7 +217,7 @@ class UserController extends Controller
         return redirect()->back()->with('error', __('profile.password_old_mismatch'));
     }
 
-    public function postProfileRepairDirectory(Request $request)
+    public function postProfileRepairDirectory(Request $request): RedirectResponse
     {
         $rules = [
             'role' => 'required|digits_between:'.Role::REPAIR_DIRECTORY_SUPERADMIN.','.Role::REPAIR_DIRECTORY_EDITOR,
@@ -249,7 +245,7 @@ class UserController extends Controller
         return redirect()->back()->with('message', __('profile.profile_updated'));
     }
 
-    public function storeLanguage(Request $request)
+    public function storeLanguage(Request $request): RedirectResponse
     {
         if ($request->input('id') !== null) {
             $userId = $request->input('id');
@@ -275,7 +271,7 @@ class UserController extends Controller
         return redirect()->back()->with('message', Lang::get('profile.language_updated'));
     }
 
-    public function postSoftDeleteUser(Request $request)
+    public function postSoftDeleteUser(Request $request): RedirectResponse
     {
         if ($request->input('id') !== null) {
             $id = $request->input('id');
@@ -286,10 +282,6 @@ class UserController extends Controller
         $user = User::find($id);
         $old_user_name = $user->name;
         $user_id = $user->id;
-
-        if ($user->isDripSubscriber()) {
-            $user->drip_subscriber_id = null;
-        }
 
         $user->delete(); // Will be anonymised automatically by event handlers
 
@@ -302,7 +294,7 @@ class UserController extends Controller
         }
     }
 
-    public function postProfilePreferencesEdit(Request $request)
+    public function postProfilePreferencesEdit(Request $request): RedirectResponse
     {
         if ($request->input('id') !== null) {
             $id = $request->input('id');
@@ -322,7 +314,7 @@ class UserController extends Controller
         return redirect()->back()->with('message', Lang::get('profile.preferences_updated'));
     }
 
-    public function postProfileTagsEdit(Request $request)
+    public function postProfileTagsEdit(Request $request): RedirectResponse
     {
         if ($request->input('id') !== null) {
             $id = $request->input('id');
@@ -345,7 +337,7 @@ class UserController extends Controller
         return redirect()->back()->with('message', Lang::get('profile.skills_updated'));
     }
 
-    public function postProfilePictureEdit(Request $request)
+    public function postProfilePictureEdit(Request $request): RedirectResponse
     {
         if ($request->input('id') !== null) {
             $id = $request->input('id');
@@ -363,7 +355,7 @@ class UserController extends Controller
         return redirect()->back()->with('error', __('profile.picture_error'));
     }
 
-    public function postAdminEdit(Request $request)
+    public function postAdminEdit(Request $request): RedirectResponse
     {
         if ($request->input('id') !== null) {
             $user_id = $request->input('id');
@@ -407,7 +399,7 @@ class UserController extends Controller
         return redirect()->back()->with('message', __('profile.admin_success'));
     }
 
-    public function recover(Request $request)
+    public function recover(Request $request): View
     {
         $User = new User;
 
@@ -499,7 +491,7 @@ class UserController extends Controller
                 $oldPassword = $user->password;
 
                 $update = $user->update([
-                    'password' => crypt($pwd, '$1$'.strrev(md5(env('APP_KEY')))),
+                    'password' => Hash::make($pwd),
                 ]);
 
                 if ($update) {
@@ -679,7 +671,7 @@ class UserController extends Controller
                 // No errors. We can proceed and create the User.
                 $data = ['name'     => $name,
                 'email'    => $email,
-                'password' => crypt($pwd, '$1$'.strrev(md5(env('APP_KEY')))),
+                'password' => Hash::make($pwd),
                 'role'     => $role,
                 'calendar_hash' => Str::random(15),
                 //'group'    => $group
@@ -737,7 +729,7 @@ class UserController extends Controller
         }
     }
 
-    public function edit($id, Request $request)
+    public function edit($id, Request $request): View
     {
         global $fixometer_languages;
 
@@ -769,7 +761,7 @@ class UserController extends Controller
                 if ($data['new-password'] !== $data['password-confirm']) {
                     $error['password'] = 'The passwords are not identical!';
                 } else {
-                    $data['password'] = crypt($data['new-password'], '$1$'.strrev(md5(env('APP_KEY'))));
+                    $data['password'] = Hash::make($data['new-password']);
                 }
             }
 
@@ -849,7 +841,7 @@ class UserController extends Controller
         }
     }
 
-    public function logout()
+    public function logout(): RedirectResponse
     {
         Auth::logout();
 
@@ -879,7 +871,7 @@ class UserController extends Controller
         ]);
     }
 
-    public function postRegister(Request $request, $hash = null)
+    public function postRegister(Request $request, $hash = null): RedirectResponse
     {
         $geocoder = new \App\Helpers\Geocoder();
 
@@ -956,15 +948,6 @@ class UserController extends Controller
             $user->newsletter = 1;
         } else {
             $subscribed = false;
-        }
-
-        if (env('DRIP_API_TOKEN') !== null && env('DRIP_API_TOKEN') !== '') {
-            $activeRepairNetworkId = session()->get('repair_network');
-            $network = Network::find($activeRepairNetworkId);
-            if (! is_null($network) && $network->users_push_to_drip) {
-                $drip_subscribe_user = DripEvent::createOrUpdateSubscriber($user, $subscribed);
-                $user->drip_subscriber_id = $drip_subscribe_user->id;
-            }
         }
 
         // 'invites' refers to receiving notifications about groups or events near the user.
@@ -1057,14 +1040,14 @@ class UserController extends Controller
         return 'true';
     }
 
-    public function postEmail(Request $request)
+    public function postEmail(Request $request): JsonResponse
     {
         if (User::where('email', '=', $request->get('email'))->exists()) {
             return response()->json(['message' =>  __('auth.email_address_validation')]);
         }
     }
 
-    public static function getThumbnail(Request $request)
+    public static function getThumbnail(Request $request): JsonResponse
     {
         $user = User::where('mediawiki', $request->input('wiki_username'))->first();
 
@@ -1081,7 +1064,7 @@ class UserController extends Controller
         return response()->json($thumbnailPath);
     }
 
-    public function getUserMenus(Request $request)
+    public function getUserMenus(Request $request): JsonResponse
     {
         $user = User::where('mediawiki', $request->input('wiki_username'))->first();
 

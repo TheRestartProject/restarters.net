@@ -26,11 +26,8 @@ class EventsUsersObserver {
 
         /**
      * Listen to the created event.
-     *
-     * @param  \App\EventsUsers  $eu
-     * @return void
      */
-    public function created(EventsUsers $eu)
+    public function created(EventsUsers $eu): void
     {
         $idevents = $eu->event;
         $event = \App\Party::find($idevents);
@@ -49,11 +46,8 @@ class EventsUsersObserver {
 
     /**
      * Listen to the updated event.
-     *
-     * @param  \App\EventsUsers  $eu
-     * @return void
      */
-    public function updating(EventsUsers $eu) {
+    public function updating(EventsUsers $eu): void {
         $idevents = $eu->event;
         $event = \App\Party::find($idevents);
         $iduser = $eu->user;
@@ -74,11 +68,8 @@ class EventsUsersObserver {
 
     /**
      * Listen to the deleted event.
-     *
-     * @param  \App\EventsUsers  $eu
-     * @return void
      */
-    public function deleted(EventsUsers $eu)
+    public function deleted(EventsUsers $eu): void
     {
         $idevents = $eu->event;
         $event = \App\Party::find($idevents);
@@ -89,12 +80,7 @@ class EventsUsersObserver {
         $this->removed($event, $user, true, $eu->status == 1);
     }
 
-    /**
-     * @param Party $event
-     * @param User $user
-     * @return void
-     */
-    private function confirmed($event, $user, $count): void
+    private function confirmed(Party $event, User $user, $count): void
     {
         if ($count) {
             $event->increment('volunteers');
@@ -103,12 +89,7 @@ class EventsUsersObserver {
         event(new UserConfirmedEvent($event->idevents, $user ? $user->id : null));
     }
 
-    /**
-     * @param Party $event
-     * @param User $user
-     * @return void
-     */
-    private function removed($event, $user, $count): void
+    private function removed(Party $event, User $user, $count): void
     {
         if ($count) {
             $event->decrement('volunteers');

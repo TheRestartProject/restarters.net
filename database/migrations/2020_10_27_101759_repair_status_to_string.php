@@ -8,10 +8,8 @@ return new class extends Migration
 {
     /**
      * Run the migrations.
-     *
-     * @return void
      */
-    public function up()
+    public function up(): void
     {
         DB::unprepared('DROP FUNCTION IF EXISTS `REPAIR_STATUS_TO_STRING`');
         // Might need to set definer
@@ -36,10 +34,8 @@ END
 
     /**
      * Reverse the migrations.
-     *
-     * @return void
      */
-    public function down()
+    public function down(): void
     {
         DB::unprepared('DROP FUNCTION IF EXISTS `REPAIR_STATUS_TO_STRING`');
     }

@@ -10,10 +10,8 @@ class NetworksTableSeeder extends Seeder
 {
     /**
      * Run the database seeds.
-     *
-     * @return void
      */
-    public function run()
+    public function run(): void
     {
         // Restarters network is REQUIRED, so is created as part of the database
         // migrations with id = 1.
@@ -26,7 +24,6 @@ class NetworksTableSeeder extends Seeder
             'timezone' => 'Europe/Brussels',
             'events_push_to_wordpress' => false,
             'include_in_zapier' => false,
-            'users_push_to_drip' => false,
             'shortname' => 'repairshare',
             'created_at' => Carbon::now(),
         ]);
@@ -39,7 +36,6 @@ class NetworksTableSeeder extends Seeder
             'timezone' => 'Europe/Brussels',
             'events_push_to_wordpress' => false,
             'include_in_zapier' => false,
-            'users_push_to_drip' => false,
             'shortname' => 'repairtogether',
             'created_at' => Carbon::now(),
         ]);

@@ -33,11 +33,8 @@ class LogInToWiki
 
     /**
      * Handle the event.
-     *
-     * @param  Login  $event
-     * @return void
      */
-    public function handle(Login $event)
+    public function handle(Login $event): void
     {
         $user = $event->user;
 

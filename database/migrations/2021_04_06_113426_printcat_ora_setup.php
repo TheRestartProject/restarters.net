@@ -8,10 +8,8 @@ return new class extends Migration
 {
     /**
      * Run the migrations.
-     *
-     * @return void
      */
-    public function up()
+    public function up(): void
     {
         if (! Schema::hasTable('devices_faults_printers_ora_opinions')) {
             Schema::create('devices_faults_printers_ora_opinions', function (Blueprint $table) {
@@ -222,10 +220,8 @@ return new class extends Migration
 
     /**
      * Reverse the migrations.
-     *
-     * @return void
      */
-    public function down()
+    public function down(): void
     {
         Schema::dropIfExists('devices_faults_printers_ora_adjudicated');
         Schema::dropIfExists('devices_faults_printers_ora_opinions');

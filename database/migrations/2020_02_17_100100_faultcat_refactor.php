@@ -11,10 +11,8 @@ return new class extends Migration
      *
      * Includes missed migrations for tables
      * `devices_faults` and `devices_faults_opinions`.
-     *
-     * @return void
      */
-    public function up()
+    public function up(): void
     {
         if (Schema::hasTable('devices_faults')) {
             Schema::rename('devices_faults', 'devices_faults_events');
@@ -81,10 +79,8 @@ return new class extends Migration
      * Reverse the migrations.
      *
      * DO NOT DROP `devices_faults` or `devices_faults_opinions`.
-     *
-     * @return void
      */
-    public function down()
+    public function down(): void
     {
         Schema::dropIfExists('devices_faults_adjudicated');
 

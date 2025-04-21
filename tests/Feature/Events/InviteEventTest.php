@@ -23,10 +23,8 @@ class InviteEventTest extends TestCase
 {
     /**
      * Test notification content.
-     *
-     * @return void
      */
-    public function testInvite()
+    public function testInvite(): void
     {
         Notification::fake();
 
@@ -78,7 +76,7 @@ class InviteEventTest extends TestCase
         assertEquals(0, $event->volunteers);
     }
 
-    public function testInviteReal()
+    public function testInviteReal(): void
     {
         $userAttributes = $this->userAttributes();
         $response = $this->post('/user/register/', $userAttributes);
@@ -186,7 +184,7 @@ class InviteEventTest extends TestCase
         $response->assertSessionHas('warning');
     }
 
-    public function testInvitableUserPOV()
+    public function testInvitableUserPOV(): void
     {
         $this->withoutExceptionHandling();
 
@@ -288,7 +286,7 @@ class InviteEventTest extends TestCase
         $this->assertEquals([], $members);
     }
 
-    public function testInvitableNotifications()
+    public function testInvitableNotifications(): void
     {
         Queue::fake();
         Notification::fake();
@@ -402,7 +400,7 @@ class InviteEventTest extends TestCase
         });
     }
 
-    public function testInviteViaLink() {
+    public function testInviteViaLink(): void {
         $this->loginAsTestUser(Role::ADMINISTRATOR);
         $user = User::factory()->restarter()->create([
                                                                           'api_token' => '1234',
@@ -445,7 +443,7 @@ class InviteEventTest extends TestCase
         $rsp = $this->get('/party/invite/' . $unique_shareable_code . '1');
     }
 
-    public function testInviteNonUsers() {
+    public function testInviteNonUsers(): void {
         Notification::fake();
 
         $this->withoutExceptionHandling();
@@ -475,7 +473,7 @@ class InviteEventTest extends TestCase
         $response->assertSessionHas('success');
     }
 
-    public function testInviteNoUsers() {
+    public function testInviteNoUsers(): void {
         Notification::fake();
 
         $this->withoutExceptionHandling();
@@ -508,7 +506,7 @@ class InviteEventTest extends TestCase
     /**
      * @dataProvider invalidEmailProvider
      */
-    public function testInviteInvalidEmail($email, $valid)
+    public function testInviteInvalidEmail($email, $valid): void
     {
         $this->loginAsTestUser(Role::ADMINISTRATOR);
 
@@ -529,7 +527,7 @@ class InviteEventTest extends TestCase
         ]);
     }
 
-    public function invalidEmailProvider()
+    public function invalidEmailProvider(): array
     {
         return [
             ['test@test.com', true],

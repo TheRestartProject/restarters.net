@@ -35,10 +35,8 @@ class WordpressCreateEventFailed extends Command
 
     /**
      * Execute the console command.
-     *
-     * @return mixed
      */
-    public function handle()
+    public function handle(): void
     {
         $wordpressClient = new \HieuLe\WordpressXmlrpcClient\WordpressClient();
         $wordpressClient->setCredentials(env('WP_XMLRPC_ENDPOINT'), env('WP_XMLRPC_USER'), env('WP_XMLRPC_PSWD'));

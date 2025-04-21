@@ -15,7 +15,7 @@ use function PHPUnit\Framework\assertEquals;
 
 class CheckTest extends TestCase
 {
-    public function testCheckTranslations() {
+    public function testCheckTranslations(): void {
         chdir(base_path());
         $this->artisan('translations:check')->assertExitCode(0);
     }

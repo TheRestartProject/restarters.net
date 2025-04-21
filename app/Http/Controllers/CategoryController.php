@@ -2,6 +2,8 @@
 
 namespace App\Http\Controllers;
 
+use Illuminate\View\View;
+use Illuminate\Http\RedirectResponse;
 use App\Category;
 use App\Helpers\Fixometer;
 use App\User;
@@ -11,7 +13,7 @@ use Illuminate\Support\Facades\Redirect;
 
 class CategoryController extends Controller
 {
-    public function index()
+    public function index(): View
     {
         $Category = new Category;
 
@@ -39,7 +41,7 @@ class CategoryController extends Controller
         ]);
     }
 
-    public function postEditCategory($id, Request $request)
+    public function postEditCategory($id, Request $request): RedirectResponse
     {
         if (! Fixometer::hasRole(Auth::user(), 'Administrator')) {
             return redirect('/user/forbidden');

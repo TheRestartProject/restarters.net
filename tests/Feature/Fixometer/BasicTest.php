@@ -16,7 +16,7 @@ use Tests\TestCase;
 
 class BasicTest extends TestCase
 {
-    public function testPageLoads()
+    public function testPageLoads(): void
     {
         // Create a past event with a fixed device.  This is shown on the Fixometer page as the latest data.
         $group = Group::factory()->create([
@@ -99,7 +99,7 @@ class BasicTest extends TestCase
         $this->assertEquals($event->idevents, $data['idevents']);
     }
 
-    public function testExport() {
+    public function testExport(): void {
         $this->loginAsTestUser(Role::ADMINISTRATOR);
 
         DB::statement('SET foreign_key_checks=0');

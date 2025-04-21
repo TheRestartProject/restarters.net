@@ -22,11 +22,8 @@ class SyncUserProperties
 
     /**
      * Handle the event.
-     *
-     * @param  UserUpdated  $event
-     * @return void
      */
-    public function handle(UserUpdated $event)
+    public function handle(UserUpdated $event): void
     {
         if ($event->user->isDirty('email')) {
             event(new UserEmailUpdated($event->user));

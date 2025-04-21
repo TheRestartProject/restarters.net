@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use Illuminate\Http\JsonResponse;
 use Cookie;
 use Illuminate\Http\Request;
 
@@ -26,9 +27,8 @@ class InformationAlertCookieController extends Controller
      * Show the profile for the given user.
      *
      * @param  int  $id
-     * @return View
      */
-    public function __invoke(Request $request)
+    public function __invoke(Request $request): JsonResponse
     {
         if (! $request->has('dismissable_id')) {
             return response()->json(false);
