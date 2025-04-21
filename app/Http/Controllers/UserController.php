@@ -491,7 +491,7 @@ class UserController extends Controller
                 $oldPassword = $user->password;
 
                 $update = $user->update([
-                    'password' => crypt($pwd, '$1$'.strrev(md5(env('APP_KEY')))),
+                    'password' => Hash::make($pwd),
                 ]);
 
                 if ($update) {
@@ -671,7 +671,7 @@ class UserController extends Controller
                 // No errors. We can proceed and create the User.
                 $data = ['name'     => $name,
                 'email'    => $email,
-                'password' => crypt($pwd, '$1$'.strrev(md5(env('APP_KEY')))),
+                'password' => Hash::make($pwd),
                 'role'     => $role,
                 'calendar_hash' => Str::random(15),
                 //'group'    => $group
@@ -761,7 +761,7 @@ class UserController extends Controller
                 if ($data['new-password'] !== $data['password-confirm']) {
                     $error['password'] = 'The passwords are not identical!';
                 } else {
-                    $data['password'] = crypt($data['new-password'], '$1$'.strrev(md5(env('APP_KEY'))));
+                    $data['password'] = Hash::make($data['new-password']);
                 }
             }
 
