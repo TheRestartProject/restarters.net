@@ -185,7 +185,7 @@ class FixometerFile extends Model
                     `x`.`reference` = :refId';
 
         try {
-            return DB::select(DB::raw($sql), ['refType' => $of_ref_type, 'refId' => $ref_id]);
+            return DB::select($sql, ['refType' => $of_ref_type, 'refId' => $ref_id]);
         } catch (\Illuminate\Database\QueryException $e) {
             return db($e);
         }
@@ -196,6 +196,6 @@ class FixometerFile extends Model
         // Delete the xref.  This is sufficient to stop the image being attached to the device.  We leave the
         // file in existence in case we want it later for debugging/mining.
         $sql = 'DELETE FROM `xref` WHERE `idxref` = :id AND `object_type` = '.env('TBL_IMAGES');
-        DB::delete(DB::raw($sql), ['id' => $idxref]);
+        DB::delete($sql, ['id' => $idxref]);
     }
 }

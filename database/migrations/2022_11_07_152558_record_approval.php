@@ -3,6 +3,7 @@
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
+use Illuminate\Support\Facades\DB;
 
 return new class extends Migration
 {
@@ -19,10 +20,10 @@ return new class extends Migration
             $table->boolean('approved')->default(false);
         });
 
-        DB::statement(DB::raw("UPDATE `groups` SET approved = wordpress_post_id IS NOT NULL"));
-        DB::statement(DB::raw("UPDATE `events` SET approved = wordpress_post_id IS NOT NULL"));
-        DB::statement(DB::raw("UPDATE `groups` SET wordpress_post_id = NULL WHERE wordpress_post_id = '99999'"));
-        DB::statement(DB::raw("UPDATE `events` SET wordpress_post_id = NULL WHERE wordpress_post_id = '99999'"));
+        DB::statement("UPDATE `groups` SET approved = wordpress_post_id IS NOT NULL");
+        DB::statement("UPDATE `events` SET approved = wordpress_post_id IS NOT NULL");
+        DB::statement("UPDATE `groups` SET wordpress_post_id = NULL WHERE wordpress_post_id = '99999'");
+        DB::statement("UPDATE `events` SET wordpress_post_id = NULL WHERE wordpress_post_id = '99999'");
     }
 
     /**

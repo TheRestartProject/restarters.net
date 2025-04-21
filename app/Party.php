@@ -67,7 +67,7 @@ class Party extends Model implements Auditable
     public function findAllSearchable()
     {
         // TODO Can this be replaced by Party::past?
-        return DB::select(DB::raw('SELECT
+        return DB::select('SELECT
                     `e`.`idevents` AS `id`,
                     UNIX_TIMESTAMP(`event_start_utc`) AS `event_timestamp`,
                     TIME(CONVERT_TZ(`event_start_utc`, \'GMT\', `e`.`timezone`)) AS `start`,
@@ -87,7 +87,7 @@ class Party extends Model implements Auditable
                 INNER JOIN `groups` AS `g`
                     ON `g`.`idgroups` = `e`.`group`
                 WHERE `event_end_utc` < NOW()
-                ORDER BY `e`.`event_start_utc` DESC'));
+                ORDER BY `e`.`event_start_utc` DESC');
     }
 
     public function findThis($id, $devices = false)
@@ -122,7 +122,7 @@ class Party extends Model implements Auditable
                 WHERE `e`.`idevents` = :id
                 ORDER BY `e`.`event_start_utc` DESC';
 
-        $party = DB::select(DB::raw($sql), ['id' => $id]);
+        $party = DB::select($sql, ['id' => $id]);
 
         if ($devices) {
             $devices = new Device;
@@ -134,7 +134,7 @@ class Party extends Model implements Auditable
 
     public function deleteUserList($party)
     {
-        return DB::delete(DB::raw('DELETE FROM `events_users` WHERE `event` = :party'), ['party' => $party]);
+        return DB::delete('DELETE FROM `events_users` WHERE `event` = :party', ['party' => $party]);
     }
 
     public function ofThisGroup($group = 'admin', $only_past = false, $devices = false)
@@ -175,13 +175,13 @@ class Party extends Model implements Auditable
 
         if (! is_null($group)) {
             try {
-                return DB::select(DB::raw($sql), ['group' => $group]);
+                return DB::select($sql, ['group' => $group]);
             } catch (\Illuminate\Database\QueryException $e) {
                 dd($e);
             }
         } else {
             try {
-                return DB::select(DB::raw($sql));
+                return DB::select($sql);
             } catch (\Illuminate\Database\QueryException $e) {
                 dd($e);
             }
@@ -337,7 +337,7 @@ class Party extends Model implements Auditable
         $exclude_group_ids = array_merge($exclude_group_ids, Group::where('approved', false)->pluck('idgroups')->toArray());
 
         return $this
-      ->select(DB::raw('`events`.*, ( 6371 * acos( cos( radians('.$user->latitude.') ) * cos( radians( events.latitude ) ) * cos( radians( events.longitude ) - radians('.$user->longitude.') ) + sin( radians('.$user->latitude.') ) * sin( radians( events.latitude ) ) ) ) AS distance'))
+      ->select('`events`.*, ( 6371 * acos( cos( radians('.$user->latitude.') ) * cos( radians( events.latitude ) ) * cos( radians( events.longitude ) - radians('.$user->longitude.') ) + sin( radians('.$user->latitude.') ) * sin( radians( events.latitude ) ) ) ) AS distance')
       ->join('groups', 'groups.idgroups', '=', 'events.group')
       ->join('group_network', 'groups.idgroups', '=', 'group_network.group_id')
       ->join('networks', 'networks.id', '=', 'group_network.network_id')
