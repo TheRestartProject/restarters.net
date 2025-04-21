@@ -2,35 +2,17 @@
 
 namespace App\Rules;
 
-use Illuminate\Contracts\Validation\Rule;
+use Illuminate\Contracts\Validation\ValidationRule;
 
-class Timezone implements Rule
+class Timezone implements ValidationRule
 {
     /**
-     * Create a new rule instance.
-     *
-     * @return void
+     * Run the validation rule.
      */
-    public function __construct()
+    public function validate(string $_attribute, mixed $value, \Closure $fail): void
     {
-        //
-    }
-
-    /**
-     * Determine if the validation rule passes.
-     *
-     * @param  mixed  $value
-     */
-    public function passes(string $attribute, $value): bool
-    {
-        return in_array($value, \DateTimeZone::listIdentifiers(\DateTimeZone::ALL_WITH_BC));
-    }
-
-    /**
-     * Get the validation error message.
-     */
-    public function message(): string
-    {
-        return __('partials.validate_timezone');
+        if (!in_array($value, \DateTimeZone::listIdentifiers(\DateTimeZone::ALL_WITH_BC))) {
+            $fail(__('partials.validate_timezone'));
+        }
     }
 }
