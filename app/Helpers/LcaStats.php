@@ -54,6 +54,6 @@ SUM(t1.unpowered_footprints) * $dF AS unpowered_footprint
 FROM ($t1) t1
 ";
 
-        return DB::select(DB::raw($sql));
+        return DB::select($sql);
     }
 }

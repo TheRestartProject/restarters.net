@@ -36,7 +36,7 @@ class Xref extends Model
             $sql = 'INSERT INTO `'.$this->table.'`(`object`, `object_type`, `reference`, `reference_type`) VALUES (:obj, :objType, :ref, :refType)';
 
             try {
-                return DB::insert(DB::raw($sql), ['obj' => $this->obj, 'objType' => $this->objType, 'ref' => $this->ref, 'refType' => $this->refType]);
+                return DB::insert($sql, ['obj' => $this->obj, 'objType' => $this->objType, 'ref' => $this->ref, 'refType' => $this->refType]);
             } catch (\Illuminate\Database\QueryException $e) {
                 return false;
             }
@@ -51,7 +51,7 @@ class Xref extends Model
             $sql = 'DELETE FROM `'.$this->table.'` WHERE `reference` = :id AND `reference_type` = :type AND `object_type` = :objectType';
 
             try {
-                return DB::delete(DB::raw($sql), ['id' => $this->ref, 'type' => $this->refType, 'objectType' => $this->objType]);
+                return DB::delete($sql, ['id' => $this->ref, 'type' => $this->refType, 'objectType' => $this->objType]);
             } catch (\Illuminate\Database\QueryException $e) {
                 return false;
             }
@@ -65,7 +65,7 @@ class Xref extends Model
         $sql = 'DELETE FROM `'.$this->table.'` WHERE `object` = :id AND `object_type` = :type';
 
         try {
-            return DB::delete(DB::raw($sql), ['id' => $this->obj, 'type' => $this->objType]);
+            return DB::delete($sql, ['id' => $this->obj, 'type' => $this->objType]);
         } catch (\Illuminate\Database\QueryException $e) {
             return false;
         }

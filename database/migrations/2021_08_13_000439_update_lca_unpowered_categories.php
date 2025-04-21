@@ -147,7 +147,7 @@ RIGHT JOIN `restarters.test`.categories c2 ON c2.idcategories = c1.idcategories
             'aggregate' => 1,
         ]);
 
-        DB::statement(DB::raw('UPDATE categories SET revision=2'));
+        DB::statement('UPDATE categories SET revision=2');
     }
 
     /**
@@ -220,6 +220,6 @@ RIGHT JOIN `restarters.test`.categories c2 ON c2.idcategories = c1.idcategories
             'aggregate' => 0,
         ]);
 
-        DB::statement(DB::raw('UPDATE categories SET revision=1'));
+        DB::statement('UPDATE categories SET revision=1');
     }
 };

@@ -131,7 +131,7 @@ class User extends Authenticatable implements Auditable, HasLocalePreference
         }
 
         $groupsNearbyQuery = Group::select(
-            DB::raw('*, ( 6371 * acos( cos( radians('.$this->latitude.') ) * cos( radians( latitude ) ) * cos( radians( longitude ) - radians('.$this->longitude.') ) + sin( radians('.$this->latitude.') ) * sin( radians( latitude ) ) ) ) AS dist')
+            '*, ( 6371 * acos( cos( radians('.$this->latitude.' ) * cos( radians( latitude ) ) * cos( radians( longitude ) - radians('.$this->longitude.') ) + sin( radians('.$this->latitude.') ) * sin( radians( latitude ) ) ) ) AS dist'
         )->where(function ($q) {
             $q->whereNull('archived_at');
 
@@ -190,18 +190,18 @@ class User extends Authenticatable implements Auditable, HasLocalePreference
 
     public function getRolePermissions($role)
     {
-        return DB::select(DB::raw('SELECT p.idpermissions, p.permission, r.idroles, r.role FROM permissions AS p
+        return DB::select('SELECT p.idpermissions, p.permission, r.idroles, r.role FROM permissions AS p
                 INNER JOIN roles_permissions AS rp ON rp.permission = p.idpermissions
                 INNER JOIN roles AS r ON rp.role= r.idroles
-                WHERE r.role = :role'), ['role' => $role]);
+                WHERE r.role = :role', ['role' => $role]);
     }
 
     public function getUserGroups($user)
     {
-        return DB::select(DB::raw('SELECT * FROM `'.$this->table.'` AS `u`
+        return DB::select('SELECT * FROM `'.$this->table.'` AS `u`
                 INNER JOIN `users_groups` AS `ug` ON `ug`.`user` = `u`.`id`
                 INNER JOIN `groups` AS `g` ON `ug`.`group` = `g`.`idgroups`
-                WHERE `u`.`id` = :id'), ['id' => $user]);
+                WHERE `u`.`id` = :id', ['id' => $user]);
     }
 
     // Setters
@@ -241,7 +241,7 @@ class User extends Authenticatable implements Auditable, HasLocalePreference
     //     $sql .= implode(' AND ', $clauses);
     //
     //     try {
-    //       return DB::select(DB::raw($sql), $params);
+    //       return DB::select($sql, $params);
     //     } catch (\Illuminate\Database\QueryException $e) {
     //       return false;
     //     }
@@ -252,9 +252,9 @@ class User extends Authenticatable implements Auditable, HasLocalePreference
         //Tested!
 
         if (! $eloquent) {
-            $Users = DB::select(DB::raw('SELECT users.id AS id, users.name, users.email, roles.role FROM users
+            $Users = DB::select('SELECT users.id AS id, users.name, users.email, roles.role FROM users
                   INNER JOIN roles ON roles.idroles = users.role WHERE users.deleted_at IS NULL
-                  ORDER BY users.id ASC')); //INNER JOIN sessions ON sessions.user = users.id, UNIX_TIMESTAMP(sessions.modified_at) AS modified_at
+                  ORDER BY users.id ASC'); //INNER JOIN sessions ON sessions.user = users.id, UNIX_TIMESTAMP(sessions.modified_at) AS modified_at
 
             if (is_array($Users)) {
                 $User = new self;
@@ -272,7 +272,7 @@ class User extends Authenticatable implements Auditable, HasLocalePreference
     public function partyEligible()
     {
         //Tested!
-        return DB::select(DB::raw('SELECT
+        return DB::select('SELECT
                   users.id AS id,
                   users.name,
                   users.email,
@@ -280,12 +280,12 @@ class User extends Authenticatable implements Auditable, HasLocalePreference
               FROM '.$this->table.'
               INNER JOIN roles ON roles.idroles = users.role
               WHERE users.role > 1
-              ORDER BY users.name ASC'));
+              ORDER BY users.name ASC');
     }
 
     public function inGroup($group)
     {
-        return DB::select(DB::raw('SELECT
+        return DB::select('SELECT
                     users.id AS id,
                     users.name,
                     users.email,
@@ -295,7 +295,7 @@ class User extends Authenticatable implements Auditable, HasLocalePreference
                 WHERE users.role > 1
                     AND users.id IN
                         (SELECT `user` FROM users_groups WHERE `group` = :group)
-                ORDER BY users.name ASC'), ['group' => $group]);
+                ORDER BY users.name ASC', ['group' => $group]);
     }
 
     public function isInGroup($groupId)
@@ -312,14 +312,14 @@ class User extends Authenticatable implements Auditable, HasLocalePreference
     {
         //Tested!
 
-        $r = DB::select(DB::raw('SELECT COUNT(id) AS emails FROM '.$this->table.' WHERE email = :email'), ['email' => $email]);
+        $r = DB::select('SELECT COUNT(id AS emails FROM '.$this->table.' WHERE email = :email', ['email' => $email]);
 
         return ($r[0]->emails > 0) ? false : true;
     }
 
     public function scopeNearbyRestarters($query, $latitude, $longitude, $radius = 20)
     {
-        return $query->select(DB::raw('*, ( 6371 * acos( cos( radians('.$latitude.') ) * cos( radians( latitude ) ) * cos( radians( longitude ) - radians('.$longitude.') ) + sin( radians('.$latitude.') ) * sin( radians( latitude ) ) ) ) AS distance'))
+        return $query->select('*, ( 6371 * acos( cos( radians('.$latitude.' ) * cos( radians( latitude ) ) * cos( radians( longitude ) - radians('.$longitude.') ) + sin( radians('.$latitude.') ) * sin( radians( latitude ) ) ) ) AS distance')
                         ->whereNotNull('location')
                           ->whereNotNull('latitude')
                             ->whereNotNull('longitude')

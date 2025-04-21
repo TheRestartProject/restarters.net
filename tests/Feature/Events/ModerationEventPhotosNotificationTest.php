@@ -86,7 +86,7 @@ class ModerationEventPhotosNotificationTest extends TestCase
         );
 
         // Delete the image.
-        $image = \DB::select(DB::raw("SELECT idimages, path FROM images ORDER BY idimages DESC LIMIT 1"));
+        $image = \DB::select("SELECT idimages, path FROM images ORDER BY idimages DESC LIMIT 1");
         $idimages = $image[0]->idimages;
         $path = $image[0]->path;
         $response = $this->get("/party/image/delete/{$event->idevents}/$idimages/$path");

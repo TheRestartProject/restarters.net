@@ -5,6 +5,7 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 use App\Party;
+use Illuminate\Support\Facades\DB;
 
 return new class extends Migration
 {
@@ -29,9 +30,9 @@ return new class extends Migration
         });
 
         # Back up the existing data.
-        DB::statement(DB::raw('UPDATE events SET event_date_old = event_date'));
-        DB::statement(DB::raw('UPDATE events SET start_old = start'));
-        DB::statement(DB::raw('UPDATE events SET end_old = end'));
+        DB::statement('UPDATE events SET event_date_old = event_date');
+        DB::statement('UPDATE events SET start_old = start');
+        DB::statement('UPDATE events SET end_old = end');
 
         # Set up the new timestamps.  Currently event_start/time/end are all implicitly localised to the timezone
         # of the group.
@@ -51,7 +52,7 @@ return new class extends Migration
 
             error_log("Event {$event->idevents} {$atts['event_date']} {$atts['start']}-{$atts['end']} => $event_start_utc - $event_end_utc");
 
-            DB::statement(DB::raw("UPDATE events SET timezone = '$tz', event_start_utc = '$event_start_utc', event_end_utc = '$event_end_utc' WHERE idevents = {$event->idevents}"));
+            DB::statement("UPDATE events SET timezone = '$tz', event_start_utc = '$event_start_utc', event_end_utc = '$event_end_utc' WHERE idevents = {$event->idevents}");
         }
 
         # Set up virtual generated columns which replicate event_date/start/end but generated from the new timestamps.
@@ -87,9 +88,9 @@ return new class extends Migration
             $table->time('end');
         });
 
-        DB::statement(DB::raw('UPDATE events SET event_date= event_date_old'));
-        DB::statement(DB::raw('UPDATE events SET start = start_old'));
-        DB::statement(DB::raw('UPDATE events SET start = end_old'));
+        DB::statement('UPDATE events SET event_date= event_date_old');
+        DB::statement('UPDATE events SET start = start_old');
+        DB::statement('UPDATE events SET start = end_old');
 
         Schema::table('groups', function (Blueprint $table) {
             $table->dropColumn('timezone');

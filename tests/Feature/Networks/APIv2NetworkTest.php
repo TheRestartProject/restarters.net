@@ -177,8 +177,8 @@ class APIv2NetworkTest extends TestCase
                                                                     ]);
 
         // Manually set the updated_at fields so that we can check they are returned correctly.
-        DB::statement(DB::raw("UPDATE events SET updated_at = '2011-01-01 12:34'"));
-        DB::statement(DB::raw("UPDATE `groups` SET updated_at = '2011-01-02 12:34'"));
+        DB::statement("UPDATE events SET updated_at = '2011-01-01 12:34'");
+        DB::statement("UPDATE `groups` SET updated_at = '2011-01-02 12:34'");
 
         $url = "/api/v2/networks/{$network->id}/events" .
             ($getDetails ? '?includeDetails=true' : '');

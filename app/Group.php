@@ -110,7 +110,7 @@ class Group extends Model implements Auditable
     public function findAll()
     {
         try {
-            return DB::select(DB::raw('SELECT
+            return DB::select('SELECT
                     `g`.`idgroups` AS `id`,
                     `g`.`name` AS `name`,
                     `g`.`location` AS `location`,
@@ -125,7 +125,7 @@ class Group extends Model implements Auditable
                 LEFT JOIN `users_groups` AS `ug` ON `g`.`idgroups` = `ug`.`group`
                 LEFT JOIN `users` AS `u` ON `ug`.`user` = `u`.`id`
                 GROUP BY `g`.`idgroups`
-                ORDER BY `g`.`name` ASC'));
+                ORDER BY `g`.`name` ASC');
         } catch (\Illuminate\Database\QueryException $e) {
             dd($e);
         }
@@ -134,7 +134,7 @@ class Group extends Model implements Auditable
     public function findList()
     {
         try {
-            return DB::select(DB::raw('SELECT
+            return DB::select('SELECT
                 `g`.`idgroups` AS `id`,
                 `g`.`name` AS `name`,
                 `g`.`location` AS `location`,
@@ -155,7 +155,7 @@ class Group extends Model implements Auditable
 
             GROUP BY `g`.`idgroups`
 
-            ORDER BY `g`.`name` ASC'));
+            ORDER BY `g`.`name` ASC');
         } catch (\Illuminate\Database\QueryException $e) {
             dd($e);
         }
@@ -163,7 +163,7 @@ class Group extends Model implements Auditable
 
     public function ofThisUser($id)
     {
-        return DB::select(DB::raw('SELECT * FROM `'.$this->table.'` AS `g`
+        return DB::select('SELECT * FROM `'.$this->table.'` AS `g`
                 INNER JOIN `users_groups` AS `ug`
                     ON `ug`.`group` = `g`.`idgroups`
 
@@ -177,7 +177,7 @@ class Group extends Model implements Auditable
                 ON `xi`.`reference` = `g`.`idgroups`
 
                 WHERE `ug`.`user` = :id
-                ORDER BY `g`.`name` ASC'), ['id' => $id]);
+                ORDER BY `g`.`name` ASC', ['id' => $id]);
     }
 
     public function groupImage(): HasOne

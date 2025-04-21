@@ -384,10 +384,10 @@ class Fixometer
 
             try {
                 if ($return_rows) {
-                    return DB::select(DB::raw($sql), ['id' => $id, 'object' => $object]);
+                    return DB::select($sql, ['id' => $id, 'object' => $object]);
                 }
 
-                return count(DB::select(DB::raw($sql), ['id' => $id, 'object' => $object])) > 0 ? true : false;
+                return count(DB::select($sql, ['id' => $id, 'object' => $object])) > 0 ? true : false;
             } catch (\Illuminate\Database\QueryException $e) {
                 return db($e);
             }
@@ -432,12 +432,12 @@ class Fixometer
                   `xref`.`reference_type` = :object AND
                   `xref`.`reference` = :id ';
 
-            DB::delete(DB::raw($sql), ['id' => $id, 'object' => $object]);
+            DB::delete($sql, ['id' => $id, 'object' => $object]);
 
             /** delete image from db **/
             $sql = 'DELETE FROM `images` WHERE `images`.`idimages` = :image';
 
-            DB::delete(DB::raw($sql), ['image' => $image->idimages]);
+            DB::delete($sql, ['image' => $image->idimages]);
 
             /** delete image from disk **/
             unlink($_SERVER['DOCUMENT_ROOT'].'/uploads/'.$image->path);

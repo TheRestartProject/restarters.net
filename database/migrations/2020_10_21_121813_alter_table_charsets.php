@@ -145,7 +145,7 @@ return new class extends Migration
             $key = $fields['key'];
             foreach ($fields['fields'] as $field) {
                 $qry = sprintf($format, $table, $field, $key);
-                $result = DB::select(DB::raw($qry));
+                $result = DB::select($qry);
                 $log = [];
                 foreach ($result as $v) {
                     $log[$v->id] = $v->val;
