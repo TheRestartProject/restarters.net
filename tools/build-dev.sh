@@ -62,7 +62,7 @@ fi
 if [[ $ALL || $BUILD_ASSETS ]]; then
 banner "Building assets"
 NODE_OPTIONS=--max-old-space-size=8192
-npm run prod
+npm run build
 echo -e "\nDone."
 fi
 
