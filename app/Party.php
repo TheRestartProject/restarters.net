@@ -58,10 +58,12 @@ class Party extends Model implements Auditable
     // Append data to Model
     protected $appends = ['participants', 'ShareableLink', 'event_date_local', 'start_local', 'end_local'];
 
-    protected $casts = [
-        // JSON fields in the database should be converted to/from arrays.
-        'network_data' => 'array'
-    ];
+    protected function casts(): array
+    {
+        return [
+            'network_data' => 'array'
+        ];
+    }
 
     //Getters
     public function findAllSearchable()

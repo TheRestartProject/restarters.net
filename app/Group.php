@@ -56,11 +56,6 @@ class Group extends Model implements Auditable
 
     protected $appends = ['ShareableLink', 'auto_approve'];
 
-    protected $casts = [
-        // JSON fields in the database should be converted to/from arrays.
-        'network_data' => 'array'
-    ];
-
     // The distance is not in the groups table; we add it on some queries from the select.
     private $distance = null;
 
@@ -90,6 +85,13 @@ class Group extends Model implements Auditable
         static::addGlobalScope('all_confirmed_restarters_count', function ($builder) {
             $builder->withCount('allConfirmedRestarters');
         });
+    }
+
+    protected function casts(): array
+    {
+        return [
+            'network_data' => 'array'
+        ];
     }
 
     public function addTag($tag)
