@@ -18,7 +18,6 @@ restarters-anonymised.sql
 /.idea
 .dir-locals.el
 # The following should be ignored in all branches except production.
-/public/mix-manifest.json
 /public/fonts/vendor
 /public/global
 /public/js/app.js
@@ -26,3 +25,4 @@ restarters-anonymised.sql
 /public/css/app.css
 /public/css/wiki.css
 /public/build
+/public/hot
