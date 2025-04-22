@@ -2,6 +2,7 @@ import { defineConfig } from 'vite';
 import laravel from 'laravel-vite-plugin';
 import vue from '@vitejs/plugin-vue2';
 import { watchAndRun } from 'vite-plugin-watch-and-run';
+import { fileURLToPath, URL } from 'node:url';
 
 export default defineConfig({
     optimizeDeps: {
@@ -10,7 +11,8 @@ export default defineConfig({
     resolve: {
         alias: {
             'vue': 'vue/dist/vue.esm.js',
-            '@': '/resources/js'
+            '@': '/resources/js',
+            '~': fileURLToPath(new URL('./node_modules', import.meta.url))
         }
     },
     plugins: [
