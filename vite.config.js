@@ -7,6 +7,12 @@ export default defineConfig({
     optimizeDeps: {
         exclude: ['codemirror'],
     },
+    resolve: {
+        alias: {
+            'vue': 'vue/dist/vue.esm.js',
+            '@': '/resources/js'
+        }
+    },
     plugins: [
         // Workaround from https://github.com/laravel/vite-plugin/pull/189#issuecomment-1416704995
         laravel.default({
