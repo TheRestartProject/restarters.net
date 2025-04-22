@@ -36,7 +36,6 @@ use Illuminate\Events\Dispatcher;
 
 abstract class TestCase extends BaseTestCase
 {
-    use CreatesApplication;
 
     private $userCount = 0;
     public $groupCount = 0;
