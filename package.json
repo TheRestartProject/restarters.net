@@ -27,8 +27,6 @@
         "jest-environment-jsdom": "^28.1.0",
         "jquery": "3.4.1",
         "jsdom-global": "^3.0.2",
-        "laravel-mix": "^6.0.49",
-        "laravel-mix-bundle-analyzer": "^1.0.5",
         "lodash": "^4.17.21",
         "lodash.mergewith": "^4.6.2",
         "lodash.template": "^4.5.0",
@@ -43,7 +41,10 @@
         "vue": "^2.7.14",
         "vue-loader": "^15.10.1",
         "vue-template-compiler": "^2.7.14",
-        "webpack-shell-plugin-next": "^2.3.1"
+        "webpack-shell-plugin-next": "^2.3.1",
+        "vite": "^3.0.2",
+        "laravel-vite-plugin": "^0.6.0",
+        "@vitejs/plugin-vue2": "^1.1.2"
     },
     "dependencies": {
         "@sentry/tracing": "^6.7.2",
