@@ -1,4 +1,5 @@
 {
+    "name": "restarters",
     "private": true,
     "scripts": {
         "test": "playwright test",
