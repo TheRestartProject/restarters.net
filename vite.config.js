@@ -1,13 +1,15 @@
 import { defineConfig } from 'vite';
 import laravel from 'laravel-vite-plugin';
 import vue from '@vitejs/plugin-vue2';
+import { watchAndRun } from 'vite-plugin-watch-and-run';
 
 export default defineConfig({
     optimizeDeps: {
         exclude: ['codemirror'],
     },
     plugins: [
-        laravel({
+        // Workaround from https://github.com/laravel/vite-plugin/pull/189#issuecomment-1416704995
+        laravel.default({
             input: [
                 'resources/global/css/app.scss',
                 'resources/sass/app.scss',
@@ -26,5 +28,13 @@ export default defineConfig({
                 },
             },
         }),
+        watchAndRun([
+            {
+                name: 'translation-watcher',
+                watch: 'lang/**/*.{php,json}',
+                run: 'php artisan lang:js --no-lib resources/js/translations.js',
+                delay: 300
+            }
+        ])
     ],
 });
