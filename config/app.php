@@ -6,33 +6,6 @@ use Illuminate\Support\Facades\Route;
 
 return [
 
-    'providers' => ServiceProvider::defaultProviders()->merge([
-        /*
-         * Package Service Providers...
-         */
-        Mariuzzo\LaravelJsLocalization\LaravelJsLocalizationServiceProvider::class,
-
-        /*
-         * Application Service Providers...
-         */
-        App\Providers\AppServiceProvider::class,
-        App\Providers\AuthServiceProvider::class,
-        // App\Providers\BroadcastServiceProvider::class,
-        App\Providers\EventServiceProvider::class,
-        App\Providers\RouteServiceProvider::class,
-        App\Providers\MediawikiServiceProvider::class,
-        App\Providers\WordpressServiceProvider::class,
-        Msurguy\Honeypot\HoneypotServiceProvider::class,
-        App\Providers\AgentServiceProvider::class,
-        Intervention\Image\ImageServiceProvider::class,
-        OwenIt\Auditing\AuditingServiceProvider::class,
-        Mcamara\LaravelLocalization\LaravelLocalizationServiceProvider::class,
-        Barryvdh\TranslationManager\ManagerServiceProvider::class,
-        App\Providers\DiscourseServiceProvider::class,
-        App\Providers\ScheduleServiceProvider::class,
-        Sentry\Laravel\ServiceProvider::class,
-        App\Providers\OurSentryLogging::class,
-    ])->toArray(),
 
     'aliases' => [
         'App' => Illuminate\Support\Facades\App::class,
