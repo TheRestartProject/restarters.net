@@ -13,7 +13,7 @@
 </template>
 <script>
 import Vue from 'vue'
-import NetworkDataField from "./NetworkDataField"
+import NetworkDataField from "./NetworkDataField.vue"
 
 export default {
   props: {

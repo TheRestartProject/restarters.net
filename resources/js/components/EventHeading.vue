@@ -43,8 +43,8 @@
 import { DEFAULT_PROFILE } from '../constants'
 import event from '../mixins/event'
 import moment from 'moment'
-import EventActions from './EventActions'
-import EventTitle from './EventTitle'
+import EventActions from './EventActions.vue'
+import EventTitle from './EventTitle.vue'
 
 export default {
   components: {EventTitle, EventActions},

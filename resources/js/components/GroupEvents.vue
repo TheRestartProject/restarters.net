@@ -62,10 +62,10 @@
 <script>
 import group from '../mixins/group'
 import moment from 'moment'
-import CalendarAddModal from './CalendarAddModal'
-import GroupEventsTab from './GroupEventsTab'
-import CollapsibleSection from './CollapsibleSection'
-import AlertBanner from './AlertBanner'
+import CalendarAddModal from './CalendarAddModal.vue'
+import GroupEventsTab from './GroupEventsTab.vue'
+import CollapsibleSection from './CollapsibleSection.vue'
+import AlertBanner from './AlertBanner.vue'
 
 export default {
   components: {

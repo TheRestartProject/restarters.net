@@ -53,7 +53,7 @@
 </template>
 <script>
 import { DEFAULT_PROFILE, HOST, RESTARTER } from '../constants'
-import ConfirmModal from './ConfirmModal'
+import ConfirmModal from './ConfirmModal.vue'
 import volunteers from '../store/volunteers'
 
 export default {

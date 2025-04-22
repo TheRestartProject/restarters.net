@@ -13,7 +13,7 @@
   </b-tab>
 </template>
 <script>
-import GroupEventScrollTable from './GroupEventScrollTable'
+import GroupEventScrollTable from './GroupEventScrollTable.vue'
 
 export default {
   components: {GroupEventScrollTable},

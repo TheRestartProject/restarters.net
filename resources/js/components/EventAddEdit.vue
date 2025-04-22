@@ -140,17 +140,17 @@
 <script>
 import event from '../mixins/event'
 import auth from '../mixins/auth'
-import RichTextEditor from './RichTextEditor'
-import EventDatePicker from './EventDatePicker'
-import EventTimeRangePicker from './EventTimeRangePicker'
-import VenueAddress from './VenueAddress'
-import EventVenue from './EventVenue'
-import EventGroup from './EventGroup'
-import EventLink from './EventLink'
+import RichTextEditor from './RichTextEditor.vue'
+import EventDatePicker from './EventDatePicker.vue'
+import EventTimeRangePicker from './EventTimeRangePicker.vue'
+import VenueAddress from './VenueAddress.vue'
+import EventVenue from './EventVenue.vue'
+import EventGroup from './EventGroup.vue'
+import EventLink from './EventLink.vue'
 import { required, url, helpers } from 'vuelidate/lib/validators'
 import validationHelpers from '../mixins/validationHelpers'
 import moment from 'moment-timezone'
-import NetworkData from './NetworkData'
+import NetworkData from './NetworkData.vue'
 import SpinButton from "./SpinButton.vue";
 
 function geocodeableValidation() {

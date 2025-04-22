@@ -22,15 +22,15 @@
 </template>
 <script>
 import event from '../mixins/event'
-import EventHeading from './EventHeading'
-import EventDetails from './EventDetails'
-import EventDescription from './EventDescription'
-import EventAttendance from './EventAttendance'
-import EventImages from './EventImages'
-import EventStats from './EventStats'
-import EventDevices from './EventDevices'
+import EventHeading from './EventHeading.vue'
+import EventDetails from './EventDetails.vue'
+import EventDescription from './EventDescription.vue'
+import EventAttendance from './EventAttendance.vue'
+import EventImages from './EventImages.vue'
+import EventStats from './EventStats.vue'
+import EventDevices from './EventDevices.vue'
 import auth from '../mixins/auth'
-import AlertBanner from './AlertBanner'
+import AlertBanner from './AlertBanner.vue'
 
 export default {
   components: {EventDevices, EventStats, EventImages, EventAttendance, EventDescription, EventDetails, EventHeading, AlertBanner},

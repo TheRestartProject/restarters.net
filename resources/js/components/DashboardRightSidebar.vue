@@ -49,7 +49,7 @@
   </div>
 </template>
 <script>
-import CollapsibleSection from './CollapsibleSection'
+import CollapsibleSection from './CollapsibleSection.vue'
 export default {
   components: {CollapsibleSection},
 }

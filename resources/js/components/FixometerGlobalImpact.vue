@@ -32,8 +32,8 @@
 </template>
 <script>
 import co2equivalent from '../mixins/co2equivalent'
-import StatsValue from './StatsValue'
-import FixometerLatestData from './FixometerLatestData'
+import StatsValue from './StatsValue.vue'
+import FixometerLatestData from './FixometerLatestData.vue'
 
 export default {
   mixins: [ co2equivalent ],

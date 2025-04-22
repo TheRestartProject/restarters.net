@@ -6,8 +6,8 @@
   </div>
 </template>
 <script>
-import GroupStatsFacts from './GroupStatsFacts'
-import StatsImpact from './StatsImpact'
+import GroupStatsFacts from './GroupStatsFacts.vue'
+import StatsImpact from './StatsImpact.vue'
 import group from '../mixins/group'
 
 export default {

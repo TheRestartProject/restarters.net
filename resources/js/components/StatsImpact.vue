@@ -41,7 +41,7 @@
   </div>
 </template>
 <script>
-import StatsValue from './StatsValue'
+import StatsValue from './StatsValue.vue'
 import co2equivalent from '../mixins/co2equivalent'
 const StatsShareModal = () => import('./StatsShareModal')
 

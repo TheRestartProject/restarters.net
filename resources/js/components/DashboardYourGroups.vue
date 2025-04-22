@@ -87,10 +87,10 @@
 </template>
 <script>
 import moment from 'moment'
-import DashboardGroup from './DashboardGroup'
-import CollapsibleSection from './CollapsibleSection'
-import DashboardEvent from './DashboardEvent'
-import DashboardNoGroups from './DashboardNoGroups'
+import DashboardGroup from './DashboardGroup.vue'
+import CollapsibleSection from './CollapsibleSection.vue'
+import DashboardEvent from './DashboardEvent.vue'
+import DashboardNoGroups from './DashboardNoGroups.vue'
 import { HOST } from '../constants'
 
 export default {

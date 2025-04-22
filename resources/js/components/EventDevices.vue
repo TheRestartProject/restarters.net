@@ -126,11 +126,11 @@
 </template>
 <script>
 import event from '../mixins/event'
-import ExternalLink from './ExternalLink'
-import CollapsibleSection from './CollapsibleSection'
-import EventDeviceList from './EventDeviceList'
-import EventDeviceSummary from './EventDeviceSummary'
-import EventDevice from './EventDevice'
+import ExternalLink from './ExternalLink.vue'
+import CollapsibleSection from './CollapsibleSection.vue'
+import EventDeviceList from './EventDeviceList.vue'
+import EventDeviceSummary from './EventDeviceSummary.vue'
+import EventDevice from './EventDevice.vue'
 
 export default {
   components: {EventDevice, EventDeviceSummary, EventDeviceList, CollapsibleSection, ExternalLink},
