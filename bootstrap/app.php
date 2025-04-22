@@ -9,7 +9,7 @@ return Application::configure(basePath: dirname(__DIR__))
     ->withProviders([
         \Mariuzzo\LaravelJsLocalization\LaravelJsLocalizationServiceProvider::class,
         \Msurguy\Honeypot\HoneypotServiceProvider::class,
-        \Intervention\Image\ImageServiceProvider::class,
+        \Intervention\Image\Laravel\ServiceProvider::class,
         \OwenIt\Auditing\AuditingServiceProvider::class,
         \Mcamara\LaravelLocalization\LaravelLocalizationServiceProvider::class,
         \Barryvdh\TranslationManager\ManagerServiceProvider::class,
