@@ -4,7 +4,7 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-class RemoveDripColumns extends Migration
+return new class extends Migration
 {
     /**
      * Run the migrations.
@@ -37,4 +37,4 @@ class RemoveDripColumns extends Migration
             $table->boolean('users_push_to_drip')->nullable(false)->default(false);
         });
     }
-}
+};
