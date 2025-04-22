@@ -1,3 +1,5 @@
+
+use App\Providers\AppServiceProvider;
 @if (Auth::check())
 @include('layouts.header')
 @else
@@ -39,7 +41,7 @@
 
                     @if (Auth::check())
                     <p>
-                        In the meantime, you could try going <a href="{{ URL::previous() }}">back</a>, or returning to the <a href="{{ \App\Providers\RouteServiceProvider::HOME }}">dashboard</a>.
+                        In the meantime, you could try going <a href="{{ URL::previous() }}">back</a>, or returning to the <a href="{{ \App\Providers\AppServiceProvider::HOME }}">dashboard</a>.
                     </p>
                     <p>
                         If you continue to get an error, you could try <a href="/logout">logging out</a> and logging back in again.

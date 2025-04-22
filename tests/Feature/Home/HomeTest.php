@@ -2,6 +2,7 @@
 
 namespace Tests\Feature\Dashboard;
 
+use App\Providers\AppServiceProvider;
 use App\Providers\RouteServiceProvider;
 use App\Role;
 use DB;
@@ -32,6 +33,6 @@ class HomeTest extends TestCase
     public function testLoggedIn(): void {
         $this->loginAsTestUser(Role::RESTARTER);
         $response = $this->get('/user');
-        $response->assertRedirect(RouteServiceProvider::HOME);
+        $response->assertRedirect(AppServiceProvider::HOME);
     }
 }

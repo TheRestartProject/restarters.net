@@ -2,6 +2,7 @@
 
 namespace Tests\Feature\Dashboard;
 
+use App\Providers\AppServiceProvider;
 use App\Providers\RouteServiceProvider;
 use App\Role;
 use DB;
@@ -20,7 +21,7 @@ class RoleTest extends TestCase
     public function testNotAdmin(): void {
         $this->loginAsTestUser(Role::RESTARTER);
         $response = $this->get('/role');
-        $response->assertRedirect(RouteServiceProvider::HOME);
+        $response->assertRedirect(AppServiceProvider::HOME);
     }
 
     public function testBasic(): void {

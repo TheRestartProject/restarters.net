@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Providers\AppServiceProvider;
 use App\Device;
 use App\Group;
 use App\Helpers\Fixometer;
@@ -16,7 +17,7 @@ class HomeController extends Controller
     {
         if (Auth::check()) {
             // We're logged in.  Go to the dashboard.
-            return redirect(RouteServiceProvider::HOME);
+            return redirect(AppServiceProvider::HOME);
         } else {
             // We're logged out. Render the landing page.
             $stats = Fixometer::loginRegisterStats();
