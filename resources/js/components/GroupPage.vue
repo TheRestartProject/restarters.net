@@ -50,15 +50,15 @@
   </div>
 </template>
 <script>
-import GroupHeading from './GroupHeading'
-import GroupDescription from './GroupDescription'
-import GroupVolunteers from './GroupVolunteers'
-import GroupStats from './GroupStats'
-import GroupEvents from './GroupEvents'
-import GroupDevicesWorkedOn from './GroupDevicesWorkedOn'
-import GroupDevicesMostRepaired from './GroupDevicesMostRepaired'
-import GroupDevicesBreakdown from './GroupDevicesBreakdown'
-import AlertBanner from './AlertBanner'
+import GroupHeading from './GroupHeading.vue'
+import GroupDescription from './GroupDescription.vue'
+import GroupVolunteers from './GroupVolunteers.vue'
+import GroupStats from './GroupStats.vue'
+import GroupEvents from './GroupEvents.vue'
+import GroupDevicesWorkedOn from './GroupDevicesWorkedOn.vue'
+import GroupDevicesMostRepaired from './GroupDevicesMostRepaired.vue'
+import GroupDevicesBreakdown from './GroupDevicesBreakdown.vue'
+import AlertBanner from './AlertBanner.vue'
 import auth from '../mixins/auth'
 
 export default {

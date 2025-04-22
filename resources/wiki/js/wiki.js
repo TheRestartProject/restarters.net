@@ -1,4 +1,5 @@
 import jquery from 'jquery';
 window.$ = window.jQuery=jquery;
 
-window.bootstrap = require('bootstrap');
+import bootstrap from 'bootstrap';
+window.bootstrap = bootstrap;

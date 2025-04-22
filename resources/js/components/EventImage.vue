@@ -5,9 +5,9 @@
   </div>
 </template>
 <script>
-import CollapsibleSection from './CollapsibleSection'
+import CollapsibleSection from './CollapsibleSection.vue'
 import { PLACEHOLDER } from '../constants'
-import EventImageModal from './EventImageModal'
+import EventImageModal from './EventImageModal.vue'
 
 export default {
   components: {EventImageModal},

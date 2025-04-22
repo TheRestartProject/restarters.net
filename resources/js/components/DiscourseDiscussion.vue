@@ -41,8 +41,8 @@
 </template>
 
 <script>
-import DiscourseTopic from './DiscourseTopic'
-import CollapsibleSection from './CollapsibleSection'
+import DiscourseTopic from './DiscourseTopic.vue'
+import CollapsibleSection from './CollapsibleSection.vue'
 const axios = require('axios')
 
 export default {

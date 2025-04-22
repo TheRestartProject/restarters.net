@@ -47,7 +47,7 @@
 </template>
 <script>
 import { DEFAULT_PROFILE, HOST } from '../constants'
-import ConfirmModal from './ConfirmModal'
+import ConfirmModal from './ConfirmModal.vue'
 
 export default {
   components: {ConfirmModal},

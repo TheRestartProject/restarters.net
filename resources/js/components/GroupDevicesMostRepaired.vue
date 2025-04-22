@@ -21,7 +21,7 @@
   </div>
 </template>
 <script>
-import GroupDeviceRepairPodium from './GroupDeviceRepairPodium'
+import GroupDeviceRepairPodium from './GroupDeviceRepairPodium.vue'
 export default {
   components: {GroupDeviceRepairPodium},
   props: {

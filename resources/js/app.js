@@ -4,16 +4,16 @@
 * building robust, powerful web applications using Vue and Laravel.
 */
 
-require('./bootstrap');
-require('./bootstrap-tokenfield.min');
-require('./bootstrap-sortable.js');
-require('select2');
-require('slick-carousel');
-require('ekko-lightbox');
-require('bootstrap4-datetimepicker');
-require('./misc/notifications');
-require('leaflet');
-require('./constants');
+import './bootstrap';
+import './bootstrap-tokenfield.min';
+import './bootstrap-sortable.js';
+import 'select2';
+import 'slick-carousel';
+import 'ekko-lightbox';
+import 'bootstrap4-datetimepicker';
+import './misc/notifications';
+import 'leaflet';
+import './constants';
 
 import Vue from 'vue'
 import { BootstrapVue, IconsPlugin } from 'bootstrap-vue'
@@ -72,13 +72,15 @@ import { Lang } from './mixins/lang'
 Vue.mixin(LangMixin)
 
 const Icon = require('vue-awesome/components/Icon')
-require('vue-awesome/icons/sync')
-require('vue-awesome/icons/save')
-require('vue-awesome/icons/check')
+import 'vue-awesome/icons/sync'
+import 'vue-awesome/icons/save'
+import 'vue-awesome/icons/check'
 Vue.component('v-icon', Icon)
 
-window.Dropzone = require('dropzone');
-window.Tokenfield = require("tokenfield");
+import Dropzone from 'dropzone';
+window.Dropzone = Dropzone;
+import Tokenfield from "tokenfield";
+window.Tokenfield = Tokenfield;
 
 if ( jQuery('.slideshow').length > 0 ) {
   jQuery('.slideshow').slick({

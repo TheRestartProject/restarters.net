@@ -29,8 +29,8 @@
 </template>
 <script>
 import group from '../mixins/group'
-import GroupVolunteer from './GroupVolunteer'
-import CollapsibleSection from './CollapsibleSection'
+import GroupVolunteer from './GroupVolunteer.vue'
+import CollapsibleSection from './CollapsibleSection.vue'
 import Group from '../mixins/group'
 
 export default {

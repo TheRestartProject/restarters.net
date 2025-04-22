@@ -75,10 +75,10 @@
 </template>
 <script>
 import event from '../mixins/event'
-import EventAttendanceCount from './EventAttendanceCount'
-import EventAttendee from './EventAttendee'
-import CollapsibleSection from './CollapsibleSection'
-import EventAddVolunteerModal from './EventAddVolunteerModal'
+import EventAttendanceCount from './EventAttendanceCount.vue'
+import EventAttendee from './EventAttendee.vue'
+import CollapsibleSection from './CollapsibleSection.vue'
+import EventAddVolunteerModal from './EventAddVolunteerModal.vue'
 
 export default {
   props: {
