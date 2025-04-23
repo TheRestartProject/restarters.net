@@ -47,7 +47,6 @@ class AppServiceProvider extends ServiceProvider
 
         \Illuminate\Pagination\Paginator::useBootstrapThree();
 
-        EventsUsers::observe(EventsUsersObserver::class);
         
         $this->registerEvents();
     }

@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Attributes\Scope;
 use App\Models\User;
 use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Database\Eloquent\Relations\HasMany;
@@ -602,37 +603,44 @@ class Group extends Model implements Auditable
     }
 
     // TODO We've started to refactor into scopes, but this isn't complete yet.
-    public function scopeMembers() {
+    #[Scope]
+    protected function members() {
         return User::join('users_groups', 'users_groups.user', '=', 'users.id')
             ->where('users_groups.group', $this->idgroups)
             ->select('users.*');
     }
 
-    public function scopeMembersUndeleted($query) {
+    #[Scope]
+    protected function membersUndeleted($query) {
         $query = $query->members();
         return $query->whereNull('users_groups.deleted_at');
     }
 
-    public function scopeMembersJoined($query) {
+    #[Scope]
+    protected function membersJoined($query) {
         $query = $query->membersUndeleted();
         return $query->where('users_groups.status', 'like', 1);
     }
 
-    public function scopeMembersRestarters($query) {
+    #[Scope]
+    protected function membersRestarters($query) {
         $query = $query->membersJoined();
         return $query->where('users_groups.role', Role::RESTARTER);
     }
 
-    public function scopeMembersHosts($query) {
+    #[Scope]
+    protected function membersHosts($query) {
         $query = $query->membersJoined();
         return $query->where('users_groups.role', Role::HOST);
     }
 
-    public function scopeUnapproved($query) {
+    #[Scope]
+    protected function unapproved($query) {
         return $query->where('approved', false);
     }
 
-    public function scopeUnapprovedVisibleTo($query, $user_id) {
+    #[Scope]
+    protected function unapprovedVisibleTo($query, $user_id) {
         $u = User::findOrFail($user_id);
         $unetworks = $u->networks;
         $ret = [];

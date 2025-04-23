@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Attributes\Scope;
 use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use DB;
@@ -101,7 +102,8 @@ class UserGroups extends Model implements Auditable
         return $this->status == '1';
     }
 
-    public function scopeConfirmedInvitation($query)
+    #[Scope]
+    protected function confirmedInvitation($query)
     {
         return $query->where('status', 1)->orWhereNull('status');
     }
