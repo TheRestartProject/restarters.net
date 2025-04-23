@@ -36,7 +36,7 @@
           <?php
 
           // If we are a network coordinator, only show our network.
-          $ns = App\Helpers\Fixometer::hasRole($user, 'NetworkCoordinator') ? $user->networks : \App\Network::all();
+          $ns = App\Helpers\Fixometer::hasRole($user, 'NetworkCoordinator') ? $user->networks : \App\Models\Network::all();
           $networkids = [];
 
           foreach ($ns as $n) {

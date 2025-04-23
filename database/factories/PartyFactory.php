@@ -3,7 +3,7 @@
 namespace Database\Factories;
 
 use Illuminate\Database\Eloquent\Factories\Factory;
-use App\Group;
+use App\Models\Group;
 use Carbon\Carbon;
 
 class PartyFactory extends Factory

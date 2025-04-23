@@ -3,19 +3,19 @@
 namespace Tests\Feature;
 
 use App\Events\EventDeleted;
-use App\EventsUsers;
-use App\Group;
+use App\Models\EventsUsers;
+use App\Models\Group;
 use App\Helpers\Geocoder;
 use App\Listeners\DeleteEventFromWordPress;
-use App\Network;
+use App\Models\Network;
 use App\Notifications\DeleteEventFromWordpressFailed;
 use App\Notifications\EventRepairs;
 use App\Notifications\NotifyRestartersOfNewEvent;
-use App\Party;
-use App\Preferences;
-use App\Role;
-use App\User;
-use App\UserGroups;
+use App\Models\Party;
+use App\Models\Preferences;
+use App\Models\Role;
+use App\Models\User;
+use App\Models\UserGroups;
 use Auth;
 use Carbon\Carbon;
 use DB;

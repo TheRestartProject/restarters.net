@@ -3,12 +3,12 @@
 namespace Tests\Feature;
 
 use App\Events\UserUpdated;
-use App\Group;
-use App\GroupTags;
+use App\Models\Group;
+use App\Models\GroupTags;
 use App\Notifications\GroupConfirmed;
 use App\Notifications\NewGroupWithinRadius;
-use App\Role;
-use App\User;
+use App\Models\Role;
+use App\Models\User;
 use Carbon\Carbon;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Event;

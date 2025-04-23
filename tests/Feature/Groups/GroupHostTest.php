@@ -2,12 +2,12 @@
 
 namespace Tests\Feature\Groups;
 
-use App\Group;
-use App\Network;
-use App\Role;
-use App\Skills;
-use App\User;
-use App\UsersSkills;
+use App\Models\Group;
+use App\Models\Network;
+use App\Models\Role;
+use App\Models\Skills;
+use App\Models\User;
+use App\Models\UsersSkills;
 use Tests\TestCase;
 use Illuminate\Auth\AuthenticationException;
 

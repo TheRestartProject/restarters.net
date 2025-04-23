@@ -2,15 +2,15 @@
 
 namespace Tests\Feature;
 
-use App\Category;
-use App\Device;
-use App\Group;
+use App\Models\Category;
+use App\Models\Device;
+use App\Models\Group;
 use App\Helpers\RepairNetworkService;
-use App\Network;
-use App\Party;
-use App\Role;
-use App\User;
-use App\UserGroups;
+use App\Models\Network;
+use App\Models\Party;
+use App\Models\Role;
+use App\Models\User;
+use App\Models\UserGroups;
 use DB;
 use Tests\TestCase;
 

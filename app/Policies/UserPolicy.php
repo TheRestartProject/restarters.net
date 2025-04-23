@@ -3,8 +3,8 @@
 namespace App\Policies;
 
 use App\Helpers\Fixometer;
-use App\Role;
-use App\User;
+use App\Models\Role;
+use App\Models\User;
 use Illuminate\Auth\Access\HandlesAuthorization;
 
 class UserPolicy
@@ -14,8 +14,8 @@ class UserPolicy
     /**
      * Determine whether one user can change the Repair Directory role of another to a specific value.
      *
-     * @param  \App\User  $user
-     * @param  \App\User  $user
+     * @param  \App\Models\User  $user
+     * @param  \App\Models\User  $user
      * @return mixed
      */
     public function changeRepairDirRole(User $perpetrator, User $victim, int $role)

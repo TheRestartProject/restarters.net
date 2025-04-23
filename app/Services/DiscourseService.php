@@ -2,11 +2,11 @@
 
 namespace App\Services;
 
-use App\Network;
-use App\Role;
-use App\User;
-use App\Group;
-use App\UserGroups;
+use App\Models\Network;
+use App\Models\Role;
+use App\Models\User;
+use App\Models\Group;
+use App\Models\UserGroups;
 use Auth;
 use Illuminate\Support\Facades\Log;
 

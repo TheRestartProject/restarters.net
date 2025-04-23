@@ -2,13 +2,13 @@
 
 namespace Tests\Feature;
 
-use App\EventsUsers;
-use App\Group;
+use App\Models\EventsUsers;
+use App\Models\Group;
 use App\Helpers\Fixometer;
 use App\Notifications\AdminModerationEvent;
 use App\Notifications\AdminModerationEventPhotos;
-use App\Party;
-use App\User;
+use App\Models\Party;
+use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Foundation\Testing\WithoutMiddleware;
 use Illuminate\Http\UploadedFile;

@@ -2,9 +2,9 @@
 
 namespace Tests\Feature\Groups;
 
-use App\Group;
-use App\Network;
-use App\User;
+use App\Models\Group;
+use App\Models\Network;
+use App\Models\User;
 use DB;
 use Hash;
 use Mockery;

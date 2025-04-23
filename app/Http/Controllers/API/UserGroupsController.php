@@ -2,12 +2,12 @@
 
 namespace App\Http\Controllers\API;
 
-use App\Group;
+use App\Models\Group;
 use App\Helpers\Fixometer;
 use App\Http\Controllers\Controller;
-use App\Role;
-use App\User;
-use App\UserGroups;
+use App\Models\Role;
+use App\Models\User;
+use App\Models\UserGroups;
 use Auth;
 use Illuminate\Http\Request;
 
@@ -48,7 +48,7 @@ class UserGroupsController extends Controller
 
     protected static function getUserGroupAudits($dateFrom = null)
     {
-        $query = \OwenIt\Auditing\Models\Audit::where('auditable_type', \App\UserGroups::class);
+        $query = \OwenIt\Auditing\Models\Audit::where('auditable_type', \App\Models\UserGroups::class);
 
         if (! is_null($dateFrom)) {
             $query->where('created_at', '>=', $dateFrom);

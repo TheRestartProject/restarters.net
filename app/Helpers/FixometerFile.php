@@ -1,7 +1,7 @@
 <?php
 
-use App\Images;
-use App\Xref;
+use App\Models\Images;
+use App\Models\Xref;
 use Illuminate\Database\Eloquent\Model;
 use Intervention\Image\ImageManagerStatic as Image;
 

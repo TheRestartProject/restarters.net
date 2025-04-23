@@ -4,20 +4,20 @@ namespace App\Http\Controllers\API;
 
 use Illuminate\Http\JsonResponse;
 use App\Events\EditEvent;
-use App\EventsUsers;
-use App\Group;
+use App\Models\EventsUsers;
+use App\Models\Group;
 use App\Helpers\Fixometer;
 use App\Http\Controllers\Controller;
-use App\Invite;
-use App\Network;
+use App\Models\Invite;
+use App\Models\Network;
 use App\Notifications\AdminModerationEvent;
-use App\Role;
+use App\Models\Role;
 use Illuminate\Auth\AuthenticationException;
 use Illuminate\Validation\ValidationException;
 use Notification;
 use App\Notifications\JoinGroup;
-use App\Party;
-use App\User;
+use App\Models\Party;
+use App\Models\User;
 use Auth;
 use Illuminate\Http\Request;
 use Carbon\Carbon;
@@ -498,7 +498,7 @@ class EventController extends Controller
             'hours' => $hours,
             'user_id' => $user->id,
             'created_at' => date('Y-m-d H:i:s'),
-            'shareable_code' => Fixometer::generateUniqueShareableCode(\App\Party::class, 'shareable_code'),
+            'shareable_code' => Fixometer::generateUniqueShareableCode(\App\Models\Party::class, 'shareable_code'),
             'online' => $online,
             'network_data' => $network_data,
         ];

@@ -3,7 +3,7 @@
 namespace Tests\Feature\Alerts;
 
 use App\Alerts;
-use App\Role;
+use App\Models\Role;
 use Cache;
 use DB;
 use Hash;

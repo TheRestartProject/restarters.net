@@ -3,10 +3,10 @@
 namespace App\Http\Controllers;
 
 use App\Providers\AppServiceProvider;
-use App\Device;
-use App\Group;
+use App\Models\Device;
+use App\Models\Group;
 use App\Helpers\Fixometer;
-use App\Party;
+use App\Models\Party;
 use Auth;
 use Illuminate\Http\Request;
 

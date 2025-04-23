@@ -2,15 +2,15 @@
 
 namespace Tests\Feature;
 
-use App\Device;
+use App\Models\Device;
 use App\Events\DeviceCreatedOrUpdated;
-use App\EventsUsers;
-use App\Group;
+use App\Models\EventsUsers;
+use App\Models\Group;
 use App\Listeners\DeviceUpdatedAt;
-use App\Network;
-use App\Party;
-use App\Role;
-use App\User;
+use App\Models\Network;
+use App\Models\Party;
+use App\Models\Role;
+use App\Models\User;
 use DB;
 use Illuminate\Support\Facades\Storage;
 use Tests\TestCase;

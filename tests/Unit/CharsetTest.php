@@ -2,11 +2,11 @@
 
 namespace Tests\Unit;
 
-use App\Device;
-use App\Group;
-use App\Network;
-use App\Party;
-use App\User;
+use App\Models\Device;
+use App\Models\Group;
+use App\Models\Network;
+use App\Models\Party;
+use App\Models\User;
 use DB;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Log;

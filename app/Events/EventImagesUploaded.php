@@ -2,7 +2,7 @@
 
 namespace App\Events;
 
-use App\Party;
+use App\Models\Party;
 use Illuminate\Queue\SerializesModels;
 
 class EventImagesUploaded

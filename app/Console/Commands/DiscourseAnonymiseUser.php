@@ -2,10 +2,10 @@
 
 namespace App\Console\Commands;
 
-use App\Group;
+use App\Models\Group;
 use App\Helpers\Geocoder;
 use App\Services\DiscourseService;
-use App\User;
+use App\Models\User;
 use Illuminate\Console\Command;
 
 class DiscourseAnonymiseUser extends Command

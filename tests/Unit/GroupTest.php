@@ -2,12 +2,12 @@
 
 namespace Tests\Unit;
 
-use App\Group;
-use App\GrouptagsGroups;
-use App\Network;
-use App\Role;
-use App\User;
-use App\UserGroups;
+use App\Models\Group;
+use App\Models\GrouptagsGroups;
+use App\Models\Network;
+use App\Models\Role;
+use App\Models\User;
+use App\Models\UserGroups;
 use DB;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Foundation\Testing\WithFaker;
@@ -30,8 +30,8 @@ class GroupTest extends TestCase
     /** @test */
     public function can_add_volunteer_to_a_group(): void
     {
-        $group = \App\Group::factory()->create();
-        $volunteer = \App\User::factory()->create();
+        $group = \App\Models\Group::factory()->create();
+        $volunteer = \App\Models\User::factory()->create();
 
         $group->addVolunteer($volunteer);
 
@@ -57,8 +57,8 @@ class GroupTest extends TestCase
     /** @test */
     public function it_can_set_a_host_group_member_as_host(): void
     {
-        $group = \App\Group::factory()->create();
-        $host = \App\User::factory()->host()->create();
+        $group = \App\Models\Group::factory()->create();
+        $host = \App\Models\User::factory()->host()->create();
 
         $group->addVolunteer($host);
         $group->makeMemberAHost($host);
@@ -72,8 +72,8 @@ class GroupTest extends TestCase
     /** @test */
     public function it_can_set_a_restarter_group_member_as_host(): void
     {
-        $group = \App\Group::factory()->create();
-        $restarter = \App\User::factory()->restarter()->create();
+        $group = \App\Models\Group::factory()->create();
+        $restarter = \App\Models\User::factory()->restarter()->create();
 
         $group->addVolunteer($restarter);
         $group->makeMemberAHost($restarter);
@@ -87,8 +87,8 @@ class GroupTest extends TestCase
     /** @test */
     public function it_can_have_a_tag_added(): void
     {
-        $group = \App\Group::factory()->create();
-        $tag1 = \App\GroupTags::factory()->create();
+        $group = \App\Models\Group::factory()->create();
+        $tag1 = \App\Models\GroupTags::factory()->create();
 
         $group->addTag($tag1);
 

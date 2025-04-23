@@ -3,8 +3,8 @@
 namespace App\Http\Controllers;
 
 use Illuminate\View\View;
-use App\Device;
-use App\Party;
+use App\Models\Device;
+use App\Models\Party;
 
 /**
  * Embedded at https://therestartproject.org/impact

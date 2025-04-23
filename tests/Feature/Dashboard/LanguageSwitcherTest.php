@@ -2,8 +2,8 @@
 
 namespace Tests\Feature\Dashboard;
 
-use App\Role;
-use App\Session;
+use App\Models\Role;
+use App\Models\Session;
 use DB;
 use Hash;
 use Illuminate\Support\Facades\Auth;

@@ -2,8 +2,8 @@
 
 namespace App\Policies;
 
-use App\Network;
-use App\User;
+use App\Models\Network;
+use App\Models\User;
 use Illuminate\Auth\Access\HandlesAuthorization;
 
 class NetworkPolicy

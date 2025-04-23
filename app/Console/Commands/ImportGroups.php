@@ -3,7 +3,7 @@
 namespace App\Console\Commands;
 
 use App\Helpers\Fixometer;
-use App\User;
+use App\Models\User;
 use Illuminate\Console\Command;
 
 class ImportGroups extends Command
@@ -113,7 +113,7 @@ class ImportGroups extends Command
 
                 // Create the group.
                 try {
-                    $group = new \App\Group();
+                    $group = new \App\Models\Group();
                     $group->name = $groupname;
                     $group->location = $location;
                     $group->postcode = $postcode;
@@ -124,7 +124,7 @@ class ImportGroups extends Command
                     $group->website = $website;
                     $group->phone = $phone;
                     $group->free_text = $description;
-                    $group->shareable_code = Fixometer::generateUniqueShareableCode(\App\Group::class, 'shareable_code');
+                    $group->shareable_code = Fixometer::generateUniqueShareableCode(\App\Models\Group::class, 'shareable_code');
 
                     // All these groups are approved.
                     $group->approved = true;
@@ -134,7 +134,7 @@ class ImportGroups extends Command
                     if ($networks) {
                         $networks = explode(',', $networks);
                         foreach ($networks as $network) {
-                            $n = \App\Network::findOrFail($network);
+                            $n = \App\Models\Network::findOrFail($network);
                             $n->addGroup($group);
                         }
                     }

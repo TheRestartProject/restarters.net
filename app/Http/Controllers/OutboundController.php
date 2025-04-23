@@ -2,9 +2,9 @@
 
 namespace App\Http\Controllers;
 
-use App\Device;
-use App\Group;
-use App\Party;
+use App\Models\Device;
+use App\Models\Group;
+use App\Models\Party;
 use Request;
 
 class OutboundController extends Controller

@@ -2,13 +2,13 @@
 
 namespace Tests\Feature\Groups;
 
-use App\Group;
-use App\GroupTags;
-use App\Network;
+use App\Models\Group;
+use App\Models\GroupTags;
+use App\Models\Network;
 use App\Notifications\GroupConfirmed;
-use App\Party;
-use App\Role;
-use App\User;
+use App\Models\Party;
+use App\Models\Role;
+use App\Models\User;
 use Carbon\Carbon;
 use Illuminate\Validation\ValidationException;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;

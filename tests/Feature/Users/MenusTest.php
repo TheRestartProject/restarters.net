@@ -3,8 +3,8 @@
 namespace Tests\Feature;
 
 use App\Events\UserUpdated;
-use App\User;
-use App\UsersPermissions;
+use App\Models\User;
+use App\Models\UsersPermissions;
 use Carbon\Carbon;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Event;

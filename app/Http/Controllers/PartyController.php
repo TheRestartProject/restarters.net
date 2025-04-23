@@ -5,26 +5,26 @@ namespace App\Http\Controllers;
 use Illuminate\View\View;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
-use App\Audits;
-use App\Brands;
-use App\Cluster;
-use App\Device;
+use App\Models\Audits;
+use App\Models\Brands;
+use App\Models\Cluster;
+use App\Models\Device;
 use App\Events\EditEvent;
 use App\Events\EventDeleted;
 use App\Events\EventImagesUploaded;
-use App\EventsUsers;
-use App\Group;
+use App\Models\EventsUsers;
+use App\Models\Group;
 use App\Helpers\Fixometer;
 use App\Helpers\Geocoder;
-use App\Invite;
+use App\Models\Invite;
 use App\Notifications\AdminModerationEvent;
 use App\Notifications\EventRepairs;
 use App\Notifications\JoinEvent;
 use App\Notifications\RSVPEvent;
-use App\Party;
+use App\Models\Party;
 use App\Services\DiscourseService;
-use App\User;
-use App\UserGroups;
+use App\Models\User;
+use App\Models\UserGroups;
 use Auth;
 use Carbon\Carbon;
 use DateTime;
@@ -834,7 +834,7 @@ class PartyController extends Controller
 
         $event = Party::findOrFail($id);
 
-        Audits::where('auditable_type', \App\Party::class)->where('auditable_id', $id)->delete();
+        Audits::where('auditable_type', \App\Models\Party::class)->where('auditable_id', $id)->delete();
         Device::where('event', $id)->delete();
 
         // We have to do a loop to avoid the gotcha where bulk delete operations don't invoke observers.

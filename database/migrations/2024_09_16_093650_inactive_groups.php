@@ -11,9 +11,9 @@ return new class extends Migration
      */
     public function up(): void
     {
-        $groups = \App\Group::join('grouptags_groups', 'groups.idgroups', '=', 'grouptags_groups.group')
+        $groups = \App\Models\Group::join('grouptags_groups', 'groups.idgroups', '=', 'grouptags_groups.group')
             ->join('group_tags', 'grouptags_groups.group_tag', '=', 'group_tags.id')
-            ->where('group_tags.id', \App\GroupTags::INACTIVE)
+            ->where('group_tags.id', \App\Models\GroupTags::INACTIVE)
             ->get();
 
         foreach ($groups as $group) {
@@ -32,7 +32,7 @@ return new class extends Migration
     public function down(): void
     {
         // Add [INACTIVE] into all groups with archived_at.
-        $groups = \App\Group::whereNotNull('archived_at')->get();
+        $groups = \App\Models\Group::whereNotNull('archived_at')->get();
 
         foreach ($groups as $group) {
             $group->name = '[INACTIVE] ' . $group->name;

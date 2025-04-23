@@ -4,9 +4,9 @@ namespace Tests\Feature;
 
 use App\Listeners\RemoveUserFromDiscourseThreadForEvent;
 use Illuminate\Support\Facades\Queue;
-use App\EventsUsers;
+use App\Models\EventsUsers;
 use App\Listeners\AddUserToDiscourseThreadForEvent;
-use App\User;
+use App\Models\User;
 use DB;
 use Illuminate\Support\Facades\Notification;
 use Tests\TestCase;
@@ -29,7 +29,7 @@ class JoinEventTest extends TestCase
         $idevents = $this->createEvent($idgroups, 'tomorrow');
 
         // Joining should trigger adding to the Discourse thread.  Fake one.
-        $event = \App\Party::find($idevents);
+        $event = \App\Models\Party::find($idevents);
         $event->discourse_thread = 123;
         assertEquals(1, $event->volunteers);
         $event->save();

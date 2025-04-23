@@ -2,7 +2,7 @@
 
 namespace App\Console\Commands;
 
-use App\Group;
+use App\Models\Group;
 use App\Helpers\Geocoder;
 use App\Services\DiscourseService;
 use Illuminate\Console\Command;

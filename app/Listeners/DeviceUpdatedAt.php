@@ -2,10 +2,10 @@
 
 namespace App\Listeners;
 
-use App\Device;
+use App\Models\Device;
 use App\Events\DeviceCreatedOrUpdated;
-use App\Group;
-use App\Party;
+use App\Models\Group;
+use App\Models\Party;
 
 class DeviceUpdatedAt extends BaseEvent
 {

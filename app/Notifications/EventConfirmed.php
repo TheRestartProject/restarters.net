@@ -2,7 +2,7 @@
 
 namespace App\Notifications;
 
-use App\Party;
+use App\Models\Party;
 use Illuminate\Notifications\Messages\MailMessage;
 
 class EventConfirmed extends BaseNotification

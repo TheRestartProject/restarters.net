@@ -2,7 +2,7 @@
 
 namespace App\Http\Controllers\API;
 
-use App\Device;
+use App\Models\Device;
 use App\Http\Controllers\Controller;
 use App\Http\Resources\ItemCollection;
 use Auth;

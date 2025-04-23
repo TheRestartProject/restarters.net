@@ -3,7 +3,7 @@
 namespace Tests\Feature\Dashboard;
 
 use App\Providers\AppServiceProvider;
-use App\Role;
+use App\Models\Role;
 use DB;
 use Hash;
 use Tests\TestCase;

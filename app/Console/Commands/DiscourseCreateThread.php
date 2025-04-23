@@ -3,10 +3,10 @@
 namespace App\Console\Commands;
 
 use App\Events\ApproveEvent;
-use App\Group;
+use App\Models\Group;
 use App\Helpers\Geocoder;
 use App\Listeners\CreateDiscourseThreadForEvent;
-use App\Party;
+use App\Models\Party;
 use App\Services\DiscourseService;
 use Illuminate\Console\Command;
 use Riverline\MultiPartParser\Part;

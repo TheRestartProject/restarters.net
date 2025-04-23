@@ -2,9 +2,9 @@
 
 namespace App\Console\Commands;
 
-use App\Group;
+use App\Models\Group;
 use App\Helpers\Fixometer;
-use App\Party;
+use App\Models\Party;
 use DateTime;
 use Illuminate\Console\Command;
 

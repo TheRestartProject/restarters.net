@@ -2,9 +2,9 @@
 
 namespace Tests\Feature\Stats;
 
-use App\Category;
-use App\Device;
-use App\DeviceBarrier;
+use App\Models\Category;
+use App\Models\Device;
+use App\Models\DeviceBarrier;
 use App\Helpers\LcaStats;
 use DB;
 use Tests\TestCase;

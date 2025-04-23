@@ -3,11 +3,11 @@
 namespace Tests\Feature;
 
 use App\Events\UserUpdated;
-use App\Group;
+use App\Models\Group;
 use App\Helpers\Fixometer;
-use App\Role;
-use App\Skills;
-use App\User;
+use App\Models\Role;
+use App\Models\Skills;
+use App\Models\User;
 use Carbon\Carbon;
 use DB;
 use Illuminate\Foundation\Testing\RefreshDatabase;

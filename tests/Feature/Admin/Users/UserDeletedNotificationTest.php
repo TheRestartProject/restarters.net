@@ -5,7 +5,7 @@ namespace Tests\Feature;
 use App\Events\UserDeleted;
 use App\Listeners\DiscourseUserEventSubscriber;
 use App\Notifications\AdminUserDeleted;
-use App\User;
+use App\Models\User;
 use Illuminate\Support\Facades\Notification;
 use Tests\TestCase;
 use Illuminate\Support\Facades\Event;

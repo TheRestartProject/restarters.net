@@ -2,7 +2,7 @@
 
 namespace App\Console\Commands;
 
-use App\Group;
+use App\Models\Group;
 use Illuminate\Console\Command;
 
 class CreateDiscourseGroups extends Command

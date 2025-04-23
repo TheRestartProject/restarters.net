@@ -2,7 +2,7 @@
 
 namespace App\Console\Commands;
 
-use App\User;
+use App\Models\User;
 use Illuminate\Console\Command;
 use Illuminate\Support\Str;
 
@@ -49,7 +49,7 @@ class AlertCreate extends Command
         $variant = trim($this->argument('variant'));
         $variant = $variant ? $variant : 'secondary';
 
-        $alert = new \App\Alert();
+        $alert = new \App\Models\Alert();
         $alert->title = $title;
         $alert->html = $html;
         $alert->variant = $variant;

@@ -2,9 +2,9 @@
 
 namespace App\Console\Commands;
 
-use App\Role;
+use App\Models\Role;
 use App\Services\DiscourseService;
-use App\User;
+use App\Models\User;
 use App\WikiSyncStatus;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\Hash;

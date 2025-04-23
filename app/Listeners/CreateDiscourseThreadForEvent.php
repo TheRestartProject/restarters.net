@@ -3,9 +3,9 @@
 namespace App\Listeners;
 
 use App\Events\ApproveEvent;
-use App\EventsUsers;
-use App\Party;
-use App\User;
+use App\Models\EventsUsers;
+use App\Models\Party;
+use App\Models\User;
 use Illuminate\Support\Facades\Log;
 
 class CreateDiscourseThreadForEvent extends BaseEvent

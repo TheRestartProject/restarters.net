@@ -4,8 +4,8 @@ namespace App\Http\Controllers;
 
 use Illuminate\View\View;
 use Illuminate\Http\RedirectResponse;
-use App\Group;
-use App\Network;
+use App\Models\Group;
+use App\Models\Network;
 use Auth;
 use FixometerFile;
 use Illuminate\Http\Request;

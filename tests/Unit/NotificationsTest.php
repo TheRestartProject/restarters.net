@@ -25,7 +25,7 @@ use App\Notifications\NotifyAdminNoDevices;
 use App\Notifications\NotifyRestartersOfNewEvent;
 use App\Notifications\ResetPassword;
 use App\Notifications\RSVPEvent;
-use App\User;
+use App\Models\User;
 use DB;
 use Tests\TestCase;
 

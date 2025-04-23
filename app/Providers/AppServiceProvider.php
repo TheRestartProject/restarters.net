@@ -2,7 +2,7 @@
 
 namespace App\Providers;
 
-use App\EventsUsers;
+use App\Models\EventsUsers;
 use App\Helpers\Geocoder;
 use App\Helpers\RobustTranslator;
 use App\Observers\EventsUsersObserver;

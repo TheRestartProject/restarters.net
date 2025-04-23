@@ -4,7 +4,7 @@ namespace Tests\Feature;
 
 use App\Listeners\ChangeWikiPassword;
 use App\Listeners\LogInToWiki;
-use App\User;
+use App\Models\User;
 use App\WikiSyncStatus;
 use Carbon\Carbon;
 use DB;

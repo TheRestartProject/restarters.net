@@ -2,10 +2,10 @@
 
 namespace App\Http\Controllers;
 
-use App\Group;
-use App\Party;
-use App\User;
-use App\Network;
+use App\Models\Group;
+use App\Models\Party;
+use App\Models\User;
+use App\Models\Network;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;

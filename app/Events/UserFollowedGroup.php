@@ -2,8 +2,8 @@
 
 namespace App\Events;
 
-use App\Group;
-use App\User;
+use App\Models\Group;
+use App\Models\User;
 use Illuminate\Queue\SerializesModels;
 
 class UserFollowedGroup

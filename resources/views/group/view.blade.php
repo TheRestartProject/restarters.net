@@ -57,11 +57,11 @@
           ];
 
           foreach ($group_device_count_status as $count) {
-              if ($count->status == \App\Device::REPAIR_STATUS_FIXED) {
+              if ($count->status == \App\Models\Device::REPAIR_STATUS_FIXED) {
                   $device_stats['fixed'] = $count->counter;
-              } else if ($count->status == \App\Device::REPAIR_STATUS_REPAIRABLE) {
+              } else if ($count->status == \App\Models\Device::REPAIR_STATUS_REPAIRABLE) {
                   $device_stats['repairable'] = $count->counter;
-              } else if ($count->status == \App\Device::REPAIR_STATUS_ENDOFLIFE) {
+              } else if ($count->status == \App\Models\Device::REPAIR_STATUS_ENDOFLIFE) {
                   $device_stats['dead'] = $count->counter;
               }
           }
@@ -126,7 +126,7 @@
               ];
           }
 
-          $in_group = \App\UserGroups::where('group', $group->idgroups)
+          $in_group = \App\Models\UserGroups::where('group', $group->idgroups)
               ->where('user', Auth::id())
               ->where('status', 1)
               ->whereNull('users_groups.deleted_at')

@@ -2,11 +2,11 @@
 
 namespace Tests\Feature;
 
-use App\Group;
-use App\GroupTags;
-use App\Network;
-use App\Role;
-use App\User;
+use App\Models\Group;
+use App\Models\GroupTags;
+use App\Models\Network;
+use App\Models\Role;
+use App\Models\User;
 use Carbon\Carbon;
 use DB;
 use Illuminate\Foundation\Testing\RefreshDatabase;

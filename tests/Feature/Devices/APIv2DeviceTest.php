@@ -2,14 +2,14 @@
 
 namespace Tests\Feature;
 
-use App\Device;
-use App\DeviceBarrier;
-use App\Group;
-use App\GroupTags;
+use App\Models\Device;
+use App\Models\DeviceBarrier;
+use App\Models\Group;
+use App\Models\GroupTags;
 use App\Helpers\RepairNetworkService;
-use App\Network;
-use App\Role;
-use App\User;
+use App\Models\Network;
+use App\Models\Role;
+use App\Models\User;
 use Carbon\Carbon;
 use DB;
 use Illuminate\Auth\AuthenticationException;

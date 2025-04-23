@@ -5,7 +5,7 @@ namespace App\Http\Middleware;
 use Symfony\Component\HttpFoundation\Response;
 use Illuminate\Http\Request;
 use App\Helpers\Fixometer;
-use App\User;
+use App\Models\User;
 use Auth;
 use Closure;
 

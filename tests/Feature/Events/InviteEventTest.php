@@ -2,14 +2,14 @@
 
 namespace Tests\Feature;
 
-use App\EventsUsers;
-use App\Group;
+use App\Models\EventsUsers;
+use App\Models\Group;
 use App\Helpers\Fixometer;
 use App\Listeners\AddUserToDiscourseThreadForEvent;
 use App\Notifications\RSVPEvent;
-use App\Party;
-use App\Role;
-use App\User;
+use App\Models\Party;
+use App\Models\Role;
+use App\Models\User;
 use DB;
 use Illuminate\Support\Facades\Notification;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
@@ -301,7 +301,7 @@ class InviteEventTest extends TestCase
         $idevents = $this->createEvent($idgroups, 'tomorrow');
 
         // Joining should trigger adding to the Discourse thread.  Fake one.
-        $event = \App\Party::find($idevents);
+        $event = \App\Models\Party::find($idevents);
         $event->discourse_thread = 123;
         $event->save();
 
@@ -412,7 +412,7 @@ class InviteEventTest extends TestCase
         $event = Party::findOrFail($idevents);
         assertEquals(1, $event->volunteers);
 
-        $unique_shareable_code = Fixometer::generateUniqueShareableCode(\App\Party::class, 'shareable_code');
+        $unique_shareable_code = Fixometer::generateUniqueShareableCode(\App\Models\Party::class, 'shareable_code');
         $event->update([
                            'shareable_code' => $unique_shareable_code,
                        ]);

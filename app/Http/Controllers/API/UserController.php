@@ -4,7 +4,7 @@ namespace App\Http\Controllers\API;
 
 use Illuminate\Http\JsonResponse;
 use App\Http\Controllers\Controller;
-use App\User;
+use App\Models\User;
 use Auth;
 use Illuminate\Http\Request;
 use Cache;
@@ -43,7 +43,7 @@ class UserController extends Controller
 
     protected static function getUserAudits($dateFrom = null)
     {
-        $query = \OwenIt\Auditing\Models\Audit::where('auditable_type', \App\User::class);
+        $query = \OwenIt\Auditing\Models\Audit::where('auditable_type', \App\Models\User::class);
 
         if (! is_null($dateFrom)) {
             $query->where('created_at', '>=', $dateFrom);

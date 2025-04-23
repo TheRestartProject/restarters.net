@@ -4,10 +4,10 @@ namespace App\Observers;
 
 use App\Events\UserConfirmedEvent;
 use App\Events\UserLeftEvent;
-use App\EventsUsers;
-use App\Role;
+use App\Models\EventsUsers;
+use App\Models\Role;
 use App\Services\DiscourseService;
-use App\User;
+use App\Models\User;
 
 /**
  * This class triggers add/removes from the Discourse thread when a user joins/leaves an event.
@@ -30,7 +30,7 @@ class EventsUsersObserver {
     public function created(EventsUsers $eu): void
     {
         $idevents = $eu->event;
-        $event = \App\Party::find($idevents);
+        $event = \App\Models\Party::find($idevents);
         $iduser = $eu->user;
         $user = $iduser ? User::find($iduser) : null;
         
@@ -49,7 +49,7 @@ class EventsUsersObserver {
      */
     public function updating(EventsUsers $eu): void {
         $idevents = $eu->event;
-        $event = \App\Party::find($idevents);
+        $event = \App\Models\Party::find($idevents);
         $iduser = $eu->user;
         $user = $iduser ? User::find($iduser) : null;
 
@@ -72,7 +72,7 @@ class EventsUsersObserver {
     public function deleted(EventsUsers $eu): void
     {
         $idevents = $eu->event;
-        $event = \App\Party::find($idevents);
+        $event = \App\Models\Party::find($idevents);
         $iduser = $eu->user;
         $user = $iduser ? User::find($iduser) : null;
 

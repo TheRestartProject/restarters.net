@@ -3,15 +3,15 @@
 namespace App\Http\Controllers\API;
 
 use Illuminate\Http\JsonResponse;
-use App\Barrier;
-use App\Device;
-use App\DeviceBarrier;
+use App\Models\Barrier;
+use App\Models\Device;
+use App\Models\DeviceBarrier;
 use App\Events\DeviceCreatedOrUpdated;
 use App\Helpers\Fixometer;
 use App\Http\Controllers\Controller;
 use App\Notifications\AdminAbnormalDevices;
-use App\Party;
-use App\Xref;
+use App\Models\Party;
+use App\Models\Xref;
 use Illuminate\Auth\AuthenticationException;
 use Illuminate\Validation\ValidationException;
 use Notification;

@@ -2,9 +2,9 @@
 
 namespace Tests\Feature\Groups;
 
-use App\Group;
-use App\Party;
-use App\Role;
+use App\Models\Group;
+use App\Models\Party;
+use App\Models\Role;
 use Tests\TestCase;
 
 class GroupDeleteTest extends TestCase
@@ -19,14 +19,14 @@ class GroupDeleteTest extends TestCase
 
         // Only administrators can delete.
         foreach (['Restarter', 'Host', 'NetworkCoordinator'] as $role) {
-            $user = \App\User::factory()->{lcfirst($role)}()->create();
+            $user = \App\Models\User::factory()->{lcfirst($role)}()->create();
             $this->actingAs($user);
             $this->followingRedirects();
             $response = $this->get("/group/delete/$id");
             $this->assertStringContainsString('Sorry, but you do not have the permissions to perform that action', $response->getContent());
         }
 
-        $user = \App\User::factory()->administrator()->create();
+        $user = \App\Models\User::factory()->administrator()->create();
         $this->actingAs($user);
         $this->followingRedirects();
         $response = $this->get("/group/delete/$id");
@@ -46,7 +46,7 @@ class GroupDeleteTest extends TestCase
         // Add an event with no devices - should still be able to delete.
         $this->createEvent($id, 'yesterday');
 
-        $user = \App\User::factory()->administrator()->create();
+        $user = \App\Models\User::factory()->administrator()->create();
         $this->actingAs($user);
         $this->followingRedirects();
         $response = $this->get("/group/delete/$id");
@@ -65,7 +65,7 @@ class GroupDeleteTest extends TestCase
         $idevents = $this->createEvent($id, 'yesterday');
         $iddevices = $this->createDevice($idevents, 'misc');
 
-        $user = \App\User::factory()->administrator()->create();
+        $user = \App\Models\User::factory()->administrator()->create();
         $this->actingAs($user);
         $this->followingRedirects();
         $response = $this->get("/group/delete/$id");

@@ -2,8 +2,8 @@
 
 namespace Tests\Unit;
 
-use App\Role;
-use App\User;
+use App\Models\Role;
+use App\Models\User;
 use DB;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Foundation\Testing\WithFaker;

@@ -2,13 +2,13 @@
 
 namespace Tests\Feature;
 
-use App\Group;
+use App\Models\Group;
 use App\Notifications\JoinGroup;
 use App\Notifications\NewGroupMember;
 use App\Helpers\Fixometer;
 use App\Notifications\NotifyRestartersOfNewEvent;
-use App\Party;
-use App\User;
+use App\Models\Party;
+use App\Models\User;
 use DB;
 use Illuminate\Support\Facades\Notification;
 use Tests\TestCase;

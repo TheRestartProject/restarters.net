@@ -2,18 +2,18 @@
 
 namespace App\Http\Controllers;
 
-use App\Device;
-use App\EventsUsers;
-use App\Group;
-use App\GroupTags;
-use App\GrouptagsGroups;
+use App\Models\Device;
+use App\Models\EventsUsers;
+use App\Models\Group;
+use App\Models\GroupTags;
+use App\Models\GrouptagsGroups;
 use App\Helpers\Fixometer;
 use App\Helpers\SearchHelper;
-use App\Network;
-use App\Party;
+use App\Models\Network;
+use App\Models\Party;
 use App\Search;
-use App\User;
-use App\UserGroups;
+use App\Models\User;
+use App\Models\UserGroups;
 use Auth;
 use Carbon\Carbon;
 use DateTime;
@@ -51,7 +51,7 @@ class ExportController extends Controller
             })
             ->select('devices.*', 'groups.name AS group_name')->get();
 
-        $displacementFactor = \App\Device::getDisplacementFactor();
+        $displacementFactor = \App\Models\Device::getDisplacementFactor();
         $eEmissionRatio = \App\Helpers\LcaStats::getEmissionRatioPowered();
         $uEmissionratio = \App\Helpers\LcaStats::getEmissionRatioUnpowered();
 

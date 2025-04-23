@@ -4,12 +4,12 @@ namespace Tests\Feature;
 
 use App\Events\ApproveEvent;
 use App\Events\EditEvent;
-use App\Group;
-use App\GroupNetwork;
-use App\Network;
-use App\Party;
-use App\User;
-use App\UserGroups;
+use App\Models\Group;
+use App\Models\GroupNetwork;
+use App\Models\Network;
+use App\Models\Party;
+use App\Models\User;
+use App\Models\UserGroups;
 use Carbon\Carbon;
 use DB;
 use HieuLe\WordpressXmlrpcClient\WordpressClient;

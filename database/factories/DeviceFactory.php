@@ -3,8 +3,8 @@
 namespace Database\Factories;
 
 use Illuminate\Database\Eloquent\Factories\Factory;
-use App\Category;
-use App\Party;
+use App\Models\Category;
+use App\Models\Party;
 
 class DeviceFactory extends Factory
 {

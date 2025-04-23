@@ -3,18 +3,18 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\RedirectResponse;
-use App\Brands;
-use App\Cluster;
-use App\Device;
+use App\Models\Brands;
+use App\Models\Cluster;
+use App\Models\Device;
 use App\Events\DeviceCreatedOrUpdated;
-use App\EventsUsers;
-use App\Group;
+use App\Models\EventsUsers;
+use App\Models\Group;
 use App\Helpers\Fixometer;
 use App\Notifications\AdminAbnormalDevices;
-use App\Party;
-use App\User;
-use App\UserGroups;
-use App\Xref;
+use App\Models\Party;
+use App\Models\User;
+use App\Models\UserGroups;
+use App\Models\Xref;
 use Auth;
 use FixometerFile;
 use Illuminate\Http\Request;

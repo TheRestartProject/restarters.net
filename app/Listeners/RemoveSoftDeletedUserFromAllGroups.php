@@ -3,7 +3,7 @@
 namespace App\Listeners;
 
 use App\Events\UserDeleted;
-use App\UserGroups;
+use App\Models\UserGroups;
 
 class RemoveSoftDeletedUserFromAllGroups extends BaseEvent
 {

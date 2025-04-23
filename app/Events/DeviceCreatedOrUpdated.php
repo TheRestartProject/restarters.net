@@ -2,7 +2,7 @@
 
 namespace App\Events;
 
-use App\Device;
+use App\Models\Device;
 use Illuminate\Queue\SerializesModels;
 
 class DeviceCreatedOrUpdated

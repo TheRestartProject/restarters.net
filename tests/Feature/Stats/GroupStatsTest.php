@@ -2,10 +2,10 @@
 
 namespace Tests\Feature\Stats;
 
-use App\Device;
-use App\Group;
-use App\Party;
-use App\User;
+use App\Models\Device;
+use App\Models\Group;
+use App\Models\Party;
+use App\Models\User;
 use Carbon\Carbon;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Tests\Feature\Stats\StatsTestCase;
@@ -16,7 +16,7 @@ class GroupStatsTest extends StatsTestCase
     public function a_group_with_no_events_has_empty_stats(): void
     {
         $group = Group::factory()->create()->first();
-        $expect = \App\Group::getGroupStatsArrayKeys();
+        $expect = \App\Models\Group::getGroupStatsArrayKeys();
         $this->assertEquals($expect, $group->getGroupStats());
     }
 
@@ -29,7 +29,7 @@ class GroupStatsTest extends StatsTestCase
             'event_end_utc' => '2000-01-0113:45:05+05:00',
             'group' => $group->idgroups,
         ]);
-        $expect = \App\Group::getGroupStatsArrayKeys();
+        $expect = \App\Models\Group::getGroupStatsArrayKeys();
         $expect['parties'] = 1;
         $expect['hours_volunteered'] = 21;
         $this->assertEquals($expect, $group->getGroupStats());
@@ -58,7 +58,7 @@ class GroupStatsTest extends StatsTestCase
             'category_creation' => $this->_idPoweredNonMisc,
             'event' => $event->idevents,
         ]);
-        $expect = \App\Group::getGroupStatsArrayKeys();
+        $expect = \App\Models\Group::getGroupStatsArrayKeys();
         $expect['parties'] = 1;
         $expect['waste_total'] = 4;
         $expect['co2_powered'] = 14.4 * $this->_displacementFactor;
@@ -249,7 +249,7 @@ class GroupStatsTest extends StatsTestCase
             'event' => $event1->idevents,
             'estimate' => 456,
         ]);
-        $expect = \App\Group::getGroupStatsArrayKeys();
+        $expect = \App\Models\Group::getGroupStatsArrayKeys();
         $expect['parties'] = 1;
         $expect['hours_volunteered'] = 21;
         $expect['fixed_devices'] = 6;
@@ -316,7 +316,7 @@ class GroupStatsTest extends StatsTestCase
             'estimate' => 7.89,
         ]);
 
-        $expect = \App\Group::getGroupStatsArrayKeys();
+        $expect = \App\Models\Group::getGroupStatsArrayKeys();
         $expect['parties'] = 2;
         $expect['hours_volunteered'] = 42;
         $expect['fixed_devices'] = 4;

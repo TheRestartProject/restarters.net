@@ -2,11 +2,11 @@
 
 namespace Tests\Feature;
 
-use App\Group;
+use App\Models\Group;
 use App\Notifications\NewGroupWithinRadius;
-use App\Party;
-use App\Role;
-use App\User;
+use App\Models\Party;
+use App\Models\Role;
+use App\Models\User;
 use DB;
 use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\Notification;

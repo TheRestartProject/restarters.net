@@ -2,11 +2,11 @@
 
 namespace Tests\Feature;
 
-use App\Group;
-use App\GroupTags;
+use App\Models\Group;
+use App\Models\GroupTags;
 use App\Helpers\RepairNetworkService;
-use App\Network;
-use App\User;
+use App\Models\Network;
+use App\Models\User;
 use Carbon\Carbon;
 use DB;
 use Illuminate\Auth\AuthenticationException;
