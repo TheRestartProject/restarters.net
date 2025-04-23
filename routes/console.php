@@ -1,7 +1,7 @@
 <?php
 
 use Illuminate\Support\Facades\Schedule;
-use Notification;
+use Illuminate\Support\Facades\Notification;
 use Illuminate\Foundation\Console\Kernel as ConsoleKernel;
 use Carbon\Carbon;
 use App\User;
