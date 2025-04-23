@@ -3,10 +3,10 @@
 namespace App\Listeners;
 
 use App\Events\ApproveEvent;
-use App\Group;
-use App\Party;
-use App\EventsUsers;
-use App\User;
+use App\Models\Group;
+use App\Models\Party;
+use App\Models\EventsUsers;
+use App\Models\User;
 use HieuLe\WordpressXmlrpcClient\WordpressClient;
 use Illuminate\Support\Facades\Log;
 use Notification;

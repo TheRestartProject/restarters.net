@@ -2,10 +2,10 @@
 
 namespace App\Helpers;
 
-use App\Group;
-use App\Network;
-use App\Role;
-use App\User;
+use App\Models\Group;
+use App\Models\Network;
+use App\Models\Role;
+use App\Models\User;
 
 class RepairNetworkService
 {

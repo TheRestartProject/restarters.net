@@ -2,12 +2,12 @@
 
 namespace Tests\Feature\Groups;
 
-use App\Group;
-use App\GroupTags;
+use App\Models\Group;
+use App\Models\GroupTags;
 use App\Listeners\AddUserToDiscourseGroup;
 use App\Notifications\NewGroupMember;
-use App\User;
-use App\UserGroups;
+use App\Models\User;
+use App\Models\UserGroups;
 use Illuminate\Support\Facades\Notification;
 use Tests\TestCase;
 use Mockery;

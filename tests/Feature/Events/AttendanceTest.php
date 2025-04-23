@@ -2,15 +2,15 @@
 
 namespace Tests\Feature;
 
-use App\EventsUsers;
-use App\Group;
+use App\Models\EventsUsers;
+use App\Models\Group;
 use App\Helpers\Geocoder;
 use App\Helpers\RepairNetworkService;
-use App\Network;
+use App\Models\Network;
 use App\Notifications\AdminModerationEvent;
 use App\Notifications\NotifyRestartersOfNewEvent;
-use App\Party;
-use App\User;
+use App\Models\Party;
+use App\Models\User;
 use DB;
 use Faker\Generator as Faker;
 use Illuminate\Support\Facades\Notification;

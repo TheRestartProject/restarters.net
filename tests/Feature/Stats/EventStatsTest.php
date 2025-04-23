@@ -2,11 +2,11 @@
 
 namespace Tests\Feature\Stats;
 
-use App\Device;
-use App\Group;
-use App\Party;
-use App\Role;
-use App\User;
+use App\Models\Device;
+use App\Models\Group;
+use App\Models\Party;
+use App\Models\Role;
+use App\Models\User;
 use Tests\Feature\Stats\StatsTestCase;
 
 class EventStatsTest extends StatsTestCase
@@ -15,7 +15,7 @@ class EventStatsTest extends StatsTestCase
     public function an_event_with_no_devices_has_empty_stats(): void
     {
         $event = Party::factory()->create();
-        $expect = \App\Party::getEventStatsArrayKeys();
+        $expect = \App\Models\Party::getEventStatsArrayKeys();
         $expect['hours_volunteered'] = 21;
         $this->assertEquals($expect, $event->getEventStats());
     }
@@ -32,7 +32,7 @@ class EventStatsTest extends StatsTestCase
             'category_creation' => $this->_idPoweredNonMisc,
             'event' => $event->idevents,
         ]);
-        $expect = \App\Party::getEventStatsArrayKeys();
+        $expect = \App\Models\Party::getEventStatsArrayKeys();
         $expect['co2_powered'] = 14.4 * $this->_displacementFactor;
         $expect['waste_powered'] = 4;
         $expect['co2_total'] += $expect['co2_powered'];

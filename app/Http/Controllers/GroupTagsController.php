@@ -3,7 +3,7 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\RedirectResponse;
-use App\GroupTags;
+use App\Models\GroupTags;
 use App\Helpers\Fixometer;
 use Auth;
 use Illuminate\Http\Request;

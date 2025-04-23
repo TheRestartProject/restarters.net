@@ -2,9 +2,9 @@
 
 namespace Tests\Feature\Groups;
 
-use App\Device;
-use App\Party;
-use App\Role;
+use App\Models\Device;
+use App\Models\Party;
+use App\Models\Role;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\DB;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
@@ -114,7 +114,7 @@ class GroupViewTest extends TestCase
 
         // Only administrators can delete.
         foreach (['Restarter', 'Host', 'NetworkCoordinator'] as $role) {
-            $user = \App\User::factory()->{lcfirst($role)}()->create();
+            $user = \App\Models\User::factory()->{lcfirst($role)}()->create();
             $this->actingAs($user);
             $response = $this->get("/group/view/$id");
             $this->assertVueProperties($response, [

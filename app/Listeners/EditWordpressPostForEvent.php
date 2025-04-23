@@ -3,10 +3,10 @@
 namespace App\Listeners;
 
 use App\Events\EditEvent;
-use App\Group;
+use App\Models\Group;
 use App\Helpers\Fixometer;
 use App\Notifications\AdminWordPressEditEventFailure;
-use App\Party;
+use App\Models\Party;
 use HieuLe\WordpressXmlrpcClient\WordpressClient;
 use Illuminate\Support\Facades\Log;
 use Notification;

@@ -2,7 +2,7 @@
 
 namespace Tests\Feature\Stats;
 
-use App\Device;
+use App\Models\Device;
 use Tests\Feature\Stats\StatsTestCase;
 
 class DeviceStatsTest extends StatsTestCase

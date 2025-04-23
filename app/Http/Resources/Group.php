@@ -307,7 +307,7 @@ class Group extends JsonResource
         $ret['restarters'] = $this->resource->all_confirmed_restarters_count;
 
         // Get next approved event for group
-        $nextevent = \App\Group::find($this->idgroups)->getNextUpcomingEvent();
+        $nextevent = \App\Models\Group::find($this->idgroups)->getNextUpcomingEvent();
 
         if ($nextevent) {
             // Using the resource for the nested event causes infinite loops.  Just add the model attributes we

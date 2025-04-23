@@ -3,7 +3,7 @@
 namespace Tests\Feature;
 
 use App\Notifications\ResetPassword;
-use App\User;
+use App\Models\User;
 use DB;
 use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\Notification;

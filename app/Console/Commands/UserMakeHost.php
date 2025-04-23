@@ -2,8 +2,8 @@
 
 namespace App\Console\Commands;
 
-use App\Role;
-use App\User;
+use App\Models\Role;
+use App\Models\User;
 use App\WikiSyncStatus;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\Hash;
@@ -50,7 +50,7 @@ class UserMakeHost extends Command
             return;
         }
 
-        $group = \App\Group::where('name', $groupname)->first();
+        $group = \App\Models\Group::where('name', $groupname)->first();
         if (!$group) {
             $this->error("Group $groupname not found.");
             return;

@@ -4,9 +4,9 @@ namespace App\Http\Middleware;
 
 use Symfony\Component\HttpFoundation\Response;
 use Illuminate\Http\Request;
-use App\EventsUsers;
-use App\Invite;
-use App\UserGroups;
+use App\Models\EventsUsers;
+use App\Models\Invite;
+use App\Models\UserGroups;
 use Closure;
 use Illuminate\Support\Facades\Auth;
 

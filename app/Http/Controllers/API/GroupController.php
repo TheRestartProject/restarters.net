@@ -5,22 +5,22 @@ namespace App\Http\Controllers\API;
 use Illuminate\Http\JsonResponse;
 use App\Events\ApproveGroup;
 use App\Events\EditGroup;
-use App\Group;
-use App\GroupTags;
+use App\Models\Group;
+use App\Models\GroupTags;
 use App\Helpers\Fixometer;
 use App\Http\Controllers\Controller;
 use App\Http\Resources\PartySummaryCollection;
 use App\Http\Resources\TagCollection;
 use App\Http\Resources\VolunteerCollection;
-use App\Network;
+use App\Models\Network;
 use App\Notifications\AdminModerationGroup;
 use App\Notifications\GroupConfirmed;
 use App\Notifications\NewGroupWithinRadius;
-use App\Party;
-use App\Role;
+use App\Models\Party;
+use App\Models\Role;
 use App\Rules\Timezone;
-use App\User;
-use App\UserGroups;
+use App\Models\User;
+use App\Models\UserGroups;
 use Auth;
 use Carbon\Carbon;
 use Illuminate\Auth\AuthenticationException;
@@ -183,7 +183,7 @@ class GroupController extends Controller
      */
     public static function getGroupAudits($dateFrom = null)
     {
-        $query = \OwenIt\Auditing\Models\Audit::where('auditable_type', \App\Group::class);
+        $query = \OwenIt\Auditing\Models\Audit::where('auditable_type', \App\Models\Group::class);
 
         if (! is_null($dateFrom)) {
             $query->where('created_at', '>=', $dateFrom);
@@ -746,7 +746,7 @@ class GroupController extends Controller
             'longitude' => $longitude,
             'country_code' => $country,
             'free_text' => $description,
-            'shareable_code' => Fixometer::generateUniqueShareableCode(\App\Group::class, 'shareable_code'),
+            'shareable_code' => Fixometer::generateUniqueShareableCode(\App\Models\Group::class, 'shareable_code'),
             'timezone' => $timezone,
             'phone' => $phone,
             'network_data' => $network_data,

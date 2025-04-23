@@ -2,9 +2,9 @@
 
 namespace Tests\Commands;
 
-use App\Group;
-use App\Network;
-use App\User;
+use App\Models\Group;
+use App\Models\Network;
+use App\Models\User;
 use DB;
 use Tests\TestCase;
 

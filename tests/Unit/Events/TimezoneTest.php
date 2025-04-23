@@ -2,10 +2,10 @@
 
 namespace Tests\Unit;
 
-use App\Group;
-use App\Party;
-use App\Role;
-use App\User;
+use App\Models\Group;
+use App\Models\Party;
+use App\Models\Role;
+use App\Models\User;
 use Carbon\Carbon;
 use DB;
 use Illuminate\Validation\ValidationException;

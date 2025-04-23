@@ -2,10 +2,10 @@
 
 namespace Tests\Feature\Stats;
 
-use App\Device;
-use App\Group;
+use App\Models\Device;
+use App\Models\Group;
 use App\Helpers\LcaStats;
-use App\Party;
+use App\Models\Party;
 use DB;
 use Tests\Feature\Stats\StatsTestCase;
 

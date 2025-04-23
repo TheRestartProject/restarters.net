@@ -2,12 +2,12 @@
 
 namespace Tests\Feature;
 
-use App\Group;
+use App\Models\Group;
 use App\Helpers\RepairNetworkService;
-use App\Network;
-use App\Party;
-use App\Role;
-use App\User;
+use App\Models\Network;
+use App\Models\Party;
+use App\Models\Role;
+use App\Models\User;
 use Carbon\Carbon;
 use DB;
 use Illuminate\Foundation\Testing\RefreshDatabase;
@@ -230,7 +230,7 @@ class NetworkTest extends TestCase
 
         $response = $this->get("/api/networks/{$network->id}/stats?api_token=1234");
         $stats = json_decode($response->getContent(), true);
-        $expectedStats = \App\Group::getGroupStatsArrayKeys();
+        $expectedStats = \App\Models\Group::getGroupStatsArrayKeys();
         $this->assertEquals($expectedStats, $stats);
     }
 

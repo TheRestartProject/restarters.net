@@ -2,7 +2,7 @@
 
 namespace App\Console\Commands;
 
-use App\Party;
+use App\Models\Party;
 use App\Services\DiscourseService;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\Log;

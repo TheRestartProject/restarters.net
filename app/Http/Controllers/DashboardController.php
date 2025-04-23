@@ -3,9 +3,9 @@
 namespace App\Http\Controllers;
 
 use Illuminate\View\View;
-use App\Group;
-use App\Party;
-use App\User;
+use App\Models\Group;
+use App\Models\Party;
+use App\Models\User;
 use Auth;
 use Cache;
 use DB;
@@ -38,7 +38,7 @@ class DashboardController extends Controller
 
         foreach ($upcoming_events as $event) {
             $expanded_event = \App\Http\Controllers\PartyController::expandEvent($event, null);
-            $expanded_event['the_group'] = \App\Group::find($event->group);
+            $expanded_event['the_group'] = \App\Models\Group::find($event->group);
             $expanded_events[] = $expanded_event;
         }
 

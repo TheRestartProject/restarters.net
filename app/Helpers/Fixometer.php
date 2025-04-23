@@ -3,16 +3,16 @@
 namespace App\Helpers;
 
 use App;
-use App\Barrier;
-use App\Group;
-use App\Party;
-use App\Permissions;
-use App\Role;
-use App\Skills;
-use App\User;
-use App\UserGroups;
-use App\UsersPermissions;
-use App\UsersPreferences;
+use App\Models\Barrier;
+use App\Models\Group;
+use App\Models\Party;
+use App\Models\Permissions;
+use App\Models\Role;
+use App\Models\Skills;
+use App\Models\User;
+use App\Models\UserGroups;
+use App\Models\UsersPermissions;
+use App\Models\UsersPreferences;
 use Auth;
 use DB;
 use Illuminate\Database\Eloquent\Collection;
@@ -530,8 +530,8 @@ class Fixometer
 
     public static function loginRegisterStats()
     {
-        $Party = new \App\Party;
-        $Device = new \App\Device;
+        $Party = new \App\Models\Party;
+        $Device = new \App\Models\Device;
 
         $stats = [];
         if (\Cache::has('all_stats')) {
@@ -565,7 +565,7 @@ class Fixometer
             return true;
         }
 
-        return ! empty(\App\UserGroups::where('group', $group_id)
+        return ! empty(\App\Models\UserGroups::where('group', $group_id)
             ->where('user', $user_id)
             ->where('role', $role)
             ->first());
@@ -599,7 +599,7 @@ class Fixometer
         if (is_null($skills)) {
             $has_host_skills = 0;
         } else {
-            $has_host_skills = \App\Skills::where('category', 1)->whereIn('id', $skills)->count();
+            $has_host_skills = \App\Models\Skills::where('category', 1)->whereIn('id', $skills)->count();
         }
 
         // If number of host skills is greater than or equal to amount, then give host role

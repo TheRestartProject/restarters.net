@@ -3,7 +3,7 @@
 namespace App\Console\Commands;
 
 use App\Services\DiscourseService;
-use App\User;
+use App\Models\User;
 use Illuminate\Console\Command;
 
 class SyncDiscourseUsernames extends Command

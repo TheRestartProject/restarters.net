@@ -2,9 +2,9 @@
 
 namespace App\Console\Commands;
 
-use App\Group;
-use App\Network;
-use App\User;
+use App\Models\Group;
+use App\Models\Network;
+use App\Models\User;
 use Illuminate\Console\Command;
 
 class NetworkCoordinator extends Command

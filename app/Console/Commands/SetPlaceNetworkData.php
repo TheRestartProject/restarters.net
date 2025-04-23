@@ -2,8 +2,8 @@
 
 namespace App\Console\Commands;
 
-use App\Group;
-use App\Network;
+use App\Models\Group;
+use App\Models\Network;
 use Geocoder\Query\GeocodeQuery;
 use Geocoder\Query\ReverseQuery;
 use Geocoder\Provider\Mapbox\Mapbox;

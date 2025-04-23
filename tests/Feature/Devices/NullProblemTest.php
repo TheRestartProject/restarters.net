@@ -2,9 +2,9 @@
 
 namespace Tests\Feature;
 
-use App\Device;
-use App\Party;
-use App\User;
+use App\Models\Device;
+use App\Models\Party;
+use App\Models\User;
 use DB;
 use Tests\TestCase;
 

@@ -2,10 +2,10 @@
 
 namespace Tests\Feature;
 
-use App\Device;
+use App\Models\Device;
 use App\Notifications\AdminAbnormalDevices;
-use App\Party;
-use App\User;
+use App\Models\Party;
+use App\Models\User;
 use DB;
 use Illuminate\Support\Facades\Notification;
 use Tests\TestCase;

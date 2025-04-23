@@ -2,8 +2,8 @@
 
 namespace Tests\Feature;
 
-use App\Role;
-use App\User;
+use App\Models\Role;
+use App\Models\User;
 use DB;
 use Hash;
 use Illuminate\Support\Facades\Config;

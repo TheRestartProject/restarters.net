@@ -3,7 +3,7 @@
 namespace App\Http\Resources;
 
 use Illuminate\Http\Request;
-use App\Party;
+use App\Models\Party;
 use Illuminate\Http\Resources\Json\JsonResource;
 
 /**
@@ -185,8 +185,8 @@ class Device extends JsonResource
      */
     public function toArray(Request $request): array
     {
-        $event = \App\Party::find($this->event);
-        $group = $event ? \App\Group::find($event->group) : NULL;
+        $event = \App\Models\Party::find($this->event);
+        $group = $event ? \App\Models\Group::find($event->group) : NULL;
 
         $ret = [
             'id' => intval($this->iddevices),
@@ -212,43 +212,43 @@ class Device extends JsonResource
         //
         // There is mirror code in API\DeviceController.
         switch ($this->repair_status) {
-            case \App\Device::REPAIR_STATUS_FIXED:
-                $ret['repair_status'] = \App\Device::REPAIR_STATUS_FIXED_STR;
+            case \App\Models\Device::REPAIR_STATUS_FIXED:
+                $ret['repair_status'] = \App\Models\Device::REPAIR_STATUS_FIXED_STR;
                 break;
-            case \App\Device::REPAIR_STATUS_REPAIRABLE:
-                $ret['repair_status'] = \App\Device::REPAIR_STATUS_REPAIRABLE_STR;
+            case \App\Models\Device::REPAIR_STATUS_REPAIRABLE:
+                $ret['repair_status'] = \App\Models\Device::REPAIR_STATUS_REPAIRABLE_STR;
                 break;
-            case \App\Device::REPAIR_STATUS_ENDOFLIFE:
-                $ret['repair_status'] = \App\Device::REPAIR_STATUS_ENDOFLIFE_STR;
+            case \App\Models\Device::REPAIR_STATUS_ENDOFLIFE:
+                $ret['repair_status'] = \App\Models\Device::REPAIR_STATUS_ENDOFLIFE_STR;
                 break;
         }
 
         if ($this->more_time_needed) {
-            $ret['next_steps'] = \App\Device::NEXT_STEPS_MORE_TIME_NEEDED_STR;
+            $ret['next_steps'] = \App\Models\Device::NEXT_STEPS_MORE_TIME_NEEDED_STR;
         } else if ($this->professional_help) {
-            $ret['next_steps'] = \App\Device::NEXT_STEPS_PROFESSIONAL_HELP_STR;
+            $ret['next_steps'] = \App\Models\Device::NEXT_STEPS_PROFESSIONAL_HELP_STR;
         } else if ($this->do_it_yourself) {
-            $ret['next_steps'] = \App\Device::NEXT_STEPS_DO_IT_YOURSELF_STR;
+            $ret['next_steps'] = \App\Models\Device::NEXT_STEPS_DO_IT_YOURSELF_STR;
         }
 
-        if ($this->spare_parts === \App\Device::SPARE_PARTS_NOT_NEEDED) {
-            $ret['spare_parts'] = \App\Device::PARTS_PROVIDER_NO_STR;
+        if ($this->spare_parts === \App\Models\Device::SPARE_PARTS_NOT_NEEDED) {
+            $ret['spare_parts'] = \App\Models\Device::PARTS_PROVIDER_NO_STR;
         } else if ($this->spare_parts === null) {
             $ret['spare_parts'] = null;
         } else {
-            if ($this->parts_provider === \App\Device::PARTS_PROVIDER_MANUFACTURER) {
-                $ret['spare_parts'] = \App\Device::PARTS_PROVIDER_MANUFACTURER_STR;
-            } else if ($this->parts_provider === \App\Device::PARTS_PROVIDER_THIRD_PARTY) {
-                $ret['spare_parts'] = \App\Device::PARTS_PROVIDER_THIRD_PARTY_STR;
+            if ($this->parts_provider === \App\Models\Device::PARTS_PROVIDER_MANUFACTURER) {
+                $ret['spare_parts'] = \App\Models\Device::PARTS_PROVIDER_MANUFACTURER_STR;
+            } else if ($this->parts_provider === \App\Models\Device::PARTS_PROVIDER_THIRD_PARTY) {
+                $ret['spare_parts'] = \App\Models\Device::PARTS_PROVIDER_THIRD_PARTY_STR;
             }
         }
 
         if ($this->professional_help) {
-            $ret['next_steps'] = \App\Device::NEXT_STEPS_PROFESSIONAL_HELP_STR;
+            $ret['next_steps'] = \App\Models\Device::NEXT_STEPS_PROFESSIONAL_HELP_STR;
         } else if ($this->do_it_yourself) {
-            $ret['next_steps'] = \App\Device::NEXT_STEPS_DO_IT_YOURSELF_STR;
+            $ret['next_steps'] = \App\Models\Device::NEXT_STEPS_DO_IT_YOURSELF_STR;
         } else if ($this->more_time_needed) {
-            $ret['next_steps'] = \App\Device::NEXT_STEPS_MORE_TIME_NEEDED_STR;
+            $ret['next_steps'] = \App\Models\Device::NEXT_STEPS_MORE_TIME_NEEDED_STR;
         } else {
             $ret['next_steps'] = null;
         }
@@ -259,7 +259,7 @@ class Device extends JsonResource
             break;
         }
 
-        $category = \App\Category::find($this->category);
+        $category = \App\Models\Category::find($this->category);
         $ret['category']= \App\Http\Resources\Category::make($category);
 
         $images = $this->resource->getImages();

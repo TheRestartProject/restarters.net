@@ -2,7 +2,7 @@
 
 namespace App\Http\Controllers\API;
 
-use App\Alert;
+use App\Models\Alert;
 use App\Http\Controllers\Controller;
 use App\Http\Resources\AlertCollection;
 use Auth;

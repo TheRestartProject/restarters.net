@@ -2,8 +2,8 @@
 
 namespace Tests\Feature;
 
-use App\GroupTags;
-use App\Role;
+use App\Models\GroupTags;
+use App\Models\Role;
 use Carbon\Carbon;
 use DB;
 use HieuLe\WordpressXmlrpcClient\WordpressClient;

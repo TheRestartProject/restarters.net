@@ -2,14 +2,14 @@
 
 namespace Tests\Feature;
 
-use App\Group;
+use App\Models\Group;
 use App\Notifications\JoinGroup;
 use App\Notifications\NewGroupMember;
 use App\Helpers\Fixometer;
 use App\Notifications\NotifyRestartersOfNewEvent;
-use App\Party;
-use App\Role;
-use App\User;
+use App\Models\Party;
+use App\Models\Role;
+use App\Models\User;
 use DB;
 use Illuminate\Support\Facades\Notification;
 use Tests\TestCase;
@@ -134,7 +134,7 @@ class InviteGroupTest extends TestCase
     public function testInviteViaLink(): void {
         $group = Group::factory()->create();
 
-        $unique_shareable_code = Fixometer::generateUniqueShareableCode(\App\Group::class, 'shareable_code');
+        $unique_shareable_code = Fixometer::generateUniqueShareableCode(\App\Models\Group::class, 'shareable_code');
         $group->update([
            'shareable_code' => $unique_shareable_code,
         ]);

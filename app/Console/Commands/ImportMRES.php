@@ -2,7 +2,7 @@
 
 namespace App\Console\Commands;
 
-use App\User;
+use App\Models\User;
 use Illuminate\Console\Command;
 use Illuminate\Support\Str;
 
@@ -60,7 +60,7 @@ class ImportMRES extends Command
 
                 if ($email) {
                     // Find group with name
-                    $group = \App\Group::where('name', 'like', $groupname)->first();
+                    $group = \App\Models\Group::where('name', 'like', $groupname)->first();
 
                     if ($group) {
                         $this->info("Set email for $groupname to $email");

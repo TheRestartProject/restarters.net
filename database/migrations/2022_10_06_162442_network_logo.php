@@ -15,11 +15,11 @@ return new class extends Migration
             $table->string('logo', 255)->nullable();
         });
 
-        $networks = \App\Network::all();
+        $networks = \App\Models\Network::all();
 
         foreach ($networks as $network) {
             // Find the logo.
-            $logo = \App\Xref::where('reference', $network->id)
+            $logo = \App\Models\Xref::where('reference', $network->id)
                 ->where('reference_type', config('restarters.xref_types.networks'))
                 ->where('object_type', 5)
             ->first();

@@ -3,7 +3,7 @@
 namespace App\Console\Commands;
 
 use App\Listeners\CreateWordpressPostForEvent;
-use App\Party;
+use App\Models\Party;
 use Illuminate\Console\Command;
 
 class WordpressCreateEvent extends Command

@@ -2,9 +2,9 @@
 
 namespace Tests\Feature;
 
-use App\Role;
-use App\Skills;
-use App\User;
+use App\Models\Role;
+use App\Models\Skills;
+use App\Models\User;
 use DB;
 use Hash;
 use Mockery;

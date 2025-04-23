@@ -3,10 +3,10 @@
 namespace App\Listeners;
 
 use App\Events\UserConfirmedEvent;
-use App\Party;
-use App\Role;
+use App\Models\Party;
+use App\Models\Role;
 use App\Services\DiscourseService;
-use App\User;
+use App\Models\User;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Contracts\Queue\InteractsWithQueue;
 

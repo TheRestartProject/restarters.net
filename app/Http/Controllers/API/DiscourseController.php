@@ -5,7 +5,7 @@ namespace App\Http\Controllers\API;
 use Illuminate\Http\JsonResponse;
 use App\Http\Controllers\Controller;
 use App\Services\DiscourseService;
-use App\User;
+use App\Models\User;
 use Auth;
 use Illuminate\Http\Request;
 use Cache;

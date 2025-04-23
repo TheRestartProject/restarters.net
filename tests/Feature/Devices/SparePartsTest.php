@@ -2,10 +2,10 @@
 
 namespace Tests\Feature;
 
-use App\Category;
-use App\Device;
-use App\Party;
-use App\User;
+use App\Models\Category;
+use App\Models\Device;
+use App\Models\Party;
+use App\Models\User;
 use DB;
 use Tests\TestCase;
 

@@ -2,10 +2,10 @@
 
 namespace Tests\Feature;
 
-use App\Group;
-use App\Network;
-use App\Party;
-use App\User;
+use App\Models\Group;
+use App\Models\Network;
+use App\Models\Party;
+use App\Models\User;
 use Carbon\Carbon;
 use DB;
 use http\Client\Request;

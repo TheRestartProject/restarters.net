@@ -2,11 +2,11 @@
 
 namespace Tests\Unit;
 
-use App\Group;
+use App\Models\Group;
 use App\Helpers\Fixometer;
-use App\Network;
-use App\Party;
-use App\User;
+use App\Models\Network;
+use App\Models\Party;
+use App\Models\User;
 use DB;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Foundation\Testing\WithFaker;

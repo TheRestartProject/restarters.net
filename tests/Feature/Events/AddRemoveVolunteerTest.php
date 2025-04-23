@@ -2,17 +2,17 @@
 
 namespace Tests\Feature;
 
-use App\EventsUsers;
-use App\Group;
+use App\Models\EventsUsers;
+use App\Models\Group;
 use App\Helpers\Fixometer;
 use App\Helpers\Geocoder;
 use App\Listeners\RemoveUserFromDiscourseThreadForEvent;
-use App\Network;
+use App\Models\Network;
 use App\Notifications\AdminModerationEvent;
 use App\Notifications\NotifyRestartersOfNewEvent;
-use App\Party;
-use App\Role;
-use App\User;
+use App\Models\Party;
+use App\Models\Role;
+use App\Models\User;
 use DB;
 use Faker\Generator as Faker;
 use Illuminate\Support\Facades\Notification;

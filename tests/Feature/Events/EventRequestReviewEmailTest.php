@@ -2,11 +2,11 @@
 
 namespace Tests\Feature;
 
-use App\EventsUsers;
-use App\Group;
+use App\Models\EventsUsers;
+use App\Models\Group;
 use App\Notifications\EventRepairs;
-use App\Party;
-use App\User;
+use App\Models\Party;
+use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Foundation\Testing\WithoutMiddleware;
 use Illuminate\Support\Facades\Notification;

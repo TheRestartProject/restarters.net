@@ -5,7 +5,7 @@ namespace Tests\Feature;
 use App\Events\UserLanguageUpdated;
 use App\Events\UserUpdated;
 use App\Listeners\SyncUserProperties;
-use App\User;
+use App\Models\User;
 use Carbon\Carbon;
 use DB;
 use Illuminate\Foundation\Testing\RefreshDatabase;

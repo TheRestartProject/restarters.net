@@ -6,7 +6,7 @@ use App\Events\UserRegistered;
 use App\Listeners\AddUserToDiscourseGroup;
 use App\Listeners\DiscourseUserEventSubscriber;
 use App\Providers\DiscourseServiceProvider;
-use App\User;
+use App\Models\User;
 use DB;
 use Hash;
 use HieuLe\WordpressXmlrpcClient\WordpressClient;

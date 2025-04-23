@@ -3,10 +3,10 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\JsonResponse;
-use App\Device;
-use App\Group;
-use App\Party;
-use App\User;
+use App\Models\Device;
+use App\Models\Group;
+use App\Models\Party;
+use App\Models\User;
 use Auth;
 use DB;
 use Illuminate\Http\Request;

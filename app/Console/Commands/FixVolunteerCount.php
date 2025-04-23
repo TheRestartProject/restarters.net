@@ -4,7 +4,7 @@ namespace App\Console\Commands;
 
 use DB;
 use Illuminate\Console\Command;
-use App\Party;
+use App\Models\Party;
 
 class FixVolunteerCount extends Command
 {

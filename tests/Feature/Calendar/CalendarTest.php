@@ -2,11 +2,11 @@
 
 namespace Tests\Feature;
 
-use App\EventsUsers;
-use App\Group;
-use App\Network;
-use App\Party;
-use App\User;
+use App\Models\EventsUsers;
+use App\Models\Group;
+use App\Models\Network;
+use App\Models\Party;
+use App\Models\User;
 use DB;
 use Tests\TestCase;
 use Illuminate\Support\Facades\Storage;

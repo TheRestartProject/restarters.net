@@ -3,10 +3,10 @@
 namespace App\Listeners;
 
 use App\Events\ApproveGroup;
-use App\EventsUsers;
-use App\Party;
-use App\User;
-use App\UserGroups;
+use App\Models\EventsUsers;
+use App\Models\Party;
+use App\Models\User;
+use App\Models\UserGroups;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Lang;
 

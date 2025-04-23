@@ -5,9 +5,9 @@ namespace App\Http\Controllers;
 use App\Providers\AppServiceProvider;
 use Illuminate\View\View;
 use App\Helpers\Fixometer;
-use App\Role;
-use App\RolePermissions;
-use App\User;
+use App\Models\Role;
+use App\Models\RolePermissions;
+use App\Models\User;
 use Auth;
 use Illuminate\Http\Request;
 

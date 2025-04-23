@@ -2,8 +2,8 @@
 
 namespace Tests\Feature;
 
-use App\Session;
-use App\User;
+use App\Models\Session;
+use App\Models\User;
 use DB;
 use Hash;
 use Mockery;

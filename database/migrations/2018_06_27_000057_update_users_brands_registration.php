@@ -1,6 +1,6 @@
 <?php
 
-use App\Skills;
+use App\Models\Skills;
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;

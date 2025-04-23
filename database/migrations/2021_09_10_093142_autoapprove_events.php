@@ -15,7 +15,7 @@ return new class extends Migration
             $table->boolean('auto_approve_events')->default(false);
         });
 
-        $rt = \App\Network::where('name', 'Repair Together')->first();
+        $rt = \App\Models\Network::where('name', 'Repair Together')->first();
 
         if ($rt) {
             $rt->auto_approve_events = true;

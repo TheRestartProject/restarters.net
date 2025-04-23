@@ -3,7 +3,7 @@
 namespace App\Listeners;
 
 use App\Events\ApproveGroup;
-use App\Group;
+use App\Models\Group;
 use App\Helpers\Fixometer;
 use App\Notifications\AdminWordPressCreateGroupFailure;
 use HieuLe\WordpressXmlrpcClient\WordpressClient;

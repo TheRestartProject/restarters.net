@@ -2,7 +2,7 @@
 
 namespace Tests\Feature\Dashboard;
 
-use App\Role;
+use App\Models\Role;
 use DB;
 use Hash;
 use Symfony\Component\DomCrawler\Crawler;

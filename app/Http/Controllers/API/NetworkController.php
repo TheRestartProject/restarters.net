@@ -3,10 +3,10 @@
 namespace App\Http\Controllers\API;
 
 use Illuminate\Http\JsonResponse;
-use App\Group;
+use App\Models\Group;
 use App\Http\Controllers\Controller;
-use App\Network;
-use App\Party;
+use App\Models\Network;
+use App\Models\Party;
 use Auth;
 use Carbon\Carbon;
 use Illuminate\Http\Request;

@@ -2,15 +2,15 @@
 
 namespace Tests\Feature;
 
-use App\Device;
-use App\EventsUsers;
-use App\Group;
+use App\Models\Device;
+use App\Models\EventsUsers;
+use App\Models\Group;
 use App\Helpers\Geocoder;
-use App\Network;
+use App\Models\Network;
 use App\Notifications\NotifyRestartersOfNewEvent;
-use App\Party;
-use App\User;
-use App\UserGroups;
+use App\Models\Party;
+use App\Models\User;
+use App\Models\UserGroups;
 use Carbon\Carbon;
 use DB;
 use Illuminate\Foundation\Testing\RefreshDatabase;

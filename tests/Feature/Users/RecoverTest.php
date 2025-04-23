@@ -4,7 +4,7 @@ namespace Tests\Feature;
 
 use App\Notifications\ResetPassword;
 use App\Events\PasswordChanged;
-use App\User;
+use App\Models\User;
 use DB;
 use Hash;
 use Illuminate\Support\Facades\Notification;

@@ -2,10 +2,10 @@
 
 namespace Tests\Feature\Translations;
 
-use App\Group;
-use App\Party;
-use App\Role;
-use App\User;
+use App\Models\Group;
+use App\Models\Party;
+use App\Models\Role;
+use App\Models\User;
 use DB;
 use Hash;
 use Mockery;

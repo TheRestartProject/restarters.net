@@ -2,8 +2,8 @@
 
 namespace Tests\Feature;
 
-use App\Role;
-use App\User;
+use App\Models\Role;
+use App\Models\User;
 use DB;
 use Illuminate\Auth\AuthenticationException;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;

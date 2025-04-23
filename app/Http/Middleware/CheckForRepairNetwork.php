@@ -5,7 +5,7 @@ namespace App\Http\Middleware;
 use Symfony\Component\HttpFoundation\Response;
 use Illuminate\Http\Request;
 use App;
-use App\Network;
+use App\Models\Network;
 use Auth;
 use Closure;
 use Illuminate\Support\Str;
