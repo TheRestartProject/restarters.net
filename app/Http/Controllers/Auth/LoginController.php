@@ -91,7 +91,7 @@ class LoginController extends Controller
             app('honeypot')->disable();
         }
 
-        $this->validate($request, [
+        $request->validate([
             $this->username() => 'required|email',
             'password' => 'required|string',
             'my_name'   => 'honeypot',
