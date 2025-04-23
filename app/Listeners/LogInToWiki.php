@@ -7,9 +7,9 @@ use Cookie;
 use Illuminate\Auth\Events\Login;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
-use Mediawiki\Api\ApiUser;
-use Mediawiki\Api\MediawikiApi;
-use Mediawiki\Api\Service\UserCreator;
+use Addwiki\Mediawiki\Api\Client\Auth\UserAndPassword;
+use Addwiki\Mediawiki\Api\Client\Action\ActionApi;
+use Addwiki\Mediawiki\Api\Service\UserCreator;
 
 // Don't extend BaseEvent - we don't want to queue because this needs to happen before we return to the client.
 class LogInToWiki
@@ -19,6 +19,7 @@ class LogInToWiki
     // during password reset).  It also avoids Mediawiki complaining about the password being a common one.
 
     protected $wikiUserCreator;
+    protected $request;
 
     /**
      * Create the event listener.
@@ -69,21 +70,37 @@ class LogInToWiki
     {
         try {
             Log::info("Log in to wiki $user->mediawiki");
-            $api = MediawikiApi::newFromApiEndpoint(env('WIKI_URL').'/api.php');
-            $api->login(new ApiUser($user->mediawiki, $user->password));
+            
+            // Create a new MediaWiki client with the Action API using v3 methods
+            $apiUrl = env('WIKI_URL').'/api.php';
+            $auth = new UserAndPassword($user->mediawiki, $user->password);
+            $api = new ActionApi($apiUrl, $auth);
+            
             Log::info("Logged in to wiki $user->mediawiki");
 
-            // NGM: it appears that right from the beginning MediawikiApi->getClient access modifier was changed
-            // in our vendor folder from private to public in order to access the underlying client for the cookies.
-            // This is really bad, as obviously when we update the package via composer the method changes back to private.
-            // Stuck with that until we can figure out an alternative way to access the client.
-            $cookieJar = $api->getClient()->getConfig('cookies');
-            $cookieJarArray = $cookieJar->toArray();
+            // Note: In the new version of the library, we can't directly access the cookies
+            // We'll try our best, but this may need to be revisited with a different approach
+            try {
+                $reflection = new \ReflectionClass($api);
+                $clientProperty = $reflection->getProperty('client');
+                $clientProperty->setAccessible(true);
+                $client = $clientProperty->getValue($api);
 
-            if (! empty($cookieJarArray)) {
-                foreach ($cookieJarArray as $cookie) {
-                    Cookie::queue(Cookie::make($cookie['Name'], $cookie['Value'], $cookie['Expires']));
+                if ($client) {
+                    $cookieJar = $client->getConfig('cookies');
+                    if ($cookieJar) {
+                        $cookieJarArray = $cookieJar->toArray();
+                        
+                        if (!empty($cookieJarArray)) {
+                            foreach ($cookieJarArray as $cookie) {
+                                Cookie::queue(Cookie::make($cookie['Name'], $cookie['Value'], $cookie['Expires']));
+                            }
+                        }
+                    }
                 }
+            } catch (\Exception $ex) {
+                Log::warning("Could not access MediaWiki cookies: " . $ex->getMessage());
+                // Continue without cookies
             }
         } catch (\Exception $ex) {
             Log::error("Failed to log user '".$user->mediawiki."' in to mediawiki: ".$ex->getMessage());
