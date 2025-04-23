@@ -121,6 +121,8 @@ class JoinEvent extends BaseNotification
 
             return $mail;
         }
+        // Return empty mail message for any case not handled above
+        return new MailMessage;
     }
 
     /**
