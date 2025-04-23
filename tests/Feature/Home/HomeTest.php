@@ -3,7 +3,6 @@
 namespace Tests\Feature\Dashboard;
 
 use App\Providers\AppServiceProvider;
-use App\Providers\RouteServiceProvider;
 use App\Role;
 use DB;
 use Hash;

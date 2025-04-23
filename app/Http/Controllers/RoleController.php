@@ -5,7 +5,6 @@ namespace App\Http\Controllers;
 use App\Providers\AppServiceProvider;
 use Illuminate\View\View;
 use App\Helpers\Fixometer;
-use App\Providers\RouteServiceProvider;
 use App\Role;
 use App\RolePermissions;
 use App\User;

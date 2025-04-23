@@ -7,7 +7,6 @@ use App\Device;
 use App\Group;
 use App\Helpers\Fixometer;
 use App\Party;
-use App\Providers\RouteServiceProvider;
 use Auth;
 use Illuminate\Http\Request;
 
