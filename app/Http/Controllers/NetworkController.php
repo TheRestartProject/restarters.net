@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use Illuminate\Support\Facades\Gate;
 use Illuminate\View\View;
 use Illuminate\Http\RedirectResponse;
 use App\Models\Group;
@@ -47,7 +48,7 @@ class NetworkController extends Controller
     {
         $user = Auth::user();
 
-        $this->authorize('view', $network);
+        Gate::authorize('view', $network);
 
         $groupsForAssociating = [];
 
@@ -66,7 +67,7 @@ class NetworkController extends Controller
      */
     public function edit(Network $network): View
     {
-        $this->authorize('update', $network);
+        Gate::authorize('update', $network);
 
         return view('networks.edit', [
             'network' => $network,
@@ -78,7 +79,7 @@ class NetworkController extends Controller
      */
     public function update(Request $request, Network $network): RedirectResponse
     {
-        $this->authorize('update', $network);
+        Gate::authorize('update', $network);
 
         if ($request->hasFile('network_logo')) {
             // Save the file.
@@ -103,7 +104,7 @@ class NetworkController extends Controller
      */
     public function associateGroup(Request $request, Network $network): RedirectResponse
     {
-        $this->authorize('associateGroups', $network);
+        Gate::authorize('associateGroups', $network);
 
         $groupIds = $request->input('groups');
 
