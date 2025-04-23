@@ -41,6 +41,8 @@ class EventDevices extends BaseNotification
                     ], $locale)
                 );
         }
+        // Return empty mail message when conditions aren't met
+        return new MailMessage;
     }
 
     /**

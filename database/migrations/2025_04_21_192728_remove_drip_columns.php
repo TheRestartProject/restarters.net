@@ -4,14 +4,14 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-class RemoveDripColumns extends Migration
+return new class extends Migration
 {
     /**
      * Run the migrations.
      *
      * @return void
      */
-    public function up()
+    public function up(): void
     {
         Schema::table('users', function (Blueprint $table) {
             $table->dropColumn('drip_subscriber_id');
@@ -27,7 +27,7 @@ class RemoveDripColumns extends Migration
      *
      * @return void
      */
-    public function down()
+    public function down(): void
     {
         Schema::table('users', function (Blueprint $table) {
             $table->string('drip_subscriber_id')->nullable()->after('newsletter')->unique();
@@ -37,4 +37,4 @@ class RemoveDripColumns extends Migration
             $table->boolean('users_push_to_drip')->nullable(false)->default(false);
         });
     }
-}
+};

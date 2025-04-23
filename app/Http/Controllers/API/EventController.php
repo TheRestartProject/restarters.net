@@ -45,11 +45,11 @@ class EventController extends Controller
 
         if (!empty($date_from) && !empty($date_to)) {
             $start = Carbon::parse($date_from, $timezone);
-            $start->setTimezone('UTC');
+            $startCopy = $start->copy()->setTimezone('UTC');
             $end = Carbon::parse($date_to, $timezone);
-            $end->setTimezone('UTC');
-            $parties = $parties->where('events.event_start_utc', '>=', $start->toIso8601String())
-                ->where('events.event_end_utc', '<=', $end->toIso8601String());
+            $endCopy = $end->copy()->setTimezone('UTC');
+            $parties = $parties->where('events.event_start_utc', '>=', $startCopy->toIso8601String())
+                ->where('events.event_end_utc', '<=', $endCopy->toIso8601String());
         }
 
         $parties = $parties->where([
@@ -133,8 +133,8 @@ class EventController extends Controller
                     ),
                 ],
                 'hours_volunteered' => $party->hoursVolunteered(),
-                'created_at' => new \Carbon\Carbon($party->created_at),
-             'updated_at' => (new \Carbon\Carbon($party->max_updated_at_devices_updated_at)),
+                'created_at' => Carbon::parse($party->created_at),
+                'updated_at' => Carbon::parse($party->max_updated_at_devices_updated_at),
             ]);
 
             if (!empty($party->owner)) {
@@ -477,8 +477,10 @@ class EventController extends Controller
         }
 
         // Convert the timezone to UTC, because the timezone is not itself stored in the DB.
-        $event_start_utc = Carbon::parse($start)->setTimezone('UTC')->toIso8601String();
-        $event_end_utc = Carbon::parse($end)->setTimezone('UTC')->toIso8601String();
+        $eventStart = Carbon::parse($start);
+        $eventEnd = Carbon::parse($end);
+        $event_start_utc = $eventStart->copy()->setTimezone('UTC')->toIso8601String();
+        $event_end_utc = $eventEnd->copy()->setTimezone('UTC')->toIso8601String();
         $hours = Carbon::parse($event_start_utc)->diffInHours(Carbon::parse($event_end_utc));
 
         // timezone needs to be the first attribute set, because it is used in mutators for later attributes.
@@ -639,8 +641,10 @@ class EventController extends Controller
         }
 
         // Convert the timezone to UTC, because the timezone is not itself stored in the DB.
-        $event_start_utc = Carbon::parse($start)->setTimezone('UTC')->toIso8601String();
-        $event_end_utc = Carbon::parse($end)->setTimezone('UTC')->toIso8601String();
+        $eventStart = Carbon::parse($start);
+        $eventEnd = Carbon::parse($end);
+        $event_start_utc = $eventStart->copy()->setTimezone('UTC')->toIso8601String();
+        $event_end_utc = $eventEnd->copy()->setTimezone('UTC')->toIso8601String();
         $hours = Carbon::parse($event_start_utc)->diffInHours(Carbon::parse($event_end_utc));
 
         // We don't let the user change the group that an event is on.

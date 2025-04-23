@@ -58,10 +58,12 @@ class Party extends Model implements Auditable
     // Append data to Model
     protected $appends = ['participants', 'ShareableLink', 'event_date_local', 'start_local', 'end_local'];
 
-    protected $casts = [
-        // JSON fields in the database should be converted to/from arrays.
-        'network_data' => 'array'
-    ];
+    protected function casts(): array
+    {
+        return [
+            'network_data' => 'array'
+        ];
+    }
 
     //Getters
     public function findAllSearchable()
@@ -384,9 +386,9 @@ class Party extends Model implements Auditable
      */
     public function getFormattedLocalStart(string $format = 'd/m/Y')
     {
-        $dt = new Carbon($this->event_start_utc);
-        $dt->setTimezone($this->timezone);
-        return $dt->format($format);
+        $dt = Carbon::parse($this->event_start_utc);
+        $dtWithTz = $dt->copy()->setTimezone($this->timezone);
+        return $dtWithTz->format($format);
     }
 
     /**
@@ -396,9 +398,9 @@ class Party extends Model implements Auditable
      */
     public function getFormattedLocalEnd(string $format = 'd/m/Y')
     {
-        $dt = new Carbon($this->event_end_utc);
-        $dt->setTimezone($this->timezone);
-        return $dt->format($format);
+        $dt = Carbon::parse($this->event_end_utc);
+        $dtWithTz = $dt->copy()->setTimezone($this->timezone);
+        return $dtWithTz->format($format);
     }
 
     public function getEventTimestampAttribute()
@@ -430,7 +432,7 @@ class Party extends Model implements Auditable
     public function isUpcoming()
     {
         $now = Carbon::now();
-        $event_start = new Carbon($this->event_start_utc);
+        $event_start = Carbon::parse($this->event_start_utc);
         return ($event_start->greaterThan($now));
     }
 
@@ -445,7 +447,7 @@ class Party extends Model implements Auditable
      */
     public function isStartingSoon(): bool
     {
-        $start = new Carbon($this->event_start_utc);
+        $start = Carbon::parse($this->event_start_utc);
 
         if (!$this->isInProgress() && !$this->hasFinished() && $start->isCurrentDay()) {
             return true;
@@ -457,15 +459,15 @@ class Party extends Model implements Auditable
     public function isInProgress()
     {
         $date_now = Carbon::now();
-        $start = new Carbon($this->event_start_utc);
-        $end = new Carbon($this->event_end_utc);
+        $start = Carbon::parse($this->event_start_utc);
+        $end = Carbon::parse($this->event_end_utc);
         return $date_now->gte($start) && $date_now->lte($end);
     }
 
     public function hasFinished()
     {
         $date_now = Carbon::now();
-        $end = new Carbon($this->event_end_utc);
+        $end = Carbon::parse($this->event_end_utc);
         return $date_now->gt($end);
     }
 
@@ -580,8 +582,8 @@ class Party extends Model implements Auditable
     }
 
     public function lengthInHours() {
-        $start = new Carbon($this->event_start_utc);
-        $end = new Carbon($this->event_end_utc);
+        $start = Carbon::parse($this->event_start_utc);
+        $end = Carbon::parse($this->event_end_utc);
         return ceil($start->diffInMinutes($end) / 60);
     }
 
@@ -765,20 +767,21 @@ class Party extends Model implements Auditable
     }
 
     public function getEventDateLocalAttribute() {
-        $dt = new Carbon($this->event_start_utc);
-        $dt->setTimezone($this->timezone);
-        return $dt->toDateString();
+        $dt = Carbon::parse($this->event_start_utc);
+        $dtWithTz = $dt->copy()->setTimezone($this->timezone);
+        return $dtWithTz->toDateString();
     }
+
     public function getStartLocalAttribute() {
-        $dt = new Carbon($this->event_start_utc);
-        $dt->setTimezone($this->timezone);
-        return $dt->toTimeString('minute');
+        $dt = Carbon::parse($this->event_start_utc);
+        $dtWithTz = $dt->copy()->setTimezone($this->timezone);
+        return $dtWithTz->toTimeString('minute');
     }
 
     public function getEndLocalAttribute() {
-        $dt = new Carbon($this->event_end_utc);
-        $dt->setTimezone($this->timezone);
-        return $dt->toTimeString('minute');
+        $dt = Carbon::parse($this->event_end_utc);
+        $dtWithTz = $dt->copy()->setTimezone($this->timezone);
+        return $dtWithTz->toTimeString('minute');
     }
 
     public static function expandVolunteers($volunteers, $showEmails) {

@@ -2,9 +2,9 @@
 
 namespace App\Http\Controllers;
 
+use App\Providers\AppServiceProvider;
 use Illuminate\View\View;
 use App\Helpers\Fixometer;
-use App\Providers\RouteServiceProvider;
 use App\Role;
 use App\RolePermissions;
 use App\User;
@@ -31,7 +31,7 @@ class RoleController extends Controller
             ]);
         }
 
-        return redirect(RouteServiceProvider::HOME);
+        return redirect(AppServiceProvider::HOME);
     }
 
     public function edit($id, Request $request): View

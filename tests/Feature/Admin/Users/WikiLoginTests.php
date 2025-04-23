@@ -33,9 +33,7 @@ class WikiLoginTests extends TestCase
         $this->withoutExceptionHandling();
         Honeypot::disable();
 
-        $this->instance(UserCreator::class, Mockery::mock(UserCreator::class, function ($mock) {
-            $mock->shouldReceive('create')->once();
-        }));
+        $this->instance(UserCreator::class, Mockery::mock([UserCreator::class])->shouldReceive('create')->once()->getMock());
 
         // Given we have a user with the flag set to sync them.
         $user = User::factory()->create();
@@ -57,9 +55,7 @@ class WikiLoginTests extends TestCase
         $this->withoutExceptionHandling();
         Honeypot::disable();
 
-        $this->instance(UserCreator::class, Mockery::mock(UserCreator::class, function ($mock) {
-            $mock->shouldNotReceive('create');
-        }));
+        $this->instance(UserCreator::class, Mockery::mock([UserCreator::class])->shouldNotReceive('create')->getMock());
 
         // Given we have a user with the flag set to not create
         $user = User::factory()->create();
@@ -81,9 +77,7 @@ class WikiLoginTests extends TestCase
         $this->withoutExceptionHandling();
         Honeypot::disable();
 
-        $this->instance(UserCreator::class, Mockery::mock(UserCreator::class, function ($mock) {
-            $mock->shouldNotReceive('create');
-        }));
+        $this->instance(UserCreator::class, Mockery::mock([UserCreator::class])->shouldNotReceive('create')->getMock());
 
         // Given we have a user who has already been created in the wiki
         $user = User::factory()->create();
@@ -104,9 +98,7 @@ class WikiLoginTests extends TestCase
     {
         $this->withoutExceptionHandling();
 
-        $this->instance(ChangeWikiPassword::class, Mockery::mock(ChangeWikiPassword::class, function ($mock) {
-            $mock->shouldReceive('handle')->once();
-        }));
+        $this->instance(ChangeWikiPassword::class, Mockery::mock([ChangeWikiPassword::class])->shouldReceive('handle')->once()->getMock());
 
         // Given we have a user who has already been created in the wiki
         $user = User::factory()->create();
