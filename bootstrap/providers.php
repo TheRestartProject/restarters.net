@@ -2,7 +2,6 @@
 
 return [
     App\Providers\AppServiceProvider::class,
-    App\Providers\EventServiceProvider::class,
     App\Providers\MediawikiServiceProvider::class,
     App\Providers\WordpressServiceProvider::class,
     App\Providers\AgentServiceProvider::class,
