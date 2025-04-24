@@ -7,6 +7,13 @@
     ],
     "license": "MIT",
     "type": "project",
+    "repositories": [
+        {
+            "type": "vcs",
+            "url": "https://github.com/laravel-shift/laravel-discourse-sso",
+            "reference": "l12-compatibility"
+        }
+    ],
     "require": {
         "php": "^8.2",
         "addwiki/mediawiki-api": "^3.1.0",
@@ -39,7 +46,7 @@
         "spatie/calendar-links": "^1.6",
         "spatie/laravel-validation-rules": "^3.4",
         "spatie/laravel-html": "^3.12.0",
-        "spinen/laravel-discourse-sso": "^2.9",
+        "spinen/laravel-discourse-sso": "dev-l12-compatibility",
         "symfony/http-client": "^7.2",
         "symfony/http-foundation": "^7.2",
         "symfony/mailgun-mailer": "^7.2",
