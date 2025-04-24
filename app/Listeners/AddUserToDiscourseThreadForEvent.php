@@ -30,6 +30,10 @@ class AddUserToDiscourseThreadForEvent implements ShouldQueue {
     }
 
     public function handle(UserConfirmedEvent $e) {
+        if (! config('restarters.features.discourse_integration')) {
+            return [];
+        }
+
         // This call can block for a long time - add our own timeout so that we can fail it rather than block
         // the whole queue.
         pcntl_signal(SIGALRM, function () {

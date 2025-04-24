@@ -197,7 +197,7 @@ jobs:
 
       # Run phpunit.  Discourse makes things slow, so up the timeout.
       - run:
-          command: export XDEBUG_MODE=coverage;./phpunit -d memory_limit=1024M --bootstrap vendor/autoload.php --coverage-clover tests/clover.xml --configuration ./phpunit.xml --stop-on-failure
+          command: export XDEBUG_MODE=coverage;./phpunit -d memory_limit=1024M --bootstrap vendor/autoload.php --coverage-clover tests/clover.xml --configuration ./phpunit.xml
           no_output_timeout: 45m
 
       # Coveralls is pernickety about the location it uploads from existing.
