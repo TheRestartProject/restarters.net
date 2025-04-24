@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use Illuminate\Support\Facades\Gate;
 use Illuminate\View\View;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\JsonResponse;
@@ -234,7 +235,7 @@ class UserController extends Controller
         $user = User::find($id);
 
         // Check that we are allowed to change the role, based on our own role.
-        $this->authorize('changeRepairDirRole', [Auth::user(), $user, $role]);
+        Gate::authorize('changeRepairDirRole', [Auth::user(), $user, $role]);
 
         $user->update([
             'repairdir_role' => $role,

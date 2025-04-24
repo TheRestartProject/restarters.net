@@ -2,6 +2,8 @@
 
 namespace App\Http\Controllers\Auth;
 
+use Illuminate\Routing\Controllers\HasMiddleware;
+use Illuminate\Routing\Controllers\Middleware;
 use App\Providers\AppServiceProvider;
 use Illuminate\View\View;
 use App\Models\Device;
@@ -14,7 +16,7 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Validation\ValidationException;
 use Msurguy\Honeypot\Honeypot;
 
-class LoginController extends Controller
+class LoginController extends Controller implements HasMiddleware
 {
     /*
     |--------------------------------------------------------------------------
@@ -36,14 +38,11 @@ class LoginController extends Controller
      */
     protected $redirectTo = AppServiceProvider::HOME;
 
-    /**
-     * Create a new controller instance.
-     *
-     * @return void
-     */
-    public function __construct()
+    public static function middleware(): array
     {
-        $this->middleware('guest')->except(['index', 'logout']);
+        return [
+            new Middleware('guest', except: ['index', 'logout']),
+        ];
     }
 
     /**
@@ -91,7 +90,7 @@ class LoginController extends Controller
             app('honeypot')->disable();
         }
 
-        $this->validate($request, [
+        $request->validate([
             $this->username() => 'required|email',
             'password' => 'required|string',
             'my_name'   => 'honeypot',

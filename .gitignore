@@ -16,6 +16,7 @@ anonymise-db.sql
 temp_db.sql
 restarters-anonymised.sql
 /.idea
+/.nova
 .dir-locals.el
 # The following should be ignored in all branches except production.
 /public/fonts/vendor
@@ -26,3 +27,4 @@ restarters-anonymised.sql
 /public/css/wiki.css
 /public/build
 /public/hot
+/storage/pail

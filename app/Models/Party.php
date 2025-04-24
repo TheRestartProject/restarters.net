@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Attributes\Scope;
 use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -198,28 +199,32 @@ class Party extends Model implements Auditable
         }
     }
 
-    public function scopeUndeleted($query) {
+    #[Scope]
+    protected function undeleted($query) {
         // This is the base scope.  Almost always we are only interested in seeing events which have not been
         // deleted.
         return $query->whereNull('events.deleted_at')
             ->orderBy('event_start_utc', 'DESC');
     }
 
-    public function scopePast($query) {
+    #[Scope]
+    protected function past($query) {
         // A past event is an event where the end time is less than now.
         $query = $query->undeleted();
         $query = $query->where('event_end_utc', '<', date('Y-m-d H:i:s'));
         return $query;
     }
 
-    public function scopeFuture($query) {
+    #[Scope]
+    protected function future($query) {
         // A future event is an event where the start time is greater than now.
         $query = $query->undeleted();
         $query = $query->where('event_start_utc', '>', date('Y-m-d H:i:s'))->orderBy('event_start_utc','ASC');
         return $query;
     }
 
-    public function scopeActive($query) {
+    #[Scope]
+    protected function active($query) {
         // An active event is an event which has started and not yet finished.
         $query = $query->undeleted();
         $now = date('Y-m-d H:i:s');
@@ -228,13 +233,15 @@ class Party extends Model implements Auditable
         return $query;
     }
 
-    public function scopeApproved($query) {
+    #[Scope]
+    protected function approved($query) {
         $query = $query->undeleted();
         $query = $query->where('approved', true);
         return $query;
     }
 
-    public function scopeHostFor($query, $userids = null) {
+    #[Scope]
+    protected function hostFor($query, $userids = null) {
         // Events where this user is a host.
         $this->defaultUserIds($userids);
         $query = $query->undeleted();
@@ -247,7 +254,8 @@ class Party extends Model implements Auditable
         return $query;
     }
 
-    public function scopeAttendingOrAttended($query, $userids = null) {
+    #[Scope]
+    protected function attendingOrAttended($query, $userids = null) {
         // Events this user has attending/is attending.
         $this->defaultUserIds($userids);
         $query = $query->undeleted();
@@ -264,7 +272,8 @@ class Party extends Model implements Auditable
         return $query;
     }
 
-    public function scopeMemberOfGroup($query, $userids = null) {
+    #[Scope]
+    protected function memberOfGroup($query, $userids = null) {
 
         $this->defaultUserIds($userids);
         $query = $query->approved();
@@ -276,7 +285,8 @@ class Party extends Model implements Auditable
         return $query;
     }
 
-    public function scopeForUser($query, $userids = null) {
+    #[Scope]
+    protected function forUser($query, $userids = null) {
         // Events that are relevant to a user are:
         // - ones they are a host for
         // - ones they have are attending
@@ -301,19 +311,22 @@ class Party extends Model implements Auditable
             select('events.*');
     }
 
-    public function scopeFutureForUser($query, $userids = null) {
+    #[Scope]
+    protected function futureForUser($query, $userids = null) {
         $this->defaultUserIds($userids);
         $query = $query->forUser(null)->future($userids)->reorder()->orderBy('event_start_utc', 'ASC');
         return $query;
     }
 
-    public function scopePastForUser($query, $userids = null) {
+    #[Scope]
+    protected function pastForUser($query, $userids = null) {
         $this->defaultUserIds($userids);
         $query = $query->forUser(null)->past($userids)->reorder()->orderBy('event_start_utc', 'DESC');
         return $query;
     }
 
-    public function scopeForGroup($query, $idgroups) {
+    #[Scope]
+    protected function forGroup($query, $idgroups) {
         // TODO This should probably move into Group, and be a scope in there.  But we've not yet rationalised the
         // scopes in Groups.
         $query->where('events.group', $idgroups);
@@ -329,7 +342,8 @@ class Party extends Model implements Auditable
      * @param  [type]                  $user
      * @return [type]
      */
-    public function scopeUpcomingEventsInUserArea($query, $user)
+    #[Scope]
+    protected function upcomingEventsInUserArea($query, $user)
     {
         // We want to exclude groups which we are a member of, but include ones where we have been invited but
         // not yet joined.
@@ -667,14 +681,16 @@ class Party extends Model implements Auditable
         return true;
     }
 
-    public function scopeHasDevicesRepaired($query, int $has_x_devices_fixed = 1)
+    #[Scope]
+    protected function hasDevicesRepaired($query, int $has_x_devices_fixed = 1)
     {
         return $query->whereHas('allDevices', function ($query) {
             return $query->where('repair_status', 1);
         }, '>=', $has_x_devices_fixed);
     }
 
-    public function scopeEventHasFinished($query)
+    #[Scope]
+    protected function eventHasFinished($query)
     {
         $now = Carbon::now();
         return $query->whereRaw("`event_end_utc` < '{$now}'");

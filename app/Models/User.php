@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Attributes\Scope;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
@@ -317,7 +318,8 @@ class User extends Authenticatable implements Auditable, HasLocalePreference
         return ($r[0]->emails > 0) ? false : true;
     }
 
-    public function scopeNearbyRestarters($query, $latitude, $longitude, $radius = 20)
+    #[Scope]
+    protected function nearbyRestarters($query, $latitude, $longitude, $radius = 20)
     {
         return $query->select('*, ( 6371 * acos( cos( radians('.$latitude.' ) * cos( radians( latitude ) ) * cos( radians( longitude ) - radians('.$longitude.') ) + sin( radians('.$latitude.') ) * sin( radians( latitude ) ) ) ) AS distance')
                         ->whereNotNull('location')

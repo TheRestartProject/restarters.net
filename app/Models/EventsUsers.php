@@ -2,10 +2,13 @@
 
 namespace App\Models;
 
+use App\Observers\EventsUsersObserver;
+use Illuminate\Database\Eloquent\Attributes\ObservedBy;
 use Illuminate\Database\Eloquent\Relations\HasOne;
 use DB;
 use Illuminate\Database\Eloquent\Model;
 
+#[ObservedBy([EventsUsersObserver::class])]
 class EventsUsers extends Model
 {
     protected $table = 'events_users';
