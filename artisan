@@ -9,6 +9,21 @@ define('LARAVEL_START', microtime(true));
 // Register the Composer autoloader...
 require __DIR__.'/vendor/autoload.php';
 
+/*
+|--------------------------------------------------------------------------
+| Load Environment Variables
+|--------------------------------------------------------------------------
+|
+| Here we load environment-specific variables. This allows for having
+| different environment settings (testing, staging, etc.) that override
+| the base environment configuration.
+|
+| Note: The environment.php file follows a different pattern than the
+| default Laravel environment loader.
+|
+*/
+require __DIR__.'/bootstrap/environment.php';
+
 // Bootstrap Laravel and handle the command...
 /** @var Application $app */
 $app = require_once __DIR__.'/bootstrap/app.php';
