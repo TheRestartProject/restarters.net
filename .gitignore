@@ -28,3 +28,4 @@ restarters-anonymised.sql
 /public/build
 /public/hot
 /storage/pail
+/storage/api-docs
