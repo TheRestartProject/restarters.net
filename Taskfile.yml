@@ -155,7 +155,7 @@ tasks:
       task docker:run:bash -- ls -la
 
     cmds:
-      - docker exec -it restarters bash -c "{{ .CLI_ARGS }}"
+      - docker exec -it restarters bash -c {{ .CLI_ARGS }}
 
   docker:run:artisan:
     desc: Run an artisan command in the core application container.
@@ -165,4 +165,4 @@ tasks:
       task docker:run:artisan -- migrate
 
     cmds:
-      - docker exec -it restarters php artisan "{{ .CLI_ARGS }}"
+      - docker exec -it restarters php artisan {{ .CLI_ARGS }}
