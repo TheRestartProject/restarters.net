@@ -26,4 +26,5 @@ restarters-anonymised.sql
 /public/css/app.css
 /public/css/wiki.css
 /public/build
-/public/hot/storage/pail
+/public/hot
+/storage/pail
