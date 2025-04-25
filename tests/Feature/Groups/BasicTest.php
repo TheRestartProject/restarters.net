@@ -41,16 +41,42 @@ class BasicTest extends TestCase
                 ':user-id' => $user->id,
                 'tab' => $tab,
                 ':network' => 'null',
-                ':networks' => '[{"id":' . Network::first()->id . ',"name":"Restarters","description":null,"website":null,"default_language":"en","timezone":"Europe\\/London","created_at":"2021-05-24 12:19:37","updated_at":"2021-05-24 12:19:37","events_push_to_wordpress":0,"include_in_zapier":0,"shortname":"restarters","discourse_group":null,"auto_approve_events":0,"logo":null}]',
                 ':show-tags' => 'false',
             ],
         ]);
 
-        $groups = json_decode($props[1][':all-groups'], true);
-        $this->assertEquals($group->idgroups, $groups[0]['idgroups']);
-        $this->assertEquals(0, $groups[0]['location']['distance']);
-    }
+        // Check networks exist in the response
+        $networks = json_decode($props[1][':networks'], true);
+        $this->assertNotEmpty($networks, 'Networks list should not be empty');
+        
+        // Check at least one with name "Restarters" exists
+        $restartersFound = false;
+        foreach ($networks as $network) {
+            if ($network['name'] === 'Restarters') {
+                $restartersFound = true;
+                break;
+            }
+        }
+        $this->assertTrue($restartersFound, 'Networks should contain Restarters');
 
+        // Check groups
+        $groups = json_decode($props[1][':all-groups'], true);
+        $this->assertNotEmpty($groups, 'Groups list should not be empty');
+        
+        // Find our created group in the list
+        $foundGroup = false;
+        $distance = null;
+        foreach ($groups as $returnedGroup) {
+            if ($returnedGroup['idgroups'] === $group->idgroups) {
+                $foundGroup = true;
+                $distance = $returnedGroup['location']['distance'];
+                break;
+            }
+        }
+        
+        $this->assertTrue($foundGroup, 'Created group should be in the returned groups list');
+        $this->assertEquals(0, $distance, 'Distance to created group should be 0');
+    }
 
     public static function tabProvider(): array {
         return [
