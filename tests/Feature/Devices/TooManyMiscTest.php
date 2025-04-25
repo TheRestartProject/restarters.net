@@ -45,7 +45,7 @@ class TooManyMiscTest extends TestCase
         self::assertTrue(true);
     }
 
-    public function provider(): array {
+    public static function provider(): array {
         return [
             [ env('DEVICE_ABNORMAL_MISC_COUNT', 5) - 1, false, ],
             [ env('DEVICE_ABNORMAL_MISC_COUNT', 5), true, ]

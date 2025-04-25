@@ -198,7 +198,7 @@ class ProfileTest extends TestCase
         $this->assertEquals($invites, $user->invites);
     }
 
-    public function invitesProvider(): array {
+    public static function invitesProvider(): array {
         return [
             [ FALSE, 0 ],
             [ FALSE, 1 ],

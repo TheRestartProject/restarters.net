@@ -73,7 +73,7 @@ class BasicTest extends TestCase
         self::assertTrue(array_key_exists('topics', $ret));
     }
 
-    public function provider()
+    public static function provider()
     {
         return [
             ['London', 'GB', 51.5465, -0.10581, 1],    // Known location, nearby group

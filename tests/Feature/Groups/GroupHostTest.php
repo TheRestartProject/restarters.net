@@ -28,7 +28,7 @@ class GroupHostTest extends TestCase
         $this->assertNotNull($this->idgroups);
     }
 
-    public function roleProvider(): array {
+    public static function roleProvider(): array {
         return [
             [ 'Administrator' ],
             [ 'NetworkCoordinator' ],
@@ -117,7 +117,7 @@ class GroupHostTest extends TestCase
         $response = $this->delete("/api/v2/groups/{$this->idgroups}/volunteers/{$host->id}?api_token=" . $host->api_token);
     }
 
-    public function providerTrueFalse(): array
+    public static function providerTrueFalse(): array
     {
         return [
             [false],

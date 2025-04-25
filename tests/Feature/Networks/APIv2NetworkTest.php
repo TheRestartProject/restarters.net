@@ -147,7 +147,7 @@ class APIv2NetworkTest extends TestCase
         $this->assertEquals(0, count($json));
     }
 
-    public function providerGroupsParameters(): array {
+    public static function providerGroupsParameters(): array {
         return [
             [false, false],
             [false, true],
@@ -213,7 +213,7 @@ class APIv2NetworkTest extends TestCase
         $this->assertEquals(0, count($json));
     }
 
-    public function providerEventsParameters(): array {
+    public static function providerEventsParameters(): array {
         return [
             [false],
             [true],

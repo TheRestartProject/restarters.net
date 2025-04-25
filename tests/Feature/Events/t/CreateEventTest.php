@@ -246,7 +246,7 @@ class CreateEventTest extends TestCase
         $this->assertEquals(false, array_key_exists('nearby', $events[0]));
     }
 
-    public function roles(): array
+    public static function roles(): array
     {
         return [
             // Hosts can see but not moderate.
@@ -289,7 +289,7 @@ class CreateEventTest extends TestCase
     }
 
 
-    public function providerTrueFalse(): array
+    public static function providerTrueFalse(): array
     {
         return [
             [false],
@@ -574,7 +574,7 @@ class CreateEventTest extends TestCase
         $listener->handle($event);
     }
 
-    public function provider()
+    public static function provider()
     {
         return [
             // Check the event has been approved (using the magic value of the WordPress post id used when WordPress is
@@ -840,7 +840,7 @@ class CreateEventTest extends TestCase
         ]);
     }
 
-    public function invalidEmailProvider(): array
+    public static function invalidEmailProvider(): array
     {
         return [
             ['test@test.com', true],
