@@ -351,10 +351,7 @@ class User extends Authenticatable implements Auditable, HasLocalePreference
         return true;
     }
 
-    /**
-     * @return Date when the user last logged in
-     */
-    public function lastLogin(): Date
+    public function lastLogin(): \Carbon\Carbon
     {
         return new \Carbon\Carbon($this->last_login_at);
     }
