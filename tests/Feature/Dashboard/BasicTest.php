@@ -16,12 +16,18 @@ use function PHPUnit\Framework\assertEquals;
 
 class BasicTest extends TestCase
 {
+    private $idgroups;
+    
     protected function setUp(): void
     {
         parent::setUp();
-        $this->loginAsTestUser(Role::ADMINISTRATOR);
+        
+        // Use faster login method instead of HTTP-based login
+        $admin = $this->fastLoginAsTestUser(Role::ADMINISTRATOR);
         $this->idgroups = $this->createGroup();
-        $this->get('/logout');
+        
+        // Just reset auth state instead of doing a full logout request
+        $this->app['auth']->forgetGuards();
     }
 
     #[DataProvider('provider')]
@@ -31,15 +37,13 @@ class BasicTest extends TestCase
         $user = User::factory()->host()->create();
         $this->actingAs($user);
 
-        $user = User::factory()->restarter()->create();
-        $user->update([
+        $user = User::factory()->restarter()->create([
             'location' => $city,
             'country_code' => $country,
             'latitude' => $lat,
             'longitude' => $lng,
-            ]);
-        $user->save();
-        $user->refresh();
+        ]);
+        
         $this->assertEquals($country, $user->country_code);
         $this->assertEquals($city, $user->location);
         $this->actingAs($user);
@@ -84,29 +88,29 @@ class BasicTest extends TestCase
     }
 
     public function testUpcomingEvents(): void {
+        // Create users more efficiently
         $host = User::factory()->restarter()->create();
+        $admin = $this->fastLoginAsTestUser(Role::ADMINISTRATOR);
 
-        // Create an event.
-        $admin = $this->loginAsTestUser(Role::ADMINISTRATOR);
-
+        // Create an event with all attributes in one go
         $event = Party::factory()->create([
-                                                   'group' => $this->idgroups,
-                                                   'event_start_utc' => '2130-01-01T12:13:00+00:00',
-                                                   'event_end_utc' => '2130-01-01T13:14:00+00:00',
-                                                   'free_text' => 'A test event',
-                                                   'location' => 'London'
-                                               ]);
+            'group' => $this->idgroups,
+            'event_start_utc' => '2130-01-01T12:13:00+00:00',
+            'event_end_utc' => '2130-01-01T13:14:00+00:00',
+            'free_text' => 'A test event',
+            'location' => 'London'
+        ]);
 
-        // Join the group - as a Restarter.
+        // Join the group - as a Restarter
         $this->actingAs($host);
         $this->get('/group/join/' . $this->idgroups);
 
-        // Should not show in upcoming as not yet approved.
+        // Should not show in upcoming as not yet approved
         $response1 = $this->get('/dashboard');
         $response1->assertDontSeeText('A test event');
 
-        // Admin approves the event.
-        $this->loginAsTestUser(Role::ADMINISTRATOR);
+        // Admin approves the event
+        $this->actingAs($admin);
 
         $response1b = $this->get('/party/edit/'.$event->idevents);
 
@@ -116,12 +120,15 @@ class BasicTest extends TestCase
         $eventData = $event->getAttributes();
         $eventData['id'] = $event->idevents;
         $eventData['moderate'] = 'approve';
-        $response1a = $this->patch('/api/v2/events/'.$event->idevents . '?api_token=' . $admin->api_key, $this->eventAttributesToAPI($eventData));
+        
+        // Use the admin's existing token instead of looking up api_key
+        $response1a = $this->patch('/api/v2/events/'.$event->idevents . '?api_token=' . $admin->api_token, $this->eventAttributesToAPI($eventData));
         $response1a->assertSuccessful();
-        $this->artisan("queue:work --stop-when-empty");
+        
+        // Run queue once instead of twice
         $this->artisan("queue:work --stop-when-empty");
 
-        // Should now show as an upcoming event, both on dashboard page and events page.
+        // Should now show as an upcoming event, both on dashboard page and events page
         $this->actingAs($host);
         $response2 = $this->get('/dashboard');
 
@@ -147,13 +154,14 @@ class BasicTest extends TestCase
         $this->assertEquals($event->idevents, $initialEvents[0]['idevents']);
         $this->assertEquals(true, $initialEvents[0]['approved']);
 
-        // Invite a second host to the group.
+        // Create second host with all attributes in one go
         $host2 = User::factory()->restarter()->create([
             'location' => 'London',
             'latitude' => 51.5073509,
             'longitude' => -0.1277583
         ]);
-        $this->loginAsTestUser(Role::ADMINISTRATOR);
+        
+        $this->actingAs($admin);
 
         $response4 = $this->post('/group/invite', [
             'group_name' => 'Test Group',
@@ -164,8 +172,8 @@ class BasicTest extends TestCase
 
         $response4->assertSessionHas('success');
 
-        // Should not show in upcoming as not yet a member, but should show in nearby.
-        $this->get('/logout');
+        // Reset auth state without a full logout request
+        $this->app['auth']->forgetGuards();
         $this->actingAs($host2);
 
         $response5 = $this->get('/dashboard');
