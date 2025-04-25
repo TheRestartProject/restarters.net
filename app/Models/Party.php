@@ -345,27 +345,26 @@ class Party extends Model implements Auditable
     #[Scope]
     protected function upcomingEventsInUserArea($query, $user)
     {
-        // We want to exclude groups which we are a member of, but include ones where we have been invited but
-        // not yet joined.
         $exclude_group_ids = UserGroups::where('user', $user->id)->where('status', 1)->pluck('group')->toArray();
 
         // We also want to exclude any groups which are not yet approved.
         $exclude_group_ids = array_merge($exclude_group_ids, Group::where('approved', false)->pluck('idgroups')->toArray());
 
-        return $this
-      ->select('`events`.*, ( 6371 * acos( cos( radians('.$user->latitude.') ) * cos( radians( events.latitude ) ) * cos( radians( events.longitude ) - radians('.$user->longitude.') ) + sin( radians('.$user->latitude.') ) * sin( radians( events.latitude ) ) ) ) AS distance')
-      ->join('groups', 'groups.idgroups', '=', 'events.group')
-      ->join('group_network', 'groups.idgroups', '=', 'group_network.group_id')
-      ->join('networks', 'networks.id', '=', 'group_network.network_id')
-      ->join('users_groups', 'users_groups.group', '=', 'groups.idgroups')
-      ->where(function ($query) use ($exclude_group_ids) {
-          $query->whereNotIn('events.group', $exclude_group_ids)
-        ->where('event_start_utc', '>=', date('Y-m-d H:i:s'));
-      })
-      ->having('distance', '<=', User::NEARBY_KM)
-      ->groupBy('events.idevents')
-      ->orderBy('events.event_start_utc', 'ASC')
-      ->orderBy('distance', 'ASC');
+        return $query
+            ->selectRaw('`events`.*, ( 6371 * acos( cos( radians(?) ) * cos( radians( events.latitude ) ) * cos( radians( events.longitude ) - radians(?) ) + sin( radians(?) ) * sin( radians( events.latitude ) ) ) ) AS distance', 
+                [$user->latitude, $user->longitude, $user->latitude])
+            ->join('groups', 'groups.idgroups', '=', 'events.group')
+            ->join('group_network', 'groups.idgroups', '=', 'group_network.group_id')
+            ->join('networks', 'networks.id', '=', 'group_network.network_id')
+            ->join('users_groups', 'users_groups.group', '=', 'groups.idgroups')
+            ->where(function ($query) use ($exclude_group_ids) {
+                $query->whereNotIn('events.group', $exclude_group_ids)
+                    ->where('event_start_utc', '>=', date('Y-m-d H:i:s'));
+            })
+            ->having('distance', '<=', User::NEARBY_KM)
+            ->groupBy('events.idevents')
+            ->orderBy('events.event_start_utc', 'ASC')
+            ->orderBy('distance', 'ASC');
     }
 
     public function allDevices(): HasMany
