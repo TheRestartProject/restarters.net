@@ -1,18 +1,18 @@
 <?php
 
-namespace Tests\Feature\Dashboard;
+namespace Tests\Feature\Category;
 
 use App\Models\Role;
 use DB;
 use Hash;
 use Symfony\Component\DomCrawler\Crawler;
-use Tests\TestCase;
+use Tests\ApiTestCase;
 
-class CategoryTest extends TestCase
+class CategoryTest extends ApiTestCase
 {
     public function testBasic(): void
     {
-        $this->loginAsTestUser(Role::ADMINISTRATOR);
+        $this->fastLoginAsTestUser(Role::ADMINISTRATOR);
 
         // We should see a category we set up in TestCase.
         $response = $this->get('/category');
@@ -42,7 +42,7 @@ class CategoryTest extends TestCase
     }
 
     public function testErrors(): void {
-        $this->loginAsTestUser(Role::RESTARTER);
+        $this->fastLoginAsTestUser(Role::RESTARTER);
 
         $response = $this->get('/category/edit/111');
         $response->assertRedirect('/user/forbidden');
