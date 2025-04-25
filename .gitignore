@@ -18,6 +18,8 @@ restarters-anonymised.sql
 /.idea
 /.nova
 .dir-locals.el
+.phpunit.result.cache
+.phpunit.cache/
 # The following should be ignored in all branches except production.
 /public/fonts/vendor
 /public/global
