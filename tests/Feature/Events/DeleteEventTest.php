@@ -3,6 +3,7 @@
 namespace Tests\Feature;
 
 use App\Events\EventDeleted;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Test;
 use App\Models\EventsUsers;
 use App\Models\Group;
@@ -91,9 +92,7 @@ class DeleteEventTest extends TestCase
         $this->get("/outbound/info/party/{$event->idevents}");
     }
 
-    /**
-     * @dataProvider roleProvider
-     */
+    #[DataProvider('roleProvider')]
     #[Test]
     public function view_edit_deleted_event($role): void
     {
@@ -270,9 +269,7 @@ class DeleteEventTest extends TestCase
         ];
     }
 
-    /**
-     * @dataProvider provider
-     */
+    #[DataProvider('provider')]
     #[Test]
     public function candelete_flag($role, $pastFuture, $addDevice, $canDelete): void
     {

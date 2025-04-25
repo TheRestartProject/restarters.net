@@ -3,6 +3,7 @@
 namespace Tests\Unit;
 
 use App\Models\Group;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Test;
 use App\Models\GrouptagsGroups;
 use App\Models\Network;
@@ -138,9 +139,7 @@ class GroupTest extends TestCase
         $this->assertFalse($shouldPush);
     }
 
-    /**
-     * @dataProvider timezoneProvider
-     */
+    #[DataProvider('timezoneProvider')]
     #[Test]
     public function timezone_inheritance($group, $network1, $network2, $result, $exception): void {
         $network1 = Network::factory()->create([

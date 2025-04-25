@@ -3,6 +3,7 @@
 namespace Tests\Feature\Groups;
 
 use App\Models\Group;
+use PHPUnit\Framework\Attributes\DataProvider;
 use App\Models\Network;
 use App\Models\Role;
 use App\Models\Skills;
@@ -34,9 +35,7 @@ class GroupHostTest extends TestCase
         ];
     }
 
-    /**
-     * @dataProvider roleProvider
-     */
+    #[DataProvider('roleProvider')]
     public function testMakeHost($role): void
     {
         $user = User::factory()->{lcfirst($role)}()->create();
@@ -126,9 +125,7 @@ class GroupHostTest extends TestCase
         ];
     }
 
-    /**
-     * @dataProvider providerTrueFalse
-     */
+    #[DataProvider('providerTrueFalse')]
     public function testNetworkCoordinatorDemoteHost($addToNetwork): void {
         $host = User::factory()->host()->create();
         $this->group->addVolunteer($host);

@@ -3,6 +3,7 @@
 namespace Tests\Feature;
 
 use App\Models\Device;
+use PHPUnit\Framework\Attributes\DataProvider;
 use App\Models\Group;
 use App\Models\Network;
 use App\Models\Party;
@@ -159,8 +160,8 @@ class APIv2EventTest extends TestCase
 
     /**
      * @param $role
-     * @dataProvider roleProvider
      */
+    #[DataProvider('roleProvider')]
     public function testCreateLoggedOutUsingKey($role): void {
         switch ($role) {
             case 'Administrator': $user = User::factory()->administrator()->create(); break;

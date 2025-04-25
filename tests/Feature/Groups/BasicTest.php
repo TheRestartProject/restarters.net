@@ -3,6 +3,7 @@
 namespace Tests\Feature\Groups;
 
 use App\Models\Group;
+use PHPUnit\Framework\Attributes\DataProvider;
 use App\Models\Network;
 use App\Models\User;
 use DB;
@@ -12,9 +13,7 @@ use Tests\TestCase;
 
 class BasicTest extends TestCase
 {
-    /**
-     * @dataProvider tabProvider
-     */
+    #[DataProvider('tabProvider')]
     public function testPageLoads($url, $tab): void
     {
         // Test the dashboard page loads.  Most of the work is done inside Vue, so a basic test is just that the

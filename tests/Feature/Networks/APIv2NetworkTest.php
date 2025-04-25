@@ -3,6 +3,7 @@
 namespace Tests\Feature;
 
 use App\Models\Group;
+use PHPUnit\Framework\Attributes\DataProvider;
 use App\Models\Network;
 use App\Models\Party;
 use App\Models\User;
@@ -76,9 +77,9 @@ class APIv2NetworkTest extends TestCase
     }
 
     /**
-     * @dataProvider providerGroupsParameters
      * @param $value
      */
+    #[DataProvider('providerGroupsParameters')]
     public function testListGroups($getNextEvent, $getDetails): void {
         $network = Network::factory()->create([
                                                        'name' => 'Restart',
@@ -156,9 +157,9 @@ class APIv2NetworkTest extends TestCase
     }
 
     /**
-     * @dataProvider providerEventsParameters
      * @param $value
      */
+    #[DataProvider('providerEventsParameters')]
     public function testListEvents($getDetails): void {
         $network = Network::factory()->create([
                                                        'name' => 'Restart',

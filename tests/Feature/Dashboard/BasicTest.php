@@ -3,6 +3,7 @@
 namespace Tests\Feature\Dashboard;
 
 use App\Models\Group;
+use PHPUnit\Framework\Attributes\DataProvider;
 use App\Models\Party;
 use App\Models\Role;
 use App\Models\User;
@@ -23,9 +24,7 @@ class BasicTest extends TestCase
         $this->get('/logout');
     }
 
-    /**
-     *@dataProvider provider
-     */
+    #[DataProvider('provider')]
     public function testPageLoads($city, $country, $lat, $lng, $nearbyGroupCount): void
     {
         // Test the dashboard page loads and shows a nearby group when relevant.

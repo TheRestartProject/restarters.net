@@ -3,6 +3,7 @@
 namespace Tests\Feature;
 
 use App\Events\UserUpdated;
+use PHPUnit\Framework\Attributes\DataProvider;
 use App\Models\User;
 use App\Models\UsersPermissions;
 use Carbon\Carbon;
@@ -67,9 +68,7 @@ class MenusTest extends TestCase
         ];
     }
 
-    /**
-     *@dataProvider provider
-     */
+    #[DataProvider('provider')]
     public function testSections($role, $present, $translator, $adminMenu): void
     {
         $user = User::factory()->{lcfirst($role)}()->create();

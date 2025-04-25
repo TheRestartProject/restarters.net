@@ -3,6 +3,7 @@
 namespace Tests\Feature;
 
 use App\Models\Role;
+use PHPUnit\Framework\Attributes\DataProvider;
 use App\Models\User;
 use DB;
 use Hash;
@@ -184,9 +185,7 @@ class AccountCreationTest extends TestCase
         $response->assertStatus(302);
     }
 
-    /**
-     * @dataProvider missingProvider
-     */
+    #[DataProvider('missingProvider')]
     public function testAdminCreateErrors($remove): void
     {
         $this->loginAsTestUser(Role::ADMINISTRATOR);

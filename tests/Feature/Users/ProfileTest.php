@@ -3,6 +3,7 @@
 namespace Tests\Feature;
 
 use App\Models\Role;
+use PHPUnit\Framework\Attributes\DataProvider;
 use App\Models\User;
 use DB;
 use Illuminate\Auth\AuthenticationException;
@@ -172,9 +173,7 @@ class ProfileTest extends TestCase
         $this->assertEquals(__('profile.language_updated'), \Session::get('message'));
     }
 
-    /**
-     * @dataProvider invitesProvider
-     */
+    #[DataProvider('invitesProvider')]
     public function testInvites($admin, $invites): void {
         $user = User::factory()->restarter()->create();
 

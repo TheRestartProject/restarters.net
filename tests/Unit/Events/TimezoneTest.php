@@ -3,6 +3,7 @@
 namespace Tests\Unit;
 
 use App\Models\Group;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Test;
 use App\Models\Party;
 use App\Models\Role;
@@ -18,9 +19,7 @@ use Illuminate\Support\Facades\Artisan;
 
 class TimezoneTest extends TestCase
 {
-    /**
-     * @dataProvider timezoneProvider
-     */
+    #[DataProvider('timezoneProvider')]
     #[Test]
     public function timezone_inheritance($event, $group, $result, $exception): void {
         $g = Group::factory()->create([
@@ -74,9 +73,7 @@ class TimezoneTest extends TestCase
         self::assertEquals(4.0, $e->lengthInHours());
     }
 
-    /**
-     * @dataProvider timesProvider
-     */
+    #[DataProvider('timesProvider')]
     public function testOrder($date, $tz1, $start1, $end1, $tz2, $start2, $end2, $editstart2, $editend2): void {
         // Two groups in different timezones.
         $g1 = Group::factory()->create([

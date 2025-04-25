@@ -3,6 +3,7 @@
 namespace Tests\Feature;
 
 use App\Events\UserUpdated;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Test;
 use App\Models\Group;
 use App\Helpers\Fixometer;
@@ -136,9 +137,7 @@ class EditProfileTest extends TestCase
         ];
     }
 
-    /**
-     * @dataProvider idProvider
-     */
+    #[DataProvider('idProvider')]
     #[Test]
     public function test_tags_update($id): void {
         $user = User::factory()->create();
@@ -183,9 +182,7 @@ class EditProfileTest extends TestCase
         $response = $this->get('/profile/edit/' . ($user->id + 1));
     }
 
-    /**
-     * @dataProvider idProvider
-     */
+    #[DataProvider('idProvider')]
     #[Test]
     public function image_upload($id): void {
         Storage::fake('avatars');

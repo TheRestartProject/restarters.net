@@ -3,6 +3,7 @@
 namespace Tests\Unit;
 
 use App\Models\Group;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Test;
 use App\Helpers\Fixometer;
 use App\Helpers\RepairNetworkService;
@@ -71,9 +72,7 @@ class EventStateTest extends TestCase
         $this->assertFalse($event->isInProgress());
     }
 
-    /**
-     * @dataProvider timeProvider
-     */
+    #[DataProvider('timeProvider')]
     public function testStatesOnViewPage($date, $upcoming, $finished, $inprogress, $startingsoon): void {
 
         $idevents = $this->createEvent($this->group->idgroups, $date);

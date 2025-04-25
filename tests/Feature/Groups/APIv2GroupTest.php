@@ -3,6 +3,7 @@
 namespace Tests\Feature;
 
 use App\Models\Group;
+use PHPUnit\Framework\Attributes\DataProvider;
 use App\Models\GroupTags;
 use App\Helpers\RepairNetworkService;
 use App\Models\Network;
@@ -21,10 +22,10 @@ use function PHPUnit\Framework\assertEquals;
 class APIv2GroupTest extends TestCase
 {
     /**
-     * @dataProvider providerTrueFalse
      *
      * @param $approve
      */
+    #[DataProvider('providerTrueFalse')]
     public function testGetGroup($approve): void {
         $user = User::factory()->administrator()->create([
                                                                           'api_token' => '1234',
@@ -307,9 +308,8 @@ class APIv2GroupTest extends TestCase
 
     /**
      * Network coordinators should see groups for approval, but only from their own networks.
-     *
-     * @dataProvider providerTrueFalse
      */
+    #[DataProvider('providerTrueFalse')]
     public function testNetworkCoordinatorApprove($first): void {
         $network1 = Network::factory()->create();
         $group1 = Group::factory()->create();

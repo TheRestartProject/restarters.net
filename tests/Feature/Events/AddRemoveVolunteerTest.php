@@ -3,6 +3,7 @@
 namespace Tests\Feature;
 
 use App\Models\EventsUsers;
+use PHPUnit\Framework\Attributes\DataProvider;
 use App\Models\Group;
 use App\Helpers\Fixometer;
 use App\Helpers\Geocoder;
@@ -23,10 +24,7 @@ use function PHPUnit\Framework\assertEquals;
 
 class AddRemoveVolunteerTest extends TestCase
 {
-    /**
-     * @dataProvider roleProvider
-     */
-
+    #[DataProvider('roleProvider')]
     public function testAddRemove($role, $addrole, $shouldBeHost): void
     {
         $this->withoutExceptionHandling();

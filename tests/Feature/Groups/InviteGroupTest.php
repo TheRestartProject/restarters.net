@@ -3,6 +3,7 @@
 namespace Tests\Feature;
 
 use App\Models\Group;
+use PHPUnit\Framework\Attributes\DataProvider;
 use App\Notifications\JoinGroup;
 use App\Notifications\NewGroupMember;
 use App\Helpers\Fixometer;
@@ -157,9 +158,7 @@ class InviteGroupTest extends TestCase
         $this->assertNotFalse(strpos($redirectTo, '/user/register'));
     }
 
-    /**
-     * @dataProvider invalidEmailProvider
-     */
+    #[DataProvider('invalidEmailProvider')]
     public function testInviteInvalidEmail($email, $valid): void
     {
         $this->loginAsTestUser(Role::ADMINISTRATOR);

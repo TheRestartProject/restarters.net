@@ -3,6 +3,7 @@
 namespace Tests\Feature\Alerts;
 
 use App\Alerts;
+use PHPUnit\Framework\Attributes\DataProvider;
 use App\Models\Role;
 use Cache;
 use DB;
@@ -28,9 +29,7 @@ class AlertsTest extends TestCase
         self::assertEquals(0, count($json['data']));
     }
 
-    /**
-     * @dataProvider roleProvider
-     */
+    #[DataProvider('roleProvider')]
     public function testCreate($role, $allowed): void {
         $user = null;
         $tokenstr = null;

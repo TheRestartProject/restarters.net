@@ -3,6 +3,7 @@
 namespace Tests\Feature;
 
 use App\Events\UserConfirmedEvent;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Test;
 use App\Events\UserLeftEvent;
 use App\Models\EventsUsers;
@@ -69,9 +70,7 @@ class CreateEventTest extends TestCase
         $response->assertSee('You need to be a host of a group in order to create a new event listing');
     }
 
-    /**
-     * @dataProvider roles
-     */
+    #[DataProvider('roles')]
     #[Test]
     public function a_host_with_a_group_can_create_an_event($data): void
     {
@@ -298,10 +297,7 @@ class CreateEventTest extends TestCase
         ];
     }
 
-    /**
-     *
-     * @dataProvider providerTrueFalse
-     */
+    #[DataProvider('providerTrueFalse')]
     #[Test]
     public function emails_sent_when_created($notify): void
     {
@@ -590,9 +586,7 @@ class CreateEventTest extends TestCase
         ];
     }
 
-    /**
-     **@dataProvider provider
-     */
+    #[DataProvider('provider')]
     #[Test]
     public function an_event_can_be_auto_approved($autoApprove, $approved): void
     {
@@ -707,10 +701,7 @@ class CreateEventTest extends TestCase
         );
     }
 
-    /**
-     *
-     * @dataProvider providerTrueFalse
-     */
+    #[DataProvider('providerTrueFalse')]
     #[Test]
     public function notifications_are_queued_as_expected($notify): void
     {
@@ -810,9 +801,7 @@ class CreateEventTest extends TestCase
         $response->assertSuccessful();
     }
 
-    /**
-     * @dataProvider invalidEmailProvider
-     */
+    #[DataProvider('invalidEmailProvider')]
     public function an_invalid_email_is_trapped($email, $valid)
     {
         $this->withoutExceptionHandling();

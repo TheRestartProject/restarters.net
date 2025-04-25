@@ -3,6 +3,7 @@
 namespace Tests\Feature;
 
 use App\Models\EventsUsers;
+use PHPUnit\Framework\Attributes\DataProvider;
 use App\Models\Group;
 use App\Helpers\Fixometer;
 use App\Listeners\AddUserToDiscourseThreadForEvent;
@@ -503,9 +504,7 @@ class InviteEventTest extends TestCase
         ]);
     }
 
-    /**
-     * @dataProvider invalidEmailProvider
-     */
+    #[DataProvider('invalidEmailProvider')]
     public function testInviteInvalidEmail($email, $valid): void
     {
         $this->loginAsTestUser(Role::ADMINISTRATOR);

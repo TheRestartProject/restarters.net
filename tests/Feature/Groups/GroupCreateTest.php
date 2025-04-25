@@ -3,6 +3,7 @@
 namespace Tests\Feature\Groups;
 
 use App\Models\Group;
+use PHPUnit\Framework\Attributes\DataProvider;
 use App\Models\GroupTags;
 use App\Models\Network;
 use App\Notifications\GroupConfirmed;
@@ -82,9 +83,7 @@ class GroupCreateTest extends TestCase
         ];
     }
 
-    /**
-     * @dataProvider roles
-     */
+    #[DataProvider('roles')]
     public function testApprove($role): void {
         Notification::fake();
 
