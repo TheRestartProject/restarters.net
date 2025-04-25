@@ -3,6 +3,7 @@
 namespace Tests\Feature\Stats;
 
 use App\Models\Device;
+use PHPUnit\Framework\Attributes\Test;
 use App\Models\Group;
 use App\Models\Party;
 use App\Models\User;
@@ -12,7 +13,7 @@ use Tests\Feature\Stats\StatsTestCase;
 
 class GroupStatsTest extends StatsTestCase
 {
-    /** @test */
+    #[Test]
     public function a_group_with_no_events_has_empty_stats(): void
     {
         $group = Group::factory()->create()->first();
@@ -20,7 +21,7 @@ class GroupStatsTest extends StatsTestCase
         $this->assertEquals($expect, $group->getGroupStats());
     }
 
-    /** @test */
+    #[Test]
     public function a_group_with_one_past_event_has_stats_for_that_event(): void
     {
         $group = Group::factory()->create();
@@ -40,7 +41,7 @@ class GroupStatsTest extends StatsTestCase
         $rsp->assertSee('<span class="largetext">21</span>', false);
     }
 
-    /** @test */
+    #[Test]
     public function a_group_with_mixed_devices_has_correct_stats(): void
     {
         $group = Group::factory()->create();
@@ -194,7 +195,7 @@ class GroupStatsTest extends StatsTestCase
         }
     }
 
-    /** @test */
+    #[Test]
     public function two_groups_with_mixed_devices_have_correct_stats(): void
     {
         $group1 = Group::factory()->create();
@@ -340,7 +341,7 @@ class GroupStatsTest extends StatsTestCase
         }
     }
 
-    /** @test */
+    #[Test]
     public function get_of_stats_after_deletion(): void {
 
         $admin = User::factory()->administrator()->create([

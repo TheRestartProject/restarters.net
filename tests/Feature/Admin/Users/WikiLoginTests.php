@@ -3,6 +3,7 @@
 namespace Tests\Feature;
 
 use App\Listeners\ChangeWikiPassword;
+use PHPUnit\Framework\Attributes\Test;
 use App\Listeners\LogInToWiki;
 use App\Models\User;
 use App\WikiSyncStatus;
@@ -27,7 +28,7 @@ class WikiLoginTests extends TestCase
         DB::statement('SET foreign_key_checks=1');
     }
 
-    /** @test */
+    #[Test]
     public function if_flagged_for_creation_create_when_logging_in(): void
     {
         $this->withoutExceptionHandling();
@@ -49,7 +50,7 @@ class WikiLoginTests extends TestCase
         $this->assertEquals(WikiSyncStatus::Created, $user->wiki_sync_status);
     }
 
-    /** @test */
+    #[Test]
     public function if_not_flagged_for_creation(): void
     {
         $this->withoutExceptionHandling();
@@ -71,7 +72,7 @@ class WikiLoginTests extends TestCase
         $this->assertEquals(WikiSyncStatus::DoNotCreate, $user->wiki_sync_status);
     }
 
-    /** @test */
+    #[Test]
     public function if_already_created(): void
     {
         $this->withoutExceptionHandling();
@@ -93,7 +94,7 @@ class WikiLoginTests extends TestCase
         $this->assertEquals(WikiSyncStatus::Created, $user->wiki_sync_status);
     }
 
-    /** @test */
+    #[Test]
     public function if_wiki_user_changes_password(): void
     {
         $this->withoutExceptionHandling();

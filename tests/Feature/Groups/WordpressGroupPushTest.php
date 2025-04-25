@@ -3,6 +3,7 @@
 namespace Tests\Feature;
 
 use App\Events\ApproveGroup;
+use PHPUnit\Framework\Attributes\Test;
 use App\Events\EditGroup;
 use App\Models\Group;
 use App\Listeners\AddUserToDiscourseGroup;
@@ -29,7 +30,7 @@ class WordpressGroupPushTest extends TestCase
         $queueManager->setDefaultDriver('sync');
     }
 
-    /** @test */
+    #[Test]
     public function group_approved_wordpress_and_discourse(): void
     {
         $this->instance(WordpressClient::class, Mockery::mock(WordpressClient::class, function ($mock) {
@@ -58,7 +59,7 @@ class WordpressGroupPushTest extends TestCase
         $this->artisan("queue:work --stop-when-empty");
     }
 
-    /** @test */
+    #[Test]
     public function groups_pushed_to_wordpress_when_edited(): void
     {
         $this->instance(WordpressClient::class, Mockery::mock(WordpressClient::class, function ($mock) {

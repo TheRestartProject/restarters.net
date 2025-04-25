@@ -3,6 +3,7 @@
 namespace Tests\Feature;
 
 use App\Events\UserRegistered;
+use PHPUnit\Framework\Attributes\Test;
 use App\Listeners\AddUserToDiscourseGroup;
 use App\Listeners\DiscourseUserEventSubscriber;
 use App\Providers\DiscourseServiceProvider;
@@ -18,7 +19,7 @@ use Tests\Feature\MockInterface;
 
 class DiscourseAccountCreationTest extends TestCase
 {
-    /** @test */
+    #[Test]
     public function user_registration_triggers_user_registered_event(): void
     {
         Event::fake();
@@ -31,7 +32,7 @@ class DiscourseAccountCreationTest extends TestCase
         Event::assertDispatched(UserRegistered::class);
     }
 
-    /** @test */
+    #[Test]
     public function user_registration_triggers_discourse_sync_attempt(): void
     {
         if (config('restarters.features.discourse_integration')) {
@@ -51,7 +52,7 @@ class DiscourseAccountCreationTest extends TestCase
         }
     }
 
-    /** @test */
+    #[Test]
     public function user_registration_discourse_sync(): void
     {
         if (config('restarters.features.discourse_integration')) {
@@ -82,7 +83,7 @@ class DiscourseAccountCreationTest extends TestCase
         }
     }
 
-    /** @test */
+    #[Test]
     public function user_sync(): void
     {
         // TODO Not working and agreed to disable for now.

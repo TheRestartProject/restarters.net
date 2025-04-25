@@ -3,6 +3,7 @@
 namespace Tests\Feature\Stats;
 
 use App\Models\Device;
+use PHPUnit\Framework\Attributes\Test;
 use App\Models\Group;
 use App\Models\Party;
 use App\Models\Role;
@@ -11,7 +12,7 @@ use Tests\Feature\Stats\StatsTestCase;
 
 class EventStatsTest extends StatsTestCase
 {
-    /** @test */
+    #[Test]
     public function an_event_with_no_devices_has_empty_stats(): void
     {
         $event = Party::factory()->create();
@@ -20,7 +21,7 @@ class EventStatsTest extends StatsTestCase
         $this->assertEquals($expect, $event->getEventStats());
     }
 
-    /** @test */
+    #[Test]
     public function event_stats_with_both_powered_and_unpowered_devices(): void
     {
         $this->_setupCategoriesWithUnpoweredWeights();
@@ -180,7 +181,7 @@ class EventStatsTest extends StatsTestCase
         $response->assertSee('<span id="ewaste-diverted-value">23</span>', false);
     }
 
-    /** @test */
+    #[Test]
     public function event_stats_for_upcoming_event(): void {
         $this->_setupCategoriesWithUnpoweredWeights();
 

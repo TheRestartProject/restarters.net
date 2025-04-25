@@ -3,6 +3,7 @@
 namespace Tests\Feature;
 
 use App\Models\Device;
+use PHPUnit\Framework\Attributes\Test;
 use App\Models\EventsUsers;
 use App\Models\Group;
 use App\Helpers\Geocoder;
@@ -28,7 +29,7 @@ class OnlineEventsTest extends TestCase
         });
     }
 
-    /** @test */
+    #[Test]
     public function a_host_can_create_an_online_event(): void
     {
         $this->withoutExceptionHandling();

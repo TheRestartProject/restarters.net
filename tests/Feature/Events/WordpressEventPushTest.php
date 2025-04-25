@@ -3,6 +3,7 @@
 namespace Tests\Feature;
 
 use App\Events\ApproveEvent;
+use PHPUnit\Framework\Attributes\Test;
 use App\Events\EditEvent;
 use App\Models\Group;
 use App\Models\GroupNetwork;
@@ -31,7 +32,7 @@ class WordpressEventPushTest extends TestCase
         $queueManager->setDefaultDriver('sync');
     }
 
-    /** @test */
+    #[Test]
     public function given_restart_network_when_event_approved_then_pushed_to_wordpress(): void
     {
         $this->instance(WordpressClient::class, Mockery::mock(WordpressClient::class, function ($mock) {
@@ -60,7 +61,7 @@ class WordpressEventPushTest extends TestCase
         $this->artisan('sync:events');
     }
 
-    /** @test */
+    #[Test]
     public function date_format_in_events(): void {
         $network = Network::factory()->create([
            'events_push_to_wordpress' => true,
@@ -118,7 +119,7 @@ class WordpressEventPushTest extends TestCase
         ]));
     }
 
-    /** @test */
+    #[Test]
     public function given_nonrestart_network_when_event_approved_then_not_pushed_to_wordpress(): void
     {
         $this->instance(WordpressClient::class, Mockery::mock(WordpressClient::class, function ($mock) {
@@ -142,7 +143,7 @@ class WordpressEventPushTest extends TestCase
         event(new ApproveEvent($event));
     }
 
-    /** @test */
+    #[Test]
     public function given_restart_network_when_event_edited_then_pushed_to_wordpress(): void
     {
         $this->instance(WordpressClient::class, Mockery::mock(WordpressClient::class, function ($mock) {
@@ -176,7 +177,7 @@ class WordpressEventPushTest extends TestCase
         event(new EditEvent($event, $eventData));
     }
 
-    /** @test */
+    #[Test]
     public function given_nonrestart_network_when_event_edited_then_not_pushed_to_wordpress(): void
     {
         $this->instance(WordpressClient::class, Mockery::mock(WordpressClient::class, function ($mock) {
@@ -205,7 +206,7 @@ class WordpressEventPushTest extends TestCase
     }
 
 
-    /** @test */
+    #[Test]
     public function given_group_not_approved_then_not_pushed_to_wordpress(): void
     {
         $this->instance(WordpressClient::class, Mockery::mock(WordpressClient::class, function ($mock) {

@@ -3,6 +3,7 @@
 namespace Tests\Unit;
 
 use App\Models\User;
+use PHPUnit\Framework\Attributes\Test;
 use DB;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Foundation\Testing\WithFaker;
@@ -18,7 +19,7 @@ class UsernameGeneratorTest extends TestCase
         DB::statement('SET foreign_key_checks=1');
     }
 
-    /** @test */
+    #[Test]
     public function name_is_single_name(): void
     {
         $user = \App\Models\User::factory()->create();
@@ -29,7 +30,7 @@ class UsernameGeneratorTest extends TestCase
         $this->assertEquals('Philip', $user->username);
     }
 
-    /** @test */
+    #[Test]
     public function name_is_first_and_last_name(): void
     {
         $user = \App\Models\User::factory()->create();
@@ -40,7 +41,7 @@ class UsernameGeneratorTest extends TestCase
         $this->assertEquals('Philip_Fry', $user->username);
     }
 
-    /** @test */
+    #[Test]
     public function name_is_first_name_initial_and_last_name(): void
     {
         $user = \App\Models\User::factory()->create();
@@ -51,7 +52,7 @@ class UsernameGeneratorTest extends TestCase
         $this->assertEquals('Philip_J_Fry', $user->username);
     }
 
-    /** @test */
+    #[Test]
     public function name_has_special_chars(): void
     {
         $user = \App\Models\User::factory()->create();
@@ -62,7 +63,7 @@ class UsernameGeneratorTest extends TestCase
         $this->assertEquals('Brixton_Repair_Cafe', $user->username);
     }
 
-    /** @test */
+    #[Test]
     public function name_has_leading_or_trailing_whitespace(): void
     {
         $user = \App\Models\User::factory()->create();
@@ -73,7 +74,7 @@ class UsernameGeneratorTest extends TestCase
         $this->assertEquals('Philip_J_Fry', $user->username);
     }
 
-    /** @test */
+    #[Test]
     public function username_already_taken(): void
     {
         $user1 = \App\Models\User::factory()->create();
@@ -88,7 +89,7 @@ class UsernameGeneratorTest extends TestCase
         $this->assertEquals('Philip_J_Fry_'.$user2->id, $user2->username);
     }
 
-    /** @test */
+    #[Test]
     public function username_repeated_special_char(): void {
         $user = \App\Models\User::factory()->create();
         $user->name = 'M._Someone';

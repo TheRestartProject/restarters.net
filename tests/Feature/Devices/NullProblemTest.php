@@ -3,6 +3,7 @@
 namespace Tests\Feature;
 
 use App\Models\Device;
+use PHPUnit\Framework\Attributes\Test;
 use App\Models\Party;
 use App\Models\User;
 use DB;
@@ -26,7 +27,7 @@ class NullProblemTest extends TestCase
         $this->withoutExceptionHandling();
     }
 
-    /** @test */
+    #[Test]
     public function null_problem_mapped_to_empty_string(): void
     {
         $iddevices = $this->createDevice($this->event->idevents, 'misc', null, 1, 100, null);

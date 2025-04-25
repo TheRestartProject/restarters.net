@@ -3,6 +3,7 @@
 namespace Tests\Feature;
 
 use App\Notifications\AdminModerationEvent;
+use PHPUnit\Framework\Attributes\Test;
 use App\Models\Party;
 use App\Models\User;
 use Illuminate\Support\Facades\Notification;
@@ -10,7 +11,7 @@ use Tests\TestCase;
 
 class ModerationEventEmailTest extends TestCase
 {
-    /** @test */
+    #[Test]
     public function a_moderation_email_is_sent_to_admins_when_an_event_is_created(): void
     {
         Notification::fake();

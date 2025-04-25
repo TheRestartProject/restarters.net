@@ -3,6 +3,7 @@
 namespace Tests\Unit;
 
 use App\Models\Device;
+use PHPUnit\Framework\Attributes\Test;
 use App\Models\Group;
 use App\Helpers\Fixometer;
 use App\Models\Network;
@@ -18,7 +19,7 @@ class CountsTest extends TestCase
 {
     // Event counts should only include events in the past.
 
-    /** @test */
+    #[Test]
     public function it_can_check_if_event_counts_past(): void
     {
         // Create a group and an event on it.

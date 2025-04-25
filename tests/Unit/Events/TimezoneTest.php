@@ -3,6 +3,7 @@
 namespace Tests\Unit;
 
 use App\Models\Group;
+use PHPUnit\Framework\Attributes\Test;
 use App\Models\Party;
 use App\Models\Role;
 use App\Models\User;
@@ -18,9 +19,9 @@ use Illuminate\Support\Facades\Artisan;
 class TimezoneTest extends TestCase
 {
     /**
-     * @test
      * @dataProvider timezoneProvider
      */
+    #[Test]
     public function timezone_inheritance($event, $group, $result, $exception): void {
         $g = Group::factory()->create([
                                                    'timezone' => $group

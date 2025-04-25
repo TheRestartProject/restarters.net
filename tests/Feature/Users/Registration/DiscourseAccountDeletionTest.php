@@ -3,6 +3,7 @@
 namespace Tests\Feature;
 
 use App\Events\UserDeleted;
+use PHPUnit\Framework\Attributes\Test;
 use App\Events\UserLanguageUpdated;
 use App\Events\UserRegistered;
 use App\Listeners\AddUserToDiscourseGroup;
@@ -23,7 +24,7 @@ use Illuminate\Support\Facades\Artisan;
 
 class DiscourseAccountDeletionTest extends TestCase
 {
-    /** @test */
+    #[Test]
     public function user_deletion_triggers_anonymise(): void
     {
         if (config('restarters.features.discourse_integration')) {

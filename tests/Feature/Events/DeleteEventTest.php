@@ -3,6 +3,7 @@
 namespace Tests\Feature;
 
 use App\Events\EventDeleted;
+use PHPUnit\Framework\Attributes\Test;
 use App\Models\EventsUsers;
 use App\Models\Group;
 use App\Helpers\Geocoder;
@@ -35,7 +36,7 @@ class DeleteEventTest extends TestCase
         parent::setUp();
     }
 
-    /** @test */
+    #[Test]
     public function an_admin_can_delete_an_event(): void
     {
         $this->withoutExceptionHandling();
@@ -91,9 +92,9 @@ class DeleteEventTest extends TestCase
     }
 
     /**
-     * @test
      * @dataProvider roleProvider
      */
+    #[Test]
     public function view_edit_deleted_event($role): void
     {
         $this->withoutExceptionHandling();
@@ -158,7 +159,7 @@ class DeleteEventTest extends TestCase
         ];
     }
 
-    /** @test */
+    #[Test]
     public function given_network_connected_to_wordpress_when_event_deleted(): void
     {
         $this->withoutExceptionHandling();
@@ -186,7 +187,7 @@ class DeleteEventTest extends TestCase
         $handler->handle(new EventDeleted($event));
     }
 
-    /** @test */
+    #[Test]
     public function given_wordpress_deletion_failure(): void
     {
         $this->withoutExceptionHandling();
@@ -270,9 +271,9 @@ class DeleteEventTest extends TestCase
     }
 
     /**
-     * @test
      * @dataProvider provider
      */
+    #[Test]
     public function candelete_flag($role, $pastFuture, $addDevice, $canDelete): void
     {
         $this->loginAsTestUser(Role::ADMINISTRATOR);
@@ -315,9 +316,7 @@ class DeleteEventTest extends TestCase
     }
 
 
-    /**
-     * @test
-     */
+    #[Test]
     public function request_review(): void
     {
         Notification::fake();

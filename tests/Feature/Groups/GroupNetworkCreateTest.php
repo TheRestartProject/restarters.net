@@ -3,6 +3,7 @@
 namespace Tests\Feature;
 
 use App\Events\ApproveEvent;
+use PHPUnit\Framework\Attributes\Test;
 use App\Events\EditEvent;
 use App\Models\Group;
 use App\Models\GroupNetwork;
@@ -24,7 +25,7 @@ class GroupNetworkCreateTest extends TestCase
 {
     // New group is created as part of the network represented by the current domain.
 
-    /** @test */
+    #[Test]
     public function given_specific_domain_when_group_created_then_it_is_created_as_part_of_corresponding_network(): void
     {
         $this->withoutExceptionHandling();
