@@ -8,14 +8,17 @@ use App\Models\Role;
 use Cache;
 use DB;
 use Hash;
-use Tests\TestCase;
+use Tests\ApiTestCase;
 use Illuminate\Auth\AuthenticationException;
 
-class AlertsTest extends TestCase
+class AlertsTest extends ApiTestCase
 {
     protected function setUp(): void
     {
         parent::setUp();
+        
+        // Ensure there are no alerts from previous tests
+        DB::table('alerts')->truncate();
         Cache::clear('alerts');
     }
 
@@ -34,8 +37,10 @@ class AlertsTest extends TestCase
         $user = null;
         $tokenstr = null;
 
+        // Use faster login method to avoid full HTTP registration flow
+        $user = $this->fastLoginAsTestUser($role);
+
         if ($role != Role::GUSET) {
-            $user = $this->loginAsTestUser($role);
             $token = $user->api_token;
             $tokenstr = "?api_token=$token";
         }
@@ -83,8 +88,6 @@ class AlertsTest extends TestCase
             self::assertEquals('<p>Test alert2</p>', $json['data'][0]['html']);
             self::assertEquals('2001-01-02T00:00:00+00:00', $json['data'][0]['start']);
             self::assertEquals('2038-01-02T02:00:00+00:00', $json['data'][0]['end']);
-
-            // No delete call - can fake by editing the start/end time.
         }
     }
 

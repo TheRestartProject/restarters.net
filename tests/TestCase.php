@@ -143,6 +143,28 @@ abstract class TestCase extends BaseTestCase
         return Auth::user();
     }
 
+    public function fastLoginAsTestUser($role = Role::RESTARTER)
+    {
+        // Create a user directly without going through the HTTP registration flow
+        $userAttributes = $this->userAttributes();
+        $user = User::factory()->create([
+            'name' => $userAttributes['name'],
+            'email' => $userAttributes['email'],
+            'password' => Hash::make($userAttributes['password']),
+            'role' => $role,
+            'consent_gdpr' => true,
+            'consent_future_data' => true,
+        ]);
+        
+        // Log in the user
+        $this->actingAs($user);
+        
+        // Ensure API token
+        $user->ensureAPIToken();
+        
+        return $user;
+    }
+
     public function createGroup($name = 'Test Group', $website = 'https://therestartproject.org', $location = 'London', $text = 'Some text.', $assert = true, $approve = true, $email = null)
     {
         $idgroups = null;
