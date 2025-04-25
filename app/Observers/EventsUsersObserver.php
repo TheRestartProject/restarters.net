@@ -29,26 +29,14 @@ class EventsUsersObserver {
      */
     public function created(EventsUsers $eu): void
     {
-        // Get the party directly or via relationship
-        $event = $eu->party;
-        if (!$event) {
-            $event = Party::where('idevents', $eu->event)->first();
-        }
-        
-        // Get user via relationship if available or direct query
-        $user = null;
-        if ($eu->userObj) {
-            $user = $eu->userObj;
-        } elseif ($eu->user) {
-            $user = User::where('id', $eu->user)->first();
-        }
+        $event = $this->getEvent($eu);
+        $user = $this->getUser($eu);
         
         if ($eu->status == 1) {
-            // Confirmed.  Make sure they are on the thread.
+            // Confirmed. Make sure they are on the thread.
             $this->confirmed($event, $user, true);
         } else {
-            // Not confirmed.  Make sure they are not on the thread.  Don't change the count, as they shouldn't
-            // be on it anyway.
+            // Not confirmed. Make sure they are not on the thread.
             $this->removed($event, $user, false);
         }
     }
@@ -57,28 +45,16 @@ class EventsUsersObserver {
      * Listen to the updated event.
      */
     public function updating(EventsUsers $eu): void {
-        // Get the party directly or via relationship
-        $event = $eu->party;
-        if (!$event) {
-            $event = Party::where('idevents', $eu->event)->first();
-        }
-        
-        // Get user via relationship if available or direct query
-        $user = null;
-        if ($eu->userObj) {
-            $user = $eu->userObj;
-        } elseif ($eu->user) {
-            $user = User::where('id', $eu->user)->first();
-        }
-
         if ($eu->isDirty('status')) {
-            // The confirmed status has changed, so we need to update the thread.
+            $event = $this->getEvent($eu);
+            $user = $this->getUser($eu);
 
+            // The confirmed status has changed, so we need to update the thread.
             if ($eu->status == 1) {
-                // Confirmed.  Make sure they are on the thread.
+                // Confirmed. Make sure they are on the thread.
                 $this->confirmed($event, $user, true);
             } else {
-                // Not confirmed.  Make sure they are not on the thread.
+                // Not confirmed. Make sure they are not on the thread.
                 $this->removed($event, $user, true);
             }
         }
@@ -89,22 +65,38 @@ class EventsUsersObserver {
      */
     public function deleted(EventsUsers $eu): void
     {
+        $event = $this->getEvent($eu);
+        $user = $this->getUser($eu);
+
+        // Make sure they are not on the thread. If they were confirmed, we need to update the volunteer count.
+        $this->removed($event, $user, true, $eu->status == 1);
+    }
+
+    /**
+     * Get Party model from EventsUsers
+     */
+    private function getEvent(EventsUsers $eu): ?Party
+    {
         // Get the party directly or via relationship
         $event = $eu->party;
         if (!$event) {
             $event = Party::where('idevents', $eu->event)->first();
         }
-        
-        // Get user via relationship if available or direct query
-        $user = null;
-        if ($eu->userObj) {
-            $user = $eu->userObj;
-        } elseif ($eu->user) {
-            $user = User::where('id', $eu->user)->first();
-        }
+        return $event;
+    }
 
-        // Make sure they are not on the thread.  If they were confirmed, we need to update the volunteer count.
-        $this->removed($event, $user, true, $eu->status == 1);
+    /**
+     * Get User model from EventsUsers
+     */
+    private function getUser(EventsUsers $eu): ?User
+    {
+        // Get user via relationship if available or direct query
+        if ($eu->userObj) {
+            return $eu->userObj;
+        } elseif ($eu->user) {
+            return User::where('id', $eu->user)->first();
+        }
+        return null;
     }
 
     private function confirmed(?Party $event, ?User $user, $count): void
