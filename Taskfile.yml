@@ -171,7 +171,7 @@ tasks:
     desc: Run the tests
     silent: true
     cmds:
-      - task docker:run:artisan -- test {{.CLI_ARGS}}
+      - task docker:run:artisan -- test --env=testing {{.CLI_ARGS}}
 
   docker:init:test_db:
     desc: Initialize the test database in Docker environment
