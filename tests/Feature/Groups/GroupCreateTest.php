@@ -37,12 +37,7 @@ class GroupCreateTest extends TestCase
     
     public function testCreate(): void
     {
-        // Use a unique API token to avoid conflicts
-        $uniqueToken = 'token_' . uniqid();
-        
-        $user = User::factory()->administrator()->create([
-                                                                      'api_token' => $uniqueToken,
-                                                                  ]);
+        $user = $this->createUserWithToken(Role::ADMINISTRATOR);
         $this->actingAs($user);
 
         $response = $this->get('/group/create');
@@ -52,7 +47,7 @@ class GroupCreateTest extends TestCase
         $this->assertNotNull($idgroups);
         $group = Group::find($idgroups);
 
-        $response = $this->get('/api/groups?api_token=' . $uniqueToken);
+        $response = $this->get('/api/groups?api_token=' . $user->api_token);
         $response->assertSuccessful();
         $ret = json_decode($response->getContent(), TRUE);
         self::assertEquals(1, count($ret));

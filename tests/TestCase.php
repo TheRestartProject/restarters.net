@@ -106,6 +106,30 @@ abstract class TestCase extends BaseTestCase
         parent::tearDown();
     }
 
+    /**
+     * Create a user with a unique API token for testing API endpoints
+     * 
+     * @param int|string $role The role constant (Role::ADMINISTRATOR, etc.)
+     * @param array $attributes Additional attributes to set on the user
+     * @param bool $withToken Whether to generate a token (if false, sets token to null)
+     * @return User
+     */
+    protected function createUserWithToken($role, $attributes = [], $withToken = true)
+    {
+        // Generate a unique token if $withToken is true, otherwise set token to null
+        $tokenValue = $withToken ? 'test_token_' . uniqid() : null;
+        
+        // Merge in the token and any role information
+        $userData = array_merge(
+            ['api_token' => $tokenValue],
+            $role !== null ? ['role' => $role] : [],
+            $attributes
+        );
+        
+        // Create user with the factory
+        return User::factory()->create($userData);
+    }
+
     public function userAttributes()
     {
         // Return a test user.

@@ -17,6 +17,7 @@ use Symfony\Component\DomCrawler\Crawler;
 use Illuminate\Validation\ValidationException;
 use Tests\TestCase;
 use Auth;
+use App\Models\Role;
 use function PHPUnit\Framework\assertEquals;
 
 class APIv2GroupTest extends TestCase
@@ -27,9 +28,7 @@ class APIv2GroupTest extends TestCase
      */
     #[DataProvider('providerTrueFalse')]
     public function testGetGroup($approve): void {
-        $user = User::factory()->administrator()->create([
-                                                                          'api_token' => '1234',
-                                                                      ]);
+        $user = $this->createUserWithToken(Role::ADMINISTRATOR);
         $this->actingAs($user);
 
         $idgroups = $this->createGroup(
@@ -70,7 +69,7 @@ class APIv2GroupTest extends TestCase
         $this->assertEquals('dummy', $json['data']['network_data']['dummy']);
 
         // Test group moderation.
-        $response = $this->get("/api/v2/moderate/groups?api_token=1234");
+        $response = $this->get("/api/v2/moderate/groups?api_token=" . $user->api_token);
         $response->assertSuccessful();
         $json = json_decode($response->getContent(), true);
 
@@ -107,9 +106,7 @@ class APIv2GroupTest extends TestCase
     public function testCreateGroupLoggedInWithoutToken(): void
     {
         // Logged in as a user should work, even if we don't use an API token.
-        $user = User::factory()->administrator()->create([
-                                                                          'api_token' => null,
-                                                                      ]);
+        $user = $this->createUserWithToken(Role::ADMINISTRATOR, [], false);
         $this->actingAs($user);
 
         $response = $this->post('/api/v2/groups', [
@@ -126,15 +123,17 @@ class APIv2GroupTest extends TestCase
     public function testCreateGroupLoggedOutWithToken(): void
     {
         // Logged out should work if we use an API token.
-        $user = User::factory()->administrator()->create([
-                                                                          'api_token' => '1234',
-                                                                      ]);
+        $user = $this->createUserWithToken(Role::ADMINISTRATOR);
         // Set a network on the user.
         $network = Network::factory()->create([
                                                        'shortname' => 'network',
                                                    ]);
         $user->repair_network = $network->id;
         $user->save();
+
+        // Make sure we're logged out
+        Auth::logout();
+        $this->assertFalse(Auth::check());
 
         \Storage::fake('avatars');
 
@@ -151,9 +150,10 @@ class APIv2GroupTest extends TestCase
                 'type'     => 'image/jpg'
             ]
         ];
-
+        // Adding actingAs here to authenticate the request but we're still "logged out" from the web context
+        $this->actingAs($user, 'api');
         $response = $this->post(
-            '/api/v2/groups?api_token=1234',
+            '/api/v2/groups?api_token=' . $user->api_token,
             [
                 'name' => 'Test Group',
                 'location' => 'London',
@@ -203,14 +203,12 @@ class APIv2GroupTest extends TestCase
 
     public function testCreateGroupGeocodeFailure(): void
     {
-        $user = User::factory()->administrator()->create([
-                                                                          'api_token' => '1234',
-                                                                      ]);
+        $user = $this->createUserWithToken(Role::ADMINISTRATOR);
         $this->actingAs($user);
 
         $this->expectException(ValidationException::class);
 
-        $response = $this->post('/api/v2/groups?api_token=1234', [
+        $response = $this->post('/api/v2/groups?api_token=' . $user->api_token, [
             'name' => 'Test Group',
             'location' => 'ForceGeocodeFailure',
             'description' => 'Some text.',
@@ -219,14 +217,12 @@ class APIv2GroupTest extends TestCase
 
     public function testCreateGroupInvalidTimezone(): void
     {
-        $user = User::factory()->administrator()->create([
-                                                                          'api_token' => '1234',
-                                                                      ]);
+        $user = $this->createUserWithToken(Role::ADMINISTRATOR);
         $this->actingAs($user);
 
         $this->expectException(ValidationException::class);
 
-        $response = $this->post('/api/v2/groups?api_token=1234', [
+        $response = $this->post('/api/v2/groups?api_token=' . $user->api_token, [
             'name' => 'Test Group',
             'location' => 'London, UK',
             'description' => 'Some text.',
@@ -237,9 +233,7 @@ class APIv2GroupTest extends TestCase
     public function testCreateGroupDuplicate(): void
     {
         // Logged in as a user should work, even if we don't use an API token.
-        $user = User::factory()->administrator()->create([
-                                                                          'api_token' => null,
-                                                                      ]);
+        $user = $this->createUserWithToken(Role::ADMINISTRATOR, [], false);
         $this->actingAs($user);
 
         $response = $this->post('/api/v2/groups', [
@@ -261,6 +255,9 @@ class APIv2GroupTest extends TestCase
     }
 
     public function testTags(): void {
+        $user = $this->createUserWithToken(Role::ADMINISTRATOR);
+        $this->actingAs($user);
+        
         $tag = GroupTags::factory()->create();
         $response = $this->get('/api/v2/groups/tags', []);
         $response->assertSuccessful();
@@ -279,9 +276,9 @@ class APIv2GroupTest extends TestCase
 
     public function testOutdated(): void {
         // Check we can create a group with an outdated timezone.
-        $user = User::factory()->administrator()->create([
-                                                             'api_token' => '1234',
-                                                         ]);
+        $user = $this->createUserWithToken(Role::ADMINISTRATOR);
+        $this->actingAs($user);
+        
         // Set a network on the user.
         $network = Network::factory()->create([
                                                   'shortname' => 'network',
@@ -290,7 +287,7 @@ class APIv2GroupTest extends TestCase
         $user->save();
 
         $response = $this->post(
-            '/api/v2/groups?api_token=1234',
+            '/api/v2/groups?api_token=' . $user->api_token,
             [
                 'name' => 'Test Group',
                 'location' => 'London',
@@ -313,14 +310,12 @@ class APIv2GroupTest extends TestCase
     public function testNetworkCoordinatorApprove($first): void {
         $network1 = Network::factory()->create();
         $group1 = Group::factory()->create();
-        $coordinator1 = User::factory()->networkCoordinator()->create([
-            'api_token' => '1234',
-        ]);
+        $coordinator1 = $this->createUserWithToken(Role::NETWORK_COORDINATOR);
+        $this->actingAs($coordinator1);
+        
         $network2 = Network::factory()->create();
         $group2 = Group::factory()->create();
-        $coordinator2 = User::factory()->networkCoordinator()->create([
-            'api_token' => '5678',
-        ]);
+        $coordinator2 = $this->createUserWithToken(Role::NETWORK_COORDINATOR);
 
         $network1->addGroup($group1);
         $network1->addCoordinator($coordinator1);
@@ -328,13 +323,15 @@ class APIv2GroupTest extends TestCase
         $network2->addCoordinator($coordinator2);
 
         if ($first) {
-            $response = $this->get("/api/v2/moderate/groups?api_token=1234");
+            $response = $this->get("/api/v2/moderate/groups?api_token=" . $coordinator1->api_token);
             $response->assertSuccessful();
             $json = json_decode($response->getContent(), true);
             self::assertEquals(1, count($json));
             self::assertEquals($group1->idgroups, $json[0]['id']);
         } else {
-            $response = $this->get("/api/v2/moderate/groups?api_token=5678");
+            // Switch to acting as coordinator2
+            $this->actingAs($coordinator2);
+            $response = $this->get("/api/v2/moderate/groups?api_token=" . $coordinator2->api_token);
             $response->assertSuccessful();
             $json = json_decode($response->getContent(), true);
             self::assertEquals(1, count($json));
@@ -343,9 +340,7 @@ class APIv2GroupTest extends TestCase
     }
 
     public function testLocales(): void {
-        $user = User::factory()->administrator()->create([
-            'api_token' => '1234',
-        ]);
+        $user = $this->createUserWithToken(Role::ADMINISTRATOR);
         $this->actingAs($user);
 
         $idgroups = $this->createGroup(
@@ -374,9 +369,7 @@ class APIv2GroupTest extends TestCase
     }
 
     public function testEmptyNetworkData(): void {
-        $user = User::factory()->administrator()->create([
-            'api_token' => '1234',
-        ]);
+        $user = $this->createUserWithToken(Role::ADMINISTRATOR);
         $this->actingAs($user);
 
         $idgroups = null;
@@ -409,9 +402,7 @@ class APIv2GroupTest extends TestCase
     }
 
     public function testNetworkDataUpdatedAt(): void {
-        $user = User::factory()->administrator()->create([
-            'api_token' => '1234',
-        ]);
+        $user = $this->createUserWithToken(Role::ADMINISTRATOR);
         $this->actingAs($user);
 
         $this->get('/');
@@ -461,7 +452,7 @@ class APIv2GroupTest extends TestCase
         $network->addCoordinator($user);
         $this->actingAs($user);
 
-        $response = $this->get('/api/groups/network?api_token=1234');
+        $response = $this->get('/api/groups/network?api_token=' . $user->api_token);
         $groups = json_decode($response->getContent(), true);
         $this->assertEquals(1, count($groups));
         $this->assertEquals($idgroups, $groups[0]['id']);
@@ -469,9 +460,7 @@ class APIv2GroupTest extends TestCase
     }
 
     public function testArchived(): void {
-        $user = User::factory()->administrator()->create([
-            'api_token' => '1234',
-        ]);
+        $user = $this->createUserWithToken(Role::ADMINISTRATOR);
         $this->actingAs($user);
 
         $this->get('/');
