@@ -15,13 +15,33 @@ use Illuminate\Validation\ValidationException;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Tests\TestCase;
 use Illuminate\Support\Facades\Notification;
+use Illuminate\Support\Facades\DB;
 
 class GroupCreateTest extends TestCase
 {
+
+    protected function setUp(): void
+    {
+        parent::setUp();
+
+        DB::statement('SET FOREIGN_KEY_CHECKS=0');
+        
+        // Clean up any existing data
+        Party::query()->delete();
+        \App\Models\UserGroups::query()->delete();
+        Group::query()->delete();
+        
+        // Re-enable foreign key checks
+        DB::statement('SET FOREIGN_KEY_CHECKS=1');
+    }
+    
     public function testCreate(): void
     {
+        // Use a unique API token to avoid conflicts
+        $uniqueToken = 'token_' . uniqid();
+        
         $user = User::factory()->administrator()->create([
-                                                                      'api_token' => '1234',
+                                                                      'api_token' => $uniqueToken,
                                                                   ]);
         $this->actingAs($user);
 
@@ -32,7 +52,7 @@ class GroupCreateTest extends TestCase
         $this->assertNotNull($idgroups);
         $group = Group::find($idgroups);
 
-        $response = $this->get('/api/groups?api_token=1234');
+        $response = $this->get('/api/groups?api_token=' . $uniqueToken);
         $response->assertSuccessful();
         $ret = json_decode($response->getContent(), TRUE);
         self::assertEquals(1, count($ret));
