@@ -604,43 +604,43 @@ class Group extends Model implements Auditable
 
     // TODO We've started to refactor into scopes, but this isn't complete yet.
     #[Scope]
-    protected function members() {
+    public function members($query) {
         return User::join('users_groups', 'users_groups.user', '=', 'users.id')
             ->where('users_groups.group', $this->idgroups)
             ->select('users.*');
     }
 
     #[Scope]
-    protected function membersUndeleted($query) {
+    public function membersUndeleted($query) {
         $query = $query->members();
         return $query->whereNull('users_groups.deleted_at');
     }
 
     #[Scope]
-    protected function membersJoined($query) {
+    public function membersJoined($query) {
         $query = $query->membersUndeleted();
         return $query->where('users_groups.status', 'like', 1);
     }
 
     #[Scope]
-    protected function membersRestarters($query) {
+    public function membersRestarters($query) {
         $query = $query->membersJoined();
         return $query->where('users_groups.role', Role::RESTARTER);
     }
 
     #[Scope]
-    protected function membersHosts($query) {
+    public function membersHosts($query) {
         $query = $query->membersJoined();
         return $query->where('users_groups.role', Role::HOST);
     }
 
     #[Scope]
-    protected function unapproved($query) {
+    public function unapproved($query) {
         return $query->where('approved', false);
     }
 
     #[Scope]
-    protected function unapprovedVisibleTo($query, $user_id) {
+    public function unapprovedVisibleTo($query, $user_id) {
         $u = User::findOrFail($user_id);
         $unetworks = $u->networks;
         $ret = [];

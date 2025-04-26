@@ -647,7 +647,22 @@ class GroupController extends Controller
      */
     public function moderateGroupsv2(Request $request): JsonResponse {
         $user = $this->getUser();
-        $ret = \App\Http\Resources\GroupCollection::make(Group::unapprovedVisibleTo($user->id));
+        $unapprovedGroups = Group::where(function($query) use ($user) {
+            if ($user->hasRole('Administrator')) {
+                $query->where('approved', false);
+            } else if ($user->hasRole('NetworkCoordinator')) {
+                // Get all networks this user coordinates
+                $userNetworks = $user->networks->pluck('id');
+                
+                // Get groups that belong to these networks and are unapproved
+                $query->where('approved', false)
+                      ->whereHas('networks', function($q) use ($userNetworks) {
+                          $q->whereIn('network_id', $userNetworks);
+                      });
+            }
+        })->get();
+        
+        $ret = \App\Http\Resources\GroupCollection::make($unapprovedGroups);
         return response()->json($ret);
     }
 
