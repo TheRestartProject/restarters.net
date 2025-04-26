@@ -75,6 +75,12 @@ abstract class TestCase extends BaseTestCase
 
         // We manipulate some globals for image upload testing.
         \FixometerFile::$uploadTesting = FALSE;
+        
+        // Create the uploads directory if it doesn't exist
+        $uploadsDir = public_path('uploads');
+        if (!is_dir($uploadsDir)) {
+            mkdir($uploadsDir, 0777, true);
+        }
 
         if (isset($_FILES)) {
             unset($_FILES);

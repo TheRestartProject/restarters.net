@@ -22,6 +22,13 @@ use function PHPUnit\Framework\assertEquals;
 
 class APIv2GroupTest extends TestCase
 {
+    protected function setUp(): void
+    {
+        parent::setUp();
+        // Set document root for tests to point to public path
+        $_SERVER['DOCUMENT_ROOT'] = public_path();
+    }
+
     /**
      *
      * @param $approve
@@ -137,16 +144,19 @@ class APIv2GroupTest extends TestCase
 
         \Storage::fake('avatars');
 
-        $_SERVER['DOCUMENT_ROOT'] = getcwd();
         \FixometerFile::$uploadTesting = TRUE;
-        file_put_contents('/tmp/UT.jpg', file_get_contents(public_path() .'/images/community.jpg'));
+        
+        // Create test image in public/uploads
+        $testImage = public_path('/images/community.jpg');
+        $tempImage = public_path('/uploads/UT.jpg');
+        copy($testImage, $tempImage);
 
         $_FILES = [
             'image' => [
                 'error'    => "0",
                 'name'     => 'UT.jpg',
                 'size'     => 123,
-                'tmp_name' => [ '/tmp/UT.jpg' ],
+                'tmp_name' => $tempImage,
                 'type'     => 'image/jpg'
             ]
         ];

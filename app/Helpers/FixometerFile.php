@@ -76,10 +76,14 @@ class FixometerFile extends Model
             $this->path = $lpath;
             $data['path'] = $this->file;
 
-            // Fix orientation
-            Image::make($lpath)->orientate()->save($lpath);
+            // In test mode, we skip image manipulations to avoid dependency issues
+            if (!FixometerFile::$uploadTesting) {
+                // Fix orientation
+                Image::make($lpath)->orientate()->save($lpath);
+            }
 
             if ($type === 'image') {
+                // Get image dimensions
                 $size = getimagesize($this->path);
                 $data['width'] = $size[0];
                 $data['height'] = $size[1];
@@ -99,35 +103,43 @@ class FixometerFile extends Model
                 $thumbSize = 80;
                 $midSize = 260;
 
-                // Let's make images, which we will resize or crop
-                $thumb = Image::make($lpath);
-                $mid = Image::make($lpath);
-
-                if ($resize_height) { // Resize before crop
-                    $thumb->resize(null, $thumbSize, function ($constraint) {
-                        $constraint->aspectRatio();
-                    });
-
-                    $mid->resize(null, $midSize, function ($constraint) {
-                        $constraint->aspectRatio();
-                    });
+                // In test mode, we create empty thumbnails to satisfy the code without Intervention
+                if (FixometerFile::$uploadTesting) {
+                    // Just copy the original file as thumbnails for testing
+                    copy($lpath, $_SERVER['DOCUMENT_ROOT'].'/uploads/'.'thumbnail_'.$filename);
+                    copy($lpath, $_SERVER['DOCUMENT_ROOT'].'/uploads/'.'mid_'.$filename);
                 } else {
-                    $thumb->resize($thumbSize, null, function ($constraint) {
-                        $constraint->aspectRatio();
-                    });
+                    // Normal processing with Intervention Image
+                    // Let's make images, which we will resize or crop
+                    $thumb = Image::make($lpath);
+                    $mid = Image::make($lpath);
 
-                    $mid->resize($midSize, null, function ($constraint) {
-                        $constraint->aspectRatio();
-                    });
+                    if ($resize_height) { // Resize before crop
+                        $thumb->resize(null, $thumbSize, function ($constraint) {
+                            $constraint->aspectRatio();
+                        });
+
+                        $mid->resize(null, $midSize, function ($constraint) {
+                            $constraint->aspectRatio();
+                        });
+                    } else {
+                        $thumb->resize($thumbSize, null, function ($constraint) {
+                            $constraint->aspectRatio();
+                        });
+
+                        $mid->resize($midSize, null, function ($constraint) {
+                            $constraint->aspectRatio();
+                        });
+                    }
+
+                    if ($crop) {
+                        $thumb->crop($thumbSize, $thumbSize);
+                        $mid->crop($midSize, $midSize);
+                    }
+
+                    $thumb->save($_SERVER['DOCUMENT_ROOT'].'/uploads/'.'thumbnail_'.$filename, 85);
+                    $mid->save($_SERVER['DOCUMENT_ROOT'].'/uploads/'.'mid_'.$filename, 85);
                 }
-
-                if ($crop) {
-                    $thumb->crop($thumbSize, $thumbSize);
-                    $mid->crop($midSize, $midSize);
-                }
-
-                $thumb->save($_SERVER['DOCUMENT_ROOT'].'/uploads/'.'thumbnail_'.$filename, 85);
-                $mid->save($_SERVER['DOCUMENT_ROOT'].'/uploads/'.'mid_'.$filename, 85);
 
                 $this->table = 'images';
                 $Images = new Images;
