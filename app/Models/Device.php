@@ -98,15 +98,18 @@ class Device extends Model implements Auditable
     public function ofThisEvent($event)
     {
         //Tested
+        $tblImages = env('TBL_IMAGES');
+        $tblDevices = env('TBL_DEVICES');
+        
         return DB::select("SELECT * FROM `{$this->table}` AS `d`
                 INNER JOIN `categories` AS `c` ON `c`.`idcategories` = `d`.`category`
                 LEFT JOIN (
                   SELECT * FROM xref
                     INNER JOIN images ON images.idimages = xref.object
-                    WHERE object_type = '.env('TBL_IMAGES').' AND reference_type = '.env('TBL_DEVICES').'
+                    WHERE object_type = :tblImages AND reference_type = :tblDevices
                   ) AS i ON i.reference = d.iddevices
 
-                WHERE `event` = :event", ['event' => $event]);
+                WHERE `event` = :event", ['event' => $event, 'tblImages' => $tblImages, 'tblDevices' => $tblDevices]);
     }
 
     public function ofThisGroup($group)
