@@ -99,7 +99,6 @@ class EditTest extends TestCase
         ]);
 
         // We don't upload files in a standard Laravel way, so testing upload is a bit of a hack.
-        $_SERVER['DOCUMENT_ROOT'] = getcwd();
         \FixometerFile::$uploadTesting = TRUE;
         file_put_contents('/tmp/UT.jpg', file_get_contents(public_path() . '/images/community.jpg'));
 
@@ -155,7 +154,6 @@ class EditTest extends TestCase
         $iddevices = -1;
 
         // We don't upload files in a standard Laravel way, so testing upload is a bit of a hack.
-        $_SERVER['DOCUMENT_ROOT'] = getcwd();
         \FixometerFile::$uploadTesting = TRUE;
         file_put_contents('/tmp/UT.jpg', file_get_contents(public_path() . '/images/community.jpg'));
 

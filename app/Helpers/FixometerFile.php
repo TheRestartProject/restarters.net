@@ -68,7 +68,9 @@ class FixometerFile extends Model
         if ($error == UPLOAD_ERR_OK) {
             $filename = $this->filename($tmp_name);
             $this->file = $filename;
-            $lpath = $_SERVER['DOCUMENT_ROOT'].'/uploads/'.$filename;
+            
+            $uploadsPath = public_path('uploads');
+            $lpath = $uploadsPath . '/' . $filename;
             if (!$this->move($tmp_name, $lpath)) {
                 return false;
             }
@@ -106,8 +108,8 @@ class FixometerFile extends Model
                 // In test mode, we create empty thumbnails to satisfy the code without Intervention
                 if (FixometerFile::$uploadTesting) {
                     // Just copy the original file as thumbnails for testing
-                    copy($lpath, $_SERVER['DOCUMENT_ROOT'].'/uploads/'.'thumbnail_'.$filename);
-                    copy($lpath, $_SERVER['DOCUMENT_ROOT'].'/uploads/'.'mid_'.$filename);
+                    copy($lpath, $uploadsPath . '/thumbnail_' . $filename);
+                    copy($lpath, $uploadsPath . '/mid_' . $filename);
                 } else {
                     // Normal processing with Intervention Image
                     // Let's make images, which we will resize or crop
@@ -137,8 +139,8 @@ class FixometerFile extends Model
                         $mid->crop($midSize, $midSize);
                     }
 
-                    $thumb->save($_SERVER['DOCUMENT_ROOT'].'/uploads/'.'thumbnail_'.$filename, 85);
-                    $mid->save($_SERVER['DOCUMENT_ROOT'].'/uploads/'.'mid_'.$filename, 85);
+                    $thumb->save($uploadsPath . '/thumbnail_' . $filename, 85);
+                    $mid->save($uploadsPath . '/mid_' . $filename, 85);
                 }
 
                 $this->table = 'images';

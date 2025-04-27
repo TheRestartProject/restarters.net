@@ -25,8 +25,6 @@ class APIv2GroupTest extends TestCase
     protected function setUp(): void
     {
         parent::setUp();
-        // Set document root for tests to point to public path
-        $_SERVER['DOCUMENT_ROOT'] = public_path();
     }
 
     /**

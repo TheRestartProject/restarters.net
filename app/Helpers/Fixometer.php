@@ -440,7 +440,7 @@ class Fixometer
             DB::delete($sql, ['image' => $image->idimages]);
 
             /** delete image from disk **/
-            unlink($_SERVER['DOCUMENT_ROOT'].'/uploads/'.$image->path);
+            unlink(public_path().'/uploads/'.$image->path);
         }
     }
 
