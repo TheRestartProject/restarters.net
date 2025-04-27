@@ -138,7 +138,7 @@ class GroupEditTest extends TestCase
 
     #[Test]
     public function can_edit_timezone(): void {
-        // Get list of timezones.
+        // Get list of timezones without authentication - this should work now that we've made the endpoint public
         $response = $this->get('/api/timezones');
         $response->assertSuccessful();
         $timezones = json_decode($response->getContent(), TRUE);
