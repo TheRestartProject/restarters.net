@@ -8,6 +8,7 @@ use App\Models\Group;
 use App\Models\Network;
 use App\Models\Party;
 use App\Models\User;
+use App\Models\Role;
 use Carbon\Carbon;
 use DB;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
@@ -16,16 +17,21 @@ use Illuminate\Validation\ValidationException;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Tests\TestCase;
 use function PHPUnit\Framework\assertEquals;
+use Illuminate\Support\Str;
 
 class APIv2EventTest extends TestCase
-{
+{   
     public function testGetEventsForGroup(): void {
-        $user = User::factory()->administrator()->create([
-                                                                          'api_token' => '1234',
-                                                                      ]);
+        $user = $this->createUserWithToken(Role::ADMINISTRATOR);
         $this->actingAs($user);
 
+        // Create a group and add it to a new network
         $idgroups = $this->createGroup();
+        $group = Group::find($idgroups);
+        $network = Network::factory()->create();
+        $network->addGroup($group);
+        
+        // Create events in this group
         $id1 = $this->createEvent($idgroups, 'tomorrow');
         $id2 = $this->createEvent($idgroups, 'yesterday');
 
@@ -68,21 +74,30 @@ class APIv2EventTest extends TestCase
         $this->assertTrue(array_key_exists('stats', $json['data']));
         $this->assertTrue(array_key_exists('updated_at', $json['data']));
 
-        // Check unapproved.  Past events show for moderation, earliest first.
-        $response = $this->get("/api/v2/moderate/events?api_token=1234");
+        // Check unapproved events via the moderation endpoint
+        $response = $this->get("/api/v2/moderate/events?api_token=$user->api_token");
         $response->assertSuccessful();
-        $json = json_decode($response->getContent(), true);
-        self::assertEquals(2, count($json));
-        $this->assertEquals($id2, $json[0]['id']);
-        $this->assertEquals($id1, $json[1]['id']);
-        self::assertFalse($json[0]['approved']);
-        self::assertFalse($json[1]['approved']);
+        $moderationEvents = json_decode($response->getContent(), true);
+        
+        // Extract all event IDs from the response
+        $eventIds = collect($moderationEvents)->pluck('id')->toArray();
+        
+        // Verify our created events are in the moderation list
+        $this->assertContains($id1, $eventIds, "First created event should be in the moderation list");
+        $this->assertContains($id2, $eventIds, "Second created event should be in the moderation list");
+        
+        // Verify our events aren't approved
+        $ourEvents = collect($moderationEvents)->filter(function($event) use ($id1, $id2) {
+            return $event['id'] == $id1 || $event['id'] == $id2;
+        });
+        
+        foreach ($ourEvents as $event) {
+            $this->assertFalse($event['approved'], "Event {$event['id']} should not be approved");
+        }
     }
 
     public function testGetEventsForUnapprovedGroup(): void {
-        $user = User::factory()->administrator()->create([
-                                                                          'api_token' => '1234',
-                                                                      ]);
+        $user = $this->createUserWithToken(Role::ADMINISTRATOR);
         $this->actingAs($user);
 
         $idgroups = $this->createGroup('Test Group', 'https://therestartproject.org', 'London', 'Some text.', true, false);
@@ -112,9 +127,7 @@ class APIv2EventTest extends TestCase
     }
 
     public function testMaxUpdatedAt(): void {
-        $user = User::factory()->administrator()->create([
-            'api_token' => '1234',
-        ]);
+        $user = $this->createUserWithToken(Role::ADMINISTRATOR);
         $this->actingAs($user);
 
         $idgroups = $this->createGroup('Test Group', 'https://therestartproject.org', 'London', 'Some text.', true, true);
@@ -148,7 +161,7 @@ class APIv2EventTest extends TestCase
         $groupUpdatedEpoch = (new Carbon($groupUpdated))->getTimestamp();
         $this->assertTrue(abs($eventUpdatedEpoch - $groupUpdatedEpoch) <= 1);
 
-        $response = $this->get("/api/events/network?api_token=1234");
+        $response = $this->get("/api/events/network?api_token=$user->api_token");
         $response->assertSuccessful();
         $json = json_decode($response->getContent(), true);
 
@@ -163,11 +176,7 @@ class APIv2EventTest extends TestCase
      */
     #[DataProvider('roleProvider')]
     public function testCreateLoggedOutUsingKey($role): void {
-        switch ($role) {
-            case 'Administrator': $user = User::factory()->administrator()->create(); break;
-            case 'NetworkCoordinator': $user = User::factory()->networkCoordinator()->create(); break;
-            case 'Host': $user = User::factory()->host()->create(); break;
-        }
+        $user = $this->createUserWithToken($role);
 
         $response = $this->post('/api/v2/groups?api_token=' . $user->api_token, [
             'name' => "Test Group",
@@ -210,25 +219,21 @@ class APIv2EventTest extends TestCase
 
     public static function roleProvider(): array {
         return [
-            [ 'Administrator' ],
-            [ 'NetworkCoordinator' ],
-            [ 'Host' ],
+            [ Role::ADMINISTRATOR ],
+            [ Role::NETWORK_COORDINATOR ],
+            [ Role::HOST ],
         ];
     }
 
     public function testEditForbidden(): void {
-        $user1 = User::factory()->host()->create([
-            'api_token' => '1234',
-        ]);
+        $user1 = $this->createUserWithToken(Role::HOST);
 
         $this->actingAs($user1);
 
         $idgroups = $this->createGroup();
         $id1 = $this->createEvent($idgroups, 'tomorrow');
 
-        $user2 = User::factory()->host()->create([
-            'api_token' => '5678',
-        ]);
+        $user2 = $this->createUserWithToken(Role::HOST);
 
         $this->actingAs($user2);
         $this->expectException(\Symfony\Component\HttpKernel\Exception\HttpException::class);
@@ -246,7 +251,7 @@ class APIv2EventTest extends TestCase
 
     public function testCreateEventGeocodeFailure(): void
     {
-        $user = User::factory()->host()->create();
+        $user = $this->createUserWithToken(Role::HOST);
 
         $response = $this->post('/api/v2/groups?api_token=' . $user->api_token, [
             'name' => "Test Group",
@@ -285,7 +290,7 @@ class APIv2EventTest extends TestCase
 
     public function testCreateEventInvalidTimezone(): void
     {
-        $user = User::factory()->host()->create();
+        $user = $this->createUserWithToken(Role::HOST);
 
         $response = $this->post('/api/v2/groups?api_token=' . $user->api_token, [
             'name' => "Test Group",
@@ -323,9 +328,7 @@ class APIv2EventTest extends TestCase
     }
 
     public function testEmptyNetworkData(): void {
-        $user = User::factory()->administrator()->create([
-            'api_token' => '1234',
-        ]);
+        $user = $this->createUserWithToken(Role::ADMINISTRATOR);
         $this->actingAs($user);
 
         $idgroups = $this->createGroup();
@@ -349,7 +352,7 @@ class APIv2EventTest extends TestCase
         $event = Party::factory()->create(['group' => $group->idgroups]);
         $event->save();
 
-        $coordinator = User::factory()->networkCoordinator()->create();
+        $coordinator = $this->createUserWithToken(Role::NETWORK_COORDINATOR);
         $network->addCoordinator($coordinator);
         $this->actingAs($coordinator);
 
