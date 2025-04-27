@@ -623,8 +623,18 @@ class Group extends Model implements Auditable
     }
 
     #[Scope]
-    public function membersRestarters($query) {
-        $query = $query->membersJoined();
+    public function membersRestarters($query = null) {
+        // If no query is provided, create a new query starting with members
+        if (is_null($query)) {
+            $query = User::query();
+            $query = $query->join('users_groups', 'users_groups.user', '=', 'users.id')
+                ->where('users_groups.group', $this->idgroups)
+                ->whereNull('users_groups.deleted_at')
+                ->where('users_groups.status', 'like', 1);
+        } else {
+            $query = $query->membersJoined();
+        }
+        
         return $query->where('users_groups.role', Role::RESTARTER);
     }
 
