@@ -206,7 +206,7 @@ abstract class TestCase extends BaseTestCase
         $user = Auth::user();
 
         $this->lastResponse = $this->post('/api/v2/groups?api_token=' . $user->api_token, [
-             'name' => $name.$this->groupCount++,
+             'name' => $name . uniqid(),
              'website' => $website,
              'location' => $location,
              'description' => $text,

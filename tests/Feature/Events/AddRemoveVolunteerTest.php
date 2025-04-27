@@ -216,19 +216,17 @@ class AddRemoveVolunteerTest extends TestCase
     public function testAdminRemoveReaddHost(): void {
         $this->withoutExceptionHandling();
 
-        $host = User::factory()->administrator()->create([
-          'api_token' => '1234',
-        ]);
-
+        $host = $this->createUserWithToken(Role::HOST);
         $this->actingAs($host);
 
         // Create group.
         $idgroups = $this->createGroup();
+        $group = \App\Models\Group::find($idgroups);
 
         // Host remove themselves.
         $this->followingRedirects();
         $response = $this->post('/api/usersgroups/' . $idgroups, [
-            'api_token' => '1234',
+            'api_token' => $host->api_token,
             '_method' => 'delete',
         ]);
 
@@ -236,7 +234,7 @@ class AddRemoveVolunteerTest extends TestCase
         $this->assertTrue($ret['success']);
 
         // Admin re-add from user account page.
-        $admin = User::factory()->administrator()->create();
+        $admin = $this->createUserWithToken(Role::ADMINISTRATOR);
         $this->actingAs($admin);
 
         $response = $this->get('/user/edit/' . $host->id);
@@ -267,6 +265,8 @@ class AddRemoveVolunteerTest extends TestCase
         // Should now see the group.
         $response = $this->get('/user/edit/' . $host->id);
         $response->assertStatus(200);
-        $response->assertSee('<option value="' . $idgroups . '" selected>Test Group0</option>', false);
+        
+        // Use the actual group name in the assertion
+        $response->assertSee('<option value="' . $idgroups . '" selected>' . $group->name . '</option>', false);
     }
 }
