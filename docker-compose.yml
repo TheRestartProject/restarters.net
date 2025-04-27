@@ -132,10 +132,10 @@ services:
     networks:
       - app-network
       
-  mailhog:
+  mailpit:
     profiles: ["debug"]
-    image: mailhog/mailhog
-    container_name: restarters_mailhog
+    image: axllent/mailpit
+    container_name: restarters_mailpit
     logging:
       driver: 'none'  # disable saving logs
     ports:
