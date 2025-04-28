@@ -26,6 +26,7 @@ class GroupTest extends TestCase
         GrouptagsGroups::truncate();
         Network::truncate();
         UserGroups::truncate();
+        DB::table('group_network')->truncate();
         DB::statement('SET foreign_key_checks=1');
     }
 
