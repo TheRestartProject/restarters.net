@@ -6,18 +6,16 @@ use App\Models\Group;
 use PHPUnit\Framework\Attributes\DataProvider;
 use App\Models\Network;
 use App\Models\Party;
+use App\Models\Role;
 use App\Models\User;
 use Carbon\Carbon;
 use DB;
-use http\Client\Request;
 use Tests\TestCase;
 
 class APIv2NetworkTest extends TestCase
 {
     public function testList(): void {
-        $user = User::factory()->administrator()->create([
-                                                                          'api_token' => '1234',
-                                                                      ]);
+        $user = $this->createUserWithToken(Role::ADMINISTRATOR);
         $this->actingAs($user);
 
         // List networks.
@@ -46,6 +44,10 @@ class APIv2NetworkTest extends TestCase
     }
 
     public function testGet(): void {
+        // Create a test user with admin privileges and authenticate
+        $user = $this->createUserWithToken(Role::ADMINISTRATOR);
+        $this->actingAs($user);
+        
         $network = Network::first();
         self::assertNotNull($network);
 
@@ -81,6 +83,10 @@ class APIv2NetworkTest extends TestCase
      */
     #[DataProvider('providerGroupsParameters')]
     public function testListGroups($getNextEvent, $getDetails): void {
+        // Create a test user with admin privileges and authenticate
+        $user = $this->createUserWithToken(Role::ADMINISTRATOR);
+        $this->actingAs($user);
+        
         $network = Network::factory()->create([
                                                        'name' => 'Restart',
                                                        'events_push_to_wordpress' => true,
@@ -161,6 +167,10 @@ class APIv2NetworkTest extends TestCase
      */
     #[DataProvider('providerEventsParameters')]
     public function testListEvents($getDetails): void {
+        // Create a test user with admin privileges and authenticate
+        $user = $this->createUserWithToken(Role::ADMINISTRATOR);
+        $this->actingAs($user);
+        
         $network = Network::factory()->create([
                                                        'name' => 'Restart',
                                                        'events_push_to_wordpress' => true,
