@@ -450,19 +450,23 @@ class Party extends Model implements Auditable
     }
 
     /**
-     * [isStartingSoon description]
-     * If the event is not of today = false
-     * If the event is in progress = false
-     * If the event has finished = false
-     * If the event is of today, is not in progress and has not finished = true.
-     * @author Christopher Kelker
-     * @date   2019-06-13T15:48:05+010
+     * Is this event starting soon?
+     * 
+     * @return bool True if the event is starting soon (within the next 3 hours), but has not yet started
      */
     public function isStartingSoon(): bool
     {
         $start = Carbon::parse($this->event_start_utc);
+        $now = Carbon::now();
 
-        if (!$this->isInProgress() && !$this->hasFinished() && $start->isCurrentDay()) {
+        // An event is starting soon if:
+        // 1. It has not started yet (not in progress and not finished)
+        // 2. It will start in the future (after now)
+        // 3. It will start within the next 3 hours (not far in the future)
+        if (!$this->isInProgress() && 
+            !$this->hasFinished() && 
+            $start->gt($now) && 
+            $now->diffInHours($start) <= 3) {
             return true;
         }
 
