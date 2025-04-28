@@ -27,6 +27,11 @@ class WordpressEventPushTest extends TestCase
     {
         parent::setUp();
 
+        // Skip all tests if WordPress integration is disabled
+        if (config('restarters.features.wordpress_integration') === false) {
+            $this->markTestSkipped('WordPress integration is disabled.');
+        }
+
         // These tests are hard to get working with genuinely queued events, so use the sync queue.
         $queueManager = $this->app['queue'];
         $queueManager->setDefaultDriver('sync');

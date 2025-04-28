@@ -4,6 +4,7 @@ return [
 
     'features' => [
         'discourse_integration' => env('FEATURE__DISCOURSE_INTEGRATION', true),
+        'wordpress_integration' => env('FEATURE__WORDPRESS_INTEGRATION', true),
     ],
 
     'wiki' => [
