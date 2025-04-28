@@ -21,6 +21,8 @@ class InviteGroupTest extends TestCase
 {
     public function testInvite(): void
     {
+        $this->fastLoginAsTestUser(Role::ADMINISTRATOR);
+
         Notification::fake();
         $this->withoutExceptionHandling();
 
@@ -143,7 +145,6 @@ class InviteGroupTest extends TestCase
         $host = User::factory()->host()->create();
         $this->actingAs($host);
 
-        $this->actingAs($host);
         $response = $this->get('/group/view/'.$group->idgroups);
 
         // Should see shareable code in there.
@@ -161,7 +162,7 @@ class InviteGroupTest extends TestCase
     #[DataProvider('invalidEmailProvider')]
     public function testInviteInvalidEmail($email, $valid): void
     {
-        $this->loginAsTestUser(Role::ADMINISTRATOR);
+        $this->fastLoginAsTestUser(Role::ADMINISTRATOR);
 
         $idgroups = $this->createGroup();
         $group = Group::findOrFail($idgroups);
@@ -189,7 +190,7 @@ class InviteGroupTest extends TestCase
     }
 
     public function testInviteNearby(): void {
-        $this->loginAsTestUser(Role::ADMINISTRATOR);
+        $this->fastLoginAsTestUser(Role::ADMINISTRATOR);
 
         $idgroups = $this->createGroup();
         $group = Group::findOrFail($idgroups);
