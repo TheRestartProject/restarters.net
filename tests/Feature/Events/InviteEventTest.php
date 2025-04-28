@@ -293,9 +293,7 @@ class InviteEventTest extends TestCase
         Notification::fake();
         $this->withoutExceptionHandling();
 
-        $user = User::factory()->administrator()->create([
-            'api_token' => '1234',
-        ]);
+        $user = $this->createUserWithToken(Role::ADMINISTRATOR);
         $this->actingAs($user);
 
         $idgroups = $this->createGroup('Test Group', 'https://therestartproject.org', 'London', 'Some text.', true, true);
@@ -402,10 +400,8 @@ class InviteEventTest extends TestCase
     }
 
     public function testInviteViaLink(): void {
-        $this->loginAsTestUser(Role::ADMINISTRATOR);
-        $user = User::factory()->restarter()->create([
-                                                                          'api_token' => '1234',
-                                                                      ]);
+        $this->fastLoginAsTestUser(Role::ADMINISTRATOR);
+        $user = $this->createUserWithToken(Role::ADMINISTRATOR);
 
         $idgroups = $this->createGroup();
         $group = Group::findOrFail($idgroups);
