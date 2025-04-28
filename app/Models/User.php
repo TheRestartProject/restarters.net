@@ -314,7 +314,7 @@ class User extends Authenticatable implements Auditable, HasLocalePreference
     {
         //Tested!
 
-        $r = DB::select('SELECT COUNT(id AS emails FROM '.$this->table.' WHERE email = :email', ['email' => $email]);
+        $r = DB::select('SELECT COUNT(id) AS emails FROM '.$this->table.' WHERE email = :email', ['email' => $email]);
 
         return ($r[0]->emails > 0) ? false : true;
     }
