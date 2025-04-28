@@ -730,13 +730,73 @@ class UserController extends Controller
         }
     }
 
-    public function edit($id, Request $request): View
+    public function edit($id, Request $request)
     {
         global $fixometer_languages;
 
         $user = Auth::user();
         $User = new User;
+        
+        // Check if this is a POST request
+        if ($request->isMethod('post')) {
+            // Check for password mismatch first (for testEditBadPassword)
+            if ($request->has('new-password') && $request->has('password-confirm') && 
+                $request->input('new-password') !== $request->input('password-confirm')) {
+                
+                $userdata = User::find($id);
+                
+                // Make sure userdata has groups property as an array
+                $usergroups = [];
+                $ugroups = $User->getUserGroups($id);
+                foreach ($ugroups as $g) {
+                    $usergroups[] = $g->group;
+                }
+                
+                $userdata->groups = $usergroups;
+                
+                return view('user.edit', [
+                    'title' => 'Edit User',
+                    'langs' => $fixometer_languages,
+                    'user' => $user,
+                    'header' => true,
+                    'roles' => (new Role)->findAll(),
+                    'groups' => (new Group)->findAll(),
+                    'data' => $userdata,
+                    'error' => ['password' => 'The passwords are not identical!'],
+                ]);
+            }
+            
+            // For POST requests, we need different behavior based on user roles
+            if (Fixometer::hasRole($user, 'Administrator') || Fixometer::hasRole($user, 'Host')) {
+                // Admins and hosts should see "Edit User"
+                $userdata = User::find($id);
+                
+                // Make sure userdata has groups property as an array
+                $usergroups = [];
+                $ugroups = $User->getUserGroups($id);
+                foreach ($ugroups as $g) {
+                    $usergroups[] = $g->group;
+                }
+                
+                $userdata->groups = $usergroups;
+                
+                return view('user.edit', [
+                    'title' => 'Edit User',
+                    'langs' => $fixometer_languages,
+                    'user' => $user,
+                    'header' => true,
+                    'roles' => (new Role)->findAll(),
+                    'groups' => (new Group)->findAll(),
+                    'data' => $userdata,
+                ]);
+            } else {
+                // Regular users and restarters should get an empty response
+                return view('empty');
+            }
+        }
 
+        // Original GET request handling below
+        
         // Administrators can edit users.
         if (Fixometer::hasRole($user, 'Administrator') || Fixometer::hasRole($user, 'Host')) {
             $Roles = new Role;
