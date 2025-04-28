@@ -233,9 +233,15 @@ class UserController extends Controller
         $id = $request->input('id');
         $role = intval($request->input('role'));
         $user = User::find($id);
-
-        // Check that we are allowed to change the role, based on our own role.
-        Gate::authorize('changeRepairDirRole', [Auth::user(), $user, $role]);
+        
+        // The policy expects the authenticated user as the first implicit parameter
+        // and then additional parameters in the order defined in the policy method
+        // changeRepairDirRole(User $perpetrator, User $victim, int $role)
+        // 
+        // When using Gate::authorize, Laravel automatically passes the authenticated user
+        // as the first parameter to the policy method, so we only need to pass the
+        // additional parameters in the exact order they're defined in the policy.
+        Gate::authorize('changeRepairDirRole', [$user, $role]);
 
         $user->update([
             'repairdir_role' => $role,
