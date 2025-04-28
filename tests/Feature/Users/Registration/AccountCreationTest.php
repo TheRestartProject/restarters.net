@@ -146,7 +146,8 @@ class AccountCreationTest extends TestCase
             'email' => 'test@invalid.com',
         ]);
 
-        $this->assertNull(json_decode($response->getContent(), true));
+        // Assert empty response.
+        $this->assertEquals([], json_decode($response->getContent(), true));
     }
 
     public function testAdminCreate(): void

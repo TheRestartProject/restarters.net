@@ -1046,6 +1046,8 @@ class UserController extends Controller
         if (User::where('email', '=', $request->get('email'))->exists()) {
             return response()->json(['message' =>  __('auth.email_address_validation')]);
         }
+
+        return response()->json(null);
     }
 
     public static function getThumbnail(Request $request): JsonResponse
