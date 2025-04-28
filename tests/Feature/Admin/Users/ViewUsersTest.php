@@ -69,6 +69,7 @@ class ViewUsersTest extends TestCase
     {
         // Given we have a user who has just logged in
         $lastLogin = new \Carbon\Carbon();
+        $diff = $lastLogin->diffForHumans(null, true);
         $user = User::factory()->create([
             'updated_at' => $lastLogin,
         ]);
@@ -77,7 +78,7 @@ class ViewUsersTest extends TestCase
         $response = $this->get('/user/all/search?name='.$user->name);
 
         // Then we should see the last login date for that user
-        $response->assertSeeText($lastLogin->diffForHumans(null, true));
+        $response->assertSeeText($diff);
     }
 
     /** @test */
