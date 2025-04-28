@@ -15,7 +15,7 @@ class GroupViewTest extends TestCase
     public function testBasic(): void
     {
         // Check we can create a group and view it.
-        $this->loginAsTestUser(Role::ADMINISTRATOR);
+        $this->fastLoginAsTestUser(Role::ADMINISTRATOR);
         $id = $this->createGroup();
         $this->assertNotNull($id);
 
@@ -55,21 +55,22 @@ class GroupViewTest extends TestCase
 
     public function testInvalidGroup(): void
     {
-        $this->loginAsTestUser(Role::RESTARTER);
+        $this->fastLoginAsTestUser(Role::RESTARTER);
         $this->expectException(NotFoundHttpException::class);
         $this->get('/group/view/undefined');
     }
 
     public function testInvalidGroup2(): void
     {
-        $this->loginAsTestUser(Role::RESTARTER);
+        $this->fastLoginAsTestUser(Role::RESTARTER);
         $this->expectException(NotFoundHttpException::class);
-        $this->get('/group/view/1');
+        // Use a non-existent ID that is higher than any existing records
+        $this->get('/group/view/99999');
     }
 
     public function testCanDelete(): void
     {
-        $this->loginAsTestUser(Role::ADMINISTRATOR);
+        $this->fastLoginAsTestUser(Role::ADMINISTRATOR);
         $id = $this->createGroup();
         $this->assertNotNull($id);
 
@@ -140,7 +141,7 @@ class GroupViewTest extends TestCase
     }
 
     public function testInProgressVisible(): void {
-        $this->loginAsTestUser(Role::ADMINISTRATOR);
+        $this->fastLoginAsTestUser(Role::ADMINISTRATOR);
         $id = $this->createGroup();
         $this->assertNotNull($id);
 
