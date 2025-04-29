@@ -3,6 +3,7 @@
 namespace Tests\Feature;
 
 use App\Models\Device;
+use PHPUnit\Framework\Attributes\DataProvider;
 use App\Models\DeviceBarrier;
 use App\Models\Group;
 use App\Models\GroupTags;
@@ -28,10 +29,10 @@ class APIv2DeviceTest extends TestCase
      * This logic duplicates that in DeviceController, but it's worth testing to make sure that the API is
      * behaving as we'd expect from the DB entries.
      *
-     * @dataProvider providerDevice
      */
+    #[DataProvider('providerDevice')]
     public function testGetDevice($repair_status_str, $parts_provider_str, $next_steps_str, $barrierstr): void {
-        $this->loginAsTestUser(Role::ADMINISTRATOR);
+        $this->fastLoginAsTestUser(Role::ADMINISTRATOR);
         $idGroup = $this->createGroup();
         $this->assertNotNull($idGroup);
 
@@ -148,11 +149,10 @@ class APIv2DeviceTest extends TestCase
 
     /**
      * Create a device over the API and check it retrieves as expected.
-     *
-     * @dataProvider providerDevice
      */
+    #[DataProvider('providerDevice')]
     public function testCreate($repair_status_str, $parts_provider_str, $next_steps_str, $barrierstr): void {
-        $this->loginAsTestUser(Role::ADMINISTRATOR);
+        $this->fastLoginAsTestUser(Role::ADMINISTRATOR);
         $idGroup = $this->createGroup();
         $this->assertNotNull($idGroup);
 
@@ -218,7 +218,7 @@ class APIv2DeviceTest extends TestCase
         }
     }
 
-    public function providerDevice(): array
+    public static function providerDevice(): array
     {
         // Possible combinations of inputs for repair status, spare parts, next steps and barriers to repair fields.
         //

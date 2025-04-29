@@ -14,11 +14,12 @@ class UserPolicy
     /**
      * Determine whether one user can change the Repair Directory role of another to a specific value.
      *
-     * @param  \App\Models\User  $user
-     * @param  \App\Models\User  $user
+     * @param  \App\Models\User  $user  The authenticated user
+     * @param  \App\Models\User  $victim  The user being modified
+     * @param  int  $role  The new role
      * @return mixed
      */
-    public function changeRepairDirRole(User $perpetrator, User $victim, int $role)
+    public function changeRepairDirRole(User $user, User $victim, int $role)
     {
         // We have rules for whether you can change the Repair Directory role.  Code is structured for readability
         // of these rules, rather than a single big if.
@@ -26,12 +27,12 @@ class UserPolicy
         // Default to forbidden.
         $ret = false;
 
-        if ($perpetrator->repairdir_role() === Role::REPAIR_DIRECTORY_SUPERADMIN) {
+        if ($user->repairdir_role() === Role::REPAIR_DIRECTORY_SUPERADMIN) {
             // SuperAdmins can do anything
             $ret = true;
-        } elseif ($perpetrator->repairdir_role() === Role::REPAIR_DIRECTORY_REGIONAL_ADMIN) {
+        } elseif ($user->repairdir_role() === Role::REPAIR_DIRECTORY_REGIONAL_ADMIN) {
             // Regional Admins can do some things.
-            if ($victim->id === $perpetrator->id) {
+            if ($victim->id === $user->id) {
                 // Operating on themselves.
                 if ($role === Role::REPAIR_DIRECTORY_NONE || $role === Role::REPAIR_DIRECTORY_EDITOR) {
                     // Demoting themselves.

@@ -604,43 +604,63 @@ class Group extends Model implements Auditable
 
     // TODO We've started to refactor into scopes, but this isn't complete yet.
     #[Scope]
-    protected function members() {
+    public function members($query) {
         return User::join('users_groups', 'users_groups.user', '=', 'users.id')
             ->where('users_groups.group', $this->idgroups)
             ->select('users.*');
     }
 
     #[Scope]
-    protected function membersUndeleted($query) {
+    public function membersUndeleted($query) {
         $query = $query->members();
         return $query->whereNull('users_groups.deleted_at');
     }
 
     #[Scope]
-    protected function membersJoined($query) {
+    public function membersJoined($query) {
         $query = $query->membersUndeleted();
         return $query->where('users_groups.status', 'like', 1);
     }
 
     #[Scope]
-    protected function membersRestarters($query) {
-        $query = $query->membersJoined();
+    public function membersRestarters($query = null) {
+        // If no query is provided, create a new query starting with members
+        if (is_null($query)) {
+            $query = User::query();
+            $query = $query->join('users_groups', 'users_groups.user', '=', 'users.id')
+                ->where('users_groups.group', $this->idgroups)
+                ->whereNull('users_groups.deleted_at')
+                ->where('users_groups.status', 'like', 1);
+        } else {
+            $query = $query->membersJoined();
+        }
+        
         return $query->where('users_groups.role', Role::RESTARTER);
     }
 
     #[Scope]
-    protected function membersHosts($query) {
-        $query = $query->membersJoined();
+    public function membersHosts($query = null) {
+        // If no query is provided, create a new query starting with members
+        if (is_null($query)) {
+            $query = User::query();
+            $query = $query->join('users_groups', 'users_groups.user', '=', 'users.id')
+                ->where('users_groups.group', $this->idgroups)
+                ->whereNull('users_groups.deleted_at')
+                ->where('users_groups.status', 'like', 1);
+        } else {
+            $query = $query->membersJoined();
+        }
+        
         return $query->where('users_groups.role', Role::HOST);
     }
 
     #[Scope]
-    protected function unapproved($query) {
+    public function unapproved($query) {
         return $query->where('approved', false);
     }
 
     #[Scope]
-    protected function unapprovedVisibleTo($query, $user_id) {
+    public function unapprovedVisibleTo($query, $user_id) {
         $u = User::findOrFail($user_id);
         $unetworks = $u->networks;
         $ret = [];

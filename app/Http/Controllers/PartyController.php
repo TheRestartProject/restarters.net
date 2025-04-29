@@ -512,9 +512,9 @@ class PartyController extends Controller
      *
      * @param int $event_id The event for which to find associated users.
      *
-     * @return Response json formatted array of relevant info on users in the group.
+     * @return \Illuminate\Http\JsonResponse json formatted array of relevant info on users in the group.
      */
-    public function getGroupEmailsWithNames(int $event_id): Response
+    public function getGroupEmailsWithNames(int $event_id): JsonResponse
     {
         $group_user_ids = UserGroups::where('group', Party::find($event_id)->group)
         ->where('user', '!=', Auth::user()->id)

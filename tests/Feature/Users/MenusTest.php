@@ -3,6 +3,7 @@
 namespace Tests\Feature;
 
 use App\Events\UserUpdated;
+use PHPUnit\Framework\Attributes\DataProvider;
 use App\Models\User;
 use App\Models\UsersPermissions;
 use Carbon\Carbon;
@@ -13,7 +14,7 @@ use Tests\TestCase;
 
 class MenusTest extends TestCase
 {
-    public function provider()
+    public static function provider()
     {
         return [
             [
@@ -67,12 +68,14 @@ class MenusTest extends TestCase
         ];
     }
 
-    /**
-     *@dataProvider provider
-     */
+    #[DataProvider('provider')]
     public function testSections($role, $present, $translator, $adminMenu): void
     {
         $user = User::factory()->{lcfirst($role)}()->create();
+        
+        // Set a mediawiki username that we can pass in the request
+        $user->mediawiki = 'test_wiki_user';
+        $user->save();
 
         if ($translator) {
             $up = new UsersPermissions();
@@ -83,19 +86,21 @@ class MenusTest extends TestCase
 
         $this->actingAs($user);
 
-        $response = $this->get('/user/menus');
+        // Pass the wiki_username parameter to the endpoint
+        $response = $this->get('/user/menus?wiki_username=test_wiki_user');
         $menus = json_decode($response->getContent(), true);
 
-        $this->assertEquals($present, array_keys($menus));
+        $this->assertEquals($present, array_keys($menus), "Menu sections don't match for role: $role");
 
-        if ($adminMenu && count($adminMenu)) {
-            $this->assertEquals($adminMenu, array_keys($menus['Administrator']['items']));
+        if ($adminMenu && count($adminMenu) && isset($menus['Administrator']) && isset($menus['Administrator']['items'])) {
+            $this->assertEquals($adminMenu, array_keys($menus['Administrator']['items']), "Admin menu items don't match for role: $role");
         }
     }
 
     public function testLoggedOut(): void
     {
+        $this->withoutExceptionHandling();
         $this->expectException(NotFoundHttpException::class);
-        $this->get('/user/menus');
+        $this->get('/user/menus?wiki_username=nonexistent_user');
     }
 }

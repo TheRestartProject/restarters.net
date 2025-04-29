@@ -3,6 +3,7 @@
 namespace Tests\Feature;
 
 use App\Events\UserLanguageUpdated;
+use PHPUnit\Framework\Attributes\Test;
 use App\Events\UserUpdated;
 use App\Listeners\SyncUserProperties;
 use App\Models\User;
@@ -22,7 +23,7 @@ class EditLanguageSettingsTest extends TestCase
         DB::statement('SET foreign_key_checks=1');
     }
 
-    /** @test */
+    #[Test]
     // The assertion just tells us that the event is dispatched, not much else.
     // In order to actually check it worked, we need to look at Discourse.
     public function user_language_update_triggers_language_sync(): void
@@ -48,7 +49,7 @@ class EditLanguageSettingsTest extends TestCase
         Event::assertDispatched(UserLanguageUpdated::class);
     }
 
-    /** @test */
+    #[Test]
     // Added these to try (and fail) to reproduce a Sentry error.
     public function user_sets_language(): void
     {

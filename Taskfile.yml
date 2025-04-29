@@ -155,7 +155,7 @@ tasks:
       task docker:run:bash -- ls -la
 
     cmds:
-      - docker exec -it restarters bash -c "{{ .CLI_ARGS }}"
+      - docker exec -it restarters bash -c {{ .CLI_ARGS }}
 
   docker:run:artisan:
     desc: Run an artisan command in the core application container.
@@ -165,4 +165,27 @@ tasks:
       task docker:run:artisan -- migrate
 
     cmds:
-      - docker exec -it restarters php artisan "{{ .CLI_ARGS }}"
+      - docker exec -it restarters php artisan {{ .CLI_ARGS }}
+
+  docker:run:tests:
+    desc: Run the tests
+    silent: true
+    cmds:
+      - task docker:run:artisan -- test --env=testing {{.CLI_ARGS}}
+
+  docker:init:test_db:
+    desc: Initialize the test database in Docker environment
+    dotenv:
+      - .env.testing
+    silent: true
+    cmds:
+      - echo "Creating test database $DB_DATABASE..."
+      - docker exec -it $MYSQL_CONTAINER_NAME mysql -u root -p$MYSQL_ROOT_PASSWORD -e "
+          CREATE DATABASE IF NOT EXISTS $DB_DATABASE;
+          GRANT ALL PRIVILEGES ON $DB_DATABASE.* TO '$DB_USERNAME'@'%';
+          FLUSH PRIVILEGES;
+        "
+      - echo "Test database created and permissions granted."
+      - echo "Running migrations for test database $DB_DATABASE..."
+      - task docker:run:artisan -- migrate --env=testing --no-interaction --force {{.CLI_ARGS}}
+      - echo "Test database migrations complete."

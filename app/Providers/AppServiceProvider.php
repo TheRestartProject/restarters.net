@@ -68,6 +68,7 @@ class AppServiceProvider extends ServiceProvider
         });
 
         $this->app->register(\L5Swagger\L5SwaggerServiceProvider::class);
+        $this->app->register(\App\Providers\FormServiceProvider::class);
 
         // Register exception handler (recommended for Laravel 11)
         $this->app->bind(\Illuminate\Contracts\Debug\ExceptionHandler::class, \App\Exceptions\Handler::class);

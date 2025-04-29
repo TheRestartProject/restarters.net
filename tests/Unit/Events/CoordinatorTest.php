@@ -3,6 +3,7 @@
 namespace Tests\Unit;
 
 use App\Models\Group;
+use PHPUnit\Framework\Attributes\Test;
 use App\Helpers\Fixometer;
 use App\Models\Network;
 use App\Models\Party;
@@ -29,7 +30,7 @@ class CoordinatorTest extends TestCase
         DB::statement('SET foreign_key_checks=1');
     }
 
-    /** @test */
+    #[Test]
     public function it_can_find_relevant_coordinators(): void
     {
         // arrange
@@ -48,7 +49,7 @@ class CoordinatorTest extends TestCase
         $this->assertStringContainsString($coordinator->id, $coordinators->pluck('id'));
     }
 
-    /** @test */
+    #[Test]
     public function promote_to_coordinator(): void
     {
         // arrange

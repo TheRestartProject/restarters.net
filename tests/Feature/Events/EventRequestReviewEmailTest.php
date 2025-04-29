@@ -3,6 +3,7 @@
 namespace Tests\Feature;
 
 use App\Models\EventsUsers;
+use PHPUnit\Framework\Attributes\Test;
 use App\Models\Group;
 use App\Notifications\EventRepairs;
 use App\Models\Party;
@@ -39,7 +40,7 @@ class EventRequestReviewEmailTest extends TestCase
         parent::setUp();
     }
 
-    /** @test */
+    #[Test]
     public function a_request_review_email_is_sent_to_volunteer(): void
     {
         Notification::fake();

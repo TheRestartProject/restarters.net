@@ -65,8 +65,9 @@ Route::get('/users/{id}/notifications', [API\UserController::class, 'notificatio
 // Top Talk topics.  Doesn't need authentication either.
 Route::get('/talk/topics/{tag?}', [API\DiscourseController::class, 'discussionTopics']);
 
-// Timezones
-Route::get('/timezones', [App\Http\Controllers\ApiController::class, 'timezones']);
+// Timezones - Publicly accessible endpoint
+Route::get('/timezones', [App\Http\Controllers\ApiController::class, 'timezones'])
+     ->withoutMiddleware(\App\Http\Middleware\CustomApiTokenAuth::class); // Explicitly bypass authentication
 
 // We are working towards a new and more coherent API.
 Route::prefix('v2')->group(function() {

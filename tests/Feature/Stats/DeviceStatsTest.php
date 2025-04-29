@@ -3,6 +3,7 @@
 namespace Tests\Feature\Stats;
 
 use App\Models\Device;
+use PHPUnit\Framework\Attributes\Test;
 use Tests\Feature\Stats\StatsTestCase;
 
 class DeviceStatsTest extends StatsTestCase
@@ -52,7 +53,7 @@ class DeviceStatsTest extends StatsTestCase
 
     /** WASTE TESTS */
 
-    /** @test */
+    #[Test]
     public function an_unpowered_nonmisc_device_has_waste_diverted(): void
     {
         $device = Device::factory()->fixed()->create([
@@ -63,7 +64,7 @@ class DeviceStatsTest extends StatsTestCase
         $this->assertEquals(5, $result);
     }
 
-    /** @test */
+    #[Test]
     public function a_powered_misc_device_without_estimate_has_no_waste_diverted(): void
     {
         $device = Device::factory()->fixed()->create([
@@ -74,7 +75,7 @@ class DeviceStatsTest extends StatsTestCase
         $this->assertEquals(0, $result);
     }
 
-    /** @test */
+    #[Test]
     public function a_powered_misc_device_with_estimate_has_waste_diverted(): void
     {
         $device = Device::factory()->fixed()->create([
@@ -86,7 +87,7 @@ class DeviceStatsTest extends StatsTestCase
         $this->assertEquals(123, $result);
     }
 
-    /** @test */
+    #[Test]
     public function a_powered_non_misc_device_has_waste_diverted(): void
     {
         $device = Device::factory()->fixed()->create([
@@ -97,7 +98,7 @@ class DeviceStatsTest extends StatsTestCase
         $this->assertEquals(4, $result);
     }
 
-    /** @test */
+    #[Test]
     public function a_powered_non_fixed_device_has_no_waste_diverted(): void
     {
         $device = Device::factory()->repairable()->create([
@@ -123,7 +124,7 @@ class DeviceStatsTest extends StatsTestCase
         $this->assertEquals(0, $result);
     }
 
-    /** @test */
+    #[Test]
     public function an_unpowered_misc_device_without_estimate_has_no_waste_diverted(): void
     {
         $device = Device::factory()->fixed()->create([
@@ -134,7 +135,7 @@ class DeviceStatsTest extends StatsTestCase
         $this->assertEquals(0, $result);
     }
 
-    /** @test */
+    #[Test]
     public function an_unpowered_misc_device_with_estimate_has_waste_diverted(): void
     {
         $device = Device::factory()->fixed()->create([
@@ -146,7 +147,7 @@ class DeviceStatsTest extends StatsTestCase
         $this->assertEquals(456, $result);
     }
 
-    /** @test */
+    #[Test]
     public function an_unpowered_non_misc_device_has_waste_diverted(): void
     {
         $device = Device::factory()->fixed()->create([
@@ -159,7 +160,7 @@ class DeviceStatsTest extends StatsTestCase
 
     /** CO2 TESTS */
 
-    /** @test */
+    #[Test]
     public function an_unpowered_non_fixed_device_has_no_waste_diverted(): void
     {
         $device1 = Device::factory()->repairable()->create([
@@ -188,7 +189,7 @@ class DeviceStatsTest extends StatsTestCase
         $this->assertEquals(0, $result);
     }
 
-    /** @test */
+    #[Test]
     public function a_powered_misc_device_with_no_estimate_has_no_c02_diverted(): void
     {
         $device = Device::factory()->fixed()->create([
@@ -200,7 +201,7 @@ class DeviceStatsTest extends StatsTestCase
         $this->assertEquals(0, $result);
     }
 
-    /** @test */
+    #[Test]
     public function a_powered_misc_device_with_estimate_has_c02_diverted(): void
     {
         $device = Device::factory()->fixed()->create([
@@ -214,7 +215,7 @@ class DeviceStatsTest extends StatsTestCase
         $this->assertEquals($expect, $result);
     }
 
-    /** @test */
+    #[Test]
     public function a_powered_non_misc_device_has_c02_diverted(): void
     {
         $device = Device::factory()->fixed()->create([
@@ -227,7 +228,7 @@ class DeviceStatsTest extends StatsTestCase
         $this->assertEquals($expect, $result);
     }
 
-    /** @test */
+    #[Test]
     public function an_unpowered_misc_device_with_no_estimate_has_no_c02_diverted(): void
     {
         $device = Device::factory()->fixed()->create([
@@ -239,7 +240,7 @@ class DeviceStatsTest extends StatsTestCase
         $this->assertEquals(0, $result);
     }
 
-    /** @test */
+    #[Test]
     public function an_unpowered_misc_device_with_estimate_has_c02_diverted(): void
     {
         $device = Device::factory()->fixed()->create([
@@ -253,7 +254,7 @@ class DeviceStatsTest extends StatsTestCase
         $this->assertEquals($expect, $result);
     }
 
-    /** @test */
+    #[Test]
     public function an_unpowered_non_misc_device_has_c02_diverted(): void
     {
         $device = Device::factory()->fixed()->create([

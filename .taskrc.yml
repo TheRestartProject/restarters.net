@@ -1,4 +1,0 @@
-experiments:
-  # This enables the experimental Taskfile feature that allows you to map variables to Taskfile.yml
-  # See https://taskfile.dev/experiments/map-variables/?proposal=2
-  MAP_VARIABLES: 2

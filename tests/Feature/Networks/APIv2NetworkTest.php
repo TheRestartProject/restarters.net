@@ -3,20 +3,19 @@
 namespace Tests\Feature;
 
 use App\Models\Group;
+use PHPUnit\Framework\Attributes\DataProvider;
 use App\Models\Network;
 use App\Models\Party;
+use App\Models\Role;
 use App\Models\User;
 use Carbon\Carbon;
 use DB;
-use http\Client\Request;
 use Tests\TestCase;
 
 class APIv2NetworkTest extends TestCase
 {
     public function testList(): void {
-        $user = User::factory()->administrator()->create([
-                                                                          'api_token' => '1234',
-                                                                      ]);
+        $user = $this->createUserWithToken(Role::ADMINISTRATOR);
         $this->actingAs($user);
 
         // List networks.
@@ -45,6 +44,10 @@ class APIv2NetworkTest extends TestCase
     }
 
     public function testGet(): void {
+        // Create a test user with admin privileges and authenticate
+        $user = $this->createUserWithToken(Role::ADMINISTRATOR);
+        $this->actingAs($user);
+        
         $network = Network::first();
         self::assertNotNull($network);
 
@@ -76,10 +79,14 @@ class APIv2NetworkTest extends TestCase
     }
 
     /**
-     * @dataProvider providerGroupsParameters
      * @param $value
      */
+    #[DataProvider('providerGroupsParameters')]
     public function testListGroups($getNextEvent, $getDetails): void {
+        // Create a test user with admin privileges and authenticate
+        $user = $this->createUserWithToken(Role::ADMINISTRATOR);
+        $this->actingAs($user);
+        
         $network = Network::factory()->create([
                                                        'name' => 'Restart',
                                                        'events_push_to_wordpress' => true,
@@ -146,7 +153,7 @@ class APIv2NetworkTest extends TestCase
         $this->assertEquals(0, count($json));
     }
 
-    public function providerGroupsParameters(): array {
+    public static function providerGroupsParameters(): array {
         return [
             [false, false],
             [false, true],
@@ -156,10 +163,14 @@ class APIv2NetworkTest extends TestCase
     }
 
     /**
-     * @dataProvider providerEventsParameters
      * @param $value
      */
+    #[DataProvider('providerEventsParameters')]
     public function testListEvents($getDetails): void {
+        // Create a test user with admin privileges and authenticate
+        $user = $this->createUserWithToken(Role::ADMINISTRATOR);
+        $this->actingAs($user);
+        
         $network = Network::factory()->create([
                                                        'name' => 'Restart',
                                                        'events_push_to_wordpress' => true,
@@ -212,7 +223,7 @@ class APIv2NetworkTest extends TestCase
         $this->assertEquals(0, count($json));
     }
 
-    public function providerEventsParameters(): array {
+    public static function providerEventsParameters(): array {
         return [
             [false],
             [true],

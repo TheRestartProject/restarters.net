@@ -3,6 +3,7 @@
 namespace Tests\Feature;
 
 use App\Models\EventsUsers;
+use PHPUnit\Framework\Attributes\Test;
 use App\Models\Group;
 use App\Helpers\Fixometer;
 use App\Notifications\AdminModerationEvent;
@@ -38,7 +39,7 @@ class ModerationEventPhotosNotificationTest extends TestCase
      */
     protected $group;
 
-    /** @test */
+    #[Test]
     public function a_moderation_notification_is_sent_to_admins_when_event_photos_are_uploaded(): void
     {
         Notification::fake();

@@ -36,8 +36,10 @@ class GroupJoinTest extends TestCase
         $this->followingRedirects();
 
         // When we follow a Restarters group, we should try to follow the Discourse group.
+        // But allow for the handle method to be called any number of times, as it may be called both
+        // when the group is joined and when the queue is processed
         $this->instance(AddUserToDiscourseGroup::class, Mockery::mock(AddUserToDiscourseGroup::class, function ($mock) {
-            $mock->shouldReceive('handle')->once();
+            $mock->shouldReceive('handle')->atLeast()->once();
         }));
 
         $response = $this->get('/group/join/'.$group->idgroups);

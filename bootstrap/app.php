@@ -65,6 +65,11 @@ return Application::configure(basePath: dirname(__DIR__))
         ]);
 
         $middleware->throttleApi();
+        
+        // Custom API middleware group to ensure API token authentication works correctly
+        $middleware->api([
+            \App\Http\Middleware\CustomApiTokenAuth::class,
+        ]);
 
         $middleware->group('translation', [
             \App\Http\Middleware\VerifyTranslationAccess::class,
@@ -73,6 +78,7 @@ return Application::configure(basePath: dirname(__DIR__))
         $middleware->alias([
             'AcceptUserInvites' => \App\Http\Middleware\AcceptUserInvites::class,
             'ensureAPIToken' => \App\Http\Middleware\EnsureAPIToken::class,
+            'customApiAuth' => \App\Http\Middleware\CustomApiTokenAuth::class,
             'localeSessionRedirect' => \Mcamara\LaravelLocalization\Middleware\LocaleSessionRedirect::class,
             'localeViewPath' => \Mcamara\LaravelLocalization\Middleware\LaravelLocalizationViewPath::class,
             'localizationRedirect' => \Mcamara\LaravelLocalization\Middleware\LaravelLocalizationRedirectFilter::class,
@@ -83,7 +89,6 @@ return Application::configure(basePath: dirname(__DIR__))
         $middleware->priority([
             \Illuminate\Session\Middleware\StartSession::class,
             \Illuminate\View\Middleware\ShareErrorsFromSession::class,
-            \App\Http\Middleware\Authenticate::class,
             \Illuminate\Routing\Middleware\ThrottleRequests::class,
             \Illuminate\Session\Middleware\AuthenticateSession::class,
             \Illuminate\Routing\Middleware\SubstituteBindings::class,

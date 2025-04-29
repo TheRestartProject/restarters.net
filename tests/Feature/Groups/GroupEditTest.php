@@ -3,6 +3,7 @@
 namespace Tests\Feature;
 
 use App\Models\Group;
+use PHPUnit\Framework\Attributes\Test;
 use App\Models\GroupTags;
 use App\Models\Network;
 use App\Models\Role;
@@ -17,7 +18,7 @@ use Illuminate\Support\Facades\Storage;
 
 class GroupEditTest extends TestCase
 {
-    /** @test */
+    #[Test]
     public function group_tags_retained_after_edited_by_host(): void
     {
         $this->withoutExceptionHandling();
@@ -66,7 +67,7 @@ class GroupEditTest extends TestCase
         $this->get('/group/edit/' . $group->idgroups);
     }
 
-    /** @test */
+    #[Test]
     public function invalid_location(): void
     {
         $this->withoutExceptionHandling();
@@ -92,7 +93,7 @@ class GroupEditTest extends TestCase
         ]);
     }
 
-    /** @test */
+    #[Test]
     public function image_upload(): void {
         Storage::fake('avatars');
         $group = Group::factory()->create();
@@ -104,7 +105,6 @@ class GroupEditTest extends TestCase
         $this->actingAs($host);
 
         // We don't upload files in a standard Laravel way, so testing upload is a bit of a hack.
-        $_SERVER['DOCUMENT_ROOT'] = getcwd();
         \FixometerFile::$uploadTesting = TRUE;
         file_put_contents('/tmp/UT.jpg', file_get_contents(public_path() . '/images/community.jpg'));
 
@@ -136,9 +136,9 @@ class GroupEditTest extends TestCase
         self::assertEquals('Thank you, the image has been deleted', $response->getContent());
     }
 
-    /** @test */
+    #[Test]
     public function can_edit_timezone(): void {
-        // Get list of timezones.
+        // Get list of timezones without authentication - this should work now that we've made the endpoint public
         $response = $this->get('/api/timezones');
         $response->assertSuccessful();
         $timezones = json_decode($response->getContent(), TRUE);
@@ -156,7 +156,7 @@ class GroupEditTest extends TestCase
         self::assertTrue($found);
     }
 
-    /** @test */
+    #[Test]
     public function edit_email(): void
     {
         $this->withoutExceptionHandling();

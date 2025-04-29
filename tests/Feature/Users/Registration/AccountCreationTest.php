@@ -3,6 +3,7 @@
 namespace Tests\Feature;
 
 use App\Models\Role;
+use PHPUnit\Framework\Attributes\DataProvider;
 use App\Models\User;
 use DB;
 use Hash;
@@ -145,7 +146,8 @@ class AccountCreationTest extends TestCase
             'email' => 'test@invalid.com',
         ]);
 
-        $this->assertNull(json_decode($response->getContent(), true));
+        // Assert empty response.
+        $this->assertEmpty( json_decode($response->getContent(), true));
     }
 
     public function testAdminCreate(): void
@@ -184,9 +186,7 @@ class AccountCreationTest extends TestCase
         $response->assertStatus(302);
     }
 
-    /**
-     * @dataProvider missingProvider
-     */
+    #[DataProvider('missingProvider')]
     public function testAdminCreateErrors($remove): void
     {
         $this->loginAsTestUser(Role::ADMINISTRATOR);
@@ -202,7 +202,7 @@ class AccountCreationTest extends TestCase
         $response->assertSee('alert-danger');
     }
 
-    public function missingProvider(): array {
+    public static function missingProvider(): array {
         return [
             [ 'email' ],
             [ 'role' ],

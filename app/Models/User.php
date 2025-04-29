@@ -131,8 +131,9 @@ class User extends Authenticatable implements Auditable, HasLocalePreference
             return [];
         }
 
-        $groupsNearbyQuery = Group::select(
-            '*, ( 6371 * acos( cos( radians('.$this->latitude.' ) * cos( radians( latitude ) ) * cos( radians( longitude ) - radians('.$this->longitude.') ) + sin( radians('.$this->latitude.') ) * sin( radians( latitude ) ) ) ) AS dist'
+        $groupsNearbyQuery = Group::selectRaw(
+            '*, ( 6371 * acos( cos( radians(?) ) * cos( radians( latitude ) ) * cos( radians( longitude ) - radians(?) ) + sin( radians(?) ) * sin( radians( latitude ) ) ) ) AS dist',
+            [$this->latitude, $this->longitude, $this->latitude]
         )->where(function ($q) {
             $q->whereNull('archived_at');
 
@@ -313,7 +314,7 @@ class User extends Authenticatable implements Auditable, HasLocalePreference
     {
         //Tested!
 
-        $r = DB::select('SELECT COUNT(id AS emails FROM '.$this->table.' WHERE email = :email', ['email' => $email]);
+        $r = DB::select('SELECT COUNT(id) AS emails FROM '.$this->table.' WHERE email = :email', ['email' => $email]);
 
         return ($r[0]->emails > 0) ? false : true;
     }
@@ -321,11 +322,14 @@ class User extends Authenticatable implements Auditable, HasLocalePreference
     #[Scope]
     protected function nearbyRestarters($query, $latitude, $longitude, $radius = 20)
     {
-        return $query->select('*, ( 6371 * acos( cos( radians('.$latitude.' ) * cos( radians( latitude ) ) * cos( radians( longitude ) - radians('.$longitude.') ) + sin( radians('.$latitude.') ) * sin( radians( latitude ) ) ) ) AS distance')
-                        ->whereNotNull('location')
-                          ->whereNotNull('latitude')
-                            ->whereNotNull('longitude')
-                              ->having('distance', '<=', $radius);
+        return $query->selectRaw(
+            '*, ( 6371 * acos( cos( radians(?) ) * cos( radians( latitude ) ) * cos( radians( longitude ) - radians(?) ) + sin( radians(?) ) * sin( radians( latitude ) ) ) ) AS distance',
+            [$latitude, $longitude, $latitude]
+        )
+        ->whereNotNull('location')
+        ->whereNotNull('latitude')
+        ->whereNotNull('longitude')
+        ->having('distance', '<=', $radius);
     }
 
     /*
@@ -351,10 +355,7 @@ class User extends Authenticatable implements Auditable, HasLocalePreference
         return true;
     }
 
-    /**
-     * @return Date when the user last logged in
-     */
-    public function lastLogin(): Date
+    public function lastLogin(): \Carbon\Carbon
     {
         return new \Carbon\Carbon($this->last_login_at);
     }
@@ -572,7 +573,7 @@ class User extends Authenticatable implements Auditable, HasLocalePreference
         // TODO Use of preferredLocale should mean we don't have to explicitly pass the locale.  But that isn't
         // working.  So at the moment we are passing a locale explicitly in the translations in the notifications
         // to users (not admins).
-        return $this->language;
+        return $this->language ?? config('app.locale', 'en');
     }
 
     public static function userCanSeeEvent($user, $event) {

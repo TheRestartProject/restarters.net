@@ -3,6 +3,7 @@
 namespace Tests\Unit;
 
 use App\Models\Role;
+use PHPUnit\Framework\Attributes\Test;
 use App\Models\User;
 use DB;
 use Illuminate\Foundation\Testing\RefreshDatabase;
@@ -19,7 +20,7 @@ class UserRolesTest extends TestCase
         DB::statement('SET foreign_key_checks=1');
     }
 
-    /** @test */
+    #[Test]
     public function user_can_have_network_coordinator_role(): void
     {
         // arrange
@@ -32,7 +33,7 @@ class UserRolesTest extends TestCase
         $this->assertTrue($user->hasRole('NetworkCoordinator'));
     }
 
-    /** @test */
+    #[Test]
     public function can_change_restarter_to_host_role(): void
     {
         // arrange
@@ -46,7 +47,7 @@ class UserRolesTest extends TestCase
         $this->assertTrue($user->hasRole('Host'));
     }
 
-    /** @test */
+    #[Test]
     public function cannot_change_admin_or_coordinator_to_host_role(): void
     {
         // arrange

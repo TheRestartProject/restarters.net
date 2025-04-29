@@ -3,6 +3,7 @@
 namespace Tests\Feature\Stats;
 
 use App\Models\Device;
+use PHPUnit\Framework\Attributes\Test;
 use App\Models\Group;
 use App\Helpers\LcaStats;
 use App\Models\Party;
@@ -16,28 +17,28 @@ class LcaStatsTest extends StatsTestCase
         parent::setUp();
     }
 
-    /** @test */
+    #[Test]
     public function get_displacement_factor(): void
     {
         $result = LcaStats::getDisplacementFactor();
         $this->assertEquals($this->_displacementFactor, $result);
     }
 
-    /** @test */
+    #[Test]
     public function get_ratio_unpowered(): void
     {
         $result = LcaStats::getEmissionRatioUnpowered();
         $this->assertEquals($this->_ratioUnpowered, $result);
     }
 
-    /** @test */
+    #[Test]
     public function get_ratio_powered(): void
     {
         $result = LcaStats::getEmissionRatioPowered();
         $this->assertEquals($this->_ratioPowered, $result);
     }
 
-    /** @test */
+    #[Test]
     public function get_waste_stats(): void
     {
         $this->_setupCategoriesWithUnpoweredWeights();
@@ -173,7 +174,7 @@ class LcaStatsTest extends StatsTestCase
         }
     }
 
-    /** @test */
+    #[Test]
     public function get_waste_stats_group(): void
     {
         $this->_setupCategoriesWithUnpoweredWeights();

@@ -3,6 +3,7 @@
 namespace Tests\Feature\Dashboard;
 
 use App\Providers\AppServiceProvider;
+use PHPUnit\Framework\Attributes\DataProvider;
 use App\Models\Role;
 use DB;
 use Hash;
@@ -10,9 +11,7 @@ use Tests\TestCase;
 
 class HomeTest extends TestCase
 {
-    /**
-     * @dataProvider landingPagesProvider
-     */
+    #[DataProvider('landingPagesProvider')]
     public function testLoggedOut($url): void
     {
         $response = $this->get($url);
@@ -21,7 +20,7 @@ class HomeTest extends TestCase
         $response->assertSee('language-bar');
     }
 
-    public function landingPagesProvider(): array {
+    public static function landingPagesProvider(): array {
         return [
             [ '/' ],
             [ '/about' ],

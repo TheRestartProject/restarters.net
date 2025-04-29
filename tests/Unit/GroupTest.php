@@ -3,6 +3,8 @@
 namespace Tests\Unit;
 
 use App\Models\Group;
+use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\Test;
 use App\Models\GrouptagsGroups;
 use App\Models\Network;
 use App\Models\Role;
@@ -24,10 +26,11 @@ class GroupTest extends TestCase
         GrouptagsGroups::truncate();
         Network::truncate();
         UserGroups::truncate();
+        DB::table('group_network')->truncate();
         DB::statement('SET foreign_key_checks=1');
     }
 
-    /** @test */
+    #[Test]
     public function can_add_volunteer_to_a_group(): void
     {
         $group = \App\Models\Group::factory()->create();
@@ -39,7 +42,7 @@ class GroupTest extends TestCase
         $this->assertTrue($groupVolunteer->id == $volunteer->id);
     }
 
-    /** @test */
+    #[Test]
     public function ensure_user_is_removed_from_group_when_deleted(): void
     {
         /** @var Group $group */
@@ -54,7 +57,7 @@ class GroupTest extends TestCase
         $this->assertFalse($group->isVolunteer($volunteer->id));
     }
 
-    /** @test */
+    #[Test]
     public function it_can_set_a_host_group_member_as_host(): void
     {
         $group = \App\Models\Group::factory()->create();
@@ -69,7 +72,7 @@ class GroupTest extends TestCase
         $this->assertEquals($host->role, Role::HOST);
     }
 
-    /** @test */
+    #[Test]
     public function it_can_set_a_restarter_group_member_as_host(): void
     {
         $group = \App\Models\Group::factory()->create();
@@ -84,7 +87,7 @@ class GroupTest extends TestCase
         $this->assertEquals(Role::HOST, $restarter->role, 'Restarter was converted to a Host');
     }
 
-    /** @test */
+    #[Test]
     public function it_can_have_a_tag_added(): void
     {
         $group = \App\Models\Group::factory()->create();
@@ -97,7 +100,7 @@ class GroupTest extends TestCase
         $this->assertTrue($tag1->tag_name == $retrievedTag->tag_name);
     }
 
-    /** @test */
+    #[Test]
     public function given_a_network_that_should_push_then_group_should_push(): void
     {
         $network1 = Network::factory()->create([
@@ -118,7 +121,7 @@ class GroupTest extends TestCase
         $this->assertTrue($shouldPush);
     }
 
-    /** @test */
+    #[Test]
     public function given_no_network_that_should_push_then_group_should_not_push(): void
     {
         $network1 = Network::factory()->create([
@@ -137,10 +140,8 @@ class GroupTest extends TestCase
         $this->assertFalse($shouldPush);
     }
 
-    /**
-     * @test
-     * @dataProvider timezoneProvider
-     */
+    #[DataProvider('timezoneProvider')]
+    #[Test]
     public function timezone_inheritance($group, $network1, $network2, $result, $exception): void {
         $network1 = Network::factory()->create([
             'timezone' => $network1
@@ -167,7 +168,7 @@ class GroupTest extends TestCase
         }
     }
 
-    public function timezoneProvider(): array {
+    public static function timezoneProvider(): array {
         return [
             [ NULL, 'Europe/Paris', NULL, 'Europe/Paris', FALSE ],
             [ NULL, 'Europe/Paris', 'Europe/Paris', 'Europe/Paris', FALSE ],

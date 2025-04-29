@@ -5,10 +5,9 @@ namespace Tests\Commands;
 use App\Models\Group;
 use App\Models\Network;
 use App\Models\User;
-use DB;
-use Tests\TestCase;
+use Tests\DiscourseTestCase;
 
-class DiscourseTest extends TestCase {
+class DiscourseTest extends DiscourseTestCase {
     public function testSyncDiscourseUsernames(): void {
         $this->artisan('sync:discourseusernames')->assertExitCode(0);
     }
@@ -30,7 +29,6 @@ class DiscourseTest extends TestCase {
         $this->artisan('group:create_discourse_group')->assertExitCode(0);
 
         // Rename group to trigger the rename of the group on Discourse.
-
         $group->name = 'New Name';
         $group->save();
 

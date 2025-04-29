@@ -14,6 +14,7 @@ php artisan lang:js --no-lib resources/js/translations.js
 chmod -R 777 public
 
 php artisan key:generate
+php artisan l5-swagger:generate
 php artisan cache:clear
 php artisan config:clear
 

@@ -3,6 +3,7 @@
 namespace Tests\Unit;
 
 use App\Models\Group;
+use PHPUnit\Framework\Attributes\Test;
 use App\Helpers\Fixometer;
 use App\Models\Network;
 use App\Models\Party;
@@ -33,7 +34,7 @@ class EventPermissionsTest extends TestCase
     // Network Coords - can edit all events from groups in their network
     // Hosts - can edit all events in their groups
 
-    /** @test */
+    #[Test]
     public function it_can_check_if_admin_can_edit_all(): void
     {
         // arrange
@@ -61,7 +62,7 @@ class EventPermissionsTest extends TestCase
         $this->assertFalse(Fixometer::userHasEditPartyPermission($event->idevents));
     }
 
-    /** @test */
+    #[Test]
     public function it_can_check_if_coordinator_can_edit_for_network(): void
     {
         // arrange
@@ -88,7 +89,7 @@ class EventPermissionsTest extends TestCase
         $this->assertFalse(Fixometer::userHasEditPartyPermission($event->idevents));
     }
 
-    /** @test */
+    #[Test]
     public function it_can_check_if_host_can_edit_for_group(): void
     {
         // arrange

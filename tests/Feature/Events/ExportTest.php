@@ -3,6 +3,7 @@
 namespace Tests\Feature;
 
 use App\Models\Category;
+use PHPUnit\Framework\Attributes\DataProvider;
 use App\Models\Device;
 use App\Models\Group;
 use App\Helpers\RepairNetworkService;
@@ -16,9 +17,7 @@ use Tests\TestCase;
 
 class ExportTest extends TestCase
 {
-    /**
-     * @dataProvider roleProvider
-     */
+    #[DataProvider('roleProvider')]
     public function testExport($role): void
     {
         $network = Network::factory()->create();
@@ -227,7 +226,7 @@ class ExportTest extends TestCase
         }
     }
 
-    public function roleProvider(): array {
+    public static function roleProvider(): array {
         return [
             [ 'Administrator' ],
             [ 'NetworkCoordinator' ],

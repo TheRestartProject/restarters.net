@@ -3,6 +3,7 @@
 namespace Tests\Feature;
 
 use App\Models\EventsUsers;
+use PHPUnit\Framework\Attributes\DataProvider;
 use App\Models\Group;
 use App\Helpers\Fixometer;
 use App\Listeners\AddUserToDiscourseThreadForEvent;
@@ -292,9 +293,7 @@ class InviteEventTest extends TestCase
         Notification::fake();
         $this->withoutExceptionHandling();
 
-        $user = User::factory()->administrator()->create([
-            'api_token' => '1234',
-        ]);
+        $user = $this->createUserWithToken(Role::ADMINISTRATOR);
         $this->actingAs($user);
 
         $idgroups = $this->createGroup('Test Group', 'https://therestartproject.org', 'London', 'Some text.', true, true);
@@ -401,10 +400,8 @@ class InviteEventTest extends TestCase
     }
 
     public function testInviteViaLink(): void {
-        $this->loginAsTestUser(Role::ADMINISTRATOR);
-        $user = User::factory()->restarter()->create([
-                                                                          'api_token' => '1234',
-                                                                      ]);
+        $this->fastLoginAsTestUser(Role::ADMINISTRATOR);
+        $user = $this->createUserWithToken(Role::ADMINISTRATOR);
 
         $idgroups = $this->createGroup();
         $group = Group::findOrFail($idgroups);
@@ -503,9 +500,7 @@ class InviteEventTest extends TestCase
         ]);
     }
 
-    /**
-     * @dataProvider invalidEmailProvider
-     */
+    #[DataProvider('invalidEmailProvider')]
     public function testInviteInvalidEmail($email, $valid): void
     {
         $this->loginAsTestUser(Role::ADMINISTRATOR);
@@ -527,7 +522,7 @@ class InviteEventTest extends TestCase
         ]);
     }
 
-    public function invalidEmailProvider(): array
+    public static function invalidEmailProvider(): array
     {
         return [
             ['test@test.com', true],

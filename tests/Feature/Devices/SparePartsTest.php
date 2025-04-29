@@ -3,6 +3,7 @@
 namespace Tests\Feature;
 
 use App\Models\Category;
+use PHPUnit\Framework\Attributes\Test;
 use App\Models\Device;
 use App\Models\Party;
 use App\Models\User;
@@ -31,7 +32,7 @@ class SparePartsTest extends TestCase
         $this->withoutExceptionHandling();
     }
 
-    /** @test */
+    #[Test]
     public function recording_spare_parts_from_manufacturer(): void
     {
         $iddevices = $this->createDevice($this->event->idevents,
@@ -47,7 +48,7 @@ class SparePartsTest extends TestCase
         $this->assertEquals(trans('partials.fixed'), $device->getRepairStatus());
     }
 
-    /** @test */
+    #[Test]
     public function recording_spare_parts_from_third_party(): void
     {
         $this->device_inputs['repair_status'] = Device::REPAIR_STATUS_REPAIRABLE;
@@ -66,7 +67,7 @@ class SparePartsTest extends TestCase
         $this->assertEquals(trans('partials.yes_third_party'), $device->getSpareParts());
     }
 
-    /** @test */
+    #[Test]
     public function recording_no_spare_parts_needed(): void
     {
         $iddevices = $this->createDevice($this->event->idevents,
@@ -81,7 +82,7 @@ class SparePartsTest extends TestCase
         $this->assertEquals(trans('partials.no'), $device->getSpareParts());
     }
 
-    /** @test */
+    #[Test]
     public function recording_spare_parts_related_barrier(): void
     {
         $iddevices = $this->createDevice($this->event->idevents,
@@ -95,7 +96,7 @@ class SparePartsTest extends TestCase
 
     }
 
-    /** @test */
+    #[Test]
     public function recording_no_spare_parts_related_barrier(): void
     {
         $iddevices = $this->createDevice($this->event->idevents,

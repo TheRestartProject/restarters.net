@@ -3,6 +3,7 @@
 namespace Tests\Feature;
 
 use App\Events\UserUpdated;
+use PHPUnit\Framework\Attributes\DataProvider;
 use App\Models\Role;
 use App\Models\User;
 use Carbon\Carbon;
@@ -13,7 +14,7 @@ use Tests\TestCase;
 
 class UserAdminTest extends TestCase
 {
-    public function provider()
+    public static function provider()
     {
         return [
             [
@@ -31,9 +32,7 @@ class UserAdminTest extends TestCase
         ];
     }
 
-    /**
-     *@dataProvider provider
-     */
+    #[DataProvider('provider')]
     public function testUsersPage($role, $cansee): void
     {
         // Fetch the list of all users and check that we're in it.

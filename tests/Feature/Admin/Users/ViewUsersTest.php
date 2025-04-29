@@ -3,6 +3,7 @@
 namespace Tests\Feature;
 
 use App\Models\User;
+use PHPUnit\Framework\Attributes\Test;
 use Carbon\Carbon;
 use DB;
 use Illuminate\Foundation\Testing\RefreshDatabase;
@@ -22,7 +23,7 @@ class ViewUsersTest extends TestCase
         $this->actingAs($admin);
     }
 
-    /** @test */
+    #[Test]
     public function an_admin_can_view_list_of_users(): void
     {
         // Given we have users in the database
@@ -35,7 +36,7 @@ class ViewUsersTest extends TestCase
         $response->assertSeeText($users[0]->name);
     }
 
-    /** @test */
+    #[Test]
     public function an_admin_can_see_how_many_total_users_in_the_list(): void
     {
         // Given we have users in the database
@@ -48,7 +49,7 @@ class ViewUsersTest extends TestCase
         $response->assertSeeText(42);
     }
 
-    /** @test */
+    #[Test]
     public function admin_can_see_users_last_login_time(): void
     {
         // Given we have a user who has just logged in
@@ -64,7 +65,7 @@ class ViewUsersTest extends TestCase
         $response->assertSeeText($lastLogin->diffForHumans(null, true));
     }
 
-    /** @test */
+    #[Test]
     public function admin_can_see_users_last_login_time_on_filtered_results(): void
     {
         // Given we have a user who has just logged in
@@ -80,7 +81,7 @@ class ViewUsersTest extends TestCase
         $response->assertSeeText($lastLogin->diffForHumans(null, true));
     }
 
-    /** @test */
+    #[Test]
     public function admin_can_sort_user_list_by_last_login(): void
     {
         // Given we have users with various login times

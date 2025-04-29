@@ -1,22 +1,17 @@
 <?php
 
-namespace Tests\Feature;
+namespace Tests\Feature\Devices;
 
 use App\Models\Category;
 use App\Models\Device;
 use App\Models\Party;
-use App\Models\User;
-use DB;
-use Tests\TestCase;
+use Tests\ApiTestCase;
 
-class CategoryTest extends TestCase
+class CategoryTest extends ApiTestCase
 {
     public function testCategoryChange(): void
     {
         $event = Party::factory()->create();
-
-        $admin = User::factory()->administrator()->create();
-        $this->actingAs($admin);
 
         $rsp = $this->post('/api/v2/devices', [
             'eventid' => $event->idevents,

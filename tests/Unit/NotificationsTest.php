@@ -91,6 +91,8 @@ class NotificationsTest extends TestCase
         $this->useren = User::factory()->create(['language' => 'en', 'id' => 10001]);
         $this->userfr = User::factory()->create(['language' => 'fr', 'id' => 10002]);
 
+        $domain = config('app.url');
+
         // This is the output pasted in from testGenerateOutputs.
         $this->outputs = [];
         $this->outputs[\App\Notifications\AdminAbnormalDevices::class] = [];
@@ -103,7 +105,7 @@ class NotificationsTest extends TestCase
         $this->outputs[\App\Notifications\AdminAbnormalDevices::class]['mail']['en']['introLines'] = [];
         $this->outputs[\App\Notifications\AdminAbnormalDevices::class]['mail']['en']['introLines'][0] = 'The event \'Event Venue\' has an abnormal number of miscellaneous devices. Please check the event and fix this issue.';
         $this->outputs[\App\Notifications\AdminAbnormalDevices::class]['mail']['en']['outroLines'] = [];
-        $this->outputs[\App\Notifications\AdminAbnormalDevices::class]['mail']['en']['outroLines'][0] = 'If you would like to stop receiving these emails, please visit <a href="http://restarters.test:8000/user/edit/10001#list-email-preferences">your preferences</a> on your account.';
+        $this->outputs[\App\Notifications\AdminAbnormalDevices::class]['mail']['en']['outroLines'][0] = 'If you would like to stop receiving these emails, please visit <a href="' . $domain . '/user/edit/10001#list-email-preferences">your preferences</a> on your account.';
         $this->outputs[\App\Notifications\AdminAbnormalDevices::class]['mail']['en']['actionText'] = 'View event';
         $this->outputs[\App\Notifications\AdminAbnormalDevices::class]['mail']['en']['actionUrl'] = 'https://eventurl';
         $this->outputs[\App\Notifications\AdminAbnormalDevices::class]['mail']['en']['displayableActionUrl'] = 'https://eventurl';
@@ -115,7 +117,7 @@ class NotificationsTest extends TestCase
         $this->outputs[\App\Notifications\AdminAbnormalDevices::class]['mail']['fr']['introLines'] = [];
         $this->outputs[\App\Notifications\AdminAbnormalDevices::class]['mail']['fr']['introLines'][0] = 'L\'événement \':nom\' a un nombre anormal de périphériques divers. Veuillez vérifier l\'événement et résoudre ce problème.';
         $this->outputs[\App\Notifications\AdminAbnormalDevices::class]['mail']['fr']['outroLines'] = [];
-        $this->outputs[\App\Notifications\AdminAbnormalDevices::class]['mail']['fr']['outroLines'][0] = 'If you would like to stop receiving these emails, please visit <a href="http://restarters.test:8000/user/edit/10002#list-email-preferences">your preferences</a> on your account.';
+        $this->outputs[\App\Notifications\AdminAbnormalDevices::class]['mail']['fr']['outroLines'][0] = 'If you would like to stop receiving these emails, please visit <a href="' . $domain . '/user/edit/10002#list-email-preferences">your preferences</a> on your account.';
         $this->outputs[\App\Notifications\AdminAbnormalDevices::class]['mail']['fr']['actionText'] = 'Voir l\'événement';
         $this->outputs[\App\Notifications\AdminAbnormalDevices::class]['mail']['fr']['actionUrl'] = 'https://eventurl';
         $this->outputs[\App\Notifications\AdminAbnormalDevices::class]['mail']['fr']['displayableActionUrl'] = 'https://eventurl';
@@ -139,7 +141,7 @@ class NotificationsTest extends TestCase
         $this->outputs[\App\Notifications\AdminModerationEvent::class]['mail']['en']['introLines'][0] = 'A new event has been created: \'Event Venue\'.';
         $this->outputs[\App\Notifications\AdminModerationEvent::class]['mail']['en']['outroLines'] = [];
         $this->outputs[\App\Notifications\AdminModerationEvent::class]['mail']['en']['outroLines'][0] = 'This event might need your moderation, if your network moderates events and it hasn\'t yet been moderated by another administrator.';
-        $this->outputs[\App\Notifications\AdminModerationEvent::class]['mail']['en']['outroLines'][1] = 'If you would like to stop receiving these emails, please visit <a href="http://restarters.test:8000/user/edit/10001#list-email-preferences">your preferences</a> on your account.';
+        $this->outputs[\App\Notifications\AdminModerationEvent::class]['mail']['en']['outroLines'][1] = 'If you would like to stop receiving these emails, please visit <a href="' . $domain . '/user/edit/10001#list-email-preferences">your preferences</a> on your account.';
         $this->outputs[\App\Notifications\AdminModerationEvent::class]['mail']['en']['actionText'] = 'View event';
         $this->outputs[\App\Notifications\AdminModerationEvent::class]['mail']['en']['actionUrl'] = 'https://eventurl';
         $this->outputs[\App\Notifications\AdminModerationEvent::class]['mail']['en']['displayableActionUrl'] = 'https://eventurl';
@@ -152,7 +154,7 @@ class NotificationsTest extends TestCase
         $this->outputs[\App\Notifications\AdminModerationEvent::class]['mail']['fr']['introLines'][0] = 'Un nouvel événement a été créé Event Venue';
         $this->outputs[\App\Notifications\AdminModerationEvent::class]['mail']['fr']['outroLines'] = [];
         $this->outputs[\App\Notifications\AdminModerationEvent::class]['mail']['fr']['outroLines'][0] = 'Cet événement peut nécessiter votre modération si votre réseau a modéré des événements et qu\'il n\'a pas encore été modéré par un autre administrateur.';
-        $this->outputs[\App\Notifications\AdminModerationEvent::class]['mail']['fr']['outroLines'][1] = 'If you would like to stop receiving these emails, please visit <a href="http://restarters.test:8000/user/edit/10002#list-email-preferences">your preferences</a> on your account.';
+        $this->outputs[\App\Notifications\AdminModerationEvent::class]['mail']['fr']['outroLines'][1] = 'If you would like to stop receiving these emails, please visit <a href="' . $domain . '/user/edit/10002#list-email-preferences">your preferences</a> on your account.';
         $this->outputs[\App\Notifications\AdminModerationEvent::class]['mail']['fr']['actionText'] = 'Voir l\'événement';
         $this->outputs[\App\Notifications\AdminModerationEvent::class]['mail']['fr']['actionUrl'] = 'https://eventurl';
         $this->outputs[\App\Notifications\AdminModerationEvent::class]['mail']['fr']['displayableActionUrl'] = 'https://eventurl';
@@ -176,7 +178,7 @@ class NotificationsTest extends TestCase
         $this->outputs[\App\Notifications\AdminModerationEventPhotos::class]['mail']['en']['introLines'][0] = 'Photos have been uploaded to an event: \'Event Venue\'.';
         $this->outputs[\App\Notifications\AdminModerationEventPhotos::class]['mail']['en']['outroLines'] = [];
         $this->outputs[\App\Notifications\AdminModerationEventPhotos::class]['mail']['en']['outroLines'][0] = 'These photos might need your moderation, if they haven\'t yet been moderated by another administrator.';
-        $this->outputs[\App\Notifications\AdminModerationEventPhotos::class]['mail']['en']['outroLines'][1] = 'If you would like to stop receiving these emails, please visit <a href="http://restarters.test:8000/user/edit/10001#list-email-preferences">your preferences</a> on your account.';
+        $this->outputs[\App\Notifications\AdminModerationEventPhotos::class]['mail']['en']['outroLines'][1] = 'If you would like to stop receiving these emails, please visit <a href="' . $domain . '/user/edit/10001#list-email-preferences">your preferences</a> on your account.';
         $this->outputs[\App\Notifications\AdminModerationEventPhotos::class]['mail']['en']['actionText'] = 'View event';
         $this->outputs[\App\Notifications\AdminModerationEventPhotos::class]['mail']['en']['actionUrl'] = 'https://eventurl';
         $this->outputs[\App\Notifications\AdminModerationEventPhotos::class]['mail']['en']['displayableActionUrl'] = 'https://eventurl';
@@ -189,7 +191,7 @@ class NotificationsTest extends TestCase
         $this->outputs[\App\Notifications\AdminModerationEventPhotos::class]['mail']['fr']['introLines'][0] = 'Des photos ont été téléchargées pour un événement: \'Event Venue\'.';
         $this->outputs[\App\Notifications\AdminModerationEventPhotos::class]['mail']['fr']['outroLines'] = [];
         $this->outputs[\App\Notifications\AdminModerationEventPhotos::class]['mail']['fr']['outroLines'][0] = 'Ces photos peuvent nécessiter votre modération, si elles n\'ont pas encore été modérées par un autre administrateur.';
-        $this->outputs[\App\Notifications\AdminModerationEventPhotos::class]['mail']['fr']['outroLines'][1] = 'If you would like to stop receiving these emails, please visit <a href="http://restarters.test:8000/user/edit/10002#list-email-preferences">your preferences</a> on your account.';
+        $this->outputs[\App\Notifications\AdminModerationEventPhotos::class]['mail']['fr']['outroLines'][1] = 'If you would like to stop receiving these emails, please visit <a href="' . $domain . '/user/edit/10002#list-email-preferences">your preferences</a> on your account.';
         $this->outputs[\App\Notifications\AdminModerationEventPhotos::class]['mail']['fr']['actionText'] = 'Voir l\'événement';
         $this->outputs[\App\Notifications\AdminModerationEventPhotos::class]['mail']['fr']['actionUrl'] = 'https://eventurl';
         $this->outputs[\App\Notifications\AdminModerationEventPhotos::class]['mail']['fr']['displayableActionUrl'] = 'https://eventurl';
@@ -215,7 +217,7 @@ class NotificationsTest extends TestCase
         $this->outputs[\App\Notifications\AdminModerationGroup::class]['mail']['en']['introLines'][0] = 'A new group has been created: \'Group Name\'.';
         $this->outputs[\App\Notifications\AdminModerationGroup::class]['mail']['en']['outroLines'] = [];
         $this->outputs[\App\Notifications\AdminModerationGroup::class]['mail']['en']['outroLines'][0] = 'This group might need your moderation, if it hasn\'t yet been moderated by another administrator.';
-        $this->outputs[\App\Notifications\AdminModerationGroup::class]['mail']['en']['outroLines'][1] = 'If you would like to stop receiving these emails, please visit <a href="http://restarters.test:8000/user/edit/10001#list-email-preferences">your preferences</a> on your account.';
+        $this->outputs[\App\Notifications\AdminModerationGroup::class]['mail']['en']['outroLines'][1] = 'If you would like to stop receiving these emails, please visit <a href="' . $domain . '/user/edit/10001#list-email-preferences">your preferences</a> on your account.';
         $this->outputs[\App\Notifications\AdminModerationGroup::class]['mail']['en']['actionText'] = 'View group';
         $this->outputs[\App\Notifications\AdminModerationGroup::class]['mail']['en']['actionUrl'] = 'https://groupurl';
         $this->outputs[\App\Notifications\AdminModerationGroup::class]['mail']['en']['displayableActionUrl'] = 'https://groupurl';
@@ -228,7 +230,7 @@ class NotificationsTest extends TestCase
         $this->outputs[\App\Notifications\AdminModerationGroup::class]['mail']['fr']['introLines'][0] = 'Un nouveau Repair Café a été créé: \'Group Name\'.';
         $this->outputs[\App\Notifications\AdminModerationGroup::class]['mail']['fr']['outroLines'] = [];
         $this->outputs[\App\Notifications\AdminModerationGroup::class]['mail']['fr']['outroLines'][0] = 'Ce Repair Café peut avoir besoin de votre modération s\'il n\'a pas encore été modéré par un autre administrateur.';
-        $this->outputs[\App\Notifications\AdminModerationGroup::class]['mail']['fr']['outroLines'][1] = 'If you would like to stop receiving these emails, please visit <a href="http://restarters.test:8000/user/edit/10002#list-email-preferences">your preferences</a> on your account.';
+        $this->outputs[\App\Notifications\AdminModerationGroup::class]['mail']['fr']['outroLines'][1] = 'If you would like to stop receiving these emails, please visit <a href="' . $domain . '/user/edit/10002#list-email-preferences">your preferences</a> on your account.';
         $this->outputs[\App\Notifications\AdminModerationGroup::class]['mail']['fr']['actionText'] = 'View group';
         $this->outputs[\App\Notifications\AdminModerationGroup::class]['mail']['fr']['actionUrl'] = 'https://groupurl';
         $this->outputs[\App\Notifications\AdminModerationGroup::class]['mail']['fr']['displayableActionUrl'] = 'https://groupurl';
@@ -251,10 +253,10 @@ class NotificationsTest extends TestCase
         $this->outputs[\App\Notifications\AdminNewUser::class]['mail']['en']['introLines'] = [];
         $this->outputs[\App\Notifications\AdminNewUser::class]['mail']['en']['introLines'][0] = 'A new user "Name" has joined the Restarters community.';
         $this->outputs[\App\Notifications\AdminNewUser::class]['mail']['en']['outroLines'] = [];
-        $this->outputs[\App\Notifications\AdminNewUser::class]['mail']['en']['outroLines'][0] = 'If you would like to stop receiving these emails, please visit <a href="http://restarters.test:8000/user/edit/10001#list-email-preferences">your preferences</a> on your account.';
+        $this->outputs[\App\Notifications\AdminNewUser::class]['mail']['en']['outroLines'][0] = 'If you would like to stop receiving these emails, please visit <a href="' . $domain . '/user/edit/10001#list-email-preferences">your preferences</a> on your account.';
         $this->outputs[\App\Notifications\AdminNewUser::class]['mail']['en']['actionText'] = 'View profile';
-        $this->outputs[\App\Notifications\AdminNewUser::class]['mail']['en']['actionUrl'] = 'http://restarters.test:8000/profile/456';
-        $this->outputs[\App\Notifications\AdminNewUser::class]['mail']['en']['displayableActionUrl'] = 'http://restarters.test:8000/profile/456';
+        $this->outputs[\App\Notifications\AdminNewUser::class]['mail']['en']['actionUrl'] = '' . $domain . '/profile/456';
+        $this->outputs[\App\Notifications\AdminNewUser::class]['mail']['en']['displayableActionUrl'] = '' . $domain . '/profile/456';
         $this->outputs[\App\Notifications\AdminNewUser::class]['mail']['fr'] = [];
         $this->outputs[\App\Notifications\AdminNewUser::class]['mail']['fr']['level'] = 'info';
         $this->outputs[\App\Notifications\AdminNewUser::class]['mail']['fr']['subject'] = 'Enregistrement d\'un nouvel utilisateur';
@@ -263,19 +265,19 @@ class NotificationsTest extends TestCase
         $this->outputs[\App\Notifications\AdminNewUser::class]['mail']['fr']['introLines'] = [];
         $this->outputs[\App\Notifications\AdminNewUser::class]['mail']['fr']['introLines'][0] = 'A new user "Name" has joined the Restarters community.';
         $this->outputs[\App\Notifications\AdminNewUser::class]['mail']['fr']['outroLines'] = [];
-        $this->outputs[\App\Notifications\AdminNewUser::class]['mail']['fr']['outroLines'][0] = 'If you would like to stop receiving these emails, please visit <a href="http://restarters.test:8000/user/edit/10002#list-email-preferences">your preferences</a> on your account.';
+        $this->outputs[\App\Notifications\AdminNewUser::class]['mail']['fr']['outroLines'][0] = 'If you would like to stop receiving these emails, please visit <a href="' . $domain . '/user/edit/10002#list-email-preferences">your preferences</a> on your account.';
         $this->outputs[\App\Notifications\AdminNewUser::class]['mail']['fr']['actionText'] = 'Voir profil';
-        $this->outputs[\App\Notifications\AdminNewUser::class]['mail']['fr']['actionUrl'] = 'http://restarters.test:8000/profile/456';
-        $this->outputs[\App\Notifications\AdminNewUser::class]['mail']['fr']['displayableActionUrl'] = 'http://restarters.test:8000/profile/456';
+        $this->outputs[\App\Notifications\AdminNewUser::class]['mail']['fr']['actionUrl'] = '' . $domain . '/profile/456';
+        $this->outputs[\App\Notifications\AdminNewUser::class]['mail']['fr']['displayableActionUrl'] = '' . $domain . '/profile/456';
         $this->outputs[\App\Notifications\AdminNewUser::class]['array'] = [];
         $this->outputs[\App\Notifications\AdminNewUser::class]['array']['en'] = [];
         $this->outputs[\App\Notifications\AdminNewUser::class]['array']['en']['title'] = 'New user has joined the community:';
         $this->outputs[\App\Notifications\AdminNewUser::class]['array']['en']['name'] = 'Name';
-        $this->outputs[\App\Notifications\AdminNewUser::class]['array']['en']['url'] = 'http://restarters.test:8000/profile/456';
+        $this->outputs[\App\Notifications\AdminNewUser::class]['array']['en']['url'] = '' . $domain . '/profile/456';
         $this->outputs[\App\Notifications\AdminNewUser::class]['array']['fr'] = [];
         $this->outputs[\App\Notifications\AdminNewUser::class]['array']['fr']['title'] = 'New user has joined the community:';
         $this->outputs[\App\Notifications\AdminNewUser::class]['array']['fr']['name'] = 'Name';
-        $this->outputs[\App\Notifications\AdminNewUser::class]['array']['fr']['url'] = 'http://restarters.test:8000/profile/456';
+        $this->outputs[\App\Notifications\AdminNewUser::class]['array']['fr']['url'] = '' . $domain . '/profile/456';
         $this->outputs[\App\Notifications\AdminUserDeleted::class] = [];
         $this->outputs[\App\Notifications\AdminUserDeleted::class]['mail'] = [];
         $this->outputs[\App\Notifications\AdminUserDeleted::class]['mail']['en'] = [];
@@ -285,7 +287,7 @@ class NotificationsTest extends TestCase
         $this->outputs[\App\Notifications\AdminUserDeleted::class]['mail']['en']['salutation'] = NULL;
         $this->outputs[\App\Notifications\AdminUserDeleted::class]['mail']['en']['introLines'] = [];
         $this->outputs[\App\Notifications\AdminUserDeleted::class]['mail']['en']['introLines'][0] = 'The user "Name" has deleted their Restarters account.';
-        $this->outputs[\App\Notifications\AdminUserDeleted::class]['mail']['en']['introLines'][1] = 'If you would like to stop receiving these emails, please visit <a href="http://restarters.test:8000/user/edit/10001#list-email-preferences">your preferences</a> on your account.';
+        $this->outputs[\App\Notifications\AdminUserDeleted::class]['mail']['en']['introLines'][1] = 'If you would like to stop receiving these emails, please visit <a href="' . $domain . '/user/edit/10001#list-email-preferences">your preferences</a> on your account.';
         $this->outputs[\App\Notifications\AdminUserDeleted::class]['mail']['en']['outroLines'] = [];
         $this->outputs[\App\Notifications\AdminUserDeleted::class]['mail']['en']['actionText'] = NULL;
         $this->outputs[\App\Notifications\AdminUserDeleted::class]['mail']['en']['actionUrl'] = NULL;
@@ -297,7 +299,7 @@ class NotificationsTest extends TestCase
         $this->outputs[\App\Notifications\AdminUserDeleted::class]['mail']['fr']['salutation'] = NULL;
         $this->outputs[\App\Notifications\AdminUserDeleted::class]['mail']['fr']['introLines'] = [];
         $this->outputs[\App\Notifications\AdminUserDeleted::class]['mail']['fr']['introLines'][0] = 'The user "Name" has deleted their Restarters account.';
-        $this->outputs[\App\Notifications\AdminUserDeleted::class]['mail']['fr']['introLines'][1] = 'If you would like to stop receiving these emails, please visit <a href="http://restarters.test:8000/user/edit/10002#list-email-preferences">your preferences</a> on your account.';
+        $this->outputs[\App\Notifications\AdminUserDeleted::class]['mail']['fr']['introLines'][1] = 'If you would like to stop receiving these emails, please visit <a href="' . $domain . '/user/edit/10002#list-email-preferences">your preferences</a> on your account.';
         $this->outputs[\App\Notifications\AdminUserDeleted::class]['mail']['fr']['outroLines'] = [];
         $this->outputs[\App\Notifications\AdminUserDeleted::class]['mail']['fr']['actionText'] = NULL;
         $this->outputs[\App\Notifications\AdminUserDeleted::class]['mail']['fr']['actionUrl'] = NULL;
@@ -319,7 +321,7 @@ class NotificationsTest extends TestCase
         $this->outputs[\App\Notifications\AdminWordPressCreateEventFailure::class]['mail']['en']['introLines'] = [];
         $this->outputs[\App\Notifications\AdminWordPressCreateEventFailure::class]['mail']['en']['introLines'][0] = 'Event \'Event Venue\' failed to create a WordPress post during admin approval.';
         $this->outputs[\App\Notifications\AdminWordPressCreateEventFailure::class]['mail']['en']['outroLines'] = [];
-        $this->outputs[\App\Notifications\AdminWordPressCreateEventFailure::class]['mail']['en']['outroLines'][0] = 'If you would like to stop receiving these emails, please visit <a href="http://restarters.test:8000/user/edit/10001#list-email-preferences">your preferences</a> on your account.';
+        $this->outputs[\App\Notifications\AdminWordPressCreateEventFailure::class]['mail']['en']['outroLines'][0] = 'If you would like to stop receiving these emails, please visit <a href="' . $domain . '/user/edit/10001#list-email-preferences">your preferences</a> on your account.';
         $this->outputs[\App\Notifications\AdminWordPressCreateEventFailure::class]['mail']['en']['actionText'] = 'View event';
         $this->outputs[\App\Notifications\AdminWordPressCreateEventFailure::class]['mail']['en']['actionUrl'] = 'https://eventurl';
         $this->outputs[\App\Notifications\AdminWordPressCreateEventFailure::class]['mail']['en']['displayableActionUrl'] = 'https://eventurl';
@@ -331,7 +333,7 @@ class NotificationsTest extends TestCase
         $this->outputs[\App\Notifications\AdminWordPressCreateEventFailure::class]['mail']['fr']['introLines'] = [];
         $this->outputs[\App\Notifications\AdminWordPressCreateEventFailure::class]['mail']['fr']['introLines'][0] = 'L\'événement \'Event Venue\' n\'a pas pu créer de publication WordPress lors de l\'approbation de l\'administrateur.';
         $this->outputs[\App\Notifications\AdminWordPressCreateEventFailure::class]['mail']['fr']['outroLines'] = [];
-        $this->outputs[\App\Notifications\AdminWordPressCreateEventFailure::class]['mail']['fr']['outroLines'][0] = 'If you would like to stop receiving these emails, please visit <a href="http://restarters.test:8000/user/edit/10002#list-email-preferences">your preferences</a> on your account.';
+        $this->outputs[\App\Notifications\AdminWordPressCreateEventFailure::class]['mail']['fr']['outroLines'][0] = 'If you would like to stop receiving these emails, please visit <a href="' . $domain . '/user/edit/10002#list-email-preferences">your preferences</a> on your account.';
         $this->outputs[\App\Notifications\AdminWordPressCreateEventFailure::class]['mail']['fr']['actionText'] = 'Voir l\'événement';
         $this->outputs[\App\Notifications\AdminWordPressCreateEventFailure::class]['mail']['fr']['actionUrl'] = 'https://eventurl';
         $this->outputs[\App\Notifications\AdminWordPressCreateEventFailure::class]['mail']['fr']['displayableActionUrl'] = 'https://eventurl';
@@ -354,7 +356,7 @@ class NotificationsTest extends TestCase
         $this->outputs[\App\Notifications\AdminWordPressCreateGroupFailure::class]['mail']['en']['introLines'] = [];
         $this->outputs[\App\Notifications\AdminWordPressCreateGroupFailure::class]['mail']['en']['introLines'][0] = 'Error creating group page for \'Group Name\' on WordPress.';
         $this->outputs[\App\Notifications\AdminWordPressCreateGroupFailure::class]['mail']['en']['outroLines'] = [];
-        $this->outputs[\App\Notifications\AdminWordPressCreateGroupFailure::class]['mail']['en']['outroLines'][0] = 'If you would like to stop receiving these emails, please visit <a href="http://restarters.test:8000/user/edit/10001#list-email-preferences">your preferences</a> on your account.';
+        $this->outputs[\App\Notifications\AdminWordPressCreateGroupFailure::class]['mail']['en']['outroLines'][0] = 'If you would like to stop receiving these emails, please visit <a href="' . $domain . '/user/edit/10001#list-email-preferences">your preferences</a> on your account.';
         $this->outputs[\App\Notifications\AdminWordPressCreateGroupFailure::class]['mail']['en']['actionText'] = 'View group';
         $this->outputs[\App\Notifications\AdminWordPressCreateGroupFailure::class]['mail']['en']['actionUrl'] = 'https://groupurl';
         $this->outputs[\App\Notifications\AdminWordPressCreateGroupFailure::class]['mail']['en']['displayableActionUrl'] = 'https://groupurl';
@@ -366,7 +368,7 @@ class NotificationsTest extends TestCase
         $this->outputs[\App\Notifications\AdminWordPressCreateGroupFailure::class]['mail']['fr']['introLines'] = [];
         $this->outputs[\App\Notifications\AdminWordPressCreateGroupFailure::class]['mail']['fr']['introLines'][0] = 'Error creating group page for \'Group Name\' on WordPress.';
         $this->outputs[\App\Notifications\AdminWordPressCreateGroupFailure::class]['mail']['fr']['outroLines'] = [];
-        $this->outputs[\App\Notifications\AdminWordPressCreateGroupFailure::class]['mail']['fr']['outroLines'][0] = 'If you would like to stop receiving these emails, please visit <a href="http://restarters.test:8000/user/edit/10002#list-email-preferences">your preferences</a> on your account.';
+        $this->outputs[\App\Notifications\AdminWordPressCreateGroupFailure::class]['mail']['fr']['outroLines'][0] = 'If you would like to stop receiving these emails, please visit <a href="' . $domain . '/user/edit/10002#list-email-preferences">your preferences</a> on your account.';
         $this->outputs[\App\Notifications\AdminWordPressCreateGroupFailure::class]['mail']['fr']['actionText'] = 'Voir le Repair Café';
         $this->outputs[\App\Notifications\AdminWordPressCreateGroupFailure::class]['mail']['fr']['actionUrl'] = 'https://groupurl';
         $this->outputs[\App\Notifications\AdminWordPressCreateGroupFailure::class]['mail']['fr']['displayableActionUrl'] = 'https://groupurl';
@@ -389,7 +391,7 @@ class NotificationsTest extends TestCase
         $this->outputs[\App\Notifications\AdminWordPressEditEventFailure::class]['mail']['en']['introLines'] = [];
         $this->outputs[\App\Notifications\AdminWordPressEditEventFailure::class]['mail']['en']['introLines'][0] = 'Event \'Event Venue\' failed to post to WordPress during an edit to the event.';
         $this->outputs[\App\Notifications\AdminWordPressEditEventFailure::class]['mail']['en']['outroLines'] = [];
-        $this->outputs[\App\Notifications\AdminWordPressEditEventFailure::class]['mail']['en']['outroLines'][0] = 'If you would like to stop receiving these emails, please visit <a href="http://restarters.test:8000/user/edit/10001#list-email-preferences">your preferences</a> on your account.';
+        $this->outputs[\App\Notifications\AdminWordPressEditEventFailure::class]['mail']['en']['outroLines'][0] = 'If you would like to stop receiving these emails, please visit <a href="' . $domain . '/user/edit/10001#list-email-preferences">your preferences</a> on your account.';
         $this->outputs[\App\Notifications\AdminWordPressEditEventFailure::class]['mail']['en']['actionText'] = 'View event';
         $this->outputs[\App\Notifications\AdminWordPressEditEventFailure::class]['mail']['en']['actionUrl'] = 'https://eventurl';
         $this->outputs[\App\Notifications\AdminWordPressEditEventFailure::class]['mail']['en']['displayableActionUrl'] = 'https://eventurl';
@@ -401,7 +403,7 @@ class NotificationsTest extends TestCase
         $this->outputs[\App\Notifications\AdminWordPressEditEventFailure::class]['mail']['fr']['introLines'] = [];
         $this->outputs[\App\Notifications\AdminWordPressEditEventFailure::class]['mail']['fr']['introLines'][0] = 'L\'événement \'Event Venue\' n\'a pas pu être publié sur WordPress lors d\'une modification de l\'événement.';
         $this->outputs[\App\Notifications\AdminWordPressEditEventFailure::class]['mail']['fr']['outroLines'] = [];
-        $this->outputs[\App\Notifications\AdminWordPressEditEventFailure::class]['mail']['fr']['outroLines'][0] = 'If you would like to stop receiving these emails, please visit <a href="http://restarters.test:8000/user/edit/10002#list-email-preferences">your preferences</a> on your account.';
+        $this->outputs[\App\Notifications\AdminWordPressEditEventFailure::class]['mail']['fr']['outroLines'][0] = 'If you would like to stop receiving these emails, please visit <a href="' . $domain . '/user/edit/10002#list-email-preferences">your preferences</a> on your account.';
         $this->outputs[\App\Notifications\AdminWordPressEditEventFailure::class]['mail']['fr']['actionText'] = 'Voir l\'événement';
         $this->outputs[\App\Notifications\AdminWordPressEditEventFailure::class]['mail']['fr']['actionUrl'] = 'https://eventurl';
         $this->outputs[\App\Notifications\AdminWordPressEditEventFailure::class]['mail']['fr']['displayableActionUrl'] = 'https://eventurl';
@@ -426,7 +428,7 @@ class NotificationsTest extends TestCase
         $this->outputs[\App\Notifications\DeleteEventFromWordpressFailed::class]['mail']['en']['introLines'][1] = '';
         $this->outputs[\App\Notifications\DeleteEventFromWordpressFailed::class]['mail']['en']['introLines'][2] = 'Please find and delete this event manually from WordPress.';
         $this->outputs[\App\Notifications\DeleteEventFromWordpressFailed::class]['mail']['en']['introLines'][3] = '';
-        $this->outputs[\App\Notifications\DeleteEventFromWordpressFailed::class]['mail']['en']['introLines'][4] = 'If you would like to stop receiving these emails, please visit <a href="http://restarters.test:8000/user/edit/10001#list-email-preferences">your preferences</a> on your account.';
+        $this->outputs[\App\Notifications\DeleteEventFromWordpressFailed::class]['mail']['en']['introLines'][4] = 'If you would like to stop receiving these emails, please visit <a href="' . $domain . '/user/edit/10001#list-email-preferences">your preferences</a> on your account.';
         $this->outputs[\App\Notifications\DeleteEventFromWordpressFailed::class]['mail']['en']['outroLines'] = [];
         $this->outputs[\App\Notifications\DeleteEventFromWordpressFailed::class]['mail']['en']['actionText'] = NULL;
         $this->outputs[\App\Notifications\DeleteEventFromWordpressFailed::class]['mail']['en']['actionUrl'] = NULL;
@@ -441,7 +443,7 @@ class NotificationsTest extends TestCase
         $this->outputs[\App\Notifications\DeleteEventFromWordpressFailed::class]['mail']['fr']['introLines'][1] = '';
         $this->outputs[\App\Notifications\DeleteEventFromWordpressFailed::class]['mail']['fr']['introLines'][2] = 'Veuillez rechercher et supprimer cet événement manuellement de WordPress.';
         $this->outputs[\App\Notifications\DeleteEventFromWordpressFailed::class]['mail']['fr']['introLines'][3] = '';
-        $this->outputs[\App\Notifications\DeleteEventFromWordpressFailed::class]['mail']['fr']['introLines'][4] = 'If you would like to stop receiving these emails, please visit <a href="http://restarters.test:8000/user/edit/10002#list-email-preferences">your preferences</a> on your account.';
+        $this->outputs[\App\Notifications\DeleteEventFromWordpressFailed::class]['mail']['fr']['introLines'][4] = 'If you would like to stop receiving these emails, please visit <a href="' . $domain . '/user/edit/10002#list-email-preferences">your preferences</a> on your account.';
         $this->outputs[\App\Notifications\DeleteEventFromWordpressFailed::class]['mail']['fr']['outroLines'] = [];
         $this->outputs[\App\Notifications\DeleteEventFromWordpressFailed::class]['mail']['fr']['actionText'] = NULL;
         $this->outputs[\App\Notifications\DeleteEventFromWordpressFailed::class]['mail']['fr']['actionUrl'] = NULL;
@@ -461,7 +463,7 @@ class NotificationsTest extends TestCase
         $this->outputs[\App\Notifications\EventDevices::class]['mail']['en']['introLines'] = [];
         $this->outputs[\App\Notifications\EventDevices::class]['mail']['en']['introLines'][0] = 'Thank you for hosting the event Event Venue, please help us outline what devices were bought to the event and the status of their repair. This will help us improve the quality of our data.';
         $this->outputs[\App\Notifications\EventDevices::class]['mail']['en']['outroLines'] = [];
-        $this->outputs[\App\Notifications\EventDevices::class]['mail']['en']['outroLines'][0] = 'If you would like to stop receiving these emails, please visit <a href="http://restarters.test:8000/user/edit/10001#list-email-preferences">your preferences</a> on your account.';
+        $this->outputs[\App\Notifications\EventDevices::class]['mail']['en']['outroLines'][0] = 'If you would like to stop receiving these emails, please visit <a href="' . $domain . '/user/edit/10001#list-email-preferences">your preferences</a> on your account.';
         $this->outputs[\App\Notifications\EventDevices::class]['mail']['en']['actionText'] = 'Contribute Data';
         $this->outputs[\App\Notifications\EventDevices::class]['mail']['en']['actionUrl'] = 'https://eventurl';
         $this->outputs[\App\Notifications\EventDevices::class]['mail']['en']['displayableActionUrl'] = 'https://eventurl';
@@ -473,7 +475,7 @@ class NotificationsTest extends TestCase
         $this->outputs[\App\Notifications\EventDevices::class]['mail']['fr']['introLines'] = [];
         $this->outputs[\App\Notifications\EventDevices::class]['mail']['fr']['introLines'][0] = 'Merci d\'avoir organisé l\'événement : aidez-nous à préciser quels appareils ont été amenés pour l\'événement et l\'état de leur réparation. Cela nous aidera à améliorer la qualité de nos données.';
         $this->outputs[\App\Notifications\EventDevices::class]['mail']['fr']['outroLines'] = [];
-        $this->outputs[\App\Notifications\EventDevices::class]['mail']['fr']['outroLines'][0] = 'Si vous souhaitez ne plus recevoir ces courriels, veuillez consulter <a href="http://restarters.test:8000/user/edit/10002">vos préférences</a> sur votre compte.';
+        $this->outputs[\App\Notifications\EventDevices::class]['mail']['fr']['outroLines'][0] = 'Si vous souhaitez ne plus recevoir ces courriels, veuillez consulter <a href="' . $domain . '/user/edit/10002">vos préférences</a> sur votre compte.';
         $this->outputs[\App\Notifications\EventDevices::class]['mail']['fr']['actionText'] = 'Contribuer aux données';
         $this->outputs[\App\Notifications\EventDevices::class]['mail']['fr']['actionUrl'] = 'https://eventurl';
         $this->outputs[\App\Notifications\EventDevices::class]['mail']['fr']['displayableActionUrl'] = 'https://eventurl';
@@ -494,7 +496,7 @@ class NotificationsTest extends TestCase
         $this->outputs[\App\Notifications\EventRepairs::class]['mail']['en']['introLines'] = [];
         $this->outputs[\App\Notifications\EventRepairs::class]['mail']['en']['introLines'][0] = 'Thank you for fixing at the \':name\' event. The host has posted photos of any feedback left by participants and repair data. Please help us to improve the details of the repairs you carried out by adding any useful information or photos you have. Any extra details you can add will help future repair attempts.';
         $this->outputs[\App\Notifications\EventRepairs::class]['mail']['en']['outroLines'] = [];
-        $this->outputs[\App\Notifications\EventRepairs::class]['mail']['en']['outroLines'][0] = 'If you would like to stop receiving these emails, please visit <a href="http://restarters.test:8000/user/edit/10001#list-email-preferences">your preferences</a> on your account.';
+        $this->outputs[\App\Notifications\EventRepairs::class]['mail']['en']['outroLines'][0] = 'If you would like to stop receiving these emails, please visit <a href="' . $domain . '/user/edit/10001#list-email-preferences">your preferences</a> on your account.';
         $this->outputs[\App\Notifications\EventRepairs::class]['mail']['en']['actionText'] = 'Contribute repair info';
         $this->outputs[\App\Notifications\EventRepairs::class]['mail']['en']['actionUrl'] = 'https://eventurl';
         $this->outputs[\App\Notifications\EventRepairs::class]['mail']['en']['displayableActionUrl'] = 'https://eventurl';
@@ -506,7 +508,7 @@ class NotificationsTest extends TestCase
         $this->outputs[\App\Notifications\EventRepairs::class]['mail']['fr']['introLines'] = [];
         $this->outputs[\App\Notifications\EventRepairs::class]['mail']['fr']['introLines'][0] = 'Merci d\'avoir réparé à l\'événement \':name\'. L\'hôte a mis en ligne des photos des commentaires laissés par les participants et des données sur les réparations. Veuillez nous aider à améliorer les détails des réparations que vous avez effectuées en ajoutant toute information utile ou toute photo dont vous disposez. Tous les détails supplémentaires que vous pouvez ajouter aideront les futures tentatives de réparation.';
         $this->outputs[\App\Notifications\EventRepairs::class]['mail']['fr']['outroLines'] = [];
-        $this->outputs[\App\Notifications\EventRepairs::class]['mail']['fr']['outroLines'][0] = 'Si vous souhaitez ne plus recevoir ces courriels, veuillez consulter <a href="http://restarters.test:8000/user/edit/10002">vos préférences</a> sur votre compte.';
+        $this->outputs[\App\Notifications\EventRepairs::class]['mail']['fr']['outroLines'][0] = 'Si vous souhaitez ne plus recevoir ces courriels, veuillez consulter <a href="' . $domain . '/user/edit/10002">vos préférences</a> sur votre compte.';
         $this->outputs[\App\Notifications\EventRepairs::class]['mail']['fr']['actionText'] = 'Contribuer aux informations sur les réparations';
         $this->outputs[\App\Notifications\EventRepairs::class]['mail']['fr']['actionUrl'] = 'https://eventurl';
         $this->outputs[\App\Notifications\EventRepairs::class]['mail']['fr']['displayableActionUrl'] = 'https://eventurl';
@@ -569,7 +571,7 @@ class NotificationsTest extends TestCase
         $this->outputs[\App\Notifications\NewDiscourseMember::class]['mail']['en']['salutation'] = NULL;
         $this->outputs[\App\Notifications\NewDiscourseMember::class]['mail']['en']['introLines'] = [];
         $this->outputs[\App\Notifications\NewDiscourseMember::class]['mail']['en']['introLines'][0] = 'Thank you for following Group Name! You will now receive notifications when new events are planned and will be added to group messages. <a href="https://talk.restarters.net/t/how-to-communicate-with-your-repair-group/6293">Learn how group messages work and how to change your notification settings</a>.';
-        $this->outputs[\App\Notifications\NewDiscourseMember::class]['mail']['en']['introLines'][1] = 'If you would like to stop receiving these emails, please visit <a href="http://restarters.test:8000/user/edit/10001#list-email-preferences">your preferences</a> on your account.';
+        $this->outputs[\App\Notifications\NewDiscourseMember::class]['mail']['en']['introLines'][1] = 'If you would like to stop receiving these emails, please visit <a href="' . $domain . '/user/edit/10001#list-email-preferences">your preferences</a> on your account.';
         $this->outputs[\App\Notifications\NewDiscourseMember::class]['mail']['en']['outroLines'] = [];
         $this->outputs[\App\Notifications\NewDiscourseMember::class]['mail']['en']['actionText'] = NULL;
         $this->outputs[\App\Notifications\NewDiscourseMember::class]['mail']['en']['actionUrl'] = NULL;
@@ -581,7 +583,7 @@ class NotificationsTest extends TestCase
         $this->outputs[\App\Notifications\NewDiscourseMember::class]['mail']['fr']['salutation'] = NULL;
         $this->outputs[\App\Notifications\NewDiscourseMember::class]['mail']['fr']['introLines'] = [];
         $this->outputs[\App\Notifications\NewDiscourseMember::class]['mail']['fr']['introLines'][0] = 'Thank you for following Group Name! You will now receive notifications when new events are planned and will be added to group messages. <a href="https://talk.restarters.net/t/how-to-communicate-with-your-repair-group/6293">Learn how group messages work and how to change your notification settings</a>.';
-        $this->outputs[\App\Notifications\NewDiscourseMember::class]['mail']['fr']['introLines'][1] = 'If you would like to stop receiving these emails, please visit <a href="http://restarters.test:8000/user/edit/10002#list-email-preferences">your preferences</a> on your account.';
+        $this->outputs[\App\Notifications\NewDiscourseMember::class]['mail']['fr']['introLines'][1] = 'If you would like to stop receiving these emails, please visit <a href="' . $domain . '/user/edit/10002#list-email-preferences">your preferences</a> on your account.';
         $this->outputs[\App\Notifications\NewDiscourseMember::class]['mail']['fr']['outroLines'] = [];
         $this->outputs[\App\Notifications\NewDiscourseMember::class]['mail']['fr']['actionText'] = NULL;
         $this->outputs[\App\Notifications\NewDiscourseMember::class]['mail']['fr']['actionUrl'] = NULL;
@@ -603,7 +605,7 @@ class NotificationsTest extends TestCase
         $this->outputs[\App\Notifications\NewGroupMember::class]['mail']['en']['introLines'] = [];
         $this->outputs[\App\Notifications\NewGroupMember::class]['mail']['en']['introLines'][0] = 'A new volunteer, User Name, has followed your group \'Group Name\'.';
         $this->outputs[\App\Notifications\NewGroupMember::class]['mail']['en']['outroLines'] = [];
-        $this->outputs[\App\Notifications\NewGroupMember::class]['mail']['en']['outroLines'][0] = 'If you would like to stop receiving these emails, please visit <a href="http://restarters.test:8000/user/edit/10001#list-email-preferences">your preferences</a> on your account.';
+        $this->outputs[\App\Notifications\NewGroupMember::class]['mail']['en']['outroLines'][0] = 'If you would like to stop receiving these emails, please visit <a href="' . $domain . '/user/edit/10001#list-email-preferences">your preferences</a> on your account.';
         $this->outputs[\App\Notifications\NewGroupMember::class]['mail']['en']['actionText'] = 'Go to group';
         $this->outputs[\App\Notifications\NewGroupMember::class]['mail']['en']['actionUrl'] = 'https://groupurl';
         $this->outputs[\App\Notifications\NewGroupMember::class]['mail']['en']['displayableActionUrl'] = 'https://groupurl';
@@ -615,7 +617,7 @@ class NotificationsTest extends TestCase
         $this->outputs[\App\Notifications\NewGroupMember::class]['mail']['fr']['introLines'] = [];
         $this->outputs[\App\Notifications\NewGroupMember::class]['mail']['fr']['introLines'][0] = 'Un nouveau volontaire, User Name, a suivi votre Repair Café \'Group Name\'.';
         $this->outputs[\App\Notifications\NewGroupMember::class]['mail']['fr']['outroLines'] = [];
-        $this->outputs[\App\Notifications\NewGroupMember::class]['mail']['fr']['outroLines'][0] = 'Si vous souhaitez ne plus recevoir ces courriels, veuillez consulter <a href="http://restarters.test:8000/user/edit/10002">vos préférences</a> sur votre compte.';
+        $this->outputs[\App\Notifications\NewGroupMember::class]['mail']['fr']['outroLines'][0] = 'Si vous souhaitez ne plus recevoir ces courriels, veuillez consulter <a href="' . $domain . '/user/edit/10002">vos préférences</a> sur votre compte.';
         $this->outputs[\App\Notifications\NewGroupMember::class]['mail']['fr']['actionText'] = 'Aller au Repair Café';
         $this->outputs[\App\Notifications\NewGroupMember::class]['mail']['fr']['actionUrl'] = 'https://groupurl';
         $this->outputs[\App\Notifications\NewGroupMember::class]['mail']['fr']['displayableActionUrl'] = 'https://groupurl';
@@ -638,7 +640,7 @@ class NotificationsTest extends TestCase
         $this->outputs[\App\Notifications\NewGroupWithinRadius::class]['mail']['en']['introLines'] = [];
         $this->outputs[\App\Notifications\NewGroupWithinRadius::class]['mail']['en']['introLines'][0] = 'A new group near to you, Group Name, has just become active on Restarters.net.';
         $this->outputs[\App\Notifications\NewGroupWithinRadius::class]['mail']['en']['outroLines'] = [];
-        $this->outputs[\App\Notifications\NewGroupWithinRadius::class]['mail']['en']['outroLines'][0] = 'If you would like to stop receiving these emails, please visit <a href="http://restarters.test:8000/user/edit/10001#list-email-preferences">your preferences</a> on your account.';
+        $this->outputs[\App\Notifications\NewGroupWithinRadius::class]['mail']['en']['outroLines'][0] = 'If you would like to stop receiving these emails, please visit <a href="' . $domain . '/user/edit/10001#list-email-preferences">your preferences</a> on your account.';
         $this->outputs[\App\Notifications\NewGroupWithinRadius::class]['mail']['en']['actionText'] = 'Find out more about Group Name';
         $this->outputs[\App\Notifications\NewGroupWithinRadius::class]['mail']['en']['actionUrl'] = 'https://groupurl';
         $this->outputs[\App\Notifications\NewGroupWithinRadius::class]['mail']['en']['displayableActionUrl'] = 'https://groupurl';
@@ -650,7 +652,7 @@ class NotificationsTest extends TestCase
         $this->outputs[\App\Notifications\NewGroupWithinRadius::class]['mail']['fr']['introLines'] = [];
         $this->outputs[\App\Notifications\NewGroupWithinRadius::class]['mail']['fr']['introLines'][0] = 'Un nouveau Repair Café près de chez vous, Group Name, vient de devenir actif sur Restarters.net.';
         $this->outputs[\App\Notifications\NewGroupWithinRadius::class]['mail']['fr']['outroLines'] = [];
-        $this->outputs[\App\Notifications\NewGroupWithinRadius::class]['mail']['fr']['outroLines'][0] = 'Si vous souhaitez ne plus recevoir ces courriels, veuillez consulter <a href="http://restarters.test:8000/user/edit/10002">vos préférences</a> sur votre compte.';
+        $this->outputs[\App\Notifications\NewGroupWithinRadius::class]['mail']['fr']['outroLines'][0] = 'Si vous souhaitez ne plus recevoir ces courriels, veuillez consulter <a href="' . $domain . '/user/edit/10002">vos préférences</a> sur votre compte.';
         $this->outputs[\App\Notifications\NewGroupWithinRadius::class]['mail']['fr']['actionText'] = 'En savoir plus sur Group Name';
         $this->outputs[\App\Notifications\NewGroupWithinRadius::class]['mail']['fr']['actionUrl'] = 'https://groupurl';
         $this->outputs[\App\Notifications\NewGroupWithinRadius::class]['mail']['fr']['displayableActionUrl'] = 'https://groupurl';
@@ -708,7 +710,7 @@ class NotificationsTest extends TestCase
         $this->outputs[\App\Notifications\NotifyRestartersOfNewEvent::class]['mail']['en']['introLines'] = [];
         $this->outputs[\App\Notifications\NotifyRestartersOfNewEvent::class]['mail']['en']['introLines'][0] = 'There has been a new event added to your group: \'Event Venue\'.';
         $this->outputs[\App\Notifications\NotifyRestartersOfNewEvent::class]['mail']['en']['outroLines'] = [];
-        $this->outputs[\App\Notifications\NotifyRestartersOfNewEvent::class]['mail']['en']['outroLines'][0] = 'If you would like to stop receiving these emails, please visit <a href="http://restarters.test:8000/user/edit/10001#list-email-preferences">your preferences</a> on your account.';
+        $this->outputs[\App\Notifications\NotifyRestartersOfNewEvent::class]['mail']['en']['outroLines'][0] = 'If you would like to stop receiving these emails, please visit <a href="' . $domain . '/user/edit/10001#list-email-preferences">your preferences</a> on your account.';
         $this->outputs[\App\Notifications\NotifyRestartersOfNewEvent::class]['mail']['en']['actionText'] = 'View event';
         $this->outputs[\App\Notifications\NotifyRestartersOfNewEvent::class]['mail']['en']['actionUrl'] = 'https://eventurl';
         $this->outputs[\App\Notifications\NotifyRestartersOfNewEvent::class]['mail']['en']['displayableActionUrl'] = 'https://eventurl';
@@ -720,7 +722,7 @@ class NotificationsTest extends TestCase
         $this->outputs[\App\Notifications\NotifyRestartersOfNewEvent::class]['mail']['fr']['introLines'] = [];
         $this->outputs[\App\Notifications\NotifyRestartersOfNewEvent::class]['mail']['fr']['introLines'][0] = 'Un nouvel événement a été ajouté à votre Repair Café : \'Event Venue\'.';
         $this->outputs[\App\Notifications\NotifyRestartersOfNewEvent::class]['mail']['fr']['outroLines'] = [];
-        $this->outputs[\App\Notifications\NotifyRestartersOfNewEvent::class]['mail']['fr']['outroLines'][0] = 'Si vous souhaitez ne plus recevoir ces courriels, veuillez consulter <a href="http://restarters.test:8000/user/edit/10002">vos préférences</a> sur votre compte.';
+        $this->outputs[\App\Notifications\NotifyRestartersOfNewEvent::class]['mail']['fr']['outroLines'][0] = 'Si vous souhaitez ne plus recevoir ces courriels, veuillez consulter <a href="' . $domain . '/user/edit/10002">vos préférences</a> sur votre compte.';
         $this->outputs[\App\Notifications\NotifyRestartersOfNewEvent::class]['mail']['fr']['actionText'] = 'Voir l\'événement';
         $this->outputs[\App\Notifications\NotifyRestartersOfNewEvent::class]['mail']['fr']['actionUrl'] = 'https://eventurl';
         $this->outputs[\App\Notifications\NotifyRestartersOfNewEvent::class]['mail']['fr']['displayableActionUrl'] = 'https://eventurl';
@@ -772,7 +774,7 @@ class NotificationsTest extends TestCase
         $this->outputs[\App\Notifications\RSVPEvent::class]['mail']['en']['introLines'] = [];
         $this->outputs[\App\Notifications\RSVPEvent::class]['mail']['en']['introLines'][0] = 'A volunteer, User Name, has RSVPed to the \'Event Venue\' event.';
         $this->outputs[\App\Notifications\RSVPEvent::class]['mail']['en']['outroLines'] = [];
-        $this->outputs[\App\Notifications\RSVPEvent::class]['mail']['en']['outroLines'][0] = 'If you would like to stop receiving these emails, please visit <a href="http://restarters.test:8000/user/edit/10001#list-email-preferences">your preferences</a> on your account.';
+        $this->outputs[\App\Notifications\RSVPEvent::class]['mail']['en']['outroLines'][0] = 'If you would like to stop receiving these emails, please visit <a href="' . $domain . '/user/edit/10001#list-email-preferences">your preferences</a> on your account.';
         $this->outputs[\App\Notifications\RSVPEvent::class]['mail']['en']['actionText'] = 'View your event';
         $this->outputs[\App\Notifications\RSVPEvent::class]['mail']['en']['actionUrl'] = 'https://eventurl';
         $this->outputs[\App\Notifications\RSVPEvent::class]['mail']['en']['displayableActionUrl'] = 'https://eventurl';
@@ -784,7 +786,7 @@ class NotificationsTest extends TestCase
         $this->outputs[\App\Notifications\RSVPEvent::class]['mail']['fr']['introLines'] = [];
         $this->outputs[\App\Notifications\RSVPEvent::class]['mail']['fr']['introLines'][0] = 'Un volontaire, User Name, s\'est inscrit à l\'événement \'Event Venue\'.';
         $this->outputs[\App\Notifications\RSVPEvent::class]['mail']['fr']['outroLines'] = [];
-        $this->outputs[\App\Notifications\RSVPEvent::class]['mail']['fr']['outroLines'][0] = 'If you would like to stop receiving these emails, please visit <a href="http://restarters.test:8000/user/edit/10002#list-email-preferences">your preferences</a> on your account.';
+        $this->outputs[\App\Notifications\RSVPEvent::class]['mail']['fr']['outroLines'][0] = 'If you would like to stop receiving these emails, please visit <a href="' . $domain . '/user/edit/10002#list-email-preferences">your preferences</a> on your account.';
         $this->outputs[\App\Notifications\RSVPEvent::class]['mail']['fr']['actionText'] = 'Voir votre événement';
         $this->outputs[\App\Notifications\RSVPEvent::class]['mail']['fr']['actionUrl'] = 'https://eventurl';
         $this->outputs[\App\Notifications\RSVPEvent::class]['mail']['fr']['displayableActionUrl'] = 'https://eventurl';

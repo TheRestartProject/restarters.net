@@ -345,27 +345,26 @@ class Party extends Model implements Auditable
     #[Scope]
     protected function upcomingEventsInUserArea($query, $user)
     {
-        // We want to exclude groups which we are a member of, but include ones where we have been invited but
-        // not yet joined.
         $exclude_group_ids = UserGroups::where('user', $user->id)->where('status', 1)->pluck('group')->toArray();
 
         // We also want to exclude any groups which are not yet approved.
         $exclude_group_ids = array_merge($exclude_group_ids, Group::where('approved', false)->pluck('idgroups')->toArray());
 
-        return $this
-      ->select('`events`.*, ( 6371 * acos( cos( radians('.$user->latitude.') ) * cos( radians( events.latitude ) ) * cos( radians( events.longitude ) - radians('.$user->longitude.') ) + sin( radians('.$user->latitude.') ) * sin( radians( events.latitude ) ) ) ) AS distance')
-      ->join('groups', 'groups.idgroups', '=', 'events.group')
-      ->join('group_network', 'groups.idgroups', '=', 'group_network.group_id')
-      ->join('networks', 'networks.id', '=', 'group_network.network_id')
-      ->join('users_groups', 'users_groups.group', '=', 'groups.idgroups')
-      ->where(function ($query) use ($exclude_group_ids) {
-          $query->whereNotIn('events.group', $exclude_group_ids)
-        ->where('event_start_utc', '>=', date('Y-m-d H:i:s'));
-      })
-      ->having('distance', '<=', User::NEARBY_KM)
-      ->groupBy('events.idevents')
-      ->orderBy('events.event_start_utc', 'ASC')
-      ->orderBy('distance', 'ASC');
+        return $query
+            ->selectRaw('`events`.*, ( 6371 * acos( cos( radians(?) ) * cos( radians( events.latitude ) ) * cos( radians( events.longitude ) - radians(?) ) + sin( radians(?) ) * sin( radians( events.latitude ) ) ) ) AS distance', 
+                [$user->latitude, $user->longitude, $user->latitude])
+            ->join('groups', 'groups.idgroups', '=', 'events.group')
+            ->join('group_network', 'groups.idgroups', '=', 'group_network.group_id')
+            ->join('networks', 'networks.id', '=', 'group_network.network_id')
+            ->join('users_groups', 'users_groups.group', '=', 'groups.idgroups')
+            ->where(function ($query) use ($exclude_group_ids) {
+                $query->whereNotIn('events.group', $exclude_group_ids)
+                    ->where('event_start_utc', '>=', date('Y-m-d H:i:s'));
+            })
+            ->having('distance', '<=', User::NEARBY_KM)
+            ->groupBy('events.idevents')
+            ->orderBy('events.event_start_utc', 'ASC')
+            ->orderBy('distance', 'ASC');
     }
 
     public function allDevices(): HasMany
@@ -451,19 +450,23 @@ class Party extends Model implements Auditable
     }
 
     /**
-     * [isStartingSoon description]
-     * If the event is not of today = false
-     * If the event is in progress = false
-     * If the event has finished = false
-     * If the event is of today, is not in progress and has not finished = true.
-     * @author Christopher Kelker
-     * @date   2019-06-13T15:48:05+010
+     * Is this event starting soon?
+     * 
+     * @return bool True if the event is starting soon (within the next 3 hours), but has not yet started
      */
     public function isStartingSoon(): bool
     {
         $start = Carbon::parse($this->event_start_utc);
+        $now = Carbon::now();
 
-        if (!$this->isInProgress() && !$this->hasFinished() && $start->isCurrentDay()) {
+        // An event is starting soon if:
+        // 1. It has not started yet (not in progress and not finished)
+        // 2. It will start in the future (after now)
+        // 3. It will start within the next 3 hours (not far in the future)
+        if (!$this->isInProgress() && 
+            !$this->hasFinished() && 
+            $start->gt($now) && 
+            $now->diffInHours($start) <= 3) {
             return true;
         }
 

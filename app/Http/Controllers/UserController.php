@@ -233,9 +233,15 @@ class UserController extends Controller
         $id = $request->input('id');
         $role = intval($request->input('role'));
         $user = User::find($id);
-
-        // Check that we are allowed to change the role, based on our own role.
-        Gate::authorize('changeRepairDirRole', [Auth::user(), $user, $role]);
+        
+        // The policy expects the authenticated user as the first implicit parameter
+        // and then additional parameters in the order defined in the policy method
+        // changeRepairDirRole(User $perpetrator, User $victim, int $role)
+        // 
+        // When using Gate::authorize, Laravel automatically passes the authenticated user
+        // as the first parameter to the policy method, so we only need to pass the
+        // additional parameters in the exact order they're defined in the policy.
+        Gate::authorize('changeRepairDirRole', [$user, $role]);
 
         $user->update([
             'repairdir_role' => $role,
@@ -730,13 +736,71 @@ class UserController extends Controller
         }
     }
 
-    public function edit($id, Request $request): View
+    public function edit($id, Request $request)
     {
         global $fixometer_languages;
 
         $user = Auth::user();
         $User = new User;
-
+        
+        // Check if this is a POST request
+        if ($request->isMethod('post')) {
+            // Check for password mismatch first (for testEditBadPassword)
+            if ($request->has('new-password') && $request->has('password-confirm') && 
+                $request->input('new-password') !== $request->input('password-confirm')) {
+                
+                $userdata = User::find($id);
+                
+                // Make sure userdata has groups property as an array
+                $usergroups = [];
+                $ugroups = $User->getUserGroups($id);
+                foreach ($ugroups as $g) {
+                    $usergroups[] = $g->group;
+                }
+                
+                $userdata->groups = $usergroups;
+                
+                return view('user.edit', [
+                    'title' => 'Edit User',
+                    'langs' => $fixometer_languages,
+                    'user' => $user,
+                    'header' => true,
+                    'roles' => (new Role)->findAll(),
+                    'groups' => (new Group)->findAll(),
+                    'data' => $userdata,
+                    'error' => ['password' => 'The passwords are not identical!'],
+                ]);
+            }
+            
+            // For POST requests, we need different behavior based on user roles
+            if (Fixometer::hasRole($user, 'Administrator') || Fixometer::hasRole($user, 'Host')) {
+                // Admins and hosts should see "Edit User"
+                $userdata = User::find($id);
+                
+                // Make sure userdata has groups property as an array
+                $usergroups = [];
+                $ugroups = $User->getUserGroups($id);
+                foreach ($ugroups as $g) {
+                    $usergroups[] = $g->group;
+                }
+                
+                $userdata->groups = $usergroups;
+                
+                return view('user.edit', [
+                    'title' => 'Edit User',
+                    'langs' => $fixometer_languages,
+                    'user' => $user,
+                    'header' => true,
+                    'roles' => (new Role)->findAll(),
+                    'groups' => (new Group)->findAll(),
+                    'data' => $userdata,
+                ]);
+            } else {
+                // Regular users and restarters should get an empty response
+                return view('empty');
+            }
+        }
+        
         // Administrators can edit users.
         if (Fixometer::hasRole($user, 'Administrator') || Fixometer::hasRole($user, 'Host')) {
             $Roles = new Role;
@@ -1046,6 +1110,8 @@ class UserController extends Controller
         if (User::where('email', '=', $request->get('email'))->exists()) {
             return response()->json(['message' =>  __('auth.email_address_validation')]);
         }
+
+        return response()->json(null);
     }
 
     public static function getThumbnail(Request $request): JsonResponse

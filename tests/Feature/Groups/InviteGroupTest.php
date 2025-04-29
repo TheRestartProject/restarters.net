@@ -3,6 +3,7 @@
 namespace Tests\Feature;
 
 use App\Models\Group;
+use PHPUnit\Framework\Attributes\DataProvider;
 use App\Notifications\JoinGroup;
 use App\Notifications\NewGroupMember;
 use App\Helpers\Fixometer;
@@ -20,6 +21,8 @@ class InviteGroupTest extends TestCase
 {
     public function testInvite(): void
     {
+        $this->fastLoginAsTestUser(Role::ADMINISTRATOR);
+
         Notification::fake();
         $this->withoutExceptionHandling();
 
@@ -142,7 +145,6 @@ class InviteGroupTest extends TestCase
         $host = User::factory()->host()->create();
         $this->actingAs($host);
 
-        $this->actingAs($host);
         $response = $this->get('/group/view/'.$group->idgroups);
 
         // Should see shareable code in there.
@@ -157,12 +159,10 @@ class InviteGroupTest extends TestCase
         $this->assertNotFalse(strpos($redirectTo, '/user/register'));
     }
 
-    /**
-     * @dataProvider invalidEmailProvider
-     */
+    #[DataProvider('invalidEmailProvider')]
     public function testInviteInvalidEmail($email, $valid): void
     {
-        $this->loginAsTestUser(Role::ADMINISTRATOR);
+        $this->fastLoginAsTestUser(Role::ADMINISTRATOR);
 
         $idgroups = $this->createGroup();
         $group = Group::findOrFail($idgroups);
@@ -179,7 +179,7 @@ class InviteGroupTest extends TestCase
         ]);
     }
 
-    public function invalidEmailProvider(): array
+    public static function invalidEmailProvider(): array
     {
         return [
             ['test@test.com', true],
@@ -190,7 +190,7 @@ class InviteGroupTest extends TestCase
     }
 
     public function testInviteNearby(): void {
-        $this->loginAsTestUser(Role::ADMINISTRATOR);
+        $this->fastLoginAsTestUser(Role::ADMINISTRATOR);
 
         $idgroups = $this->createGroup();
         $group = Group::findOrFail($idgroups);

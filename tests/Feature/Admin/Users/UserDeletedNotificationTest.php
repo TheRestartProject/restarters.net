@@ -3,6 +3,7 @@
 namespace Tests\Feature;
 
 use App\Events\UserDeleted;
+use PHPUnit\Framework\Attributes\Test;
 use App\Listeners\DiscourseUserEventSubscriber;
 use App\Notifications\AdminUserDeleted;
 use App\Models\User;
@@ -12,7 +13,7 @@ use Illuminate\Support\Facades\Event;
 
 class UserDeletedNotificationTest extends TestCase
 {
-    /** @test */
+    #[Test]
     public function a_notification_is_sent_to_admins_when_a_user_is_deleted(): void
     {
         Notification::fake();

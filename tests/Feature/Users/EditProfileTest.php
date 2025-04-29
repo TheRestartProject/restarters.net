@@ -3,6 +3,8 @@
 namespace Tests\Feature;
 
 use App\Events\UserUpdated;
+use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\Test;
 use App\Models\Group;
 use App\Helpers\Fixometer;
 use App\Models\Role;
@@ -27,7 +29,7 @@ class EditProfileTest extends TestCase
         DB::statement('SET foreign_key_checks=1');
     }
 
-    /** @test */
+    #[Test]
     // The assertion just tells us that the event is dispatched, not much else.
     // In order to actually check it worked, we need to look at Discourse.
     public function email_address_update_triggers_discourse_sync(): void
@@ -128,17 +130,15 @@ class EditProfileTest extends TestCase
         $this->assertNull($user->longitude);
     }
 
-    public function idProvider(): array {
+    public static function idProvider(): array {
         return [
             [ TRUE ],
             [ FALSE ]
         ];
     }
 
-    /**
-     * @test
-     * @dataProvider idProvider
-     */
+    #[DataProvider('idProvider')]
+    #[Test]
     public function test_tags_update($id): void {
         $user = User::factory()->create();
         $this->actingAs($user);
@@ -182,10 +182,8 @@ class EditProfileTest extends TestCase
         $response = $this->get('/profile/edit/' . ($user->id + 1));
     }
 
-    /**
-     * @test
-     * @dataProvider idProvider
-     */
+    #[DataProvider('idProvider')]
+    #[Test]
     public function image_upload($id): void {
         Storage::fake('avatars');
         $user = User::factory()->create();
@@ -223,9 +221,7 @@ class EditProfileTest extends TestCase
         $response->assertSessionHas('message');
     }
 
-    /**
-     * @test
-     */
+    #[Test]
     public function edit_profile(): void {
         $user = User::factory()->create();
         $this->actingAs($user);

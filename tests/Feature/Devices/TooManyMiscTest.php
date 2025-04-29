@@ -3,6 +3,7 @@
 namespace Tests\Feature;
 
 use App\Models\Device;
+use PHPUnit\Framework\Attributes\DataProvider;
 use App\Notifications\AdminAbnormalDevices;
 use App\Models\Party;
 use App\Models\User;
@@ -12,9 +13,7 @@ use Tests\TestCase;
 
 class TooManyMiscTest extends TestCase
 {
-    /**
-     * @dataProvider provider
-     */
+    #[DataProvider('provider')]
     public function testTooMany($count, $notif): void
     {
         Notification::fake();
@@ -46,7 +45,7 @@ class TooManyMiscTest extends TestCase
         self::assertTrue(true);
     }
 
-    public function provider(): array {
+    public static function provider(): array {
         return [
             [ env('DEVICE_ABNORMAL_MISC_COUNT', 5) - 1, false, ],
             [ env('DEVICE_ABNORMAL_MISC_COUNT', 5), true, ]

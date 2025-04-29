@@ -3,6 +3,8 @@
 namespace Tests\Unit;
 
 use App\Models\Group;
+use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\Test;
 use App\Models\Party;
 use App\Models\Role;
 use App\Models\User;
@@ -17,10 +19,8 @@ use Illuminate\Support\Facades\Artisan;
 
 class TimezoneTest extends TestCase
 {
-    /**
-     * @test
-     * @dataProvider timezoneProvider
-     */
+    #[DataProvider('timezoneProvider')]
+    #[Test]
     public function timezone_inheritance($event, $group, $result, $exception): void {
         $g = Group::factory()->create([
                                                    'timezone' => $group
@@ -43,7 +43,7 @@ class TimezoneTest extends TestCase
         }
     }
 
-    public function timezoneProvider(): array {
+    public static function timezoneProvider(): array {
         return [
             [ NULL, 'Asia/Samarkand', 'Asia/Samarkand', FALSE ],
             [ 'Asia/Samarkand', NULL, 'Asia/Samarkand', FALSE ],
@@ -73,9 +73,7 @@ class TimezoneTest extends TestCase
         self::assertEquals(4.0, $e->lengthInHours());
     }
 
-    /**
-     * @dataProvider timesProvider
-     */
+    #[DataProvider('timesProvider')]
     public function testOrder($date, $tz1, $start1, $end1, $tz2, $start2, $end2, $editstart2, $editend2): void {
         // Two groups in different timezones.
         $g1 = Group::factory()->create([
@@ -158,7 +156,7 @@ class TimezoneTest extends TestCase
         $this->assertEquals($eventData['event_end_utc'], $event->event_end_utc);
     }
 
-    public function timesProvider(): array {
+    public static function timesProvider(): array {
         // The first event must be chronologically later than the second event once timezones are considered.
         return [
             [ '2037-01-15', 'Europe/London', '12:00:00', '12:00:00', 'Europe/Brussels', '12:00:00', '13:00:00', '13:00:00', '14:00:00' ],

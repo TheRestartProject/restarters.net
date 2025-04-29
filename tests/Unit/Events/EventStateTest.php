@@ -3,6 +3,8 @@
 namespace Tests\Unit;
 
 use App\Models\Group;
+use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\Test;
 use App\Helpers\Fixometer;
 use App\Helpers\RepairNetworkService;
 use App\Models\Network;
@@ -28,7 +30,7 @@ class EventStateTest extends TestCase
         $this->group->makeMemberAHost($this->host);
     }
 
-    /** @test */
+    #[Test]
     public function it_is_active_during_an_event(): void
     {
         // arrange
@@ -40,7 +42,7 @@ class EventStateTest extends TestCase
         $this->assertTrue($event->isInProgress());
     }
 
-    /** @test */
+    #[Test]
     public function it_is_active_at_the_start_time(): void
     {
         // arrange
@@ -52,7 +54,7 @@ class EventStateTest extends TestCase
         $this->assertTrue($event->isInProgress());
     }
 
-    /** @test */
+    #[Test]
     public function it_doesnt_start_an_hour_early(): void {
         $event = Party::factory()->create();
 
@@ -61,7 +63,7 @@ class EventStateTest extends TestCase
         $this->assertFalse($event->isInProgress());
     }
 
-    /** @test */
+    #[Test]
     public function is_doesnt_start_too_soon(): void {
         $event = Party::factory()->create();
         $event->event_start_utc = Carbon::now()->addMinutes(65)->toIso8601String();
@@ -70,9 +72,7 @@ class EventStateTest extends TestCase
         $this->assertFalse($event->isInProgress());
     }
 
-    /**
-     * @dataProvider timeProvider
-     */
+    #[DataProvider('timeProvider')]
     public function testStatesOnViewPage($date, $upcoming, $finished, $inprogress, $startingsoon): void {
 
         $idevents = $this->createEvent($this->group->idgroups, $date);
@@ -93,7 +93,7 @@ class EventStateTest extends TestCase
         self::assertEquals($startingsoon, $initialEvent['startingsoon']);
     }
 
-    public function timeProvider(): array {
+    public static function timeProvider(): array {
         return [
             // Past event
             [ '2000-01-01 12:00', false, true, false, false ],

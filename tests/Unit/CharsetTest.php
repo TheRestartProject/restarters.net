@@ -3,6 +3,7 @@
 namespace Tests\Unit;
 
 use App\Models\Device;
+use PHPUnit\Framework\Attributes\Test;
 use App\Models\Group;
 use App\Models\Network;
 use App\Models\Party;
@@ -21,7 +22,7 @@ class CharsetTest extends TestCase
         parent::setUp();
     }
 
-    /** @test */
+    #[Test]
     public function test_charset_db_insert(): void
     {
         DB::statement('SET foreign_key_checks=0');

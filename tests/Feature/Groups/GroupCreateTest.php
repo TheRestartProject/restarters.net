@@ -3,6 +3,7 @@
 namespace Tests\Feature\Groups;
 
 use App\Models\Group;
+use PHPUnit\Framework\Attributes\DataProvider;
 use App\Models\GroupTags;
 use App\Models\Network;
 use App\Notifications\GroupConfirmed;
@@ -14,14 +15,29 @@ use Illuminate\Validation\ValidationException;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Tests\TestCase;
 use Illuminate\Support\Facades\Notification;
+use Illuminate\Support\Facades\DB;
 
 class GroupCreateTest extends TestCase
 {
+
+    protected function setUp(): void
+    {
+        parent::setUp();
+
+        DB::statement('SET FOREIGN_KEY_CHECKS=0');
+        
+        // Clean up any existing data
+        Party::query()->delete();
+        \App\Models\UserGroups::query()->delete();
+        Group::query()->delete();
+        
+        // Re-enable foreign key checks
+        DB::statement('SET FOREIGN_KEY_CHECKS=1');
+    }
+    
     public function testCreate(): void
     {
-        $user = User::factory()->administrator()->create([
-                                                                      'api_token' => '1234',
-                                                                  ]);
+        $user = $this->createUserWithToken(Role::ADMINISTRATOR);
         $this->actingAs($user);
 
         $response = $this->get('/group/create');
@@ -31,7 +47,7 @@ class GroupCreateTest extends TestCase
         $this->assertNotNull($idgroups);
         $group = Group::find($idgroups);
 
-        $response = $this->get('/api/groups?api_token=1234');
+        $response = $this->get('/api/groups?api_token=' . $user->api_token);
         $response->assertSuccessful();
         $ret = json_decode($response->getContent(), TRUE);
         self::assertEquals(1, count($ret));
@@ -75,16 +91,14 @@ class GroupCreateTest extends TestCase
         $this->assertNull($this->createGroup('Test Group', 'https://therestartproject.org', 'zzzzzzzzzzz123', 'Some text', false));
     }
 
-    public function roles(): array {
+    public static function roles(): array {
         return [
             [ 'Administrator'],
             [ 'NetworkCoordinator' ]
         ];
     }
 
-    /**
-     * @dataProvider roles
-     */
+    #[DataProvider('roles')]
     public function testApprove($role): void {
         Notification::fake();
 

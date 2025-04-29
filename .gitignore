@@ -1,8 +1,9 @@
 /node_modules
 /public/storage
 /public/uploads
-/public/devices.csv
+/public/*.csv
 /public/report.html
+events.csv
 npm-debug.log
 yarn-error.log
 .env
@@ -18,6 +19,8 @@ restarters-anonymised.sql
 /.idea
 /.nova
 .dir-locals.el
+.phpunit.result.cache
+.phpunit.cache/
 # The following should be ignored in all branches except production.
 /public/fonts/vendor
 /public/global
@@ -28,3 +31,4 @@ restarters-anonymised.sql
 /public/build
 /public/hot
 /storage/pail
+/storage/api-docs

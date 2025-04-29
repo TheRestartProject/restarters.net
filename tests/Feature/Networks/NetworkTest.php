@@ -3,6 +3,7 @@
 namespace Tests\Feature;
 
 use App\Models\Group;
+use PHPUnit\Framework\Attributes\Test;
 use App\Helpers\RepairNetworkService;
 use App\Models\Network;
 use App\Models\Party;
@@ -22,7 +23,7 @@ class NetworkTest extends TestCase
         $this->networkService = new RepairNetworkService();
     }
 
-    /** @test */
+    #[Test]
     public function network_can_be_created(): void
     {
         $this->withoutExceptionHandling();
@@ -32,7 +33,7 @@ class NetworkTest extends TestCase
         $this->assertNotNull($network);
     }
 
-    /** @test */
+    #[Test]
     public function network_can_be_edited(): void
     {
         $this->withoutExceptionHandling();
@@ -44,7 +45,7 @@ class NetworkTest extends TestCase
         $this->assertEquals('Restart', $network->name);
     }
 
-    /** @test */
+    #[Test]
     public function networks_can_be_queried(): void
     {
         $this->withoutExceptionHandling();
@@ -62,7 +63,7 @@ class NetworkTest extends TestCase
         $this->assertEquals('Restart', $result->name);
     }
 
-    /** @test */
+    #[Test]
     public function groups_can_be_associated_to_network(): void
     {
         $this->withoutExceptionHandling();
@@ -81,7 +82,7 @@ class NetworkTest extends TestCase
         $this->assertTrue($group->isMemberOf($network));
     }
 
-    /** @test */
+    #[Test]
     public function admins_can_associate_group_to_network(): void
     {
         $this->withoutExceptionHandling();
@@ -174,7 +175,7 @@ class NetworkTest extends TestCase
         $this->assertStringContainsString('T', (new Carbon($events[1]['updated_at']))->toIso8601String());
     }
 
-    /** @test */
+    #[Test]
     public function non_admins_cant_associate_group_to_network(): void
     {
         $this->withoutExceptionHandling();
@@ -192,7 +193,7 @@ class NetworkTest extends TestCase
         $this->assertFalse($group->isMemberOf($network));
     }
 
-    /** @test */
+    #[Test]
     public function user_can_be_set_as_coordinator_of_network(): void
     {
         $this->withoutExceptionHandling();
@@ -211,7 +212,7 @@ class NetworkTest extends TestCase
         $this->assertTrue($coordinator->isCoordinatorOf($network));
     }
 
-    /** @test */
+    #[Test]
     public function network_stats_can_be_queried(): void
     {
         $network = Network::factory()->create();
@@ -234,7 +235,7 @@ class NetworkTest extends TestCase
         $this->assertEquals($expectedStats, $stats);
     }
 
-    /** @test */
+    #[Test]
     public function network_page(): void
     {
         $network = Network::factory()->create([
@@ -296,7 +297,7 @@ class NetworkTest extends TestCase
         $response->assertSee(__('networks.index.all_networks_explainer'));
     }
 
-    /** @test */
+    #[Test]
     public function admins_can_edit(): void
     {
         $this->withoutExceptionHandling();
