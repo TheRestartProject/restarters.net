@@ -31,26 +31,4 @@ class DiscourseAccountCreationTest extends DiscourseTestCase
         $response->assertRedirect('dashboard');
         Event::assertDispatched(UserRegistered::class);
     }
-
-    #[Test]
-    public function user_registration_triggers_discourse_sync_attempt(): void
-    {
-        // TODO Not working and agreed to disable for now.
-        $this->assertTrue(true);
-    }
-
-    #[Test]
-    public function user_registration_discourse_sync(): void
-    {
-        // This is a test against a real Discourse instance.
-        // TODO Not working and agreed to disable for now.
-        $this->assertTrue(true);
-    }
-
-    #[Test]
-    public function user_sync(): void
-    {
-        // TODO Not working and agreed to disable for now.
-        $this->assertTrue(true);
-    }
 }
