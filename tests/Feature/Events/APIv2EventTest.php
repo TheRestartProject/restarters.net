@@ -80,16 +80,15 @@ class APIv2EventTest extends TestCase
         $moderationEvents = json_decode($response->getContent(), true);
         
         // Extract all event IDs from the response
-        $eventIds = collect($moderationEvents)->pluck('id')->toArray();
+        // $eventIds = collect($moderationEvents)->pluck('id')->toArray();
+        $eventIds = array_map(fn($event) => $event['id'], $moderationEvents);
         
         // Verify our created events are in the moderation list
         $this->assertContains($id1, $eventIds, "First created event should be in the moderation list");
         $this->assertContains($id2, $eventIds, "Second created event should be in the moderation list");
         
         // Verify our events aren't approved
-        $ourEvents = collect($moderationEvents)->filter(function($event) use ($id1, $id2) {
-            return $event['id'] == $id1 || $event['id'] == $id2;
-        });
+        $ourEvents = array_filter($moderationEvents, fn($event) => $event['id'] == $id1 || $event['id'] == $id2);
         
         foreach ($ourEvents as $event) {
             $this->assertFalse($event['approved'], "Event {$event['id']} should not be approved");
