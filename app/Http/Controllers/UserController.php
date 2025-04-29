@@ -800,8 +800,6 @@ class UserController extends Controller
                 return view('empty');
             }
         }
-
-        // Original GET request handling below
         
         // Administrators can edit users.
         if (Fixometer::hasRole($user, 'Administrator') || Fixometer::hasRole($user, 'Host')) {
