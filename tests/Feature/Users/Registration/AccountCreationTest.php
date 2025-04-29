@@ -147,7 +147,7 @@ class AccountCreationTest extends TestCase
         ]);
 
         // Assert empty response.
-        $this->assertEquals([], json_decode($response->getContent(), true));
+        $this->assertEmpty( json_decode($response->getContent(), true));
     }
 
     public function testAdminCreate(): void
