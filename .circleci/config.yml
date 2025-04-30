@@ -211,7 +211,7 @@ jobs:
       # the create fails, the tests will fail too.
       - run: echo "App\User::create(['name'=>'Jane Bloggs','email'=>'jane@bloggs.net','password'=>Hash::make('passw0rd'),'role'=>2,'consent_past_data'=>'2021-01-01','consent_future_data'=>'2021-01-01','consent_gdpr'=>'2021-01-01']);" | php artisan tinker || true
       # Build the web app.
-      - run: export NODE_OPTIONS=--max-old-space-size=8192;  npm rebuild node-sass; npm run build
+      - run: export NODE_OPTIONS=--max-old-space-size=8192;  npm rebuild node-sass; npm run prod
       - run: npx playwright install
       # Set up a real nginx/fpm server.  This improves the speed of the tests enormously as artisan serve uses the
       # single-threaded php built-in web server.

@@ -14,9 +14,9 @@
 <script>
 import map from '../mixins/map'
 import event from '../mixins/event'
-import ExternalLink from './ExternalLink.vue'
-import CollapsibleSection from './CollapsibleSection.vue'
-import ReadMore from './ReadMore.vue'
+import ExternalLink from './ExternalLink'
+import CollapsibleSection from './CollapsibleSection'
+import ReadMore from './ReadMore'
 
 export default {
   components: {ReadMore, CollapsibleSection, ExternalLink},

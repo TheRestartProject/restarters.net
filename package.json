@@ -1,14 +1,16 @@
 {
     "name": "restarters",
     "private": true,
-    "type": "module",
     "scripts": {
+        "dev": "npm run development",
+        "development": "mix",
+        "watch": "mix watch",
+        "watch-poll": "mix watch -- --watch-options-poll=1000",
+        "hot": "mix watch --hot",
+        "prod": "npm run production",
+        "production": "mix --production",
         "test": "playwright test",
-        "jest": "jest --verbose",
-        "dev": "vite",
-        "build": "vite build",
-        "prebuild": "php artisan lang:js --no-lib resources/js/translations.js",
-        "postbuild": "php artisan translations:check"
+        "jest": "jest --verbose"
     },
     "devDependencies": {
         "@babel/core": "^7.22.8",
@@ -19,11 +21,15 @@
         "axios": "^1.6.4",
         "babel-jest": "^28.1.0",
         "bootstrap": "^4.6.1",
+        "browser-sync": "^2.27.11",
+        "browser-sync-webpack-plugin": "^2.3.0",
         "faker": "^5.5.3",
         "jest": "^28.1.0",
         "jest-environment-jsdom": "^28.1.0",
         "jquery": "3.4.1",
         "jsdom-global": "^3.0.2",
+        "laravel-mix": "^6.0.49",
+        "laravel-mix-bundle-analyzer": "^1.0.5",
         "lodash": "^4.17.21",
         "lodash.mergewith": "^4.6.2",
         "lodash.template": "^4.5.0",
@@ -35,14 +41,11 @@
         "sass": "^1.56.1",
         "sass-loader": "^12.6.0",
         "v8-to-istanbul": "^8.0.0",
-        "vite-plugin-watch-and-run": "^1.7.4",
         "vue": "^2.7.14",
         "vue-loader": "^15.10.1",
         "vue-template-compiler": "^2.7.14",
-        "vite": "^3.0.2",
-        "laravel-vite-plugin": "^0.6.0",
-        "@vitejs/plugin-vue2": "^1.1.2",
-        "concurrently": "^9.0.1"
+        "concurrently": "^9.0.1",
+        "webpack-shell-plugin-next": "^2.3.1"
     },
     "dependencies": {
         "@sentry/tracing": "^6.7.2",

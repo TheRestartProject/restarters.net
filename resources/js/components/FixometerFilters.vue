@@ -97,9 +97,9 @@
   </div>
 </template>
 <script>
-import DeviceCategorySelect from './DeviceCategorySelect.vue'
-import DeviceModel from './DeviceModel.vue'
-import DeviceBrand from './DeviceBrand.vue'
+import DeviceCategorySelect from './DeviceCategorySelect'
+import DeviceModel from './DeviceModel'
+import DeviceBrand from './DeviceBrand'
 import { END_OF_LIFE, FIXED, REPAIRABLE } from '../constants'
 
 export default {

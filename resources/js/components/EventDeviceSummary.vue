@@ -79,8 +79,8 @@
 <script>
 import event from '../mixins/event'
 import { FIXED, REPAIRABLE, END_OF_LIFE, SPARE_PARTS_MANUFACTURER, SPARE_PARTS_THIRD_PARTY } from '../constants'
-import ConfirmModal from './ConfirmModal.vue'
-import EventDevice from './EventDevice.vue'
+import ConfirmModal from './ConfirmModal'
+import EventDevice from './EventDevice'
 
 export default {
   components: {EventDevice, ConfirmModal},

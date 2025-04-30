@@ -32,8 +32,8 @@
 <script>
 import {DEFAULT_PROFILE} from '../constants'
 import group from '../mixins/group'
-import GroupActions from './GroupActions.vue'
-import ExternalLink from './ExternalLink.vue'
+import GroupActions from './GroupActions'
+import ExternalLink from './ExternalLink'
 
 export default {
   components: {ExternalLink, GroupActions},

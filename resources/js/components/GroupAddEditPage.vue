@@ -9,7 +9,7 @@
   </div>
 </template>
 <script>
-import GroupAddEdit from './GroupAddEdit.vue'
+import GroupAddEdit from './GroupAddEdit'
 import auth from '../mixins/auth'
 
 export default {

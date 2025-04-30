@@ -13,9 +13,9 @@
   </div>
 </template>
 <script>
-import GroupEvents from './GroupEvents.vue'
+import GroupEvents from './GroupEvents'
 import auth from '../mixins/auth'
-import AlertBanner from './AlertBanner.vue'
+import AlertBanner from './AlertBanner'
 
 export default {
   components: {

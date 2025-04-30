@@ -1,5 +1,5 @@
 import Vue from "vue";
-import 'bootstrap';
+require('bootstrap');
 import { BootstrapVue } from 'bootstrap-vue'
 Vue.use(BootstrapVue)
 

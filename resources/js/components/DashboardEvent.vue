@@ -27,7 +27,7 @@
 import event from '../mixins/event'
 import moment from 'moment'
 import { DATE_FORMAT, DEFAULT_PROFILE } from '../constants'
-import EventTitle from './EventTitle.vue'
+import EventTitle from './EventTitle'
 
 export default {
   components: {EventTitle},

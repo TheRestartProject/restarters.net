@@ -166,13 +166,13 @@
   </div>
 </template>
 <script>
-import FixometerHeading from './FixometerHeading.vue'
-import FixometerGlobalImpact from './FixometerGlobalImpact.vue'
-import FixometerRecordsTable from './FixometerRecordsTable.vue'
-import FixometerFilters from './FixometerFilters.vue'
-import CollapsibleSection from './CollapsibleSection.vue'
+import FixometerHeading from './FixometerHeading'
+import FixometerGlobalImpact from './FixometerGlobalImpact'
+import FixometerRecordsTable from './FixometerRecordsTable'
+import FixometerFilters from './FixometerFilters'
+import CollapsibleSection from './CollapsibleSection'
 import auth from '../mixins/auth'
-import AlertBanner from './AlertBanner.vue'
+import AlertBanner from './AlertBanner'
 
 export default {
   components: {

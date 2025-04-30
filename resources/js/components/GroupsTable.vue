@@ -111,8 +111,8 @@
 <script>
 import { DATE_FORMAT, DEFAULT_PROFILE } from '../constants'
 import moment from 'moment'
-import GroupsTableFilters from './GroupsTableFilters.vue'
-import ConfirmModal from './ConfirmModal.vue'
+import GroupsTableFilters from './GroupsTableFilters'
+import ConfirmModal from './ConfirmModal'
 import GroupArchivedBadge from "./GroupArchivedBadge.vue";
 
 export default {

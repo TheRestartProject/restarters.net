@@ -23,11 +23,11 @@
 </template>
 <script>
 import auth from '../mixins/auth'
-import AlertBanner from './AlertBanner.vue'
-import DashboardYourGroups from './DashboardYourGroups.vue'
-import DashboardRightSidebar from './DashboardRightSidebar.vue'
-import DiscourseDiscussion from './DiscourseDiscussion.vue'
-import DashboardAddData from './DashboardAddData.vue'
+import AlertBanner from './AlertBanner'
+import DashboardYourGroups from './DashboardYourGroups'
+import DashboardRightSidebar from './DashboardRightSidebar'
+import DiscourseDiscussion from './DiscourseDiscussion'
+import DashboardAddData from './DashboardAddData'
 
 export default {
   components: {DashboardAddData, DashboardYourGroups,DashboardRightSidebar,AlertBanner,DiscourseDiscussion},

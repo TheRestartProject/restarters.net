@@ -16,7 +16,7 @@
   </div>
 </template>
 <script>
-import EventAddEdit from './EventAddEdit.vue'
+import EventAddEdit from './EventAddEdit'
 import auth from '../mixins/auth'
 import event from '../mixins/event'
 

@@ -14,7 +14,7 @@
   </div>
 </template>
 <script>
-import GroupEventScrollTable from './GroupEventScrollTable.vue'
+import GroupEventScrollTable from './GroupEventScrollTable'
 import auth from '../mixins/auth'
 
 export default {

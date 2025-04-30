@@ -23,7 +23,7 @@
   </div>
 </template>
 <script>
-import AddDataModal from "./AddDataModal.vue";
+import AddDataModal from "./AddDataModal";
 
 export default {
   components: { AddDataModal },

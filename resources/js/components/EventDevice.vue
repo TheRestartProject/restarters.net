@@ -85,19 +85,19 @@ import {
   PARTS_PROVIDER_MANUFACTURER,
   PARTS_PROVIDER_THIRD_PARTY, SPARE_PARTS_NOT_NEEDED
 } from '../constants'
-import DeviceCategorySelect from './DeviceCategorySelect.vue'
-import DeviceBrand from './DeviceBrand.vue'
-import DeviceModel from './DeviceModel.vue'
-import DeviceWeight from './DeviceWeight.vue'
-import DeviceAge from './DeviceAge.vue'
-import DeviceType from './DeviceType.vue'
-import DeviceRepairStatus from './DeviceRepairStatus.vue'
-import DeviceProblem from './DeviceProblem.vue'
-import DeviceNotes from './DeviceNotes.vue'
-import DeviceQuantity from './DeviceQuantity.vue'
-import FileUploader from './FileUploader.vue'
-import DeviceImages from './DeviceImages.vue'
-import ConfirmModal from './ConfirmModal.vue'
+import DeviceCategorySelect from './DeviceCategorySelect'
+import DeviceBrand from './DeviceBrand'
+import DeviceModel from './DeviceModel'
+import DeviceWeight from './DeviceWeight'
+import DeviceAge from './DeviceAge'
+import DeviceType from './DeviceType'
+import DeviceRepairStatus from './DeviceRepairStatus'
+import DeviceProblem from './DeviceProblem'
+import DeviceNotes from './DeviceNotes'
+import DeviceQuantity from './DeviceQuantity'
+import FileUploader from './FileUploader'
+import DeviceImages from './DeviceImages'
+import ConfirmModal from './ConfirmModal'
 
 export default {
   components: {

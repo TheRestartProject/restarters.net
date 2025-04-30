@@ -33,7 +33,7 @@
   </div>
 </template>
 <script>
-import DashboardGroup from './DashboardGroup.vue'
+import DashboardGroup from './DashboardGroup'
 export default {
   components: {DashboardGroup},
   props: {

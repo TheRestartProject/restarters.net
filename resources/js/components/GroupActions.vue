@@ -64,7 +64,7 @@
 </template>
 <script>
 import group from '../mixins/group'
-import ConfirmModal from './ConfirmModal.vue'
+import ConfirmModal from './ConfirmModal'
 
 export default {
   components: {ConfirmModal},

@@ -6,8 +6,8 @@
   </div>
 </template>
 <script>
-import EventStatsItems from './EventStatsItems.vue'
-import StatsImpact from './StatsImpact.vue'
+import EventStatsItems from './EventStatsItems'
+import StatsImpact from './StatsImpact'
 
 export default {
   components: {StatsImpact, EventStatsItems},

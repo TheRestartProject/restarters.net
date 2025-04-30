@@ -18,7 +18,7 @@
   </div>
 </template>
 <script>
-import StatsValue from './StatsValue.vue'
+import StatsValue from './StatsValue'
 export default {
   components: {StatsValue},
   props: {

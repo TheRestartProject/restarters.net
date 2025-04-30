@@ -12,8 +12,8 @@
   </div>
 </template>
 <script>
-import FileUploader from './FileUploader.vue'
-import DeviceImage from './DeviceImage.vue'
+import FileUploader from './FileUploader'
+import DeviceImage from './DeviceImage'
 
 export default {
   components: {DeviceImage, FileUploader},

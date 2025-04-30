@@ -37,7 +37,7 @@
 </template>
 <script>
 import event from '../mixins/event'
-import EventDeviceSummary from './EventDeviceSummary.vue'
+import EventDeviceSummary from './EventDeviceSummary'
 
 export default {
   components: {EventDeviceSummary},

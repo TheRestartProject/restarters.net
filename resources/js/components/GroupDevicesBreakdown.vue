@@ -77,8 +77,8 @@
   </div>
 </template>
 <script>
-import GroupDevicesBreakdownCluster from './GroupDevicesBreakdownCluster.vue'
-import CollapsibleSection from './CollapsibleSection.vue'
+import GroupDevicesBreakdownCluster from './GroupDevicesBreakdownCluster'
+import CollapsibleSection from './CollapsibleSection'
 export default {
   components: {CollapsibleSection, GroupDevicesBreakdownCluster},
   props: {

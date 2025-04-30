@@ -11,9 +11,9 @@
   </CollapsibleSection>
 </template>
 <script>
-import CollapsibleSection from './CollapsibleSection.vue'
+import CollapsibleSection from './CollapsibleSection'
 import { DEFAULT_PROFILE, PLACEHOLDER } from '../constants'
-import EventImage from './EventImage.vue'
+import EventImage from './EventImage'
 export default {
   components: {EventImage, CollapsibleSection},
   props: {

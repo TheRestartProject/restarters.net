@@ -82,7 +82,7 @@
   </div>
 </template>
 <script>
-import GroupsTable from './GroupsTable.vue'
+import GroupsTable from './GroupsTable'
 import auth from '../mixins/auth'
 
 export default {

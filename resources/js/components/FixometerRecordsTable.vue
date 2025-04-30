@@ -93,11 +93,11 @@
 <script>
 import { END_OF_LIFE, FIXED, REPAIRABLE } from '../constants'
 import moment from 'moment'
-import DeviceModel from './DeviceModel.vue'
+import DeviceModel from './DeviceModel'
 import Vue from 'vue'
 import lineClamp from 'vue-line-clamp'
-import ConfirmModal from './ConfirmModal.vue'
-import EventDevice from './EventDevice.vue'
+import ConfirmModal from './ConfirmModal'
+import EventDevice from './EventDevice'
 
 Vue.use(lineClamp, {
   textOverflow: 'ellipsis'
