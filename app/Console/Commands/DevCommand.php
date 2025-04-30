@@ -18,7 +18,7 @@ class DevCommand extends Command
                             {--no-server : Do not start the development server}
                             {--no-queue : Do not start the queue worker}
                             {--no-logs : Do not start the log watcher}
-                            {--no-vite : Do not start the Vite dev server}';
+                            {--no-mix : Do not start the Laravel Mix watcher}';
 
     /**
      * The console command description.
@@ -34,7 +34,7 @@ class DevCommand extends Command
         'server' => 'blue',
         'queue' => 'magenta',
         'logs' => 'red',
-        'vite' => 'yellow',
+        'mix' => 'yellow',
     ];
 
     /**
@@ -68,9 +68,9 @@ class DevCommand extends Command
             $names[] = 'logs';
         }
         
-        if (!$this->option('no-vite')) {
-            $commands[] = "npm run dev";
-            $names[] = 'vite';
+        if (!$this->option('no-mix')) {
+            $commands[] = "npm run watch";
+            $names[] = 'mix';
         }
         
         if (empty($commands)) {
