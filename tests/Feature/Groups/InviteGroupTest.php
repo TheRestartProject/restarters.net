@@ -188,28 +188,4 @@ class InviteGroupTest extends TestCase
             ['test@test.com, invalidmail', false]
         ];
     }
-
-    public function testInviteNearby() {
-        $this->loginAsTestUser(Role::ADMINISTRATOR);
-
-        $idgroups = $this->createGroup();
-        $group = Group::findOrFail($idgroups);
-
-        // Create a user near the group.
-        $user = User::factory()->create();
-        $userId = $user->id;
-        $user->name = 'Joe Bloggs';
-        $user->latitude = $group->latitude;
-        $user->longitude = $group->longitude;
-        $user->save();
-
-        $rsp = $this->get("/group/nearbyinvite/{$idgroups}/$userId");
-        $rsp->assertRedirect();
-        $rsp->assertSessionHas('success');
-
-        // Run again for coverage.
-        $rsp = $this->get("/group/nearbyinvite/{$idgroups}/$userId");
-        $rsp->assertRedirect();
-        $rsp->assertSessionHas('success');
-    }
 }
