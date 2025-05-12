@@ -59,7 +59,17 @@ export default {
       return this.$store.getters['items/list'];
     },
     suggestions() {
-      return this.itemTypes.map(i => i.type)
+      const ret = []
+
+      this.itemTypes.forEach(i => {
+        if (i.type && i.type.length) {
+          if (this.powered === i.powered) {
+            ret.push(i.type)
+          }
+        }
+      })
+
+      return ret
     },
     notASuggestion() {
       if (!this.currentType || !this.itemTypes.length) {
