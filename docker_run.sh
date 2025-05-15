@@ -37,7 +37,7 @@ npm rebuild node-sass
 php artisan lang:js --no-lib resources/js/translations.js
 chmod -R 777 public
 
-npm run watch&
+npm run watch-poll&
 php artisan key:generate
 php artisan cache:clear
 php artisan config:clear
