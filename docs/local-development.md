@@ -57,7 +57,8 @@ The development environment includes several optional components that can be ena
 
 - **Core**: Restarters web application and MySQL database
 - **Debug Tools**: Adds phpMyAdmin and Mailhog for debugging and testing
-- **Discourse**: Adds Discourse forum with its required services (PostgreSQL, Redis, Sidekiq) 
+- **Discourse**: Adds Discourse forum with its required services (PostgreSQL, Redis, Sidekiq)
+- **All**: Starts all containers in the `docker-compose.yml` file (Core, Debug Tools, Discourse)
 
 The project includes a Taskfile that provides convenient commands for managing Docker:
 
