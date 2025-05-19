@@ -2,7 +2,7 @@
   <div>
     <div class="row row-expanded pb-3">
       <div class="col-lg-6 d-flex">
-        <form id="login-form" action="/login" method="post" class="card card__login col-12 panel">
+        <form id="login-form" action="/login" method="post" class="card card__login col-12 panel" ref="form" @submit.prevent="submit">
 
           <input type="hidden" name="_token" :value="CSRF" />
 
@@ -40,7 +40,7 @@
               </div>
             </div>
             <div class="col-6 col-md-4 align-content-center flex-column justify-content-end d-flex">
-              <b-button id="login-form-submit" type="submit" variant="primary" @click="login" :disabled="disabled">{{ translatedLogin }}</b-button>
+              <b-button id="login-form-submit" type="submit" variant="primary">{{ translatedLogin }}</b-button>
             </div>
           </div>
         </form>
@@ -78,7 +78,7 @@ export default {
   },
   data () {
     return {
-      disabled: false,
+      lastSubmit: null,
     }
   },
   computed: {
@@ -117,13 +117,18 @@ export default {
     }
   },
   methods: {
-    login() {
+    submit() {
       // We've seen double submits of the login form, leading to 419 errors.  Prevent the user submitting twice by
-      // double-clicking.
+      // double-clicking by ignoring submits within 1 second of the last submit.
       //
       // The default event handler will proceed to validate the form (because of the required attributes) and
       // submit or show a native error.
-      this.submitDisabled = true
+      if (!this.lastSubmit || this.lastSubmit < Date.now() - 1000) {
+        this.lastSubmit = Date.now()
+        this.$refs.form.submit()
+      } else {
+        console.log('Ignore double submit')
+      }
     }
   }
 }
