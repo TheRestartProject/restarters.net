@@ -136,20 +136,20 @@ class CalendarEventsController extends Controller
         $groupApproved = [];
 
         foreach ($events as $event) {
+            if (!array_key_exists($event->group, $groupApproved)) {
+                $group = Group::find($event->group);
+
+                $groupApproved[$event->group] = $group ? $group->approved : false;
+            }
+
             // We need to filter by approval status.  If the event is not approved, we can only see it if we are
             // an admin, network coordinator, or the host of the event.
 
-            if (!User::userCanSeeEvent($me, $event)) {
+            if (!User::userCanSeeEvent($me, $event, $groupApproved[$event->group])) {
                 continue;
             }
 
             if (! is_null($event->event_start_utc) ) {
-                if (!array_key_exists($event->group, $groupApproved)) {
-                    $group = Group::find($event->group);
-
-                    $groupApproved[$event->group] = $group ? $group->approved : false;
-                }
-
                 $ical[] = 'BEGIN:VEVENT';
 
                 $ical[] = 'TZID:' . $event->timezone;
