@@ -26,8 +26,6 @@
 # TODO This isn't checked in to the codebase, but once this works on Circle then we can put it in an env variable and edit it in via docker_run.sh.
 # - log in to the restarters container using: docker exec -it restarters bash
 # - run UT using: export DB_TEST_HOST=restarters_db; php vendor/phpunit/phpunit/phpunit --configuration ./phpunit.xml
-# TODO This isn't a very convenient way to do run tests.  Would be good to enable SSH on the Restarter container so
-# that JetBrains and other IDEs can trigger the running of tests.
 #
 # If you want to remove everything to free up disk space or force a complete rebuild (e.g. as a sanity check
 # after changing this configuration):

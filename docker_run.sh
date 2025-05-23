@@ -3,7 +3,6 @@
 #
 # We install composer dependencies in here rather than during the build step so that if we switch branches
 # and restart the container, it works.
-service ssh start
 
 if [ ! -f .env ]
 then
