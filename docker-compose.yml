@@ -81,7 +81,6 @@ services:
     build:
       context: .
       dockerfile: Dockerfile
-    user: root
     container_name: restarters
     restart: unless-stopped
     tty: true

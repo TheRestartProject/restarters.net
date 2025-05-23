@@ -40,6 +40,6 @@ RUN wget https://getcomposer.org/composer-1.phar
 # Expose port 9000, which is our PHP FPM port referenced from nginx.conf.
 EXPOSE 9000
 
-RUN sudo pecl install channel://pecl.php.net/xmlrpc-1.0.0RC3  xmlrpc
+RUN pecl install channel://pecl.php.net/xmlrpc-1.0.0RC3 xmlrpc
 
 CMD ["bash", "docker_run.sh"]
