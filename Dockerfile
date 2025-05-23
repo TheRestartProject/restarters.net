@@ -28,6 +28,8 @@ RUN install-php-extensions \
 # Install composer.  Don't run composer install yet - see docker_run.sh
 COPY --from=composer/composer:2-bin /composer /usr/bin/composer
 
+RUN git config --system --add safe.directory /var/www
+
 # Set working directory to where we will run.
 WORKDIR /var/www
 
