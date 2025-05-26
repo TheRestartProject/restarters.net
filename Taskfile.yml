@@ -6,6 +6,10 @@ version: "3"
 dotenv:
   - .env
 
+env:
+  GID:
+    sh: id -g
+
 vars:
   DOCKER_CMD:
     sh: command -v docker-compose &> /dev/null && echo "docker-compose" || echo "docker compose"

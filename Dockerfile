@@ -33,6 +33,22 @@ RUN git config --system --add safe.directory /var/www
 # Set working directory to where we will run.
 WORKDIR /var/www
 
+# Allow a GID variable to be set from the command line.
+ARG GID=1000
+
+# Use host's group IDs for www-data.
+RUN groupmod -g ${GID} www-data && \
+    # Set www-data's home directory to /home/www-data and ensure it exists.
+    # This is needed to ensure that commands like composer install do
+    # not assume that the home directory is /var/www - i.e. the working directory.
+    mkdir -p /home/www-data && \
+    usermod -d /home/www-data www-data && \
+    usermod -a -G ${GID} www-data && \
+    # Ensure the home directory has correct permissions
+    chown www-data:${GID} /home/www-data
+
+USER www-data
+
 # Copy the code
 COPY . ./
 

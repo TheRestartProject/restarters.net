@@ -34,7 +34,6 @@ php artisan migrate
 npm install --legacy-peer-deps
 npm rebuild node-sass
 php artisan lang:js --no-lib resources/js/translations.js
-chmod -R 777 public
 
 npm run watch-poll&
 php artisan key:generate
