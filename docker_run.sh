@@ -48,9 +48,6 @@ mkdir -p storage/framework/views
 mkdir -p storage/logs
 mkdir -p bootstrap/cache
 
-# Set permissions for Laravel directories
-chmod -R 775 storage bootstrap/cache 2>/dev/null || true
-
 php artisan migrate
 npm install --legacy-peer-deps
 npm rebuild node-sass
