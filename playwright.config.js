@@ -11,15 +11,24 @@ const config = {
   // Only use 1 worker, otherwise we hit CSRF issues.
   workers: 1,
 
+  // Global setup for interrupt handling
+  globalSetup: require.resolve('./tests/Integration/global-setup.js'),
+
   use: {
-    trace: 'on-first-retry',
+    trace: 'on',
+    // Take screenshot on failure for debugging
+    screenshot: 'on',
+    // Also capture video on failure for additional context
+    video: 'on',
+    // Configurable timeout for waitForURL operations
+    navigationTimeout: 30000,
   },
   projects: [
     {
       name: 'Desktop Chromium',
       use: {
         browserName: 'chromium',
-        baseURL: 'http://localhost'
+        baseURL: process.env.PLAYWRIGHT_BASE_URL || 'http://localhost:8000'
       },
     },
     // TODO The other browsers don't work reliably yet.
