@@ -33,28 +33,24 @@ RUN git config --system --add safe.directory /var/www
 # Set working directory to where we will run.
 WORKDIR /var/www
 
-# Allow a GID variable to be set from the command line.
+# Add ARGs for syncing permissions
+ARG UID=1000
 ARG GID=1000
 
-# Use host's group IDs for www-data.
-# Check if the GID is already in use and handle accordingly
-RUN if getent group ${GID} > /dev/null 2>&1; then \
-        # If GID exists, add www-data to that group instead of changing its GID
-        EXISTING_GROUP=$(getent group ${GID} | cut -d: -f1) && \
-        usermod -a -G ${GID} www-data; \
+# Create a new user with the specified UID and GID, reusing an existing group if GID exists
+RUN if getent group ${GID}; then \
+      group_name=$(getent group ${GID} | cut -d: -f1); \
+      useradd -m -u ${UID} -g ${GID} -s /bin/bash restarter; \
     else \
-        # If GID doesn't exist, change www-data's group ID as before
-        groupmod -g ${GID} www-data; \
-    fi && \
-    # Set www-data's home directory to /home/www-data and ensure it exists.
-    # This is needed to ensure that commands like composer install do
-    # not assume that the home directory is /var/www - i.e. the working directory.
-    mkdir -p /home/www-data && \
-    usermod -d /home/www-data www-data && \
-    # Ensure the home directory has correct permissions
-    chown www-data:${GID} /home/www-data
+      groupadd -g ${GID} restarter && \
+      useradd -m -u ${UID} -g restarter -s /bin/bash restarter; \
+    fi
 
-USER www-data
+# Dynamically update php-fpm to use the new user and group
+RUN sed -i "s/user = www-data/user = restarter/g" /usr/local/etc/php-fpm.d/www.conf && \
+    sed -i "s/group = www-data/group = restarter/g" /usr/local/etc/php-fpm.d/www.conf
+
+USER restarter
 
 # Copy the code
 COPY . ./

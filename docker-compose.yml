@@ -77,17 +77,17 @@ services:
   restarters:
     profiles: ["core", "debug", "discourse"]
     depends_on:
-      - restarters_db
+      restarters_db:
+        condition: service_started
     build:
       context: .
       dockerfile: Dockerfile
       args:
+        UID: ${UID}
         GID: ${GID}
     container_name: restarters
     restart: unless-stopped
     tty: true
-    ports:
-      - "8001:80"
     environment:
       SERVICE_NAME: restarters
       SERVICE_TAGS: dev
@@ -99,6 +99,21 @@ services:
       - ./php/local.ini:/usr/local/etc/php/conf.d/local.ini
     networks:
       - app-network
+
+  restarters_nginx:
+    profiles: ["core", "debug", "discourse"]
+    image: nginx:latest
+    container_name: restarters_nginx
+    restart: unless-stopped
+    ports:
+      - "8001:80"
+    volumes:
+      - ./docker/nginx.conf:/etc/nginx/nginx.conf
+      - ./public:/var/www/public:ro
+    networks:
+      - app-network
+    depends_on:
+      - restarters
 
   restarters_db:
     profiles: ["core", "debug", "discourse"]
@@ -138,7 +153,7 @@ services:
 #      - PMA_PASSWORD=s3cr3t
     networks:
       - app-network
-      
+
   mailhog:
     profiles: ["debug"]
     image: mailhog/mailhog

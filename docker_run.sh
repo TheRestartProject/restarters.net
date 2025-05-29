@@ -43,7 +43,7 @@ php artisan config:clear
 # Ensure we have the admin user
 echo "User::create(['name'=>'Jane Bloggs','email'=>'jane@bloggs.net','password'=>Hash::make('passw0rd'),'role'=>2,'consent_past_data'=>'2021-01-01','consent_future_data'=>'2021-01-01','consent_gdpr'=>'2021-01-01']);" | php artisan tinker
 
-php artisan serve --host=0.0.0.0 --port=80
+php-fpm
 
 # In case everything else bombs out.
 sleep infinity
