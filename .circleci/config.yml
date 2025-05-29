@@ -19,7 +19,7 @@ jobs:
           - DB_USERNAME: restarters
           - DB_PASSWORD: s3cr3t
           - TZ: "UTC"
-      - image: cimg/mysql:5.7.36
+      - image: cimg/mysql:8.0
         environment:
           # You can connect once ssh'd in using  mysql -u root -p -h 127.0.0.1
           - MYSQL_ROOT_PASSWORD: s3cr3t
