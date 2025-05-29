@@ -50,14 +50,15 @@ RUN if getent group ${GID}; then \
 RUN sed -i "s/user = www-data/user = restarter/g" /usr/local/etc/php-fpm.d/www.conf && \
     sed -i "s/group = www-data/group = restarter/g" /usr/local/etc/php-fpm.d/www.conf
 
-USER restarter
-
-# Copy the code
-COPY . ./
+# Copy the code (this will be overridden by the volume mount in docker-compose)
+COPY --chown=${UID}:${GID} . ./
 
 # Expose port 9000, which is our PHP FPM port referenced from nginx.conf.
 EXPOSE 9000
 
+# Install xmlrpc as the restarter user to avoid permission issues
+USER root
 RUN pecl install channel://pecl.php.net/xmlrpc-1.0.0RC3 xmlrpc
+USER restarter
 
 CMD ["bash", "docker_run.sh"]
