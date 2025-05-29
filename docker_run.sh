@@ -4,6 +4,9 @@
 # We install composer dependencies in here rather than during the build step so that if we switch branches
 # and restart the container, it works.
 
+USER_ID=${UID:-1000}
+GROUP_ID=${GID:-1000}
+
 if [ ! -f .env ]
 then
  cp .env.example .env
@@ -28,6 +31,9 @@ sed -i 's/DISCOURSE_SECRET=.*$/DISCOURSE_SECRET=mustbetencharacters/g' .env
 # Change the database environment used for automated tests.
 sed -i 's/SESSION_DOMAIN=.*$/SESSION_DOMAIN=/g' phpunit.xml
 sed -i 's/DB_TEST_HOST=.*$/DB_TEST_HOST=restarters_db/g' phpunit.xml
+
+echo "Fixing file permissions with ${USER_ID}:${GROUP_ID}"
+find /var/www -not -path "*/\.git/*" -exec chown ${USER_ID}:${GROUP_ID} {} \;
 
 mkdir storage/framework/cache/data
 php artisan migrate
