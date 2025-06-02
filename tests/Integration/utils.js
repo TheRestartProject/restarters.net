@@ -180,8 +180,8 @@ exports.approveEvent = async function(page, baseURL, idevents) {
   log('Event approved successfully', { idevents })
 }
 
-exports.addDevice = async function(page, baseURL, idevents, powered, photo, fixed, spareparts) {
-  log('Starting device addition', { idevents, powered, photo, fixed, spareparts })
+exports.addDevice = async function(page, baseURL, idevents, powered, photo, fixed, spareparts, itemType = null, category = null) {
+  log('Starting device addition', { idevents, powered, photo, fixed, spareparts, itemType, category })
   
   // Go to event edit page.
   log('Navigating to event view page')
@@ -199,10 +199,27 @@ exports.addDevice = async function(page, baseURL, idevents, powered, photo, fixe
   log('Clicking add device button')
   await page.locator(addsel).click()
 
-  // Item type is focused, so we just need one tab to get to the category.  Then select first.
-  log('Setting device category (tabbing to category field)')
-  await page.keyboard.press('Tab')
-  await page.keyboard.press('Enter')
+  // Set item type if provided
+  if (itemType) {
+    log('Setting specific item type', { itemType })
+    await page.fill('.item-type:visible input', itemType)
+    await page.keyboard.press('Tab')
+  } else {
+    // Item type is focused, so we just need one tab to get to the category.
+    log('Skipping item type, tabbing to category field')
+    await page.keyboard.press('Tab')
+  }
+
+  // Set category if provided
+  if (category) {
+    log('Setting specific category', { category })
+    await page.fill('.category-select:visible input', category)
+    await page.keyboard.press('Enter')
+  } else {
+    // Then select first category.
+    log('Setting default category (first option)')
+    await page.keyboard.press('Enter')
+  }
 
   if (fixed) {
     log('Setting repair status to fixed')

@@ -143,6 +143,11 @@ test('Automatic category suggestion from item type', async ({page, baseURL}) => 
     for (const testCase of testCases) {
       interruptHandler.checkInterrupted()
       
+      // First create a device with the specific item type and expected category using the fixture.
+      // This will mean that there is data for the category autocomplete to work with.
+      await addDevice(page, baseURL, eventid, testCase.powered, false, false, false, testCase.itemType, testCase.expectedCategory)
+      
+      // Then test the UI behavior for category autocomplete
       // Go to event view page
       await page.goto('/party/view/' + eventid)
       
