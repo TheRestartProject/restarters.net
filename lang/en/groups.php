@@ -66,7 +66,6 @@ return [
   'group_actions' => 'Group actions',
   'add_event' => 'Add event',
   'invite_volunteers' => 'Invite volunteers',
-  'volunteers_nearby' => 'Volunteers nearby',
   'share_group_stats' => 'Share group stats',
   'about' => 'About',
   'read_more' => 'Read more',

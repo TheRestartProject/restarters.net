@@ -84,7 +84,6 @@ return [
   'waste_prevented' => 'Déchets évités',
   'upcoming_active' => 'A venir et actif',
   'volunteers' => 'Bénévoles',
-  'volunteers_nearby' => 'Bénévoles proches',
   'about_none' => 'Il n\'y a pas encore de description pour ce Repair Café.',
   'events' => 'évenement|évenements',
   'group_facts' => 'Réalisations du Repair Café',
