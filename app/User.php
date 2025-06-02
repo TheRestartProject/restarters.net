@@ -577,7 +577,7 @@ class User extends Authenticatable implements Auditable, HasLocalePreference
         return $this->language;
     }
 
-    public static function userCanSeeEvent($user, $event) {
+    public static function userCanSeeEvent($user, $event, $group = null) {
         // We need to filter based on approved visibility:
         // - where the group is approved, this event is visible
         // - where the group is not approved, this event is visible to network coordinators or group hosts.
@@ -591,7 +591,10 @@ class User extends Authenticatable implements Auditable, HasLocalePreference
         $amHost = $user && $user->hasRole('Host');
         $admin = $user && $user->hasRole('Administrator');
 
-        if ($admin ||
+        $group = $group ? $group : Group::find($event->group);
+
+        if (($event->approved && $group->approved) ||
+            $admin ||
             ($user && $user->isCoordinatorForGroup($group)) ||
             ($amHost && $user && Fixometer::userIsHostOfGroup($group->idgroups, $user->id))) {
             return true;

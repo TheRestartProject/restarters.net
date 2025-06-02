@@ -134,11 +134,22 @@ class CalendarEventsController extends Controller
         // loop over events
         $me = auth()->user();
 
+        // We cache the group approval status to reduce DB queries.
+        $groupApproved = [];
+        $groups = [];
+
         foreach ($events as $event) {
+            if (!array_key_exists($event->group, $groupApproved)) {
+                $group = Group::find($event->group);
+
+                $groupApproved[$event->group] = $group ? $group->approved : false;
+                $groups[$event->group] = $group;
+            }
+
             // We need to filter by approval status.  If the event is not approved, we can only see it if we are
             // an admin, network coordinator, or the host of the event.
 
-            if (!User::userCanSeeEvent($me, $event)) {
+            if (!User::userCanSeeEvent($me, $event, $groups[$event->group])) {
                 continue;
             }
 
