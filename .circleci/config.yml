@@ -30,6 +30,7 @@ jobs:
         environment:
           NODE_ENV: development
           TZ: "UTC"
+        command: [--log_bin_trust_function_creators=1]
       - image: 'bitnami/mariadb:latest'
         name: mariadb
         environment:
