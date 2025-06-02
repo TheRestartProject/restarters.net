@@ -30,7 +30,6 @@ jobs:
         environment:
           NODE_ENV: development
           TZ: "UTC"
-        command: [--log_bin_trust_function_creators=1]
       - image: 'bitnami/mariadb:latest'
         name: mariadb
         environment:
@@ -179,6 +178,7 @@ jobs:
       - run: npm install -D @playwright/test
 
       - run: php artisan key:generate
+      - run: mysql --host="127.0.0.1" -u root -ps3cr3t -e "SET PERSIST log_bin_trust_function_creators = 1;"
       - run: php artisan migrate
       - run: php artisan l5-swagger:generate
 
