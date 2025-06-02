@@ -47,8 +47,8 @@ cp .env.example .env
 You may need to adjust the following settings in your `.env` file:
 - The `APP_KEY` will be auto-generated during setup
 > [!NOTE]
-> This is only required if another service is already running on the port `8001`
-- Set `APP_URL` to `http://localhost:<AVAILABLE_PORT>`
+> This is only required if the default port, `8001`, is not available.
+- Set `APP_URL` to `http://localhost:PORT
   - You will need to change the port in the `docker-compose.yml` file to match the port you are using.
 
 ### 3. Starting the Development Environment
