@@ -66,22 +66,18 @@ exports.createGroup = async function(page, baseURL) {
   // Always say London for geocoding.
   //
   // Google seems to block autocomplete when running on CircleCI (but not locally).  So we have to hack around that by
-  // setting some hidden inputs directly.
+  // setting some hidden inputs directly.  The code spots this via a timer.
   log('Setting location to London (hardcoded for CI)')
   interruptHandler.checkInterrupted()
-  await page.fill('#lat', '51.5074', {
-    force: true,
-  })
-  await page.fill('#lng', '-0.1276' , {
-    force: true,
-  })
-  await page.fill('#location', 'London, UK' , {
-    force: true,
-  })
+  await page.evaluate('document.getElementById("lat").setAttribute("value", 51.5074);')
+  await page.evaluate('document.getElementById("lng").setAttribute("value", -0.1276);')
+  await page.evaluate('document.querySelector(\'[placeholder="Enter your address"]\').setAttribute("value", "London, UK");')
 
-  // Now create it.
+  // Now create it.  Wait a hardcoded time to let the autocomplete code sort itself out.  This is
+  // ugly, but will do.
   log('Submitting group creation form')
   interruptHandler.checkInterrupted()
+  await page.waitForTimeout(3000);
   await page.click('button[type=submit]')
 
   // Should get redirected to Edit form.  We used to wait on #details, but this stopped working for reasons we don't

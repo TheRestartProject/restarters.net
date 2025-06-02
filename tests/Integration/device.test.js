@@ -130,14 +130,14 @@ test('Automatic category suggestion from item type', async ({page, baseURL}) => 
     const testCases = [
       { itemType: 'Food processor', expectedCategory: 'Small kitchen item', powered: true },
       { itemType: 'Blender', expectedCategory: 'Small kitchen item', powered: true },
-      { itemType: 'TV', expectedCategory: 'Flat screen 32"-37"', powered: true },
+      { itemType: 'TV', expectedCategory: 'Flat screen 32-37"', powered: true },
       { itemType: 'Phone', expectedCategory: 'Mobile', powered: true },
       { itemType: 'Printer', expectedCategory: 'Printer/scanner', powered: true },
-      { itemType: 'Television', expectedCategory: 'Flat screen 32"-37"', powered: true },
-      { itemType: 'Télévision', expectedCategory: 'Flat screen 32"-37"', powered: true },
+      { itemType: 'Television', expectedCategory: 'Flat screen 32-37"', powered: true },
+      { itemType: 'Télévision', expectedCategory: 'Flat screen 32-37"', powered: true },
       { itemType: 'Toaster', expectedCategory: 'Toaster', powered: true },
-      { itemType: 'Microwave oven', expectedCategory: 'Misc (powered)', powered: true },
-      { itemType: 'Heater', expectedCategory: 'Misc (powered)', powered: true }
+      { itemType: 'Microwave oven', expectedCategory: 'None of the above', powered: true },
+      { itemType: 'Heater', expectedCategory: 'None of the above', powered: true }
     ]
 
     for (const testCase of testCases) {
@@ -151,21 +151,21 @@ test('Automatic category suggestion from item type', async ({page, baseURL}) => 
       await page.locator('.add-powered-device-desktop').click()
 
       // Wait for the device modal to open and item type field to be focused
-      await page.waitForSelector('.device-type input', { state: 'visible' })
+      await page.waitForSelector('.device-select-row input', { state: 'visible' })
       
       // Type the item type
-      await page.fill('.device-type input', testCase.itemType)
+      await page.fill('.device-select-row input', testCase.itemType)
+
+      // Select the suggestion by hitting tab and then enter
+      await page.keyboard.press('Tab')
+      await page.keyboard.press('Enter')
       
       // Wait for the category dropdown to be automatically populated with the expected category
-      const categorySelect = page.locator('.device-category select')
-      await expect(categorySelect).toBeVisible()
-      
-      // Wait for the specific category option to be selected
-      await expect(categorySelect.locator('option:checked')).toContainText(testCase.expectedCategory)
-      
+      const categorySelect = page.locator('.device-category .multiselect__single').first()
+      await expect(categorySelect).toContainText(testCase.expectedCategory)
+
       // Close the modal by clicking cancel to prepare for next test case
-      await page.locator('.cancel', { hasText: 'Cancel' }).click()
-      await page.waitForSelector('.device-type input', { state: 'hidden' })
+      await page.locator('.cancel', { hasText: 'Cancel' }).first().click()
     }
   } finally {
     interruptHandler.reset()
