@@ -25,7 +25,6 @@ return [
   'profile_content' => 'Schrijf hier wat info over jezelf. Zo leg je  makkelijker contact met andere  organisatoren en herstellers. Je info geeft ons ook meer inzicht in de Repair Community.',
   'repair_skills' => 'Competenties',
   'repair_skills_content' => 'Dit is optioneel, maar het helpt ons om je gebruikerservaring te verbeteren. Welke competenties heb je en wil je met anderen delen?',
-  'reporting' => 'Verslagen',
   'restartproject_url' => 'https://therestartproject.org',
   'save_repair_skills' => 'Competenties bewaren',
   'signmeup' => 'Registreer mij!',

@@ -11,9 +11,6 @@
         <b-dropdown-item  data-toggle="modal" data-target="#invite-to-group" v-if="canedit">
           {{ __('groups.invite_volunteers') }}
         </b-dropdown-item>
-        <b-dropdown-item :href="'/group/nearby/' + idgroups" v-if="canedit">
-          {{ __('groups.volunteers_nearby') }}
-        </b-dropdown-item>
         <b-dropdown-item  data-toggle="modal" data-target="#group-share-stats" v-if="canedit">
           {{ __('groups.share_group_stats') }}
         </b-dropdown-item>

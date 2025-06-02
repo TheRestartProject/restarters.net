@@ -31,19 +31,21 @@ class CalendarEventsController extends Controller
         }
 
         // We use two separate queries because they are a lot more efficient in DB terms than using an OR clause.
-        $attendingEvents = Party::join('groups', 'groups.idgroups', '=', 'events.group')
+        $attendingEvents = Party::with('theGroup')
+          ->join('groups', 'groups.idgroups', '=', 'events.group')
           ->join('users_groups', 'users_groups.group', '=', 'groups.idgroups')
           ->join('events_users', 'events_users.event', '=', 'events.idevents')
           ->where('events_users.user', $user->id)
           ->whereNull('users_groups.deleted_at')
-          ->select('events.*', 'groups.name');
+          ->select('events.*');
 
-        $groupEvents = Party::join('groups', 'groups.idgroups', '=', 'events.group')
+        $groupEvents = Party::with('theGroup')
+            ->join('groups', 'groups.idgroups', '=', 'events.group')
             ->join('users_groups', 'users_groups.group', '=', 'groups.idgroups')
             ->join('events_users', 'events_users.event', '=', 'events.idevents')
             ->where('users_groups.user', $user->id)
             ->whereNull('users_groups.deleted_at')
-            ->select('events.*', 'groups.name');
+            ->select('events.*');
 
         // GROUP BY doesn't seem to be enough to get unique values, so do unique() on the results.
         $events = $attendingEvents->union($groupEvents)->groupBy('idevents')->orderBy('event_start_utc', 'asc')->get()->unique();
@@ -166,7 +168,7 @@ class CalendarEventsController extends Controller
 
                 if ($event->cancelled) {
                     $ical[] = 'STATUS:CANCELLED';
-                } else if ($event->approved && $groupApproved[$event->group]) {
+                } else if ($event->approved && $event->theGroup->approved) {
                     // Events are only confirmed once the event and the group are approved.
                     $ical[] = 'STATUS:CONFIRMED';
                 } else {

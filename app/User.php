@@ -581,6 +581,13 @@ class User extends Authenticatable implements Auditable, HasLocalePreference
         // We need to filter based on approved visibility:
         // - where the group is approved, this event is visible
         // - where the group is not approved, this event is visible to network coordinators or group hosts.
+        $group = $event->theGroup;
+
+        if ($event->approved && $group->approved) {
+            // Do this before getting user roles - improves performance.
+            return true;
+        }
+
         $amHost = $user && $user->hasRole('Host');
         $admin = $user && $user->hasRole('Administrator');
 
