@@ -4,6 +4,8 @@ This guide will help you set up a local development environment for the Restarte
 
 - [Local Development Setup Guide](#local-development-setup-guide)
   - [Prerequisites](#prerequisites)
+    - [Windows Users](#windows-users)
+      - [Permission Issues on Windows](#permission-issues-on-windows)
   - [Setup Steps](#setup-steps)
     - [1. Clone the Repository](#1-clone-the-repository)
     - [2. Environment Configuration](#2-environment-configuration)
@@ -26,6 +28,24 @@ Before you begin, ensure you have the following installed:
 
 > [!NOTE]
 > The `Taskfile` will automatically detect your Docker version and use the appropriate command (`docker-compose` or `docker compose`).
+
+### Windows Users
+
+If you're developing on Windows, we highly recommend following this guide to significantly improve Docker performance:
+
+**[Increase Docker Performance on Windows by 20x](https://medium.com/@suyashsingh.stem/increase-docker-performance-on-windows-by-20x-6d2318256b9a)**
+
+This optimization can dramatically reduce build times and improve overall development experience.
+
+#### Permission Issues on Windows
+
+If you encounter permission issues when running Docker commands, you may need to add your user to the Docker group:
+
+```bash
+sudo usermod -aG docker $USER
+```
+
+After running this command, close and reopen your terminal to instantiate a new session.
 
 ## Setup Steps
 
