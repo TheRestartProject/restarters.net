@@ -6,8 +6,6 @@ const { devices } = require('@playwright/test');
 const config = {
   // Generate trace if a test fails; can be viewed using something like:
   // npx playwright show-trace test-results/group-Can-create-group-Desktop-Chromium-retry1/trace.zip
-  retries: 0,
-
   // Only use 1 worker, otherwise we hit CSRF issues.
   workers: 1,
 
@@ -64,7 +62,7 @@ const config = {
   timeout: 5 * 60 * 1000,
   navigationTimeout: 2 * 60 * 1000,
   actionTimeout: 2 * 60 * 1000,
-  retries: 2
+  retries: 0
 };
 
 module.exports = config;

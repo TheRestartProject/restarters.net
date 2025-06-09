@@ -183,9 +183,16 @@ exports.approveEvent = async function(page, baseURL, idevents) {
 exports.addDevice = async function(page, baseURL, idevents, powered, photo, fixed, spareparts, itemType = null, category = null) {
   log('Starting device addition', { idevents, powered, photo, fixed, spareparts, itemType, category })
   
-  // Go to event edit page.
-  log('Navigating to event view page')
-  await page.goto('/party/view/' + idevents)
+  // Check if we're already on the correct event view page
+  const expectedUrl = '/party/view/' + idevents
+  const currentUrl = page.url()
+  
+  if (!currentUrl.includes(expectedUrl)) {
+    log('Navigating to event view page', { expectedUrl, currentUrl })
+    await page.goto(expectedUrl)
+  } else {
+    log('Already on correct event view page, skipping navigation', { currentUrl })
+  }
 
   var addsel = powered ? '.add-powered-device-desktop' : '.add-unpowered-device-desktop'
   log('Using device selector', { addsel, powered })
@@ -213,7 +220,9 @@ exports.addDevice = async function(page, baseURL, idevents, powered, photo, fixe
   // Set category if provided
   if (category) {
     log('Setting specific category', { category })
-    await page.fill('.category-select:visible input', category)
+    await page.keyboard.press('Enter')
+    await page.keyboard.press('Tab')
+    await page.fill('.device-category:visible input', category)
     await page.keyboard.press('Enter')
   } else {
     // Then select first category.
@@ -230,7 +239,7 @@ exports.addDevice = async function(page, baseURL, idevents, powered, photo, fixe
 
   if (spareparts) {
     log('Setting spare parts required')
-    await page.locator('.spare-parts').click()
+    await page.locator('.spare-parts:visible').click()
     await page.keyboard.press('Enter')
   }
 
@@ -251,7 +260,7 @@ exports.addDevice = async function(page, baseURL, idevents, powered, photo, fixe
 
   // Check that the photo appears.
   log('Opening device for verification')
-  await page.locator('.edit:visible').click()
+  await page.locator('.edit:visible').last().click()
 
   if (photo) {
     log('Verifying photo was uploaded')
@@ -273,7 +282,7 @@ exports.addDevice = async function(page, baseURL, idevents, powered, photo, fixe
 
   // Age of device is 0, which should show as 0.
   log('Verifying device age display')
-  await expect(page.locator('.device-age-summary:visible')).toHaveText('-')
+  await expect(page.locator('.device-age-summary:visible').last()).toHaveText('-')
   
   log('Device added successfully')
 }

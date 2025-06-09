@@ -1,5 +1,5 @@
 <template>
-  <div class="w-100 device-select-row">
+  <div class="w-100 device-select-row item-type">
     <vue-typeahead-bootstrap ref="typeahead" v-model="currentType" :maxMatches="5" :data="suggestions"
                              :minMatchingChars="1" size="lg" :inputClass="'marg form-control-lg theinput-' + uid" :disabled="disabled"
                              :placeholder="__('devices.item_type')" @hit="emit"/>
