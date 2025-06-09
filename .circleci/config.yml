@@ -196,9 +196,34 @@ jobs:
       - run: psql -h postgresql -U postgres -c "INSERT INTO api_keys (id, user_id, created_by_id, created_at, updated_at, allowed_ips, hidden, last_used_at, revoked_at, description, key_hash, truncated_key) VALUES (1, NULL, 1, '2021-10-25 13:56:20.033338', '2021-10-25 13:56:20.033338', NULL, false, NULL, NULL, 'Restarters', 'd89e9dfacfb611fbaf004807648187ce7ed474df44dcb0ada230fab5c8dd6a5b', '9fd7');" bitnami_discourse
       - run: php artisan discourse:setting personal_message_enabled_groups 10
 
+      # Update timezone definitions before running PHP unit tests
+      - run:
+          name: Update system timezone data
+          command: |
+            # Update system timezone data
+            sudo apt-get update
+            sudo apt-get install -y tzdata
+            
+            # Download and load MySQL timezone tables
+            echo "Loading MySQL timezone data..."
+            mysql_tzinfo_to_sql /usr/share/zoneinfo | mysql --host="127.0.0.1" -u root -ps3cr3t mysql
+            
+            # Verify timezone data is loaded
+            mysql --host="127.0.0.1" -u root -ps3cr3t -e "SELECT COUNT(*) as timezone_count FROM mysql.time_zone_name;" mysql
+            
+            # Ensure PHP has up-to-date timezone info
+            php -r "echo 'PHP timezone version: ' . timezone_version_get() . PHP_EOL;"
+            
+            # Test a few timezone conversions to ensure everything is working
+            php -r "
+              \$tz = new DateTimeZone('Europe/London');
+              \$dt = new DateTime('2024-01-01 12:00:00', \$tz);
+              echo 'Test timezone conversion: ' . \$dt->format('Y-m-d H:i:s T') . PHP_EOL;
+            "
+
       # Run phpunit.  Discourse makes things slow, so up the timeout.
       - run:
-           command: export XDEBUG_MODE=coverage;./phpunit -d memory_limit=1024M --bootstrap vendor/autoload.php --coverage-clover tests/clover.xml --configuration ./phpunit.xml
+           command: export XDEBUG_MODE=coverage;export TZ=UTC;./phpunit -d memory_limit=1024M --bootstrap vendor/autoload.php --coverage-clover tests/clover.xml --configuration ./phpunit.xml
            no_output_timeout: 45m
 
       # Coveralls is pernickety about the location it uploads from existing.

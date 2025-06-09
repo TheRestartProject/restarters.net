@@ -40,6 +40,13 @@ class ItemController extends Controller
      */
     public static function listItemsv2(Request $request) {
         // Item types don't change often, so we can cache them.
+        // Allow cache refresh for testing purposes
+        $refreshCache = $request->has('refresh_cache') && $request->get('refresh_cache') === 'true';
+        
+        if ($refreshCache) {
+            \Cache::forget('item_types');
+        }
+        
         if (\Cache::has('item_types')) {
             $items = \Cache::get('item_types');
         } else {

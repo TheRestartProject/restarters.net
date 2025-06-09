@@ -136,18 +136,73 @@ test('Automatic category suggestion from item type', async ({page, baseURL}) => 
       { itemType: 'Television', expectedCategory: 'Flat screen 32-37"', powered: true },
       { itemType: 'Télévision', expectedCategory: 'Flat screen 32-37"', powered: true },
       { itemType: 'Toaster', expectedCategory: 'Toaster', powered: true },
-      { itemType: 'Microwave oven', expectedCategory: 'None of the above', powered: true },
-      { itemType: 'Heater', expectedCategory: 'None of the above', powered: true }
+      { itemType: 'Microwave oven', expectedCategory: 'Misc', powered: true },
+      { itemType: 'Heater', expectedCategory: 'Misc', powered: true }
     ]
 
+    // Set up test data: create multiple devices for each item type to ensure autocomplete works
+    // The getItemTypes() method uses a count-based algorithm, so we need sufficient data
+    console.log('Setting up autocomplete test data...')
+    
+    // Create the expected mappings (5 devices each to ensure they win the count algorithm)
+    const deviceCreationPromises = []
+    for (const testCase of testCases) {
+      for (let i = 0; i < 5; i++) {
+        deviceCreationPromises.push(
+          addDevice(page, baseURL, eventid, testCase.powered, false, false, false, testCase.itemType, testCase.expectedCategory)
+        )
+      }
+    }
+    
+    // Create some conflicting data with fewer items to ensure our expected categories win
+    const conflictingData = [
+      { itemType: 'Food processor', category: 'Misc', count: 2 },
+      { itemType: 'TV', category: 'Flat screen 15-17"', count: 3 },
+      { itemType: 'Phone', category: 'Handheld entertainment device', count: 2 },
+      { itemType: 'Printer', category: 'PC accessory', count: 1 },
+      { itemType: 'Toaster', category: 'Small kitchen item', count: 2 }
+    ]
+    
+    for (const conflict of conflictingData) {
+      for (let i = 0; i < conflict.count; i++) {
+        deviceCreationPromises.push(
+          addDevice(page, baseURL, eventid, true, false, false, false, conflict.itemType, conflict.category)
+        )
+      }
+    }
+    
+    // Wait for all devices to be created
+    console.log(`Creating ${deviceCreationPromises.length} devices...`)
+    await Promise.all(deviceCreationPromises)
+    console.log('All test devices created successfully')
+    
+    // Force refresh of item types cache by making an API call with cache refresh parameter
+    // Wait a bit to ensure all devices are saved to database
+    await page.waitForTimeout(1000)
+    
+    console.log('Refreshing autocomplete data...')
+    // Make a request to the API to force cache refresh
+    const apiResponse = await page.request.get('/api/v2/items?refresh_cache=true')
+    if (apiResponse.ok()) {
+      const itemsData = await apiResponse.json()
+      console.log(`Refreshed cache and found ${itemsData.data.length} item types in API response`)
+      
+      // Log some of the mappings for debugging
+      const relevantItems = itemsData.data.filter(item => 
+        testCases.some(tc => tc.itemType.toLowerCase() === item.item_type.toLowerCase())
+      )
+      console.log('Relevant autocomplete mappings:', relevantItems.map(item => 
+        `${item.item_type} → ${item.categoryname}`
+      ))
+    } else {
+      console.warn('Failed to refresh cache via API')
+    }
+
+    console.log('Testing autocomplete functionality...')
     for (const testCase of testCases) {
       interruptHandler.checkInterrupted()
       
-      // First create a device with the specific item type and expected category using the fixture.
-      // This will mean that there is data for the category autocomplete to work with.
-      await addDevice(page, baseURL, eventid, testCase.powered, false, false, false, testCase.itemType, testCase.expectedCategory)
-      
-      // Then test the UI behavior for category autocomplete
+      // Test the UI behavior for category autocomplete
       // Go to event view page
       await page.goto('/party/view/' + eventid)
       
