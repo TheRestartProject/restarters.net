@@ -119,11 +119,12 @@ export default {
   methods: {
     submit() {
       // We've seen double submits of the login form, leading to 419 errors.  Prevent the user submitting twice by
-      // double-clicking by ignoring submits within 1 second of the last submit.
+      // double-clicking, or because an autosubmit happened and they didn't realise it.  Do this
+      // by ignoring submits within 5 seconds of the last submit.
       //
       // The default event handler will proceed to validate the form (because of the required attributes) and
       // submit or show a native error.
-      if (!this.lastSubmit || this.lastSubmit < Date.now() - 1000) {
+      if (!this.lastSubmit || this.lastSubmit < Date.now() - 5000) {
         this.lastSubmit = Date.now()
         this.$refs.form.submit()
       } else {
