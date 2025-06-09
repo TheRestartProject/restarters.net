@@ -20,6 +20,10 @@ const config = {
     video: 'on',
     // Configurable timeout for waitForURL operations
     navigationTimeout: 30000,
+    // Add header to identify Playwright requests
+    extraHTTPHeaders: {
+      'X-Playwright-Test': 'true'
+    },
   },
   projects: [
     {

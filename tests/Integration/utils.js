@@ -220,9 +220,7 @@ exports.addDevice = async function(page, baseURL, idevents, powered, photo, fixe
   // Set category if provided
   if (category) {
     log('Setting specific category', { category })
-    await page.keyboard.press('Enter')
-    await page.keyboard.press('Tab')
-    await page.fill('.device-category:visible input', category)
+    await page.keyboard.type(category)
     await page.keyboard.press('Enter')
   } else {
     // Then select first category.

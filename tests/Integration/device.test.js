@@ -1,4 +1,5 @@
-const {test, expect} = require('@playwright/test')
+const {expect} = require('@playwright/test')
+const { test } = require('./fixtures')
 const { login, createGroup, createEvent, approveEvent, addDevice } = require('./utils')
 const interruptHandler = require('./interrupt-handler')
 
@@ -178,15 +179,8 @@ test('Automatic category suggestion from item type', async ({page, baseURL}) => 
     
     console.log(`Created ${deviceCount} test devices successfully`)
     
-    // Force refresh of item types cache by making an API call with cache refresh parameter
-    console.log('Refreshing autocomplete data...')
-    // Make a request to the API to force cache refresh
-    const apiResponse = await page.request.get('/api/v2/items?refresh_cache=true')
-    if (!apiResponse.ok()) {
-      console.error('Failed to refresh cache via API')
-    }
-
     console.log('Testing autocomplete functionality...')
+    // Note: The items.js store will automatically fetch fresh data since we're running under Playwright
     for (const testCase of testCases) {
       interruptHandler.checkInterrupted()
       
