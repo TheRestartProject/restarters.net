@@ -53,10 +53,10 @@ class TimezoneTest extends TestCase
 
     public function testStartEnd() {
         $g = Group::factory()->create([
-           'timezone' => 'Asia/Samarkand'
+           'timezone' => 'Europe/London'
         ]);
 
-        // Create an event in a different timezone, using local times.
+        // Create an event in a different timezone.
         $e = Party::factory()->create([
             'group' => $g->idgroups,
             'event_start_utc' => '2021-02-01T10:15:05+05:00',
@@ -65,10 +65,10 @@ class TimezoneTest extends TestCase
         ]);
 
         // Check that the ISO times are as we would expect for this zone.
-        self::assertEquals('2021-02-01T10:15:05+00:00', $e->event_start_utc);
-        self::assertEquals('2021-02-01T13:45:05+00:00', $e->event_end_utc);
-        self::assertEquals('15:15', $e->start_local);
-        self::assertEquals('18:45', $e->end_local);
+        self::assertEquals('2021-02-01T05:15:05+00:00', $e->event_start_utc);
+        self::assertEquals('2021-02-01T08:45:05+00:00', $e->event_end_utc);
+        self::assertEquals('05:15', $e->start_local);
+        self::assertEquals('08:45', $e->end_local);
         self::assertEquals('01/02/2021', $e->getFormattedLocalEnd());
         self::assertEquals(4.0, $e->lengthInHours());
     }
