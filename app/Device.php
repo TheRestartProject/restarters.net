@@ -482,7 +482,8 @@ class Device extends Model implements Auditable
                   ) s
               ) t
               WHERE t.count = t.max_count
-                AND LENGTH(t.item_type) > 0;
+                AND LENGTH(t.item_type) > 0
+              GROUP BY t.item_type, t.powered;
 "));
             \Cache::put('item_types', $types, 24 * 3600);
         }
