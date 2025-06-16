@@ -38,8 +38,6 @@
           <DeviceRepairStatus :status.sync="currentDevice.repair_status" :steps.sync="currentDevice.next_steps"
                               :parts.sync="currentDevice.spare_parts" :barrier.sync="currentDevice.barrier"
                               :barrierList="barrierList" :disabled="disabled"/>
-          <DeviceReference :reference.sync="currentDevice.reference" class="mb-4" :icon-variant="add ? 'black' : 'brand'"
-                           :disabled="disabled"/>
         </b-card>
       </div>
       <div class="bl d-flex flex-column botwhite">
@@ -60,20 +58,24 @@
         {{ axiosError }}
       </p>
     </b-alert>
-    <div class="d-flex justify-content-center flex-wrap pt-4 pb-4">
-      <b-btn variant="primary" class="mr-2" v-if="add" @click="addDevice">
-        {{ __('partials.add_device') }}
-      </b-btn>
-      <b-btn variant="primary" class="mr-2" v-if="edit" @click="saveDevice">
-        {{ __('partials.save') }}
-      </b-btn>
-      <b-btn variant="primary" class="mr-2" v-if="edit && deleteButton" @click="confirmDeleteDevice">
-        {{ __('devices.delete_device') }}
-      </b-btn>
-      <DeviceQuantity v-if="add" :quantity.sync="currentDevice.quantity" class="flex-md-shrink-1 ml-2 mr-2"/>
-      <b-btn variant="tertiary" class="ml-2 cancel" @click="cancel" v-if="cancelButton">
-        {{ __('partials.cancel') }}
-      </b-btn>
+    <div class="d-flex justify-content-between flex-wrap ml-3 mr-3">
+      <DeviceReference :reference.sync="currentDevice.reference" class="mb-4" :icon-variant="add ? 'black' : 'brand'"
+                       :disabled="disabled"/>
+      <div class="d-flex justify-content-center flex-wrap pt-4 pb-4">
+        <b-btn variant="primary" class="mr-2" v-if="add" @click="addDevice">
+          {{ __('partials.add_device') }}
+        </b-btn>
+        <b-btn variant="primary" class="mr-2" v-if="edit" @click="saveDevice">
+          {{ __('partials.save') }}
+        </b-btn>
+        <b-btn variant="primary" class="mr-2" v-if="edit && deleteButton" @click="confirmDeleteDevice">
+          {{ __('devices.delete_device') }}
+        </b-btn>
+        <DeviceQuantity v-if="add" :quantity.sync="currentDevice.quantity" class="flex-md-shrink-1 ml-2 mr-2"/>
+        <b-btn variant="tertiary" class="ml-2 cancel" @click="cancel" v-if="cancelButton">
+          {{ __('partials.cancel') }}
+        </b-btn>
+      </div>
     </div>
     <ConfirmModal @confirm="deleteDevice" ref="confirm"/>
   </b-form>

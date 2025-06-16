@@ -2,16 +2,15 @@
   <transition name="recent">
     <b-tr v-if="!editing" :key="'summary-' + device.id">
       <b-td class="refcell">
+        <span v-if="device.reference" class="ref text-muted">
+          {{ device.reference }}
+        </span>
         <span v-if="device.item_type">
           {{ device.item_type }}
         </span>
         <em v-else class="text-muted">
           -
         </em>
-        <span v-if="device.reference" class="ref text-muted">
-          <br />
-          {{ device.reference }}
-        </span>
       </b-td>
       <b-td>
         <h3 class="noheader">
