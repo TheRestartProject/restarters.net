@@ -79,4 +79,5 @@ return [
   'image_delete_error' => 'Sorry, but the image can\'t be deleted',
   'image_upload_error' => 'fail - image could not be uploaded',
   'reference' => 'Reference',
+  'tooltip_reference' => 'You can optionally record your own reference ID for this item, to cross-reference it to other software tools you are using.',
 ];

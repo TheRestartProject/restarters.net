@@ -79,4 +79,5 @@ return [
   'image_delete_error' => 'Désolé, mais l\'image ne peut pas être supprimée.',
   'image_upload_error' => 'fail - l\'image n\'a pas pu être téléchargée',
   'reference' => 'Référence',
+  'tooltip_reference' => 'Vous pouvez éventuellement enregistrer votre propre identifiant de référence pour cet élément, afin de le recouper avec d\'autres outils logiciels que vous utilisez.',
 ];
