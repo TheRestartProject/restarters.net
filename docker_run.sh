@@ -3,7 +3,9 @@
 #
 # We install composer dependencies in here rather than during the build step so that if we switch branches
 # and restart the container, it works.
-service ssh start
+
+USER_ID=${UID:-1000}
+GROUP_ID=${GID:-1000}
 
 if [ ! -f .env ]
 then
@@ -11,7 +13,7 @@ then
 fi
 
 rm -rf vendor
-php composer.phar install
+composer install
 
 # Point at the DB server
 sed -i 's/DB_HOST=.*$/DB_HOST=restarters_db/g' .env
@@ -30,14 +32,28 @@ sed -i 's/DISCOURSE_SECRET=.*$/DISCOURSE_SECRET=mustbetencharacters/g' .env
 sed -i 's/SESSION_DOMAIN=.*$/SESSION_DOMAIN=/g' phpunit.xml
 sed -i 's/DB_TEST_HOST=.*$/DB_TEST_HOST=restarters_db/g' phpunit.xml
 
-mkdir storage/framework/cache/data
+echo "Fixing file permissions with ${USER_ID}:${GROUP_ID}"
+# Only change ownership of directories that need it, excluding .git and other system files
+# This prevents permission errors on files owned by the host system
+for dir in storage bootstrap/cache vendor node_modules public/uploads; do
+    if [ -d "$dir" ]; then
+        chown -R ${USER_ID}:${GROUP_ID} "$dir" 2>/dev/null || true
+    fi
+done
+
+# Ensure storage directories exist and have correct permissions
+mkdir -p storage/framework/cache/data
+mkdir -p storage/framework/sessions
+mkdir -p storage/framework/views
+mkdir -p storage/logs
+mkdir -p bootstrap/cache
+
 php artisan migrate
 npm install --legacy-peer-deps
 npm rebuild node-sass
 php artisan lang:js --no-lib resources/js/translations.js
-chmod -R 777 public
 
-npm run watch&
+npm run watch-poll&
 php artisan key:generate
 php artisan cache:clear
 php artisan config:clear
@@ -45,7 +61,7 @@ php artisan config:clear
 # Ensure we have the admin user
 echo "User::create(['name'=>'Jane Bloggs','email'=>'jane@bloggs.net','password'=>Hash::make('passw0rd'),'role'=>2,'consent_past_data'=>'2021-01-01','consent_future_data'=>'2021-01-01','consent_gdpr'=>'2021-01-01']);" | php artisan tinker
 
-php artisan serve --host=0.0.0.0 --port=80
+php-fpm
 
 # In case everything else bombs out.
 sleep infinity
