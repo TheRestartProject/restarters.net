@@ -1,6 +1,5 @@
 const {expect} = require('@playwright/test')
 const faker = require('faker')
-const interruptHandler = require('./interrupt-handler')
 
 // Debug logging utility
 const DEBUG = process.env.PLAYWRIGHT_DEBUG === 'true' || process.env.DEBUG === 'playwright'
@@ -16,18 +15,15 @@ const login = async function(page, baseURL, email = 'jane@bloggs.net', password 
   
   // Load the login page.
   log('Navigating to login page')
-  interruptHandler.checkInterrupted()
   await page.goto(baseURL + '/login')
   await expect(page.locator('legend')).toHaveText('Sign in')
 
   log('Filling login credentials')
-  interruptHandler.checkInterrupted()
   await page.waitForSelector('#fp_email')
   await page.fill('#fp_email', email)
   await page.fill('#password', password)
 
   log('Submitting login form')
-  interruptHandler.checkInterrupted()
   await page.click('button[type=submit]')
   await page.waitForSelector('section.dashboard')
 
@@ -42,18 +38,15 @@ exports.createGroup = async function(page, baseURL) {
   
   // Go to groups page
   log('Navigating to groups page')
-  interruptHandler.checkInterrupted()
   await page.goto('/group', { timeout: 30000 })
 
   // Click on add a new group button
   log('Clicking create group button')
-  interruptHandler.checkInterrupted()
   await page.click('a[href="/group/create"]')
   // await page.goto(baseURL + '/group/create')
 
   const groupName = faker.company.companyName()
   log('Filling group form', { groupName })
-  interruptHandler.checkInterrupted()
   
   // Name
   await page.fill('#group_name', groupName)
@@ -68,7 +61,6 @@ exports.createGroup = async function(page, baseURL) {
   // Google seems to block autocomplete when running on CircleCI (but not locally).  So we have to hack around that by
   // setting some hidden inputs directly.  The code spots this via a timer.
   log('Setting location to London (hardcoded for CI)')
-  interruptHandler.checkInterrupted()
   await page.evaluate('document.getElementById("lat").setAttribute("value", 51.5074);')
   await page.evaluate('document.getElementById("lng").setAttribute("value", -0.1276);')
   await page.evaluate('document.querySelector(\'[placeholder="Enter your address"]\').setAttribute("value", "London, UK");')
@@ -76,7 +68,6 @@ exports.createGroup = async function(page, baseURL) {
   // Now create it.  Wait a hardcoded time to let the autocomplete code sort itself out.  This is
   // ugly, but will do.
   log('Submitting group creation form')
-  interruptHandler.checkInterrupted()
   await page.waitForTimeout(3000);
   await page.click('button[type=submit]')
 
@@ -84,7 +75,6 @@ exports.createGroup = async function(page, baseURL) {
   // understand.  It may be as design in Playwright.  However the page URL will have been updated and we can use that
   // to check that the create redirected to edit.
   log('Waiting for redirect to edit page')
-  interruptHandler.checkInterrupted()
   const WAIT_FOR_URL_TIMEOUT = process.env.PLAYWRIGHT_WAIT_URL_TIMEOUT ? parseInt(process.env.PLAYWRIGHT_WAIT_URL_TIMEOUT) : 30000;
   await page.waitForURL('**/edit/**', { timeout: WAIT_FOR_URL_TIMEOUT });
 

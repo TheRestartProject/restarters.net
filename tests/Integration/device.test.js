@@ -1,131 +1,79 @@
 const {expect} = require('@playwright/test')
 const { test } = require('./fixtures')
 const { login, createGroup, createEvent, approveEvent, addDevice } = require('./utils')
-const interruptHandler = require('./interrupt-handler')
 
 test('Spare parts set as expected', async ({page, baseURL}) => {
   test.slow()
-  interruptHandler.setCurrentTest('Spare parts set as expected')
   
-  try {
-    interruptHandler.checkInterrupted()
-    await login(page, baseURL)
-    interruptHandler.checkInterrupted()
-    
-    const groupid = await createGroup(page, baseURL)
-    interruptHandler.checkInterrupted()
-    
-    const eventid = await createEvent(page, baseURL, groupid, true)
-    interruptHandler.checkInterrupted()
-    
-    await approveEvent(page, baseURL, eventid)
-    interruptHandler.checkInterrupted()
-    
-    await addDevice(page, baseURL, eventid, true, false, true, true)
-    interruptHandler.checkInterrupted()
+  await login(page, baseURL)
+  
+  const groupid = await createGroup(page, baseURL)
+  
+  const eventid = await createEvent(page, baseURL, groupid, true)
+  
+  await approveEvent(page, baseURL, eventid)
+  
+  await addDevice(page, baseURL, eventid, true, false, true, true)
 
-    // Should  see spare parts tick in summary.  Two copies because of mobile view.
-    await expect(await page.locator('.spare-parts-tick').count()).toEqual(2);
-  } finally {
-    interruptHandler.reset()
-  }
+  // Should  see spare parts tick in summary.  Two copies because of mobile view.
+  await expect(await page.locator('.spare-parts-tick').count()).toEqual(2);
 })
 
 test('Spare parts not set unexpectedly', async ({page, baseURL}) => {
   test.slow()
-  interruptHandler.setCurrentTest('Spare parts not set unexpectedly')
   
-  try {
-    interruptHandler.checkInterrupted()
-    await login(page, baseURL)
-    interruptHandler.checkInterrupted()
-    
-    const groupid = await createGroup(page, baseURL)
-    interruptHandler.checkInterrupted()
-    
-    const eventid = await createEvent(page, baseURL, groupid, true)
-    interruptHandler.checkInterrupted()
-    
-    await approveEvent(page, baseURL, eventid)
-    interruptHandler.checkInterrupted()
-    
-    await addDevice(page, baseURL, eventid, true, false, true)
-    interruptHandler.checkInterrupted()
+  await login(page, baseURL)
+  
+  const groupid = await createGroup(page, baseURL)
+  
+  const eventid = await createEvent(page, baseURL, groupid, true)
+  
+  await approveEvent(page, baseURL, eventid)
+  
+  await addDevice(page, baseURL, eventid, true, false, true)
 
-    // Should not see spare parts tick in summary.
-    await expect(await page.locator('.spare-parts-tick:visible').count()).toEqual(0);
-  } finally {
-    interruptHandler.reset()
-  }
+  // Should not see spare parts tick in summary.
+  await expect(await page.locator('.spare-parts-tick:visible').count()).toEqual(0);
 })
 
 test('Can create misc powered device', async ({page, baseURL}) => {
   test.slow()
-  interruptHandler.setCurrentTest('Can create misc powered device')
   
-  try {
-    interruptHandler.checkInterrupted()
-    await login(page, baseURL)
-    interruptHandler.checkInterrupted()
-    
-    const groupid = await createGroup(page, baseURL)
-    interruptHandler.checkInterrupted()
-    
-    const eventid = await createEvent(page, baseURL, groupid, true)
-    interruptHandler.checkInterrupted()
-    
-    await approveEvent(page, baseURL, eventid)
-    interruptHandler.checkInterrupted()
-    
-    await addDevice(page, baseURL, eventid, true)
-    interruptHandler.checkInterrupted()
-  } finally {
-    interruptHandler.reset()
-  }
+  await login(page, baseURL)
+  
+  const groupid = await createGroup(page, baseURL)
+  
+  const eventid = await createEvent(page, baseURL, groupid, true)
+  
+  await approveEvent(page, baseURL, eventid)
+  
+  await addDevice(page, baseURL, eventid, true)
 })
 
 test('Can create device with photo', async ({page, baseURL}) => {
   test.slow()
-  interruptHandler.setCurrentTest('Can create device with photo')
   
-  try {
-    interruptHandler.checkInterrupted()
-    await login(page, baseURL)
-    interruptHandler.checkInterrupted()
-    
-    const groupid = await createGroup(page, baseURL)
-    interruptHandler.checkInterrupted()
-    
-    const eventid = await createEvent(page, baseURL, groupid, true)
-    interruptHandler.checkInterrupted()
-    
-    await approveEvent(page, baseURL, eventid)
-    interruptHandler.checkInterrupted()
-    
-    await addDevice(page, baseURL, eventid, true, true)
-    interruptHandler.checkInterrupted()
-  } finally {
-    interruptHandler.reset()
-  }
+  await login(page, baseURL)
+  
+  const groupid = await createGroup(page, baseURL)
+  
+  const eventid = await createEvent(page, baseURL, groupid, true)
+  
+  await approveEvent(page, baseURL, eventid)
+  
+  await addDevice(page, baseURL, eventid, true, true)
 })
 
 test('Automatic category suggestion from item type', async ({page, baseURL}) => {
   test.slow()
-  interruptHandler.setCurrentTest('Automatic category suggestion from item type')
   
-  try {
-    interruptHandler.checkInterrupted()
-    await login(page, baseURL)
-    interruptHandler.checkInterrupted()
-    
-    const groupid = await createGroup(page, baseURL)
-    interruptHandler.checkInterrupted()
-    
-    const eventid = await createEvent(page, baseURL, groupid, true)
-    interruptHandler.checkInterrupted()
-    
-    await approveEvent(page, baseURL, eventid)
-    interruptHandler.checkInterrupted()
+  await login(page, baseURL)
+  
+  const groupid = await createGroup(page, baseURL)
+  
+  const eventid = await createEvent(page, baseURL, groupid, true)
+  
+  await approveEvent(page, baseURL, eventid)
 
     // Test data: item types and their expected suggested categories
     const testCases = [
@@ -149,7 +97,6 @@ test('Automatic category suggestion from item type', async ({page, baseURL}) => 
     
     // Create the expected mappings (5 devices each to ensure they win the count algorithm)
     for (const testCase of testCases) {
-      interruptHandler.checkInterrupted()
       console.log(`Creating 5 devices for '${testCase.itemType}' → '${testCase.expectedCategory}'`)
       
       for (let i = 0; i < 5; i++) {
@@ -168,7 +115,6 @@ test('Automatic category suggestion from item type', async ({page, baseURL}) => 
     ]
     
     for (const conflict of conflictingData) {
-      interruptHandler.checkInterrupted()
       console.log(`Creating ${conflict.count} conflicting devices for '${conflict.itemType}' → '${conflict.category}'`)
       
       for (let i = 0; i < conflict.count; i++) {
@@ -182,7 +128,6 @@ test('Automatic category suggestion from item type', async ({page, baseURL}) => 
     console.log('Testing autocomplete functionality...')
     // Note: The items.js store will automatically fetch fresh data since we're running under Playwright
     for (const testCase of testCases) {
-      interruptHandler.checkInterrupted()
       
       // Test the UI behavior for category autocomplete
       // Go to event view page
@@ -209,7 +154,4 @@ test('Automatic category suggestion from item type', async ({page, baseURL}) => 
       // Close the modal by clicking cancel to prepare for next test case
       await page.locator('.cancel', { hasText: 'Cancel' }).first().click()
     }
-  } finally {
-    interruptHandler.reset()
-  }
 })

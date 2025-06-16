@@ -9,8 +9,6 @@ const config = {
   // Only use 1 worker, otherwise we hit CSRF issues.
   workers: 1,
 
-  // Global setup for interrupt handling
-  globalSetup: require.resolve('./tests/Integration/global-setup.js'),
 
   use: {
     trace: 'on',
