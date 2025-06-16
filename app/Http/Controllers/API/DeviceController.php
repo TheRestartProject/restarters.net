@@ -139,6 +139,10 @@ class DeviceController extends Controller {
      *                     property="barrier",
      *                     ref="#/components/schemas/Device/properties/barrier",
      *                ),
+     *                @OA\Property(
+     *                     property="reference",
+     *                     ref="#/components/schemas/Device/properties/reference",
+     *                ),
      *             )
      *         )
      *    ),
@@ -174,7 +178,8 @@ class DeviceController extends Controller {
             $professional_help,
             $more_time_needed,
             $do_it_yourself,
-            $barrier
+            $barrier,
+            $reference
         ) = $this->validateDeviceParams($request,true);
 
         // We may have uploaded photos before creation, and we have a draft id which allows us to patch that
@@ -206,6 +211,7 @@ class DeviceController extends Controller {
             'more_time_needed' => $more_time_needed,
             'do_it_yourself' => $do_it_yourself,
             'repaired_by' => $user->id,
+            'reference' => $reference
         ];
 
         $device = Device::create($data);
@@ -328,6 +334,10 @@ class DeviceController extends Controller {
      *                     property="barrier",
      *                     ref="#/components/schemas/Device/properties/barrier",
      *                ),
+     *                @OA\Property(
+     *                     property="reference",
+     *                     ref="#/components/schemas/Device/properties/reference",
+     *                ),
      *             )
      *         )
      *    ),
@@ -363,7 +373,8 @@ class DeviceController extends Controller {
             $professional_help,
             $more_time_needed,
             $do_it_yourself,
-            $barrier
+            $barrier,
+            $reference
             ) = $this->validateDeviceParams($request,false);
 
         $event = Party::findOrFail($eventid);
@@ -390,6 +401,7 @@ class DeviceController extends Controller {
             'more_time_needed' => $more_time_needed,
             'do_it_yourself' => $do_it_yourself,
             'repaired_by' => $user->id,
+            'reference' => $reference
         ];
 
         $device = Device::findOrFail($iddevices);
@@ -481,6 +493,7 @@ class DeviceController extends Controller {
             'next_steps' => [ 'string', 'in:More time needed,Professional help,Do it yourself', 'nullable' ],
             'spare_parts' => [ 'string', 'in:No,Manufacturer,Third party' ],
             'barrier' => [ 'string', 'nullable', 'in:Spare parts not available,Spare parts too expensive,No way to open the product,Repair information not available,Lack of equipment' ],
+            'reference' => [ 'string', 'nullable', 'max:255' ]
         ]);
 
         $eventid = $request->input('eventid');
@@ -496,6 +509,7 @@ class DeviceController extends Controller {
         $notes = $request->input('notes');
         $repair_status = $request->input('repair_status');
         $barrierInput = $request->input('barrier');
+        $reference = $request->input('reference');
 
         // Our database has a slightly complex structure for historical reasons, so we need to map some input
         // values to the underlying fields.  This keeps the API clean.
@@ -589,7 +603,8 @@ class DeviceController extends Controller {
             $professional_help,
             $more_time_needed,
             $do_it_yourself,
-            $barrier
+            $barrier,
+            $reference
         ];
     }
 
