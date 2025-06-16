@@ -1,4 +1,5 @@
-const { test as base } = require('@playwright/test');
+const playwright = require('@playwright/test');
+const base = playwright.test;
 
 // Extend base test with custom fixtures
 const test = base.extend({
