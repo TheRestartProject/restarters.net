@@ -202,7 +202,7 @@ jobs:
 #           no_output_timeout: 45m
 
       # Coveralls is pernickety about the location it uploads from existing.
-      - run: mkdir build; mkdir build/logs; php vendor/bin/php-coveralls -v -x tests/clover.xml
+#      - run: mkdir build; mkdir build/logs; php vendor/bin/php-coveralls -v -x tests/clover.xml
 
       # Run the Jest tests.
       - run: npm run jest
