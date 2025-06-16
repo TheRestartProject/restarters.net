@@ -42,6 +42,7 @@ class DeviceItemTypesTest extends TestCase
             'item_type' => 'flatscreen LCD'
         ]);
 
-        $this->assertEquals(1, count(Device::getItemTypes()));
+        $types = Device::getItemTypes();
+        $this->assertEquals(1, count($types));
     }
 }

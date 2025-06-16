@@ -384,10 +384,12 @@ export default {
         // Check the form is valid.
         if (this.$v.$invalid) {
           // It's not.
+          console.log('Form is invalid', )
           this.validationFocusFirstError()
         } else {
+          console.log('Form is valid')
           if (this.creating) {
-            const id = await this.$store.dispatch('groups/create', {
+            const payload = {
               name: this.name,
               website: this.website,
               email: this.email,
@@ -399,13 +401,16 @@ export default {
               phone: this.phone,
               image: this.image,
               network_data: JSON.stringify(this.networkData)
-            })
+            }
+            console.log('Create', JSON.stringify(payload))
+            const id = await this.$store.dispatch('groups/create', payload)
 
             if (id) {
               // Success.  Go to the edit page.
               window.location = '/group/edit/' + id
               success = true
             } else {
+              console.log('Create failed')
               this.failed = true
             }
           } else {
@@ -413,7 +418,7 @@ export default {
               // It's not.
               this.validationFocusFirstError()
             } else {
-              let id = await this.$store.dispatch('groups/edit', {
+              const payload = {
                 id: this.idgroups,
                 name: this.name,
                 website: this.website,
@@ -430,7 +435,10 @@ export default {
                 tags: JSON.stringify(this.tagList.map(n => n.id)),
                 network_data: JSON.stringify(this.networkData),
                 archived_at: this.archived_at,
-              })
+              }
+
+              console.log('Edit', JSON.stringify(payload))
+              let id = await this.$store.dispatch('groups/edit', payload)
 
               if (id) {
                 // Don't reload the page, because group approval is handled asynchronously, and hence the
@@ -439,11 +447,14 @@ export default {
                 this.edited = true
                 success = true
               } else {
+                console.log('Edit failed')
                 this.failed = true
               }
             }
           }
         }
+      } else {
+        console.log('Duplicate name')
       }
 
       callback(success)

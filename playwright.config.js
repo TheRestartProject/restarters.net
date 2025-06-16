@@ -6,20 +6,29 @@ const { devices } = require('@playwright/test');
 const config = {
   // Generate trace if a test fails; can be viewed using something like:
   // npx playwright show-trace test-results/group-Can-create-group-Desktop-Chromium-retry1/trace.zip
-  retries: 1,
-
   // Only use 1 worker, otherwise we hit CSRF issues.
   workers: 1,
 
+
   use: {
-    trace: 'on-first-retry',
+    trace: 'on',
+    // Take screenshot on failure for debugging
+    screenshot: 'on',
+    // Also capture video on failure for additional context
+    video: 'on',
+    // Configurable timeout for waitForURL operations
+    navigationTimeout: 30000,
+    // Add header to identify Playwright requests
+    extraHTTPHeaders: {
+      'X-Playwright-Test': 'true'
+    },
   },
   projects: [
     {
       name: 'Desktop Chromium',
       use: {
         browserName: 'chromium',
-        baseURL: 'http://localhost'
+        baseURL: process.env.PLAYWRIGHT_BASE_URL || 'http://localhost:8000'
       },
     },
     // TODO The other browsers don't work reliably yet.
@@ -55,7 +64,7 @@ const config = {
   timeout: 5 * 60 * 1000,
   navigationTimeout: 2 * 60 * 1000,
   actionTimeout: 2 * 60 * 1000,
-  retries: 2
+  retries: 0
 };
 
 module.exports = config;
