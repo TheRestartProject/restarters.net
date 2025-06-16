@@ -750,6 +750,20 @@ class Party extends Model implements Auditable
         return array_key_exists('event_end_utc', $this->attributes) ? Carbon::parse($this->attributes['event_end_utc'], 'UTC')->toIso8601String() : null;
     }
 
+    // MySQL doesn't handle ISO 8601 strings well, so we convert them to the UTC timezone before
+    // storing them in the database.  This is a mutator, so it will be called when the model is saved.
+    public function setEventStartUtcAttribute($val) {
+        $dt = Carbon::parse($val);
+        $dt->setTimezone('UTC');
+        $this->attributes['event_start_utc'] = $dt->toDateTimeString();
+    }
+
+    public function setEventEndUtcAttribute($val) {
+        $dt = Carbon::parse($val);
+        $dt->setTimezone('UTC');
+        $this->attributes['event_end_utc'] = $dt->toDateTimeString();
+    }
+
     // Mutators for previous event_date/start/end fields.  These are now superceded by the UTC fields and therefore
     // should never be set directly.  Throw exceptions to ensure that they are not.
     public function setEventDateAttribute($val) {

@@ -40,7 +40,11 @@ class ItemController extends Controller
      */
     public static function listItemsv2(Request $request) {
         // Item types don't change often, so we can cache them.
-        if (\Cache::has('item_types')) {
+        // Allow cache refresh for testing purposes or when running under Playwright
+        $refreshCache = $request->has('refresh_cache') && $request->get('refresh_cache') === 'true';
+        $isPlaywrightTest = $request->hasHeader('X-Playwright-Test');
+        
+        if (!$refreshCache && !$isPlaywrightTest && \Cache::has('item_types')) {
             $items = \Cache::get('item_types');
         } else {
             $items = Device::getItemTypes();

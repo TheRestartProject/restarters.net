@@ -1,5 +1,5 @@
 <template>
-  <div class="w-100 device-select-row">
+  <div class="w-100 device-select-row item-type">
     <vue-typeahead-bootstrap ref="typeahead" v-model="currentType" :maxMatches="5" :data="suggestions"
                              :minMatchingChars="1" size="lg" :inputClass="'marg form-control-lg theinput-' + uid" :disabled="disabled"
                              :placeholder="__('devices.item_type')" @hit="emit"/>
@@ -59,7 +59,17 @@ export default {
       return this.$store.getters['items/list'];
     },
     suggestions() {
-      return this.itemTypes.map(i => i.type)
+      const ret = []
+
+      this.itemTypes.forEach(i => {
+        if (i.type && i.type.length) {
+          if (this.powered === i.powered) {
+            ret.push(i.type)
+          }
+        }
+      })
+
+      return ret
     },
     notASuggestion() {
       if (!this.currentType || !this.itemTypes.length) {

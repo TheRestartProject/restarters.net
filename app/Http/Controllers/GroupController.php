@@ -630,50 +630,6 @@ class GroupController extends Controller
         return 'Sorry, but the image can\'t be deleted';
     }
 
-    public function inviteNearbyRestarter($groupId, $userId)
-    {
-        $user_group = UserGroups::where('user', $userId)->where('group', $groupId)->first();
-        $user = User::where('id', $userId)->first();
-
-        // not already a confirmed member of the group
-        if (is_null($user_group) || $user_group->status != '1') {
-            $hash = substr(bin2hex(openssl_random_pseudo_bytes(32)), 0, 24);
-            $url = url('/').'/group/accept-invite/'.$groupId.'/'.$hash;
-
-            // already been invited once, set a new invite hash
-            if (! is_null($user_group)) {
-                $user_group->update([
-                    'status' => $hash,
-                ]);
-            // not associated with the group at all yet
-            } else {
-                UserGroups::create([
-                    'user' => $userId,
-                    'group' => $groupId,
-                    'status' => $hash,
-                    'role' => 4,
-                ]);
-            }
-
-            try {
-                $from = Auth::user();
-                $group = Group::where('idgroups', $groupId)->first();
-                if ($user->invites == 1) {
-                    Notification::send($user, new JoinGroup([
-                        'name' => $from->name,
-                        'group' => $group->name,
-                        'url' => $url,
-                        'message' => null,
-                    ], $user));
-                }
-            } catch (\Exception $ex) {
-                Log::error('An error occurred while sending invitation to nearby Restarter:'.$ex->getMessage());
-            }
-        }
-
-        return redirect('/group/nearby/'.intval($groupId))->with('success', $user->name.' has been invited');
-    }
-
     /**
      * [confirmCodeInvite description].
      *
