@@ -70,8 +70,6 @@ jobs:
             
             # Setup Laravel (some commands are already handled by docker setup)
             task docker:run:artisan -- "key:generate"
-            # Set MySQL function creators - run directly on MySQL container
-            docker exec restarters_db mysql -u root -ps3cr3t -e "SET PERSIST log_bin_trust_function_creators = 1;"
             task docker:run:artisan -- "migrate"
             task docker:run:artisan -- "l5-swagger:generate"
             
@@ -128,8 +126,8 @@ jobs:
       - run:
           name: Prepare for Playwright tests
           command: |
-            # Clean up test data that might interfere
-            task docker:run:bash -- "mysql -h restarters_db -u root -ps3cr3t -e \"use restarters_db_test;SET foreign_key_checks=0;DELETE FROM \\\`groups\\\` WHERE location IS NULL;SET foreign_key_checks=1;\""
+            # Clean up test data that might interfere - run directly on MySQL container
+            docker exec restarters_db mysql -u root -ps3cr3t -e "use restarters_db_test;SET foreign_key_checks=0;DELETE FROM \`groups\` WHERE location IS NULL;SET foreign_key_checks=1;"
             task docker:run:artisan -- "cache:clear"
             
             # Create test user
