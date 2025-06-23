@@ -94,7 +94,7 @@ jobs:
             docker exec restarters_db mysql -u root -ps3cr3t -e "SET GLOBAL log_bin_trust_function_creators = 1;"
             
             # Generate additional Laravel artifacts for testing
-            task docker:run:artisan -- "l5-swagger:generate"
+            docker exec restarters php artisan l5-swagger:generate
 
       # Setup Discourse API
       - run:
@@ -104,7 +104,7 @@ jobs:
             docker exec postgresql psql -U postgres -c "INSERT INTO api_keys (id, user_id, created_by_id, created_at, updated_at, allowed_ips, hidden, last_used_at, revoked_at, description, key_hash, truncated_key) VALUES (1, NULL, 1, '2021-10-25 13:56:20.033338', '2021-10-25 13:56:20.033338', NULL, false, NULL, NULL, 'Restarters', 'd89e9dfacfb611fbaf004807648187ce7ed474df44dcb0ada230fab5c8dd6a5b', '9fd7');" bitnami_discourse
             
             # Configure Discourse settings
-            task docker:run:artisan -- "discourse:setting personal_message_enabled_groups 10"
+            docker exec restarters php artisan discourse:setting personal_message_enabled_groups 10
 
       # Run PHPUnit tests
       - run:
@@ -141,7 +141,7 @@ jobs:
           command: |
             # Clean up test data that might interfere - run directly on MySQL container
             docker exec restarters_db mysql -u root -ps3cr3t -e "use restarters_db_test;SET foreign_key_checks=0;DELETE FROM \`groups\` WHERE location IS NULL;SET foreign_key_checks=1;"
-            task docker:run:artisan -- "cache:clear"
+            docker exec restarters php artisan cache:clear
             
             # Create test user
             task docker:run:bash -- "echo \"App\\\\User::create(['name'=>'Jane Bloggs','email'=>'jane@bloggs.net','password'=>Hash::make('passw0rd'),'role'=>2,'consent_past_data'=>'2021-01-01','consent_future_data'=>'2021-01-01','consent_gdpr'=>'2021-01-01']);\" | php artisan tinker" || true
