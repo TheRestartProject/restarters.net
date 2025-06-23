@@ -95,14 +95,6 @@ jobs:
             
             # Generate additional Laravel artifacts for testing
             task docker:run:artisan -- "l5-swagger:generate"
-            
-            # Install test-specific dependencies (npm install and basic setup already done by docker_run.sh)
-            task docker:run:bash -- "npx playwright install"
-            task docker:run:bash -- "npx playwright install-deps"
-            task docker:run:bash -- "npm install -D @playwright/test"
-            
-            # Create uploads directories
-            task docker:run:bash -- "mkdir -p uploads public/uploads"
 
       # Setup Discourse API
       - run:

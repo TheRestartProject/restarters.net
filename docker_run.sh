@@ -53,6 +53,11 @@ npm install --legacy-peer-deps
 npm rebuild node-sass
 php artisan lang:js --no-lib resources/js/translations.js
 
+# Install Playwright for testing
+npm install -D @playwright/test
+npx playwright install
+npx playwright install-deps
+
 npm run watch-poll&
 php artisan key:generate
 php artisan cache:clear
