@@ -65,12 +65,13 @@ jobs:
       - run:
           name: Setup application
           command: |
-            # Grant timezone access
-            task docker:run:bash -- "mysql -h restarters_db -u root -ps3cr3t -e \"GRANT SELECT ON mysql.time_zone_name TO 'restarters'@'%';\""
+            # Grant timezone access - run directly on MySQL container
+            docker exec restarters_db mysql -u root -ps3cr3t -e "GRANT SELECT ON mysql.time_zone_name TO 'restarters'@'%';"
             
             # Setup Laravel (some commands are already handled by docker setup)
             task docker:run:artisan -- "key:generate"
-            task docker:run:bash -- "mysql -h restarters_db -u root -ps3cr3t -e \"SET PERSIST log_bin_trust_function_creators = 1;\""
+            # Set MySQL function creators - run directly on MySQL container
+            docker exec restarters_db mysql -u root -ps3cr3t -e "SET PERSIST log_bin_trust_function_creators = 1;"
             task docker:run:artisan -- "migrate"
             task docker:run:artisan -- "l5-swagger:generate"
             
@@ -88,8 +89,8 @@ jobs:
       - run:
           name: Setup Discourse
           command: |
-            # Add API key to Discourse
-            task docker:run:bash -- "docker exec postgresql psql -U postgres -c \"INSERT INTO api_keys (id, user_id, created_by_id, created_at, updated_at, allowed_ips, hidden, last_used_at, revoked_at, description, key_hash, truncated_key) VALUES (1, NULL, 1, '2021-10-25 13:56:20.033338', '2021-10-25 13:56:20.033338', NULL, false, NULL, NULL, 'Restarters', 'd89e9dfacfb611fbaf004807648187ce7ed474df44dcb0ada230fab5c8dd6a5b', '9fd7');\" bitnami_discourse"
+            # Add API key to Discourse - run directly on PostgreSQL container
+            docker exec postgresql psql -U postgres -c "INSERT INTO api_keys (id, user_id, created_by_id, created_at, updated_at, allowed_ips, hidden, last_used_at, revoked_at, description, key_hash, truncated_key) VALUES (1, NULL, 1, '2021-10-25 13:56:20.033338', '2021-10-25 13:56:20.033338', NULL, false, NULL, NULL, 'Restarters', 'd89e9dfacfb611fbaf004807648187ce7ed474df44dcb0ada230fab5c8dd6a5b', '9fd7');" bitnami_discourse
             
             # Configure Discourse settings
             task docker:run:artisan -- "discourse:setting personal_message_enabled_groups 10"
