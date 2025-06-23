@@ -53,10 +53,9 @@ npm install --legacy-peer-deps
 npm rebuild node-sass
 php artisan lang:js --no-lib resources/js/translations.js
 
-# Install Playwright for testing
+# Install Playwright for testing (system deps already in Dockerfile)
 npm install -D @playwright/test
 npx playwright install
-npx playwright install-deps
 
 npm run watch-poll&
 php artisan key:generate
