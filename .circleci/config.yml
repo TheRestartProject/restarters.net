@@ -112,8 +112,8 @@ jobs:
           command: |
             # Create test results directory on host
             mkdir -p /tmp/test-results/phpunit
-            # Run PHPUnit with JUnit XML output
-            task docker:run:bash -- "export XDEBUG_MODE=coverage; ./vendor/bin/phpunit -d memory_limit=1024M --bootstrap vendor/autoload.php --coverage-clover tests/clover.xml --log-junit /tmp/phpunit-results.xml --configuration ./phpunit.xml"
+            # Run PHPUnit with JUnit XML output - using direct docker exec to avoid quote issues
+            docker exec restarters bash -c "export XDEBUG_MODE=coverage; ./vendor/bin/phpunit -d memory_limit=1024M --bootstrap vendor/autoload.php --coverage-clover tests/clover.xml --log-junit /tmp/phpunit-results.xml --configuration ./phpunit.xml"
             # Copy test results to host
             docker cp restarters:/tmp/phpunit-results.xml /tmp/test-results/phpunit/results.xml
           no_output_timeout: 45m
@@ -122,7 +122,7 @@ jobs:
       - run:
           name: Upload coverage
           command: |
-            task docker:run:bash -- "mkdir -p build/logs && php vendor/bin/php-coveralls -v -x tests/clover.xml"
+            docker exec restarters bash -c "mkdir -p build/logs && php vendor/bin/php-coveralls -v -x tests/clover.xml"
 
       # Run Jest tests
       - run:
@@ -131,7 +131,7 @@ jobs:
             # Create test results directory for Jest
             mkdir -p /tmp/test-results/jest
             # Run Jest with JUnit output
-            task docker:run:bash -- "npm run jest -- --outputFile=/tmp/jest-results.xml --testResultsProcessor=jest-junit"
+            docker exec restarters bash -c "npm run jest -- --outputFile=/tmp/jest-results.xml --testResultsProcessor=jest-junit"
             # Copy test results to host if they exist
             docker cp restarters:/tmp/jest-results.xml /tmp/test-results/jest/results.xml || echo "Jest results not found, skipping"
 
@@ -144,13 +144,13 @@ jobs:
             docker exec restarters php artisan cache:clear
             
             # Create test user
-            task docker:run:bash -- "echo \"App\\\\User::create(['name'=>'Jane Bloggs','email'=>'jane@bloggs.net','password'=>Hash::make('passw0rd'),'role'=>2,'consent_past_data'=>'2021-01-01','consent_future_data'=>'2021-01-01','consent_gdpr'=>'2021-01-01']);\" | php artisan tinker" || true
+            docker exec restarters bash -c "echo \"App\\\\User::create(['name'=>'Jane Bloggs','email'=>'jane@bloggs.net','password'=>Hash::make('passw0rd'),'role'=>2,'consent_past_data'=>'2021-01-01','consent_future_data'=>'2021-01-01','consent_gdpr'=>'2021-01-01']);\" | php artisan tinker" || true
             
             # Build assets
-            task docker:run:bash -- "export NODE_OPTIONS=--max-old-space-size=8192; npm rebuild node-sass; npm run prod"
+            docker exec restarters bash -c "export NODE_OPTIONS=--max-old-space-size=8192; npm rebuild node-sass; npm run prod"
             
             # Disable API throttling for tests
-            task docker:run:bash -- "sed -i 's/.throttle:api.,//g' /var/www/app/Http/Kernel.php"
+            docker exec restarters bash -c "sed -i 's/.throttle:api.,//g' /var/www/app/Http/Kernel.php"
 
       # Run Playwright tests
       - run:
@@ -159,7 +159,7 @@ jobs:
             # Create test results directory for Playwright
             mkdir -p /tmp/test-results/playwright
             # Run Playwright tests with proper output directory
-            task docker:run:bash -- "export PLAYWRIGHT_DEBUG=true; export DEBUG=playwright; export PLAYWRIGHT_BASE_URL=http://localhost:8001; npx playwright test --reporter=junit --output-dir=/tmp/playwright-results"
+            docker exec restarters bash -c "export PLAYWRIGHT_DEBUG=true; export DEBUG=playwright; export PLAYWRIGHT_BASE_URL=http://localhost:8001; npx playwright test --reporter=junit --output-dir=/tmp/playwright-results"
             # Copy test results and artifacts to host
             docker cp restarters:/tmp/playwright-results /tmp/test-results/playwright/ || echo "Playwright results not found, skipping"
           no_output_timeout: 10m
