@@ -3,7 +3,8 @@ version: 2.1
 jobs:
   build:
     machine:
-      image: circleci/cci-demo-docker-primary
+      image: ubuntu-2204:current
+    resource_class: large
     environment:
       - TZ: "UTC"
 
