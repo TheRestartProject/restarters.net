@@ -55,6 +55,27 @@ jobs:
             task docker:up-all
           no_output_timeout: 10m
 
+      # Wait for initial application build to complete
+      - run:
+          name: Wait for application build
+          command: |
+            echo "Waiting for initial application build to complete..."
+            # Wait for build completion by checking for expected build artifacts
+            max_attempts=60  # 10 minutes total
+            attempt=0
+            while [ $attempt -lt $max_attempts ]; do
+              if docker exec restarters bash -c "[ -f public/mix-manifest.json ] || [ -f public/css/app.css ]"; then
+                echo "✓ Application build complete - build artifacts found"
+                break
+              fi
+              echo "  Build not complete, waiting... (attempt $((attempt + 1))/$max_attempts)"
+              sleep 10
+              attempt=$((attempt + 1))
+            done
+            if [ $attempt -eq $max_attempts ]; then
+              echo "⚠️  Build artifacts not found after $max_attempts attempts, proceeding anyway"
+            fi
+
       # Wait for services to be ready
       - run:
           name: Wait for services
@@ -68,14 +89,14 @@ jobs:
             # Grant timezone access - run directly on MySQL container
             docker exec restarters_db mysql -u root -ps3cr3t -e "GRANT SELECT ON mysql.time_zone_name TO 'restarters'@'%';"
             
-            # Setup Laravel (some commands are already handled by docker setup)
-            task docker:run:artisan -- "key:generate"
-            task docker:run:artisan -- "migrate"
+            # Setup additional configuration needed for CI (most setup already done by docker_run.sh)
+            # Set MySQL function creators using session variable (compatible with MySQL 5.7)
+            docker exec restarters_db mysql -u root -ps3cr3t -e "SET GLOBAL log_bin_trust_function_creators = 1;"
+            
+            # Generate additional Laravel artifacts for testing
             task docker:run:artisan -- "l5-swagger:generate"
             
-            # Install test dependencies
-            task docker:run:bash -- "npm install"
-            task docker:run:artisan -- "lang:js --no-lib resources/js/translations.js"
+            # Install test-specific dependencies (npm install and basic setup already done by docker_run.sh)
             task docker:run:bash -- "npx playwright install"
             task docker:run:bash -- "npx playwright install-deps"
             task docker:run:bash -- "npm install -D @playwright/test"
@@ -158,10 +179,3 @@ jobs:
       
       - store_test_results:
           path: /tmp/test-results
-
-      # Cleanup
-      - run:
-          name: Cleanup
-          command: |
-            task docker:down-all
-          when: always
