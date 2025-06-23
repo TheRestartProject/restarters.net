@@ -70,8 +70,6 @@
 # TODO This is stock Discourse - no theme.  Would be nice to have the theme, but that doesn't matter so far as
 # testing the integration.
 
-version: '3'
-
 services:
   # Core services - always enabled
   restarters:

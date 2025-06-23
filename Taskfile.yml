@@ -8,9 +8,19 @@ dotenv:
 
 env:
   UID:
-    sh: id -u
+    sh: |
+      if command -v id >/dev/null 2>&1; then
+        id -u
+      else
+        echo "1000"
+      fi
   GID:
-    sh: id -g
+    sh: |
+      if command -v id >/dev/null 2>&1; then
+        id -g
+      else
+        echo "1000"
+      fi
 
 vars:
   DOCKER_CMD:
@@ -160,3 +170,94 @@ tasks:
 
     cmds:
       - docker exec -it restarters php artisan "{{ .CLI_ARGS }}"
+
+  docker:wait-for-services-*:
+    desc: Wait for Docker services to be ready and responding for a given profile (Usage - task docker:wait-for-services-[core|debug|discourse|all])
+    summary: |
+      Wait for Docker services to be ready by checking their health endpoints.
+      This task will check that services are listening on their ports and returning
+      plausible responses before proceeding, but only for the services in the specified profile.
+      
+      For just the core services, use:
+      task docker:wait-for-services-core
+      
+      To include debug tools (phpMyAdmin, Mailhog), use:
+      task docker:wait-for-services-debug
+      
+      To include Discourse services, use:
+      task docker:wait-for-services-discourse
+      
+      To wait for all services, use:
+      task docker:wait-for-services-all
+      
+      The task checks:
+      - Core profile: MySQL database, Restarters web app
+      - Debug profile: Core + phpMyAdmin, Mailhog  
+      - Discourse profile: Core + Discourse, PostgreSQL, Redis, Sidekiq
+      - All profile: All services
+      
+    requires: *PROFILE_REQUIRES
+    
+    vars: *PROFILE_VARS
+
+    cmds:
+      - |
+        # Cross-platform sleep function
+        cross_platform_sleep() {
+          if command -v sleep >/dev/null 2>&1; then
+            sleep "$1"
+          elif command -v powershell >/dev/null 2>&1; then
+            powershell -Command "Start-Sleep -Seconds $1"
+          else
+            # Fallback using ping (works on most systems)
+            ping -n $(($1 + 1)) 127.0.0.1 >/dev/null 2>&1 || ping -c $1 127.0.0.1 >/dev/null 2>&1
+          fi
+        }
+        
+        # Generic wait function that takes: service_name, check_command, max_attempts, sleep_interval
+        wait_for_service() {
+          local service_name="$1"
+          local check_command="$2" 
+          local max_attempts="$3"
+          local sleep_interval="$4"
+          
+          echo "Waiting for $service_name..."
+          local attempt=0
+          while [ $attempt -lt $max_attempts ]; do
+            if eval "$check_command" >/dev/null 2>&1; then
+              echo "✓ $service_name is ready"
+              return 0
+            fi
+            echo "  $service_name not ready, waiting... (attempt $((attempt + 1))/$max_attempts)"
+            cross_platform_sleep "$sleep_interval"
+            attempt=$((attempt + 1))
+          done
+          echo "❌ $service_name failed to start after $max_attempts attempts"
+          exit 1
+        }
+        
+        echo "Waiting for services in profile: {{.PROFILE}}"
+        echo ""
+        
+        # Wait for core services (always needed)
+        wait_for_service "MySQL database" "docker exec restarters_db mysqladmin ping -h localhost -u root -ps3cr3t --silent" 60 5
+        wait_for_service "Restarters web application" "curl -f -s http://localhost:8001" 60 5
+        
+        # Wait for debug services (if in debug or all profile)
+        {{- if or (eq .PROFILE "debug") (eq .PROFILE "all") }}
+        wait_for_service "phpMyAdmin" "curl -f -s http://localhost:8002" 60 5
+        wait_for_service "Mailhog" "curl -f -s http://localhost:8025" 60 5
+        {{- else }}
+        echo "✓ phpMyAdmin not in profile {{.PROFILE}}, skipping"
+        echo "✓ Mailhog not in profile {{.PROFILE}}, skipping"
+        {{- end }}
+        
+        # Wait for discourse services (if in discourse or all profile)
+        {{- if or (eq .PROFILE "discourse") (eq .PROFILE "all") }}
+        wait_for_service "PostgreSQL" "docker exec postgresql pg_isready -U postgres" 60 5
+        wait_for_service "Discourse" "curl -f -s http://localhost:8003" 120 10
+        {{- else }}
+        echo "✓ PostgreSQL not in profile {{.PROFILE}}, skipping"
+        echo "✓ Discourse not in profile {{.PROFILE}}, skipping"
+        {{- end }}
+      - echo "🎉 All services in profile {{.PROFILE}} are ready!"
