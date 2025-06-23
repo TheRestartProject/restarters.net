@@ -65,7 +65,7 @@ tasks:
       PROFILE: "{{index .MATCH 0}}"
 
     cmds:
-      - '{{.DOCKER_CMD}} --profile {{ index .COMPOSE_PROFILES .PROFILE }} up -d'
+      - '{{.DOCKER_CMD}} --project-name restarters-ci --profile {{ index .COMPOSE_PROFILES .PROFILE }} up -d'
 
   docker:down-*:
     desc: Stop Docker containers for a given profile (Usage - task docker:down-[core|debug|discourse|all])
@@ -88,7 +88,7 @@ tasks:
     vars: *PROFILE_VARS
 
     cmds:
-      - '{{.DOCKER_CMD}} --profile {{ index .COMPOSE_PROFILES .PROFILE }} down'
+      - '{{.DOCKER_CMD}} --project-name restarters-ci --profile {{ index .COMPOSE_PROFILES .PROFILE }} down'
 
   docker:rebuild-*:
     desc: Rebuild Docker containers for a given profile (Usage - task docker:rebuild-[core|debug|discourse|all])
@@ -111,8 +111,8 @@ tasks:
     vars: *PROFILE_VARS
 
     cmds:
-      - '{{.DOCKER_CMD}} --profile {{ index .COMPOSE_PROFILES .PROFILE }} down -v --rmi all'
-      - '{{.DOCKER_CMD}} --profile {{ index .COMPOSE_PROFILES .PROFILE }} up -d'
+      - '{{.DOCKER_CMD}} --project-name restarters-ci --profile {{ index .COMPOSE_PROFILES .PROFILE }} down -v --rmi all'
+      - '{{.DOCKER_CMD}} --project-name restarters-ci --profile {{ index .COMPOSE_PROFILES .PROFILE }} up -d'
 
   docker:restart-*:
     desc: Restart Docker containers for a given profile (Usage - task docker:restart-[core|debug|discourse|all])
@@ -135,7 +135,7 @@ tasks:
     vars: *PROFILE_VARS
 
     cmds:
-      - '{{.DOCKER_CMD}} --profile {{ index .COMPOSE_PROFILES .PROFILE }} restart'
+      - '{{.DOCKER_CMD}} --project-name restarters-ci --profile {{ index .COMPOSE_PROFILES .PROFILE }} restart'
 
 
   docker:logs:

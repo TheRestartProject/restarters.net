@@ -3,7 +3,7 @@ version: 2.1
 jobs:
   build:
     machine:
-      image: ubuntu-2204:2023.07.1
+      image: circleci/cci-demo-docker-primary
     environment:
       - TZ: "UTC"
 
@@ -97,7 +97,12 @@ jobs:
       - run:
           name: Run PHPUnit tests
           command: |
-            task docker:run:bash -- "export XDEBUG_MODE=coverage; ./vendor/bin/phpunit -d memory_limit=1024M --bootstrap vendor/autoload.php --coverage-clover tests/clover.xml --configuration ./phpunit.xml"
+            # Create test results directory on host
+            mkdir -p /tmp/test-results/phpunit
+            # Run PHPUnit with JUnit XML output
+            task docker:run:bash -- "export XDEBUG_MODE=coverage; ./vendor/bin/phpunit -d memory_limit=1024M --bootstrap vendor/autoload.php --coverage-clover tests/clover.xml --log-junit /tmp/phpunit-results.xml --configuration ./phpunit.xml"
+            # Copy test results to host
+            docker cp restarters:/tmp/phpunit-results.xml /tmp/test-results/phpunit/results.xml
           no_output_timeout: 45m
 
       # Upload coverage
@@ -110,7 +115,12 @@ jobs:
       - run:
           name: Run Jest tests
           command: |
-            task docker:run:bash -- "npm run jest"
+            # Create test results directory for Jest
+            mkdir -p /tmp/test-results/jest
+            # Run Jest with JUnit output
+            task docker:run:bash -- "npm run jest -- --outputFile=/tmp/jest-results.xml --testResultsProcessor=jest-junit"
+            # Copy test results to host if they exist
+            docker cp restarters:/tmp/jest-results.xml /tmp/test-results/jest/results.xml || echo "Jest results not found, skipping"
 
       # Prepare for Playwright tests
       - run:
@@ -133,8 +143,12 @@ jobs:
       - run:
           name: Run Playwright tests
           command: |
-            # Run tests inside container with debug logging
-            task docker:run:bash -- "export PLAYWRIGHT_DEBUG=true; export DEBUG=playwright; export PLAYWRIGHT_BASE_URL=http://localhost:8001; npx playwright test --reporter=list"
+            # Create test results directory for Playwright
+            mkdir -p /tmp/test-results/playwright
+            # Run Playwright tests with proper output directory
+            task docker:run:bash -- "export PLAYWRIGHT_DEBUG=true; export DEBUG=playwright; export PLAYWRIGHT_BASE_URL=http://localhost:8001; npx playwright test --reporter=junit --output-dir=/tmp/playwright-results"
+            # Copy test results and artifacts to host
+            docker cp restarters:/tmp/playwright-results /tmp/test-results/playwright/ || echo "Playwright results not found, skipping"
           no_output_timeout: 10m
 
       # Store artifacts

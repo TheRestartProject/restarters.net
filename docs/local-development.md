@@ -114,12 +114,7 @@ task docker:wait-for-services-discourse
 task docker:wait-for-services-all
 ```
 
-The wait commands will:
-- Check that services are listening on their expected ports
-- Verify services return proper responses (not just port availability)
-- Show progress with attempt counters
-- Fail fast if services don't start within reasonable timeouts
-- Only check services that match the specified profile
+The wait commands will check that services are listening on their expected ports and return proper responses.
 
 ### 4. Initial Setup
 
@@ -171,12 +166,6 @@ task docker:run:artisan -- [command]
 ### Checking Service Health
 
 ```bash
-# Check if services are ready (useful for debugging startup issues)
-task docker:wait-for-services-core
-
-# Check all services including optional ones
-task docker:wait-for-services-all
-
 # View container logs if services aren't starting properly
 task docker:logs
 ```
