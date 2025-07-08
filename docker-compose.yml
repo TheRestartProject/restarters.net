@@ -117,7 +117,7 @@ services:
 
   restarters_db:
     profiles: ["core", "debug", "discourse"]
-    image: mysql:5.7.33
+    image: mysql:8.0
     container_name: restarters_db
     restart: unless-stopped
     tty: true
