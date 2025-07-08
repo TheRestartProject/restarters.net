@@ -9,7 +9,7 @@ RUN apt-get update && \
         unzip \
         npm \
         vim \
-        netcat \
+        netcat-openbsd \
         default-mysql-client \
         postgresql-client && \
     apt-get clean && \
