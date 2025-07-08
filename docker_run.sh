@@ -84,7 +84,7 @@ for dir in storage bootstrap/cache vendor node_modules uploads public/uploads; d
 done
 
 # Wait for MySQL database to be ready before running migrations
-wait_for_service "MySQL database" "docker exec restarters_db mysqladmin ping -h localhost -u root -ps3cr3t --silent" 60 5
+wait_for_service "MySQL database" "docker exec restarters_db mysqladmin ping -h restarters_db -u root -ps3cr3t --silent" 60 5
 
 php artisan migrate
 npm install --legacy-peer-deps
