@@ -75,9 +75,6 @@ done
 wait_for_service "MySQL database" "nc -z restarters_db 3306" 60 5
 
 php artisan migrate
-
-# Ensure test database exists and migrations are run
-php artisan migrate --database=testmysql
 npm install --legacy-peer-deps
 npm rebuild node-sass
 php artisan lang:js --no-lib resources/js/translations.js
