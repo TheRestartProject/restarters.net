@@ -42,8 +42,6 @@ return new class extends Migration
      */
     public function down()
     {
-        DB::unprepared('DROP TRIGGER IF EXISTS `repair_status_str_in`');
-        DB::unprepared('DROP TRIGGER IF EXISTS `repair_status_str_up`');
         if (Schema::hasColumn('devices', 'repair_status_str')) {
             Schema::table('devices', function (Blueprint $table) {
                 $table->dropColumn('repair_status_str');

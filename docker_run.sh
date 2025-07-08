@@ -35,21 +35,23 @@ sed -i 's/DISCOURSE_SECRET=.*$/DISCOURSE_SECRET=mustbetencharacters/g' .env
 sed -i 's/SESSION_DOMAIN=.*$/SESSION_DOMAIN=/g' phpunit.xml
 sed -i 's/DB_TEST_HOST=.*$/DB_TEST_HOST=restarters_db/g' phpunit.xml
 
-echo "Fixing file permissions with ${USER_ID}:${GROUP_ID}"
-# Only change ownership of directories that need it, excluding .git and other system files
-# This prevents permission errors on files owned by the host system
-for dir in storage bootstrap/cache vendor node_modules public/uploads; do
-    if [ -d "$dir" ]; then
-        chown -R ${USER_ID}:${GROUP_ID} "$dir" 2>/dev/null || true
-    fi
-done
-
 # Ensure storage directories exist and have correct permissions
 mkdir -p storage/framework/cache/data
 mkdir -p storage/framework/sessions
 mkdir -p storage/framework/views
 mkdir -p storage/logs
 mkdir -p bootstrap/cache
+mkdir -p uploads
+mkdir -p public/uploads
+
+# Only change ownership of directories that need it, excluding .git and other system files
+# This prevents permission errors on files owned by the host system
+echo "Fixing file permissions with ${USER_ID}:${GROUP_ID}"
+for dir in storage bootstrap/cache vendor node_modules uploads public/uploads; do
+    if [ -d "$dir" ]; then
+        chown -R ${USER_ID}:${GROUP_ID} "$dir" 2>/dev/null || true
+    fi
+done
 
 php artisan migrate
 npm install --legacy-peer-deps

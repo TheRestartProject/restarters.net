@@ -29,6 +29,7 @@ RUN install-php-extensions \
     xmlrpc \
     xdebug \
     intl \
+    exif \
     gd
 
 # Install composer.  Don't run composer install yet - see docker_run.sh
