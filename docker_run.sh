@@ -31,18 +31,6 @@ sed -i 's/DISCOURSE_SECRET=.*$/DISCOURSE_SECRET=mustbetencharacters/g' .env
 sed -i 's/SESSION_DOMAIN=.*$/SESSION_DOMAIN=/g' phpunit.xml
 sed -i 's/DB_TEST_HOST=.*$/DB_TEST_HOST=restarters_db/g' phpunit.xml
 
-# Cross-platform sleep function
-cross_platform_sleep() {
-  if command -v sleep >/dev/null 2>&1; then
-    sleep "$1"
-  elif command -v powershell >/dev/null 2>&1; then
-    powershell -Command "Start-Sleep -Seconds $1"
-  else
-    # Fallback using ping (works on most systems)
-    ping -n $(($1 + 1)) 127.0.0.1 >/dev/null 2>&1 || ping -c $1 127.0.0.1 >/dev/null 2>&1
-  fi
-}
-
 # Generic wait function that takes: service_name, check_command, max_attempts, sleep_interval
 wait_for_service() {
   local service_name="$1"
@@ -58,7 +46,7 @@ wait_for_service() {
       return 0
     fi
     echo "  $service_name not ready, waiting... (attempt $((attempt + 1))/$max_attempts)"
-    cross_platform_sleep "$sleep_interval"
+    sleep "$sleep_interval"
     attempt=$((attempt + 1))
   done
   echo "❌ $service_name failed to start after $max_attempts attempts"
@@ -84,7 +72,7 @@ for dir in storage bootstrap/cache vendor node_modules uploads public/uploads; d
 done
 
 # Wait for MySQL database to be ready before running migrations
-wait_for_service "MySQL database" "docker exec restarters_db mysqladmin ping -h restarters_db -u root -ps3cr3t --silent" 60 5
+wait_for_service "MySQL database" "mysqladmin ping -h restarters_db -u root -ps3cr3t --silent" 60 5
 
 php artisan migrate
 npm install --legacy-peer-deps
