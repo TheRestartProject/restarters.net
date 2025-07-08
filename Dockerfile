@@ -30,6 +30,7 @@ RUN install-php-extensions \
     xdebug \
     intl \
     exif \
+    pcntl \
     gd
 
 # Install composer.  Don't run composer install yet - see docker_run.sh
