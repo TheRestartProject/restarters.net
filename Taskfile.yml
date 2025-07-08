@@ -241,7 +241,7 @@ tasks:
         
         # Wait for core services (always needed)
         wait_for_service "MySQL database" "docker exec restarters_db mysqladmin ping -h localhost -u root -ps3cr3t --silent" 60 5
-        wait_for_service "Restarters web application" "curl -f -s http://localhost:8001" 60 5
+        wait_for_service "Restarters web application" "curl -f -s http://localhost:8001" 120 5
         
         # Wait for debug services (if in debug or all profile)
         {{- if or (eq .PROFILE "debug") (eq .PROFILE "all") }}
