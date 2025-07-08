@@ -10,7 +10,6 @@ RUN apt-get update && \
         npm \
         vim \
         default-mysql-client \
-        mysql-client-core-8.0 \
         postgresql-client && \
     apt-get clean && \
     rm -rf /var/lib/apt/lists/*
