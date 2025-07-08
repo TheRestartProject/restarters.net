@@ -68,7 +68,7 @@ php artisan cache:clear
 php artisan config:clear
 
 # Ensure we have the admin user
-echo "User::create(['name'=>'Jane Bloggs','email'=>'jane@bloggs.net','password'=>Hash::make('passw0rd'),'role'=>2,'consent_past_data'=>'2021-01-01','consent_future_data'=>'2021-01-01','consent_gdpr'=>'2021-01-01']);" | php artisan tinker
+echo "User::firstOrCreate(['email'=>'jane@bloggs.net'], ['name'=>'Jane Bloggs','password'=>Hash::make('passw0rd'),'role'=>2,'consent_past_data'=>'2021-01-01','consent_future_data'=>'2021-01-01','consent_gdpr'=>'2021-01-01']);" | php artisan tinker
 
 php-fpm
 
