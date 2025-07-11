@@ -32,7 +32,7 @@ class WordpressEventPushTest extends TestCase
     }
 
     /** @test */
-    public function given_restart_network_when_event_approved_then_pushed_to_wordpress()
+    public function given_restart_network_when_event_approved_then_pushed_to_wordpress(): void
     {
         $this->instance(WordpressClient::class, Mockery::mock(WordpressClient::class, function ($mock) {
             $mock->shouldReceive('newPost')->once();
@@ -61,7 +61,7 @@ class WordpressEventPushTest extends TestCase
     }
 
     /** @test */
-    public function date_format_in_events() {
+    public function date_format_in_events(): void {
         $network = Network::factory()->create([
            'events_push_to_wordpress' => true,
         ]);
@@ -119,7 +119,7 @@ class WordpressEventPushTest extends TestCase
     }
 
     /** @test */
-    public function given_nonrestart_network_when_event_approved_then_not_pushed_to_wordpress()
+    public function given_nonrestart_network_when_event_approved_then_not_pushed_to_wordpress(): void
     {
         $this->instance(WordpressClient::class, Mockery::mock(WordpressClient::class, function ($mock) {
             $mock->shouldNotReceive('newPost');
@@ -143,7 +143,7 @@ class WordpressEventPushTest extends TestCase
     }
 
     /** @test */
-    public function given_restart_network_when_event_edited_then_pushed_to_wordpress()
+    public function given_restart_network_when_event_edited_then_pushed_to_wordpress(): void
     {
         $this->instance(WordpressClient::class, Mockery::mock(WordpressClient::class, function ($mock) {
             $mock->shouldReceive('getPost')->andReturn(100);
@@ -177,7 +177,7 @@ class WordpressEventPushTest extends TestCase
     }
 
     /** @test */
-    public function given_nonrestart_network_when_event_edited_then_not_pushed_to_wordpress()
+    public function given_nonrestart_network_when_event_edited_then_not_pushed_to_wordpress(): void
     {
         $this->instance(WordpressClient::class, Mockery::mock(WordpressClient::class, function ($mock) {
             $mock->shouldNotReceive('getPost');
@@ -206,7 +206,7 @@ class WordpressEventPushTest extends TestCase
 
 
     /** @test */
-    public function given_group_not_approved_then_not_pushed_to_wordpress()
+    public function given_group_not_approved_then_not_pushed_to_wordpress(): void
     {
         $this->instance(WordpressClient::class, Mockery::mock(WordpressClient::class, function ($mock) {
             $mock->shouldNotReceive('getPost');

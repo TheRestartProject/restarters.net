@@ -28,7 +28,7 @@ class WikiLoginTests extends TestCase
     }
 
     /** @test */
-    public function if_flagged_for_creation_create_when_logging_in()
+    public function if_flagged_for_creation_create_when_logging_in(): void
     {
         $this->withoutExceptionHandling();
         Honeypot::disable();
@@ -52,7 +52,7 @@ class WikiLoginTests extends TestCase
     }
 
     /** @test */
-    public function if_not_flagged_for_creation()
+    public function if_not_flagged_for_creation(): void
     {
         $this->withoutExceptionHandling();
         Honeypot::disable();
@@ -76,7 +76,7 @@ class WikiLoginTests extends TestCase
     }
 
     /** @test */
-    public function if_already_created()
+    public function if_already_created(): void
     {
         $this->withoutExceptionHandling();
         Honeypot::disable();
@@ -100,7 +100,7 @@ class WikiLoginTests extends TestCase
     }
 
     /** @test */
-    public function if_wiki_user_changes_password()
+    public function if_wiki_user_changes_password(): void
     {
         $this->withoutExceptionHandling();
 

@@ -2,6 +2,7 @@
 
 namespace App;
 
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use App\Group;
 use Illuminate\Database\Eloquent\Model;
@@ -10,7 +11,7 @@ class Network extends Model
 {
     use HasFactory;
 
-    public function groups()
+    public function groups(): BelongsToMany
     {
         return $this->belongsToMany(Group::class, 'group_network', 'network_id', 'group_id');
     }
@@ -25,7 +26,7 @@ class Network extends Model
         return $this->groups->contains($group);
     }
 
-    public function coordinators()
+    public function coordinators(): BelongsToMany
     {
         return $this->belongsToMany(User::class, 'user_network', 'network_id', 'user_id');
     }

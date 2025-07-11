@@ -33,10 +33,8 @@ class LanguageSync extends Command
 
     /**
      * Execute the console command.
-     *
-     * @return mixed
      */
-    public function handle()
+    public function handle(): void
     {
         // We want to sync the language preference from restarters to mediawiki.
         //

@@ -14,7 +14,7 @@ use Mockery;
 
 class GroupJoinTest extends TestCase
 {
-    public function testJoin()
+    public function testJoin(): void
     {
         Notification::fake();
 

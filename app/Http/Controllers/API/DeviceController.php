@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\API;
 
+use Illuminate\Http\JsonResponse;
 use App\Barrier;
 use App\Device;
 use App\DeviceBarrier;
@@ -344,7 +345,7 @@ class DeviceController extends Controller {
      *     )
      *  )
      */
-    public function updateDevicev2(Request $request, $iddevices)
+    public function updateDevicev2(Request $request, $iddevices): JsonResponse
     {
         $user = $this->getUser();
 
@@ -440,7 +441,7 @@ class DeviceController extends Controller {
      *     )
      */
 
-    public function deleteDevicev2(Request $request, $iddevices)
+    public function deleteDevicev2(Request $request, $iddevices): JsonResponse
     {
         $user = $this->getUser();
 

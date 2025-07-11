@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use Illuminate\Http\RedirectResponse;
 use App\GroupTags;
 use App\Helpers\Fixometer;
 use Auth;
@@ -24,7 +25,7 @@ class GroupTagsController extends Controller
         ]);
     }
 
-    public function postCreateTag(Request $request)
+    public function postCreateTag(Request $request): RedirectResponse
     {
         if (! Fixometer::hasRole(Auth::user(), 'Administrator')) {
             return redirect('/user/forbidden');
@@ -55,7 +56,7 @@ class GroupTagsController extends Controller
         ]);
     }
 
-    public function postEditTag($id, Request $request)
+    public function postEditTag($id, Request $request): RedirectResponse
     {
         if (! Fixometer::hasRole(Auth::user(), 'Administrator')) {
             return redirect('/user/forbidden');
@@ -72,7 +73,7 @@ class GroupTagsController extends Controller
         return Redirect::back()->with('success', __('group-tags.update_success'));
     }
 
-    public function getDeleteTag($id)
+    public function getDeleteTag($id): RedirectResponse
     {
         if (! Fixometer::hasRole(Auth::user(), 'Administrator')) {
             return redirect('/user/forbidden');

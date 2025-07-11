@@ -27,7 +27,7 @@ class RemoveUserFromDiscourseThreadForEvent implements ShouldQueue {
         return $hosts->count() ? $hosts[0] : null;
     }
 
-    public function handle(UserLeftEvent $e) {
+    public function handle(UserLeftEvent $e): void {
         if ($e->iduser) {
             $event = Party::find($e->idevents);
             $user = User::find($e->iduser);

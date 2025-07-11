@@ -8,10 +8,8 @@ return new class extends Migration
 {
     /**
      * Run the migrations.
-     *
-     * @return void
      */
-    public function up()
+    public function up(): void
     {
         // Using raw SQL as tinyint columns can't be altered.
         // See https://laravel.com/docs/5.6/migrations#modifying-columns
@@ -20,10 +18,8 @@ return new class extends Migration
 
     /**
      * Reverse the migrations.
-     *
-     * @return void
      */
-    public function down()
+    public function down(): void
     {
         DB::statement("ALTER TABLE `users_groups` CHANGE `role` `role` TINYINT(4) NOT NULL DEFAULT '3'");
     }

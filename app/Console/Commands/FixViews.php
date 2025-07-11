@@ -23,10 +23,8 @@ class FixViews extends Command
 
     /**
      * Execute the console command.
-     *
-     * @return mixed
      */
-    public function handle()
+    public function handle(): void
     {
         if (env('APP_ENV') !== 'local') {
             $this->error('This command is only designed to be run during local development.');
@@ -34,13 +32,13 @@ class FixViews extends Command
             return;
         }
 
-        $results = DB::select(DB::raw('
+        $results = DB::select('
 SELECT table_name as viewName, CONCAT("ALTER DEFINER=`'.env('DB_USERNAME').'`@`'.env('DB_HOST').'` VIEW `",table_name,"` AS ", view_definition,";") as alter_statement
 FROM information_schema.views
-WHERE table_schema="'.env('DB_DATABASE').'"'));
+WHERE table_schema="'.env('DB_DATABASE').'"');
 
         foreach ($results as $result) {
-            DB::unprepared(DB::raw($result->alter_statement));
+            DB::unprepared($result->alter_statement);
             $this->info('Fixed '.$result->viewName);
         }
     }

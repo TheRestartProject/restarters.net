@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use Illuminate\View\View;
 use App\Device;
 use App\Party;
 
@@ -10,7 +11,7 @@ use App\Party;
  */
 class AdminController extends Controller
 {
-    public static function stats($section = 1, $paragraph_only = false)
+    public static function stats($section = 1, $paragraph_only = false): View
     {
         if ($section == 1) {
             $stats = self::getStats1();

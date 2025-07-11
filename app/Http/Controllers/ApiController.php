@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use Illuminate\Http\JsonResponse;
 use App\Device;
 use App\Group;
 use App\Party;
@@ -46,7 +47,7 @@ class ApiController extends Controller
     /**
      * Embedded at https://therestartproject.org
      */
-    public static function homepage_data()
+    public static function homepage_data(): JsonResponse
     {
         $result = [];
 
@@ -98,7 +99,7 @@ class ApiController extends Controller
             ->json($result, 200);
     }
 
-    public static function partyStats($partyId)
+    public static function partyStats($partyId): JsonResponse
     {
         $event = Party::where('idevents', $partyId)->first();
 
@@ -128,7 +129,7 @@ class ApiController extends Controller
         return response()->json($result, 200);
     }
 
-    public static function groupStats($groupId)
+    public static function groupStats($groupId): JsonResponse
     {
         $group = Group::where('idgroups', $groupId)->first();
 
@@ -159,7 +160,7 @@ class ApiController extends Controller
         return response()->json($result, 200);
     }
 
-    public static function getUserInfo()
+    public static function getUserInfo(): JsonResponse
     {
         $user = Auth::user();
 
@@ -184,11 +185,8 @@ class ApiController extends Controller
 
     /**
      * List/search devices.
-     *
-     * @param  Request  $request
-     * @return Response
      */
-    public static function getDevices(Request $request, $page, $size)
+    public static function getDevices(Request $request, $page, $size): JsonResponse
     {
         $powered = $request->input('powered');
         $sortBy = $request->input('sortBy');
@@ -275,7 +273,7 @@ class ApiController extends Controller
         ]);
     }
 
-    public function timezones() {
+    public function timezones(): JsonResponse {
         $zones = \DateTimeZone::listIdentifiers(\DateTimeZone::ALL_WITH_BC);
         $ret = [];
 

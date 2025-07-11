@@ -9,7 +9,7 @@ use Tests\TestCase;
 
 class GroupDeleteTest extends TestCase
 {
-    public function testDelete()
+    public function testDelete(): void
     {
         $this->loginAsTestUser(Role::ADMINISTRATOR);
         $id = $this->createGroup();
@@ -35,7 +35,7 @@ class GroupDeleteTest extends TestCase
         ]), $response->getContent());
     }
 
-    public function testCanDeleteWithEmptyEvent()
+    public function testCanDeleteWithEmptyEvent(): void
     {
         $this->loginAsTestUser(Role::ADMINISTRATOR);
         $id = $this->createGroup();
@@ -55,7 +55,7 @@ class GroupDeleteTest extends TestCase
         ]), $response->getContent());
     }
 
-    public function testCantDeleteWithDevice()
+    public function testCantDeleteWithDevice(): void
     {
         $this->loginAsTestUser(Role::ADMINISTRATOR);
         $id = $this->createGroup();
@@ -78,7 +78,7 @@ class GroupDeleteTest extends TestCase
         $response->assertRedirect('/user/forbidden');
     }
 
-    public function testCanDeleteWithDeletedEvent()
+    public function testCanDeleteWithDeletedEvent(): void
     {
         $this->loginAsTestUser(Role::ADMINISTRATOR);
         $id = $this->createGroup();

@@ -30,7 +30,7 @@ class WordpressGroupPushTest extends TestCase
     }
 
     /** @test */
-    public function group_approved_wordpress_and_discourse()
+    public function group_approved_wordpress_and_discourse(): void
     {
         $this->instance(WordpressClient::class, Mockery::mock(WordpressClient::class, function ($mock) {
             $mock->shouldReceive('newPost')->once();
@@ -59,7 +59,7 @@ class WordpressGroupPushTest extends TestCase
     }
 
     /** @test */
-    public function groups_pushed_to_wordpress_when_edited()
+    public function groups_pushed_to_wordpress_when_edited(): void
     {
         $this->instance(WordpressClient::class, Mockery::mock(WordpressClient::class, function ($mock) {
             $mock->shouldReceive('getPost')->andReturn(100);

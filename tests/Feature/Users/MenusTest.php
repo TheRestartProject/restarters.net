@@ -68,7 +68,7 @@ class MenusTest extends TestCase
     /**
      *@dataProvider provider
      */
-    public function testSections($role, $present, $translator, $adminMenu)
+    public function testSections($role, $present, $translator, $adminMenu): void
     {
         $user = User::factory()->{lcfirst($role)}()->create();
 
@@ -91,7 +91,7 @@ class MenusTest extends TestCase
         }
     }
 
-    public function testLoggedOut()
+    public function testLoggedOut(): void
     {
         $this->expectException(NotFoundHttpException::class);
         $this->get('/user/menus');

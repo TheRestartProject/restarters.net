@@ -7,7 +7,7 @@ use Illuminate\Support\ServiceProvider;
 
 class ScheduleServiceProvider extends ServiceProvider
 {
-    public function boot()
+    public function boot(): void
     {
         $this->app->booted(function () {
             $schedule = $this->app->make(Schedule::class);
@@ -16,7 +16,7 @@ class ScheduleServiceProvider extends ServiceProvider
         });
     }
 
-    public function register()
+    public function register(): void
     {
     }
 }

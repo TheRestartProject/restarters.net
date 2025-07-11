@@ -36,7 +36,7 @@ class DeleteEventTest extends TestCase
     }
 
     /** @test */
-    public function an_admin_can_delete_an_event()
+    public function an_admin_can_delete_an_event(): void
     {
         $this->withoutExceptionHandling();
         Event::fake();
@@ -94,7 +94,7 @@ class DeleteEventTest extends TestCase
      * @test
      * @dataProvider roleProvider
      */
-    public function view_edit_deleted_event($role)
+    public function view_edit_deleted_event($role): void
     {
         $this->withoutExceptionHandling();
 
@@ -150,7 +150,7 @@ class DeleteEventTest extends TestCase
         }
     }
 
-    public function roleProvider() {
+    public function roleProvider(): array {
         return [
             [ Role::ADMINISTRATOR ],
             [ Role::NETWORK_COORDINATOR ],
@@ -159,7 +159,7 @@ class DeleteEventTest extends TestCase
     }
 
     /** @test */
-    public function given_network_connected_to_wordpress_when_event_deleted()
+    public function given_network_connected_to_wordpress_when_event_deleted(): void
     {
         $this->withoutExceptionHandling();
 
@@ -187,7 +187,7 @@ class DeleteEventTest extends TestCase
     }
 
     /** @test */
-    public function given_wordpress_deletion_failure()
+    public function given_wordpress_deletion_failure(): void
     {
         $this->withoutExceptionHandling();
         Notification::fake();
@@ -225,7 +225,7 @@ class DeleteEventTest extends TestCase
         );
     }
 
-    public function provider()
+    public function provider(): array
     {
         // We return:
         // - role
@@ -273,7 +273,7 @@ class DeleteEventTest extends TestCase
      * @test
      * @dataProvider provider
      */
-    public function candelete_flag($role, $pastFuture, $addDevice, $canDelete)
+    public function candelete_flag($role, $pastFuture, $addDevice, $canDelete): void
     {
         $this->loginAsTestUser(Role::ADMINISTRATOR);
         $id = $this->createGroup();
@@ -318,7 +318,7 @@ class DeleteEventTest extends TestCase
     /**
      * @test
      */
-    public function request_review()
+    public function request_review(): void
     {
         Notification::fake();
 

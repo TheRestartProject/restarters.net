@@ -15,7 +15,7 @@ class TooManyMiscTest extends TestCase
     /**
      * @dataProvider provider
      */
-    public function testTooMany($count, $notif)
+    public function testTooMany($count, $notif): void
     {
         Notification::fake();
 
@@ -46,7 +46,7 @@ class TooManyMiscTest extends TestCase
         self::assertTrue(true);
     }
 
-    public function provider() {
+    public function provider(): array {
         return [
             [ env('DEVICE_ABNORMAL_MISC_COUNT', 5) - 1, false, ],
             [ env('DEVICE_ABNORMAL_MISC_COUNT', 5), true, ]

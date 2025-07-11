@@ -13,7 +13,7 @@ use Illuminate\Support\Facades\Event;
 class UserDeletedNotificationTest extends TestCase
 {
     /** @test */
-    public function a_notification_is_sent_to_admins_when_a_user_is_deleted()
+    public function a_notification_is_sent_to_admins_when_a_user_is_deleted(): void
     {
         Notification::fake();
 

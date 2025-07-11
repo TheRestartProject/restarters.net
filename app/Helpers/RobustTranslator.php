@@ -8,14 +8,11 @@ use Illuminate\Translation\Translator as BaseTranslator;
 class RobustTranslator extends BaseTranslator
 {
     /**
-     * @param string $key
-     * @param array $replace
      * @param null $locale
-     * @param bool $fallback
      *
      * @return array|null|string|void
      */
-    public function get($key, array $replace = [], $locale = null, $fallback = true)
+    public function get(string $key, array $replace = [], $locale = null, bool $fallback = true)
     {
         $translation = parent::get($key, $replace, $locale, $fallback);
 

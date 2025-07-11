@@ -24,11 +24,8 @@ class EditWordpressPostForGroup extends BaseEvent
 
     /**
      * Handle the event.
-     *
-     * @param  EditGroup  $event
-     * @return void
      */
-    public function handle(EditGroup $event)
+    public function handle(EditGroup $event): void
     {
         $id = $event->group->idgroups;
         $data = $event->data;

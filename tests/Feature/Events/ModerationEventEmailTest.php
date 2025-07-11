@@ -11,7 +11,7 @@ use Tests\TestCase;
 class ModerationEventEmailTest extends TestCase
 {
     /** @test */
-    public function a_moderation_email_is_sent_to_admins_when_an_event_is_created()
+    public function a_moderation_email_is_sent_to_admins_when_an_event_is_created(): void
     {
         Notification::fake();
 

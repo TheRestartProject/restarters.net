@@ -2,6 +2,8 @@
 
 namespace App\Http\Middleware;
 
+use Symfony\Component\HttpFoundation\Response;
+use Illuminate\Http\Request;
 use App;
 use App\Network;
 use Auth;
@@ -16,11 +18,8 @@ class CheckForRepairNetwork
      * on the website
      * @author Dean Appleton-Claydon
      * @date   2019-03-20
-     * @param  \Illuminate\Http\Request  $request
-     * @param  \Closure  $next
-     * @return mixed
      */
-    public function handle($request, Closure $next)
+    public function handle(Request $request, Closure $next): Response
     {
         $host = $request->getHost();
         $update_user = [];
