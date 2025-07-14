@@ -809,12 +809,12 @@ class NotificationsTest extends TestCase
         {
             $notificationen = new $class($this->params, $this->useren);
 
-            $outputs[$class]['mail']['en'] = $notificationen->toMail($this->useren)->toArray();
-            $outputs[$class]['array']['en'] = $notificationen->toArray($this->useren);
+            $this->outputs[$class]['mail']['en'] = $notificationen->toMail($this->useren)->toArray();
+            $this->outputs[$class]['array']['en'] = $notificationen->toArray($this->useren);
 
             $notificationfr = new $class($this->params, $this->userfr);
-            $outputs[$class]['mail']['fr'] = $notificationfr->toMail($this->userfr)->toArray();
-            $outputs[$class]['array']['fr'] = $notificationfr->toArray($this->userfr);
+            $this->outputs[$class]['mail']['fr'] = $notificationfr->toMail($this->userfr)->toArray();
+            $this->outputs[$class]['array']['fr'] = $notificationfr->toArray($this->userfr);
         }
 
 //        $this->recursive_print('$this->outputs', $outputs);
