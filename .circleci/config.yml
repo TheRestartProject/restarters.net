@@ -113,7 +113,7 @@ jobs:
             # Create test results directory on host
             mkdir -p /tmp/test-results/phpunit
             # Run PHPUnit with JUnit XML output - using direct docker exec to avoid quote issues
-            docker exec restarters bash -c "export XDEBUG_MODE=coverage; ./vendor/bin/phpunit -d memory_limit=1024M --bootstrap vendor/autoload.php --coverage-clover tests/clover.xml --log-junit /tmp/phpunit-results.xml --configuration ./phpunit.xml"
+            docker exec restarters bash -c "export XDEBUG_MODE=coverage; ./vendor/bin/phpunit -d memory_limit=1024M --bootstrap vendor/autoload.php --coverage-clover tests/clover.xml --log-junit /tmp/phpunit-results.xml --configuration ./phpunit.xml --teamcity"
             # Copy test results to host
             docker cp restarters:/tmp/phpunit-results.xml /tmp/test-results/phpunit/results.xml
           no_output_timeout: 45m
