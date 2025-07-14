@@ -83,6 +83,9 @@ class NotificationsTest extends TestCase
 
     private $outputs = [];
 
+    private $useren = null;
+    private $userfr = null;
+
     protected function setUp(): void {
         parent::setUp();
 
