@@ -79,6 +79,7 @@ class MenusTest extends TestCase
             $up->save();
         }
 
+        $this->get('/logout');
         $this->actingAs($user);
 
         $response = $this->get('/user/menus');
