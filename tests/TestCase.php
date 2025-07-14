@@ -43,6 +43,8 @@ abstract class TestCase extends BaseTestCase
     private $DOM = null;
     public $lastResponse = null;
 
+    private $OpenAPIValidator = null;
+
     protected function setUp(): void
     {
         parent::setUp();
