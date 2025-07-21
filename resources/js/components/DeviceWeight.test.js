@@ -11,6 +11,9 @@ import DeviceWeight from './DeviceWeight.vue'
 test('DeviceWeight', () => {
     const wrapper = mount(DeviceWeight, {
         mixins: [LangMixin],
+        propsData: {
+            required: false
+        }
     })
 
     expect(wrapper.html()).toContain('impact calculation')
