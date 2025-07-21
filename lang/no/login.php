@@ -10,7 +10,7 @@ return [
                                 <li>Document and bring down the barriers to repair</li>
                             </ul>',
   'more' => 'Find out more',
-  'stat_1' => 'Devices fixed',
+  'stat_1' => 'Items fixed',
   'stat_2' => 'CO<sub>2</sub> emissions prevented',
   'stat_3' => 'Waste prevented',
   'stat_4' => 'Events held',
