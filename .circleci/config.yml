@@ -159,7 +159,7 @@ jobs:
             # Create test results directory for Playwright
             mkdir -p /tmp/test-results/playwright
             # Run Playwright tests with proper output directory
-            docker exec restarters bash -c "export PLAYWRIGHT_DEBUG=true; export DEBUG=playwright; export PLAYWRIGHT_BASE_URL=http://localhost:8001; export PLAYWRIGHT_HTML_REPORT=/tmp/playwright-results; npx playwright test --reporter=junit"
+            docker exec restarters bash -c "export PLAYWRIGHT_DEBUG=true; export DEBUG=playwright; export PLAYWRIGHT_BASE_URL=http://restarters_nginx; export PLAYWRIGHT_HTML_REPORT=/tmp/playwright-results; npx playwright test --reporter=junit"
             # Copy test results and artifacts to host
             docker cp restarters:/tmp/playwright-results /tmp/test-results/playwright/ || echo "Playwright results not found, skipping"
           no_output_timeout: 10m
