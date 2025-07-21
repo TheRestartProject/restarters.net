@@ -158,16 +158,20 @@ jobs:
           command: |
             # Create test results directory for Playwright
             mkdir -p /tmp/test-results/playwright
-            # Run Playwright tests with proper output directory
-            docker exec restarters bash -c "export PLAYWRIGHT_DEBUG=true; export DEBUG=playwright; export PLAYWRIGHT_BASE_URL=http://restarters_nginx; export PLAYWRIGHT_HTML_REPORT=/tmp/playwright-results; npx playwright test --reporter=junit" || true
+            # Create Playwright results directory inside container and run tests
+            docker exec restarters bash -c "mkdir -p /tmp/playwright-results && export PLAYWRIGHT_DEBUG=true; export DEBUG=playwright; export PLAYWRIGHT_BASE_URL=http://restarters_nginx; export PLAYWRIGHT_HTML_REPORT=/tmp/playwright-results; npx playwright test --reporter=junit" || true
           no_output_timeout: 10m
 
       # Copy test results and artifacts
       - run:
           name: Copy Playwright artifacts
           command: |
-            # Copy test results and artifacts to host
-            docker cp restarters:/tmp/playwright-results /tmp/test-results/playwright/ || echo "Playwright results not found, skipping"
+            # List what's available in the container
+            docker exec restarters bash -c "ls -la /tmp/ | grep playwright || echo 'No playwright directories found'"
+            # Copy test results and artifacts to host if they exist
+            docker cp restarters:/tmp/playwright-results /tmp/test-results/playwright/ 2>/dev/null || echo "Playwright HTML report not found"
+            # Also try to copy any junit results that might exist
+            docker cp restarters:/tmp/test-results.xml /tmp/test-results/playwright/results.xml 2>/dev/null || echo "Playwright junit results not found"
           when: always
 
       # Store artifacts
