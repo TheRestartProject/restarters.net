@@ -122,7 +122,7 @@ jobs:
       - run:
           name: Upload coverage
           command: |
-            docker exec restarters bash -c "mkdir -p build/logs && php vendor/bin/php-coveralls -v -x tests/clover.xml"
+            docker exec -e COVERALLS_REPO_TOKEN="$COVERALLS_REPO_TOKEN" restarters bash -c "mkdir -p build/logs && php vendor/bin/php-coveralls -v -x tests/clover.xml"
 
       # Run Jest tests
       - run:
