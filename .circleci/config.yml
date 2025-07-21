@@ -167,11 +167,11 @@ jobs:
           name: Copy Playwright artifacts
           command: |
             # List what's available in the container
-            docker exec restarters bash -c "ls -la /tmp/ | grep playwright || echo 'No playwright directories found'"
+            docker exec restarters bash -c "ls -la /tmp/playwright-results/* || echo 'No playwright directories found'"
             # Copy test results and artifacts to host if they exist
-            docker cp restarters:/tmp/playwright-results /tmp/test-results/playwright/ 2>/dev/null || echo "Playwright HTML report not found"
+            docker cp restarters:/tmp/playwright-results /tmp/test-results/playwright/ || echo "Playwright HTML report not found"
             # Also try to copy any junit results that might exist
-            docker cp restarters:/tmp/test-results.xml /tmp/test-results/playwright/results.xml 2>/dev/null || echo "Playwright junit results not found"
+            docker cp restarters:/tmp/test-results.xml /tmp/test-results/playwright/results.xml || echo "Playwright junit results not found"
           when: always
 
       # Store artifacts
