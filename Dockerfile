@@ -18,6 +18,7 @@ RUN apt-get update && \
 # Install Playwright system dependencies
 # We need to install @playwright/test first to get the install-deps command
 RUN npm install -g @playwright/test && \
+    npm install -g jest-junit && \
     npx playwright install-deps && \
     npm uninstall -g @playwright/test
 
