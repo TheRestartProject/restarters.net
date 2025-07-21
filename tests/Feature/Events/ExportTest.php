@@ -247,7 +247,7 @@ class ExportTest extends TestCase
             'start' => $event_start->toIso8601String(),
             'end' => $event_end->toIso8601String(),
             'title' => 'Test/Event/Title',
-            'location' => 'Test Location',
+            'location' => 'London',
             'description' => 'Test Description',
             'timezone' => 'UTC'
         ]);
