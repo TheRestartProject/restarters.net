@@ -158,7 +158,7 @@ jobs:
           command: |
             mkdir -p /tmp/test-results/playwright
             # Create Playwright results directory inside container and run tests
-            docker exec restarters bash -c "export PLAYWRIGHT_DEBUG=true; export DEBUG=playwright; export PLAYWRIGHT_BASE_URL=http://restarters_nginx; npx playwright test --reporter=junit" || true
+            docker exec restarters bash -c "export PLAYWRIGHT_DEBUG=true; export DEBUG=playwright; export PLAYWRIGHT_BASE_URL=http://restarters_nginx; npx playwright test --reporter=html" || true
           no_output_timeout: 10m
 
       # Copy test results and artifacts
