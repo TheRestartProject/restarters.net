@@ -8,7 +8,6 @@
   <testsuites>
     <testsuite name="Feature">
       <directory suffix=".php">./tests/Feature</directory>
-      <exclude>./tests/Unit/NotificationsTest.php</exclude>
       <exclude>./tests/Feature/Admin/Users/WikiLoginTests.php</exclude>
       <exclude>./tests/Feature/Stats/StatsTestCase.php</exclude>
       <exclude>./tests/Feature/StyleTest.php</exclude>
@@ -16,6 +15,7 @@
     </testsuite>
     <testsuite name="Unit">
       <directory suffix=".php">./tests/Unit</directory>
+      <exclude>./tests/Unit/NotificationsTest.php</exclude>
       <exclude>./tests/Unit/CharsetTest.php</exclude>
     </testsuite>
   </testsuites>
