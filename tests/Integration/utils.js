@@ -189,7 +189,7 @@ exports.addDevice = async function(page, baseURL, idevents, powered, photo, fixe
 
   // Get current device count.
   await page.waitForSelector(addsel)
-  var current = await page.locator('h3:visible').count()
+  var current = await page.locator('.device-info:visible').count()
   log('Current device count', { current })
 
   // Click the add button.
@@ -244,7 +244,7 @@ exports.addDevice = async function(page, baseURL, idevents, powered, photo, fixe
 
   // Wait for device to show.
   log('Waiting for device to appear in list')
-  await expect(page.locator('h3:visible')).toHaveCount(current + 1)
+  await expect(page.locator('.device-info:visible')).toHaveCount(current + 1)
 
   // Check that the photo appears.
   log('Opening device for verification')

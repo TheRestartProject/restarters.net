@@ -141,8 +141,6 @@ jobs:
       - run:
           name: Prepare for Playwright tests
           command: |
-            # Clean up test data that might interfere - run directly on MySQL container
-            docker exec restarters_db mysql -u root -ps3cr3t -e "use restarters_db_test;SET foreign_key_checks=0;DELETE FROM \`groups\` WHERE location IS NULL;SET foreign_key_checks=1;"
             docker exec restarters php artisan cache:clear
             
             # Delete all devices from database to ensure clean state for Playwright tests
