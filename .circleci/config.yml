@@ -145,6 +145,9 @@ jobs:
             docker exec restarters_db mysql -u root -ps3cr3t -e "use restarters_db_test;SET foreign_key_checks=0;DELETE FROM \`groups\` WHERE location IS NULL;SET foreign_key_checks=1;"
             docker exec restarters php artisan cache:clear
             
+            # Delete all devices from database to ensure clean state for Playwright tests
+            docker exec restarters bash -c "echo \"App\\\\Device::truncate();\" | php artisan tinker" || true
+            
             # Create test user
             docker exec restarters bash -c "echo \"App\\\\User::firstOrCreate(['email'=>'jane@bloggs.net'], ['name'=>'Jane Bloggs','password'=>Hash::make('passw0rd'),'role'=>2,'consent_past_data'=>'2021-01-01','consent_future_data'=>'2021-01-01','consent_gdpr'=>'2021-01-01']);\" | php artisan tinker" || true
             
