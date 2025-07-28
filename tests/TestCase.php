@@ -43,6 +43,10 @@ abstract class TestCase extends BaseTestCase
     private $DOM = null;
     public $lastResponse = null;
 
+    private $host = null;
+    private $group = null;
+    private $event_start_utc = null;
+    private $event_end_utc = null;
     private $OpenAPIValidator = null;
 
     protected function setUp(): void
