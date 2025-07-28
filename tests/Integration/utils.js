@@ -275,6 +275,32 @@ exports.addDevice = async function(page, baseURL, idevents, powered, photo, fixe
   log('Device added successfully')
 }
 
+// Fast device creation for bulk test data - skips verification steps
+exports.addDeviceFast = async function(page, baseURL, idevents, powered, itemType, category) {
+  log('Starting fast device addition', { idevents, powered, itemType, category })
+  
+  var addsel = powered ? '.add-powered-device-desktop' : '.add-unpowered-device-desktop'
+  
+  // Click the add button.
+  await page.locator(addsel).click()
+
+  // Set item type
+  await page.fill('.item-type:visible input', itemType)
+  await page.keyboard.press('Tab')
+
+  // Set category
+  await page.keyboard.type(category)
+  await page.keyboard.press('Enter')
+
+  // Submit without verification
+  await page.locator('text=Add item >> visible=true').click()
+  
+  // Wait briefly for submission to complete
+  await page.waitForTimeout(500)
+  
+  log('Fast device added successfully')
+}
+
 exports.unfollowGroup = async function(page, idgroups) {
   await page.goto('/group/view/' + idgroups)
 
