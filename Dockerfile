@@ -33,6 +33,7 @@ RUN install-php-extensions \
     intl \
     exif \
     pcntl \
+    curl \
     gd
 
 # Install composer.  Don't run composer install yet - see docker_run.sh

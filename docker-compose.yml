@@ -91,6 +91,7 @@ services:
       SERVICE_TAGS: dev
       UID: ${UID}
       GID: ${GID}
+      CIRCLECI: ${CIRCLECI:-false}
     working_dir: /var/www
     volumes:
       # We share the current folder into /var/www.  This means code changes on the host will get picked up
