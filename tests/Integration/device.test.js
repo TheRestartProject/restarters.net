@@ -128,6 +128,7 @@ test('Automatic category suggestion from item type', async ({page, baseURL}) => 
     console.log('Testing autocomplete functionality...')
     // Note: The items.js store will automatically fetch fresh data since we're running under Playwright
     for (const testCase of testCases) {
+      console.log('Testing', testCase.itemType, testCase.expectedCategory, testCase.powered)
       
       // Test the UI behavior for category autocomplete
       // Go to event view page

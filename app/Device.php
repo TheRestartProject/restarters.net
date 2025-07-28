@@ -50,14 +50,6 @@ class Device extends Model implements Auditable
 
     use \OwenIt\Auditing\Auditable;
     protected $table = 'devices';
-
-    /**
-     * Check if we're running in CircleCI environment
-     */
-    private function isCircleCI()
-    {
-        return env('CIRCLECI', false) || env('CI', false);
-    }
     protected $primaryKey = 'iddevices';
     /**
      * The attributes that are mass assignable.
@@ -277,13 +269,9 @@ class Device extends Model implements Auditable
             if ($this->category == env('MISC_CATEGORY_ID_POWERED') && $this->estimate > 0) {
                 $footprint = $this->estimate * $emissionRatio;
             } else {
-                if ($this->isCircleCI()) {
-                    $footprint = $this->deviceCategory->footprint;
-                } else {
-                    $footprint = \Cache::remember('category-' . $this->category, 15, function() {
-                        return $this->deviceCategory;
-                    })->footprint;
-                }
+                $footprint = \Cache::remember('category-' . $this->category, 15, function() {
+                    return $this->deviceCategory;
+                })->footprint;
             }
         }
 
@@ -317,25 +305,17 @@ class Device extends Model implements Auditable
     {
         $ewasteDiverted = 0;
 
-        if ($this->isCircleCI()) {
-            $powered = $this->deviceCategory->powered;
-        } else {
-            $powered = \Cache::remember('category-powered-' . $this->category, 15, function() {
-                return $this->deviceCategory->powered;
-            });
-        }
+        $powered = \Cache::remember('category-powered-' . $this->category, 15, function() {
+            return $this->deviceCategory->powered;
+        });
 
         if ($this->isFixed() && $powered) {
             if ($this->category == env('MISC_CATEGORY_ID_POWERED') && $this->estimate > 0) {
                 $ewasteDiverted = $this->estimate;
             } else {
-                if ($this->isCircleCI()) {
-                    $category = $this->deviceCategory;
-                } else {
-                    $category = \Cache::remember('category-' . $this->category, 15, function() {
-                        return $this->deviceCategory;
-                    });
-                }
+                $category = \Cache::remember('category-' . $this->category, 15, function() {
+                    return $this->deviceCategory;
+                });
 
                 $ewasteDiverted = $category->weight;
             }
@@ -473,9 +453,8 @@ class Device extends Model implements Auditable
         // This is a beast of a query, but the basic idea is to return a list of the categories most commonly
         // used by the item types.
         //
-        // This is slow and the results don't change much, so we use a cache - except when running in CI
-        // where the tests can set up devices and we need to return up to date results.
-        if (!(env('CIRCLECI', false) || env('CI', false)) && Cache::has('item_types')) {
+        // This is slow and the results don't change much, so we use a cache.
+        if (Cache::has('item_types')) {
             $types = Cache::get('item_types');
         } else {
             $types = DB::select(DB::raw("
@@ -506,9 +485,7 @@ class Device extends Model implements Auditable
                 AND LENGTH(t.item_type) > 0
               GROUP BY t.item_type, t.powered;
 "));
-            if (!(env('CIRCLECI', false) || env('CI', false))) {
-                \Cache::put('item_types', $types, 24 * 3600);
-            }
+            \Cache::put('item_types', $types, 24 * 3600);
         }
 
         return $types;
