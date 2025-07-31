@@ -75,24 +75,29 @@ test('Automatic category suggestion from item type', async ({page, baseURL}) => 
   
   await approveEvent(page, baseURL, eventid)
 
-    // Test data: item types and their expected suggested categories (reduced set)
+    // Test data: item types and their expected suggested categories
     const testCases = [
       { itemType: 'Food processor', expectedCategory: 'Small kitchen item', powered: true },
+      { itemType: 'Blender', expectedCategory: 'Small kitchen item', powered: true },
       { itemType: 'TV', expectedCategory: 'Flat screen 32-37"', powered: true },
-      { itemType: 'Phone', expectedCategory: 'Mobile', powered: true }
+      { itemType: 'Phone', expectedCategory: 'Mobile', powered: true },
+      { itemType: 'Printer', expectedCategory: 'Printer/scanner', powered: true },
+      { itemType: 'Television', expectedCategory: 'Flat screen 32-37"', powered: true },
+      { itemType: 'Télévision', expectedCategory: 'Flat screen 32-37"', powered: true },
+      { itemType: 'Toaster', expectedCategory: 'Toaster', powered: true },
+      { itemType: 'Microwave oven', expectedCategory: 'None of the above', powered: true },
+      { itemType: 'Heater', expectedCategory: 'None of the above', powered: true }
     ]
 
-    // Navigate to event page once for all device creation
-    await page.goto('/party/view/' + eventid)
-    
-    // Set up test data: create fewer devices (3 each to ensure they win the count algorithm)
+    // Set up test data: create multiple devices for each item type to ensure autocomplete works
+    // The getItemTypes() method uses a count-based algorithm, so we need sufficient data
     console.log('Setting up autocomplete test data...')
     
     let deviceCount = 0
     
-    // Create the expected mappings (3 devices each to ensure they win the count algorithm)
+    // Create the expected mappings (5 devices each to ensure they win the count algorithm)
     for (const testCase of testCases) {
-      console.log(`Creating 3 devices for '${testCase.itemType}' → '${testCase.expectedCategory}'`)
+      console.log(`Creating 5 devices for '${testCase.itemType}' → '${testCase.expectedCategory}'`)
       
       for (let i = 0; i < 3; i++) {
         await addDeviceFast(page, baseURL, eventid, testCase.powered, testCase.itemType, testCase.expectedCategory)
@@ -100,11 +105,13 @@ test('Automatic category suggestion from item type', async ({page, baseURL}) => 
       }
     }
     
-    // Create minimal conflicting data (1 each to ensure our expected categories still win)
+    // Create some conflicting data with fewer items to ensure our expected categories win
     const conflictingData = [
-      { itemType: 'Food processor', category: 'None of the above', count: 1 },
-      { itemType: 'TV', category: 'Flat screen 15-17"', count: 1 },
-      { itemType: 'Phone', category: 'Handheld entertainment device', count: 1 }
+      { itemType: 'Food processor', category: 'None of the above', count: 2 },
+      { itemType: 'TV', category: 'Flat screen 15-17"', count: 3 },
+      { itemType: 'Phone', category: 'Handheld entertainment device', count: 2 },
+      { itemType: 'Printer', category: 'PC accessory', count: 1 },
+      { itemType: 'Toaster', category: 'Small kitchen item', count: 2 }
     ]
     
     for (const conflict of conflictingData) {
