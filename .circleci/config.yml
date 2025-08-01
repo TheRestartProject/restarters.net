@@ -183,7 +183,19 @@ jobs:
           name: Setup autocomplete test data
           command: |
             echo "Setting up test data for autocomplete test..."
-            docker exec restarters php artisan tinker setup-autocomplete-test-data.php
+            # Run tinker script and check for success message instead of exit code
+            docker exec restarters bash -c "
+              php artisan tinker setup-autocomplete-test-data.php > /tmp/setup-output.log 2>&1
+              if grep -q 'Test data setup complete!' /tmp/setup-output.log; then
+                echo 'Setup completed successfully!'
+                cat /tmp/setup-output.log
+                exit 0
+              else
+                echo 'Setup failed!'
+                cat /tmp/setup-output.log
+                exit 1
+              fi
+            "
           no_output_timeout: 5m
 
       # Run autocomplete Playwright test separately because it needs special setup.
