@@ -100,7 +100,7 @@ foreach ($testCases as $testCase) {
             'age' => 5,
             'repair_status' => 1, // Fixed
             'spare_parts' => 1,
-            'event_id' => $testEvent->idevents,
+            'event' => $testEvent->idevents,
             'problem' => 'Test problem description',
             'wiki' => 1,
             'do_it_yourself' => 0,
@@ -138,7 +138,7 @@ foreach ($conflictingData as $conflict) {
             'age' => 5,
             'repair_status' => 1, // Fixed
             'spare_parts' => 1,
-            'event_id' => $testEvent->idevents,
+            'event' => $testEvent->idevents,
             'problem' => 'Conflict test problem description',
             'wiki' => 1,
             'do_it_yourself' => 0,
