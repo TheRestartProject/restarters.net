@@ -9,6 +9,7 @@
         "prod": "npm run production",
         "production": "mix --production",
         "test": "playwright test",
+        "test:autocomplete": "playwright test --config=playwright.autocomplete.config.js",
         "jest": "jest --verbose"
     },
     "devDependencies": {
