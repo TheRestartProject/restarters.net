@@ -161,7 +161,21 @@ jobs:
           command: |
             mkdir -p /tmp/test-results/playwright
             # Create Playwright results directory inside container and run tests
-            docker exec restarters bash -c "export PLAYWRIGHT_TEST=true; export PLAYWRIGHT_DEBUG=true; export PWTEST_SKIP_TEST_OUTPUT=0; export DEBUG=playwright; export PLAYWRIGHT_BASE_URL=http://restarters_nginx; export PW_TEST_HTML_REPORT_OPEN=never; npx playwright test --reporter=html"
+            # Use -t flag for pseudo-TTY to ensure unbuffered output
+            docker exec -t restarters bash -c "
+              export PLAYWRIGHT_TEST=true
+              export PLAYWRIGHT_DEBUG=true
+              export PWTEST_SKIP_TEST_OUTPUT=0
+              export DEBUG=playwright
+              export PLAYWRIGHT_BASE_URL=http://restarters_nginx
+              export PW_TEST_HTML_REPORT_OPEN=never
+              export FORCE_COLOR=1
+              # Unbuffer output and add periodic keepalive
+              stdbuf -oL -eL npx playwright test --reporter=html | while IFS= read -r line; do
+                echo \"\$line\"
+                echo '[CircleCI] Playwright test running...' >&2
+              done
+            "
           no_output_timeout: 10m
 
       # Setup test data for autocomplete test
@@ -178,7 +192,26 @@ jobs:
           command: |
             mkdir -p /tmp/test-results/playwright-autocomplete
             # Run the autocomplete test with its own configuration
-            docker exec restarters bash -c "export PLAYWRIGHT_TEST=true; export PLAYWRIGHT_DEBUG=true; export PWTEST_SKIP_TEST_OUTPUT=0; export DEBUG=playwright; export PLAYWRIGHT_BASE_URL=http://restarters_nginx; export PW_TEST_HTML_REPORT_OPEN=never; npx playwright test --config=playwright.autocomplete.config.js --reporter=html"
+            # Use -t flag for pseudo-TTY and add background keepalive process
+            docker exec -t restarters bash -c "
+              export PLAYWRIGHT_TEST=true
+              export PLAYWRIGHT_DEBUG=true
+              export PWTEST_SKIP_TEST_OUTPUT=0
+              export DEBUG=playwright
+              export PLAYWRIGHT_BASE_URL=http://restarters_nginx
+              export PW_TEST_HTML_REPORT_OPEN=never
+              export FORCE_COLOR=1
+              
+              # Start background keepalive process
+              (while true; do sleep 30; echo '[CircleCI] Autocomplete test still running...'; done) &
+              KEEPALIVE_PID=\$!
+              
+              # Run the test with unbuffered output
+              stdbuf -oL -eL npx playwright test --config=playwright.autocomplete.config.js --reporter=html
+              
+              # Clean up keepalive process
+              kill \$KEEPALIVE_PID 2>/dev/null || true
+            "
           no_output_timeout: 15m
 
       # Copy test results and artifacts
