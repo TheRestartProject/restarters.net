@@ -5,6 +5,9 @@ import { __ as translate } from 'laravel-translator';
 export const Lang = { get: translate }
 
 export default {
+    beforeCreate() {
+        this.$lang = { get: translate }
+    },
     methods: {
         __(key, values) {
             try {

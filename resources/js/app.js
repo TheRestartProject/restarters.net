@@ -77,16 +77,13 @@ function initializeJQuery() {
     return;
   }
   
-  // Also wait for Select2 and Leaflet to be available
-  if (typeof window.jQuery.fn.select2 === 'undefined' || typeof window.L === 'undefined') {
+  // Also wait for Select2, Leaflet, and Bootstrap to be available
+  if (typeof window.jQuery.fn.select2 === 'undefined' || typeof window.L === 'undefined' || typeof window.jQuery.fn.popover === 'undefined') {
     setTimeout(initializeJQuery, 50);
     return;
   }
   
   const $ = window.jQuery;
-  
-  // Make jQuery available to the rest of the module
-  jQuery = $;
   
   // All jQuery initialization code goes here
   $('.btn-next').on('click', formProcess);
@@ -108,24 +105,45 @@ function initializeJQuery() {
     eventsMap();
     truncate();
     nestedTable();
-    select2Fields();
     
-    // All the remaining jQuery initialization code from the file
-    $('.users-list').find('[data-toggle="popover"]').popover();
-    $('.users-list').find('[data-toggle="popover"]').on('click', function (e) {
-      $('.users-list').find('[data-toggle="popover"]').not(this).popover('hide');
-    });
+    // Retry select2Fields with a small delay to ensure Select2 is fully loaded
+    setTimeout(function() {
+      if (typeof window.jQuery.fn.select2 !== 'undefined') {
+        select2Fields();
+      } else {
+        console.warn('Select2 still not available after delay, retrying...');
+        setTimeout(function() {
+          if (typeof window.jQuery.fn.select2 !== 'undefined') {
+            select2Fields();
+          } else {
+            console.error('Select2 failed to load after multiple retries');
+          }
+        }, 200);
+      }
+    }, 100);
     
-    $('.table:not(.table-devices)').find('[data-toggle="popover"]').popover({
-      template: '<div class="popover popover__table" role="tooltip"><div class="arrow"></div><h3 class="popover-header"></h3><div class="popover-body"></div></div>',
-      placement:'top'
-    });
+    // Initialize popover functionality with retry mechanism
+    setTimeout(function() {
+      if (typeof window.jQuery.fn.popover !== 'undefined') {
+        $('.users-list').find('[data-toggle="popover"]').popover();
+        $('.users-list').find('[data-toggle="popover"]').on('click', function (e) {
+          $('.users-list').find('[data-toggle="popover"]').not(this).popover('hide');
+        });
+        
+        $('.table:not(.table-devices)').find('[data-toggle="popover"]').popover({
+          template: '<div class="popover popover__table" role="tooltip"><div class="arrow"></div><h3 class="popover-header"></h3><div class="popover-body"></div></div>',
+          placement:'top'
+        });
 
-    $('.table-devices').find('[data-toggle="popover"]').popover();
+        $('.table-devices').find('[data-toggle="popover"]').popover();
 
-    $('.table').find('[data-toggle="popover"]').on('click', function (e) {
-      $('.table').find('[data-toggle="popover"]').not(this).popover('hide');
-    });
+        $('.table').find('[data-toggle="popover"]').on('click', function (e) {
+          $('.table').find('[data-toggle="popover"]').not(this).popover('hide');
+        });
+      } else {
+        console.warn('Bootstrap popover still not available after delay');
+      }
+    }, 100);
 
     $(document).on('change', '.category', function (e) {
       var $value = parseInt($(this).val());
@@ -270,25 +288,25 @@ function initializeJQuery() {
       components: {
         'loginpage' : LoginPage,
         'dashboardpage': DashboardPage,
-        'eventaddeditpage': EventAddEditPage,
-        'eventaddedit': EventAddEdit,
-        'eventsrequiringmoderation': EventsRequiringModeration,
-        'eventpage': EventPage,
-        'fixometerpage': FixometerPage,
-        'groupspage': GroupsPage,
-        'grouppage': GroupPage,
-        'groupaddeditpage': GroupAddEditPage,
-        'groupeventspage': GroupEventsPage,
-        'groupevents': GroupEvents,
-        'groupsrequiringmoderation': GroupsRequiringModeration,
+        'EventAddEditPage': EventAddEditPage,
+        'EventAddEdit': EventAddEdit,
+        'EventsRequiringModeration': EventsRequiringModeration,
+        'EventPage': EventPage,
+        'FixometerPage': FixometerPage,
+        'GroupsPage': GroupsPage,
+        'GroupPage': GroupPage,
+        'GroupAddEditPage': GroupAddEditPage,
+        'GroupEventsPage': GroupEventsPage,
+        'GroupEvents': GroupEvents,
+        'GroupsRequiringModeration': GroupsRequiringModeration,
 
-        'eventtimerangepicker': EventTimeRangePicker,
-        'eventdatepicker': EventDatePicker,
-        'venueaddress': VenueAddress,
-        'richtexteditor': RichTextEditor,
-        'notifications': Notifications,
-        'grouptimezone': GroupTimeZone,
-        'statsshare': StatsShare,
+        'EventTimeRangePicker': EventTimeRangePicker,
+        'EventDatePicker': EventDatePicker,
+        'VenueAddress': VenueAddress,
+        'RichTextEditor': RichTextEditor,
+        'Notifications': Notifications,
+        'GroupTimeZone': GroupTimeZone,
+        'StatsShare': StatsShare,
       }
     })
     $(".vue-placeholder-large").hide()
@@ -445,26 +463,26 @@ function initializeJQuery() {
       store: store,
       components: {
         'loginpage' : LoginPage,
-        'dashboardpage': DashBoardPage,
-        'eventaddeditpage': EventAddEditPage,
-        'eventaddedit': EventAddEdit,
-        'eventsrequiringmoderation': EventsRequiringModeration,
-        'eventpage': EventPage,
-        'fixometerpage': FixometerPage,
-        'groupspage': GroupsPage,
-        'grouppage': GroupPage,
-        'groupaddeditpage': GroupAddEditPage,
-        'groupeventspage': GroupEventsPage,
-        'groupevents': GroupEvents,
-        'groupsrequiringmoderation': GroupsRequiringModeration,
+        'DashBoardPage': DashboardPage,
+        'EventAddEditPage': EventAddEditPage,
+        'EventAddEdit': EventAddEdit,
+        'EventsRequiringModeration': EventsRequiringModeration,
+        'EventPage': EventPage,
+        'FixometerPage': FixometerPage,
+        'GroupsPage': GroupsPage,
+        'GroupPage': GroupPage,
+        'GroupAddEditPage': GroupAddEditPage,
+        'GroupEventsPage': GroupEventsPage,
+        'GroupEvents': GroupEvents,
+        'GroupsRequiringModeration': GroupsRequiringModeration,
 
-        'eventtimerangepicker': EventTimeRangePicker,
-        'eventdatepicker': EventDatePicker,
-        'venueaddress': VenueAddress,
-        'richtexteditor': RichTextEditor,
-        'notifications': Notifications,
-        'grouptimezone': GroupTimeZone,
-        'statsshare': StatsShare,
+        'EventTimeRangePicker': EventTimeRangePicker,
+        'EventDatePicker': EventDatePicker,
+        'VenueAddress': VenueAddress,
+        'RichTextEditor': RichTextEditor,
+        'Notifications': Notifications,
+        'GroupTimeZone': GroupTimeZone,
+        'StatsShare': StatsShare,
       }
     })
   })

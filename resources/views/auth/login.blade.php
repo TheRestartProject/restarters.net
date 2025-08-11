@@ -13,7 +13,7 @@
         @endif
 
         <div class="vue">
-            <LoginPage
+            <loginpage
                 csrf="{{ csrf_token() }}"
                 :error="{{ count($errors->all()) ? 'true' : 'false' }}"
                 time="{{ Crypt::encrypt(time()) }}"

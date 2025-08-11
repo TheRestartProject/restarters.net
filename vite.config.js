@@ -112,9 +112,7 @@ export default defineConfig({
         ],
         exclude: [
             'vue2-leaflet', 
-            'leaflet',
             'vue2-dropzone',
-            'slick-carousel',
         ]
     },
     build: {
