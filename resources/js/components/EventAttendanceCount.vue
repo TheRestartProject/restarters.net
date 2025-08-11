@@ -4,13 +4,13 @@
       <b-input-group>
         <b-input-group-prepend class="d-flex flex-column justify-content-center">
           <b-btn variant="white" class="attendance-button d-grid align-content-center justify-content-center" @click="dec">
-            <img class="icon" src="/images/minus-icon.svg" alt="-" title="Decrement" />
+            <img class="icon" :src="imageUrl('/images/minus-icon.svg')" alt="-" title="Decrement" />
           </b-btn>
         </b-input-group-prepend>
         <b-input v-model="current" class="attendance-count pt-1 text-center" type="number" step="1" @keyup="set" />
         <b-input-group-append class="d-flex flex-column justify-content-center">
           <b-btn variant="white" class="attendance-button d-grid align-content-center justify-content-center" @click="inc">
-            <img class="icon" src="/images/add-icon.svg" alt="+" title="Increment" />
+            <img class="icon" :src="imageUrl('/images/add-icon.svg')" alt="+" title="Increment" />
           </b-btn>
         </b-input-group-append>
       </b-input-group>
@@ -23,6 +23,8 @@
   </div>
 </template>
 <script>
+import images from '../mixins/images'
+
 export default {
   props: {
     count: {
@@ -36,6 +38,7 @@ export default {
       default: false
     }
   },
+  mixins: [images],
   data () {
     return {
       current: null
@@ -71,9 +74,9 @@ export default {
 </script>
 <style scoped lang="scss">
 @import 'resources/global/css/_variables';
-@import '~bootstrap/scss/functions';
-@import '~bootstrap/scss/variables';
-@import '~bootstrap/scss/mixins/_breakpoints';
+@import 'bootstrap/scss/functions';
+@import 'bootstrap/scss/variables';
+@import 'bootstrap/scss/mixins/_breakpoints';
 
 .attendance-button-wrapper {
   width: 180px;

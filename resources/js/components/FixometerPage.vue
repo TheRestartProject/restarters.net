@@ -166,13 +166,13 @@
   </div>
 </template>
 <script>
-import FixometerHeading from './FixometerHeading'
-import FixometerGlobalImpact from './FixometerGlobalImpact'
-import FixometerRecordsTable from './FixometerRecordsTable'
-import FixometerFilters from './FixometerFilters'
-import CollapsibleSection from './CollapsibleSection'
+import FixometerHeading from './FixometerHeading.vue'
+import FixometerGlobalImpact from './FixometerGlobalImpact.vue'
+import FixometerRecordsTable from './FixometerRecordsTable.vue'
+import FixometerFilters from './FixometerFilters.vue'
+import CollapsibleSection from './CollapsibleSection.vue'
 import auth from '../mixins/auth'
-import AlertBanner from './AlertBanner'
+import AlertBanner from './AlertBanner.vue'
 
 export default {
   components: {
@@ -377,9 +377,9 @@ export default {
 </script>
 <style scoped lang="scss">
 @import 'resources/global/css/_variables';
-@import '~bootstrap/scss/functions';
-@import '~bootstrap/scss/variables';
-@import '~bootstrap/scss/mixins/_breakpoints';
+@import 'bootstrap/scss/functions';
+@import 'bootstrap/scss/variables';
+@import 'bootstrap/scss/mixins/_breakpoints';
 
 .iconsmall {
   height: 15px;

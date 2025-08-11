@@ -3,7 +3,7 @@ $brand-primary:             darken(#428bca, 6.5%);
 $font-size-base:            14px !default;
 
 $line-height-base:          1.428571429 !default; // 20/14
-$line-height-computed:      floor(($font-size-base * $line-height-base)) !default; // ~20px
+$line-height-computed:      floor(($font-size-base * $line-height-base)) !default; // 20px
 
 $padding-base-vertical:     6px !default;
 $padding-base-horizontal:   12px !default;

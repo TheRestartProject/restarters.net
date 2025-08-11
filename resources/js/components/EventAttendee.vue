@@ -26,7 +26,7 @@
              'clickme' : true,
              'text-muted': noskills
             }">
-              <b-img-lazy src="/images/star.svg" :class="{
+              <b-img-lazy :src="imageUrl('/images/star.svg')" :class="{
              'star': true,
              'mr-1': true,
              'faded': noskills
@@ -36,7 +36,7 @@
         </div>
       </div>
       <b-btn variant="none" v-if="attendee.confirmed && canedit" @click="confirm" class="p-0">
-        <b-img src="/icons/delete_ico_red.svg" />
+        <b-img :src="imageUrl('/icons/delete_ico_red.svg')" />
       </b-btn>
     </div>
     <b-alert variant="danger" v-if="error">
@@ -47,10 +47,12 @@
 </template>
 <script>
 import { DEFAULT_PROFILE, HOST } from '../constants'
-import ConfirmModal from './ConfirmModal'
+import ConfirmModal from './ConfirmModal.vue'
+import images from '../mixins/images'
 
 export default {
   components: {ConfirmModal},
+  mixins: [images],
   props: {
     attendee: {
       type: Object,

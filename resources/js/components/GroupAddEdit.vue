@@ -84,7 +84,7 @@
       />
       <b-card v-if="canApprove" no-body class="group-admin">
         <b-card-header>
-          <b-img src="/images/cog.svg" />
+          <b-img :src="imageUrl('/images/cog.svg')" />
           {{ __('groups.group_admin_only') }}
         </b-card-header>
         <b-card-body>
@@ -179,18 +179,19 @@
 <script>
 import group from '../mixins/group'
 import auth from '../mixins/auth'
-import RichTextEditor from './RichTextEditor'
+import images from '../mixins/images'
+import RichTextEditor from './RichTextEditor.vue'
 import { required, url, email, helpers } from 'vuelidate/lib/validators'
 import validationHelpers from '../mixins/validationHelpers'
-import GroupName from './GroupName'
-import GroupWebsite from './GroupWebsite'
-import GroupEmail from './GroupEmail'
-import GroupLocation from './GroupLocation'
-import GroupLocationMap from './GroupLocationMap'
-import GroupTimeZone from './GroupTimeZone'
-import GroupPhone from './GroupPhone'
-import GroupImage from './GroupImage'
-import NetworkData from './NetworkData'
+import GroupName from './GroupName.vue'
+import GroupWebsite from './GroupWebsite.vue'
+import GroupEmail from './GroupEmail.vue'
+import GroupLocation from './GroupLocation.vue'
+import GroupLocationMap from './GroupLocationMap.vue'
+import GroupTimeZone from './GroupTimeZone.vue'
+import GroupPhone from './GroupPhone.vue'
+import GroupImage from './GroupImage.vue'
+import NetworkData from './NetworkData.vue'
 import SpinButton from "./SpinButton.vue";
 
 function geocodeableValidation () {
@@ -211,7 +212,7 @@ export default {
     GroupImage,
     SpinButton,
   },
-  mixins: [group, auth, validationHelpers],
+  mixins: [group, auth, validationHelpers, images],
   props: {
     idgroups: {
       type: Number,
@@ -464,9 +465,9 @@ export default {
 </script>
 <style scoped lang="scss">
 @import 'resources/global/css/_variables';
-@import '~bootstrap/scss/functions';
-@import '~bootstrap/scss/variables';
-@import '~bootstrap/scss/mixins/_breakpoints';
+@import 'bootstrap/scss/functions';
+@import 'bootstrap/scss/variables';
+@import 'bootstrap/scss/mixins/_breakpoints';
 
 .box {
   background-color: $white;

@@ -3,7 +3,7 @@
     <div class="title mb-2 ml-3">
       {{ __('devices.latest_data') }}
       <span class="icon mt-2 mb-2">
-        <b-img src="/images/clap_doodle.svg" class="img" />
+        <b-img :src="imageUrl('/images/clap_doodle.svg')" class="img" />
       </span>
     </div>
     <div class="description pt-4 m-3 font-weight-bold">
@@ -13,6 +13,8 @@
   </div>
 </template>
 <script>
+import images from '../mixins/images'
+
 export default {
   props: {
     latestData: {
@@ -20,6 +22,7 @@ export default {
       required: true
     }
   },
+  mixins: [images],
   computed: {
     translatedWastePrevented() {
       // Round up to avoid 0kg.
@@ -33,9 +36,9 @@ export default {
 </script>
 <style scoped lang="scss">
 @import 'resources/global/css/_variables';
-@import '~bootstrap/scss/functions';
-@import '~bootstrap/scss/variables';
-@import '~bootstrap/scss/mixins/_breakpoints';
+@import 'bootstrap/scss/functions';
+@import 'bootstrap/scss/variables';
+@import 'bootstrap/scss/mixins/_breakpoints';
 
 .fld-layout {
   display: grid;

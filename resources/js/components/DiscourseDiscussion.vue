@@ -3,7 +3,7 @@
     <template slot="title">
           <div class="d-flex">
       {{ __('discourse.title') }}
-      <b-img class="icon ml-3 d-none d-md-block" src="/images/talk_doodle.svg" style="width:70px"/>
+      <b-img class="icon ml-3 d-none d-md-block" :src="imageUrl('/images/talk_doodle.svg')" style="width:70px"/>
           </div>
     </template>
 
@@ -15,10 +15,10 @@
             <b-tr class="border-0">
               <b-th></b-th>
               <b-th class="d-none d-md-table-cell">
-                <b-img class="icon" src="/images/speech_bubble.svg" :title="__('discourse.number_of_comments')"/>
+                <b-img class="icon" :src="imageUrl('/images/speech_bubble.svg')" :title="__('discourse.number_of_comments')"/>
               </b-th>
               <b-th class="d-none d-md-table-cell">
-                <b-img class="icon" height="28px" src="/images/clock.svg" :title="__('discourse.topic_created_at')"/>
+                <b-img class="icon" height="28px" :src="imageUrl('/images/clock.svg')" :title="__('discourse.topic_created_at')"/>
               </b-th>
             </b-tr>
           </b-thead>
@@ -41,11 +41,13 @@
 </template>
 
 <script>
-import DiscourseTopic from './DiscourseTopic'
-import CollapsibleSection from './CollapsibleSection'
+import DiscourseTopic from './DiscourseTopic.vue'
+import CollapsibleSection from './CollapsibleSection.vue'
+import images from '../mixins/images'
 const axios = require('axios')
 
 export default {
+  mixins: [images],
   components: {CollapsibleSection, DiscourseTopic},
   props: {
     seeAllTopicsLink: {

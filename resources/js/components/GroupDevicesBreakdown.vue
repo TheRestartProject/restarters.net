@@ -77,8 +77,8 @@
   </div>
 </template>
 <script>
-import GroupDevicesBreakdownCluster from './GroupDevicesBreakdownCluster'
-import CollapsibleSection from './CollapsibleSection'
+import GroupDevicesBreakdownCluster from './GroupDevicesBreakdownCluster.vue'
+import CollapsibleSection from './CollapsibleSection.vue'
 export default {
   components: {CollapsibleSection, GroupDevicesBreakdownCluster},
   props: {
@@ -95,9 +95,9 @@ export default {
 </script>
 <style scoped lang="scss">
 @import 'resources/global/css/_variables';
-@import '~bootstrap/scss/functions';
-@import '~bootstrap/scss/variables';
-@import '~bootstrap/scss/mixins/_breakpoints';
+@import 'bootstrap/scss/functions';
+@import 'bootstrap/scss/variables';
+@import 'bootstrap/scss/mixins/_breakpoints';
 
 ::v-deep .impact-stat-subtitle {
   font-size: 80%;

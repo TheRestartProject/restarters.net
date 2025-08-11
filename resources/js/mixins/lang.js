@@ -2,7 +2,7 @@ import * as Sentry from "@sentry/vue";
 
 // Set up internationalisation.  translations.js is built in webpack.mix.js from the PHP lang folder.
 import lang from 'lang.js';
-import translations from '../translations.js';
+import * as translations from '../translations.js';
 export const Lang = new lang()
 Lang.setFallback('en')
 Lang.setMessages(translations)

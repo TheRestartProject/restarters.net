@@ -7,7 +7,7 @@
           <div v-if="group">{{ group.name }}</div> {{ translatedTitle }}
           <div>
             <b-btn v-if="calendarCopyUrl" class="ml-0 ml-md-2" variant="primary" @click="showCalendar">
-              <b-img-lazy src="/images/subs_cal_ico.svg" />
+              <b-img-lazy :src="imageUrl('/images/subs_cal_ico.svg')" />
             </b-btn>
           </div>
         </div>
@@ -61,11 +61,12 @@
 </template>
 <script>
 import group from '../mixins/group'
+import images from '../mixins/images'
 import moment from 'moment'
-import CalendarAddModal from './CalendarAddModal'
-import GroupEventsTab from './GroupEventsTab'
-import CollapsibleSection from './CollapsibleSection'
-import AlertBanner from './AlertBanner'
+import CalendarAddModal from './CalendarAddModal.vue'
+import GroupEventsTab from './GroupEventsTab.vue'
+import CollapsibleSection from './CollapsibleSection.vue'
+import AlertBanner from './AlertBanner.vue'
 
 export default {
   components: {
@@ -74,7 +75,7 @@ export default {
     CalendarAddModal,
     AlertBanner,
   },
-  mixins: [ group ],
+  mixins: [ group, images ],
   props: {
     idgroups: {
       type: Number,

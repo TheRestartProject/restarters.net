@@ -2,33 +2,33 @@
 @import "variables";
 
 // Bootstrap
-@import '~bootstrap/scss/bootstrap';
-@import '~bootstrap-vue/dist/bootstrap-vue.css';
+@import 'bootstrap/scss/bootstrap';
+@import 'bootstrap-vue/dist/bootstrap-vue.css';
 
 // Slick
-@import '~slick-carousel/slick/slick';
-@import '~slick-carousel/slick/slick-theme';
+@import 'slick-carousel/slick/slick';
+@import 'slick-carousel/slick/slick-theme';
 
 // Tokenfield
 @import 'tfvariables';
-@import '~tokenfield/lib/scss/mixins';
-@import '~tokenfield/lib/scss/tokenfield';
-// @import '~bootstrap-tokenfield/dist/css/bootstrap-tokenfield.css';
+@import 'tokenfield/lib/scss/mixins';
+@import 'tokenfield/lib/scss/tokenfield';
+// @import 'bootstrap-tokenfield/dist/css/bootstrap-tokenfield.css';
 
 // Dropzone
-@import '~dropzone/dist/basic';
-@import '~dropzone/dist/dropzone';
+@import 'dropzone/dist/basic';
+@import 'dropzone/dist/dropzone';
 
 // Select2
-@import '~select2/src/scss/core';
+@import 'select2/src/scss/core';
 
 // BS4 Datepicker
-@import '~bootstrap4-datetimepicker/build/css/bootstrap-datetimepicker.min';
+@import 'bootstrap4-datetimepicker/build/css/bootstrap-datetimepicker.min';
 
 // BS4 Sortable
 @import 'bootstrap-sortable';
 
-@import '~leaflet/dist/leaflet';
+@import 'leaflet/dist/leaflet';
 
 .navbar-laravel {
   background-color: #fff;

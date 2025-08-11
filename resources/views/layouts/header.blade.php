@@ -19,8 +19,7 @@
     <link rel="shortcut icon" href="/favicon.ico" type="image/x-icon" />
 
     <!-- Styles -->
-    <link href="{{ asset('css/app.css') }}" rel="stylesheet">
-    <link href="{{ asset('global/css/app.css') }}" rel="stylesheet">
+    @vite(['resources/sass/app.scss', 'resources/global/css/app.scss'])
 
     @yield('extra-css')
 

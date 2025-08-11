@@ -28,7 +28,6 @@ import 'leaflet/dist/leaflet.css'
 import Multiselect from 'vue-multiselect'
 import 'vue-multiselect/dist/vue-multiselect.min.css'
 import * as Sentry from "@sentry/vue";
-import { Integrations } from "@sentry/tracing";
 
 import Vuelidate from 'vuelidate'
 Vue.use(Vuelidate)
@@ -37,21 +36,21 @@ import LoginPage from './components/LoginPage.vue'
 import DashBoardPage from './components/DashboardPage.vue'
 import EventAddEditPage from './components/EventAddEditPage.vue'
 import EventAddEdit from './components/EventAddEdit.vue'
-import EventsRequiringModeration from './components/EventsRequiringModeration'
+import EventsRequiringModeration from './components/EventsRequiringModeration.vue'
 import EventPage from './components/EventPage.vue'
-import FixometerPage from './components/FixometerPage'
+import FixometerPage from './components/FixometerPage.vue'
 import GroupsPage from './components/GroupsPage.vue'
 import GroupPage from './components/GroupPage.vue'
 import GroupAddEditPage from './components/GroupAddEditPage.vue'
 import GroupEventsPage from './components/GroupEventsPage.vue'
 import GroupEvents from './components/GroupEvents.vue'
-import GroupsRequiringModeration from './components/GroupsRequiringModeration'
-import EventTimeRangePicker from './components/EventTimeRangePicker'
-import EventDatePicker from './components/EventDatePicker'
+import GroupsRequiringModeration from './components/GroupsRequiringModeration.vue'
+import EventTimeRangePicker from './components/EventTimeRangePicker.vue'
+import EventDatePicker from './components/EventDatePicker.vue'
 import VenueAddress from './components/VenueAddress.vue'
-import RichTextEditor from './components/RichTextEditor'
-import Notifications from './components/Notifications'
-import GroupTimeZone from './components/GroupTimeZone'
+import RichTextEditor from './components/RichTextEditor.vue'
+import Notifications from './components/Notifications.vue'
+import GroupTimeZone from './components/GroupTimeZone.vue'
 import StatsShare  from './components/StatsShare.vue'
 
 // Without this, the default map marker doesn't appear in production.  Fairly well-known problem.
@@ -1264,7 +1263,7 @@ jQuery(document).ready(function () {
   Sentry.init({
     Vue,
     dsn: "https://50fd2fa440af4bb4a230f40ca8d8cf90@o879179.ingest.sentry.io/5831645",
-    integrations: [new Integrations.BrowserTracing()],
+    integrations: [Sentry.browserTracingIntegration()],
 
     // We are low traffic, so we can capture all performance events.
     tracesSampleRate: 1.0,

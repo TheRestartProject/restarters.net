@@ -14,7 +14,7 @@
       <b-input readonly size="lg" :value="copyUrl" ref="container" />
       <b-input-group-append>
         <b-button variant="white" class="butt" v-clipboard:copy="copyUrl" v-clipboard:success="copySucceed" v-clipboard:error="copyFail">
-          <b-img src="/images/copy.svg" />
+          <b-img :src="imageUrl('/images/copy.svg')" />
         </b-button>
       </b-input-group-append>
     </b-input-group>
@@ -46,11 +46,13 @@
 <script>
 import Vue from 'vue'
 import VueClipboard from 'vue-clipboard2'
+import images from '../mixins/images'
 
 VueClipboard.config.autoSetContainer = true
 Vue.use(VueClipboard)
 
 export default {
+  mixins: [images],
   props: {
     copyUrl: {
       type: String,

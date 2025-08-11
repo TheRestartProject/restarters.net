@@ -33,7 +33,7 @@
   </div>
 </template>
 <script>
-import DashboardGroup from './DashboardGroup'
+import DashboardGroup from './DashboardGroup.vue'
 export default {
   components: {DashboardGroup},
   props: {
@@ -51,9 +51,9 @@ export default {
 </script>
 <style scoped lang="scss">
 @import 'resources/global/css/_variables';
-@import '~bootstrap/scss/functions';
-@import '~bootstrap/scss/variables';
-@import '~bootstrap/scss/mixins/_breakpoints';
+@import 'bootstrap/scss/functions';
+@import 'bootstrap/scss/variables';
+@import 'bootstrap/scss/mixins/_breakpoints';
 
 .dng-layout {
   display: grid;

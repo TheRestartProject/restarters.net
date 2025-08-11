@@ -3,7 +3,7 @@
     <h2 class="mt-2 mb-2">
       {{ __('events.environmental_impact') }}
       <span v-b-popover.html="__('events.impact_calculation')">
-        <b-img class="ml-2 icon-info clickable" src="/icons/info_ico_green.svg" />
+        <b-img class="ml-2 icon-info clickable" :src="imageUrl('/icons/info_ico_green.svg')" />
       </span>
     </h2>
     <div class="impact-container">
@@ -41,13 +41,14 @@
   </div>
 </template>
 <script>
-import StatsValue from './StatsValue'
+import StatsValue from './StatsValue.vue'
 import co2equivalent from '../mixins/co2equivalent'
-const StatsShareModal = () => import('./StatsShareModal')
+import images from '../mixins/images'
+const StatsShareModal = () => import('./StatsShareModal.vue')
 
 export default {
   components: {StatsValue, StatsShareModal},
-  mixins: [ co2equivalent ],
+  mixins: [ co2equivalent, images ],
   props: {
     stats: {
       required: true,
@@ -105,9 +106,9 @@ export default {
 </script>
 <style scoped lang="scss">
 @import 'resources/global/css/_variables';
-@import '~bootstrap/scss/functions';
-@import '~bootstrap/scss/variables';
-@import '~bootstrap/scss/mixins/_breakpoints';
+@import 'bootstrap/scss/functions';
+@import 'bootstrap/scss/variables';
+@import 'bootstrap/scss/mixins/_breakpoints';
 
 .impact-container {
   display: grid;

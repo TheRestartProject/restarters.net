@@ -6,7 +6,7 @@
           <div class="align-self-center">
             {{ __('dashboard.add_data_heading') }}
           </div>
-          <b-img src="/images/fixometer_doodle.svg" class="ml-4 d-none d-md-block" />
+          <b-img :src="imageUrl('/images/fixometer_doodle.svg')" class="ml-4 d-none d-md-block" />
         </div>
       </template>
       <template slot="content">
@@ -49,10 +49,12 @@
   </div>
 </template>
 <script>
-import CollapsibleSection from './CollapsibleSection'
+import CollapsibleSection from './CollapsibleSection.vue'
+import images from '../mixins/images'
 import moment from 'moment'
 
 export default {
+  mixins: [images],
   data () {
     return {
       groupValue: null,
@@ -110,9 +112,9 @@ export default {
 </script>
 <style scoped lang="scss">
 @import 'resources/global/css/_variables';
-@import '~bootstrap/scss/functions';
-@import '~bootstrap/scss/variables';
-@import '~bootstrap/scss/mixins/_breakpoints';
+@import 'bootstrap/scss/functions';
+@import 'bootstrap/scss/variables';
+@import 'bootstrap/scss/mixins/_breakpoints';
 
 .content {
   border-top: 3px dashed black;

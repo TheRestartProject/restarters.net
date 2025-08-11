@@ -37,7 +37,7 @@
 
       <template slot="head(date_long)">
         <div class="text-left">
-          <b-img class="icon mt-3 ml-3" src="/images/clock.svg" />
+          <b-img class="icon mt-3 ml-3" :src="imageUrl('/images/clock.svg')" />
         </div>
       </template>
       <template slot="cell(date_long)" slot-scope="data">
@@ -58,7 +58,7 @@
 
       <template slot="head(invited)">
         <div class="hidecell text-center">
-          <b-img class="icon mt-3" src="/images/mail_ico.svg" :title="__('groups.volunteers_invited')" />
+          <b-img class="icon mt-3" :src="imageUrl('/images/mail_ico.svg')" :title="__('groups.volunteers_invited')" />
         </div>
       </template>
       <template slot="cell(invited)" slot-scope="data">
@@ -67,7 +67,7 @@
 
       <template slot="head(volunteers)">
         <div class="hidecell text-center">
-          <b-img class="icon mt-3" src="/images/participants.svg" :title="__('groups.volunteers_confirmed')" />
+          <b-img class="icon mt-3" :src="imageUrl('/images/participants.svg')" :title="__('groups.volunteers_confirmed')" />
         </div>
       </template>
       <template slot="cell(volunteers)" slot-scope="data">
@@ -83,7 +83,7 @@
 
       <template slot="head(participants_count)">
         <div class="hidecell text-center">
-          <b-img class="icon mt-3" src="/images/participants.svg" :title="__('groups.participants_attended')" />
+          <b-img class="icon mt-3" :src="imageUrl('/images/participants.svg')" :title="__('groups.participants_attended')" />
         </div>
       </template>
       <template slot="cell(participants_count)" slot-scope="data">
@@ -92,7 +92,7 @@
 
       <template slot="head(volunteers_count)">
         <div class="hidecell text-center">
-          <b-img class="icon mt-3" src="/icons/volunteer_ico-thick.svg" :title="__('groups.volunteers_attended')" />
+          <b-img class="icon mt-3" :src="imageUrl('/icons/volunteer_ico-thick.svg')" :title="__('groups.volunteers_attended')" />
         </div>
       </template>
       <template slot="cell(volunteers_count)" slot-scope="data">
@@ -101,7 +101,7 @@
 
       <template slot="head(waste)">
         <div class="hidecell text-center">
-          <b-img class="icon mt-3" src="/images/trash.svg" :title="__('groups.waste_prevented')" />
+          <b-img class="icon mt-3" :src="imageUrl('/images/trash.svg')" :title="__('groups.waste_prevented')" />
         </div>
       </template>
       <template slot="cell(waste)" slot-scope="data" v-bind="stats">
@@ -116,7 +116,7 @@
 
       <template slot="head(co2)">
         <div class="hidecell text-center">
-          <b-img class="icon mt-3" src="/images/cloud_empty.svg" :title="__('groups.co2_emissions_prevented')" />
+          <b-img class="icon mt-3" :src="imageUrl('/images/cloud_empty.svg')" :title="__('groups.co2_emissions_prevented')" />
         </div>
       </template>
       <template slot="cell(co2)" slot-scope="data" v-bind="stats">
@@ -125,7 +125,7 @@
 
       <template slot="head(fixed_devices)">
         <div class="hidecell text-center">
-          <b-img class="icon mt-3" src="/images/fixed.svg" :title="__('groups.fixed_items')" />
+          <b-img class="icon mt-3" :src="imageUrl('/images/fixed.svg')" :title="__('groups.fixed_items')" />
         </div>
       </template>
       <template slot="cell(fixed_devices)" slot-scope="data" v-bind="stats">
@@ -134,7 +134,7 @@
 
       <template slot="head(repairable_devices)">
         <div class="hidecell text-center">
-          <b-img class="icon mt-3" src="/images/repairable_ico.svg" :title="__('groups.repairable_items')" />
+          <b-img class="icon mt-3" :src="imageUrl('/images/repairable_ico.svg')" :title="__('groups.repairable_items')" />
         </div>
       </template>
       <template slot="cell(repairable_devices)" slot-scope="data" v-bind="stats">
@@ -143,7 +143,7 @@
 
       <template slot="head(dead_devices)">
         <div class="hidecell text-center">
-          <b-img class="icon mt-3" src="/images/dead_ico.svg" :title="__('groups.end_of_life_items')" />
+          <b-img class="icon mt-3" :src="imageUrl('/images/dead_ico.svg')" :title="__('groups.end_of_life_items')" />
         </div>
       </template>
       <template slot="cell(dead_devices)" slot-scope="data" v-bind="stats">
@@ -155,15 +155,17 @@
 </template>
 <script>
 import moment from 'moment'
+import images from '../mixins/images'
 import InfiniteLoading from 'vue-infinite-loading'
-import GroupEventsScrollTableDateShort from './GroupEventsScrollTableDateShort'
-import GroupEventsScrollTableDateLong from './GroupEventsScrollTableDateLong'
-import GroupEventsScrollTableNumber from './GroupEventsScrollTableNumber'
-import GroupEventsScrollTableActions from './GroupEventsScrollTableActions'
-import GroupEventsScrollTableFilters from './GroupEventsScrollTableFilters'
-import EventTitle from './EventTitle'
+import GroupEventsScrollTableDateShort from './GroupEventsScrollTableDateShort.vue'
+import GroupEventsScrollTableDateLong from './GroupEventsScrollTableDateLong.vue'
+import GroupEventsScrollTableNumber from './GroupEventsScrollTableNumber.vue'
+import GroupEventsScrollTableActions from './GroupEventsScrollTableActions.vue'
+import GroupEventsScrollTableFilters from './GroupEventsScrollTableFilters.vue'
+import EventTitle from './EventTitle.vue'
 
 export default {
+  mixins: [images],
   components: {
     EventTitle,
     GroupEventsScrollTableFilters,
@@ -400,9 +402,9 @@ export default {
 </script>
 <style scoped lang="scss">
 @import 'resources/global/css/_variables';
-@import '~bootstrap/scss/functions';
-@import '~bootstrap/scss/variables';
-@import '~bootstrap/scss/mixins/_breakpoints';
+@import 'bootstrap/scss/functions';
+@import 'bootstrap/scss/variables';
+@import 'bootstrap/scss/mixins/_breakpoints';
 
 ::v-deep .hidecell {
   display: none;

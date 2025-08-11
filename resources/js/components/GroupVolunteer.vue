@@ -27,7 +27,7 @@
              'text-muted': noskills
             }">
               <div v-b-tooltip.hover :title="skillList">
-                <b-img-lazy src="/images/star.svg" :class="{
+                <b-img-lazy :src="imageUrl('/images/star.svg')" :class="{
                    'star': true,
                    'mr-1': true,
                    'faded': noskills
@@ -53,11 +53,13 @@
 </template>
 <script>
 import { DEFAULT_PROFILE, HOST, RESTARTER } from '../constants'
-import ConfirmModal from './ConfirmModal'
+import images from '../mixins/images'
+import ConfirmModal from './ConfirmModal.vue'
 import volunteers from '../store/volunteers'
 
 export default {
   components: {ConfirmModal},
+  mixins: [images],
   props: {
     id: {
       type: Number,

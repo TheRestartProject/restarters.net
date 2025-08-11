@@ -14,8 +14,8 @@
           </h3>
         </div>
         <b-btn variant="link" class="pr-1 pl-0">
-          <img class="icon" v-if="expandedItems" src="/images/minus-icon-brand.svg" alt="Collapse" />
-          <img class="icon" v-else src="/images/add-icon-brand.svg" alt="Expand" />
+          <img class="icon" v-if="expandedItems" :src="imageUrl('/images/minus-icon-brand.svg')" alt="Collapse" />
+          <img class="icon" v-else :src="imageUrl('/images/add-icon-brand.svg')" alt="Expand" />
         </b-btn>
       </div>
       <b-collapse id="collapse-item" v-model="expandedItems">
@@ -74,8 +74,8 @@
           </h3>
         </div>
         <b-btn variant="link" class="pr-1 pl-0">
-          <img class="icon" v-if="expandedEvents" src="/images/minus-icon-brand.svg" alt="Collapse" />
-          <img class="icon" v-else src="/images/add-icon-brand.svg" alt="Expand" />
+          <img class="icon" v-if="expandedEvents" :src="imageUrl('/images/minus-icon-brand.svg')" alt="Collapse" />
+          <img class="icon" v-else :src="imageUrl('/images/add-icon-brand.svg')" alt="Expand" />
         </b-btn>
       </div>
       <b-collapse id="collapse-item" v-model="expandedEvents">
@@ -97,13 +97,15 @@
   </div>
 </template>
 <script>
-import DeviceCategorySelect from './DeviceCategorySelect'
-import DeviceModel from './DeviceModel'
-import DeviceBrand from './DeviceBrand'
+import DeviceCategorySelect from './DeviceCategorySelect.vue'
+import DeviceModel from './DeviceModel.vue'
+import DeviceBrand from './DeviceBrand.vue'
+import images from '../mixins/images'
 import { END_OF_LIFE, FIXED, REPAIRABLE } from '../constants'
 
 export default {
   components: {DeviceBrand, DeviceModel, DeviceCategorySelect},
+  mixins: [images],
   props: {
     clusters: {
       type: Array,
@@ -291,9 +293,9 @@ export default {
 </script>
 <style scoped lang="scss">
 @import 'resources/global/css/_variables';
-@import '~bootstrap/scss/functions';
-@import '~bootstrap/scss/variables';
-@import '~bootstrap/scss/mixins/_breakpoints';
+@import 'bootstrap/scss/functions';
+@import 'bootstrap/scss/variables';
+@import 'bootstrap/scss/mixins/_breakpoints';
 
 .border {
   border: 1px solid $brand-light !important;

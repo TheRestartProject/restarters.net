@@ -2,7 +2,7 @@
 
     <footer></footer>
 
-    <script src="{{ asset('js/app.js') }}"></script>
+    @vite(['resources/js/app.js', 'resources/global/js/app.js'])
 
     @yield('scripts')
   </body>

@@ -6,7 +6,7 @@
     <template slot="content">
       <div class="border-top-thick d-flex pt-1 pb-1">
         <div class="mr-2">
-          <b-img-lazy src="/icons/date_ico.svg" class="icon" />
+          <b-img-lazy :src="imageUrl('/icons/date_ico.svg')" class="icon" />
         </div>
         <div class="d-flex justify-content-between w-100 flex-wrap">
           <div>
@@ -24,7 +24,7 @@
       </div>
       <div class="border-top-thin d-flex pt-1 pb-1">
         <div class="mr-2">
-          <b-img-lazy src="/icons/time_ico.svg" class="icon" />
+          <b-img-lazy :src="imageUrl('/icons/time_ico.svg')" class="icon" />
         </div>
         <div>
           {{ start }}-{{ end }} <span class="text-muted small">{{ timezone }}</span>
@@ -32,7 +32,7 @@
       </div>
       <div class="border-top-thin d-flex pt-1 pb-1" v-if="isAttending && discourseThread">
         <div class="mr-2">
-          <b-img-lazy src="/icons/talk_ico.svg" class="icon" />
+          <b-img-lazy :src="imageUrl('/icons/talk_ico.svg')" class="icon" />
         </div>
         <div>
           <a :href="discourseThread">{{ __('events.talk_thread') }}</a>
@@ -40,7 +40,7 @@
       </div>
       <div class="border-top-thin d-flex pt-1 pb-1">
         <div class="mr-2">
-          <b-img-lazy src="/icons/host_ico.svg" class="icon" />
+          <b-img-lazy :src="imageUrl('/icons/host_ico.svg')" class="icon" />
         </div>
         <div>
           <div v-for="host in hosts">
@@ -50,7 +50,7 @@
       </div>
       <div class="border-top-thin d-flex pt-1 pb-1" v-if="event.link">
         <div class="mr-2">
-          <b-img-lazy src="/icons/link_ico.svg" class="icon" />
+          <b-img-lazy :src="imageUrl('/icons/link_ico.svg')" class="icon" />
         </div>
         <div>
           <ExternalLink :href="event.link" target="_blank" rel="noopener noreferrer" class="truncate">{{ event.link }}</ExternalLink>
@@ -58,7 +58,7 @@
       </div>
       <div class="border-top-thin d-flex pt-1 pb-1" v-if="!event.online && event.location">
         <div class="mr-2">
-          <b-img src="/icons/map_marker_ico.svg" class="icon" />
+          <b-img :src="imageUrl('/icons/map_marker_ico.svg')" class="icon" />
         </div>
         <div class="justify-content-between w-100 d-flex flex-wrap">
           <div>
@@ -85,12 +85,13 @@
 <script>
 import map from '../mixins/map'
 import event from '../mixins/event'
-import ExternalLink from './ExternalLink'
-import CollapsibleSection from './CollapsibleSection'
+import images from '../mixins/images'
+import ExternalLink from './ExternalLink.vue'
+import CollapsibleSection from './CollapsibleSection.vue'
 
 export default {
   components: {CollapsibleSection, ExternalLink},
-  mixins: [ map, event ],
+  mixins: [ map, event, images ],
   props: {
     idevents: {
       type: Number,

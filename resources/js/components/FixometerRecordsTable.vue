@@ -54,13 +54,13 @@
         <template slot="cell(show_details)" slot-scope="row">
           <div v-if="isAdmin" class="text-md-right">
             <span class="pl-0 pl-md-2 pr-2 clickme" @click="row.toggleDetails">
-              <b-img class="icon" src="/icons/edit_ico_green.svg" />
+              <b-img class="icon" :src="imageUrl('/icons/edit_ico_green.svg')" />
             </span>
             <ConfirmModal :key="'modal-' + row.item.id" ref="confirmDelete" @confirm="deleteConfirmed(row.item)" :message="__('devices.confirm_delete')" />
           </div>
           <div v-else class="text-md-right">
             <span class="pl-0 pl-md-2 pr-2 clickme" @click="row.toggleDetails">
-              <b-img class="icon" src="/icons/info_ico_green.svg" />
+              <b-img class="icon" :src="imageUrl('/icons/info_ico_green.svg')" />
             </span>
           </div>
         </template>
@@ -93,11 +93,12 @@
 <script>
 import { END_OF_LIFE, FIXED, REPAIRABLE } from '../constants'
 import moment from 'moment'
-import DeviceModel from './DeviceModel'
+import DeviceModel from './DeviceModel.vue'
 import Vue from 'vue'
 import lineClamp from 'vue-line-clamp'
-import ConfirmModal from './ConfirmModal'
-import EventDevice from './EventDevice'
+import ConfirmModal from './ConfirmModal.vue'
+import EventDevice from './EventDevice.vue'
+import images from '../mixins/images'
 
 Vue.use(lineClamp, {
   textOverflow: 'ellipsis'
@@ -106,6 +107,7 @@ Vue.use(lineClamp, {
 const bootaxios = require('axios')
 
 export default {
+  mixins: [images],
   components: {EventDevice, ConfirmModal, DeviceModel},
   props: {
     isAdmin: {
@@ -393,9 +395,9 @@ export default {
 </script>
 <style scoped lang="scss">
 @import 'resources/global/css/_variables';
-@import '~bootstrap/scss/functions';
-@import '~bootstrap/scss/variables';
-@import '~bootstrap/scss/mixins/_breakpoints';
+@import 'bootstrap/scss/functions';
+@import 'bootstrap/scss/variables';
+@import 'bootstrap/scss/mixins/_breakpoints';
 
 .badge {
   width: 90px;

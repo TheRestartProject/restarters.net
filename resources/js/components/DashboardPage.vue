@@ -1,9 +1,9 @@
 <template>
   <div>
     <div class="d-flex justify-content-center align-content-center">
-      <b-img-lazy fluid src="/images/arrows_doodle.svg" class="d-none d-md-block" />
+      <b-img-lazy fluid :src="imageUrl('/images/arrows_doodle.svg')" class="d-none d-md-block" />
       <h1 class="ml-2 mr-2 align-self-center">{{ __('dashboard.title') }}</h1>
-      <b-img-lazy fluid src="/images/confetti_doodle.svg" class="d-none d-md-block" />
+      <b-img-lazy fluid :src="imageUrl('/images/confetti_doodle.svg')" class="d-none d-md-block" />
     </div>
     <div class="dp-layout mt-4 mb-4">
       <AlertBanner class="banner" />
@@ -23,15 +23,16 @@
 </template>
 <script>
 import auth from '../mixins/auth'
-import AlertBanner from './AlertBanner'
-import DashboardYourGroups from './DashboardYourGroups'
-import DashboardRightSidebar from './DashboardRightSidebar'
-import DiscourseDiscussion from './DiscourseDiscussion'
-import DashboardAddData from './DashboardAddData'
+import images from '../mixins/images'
+import AlertBanner from './AlertBanner.vue'
+import DashboardYourGroups from './DashboardYourGroups.vue'
+import DashboardRightSidebar from './DashboardRightSidebar.vue'
+import DiscourseDiscussion from './DiscourseDiscussion.vue'
+import DashboardAddData from './DashboardAddData.vue'
 
 export default {
   components: {DashboardAddData, DashboardYourGroups,DashboardRightSidebar,AlertBanner,DiscourseDiscussion},
-  mixins: [ auth ],
+  mixins: [ auth, images ],
   props: {
     yourGroups: {
       type: Array,
@@ -104,9 +105,9 @@ export default {
 </script>
 <style scoped lang="scss">
 @import 'resources/global/css/_variables';
-@import '~bootstrap/scss/functions';
-@import '~bootstrap/scss/variables';
-@import '~bootstrap/scss/mixins/_breakpoints';
+@import 'bootstrap/scss/functions';
+@import 'bootstrap/scss/variables';
+@import 'bootstrap/scss/mixins/_breakpoints';
 
 .dp-layout {
   display: grid;

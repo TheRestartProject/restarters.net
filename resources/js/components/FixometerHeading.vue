@@ -3,7 +3,7 @@
     <div class="d-flex justify-content-between mb-3">
       <div class="d-flex">
         <h1>{{ __('devices.fixometer') }}</h1>
-        <b-img src="/images/fixometer_doodle.svg" class="ml-4 d-none d-md-block" />
+        <b-img :src="imageUrl('/images/fixometer_doodle.svg')" class="ml-4 d-none d-md-block" />
       </div>
       <div>
         <b-btn variant="primary" @click="addData">
@@ -23,9 +23,11 @@
   </div>
 </template>
 <script>
-import AddDataModal from "./AddDataModal";
+import AddDataModal from "./AddDataModal.vue";
+import images from '../mixins/images'
 
 export default {
+  mixins: [images],
   components: { AddDataModal },
   methods: {
     addData() {
@@ -36,9 +38,9 @@ export default {
 </script>
 <style scoped lang="scss">
 @import 'resources/global/css/_variables';
-@import '~bootstrap/scss/functions';
-@import '~bootstrap/scss/variables';
-@import '~bootstrap/scss/mixins/_breakpoints';
+@import 'bootstrap/scss/functions';
+@import 'bootstrap/scss/variables';
+@import 'bootstrap/scss/mixins/_breakpoints';
 
 .border-top-very-thick {
   border-top: 5px solid $black;

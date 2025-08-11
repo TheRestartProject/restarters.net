@@ -11,15 +11,16 @@
     {{ start }} <span class="d-none d-md-inline">- {{ end }}</span>
     <br class="d-block d-md-none"/>
     <div class="text-muted small">
-      <b-img class="icon" src="/images/clock.svg" /> {{ timezone }}
+      <b-img class="icon" :src="imageUrl('/images/clock.svg')" /> {{ timezone }}
     </div>
   </div>
 </template>
 <script>
 import event from '../mixins/event'
+import images from '../mixins/images'
 
 export default {
-  mixins: [event],
+  mixins: [event, images],
   props: {
     idevents: {
       type: Number,
@@ -30,9 +31,9 @@ export default {
 </script>
 <style scoped lang="scss">
 @import 'resources/global/css/_variables';
-@import '~bootstrap/scss/functions';
-@import '~bootstrap/scss/variables';
-@import '~bootstrap/scss/mixins/_breakpoints';
+@import 'bootstrap/scss/functions';
+@import 'bootstrap/scss/variables';
+@import 'bootstrap/scss/mixins/_breakpoints';
 
 .date {
   line-height: 1.3rem;

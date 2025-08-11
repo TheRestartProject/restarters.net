@@ -16,7 +16,7 @@
   </div>
 </template>
 <script>
-import EventAddEdit from './EventAddEdit'
+import EventAddEdit from './EventAddEdit.vue'
 import auth from '../mixins/auth'
 import event from '../mixins/event'
 
@@ -123,9 +123,9 @@ export default {
 </script>
 <style scoped lang="scss">
 @import 'resources/global/css/_variables';
-@import '~bootstrap/scss/functions';
-@import '~bootstrap/scss/variables';
-@import '~bootstrap/scss/mixins/_breakpoints';
+@import 'bootstrap/scss/functions';
+@import 'bootstrap/scss/variables';
+@import 'bootstrap/scss/mixins/_breakpoints';
 
 .box {
   background-color: $white;

@@ -34,7 +34,7 @@
       border-radius: 0;
     }
 
-    .custom-control-input:checked ~ .custom-control-label::after {
+    .custom-control-input:checked  .custom-control-label::after {
       background-image: url('/images/tick.svg') !important;
       background-color: white;
       background-size: 22px 22px;
@@ -219,7 +219,7 @@ select.form-control:not([class*="select2"]) {
   background-image: url('/images/dropdown-arrow.svg') !important;
 }
 
-.custom-file-input ~ .custom-file-label::after {
+.custom-file-input  .custom-file-label::after {
     content: "Button Text";
 }
 

@@ -22,16 +22,18 @@
     >
     </multiselect>
     <div v-b-popover.html.left="__('devices.tooltip_category')" class="ml-3 mt-2">
-      <b-img class="icon clickable" src="/icons/info_ico_black.svg" v-if="iconVariant === 'black'" />
-      <b-img class="icon clickable" src="/icons/info_ico_green.svg" v-else="iconVariant === 'brand'" />
+      <b-img class="icon clickable" :src="imageUrl('/icons/info_ico_black.svg')" v-if="iconVariant === 'black'" />
+      <b-img class="icon clickable" :src="imageUrl('/icons/info_ico_green.svg')" v-else="iconVariant === 'brand'" />
     </div>
     <div class="multiselect__content-wrapper d-none" />
   </div>
 </template>
 <script>
 import { CATEGORY_MISC_POWERED, CATEGORY_MISC_UNPOWERED } from '../constants'
+import images from '../mixins/images'
 
 export default {
+  mixins: [images],
   props: {
     category: {
       type: Number,

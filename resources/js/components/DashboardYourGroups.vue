@@ -6,10 +6,10 @@
           <div class="align-self-center">
             {{ __('dashboard.your_groups_heading') }}
           </div>
-          <b-img class="height ml-4" src="/images/group_doodle_ico.svg" />
+          <b-img class="height ml-4" :src="imageUrl('/images/group_doodle_ico.svg')" />
         </div>
         <a href="/group/nearby" v-if="newGroups && newGroups.length" class="added added-md d-none d-md-block pr-3">
-          <b-img src="/images/arrow-right-doodle-white.svg" />
+          <b-img :src="imageUrl('/images/arrow-right-doodle-white.svg')" />
           {{ translatedNewlyAdded }}
         </a>
       </div>
@@ -20,7 +20,7 @@
         <DashboardNoGroups v-if="!myGroups || !myGroups.length" :nearby-groups="nearbyGroups" :location="location" />
         <div v-else>
           <a href="/group/nearby" v-if="newGroups && newGroups.length" class="added added-xs d-block d-md-none pr-3 pt-3 pb-3 mb-2">
-            <b-img src="/images/arrow-right-doodle-white.svg" />
+            <b-img :src="imageUrl('/images/arrow-right-doodle-white.svg')" />
             {{ translatedNewlyAdded }}
           </a>
           <div class="dyg-layout">
@@ -87,13 +87,15 @@
 </template>
 <script>
 import moment from 'moment'
-import DashboardGroup from './DashboardGroup'
-import CollapsibleSection from './CollapsibleSection'
-import DashboardEvent from './DashboardEvent'
-import DashboardNoGroups from './DashboardNoGroups'
+import DashboardGroup from './DashboardGroup.vue'
+import CollapsibleSection from './CollapsibleSection.vue'
+import DashboardEvent from './DashboardEvent.vue'
+import DashboardNoGroups from './DashboardNoGroups.vue'
+import images from '../mixins/images'
 import { HOST } from '../constants'
 
 export default {
+  mixins: [images],
   props: {
     location: {
       type: String,
@@ -152,9 +154,9 @@ export default {
 </script>
 <style scoped lang="scss">
 @import 'resources/global/css/_variables';
-@import '~bootstrap/scss/functions';
-@import '~bootstrap/scss/variables';
-@import '~bootstrap/scss/mixins/_breakpoints';
+@import 'bootstrap/scss/functions';
+@import 'bootstrap/scss/variables';
+@import 'bootstrap/scss/mixins/_breakpoints';
 
 .content {
   border-top: 3px dashed black;

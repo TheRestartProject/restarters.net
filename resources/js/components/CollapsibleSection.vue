@@ -30,8 +30,8 @@
         <slot name="title-right" />
       </div>
       <span class="d-inline d-md-none clickme d-flex flex-column justify-content-center">
-        <img class="icon" v-if="expanded" src="/images/minus-icon.svg" alt="Collapse" />
-        <img class="icon" v-else src="/images/add-icon.svg" alt="Expand" />
+        <img class="icon" v-if="expanded" :src="imageUrl('/images/minus-icon.svg')" alt="Collapse" />
+        <img class="icon" v-else :src="imageUrl('/images/add-icon.svg')" alt="Expand" />
       </span>
     </component>
     <div :class="{
@@ -50,7 +50,10 @@
 // - optional count on mobile to encourage clicks.
 // The class-wrangling is complex because Vue doesn't let you use the same slot multiple times in the same component.
 
+import images from '../mixins/images'
+
 export default {
+  mixins: [images],
   props: {
     collapsed: {
       type: Boolean,
@@ -147,9 +150,9 @@ export default {
 </script>
 <style scoped lang="scss">
 @import 'resources/global/css/_variables';
-@import '~bootstrap/scss/functions';
-@import '~bootstrap/scss/variables';
-@import '~bootstrap/scss/mixins/_breakpoints';
+@import 'bootstrap/scss/functions';
+@import 'bootstrap/scss/variables';
+@import 'bootstrap/scss/mixins/_breakpoints';
 
 .icon {
   width: 30px;

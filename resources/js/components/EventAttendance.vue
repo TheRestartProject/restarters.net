@@ -12,14 +12,14 @@
           <div class="counts">
             <div v-if="!upcoming" class="count-participants">
               <b>
-                <b-img src="/icons/group_ico.svg" class="mr-2 icon" />
+                <b-img :src="imageUrl('/icons/group_ico.svg')" class="mr-2 icon" />
                 {{ __('events.stat-0') }}
               </b>
               <EventAttendanceCount :count="event.participants" class="mt-2 mb-4" @change="changeParticipants($event)" :canedit="canedit" />
             </div>
             <div v-if="!upcoming" class="count-volunteers">
               <b>
-                <b-img src="/icons/volunteer_ico.svg" class="mr-2 icon" />
+                <b-img :src="imageUrl('/icons/volunteer_ico.svg')" class="mr-2 icon" />
                 {{ __('events.stat-2') }}
               </b>
               <EventAttendanceCount :count="event.volunteers" class="mt-2"  @change="changeVolunteers($event)" :canedit="canedit" />
@@ -61,7 +61,7 @@
                 <hr />
                 <div v-if="upcoming && approved" class="d-flex justify-content-between">
                   <a data-toggle="modal" data-target="#event-invite-to" href="#" class="ml-2">
-                    <img class="icon" src="/images/add-icon.svg" />
+                    <img class="icon" :src="imageUrl('/images/add-icon.svg')" />
                     {{ __('events.invite_to_join') }}
                   </a>
                 </div>
@@ -75,10 +75,11 @@
 </template>
 <script>
 import event from '../mixins/event'
-import EventAttendanceCount from './EventAttendanceCount'
-import EventAttendee from './EventAttendee'
-import CollapsibleSection from './CollapsibleSection'
-import EventAddVolunteerModal from './EventAddVolunteerModal'
+import images from '../mixins/images'
+import EventAttendanceCount from './EventAttendanceCount.vue'
+import EventAttendee from './EventAttendee.vue'
+import CollapsibleSection from './CollapsibleSection.vue'
+import EventAddVolunteerModal from './EventAddVolunteerModal.vue'
 
 export default {
   props: {
@@ -98,7 +99,7 @@ export default {
     }
   },
   components: {EventAddVolunteerModal, CollapsibleSection, EventAttendee, EventAttendanceCount},
-  mixins: [event],
+  mixins: [event, images],
   computed: {
     attendance() {
       return this.$store.getters['attendance/byEvent'](this.idevents)
@@ -142,9 +143,9 @@ export default {
 </script>
 <style scoped lang="scss">
 @import 'resources/global/css/_variables';
-@import '~bootstrap/scss/functions';
-@import '~bootstrap/scss/variables';
-@import '~bootstrap/scss/mixins/_breakpoints';
+@import 'bootstrap/scss/functions';
+@import 'bootstrap/scss/variables';
+@import 'bootstrap/scss/mixins/_breakpoints';
 
 .attendance {
   display: grid;

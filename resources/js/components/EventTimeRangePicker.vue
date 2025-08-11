@@ -21,7 +21,7 @@
   </div>
 </template>
 <script>
-import DashboardEvent from './DashboardEvent'
+import DashboardEvent from './DashboardEvent.vue'
 export default {
   components: {DashboardEvent},
   props: {
@@ -124,9 +124,9 @@ export default {
 </script>
 
 <style scoped lang="scss">
-@import '~bootstrap/scss/functions';
-@import '~bootstrap/scss/variables';
-@import '~bootstrap/scss/mixins/_breakpoints';
+@import 'bootstrap/scss/functions';
+@import 'bootstrap/scss/variables';
+@import 'bootstrap/scss/mixins/_breakpoints';
 ::v-deep label {
   font-weight: normal;
 }

@@ -17,10 +17,10 @@
     </div>
     <div class="d-block d-md-none" v-if="search">
       <div class="clickme d-flex justify-content-end pr-3 text-uppercase" v-if="!searchShow" @click="toggleFilters">
-        <a href="#">{{ __('groups.show_filters') }}</a>&nbsp;<b-img class="plusminusicon" src="/images/add-icon.svg" />
+        <a href="#">{{ __('groups.show_filters') }}</a>&nbsp;<b-img class="plusminusicon" :src="imageUrl('/images/add-icon.svg')" />
       </div>
       <div class="clickme d-flex justify-content-end pr-3 text-uppercase" v-if="searchShow" @click="toggleFilters">
-        <b-img class="plusminusicon" src="/images/minus-icon.svg" /><a href="#">&nbsp;{{ __('groups.hide_filters') }}</a>
+        <b-img class="plusminusicon" :src="imageUrl('/images/minus-icon.svg')" /><a href="#">&nbsp;{{ __('groups.hide_filters') }}</a>
       </div>
       <GroupsTableFilters
           v-if="searchShow"
@@ -45,14 +45,14 @@
         <b-img-lazy :src="defaultProfile" class="profile" v-else />
       </template>
       <template slot="head(group_name)">
-        <b-img src="/icons/group_name_ico.svg" class="mt-3 icon" />
+        <b-img :src="imageUrl('/icons/group_name_ico.svg')" class="mt-3 icon" />
       </template>
       <template slot="cell(group_name)" slot-scope="data">
         <a :href="'/group/view/' + data.item.group_name.idgroups">{{ data.item.group_name.name }}</a>
         <GroupArchivedBadge :idgroups="data.item.group_name.idgroups" />
       </template>
       <template slot="head(location)">
-        <b-img src="/icons/map_marker_ico.svg" class="mt-3 icon " />
+        <b-img :src="imageUrl('/icons/map_marker_ico.svg')" class="mt-3 icon " />
       </template>
       <template slot="cell(location)" slot-scope="data">
         <div class="d-none d-md-block">
@@ -62,13 +62,13 @@
         </div>
       </template>
       <template slot="head(all_confirmed_hosts_count)">
-        <b-img src="/icons/user_ico.svg" class="mt-3 iconsmall" />
+        <b-img :src="imageUrl('/icons/user_ico.svg')" class="mt-3 iconsmall" />
       </template>
       <template slot="head(all_confirmed_restarters_count)">
-        <b-img src="/icons/volunteer_ico-thick.svg" class="mt-3 icon" />
+        <b-img :src="imageUrl('/icons/volunteer_ico-thick.svg')" class="mt-3 icon" />
       </template>
       <template slot="head(next_event)">
-        <b-img src="/icons/events_ico.svg" class="mt-3 icon" />
+        <b-img :src="imageUrl('/icons/events_ico.svg')" class="mt-3 icon" />
       </template>
       <template slot="cell(next_event)" slot-scope="data">
         <div>
@@ -110,13 +110,15 @@
 </template>
 <script>
 import { DATE_FORMAT, DEFAULT_PROFILE } from '../constants'
+import images from '../mixins/images'
 import moment from 'moment'
-import GroupsTableFilters from './GroupsTableFilters'
-import ConfirmModal from './ConfirmModal'
+import GroupsTableFilters from './GroupsTableFilters.vue'
+import ConfirmModal from './ConfirmModal.vue'
 import GroupArchivedBadge from "./GroupArchivedBadge.vue";
 
 export default {
   components: {GroupArchivedBadge, ConfirmModal, GroupsTableFilters},
+  mixins: [images],
   props: {
     groups: {
       type: Array,
@@ -342,9 +344,9 @@ export default {
 </script>
 <style scoped lang="scss">
 @import 'resources/global/css/_variables';
-@import '~bootstrap/scss/functions';
-@import '~bootstrap/scss/variables';
-@import '~bootstrap/scss/mixins/_breakpoints';
+@import 'bootstrap/scss/functions';
+@import 'bootstrap/scss/variables';
+@import 'bootstrap/scss/mixins/_breakpoints';
 
 .profile {
   border: 1px solid black;

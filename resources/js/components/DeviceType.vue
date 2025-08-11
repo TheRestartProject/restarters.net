@@ -4,8 +4,8 @@
                              :minMatchingChars="1" size="lg" :inputClass="'marg form-control-lg theinput-' + uid" :disabled="disabled"
                              :placeholder="__('devices.item_type')" @hit="emit"/>
     <div v-b-popover.html.left="translatedTooltip" class="ml-3 mt-2">
-      <b-img class="icon clickable" src="/icons/info_ico_black.svg" v-if="iconVariant === 'black'"/>
-      <b-img class="icon clickable" src="/icons/info_ico_green.svg" v-else/>
+      <b-img class="icon clickable" :src="imageUrl('/icons/info_ico_black.svg')" v-if="iconVariant === 'black'"/>
+      <b-img class="icon clickable" :src="imageUrl('/icons/info_ico_green.svg')" v-else/>
     </div>
     <p v-if="!suppressTypeWarning && notASuggestion" class="pl-1 form-text">
       {{ __('devices.unknown_item_type') }}
@@ -16,10 +16,12 @@
 import Vue from 'vue'
 import VueTypeaheadBootstrap from 'vue-typeahead-bootstrap'
 import UniqueId from 'vue-unique-id'
+import images from '../mixins/images'
 
 Vue.use(UniqueId)
 
 export default {
+  mixins: [images],
   components: {VueTypeaheadBootstrap},
   props: {
     type: {
