@@ -51,9 +51,8 @@ mkdir -p bootstrap/cache
 php artisan migrate
 npm install --legacy-peer-deps
 npm rebuild node-sass
-php artisan lang:js --no-lib resources/js/translations.js
 
-npm run watch-poll&
+npm run watch&
 php artisan key:generate
 php artisan cache:clear
 php artisan config:clear

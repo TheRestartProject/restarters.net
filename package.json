@@ -24,6 +24,7 @@
         "jquery": "3.4.1",
         "jsdom-global": "^3.0.2",
         "laravel-vite-plugin": "^0.8.1",
+        "laravel-translator": "^1.1.1",
         "lodash": "^4.17.21",
         "lodash.mergewith": "^4.6.2",
         "lodash.template": "^4.5.0",

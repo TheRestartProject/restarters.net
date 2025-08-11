@@ -2,7 +2,6 @@
 
 namespace App\Http\Middleware;
 
-use Symfony\Component\HttpFoundation\Response;
 use Illuminate\Http\Request;
 use Closure;
 use Illuminate\Auth\Middleware\Authenticate;
@@ -13,7 +12,7 @@ use Illuminate\Auth\Middleware\Authenticate;
  */
 class APISetLocale extends Authenticate
 {
-    public function handle(Request $request, Closure $next, ...$guards): Response
+    public function handle($request, Closure $next, ...$guards)
     {
         if ($request->has('locale')) {
             $locale = $request->input('locale');

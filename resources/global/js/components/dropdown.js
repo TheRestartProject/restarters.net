@@ -1,3 +1,6 @@
+import jQuery from 'jquery';
+const $ = jQuery;
+
 $('.toggle-dropdown-menu').click(function() {
 
   // If item is already active then close all.

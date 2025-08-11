@@ -104,7 +104,8 @@ Vue.use(lineClamp, {
   textOverflow: 'ellipsis'
 })
 
-const bootaxios = require('axios')
+import axios from 'axios'
+const bootaxios = axios
 
 export default {
   mixins: [images],

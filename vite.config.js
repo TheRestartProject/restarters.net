@@ -3,6 +3,7 @@ import laravel from 'laravel-vite-plugin';
 import vue from '@vitejs/plugin-vue2';
 import { resolve } from 'path';
 import { readFileSync } from 'fs';
+import laravelTranslator from 'laravel-translator/vite';
 
 // Parse .env file to get APP_URL
 function getAppUrl() {
@@ -37,6 +38,36 @@ export default defineConfig({
             devUrl: `http://${host}:5173`,
         }),
         vue(),
+        laravelTranslator(),
+        // Plugin to handle broken source maps and malformed JS from legacy packages
+        {
+            name: 'fix-legacy-packages',
+            load(id) {
+                // Skip loading source maps for packages with known issues
+                if (id.includes('vue2-dropzone') && id.endsWith('.js.map')) {
+                    return null;
+                }
+                if (id.includes('vue2-dropzone') && id.includes('vue2Dropzone.js.map')) {
+                    return null;
+                }
+                if (id.includes('tokenfield') && id.endsWith('.js.map')) {
+                    return null;
+                }
+                if (id.includes('slick-carousel') && id.endsWith('.js.map')) {
+                    return null;
+                }
+            },
+            transform(code, id) {
+                // Remove source map references from files with broken source maps
+                if (id.includes('vue2-dropzone') && (id.endsWith('.js') || id.includes('vue2Dropzone.js'))) {
+                    return {
+                        code: code.replace(/\/\/# sourceMappingURL=.*\.js\.map/g, ''),
+                        map: null
+                    };
+                }
+                
+            }
+        }
     ],
     server: {
         host: '0.0.0.0',
@@ -62,24 +93,34 @@ export default defineConfig({
     },
     define: {
         global: 'globalThis',
+        // Make jQuery available globally for packages that expect it
         $: 'jQuery',
         jQuery: 'jQuery',
+        // Define process for packages that expect Node.js environment
+        'process.env': JSON.stringify(process.env),
+        'process.env.NODE_ENV': JSON.stringify(process.env.NODE_ENV || 'development'),
     },
     optimizeDeps: {
         force: true,
+        include: [
+            'lodash/clone',
+            'lodash/includes', 
+            'lodash/isEmpty',
+            'lodash/reject',
+            'lodash/reverse',
+            'lodash/findIndex'
+        ],
         exclude: [
-            'bootstrap-vue',
             'vue2-leaflet', 
             'leaflet',
-            'vue-multiselect',
-            '@sentry/vue',
+            'vue2-dropzone',
             'slick-carousel',
-            'bootstrap-tokenfield',
-            'tokenfield',
         ]
     },
     build: {
         rollupOptions: {
+            external: [
+            ],
             onwarn(warning, warn) {
                 // Suppress warnings about unresolved asset references
                 if (warning.code === 'UNRESOLVED_IMPORT' && 

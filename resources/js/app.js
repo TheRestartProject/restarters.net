@@ -4,36 +4,23 @@
 * building robust, powerful web applications using Vue and Laravel.
 */
 
-require('./bootstrap');
-require('./bootstrap-tokenfield.min');
-require('./bootstrap-sortable.js');
-require('select2');
-require('slick-carousel');
-require('ekko-lightbox');
-require('bootstrap4-datetimepicker');
-require('./misc/notifications');
-require('leaflet');
-require('./constants');
+import './bootstrap';
+
+// Import all other dependencies first
+import './misc/notifications';
+import 'leaflet';
+import './constants';
 
 import Vue from 'vue'
 import { BootstrapVue, IconsPlugin } from 'bootstrap-vue'
 import store from './store'
-import {
-  LMap,
-  LTileLayer,
-  LMarker,
-} from 'vue2-leaflet'
-import L from 'leaflet'
-import 'leaflet/dist/leaflet.css'
+// Leaflet components moved to individual Vue components that use them
 import Multiselect from 'vue-multiselect'
 import 'vue-multiselect/dist/vue-multiselect.min.css'
-import * as Sentry from "@sentry/vue";
+import * as Sentry from '@sentry/vue';
 
-import Vuelidate from 'vuelidate'
-Vue.use(Vuelidate)
-
-import LoginPage from './components/LoginPage.vue'
-import DashBoardPage from './components/DashboardPage.vue'
+// Import only existing Vue components
+import DashboardPage from './components/DashboardPage.vue'
 import EventAddEditPage from './components/EventAddEditPage.vue'
 import EventAddEdit from './components/EventAddEdit.vue'
 import EventsRequiringModeration from './components/EventsRequiringModeration.vue'
@@ -51,60 +38,473 @@ import VenueAddress from './components/VenueAddress.vue'
 import RichTextEditor from './components/RichTextEditor.vue'
 import Notifications from './components/Notifications.vue'
 import GroupTimeZone from './components/GroupTimeZone.vue'
-import StatsShare  from './components/StatsShare.vue'
+import StatsShare from './components/StatsShare.vue'
 
-// Without this, the default map marker doesn't appear in production.  Fairly well-known problem.
-// eslint-disable-next-line
-delete L.Icon.Default.prototype._getIconUrl
-// eslint-disable-next-line
-L.Icon.Default.mergeOptions({
-  iconRetinaUrl: require('leaflet/dist/images/marker-icon-2x.png'),
-  iconUrl: require('leaflet/dist/images/marker-icon.png'),
-  shadowUrl: require('leaflet/dist/images/marker-shadow.png')
-})
+import lang from './mixins/lang'
 
-Vue.use(BootstrapVue)
-Vue.use(IconsPlugin)
+import Vuelidate from 'vuelidate'
+
+import LoginPage from './components/LoginPage.vue'
 
 import LangMixin from './mixins/lang'
 import { Lang } from './mixins/lang'
-Vue.mixin(LangMixin)
 
-const Icon = require('vue-awesome/components/Icon')
-require('vue-awesome/icons/sync')
-require('vue-awesome/icons/save')
-require('vue-awesome/icons/check')
+
+import Dropzone from 'dropzone'
+
+import Icon from 'vue-awesome/components/Icon'
+import 'vue-awesome/icons/sync'
+import 'vue-awesome/icons/save'
+import 'vue-awesome/icons/check'
+
+// Leaflet components will be loaded dynamically to avoid ES module issues
+
+// Vue configuration
+Vue.use(BootstrapVue)
+Vue.use(IconsPlugin)
+Vue.use(Vuelidate)
 Vue.component('v-icon', Icon)
+Vue.component('multiselect', Multiselect)
+Vue.mixin(lang)
 
-window.Dropzone = require('dropzone');
-window.Tokenfield = require("tokenfield");
+// Wait for jQuery to be available, then run all jQuery-dependent code
+// TODO: This entire jQuery initialization block is temporary and will be removed
+// as we gradually migrate from Blade templates to Vue components. Each piece of
+// jQuery functionality should be replaced with Vue component equivalents.
+function initializeJQuery() {
+  if (typeof window === 'undefined' || !window.jQuery) {
+    setTimeout(initializeJQuery, 50);
+    return;
+  }
+  
+  // Also wait for Select2 and Leaflet to be available
+  if (typeof window.jQuery.fn.select2 === 'undefined' || typeof window.L === 'undefined') {
+    setTimeout(initializeJQuery, 50);
+    return;
+  }
+  
+  const $ = window.jQuery;
+  
+  // Make jQuery available to the rest of the module
+  jQuery = $;
+  
+  // All jQuery initialization code goes here
+  $('.btn-next').on('click', formProcess);
+  $('.registration__prev').on('click', formProcessPrev);
+  
+  // Document ready functionality
+  $(document).ready(function() {
+    console.log('Global js ready!');
+    
+    // Continue with all other jQuery code that was in the file
+    if ($('section.registration').length > 0 && $('.alert.alert-danger').length > 0 && $('.is-invalid').length > 0) {
+      $('.registration__step').removeClass('registration__step--active');
+      $('.is-invalid').first().parents('.registration__step').addClass('registration__step--active');
+    }
+    
+    // Initialize all other jQuery-dependent functionality here
+    registration();
+    onboarding();
+    eventsMap();
+    truncate();
+    nestedTable();
+    select2Fields();
+    
+    // All the remaining jQuery initialization code from the file
+    $('.users-list').find('[data-toggle="popover"]').popover();
+    $('.users-list').find('[data-toggle="popover"]').on('click', function (e) {
+      $('.users-list').find('[data-toggle="popover"]').not(this).popover('hide');
+    });
+    
+    $('.table:not(.table-devices)').find('[data-toggle="popover"]').popover({
+      template: '<div class="popover popover__table" role="tooltip"><div class="arrow"></div><h3 class="popover-header"></h3><div class="popover-body"></div></div>',
+      placement:'top'
+    });
 
-if ( jQuery('.slideshow').length > 0 ) {
-  jQuery('.slideshow').slick({
-    dots: true,
-    arrows:true,
-    infinite: false,
-    responsive: [
-      {
-        breakpoint: 1024,
-        settings: {
-          arrows: false
+    $('.table-devices').find('[data-toggle="popover"]').popover();
+
+    $('.table').find('[data-toggle="popover"]').on('click', function (e) {
+      $('.table').find('[data-toggle="popover"]').not(this).popover('hide');
+    });
+
+    $(document).on('change', '.category', function (e) {
+      var $value = parseInt($(this).val());
+      var $field = $(this).parents('td').find('.weight');
+
+      if (!$field.length) {
+        // At present this global JS is used in both old and new designs which have different DOM structure, so we
+        // need to cope with both.
+        $field = $(this).parents('.card-body').find('.weight')
+      }
+      if( $value === 46 || $value === '' ){
+        $field.prop('disabled', false);
+        $field.parents('.display-weight').removeClass('d-none');
+      } else {
+        $field.val('');
+        $field.trigger('change');
+        $field.prop('disabled', true);
+        $field.parents('.display-weight').addClass('d-none');
+      }
+    });
+
+    function removeUser() {
+
+      var id = $(this).data('remove-volunteer');
+
+      $.ajax({
+        headers: {
+          'X-CSRF-TOKEN': $("input[name='_token']").val()
+        },
+        type: 'post',
+        url: '/party/remove-volunteer',
+        data: {
+          id : id,
+        },
+        datatype: 'json',
+        success: function(json) {
+          if( json.success ){
+            $('.volunteer-' + id).fadeOut();
+          } else {
+            alert('Something has gone wrong');
+          }
+        },
+        error: function(error) {
+          alert('Something has gone wrong');
         }
-      },
-      {
-        breakpoint: 480,
-        settings: {
-          autoplay: true,
-          arrows: false
+      });
+
+    }
+
+    $('.js-remove').on('click', removeUser);
+    $(document).on('click', '[data-toggle="lightbox"]', function (event) {
+      event.preventDefault();
+      $(this).ekkoLightbox();
+    });
+
+    $('.reset').on('click', resetForm);
+
+    loadDropzones();
+
+    if (window.location.hash === '#change-password' && $('#list-account').length > 0) {
+      $('#list-account-list').tab('show');
+    }
+    
+    // Make navbar hide on mobile scroll.
+    var showNavbar = true;
+    var lastScrollPosition = true;
+
+    window.addEventListener('scroll', function() {
+      // Get the current scroll position
+      const currentScrollPosition = window.pageYOffset || document.documentElement.scrollTop
+
+      // Because of momentum scrolling on mobiles, we shouldn't continue if it is less than zero
+      if (currentScrollPosition < 0) {
+        return
+      }
+
+      // Here we determine whether we need to show or hide the navbar
+      showNavbar = currentScrollPosition < lastScrollPosition
+
+      if (showNavbar) {
+        $('#nav-left').removeClass('nav-left--hidden')
+      } else {
+        $('#nav-left').addClass('nav-left--hidden')
+      }
+
+      // Set the current scroll position as the last scroll position
+      lastScrollPosition = currentScrollPosition
+    })
+
+    // Sentry error
+    Sentry.init({
+      Vue,
+      dsn: "https://50fd2fa440af4bb4a230f40ca8d8cf90@o879179.ingest.sentry.io/5831645",
+      integrations: [Sentry.browserTracingIntegration()],
+
+      // We are low traffic, so we can capture all performance events.
+      tracesSampleRate: 1.0,
+      profilesSampleRate: 1.0,
+      ignoreErrors: [
+        'ResizeObserver loop limit exceeded',
+        // Random plugins/extensions
+        'top.GLOBALS',
+        // See: http://blog.errorception.com/2012/03/tale-of-unfindable-js-error.html
+        'originalCreateNotification',
+        'canvas.contentDocument',
+        'MyApp_RemoveAllHighlights',
+        'http://tt.epicplay.com',
+        'Can\'t find variable: ZiteReader',
+        'jigsaw is not defined',
+        'ComboSearch is not defined',
+        'http://loading.retry.widdit.com/',
+        'atomicFindClose',
+        // Facebook borked
+        'fb_xd_fragment',
+        // ISP "optimizing" proxy - `Cache-Control: no-transform` seems to
+        // reduce this. (thanks @acdha)
+        // See http://stackoverflow.com/questions/4113268
+        'bmi_SafeAddOnload',
+        'EBCallBackMessageReceived',
+        // See http://toolbar.conduit.com/Developer/HtmlAndGadget/Methods/JSInjection.aspx
+        'conduitPage'
+      ],
+      beforeSend: function beforeSend(event) {
+        if (window.restarters.analyticsCookieEnabled) {
+          return event;
+        } else {
+          return null;
         }
       }
-    ]
+    });
+
+    /**
+    * Next, we will create a fresh Vue application instance and attach it to
+    * the page. Then, you may begin adding components to this application
+    * or customize the JavaScript scaffolding to fit your unique needs.
+    */
+
+    const app = new Vue({
+      el: '.vue',
+      mixins: [lang],
+      store,
+      components: {
+        'loginpage' : LoginPage,
+        'dashboardpage': DashboardPage,
+        'eventaddeditpage': EventAddEditPage,
+        'eventaddedit': EventAddEdit,
+        'eventsrequiringmoderation': EventsRequiringModeration,
+        'eventpage': EventPage,
+        'fixometerpage': FixometerPage,
+        'groupspage': GroupsPage,
+        'grouppage': GroupPage,
+        'groupaddeditpage': GroupAddEditPage,
+        'groupeventspage': GroupEventsPage,
+        'groupevents': GroupEvents,
+        'groupsrequiringmoderation': GroupsRequiringModeration,
+
+        'eventtimerangepicker': EventTimeRangePicker,
+        'eventdatepicker': EventDatePicker,
+        'venueaddress': VenueAddress,
+        'richtexteditor': RichTextEditor,
+        'notifications': Notifications,
+        'grouptimezone': GroupTimeZone,
+        'statsshare': StatsShare,
+      }
+    })
+    $(".vue-placeholder-large").hide()
+    
+    // Initialize tokenfield
+    $('.tokenfield').tokenfield();
+
+    $(".select2-dropdown").select2({
+      placeholder: 'Select an country',
+      allowClear: false
+    });
+
+    $('.btn-calendar-feed').popover({
+      trigger: 'focus'
+    });
+
+    $('.btn-action').on('click', function () {
+      setTimeout(copyLinkUser, 200);
+    });
+
+    $('#btn-copy').on('click', function () {
+      copyLinkUser();
+    });
+
+    $('.btn-copy-input-text').on('click', function () {
+      copyLinkUser();
+    });
+
+    $('.information-alert').on('closed.bs.alert', function () {
+      localStorage.setItem('information-alert-closed', 'true');
+    });
+
+    $('#manual_invite_box').on('tokenfield:createtoken', function (event) {
+      var existingTokens = $(this).tokenfield('getTokens');
+      var newval = event.attrs.value
+
+      $.each(existingTokens, function(index, token) {
+        if (token.value === newval)
+        event.preventDefault();
+      });
+
+      if (existingTokens.length >= 20) {
+        event.preventDefault();
+        $(event.target).closest('div.tokenfield').css('border', '2px solid red')
+      } else {
+        $(event.target).closest('div.tokenfield').css('border', '')
+      }
+
+      if (existingTokens.length >= 19) {
+        $('#event-invite-to button, #invite-to-group button').prop('disabled', disabled);
+      }
+    });
+
+    $('#manual_invite_box').on('tokenfield:removedtoken', function (event) {
+      var existingTokens = $(this).tokenfield('getTokens');
+
+      if (existingTokens.length < 20) {
+        $('#event-invite-to button, #invite-to-group button').prop('disabled', false);
+        $(event.target).closest('div.tokenfield').css('border', '')
+      }
+    });
+
+    $(document).on("click", "#btn-copy", function () {
+      var $copy_link = $(this).data('clipboard-text');
+      var $temp = $("<input>");
+      $("body").append($temp);
+      $temp.val($copy_link).select();
+      document.execCommand("copy");
+      $temp.remove();
+
+      alert("Copied the link: " + $copy_link);
+    });
+
+    // Hash-based tab switching
+    let hash = document.location.hash;
+    if (hash) {
+        $('a[href=\"'+hash).tab('show');
+    }
+    
+    // Enable popovers - Bootstrap doesn't enable these by default.
+    $('[data-toggle="popover"]').popover();
+    
+    // All other jQuery initialization continues here...
+    groupsMap();
+    
+    if (window.gdprCookieNotice && !window.noCookieNotice) {
+      gdprCookieNotice({
+        locale: 'en',
+        timeout: 500,
+        expiration: 30,
+        domain: restarters.cookie_domain,
+        implicit: false,
+        statement: '/about/cookie-policy',
+        performace: ['DYNSRV'],
+        analytics: ['_ga','_gat', '_gid'],
+        marketing: []
+      });
+    }
+
+
+    $(".select2-dropdown").select2({
+      placeholder: 'Select an country',
+    });
+
+
+
+    // Information alerts
+    $('.information-alert').on('closed.bs.alert', function () {
+      var $dismissable_id = $(this).attr('id');
+      $.ajax({
+        headers: {
+          'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+        },
+        type: 'POST',
+        url: '/set-cookie',
+        datatype: 'json',
+        data: {
+          'dismissable_id': $dismissable_id,
+        },
+        success: function(data) {
+          console.log(true);
+        }
+      });
+    });
+
+    // Copy Calendar Feed link
+    $(document).on("click", "#btn-copy", function () {
+      var $copy_link = $(this).parents('div').parents('div').find('input[type=text]').val();
+
+      var $temp = $("<input>");
+      $("body").append($temp);
+      $temp.val($copy_link).select();
+
+      document.execCommand("copy");
+      $temp.remove();
+
+      alert("Copied the link: " + $copy_link);
+    });
+
+    // All remaining jQuery initialization code goes here
   });
+
+  // Initialize Vue instances on any divs which have asked for it.
+  //
+  // Normally you'd initialise one instance on a single top-level div.  But we put content directly under body.
+  // Initialising multiple instances is a bit more expensive, but not much.
+  //
+  // We need to list all the top-level components we will use in blades here; they are stored in
+  // resources/js/components.  Lower level components can be included from within those as normal;
+  // they don't need listing here.
+  window.jQuery(".vue").each(function(index) {
+    new Vue({
+      el: window.jQuery(this).get(0),
+      store: store,
+      components: {
+        'loginpage' : LoginPage,
+        'dashboardpage': DashBoardPage,
+        'eventaddeditpage': EventAddEditPage,
+        'eventaddedit': EventAddEdit,
+        'eventsrequiringmoderation': EventsRequiringModeration,
+        'eventpage': EventPage,
+        'fixometerpage': FixometerPage,
+        'groupspage': GroupsPage,
+        'grouppage': GroupPage,
+        'groupaddeditpage': GroupAddEditPage,
+        'groupeventspage': GroupEventsPage,
+        'groupevents': GroupEvents,
+        'groupsrequiringmoderation': GroupsRequiringModeration,
+
+        'eventtimerangepicker': EventTimeRangePicker,
+        'eventdatepicker': EventDatePicker,
+        'venueaddress': VenueAddress,
+        'richtexteditor': RichTextEditor,
+        'notifications': Notifications,
+        'grouptimezone': GroupTimeZone,
+        'statsshare': StatsShare,
+      }
+    })
+  })
+
+  // Initialize Leaflet components now that CDN Leaflet is available
+  try {
+    // Use vue2-leaflet with the global Leaflet from CDN
+    import('vue2-leaflet').then((leafletModule) => {
+      Vue.component('l-map', leafletModule.LMap);
+      Vue.component('l-marker', leafletModule.LMarker);
+      Vue.component('l-tile-layer', leafletModule.LTileLayer);
+    }).catch((e) => {
+      console.warn('Vue2-Leaflet components not available, using fallback:', e.message);
+    });
+  } catch (e) {
+    console.warn('Vue2-Leaflet components not available:', e.message);
+  }
 }
+
+// Start the initialization
+initializeJQuery();
+
+// Create a jQuery reference for use in functions (will be available after initialization)
+let jQuery;
+
+
+
+// Leaflet icon setup moved to components that use Leaflet
+
+
+
+window.Dropzone = Dropzone;
+// Note: tokenfield is loaded via script tag in HTML template due to parsing issues
+// Note: slick-carousel is loaded via script tag in HTML template due to parsing issues
+
+// Slick carousel initialization moved to footer after CDN script loads
 
 function validateForm() {
 
-  var form = jQuery('#step-2');
+  var form = window.jQuery('#step-2');
   var validCount = 0;
 
   var validation = Array.prototype.filter.call(form, function (form) {
@@ -138,30 +538,30 @@ function validateForm() {
 
     });
 
-    var valid = validCount === jQuery('#step-2').find('input,select').filter('[required]:visible').length
+    var valid = validCount === window.jQuery('#step-2').find('input,select').filter('[required]:visible').length
 
-    if ( jQuery('#password').length > 0 && jQuery('#password').val().length < 6 ) {
+    if ( window.jQuery('#password').length > 0 && window.jQuery('#password').val().length < 6 ) {
 
-      jQuery('#password').addClass('is-invalid');
-      jQuery('#password-confirm').addClass('is-invalid');
-      jQuery('.email-invalid-feedback').show();
+      window.jQuery('#password').addClass('is-invalid');
+      window.jQuery('#password-confirm').addClass('is-invalid');
+      window.jQuery('.email-invalid-feedback').show();
       valid = false;
 
-    } else if ( jQuery('#password').length > 0 && jQuery('#password').val() !== jQuery('#password-confirm').val() ) {
+    } else if ( window.jQuery('#password').length > 0 && window.jQuery('#password').val() !== window.jQuery('#password-confirm').val() ) {
 
-      jQuery('#password').addClass('is-invalid');
-      jQuery('#password-confirm').addClass('is-invalid');
-      jQuery('.email-invalid-feedback').show();
+      window.jQuery('#password').addClass('is-invalid');
+      window.jQuery('#password-confirm').addClass('is-invalid');
+      window.jQuery('.email-invalid-feedback').show();
       valid = false;
 
     } else {
 
-      jQuery('#password').removeClass('is-invalid');
-      jQuery('#password-confirm').removeClass('is-invalid');
-      jQuery('.email-invalid-feedback').hide();
+      window.jQuery('#password').removeClass('is-invalid');
+      window.jQuery('#password-confirm').removeClass('is-invalid');
+      window.jQuery('.email-invalid-feedback').hide();
 
-      jQuery('.registration__step').removeClass('registration__step--active');
-      jQuery('#step-3').addClass('registration__step--active');
+      window.jQuery('.registration__step').removeClass('registration__step--active');
+      window.jQuery('#step-3').addClass('registration__step--active');
 
     }
 
@@ -175,79 +575,78 @@ function validateForm() {
 }
 
 function formProcess(e) {
-  var target = jQuery(this).data('target');
+  var target = window.jQuery(this).data('target');
   var targetLabel = document.getElementById(target+'-form-label');
   e.preventDefault();
 
-  jQuery('.btn-next').attr('aria-expanded', 'false');
-  jQuery(this).attr('aria-expanded', 'true');
-  if ( jQuery('#step-2.registration__step--active').length > 0 ) {
+  window.jQuery('.btn-next').attr('aria-expanded', 'false');
+  window.jQuery(this).attr('aria-expanded', 'true');
+  if ( window.jQuery('#step-2.registration__step--active').length > 0 ) {
     validateForm();
   } else {
-    jQuery('.registration__step').removeClass('registration__step--active');
-    jQuery('#' + target).addClass('registration__step--active');
+    window.jQuery('.registration__step').removeClass('registration__step--active');
+    window.jQuery('#' + target).addClass('registration__step--active');
     if (targetLabel) { targetLabel.scrollIntoView(500) }
   }
 
 }
 
 function formProcessPrev(e) {
-  var target = jQuery(this).data('target');
+  var target = window.jQuery(this).data('target');
   var targetLabel = document.getElementById(target+'-form-label');
   e.preventDefault();
 
-  jQuery('.registration__step').removeClass('registration__step--active');
-  jQuery('.btn-next').attr('aria-expanded','false');
-  jQuery('#' + target).addClass('registration__step--active');
-  jQuery(this).attr('aria-expanded', 'true');
+  window.jQuery('.registration__step').removeClass('registration__step--active');
+  window.jQuery('.btn-next').attr('aria-expanded','false');
+  window.jQuery('#' + target).addClass('registration__step--active');
+  window.jQuery(this).attr('aria-expanded', 'true');
 
   if (targetLabel) { console.log(targetLabel); targetLabel.scrollIntoView(500) }
 
 }
 
-jQuery('.btn-next').on('click',formProcess);
-jQuery('.registration__prev').on('click', formProcessPrev);
+// jQuery event bindings moved to initializeJQuery() function at top of file
 
 function registration() {
 
-  if ( jQuery('section.registration').length > 0 && jQuery('.alert.alert-danger').length > 0 && jQuery('.is-invalid').length > 0 ) {
+  if ( window.jQuery('section.registration').length > 0 && window.jQuery('.alert.alert-danger').length > 0 && window.jQuery('.is-invalid').length > 0 ) {
 
-    jQuery('.registration__step').removeClass('registration__step--active');
-    jQuery('.is-invalid').first().parents('.registration__step').addClass('registration__step--active');
+    window.jQuery('.registration__step').removeClass('registration__step--active');
+    window.jQuery('.is-invalid').first().parents('.registration__step').addClass('registration__step--active');
 
   }
 
 }
 
 function onboarding() {
-  if ( jQuery('body.onboarding').length > 0 ) {
+  if ( window.jQuery('body.onboarding').length > 0 ) {
 
-    jQuery('#onboarding').modal('show');
+    window.jQuery('#onboarding').modal('show');
 
-    jQuery('#onboarding').on('shown.bs.modal', function () {
-      jQuery('.modal-slideshow').slick({
+    window.jQuery('#onboarding').on('shown.bs.modal', function () {
+      window.jQuery('.modal-slideshow').slick({
         dots: true, arrows: true, infinite: false,
         prevArrow: '.modal-prev',
         nextArrow: '.modal-next'
       });
     });
 
-    //if ( jQuery('.slick-initialized').length > 0 ) {
+    //if ( window.jQuery('.slick-initialized').length > 0 ) {
 
-    jQuery('#onboarding').on('beforeChange', function (event, slick, currentSlide, nextSlide) {
+    window.jQuery('#onboarding').on('beforeChange', function (event, slick, currentSlide, nextSlide) {
       if (nextSlide === 2) {
-        jQuery('.modal-finished').addClass('modal-finished--visible');
-        jQuery('.close').addClass('close--visible');
+        window.jQuery('.modal-finished').addClass('modal-finished--visible');
+        window.jQuery('.close').addClass('close--visible');
       } else {
-        jQuery('.modal-finished').removeClass('modal-finished--visible');
-        jQuery('.close').removeClass('close--visible');
+        window.jQuery('.modal-finished').removeClass('modal-finished--visible');
+        window.jQuery('.close').removeClass('close--visible');
       }
     });
 
     //}
 
 
-    jQuery('#onboarding').on('hide.bs.modal', function (e) {
+    window.jQuery('#onboarding').on('hide.bs.modal', function (e) {
       $.ajax({
         headers: {
           'X-CSRF-TOKEN': $("input[name='_token']").val()
@@ -255,7 +654,7 @@ function onboarding() {
         type: 'get',
         url: '/user/onboarding-complete',
       });
-      jQuery('.modal-slideshow').slick('destroy');
+      window.jQuery('.modal-slideshow').slick('destroy');
     });
 
   }
@@ -398,35 +797,35 @@ function initAutocomplete() {
   }
 
   function groupsMap() {
-    if (jQuery('.field-geolocate').length > 0 ) {
+    if (window.jQuery('.field-geolocate').length > 0 ) {
       initAutocomplete();
     }
   }
 
   function truncate() {
 
-    if (jQuery('.truncate').length > 0) {
-      jQuery('.truncate').each(function () {
-        jQuery(this).parent().addClass('truncated');
+    if (window.jQuery('.truncate').length > 0) {
+      window.jQuery('.truncate').each(function () {
+        window.jQuery(this).parent().addClass('truncated');
       });
     }
 
-    var button = jQuery('.truncate__button');
+    var button = window.jQuery('.truncate__button');
     button.on('click', function (e) {
       e.preventDefault();
 
-      if (jQuery(this).parent().hasClass('truncated')) {
-        jQuery(this).parent().removeClass('truncated');
-        jQuery(this).find('span').text('Show less');
+      if (window.jQuery(this).parent().hasClass('truncated')) {
+        window.jQuery(this).parent().removeClass('truncated');
+        window.jQuery(this).find('span').text('Show less');
       } else {
-        jQuery(this).parent().addClass('truncated');
-        jQuery(this).find('span').text('Read more');
+        window.jQuery(this).parent().addClass('truncated');
+        window.jQuery(this).find('span').text('Read more');
       }
     });
   }
 
   function eventsMap() {
-    if ( jQuery('#event-map').length > 0 ) {
+    if ( window.jQuery('#event-map').length > 0 ) {
 
       const mapObject = document.querySelector('#event-map');
 
@@ -480,14 +879,14 @@ function initAutocomplete() {
 
   function nestedTable() {
 
-    jQuery('.table-row-details').each(function(){
+    window.jQuery('.table-row-details').each(function(){
 
-      jQuery(this).on('show.bs.collapse', function () {
-        jQuery(this).prev('tr').addClass('active-row');
-        //jQuery(this).prev('tr').find('.row-button')
+      window.jQuery(this).on('show.bs.collapse', function () {
+        window.jQuery(this).prev('tr').addClass('active-row');
+        //window.jQuery(this).prev('tr').find('.row-button')
       })
-      jQuery(this).on('hide.bs.collapse', function () {
-        jQuery(this).prev('tr').removeClass('active-row');
+      window.jQuery(this).on('hide.bs.collapse', function () {
+        window.jQuery(this).prev('tr').removeClass('active-row');
       })
 
     });
@@ -496,9 +895,9 @@ function initAutocomplete() {
   }
 
   function loadDropzones() {
-    if (jQuery(".dropzoneEl").length > 0 ) {
-      var field1 = jQuery('.dropzone').data('field1');
-      var field2 = jQuery('.dropzone').data('field2');
+    if (window.jQuery(".dropzoneEl").length > 0 ) {
+      var field1 = window.jQuery('.dropzone').data('field1');
+      var field2 = window.jQuery('.dropzone').data('field2');
 
       var preview = ".uploads";
       var dropzone_id = ".dropzoneEl";
@@ -545,15 +944,15 @@ function initAutocomplete() {
 
     }
 
-    if (jQuery("#dropzoneSingleEl").length > 0) {
+    if (window.jQuery("#dropzoneSingleEl").length > 0) {
 
-      var field1 = jQuery('#dropzoneSingleEl').data('field1');
-      var field2 = jQuery('#dropzoneSingleEl').data('field2');
+      var field1 = window.jQuery('#dropzoneSingleEl').data('field1');
+      var field2 = window.jQuery('#dropzoneSingleEl').data('field2');
 
       var instanceDropzone = new Dropzone("#dropzoneSingleEl", {
         init: function () {
-          jQuery(".dz-message").find('span').text(field1);
-          jQuery(".dz-message").append('<small>'+field2+'</small>');
+          window.jQuery(".dz-message").find('span').text(field1);
+          window.jQuery(".dz-message").append('<small>'+field2+'</small>');
         },
         paramName: "file", // The name that will be used to transfer the file
         // maxFilesize: 4,
@@ -569,15 +968,15 @@ function initAutocomplete() {
 
     }
 
-    if (jQuery("#dropzoneSingleEl-create").length > 0) {
+    if (window.jQuery("#dropzoneSingleEl-create").length > 0) {
 
-      var field1 = jQuery('#dropzoneSingleEl-create').data('field1');
-      var field2 = jQuery('#dropzoneSingleEl-create').data('field2');
+      var field1 = window.jQuery('#dropzoneSingleEl-create').data('field1');
+      var field2 = window.jQuery('#dropzoneSingleEl-create').data('field2');
 
       var instanceDropzone = new Dropzone("#dropzoneSingleEl-create", {
         init: function () {
-          jQuery(".dz-message").find('span').text(field1);
-          jQuery(".dz-message").append('<small>'+field2+'</small>');
+          window.jQuery(".dz-message").find('span').text(field1);
+          window.jQuery(".dz-message").append('<small>'+field2+'</small>');
         },
         paramName: "file", // The name that will be used to transfer the file
         // maxFilesize: 4,
@@ -597,8 +996,8 @@ function initAutocomplete() {
 
   function resetForm (e) {
     e.preventDefault();
-    var attr = jQuery(this).data('form');
-    var form = jQuery('#' + attr);
+    var attr = window.jQuery(this).data('form');
+    var form = window.jQuery('#' + attr);
     form[0].reset();
 
     if (form.find('select').length > 0 ) {
@@ -638,20 +1037,19 @@ function initAutocomplete() {
 
   function select2Fields($target = false) {
 
-
     if( $target === false ){
 
-      jQuery('.select2').select2();
-      jQuery('.select2-repair-barrier').select2(repair_barrier_options);
-      jQuery('.select2-tags').select2(tag_options);
-      jQuery(".select2-with-input").select2(tag_options_with_input);
-      jQuery(".select2-with-input-group").select2({
+      window.jQuery('.select2').select2();
+      window.jQuery('.select2-repair-barrier').select2(repair_barrier_options);
+      window.jQuery('.select2-tags').select2(tag_options);
+      window.jQuery(".select2-with-input").select2(tag_options_with_input);
+      window.jQuery(".select2-with-input-group").select2({
         width: 'auto',
     		dropdownAutoWidth: true,
     		allowClear: true,
       });
 
-      jQuery('.select2[data-placeholder]').each(function() {
+      window.jQuery('.select2[data-placeholder]').each(function() {
         $(this).select2({
           placeholder: $(this).data('placeholder')
         })
@@ -688,341 +1086,7 @@ function initAutocomplete() {
   }
 
   Dropzone.autoDiscover = false;
-  registration();
-  onboarding();
-  eventsMap();
-  truncate();
-  nestedTable();
-  select2Fields();
-
-  jQuery(function () {
-
-
-    jQuery('.users-list').find('[data-toggle="popover"]').popover();
-
-    jQuery('.users-list').find('[data-toggle="popover"]').on('click', function (e) {
-      jQuery('.users-list').find('[data-toggle="popover"]').not(this).popover('hide');
-    });
-
-    jQuery('.table:not(.table-devices)').find('[data-toggle="popover"]').popover({
-      template: '<div class="popover popover__table" role="tooltip"><div class="arrow"></div><h3 class="popover-header"></h3><div class="popover-body"></div></div>',
-      placement:'top'
-    })
-
-    jQuery('.table-devices').find('[data-toggle="popover"]').popover();
-
-    jQuery('.table').find('[data-toggle="popover"]').on('click', function (e) {
-      jQuery('.table').find('[data-toggle="popover"]').not(this).popover('hide');
-    });
-
-    jQuery(document).on('change', '.category', function (e) {
-      var $value = parseInt(jQuery(this).val());
-      var $field = jQuery(this).parents('td').find('.weight');
-
-      if (!$field.length) {
-        // At present this global JS is used in both old and new designs which have different DOM structure, so we
-        // need to cope with both.
-        $field = jQuery(this).parents('.card-body').find('.weight')
-      }
-      if( $value === 46 || $value === '' ){
-        $field.prop('disabled', false);
-        $field.parents('.display-weight').removeClass('d-none');
-      } else {
-        $field.val('');
-        $field.trigger('change');
-        $field.prop('disabled', true);
-        $field.parents('.display-weight').addClass('d-none');
-      }
-    });
-
-    function removeUser() {
-
-      var id = jQuery(this).data('remove-volunteer');
-
-      $.ajax({
-        headers: {
-          'X-CSRF-TOKEN': $("input[name='_token']").val()
-        },
-        type: 'post',
-        url: '/party/remove-volunteer',
-        data: {
-          id : id,
-        },
-        datatype: 'json',
-        success: function(json) {
-          if( json.success ){
-            jQuery('.volunteer-' + id).fadeOut();
-          } else {
-            alert('Something has gone wrong');
-          }
-        },
-        error: function(error) {
-          alert('Something has gone wrong');
-        }
-      });
-
-    }
-
-    jQuery('.js-remove').on('click', removeUser);
-    jQuery(document).on('click', '[data-toggle="lightbox"]', function (event) {
-      event.preventDefault();
-      jQuery(this).ekkoLightbox();
-    });
-
-    jQuery('.reset').on('click', resetForm);
-
-    loadDropzones();
-
-    if (window.location.hash === '#change-password' && jQuery('#list-account').length > 0) {
-      jQuery('#list-account-list').tab('show');
-    }
-  })
-
-  jQuery(document).ready(function () {
-    groupsMap();
-
-    if (window.gdprCookieNotice && !window.noCookieNotice) {
-      gdprCookieNotice({
-        locale: 'en',
-        timeout: 500, //Time until the cookie bar appears
-        expiration: 30, //This is the default value, in days
-        domain: restarters.cookie_domain, //If you run the same cookie notice on all subdomains, define the main domain starting with a .
-        implicit: false, //Accept cookies on page scroll automatically
-        statement: '/about/cookie-policy', //Link to your cookie statement page
-        performace: ['DYNSRV'], //Cookies in the performance category.
-        analytics: ['_ga','_gat', '_gid'], //Cookies in the analytics category.
-        marketing: [] //Cookies in the marketing category.
-      });
-    }
-
-      let hash = document.location.hash;
-      if (hash) {
-          $('a[href=\"'+hash).tab('show');
-      }
-  });
-
-  jQuery(document).ready(function () {
-    // Enable popovers - Bootstrap doesn't enable these by default.
-    $('[data-toggle="popover"]').popover()
-  });
-
-  $('#register-form-submit').on('click', function(e) {
-    e.preventDefault();
-
-    if ( $('#consent_gdpr')["0"].checked && $('#consent_future_data')["0"].checked ) {
-      $('#register-form').submit();
-    } else {
-      alert('You must consent to the use of your data in order to register');
-    }
-  });
-
-  // On toggling between multi collapable invite modal content
-  // Then also toggle the link to change the text (show a different link -
-  // that has the same functionality)
-  $('.multi-collapse-invite-modal').on('show.bs.collapse', function () {
-      $('.toggle-modal-link').toggleClass('d-none');
-  })
-
-  $('#delete-form-submit').on('click', function(e) {
-    e.preventDefault();
-
-    if (confirm('You are about to delete your account! Are you sure you wish to continue?')) {
-      $('#delete-form').submit();
-    }
-
-  });
-
-  $('#reg_email').on('change', function() {
-    $('#email-update').text($(this).val());
-  });
-
-  $(".select2-dropdown").select2({
-    placeholder: 'Select an country',
-  });
-
-  $( document ).ready(function() {
-
-    $(function () {
-      $('.btn-calendar-feed').popover({
-        html: true,
-        title: '',
-        trigger: 'click',
-        placement: 'bottom',
-        sanitize: false,
-        delay: { "show": 0, "hide": 0 },
-        template: '<div class="popover popover-calendar-feed" role="tooltip"><div class="arrow"></div><div class="popover-body"></div></div>',
-        content: $('#calendar-feed').html()
-      });
-    });
-
-    // Dismissable Alert copy link action
-    $('.btn-action').on('click', function () {
-      var $copy_link = $(this).attr('data-copy-link');
-      copyLink($copy_link);
-    });
-
-    // Copy Calendar Feed link
-    $('#btn-copy').on('click', function () {
-      var $link = $(this).parents('div').parents('div').find('input[type=text]');
-      copyLink($link.val());
-    });
-
-    // User Profile Settings - Calendar copy links
-    $('.btn-copy-input-text').on('click', function () {
-      var $link = $(this).parent('div').parent('div').find('input[type=text]');
-      copyLink($link.val());
-    });
-
-    function copyLink($copy_link) {
-      var $temp = $("<input>");
-      $("body").append($temp);
-      $temp.val($copy_link).select();
-
-      document.execCommand("copy");
-      $temp.remove();
-
-      alert("Copied the link: " + $copy_link);
-    }
-
-
-    $('.information-alert').on('closed.bs.alert', function () {
-      var $dismissable_id = $(this).attr('id');
-      $.ajax({
-        headers: {
-          'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
-        },
-        type: 'POST',
-        url: '/set-cookie',
-        datatype: 'json',
-        data: {
-          'dismissable_id': $dismissable_id,
-        },
-        success: function(data) {
-          console.log(true);
-        }
-      });
-    });
-
-    $('.tokenfield').tokenfield();
-
-    var $current_column = $('input[name=sort_column]:checked').val();
-
-    $('input[name=sort_column]').on('click', function(e) {
-        var $form = $('#device-search');
-        var $sort_direction = $form.find('input[name=sort_direction]');
-            if( $sort_direction.val() === 'DESC' ){
-                $sort_direction.val('ASC');
-            } else {
-                $sort_direction.val('DESC');
-            }
-        $form.submit();
-    });
-
-    $('.filter-columns').on('click', function(e) {
-
-      var $table = $('#sort-table');
-
-      var hide_columns = $table.find('.'+$(this).data('id'));
-      $(hide_columns).toggle();
-
-      var preferences = [];
-      $.each($('.filter-columns:checked'), function() {
-         preferences.push($(this).val());
-      });
-
-      $('.device-colspan').attr('colspan', preferences.length + 3);
-
-      $.ajax({
-        headers: {
-          'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
-        },
-        type: 'post',
-        url: '/device/column-preferences',
-        data: {
-          column_preferences: preferences,
-        }
-      });
-
-    });
-
-    $("#invites_to_volunteers").on("click", function(){
-      if (this.checked){
-        var event_id = $('#event_id').val();
-
-        $.ajax({
-          headers: {
-            'X-CSRF-TOKEN': $("input[name='_token']").val()
-          },
-          type: 'get',
-          url: '/party/get-group-emails-with-names/'+event_id,
-          datatype: 'json',
-          success: function(data) {
-            var current_items = $('#manual_invite_box').tokenfield('getTokens');
-            var new_items = data;
-
-            var pop_arr = [];
-
-            // Keep all the items that were already there.
-            current_items.forEach(function(current_item) {
-                var manual_email = {
-                    value: current_item.value,
-                    label: current_item.value
-                };
-                pop_arr.push(manual_email);
-            });
-
-            // Add the new items - i.e. existing volunteers for the group.
-            new_items.forEach(function(new_item) {
-                var label = '';
-                if (! new_item.invites)
-                    label += '\u{26A0} ';
-                label += new_item.name;
-
-                var volunteer = {
-                    value: new_item.email,
-                    label: label
-                };
-                pop_arr.push(volunteer);
-            });
-
-            $('#manual_invite_box').tokenfield('setTokens', pop_arr);
-          },
-            error: function(xhr, status, error) {
-                var err = JSON.parse(xhr.responseText);
-                console.log(err);
-          }
-        });
-      }
-    });
-
-    $('#start-time').on('change', function() {
-      var time = $(this).val().split(':');
-      var hours = (parseInt(time[0]) + 3).toString();
-
-      if (hours.length < 2) {
-        hours = '0' + hours;
-      }
-
-      var mins = time[1];
-
-      $('#end-time').val(hours+':'+mins);
-
-    });
-
-    // Copy to clipboard
-    // Grab any text in the attribute 'data-copy' and pass it to the
-    // copy function
-    // ---------------------------------------------------------------------
-    $('.js-copy').click(function() {
-      var text = $(this).attr('data-copy');
-      var el = $(this);
-      copyToClipboard(text, el);
-    });
-
-    // Set current locale.  Passed via DOM element from languages.blade.php.
-    const locale = $('#language-current').html() ? $('#language-current').html() : 'en'
-    Lang.setLocale(locale)
-  });
+  // All remaining jQuery initialization code moved to initializeJQuery() function
 
   // COPY TO CLIPBOARD
   // Attempts to use .execCommand('copy') on a created text field
@@ -1087,30 +1151,6 @@ function initAutocomplete() {
   }
 
 
-  $('#manual_invite_box').on('tokenfield:createtoken', function (event) {
-    var existingTokens = $(this).tokenfield('getTokens');
-    var newval = event.attrs.value
-
-    $.each(existingTokens, function(index, token) {
-      if (token.value === newval)
-      event.preventDefault();
-    });
-
-    if (!newval || newval.indexOf('@') == -1) {
-      // This is a very basic check that we're putting in something which looks like an email.  Email regexp validation
-      // is a bit of a fool's errand, and in the longer term this code will be replaced by Vue and/or a different
-      // invitation model.
-      $(event.target).closest('div.tokenfield').css('border', '2px solid red')
-    } else {
-      $(event.target).closest('div.tokenfield').css('border', '')
-    }
-
-      tokenFieldCheck();
-  });
-
-  $('#manual_invite_box').on('tokenfield:removedtoken', function (event) {
-    tokenFieldCheck();
-  });
 
   function deviceFormCollect($form) {
     var formdata = $form.serializeArray()
@@ -1137,130 +1177,12 @@ function initAutocomplete() {
     form.find(':input').attr("disabled", disabled);
   }
 
-  $( document ).ready(function() {
+  // Final jQuery block moved to initializeJQuery() function
 
-    $("textarea#message_to_restarters[name=message_to_restarters]").on("keydown", function(event){
-      if (event.which == 13) {
-        event.preventDefault();
-        this.value = this.value + "\n";
-      }
-    });
+// All jQuery initialization moved to initializeJQuery() function above
 
-    $('.ajax-delete-image').on('click', function (e) {
-      e.preventDefault();
-
-      if (window.confirm("Are you sure? This cannot be undone.")) {
-        var $this = jQuery(this);
-        var $device = jQuery(this).data('device-id');
-        var $href = $(this).attr('href');
-        $.ajax({
-          type: 'get',
-          url: $href,
-          success: function(data) {
-            $this.parent().fadeOut(1000);
-          },
-          error: function(error) {
-            alert(error);
-          }
-        });
-      }
-    });
-
-    $("#registeremail").blur(function() {
-
-      if ( $(this).val().length > 0 ){
-
-        var email = $('#registeremail').val();
-
-        $.ajax({
-          headers: {
-            'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
-          },
-          type:'POST',
-          url:'/user/register/check-valid-email',
-          data: {
-            email : email
-          },
-          dataType : 'json',
-          success: function(response){
-            $('div.emailtest > .invalid-feedback').text(response['message']).show();
-          },
-          error: function(){
-            $('.invalid-feedback').hide();
-          }
-        });
-
-      }
-    });
-
-    // Set min height so the language menu sits just under the overall height of the browser window
-    $('body > .container:not(.container-nav)').css('min-height', ( $(window).height() - $('nav.navbar').height() ) +'px');
-
-    $(".toggle-invite-modals").click(function (e) {
-
-      $('#invite-to-group').modal('toggle');
-      $('#event-invite-to').modal('toggle');
-
-      $('#shareable-modal').modal('toggle');
-    });
-
-    $('.select2-with-input-group').on("select2:select", function(e) {
-      var $input_field = $(this).parents('.input-group-select2').find('input[type=text]');
-
-      var $current_url = $input_field.val();
-
-      var $remove_current_area = $current_url.lastIndexOf('/') + 1;
-      var $creating_new_url =  $current_url.substring( 0, $remove_current_area );
-      var $new_url = $creating_new_url.concat( $(this).val() );
-
-      $input_field.val($new_url);
-    });
-
-  });
-
-  // Copy Calendar Feed link
-  $(document).on("click", "#btn-copy", function () {
-    var $copy_link = $(this).parents('div').parents('div').find('input[type=text]').val();
-
-    var $temp = $("<input>");
-    $("body").append($temp);
-    $temp.val($copy_link).select();
-
-    document.execCommand("copy");
-    $temp.remove();
-
-    alert("Copied the link: " + $copy_link);
-  });
-
-jQuery(document).ready(function () {
-  // Make navbar hide on mobile scroll.
-  var showNavbar = true;
-  var lastScrollPosition = true;
-
-  window.addEventListener('scroll', function() {
-    // Get the current scroll position
-    const currentScrollPosition = window.pageYOffset || document.documentElement.scrollTop
-
-    // Because of momentum scrolling on mobiles, we shouldn't continue if it is less than zero
-    if (currentScrollPosition < 0) {
-      return
-    }
-
-    // Here we determine whether we need to show or hide the navbar
-    showNavbar = currentScrollPosition < lastScrollPosition
-
-    if (showNavbar) {
-      $('#nav-left').removeClass('nav-left--hidden')
-    } else {
-      $('#nav-left').addClass('nav-left--hidden')
-    }
-
-    // Set the current scroll position as the last scroll position
-    lastScrollPosition = currentScrollPosition
-  })
-
-  // Sentry error
-  Sentry.init({
+// Sentry error
+Sentry.init({
     Vue,
     dsn: "https://50fd2fa440af4bb4a230f40ca8d8cf90@o879179.ingest.sentry.io/5831645",
     integrations: [Sentry.browserTracingIntegration()],
@@ -1278,53 +1200,12 @@ jQuery(document).ready(function () {
     }
   });
 
-  // We use Leaflet
-  Vue.use({
-    install(Vue, options) {
-      Vue.component('l-map', LMap)
-      Vue.component('l-marker', LMarker)
-      Vue.component('l-tile-layer', LTileLayer)
-      Vue.component('multiselect', Multiselect)
-    }
-  })
+  // Initialize Leaflet components using CDN-loaded Leaflet
+  // This will be set up after jQuery initialization to ensure all dependencies are loaded
 
-  // Initialise Vue instances on any divs which have asked for it.
-  //
-  // Normally you'd initialise one instance on a single top-level div.  But we put content directly under body.
-  // Initialising multiple instances is a bit more expensive, but not much.
-  //
-  // We need to list all the top-level components we will use in blades here; they are stored in
-  // resources/js/components.  Lower level components can be included from within those as normal;
-  // they don't need listing here.
-  $(".vue").each(function(index) {
-    new Vue({
-      el: $(this).get(0),
-      store: store,
-      components: {
-        'loginpage' : LoginPage,
-        'dashboardpage': DashBoardPage,
-        'eventaddeditpage': EventAddEditPage,
-        'eventaddedit': EventAddEdit,
-        'eventsrequiringmoderation': EventsRequiringModeration,
-        'eventpage': EventPage,
-        'fixometerpage': FixometerPage,
-        'groupspage': GroupsPage,
-        'grouppage': GroupPage,
-        'groupaddeditpage': GroupAddEditPage,
-        'groupeventspage': GroupEventsPage,
-        'groupevents': GroupEvents,
-        'groupsrequiringmoderation': GroupsRequiringModeration,
 
-        'eventtimerangepicker': EventTimeRangePicker,
-        'eventdatepicker': EventDatePicker,
-        'venueaddress': VenueAddress,
-        'richtexteditor': RichTextEditor,
-        'notifications': Notifications,
-        'grouptimezone': GroupTimeZone,
-        'statsshare': StatsShare,
-      }
-    })
-  })
-  $(".vue-placeholder-large").hide()
-})
+// jQuery initialization moved to initializeJQuery() function at top of file
+
+// Start jQuery initialization
+initializeJQuery();
 

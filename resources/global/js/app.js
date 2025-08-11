@@ -1,18 +1,16 @@
-// import jquery from 'jquery';
-// window.$ = window.jQuery=jquery;
+import jQuery from 'jquery';
 
-// window.bootstrap = require('bootstrap');
+window.$ = window.jQuery = jQuery;
+
+import './components/dropdown.js';
+import './components/ajax-search-discourse-notifications.js';
+import './components/check-auth.js';
 
 window.onload = function() {
+  // Use strict mode to reduce development errors.
+  "use strict";
 
-  (function($, window, document) {
-    // Use strict mode to reduce development errors.
-    "use strict";
-
-    $(document).ready(function() {
-      require('./components/dropdown.js');
-      require('./components/ajax-search-discourse-notifications.js');
-      require('./components/check-auth.js');
+  $(document).ready(function() {
 
       console.log('Global js ready!');
 
@@ -65,5 +63,4 @@ window.onload = function() {
         $(this).addClass('active');
       });
     }
-  })(jQuery, window, document);
 }

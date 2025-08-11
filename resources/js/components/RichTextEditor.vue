@@ -5,10 +5,9 @@
   </div>
 </template>
 <script>
-const Quill = require('vue2-editor').Quill
+import { Quill, VueEditor } from 'vue2-editor'
+import { htmlEditButton } from 'quill-html-edit-button'
 window.Quill = Quill
-const htmlEditButton = require('quill-html-edit-button').htmlEditButton
-const VueEditor = require('vue2-editor').VueEditor
 Quill.register('modules/htmlEditButton', htmlEditButton)
 
 // Importing this registers a clipboard handler that sanitizes on paste.

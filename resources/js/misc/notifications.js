@@ -1,6 +1,9 @@
 function toggleRead(event) {
     event.preventDefault();
 
+    const $ = window.jQuery || window.$;
+    if (!$) return;
+
     $button = $(this);
     $counter = $('#notifications-badge .chat-count');
 
@@ -25,4 +28,8 @@ function toggleRead(event) {
     });
 }
 
-jQuery('.btn-marked').on('click',toggleRead);
+// Ensure jQuery is available from global scope since it's loaded via CDN
+if (typeof window !== 'undefined' && (window.jQuery || window.$)) {
+    const $ = window.jQuery || window.$;
+    $('.btn-marked').on('click',toggleRead);
+}

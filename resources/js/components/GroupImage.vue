@@ -15,11 +15,13 @@
   </b-form-group>
 </template>
 <script>
-import vue2Dropzone from 'vue2-dropzone'
 import images from '../mixins/images'
 
 export default {
   mixins: [images],
+  components: {
+    vueDropzone: () => import('vue2-dropzone').then(m => m.VueDropzone || m.default || m)
+  },
   props: {
     image: {
       type: String,
@@ -31,9 +33,6 @@ export default {
     return {
       currentimage: null,
     }
-  },
-  components: {
-    vueDropzone: vue2Dropzone
   },
   computed: {
     src() {

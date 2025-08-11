@@ -44,7 +44,7 @@
 import DiscourseTopic from './DiscourseTopic.vue'
 import CollapsibleSection from './CollapsibleSection.vue'
 import images from '../mixins/images'
-const axios = require('axios')
+import axios from 'axios'
 
 export default {
   mixins: [images],

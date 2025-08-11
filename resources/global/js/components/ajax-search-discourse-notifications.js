@@ -1,3 +1,6 @@
+import jQuery from 'jquery';
+const $ = jQuery;
+
 // API call to current site - check for notifications
 function ajaxSearchNotifications() {
   // $base_url = window.location.host;

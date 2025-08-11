@@ -1,5 +1,6 @@
 import Vue from 'vue'
-Vue.use(require('vue-cookies'))
+import VueCookies from 'vue-cookies'
+Vue.use(VueCookies)
 
 export default {
   props: {

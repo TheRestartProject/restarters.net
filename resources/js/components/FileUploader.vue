@@ -7,11 +7,13 @@
   </div>
 </template>
 <script>
-import vue2Dropzone from 'vue2-dropzone'
 import images from '../mixins/images'
 
 export default {
   mixins: [images],
+  components: {
+    vueDropzone: () => import('vue2-dropzone').then(m => m.VueDropzone || m.default || m)
+  },
   props: {
     url: {
       type: String,
@@ -26,9 +28,6 @@ export default {
       required: false,
       default: 1
     },
-  },
-  components: {
-    vueDropzone: vue2Dropzone
   },
   computed: {
     dropzoneOptions () {

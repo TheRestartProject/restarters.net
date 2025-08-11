@@ -30,7 +30,7 @@
         "laravelcollective/html": "^6.4",
         "league/csv": "^9.7",
         "league/flysystem-aws-s3-v3": "^3.0",
-        "mariuzzo/laravel-js-localization": "^1.10",
+        "sergix44/laravel-translator-js": "^2.0",
         "mcamara/laravel-localization": "^1.8",
         "msurguy/honeypot": "^1.2",
         "owen-it/laravel-auditing": "^13.1",

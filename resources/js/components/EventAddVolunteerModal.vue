@@ -33,7 +33,7 @@
 import event from '../mixins/event'
 import auth from '../mixins/auth'
 
-const axios = require('axios')
+import axios from 'axios'
 
 export default {
   props: {

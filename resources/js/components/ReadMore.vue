@@ -18,7 +18,7 @@
 </template>
 
 <script>
-const htmlToText = require('html-to-text');
+import { htmlToText } from 'html-to-text';
 import clip from "text-clipper"
 // Originally based on https://github.com/orlyyani/read-more, with thanks.
 
