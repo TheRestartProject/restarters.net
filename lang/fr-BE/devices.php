@@ -41,7 +41,7 @@ return [
   'description_unpowered' => 'Un <b>appareil non-électrique</b> est tout ce qui ne dispose pas ou n\'a pas besoin de source électrique.',
   'images' => 'Images',
   'model_or_type' => 'Type d\'objet',
-  'placeholder_notes' => 'Notes. Ex: difficultés de réparation, perception du problème par le propriétaire etc.',
+  'placeholder_notes' => 'Notes. Exemples : difficultés de réparation, perception du propriétaire du problème, etc. Vous aidez à la fin de Windows 10 ? Ajoutez le hashtag #EndOf10 dans les notes.',
   'powered_items' => 'Appareils électriques',
   'repair_outcome' => 'Résultat de la réparation?',
   'required_impact' => 'kg - nécessaire pour calculer l\'impact sur l\'environnement',

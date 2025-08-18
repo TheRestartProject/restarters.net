@@ -227,6 +227,83 @@ class ExportTest extends TestCase
         }
     }
 
+    public function testSlashesExport()
+    {
+        $admin = User::factory()->administrator()->create();
+        $this->actingAs($admin);
+
+        // Create a group with forward slash in the name
+        $group = Group::factory()->create([
+            'name' => 'Test/Group/Name',
+            'approved' => true
+        ]);
+
+        // Create an event for this group with a slash in the title
+        $event_start = \Carbon\Carbon::createFromTimestamp(strtotime('2000-01-02'))->setTimezone('UTC');
+        $event_end = \Carbon\Carbon::createFromTimestamp(strtotime('2000-01-02'))->setTimezone('UTC')->addHour(2);
+        
+        $this->lastResponse = $this->post('/api/v2/events?api_token=' . $admin->api_token, [
+            'groupid' => $group->idgroups,
+            'start' => $event_start->toIso8601String(),
+            'end' => $event_end->toIso8601String(),
+            'title' => 'Test/Event/Title',
+            'location' => 'London',
+            'description' => 'Test Description',
+            'timezone' => 'UTC'
+        ]);
+        $this->assertTrue($this->lastResponse->isSuccessful());
+        $json = json_decode($this->lastResponse->getContent(), true);
+        $idevents = $json['id'];
+        
+        $event = Party::find($idevents);
+        $event->approved = true;
+        $event->save();
+
+        // Add a device for the event
+        Device::factory()->fixed()->create([
+            'category' => 111,
+            'category_creation' => 111,
+            'event' => $idevents,
+        ]);
+
+        // Export devices for this group - should not fail
+        $response = $this->get("/export/devices/group/{$group->idgroups}");
+        $response->assertSuccessful();
+
+        // Check that the filename was created correctly (forward slashes replaced with dashes)
+        $header = $response->headers->get('content-disposition');
+        $expectedFilename = 'repair-data-Test-Group-Name.csv';
+        $this->assertStringContainsString($expectedFilename, $header);
+
+        // Verify the file can be read
+        $filename = public_path() . '/' . $expectedFilename;
+        $this->assertFileExists($filename);
+        $fh = fopen($filename, 'r');
+        $this->assertNotFalse($fh);
+        fgetcsv($fh); // Skip header
+        $row = fgetcsv($fh);
+        $this->assertEquals($group->name, $row[8]); // Group name column
+        fclose($fh);
+
+        // Export devices for this specific event - should not fail
+        $response = $this->get("/export/devices/event/{$idevents}");
+        $response->assertSuccessful();
+
+        // Check that the event export also works with slashes in title
+        $header = $response->headers->get('content-disposition');
+        $this->assertStringContainsString('.csv', $header);
+
+        // Verify the event export file can be read and contains event data
+        $filename = public_path() . '/' . substr($header, strpos($header, 'filename=') + 9);
+        $this->assertFileExists($filename);
+        $fh = fopen($filename, 'r');
+        $this->assertNotFalse($fh);
+        fgetcsv($fh); // Skip header
+        $row = fgetcsv($fh);
+        $this->assertEquals(e($event->getEventName()), e($row[7])); // Event name column
+        fclose($fh);
+    }
+
     public function roleProvider() {
         return [
             [ 'Administrator' ],

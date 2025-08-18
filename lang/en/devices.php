@@ -49,7 +49,7 @@ return [
   'tooltip_model' => 'Add as much information about the specific model of device here as you can (e.g. \'Galaxy S10 5G\'). Leave empty if you don\'t know the model.',
   'tooltip_problem' => '<p>Please provide as much detail as you can about the problem with the device and what was done to repair it. For example:</p><ul><li>How did it break?</li><li>What, specifically, was broken?</li><li>What steps were taken to fix it and did they work?</li></ul><p><a href=\'https://talk.restarters.net/t/fixometer-how-to-log-repair-data-from-your-event/1028#heading--comments\' target=\'_blank\' rel=\'noopener nofollower\'>More information</a></p>',
   'tooltip_notes' => '<p>Add any additional detail here, for example:</p><ul><li>Did you encounter anything that made the repair more difficult?</li><li>Was the actual problem different to what the owner thought?</li></ul>',
-  'placeholder_notes' => 'Notes.  Examples: repair difficulties, owner\'s perception of problem etc.',
+  'placeholder_notes' => 'Notes.  Examples: repair difficulties, owner\'s perception of problem etc. Helping with the end of Windows 10? Add the #EndOf10 hashtag in the notes.',
   'title_items' => 'ITEM',
   'title_items_at_event' => 'Items at this event',
   'title_repair' => 'REPAIR',
