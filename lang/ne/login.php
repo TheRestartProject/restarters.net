@@ -4,7 +4,7 @@ return [
   'login_title' => 'Inloggen',
   'more' => 'Meer weten',
   'stat_1' => 'Herstelde toestellen',
-  'stat_2' => 'Vermeden CO<sub>2</sub> uitstoot',
+  'stat_2' => 'Vermeden CO<sub>2</sub>e uitstoot',
   'stat_3' => 'Vermeden afval',
   'stat_4' => 'georganiseerde activiteiten',
   'whatis' => 'Welkom in de Restart gemeenschap',

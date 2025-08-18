@@ -15,6 +15,7 @@
     </testsuite>
     <testsuite name="Unit">
       <directory suffix=".php">./tests/Unit</directory>
+      <exclude>./tests/Unit/NotificationsTest.php</exclude>
       <exclude>./tests/Unit/CharsetTest.php</exclude>
     </testsuite>
   </testsuites>

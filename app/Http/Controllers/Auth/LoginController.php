@@ -106,13 +106,11 @@ class LoginController extends Controller
     {
         $stats = Fixometer::loginRegisterStats();
 
-        $deviceCount = array_key_exists(0, $stats['device_count_status']) ? $stats['device_count_status'][0]->counter : 0;
-
         return view('auth.login', [
-          'co2Total' => $stats['waste_stats'][0]->powered_footprint + $stats['waste_stats'][0]->unpowered_footprint,
-          'wasteTotal' => $stats['waste_stats'][0]->powered_waste + $stats['waste_stats'][0]->unpowered_waste,
-          'partiesCount' => count($stats['allparties']),
-          'deviceCount' => $deviceCount,
+          'co2Total' => $stats['co2Total'],
+          'wasteTotal' => $stats['wasteTotal'],
+          'partiesCount' => $stats['partiesCount'],
+          'deviceCount' => $stats['deviceCount'],
         ]);
     }
 }

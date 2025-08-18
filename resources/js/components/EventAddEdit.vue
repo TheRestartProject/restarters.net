@@ -30,6 +30,7 @@
               :value.sync="free_text"
               :has-error="$v.free_text.$error"
               ref="free_text"/>
+          <small class="form-text text-muted">{{ __('events.endof10_helper') }}</small>
         </b-form-group>
       </div>
       <div class="event-date">
