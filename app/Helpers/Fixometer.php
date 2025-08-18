@@ -555,6 +555,19 @@ class Fixometer
             \Cache::put('all_stats', $stats, 7200);
         }
 
+        // Add commonly computed values to avoid duplication in controllers
+        $stats['deviceCount'] = 0;
+        foreach ($stats['device_count_status'] as $statusRow) {
+            if ($statusRow->status == \App\Device::REPAIR_STATUS_FIXED) {
+                $stats['deviceCount'] = $statusRow->counter;
+                break;
+            }
+        }
+
+        $stats['co2Total'] = $stats['waste_stats'][0]->powered_footprint + $stats['waste_stats'][0]->unpowered_footprint;
+        $stats['wasteTotal'] = $stats['waste_stats'][0]->powered_waste + $stats['waste_stats'][0]->unpowered_waste;
+        $stats['partiesCount'] = count($stats['allparties']);
+
         return $stats;
     }
 
