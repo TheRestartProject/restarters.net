@@ -3,6 +3,7 @@
 return [
   'field_event_name_helper' => 'Name of the venue or neighbourhood',
   'field_venue_helper' => 'I.e. the place where the fixing happens!',
+  'endof10_helper' => 'Are you helping with the end of Windows 10 at this event? Add the #EndOf10 hashtag somewhere in your event description to help track these events.',
   'create_event' => 'Create event',
   'events_title_admin' => 'Events to moderate',
   'approve_event' => 'Approve Event',

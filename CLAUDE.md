@@ -144,3 +144,4 @@ npm test
 - Image handling via intervention/image with custom sizing
 - Custom validation rules in `app/Rules/`
 - Event-driven architecture with model observers
+- Only translate fr and fr-BE
