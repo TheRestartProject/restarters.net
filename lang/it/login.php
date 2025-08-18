@@ -11,7 +11,7 @@ return [
                             </ul>',
   'more' => 'Scopri altro',
   'stat_1' => 'Dispositivi riparati',
-  'stat_2' => 'Emissioni di CO<sub>2</sub> prevenute',
+  'stat_2' => 'Emissioni di CO<sub>2</sub>e prevenute',
   'stat_3' => 'Rifiuti evitati',
   'stat_4' => 'Eventi realizzati',
   'login_title' => 'Entra',

@@ -14,11 +14,23 @@
                 <div class="stat-header">@lang('login.stat_1')</div>
             </div>
             <div class="stats__stat">
-                <div class="stat-figure">{{ number_format(round($co2Total), 0, '.', ',') }} kg</div>
+                <div class="stat-figure">
+                    @if($co2Total >= 1000)
+                        {{ number_format(round($co2Total / 1000), 0, '.', ',') }} tonnes
+                    @else
+                        {{ number_format(round($co2Total), 0, '.', ',') }} kg
+                    @endif
+                </div>
                 <div class="stat-header">@lang('login.stat_2')</div>
             </div>
             <div class="stats__stat">
-                <div class="stat-figure">{{ number_format(round($wasteTotal), 0, '.', ',') }} kg</div>
+                <div class="stat-figure">
+                    @if($wasteTotal >= 1000)
+                        {{ number_format(round($wasteTotal / 1000), 0, '.', ',') }} tonnes
+                    @else
+                        {{ number_format(round($wasteTotal), 0, '.', ',') }} kg
+                    @endif
+                </div>
                 <div class="stat-header">@lang('login.stat_3')</div>
             </div>
             <div class="stats__stat">
