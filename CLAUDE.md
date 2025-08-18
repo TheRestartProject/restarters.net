@@ -145,3 +145,6 @@ npm test
 - Custom validation rules in `app/Rules/`
 - Event-driven architecture with model observers
 - Only translate fr and fr-BE
+
+## Development Warnings
+- Don't try to test changes when you're running on Windows.
