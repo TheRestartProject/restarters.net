@@ -37,7 +37,7 @@ jobs:
           - MARIADB_PORT_NUMBER=3307
           - MARIADB_USER=bn_mediawiki
           - MARIADB_DATABASE=bitnami_mediawiki
-      - image: 'bitnami/mediawiki:1'
+      - image: 'bitnami/mediawiki:1.39.5'
         name: mediawiki
         labels:
           kompose.service.type: nodeport
