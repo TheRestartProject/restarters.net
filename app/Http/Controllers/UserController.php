@@ -7,7 +7,6 @@ use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\JsonResponse;
 use App;
 use App\Device;
-use App\DripEvent;
 use App\Events\PasswordChanged;
 use App\Events\UserLanguageUpdated;
 use App\Events\UserRegistered;
@@ -167,10 +166,6 @@ class UserController extends Controller
 
         $user = User::find($id);
 
-        if ($user->isDripSubscriber()) {
-            DripEvent::createOrUpdateSubscriber($user, true, auth()->user()->email, request()->input('email'));
-        }
-
         if (! empty($user->location)) {
             $geocoded = $geocoder->geocode("{$user->location}, " . Fixometer::getCountryFromCountryCode($user->country_code));
             if (! empty($geocoded)) {
@@ -239,7 +234,7 @@ class UserController extends Controller
         $user = User::find($id);
 
         // Check that we are allowed to change the role, based on our own role.
-        $this->authorize('changeRepairDirRole', [Auth::user(), $user, $role]);
+        $this->authorize('changeRepairDirRole', [$user, $role]);
 
         $user->update([
             'repairdir_role' => $role,
@@ -287,10 +282,6 @@ class UserController extends Controller
         $user = User::find($id);
         $old_user_name = $user->name;
         $user_id = $user->id;
-
-        if ($user->isDripSubscriber()) {
-            $user->drip_subscriber_id = null;
-        }
 
         $user->delete(); // Will be anonymised automatically by event handlers
 
@@ -500,7 +491,7 @@ class UserController extends Controller
                 $oldPassword = $user->password;
 
                 $update = $user->update([
-                    'password' => crypt($pwd, '$1$'.strrev(md5(env('APP_KEY')))),
+                    'password' => Hash::make($pwd),
                 ]);
 
                 if ($update) {
@@ -680,7 +671,7 @@ class UserController extends Controller
                 // No errors. We can proceed and create the User.
                 $data = ['name'     => $name,
                 'email'    => $email,
-                'password' => crypt($pwd, '$1$'.strrev(md5(env('APP_KEY')))),
+                'password' => Hash::make($pwd),
                 'role'     => $role,
                 'calendar_hash' => Str::random(15),
                 //'group'    => $group
@@ -770,7 +761,7 @@ class UserController extends Controller
                 if ($data['new-password'] !== $data['password-confirm']) {
                     $error['password'] = 'The passwords are not identical!';
                 } else {
-                    $data['password'] = crypt($data['new-password'], '$1$'.strrev(md5(env('APP_KEY'))));
+                    $data['password'] = Hash::make($data['new-password']);
                 }
             }
 
@@ -848,6 +839,9 @@ class UserController extends Controller
                 ]);
             }
         }
+        
+        // Add a default return for when user doesn't have permissions
+        abort(403, 'Unauthorized');
     }
 
     public function logout(): RedirectResponse
@@ -864,6 +858,7 @@ class UserController extends Controller
         }
 
         $stats = Fixometer::loginRegisterStats();
+        $deviceCount = array_key_exists(0, $stats['device_count_status']) ? $stats['device_count_status'][0]->counter : 0;
 
         $activeRepairNetworkId = session()->get('repair_network');
         $network = Network::find($activeRepairNetworkId);
@@ -871,10 +866,10 @@ class UserController extends Controller
 
         return view('auth.register-new', [
             'skills' => Fixometer::allSkills(),
-            'co2Total' => $stats['co2Total'],
-            'wasteTotal' => $stats['wasteTotal'],
-            'partiesCount' => $stats['partiesCount'],
-            'deviceCount' => $stats['deviceCount'],
+            'co2Total' => $stats['waste_stats'][0]->powered_footprint + $stats['waste_stats'][0]->unpowered_footprint,
+            'wasteTotal' => $stats['waste_stats'][0]->powered_waste + $stats['waste_stats'][0]->unpowered_waste,
+            'partiesCount' => count($stats['allparties']),
+            'deviceCount' => $deviceCount,
             'showNewsletterSignup' => $showNewsletterSignup,
         ]);
     }
@@ -956,15 +951,6 @@ class UserController extends Controller
             $user->newsletter = 1;
         } else {
             $subscribed = false;
-        }
-
-        if (env('DRIP_API_TOKEN') !== null && env('DRIP_API_TOKEN') !== '') {
-            $activeRepairNetworkId = session()->get('repair_network');
-            $network = Network::find($activeRepairNetworkId);
-            if (! is_null($network) && $network->users_push_to_drip) {
-                $drip_subscribe_user = DripEvent::createOrUpdateSubscriber($user, $subscribed);
-                $user->drip_subscriber_id = $drip_subscribe_user->id;
-            }
         }
 
         // 'invites' refers to receiving notifications about groups or events near the user.
@@ -1062,6 +1048,8 @@ class UserController extends Controller
         if (User::where('email', '=', $request->get('email'))->exists()) {
             return response()->json(['message' =>  __('auth.email_address_validation')]);
         }
+        
+        return response()->json(['message' => 'Email is available']);
     }
 
     public static function getThumbnail(Request $request): JsonResponse
@@ -1120,6 +1108,19 @@ class UserController extends Controller
             $adminMenu = ['name' => 'Administrator', 'items' => $items];
             $adminMenu['svg'] = self::adminMenuSvg;
             $menus['Administrator'] = $adminMenu;
+        }
+
+        if ($user->hasRole('Administrator') || $user->hasRole('Host')) {
+            $items = [];
+            $items[Lang::get('general.party_reporting')] = url('/search');
+
+            $reportingMenu = [
+                'name' => Lang::get('general.reporting'),
+                'items' => $items,
+                'svg' => self::reportingMenuSvg,
+            ];
+
+            $menus['Reporting'] = $reportingMenu;
         }
 
         $generalMenu = [

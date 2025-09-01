@@ -40,7 +40,7 @@ class User extends Authenticatable implements Auditable, HasLocalePreference
      * @var array
      */
     protected $fillable = [
-        'name', 'email', 'password', 'role', 'recovery', 'recovery_expires', 'language', 'repair_network', 'location', 'age', 'gender', 'country_code', 'newsletter', 'drip_subscriber_id', 'invites', 'biography', 'consent_future_data', 'consent_past_data', 'consent_gdpr', 'number_of_logins', 'latitude', 'longitude', 'last_login_at', 'api_token', 'access_group_tag_id', 'calendar_hash', 'repairdir_role', 'mediawiki', 'username',
+        'name', 'email', 'password', 'role', 'recovery', 'recovery_expires', 'language', 'repair_network', 'location', 'age', 'gender', 'country_code', 'newsletter', 'invites', 'biography', 'consent_future_data', 'consent_past_data', 'consent_gdpr', 'number_of_logins', 'latitude', 'longitude', 'last_login_at', 'api_token', 'access_group_tag_id', 'calendar_hash', 'repairdir_role', 'mediawiki', 'username',
     ];
 
     /**
@@ -312,7 +312,7 @@ class User extends Authenticatable implements Auditable, HasLocalePreference
     {
         //Tested!
 
-        $r = DB::select('SELECT COUNT(id) AS emails FROM '.$this->table.' WHERE email = :email', ['email' => $email]);
+        $r = DB::select('SELECT COUNT(id AS emails FROM '.$this->table.' WHERE email = :email', ['email' => $email]);
 
         return ($r[0]->emails > 0) ? false : true;
     }
@@ -350,9 +350,9 @@ class User extends Authenticatable implements Auditable, HasLocalePreference
     }
 
     /**
-     * @return Date when the user last logged in
+     * @return \Carbon\Carbon when the user last logged in
      */
-    public function lastLogin(): Date
+    public function lastLogin(): \Carbon\Carbon
     {
         return new \Carbon\Carbon($this->last_login_at);
     }
@@ -439,11 +439,6 @@ class User extends Authenticatable implements Auditable, HasLocalePreference
         }
 
         $this->username = $username;
-    }
-
-    public function isDripSubscriber()
-    {
-        return ! is_null($this->drip_subscriber_id);
     }
 
     public function isRepairDirectoryNone()
@@ -575,24 +570,17 @@ class User extends Authenticatable implements Auditable, HasLocalePreference
         // TODO Use of preferredLocale should mean we don't have to explicitly pass the locale.  But that isn't
         // working.  So at the moment we are passing a locale explicitly in the translations in the notifications
         // to users (not admins).
-        return $this->language;
+        return $this->language ?? 'en';
     }
 
-    public static function userCanSeeEvent($user, $event, $group = null) {
+    public static function userCanSeeEvent($user, $event) {
         // We need to filter based on approved visibility:
         // - where the group is approved, this event is visible
         // - where the group is not approved, this event is visible to network coordinators or group hosts.
-        $group = $event->theGroup;
-
-        if ($event->approved && $group->approved) {
-            // Do this before getting user roles - improves performance.
-            return true;
-        }
-
         $amHost = $user && $user->hasRole('Host');
         $admin = $user && $user->hasRole('Administrator');
 
-        $group = $group ? $group : Group::find($event->group);
+        $group = Group::find($event->group);
 
         if (($event->approved && $group->approved) ||
             $admin ||

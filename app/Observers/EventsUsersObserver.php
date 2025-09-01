@@ -5,6 +5,7 @@ namespace App\Observers;
 use App\Events\UserConfirmedEvent;
 use App\Events\UserLeftEvent;
 use App\EventsUsers;
+use App\Party;
 use App\Role;
 use App\Services\DiscourseService;
 use App\User;
