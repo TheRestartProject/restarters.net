@@ -61,7 +61,7 @@ cd restarters.net
 Copy the example environment file:
 
 ```bash
-cp .env.example .env
+cp .env.docker .env
 ```
 
 You may need to adjust the following settings in your `.env` file:
