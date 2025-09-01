@@ -133,7 +133,7 @@ jobs:
       - run: sudo apt install dnsutils openssl zip unzip git libxml2-dev libzip-dev zlib1g-dev libcurl4-openssl-dev iputils-ping default-mysql-client vim libpng-dev libgmp-dev libjpeg-turbo8-dev
       - run: sudo apt-get install php-xmlrpc php-intl php-xdebug php-mbstring php-simplexml php-curl php-zip postgresql-client php-gd php-xmlrpc php-mysql php-mysql
       - run: sudo pecl install xdebug
-      - run: pecl install channel://pecl.php.net/xmlrpc-1.0.0RC3 xmlrpc
+      - run: sudo pecl install channel://pecl.php.net/xmlrpc-1.0.0RC3 xmlrpc
 
       # We now need Node 18 for Playwright.
       - run: sudo curl -sL https://deb.nodesource.com/setup_18.x | sudo bash -
