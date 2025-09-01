@@ -131,7 +131,7 @@ jobs:
       - run: sudo bash -c "echo 'Acquire::Retries "3";' > /etc/apt/apt.conf.d/80-retries"
       - run: sudo apt update
       - run: sudo apt install dnsutils openssl zip unzip git libxml2-dev libzip-dev zlib1g-dev libcurl4-openssl-dev iputils-ping default-mysql-client vim libpng-dev libgmp-dev libjpeg-turbo8-dev
-      - run: sudo apt-get install php-xmlrpc php8.1-intl php8.1-xdebug php8.1-mbstring php8.1-simplexml php8.1-curl php8.1-zip postgresql-client php8.1-gd php8.1-xmlrpc php8.1-mysql php-mysql
+      - run: sudo apt-get install php-xmlrpc php8.2-intl php8.2-xdebug php8.2-mbstring php8.2-simplexml php8.2-curl php8.2-zip postgresql-client php8.2-gd php8.2-xmlrpc php8.2-mysql php-mysql
       - run: sudo pecl install xdebug
 
       # We now need Node 18 for Playwright.
@@ -170,7 +170,7 @@ jobs:
       # ...and needs honeypot rate-limiting needs to be turned off.
       - run: sed -i 's/HONEYPOT_DISABLE=.*$/HONEYPOT_DISABLE=TRUE/g' .env
 
-      - run: wget https://getcomposer.org/composer-2.phar -O composer.phar; rm -rf vendor; echo Y | php8.1 composer.phar install
+      - run: wget https://getcomposer.org/composer-2.phar -O composer.phar; rm -rf vendor; echo Y | php8.2 composer.phar install
       - run: npm install
       - run: npx playwright install
       - run: npx playwright install-deps
@@ -219,10 +219,10 @@ jobs:
       - run: npx playwright install
       # Set up a real nginx/fpm server.  This improves the speed of the tests enormously as artisan serve uses the
       # single-threaded php built-in web server.
-      - run: sudo apt-get install nginx php8.1-fpm php8.1-mysql php8.1-pdo
+      - run: sudo apt-get install nginx php8.2-fpm php8.2-mysql php8.2-pdo
       - run: sudo cp /home/circleci/project/.circleci/nginx.conf /etc/nginx/sites-available/default
-      - run: sudo sed -i 's/www-data/circleci/g' /etc/php/8.1/fpm/pool.d/www.conf
-      - run: sudo /etc/init.d/php8.1-fpm start
+      - run: sudo sed -i 's/www-data/circleci/g' /etc/php/8.2/fpm/pool.d/www.conf
+      - run: sudo /etc/init.d/php8.2-fpm start
       - run: sudo sed -i 's/user .*;/user circleci;/g' /etc/nginx/nginx.conf
       - run: sudo /etc/init.d/nginx start
       # We're running against localhost.
