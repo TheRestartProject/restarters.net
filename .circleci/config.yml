@@ -9,7 +9,7 @@ dependencies:
 jobs:
   build:
     docker:
-      - image: cimg/php:8.2.28-node
+      - image: cimg/php:8.1.12-node
         name: restarters.test
         environment:
           - DB_CONNECTION: mysql
@@ -19,7 +19,7 @@ jobs:
           - DB_USERNAME: restarters
           - DB_PASSWORD: s3cr3t
           - TZ: "UTC"
-      - image: cimg/mysql:8.0
+      - image: cimg/mysql:5.7.36
         environment:
           # You can connect once ssh'd in using  mysql -u root -p -h 127.0.0.1
           - MYSQL_ROOT_PASSWORD: s3cr3t
@@ -37,7 +37,7 @@ jobs:
           - MARIADB_PORT_NUMBER=3307
           - MARIADB_USER=bn_mediawiki
           - MARIADB_DATABASE=bitnami_mediawiki
-      - image: 'bitnami/mediawiki-archived:1'
+      - image: 'bitnami/mediawiki:1'
         name: mediawiki
         labels:
           kompose.service.type: nodeport
@@ -131,9 +131,8 @@ jobs:
       - run: sudo bash -c "echo 'Acquire::Retries "3";' > /etc/apt/apt.conf.d/80-retries"
       - run: sudo apt update
       - run: sudo apt install dnsutils openssl zip unzip git libxml2-dev libzip-dev zlib1g-dev libcurl4-openssl-dev iputils-ping default-mysql-client vim libpng-dev libgmp-dev libjpeg-turbo8-dev
-      - run: sudo apt-get install php-xmlrpc php-intl php-xdebug php-mbstring php-simplexml php-curl php-zip postgresql-client php-gd php-xmlrpc php-mysql php-mysql
+      - run: sudo apt-get install php-xmlrpc php8.1-intl php8.1-xdebug php8.1-mbstring php8.1-simplexml php8.1-curl php8.1-zip postgresql-client php8.1-gd php8.1-xmlrpc php8.1-mysql php-mysql
       - run: sudo pecl install xdebug
-      - run: sudo pecl install channel://pecl.php.net/xmlrpc-1.0.0RC3 xmlrpc
 
       # We now need Node 18 for Playwright.
       - run: sudo curl -sL https://deb.nodesource.com/setup_18.x | sudo bash -
@@ -171,14 +170,14 @@ jobs:
       # ...and needs honeypot rate-limiting needs to be turned off.
       - run: sed -i 's/HONEYPOT_DISABLE=.*$/HONEYPOT_DISABLE=TRUE/g' .env
 
-      - run: wget https://getcomposer.org/composer-2.phar -O composer.phar; rm -rf vendor; echo Y | php composer.phar install
+      - run: wget https://getcomposer.org/composer-2.phar -O composer.phar; rm -rf vendor; echo Y | php8.1 composer.phar install
       - run: npm install
+      - run: php artisan lang:js --no-lib resources/js/translations.js
       - run: npx playwright install
       - run: npx playwright install-deps
       - run: npm install -D @playwright/test
 
       - run: php artisan key:generate
-      - run: mysql --host="127.0.0.1" -u root -ps3cr3t -e "SET PERSIST log_bin_trust_function_creators = 1;"
       - run: php artisan migrate
       - run: php artisan l5-swagger:generate
 
@@ -201,29 +200,25 @@ jobs:
            command: export XDEBUG_MODE=coverage;./phpunit -d memory_limit=1024M --bootstrap vendor/autoload.php --coverage-clover tests/clover.xml --configuration ./phpunit.xml
            no_output_timeout: 45m
 
-      # Coveralls is pernickety about the location it uploads from existing.
-      - run: mkdir build; mkdir build/logs; php vendor/bin/php-coveralls -v -x tests/clover.xml
-
       # Run the Jest tests.
       - run: npm run jest
 
       # Run the Playwright tests.
       #
       # Zap groups set up by the UT; this can confuse Playwright tests.
-      - run: mysql --host="127.0.0.1" -u root -ps3cr3t -e "use restarters_db;SET foreign_key_checks=0;DELETE FROM \`groups\` WHERE location IS NULL;SET foreign_key_checks=1;"
-      - run: php artisan cache:clear
+      - run: mysql --host="127.0.0.1" -u root -ps3cr3t -e "use restarters_db;SET foreign_key_checks=0;DELETE FROM groups WHERE location IS NULL;SET foreign_key_checks=1;"
       # Ignore the return code from the tinker; the user might exist from the phpunit tests.  If it doesn't and
       # the create fails, the tests will fail too.
       - run: echo "App\User::create(['name'=>'Jane Bloggs','email'=>'jane@bloggs.net','password'=>Hash::make('passw0rd'),'role'=>2,'consent_past_data'=>'2021-01-01','consent_future_data'=>'2021-01-01','consent_gdpr'=>'2021-01-01']);" | php artisan tinker || true
       # Build the web app.
-      - run: export NODE_OPTIONS=--max-old-space-size=8192;  npm rebuild node-sass; npm run prod
+      - run: export NODE_OPTIONS=--max-old-space-size=8192; npm run build
       - run: npx playwright install
       # Set up a real nginx/fpm server.  This improves the speed of the tests enormously as artisan serve uses the
       # single-threaded php built-in web server.
-      - run: sudo apt-get install nginx php-fpm php-mysql php-pdo
+      - run: sudo apt-get install nginx php8.1-fpm php8.1-mysql php8.1-pdo
       - run: sudo cp /home/circleci/project/.circleci/nginx.conf /etc/nginx/sites-available/default
-      - run: sudo sed -i 's/www-data/circleci/g' /etc/php/8.2/fpm/pool.d/www.conf
-      - run: sudo /etc/init.d/php-fpm start
+      - run: sudo sed -i 's/www-data/circleci/g' /etc/php/8.1/fpm/pool.d/www.conf
+      - run: sudo /etc/init.d/php8.1-fpm start
       - run: sudo sed -i 's/user .*;/user circleci;/g' /etc/nginx/nginx.conf
       - run: sudo /etc/init.d/nginx start
       # We're running against localhost.
@@ -237,36 +232,10 @@ jobs:
       # Comment out throttle:api in App/Http/Kernel.php otherwise it kicks in during Playwright tests.
       - run: sudo sed -i 's/.throttle:api.,//g' /home/circleci/project/app/Http/Kernel.php
 
-      # Determine which port to use for Playwright tests
-      - run:
-          name: Check if port 8000 is available
-          command: |
-            if nc -z localhost 8000; then
-              echo "export PLAYWRIGHT_BASE_URL=http://localhost:8000" >> $BASH_ENV
-              echo "Port 8000 is open, using localhost:8000"
-            else
-              echo "export PLAYWRIGHT_BASE_URL=http://localhost" >> $BASH_ENV
-              echo "Port 8000 not available, using localhost"
-            fi
-      
       # Now run the tests.
       - run:
           name: Playwright Tests
           no_output_timeout: 10m
-          command: |
-            source $BASH_ENV
-            # Enable debug logging for Playwright tests in CI
-            export PLAYWRIGHT_DEBUG=true
-            export DEBUG=playwright
-            npx playwright test --reporter=list
-      
-      # Store test artifacts (screenshots, videos, traces, test reports)
-      - store_artifacts:
-          path: /tmp/test-results
-          destination: playwright-test-results
-      
-      # Store test results for CircleCI UI
-      - store_test_results:
-          path: /tmp/test-results
+          command: npx playwright test --reporter=list
 
 
