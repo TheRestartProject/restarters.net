@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "da1061208d4d8b9e0a9887d89d0892bc",
+    "content-hash": "58e367724a0cb582befb5a878f939819",
     "packages": [
         {
             "name": "addwiki/mediawiki-api",
@@ -10262,6 +10262,61 @@
             "time": "2022-07-30T11:09:43+00:00"
         },
         {
+            "name": "wouternl/laravel-drip",
+            "version": "dev-master",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/TheRestartProject/laravel-drip.git",
+                "reference": "424e5fa2bc9493f118cc482fb37007738a15a79f"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/TheRestartProject/laravel-drip/zipball/424e5fa2bc9493f118cc482fb37007738a15a79f",
+                "reference": "424e5fa2bc9493f118cc482fb37007738a15a79f",
+                "shasum": ""
+            },
+            "require": {
+                "laravel/framework": "5.2.*|5.3.*|5.4.*|5.5.*|5.6.*|5.7.*|5.8.*|^6.0|^7.0|^8.0|^9.0|^10.0",
+                "php": ">=8.1.0"
+            },
+            "default-branch": true,
+            "type": "package",
+            "extra": {
+                "laravel": {
+                    "providers": [
+                        "wouterNL\\Drip\\DripServiceProvider"
+                    ],
+                    "aliases": {
+                        "Drip": "wouterNL\\Drip\\Facades\\DripFacade"
+                    }
+                }
+            },
+            "autoload": {
+                "psr-4": {
+                    "wouterNL\\Drip\\": "src"
+                }
+            },
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Drip",
+                    "homepage": "https://github.com/DripEmail/drip-php"
+                },
+                {
+                    "name": "Wouter Steegers",
+                    "email": "wouter42@gmail.com"
+                }
+            ],
+            "description": "A Laravel wrapper for Drip's REST API v2.0",
+            "homepage": "https://bitbucket.org/wouterNL/laravel-drip-php",
+            "support": {
+                "source": "https://github.com/TheRestartProject/laravel-drip/tree/master"
+            },
+            "time": "2025-08-11T08:58:00+00:00"
+        },
+        {
             "name": "zircote/swagger-php",
             "version": "4.11.1",
             "source": {
@@ -14070,7 +14125,9 @@
     ],
     "aliases": [],
     "minimum-stability": "stable",
-    "stability-flags": {},
+    "stability-flags": {
+        "wouternl/laravel-drip": 20
+    },
     "prefer-stable": true,
     "prefer-lowest": false,
     "platform": {

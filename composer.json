@@ -44,6 +44,7 @@
         "symfony/http-foundation": "^6.2",
         "symfony/mailgun-mailer": "^6.2",
         "toin0u/geocoder-laravel": "^4.6",
+        "wouternl/laravel-drip": "dev-master",
         "twbs/bootstrap": "4.1.0"
     },
     "require-dev": {
@@ -105,5 +106,11 @@
         }
     },
     "minimum-stability": "stable",
-    "prefer-stable": true
+    "prefer-stable": true,
+    "repositories": {
+        "laravel-drip": {
+            "type": "vcs",
+            "url": "https://github.com/TheRestartProject/laravel-drip"
+        }
+    }
 }
