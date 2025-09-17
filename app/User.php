@@ -131,7 +131,7 @@ class User extends Authenticatable implements Auditable, HasLocalePreference
         }
 
         $groupsNearbyQuery = Group::select(
-            '*, ( 6371 * acos( cos( radians('.$this->latitude.' ) * cos( radians( latitude ) ) * cos( radians( longitude ) - radians('.$this->longitude.') ) + sin( radians('.$this->latitude.') ) * sin( radians( latitude ) ) ) ) AS dist'
+            '*, ( 6371 * acos( cos( radians('.$this->latitude.') ) * cos( radians( latitude ) ) * cos( radians( longitude ) - radians('.$this->longitude.') ) + sin( radians('.$this->latitude.') ) * sin( radians( latitude ) ) ) ) AS dist'
         )->where(function ($q) {
             $q->whereNull('archived_at');
 
