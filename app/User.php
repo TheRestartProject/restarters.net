@@ -130,8 +130,9 @@ class User extends Authenticatable implements Auditable, HasLocalePreference
             return [];
         }
 
-        $groupsNearbyQuery = Group::select(
-            '*, ( 6371 * acos( cos( radians('.$this->latitude.') ) * cos( radians( latitude ) ) * cos( radians( longitude ) - radians('.$this->longitude.') ) + sin( radians('.$this->latitude.') ) * sin( radians( latitude ) ) ) ) AS dist'
+        $groupsNearbyQuery = Group::selectRaw(
+            '*, ( 6371 * acos( cos( radians(?) ) * cos( radians( latitude ) ) * cos( radians( longitude ) - radians(?) ) + sin( radians(?) ) * sin( radians( latitude ) ) ) ) AS dist',
+            [$this->latitude, $this->longitude, $this->latitude]
         )->where(function ($q) {
             $q->whereNull('archived_at');
 
@@ -319,7 +320,7 @@ class User extends Authenticatable implements Auditable, HasLocalePreference
 
     public function scopeNearbyRestarters($query, $latitude, $longitude, $radius = 20)
     {
-        return $query->select('*, ( 6371 * acos( cos( radians('.$latitude.' ) * cos( radians( latitude ) ) * cos( radians( longitude ) - radians('.$longitude.') ) + sin( radians('.$latitude.') ) * sin( radians( latitude ) ) ) ) AS distance')
+        return $query->selectRaw('*, ( 6371 * acos( cos( radians(?) ) * cos( radians( latitude ) ) * cos( radians( longitude ) - radians(?) ) + sin( radians(?) ) * sin( radians( latitude ) ) ) ) AS distance', [$latitude, $longitude, $latitude])
                         ->whereNotNull('location')
                           ->whereNotNull('latitude')
                             ->whereNotNull('longitude')

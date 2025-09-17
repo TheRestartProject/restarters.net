@@ -171,6 +171,105 @@ tasks:
     cmds:
       - docker exec -it restarters php artisan "{{ .CLI_ARGS }}"
 
+  docker:test:phpunit:
+    desc: Run PHPUnit tests in the core application container.
+    summary: |
+      Run PHPUnit tests with the same configuration used in CircleCI.
+      This ensures consistency between local development and CI environments.
+
+      The command includes:
+      - Memory limit set to 1024M
+      - Coverage reporting (clover.xml)
+      - JUnit XML output for CI integration
+      - TeamCity output format for better test reporting
+      - Coverage upload to Coveralls if COVERALLS_REPO_TOKEN is set
+
+      Use this task instead of running phpunit directly to maintain consistency.
+
+    cmds:
+      - mkdir -p /tmp/test-results/phpunit
+      - docker exec restarters bash -c "export XDEBUG_MODE=coverage; ./vendor/bin/phpunit -d memory_limit=1024M --bootstrap vendor/autoload.php --coverage-clover tests/clover.xml --log-junit /tmp/phpunit-results.xml --configuration ./phpunit.xml --teamcity"
+      - |
+        if [ ! -z "$COVERALLS_REPO_TOKEN" ]; then
+          echo "Uploading coverage to Coveralls..."
+          docker exec -e COVERALLS_REPO_TOKEN="$COVERALLS_REPO_TOKEN" restarters bash -c "mkdir -p build/logs && php vendor/bin/php-coveralls -v -x tests/clover.xml"
+        else
+          echo "COVERALLS_REPO_TOKEN not set, skipping coverage upload"
+        fi
+
+  docker:test:jest:
+    desc: Run Jest tests in the core application container.
+    summary: |
+      Run Jest tests with JUnit output for CI integration.
+      This ensures consistency between local development and CI environments.
+
+    cmds:
+      - mkdir -p /tmp/test-results/jest
+      - docker exec restarters bash -c "npm i jest-junit; JEST_JUNIT_OUTPUT_DIR=/tmp/test-results npm run jest -- --testResultsProcessor=jest-junit"
+
+  docker:test:playwright:
+    desc: Run Playwright tests in the core application container.
+    summary: |
+      Run Playwright end-to-end tests with the same configuration used in CircleCI.
+      This ensures consistency between local development and CI environments.
+
+      The command includes:
+      - Environment variables for test configuration
+      - HTML report generation
+      - Proper test isolation
+
+    cmds:
+      - mkdir -p /tmp/test-results/playwright
+      - docker exec restarters bash -c "php artisan cache:clear"
+      - docker exec restarters bash -c "echo \"DB::statement('SET foreign_key_checks=0'); App\\\\Device::truncate(); DB::statement('SET foreign_key_checks=1');\" | php artisan tinker" || true
+      - docker exec restarters bash -c "echo \"App\\\\User::firstOrCreate(['email'=>'jane@bloggs.net'], ['name'=>'Jane Bloggs','password'=>Hash::make('passw0rd'),'role'=>2,'consent_past_data'=>'2021-01-01','consent_future_data'=>'2021-01-01','consent_gdpr'=>'2021-01-01']);\" | php artisan tinker" || true
+      - docker exec restarters bash -c "export NODE_OPTIONS=--max-old-space-size=8192; npm run build"
+      - docker exec restarters bash -c "sed -i 's/.throttle:api.,//g' /var/www/app/Http/Kernel.php"
+      - |
+        docker exec restarters bash -c "
+          export PLAYWRIGHT_TEST=true
+          export PLAYWRIGHT_DEBUG=true
+          export PWTEST_SKIP_TEST_OUTPUT=0
+          export DEBUG=playwright
+          export PLAYWRIGHT_BASE_URL=http://restarters_nginx
+          export PW_TEST_HTML_REPORT_OPEN=never
+          export FORCE_COLOR=1
+          stdbuf -oL -eL npx playwright test --reporter=html
+        "
+
+  docker:test:playwright-autocomplete:
+    desc: Run Playwright autocomplete tests in the core application container.
+    summary: |
+      Run Playwright autocomplete tests with special setup data.
+      This test requires specific test data setup before running.
+
+    cmds:
+      - mkdir -p /tmp/test-results/playwright-autocomplete
+      - |
+        echo "Setting up test data for autocomplete test..."
+        docker exec restarters bash -c "
+          php artisan tinker setup-autocomplete-test-data.php > /tmp/setup-output.log 2>&1
+          if grep -q 'Test data setup complete!' /tmp/setup-output.log; then
+            echo 'Setup completed successfully!'
+            cat /tmp/setup-output.log
+          else
+            echo 'Setup failed!'
+            cat /tmp/setup-output.log
+            exit 1
+          fi
+        "
+      - |
+        docker exec restarters bash -c "
+          export PLAYWRIGHT_TEST=true
+          export PLAYWRIGHT_DEBUG=true
+          export PWTEST_SKIP_TEST_OUTPUT=0
+          export DEBUG=playwright
+          export PLAYWRIGHT_BASE_URL=http://restarters_nginx
+          export PW_TEST_HTML_REPORT_OPEN=never
+          export FORCE_COLOR=1
+          stdbuf -oL -eL npx playwright test --config=playwright.autocomplete.config.js --reporter=html
+        "
+
   docker:wait-for-services-*:
     desc: Wait for Docker services to be ready and responding for a given profile (Usage - task docker:wait-for-services-[core|debug|discourse|all])
     summary: |

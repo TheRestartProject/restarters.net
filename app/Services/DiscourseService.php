@@ -159,10 +159,22 @@ class DiscourseService
             }
             $discourseResult = json_decode($response->getBody());
 
+            // Check for JSON error responses (like {"errors":["..."], "error_type":"not_found"})
+            if (property_exists($discourseResult, 'error_type') && $discourseResult->error_type == 'not_found') {
+                Log::warning("{$endpoint} returned not_found error - trust_level_0 group may not exist or be accessible");
+                return []; // Return empty array instead of throwing exception for missing groups
+            }
+
             // We seem to get rate-limited in a way that the 429 retrying doesn't cover, so spot that here.
             $limited = property_exists($discourseResult, 'error_type') && $discourseResult->error_type == 'rate_limit';
 
             if (! $limited) {
+                // Check if members property exists before accessing it
+                if (! property_exists($discourseResult, 'members')) {
+                    Log::warning("{$endpoint} response missing 'members' property, got: " . json_encode($discourseResult));
+                    return []; // Return empty array for unexpected response format
+                }
+
                 $users = $discourseResult->members;
                 Log::info('...process '.count($users));
 

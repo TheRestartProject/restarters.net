@@ -1038,7 +1038,7 @@ class GroupController extends Controller
         }
 
         if (!empty($location)) {
-            $geocoder = new \App\Helpers\Geocoder();
+            $geocoder = app(\App\Helpers\Geocoder::class);
             $geocoded = $geocoder->geocode($location);
 
             if (empty($geocoded))

@@ -174,7 +174,7 @@ services:
   # psql -h postgresql -U bn_discourse -p 5432 -w bitnami_discourse
   postgresql:
     profiles: ["discourse"]
-    image: docker.io/bitnami/postgresql:11
+    image: docker.io/bitnami/postgresql
     container_name: postgresql
     volumes:
       - 'postgresql_data:/bitnami/postgresql'
