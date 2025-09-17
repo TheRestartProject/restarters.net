@@ -89,45 +89,11 @@ test('Automatic category suggestion from item type', async ({page, baseURL}) => 
       { itemType: 'Heater', expectedCategory: 'None of the above', powered: true }
     ]
 
-    // Set up test data: create multiple devices for each item type to ensure autocomplete works
-    // The getItemTypes() method uses a count-based algorithm, so we need sufficient data
-    console.log('Setting up autocomplete test data...')
-    
-    let deviceCount = 0
-    
-    // Create the expected mappings (5 devices each to ensure they win the count algorithm)
-    for (const testCase of testCases) {
-      console.log(`Creating 5 devices for '${testCase.itemType}' → '${testCase.expectedCategory}'`)
-      
-      for (let i = 0; i < 5; i++) {
-        await addDevice(page, baseURL, eventid, testCase.powered, false, false, false, testCase.itemType, testCase.expectedCategory)
-        deviceCount++
-      }
-    }
-    
-    // Create some conflicting data with fewer items to ensure our expected categories win
-    const conflictingData = [
-      { itemType: 'Food processor', category: 'None of the above', count: 2 },
-      { itemType: 'TV', category: 'Flat screen 15-17"', count: 3 },
-      { itemType: 'Phone', category: 'Handheld entertainment device', count: 2 },
-      { itemType: 'Printer', category: 'PC accessory', count: 1 },
-      { itemType: 'Toaster', category: 'Small kitchen item', count: 2 }
-    ]
-    
-    for (const conflict of conflictingData) {
-      console.log(`Creating ${conflict.count} conflicting devices for '${conflict.itemType}' → '${conflict.category}'`)
-      
-      for (let i = 0; i < conflict.count; i++) {
-        await addDevice(page, baseURL, eventid, true, false, false, false, conflict.itemType, conflict.category)
-        deviceCount++
-      }
-    }
-    
-    console.log(`Created ${deviceCount} test devices successfully`)
-    
-    console.log('Testing autocomplete functionality...')
+    // Test data is now set up by the PHP script in CircleCI before this test runs
     // Note: The items.js store will automatically fetch fresh data since we're running under Playwright
+    console.log('Testing autocomplete functionality...')
     for (const testCase of testCases) {
+      console.log('Testing', testCase.itemType, testCase.expectedCategory, testCase.powered)
       
       // Test the UI behavior for category autocomplete
       // Go to event view page

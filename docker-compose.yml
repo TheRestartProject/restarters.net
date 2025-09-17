@@ -70,8 +70,6 @@
 # TODO This is stock Discourse - no theme.  Would be nice to have the theme, but that doesn't matter so far as
 # testing the integration.
 
-version: '3'
-
 services:
   # Core services - always enabled
   restarters:
@@ -93,6 +91,7 @@ services:
       SERVICE_TAGS: dev
       UID: ${UID}
       GID: ${GID}
+      CIRCLECI: ${CIRCLECI:-false}
     working_dir: /var/www
     volumes:
       # We share the current folder into /var/www.  This means code changes on the host will get picked up
@@ -119,7 +118,7 @@ services:
 
   restarters_db:
     profiles: ["core", "debug", "discourse"]
-    image: mysql:5.7.33
+    image: mysql:8.0
     container_name: restarters_db
     restart: unless-stopped
     tty: true

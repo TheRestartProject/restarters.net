@@ -15,6 +15,9 @@ use Tests\TestCase;
 
 class RecoverTest extends TestCase
 {
+    private $recovery = null;
+    private $recoveryCode = null;
+
     private function getCode($recovery) {
         if (preg_match('/recovery=(.*?)($|&)/', $recovery, $matches)) {
             return($matches[1]);

@@ -86,6 +86,26 @@ task docker:up-discourse
 task docker:up-all
 ```
 
+**Waiting for Services to be Ready**
+
+After starting services, you can wait for them to be fully ready and responding:
+
+```bash
+# Wait for core services to be ready
+task docker:wait-for-services-core
+
+# Wait for debug services to be ready
+task docker:wait-for-services-debug
+
+# Wait for Discourse services to be ready  
+task docker:wait-for-services-discourse
+
+# Wait for all services to be ready
+task docker:wait-for-services-all
+```
+
+The wait commands will check that services are listening on their expected ports and return proper responses.
+
 ### 4. Initial Setup
 
 The core application container will automatically:
@@ -131,6 +151,13 @@ task docker:run:bash -- [command]
 
 # Run an artisan command
 task docker:run:artisan -- [command]
+```
+
+### Checking Service Health
+
+```bash
+# View container logs if services aren't starting properly
+task docker:logs
 ```
 
 ### Stopping the Environment

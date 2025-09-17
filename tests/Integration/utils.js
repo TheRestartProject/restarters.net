@@ -189,7 +189,7 @@ exports.addDevice = async function(page, baseURL, idevents, powered, photo, fixe
 
   // Get current device count.
   await page.waitForSelector(addsel)
-  var current = await page.locator('h3:visible').count()
+  var current = await page.locator('.device-info:visible').count()
   log('Current device count', { current })
 
   // Click the add button.
@@ -244,7 +244,7 @@ exports.addDevice = async function(page, baseURL, idevents, powered, photo, fixe
 
   // Wait for device to show.
   log('Waiting for device to appear in list')
-  await expect(page.locator('h3:visible')).toHaveCount(current + 1)
+  await expect(page.locator('.device-info:visible')).toHaveCount(current + 1)
 
   // Check that the photo appears.
   log('Opening device for verification')
@@ -273,6 +273,32 @@ exports.addDevice = async function(page, baseURL, idevents, powered, photo, fixe
   await expect(page.locator('.device-age-summary:visible').last()).toHaveText('-')
   
   log('Device added successfully')
+}
+
+// Fast device creation for bulk test data - skips verification steps
+exports.addDeviceFast = async function(page, baseURL, idevents, powered, itemType, category) {
+  log('Starting fast device addition', { idevents, powered, itemType, category })
+  
+  var addsel = powered ? '.add-powered-device-desktop' : '.add-unpowered-device-desktop'
+  
+  // Click the add button.
+  await page.locator(addsel).click()
+
+  // Set item type
+  await page.fill('.item-type:visible input', itemType)
+  await page.keyboard.press('Tab')
+
+  // Set category
+  await page.keyboard.type(category)
+  await page.keyboard.press('Enter')
+
+  // Submit without verification
+  await page.locator('text=Add item >> visible=true').click()
+  
+  // Wait briefly for submission to complete
+  await page.waitForTimeout(500)
+  
+  log('Fast device added successfully')
 }
 
 exports.unfollowGroup = async function(page, idgroups) {

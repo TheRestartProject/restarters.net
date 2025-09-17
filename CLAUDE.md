@@ -148,3 +148,6 @@ npm test
 
 ## Development Warnings
 - Don't try to test changes when you're running on Windows.
+
+## Workflow Guidelines
+- When you create files, add them to git
