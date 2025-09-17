@@ -144,6 +144,10 @@ npm test
 - Image handling via intervention/image with custom sizing
 - Custom validation rules in `app/Rules/`
 - Event-driven architecture with model observers
+- Only translate fr and fr-BE
+
+## Development Warnings
+- Don't try to test changes when you're running on Windows.
 
 ## Workflow Guidelines
 - When you create files, add them to git
