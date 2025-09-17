@@ -4,7 +4,6 @@
 # - A Database: Exposed on port 3306 internally
 #
 # TODO The domain name could be better but needs some configuration on the Discourse images which is hard.
-# TODO It doesn't yet include the wiki.
 # TODO If your host is Linux, this probably only works if you run as root.
 #
 # On the machine where you will be using your browser to access the Restarters / Discourse sites once set up on Docker,
