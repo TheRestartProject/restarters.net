@@ -116,6 +116,7 @@ class EditTest extends TestCase
         $params = [];
 
         $response = $this->json('POST', '/device/image-upload/' . $iddevices, $params);
+        $response->assertSuccessful();
         $ret = json_decode($response->getContent(), TRUE);
         self::assertEquals(true, $ret['success']);
         self::assertEquals($iddevices, $ret['iddevices']);

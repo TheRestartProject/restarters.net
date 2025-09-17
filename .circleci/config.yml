@@ -1,241 +1,245 @@
-version: 2
+version: 2.1
 
-dependencies:
-  pre:
-    - curl -L -o google-chrome.deb https://dl.google.com/linux/direct/google-chrome-stable_current_amd64.deb
-    - sudo dpkg -i google-chrome.deb
-    - sudo sed -i 's|HERE/chrome\"|HERE/chrome\" --disable-setuid-sandbox|g' /opt/google/chrome/google-chrome
-    - rm google-chrome.deb
 jobs:
   build:
-    docker:
-      - image: cimg/php:8.1.12-node
-        name: restarters.test
-        environment:
-          - DB_CONNECTION: mysql
-          - DB_HOST: 127.0.0.1
-          - DB_PORT: 3306
-          - DB_DATABASE: restarters_db
-          - DB_USERNAME: restarters
-          - DB_PASSWORD: s3cr3t
-          - TZ: "UTC"
-      - image: cimg/mysql:5.7.36
-        environment:
-          # You can connect once ssh'd in using  mysql -u root -p -h 127.0.0.1
-          - MYSQL_ROOT_PASSWORD: s3cr3t
-          - MYSQL_DATABASE: restarters_db
-          - MYSQL_USER: restarters
-          - MYSQL_PASSWORD: s3cr3t
-      - image: mcr.microsoft.com/playwright:focal
-        environment:
-          NODE_ENV: development
-          TZ: "UTC"
-      - image: 'bitnami/mariadb:latest'
-        name: mariadb
-        environment:
-          - ALLOW_EMPTY_PASSWORD=yes
-          - MARIADB_PORT_NUMBER=3307
-          - MARIADB_USER=bn_mediawiki
-          - MARIADB_DATABASE=bitnami_mediawiki
-      - image: 'bitnamilegacy/mediawiki-archived'
-        name: mediawiki
-        labels:
-          kompose.service.type: nodeport
-        environment:
-          - MEDIAWIKI_DATABASE_HOST=mariadb
-          - MEDIAWIKI_DATABASE_PORT_NUMBER=3307
-          - MEDIAWIKI_DATABASE_USER=bn_mediawiki
-          - MEDIAWIKI_DATABASE_NAME=bitnami_mediawiki
-          - ALLOW_EMPTY_PASSWORD=yes
-          - MEDIAWIKI_EXTERNAL_HTTP_PORT_NUMBER=8080
-          - MEDIAWIKI_HOST=mediawiki
-          - TZ: "UTC"
-        depends_on:
-          - mariadb
-        entrypoint:
-          - /bin/bash
-          - -c
-          - sleep 60; /opt/bitnami/scripts/mediawiki/entrypoint.sh "/opt/bitnami/scripts/apache/run.sh"
-      - image: 'docker.io/bitnami/postgresql:11'
-        name: postgresql
-# No volumes on CircleCI
-#        volumes:
-#          - 'postgresql_data:/bitnami/postgresql'
-        environment:
-          - ALLOW_EMPTY_PASSWORD=yes
-          - POSTGRESQL_USERNAME=bn_discourse
-          - POSTGRESQL_DATABASE=bitnami_discourse
-# No networks on CircleCI
-#    networks:
-#      - app-network
-
-      - image: docker.io/bitnami/redis:6.0
-        name: restarters_discourse_redis
-        environment:
-          - ALLOW_EMPTY_PASSWORD=yes
-#        volumes:
-#          - 'redis_data:/bitnami/discourse'
-#        networks:
-#          - app-network
-
-      - image: docker.io/bitnami/discourse:2
-        name: restarters_discourse
-# No ports on CircleCI
-#        ports:
-#          - '8003:80'
-#        volumes:
-#          - 'discourse_data:/bitnami/discourse'
-        depends_on:
-          - postgresql
-          - restarters_discourse_redis
-        environment:
-          - ALLOW_EMPTY_PASSWORD=yes
-          - DISCOURSE_USERNAME=someuser
-          - DISCOURSE_PASSWORD=mustbetencharacters
-          - DISCOURSE_HOST=www.example.com:8003
-          - DISCOURSE_PORT_NUMBER=80
-          - DISCOURSE_DATABASE_HOST=postgresql
-          - DISCOURSE_DATABASE_PORT_NUMBER=5432
-          - DISCOURSE_DATABASE_USER=bn_discourse
-          - DISCOURSE_DATABASE_NAME=bitnami_discourse
-          - DISCOURSE_REDIS_HOST=restarters_discourse_redis
-          - DISCOURSE_REDIS_PORT_NUMBER=6379
-          - POSTGRESQL_CLIENT_POSTGRES_USER=postgres
-          - POSTGRESQL_CLIENT_CREATE_DATABASE_NAME=bitnami_discourse
-          - POSTGRESQL_CLIENT_CREATE_DATABASE_EXTENSIONS=hstore,pg_trgm
-          - DISCOURSE_EXTRA_CONF_CONTENT=personal_message_enabled_groups \= 10
-#    networks:
-#      - app-network
-
-      - image: docker.io/bitnami/discourse:latest
-        name: restarters_discourse_sidekiq
-        depends_on:
-          - restarters_discourse
-#        volumes:
-#          - 'sidekiq_data:/bitnami/discourse'
-        command: /opt/bitnami/scripts/discourse-sidekiq/run.sh
-        environment:
-          - ALLOW_EMPTY_PASSWORD=yes
-          - DISCOURSE_HOST=www.example.com
-          - DISCOURSE_DATABASE_HOST=postgresql
-          - DISCOURSE_DATABASE_PORT_NUMBER=5432
-          - DISCOURSE_DATABASE_USER=bn_discourse
-          - DISCOURSE_DATABASE_NAME=bitnami_discourse
-          - DISCOURSE_REDIS_HOST=restarters_discourse_redis
-          - DISCOURSE_REDIS_PORT_NUMBER=6379
-#        networks:
-#          - app-network
+    machine:
+      image: ubuntu-2204:current
+    resource_class: large
+    environment:
+      - TZ: "UTC"
 
     steps:
       - checkout
-      - run: sudo bash -c "echo 'Acquire::Retries "3";' > /etc/apt/apt.conf.d/80-retries"
-      - run: sudo apt update
-      - run: sudo apt install dnsutils openssl zip unzip git libxml2-dev libzip-dev zlib1g-dev libcurl4-openssl-dev iputils-ping default-mysql-client vim libpng-dev libgmp-dev libjpeg-turbo8-dev
-      - run: sudo apt-get install php-xmlrpc php8.1-intl php8.1-xdebug php8.1-mbstring php8.1-simplexml php8.1-curl php8.1-zip postgresql-client php8.1-gd php8.1-xmlrpc php8.1-mysql php-mysql
-      - run: sudo pecl install xdebug
-
-      # We now need Node 18 for Playwright.
-      - run: sudo curl -sL https://deb.nodesource.com/setup_18.x | sudo bash -
-      - run: sudo apt update
-      - run: sudo apt -y install nodejs
-      - run: sudo rm /usr/local/bin/node
-
-      - run: cp .env.example .env
-
-      # Need access to timezones.
-      - run: mysql --host="127.0.0.1" -u root -ps3cr3t -e "GRANT SELECT ON mysql.time_zone_name TO 'restarters'@'%';"
-
-      # We have Discourse on CircleCI.  The API key is inserted using psql below.
-      - run: sed -i 's/FEATURE__DISCOURSE_INTEGRATION=.*$/FEATURE__DISCOURSE_INTEGRATION=true/g' .env
-      - run: sed -i 's/DISCOURSE_URL=.*$/DISCOURSE_URL=http:\/\/restarters_discourse/g' .env
-      - run: sed -i 's/DISCOURSE_APIKEY=.*$/DISCOURSE_APIKEY=fb71f38ca2b8b7cd6a041e57fd8202c9937088f0ecae7db40722bd758dda92fc/g' .env
-      - run: sed -i 's/DISCOURSE_APIUSER=.*$/DISCOURSE_APIUSER=someuser/g' .env
-
-      # ...and Mediawiki.
-      # Disable wiki as problems getting that running.
-      # - run: sed -i 's/FEATURE__WIKI_INTEGRATION=.*$/FEATURE__WIKI_INTEGRATION=true/g' .env
-      - run: sed -i 's/WIKI_URL=.*$/WIKI_URL=http:\/\/mediawiki:8080/g' .env
-      - run: sed -i 's/WIKI_DB=.*$/WIKI_DB=bitnami_mediawiki/g' .env
-      - run: sed -i 's/WIKI_USER=.*$/WIKI_USER=user/g' .env
-      - run: sed -i 's/WIKI_PASSWORD=.*$/WIKI_PASSWORD=bitnami123/g' .env
-      - run: sed -i 's/WIKI_APIUSER=.*$/WIKI_APIUSER=user/g' .env
-      - run: sed -i 's/WIKI_APIPASSWORD=.*$/WIKI_APIPASSWORD=bitnami123/g' .env
-
-      # Playwright needs the debug bar not to appear
-      - run: sed -i 's/APP_DEBUG=.*$/APP_DEBUG=FALSE/g' .env
-
-      # ...and runs on localhost.
-      - run: sed -i 's/SESSION_DOMAIN=.*$/SESSION_DOMAIN=localhost/g' .env
-
-      # ...and needs honeypot rate-limiting needs to be turned off.
-      - run: sed -i 's/HONEYPOT_DISABLE=.*$/HONEYPOT_DISABLE=TRUE/g' .env
-
-      - run: wget https://getcomposer.org/composer-2.phar -O composer.phar; rm -rf vendor; echo Y | php8.1 composer.phar install
-      - run: npm install
-      - run: php artisan lang:js --no-lib resources/js/translations.js
-      - run: npx playwright install
-      - run: npx playwright install-deps
-      - run: npm install -D @playwright/test
-
-      - run: php artisan key:generate
-      - run: php artisan migrate
-      - run: php artisan l5-swagger:generate
-
-      - run: wget -O phpunit https://phar.phpunit.de/phpunit-9.phar ; chmod +x phpunit
-
-      # The phpunit and playwright tests require an uploads directory in a slightly different place.  Not really
-      # worth fixing.
-      - run: mkdir uploads
-      - run: mkdir public/uploads
-
-      # Wait for Discourse to finish initialising.
-      - run: while ! nc -z restarters_discourse 80; do sleep 1 ; done
-
-      # Add the config we need.
-      - run: psql -h postgresql -U postgres -c "INSERT INTO api_keys (id, user_id, created_by_id, created_at, updated_at, allowed_ips, hidden, last_used_at, revoked_at, description, key_hash, truncated_key) VALUES (1, NULL, 1, '2021-10-25 13:56:20.033338', '2021-10-25 13:56:20.033338', NULL, false, NULL, NULL, 'Restarters', 'd89e9dfacfb611fbaf004807648187ce7ed474df44dcb0ada230fab5c8dd6a5b', '9fd7');" bitnami_discourse
-      - run: php artisan discourse:setting personal_message_enabled_groups 10
-
-      # Run phpunit.  Discourse makes things slow, so up the timeout.
+      
+      # Install Task
       - run:
-           command: export XDEBUG_MODE=coverage;./phpunit -d memory_limit=1024M --bootstrap vendor/autoload.php --coverage-clover tests/clover.xml --configuration ./phpunit.xml
-           no_output_timeout: 45m
+          name: Install Task
+          command: |
+            sudo sh -c "$(curl --location https://taskfile.dev/install.sh)" -- -d -b /usr/local/bin
+            task --version
 
-      # Run the Jest tests.
-      - run: npm run jest
-
-      # Run the Playwright tests.
-      #
-      # Zap groups set up by the UT; this can confuse Playwright tests.
-      - run: mysql --host="127.0.0.1" -u root -ps3cr3t -e "use restarters_db;SET foreign_key_checks=0;DELETE FROM groups WHERE location IS NULL;SET foreign_key_checks=1;"
-      # Ignore the return code from the tinker; the user might exist from the phpunit tests.  If it doesn't and
-      # the create fails, the tests will fail too.
-      - run: echo "App\User::create(['name'=>'Jane Bloggs','email'=>'jane@bloggs.net','password'=>Hash::make('passw0rd'),'role'=>2,'consent_past_data'=>'2021-01-01','consent_future_data'=>'2021-01-01','consent_gdpr'=>'2021-01-01']);" | php artisan tinker || true
-      # Build the web app.
-      - run: export NODE_OPTIONS=--max-old-space-size=8192; npm run build
-      - run: npx playwright install
-      # Set up a real nginx/fpm server.  This improves the speed of the tests enormously as artisan serve uses the
-      # single-threaded php built-in web server.
-      - run: sudo apt-get install nginx php8.1-fpm php8.1-mysql php8.1-pdo
-      - run: sudo cp /home/circleci/project/.circleci/nginx.conf /etc/nginx/sites-available/default
-      - run: sudo sed -i 's/www-data/circleci/g' /etc/php/8.1/fpm/pool.d/www.conf
-      - run: sudo /etc/init.d/php8.1-fpm start
-      - run: sudo sed -i 's/user .*;/user circleci;/g' /etc/nginx/nginx.conf
-      - run: sudo /etc/init.d/nginx start
-      # We're running against localhost.
-      - run: sudo sed -i 's/APP_URL=.*$/APP_URL=http:\/\/localhost/g' /home/circleci/project/.env
-      # Fix up Google key from CircleCI config.
-      - run: cp .env /tmp/.env
-      - run: echo "" >> /tmp/.env
-      - run: echo GOOGLE_API_CONSOLE_KEY=$GOOGLE_API_CONSOLE_KEY >> /tmp/.env
-      - run: echo MAPBOX_TOKEN=$MAPBOX_TOKEN >> /tmp/.env
-      - run: sudo cp /tmp/.env /home/circleci/project/.env
-      # Comment out throttle:api in App/Http/Kernel.php otherwise it kicks in during Playwright tests.
-      - run: sudo sed -i 's/.throttle:api.,//g' /home/circleci/project/app/Http/Kernel.php
-
-      # Now run the tests.
+      # Set up environment file
       - run:
-          name: Playwright Tests
+          name: Setup environment
+          command: |
+            cp .env.example .env
+            
+            # Configure for Docker Compose setup
+            sed -i 's/DB_HOST=.*$/DB_HOST=restarters_db/g' .env
+            sed -i 's/DB_DATABASE=.*$/DB_DATABASE=restarters_db_test/g' .env
+            sed -i 's/DB_USERNAME=.*$/DB_USERNAME=restarters/g' .env
+            sed -i 's/DB_PASSWORD=.*$/DB_PASSWORD=s3cr3t/g' .env
+            
+            # Configure Discourse integration
+            sed -i 's/FEATURE__DISCOURSE_INTEGRATION=.*$/FEATURE__DISCOURSE_INTEGRATION=true/g' .env
+            sed -i 's/DISCOURSE_URL=.*$/DISCOURSE_URL=http:\/\/restarters_discourse/g' .env
+            sed -i 's/DISCOURSE_APIKEY=.*$/DISCOURSE_APIKEY=fb71f38ca2b8b7cd6a041e57fd8202c9937088f0ecae7db40722bd758dda92fc/g' .env
+            sed -i 's/DISCOURSE_APIUSER=.*$/DISCOURSE_APIUSER=someuser/g' .env
+            
+            # Configure for testing
+            sed -i 's/APP_DEBUG=.*$/APP_DEBUG=FALSE/g' .env
+            sed -i 's/SESSION_DOMAIN=.*$/SESSION_DOMAIN=localhost/g' .env
+            sed -i 's/HONEYPOT_DISABLE=.*$/HONEYPOT_DISABLE=TRUE/g' .env
+            sed -i 's/APP_URL=.*$/APP_URL=http:\/\/localhost:8001/g' .env
+            
+            # Add environment variables from CircleCI
+            echo "" >> .env
+            echo "GOOGLE_API_CONSOLE_KEY=$GOOGLE_API_CONSOLE_KEY" >> .env
+            echo "MAPBOX_TOKEN=$MAPBOX_TOKEN" >> .env
+
+      # Start Docker services using Task
+      - run:
+          name: Start Docker services
+          command: |
+            # Set environment variable for CircleCI detection
+            export CIRCLECI=true
+            # Start all services using Task
+            task docker:up-all
           no_output_timeout: 10m
-          command: npx playwright test --reporter=list
 
+      # Wait for initial application build to complete
+      - run:
+          name: Wait for application build
+          command: |
+            echo "Waiting for initial application build to complete..."
+            # Wait for build completion by checking for expected build artifacts
+            max_attempts=60  # 10 minutes total
+            attempt=0
+            while [ $attempt -lt $max_attempts ]; do
+              if docker exec restarters bash -c "[ -f public/mix-manifest.json ] || [ -f public/css/app.css ]"; then
+                echo "✓ Application build complete - build artifacts found"
+                break
+              fi
+              echo "  Build not complete, waiting... (attempt $((attempt + 1))/$max_attempts)"
+              sleep 10
+              attempt=$((attempt + 1))
+            done
+            if [ $attempt -eq $max_attempts ]; then
+              echo "⚠️  Build artifacts not found after $max_attempts attempts, proceeding anyway"
+            fi
 
+      # Wait for services to be ready
+      - run:
+          name: Wait for services
+          command: |
+            task docker:wait-for-services-all
+
+      # Setup database and application
+      - run:
+          name: Setup application
+          command: |
+            # Grant timezone access - run directly on MySQL container
+            docker exec restarters_db mysql -u root -ps3cr3t -e "GRANT SELECT ON mysql.time_zone_name TO 'restarters'@'%';"
+            
+            # Setup additional configuration needed for CI (most setup already done by docker_run.sh)
+            # Set MySQL function creators using session variable (compatible with MySQL 5.7)
+            docker exec restarters_db mysql -u root -ps3cr3t -e "SET GLOBAL log_bin_trust_function_creators = 1;"
+            
+            # Generate additional Laravel artifacts for testing
+            docker exec restarters php artisan l5-swagger:generate
+
+      # Setup Discourse API
+      - run:
+          name: Setup Discourse
+          command: |
+            # Add API key to Discourse - run directly on PostgreSQL container
+            docker exec postgresql psql -U postgres -c "INSERT INTO api_keys (id, user_id, created_by_id, created_at, updated_at, allowed_ips, hidden, last_used_at, revoked_at, description, key_hash, truncated_key) VALUES (1, NULL, 1, '2021-10-25 13:56:20.033338', '2021-10-25 13:56:20.033338', NULL, false, NULL, NULL, 'Restarters', 'd89e9dfacfb611fbaf004807648187ce7ed474df44dcb0ada230fab5c8dd6a5b', '9fd7');" bitnami_discourse
+            
+            # Configure Discourse settings
+            docker exec restarters php artisan discourse:setting personal_message_enabled_groups 10
+
+      # Run PHPUnit tests
+      - run:
+          name: Run PHPUnit tests
+          command: |
+            # Create test results directory on host
+            mkdir -p /tmp/test-results/phpunit
+            # Run PHPUnit with JUnit XML output - using direct docker exec to avoid quote issues
+            docker exec restarters bash -c "export XDEBUG_MODE=coverage; ./vendor/bin/phpunit -d memory_limit=1024M --bootstrap vendor/autoload.php --coverage-clover tests/clover.xml --log-junit /tmp/phpunit-results.xml --configuration ./phpunit.xml --teamcity"
+            # Copy test results to host
+            docker cp restarters:/tmp/phpunit-results.xml /tmp/test-results/phpunit/results.xml
+          no_output_timeout: 45m
+
+      # Upload coverage
+      - run:
+          name: Upload coverage
+          command: |
+            docker exec -e COVERALLS_REPO_TOKEN="$COVERALLS_REPO_TOKEN" restarters bash -c "mkdir -p build/logs && php vendor/bin/php-coveralls -v -x tests/clover.xml"
+
+      # Run Jest tests
+      - run:
+          name: Run Jest tests
+          command: |
+            # Create test results directory for Jest
+            mkdir -p /tmp/test-results/jest
+            # Run Jest with JUnit output
+            docker exec restarters bash -c "npm i jest-junit; JEST_JUNIT_OUTPUT_DIR=/tmp/test-results npm run jest -- --testResultsProcessor=jest-junit"
+            # Copy test results to host if they exist
+            docker cp restarters:/tmp/test-results/junit.xml /tmp/test-results/jest/junit.xml || echo "Jest results not found, skipping"
+
+      # Prepare for Playwright tests
+      - run:
+          name: Prepare for Playwright tests
+          command: |
+            docker exec restarters php artisan cache:clear
+            
+            # Delete all devices from database to ensure clean state for Playwright tests
+            docker exec restarters bash -c "echo \"DB::statement('SET foreign_key_checks=0'); App\\\\Device::truncate(); DB::statement('SET foreign_key_checks=1');\" | php artisan tinker" || true
+            
+            # Create test user
+            docker exec restarters bash -c "echo \"App\\\\User::firstOrCreate(['email'=>'jane@bloggs.net'], ['name'=>'Jane Bloggs','password'=>Hash::make('passw0rd'),'role'=>2,'consent_past_data'=>'2021-01-01','consent_future_data'=>'2021-01-01','consent_gdpr'=>'2021-01-01']);\" | php artisan tinker" || true
+            
+            # Build assets
+            docker exec restarters bash -c "export NODE_OPTIONS=--max-old-space-size=8192; npm rebuild node-sass; npm run prod"
+            
+            # Disable API throttling for tests
+            docker exec restarters bash -c "sed -i 's/.throttle:api.,//g' /var/www/app/Http/Kernel.php"
+
+      # Run main Playwright tests (excluding autocomplete)
+      - run:
+          name: Run main Playwright tests
+          command: |
+            mkdir -p /tmp/test-results/playwright
+            # Create Playwright results directory inside container and run tests
+            # Use -t flag for pseudo-TTY to ensure unbuffered output
+            docker exec -t restarters bash -c "
+              export PLAYWRIGHT_TEST=true
+              export PLAYWRIGHT_DEBUG=true
+              export PWTEST_SKIP_TEST_OUTPUT=0
+              export DEBUG=playwright
+              export PLAYWRIGHT_BASE_URL=http://restarters_nginx
+              export PW_TEST_HTML_REPORT_OPEN=never
+              export FORCE_COLOR=1
+              # Unbuffer output and add periodic keepalive
+              stdbuf -oL -eL npx playwright test --reporter=html | while IFS= read -r line; do
+                echo \"\$line\"
+                echo '[CircleCI] Playwright test running...' >&2
+              done
+            "
+          no_output_timeout: 10m
+
+      # Setup test data for autocomplete test
+      - run:
+          name: Setup autocomplete test data
+          command: |
+            echo "Setting up test data for autocomplete test..."
+            # Run tinker script and check for success message instead of exit code
+            docker exec restarters bash -c "
+              php artisan tinker setup-autocomplete-test-data.php > /tmp/setup-output.log 2>&1
+              if grep -q 'Test data setup complete!' /tmp/setup-output.log; then
+                echo 'Setup completed successfully!'
+                cat /tmp/setup-output.log
+                exit 0
+              else
+                echo 'Setup failed!'
+                cat /tmp/setup-output.log
+                exit 1
+              fi
+            "
+          no_output_timeout: 5m
+
+      # Run autocomplete Playwright test separately because it needs special setup.
+      - run:
+          name: Run autocomplete Playwright test
+          command: |
+            mkdir -p /tmp/test-results/playwright-autocomplete
+            # Run the autocomplete test with its own configuration
+            # Use -t flag for pseudo-TTY and add background keepalive process
+            docker exec -t restarters bash -c "
+              export PLAYWRIGHT_TEST=true
+              export PLAYWRIGHT_DEBUG=true
+              export PWTEST_SKIP_TEST_OUTPUT=0
+              export DEBUG=playwright
+              export PLAYWRIGHT_BASE_URL=http://restarters_nginx
+              export PW_TEST_HTML_REPORT_OPEN=never
+              export FORCE_COLOR=1
+              
+              # Start background keepalive process
+              (while true; do sleep 30; echo '[CircleCI] Autocomplete test still running...'; done) &
+              KEEPALIVE_PID=\$!
+              
+              # Run the test with unbuffered output
+              stdbuf -oL -eL npx playwright test --config=playwright.autocomplete.config.js --reporter=html
+              
+              # Clean up keepalive process
+              kill \$KEEPALIVE_PID 2>/dev/null || true
+            "
+          no_output_timeout: 15m
+
+      # Copy test results and artifacts
+      - run:
+          name: Copy Playwright artifacts
+          command: |
+            # List what's available in the container
+            docker exec restarters bash -c "ls -la /tmp/test-results/* || echo 'No playwright directories found'"
+            # Copy test results and artifacts to host if they exist
+            docker cp restarters:/tmp/test-results /tmp/test-results/playwright/ || echo "Playwright HTML report not found"
+          when: always
+
+      # Store artifacts
+      - store_artifacts:
+          path: /tmp/test-results
+          destination: playwright-test-results
+      
+      - store_test_results:
+          path: /tmp/test-results

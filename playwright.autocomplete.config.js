@@ -1,4 +1,5 @@
-// playwright.config.js
+// playwright.autocomplete.config.js
+// Configuration specifically for the autocomplete test
 // @ts-check
 const { devices } = require('@playwright/test');
 
@@ -9,8 +10,8 @@ const config = {
   // Only use 1 worker, otherwise we hit CSRF issues.
   workers: 1,
 
-  // Exclude the slow autocomplete test from the main test run
-  grep: /^(?!.*Automatic category suggestion from item type)/,
+  // Only run the autocomplete test
+  grep: /Automatic category suggestion from item type/,
 
   use: {
     trace: 'on',
@@ -33,37 +34,13 @@ const config = {
         baseURL: process.env.PLAYWRIGHT_BASE_URL || 'http://localhost:8000'
       },
     },
-    // TODO The other browsers don't work reliably yet.
-    // {
-    //   name: 'Desktop Safari',
-    //   use: {
-    //     browserName: 'webkit',
-    //     viewport: { width: 1200, height: 750 },
-    //   }
-    // },
-    // // Test against mobile viewports.
-    // {
-    //   name: 'Mobile Chrome',
-    //   use: devices['Pixel 5'],
-    // },
-    // {
-    //   name: 'Mobile Safari',
-    //   use: devices['iPhone 12'],
-    // },
-    // {
-    //   name: 'Desktop Firefox',
-    //   use: {
-    //     browserName: 'firefox',
-    //     viewport: { width: 800, height: 600 },
-    //   }
-    // },
   ],
   testDir: 'tests/Integration',
   outputDir: '/tmp/test-results',
 
   // Flakiness
   // Timeout per test - needs to be less than 10 minutes to avoid Circle CI timeout kicking in.
-  timeout: 5 * 60 * 1000,
+  timeout: 10 * 60 * 1000, // Increased timeout for the slow autocomplete test
   navigationTimeout: 2 * 60 * 1000,
   actionTimeout: 2 * 60 * 1000,
   retries: 0
