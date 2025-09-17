@@ -1,6 +1,7 @@
 import { defineConfig } from 'vite';
 import laravel from 'laravel-vite-plugin';
 import vue from '@vitejs/plugin-vue2';
+import laravelTranslations from 'vite-plugin-laravel-translations';
 import { resolve } from 'path';
 
 export default defineConfig({
@@ -17,6 +18,7 @@ export default defineConfig({
             refresh: true,
         }),
         vue(),
+        laravelTranslations(),
     ],
     resolve: {
         alias: {
