@@ -59,28 +59,7 @@ jobs:
             task docker:up-all
           no_output_timeout: 10m
 
-      # Wait for initial application build to complete
-      - run:
-          name: Wait for application build
-          command: |
-            echo "Waiting for initial application build to complete..."
-            # Wait for build completion by checking for expected build artifacts
-            max_attempts=60  # 10 minutes total
-            attempt=0
-            while [ $attempt -lt $max_attempts ]; do
-              if docker exec restarters bash -c "[ -f public/mix-manifest.json ] || [ -f public/css/app.css ]"; then
-                echo "✓ Application build complete - build artifacts found"
-                break
-              fi
-              echo "  Build not complete, waiting... (attempt $((attempt + 1))/$max_attempts)"
-              sleep 10
-              attempt=$((attempt + 1))
-            done
-            if [ $attempt -eq $max_attempts ]; then
-              echo "⚠️  Build artifacts not found after $max_attempts attempts, proceeding anyway"
-            fi
-
-      # Wait for services to be ready
+      # Wait for services to be ready (includes build completion and restart detection)
       - run:
           name: Wait for services
           command: |

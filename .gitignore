@@ -26,3 +26,4 @@ restarters-anonymised.sql
 /public/css/app.css
 /public/css/wiki.css
 /.claude/settings.local.json
+/public/build/
