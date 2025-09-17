@@ -53,6 +53,8 @@ jobs:
           command: |
             # Set environment variable for CircleCI detection
             export CIRCLECI=true
+            # Enable Docker Compose bake for build optimization
+            export COMPOSE_BAKE=true
             # Start all services using Task
             task docker:up-all
           no_output_timeout: 10m

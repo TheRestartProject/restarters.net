@@ -214,16 +214,37 @@ tasks:
           fi
         }
         
-        # Generic wait function that takes: service_name, check_command, max_attempts, sleep_interval
+        # Generic wait function that takes: service_name, container_name, check_command, max_attempts, sleep_interval
         wait_for_service() {
           local service_name="$1"
-          local check_command="$2" 
-          local max_attempts="$3"
-          local sleep_interval="$4"
-          
+          local container_name="$2"
+          local check_command="$3"
+          local max_attempts="$4"
+          local sleep_interval="$5"
+
           echo "Waiting for $service_name..."
           local attempt=0
+          local initial_restart_count=0
+
+          # Get initial restart count if container exists
+          if docker ps -a --format "table {{.Names}}" | grep -q "^${container_name}$"; then
+            initial_restart_count=$(docker inspect --format='{{.RestartCount}}' "$container_name" 2>/dev/null || echo "0")
+          fi
+
           while [ $attempt -lt $max_attempts ]; do
+            # Check if container has restarted since we started monitoring
+            if docker ps -a --format "table {{.Names}}" | grep -q "^${container_name}$"; then
+              current_restart_count=$(docker inspect --format='{{.RestartCount}}' "$container_name" 2>/dev/null || echo "0")
+              if [ "$current_restart_count" -gt "$initial_restart_count" ]; then
+                echo "❌ $service_name container ($container_name) has restarted during health check!"
+                echo "   Initial restart count: $initial_restart_count"
+                echo "   Current restart count: $current_restart_count"
+                echo "   Container logs:"
+                docker logs --tail=50 "$container_name" 2>&1 || echo "   Could not retrieve logs"
+                exit 1
+              fi
+            fi
+
             if eval "$check_command" >/dev/null 2>&1; then
               echo "✓ $service_name is ready"
               return 0
@@ -240,22 +261,22 @@ tasks:
         echo ""
         
         # Wait for core services (always needed)
-        wait_for_service "MySQL database" "docker exec restarters_db mysqladmin ping -h localhost -u root -ps3cr3t --silent" 60 5
-        wait_for_service "Restarters web application" "curl -f -s http://localhost:8001" 120 5
-        
+        wait_for_service "MySQL database" "restarters_db" "docker exec restarters_db mysqladmin ping -h localhost -u root -ps3cr3t --silent" 60 5
+        wait_for_service "Restarters web application" "restarters" "curl -f -s http://localhost:8001" 120 5
+
         # Wait for debug services (if in debug or all profile)
         {{- if or (eq .PROFILE "debug") (eq .PROFILE "all") }}
-        wait_for_service "phpMyAdmin" "curl -f -s http://localhost:8002" 60 5
-        wait_for_service "Mailhog" "curl -f -s http://localhost:8025" 60 5
+        wait_for_service "phpMyAdmin" "phpmyadmin" "curl -f -s http://localhost:8002" 60 5
+        wait_for_service "Mailhog" "mailhog" "curl -f -s http://localhost:8025" 60 5
         {{- else }}
         echo "✓ phpMyAdmin not in profile {{.PROFILE}}, skipping"
         echo "✓ Mailhog not in profile {{.PROFILE}}, skipping"
         {{- end }}
-        
+
         # Wait for discourse services (if in discourse or all profile)
         {{- if or (eq .PROFILE "discourse") (eq .PROFILE "all") }}
-        wait_for_service "PostgreSQL" "docker exec postgresql pg_isready -U postgres" 60 5
-        wait_for_service "Discourse" "curl -f -s http://localhost:8003" 120 10
+        wait_for_service "PostgreSQL" "postgresql" "docker exec postgresql pg_isready -U postgres" 60 5
+        wait_for_service "Discourse" "restarters_discourse" "curl -f -s http://localhost:8003" 120 10
         {{- else }}
         echo "✓ PostgreSQL not in profile {{.PROFILE}}, skipping"
         echo "✓ Discourse not in profile {{.PROFILE}}, skipping"
