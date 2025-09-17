@@ -187,7 +187,7 @@ services:
 
   restarters_discourse_redis:
     profiles: ["discourse"]
-    image: docker.io/bitnami/redis
+    image: docker.io/bitnamilegacy/redis
     container_name: restarters_discourse_redis
     environment:
       - ALLOW_EMPTY_PASSWORD=yes
