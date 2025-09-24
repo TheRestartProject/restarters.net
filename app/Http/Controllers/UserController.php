@@ -729,15 +729,15 @@ class UserController extends Controller
         }
     }
 
-    public function edit($id, Request $request): View
+    public function edit($id, Request $request)
     {
         global $fixometer_languages;
 
         $user = Auth::user();
         $User = new User;
 
-        // Administrators can edit users.
-        if (Fixometer::hasRole($user, 'Administrator') || Fixometer::hasRole($user, 'Host')) {
+        // Administrators and Hosts can edit users. Users can edit themselves.
+        if (Fixometer::hasRole($user, 'Administrator') || Fixometer::hasRole($user, 'Host') || $user->id == $id) {
             $Roles = new Role;
             $Roles = $Roles->findAll();
 
@@ -793,6 +793,9 @@ class UserController extends Controller
                     if (Fixometer::hasRole($user, 'Host')) {
                         // Use @ for phpunit tests.
                         @header('Location: /host?action=ue&code=200');
+                    } elseif ($user->id == $id && !Fixometer::hasRole($user, 'Administrator')) {
+                        // Regular users editing themselves should return empty response
+                        return response('');
                     }
                 }
 

@@ -178,6 +178,7 @@ tasks:
       This ensures consistency between local development and CI environments.
 
       The command includes:
+      - Database reset and migrations (fresh test database state)
       - Memory limit set to 1024M
       - Coverage reporting (clover.xml)
       - JUnit XML output for CI integration
@@ -193,6 +194,8 @@ tasks:
 
     cmds:
       - mkdir -p /tmp/test-results/phpunit
+      - echo "Resetting test database and running migrations..."
+      - docker exec restarters bash -c "php artisan migrate:fresh --database=mysql_testing --force"
       - docker exec restarters bash -c "export XDEBUG_MODE=coverage; ./vendor/bin/phpunit -d memory_limit=1024M --bootstrap vendor/autoload.php --coverage-clover tests/clover.xml --log-junit /tmp/phpunit-results.xml --configuration ./phpunit.xml --teamcity {{ .CLI_ARGS }}"
       - |
         if [ ! -z "$COVERALLS_REPO_TOKEN" ]; then

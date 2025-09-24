@@ -69,12 +69,15 @@ class ProfileTest extends TestCase
 
         $this->assertEquals('', $response->getContent());
 
-        // A restart acting on another restart.
+        // A restart acting on another restart - should be unauthorized.
         $this->actingAs($user2);
 
-        $response = $this->post('/user/edit/'.$user1->id, $editdata);
-
-        $this->assertEquals('', $response->getContent());
+        try {
+            $response = $this->post('/user/edit/'.$user1->id, $editdata);
+            $this->assertFalse(true); // Should not reach here
+        } catch (\Symfony\Component\HttpKernel\Exception\HttpException $e) {
+            $this->assertEquals(403, $e->getStatusCode());
+        }
 
         // A host acting on a restarter - can.
         $this->actingAs($host);
@@ -83,15 +86,18 @@ class ProfileTest extends TestCase
 
         $response->assertSee('Edit User');
 
-        // A network coordinator acting on a restarter - can't.
+        // A network coordinator acting on a restarter - should be unauthorized.
         $this->actingAs($nc);
 
-        $response = $this->post('/user/edit/'.$user1->id, $editdata);
-
-        $response->assertSee('');
+        try {
+            $response = $this->post('/user/edit/'.$user1->id, $editdata);
+            $this->assertFalse(true); // Should not reach here
+        } catch (\Symfony\Component\HttpKernel\Exception\HttpException $e) {
+            $this->assertEquals(403, $e->getStatusCode());
+        }
 
         // An administrator acting on a restarter - can.
-        $this->actingAs($host);
+        $this->actingAs($admin);
 
         $response = $this->post('/user/edit/'.$user1->id, $editdata);
 
