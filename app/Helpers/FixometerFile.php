@@ -187,7 +187,7 @@ class FixometerFile extends Model
         try {
             return DB::select($sql, [env('TBL_IMAGES'), 'refType' => $of_ref_type, 'refId' => $ref_id]);
         } catch (\Illuminate\Database\QueryException $e) {
-            return db($e);
+            return [];
         }
     }
 

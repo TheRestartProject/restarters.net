@@ -389,7 +389,7 @@ class Fixometer
 
                 return count(DB::select($sql, ['id' => $id, 'object' => $object])) > 0 ? true : false;
             } catch (\Illuminate\Database\QueryException $e) {
-                return db($e);
+                return $return_rows ? [] : false;
             }
         }
     }
