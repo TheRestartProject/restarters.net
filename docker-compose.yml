@@ -97,7 +97,6 @@ services:
       # by the client.
       - ./:/var/www:rw
       - ./php/local.ini:/usr/local/etc/php/conf.d/local.ini
-      - ./docker/php-fpm-www.conf:/usr/local/etc/php-fpm.d/www.conf
     networks:
       - app-network
 

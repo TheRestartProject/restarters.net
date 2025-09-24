@@ -39,9 +39,17 @@ class CheckForRepairNetwork
 
         $network = $networkQuery->first();
         if (empty($network)) {
-            // In testing environment, fall back to any available network
+            // In testing environment, fall back to any available network or create one
             if (app()->environment('testing')) {
                 $network = Network::first();
+                if (empty($network)) {
+                    // Create a default test network if none exists
+                    $network = new Network();
+                    $network->name = 'Test Network';
+                    $network->shortname = 'restarters';
+                    $network->default_language = 'en';
+                    $network->save();
+                }
             }
 
             if (empty($network)) {

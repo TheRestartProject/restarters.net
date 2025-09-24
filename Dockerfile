@@ -57,9 +57,10 @@ RUN if getent group ${GID}; then \
       useradd -m -u ${UID} -g restarter -s /bin/bash restarter; \
     fi
 
-# Dynamically update php-fpm to use the new user and group
+# Dynamically update php-fpm to use the new user and group, and listen on all interfaces
 RUN sed -i "s/user = www-data/user = restarter/g" /usr/local/etc/php-fpm.d/www.conf && \
-    sed -i "s/group = www-data/group = restarter/g" /usr/local/etc/php-fpm.d/www.conf
+    sed -i "s/group = www-data/group = restarter/g" /usr/local/etc/php-fpm.d/www.conf && \
+    sed -i "s/listen = 127.0.0.1:9000/listen = 0.0.0.0:9000/g" /usr/local/etc/php-fpm.d/www.conf
 
 # Copy the code (this will be overridden by the volume mount in docker-compose)
 COPY --chown=${UID}:${GID} . ./
