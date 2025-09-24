@@ -82,7 +82,7 @@ npm rebuild node-sass
 npm install -D @playwright/test
 npx playwright install
 
-npm run watch-poll&
+npm run dev&
 php artisan key:generate
 php artisan cache:clear
 php artisan config:clear

@@ -337,7 +337,7 @@ class Party extends Model implements Auditable
         $exclude_group_ids = array_merge($exclude_group_ids, Group::where('approved', false)->pluck('idgroups')->toArray());
 
         return $this
-      ->select('`events`.*, ( 6371 * acos( cos( radians('.$user->latitude.') ) * cos( radians( events.latitude ) ) * cos( radians( events.longitude ) - radians('.$user->longitude.') ) + sin( radians('.$user->latitude.') ) * sin( radians( events.latitude ) ) ) ) AS distance')
+      ->selectRaw('`events`.*, ( 6371 * acos( cos( radians(?) ) * cos( radians( events.latitude ) ) * cos( radians( events.longitude ) - radians(?) ) + sin( radians(?) ) * sin( radians( events.latitude ) ) ) ) AS distance', [$user->latitude, $user->longitude, $user->latitude])
       ->join('groups', 'groups.idgroups', '=', 'events.group')
       ->join('group_network', 'groups.idgroups', '=', 'group_network.group_id')
       ->join('networks', 'networks.id', '=', 'group_network.network_id')
