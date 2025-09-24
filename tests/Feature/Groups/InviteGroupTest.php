@@ -70,6 +70,9 @@ class InviteGroupTest extends TestCase
         $response2->assertSee('You have an invitation to this group.');
 
         // Check the counts.
+        // Small delay to ensure any database commits or cache invalidations are complete
+        usleep(100000); // 100ms
+
         $props = $this->assertVueProperties($response2, [
             [],
             [
