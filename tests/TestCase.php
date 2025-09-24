@@ -109,12 +109,25 @@ abstract class TestCase extends BaseTestCase
         $this->withoutExceptionHandling();
         app('honeypot')->disable();
 
-        Category::factory()->count(1)->cat1()->create();
-        Category::factory()->count(1)->cat2()->create();
-        Category::factory()->count(1)->cat3()->create();
-        Category::factory()->count(1)->mobile()->create();
-        Category::factory()->count(1)->misc()->create();
-        Category::factory()->count(1)->desktopComputer()->create();
+        // Create categories defensively - only if they don't already exist
+        if (!Category::where('idcategories', 111)->exists()) {
+            Category::factory()->count(1)->cat1()->create();
+        }
+        if (!Category::where('idcategories', 222)->exists()) {
+            Category::factory()->count(1)->cat2()->create();
+        }
+        if (!Category::where('idcategories', 333)->exists()) {
+            Category::factory()->count(1)->cat3()->create();
+        }
+        if (!Category::where('idcategories', 25)->exists()) {
+            Category::factory()->count(1)->mobile()->create();
+        }
+        if (!Category::where('idcategories', 46)->exists()) {
+            Category::factory()->count(1)->misc()->create();
+        }
+        if (!Category::where('idcategories', 11)->exists()) {
+            Category::factory()->count(1)->desktopComputer()->create();
+        }
 
         // We manipulate some globals for image upload testing.
         \FixometerFile::$uploadTesting = FALSE;

@@ -115,7 +115,7 @@ class Device extends Model implements Auditable
                     WHERE object_type = ? AND reference_type = ?
                   ) AS i ON i.reference = d.iddevices
 
-                WHERE `event` = :event", ['event' => $event, env('TBL_IMAGES'), env('TBL_DEVICES')]);
+                WHERE `event` = ?", [env('TBL_IMAGES'), env('TBL_DEVICES'), $event]);
     }
 
     public function ofThisGroup($group)

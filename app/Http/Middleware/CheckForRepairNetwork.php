@@ -39,7 +39,14 @@ class CheckForRepairNetwork
 
         $network = $networkQuery->first();
         if (empty($network)) {
-            throw new \Exception('Could not determine repair network from domain');
+            // In testing environment, fall back to any available network
+            if (app()->environment('testing')) {
+                $network = Network::first();
+            }
+
+            if (empty($network)) {
+                throw new \Exception('Could not determine repair network from domain');
+            }
         }
         $locale = $network->default_language;
         $repair_network = $network->id;

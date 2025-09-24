@@ -183,12 +183,17 @@ tasks:
       - JUnit XML output for CI integration
       - TeamCity output format for better test reporting
       - Coverage upload to Coveralls if COVERALLS_REPO_TOKEN is set
+      - Support for additional PHPUnit options via CLI_ARGS
 
       Use this task instead of running phpunit directly to maintain consistency.
 
+      Examples:
+      - task docker:test:phpunit -- --stop-on-failure
+      - task docker:test:phpunit -- --filter=UserTest
+
     cmds:
       - mkdir -p /tmp/test-results/phpunit
-      - docker exec restarters bash -c "export XDEBUG_MODE=coverage; ./vendor/bin/phpunit -d memory_limit=1024M --bootstrap vendor/autoload.php --coverage-clover tests/clover.xml --log-junit /tmp/phpunit-results.xml --configuration ./phpunit.xml --teamcity"
+      - docker exec restarters bash -c "export XDEBUG_MODE=coverage; ./vendor/bin/phpunit -d memory_limit=1024M --bootstrap vendor/autoload.php --coverage-clover tests/clover.xml --log-junit /tmp/phpunit-results.xml --configuration ./phpunit.xml --teamcity {{ .CLI_ARGS }}"
       - |
         if [ ! -z "$COVERALLS_REPO_TOKEN" ]; then
           echo "Uploading coverage to Coveralls..."
