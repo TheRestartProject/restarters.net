@@ -205,7 +205,7 @@ tasks:
       - |
         if [ ! -z "$COVERALLS_REPO_TOKEN" ]; then
           echo "Uploading coverage to Coveralls..."
-          docker exec -e COVERALLS_REPO_TOKEN="$COVERALLS_REPO_TOKEN" restarters bash -c "mkdir -p build/logs && php vendor/bin/php-coveralls -v -x tests/clover.xml"
+          docker exec -e COVERALLS_REPO_TOKEN="$COVERALLS_REPO_TOKEN" restarters bash -c "./upload-coverage.sh tests/clover.xml"
         else
           echo "COVERALLS_REPO_TOKEN not set, skipping coverage upload"
         fi
