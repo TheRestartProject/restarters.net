@@ -56,11 +56,12 @@ class FixometerFile extends Model
                     ->forceDelete();
         }
 
-        if ($ajax && gettype($user_file['tmp_name']) == 'array') {
-            $error = $user_file['error'][0];
+        // Handle both array and non-array formats for $_FILES
+        if (gettype($user_file['tmp_name']) == 'array') {
+            $error = is_array($user_file['error']) ? $user_file['error'][0] : $user_file['error'];
             $tmp_name = $user_file['tmp_name'][0];
         } else {
-            $error = $user_file['error'];
+            $error = is_array($user_file['error']) ? $user_file['error'][0] : $user_file['error'];
             $tmp_name = $user_file['tmp_name'];
         }
 
@@ -180,12 +181,12 @@ class FixometerFile extends Model
     {
         $sql = 'SELECT * FROM `images` AS `i`
                     INNER JOIN `xref` AS `x` ON `x`.`object` = `i`.`idimages`
-                    WHERE `x`.`object_type` = ? AND
+                    WHERE `x`.`object_type` = :objectType AND
                     `x`.`reference_type` = :refType AND
                     `x`.`reference` = :refId';
 
         try {
-            return DB::select($sql, [env('TBL_IMAGES'), 'refType' => $of_ref_type, 'refId' => $ref_id]);
+            return DB::select($sql, ['objectType' => env('TBL_IMAGES'), 'refType' => $of_ref_type, 'refId' => $ref_id]);
         } catch (\Illuminate\Database\QueryException $e) {
             return [];
         }
@@ -195,7 +196,7 @@ class FixometerFile extends Model
     {
         // Delete the xref.  This is sufficient to stop the image being attached to the device.  We leave the
         // file in existence in case we want it later for debugging/mining.
-        $sql = 'DELETE FROM `xref` WHERE `idxref` = :id AND `object_type` = ?';
-        DB::delete($sql, ['id' => $idxref, env('TBL_IMAGES')]);
+        $sql = 'DELETE FROM `xref` WHERE `idxref` = :id AND `object_type` = :objectType';
+        DB::delete($sql, ['id' => $idxref, 'objectType' => env('TBL_IMAGES')]);
     }
 }

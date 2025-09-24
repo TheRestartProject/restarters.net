@@ -171,13 +171,13 @@ class Group extends Model implements Auditable
                     SELECT * FROM `images`
                         INNER JOIN `xref` ON `xref`.`object` = `images`.`idimages`
                         WHERE `xref`.`object_type` = 5
-                        AND `xref`.`reference_type` = ?
+                        AND `xref`.`reference_type` = :tblGroups
                         GROUP BY `images`.`path`
                 ) AS `xi`
                 ON `xi`.`reference` = `g`.`idgroups`
 
                 WHERE `ug`.`user` = :id
-                ORDER BY `g`.`name` ASC', ['id' => $id, env('TBL_GROUPS')]);
+                ORDER BY `g`.`name` ASC', ['id' => $id, 'tblGroups' => env('TBL_GROUPS')]);
     }
 
     public function groupImage(): HasOne

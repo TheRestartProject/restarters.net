@@ -35,13 +35,15 @@ class EventsUsersObserver {
         $iduser = $eu->user;
         $user = $iduser ? User::find($iduser) : null;
         
-        if ($eu->status == 1) {
-            // Confirmed.  Make sure they are on the thread.
-            $this->confirmed($event, $user, true);
-        } else {
-            // Not confirmed.  Make sure they are not on the thread.  Don't change the count, as they shouldn't
-            // be on it anyway.
-            $this->removed($event, $user, false);
+        if ($user) {
+            if ($eu->status == 1) {
+                // Confirmed.  Make sure they are on the thread.
+                $this->confirmed($event, $user, true);
+            } else {
+                // Not confirmed.  Make sure they are not on the thread.  Don't change the count, as they shouldn't
+                // be on it anyway.
+                $this->removed($event, $user, false);
+            }
         }
     }
 
@@ -78,7 +80,9 @@ class EventsUsersObserver {
         $user = $iduser ? User::find($iduser) : null;
 
         // Make sure they are not on the thread.  If they were confirmed, we need to update the volunteer count.
-        $this->removed($event, $user, true, $eu->status == 1);
+        if ($user) {
+            $this->removed($event, $user, true, $eu->status == 1);
+        }
     }
 
     private function confirmed(Party $event, User $user, $count): void
