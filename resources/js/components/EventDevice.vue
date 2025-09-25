@@ -58,20 +58,24 @@
         {{ axiosError }}
       </p>
     </b-alert>
-    <div class="d-flex justify-content-center flex-wrap pt-4 pb-4">
-      <b-btn variant="primary" class="mr-2" v-if="add" @click="addDevice">
-        {{ __('partials.add_device') }}
-      </b-btn>
-      <b-btn variant="primary" class="mr-2" v-if="edit" @click="saveDevice">
-        {{ __('partials.save') }}
-      </b-btn>
-      <b-btn variant="primary" class="mr-2" v-if="edit && deleteButton" @click="confirmDeleteDevice">
-        {{ __('devices.delete_device') }}
-      </b-btn>
-      <DeviceQuantity v-if="add" :quantity.sync="currentDevice.quantity" class="flex-md-shrink-1 ml-2 mr-2"/>
-      <b-btn variant="tertiary" class="ml-2 cancel" @click="cancel" v-if="cancelButton">
-        {{ __('partials.cancel') }}
-      </b-btn>
+    <div class="d-flex justify-content-between flex-wrap ml-3 mr-3">
+      <DeviceReference :reference.sync="currentDevice.reference" class="mb-4" :icon-variant="add ? 'black' : 'brand'"
+                       :disabled="disabled"/>
+      <div class="d-flex justify-content-center flex-wrap pt-4 pb-4">
+        <b-btn variant="primary" class="mr-2" v-if="add" @click="addDevice">
+          {{ __('partials.add_device') }}
+        </b-btn>
+        <b-btn variant="primary" class="mr-2" v-if="edit" @click="saveDevice">
+          {{ __('partials.save') }}
+        </b-btn>
+        <b-btn variant="primary" class="mr-2" v-if="edit && deleteButton" @click="confirmDeleteDevice">
+          {{ __('devices.delete_device') }}
+        </b-btn>
+        <DeviceQuantity v-if="add" :quantity.sync="currentDevice.quantity" class="flex-md-shrink-1 ml-2 mr-2"/>
+        <b-btn variant="tertiary" class="ml-2 cancel" @click="cancel" v-if="cancelButton">
+          {{ __('partials.cancel') }}
+        </b-btn>
+      </div>
     </div>
     <ConfirmModal @confirm="deleteDevice" ref="confirm"/>
   </b-form>
@@ -95,6 +99,7 @@ import DeviceRepairStatus from './DeviceRepairStatus'
 import DeviceProblem from './DeviceProblem'
 import DeviceNotes from './DeviceNotes'
 import DeviceQuantity from './DeviceQuantity'
+import DeviceReference from './DeviceReference'
 import FileUploader from './FileUploader'
 import DeviceImages from './DeviceImages'
 import ConfirmModal from './ConfirmModal'
@@ -113,7 +118,8 @@ export default {
     DeviceWeight,
     DeviceModel,
     DeviceBrand,
-    DeviceCategorySelect
+    DeviceCategorySelect,
+    DeviceReference,
   },
   mixins: [event],
   props: {
@@ -290,6 +296,7 @@ export default {
       problem: null,
       assessment: null,
       quantity: 1,
+      reference: null,
     }
 
     if (this.device) {

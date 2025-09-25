@@ -1,7 +1,10 @@
 <template>
   <transition name="recent">
     <b-tr v-if="!editing" :key="'summary-' + device.id">
-      <b-td>
+      <b-td class="refcell">
+        <span v-if="device.reference" class="ref text-muted">
+          {{ device.reference }}
+        </span>
         <span v-if="device.item_type">
           {{ device.item_type }}
         </span>
@@ -223,5 +226,13 @@ export default {
   font-size: small;
   line-height: 2;
   text-transform: uppercase;
+}
+
+.refcell {
+  line-height: normal;
+
+  .ref {
+    font-size: 60%;
+  }
 }
 </style>
