@@ -134,6 +134,30 @@ jobs:
             docker cp restarters:/tmp/test-results /tmp/test-results/playwright/ || echo "Playwright HTML report not found"
           when: always
 
+      # Keep containers running for SSH debugging
+      - run:
+          name: Keep containers running for debugging
+          command: |
+            echo "=== DEBUGGING MODE ENABLED ==="
+            echo "All containers are now running and ready for SSH debugging"
+            echo "Available containers:"
+            docker ps --format "table {{.Names}}\t{{.Status}}\t{{.Ports}}"
+            echo ""
+            echo "To debug, SSH into this job and use:"
+            echo "  docker exec -it restarters bash"
+            echo "  docker exec -it restarters_db mysql -u restarters -ps3cr3t restarters_db_test"
+            echo "  docker exec -it restarters_discourse bash"
+            echo ""
+            echo "Containers will stay running until you cancel the job or it times out (default 5h)"
+            # Keep the containers running - this will timeout after CircleCI's default timeout
+            while true; do
+              echo "Containers still running... ($(date))"
+              docker ps --format "table {{.Names}}\t{{.Status}}" | grep -v "NAME"
+              sleep 300  # Check every 5 minutes
+            done
+          no_output_timeout: 5h
+          when: always
+
       # Store artifacts
       - store_artifacts:
           path: /tmp/test-results
