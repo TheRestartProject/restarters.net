@@ -236,8 +236,22 @@ tasks:
       - docker exec restarters bash -c "php artisan cache:clear"
       - docker exec restarters bash -c "echo \"DB::statement('SET foreign_key_checks=0'); App\\\\Device::truncate(); DB::statement('SET foreign_key_checks=1');\" | php artisan tinker" || true
       - docker exec restarters bash -c "echo \"App\\\\User::firstOrCreate(['email'=>'jane@bloggs.net'], ['name'=>'Jane Bloggs','password'=>Hash::make('passw0rd'),'role'=>2,'consent_past_data'=>'2021-01-01','consent_future_data'=>'2021-01-01','consent_gdpr'=>'2021-01-01']);\" | php artisan tinker" || true
-      - docker exec restarters bash -c "export NODE_OPTIONS=--max-old-space-size=8192; npm run build"
       - docker exec restarters bash -c "sed -i 's/.throttle:api.,//g' /var/www/app/Http/Kernel.php"
+      - |
+        # Wait for Vite dev server to be ready
+        echo "Waiting for Vite dev server to be ready..."
+        docker exec restarters bash -c "
+          for i in {1..60}; do
+            if curl -sf http://localhost:5173 > /dev/null 2>&1; then
+              echo 'Vite dev server is ready'
+              exit 0
+            fi
+            echo \"Waiting for Vite... (attempt \$i/60)\"
+            sleep 2
+          done
+          echo 'ERROR: Vite dev server failed to start after 120 seconds'
+          exit 1
+        "
       - |
         docker exec restarters bash -c "
           export PLAYWRIGHT_TEST=true
