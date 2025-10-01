@@ -1,6 +1,5 @@
-import jQuery from 'jquery';
-
-window.$ = window.jQuery = jQuery;
+// jQuery is loaded via CDN in the header, so we don't import it here
+// Just use the global window.jQuery and window.$
 
 import './components/dropdown.js';
 import './components/ajax-search-discourse-notifications.js';

@@ -92,6 +92,8 @@ services:
       GID: ${GID}
       CIRCLECI: ${CIRCLECI:-false}
     working_dir: /var/www
+    ports:
+      - "5173:5173"
     volumes:
       # We share the current folder into /var/www.  This means code changes on the host will get picked up
       # by the client.

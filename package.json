@@ -73,6 +73,7 @@
         "js-cookie": "^2.2.0",
         "lang.js": "^1.1.14",
         "leaflet": "^1.4.0",
+        "lodash-es": "^4.17.21",
         "moment": "^2.29.4",
         "moment-timezone": "^0.5.35",
         "npm": "^9.4.0",

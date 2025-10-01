@@ -12,7 +12,7 @@
             </div>
         @endif
 
-        <div class="vue">
+        <div class="vue" data-my-time="{{ Crypt::encrypt(time()) }}">
             <loginpage
                 csrf="{{ csrf_token() }}"
                 :error="{{ count($errors->all()) ? 'true' : 'false' }}"

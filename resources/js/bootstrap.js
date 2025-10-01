@@ -3,11 +3,19 @@ import _ from 'lodash';
 import { createPopper } from '@popperjs/core';
 import 'bootstrap';
 import axios from 'axios';
+// Import Select2 CSS and JS - jQuery must be loaded via CDN first
+import 'select2/dist/css/select2.css';
+import 'select2';
 
 window._ = _;
 window.Popper = createPopper;
 // jQuery loaded via CDN in header
 window.axios = axios;
+
+// Debug: Check if Select2 attached to jQuery
+console.log('Bootstrap.js loaded');
+console.log('jQuery available:', typeof window.jQuery !== 'undefined');
+console.log('Select2 attached:', typeof window.jQuery !== 'undefined' && typeof window.jQuery.fn.select2 !== 'undefined');
 // moment loaded via CDN in footer
 
 window.axios.defaults.headers.common['X-Requested-With'] = 'XMLHttpRequest';

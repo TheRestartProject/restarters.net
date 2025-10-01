@@ -18,6 +18,7 @@ import store from './store'
 import Multiselect from 'vue-multiselect'
 import 'vue-multiselect/dist/vue-multiselect.min.css'
 import * as Sentry from '@sentry/vue';
+import { BrowserTracing } from '@sentry/tracing';
 
 // Import only existing Vue components
 import DashboardPage from './components/DashboardPage.vue'
@@ -91,415 +92,402 @@ function initializeJQuery() {
   
   // Document ready functionality
   $(document).ready(function() {
-    console.log('Global js ready!');
-    
-    // Continue with all other jQuery code that was in the file
-    if ($('section.registration').length > 0 && $('.alert.alert-danger').length > 0 && $('.is-invalid').length > 0) {
-      $('.registration__step').removeClass('registration__step--active');
-      $('.is-invalid').first().parents('.registration__step').addClass('registration__step--active');
-    }
-    
-    // Initialize all other jQuery-dependent functionality here
-    registration();
-    onboarding();
-    eventsMap();
-    truncate();
-    nestedTable();
-    
-    // Retry select2Fields with a small delay to ensure Select2 is fully loaded
-    setTimeout(function() {
-      if (typeof window.jQuery.fn.select2 !== 'undefined') {
-        select2Fields();
-      } else {
-        console.warn('Select2 still not available after delay, retrying...');
-        setTimeout(function() {
-          if (typeof window.jQuery.fn.select2 !== 'undefined') {
-            select2Fields();
-          } else {
-            console.error('Select2 failed to load after multiple retries');
-          }
-        }, 200);
+    try {
+      console.log('Global js ready!');
+
+      // Continue with all other jQuery code that was in the file
+      if ($('section.registration').length > 0 && $('.alert.alert-danger').length > 0 && $('.is-invalid').length > 0) {
+        $('.registration__step').removeClass('registration__step--active');
+        $('.is-invalid').first().parents('.registration__step').addClass('registration__step--active');
       }
-    }, 100);
-    
-    // Initialize popover functionality with retry mechanism
-    setTimeout(function() {
-      if (typeof window.jQuery.fn.popover !== 'undefined') {
-        $('.users-list').find('[data-toggle="popover"]').popover();
-        $('.users-list').find('[data-toggle="popover"]').on('click', function (e) {
-          $('.users-list').find('[data-toggle="popover"]').not(this).popover('hide');
-        });
-        
-        $('.table:not(.table-devices)').find('[data-toggle="popover"]').popover({
-          template: '<div class="popover popover__table" role="tooltip"><div class="arrow"></div><h3 class="popover-header"></h3><div class="popover-body"></div></div>',
-          placement:'top'
-        });
 
-        $('.table-devices').find('[data-toggle="popover"]').popover();
+      console.log('Initializing jQuery-dependent functionality...');
+      // Initialize all other jQuery-dependent functionality here
+      registration();
+      console.log('registration() complete');
+      onboarding();
+      console.log('onboarding() complete');
+      eventsMap();
+      console.log('eventsMap() complete');
+      truncate();
+      console.log('truncate() complete');
+      nestedTable();
+      console.log('nestedTable() complete');
 
-        $('.table').find('[data-toggle="popover"]').on('click', function (e) {
-          $('.table').find('[data-toggle="popover"]').not(this).popover('hide');
-        });
-      } else {
-        console.warn('Bootstrap popover still not available after delay');
-      }
-    }, 100);
+      console.log('Setting up select2Fields timeout...');
+      // Retry select2Fields with a small delay to ensure Select2 is fully loaded
+      setTimeout(function () {
+        if (typeof window.jQuery.fn.select2 !== 'undefined') {
+          select2Fields();
+        } else {
+          console.warn('Select2 still not available after delay, retrying...');
+          setTimeout(function () {
+            if (typeof window.jQuery.fn.select2 !== 'undefined') {
+              select2Fields();
+            } else {
+              console.error('Select2 failed to load after multiple retries');
+            }
+          }, 200);
+        }
+      }, 100);
 
-    $(document).on('change', '.category', function (e) {
-      var $value = parseInt($(this).val());
-      var $field = $(this).parents('td').find('.weight');
+      console.log('Setting up popover timeout...');
+      // Initialize popover functionality with retry mechanism
+      setTimeout(function () {
+        if (typeof window.jQuery.fn.popover !== 'undefined') {
+          $('.users-list').find('[data-toggle="popover"]').popover();
+          $('.users-list').find('[data-toggle="popover"]').on('click', function (e) {
+            $('.users-list').find('[data-toggle="popover"]').not(this).popover('hide');
+          });
 
-      if (!$field.length) {
-        // At present this global JS is used in both old and new designs which have different DOM structure, so we
-        // need to cope with both.
-        $field = $(this).parents('.card-body').find('.weight')
-      }
-      if( $value === 46 || $value === '' ){
-        $field.prop('disabled', false);
-        $field.parents('.display-weight').removeClass('d-none');
-      } else {
-        $field.val('');
-        $field.trigger('change');
-        $field.prop('disabled', true);
-        $field.parents('.display-weight').addClass('d-none');
-      }
-    });
+          $('.table:not(.table-devices)').find('[data-toggle="popover"]').popover({
+            template: '<div class="popover popover__table" role="tooltip"><div class="arrow"></div><h3 class="popover-header"></h3><div class="popover-body"></div></div>',
+            placement: 'top'
+          });
 
-    function removeUser() {
+          $('.table-devices').find('[data-toggle="popover"]').popover();
 
-      var id = $(this).data('remove-volunteer');
+          $('.table').find('[data-toggle="popover"]').on('click', function (e) {
+            $('.table').find('[data-toggle="popover"]').not(this).popover('hide');
+          });
+        } else {
+          console.warn('Bootstrap popover still not available after delay');
+        }
+      }, 100);
 
-      $.ajax({
-        headers: {
-          'X-CSRF-TOKEN': $("input[name='_token']").val()
-        },
-        type: 'post',
-        url: '/party/remove-volunteer',
-        data: {
-          id : id,
-        },
-        datatype: 'json',
-        success: function(json) {
-          if( json.success ){
-            $('.volunteer-' + id).fadeOut();
-          } else {
+      $(document).on('change', '.category', function (e) {
+        var $value = parseInt($(this).val());
+        var $field = $(this).parents('td').find('.weight');
+
+        if (!$field.length) {
+          // At present this global JS is used in both old and new designs which have different DOM structure, so we
+          // need to cope with both.
+          $field = $(this).parents('.card-body').find('.weight')
+        }
+        if ($value === 46 || $value === '') {
+          $field.prop('disabled', false);
+          $field.parents('.display-weight').removeClass('d-none');
+        } else {
+          $field.val('');
+          $field.trigger('change');
+          $field.prop('disabled', true);
+          $field.parents('.display-weight').addClass('d-none');
+        }
+      });
+
+      function removeUser () {
+
+        var id = $(this).data('remove-volunteer');
+
+        $.ajax({
+          headers: {
+            'X-CSRF-TOKEN': $("input[name='_token']").val()
+          },
+          type: 'post',
+          url: '/party/remove-volunteer',
+          data: {
+            id: id,
+          },
+          datatype: 'json',
+          success: function (json) {
+            if (json.success) {
+              $('.volunteer-' + id).fadeOut();
+            } else {
+              alert('Something has gone wrong');
+            }
+          },
+          error: function (error) {
             alert('Something has gone wrong');
           }
-        },
-        error: function(error) {
-          alert('Something has gone wrong');
-        }
+        });
+
+      }
+
+      $('.js-remove').on('click', removeUser);
+      $(document).on('click', '[data-toggle="lightbox"]', function (event) {
+        event.preventDefault();
+        $(this).ekkoLightbox();
       });
 
-    }
+      $('.reset').on('click', resetForm);
 
-    $('.js-remove').on('click', removeUser);
-    $(document).on('click', '[data-toggle="lightbox"]', function (event) {
-      event.preventDefault();
-      $(this).ekkoLightbox();
-    });
+      loadDropzones();
 
-    $('.reset').on('click', resetForm);
-
-    loadDropzones();
-
-    if (window.location.hash === '#change-password' && $('#list-account').length > 0) {
-      $('#list-account-list').tab('show');
-    }
-    
-    // Make navbar hide on mobile scroll.
-    var showNavbar = true;
-    var lastScrollPosition = true;
-
-    window.addEventListener('scroll', function() {
-      // Get the current scroll position
-      const currentScrollPosition = window.pageYOffset || document.documentElement.scrollTop
-
-      // Because of momentum scrolling on mobiles, we shouldn't continue if it is less than zero
-      if (currentScrollPosition < 0) {
-        return
+      if (window.location.hash === '#change-password' && $('#list-account').length > 0) {
+        $('#list-account-list').tab('show');
       }
 
-      // Here we determine whether we need to show or hide the navbar
-      showNavbar = currentScrollPosition < lastScrollPosition
+      // Make navbar hide on mobile scroll.
+      var showNavbar = true;
+      var lastScrollPosition = true;
 
-      if (showNavbar) {
-        $('#nav-left').removeClass('nav-left--hidden')
-      } else {
-        $('#nav-left').addClass('nav-left--hidden')
-      }
+      window.addEventListener('scroll', function () {
+        // Get the current scroll position
+        const currentScrollPosition = window.pageYOffset || document.documentElement.scrollTop
 
-      // Set the current scroll position as the last scroll position
-      lastScrollPosition = currentScrollPosition
-    })
+        // Because of momentum scrolling on mobiles, we shouldn't continue if it is less than zero
+        if (currentScrollPosition < 0) {
+          return
+        }
 
-    // Sentry error
-    Sentry.init({
-      Vue,
-      dsn: "https://50fd2fa440af4bb4a230f40ca8d8cf90@o879179.ingest.sentry.io/5831645",
-      integrations: [Sentry.browserTracingIntegration()],
+        // Here we determine whether we need to show or hide the navbar
+        showNavbar = currentScrollPosition < lastScrollPosition
 
-      // We are low traffic, so we can capture all performance events.
-      tracesSampleRate: 1.0,
-      profilesSampleRate: 1.0,
-      ignoreErrors: [
-        'ResizeObserver loop limit exceeded',
-        // Random plugins/extensions
-        'top.GLOBALS',
-        // See: http://blog.errorception.com/2012/03/tale-of-unfindable-js-error.html
-        'originalCreateNotification',
-        'canvas.contentDocument',
-        'MyApp_RemoveAllHighlights',
-        'http://tt.epicplay.com',
-        'Can\'t find variable: ZiteReader',
-        'jigsaw is not defined',
-        'ComboSearch is not defined',
-        'http://loading.retry.widdit.com/',
-        'atomicFindClose',
-        // Facebook borked
-        'fb_xd_fragment',
-        // ISP "optimizing" proxy - `Cache-Control: no-transform` seems to
-        // reduce this. (thanks @acdha)
-        // See http://stackoverflow.com/questions/4113268
-        'bmi_SafeAddOnload',
-        'EBCallBackMessageReceived',
-        // See http://toolbar.conduit.com/Developer/HtmlAndGadget/Methods/JSInjection.aspx
-        'conduitPage'
-      ],
-      beforeSend: function beforeSend(event) {
-        if (window.restarters.analyticsCookieEnabled) {
-          return event;
+        if (showNavbar) {
+          $('#nav-left').removeClass('nav-left--hidden')
         } else {
-          return null;
+          $('#nav-left').addClass('nav-left--hidden')
         }
-      }
-    });
 
-    /**
-    * Next, we will create a fresh Vue application instance and attach it to
-    * the page. Then, you may begin adding components to this application
-    * or customize the JavaScript scaffolding to fit your unique needs.
-    */
+        // Set the current scroll position as the last scroll position
+        lastScrollPosition = currentScrollPosition
+      })
 
-    const app = new Vue({
-      el: '.vue',
-      mixins: [lang],
-      store,
-      components: {
-        'loginpage' : LoginPage,
-        'dashboardpage': DashboardPage,
-        'EventAddEditPage': EventAddEditPage,
-        'EventAddEdit': EventAddEdit,
-        'EventsRequiringModeration': EventsRequiringModeration,
-        'EventPage': EventPage,
-        'FixometerPage': FixometerPage,
-        'GroupsPage': GroupsPage,
-        'GroupPage': GroupPage,
-        'GroupAddEditPage': GroupAddEditPage,
-        'GroupEventsPage': GroupEventsPage,
-        'GroupEvents': GroupEvents,
-        'GroupsRequiringModeration': GroupsRequiringModeration,
+      console.log('Initializing Sentry...');
+      // Sentry error
+      Sentry.init({
+        Vue,
+        dsn: "https://50fd2fa440af4bb4a230f40ca8d8cf90@o879179.ingest.sentry.io/5831645",
+        integrations: [new BrowserTracing()],
 
-        'EventTimeRangePicker': EventTimeRangePicker,
-        'EventDatePicker': EventDatePicker,
-        'VenueAddress': VenueAddress,
-        'RichTextEditor': RichTextEditor,
-        'Notifications': Notifications,
-        'GroupTimeZone': GroupTimeZone,
-        'StatsShare': StatsShare,
-      }
-    })
-    $(".vue-placeholder-large").hide()
-    
-    // Initialize tokenfield
-    $('.tokenfield').tokenfield();
-
-    $(".select2-dropdown").select2({
-      placeholder: 'Select an country',
-      allowClear: false
-    });
-
-    $('.btn-calendar-feed').popover({
-      trigger: 'focus'
-    });
-
-    $('.btn-action').on('click', function () {
-      setTimeout(copyLinkUser, 200);
-    });
-
-    $('#btn-copy').on('click', function () {
-      copyLinkUser();
-    });
-
-    $('.btn-copy-input-text').on('click', function () {
-      copyLinkUser();
-    });
-
-    $('.information-alert').on('closed.bs.alert', function () {
-      localStorage.setItem('information-alert-closed', 'true');
-    });
-
-    $('#manual_invite_box').on('tokenfield:createtoken', function (event) {
-      var existingTokens = $(this).tokenfield('getTokens');
-      var newval = event.attrs.value
-
-      $.each(existingTokens, function(index, token) {
-        if (token.value === newval)
-        event.preventDefault();
-      });
-
-      if (existingTokens.length >= 20) {
-        event.preventDefault();
-        $(event.target).closest('div.tokenfield').css('border', '2px solid red')
-      } else {
-        $(event.target).closest('div.tokenfield').css('border', '')
-      }
-
-      if (existingTokens.length >= 19) {
-        $('#event-invite-to button, #invite-to-group button').prop('disabled', disabled);
-      }
-    });
-
-    $('#manual_invite_box').on('tokenfield:removedtoken', function (event) {
-      var existingTokens = $(this).tokenfield('getTokens');
-
-      if (existingTokens.length < 20) {
-        $('#event-invite-to button, #invite-to-group button').prop('disabled', false);
-        $(event.target).closest('div.tokenfield').css('border', '')
-      }
-    });
-
-    $(document).on("click", "#btn-copy", function () {
-      var $copy_link = $(this).data('clipboard-text');
-      var $temp = $("<input>");
-      $("body").append($temp);
-      $temp.val($copy_link).select();
-      document.execCommand("copy");
-      $temp.remove();
-
-      alert("Copied the link: " + $copy_link);
-    });
-
-    // Hash-based tab switching
-    let hash = document.location.hash;
-    if (hash) {
-        $('a[href=\"'+hash).tab('show');
-    }
-    
-    // Enable popovers - Bootstrap doesn't enable these by default.
-    $('[data-toggle="popover"]').popover();
-    
-    // All other jQuery initialization continues here...
-    groupsMap();
-    
-    if (window.gdprCookieNotice && !window.noCookieNotice) {
-      gdprCookieNotice({
-        locale: 'en',
-        timeout: 500,
-        expiration: 30,
-        domain: restarters.cookie_domain,
-        implicit: false,
-        statement: '/about/cookie-policy',
-        performace: ['DYNSRV'],
-        analytics: ['_ga','_gat', '_gid'],
-        marketing: []
-      });
-    }
-
-
-    $(".select2-dropdown").select2({
-      placeholder: 'Select an country',
-    });
-
-
-
-    // Information alerts
-    $('.information-alert').on('closed.bs.alert', function () {
-      var $dismissable_id = $(this).attr('id');
-      $.ajax({
-        headers: {
-          'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
-        },
-        type: 'POST',
-        url: '/set-cookie',
-        datatype: 'json',
-        data: {
-          'dismissable_id': $dismissable_id,
-        },
-        success: function(data) {
-          console.log(true);
+        // We are low traffic, so we can capture all performance events.
+        tracesSampleRate: 1.0,
+        ignoreErrors: [
+          'ResizeObserver loop limit exceeded',
+          // Random plugins/extensions
+          'top.GLOBALS',
+          // See: http://blog.errorception.com/2012/03/tale-of-unfindable-js-error.html
+          'originalCreateNotification',
+          'canvas.contentDocument',
+          'MyApp_RemoveAllHighlights',
+          'http://tt.epicplay.com',
+          'Can\'t find variable: ZiteReader',
+          'jigsaw is not defined',
+          'ComboSearch is not defined',
+          'http://loading.retry.widdit.com/',
+          'atomicFindClose',
+          // Facebook borked
+          'fb_xd_fragment',
+          // ISP "optimizing" proxy - `Cache-Control: no-transform` seems to
+          // reduce this. (thanks @acdha)
+          // See http://stackoverflow.com/questions/4113268
+          'bmi_SafeAddOnload',
+          'EBCallBackMessageReceived',
+          // See http://toolbar.conduit.com/Developer/HtmlAndGadget/Methods/JSInjection.aspx
+          'conduitPage'
+        ],
+        beforeSend: function beforeSend (event) {
+          if (window.restarters.analyticsCookieEnabled) {
+            return event;
+          } else {
+            return null;
+          }
         }
       });
-    });
+      console.log('Sentry initialized');
 
-    // Copy Calendar Feed link
-    $(document).on("click", "#btn-copy", function () {
-      var $copy_link = $(this).parents('div').parents('div').find('input[type=text]').val();
+      /**
+       * Vue instances are initialized outside of jQuery.ready for each .vue element
+       * See the initialization code after the jQuery.ready block
+       */
 
-      var $temp = $("<input>");
-      $("body").append($temp);
-      $temp.val($copy_link).select();
+      console.log('jQuery initialization complete - Vue will be initialized next')
+      $(".vue-placeholder-large").hide()
 
-      document.execCommand("copy");
-      $temp.remove();
+      // Initialize tokenfield
+      $('.tokenfield').tokenfield();
 
-      alert("Copied the link: " + $copy_link);
-    });
+      $(".select2-dropdown").select2({
+        placeholder: 'Select an country',
+        allowClear: false
+      });
 
-    // All remaining jQuery initialization code goes here
+      $('.btn-calendar-feed').popover({
+        trigger: 'focus'
+      });
+
+      $('.btn-action').on('click', function () {
+        setTimeout(copyLinkUser, 200);
+      });
+
+      $('#btn-copy').on('click', function () {
+        copyLinkUser();
+      });
+
+      $('.btn-copy-input-text').on('click', function () {
+        copyLinkUser();
+      });
+
+      $('.information-alert').on('closed.bs.alert', function () {
+        localStorage.setItem('information-alert-closed', 'true');
+      });
+
+      $('#manual_invite_box').on('tokenfield:createtoken', function (event) {
+        var existingTokens = $(this).tokenfield('getTokens');
+        var newval = event.attrs.value
+
+        $.each(existingTokens, function (index, token) {
+          if (token.value === newval)
+            event.preventDefault();
+        });
+
+        if (existingTokens.length >= 20) {
+          event.preventDefault();
+          $(event.target).closest('div.tokenfield').css('border', '2px solid red')
+        } else {
+          $(event.target).closest('div.tokenfield').css('border', '')
+        }
+
+        if (existingTokens.length >= 19) {
+          $('#event-invite-to button, #invite-to-group button').prop('disabled', disabled);
+        }
+      });
+
+      $('#manual_invite_box').on('tokenfield:removedtoken', function (event) {
+        var existingTokens = $(this).tokenfield('getTokens');
+
+        if (existingTokens.length < 20) {
+          $('#event-invite-to button, #invite-to-group button').prop('disabled', false);
+          $(event.target).closest('div.tokenfield').css('border', '')
+        }
+      });
+
+      $(document).on("click", "#btn-copy", function () {
+        var $copy_link = $(this).data('clipboard-text');
+        var $temp = $("<input>");
+        $("body").append($temp);
+        $temp.val($copy_link).select();
+        document.execCommand("copy");
+        $temp.remove();
+
+        alert("Copied the link: " + $copy_link);
+      });
+
+      // Hash-based tab switching
+      let hash = document.location.hash;
+      if (hash) {
+        $('a[href=\"' + hash).tab('show');
+      }
+
+      // Enable popovers - Bootstrap doesn't enable these by default.
+      $('[data-toggle="popover"]').popover();
+
+      // All other jQuery initialization continues here...
+      groupsMap();
+
+      if (window.gdprCookieNotice && !window.noCookieNotice) {
+        gdprCookieNotice({
+          locale: 'en',
+          timeout: 500,
+          expiration: 30,
+          domain: restarters.cookie_domain,
+          implicit: false,
+          statement: '/about/cookie-policy',
+          performace: ['DYNSRV'],
+          analytics: ['_ga', '_gat', '_gid'],
+          marketing: []
+        });
+      }
+
+      $(".select2-dropdown").select2({
+        placeholder: 'Select an country',
+      });
+
+      // Information alerts
+      $('.information-alert').on('closed.bs.alert', function () {
+        var $dismissable_id = $(this).attr('id');
+        $.ajax({
+          headers: {
+            'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+          },
+          type: 'POST',
+          url: '/set-cookie',
+          datatype: 'json',
+          data: {
+            'dismissable_id': $dismissable_id,
+          },
+          success: function (data) {
+            console.log(true);
+          }
+        });
+      });
+
+      // Copy Calendar Feed link
+      $(document).on("click", "#btn-copy", function () {
+        var $copy_link = $(this).parents('div').parents('div').find('input[type=text]').val();
+
+        var $temp = $("<input>");
+        $("body").append($temp);
+        $temp.val($copy_link).select();
+
+        document.execCommand("copy");
+        $temp.remove();
+
+        alert("Copied the link: " + $copy_link);
+      });
+
+
+      // Initialize Vue instances on any divs which have asked for it.
+      //
+      // Normally you'd initialise one instance on a single top-level div.  But we put content directly under body.
+      // Initialising multiple instances is a bit more expensive, but not much.
+      //
+      // We need to list all the top-level components we will use in blades here; they are stored in
+      // resources/js/components.  Lower level components can be included from within those as normal;
+      // they don't need listing here.
+      console.log('About to initialize Vue instances, found', window.jQuery(".vue").length, 'elements');
+      window.jQuery(".vue").each(function(index) {
+        console.log('Initializing Vue instance', index);
+        new Vue({
+          el: window.jQuery(this).get(0),
+          store: store,
+          components: {
+            'loginpage': LoginPage,
+            'dashboardpage': DashboardPage,
+            'eventaddeditpage': EventAddEditPage,
+            'eventaddedit': EventAddEdit,
+            'eventsrequiringmoderation': EventsRequiringModeration,
+            'eventpage': EventPage,
+            'fixometerpage': FixometerPage,
+            'groupspage': GroupsPage,
+            'grouppage': GroupPage,
+            'groupaddeditpage': GroupAddEditPage,
+            'groupeventspage': GroupEventsPage,
+            'groupevents': GroupEvents,
+            'groupsrequiringmoderation': GroupsRequiringModeration,
+
+            'eventtimerangepicker': EventTimeRangePicker,
+            'eventdatepicker': EventDatePicker,
+            'venueaddress': VenueAddress,
+            'richtexteditor': RichTextEditor,
+            'notifications': Notifications,
+            'grouptimezone': GroupTimeZone,
+            'statsshare': StatsShare,
+          }
+        })
+      })
+
+      // Initialize Leaflet components now that CDN Leaflet is available
+      try {
+        // Use vue2-leaflet with the global Leaflet from CDN
+        import('vue2-leaflet').then((leafletModule) => {
+          Vue.component('l-map', leafletModule.LMap);
+          Vue.component('l-marker', leafletModule.LMarker);
+          Vue.component('l-tile-layer', leafletModule.LTileLayer);
+        }).catch((e) => {
+          console.warn('Vue2-Leaflet components not available, using fallback:', e.message);
+        });
+      } catch (e) {
+        console.warn('Vue2-Leaflet components not available:', e.message);
+      }
+
+      // All remaining jQuery initialization code goes here
+      console.log('Global JS initialization complete');
+    } catch (e) {
+      console.error('Global JS initialization error:', e);
+      console.error('Error details:', e.message, e.stack);
+    }
   });
-
-  // Initialize Vue instances on any divs which have asked for it.
-  //
-  // Normally you'd initialise one instance on a single top-level div.  But we put content directly under body.
-  // Initialising multiple instances is a bit more expensive, but not much.
-  //
-  // We need to list all the top-level components we will use in blades here; they are stored in
-  // resources/js/components.  Lower level components can be included from within those as normal;
-  // they don't need listing here.
-  window.jQuery(".vue").each(function(index) {
-    new Vue({
-      el: window.jQuery(this).get(0),
-      store: store,
-      components: {
-        'loginpage' : LoginPage,
-        'DashBoardPage': DashboardPage,
-        'EventAddEditPage': EventAddEditPage,
-        'EventAddEdit': EventAddEdit,
-        'EventsRequiringModeration': EventsRequiringModeration,
-        'EventPage': EventPage,
-        'FixometerPage': FixometerPage,
-        'GroupsPage': GroupsPage,
-        'GroupPage': GroupPage,
-        'GroupAddEditPage': GroupAddEditPage,
-        'GroupEventsPage': GroupEventsPage,
-        'GroupEvents': GroupEvents,
-        'GroupsRequiringModeration': GroupsRequiringModeration,
-
-        'EventTimeRangePicker': EventTimeRangePicker,
-        'EventDatePicker': EventDatePicker,
-        'VenueAddress': VenueAddress,
-        'RichTextEditor': RichTextEditor,
-        'Notifications': Notifications,
-        'GroupTimeZone': GroupTimeZone,
-        'StatsShare': StatsShare,
-      }
-    })
-  })
-
-  // Initialize Leaflet components now that CDN Leaflet is available
-  try {
-    // Use vue2-leaflet with the global Leaflet from CDN
-    import('vue2-leaflet').then((leafletModule) => {
-      Vue.component('l-map', leafletModule.LMap);
-      Vue.component('l-marker', leafletModule.LMarker);
-      Vue.component('l-tile-layer', leafletModule.LTileLayer);
-    }).catch((e) => {
-      console.warn('Vue2-Leaflet components not available, using fallback:', e.message);
-    });
-  } catch (e) {
-    console.warn('Vue2-Leaflet components not available:', e.message);
-  }
 }
 
 // Start the initialization
@@ -1198,31 +1186,7 @@ function initAutocomplete() {
   // Final jQuery block moved to initializeJQuery() function
 
 // All jQuery initialization moved to initializeJQuery() function above
-
-// Sentry error
-Sentry.init({
-    Vue,
-    dsn: "https://50fd2fa440af4bb4a230f40ca8d8cf90@o879179.ingest.sentry.io/5831645",
-    integrations: [Sentry.browserTracingIntegration()],
-
-    // We are low traffic, so we can capture all performance events.
-    tracesSampleRate: 1.0,
-
-    beforeSend(event) {
-      // Suppress development logs..
-      if (process.env.NODE_ENV === 'development') {
-        return null
-      }
-
-      return event
-    }
-  });
-
-  // Initialize Leaflet components using CDN-loaded Leaflet
-  // This will be set up after jQuery initialization to ensure all dependencies are loaded
-
-
-// jQuery initialization moved to initializeJQuery() function at top of file
+// Sentry initialization is also inside the initializeJQuery() function
 
 // Start jQuery initialization
 initializeJQuery();
