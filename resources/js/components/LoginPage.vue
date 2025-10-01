@@ -83,27 +83,12 @@ export default {
     }
   },
   mounted() {
-    console.log('LoginPage mounted, time prop:', this.time);
-    console.log('LoginPage mounted, email prop:', this.email);
-    console.log('LoginPage mounted, error prop:', this.error);
-    console.log('LoginPage form ref:', this.$refs.form);
-    console.log('my_time input value:', this.$refs.myTimeInput?.value);
-
     // Force set the input value directly on the DOM element
     // Get it from the parent element's data attribute as a fallback
     const myTimeFromData = this.$el.parentElement?.dataset?.myTime || this.time;
     if (this.$refs.myTimeInput && myTimeFromData) {
       this.$refs.myTimeInput.value = myTimeFromData;
       this.$refs.myTimeInput.setAttribute('value', myTimeFromData);
-      console.log('Forcefully set my_time input value to:', myTimeFromData.substring(0, 50));
-    }
-
-    // Add a native event listener to debug
-    if (this.$refs.form) {
-      this.$refs.form.addEventListener('submit', (e) => {
-        console.log('Native submit event fired, defaultPrevented:', e.defaultPrevented);
-        console.log('my_time value at submit:', this.$refs.myTimeInput?.value);
-      });
     }
   },
   computed: {
@@ -143,8 +128,6 @@ export default {
   },
   methods: {
     submit(event) {
-      console.log('Submit handler called, event:', event);
-
       // We've seen double submits of the login form, leading to 419 errors.  Prevent the user submitting twice by
       // double-clicking, or because an autosubmit happened and they didn't realise it.  Do this
       // by ignoring submits within 5 seconds of the last submit.
@@ -153,18 +136,7 @@ export default {
       // submit or show a native error.
       if (!this.lastSubmit || this.lastSubmit < Date.now() - 5000) {
         this.lastSubmit = Date.now()
-
-        // Debug: Check form values before submit
-        const formData = new FormData(this.$refs.form);
-        console.log('Form data before submit:');
-        for (let [key, value] of formData.entries()) {
-          console.log(`  ${key}: ${value}`);
-        }
-
-        console.log('About to submit form');
         this.$refs.form.submit()
-      } else {
-        console.log('Ignore double submit')
       }
     }
   }

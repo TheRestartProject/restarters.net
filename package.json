@@ -50,8 +50,8 @@
         "webpack-shell-plugin-next": "^2.3.1"
     },
     "dependencies": {
-        "@sentry/tracing": "^6.7.2",
-        "@sentry/vue": "^6.7.2",
+        "@sentry/tracing": "^7.119.0",
+        "@sentry/vue": "^7.119.0",
         "ajv": "^6.12.3",
         "babel-plugin-istanbul": "^6.1.1",
         "bootstrap-fileinput": "^4.4.9",

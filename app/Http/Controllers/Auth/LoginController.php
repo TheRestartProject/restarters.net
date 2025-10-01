@@ -55,15 +55,7 @@ class LoginController extends Controller
      */
     public function login(Request $request)
     {
-        \Log::info('Login attempt', ['email' => $request->email, 'my_time_present' => $request->has('my_time'), 'my_time_value' => substr($request->my_time ?? '', 0, 50)]);
-
-        try {
-            $this->validateLogin($request);
-            \Log::info('Login validation passed');
-        } catch (\Illuminate\Validation\ValidationException $e) {
-            \Log::error('Login validation failed', ['errors' => $e->errors()]);
-            throw $e;
-        }
+        $this->validateLogin($request);
 
         // If the class is using the ThrottlesLogins trait, we can automatically throttle
         // the login attempts for this application. We'll key this by the username and
@@ -75,7 +67,6 @@ class LoginController extends Controller
         }
 
         if ($this->attemptLogin($request)) {
-            \Log::info('Login successful', ['email' => $request->email]);
             \Cookie::queue(\Cookie::make('authenticated', $request->email, config('session.lifetime'), null, config('session.domain')));
 
             return $this->sendLoginResponse($request);
@@ -84,7 +75,6 @@ class LoginController extends Controller
         // If the login attempt was unsuccessful we will increment the number of attempts
         // to login and redirect the user back to the login form. Of course, when this
         // user surpasses their maximum number of attempts they will get locked out.
-        \Log::info('Login failed - credentials incorrect', ['email' => $request->email]);
         $this->incrementLoginAttempts($request);
 
         return $this->sendFailedLoginResponse($request);
