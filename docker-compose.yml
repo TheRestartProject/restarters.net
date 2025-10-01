@@ -174,7 +174,7 @@ services:
   # psql -h postgresql -U bn_discourse -p 5432 -w bitnami_discourse
   postgresql:
     profiles: ["discourse"]
-    image: docker.io/bitnami/postgresql:11
+    image: docker.io/bitnamilegacy/postgresql:11
     container_name: postgresql
     volumes:
       - 'postgresql_data:/bitnami/postgresql'
@@ -187,7 +187,7 @@ services:
 
   restarters_discourse_redis:
     profiles: ["discourse"]
-    image: docker.io/bitnami/redis:6.0
+    image: docker.io/bitnamilegacy/redis:6.0
     container_name: restarters_discourse_redis
     environment:
       - ALLOW_EMPTY_PASSWORD=yes
@@ -198,7 +198,7 @@ services:
 
   restarters_discourse:
     profiles: ["discourse"]
-    image: docker.io/bitnami/discourse:2
+    image: docker.io/bitnamilegacy/discourse:2
     container_name: restarters_discourse
     ports:
       - '8003:80'
