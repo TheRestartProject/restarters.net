@@ -289,28 +289,30 @@ tasks:
       Wait for Docker services to be ready by checking their health endpoints.
       This task will check that services are listening on their ports and returning
       plausible responses before proceeding, but only for the services in the specified profile.
-      
+
       For just the core services, use:
       task docker:wait-for-services-core
-      
+
       To include debug tools (phpMyAdmin, Mailhog), use:
       task docker:wait-for-services-debug
-      
+
       To include Discourse services, use:
       task docker:wait-for-services-discourse
-      
+
       To wait for all services, use:
       task docker:wait-for-services-all
-      
+
       The task checks:
       - Core profile: MySQL database, Restarters web app
-      - Debug profile: Core + phpMyAdmin, Mailhog  
+      - Debug profile: Core + phpMyAdmin, Mailhog
       - Discourse profile: Core + Discourse, PostgreSQL, Redis, Sidekiq
       - All profile: All services
-      
+
     requires: *PROFILE_REQUIRES
-    
+
     vars: *PROFILE_VARS
+
+    silent: true
 
     cmds:
       - |

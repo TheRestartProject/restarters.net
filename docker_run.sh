@@ -74,7 +74,7 @@ done
 # Wait for MySQL database to be ready before running migrations
 wait_for_service "MySQL database" "nc -z restarters_db 3306" 60 5
 
-php artisan migrate
+php artisan migrate:fresh --seed
 npm install --legacy-peer-deps
 npm rebuild node-sass
 

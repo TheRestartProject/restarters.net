@@ -1113,7 +1113,7 @@ class UserController extends Controller
             $menus['Administrator'] = $adminMenu;
         }
 
-        if ($user->hasRole('Administrator') || $user->hasRole('Host')) {
+        if ($user->hasRole('Administrator') || $user->hasRole('NetworkCoordinator') || $user->hasRole('Host')) {
             $items = [];
             $items[Lang::get('general.party_reporting')] = url('/search');
 

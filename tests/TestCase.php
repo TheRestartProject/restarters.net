@@ -19,6 +19,7 @@ use App\Skills;
 use App\UsersSkills;
 use App\User;
 use App\UserGroups;
+use App\UsersPermissions;
 use App\UsersPreferences;
 use App\Xref;
 use App\Alert;
@@ -62,6 +63,7 @@ abstract class TestCase extends BaseTestCase
         EventsUsers::truncate();
         UserGroups::truncate();
         UsersPreferences::truncate();
+        UsersPermissions::truncate();
         DeviceBarrier::truncate();
         Device::truncate();
         Party::truncate();
