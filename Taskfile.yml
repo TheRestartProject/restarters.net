@@ -250,6 +250,11 @@ tasks:
             sleep 2
           done
           echo 'ERROR: Vite dev server failed to start after 120 seconds'
+          echo 'Vite process status:'
+          ps aux | grep -i vite || echo 'No Vite process found'
+          echo ''
+          echo 'Vite log (last 50 lines):'
+          tail -n 50 /var/log/vite.log 2>&1 || echo 'No Vite log found'
           exit 1
         "
       - |

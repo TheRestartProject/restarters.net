@@ -82,7 +82,11 @@ npm rebuild node-sass
 npm install -D @playwright/test
 npx playwright install
 
-npm run dev&
+# Start Vite dev server in the background with logging
+echo "Starting Vite dev server..."
+nohup npm run dev > /var/log/vite.log 2>&1 &
+echo "Vite dev server started with PID $!"
+
 php artisan key:generate
 php artisan cache:clear
 php artisan config:clear
