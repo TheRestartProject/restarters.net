@@ -128,12 +128,18 @@ jobs:
       - run:
           name: Copy Playwright artifacts
           command: |
+            # Create test results directory on host
+            mkdir -p /tmp/test-results/playwright
+            mkdir -p /tmp/test-results/logs
+
             # List what's available in the container
             docker exec restarters bash -c "ls -la /tmp/test-results/* || echo 'No playwright directories found'"
+
             # Copy test results and artifacts to host if they exist
-            docker cp restarters:/tmp/test-results /tmp/test-results/playwright/ || echo "Playwright HTML report not found"
+            docker cp restarters:/tmp/test-results/. /tmp/test-results/playwright/ || echo "Playwright HTML report not found"
+
             # Copy Vite log for debugging
-            docker cp restarters:/var/log/vite.log /tmp/test-results/vite.log || echo "Vite log not found"
+            docker cp restarters:/var/log/vite.log /tmp/test-results/logs/vite.log || echo "Vite log not found"
           when: always
 
       # Keep containers running for SSH debugging
