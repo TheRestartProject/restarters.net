@@ -82,6 +82,11 @@ npm rebuild node-sass
 npm install -D @playwright/test
 npx playwright install
 
+# Start Vite dev server in the background with logging
+echo "Starting Vite dev server..."
+nohup npm run dev > /var/log/vite.log 2>&1 &
+echo "Vite dev server started with PID $!"
+
 php artisan key:generate
 php artisan cache:clear
 php artisan config:clear
@@ -91,11 +96,6 @@ php artisan l5-swagger:generate
 
 # Ensure we have the admin user
 echo "User::firstOrCreate(['email'=>'jane@bloggs.net'], ['name'=>'Jane Bloggs','password'=>Hash::make('passw0rd'),'role'=>2,'consent_past_data'=>'2021-01-01','consent_future_data'=>'2021-01-01','consent_gdpr'=>'2021-01-01']);" | php artisan tinker
-
-# Start Vite dev server in the background with logging
-echo "Starting Vite dev server..."
-nohup npm run dev > /var/log/vite.log 2>&1 &
-echo "Vite dev server started with PID $!"
 
 php-fpm
 
