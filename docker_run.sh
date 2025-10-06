@@ -84,7 +84,7 @@ npx playwright install
 
 # Start Vite dev server in the background with logging
 echo "Starting Vite dev server..."
-nohup npm run dev > /var/log/vite.log 2>&1 &
+nohup npm run dev > /tmp/vite.log 2>&1 &
 echo "Vite dev server started with PID $!"
 
 php artisan key:generate

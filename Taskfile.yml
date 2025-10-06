@@ -254,7 +254,7 @@ tasks:
           ps aux | grep -i vite || echo 'No Vite process found'
           echo ''
           echo 'Vite log (last 50 lines):'
-          tail -n 50 /var/log/vite.log 2>&1 || echo 'No Vite log found'
+          tail -n 50 /tmp/vite.log 2>&1 || echo 'No Vite log found'
           exit 1
         "
       - |
