@@ -242,7 +242,7 @@ tasks:
         echo "Waiting for Vite dev server to be ready..."
         docker exec restarters bash -c "
           for i in {1..60}; do
-            if curl -sf http://localhost:5173 > /dev/null 2>&1; then
+            if grep -q 'ready in' /tmp/vite.log 2>/dev/null; then
               echo 'Vite dev server is ready'
               exit 0
             fi
