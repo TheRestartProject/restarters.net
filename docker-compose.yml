@@ -182,7 +182,8 @@ services:
       - restarters_nginx
     environment:
       - PLAYWRIGHT_BASE_URL=http://restarters_nginx
-    command: tail -f /dev/null
+    # Install Playwright browsers after npm install to ensure version match
+    command: /bin/sh -c "npx playwright install chromium && tail -f /dev/null"
 
   # From here, it's stuff that Discourse needs.
   #

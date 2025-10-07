@@ -244,6 +244,10 @@ tasks:
         docker exec restarters bash -c "ps aux | grep 'node.*vite' | grep -v grep | awk '{print \$2}' | xargs -r kill || true"
         docker exec restarters bash -c "rm -f /var/www/public/hot && npm run build"
       - |
+        # Ensure Playwright browsers are installed (handles version mismatches)
+        echo "Installing Playwright browsers..."
+        docker exec restarters_playwright bash -c "npx playwright install chromium"
+      - |
         docker exec restarters_playwright bash -c "
           export PLAYWRIGHT_TEST=true
           export PLAYWRIGHT_DEBUG=true
