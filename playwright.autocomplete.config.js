@@ -21,10 +21,8 @@ const config = {
     video: 'on',
     // Configurable timeout for waitForURL operations
     navigationTimeout: 30000,
-    // Add header to identify Playwright requests
-    extraHTTPHeaders: {
-      'X-Playwright-Test': 'true'
-    },
+    // Note: X-Playwright-Test header is added via fixtures.js route interception
+    // to avoid CORS issues with CDN resources
   },
   projects: [
     {

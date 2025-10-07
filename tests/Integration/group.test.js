@@ -1,4 +1,5 @@
-const {test, expect} = require('@playwright/test')
+const { test } = require('./fixtures')
+const { expect } = require('@playwright/test')
 const { login, createGroup, unfollowGroup } = require('./utils')
 
 test('Can create group', async ({page, baseURL}) => {

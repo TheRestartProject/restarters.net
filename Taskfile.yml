@@ -221,10 +221,10 @@ tasks:
       - docker exec restarters bash -c "npm i jest-junit; JEST_JUNIT_OUTPUT_DIR=/tmp/test-results npm run jest -- --testResultsProcessor=jest-junit"
 
   docker:test:playwright:
-    desc: Run Playwright tests in the core application container.
+    desc: Run Playwright tests in dedicated playwright container.
     summary: |
-      Run Playwright end-to-end tests with the same configuration used in CircleCI.
-      This ensures consistency between local development and CI environments.
+      Run Playwright end-to-end tests using a dedicated playwright container.
+      This ensures proper isolation and reliable network access to the application.
 
       The command includes:
       - Environment variables for test configuration
@@ -244,7 +244,7 @@ tasks:
         docker exec restarters bash -c "ps aux | grep 'node.*vite' | grep -v grep | awk '{print \$2}' | xargs -r kill || true"
         docker exec restarters bash -c "rm -f /var/www/public/hot && npm run build"
       - |
-        docker exec restarters bash -c "
+        docker exec restarters_playwright bash -c "
           export PLAYWRIGHT_TEST=true
           export PLAYWRIGHT_DEBUG=true
           export PWTEST_SKIP_TEST_OUTPUT=0

@@ -1,4 +1,5 @@
-const {test, expect} = require('@playwright/test')
+const { test } = require('./fixtures')
+const { expect } = require('@playwright/test')
 const { login } = require('./utils')
 
 test('Landing page has blurb', async ({page, baseURL}) => {

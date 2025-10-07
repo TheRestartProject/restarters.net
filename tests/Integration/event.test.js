@@ -1,4 +1,5 @@
-const {test, expect} = require('@playwright/test')
+const { test } = require('./fixtures')
+const { expect } = require('@playwright/test')
 const { login, createGroup, createEvent, approveEvent} = require('./utils')
 
 test('Can create future event', async ({page, baseURL}) => {

@@ -132,13 +132,13 @@ jobs:
             mkdir -p /tmp/test-results/playwright
             mkdir -p /tmp/test-results/logs
 
-            # List what's available in the container
-            docker exec restarters bash -c "ls -la /tmp/test-results/* || echo 'No playwright directories found'"
+            # List what's available in the playwright container
+            docker exec restarters_playwright bash -c "ls -la /tmp/test-results/* || echo 'No playwright directories found'"
 
-            # Copy test results and artifacts to host if they exist
-            docker cp restarters:/tmp/test-results/. /tmp/test-results/playwright/ || echo "Playwright HTML report not found"
+            # Copy test results and artifacts from playwright container to host
+            docker cp restarters_playwright:/tmp/test-results/. /tmp/test-results/playwright/ || echo "Playwright HTML report not found"
 
-            # Copy Vite log for debugging
+            # Copy Vite log from restarters container for debugging
             docker cp restarters:/tmp/vite.log /tmp/test-results/logs/vite.log || echo "Vite log not found"
           when: always
 

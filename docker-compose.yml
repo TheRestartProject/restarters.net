@@ -168,6 +168,22 @@ services:
     networks:
       - app-network
 
+  # Playwright testing service
+  playwright:
+    profiles: ["core", "debug", "discourse"]
+    image: mcr.microsoft.com/playwright:v1.55.1-noble
+    container_name: restarters_playwright
+    working_dir: /var/www
+    volumes:
+      - ./:/var/www:rw
+    networks:
+      - app-network
+    depends_on:
+      - restarters_nginx
+    environment:
+      - PLAYWRIGHT_BASE_URL=http://restarters_nginx
+    command: tail -f /dev/null
+
   # From here, it's stuff that Discourse needs.
   #
   # The other Docker images hardcode the name of the postgresql server in some places, so we can't prefix that.

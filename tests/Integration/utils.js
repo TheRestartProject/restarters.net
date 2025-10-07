@@ -12,7 +12,7 @@ const log = (message, ...args) => {
 
 const login = async function(page, baseURL, email = 'jane@bloggs.net', password = 'passw0rd') {
   log('Starting login process', { email, baseURL })
-  
+
   // Load the login page.
   log('Navigating to login page')
   await page.goto(baseURL + '/login')
