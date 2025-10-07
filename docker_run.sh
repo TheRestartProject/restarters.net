@@ -84,10 +84,6 @@ npx playwright install
 
 # Start Vite dev server in the background with logging
 echo "Starting Vite dev server..."
-# Use VITE_HMR_HOST from docker-compose environment, default to restarters if not set
-export VITE_HMR_HOST=${VITE_HMR_HOST:-restarters}
-# Set Vite dev server URL for Laravel to use container name
-export VITE_DEV_SERVER_URL=http://${VITE_HMR_HOST}:5173
 nohup npm run dev > /tmp/vite.log 2>&1 &
 echo "Vite dev server started with PID $!"
 

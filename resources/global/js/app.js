@@ -1,9 +1,11 @@
-// jQuery is loaded via CDN in the header, so we don't import it here
-// Just use the global window.jQuery and window.$
+// jQuery loaded from CDN in header, not bundled
 
 import './components/dropdown.js';
 import './components/ajax-search-discourse-notifications.js';
 import './components/check-auth.js';
+
+// Use global jQuery
+const $ = window.jQuery;
 
 window.onload = function() {
   // Use strict mode to reduce development errors.

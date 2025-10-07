@@ -237,26 +237,12 @@ tasks:
       - docker exec restarters bash -c "echo \"DB::statement('SET foreign_key_checks=0'); App\\\\Device::truncate(); DB::statement('SET foreign_key_checks=1');\" | php artisan tinker" || true
       - docker exec restarters bash -c "echo \"App\\\\User::firstOrCreate(['email'=>'jane@bloggs.net'], ['name'=>'Jane Bloggs','password'=>Hash::make('passw0rd'),'role'=>2,'consent_past_data'=>'2021-01-01','consent_future_data'=>'2021-01-01','consent_gdpr'=>'2021-01-01']);\" | php artisan tinker" || true
       - docker exec restarters bash -c "sed -i 's/.throttle:api.,//g' /var/www/app/Http/Kernel.php"
+      - docker exec restarters bash -c "sed -i 's/APP_DEBUG=.*$/APP_DEBUG=false/g' /var/www/.env"
       - |
-        # Wait for Vite dev server to be ready
-        echo "Waiting for Vite dev server to be ready..."
-        docker exec restarters bash -c "
-          for i in {1..60}; do
-            if grep -q 'ready in' /tmp/vite.log 2>/dev/null; then
-              echo 'Vite dev server is ready'
-              exit 0
-            fi
-            echo \"Waiting for Vite... (attempt \$i/60)\"
-            sleep 2
-          done
-          echo 'ERROR: Vite dev server failed to start after 120 seconds'
-          echo 'Vite process status:'
-          ps aux | grep -i vite || echo 'No Vite process found'
-          echo ''
-          echo 'Vite log (last 50 lines):'
-          tail -n 50 /tmp/vite.log 2>&1 || echo 'No Vite log found'
-          exit 1
-        "
+        # Stop Vite dev server and build assets for production
+        echo "Stopping Vite dev server and building assets..."
+        docker exec restarters bash -c "ps aux | grep 'node.*vite' | grep -v grep | awk '{print \$2}' | xargs -r kill || true"
+        docker exec restarters bash -c "rm -f /var/www/public/hot && npm run build"
       - |
         docker exec restarters bash -c "
           export PLAYWRIGHT_TEST=true

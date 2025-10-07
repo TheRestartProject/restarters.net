@@ -29,3 +29,4 @@ restarters-anonymised.sql
 /public/build/
 /storage/api-docs/api-docs.json
 /.phpunit.result.cache
+/playwright-report/

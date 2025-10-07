@@ -91,7 +91,6 @@ services:
       UID: ${UID}
       GID: ${GID}
       CIRCLECI: ${CIRCLECI:-false}
-      VITE_HMR_HOST: ${VITE_HMR_HOST:-localhost}
     working_dir: /var/www
     ports:
       - "5173:5173"

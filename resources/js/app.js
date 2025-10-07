@@ -4,6 +4,9 @@
 * building robust, powerful web applications using Vue and Laravel.
 */
 
+// Import vendor dependencies first to ensure jQuery and plugins are available
+import './vendor';
+
 import './bootstrap';
 
 // Import all other dependencies first
@@ -72,16 +75,27 @@ Vue.mixin(lang)
 // as we gradually migrate from Blade templates to Vue components. Each piece of
 // jQuery functionality should be replaced with Vue component equivalents.
 function initializeJQuery() {
+  console.log('initializeJQuery called', {
+    hasWindow: typeof window !== 'undefined',
+    hasJQuery: typeof window.jQuery !== 'undefined',
+    hasSelect2: typeof window.jQuery !== 'undefined' && typeof window.jQuery.fn.select2 !== 'undefined',
+    hasLeaflet: typeof window.L !== 'undefined'
+  });
+
   if (typeof window === 'undefined' || !window.jQuery) {
     setTimeout(initializeJQuery, 50);
     return;
   }
-  
-  // Also wait for Select2, Leaflet, and Bootstrap to be available
-  if (typeof window.jQuery.fn.select2 === 'undefined' || typeof window.L === 'undefined' || typeof window.jQuery.fn.popover === 'undefined') {
+
+  // Wait for Select2 and Leaflet to be available
+  // Note: Bootstrap loads from CDN and may not be ready yet, but that's OK
+  if (typeof window.jQuery.fn.select2 === 'undefined' || typeof window.L === 'undefined') {
+    console.log('Waiting for dependencies...');
     setTimeout(initializeJQuery, 50);
     return;
   }
+
+  console.log('All dependencies ready, initializing...');
   
   const $ = window.jQuery;
   
