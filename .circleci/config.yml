@@ -37,7 +37,7 @@ jobs:
             sed -i 's/DISCOURSE_APIUSER=.*$/DISCOURSE_APIUSER=someuser/g' .env
             
             # Configure for testing
-            sed -i 's/APP_DEBUG=.*$/APP_DEBUG=FALSE/g' .env
+            sed -i 's/APP_DEBUG=.*$/APP_DEBUG=true/g' .env
             sed -i 's/SESSION_DOMAIN=.*$/SESSION_DOMAIN=localhost/g' .env
             sed -i 's/HONEYPOT_DISABLE=.*$/HONEYPOT_DISABLE=TRUE/g' .env
             sed -i 's/APP_URL=.*$/APP_URL=http:\/\/localhost:8001/g' .env
