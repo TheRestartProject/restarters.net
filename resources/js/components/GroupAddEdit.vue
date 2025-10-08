@@ -376,22 +376,18 @@ export default {
     async submit (callback) {
       // Events are created via form submission - we don't yet have an API call to do this over AJAX.  Therefore
       // this page and the subcomponents have form inputs with suitable names.
-      console.log('DEBUG: submit method called')
       this.failed = false
       this.edited = false
       let success = false
 
       this.$v.$touch()
-      console.log('DEBUG: Form validation touched, duplicateName:', this.duplicateName, 'invalid:', this.$v.$invalid)
 
       if (!this.duplicateName) {
         // Check the form is valid.
         if (this.$v.$invalid) {
           // It's not.
-          console.log('Form is invalid', )
           this.validationFocusFirstError()
         } else {
-          console.log('Form is valid')
           if (this.creating) {
             const payload = {
               name: this.name,
@@ -406,17 +402,13 @@ export default {
               image: this.image,
               network_data: JSON.stringify(this.networkData)
             }
-            console.log('DEBUG: About to dispatch groups/create with payload:', JSON.stringify(payload))
             const id = await this.$store.dispatch('groups/create', payload)
-            console.log('DEBUG: Received id from store dispatch:', id)
 
             if (id) {
               // Success.  Go to the edit page.
-              console.log('DEBUG: Redirecting to /group/edit/' + id)
               window.location = '/group/edit/' + id
               success = true
             } else {
-              console.log('DEBUG: Create failed - no id returned')
               this.failed = true
             }
           } else {
