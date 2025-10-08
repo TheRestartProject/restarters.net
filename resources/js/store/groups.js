@@ -159,7 +159,10 @@ export default {
           }
         }
 
-        let ret = await axios.post('/api/v2/groups?api_token=' + rootGetters['auth/apiToken'], formData, {
+        const apiToken = rootGetters['auth/apiToken']
+        const url = '/api/v2/groups?api_token=' + apiToken
+
+        let ret = await axios.post(url, formData, {
           headers: {
             "Content-Type": "multipart/form-data",
           },

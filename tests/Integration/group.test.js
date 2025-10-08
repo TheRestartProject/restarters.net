@@ -4,6 +4,12 @@ const { login, createGroup, unfollowGroup } = require('./utils')
 
 test('Can create group', async ({page, baseURL}) => {
   test.slow()
+
+  // Listen to browser console
+  page.on('console', msg => {
+    console.log('BROWSER CONSOLE:', msg.type(), msg.text())
+  })
+
   await login(page, baseURL)
   await createGroup(page, baseURL)
 })

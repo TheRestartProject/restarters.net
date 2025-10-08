@@ -69,7 +69,58 @@ exports.createGroup = async function(page, baseURL) {
   // ugly, but will do.
   log('Submitting group creation form')
   await page.waitForTimeout(3000);
-  await page.click('button[type=submit]')
+
+  // Debug: check how many submit buttons exist
+  const submitButtonCount = await page.locator('button[type=submit]').count()
+  log('Found submit button count:', submitButtonCount)
+
+  // Use more specific selector - the button with "Create group" text
+  const createButton = page.locator('button', { hasText: 'Create group' })
+  const buttonText = await createButton.textContent()
+  log('Button text:', buttonText)
+
+  // Debug: check if button has Vue event listeners and find .vue containers
+  const hasListeners = await page.evaluate(() => {
+    const buttons = Array.from(document.querySelectorAll('button'))
+    const createBtn = buttons.find(b => b.textContent.includes('Create group'))
+    const vueContainers = document.querySelectorAll('.vue')
+    const vueContainerInfo = Array.from(vueContainers).map((c, i) => ({
+      index: i,
+      hasVue: c.__vue__ !== undefined,
+      childCount: c.children.length,
+      innerHTML: c.innerHTML.substring(0, 100)
+    }))
+    return {
+      hasOnClick: createBtn && typeof createBtn.onclick === 'function',
+      hasVueListeners: createBtn && createBtn.__vue__ !== undefined,
+      parentHasVue: createBtn && createBtn.parentElement && createBtn.parentElement.__vue__ !== undefined,
+      vueContainers: vueContainerInfo,
+      buttonInVueContainer: createBtn && Array.from(vueContainers).some(c => c.contains(createBtn))
+    }
+  })
+  log('Button listener check:', JSON.stringify(hasListeners, null, 2))
+
+  // Debug: check what JS files are loaded
+  const loadedScripts = await page.evaluate(() => {
+    const scripts = Array.from(document.querySelectorAll('script[src]'))
+    return scripts.map(s => s.src).filter(src => src.includes('app-'))
+  })
+  log('Loaded scripts:', loadedScripts)
+
+  // Try clicking via JavaScript to trigger Vue event
+  await page.evaluate(() => {
+    const buttons = Array.from(document.querySelectorAll('button'))
+    const createBtn = buttons.find(b => b.textContent.includes('Create group'))
+    if (createBtn) {
+      console.log('DEBUG TEST: Triggering click via JS')
+      createBtn.click()
+    }
+  })
+
+  // Wait a bit to see if the click handler fires
+  await page.waitForTimeout(1000)
+
+  log('Clicked submit button via JS')
 
   // Should get redirected to Edit form.  We used to wait on #details, but this stopped working for reasons we don't
   // understand.  It may be as design in Playwright.  However the page URL will have been updated and we can use that

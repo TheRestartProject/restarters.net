@@ -80,8 +80,8 @@ services:
       context: .
       dockerfile: Dockerfile
       args:
-        UID: ${UID}
-        GID: ${GID}
+        UID: ${UID:-1000}
+        GID: ${GID:-1000}
     container_name: restarters
     restart: unless-stopped
     tty: true

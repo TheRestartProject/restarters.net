@@ -106,7 +106,7 @@ function initializeJQuery() {
   // Document ready functionality
   $(document).ready(function() {
     try {
-      console.log('Global js ready!');
+      console.log('RESOURCES/js/app.js ready!');
 
       // Continue with all other jQuery code that was in the file
       if ($('section.registration').length > 0 && $('.alert.alert-danger').length > 0 && $('.is-invalid').length > 0) {
@@ -1203,6 +1203,6 @@ function initAutocomplete() {
 // All jQuery initialization moved to initializeJQuery() function above
 // Sentry initialization is also inside the initializeJQuery() function
 
-// Start jQuery initialization
-initializeJQuery();
+// Start jQuery initialization (called earlier on line 509, don't duplicate here)
+// initializeJQuery();
 
