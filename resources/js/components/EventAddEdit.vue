@@ -345,7 +345,6 @@ export default {
 
       if (this.$v.$invalid) {
         // It's not - prevent the submit.
-        console.log("Not valid event", this.$v)
         this.validationFocusFirstError()
       } else {
         if (this.creating) {
