@@ -37,7 +37,6 @@ if (!$testGroup) {
         'latitude' => 51.5074,
         'longitude' => -0.1278,
         'free_text' => 'Test group for autocomplete functionality',
-        'approved' => true,
     ]);
 }
 
@@ -50,12 +49,10 @@ if (!$testEvent) {
         'location' => 'London, UK',
         'latitude' => 51.5074,
         'longitude' => -0.1278,
-        'event_date' => now()->subDays(1),
-        'start' => '10:00',
-        'end' => '16:00',
+        'event_start_utc' => now()->subDays(1)->setTime(10, 0),
+        'event_end_utc' => now()->subDays(1)->setTime(16, 0),
         'group' => $testGroup->idgroups,
         'free_text' => 'Test event for autocomplete functionality',
-        'approved' => true,
         'wordpress_post_id' => 1,
     ]);
 }
@@ -73,8 +70,8 @@ $testCases = [
     ['itemType' => 'Television', 'expectedCategory' => 'Flat screen 32-37"', 'powered' => true],
     ['itemType' => 'Télévision', 'expectedCategory' => 'Flat screen 32-37"', 'powered' => true],
     ['itemType' => 'Toaster', 'expectedCategory' => 'Toaster', 'powered' => true],
-    ['itemType' => 'Microwave oven', 'expectedCategory' => 'None of the above', 'powered' => true],
-    ['itemType' => 'Heater', 'expectedCategory' => 'None of the above', 'powered' => true],
+    ['itemType' => 'Microwave oven', 'expectedCategory' => 'Misc', 'powered' => true],
+    ['itemType' => 'Heater', 'expectedCategory' => 'Misc', 'powered' => true],
 ];
 
 $deviceCount = 0;
@@ -82,10 +79,13 @@ $deviceCount = 0;
 // Create the expected mappings (3 devices each to ensure they win the count algorithm)
 foreach ($testCases as $testCase) {
     echo "Creating 3 devices for '{$testCase['itemType']}' → '{$testCase['expectedCategory']}'\n";
-    
-    $category = $categories->get($testCase['expectedCategory']);
+
+    // Find category that matches both name AND powered status
+    $category = Category::where('name', $testCase['expectedCategory'])
+                        ->where('powered', $testCase['powered'] ? 1 : 0)
+                        ->first();
     if (!$category) {
-        echo "Warning: Category '{$testCase['expectedCategory']}' not found, using first category\n";
+        echo "Warning: Category '{$testCase['expectedCategory']}' (powered={$testCase['powered']}) not found, using first category\n";
         $category = $categories->first();
     }
     
@@ -111,7 +111,7 @@ foreach ($testCases as $testCase) {
 
 // Create some conflicting data with fewer items to ensure our expected categories win
 $conflictingData = [
-    ['itemType' => 'Food processor', 'category' => 'None of the above', 'count' => 2],
+    ['itemType' => 'Food processor', 'category' => 'Misc', 'count' => 2],
     ['itemType' => 'TV', 'category' => 'Flat screen 15-17"', 'count' => 1],
     ['itemType' => 'Phone', 'category' => 'Handheld entertainment device', 'count' => 2],
     ['itemType' => 'Printer', 'category' => 'PC accessory', 'count' => 1],
