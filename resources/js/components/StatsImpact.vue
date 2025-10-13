@@ -65,19 +65,22 @@ export default {
       let ret = []
 
       if (this.stats.dead_devices) {
-        ret.push(this.$lang.choice('partials.to_be_recycled', this.stats.dead_devices, {
+        ret.push(this.__('partials.to_be_recycled', {
+          count: this.stats.dead_devices,
           value: this.stats.dead_devices
         }))
       }
 
       if (this.stats.repairable_devices) {
-        ret.push(this.$lang.choice('partials.to_be_repaired', this.stats.repairable_devices, {
+        ret.push(this.__('partials.to_be_repaired', {
+          count: this.stats.repairable_devices,
           value: this.stats.repairable_devices
         }))
       }
 
       if (this.stats.no_weight) {
-        ret.push(this.$lang.choice('partials.no_weight', this.stats.no_weight, {
+        ret.push(this.__('partials.no_weight', {
+          count: this.stats.no_weight,
           value: this.stats.no_weight
         }))
       }
@@ -86,14 +89,14 @@ export default {
         return null
       } else if (ret.length === 1) {
         // events.not_counting, groups.not_counting
-        const intro = this.$lang.choice(langSource + '.not_counting', this.stats.no_weight)
+        const intro = this.__(langSource + '.not_counting', { count: this.stats.no_weight })
         return intro + ' ' + ret[0] + '.'
       } else {
-        const intro = this.$lang.choice(langSource + '.not_counting', this.stats.no_weight)
+        const intro = this.__(langSource + '.not_counting', { count: this.stats.no_weight })
         const first = ret.slice(0, -1)
         const last = ret[ret.length - 1]
 
-        return intro + ' ' + first.join(', ') + ' ' + this.$lang.get('and') + ' ' + last + '.'
+        return intro + ' ' + first.join(', ') + ' ' + this.__('and') + ' ' + last + '.'
       }
     }
   },

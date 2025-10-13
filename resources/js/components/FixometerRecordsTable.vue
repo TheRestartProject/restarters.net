@@ -351,11 +351,11 @@ export default {
     showStatus (data) {
       switch (data.item.repair_status) {
         case FIXED:
-          return this.$lang.get('partials.fixed')
+          return this.__('partials.fixed')
         case REPAIRABLE:
-          return this.$lang.get('partials.repairable')
+          return this.__('partials.repairable')
         case END_OF_LIFE:
-          return this.$lang.get('partials.end')
+          return this.__('partials.end')
         default:
           return null
       }

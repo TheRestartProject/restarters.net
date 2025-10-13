@@ -140,12 +140,16 @@ exports.createGroup = async function(page, baseURL) {
 
 exports.createEvent = async function(page, baseURL, idgroups, past) {
   log('Starting event creation', { idgroups, past })
-  
-  // Go to groups page
+
+  // Go to group view page
   log('Navigating to group view page')
   await page.goto('/group/view/' + idgroups)
 
-  // Click on Add New Event button
+  // Wait for page to load
+  log('Waiting for page to load')
+  await page.waitForLoadState('networkidle', { timeout: 30000 })
+
+  // Click on Add Event button
   log('Clicking create event button')
   await page.click('a[href="/party/create"]')
 

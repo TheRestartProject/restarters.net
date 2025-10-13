@@ -156,30 +156,27 @@ export default {
     nearbyNoneMessage() {
       if (this.location) {
         // We have a location, so we can say that there are no other nearby events.
-        return this.$lang.get('groups.no_other_nearby_events')
+        return this.__('groups.no_other_nearby_events')
       } else {
         // We don't have a location - nudge to add one.
-        return this.$lang.get('events.no_location')
+        return this.__('events.no_location')
       }
     },
     translatedTitle() {
       // If we have a group then we are putting the name elsewhere and just want "events" (force the plural).  Otherwise
       // "Your events".
-      let ret = this.group ? this.$lang.choice('groups.events', {
-        value: 2
-      }) : this.$lang.get('events.your_events')
-
+      let ret = this.group ? this.__('groups.events') : this.__('events.your_events')
       ret = ret.charAt(0).toUpperCase() + ret.slice(1)
       return ret
     },
     translatedCalendarTitle() {
-      return this.$lang.get('groups.calendar_copy_title', {
-        group: this.group ? this.group.name : this.$lang.get('groups.groups_title1').toLowerCase()
+      return this.__('groups.calendar_copy_title', {
+        group: this.group ? this.group.name : this.__('groups.groups_title1').toLowerCase()
       })
     },
     translatedCalendarDescription() {
-      return this.$lang.get('groups.calendar_copy_description', {
-        group: this.group ? this.group.name : this.$lang.get('groups.groups_title1').toLowerCase()
+      return this.__('groups.calendar_copy_description', {
+        group: this.group ? this.group.name : this.__('groups.groups_title1').toLowerCase()
       })
     },
   },

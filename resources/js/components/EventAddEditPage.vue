@@ -80,7 +80,7 @@ export default {
       div.innerText = title
       title = div.innerHTML
 
-      let ret =  this.$lang.get('events.editing', {
+      let ret =  this.__('events.editing', {
         event: '<a style="color:black; text-decoration:underline" href="/party/view/' + this.currentid  +'">' + title + '</a>'
       })
 

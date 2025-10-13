@@ -26,7 +26,7 @@ export default {
   computed: {
     translatedWastePrevented() {
       // Round up to avoid 0kg.
-      return this.$lang.get('devices.group_prevented', {
+      return this.__('devices.group_prevented', {
         idevents: this.latestData.id_events,
         amount: Math.ceil(this.latestData.waste_prevented)
       })

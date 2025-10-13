@@ -96,34 +96,34 @@ export default {
       return this.$store.getters['auth/CSRF']
     },
     translatedLoginTitle() {
-      return this.$lang.get('login.login_title')
+      return this.__('login.login_title')
     },
     translatedEmailAddress() {
-      return this.$lang.get('auth.email_address')
+      return this.__('auth.email_address')
     },
     translatedPassword() {
-      return this.$lang.get('auth.password')
+      return this.__('auth.password')
     },
     translatedForgotPassword() {
-      return this.$lang.get('auth.forgot_password')
+      return this.__('auth.forgot_password')
     },
     translatedCreateAccount() {
-      return this.$lang.get('auth.create_account')
+      return this.__('auth.create_account')
     },
     translatedLogin() {
-      return this.$lang.get('auth.login')
+      return this.__('auth.login')
     },
     translatedWhatIs() {
-      return this.$lang.get('login.whatis')
+      return this.__('login.whatis')
     },
     translatedWhatIsContent() {
-      return this.$lang.get('login.whatis_content')
+      return this.__('login.whatis_content')
     },
     translatedMore() {
-      return this.$lang.get('login.more')
+      return this.__('login.more')
     },
     translatedAuthFailed() {
-      return this.$lang.get('auth.failed')
+      return this.__('auth.failed')
     }
   },
   methods: {

@@ -258,7 +258,7 @@ export default {
       return this.items.slice(0, this.show)
     },
     translatedGroupCount() {
-      return this.$lang.choice('groups.group_count', this.filteredGroups.length, {
+      return this.__('groups.group_count', {
         count: this.filteredGroups.length
       })
     },

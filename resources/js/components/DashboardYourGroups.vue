@@ -145,7 +145,7 @@ export default {
       })
     },
     translatedNewlyAdded() {
-      return this.$lang.choice('dashboard.newly_added', this.newGroups.length, {
+      return this.__('dashboard.newly_added', {
         count: this.newGroups ? this.newGroups.length : 0
       })
     },

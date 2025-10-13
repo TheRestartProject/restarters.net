@@ -219,15 +219,15 @@ export default {
       return [
         {
           id: FIXED,
-          text: this.$lang.get('partials.fixed')
+          text: this.__('partials.fixed')
         },
         {
           id: REPAIRABLE,
-          text: this.$lang.get('partials.repairable')
+          text: this.__('partials.repairable')
         },
         {
           id: END_OF_LIFE,
-          text: this.$lang.get('partials.end_of_life')
+          text: this.__('partials.end_of_life')
         }
       ]
     },

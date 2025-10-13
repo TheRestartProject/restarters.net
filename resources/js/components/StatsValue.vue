@@ -133,13 +133,13 @@ export default {
       return 'impact-stat impact-stat-' + this.size + ' impact-stat-' + this.variant + (this.border ? ' hasBorder' : '')
     },
     translatedTitle() {
-      return this.translate ? this.$lang.choice(this.title, this.roundedCount) : this.title
+      return this.translate ? this.__(this.title, { count: this.roundedCount }) : this.title
     },
     translatedSubtitle() {
-      return this.translate ? this.$lang.get(this.subtitle) : this.subtitle
+      return this.translate ? this.__(this.subtitle) : this.subtitle
     },
     translatedDescription() {
-      return this.translate ? this.$lang.get(this.description) : this.description
+      return this.translate ? this.__(this.description) : this.description
     },
     roundedCount() {
       if (this.roundTo) {

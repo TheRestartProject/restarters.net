@@ -83,31 +83,31 @@ export default {
       return this.user === null || (this.user === 'not-registered' && !this.volunteerEmailAddress && !this.fullName)
     },
     translatedOptionDefault() {
-      return this.$lang.get('events.option_default')
+      return this.__('events.option_default')
     },
     translatedAddVolunteerModalHeading() {
-      return this.$lang.get('events.add_volunteer_modal_heading')
+      return this.__('events.add_volunteer_modal_heading')
     },
     translatedGroupMember() {
-      return this.$lang.get('events.group_member')
+      return this.__('events.group_member')
     },
     translatedVolunteerAttended() {
-      return this.$lang.get('events.volunteer_attended_button')
+      return this.__('events.volunteer_attended_button')
     },
     translatedOptionNotRegistered() {
-      return this.$lang.get('events.option_not_registered')
+      return this.__('events.option_not_registered')
     },
     translatedFullName() {
-      return this.$lang.get('events.full_name')
+      return this.__('events.full_name')
     },
     translatedFullNameHelper() {
-      return this.$lang.get('events.full_name_helper')
+      return this.__('events.full_name_helper')
     },
     translatedVolunteerEmailAddress() {
-      return this.$lang.get('events.volunteer_email_address')
+      return this.__('events.volunteer_email_address')
     },
     translatedMessageVolunteerEmailAddress() {
-      return this.$lang.get('events.message_volunteer_email_address')
+      return this.__('events.message_volunteer_email_address')
     }
   },
   methods: {

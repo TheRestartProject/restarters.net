@@ -22,7 +22,7 @@ export default {
       return this.group && this.group.archived_at
     },
     title() {
-      return this.$lang.get('groups.archived_group_title', {
+      return this.__('groups.archived_group_title', {
         date: this.archived_at
       })
     },

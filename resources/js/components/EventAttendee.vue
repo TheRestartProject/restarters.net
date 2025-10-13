@@ -100,9 +100,9 @@ export default {
 
       if (this.attendee.volunteer) {
         let skills = this.attendee.volunteer.user_skills
-        ret = (skills && skills.length ? skills.length : '0') + ' ' + this.$lang.choice('partials.skills', skills.length)
+        ret = (skills && skills.length ? skills.length : '0') + ' ' + this.__('partials.skills', { count: skills.length })
       } else {
-        ret = '0 ' + this.$lang.choice('partials.skills', 0)
+        ret = '0 ' + this.__('partials.skills', { count: 0 })
       }
 
       return ret

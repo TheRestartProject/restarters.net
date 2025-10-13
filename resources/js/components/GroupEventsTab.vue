@@ -61,7 +61,7 @@ export default {
   },
   computed: {
     translatedNoneMessage() {
-      return this.$lang.get(this.noneMessage)
+      return this.__(this.noneMessage)
     },
   }
 }

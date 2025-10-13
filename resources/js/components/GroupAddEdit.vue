@@ -307,7 +307,7 @@ export default {
       return ret
     },
     duplicateError () {
-      return this.$lang.get('groups.duplicate', {
+      return this.__('groups.duplicate', {
         name: this.name
       })
     },

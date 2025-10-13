@@ -40,14 +40,14 @@ export default {
   },
   computed: {
     translatedClose() {
-      return this.$lang.get('partials.close')
+      return this.__('partials.close')
     },
     translatedDownload() {
       // TODO Translations.
-      return this.$lang.get('partials.download')
+      return this.__('partials.download')
     },
     translatedShareTitle() {
-      return this.$lang.get('partials.share_modal_title')
+      return this.__('partials.share_modal_title')
     },
   },
   data: function() {

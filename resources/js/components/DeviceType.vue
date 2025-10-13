@@ -90,9 +90,9 @@ export default {
     },
     translatedTooltip() {
       if (this.powered) {
-        return this.$lang.get('devices.tooltip_type_powered')
+        return this.__('devices.tooltip_type_powered')
       } else {
-        return this.$lang.get('devices.tooltip_type_unpowered')
+        return this.__('devices.tooltip_type_unpowered')
       }
     }
   },

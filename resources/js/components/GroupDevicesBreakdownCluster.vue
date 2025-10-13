@@ -41,7 +41,7 @@ export default {
       if (category === null) {
         return ''
       } else {
-        return this.$lang.get('strings.' + category)
+        return this.__('strings.' + category)
       }
     }
   }

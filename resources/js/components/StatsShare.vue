@@ -400,7 +400,7 @@ export default {
             // Use the line height of this as our standard for moving down the image.
             //
             // Older browsers don't support emHeight*
-            let measure1 = ctx.measureText(this.$lang.get('partials.share_modal_weve_saved') + str + this.$lang.get('partials.share_modal_of_co2'))
+            let measure1 = ctx.measureText(this.__('partials.share_modal_weve_saved') + str + this.__('partials.share_modal_of_co2'))
             let measure2 = ctx.measureText(str)
             let asc = measure1.emHeightAscent ? 'emHeightAscent' : 'actualBoundingBoxAscent'
             let desc = measure1.emHeightDescent ? 'emHeightDescent' : 'actualBoundingBoxDescent'
@@ -410,30 +410,30 @@ export default {
             let wholeline
 
             if (this.portrait) {
-              wholeline = this.$lang.get('partials.share_modal_weve_saved') + str + this.$lang.get('partials.share_modal_of_co2')
-              x = this.fillCentredText(this.$lang.get('partials.share_modal_weve_saved') + ' ', x, y, wholeline)
+              wholeline = this.__('partials.share_modal_weve_saved') + str + this.__('partials.share_modal_of_co2')
+              x = this.fillCentredText(this.__('partials.share_modal_weve_saved') + ' ', x, y, wholeline)
               x = this.fillWhiteBlackBox(str, x, y)
-              x = this.fillText(' ' + this.$lang.get('partials.share_modal_of_co2'), x, y)
+              x = this.fillText(' ' + this.__('partials.share_modal_of_co2'), x, y)
 
               y += lineHeight
 
-              wholeline = this.$lang.get('partials.share_modal_by_repairing') + ' ' + this.$lang.get('partials.share_modal_broken_stuff')
-              x = this.fillCentredText(this.$lang.get('partials.share_modal_by_repairing') + ' ', x, y, wholeline)
-              x = this.fillText(this.$lang.get('partials.share_modal_broken_stuff'), x, y)
+              wholeline = this.__('partials.share_modal_by_repairing') + ' ' + this.__('partials.share_modal_broken_stuff')
+              x = this.fillCentredText(this.__('partials.share_modal_by_repairing') + ' ', x, y, wholeline)
+              x = this.fillText(this.__('partials.share_modal_broken_stuff'), x, y)
             } else {
-              x = this.fillText(this.$lang.get('partials.share_modal_weve_saved') + ' ', x, y)
+              x = this.fillText(this.__('partials.share_modal_weve_saved') + ' ', x, y)
               x = this.fillWhiteBlackBox(str, x, y)
 
               y += lineHeight
               x = this.initialX
 
-              x = this.fillText(this.$lang.get('partials.share_modal_of_co2'), x, y)
-              x = this.fillText(' ' + this.$lang.get('partials.share_modal_by_repairing'), x, y)
+              x = this.fillText(this.__('partials.share_modal_of_co2'), x, y)
+              x = this.fillText(' ' + this.__('partials.share_modal_by_repairing'), x, y)
 
               y += lineHeight
               x = this.initialX
 
-              x = this.fillText(this.$lang.get('partials.share_modal_broken_stuff'), x, y)
+              x = this.fillText(this.__('partials.share_modal_broken_stuff'), x, y)
             }
 
             // Wavy divider line.
@@ -466,12 +466,13 @@ export default {
             }
 
             const ix = this.rangeIndex(this.currentCount)
-            str = this.getCount(this.currentCount).toLocaleString()
+            const numericCount = this.getCount(this.currentCount)
+            str = numericCount.toLocaleString()
 
             ctx.font = "bold " + this.smallerFontSize + "px Asap, sans-serif"
 
             // Older browsers don't support emHeight*
-            measure1 = ctx.measureText(this.$lang.get('partials.share_modal_weve_saved') + str + this.$lang.get('partials.share_modal_of_co2'))
+            measure1 = ctx.measureText(this.__('partials.share_modal_weve_saved') + str + this.__('partials.share_modal_of_co2'))
             measure2 = ctx.measureText(str)
             asc = measure1.emHeightAscent ? 'emHeightAscent' : 'actualBoundingBoxAscent'
             desc = measure1.emHeightDescent ? 'emHeightDescent' : 'actualBoundingBoxDescent'
@@ -479,47 +480,47 @@ export default {
 
             if (RANGES[ix][2] != 'Hectare') {
               if (this.portrait) {
-                wholeline = this.$lang.get('partials.share_modal_thats_like') + ' ' +
-                    this.$lang.get('partials.share_modal_growing_about') + ' '
+                wholeline = this.__('partials.share_modal_thats_like') + ' ' +
+                    this.__('partials.share_modal_growing_about') + ' '
                 str
-                x = this.fillCentredText(this.$lang.get('partials.share_modal_thats_like') + ' ', x, y, wholeline)
-                x = this.fillText(this.$lang.get('partials.share_modal_growing_about') + ' ', x, y)
+                x = this.fillCentredText(this.__('partials.share_modal_thats_like') + ' ', x, y, wholeline)
+                x = this.fillText(this.__('partials.share_modal_growing_about') + ' ', x, y)
                 x = this.fillWhiteBlackBox(str, x, y)
                 y += lineHeight
                 x = this.initialX
-                wholeline = this.$lang.choice('partials.share_modal_seedlings', str)
-                x = this.fillCentredText(this.$lang.choice('partials.share_modal_seedlings', str), x, y, wholeline)
+                wholeline = this.__('partials.share_modal_seedlings', { count: numericCount })
+                x = this.fillCentredText(this.__('partials.share_modal_seedlings', { count: numericCount }), x, y, wholeline)
               } else {
-                x = this.fillText(this.$lang.get('partials.share_modal_thats_like'), x, y)
+                x = this.fillText(this.__('partials.share_modal_thats_like'), x, y)
                 y += lineHeight
                 x = this.initialX
-                x = this.fillText(this.$lang.get('partials.share_modal_growing_about') + ' ', x, y)
+                x = this.fillText(this.__('partials.share_modal_growing_about') + ' ', x, y)
                 x = this.fillWhiteBlackBox(str, x, y)
                 y += lineHeight
                 x = this.initialX
-                x = this.fillText(this.$lang.choice('partials.share_modal_seedlings', str), x, y)
+                x = this.fillText(this.__('partials.share_modal_seedlings', { count: numericCount }), x, y)
               }
             } else {
               if (this.portrait) {
-                wholeline = this.$lang.get('partials.share_modal_thats_like') + ' ' +
-                    this.$lang.get('partials.share_modal_planting_around') + ' '
+                wholeline = this.__('partials.share_modal_thats_like') + ' ' +
+                    this.__('partials.share_modal_planting_around') + ' '
                 str
-                x = this.fillCentredText(this.$lang.get('partials.share_modal_thats_like') + ' ', x, y, wholeline)
-                x = this.fillText(this.$lang.get('partials.share_modal_planting_around') + ' ', x, y)
+                x = this.fillCentredText(this.__('partials.share_modal_thats_like') + ' ', x, y, wholeline)
+                x = this.fillText(this.__('partials.share_modal_planting_around') + ' ', x, y)
                 x = this.fillWhiteBlackBox(str, x, y)
                 y += lineHeight
                 x = this.initialX
-                wholeline = this.$lang.choice('partials.share_modal_hectares', str)
-                x = this.fillCentredText(this.$lang.choice('partials.share_modal_hectares', str), x, y, wholeline)
+                wholeline = this.__('partials.share_modal_hectares', { count: numericCount })
+                x = this.fillCentredText(this.__('partials.share_modal_hectares', { count: numericCount }), x, y, wholeline)
               } else {
-                x = this.fillText(this.$lang.get('partials.share_modal_thats_like'), x, y)
+                x = this.fillText(this.__('partials.share_modal_thats_like'), x, y)
                 y += lineHeight
                 x = this.initialX
-                x = this.fillText(this.$lang.get('partials.share_modal_planting_around') + ' ', x, y)
+                x = this.fillText(this.__('partials.share_modal_planting_around') + ' ', x, y)
                 x = this.fillWhiteBlackBox(str, x, y)
                 y += lineHeight
                 x = this.initialX
-                x = this.fillText(this.$lang.choice('partials.share_modal_hectares', str), x, y)
+                x = this.fillText(this.__('partials.share_modal_hectares', { count: numericCount }), x, y)
               }
             }
           })

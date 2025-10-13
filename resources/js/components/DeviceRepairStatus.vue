@@ -129,15 +129,15 @@ export default {
       return [
         {
           id: FIXED,
-          text: this.$lang.get('partials.fixed')
+          text: this.__('partials.fixed')
         },
         {
           id: REPAIRABLE,
-          text: this.$lang.get('partials.repairable')
+          text: this.__('partials.repairable')
         },
         {
           id: END_OF_LIFE,
-          text: this.$lang.get('partials.end_of_life')
+          text: this.__('partials.end_of_life')
         }
       ]
     },
@@ -155,15 +155,15 @@ export default {
       return [
         {
           id: NEXT_STEPS_MORE_TIME,
-          text: this.$lang.get('partials.more_time')
+          text: this.__('partials.more_time')
         },
         {
           id: NEXT_STEPS_PROFESSIONAL,
-          text: this.$lang.get('partials.professional_help')
+          text: this.__('partials.professional_help')
         },
         {
           id: NEXT_STEPS_DIY,
-          text: this.$lang.get('partials.diy')
+          text: this.__('partials.diy')
         }
       ]
     },
@@ -181,15 +181,15 @@ export default {
       return [
         {
           id: SPARE_PARTS_THIRD_PARTY,
-          text: this.$lang.get('partials.yes_third_party')
+          text: this.__('partials.yes_third_party')
         },
         {
           id: SPARE_PARTS_MANUFACTURER,
-          text: this.$lang.get('partials.yes_manufacturer')
+          text: this.__('partials.yes_manufacturer')
         },
         {
           id: SPARE_PARTS_NOT_NEEDED,
-          text: this.$lang.get('partials.no')
+          text: this.__('partials.no')
         }
       ]
     },
@@ -197,7 +197,7 @@ export default {
       return this.barrierList.map(b => {
         var newb = {
           id: b.barrier,
-          text: this.$lang.get('strings.' + b.barrier)
+          text: this.__('strings.' + b.barrier)
         }
 
         return newb

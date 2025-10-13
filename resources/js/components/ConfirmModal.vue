@@ -40,16 +40,16 @@ export default {
   },
   computed: {
     translatedCancel() {
-      return this.$lang.get('partials.cancel')
+      return this.__('partials.cancel')
     },
     translatedConfirm() {
-      return this.$lang.get('partials.confirm')
+      return this.__('partials.confirm')
     },
     translatedAreYouSure() {
-      return this.title ? this.title : this.$lang.get('partials.are_you_sure')
+      return this.title ? this.title : this.__('partials.are_you_sure')
     },
     translatedPleaseConfirm() {
-      return this.message ? this.message : this.$lang.get('partials.please_confirm')
+      return this.message ? this.message : this.__('partials.please_confirm')
     }
   },
   methods: {

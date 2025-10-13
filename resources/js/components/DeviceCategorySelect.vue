@@ -100,7 +100,7 @@ export default {
           if (((c.idcategories !== this.miscCat) &&
               ((this.powered && c.powered) || (!this.powered && !c.powered)))) {
             categories.push({
-              name: this.$lang.get('strings.' + c.name),
+              name: this.__('strings.' + c.name),
               value: c.idcategories
             })
           }
@@ -108,7 +108,7 @@ export default {
 
         if (categories.length) {
           ret.push({
-            cluster: this.$lang.get('strings.' + cluster.name),
+            cluster: this.__('strings.' + cluster.name),
             categories: categories
           })
         }
@@ -118,7 +118,7 @@ export default {
         cluster: '---',
         categories: [
           {
-            name: this.$lang.get('partials.category_none'),
+            name: this.__('partials.category_none'),
             value: this.miscCat,
           }
         ]
