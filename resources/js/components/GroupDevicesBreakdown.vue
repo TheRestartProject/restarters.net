@@ -4,25 +4,25 @@
     <b-tabs class="ourtabs w-100 mt-4 d-none d-md-block" justified>
       <b-tab active class="pt-2">
         <template slot="title">
-          <b>{{ __('strings.Computers and Home Office') }}</b>
+          <b>{{ __('Computers and Home Office') }}</b>
         </template>
         <GroupDevicesBreakdownCluster :stats="clusterStats[1]" />
       </b-tab>
       <b-tab class="pt-2">
         <template slot="title">
-          <b>{{ __('strings.Electronic Gadgets') }}</b>
+          <b>{{ __('Electronic Gadgets') }}</b>
         </template>
         <GroupDevicesBreakdownCluster :stats="clusterStats[2]" />
       </b-tab>
       <b-tab class="pt-2">
         <template slot="title">
-          <b>{{ __('strings.Home Entertainment') }}</b>
+          <b>{{ __('Home Entertainment') }}</b>
         </template>
         <GroupDevicesBreakdownCluster :stats="clusterStats[3]" />
       </b-tab>
       <b-tab class="pt-2">
         <template slot="title">
-          <b>{{ __('strings.Kitchen and Household Items') }}</b>
+          <b>{{ __('Kitchen and Household Items') }}</b>
         </template>
         <GroupDevicesBreakdownCluster :stats="clusterStats[4]" />
       </b-tab>
@@ -31,7 +31,7 @@
       <CollapsibleSection heading-level="h3">
         <template slot="title">
           <span class="mobtitle">
-            {{ __('strings.Computers and Home Office') }}
+            {{ __('Computers and Home Office') }}
           </span>
         </template>
         <template slot="content">
@@ -41,7 +41,7 @@
       <CollapsibleSection collapsed heading-level="h3">
         <template slot="title">
           <span class="mobtitle">
-            {{ __('strings.Electronic Gadgets') }}
+            {{ __('Electronic Gadgets') }}
           </span>
         </template>
         <template slot="content">
@@ -51,7 +51,7 @@
       <CollapsibleSection collapsed heading-level="h3">
         <template slot="title">
           <span class="mobtitle">
-            {{ __('strings.Home Entertainment') }}
+            {{ __('Home Entertainment') }}
           </span>
         </template>
         <template slot="content">
@@ -61,7 +61,7 @@
       <CollapsibleSection collapsed heading-level="h3">
         <template slot="title">
           <span class="mobtitle">
-            {{ __('strings.Kitchen and Household Items') }}
+            {{ __('Kitchen and Household Items') }}
           </span>
         </template>
         <template slot="content">

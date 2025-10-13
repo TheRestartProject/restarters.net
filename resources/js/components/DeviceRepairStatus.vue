@@ -197,7 +197,7 @@ export default {
       return this.barrierList.map(b => {
         var newb = {
           id: b.barrier,
-          text: this.__('strings.' + b.barrier)
+          text: this.__(b.barrier)
         }
 
         return newb

@@ -100,7 +100,7 @@ export default {
           if (((c.idcategories !== this.miscCat) &&
               ((this.powered && c.powered) || (!this.powered && !c.powered)))) {
             categories.push({
-              name: this.__('strings.' + c.name),
+              name: this.__(c.name),
               value: c.idcategories
             })
           }
@@ -108,7 +108,7 @@ export default {
 
         if (categories.length) {
           ret.push({
-            cluster: this.__('strings.' + cluster.name),
+            cluster: this.__(cluster.name),
             categories: categories
           })
         }

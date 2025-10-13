@@ -133,7 +133,7 @@ export default {
       return this.id ? this.$store.getters['devices/byId'](this.id) : null
     },
     translatedCategoryName() {
-      return this.__('strings.' + this.device.category.name)
+      return this.__(this.device.category.name)
     },
     powered() {
       return this.device.category && this.device.category.powered

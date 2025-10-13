@@ -44,7 +44,7 @@ export default {
   },
   computed: {
     translatedName() {
-      return this.__('strings.' + this.device.name)
+      return this.__(this.device.name)
     }
   }
 }

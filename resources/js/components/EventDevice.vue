@@ -226,7 +226,7 @@ export default {
         // Some item types are the same as category names.
         this.clusters.forEach((cluster) => {
           cluster.categories.forEach((c) => {
-            const name = this.__('strings.' + c.name)
+            const name = this.__(c.name)
             if (Boolean(c.powered) === Boolean(this.powered) && !name.toLowerCase().localeCompare(this.currentType.toLowerCase())) {
               ret = {
                 idcategories: c.idcategories,

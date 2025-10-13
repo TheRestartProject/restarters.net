@@ -20,7 +20,7 @@
           </em>
         </template>
         <template slot="cell(device_category.name)" slot-scope="data">
-          {{ __('strings.' + data.item.category.name) }}
+          {{ __(data.item.category.name) }}
         </template>
         <template slot="cell(short_problem)" slot-scope="data">
           <div v-line-clamp="3">

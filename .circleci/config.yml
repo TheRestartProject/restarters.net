@@ -89,15 +89,15 @@ jobs:
             # Configure Discourse settings
             docker exec restarters php artisan discourse:setting personal_message_enabled_groups 10
 
-      # Run PHPUnit tests (temporarily disabled)
-      # - run:
-      #     name: Run PHPUnit tests
-      #     command: |
-      #       # Run PHPUnit tests using Task for consistency with local development
-      #       task docker:test:phpunit
-      #       # Copy test results to host
-      #       docker cp restarters:/tmp/phpunit-results.xml /tmp/test-results/phpunit/results.xml
-      #     no_output_timeout: 45m
+      # Run PHPUnit tests
+      - run:
+          name: Run PHPUnit tests
+          command: |
+            # Run PHPUnit tests using Task for consistency with local development
+            task docker:test:phpunit
+            # Copy test results to host
+            docker cp restarters:/tmp/phpunit-results.xml /tmp/test-results/phpunit/results.xml
+          no_output_timeout: 45m
 
       # Run Jest tests
       - run:
@@ -140,30 +140,6 @@ jobs:
 
             # Copy Vite log from restarters container for debugging
             docker cp restarters:/tmp/vite.log /tmp/test-results/logs/vite.log || echo "Vite log not found"
-          when: always
-
-      # Keep containers running for SSH debugging
-      - run:
-          name: Keep containers running for debugging
-          command: |
-            echo "=== DEBUGGING MODE ENABLED ==="
-            echo "All containers are now running and ready for SSH debugging"
-            echo "Available containers:"
-            docker ps --format "table {{.Names}}\t{{.Status}}\t{{.Ports}}"
-            echo ""
-            echo "To debug, SSH into this job and use:"
-            echo "  docker exec -it restarters bash"
-            echo "  docker exec -it restarters_db mysql -u restarters -ps3cr3t restarters_db_test"
-            echo "  docker exec -it restarters_discourse bash"
-            echo ""
-            echo "Containers will stay running until you cancel the job or it times out (default 5h)"
-            # Keep the containers running - this will timeout after CircleCI's default timeout
-            while true; do
-              echo "Containers still running... ($(date))"
-              docker ps --format "table {{.Names}}\t{{.Status}}" | grep -v "NAME"
-              sleep 300  # Check every 5 minutes
-            done
-          no_output_timeout: 5h
           when: always
 
       # Store artifacts
