@@ -197,7 +197,7 @@ tasks:
       - |
         if [ -z "$CIRCLECI" ]; then
           echo "Resetting test database and running migrations..."
-          docker exec restarters bash -c "php artisan migrate:fresh --database=mysql_testing --force"
+          docker exec restarters bash -c "php artisan migrate:fresh --seed --database=mysql_testing --force"
         else
           echo "Running on CircleCI - skipping database reset (handled by CI setup)"
         fi
@@ -267,10 +267,11 @@ tasks:
 
     cmds:
       - mkdir -p /tmp/test-results/playwright-autocomplete
+      - docker exec restarters bash -c "php artisan cache:clear"
+      - docker exec restarters bash -c "echo \"DB::statement('SET foreign_key_checks=0'); App\\\\Device::truncate(); DB::statement('SET foreign_key_checks=1');\" | php artisan tinker" || true
       - |
         echo "Ensuring test user exists..."
         docker exec restarters bash -c "echo \"App\\\\User::firstOrCreate(['email'=>'jane@bloggs.net'], ['name'=>'Jane Bloggs','password'=>Hash::make('passw0rd'),'role'=>2,'consent_past_data'=>'2021-01-01','consent_future_data'=>'2021-01-01','consent_gdpr'=>'2021-01-01']);\" | php artisan tinker" || true
-      - docker exec restarters bash -c "php artisan cache:clear"
       - |
         echo "Setting up test data for autocomplete test..."
         docker exec restarters bash -c "
