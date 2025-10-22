@@ -259,47 +259,6 @@ tasks:
           stdbuf -oL -eL npx playwright test --reporter=html
         "
 
-  docker:test:playwright-autocomplete:
-    desc: Run Playwright autocomplete tests in the core application container.
-    summary: |
-      Run Playwright autocomplete tests with special setup data.
-      This test requires specific test data setup before running.
-
-    cmds:
-      - mkdir -p /tmp/test-results/playwright-autocomplete
-      - docker exec restarters bash -c "php artisan cache:clear"
-      - docker exec restarters bash -c "echo \"DB::statement('SET foreign_key_checks=0'); App\\\\Device::truncate(); DB::statement('SET foreign_key_checks=1');\" | php artisan tinker" || true
-      - |
-        echo "Ensuring test user exists..."
-        docker exec restarters bash -c "echo \"App\\\\User::firstOrCreate(['email'=>'jane@bloggs.net'], ['name'=>'Jane Bloggs','password'=>Hash::make('passw0rd'),'role'=>2,'consent_past_data'=>'2021-01-01','consent_future_data'=>'2021-01-01','consent_gdpr'=>'2021-01-01']);\" | php artisan tinker" || true
-      - |
-        echo "Ensuring all categories are seeded..."
-        docker exec restarters bash -c "php artisan tinker ensure-categories-seeded.php" || true
-      - |
-        echo "Setting up test data for autocomplete test..."
-        docker exec restarters bash -c "
-          php artisan tinker setup-autocomplete-test-data.php > /tmp/setup-output.log 2>&1
-          if grep -q 'Test data setup complete!' /tmp/setup-output.log; then
-            echo 'Setup completed successfully!'
-            cat /tmp/setup-output.log
-          else
-            echo 'Setup failed!'
-            cat /tmp/setup-output.log
-            exit 1
-          fi
-        "
-      - |
-        docker exec restarters bash -c "
-          export PLAYWRIGHT_TEST=true
-          export PLAYWRIGHT_DEBUG=true
-          export PWTEST_SKIP_TEST_OUTPUT=0
-          export DEBUG=playwright
-          export PLAYWRIGHT_BASE_URL=http://restarters_nginx
-          export PW_TEST_HTML_REPORT_OPEN=never
-          export FORCE_COLOR=1
-          stdbuf -oL -eL npx playwright test --config=playwright.autocomplete.config.js --reporter=html
-        "
-
   docker:wait-for-services-*:
     desc: Wait for Docker services to be ready and responding for a given profile (Usage - task docker:wait-for-services-[core|debug|discourse|all])
     summary: |

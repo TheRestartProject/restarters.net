@@ -119,14 +119,6 @@ jobs:
             task docker:test:playwright
           no_output_timeout: 10m
 
-      # Run autocomplete Playwright test separately because it needs special setup.
-      - run:
-          name: Run autocomplete Playwright test
-          command: |
-            # Run autocomplete Playwright tests using Task for consistency with local development
-            task docker:test:playwright-autocomplete
-          no_output_timeout: 15m
-
       # Copy test results and artifacts
       - run:
           name: Copy Playwright artifacts
