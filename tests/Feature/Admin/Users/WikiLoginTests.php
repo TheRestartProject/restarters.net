@@ -119,4 +119,26 @@ class WikiLoginTests extends TestCase
 
         // Then the user's wiki password should be changed to match
     }
+
+    /** @test */
+    public function login_succeeds_when_wiki_unavailable()
+    {
+        $this->withoutExceptionHandling();
+        Honeypot::disable();
+
+        // Bind null for UserCreator to simulate Wiki being unavailable
+        $this->instance(UserCreator::class, null);
+
+        // Given we have a user
+        $user = User::factory()->create();
+        $user->wiki_sync_status = WikiSyncStatus::CreateAtLogin;
+        $user->save();
+
+        // When user logs in
+        $response = $this->post('/login', ['email' => $user->email, 'password'=> 'secret', 'my_name' => 'foo', 'my_time' => 1]);
+
+        // Then the login should succeed (redirects to dashboard)
+        $response->assertStatus(302);
+        $this->assertAuthenticatedAs($user);
+    }
 }
