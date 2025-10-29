@@ -27,5 +27,26 @@ export default {
       default: null
     },
   },
+  watch: {
+    lat(newLat) {
+      this.updateMapCenter()
+    },
+    lng(newLng) {
+      this.updateMapCenter()
+    }
+  },
+  methods: {
+    updateMapCenter() {
+      if (this.lat !== null && this.lng !== null && this.$refs['group-map'] && this.$refs['group-map'].mapObject) {
+        this.$refs['group-map'].mapObject.setView([this.lat, this.lng], this.$refs['group-map'].mapObject.getZoom())
+      }
+    }
+  },
+  mounted() {
+    // Ensure map is centered correctly on initial mount
+    this.$nextTick(() => {
+      this.updateMapCenter()
+    })
+  }
 }
 </script>
