@@ -66,7 +66,6 @@ class Party extends Model implements Auditable
     //Getters
     public function findAllSearchable()
     {
-        // TODO Can this be replaced by Party::past?
         return DB::select('SELECT
                     `e`.`idevents` AS `id`,
                     UNIX_TIMESTAMP(`event_start_utc`) AS `event_timestamp`,
@@ -312,8 +311,6 @@ class Party extends Model implements Auditable
     }
 
     public function scopeForGroup($query, $idgroups) {
-        // TODO This should probably move into Group, and be a scope in there.  But we've not yet rationalised the
-        // scopes in Groups.
         $query->where('events.group', $idgroups);
         return $query;
     }

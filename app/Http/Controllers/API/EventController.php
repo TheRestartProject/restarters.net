@@ -472,7 +472,6 @@ class EventController extends Controller
         $autoapprove = $group->auto_approve;
 
         if (!Fixometer::userCanCreateEvents($user)) {
-            // TODO: This doesn't check that they are a host of this particular group.
             abort(403);
         }
 

@@ -31,7 +31,6 @@ const config = {
         baseURL: process.env.PLAYWRIGHT_BASE_URL || 'http://restarters_nginx'
       },
     },
-    // TODO The other browsers don't work reliably yet.
     // {
     //   name: 'Desktop Safari',
     //   use: {

@@ -91,7 +91,6 @@ class PartyController extends Controller
             }
         }
 
-        // TODO LATER Consider whether these stats should be in the event or passed into the store.
         $thisone['stats'] = $event->getEventStats();
 
         // These counts are separate from the list of participants - that list is of named individuals, but you

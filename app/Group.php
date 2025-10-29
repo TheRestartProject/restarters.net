@@ -576,10 +576,9 @@ class Group extends Model implements Auditable
             if ($network->timezone) {
                 if ($timezone) {
                     if ($timezone != $network->timezone) {
-                        // This should not occur if the networks are set up correctly.
-                        \Sentry\captureMessage("Problem getting timezone for group {$this->idgroups} - networks conflict with $timezone and {$network->timezone}.  Will use $timezone.");
-                        // TODO Convert to exception once groups have timezones set by Neil.
-                        // throw new \Exception("Group does not have own timezone and is in networks with conflicting timezones");
+                        // This indicates a data integrity problem - a group should not be in multiple networks with conflicting timezones.
+                        \Sentry\captureMessage("Problem getting timezone for group {$this->idgroups} - networks conflict with $timezone and {$network->timezone}.");
+                        throw new \Exception("Group does not have own timezone and is in networks with conflicting timezones");
                     }
                 } else {
                     // First timezone found.
@@ -589,17 +588,14 @@ class Group extends Model implements Auditable
         }
 
         if (!$timezone) {
-            // This should not occur if the networks are set up correctly.
-            // TODO Later on we should throw an exception, but only once this code has gone live, as we rely on
-            // the default behaviour during migration.
-            //throw new \Exception("Group {$this->idgroups} cannot resolve timezone");
+            // Extremely unlikely edge case - all networks have timezone defaults.
+            // Fallback to Europe/London which matches the network default.
             $timezone = 'Europe/London';
         }
 
         return $timezone;
     }
 
-    // TODO We've started to refactor into scopes, but this isn't complete yet.
     public function scopeMembers() {
         return User::join('users_groups', 'users_groups.user', '=', 'users.id')
             ->where('users_groups.group', $this->idgroups)

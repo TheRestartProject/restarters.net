@@ -71,9 +71,6 @@ Vue.component('multiselect', Multiselect)
 Vue.mixin(lang)
 
 // Wait for jQuery to be available, then run all jQuery-dependent code
-// TODO: This entire jQuery initialization block is temporary and will be removed
-// as we gradually migrate from Blade templates to Vue components. Each piece of
-// jQuery functionality should be replaced with Vue component equivalents.
 function initializeJQuery() {
   console.log('initializeJQuery called', {
     hasWindow: typeof window !== 'undefined',

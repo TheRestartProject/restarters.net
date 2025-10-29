@@ -170,8 +170,6 @@ export default {
     // and so that as/when it changes then reactivity updates all the views.
     //
     // Further down the line this may change so that the data is obtained via an AJAX call and perhaps SSR.
-    // TODO LATER We add some properties to the group before adding it to the store.  These should move into
-    // computed properties once we have good access to the session on the client.
     this.initialGroup.idgroups = this.idgroups
     this.initialGroup.canedit = this.canedit
     this.initialGroup.candemote = this.candemote

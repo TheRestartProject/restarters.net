@@ -27,6 +27,7 @@ restarters-anonymised.sql
 /public/css/wiki.css
 /.claude/settings.local.json
 /public/build/
+/public/hot
 /storage/api-docs/api-docs.json
 /.phpunit.result.cache
 /playwright-report/

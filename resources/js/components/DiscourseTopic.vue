@@ -41,8 +41,6 @@ export default {
       return this.discourseBaseUrl + '/t/' + this.topic.slug
     },
     categoryUrl() {
-      // todo - should be category url, but needs building for child categories
-      //return this.discourseBaseUrl + this.topic.category.topic_url
       return this.discourseBaseUrl + this.topic.category.topic_url
     }
   }

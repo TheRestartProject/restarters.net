@@ -305,7 +305,6 @@ Route::middleware('auth', 'verifyUserConsent', 'ensureAPIToken')->group(function
         Route::get('/', [DeviceController::class, 'index'])->name('devices');
     });
 
-    // TODO: the rest of these to be redirected properly.
     Route::prefix('device')->group(function () {
         Route::get('/', function () {
             return redirect('/fixometer');

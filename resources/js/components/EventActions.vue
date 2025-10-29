@@ -106,7 +106,6 @@ export default {
         idevents: this.idevents
       })
 
-      // TODO LATER Assumes always works.
       window.location = '/party'
     }
   }

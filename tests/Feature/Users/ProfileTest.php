@@ -25,7 +25,6 @@ class ProfileTest extends TestCase
         }
 
         // When logged in should be able to see.
-        // TODO I'm not convinced that viewing /profile is ever reachable, though /profile/id is.
         $this->actingAs($user);
 
         $response = $this->get('/profile');
@@ -60,8 +59,6 @@ class ProfileTest extends TestCase
             // Success case.
         }
 
-        // TODO These are the behaviours as coded, but they seem weird.
-        //
         // As yourself.
         $this->actingAs($user1);
 

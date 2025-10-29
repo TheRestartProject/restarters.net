@@ -53,8 +53,6 @@ class AnonymiseUsersForTest extends Command
             $user->password = Hash::make('secret');
 
             $user->save();
-
-            // TODO: anonymise photos.
         }
     }
 }

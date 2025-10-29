@@ -375,8 +375,6 @@ class DiscourseService
                         }
                     }
 
-                    // TODO The Discourse API accepts up to around 1000 as the limit.  This is plenty for now, but
-                    // we will assert below if it turns out not to be in future.
                     $limit = 1000;
 
                     $response = $client->request('GET', "/groups/$discourseName/members.json?limit=$limit");

@@ -83,7 +83,7 @@ class DiscourseUserEventSubscriber extends BaseEvent
 
                 $userName = $json['user']['username'];
 
-                // TODO: Discourse doesn't have e.g. fr-BE, so just going with main locale.
+                // Discourse doesn't support regional locales like fr-BE, so use the main locale.
                 $locale = explode('-', $user->language)[0];
 
                 $endpoint = "/u/{$userName}.json";

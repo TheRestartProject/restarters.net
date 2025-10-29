@@ -43,7 +43,6 @@ export default {
       return this.__('partials.close')
     },
     translatedDownload() {
-      // TODO Translations.
       return this.__('partials.download')
     },
     translatedShareTitle() {

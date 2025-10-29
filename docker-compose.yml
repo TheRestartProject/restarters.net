@@ -3,9 +3,6 @@
 # - Restarters web server: http://www.example.com:8001 (Admin: jane@bloggs.net/passw0rd)
 # - A Database: Exposed on port 3306 internally
 #
-# TODO The domain name could be better but needs some configuration on the Discourse images which is hard.
-# TODO If your host is Linux, this probably only works if you run as root.
-#
 # On the machine where you will be using your browser to access the Restarters / Discourse sites once set up on Docker,
 # add a record to your hosts file to point the domain www.example.com to the machine.
 #
@@ -22,7 +19,6 @@
 #
 # Then:
 # - edit .env and set GOOGLE_API_CONSOLE_KEY to the dev key.
-# TODO This isn't checked in to the codebase, but once this works on Circle then we can put it in an env variable and edit it in via docker_run.sh.
 # - log in to the restarters container using: docker exec -it restarters bash
 # - run UT using: export DB_TEST_HOST=restarters_db; php vendor/phpunit/phpunit/phpunit --configuration ./phpunit.xml
 #
@@ -65,9 +61,6 @@
 # Database Access:
 # To connect to Discourse's PostgreSQL database from the restarters container:
 # psql -h postgresql -U bn_discourse -p 5432 -w bitnami_discourse
-#
-# TODO This is stock Discourse - no theme.  Would be nice to have the theme, but that doesn't matter so far as
-# testing the integration.
 
 services:
   # Core services - always enabled

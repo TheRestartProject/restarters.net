@@ -29,9 +29,15 @@ Development category.
 (However, if you would prefer to create an issue in Github, please go ahead -
 we'll make sure it ends up in the right place.)
 
+## Features
+
+For a comprehensive overview of all platform features, see [Features.md](Features.md).
+
 ## Tech
 
-More details on the tech side of things in the [dev wiki](https://github.com/therestartproject/restarters.net/wiki).
+For technical details, architecture, and development information, see [Tech.md](Tech.md).
+
+Additional details in the [dev wiki](https://github.com/therestartproject/restarters.net/wiki).
 
 ## Methodology
 

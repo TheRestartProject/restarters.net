@@ -87,7 +87,6 @@ class LoginController extends Controller
     {
         if (env('HONEYPOT_DISABLE', false)) {
             // This is used in Playwright testing where we get many requests in a short time.
-            // TODO There is probably a better place to put this code.
             app('honeypot')->disable();
         }
 

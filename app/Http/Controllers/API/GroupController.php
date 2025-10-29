@@ -945,8 +945,6 @@ class GroupController extends Controller
             }
 
             // We can update the tags.  The parameter is an array of ids.
-            // TODO The old code restricts updating tags to admins.  But I wonder if it should include
-            // networks coordinators too.
             $tags = $request->tags;
 
             if ($tags) {
