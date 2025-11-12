@@ -27,6 +27,7 @@
     <env name="QUEUE_CONNECTION" value="database"/>
     <env name="MAIL_MAILER" value="array"/>
     <env name="DB_CONNECTION" value="mysql_testing"/>
+    <env name="DB_TEST_HOST" value="restarters_db"/>
     <env name="DB_TEST_DATABASE" value="restarters_db"/>
     <env name="DB_TEST_USERNAME" value="restarters"/>
     <env name="DB_TEST_PASSWORD" value="s3cr3t"/>
