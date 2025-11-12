@@ -51,6 +51,9 @@ class MediawikiServiceProvider extends ServiceProvider
             if ($mw) {
                 return $mw->newUserCreator();
             }
+
+            // Return null if Wiki connection is not available
+            return null;
         });
     }
 }

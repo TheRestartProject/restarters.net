@@ -20,7 +20,7 @@
                         Please let us know that you encountered this issue and we will look into it ASAP.
                     </h2>
                     <p>
-                        You can report the issue by sending an email to <a href="mailto:community@therestartproject.org">community@therestartproject.org</a>, or by posting in the <a href="https://talk.restarters.net/c/help/17">restarters.net help forum</a>.
+                        You can report the issue by sending an email to <a href="mailto:{{ config('restarters.support_email_address') }}">{{ config('restarters.support_email_address') }}</a>, or by posting in the <a href="https://talk.restarters.net/c/help/17">restarters.net help forum</a>.
                     </p>
                     <p>
                         Please include the following details in your bug report:

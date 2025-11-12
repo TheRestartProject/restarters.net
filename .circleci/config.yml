@@ -30,33 +30,32 @@ jobs:
         environment:
           NODE_ENV: development
           TZ: "UTC"
-      - image: 'bitnami/mariadb:latest'
+      - image: 'mariadb:latest'
         name: mariadb
         environment:
-          - ALLOW_EMPTY_PASSWORD=yes
-          - MARIADB_PORT_NUMBER=3307
-          - MARIADB_USER=bn_mediawiki
-          - MARIADB_DATABASE=bitnami_mediawiki
-      - image: 'bitnami/mediawiki-archived:1'
+          - MYSQL_ROOT_PASSWORD=root_password
+          - MYSQL_DATABASE=mediawiki_db
+          - MYSQL_USER=mediawiki_user
+          - MYSQL_PASSWORD=mediawiki_pass
+      - image: 'mediawiki:latest'
         name: mediawiki
         labels:
           kompose.service.type: nodeport
         environment:
-          - MEDIAWIKI_DATABASE_HOST=mariadb
-          - MEDIAWIKI_DATABASE_PORT_NUMBER=3307
-          - MEDIAWIKI_DATABASE_USER=bn_mediawiki
-          - MEDIAWIKI_DATABASE_NAME=bitnami_mediawiki
-          - ALLOW_EMPTY_PASSWORD=yes
-          - MEDIAWIKI_EXTERNAL_HTTP_PORT_NUMBER=8080
-          - MEDIAWIKI_HOST=mediawiki
+          - MEDIAWIKI_DB_TYPE=mysql
+          - MEDIAWIKI_DB_HOST=mariadb
+          - MEDIAWIKI_DB_PORT=3306
+          - MEDIAWIKI_DB_NAME=mediawiki_db
+          - MEDIAWIKI_DB_USER=mediawiki_user
+          - MEDIAWIKI_DB_PASSWORD=mediawiki_pass
+          - MEDIAWIKI_SITE_NAME=Restarters Wiki
+          - MEDIAWIKI_SITE_LANG=en
+          - MEDIAWIKI_ADMIN_USER=admin
+          - MEDIAWIKI_ADMIN_PASS=adminpass123
           - TZ: "UTC"
         depends_on:
           - mariadb
-        entrypoint:
-          - /bin/bash
-          - -c
-          - sleep 60; /opt/bitnami/scripts/mediawiki/entrypoint.sh "/opt/bitnami/scripts/apache/run.sh"
-      - image: 'docker.io/bitnami/postgresql:11'
+      - image: 'docker.io/bitnamilegacy/postgresql:11'
         name: postgresql
 # No volumes on CircleCI
 #        volumes:
@@ -69,16 +68,16 @@ jobs:
 #    networks:
 #      - app-network
 
-      - image: docker.io/bitnami/redis:6.0
+      - image: docker.io/bitnamilegacy/redis:6.0
         name: restarters_discourse_redis
         environment:
           - ALLOW_EMPTY_PASSWORD=yes
 #        volumes:
-#          - 'redis_data:/bitnami/discourse'
+#          - 'redis_data:/bitnami/redis'
 #        networks:
 #          - app-network
 
-      - image: docker.io/bitnami/discourse:2
+      - image: docker.io/bitnamilegacy/discourse:2
         name: restarters_discourse
 # No ports on CircleCI
 #        ports:
@@ -107,7 +106,7 @@ jobs:
 #    networks:
 #      - app-network
 
-      - image: docker.io/bitnami/discourse:latest
+      - image: docker.io/bitnamilegacy/discourse:2
         name: restarters_discourse_sidekiq
         depends_on:
           - restarters_discourse
@@ -154,12 +153,12 @@ jobs:
       # ...and Mediawiki.
       # Disable wiki as problems getting that running.
       # - run: sed -i 's/FEATURE__WIKI_INTEGRATION=.*$/FEATURE__WIKI_INTEGRATION=true/g' .env
-      - run: sed -i 's/WIKI_URL=.*$/WIKI_URL=http:\/\/mediawiki:8080/g' .env
-      - run: sed -i 's/WIKI_DB=.*$/WIKI_DB=bitnami_mediawiki/g' .env
-      - run: sed -i 's/WIKI_USER=.*$/WIKI_USER=user/g' .env
-      - run: sed -i 's/WIKI_PASSWORD=.*$/WIKI_PASSWORD=bitnami123/g' .env
-      - run: sed -i 's/WIKI_APIUSER=.*$/WIKI_APIUSER=user/g' .env
-      - run: sed -i 's/WIKI_APIPASSWORD=.*$/WIKI_APIPASSWORD=bitnami123/g' .env
+      - run: sed -i 's/WIKI_URL=.*$/WIKI_URL=http:\/\/mediawiki/g' .env
+      - run: sed -i 's/WIKI_DB=.*$/WIKI_DB=mediawiki_db/g' .env
+      - run: sed -i 's/WIKI_USER=.*$/WIKI_USER=mediawiki_user/g' .env
+      - run: sed -i 's/WIKI_PASSWORD=.*$/WIKI_PASSWORD=mediawiki_pass/g' .env
+      - run: sed -i 's/WIKI_APIUSER=.*$/WIKI_APIUSER=admin/g' .env
+      - run: sed -i 's/WIKI_APIPASSWORD=.*$/WIKI_APIPASSWORD=adminpass123/g' .env
 
       # Playwright needs the debug bar not to appear
       - run: sed -i 's/APP_DEBUG=.*$/APP_DEBUG=FALSE/g' .env

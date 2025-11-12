@@ -31,21 +31,11 @@ Before you begin, ensure you have the following installed:
 
 ### Windows Users
 
-If you're developing on Windows, we highly recommend following this guide to significantly improve Docker performance:
-
-**[Increase Docker Performance on Windows by 20x](https://medium.com/@suyashsingh.stem/increase-docker-performance-on-windows-by-20x-6d2318256b9a)**
-
-This optimization can dramatically reduce build times and improve overall development experience.
-
-#### Permission Issues on Windows
-
-If you encounter permission issues when running Docker commands, you may need to add your user to the Docker group:
-
-```bash
-sudo usermod -aG docker $USER
-```
-
-After running this command, close and reopen your terminal to instantiate a new session.
+If you're developing on Windows, then for acceptable performance you must:
+* Make sure you have WSL2 installed.  Running Docker under native windows via Docker Desktop is unusably slow.
+* Check out the code to a WSL path (e.g. `/home/user/restarters.net`).  Do **not** use a path under `/mnt`.
+* Run the commands below from inside the WSL container.
+* You **must** run the `file-sync.sh` job to ensure changes are sync'd to the Docker containers.
 
 ## Setup Steps
 

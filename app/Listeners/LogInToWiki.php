@@ -25,7 +25,7 @@ class LogInToWiki
      *
      * @return void
      */
-    public function __construct(Request $request, UserCreator $mediawikiUserCreator)
+    public function __construct(Request $request, ?UserCreator $mediawikiUserCreator)
     {
         $this->request = $request;
         $this->wikiUserCreator = $mediawikiUserCreator;
@@ -39,17 +39,28 @@ class LogInToWiki
      */
     public function handle(Login $event)
     {
-        $user = $event->user;
+        try {
+            // If Wiki integration is not available, just return without error
+            if ($this->wikiUserCreator === null) {
+                Log::info("Wiki integration not available - skipping wiki login");
+                return;
+            }
 
-        if ($user->wiki_sync_status == WikiSyncStatus::CreateAtLogin) {
-            Log::info("Need to create " . $user->name);
-            $this->createUserInWiki($user);
-            $user->refresh();
-        }
+            $user = $event->user;
 
-        if (! is_null($user->mediawiki) && ! empty($user->mediawiki) &&
-            $user->wiki_sync_status == WikiSyncStatus::Created) {
-            $this->logUserIn($user);
+            if ($user->wiki_sync_status == WikiSyncStatus::CreateAtLogin) {
+                Log::info("Need to create " . $user->name);
+                $this->createUserInWiki($user);
+                $user->refresh();
+            }
+
+            if (! is_null($user->mediawiki) && ! empty($user->mediawiki) &&
+                $user->wiki_sync_status == WikiSyncStatus::Created) {
+                $this->logUserIn($user);
+            }
+        } catch (\Exception $ex) {
+            // Log the error but don't let it break the user's login
+            Log::error("Wiki login failed but user login will continue: " . $ex->getMessage());
         }
     }
 
