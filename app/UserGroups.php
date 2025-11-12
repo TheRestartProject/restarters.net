@@ -101,7 +101,9 @@ class UserGroups extends Model implements Auditable
 
     public function scopeConfirmedInvitation($query)
     {
-        return $query->where('status', 1)->orWhereNull('status');
+        return $query->where(function ($q) {
+            $q->where('status', 1)->orWhereNull('status');
+        });
     }
 
     public function getFullName()
