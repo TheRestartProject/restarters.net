@@ -68,12 +68,10 @@ jobs:
 #    networks:
 #      - app-network
 
-      - image: docker.io/bitnami/redis:6.0
+      - image: redis:6.0
         name: restarters_discourse_redis
-        environment:
-          - ALLOW_EMPTY_PASSWORD=yes
 #        volumes:
-#          - 'redis_data:/bitnami/discourse'
+#          - 'redis_data:/data'
 #        networks:
 #          - app-network
 
