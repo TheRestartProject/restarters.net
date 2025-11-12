@@ -75,7 +75,7 @@ jobs:
 #        networks:
 #          - app-network
 
-      - image: docker.io/bitnami/discourse:2
+      - image: docker.io/bitnamilegacy/discourse:2
         name: restarters_discourse
 # No ports on CircleCI
 #        ports:
@@ -104,7 +104,7 @@ jobs:
 #    networks:
 #      - app-network
 
-      - image: docker.io/bitnami/discourse:latest
+      - image: docker.io/bitnamilegacy/discourse:2
         name: restarters_discourse_sidekiq
         depends_on:
           - restarters_discourse
