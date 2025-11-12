@@ -64,7 +64,7 @@ const config = {
   timeout: 5 * 60 * 1000,
   navigationTimeout: 2 * 60 * 1000,
   actionTimeout: 2 * 60 * 1000,
-  retries: 0
+  retries: 2
 };
 
 module.exports = config;
