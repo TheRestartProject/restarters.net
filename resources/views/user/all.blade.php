@@ -166,9 +166,9 @@
                       <td>
 
                           @if(App\Helpers\Fixometer::hasRole($user, 'Administrator'))
-                          <a href="/user/edit/<?php echo $u->id; ?>"><?php echo $u->name; ?></a>
+                          <a href="/user/edit/{{ $u->id }}">{{ $u->name }}</a>
                           @else
-                          <?php echo $u->name; ?>
+                          {{ $u->name }}
                           @endif
 
                       </td>
