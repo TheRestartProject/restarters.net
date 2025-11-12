@@ -55,15 +55,15 @@ jobs:
           - TZ: "UTC"
         depends_on:
           - mariadb
-      - image: 'docker.io/bitnami/postgresql:11'
+      - image: 'postgres:11'
         name: postgresql
 # No volumes on CircleCI
 #        volumes:
-#          - 'postgresql_data:/bitnami/postgresql'
+#          - 'postgresql_data:/var/lib/postgresql/data'
         environment:
-          - ALLOW_EMPTY_PASSWORD=yes
-          - POSTGRESQL_USERNAME=bn_discourse
-          - POSTGRESQL_DATABASE=bitnami_discourse
+          - POSTGRES_USER=bn_discourse
+          - POSTGRES_DB=bitnami_discourse
+          - POSTGRES_HOST_AUTH_METHOD=trust
 # No networks on CircleCI
 #    networks:
 #      - app-network
