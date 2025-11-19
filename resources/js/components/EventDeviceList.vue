@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <div class="device-list">
     <b-table-simple responsive class="pl-0 pl-md-3 pr-0 pr-md-3 pb-2 mb-2" table-class="m-0 leave-tables-alone">
       <b-thead>
         <b-tr>
