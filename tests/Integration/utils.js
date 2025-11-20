@@ -187,10 +187,9 @@ exports.addDevice = async function(page, baseURL, idevents, powered, photo, fixe
   var addsel = powered ? '.add-powered-device-desktop' : '.add-unpowered-device-desktop'
   log('Using device selector', { addsel, powered })
 
-  // Get current device count - count h3 elements within the device-list container
-  // Use the device-list class we added to EventDeviceList.vue for specificity
+  // Get current device count.
   await page.waitForSelector(addsel)
-  var current = await page.locator('.device-list h3.noheader').count()
+  var current = await page.locator('h3:visible').count()
   log('Current device count', { current })
 
   // Click the add button.
@@ -243,9 +242,9 @@ exports.addDevice = async function(page, baseURL, idevents, powered, photo, fixe
   log('Submitting device creation')
   await page.locator('text=Add item >> visible=true').click()
 
-  // Wait for device to show - use same specific selector as when counting
+  // Wait for device to show.
   log('Waiting for device to appear in list')
-  await expect(page.locator('.device-list h3.noheader')).toHaveCount(current + 1)
+  await expect(page.locator('h3:visible')).toHaveCount(current + 1)
 
   // Check that the photo appears.
   log('Opening device for verification')
@@ -253,8 +252,8 @@ exports.addDevice = async function(page, baseURL, idevents, powered, photo, fixe
 
   if (photo) {
     log('Verifying photo was uploaded')
-    // Should see the dropzone and uploaded photo - allow extra time for upload to complete
-    await expect(page.locator('.device-photos:visible img')).toHaveCount(2, { timeout: 10000 })
+    // Should see the dropzone and uploaded photo.
+    await expect(page.locator('.device-photos:visible img')).toHaveCount(2)
   } else {
     log('Verifying no additional photos present')
     // Just dropzone
