@@ -22,11 +22,16 @@ export default {
     actions: {
         async fetch({ commit, state }) {
             // Check if we're running under Playwright tests via global variable or query param
-            const isPlaywrightTest = (typeof window !== 'undefined' && window.PLAYWRIGHT_TEST === true) || 
+            const isPlaywrightTest = (typeof window !== 'undefined' && window.PLAYWRIGHT_TEST === true) ||
                                     (typeof window !== 'undefined' && window.location.search.includes('playwright=true'))
-            
+
             // Item types don't change often, so only fetch if we don't have them in store
             // Exception: always fetch fresh data during Playwright tests to get latest test data
+            // For Playwright tests, reset the fetching promise to force a fresh fetch
+            if (isPlaywrightTest) {
+                state.fetching = null
+            }
+
             if (!state.fetching && (!state.list.length || isPlaywrightTest)) {
                 const url = isPlaywrightTest ? '/api/v2/items?refresh_cache=true' : '/api/v2/items'
                 state.fetching = axios.get(url)

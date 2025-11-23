@@ -208,8 +208,9 @@ jobs:
 
       # Run the Playwright tests.
       #
-      # Zap groups set up by the UT; this can confuse Playwright tests.
-      - run: mysql --host="127.0.0.1" -u root -ps3cr3t -e "use restarters_db;SET foreign_key_checks=0;DELETE FROM \`groups\` WHERE location IS NULL;SET foreign_key_checks=1;"
+      # Reset the database to restore categories truncated by PHPUnit tests.
+      # The autocomplete test requires all categories (Small kitchen item, Flat screen, etc.)
+      - run: php artisan migrate:fresh
       - run: php artisan cache:clear
       # Ignore the return code from the tinker; the user might exist from the phpunit tests.  If it doesn't and
       # the create fails, the tests will fail too.

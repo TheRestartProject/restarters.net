@@ -137,7 +137,9 @@ class PartyController extends Controller
             // Get the list of events we are attending and invited to- speeds up expansion.
             $attending = EventsUsers::where('user', Auth::user()->id)->where('status', 1)->pluck('event')->toArray();
             $invited = EventsUsers::where('user', Auth::user()->id)->where('status', '!=', 1)->pluck('event')->toArray();
-            $volunteering = EventsUsers::where('user', Auth::user()->id)->where('status', 1)->orWhereNull('status')->pluck('event')->toArray();
+            $volunteering = EventsUsers::where('user', Auth::user()->id)->where(function($query) {
+                $query->where('status', 1)->orWhereNull('status');
+            })->pluck('event')->toArray();
 
             foreach (Party::forUser(null)->reorder()->orderBy('event_start_utc', 'DESC')->get() as $event) {
                 $e = \App\Http\Controllers\PartyController::expandEvent($event, NULL, $countries, $attending, $invited, $volunteering);
