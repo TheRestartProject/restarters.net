@@ -46,7 +46,13 @@ class ItemController extends Controller
         $refreshCache = $request->has('refresh_cache') &&
                        ($refreshCacheValue === 'true' || $refreshCacheValue === true || $refreshCacheValue === '1' || $refreshCacheValue === 1);
         $isPlaywrightTest = $request->hasHeader('X-Playwright-Test');
-        
+
+        // Clear cache first if refresh requested - this is needed because Device::getItemTypes()
+        // also has its own internal cache check that would return stale data
+        if ($refreshCache || $isPlaywrightTest) {
+            \Cache::forget('item_types');
+        }
+
         if (!$refreshCache && !$isPlaywrightTest && \Cache::has('item_types')) {
             $items = \Cache::get('item_types');
         } else {
