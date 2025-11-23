@@ -237,6 +237,11 @@ exports.addDevice = async function(page, baseURL, idevents, powered, photo, fixe
     page.locator('.add-device .vue-dropzone:visible').click()
     const fileChooser = await fileChooserPromise;
     await fileChooser.setFiles('public/images/community.jpg');
+
+    // Wait for the file upload to complete - dropzone shows .dz-preview when file is being uploaded
+    // and adds .dz-success class when upload succeeds
+    log('Waiting for photo upload to complete')
+    await expect(page.locator('.add-device .dz-preview.dz-success:visible')).toBeVisible({ timeout: 30000 })
   }
 
   log('Submitting device creation')
