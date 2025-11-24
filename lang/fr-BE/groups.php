@@ -129,7 +129,7 @@ return [
   'nearby' => 'Proche',
   'no_other_events' => 'Il n\'y a actuellement aucun autre événement à venir',
   'no_other_nearby_events' => 'Il n\'y a actuellement aucun autre événement proche de chez vous',
-  'groups_postcode_small' => '(Optionnel)',
+  'groups_postcode_small' => '',
   'postcode' => 'Code postal du Repair Café',
   'create_failed' => 'Le Repair Café <strong>n\'a pas pu</strong> être créé. Veuillez regarder les erreurs, les corriger, et essayer à nouveau.',
   'edit_failed' => 'Le Repair Café n\'a pas pu être édité.',
