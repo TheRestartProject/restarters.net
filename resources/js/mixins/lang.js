@@ -39,11 +39,26 @@ function translate(key, values = {}) {
     return typeof translation === 'string' ? translation : key;
 }
 
-export const Lang = { get: translate }
+function choice(key, count, values = {}) {
+    // Simple pluralization helper
+    // Laravel's pluralization uses count parameter to determine singular/plural
+    const translation = translate(key, { ...values, count });
+
+    // If translation contains pipes, handle pluralization
+    if (typeof translation === 'string' && translation.includes('|')) {
+        const parts = translation.split('|');
+        // Simple rule: 0 or 1 uses first part, > 1 uses second part
+        return count <= 1 ? parts[0] : (parts[1] || parts[0]);
+    }
+
+    return translation;
+}
+
+export const Lang = { get: translate, choice: choice }
 
 export default {
     beforeCreate() {
-        this.$lang = { get: translate }
+        this.$lang = { get: translate, choice: choice }
     },
     methods: {
         __(key, values) {

@@ -83,8 +83,8 @@ export default {
 
       // For HTML we need to do a more complex check, as truncate() can result in HTML which is different from
       // the original even if it's not removed anything, because of slight HTML differences.
-      const origtext = htmlToText.fromString(this.html)
-      const truncatedtext = htmlToText.fromString(this.truncatedHTML)
+      const origtext = htmlToText(this.html)
+      const truncatedtext = htmlToText(this.truncatedHTML)
 
       return origtext !== truncatedtext
     }
