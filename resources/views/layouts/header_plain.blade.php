@@ -43,11 +43,9 @@
         <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="" />
 
         <!-- Styles -->
+        @vite(['resources/sass/app.scss', 'resources/global/css/app.scss'])
         @if( isset($iframe) )
-          <link href="{{ asset('css/app.css') }}" rel="stylesheet">
           <link href="{{ asset('css/iframe.css') }}" rel="stylesheet">
-        @else
-          <link href="{{ asset('css/app.css') }}" rel="stylesheet">
         @endif
 
         <!-- Meta tags for social previews. -->
