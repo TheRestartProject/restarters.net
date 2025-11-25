@@ -19,9 +19,10 @@
 
         @yield('extra-css')
 
+        @if( !isset($iframe) || !$iframe )
         <!-- Load jQuery first to ensure it's available for all scripts -->
         <script src="https://cdn.jsdelivr.net/npm/jquery@3.4.1/dist/jquery.min.js"></script>
-        
+
         <!-- Load jQuery plugins immediately after jQuery -->
         <script src="https://cdn.jsdelivr.net/npm/moment@2.29.4/moment.min.js"></script>
         <script src="https://cdn.jsdelivr.net/npm/tinysort@3.2.8/dist/tinysort.min.js"></script>
@@ -35,12 +36,13 @@
         <script src="https://cdn.jsdelivr.net/npm/js-cookie@2.2.1/src/js.cookie.min.js"></script>
         <!-- Load Select2 last to ensure jQuery is fully available -->
         <script src="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.13/js/select2.min.js" integrity="sha512-2ImtlRlf2VVmiGZsjm9bEyhjGW4dU7B6TNwh/hx/iSByxNENtj3WVE6o/9Lj4TJeVXPi4bnOIMXFIJJAeufa0A==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
-        
+
         <!-- Select2 CSS -->
         <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.13/css/select2.min.css" integrity="sha512-nMNlpuaDPrqlEls3IX/Q56H36qvBASwb3ipuo3MxeWbsQB1881ox0cRv7UPTgBlriqoynt35KjEwgGUeUXIPnw==" crossorigin="anonymous" referrerpolicy="no-referrer" />
-        
+
         <!-- Leaflet CSS -->
         <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="" />
+        @endif
 
         <!-- Styles -->
         @vite(['resources/sass/app.scss', 'resources/global/css/app.scss'])
@@ -64,6 +66,7 @@
         <meta data-hid="twitter:card" name="twitter:card" content="summary_large_image">
         <meta data-hid="twitter:site" name="twitter:site" content="RestartProject">
 
+        @if( !isset($iframe) || !$iframe )
         <!-- Cookie banner with fine-grained opt-in -->
         <script src="{{ asset('js/gdpr-cookie-notice.js') }}"></script>
         <!-- Check to see if visitor has opted in to analytics cookies -->
@@ -90,6 +93,7 @@
             })();
         </script>
         <!-- End Matomo Code -->
+        @endif
     </head>
     @if( Request::is('login') || Request::is('user/register') )
       <body class="fixed-layout">
