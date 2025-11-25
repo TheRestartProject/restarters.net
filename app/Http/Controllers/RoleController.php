@@ -24,10 +24,22 @@ class RoleController extends Controller
             // $this->set('roleList', $this->Role->findAll());
 
             $Role = new Role;
+            $roleList = $Role->findAll();
+
+            // Prepare data for Vue table
+            $tableData = [];
+            foreach ($roleList as $role) {
+                $tableData[] = [
+                    'id' => $role->id,
+                    'role' => $role->role,
+                    'permissions_list' => $role->permissions_list,
+                ];
+            }
 
             return view('role.all', [//role.index
               'title' => 'Roles',
-              'roleList' => $Role->findAll(),
+              'roleList' => $roleList,
+              'tableData' => $tableData,
             ]);
         }
 

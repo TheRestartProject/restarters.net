@@ -16,10 +16,52 @@ class CategoryController extends Controller
     public function index(): View
     {
         $Category = new Category;
+        $list = $Category->findAll();
+        $clusters = $Category->listed();
+
+        // Prepare data for Vue table
+        $tableData = [];
+        foreach ($list as $category) {
+            // Find cluster name
+            $clusterName = null;
+            if (!empty($category->cluster)) {
+                foreach ($clusters as $cluster) {
+                    if ($cluster->idclusters == $category->cluster) {
+                        $clusterName = $cluster->name;
+                        break;
+                    }
+                }
+            }
+
+            // Prepare reliability badge HTML
+            $reliability = $category->footprint_reliability ?? 6;
+            $colors = [
+                1 => '#AD2C1C',
+                2 => '#FF1B00',
+                3 => '#FFBA00',
+                4 => '#43B136',
+                5 => '#26781C',
+                6 => '#FFBA00',
+            ];
+            $color = $colors[$reliability] ?? '#FFBA00';
+            $reliabilityHtml = '<span class="badge indicator-' . $reliability . '" style="background-color: ' . $color . '">' . __('admin.reliability-' . $reliability) . '</span>';
+
+            $tableData[] = [
+                'idcategories' => $category->idcategories,
+                'name' => $category->name,
+                'cluster' => $clusterName,
+                'cluster_name' => $clusterName,
+                'weight' => $category->weight,
+                'footprint' => $category->footprint,
+                'footprint_html' => $category->footprint,
+                'reliability' => $reliabilityHtml,
+            ];
+        }
 
         return view('category.index', [
-        'list' => $Category->findAll(),
-        'categories'  => $Category->listed(),
+            'list' => $list,
+            'categories' => $clusters,
+            'tableData' => $tableData,
         ]);
     }
 

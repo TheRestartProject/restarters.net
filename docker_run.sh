@@ -97,6 +97,9 @@ php artisan l5-swagger:generate
 # Ensure we have the admin user
 echo "User::firstOrCreate(['email'=>'jane@bloggs.net'], ['name'=>'Jane Bloggs','password'=>Hash::make('passw0rd'),'role'=>2,'consent_past_data'=>'2021-01-01','consent_future_data'=>'2021-01-01','consent_gdpr'=>'2021-01-01']);" | php artisan tinker
 
+# Ensure we have a test group tag
+echo "\App\GroupTags::firstOrCreate(['tag_name'=>'Test Tag'], ['description'=>'A test tag for development']);" | php artisan tinker
+
 php-fpm
 
 # In case everything else bombs out.

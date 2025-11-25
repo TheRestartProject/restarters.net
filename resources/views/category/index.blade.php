@@ -34,43 +34,9 @@
 
         <div class="row">
             <div class="col-12">
-
-                <div class="table-responsive table-section">
-                    <table class="table table-hover table-striped table-categories sortable" role="table">
-                        <thead>
-                            <tr>
-
-                                <th>Name</th>
-                                <th>Category Cluster</th>
-                                <th>Weight [kg]</th>
-                                <th>CO<sub>2</sub> Footprint [kg]</th>
-                                <th width="145">Reliability</th>
-
-                            </tr>
-                        </thead>
-
-                        <tbody>
-                            @if(isset($list))
-                            @foreach($list as $p)
-                            <tr>
-                                <td><a href="/category/edit/{{ $p->idcategories }}">@lang($p->name)</a></td>
-                                @if( !empty($p->cluster) )
-                                @foreach($categories as $cluster)
-                                {!! $cluster->idclusters == $p->cluster ? '<td>'.__($cluster->name).'</td>' : '' !!}
-                                @endforeach
-                                @else
-                                <td>N/A</td>
-                                @endif
-                                <td>{{{ $p->weight }}}</td>
-                                <td>{{{ $p->footprint }}}</td>
-                                @include('partials/footprint-reliability', ['reliability' => $p->footprint_reliability])
-                            </tr>
-                            @endforeach
-                            @endif
-                        </tbody>
-                    </table>
+                <div class="vue">
+                    <categories-table :categories="{{ json_encode($tableData) }}"></categories-table>
                 </div>
-
             </div>
         </div>
 
