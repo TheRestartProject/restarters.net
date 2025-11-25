@@ -141,7 +141,7 @@ export default {
       }
     },
     async listTags({commit}) {
-      let ret = await axios.get('/api/v2/groups/tags?locale=\' + getLocale()')
+      let ret = await axios.get('/api/v2/groups/tags?locale=' + getLocale())
       if (ret && ret.data) {
         commit('setTags', {
           tags: ret.data.data
