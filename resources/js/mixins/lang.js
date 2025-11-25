@@ -63,6 +63,10 @@ export default {
     methods: {
         __(key, values) {
             try {
+                // If values contains a 'count' parameter, use pluralization
+                if (values && values.count !== undefined) {
+                    return choice(key, values.count, values)
+                }
                 return translate(key, values)
             } catch (error) {
                 Sentry.captureMessage("Missing translation " + key)

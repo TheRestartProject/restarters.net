@@ -4,7 +4,8 @@
     <CollapsibleSection class="lineheight" collapsed :count="upcomingOrActive.length" count-badge :heading-level="headingLevel">
       <template slot="title">
         <div class="d-flex flex-wrap flex-column flex-md-row">
-          <div v-if="group">{{ group.name }}</div> {{ translatedTitle }}
+          <div v-if="group">{{ group.name }}</div>
+          <div class="ml-1">{{ translatedTitle }}</div>
           <div>
             <b-btn v-if="calendarCopyUrl" class="ml-0 ml-md-2" variant="primary" @click="showCalendar">
               <b-img-lazy :src="imageUrl('/images/subs_cal_ico.svg')" />
@@ -165,7 +166,7 @@ export default {
     translatedTitle() {
       // If we have a group then we are putting the name elsewhere and just want "events" (force the plural).  Otherwise
       // "Your events".
-      let ret = this.group ? this.__('groups.events') : this.__('events.your_events')
+      let ret = this.group ? 'events' : this.__('events.your_events')
       ret = ret.charAt(0).toUpperCase() + ret.slice(1)
       return ret
     },
