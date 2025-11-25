@@ -77,7 +77,7 @@ export default {
       return ret
     },
     needsTruncating() {
-      if (this.text && (text.length > maxChars)) {
+      if (this.text && (this.text.length > this.maxChars)) {
         return true
       }
 
