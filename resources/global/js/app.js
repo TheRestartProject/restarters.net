@@ -4,14 +4,21 @@ import './components/dropdown.js';
 import './components/ajax-search-discourse-notifications.js';
 import './components/check-auth.js';
 
-// Use global jQuery
-const $ = window.jQuery;
-
 // Use strict mode to reduce development errors.
 "use strict";
 
-$(document).ready(function() {
-  console.log('GLOBAL/js/app.js ready!');
+// Wait for jQuery to be available before executing any jQuery code
+function initWhenReady() {
+  if (typeof window.jQuery === 'undefined') {
+    setTimeout(initWhenReady, 50);
+    return;
+  }
+
+  // Use global jQuery
+  const $ = window.jQuery;
+
+  $(document).ready(function() {
+    console.log('GLOBAL/js/app.js ready!');
 
       // Keep hash within URL when toggling between Bootstrap Panes/Tabs
       $('a[data-toggle="tab"]').on('shown.bs.tab', function (e) {
@@ -62,3 +69,7 @@ $(document).ready(function() {
     });
   }
 });
+}
+
+// Start checking for jQuery
+initWhenReady();
