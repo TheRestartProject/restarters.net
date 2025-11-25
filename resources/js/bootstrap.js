@@ -8,12 +8,6 @@ window._ = _;
 window.Popper = createPopper;
 window.axios = axios;
 
-// Debug: Check if Select2 attached to jQuery
-console.log('Bootstrap.js loaded');
-console.log('jQuery available:', typeof window.jQuery !== 'undefined');
-console.log('Select2 attached:', typeof window.jQuery !== 'undefined' && typeof window.jQuery.fn.select2 !== 'undefined');
-// moment loaded via CDN in footer
-
 window.axios.defaults.headers.common['X-Requested-With'] = 'XMLHttpRequest';
 
 /**

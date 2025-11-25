@@ -24,18 +24,16 @@
 
         <div class="form-group col-lg-6">
             <label for="country">@lang('profile.country'):<sup>*</sup></label>
-            <div class="form-control form-control__select">
-                <select id="country" name="country" required aria-required="true" class="field select2">
-                    <option value=""></option>
-                    @foreach (App\Helpers\Fixometer::getAllCountries() as $key => $value)
-                        @if ($user->country_code == $key)
-                        <option value="{{ $key }}" selected>{{ $value }}</option>
-                        @else
-                        <option value="{{ $key }}">{{ $value }}</option>
-                        @endif
-                    @endforeach
-                </select>
-            </div>
+            <select id="country" name="country" required aria-required="true" class="form-control">
+                <option value=""></option>
+                @foreach (App\Helpers\Fixometer::getAllCountries() as $key => $value)
+                    @if ($user->country_code == $key)
+                    <option value="{{ $key }}" selected>{{ $value }}</option>
+                    @else
+                    <option value="{{ $key }}">{{ $value }}</option>
+                    @endif
+                @endforeach
+            </select>
             <div class="invalid-feedback">@lang('registration.country_validation')</div>
         </div>
     </div>
@@ -53,17 +51,15 @@
 
         <div class="form-group col-lg-6">
             <label for="age">@lang('registration.age'):</label>
-            <div class="form-control form-control__select">
-                <select id="age" name="age" required aria-required="true" class="field select2">
-                    @foreach(App\Helpers\Fixometer::allAges() as $age)
-                    @if ( $user->age == $age )
-                        <option value="{{ $age }}" selected>{{ $age }}</option>
-                    @else
-                        <option value="{{ $age }}">{{ $age }}</option>
-                    @endif
-                    @endforeach
-                </select>
-            </div>
+            <select id="age" name="age" required aria-required="true" class="form-control">
+                @foreach(App\Helpers\Fixometer::allAges() as $age)
+                @if ( $user->age == $age )
+                    <option value="{{ $age }}" selected>{{ $age }}</option>
+                @else
+                    <option value="{{ $age }}">{{ $age }}</option>
+                @endif
+                @endforeach
+            </select>
             <div class="invalid-feedback">@lang('registration.age_validation')</div>
         </div>
 
@@ -105,8 +101,7 @@
 
         <div class="form-group">
             <label for="tags[]">@lang('general.your_repair_skills'):</label>
-            <div class="form-control form-control__select">
-            <select id="tags" name="tags[]" class="select2-tags" multiple>
+            <select id="tags" name="tags[]" class="form-control" multiple size="10">
                 @foreach( App\Helpers\Fixometer::skillCategories() as $key => $skill_category )
                     <optgroup label="@lang($skill_category)">
                     @foreach ($skills[$key] as $skill)
@@ -119,7 +114,6 @@
                     </optgroup>
                 @endforeach
             </select>
-            </div>
         </div>
 
         <div class="form-row">

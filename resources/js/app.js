@@ -42,6 +42,8 @@ import RichTextEditor from './components/RichTextEditor.vue'
 import Notifications from './components/Notifications.vue'
 import GroupTimeZone from './components/GroupTimeZone.vue'
 import StatsShare from './components/StatsShare.vue'
+import CategoriesTable from './components/CategoriesTable.vue'
+import RolesTable from './components/RolesTable.vue'
 
 import lang from './mixins/lang'
 
@@ -75,27 +77,17 @@ Vue.mixin(lang)
 // as we gradually migrate from Blade templates to Vue components. Each piece of
 // jQuery functionality should be replaced with Vue component equivalents.
 function initializeJQuery() {
-  console.log('initializeJQuery called', {
-    hasWindow: typeof window !== 'undefined',
-    hasJQuery: typeof window.jQuery !== 'undefined',
-    hasSelect2: typeof window.jQuery !== 'undefined' && typeof window.jQuery.fn.select2 !== 'undefined',
-    hasLeaflet: typeof window.L !== 'undefined'
-  });
-
   if (typeof window === 'undefined' || !window.jQuery) {
     setTimeout(initializeJQuery, 50);
     return;
   }
 
-  // Wait for Select2 and Leaflet to be available
+  // Wait for Leaflet to be available
   // Note: Bootstrap loads from CDN and may not be ready yet, but that's OK
-  if (typeof window.jQuery.fn.select2 === 'undefined' || typeof window.L === 'undefined') {
-    console.log('Waiting for dependencies...');
+  if (typeof window.L === 'undefined') {
     setTimeout(initializeJQuery, 50);
     return;
   }
-
-  console.log('All dependencies ready, initializing...');
   
   const $ = window.jQuery;
   
@@ -106,45 +98,18 @@ function initializeJQuery() {
   // Document ready functionality
   $(document).ready(function() {
     try {
-      console.log('RESOURCES/js/app.js ready!');
-
       // Continue with all other jQuery code that was in the file
       if ($('section.registration').length > 0 && $('.alert.alert-danger').length > 0 && $('.is-invalid').length > 0) {
         $('.registration__step').removeClass('registration__step--active');
         $('.is-invalid').first().parents('.registration__step').addClass('registration__step--active');
       }
 
-      console.log('Initializing jQuery-dependent functionality...');
       // Initialize all other jQuery-dependent functionality here
       registration();
-      console.log('registration() complete');
       onboarding();
-      console.log('onboarding() complete');
       eventsMap();
-      console.log('eventsMap() complete');
       truncate();
-      console.log('truncate() complete');
       nestedTable();
-      console.log('nestedTable() complete');
-
-      console.log('Setting up select2Fields timeout...');
-      // Retry select2Fields with a small delay to ensure Select2 is fully loaded
-      setTimeout(function () {
-        if (typeof window.jQuery.fn.select2 !== 'undefined') {
-          select2Fields();
-        } else {
-          console.warn('Select2 still not available after delay, retrying...');
-          setTimeout(function () {
-            if (typeof window.jQuery.fn.select2 !== 'undefined') {
-              select2Fields();
-            } else {
-              console.error('Select2 failed to load after multiple retries');
-            }
-          }, 200);
-        }
-      }, 100);
-
-      console.log('Setting up popover timeout...');
       // Initialize popover functionality with retry mechanism
       setTimeout(function () {
         if (typeof window.jQuery.fn.popover !== 'undefined') {
@@ -256,7 +221,7 @@ function initializeJQuery() {
         lastScrollPosition = currentScrollPosition
       })
 
-      console.log('Initializing Sentry...');
+      // Initialize Sentry
       // Sentry error
       Sentry.init({
         Vue,
@@ -299,23 +264,15 @@ function initializeJQuery() {
           }
         }
       });
-      console.log('Sentry initialized');
+      // Sentry initialized
 
       /**
        * Vue instances are initialized outside of jQuery.ready for each .vue element
        * See the initialization code after the jQuery.ready block
        */
 
-      console.log('jQuery initialization complete - Vue will be initialized next')
+      // jQuery initialization complete - Vue will be initialized next
       $(".vue-placeholder-large").hide()
-
-      // Initialize tokenfield
-      $('.tokenfield').tokenfield();
-
-      $(".select2-dropdown").select2({
-        placeholder: 'Select an country',
-        allowClear: false
-      });
 
       $('.btn-calendar-feed').popover({
         trigger: 'focus'
@@ -337,34 +294,10 @@ function initializeJQuery() {
         localStorage.setItem('information-alert-closed', 'true');
       });
 
-      $('#manual_invite_box').on('tokenfield:createtoken', function (event) {
-        var existingTokens = $(this).tokenfield('getTokens');
-        var newval = event.attrs.value
-
-        $.each(existingTokens, function (index, token) {
-          if (token.value === newval)
-            event.preventDefault();
-        });
-
-        if (existingTokens.length >= 20) {
-          event.preventDefault();
-          $(event.target).closest('div.tokenfield').css('border', '2px solid red')
-        } else {
-          $(event.target).closest('div.tokenfield').css('border', '')
-        }
-
-        if (existingTokens.length >= 19) {
-          $('#event-invite-to button, #invite-to-group button').prop('disabled', disabled);
-        }
-      });
-
-      $('#manual_invite_box').on('tokenfield:removedtoken', function (event) {
-        var existingTokens = $(this).tokenfield('getTokens');
-
-        if (existingTokens.length < 20) {
-          $('#event-invite-to button, #invite-to-group button').prop('disabled', false);
-          $(event.target).closest('div.tokenfield').css('border', '')
-        }
+      // Enable submit button when email textarea has content
+      $('#manual_invite_box').on('input', function() {
+        var hasContent = $(this).val().trim().length > 0;
+        $('#event-invite-to button[type="submit"], #invite-to-group button[type="submit"]').prop('disabled', !hasContent);
       });
 
       $(document).on("click", "#btn-copy", function () {
@@ -387,6 +320,12 @@ function initializeJQuery() {
       // Enable popovers - Bootstrap doesn't enable these by default.
       $('[data-toggle="popover"]').popover();
 
+      // Handle invite modal toggle links - swap visibility when clicked
+      $('.toggle-modal-link').on('click', function(e) {
+        // Toggle d-none class on both toggle links
+        $('.toggle-modal-link').toggleClass('d-none');
+      });
+
       // All other jQuery initialization continues here...
       groupsMap();
 
@@ -403,10 +342,6 @@ function initializeJQuery() {
           marketing: []
         });
       }
-
-      $(".select2-dropdown").select2({
-        placeholder: 'Select an country',
-      });
 
       // Information alerts
       $('.information-alert').on('closed.bs.alert', function () {
@@ -478,6 +413,8 @@ function initializeJQuery() {
             'notifications': Notifications,
             'grouptimezone': GroupTimeZone,
             'statsshare': StatsShare,
+            'categoriestable': CategoriesTable,
+            'rolestable': RolesTable,
           }
         })
       })
@@ -497,10 +434,9 @@ function initializeJQuery() {
       }
 
       // All remaining jQuery initialization code goes here
-      console.log('Global JS initialization complete');
+      // Global JS initialization complete
     } catch (e) {
       console.error('Global JS initialization error:', e);
-      console.error('Error details:', e.message, e.stack);
     }
   });
 }
@@ -518,7 +454,6 @@ let jQuery;
 
 
 window.Dropzone = Dropzone;
-// Note: tokenfield is loaded via script tag in HTML template due to parsing issues
 // Note: slick-carousel is loaded via script tag in HTML template due to parsing issues
 
 // Slick carousel initialization moved to footer after CDN script loads
@@ -681,28 +616,7 @@ function onboarding() {
   }
 }
 
-function serialize(tokenfield) {
-  var items = tokenfield.getItems();
-  //console.log(items);
-  var prop;
-  var data = {};
-  items.forEach(function (item) {
-    if (item.isNew) {
-      prop = tokenfield._options.newItemName;
-    } else {
-      prop = tokenfield._options.itemName;
-    }
-    if (typeof data[prop] === 'undefined') {
-      data[prop] = [];
-    }
-    if (item.isNew) {
-      data[prop].push(item.name);
-    } else {
-      data[prop].push(item[tokenfield._options.itemValue]);
-    }
-  });
-  return data;
-}
+// serialize function removed - tokenfield has been replaced with textarea
 
 var placeSearch, autocomplete;
 var componentForm = {
@@ -1056,55 +970,7 @@ function initAutocomplete() {
     }
   }
 
-  function select2Fields($target = false) {
-
-    if( $target === false ){
-
-      window.jQuery('.select2').select2();
-      window.jQuery('.select2-repair-barrier').select2(repair_barrier_options);
-      window.jQuery('.select2-tags').select2(tag_options);
-      window.jQuery(".select2-with-input").select2(tag_options_with_input);
-      window.jQuery(".select2-with-input-group").select2({
-        width: 'auto',
-    		dropdownAutoWidth: true,
-    		allowClear: true,
-      });
-
-      window.jQuery('.select2[data-placeholder]').each(function() {
-        $(this).select2({
-          placeholder: $(this).data('placeholder')
-        })
-      })
-
-    } else {
-
-      $target.find('.select2').select2();
-      $target.find('.select2-repair-barrier').select2(repair_barrier_options);
-      $target.find('.select2-tags').select2(tag_options);
-      $target.find(".select2-with-input").select2(tag_options_with_input);
-      $target.find(".select2-with-input-group").select2({
-        width: 'auto',
-    		dropdownAutoWidth: true,
-    		allowClear: true,
-      });
-
-
-      $target.find('.select2[data-placeholder]').each(function() {
-        $(this).select2({
-          placeholder: $(this).data('placeholder')
-        })
-      })
-    }
-
-
-    // $(document).on('focus', '.select2.select2-container', function (e) {
-    //   // only open on original attempt - close focus event should not fire open
-    //   if (e.originalEvent && $(this).find(".select2-selection--single").length > 0) {
-    //     $(this).siblings('select').select2('open');
-    //   }
-    // });
-
-  }
+  // select2Fields function removed - Select2 has been replaced with native selects
 
   Dropzone.autoDiscover = false;
   // All remaining jQuery initialization code moved to initializeJQuery() function

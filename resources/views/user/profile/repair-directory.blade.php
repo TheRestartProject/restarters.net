@@ -43,20 +43,18 @@
           @lang('profile.repair_dir_role')
         </label>
         <div class="col-lg-6">
-          <div class="form-control form-control__select">
-            <select id="role" name="role" required aria-required="true" class="field select2">
-              <?php
+          <select id="role" name="role" required aria-required="true" class="form-control">
+            <?php
 
-              foreach ($roles as $role => $info) {
-                echo "<option value=\"$role\"" .
-                   ($info['selected'] ? " selected" : "") .
-                   ($info['disabled'] ? " disabled" : "") .
-                  ">{$info['name']}</option>";
-              }
+            foreach ($roles as $role => $info) {
+              echo "<option value=\"$role\"" .
+                 ($info['selected'] ? " selected" : "") .
+                 ($info['disabled'] ? " disabled" : "") .
+                ">{$info['name']}</option>";
+            }
 
-              ?>
-            </select>
-          </div>
+            ?>
+          </select>
         </div>
       </div>
     </fieldset>
