@@ -1,21 +1,9 @@
-// jQuery, moment, Select2, and Bootstrap are loaded from CDN (not bundled due to compatibility issues)
+// jQuery, moment, and Bootstrap are loaded from CDN (not bundled due to compatibility issues)
 // All vendor libraries below expect jQuery to be available globally
 
-// Import tinysort
-import tinysort from 'tinysort';
-window.tinysort = tinysort;
+// Note: tinysort removed - was only used by bootstrap-sortable which has been replaced
+// Note: Slick carousel has been replaced with Bootstrap-Vue carousel
+// Note: bootstrap-sortable has been replaced with Bootstrap-Vue tables
+// Note: bootstrap-tokenfield has been replaced with textarea
 
-// Import slick-carousel (requires jQuery)
-import 'slick-carousel';
-
-// Import bootstrap-tokenfield (requires jQuery)
-import 'bootstrap-tokenfield';
-
-// Import bootstrap-sortable (requires jQuery, tinysort, moment)
-import './bootstrap-sortable.js';
-
-// Import ekko-lightbox (requires jQuery)
-import 'ekko-lightbox';
-
-// Import tempusdominus-bootstrap-4 (requires jQuery and moment)
-import 'tempusdominus-bootstrap-4';
+// Note: ekko-lightbox and tempusdominus are loaded from CDN in header.blade.php
