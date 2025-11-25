@@ -41,6 +41,19 @@ export default defineConfig({
         alias: {
             'vue': resolve(__dirname, 'node_modules/vue/dist/vue.esm.js'),
             '@': resolve(__dirname, 'resources/js'),
+            'lodash/clone': 'lodash-es/clone',
+            'lodash/includes': 'lodash-es/includes',
+            'lodash/isEmpty': 'lodash-es/isEmpty',
+            'lodash/reject': 'lodash-es/reject',
+            'lodash/reverse': 'lodash-es/reverse',
+            'lodash/findIndex': 'lodash-es/findIndex',
+            // 'lodash/trimEnd': 'lodash-es/trimEnd', - REMOVED: breaks text-clipper
+            'lodash/zip': 'lodash-es/zip',
+            'lodash/compact': 'lodash-es/compact',
+            'lodash/max': 'lodash-es/max',
+            'lodash/times': 'lodash-es/times',
+            // 'lodash/trimStart': 'lodash-es/trimStart', - REMOVED: may break text-clipper
+            'lodash/padEnd': 'lodash-es/padEnd',
         },
     },
     build: {
