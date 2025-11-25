@@ -152,7 +152,7 @@
 // This is to add an edit button for a b-dropdown.  We should be able to do that by using <template v-slot:button-content>,
 // but that's not working.  So instead, we style an empty button with a background image.
 .edit-dropdown button.dropdown-toggle {
-    background-image: url('/icons/edit_ico_green.svg');
+    background-image: url('../icons/edit_ico_green.svg');
     object-fit: cover;
     background-repeat: no-repeat;
     background-position: center;
