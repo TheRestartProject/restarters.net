@@ -48,9 +48,12 @@
     }
 }
 
-.stats {
+.stats.row {
     margin-bottom: 30px;
+    flex-wrap: nowrap;
+}
 
+.stats {
     &__stat {
         border-right: 1px solid black;
     }
