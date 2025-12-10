@@ -21,6 +21,7 @@
                   <GroupAddEditPage :idgroups="{{ $id }}"
                                     :can-approve="{{ $can_approve ? "true": "false" }}"
                                     :can-network="{{ Auth::user()->hasRole('Administrator') ? "true" : "false" }}"
+                                    :can-edit-tags="{{ $can_approve ? "true" : "false" }}"
                   />
                 </div>
               </div>

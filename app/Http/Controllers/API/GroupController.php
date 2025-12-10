@@ -313,8 +313,38 @@ class GroupController extends Controller
      *     )
      */
     public static function listTagsv2(Request $request) {
+        // Try session auth first, then API token auth
+        $user = Auth::user();
+        if (!$user) {
+            $user = auth('api')->user();
+        }
+
+        // Unauthenticated users only see global tags
+        if (!$user) {
+            return [
+                'data' => TagCollection::make(GroupTags::with('network')->whereNull('network_id')->get())
+            ];
+        }
+
+        // Admins see all tags
+        if ($user->hasRole('Administrator')) {
+            return [
+                'data' => TagCollection::make(GroupTags::with('network')->get())
+            ];
+        }
+
+        // Network Coordinators see global tags + tags from their networks
+        $userNetworkIds = $user->networks->pluck('id')->toArray();
+
+        $tags = GroupTags::with('network')
+            ->where(function ($query) use ($userNetworkIds) {
+                $query->whereNull('network_id')  // Global tags
+                    ->orWhereIn('network_id', $userNetworkIds);  // Their networks' tags
+            })
+            ->get();
+
         return [
-            'data' => TagCollection::make(GroupTags::all())
+            'data' => TagCollection::make($tags)
         ];
     }
 

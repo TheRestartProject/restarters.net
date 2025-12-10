@@ -107,16 +107,19 @@
                 :selectedLabel="__('partials.remove')"
             />
           </div>
-          <div class="mt-2" v-if="canNetwork">
+          <div class="mt-2" v-if="canEditTags">
             <label for="tags">
               {{ __('groups.group_tags') }}:
             </label>
             <multiselect
                 id="tags"
                 v-model="tagList"
-                :options="tagOptions"
+                :options="groupedTagOptions"
                 track-by="id"
                 label="name"
+                group-values="tags"
+                group-label="network"
+                :group-select="false"
                 multiple
                 deselect-label=""
                 :taggable="false"
@@ -230,6 +233,11 @@ export default {
       required: false,
       default: false
     },
+    canEditTags: {
+      type: Boolean,
+      required: false,
+      default: false
+    },
   },
   data () {
     return {
@@ -331,6 +339,47 @@ export default {
         }
       }) : []
     },
+    groupedTagOptions() {
+      const tags = this.$store.getters['groups/listTags']
+
+      if (!tags) return []
+
+      // Group tags by network_name (null = "Global")
+      const grouped = {}
+
+      tags.forEach(tag => {
+        const networkName = tag.network_name || 'Global'
+        if (!grouped[networkName]) {
+          grouped[networkName] = []
+        }
+        grouped[networkName].push({
+          id: tag.id,
+          name: tag.name
+        })
+      })
+
+      // Convert to array format for vue-multiselect with "Global" first
+      const result = []
+
+      // Add Global first if it exists
+      if (grouped['Global']) {
+        result.push({
+          network: 'Global',
+          tags: grouped['Global']
+        })
+        delete grouped['Global']
+      }
+
+      // Add remaining networks sorted alphabetically
+      Object.keys(grouped).sort().forEach(networkName => {
+        result.push({
+          network: networkName,
+          tags: grouped[networkName]
+        })
+      })
+
+      return result
+    },
   },
   async mounted () {
     // Fetch the list of groups, so that we can ensure group names are unique.  No need to await because the check
@@ -365,7 +414,9 @@ export default {
     if (this.canNetwork) {
       // Fetch the list of networks.
       this.$store.dispatch('networks/list')
+    }
 
+    if (this.canEditTags) {
       // Fetch the list of tags.
       this.$store.dispatch('groups/listTags')
     }

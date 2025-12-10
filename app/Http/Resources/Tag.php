@@ -38,6 +38,14 @@ use Illuminate\Http\Resources\Json\JsonResource;
  *          format="int64",
  *          example=1,
  *          nullable=true
+ *     ),
+ *     @OA\Property(
+ *          property="network_name",
+ *          title="network_name",
+ *          description="Name of the network this tag belongs to (null for global tags)",
+ *          format="string",
+ *          example="MRES",
+ *          nullable=true
  *     )
  * )
  */
@@ -54,6 +62,7 @@ class Tag extends JsonResource
             'name' => $this->tag_name,
             'description' => $this->description,
             'network_id' => $this->network_id,
+            'network_name' => $this->network ? $this->network->name : null,
         ];
     }
 }

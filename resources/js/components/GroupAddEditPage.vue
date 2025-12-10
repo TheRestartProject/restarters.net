@@ -2,10 +2,10 @@
   <div>
     <b-card no-body v-if="box" class="box mt-4">
       <b-card-body class="p-4">
-        <GroupAddEdit :idgroups="idgroups" :can-approve="canApprove" :can-network="canNetwork" />
+        <GroupAddEdit :idgroups="idgroups" :can-approve="canApprove" :can-network="canNetwork" :can-edit-tags="canEditTags" />
       </b-card-body>
     </b-card>
-    <GroupAddEdit :idgroups="idgroups" :can-approve="canApprove" :can-network="canNetwork" v-else />
+    <GroupAddEdit :idgroups="idgroups" :can-approve="canApprove" :can-network="canNetwork" :can-edit-tags="canEditTags" v-else />
   </div>
 </template>
 <script>
@@ -27,6 +27,11 @@ export default {
       default: false
     },
     canNetwork: {
+      type: Boolean,
+      required: false,
+      default: false
+    },
+    canEditTags: {
       type: Boolean,
       required: false,
       default: false
