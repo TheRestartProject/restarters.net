@@ -243,19 +243,28 @@ class APIv2NetworkTest extends TestCase
             'network_id' => $otherNetwork->id,
         ]);
 
-        // List tags for network - should include global and network-specific tags
+        // Unauthenticated: should only see network-specific tags (NOT global - global is admin-only)
         $response = $this->get("/api/v2/networks/{$network->id}/tags");
         $response->assertSuccessful();
         $json = json_decode($response->getContent(), true)['data'];
-
-        // Should have at least 2 tags (global + network-specific)
         $tagIds = array_column($json, 'id');
-        $this->assertContains($globalTag->id, $tagIds);
+        $this->assertNotContains($globalTag->id, $tagIds); // Global tags are admin-only
         $this->assertContains($networkTag->id, $tagIds);
         $this->assertNotContains($otherTag->id, $tagIds);
 
-        // Test network_only parameter
-        $response = $this->get("/api/v2/networks/{$network->id}/tags?network_only=true");
+        // Admin: should see global + network-specific tags
+        $admin = User::factory()->administrator()->create(['api_token' => 'admintoken123']);
+        $this->actingAs($admin);
+        $response = $this->get("/api/v2/networks/{$network->id}/tags?api_token=admintoken123");
+        $response->assertSuccessful();
+        $json = json_decode($response->getContent(), true)['data'];
+        $tagIds = array_column($json, 'id');
+        $this->assertContains($globalTag->id, $tagIds); // Admin can see global tags
+        $this->assertContains($networkTag->id, $tagIds);
+        $this->assertNotContains($otherTag->id, $tagIds);
+
+        // Test network_only parameter (even for admin, should exclude global)
+        $response = $this->get("/api/v2/networks/{$network->id}/tags?network_only=true&api_token=admintoken123");
         $response->assertSuccessful();
         $json = json_decode($response->getContent(), true)['data'];
         $tagIds = array_column($json, 'id');
@@ -493,7 +502,7 @@ class APIv2NetworkTest extends TestCase
 
         $this->actingAs($user);
 
-        // NC should be able to add global and network tags, but not other network's tags
+        // NC can only add tags from their own networks (NOT global, NOT other networks)
         $response = $this->patch("/api/v2/groups/{$group->idgroups}?api_token=1234", [
             'tags' => json_encode([$globalTag->id, $networkTag->id, $otherNetworkTag->id]),
         ]);
@@ -504,10 +513,10 @@ class APIv2NetworkTest extends TestCase
         $group->refresh();
         $tagIds = $group->group_tags->pluck('id')->toArray();
 
-        // Should have global and network tags, but NOT other network's tag
-        $this->assertContains($globalTag->id, $tagIds);
-        $this->assertContains($networkTag->id, $tagIds);
-        $this->assertNotContains($otherNetworkTag->id, $tagIds);
+        // Should have ONLY network tags (global tags are admin-only)
+        $this->assertNotContains($globalTag->id, $tagIds); // Global tags are admin-only
+        $this->assertContains($networkTag->id, $tagIds); // Own network's tag - allowed
+        $this->assertNotContains($otherNetworkTag->id, $tagIds); // Other network's tag - not allowed
     }
 
     public function testTagResourceIncludesNetworkId(): void {

@@ -333,14 +333,11 @@ class GroupController extends Controller
             ];
         }
 
-        // Network Coordinators see global tags + tags from their networks
+        // Network Coordinators only see tags from their networks (NOT global tags - those are admin-only)
         $userNetworkIds = $user->networks->pluck('id')->toArray();
 
         $tags = GroupTags::with('network')
-            ->where(function ($query) use ($userNetworkIds) {
-                $query->whereNull('network_id')  // Global tags
-                    ->orWhereIn('network_id', $userNetworkIds);  // Their networks' tags
-            })
+            ->whereIn('network_id', $userNetworkIds)
             ->get();
 
         return [
@@ -983,7 +980,7 @@ class GroupController extends Controller
             }
         } elseif ($isCoordinatorForGroup) {
             // Network Coordinators can update tags, but only with tags that belong to
-            // networks they coordinate or global tags.
+            // networks they coordinate (global tags are admin-only).
             $tags = $request->tags;
 
             if ($tags) {
@@ -992,13 +989,13 @@ class GroupController extends Controller
                 // Get the network IDs this user coordinates
                 $userNetworkIds = $user->networks->pluck('id')->toArray();
 
-                // Validate each tag is either global or belongs to a network the user coordinates
+                // Validate each tag belongs to a network the user coordinates (global tags are admin-only)
                 $validTags = [];
                 foreach ($tags as $tagId) {
                     $tag = \App\GroupTags::find($tagId);
                     if ($tag) {
-                        // Tag is valid if it's global (network_id is null) or belongs to a network the user coordinates
-                        if ($tag->network_id === null || in_array($tag->network_id, $userNetworkIds)) {
+                        // Tag is valid only if it belongs to a network the user coordinates
+                        if ($tag->network_id !== null && in_array($tag->network_id, $userNetworkIds)) {
                             $validTags[] = $tagId;
                         }
                     }

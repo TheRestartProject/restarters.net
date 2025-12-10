@@ -419,7 +419,7 @@ class NetworkController extends Controller
      *      operationId="getNetworkTags",
      *      tags={"Networks"},
      *      summary="Get Network Tags",
-     *      description="Returns list of tags available for a network (network-specific + global tags).",
+     *      description="Returns list of tags available for a network. Administrators see global + network tags; others see only network-specific tags.",
      *      @OA\Parameter(
      *          name="id",
      *          description="Network id",
@@ -463,9 +463,21 @@ class NetworkController extends Controller
     {
         $network = Network::findOrFail($id);
 
-        if ($request->get('network_only', false) === 'true' || $request->get('network_only', false) === true) {
+        // Try session auth first, then API token auth
+        $user = Auth::user();
+        if (!$user) {
+            $user = auth('api')->user();
+        }
+
+        // Only admins can see global tags; everyone else sees only network-specific tags
+        $isAdmin = $user && $user->hasRole('Administrator');
+        $networkOnly = $request->get('network_only', false) === 'true' || $request->get('network_only', false) === true;
+
+        if ($networkOnly || !$isAdmin) {
+            // Network tags only (exclude global tags)
             $tags = GroupTags::forNetwork($id)->get();
         } else {
+            // Admin: global + network tags
             $tags = GroupTags::availableForNetwork($id)->get();
         }
 
