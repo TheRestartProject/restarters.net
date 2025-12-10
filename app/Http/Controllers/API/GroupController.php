@@ -944,14 +944,37 @@ class GroupController extends Controller
                 $group->networks()->sync($networks);
             }
 
-            // We can update the tags.  The parameter is an array of ids.
-            // TODO The old code restricts updating tags to admins.  But I wonder if it should include
-            // networks coordinators too.
+            // Administrators can update tags with any tag (global or any network's tags)
             $tags = $request->tags;
 
             if ($tags) {
                 $tags = json_decode($tags);
                 $group->group_tags()->sync($tags);
+            }
+        } elseif ($isCoordinatorForGroup) {
+            // Network Coordinators can update tags, but only with tags that belong to
+            // networks they coordinate or global tags.
+            $tags = $request->tags;
+
+            if ($tags) {
+                $tags = json_decode($tags);
+
+                // Get the network IDs this user coordinates
+                $userNetworkIds = $user->networks->pluck('id')->toArray();
+
+                // Validate each tag is either global or belongs to a network the user coordinates
+                $validTags = [];
+                foreach ($tags as $tagId) {
+                    $tag = \App\GroupTags::find($tagId);
+                    if ($tag) {
+                        // Tag is valid if it's global (network_id is null) or belongs to a network the user coordinates
+                        if ($tag->network_id === null || in_array($tag->network_id, $userNetworkIds)) {
+                            $validTags[] = $tagId;
+                        }
+                    }
+                }
+
+                $group->group_tags()->sync($validTags);
             }
         }
 

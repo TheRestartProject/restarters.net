@@ -3,6 +3,7 @@
 namespace App;
 
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use App\Group;
 use Illuminate\Database\Eloquent\Model;
@@ -10,6 +11,22 @@ use Illuminate\Database\Eloquent\Model;
 class Network extends Model
 {
     use HasFactory;
+
+    /**
+     * Get tags belonging to this network.
+     */
+    public function tags(): HasMany
+    {
+        return $this->hasMany(GroupTags::class, 'network_id', 'id');
+    }
+
+    /**
+     * Get all tags available to this network (network-specific + global).
+     */
+    public function availableTags()
+    {
+        return GroupTags::availableForNetwork($this->id);
+    }
 
     public function groups(): BelongsToMany
     {

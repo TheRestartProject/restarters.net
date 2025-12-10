@@ -98,6 +98,11 @@ Route::prefix('v2')->group(function() {
             Route::get('{id}', [API\NetworkController::class, 'getNetworkv2']);
             Route::get('{id}/groups', [API\NetworkController::class, 'getNetworkGroupsv2']);
             Route::get('{id}/events', [API\NetworkController::class, 'getNetworkEventsv2']);
+            Route::get('{id}/tags', [API\NetworkController::class, 'getNetworkTagsv2']);
+            Route::middleware('auth:api')->group(function() {
+                Route::post('{id}/tags', [API\NetworkController::class, 'createNetworkTagv2']);
+                Route::delete('{id}/tags/{tagId}', [API\NetworkController::class, 'deleteNetworkTagv2']);
+            });
         });
 
         Route::prefix('/moderate')->group(function() {

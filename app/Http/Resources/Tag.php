@@ -30,6 +30,14 @@ use Illuminate\Http\Resources\Json\JsonResource;
  *          description="What this tag is for",
  *          format="string",
  *          example="Groups in Scotland"
+ *     ),
+ *     @OA\Property(
+ *          property="network_id",
+ *          title="network_id",
+ *          description="Network this tag belongs to (null for global tags)",
+ *          format="int64",
+ *          example=1,
+ *          nullable=true
  *     )
  * )
  */
@@ -45,6 +53,7 @@ class Tag extends JsonResource
             'id' => $this->id,
             'name' => $this->tag_name,
             'description' => $this->description,
+            'network_id' => $this->network_id,
         ];
     }
 }

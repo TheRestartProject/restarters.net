@@ -3,8 +3,10 @@
 namespace Tests\Feature;
 
 use App\Group;
+use App\GroupTags;
 use App\Network;
 use App\Party;
+use App\Role;
 use App\User;
 use Carbon\Carbon;
 use DB;
@@ -217,5 +219,321 @@ class APIv2NetworkTest extends TestCase
             [false],
             [true],
         ];
+    }
+
+    public function testListNetworkTags(): void {
+        $network = Network::factory()->create();
+
+        // Create a global tag
+        $globalTag = GroupTags::factory()->create([
+            'tag_name' => 'GlobalTag',
+            'network_id' => null,
+        ]);
+
+        // Create a tag for this network
+        $networkTag = GroupTags::factory()->create([
+            'tag_name' => 'NetworkTag',
+            'network_id' => $network->id,
+        ]);
+
+        // Create a tag for another network
+        $otherNetwork = Network::factory()->create();
+        $otherTag = GroupTags::factory()->create([
+            'tag_name' => 'OtherNetworkTag',
+            'network_id' => $otherNetwork->id,
+        ]);
+
+        // List tags for network - should include global and network-specific tags
+        $response = $this->get("/api/v2/networks/{$network->id}/tags");
+        $response->assertSuccessful();
+        $json = json_decode($response->getContent(), true)['data'];
+
+        // Should have at least 2 tags (global + network-specific)
+        $tagIds = array_column($json, 'id');
+        $this->assertContains($globalTag->id, $tagIds);
+        $this->assertContains($networkTag->id, $tagIds);
+        $this->assertNotContains($otherTag->id, $tagIds);
+
+        // Test network_only parameter
+        $response = $this->get("/api/v2/networks/{$network->id}/tags?network_only=true");
+        $response->assertSuccessful();
+        $json = json_decode($response->getContent(), true)['data'];
+        $tagIds = array_column($json, 'id');
+        $this->assertNotContains($globalTag->id, $tagIds);
+        $this->assertContains($networkTag->id, $tagIds);
+    }
+
+    public function testCreateNetworkTagAsCoordinator(): void {
+        $network = Network::factory()->create();
+
+        $user = User::factory()->networkCoordinator()->create([
+            'api_token' => '1234',
+        ]);
+        $network->addCoordinator($user);
+
+        $this->actingAs($user);
+
+        $response = $this->postJson("/api/v2/networks/{$network->id}/tags?api_token=1234", [
+            'name' => 'TestTag',
+            'description' => 'A test tag',
+        ]);
+
+        $response->assertStatus(201);
+        $json = json_decode($response->getContent(), true)['data'];
+        $this->assertEquals('TestTag', $json['name']);
+        $this->assertEquals($network->id, $json['network_id']);
+
+        // Verify tag was created in database
+        $tag = GroupTags::find($json['id']);
+        $this->assertNotNull($tag);
+        $this->assertEquals($network->id, $tag->network_id);
+    }
+
+    public function testCreateNetworkTagAsAdmin(): void {
+        $network = Network::factory()->create();
+
+        $user = User::factory()->administrator()->create([
+            'api_token' => '1234',
+        ]);
+
+        $this->actingAs($user);
+
+        $response = $this->postJson("/api/v2/networks/{$network->id}/tags?api_token=1234", [
+            'name' => 'AdminTag',
+            'description' => 'An admin-created tag',
+        ]);
+
+        $response->assertStatus(201);
+        $json = json_decode($response->getContent(), true)['data'];
+        $this->assertEquals('AdminTag', $json['name']);
+    }
+
+    public function testCreateNetworkTagUnauthorized(): void {
+        $network = Network::factory()->create();
+
+        // User who is not a coordinator for this network
+        $user = User::factory()->restarter()->create([
+            'api_token' => '1234',
+        ]);
+
+        $this->actingAs($user);
+
+        $response = $this->postJson("/api/v2/networks/{$network->id}/tags?api_token=1234", [
+            'name' => 'UnauthorizedTag',
+        ]);
+
+        $response->assertStatus(403);
+    }
+
+    public function testCreateDuplicateNetworkTag(): void {
+        $network = Network::factory()->create();
+
+        // Create existing tag
+        GroupTags::factory()->create([
+            'tag_name' => 'ExistingTag',
+            'network_id' => $network->id,
+        ]);
+
+        $user = User::factory()->administrator()->create([
+            'api_token' => '1234',
+        ]);
+
+        $this->actingAs($user);
+
+        $response = $this->postJson("/api/v2/networks/{$network->id}/tags?api_token=1234", [
+            'name' => 'ExistingTag',
+        ]);
+
+        $response->assertStatus(422);
+    }
+
+    public function testDeleteNetworkTag(): void {
+        $network = Network::factory()->create();
+
+        $tag = GroupTags::factory()->create([
+            'tag_name' => 'ToDelete',
+            'network_id' => $network->id,
+        ]);
+
+        $user = User::factory()->networkCoordinator()->create([
+            'api_token' => '1234',
+        ]);
+        $network->addCoordinator($user);
+
+        $this->actingAs($user);
+
+        $response = $this->delete("/api/v2/networks/{$network->id}/tags/{$tag->id}?api_token=1234");
+
+        $response->assertSuccessful();
+
+        // Verify tag was deleted
+        $this->assertNull(GroupTags::find($tag->id));
+    }
+
+    public function testDeleteTagFromWrongNetwork(): void {
+        $network1 = Network::factory()->create();
+        $network2 = Network::factory()->create();
+
+        $tag = GroupTags::factory()->create([
+            'tag_name' => 'Network2Tag',
+            'network_id' => $network2->id,
+        ]);
+
+        $user = User::factory()->networkCoordinator()->create([
+            'api_token' => '1234',
+        ]);
+        $network1->addCoordinator($user);
+
+        $this->actingAs($user);
+
+        // Try to delete tag from network1 but tag belongs to network2
+        $response = $this->delete("/api/v2/networks/{$network1->id}/tags/{$tag->id}?api_token=1234");
+
+        $response->assertStatus(403);
+
+        // Verify tag was NOT deleted
+        $this->assertNotNull(GroupTags::find($tag->id));
+    }
+
+    public function testListGroupsFilterByTag(): void {
+        $network = Network::factory()->create();
+
+        $group1 = Group::factory()->create();
+        $group2 = Group::factory()->create();
+        $network->addGroup($group1);
+        $network->addGroup($group2);
+
+        $tag = GroupTags::factory()->create([
+            'tag_name' => 'FilterTag',
+            'network_id' => $network->id,
+        ]);
+
+        // Add tag only to group1
+        $group1->group_tags()->attach($tag->id);
+
+        // Without filter - should return both groups
+        $response = $this->get("/api/v2/networks/{$network->id}/groups");
+        $response->assertSuccessful();
+        $json = json_decode($response->getContent(), true)['data'];
+        $this->assertEquals(2, count($json));
+
+        // With tag filter - should return only group1
+        $response = $this->get("/api/v2/networks/{$network->id}/groups?tag={$tag->id}");
+        $response->assertSuccessful();
+        $json = json_decode($response->getContent(), true)['data'];
+        $this->assertEquals(1, count($json));
+        $this->assertEquals($group1->idgroups, $json[0]['id']);
+    }
+
+    public function testListEventsFilterByTag(): void {
+        $network = Network::factory()->create();
+
+        $group1 = Group::factory()->create(['approved' => true]);
+        $group2 = Group::factory()->create(['approved' => true]);
+        $network->addGroup($group1);
+        $network->addGroup($group2);
+
+        $event1 = Party::factory()->moderated()->create([
+            'group' => $group1->idgroups,
+            'event_start_utc' => '2038-01-01T00:00:00Z',
+            'event_end_utc' => '2038-01-01T02:00:00Z',
+        ]);
+        $event2 = Party::factory()->moderated()->create([
+            'group' => $group2->idgroups,
+            'event_start_utc' => '2038-01-02T00:00:00Z',
+            'event_end_utc' => '2038-01-02T02:00:00Z',
+        ]);
+
+        $tag = GroupTags::factory()->create([
+            'tag_name' => 'EventFilterTag',
+            'network_id' => $network->id,
+        ]);
+
+        // Add tag only to group1
+        $group1->group_tags()->attach($tag->id);
+
+        // Without filter - should return both events
+        $response = $this->get("/api/v2/networks/{$network->id}/events");
+        $response->assertSuccessful();
+        $json = json_decode($response->getContent(), true)['data'];
+        $this->assertEquals(2, count($json));
+
+        // With tag filter - should return only event1
+        $response = $this->get("/api/v2/networks/{$network->id}/events?tag={$tag->id}");
+        $response->assertSuccessful();
+        $json = json_decode($response->getContent(), true)['data'];
+        $this->assertEquals(1, count($json));
+        $this->assertEquals($event1->idevents, $json[0]['id']);
+    }
+
+    public function testNetworkCoordinatorCanUpdateGroupTags(): void {
+        $network = Network::factory()->create();
+
+        $group = Group::factory()->create(['approved' => true]);
+        $network->addGroup($group);
+
+        // Create tags
+        $globalTag = GroupTags::factory()->create([
+            'tag_name' => 'GlobalTag',
+            'network_id' => null,
+        ]);
+        $networkTag = GroupTags::factory()->create([
+            'tag_name' => 'NetworkTag',
+            'network_id' => $network->id,
+        ]);
+        $otherNetworkTag = GroupTags::factory()->create([
+            'tag_name' => 'OtherNetworkTag',
+            'network_id' => Network::factory()->create()->id,
+        ]);
+
+        $user = User::factory()->networkCoordinator()->create([
+            'api_token' => '1234',
+        ]);
+        $network->addCoordinator($user);
+
+        $this->actingAs($user);
+
+        // NC should be able to add global and network tags, but not other network's tags
+        $response = $this->patch("/api/v2/groups/{$group->idgroups}?api_token=1234", [
+            'tags' => json_encode([$globalTag->id, $networkTag->id, $otherNetworkTag->id]),
+        ]);
+
+        $response->assertSuccessful();
+
+        // Refresh group and check tags
+        $group->refresh();
+        $tagIds = $group->group_tags->pluck('id')->toArray();
+
+        // Should have global and network tags, but NOT other network's tag
+        $this->assertContains($globalTag->id, $tagIds);
+        $this->assertContains($networkTag->id, $tagIds);
+        $this->assertNotContains($otherNetworkTag->id, $tagIds);
+    }
+
+    public function testTagResourceIncludesNetworkId(): void {
+        $network = Network::factory()->create();
+
+        $networkTag = GroupTags::factory()->create([
+            'tag_name' => 'NetworkSpecificTag',
+            'network_id' => $network->id,
+        ]);
+
+        $globalTag = GroupTags::factory()->create([
+            'tag_name' => 'GlobalTag2',
+            'network_id' => null,
+        ]);
+
+        $response = $this->get("/api/v2/networks/{$network->id}/tags");
+        $response->assertSuccessful();
+        $json = json_decode($response->getContent(), true)['data'];
+
+        foreach ($json as $tag) {
+            if ($tag['id'] == $networkTag->id) {
+                $this->assertEquals($network->id, $tag['network_id']);
+            }
+            if ($tag['id'] == $globalTag->id) {
+                $this->assertNull($tag['network_id']);
+            }
+        }
     }
 }
