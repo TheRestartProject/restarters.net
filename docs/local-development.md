@@ -137,7 +137,7 @@ Once setup is complete:
   - Host: `restarters_db`
   - User: `root`
   - Password: `s3cr3t`
-- **Mailhog**: http://localhost:8025 (debug profile only)
+- **Mailhog**: http://localhost:8026 (debug profile only)
 - **Discourse**: http://localhost:8003 (discourse profile only)
   -  User: `someuser`
   -  Password: `mustbetencharacters`

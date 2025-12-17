@@ -23,7 +23,7 @@ docker-compose up -d
 # - Restarters: http://www.example.com:8001
 # - phpMyAdmin: http://www.example.com:8002  
 # - Discourse: http://www.example.com:8003
-# - Mailhog: http://localhost:8025
+# - Mailhog: http://localhost:8026
 
 # Note: Add www.example.com to your hosts file pointing to your Docker host
 ```
