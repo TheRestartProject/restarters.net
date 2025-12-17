@@ -4,6 +4,7 @@
 # - A Database: Exposed on port 3306 internally
 #
 # TODO The domain name could be better but needs some configuration on the Discourse images which is hard.
+# TODO It doesn't yet include the wiki.
 # TODO If your host is Linux, this probably only works if you run as root.
 #
 # On the machine where you will be using your browser to access the Restarters / Discourse sites once set up on Docker,
@@ -33,7 +34,7 @@
 # Debug services extension for docker-compose
 # Additional Services:
 # - phpMyAdmin: http://www.example.com:8002 (Use host: restarters_db, user: root/s3cr3t)
-# - Mailhog: http://localhost:8026 (SMTP server on port 1025)
+# - Mailhog: http://localhost:8025 (SMTP server on port 1025)
 #
 # Debug Tools:
 # - phpMyAdmin: Database management interface
@@ -41,7 +42,7 @@
 #   - Use host: restarters_db, username: root, password: s3cr3t
 #
 # - Mailhog: Email testing tool
-#   - Web interface: http://localhost:8026
+#   - Web interface: http://localhost:8025
 #   - SMTP server: localhost:1025
 #   - All emails from the application will be caught here
 # ------------------------------------------------------------
@@ -69,6 +70,8 @@
 # TODO This is stock Discourse - no theme.  Would be nice to have the theme, but that doesn't matter so far as
 # testing the integration.
 
+version: '3'
+
 services:
   # Core services - always enabled
   restarters:
@@ -80,8 +83,8 @@ services:
       context: .
       dockerfile: Dockerfile
       args:
-        UID: ${UID:-1000}
-        GID: ${GID:-1000}
+        UID: ${UID}
+        GID: ${GID}
     container_name: restarters
     restart: unless-stopped
     tty: true
@@ -90,10 +93,7 @@ services:
       SERVICE_TAGS: dev
       UID: ${UID}
       GID: ${GID}
-      CIRCLECI: ${CIRCLECI:-false}
     working_dir: /var/www
-    ports:
-      - "5173:5173"
     volumes:
       # We share the current folder into /var/www.  This means code changes on the host will get picked up
       # by the client.
@@ -119,7 +119,7 @@ services:
 
   restarters_db:
     profiles: ["core", "debug", "discourse"]
-    image: mysql:8.0
+    image: mysql:5.7.33
     container_name: restarters_db
     restart: unless-stopped
     tty: true
@@ -164,26 +164,9 @@ services:
       driver: 'none'  # disable saving logs
     ports:
       - 1025:1025 # smtp server
-      - 8026:8025 # web ui
+      - 8025:8025 # web ui
     networks:
       - app-network
-
-  # Playwright testing service
-  playwright:
-    profiles: ["core", "debug", "discourse"]
-    image: mcr.microsoft.com/playwright:v1.55.1-noble
-    container_name: restarters_playwright
-    working_dir: /var/www
-    volumes:
-      - ./:/var/www:rw
-    networks:
-      - app-network
-    depends_on:
-      - restarters_nginx
-    environment:
-      - PLAYWRIGHT_BASE_URL=http://restarters_nginx
-    # Install Playwright browsers after npm install to ensure version match
-    command: /bin/sh -c "npx playwright install chromium && tail -f /dev/null"
 
   # From here, it's stuff that Discourse needs.
   #
