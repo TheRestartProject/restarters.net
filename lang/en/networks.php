@@ -16,8 +16,8 @@ return [
     'impact' => 'Impact'
   ],
   'stats' => [
-    'groups' => 'Groups',
-    'events' => 'Events',
+    'groups' => '{1} Group|[0,*] Groups',
+    'events' => '{1} Event|[0,*] Events',
     'waste_diverted' => 'Waste Diverted',
     'co2_prevented' => 'CO2 Prevented'
   ],

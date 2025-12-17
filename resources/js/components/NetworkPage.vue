@@ -25,11 +25,11 @@
       <div class="stats-grid">
         <div class="stat-box">
           <div class="stat-value">{{ stats.groups || 0 }}</div>
-          <div class="stat-label">{{ __('networks.stats.groups') }}</div>
+          <div class="stat-label">{{ __('networks.stats.groups', { count: stats.groups || 0 }) }}</div>
         </div>
         <div class="stat-box">
           <div class="stat-value">{{ stats.parties || 0 }}</div>
-          <div class="stat-label">{{ __('networks.stats.events') }}</div>
+          <div class="stat-label">{{ __('networks.stats.events', { count: stats.parties || 0 }) }}</div>
         </div>
         <div class="stat-box">
           <div class="stat-value">{{ formatWeight(stats.waste_total) }}</div>
