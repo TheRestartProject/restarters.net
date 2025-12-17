@@ -167,6 +167,6 @@ class NetworkController extends Controller
 
         $numberOfGroups = count($groupIds);
 
-        return redirect()->route('networks.show', [$network])->withSuccess(Lang::get('networks.show.add_groups_success', ['number' => $numberOfGroups]));
+        return redirect()->route('networks.show', [$network])->withSuccess(Lang::choice('networks.show.add_groups_success', $numberOfGroups, ['number' => $numberOfGroups]));
     }
 }

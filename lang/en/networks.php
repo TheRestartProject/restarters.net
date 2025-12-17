@@ -9,7 +9,7 @@ return [
     'particular_network' => ':networkName network',
     'groups' => 'Groups',
     'about' => 'About',
-    'count' => 'There are currently :count groups in the :name network. <a href="/group/network/:id">View these groups</a>.',
+    'count' => '{0} There are currently no groups in the :name network.|{1} There is currently :count group in the :name network. <a href="/group/network/:id">View this group</a>.|[2,*] There are currently :count groups in the :name network. <a href="/group/network/:id">View these groups</a>.',
     'actions' => 'Network Actions',
     'coordinators' => 'Network Coordinators',
     'coordinator_badge' => 'Coordinator',
@@ -30,7 +30,7 @@ return [
     'delete' => 'Delete',
     'delete_confirm_title' => 'Delete Tag',
     'delete_confirm_message' => 'Are you sure you want to delete the tag ":name"?',
-    'delete_warning' => 'This will remove the tag from :count group(s).'
+    'delete_warning' => '{1} This will remove the tag from :count group.|[2,*] This will remove the tag from :count groups.'
   ],
   'index' => [
     'your_networks' => 'Your networks',
@@ -48,9 +48,9 @@ return [
     'add_groups_select_label' => 'Choose groups to add',
     'add_groups_save_button' => 'Add',
     'add_groups_warning_none_selected' => 'No groups selected.',
-    'add_groups_success' => ':number group(s) added.',
+    'add_groups_success' => '{1} :number group added.|[2,*] :number groups added.',
     'view_groups_menuitem' => 'View groups',
-    'groups_count' => 'There are currently :count groups in the :name network.',
+    'groups_count' => '{0} There are currently no groups in the :name network.|{1} There is currently :count group in the :name network.|[2,*] There are currently :count groups in the :name network.',
     'view_groups_link' => 'View these groups.',
     'none' => 'None',
   ],

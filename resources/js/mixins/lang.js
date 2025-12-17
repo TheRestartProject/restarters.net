@@ -44,18 +44,69 @@ function getLocale() {
 }
 
 function choice(key, count, values = {}) {
-    // Simple pluralization helper
-    // Laravel's pluralization uses count parameter to determine singular/plural
-    const translation = translate(key, { ...values, count });
+    // Get raw translation without substitution first
+    const parts = key.split('.');
+    let rawTranslation = translations;
+    const locale = document.documentElement.lang || 'en';
 
-    // If translation contains pipes, handle pluralization
-    if (typeof translation === 'string' && translation.includes('|')) {
-        const parts = translation.split('|');
-        // Simple rule: 0 or 1 uses first part, > 1 uses second part
-        return count <= 1 ? parts[0] : (parts[1] || parts[0]);
+    if (translations[locale]) {
+        rawTranslation = translations[locale];
+    } else if (translations['en']) {
+        rawTranslation = translations['en'];
+    } else {
+        return key;
     }
 
-    return translation;
+    for (const part of parts) {
+        if (rawTranslation && typeof rawTranslation === 'object' && part in rawTranslation) {
+            rawTranslation = rawTranslation[part];
+        } else {
+            return key;
+        }
+    }
+
+    if (typeof rawTranslation !== 'string') {
+        return key;
+    }
+
+    // Handle Laravel's pluralization syntax: {0} text|{1} text|[2,*] text
+    if (rawTranslation.includes('|')) {
+        const segments = rawTranslation.split('|');
+        let selectedSegment = segments[segments.length - 1]; // Default to last segment
+
+        for (const segment of segments) {
+            // Match {n} syntax for exact values
+            const exactMatch = segment.match(/^\{(\d+)\}\s*(.*)$/);
+            if (exactMatch) {
+                const exactNum = parseInt(exactMatch[1], 10);
+                if (count === exactNum) {
+                    selectedSegment = exactMatch[2];
+                    break;
+                }
+                continue;
+            }
+
+            // Match [n,m] or [n,*] syntax for ranges
+            const rangeMatch = segment.match(/^\[(\d+),(\d+|\*)\]\s*(.*)$/);
+            if (rangeMatch) {
+                const min = parseInt(rangeMatch[1], 10);
+                const max = rangeMatch[2] === '*' ? Infinity : parseInt(rangeMatch[2], 10);
+                if (count >= min && count <= max) {
+                    selectedSegment = rangeMatch[3];
+                    break;
+                }
+                continue;
+            }
+        }
+
+        // Apply parameter substitution
+        return selectedSegment.replace(/:(\w+)/g, (match, param) => {
+            if (param === 'count') return count;
+            return values[param] !== undefined ? values[param] : match;
+        });
+    }
+
+    return translate(key, { ...values, count });
 }
 
 export const Lang = { get: translate, choice: choice, getLocale: getLocale }
