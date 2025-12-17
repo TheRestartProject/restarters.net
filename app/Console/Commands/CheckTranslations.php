@@ -60,33 +60,50 @@ class CheckTranslations extends Command
                 $group = substr($file, 0, strpos($file, '.'));
                 $keys = \Lang::get($group);
 
-                foreach ($keys as $key => $value) {
-                    // Find the translation in the languages we care about.
-                    foreach (['fr-BE', 'fr'] as $other) {
-                        // First we want to check if the translation is used in the code.  If it's not, then we
-                        // will want to remove it and it doesn't matter if it is not translated properly.
-                        if (strpos("$group.$key", 'groups.tag-') === 0) {
-                            // This is valid - it's used in a constructed way.
-                        } else if (!$this->usedInCode("$group.$key")) {
-                            error_log("ERROR: translation key $group.$key not used in code so far as we can tell");
-                            $count++;
-                        } else if (!\Lang::has("$group.$key", $other, false)) {
-                            // This is an error. If the translated value would be different, then we need to translate
-                            // it.  If it would be the same, then the code would work using fallbacks, but we translate
-                            // it anyway so that this check doesn't give errors.
-                            error_log("ERROR: translation key $group.$key not translated into $other, in English: $value");
-                            $count++;
-                        } else {
-                            // Occasionally we want to check whether the translated values are the same as the English
-                            // ones.  This might either be legit (as above) or might be a cut & paste error.
-                            $translated = \Lang::get("$group.$key", [], $other);
+                $count += $this->checkKeys($keys, $group);
+            }
+        }
 
-                            // json_encode for comparison as it may be a string or an array.
-                            if (json_encode($translated) == json_encode($value)) {
-//                                error_log("ERROR translation key $group.$key in $other is the same as English, " . json_encode($value));
-//                                $count++;
-                            }
-                        }
+        return $count;
+    }
+
+    private function checkKeys($keys, $prefix): int
+    {
+        $count = 0;
+
+        foreach ($keys as $key => $value) {
+            $fullKey = "$prefix.$key";
+
+            // If the value is an array, recurse into it
+            if (is_array($value)) {
+                $count += $this->checkKeys($value, $fullKey);
+                continue;
+            }
+
+            // Find the translation in the languages we care about.
+            foreach (['fr-BE', 'fr'] as $other) {
+                // First we want to check if the translation is used in the code.  If it's not, then we
+                // will want to remove it and it doesn't matter if it is not translated properly.
+                if (strpos($fullKey, 'groups.tag-') === 0) {
+                    // This is valid - it's used in a constructed way.
+                } else if (!$this->usedInCode($fullKey)) {
+                    error_log("ERROR: translation key $fullKey not used in code so far as we can tell");
+                    $count++;
+                } else if (!\Lang::has($fullKey, $other, false)) {
+                    // This is an error. If the translated value would be different, then we need to translate
+                    // it.  If it would be the same, then the code would work using fallbacks, but we translate
+                    // it anyway so that this check doesn't give errors.
+                    error_log("ERROR: translation key $fullKey not translated into $other, in English: $value");
+                    $count++;
+                } else {
+                    // Occasionally we want to check whether the translated values are the same as the English
+                    // ones.  This might either be legit (as above) or might be a cut & paste error.
+                    $translated = \Lang::get($fullKey, [], $other);
+
+                    // json_encode for comparison as it may be a string or an array.
+                    if (json_encode($translated) == json_encode($value)) {
+//                        error_log("ERROR translation key $fullKey in $other is the same as English, " . json_encode($value));
+//                        $count++;
                     }
                 }
             }
