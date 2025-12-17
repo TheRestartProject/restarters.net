@@ -357,7 +357,7 @@ tasks:
         # Wait for debug services (if in debug or all profile)
         {{- if or (eq .PROFILE "debug") (eq .PROFILE "all") }}
         wait_for_service "phpMyAdmin" "phpmyadmin" "curl -f -s http://localhost:8002" 60 5
-        wait_for_service "Mailhog" "mailhog" "curl -f -s http://localhost:8025" 60 5
+        wait_for_service "Mailhog" "mailhog" "curl -f -s http://localhost:8026" 60 5
         {{- else }}
         echo "✓ phpMyAdmin not in profile {{.PROFILE}}, skipping"
         echo "✓ Mailhog not in profile {{.PROFILE}}, skipping"
