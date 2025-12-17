@@ -46,6 +46,13 @@ use Illuminate\Http\Resources\Json\JsonResource;
  *          format="string",
  *          example="MRES",
  *          nullable=true
+ *     ),
+ *     @OA\Property(
+ *          property="groups_count",
+ *          title="groups_count",
+ *          description="Number of groups that have this tag applied",
+ *          format="int64",
+ *          example=5
  *     )
  * )
  */
@@ -63,6 +70,7 @@ class Tag extends JsonResource
             'description' => $this->description,
             'network_id' => $this->network_id,
             'network_name' => $this->network ? $this->network->name : null,
+            'groups_count' => $this->groupTagGroups()->count(),
         ];
     }
 }

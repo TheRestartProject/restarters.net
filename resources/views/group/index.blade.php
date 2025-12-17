@@ -26,7 +26,9 @@
         // Any logged-in user can create a group.
         $can_create = Auth::user() ? true : false;
 
-        $show_tags = App\Helpers\Fixometer::hasRole(Auth::user(), 'Administrator');
+        // Show tags to both Administrators and Network Coordinators
+        $show_tags = App\Helpers\Fixometer::hasRole(Auth::user(), 'Administrator') ||
+                     App\Helpers\Fixometer::hasRole(Auth::user(), 'NetworkCoordinator');
 
         $user = Auth::user();
         $myid = $user ? $user->id : null;

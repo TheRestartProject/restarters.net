@@ -11,7 +11,26 @@ return [
     'about' => 'About',
     'count' => 'There are currently :count groups in the :name network. <a href="/group/network/:id">View these groups</a>.',
     'actions' => 'Network Actions',
-    'coordinators' => 'Network Coordinators'
+    'coordinators' => 'Network Coordinators',
+    'coordinator_badge' => 'Coordinator',
+    'impact' => 'Impact'
+  ],
+  'stats' => [
+    'groups' => 'Groups',
+    'events' => 'Events',
+    'waste_diverted' => 'Waste Diverted',
+    'co2_prevented' => 'CO2 Prevented'
+  ],
+  'tags' => [
+    'title' => 'Group Tags',
+    'no_tags' => 'No tags created yet.',
+    'new_tag_placeholder' => 'New tag name...',
+    'create' => 'Create Tag',
+    'create_error' => 'Failed to create tag. Please try again.',
+    'delete' => 'Delete',
+    'delete_confirm_title' => 'Delete Tag',
+    'delete_confirm_message' => 'Are you sure you want to delete the tag ":name"?',
+    'delete_warning' => 'This will remove the tag from :count group(s).'
   ],
   'index' => [
     'your_networks' => 'Your networks',
@@ -31,6 +50,9 @@ return [
     'add_groups_warning_none_selected' => 'No groups selected.',
     'add_groups_success' => ':number group(s) added.',
     'view_groups_menuitem' => 'View groups',
+    'groups_count' => 'There are currently :count groups in the :name network.',
+    'view_groups_link' => 'View these groups.',
+    'none' => 'None',
   ],
   'edit' => [
     'label_logo' => 'Network logo',

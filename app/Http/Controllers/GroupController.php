@@ -50,8 +50,16 @@ class GroupController extends Controller
             ->orderBy('name', 'ASC')
             ->get();
 
-        // Get all group tags
-        $all_group_tags = GroupTags::all();
+        // Get group tags based on user role
+        // Admins see all tags, NCs see tags from their networks only
+        if (Fixometer::hasRole($user, 'Administrator')) {
+            $all_group_tags = GroupTags::all();
+        } elseif (Fixometer::hasRole($user, 'NetworkCoordinator')) {
+            $userNetworkIds = $user->networks->pluck('id')->toArray();
+            $all_group_tags = GroupTags::whereIn('network_id', $userNetworkIds)->get();
+        } else {
+            $all_group_tags = collect([]);
+        }
         $networks = Network::all();
 
         // Look for groups we have joined, not just been invited to.  We have to explicitly test on deleted_at because
@@ -518,6 +526,13 @@ class GroupController extends Controller
                     'all_confirmed_hosts_count' => $group->all_confirmed_hosts_count,
                     'networks' => \Illuminate\Support\Arr::pluck($group->networks, 'id'),
                     'group_tags' => $group->group_tags()->get()->pluck('id'),
+                    'group_tags_full' => $group->group_tags()->get()->map(function($tag) {
+                        return [
+                            'id' => $tag->id,
+                            'name' => $tag->tag_name,
+                            'network_id' => $tag->network_id,
+                        ];
+                    }),
                     'following' => in_array($group->idgroups, $your_groupids),
                     'nearby' => in_array($group->idgroups, $nearby_groupids),
                     'archived_at' => $group->archived_at ? Carbon::parse($group->archived_at)->toIso8601String() : null

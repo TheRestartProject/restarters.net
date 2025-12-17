@@ -47,6 +47,7 @@ import GroupAddEditPage from './components/GroupAddEditPage.vue'
 import GroupEventsPage from './components/GroupEventsPage.vue'
 import GroupEvents from './components/GroupEvents.vue'
 import GroupsRequiringModeration from './components/GroupsRequiringModeration.vue'
+import NetworkPage from './components/NetworkPage.vue'
 import EventTimeRangePicker from './components/EventTimeRangePicker.vue'
 import EventDatePicker from './components/EventDatePicker.vue'
 import VenueAddress from './components/VenueAddress.vue'
@@ -417,6 +418,7 @@ function initializeJQuery() {
             'groupeventspage': GroupEventsPage,
             'groupevents': GroupEvents,
             'groupsrequiringmoderation': GroupsRequiringModeration,
+            'networkpage': NetworkPage,
 
             'eventtimerangepicker': EventTimeRangePicker,
             'eventdatepicker': EventDatePicker,

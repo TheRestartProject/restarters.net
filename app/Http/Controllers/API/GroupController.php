@@ -981,27 +981,52 @@ class GroupController extends Controller
         } elseif ($isCoordinatorForGroup) {
             // Network Coordinators can update tags, but only with tags that belong to
             // networks they coordinate (global tags are admin-only).
+            // IMPORTANT: Preserve tags from networks the NC doesn't coordinate.
             $tags = $request->tags;
 
-            if ($tags) {
+            if ($tags !== null) {
                 $tags = json_decode($tags);
 
                 // Get the network IDs this user coordinates
                 $userNetworkIds = $user->networks->pluck('id')->toArray();
 
-                // Validate each tag belongs to a network the user coordinates (global tags are admin-only)
-                $validTags = [];
-                foreach ($tags as $tagId) {
-                    $tag = \App\GroupTags::find($tagId);
-                    if ($tag) {
-                        // Tag is valid only if it belongs to a network the user coordinates
-                        if ($tag->network_id !== null && in_array($tag->network_id, $userNetworkIds)) {
-                            $validTags[] = $tagId;
+                // Get the network IDs the group belongs to
+                $groupNetworkIds = $group->networks->pluck('id')->toArray();
+
+                // Find the intersection: networks where NC coordinates AND group belongs
+                $editableNetworkIds = array_intersect($userNetworkIds, $groupNetworkIds);
+
+                // Get existing tags on the group that are from networks the NC CANNOT edit
+                // (either global tags, or tags from networks the NC doesn't coordinate,
+                // or tags from networks the group doesn't belong to)
+                $existingTagIds = $group->group_tags->pluck('id')->toArray();
+                $tagsToPreserve = [];
+                foreach ($existingTagIds as $existingTagId) {
+                    $existingTag = \App\GroupTags::find($existingTagId);
+                    if ($existingTag) {
+                        // Preserve if: global tag OR not in editable networks
+                        if ($existingTag->network_id === null || !in_array($existingTag->network_id, $editableNetworkIds)) {
+                            $tagsToPreserve[] = $existingTagId;
                         }
                     }
                 }
 
-                $group->group_tags()->sync($validTags);
+                // Validate each submitted tag belongs to an editable network
+                $validNewTags = [];
+                foreach ($tags as $tagId) {
+                    $tag = \App\GroupTags::find($tagId);
+                    if ($tag) {
+                        // Tag is valid only if it belongs to an editable network
+                        if ($tag->network_id !== null && in_array($tag->network_id, $editableNetworkIds)) {
+                            $validNewTags[] = $tagId;
+                        }
+                    }
+                }
+
+                // Combine preserved tags with new valid tags
+                $finalTags = array_unique(array_merge($tagsToPreserve, $validNewTags));
+
+                $group->group_tags()->sync($finalTags);
             }
         }
 

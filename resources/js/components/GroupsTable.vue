@@ -50,6 +50,14 @@
       <template slot="cell(group_name)" slot-scope="data">
         <a :href="'/group/view/' + data.item.group_name.idgroups">{{ data.item.group_name.name }}</a>
         <GroupArchivedBadge :idgroups="data.item.group_name.idgroups" />
+        <div v-if="showTags && data.item.group_name.group_tags_full && data.item.group_name.group_tags_full.length" class="mt-1">
+          <b-badge
+              v-for="tag in visibleTags(data.item.group_name.group_tags_full)"
+              :key="tag.id"
+              variant="secondary"
+              class="mr-1 tag-badge"
+          >{{ tag.name }}</b-badge>
+        </div>
       </template>
       <template slot="head(location)">
         <b-img :src="imageUrl('/icons/map_marker_ico.svg')" class="mt-3 icon " />
@@ -338,6 +346,15 @@ export default {
       } else {
         return Math.round(dist)
       }
+    },
+    visibleTags(tags) {
+      // Filter tags to only show those the user has access to view
+      // allGroupTags contains the tags the user can see (admin sees all, NC sees their networks)
+      if (!this.allGroupTags || !tags) {
+        return []
+      }
+      const visibleTagIds = this.allGroupTags.map(t => t.id)
+      return tags.filter(t => visibleTagIds.includes(t.id))
     }
   }
 }
@@ -403,5 +420,11 @@ export default {
   @include media-breakpoint-up(md) {
     display: table-cell;
   }
+}
+
+.tag-badge {
+  font-size: 0.75rem;
+  font-weight: normal;
+  padding: 0.2em 0.5em;
 }
 </style>

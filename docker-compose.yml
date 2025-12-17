@@ -33,7 +33,7 @@
 # Debug services extension for docker-compose
 # Additional Services:
 # - phpMyAdmin: http://www.example.com:8002 (Use host: restarters_db, user: root/s3cr3t)
-# - Mailhog: http://localhost:8025 (SMTP server on port 1025)
+# - Mailhog: http://localhost:8026 (SMTP server on port 1025)
 #
 # Debug Tools:
 # - phpMyAdmin: Database management interface
@@ -41,7 +41,7 @@
 #   - Use host: restarters_db, username: root, password: s3cr3t
 #
 # - Mailhog: Email testing tool
-#   - Web interface: http://localhost:8025
+#   - Web interface: http://localhost:8026
 #   - SMTP server: localhost:1025
 #   - All emails from the application will be caught here
 # ------------------------------------------------------------
@@ -164,7 +164,7 @@ services:
       driver: 'none'  # disable saving logs
     ports:
       - 1025:1025 # smtp server
-      - 8025:8025 # web ui
+      - 8026:8025 # web ui
     networks:
       - app-network
 

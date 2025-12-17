@@ -545,4 +545,144 @@ class APIv2NetworkTest extends TestCase
             }
         }
     }
+
+    /**
+     * Test that NC can only apply tags from networks where BOTH:
+     * 1. The NC is a coordinator, AND
+     * 2. The group belongs to that network
+     *
+     * This tests the "tag visibility intersection" requirement.
+     */
+    public function testNCCanOnlyApplyTagsFromIntersectionOfCoordinatedAndGroupNetworks(): void {
+        // Create two networks
+        $network1 = Network::factory()->create(['name' => 'Network1']);
+        $network2 = Network::factory()->create(['name' => 'Network2']);
+
+        // Create tags for each network
+        $tag1 = GroupTags::factory()->create([
+            'tag_name' => 'Network1Tag',
+            'network_id' => $network1->id,
+        ]);
+        $tag2 = GroupTags::factory()->create([
+            'tag_name' => 'Network2Tag',
+            'network_id' => $network2->id,
+        ]);
+
+        // Create a group that belongs to Network1 ONLY
+        $group = Group::factory()->create();
+        $network1->addGroup($group);
+        // Group is NOT in Network2
+
+        // User coordinates BOTH networks
+        $user = User::factory()->create(['api_token' => '1234']);
+        $network1->addCoordinator($user);
+        $network2->addCoordinator($user);
+
+        $this->actingAs($user);
+
+        // Try to add both tags
+        $response = $this->patch("/api/v2/groups/{$group->idgroups}?api_token=1234", [
+            'tags' => json_encode([$tag1->id, $tag2->id]),
+        ]);
+
+        $response->assertSuccessful();
+
+        // Refresh group and check tags
+        $group->refresh();
+        $tagIds = $group->group_tags->pluck('id')->toArray();
+
+        // Should ONLY have tag1 (from Network1 which group belongs to)
+        // Should NOT have tag2 (even though NC coordinates Network2, group is not in it)
+        $this->assertContains($tag1->id, $tagIds);
+        $this->assertNotContains($tag2->id, $tagIds);
+    }
+
+    /**
+     * Test that when NC updates a group's tags, tags from networks they don't coordinate are preserved.
+     */
+    public function testNCPreservesTagsFromOtherNetworksWhenUpdating(): void {
+        // Create two networks
+        $network1 = Network::factory()->create(['name' => 'CoordinatedNetwork']);
+        $network2 = Network::factory()->create(['name' => 'OtherNetwork']);
+
+        // Create tags for each network
+        $tag1 = GroupTags::factory()->create([
+            'tag_name' => 'CoordinatedTag',
+            'network_id' => $network1->id,
+        ]);
+        $tag2 = GroupTags::factory()->create([
+            'tag_name' => 'OtherTag',
+            'network_id' => $network2->id,
+        ]);
+        $globalTag = GroupTags::factory()->create([
+            'tag_name' => 'GlobalTag',
+            'network_id' => null,
+        ]);
+
+        // Create a group that belongs to BOTH networks
+        $group = Group::factory()->create();
+        $network1->addGroup($group);
+        $network2->addGroup($group);
+
+        // Add pre-existing tags from network2 and global
+        $group->group_tags()->attach([$tag2->id, $globalTag->id]);
+
+        // User coordinates only Network1
+        $user = User::factory()->create(['api_token' => '1234']);
+        $network1->addCoordinator($user);
+
+        $this->actingAs($user);
+
+        // NC adds tag1 (their network's tag)
+        $response = $this->patch("/api/v2/groups/{$group->idgroups}?api_token=1234", [
+            'tags' => json_encode([$tag1->id]),
+        ]);
+
+        $response->assertSuccessful();
+
+        // Refresh group and check tags
+        $group->refresh();
+        $tagIds = $group->group_tags->pluck('id')->toArray();
+
+        // Should have:
+        // - tag1: NC added from their network
+        // - tag2: preserved from network2 (NC doesn't coordinate)
+        // - globalTag: preserved (NC cannot see/edit global tags)
+        $this->assertContains($tag1->id, $tagIds); // Added by NC
+        $this->assertContains($tag2->id, $tagIds); // Preserved from other network
+        $this->assertContains($globalTag->id, $tagIds); // Preserved global tag
+    }
+
+    /**
+     * Test that tag resource includes groups_count field.
+     */
+    public function testTagResourceIncludesGroupsCount(): void {
+        $network = Network::factory()->create();
+
+        // Create tag
+        $tag = GroupTags::factory()->create([
+            'tag_name' => 'TagWithGroups',
+            'network_id' => $network->id,
+        ]);
+
+        // Create groups and attach tag to some of them
+        $group1 = Group::factory()->create();
+        $group2 = Group::factory()->create();
+        $group3 = Group::factory()->create();
+        $network->addGroup($group1);
+        $network->addGroup($group2);
+        $network->addGroup($group3);
+
+        $group1->group_tags()->attach($tag->id);
+        $group2->group_tags()->attach($tag->id);
+        // group3 does NOT have the tag
+
+        $response = $this->get("/api/v2/networks/{$network->id}/tags");
+        $response->assertSuccessful();
+        $json = json_decode($response->getContent(), true)['data'];
+
+        $foundTag = collect($json)->firstWhere('id', $tag->id);
+        $this->assertNotNull($foundTag);
+        $this->assertEquals(2, $foundTag['groups_count']);
+    }
 }

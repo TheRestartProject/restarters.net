@@ -39,6 +39,10 @@ function translate(key, values = {}) {
     return typeof translation === 'string' ? translation : key;
 }
 
+function getLocale() {
+    return document.documentElement.lang || 'en';
+}
+
 function choice(key, count, values = {}) {
     // Simple pluralization helper
     // Laravel's pluralization uses count parameter to determine singular/plural
@@ -54,11 +58,11 @@ function choice(key, count, values = {}) {
     return translation;
 }
 
-export const Lang = { get: translate, choice: choice }
+export const Lang = { get: translate, choice: choice, getLocale: getLocale }
 
 export default {
     beforeCreate() {
-        this.$lang = { get: translate, choice: choice }
+        this.$lang = { get: translate, choice: choice, getLocale: getLocale }
     },
     methods: {
         __(key, values) {

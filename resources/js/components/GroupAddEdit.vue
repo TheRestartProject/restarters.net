@@ -259,8 +259,8 @@ export default {
       ready: false,
       approved: false,
       edited: false,
-      networkList: null,
-      tagList: null,
+      networkList: [],
+      tagList: [],
       networkData: {},
       archived_at: null,
     }
@@ -344,10 +344,32 @@ export default {
 
       if (!tags) return []
 
+      // For NCs (not admins), filter tags to only show those from networks the group belongs to.
+      // This implements the "tag visibility intersection" requirement: NC should only see tags
+      // from networks where BOTH: NC coordinates AND group belongs to that network.
+      // canNetwork is true only for admins (who can change group networks), so use it as proxy.
+      const groupNetworkIds = this.networkList ? this.networkList.map(n => n.id) : []
+
+      const filteredTags = tags.filter(tag => {
+        // Global tags (network_id is null) are admin-only, already filtered by API
+        // But double-check here for safety
+        if (!tag.network_id) {
+          return this.canNetwork // Only admins see global tags
+        }
+
+        // For admins, show all tags
+        if (this.canNetwork) {
+          return true
+        }
+
+        // For NCs, only show tags from networks the group belongs to
+        return groupNetworkIds.includes(tag.network_id)
+      })
+
       // Group tags by network_name (null = "Global")
       const grouped = {}
 
-      tags.forEach(tag => {
+      filteredTags.forEach(tag => {
         const networkName = tag.network_name || 'Global'
         if (!grouped[networkName]) {
           grouped[networkName] = []
@@ -405,8 +427,8 @@ export default {
       this.lng = parseFloat(group.location.lng)
       this.image = group.image
       this.approved = group.approved
-      this.networkList = group.networks
-      this.tagList = group.tags
+      this.networkList = group.networks || []
+      this.tagList = group.tags || []
       this.networkData = group.network_data ? group.network_data : {}
       this.archived_at = group.archived_at
     }
@@ -480,8 +502,8 @@ export default {
                 phone: this.phone,
                 image: this.image,
                 moderate: this.moderate,
-                networks: JSON.stringify(this.networkList.map(n => n.id)),
-                tags: JSON.stringify(this.tagList.map(n => n.id)),
+                networks: JSON.stringify((this.networkList || []).map(n => n.id)),
+                tags: JSON.stringify((this.tagList || []).map(n => n.id)),
                 network_data: JSON.stringify(this.networkData),
                 archived_at: this.archived_at,
               }
