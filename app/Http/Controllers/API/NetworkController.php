@@ -469,8 +469,13 @@ class NetworkController extends Controller
             $user = auth('api')->user();
         }
 
+        // Unauthenticated users cannot see any tags
+        if (!$user) {
+            return TagCollection::make(collect([]));
+        }
+
         // Only admins can see global tags; everyone else sees only network-specific tags
-        $isAdmin = $user && $user->hasRole('Administrator');
+        $isAdmin = $user->hasRole('Administrator');
         $networkOnly = $request->get('network_only', false) === 'true' || $request->get('network_only', false) === true;
 
         if ($networkOnly || !$isAdmin) {

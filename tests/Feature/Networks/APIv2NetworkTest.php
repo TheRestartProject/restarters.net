@@ -685,4 +685,53 @@ class APIv2NetworkTest extends TestCase
         $this->assertNotNull($foundTag);
         $this->assertEquals(2, $foundTag['groups_count']);
     }
+
+    /**
+     * Test that unauthenticated API calls return no tags for network tags endpoint.
+     */
+    public function testUnauthenticatedNetworkTagsReturnsEmpty(): void {
+        $network = Network::factory()->create();
+
+        // Create some tags
+        GroupTags::factory()->create([
+            'tag_name' => 'NetworkTag',
+            'network_id' => $network->id,
+        ]);
+        GroupTags::factory()->create([
+            'tag_name' => 'GlobalTag',
+            'network_id' => null,
+        ]);
+
+        // Make unauthenticated request
+        $response = $this->get("/api/v2/networks/{$network->id}/tags");
+        $response->assertSuccessful();
+        $json = json_decode($response->getContent(), true)['data'];
+
+        // Should return empty array
+        $this->assertEmpty($json);
+    }
+
+    /**
+     * Test that unauthenticated API calls return no tags for groups tags endpoint.
+     */
+    public function testUnauthenticatedGroupTagsReturnsEmpty(): void {
+        // Create some tags
+        $network = Network::factory()->create();
+        GroupTags::factory()->create([
+            'tag_name' => 'NetworkTag',
+            'network_id' => $network->id,
+        ]);
+        GroupTags::factory()->create([
+            'tag_name' => 'GlobalTag',
+            'network_id' => null,
+        ]);
+
+        // Make unauthenticated request
+        $response = $this->get("/api/v2/groups/tags");
+        $response->assertSuccessful();
+        $json = json_decode($response->getContent(), true)['data'];
+
+        // Should return empty array
+        $this->assertEmpty($json);
+    }
 }

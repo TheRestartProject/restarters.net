@@ -319,10 +319,10 @@ class GroupController extends Controller
             $user = auth('api')->user();
         }
 
-        // Unauthenticated users only see global tags
+        // Unauthenticated users cannot see any tags
         if (!$user) {
             return [
-                'data' => TagCollection::make(GroupTags::with('network')->whereNull('network_id')->get())
+                'data' => []
             ];
         }
 
