@@ -9,7 +9,6 @@ return [
     'particular_network' => ':networkName network',
     'groups' => 'Groups',
     'about' => 'About',
-    'count' => '{0} There are currently no groups in the :name network.|{1} There is currently :count group in the :name network. <a href="/group/network/:id">View this group</a>.|[2,*] There are currently :count groups in the :name network. <a href="/group/network/:id">View these groups</a>.',
     'actions' => 'Network Actions',
     'coordinators' => 'Network Coordinators',
     'coordinator_badge' => 'Coordinator',
@@ -42,7 +41,6 @@ return [
     'description' => 'Description',
   ],
   'show' => [
-    'about_modal_header' => 'About :name',
     'add_groups_menuitem' => 'Add groups',
     'add_groups_modal_header' => 'Add groups to :name',
     'add_groups_select_label' => 'Choose groups to add',
