@@ -156,21 +156,20 @@ class InviteEventTest extends TestCase
         $response3 = $this->get('/party');
         $events = $this->getVueProperties($response3)[1][':initial-events'];
 
-        // Debug: check EventsUsers status before assertion
+        // Debug info only shown on failure
         $eventUser = \App\EventsUsers::where('event', $event->idevents)
             ->where('user', $user->id)
             ->first();
-        $debugInfo = [
+        $debugInfo = json_encode([
             'event_id' => $event->idevents,
             'user_id' => $user->id,
             'events_users_status' => $eventUser ? $eventUser->status : 'NOT_FOUND',
             'events_users_role' => $eventUser ? $eventUser->role : 'NOT_FOUND',
             'attending_in_response' => strpos($events, '"attending":true') !== false ? 'true' : 'false',
-        ];
-        fwrite(STDERR, "DEBUG testInviteReal: " . json_encode($debugInfo) . "\n");
+        ]);
 
         $this->assertStringContainsString('"attending":false', $events,
-            "Expected attending:false but got attending:true. Debug: " . json_encode($debugInfo));
+            "Expected attending:false but got attending:true. Debug: " . $debugInfo);
         $this->assertStringContainsString('"invitation"', $events);
 
         // Now accept the invitation.
