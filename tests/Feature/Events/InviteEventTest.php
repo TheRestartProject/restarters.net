@@ -155,7 +155,22 @@ class InviteEventTest extends TestCase
         // ...should show up in the list of events with an invitation as we have not yet accepted.
         $response3 = $this->get('/party');
         $events = $this->getVueProperties($response3)[1][':initial-events'];
-        $this->assertStringContainsString('"attending":false', $events);
+
+        // Debug: check EventsUsers status before assertion
+        $eventUser = \App\EventsUsers::where('event', $event->idevents)
+            ->where('user', $user->id)
+            ->first();
+        $debugInfo = [
+            'event_id' => $event->idevents,
+            'user_id' => $user->id,
+            'events_users_status' => $eventUser ? $eventUser->status : 'NOT_FOUND',
+            'events_users_role' => $eventUser ? $eventUser->role : 'NOT_FOUND',
+            'attending_in_response' => strpos($events, '"attending":true') !== false ? 'true' : 'false',
+        ];
+        fwrite(STDERR, "DEBUG testInviteReal: " . json_encode($debugInfo) . "\n");
+
+        $this->assertStringContainsString('"attending":false', $events,
+            "Expected attending:false but got attending:true. Debug: " . json_encode($debugInfo));
         $this->assertStringContainsString('"invitation"', $events);
 
         // Now accept the invitation.
