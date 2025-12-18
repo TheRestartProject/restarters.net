@@ -33,3 +33,6 @@ restarters-anonymised.sql
 /storage/api-docs/api-docs.json
 /.phpunit.result.cache
 /playwright-report/
+/events.csv
+/public/repair-data*.csv
+/uploads/*.jpg
