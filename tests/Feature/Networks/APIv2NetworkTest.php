@@ -243,14 +243,11 @@ class APIv2NetworkTest extends TestCase
             'network_id' => $otherNetwork->id,
         ]);
 
-        // Unauthenticated: should only see network-specific tags (NOT global - global is admin-only)
+        // Unauthenticated: should see no tags at all
         $response = $this->get("/api/v2/networks/{$network->id}/tags");
         $response->assertSuccessful();
         $json = json_decode($response->getContent(), true)['data'];
-        $tagIds = array_column($json, 'id');
-        $this->assertNotContains($globalTag->id, $tagIds); // Global tags are admin-only
-        $this->assertContains($networkTag->id, $tagIds);
-        $this->assertNotContains($otherTag->id, $tagIds);
+        $this->assertEmpty($json);
 
         // Admin: should see global + network-specific tags
         $admin = User::factory()->administrator()->create(['api_token' => 'admintoken123']);
