@@ -656,6 +656,10 @@ class APIv2NetworkTest extends TestCase
     public function testTagResourceIncludesGroupsCount(): void {
         $network = Network::factory()->create();
 
+        // Must be authenticated to see tags
+        $admin = User::factory()->administrator()->create();
+        $this->actingAs($admin);
+
         // Create tag
         $tag = GroupTags::factory()->create([
             'tag_name' => 'TagWithGroups',
