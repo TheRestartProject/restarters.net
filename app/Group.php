@@ -245,6 +245,7 @@ class Group extends Model implements Auditable
         }
 
         $allPastEvents = Party::past()
+            ->with('allDevices')
             ->where('events.group', $this->idgroups)
             ->get();
 

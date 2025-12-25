@@ -132,6 +132,15 @@ class NetworkController extends Controller
      *          )
      *      ),
      *      @OA\Parameter(
+     *          name="includeStats",
+     *          description="Include the stats for each group.  This makes the call significantly slower.  Default false.",
+     *          required=false,
+     *          in="query",
+     *          @OA\Schema(
+     *              type="boolean"
+     *          )
+     *      ),
+     *      @OA\Parameter(
      *          name="includeArchived",
      *          description="Include archived groups",
      *          required=false,
