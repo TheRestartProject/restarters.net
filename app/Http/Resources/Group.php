@@ -274,9 +274,11 @@ class Group extends JsonResource
      */
     public function toArray($request)
     {
-        $stats = $this->resource->getGroupStats();
-        $stats['events'] = $stats['parties'];
-        unset($stats['parties']);
+        if ($request->get('includeStats', true)) {
+            $stats = $this->resource->getGroupStats();
+            $stats['events'] = $stats['parties'];
+            unset($stats['parties']);
+        }
 
         $networkData = gettype($this->network_data) == 'string' ? json_decode($this->network_data, true) : $this->network_data;
 
@@ -288,7 +290,7 @@ class Group extends JsonResource
         $ret = [
             'id' => $this->idgroups,
             'name' => $this->name,
-            'image' => $this->groupImage && is_object($this->groupImage) && is_object($this->groupImage->image) ? $this->groupImage->image->path : null,
+            'image' => $this->image,
             'website' => $this->website,
             'phone' => $this->phone,
             'description' => $this->free_text,

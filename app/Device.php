@@ -332,7 +332,11 @@ class Device extends Model implements Auditable
     {
         $wasteDiverted = 0;
 
-        if ($this->isFixed() && $this->deviceCategory->isUnpowered()) {
+        $unpowered = \Cache::remember('category-unpowered-' . $this->category, 60, function() {
+            return $this->deviceCategory->isUnpowered();
+        });
+
+        if ($this->isFixed() && $unpowered) {
             if ($this->estimate > 0) {
                 $wasteDiverted = $this->estimate;
             } else {

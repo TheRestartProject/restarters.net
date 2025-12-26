@@ -53,6 +53,9 @@ import RichTextEditor from './components/RichTextEditor'
 import Notifications from './components/Notifications'
 import GroupTimeZone from './components/GroupTimeZone'
 import StatsShare  from './components/StatsShare.vue'
+import GroupMapAndList from './components/GroupMapAndList.vue'
+import GroupMarker from './components/GroupMarker.vue'
+import GroupInfoModal from './components/GroupInfoModal.vue'
 
 // Without this, the default map marker doesn't appear in production.  Fairly well-known problem.
 // eslint-disable-next-line
@@ -1323,6 +1326,9 @@ jQuery(document).ready(function () {
         'notifications': Notifications,
         'grouptimezone': GroupTimeZone,
         'statsshare': StatsShare,
+        'groupmapandlist': GroupMapAndList,
+        'groupmarker': GroupMarker,
+        'groupinfomodal': GroupInfoModal,
       }
     })
   })

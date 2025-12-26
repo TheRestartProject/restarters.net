@@ -44,18 +44,13 @@ class GroupController extends Controller
         //Get current logged in user
         $user = Auth::user();
 
-        // Get all groups
-        $groups = Group::with(['networks'])
-            ->orderBy('name', 'ASC')
-            ->get();
-
         // Get all group tags
         $all_group_tags = GroupTags::all();
         $networks = Network::all();
 
         // Look for groups we have joined, not just been invited to.  We have to explicitly test on deleted_at because
         // the normal filtering out of soft deletes won't happen for joins.
-        $your_groups =array_column(Group::with(['networks'])
+        $your_groups = array_column(Group::with(['networks'])
             ->join('users_groups', 'users_groups.group', '=', 'groups.idgroups')
             ->leftJoin('events', 'events.group', '=', 'groups.idgroups')
             ->where('users_groups.user', $user->id)
@@ -66,13 +61,40 @@ class GroupController extends Controller
             ->get()
             ->toArray(), 'idgroups');
 
-        // We pass a high limit to the groups nearby; there is a distance limit which will normally kick in first.
-        $groups_near_you = array_column($user->groupsNearby(1000), 'idgroups');
+        $nearby_groups = [];
+        $min_lat = 90;
+        $max_lat = -90;
+        $min_lng = 180;
+        $max_lng = -180;
+
+        if ($user->latitude || $user->longitude || $user->country_code) {
+            // We pass a high limit to the groups nearby; there is a distance limit which will normally kick in first.
+            $nearby_groups = $user->groupsNearby(1000);
+
+            // Now find the lat/lng bounding box which contains these groups.
+            foreach ($nearby_groups as $group) {
+                if ($group->latitude < $min_lat) {
+                    $min_lat = $group->latitude;
+                }
+                if ($group->latitude > $max_lat) {
+                    $max_lat = $group->latitude;
+                }
+                if ($group->longitude < $min_lng) {
+                    $min_lng = $group->longitude;
+                }
+                if ($group->longitude > $max_lng) {
+                    $max_lng = $group->longitude;
+                }
+            }
+        }
 
         return view('group.index', [
-            'groups' => GroupController::expandGroups($groups, $your_groups, $groups_near_you),
+            'your_groups' => $your_groups,
+            'nearby_groups' => [ [ $min_lat, $min_lng ], [ $max_lat, $max_lng ] ],
             'your_area' => $user->location,
-            'tab' => $tab,
+            'your_lat' => $user->latitude,
+            'your_lng' => $user->longitude,
+            'tab' => (!$tab || $tab === 'mine') ? 'mine' : 'other',
             'network' => $network,
             'networks' => $networks,
             'all_group_tags' => $all_group_tags,
@@ -472,7 +494,7 @@ class GroupController extends Controller
         }
     }
 
-    public static function expandGroups($groups, $your_groupids, $nearby_groupids)
+    public static function expandGroups($groups, $your_groupids)
     {
         $ret = [];
         $user = Auth::user();
@@ -518,7 +540,6 @@ class GroupController extends Controller
                     'networks' => \Illuminate\Support\Arr::pluck($group->networks, 'id'),
                     'group_tags' => $group->group_tags()->get()->pluck('id'),
                     'following' => in_array($group->idgroups, $your_groupids),
-                    'nearby' => in_array($group->idgroups, $nearby_groupids),
                     'archived_at' => $group->archived_at ? Carbon::parse($group->archived_at)->toIso8601String() : null
                 ];
             }

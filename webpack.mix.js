@@ -18,7 +18,7 @@ mix.webpackConfig({
         }),
         // Build a JS translation file that corresponds to our PHP lang/ folder.
         new WebpackShellPlugin({onBuildStart:['php artisan lang:js --no-lib resources/js/translations.js'], onBuildEnd:['php artisan translations:check']})
-    ]
+        ]
 });
 /*
  |--------------------------------------------------------------------------
@@ -57,3 +57,4 @@ mix.alias({
 
 mix.copy('resources/js/components/StatsShare.vue', 'public/js/components/StatsShare.vue')
 mix.copy('resources/js/translations.js', 'public/js/translations.js')
+mix.copy('node_modules/@vectorial1024/leaflet-color-markers/img/*', 'public/images/vendor/leaflet/dist')

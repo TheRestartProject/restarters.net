@@ -103,21 +103,6 @@
             </div>
             <div class="col-lg-9">
 
-                <section style="mt-40 mb-40">
-                    <h2>{{ __('networks.general.groups') }}</h2>
-
-                    <div class="panel">
-                    <p>
-                        {!! __('networks.general.count', [
-                            'count' => $network->groups->count(),
-                            'name' => $network->name,
-                            'id' => $network->id
-                        ]) !!}
-                    </p>
-                    </div>
-
-                </section>
-
                 <div class="vue-placeholder vue-placeholder-large">
                     <div class="vue-placeholder-content">@lang('partials.loading')...</div>
                 </div>
@@ -131,6 +116,16 @@
                 <div class="vue">
                     <EventsRequiringModeration :networks="[{{ $network->id }}]" />
                 </div>
+
+                <section style="mt-40 mb-40">
+                    <h2>{{ __('networks.general.groups') }}</h2>
+
+
+                    <div class="panel vue">
+                        <GroupMapAndList :network="{{ $network->id }}" :initial-bounds="{{ json_encode($mapBounds) }}" fetch-groups />
+                    </div>
+
+                </section>
 
             </div>
         </div>

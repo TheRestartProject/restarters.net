@@ -3,8 +3,6 @@
 return [
   'group' => 'Group',
   'groups' => 'Groups',
-  'all_groups' => 'All groups',
-  'search_name' => 'Search name',
   'add_groups' => 'Add a group',
   'add_groups_content' => 'Tell us more about your group, so we can create a page for you and help you publicise to potential volunteers and participants.',
   'create_groups' => 'Create new group',

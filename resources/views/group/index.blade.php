@@ -21,8 +21,6 @@
       @endif
 
       <?php
-        $all_groups = $groups;
-
         // Any logged-in user can create a group.
         $can_create = Auth::user() ? true : false;
 
@@ -59,8 +57,11 @@
       <div class="vue">
         <GroupsPage
           csrf="{{ csrf_token() }}"
-          :all-groups="{{ json_encode($all_groups, JSON_INVALID_UTF8_IGNORE) }}"
+          :your-groups="{{ json_encode($your_groups, JSON_INVALID_UTF8_IGNORE) }}"
+          :nearby-groups="{{ json_encode($nearby_groups, JSON_INVALID_UTF8_IGNORE) }}"
           your-area="{{ $your_area }}"
+          your-lat="{{ $your_lat }}"
+          your-lng="{{ $your_lng }}"
           :can-create="{{ $can_create ? 'true' : 'false' }}"
           :user-id="{{ $myid }}"
           tab="{{ $tab }}"

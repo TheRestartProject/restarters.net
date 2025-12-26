@@ -27,7 +27,7 @@
         <div class="pt-2 pb-2">
           <div v-if="yourGroups.length">
             <GroupsTable
-                :groups="yourGroups"
+                :groupids="yourGroups"
                 class="mt-3"
                 :tab="currentTab"
                 @nearest="currentTab = 1"
@@ -43,40 +43,12 @@
           <b class="text-uppercase d-none d-lg-block">{{ __('groups.groups_title2') }}</b>
         </template>
         <div v-if="nearbyGroups.length">
-          <p class="mt-1">
-            {{ nearestGroups }}
-            <a href="/profile/edit" class="small">{{ __('groups.nearest_groups_change') }}</a>.
-          </p>
-          <GroupsTable
-              :groups="nearbyGroups"
-              class="mt-3"
-              :tab="currentTab"
-              @all="currentTab = 2"
-              your-area="yourArea"
-          />
+          <GroupMapAndList :initial-bounds="nearbyGroups" :yourGroups="yourGroups"/>
         </div>
         <div v-else class="mt-2 mb-2 text-center">
           <div v-if="yourArea" v-html="__('groups.no_groups_nearest_with_location')" />
           <div v-else v-html="__('groups.no_groups_nearest_no_location')" />
         </div>
-      </b-tab>
-      <b-tab class="pt-2" lazy>
-        <template slot="title">
-          <b class="text-uppercase d-block d-md-none">{{ __('groups.all_groups_mobile') }}</b>
-          <b class="text-uppercase d-none d-md-block">{{ __('groups.all_groups') }}</b>
-        </template>
-        <GroupsTable
-            :groups="groups"
-            class="mt-3"
-            count
-            search
-            :networks="networks"
-            :network="network"
-            :all-group-tags="allGroupTags"
-            :show-tags="showTags"
-            :tab="currentTab"
-            your-area="yourArea"
-        />
       </b-tab>
     </b-tabs>
   </div>
@@ -84,9 +56,10 @@
 <script>
 import GroupsTable from './GroupsTable'
 import auth from '../mixins/auth'
+import GroupMapAndList from "./GroupMapAndList.vue";
 
 export default {
-  components: {GroupsTable},
+  components: {GroupMapAndList, GroupsTable},
   mixins: [ auth ],
   props: {
     network: {
@@ -99,12 +72,25 @@ export default {
       required: false,
       default: 'mine'
     },
-    allGroups: {
+    yourGroups: {
       type: Array,
+      required: true
+    },
+    nearbyGroups: {
+      type: Array,
+      required: true
+    },
+    yourArea: {
+      type: String,
       required: false,
       default: null
     },
-    yourArea: {
+    yourLat: {
+      type: String,
+      required: false,
+      default: null
+    },
+    yourLng: {
       type: String,
       required: false,
       default: null
@@ -128,6 +114,7 @@ export default {
       type: Array,
       required: true
     },
+    // TODO Check whether all these parameters are now used or can be removed
     allGroupTags: {
       type: Array,
       required: true
@@ -146,18 +133,6 @@ export default {
         return a.name.localeCompare(b.name)
       }) : []
     },
-    yourGroups() {
-      return this.groups.filter(g => {
-        return g.following
-      })
-    },
-    nearbyGroups() {
-      return this.groups.filter(g => {
-        return g.nearby && !g.following
-      }).sort((a, b) => {
-        return a.distance - b.distance
-      })
-    },
     nearestGroups() {
       return this.$lang.get('groups.nearest_groups', {
         location: this.yourArea
@@ -165,48 +140,59 @@ export default {
     }
   },
   watch: {
-    currentTab(newVal) {
-      // We want to update the URL in the browser.  In a full app this would be done by the router, but hack it in
-      // here.
-      try {
-        let tag = '';
+    currentTab: {
+      handler: function (newVal) {
+        // We want to update the URL in the browser.  In a full app this would be done by the router, but hack it in
+        // here.
+        try {
+          let tag = '';
 
-        switch (newVal) {
-          case 1: tag = 'nearby'; break;
-          case 2: tag = 'all'; break;
-          default: tag = 'mine'; break;
-        }
+          switch (newVal) {
+            case 1:
+              tag = 'other';
+              break;
+            case 2:
+              tag = 'all';
+              break;
+            default:
+              tag = 'mine';
+              break;
+          }
 
-        if (!this.network) {
-          // If we are vieiwng a specific network, don't mess with the URL as it's confusing.
-          window.history.pushState(null, "Groups", "/group/" + tag);
+          if (!this.network) {
+            // If we are vieiwng a specific network, don't mess with the URL as it's confusing.
+            window.history.pushState(null, "Groups", "/group/" + tag);
+          }
+        } catch (e) {
+          console.error("Failed to update URL")
         }
-      } catch (e) {
-        console.error("Failed to update URL")
-      }
+      },
+      immediate: true
     }
   },
   created() {
-    // Data is passed from the blade template to us via props.  We put it in the store for all components to use,
-    // and so that as/when it changes then reactivity updates all the views.
-    //
-    // Further down the line this may change so that the data is obtained via an AJAX call and perhaps SSR.
-    this.$store.dispatch('groups/setList', {
-      groups: Object.values(this.allGroups)
-    })
-
-    // We have three tabs, and might be asked to start on a specific one.
+    // We have two tabs, but we want to support old URLs for backwards compatibility.
     switch (this.tab) {
-      case 'nearby':
-        this.currentTab = 1;
-        break;
       case 'all':
       case 'network':
-        this.currentTab = 2;
+      case 'nearby':
+      case 'other':
+        this.currentTab = 1;
         break;
       default:
         this.currentTab = 0;
         break;
+    }
+  },
+  mounted() {
+    if (this.currentTab === 0) {
+      // Fetch our own groups.  We fetch them individually because there aren't that many.
+      this.yourGroups.forEach((g) => {
+        this.$store.dispatch('groups/fetch', {
+          id: g,
+          includeStats: false
+        })
+      })
     }
   }
 }
