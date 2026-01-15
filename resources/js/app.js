@@ -57,6 +57,7 @@ import GroupTimeZone from './components/GroupTimeZone.vue'
 import StatsShare from './components/StatsShare.vue'
 import CategoriesTable from './components/CategoriesTable.vue'
 import RolesTable from './components/RolesTable.vue'
+import EmailValidation from './components/EmailValidation.vue'
 
 import lang from './mixins/lang'
 
@@ -429,6 +430,7 @@ function initializeJQuery() {
             'statsshare': StatsShare,
             'categoriestable': CategoriesTable,
             'rolestable': RolesTable,
+            'emailvalidation': EmailValidation,
           }
         })
       })
