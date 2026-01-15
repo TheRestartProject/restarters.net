@@ -428,8 +428,8 @@ function initializeJQuery() {
             'notifications': Notifications,
             'grouptimezone': GroupTimeZone,
             'statsshare': StatsShare,
-            'categoriestable': CategoriesTable,
-            'rolestable': RolesTable,
+            'categories-table': CategoriesTable,
+            'roles-table': RolesTable,
             'emailvalidation': EmailValidation,
           }
         })
