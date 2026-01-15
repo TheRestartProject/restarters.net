@@ -43,6 +43,10 @@
         font-weight: bold;
     }
 
+    .landing-page h1 {
+        line-height: 1.1;
+    }
+
     .landing-page .landing-hr {
         border-top: 3px dashed black;
     }
@@ -103,6 +107,7 @@
     .landing-top-middle {
         grid-row: 1 / 2;
         grid-column: 2 / 3;
+        text-align: center;
     }
 
     .landing-top-right {
@@ -123,6 +128,7 @@
     .landing-middle-middle {
         grid-row: 2 / 3;
         grid-column: 2 / 3;
+        text-align: center;
     }
 
     .landing-middle-right {
