@@ -163,16 +163,22 @@
     @include button-variant(#4a4a4a, white, #4a4a4a);
 }
 
-.btn-checkbox {
+label.btn.btn-checkbox {
     width: 100%;
     font-size: 16px;
     padding: 16px;
     padding-bottom: 13px;
     margin-bottom: 15px;
-    background-color: #E4E4E4;
-    border-bottom: 3px solid #B6B6B6;
+    background-color: #E4E4E4 !important;
+    background-image: none !important;
+    border: none !important;
+    border-bottom: 3px solid #B6B6B6 !important;
     color: #000;
     border-radius: 0;
+    text-transform: none !important;
+    letter-spacing: normal;
+    font-weight: 400 !important;
+    box-shadow: none !important;
 }
 
 // skills buttons
