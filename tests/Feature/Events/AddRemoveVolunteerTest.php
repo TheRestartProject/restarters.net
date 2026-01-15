@@ -271,4 +271,202 @@ class AddRemoveVolunteerTest extends TestCase
         $response->assertStatus(200);
         $response->assertSee('<option value="' . $idgroups . '" selected>Test Group0</option>', false);
     }
+
+    /**
+     * Test that deleting an invited (non-confirmed) volunteer does NOT decrement the volunteer count.
+     *
+     * This test demonstrates a bug in EventsUsersObserver::deleted() where the volunteer count
+     * is decremented for ALL deleted events_users records, not just confirmed ones.
+     *
+     * The bug is on line 89 of EventsUsersObserver.php:
+     *   $this->removed($event, $user, true, $eu->status == 1);
+     *
+     * The removed() method only takes 3 parameters, so the 4th parameter ($eu->status == 1)
+     * is silently ignored. This means $count is always true, causing incorrect decrements.
+     */
+    public function testDeletingInvitedVolunteerDoesNotDecrementCount()
+    {
+        $this->withoutExceptionHandling();
+        Queue::fake();
+
+        // Create an admin user to perform the operations
+        $admin = User::factory()->administrator()->create();
+        $this->actingAs($admin);
+
+        // Create a group and event
+        $group = Group::factory()->create();
+        $network = Network::factory()->create();
+        $network->addGroup($group);
+
+        $event = Party::factory()->create([
+            'group' => $group->idgroups,
+            'event_start_utc' => '2130-01-01T12:13:00+00:00',
+            'event_end_utc' => '2130-01-01T13:14:00+00:00',
+        ]);
+
+        // Verify initial state: volunteer count should be 0
+        $event->refresh();
+        $this->assertEquals(0, $event->volunteers, 'Initial volunteer count should be 0');
+
+        // Create a user to invite
+        $invitee = User::factory()->restarter()->create();
+
+        // Invite the user (this creates an events_users record with status = hash token)
+        $response = $this->post('/party/invite', [
+            'group_name' => $group->name,
+            'event_id' => $event->idevents,
+            'manual_invite_box' => $invitee->email,
+            'message_to_restarters' => 'Please join our event',
+        ]);
+        $response->assertSessionHas('success');
+
+        // Verify the invitation was created with a hash status (not '1')
+        $invitation = EventsUsers::where('event', $event->idevents)
+            ->where('user', $invitee->id)
+            ->first();
+        $this->assertNotNull($invitation, 'Invitation should exist');
+        $this->assertNotEquals('1', $invitation->status, 'Invited user should have hash status, not confirmed');
+        $this->assertNotNull($invitation->status, 'Invited user should have a status (the hash token)');
+
+        // Verify volunteer count is still 0 (invited users don't count)
+        $event->refresh();
+        $this->assertEquals(0, $event->volunteers, 'Volunteer count should still be 0 after invitation');
+
+        // Now delete the invitation (this is where the bug manifests)
+        $invitation->delete();
+
+        // THE KEY ASSERTION: After deleting an INVITED (not confirmed) user,
+        // the volunteer count should still be 0, NOT -1
+        $event->refresh();
+        $this->assertEquals(
+            0,
+            $event->volunteers,
+            'BUG: Deleting an invited (non-confirmed) volunteer should NOT decrement the count. ' .
+            'Expected 0, got ' . $event->volunteers . '. ' .
+            'This indicates the bug in EventsUsersObserver::deleted() where the 4th parameter is ignored.'
+        );
+    }
+
+    /**
+     * Test that deleting a CONFIRMED volunteer DOES decrement the volunteer count correctly.
+     *
+     * This is the counterpart to testDeletingInvitedVolunteerDoesNotDecrementCount() and verifies
+     * that confirmed volunteers are handled correctly.
+     */
+    public function testDeletingConfirmedVolunteerDecrementsCount()
+    {
+        $this->withoutExceptionHandling();
+        Queue::fake();
+
+        // Create an admin user
+        $admin = User::factory()->administrator()->create();
+        $this->actingAs($admin);
+
+        // Create a group and event
+        $group = Group::factory()->create();
+        $network = Network::factory()->create();
+        $network->addGroup($group);
+
+        $event = Party::factory()->create([
+            'group' => $group->idgroups,
+            'event_start_utc' => '2130-01-01T12:13:00+00:00',
+            'event_end_utc' => '2130-01-01T13:14:00+00:00',
+        ]);
+
+        // Verify initial state
+        $event->refresh();
+        $this->assertEquals(0, $event->volunteers, 'Initial volunteer count should be 0');
+
+        // Create and add a confirmed volunteer
+        $volunteer = User::factory()->restarter()->create();
+
+        // Add the volunteer as confirmed (status = 1)
+        $response = $this->put('/api/events/' . $event->idevents . '/volunteers', [
+            'api_token' => $admin->api_token,
+            'volunteer_email_address' => $volunteer->email,
+            'full_name' => $volunteer->name,
+            'user' => $volunteer->id,
+        ]);
+        $response->assertJson(['success' => 'success']);
+
+        // Verify volunteer count increased to 1
+        $event->refresh();
+        $this->assertEquals(1, $event->volunteers, 'Volunteer count should be 1 after adding confirmed volunteer');
+
+        // Get the events_users record and verify it's confirmed
+        $eventsUser = EventsUsers::where('event', $event->idevents)
+            ->where('user', $volunteer->id)
+            ->first();
+        $this->assertNotNull($eventsUser);
+        $this->assertEquals('1', $eventsUser->status, 'Volunteer should be confirmed (status = 1)');
+
+        // Delete the confirmed volunteer
+        $eventsUser->delete();
+
+        // Verify volunteer count decreased back to 0
+        $event->refresh();
+        $this->assertEquals(
+            0,
+            $event->volunteers,
+            'Volunteer count should be 0 after deleting confirmed volunteer'
+        );
+    }
+
+    /**
+     * Test multiple invitation deletions cause increasingly negative counts (demonstrates severity of bug).
+     */
+    public function testMultipleInvitationDeletionsCauseNegativeCount()
+    {
+        $this->withoutExceptionHandling();
+        Queue::fake();
+
+        $admin = User::factory()->administrator()->create();
+        $this->actingAs($admin);
+
+        $group = Group::factory()->create();
+        $network = Network::factory()->create();
+        $network->addGroup($group);
+
+        $event = Party::factory()->create([
+            'group' => $group->idgroups,
+            'event_start_utc' => '2130-01-01T12:13:00+00:00',
+            'event_end_utc' => '2130-01-01T13:14:00+00:00',
+        ]);
+
+        $event->refresh();
+        $this->assertEquals(0, $event->volunteers, 'Initial volunteer count should be 0');
+
+        // Create and invite 5 users
+        $invitees = [];
+        for ($i = 0; $i < 5; $i++) {
+            $invitee = User::factory()->restarter()->create();
+            $invitees[] = $invitee;
+
+            $this->post('/party/invite', [
+                'group_name' => $group->name,
+                'event_id' => $event->idevents,
+                'manual_invite_box' => $invitee->email,
+                'message_to_restarters' => 'Please join',
+            ]);
+        }
+
+        // Verify count is still 0
+        $event->refresh();
+        $this->assertEquals(0, $event->volunteers, 'Volunteer count should be 0 after 5 invitations');
+
+        // Delete all invitations
+        $invitations = EventsUsers::where('event', $event->idevents)->get();
+        foreach ($invitations as $invitation) {
+            $invitation->delete();
+        }
+
+        // THE BUG: This will be -5 instead of 0
+        $event->refresh();
+        $this->assertEquals(
+            0,
+            $event->volunteers,
+            'BUG: After deleting 5 invitations (not confirmed), count should be 0, not ' . $event->volunteers .
+            '. Each deleted invitation incorrectly decrements the count.'
+        );
+    }
 }
