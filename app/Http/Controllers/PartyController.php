@@ -106,6 +106,7 @@ class PartyController extends Controller
         $thisone['event_date_local'] = $event->eventDateLocal;
         $thisone['start_local'] = $event->startLocal;
         $thisone['end_local'] = $event->endLocal;
+        $thisone['timezone'] = $event->timezone;
 
         $thisone['upcoming'] = $event->isUpcoming();
         $thisone['finished'] = $event->hasFinished();
