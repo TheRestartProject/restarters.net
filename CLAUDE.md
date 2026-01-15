@@ -2,6 +2,42 @@
 
 This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
 
+## CRITICAL: Docker Commands
+
+**NEVER use `docker-compose` or `docker exec` directly. ALWAYS use `task` commands.**
+
+```bash
+# Starting containers
+task docker:up-core      # Core services only
+task docker:up-debug     # Core + debug tools (phpMyAdmin, Mailhog)
+task docker:up-discourse # Core + Discourse
+task docker:up-all       # All services
+
+# Stopping containers
+task docker:down-core
+task docker:down-debug
+task docker:down-discourse
+task docker:down-all
+
+# Running commands in container
+task docker:run:bash -- "npm run dev"      # Run bash command
+task docker:run:artisan -- migrate         # Run artisan command
+task docker:shell                          # Open shell in container
+
+# Testing
+task docker:test:phpunit      # Run PHP tests
+task docker:test:jest         # Run JS tests
+task docker:test:playwright   # Run e2e tests
+
+# Vite dev server (HMR)
+task docker:vite:start        # Start Vite in background
+task docker:vite:stop         # Stop Vite
+task docker:vite              # Start Vite in foreground (interactive)
+
+# Logs and debugging
+task docker:logs              # View container logs
+```
+
 ## Project Overview
 
 Restarters.net is a suite of software for the repair community that brings together community repair enthusiasts and activists. It combines three core modules:
@@ -16,16 +52,16 @@ This is a Laravel 9 application with PHP 8+ that integrates with external servic
 
 ### Local Development Setup
 ```bash
-# Using Docker (recommended for full development environment)
-docker-compose up -d
+# Using Docker (recommended) - see CRITICAL section above for task commands
+task docker:up-debug    # Start with debug tools
 
 # The application will be available at:
-# - Restarters: http://www.example.com:8001
-# - phpMyAdmin: http://www.example.com:8002  
-# - Discourse: http://www.example.com:8003
-# - Mailhog: http://localhost:8026
+# - Restarters: http://localhost:8001
+# - phpMyAdmin: http://localhost:8002
+# - Mailhog: http://localhost:8025
 
-# Note: Add www.example.com to your hosts file pointing to your Docker host
+# Run Vite for HMR (hot module replacement)
+task docker:run:bash -- "npm run dev"
 ```
 
 ### Common Development Commands

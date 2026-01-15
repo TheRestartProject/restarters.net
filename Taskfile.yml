@@ -171,6 +171,30 @@ tasks:
     cmds:
       - docker exec -it restarters php artisan "{{ .CLI_ARGS }}"
 
+  docker:vite:
+    desc: Start Vite dev server with HMR in the container.
+    summary: |
+      Start Vite dev server for hot module replacement.
+      This runs in the foreground - use Ctrl+C to stop.
+      For background execution, use: task docker:vite &
+    cmds:
+      - docker exec -it restarters npm run dev
+
+  docker:vite:start:
+    desc: Start Vite dev server in the background.
+    summary: |
+      Start Vite dev server in background (detached mode).
+      Use 'task docker:vite:stop' to stop it.
+    cmds:
+      - docker exec -d restarters npm run dev
+      - echo "Vite dev server started in background"
+
+  docker:vite:stop:
+    desc: Stop Vite dev server running in the container.
+    cmds:
+      - docker exec restarters bash -c "ps aux | grep 'node.*vite' | grep -v grep | awk '{print $$2}' | xargs -r kill || true"
+      - echo "Vite dev server stopped"
+
   docker:test:phpunit:
     desc: Run PHPUnit tests in the core application container.
     summary: |
