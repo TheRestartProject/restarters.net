@@ -38,7 +38,7 @@
           <a :href="discourseThread">{{ __('events.talk_thread') }}</a>
         </div>
       </div>
-      <div class="border-top-thin d-flex pt-1 pb-1">
+      <div class="border-top-thin d-flex pt-1 pb-1" v-if="hosts && hosts.length">
         <div class="mr-2">
           <b-img-lazy :src="imageUrl('/icons/host_ico.svg')" class="icon" />
         </div>
