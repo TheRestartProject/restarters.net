@@ -29,7 +29,7 @@
         "jsdom-global": "^3.0.2",
         "laravel-mix": "^6.0.49",
         "laravel-mix-bundle-analyzer": "^1.0.5",
-        "lodash": "^4.17.21",
+        "lodash": "^4.17.23",
         "lodash.mergewith": "^4.6.2",
         "lodash.template": "^4.5.0",
         "nyc": "^15.1.0",
