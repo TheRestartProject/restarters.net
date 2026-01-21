@@ -41,6 +41,7 @@ class CategoryTest extends TestCase
             'estimate' => 100.00,
             'item_type' => 'Test item type',
             'repair_status' => 'Fixed',
+            'reference' => 'REP12456'
         ]);
 
         $rsp->assertSuccessful();
@@ -48,6 +49,7 @@ class CategoryTest extends TestCase
         $device = Device::findOrFail($iddevices);
         self::assertEquals($device->category_creation, 11);
         self::assertEquals($device->category, 46);
+        self::assertEquals($device->reference, 'REP12456');
     }
 
     public function testListItems() {

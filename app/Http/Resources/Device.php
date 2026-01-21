@@ -174,6 +174,14 @@ use Illuminate\Http\Resources\Json\JsonResource;
  *           ref="#/components/schemas/Image"
  *         )
  *     ),
+ *     @OA\Property(
+ *         property="reference",
+ *         title="reference",
+ *         description="Your reference for this device.",
+ *         format="string",
+ *         maxLength=255,
+ *         example="REP1234"
+ *     ),
  * )
  */
 
@@ -207,6 +215,7 @@ class Device extends JsonResource
             'notes' => $this->notes,
             'created_at' => $this->created_at->toIso8601String(),
             'updated_at' => $this->created_at->toIso8601String(),
+            'reference' => $this->reference,
         ];
 
         // Our database has a slightly complex structure for historical reasons, so we need to map some underlying
