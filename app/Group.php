@@ -130,6 +130,22 @@ class Group extends Model implements Auditable
         });
     }
 
+    /**
+     * Override toArray to filter tags based on user permissions.
+     * This ensures tags are filtered when the model is serialized to JSON in Blade templates.
+     */
+    public function toArray()
+    {
+        $array = parent::toArray();
+
+        // Replace group_tags with filtered tags
+        if (isset($array['group_tags'])) {
+            $array['group_tags'] = $this->getFilteredTagsForUser()->values()->toArray();
+        }
+
+        return $array;
+    }
+
     // Setters
 
     //Getters
