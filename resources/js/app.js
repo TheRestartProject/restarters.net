@@ -312,43 +312,6 @@ function initializeJQuery() {
         $('#event-invite-to button[type="submit"], #invite-to-group button[type="submit"]').prop('disabled', !hasContent);
       });
 
-      // Handle "Add invites for group members" checkbox in event invite modal
-      $('#invites_to_volunteers').on('change', function() {
-        var memberEmails = $(this).data('member-emails') || '';
-        var $textarea = $('#manual_invite_box');
-        var currentEmails = $textarea.val().trim();
-
-        if ($(this).is(':checked')) {
-          // Add member emails to textarea
-          if (memberEmails) {
-            if (currentEmails) {
-              // Append to existing emails, avoiding duplicates
-              var existingEmails = currentEmails.split(',').map(function(e) { return e.trim().toLowerCase(); });
-              var newEmails = memberEmails.split(',').filter(function(email) {
-                return existingEmails.indexOf(email.trim().toLowerCase()) === -1;
-              });
-              if (newEmails.length > 0) {
-                $textarea.val(currentEmails + ', ' + newEmails.join(', '));
-              }
-            } else {
-              $textarea.val(memberEmails);
-            }
-          }
-        } else {
-          // Remove member emails from textarea when unchecked
-          if (memberEmails && currentEmails) {
-            var memberEmailList = memberEmails.split(',').map(function(e) { return e.trim().toLowerCase(); });
-            var remainingEmails = currentEmails.split(',').map(function(e) { return e.trim(); }).filter(function(email) {
-              return memberEmailList.indexOf(email.toLowerCase()) === -1;
-            });
-            $textarea.val(remainingEmails.join(', '));
-          }
-        }
-
-        // Trigger input event to update submit button state
-        $textarea.trigger('input');
-      });
-
       $(document).on("click", "#btn-copy", function () {
         var $copy_link = $(this).data('clipboard-text');
         var $temp = $("<input>");

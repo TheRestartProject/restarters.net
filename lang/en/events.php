@@ -39,6 +39,7 @@ return [
   'shareable_link_box' => 'Shareable link',
   'cancel_invites_link' => 'Cancel',
   'manual_invite_box' => 'Send invites to',
+  'manual_invite_placeholder' => 'Enter email addresses separated by commas',
   'type_email_addresses_message' => 'Note: you can also manually type in the email address of anyone else you would like to invite to this event.  Press the tab, enter or comma key after each email address that you enter.',
   'message_to_restarters' => 'Invitation message',
   'send_invite_button' => 'Send invites',
