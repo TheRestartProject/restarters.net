@@ -294,7 +294,7 @@ class Group extends JsonResource
             'updated_at' => Carbon::parse($this->updated_at)->toIso8601String(),
             'location' => new GroupLocation($this),
             'networks' => new NetworkSummaryCollection($this->networks),
-            'tags' => new TagCollection($this->group_tags),
+            'tags' => new TagCollection($this->resource->getFilteredTagsForUser()),
             'timezone' => $this->timezone,
             'approved' => $this->approved ? true : false,
             'network_data' => $networkData,
