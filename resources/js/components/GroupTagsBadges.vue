@@ -7,7 +7,7 @@
         variant="info"
         pill
         class="mr-1"
-    >{{ tag.name }}</b-badge>
+    >{{ tag.name || tag.tag_name }}</b-badge>
   </span>
 </template>
 <script>
@@ -23,7 +23,9 @@ export default {
       return this.$store.getters['groups/get'](this.idgroups)
     },
     tags() {
-      return this.group && this.group.tags ? this.group.tags : []
+      if (!this.group) return []
+      // Handle both 'tags' (from API) and 'group_tags' (from Blade serialization)
+      return this.group.tags || this.group.group_tags || []
     },
   },
 }
