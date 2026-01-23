@@ -198,8 +198,8 @@ class NetworkController extends Controller
      *          )
      *      ),
      *      @OA\Parameter(
-     *          name="tag",
-     *          description="Filter by tag ID. Only groups with this tag will be returned.",
+     *          name="group_tag",
+     *          description="Filter by group tag ID. Only groups with this tag will be returned.",
      *          required=false,
      *          in="query",
      *          @OA\Schema(
@@ -255,9 +255,9 @@ class NetworkController extends Controller
             $query = $query->whereNull('archived_at');
         }
 
-        // Filter by tag if specified
-        if ($request->has('tag')) {
-            $tagId = $request->get('tag');
+        // Filter by group tag if specified
+        if ($request->has('group_tag')) {
+            $tagId = $request->get('group_tag');
             $query = $query->join('grouptags_groups', 'grouptags_groups.group', '=', 'groups.idgroups')
                 ->where('grouptags_groups.group_tag', $tagId);
         }
@@ -337,8 +337,8 @@ class NetworkController extends Controller
      *          )
      *      ),
      *      @OA\Parameter(
-     *          name="tag",
-     *          description="Filter by tag ID. Only events from groups with this tag will be returned.",
+     *          name="group_tag",
+     *          description="Filter by group tag ID. Only events from groups with this tag will be returned.",
      *          required=false,
      *          in="query",
      *          @OA\Schema(
@@ -397,9 +397,9 @@ class NetworkController extends Controller
             ->where('events.approved', true)
             ->where('groups.approved', true);
 
-        // Filter by tag if specified
-        if ($request->has('tag')) {
-            $tagId = $request->get('tag');
+        // Filter by group tag if specified
+        if ($request->has('group_tag')) {
+            $tagId = $request->get('group_tag');
             $query = $query->join('grouptags_groups', 'grouptags_groups.group', '=', 'groups.idgroups')
                 ->where('grouptags_groups.group_tag', $tagId);
         }
@@ -590,6 +590,108 @@ class NetworkController extends Controller
         ]);
 
         return TagResource::make($tag)->response()->setStatusCode(201);
+    }
+
+    /**
+     * @OA\Put(
+     *      path="/api/v2/networks/{id}/tags/{tagId}",
+     *      operationId="updateNetworkTag",
+     *      tags={"Networks"},
+     *      summary="Update Network Tag",
+     *      description="Update a tag for a network. Requires authentication as a Network Coordinator for this network or an Administrator.",
+     *      security={{"apiToken":{}}},
+     *      @OA\Parameter(
+     *          name="id",
+     *          description="Network id",
+     *          required=true,
+     *          in="path",
+     *          @OA\Schema(
+     *              type="integer"
+     *          )
+     *      ),
+     *      @OA\Parameter(
+     *          name="tagId",
+     *          description="Tag id",
+     *          required=true,
+     *          in="path",
+     *          @OA\Schema(
+     *              type="integer"
+     *          )
+     *      ),
+     *      @OA\RequestBody(
+     *          required=true,
+     *          @OA\JsonContent(
+     *              required={"name"},
+     *              @OA\Property(property="name", type="string", example="My Tag"),
+     *              @OA\Property(property="description", type="string", example="Description of the tag", nullable=true),
+     *          )
+     *      ),
+     *      @OA\Response(
+     *          response=200,
+     *          description="Tag updated successfully",
+     *       ),
+     *      @OA\Response(
+     *          response=401,
+     *          description="Unauthenticated",
+     *      ),
+     *      @OA\Response(
+     *          response=403,
+     *          description="Forbidden - User is not a coordinator for this network",
+     *      ),
+     *      @OA\Response(
+     *          response=404,
+     *          description="Network or tag not found",
+     *      ),
+     *      @OA\Response(
+     *          response=422,
+     *          description="Validation error or duplicate tag name",
+     *      ),
+     *     )
+     */
+    public function updateNetworkTagv2(Request $request, $id, $tagId)
+    {
+        $network = Network::findOrFail($id);
+        $tag = GroupTags::findOrFail($tagId);
+        $user = Auth::user();
+
+        if (!$user) {
+            return response()->json(['message' => 'Unauthenticated'], 401);
+        }
+
+        // Check tag belongs to this network
+        if ($tag->network_id != $id) {
+            return response()->json(['message' => 'Tag does not belong to this network'], 403);
+        }
+
+        // Check if user is admin or network coordinator for this network
+        $isAdmin = $user->hasRole('Administrator');
+        $isCoordinator = $user->isCoordinatorOf($network);
+
+        if (!$isAdmin && !$isCoordinator) {
+            return response()->json(['message' => 'You do not have permission to edit tags for this network'], 403);
+        }
+
+        $request->validate([
+            'name' => 'required|string|max:255',
+            'description' => 'nullable|string|max:1000',
+        ]);
+
+        // Check if tag name already exists in this network (excluding current tag)
+        $existingTag = GroupTags::where('tag_name', $request->name)
+            ->where('network_id', $id)
+            ->where('id', '!=', $tagId)
+            ->first();
+
+        if ($existingTag) {
+            return response()->json(['message' => 'A tag with this name already exists in this network'], 422);
+        }
+
+        $tag->update([
+            'tag_name' => $request->name,
+            'description' => $request->description,
+        ]);
+
+        return TagResource::make($tag->fresh());
     }
 
     /**

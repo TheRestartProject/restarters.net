@@ -101,6 +101,7 @@ Route::prefix('v2')->group(function() {
             Route::get('{id}/tags', [API\NetworkController::class, 'getNetworkTagsv2']);
             Route::middleware('auth:api')->group(function() {
                 Route::post('{id}/tags', [API\NetworkController::class, 'createNetworkTagv2']);
+                Route::put('{id}/tags/{tagId}', [API\NetworkController::class, 'updateNetworkTagv2']);
                 Route::delete('{id}/tags/{tagId}', [API\NetworkController::class, 'deleteNetworkTagv2']);
             });
         });

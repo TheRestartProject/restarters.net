@@ -103,7 +103,7 @@ class UserController extends Controller
             if (Cache::has('talk_notification_' . $user->username)) {
                 $discourseNotifications = Cache::get('talk_notification_' . $user->username);
             } else {
-                if (config('restarters.features.discourse_integration')) {
+                try {
                     $client = app('discourse-client');
                     $response = $client->request('GET', '/notifications.json?username=' . $user->username);
                     $talk_notifications = json_decode($response->getBody()->getContents(), true);
@@ -117,6 +117,9 @@ class UserController extends Controller
 
                         Cache::put('talk_notification_' . $user->username, $discourseNotifications, 60);
                     }
+                } catch (\Exception $e) {
+                    // Discourse unavailable - fail gracefully with 0 notifications
+                    \Log::warning('Discourse notifications unavailable: ' . $e->getMessage());
                 }
             }
         }

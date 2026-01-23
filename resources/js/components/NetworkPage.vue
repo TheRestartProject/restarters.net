@@ -42,6 +42,26 @@
       </div>
     </div>
 
+    <!-- About (moved from column layout) -->
+    <section class="mb-4" v-if="network.description">
+      <h2>{{ __('networks.general.about') }}</h2>
+      <div class="network-description" v-html="truncatedDescription"></div>
+      <button v-if="showReadMore" class="btn btn-link p-0" @click="showDescriptionModal = true">
+        {{ __('partials.read_more') }}
+      </button>
+    </section>
+
+    <!-- Network Coordinators (horizontal) -->
+    <section class="mb-4" v-if="network.coordinators && network.coordinators.length">
+      <h2>{{ __('networks.general.coordinators') }}</h2>
+      <div class="coordinators-horizontal">
+        <a v-for="coordinator in network.coordinators" :key="coordinator.id" :href="'/profile/' + coordinator.id" class="coordinator-card">
+          <img :src="coordinator.picture" :alt="coordinator.name" class="coordinator-avatar">
+          <span class="coordinator-name">{{ coordinator.name }}</span>
+        </a>
+      </div>
+    </section>
+
     <!-- Groups requiring moderation (full width) -->
     <section class="mb-4">
       <h2>{{ __('groups.groups_title_admin') }}</h2>
@@ -66,21 +86,7 @@
     </section>
 
     <div class="row">
-      <div class="col-lg-4">
-        <!-- Coordinators -->
-        <section class="mb-4" v-if="network.coordinators && network.coordinators.length">
-          <h2>{{ __('networks.general.coordinators') }}</h2>
-          <ul class="list-unstyled coordinators-list">
-            <li v-for="coordinator in network.coordinators" :key="coordinator.id" class="coordinator-item d-flex align-items-center mb-3">
-              <img :src="coordinator.picture" :alt="coordinator.name" class="coordinator-avatar rounded-circle mr-3">
-              <div>
-                <a :href="'/profile/' + coordinator.id" class="coordinator-name">{{ coordinator.name }}</a>
-                <div><span class="badge badge-primary">{{ __('networks.general.coordinator_badge') }}</span></div>
-              </div>
-            </li>
-          </ul>
-        </section>
-
+      <div class="col-lg-6">
         <!-- Tag Management (for NCs and Admins) -->
         <section class="mb-4" v-if="canManageTags">
           <h2>{{ __('networks.tags.title') }}</h2>
@@ -89,44 +95,48 @@
               {{ __('networks.tags.no_tags') }}
             </div>
             <div v-else class="tags-list mb-3">
-              <div v-for="tag in tags" :key="tag.id" class="tag-item d-flex justify-content-between align-items-center mb-2 p-2 border rounded">
-                <div>
-                  <strong>{{ tag.name }}</strong>
-                  <span class="text-muted ml-2">({{ tag.groups_count }} {{ tag.groups_count === 1 ? 'group' : 'groups' }})</span>
+              <div v-for="tag in tags" :key="tag.id" class="tag-item mb-2 p-2 border rounded">
+                <div class="d-flex justify-content-between align-items-start">
+                  <div>
+                    <strong>{{ tag.name }}</strong>
+                    <span class="text-muted ml-2">({{ tag.groups_count }} {{ tag.groups_count === 1 ? 'group' : 'groups' }})</span>
+                  </div>
+                  <div class="tag-actions">
+                    <b-button variant="link" size="sm" class="edit-tag-btn p-0 mr-2" @click="openEditTag(tag)">
+                      <span class="sr-only">{{ __('networks.tags.edit') }}</span>
+                      <img :src="imageUrl('/images/pencil.svg')" alt="" class="edit-icon">
+                    </b-button>
+                    <b-button variant="link" size="sm" class="delete-tag-btn p-0" @click="confirmDeleteTag(tag)">
+                      <span class="sr-only">{{ __('networks.tags.delete') }}</span>
+                      <img :src="imageUrl('/images/trash.svg')" alt="" class="delete-icon">
+                    </b-button>
+                  </div>
                 </div>
-                <b-button variant="link" size="sm" class="delete-tag-btn p-0" @click="confirmDeleteTag(tag)">
-                  <span class="sr-only">{{ __('networks.tags.delete') }}</span>
-                  <img :src="imageUrl('/images/trash.svg')" alt="" class="delete-icon">
-                </b-button>
+                <div v-if="tag.description" class="tag-description text-muted small mt-1" v-html="tag.description"></div>
               </div>
             </div>
             <div class="create-tag">
-              <b-form @submit.prevent="createTag" inline>
+              <b-form @submit.prevent="createTag">
                 <b-form-input
                     v-model="newTagName"
                     :placeholder="__('networks.tags.new_tag_placeholder')"
-                    class="mr-2 mb-2"
                     size="sm"
                     required
+                    class="tag-name-input mb-2"
                 />
-                <b-button type="submit" variant="primary" size="sm" class="mb-2" :disabled="!newTagName.trim()">
+                <b-form-input
+                    v-model="newTagDescription"
+                    :placeholder="__('networks.tags.description_placeholder')"
+                    size="sm"
+                    class="tag-description-input mb-2"
+                />
+                <b-button type="submit" variant="primary" size="sm" :disabled="!newTagName.trim()">
                   {{ __('networks.tags.create') }}
                 </b-button>
               </b-form>
               <div v-if="tagError" class="text-danger small mt-1">{{ tagError }}</div>
             </div>
           </div>
-        </section>
-      </div>
-
-      <div class="col-lg-8">
-        <!-- About -->
-        <section class="mb-4" v-if="network.description">
-          <h2>{{ __('networks.general.about') }}</h2>
-          <div class="network-description" v-html="truncatedDescription"></div>
-          <button v-if="showReadMore" class="btn btn-link p-0" @click="showDescriptionModal = true">
-            {{ __('partials.read_more') }}
-          </button>
         </section>
       </div>
     </div>
@@ -137,6 +147,17 @@
       <p v-if="tagToDelete && tagToDelete.groups_count > 0" class="text-warning">
         <strong>{{ __('networks.tags.delete_warning', { count: tagToDelete.groups_count }) }}</strong>
       </p>
+    </b-modal>
+
+    <!-- Edit Tag Modal -->
+    <b-modal v-model="showEditModal" :title="__('networks.tags.edit_title')" @ok="updateTag" :ok-disabled="!editTagName.trim()">
+      <b-form-group :label="__('networks.tags.name_label')">
+        <b-form-input v-model="editTagName" required />
+      </b-form-group>
+      <b-form-group :label="__('networks.tags.description_label')">
+        <b-form-textarea v-model="editTagDescription" rows="3" />
+      </b-form-group>
+      <div v-if="editTagError" class="text-danger small">{{ editTagError }}</div>
     </b-modal>
 
     <!-- Description Modal -->
@@ -196,9 +217,15 @@ export default {
       stats: this.initialStats,
       tags: this.initialTags,
       newTagName: '',
+      newTagDescription: '',
       tagError: null,
       showDeleteModal: false,
       tagToDelete: null,
+      showEditModal: false,
+      editingTag: null,
+      editTagName: '',
+      editTagDescription: '',
+      editTagError: null,
       showDescriptionModal: false
     }
   },
@@ -248,11 +275,13 @@ export default {
 
       try {
         const response = await axios.post(`/api/v2/networks/${this.network.id}/tags?api_token=${this.apiToken}`, {
-          name: this.newTagName.trim()
+          name: this.newTagName.trim(),
+          description: this.newTagDescription.trim() || null
         })
 
         this.tags.push(response.data.data)
         this.newTagName = ''
+        this.newTagDescription = ''
       } catch (error) {
         if (error.response && error.response.data && error.response.data.message) {
           this.tagError = error.response.data.message
@@ -274,6 +303,40 @@ export default {
         this.tagToDelete = null
       } catch (error) {
         console.error('Failed to delete tag:', error)
+      }
+    },
+    openEditTag(tag) {
+      this.editingTag = tag
+      this.editTagName = tag.name
+      this.editTagDescription = tag.description || ''
+      this.editTagError = null
+      this.showEditModal = true
+    },
+    async updateTag() {
+      if (!this.editingTag || !this.editTagName.trim()) return
+
+      this.editTagError = null
+
+      try {
+        const response = await axios.put(`/api/v2/networks/${this.network.id}/tags/${this.editingTag.id}?api_token=${this.apiToken}`, {
+          name: this.editTagName.trim(),
+          description: this.editTagDescription.trim() || null
+        })
+
+        // Update the tag in the list
+        const index = this.tags.findIndex(t => t.id === this.editingTag.id)
+        if (index !== -1) {
+          this.tags.splice(index, 1, response.data.data)
+        }
+
+        this.showEditModal = false
+        this.editingTag = null
+      } catch (error) {
+        if (error.response && error.response.data && error.response.data.message) {
+          this.editTagError = error.response.data.message
+        } else {
+          this.editTagError = this.__('networks.tags.edit_error')
+        }
       }
     }
   },
@@ -329,26 +392,39 @@ export default {
   text-transform: uppercase;
 }
 
-.coordinators-list {
-  .coordinator-item {
-    border: 1px solid $brand-grey;
-    padding: 0.75rem;
-    border-radius: 4px;
-  }
+.coordinators-horizontal {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem;
 
-  .coordinator-avatar {
-    width: 50px;
-    height: 50px;
-    object-fit: cover;
-  }
-
-  .coordinator-name {
-    font-weight: bold;
-    color: inherit;
+  .coordinator-card {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    padding: 0.5rem 1rem 0.5rem 0.5rem;
+    background: $white;
+    border: 2px solid $black;
+    border-radius: 50px;
     text-decoration: none;
+    color: inherit;
+    transition: box-shadow 0.2s, border-color 0.2s;
 
     &:hover {
-      text-decoration: underline;
+      border-color: $brand-light;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+      text-decoration: none;
+    }
+
+    .coordinator-avatar {
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      object-fit: cover;
+    }
+
+    .coordinator-name {
+      font-weight: 500;
+      white-space: nowrap;
     }
   }
 }
@@ -364,10 +440,48 @@ export default {
     background: $brand-grey;
   }
 
+  .tag-actions {
+    display: flex;
+    align-items: center;
+  }
+
+  .edit-tag-btn {
+    .edit-icon {
+      width: 18px;
+      height: 18px;
+    }
+  }
+
   .delete-tag-btn {
     .delete-icon {
       width: 20px;
       height: 20px;
+    }
+  }
+
+  .create-tag {
+    .tag-name-input {
+      flex: 1 1 auto;
+      min-width: 150px;
+    }
+
+    .tag-description-input {
+      width: 100%;
+      margin-top: 0.5rem;
+    }
+
+    input.form-control {
+      // Prevent border width change on focus causing layout shift
+      border-width: 1px;
+      &:focus {
+        border-width: 1px;
+        box-shadow: 0 0 0 2px rgba($brand-light, 0.25);
+      }
+    }
+
+    button {
+      flex-shrink: 0;
+      white-space: nowrap;
     }
   }
 }

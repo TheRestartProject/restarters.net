@@ -428,7 +428,23 @@ export default {
       this.image = group.image
       this.approved = group.approved
       this.networkList = group.networks || []
-      this.tagList = group.tags || []
+      // For NCs (not admins), filter tags to only show those they can edit
+      // Global tags (network_id is null) and tags from other networks are hidden
+      // but preserved on save by the backend
+      const allTags = group.tags || []
+      if (this.canNetwork) {
+        // Admin - show all tags
+        this.tagList = allTags
+      } else {
+        // NC - filter to only show tags from networks the group belongs to
+        const groupNetworkIds = (group.networks || []).map(n => n.id)
+        this.tagList = allTags.filter(tag => {
+          // Hide global tags (network_id is null)
+          if (!tag.network_id) return false
+          // Only show tags from networks the group belongs to
+          return groupNetworkIds.includes(tag.network_id)
+        })
+      }
       this.networkData = group.network_data ? group.network_data : {}
       this.archived_at = group.archived_at
     }

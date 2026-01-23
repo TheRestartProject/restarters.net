@@ -401,6 +401,114 @@ class APIv2NetworkTest extends TestCase
         $this->assertNotNull(GroupTags::find($tag->id));
     }
 
+    public function testUpdateNetworkTag(): void {
+        $network = Network::factory()->create();
+
+        $tag = GroupTags::factory()->create([
+            'tag_name' => 'OriginalName',
+            'description' => 'Original description',
+            'network_id' => $network->id,
+        ]);
+
+        $user = User::factory()->networkCoordinator()->create([
+            'api_token' => '1234',
+        ]);
+        $network->addCoordinator($user);
+
+        $this->actingAs($user);
+
+        $response = $this->putJson("/api/v2/networks/{$network->id}/tags/{$tag->id}?api_token=1234", [
+            'name' => 'UpdatedName',
+            'description' => 'Updated description',
+        ]);
+
+        $response->assertSuccessful();
+
+        // Verify tag was updated
+        $tag->refresh();
+        $this->assertEquals('UpdatedName', $tag->tag_name);
+        $this->assertEquals('Updated description', $tag->description);
+    }
+
+    public function testUpdateNetworkTagAsAdmin(): void {
+        $network = Network::factory()->create();
+
+        $tag = GroupTags::factory()->create([
+            'tag_name' => 'OriginalName',
+            'network_id' => $network->id,
+        ]);
+
+        $user = User::factory()->administrator()->create([
+            'api_token' => '1234',
+        ]);
+
+        $this->actingAs($user);
+
+        $response = $this->putJson("/api/v2/networks/{$network->id}/tags/{$tag->id}?api_token=1234", [
+            'name' => 'AdminUpdatedName',
+        ]);
+
+        $response->assertSuccessful();
+
+        $tag->refresh();
+        $this->assertEquals('AdminUpdatedName', $tag->tag_name);
+    }
+
+    public function testUpdateTagFromWrongNetwork(): void {
+        $network1 = Network::factory()->create();
+        $network2 = Network::factory()->create();
+
+        $tag = GroupTags::factory()->create([
+            'tag_name' => 'Network2Tag',
+            'network_id' => $network2->id,
+        ]);
+
+        $user = User::factory()->networkCoordinator()->create([
+            'api_token' => '1234',
+        ]);
+        $network1->addCoordinator($user);
+
+        $this->actingAs($user);
+
+        // Try to update tag from network1 but tag belongs to network2
+        $response = $this->putJson("/api/v2/networks/{$network1->id}/tags/{$tag->id}?api_token=1234", [
+            'name' => 'ShouldNotWork',
+        ]);
+
+        $response->assertStatus(403);
+
+        // Verify tag was NOT updated
+        $tag->refresh();
+        $this->assertEquals('Network2Tag', $tag->tag_name);
+    }
+
+    public function testUpdateTagDuplicateName(): void {
+        $network = Network::factory()->create();
+
+        $tag1 = GroupTags::factory()->create([
+            'tag_name' => 'Tag1',
+            'network_id' => $network->id,
+        ]);
+
+        $tag2 = GroupTags::factory()->create([
+            'tag_name' => 'Tag2',
+            'network_id' => $network->id,
+        ]);
+
+        $user = User::factory()->administrator()->create([
+            'api_token' => '1234',
+        ]);
+
+        $this->actingAs($user);
+
+        // Try to rename tag2 to tag1's name
+        $response = $this->putJson("/api/v2/networks/{$network->id}/tags/{$tag2->id}?api_token=1234", [
+            'name' => 'Tag1',
+        ]);
+
+        $response->assertStatus(422);
+    }
+
     public function testListGroupsFilterByTag(): void {
         $network = Network::factory()->create();
 
@@ -423,8 +531,8 @@ class APIv2NetworkTest extends TestCase
         $json = json_decode($response->getContent(), true)['data'];
         $this->assertEquals(2, count($json));
 
-        // With tag filter - should return only group1
-        $response = $this->get("/api/v2/networks/{$network->id}/groups?tag={$tag->id}");
+        // With group_tag filter - should return only group1
+        $response = $this->get("/api/v2/networks/{$network->id}/groups?group_tag={$tag->id}");
         $response->assertSuccessful();
         $json = json_decode($response->getContent(), true)['data'];
         $this->assertEquals(1, count($json));
@@ -464,8 +572,8 @@ class APIv2NetworkTest extends TestCase
         $json = json_decode($response->getContent(), true)['data'];
         $this->assertEquals(2, count($json));
 
-        // With tag filter - should return only event1
-        $response = $this->get("/api/v2/networks/{$network->id}/events?tag={$tag->id}");
+        // With group_tag filter - should return only event1
+        $response = $this->get("/api/v2/networks/{$network->id}/events?group_tag={$tag->id}");
         $response->assertSuccessful();
         $json = json_decode($response->getContent(), true)['data'];
         $this->assertEquals(1, count($json));
