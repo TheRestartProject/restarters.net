@@ -15,7 +15,7 @@ return [
   'your_name' => 'Prénom & Nom',
   'your_name_validation' => 'Veuillez taper une adresse e-mail valide',
   'repair_skills' => 'Compétences',
-  'repair_skills_content' => 'Ceci est facultatif mais nous aiderait à améliorer votre expérience. Quelles compétences souhaitez‐vous partager avec les autres ?',
+  'repair_skills_content' => 'Ceci est facultatif mais nous aiderait à améliorer votre expérience. Quelles compétences souhaitez‐vous partager avec les autres ? Ctrl-clic pour sélectionner plusieurs compétences.',
   'your_repair_skills' => 'Vos compétences',
   'save_repair_skills' => 'Sauvegarder les compétences',
   'email_alerts' => 'E-mails et alertes',

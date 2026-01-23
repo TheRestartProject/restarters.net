@@ -60,10 +60,11 @@
                 </p>
                 <hr />
                 <div v-if="upcoming && approved" class="d-flex justify-content-between">
-                  <a data-toggle="modal" data-target="#event-invite-to" href="#" class="ml-2">
+                  <a href="#" class="ml-2" @click.prevent="inviteVolunteers">
                     <img class="icon" :src="imageUrl('/images/add-icon.svg')" />
                     {{ __('events.invite_to_join') }}
                   </a>
+                  <EventInviteModal :idevents="idevents" :canedit="canedit" ref="inviteModal" />
                 </div>
               </b-tab>
             </b-tabs>
@@ -80,6 +81,7 @@ import EventAttendanceCount from './EventAttendanceCount.vue'
 import EventAttendee from './EventAttendee.vue'
 import CollapsibleSection from './CollapsibleSection.vue'
 import EventAddVolunteerModal from './EventAddVolunteerModal.vue'
+import EventInviteModal from './EventInviteModal.vue'
 
 export default {
   props: {
@@ -98,7 +100,7 @@ export default {
       default: function () { return [] }
     }
   },
-  components: {EventAddVolunteerModal, CollapsibleSection, EventAttendee, EventAttendanceCount},
+  components: {EventAddVolunteerModal, EventInviteModal, CollapsibleSection, EventAttendee, EventAttendanceCount},
   mixins: [event, images],
   computed: {
     attendance() {
@@ -132,6 +134,9 @@ export default {
     },
     addVolunteer() {
       this.$refs.addVolunteerModal.show()
+    },
+    inviteVolunteers() {
+      this.$refs.inviteModal.show()
     },
     fetchVolunteers() {
       this.$store.dispatch('attendance/fetch', {
