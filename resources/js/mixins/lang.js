@@ -54,11 +54,15 @@ function choice(key, count, values = {}) {
     return translation;
 }
 
-export const Lang = { get: translate, choice: choice }
+function getLocale() {
+    return document.documentElement.lang || 'en';
+}
+
+export const Lang = { get: translate, choice: choice, getLocale: getLocale }
 
 export default {
     beforeCreate() {
-        this.$lang = { get: translate, choice: choice }
+        this.$lang = { get: translate, choice: choice, getLocale: getLocale }
     },
     methods: {
         __(key, values) {

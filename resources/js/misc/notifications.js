@@ -29,7 +29,20 @@ function toggleRead(event) {
 }
 
 // Ensure jQuery is available from global scope since it's loaded via CDN
-if (typeof window !== 'undefined' && (window.jQuery || window.$)) {
-    const $ = window.jQuery || window.$;
-    $('.btn-marked').on('click',toggleRead);
+// Use event delegation to handle dynamically loaded notification elements
+if (typeof window !== 'undefined') {
+    const initNotifications = () => {
+        const $ = window.jQuery || window.$;
+        if (!$) return;
+
+        // Use event delegation so it works for dynamically loaded notifications
+        $(document).on('click', '.btn-marked', toggleRead);
+    };
+
+    // Initialize when DOM is ready, or immediately if already loaded
+    if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', initNotifications);
+    } else {
+        initNotifications();
+    }
 }

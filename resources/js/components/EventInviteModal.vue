@@ -7,26 +7,72 @@
       size="lg"
   >
     <template slot="default">
-      <div class="form-group">
-        <label for="manual_invite_box">{{ __('events.manual_invite_box') }}:</label>
-        <b-form-textarea
-            id="manual_invite_box"
-            v-model="manualInviteBox"
-            rows="3"
-            :placeholder="__('events.manual_invite_placeholder') || 'Enter email addresses separated by commas'"
-        />
+      <div class="form-group" v-if="canedit && groupVolunteers && groupVolunteers.length > 0">
+        <label>{{ __('events.select_group_members') }}:</label>
+        <multiselect
+            v-model="selectedMembers"
+            :options="groupVolunteers"
+            :multiple="true"
+            :close-on-select="false"
+            :clear-on-select="false"
+            :preserve-search="true"
+            :placeholder="__('events.select_members_placeholder')"
+            track-by="user"
+            :custom-label="memberLabel"
+            :taggable="false"
+            :selectedLabel="__('partials.remove')"
+            selectLabel=""
+            deselectLabel=""
+        >
+          <template slot="tag" slot-scope="{ option, remove }">
+            <span class="multiselect__tag">
+              <span>{{ option.name }}</span>
+              <i aria-hidden="true" tabindex="1" class="multiselect__tag-icon" @click="remove(option)"></i>
+            </span>
+          </template>
+          <template slot="option" slot-scope="{ option }">
+            <span>{{ option.name }}</span>
+          </template>
+        </multiselect>
+        <div class="form-check mt-2">
+          <b-form-checkbox
+              id="invites_to_volunteers"
+              v-model="inviteGroupMembers"
+              @change="onCheckboxChange"
+          >
+            {{ __('events.send_invites_to_restarters_tickbox', { group: groupName }) }}
+          </b-form-checkbox>
+        </div>
       </div>
 
-      <div class="form-check" v-if="canedit">
-        <b-form-checkbox
-            id="invites_to_volunteers"
-            v-model="inviteGroupMembers"
-            @change="onCheckboxChange"
+      <div class="form-group">
+        <label for="manual_invite_box">{{ __('events.manual_invite_box') }}:</label>
+        <multiselect
+            id="manual_invite_box"
+            ref="emailMultiselect"
+            v-model="manualEmails"
+            :options="[]"
+            :multiple="true"
+            :taggable="true"
+            :close-on-select="false"
+            :clear-on-select="true"
+            :placeholder="__('events.manual_invite_placeholder')"
+            tag-placeholder="Press enter or tab to add email"
+            @tag="addEmailTag"
+            @keydown.native.tab="onTabKey"
+            :class="{ 'has-invalid-email': hasInvalidEmail }"
         >
-          {{ __('events.send_invites_to_restarters_tickbox', { group: groupName }) }}
-        </b-form-checkbox>
+          <template slot="tag" slot-scope="{ option, remove }">
+            <span class="multiselect__tag" :class="{ 'invalid-email': !isValidEmail(option) }">
+              <span>{{ option }}</span>
+              <i aria-hidden="true" tabindex="1" class="multiselect__tag-icon" @click="remove(option)"></i>
+            </span>
+          </template>
+          <template slot="noOptions">
+            <span></span>
+          </template>
+        </multiselect>
       </div>
-      <br v-if="canedit" />
 
       <small class="after-offset">{{ __('events.type_email_addresses_message') }}</small>
       <hr/>
@@ -44,7 +90,7 @@
 
     <template slot="modal-footer">
       <a href="#" class="text-dark mb-0 mr-auto" @click.prevent="hide">{{ __('events.cancel_invites_link') }}</a>
-      <b-button variant="primary" @click="submit" :disabled="!canSubmit">
+      <b-button variant="primary" @mousedown.prevent="submit" :disabled="!canSubmit">
         {{ __('events.send_invite_button') }}
       </b-button>
     </template>
@@ -52,8 +98,6 @@
 </template>
 
 <script>
-import axios from 'axios'
-
 export default {
   props: {
     idevents: {
@@ -69,28 +113,64 @@ export default {
   data() {
     return {
       showModal: false,
-      manualInviteBox: '',
+      manualEmails: [],
       messageToRestarters: '',
       inviteGroupMembers: false,
       groupId: null,
       groupName: '',
-      memberEmails: []
+      selectedMembers: []
     }
   },
   computed: {
     canSubmit() {
-      return this.manualInviteBox.trim().length > 0
+      // Can submit if there are selected members OR manual email entries
+      return this.selectedMembers.length > 0 || this.manualEmails.length > 0
+    },
+    hasInvalidEmail() {
+      return this.manualEmails.some(email => !this.isValidEmail(email))
     },
     groupVolunteers() {
-      return this.groupId ? this.$store.getters['volunteers/byGroup'](this.groupId) : []
+      if (!this.groupId) return []
+      const volunteers = this.$store.getters['volunteers/byGroup'](this.groupId)
+      return volunteers || []
+    },
+    // Combine selected member emails with manual email entries
+    allEmails() {
+      const memberEmails = this.selectedMembers
+        .filter(v => v.email)
+        .map(v => v.email)
+      return [...memberEmails, ...this.manualEmails].join(', ')
     }
   },
   methods: {
+    memberLabel(member) {
+      return member.name
+    },
+    isValidEmail(email) {
+      return email && email.indexOf('@') !== -1
+    },
+    addEmailTag(newTag) {
+      // Strip commas and trim the tag, then add if not already present
+      const trimmed = newTag.replace(/,/g, '').trim()
+      if (trimmed && !this.manualEmails.includes(trimmed)) {
+        this.manualEmails.push(trimmed)
+      }
+    },
+    onTabKey(event) {
+      // Get the current search/input value from the multiselect
+      const multiselect = this.$refs.emailMultiselect
+      if (multiselect && multiselect.search) {
+        event.preventDefault()
+        this.addEmailTag(multiselect.search)
+        multiselect.search = ''
+      }
+    },
     async show() {
       // Reset form state
-      this.manualInviteBox = ''
+      this.manualEmails = []
       this.messageToRestarters = ''
       this.inviteGroupMembers = false
+      this.selectedMembers = []
 
       // Get the event details to get group info
       const event = await this.$store.dispatch('events/fetch', {
@@ -103,11 +183,6 @@ export default {
       // Fetch group volunteers to get their emails
       await this.$store.dispatch('volunteers/fetchGroup', this.groupId)
 
-      // Extract emails from volunteers
-      this.memberEmails = this.groupVolunteers
-        .filter(v => v.email)
-        .map(v => v.email)
-
       this.showModal = true
     },
     hide() {
@@ -115,54 +190,60 @@ export default {
       this.showModal = false
     },
     onCheckboxChange(checked) {
-      if (checked && this.memberEmails.length > 0) {
-        // Add member emails to textarea
-        const currentEmails = this.manualInviteBox.trim()
-        if (currentEmails) {
-          // Append to existing emails, avoiding duplicates
-          const existingEmails = currentEmails.split(',').map(e => e.trim().toLowerCase())
-          const newEmails = this.memberEmails.filter(email =>
-            !existingEmails.includes(email.trim().toLowerCase())
-          )
-          if (newEmails.length > 0) {
-            this.manualInviteBox = currentEmails + ', ' + newEmails.join(', ')
-          }
-        } else {
-          this.manualInviteBox = this.memberEmails.join(', ')
-        }
-      } else if (!checked && this.memberEmails.length > 0) {
-        // Remove member emails from textarea when unchecked
-        const currentEmails = this.manualInviteBox.trim()
-        if (currentEmails) {
-          const memberEmailList = this.memberEmails.map(e => e.trim().toLowerCase())
-          const remainingEmails = currentEmails.split(',')
-            .map(e => e.trim())
-            .filter(email => !memberEmailList.includes(email.toLowerCase()))
-          this.manualInviteBox = remainingEmails.join(', ')
-        }
+      if (checked) {
+        // Select all group members with emails
+        this.selectedMembers = this.groupVolunteers.filter(v => v.email)
+      } else {
+        // Deselect all members
+        this.selectedMembers = []
       }
     },
-    async submit() {
-      try {
-        await axios.post('/party/invite', {
-          event_id: this.idevents,
-          group_name: this.groupName,
-          manual_invite_box: this.manualInviteBox,
-          message_to_restarters: this.messageToRestarters,
-          invite_group: this.inviteGroupMembers ? 1 : 0
-        }, {
-          headers: {
-            'X-CSRF-TOKEN': this.$store.getters['auth/CSRF']
-          }
-        })
+    submit() {
+      // Create and submit a form (the controller expects form submission, not AJAX)
+      const form = document.createElement('form')
+      form.method = 'POST'
+      form.action = '/party/invite'
 
-        this.hide()
-        // Refresh the page to show updated invitations
-        window.location.reload()
-      } catch (error) {
-        console.error('Failed to send invites:', error)
+      // Get CSRF token directly from meta tag for reliability
+      const csrfToken = document.head.querySelector('meta[name="csrf-token"]')?.content
+
+      const fields = {
+        '_token': csrfToken,
+        'event_id': this.idevents,
+        'group_name': this.groupName,
+        'manual_invite_box': this.allEmails,
+        'message_to_restarters': this.messageToRestarters
       }
+
+      for (const [name, value] of Object.entries(fields)) {
+        const input = document.createElement('input')
+        input.type = 'hidden'
+        input.name = name
+        input.value = value
+        form.appendChild(input)
+      }
+
+      document.body.appendChild(form)
+      form.submit()
     }
   }
 }
 </script>
+
+<style scoped>
+/* Vue 2 deep selector for multiselect styling */
+.invalid-email {
+  background-color: #f8d7da !important;
+  border-color: #dc3545 !important;
+}
+
+.has-invalid-email >>> .multiselect__tags {
+  border: 2px solid #dc3545;
+}
+
+/* Target multiselect tags directly */
+>>> .multiselect__tag.invalid-email {
+  background-color: #f8d7da !important;
+  border: 1px solid #dc3545 !important;
+}
+</style>

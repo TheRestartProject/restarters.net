@@ -216,6 +216,11 @@
     height: auto;
 }
 
+// Remove dropdown arrow from multi-select elements
+select[multiple].form-control {
+    background-image: none;
+}
+
 .tokenfield {
     margin-bottom: 15px;
     padding: 3px 2px;
