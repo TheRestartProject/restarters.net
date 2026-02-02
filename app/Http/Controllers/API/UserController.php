@@ -103,20 +103,24 @@ class UserController extends Controller
             if (Cache::has('talk_notification_' . $user->username)) {
                 $discourseNotifications = Cache::get('talk_notification_' . $user->username);
             } else {
-                if (config('restarters.features.discourse_integration')) {
-                    $client = app('discourse-client');
-                    $response = $client->request('GET', '/notifications.json?username=' . $user->username);
-                    $talk_notifications = json_decode($response->getBody()->getContents(), true);
+                try {
+                    if (config('restarters.features.discourse_integration')) {
+                        $client = app('discourse-client');
+                        $response = $client->request('GET', '/notifications.json?username=' . $user->username);
+                        $talk_notifications = json_decode($response->getBody()->getContents(), true);
 
-                    if (!empty($talk_notifications) && array_key_exists('notifications', $talk_notifications)) {
-                        foreach ($talk_notifications['notifications'] as $notification) {
-                            if ($notification['read'] !== true) {
-                                $discourseNotifications++;
+                        if (!empty($talk_notifications) && array_key_exists('notifications', $talk_notifications)) {
+                            foreach ($talk_notifications['notifications'] as $notification) {
+                                if ($notification['read'] !== true) {
+                                    $discourseNotifications++;
+                                }
                             }
-                        }
 
-                        Cache::put('talk_notification_' . $user->username, $discourseNotifications, 60);
+                            Cache::put('talk_notification_' . $user->username, $discourseNotifications, 60);
+                        }
                     }
+                } catch (\Exception $e) {
+                    // Discourse unavailable - fail gracefully with 0 notifications
                 }
             }
         }
