@@ -44,6 +44,10 @@ fi
     php /var/www/artisan route:cache 2>/dev/null || true
     php /var/www/artisan view:cache 2>/dev/null || true
     php /var/www/artisan queue:restart 2>/dev/null || true
+
+    # Re-fix ownership: the commands above run as root and may create
+    # files that php-fpm (www-data) later needs to write to.
+    chown -R www-data:www-data /var/www/storage /var/www/bootstrap/cache
 ) &
 
 # Start supervisord immediately (manages nginx, php-fpm, cron)
