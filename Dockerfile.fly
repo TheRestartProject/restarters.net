@@ -89,7 +89,7 @@ RUN sed -i 's|listen = 127.0.0.1:9000|listen = /var/run/php-fpm.sock|' /usr/loca
 RUN cp /usr/local/etc/php/php.ini-production /usr/local/etc/php/conf.d/php.ini && \
     echo "upload_max_filesize = 100M" >> /usr/local/etc/php/conf.d/php.ini && \
     echo "post_max_size = 100M" >> /usr/local/etc/php/conf.d/php.ini && \
-    echo "memory_limit = 512M" >> /usr/local/etc/php/conf.d/php.ini
+    echo "memory_limit = 1024M" >> /usr/local/etc/php/conf.d/php.ini
 
 # Copy nginx config
 COPY docker/nginx-fly.conf /etc/nginx/nginx.conf

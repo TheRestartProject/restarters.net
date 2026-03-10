@@ -1,0 +1,44 @@
+name: Deploy to Fly.io
+
+# NOT ACTIVATED YET - this workflow is prepared for future use.
+# To activate: change the branch filter to 'production' and add
+# FLY_API_TOKEN to GitHub repo secrets.
+#
+# For CircleCI integration instead, add a deploy job to .circleci/config.yml
+# that runs after the build job succeeds on the production branch:
+#
+#   deploy-fly:
+#     docker:
+#       - image: cimg/base:current
+#     steps:
+#       - checkout
+#       - run: curl -L https://fly.io/install.sh | sh
+#       - run: ~/.fly/bin/flyctl deploy --remote-only
+#     environment:
+#       FLY_API_TOKEN: (set in CircleCI project settings)
+#
+#   workflows:
+#     build-and-deploy:
+#       jobs:
+#         - build
+#         - deploy-fly:
+#             requires:
+#               - build
+#             filters:
+#               branches:
+#                 only: production
+
+on:
+  push:
+    branches:
+      - DISABLED-fly-deploy  # Change to 'production' to activate
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: superfly/flyctl-actions/setup-flyctl@master
+      - run: flyctl deploy --remote-only
+        env:
+          FLY_API_TOKEN: ${{ secrets.FLY_API_TOKEN }}
