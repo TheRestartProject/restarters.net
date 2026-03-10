@@ -1,0 +1,17 @@
+app = "restarters-pma"
+primary_region = "lhr"
+
+[build]
+  image = "phpmyadmin:5"
+
+[env]
+  PMA_HOST = "restarters-db.internal"
+  PMA_PORT = "3306"
+  UPLOAD_LIMIT = "100M"
+
+# No [http_service] — not publicly accessible.
+# Access via: fly proxy 8080:80 -a restarters-pma
+
+[[vm]]
+  size = "shared-cpu-1x"
+  memory = 256

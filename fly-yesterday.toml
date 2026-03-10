@@ -1,23 +1,20 @@
-app = "restarters"
+app = "restarters-yesterday"
 primary_region = "lhr"
 
 [build]
   dockerfile = "Dockerfile.fly"
 
-# Migrations run in startup.sh instead of release_command because
-# release_command machines don't have 6PN network access to the DB.
-
 [env]
   APP_ENV = "staging"
-  APP_DEBUG = "false"
-  APP_URL = "https://restarters.fly.dev"
+  APP_DEBUG = "true"
+  APP_URL = "https://restarters-yesterday.fly.dev"
   DB_CONNECTION = "mysql"
-  DB_HOST = "restarters-db.internal"
+  DB_HOST = "restarters-db-yesterday.internal"
   DB_PORT = "3306"
   DB_DATABASE = "restarters"
   CACHE_DRIVER = "file"
-  SESSION_DRIVER = "database"
-  QUEUE_CONNECTION = "database"
+  SESSION_DRIVER = "file"
+  QUEUE_CONNECTION = "sync"
   SESSION_DOMAIN = ""
   LOG_CHANNEL = "stderr"
   FILESYSTEM_DISK = "s3"
@@ -26,7 +23,7 @@ primary_region = "lhr"
   AWS_USE_PATH_STYLE_ENDPOINT = "true"
   FEATURE__WIKI_INTEGRATION = "false"
   FEATURE__DISCOURSE_INTEGRATION = "false"
-  SENTRY_ENVIRONMENT = "staging"
+  SENTRY_ENVIRONMENT = "yesterday-restore"
   # Table type constants
   TBL_USERS = "1"
   TBL_GROUPS = "2"
@@ -47,7 +44,7 @@ primary_region = "lhr"
   EMISSION_RATIO_UNPOWERED = "17.70147059"
   EMISSION_RATIO_POWERED = "32.06679233"
   # Session
-  SESSION_COOKIE = "restarters_session"
+  SESSION_COOKIE = "restarters_yesterday_session"
   SESSION_LIFETIME = "10080"
   SESSION_TABLE = "laravel_sessions"
   # Misc
@@ -57,19 +54,9 @@ primary_region = "lhr"
 [http_service]
   internal_port = 80
   force_https = true
-  auto_stop_machines = "off"
+  auto_stop_machines = "stop"
   auto_start_machines = true
-  min_machines_running = 1
-
-[checks]
-  [checks.health]
-    port = 80
-    type = "http"
-    interval = "15s"
-    timeout = "5s"
-    grace_period = "120s"
-    method = "GET"
-    path = "/"
+  min_machines_running = 0
 
 [[vm]]
   size = "shared-cpu-1x"
