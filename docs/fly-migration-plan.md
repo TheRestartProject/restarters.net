@@ -62,9 +62,9 @@
 - `restarters.net` — main app → **DNS changes to Fly.io**
 - `www.restarters.net` — CNAME to `restarters.net` → follows main domain
 - `map.restarters.net` — currently same server → **needs separate plan**
-- `repairtogether.restarters.net` — network subdomain (Repair Together, Belgium, `fr-BE`) → **DNS must move to Fly + `fly certs add`**
-- `repairshare.restarters.net` — network subdomain (Repair Share) → **DNS must move to Fly + `fly certs add`**
-- `hauts-de-france.restarters.net` — network subdomain (Hauts-de-France) → **DNS must move to Fly + `fly certs add`**
+- `repairtogether.restarters.net` — network subdomain (Repair Together, Belgium, `fr-BE`) → **DNS must move to Fly** (covered by wildcard cert)
+- `repairshare.restarters.net` — network subdomain (Repair Share) → **DNS must move to Fly** (covered by wildcard cert)
+- `hauts-de-france.restarters.net` — network subdomain (Hauts-de-France) → **DNS must move to Fly** (covered by wildcard cert)
 - `talk.restarters.net` — Discourse (external) → no change
 - `wiki.restarters.net` — MediaWiki (external) → no change
 - `therestartproject.org` — WordPress (external) → no change
@@ -445,14 +445,24 @@ workflows:
 
 This can be tested by merging to the production branch before DNS cutover — the deploy will go to Fly.io and be accessible on `restarters.fly.dev`.
 
-#### Add custom domain (before cutover)
+#### Set up wildcard TLS certificate (before cutover — do this now)
 
+A wildcard cert covers `*.restarters.net` — all network subdomains (`repairtogether`, `repairshare`, `hauts-de-france`) plus `www`, without needing individual `fly certs add` for each.
+
+**Already done (2026-03-19):**
 ```bash
-fly certs add restarters.net -a restarters
-fly certs add www.restarters.net -a restarters
+fly certs add "*.restarters.net" -a restarters   # ✅ Done
+fly certs add restarters.net -a restarters        # Also needed for the apex domain
 ```
 
-The certificate won't be issued until DNS points to Fly.io (Let's Encrypt needs to reach it for the HTTP-01 challenge), but adding the domain is a prerequisite that should be done early.
+**DNS validation required** — add this CNAME at iwantmyname.com now (does not affect current production):
+```
+_acme-challenge.restarters.net.  CNAME  restarters.net.369kyp0.flydns.net.
+```
+
+Once the CNAME is in place, Fly.io will issue the wildcard cert via DNS-01 challenge. Unlike per-domain HTTP-01 validation, this works **before** DNS cutover, so the cert can be ready and waiting.
+
+Check progress: `fly certs check "*.restarters.net" -a restarters`
 
 ### Cutover Steps (maintenance window — aim for minimal duration)
 
@@ -482,24 +492,42 @@ DNS is hosted at **iwantmyname.com**. Since iwantmyname does not support CNAME f
 - IPv6 (dedicated): `2a09:8280:1::ce:b85f:0`
 
 ```
-restarters.net.      300    A        66.241.124.187
-restarters.net.      300    AAAA     2a09:8280:1::ce:b85f:0
-www.restarters.net.  300    CNAME    restarters.net.
+restarters.net.                   300    A        66.241.124.187
+restarters.net.                   300    AAAA     2a09:8280:1::ce:b85f:0
+www.restarters.net.               300    CNAME    restarters.net.
+repairtogether.restarters.net.    300    A        66.241.124.187
+repairtogether.restarters.net.    300    AAAA     2a09:8280:1::ce:b85f:0
+repairshare.restarters.net.       300    A        66.241.124.187
+repairshare.restarters.net.       300    AAAA     2a09:8280:1::ce:b85f:0
+hauts-de-france.restarters.net.   300    A        66.241.124.187
+hauts-de-france.restarters.net.   300    AAAA     2a09:8280:1::ce:b85f:0
 ```
+
+Or, if iwantmyname supports wildcard DNS records:
+```
+*.restarters.net.    300    A        66.241.124.187
+*.restarters.net.    300    AAAA     2a09:8280:1::ce:b85f:0
+```
+
+**Note:** Do NOT wildcard DNS if `map.restarters.net` still needs the old server. In that case, use individual records above.
 
 If a dedicated IPv4 is needed later: `fly ips allocate-v4 -a restarters` (~$2/month).
 
 #### Step 3: Verify TLS Certificate
 
 ```bash
-# Wait for certificate to be issued (usually 1-5 minutes after DNS propagation)
+# Wildcard cert (should already be issued via DNS-01 validation done pre-cutover)
+fly certs check "*.restarters.net" -a restarters
+
+# Apex domain
 fly certs check restarters.net -a restarters
 
 # Verify in browser
 curl -I https://restarters.net
+curl -I https://repairtogether.restarters.net
 ```
 
-**Certificate Renewal:** Fly.io auto-renews Let's Encrypt certificates (typically 30 days before the 90-day expiry). No certbot or cron needed. DNS must continue pointing to Fly.io for renewal to work.
+**Certificate Renewal:** Fly.io auto-renews Let's Encrypt certificates. The wildcard cert renews via DNS-01 challenge using the `_acme-challenge` CNAME — this must remain in place permanently. No certbot or cron needed.
 
 #### Step 6: Verify Application
 
