@@ -106,12 +106,24 @@ The GitHub Actions workflow (`.github/workflows/fly-deploy.yml`) is prepared but
 
 ### 1 Week Before Migration
 
-- [ ] **Lower DNS TTL** for `restarters.net` (and any relevant subdomains) to **300 seconds** (5 minutes)
-  - This ensures fast propagation during the cutover
-  - Current TTL is likely 3600s or higher; lowering a week early ensures all caches have expired
+- [ ] **Lower DNS TTL** for `restarters.net` and relevant subdomains to **300 seconds** (5 minutes)
+  - DNS is hosted at **iwantmyname.com** (nameservers: `dns1/2/3.iwantmyname.com`)
+  - Current TTL is **3600s** for all records
+  - Records that need TTL lowered:
+    - `restarters.net` — A record → `139.59.184.196` (current production server)
+    - `www.restarters.net` — CNAME → `restarters.net`
+    - `map.restarters.net` — A record → `139.59.184.196` (same server, may need separate migration)
+  - Records that do NOT need changing (external services):
+    - `talk.restarters.net` — CNAME → `restarters.discoursehosting.net` (Discourse, externally hosted)
+    - `wiki.restarters.net` — A record → `165.22.123.158` (MediaWiki, separate server)
+    - `mg.restarters.net` — Mailgun subdomain (SPF + MX + DKIM set, do not change)
 - [ ] **Document current DNS records** for rollback purposes
-  - A record for `restarters.net`
-  - Any CNAME, MX, or TXT records
+  - `restarters.net` A → `139.59.184.196` (current production)
+  - `www.restarters.net` CNAME → `restarters.net`
+  - `map.restarters.net` A → `139.59.184.196`
+  - `talk.restarters.net` CNAME → `restarters.discoursehosting.net`
+  - `wiki.restarters.net` A → `165.22.123.158`
+  - `mg.restarters.net` — Mailgun (TXT SPF, MX, DKIM records)
 - [ ] **Final staging test** with production data
   - Run `fly-migrate.sh --db-only` to load a recent production DB snapshot
   - Run `fly-migrate.sh --images-only` to sync all images to Tigris
@@ -119,10 +131,7 @@ The GitHub Actions workflow (`.github/workflows/fly-deploy.yml`) is prepared but
 
 ### Day Before Migration
 
-- [ ] **Take a full production database backup** and store it safely off-server
-  ```bash
-  mysqldump --single-transaction --routines --triggers restarters > restarters-pre-migration-$(date +%Y%m%d).sql
-  ```
+- [x] **Daily production database backups** *(DONE — already running daily backups)*
 - [ ] **Verify DNS TTL is at 300s** (check with `dig restarters.net`)
 - [ ] **Notify users** of planned maintenance window if appropriate
 - [ ] **Verify Fly.io deploy workflow** is ready to activate (secrets set in GitHub, branch filter prepared)
@@ -167,6 +176,8 @@ These are set via `fly secrets set` or `fly secrets import` (the `fly-migrate.sh
 
 | Secret | Purpose | Action Required |
 |---|---|---|
+| `MAIL_FROM_ADDRESS` | Email "from" address | **Critical.** Currently defaults to `hello@example.com`. Set from production `.env` |
+| `MAIL_FROM_NAME` | Email "from" name | **Critical.** Currently defaults to `Example`. Set from production `.env` |
 | `WP_XMLRPC_ENDPOINT` | WordPress XML-RPC URL | Set from production `.env`. Used by event/group sync commands. |
 | `WP_XMLRPC_USER` | WordPress XML-RPC username | Set from production `.env` |
 | `WP_XMLRPC_PSWD` | WordPress XML-RPC password | Set from production `.env` |
@@ -174,41 +185,53 @@ These are set via `fly secrets set` or `fly secrets import` (the `fly-migrate.sh
 
 ### 4.2 Mailgun
 
-**Reconfiguration needed:** Possibly.
+**Reconfiguration needed:** Yes — `MAIL_FROM_ADDRESS` and `MAIL_FROM_NAME` are missing from Fly secrets.
 
-- If Mailgun is configured via SMTP (`MAIL_MAILER=smtp`, `MAIL_HOST=smtp.mailgun.org`), no change is needed -- the app connects outbound to Mailgun's SMTP servers.
-- If using the Mailgun HTTP API driver (`MAIL_MAILER=mailgun`), also no infrastructure change, but verify `MAILGUN_ENDPOINT` is correct (EU endpoint is `api.eu.mailgun.net`).
-- **SPF/DKIM records** for the sending domain must remain valid. If the sending domain is `restarters.net`, no DNS changes are needed for email -- SPF and DKIM are domain-level, not IP-level.
-- **Verify:** Send a test email from staging and check deliverability.
+**Verified on 2026-03-19:**
+- ✅ **Test email sent successfully** from Fly.io to `edward@therestartproject.org`
+- ✅ **Mail driver:** `MAIL_MAILER=mailgun` (uses Mailgun HTTP API, not SMTP)
+- ✅ **Mailgun domain:** `mg.restarters.net` (EU endpoint: `api.eu.mailgun.net`)
+- ✅ **SPF:** `mg.restarters.net` has SPF record: `v=spf1 include:eu.mailgun.org ~all`
+- ✅ **DKIM:** `mta._domainkey.mg.restarters.net` has RSA key set
+- ⚠️ **No DMARC record** for `mg.restarters.net` (not strictly required but recommended)
+- ❌ **`MAIL_FROM_ADDRESS` not set** — defaults to `hello@example.com`. Must be set from production `.env`
+- ❌ **`MAIL_FROM_NAME` not set** — defaults to `Example`. Must be set from production `.env`
+
+**No DNS changes needed for email** — Mailgun uses `mg.restarters.net` subdomain which has its own SPF/DKIM/MX records independent of the main A record.
 
 ### 4.3 Discourse Integration
 
-**Reconfiguration needed:** Yes, on the Discourse side.
+**Reconfiguration needed:** No — domain stays the same, confirmed no IP matching.
 
-- The Restarters app acts as an SSO provider for Discourse. The Discourse instance is configured with a `sso_url` pointing to the Restarters app (e.g., `https://restarters.net/discourse/sso`).
-- After DNS cutover, this URL will resolve to Fly.io. **No Discourse config change is needed if the domain stays the same.**
+**Verified on 2026-03-19:**
+- ✅ **Feature flag fixed:** `FEATURE__DISCOURSE_INTEGRATION=true` now set as Fly secret (was incorrectly `false`)
+- ✅ **Community Tech confirmed** they do not do any IP matching, so the Discourse SSO will work as long as the domain stays the same
+- The Restarters app acts as an SSO provider for Discourse. The Discourse instance is configured with a `sso_url` pointing to `https://restarters.net/discourse/sso`.
+- After DNS cutover, this URL will resolve to Fly.io. **No Discourse config change is needed.**
 - If testing on `restarters.fly.dev` before DNS cutover, Discourse SSO will not work (URL mismatch). This is expected.
 - The `DISCOURSE_URL` secret points Restarters to Discourse -- this does not change.
 - **Scheduled tasks** that sync with Discourse (`discourse:syncgroups` every 15 minutes) will run via cron on the Fly.io container.
-- **Feature flag:** Currently `FEATURE__DISCOURSE_INTEGRATION=false` in fly.toml for staging. **Must be set to `true` in fly.toml or as a Fly secret before production cutover.**
 
 ### 4.4 MediaWiki / Wiki Integration
 
-**Reconfiguration needed:** Minimal.
+**Reconfiguration needed:** No.
 
-- Currently disabled in fly.toml (`FEATURE__WIKI_INTEGRATION=false`).
-- The `MediawikiServiceProvider` checks this flag and skips registration if disabled.
-- Wiki-related event listeners (password change, login/logout sync) also check this flag.
-- **Decision required:** If Wiki integration should remain disabled on Fly.io, no action needed. If re-enabling, ensure `WIKI_URL` and related secrets are set, and that the Wiki server can accept API connections from Fly.io's IP range.
+**Verified on 2026-03-19:**
+- ✅ **Feature flag fixed:** `FEATURE__WIKI_INTEGRATION=true` now set as Fly secret (was incorrectly `false`)
+- ✅ Wiki secrets are all set (`WIKI_URL`, `WIKI_DB`, `WIKI_APIUSER`, `WIKI_APIPASSWORD`)
+- Wiki is hosted separately at `wiki.restarters.net` (165.22.123.158) — not affected by migration
+- Wiki-related event listeners (password change, login/logout sync) will work from Fly.io as they connect outbound
 
 ### 4.5 WordPress XML-RPC
 
-**Reconfiguration needed:** No infrastructure change.
+**Reconfiguration needed:** Secrets need to be set.
 
-- The app connects outbound to WordPress via XML-RPC (`WP_XMLRPC_ENDPOINT`).
+**Verified on 2026-03-19:**
+- ✅ **Endpoint reachable from Fly.io:** `https://therestartproject.org/fxm.php` returns HTTP 200 (POST)
+- ❌ **Secrets not yet set:** `WP_XMLRPC_ENDPOINT`, `WP_XMLRPC_USER`, `WP_XMLRPC_PSWD` must be copied from production `.env`
 - WordPress event/group sync happens via queue jobs (listeners like `CreateWordpressPostForEvent`, `EditWordpressPostForGroup`, etc.).
 - The queue worker on Fly.io will process these jobs.
-- **Verify:** The WordPress endpoint must be reachable from Fly.io's network. If it has IP-based access restrictions, Fly.io's outbound IPs may need to be allowed.
+- No IP-based access restrictions on the WordPress side.
 
 ### 4.6 Geocoding (Google Maps / Mapbox)
 
@@ -290,10 +313,12 @@ The `scripts/fly-migrate.sh` script handles this in three phases. For the databa
 
 ### 5.3 Croppa (Image Thumbnailing)
 
-The Croppa config (`config/croppa.php`) uses the `public_uploads` disk (local filesystem). On Fly.io with S3 storage, Croppa's source and crop directories point to local disk, but images are served from Tigris. This means:
+**Verified on 2026-03-19:** `Croppa::url()` is **not called anywhere** in the application code or templates. Dynamic Croppa resizing is NOT actively used. All thumbnails are pre-generated at upload time (prefixed `thumbnail_*`, `mid_*`).
 
-- Pre-generated thumbnails (`thumbnail_*`, `mid_*`) are uploaded to Tigris alongside the originals by the sync script.
-- Dynamic Croppa resizing (if used) would fail unless the source image is available locally. Verify whether Croppa dynamic resizing is actively used or if all thumbnails are pre-generated at upload time.
+This means:
+- Pre-generated thumbnails are uploaded to Tigris alongside the originals by the sync script — no special handling needed
+- Croppa config exists but is effectively unused for runtime image processing
+- **No action required** for Croppa during migration
 
 ---
 
