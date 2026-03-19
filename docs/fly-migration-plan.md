@@ -24,7 +24,7 @@
 ---
 
 <details>
-<summary><h2>1. What Changes</h2></summary>
+<summary><strong>1. What Changes</strong></summary>
 
 | Area | Current (ServerPilot) | Fly.io | Risk |
 |---|---|---|---|
@@ -43,7 +43,7 @@
 </details>
 
 <details>
-<summary><h2>2. What Stays the Same</h2></summary>
+<summary><strong>2. What Stays the Same</strong></summary>
 
 - **Domain** — `restarters.net` stays the same, DNS just points to new IP
 - **External services** — all connect outbound, unaffected by server change:
@@ -71,7 +71,7 @@
 </details>
 
 <details open>
-<summary><h2>3. Known Risks</h2></summary>
+<summary><strong>3. Known Risks</strong></summary>
 
 ### 3.1 FixometerFile — Local Disk Writes (HIGH RISK — BLOCKER)
 
@@ -131,7 +131,7 @@ Currently served from the same server (`139.59.184.196`). If DNS for `restarters
 </details>
 
 <details>
-<summary><h2>4. Pre-migration Checklist</h2></summary>
+<summary><strong>4. Pre-migration Checklist</strong></summary>
 
 ### 2-3 Weeks Before Migration
 
@@ -184,7 +184,7 @@ Currently served from the same server (`139.59.184.196`). If DNS for `restarters
 </details>
 
 <details>
-<summary><h2>5. Service Dependencies and Reconfiguration</h2></summary>
+<summary><strong>5. Service Dependencies and Reconfiguration</strong></summary>
 
 ### 4.1 Secrets Required on Fly.io
 
@@ -309,7 +309,7 @@ The from address (`noreply@mg.rstrt.org`) is on a different domain to the Mailgu
 </details>
 
 <details>
-<summary><h2>6. Data Migration</h2></summary>
+<summary><strong>6. Data Migration</strong></summary>
 
 ### 5.1 Database Migration
 
@@ -380,7 +380,7 @@ This means:
 </details>
 
 <details>
-<summary><h2>7. DNS Cutover Strategy</h2></summary>
+<summary><strong>7. DNS Cutover Strategy</strong></summary>
 
 ### Prerequisites
 
@@ -524,7 +524,7 @@ After 1-2 weeks of stable operation:
 </details>
 
 <details>
-<summary><h2>8. Smoke Tests</h2></summary>
+<summary><strong>8. Smoke Tests</strong></summary>
 
 ### Immediate (within 5 minutes of DNS cutover)
 
@@ -589,7 +589,7 @@ After 1-2 weeks of stable operation:
 </details>
 
 <details>
-<summary><h2>9. Rollback Plan</h2></summary>
+<summary><strong>9. Rollback Plan</strong></summary>
 
 ### Rollback Decision Criteria
 
@@ -658,7 +658,7 @@ To minimize the risk of needing to merge data from two databases:
 </details>
 
 <details>
-<summary><h2>10. Post-Cutover Monitoring</h2></summary>
+<summary><strong>10. Post-Cutover Monitoring</strong></summary>
 
 ### First 24 Hours
 
@@ -719,7 +719,7 @@ To minimize the risk of needing to merge data from two databases:
 </details>
 
 <details>
-<summary><h2>11. Timeline</h2></summary>
+<summary><strong>11. Timeline</strong></summary>
 
 ### Suggested Schedule
 
@@ -755,7 +755,7 @@ To minimize the risk of needing to merge data from two databases:
 </details>
 
 <details>
-<summary><h2>12. Reference: Fly.io Architecture</h2></summary>
+<summary><strong>12. Reference: Fly.io Architecture</strong></summary>
 
 See `Dockerfile.fly`, `docker/supervisord-fly.conf`, `docker/nginx-fly.conf`, `.fly/scripts/startup.sh` for implementation details.
 
@@ -771,7 +771,7 @@ Fly apps in `lhr` region:
 </details>
 
 <details>
-<summary><h2>Appendix A: Key File References</h2></summary>
+<summary><strong>Appendix A: Key File References</strong></summary>
 
 | File | Purpose |
 |---|---|
@@ -798,7 +798,7 @@ Fly apps in `lhr` region:
 </details>
 
 <details>
-<summary><h2>Appendix B: Environment Variables in fly.toml</h2></summary>
+<summary><strong>Appendix B: Environment Variables in fly.toml</strong></summary>
 
 The following are set as non-secret env vars in `fly.toml` and will need updating for production:
 
@@ -814,7 +814,7 @@ The following are set as non-secret env vars in `fly.toml` and will need updatin
 </details>
 
 <details>
-<summary><h2>Appendix C: Fly CLI Quick Reference</h2></summary>
+<summary><strong>Appendix C: Fly CLI Quick Reference</strong></summary>
 
 ```bash
 # Deploy
