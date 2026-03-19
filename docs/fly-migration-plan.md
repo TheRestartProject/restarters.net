@@ -37,8 +37,10 @@
 - `restarters.net` - main application
 - `talk.restarters.net` - Discourse (Restarters Talk) -- externally hosted, not migrated
 - `wiki.restarters.net` - MediaWiki (Restarters Wiki) -- externally hosted, not migrated
-- `map.restarters.net` - Repair Directory -- separate app, not migrated
+- `map.restarters.net` - Repair Directory -- same server as main app, may need separate migration
 - `therestartproject.org` - WordPress site -- separate, not migrated
+- `mg.restarters.net` - Mailgun sending domain (EU, `MAILGUN_DOMAIN`) -- DNS records must not change
+- `mg.rstrt.org` - from address domain (`MAIL_FROM_ADDRESS=noreply@mg.rstrt.org`) -- **⚠️ DMARC misalignment**: this domain is on US Mailgun but mail is sent via EU Mailgun domain `mg.restarters.net` (see section 4.2)
 
 ---
 
