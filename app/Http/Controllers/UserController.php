@@ -871,7 +871,7 @@ class UserController extends Controller
             'skills' => Fixometer::allSkills(),
             'co2Total' => $stats['waste_stats'][0]->powered_footprint + $stats['waste_stats'][0]->unpowered_footprint,
             'wasteTotal' => $stats['waste_stats'][0]->powered_waste + $stats['waste_stats'][0]->unpowered_waste,
-            'partiesCount' => count($stats['allparties']),
+            'partiesCount' => $stats['partiesCount'],
             'deviceCount' => $deviceCount,
             'showNewsletterSignup' => $showNewsletterSignup,
         ]);
