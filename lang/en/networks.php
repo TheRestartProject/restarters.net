@@ -11,7 +11,6 @@ return [
     'about' => 'About',
     'actions' => 'Network Actions',
     'coordinators' => 'Network Coordinators',
-    'coordinator_badge' => 'Coordinator',
     'impact' => 'Impact'
   ],
   'stats' => [
