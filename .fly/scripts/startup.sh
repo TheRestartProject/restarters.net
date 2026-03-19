@@ -9,6 +9,13 @@ mkdir -p /var/www/storage/logs
 mkdir -p /var/www/bootstrap/cache
 chown -R www-data:www-data /var/www/storage /var/www/bootstrap/cache
 
+# Ensure log directories exist on the persistent volume (/var/log is mounted)
+mkdir -p /var/log/nginx
+mkdir -p /var/log/sysstat
+# Symlink sysstat SA data to persistent volume
+rm -rf /var/log/sa 2>/dev/null
+ln -sf /var/log/sysstat /var/log/sa
+
 # Substitute environment variables in nginx config for Tigris proxy.
 if [ -n "$AWS_BUCKET" ]; then
     export TIGRIS_BUCKET_URL="https://${AWS_BUCKET}.fly.storage.tigris.dev"

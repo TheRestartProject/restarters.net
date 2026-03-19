@@ -71,6 +71,10 @@ primary_region = "lhr"
     method = "GET"
     path = "/"
 
+[mounts]
+  source = "app_logs"
+  destination = "/var/log"
+
 [[vm]]
   size = "shared-cpu-1x"
   memory = 1024
