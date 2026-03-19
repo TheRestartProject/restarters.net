@@ -50,8 +50,8 @@ The Fly.io setup consists of four apps, all in the `lhr` region:
 |---|---|---|---|
 | `restarters` | `fly.toml` | Main Laravel app (Nginx + PHP-FPM + cron + queue worker via supervisord) | shared-cpu-1x, 1024 MB |
 | `restarters-db` | `fly-mysql.toml` | MySQL 8.0 with persistent volume (`mysqldata`) | shared-cpu-1x, 2048 MB |
-| `restarters-pma` | `fly-pma.toml` | phpMyAdmin (no public endpoint; access via `fly proxy`) | shared-cpu-1x, 256 MB |
-| `restarters-yesterday` | `fly-yesterday.toml` | Yesterday's DB restore for debugging (auto-stop enabled) | shared-cpu-1x, 1024 MB |
+| `restarters-pma` | `fly-pma.toml` | phpMyAdmin (no public endpoint; access via `fly proxy`) | shared-cpu-1x, 256 MB | **Suspended** |
+| `restarters-yesterday` | `fly-yesterday.toml` | Yesterday's DB restore for debugging (auto-stop enabled) | shared-cpu-1x, 1024 MB | **Suspended** (+ its DB `restarters-db-yesterday` also stopped) |
 
 ### Container Architecture (`Dockerfile.fly`)
 
@@ -82,7 +82,9 @@ Key runtime processes managed by `supervisord-fly.conf`:
 
 ### Deploy Workflow
 
-The GitHub Actions workflow (`.github/workflows/fly-deploy.yml`) is prepared but **not yet activated**. It triggers on a disabled branch name. To activate: change the branch filter to `production` and add `FLY_API_TOKEN` to GitHub secrets.
+The GitHub Actions workflow (`.github/workflows/fly-deploy.yml`) is prepared but **not yet activated**. It triggers on the disabled branch name `DISABLED-fly-deploy`. To activate: change the branch filter to `production` (or `main`/`develop` for staging) and add `FLY_API_TOKEN` to GitHub repo secrets.
+
+**Current CI:** CircleCI runs tests on all branches. Deploy to Fly.io is manual via `fly deploy`. The workflow file also contains commented instructions for adding a CircleCI deploy job that runs after tests pass.
 
 ---
 
@@ -90,18 +92,17 @@ The GitHub Actions workflow (`.github/workflows/fly-deploy.yml`) is prepared but
 
 ### 2-3 Weeks Before Migration
 
-- [ ] **Confirm Fly.io apps are created and working** on staging
-  - `fly status -a restarters`
-  - `fly status -a restarters-db`
-  - Verify the staging site loads at `https://restarters.fly.dev`
+- [x] **Confirm Fly.io apps are created and working** on staging *(DONE — all 4 apps exist)*
+  - `restarters` — deployed, shared-cpu-1x/1024MB
+  - `restarters-db` — deployed, shared-cpu-1x/2048MB, MySQL 8.0 with persistent volume
+  - `restarters-pma` — suspended (start on demand via `fly machine start`)
+  - `restarters-yesterday` — suspended (start on demand)
 - [ ] **Run `scripts/fly-migrate.sh --dry-run`** on the production server to validate the script
-- [ ] **Provision Tigris bucket** if not already done
-  - `fly storage create` or verify existing bucket
-  - Confirm `AWS_ACCESS_KEY_ID`, `AWS_SECRET_ACCESS_KEY`, and `AWS_BUCKET` are set as Fly secrets
+- [x] **Provision Tigris bucket** *(DONE — `AWS_ACCESS_KEY_ID`, `AWS_SECRET_ACCESS_KEY`, `AWS_BUCKET`, plus `BUCKET_NAME`, `AWS_ENDPOINT_URL_S3`, `AWS_REGION` all set)*
 - [ ] **Test image upload/download** on staging: upload an image via the app, confirm it appears via the Tigris-proxied `/uploads/` path
 - [ ] **Verify Discourse SSO** works on staging (if `FEATURE__DISCOURSE_INTEGRATION` is to be enabled)
-- [ ] **Set up Sentry** with `SENTRY_ENVIRONMENT=production` for the Fly deployment
-- [ ] **Review Fly secrets** are complete (see section 4)
+- [x] **Set up Sentry** *(DONE — `SENTRY_LARAVEL_DSN` set as Fly secret)*
+- [x] **Review Fly secrets** are complete (see section 4) *(DONE — see status below)*
 
 ### 1 Week Before Migration
 
@@ -132,29 +133,44 @@ The GitHub Actions workflow (`.github/workflows/fly-deploy.yml`) is prepared but
 
 ### 4.1 Secrets Required on Fly.io
 
-These are set via `fly secrets set` or `fly secrets import` (the `fly-migrate.sh` script handles this). Full list from the migration script:
+These are set via `fly secrets set` or `fly secrets import` (the `fly-migrate.sh` script handles this).
 
-| Secret | Purpose | Reconfiguration Needed? |
+**Status as of 2026-03-19:** 39 secrets are set on the `restarters` app. 2 secrets are set on `restarters-db`.
+
+#### Secrets already set (✓ = confirmed on Fly.io)
+
+| Secret | Purpose | Status |
 |---|---|---|
-| `APP_KEY` | Laravel encryption key | **Copy from production exactly** -- changing this breaks all encrypted data |
-| `DB_USERNAME` / `DB_PASSWORD` | Fly MySQL credentials | New credentials for Fly DB (set on `restarters-db` app as `MYSQL_PASSWORD` / `MYSQL_ROOT_PASSWORD`) |
-| `DISCOURSE_URL` | Discourse base URL | No change (points to external Discourse instance) |
-| `DISCOURSE_SECRET` | SSO shared secret | No change |
-| `DISCOURSE_APIKEY` / `DISCOURSE_APIUSER` | API credentials | No change |
-| `WIKI_URL`, `WIKI_*` | MediaWiki integration | No change (external service). Currently disabled via `FEATURE__WIKI_INTEGRATION=false` in fly.toml |
-| `WP_XMLRPC_ENDPOINT`, `WP_XMLRPC_USER`, `WP_XMLRPC_PSWD` | WordPress XML-RPC | No change (external service) |
-| `MAIL_MAILER`, `MAIL_HOST`, `MAIL_PORT`, `MAIL_USERNAME`, `MAIL_PASSWORD` | SMTP config | No change (connects to Mailgun SMTP externally) |
-| `MAILGUN_DOMAIN`, `MAILGUN_SECRET`, `MAILGUN_ENDPOINT` | Mailgun API | No change |
-| `AWS_ACCESS_KEY_ID`, `AWS_SECRET_ACCESS_KEY`, `AWS_BUCKET` | Tigris S3 storage | **New Tigris credentials** (not the same as production AWS if any) |
-| `MAPBOX_TOKEN` | Map rendering | No change |
-| `GOOGLE_API_CONSOLE_KEY` | Geocoding | No change |
-| `GOOGLE_ANALYTICS_TRACKING_ID`, `GOOGLE_TAG_MANAGER_ID` | Analytics | No change |
-| `SENTRY_LARAVEL_DSN` | Error monitoring | No change (update `SENTRY_ENVIRONMENT` to `production` in fly.toml) |
-| `DRIP_API_TOKEN`, `DRIP_ACCOUNT_ID`, `DRIP_CAMPAIGN_ID` | Drip email marketing | No change |
-| `CALENDAR_HASH` | Calendar feed | No change |
-| `REPAIRDIRECTORY_URL` | Repair Directory link | No change |
-| `SUPPORT_EMAIL_ADDRESS` | Support contact | No change |
-| `SEND_COMMAND_LOGS_TO` | Command log recipient | No change |
+| `APP_KEY` | Laravel encryption key | ✓ Set |
+| `DB_USERNAME` / `DB_PASSWORD` | Fly MySQL credentials | ✓ Set (also `MYSQL_PASSWORD` / `MYSQL_ROOT_PASSWORD` on `restarters-db`) |
+| `DISCOURSE_URL` | Discourse base URL | ✓ Set |
+| `DISCOURSE_SECRET` | SSO shared secret | ✓ Set |
+| `DISCOURSE_APIKEY` / `DISCOURSE_APIUSER` | API credentials | ✓ Set |
+| `WIKI_URL`, `WIKI_DB`, `WIKI_APIUSER`, `WIKI_APIPASSWORD` | MediaWiki integration | ✓ Set (integration currently disabled) |
+| `MAIL_MAILER`, `MAIL_HOST`, `MAIL_PORT`, `MAIL_USERNAME`, `MAIL_PASSWORD`, `MAIL_ENCRYPTION` | SMTP config | ✓ Set |
+| `MAILGUN_DOMAIN`, `MAILGUN_SECRET`, `MAILGUN_ENDPOINT` | Mailgun API | ✓ Set |
+| `AWS_ACCESS_KEY_ID`, `AWS_SECRET_ACCESS_KEY`, `AWS_BUCKET` | Tigris S3 storage | ✓ Set |
+| `AWS_ENDPOINT_URL_S3`, `AWS_REGION`, `BUCKET_NAME` | Tigris additional config | ✓ Set (extra, not in plan originally) |
+| `MAPBOX_TOKEN` | Map rendering | ✓ Set |
+| `GOOGLE_API_CONSOLE_KEY` | Geocoding | ✓ Set |
+| `GOOGLE_ANALYTICS_TRACKING_ID`, `GOOGLE_TAG_MANAGER_ID` | Analytics | ✓ Set |
+| `SENTRY_LARAVEL_DSN` | Error monitoring | ✓ Set |
+| `DRIP_API_TOKEN`, `DRIP_ACCOUNT_ID` | Drip email marketing | ✓ Set |
+| `CALENDAR_HASH` | Calendar feed | ✓ Set |
+| `REPAIRDIRECTORY_URL` | Repair Directory link | ✓ Set |
+| `SUPPORT_EMAIL_ADDRESS` | Support contact | ✓ Set |
+| `SEND_COMMAND_LOGS_TO` | Command log recipient | ✓ Set |
+| `FEATURE__DISCOURSE_INTEGRATION` | Feature flag (currently `false`) | ✓ Set as secret (overrides fly.toml) |
+| `FEATURE__WIKI_INTEGRATION` | Feature flag (currently `false`) | ✓ Set as secret (overrides fly.toml) |
+
+#### Secrets NOT yet set (need action before production cutover)
+
+| Secret | Purpose | Action Required |
+|---|---|---|
+| `WP_XMLRPC_ENDPOINT` | WordPress XML-RPC URL | Set from production `.env`. Used by event/group sync commands. |
+| `WP_XMLRPC_USER` | WordPress XML-RPC username | Set from production `.env` |
+| `WP_XMLRPC_PSWD` | WordPress XML-RPC password | Set from production `.env` |
+| `DRIP_CAMPAIGN_ID` | Drip campaign ID | Set from production `.env` (may be empty if not used) |
 
 ### 4.2 Mailgun
 
@@ -326,6 +342,12 @@ fly deploy -a restarters
 
 #### Step 3: Add Custom Domain and TLS Certificate on Fly.io
 
+**Current state (2026-03-19):** No custom domains or certificates configured yet. The app is only accessible via `restarters.fly.dev`.
+
+**Allocated IPs:**
+- IPv4 (shared): `66.241.124.187`
+- IPv6 (dedicated): `2a09:8280:1::ce:b85f:0`
+
 ```bash
 # Add the custom domain
 fly certs add restarters.net -a restarters
@@ -339,6 +361,14 @@ fly certs show restarters.net -a restarters
 
 Fly.io will automatically provision a TLS certificate via Let's Encrypt. This requires DNS to be pointed to Fly.io, so steps 3 and 4 happen in close succession.
 
+**Certificate Renewal:** Fly.io handles TLS certificate renewal automatically. Certificates are issued via Let's Encrypt and renewed before expiry (typically 30 days before the 90-day expiry). No manual intervention or cron jobs are needed. However:
+
+- The custom domain must remain configured in Fly.io (`fly certs list -a restarters`)
+- DNS must continue pointing to Fly.io for the ACME HTTP-01 challenge to succeed
+- If certificate renewal fails, Fly.io will retry and send notifications
+- Monitor with: `fly certs check restarters.net -a restarters`
+- Unlike ServerPilot (which also auto-renews via Let's Encrypt), Fly.io manages certs at the edge/proxy layer, not on the application container
+
 #### Step 4: Update DNS Records
 
 Change the DNS A/AAAA records for `restarters.net`:
@@ -348,14 +378,12 @@ Change the DNS A/AAAA records for `restarters.net`:
 restarters.net.    300    CNAME    restarters.fly.dev.
 
 # Option B: A/AAAA records (if CNAME not possible at apex)
-# Get Fly.io's IP addresses:
-fly ips list -a restarters
-# Then set:
-restarters.net.    300    A        <fly-ipv4>
-restarters.net.    300    AAAA     <fly-ipv6>
+# Current Fly.io IPs for restarters:
+restarters.net.    300    A        66.241.124.187
+restarters.net.    300    AAAA     2a09:8280:1::ce:b85f:0
 ```
 
-**Note:** If using Cloudflare as the DNS provider, you can use CNAME flattening at the apex. Otherwise, use A/AAAA records obtained from `fly ips list`.
+**Note:** The IPv4 address is a **shared** IP. If using Cloudflare as the DNS provider, you can use CNAME flattening at the apex (recommended). Otherwise, use A/AAAA records. If a dedicated IPv4 is needed later: `fly ips allocate-v4 -a restarters` (costs ~$2/month).
 
 #### Step 5: Verify TLS Certificate
 
@@ -558,6 +586,11 @@ To minimize the risk of needing to merge data from two databases:
 
 ### Ongoing
 
+- [ ] **TLS certificate renewal** -- Fly.io auto-renews Let's Encrypt certificates. Verify periodically:
+  ```bash
+  fly certs show restarters.net -a restarters
+  ```
+  If renewal fails (e.g., DNS misconfiguration), Fly.io will send notifications. No cron or certbot needed.
 - [ ] **Activate CI/CD** -- update `.github/workflows/fly-deploy.yml`:
   - Change branch filter from `DISABLED-fly-deploy` to `production` (or `develop` for staging)
   - Ensure `FLY_API_TOKEN` is set in GitHub repo secrets
