@@ -230,6 +230,8 @@ if [[ "$DO_SECRETS" = true ]]; then
         MAIL_USERNAME
         MAIL_PASSWORD
         MAIL_ENCRYPTION
+        MAIL_FROM_ADDRESS
+        MAIL_FROM_NAME
         WP_XMLRPC_ENDPOINT
         WP_XMLRPC_USER
         WP_XMLRPC_PSWD
