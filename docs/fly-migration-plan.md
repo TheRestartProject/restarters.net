@@ -8,89 +8,130 @@
 
 ## Table of Contents
 
-1. [Current State Summary](#1-current-state-summary)
-2. [Fly.io Architecture](#2-flyio-architecture)
-3. [Pre-migration Checklist](#3-pre-migration-checklist)
-4. [Service Dependencies and Reconfiguration](#4-service-dependencies-and-reconfiguration)
-5. [Data Migration](#5-data-migration)
-6. [DNS Cutover Strategy](#6-dns-cutover-strategy)
-7. [Smoke Tests](#7-smoke-tests)
-8. [Rollback Plan](#8-rollback-plan)
-9. [Post-Cutover Monitoring](#9-post-cutover-monitoring)
-10. [Timeline](#10-timeline)
+1. [What Changes](#1-what-changes)
+2. [What Stays the Same](#2-what-stays-the-same)
+3. [Known Risks](#3-known-risks) — FixometerFile (blocker), DMARC, Metabase, map subdomain
+4. [Pre-migration Checklist](#4-pre-migration-checklist)
+5. [Service Dependencies](#5-service-dependencies-and-reconfiguration) — Secrets status, Mailgun, Discourse, Wiki, WordPress
+6. [Data Migration](#6-data-migration) — Database, images, Croppa
+7. [DNS Cutover Strategy](#7-dns-cutover-strategy) — Pre-cutover setup, maintenance window steps
+8. [Smoke Tests](#8-smoke-tests)
+9. [Rollback Plan](#9-rollback-plan)
+10. [Post-Cutover Monitoring](#10-post-cutover-monitoring)
+11. [Timeline](#11-timeline)
+12. [Reference: Fly.io Architecture](#12-reference-flyio-architecture)
 
 ---
 
-## 1. Current State Summary
+<details>
+<summary><h2>1. What Changes</h2></summary>
 
-### Current Hosting
+| Area | Current (ServerPilot) | Fly.io | Risk |
+|---|---|---|---|
+| **Server** | `restart-sp`, ServerPilot-managed VPS | Docker container on Fly.io shared-cpu-1x, 1024MB, `lhr` region | Different resource limits; need to monitor |
+| **File storage** | Local filesystem `public/uploads/` | Tigris S3-compatible storage, served via nginx proxy | **Highest risk.** `FixometerFile` helper writes directly to local disk in 15+ places (user photos, event images, group logos). These writes will go to ephemeral container storage and be lost on redeploy. Reads work (nginx proxies `/uploads/` to Tigris) but new uploads via `FixometerFile` will not persist. |
+| **Database** | MySQL on same server (fast local connection) | MySQL on separate Fly app (`restarters-db`), connected via Fly internal network (`restarters-db.internal:3306`) | Adds network latency between app and DB. Monitor query performance. |
+| **SSL/TLS** | ServerPilot manages Let's Encrypt | Fly.io manages Let's Encrypt at the edge. Auto-renewal, no certbot. | Different renewal mechanism — need to add custom domain via `fly certs add` before cutover |
+| **Deployment** | ServerPilot / manual | `fly deploy` builds Docker image remotely, rolls out new container | Different deploy process. GitHub Actions workflow prepared but not yet activated. |
+| **Process management** | ServerPilot manages nginx/PHP-FPM separately; cron via system crontab; queue worker likely via supervisor or systemd | Single container runs nginx + PHP-FPM + cron + queue worker via supervisord | All processes in one container — if container restarts, everything restarts |
+| **Persistent filesystem** | Full persistent disk | **Ephemeral.** Container filesystem is lost on redeploy. Only the DB volume persists. | Any code writing to local disk (logs, cache, uploads) loses data on redeploy. Laravel cache/sessions use DB so that's fine, but `FixometerFile` is a problem. |
+| **IP address** | Dedicated: `139.59.184.196` | Shared IPv4: `66.241.124.187`, Dedicated IPv6: `2a09:8280:1::ce:b85f:0` | Shared IPv4 — if IP reputation matters, consider dedicated ($2/mo) |
+| **Scaling** | Vertical (upgrade VPS) | Can scale VM size or add machines | More flexible but currently single machine |
+| **Backups** | Daily backups (existing process) | Fly.io daily volume snapshots for DB | Different backup mechanism — verify snapshots are working |
+| **`map.restarters.net`** | Served from same server | Not on Fly.io | Needs separate migration or DNS kept pointing to old server |
 
-- **Server:** `restart-sp` (ServerPilot-managed, app root at `/srv/users/serverpilot/apps/restarters`)
-- **Web server:** Nginx + PHP-FPM
-- **Database:** MySQL (local or managed, on the same server)
-- **File storage:** Local filesystem at `public/uploads/`
-- **SSL:** Managed by ServerPilot / Let's Encrypt
-- **CI/CD:** CircleCI runs tests; deployment mechanism is separate from Fly.io
+</details>
+
+<details>
+<summary><h2>2. What Stays the Same</h2></summary>
+
+- **Domain** — `restarters.net` stays the same, DNS just points to new IP
+- **External services** — all connect outbound, unaffected by server change:
+  - Discourse (`talk.restarters.net`) — confirmed no IP matching, SSO works via domain
+  - MediaWiki (`wiki.restarters.net`) — separate server at `165.22.123.158`
+  - WordPress XML-RPC (`therestartproject.org/fxm.php`) — verified reachable from Fly (HTTP 200)
+  - Mailgun — sends via API (`MAIL_MAILER=mailgun`), domain `mg.restarters.net`
+  - Mapbox, Google APIs, Drip — all outbound API calls
+- **Email sending** — same Mailgun config, same from address. Tested and working from Fly.
+- **Database schema** — migrated via mysqldump, Laravel migrations run on startup
+- **Application code** — same Laravel app, same PHP 8.2
+- **Queue/cron** — same jobs, same schedule, just different process manager
 
 ### Key Domains
 
-- `restarters.net` - main application
-- `talk.restarters.net` - Discourse (Restarters Talk) -- externally hosted, not migrated
-- `wiki.restarters.net` - MediaWiki (Restarters Wiki) -- externally hosted, not migrated
-- `map.restarters.net` - Repair Directory -- same server as main app, may need separate migration
-- `therestartproject.org` - WordPress site -- separate, not migrated
-- `mg.restarters.net` - Mailgun sending domain (EU, `MAILGUN_DOMAIN`) -- DNS records must not change
-- `mg.rstrt.org` - from address domain (`MAIL_FROM_ADDRESS=noreply@mg.rstrt.org`) -- **⚠️ DMARC misalignment**: this domain is on US Mailgun but mail is sent via EU Mailgun domain `mg.restarters.net` (see section 4.2)
+- `restarters.net` — main app → **DNS changes to Fly.io**
+- `www.restarters.net` — CNAME to `restarters.net` → follows main domain
+- `map.restarters.net` — currently same server → **needs separate plan**
+- `talk.restarters.net` — Discourse (external) → no change
+- `wiki.restarters.net` — MediaWiki (external) → no change
+- `therestartproject.org` — WordPress (external) → no change
+- `mg.restarters.net` — Mailgun EU sending domain → **do not change DNS**
+- `mg.rstrt.org` — from address domain → **⚠️ DMARC misalignment** (see section 5)
+
+</details>
+
+<details open>
+<summary><h2>3. Known Risks</h2></summary>
+
+### 3.1 FixometerFile — Local Disk Writes (HIGH RISK — BLOCKER)
+
+**Investigated 2026-03-19.** The `FixometerFile::upload()` method (`app/Helpers/FixometerFile.php`) does three things that interact badly with Fly.io:
+
+1. **Writes original file** to `$_SERVER['DOCUMENT_ROOT'].'/uploads/'.$filename` via `move_uploaded_file()` (line 72)
+2. **Processes with Intervention Image** — orientate, resize, crop — reading from and saving back to local disk (lines 81, 130-131)
+3. **Saves thumbnails** (`thumbnail_` and `mid_` prefixed) to the same local directory
+
+On Fly.io, nginx proxies ALL `/uploads/` requests **directly to Tigris** (see `docker/nginx-fly.conf` line 37-61). It does NOT try local disk first. So:
+
+- Upload runs → file written to local container disk ✓
+- Image processing runs → thumbnails created on local disk ✓
+- User sees broken image immediately → nginx asks Tigris, file isn't there ✗
+- Files are also lost on next deploy (ephemeral filesystem)
+
+This is used across `UserController`, `PartyController`, `DeviceController`, `EventController`, and `GroupController` (15+ call sites) for user photos, event images, and group logos.
+
+**Fix:** Add S3 upload after local file processing. The local write is still needed as a staging area for Intervention Image, but after processing, the original + thumbnails must be uploaded to Tigris. Add to the end of `FixometerFile::upload()`:
+
+```php
+// After local processing, upload to S3/Tigris
+$disk = Storage::disk('s3');
+$disk->put($filename, file_get_contents($lpath));
+$disk->put('thumbnail_'.$filename, file_get_contents($_SERVER['DOCUMENT_ROOT'].'/uploads/thumbnail_'.$filename));
+$disk->put('mid_'.$filename, file_get_contents($_SERVER['DOCUMENT_ROOT'].'/uploads/mid_'.$filename));
+```
+
+**This must be resolved before production cutover.**
+
+### 3.2 DMARC Email Alignment (LOW RISK — pre-existing)
+
+`MAIL_FROM_ADDRESS` is `noreply@mg.rstrt.org` but `MAILGUN_DOMAIN` is `mg.restarters.net`. DKIM is signed by `mg.restarters.net` but the From header says `mg.rstrt.org`, causing DMARC alignment failure. This is the same on the current production server — not caused by migration. Emails deliver but may be flagged by strict receivers.
+
+**Options:**
+1. Change `MAIL_FROM_ADDRESS` to `noreply@mg.restarters.net` (simplest)
+2. Add `mg.rstrt.org` as a verified domain on EU Mailgun and update DNS
+3. Leave as-is
+
+### 3.3 Metabase — Direct Database Access (MEDIUM RISK — BLOCKER)
+
+Metabase connects directly to the production MySQL database (referenced in `app/Device.php:521`). On Fly.io, MySQL is on `restarters-db.internal:3306` — only accessible via Fly's internal 6PN network. It is **not publicly exposed**.
+
+**Options:**
+1. **Fly WireGuard tunnel** — Metabase server connects to Fly's private network via WireGuard. Set up with `fly wireguard create`, then Metabase connects to `restarters-db.internal:3306` through the tunnel.
+2. **Persistent `fly proxy`** — run `fly proxy 3306:3306 -a restarters-db` on the Metabase server. Fragile, needs process supervision.
+3. **Expose MySQL publicly** — add a public IP to `restarters-db` and configure firewall rules. Least secure option.
+
+**Are there other external systems with direct DB access?** This needs to be confirmed before cutover.
+
+### 3.4 map.restarters.net (MEDIUM RISK)
+
+Currently served from the same server (`139.59.184.196`). If DNS for `restarters.net` changes to Fly.io but `map.restarters.net` still needs the old server, the old server must stay running. If the Repair Directory app is also on the old server, it needs its own migration plan or DNS must be kept separate.
 
 ---
 
-## 2. Fly.io Architecture
+</details>
 
-The Fly.io setup consists of four apps, all in the `lhr` region:
-
-| Fly App | Config File | Purpose | VM Size |
-|---|---|---|---|
-| `restarters` | `fly.toml` | Main Laravel app (Nginx + PHP-FPM + cron + queue worker via supervisord) | shared-cpu-1x, 1024 MB |
-| `restarters-db` | `fly-mysql.toml` | MySQL 8.0 with persistent volume (`mysqldata`) | shared-cpu-1x, 2048 MB |
-| `restarters-pma` | `fly-pma.toml` | phpMyAdmin (no public endpoint; access via `fly proxy`) | shared-cpu-1x, 256 MB | **Suspended** |
-| `restarters-yesterday` | `fly-yesterday.toml` | Yesterday's DB restore for debugging (auto-stop enabled) | shared-cpu-1x, 1024 MB | **Suspended** (+ its DB `restarters-db-yesterday` also stopped) |
-
-### Container Architecture (`Dockerfile.fly`)
-
-Two-stage build:
-1. **Builder stage** (php:8.2-cli): Composer install, npm install, Vite production build, Swagger generation
-2. **Runtime stage** (php:8.2-fpm): Nginx + PHP-FPM + cron + supervisord queue worker
-
-Key runtime processes managed by `supervisord-fly.conf`:
-- **php-fpm** -- serves PHP requests via Unix socket
-- **nginx** -- reverse proxy, static files, Tigris proxy for `/uploads/`
-- **cron** -- Laravel scheduler (`php artisan schedule:run` every minute)
-- **queue-worker** -- `php artisan queue:work database --sleep=3 --tries=3 --max-time=3600`
-
-### Startup Flow (`/.fly/scripts/startup.sh`)
-
-1. Ensure storage/cache directories exist with correct ownership
-2. Substitute Tigris bucket URL into nginx config via `envsubst`
-3. Background subshell: wait for MySQL (up to 60s), run migrations, cache config/routes/views
-4. Immediately start supervisord (so health check passes while DB setup runs)
-
-### Image Storage
-
-- **Current:** Local filesystem at `public/uploads/`
-- **Fly.io:** Tigris S3-compatible storage (`https://fly.storage.tigris.dev`)
-- **Serving:** Nginx proxies `/uploads/*` requests to Tigris bucket, with 30-day cache headers
-- **Application writes:** Via Laravel's S3 filesystem driver (`FILESYSTEM_DISK=s3`)
-- **Note:** The legacy `FixometerFile` helper uses `$_SERVER['DOCUMENT_ROOT'].'/uploads/'` for direct file writes. This code path will need to work with Tigris. Since `FILESYSTEM_DISK=s3` is set and the nginx proxy handles reads, new uploads via the S3 driver will work. However, `FixometerFile::upload()` writes directly to the local filesystem -- this is a known issue that needs a separate code migration or may already be handled by the S3 disk being the default.
-
-### Deploy Workflow
-
-The GitHub Actions workflow (`.github/workflows/fly-deploy.yml`) is prepared but **not yet activated**. It triggers on the disabled branch name `DISABLED-fly-deploy`. To activate: change the branch filter to `production` (or `main`/`develop` for staging) and add `FLY_API_TOKEN` to GitHub repo secrets.
-
-**Current CI:** CircleCI runs tests on all branches. Deploy to Fly.io is manual via `fly deploy`. The workflow file also contains commented instructions for adding a CircleCI deploy job that runs after tests pass.
-
----
-
-## 3. Pre-migration Checklist
+<details>
+<summary><h2>4. Pre-migration Checklist</h2></summary>
 
 ### 2-3 Weeks Before Migration
 
@@ -140,7 +181,10 @@ The GitHub Actions workflow (`.github/workflows/fly-deploy.yml`) is prepared but
 
 ---
 
-## 4. Service Dependencies and Reconfiguration
+</details>
+
+<details>
+<summary><h2>5. Service Dependencies and Reconfiguration</h2></summary>
 
 ### 4.1 Secrets Required on Fly.io
 
@@ -262,7 +306,10 @@ The from address (`noreply@mg.rstrt.org`) is on a different domain to the Mailgu
 
 ---
 
-## 5. Data Migration
+</details>
+
+<details>
+<summary><h2>6. Data Migration</h2></summary>
 
 ### 5.1 Database Migration
 
@@ -317,7 +364,7 @@ The `scripts/fly-migrate.sh` script handles this in three phases. For the databa
 - **Incremental sync:** `--size-only` means only new/changed files are uploaded. This can be run multiple times before cutover to keep Tigris in sync.
 - **Run a full sync days before cutover**, then a final incremental sync during the maintenance window.
 - **Serving:** On Fly.io, nginx proxies `/uploads/*` to the Tigris bucket (configured in `docker/nginx-fly.conf` and substituted at startup). The app code does not need changes for reading images.
-- **Writing:** New uploads will go to Tigris via Laravel's S3 filesystem driver. The legacy `FixometerFile` helper that writes to local disk will need attention (it uses `$_SERVER['DOCUMENT_ROOT'].'/uploads/'`). Verify whether this code path is still active in production.
+- **Writing:** ⚠️ `FixometerFile` writes to local disk, NOT to Tigris. See section 3.1 — this is a blocker that must be fixed before cutover.
 
 ### 5.3 Croppa (Image Thumbnailing)
 
@@ -330,7 +377,10 @@ This means:
 
 ---
 
-## 6. DNS Cutover Strategy
+</details>
+
+<details>
+<summary><h2>7. DNS Cutover Strategy</h2></summary>
 
 ### Prerequisites
 
@@ -338,12 +388,77 @@ This means:
 - Staging verification complete on `restarters.fly.dev`
 - DNS TTL already lowered to 300s (done 1 week prior)
 
-### Step-by-Step Cutover
+### Pre-Cutover Setup (days/weeks before — verify everything works on Fly before the maintenance window)
 
-#### Step 1: Final Data Sync (Maintenance Window Start)
+#### Set production config on Fly.io now
+
+These can be set immediately. The app runs on `restarters.fly.dev` regardless — setting production values won't break anything since DNS still points to the old server.
 
 ```bash
-# Put production into maintenance mode (optional but recommended)
+# Set production env vars as secrets (override fly.toml staging values)
+fly secrets set \
+  APP_ENV=production \
+  APP_URL=https://restarters.net \
+  SENTRY_ENVIRONMENT=production \
+  SESSION_DOMAIN=.restarters.net \
+  -a restarters
+
+# Deploy and verify on restarters.fly.dev
+fly deploy -a restarters
+```
+
+**Verify on `restarters.fly.dev`:** The site will show `APP_URL=https://restarters.net` in generated URLs, but that's fine — we're verifying the app boots, connects to DB, and runs correctly with production config.
+
+#### Set up automated deploy via CircleCI (optional but recommended)
+
+Adding a deploy step to CircleCI means deploys happen automatically after tests pass on the production branch. This can be set up and tested before cutover — pushes to the production branch will deploy to Fly.io even though DNS isn't pointed there yet.
+
+Add `FLY_API_TOKEN` to CircleCI project settings as an environment variable, then add to `.circleci/config.yml`:
+
+```yaml
+  deploy-fly:
+    machine:
+      image: ubuntu-2204:current
+    steps:
+      - checkout
+      - run:
+          name: Install flyctl
+          command: curl -L https://fly.io/install.sh | sh
+      - run:
+          name: Deploy to Fly.io
+          command: ~/.fly/bin/flyctl deploy --remote-only
+
+workflows:
+  build-and-deploy:
+    jobs:
+      - build
+      - deploy-fly:
+          requires:
+            - build
+          filters:
+            branches:
+              only: production
+```
+
+This can be tested by merging to the production branch before DNS cutover — the deploy will go to Fly.io and be accessible on `restarters.fly.dev`.
+
+#### Add custom domain (before cutover)
+
+```bash
+fly certs add restarters.net -a restarters
+fly certs add www.restarters.net -a restarters
+```
+
+The certificate won't be issued until DNS points to Fly.io (Let's Encrypt needs to reach it for the HTTP-01 challenge), but adding the domain is a prerequisite that should be done early.
+
+### Cutover Steps (maintenance window — aim for minimal duration)
+
+By this point, all config, secrets, deploy pipeline, and domain setup should already be done and verified. The maintenance window is only for final data sync and DNS change.
+
+#### Step 1: Final Data Sync
+
+```bash
+# Put production into maintenance mode
 ssh restart-sp
 cd /srv/users/serverpilot/apps/restarters
 php artisan down --message="We're upgrading our infrastructure. Back shortly."
@@ -355,70 +470,23 @@ php artisan down --message="We're upgrading our infrastructure. Back shortly."
 ./scripts/fly-migrate.sh --db-only
 ```
 
-#### Step 2: Update Fly.io Configuration for Production
+#### Step 2: Update DNS Records
 
-Before pointing DNS, update the Fly.io app configuration:
+DNS is hosted at **iwantmyname.com**. Since iwantmyname does not support CNAME flattening at the apex, use A/AAAA records.
 
-```bash
-# Update fly.toml env vars for production
-# APP_ENV=production
-# APP_URL=https://restarters.net
-# FEATURE__DISCOURSE_INTEGRATION=true (if ready)
-# SENTRY_ENVIRONMENT=production
-
-# Set the production APP_URL as a Fly secret (overrides fly.toml)
-fly secrets set APP_URL=https://restarters.net APP_ENV=production -a restarters
-
-# Deploy with production config
-fly deploy -a restarters
-```
-
-#### Step 3: Add Custom Domain and TLS Certificate on Fly.io
-
-**Current state (2026-03-19):** No custom domains or certificates configured yet. The app is only accessible via `restarters.fly.dev`.
-
-**Allocated IPs:**
+**Allocated Fly.io IPs:**
 - IPv4 (shared): `66.241.124.187`
 - IPv6 (dedicated): `2a09:8280:1::ce:b85f:0`
 
-```bash
-# Add the custom domain
-fly certs add restarters.net -a restarters
-
-# If using www subdomain:
-fly certs add www.restarters.net -a restarters
-
-# Verify certificate status
-fly certs show restarters.net -a restarters
+```
+restarters.net.      300    A        66.241.124.187
+restarters.net.      300    AAAA     2a09:8280:1::ce:b85f:0
+www.restarters.net.  300    CNAME    restarters.net.
 ```
 
-Fly.io will automatically provision a TLS certificate via Let's Encrypt. This requires DNS to be pointed to Fly.io, so steps 3 and 4 happen in close succession.
+If a dedicated IPv4 is needed later: `fly ips allocate-v4 -a restarters` (~$2/month).
 
-**Certificate Renewal:** Fly.io handles TLS certificate renewal automatically. Certificates are issued via Let's Encrypt and renewed before expiry (typically 30 days before the 90-day expiry). No manual intervention or cron jobs are needed. However:
-
-- The custom domain must remain configured in Fly.io (`fly certs list -a restarters`)
-- DNS must continue pointing to Fly.io for the ACME HTTP-01 challenge to succeed
-- If certificate renewal fails, Fly.io will retry and send notifications
-- Monitor with: `fly certs check restarters.net -a restarters`
-- Unlike ServerPilot (which also auto-renews via Let's Encrypt), Fly.io manages certs at the edge/proxy layer, not on the application container
-
-#### Step 4: Update DNS Records
-
-Change the DNS A/AAAA records for `restarters.net`:
-
-```
-# Option A: CNAME (if apex domain supports it, e.g., Cloudflare CNAME flattening)
-restarters.net.    300    CNAME    restarters.fly.dev.
-
-# Option B: A/AAAA records (if CNAME not possible at apex)
-# Current Fly.io IPs for restarters:
-restarters.net.    300    A        66.241.124.187
-restarters.net.    300    AAAA     2a09:8280:1::ce:b85f:0
-```
-
-**Note:** The IPv4 address is a **shared** IP. If using Cloudflare as the DNS provider, you can use CNAME flattening at the apex (recommended). Otherwise, use A/AAAA records. If a dedicated IPv4 is needed later: `fly ips allocate-v4 -a restarters` (costs ~$2/month).
-
-#### Step 5: Verify TLS Certificate
+#### Step 3: Verify TLS Certificate
 
 ```bash
 # Wait for certificate to be issued (usually 1-5 minutes after DNS propagation)
@@ -427,6 +495,8 @@ fly certs check restarters.net -a restarters
 # Verify in browser
 curl -I https://restarters.net
 ```
+
+**Certificate Renewal:** Fly.io auto-renews Let's Encrypt certificates (typically 30 days before the 90-day expiry). No certbot or cron needed. DNS must continue pointing to Fly.io for renewal to work.
 
 #### Step 6: Verify Application
 
@@ -451,7 +521,10 @@ After 1-2 weeks of stable operation:
 
 ---
 
-## 7. Smoke Tests
+</details>
+
+<details>
+<summary><h2>8. Smoke Tests</h2></summary>
 
 ### Immediate (within 5 minutes of DNS cutover)
 
@@ -513,7 +586,10 @@ After 1-2 weeks of stable operation:
 
 ---
 
-## 8. Rollback Plan
+</details>
+
+<details>
+<summary><h2>9. Rollback Plan</h2></summary>
 
 ### Rollback Decision Criteria
 
@@ -579,7 +655,10 @@ To minimize the risk of needing to merge data from two databases:
 
 ---
 
-## 9. Post-Cutover Monitoring
+</details>
+
+<details>
+<summary><h2>10. Post-Cutover Monitoring</h2></summary>
 
 ### First 24 Hours
 
@@ -637,7 +716,10 @@ To minimize the risk of needing to merge data from two databases:
 
 ---
 
-## 10. Timeline
+</details>
+
+<details>
+<summary><h2>11. Timeline</h2></summary>
 
 ### Suggested Schedule
 
@@ -670,7 +752,26 @@ To minimize the risk of needing to merge data from two databases:
 
 ---
 
-## Appendix A: Key File References
+</details>
+
+<details>
+<summary><h2>12. Reference: Fly.io Architecture</h2></summary>
+
+See `Dockerfile.fly`, `docker/supervisord-fly.conf`, `docker/nginx-fly.conf`, `.fly/scripts/startup.sh` for implementation details.
+
+Fly apps in `lhr` region:
+
+| Fly App | Purpose | Status |
+|---|---|---|
+| `restarters` | Main app (nginx + PHP-FPM + cron + queue worker via supervisord) | Deployed |
+| `restarters-db` | MySQL 8.0 with persistent volume | Deployed |
+| `restarters-pma` | phpMyAdmin (access via `fly proxy`) | Suspended |
+| `restarters-yesterday` | Yesterday's DB restore for debugging | Suspended |
+
+</details>
+
+<details>
+<summary><h2>Appendix A: Key File References</h2></summary>
 
 | File | Purpose |
 |---|---|
@@ -694,7 +795,10 @@ To minimize the risk of needing to merge data from two databases:
 | `config/croppa.php` | Image thumbnailing config |
 | `app/Providers/ScheduleServiceProvider.php` | Cron schedule (language sync, Discourse sync) |
 
-## Appendix B: Environment Variables in fly.toml
+</details>
+
+<details>
+<summary><h2>Appendix B: Environment Variables in fly.toml</h2></summary>
 
 The following are set as non-secret env vars in `fly.toml` and will need updating for production:
 
@@ -707,7 +811,10 @@ The following are set as non-secret env vars in `fly.toml` and will need updatin
   SESSION_DOMAIN = ".restarters.net"  # Set for production domain (currently empty)
 ```
 
-## Appendix C: Fly CLI Quick Reference
+</details>
+
+<details>
+<summary><h2>Appendix C: Fly CLI Quick Reference</h2></summary>
 
 ```bash
 # Deploy
@@ -752,3 +859,5 @@ fly certs show restarters.net -a restarters
 fly certs check restarters.net -a restarters
 fly ips list -a restarters
 ```
+
+</details>
