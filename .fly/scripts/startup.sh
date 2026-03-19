@@ -9,6 +9,16 @@ mkdir -p /var/www/storage/logs
 mkdir -p /var/www/bootstrap/cache
 chown -R www-data:www-data /var/www/storage /var/www/bootstrap/cache
 
+# Create swap file on root filesystem (ephemeral, recreated each boot)
+SWAPFILE=/swapfile
+if [ ! -f "$SWAPFILE" ]; then
+    echo "Creating 2GB swap file..."
+    fallocate -l 2G "$SWAPFILE" 2>/dev/null || dd if=/dev/zero of="$SWAPFILE" bs=1M count=2048 2>/dev/null
+    chmod 600 "$SWAPFILE"
+    mkswap "$SWAPFILE" >/dev/null
+fi
+swapon "$SWAPFILE" 2>/dev/null || true
+
 # Ensure log directories exist on the persistent volume (/var/log is mounted)
 mkdir -p /var/log/nginx
 mkdir -p /var/log/sysstat
