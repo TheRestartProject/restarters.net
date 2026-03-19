@@ -117,7 +117,7 @@ class EventServiceProvider extends ServiceProvider
     public function boot(): void
     {
 
-        if (env('FEATURE__WIKI_INTEGRATION') === true) {
+        if (env('FEATURE__WIKI_INTEGRATION') === true && !empty(env('WIKI_URL'))) {
             Event::listen('Illuminate\Auth\Events\Login', \App\Listeners\LogInToWiki::class);
         }
     }

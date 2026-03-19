@@ -24,7 +24,7 @@ class MediawikiServiceProvider extends ServiceProvider
      */
     public function register(): void
     {
-        if (env('FEATURE__WIKI_INTEGRATION') === false) {
+        if (env('FEATURE__WIKI_INTEGRATION') === false || empty(env('WIKI_URL'))) {
             return;
         }
 

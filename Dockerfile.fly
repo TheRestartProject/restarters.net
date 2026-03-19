@@ -1,0 +1,134 @@
+# =============================================================================
+# Stage 1: Build assets (Node + Composer)
+# =============================================================================
+FROM php:8.2-cli AS builder
+
+# Install system dependencies for building
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    git zip unzip curl \
+    libpng-dev libjpeg62-turbo-dev libfreetype6-dev libzip-dev libicu-dev libxml2-dev \
+    && docker-php-ext-configure gd --with-freetype --with-jpeg \
+    && docker-php-ext-install pdo_mysql bcmath zip intl gd \
+    && apt-get clean && rm -rf /var/lib/apt/lists/*
+
+# Install xmlrpc via pecl
+RUN pecl install channel://pecl.php.net/xmlrpc-1.0.0RC3 && docker-php-ext-enable xmlrpc
+
+# Install composer
+COPY --from=composer/composer:2-bin /composer /usr/bin/composer
+
+# Install Node 18
+RUN curl -fsSL https://deb.nodesource.com/setup_18.x | bash - \
+    && apt-get install -y nodejs \
+    && apt-get clean && rm -rf /var/lib/apt/lists/*
+
+WORKDIR /build
+
+# Copy composer files first for layer caching
+COPY composer.json composer.lock ./
+RUN composer install --no-dev --no-scripts --no-autoloader --prefer-dist
+
+# Copy package files for npm layer caching
+COPY package.json package-lock.json ./
+RUN npm ci --legacy-peer-deps
+RUN npx update-browserslist-db@latest
+
+# Copy all source code
+COPY . .
+
+# Create a minimal .env for artisan commands during build (no DB needed)
+RUN echo "APP_KEY=base64:$(openssl rand -base64 32)" > .env && \
+    echo "APP_ENV=production" >> .env
+
+# Finish composer autoload (skip post-autoload scripts that need DB/app context)
+ENV COMPOSER_ALLOW_SUPERUSER=1
+RUN composer dump-autoload --optimize --no-dev --no-scripts
+
+# Run package discovery manually
+RUN php artisan package:discover --ansi || true
+
+# Build frontend assets
+# The webpack.mix.js runs `php artisan lang:js` via WebpackShellPlugin, but that
+# needs the full app bootstrapped. Generate translations first, then build.
+RUN php artisan lang:js --no-lib resources/js/translations.js 2>/dev/null || true
+RUN npm run production
+
+# Generate swagger docs (non-fatal if it fails)
+RUN php artisan l5-swagger:generate 2>/dev/null || true
+
+# Remove build .env (real env comes from Fly secrets at runtime)
+RUN rm -f .env
+
+# =============================================================================
+# Stage 2: Production image (Nginx + PHP-FPM + Supervisord + Cron)
+# =============================================================================
+FROM php:8.2-fpm
+
+# Install runtime dependencies
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    nginx \
+    supervisor \
+    cron \
+    gettext-base \
+    libpng-dev libjpeg62-turbo-dev libfreetype6-dev libzip-dev libicu-dev libxml2-dev \
+    && docker-php-ext-configure gd --with-freetype --with-jpeg \
+    && docker-php-ext-install pdo_mysql bcmath zip intl gd \
+    && apt-get clean && rm -rf /var/lib/apt/lists/*
+
+# Install xmlrpc
+RUN pecl install channel://pecl.php.net/xmlrpc-1.0.0RC3 && docker-php-ext-enable xmlrpc
+
+# Configure PHP-FPM to use unix socket
+RUN sed -i 's|listen = 127.0.0.1:9000|listen = /var/run/php-fpm.sock|' /usr/local/etc/php-fpm.d/www.conf && \
+    sed -i 's|;listen.owner = www-data|listen.owner = www-data|' /usr/local/etc/php-fpm.d/www.conf && \
+    sed -i 's|;listen.group = www-data|listen.group = www-data|' /usr/local/etc/php-fpm.d/www.conf && \
+    sed -i 's|;listen.mode = 0660|listen.mode = 0660|' /usr/local/etc/php-fpm.d/www.conf && \
+    sed -i 's|;slowlog = .*|slowlog = /var/log/php-fpm-slow.log|' /usr/local/etc/php-fpm.d/www.conf && \
+    sed -i 's|;request_slowlog_timeout = .*|request_slowlog_timeout = 5s|' /usr/local/etc/php-fpm.d/www.conf && \
+    sed -i 's|;request_terminate_timeout = .*|request_terminate_timeout = 60s|' /usr/local/etc/php-fpm.d/www.conf && \
+    rm -f /usr/local/etc/php-fpm.d/zz-docker.conf
+
+# Install sysstat (sar) for system activity monitoring
+RUN apt-get update && apt-get install -y --no-install-recommends sysstat && \
+    sed -i 's/ENABLED="false"/ENABLED="true"/' /etc/default/sysstat && \
+    rm -rf /var/lib/apt/lists/*
+
+# PHP production settings
+RUN cp /usr/local/etc/php/php.ini-production /usr/local/etc/php/conf.d/php.ini && \
+    echo "upload_max_filesize = 100M" >> /usr/local/etc/php/conf.d/php.ini && \
+    echo "post_max_size = 100M" >> /usr/local/etc/php/conf.d/php.ini && \
+    echo "memory_limit = 1024M" >> /usr/local/etc/php/conf.d/php.ini
+
+# Copy nginx config
+COPY docker/nginx-fly.conf /etc/nginx/nginx.conf
+
+# Copy supervisord config
+COPY docker/supervisord-fly.conf /etc/supervisor/conf.d/supervisord.conf
+
+# Copy logrotate config
+COPY docker/logrotate-fly.conf /etc/logrotate.d/restarters
+
+# Set up cron for Laravel scheduler (every minute)
+RUN echo "* * * * * cd /var/www && php artisan schedule:run >> /dev/null 2>&1" | crontab -
+
+# Set working directory
+WORKDIR /var/www
+
+# Copy application from builder
+COPY --from=builder --chown=www-data:www-data /build /var/www
+
+# Remove dev files not needed in production
+RUN rm -rf node_modules tests .git .github
+
+# Ensure storage and cache directories exist
+RUN mkdir -p storage/framework/{sessions,views,cache/data} \
+    storage/logs bootstrap/cache \
+    && chown -R www-data:www-data storage bootstrap/cache
+
+# Copy startup script
+COPY .fly/scripts/startup.sh /usr/local/bin/startup.sh
+RUN chmod +x /usr/local/bin/startup.sh
+
+EXPOSE 80
+
+CMD ["/usr/local/bin/startup.sh"]

@@ -1,0 +1,20 @@
+app = "restarters-db"
+primary_region = "lhr"
+
+[build]
+  image = "mysql:8.0"
+
+[processes]
+  app = "mysqld --datadir=/data/mysql --default-authentication-plugin=mysql_native_password"
+
+[mounts]
+  source = "mysqldata"
+  destination = "/data"
+
+[env]
+  MYSQL_DATABASE = "restarters"
+  MYSQL_USER = "restarters"
+
+[[vm]]
+  size = "shared-cpu-1x"
+  memory = 2048
