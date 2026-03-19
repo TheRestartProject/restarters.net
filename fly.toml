@@ -66,10 +66,10 @@ primary_region = "lhr"
     port = 80
     type = "http"
     interval = "15s"
-    timeout = "5s"
+    timeout = "10s"
     grace_period = "120s"
     method = "GET"
-    path = "/"
+    path = "/robots.txt"
 
 [mounts]
   source = "app_logs"

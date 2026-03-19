@@ -105,6 +105,9 @@ COPY docker/nginx-fly.conf /etc/nginx/nginx.conf
 # Copy supervisord config
 COPY docker/supervisord-fly.conf /etc/supervisor/conf.d/supervisord.conf
 
+# Copy logrotate config
+COPY docker/logrotate-fly.conf /etc/logrotate.d/restarters
+
 # Set up cron for Laravel scheduler (every minute)
 RUN echo "* * * * * cd /var/www && php artisan schedule:run >> /dev/null 2>&1" | crontab -
 
