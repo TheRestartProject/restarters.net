@@ -62,6 +62,9 @@
 - `restarters.net` — main app → **DNS changes to Fly.io**
 - `www.restarters.net` — CNAME to `restarters.net` → follows main domain
 - `map.restarters.net` — currently same server → **needs separate plan**
+- `repairtogether.restarters.net` — network subdomain (Repair Together, Belgium, `fr-BE`) → **DNS must move to Fly + `fly certs add`**
+- `repairshare.restarters.net` — network subdomain (Repair Share) → **DNS must move to Fly + `fly certs add`**
+- `hauts-de-france.restarters.net` — network subdomain (Hauts-de-France) → **DNS must move to Fly + `fly certs add`**
 - `talk.restarters.net` — Discourse (external) → no change
 - `wiki.restarters.net` — MediaWiki (external) → no change
 - `therestartproject.org` — WordPress (external) → no change
