@@ -199,6 +199,12 @@ These are set via `fly secrets set` or `fly secrets import` (the `fly-migrate.sh
 
 **No DNS changes needed for email** — Mailgun uses `mg.restarters.net` subdomain which has its own SPF/DKIM/MX records independent of the main A record.
 
+**⚠️ Pre-existing DMARC alignment issue (not caused by migration):**
+The from address (`noreply@mg.rstrt.org`) is on a different domain to the Mailgun sending domain (`mg.restarters.net`). DKIM is signed by `mg.restarters.net` but the From header says `mg.rstrt.org`, so DMARC alignment fails. This is the same on the current production server. Test email to `edward@ehibbert.org.uk` arrived but showed DMARC failure. Options to fix:
+1. Change `MAIL_FROM_ADDRESS` to `noreply@mg.restarters.net` (simplest — keeps EU Mailgun, aligns domains)
+2. Add `mg.rstrt.org` as a verified domain on the EU Mailgun account and update its DNS to point to EU Mailgun
+3. Leave as-is — emails deliver but may be flagged by strict receivers
+
 ### 4.3 Discourse Integration
 
 **Reconfiguration needed:** No — domain stays the same, confirmed no IP matching.
