@@ -15,6 +15,8 @@ use function PHPUnit\Framework\assertEquals;
 
 class BasicTest extends TestCase
 {
+    protected $idgroups;
+
     protected function setUp(): void
     {
         parent::setUp();
