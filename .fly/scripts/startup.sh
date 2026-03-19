@@ -16,6 +16,12 @@ mkdir -p /var/log/sysstat
 rm -rf /var/log/sa 2>/dev/null
 ln -sf /var/log/sysstat /var/log/sa
 
+# Move file cache to persistent volume so it survives redeploys
+mkdir -p /var/log/cache/data
+rm -rf /var/www/storage/framework/cache/data
+ln -sf /var/log/cache/data /var/www/storage/framework/cache/data
+chown -R www-data:www-data /var/log/cache
+
 # Substitute environment variables in nginx config for Tigris proxy.
 if [ -n "$AWS_BUCKET" ]; then
     export TIGRIS_BUCKET_URL="https://${AWS_BUCKET}.fly.storage.tigris.dev"
