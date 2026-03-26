@@ -1088,7 +1088,7 @@ class GroupController extends Controller
             $request->validate([
                                    'name' => ['max:255'],
                                    'location' => ['max:255'],
-                                   'archived_at' => ['date'],
+                                   'archived_at' => ['nullable', 'date'],
                                ]);
         }
 
