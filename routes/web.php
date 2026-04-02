@@ -3,6 +3,7 @@
 use App\Http\Controllers\DeviceUrlController;
 use App\Http\Controllers\InformationAlertCookieController;
 use App\Http\Controllers\AdminController;
+use App\Http\Controllers\ApiClientAdminController;
 use App\Http\Controllers\BattcatOraController;
 use App\Http\Controllers\BrandsController;
 use App\Http\Controllers\CalendarEventsController;
@@ -286,6 +287,10 @@ Route::middleware('auth', 'verifyUserConsent', 'ensureAPIToken')->group(function
     //Admin Controller
     Route::prefix('admin')->group(function () {
         Route::get('/stats', [AdminController::class, 'stats']);
+        Route::get('/api-clients', [ApiClientAdminController::class, 'index'])->name('admin.api-clients');
+        Route::post('/api-clients', [ApiClientAdminController::class, 'store'])->name('admin.api-clients.store');
+        Route::post('/api-clients/{id}/rotate', [ApiClientAdminController::class, 'rotate'])->name('admin.api-clients.rotate');
+        Route::post('/api-clients/{id}/revoke', [ApiClientAdminController::class, 'revoke'])->name('admin.api-clients.revoke');
     });
 
     //Category Controller

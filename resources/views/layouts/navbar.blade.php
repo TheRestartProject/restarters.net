@@ -112,6 +112,7 @@
                                   <li><a href="{{ route('skills') }}">Skills</a></li>
                                   <li><a href="{{ route('tags') }}">Group tags</a></li>
                                   <li><a href="{{ route('category') }}">Categories</a></li>
+                                  <li><a href="{{ route('admin.api-clients') }}">API clients</a></li>
                                   <li><a href="{{ route('users') }}">Users</a></li>
                                   <li><a href="{{ route('roles') }}">Roles</a></li>
                                   <li><a href="{{ route('networks.index') }}">@lang('networks.general.networks')</a></li>
