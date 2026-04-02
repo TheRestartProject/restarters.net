@@ -4,6 +4,7 @@ return [
 
     'features' => [
         'discourse_integration' => env('FEATURE__DISCOURSE_INTEGRATION', true),
+        'public_events_api' => env('FEATURE__PUBLIC_EVENTS_API', false),
     ],
 
     'wiki' => [
