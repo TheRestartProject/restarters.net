@@ -42,6 +42,10 @@ electronic repairs. Please read more at http://rstrt.org/FAQ
 
 Compiled version of the specs is available at: https://therestartproject.github.io/restarters.net/Index.html.
 
+## Public events API
+
+The public events API is documented in [docs/public-events-api.md](docs/public-events-api.md). Enable it with `FEATURE__PUBLIC_EVENTS_API=true`.
+
 ## Funding and future development
 
 The first version of the tool (2015) was the core Fixometer engine. This was
