@@ -68,6 +68,21 @@ Route::get('/talk/topics/{tag?}', [API\DiscourseController::class, 'discussionTo
 // Timezones
 Route::get('/timezones', [App\Http\Controllers\ApiController::class, 'timezones']);
 
+Route::prefix('public/v2')
+    ->withoutMiddleware('throttle:api')
+    ->middleware(['publicEventsApiEnabled', 'publicApiCors'])
+    ->group(function () {
+        Route::options('{any}', function () {
+            return response()->noContent();
+        })->where('any', '.*');
+
+        Route::middleware(['apiClient:events:read', 'apiClientOrigin', 'throttle:public-api'])->group(function () {
+            Route::get('/events', [API\PublicEventController::class, 'listEvents']);
+            Route::get('/events/{id}', [API\PublicEventController::class, 'showEvent']);
+            Route::get('/groups/{id}/events', [API\PublicEventController::class, 'listGroupEvents']);
+        });
+    });
+
 // We are working towards a new and more coherent API.
 Route::prefix('v2')->group(function() {
     Route::middleware(\App\Http\Middleware\APISetLocale::class)->group(function() {
