@@ -69,6 +69,10 @@ class Kernel extends HttpKernel
         'verifyUserConsent' => \App\Http\Middleware\VerifyUserConsent::class,
         'AcceptUserInvites' => \App\Http\Middleware\AcceptUserInvites::class,
         'ensureAPIToken' => \App\Http\Middleware\EnsureAPIToken::class,
+        'apiClient' => \App\Http\Middleware\AuthenticateApiClient::class,
+        'apiClientOrigin' => \App\Http\Middleware\EnforceApiClientOrigin::class,
+        'publicEventsApiEnabled' => \App\Http\Middleware\EnsurePublicEventsApiEnabled::class,
+        'publicApiCors' => \App\Http\Middleware\PublicApiCors::class,
 
         /**** OTHER MIDDLEWARE ****/
         'localize' => \Mcamara\LaravelLocalization\Middleware\LaravelLocalizationRoutes::class,
