@@ -21,6 +21,7 @@ use App\User;
 use App\UserGroups;
 use App\Xref;
 use App\Alert;
+use App\ApiClient;
 use Auth;
 use Carbon\Carbon;
 use DB;
@@ -28,6 +29,7 @@ use Hash;
 use Illuminate\Foundation\Testing\TestCase as BaseTestCase;
 use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\Queue;
+use Illuminate\Support\Facades\Schema;
 use Symfony\Component\DomCrawler\Crawler;
 use Osteel\OpenApi\Testing\ValidatorBuilder;
 use Osteel\OpenApi\Testing\Exceptions\ValidationException;
@@ -66,6 +68,9 @@ abstract class TestCase extends BaseTestCase
         UsersSkills::truncate();
         Skills::truncate();
         Alert::truncate();
+        if (Schema::hasTable('api_clients')) {
+            ApiClient::truncate();
+        }
         DB::statement('delete from audits');
         DB::delete('delete from user_network');
         DB::delete('delete from users_preferences');
