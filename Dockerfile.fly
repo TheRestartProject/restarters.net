@@ -51,7 +51,7 @@ RUN php artisan package:discover --ansi || true
 # The webpack.mix.js runs `php artisan lang:js` via WebpackShellPlugin, but that
 # needs the full app bootstrapped. Generate translations first, then build.
 RUN php artisan lang:js --no-lib resources/js/translations.js 2>/dev/null || true
-RUN npm run production
+RUN npm run production && rm -f public/hot
 
 # Generate swagger docs (non-fatal if it fails)
 RUN php artisan l5-swagger:generate 2>/dev/null || true
