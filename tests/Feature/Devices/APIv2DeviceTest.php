@@ -28,6 +28,7 @@ class APIv2DeviceTest extends TestCase
      * This logic duplicates that in DeviceController, but it's worth testing to make sure that the API is
      * behaving as we'd expect from the DB entries.
      *
+     * @story:DeviceController::getDevicev2
      * @dataProvider providerDevice
      */
     public function testGetDevice($repair_status_str, $parts_provider_str, $next_steps_str, $barrierstr) {
@@ -149,6 +150,8 @@ class APIv2DeviceTest extends TestCase
     /**
      * Create a device over the API and check it retrieves as expected.
      *
+     * @story:DeviceController::createDevicev2
+     * @story:DeviceController::getDevicev2
      * @dataProvider providerDevice
      */
     public function testCreate($repair_status_str, $parts_provider_str, $next_steps_str, $barrierstr) {

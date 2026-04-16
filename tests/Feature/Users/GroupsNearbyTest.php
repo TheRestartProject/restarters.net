@@ -113,6 +113,7 @@ class GroupsNearbyTest extends TestCase
         $this->assertEquals(0, count($groups));
     }
 
+    /** @story:GroupController::updateGroupv2 */
     public function testNotification() {
         Notification::fake();
 

@@ -23,6 +23,12 @@ class RecoverTest extends TestCase
         }
     }
 
+    /**
+     * @story:UserController::recover
+     * @story:UserController::reset
+     * @story:LoginController::showLoginForm
+     * @story:LoginController::login
+     */
     public function testRecover()
     {
         $restarter = User::factory()->restarter()->create([

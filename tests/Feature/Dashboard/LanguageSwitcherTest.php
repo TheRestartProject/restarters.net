@@ -13,6 +13,7 @@ use function PHPUnit\Framework\assertEquals;
 
 class LanguageSwitcherTest extends TestCase
 {
+    /** @story:LocaleController::setLang */
     public function testSwitchEndpoint()
     {
         $this->loginAsTestUser(Role::ADMINISTRATOR);

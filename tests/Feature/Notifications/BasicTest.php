@@ -15,6 +15,7 @@ use Tests\TestCase;
 
 class BasicTest extends TestCase
 {
+    /** @story:UserController::getNotifications */
     public function testNotificationsPage() {
         $this->loginAsTestUser(Role::ADMINISTRATOR);
         $idgroups = $this->createGroup();

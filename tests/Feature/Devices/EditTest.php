@@ -30,6 +30,11 @@ class EditTest extends TestCase
         $this->withoutExceptionHandling();
     }
 
+    /**
+     * @story:DeviceController::createDevicev2
+     * @story:DeviceController::updateDevicev2
+     * @story:DeviceController::deleteDevicev2
+     */
     public function testEdit()
     {
         $iddevices = $this->createDevice($this->event->idevents, 'misc');
@@ -56,6 +61,10 @@ class EditTest extends TestCase
         $this->deleteDevice($iddevices);
     }
 
+    /**
+     * @story:DeviceController::createDevicev2
+     * @story:DeviceController::updateDevicev2
+     */
     public function testEditAsNetworkCoordinator()
     {
         $network = Network::factory()->create();
@@ -83,6 +92,10 @@ class EditTest extends TestCase
         $response->assertSuccessful();
     }
 
+    /**
+     * @story:DeviceController::imageUpload
+     * @story:DeviceController::deleteImage
+     */
     public function testDeviceEditAddImage() {
         Storage::fake('avatars');
         $user = User::factory()->administrator()->create();
@@ -146,6 +159,10 @@ class EditTest extends TestCase
         $this->assertEquals('Thank you, the image has been deleted', \Session::get('message'));
     }
 
+    /**
+     * @story:DeviceController::imageUpload
+     * @story:DeviceController::deleteImage
+     */
     public function testDeviceAddAddImage() {
         Storage::fake('avatars');
         $user = User::factory()->administrator()->create();
@@ -202,6 +219,7 @@ class EditTest extends TestCase
         $this->assertEquals('Thank you, the image has been deleted', \Session::get('message'));
     }
 
+    /** @story:DeviceController::updateDevicev2 */
     public function testNextSteps() {
         $iddevices = $this->createDevice($this->event->idevents, 'misc');
 

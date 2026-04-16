@@ -22,7 +22,10 @@ class ViewUsersTest extends TestCase
         $this->actingAs($admin);
     }
 
-    /** @test */
+    /**
+     * @test
+     * @story:UserController::all
+     */
     public function an_admin_can_view_list_of_users()
     {
         // Given we have users in the database
@@ -35,7 +38,10 @@ class ViewUsersTest extends TestCase
         $response->assertSeeText($users[0]->name);
     }
 
-    /** @test */
+    /**
+     * @test
+     * @story:UserController::all
+     */
     public function an_admin_can_see_how_many_total_users_in_the_list()
     {
         // Given we have users in the database
@@ -48,7 +54,10 @@ class ViewUsersTest extends TestCase
         $response->assertSeeText(42);
     }
 
-    /** @test */
+    /**
+     * @test
+     * @story:UserController::all
+     */
     public function admin_can_see_users_last_login_time()
     {
         // Given we have a user who has just logged in
@@ -64,7 +73,10 @@ class ViewUsersTest extends TestCase
         $response->assertSeeText($lastLogin->diffForHumans(null, true));
     }
 
-    /** @test */
+    /**
+     * @test
+     * @story:UserController::search
+     */
     public function admin_can_see_users_last_login_time_on_filtered_results()
     {
         // Given we have a user who has just logged in
@@ -80,7 +92,10 @@ class ViewUsersTest extends TestCase
         $response->assertSeeText($lastLogin->diffForHumans(null, true));
     }
 
-    /** @test */
+    /**
+     * @test
+     * @story:UserController::search
+     */
     public function admin_can_sort_user_list_by_last_login()
     {
         // Given we have users with various login times

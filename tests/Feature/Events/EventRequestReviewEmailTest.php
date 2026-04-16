@@ -39,7 +39,10 @@ class EventRequestReviewEmailTest extends TestCase
         parent::setUp();
     }
 
-    /** @test */
+    /**
+     * @test
+     * @story:PartyController::getContributions
+     */
     public function a_request_review_email_is_sent_to_volunteer()
     {
         Notification::fake();

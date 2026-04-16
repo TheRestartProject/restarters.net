@@ -26,7 +26,10 @@ class NullProblemTest extends TestCase
         $this->withoutExceptionHandling();
     }
 
-    /** @test */
+    /**
+     * @test
+     * @story:DeviceController::createDevicev2
+     */
     public function null_problem_mapped_to_empty_string()
     {
         $iddevices = $this->createDevice($this->event->idevents, 'misc', null, 1, 100, null);

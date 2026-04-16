@@ -18,6 +18,7 @@ class AlertsTest extends TestCase
         Cache::clear('alerts');
     }
 
+    /** @story:AlertController::listAlertsv2 */
     public function testListNonePresent()
     {
         // List - no alerts present.
@@ -29,6 +30,9 @@ class AlertsTest extends TestCase
     }
 
     /**
+     * @story:AlertController::addAlertv2
+     * @story:AlertController::listAlertsv2
+     * @story:AlertController::updateAlertv2
      * @dataProvider roleProvider
      */
     public function testCreate($role, $allowed) {

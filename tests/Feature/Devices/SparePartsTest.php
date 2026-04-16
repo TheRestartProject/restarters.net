@@ -31,7 +31,10 @@ class SparePartsTest extends TestCase
         $this->withoutExceptionHandling();
     }
 
-    /** @test */
+    /**
+     * @test
+     * @story:DeviceController::createDevicev2
+     */
     public function recording_spare_parts_from_manufacturer()
     {
         $iddevices = $this->createDevice($this->event->idevents,
@@ -47,7 +50,10 @@ class SparePartsTest extends TestCase
         $this->assertEquals(trans('partials.fixed'), $device->getRepairStatus());
     }
 
-    /** @test */
+    /**
+     * @test
+     * @story:DeviceController::createDevicev2
+     */
     public function recording_spare_parts_from_third_party()
     {
         $this->device_inputs['repair_status'] = Device::REPAIR_STATUS_REPAIRABLE;
@@ -66,7 +72,10 @@ class SparePartsTest extends TestCase
         $this->assertEquals(trans('partials.yes_third_party'), $device->getSpareParts());
     }
 
-    /** @test */
+    /**
+     * @test
+     * @story:DeviceController::createDevicev2
+     */
     public function recording_no_spare_parts_needed()
     {
         $iddevices = $this->createDevice($this->event->idevents,
@@ -81,7 +90,10 @@ class SparePartsTest extends TestCase
         $this->assertEquals(trans('partials.no'), $device->getSpareParts());
     }
 
-    /** @test */
+    /**
+     * @test
+     * @story:DeviceController::createDevicev2
+     */
     public function recording_spare_parts_related_barrier()
     {
         $iddevices = $this->createDevice($this->event->idevents,
@@ -95,7 +107,10 @@ class SparePartsTest extends TestCase
 
     }
 
-    /** @test */
+    /**
+     * @test
+     * @story:DeviceController::createDevicev2
+     */
     public function recording_no_spare_parts_related_barrier()
     {
         $iddevices = $this->createDevice($this->event->idevents,

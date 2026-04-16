@@ -25,6 +25,7 @@ class InviteEventTest extends TestCase
      * Test notification content.
      *
      * @return void
+     * @story:PartyController::postSendInvite
      */
     public function testInvite()
     {
@@ -78,6 +79,13 @@ class InviteEventTest extends TestCase
         assertEquals(0, $event->volunteers);
     }
 
+    /**
+     * @story:PartyController::postSendInvite
+     * @story:PartyController::view
+     * @story:PartyController::confirmInvite
+     * @story:PartyController::index
+     * @story:EventController::updateEventv2
+     */
     public function testInviteReal()
     {
         $userAttributes = $this->userAttributes();
@@ -186,6 +194,12 @@ class InviteEventTest extends TestCase
         $response->assertSessionHas('warning');
     }
 
+    /**
+     * @story:PartyController::getGroupEmailsWithNames
+     * @story:PartyController::postSendInvite
+     * @story:PartyController::confirmInvite
+     * @story:PartyController::view
+     */
     public function testInvitableUserPOV()
     {
         $this->withoutExceptionHandling();
@@ -288,6 +302,12 @@ class InviteEventTest extends TestCase
         $this->assertEquals([], $members);
     }
 
+    /**
+     * @story:PartyController::getGroupEmailsWithNames
+     * @story:PartyController::postSendInvite
+     * @story:PartyController::confirmInvite
+     * @story:PartyController::view
+     */
     public function testInvitableNotifications()
     {
         Queue::fake();
@@ -402,6 +422,7 @@ class InviteEventTest extends TestCase
         });
     }
 
+    /** @story:PartyController::confirmCodeInvite */
     public function testInviteViaLink() {
         $this->loginAsTestUser(Role::ADMINISTRATOR);
         $user = User::factory()->restarter()->create([
@@ -445,6 +466,7 @@ class InviteEventTest extends TestCase
         $rsp = $this->get('/party/invite/' . $unique_shareable_code . '1');
     }
 
+    /** @story:PartyController::postSendInvite */
     public function testInviteNonUsers() {
         Notification::fake();
 
@@ -475,6 +497,7 @@ class InviteEventTest extends TestCase
         $response->assertSessionHas('success');
     }
 
+    /** @story:PartyController::postSendInvite */
     public function testInviteNoUsers() {
         Notification::fake();
 
@@ -507,6 +530,7 @@ class InviteEventTest extends TestCase
 
     /**
      * @dataProvider invalidEmailProvider
+     * @story:PartyController::postSendInvite
      */
     public function testInviteInvalidEmail($email, $valid)
     {

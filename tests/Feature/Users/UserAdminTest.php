@@ -32,7 +32,8 @@ class UserAdminTest extends TestCase
     }
 
     /**
-     *@dataProvider provider
+     * @dataProvider provider
+     * @story:UserController::all
      */
     public function testUsersPage($role, $cansee)
     {
@@ -50,6 +51,7 @@ class UserAdminTest extends TestCase
         }
     }
 
+    /** @story:UserController::postSoftDeleteUser */
     public function testSoftDelete() {
         $user = User::factory()->restarter()->create();
         $this->loginAsTestUser(Role::ADMINISTRATOR);

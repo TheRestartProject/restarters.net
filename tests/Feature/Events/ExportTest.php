@@ -18,6 +18,11 @@ class ExportTest extends TestCase
 {
     /**
      * @dataProvider roleProvider
+     * @story:ExportController::groupEvents
+     * @story:ExportController::networkEvents
+     * @story:ExportController::devices
+     * @story:ExportController::devicesEvent
+     * @story:ExportController::devicesGroup
      */
     public function testExport($role)
     {
@@ -227,6 +232,10 @@ class ExportTest extends TestCase
         }
     }
 
+    /**
+     * @story:ExportController::devicesGroup
+     * @story:ExportController::devicesEvent
+     */
     public function testSlashesExport()
     {
         $admin = User::factory()->administrator()->create();

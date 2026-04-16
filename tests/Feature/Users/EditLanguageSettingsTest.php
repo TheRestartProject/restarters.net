@@ -48,7 +48,10 @@ class EditLanguageSettingsTest extends TestCase
         Event::assertDispatched(UserLanguageUpdated::class);
     }
 
-    /** @test */
+    /**
+     * @test
+     * @story:LocaleController::setLang
+     */
     // Added these to try (and fail) to reproduce a Sentry error.
     public function user_sets_language()
     {

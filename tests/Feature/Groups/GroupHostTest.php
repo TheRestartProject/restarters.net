@@ -36,6 +36,9 @@ class GroupHostTest extends TestCase
 
     /**
      * @dataProvider roleProvider
+     * @story:GroupController::getVolunteersForGroupv2
+     * @story:GroupController::patchVolunteerForGroupv2
+     * @story:GroupController::deleteVolunteerForGroupv2
      */
     public function testMakeHost($role)
     {
@@ -95,6 +98,10 @@ class GroupHostTest extends TestCase
         $this->assertEquals(1, count($json['data']));
     }
 
+    /**
+     * @story:GroupController::patchVolunteerForGroupv2
+     * @story:GroupController::deleteVolunteerForGroupv2
+     */
     public function testHostMakeHost()
     {
         $firsthost = User::factory()->host()->create();
@@ -128,6 +135,7 @@ class GroupHostTest extends TestCase
 
     /**
      * @dataProvider providerTrueFalse
+     * @story:GroupController::patchVolunteerForGroupv2
      */
     public function testNetworkCoordinatorDemoteHost($addToNetwork) {
         $host = User::factory()->host()->create();

@@ -11,6 +11,13 @@ use Tests\TestCase;
 
 class BrandsTest extends TestCase
 {
+    /**
+     * @story:BrandsController::postCreateBrand
+     * @story:BrandsController::index
+     * @story:BrandsController::getEditBrand
+     * @story:BrandsController::postEditBrand
+     * @story:BrandsController::getDeleteBrand
+     */
     public function testBasic()
     {
         $this->loginAsTestUser(Role::ADMINISTRATOR);
@@ -47,6 +54,13 @@ class BrandsTest extends TestCase
         $response->assertSessionHas('message');
     }
 
+    /**
+     * @story:BrandsController::postCreateBrand
+     * @story:BrandsController::index
+     * @story:BrandsController::getEditBrand
+     * @story:BrandsController::postEditBrand
+     * @story:BrandsController::getDeleteBrand
+     */
     public function testErrors() {
         $this->loginAsTestUser(Role::RESTARTER);
 

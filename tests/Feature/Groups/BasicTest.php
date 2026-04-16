@@ -14,6 +14,9 @@ class BasicTest extends TestCase
 {
     /**
      * @dataProvider tabProvider
+     * @story:GroupController::mine
+     * @story:GroupController::all
+     * @story:GroupController::nearby
      */
     public function testPageLoads($url, $tab)
     {

@@ -21,7 +21,10 @@ class CharsetTest extends TestCase
         parent::setUp();
     }
 
-    /** @test */
+    /**
+     * @test
+     * @story:PartyController::view
+     */
     public function test_charset_db_insert()
     {
         DB::statement('SET foreign_key_checks=0');

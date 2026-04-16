@@ -14,6 +14,11 @@ use function PHPUnit\Framework\assertEquals;
 
 class JoinEventTest extends TestCase
 {
+    /**
+     * @story:PartyController::getJoinEvent
+     * @story:PartyController::view
+     * @story:PartyController::cancelInvite
+     */
     public function testJoin()
     {
         Queue::fake();
@@ -82,6 +87,7 @@ class JoinEventTest extends TestCase
         });
     }
 
+    /** @story:PartyController::getJoinEvent */
     public function testJoinInvalid() {
         $user = User::factory()->restarter()->create();
         $this->actingAs($user);

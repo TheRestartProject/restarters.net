@@ -10,6 +10,11 @@ use Tests\TestCase;
 
 class CategoryTest extends TestCase
 {
+    /**
+     * @story:CategoryController::index
+     * @story:CategoryController::getEditCategory
+     * @story:CategoryController::postEditCategory
+     */
     public function testBasic()
     {
         $this->loginAsTestUser(Role::ADMINISTRATOR);
@@ -41,6 +46,10 @@ class CategoryTest extends TestCase
         $response->assertSessionHas('success');
     }
 
+    /**
+     * @story:CategoryController::getEditCategory
+     * @story:CategoryController::postEditCategory
+     */
     public function testErrors() {
         $this->loginAsTestUser(Role::RESTARTER);
 

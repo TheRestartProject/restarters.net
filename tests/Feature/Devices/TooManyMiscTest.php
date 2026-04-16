@@ -13,6 +13,7 @@ use Tests\TestCase;
 class TooManyMiscTest extends TestCase
 {
     /**
+     * @story:DeviceController::createDevicev2
      * @dataProvider provider
      */
     public function testTooMany($count, $notif)
