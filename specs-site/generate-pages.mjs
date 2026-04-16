@@ -202,6 +202,14 @@ hero:
       link: /personas/
 ---
 
+## About Restarters.net
+
+Restarters.net is the platform behind the global community repair movement. It brings together volunteer fixers, event hosts, and repair networks to organise community repair events and measure their environmental impact.
+
+The platform combines three core modules: **The Fixometer** for organising repair events and recording their impact, **Restarters Talk** for community discussion, and **Restarters Wiki** for collectively produced repair knowledge. Groups around the world use it to run events, log device repairs, track waste prevented, and coordinate through regional networks.
+
+This site is the living specification — every user story listed here is extracted directly from the codebase and linked to its test coverage. It updates automatically as the code changes.
+
 ## At a Glance
 
 | | |
