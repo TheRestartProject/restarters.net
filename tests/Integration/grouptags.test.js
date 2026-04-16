@@ -355,6 +355,20 @@ test('NC can filter groups list by tag', async ({page, baseURL}) => {
   }
 })
 
+test('NC should see tags displayed on group page', async ({page, baseURL}) => {
+  test.slow()
+  await login(page, baseURL, NC_EMAIL, PASSWORD)
+  const groupId = await getGroupId(page, baseURL)
+
+  // View the group page (not edit)
+  await page.goto(baseURL + '/group/view/' + groupId)
+  await page.waitForLoadState('networkidle')
+  await page.waitForTimeout(2000)
+
+  // Tags should be displayed as badges on the group view page
+  await expect(page.locator('.badge-info.badge-pill.mr-1').first()).toBeVisible({ timeout: 10000 })
+})
+
 // ---------- Host: Should not see tags ----------
 
 test('Host does not see tags on groups list', async ({page, baseURL}) => {
@@ -477,6 +491,202 @@ test('Admin cannot create duplicate tag', async ({page, baseURL}) => {
   await expect(page.locator('.text-danger')).toBeVisible()
 })
 
+test('Admin can create tag with same name as global tag', async ({page, baseURL}) => {
+  test.slow()
+  await login(page, baseURL, ADMIN_EMAIL, PASSWORD)
+  const networkId = await getNetworkId(page, baseURL)
+  await page.goto(baseURL + '/networks/' + networkId)
+
+  // Create a tag with a name that might exist as a global tag
+  // This should succeed - network tags can share names with global tags
+  await page.fill('.tag-name-input', 'Admin Global Name Tag')
+  await page.fill('.tag-description-input', 'Same name as global')
+  await page.click('.create-tag button[type=submit]')
+
+  await expect(page.locator('.tag-item', { hasText: 'Admin Global Name Tag' })).toBeVisible()
+})
+
+test('Admin can edit a tag', async ({page, baseURL}) => {
+  test.slow()
+  await login(page, baseURL, ADMIN_EMAIL, PASSWORD)
+  const networkId = await getNetworkId(page, baseURL)
+  await page.goto(baseURL + '/networks/' + networkId)
+
+  // Find the first tag's edit button and click it
+  await page.locator('.edit-tag-btn').first().click()
+
+  // Modal should open with edit fields
+  await page.waitForSelector('.modal.show')
+  const nameInput = page.locator('.modal.show .tag-name-input, .modal.show input[type="text"]').first()
+  await nameInput.fill('Admin Edited Tag')
+  await page.click('.modal.show .btn-primary')
+  await page.waitForSelector('.modal.show', { state: 'hidden' })
+
+  // Verify the tag was updated
+  await expect(page.locator('.tag-item', { hasText: 'Admin Edited Tag' })).toBeVisible()
+})
+
+test('Admin cannot edit tag to duplicate name', async ({page, baseURL}) => {
+  test.slow()
+  await login(page, baseURL, ADMIN_EMAIL, PASSWORD)
+  const networkId = await getNetworkId(page, baseURL)
+  await page.goto(baseURL + '/networks/' + networkId)
+
+  // Create a second tag to try to rename to an existing name
+  await page.fill('.tag-name-input', 'Admin Unique Tag')
+  await page.fill('.tag-description-input', 'Will try to rename')
+  await page.click('.create-tag button[type=submit]')
+  await expect(page.locator('.tag-item', { hasText: 'Admin Unique Tag' })).toBeVisible()
+
+  // Edit the new tag to have the same name as an existing tag
+  const tagItem = page.locator('.tag-item', { hasText: 'Admin Unique Tag' })
+  await tagItem.locator('.edit-tag-btn').click()
+
+  await page.waitForSelector('.modal.show')
+  const nameInput = page.locator('.modal.show .tag-name-input, .modal.show input[type="text"]').first()
+  await nameInput.fill('Admin Edited Tag')
+  await page.click('.modal.show .btn-primary')
+
+  // Should show an error about duplicate name
+  await expect(page.locator('.text-danger, .modal.show .text-danger')).toBeVisible({ timeout: 5000 })
+})
+
+test('Admin can delete tag with 0 groups', async ({page, baseURL}) => {
+  test.slow()
+  await login(page, baseURL, ADMIN_EMAIL, PASSWORD)
+  const networkId = await getNetworkId(page, baseURL)
+  await page.goto(baseURL + '/networks/' + networkId)
+
+  // Create a fresh tag to delete
+  await page.fill('.tag-name-input', 'Admin Delete Me')
+  await page.fill('.tag-description-input', 'Will be deleted')
+  await page.click('.create-tag button[type=submit]')
+  await expect(page.locator('.tag-item', { hasText: 'Admin Delete Me' })).toBeVisible()
+
+  const countBefore = await page.locator('.tag-item').count()
+
+  // Delete the tag
+  const tagItem = page.locator('.tag-item', { hasText: 'Admin Delete Me' })
+  await tagItem.locator('.delete-tag-btn').click()
+
+  // Confirm in modal
+  await page.waitForSelector('.modal.show')
+  await page.click('.modal.show .btn-primary')
+  await page.waitForSelector('.modal.show', { state: 'hidden' })
+
+  await expect(page.locator('.tag-item')).toHaveCount(countBefore - 1)
+})
+
+test('Admin can delete tag with groups attached', async ({page, baseURL}) => {
+  test.slow()
+  await login(page, baseURL, ADMIN_EMAIL, PASSWORD)
+  const networkId = await getNetworkId(page, baseURL)
+
+  // Create a tag
+  await page.goto(baseURL + '/networks/' + networkId)
+  await page.fill('.tag-name-input', 'Admin Tag With Group')
+  await page.fill('.tag-description-input', 'Tag to assign then delete')
+  await page.click('.create-tag button[type=submit]')
+  await expect(page.locator('.tag-item', { hasText: 'Admin Tag With Group' })).toBeVisible()
+
+  // Assign it to the group
+  const groupId = await getGroupId(page, baseURL)
+  await page.goto(baseURL + '/group/edit/' + groupId)
+  await page.waitForLoadState('networkidle')
+  await page.waitForTimeout(2000)
+
+  await page.locator('label[for="tags"]').click()
+  await page.waitForTimeout(500)
+  await page.locator('#tags').fill('Admin Tag With Group')
+  await page.waitForTimeout(1000)
+  await page.locator('.multiselect__content-wrapper .multiselect__option', { hasText: 'Admin Tag With Group' }).first().click({ timeout: 10000 })
+
+  await page.locator('button', { hasText: 'Save changes' }).click()
+  await page.waitForLoadState('networkidle')
+  await page.waitForTimeout(2000)
+
+  // Go back to network page and delete the tag
+  await page.goto(baseURL + '/networks/' + networkId)
+  await page.waitForLoadState('networkidle')
+
+  const tagItem = page.locator('.tag-item', { hasText: 'Admin Tag With Group' })
+  await expect(tagItem).toBeVisible()
+  await expect(tagItem.locator('text=1 group')).toBeVisible()
+
+  await tagItem.locator('.delete-tag-btn').click()
+
+  // Modal should warn about groups
+  await page.waitForSelector('.modal.show')
+  await expect(page.locator('.modal.show .text-warning')).toBeVisible()
+
+  // Confirm delete
+  await page.click('.modal.show .btn-primary')
+  await page.waitForSelector('.modal.show', { state: 'hidden' })
+})
+
+test('Admin can remove a tag from a group', async ({page, baseURL}) => {
+  test.slow()
+  await login(page, baseURL, ADMIN_EMAIL, PASSWORD)
+  const networkId = await getNetworkId(page, baseURL)
+
+  // First ensure there's a tag assigned - create and assign one
+  await page.goto(baseURL + '/networks/' + networkId)
+  await page.fill('.tag-name-input', 'Admin Remove Tag')
+  await page.fill('.tag-description-input', 'Will be removed from group')
+  await page.click('.create-tag button[type=submit]')
+  await page.waitForTimeout(1000)
+
+  // Assign to group
+  const groupId = await getGroupId(page, baseURL)
+  await page.goto(baseURL + '/group/edit/' + groupId)
+  await page.waitForLoadState('networkidle')
+  await page.waitForTimeout(2000)
+
+  await page.locator('label[for="tags"]').click()
+  await page.waitForTimeout(500)
+  await page.locator('#tags').fill('Admin Remove Tag')
+  await page.waitForTimeout(1000)
+  await page.locator('.multiselect__content-wrapper .multiselect__option', { hasText: 'Admin Remove Tag' }).first().click({ timeout: 10000 })
+
+  await page.locator('button', { hasText: 'Save changes' }).click()
+  await page.waitForLoadState('networkidle')
+  await page.waitForTimeout(2000)
+
+  // Now remove the tag
+  await page.goto(baseURL + '/group/edit/' + groupId)
+  await page.waitForLoadState('networkidle')
+  await page.waitForTimeout(2000)
+
+  // Click the remove button on the tag in the multiselect
+  const tagToRemove = page.locator('.multiselect__tag', { hasText: 'Admin Remove Tag' })
+  await expect(tagToRemove).toBeVisible()
+  await tagToRemove.locator('.multiselect__tag-icon, i').click()
+
+  await page.locator('button', { hasText: 'Save changes' }).click()
+  await page.waitForLoadState('networkidle')
+  await page.waitForTimeout(2000)
+
+  // Verify tag was removed - reload and check
+  await page.goto(baseURL + '/group/edit/' + groupId)
+  await page.waitForLoadState('networkidle')
+  await page.waitForTimeout(2000)
+
+  await expect(page.locator('.multiselect__tag', { hasText: 'Admin Remove Tag' })).not.toBeVisible()
+})
+
+test('Admin should see tags displayed on group page', async ({page, baseURL}) => {
+  test.slow()
+  await login(page, baseURL, ADMIN_EMAIL, PASSWORD)
+  const groupId = await getGroupId(page, baseURL)
+
+  await page.goto(baseURL + '/group/view/' + groupId)
+  await page.waitForLoadState('networkidle')
+  await page.waitForTimeout(2000)
+
+  // Tags should be displayed as badges on the group view page
+  await expect(page.locator('.badge-info.badge-pill.mr-1').first()).toBeVisible({ timeout: 10000 })
+})
+
 test('Admin can add tag to group (scoped to group networks)', async ({page, baseURL}) => {
   test.slow()
   await login(page, baseURL, ADMIN_EMAIL, PASSWORD)
@@ -547,4 +757,87 @@ test('Admin can filter groups by tag', async ({page, baseURL}) => {
       }
     }
   }
+})
+
+// ---------- Admin: Global tag management (/tags page) ----------
+
+test('Admin can view global tags page', async ({page, baseURL}) => {
+  test.slow()
+  await login(page, baseURL, ADMIN_EMAIL, PASSWORD)
+  await page.goto(baseURL + '/tags')
+  await page.waitForLoadState('networkidle')
+
+  // Should see the tags table
+  await expect(page.locator('#tags-table, table')).toBeVisible()
+})
+
+test('Admin can add a global tag', async ({page, baseURL}) => {
+  test.slow()
+  await login(page, baseURL, ADMIN_EMAIL, PASSWORD)
+  await page.goto(baseURL + '/tags')
+  await page.waitForLoadState('networkidle')
+
+  // Click create button to open modal
+  await page.click('button[data-target="#add-new-tag"], .btn-save')
+  await page.waitForSelector('#add-new-tag.show, .modal.show')
+
+  // Fill in the form
+  await page.fill('#tag-name', 'PW Global Tag')
+  await page.fill('#tag-description', 'Created by Playwright')
+  await page.click('#add-new-tag .btn-primary, .modal.show button[type="submit"]')
+
+  await page.waitForLoadState('networkidle')
+
+  // After creation, redirects to edit page with success message
+  await expect(page.locator('text=successfully created')).toBeVisible({ timeout: 5000 })
+
+  // Navigate back to tags list and verify it's there
+  await page.goto(baseURL + '/tags')
+  await page.waitForLoadState('networkidle')
+  await expect(page.locator('#tags-table, table')).toContainText('PW Global Tag')
+})
+
+test('Admin can edit a global tag', async ({page, baseURL}) => {
+  test.slow()
+  await login(page, baseURL, ADMIN_EMAIL, PASSWORD)
+  await page.goto(baseURL + '/tags')
+  await page.waitForLoadState('networkidle')
+
+  // Click on the tag name link to go to edit page
+  await page.locator('a[href*="/tags/edit/"]', { hasText: 'PW Global Tag' }).first().click()
+  await page.waitForLoadState('networkidle')
+
+  // Should be on the edit page
+  await expect(page.locator('#tag-name')).toBeVisible()
+
+  // Change the name
+  await page.fill('#tag-name', 'PW Global Tag Edited')
+  await page.click('.btn-create, button[type="submit"]')
+  await page.waitForLoadState('networkidle')
+
+  // After save, stays on edit page with success message
+  await expect(page.locator('text=successfully updated')).toBeVisible({ timeout: 5000 })
+
+  // Navigate back to tags list and verify updated name
+  await page.goto(baseURL + '/tags')
+  await page.waitForLoadState('networkidle')
+  await expect(page.locator('#tags-table, table')).toContainText('PW Global Tag Edited')
+})
+
+test('Admin can delete a global tag', async ({page, baseURL}) => {
+  test.slow()
+  await login(page, baseURL, ADMIN_EMAIL, PASSWORD)
+  await page.goto(baseURL + '/tags')
+  await page.waitForLoadState('networkidle')
+
+  // Click on the tag to go to edit page
+  await page.locator('a[href*="/tags/edit/"]', { hasText: 'PW Global Tag Edited' }).click()
+  await page.waitForLoadState('networkidle')
+
+  // Click delete button
+  await page.click('.btn-danger')
+  await page.waitForLoadState('networkidle')
+
+  // Should redirect to tags list, tag should be gone
+  await expect(page.locator('#tags-table, table')).not.toContainText('PW Global Tag Edited')
 })
