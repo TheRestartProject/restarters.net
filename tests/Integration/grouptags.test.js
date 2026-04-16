@@ -358,7 +358,29 @@ test('NC can filter groups list by tag', async ({page, baseURL}) => {
 test('NC should see tags displayed on group page', async ({page, baseURL}) => {
   test.slow()
   await login(page, baseURL, NC_EMAIL, PASSWORD)
+  const networkId = await getNetworkId(page, baseURL)
   const groupId = await getGroupId(page, baseURL)
+
+  // Ensure a tag exists and is assigned to the group
+  await page.goto(baseURL + '/networks/' + networkId)
+  await page.fill('.tag-name-input', 'PW Visible Tag')
+  await page.fill('.tag-description-input', 'Should appear on group page')
+  await page.click('.create-tag button[type=submit]')
+  await page.waitForTimeout(1000)
+
+  await page.goto(baseURL + '/group/edit/' + groupId)
+  await page.waitForLoadState('networkidle')
+  await page.waitForTimeout(2000)
+
+  await page.locator('label[for="tags"]').click()
+  await page.waitForTimeout(500)
+  await page.locator('#tags').fill('PW Visible Tag')
+  await page.waitForTimeout(1000)
+  await page.locator('.multiselect__content-wrapper .multiselect__option', { hasText: 'PW Visible Tag' }).first().click({ timeout: 10000 })
+
+  await page.locator('button', { hasText: 'Save changes' }).click()
+  await page.waitForLoadState('networkidle')
+  await page.waitForTimeout(2000)
 
   // View the group page (not edit)
   await page.goto(baseURL + '/group/view/' + groupId)
@@ -677,8 +699,31 @@ test('Admin can remove a tag from a group', async ({page, baseURL}) => {
 test('Admin should see tags displayed on group page', async ({page, baseURL}) => {
   test.slow()
   await login(page, baseURL, ADMIN_EMAIL, PASSWORD)
+  const networkId = await getNetworkId(page, baseURL)
   const groupId = await getGroupId(page, baseURL)
 
+  // Ensure a tag exists and is assigned to the group
+  await page.goto(baseURL + '/networks/' + networkId)
+  await page.fill('.tag-name-input', 'Admin Visible Tag')
+  await page.fill('.tag-description-input', 'Should appear on group page')
+  await page.click('.create-tag button[type=submit]')
+  await page.waitForTimeout(1000)
+
+  await page.goto(baseURL + '/group/edit/' + groupId)
+  await page.waitForLoadState('networkidle')
+  await page.waitForTimeout(2000)
+
+  await page.locator('label[for="tags"]').click()
+  await page.waitForTimeout(500)
+  await page.locator('#tags').fill('Admin Visible Tag')
+  await page.waitForTimeout(1000)
+  await page.locator('.multiselect__content-wrapper .multiselect__option', { hasText: 'Admin Visible Tag' }).first().click({ timeout: 10000 })
+
+  await page.locator('button', { hasText: 'Save changes' }).click()
+  await page.waitForLoadState('networkidle')
+  await page.waitForTimeout(2000)
+
+  // View the group page (not edit)
   await page.goto(baseURL + '/group/view/' + groupId)
   await page.waitForLoadState('networkidle')
   await page.waitForTimeout(2000)
