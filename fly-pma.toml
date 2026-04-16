@@ -2,15 +2,21 @@ app = "restarters-pma"
 primary_region = "lhr"
 
 [build]
-  image = "phpmyadmin:5"
+  dockerfile = "docker/Dockerfile.pma"
 
 [env]
   PMA_HOST = "restarters-db.internal"
   PMA_PORT = "3306"
   UPLOAD_LIMIT = "100M"
 
-# No [http_service] — not publicly accessible.
-# Access via: fly proxy 8080:80 -a restarters-pma
+# PMA_BASIC_AUTH_USER and PMA_BASIC_AUTH_PASS set via fly secrets
+
+[http_service]
+  internal_port = 80
+  force_https = true
+  auto_stop_machines = "stop"
+  auto_start_machines = true
+  min_machines_running = 0
 
 [[vm]]
   size = "shared-cpu-1x"
