@@ -99,6 +99,7 @@ Route::prefix('v2')->group(function() {
             Route::get('{id}/groups', [API\NetworkController::class, 'getNetworkGroupsv2']);
             Route::get('{id}/events', [API\NetworkController::class, 'getNetworkEventsv2']);
             Route::get('{id}/tags', [API\NetworkController::class, 'getNetworkTagsv2']);
+            Route::get('{id}/stats', [API\NetworkController::class, 'getNetworkStatsv2']);
             Route::middleware('auth:api')->group(function() {
                 Route::post('{id}/tags', [API\NetworkController::class, 'createNetworkTagv2']);
                 Route::put('{id}/tags/{tagId}', [API\NetworkController::class, 'updateNetworkTagv2']);

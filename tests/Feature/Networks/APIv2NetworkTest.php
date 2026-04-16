@@ -817,6 +817,65 @@ class APIv2NetworkTest extends TestCase
     }
 
     /**
+     * Test v2 stats endpoint returns stats for a network.
+     */
+    public function testGetNetworkStats(): void {
+        $network = Network::factory()->create();
+        $user = User::factory()->networkCoordinator()->create([
+            'api_token' => '1234',
+        ]);
+        $network->addCoordinator($user);
+
+        $group = Group::factory()->create();
+        $network->addGroup($group);
+
+        $response = $this->get("/api/v2/networks/{$network->id}/stats");
+        $response->assertSuccessful();
+        $json = json_decode($response->getContent(), true);
+
+        $this->assertArrayHasKey('parties', $json);
+        $this->assertArrayHasKey('co2_total', $json);
+        $this->assertArrayHasKey('waste_total', $json);
+        $this->assertArrayHasKey('fixed_devices', $json);
+    }
+
+    /**
+     * Test v2 stats endpoint with group_tag filter.
+     */
+    public function testGetNetworkStatsFilteredByTag(): void {
+        $network = Network::factory()->create();
+        $user = User::factory()->networkCoordinator()->create([
+            'api_token' => '1234',
+        ]);
+        $network->addCoordinator($user);
+
+        // Create two groups in the network
+        $group1 = Group::factory()->create();
+        $group2 = Group::factory()->create();
+        $network->addGroup($group1);
+        $network->addGroup($group2);
+
+        // Create a tag and assign it to only group1
+        $tag = GroupTags::factory()->create([
+            'tag_name' => 'StatsTestTag',
+            'network_id' => $network->id,
+        ]);
+        DB::table('grouptags_groups')->insert([
+            'group' => $group1->idgroups,
+            'group_tag' => $tag->id,
+        ]);
+
+        // Get stats filtered by tag
+        $response = $this->get("/api/v2/networks/{$network->id}/stats?group_tag={$tag->id}");
+        $response->assertSuccessful();
+        $json = json_decode($response->getContent(), true);
+
+        $this->assertArrayHasKey('parties', $json);
+        $this->assertArrayHasKey('co2_total', $json);
+        $this->assertArrayHasKey('waste_total', $json);
+    }
+
+    /**
      * Test that unauthenticated API calls return no tags for groups tags endpoint.
      */
     public function testUnauthenticatedGroupTagsReturnsEmpty(): void {
