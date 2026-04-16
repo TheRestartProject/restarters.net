@@ -37,15 +37,19 @@ class MediawikiServiceProvider extends ServiceProvider
                 Log::debug('...connected');
 
                 return new MediawikiFactory($api);
-            } catch (\Exception $ex) {
+            } catch (\Throwable $ex) {
                 Log::error('Failed to instantiate Wiki API classes: '.$ex->getMessage());
             }
         });
 
         $this->app->bind(UserCreator::class, function ($app) {
-            $mw = $app->make(MediawikiFactory::class);
-            if ($mw) {
-                return $mw->newUserCreator();
+            try {
+                $mw = $app->make(MediawikiFactory::class);
+                if ($mw) {
+                    return $mw->newUserCreator();
+                }
+            } catch (\Throwable $ex) {
+                Log::error('Failed to create Wiki UserCreator: '.$ex->getMessage());
             }
         });
     }
