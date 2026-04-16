@@ -291,7 +291,7 @@ test('NC should see tags on groups list', async ({page, baseURL}) => {
   // The tag filter dropdown should be visible for NC
   const tagFilter = page.locator('.multiselect', { hasText: /tag/i })
   // At minimum, the groups page should load and show groups
-  await expect(page.locator('table, .table')).toBeVisible()
+  await expect(page.locator('table, .table').first()).toBeVisible()
 })
 
 test('NC can filter groups list by tag', async ({page, baseURL}) => {
@@ -771,9 +771,7 @@ test('Admin should see tags on groups list', async ({page, baseURL}) => {
   await page.waitForTimeout(2000)
 
   // Admin should see groups table with tags
-  await expect(page.locator('table, .table')).toBeVisible()
-  // Tag badges should be visible if any groups are tagged
-  // At minimum verify the page loads correctly
+  await expect(page.locator('table, .table').first()).toBeVisible()
 })
 
 test('Admin can filter groups by tag', async ({page, baseURL}) => {
@@ -813,7 +811,7 @@ test('Admin can view global tags page', async ({page, baseURL}) => {
   await page.waitForLoadState('networkidle')
 
   // Should see the tags table
-  await expect(page.locator('#tags-table, table')).toBeVisible()
+  await expect(page.locator('#tags-table, table').first()).toBeVisible()
 })
 
 test('Admin can add a global tag', async ({page, baseURL}) => {
@@ -839,7 +837,7 @@ test('Admin can add a global tag', async ({page, baseURL}) => {
   // Navigate back to tags list and verify it's there
   await page.goto(baseURL + '/tags')
   await page.waitForLoadState('networkidle')
-  await expect(page.locator('#tags-table, table')).toContainText('PW Global Tag')
+  await expect(page.locator('#tags-table, table').first()).toContainText('PW Global Tag')
 })
 
 test('Admin can edit a global tag', async ({page, baseURL}) => {
@@ -866,7 +864,7 @@ test('Admin can edit a global tag', async ({page, baseURL}) => {
   // Navigate back to tags list and verify updated name
   await page.goto(baseURL + '/tags')
   await page.waitForLoadState('networkidle')
-  await expect(page.locator('#tags-table, table')).toContainText('PW Global Tag Edited')
+  await expect(page.locator('#tags-table, table').first()).toContainText('PW Global Tag Edited')
 })
 
 test('Admin can delete a global tag', async ({page, baseURL}) => {
@@ -884,5 +882,5 @@ test('Admin can delete a global tag', async ({page, baseURL}) => {
   await page.waitForLoadState('networkidle')
 
   // Should redirect to tags list, tag should be gone
-  await expect(page.locator('#tags-table, table')).not.toContainText('PW Global Tag Edited')
+  await expect(page.locator('#tags-table, table').first()).not.toContainText('PW Global Tag Edited')
 })
