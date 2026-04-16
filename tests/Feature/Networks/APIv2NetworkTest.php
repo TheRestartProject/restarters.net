@@ -243,30 +243,25 @@ class APIv2NetworkTest extends TestCase
             'network_id' => $otherNetwork->id,
         ]);
 
-        // Unauthenticated: should see no tags at all
+        // Unauthenticated: should see network-specific tags (public endpoint)
         $response = $this->get("/api/v2/networks/{$network->id}/tags");
         $response->assertSuccessful();
         $json = json_decode($response->getContent(), true)['data'];
-        $this->assertEmpty($json);
+        $tagIds = array_column($json, 'id');
+        $this->assertContains($networkTag->id, $tagIds);
+        $this->assertNotContains($globalTag->id, $tagIds); // Global tags not shown
+        $this->assertNotContains($otherTag->id, $tagIds); // Other network tags not shown
 
-        // Admin: should see global + network-specific tags
+        // Admin: same result - only this network's tags (global tags managed on /tags page)
         $admin = User::factory()->administrator()->create(['api_token' => 'admintoken123']);
         $this->actingAs($admin);
         $response = $this->get("/api/v2/networks/{$network->id}/tags?api_token=admintoken123");
         $response->assertSuccessful();
         $json = json_decode($response->getContent(), true)['data'];
         $tagIds = array_column($json, 'id');
-        $this->assertContains($globalTag->id, $tagIds); // Admin can see global tags
+        $this->assertNotContains($globalTag->id, $tagIds); // Global tags not shown here
         $this->assertContains($networkTag->id, $tagIds);
         $this->assertNotContains($otherTag->id, $tagIds);
-
-        // Test network_only parameter (even for admin, should exclude global)
-        $response = $this->get("/api/v2/networks/{$network->id}/tags?network_only=true&api_token=admintoken123");
-        $response->assertSuccessful();
-        $json = json_decode($response->getContent(), true)['data'];
-        $tagIds = array_column($json, 'id');
-        $this->assertNotContains($globalTag->id, $tagIds);
-        $this->assertContains($networkTag->id, $tagIds);
     }
 
     public function testCreateNetworkTagAsCoordinator(): void {
@@ -798,26 +793,27 @@ class APIv2NetworkTest extends TestCase
     /**
      * Test that unauthenticated API calls return no tags for network tags endpoint.
      */
-    public function testUnauthenticatedNetworkTagsReturnsEmpty(): void {
+    public function testUnauthenticatedNetworkTagsReturnsNetworkTags(): void {
         $network = Network::factory()->create();
 
         // Create some tags
-        GroupTags::factory()->create([
+        $networkTag = GroupTags::factory()->create([
             'tag_name' => 'NetworkTag',
             'network_id' => $network->id,
         ]);
-        GroupTags::factory()->create([
+        $globalTag = GroupTags::factory()->create([
             'tag_name' => 'GlobalTag',
             'network_id' => null,
         ]);
 
-        // Make unauthenticated request
+        // Make unauthenticated request - should see network tags (public endpoint)
         $response = $this->get("/api/v2/networks/{$network->id}/tags");
         $response->assertSuccessful();
         $json = json_decode($response->getContent(), true)['data'];
+        $tagIds = array_column($json, 'id');
 
-        // Should return empty array
-        $this->assertEmpty($json);
+        $this->assertContains($networkTag->id, $tagIds);
+        $this->assertNotContains($globalTag->id, $tagIds);
     }
 
     /**

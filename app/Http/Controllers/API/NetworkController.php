@@ -24,8 +24,9 @@ class NetworkController extends Controller
         }
 
         // If tag filter specified, compute stats only for groups with that tag
-        if ($request->has('tag')) {
-            $tagId = $request->get('tag');
+        // Accept both 'tag' (legacy) and 'group_tag' parameter names
+        if ($request->has('group_tag') || $request->has('tag')) {
+            $tagId = $request->get('group_tag', $request->get('tag'));
             return response()->json($this->statsForTag($network, $tagId));
         }
 
@@ -463,28 +464,8 @@ class NetworkController extends Controller
     {
         $network = Network::findOrFail($id);
 
-        // Try session auth first, then API token auth
-        $user = Auth::user();
-        if (!$user) {
-            $user = auth('api')->user();
-        }
-
-        // Unauthenticated users cannot see any tags
-        if (!$user) {
-            return TagCollection::make(collect([]));
-        }
-
-        // Only admins can see global tags; everyone else sees only network-specific tags
-        $isAdmin = $user->hasRole('Administrator');
-        $networkOnly = $request->get('network_only', false) === 'true' || $request->get('network_only', false) === true;
-
-        if ($networkOnly || !$isAdmin) {
-            // Network tags only (exclude global tags)
-            $tags = GroupTags::forNetwork($id)->get();
-        } else {
-            // Admin: global + network tags
-            $tags = GroupTags::availableForNetwork($id)->get();
-        }
+        // Return tags belonging to this network (public - tags are visible on group pages)
+        $tags = GroupTags::forNetwork($id)->get();
 
         return TagCollection::make($tags);
     }

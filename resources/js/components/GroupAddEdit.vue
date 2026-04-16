@@ -351,18 +351,12 @@ export default {
       const groupNetworkIds = this.networkList ? this.networkList.map(n => n.id) : []
 
       const filteredTags = tags.filter(tag => {
-        // Global tags (network_id is null) are admin-only, already filtered by API
-        // But double-check here for safety
+        // Global tags (network_id is null) - only admins can see these
         if (!tag.network_id) {
-          return this.canNetwork // Only admins see global tags
+          return this.canNetwork
         }
 
-        // For admins, show all tags
-        if (this.canNetwork) {
-          return true
-        }
-
-        // For NCs, only show tags from networks the group belongs to
+        // For both admins and NCs, only show tags from networks the group belongs to
         return groupNetworkIds.includes(tag.network_id)
       })
 
