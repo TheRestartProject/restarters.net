@@ -21,9 +21,14 @@ use Auth;
 use Illuminate\Http\Request;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Log;
+use App\Attributes\Feature;
+use App\Attributes\UserStory;
+use App\Attributes\NoStory;
 
+#[Feature('Events', description: 'Community repair event management')]
 class EventController extends Controller
 {
+    #[UserStory('As a NetworkCoordinator, I can list events across my networks', persona: 'NetworkCoordinator')]
     public function getEventsByUsersNetworks(Request $request, $date_from = null, $date_to = null, $timezone = 'UTC')
     {
         $authenticatedUser = Auth::user();
@@ -145,6 +150,7 @@ class EventController extends Controller
         return $collection;
     }
 
+    #[UserStory('As a Host, I can add a volunteer to my event', persona: 'Host')]
     public function addVolunteer(Request $request, $idevents)
     {
         $request->validate([
@@ -236,6 +242,8 @@ class EventController extends Controller
     }
 
 
+    #[UserStory('As a Guest, I can view confirmed volunteers for an event', persona: 'Guest')]
+    #[UserStory('As a ThirdParty, I can retrieve volunteer data for an event via the API', persona: 'ThirdParty')]
     public function listVolunteers(Request $request, $idevents)
     {
         $party = Party::findOrFail($idevents);
@@ -287,6 +295,8 @@ class EventController extends Controller
      *     )
      */
 
+    #[UserStory('As a Guest, I can view event details via the API', persona: 'Guest')]
+    #[UserStory('As a ThirdParty, I can retrieve event details to display on my platform', persona: 'ThirdParty')]
     public function getEventv2(Request $request, $idevents)
     {
         $party = Party::findOrFail($idevents);
@@ -343,6 +353,8 @@ class EventController extends Controller
      *       ),
      *     )
      */
+    #[UserStory('As a NetworkCoordinator, I can view events pending moderation in my networks', persona: 'NetworkCoordinator')]
+    #[UserStory('As an Admin, I can view all events pending moderation', persona: 'Admin')]
     public function moderateEventsv2(Request $request)
     {
         // Get the user that the API has been authenticated as.
@@ -455,6 +467,7 @@ class EventController extends Controller
      *     )
      *  )
      */
+    #[UserStory('As a Host, I can create an event via the API', persona: 'Host')]
     public function createEventv2(Request $request)
     {
         $user = $this->getUser();
@@ -624,6 +637,7 @@ class EventController extends Controller
      *     )
      *  )
      */
+    #[UserStory('As a Host, I can update my event via the API', persona: 'Host')]
     public function updateEventv2(Request $request, $idEvents)
     {
         $user = $this->getUser();

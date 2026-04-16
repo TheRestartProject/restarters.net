@@ -10,9 +10,13 @@ use Auth;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use App\Attributes\Feature;
+use App\Attributes\UserStory;
 
+#[Feature('Networks', description: 'Regional network management and coordination')]
 class NetworkController extends Controller
 {
+    #[UserStory('As a NetworkCoordinator, I can view my network\'s statistics via the API', persona: 'NetworkCoordinator')]
     public function stats(Network $network)
     {
         if (! Auth::user()->can('view', $network)) {
@@ -51,6 +55,8 @@ class NetworkController extends Controller
      *     )
      */
 
+    #[UserStory('As a Guest, I can list all networks via the API', persona: 'Guest')]
+    #[UserStory('As a ThirdParty, I can retrieve all networks to display on my platform', persona: 'ThirdParty')]
     public function getNetworksv2()
     {
         $networks = Network::all();
@@ -91,6 +97,8 @@ class NetworkController extends Controller
      *     )
      */
 
+    #[UserStory('As a Guest, I can view network details via the API', persona: 'Guest')]
+    #[UserStory('As a ThirdParty, I can retrieve network details via the API', persona: 'ThirdParty')]
     public function getNetworkv2($id)
     {
         $network = Network::findOrFail($id);
@@ -189,6 +197,8 @@ class NetworkController extends Controller
      *     )
      */
 
+    #[UserStory('As a Guest, I can list groups for a network via the API', persona: 'Guest')]
+    #[UserStory('As a ThirdParty, I can retrieve groups for a network to display on my platform', persona: 'ThirdParty')]
     public function getNetworkGroupsv2(Request $request, $id)
     {
         $network = Network::findOrFail($id);
@@ -312,6 +322,8 @@ class NetworkController extends Controller
      *     )
      */
 
+    #[UserStory('As a Guest, I can list events for a network via the API', persona: 'Guest')]
+    #[UserStory('As a ThirdParty, I can retrieve events for a network to display on my platform', persona: 'ThirdParty')]
     public function getNetworkEventsv2(Request $request, $id)
     {
         Network::findOrFail($id);

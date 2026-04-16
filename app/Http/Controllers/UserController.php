@@ -3,6 +3,9 @@
 namespace App\Http\Controllers;
 
 use App;
+use App\Attributes\Feature;
+use App\Attributes\NoStory;
+use App\Attributes\UserStory;
 use App\Device;
 use App\DripEvent;
 use App\Events\PasswordChanged;
@@ -43,6 +46,7 @@ use Lang;
 use LaravelLocalization;
 use Notification;
 
+#[Feature('Users', description: 'User accounts, profiles, and authentication')]
 class UserController extends Controller
 {
     /**
@@ -50,6 +54,7 @@ class UserController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
+    #[UserStory('As a Restarter, I can view my profile or another user\'s profile', persona: 'Restarter')]
     public function index($id = null)
     {
         if (is_null($id)) {
@@ -67,6 +72,7 @@ class UserController extends Controller
         ]);
     }
 
+    #[UserStory('As a Restarter, I can access the form to edit my profile', persona: 'Restarter')]
     public function getProfileEdit($id = null)
     {
         if (is_null($id)) {
@@ -122,6 +128,7 @@ class UserController extends Controller
         ]);
     }
 
+    #[UserStory('As a Restarter, I can view my notifications', persona: 'Restarter')]
     public function getNotifications()
     {
         $user = Auth::user();
@@ -133,6 +140,7 @@ class UserController extends Controller
         ]);
     }
 
+    #[UserStory('As a Restarter, I can update my profile information', persona: 'Restarter')]
     public function postProfileInfoEdit(Request $request, App\Helpers\Geocoder $geocoder)
     {
         $rules = [
@@ -189,6 +197,7 @@ class UserController extends Controller
         return redirect()->back()->with('message', __('profile.profile_updated'));
     }
 
+    #[UserStory('As a Restarter, I can change my password', persona: 'Restarter')]
     public function postProfilePasswordEdit(Request $request)
     {
         if ($request->input('id') !== null) {
@@ -221,6 +230,7 @@ class UserController extends Controller
         return redirect()->back()->with('error', __('profile.password_old_mismatch'));
     }
 
+    #[UserStory('As an Admin, I can change a user\'s Repair Directory role', persona: 'Admin')]
     public function postProfileRepairDirectory(Request $request)
     {
         $rules = [
@@ -249,6 +259,7 @@ class UserController extends Controller
         return redirect()->back()->with('message', __('profile.profile_updated'));
     }
 
+    #[UserStory('As a Restarter, I can change my preferred language', persona: 'Restarter')]
     public function storeLanguage(Request $request)
     {
         if ($request->input('id') !== null) {
@@ -275,6 +286,8 @@ class UserController extends Controller
         return redirect()->back()->with('message', Lang::get('profile.language_updated'));
     }
 
+    #[UserStory('As a Restarter, I can delete my own account', persona: 'Restarter')]
+    #[UserStory('As an Admin, I can delete a user\'s account', persona: 'Admin')]
     public function postSoftDeleteUser(Request $request)
     {
         if ($request->input('id') !== null) {
@@ -302,6 +315,7 @@ class UserController extends Controller
         }
     }
 
+    #[UserStory('As a Restarter, I can update my notification preferences', persona: 'Restarter')]
     public function postProfilePreferencesEdit(Request $request)
     {
         if ($request->input('id') !== null) {
@@ -322,6 +336,7 @@ class UserController extends Controller
         return redirect()->back()->with('message', Lang::get('profile.preferences_updated'));
     }
 
+    #[UserStory('As a Restarter, I can update my repair skills', persona: 'Restarter')]
     public function postProfileTagsEdit(Request $request)
     {
         if ($request->input('id') !== null) {
@@ -345,6 +360,7 @@ class UserController extends Controller
         return redirect()->back()->with('message', Lang::get('profile.skills_updated'));
     }
 
+    #[UserStory('As a Restarter, I can upload a new profile picture', persona: 'Restarter')]
     public function postProfilePictureEdit(Request $request)
     {
         if ($request->input('id') !== null) {
@@ -363,6 +379,7 @@ class UserController extends Controller
         return redirect()->back()->with('error', __('profile.picture_error'));
     }
 
+    #[UserStory('As an Admin, I can edit a user\'s role, groups, and permissions', persona: 'Admin')]
     public function postAdminEdit(Request $request)
     {
         if ($request->input('id') !== null) {
@@ -407,6 +424,7 @@ class UserController extends Controller
         return redirect()->back()->with('message', __('profile.admin_success'));
     }
 
+    #[UserStory('As a Guest, I can request a password recovery email', persona: 'Guest')]
     public function recover(Request $request)
     {
         $User = new User;
@@ -461,6 +479,7 @@ class UserController extends Controller
         ]);
     }
 
+    #[UserStory('As a Guest, I can reset my password using a recovery code', persona: 'Guest')]
     public function reset(Request $request)
     {
         $User = new User;
@@ -523,6 +542,7 @@ class UserController extends Controller
         ]);
     }
 
+    #[UserStory('As an Admin, I can view and search all users on the platform', persona: 'Admin')]
     public function all()
     {
         $user = User::find(Auth::id());
@@ -558,6 +578,7 @@ class UserController extends Controller
         }
     }
 
+    #[UserStory('As an Admin, I can filter and search the user list', persona: 'Admin')]
     public function search(Request $request)
     {
         $user = User::find(Auth::id());
@@ -629,6 +650,7 @@ class UserController extends Controller
         }
     }
 
+    #[UserStory('As an Admin, I can create a new user account', persona: 'Admin')]
     public function create(Request $request)
     {
         $user = Auth::user();
@@ -737,6 +759,7 @@ class UserController extends Controller
         }
     }
 
+    #[UserStory('As an Admin, I can edit any user\'s account details', persona: 'Admin')]
     public function edit($id, Request $request)
     {
         global $fixometer_languages;
@@ -849,6 +872,7 @@ class UserController extends Controller
         }
     }
 
+    #[UserStory('As a Restarter, I can log out of my account', persona: 'Restarter')]
     public function logout()
     {
         Auth::logout();
@@ -856,6 +880,7 @@ class UserController extends Controller
         return redirect('/login');
     }
 
+    #[UserStory('As a Guest, I can view the registration page', persona: 'Guest')]
     public function getRegister($hash = null)
     {
         if (Auth::check() && Auth::user()->hasUserGivenConsent()) {
@@ -878,6 +903,7 @@ class UserController extends Controller
         ]);
     }
 
+    #[UserStory('As a Guest, I can register a new account', persona: 'Guest')]
     public function postRegister(Request $request, $hash = null)
     {
         $geocoder = new \App\Helpers\Geocoder();
@@ -1044,6 +1070,7 @@ class UserController extends Controller
         }
     }
 
+    #[UserStory('As a Restarter, I can complete my onboarding process', persona: 'Restarter')]
     public function getOnboardingComplete()
     {
         $user = Auth::user();
@@ -1056,6 +1083,7 @@ class UserController extends Controller
         return 'true';
     }
 
+    #[NoStory(reason: 'AJAX email validation helper')]
     public function postEmail(Request $request)
     {
         if (User::where('email', '=', $request->get('email'))->exists()) {
@@ -1063,6 +1091,7 @@ class UserController extends Controller
         }
     }
 
+    #[NoStory(reason: 'MediaWiki thumbnail integration')]
     public static function getThumbnail(Request $request)
     {
         $user = User::where('mediawiki', $request->input('wiki_username'))->first();
@@ -1080,6 +1109,7 @@ class UserController extends Controller
         return response()->json($thumbnailPath);
     }
 
+    #[NoStory(reason: 'MediaWiki menu integration')]
     public function getUserMenus(Request $request)
     {
         $user = User::where('mediawiki', $request->input('wiki_username'))->first();

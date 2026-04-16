@@ -2,6 +2,9 @@
 
 namespace App\Http\Controllers;
 
+use App\Attributes\Feature;
+use App\Attributes\NoStory;
+use App\Attributes\UserStory;
 use App\Group;
 use App\Party;
 use App\User;
@@ -10,6 +13,7 @@ use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
 
+#[Feature('Events', description: 'Community repair event management')]
 class CalendarEventsController extends Controller
 {
     public $ical_format;
@@ -19,6 +23,7 @@ class CalendarEventsController extends Controller
         $this->ical_format = 'Ymd\THis';
     }
 
+    #[UserStory('As a Restarter, I can subscribe to my events as an iCal feed', persona: 'Restarter')]
     public function allEventsByUser(Request $request, $calendar_hash)
     {
         if (empty($calendar_hash)) {
@@ -53,6 +58,7 @@ class CalendarEventsController extends Controller
         $this->exportCalendar($events);
     }
 
+    #[UserStory('As a Guest, I can subscribe to a group\'s events as an iCal feed', persona: 'Guest')]
     public function allEventsByGroup(Request $request, Group $group)
     {
         $events = Party::join('groups', 'groups.idgroups', '=', 'events.group')
@@ -72,6 +78,7 @@ class CalendarEventsController extends Controller
         $this->exportCalendar($events);
     }
 
+    #[UserStory('As a Guest, I can subscribe to a network\'s events as an iCal feed', persona: 'Guest')]
     public function allEventsByNetwork(Request $request, Network $network)
     {
         $events = Party::join('groups', 'groups.idgroups', '=', 'events.group')
@@ -92,6 +99,7 @@ class CalendarEventsController extends Controller
         $this->exportCalendar($events);
     }
 
+    #[UserStory('As a Guest, I can subscribe to events in my area as an iCal feed', persona: 'Guest')]
     public function allEventsByArea(Request $request, $area)
     {
         $events = Party::join('groups', 'groups.idgroups', '=', 'events.group')
@@ -110,6 +118,7 @@ class CalendarEventsController extends Controller
         $this->exportCalendar($events);
     }
 
+    #[NoStory(reason: 'All-events calendar feed requiring environment secret')]
     public function allEvents(Request $request, $env_hash)
     {
         if ($env_hash != env('CALENDAR_HASH')) {
@@ -124,6 +133,7 @@ class CalendarEventsController extends Controller
         $this->exportCalendar($events);
     }
 
+    #[NoStory(reason: 'Internal iCal generation helper')]
     public function exportCalendar($events)
     {
         $ical = [];

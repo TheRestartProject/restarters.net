@@ -2,6 +2,8 @@
 
 namespace App\Http\Controllers;
 
+use App\Attributes\Feature;
+use App\Attributes\UserStory;
 use App\Group;
 use App\Network;
 use Auth;
@@ -9,6 +11,7 @@ use FixometerFile;
 use Illuminate\Http\Request;
 use Lang;
 
+#[Feature('Networks', description: 'Regional network management and coordination')]
 class NetworkController extends Controller
 {
     /**
@@ -16,6 +19,8 @@ class NetworkController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
+    #[UserStory('As a NetworkCoordinator, I can view the networks I coordinate', persona: 'NetworkCoordinator')]
+    #[UserStory('As an Admin, I can view all networks on the platform', persona: 'Admin')]
     public function index()
     {
         $user = Auth::user();
@@ -46,6 +51,7 @@ class NetworkController extends Controller
      * @param  \App\Network  $network
      * @return \Illuminate\Http\Response
      */
+    #[UserStory('As a NetworkCoordinator, I can view my network\'s details and statistics', persona: 'NetworkCoordinator')]
     public function show(Network $network)
     {
         $user = Auth::user();
@@ -70,6 +76,7 @@ class NetworkController extends Controller
      * @param  \App\Network  $network
      * @return \Illuminate\Http\Response
      */
+    #[UserStory('As a NetworkCoordinator, I can access the form to edit my network', persona: 'NetworkCoordinator')]
     public function edit(Network $network)
     {
         $this->authorize('update', $network);
@@ -86,6 +93,7 @@ class NetworkController extends Controller
      * @param  \App\Network  $network
      * @return \Illuminate\Http\Response
      */
+    #[UserStory('As a NetworkCoordinator, I can update my network\'s details and logo', persona: 'NetworkCoordinator')]
     public function update(Request $request, Network $network)
     {
         $this->authorize('update', $network);
@@ -114,6 +122,7 @@ class NetworkController extends Controller
      * @param  \App\Network  $network
      * @return \Illuminate\Http\Response
      */
+    #[UserStory('As a NetworkCoordinator, I can add groups to my network', persona: 'NetworkCoordinator')]
     public function associateGroup(Request $request, Network $network)
     {
         $this->authorize('associateGroups', $network);

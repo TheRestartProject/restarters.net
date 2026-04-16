@@ -12,7 +12,10 @@ use Illuminate\Database\QueryException;
 use Illuminate\Http\Request;
 use Notification;
 use Illuminate\Validation\ValidationException;
+use App\Attributes\Feature;
+use App\Attributes\UserStory;
 
+#[Feature('Devices', description: 'Repair device tracking and impact measurement')]
 class ItemController extends Controller
 {
     /**
@@ -38,6 +41,7 @@ class ItemController extends Controller
      *       ),
      *     )
      */
+    #[UserStory('As a Guest, I can view suggested item types for device records', persona: 'Guest')]
     public static function listItemsv2(Request $request) {
         // Item types don't change often, so we can cache them.
         // Allow cache refresh for testing purposes or when running under Playwright
