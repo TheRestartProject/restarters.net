@@ -88,23 +88,30 @@ function generateFeaturePages(manifest) {
       content += `## Overview\n\n${narrative}\n\n`
     }
 
-    // Group stories by persona
-    const byPersona = {}
+    // Group stories by theme, then by persona within each theme
+    const byTheme = {}
     for (const story of f.stories) {
-      if (!byPersona[story.persona]) {
-        byPersona[story.persona] = []
-      }
-      byPersona[story.persona].push(story)
+      const theme = story.theme || 'General'
+      if (!byTheme[theme]) byTheme[theme] = []
+      byTheme[theme].push(story)
     }
 
-    for (const persona of Object.keys(byPersona).sort()) {
-      const stories = byPersona[persona]
-      content += `## ${persona}\n\n`
-      content += `| Story | Method | Tests |\n|-------|--------|-------|\n`
+    const themeNames = Object.keys(byTheme).sort((a, b) => {
+      if (a === 'General') return 1
+      if (b === 'General') return -1
+      return a.localeCompare(b)
+    })
+
+    for (const theme of themeNames) {
+      const stories = byTheme[theme]
+      content += `## ${theme}\n\n`
+      content += `| Persona | Story | Method | Tests |\n|---------|-------|--------|-------|\n`
+
+      stories.sort((a, b) => a.persona.localeCompare(b.persona) || a.method.localeCompare(b.method))
 
       for (const story of stories) {
         const methodLink = `[\`${story.method}\`](${GITHUB_BASE}/${story.file})`
-        content += `| ${story.story} | ${methodLink} | ${coverageIndicator(story.tests)} |\n`
+        content += `| **${story.persona}** | ${story.story} | ${methodLink} | ${coverageIndicator(story.tests)} |\n`
       }
 
       content += `\n`
@@ -168,14 +175,29 @@ function generatePersonaPages(manifest) {
 
       const featureSlug = featureName.toLowerCase().replace(/\s+/g, '-')
       content += `## [${featureName}](/features/${featureSlug})\n\n`
-      content += `| Story | Method | Tests |\n|-------|--------|-------|\n`
 
+      const byTheme = {}
       for (const story of personaStories) {
-        const methodLink = `[\`${story.method}\`](${GITHUB_BASE}/${story.file})`
-        content += `| ${story.story} | ${methodLink} | ${coverageIndicator(story.tests)} |\n`
+        const theme = story.theme || 'General'
+        if (!byTheme[theme]) byTheme[theme] = []
+        byTheme[theme].push(story)
       }
 
-      content += `\n`
+      const themeNames = Object.keys(byTheme).sort((a, b) => {
+        if (a === 'General') return 1
+        if (b === 'General') return -1
+        return a.localeCompare(b)
+      })
+
+      for (const theme of themeNames) {
+        content += `### ${theme}\n\n`
+        content += `| Story | Method | Tests |\n|-------|--------|-------|\n`
+        for (const story of byTheme[theme]) {
+          const methodLink = `[\`${story.method}\`](${GITHUB_BASE}/${story.file})`
+          content += `| ${story.story} | ${methodLink} | ${coverageIndicator(story.tests)} |\n`
+        }
+        content += `\n`
+      }
     }
 
     fs.writeFileSync(path.join(personasDir, `${slug}.md`), content)

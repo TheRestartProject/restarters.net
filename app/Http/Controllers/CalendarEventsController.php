@@ -23,7 +23,7 @@ class CalendarEventsController extends Controller
         $this->ical_format = 'Ymd\THis';
     }
 
-    #[UserStory('As a Restarter, I can subscribe to my events as an iCal feed', persona: 'Restarter')]
+    #[UserStory('As a Restarter, I can subscribe to my events as an iCal feed', persona: 'Restarter', theme: 'Calendar feeds')]
     public function allEventsByUser(Request $request, $calendar_hash)
     {
         if (empty($calendar_hash)) {
@@ -58,7 +58,7 @@ class CalendarEventsController extends Controller
         $this->exportCalendar($events);
     }
 
-    #[UserStory('As a Guest, I can subscribe to a group\'s events as an iCal feed', persona: 'Guest')]
+    #[UserStory('As a Guest, I can subscribe to a group\'s events as an iCal feed', persona: 'Guest', theme: 'Calendar feeds')]
     public function allEventsByGroup(Request $request, Group $group)
     {
         $events = Party::join('groups', 'groups.idgroups', '=', 'events.group')
@@ -78,7 +78,7 @@ class CalendarEventsController extends Controller
         $this->exportCalendar($events);
     }
 
-    #[UserStory('As a Guest, I can subscribe to a network\'s events as an iCal feed', persona: 'Guest')]
+    #[UserStory('As a Guest, I can subscribe to a network\'s events as an iCal feed', persona: 'Guest', theme: 'Calendar feeds')]
     public function allEventsByNetwork(Request $request, Network $network)
     {
         $events = Party::join('groups', 'groups.idgroups', '=', 'events.group')
@@ -99,7 +99,7 @@ class CalendarEventsController extends Controller
         $this->exportCalendar($events);
     }
 
-    #[UserStory('As a Guest, I can subscribe to events in my area as an iCal feed', persona: 'Guest')]
+    #[UserStory('As a Guest, I can subscribe to events in my area as an iCal feed', persona: 'Guest', theme: 'Calendar feeds')]
     public function allEventsByArea(Request $request, $area)
     {
         $events = Party::join('groups', 'groups.idgroups', '=', 'events.group')

@@ -42,7 +42,7 @@ class GroupController extends Controller
      *
      * Only Administrators can access this API call.
      */
-    #[UserStory('As an Admin, I can list group audit changes for Zapier integration', persona: 'Admin')]
+    #[UserStory('As an Admin, I can list group audit changes for Zapier integration', persona: 'Admin', theme: 'Admin & integrations')]
     public static function getGroupChanges(Request $request)
     {
         $authenticatedUser = Auth::user();
@@ -65,7 +65,7 @@ class GroupController extends Controller
         return response()->json($groupChanges);
     }
 
-    #[UserStory('As a NetworkCoordinator, I can list all groups in my networks via the API', persona: 'NetworkCoordinator')]
+    #[UserStory('As a NetworkCoordinator, I can list all groups in my networks via the API', persona: 'NetworkCoordinator', theme: 'Network membership')]
     public static function getGroupsByUsersNetworks(Request $request)
     {
         $authenticatedUser = Auth::user();
@@ -221,7 +221,7 @@ class GroupController extends Controller
         return $groupChange;
     }
 
-    #[UserStory('As a Restarter, I can list all groups via the API', persona: 'Restarter')]
+    #[UserStory('As a Restarter, I can list all groups via the API', persona: 'Restarter', theme: 'Find & browse groups')]
     public static function getGroupList()
     {
         $groups = Group::orderBy('created_at', 'desc');
@@ -269,8 +269,8 @@ class GroupController extends Controller
      *     )
      */
 
-    #[UserStory('As a Guest, I can get a list of group names via the API', persona: 'Guest')]
-    #[UserStory('As a ThirdParty, I can retrieve group names to display on my own platform', persona: 'ThirdParty')]
+    #[UserStory('As a Guest, I can get a list of group names via the API', persona: 'Guest', theme: 'Find & browse groups')]
+    #[UserStory('As a ThirdParty, I can retrieve group names to display on my own platform', persona: 'ThirdParty', theme: 'Find & browse groups')]
     public static function listNamesv2(Request $request) {
         $request->validate([
             'includeArchived' => ['string', 'in:true,false'],
@@ -322,8 +322,8 @@ class GroupController extends Controller
      *       ),
      *     )
      */
-    #[UserStory('As a Guest, I can get a list of group tags via the API', persona: 'Guest')]
-    #[UserStory('As a ThirdParty, I can retrieve group tags to categorise groups on my platform', persona: 'ThirdParty')]
+    #[UserStory('As a Guest, I can get a list of group tags via the API', persona: 'Guest', theme: 'Find & browse groups')]
+    #[UserStory('As a ThirdParty, I can retrieve group tags to categorise groups on my platform', persona: 'ThirdParty', theme: 'Find & browse groups')]
     public static function listTagsv2(Request $request) {
         return [
             'data' => TagCollection::make(GroupTags::all())
@@ -363,8 +363,8 @@ class GroupController extends Controller
      *      ),
      *     )
      */
-    #[UserStory('As a Guest, I can view group details via the API', persona: 'Guest')]
-    #[UserStory('As a ThirdParty, I can retrieve group details to display on my platform', persona: 'ThirdParty')]
+    #[UserStory('As a Guest, I can view group details via the API', persona: 'Guest', theme: 'Find & browse groups')]
+    #[UserStory('As a ThirdParty, I can retrieve group details to display on my platform', persona: 'ThirdParty', theme: 'Find & browse groups')]
     public static function getGroupv2(Request $request, $idgroups) {
         $group = Group::findOrFail($idgroups);
         return \App\Http\Resources\Group::make($group);
@@ -428,8 +428,8 @@ class GroupController extends Controller
      *     )
      */
 
-    #[UserStory('As a Guest, I can list events for a group via the API', persona: 'Guest')]
-    #[UserStory('As a ThirdParty, I can retrieve events for a group to display on my platform', persona: 'ThirdParty')]
+    #[UserStory('As a Guest, I can list events for a group via the API', persona: 'Guest', theme: 'Events for group')]
+    #[UserStory('As a ThirdParty, I can retrieve events for a group to display on my platform', persona: 'ThirdParty', theme: 'Events for group')]
     public static function getEventsForGroupv2(Request $request, $idgroups) {
         $group = Group::findOrFail($idgroups);
 
@@ -489,8 +489,8 @@ class GroupController extends Controller
      *     )
      */
 
-    #[UserStory('As a Guest, I can view a group\'s volunteers via the API', persona: 'Guest')]
-    #[UserStory('As a ThirdParty, I can retrieve volunteer data for a group via the API', persona: 'ThirdParty')]
+    #[UserStory('As a Guest, I can view a group\'s volunteers via the API', persona: 'Guest', theme: 'Manage volunteers')]
+    #[UserStory('As a ThirdParty, I can retrieve volunteer data for a group via the API', persona: 'ThirdParty', theme: 'Manage volunteers')]
     public static function getVolunteersForGroupv2($idgroups) {
         $group = Group::findOrFail($idgroups);
         $volunteers = $group->allConfirmedVolunteers()->get();
@@ -533,7 +533,7 @@ class GroupController extends Controller
      *     )
      */
 
-    #[UserStory('As a Host, I can remove a volunteer from my group', persona: 'Host')]
+    #[UserStory('As a Host, I can remove a volunteer from my group', persona: 'Host', theme: 'Manage volunteers')]
     public function deleteVolunteerForGroupv2(Request $request, $id, $iduser)
     {
         $user = $this->getUser();
@@ -589,7 +589,7 @@ class GroupController extends Controller
      *     )
      */
 
-    #[UserStory('As a Host, I can change a volunteer\'s role in my group', persona: 'Host')]
+    #[UserStory('As a Host, I can change a volunteer\'s role in my group', persona: 'Host', theme: 'Manage volunteers')]
     public function patchVolunteerForGroupv2(Request $request, $id, $iduser)
     {
         $user = $this->getUser();
@@ -665,8 +665,8 @@ class GroupController extends Controller
      *       ),
      *     )
      */
-    #[UserStory('As a NetworkCoordinator, I can view groups pending moderation in my networks', persona: 'NetworkCoordinator')]
-    #[UserStory('As an Admin, I can view all groups pending moderation', persona: 'Admin')]
+    #[UserStory('As a NetworkCoordinator, I can view groups pending moderation in my networks', persona: 'NetworkCoordinator', theme: 'Create & manage groups')]
+    #[UserStory('As an Admin, I can view all groups pending moderation', persona: 'Admin', theme: 'Create & manage groups')]
     public function moderateGroupsv2(Request $request) {
         $user = $this->getUser();
         $ret = \App\Http\Resources\GroupCollection::make(Group::unapprovedVisibleTo($user->id));
@@ -749,7 +749,7 @@ class GroupController extends Controller
      *     )
      *  )
      */
-    #[UserStory('As a Restarter, I can create a new group via the API', persona: 'Restarter')]
+    #[UserStory('As a Restarter, I can create a new group via the API', persona: 'Restarter', theme: 'Create & manage groups')]
     public function createGroupv2(Request $request) {
         $user = $this->getUser();
         $user->convertToHost();
@@ -898,7 +898,7 @@ class GroupController extends Controller
      *     )
      *  )
      */
-    #[UserStory('As a Host, I can update my group via the API', persona: 'Host')]
+    #[UserStory('As a Host, I can update my group via the API', persona: 'Host', theme: 'Create & manage groups')]
     public function updateGroupv2(Request $request, $idGroup) {
         $user = $this->getUser();
 

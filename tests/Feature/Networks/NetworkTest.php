@@ -247,6 +247,7 @@ class NetworkTest extends TestCase
      * @story:NetworkController::index
      * @story:NetworkController::show
      * @story:NetworkController::associateGroup
+     * @story:GroupController::network
      */
     public function network_page()
     {

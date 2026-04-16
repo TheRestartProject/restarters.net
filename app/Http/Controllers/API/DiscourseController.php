@@ -21,7 +21,7 @@ class DiscourseController extends Controller
      * @param string $tag
      * @return \Illuminate\Http\Response
      */
-    #[UserStory('As a Guest, I can view recent community discussion topics', persona: 'Guest')]
+    #[UserStory('As a Guest, I can view recent community discussion topics', persona: 'Guest', theme: 'Discussion integration')]
     public function discussionTopics(Request $request, DiscourseService $discourseService, $tag = NULL)
     {
         $topics = [];

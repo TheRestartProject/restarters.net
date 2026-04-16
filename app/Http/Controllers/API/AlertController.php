@@ -41,7 +41,7 @@ class AlertController extends Controller
      *       ),
      *     )
      */
-    #[UserStory('As a Guest, I can view active platform alerts', persona: 'Guest')]
+    #[UserStory('As a Guest, I can view active platform alerts', persona: 'Guest', theme: 'Platform alerts')]
     public function listAlertsv2(Request $request) {
         // Alerts don't change often, so we can cache them.
         if (\Cache::has('alerts')) {
@@ -119,7 +119,7 @@ class AlertController extends Controller
      *     )
      *  )
      */
-    #[UserStory('As an Admin, I can create a platform-wide alert', persona: 'Admin')]
+    #[UserStory('As an Admin, I can create a platform-wide alert', persona: 'Admin', theme: 'Platform alerts')]
     public function addAlertv2(Request $request)
     {
         $user = $this->getUser();
@@ -206,7 +206,7 @@ class AlertController extends Controller
      *     )
      *  )
      */
-    #[UserStory('As an Admin, I can update a platform alert', persona: 'Admin')]
+    #[UserStory('As an Admin, I can update a platform alert', persona: 'Admin', theme: 'Platform alerts')]
     public function updateAlertv2(Request $request, $id)
     {
         $user = $this->getUser();

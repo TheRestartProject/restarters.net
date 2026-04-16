@@ -16,7 +16,7 @@ use Illuminate\Http\Request;
 class RoleController extends Controller
 {
     //Custom Functions
-    #[UserStory('As an Admin, I can view all roles and their permissions', persona: 'Admin')]
+    #[UserStory('As an Admin, I can view all roles and their permissions', persona: 'Admin', theme: 'Roles & permissions')]
     public function index()
     {
         $user = User::find(Auth::id());
@@ -37,7 +37,7 @@ class RoleController extends Controller
         return redirect(RouteServiceProvider::HOME);
     }
 
-    #[UserStory('As an Admin, I can edit the permissions assigned to a role', persona: 'Admin')]
+    #[UserStory('As an Admin, I can edit the permissions assigned to a role', persona: 'Admin', theme: 'Roles & permissions')]
     public function edit($id, Request $request)
     {
         $user = Auth::user();

@@ -11,7 +11,7 @@ use LaravelLocalization;
 #[Feature('Platform', description: 'Platform-wide statistics and public impact data')]
 class LocaleController extends Controller
 {
-    #[UserStory('As a Guest, I can switch the application language', persona: 'Guest')]
+    #[UserStory('As a Guest, I can switch the application language', persona: 'Guest', theme: 'Language preferences')]
     public function setLang($locale)
     {
         // Get local from URL and set in the session

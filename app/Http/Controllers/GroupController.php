@@ -83,31 +83,31 @@ class GroupController extends Controller
         ]);
     }
 
-    #[UserStory('As a Restarter, I can browse all repair groups on the platform', persona: 'Restarter')]
+    #[UserStory('As a Restarter, I can browse all repair groups on the platform', persona: 'Restarter', theme: 'Find & browse groups')]
     public function all()
     {
         return $this->indexVariations('all', null);
     }
 
-    #[UserStory('As a Restarter, I can view the groups I belong to', persona: 'Restarter')]
+    #[UserStory('As a Restarter, I can view the groups I belong to', persona: 'Restarter', theme: 'Find & browse groups')]
     public function mine()
     {
         return $this->indexVariations('mine', null);
     }
 
-    #[UserStory('As a Restarter, I can discover repair groups near my location', persona: 'Restarter')]
+    #[UserStory('As a Restarter, I can discover repair groups near my location', persona: 'Restarter', theme: 'Find & browse groups')]
     public function nearby()
     {
         return $this->indexVariations('nearby', null);
     }
 
-    #[UserStory('As a Restarter, I can browse groups within a specific network', persona: 'Restarter')]
+    #[UserStory('As a Restarter, I can browse groups within a specific network', persona: 'Restarter', theme: 'Find & browse groups')]
     public function network($id)
     {
         return $this->indexVariations('all', $id);
     }
 
-    #[UserStory('As a Restarter, I can create a new repair group and become its Host', persona: 'Restarter')]
+    #[UserStory('As a Restarter, I can create a new repair group and become its Host', persona: 'Restarter', theme: 'Create & manage groups')]
     public function create(Request $request)
     {
         $user = User::find(Auth::id());
@@ -120,7 +120,7 @@ class GroupController extends Controller
         return view('group.create');
     }
 
-    #[UserStory('As a Restarter, I can view a group\'s details, events, and members', persona: 'Restarter')]
+    #[UserStory('As a Restarter, I can view a group\'s details, events, and members', persona: 'Restarter', theme: 'Find & browse groups')]
     public function view($groupid)
     {
         $user = User::find(Auth::id());
@@ -297,7 +297,7 @@ class GroupController extends Controller
         ]);
     }
 
-    #[UserStory('As a Host, I can send email invitations to join my group', persona: 'Host')]
+    #[UserStory('As a Host, I can send email invitations to join my group', persona: 'Host', theme: 'Group invitations')]
     public function postSendInvite(Request $request)
     {
         $request->validate([
@@ -390,7 +390,7 @@ class GroupController extends Controller
         ]));
     }
 
-    #[UserStory('As a Restarter, I can accept a group invitation', persona: 'Restarter')]
+    #[UserStory('As a Restarter, I can accept a group invitation', persona: 'Restarter', theme: 'Group invitations')]
     public function confirmInvite($group_id, $hash)
     {
         // Find user/group relationship based on the invitation hash.
@@ -423,7 +423,7 @@ class GroupController extends Controller
         return redirect('/group/view/'.$user_group->group)->with('success', __('groups.invite_confirmed'));
     }
 
-    #[UserStory('As a Host, I can edit my group\'s details and settings', persona: 'Host')]
+    #[UserStory('As a Host, I can edit my group\'s details and settings', persona: 'Host', theme: 'Create & manage groups')]
     public function edit(Request $request, $id, Geocoder $geocoder)
     {
         $user = Auth::user();
@@ -448,7 +448,7 @@ class GroupController extends Controller
         ]);
     }
 
-    #[UserStory('As an Admin, I can delete a group that has no device records', persona: 'Admin')]
+    #[UserStory('As an Admin, I can delete a group that has no device records', persona: 'Admin', theme: 'Create & manage groups')]
     public function delete($id)
     {
         $group = Group::where('idgroups', $id)->first();
@@ -542,7 +542,7 @@ class GroupController extends Controller
         return $ret;
     }
 
-    #[UserStory('As a Guest, I can view a group\'s repair impact statistics', persona: 'Guest')]
+    #[UserStory('As a Guest, I can view a group\'s repair impact statistics', persona: 'Guest', theme: 'Stats & data')]
     public static function stats($id, $format = 'row')
     {
         $group = Group::where('idgroups', $id)->first();
@@ -557,7 +557,7 @@ class GroupController extends Controller
         return view('group.stats', $groupStats);
     }
 
-    #[UserStory('As a Restarter, I can join a repair group', persona: 'Restarter')]
+    #[UserStory('As a Restarter, I can join a repair group', persona: 'Restarter', theme: 'Manage volunteers')]
     public function getJoinGroup($group_id)
     {
         $user_id = Auth::id();
@@ -614,7 +614,7 @@ class GroupController extends Controller
         }
     }
 
-    #[UserStory('As a Host, I can upload an image for my group', persona: 'Host')]
+    #[UserStory('As a Host, I can upload an image for my group', persona: 'Host', theme: 'Photos & branding')]
     public function imageUpload(Request $request, $id)
     {
         try {
@@ -633,7 +633,7 @@ class GroupController extends Controller
         }
     }
 
-    #[UserStory('As a Host, I can remove my group\'s image', persona: 'Host')]
+    #[UserStory('As a Host, I can remove my group\'s image', persona: 'Host', theme: 'Photos & branding')]
     public function ajaxDeleteImage($group_id, $id, $path)
     {
         $user = Auth::user();
@@ -659,7 +659,7 @@ class GroupController extends Controller
      * @param   [type]      $code
      * @return  [type]
      */
-    #[UserStory('As a Guest, I can join a group using a shareable invite code', persona: 'Guest')]
+    #[UserStory('As a Guest, I can join a group using a shareable invite code', persona: 'Guest', theme: 'Group invitations')]
     public function confirmCodeInvite(Request $request, $code)
     {
         // Variables

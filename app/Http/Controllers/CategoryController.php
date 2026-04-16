@@ -14,7 +14,7 @@ use Illuminate\Support\Facades\Redirect;
 #[Feature('Administration', description: 'Platform administration and configuration')]
 class CategoryController extends Controller
 {
-    #[UserStory('As an Admin, I can view all device categories', persona: 'Admin')]
+    #[UserStory('As an Admin, I can view all device categories', persona: 'Admin', theme: 'Reference data')]
     public function index()
     {
         $Category = new Category;
@@ -25,7 +25,7 @@ class CategoryController extends Controller
         ]);
     }
 
-    #[UserStory('As an Admin, I can access the form to edit a device category', persona: 'Admin')]
+    #[UserStory('As an Admin, I can access the form to edit a device category', persona: 'Admin', theme: 'Reference data')]
     public function getEditCategory($id)
     {
         if (! Fixometer::hasRole(Auth::user(), 'Administrator')) {
@@ -44,7 +44,7 @@ class CategoryController extends Controller
         ]);
     }
 
-    #[UserStory('As an Admin, I can update a device category\'s details and impact factors', persona: 'Admin')]
+    #[UserStory('As an Admin, I can update a device category\'s details and impact factors', persona: 'Admin', theme: 'Reference data')]
     public function postEditCategory($id, Request $request)
     {
         if (! Fixometer::hasRole(Auth::user(), 'Administrator')) {

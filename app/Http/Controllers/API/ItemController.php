@@ -41,7 +41,7 @@ class ItemController extends Controller
      *       ),
      *     )
      */
-    #[UserStory('As a Guest, I can view suggested item types for device records', persona: 'Guest')]
+    #[UserStory('As a Guest, I can view suggested item types for device records', persona: 'Guest', theme: 'Browse & search devices')]
     public static function listItemsv2(Request $request) {
         // Item types don't change often, so we can cache them.
         // Allow cache refresh for testing purposes or when running under Playwright

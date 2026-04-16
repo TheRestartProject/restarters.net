@@ -58,8 +58,8 @@ class DeviceController extends Controller {
      *     )
      */
 
-    #[UserStory('As a Guest, I can view device details via the API', persona: 'Guest')]
-    #[UserStory('As a ThirdParty, I can retrieve device repair data via the API', persona: 'ThirdParty')]
+    #[UserStory('As a Guest, I can view device details via the API', persona: 'Guest', theme: 'Get device details')]
+    #[UserStory('As a ThirdParty, I can retrieve device repair data via the API', persona: 'ThirdParty', theme: 'Get device details')]
     public function getDevicev2(Request $request, $iddevices)
     {
         $device = Device::findOrFail($iddevices);
@@ -160,7 +160,7 @@ class DeviceController extends Controller {
      *     )
      *  )
      */
-    #[UserStory('As a Restarter, I can log a device repair at an event I attended', persona: 'Restarter')]
+    #[UserStory('As a Restarter, I can log a device repair at an event I attended', persona: 'Restarter', theme: 'Log & edit repairs')]
     public function createDevicev2(Request $request)
     {
         $user = $this->getUser();
@@ -350,7 +350,7 @@ class DeviceController extends Controller {
      *     )
      *  )
      */
-    #[UserStory('As a Restarter, I can update a device repair record at an event I attended', persona: 'Restarter')]
+    #[UserStory('As a Restarter, I can update a device repair record at an event I attended', persona: 'Restarter', theme: 'Log & edit repairs')]
     public function updateDevicev2(Request $request, $iddevices)
     {
         $user = $this->getUser();
@@ -447,7 +447,7 @@ class DeviceController extends Controller {
      *     )
      */
 
-    #[UserStory('As a Host, I can delete a device record from my event', persona: 'Host')]
+    #[UserStory('As a Host, I can delete a device record from my event', persona: 'Host', theme: 'Delete devices')]
     public function deleteDevicev2(Request $request, $iddevices)
     {
         $user = $this->getUser();

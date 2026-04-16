@@ -15,7 +15,7 @@ use Illuminate\Support\Facades\Log;
 #[Feature('Dashboard', description: 'User dashboard with personalised event and group information')]
 class DashboardController extends Controller
 {
-    #[UserStory('As a Restarter, I can view my dashboard with upcoming events, my groups, and nearby groups', persona: 'Restarter')]
+    #[UserStory('As a Restarter, I can view my dashboard with upcoming events, my groups, and nearby groups', persona: 'Restarter', theme: 'Personal dashboard')]
     public function index()
     {
         $user = User::getProfile(Auth::id());
@@ -85,7 +85,7 @@ class DashboardController extends Controller
         );
     }
 
-    #[UserStory('As a Host, I can view the host dashboard', persona: 'Host')]
+    #[UserStory('As a Host, I can view the host dashboard', persona: 'Host', theme: 'Host dashboard')]
     public function getHostDash()
     {
         return view('dashboard.host');

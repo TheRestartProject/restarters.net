@@ -23,7 +23,7 @@ class UserGroupsController extends Controller
      *
      * Only Administrators allowed to access this endpoint.
      */
-    #[UserStory('As an Admin, I can list group membership changes for Zapier integration', persona: 'Admin')]
+    #[UserStory('As an Admin, I can list group membership changes for Zapier integration', persona: 'Admin', theme: 'Admin & integrations')]
     public static function changes(Request $request)
     {
         $authenticatedUser = Auth::user();
@@ -100,7 +100,7 @@ class UserGroupsController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    #[UserStory('As a Restarter, I can leave a group I belong to', persona: 'Restarter')]
+    #[UserStory('As a Restarter, I can leave a group I belong to', persona: 'Restarter', theme: 'Manage volunteers')]
     public function leave(Request $request, $id)
     {
         $authenticatedUser = Auth::user();

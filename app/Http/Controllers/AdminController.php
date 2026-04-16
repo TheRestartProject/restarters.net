@@ -14,7 +14,7 @@ use App\Party;
 #[Feature('Platform', description: 'Platform-wide statistics and public impact data')]
 class AdminController extends Controller
 {
-    #[UserStory('As a Guest, I can view the platform\'s global repair impact statistics', persona: 'Guest')]
+    #[UserStory('As a Guest, I can view the platform\'s global repair impact statistics', persona: 'Guest', theme: 'Landing page')]
     public static function stats($section = 1, $paragraph_only = false)
     {
         if ($section == 1) {

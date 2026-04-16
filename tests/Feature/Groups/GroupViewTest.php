@@ -70,7 +70,11 @@ class GroupViewTest extends TestCase
         $this->get('/group/view/1');
     }
 
-    /** @story:GroupController::view */
+    /**
+     * @story:GroupController::view
+     * @story:ApiController::getDevices
+     * @story:OutboundController::info
+     */
     public function testCanDelete()
     {
         $this->loginAsTestUser(Role::ADMINISTRATOR);

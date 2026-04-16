@@ -15,7 +15,7 @@ use Illuminate\Http\Request;
 #[Feature('Platform', description: 'Platform-wide statistics and public impact data')]
 class HomeController extends Controller
 {
-    #[UserStory('As a Guest, I can view the landing page with platform impact statistics', persona: 'Guest')]
+    #[UserStory('As a Guest, I can view the landing page with platform impact statistics', persona: 'Guest', theme: 'Landing page')]
     public function index(Request $request)
     {
         if (Auth::check()) {

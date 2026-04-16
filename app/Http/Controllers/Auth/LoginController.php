@@ -56,7 +56,7 @@ class LoginController extends Controller
      *
      * @throws \Illuminate\Validation\ValidationException
      */
-    #[UserStory('As a Guest, I can log in to the platform', persona: 'Guest')]
+    #[UserStory('As a Guest, I can log in to the platform', persona: 'Guest', theme: 'Authentication')]
     public function login(Request $request)
     {
         $this->validateLogin($request);
@@ -111,7 +111,7 @@ class LoginController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    #[UserStory('As a Guest, I can view the login page', persona: 'Guest')]
+    #[UserStory('As a Guest, I can view the login page', persona: 'Guest', theme: 'Authentication')]
     public function showLoginForm()
     {
         $stats = Fixometer::loginRegisterStats();

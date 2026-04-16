@@ -22,7 +22,7 @@ class UserController extends Controller
      *
      * Only Administrators can access this API call.
      */
-    #[UserStory('As an Admin, I can list user audit changes for Zapier integration', persona: 'Admin')]
+    #[UserStory('As an Admin, I can list user audit changes for Zapier integration', persona: 'Admin', theme: 'Data exports')]
     public static function changes(Request $request)
     {
         $authenticatedUser = Auth::user();

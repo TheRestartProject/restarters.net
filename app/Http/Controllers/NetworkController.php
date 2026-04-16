@@ -19,8 +19,8 @@ class NetworkController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    #[UserStory('As a NetworkCoordinator, I can view the networks I coordinate', persona: 'NetworkCoordinator')]
-    #[UserStory('As an Admin, I can view all networks on the platform', persona: 'Admin')]
+    #[UserStory('As a NetworkCoordinator, I can view the networks I coordinate', persona: 'NetworkCoordinator', theme: 'Browse networks')]
+    #[UserStory('As an Admin, I can view all networks on the platform', persona: 'Admin', theme: 'Browse networks')]
     public function index()
     {
         $user = Auth::user();
@@ -51,7 +51,7 @@ class NetworkController extends Controller
      * @param  \App\Network  $network
      * @return \Illuminate\Http\Response
      */
-    #[UserStory('As a NetworkCoordinator, I can view my network\'s details and statistics', persona: 'NetworkCoordinator')]
+    #[UserStory('As a NetworkCoordinator, I can view my network\'s details and statistics', persona: 'NetworkCoordinator', theme: 'Browse networks')]
     public function show(Network $network)
     {
         $user = Auth::user();
@@ -76,7 +76,7 @@ class NetworkController extends Controller
      * @param  \App\Network  $network
      * @return \Illuminate\Http\Response
      */
-    #[UserStory('As a NetworkCoordinator, I can access the form to edit my network', persona: 'NetworkCoordinator')]
+    #[UserStory('As a NetworkCoordinator, I can access the form to edit my network', persona: 'NetworkCoordinator', theme: 'Manage network details')]
     public function edit(Network $network)
     {
         $this->authorize('update', $network);
@@ -93,7 +93,7 @@ class NetworkController extends Controller
      * @param  \App\Network  $network
      * @return \Illuminate\Http\Response
      */
-    #[UserStory('As a NetworkCoordinator, I can update my network\'s details and logo', persona: 'NetworkCoordinator')]
+    #[UserStory('As a NetworkCoordinator, I can update my network\'s details and logo', persona: 'NetworkCoordinator', theme: 'Manage network details')]
     public function update(Request $request, Network $network)
     {
         $this->authorize('update', $network);
@@ -122,7 +122,7 @@ class NetworkController extends Controller
      * @param  \App\Network  $network
      * @return \Illuminate\Http\Response
      */
-    #[UserStory('As a NetworkCoordinator, I can add groups to my network', persona: 'NetworkCoordinator')]
+    #[UserStory('As a NetworkCoordinator, I can add groups to my network', persona: 'NetworkCoordinator', theme: 'Network groups & events')]
     public function associateGroup(Request $request, Network $network)
     {
         $this->authorize('associateGroups', $network);

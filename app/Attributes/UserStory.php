@@ -11,5 +11,6 @@ class UserStory
         public string $story,
         public string $persona,
         public string $feature = '',
+        public string $theme = '',
     ) {}
 }

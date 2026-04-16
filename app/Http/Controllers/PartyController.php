@@ -122,7 +122,7 @@ class PartyController extends Controller
         return $thisone;
     }
 
-    #[UserStory('As a Restarter, I can view upcoming events and events near me', persona: 'Restarter')]
+    #[UserStory('As a Restarter, I can view upcoming events and events near me', persona: 'Restarter', theme: 'Find & browse events')]
     public function index($group_id = null)
     {
         $events = [];
@@ -195,8 +195,8 @@ class PartyController extends Controller
         ]);
     }
 
-    #[UserStory('As a Host, I can access the form to create a new event for my group', persona: 'Host')]
-    #[UserStory('As a Host, I can create an online event without a physical location', persona: 'Host')]
+    #[UserStory('As a Host, I can access the form to create a new event for my group', persona: 'Host', theme: 'Create & manage events')]
+    #[UserStory('As a Host, I can create an online event without a physical location', persona: 'Host', theme: 'Create & manage events')]
     public function create(Request $request, $group_id = null)
     {
         $user = Auth::user();
@@ -224,8 +224,8 @@ class PartyController extends Controller
         ]);
     }
 
-    #[UserStory('As a Host, I can edit my group\'s event details', persona: 'Host')]
-    #[UserStory('As a NetworkCoordinator, I can edit events for groups in my network', persona: 'NetworkCoordinator')]
+    #[UserStory('As a Host, I can edit my group\'s event details', persona: 'Host', theme: 'Create & manage events')]
+    #[UserStory('As a NetworkCoordinator, I can edit events for groups in my network', persona: 'NetworkCoordinator', theme: 'Create & manage events')]
     public function edit($id, Request $request)
     {
         $user = Auth::user();
@@ -277,7 +277,7 @@ class PartyController extends Controller
         ]);
     }
 
-    #[UserStory('As a Host, I can duplicate an existing event to create a new one', persona: 'Host')]
+    #[UserStory('As a Host, I can duplicate an existing event to create a new one', persona: 'Host', theme: 'Create & manage events')]
     public function duplicate($id, Request $request)
     {
         $user = Auth::user();
@@ -321,7 +321,7 @@ class PartyController extends Controller
         ]);
     }
 
-    #[UserStory('As a Guest, I can view a public event\'s details and repair statistics', persona: 'Guest')]
+    #[UserStory('As a Guest, I can view a public event\'s details and repair statistics', persona: 'Guest', theme: 'Find & browse events')]
     public function view($id)
     {
         $File = new FixometerFile;
@@ -427,7 +427,7 @@ class PartyController extends Controller
         }
     }
 
-    #[UserStory('As a Restarter, I can RSVP to attend an upcoming event', persona: 'Restarter')]
+    #[UserStory('As a Restarter, I can RSVP to attend an upcoming event', persona: 'Restarter', theme: 'Attendance & volunteers')]
     public function getJoinEvent($event_id)
     {
         $user_id = Auth::id();
@@ -507,7 +507,7 @@ class PartyController extends Controller
         }
     }
 
-    #[UserStory('As a Guest, I can view an event\'s repair impact statistics', persona: 'Guest')]
+    #[UserStory('As a Guest, I can view an event\'s repair impact statistics', persona: 'Guest', theme: 'Stats & data')]
     public static function stats($id)
     {
         $event = Party::where('idevents', $id)->first();
@@ -529,7 +529,7 @@ class PartyController extends Controller
      *
      * @return Response json formatted array of relevant info on users in the group.
      */
-    #[UserStory('As a Host, I can retrieve group member emails to invite them to an event', persona: 'Host')]
+    #[UserStory('As a Host, I can retrieve group member emails to invite them to an event', persona: 'Host', theme: 'Invitations')]
     public function getGroupEmailsWithNames($event_id)
     {
         $group_user_ids = UserGroups::where('group', Party::find($event_id)->group)
@@ -553,7 +553,7 @@ class PartyController extends Controller
         return response()->json($group_users);
     }
 
-    #[UserStory('As a Host, I can update the participant count for my event', persona: 'Host')]
+    #[UserStory('As a Host, I can update the participant count for my event', persona: 'Host', theme: 'Attendance & volunteers')]
     public function updateQuantity(Request $request)
     {
         $event_id = $request->input('event_id');
@@ -576,7 +576,7 @@ class PartyController extends Controller
         return response()->json($return);
     }
 
-    #[UserStory('As a Host, I can update the volunteer count for my event', persona: 'Host')]
+    #[UserStory('As a Host, I can update the volunteer count for my event', persona: 'Host', theme: 'Attendance & volunteers')]
     public function updateVolunteerQuantity(Request $request)
     {
         $event_id = $request->input('event_id');
@@ -599,7 +599,7 @@ class PartyController extends Controller
         return response()->json($return);
     }
 
-    #[UserStory('As a Host, I can remove a volunteer from my event', persona: 'Host')]
+    #[UserStory('As a Host, I can remove a volunteer from my event', persona: 'Host', theme: 'Attendance & volunteers')]
     public function removeVolunteer(Request $request)
     {
         // The id that's passed in is that of the events_users table, because the entry may refer to a user without
@@ -631,7 +631,7 @@ class PartyController extends Controller
         }
     }
 
-    #[UserStory('As a Host, I can send email invitations for an event', persona: 'Host')]
+    #[UserStory('As a Host, I can send email invitations for an event', persona: 'Host', theme: 'Invitations')]
     public function postSendInvite(Request $request)
     {
         $from_id = Auth::id();
@@ -731,7 +731,7 @@ class PartyController extends Controller
         return redirect()->back()->with('warning', __('events.invite_noemails'));
     }
 
-    #[UserStory('As a Restarter, I can accept an event invitation', persona: 'Restarter')]
+    #[UserStory('As a Restarter, I can accept an event invitation', persona: 'Restarter', theme: 'Invitations')]
     public function confirmInvite($event_id, $hash)
     {
         $user_event = EventsUsers::where('status', $hash)->where('event', $event_id)->first();
@@ -751,7 +751,7 @@ class PartyController extends Controller
         return redirect('/party/view/'.intval($event_id))->with('warning', __('events.invite_invalid'));
     }
 
-    #[UserStory('As a Restarter, I can cancel my attendance at an event', persona: 'Restarter')]
+    #[UserStory('As a Restarter, I can cancel my attendance at an event', persona: 'Restarter', theme: 'Invitations')]
     public function cancelInvite($event_id)
     {
         // We have to do a loop to avoid the gotcha where bulk delete operations don't invoke observers.
@@ -762,7 +762,7 @@ class PartyController extends Controller
         return redirect('/party/view/'.intval($event_id))->with('success', __('events.invite_cancelled'));
     }
 
-    #[UserStory('As a Restarter, I can upload photos from an event', persona: 'Restarter')]
+    #[UserStory('As a Restarter, I can upload photos from an event', persona: 'Restarter', theme: 'Photos & media')]
     public function imageUpload(Request $request, $id)
     {
         try {
@@ -793,7 +793,7 @@ class PartyController extends Controller
         }
     }
 
-    #[UserStory('As a Restarter, I can delete my uploaded event photos', persona: 'Restarter')]
+    #[UserStory('As a Restarter, I can delete my uploaded event photos', persona: 'Restarter', theme: 'Photos & media')]
     public function deleteImage($event_id, $id, $path)
     {
         $user = Auth::user();
@@ -815,7 +815,7 @@ class PartyController extends Controller
     * This sends an email to all user except the host logged in an email to ask for contributions
     *
     */
-    #[UserStory('As a Host, I can request attendees log their repair contributions', persona: 'Host')]
+    #[UserStory('As a Host, I can request attendees log their repair contributions', persona: 'Host', theme: 'Devices & repairs')]
     public function getContributions($event_id)
     {
         $event = Party::find($event_id);
@@ -844,7 +844,7 @@ class PartyController extends Controller
      * Called via AJAX.
      * @param id The event id.
      */
-    #[UserStory('As a Host, I can delete an event from my group', persona: 'Host')]
+    #[UserStory('As a Host, I can delete an event from my group', persona: 'Host', theme: 'Create & manage events')]
     public function deleteEvent($id)
     {
         $event = Party::findOrFail($id);
@@ -887,7 +887,7 @@ class PartyController extends Controller
      * @param   [type]      $code
      * @return  [type]
      */
-    #[UserStory('As a Guest, I can join an event using a shareable invite code', persona: 'Guest')]
+    #[UserStory('As a Guest, I can join an event using a shareable invite code', persona: 'Guest', theme: 'Invitations')]
     public function confirmCodeInvite(Request $request, $code)
     {
         // Variables

@@ -31,7 +31,7 @@ class InformationAlertCookieController extends Controller
      * @param  int  $id
      * @return View
      */
-    #[UserStory('As a Guest, I can dismiss an information alert banner', persona: 'Guest')]
+    #[UserStory('As a Guest, I can dismiss an information alert banner', persona: 'Guest', theme: 'Cookie alerts')]
     public function __invoke(Request $request)
     {
         if (! $request->has('dismissable_id')) {

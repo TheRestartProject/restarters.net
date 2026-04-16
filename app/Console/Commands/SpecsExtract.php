@@ -167,6 +167,7 @@ class SpecsExtract extends Command
                                 'story' => $args[0] ?? $args['story'] ?? '',
                                 'persona' => $args['persona'] ?? $args[1] ?? '',
                                 'feature' => $args['feature'] ?? '',
+                                'theme' => $args['theme'] ?? '',
                             ];
                         }
                     }
@@ -260,6 +261,7 @@ class SpecsExtract extends Command
                 $features[$featureName]['stories'][] = [
                     'story' => $story['story'],
                     'persona' => $story['persona'],
+                    'theme' => $story['theme'] ?: 'General',
                     'method' => "{$shortClass}::{$method['name']}",
                     'file' => $filePath,
                     'tests' => [],
@@ -279,7 +281,7 @@ class SpecsExtract extends Command
         $storyIndex = [];
         foreach ($features as $featureName => &$feature) {
             foreach ($feature['stories'] as $idx => &$story) {
-                $storyIndex[$story['method']] = [
+                $storyIndex[$story['method']][] = [
                     'feature' => $featureName,
                     'index' => $idx,
                 ];
@@ -313,13 +315,14 @@ class SpecsExtract extends Command
                 foreach ($matches as $match) {
                     $methodRef = $match[1];
                     if (isset($storyIndex[$methodRef])) {
-                        $ref = $storyIndex[$methodRef];
                         $testName = $this->extractTestName($content, $match[0], $ext);
 
-                        $features[$ref['feature']]['stories'][$ref['index']]['tests'][] = [
-                            'file' => $relativePath,
-                            'test' => $testName,
-                        ];
+                        foreach ($storyIndex[$methodRef] as $ref) {
+                            $features[$ref['feature']]['stories'][$ref['index']]['tests'][] = [
+                                'file' => $relativePath,
+                                'test' => $testName,
+                            ];
+                        }
                     }
                 }
             }

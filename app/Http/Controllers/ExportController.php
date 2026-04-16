@@ -27,17 +27,17 @@ use Illuminate\Database\Eloquent\Collection;
 #[Feature('Platform', description: 'Platform-wide statistics and public impact data')]
 class ExportController extends Controller
 {
-    #[UserStory('As a Restarter, I can export device data from an event as CSV', persona: 'Restarter')]
+    #[UserStory('As a Restarter, I can export device data from an event as CSV', persona: 'Restarter', theme: 'Data exports')]
     public function devicesEvent(Request $request, $idevents = NULL) {
         return $this->devices($request, $idevents);
     }
 
-    #[UserStory('As a Restarter, I can export device data from a group as CSV', persona: 'Restarter')]
+    #[UserStory('As a Restarter, I can export device data from a group as CSV', persona: 'Restarter', theme: 'Data exports')]
     public function devicesGroup(Request $request, $idgroups = NULL) {
         return $this->devices($request, NULL, $idgroups);
     }
 
-    #[UserStory('As a Restarter, I can export all device records as CSV', persona: 'Restarter')]
+    #[UserStory('As a Restarter, I can export all device records as CSV', persona: 'Restarter', theme: 'Data exports')]
     public function devices(Request $request, $idevents = NULL, $idgroups = NULL)
     {
         // To not display column if the referring URL is therestartproject.org
@@ -153,7 +153,7 @@ class ExportController extends Controller
     /**
      * @return \Illuminate\Http\Response
      */
-    #[UserStory('As a Restarter, I can export a group\'s event summary as CSV', persona: 'Restarter')]
+    #[UserStory('As a Restarter, I can export a group\'s event summary as CSV', persona: 'Restarter', theme: 'Data exports')]
     public function groupEvents(Request $request, $idgroups)
     {
         $group = Group::findOrFail($idgroups);
@@ -161,7 +161,7 @@ class ExportController extends Controller
         return $this->exportEvents($parties);
     }
 
-    #[UserStory('As a NetworkCoordinator, I can export my network\'s event summary as CSV', persona: 'NetworkCoordinator')]
+    #[UserStory('As a NetworkCoordinator, I can export my network\'s event summary as CSV', persona: 'NetworkCoordinator', theme: 'Data exports')]
     public function networkEvents(Request $request, $id)
     {
         $network = Network::findOrFail($id);
