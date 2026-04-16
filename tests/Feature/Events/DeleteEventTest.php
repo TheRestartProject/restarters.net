@@ -35,7 +35,14 @@ class DeleteEventTest extends TestCase
         parent::setUp();
     }
 
-    /** @test */
+    /**
+     * @test
+     * @story:PartyController::deleteEvent
+     * @story:OutboundController::info
+     * @story:PartyController::getJoinEvent
+     * @story:ApiController::groupStats
+     * @story:ApiController::partyStats
+     */
     public function an_admin_can_delete_an_event()
     {
         $this->withoutExceptionHandling();
@@ -93,6 +100,9 @@ class DeleteEventTest extends TestCase
     /**
      * @test
      * @dataProvider roleProvider
+     * @story:PartyController::view
+     * @story:PartyController::deleteEvent
+     * @story:PartyController::edit
      */
     public function view_edit_deleted_event($role)
     {
@@ -272,6 +282,7 @@ class DeleteEventTest extends TestCase
     /**
      * @test
      * @dataProvider provider
+     * @story:PartyController::view
      */
     public function candelete_flag($role, $pastFuture, $addDevice, $canDelete)
     {
@@ -317,6 +328,8 @@ class DeleteEventTest extends TestCase
 
     /**
      * @test
+     * @story:PartyController::getJoinEvent
+     * @story:PartyController::getContributions
      */
     public function request_review()
     {

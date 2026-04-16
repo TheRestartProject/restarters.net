@@ -2,6 +2,8 @@
 
 namespace App\Http\Controllers;
 
+use App\Attributes\Feature;
+use App\Attributes\UserStory;
 use App\Brands;
 use App\Cluster;
 use App\Device;
@@ -24,8 +26,10 @@ use Lang;
 use Notification;
 use View;
 
+#[Feature('Devices', description: 'Repair device tracking and impact measurement')]
 class DeviceController extends Controller
 {
+    #[UserStory('As a Restarter, I can browse all devices and view global repair impact data', persona: 'Restarter', theme: 'Browse & search devices')]
     public function index($search = null)
     {
         $user = User::getProfile(Auth::id());
@@ -66,6 +70,7 @@ class DeviceController extends Controller
         ]);
     }
 
+    #[UserStory('As a Restarter, I can upload photos of devices I\'ve worked on', persona: 'Restarter', theme: 'Device photos')]
     public function imageUpload(Request $request, $id)
     {
         try {
@@ -105,6 +110,7 @@ class DeviceController extends Controller
         }
     }
 
+    #[UserStory('As a Restarter, I can delete device photos I\'ve uploaded', persona: 'Restarter', theme: 'Device photos')]
     public function deleteImage($device_id, $idxref)
     {
         $user = Auth::user();

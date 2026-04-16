@@ -8,7 +8,10 @@ use App\User;
 use Auth;
 use Illuminate\Http\Request;
 use Cache;
+use App\Attributes\Feature;
+use App\Attributes\UserStory;
 
+#[Feature('Platform', description: 'Platform-wide statistics and public impact data')]
 class DiscourseController extends Controller
 {
     /**
@@ -18,6 +21,7 @@ class DiscourseController extends Controller
      * @param string $tag
      * @return \Illuminate\Http\Response
      */
+    #[UserStory('As a Guest, I can view recent community discussion topics', persona: 'Guest', theme: 'Discussion integration')]
     public function discussionTopics(Request $request, DiscourseService $discourseService, $tag = NULL)
     {
         $topics = [];

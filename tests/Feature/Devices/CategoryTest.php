@@ -11,6 +11,10 @@ use Tests\TestCase;
 
 class CategoryTest extends TestCase
 {
+    /**
+     * @story:DeviceController::createDevicev2
+     * @story:DeviceController::updateDevicev2
+     */
     public function testCategoryChange()
     {
         $event = Party::factory()->create();
@@ -50,6 +54,7 @@ class CategoryTest extends TestCase
         self::assertEquals($device->category, 46);
     }
 
+    /** @story:ItemController::listItemsv2 */
     public function testListItems() {
         $cat1 = Category::factory()->create([
             'idcategories' => 444,

@@ -27,7 +27,10 @@ class WikiLoginTests extends TestCase
         DB::statement('SET foreign_key_checks=1');
     }
 
-    /** @test */
+    /**
+     * @test
+     * @story:LoginController::login
+     */
     public function if_flagged_for_creation_create_when_logging_in()
     {
         $this->withoutExceptionHandling();
@@ -51,7 +54,10 @@ class WikiLoginTests extends TestCase
         $this->assertEquals(WikiSyncStatus::Created, $user->wiki_sync_status);
     }
 
-    /** @test */
+    /**
+     * @test
+     * @story:LoginController::login
+     */
     public function if_not_flagged_for_creation()
     {
         $this->withoutExceptionHandling();
@@ -75,7 +81,10 @@ class WikiLoginTests extends TestCase
         $this->assertEquals(WikiSyncStatus::DoNotCreate, $user->wiki_sync_status);
     }
 
-    /** @test */
+    /**
+     * @test
+     * @story:LoginController::login
+     */
     public function if_already_created()
     {
         $this->withoutExceptionHandling();
@@ -99,7 +108,10 @@ class WikiLoginTests extends TestCase
         $this->assertEquals(WikiSyncStatus::Created, $user->wiki_sync_status);
     }
 
-    /** @test */
+    /**
+     * @test
+     * @story:UserController::postProfilePasswordEdit
+     */
     public function if_wiki_user_changes_password()
     {
         $this->withoutExceptionHandling();
@@ -120,7 +132,10 @@ class WikiLoginTests extends TestCase
         // Then the user's wiki password should be changed to match
     }
 
-    /** @test */
+    /**
+     * @test
+     * @story:LoginController::login
+     */
     public function login_succeeds_when_wiki_unavailable()
     {
         $this->withoutExceptionHandling();

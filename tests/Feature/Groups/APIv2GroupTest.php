@@ -24,6 +24,8 @@ class APIv2GroupTest extends TestCase
      * @dataProvider providerTrueFalse
      *
      * @param $approve
+     * @story:GroupController::getGroupv2
+     * @story:GroupController::moderateGroupsv2
      */
     public function testGetGroup($approve) {
         $user = User::factory()->administrator()->create([
@@ -92,6 +94,7 @@ class APIv2GroupTest extends TestCase
         ];
     }
 
+    /** @story:GroupController::createGroupv2 */
     public function testCreateGroupLoggedOut()
     {
         $this->expectException(AuthenticationException::class);
@@ -103,6 +106,7 @@ class APIv2GroupTest extends TestCase
         ]);
     }
 
+    /** @story:GroupController::createGroupv2 */
     public function testCreateGroupLoggedInWithoutToken()
     {
         // Logged in as a user should work, even if we don't use an API token.
@@ -122,6 +126,10 @@ class APIv2GroupTest extends TestCase
         $this->assertTrue(array_key_exists('id', $json));
     }
 
+    /**
+     * @story:GroupController::createGroupv2
+     * @story:GroupController::listNamesv2
+     */
     public function testCreateGroupLoggedOutWithToken()
     {
         // Logged out should work if we use an API token.
@@ -200,6 +208,7 @@ class APIv2GroupTest extends TestCase
         return $ix;
     }
 
+    /** @story:GroupController::createGroupv2 */
     public function testCreateGroupGeocodeFailure()
     {
         $user = User::factory()->administrator()->create([
@@ -216,6 +225,7 @@ class APIv2GroupTest extends TestCase
         ]);
     }
 
+    /** @story:GroupController::createGroupv2 */
     public function testCreateGroupInvalidTimezone()
     {
         $user = User::factory()->administrator()->create([
@@ -233,6 +243,7 @@ class APIv2GroupTest extends TestCase
         ]);
     }
 
+    /** @story:GroupController::createGroupv2 */
     public function testCreateGroupDuplicate()
     {
         // Logged in as a user should work, even if we don't use an API token.
@@ -259,6 +270,10 @@ class APIv2GroupTest extends TestCase
         ]);
     }
 
+    /**
+     * @story:GroupController::listTagsv2
+     * @story:GroupController::getGroupv2
+     */
     public function testTags() {
         $tag = GroupTags::factory()->create();
         $response = $this->get('/api/v2/groups/tags', []);
@@ -276,6 +291,7 @@ class APIv2GroupTest extends TestCase
         self::assertEquals($tag->id, $json['data']['tags'][0]['id']);
     }
 
+    /** @story:GroupController::createGroupv2 */
     public function testOutdated() {
         // Check we can create a group with an outdated timezone.
         $user = User::factory()->administrator()->create([
@@ -311,6 +327,7 @@ class APIv2GroupTest extends TestCase
      * @dataProvider providerTrueFalse
      *
      * @return void
+     * @story:GroupController::moderateGroupsv2
      */
     public function testNetworkCoordinatorApprove($first) {
         $network1 = Network::factory()->create();
@@ -344,6 +361,7 @@ class APIv2GroupTest extends TestCase
         }
     }
 
+    /** @story:GroupController::getGroupv2 */
     public function testLocales() {
         $user = User::factory()->administrator()->create([
             'api_token' => '1234',
@@ -375,6 +393,10 @@ class APIv2GroupTest extends TestCase
         // Create a group in
     }
 
+    /**
+     * @story:GroupController::createGroupv2
+     * @story:GroupController::getGroupv2
+     */
     public function testEmptyNetworkData() {
         $user = User::factory()->administrator()->create([
             'api_token' => '1234',
@@ -410,6 +432,12 @@ class APIv2GroupTest extends TestCase
         assertEquals(null, $json['data']['network_data']);
     }
 
+    /**
+     * @story:GroupController::createGroupv2
+     * @story:GroupController::updateGroupv2
+     * @story:GroupController::getGroupv2
+     * @story:GroupController::getGroupsByUsersNetworks
+     */
     public function testNetworkDataUpdatedAt() {
         $user = User::factory()->administrator()->create([
             'api_token' => '1234',
@@ -470,6 +498,11 @@ class APIv2GroupTest extends TestCase
         $this->assertEquals((new Carbon($updated_at))->getTimestamp(), (new Carbon($groups[0]['updated_at']))->getTimestamp());
     }
 
+    /**
+     * @story:GroupController::getGroupv2
+     * @story:GroupController::updateGroupv2
+     * @story:GroupController::listNamesv2
+     */
     public function testArchived() {
         $user = User::factory()->administrator()->create([
             'api_token' => '1234',

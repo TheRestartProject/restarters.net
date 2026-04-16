@@ -72,6 +72,8 @@ class EventStateTest extends TestCase
 
     /**
      * @dataProvider timeProvider
+     * @story:EventController::createEventv2
+     * @story:PartyController::view
      */
     public function testStatesOnViewPage($date, $upcoming, $finished, $inprogress, $startingsoon) {
 

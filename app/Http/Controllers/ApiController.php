@@ -9,6 +9,9 @@ use App\User;
 use Auth;
 use DB;
 use Illuminate\Http\Request;
+use App\Attributes\Feature;
+use App\Attributes\UserStory;
+use App\Attributes\NoStory;
 
 /**
  * @OA\Info(
@@ -41,11 +44,14 @@ use Illuminate\Http\Request;
  *   name="api_token",
  *  )
  */
+#[Feature('Platform', description: 'Platform-wide statistics and public impact data')]
 class ApiController extends Controller
 {
     /**
      * Embedded at https://therestartproject.org
      */
+    #[UserStory('As a Guest, I can view aggregate platform impact statistics', persona: 'Guest', theme: 'Platform impact stats')]
+    #[UserStory('As a ThirdParty, I can retrieve aggregate platform impact data for embedding', persona: 'ThirdParty', theme: 'Platform impact stats')]
     public static function homepage_data()
     {
         $result = [];
@@ -98,6 +104,8 @@ class ApiController extends Controller
             ->json($result, 200);
     }
 
+    #[UserStory('As a Guest, I can view repair statistics for a specific event', persona: 'Guest', theme: 'Platform impact stats')]
+    #[UserStory('As a ThirdParty, I can retrieve event repair statistics for embedding', persona: 'ThirdParty', theme: 'Platform impact stats')]
     public static function partyStats($partyId)
     {
         $event = Party::where('idevents', $partyId)->first();
@@ -128,6 +136,8 @@ class ApiController extends Controller
         return response()->json($result, 200);
     }
 
+    #[UserStory('As a Guest, I can view repair statistics for a specific group', persona: 'Guest', theme: 'Platform impact stats')]
+    #[UserStory('As a ThirdParty, I can retrieve group repair statistics for embedding', persona: 'ThirdParty', theme: 'Platform impact stats')]
     public static function groupStats($groupId)
     {
         $group = Group::where('idgroups', $groupId)->first();
@@ -159,6 +169,7 @@ class ApiController extends Controller
         return response()->json($result, 200);
     }
 
+    #[UserStory('As a Restarter, I can retrieve my own profile information via the API', persona: 'Restarter', theme: 'Platform impact stats')]
     public static function getUserInfo()
     {
         $user = Auth::user();
@@ -168,6 +179,7 @@ class ApiController extends Controller
         return response()->json($user->toArray());
     }
 
+    #[UserStory('As an Admin, I can retrieve a list of all users via the API', persona: 'Admin', theme: 'Platform impact stats')]
     public static function getUserList()
     {
         $authenticatedUser = Auth::user();
@@ -188,6 +200,8 @@ class ApiController extends Controller
      * @param  Request  $request
      * @return Response
      */
+    #[UserStory('As a Guest, I can search and filter device records via the API', persona: 'Guest', theme: 'Data exports')]
+    #[UserStory('As a ThirdParty, I can search and retrieve device records via the API', persona: 'ThirdParty', theme: 'Data exports')]
     public static function getDevices(Request $request, $page, $size)
     {
         $powered = $request->input('powered');
@@ -275,6 +289,7 @@ class ApiController extends Controller
         ]);
     }
 
+    #[NoStory(reason: 'Timezone list helper endpoint')]
     public function timezones() {
         $zones = \DateTimeZone::listIdentifiers(\DateTimeZone::ALL_WITH_BC);
         $ret = [];

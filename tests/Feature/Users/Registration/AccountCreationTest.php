@@ -13,6 +13,11 @@ use Tests\TestCase;
 
 class AccountCreationTest extends TestCase
 {
+    /**
+     * @story:UserController::getRegister
+     * @story:UserController::postRegister
+     * @story:UserController::getOnboardingComplete
+     */
     public function testRegister()
     {
         $response = $this->get('/user/register');
@@ -92,6 +97,7 @@ class AccountCreationTest extends TestCase
         $this->assertEquals(1950, \Auth::user()->age);
     }
 
+    /** @story:UserController::logout */
     public function testLogout()
     {
         $response = $this->post('/user/register/', $this->userAttributes());
@@ -148,6 +154,7 @@ class AccountCreationTest extends TestCase
         $this->assertNull(json_decode($response->getContent(), true));
     }
 
+    /** @story:UserController::create */
     public function testAdminCreate()
     {
         $this->loginAsTestUser(Role::ADMINISTRATOR);

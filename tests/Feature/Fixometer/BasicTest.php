@@ -16,6 +16,7 @@ use Tests\TestCase;
 
 class BasicTest extends TestCase
 {
+    /** @story:DeviceController::index */
     public function testPageLoads()
     {
         // Create a past event with a fixed device.  This is shown on the Fixometer page as the latest data.
@@ -99,6 +100,7 @@ class BasicTest extends TestCase
         $this->assertEquals($event->idevents, $data['idevents']);
     }
 
+    /** @story:ExportController::devices */
     public function testExport() {
         $this->loginAsTestUser(Role::ADMINISTRATOR);
 

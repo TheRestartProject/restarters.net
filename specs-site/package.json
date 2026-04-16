@@ -1,0 +1,13 @@
+{
+  "name": "restarters-specs",
+  "private": true,
+  "scripts": {
+    "prebuild": "node generate-pages.mjs",
+    "dev": "npm run prebuild && vitepress dev",
+    "build": "npm run prebuild && vitepress build",
+    "preview": "vitepress preview"
+  },
+  "devDependencies": {
+    "vitepress": "^1.6.0"
+  }
+}

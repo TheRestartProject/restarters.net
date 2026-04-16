@@ -11,6 +11,7 @@ use Illuminate\Validation\ValidationException;
 
 class NullAgeProblemTest extends TestCase
 {
+    /** @story:DeviceController::createDevicev2 */
     public function testNullAgeCreate()
     {
         $event = Party::factory()->create();
@@ -24,6 +25,7 @@ class NullAgeProblemTest extends TestCase
         $iddevices = $this->createDevice($event->idevents, 'misc', null, null);
     }
 
+    /** @story:DeviceController::updateDevicev2 */
     public function testNullAgeEdit()
     {
         $event = Party::factory()->create();

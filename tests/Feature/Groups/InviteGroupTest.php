@@ -18,6 +18,11 @@ use Illuminate\Validation\ValidationException;
 
 class InviteGroupTest extends TestCase
 {
+    /**
+     * @story:GroupController::postSendInvite
+     * @story:GroupController::view
+     * @story:GroupController::confirmInvite
+     */
     public function testInvite()
     {
         Notification::fake();
@@ -131,6 +136,10 @@ class InviteGroupTest extends TestCase
         );
     }
 
+    /**
+     * @story:GroupController::view
+     * @story:GroupController::confirmCodeInvite
+     */
     public function testInviteViaLink() {
         $group = Group::factory()->create();
 
@@ -159,6 +168,7 @@ class InviteGroupTest extends TestCase
 
     /**
      * @dataProvider invalidEmailProvider
+     * @story:GroupController::postSendInvite
      */
     public function testInviteInvalidEmail($email, $valid)
     {

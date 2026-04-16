@@ -20,7 +20,10 @@ class GroupStatsTest extends StatsTestCase
         $this->assertEquals($expect, $group->getGroupStats());
     }
 
-    /** @test */
+    /**
+     * @test
+     * @story:GroupController::stats
+     */
     public function a_group_with_one_past_event_has_stats_for_that_event()
     {
         $group = Group::factory()->create();
@@ -340,7 +343,10 @@ class GroupStatsTest extends StatsTestCase
         }
     }
 
-    /** @test */
+    /**
+     * @test
+     * @story:ApiController::groupStats
+     */
     public function get_of_stats_after_deletion() {
 
         $admin = User::factory()->administrator()->create([

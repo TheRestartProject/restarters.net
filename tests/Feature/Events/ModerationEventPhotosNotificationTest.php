@@ -38,7 +38,11 @@ class ModerationEventPhotosNotificationTest extends TestCase
      */
     protected $group;
 
-    /** @test */
+    /**
+     * @test
+     * @story:PartyController::imageUpload
+     * @story:PartyController::deleteImage
+     */
     public function a_moderation_notification_is_sent_to_admins_when_event_photos_are_uploaded()
     {
         Notification::fake();

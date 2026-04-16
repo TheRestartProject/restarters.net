@@ -11,6 +11,7 @@ use Illuminate\Validation\ValidationException;
 
 class NullEstimateProblemTest extends TestCase
 {
+    /** @story:DeviceController::createDevicev2 */
     public function testNullEstimateCreate()
     {
         $event = Party::factory()->create();
@@ -23,6 +24,7 @@ class NullEstimateProblemTest extends TestCase
         $iddevices = $this->createDevice($event->idevents, 'misc', null, 1, null);
     }
 
+    /** @story:DeviceController::updateDevicev2 */
     public function testNullEstimateEdit()
     {
         $event = Party::factory()->create();

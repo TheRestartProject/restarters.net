@@ -89,7 +89,10 @@ class EditProfileTest extends TestCase
         $this->assertEquals(132.654, $user->longitude);
     }
 
-    /** test */
+    /**
+     * test
+     * @story:UserController::postProfileInfoEdit
+     */
     // Check that we can update the location.
     public function test_location_update()
     {
@@ -138,6 +141,8 @@ class EditProfileTest extends TestCase
     /**
      * @test
      * @dataProvider idProvider
+     * @story:UserController::postProfileTagsEdit
+     * @story:UserController::getProfileEdit
      */
     public function test_tags_update($id) {
         $user = User::factory()->create();
@@ -185,6 +190,7 @@ class EditProfileTest extends TestCase
     /**
      * @test
      * @dataProvider idProvider
+     * @story:UserController::postProfilePictureEdit
      */
     public function image_upload($id) {
         Storage::fake('avatars');
@@ -225,6 +231,7 @@ class EditProfileTest extends TestCase
 
     /**
      * @test
+     * @story:UserController::postProfileInfoEdit
      */
     public function edit_profile() {
         $user = User::factory()->create();

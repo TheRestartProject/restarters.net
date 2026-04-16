@@ -20,7 +20,11 @@ class EventStatsTest extends StatsTestCase
         $this->assertEquals($expect, $event->getEventStats());
     }
 
-    /** @test */
+    /**
+     * @test
+     * @story:AdminController::stats
+     * @story:PartyController::stats
+     */
     public function event_stats_with_both_powered_and_unpowered_devices()
     {
         $this->_setupCategoriesWithUnpoweredWeights();
@@ -180,7 +184,11 @@ class EventStatsTest extends StatsTestCase
         $response->assertSee('<span id="ewaste-diverted-value">23</span>', false);
     }
 
-    /** @test */
+    /**
+     * @test
+     * @story:PartyController::view
+     * @story:GroupController::view
+     */
     public function event_stats_for_upcoming_event() {
         $this->_setupCategoriesWithUnpoweredWeights();
 

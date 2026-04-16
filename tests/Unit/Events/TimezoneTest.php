@@ -75,6 +75,9 @@ class TimezoneTest extends TestCase
 
     /**
      * @dataProvider timesProvider
+     * @story:EventController::createEventv2
+     * @story:PartyController::index
+     * @story:EventController::updateEventv2
      */
     public function testOrder($date, $tz1, $start1, $end1, $tz2, $start2, $end2, $editstart2, $editend2) {
         // Two groups in different timezones.
@@ -187,6 +190,9 @@ class TimezoneTest extends TestCase
         $p->end = '10:00';
     }
 
+    /** @story:EventController::createEventv2
+     * @story:GroupController::updateGroupv2
+     */
     public function testTimezoneChangeUpdatesFutureEvents() {
         // Create a group.
         $g = Group::factory()->create([

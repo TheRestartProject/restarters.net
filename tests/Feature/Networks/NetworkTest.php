@@ -81,7 +81,12 @@ class NetworkTest extends TestCase
         $this->assertTrue($group->isMemberOf($network));
     }
 
-    /** @test */
+    /**
+     * @test
+     * @story:NetworkController::associateGroup
+     * @story:GroupController::getGroupsByUsersNetworks
+     * @story:EventController::getEventsByUsersNetworks
+     */
     public function admins_can_associate_group_to_network()
     {
         $this->withoutExceptionHandling();
@@ -211,7 +216,10 @@ class NetworkTest extends TestCase
         $this->assertTrue($coordinator->isCoordinatorOf($network));
     }
 
-    /** @test */
+    /**
+     * @test
+     * @story:NetworkController::stats
+     */
     public function network_stats_can_be_queried()
     {
         $network = Network::factory()->create();
@@ -234,7 +242,13 @@ class NetworkTest extends TestCase
         $this->assertEquals($expectedStats, $stats);
     }
 
-    /** @test */
+    /**
+     * @test
+     * @story:NetworkController::index
+     * @story:NetworkController::show
+     * @story:NetworkController::associateGroup
+     * @story:GroupController::network
+     */
     public function network_page()
     {
         $network = Network::factory()->create([
@@ -296,7 +310,12 @@ class NetworkTest extends TestCase
         $response->assertSee(__('networks.index.all_networks_explainer'));
     }
 
-    /** @test */
+    /**
+     * @test
+     * @story:NetworkController::edit
+     * @story:NetworkController::update
+     * @story:NetworkController::associateGroup
+     */
     public function admins_can_edit()
     {
         $this->withoutExceptionHandling();
@@ -327,6 +346,7 @@ class NetworkTest extends TestCase
         $this->assertTrue($group->isMemberOf($network));
     }
 
+    /** @story:UserController::postAdminEdit */
     public function testRemoveNetworkCoordinatorByRole() {
         $this->withoutExceptionHandling();
 

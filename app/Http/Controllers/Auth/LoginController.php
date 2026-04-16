@@ -2,6 +2,8 @@
 
 namespace App\Http\Controllers\Auth;
 
+use App\Attributes\Feature;
+use App\Attributes\UserStory;
 use App\Device;
 use App\Helpers\Fixometer;
 use App\Http\Controllers\Controller;
@@ -13,6 +15,7 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Validation\ValidationException;
 use Msurguy\Honeypot\Honeypot;
 
+#[Feature('Users', description: 'User accounts, profiles, and authentication')]
 class LoginController extends Controller
 {
     /*
@@ -53,6 +56,7 @@ class LoginController extends Controller
      *
      * @throws \Illuminate\Validation\ValidationException
      */
+    #[UserStory('As a Guest, I can log in to the platform', persona: 'Guest', theme: 'Authentication')]
     public function login(Request $request)
     {
         $this->validateLogin($request);
@@ -107,6 +111,7 @@ class LoginController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
+    #[UserStory('As a Guest, I can view the login page', persona: 'Guest', theme: 'Authentication')]
     public function showLoginForm()
     {
         $stats = Fixometer::loginRegisterStats();

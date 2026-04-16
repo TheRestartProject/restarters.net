@@ -14,6 +14,10 @@ use Mockery;
 
 class GroupJoinTest extends TestCase
 {
+    /**
+     * @story:GroupController::getJoinGroup
+     * @story:UserGroupsController::leave
+     */
     public function testJoin()
     {
         Notification::fake();

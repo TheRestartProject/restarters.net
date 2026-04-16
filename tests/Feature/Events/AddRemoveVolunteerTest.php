@@ -25,8 +25,12 @@ class AddRemoveVolunteerTest extends TestCase
 {
     /**
      * @dataProvider roleProvider
+     * @story:EventController::addVolunteer
+     * @story:EventController::listVolunteers
+     * @story:PartyController::removeVolunteer
+     * @story:PartyController::postSendInvite
+     * @story:PartyController::view
      */
-
     public function testAddRemove($role, $addrole, $shouldBeHost)
     {
         $this->withoutExceptionHandling();
@@ -215,6 +219,10 @@ class AddRemoveVolunteerTest extends TestCase
         ];
     }
 
+    /** @story:UserGroupsController::leave
+     * @story:UserController::edit
+     * @story:UserController::postAdminEdit
+     */
     public function testAdminRemoveReaddHost() {
         $this->withoutExceptionHandling();
 

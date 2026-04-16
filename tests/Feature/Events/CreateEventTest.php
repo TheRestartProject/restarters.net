@@ -56,7 +56,10 @@ class CreateEventTest extends TestCase
         });
     }
 
-    /** @test */
+    /**
+     * @test
+     * @story:PartyController::create
+     */
     public function a_host_without_a_group_cant_create_an_event()
     {
         $this->withoutExceptionHandling();
@@ -71,6 +74,11 @@ class CreateEventTest extends TestCase
     /**
      * @test
      * @dataProvider roles
+     * @story:EventController::createEventv2
+     * @story:PartyController::create
+     * @story:PartyController::view
+     * @story:GroupController::getEventsForGroupv2
+     * @story:PartyController::index
      */
     public function a_host_with_a_group_can_create_an_event($data)
     {
@@ -262,7 +270,10 @@ class CreateEventTest extends TestCase
         ];
     }
 
-    /** @test */
+    /**
+     * @test
+     * @story:PartyController::duplicate
+     */
     public function a_host_can_duplicate_an_event()
     {
         $this->withoutExceptionHandling();
@@ -301,6 +312,7 @@ class CreateEventTest extends TestCase
      * @test
      *
      * @dataProvider providerTrueFalse
+     * @story:EventController::createEventv2
      */
     public function emails_sent_when_created($notify)
     {
@@ -358,7 +370,11 @@ class CreateEventTest extends TestCase
         }
     }
 
-    /** @test */
+    /**
+     * @test
+     * @story:EventController::createEventv2
+     * @story:EventController::updateEventv2
+     */
     public function emails_sent_to_restarters_when_upcoming_event_approved()
     {
         $this->withoutExceptionHandling();
@@ -420,7 +436,11 @@ class CreateEventTest extends TestCase
         $this->patch('/api/v2/events/'.$event->idevents, $this->eventAttributesToAPI($eventData));
     }
 
-    /** @test */
+    /**
+     * @test
+     * @story:EventController::createEventv2
+     * @story:EventController::updateEventv2
+     */
     public function emails_not_sent_to_volunteers_when_past_event_approved()
     {
         $this->withoutExceptionHandling();
@@ -453,7 +473,10 @@ class CreateEventTest extends TestCase
         );
     }
 
-    /** @test */
+    /**
+     * @test
+     * @story:EventController::createEventv2
+     */
     public function emails_sent_to_coordinators_when_event_created()
     {
         $this->withoutExceptionHandling();
@@ -487,7 +510,13 @@ class CreateEventTest extends TestCase
         );
     }
 
-    /** @test */
+    /**
+     * @test
+     * @story:EventController::createEventv2
+     * @story:EventController::addVolunteer
+     * @story:PartyController::removeVolunteer
+     * @story:GroupController::getVolunteersForGroupv2
+     */
     public function a_host_can_be_added_later()
     {
         $this->withoutExceptionHandling();
@@ -591,7 +620,8 @@ class CreateEventTest extends TestCase
 
     /**
      * @test
-     **@dataProvider provider
+     * @dataProvider provider
+     * @story:EventController::createEventv2
      */
     public function an_event_can_be_auto_approved($autoApprove, $approved)
     {
@@ -619,6 +649,7 @@ class CreateEventTest extends TestCase
 
     /**
      * @test
+     * @story:EventController::createEventv2
      */
     public function a_past_event_is_not_upcoming() {
         $host = User::factory()->administrator()->create();
@@ -643,6 +674,7 @@ class CreateEventTest extends TestCase
 
     /**
      * @test
+     * @story:EventController::createEventv2
      */
     public function a_future_event_is_upcoming() {
         $host = User::factory()->administrator()->create();
@@ -667,6 +699,9 @@ class CreateEventTest extends TestCase
 
     /**
      * @test
+     * @story:GroupController::deleteVolunteerForGroupv2
+     * @story:EventController::createEventv2
+     * @story:EventController::updateEventv2
      */
     public function no_notification_after_leaving() {
         Notification::fake();
@@ -716,6 +751,7 @@ class CreateEventTest extends TestCase
      * @test
      *
      * @dataProvider providerTrueFalse
+     * @story:EventController::createEventv2
      */
     public function notifications_are_queued_as_expected($notify)
     {
@@ -772,7 +808,12 @@ class CreateEventTest extends TestCase
         );
     }
 
-    /** @test */
+    /**
+     * @test
+     * @story:PartyController::create
+     * @story:EventController::createEventv2
+     * @story:PartyController::edit
+     */
     public function network_coordinator_other_group() {
         $network = Network::factory()->create();
 
@@ -817,6 +858,8 @@ class CreateEventTest extends TestCase
 
     /**
      * @dataProvider invalidEmailProvider
+     * @story:EventController::createEventv2
+     * @story:EventController::addVolunteer
      */
     public function an_invalid_email_is_trapped($email, $valid)
     {
