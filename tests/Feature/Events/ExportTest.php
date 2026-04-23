@@ -304,6 +304,78 @@ class ExportTest extends TestCase
         fclose($fh);
     }
 
+    /**
+     * Test that emdash in group name doesn't break CSV export.
+     *
+     * The fix was to change //TRANSLIT to //TRANSLIT//IGNORE, which skips
+     * characters that cannot be transliterated instead of throwing an error.
+     */
+    public function testEmdashInGroupNameExport()
+    {
+        $admin = User::factory()->administrator()->create();
+        $this->actingAs($admin);
+
+        $network = Network::factory()->create();
+
+        $group = Group::factory()->create([
+            'name' => 'Repair Café — Schöneberg',
+            'approved' => true
+        ]);
+
+        $this->networkService = new RepairNetworkService();
+        $this->networkService->addGroupToNetwork($admin, $group, $network);
+
+        $event_start = \Carbon\Carbon::createFromTimestamp(strtotime('2000-01-02'))->setTimezone('UTC');
+        $event_end = \Carbon\Carbon::createFromTimestamp(strtotime('2000-01-02'))->setTimezone('UTC')->addHour(2);
+
+        $this->lastResponse = $this->post('/api/v2/events?api_token=' . $admin->api_token, [
+            'groupid' => $group->idgroups,
+            'start' => $event_start->toIso8601String(),
+            'end' => $event_end->toIso8601String(),
+            'title' => 'Test Event',
+            'location' => 'London',
+            'description' => 'Test Description',
+            'timezone' => 'UTC'
+        ]);
+        $this->assertTrue($this->lastResponse->isSuccessful());
+        $json = json_decode($this->lastResponse->getContent(), true);
+        $idevents = $json['id'];
+
+        $event = Party::find($idevents);
+        $event->approved = true;
+        $event->save();
+
+        $this->artisan("queue:work --stop-when-empty");
+
+        $originalLocale = setlocale(LC_ALL, 0);
+        setlocale(LC_ALL, 'POSIX');
+
+        try {
+            $response = $this->get("/export/networks/{$network->id}/events");
+            $response->assertSuccessful();
+
+            $filename = 'events.csv';
+            $this->assertFileExists($filename);
+            $fh = fopen($filename, 'r');
+            $this->assertNotFalse($fh);
+
+            $header = fgetcsv($fh);
+            $this->assertNotFalse($header);
+
+            $row = fgetcsv($fh);
+            $this->assertNotFalse($row, 'CSV data row should be readable');
+            $this->assertNotEmpty($row[10], 'Group name should not be empty');
+            $this->assertTrue(
+                mb_check_encoding($row[10], 'ASCII'),
+                'Group name should be valid ASCII after export. Got: ' . $row[10]
+            );
+
+            fclose($fh);
+        } finally {
+            setlocale(LC_ALL, $originalLocale);
+        }
+    }
+
     public function roleProvider(): array {
         return [
             [ 'Administrator' ],
