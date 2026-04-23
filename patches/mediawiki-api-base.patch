@@ -1,17 +1,22 @@
-Index: src/MediawikiApi.php
-IDEA additional info:
-Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
-<+>UTF-8
-===================================================================
-diff --git a/src/MediawikiApi.php b/src/MediawikiApi.php
---- a/src/MediawikiApi.php	(revision 3da3a088e6ebbd353aa6412766cfc2895cea0d3e)
-+++ b/src/MediawikiApi.php	(date 1629716501064)
-@@ -147,7 +147,7 @@
- 	/**
- 	 * @return ClientInterface
- 	 */
--	private function getClient() {
-+	public function getClient() {
- 		if ( $this->client === null ) {
+--- a/src/Client/Action/ActionApi.php
++++ b/src/Client/Action/ActionApi.php
+@@ -69,7 +69,7 @@
+ 		return $clientResponse;
+ 	}
+ 
+-	private function getClient(): ClientInterface {
++	public function getClient(): ClientInterface {
+ 		if ( !$this->client instanceof ClientInterface ) {
+ 			$clientFactory = new ClientFactory();
+ 			$clientFactory->setLogger( $this->logger );
+--- a/src/Client/Rest/RestApi.php
++++ b/src/Client/Rest/RestApi.php
+@@ -68,7 +68,7 @@
+ 		return $clientResponse;
+ 	}
+ 
+-	private function getClient(): ClientInterface {
++	public function getClient(): ClientInterface {
+ 		if ( !$this->client instanceof ClientInterface ) {
  			$clientFactory = new ClientFactory();
  			$clientFactory->setLogger( $this->logger );

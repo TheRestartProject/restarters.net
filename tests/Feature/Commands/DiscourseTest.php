@@ -9,11 +9,11 @@ use DB;
 use Tests\TestCase;
 
 class DiscourseTest extends TestCase {
-    public function testSyncDiscourseUsernames() {
+    public function testSyncDiscourseUsernames(): void {
         $this->artisan('sync:discourseusernames')->assertExitCode(0);
     }
 
-    public function testDiscourseSyncGroups() {
+    public function testDiscourseSyncGroups(): void {
         $user = User::factory()->administrator()->create([
             'api_token' => '1234',
         ]);

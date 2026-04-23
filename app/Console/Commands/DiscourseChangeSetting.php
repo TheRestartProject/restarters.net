@@ -56,10 +56,8 @@ class DiscourseChangeSetting extends Command
 
     /**
      * Execute the console command.
-     *
-     * @return mixed
      */
-    public function handle(DiscourseService $discourseService)
+    public function handle(DiscourseService $discourseService): void
     {
         $setting = $this->argument('setting');
         $value = $this->argument('value');

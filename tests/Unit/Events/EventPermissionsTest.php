@@ -34,7 +34,7 @@ class EventPermissionsTest extends TestCase
     // Hosts - can edit all events in their groups
 
     /** @test */
-    public function it_can_check_if_admin_can_edit_all()
+    public function it_can_check_if_admin_can_edit_all(): void
     {
         // arrange
         $network = Network::factory()->create();
@@ -62,7 +62,7 @@ class EventPermissionsTest extends TestCase
     }
 
     /** @test */
-    public function it_can_check_if_coordinator_can_edit_for_network()
+    public function it_can_check_if_coordinator_can_edit_for_network(): void
     {
         // arrange
         $network = Network::factory()->create();
@@ -89,7 +89,7 @@ class EventPermissionsTest extends TestCase
     }
 
     /** @test */
-    public function it_can_check_if_host_can_edit_for_group()
+    public function it_can_check_if_host_can_edit_for_group(): void
     {
         // arrange
         $network = Network::factory()->create();

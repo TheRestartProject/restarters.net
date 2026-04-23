@@ -19,7 +19,7 @@ use Tests\Feature\MockInterface;
 class DiscourseAccountCreationTest extends TestCase
 {
     /** @test */
-    public function user_registration_triggers_user_registered_event()
+    public function user_registration_triggers_user_registered_event(): void
     {
         Event::fake();
 
@@ -32,7 +32,7 @@ class DiscourseAccountCreationTest extends TestCase
     }
 
     /** @test */
-    public function user_registration_triggers_discourse_sync_attempt()
+    public function user_registration_triggers_discourse_sync_attempt(): void
     {
         if (config('restarters.features.discourse_integration')) {
             // TODO Not working and agreed to disable for now.
@@ -52,7 +52,7 @@ class DiscourseAccountCreationTest extends TestCase
     }
 
     /** @test */
-    public function user_registration_discourse_sync()
+    public function user_registration_discourse_sync(): void
     {
         if (config('restarters.features.discourse_integration')) {
             // This is a test against a real Discourse instance.
@@ -83,7 +83,7 @@ class DiscourseAccountCreationTest extends TestCase
     }
 
     /** @test */
-    public function user_sync()
+    public function user_sync(): void
     {
         // TODO Not working and agreed to disable for now.
 //        $this->withExceptionHandling();

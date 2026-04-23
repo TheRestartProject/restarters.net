@@ -57,10 +57,8 @@ class DiscourseAnonymiseUser extends Command
 
     /**
      * Execute the console command.
-     *
-     * @return mixed
      */
-    public function handle(DiscourseService $discourseService)
+    public function handle(DiscourseService $discourseService): void
     {
         $id = $this->argument('id');
         $user = User::findOrFail($id);

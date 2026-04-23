@@ -2,6 +2,7 @@
 
 namespace App\Listeners;
 
+use Illuminate\Events\Dispatcher;
 use App\Events\UserEmailUpdated;
 use App\Events\UserLanguageUpdated;
 use App\Events\UserRegistered;
@@ -136,10 +137,8 @@ class DiscourseUserEventSubscriber extends BaseEvent
 
     /**
      * Register the listeners for the subscriber.
-     *
-     * @param  \Illuminate\Events\Dispatcher  $events
      */
-    public function subscribe($events)
+    public function subscribe(Dispatcher $events)
     {
         // We subscribe to all the events irrespective of whether the feature is enabled so that we can test them.
         $events->listen(

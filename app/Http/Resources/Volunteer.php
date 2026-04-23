@@ -2,6 +2,10 @@
 
 namespace App\Http\Resources;
 
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
+use App\Helpers\Fixometer;
+use App\Group;
 use App\Role;
 use App\Skills;
 use App\User;
@@ -35,6 +39,14 @@ use Illuminate\Http\Resources\Json\JsonResource;
  *          example="Sam"
  *     ),
  *     @OA\Property(
+ *          property="email",
+ *          title="email",
+ *          description="The volunteer's email address. Only included when the authenticated user is a group host, network coordinator, or admin.",
+ *          format="string",
+ *          example="sam@example.com",
+ *          nullable=true
+ *     ),
+ *     @OA\Property(
  *          property="host",
  *          title="host",
  *          description="Whether the volunteer is a host of the event/group",
@@ -64,11 +76,8 @@ class Volunteer extends JsonResource
 {
     /**
      * Transform the resource into an array.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @return array
      */
-    public function toArray($request)
+    public function toArray(Request $request): array
     {
         if (\Cache::has('all_skills')) {
             $allSkills = \Cache::get('all_skills');
@@ -99,7 +108,7 @@ class Volunteer extends JsonResource
 
         $u = User::find($this->user);
 
-        return [
+        $data = [
             'id' => $this->idusers_groups, // When we write the v2 event volunteer code we'll need to change this.
             'user' => $this->user,
             'group' => $this->group,
@@ -108,5 +117,21 @@ class Volunteer extends JsonResource
             'image' => $image,
             'skills' => SkillCollection::make($skills)
         ];
+
+        // Only include email when the authenticated user is a group host, network coordinator, or admin
+        // Check both web and API authentication
+        $currentUser = Auth::user() ?? auth('api')->user();
+        if ($currentUser) {
+            $isAdmin = Fixometer::hasRole($currentUser, 'Administrator');
+            $isHost = Fixometer::userIsHostOfGroup($this->group, $currentUser->id);
+            $group = Group::find($this->group);
+            $isNetworkCoordinator = $group && $currentUser->isCoordinatorForGroup($group);
+
+            if ($isAdmin || $isHost || $isNetworkCoordinator) {
+                $data['email'] = $u->email;
+            }
+        }
+
+        return $data;
     }
 }

@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\API;
 
+use Illuminate\Http\JsonResponse;
 use App\Events\ApproveGroup;
 use App\Events\EditGroup;
 use App\Group;
@@ -60,7 +61,7 @@ class GroupController extends Controller
         return response()->json($groupChanges);
     }
 
-    public static function getGroupsByUsersNetworks(Request $request)
+    public static function getGroupsByUsersNetworks(Request $request): JsonResponse
     {
         $authenticatedUser = Auth::user();
 
@@ -213,7 +214,7 @@ class GroupController extends Controller
         return $groupChange;
     }
 
-    public static function getGroupList()
+    public static function getGroupList(): JsonResponse
     {
         $groups = Group::orderBy('created_at', 'desc');
 
@@ -644,7 +645,7 @@ class GroupController extends Controller
      *       ),
      *     )
      */
-    public function moderateGroupsv2(Request $request) {
+    public function moderateGroupsv2(Request $request): JsonResponse {
         $user = $this->getUser();
         $ret = \App\Http\Resources\GroupCollection::make(Group::unapprovedVisibleTo($user->id));
         return response()->json($ret);
@@ -726,7 +727,7 @@ class GroupController extends Controller
      *     )
      *  )
      */
-    public function createGroupv2(Request $request) {
+    public function createGroupv2(Request $request): JsonResponse {
         $user = $this->getUser();
         $user->convertToHost();
 
@@ -874,7 +875,7 @@ class GroupController extends Controller
      *     )
      *  )
      */
-    public function updateGroupv2(Request $request, $idGroup) {
+    public function updateGroupv2(Request $request, $idGroup): JsonResponse {
         $user = $this->getUser();
 
         list($name, $area, $postcode, $location, $phone, $website, $description, $timezone,
@@ -1037,7 +1038,7 @@ class GroupController extends Controller
         }
 
         if (!empty($location)) {
-            $geocoder = new \App\Helpers\Geocoder();
+            $geocoder = app(\App\Helpers\Geocoder::class);
             $geocoded = $geocoder->geocode($location);
 
             if (empty($geocoded))
@@ -1050,10 +1051,10 @@ class GroupController extends Controller
 
             // Note that the country returned by the geocoder is already in English, which is what we need for the
             // value in the database.
-            $country_code = $geocoded['country_code'];
+            $country_code = $geocoded['country_code'] ?? null;
         }
 
-        return array(
+        return [
             $name,
             $area,
             $postcode,
@@ -1068,6 +1069,6 @@ class GroupController extends Controller
             $network_data,
             $email,
             $archived_at
-        );
+        ];
     }
 }

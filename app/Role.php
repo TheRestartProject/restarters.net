@@ -53,7 +53,7 @@ class Role extends Model
      * */
     public function findAll()
     {
-        return DB::select(DB::raw('SELECT
+        return DB::select('SELECT
                         `r`.`idroles` AS `id`,
                         `r`.`role` AS `role`,
                         GROUP_CONCAT(`p`.`permission` ORDER BY `p`.`permission` ASC SEPARATOR ", "  )  as `permissions_list`
@@ -61,22 +61,22 @@ class Role extends Model
                     LEFT JOIN `roles_permissions` AS `rp` ON `r`.`idroles` = `rp`.`role`
                     LEFT JOIN `permissions` AS `p` ON `rp`.`permission` = `p`.`idpermissions`
                     GROUP BY `r`.`idroles`
-                    ORDER BY `r`.`idroles` ASC'));
+                    ORDER BY `r`.`idroles` ASC');
     }
 
     public function permissions()
     {
         //Tested!
-        return DB::select(DB::raw('SELECT * FROM `permissions` ORDER BY `idpermissions` ASC'));
+        return DB::select('SELECT * FROM `permissions` ORDER BY `idpermissions` ASC');
     }
 
     public function rolePermissions($role)
     {
         //Tested!
-        return DB::select(DB::raw('SELECT * FROM `permissions`
+        return DB::select('SELECT * FROM `permissions`
                     INNER JOIN `roles_permissions` ON `roles_permissions`.`permission` = `permissions`.`idpermissions`
                     WHERE `roles_permissions`.`role` = :role
-                    ORDER BY `idpermissions` ASC'), ['role' => $role]);
+                    ORDER BY `idpermissions` ASC', ['role' => $role]);
     }
 
     public function edit($id, $data)
@@ -84,14 +84,14 @@ class Role extends Model
         //Tested!
 
         // delete permissions before updating references
-        DB::delete(DB::raw('DELETE FROM roles_permissions WHERE role = :role'), ['role' => $id]);
+        DB::delete('DELETE FROM roles_permissions WHERE role = :role', ['role' => $id]);
 
         // insert data here
         $sql = 'INSERT INTO roles_permissions(role, permission) VALUES (:role, :permission)';
 
         foreach ($data as &$p) {
             try {
-                DB::insert(DB::raw($sql), ['role' => $id, 'permission' => $p]);
+                DB::insert($sql, ['role' => $id, 'permission' => $p]);
             } catch (\Illuminate\Database\QueryException $e) {
                 return false;
             }

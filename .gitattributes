@@ -1,0 +1,25 @@
+# Ensure shell scripts always use LF line endings
+*.sh text eol=lf
+
+# Auto detect text files and normalize line endings to LF
+* text=auto eol=lf
+
+# Ensure specific file types use LF
+*.php text eol=lf
+*.js text eol=lf
+*.vue text eol=lf
+*.json text eol=lf
+*.md text eol=lf
+*.yml text eol=lf
+*.yaml text eol=lf
+
+# Binary files
+*.png binary
+*.jpg binary
+*.jpeg binary
+*.gif binary
+*.ico binary
+*.woff binary
+*.woff2 binary
+*.ttf binary
+*.eot binary

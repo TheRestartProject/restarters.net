@@ -1,25 +1,80 @@
 import * as Sentry from "@sentry/vue";
 
-// Set up internationalisation.  translations.js is built in webpack.mix.js from the PHP lang folder.
-import lang from 'lang.js';
-import translations from '../translations.js';
-export const Lang = new lang()
-Lang.setFallback('en')
-Lang.setMessages(translations)
+const translations = import.meta.env.VITE_LARAVEL_TRANSLATIONS || {};
+
+function translate(key, values = {}) {
+    const parts = key.split('.');
+    let translation = translations;
+
+    // Get the current locale from Laravel (it should be set in a meta tag or similar)
+    const locale = document.documentElement.lang || 'en';
+
+    // Start from the locale-specific translations
+    if (translations[locale]) {
+        translation = translations[locale];
+    } else if (translations['en']) {
+        // Fallback to English if locale not found
+        translation = translations['en'];
+        console.warn(`Locale ${locale} not found, using English`);
+    } else {
+        console.error('No translations available');
+        return key;
+    }
+
+    for (const part of parts) {
+        if (translation && typeof translation === 'object' && part in translation) {
+            translation = translation[part];
+        } else {
+            console.warn(`Translation not found for key: ${key} (missing part: ${part})`);
+            return key;
+        }
+    }
+
+    if (typeof translation === 'string' && Object.keys(values).length > 0) {
+        return translation.replace(/:(\w+)/g, (match, param) => {
+            return values[param] !== undefined ? values[param] : match;
+        });
+    }
+
+    return typeof translation === 'string' ? translation : key;
+}
+
+function choice(key, count, values = {}) {
+    // Simple pluralization helper
+    // Laravel's pluralization uses count parameter to determine singular/plural
+    const translation = translate(key, { ...values, count });
+
+    // If translation contains pipes, handle pluralization
+    if (typeof translation === 'string' && translation.includes('|')) {
+        const parts = translation.split('|');
+        // Simple rule: 0 or 1 uses first part, > 1 uses second part
+        return count <= 1 ? parts[0] : (parts[1] || parts[0]);
+    }
+
+    return translation;
+}
+
+function getLocale() {
+    return document.documentElement.lang || 'en';
+}
+
+export const Lang = { get: translate, choice: choice, getLocale: getLocale }
 
 export default {
-    computed: {
-        $lang() {
-            // We want this to be available in all components.
-            return Lang
-        }
+    beforeCreate() {
+        this.$lang = { get: translate, choice: choice, getLocale: getLocale }
     },
     methods: {
         __(key, values) {
-            if (this.$lang.has(key)) {
-                return this.$lang.get(key, values)
-            } else {
+            try {
+                // If values contains a 'count' parameter, use pluralization
+                if (values && values.count !== undefined) {
+                    return choice(key, values.count, values)
+                }
+                return translate(key, values)
+            } catch (error) {
                 Sentry.captureMessage("Missing translation " + key)
+                return key
             }
         }
     }

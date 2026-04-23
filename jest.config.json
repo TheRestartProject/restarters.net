@@ -20,5 +20,8 @@
         "node_modules"
     ],
     "setupFilesAfterEnv": ["<rootDir>/tests/jest.setup.js"],
-    "testEnvironment": "jsdom"
+    "testEnvironment": "jsdom",
+    "moduleNameMapper": {
+        "^resources/js/mixins/lang.js$": "<rootDir>/tests/__mocks__/resources/js/mixins/lang.js"
+    }
 }

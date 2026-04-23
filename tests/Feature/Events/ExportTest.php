@@ -19,7 +19,7 @@ class ExportTest extends TestCase
     /**
      * @dataProvider roleProvider
      */
-    public function testExport($role)
+    public function testExport($role): void
     {
         $network = Network::factory()->create();
 
@@ -241,7 +241,7 @@ class ExportTest extends TestCase
         // Create an event for this group with a slash in the title
         $event_start = \Carbon\Carbon::createFromTimestamp(strtotime('2000-01-02'))->setTimezone('UTC');
         $event_end = \Carbon\Carbon::createFromTimestamp(strtotime('2000-01-02'))->setTimezone('UTC')->addHour(2);
-        
+
         $this->lastResponse = $this->post('/api/v2/events?api_token=' . $admin->api_token, [
             'groupid' => $group->idgroups,
             'start' => $event_start->toIso8601String(),
@@ -254,7 +254,7 @@ class ExportTest extends TestCase
         $this->assertTrue($this->lastResponse->isSuccessful());
         $json = json_decode($this->lastResponse->getContent(), true);
         $idevents = $json['id'];
-        
+
         $event = Party::find($idevents);
         $event->approved = true;
         $event->save();
@@ -304,7 +304,7 @@ class ExportTest extends TestCase
         fclose($fh);
     }
 
-    public function roleProvider() {
+    public function roleProvider(): array {
         return [
             [ 'Administrator' ],
             [ 'NetworkCoordinator' ],

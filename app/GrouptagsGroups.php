@@ -2,6 +2,7 @@
 
 namespace App;
 
+use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Database\Eloquent\Model;
 
 class GrouptagsGroups extends Model
@@ -33,7 +34,7 @@ class GrouptagsGroups extends Model
      * @version 1.0.0
      * @return  [type]
      */
-    public function theGroup()
+    public function theGroup(): HasOne
     {
         return $this->hasOne(Group::class, 'idgroups', 'group');
     }

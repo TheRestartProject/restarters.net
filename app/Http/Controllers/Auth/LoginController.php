@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Auth;
 
+use Illuminate\View\View;
 use App\Device;
 use App\Helpers\Fixometer;
 use App\Http\Controllers\Controller;
@@ -48,7 +49,6 @@ class LoginController extends Controller
     /**
      * Override login from AuthenticateUsers
      *
-     * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\RedirectResponse|\Illuminate\Http\Response|\Illuminate\Http\JsonResponse
      *
      * @throws \Illuminate\Validation\ValidationException
@@ -82,11 +82,8 @@ class LoginController extends Controller
 
     /**
      * Override validateLogin from AuthenticateUsers
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @return void
      */
-    protected function validateLogin(Request $request)
+    protected function validateLogin(Request $request): void
     {
         if (env('HONEYPOT_DISABLE', false)) {
             // This is used in Playwright testing where we get many requests in a short time.
@@ -98,16 +95,14 @@ class LoginController extends Controller
             $this->username() => 'required|email',
             'password' => 'required|string',
             'my_name'   => 'honeypot',
-            'my_time'   => 'required|honeytime:1',
+            'my_time'   => 'required|honeytime:0',
         ]);
     }
 
     /**
      * Override showLoginForm from AuthenticateUsers
-     *
-     * @return \Illuminate\Http\Response
      */
-    public function showLoginForm()
+    public function showLoginForm(): View
     {
         $stats = Fixometer::loginRegisterStats();
 

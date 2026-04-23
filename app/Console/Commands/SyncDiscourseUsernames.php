@@ -55,10 +55,8 @@ class SyncDiscourseUsernames extends Command
 
     /**
      * Execute the console command.
-     *
-     * @return mixed
      */
-    public function handle()
+    public function handle(): void
     {
         $usersFoundInRestarters = 0;
         $updatedUsers = 0;

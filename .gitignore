@@ -26,3 +26,10 @@ restarters-anonymised.sql
 /public/css/app.css
 /public/css/wiki.css
 /.claude/settings.local.json
+/public/build/
+/storage/api-docs/api-docs.json
+/.phpunit.result.cache
+/playwright-report/
+/events.csv
+/public/repair-data*.csv
+/uploads/*.jpg

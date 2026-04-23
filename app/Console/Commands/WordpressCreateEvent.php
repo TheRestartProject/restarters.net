@@ -34,10 +34,8 @@ class WordpressCreateEvent extends Command
 
     /**
      * Execute the console command.
-     *
-     * @return mixed
      */
-    public function handle()
+    public function handle(): void
     {
         $id = $this->argument('id');
         $event = Party::findOrFail($id);

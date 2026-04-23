@@ -27,7 +27,7 @@ class GroupHostTest extends TestCase
         $this->assertNotNull($this->idgroups);
     }
 
-    public function roleProvider() {
+    public function roleProvider(): array {
         return [
             [ 'Administrator' ],
             [ 'NetworkCoordinator' ],
@@ -37,7 +37,7 @@ class GroupHostTest extends TestCase
     /**
      * @dataProvider roleProvider
      */
-    public function testMakeHost($role)
+    public function testMakeHost($role): void
     {
         $user = User::factory()->{lcfirst($role)}()->create();
         $this->actingAs($user);
@@ -95,7 +95,7 @@ class GroupHostTest extends TestCase
         $this->assertEquals(1, count($json['data']));
     }
 
-    public function testHostMakeHost()
+    public function testHostMakeHost(): void
     {
         $firsthost = User::factory()->host()->create();
         $this->group->addVolunteer($firsthost);
@@ -118,7 +118,7 @@ class GroupHostTest extends TestCase
         $response = $this->delete("/api/v2/groups/{$this->idgroups}/volunteers/{$host->id}?api_token=" . $host->api_token);
     }
 
-    public function providerTrueFalse()
+    public function providerTrueFalse(): array
     {
         return [
             [false],
@@ -129,7 +129,7 @@ class GroupHostTest extends TestCase
     /**
      * @dataProvider providerTrueFalse
      */
-    public function testNetworkCoordinatorDemoteHost($addToNetwork) {
+    public function testNetworkCoordinatorDemoteHost($addToNetwork): void {
         $host = User::factory()->host()->create();
         $this->group->addVolunteer($host);
         $this->group->makeMemberAHost($host);
@@ -147,5 +147,92 @@ class GroupHostTest extends TestCase
         ]);
 
         $response->assertSuccessful();
+    }
+
+    public function testAdminCanSeeVolunteerEmail(): void
+    {
+        $admin = User::factory()->administrator()->create();
+        $this->actingAs($admin);
+
+        $volunteer = User::factory()->create([
+            'email' => 'volunteer@example.com',
+        ]);
+        $this->group->addVolunteer($volunteer);
+
+        $response = $this->get("/api/v2/groups/{$this->idgroups}/volunteers");
+        $response->assertSuccessful();
+        $json = json_decode($response->getContent(), true);
+
+        // Find the volunteer in the response
+        $volunteerData = collect($json['data'])->firstWhere('user', $volunteer->id);
+        $this->assertNotNull($volunteerData);
+        $this->assertArrayHasKey('email', $volunteerData);
+        $this->assertEquals('volunteer@example.com', $volunteerData['email']);
+    }
+
+    public function testHostCanSeeVolunteerEmail(): void
+    {
+        $host = User::factory()->host()->create();
+        $this->group->addVolunteer($host);
+        $this->group->makeMemberAHost($host);
+        $this->actingAs($host);
+
+        $volunteer = User::factory()->create([
+            'email' => 'volunteer@example.com',
+        ]);
+        $this->group->addVolunteer($volunteer);
+
+        $response = $this->get("/api/v2/groups/{$this->idgroups}/volunteers");
+        $response->assertSuccessful();
+        $json = json_decode($response->getContent(), true);
+
+        // Find the volunteer in the response
+        $volunteerData = collect($json['data'])->firstWhere('user', $volunteer->id);
+        $this->assertNotNull($volunteerData);
+        $this->assertArrayHasKey('email', $volunteerData);
+        $this->assertEquals('volunteer@example.com', $volunteerData['email']);
+    }
+
+    public function testNetworkCoordinatorCanSeeVolunteerEmail(): void
+    {
+        $coordinator = User::factory()->networkCoordinator()->create();
+        $this->network->addCoordinator($coordinator);
+        $this->actingAs($coordinator);
+
+        $volunteer = User::factory()->create([
+            'email' => 'volunteer@example.com',
+        ]);
+        $this->group->addVolunteer($volunteer);
+
+        $response = $this->get("/api/v2/groups/{$this->idgroups}/volunteers");
+        $response->assertSuccessful();
+        $json = json_decode($response->getContent(), true);
+
+        // Find the volunteer in the response
+        $volunteerData = collect($json['data'])->firstWhere('user', $volunteer->id);
+        $this->assertNotNull($volunteerData);
+        $this->assertArrayHasKey('email', $volunteerData);
+        $this->assertEquals('volunteer@example.com', $volunteerData['email']);
+    }
+
+    public function testRestarterCannotSeeVolunteerEmail(): void
+    {
+        $restarter = User::factory()->restarter()->create();
+        $this->group->addVolunteer($restarter);
+        $this->actingAs($restarter);
+
+        $volunteer = User::factory()->create([
+            'email' => 'volunteer@example.com',
+        ]);
+        $this->group->addVolunteer($volunteer);
+
+        $response = $this->get("/api/v2/groups/{$this->idgroups}/volunteers");
+        $response->assertSuccessful();
+        $json = json_decode($response->getContent(), true);
+
+        // Find the volunteer in the response
+        $volunteerData = collect($json['data'])->firstWhere('user', $volunteer->id);
+        $this->assertNotNull($volunteerData);
+        $this->assertArrayNotHasKey('email', $volunteerData);
     }
 }

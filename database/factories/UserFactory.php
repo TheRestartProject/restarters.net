@@ -2,6 +2,7 @@
 
 namespace Database\Factories;
 
+use Illuminate\Support\Facades\Hash;
 use Illuminate\Database\Eloquent\Factories\Factory;
 use App\Role;
 use App\User;
@@ -25,13 +26,15 @@ class UserFactory extends Factory
      *
      * @return array
      */
-    public function definition()
+    protected static ?string $password;
+
+    public function definition(): array
     {
         return [
         'name' => $this->faker->name(),
         'email' => $this->faker->unique()->safeEmail(),
         'username' => $this->faker->userName(),
-        'password' => '$2y$10$TKh8H1.PfQx37YgCzwiKb.KjNyWgaHb9cbcoQgdIVFlYg7B77UdFm', // secret
+        'password' => static::$password ??= Hash::make('secret'),
         'remember_token' => Str::random(10),
         'consent_past_data' => new \DateTime(),
         'consent_future_data' => new \DateTime(),

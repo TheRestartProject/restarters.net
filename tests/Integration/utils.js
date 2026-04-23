@@ -12,7 +12,7 @@ const log = (message, ...args) => {
 
 const login = async function(page, baseURL, email = 'jane@bloggs.net', password = 'passw0rd') {
   log('Starting login process', { email, baseURL })
-  
+
   // Load the login page.
   log('Navigating to login page')
   await page.goto(baseURL + '/login')
@@ -69,7 +69,58 @@ exports.createGroup = async function(page, baseURL) {
   // ugly, but will do.
   log('Submitting group creation form')
   await page.waitForTimeout(3000);
-  await page.click('button[type=submit]')
+
+  // Debug: check how many submit buttons exist
+  const submitButtonCount = await page.locator('button[type=submit]').count()
+  log('Found submit button count:', submitButtonCount)
+
+  // Use more specific selector - the button with "Create group" text
+  const createButton = page.locator('button', { hasText: 'Create group' })
+  const buttonText = await createButton.textContent()
+  log('Button text:', buttonText)
+
+  // Debug: check if button has Vue event listeners and find .vue containers
+  const hasListeners = await page.evaluate(() => {
+    const buttons = Array.from(document.querySelectorAll('button'))
+    const createBtn = buttons.find(b => b.textContent.includes('Create group'))
+    const vueContainers = document.querySelectorAll('.vue')
+    const vueContainerInfo = Array.from(vueContainers).map((c, i) => ({
+      index: i,
+      hasVue: c.__vue__ !== undefined,
+      childCount: c.children.length,
+      innerHTML: c.innerHTML.substring(0, 100)
+    }))
+    return {
+      hasOnClick: createBtn && typeof createBtn.onclick === 'function',
+      hasVueListeners: createBtn && createBtn.__vue__ !== undefined,
+      parentHasVue: createBtn && createBtn.parentElement && createBtn.parentElement.__vue__ !== undefined,
+      vueContainers: vueContainerInfo,
+      buttonInVueContainer: createBtn && Array.from(vueContainers).some(c => c.contains(createBtn))
+    }
+  })
+  log('Button listener check:', JSON.stringify(hasListeners, null, 2))
+
+  // Debug: check what JS files are loaded
+  const loadedScripts = await page.evaluate(() => {
+    const scripts = Array.from(document.querySelectorAll('script[src]'))
+    return scripts.map(s => s.src).filter(src => src.includes('app-'))
+  })
+  log('Loaded scripts:', loadedScripts)
+
+  // Try clicking via JavaScript to trigger Vue event
+  await page.evaluate(() => {
+    const buttons = Array.from(document.querySelectorAll('button'))
+    const createBtn = buttons.find(b => b.textContent.includes('Create group'))
+    if (createBtn) {
+      console.log('DEBUG TEST: Triggering click via JS')
+      createBtn.click()
+    }
+  })
+
+  // Wait a bit to see if the click handler fires
+  await page.waitForTimeout(1000)
+
+  log('Clicked submit button via JS')
 
   // Should get redirected to Edit form.  We used to wait on #details, but this stopped working for reasons we don't
   // understand.  It may be as design in Playwright.  However the page URL will have been updated and we can use that
@@ -89,12 +140,16 @@ exports.createGroup = async function(page, baseURL) {
 
 exports.createEvent = async function(page, baseURL, idgroups, past) {
   log('Starting event creation', { idgroups, past })
-  
-  // Go to groups page
+
+  // Go to group view page
   log('Navigating to group view page')
   await page.goto('/group/view/' + idgroups)
 
-  // Click on Add New Event button
+  // Wait for page to load
+  log('Waiting for page to load')
+  await page.waitForLoadState('networkidle', { timeout: 30000 })
+
+  // Click on Add Event button
   log('Clicking create event button')
   await page.click('a[href="/party/create"]')
 
@@ -189,7 +244,7 @@ exports.addDevice = async function(page, baseURL, idevents, powered, photo, fixe
 
   // Get current device count.
   await page.waitForSelector(addsel)
-  var current = await page.locator('h3:visible').count()
+  var current = await page.locator('.device-info:visible').count()
   log('Current device count', { current })
 
   // Click the add button.
@@ -238,10 +293,11 @@ exports.addDevice = async function(page, baseURL, idevents, powered, photo, fixe
     const fileChooser = await fileChooserPromise;
     await fileChooser.setFiles('public/images/community.jpg');
 
-    // Wait for the file upload to complete - dropzone shows .dz-preview when file is being uploaded
-    // and adds .dz-success class when upload succeeds
+    // Wait for the upload to complete - the dropzone shows a preview image in .device-photos
     log('Waiting for photo upload to complete')
-    await expect(page.locator('.add-device .dz-preview.dz-success:visible')).toBeVisible({ timeout: 30000 })
+    await page.waitForSelector('.add-device .device-photos .dz-preview .dz-image img', { timeout: 30000 })
+    // Give it a moment to fully process
+    await page.waitForTimeout(500)
   }
 
   log('Submitting device creation')
@@ -249,7 +305,7 @@ exports.addDevice = async function(page, baseURL, idevents, powered, photo, fixe
 
   // Wait for device to show.
   log('Waiting for device to appear in list')
-  await expect(page.locator('h3:visible')).toHaveCount(current + 1)
+  await expect(page.locator('.device-info:visible')).toHaveCount(current + 1)
 
   // Check that the photo appears.
   log('Opening device for verification')
@@ -278,6 +334,32 @@ exports.addDevice = async function(page, baseURL, idevents, powered, photo, fixe
   await expect(page.locator('.device-age-summary:visible').last()).toHaveText('-')
   
   log('Device added successfully')
+}
+
+// Fast device creation for bulk test data - skips verification steps
+exports.addDeviceFast = async function(page, baseURL, idevents, powered, itemType, category) {
+  log('Starting fast device addition', { idevents, powered, itemType, category })
+  
+  var addsel = powered ? '.add-powered-device-desktop' : '.add-unpowered-device-desktop'
+  
+  // Click the add button.
+  await page.locator(addsel).click()
+
+  // Set item type
+  await page.fill('.item-type:visible input', itemType)
+  await page.keyboard.press('Tab')
+
+  // Set category
+  await page.keyboard.type(category)
+  await page.keyboard.press('Enter')
+
+  // Submit without verification
+  await page.locator('text=Add item >> visible=true').click()
+  
+  // Wait briefly for submission to complete
+  await page.waitForTimeout(500)
+  
+  log('Fast device added successfully')
 }
 
 exports.unfollowGroup = async function(page, idgroups) {

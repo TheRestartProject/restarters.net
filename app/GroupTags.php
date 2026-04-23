@@ -2,6 +2,8 @@
 
 namespace App;
 
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
@@ -27,13 +29,13 @@ class GroupTags extends Model
     protected $hidden = [];
 
     //Table Relations
-    public function group_tags()
+    public function group_tags(): BelongsToMany
     {
         return $this->belongsToMany(\App\GrouptagsGroups::class);
     }
 
     //Table Relations
-    public function groupTagGroups()
+    public function groupTagGroups(): HasMany
     {
         return $this->hasMany(GrouptagsGroups::class, 'group_tag', 'id');
     }

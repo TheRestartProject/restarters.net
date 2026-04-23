@@ -25,7 +25,7 @@ abstract class BaseNotification extends Notification implements ShouldQueue
      * @param mixed $notifiable
      * @return array
      */
-    public function via($notifiable)
+    public function via($notifiable): array
     {
         // If user being notified has opted in to receive emails.
         if ($notifiable->invites == 1)

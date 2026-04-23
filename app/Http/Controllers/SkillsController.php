@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use Illuminate\Http\RedirectResponse;
 use App\Helpers\Fixometer;
 use App\Skills;
 use App\UsersSkills;
@@ -25,7 +26,7 @@ class SkillsController extends Controller
         ]);
     }
 
-    public function postCreateSkill(Request $request)
+    public function postCreateSkill(Request $request): RedirectResponse
     {
         if (! Fixometer::hasRole(Auth::user(), 'Administrator')) {
             return redirect('/user/forbidden');
@@ -53,7 +54,7 @@ class SkillsController extends Controller
         ]);
     }
 
-    public function postEditSkill($id, Request $request)
+    public function postEditSkill($id, Request $request): RedirectResponse
     {
         if (! Fixometer::hasRole(Auth::user(), 'Administrator')) {
             return redirect('/user/forbidden');
@@ -68,7 +69,7 @@ class SkillsController extends Controller
         return Redirect::back()->with('success', __('skills.update_success'));
     }
 
-    public function getDeleteSkill($id)
+    public function getDeleteSkill($id): RedirectResponse
     {
 
       // Are you an admin?

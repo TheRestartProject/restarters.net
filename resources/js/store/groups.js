@@ -1,7 +1,7 @@
 import Vue from 'vue'
 import moment from 'moment'
 
-const axios = require('axios')
+import axios from 'axios'
 
 function newToOld(e) {
   // We are in the frustrating position of having a half-written new API with sensible field names, but existing
@@ -141,7 +141,7 @@ export default {
       }
     },
     async listTags({commit}) {
-      let ret = await axios.get('/api/v2/groups/tags?locale=\' + getLocale()')
+      let ret = await axios.get('/api/v2/groups/tags?locale=' + getLocale())
       if (ret && ret.data) {
         commit('setTags', {
           tags: ret.data.data
@@ -159,7 +159,10 @@ export default {
           }
         }
 
-        let ret = await axios.post('/api/v2/groups?api_token=' + rootGetters['auth/apiToken'], formData, {
+        const apiToken = rootGetters['auth/apiToken']
+        const url = '/api/v2/groups?api_token=' + apiToken
+
+        let ret = await axios.post(url, formData, {
           headers: {
             "Content-Type": "multipart/form-data",
           },

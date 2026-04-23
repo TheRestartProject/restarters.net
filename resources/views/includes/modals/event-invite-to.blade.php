@@ -51,12 +51,23 @@
 
               <div id="invite_div" class="form-group">
                 <label for="manual_invite_box">@lang('events.manual_invite_box'):</label>
-                <input type="text" id="manual_invite_box" name="manual_invite_box" class="tokenfield form-control" autocomplete="off">
+                <textarea id="manual_invite_box" name="manual_invite_box" class="form-control" autocomplete="off" rows="3" placeholder="Enter email addresses separated by commas"></textarea>
               </div>
               @if( App\Helpers\Fixometer::userHasEditPartyPermission($formdata->id, Auth::user()->id) || App\Helpers\Fixometer::hasRole(Auth::user(), 'Administrator') )
+                @php
+                  // Get group member emails for the invite checkbox functionality
+                  $groupMembers = $event->theGroup->allConfirmedVolunteers()->get();
+                  $memberEmails = [];
+                  foreach ($groupMembers as $member) {
+                    $user = \App\User::find($member->user);
+                    if ($user && $user->email) {
+                      $memberEmails[] = $user->email;
+                    }
+                  }
+                @endphp
                 <div class="form-check">
                   <label class="form-check-label" for="invites_to_volunteers">
-                    <input type="checkbox" name="invite_group" class="form-check-input" id="invites_to_volunteers" value="1">
+                    <input type="checkbox" name="invite_group" class="form-check-input" id="invites_to_volunteers" value="1" data-member-emails="{{ implode(',', $memberEmails) }}">
                     @lang('events.send_invites_to_restarters_tickbox', ['group' => $formdata->group_name])
                   </label>
                 </div>

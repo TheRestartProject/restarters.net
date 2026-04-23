@@ -1,7 +1,7 @@
 <template>
   <div>
     <div class="d-none d-md-block intro">
-      <b-img-lazy fluid src="/images/dashboard_3.jpg" class="border border-dark border-bottom-0" />
+      <b-img-lazy fluid :src="imageUrl('/images/dashboard_3.jpg')" class="border border-dark border-bottom-0" />
       <div class="pt-4 pl-4 pr-4 pb-2 greyish border border-dark border-bottom-0">
         <p class="font-weight-bold">
           <!--        eslint-disable-next-line-->
@@ -20,7 +20,7 @@
       <template slot="title">
         <div class="d-flex">
           <span class="pl-4 pr-2 pt-4">{{ __('dashboard.getting_the_most') }}</span>
-          <b-img-lazy fluid src="/images/hand_doodle.svg" class="hand mr-3" />
+          <b-img-lazy fluid :src="imageUrl('/images/hand_doodle.svg')" class="hand mr-3" />
         </div>
       </template>
       <template slot="content">
@@ -49,16 +49,19 @@
   </div>
 </template>
 <script>
-import CollapsibleSection from './CollapsibleSection'
+import CollapsibleSection from './CollapsibleSection.vue'
+import images from '../mixins/images'
+
 export default {
+  mixins: [images],
   components: {CollapsibleSection},
 }
 </script>
 <style scoped lang="scss">
 @import 'resources/global/css/_variables';
-@import '~bootstrap/scss/functions';
-@import '~bootstrap/scss/variables';
-@import '~bootstrap/scss/mixins/_breakpoints';
+@import 'bootstrap/scss/functions';
+@import 'bootstrap/scss/variables';
+@import 'bootstrap/scss/mixins/_breakpoints';
 
 .greyish {
   background-color: #d0dae6;

@@ -77,18 +77,16 @@
             <div class="form-row">
               <div class="form-group col">
                 <label for="inputCountry">Country:</label>
-                <div class="form-control form-control__select">
-                    <select id="country" name="country" class="field select2">
-                        <option value=""></option>
-                        @foreach (App\Helpers\Fixometer::getAllCountries() as $country_code => $country_name)
-                          @if (isset($country) && $country_code == $country)
-                            <option value="{{ $country_code }}" selected>{{ $country_name }}</option>
-                          @else
-                            <option value="{{ $country_code }}">{{ $country_name }}</option>
-                          @endif
-                        @endforeach
-                    </select>
-                </div>
+                <select id="country" name="country" class="form-control">
+                    <option value=""></option>
+                    @foreach (App\Helpers\Fixometer::getAllCountries() as $country_code => $country_name)
+                      @if (isset($country) && $country_code == $country)
+                        <option value="{{ $country_code }}" selected>{{ $country_name }}</option>
+                      @else
+                        <option value="{{ $country_code }}">{{ $country_name }}</option>
+                      @endif
+                    @endforeach
+                </select>
               </div>
             </div>
             <div class="form-row">
@@ -109,17 +107,15 @@
             <div class="form-row">
               <div class="form-group col">
                 <label for="permission">Permission:</label>
-                <div class="form-control form-control__select">
-                <select id="permissions" name="permissions[]" class="form-control select2-tags" multiple data-live-search="true" title="Choose permissions...">
-                      @foreach (App\Helpers\Fixometer::allPermissions() as $p)
-                        @if (isset($permissions) && in_array($p->idpermissions, $permissions))
-                          <option value="{{ $p->idpermissions }}" selected>{{ $p->permission }}</option>
-                        @else
-                          <option value="{{ $p->idpermissions }}">{{ $p->permission }}</option>
-                        @endif
-                      @endforeach
-                    </select>
-                </div>
+                <select id="permissions" name="permissions[]" class="form-control" multiple size="6" data-live-search="true" title="Choose permissions...">
+                  @foreach (App\Helpers\Fixometer::allPermissions() as $p)
+                    @if (isset($permissions) && in_array($p->idpermissions, $permissions))
+                      <option value="{{ $p->idpermissions }}" selected>{{ $p->permission }}</option>
+                    @else
+                      <option value="{{ $p->idpermissions }}">{{ $p->permission }}</option>
+                    @endif
+                  @endforeach
+                </select>
               </div>
             </div>
 

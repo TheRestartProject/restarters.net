@@ -15,6 +15,9 @@ use Tests\TestCase;
 
 class RecoverTest extends TestCase
 {
+    private $recovery = null;
+    private $recoveryCode = null;
+
     private function getCode($recovery) {
         if (preg_match('/recovery=(.*?)($|&)/', $recovery, $matches)) {
             return($matches[1]);
@@ -23,7 +26,7 @@ class RecoverTest extends TestCase
         }
     }
 
-    public function testRecover()
+    public function testRecover(): void
     {
         $restarter = User::factory()->restarter()->create([
                                                                           'password' => Hash::make('passw0rd'),

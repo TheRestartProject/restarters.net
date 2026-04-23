@@ -12,7 +12,7 @@ use Tests\Feature\Stats\StatsTestCase;
 class EventStatsTest extends StatsTestCase
 {
     /** @test */
-    public function an_event_with_no_devices_has_empty_stats()
+    public function an_event_with_no_devices_has_empty_stats(): void
     {
         $event = Party::factory()->create();
         $expect = \App\Party::getEventStatsArrayKeys();
@@ -21,7 +21,7 @@ class EventStatsTest extends StatsTestCase
     }
 
     /** @test */
-    public function event_stats_with_both_powered_and_unpowered_devices()
+    public function event_stats_with_both_powered_and_unpowered_devices(): void
     {
         $this->_setupCategoriesWithUnpoweredWeights();
 
@@ -181,7 +181,7 @@ class EventStatsTest extends StatsTestCase
     }
 
     /** @test */
-    public function event_stats_for_upcoming_event() {
+    public function event_stats_for_upcoming_event(): void {
         $this->_setupCategoriesWithUnpoweredWeights();
 
         $this->host = User::factory()->administrator()->create();

@@ -4,10 +4,11 @@
     <CollapsibleSection class="lineheight" collapsed :count="upcomingOrActive.length" count-badge :heading-level="headingLevel">
       <template slot="title">
         <div class="d-flex flex-wrap flex-column flex-md-row">
-          <div v-if="group">{{ group.name }}</div> {{ translatedTitle }}
+          <div v-if="group">{{ group.name }}</div>
+          <div class="ml-1">{{ translatedTitle }}</div>
           <div>
             <b-btn v-if="calendarCopyUrl" class="ml-0 ml-md-2" variant="primary" @click="showCalendar">
-              <b-img-lazy src="/images/subs_cal_ico.svg" />
+              <b-img-lazy :src="imageUrl('/images/subs_cal_ico.svg')" />
             </b-btn>
           </div>
         </div>
@@ -61,11 +62,12 @@
 </template>
 <script>
 import group from '../mixins/group'
+import images from '../mixins/images'
 import moment from 'moment'
-import CalendarAddModal from './CalendarAddModal'
-import GroupEventsTab from './GroupEventsTab'
-import CollapsibleSection from './CollapsibleSection'
-import AlertBanner from './AlertBanner'
+import CalendarAddModal from './CalendarAddModal.vue'
+import GroupEventsTab from './GroupEventsTab.vue'
+import CollapsibleSection from './CollapsibleSection.vue'
+import AlertBanner from './AlertBanner.vue'
 
 export default {
   components: {
@@ -74,7 +76,7 @@ export default {
     CalendarAddModal,
     AlertBanner,
   },
-  mixins: [ group ],
+  mixins: [ group, images ],
   props: {
     idgroups: {
       type: Number,
@@ -155,30 +157,27 @@ export default {
     nearbyNoneMessage() {
       if (this.location) {
         // We have a location, so we can say that there are no other nearby events.
-        return this.$lang.get('groups.no_other_nearby_events')
+        return this.__('groups.no_other_nearby_events')
       } else {
         // We don't have a location - nudge to add one.
-        return this.$lang.get('events.no_location')
+        return this.__('events.no_location')
       }
     },
     translatedTitle() {
       // If we have a group then we are putting the name elsewhere and just want "events" (force the plural).  Otherwise
       // "Your events".
-      let ret = this.group ? this.$lang.choice('groups.events', {
-        value: 2
-      }) : this.$lang.get('events.your_events')
-
+      let ret = this.group ? 'events' : this.__('events.your_events')
       ret = ret.charAt(0).toUpperCase() + ret.slice(1)
       return ret
     },
     translatedCalendarTitle() {
-      return this.$lang.get('groups.calendar_copy_title', {
-        group: this.group ? this.group.name : this.$lang.get('groups.groups_title1').toLowerCase()
+      return this.__('groups.calendar_copy_title', {
+        group: this.group ? this.group.name : this.__('groups.groups_title1').toLowerCase()
       })
     },
     translatedCalendarDescription() {
-      return this.$lang.get('groups.calendar_copy_description', {
-        group: this.group ? this.group.name : this.$lang.get('groups.groups_title1').toLowerCase()
+      return this.__('groups.calendar_copy_description', {
+        group: this.group ? this.group.name : this.__('groups.groups_title1').toLowerCase()
       })
     },
   },

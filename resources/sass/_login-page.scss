@@ -8,6 +8,7 @@
     #logostats-header {
         @include media-breakpoint-up(lg) {
             margin-bottom: 60px;
+            margin-right: -35px;
         }
     }
 
@@ -47,16 +48,22 @@
     }
 }
 
-.stats {
+.stats.row {
     margin-bottom: 30px;
+    flex-wrap: nowrap;
+}
 
+.stats {
     &__stat {
         border-right: 1px solid black;
+        padding: 0 10px;
+        white-space: nowrap;
     }
 
-    .stat-text {
+    .stat-text,
+    .stat-header {
         font-family: 'Open Sans';
-        margin: 0 0 20px;
+        margin: 0;
         color: $brand;
         font-size: 14px;
         line-height: 1;
@@ -67,5 +74,8 @@
         font-size: 33px;
         line-height: 1;
         font-weight: 700;
+    }
+    .stat-header {
+        white-space: nowrap;
     }
 }

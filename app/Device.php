@@ -2,6 +2,8 @@
 
 namespace App;
 
+use Illuminate\Database\Eloquent\Relations\HasOne;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use App\Events\DeviceCreatedOrUpdated;
 use DB;
@@ -50,6 +52,15 @@ class Device extends Model implements Auditable
 
     use \OwenIt\Auditing\Auditable;
     protected $table = 'devices';
+
+    /**
+     * Check if we're running in CircleCI environment
+     */
+    private static function isCircleCI()
+    {
+        return env('CIRCLECI', false) || env('CI', false);
+    }
+
     protected $primaryKey = 'iddevices';
     /**
      * The attributes that are mass assignable.
@@ -96,30 +107,30 @@ class Device extends Model implements Auditable
     public function ofThisEvent($event)
     {
         //Tested
-        return DB::select(DB::raw('SELECT * FROM `'.$this->table.'` AS `d`
+        return DB::select("SELECT * FROM `{$this->table}` AS `d`
                 INNER JOIN `categories` AS `c` ON `c`.`idcategories` = `d`.`category`
                 LEFT JOIN (
                   SELECT * FROM xref
                     INNER JOIN images ON images.idimages = xref.object
-                    WHERE object_type = '.env('TBL_IMAGES').' AND reference_type = '.env('TBL_DEVICES').'
+                    WHERE object_type = ? AND reference_type = ?
                   ) AS i ON i.reference = d.iddevices
 
-                WHERE `event` = :event'), ['event' => $event]);
+                WHERE `event` = ?", [env('TBL_IMAGES'), env('TBL_DEVICES'), $event]);
     }
 
     public function ofThisGroup($group)
     {
         //Tested
-        return DB::select(DB::raw('SELECT * FROM `'.$this->table.'` AS `d`
+        return DB::select("SELECT * FROM `{$this->table}` AS `d`
                 INNER JOIN `categories` AS `c` ON `c`.`idcategories` = `d`.`category`
                 INNER JOIN `events` AS `e` ON `e`.`idevents` = `d`.`event`
-                WHERE `group` = :group'), ['group' => $group]);
+                WHERE `group` = :group", ['group' => $group]);
     }
 
     public function statusCount($g = null, $year = null)
     {
-        $sql = 'SELECT COUNT(*) AS `counter`, `d`.`repair_status` AS `status`, `d`.`event`
-                FROM `'.$this->table.'` AS `d`';
+        $sql = "SELECT COUNT(*) AS `counter`, `d`.`repair_status` AS `status`, `d`.`event`
+                FROM `{$this->table}` AS `d`";
 
         $sql .= ' INNER JOIN `events` AS `e` ON `e`.`idevents` = `d`.`event` ';
         $sql .= ' WHERE `repair_status` > 0 ';
@@ -141,14 +152,14 @@ class Device extends Model implements Auditable
         }
 
         if (! is_null($g) && is_numeric($g) && is_null($year)) {
-            return DB::select(DB::raw($sql), ['g' => $g]);
+            return DB::select($sql, ['g' => $g]);
         } elseif (! is_null($year) && is_numeric($year) && is_null($g)) {
-            return DB::select(DB::raw($sql), ['year' => $year]);
+            return DB::select($sql, ['year' => $year]);
         } elseif (! is_null($year) && is_numeric($year) && ! is_null($g) && is_numeric($g)) {
-            return DB::select(DB::raw($sql), ['year' => $year, 'g' => $g]);
+            return DB::select($sql, ['year' => $year, 'g' => $g]);
         }
 
-        return DB::select(DB::raw($sql));
+        return DB::select($sql);
     }
 
     public function countByCluster($cluster, $group = null, $year = null)
@@ -172,14 +183,14 @@ class Device extends Model implements Auditable
                 ';
 
         if (! is_null($group) && is_numeric($group) && is_null($year)) {
-            return DB::select(DB::raw($sql), ['group' => $group, 'cluster' => $cluster]);
+            return DB::select($sql, ['group' => $group, 'cluster' => $cluster]);
         } elseif (! is_null($year) && is_numeric($year) && is_null($group)) {
-            return DB::select(DB::raw($sql), ['year' => $year, 'cluster' => $cluster]);
+            return DB::select($sql, ['year' => $year, 'cluster' => $cluster]);
         } elseif (! is_null($year) && is_numeric($year) && ! is_null($group) && is_numeric($group)) {
-            return DB::select(DB::raw($sql), ['year' => $year, 'group' => $group, 'cluster' => $cluster]);
+            return DB::select($sql, ['year' => $year, 'group' => $group, 'cluster' => $cluster]);
         }
 
-        return DB::select(DB::raw($sql), ['cluster' => $cluster]);
+        return DB::select($sql, ['cluster' => $cluster]);
     }
 
     public function countByClustersYearStatus($group)
@@ -193,7 +204,7 @@ class Device extends Model implements Auditable
             GROUP BY `cluster`, YEAR(`event_start_utc`) , `repair_status`
             ORDER BY `year` ASC, `repair_status` ASC;";
 
-        return DB::select(DB::raw($sql), ['group' => $group]);
+        return DB::select($sql, ['group' => $group]);
     }
 
     public function findMostSeen($status = null, $cluster = null, $group = null)
@@ -222,38 +233,38 @@ class Device extends Model implements Auditable
 
         if (! is_null($cluster) && is_numeric($cluster)) {
             if (! is_null($group) && is_numeric($group) && is_null($status)) {
-                return DB::select(DB::raw($sql), ['group' => $group, 'cluster' => $cluster]);
+                return DB::select($sql, ['group' => $group, 'cluster' => $cluster]);
             } elseif (! is_null($status) && is_numeric($status) && is_null($group)) {
-                return DB::select(DB::raw($sql), ['status' => $status, 'cluster' => $cluster]);
+                return DB::select($sql, ['status' => $status, 'cluster' => $cluster]);
             } elseif (! is_null($status) && is_numeric($status) && ! is_null($group) && is_numeric($group)) {
-                return DB::select(DB::raw($sql), ['status' => $status, 'group' => $group, 'cluster' => $cluster]);
+                return DB::select($sql, ['status' => $status, 'group' => $group, 'cluster' => $cluster]);
             }
 
-            return DB::select(DB::raw($sql), ['cluster' => $cluster]);
+            return DB::select($sql, ['cluster' => $cluster]);
         } else {
             if (! is_null($group) && is_numeric($group) && is_null($status)) {
-                return DB::select(DB::raw($sql), ['group' => $group]);
+                return DB::select($sql, ['group' => $group]);
             } elseif (! is_null($status) && is_numeric($status) && is_null($group)) {
-                return DB::select(DB::raw($sql), ['status' => $status]);
+                return DB::select($sql, ['status' => $status]);
             } elseif (! is_null($status) && is_numeric($status) && ! is_null($group) && is_numeric($group)) {
-                return DB::select(DB::raw($sql), ['status' => $status, 'group' => $group]);
+                return DB::select($sql, ['status' => $status, 'group' => $group]);
             }
 
-            return DB::select(DB::raw($sql));
+            return DB::select($sql);
         }
     }
 
-    public function deviceCategory()
+    public function deviceCategory(): HasOne
     {
         return $this->hasOne(\App\Category::class, 'idcategories', 'category');
     }
 
-    public function deviceEvent()
+    public function deviceEvent(): HasOne
     {
         return $this->hasOne(\App\Party::class, 'idevents', 'event');
     }
 
-    public function barriers()
+    public function barriers(): BelongsToMany
     {
         return $this->belongsToMany(\App\Barrier::class, 'devices_barriers', 'device_id', 'barrier_id');
     }
@@ -269,9 +280,13 @@ class Device extends Model implements Auditable
             if ($this->category == env('MISC_CATEGORY_ID_POWERED') && $this->estimate > 0) {
                 $footprint = $this->estimate * $emissionRatio;
             } else {
-                $footprint = \Cache::remember('category-' . $this->category, 15, function() {
-                    return $this->deviceCategory;
-                })->footprint;
+                if (self::isCircleCI()) {
+                    $footprint = $this->deviceCategory->footprint;
+                } else {
+                    $footprint = \Cache::remember('category-' . $this->category, 15, function() {
+                        return $this->deviceCategory;
+                    })->footprint;
+                }
             }
         }
 
@@ -305,17 +320,25 @@ class Device extends Model implements Auditable
     {
         $ewasteDiverted = 0;
 
-        $powered = \Cache::remember('category-powered-' . $this->category, 15, function() {
-            return $this->deviceCategory->powered;
-        });
+        if (self::isCircleCI()) {
+            $powered = $this->deviceCategory->powered;
+        } else {
+            $powered = \Cache::remember('category-powered-' . $this->category, 15, function() {
+                return $this->deviceCategory->powered;
+            });
+        }
 
         if ($this->isFixed() && $powered) {
             if ($this->category == env('MISC_CATEGORY_ID_POWERED') && $this->estimate > 0) {
                 $ewasteDiverted = $this->estimate;
             } else {
-                $category = \Cache::remember('category-' . $this->category, 15, function() {
-                    return $this->deviceCategory;
-                });
+                if (self::isCircleCI()) {
+                    $category = $this->deviceCategory;
+                } else {
+                    $category = \Cache::remember('category-' . $this->category, 15, function() {
+                        return $this->deviceCategory;
+                    });
+                }
 
                 $ewasteDiverted = $category->weight;
             }
@@ -454,10 +477,10 @@ class Device extends Model implements Auditable
         // used by the item types.
         //
         // This is slow and the results don't change much, so we use a cache.
-        if (Cache::has('item_types')) {
+        if (!self::isCircleCI() && Cache::has('item_types')) {
             $types = Cache::get('item_types');
         } else {
-            $types = DB::select(DB::raw("
+            $types = DB::select("
               SELECT item_type,
                      powered,
                      idcategories,
@@ -484,8 +507,10 @@ class Device extends Model implements Auditable
               WHERE t.count = t.max_count
                 AND LENGTH(t.item_type) > 0
               GROUP BY t.item_type, t.powered;
-"));
-            \Cache::put('item_types', $types, 24 * 3600);
+");
+            if (!self::isCircleCI()) {
+                \Cache::put('item_types', $types, 24 * 3600);
+            }
         }
 
         return $types;

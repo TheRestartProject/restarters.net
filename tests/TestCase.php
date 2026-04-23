@@ -19,6 +19,8 @@ use App\Skills;
 use App\UsersSkills;
 use App\User;
 use App\UserGroups;
+use App\UsersPermissions;
+use App\UsersPreferences;
 use App\Xref;
 use App\Alert;
 use Auth;
@@ -43,6 +45,12 @@ abstract class TestCase extends BaseTestCase
     private $DOM = null;
     public $lastResponse = null;
 
+    private $host = null;
+    private $group = null;
+    private $event_start_utc = null;
+    private $event_end_utc = null;
+    private $OpenAPIValidator = null;
+
     protected function setUp(): void
     {
         parent::setUp();
@@ -54,6 +62,8 @@ abstract class TestCase extends BaseTestCase
         Audits::truncate();
         EventsUsers::truncate();
         UserGroups::truncate();
+        UsersPreferences::truncate();
+        UsersPermissions::truncate();
         DeviceBarrier::truncate();
         Device::truncate();
         Party::truncate();
@@ -105,12 +115,25 @@ abstract class TestCase extends BaseTestCase
         $this->withoutExceptionHandling();
         app('honeypot')->disable();
 
-        Category::factory()->count(1)->cat1()->create();
-        Category::factory()->count(1)->cat2()->create();
-        Category::factory()->count(1)->cat3()->create();
-        Category::factory()->count(1)->mobile()->create();
-        Category::factory()->count(1)->misc()->create();
-        Category::factory()->count(1)->desktopComputer()->create();
+        // Create categories defensively - only if they don't already exist
+        if (!Category::where('idcategories', 111)->exists()) {
+            Category::factory()->count(1)->cat1()->create();
+        }
+        if (!Category::where('idcategories', 222)->exists()) {
+            Category::factory()->count(1)->cat2()->create();
+        }
+        if (!Category::where('idcategories', 333)->exists()) {
+            Category::factory()->count(1)->cat3()->create();
+        }
+        if (!Category::where('idcategories', 25)->exists()) {
+            Category::factory()->count(1)->mobile()->create();
+        }
+        if (!Category::where('idcategories', 46)->exists()) {
+            Category::factory()->count(1)->misc()->create();
+        }
+        if (!Category::where('idcategories', 11)->exists()) {
+            Category::factory()->count(1)->desktopComputer()->create();
+        }
 
         // We manipulate some globals for image upload testing.
         \FixometerFile::$uploadTesting = FALSE;

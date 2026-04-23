@@ -17,28 +17,28 @@ class LcaStatsTest extends StatsTestCase
     }
 
     /** @test */
-    public function get_displacement_factor()
+    public function get_displacement_factor(): void
     {
         $result = LcaStats::getDisplacementFactor();
         $this->assertEquals($this->_displacementFactor, $result);
     }
 
     /** @test */
-    public function get_ratio_unpowered()
+    public function get_ratio_unpowered(): void
     {
         $result = LcaStats::getEmissionRatioUnpowered();
         $this->assertEquals($this->_ratioUnpowered, $result);
     }
 
     /** @test */
-    public function get_ratio_powered()
+    public function get_ratio_powered(): void
     {
         $result = LcaStats::getEmissionRatioPowered();
         $this->assertEquals($this->_ratioPowered, $result);
     }
 
     /** @test */
-    public function get_waste_stats()
+    public function get_waste_stats(): void
     {
         $this->_setupCategoriesWithUnpoweredWeights();
 
@@ -174,7 +174,7 @@ class LcaStatsTest extends StatsTestCase
     }
 
     /** @test */
-    public function get_waste_stats_group()
+    public function get_waste_stats_group(): void
     {
         $this->_setupCategoriesWithUnpoweredWeights();
 

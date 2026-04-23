@@ -21,7 +21,7 @@
   </div>
 </template>
 <script>
-import GroupDeviceRepairPodium from './GroupDeviceRepairPodium'
+import GroupDeviceRepairPodium from './GroupDeviceRepairPodium.vue'
 export default {
   components: {GroupDeviceRepairPodium},
   props: {
@@ -37,9 +37,9 @@ export default {
 }
 </script>
 <style scoped lang="scss">
-@import '~bootstrap/scss/functions';
-@import '~bootstrap/scss/variables';
-@import '~bootstrap/scss/mixins/_breakpoints';
+@import 'bootstrap/scss/functions';
+@import 'bootstrap/scss/variables';
+@import 'bootstrap/scss/mixins/_breakpoints';
 
 .podia {
   display: grid;

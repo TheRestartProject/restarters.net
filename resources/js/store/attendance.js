@@ -1,6 +1,5 @@
 import Vue from 'vue'
-
-const axios = require('axios')
+import axios from 'axios'
 
 export default {
   namespaced: true,

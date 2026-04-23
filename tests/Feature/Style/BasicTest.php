@@ -15,7 +15,7 @@ use function PHPUnit\Framework\assertEquals;
 
 class BasicTest extends TestCase
 {
-    public function testPageLoads()
+    public function testPageLoads(): void
     {
         // Test the style guide page.
         $this->loginAsTestUser(Role::ADMINISTRATOR);
@@ -24,7 +24,7 @@ class BasicTest extends TestCase
         $response->assertSee('Badges');
     }
 
-    public function testSearch() {
+    public function testSearch(): void {
         $this->loginAsTestUser(Role::ADMINISTRATOR);
         $response = $this->get('/style/find');
         $response->assertSee('&quot;buttons&quot;', false);

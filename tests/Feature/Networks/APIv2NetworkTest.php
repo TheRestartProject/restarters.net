@@ -13,7 +13,7 @@ use Tests\TestCase;
 
 class APIv2NetworkTest extends TestCase
 {
-    public function testList() {
+    public function testList(): void {
         $user = User::factory()->administrator()->create([
                                                                           'api_token' => '1234',
                                                                       ]);
@@ -44,7 +44,7 @@ class APIv2NetworkTest extends TestCase
         self::assertTrue($found);
     }
 
-    public function testGet() {
+    public function testGet(): void {
         $network = Network::first();
         self::assertNotNull($network);
 
@@ -79,7 +79,7 @@ class APIv2NetworkTest extends TestCase
      * @dataProvider providerGroupsParameters
      * @param $value
      */
-    public function testListGroups($getNextEvent, $getDetails) {
+    public function testListGroups($getNextEvent, $getDetails): void {
         $network = Network::factory()->create([
                                                        'name' => 'Restart',
                                                        'events_push_to_wordpress' => true,
@@ -146,7 +146,7 @@ class APIv2NetworkTest extends TestCase
         $this->assertEquals(0, count($json));
     }
 
-    public function providerGroupsParameters() {
+    public function providerGroupsParameters(): array {
         return [
             [false, false],
             [false, true],
@@ -159,7 +159,7 @@ class APIv2NetworkTest extends TestCase
      * @dataProvider providerEventsParameters
      * @param $value
      */
-    public function testListEvents($getDetails) {
+    public function testListEvents($getDetails): void {
         $network = Network::factory()->create([
                                                        'name' => 'Restart',
                                                        'events_push_to_wordpress' => true,
@@ -177,8 +177,8 @@ class APIv2NetworkTest extends TestCase
                                                                     ]);
 
         // Manually set the updated_at fields so that we can check they are returned correctly.
-        DB::statement(DB::raw("UPDATE events SET updated_at = '2011-01-01 12:34'"));
-        DB::statement(DB::raw("UPDATE `groups` SET updated_at = '2011-01-02 12:34'"));
+        DB::statement("UPDATE events SET updated_at = '2011-01-01 12:34'");
+        DB::statement("UPDATE `groups` SET updated_at = '2011-01-02 12:34'");
 
         $url = "/api/v2/networks/{$network->id}/events" .
             ($getDetails ? '?includeDetails=true' : '');
@@ -212,7 +212,7 @@ class APIv2NetworkTest extends TestCase
         $this->assertEquals(0, count($json));
     }
 
-    public function providerEventsParameters() {
+    public function providerEventsParameters(): array {
         return [
             [false],
             [true],

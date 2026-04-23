@@ -5,10 +5,9 @@
   </div>
 </template>
 <script>
-const Quill = require('vue2-editor').Quill
+import { Quill, VueEditor } from 'vue2-editor'
+import { htmlEditButton } from 'quill-html-edit-button'
 window.Quill = Quill
-const htmlEditButton = require('quill-html-edit-button').htmlEditButton
-const VueEditor = require('vue2-editor').VueEditor
 Quill.register('modules/htmlEditButton', htmlEditButton)
 
 // Importing this registers a clipboard handler that sanitizes on paste.
@@ -95,9 +94,9 @@ export default {
 </script>
 <style scoped lang="scss">
 @import 'resources/global/css/_variables';
-@import '~bootstrap/scss/functions';
-@import '~bootstrap/scss/variables';
-@import '~bootstrap/scss/mixins/_breakpoints';
+@import 'bootstrap/scss/functions';
+@import 'bootstrap/scss/variables';
+@import 'bootstrap/scss/mixins/_breakpoints';
 
 ::v-deep .ql-editor,  ::v-deep .ql-container {
   min-height: 300px !important;

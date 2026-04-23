@@ -137,7 +137,7 @@
     </div>
   </section>
 
-  @include('includes.modals.event-invite-to')
+  {{-- Event invite modal is now handled by EventInviteModal.vue component --}}
   @include('includes.modals.event-description')
   @include('includes.modals.event-share-stats')
   @include('includes.modals.event-request-review')

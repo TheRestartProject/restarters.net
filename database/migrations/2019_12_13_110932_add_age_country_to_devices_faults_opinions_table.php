@@ -8,10 +8,8 @@ return new class extends Migration
 {
     /**
      * Run the migrations.
-     *
-     * @return void
      */
-    public function up()
+    public function up(): void
     {
         if (Schema::hasTable('devices_faults_opinions')) {
             if (! Schema::hasColumn('devices_faults_opinions', 'age')) {
@@ -41,10 +39,8 @@ return new class extends Migration
 
     /**
      * Reverse the migrations.
-     *
-     * @return void
      */
-    public function down()
+    public function down(): void
     {
         Schema::table('devices_faults_opinions', function (Blueprint $table) {
             $table->dropColumn('age');

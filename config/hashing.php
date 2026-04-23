@@ -29,7 +29,10 @@ return [
     */
 
     'bcrypt' => [
-        'rounds' => env('BCRYPT_ROUNDS', 10),
+        'rounds' => env('BCRYPT_ROUNDS', 12),
+        // Set to false to allow legacy passwords created before Laravel 10 upgrade.
+        // TODO: Implement automatic password migration on login, then re-enable verification.
+        'verify' => false,
     ],
 
     /*
@@ -47,6 +50,7 @@ return [
         'memory' => 65536,
         'threads' => 1,
         'time' => 4,
+        'verify' => true,
     ],
 
 ];

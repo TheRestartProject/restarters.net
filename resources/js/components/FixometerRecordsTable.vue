@@ -20,7 +20,7 @@
           </em>
         </template>
         <template slot="cell(device_category.name)" slot-scope="data">
-          {{ __('strings.' + data.item.category.name) }}
+          {{ __(data.item.category.name) }}
         </template>
         <template slot="cell(short_problem)" slot-scope="data">
           <div v-line-clamp="3">
@@ -54,13 +54,13 @@
         <template slot="cell(show_details)" slot-scope="row">
           <div v-if="isAdmin" class="text-md-right">
             <span class="pl-0 pl-md-2 pr-2 clickme" @click="row.toggleDetails">
-              <b-img class="icon" src="/icons/edit_ico_green.svg" />
+              <b-img class="icon" :src="imageUrl('/icons/edit_ico_green.svg')" />
             </span>
             <ConfirmModal :key="'modal-' + row.item.id" ref="confirmDelete" @confirm="deleteConfirmed(row.item)" :message="__('devices.confirm_delete')" />
           </div>
           <div v-else class="text-md-right">
             <span class="pl-0 pl-md-2 pr-2 clickme" @click="row.toggleDetails">
-              <b-img class="icon" src="/icons/info_ico_green.svg" />
+              <b-img class="icon" :src="imageUrl('/icons/info_ico_green.svg')" />
             </span>
           </div>
         </template>
@@ -93,19 +93,22 @@
 <script>
 import { END_OF_LIFE, FIXED, REPAIRABLE } from '../constants'
 import moment from 'moment'
-import DeviceModel from './DeviceModel'
+import DeviceModel from './DeviceModel.vue'
 import Vue from 'vue'
 import lineClamp from 'vue-line-clamp'
-import ConfirmModal from './ConfirmModal'
-import EventDevice from './EventDevice'
+import ConfirmModal from './ConfirmModal.vue'
+import EventDevice from './EventDevice.vue'
+import images from '../mixins/images'
 
 Vue.use(lineClamp, {
   textOverflow: 'ellipsis'
 })
 
-const bootaxios = require('axios')
+import axios from 'axios'
+const bootaxios = axios
 
 export default {
+  mixins: [images],
   components: {EventDevice, ConfirmModal, DeviceModel},
   props: {
     isAdmin: {
@@ -348,11 +351,11 @@ export default {
     showStatus (data) {
       switch (data.item.repair_status) {
         case FIXED:
-          return this.$lang.get('partials.fixed')
+          return this.__('partials.fixed')
         case REPAIRABLE:
-          return this.$lang.get('partials.repairable')
+          return this.__('partials.repairable')
         case END_OF_LIFE:
-          return this.$lang.get('partials.end')
+          return this.__('partials.end')
         default:
           return null
       }
@@ -393,9 +396,9 @@ export default {
 </script>
 <style scoped lang="scss">
 @import 'resources/global/css/_variables';
-@import '~bootstrap/scss/functions';
-@import '~bootstrap/scss/variables';
-@import '~bootstrap/scss/mixins/_breakpoints';
+@import 'bootstrap/scss/functions';
+@import 'bootstrap/scss/variables';
+@import 'bootstrap/scss/mixins/_breakpoints';
 
 .badge {
   width: 90px;

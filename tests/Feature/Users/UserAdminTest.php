@@ -34,7 +34,7 @@ class UserAdminTest extends TestCase
     /**
      *@dataProvider provider
      */
-    public function testUsersPage($role, $cansee)
+    public function testUsersPage($role, $cansee): void
     {
         // Fetch the list of all users and check that we're in it.
         $admin = User::factory()->{lcfirst($role)}()->create();
@@ -50,7 +50,7 @@ class UserAdminTest extends TestCase
         }
     }
 
-    public function testSoftDelete() {
+    public function testSoftDelete(): void {
         $user = User::factory()->restarter()->create();
         $this->loginAsTestUser(Role::ADMINISTRATOR);
         $response = $this->post('/user/soft-delete', [

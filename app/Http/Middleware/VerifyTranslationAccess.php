@@ -2,6 +2,8 @@
 
 namespace App\Http\Middleware;
 
+use Symfony\Component\HttpFoundation\Response;
+use Illuminate\Http\Request;
 use App\Helpers\Fixometer;
 use App\User;
 use Auth;
@@ -11,12 +13,8 @@ class VerifyTranslationAccess
 {
     /**
      * Handle an incoming request.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @param  \Closure  $next
-     * @return mixed
      */
-    public function handle($request, Closure $next)
+    public function handle(Request $request, Closure $next): Response
     {
         $has_permission = User::join('users_permissions', 'users_permissions.user_id', '=', 'users.id')
                                   ->join('permissions', 'permissions.idpermissions', '=', 'users_permissions.permission_id')

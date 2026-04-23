@@ -32,8 +32,8 @@
 <script>
 import {DEFAULT_PROFILE} from '../constants'
 import group from '../mixins/group'
-import GroupActions from './GroupActions'
-import ExternalLink from './ExternalLink'
+import GroupActions from './GroupActions.vue'
+import ExternalLink from './ExternalLink.vue'
 
 export default {
   components: {ExternalLink, GroupActions},
@@ -87,9 +87,9 @@ export default {
 </script>
 <style scoped lang="scss">
 @import 'resources/global/css/_variables';
-@import '~bootstrap/scss/functions';
-@import '~bootstrap/scss/variables';
-@import '~bootstrap/scss/mixins/_breakpoints';
+@import 'bootstrap/scss/functions';
+@import 'bootstrap/scss/variables';
+@import 'bootstrap/scss/mixins/_breakpoints';
 
 .border-top-very-thick {
   border-top: 5px solid $black;

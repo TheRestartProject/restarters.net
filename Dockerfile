@@ -9,10 +9,18 @@ RUN apt-get update && \
         unzip \
         npm \
         vim \
+        netcat-openbsd \
         default-mysql-client \
         postgresql-client && \
     apt-get clean && \
     rm -rf /var/lib/apt/lists/*
+
+# Install Playwright system dependencies
+# We need to install @playwright/test first to get the install-deps command
+RUN npm install -g @playwright/test && \
+    npm install -g jest-junit && \
+    npx playwright install-deps && \
+    npm uninstall -g @playwright/test
 
 ADD --chmod=0755 https://github.com/mlocati/docker-php-extension-installer/releases/download/2.7.31/install-php-extensions /usr/local/bin/
 
@@ -23,6 +31,9 @@ RUN install-php-extensions \
     xmlrpc \
     xdebug \
     intl \
+    exif \
+    pcntl \
+    curl \
     gd
 
 # Install composer.  Don't run composer install yet - see docker_run.sh
@@ -46,9 +57,10 @@ RUN if getent group ${GID}; then \
       useradd -m -u ${UID} -g restarter -s /bin/bash restarter; \
     fi
 
-# Dynamically update php-fpm to use the new user and group
+# Dynamically update php-fpm to use the new user and group, and listen on all interfaces
 RUN sed -i "s/user = www-data/user = restarter/g" /usr/local/etc/php-fpm.d/www.conf && \
-    sed -i "s/group = www-data/group = restarter/g" /usr/local/etc/php-fpm.d/www.conf
+    sed -i "s/group = www-data/group = restarter/g" /usr/local/etc/php-fpm.d/www.conf && \
+    sed -i "s/listen = 127.0.0.1:9000/listen = 0.0.0.0:9000/g" /usr/local/etc/php-fpm.d/www.conf
 
 # Copy the code (this will be overridden by the volume mount in docker-compose)
 COPY --chown=${UID}:${GID} . ./

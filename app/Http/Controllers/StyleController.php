@@ -2,6 +2,8 @@
 
 namespace App\Http\Controllers;
 
+use Illuminate\Http\RedirectResponse;
+use Illuminate\View\View;
 use Auth;
 use Illuminate\Http\Request;
 
@@ -9,10 +11,8 @@ class StyleController extends Controller
 {
     /**
      * Nothing to see here.
-     *
-     * @return \Illuminate\Http\Response
      */
-    public function index(Request $request)
+    public function index(Request $request): RedirectResponse
     {
         return redirect()->action([\App\Http\Controllers\HomeController::class, 'index']);
     }
@@ -26,7 +26,7 @@ class StyleController extends Controller
         return view('test.styles', []);
     }
 
-    public function find(Request $request)
+    public function find(Request $request): View
     {
         $result = $this->findClassElements();
         logger($result);

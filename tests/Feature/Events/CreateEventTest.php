@@ -57,7 +57,7 @@ class CreateEventTest extends TestCase
     }
 
     /** @test */
-    public function a_host_without_a_group_cant_create_an_event()
+    public function a_host_without_a_group_cant_create_an_event(): void
     {
         $this->withoutExceptionHandling();
 
@@ -72,7 +72,7 @@ class CreateEventTest extends TestCase
      * @test
      * @dataProvider roles
      */
-    public function a_host_with_a_group_can_create_an_event($data)
+    public function a_host_with_a_group_can_create_an_event($data): void
     {
         Notification::fake();
         $this->withoutExceptionHandling();
@@ -246,7 +246,7 @@ class CreateEventTest extends TestCase
         $this->assertEquals(false, array_key_exists('nearby', $events[0]));
     }
 
-    public function roles()
+    public function roles(): array
     {
         return [
             // Hosts can see but not moderate.
@@ -263,7 +263,7 @@ class CreateEventTest extends TestCase
     }
 
     /** @test */
-    public function a_host_can_duplicate_an_event()
+    public function a_host_can_duplicate_an_event(): void
     {
         $this->withoutExceptionHandling();
 
@@ -289,7 +289,7 @@ class CreateEventTest extends TestCase
     }
 
 
-    public function providerTrueFalse()
+    public function providerTrueFalse(): array
     {
         return [
             [false],
@@ -302,7 +302,7 @@ class CreateEventTest extends TestCase
      *
      * @dataProvider providerTrueFalse
      */
-    public function emails_sent_when_created($notify)
+    public function emails_sent_when_created($notify): void
     {
         $this->withoutExceptionHandling();
         Notification::fake();
@@ -359,7 +359,7 @@ class CreateEventTest extends TestCase
     }
 
     /** @test */
-    public function emails_sent_to_restarters_when_upcoming_event_approved()
+    public function emails_sent_to_restarters_when_upcoming_event_approved(): void
     {
         $this->withoutExceptionHandling();
         $admin = User::factory()->administrator()->create();
@@ -421,7 +421,7 @@ class CreateEventTest extends TestCase
     }
 
     /** @test */
-    public function emails_not_sent_to_volunteers_when_past_event_approved()
+    public function emails_not_sent_to_volunteers_when_past_event_approved(): void
     {
         $this->withoutExceptionHandling();
 
@@ -454,7 +454,7 @@ class CreateEventTest extends TestCase
     }
 
     /** @test */
-    public function emails_sent_to_coordinators_when_event_created()
+    public function emails_sent_to_coordinators_when_event_created(): void
     {
         $this->withoutExceptionHandling();
         Notification::fake();
@@ -488,7 +488,7 @@ class CreateEventTest extends TestCase
     }
 
     /** @test */
-    public function a_host_can_be_added_later()
+    public function a_host_can_be_added_later(): void
     {
         $this->withoutExceptionHandling();
         Queue::fake();
@@ -593,7 +593,7 @@ class CreateEventTest extends TestCase
      * @test
      **@dataProvider provider
      */
-    public function an_event_can_be_auto_approved($autoApprove, $approved)
+    public function an_event_can_be_auto_approved($autoApprove, $approved): void
     {
         $network = Network::factory()->create([
             'auto_approve_events' => $autoApprove,
@@ -620,7 +620,7 @@ class CreateEventTest extends TestCase
     /**
      * @test
      */
-    public function a_past_event_is_not_upcoming() {
+    public function a_past_event_is_not_upcoming(): void {
         $host = User::factory()->administrator()->create();
         $this->actingAs($host);
 
@@ -644,7 +644,7 @@ class CreateEventTest extends TestCase
     /**
      * @test
      */
-    public function a_future_event_is_upcoming() {
+    public function a_future_event_is_upcoming(): void {
         $host = User::factory()->administrator()->create();
         $this->actingAs($host);
 
@@ -668,7 +668,7 @@ class CreateEventTest extends TestCase
     /**
      * @test
      */
-    public function no_notification_after_leaving() {
+    public function no_notification_after_leaving(): void {
         Notification::fake();
         $this->withoutExceptionHandling();
 
@@ -717,7 +717,7 @@ class CreateEventTest extends TestCase
      *
      * @dataProvider providerTrueFalse
      */
-    public function notifications_are_queued_as_expected($notify)
+    public function notifications_are_queued_as_expected($notify): void
     {
         Notification::fake();
 
@@ -773,7 +773,7 @@ class CreateEventTest extends TestCase
     }
 
     /** @test */
-    public function network_coordinator_other_group() {
+    public function network_coordinator_other_group(): void {
         $network = Network::factory()->create();
 
         // Create a group in the network.
@@ -856,7 +856,7 @@ class CreateEventTest extends TestCase
         ]);
     }
 
-    public function invalidEmailProvider()
+    public function invalidEmailProvider(): array
     {
         return [
             ['test@test.com', true],

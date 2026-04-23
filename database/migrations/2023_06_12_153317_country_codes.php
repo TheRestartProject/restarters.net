@@ -9,15 +9,13 @@ return new class extends Migration
 {
     /**
      * Run the migrations.
-     *
-     * @return void
      */
-    public function up()
+    public function up(): void
     {
         $countries = array_flip(App\Helpers\Fixometer::getAllCountries('en'));
 
         // Users has country column which is a code, except for GBR; fix the contents and rename it.
-        DB::update(DB::raw("UPDATE users SET country = 'GB' WHERE country = 'GBR'"));
+        DB::update("UPDATE users SET country = 'GB' WHERE country = 'GBR'");
 
         Schema::table('users', function (Blueprint $table) {
             $table->renameColumn('country', 'country_code');
@@ -30,7 +28,7 @@ return new class extends Migration
             $table->string('country_code', 2)->after('area')->nullable();
         });
 
-        $groups = DB::select(DB::raw('SELECT idgroups, country FROM `groups`'));
+        $groups = DB::select('SELECT idgroups, country FROM `groups`');
 
         foreach ($groups as $g) {
             // Countries are stored in English.
@@ -46,10 +44,8 @@ return new class extends Migration
 
     /**
      * Reverse the migrations.
-     *
-     * @return void
      */
-    public function down()
+    public function down(): void
     {
         Schema::table('groups', function (Blueprint $table) {
             $table->dropColumn('country_code');
@@ -59,6 +55,6 @@ return new class extends Migration
             $table->renameColumn('country_code', 'country');
         });
 
-        DB::update(DB::raw("UPDATE users SET country = 'GBR' WHERE country = 'GB'"));
+        DB::update("UPDATE users SET country = 'GBR' WHERE country = 'GB'");
     }
 };

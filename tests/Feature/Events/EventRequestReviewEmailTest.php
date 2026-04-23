@@ -40,7 +40,7 @@ class EventRequestReviewEmailTest extends TestCase
     }
 
     /** @test */
-    public function a_request_review_email_is_sent_to_volunteer()
+    public function a_request_review_email_is_sent_to_volunteer(): void
     {
         Notification::fake();
 
