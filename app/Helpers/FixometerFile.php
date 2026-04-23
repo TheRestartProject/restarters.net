@@ -3,6 +3,7 @@
 use App\Images;
 use App\Xref;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Facades\Storage;
 use Intervention\Image\ImageManagerStatic as Image;
 
 class FixometerFile extends Model
@@ -80,6 +81,10 @@ class FixometerFile extends Model
             // Fix orientation
             Image::make($lpath)->orientate()->save($lpath);
 
+            if ($type !== 'image') {
+                $this->syncToCloud($filename);
+            }
+
             if ($type === 'image') {
                 $size = getimagesize($this->path);
                 $data['width'] = $size[0];
@@ -130,6 +135,10 @@ class FixometerFile extends Model
                 $thumb->save($_SERVER['DOCUMENT_ROOT'].'/uploads/'.'thumbnail_'.$filename, 85);
                 $mid->save($_SERVER['DOCUMENT_ROOT'].'/uploads/'.'mid_'.$filename, 85);
 
+                $this->syncToCloud($filename);
+                $this->syncToCloud('thumbnail_'.$filename);
+                $this->syncToCloud('mid_'.$filename);
+
                 $this->table = 'images';
                 $Images = new Images;
 
@@ -175,6 +184,23 @@ class FixometerFile extends Model
         $this->ext = $lext;
 
         return time().sha1_file($tmp_name).rand(1, 15000).'.'.$lext;
+    }
+
+    /**
+     * Sync a file from local uploads directory to cloud storage (S3/Tigris).
+     * Only acts when FILESYSTEM_DISK is set to 's3'.
+     */
+    protected function syncToCloud($filename)
+    {
+        if (config('filesystems.default') !== 's3') {
+            return;
+        }
+
+        $localPath = $_SERVER['DOCUMENT_ROOT'].'/uploads/'.$filename;
+
+        if (file_exists($localPath)) {
+            Storage::disk('s3')->put($filename, file_get_contents($localPath), 'public');
+        }
     }
 
     public function findImages($of_ref_type, $ref_id)

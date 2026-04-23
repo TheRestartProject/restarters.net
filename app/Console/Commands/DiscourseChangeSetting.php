@@ -36,32 +36,34 @@ class DiscourseChangeSetting extends Command
     {
         parent::__construct();
         $this->discourseService = $discourseService;
-
-        $discourseApiKey = env('DISCOURSE_APIKEY');
-        $discourseApiUser = env('DISCOURSE_APIUSER');
-
-        if (is_null($discourseApiKey) || empty($discourseApiKey)) {
-            $this->error('DISCOURSE_APIKEY is not set');
-            exit();
-        }
-
-        if (is_null($discourseApiUser) || empty($discourseApiUser)) {
-            $this->error('DISCOURSE_APIUSER is not set');
-            exit();
-        }
-
-        $this->discourseApiKey = $discourseApiKey;
-        $this->discourseApiUser = $discourseApiUser;
     }
 
     /**
      * Execute the console command.
      */
-    public function handle(DiscourseService $discourseService): void
+    public function handle(): int
     {
+        $discourseApiKey = env('DISCOURSE_APIKEY');
+        $discourseApiUser = env('DISCOURSE_APIUSER');
+
+        if (empty($discourseApiKey)) {
+            $this->error('DISCOURSE_APIKEY is not set');
+            return 1;
+        }
+
+        if (empty($discourseApiUser)) {
+            $this->error('DISCOURSE_APIUSER is not set');
+            return 1;
+        }
+
+        $this->discourseApiKey = $discourseApiKey;
+        $this->discourseApiUser = $discourseApiUser;
+
         $setting = $this->argument('setting');
         $value = $this->argument('value');
 
         $this->discourseService->setSetting($setting, $value);
+
+        return 0;
     }
 }

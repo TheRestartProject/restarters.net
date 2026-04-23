@@ -140,8 +140,13 @@ export default {
         })
       }
     },
-    async listTags({commit}) {
-      let ret = await axios.get('/api/v2/groups/tags?locale=' + getLocale())
+    async listTags({commit, rootGetters}) {
+      const apiToken = rootGetters['auth/apiToken']
+      let url = '/api/v2/groups/tags?locale=' + getLocale()
+      if (apiToken) {
+        url += '&api_token=' + apiToken
+      }
+      let ret = await axios.get(url)
       if (ret && ret.data) {
         commit('setTags', {
           tags: ret.data.data
@@ -183,7 +188,7 @@ export default {
         const formData = new FormData()
 
         for (var key in params) {
-          if (params[key]) {
+          if (params[key] !== null && params[key] !== undefined) {
             formData.append(key, params[key]);
           }
         }

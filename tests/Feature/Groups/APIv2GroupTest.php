@@ -260,12 +260,16 @@ class APIv2GroupTest extends TestCase
     }
 
     public function testTags(): void {
+        // Must be authenticated to see tags
+        $user = User::factory()->administrator()->create();
+        $this->actingAs($user);
+
         $tag = GroupTags::factory()->create();
         $response = $this->get('/api/v2/groups/tags', []);
         $response->assertSuccessful();
         $json = json_decode($response->getContent(), true);
         self::assertEquals($tag->id, $json['data'][0]['id']);
-        
+
         $group = Group::factory()->create();
         $tag = GroupTags::factory()->create();
         $group->addTag($tag);

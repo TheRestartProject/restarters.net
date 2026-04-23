@@ -74,5 +74,6 @@ export default defineConfig({
         hmr: {
             host: process.env.VITE_HMR_HOST || 'localhost',
         },
+        cors: true,
     },
 });

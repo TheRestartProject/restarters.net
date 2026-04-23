@@ -50,7 +50,7 @@ class ChangeWikiPassword extends BaseEvent
                                    ->setParam('retype', $user->password)
                                    ->setParam('changeauthtoken', $token);
             $api->postRequest($changePasswordRequest);
-        } catch (\Exception $ex) {
+        } catch (\Throwable $ex) {
             Log::error("Failed to changed password for user '".$user->mediawiki."' in mediawiki: ".$ex->getMessage());
         }
     }

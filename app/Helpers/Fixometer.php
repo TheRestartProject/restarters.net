@@ -540,7 +540,7 @@ class Fixometer
             // We've seen a Sentry problem which I can only see happening if there was invalid data in the cache.
             if (
                 ! $stats ||
-                ! array_key_exists('allparties', $stats) ||
+                ! array_key_exists('partiesCount', $stats) ||
                 ! array_key_exists('waste_stats', $stats) ||
                 ! array_key_exists('device_count_status', $stats)
             ) {
@@ -549,7 +549,8 @@ class Fixometer
         }
 
         if ($stats == []) {
-            $stats['allparties'] = $Party->ofThisGroup('admin', true, false);
+            // Use COUNT query instead of loading all events into memory
+            $stats['partiesCount'] = \App\Party::where('event_end_utc', '<', now())->count();
             $stats['waste_stats'] = \App\Helpers\LcaStats::getWasteStats();
             $stats['device_count_status'] = $Device->statusCount();
             \Cache::put('all_stats', $stats, 7200);
@@ -566,7 +567,6 @@ class Fixometer
 
         $stats['co2Total'] = $stats['waste_stats'][0]->powered_footprint + $stats['waste_stats'][0]->unpowered_footprint;
         $stats['wasteTotal'] = $stats['waste_stats'][0]->powered_waste + $stats['waste_stats'][0]->unpowered_waste;
-        $stats['partiesCount'] = count($stats['allparties']);
 
         return $stats;
     }

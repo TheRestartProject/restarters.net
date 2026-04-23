@@ -64,6 +64,11 @@ class LogInToWiki
     protected function createUserInWiki($user)
     {
         try {
+            if (!$this->wikiUserCreator) {
+                Log::error("Wiki UserCreator not available - cannot create user '".$user->username."' in mediawiki");
+                return;
+            }
+
             // Mediawiki does strange things with underscores.
             $mediawikiUsername = str_replace('_', '-', $user->username);
             $this->wikiUserCreator->create($mediawikiUsername, $user->password, $user->email);
@@ -71,7 +76,7 @@ class LogInToWiki
             $user->wiki_sync_status = WikiSyncStatus::Created;
             $user->mediawiki = $mediawikiUsername;
             $user->save();
-        } catch (\Exception $ex) {
+        } catch (\Throwable $ex) {
             Log::error("Failed to create new account for user '".$user->username."' in mediawiki: ".$ex->getMessage());
         }
     }
@@ -96,7 +101,7 @@ class LogInToWiki
                     Cookie::queue(Cookie::make($cookie['Name'], $cookie['Value'], $cookie['Expires']));
                 }
             }
-        } catch (\Exception $ex) {
+        } catch (\Throwable $ex) {
             Log::error("Failed to log user '".$user->mediawiki."' in to mediawiki: ".$ex->getMessage());
         }
     }

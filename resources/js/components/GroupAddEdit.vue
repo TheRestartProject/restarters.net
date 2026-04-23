@@ -107,16 +107,19 @@
                 :selectedLabel="__('partials.remove')"
             />
           </div>
-          <div class="mt-2" v-if="canNetwork">
+          <div class="mt-2" v-if="canEditTags">
             <label for="tags">
               {{ __('groups.group_tags') }}:
             </label>
             <multiselect
                 id="tags"
                 v-model="tagList"
-                :options="tagOptions"
+                :options="groupedTagOptions"
                 track-by="id"
                 label="name"
+                group-values="tags"
+                group-label="network"
+                :group-select="false"
                 multiple
                 deselect-label=""
                 :taggable="false"
@@ -230,6 +233,11 @@ export default {
       required: false,
       default: false
     },
+    canEditTags: {
+      type: Boolean,
+      required: false,
+      default: false
+    },
   },
   data () {
     return {
@@ -251,8 +259,8 @@ export default {
       ready: false,
       approved: false,
       edited: false,
-      networkList: null,
-      tagList: null,
+      networkList: [],
+      tagList: [],
       networkData: {},
       archived_at: null,
     }
@@ -331,6 +339,63 @@ export default {
         }
       }) : []
     },
+    groupedTagOptions() {
+      const tags = this.$store.getters['groups/listTags']
+
+      if (!tags) return []
+
+      // For NCs (not admins), filter tags to only show those from networks the group belongs to.
+      // This implements the "tag visibility intersection" requirement: NC should only see tags
+      // from networks where BOTH: NC coordinates AND group belongs to that network.
+      // canNetwork is true only for admins (who can change group networks), so use it as proxy.
+      const groupNetworkIds = this.networkList ? this.networkList.map(n => n.id) : []
+
+      const filteredTags = tags.filter(tag => {
+        // Global tags (network_id is null) - only admins can see these
+        if (!tag.network_id) {
+          return this.canNetwork
+        }
+
+        // For both admins and NCs, only show tags from networks the group belongs to
+        return groupNetworkIds.includes(tag.network_id)
+      })
+
+      // Group tags by network_name (null = "Global")
+      const grouped = {}
+
+      filteredTags.forEach(tag => {
+        const networkName = tag.network_name || 'Global'
+        if (!grouped[networkName]) {
+          grouped[networkName] = []
+        }
+        grouped[networkName].push({
+          id: tag.id,
+          name: tag.name
+        })
+      })
+
+      // Convert to array format for vue-multiselect with "Global" first
+      const result = []
+
+      // Add Global first if it exists
+      if (grouped['Global']) {
+        result.push({
+          network: 'Global',
+          tags: grouped['Global']
+        })
+        delete grouped['Global']
+      }
+
+      // Add remaining networks sorted alphabetically
+      Object.keys(grouped).sort().forEach(networkName => {
+        result.push({
+          network: networkName,
+          tags: grouped[networkName]
+        })
+      })
+
+      return result
+    },
   },
   async mounted () {
     // Fetch the list of groups, so that we can ensure group names are unique.  No need to await because the check
@@ -356,8 +421,24 @@ export default {
       this.lng = parseFloat(group.location.lng)
       this.image = group.image
       this.approved = group.approved
-      this.networkList = group.networks
-      this.tagList = group.tags
+      this.networkList = group.networks || []
+      // For NCs (not admins), filter tags to only show those they can edit
+      // Global tags (network_id is null) and tags from other networks are hidden
+      // but preserved on save by the backend
+      const allTags = group.tags || []
+      if (this.canNetwork) {
+        // Admin - show all tags
+        this.tagList = allTags
+      } else {
+        // NC - filter to only show tags from networks the group belongs to
+        const groupNetworkIds = (group.networks || []).map(n => n.id)
+        this.tagList = allTags.filter(tag => {
+          // Hide global tags (network_id is null)
+          if (!tag.network_id) return false
+          // Only show tags from networks the group belongs to
+          return groupNetworkIds.includes(tag.network_id)
+        })
+      }
       this.networkData = group.network_data ? group.network_data : {}
       this.archived_at = group.archived_at
     }
@@ -365,7 +446,9 @@ export default {
     if (this.canNetwork) {
       // Fetch the list of networks.
       this.$store.dispatch('networks/list')
+    }
 
+    if (this.canEditTags) {
       // Fetch the list of tags.
       this.$store.dispatch('groups/listTags')
     }
@@ -429,8 +512,8 @@ export default {
                 phone: this.phone,
                 image: this.image,
                 moderate: this.moderate,
-                networks: JSON.stringify(this.networkList.map(n => n.id)),
-                tags: JSON.stringify(this.tagList.map(n => n.id)),
+                networks: JSON.stringify((this.networkList || []).map(n => n.id)),
+                tags: JSON.stringify((this.tagList || []).map(n => n.id)),
                 network_data: JSON.stringify(this.networkData),
                 archived_at: this.archived_at,
               }
