@@ -36,3 +36,4 @@ restarters-anonymised.sql
 /events.csv
 /public/repair-data*.csv
 /uploads/*.jpg
+.mcp.json

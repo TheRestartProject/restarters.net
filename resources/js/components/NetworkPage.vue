@@ -150,7 +150,7 @@
     </b-modal>
 
     <!-- Edit Tag Modal -->
-    <b-modal v-model="showEditModal" :title="__('networks.tags.edit_title')" @ok="updateTag" :ok-disabled="!editTagName.trim()">
+    <b-modal v-model="showEditModal" :title="__('networks.tags.edit_title')" @ok.prevent="updateTag" :ok-disabled="!editTagName.trim()">
       <b-form-group :label="__('networks.tags.name_label')">
         <b-form-input v-model="editTagName" required />
       </b-form-group>
@@ -312,7 +312,8 @@ export default {
       this.editTagError = null
       this.showEditModal = true
     },
-    async updateTag() {
+    async updateTag(bvModalEvt) {
+      if (bvModalEvt) bvModalEvt.preventDefault()
       if (!this.editingTag || !this.editTagName.trim()) return
 
       this.editTagError = null

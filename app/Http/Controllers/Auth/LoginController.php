@@ -11,6 +11,7 @@ use App\Providers\RouteServiceProvider;
 use Illuminate\Foundation\Auth\AuthenticatesUsers;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Validation\ValidationException;
 use Msurguy\Honeypot\Honeypot;
 
@@ -69,7 +70,15 @@ class LoginController extends Controller
         if ($this->attemptLogin($request)) {
             \Cookie::queue(\Cookie::make('authenticated', $request->email, config('session.lifetime'), null, config('session.domain')));
 
-            return $this->sendLoginResponse($request);
+            try {
+                return $this->sendLoginResponse($request);
+            } catch (\Throwable $e) {
+                Log::error('Login post-auth error for user ' . $request->email . ': ' . $e->getMessage(), [
+                    'exception' => $e,
+                    'trace' => $e->getTraceAsString(),
+                ]);
+                throw $e;
+            }
         }
 
         // If the login attempt was unsuccessful we will increment the number of attempts

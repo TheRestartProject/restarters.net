@@ -3,7 +3,7 @@
 return [
 
     'features' => [
-        'discourse_integration' => env('FEATURE__DISCOURSE_INTEGRATION', true),
+        'discourse_integration' => env('FEATURE__DISCOURSE_INTEGRATION', true) && !empty(env('DISCOURSE_URL')),
     ],
 
     'wiki' => [
@@ -19,4 +19,5 @@ return [
         'networks' => 7,
     ],
 
+    'support_email_address' => env('SUPPORT_EMAIL_ADDRESS'),
 ];

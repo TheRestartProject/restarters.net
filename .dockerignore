@@ -8,6 +8,7 @@ storage/framework/sessions/*
 storage/framework/views/*
 bootstrap/cache/*
 public/uploads/*
+public/hot
 .phpunit.cache
 tests/Browser/screenshots
 tests/Browser/console

@@ -188,7 +188,7 @@ export default {
         const formData = new FormData()
 
         for (var key in params) {
-          if (params[key]) {
+          if (params[key] !== null && params[key] !== undefined) {
             formData.append(key, params[key]);
           }
         }

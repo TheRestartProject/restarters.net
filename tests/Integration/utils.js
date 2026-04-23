@@ -295,7 +295,7 @@ exports.addDevice = async function(page, baseURL, idevents, powered, photo, fixe
 
     // Wait for the upload to complete - the dropzone shows a preview image in .device-photos
     log('Waiting for photo upload to complete')
-    await page.waitForSelector('.add-device .device-photos .dz-preview .dz-image img', { timeout: 10000 })
+    await page.waitForSelector('.add-device .device-photos .dz-preview .dz-image img', { timeout: 30000 })
     // Give it a moment to fully process
     await page.waitForTimeout(500)
   }

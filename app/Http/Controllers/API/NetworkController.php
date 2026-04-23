@@ -24,8 +24,9 @@ class NetworkController extends Controller
         }
 
         // If tag filter specified, compute stats only for groups with that tag
-        if ($request->has('tag')) {
-            $tagId = $request->get('tag');
+        // Accept both 'tag' (legacy) and 'group_tag' parameter names
+        if ($request->has('group_tag') || $request->has('tag')) {
+            $tagId = $request->get('group_tag', $request->get('tag'));
             return response()->json($this->statsForTag($network, $tagId));
         }
 
@@ -463,30 +464,74 @@ class NetworkController extends Controller
     {
         $network = Network::findOrFail($id);
 
-        // Try session auth first, then API token auth
-        $user = Auth::user();
-        if (!$user) {
-            $user = auth('api')->user();
-        }
-
-        // Unauthenticated users cannot see any tags
-        if (!$user) {
-            return TagCollection::make(collect([]));
-        }
-
-        // Only admins can see global tags; everyone else sees only network-specific tags
-        $isAdmin = $user->hasRole('Administrator');
-        $networkOnly = $request->get('network_only', false) === 'true' || $request->get('network_only', false) === true;
-
-        if ($networkOnly || !$isAdmin) {
-            // Network tags only (exclude global tags)
-            $tags = GroupTags::forNetwork($id)->get();
-        } else {
-            // Admin: global + network tags
-            $tags = GroupTags::availableForNetwork($id)->get();
-        }
+        // Return tags belonging to this network (public - tags are visible on group pages)
+        $tags = GroupTags::forNetwork($id)->get();
 
         return TagCollection::make($tags);
+    }
+
+    /**
+     * @OA\Get(
+     *      path="/api/v2/networks/{id}/stats",
+     *      operationId="getNetworkStats",
+     *      tags={"Networks"},
+     *      summary="Get Network Stats",
+     *      description="Returns impact statistics for a network, optionally filtered by group tag.",
+     *      @OA\Parameter(
+     *          name="id",
+     *          description="Network id",
+     *          required=true,
+     *          in="path",
+     *          @OA\Schema(
+     *              type="integer"
+     *          )
+     *      ),
+     *      @OA\Parameter(
+     *          name="group_tag",
+     *          description="Filter stats to only include groups with this tag ID",
+     *          required=false,
+     *          in="query",
+     *          @OA\Schema(
+     *              type="integer"
+     *          )
+     *      ),
+     *      @OA\Response(
+     *          response=200,
+     *          description="Successful operation",
+     *          @OA\JsonContent(
+     *              @OA\Property(property="co2_total", type="number", example=17631.6),
+     *              @OA\Property(property="co2_powered", type="number", example=17475.97),
+     *              @OA\Property(property="co2_unpowered", type="number", example=155.64),
+     *              @OA\Property(property="waste_total", type="number", example=2021.72),
+     *              @OA\Property(property="waste_powered", type="number", example=1952.1),
+     *              @OA\Property(property="waste_unpowered", type="number", example=69.62),
+     *              @OA\Property(property="fixed_devices", type="integer", example=680),
+     *              @OA\Property(property="fixed_powered", type="integer", example=667),
+     *              @OA\Property(property="fixed_unpowered", type="integer", example=13),
+     *              @OA\Property(property="repairable_devices", type="integer", example=520),
+     *              @OA\Property(property="dead_devices", type="integer", example=178),
+     *              @OA\Property(property="participants", type="integer", example=880),
+     *              @OA\Property(property="volunteers", type="integer", example=556),
+     *              @OA\Property(property="hours_volunteered", type="integer", example=3152),
+     *              @OA\Property(property="parties", type="integer", example=161)
+     *          )
+     *       ),
+     *      @OA\Response(
+     *          response=404,
+     *          description="Network not found",
+     *      ),
+     *     )
+     */
+    public function getNetworkStatsv2(Request $request, $id): JsonResponse
+    {
+        $network = Network::findOrFail($id);
+
+        if ($request->has('group_tag')) {
+            $tagId = $request->get('group_tag');
+            return response()->json($this->statsForTag($network, $tagId));
+        }
+
+        return response()->json($network->stats());
     }
 
     /**

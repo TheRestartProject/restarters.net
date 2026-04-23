@@ -10,9 +10,14 @@
       <div class="d-flex flex-wrap mt-4 mb-3 mb-md-3">
         <div class="bord d-flex w-xs-100 w-md-50">
           <b-img @error="brokenGroupImage" :src="groupImage" class="groupImage align-self-start mr-4 mb-3"/>
-          <h1>
-            {{ group.name }}
-          </h1>
+          <div>
+            <h1>
+              {{ group.name }}
+            </h1>
+            <div v-if="group.tags && group.tags.length" class="mb-2">
+              <b-badge v-for="tag in group.tags" :key="tag.id" variant="info" pill class="mr-1">{{ tag.name }}</b-badge>
+            </div>
+          </div>
         </div>
         <div class="pl-md-4 d-flex w-xs-100 w-md-50 maybeborder pt-3 p-md-0 d-flex flex-column justify-content-center">
           <div class="d-flex justify-content-between w-100">
