@@ -100,6 +100,7 @@ export default {
   mounted() {
     this.currentValue = this.value
     this.currentPostcode = this.postcode
+    this.lastInputValue = this.value
     this.$refs.autocomplete.update(this.currentValue)
     this.startLocationWatcher()
   },
@@ -155,11 +156,14 @@ export default {
     handleLocationChange(newValue) {
       // Handle the location change similar to placeChanged.  Use a hardcoded lat/lng as this is just for
       // testing, where it's providing hard to get geocode to work.
+      // Only emit if we don't already have valid coordinates (i.e., this is a new input, not initialization)
       if (newValue && newValue.trim()) {
-        console.log('Emit', newValue, lat, lng)
-        this.$emit('update:value', newValue)
-        this.$emit('update:lat', 51.5074)
-        this.$emit('update:lng', -0.1276)
+        if (this.lat === null || this.lng === null) {
+          console.log('Emit', newValue, 51.5074, -0.1276)
+          this.$emit('update:value', newValue)
+          this.$emit('update:lat', 51.5074)
+          this.$emit('update:lng', -0.1276)
+        }
       } else {
         this.resetValues()
       }

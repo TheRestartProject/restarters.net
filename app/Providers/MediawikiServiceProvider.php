@@ -51,6 +51,9 @@ class MediawikiServiceProvider extends ServiceProvider
             } catch (\Throwable $ex) {
                 Log::error('Failed to create Wiki UserCreator: '.$ex->getMessage());
             }
+
+            // Return null if Wiki connection is not available
+            return null;
         });
     }
 }
