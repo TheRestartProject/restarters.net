@@ -81,7 +81,7 @@ class EventsUsersObserver {
 
         // Make sure they are not on the thread.  If they were confirmed, we need to update the volunteer count.
         if ($user) {
-            $this->removed($event, $user, true, $eu->status == 1);
+            $this->removed($event, $user, $eu->status == 1);
         }
     }
 

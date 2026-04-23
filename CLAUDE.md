@@ -51,17 +51,37 @@ This is a Laravel 9 application with PHP 8+ that integrates with external servic
 ## Development Commands
 
 ### Local Development Setup
-```bash
-# Using Docker (recommended) - see CRITICAL section above for task commands
-task docker:up-debug    # Start with debug tools
 
-# The application will be available at:
-# - Restarters: http://localhost:8001
-# - phpMyAdmin: http://localhost:8002
-# - Mailhog: http://localhost:8025
+**Prerequisites**: Install [Task](https://taskfile.dev/installation/) - the project uses Taskfile for Docker management.
+
+See `docs/local-development.md` for full setup instructions.
+
+```bash
+# Start Docker environment (uses Task - do NOT use docker-compose directly)
+task docker:up-core      # Core only (app + database)
+task docker:up-debug     # With phpMyAdmin and Mailhog
+task docker:up-discourse # With Discourse integration
+task docker:up-all       # All services
+
+# Stop Docker environment
+task docker:down-core    # Stop core services
+task docker:down-debug   # Stop debug services
+task docker:down-all     # Stop all services
+
+# Other Docker commands
+task docker:logs         # View container logs
+task docker:shell        # Open shell in container
+task docker:run:artisan -- migrate  # Run artisan commands
+task docker:run:bash -- "command"   # Run bash commands
 
 # Run Vite for HMR (hot module replacement)
 task docker:run:bash -- "npm run dev"
+
+# The application will be available at:
+# - Restarters: http://localhost:8001 (Admin: jane@bloggs.net / passw0rd)
+# - phpMyAdmin: http://localhost:8002 (Host: restarters_db, User: root, Pass: s3cr3t)
+# - Mailhog: http://localhost:8025
+# - Discourse: http://localhost:8003
 ```
 
 ### Common Development Commands
@@ -89,11 +109,17 @@ php artisan key:generate
 
 ### Testing
 ```bash
-# Run PHP unit tests
+# Run PHP unit tests (inside Docker container)
+task docker:shell
+# Then inside container:
+export DB_TEST_HOST=restarters_db
 ./vendor/bin/phpunit
 
 # Run specific test file
-./vendor/bin/phpunit tests/Unit/ExampleTest.php
+./vendor/bin/phpunit tests/Feature/Events/AddRemoveVolunteerTest.php
+
+# Run specific test method
+./vendor/bin/phpunit --filter testMethodName
 
 # Run JavaScript tests
 npm run jest
