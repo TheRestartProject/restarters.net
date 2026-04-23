@@ -78,6 +78,8 @@ abstract class TestCase extends BaseTestCase
         Alert::truncate();
         DB::statement('delete from audits');
         DB::delete('delete from user_network');
+        DB::delete('delete from users_preferences');
+        DB::delete('delete from users_permissions');
         DB::delete('delete from grouptags_groups');
         DB::delete('delete from failed_jobs');
         DB::table('notifications')->truncate();
