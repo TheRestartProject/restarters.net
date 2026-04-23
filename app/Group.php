@@ -2,6 +2,10 @@
 
 namespace App;
 
+use App\User;
+use Illuminate\Database\Eloquent\Relations\HasOne;
+use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use DB;
 use Illuminate\Database\Eloquent\Model;
@@ -19,7 +23,7 @@ class Group extends Model implements Auditable
     protected $primaryKey = 'idgroups';
 
     // Eager-loading reduces N+1 queries.
-    protected $with = ['networks'];
+    protected $with = ['networks', 'group_tags'];
 
     /**
      * The attributes that are mass assignable.
@@ -95,9 +99,51 @@ class Group extends Model implements Auditable
 
     // NGM: when tests in place, this method name should be changed to just `tags`.
     // It's on a group, the group_ prefix is superfluous.
-    public function group_tags()
+    public function group_tags(): BelongsToMany
     {
         return $this->belongsToMany(\App\GroupTags::class, 'grouptags_groups', 'group', 'group_tag');
+    }
+
+    /**
+     * Get tags filtered based on current user's permissions.
+     * Admins see all tags, NCs only see tags from their networks (not global tags).
+     */
+    public function getFilteredTagsForUser()
+    {
+        $user = auth()->user() ?? auth('api')->user();
+
+        // No user or admin - return all tags
+        if (!$user || $user->hasRole('Administrator')) {
+            return $this->group_tags;
+        }
+
+        // Network coordinators only see tags from networks they coordinate
+        $userNetworkIds = $user->networks->pluck('id')->toArray();
+
+        return $this->group_tags->filter(function ($tag) use ($userNetworkIds) {
+            // Exclude global tags (network_id is null) for non-admins
+            if ($tag->network_id === null) {
+                return false;
+            }
+            // Only include tags from networks the user coordinates
+            return in_array($tag->network_id, $userNetworkIds);
+        });
+    }
+
+    /**
+     * Override toArray to filter tags based on user permissions.
+     * This ensures tags are filtered when the model is serialized to JSON in Blade templates.
+     */
+    public function toArray()
+    {
+        $array = parent::toArray();
+
+        // Replace group_tags with filtered tags
+        if (isset($array['group_tags'])) {
+            $array['group_tags'] = $this->getFilteredTagsForUser()->values()->toArray();
+        }
+
+        return $array;
     }
 
     // Setters
@@ -106,7 +152,7 @@ class Group extends Model implements Auditable
     public function findAll()
     {
         try {
-            return DB::select(DB::raw('SELECT
+            return DB::select('SELECT
                     `g`.`idgroups` AS `id`,
                     `g`.`name` AS `name`,
                     `g`.`location` AS `location`,
@@ -121,7 +167,7 @@ class Group extends Model implements Auditable
                 LEFT JOIN `users_groups` AS `ug` ON `g`.`idgroups` = `ug`.`group`
                 LEFT JOIN `users` AS `u` ON `ug`.`user` = `u`.`id`
                 GROUP BY `g`.`idgroups`
-                ORDER BY `g`.`name` ASC'));
+                ORDER BY `g`.`name` ASC');
         } catch (\Illuminate\Database\QueryException $e) {
             dd($e);
         }
@@ -130,7 +176,7 @@ class Group extends Model implements Auditable
     public function findList()
     {
         try {
-            return DB::select(DB::raw('SELECT
+            return DB::select('SELECT
                 `g`.`idgroups` AS `id`,
                 `g`.`name` AS `name`,
                 `g`.`location` AS `location`,
@@ -151,7 +197,7 @@ class Group extends Model implements Auditable
 
             GROUP BY `g`.`idgroups`
 
-            ORDER BY `g`.`name` ASC'));
+            ORDER BY `g`.`name` ASC');
         } catch (\Illuminate\Database\QueryException $e) {
             dd($e);
         }
@@ -159,7 +205,7 @@ class Group extends Model implements Auditable
 
     public function ofThisUser($id)
     {
-        return DB::select(DB::raw('SELECT * FROM `'.$this->table.'` AS `g`
+        return DB::select('SELECT * FROM `'.$this->table.'` AS `g`
                 INNER JOIN `users_groups` AS `ug`
                     ON `ug`.`group` = `g`.`idgroups`
 
@@ -167,31 +213,31 @@ class Group extends Model implements Auditable
                     SELECT * FROM `images`
                         INNER JOIN `xref` ON `xref`.`object` = `images`.`idimages`
                         WHERE `xref`.`object_type` = 5
-                        AND `xref`.`reference_type` = '.env('TBL_GROUPS').'
+                        AND `xref`.`reference_type` = :tblGroups
                         GROUP BY `images`.`path`
                 ) AS `xi`
                 ON `xi`.`reference` = `g`.`idgroups`
 
                 WHERE `ug`.`user` = :id
-                ORDER BY `g`.`name` ASC'), ['id' => $id]);
+                ORDER BY `g`.`name` ASC', ['id' => $id, 'tblGroups' => env('TBL_GROUPS')]);
     }
 
-    public function groupImage()
+    public function groupImage(): HasOne
     {
         return $this->hasOne(\App\Xref::class, 'reference', 'idgroups')->where('reference_type', env('TBL_GROUPS'))->where('object_type', 5);
     }
 
-    public function allHosts()
+    public function allHosts(): HasMany
     {
         return $this->hasMany(\App\UserGroups::class, 'group', 'idgroups')->where('role', Role::HOST);
     }
 
-    public function allRestarters()
+    public function allRestarters(): HasMany
     {
         return $this->hasMany(\App\UserGroups::class, 'group', 'idgroups')->where('role', Role::RESTARTER);
     }
 
-    public function allVolunteers()
+    public function allVolunteers(): HasMany
     {
         return $this->hasMany(\App\UserGroups::class, 'group', 'idgroups')->orderBy('role', 'ASC');
     }
@@ -269,7 +315,7 @@ class Group extends Model implements Auditable
      *
      * @param \App\User $volunteer A registered user.
      */
-    public function addVolunteer($volunteer)
+    public function addVolunteer(User $volunteer)
     {
         UserGroups::updateOrCreate([
             'user' => $volunteer->id,
@@ -311,18 +357,14 @@ class Group extends Model implements Auditable
         return '';
     }
 
-    /**
-     * @param int|null $user_id
-     * @return bool
-     */
-    public function isVolunteer($user_id = null)
+    public function isVolunteer(?int $user_id = null): bool
     {
         $attributes = ['user' => $user_id ?: auth()->id()];
 
         return $this->allConfirmedVolunteers()->where($attributes)->exists();
     }
 
-    public function parties()
+    public function parties(): HasMany
     {
         return $this->hasMany(Party::class, 'group', 'idgroups');
     }
@@ -379,7 +421,7 @@ class Group extends Model implements Auditable
         return $event->first();
     }
 
-    public function networks()
+    public function networks(): BelongsToMany
     {
         return $this->belongsToMany(Network::class, 'group_network', 'group_id', 'network_id');
     }
@@ -662,10 +704,8 @@ class Group extends Model implements Auditable
 
     /**
      * Get a name for the Discourse group.
-     *
-     * @return string
      */
-    public function getDiscourseGroupName($unique)
+    public function getDiscourseGroupName($unique): string
     {
         // Restricted characters allowed in name, and only 20 characters.
         //

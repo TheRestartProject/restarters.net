@@ -11,7 +11,7 @@ use Tests\TestCase;
 
 class PasswordResetTest extends TestCase
 {
-    public function testInvalidEmail() {
+    public function testInvalidEmail(): void {
         $response = $this->post('/user/recover', [
             'email' => 'bademail!'
         ]);
@@ -19,7 +19,7 @@ class PasswordResetTest extends TestCase
         $response->assertSeeText(__('passwords.invalid'));
     }
 
-    public function testUnknownEmail() {
+    public function testUnknownEmail(): void {
         $response = $this->post('/user/recover', [
             'email' => 'nobody@nowhere.com'
         ]);
@@ -27,7 +27,7 @@ class PasswordResetTest extends TestCase
         $response->assertSeeText(__('passwords.user'), false);
     }
 
-    public function testResetSuccess()
+    public function testResetSuccess(): void
     {
         Notification::fake();
         Event::fake();

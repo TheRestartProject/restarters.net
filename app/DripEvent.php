@@ -22,7 +22,6 @@ class DripEvent extends Model
      * Create or Update a Subscriber
      * @author Christopher Kelker
      * @date   2019-05-29T15:55:02+010
-     * @param  User                    $user
      * @return [type]
      */
     public static function createOrUpdateSubscriber(User $user, $opted_in = false, $old_email = false, $new_email = false)

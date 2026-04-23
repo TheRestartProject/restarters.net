@@ -12,23 +12,26 @@ use Tests\TestCase;
 
 class RoleTest extends TestCase
 {
-    public function testLoggedOut() {
+    public function testLoggedOut(): void {
         $this->expectException(AuthenticationException::class);
         $response = $this->get('/role');
     }
 
-    public function testNotAdmin() {
+    public function testNotAdmin(): void {
         $this->loginAsTestUser(Role::RESTARTER);
         $response = $this->get('/role');
         $response->assertRedirect(RouteServiceProvider::HOME);
     }
 
-    public function testBasic() {
+    public function testBasic(): void {
         $this->loginAsTestUser(Role::ADMINISTRATOR);
 
-        // Should see a list with edit links.
+        // Should see the roles-table Vue component with Host role in the data.
+        // JSON is HTML-encoded with &quot; for quotes.
         $response = $this->get('/role');
-        $response->assertSee('<a href="/role/edit/3" title="edit role permissions">Host</a>', false);
+        $response->assertSee('<roles-table', false);
+        $response->assertSee('&quot;id&quot;:3', false);
+        $response->assertSee('&quot;role&quot;:&quot;Host&quot;', false);
 
         // Get Edit page.  Should see a list of permissions with permission 4 (Create Party).  Test environment
         // doesn't have permissions set up so just check existance.

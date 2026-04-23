@@ -257,6 +257,19 @@ Route::middleware('ensureAPIToken')->group(function () {
 });
 
 Route::middleware('auth', 'verifyUserConsent', 'ensureAPIToken')->group(function () {
+    // Mark notifications as read
+    Route::get('markAsRead/{id?}', function ($id = null) {
+        $notifications = auth()->user()->unReadNotifications;
+
+        if ($id) {
+            $notifications = $notifications->where('id', $id);
+        }
+
+        $notifications->markAsRead();
+
+        return redirect()->back();
+    })->name('markAsRead');
+
     //User Controller
     Route::prefix('profile')->group(function () {
         Route::get('/', [UserController::class, 'index'])->name('profile');
@@ -434,18 +447,6 @@ Route::middleware('ensureAPIToken')->group(function () {
     Route::get('/party/stats/{id}/wide', function ($id) {
         return App\Http\Controllers\PartyController::stats($id);
     });
-
-    Route::get('markAsRead/{id?}', function ($id = null) {
-        $notifications = auth()->user()->unReadNotifications;
-
-        if ($id) {
-            $notifications = $notifications->where('id', $id);
-        }
-
-        $notifications->markAsRead();
-
-        return redirect()->back();
-    })->name('markAsRead');
 
     Route::get('/set-lang/{locale}', [LocaleController::class, 'setLang']);
 

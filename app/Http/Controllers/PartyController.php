@@ -2,6 +2,9 @@
 
 namespace App\Http\Controllers;
 
+use Illuminate\View\View;
+use Illuminate\Http\JsonResponse;
+use Illuminate\Http\RedirectResponse;
 use App\Audits;
 use App\Brands;
 use App\Cluster;
@@ -103,6 +106,7 @@ class PartyController extends Controller
         $thisone['event_date_local'] = $event->eventDateLocal;
         $thisone['start_local'] = $event->startLocal;
         $thisone['end_local'] = $event->endLocal;
+        $thisone['timezone'] = $event->timezone;
 
         $thisone['upcoming'] = $event->isUpcoming();
         $thisone['finished'] = $event->hasFinished();
@@ -117,7 +121,7 @@ class PartyController extends Controller
         return $thisone;
     }
 
-    public function index($group_id = null)
+    public function index($group_id = null): View
     {
         $events = [];
 
@@ -189,7 +193,7 @@ class PartyController extends Controller
         ]);
     }
 
-    public function create(Request $request, $group_id = null)
+    public function create(Request $request, $group_id = null): View
     {
         $user = Auth::user();
         $autoapprove = $group_id ? Group::where('idgroups', $group_id)->first()->auto_approve : false;
@@ -310,7 +314,7 @@ class PartyController extends Controller
         ]);
     }
 
-    public function view($id)
+    public function view($id): View
     {
         $File = new FixometerFile;
         $Party = new Party;
@@ -414,7 +418,7 @@ class PartyController extends Controller
         }
     }
 
-    public function getJoinEvent($event_id)
+    public function getJoinEvent($event_id): RedirectResponse
     {
         $user_id = Auth::id();
         $not_in_event = EventsUsers::where('event', $event_id)
@@ -492,7 +496,7 @@ class PartyController extends Controller
         }
     }
 
-    public static function stats($id)
+    public static function stats($id): View
     {
         $event = Party::where('idevents', $id)->first();
 
@@ -511,9 +515,9 @@ class PartyController extends Controller
      *
      * @param int $event_id The event for which to find associated users.
      *
-     * @return Response json formatted array of relevant info on users in the group.
+     * @return JsonResponse json formatted array of relevant info on users in the group.
      */
-    public function getGroupEmailsWithNames($event_id)
+    public function getGroupEmailsWithNames(int $event_id): JsonResponse
     {
         $group_user_ids = UserGroups::where('group', Party::find($event_id)->group)
         ->where('user', '!=', Auth::user()->id)
@@ -536,7 +540,7 @@ class PartyController extends Controller
         return response()->json($group_users);
     }
 
-    public function updateQuantity(Request $request)
+    public function updateQuantity(Request $request): JsonResponse
     {
         $event_id = $request->input('event_id');
         $quantity = $request->input('quantity');
@@ -558,7 +562,7 @@ class PartyController extends Controller
         return response()->json($return);
     }
 
-    public function updateVolunteerQuantity(Request $request)
+    public function updateVolunteerQuantity(Request $request): JsonResponse
     {
         $event_id = $request->input('event_id');
         $quantity = $request->input('quantity');
@@ -580,7 +584,7 @@ class PartyController extends Controller
         return response()->json($return);
     }
 
-    public function removeVolunteer(Request $request)
+    public function removeVolunteer(Request $request): JsonResponse
     {
         // The id that's passed in is that of the events_users table, because the entry may refer to a user without
         // an id.
@@ -611,7 +615,7 @@ class PartyController extends Controller
         }
     }
 
-    public function postSendInvite(Request $request)
+    public function postSendInvite(Request $request): RedirectResponse
     {
         $from_id = Auth::id();
         $request->validate([
@@ -710,7 +714,7 @@ class PartyController extends Controller
         return redirect()->back()->with('warning', __('events.invite_noemails'));
     }
 
-    public function confirmInvite($event_id, $hash)
+    public function confirmInvite($event_id, $hash): RedirectResponse
     {
         $user_event = EventsUsers::where('status', $hash)->where('event', $event_id)->first();
 
@@ -729,7 +733,7 @@ class PartyController extends Controller
         return redirect('/party/view/'.intval($event_id))->with('warning', __('events.invite_invalid'));
     }
 
-    public function cancelInvite($event_id)
+    public function cancelInvite($event_id): RedirectResponse
     {
         // We have to do a loop to avoid the gotcha where bulk delete operations don't invoke observers.
         foreach (EventsUsers::where('user', Auth::user()->id)->where('event', $event_id)->get() as $delete) {
@@ -769,7 +773,7 @@ class PartyController extends Controller
         }
     }
 
-    public function deleteImage($event_id, $id, $path)
+    public function deleteImage($event_id, $id, $path): RedirectResponse
     {
         $user = Auth::user();
 
@@ -790,7 +794,7 @@ class PartyController extends Controller
     * This sends an email to all user except the host logged in an email to ask for contributions
     *
     */
-    public function getContributions($event_id)
+    public function getContributions($event_id): RedirectResponse
     {
         $event = Party::find($event_id);
 
@@ -818,7 +822,7 @@ class PartyController extends Controller
      * Called via AJAX.
      * @param id The event id.
      */
-    public function deleteEvent($id)
+    public function deleteEvent($id): RedirectResponse
     {
         $event = Party::findOrFail($id);
         $user = Auth::user();
@@ -856,11 +860,10 @@ class PartyController extends Controller
      * @author Christopher Kelker - @date 2019-03-25
      * @editor  Christopher Kelker
      * @version 1.0.0
-     * @param   Request     $request
      * @param   [type]      $code
      * @return  [type]
      */
-    public function confirmCodeInvite(Request $request, $code)
+    public function confirmCodeInvite(Request $request, $code): RedirectResponse
     {
         // Variables
         $party = Party::where('shareable_code', $code)->first();

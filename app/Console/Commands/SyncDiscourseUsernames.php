@@ -35,31 +35,29 @@ class SyncDiscourseUsernames extends Command
     {
         parent::__construct();
         $this->discourseService = $discourseService;
-
-        $discourseApiKey = env('DISCOURSE_APIKEY');
-        $discourseApiUser = env('DISCOURSE_APIUSER');
-
-        if (is_null($discourseApiKey) || empty($discourseApiKey)) {
-            $this->error('DISCOURSE_APIKEY is not set');
-            exit();
-        }
-
-        if (is_null($discourseApiUser) || empty($discourseApiUser)) {
-            $this->error('DISCOURSE_APIUSER is not set');
-            exit();
-        }
-
-        $this->discourseApiKey = $discourseApiKey;
-        $this->discourseApiUser = $discourseApiUser;
     }
 
     /**
      * Execute the console command.
-     *
-     * @return mixed
      */
-    public function handle()
+    public function handle(): int
     {
+        $discourseApiKey = env('DISCOURSE_APIKEY');
+        $discourseApiUser = env('DISCOURSE_APIUSER');
+
+        if (empty($discourseApiKey)) {
+            $this->error('DISCOURSE_APIKEY is not set');
+            return 1;
+        }
+
+        if (empty($discourseApiUser)) {
+            $this->error('DISCOURSE_APIUSER is not set');
+            return 1;
+        }
+
+        $this->discourseApiKey = $discourseApiKey;
+        $this->discourseApiUser = $discourseApiUser;
+
         $usersFoundInRestarters = 0;
         $updatedUsers = 0;
 
@@ -96,5 +94,7 @@ class SyncDiscourseUsernames extends Command
         $this->info('Users found in Discourse: '.$discourseUserCount);
         $this->info('Found user count: '.$usersFoundInRestarters);
         $this->info('Updated users: '.$updatedUsers);
+
+        return 0;
     }
 }

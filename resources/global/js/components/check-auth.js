@@ -1,3 +1,6 @@
+import jQuery from 'jquery';
+const $ = jQuery;
+
 // API call to current site - check for user authenticated
 function checkAuth() {
   $url = 'https://restarters.dev' + '/test/check-auth';

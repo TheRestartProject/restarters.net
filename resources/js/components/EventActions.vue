@@ -62,7 +62,7 @@
 </template>
 <script>
 import event from '../mixins/event'
-import ConfirmModal from './ConfirmModal'
+import ConfirmModal from './ConfirmModal.vue'
 
 export default {
   components: {ConfirmModal},

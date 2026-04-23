@@ -20,7 +20,7 @@ class UserRolesTest extends TestCase
     }
 
     /** @test */
-    public function user_can_have_network_coordinator_role()
+    public function user_can_have_network_coordinator_role(): void
     {
         // arrange
         $user = User::factory()->create();
@@ -33,7 +33,7 @@ class UserRolesTest extends TestCase
     }
 
     /** @test */
-    public function can_change_restarter_to_host_role()
+    public function can_change_restarter_to_host_role(): void
     {
         // arrange
         $user = User::factory()->create();
@@ -47,7 +47,7 @@ class UserRolesTest extends TestCase
     }
 
     /** @test */
-    public function cannot_change_admin_or_coordinator_to_host_role()
+    public function cannot_change_admin_or_coordinator_to_host_role(): void
     {
         // arrange
         $user1 = User::factory()->administrator()->create();

@@ -1,7 +1,7 @@
 import Vue from 'vue'
 import moment from 'moment'
 
-const axios = require('axios')
+import axios from 'axios'
 
 function newToOld(e) {
   // We are in the frustrating position of having a half-written new API with sensible field names, but existing

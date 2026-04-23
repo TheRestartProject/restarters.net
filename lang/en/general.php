@@ -22,7 +22,7 @@ return [
   'your_name' => 'Your name',
   'your_name_validation' => 'Please enter your name',
   'repair_skills' => 'Skills',
-  'repair_skills_content' => 'This is optional but helps us improve your experience - which skills do you have and would like to share with others?',
+  'repair_skills_content' => 'This is optional but helps us improve your experience - which skills do you have and would like to share with others? Ctrl-click to select multiple skills.',
   'your_repair_skills' => 'Your skills',
   'save_repair_skills' => 'Save skills',
   'email_alerts' => 'Emails & alerts',

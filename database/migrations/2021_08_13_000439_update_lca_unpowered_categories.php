@@ -26,10 +26,8 @@ c1.footprint as footprint_new,
 c2.footprint as footprint_old
 FROM `restarters_db_test`.categories c1
 RIGHT JOIN `restarters.test`.categories c2 ON c2.idcategories = c1.idcategories
-     *
-     * @return void
      */
-    public function up()
+    public function up(): void
     {
         DB::statement('SET foreign_key_checks=0');
         DB::table('categories')->insert([
@@ -149,15 +147,13 @@ RIGHT JOIN `restarters.test`.categories c2 ON c2.idcategories = c1.idcategories
             'aggregate' => 1,
         ]);
 
-        DB::statement(DB::raw('UPDATE categories SET revision=2'));
+        DB::statement('UPDATE categories SET revision=2');
     }
 
     /**
      * Reverse the migrations.
-     *
-     * @return void
      */
-    public function down()
+    public function down(): void
     {
         DB::statement('SET foreign_key_checks=0');
         DB::table('categories')->where('idcategories', 6)->delete();
@@ -224,6 +220,6 @@ RIGHT JOIN `restarters.test`.categories c2 ON c2.idcategories = c1.idcategories
             'aggregate' => 0,
         ]);
 
-        DB::statement(DB::raw('UPDATE categories SET revision=1'));
+        DB::statement('UPDATE categories SET revision=1');
     }
 };

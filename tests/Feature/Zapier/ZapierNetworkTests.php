@@ -44,7 +44,7 @@ class ZapierNetworkTests extends TestCase
     //         When a new group is created that is in the Restart network, it IS included in the Restart Zapier trigger
 
     /** @test */
-    public function given_restart_network_when_new_group_created_included_in_trigger()
+    public function given_restart_network_when_new_group_created_included_in_trigger(): void
     {
         $this->withoutExceptionHandling();
 
@@ -82,7 +82,7 @@ class ZapierNetworkTests extends TestCase
     //     When a new group is created that is in Repair Together network, it is not included in the Restart Zapier trigger
 
     /** @test */
-    public function given_nonrestart_network_when_new_group_created_not_included_in_trigger()
+    public function given_nonrestart_network_when_new_group_created_not_included_in_trigger(): void
     {
         $this->withoutExceptionHandling();
 
@@ -120,7 +120,7 @@ class ZapierNetworkTests extends TestCase
     //         When a new user is created that is in the Restart network, it IS included in the Restart Zapier trigger
 
     /** @test */
-    public function given_restart_network_when_new_user_created_then_included_in_trigger()
+    public function given_restart_network_when_new_user_created_then_included_in_trigger(): void
     {
         $this->withoutExceptionHandling();
 
@@ -148,7 +148,7 @@ class ZapierNetworkTests extends TestCase
     // When a new user is created that is in the Repair Together network, it is not included in the Restart Zapier trigger
 
     /** @test */
-    public function given_nonrestart_network_when_new_user_created_then_not_included_in_trigger()
+    public function given_nonrestart_network_when_new_user_created_then_not_included_in_trigger(): void
     {
         $this->withoutExceptionHandling();
 
@@ -176,7 +176,7 @@ class ZapierNetworkTests extends TestCase
     // When a new user/group association is created for a user in the Restart network joining a group in the Restart network, it IS included in the Restart Zapier trigger
 
     /** @test */
-    public function given_restart_group_and_restart_user_when_user_joins_group_then_included_in_trigger()
+    public function given_restart_group_and_restart_user_when_user_joins_group_then_included_in_trigger(): void
     {
         $this->withoutExceptionHandling();
 
@@ -207,7 +207,7 @@ class ZapierNetworkTests extends TestCase
     // When a new user/group association is created and either the user or the group is not in the Restart network, it isn't included in the Restart Zapier trigger
 
     /** @test */
-    public function given_nonrestart_group_or_nonrestart_user_when_user_joins_group_then_not_included_in_trigger()
+    public function given_nonrestart_group_or_nonrestart_user_when_user_joins_group_then_not_included_in_trigger(): void
     {
         $this->withoutExceptionHandling();
 

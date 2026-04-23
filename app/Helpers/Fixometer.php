@@ -384,12 +384,12 @@ class Fixometer
 
             try {
                 if ($return_rows) {
-                    return DB::select(DB::raw($sql), ['id' => $id, 'object' => $object]);
+                    return DB::select($sql, ['id' => $id, 'object' => $object]);
                 }
 
-                return count(DB::select(DB::raw($sql), ['id' => $id, 'object' => $object])) > 0 ? true : false;
+                return count(DB::select($sql, ['id' => $id, 'object' => $object])) > 0 ? true : false;
             } catch (\Illuminate\Database\QueryException $e) {
-                return db($e);
+                return $return_rows ? [] : false;
             }
         }
     }
@@ -432,12 +432,12 @@ class Fixometer
                   `xref`.`reference_type` = :object AND
                   `xref`.`reference` = :id ';
 
-            DB::delete(DB::raw($sql), ['id' => $id, 'object' => $object]);
+            DB::delete($sql, ['id' => $id, 'object' => $object]);
 
             /** delete image from db **/
             $sql = 'DELETE FROM `images` WHERE `images`.`idimages` = :image';
 
-            DB::delete(DB::raw($sql), ['image' => $image->idimages]);
+            DB::delete($sql, ['image' => $image->idimages]);
 
             /** delete image from disk **/
             unlink($_SERVER['DOCUMENT_ROOT'].'/uploads/'.$image->path);
@@ -540,7 +540,7 @@ class Fixometer
             // We've seen a Sentry problem which I can only see happening if there was invalid data in the cache.
             if (
                 ! $stats ||
-                ! array_key_exists('allparties', $stats) ||
+                ! array_key_exists('partiesCount', $stats) ||
                 ! array_key_exists('waste_stats', $stats) ||
                 ! array_key_exists('device_count_status', $stats)
             ) {
@@ -549,7 +549,8 @@ class Fixometer
         }
 
         if ($stats == []) {
-            $stats['allparties'] = $Party->ofThisGroup('admin', true, false);
+            // Use COUNT query instead of loading all events into memory
+            $stats['partiesCount'] = \App\Party::where('event_end_utc', '<', now())->count();
             $stats['waste_stats'] = \App\Helpers\LcaStats::getWasteStats();
             $stats['device_count_status'] = $Device->statusCount();
             \Cache::put('all_stats', $stats, 7200);
@@ -566,7 +567,6 @@ class Fixometer
 
         $stats['co2Total'] = $stats['waste_stats'][0]->powered_footprint + $stats['waste_stats'][0]->unpowered_footprint;
         $stats['wasteTotal'] = $stats['waste_stats'][0]->powered_waste + $stats['waste_stats'][0]->unpowered_waste;
-        $stats['partiesCount'] = count($stats['allparties']);
 
         return $stats;
     }
@@ -652,9 +652,8 @@ class Fixometer
      * Returns users who have a particular preference by slug
      *
      * @param $slug
-     * @return Collection
      */
-    public static function usersWhoHavePreference($slug)
+    public static function usersWhoHavePreference($slug): Collection
     {
         return User::join('users_preferences', 'users_preferences.user_id', '=', 'users.id')
             ->join('preferences', 'preferences.id', '=', 'users_preferences.preference_id')

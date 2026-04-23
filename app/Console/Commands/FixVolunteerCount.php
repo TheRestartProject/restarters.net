@@ -27,10 +27,8 @@ class FixVolunteerCount extends Command
      *
      * Volunteer counts can be manually incremented/decremented, so we only
      * fix cases where the count has gone negative - that is always wrong.
-     *
-     * @return mixed
      */
-    public function handle()
+    public function handle(): void
     {
         $events = Party::where('volunteers', '<', 0)->get();
 

@@ -15,14 +15,12 @@
 
             @csrf
             <label for="groups[]">@lang('networks.show.add_groups_select_label'):</label>
-            <div class="form-control form-control__select">
-                <select name="groups[]" id="groups[]" class="select2-tags" multiple required>
-                    <option></option>
-                    @foreach($groupsForAssociating as $group)
-                        <option value="{{{ $group->idgroups }}}">{{{ $group->name }}}</option>
-                    @endforeach
-                </select>
-            </div>
+            <select name="groups[]" id="groups[]" class="form-control" multiple size="8" required>
+                <option></option>
+                @foreach($groupsForAssociating as $group)
+                    <option value="{{{ $group->idgroups }}}">{{{ $group->name }}}</option>
+                @endforeach
+            </select>
             <button type="submit" class="btn btn-primary float-right">@lang('networks.show.add_groups_save_button')</button>
         </form>
     </div>

@@ -23,7 +23,7 @@ class ViewUsersTest extends TestCase
     }
 
     /** @test */
-    public function an_admin_can_view_list_of_users()
+    public function an_admin_can_view_list_of_users(): void
     {
         // Given we have users in the database
         $users = User::factory()->count(10)->create();
@@ -36,7 +36,7 @@ class ViewUsersTest extends TestCase
     }
 
     /** @test */
-    public function an_admin_can_see_how_many_total_users_in_the_list()
+    public function an_admin_can_see_how_many_total_users_in_the_list(): void
     {
         // Given we have users in the database
         $users = User::factory()->count(41)->create();
@@ -49,7 +49,7 @@ class ViewUsersTest extends TestCase
     }
 
     /** @test */
-    public function admin_can_see_users_last_login_time()
+    public function admin_can_see_users_last_login_time(): void
     {
         // Given we have a user who has just logged in
         $lastLogin = new \Carbon\Carbon();
@@ -65,7 +65,7 @@ class ViewUsersTest extends TestCase
     }
 
     /** @test */
-    public function admin_can_see_users_last_login_time_on_filtered_results()
+    public function admin_can_see_users_last_login_time_on_filtered_results(): void
     {
         // Given we have a user who has just logged in
         $lastLogin = new \Carbon\Carbon();
@@ -81,7 +81,7 @@ class ViewUsersTest extends TestCase
     }
 
     /** @test */
-    public function admin_can_sort_user_list_by_last_login()
+    public function admin_can_sort_user_list_by_last_login(): void
     {
         // Given we have users with various login times
         $dateOfMostRecentLogin = new Carbon();

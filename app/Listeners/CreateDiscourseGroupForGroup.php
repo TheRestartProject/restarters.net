@@ -24,11 +24,8 @@ class CreateDiscourseGroupForGroup extends BaseEvent
 
     /**
      * Handle the event.
-     *
-     * @param  ApproveGroup  $event
-     * @return void
      */
-    public function handle(ApproveGroup $event)
+    public function handle(ApproveGroup $event): void
     {
         if (! config('restarters.features.discourse_integration')) {
             return;

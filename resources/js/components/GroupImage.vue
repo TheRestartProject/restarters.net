@@ -9,15 +9,19 @@
         <div class="dz-message d-none"/>
       </vue-dropzone>
       <b-btn variant="none" @click="deleteMe" class="deleteme" v-if="currentimage">
-        <b-img src="/icons/cross_ico.svg" class="icon"/>
+        <b-img :src="imageUrl('/icons/cross_ico.svg')" class="icon"/>
       </b-btn>
     </div>
   </b-form-group>
 </template>
 <script>
-import vue2Dropzone from 'vue2-dropzone'
+import images from '../mixins/images'
 
 export default {
+  mixins: [images],
+  components: {
+    vueDropzone: () => import('vue2-dropzone').then(m => m.VueDropzone || m.default || m)
+  },
   props: {
     image: {
       type: String,
@@ -30,15 +34,12 @@ export default {
       currentimage: null,
     }
   },
-  components: {
-    vueDropzone: vue2Dropzone
-  },
   computed: {
     src() {
       if (this.image) {
         return '/uploads/' + this.image
       } else {
-        return '/images/upload_ico_grey.svg'
+        return this.imageUrl('/images/upload_ico_grey.svg')
       }
     },
     dropzoneOptions () {

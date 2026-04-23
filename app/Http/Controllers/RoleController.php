@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use Illuminate\View\View;
 use App\Helpers\Fixometer;
 use App\Providers\RouteServiceProvider;
 use App\Role;
@@ -23,17 +24,29 @@ class RoleController extends Controller
             // $this->set('roleList', $this->Role->findAll());
 
             $Role = new Role;
+            $roleList = $Role->findAll();
+
+            // Prepare data for Vue table
+            $tableData = [];
+            foreach ($roleList as $role) {
+                $tableData[] = [
+                    'id' => $role->id,
+                    'role' => $role->role,
+                    'permissions_list' => $role->permissions_list,
+                ];
+            }
 
             return view('role.all', [//role.index
               'title' => 'Roles',
-              'roleList' => $Role->findAll(),
+              'roleList' => $roleList,
+              'tableData' => $tableData,
             ]);
         }
 
         return redirect(RouteServiceProvider::HOME);
     }
 
-    public function edit($id, Request $request)
+    public function edit($id, Request $request): View
     {
         $user = Auth::user();
 

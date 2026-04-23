@@ -12,12 +12,8 @@ class NetworkPolicy
 
     /**
      * Determine whether the user can view the network.
-     *
-     * @param  \App\User  $user
-     * @param  \App\Network  $network
-     * @return mixed
      */
-    public function view(User $user, Network $network)
+    public function view(User $user, Network $network): bool
     {
         if ($user->hasRole('Administrator')) {
             return true;
@@ -32,11 +28,8 @@ class NetworkPolicy
 
     /**
      * Determine whether the user can create networks.
-     *
-     * @param  \App\User  $user
-     * @return mixed
      */
-    public function create(User $user)
+    public function create(User $user): bool
     {
         if ($user->hasRole('Administrator')) {
             return true;
@@ -45,12 +38,8 @@ class NetworkPolicy
 
     /**
      * Determine whether the user can update the network.
-     *
-     * @param  \App\User  $user
-     * @param  \App\Network  $network
-     * @return mixed
      */
-    public function update(User $user, Network $network)
+    public function update(User $user, Network $network): bool
     {
         if ($user->hasRole('Administrator')) {
             return true;
@@ -66,7 +55,6 @@ class NetworkPolicy
     /**
      * Determine whether the user can associate groups to networks.
      *
-     * @param  \App\User  $user
      * @return mixed
      */
     public function associateGroups(User $user, Network $network)
@@ -84,12 +72,8 @@ class NetworkPolicy
 
     /**
      * Determine whether the user can delete the network.
-     *
-     * @param  \App\User  $user
-     * @param  \App\Network  $network
-     * @return mixed
      */
-    public function delete(User $user, Network $network)
+    public function delete(User $user, Network $network): bool
     {
         if ($user->hasRole('Administrator')) {
             return true;
@@ -98,12 +82,8 @@ class NetworkPolicy
 
     /**
      * Determine whether the user can restore the network.
-     *
-     * @param  \App\User  $user
-     * @param  \App\Network  $network
-     * @return mixed
      */
-    public function restore(User $user, Network $network)
+    public function restore(User $user, Network $network): bool
     {
         if ($user->hasRole('Administrator')) {
             return true;
@@ -112,12 +92,8 @@ class NetworkPolicy
 
     /**
      * Determine whether the user can permanently delete the network.
-     *
-     * @param  \App\User  $user
-     * @param  \App\Network  $network
-     * @return mixed
      */
-    public function forceDelete(User $user, Network $network)
+    public function forceDelete(User $user, Network $network): bool
     {
         if ($user->hasRole('Administrator')) {
             return true;

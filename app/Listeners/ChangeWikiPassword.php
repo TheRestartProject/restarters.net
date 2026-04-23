@@ -24,11 +24,8 @@ class ChangeWikiPassword extends BaseEvent
 
     /**
      * Handle the event.
-     *
-     * @param  PasswordChanged  $event
-     * @return void
      */
-    public function handle(PasswordChanged $event)
+    public function handle(PasswordChanged $event): void
     {
         $user = $event->user;
         $oldpw = $event->oldPassword;
@@ -53,7 +50,7 @@ class ChangeWikiPassword extends BaseEvent
                                    ->setParam('retype', $user->password)
                                    ->setParam('changeauthtoken', $token);
             $api->postRequest($changePasswordRequest);
-        } catch (\Exception $ex) {
+        } catch (\Throwable $ex) {
             Log::error("Failed to changed password for user '".$user->mediawiki."' in mediawiki: ".$ex->getMessage());
         }
     }

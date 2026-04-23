@@ -12,7 +12,7 @@ use Tests\TestCase;
 
 class SkillsTest extends TestCase
 {
-    public function testIndex() {
+    public function testIndex(): void {
         $this->loginAsTestUser(Role::RESTARTER);
 
         $response = $this->get('/skills');
@@ -29,7 +29,7 @@ class SkillsTest extends TestCase
         $response->assertSee('UT1');
     }
 
-    public function testCreate() {
+    public function testCreate(): void {
         $this->loginAsTestUser(Role::RESTARTER);
 
         $response = $this->post('/skills/create');
@@ -48,7 +48,7 @@ class SkillsTest extends TestCase
         $response->assertSee('UT1');
     }
 
-    public function testEdit() {
+    public function testEdit(): void {
         $this->loginAsTestUser(Role::RESTARTER);
 
         $skill1 = Skills::create([
@@ -78,7 +78,7 @@ class SkillsTest extends TestCase
         $response->assertSee('UT2');
     }
 
-    public function testDelete() {
+    public function testDelete(): void {
         $this->loginAsTestUser(Role::RESTARTER);
 
         $skill1 = Skills::create([

@@ -17,7 +17,7 @@ use Tests\TestCase;
 
 class DeviceItemTypesTest extends TestCase
 {
-    public function testItemTypesDuplicates() {
+    public function testItemTypesDuplicates(): void {
         $cat1 = Category::factory()->create([
             'idcategories' => 444,
             'revision' => 1,

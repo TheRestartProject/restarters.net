@@ -1,0 +1,63 @@
+app = "restarters-yesterday"
+primary_region = "lhr"
+
+[build]
+  dockerfile = "Dockerfile.fly"
+
+[env]
+  APP_ENV = "staging"
+  APP_DEBUG = "true"
+  APP_URL = "https://restarters-yesterday.fly.dev"
+  DB_CONNECTION = "mysql"
+  DB_HOST = "restarters-db-yesterday.internal"
+  DB_PORT = "3306"
+  DB_DATABASE = "restarters"
+  CACHE_DRIVER = "file"
+  SESSION_DRIVER = "file"
+  QUEUE_CONNECTION = "sync"
+  SESSION_DOMAIN = ""
+  LOG_CHANNEL = "stderr"
+  FILESYSTEM_DISK = "s3"
+  AWS_DEFAULT_REGION = "auto"
+  AWS_ENDPOINT = "https://fly.storage.tigris.dev"
+  AWS_USE_PATH_STYLE_ENDPOINT = "true"
+  FEATURE__WIKI_INTEGRATION = "false"
+  FEATURE__DISCOURSE_INTEGRATION = "false"
+  SENTRY_ENVIRONMENT = "yesterday-restore"
+  # Table type constants
+  TBL_USERS = "1"
+  TBL_GROUPS = "2"
+  TBL_EVENTS = "3"
+  TBL_DEVICES = "4"
+  TBL_IMAGES = "5"
+  TBL_LINKS = "6"
+  # Device status constants
+  DEVICE_FIXED = "1"
+  DEVICE_REPAIRABLE = "2"
+  DEVICE_DEAD = "3"
+  # Category IDs
+  MISC_CATEGORY_ID = "46"
+  MISC_CATEGORY_ID_POWERED = "46"
+  MISC_CATEGORY_ID_UNPOWERED = "50"
+  # Impact calculation constants
+  DISPLACEMENT_VALUE = "0.5"
+  EMISSION_RATIO_UNPOWERED = "17.70147059"
+  EMISSION_RATIO_POWERED = "32.06679233"
+  # Session
+  SESSION_COOKIE = "restarters_yesterday_session"
+  SESSION_LIFETIME = "10080"
+  SESSION_TABLE = "laravel_sessions"
+  # Misc
+  L5_SWAGGER_GENERATE_ALWAYS = "false"
+  VITE_MANIFEST_PATH = "public/build/manifest.json"
+
+[http_service]
+  internal_port = 80
+  force_https = true
+  auto_stop_machines = "stop"
+  auto_start_machines = true
+  min_machines_running = 0
+
+[[vm]]
+  size = "shared-cpu-1x"
+  memory = 1024

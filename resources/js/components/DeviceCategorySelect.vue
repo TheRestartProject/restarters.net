@@ -22,16 +22,18 @@
     >
     </multiselect>
     <div v-b-popover.html.left="__('devices.tooltip_category')" class="ml-3 mt-2">
-      <b-img class="icon clickable" src="/icons/info_ico_black.svg" v-if="iconVariant === 'black'" />
-      <b-img class="icon clickable" src="/icons/info_ico_green.svg" v-else="iconVariant === 'brand'" />
+      <b-img class="icon clickable" :src="imageUrl('/icons/info_ico_black.svg')" v-if="iconVariant === 'black'" />
+      <b-img class="icon clickable" :src="imageUrl('/icons/info_ico_green.svg')" v-else="iconVariant === 'brand'" />
     </div>
     <div class="multiselect__content-wrapper d-none" />
   </div>
 </template>
 <script>
 import { CATEGORY_MISC_POWERED, CATEGORY_MISC_UNPOWERED } from '../constants'
+import images from '../mixins/images'
 
 export default {
+  mixins: [images],
   props: {
     category: {
       type: Number,
@@ -98,7 +100,7 @@ export default {
           if (((c.idcategories !== this.miscCat) &&
               ((this.powered && c.powered) || (!this.powered && !c.powered)))) {
             categories.push({
-              name: this.$lang.get('strings.' + c.name),
+              name: this.__(c.name),
               value: c.idcategories
             })
           }
@@ -106,7 +108,7 @@ export default {
 
         if (categories.length) {
           ret.push({
-            cluster: this.$lang.get('strings.' + cluster.name),
+            cluster: this.__(cluster.name),
             categories: categories
           })
         }
@@ -116,7 +118,7 @@ export default {
         cluster: '---',
         categories: [
           {
-            name: this.$lang.get('partials.category_none'),
+            name: this.__('partials.category_none'),
             value: this.miscCat,
           }
         ]

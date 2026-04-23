@@ -2,14 +2,14 @@
   <div>
     <b-card no-body v-if="box" class="box mt-4">
       <b-card-body class="p-4">
-        <GroupAddEdit :idgroups="idgroups" :can-approve="canApprove" :can-network="canNetwork" />
+        <GroupAddEdit :idgroups="idgroups" :can-approve="canApprove" :can-network="canNetwork" :can-edit-tags="canEditTags" />
       </b-card-body>
     </b-card>
-    <GroupAddEdit :idgroups="idgroups" :can-approve="canApprove" :can-network="canNetwork" v-else />
+    <GroupAddEdit :idgroups="idgroups" :can-approve="canApprove" :can-network="canNetwork" :can-edit-tags="canEditTags" v-else />
   </div>
 </template>
 <script>
-import GroupAddEdit from './GroupAddEdit'
+import GroupAddEdit from './GroupAddEdit.vue'
 import auth from '../mixins/auth'
 
 export default {
@@ -31,6 +31,11 @@ export default {
       required: false,
       default: false
     },
+    canEditTags: {
+      type: Boolean,
+      required: false,
+      default: false
+    },
     box: {
       type: Boolean,
       required: false,
@@ -41,9 +46,9 @@ export default {
 </script>
 <style scoped lang="scss">
 @import 'resources/global/css/_variables';
-@import '~bootstrap/scss/functions';
-@import '~bootstrap/scss/variables';
-@import '~bootstrap/scss/mixins/_breakpoints';
+@import 'bootstrap/scss/functions';
+@import 'bootstrap/scss/variables';
+@import 'bootstrap/scss/mixins/_breakpoints';
 
 .box {
   background-color: $white;

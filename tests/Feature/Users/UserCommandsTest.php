@@ -13,7 +13,7 @@ use function PHPUnit\Framework\assertFalse;
 use function PHPUnit\Framework\assertTrue;
 
 class UserCommandsTest extends TestCase {
-    public function testCreate() {
+    public function testCreate(): void {
         $network = Network::all()->first();
         $this->artisan('user:create testname test@test.com 1234567890 fr ' . $network->id)->assertExitCode(0);
         $user = User::where('email', 'test@test.com')->first();
@@ -22,7 +22,7 @@ class UserCommandsTest extends TestCase {
         self::assertEquals($network->id, $user->repair_network);
     }
 
-    public function testMakeHost() {
+    public function testMakeHost(): void {
         $host = User::factory()->host()->create();
         $group = Group::factory()->create();
         assertFalse(Fixometer::userIsHostOfGroup($group->idgroups, $host->id));

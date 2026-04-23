@@ -23,10 +23,8 @@ class InviteEventTest extends TestCase
 {
     /**
      * Test notification content.
-     *
-     * @return void
      */
-    public function testInvite()
+    public function testInvite(): void
     {
         Notification::fake();
 
@@ -78,7 +76,7 @@ class InviteEventTest extends TestCase
         assertEquals(0, $event->volunteers);
     }
 
-    public function testInviteReal()
+    public function testInviteReal(): void
     {
         $userAttributes = $this->userAttributes();
         $response = $this->post('/user/register/', $userAttributes);
@@ -157,7 +155,21 @@ class InviteEventTest extends TestCase
         // ...should show up in the list of events with an invitation as we have not yet accepted.
         $response3 = $this->get('/party');
         $events = $this->getVueProperties($response3)[1][':initial-events'];
-        $this->assertStringContainsString('"attending":false', $events);
+
+        // Debug info only shown on failure
+        $eventUser = \App\EventsUsers::where('event', $event->idevents)
+            ->where('user', $user->id)
+            ->first();
+        $debugInfo = json_encode([
+            'event_id' => $event->idevents,
+            'user_id' => $user->id,
+            'events_users_status' => $eventUser ? $eventUser->status : 'NOT_FOUND',
+            'events_users_role' => $eventUser ? $eventUser->role : 'NOT_FOUND',
+            'attending_in_response' => strpos($events, '"attending":true') !== false ? 'true' : 'false',
+        ]);
+
+        $this->assertStringContainsString('"attending":false', $events,
+            "Expected attending:false but got attending:true. Debug: " . $debugInfo);
         $this->assertStringContainsString('"invitation"', $events);
 
         // Now accept the invitation.
@@ -186,7 +198,7 @@ class InviteEventTest extends TestCase
         $response->assertSessionHas('warning');
     }
 
-    public function testInvitableUserPOV()
+    public function testInvitableUserPOV(): void
     {
         $this->withoutExceptionHandling();
 
@@ -288,7 +300,7 @@ class InviteEventTest extends TestCase
         $this->assertEquals([], $members);
     }
 
-    public function testInvitableNotifications()
+    public function testInvitableNotifications(): void
     {
         Queue::fake();
         Notification::fake();
@@ -402,7 +414,7 @@ class InviteEventTest extends TestCase
         });
     }
 
-    public function testInviteViaLink() {
+    public function testInviteViaLink(): void {
         $this->loginAsTestUser(Role::ADMINISTRATOR);
         $user = User::factory()->restarter()->create([
                                                                           'api_token' => '1234',
@@ -445,7 +457,7 @@ class InviteEventTest extends TestCase
         $rsp = $this->get('/party/invite/' . $unique_shareable_code . '1');
     }
 
-    public function testInviteNonUsers() {
+    public function testInviteNonUsers(): void {
         Notification::fake();
 
         $this->withoutExceptionHandling();
@@ -475,7 +487,7 @@ class InviteEventTest extends TestCase
         $response->assertSessionHas('success');
     }
 
-    public function testInviteNoUsers() {
+    public function testInviteNoUsers(): void {
         Notification::fake();
 
         $this->withoutExceptionHandling();
@@ -508,7 +520,7 @@ class InviteEventTest extends TestCase
     /**
      * @dataProvider invalidEmailProvider
      */
-    public function testInviteInvalidEmail($email, $valid)
+    public function testInviteInvalidEmail($email, $valid): void
     {
         $this->loginAsTestUser(Role::ADMINISTRATOR);
 
@@ -529,7 +541,7 @@ class InviteEventTest extends TestCase
         ]);
     }
 
-    public function invalidEmailProvider()
+    public function invalidEmailProvider(): array
     {
         return [
             ['test@test.com', true],

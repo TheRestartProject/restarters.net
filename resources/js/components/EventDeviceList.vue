@@ -37,7 +37,7 @@
 </template>
 <script>
 import event from '../mixins/event'
-import EventDeviceSummary from './EventDeviceSummary'
+import EventDeviceSummary from './EventDeviceSummary.vue'
 
 export default {
   components: {EventDeviceSummary},
@@ -81,9 +81,9 @@ export default {
 </script>
 <style scoped lang="scss">
 @import 'resources/global/css/_variables';
-@import '~bootstrap/scss/functions';
-@import '~bootstrap/scss/variables';
-@import '~bootstrap/scss/mixins/_breakpoints';
+@import 'bootstrap/scss/functions';
+@import 'bootstrap/scss/variables';
+@import 'bootstrap/scss/mixins/_breakpoints';
 
 .borders {
   border-bottom: 2px solid black;

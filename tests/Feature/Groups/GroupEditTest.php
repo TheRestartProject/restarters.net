@@ -18,7 +18,7 @@ use Illuminate\Support\Facades\Storage;
 class GroupEditTest extends TestCase
 {
     /** @test */
-    public function group_tags_retained_after_edited_by_host()
+    public function group_tags_retained_after_edited_by_host(): void
     {
         $this->withoutExceptionHandling();
 
@@ -58,7 +58,7 @@ class GroupEditTest extends TestCase
         ]);
     }
 
-    public function testEditGroupAsRestarter() {
+    public function testEditGroupAsRestarter(): void {
         $group = Group::factory()->create();
 
         $this->loginAsTestUser(Role::RESTARTER);
@@ -67,7 +67,7 @@ class GroupEditTest extends TestCase
     }
 
     /** @test */
-    public function invalid_location()
+    public function invalid_location(): void
     {
         $this->withoutExceptionHandling();
 
@@ -93,7 +93,7 @@ class GroupEditTest extends TestCase
     }
 
     /** @test */
-    public function image_upload() {
+    public function image_upload(): void {
         Storage::fake('avatars');
         $group = Group::factory()->create();
 
@@ -128,8 +128,7 @@ class GroupEditTest extends TestCase
         $this->assertEquals('success - image uploaded', $response->getContent());
 
         // Delete the image.
-        $image = \DB::select(
-        \Illuminate\Support\Facades\DB::raw("SELECT idimages, path FROM images ORDER BY idimages DESC LIMIT 1"));
+        $image = \DB::select("SELECT idimages, path FROM images ORDER BY idimages DESC LIMIT 1");
         $idimages = $image[0]->idimages;
         $path = $image[0]->path;
         $response = $this->get("/group/image/delete/{$group->idgroups}/$idimages/$path");
@@ -138,7 +137,7 @@ class GroupEditTest extends TestCase
     }
 
     /** @test */
-    public function can_edit_timezone() {
+    public function can_edit_timezone(): void {
         // Get list of timezones.
         $response = $this->get('/api/timezones');
         $response->assertSuccessful();
@@ -158,7 +157,7 @@ class GroupEditTest extends TestCase
     }
 
     /** @test */
-    public function edit_email()
+    public function edit_email(): void
     {
         $this->withoutExceptionHandling();
 
@@ -191,7 +190,7 @@ class GroupEditTest extends TestCase
         $this->assertEquals('info@test.com', $group->email);
     }
 
-    public function testEditAsNetworkCoordinator() {
+    public function testEditAsNetworkCoordinator(): void {
         $network = Network::factory()->create();
         $coordinator = User::factory()->restarter()->create();
         $network->addCoordinator($coordinator);

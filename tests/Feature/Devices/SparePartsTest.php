@@ -32,7 +32,7 @@ class SparePartsTest extends TestCase
     }
 
     /** @test */
-    public function recording_spare_parts_from_manufacturer()
+    public function recording_spare_parts_from_manufacturer(): void
     {
         $iddevices = $this->createDevice($this->event->idevents,
             'misc', null, 1.5, 100, '',
@@ -48,7 +48,7 @@ class SparePartsTest extends TestCase
     }
 
     /** @test */
-    public function recording_spare_parts_from_third_party()
+    public function recording_spare_parts_from_third_party(): void
     {
         $this->device_inputs['repair_status'] = Device::REPAIR_STATUS_REPAIRABLE;
         $this->device_inputs['spare_parts'] = $this->input_spare_parts_from_third_party;
@@ -67,7 +67,7 @@ class SparePartsTest extends TestCase
     }
 
     /** @test */
-    public function recording_no_spare_parts_needed()
+    public function recording_no_spare_parts_needed(): void
     {
         $iddevices = $this->createDevice($this->event->idevents,
             'misc', null, 1.5, 100, '',
@@ -82,7 +82,7 @@ class SparePartsTest extends TestCase
     }
 
     /** @test */
-    public function recording_spare_parts_related_barrier()
+    public function recording_spare_parts_related_barrier(): void
     {
         $iddevices = $this->createDevice($this->event->idevents,
             'misc', Device::BARRIER_SPARE_PARTS_NOT_AVAILABLE_STR, 1.5, 100, '',
@@ -96,7 +96,7 @@ class SparePartsTest extends TestCase
     }
 
     /** @test */
-    public function recording_no_spare_parts_related_barrier()
+    public function recording_no_spare_parts_related_barrier(): void
     {
         $iddevices = $this->createDevice($this->event->idevents,
             'misc', Device::BARRIER_REPAIR_INFORMATION_NOT_AVAILABLE_STR, 1.5, 100, '',

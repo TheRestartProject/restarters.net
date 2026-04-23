@@ -3,6 +3,7 @@
 use App\Images;
 use App\Xref;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Facades\Storage;
 use Intervention\Image\ImageManagerStatic as Image;
 
 class FixometerFile extends Model
@@ -56,11 +57,12 @@ class FixometerFile extends Model
                     ->forceDelete();
         }
 
-        if ($ajax && gettype($user_file['tmp_name']) == 'array') {
-            $error = $user_file['error'][0];
+        // Handle both array and non-array formats for $_FILES
+        if (gettype($user_file['tmp_name']) == 'array') {
+            $error = is_array($user_file['error']) ? $user_file['error'][0] : $user_file['error'];
             $tmp_name = $user_file['tmp_name'][0];
         } else {
-            $error = $user_file['error'];
+            $error = is_array($user_file['error']) ? $user_file['error'][0] : $user_file['error'];
             $tmp_name = $user_file['tmp_name'];
         }
 
@@ -78,6 +80,10 @@ class FixometerFile extends Model
 
             // Fix orientation
             Image::make($lpath)->orientate()->save($lpath);
+
+            if ($type !== 'image') {
+                $this->syncToCloud($filename);
+            }
 
             if ($type === 'image') {
                 $size = getimagesize($this->path);
@@ -129,6 +135,10 @@ class FixometerFile extends Model
                 $thumb->save($_SERVER['DOCUMENT_ROOT'].'/uploads/'.'thumbnail_'.$filename, 85);
                 $mid->save($_SERVER['DOCUMENT_ROOT'].'/uploads/'.'mid_'.$filename, 85);
 
+                $this->syncToCloud($filename);
+                $this->syncToCloud('thumbnail_'.$filename);
+                $this->syncToCloud('mid_'.$filename);
+
                 $this->table = 'images';
                 $Images = new Images;
 
@@ -176,18 +186,35 @@ class FixometerFile extends Model
         return time().sha1_file($tmp_name).rand(1, 15000).'.'.$lext;
     }
 
+    /**
+     * Sync a file from local uploads directory to cloud storage (S3/Tigris).
+     * Only acts when FILESYSTEM_DISK is set to 's3'.
+     */
+    protected function syncToCloud($filename)
+    {
+        if (config('filesystems.default') !== 's3') {
+            return;
+        }
+
+        $localPath = $_SERVER['DOCUMENT_ROOT'].'/uploads/'.$filename;
+
+        if (file_exists($localPath)) {
+            Storage::disk('s3')->put($filename, file_get_contents($localPath), 'public');
+        }
+    }
+
     public function findImages($of_ref_type, $ref_id)
     {
         $sql = 'SELECT * FROM `images` AS `i`
                     INNER JOIN `xref` AS `x` ON `x`.`object` = `i`.`idimages`
-                    WHERE `x`.`object_type` = '.env('TBL_IMAGES').' AND
+                    WHERE `x`.`object_type` = :objectType AND
                     `x`.`reference_type` = :refType AND
                     `x`.`reference` = :refId';
 
         try {
-            return DB::select(DB::raw($sql), ['refType' => $of_ref_type, 'refId' => $ref_id]);
+            return DB::select($sql, ['objectType' => env('TBL_IMAGES'), 'refType' => $of_ref_type, 'refId' => $ref_id]);
         } catch (\Illuminate\Database\QueryException $e) {
-            return db($e);
+            return [];
         }
     }
 
@@ -195,7 +222,7 @@ class FixometerFile extends Model
     {
         // Delete the xref.  This is sufficient to stop the image being attached to the device.  We leave the
         // file in existence in case we want it later for debugging/mining.
-        $sql = 'DELETE FROM `xref` WHERE `idxref` = :id AND `object_type` = '.env('TBL_IMAGES');
-        DB::delete(DB::raw($sql), ['id' => $idxref]);
+        $sql = 'DELETE FROM `xref` WHERE `idxref` = :id AND `object_type` = :objectType';
+        DB::delete($sql, ['id' => $idxref, 'objectType' => env('TBL_IMAGES')]);
     }
 }

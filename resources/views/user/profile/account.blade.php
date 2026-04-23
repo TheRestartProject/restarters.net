@@ -114,19 +114,17 @@
             </div>
             <div class="form-group col-lg-6">
             <label for="assigned_groups">@lang('auth.assigned_groups'):</label>
-            <div class="form-control form-control__select">
-                <select id="assigned_groups" name="assigned_groups[]" class="form-control select2-tags" multiple data-live-search="true" title="Choose groups...">
-                    @if(isset($all_groups))
-                    @foreach($all_groups as $g)
-                        @if (!empty($user_groups) && in_array($g->idgroups, $user_groups))
-                        <option value="<?php echo $g->idgroups; ?>" selected><?php echo $g->name; ?></option>
-                        @else
-                        <option value="<?php echo $g->idgroups; ?>"><?php echo $g->name; ?></option>
-                        @endif
-                    @endforeach
+            <select id="assigned_groups" name="assigned_groups[]" class="form-control" multiple size="8" data-live-search="true" title="Choose groups...">
+                @if(isset($all_groups))
+                @foreach($all_groups as $g)
+                    @if (!empty($user_groups) && in_array($g->idgroups, $user_groups))
+                    <option value="<?php echo $g->idgroups; ?>" selected><?php echo $g->name; ?></option>
+                    @else
+                    <option value="<?php echo $g->idgroups; ?>"><?php echo $g->name; ?></option>
                     @endif
-                </select>
-            </div>
+                @endforeach
+                @endif
+            </select>
             </div>
 
             <div class="form-group col-lg-6 pr-0">

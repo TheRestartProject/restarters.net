@@ -17,7 +17,7 @@
           <div :class="badgeClass + ' d-block d-md-none'">
             {{ status }}
           </div>
-          <b-img v-if="sparePartsNeeded" src="/images/tick.svg" class="icon spare-parts" />
+          <b-img v-if="sparePartsNeeded" :src="imageUrl('/images/tick.svg')" class="icon spare-parts" />
         </div>
       </b-td>
       <b-td class="d-none d-md-table-cell" v-if="powered">
@@ -26,20 +26,20 @@
       <b-td v-if="canedit && powered" class="d-td-cell d-md-none">
         <div>
           <span class="pl-0 pl-md-2 pr-4 clickme edit" @click="editDevice">
-            <b-img class="icon edit" src="/icons/edit_ico_green.svg" />
+            <b-img class="icon edit" :src="imageUrl('/icons/edit_ico_green.svg')" />
           </span>
           <span class="pr-2 clickme" @click="deleteConfirm">
-            <b-img class="icon" src="/icons/delete_ico_red.svg" />
+            <b-img class="icon" :src="imageUrl('/icons/delete_ico_red.svg')" />
           </span>
         </div>
       </b-td>
       <b-td v-if="canedit && !powered" class="d-td-cell d-md-none">
         <div>
           <span class="pl-0 pl-md-2 pr-2 clickme edit" @click="editDevice">
-            <b-img class="icon" src="/icons/edit_ico_green.svg" />
+            <b-img class="icon" :src="imageUrl('/icons/edit_ico_green.svg')" />
           </span>
           <span class="pl-2 pr-2 clickme" @click="deleteConfirm">
-            <b-img class="icon" src="/icons/delete_ico_red.svg" />
+            <b-img class="icon" :src="imageUrl('/icons/delete_ico_red.svg')" />
           </span>
         </div>
       </b-td>
@@ -55,15 +55,15 @@
         </span>
       </b-td>
       <b-td class="text-center d-none d-md-table-cell">
-        <b-img v-if="sparePartsNeeded" src="/images/tick.svg" class="icon spare-parts-tick" />
+        <b-img v-if="sparePartsNeeded" :src="imageUrl('/images/tick.svg')" class="icon spare-parts-tick" />
       </b-td>
       <b-td v-if="canedit" class="text-right d-none d-md-table-cell">
         <div class="d-flex">
           <span class="pl-0 pl-md-2 pr-4 clickme edit" @click="editDevice">
-            <b-img class="icon" src="/icons/edit_ico_green.svg" />
+            <b-img class="icon" :src="imageUrl('/icons/edit_ico_green.svg')" />
           </span>
             <span class="pr-2 clickme" @click="deleteConfirm">
-            <b-img class="icon" src="/icons/delete_ico_red.svg" />
+            <b-img class="icon" :src="imageUrl('/icons/delete_ico_red.svg')" />
           </span>
         </div>
         <ConfirmModal :key="'modal-' + id" ref="confirmDelete" @confirm="deleteConfirmed" :message="__('devices.confirm_delete')" />
@@ -78,13 +78,14 @@
 </template>
 <script>
 import event from '../mixins/event'
+import images from '../mixins/images'
 import { FIXED, REPAIRABLE, END_OF_LIFE, SPARE_PARTS_MANUFACTURER, SPARE_PARTS_THIRD_PARTY } from '../constants'
-import ConfirmModal from './ConfirmModal'
-import EventDevice from './EventDevice'
+import ConfirmModal from './ConfirmModal.vue'
+import EventDevice from './EventDevice.vue'
 
 export default {
   components: {EventDevice, ConfirmModal},
-  mixins: [ event ],
+  mixins: [ event, images ],
   props: {
     idevents: {
       type: Number,
@@ -132,16 +133,16 @@ export default {
       return this.id ? this.$store.getters['devices/byId'](this.id) : null
     },
     translatedCategoryName() {
-      return this.$lang.get('strings.' + this.device.category.name)
+      return this.__(this.device.category.name)
     },
     powered() {
       return this.device.category && this.device.category.powered
     },
     status() {
       switch (this.device.repair_status) {
-        case FIXED: return this.$lang.get('partials.fixed');
-        case REPAIRABLE: return this.$lang.get('partials.repairable');
-        case END_OF_LIFE: return this.$lang.get('partials.end');
+        case FIXED: return this.__('partials.fixed');
+        case REPAIRABLE: return this.__('partials.repairable');
+        case END_OF_LIFE: return this.__('partials.end');
         default: return null
       }
     },
@@ -191,9 +192,9 @@ export default {
 </script>
 <style scoped lang="scss">
 @import 'resources/global/css/_variables';
-@import '~bootstrap/scss/functions';
-@import '~bootstrap/scss/variables';
-@import '~bootstrap/scss/mixins/_breakpoints';
+@import 'bootstrap/scss/functions';
+@import 'bootstrap/scss/variables';
+@import 'bootstrap/scss/mixins/_breakpoints';
 
 .icon {
   width: 21px;

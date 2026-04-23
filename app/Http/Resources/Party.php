@@ -2,6 +2,7 @@
 
 namespace App\Http\Resources;
 
+use Illuminate\Http\Request;
 use Carbon\Carbon;
 use Illuminate\Http\Resources\Json\JsonResource;
 
@@ -238,11 +239,8 @@ class Party extends JsonResource
 {
     /**
      * Transform the resource into an array.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @return array
      */
-    public function toArray($request)
+    public function toArray(Request $request): array
     {
         // We return information which can be public, and we rename fields to look more consistent.
         $networkData = gettype($this->network_data) == 'string' ? json_decode($this->network_data, true) : $this->network_data;

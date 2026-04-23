@@ -4,7 +4,10 @@
       {{ __('groups.about') }}
     </template>
     <template slot="content">
-      <GroupArchivedBadge :idgroups="idgroups" v-if="idgroups" />
+      <div class="badges-row mb-2" v-if="idgroups">
+        <GroupArchivedBadge :idgroups="idgroups" />
+        <GroupTagsBadges :idgroups="idgroups" />
+      </div>
       <div class="d-flex flex-column justify-content-between">
         <div>
           <p v-if="!group.free_text" class="text-muted">
@@ -20,7 +23,7 @@
         </p>
         <div class="d-flex pt-1 pb-1" v-if="group.email">
           <div class="mr-2">
-            <b-img-lazy src="/images/mail_ico.svg" class="icon" />
+            <b-img-lazy :src="imageUrl('/images/mail_ico.svg')" class="icon" />
           </div>
           <div>
             <a :href="'mailto:' + group.email">{{ group.email }}</a>
@@ -28,7 +31,7 @@
         </div>
         <div class="d-flex pt-1 pb-1" v-if="discourseGroup">
           <div class="mr-2">
-            <b-img-lazy src="/icons/talk_ico.svg" class="icon" />
+            <b-img-lazy :src="imageUrl('/icons/talk_ico.svg')" class="icon" />
           </div>
           <div>
             <a :href="discourseGroup">{{ __('groups.talk_group') }}</a>
@@ -41,14 +44,16 @@
 <script>
 import map from '../mixins/map'
 import group from '../mixins/group'
-import ExternalLink from './ExternalLink'
-import CollapsibleSection from './CollapsibleSection'
-import ReadMore from './ReadMore'
+import images from '../mixins/images'
+import ExternalLink from './ExternalLink.vue'
+import CollapsibleSection from './CollapsibleSection.vue'
+import ReadMore from './ReadMore.vue'
 import GroupArchivedBadge from "./GroupArchivedBadge.vue";
+import GroupTagsBadges from "./GroupTagsBadges.vue";
 
 export default {
-  components: {GroupArchivedBadge, ReadMore, CollapsibleSection, ExternalLink},
-  mixins: [ map, group ],
+  components: {GroupArchivedBadge, GroupTagsBadges, ReadMore, CollapsibleSection, ExternalLink},
+  mixins: [ map, group, images ],
   props: {
     idgroups: {
       type: Number,

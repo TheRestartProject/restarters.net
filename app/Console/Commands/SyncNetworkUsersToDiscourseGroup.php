@@ -42,10 +42,8 @@ class SyncNetworkUsersToDiscourseGroup extends Command
 
     /**
      * Execute the console command.
-     *
-     * @return mixed
      */
-    public function handle()
+    public function handle(): void
     {
         if (! config('restarters.features.discourse_integration')) {
             return;

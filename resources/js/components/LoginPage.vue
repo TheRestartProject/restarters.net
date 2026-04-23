@@ -8,7 +8,7 @@
 
           <div id="my_name_wrap" style="display:none;">
             <input name="my_name" type="text" value="" id="my_name">
-            <input name="my_time" type="text" :value="time">
+            <input name="my_time" type="text" v-model="myTimeValue" ref="myTimeInput">
           </div>
 
           <legend>{{ translatedLoginTitle }}</legend>
@@ -79,6 +79,16 @@ export default {
   data () {
     return {
       lastSubmit: null,
+      myTimeValue: this.time,
+    }
+  },
+  mounted() {
+    // Force set the input value directly on the DOM element
+    // Get it from the parent element's data attribute as a fallback
+    const myTimeFromData = this.$el.parentElement?.dataset?.myTime || this.time;
+    if (this.$refs.myTimeInput && myTimeFromData) {
+      this.$refs.myTimeInput.value = myTimeFromData;
+      this.$refs.myTimeInput.setAttribute('value', myTimeFromData);
     }
   },
   computed: {
@@ -86,38 +96,38 @@ export default {
       return this.$store.getters['auth/CSRF']
     },
     translatedLoginTitle() {
-      return this.$lang.get('login.login_title')
+      return this.__('login.login_title')
     },
     translatedEmailAddress() {
-      return this.$lang.get('auth.email_address')
+      return this.__('auth.email_address')
     },
     translatedPassword() {
-      return this.$lang.get('auth.password')
+      return this.__('auth.password')
     },
     translatedForgotPassword() {
-      return this.$lang.get('auth.forgot_password')
+      return this.__('auth.forgot_password')
     },
     translatedCreateAccount() {
-      return this.$lang.get('auth.create_account')
+      return this.__('auth.create_account')
     },
     translatedLogin() {
-      return this.$lang.get('auth.login')
+      return this.__('auth.login')
     },
     translatedWhatIs() {
-      return this.$lang.get('login.whatis')
+      return this.__('login.whatis')
     },
     translatedWhatIsContent() {
-      return this.$lang.get('login.whatis_content')
+      return this.__('login.whatis_content')
     },
     translatedMore() {
-      return this.$lang.get('login.more')
+      return this.__('login.more')
     },
     translatedAuthFailed() {
-      return this.$lang.get('auth.failed')
+      return this.__('auth.failed')
     }
   },
   methods: {
-    submit() {
+    submit(event) {
       // We've seen double submits of the login form, leading to 419 errors.  Prevent the user submitting twice by
       // double-clicking, or because an autosubmit happened and they didn't realise it.  Do this
       // by ignoring submits within 5 seconds of the last submit.
@@ -127,8 +137,6 @@ export default {
       if (!this.lastSubmit || this.lastSubmit < Date.now() - 5000) {
         this.lastSubmit = Date.now()
         this.$refs.form.submit()
-      } else {
-        console.log('Ignore double submit')
       }
     }
   }

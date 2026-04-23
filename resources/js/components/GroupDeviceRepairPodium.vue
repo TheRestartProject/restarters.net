@@ -44,15 +44,15 @@ export default {
   },
   computed: {
     translatedName() {
-      return this.$lang.get('strings.' + this.device.name)
+      return this.__(this.device.name)
     }
   }
 }
 </script>
 <style scoped lang="scss">
-@import '~bootstrap/scss/functions';
-@import '~bootstrap/scss/variables';
-@import '~bootstrap/scss/mixins/_breakpoints';
+@import 'bootstrap/scss/functions';
+@import 'bootstrap/scss/variables';
+@import 'bootstrap/scss/mixins/_breakpoints';
 
 .height {
   height: 152px;

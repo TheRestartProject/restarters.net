@@ -8,10 +8,8 @@ return new class extends Migration
 {
     /**
      * Run the migrations.
-     *
-     * @return void
      */
-    public function up()
+    public function up(): void
     {
         DB::statement('ALTER TABLE `devices`  ADD `estimate_old` VARCHAR(10) AFTER `estimate`');
         DB::statement('UPDATE devices SET `estimate_old` = `estimate`');
@@ -23,10 +21,8 @@ return new class extends Migration
 
     /**
      * Reverse the migrations.
-     *
-     * @return void
      */
-    public function down()
+    public function down(): void
     {
         DB::statement('ALTER TABLE `devices` DROP `estimate`');
         DB::statement('ALTER TABLE `devices` CHANGE `estimate_old` `estimate` VARCHAR(10)');

@@ -10,7 +10,7 @@ use Tests\TestCase;
 
 class CategoryTest extends TestCase
 {
-    public function testBasic()
+    public function testBasic(): void
     {
         $this->loginAsTestUser(Role::ADMINISTRATOR);
 
@@ -41,7 +41,7 @@ class CategoryTest extends TestCase
         $response->assertSessionHas('success');
     }
 
-    public function testErrors() {
+    public function testErrors(): void {
         $this->loginAsTestUser(Role::RESTARTER);
 
         $response = $this->get('/category/edit/111');

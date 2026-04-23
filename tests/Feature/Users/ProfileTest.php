@@ -12,7 +12,7 @@ use Illuminate\Support\Facades\Hash;
 
 class ProfileTest extends TestCase
 {
-    public function testProfilePage()
+    public function testProfilePage(): void
     {
         $user = User::factory()->restarter()->create();
 
@@ -36,7 +36,7 @@ class ProfileTest extends TestCase
         $response->assertSee(__('profile.my_skills'));
     }
 
-    public function testEdit()
+    public function testEdit(): void
     {
         $GLOBALS['_FILES'] = [];
         $user1 = User::factory()->restarter()->create();
@@ -69,12 +69,15 @@ class ProfileTest extends TestCase
 
         $this->assertEquals('', $response->getContent());
 
-        // A restart acting on another restart.
+        // A restart acting on another restart - should be unauthorized.
         $this->actingAs($user2);
 
-        $response = $this->post('/user/edit/'.$user1->id, $editdata);
-
-        $this->assertEquals('', $response->getContent());
+        try {
+            $response = $this->post('/user/edit/'.$user1->id, $editdata);
+            $this->assertFalse(true); // Should not reach here
+        } catch (\Symfony\Component\HttpKernel\Exception\HttpException $e) {
+            $this->assertEquals(403, $e->getStatusCode());
+        }
 
         // A host acting on a restarter - can.
         $this->actingAs($host);
@@ -83,22 +86,25 @@ class ProfileTest extends TestCase
 
         $response->assertSee('Edit User');
 
-        // A network coordinator acting on a restarter - can't.
+        // A network coordinator acting on a restarter - should be unauthorized.
         $this->actingAs($nc);
 
-        $response = $this->post('/user/edit/'.$user1->id, $editdata);
-
-        $response->assertSee('');
+        try {
+            $response = $this->post('/user/edit/'.$user1->id, $editdata);
+            $this->assertFalse(true); // Should not reach here
+        } catch (\Symfony\Component\HttpKernel\Exception\HttpException $e) {
+            $this->assertEquals(403, $e->getStatusCode());
+        }
 
         // An administrator acting on a restarter - can.
-        $this->actingAs($host);
+        $this->actingAs($admin);
 
         $response = $this->post('/user/edit/'.$user1->id, $editdata);
 
         $response->assertSee('Edit User');
     }
 
-    public function testEditBadPassword()
+    public function testEditBadPassword(): void
     {
         $GLOBALS['_FILES'] = [];
         $user1 = User::factory()->restarter()->create();
@@ -119,13 +125,13 @@ class ProfileTest extends TestCase
         $response->assertSee('The passwords are not identical!');
     }
 
-    public function testBadMediaWikiId()
+    public function testBadMediaWikiId(): void
     {
         $this->expectException(NotFoundHttpException::class);
         $this->get('/user/thumbnail?wiki_username=invalid');
     }
 
-    public function testChangePassword() {
+    public function testChangePassword(): void {
         $user = User::factory()->restarter()->create();
         $user->setPassword(Hash::make('secret1'));
 
@@ -144,7 +150,7 @@ class ProfileTest extends TestCase
         $this->assertEquals(__('profile.password_changed'), \Session::get('message'));
     }
 
-    public function testRepairDirectoryRole() {
+    public function testRepairDirectoryRole(): void {
         $user = User::factory()->restarter()->create();
         $admin = User::factory()->administrator()->create([
             'repairdir_role' => Role::REPAIR_DIRECTORY_SUPERADMIN
@@ -160,7 +166,7 @@ class ProfileTest extends TestCase
         $this->assertEquals(__('profile.profile_updated'), \Session::get('message'));
     }
 
-    public function testLanguage() {
+    public function testLanguage(): void {
         $user = User::factory()->restarter()->create();
         $this->actingAs($user);
 
@@ -175,7 +181,7 @@ class ProfileTest extends TestCase
     /**
      * @dataProvider invitesProvider
      */
-    public function testInvites($admin, $invites) {
+    public function testInvites($admin, $invites): void {
         $user = User::factory()->restarter()->create();
 
         $params = [];
@@ -199,7 +205,7 @@ class ProfileTest extends TestCase
         $this->assertEquals($invites, $user->invites);
     }
 
-    public function invitesProvider() {
+    public function invitesProvider(): array {
         return [
             [ FALSE, 0 ],
             [ FALSE, 1 ],
@@ -208,7 +214,7 @@ class ProfileTest extends TestCase
         ];
     }
 
-    public function testAPI() {
+    public function testAPI(): void {
         $user = User::factory()->administrator()->create([
                                                                       'api_token' => '1234',
                                                                   ]);

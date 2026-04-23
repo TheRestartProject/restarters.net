@@ -1,15 +1,19 @@
 <template>
   <div>
     <vue-dropzone ref="dropzone" id="dropzone" :options="dropzoneOptions" @vdropzone-sending="sendingEvent" class="ourdropzone" useCustomSlot @vdropzone-success-multiple="success">
-      <b-img src="/images/upload_ico_grey.svg" />
+      <b-img :src="imageUrl('/images/upload_ico_grey.svg')" />
       <div class="dz-message d-none" />
     </vue-dropzone>
   </div>
 </template>
 <script>
-import vue2Dropzone from 'vue2-dropzone'
+import images from '../mixins/images'
 
 export default {
+  mixins: [images],
+  components: {
+    vueDropzone: () => import('vue2-dropzone').then(m => m.VueDropzone || m.default || m)
+  },
   props: {
     url: {
       type: String,
@@ -24,9 +28,6 @@ export default {
       required: false,
       default: 1
     },
-  },
-  components: {
-    vueDropzone: vue2Dropzone
   },
   computed: {
     dropzoneOptions () {

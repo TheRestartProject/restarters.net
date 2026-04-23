@@ -9,6 +9,8 @@ const config = {
   // Only use 1 worker, otherwise we hit CSRF issues.
   workers: 1,
 
+  // Exclude the slow autocomplete test from the main test run
+  grep: /^(?!.*Automatic category suggestion from item type)/,
 
   use: {
     trace: 'on',
@@ -18,17 +20,15 @@ const config = {
     video: 'on',
     // Configurable timeout for waitForURL operations
     navigationTimeout: 30000,
-    // Add header to identify Playwright requests
-    extraHTTPHeaders: {
-      'X-Playwright-Test': 'true'
-    },
+    // Note: We use route interception to add X-Playwright-Test header only to our backend,
+    // not to CDN resources, to avoid CORS issues. See baseURL project config below.
   },
   projects: [
     {
       name: 'Desktop Chromium',
       use: {
         browserName: 'chromium',
-        baseURL: process.env.PLAYWRIGHT_BASE_URL || 'http://localhost:8000'
+        baseURL: process.env.PLAYWRIGHT_BASE_URL || 'http://restarters_nginx'
       },
     },
     // TODO The other browsers don't work reliably yet.

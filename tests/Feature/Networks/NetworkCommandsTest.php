@@ -12,7 +12,7 @@ use function PHPUnit\Framework\assertFalse;
 use function PHPUnit\Framework\assertTrue;
 
 class NetworkCommandsTest extends TestCase {
-    public function testCreate() {
+    public function testCreate(): void {
         $this->artisan('network:create testname testshortname "test description" --website="https://therestartproject.org" --language=fr --timezone="Asia/Samarkand" --wordpress --zapier --drip --auto-approve-events')->assertExitCode(0);
         $network = Network::orderBy('id', 'desc')->first();
         $this->assertEquals('testname', $network->name);
@@ -27,7 +27,7 @@ class NetworkCommandsTest extends TestCase {
         $this->assertEquals(true, $network->auto_approve_events);
     }
 
-    public function testNetworkCoordinator() {
+    public function testNetworkCoordinator(): void {
         $this->artisan('network:create testname testshortname "test description" --website="https://therestartproject.org" --language=fr --timezone="Asia/Samarkand" --wordpress --zapier --drip --auto-approve-events')->assertExitCode(0);
         $network = Network::orderBy('id', 'desc')->first();
 
@@ -41,7 +41,7 @@ class NetworkCommandsTest extends TestCase {
         assertTrue($user->isCoordinatorForGroup($group));
     }
 
-    public function testAddGroup() {
+    public function testAddGroup(): void {
         $this->artisan('network:create testname testshortname "test description" --website="https://therestartproject.org" --language=fr --timezone="Asia/Samarkand" --wordpress --zapier --drip --auto-approve-events')->assertExitCode(0);
         $network = Network::orderBy('id', 'desc')->first();
 

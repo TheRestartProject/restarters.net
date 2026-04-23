@@ -83,6 +83,9 @@ class NotificationsTest extends TestCase
 
     private $outputs = [];
 
+    private $useren = null;
+    private $userfr = null;
+
     protected function setUp(): void {
         parent::setUp();
 
@@ -800,18 +803,18 @@ class NotificationsTest extends TestCase
     }
 
     // Generate all the actual outputs.  Useful when maintaining this test.
-    public function testGenerateOutputs()
+    public function testGenerateOutputs(): void
     {
         foreach ($this->classes as $class)
         {
             $notificationen = new $class($this->params, $this->useren);
 
-            $outputs[$class]['mail']['en'] = $notificationen->toMail($this->useren)->toArray();
-            $outputs[$class]['array']['en'] = $notificationen->toArray($this->useren);
+            $this->outputs[$class]['mail']['en'] = $notificationen->toMail($this->useren)->toArray();
+            $this->outputs[$class]['array']['en'] = $notificationen->toArray($this->useren);
 
             $notificationfr = new $class($this->params, $this->userfr);
-            $outputs[$class]['mail']['fr'] = $notificationfr->toMail($this->userfr)->toArray();
-            $outputs[$class]['array']['fr'] = $notificationfr->toArray($this->userfr);
+            $this->outputs[$class]['mail']['fr'] = $notificationfr->toMail($this->userfr)->toArray();
+            $this->outputs[$class]['array']['fr'] = $notificationfr->toArray($this->userfr);
         }
 
 //        $this->recursive_print('$this->outputs', $outputs);
@@ -832,7 +835,7 @@ class NotificationsTest extends TestCase
     }
 
     // Test all the notifications generate the expected outputs.
-    public function testCompareOutputs()
+    public function testCompareOutputs(): void
     {
         foreach ($this->classes as $class)
         {

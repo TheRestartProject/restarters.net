@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use Illuminate\Http\RedirectResponse;
 use App\Brands;
 use App\Cluster;
 use App\Device;
@@ -26,7 +27,7 @@ use View;
 
 class DeviceController extends Controller
 {
-    public function index($search = null)
+    public function index($search = null): \Illuminate\View\View
     {
         $user = User::getProfile(Auth::id());
         $clusters = Cluster::with(['categories'])->get()->all();
@@ -105,7 +106,7 @@ class DeviceController extends Controller
         }
     }
 
-    public function deleteImage($device_id, $idxref)
+    public function deleteImage($device_id, $idxref): RedirectResponse
     {
         $user = Auth::user();
 

@@ -17,7 +17,7 @@
     <div class="impact-stat-subtitle" v-html="translatedSubtitle" />
     <div v-if="description && count > 0" class="impact-stat-description pt-3 m-3 d-flex" >
       <span v-html="translatedDescription" />
-      <b-img v-if="popover" v-b-popover.html="popover" class="ml-2 icon-info clickable" src="/icons/info_ico_green.svg" />
+      <b-img v-if="popover" v-b-popover.html="popover" class="ml-2 icon-info clickable" :src="imageUrl('/icons/info_ico_green.svg')" />
     </div>
     <div class="image d-flex justify-content-around" v-if="image">
       <b-img :src="image" />
@@ -30,7 +30,10 @@
   </div>
 </template>
 <script>
+import images from '../mixins/images'
+
 export default {
+  mixins: [images],
   props: {
     variant: {
       type: String,
@@ -124,19 +127,19 @@ export default {
   computed: {
     src() {
       // All our icons are SVG files in asset/icons.
-      return '/images/' + this.icon + '.svg'
+      return this.imageUrl('/images/' + this.icon + '.svg')
     },
     className() {
       return 'impact-stat impact-stat-' + this.size + ' impact-stat-' + this.variant + (this.border ? ' hasBorder' : '')
     },
     translatedTitle() {
-      return this.translate ? this.$lang.choice(this.title, this.roundedCount) : this.title
+      return this.translate ? this.__(this.title, { count: this.roundedCount }) : this.title
     },
     translatedSubtitle() {
-      return this.translate ? this.$lang.get(this.subtitle) : this.subtitle
+      return this.translate ? this.__(this.subtitle) : this.subtitle
     },
     translatedDescription() {
-      return this.translate ? this.$lang.get(this.description) : this.description
+      return this.translate ? this.__(this.description) : this.description
     },
     roundedCount() {
       if (this.roundTo) {
@@ -158,9 +161,9 @@ export default {
 </script>
 <style scoped lang="scss">
 @import 'resources/global/css/_variables';
-@import '~bootstrap/scss/functions';
-@import '~bootstrap/scss/variables';
-@import '~bootstrap/scss/mixins/_breakpoints';
+@import 'bootstrap/scss/functions';
+@import 'bootstrap/scss/variables';
+@import 'bootstrap/scss/mixins/_breakpoints';
 
 /* Using a prefix to avoid possible collision with any global style rules.
  * 'impact' can refer to either a repair related impact stat, or an environmental impact stat.  */

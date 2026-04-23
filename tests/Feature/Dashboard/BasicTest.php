@@ -15,6 +15,8 @@ use function PHPUnit\Framework\assertEquals;
 
 class BasicTest extends TestCase
 {
+    protected $idgroups;
+
     protected function setUp(): void
     {
         parent::setUp();
@@ -26,7 +28,7 @@ class BasicTest extends TestCase
     /**
      *@dataProvider provider
      */
-    public function testPageLoads($city, $country, $lat, $lng, $nearbyGroupCount)
+    public function testPageLoads($city, $country, $lat, $lng, $nearbyGroupCount): void
     {
         // Test the dashboard page loads and shows a nearby group when relevant.
         $user = User::factory()->host()->create();
@@ -84,7 +86,7 @@ class BasicTest extends TestCase
         ];
     }
 
-    public function testUpcomingEvents() {
+    public function testUpcomingEvents(): void {
         $host = User::factory()->restarter()->create();
 
         // Create an event.
