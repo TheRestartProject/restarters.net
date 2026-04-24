@@ -36,7 +36,7 @@ class EventsUsersObserver {
         $user = $iduser ? User::find($iduser) : null;
         
         if ($user) {
-            if ($eu->status === '1') {
+            if ((string) $eu->status === '1') {
                 // Confirmed.  Make sure they are on the thread.
                 $this->confirmed($event, $user, true);
             } else {
@@ -59,7 +59,7 @@ class EventsUsersObserver {
         if ($eu->isDirty('status')) {
             // The confirmed status has changed, so we need to update the thread.
 
-            if ($eu->status === '1') {
+            if ((string) $eu->status === '1') {
                 // Confirmed.  Make sure they are on the thread.
                 $this->confirmed($event, $user, true);
             } else {
@@ -81,7 +81,7 @@ class EventsUsersObserver {
 
         // Make sure they are not on the thread.  If they were confirmed, we need to update the volunteer count.
         if ($user) {
-            $this->removed($event, $user, $eu->status === '1');
+            $this->removed($event, $user, (string) $eu->status === '1');
         }
     }
 

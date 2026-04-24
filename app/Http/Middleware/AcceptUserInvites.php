@@ -39,7 +39,7 @@ class AcceptUserInvites
                         UserGroups::updateOrCreate([
                             'user' => auth()->id(),
                             'group' => $acceptance->record_id,
-                            'status' => 1,
+                            'status' => '1',
                             'role' => 4,
                         ]);
                         $acceptance->delete();
@@ -72,7 +72,7 @@ class AcceptUserInvites
                         EventsUsers::updateOrCreate([
                             'user' => auth()->id(),
                             'event' => $acceptance->record_id,
-                            'status' => 1,
+                            'status' => '1',
                             'role' => 4,
                         ]);
                         $acceptance->delete();

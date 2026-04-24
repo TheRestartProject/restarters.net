@@ -193,14 +193,14 @@ class EventController extends Controller
 
         if ($userWasInvited) {
             $invitedUser = $invitedUserQuery->first();
-            $invitedUser->status = 1;
+            $invitedUser->status = '1';
             $invitedUser->save();
         } else {
             // Let's add the volunteer.
             EventsUsers::create([
                 'event' => $idevents,
                 'user' => $user,
-                'status' => 1,
+                'status' => '1',
                 'role' => $eventRole,
                 'full_name' => $full_name,
             ]);
@@ -507,7 +507,7 @@ class EventController extends Controller
         EventsUsers::create([
             'event' => $idParty,
             'user' => $user->id,
-            'status' => 1,
+            'status' => '1',
             'role' => Role::HOST,
         ]);
 

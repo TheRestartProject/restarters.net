@@ -359,7 +359,7 @@ class Party extends Model implements Auditable
 
     public function allInvited(): HasMany
     {
-        return $this->hasMany(\App\EventsUsers::class, 'event', 'idevents')->where('status', '!=', 1);
+        return $this->hasMany(\App\EventsUsers::class, 'event', 'idevents')->where('status', '<>', '1');
     }
 
     public function allConfirmedVolunteers(): HasMany
