@@ -139,10 +139,10 @@ class PartyController extends Controller
             // This is a logged-in user's events page.  We want all relevant events.
             //
             // Get the list of events we are attending and invited to- speeds up expansion.
-            $attending = EventsUsers::where('user', Auth::user()->id)->where('status', 1)->pluck('event')->toArray();
-            $invited = EventsUsers::where('user', Auth::user()->id)->where('status', '!=', 1)->pluck('event')->toArray();
+            $attending = EventsUsers::where('user', Auth::user()->id)->where('status', '1')->pluck('event')->toArray();
+            $invited = EventsUsers::where('user', Auth::user()->id)->where('status', '<>', '1')->pluck('event')->toArray();
             $volunteering = EventsUsers::where('user', Auth::user()->id)->where(function($query) {
-                $query->where('status', 1)->orWhereNull('status');
+                $query->where('status', '1')->orWhereNull('status');
             })->pluck('event')->toArray();
 
             foreach (Party::forUser(null)->reorder()->orderBy('event_start_utc', 'DESC')->get() as $event) {
@@ -351,7 +351,7 @@ class PartyController extends Controller
             $attended_summary = clone $attendees->take(6)->get();
         }
 
-        $invites = EventsUsers::where('event', $id)->where('status', '!=', 1);
+        $invites = EventsUsers::where('event', $id)->where('status', '<>', '1');
         $invited = clone $invites->get();
 
         if (count($invited) > 5 && ! $event->hasFinished() && ! Auth::guest() && ! Fixometer::hasRole(Auth::user(), 'Restarter')) {
@@ -423,7 +423,7 @@ class PartyController extends Controller
         $user_id = Auth::id();
         $not_in_event = EventsUsers::where('event', $event_id)
         ->where('user', $user_id)
-        ->where('status', '!=', 1)
+        ->where('status', '<>', '1')
         ->first();
 
         if (empty($not_in_event)) {

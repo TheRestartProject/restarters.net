@@ -180,8 +180,8 @@ export default {
       this.groupId = event.group.id
       this.groupName = event.group.name
 
-      // Fetch group volunteers to get their emails
-      await this.$store.dispatch('volunteers/fetchGroup', this.groupId)
+      // Fetch group volunteers, excluding those already confirmed at this event
+      await this.$store.dispatch('volunteers/fetchGroup', { id: this.groupId, excludeEvent: this.idevents })
 
       this.showModal = true
     },

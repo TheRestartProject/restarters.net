@@ -259,7 +259,7 @@ class Group extends Model implements Auditable
         return $this->allVolunteers()
             ->where(function ($query) {
                 $query->whereNull('deleted_at')
-                    ->where('status', 1)
+                    ->where('status', '1')
                         ->orWhereNull('status');
             });
     }

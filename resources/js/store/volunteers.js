@@ -43,8 +43,11 @@ export default {
     set({commit}, params) {
       commit('set', params);
     },
-    async fetchGroup({commit}, id) {
-      const ret = await axios.get('/api/v2/groups/' + id + '/volunteers')
+    async fetchGroup({commit}, payload) {
+      const id = typeof payload === 'object' ? payload.id : payload
+      const excludeEvent = typeof payload === 'object' ? payload.excludeEvent : null
+      const params = excludeEvent ? { exclude_event: excludeEvent } : {}
+      const ret = await axios.get('/api/v2/groups/' + id + '/volunteers', { params })
       commit('setGroup', {
         groupID: id,
         volunteers: ret.data.data

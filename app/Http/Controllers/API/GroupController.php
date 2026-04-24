@@ -16,6 +16,7 @@ use App\Network;
 use App\Notifications\AdminModerationGroup;
 use App\Notifications\GroupConfirmed;
 use App\Notifications\NewGroupWithinRadius;
+use App\EventsUsers;
 use App\Party;
 use App\Role;
 use App\Rules\Timezone;
@@ -500,10 +501,20 @@ class GroupController extends Controller
      *     )
      */
 
-    public static function getVolunteersForGroupv2($idgroups) {
+    public function getVolunteersForGroupv2(Request $request, $idgroups) {
         $group = Group::findOrFail($idgroups);
-        $volunteers = $group->allConfirmedVolunteers()->get();
-        return VolunteerCollection::make($volunteers);
+        $query = $group->allConfirmedVolunteers();
+
+        // Optionally exclude users already confirmed at a specific event.
+        $excludeEvent = $request->query('exclude_event');
+        if ($excludeEvent) {
+            $confirmedUserIds = EventsUsers::where('event', $excludeEvent)
+                ->where('status', '1')
+                ->pluck('user');
+            $query = $query->whereNotIn('users_groups.user', $confirmedUserIds);
+        }
+
+        return VolunteerCollection::make($query->get());
     }
 
     /**
