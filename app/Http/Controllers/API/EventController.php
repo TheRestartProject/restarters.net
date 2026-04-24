@@ -186,7 +186,7 @@ class EventController extends Controller
         // Check if user was invited but not RSVPed.
         $invitedUserQuery = EventsUsers::where('event', $idevents)
             ->where('user', $user)
-            ->where('status', '<>', 1)
+            ->where('status', '<>', '1')
             ->whereNotNull('status')
             ->where('role', $eventRole);
         $userWasInvited = $invitedUserQuery->count() == 1;

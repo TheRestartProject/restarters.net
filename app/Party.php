@@ -267,7 +267,7 @@ class Party extends Model implements Auditable
         $this->defaultUserIds($userids);
         $query = $query->approved();
         $query = $query->join('users_groups AS hfgug', 'hfgug.group', '=', 'events.group')
-            ->where('hfgug.status', 1)
+            ->where('hfgug.status', '1')
             ->whereNull('hfgug.deleted_at')
             ->whereIn('hfgug.user', $userids)
             ->select('events.*');
