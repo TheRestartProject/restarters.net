@@ -75,7 +75,6 @@ class UserCreate extends Command
                                      'name' => $name,
                                      'email' => $email,
                                      'password' => Hash::make($password),
-                                     'role' => Role::RESTARTER,
                                      'recovery' => substr(bin2hex(openssl_random_pseudo_bytes(32)), 0, 24),
                                      'recovery_expires' => strftime('%Y-%m-%d %X', time() + (24 * 60 * 60)),
                                      'calendar_hash' => Str::random(15),
@@ -84,6 +83,10 @@ class UserCreate extends Command
                                      'language' => $language,
                                      'repair_network' => $repair_network_id,
                                  ]);
+
+            // role excluded from $fillable (security: C2/M1); set via direct assignment
+            $user->role = Role::RESTARTER;
+            $user->save();
 
             if ($user)
             {

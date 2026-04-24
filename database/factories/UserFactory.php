@@ -42,50 +42,59 @@ class UserFactory extends Factory
         'number_of_logins' => 1,
         'age' => $this->faker->year(),
         'country_code' => $this->faker->countryCode(),
-        'role' => Role::RESTARTER,
         'invites' => 1,
         'repairdir_role' => Role::REPAIR_DIRECTORY_NONE,
-        'api_token' => \Illuminate\Support\Str::random(60)
     ];
+    }
+
+    // role and api_token are excluded from $fillable (security: C2/M1) so they
+    // must be set via direct assignment after the record is created.
+    public function configure()
+    {
+        return $this->afterCreating(function (User $user) {
+            if (is_null($user->role)) {
+                $user->role = Role::RESTARTER;
+            }
+            if (is_null($user->api_token)) {
+                $user->api_token = Str::random(60);
+            }
+            $user->saveQuietly();
+        });
     }
 
     public function restarter()
     {
-        return $this->state(function () {
-            return [
-        'role' => Role::RESTARTER,
-        'username' => '',
-    ];
+        return $this->afterCreating(function (User $user) {
+            $user->role = Role::RESTARTER;
+            $user->username = '';
+            $user->saveQuietly();
         });
     }
 
     public function host()
     {
-        return $this->state(function () {
-            return [
-        'role' => Role::HOST,
-        'username' => '',
-    ];
+        return $this->afterCreating(function (User $user) {
+            $user->role = Role::HOST;
+            $user->username = '';
+            $user->saveQuietly();
         });
     }
 
     public function administrator()
     {
-        return $this->state(function () {
-            return [
-        'role' => Role::ADMINISTRATOR,
-        'username' => '',
-    ];
+        return $this->afterCreating(function (User $user) {
+            $user->role = Role::ADMINISTRATOR;
+            $user->username = '';
+            $user->saveQuietly();
         });
     }
 
     public function networkCoordinator()
     {
-        return $this->state(function () {
-            return [
-        'role' => Role::NETWORK_COORDINATOR,
-        'username' => '',
-    ];
+        return $this->afterCreating(function (User $user) {
+            $user->role = Role::NETWORK_COORDINATOR;
+            $user->username = '';
+            $user->saveQuietly();
         });
     }
 }
