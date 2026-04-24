@@ -51,6 +51,7 @@ primary_region = "lhr"
   # Misc
   L5_SWAGGER_GENERATE_ALWAYS = "false"
   VITE_MANIFEST_PATH = "public/build/manifest.json"
+  BASIC_AUTH_ENABLED = "true"
 
 [http_service]
   internal_port = 80

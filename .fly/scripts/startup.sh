@@ -28,6 +28,15 @@ rm -rf /var/www/storage/logs
 ln -sf /var/log/laravel /var/www/storage/logs
 chown -R www-data:www-data /var/log/laravel
 
+# Set up basic auth for non-production deployments (prevents scraping on dev/staging).
+if [ "${BASIC_AUTH_ENABLED:-}" = "true" ]; then
+    printf 'restart:%s\n' "$(openssl passwd -apr1 'project')" > /etc/nginx/.htpasswd
+    printf 'auth_basic "Restarters";\nauth_basic_user_file /etc/nginx/.htpasswd;\n' \
+        > /etc/nginx/basic-auth.conf
+else
+    : > /etc/nginx/basic-auth.conf
+fi
+
 # Substitute environment variables in nginx config for Tigris proxy.
 # Always run envsubst — nginx fails to start if the variables remain as literals.
 # nginx set/proxy_set_header directives require non-empty values, so fall back to
