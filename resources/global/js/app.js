@@ -3,6 +3,7 @@
 import './components/dropdown.js';
 import './components/ajax-search-discourse-notifications.js';
 import './components/check-auth.js';
+import '../../js/misc/notifications.js';
 
 // Use strict mode to reduce development errors.
 "use strict";
