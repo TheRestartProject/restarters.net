@@ -85,7 +85,7 @@ class PartyController extends Controller
             } else {
                 $is_attending = EventsUsers::where('event', $event->idevents)->where('user', Auth::user()->id)->first();
 
-                if ($is_attending && $is_attending->status !== 1) {
+                if ($is_attending && (string) $is_attending->status !== '1') {
                     $thisone['invitation'] = "/party/accept-invite/{$event->idevents}/{$is_attending->status}";
                 }
             }
@@ -439,7 +439,7 @@ class PartyController extends Controller
                                                                   'user' => $user_id,
                                                                   'event' => $event_id,
                                                               ], [
-                                                                  'status' => 1,
+                                                                  'status' => '1',
                                                                   'role' => 4,
                                                               ]);
 
@@ -521,7 +521,7 @@ class PartyController extends Controller
     {
         $group_user_ids = UserGroups::where('group', Party::find($event_id)->group)
         ->where('user', '!=', Auth::user()->id)
-        ->where('status', '=', 1)
+        ->where('status', '1')
         ->pluck('user')
         ->toArray();
 
@@ -721,7 +721,7 @@ class PartyController extends Controller
         if (! empty($user_event)) {
             // Update event invite
             EventsUsers::where('status', $hash)->where('event', $event_id)->first()->update([
-                'status' => 1,
+                'status' => '1',
             ]);
 
             $this->notifyHostsOfRsvp($user_event, $event_id);
