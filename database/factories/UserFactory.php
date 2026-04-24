@@ -42,6 +42,8 @@ class UserFactory extends Factory
         'number_of_logins' => 1,
         'age' => $this->faker->year(),
         'country_code' => $this->faker->countryCode(),
+        // role and api_token are excluded from $fillable (security: C2/M1) but factories
+        // use Model::unguarded() internally so these are set correctly without mass assignment.
         'role' => Role::RESTARTER,
         'invites' => 1,
         'repairdir_role' => Role::REPAIR_DIRECTORY_NONE,

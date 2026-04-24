@@ -63,10 +63,13 @@ class RegisterController extends Controller
                                 'name' => $data['name'],
                                 'email' => $data['email'],
                                 'password' => Hash::make($data['password']),
-            'role' => 4,
             'recovery' => substr(bin2hex(openssl_random_pseudo_bytes(32)), 0, 24),
             'recovery_expires' => strftime('%Y-%m-%d %X', time() + (24 * 60 * 60)),
                             ]);
+
+        // role excluded from $fillable (security: C2/M1); set via direct assignment
+        $user->role = 4;
+        $user->save();
 
         Session::createSession($user->id);
 

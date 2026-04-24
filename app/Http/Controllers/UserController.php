@@ -148,10 +148,9 @@ class UserController extends Controller
             return redirect()->back()->withErrors($validator)->withInput();
         }
 
-        if ($request->input('id') !== null) {
-            $id = $request->input('id');
-        } else {
-            $id = Auth::id();
+        $id = $request->input('id', Auth::id());
+        if ($id != Auth::id() && ! Auth::user()->hasRole('Administrator')) {
+            abort(403);
         }
 
         User::find($id)->update([
@@ -187,10 +186,9 @@ class UserController extends Controller
 
     public function postProfilePasswordEdit(Request $request): RedirectResponse
     {
-        if ($request->input('id') !== null) {
-            $id = $request->input('id');
-        } else {
-            $id = Auth::id();
+        $id = $request->input('id', Auth::id());
+        if ($id != Auth::id() && ! Auth::user()->hasRole('Administrator')) {
+            abort(403);
         }
 
         $user = User::find($id);
@@ -339,10 +337,9 @@ class UserController extends Controller
 
     public function postProfilePictureEdit(Request $request): RedirectResponse
     {
-        if ($request->input('id') !== null) {
-            $id = $request->input('id');
-        } else {
-            $id = Auth::id();
+        $id = $request->input('id', Auth::id());
+        if ($id != Auth::id() && ! Auth::user()->hasRole('Administrator')) {
+            abort(403);
         }
 
         if (isset($_FILES) && ! empty($_FILES)) {
@@ -357,20 +354,18 @@ class UserController extends Controller
 
     public function postAdminEdit(Request $request): RedirectResponse
     {
-        if ($request->input('id') !== null) {
-            $user_id = $request->input('id');
-        } else {
-            $user_id = Auth::id();
+        if (! Auth::user()->hasRole('Administrator')) {
+            abort(403);
         }
 
+        $user_id = $request->input('id', Auth::id());
         $user = User::find($user_id);
 
         $oldRole = $user->role;
 
-        // Set role for User
-        $user->update([
-            'role' => $request->input('user_role'),
-        ]);
+        // Set role for User — assign directly since role is not mass-assignable
+        $user->role = $request->input('user_role');
+        $user->save();
 
         // If we are demoting from NetworkCoordinator, remove them from the list of coordinators for
         // any networks they are currently coordinating.
@@ -744,11 +739,12 @@ class UserController extends Controller
             $Groups = new Group;
             $Groups = $Groups->findAll();
 
-            $data = $request->post();
+            $sent_groups = $request->input('groups', []);
 
-            if (! Fixometer::hasRole($User->find($id), 'Administrator')) {
-                $sent_groups = $data['groups'];
-            }
+            $data = $request->only([
+                'name', 'email', 'location', 'age', 'gender', 'country_code',
+                'biography', 'language', 'newsletter', 'invites',
+            ]);
 
             $error = false;
             // check for email in use
@@ -757,20 +753,13 @@ class UserController extends Controller
                 $error['email'] = 'The email you entered is already in use in our database. Please use another one.';
             }
 
-            if (! empty($data['new-password'])) {
-                if ($data['new-password'] !== $data['password-confirm']) {
+            if ($request->filled('new-password')) {
+                if ($request->input('new-password') !== $request->input('password-confirm')) {
                     $error['password'] = 'The passwords are not identical!';
                 } else {
-                    $data['password'] = Hash::make($data['new-password']);
+                    $data['password'] = Hash::make($request->input('new-password'));
                 }
             }
-
-            unset($data['new-password']);
-            unset($data['password-confirm']);
-
-            unset($data['groups']);
-            unset($data['profile']);
-            unset($data['id']);
 
             if (! is_array($error)) {
                 $u = $User->find($id)->update($data);
@@ -930,7 +919,6 @@ class UserController extends Controller
                 'name' => $request->input('name'),
                 'email' => $request->input('email'),
                 'password' => Hash::make($request->input('password')),
-                'role' => $role,
                 'recovery' => substr(bin2hex(openssl_random_pseudo_bytes(32)), 0, 24),
                 'recovery_expires' => strftime('%Y-%m-%d %X', time() + (24 * 60 * 60)),
                 'country_code' => $request->input('country'),
@@ -940,6 +928,10 @@ class UserController extends Controller
                 'calendar_hash' => Str::random(15),
                 'username' => '',
             ]);
+
+            // role excluded from $fillable (security: C2/M1); set via direct assignment
+            $user->role = $role;
+            $user->save();
         }
 
         $user->generateAndSetUsername();
