@@ -40,10 +40,14 @@ chown -R www-data:www-data /var/log/laravel
 
 # Substitute environment variables in nginx config for Tigris proxy.
 # Always run envsubst — nginx fails to start if the variables remain as literals.
-# When AWS_BUCKET is unset, TIGRIS_BUCKET_URL/HOST expand to empty strings and
-# the Tigris proxy location block is effectively disabled.
+# nginx set/proxy_set_header directives require non-empty values, so fall back to
+# dummy localhost values when AWS_BUCKET is not configured (dev/local-storage mode).
+# In that case /uploads/ proxying simply returns 502, which is fine because dev
+# stores uploads locally (served at /storage/, not /uploads/).
 export TIGRIS_BUCKET_URL="${AWS_BUCKET:+https://${AWS_BUCKET}.fly.storage.tigris.dev}"
 export TIGRIS_BUCKET_HOST="${AWS_BUCKET:+${AWS_BUCKET}.fly.storage.tigris.dev}"
+export TIGRIS_BUCKET_URL="${TIGRIS_BUCKET_URL:-http://localhost:9999}"
+export TIGRIS_BUCKET_HOST="${TIGRIS_BUCKET_HOST:-localhost}"
 envsubst '${TIGRIS_BUCKET_URL} ${TIGRIS_BUCKET_HOST}' < /etc/nginx/nginx.conf > /etc/nginx/nginx.conf.tmp
 mv /etc/nginx/nginx.conf.tmp /etc/nginx/nginx.conf
 
