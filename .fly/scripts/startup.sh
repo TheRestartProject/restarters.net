@@ -32,13 +32,20 @@ rm -rf /var/www/storage/framework/cache/data
 ln -sf /var/log/cache/data /var/www/storage/framework/cache/data
 chown -R www-data:www-data /var/log/cache
 
+# Move Laravel logs to persistent volume so they survive redeploys
+mkdir -p /var/log/laravel
+rm -rf /var/www/storage/logs
+ln -sf /var/log/laravel /var/www/storage/logs
+chown -R www-data:www-data /var/log/laravel
+
 # Substitute environment variables in nginx config for Tigris proxy.
-if [ -n "$AWS_BUCKET" ]; then
-    export TIGRIS_BUCKET_URL="https://${AWS_BUCKET}.fly.storage.tigris.dev"
-    export TIGRIS_BUCKET_HOST="${AWS_BUCKET}.fly.storage.tigris.dev"
-    envsubst '${TIGRIS_BUCKET_URL} ${TIGRIS_BUCKET_HOST}' < /etc/nginx/nginx.conf > /etc/nginx/nginx.conf.tmp
-    mv /etc/nginx/nginx.conf.tmp /etc/nginx/nginx.conf
-fi
+# Always run envsubst — nginx fails to start if the variables remain as literals.
+# When AWS_BUCKET is unset, TIGRIS_BUCKET_URL/HOST expand to empty strings and
+# the Tigris proxy location block is effectively disabled.
+export TIGRIS_BUCKET_URL="${AWS_BUCKET:+https://${AWS_BUCKET}.fly.storage.tigris.dev}"
+export TIGRIS_BUCKET_HOST="${AWS_BUCKET:+${AWS_BUCKET}.fly.storage.tigris.dev}"
+envsubst '${TIGRIS_BUCKET_URL} ${TIGRIS_BUCKET_HOST}' < /etc/nginx/nginx.conf > /etc/nginx/nginx.conf.tmp
+mv /etc/nginx/nginx.conf.tmp /etc/nginx/nginx.conf
 
 # Run DB setup in a subshell so failures never prevent supervisord from starting
 (
