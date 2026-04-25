@@ -28,13 +28,14 @@ rm -rf /var/www/storage/logs
 ln -sf /var/log/laravel /var/www/storage/logs
 chown -R www-data:www-data /var/log/laravel
 
-# Set up basic auth for non-production deployments (prevents scraping on dev/staging).
+# Set up cookie-based site gate for non-production deployments (prevents scraping).
+# Uses nginx auth_request + a tiny PHP cookie-checker. No browser dialog — the user
+# sees an HTML form once, sets a cookie, and is never prompted again (including AJAX).
 if [ "${BASIC_AUTH_ENABLED:-}" = "true" ]; then
-    printf 'restart:%s\n' "$(openssl passwd -apr1 'project')" > /etc/nginx/.htpasswd
-    printf 'auth_basic "Restarters";\nauth_basic_user_file /etc/nginx/.htpasswd;\n' \
-        > /etc/nginx/basic-auth.conf
+    printf 'auth_request /_auth_check;\nerror_page 401 = @auth_gate;\n' \
+        > /etc/nginx/auth-gate.conf
 else
-    : > /etc/nginx/basic-auth.conf
+    : > /etc/nginx/auth-gate.conf
 fi
 
 # Substitute environment variables in nginx config for Tigris proxy.

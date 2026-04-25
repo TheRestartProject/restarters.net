@@ -57,6 +57,7 @@ primary_region = "lhr"
   L5_SWAGGER_GENERATE_ALWAYS = "false"
   VITE_MANIFEST_PATH = "public/build/manifest.json"
   BASIC_AUTH_ENABLED = "true"
+  BASIC_AUTH_PASSWORD = "project"
   APP_SHOW_BRANCH = "true"
 
 [http_service]
