@@ -20,9 +20,14 @@
 #   ./fly-migrate.sh [OPTIONS]
 #
 # Options:
-#   --secrets-only           Only set Fly secrets from .env
-#   --db-only                Only migrate the database
-#   --images-only            Only sync images to Tigris
+#   --app APP                Target Fly app for --secrets and --db (default: restarters).
+#                            Use e.g. restarters-dev for the dev environment. The DB app
+#                            is derived automatically as APP-db (e.g. restarters-dev-db).
+#                            Has no effect on --images (Tigris bucket is shared across apps).
+#   --secrets                Set Fly secrets from .env onto the target app
+#   --db                     Migrate the database into the target app's DB
+#   --images                 Sync images from public/uploads/ to the shared Tigris bucket
+#                            (app-agnostic — all Fly apps read from the same bucket)
 #   --dry-run                Show what would be done without executing
 #   --fly-db-password PASS   Fly MySQL password (skips auto-detection)
 #   --dump-file PATH         Use existing dump file (skip mysqldump step)
@@ -30,12 +35,13 @@
 #   --env-file PATH          Path to .env file (default: .env)
 #   -h, --help               Show this help message
 #
+# At least one of --secrets, --db, or --images must be specified.
+#
 set -euo pipefail
 
 # ─── Constants ────────────────────────────────────────────────────────────────
 
 FLY_APP="restarters"
-FLY_DB_APP="restarters-db"
 FLY_DB_NAME="restarters"
 LOCAL_PROXY_PORT=13306
 
@@ -43,9 +49,9 @@ LOCAL_PROXY_PORT=13306
 
 ENV_FILE=".env"
 UPLOADS_DIR="./public/uploads"
-DO_SECRETS=true
-DO_DB=true
-DO_IMAGES=true
+DO_SECRETS=false
+DO_DB=false
+DO_IMAGES=false
 DRY_RUN=false
 FLY_DB_PASSWORD=""
 DUMP_FILE=""
@@ -61,9 +67,10 @@ usage() {
 
 while [[ $# -gt 0 ]]; do
     case "$1" in
-        --secrets-only)   DO_DB=false; DO_IMAGES=false; shift ;;
-        --db-only)        DO_SECRETS=false; DO_IMAGES=false; shift ;;
-        --images-only)    DO_SECRETS=false; DO_DB=false; shift ;;
+        --app)            FLY_APP="$2"; shift 2 ;;
+        --secrets)        DO_SECRETS=true; shift ;;
+        --db)             DO_DB=true; shift ;;
+        --images)         DO_IMAGES=true; shift ;;
         --dry-run)        DRY_RUN=true; shift ;;
         --fly-db-password) FLY_DB_PASSWORD="$2"; shift 2 ;;
         --dump-file)      DUMP_FILE="$2"; shift 2 ;;
@@ -73,6 +80,15 @@ while [[ $# -gt 0 ]]; do
         *) echo "Unknown option: $1"; usage ;;
     esac
 done
+
+if [[ "$DO_SECRETS" = false && "$DO_DB" = false && "$DO_IMAGES" = false ]]; then
+    log_err "Nothing to do. Specify at least one of: --secrets, --db, --images"
+    echo ""
+    usage
+fi
+
+# Derive DB app from the target app name (restarters → restarters-db, restarters-dev → restarters-dev-db)
+FLY_DB_APP="${FLY_APP}-db"
 
 # ─── Helper functions ─────────────────────────────────────────────────────────
 
@@ -201,11 +217,38 @@ fi
 if [[ "$DO_SECRETS" = true ]]; then
     log_info "Phase 1: Setting Fly.io secrets from ${ENV_FILE}..."
 
-    # Keys to extract from production .env and set as Fly secrets.
-    # Non-secret config (TBL_*, DEVICE_*, etc.) goes in fly.toml [env].
-    SECRET_KEYS=(
+    # Keys safe to copy to any app (dev, staging, production).
+    # Non-secret config (TBL_*, DEVICE_*, etc.) lives in fly.toml [env] instead.
+    # DB_USERNAME / DB_PASSWORD are NOT imported — each Fly DB app has its own credentials.
+    SHARED_SECRET_KEYS=(
         APP_KEY
-        # DB_USERNAME and DB_PASSWORD are NOT imported — Fly DB has its own credentials
+        AWS_ACCESS_KEY_ID
+        AWS_SECRET_ACCESS_KEY
+        AWS_BUCKET
+        SENTRY_LARAVEL_DSN
+        MAPBOX_TOKEN
+        GOOGLE_API_CONSOLE_KEY
+        CALENDAR_HASH
+        SUPPORT_EMAIL_ADDRESS
+        REPAIRDIRECTORY_URL
+    )
+
+    # Keys that must ONLY be set on the production app (restarters).
+    # Setting these on dev/staging would cause the dev environment to send real
+    # emails, post to therestartproject.org, sync to Discourse/Wiki, or write
+    # analytics events to production properties.
+    PRODUCTION_ONLY_SECRET_KEYS=(
+        MAIL_MAILER
+        MAIL_HOST
+        MAIL_PORT
+        MAIL_USERNAME
+        MAIL_PASSWORD
+        MAIL_ENCRYPTION
+        MAIL_FROM_ADDRESS
+        MAIL_FROM_NAME
+        MAILGUN_DOMAIN
+        MAILGUN_SECRET
+        MAILGUN_ENDPOINT
         DISCOURSE_URL
         DISCOURSE_SECRET
         DISCOURSE_APIUSER
@@ -218,41 +261,35 @@ if [[ "$DO_SECRETS" = true ]]; then
         WIKI_APIPASSWORD
         WIKI_COOKIE_PREFIX
         WIKI_HOST
-        SENTRY_LARAVEL_DSN
-        MAPBOX_TOKEN
-        GOOGLE_API_CONSOLE_KEY
         GOOGLE_ANALYTICS_TRACKING_ID
         GOOGLE_TAG_MANAGER_ID
-        CALENDAR_HASH
-        MAIL_MAILER
-        MAIL_HOST
-        MAIL_PORT
-        MAIL_USERNAME
-        MAIL_PASSWORD
-        MAIL_ENCRYPTION
-        MAIL_FROM_ADDRESS
-        MAIL_FROM_NAME
         WP_XMLRPC_ENDPOINT
         WP_XMLRPC_USER
         WP_XMLRPC_PSWD
-        AWS_ACCESS_KEY_ID
-        AWS_SECRET_ACCESS_KEY
-        AWS_BUCKET
-        MAILGUN_DOMAIN
-        MAILGUN_SECRET
-        MAILGUN_ENDPOINT
         DRIP_API_TOKEN
         DRIP_ACCOUNT_ID
         DRIP_CAMPAIGN_ID
         SEND_COMMAND_LOGS_TO
-        SUPPORT_EMAIL_ADDRESS
-        REPAIRDIRECTORY_URL
     )
+
+    IS_PRODUCTION=false
+    if [[ "$FLY_APP" = "restarters" ]]; then
+        IS_PRODUCTION=true
+    fi
+
+    if [[ "$IS_PRODUCTION" = true ]]; then
+        KEYS_TO_SET=("${SHARED_SECRET_KEYS[@]}" "${PRODUCTION_ONLY_SECRET_KEYS[@]}")
+    else
+        KEYS_TO_SET=("${SHARED_SECRET_KEYS[@]}")
+        log_warn "Non-production app '${FLY_APP}' — skipping production-only secrets:"
+        log_warn "  ${PRODUCTION_ONLY_SECRET_KEYS[*]}"
+        log_warn "  (fly.toml [env] values will be used for these instead)"
+    fi
 
     # Build KEY=VALUE lines for fly secrets import (handles values with spaces)
     SECRET_COUNT=0
     SECRETS_PAYLOAD=""
-    for key in "${SECRET_KEYS[@]}"; do
+    for key in "${KEYS_TO_SET[@]}"; do
         val=$(env_val "$key")
         if [[ -n "$val" ]]; then
             SECRETS_PAYLOAD+="${key}=${val}"$'\n'
@@ -268,21 +305,45 @@ if [[ "$DO_SECRETS" = true ]]; then
             echo "$SECRETS_PAYLOAD" | fly secrets import -a "$FLY_APP"
         fi
         log_step "App secrets set."
-
-        # Also set MySQL password on the DB app so it matches
-        DB_PASS=$(env_val DB_PASSWORD)
-        if [[ -n "$DB_PASS" ]]; then
-            log_step "Setting MYSQL_PASSWORD and MYSQL_ROOT_PASSWORD on ${FLY_DB_APP}..."
-            if [[ "$DRY_RUN" = true ]]; then
-                log_dry "echo 'MYSQL_PASSWORD=***\nMYSQL_ROOT_PASSWORD=***' | fly secrets import -a ${FLY_DB_APP}"
-            else
-                printf "MYSQL_PASSWORD=%s\nMYSQL_ROOT_PASSWORD=%s\n" "$DB_PASS" "$DB_PASS" \
-                    | fly secrets import -a "$FLY_DB_APP"
-            fi
-            log_step "DB secrets set."
-        fi
     else
         log_warn "No secrets found in ${ENV_FILE}"
+    fi
+
+    # For non-production apps: unset any production-only secrets that may have been
+    # set previously (e.g. by an older version of this script). This ensures dev
+    # environments cannot accidentally reach real external services even if secrets
+    # were copied in the past.
+    if [[ "$IS_PRODUCTION" = false ]]; then
+        EXISTING_SECRETS=$(fly secrets list -a "$FLY_APP" --json 2>/dev/null | grep -o '"Name":"[^"]*"' | sed 's/"Name":"//;s/"//g' || true)
+        SECRETS_TO_UNSET=()
+        for key in "${PRODUCTION_ONLY_SECRET_KEYS[@]}"; do
+            if echo "$EXISTING_SECRETS" | grep -qx "$key"; then
+                SECRETS_TO_UNSET+=("$key")
+            fi
+        done
+        if [[ ${#SECRETS_TO_UNSET[@]} -gt 0 ]]; then
+            log_warn "Removing production-only secrets found on non-prod app '${FLY_APP}':"
+            log_warn "  ${SECRETS_TO_UNSET[*]}"
+            if [[ "$DRY_RUN" = true ]]; then
+                log_dry "fly secrets unset ${SECRETS_TO_UNSET[*]} -a ${FLY_APP}"
+            else
+                fly secrets unset "${SECRETS_TO_UNSET[@]}" -a "$FLY_APP"
+                log_step "Production-only secrets removed from ${FLY_APP}."
+            fi
+        fi
+    fi
+
+    # Also set MySQL password on the DB app so it matches
+    DB_PASS=$(env_val DB_PASSWORD)
+    if [[ -n "$DB_PASS" ]]; then
+        log_step "Setting MYSQL_PASSWORD and MYSQL_ROOT_PASSWORD on ${FLY_DB_APP}..."
+        if [[ "$DRY_RUN" = true ]]; then
+            log_dry "echo 'MYSQL_PASSWORD=***\nMYSQL_ROOT_PASSWORD=***' | fly secrets import -a ${FLY_DB_APP}"
+        else
+            printf "MYSQL_PASSWORD=%s\nMYSQL_ROOT_PASSWORD=%s\n" "$DB_PASS" "$DB_PASS" \
+                | fly secrets import -a "$FLY_DB_APP"
+        fi
+        log_step "DB secrets set."
     fi
 
     echo ""
@@ -433,9 +494,11 @@ if [[ "$DO_DB" = true ]]; then
 fi
 
 # ─── Phase 3: Upload images to Tigris ────────────────────────────────────────
+# The Tigris bucket is shared across all Fly apps (restarters, restarters-dev, etc).
+# This phase is app-agnostic — --app has no effect here.
 
 if [[ "$DO_IMAGES" = true ]]; then
-    log_info "Phase 3: Syncing images to Tigris"
+    log_info "Phase 3: Syncing images to Tigris (shared bucket, app-agnostic)"
 
     BUCKET=$(env_val AWS_BUCKET)
 

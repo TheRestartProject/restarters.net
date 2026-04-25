@@ -13,20 +13,28 @@
 </a>
 
 @if(env('APP_SHOW_BRANCH'))
-    <div style="position: fixed; top: 0px; left: 0px; color: red; text-transform: uppercase">
-        <?php
-        // We want to show the current branch.  This will only be set on development or staging environments.
-        $branch = "Unknown branch";
+    <?php
+    $flyApp = env('FLY_APP_NAME');
+    if ($flyApp) {
+        // On Fly: derive branch label by stripping the "restarters-" prefix
+        $branch = preg_replace('/^restarters-/', '', $flyApp);
+        $mailpitUrl = 'https://' . $flyApp . '-mail.fly.dev';
+    } else {
+        // Local dev fallback: read from git
+        $branch = 'unknown';
+        $mailpitUrl = null;
         if (is_dir(base_path() . '/.git')) {
-            exec('cd ' . base_path() . '; git branch | ' . "grep ' * '", $shellOutput);
+            exec('cd ' . base_path() . '; git branch | grep \' * \'', $shellOutput);
             foreach ($shellOutput as $line) {
                 if (strpos($line, '* ') !== false) {
                     $branch = trim(strtolower(str_replace('* ', '', $line)));
                 }
             }
         }
-        ?>
-        {{ $branch }}
+    }
+    ?>
+    <div style="position: fixed; top: 0; left: 0; color: red; text-transform: uppercase; z-index: 9999; font-size: 12px; background: rgba(255,255,255,0.8); padding: 2px 6px;">
+        {{ $branch }}@if($mailpitUrl) | <a href="{{ $mailpitUrl }}" target="_blank" rel="noopener" style="color: red;">mail</a>@endif
     </div>
 @endif
 

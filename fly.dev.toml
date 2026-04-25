@@ -24,7 +24,12 @@ primary_region = "lhr"
   FEATURE__WIKI_INTEGRATION = "false"
   FEATURE__DISCOURSE_INTEGRATION = "false"
   SENTRY_ENVIRONMENT = "dev"
-  MAIL_MAILER = "log"
+  MAIL_MAILER = "smtp"
+  MAIL_HOST = "restarters-dev-mail.internal"
+  MAIL_PORT = "1025"
+  MAIL_ENCRYPTION = ""
+  MAIL_FROM_ADDRESS = "dev@restarters.dev"
+  MAIL_FROM_NAME = "Restarters Dev"
   # Table type constants
   TBL_USERS = "1"
   TBL_GROUPS = "2"
@@ -52,6 +57,7 @@ primary_region = "lhr"
   L5_SWAGGER_GENERATE_ALWAYS = "false"
   VITE_MANIFEST_PATH = "public/build/manifest.json"
   BASIC_AUTH_ENABLED = "true"
+  APP_SHOW_BRANCH = "true"
 
 [http_service]
   internal_port = 80
