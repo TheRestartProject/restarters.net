@@ -15,7 +15,7 @@
 - [ ] Tidy `production` branch — remove committed `node_modules` / build artefacts
 - [ ] Activate auto-deploy for `production` → `restarters` (same CircleCI pattern as develop, once develop is working)
 - [ ] Rebuild "yesterday" restore system
-- [ ] Deploy Mailpit for dev: `fly deploy --config fly-mailpit.toml` (then `fly proxy 8025:8025 -a restarters-dev-mail` to inspect emails)
+- [x] Deploy Mailpit for dev: `restarters-dev-mail` live at `https://restarters-dev-mail.fly.dev` — navbar on `restarters-dev` links to it
 - [ ] Set remaining Fly secrets from production `.env` (see below)
 - [ ] Final staging test with production data (`fly-migrate.sh --app restarters-dev --db --images`)
 - [x] API compatibility check — no breaking changes for known consumers. All v1 stats endpoints, RepairTogether, Zapier triggers, and TRP.org widgets are unchanged. Tag visibility changes are intentional and fine.

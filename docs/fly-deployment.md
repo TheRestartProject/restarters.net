@@ -9,6 +9,7 @@ How the application is built, run, and deployed on Fly.io.
 | App | Config | URL | Branch |
 |---|---|---|---|
 | `restarters-dev` | `fly.dev.toml` | `restarters.dev` | `develop` |
+| `restarters-dev-mail` | `fly-mailpit.toml` | `restarters-dev-mail.fly.dev` | `develop` |
 | `restarters` | `fly.toml` | `restarters.net` | `production` |
 | `restarters-db` | `fly-mysql.toml` | internal only | — |
 | `restarters-pma` | `fly-pma.toml` | via `fly proxy` only | — |
