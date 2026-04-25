@@ -56,7 +56,7 @@ primary_region = "lhr"
   # Misc
   L5_SWAGGER_GENERATE_ALWAYS = "false"
   VITE_MANIFEST_PATH = "public/build/manifest.json"
-  BASIC_AUTH_ENABLED = "false"
+  BASIC_AUTH_ENABLED = "true"
   APP_SHOW_BRANCH = "true"
 
 [http_service]
