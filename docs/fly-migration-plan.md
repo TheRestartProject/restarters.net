@@ -10,7 +10,7 @@
 ### Edward
 - [x] Get outstanding PRs merged into `develop`
 - [x] Stand up `restarters.dev` from `develop`
-- [ ] **Set up auto-deploy for `develop` → `restarters-dev`** — add deploy job to CircleCI (see `docs/fly-deployment.md`)
+- [x] **Set up auto-deploy for `develop` → `restarters-dev`** — CircleCI deploy job added; add `FLY_API_TOKEN` to CircleCI project env vars to activate (token already generated)
 - [ ] **Set up queue and app monitoring** — supervisord keeps processes up, but need alerting if queue backs up or app goes unhealthy
 - [ ] Tidy `production` branch — remove committed `node_modules` / build artefacts
 - [ ] Activate auto-deploy for `production` → `restarters` (same CircleCI pattern as develop, once develop is working)
