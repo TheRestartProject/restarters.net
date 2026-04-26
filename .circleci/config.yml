@@ -144,3 +144,27 @@ jobs:
       
       - store_test_results:
           path: /tmp/test-results
+
+  deploy-fly-dev:
+    docker:
+      - image: cimg/base:current
+    steps:
+      - checkout
+      - run:
+          name: Install flyctl
+          command: curl -L https://fly.io/install.sh | sh
+      - run:
+          name: Deploy to restarters-dev
+          command: ~/.fly/bin/flyctl deploy --config fly.dev.toml --remote-only
+          no_output_timeout: 15m
+
+workflows:
+  build-and-deploy:
+    jobs:
+      - build
+      - deploy-fly-dev:
+          requires:
+            - build
+          filters:
+            branches:
+              only: develop
