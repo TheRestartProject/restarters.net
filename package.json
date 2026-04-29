@@ -54,6 +54,7 @@
         "webpack-shell-plugin-next": "^2.3.1"
     },
     "dependencies": {
+        "@popperjs/core": "^2.11.8",
         "@sentry/tracing": "^7.119.0",
         "@sentry/vue": "^7.119.0",
         "ajv": "^6.12.3",
