@@ -152,10 +152,12 @@ jobs:
       - checkout
       - run:
           name: Install flyctl
-          command: curl -L https://fly.io/install.sh | sh -s -- -y
+          command: |
+            curl -L https://fly.io/install.sh | sh || true
+            echo 'export PATH=/home/circleci/.fly/bin:$PATH' >> $BASH_ENV
       - run:
           name: Deploy to restarters-dev
-          command: ~/.fly/bin/flyctl deploy --config fly.dev.toml --remote-only
+          command: flyctl deploy --config fly.dev.toml --remote-only
           no_output_timeout: 15m
 
 workflows:
