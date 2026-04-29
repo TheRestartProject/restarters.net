@@ -7,10 +7,12 @@
         "prod": "npm run build",
         "production": "vite build",
         "test": "playwright test",
-        "jest": "jest --verbose"
+        "jest": "jest --verbose",
+        "lint:js": "eslint resources/js"
     },
     "devDependencies": {
-        "@babel/core": "^7.22.8",
+        "@babel/core": "^7.29.0",
+        "@babel/eslint-parser": "^7.28.6",
         "@babel/plugin-syntax-import-meta": "^7.10.4",
         "@babel/preset-env": "^7.22.7",
         "@playwright/test": "^1.59.1",
@@ -23,6 +25,8 @@
         "bootstrap": "^4.6.1",
         "browser-sync": "^2.27.11",
         "browser-sync-webpack-plugin": "^2.3.0",
+        "eslint": "^10.2.1",
+        "eslint-plugin-vue": "^10.9.0",
         "faker": "^5.5.3",
         "jest": "^28.1.0",
         "jest-environment-jsdom": "^28.1.0",
