@@ -292,18 +292,6 @@ function initializeJQuery() {
         trigger: 'focus'
       });
 
-      $('.btn-action').on('click', function () {
-        setTimeout(copyLinkUser, 200);
-      });
-
-      $('#btn-copy').on('click', function () {
-        copyLinkUser();
-      });
-
-      $('.btn-copy-input-text').on('click', function () {
-        copyLinkUser();
-      });
-
       $('.information-alert').on('closed.bs.alert', function () {
         localStorage.setItem('information-alert-closed', 'true');
       });

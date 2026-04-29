@@ -171,7 +171,7 @@ export default {
     }
   },
   beforeUnmount() {
-    clearTimeout(timer)
+    clearTimeout(this.timer)
   }
 }
 </script>

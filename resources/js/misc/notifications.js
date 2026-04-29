@@ -4,10 +4,9 @@ function toggleRead(event) {
     const $ = window.jQuery || window.$;
     if (!$) return;
 
-    $button = $(this);
-    $counter = $('#notifications-badge .chat-count');
-
-    $notificationsBadge = $('#notifications-badge');
+    const $button = $(this);
+    const $counter = $('#notifications-badge .chat-count');
+    const $notificationsBadge = $('#notifications-badge');
 
     $.ajax({
       type: 'get',

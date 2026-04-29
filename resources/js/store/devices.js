@@ -242,7 +242,7 @@ export default {
         })
       }
     },
-    async deleteURL ({commit}, params) {
+    async deleteURL ({commit, rootGetters}, params) {
       const ret = await axios.delete('/device-url/' + params.url.id, {
         headers: {
           'X-CSRF-TOKEN': rootGetters['auth/CSRF']
