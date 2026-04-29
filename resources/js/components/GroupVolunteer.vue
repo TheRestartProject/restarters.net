@@ -38,11 +38,13 @@
         </div>
       </div>
       <b-dropdown v-if="canedit" variant="none" ref="dropdown" class="edit-dropdown" no-caret>
+        <template slot="button-content">
+          <img :src="imageUrl('/icons/edit_ico_green.svg')" alt="" width="24" height="24" />
+        </template>
         <b-dropdown-item v-if="volunteer.host && candemote" @click="removeHostRole">{{ __('groups.remove_host_role') }}</b-dropdown-item>
         <b-dropdown-item v-if="!volunteer.host" @click="makeVolunteerHost">{{ __('groups.make_host') }}</b-dropdown-item>
         <b-dropdown-item @click="removeVolunteer">{{ __('groups.remove_volunteer') }}</b-dropdown-item>
       </b-dropdown>
-      <button class="dropdown-toggle d-none" />
     </div>
     <b-alert variant="danger" v-if="error">
       {{ __('partials.something_wrong') }}: {{ error }}
