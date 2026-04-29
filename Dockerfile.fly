@@ -31,7 +31,7 @@ RUN composer install --no-dev --no-scripts --no-autoloader --prefer-dist
 # Copy package files for npm layer caching
 COPY package.json package-lock.json ./
 RUN npm ci --legacy-peer-deps
-RUN npx update-browserslist-db@latest
+RUN NPM_CONFIG_LEGACY_PEER_DEPS=true npx update-browserslist-db@latest
 
 # Copy all source code
 COPY . .
