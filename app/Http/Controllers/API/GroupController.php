@@ -509,7 +509,10 @@ class GroupController extends Controller
         $excludeEvent = $request->query('exclude_event');
         if ($excludeEvent) {
             $confirmedUserIds = EventsUsers::where('event', $excludeEvent)
-                ->where('status', '1')
+                ->where(function ($query) {
+                    $query->where('status', '1')
+                          ->orWhereNull('status');
+                })
                 ->pluck('user');
             $query = $query->whereNotIn('users_groups.user', $confirmedUserIds);
         }
@@ -916,14 +919,16 @@ class GroupController extends Controller
     public function updateGroupv2(Request $request, $idGroup): JsonResponse {
         $user = $this->getUser();
 
+        $group = Group::findOrFail($idGroup);
+
         list($name, $area, $postcode, $location, $phone, $website, $description, $timezone,
             $latitude, $longitude, $country, $network_data, $email,
             $archived_at) = $this->validateGroupParams(
             $request,
-            false
+            false,
+            $group
         );
 
-        $group = Group::findOrFail($idGroup);
         $is_host_of_group = Fixometer::userHasEditGroupPermission($idGroup, $user->id);
         $isCoordinatorForGroup = $user->isCoordinatorForGroup($group);
 
@@ -1085,7 +1090,7 @@ class GroupController extends Controller
                                 ]);
     }
 
-    private function validateGroupParams(Request $request, $create): array {
+    private function validateGroupParams(Request $request, $create, ?Group $existingGroup = null): array {
         // We don't validate max lengths of other strings, to avoid duplicating the length information both here
         // and in the migrations.  If we wanted to do that we should extract the length dynamically from the
         // schema, which is possible but not trivial.
@@ -1124,20 +1129,30 @@ class GroupController extends Controller
         }
 
         if (!empty($location)) {
-            $geocoder = app(\App\Helpers\Geocoder::class);
-            $geocoded = $geocoder->geocode($location);
+            // Skip geocoding when the location string hasn't changed — avoids unnecessary API calls
+            // and prevents failures when editing other fields (e.g. group icon) in environments
+            // where the geocoding API key is unavailable.
+            $locationUnchanged = $existingGroup !== null && $location === $existingGroup->location;
 
-            if (empty($geocoded))
-            {
-                throw ValidationException::withMessages(['location ' => __('groups.geocode_failed')]);
+            if ($locationUnchanged) {
+                $latitude = $existingGroup->latitude;
+                $longitude = $existingGroup->longitude;
+                $country_code = $existingGroup->country_code;
+            } else {
+                $geocoder = app(\App\Helpers\Geocoder::class);
+                $geocoded = $geocoder->geocode($location);
+
+                if (empty($geocoded)) {
+                    throw ValidationException::withMessages(['location ' => __('groups.geocode_failed')]);
+                }
+
+                $latitude = $geocoded['latitude'];
+                $longitude = $geocoded['longitude'];
+
+                // Note that the country returned by the geocoder is already in English, which is what we need for the
+                // value in the database.
+                $country_code = $geocoded['country_code'] ?? null;
             }
-
-            $latitude = $geocoded['latitude'];
-            $longitude = $geocoded['longitude'];
-
-            // Note that the country returned by the geocoder is already in English, which is what we need for the
-            // value in the database.
-            $country_code = $geocoded['country_code'] ?? null;
         }
 
         return [
