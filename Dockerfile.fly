@@ -87,6 +87,8 @@ RUN sed -i 's|listen = 127.0.0.1:9000|listen = /var/run/php-fpm.sock|' /usr/loca
     sed -i 's|;request_slowlog_timeout = .*|request_slowlog_timeout = 5s|' /usr/local/etc/php-fpm.d/www.conf && \
     sed -i 's|;request_terminate_timeout = .*|request_terminate_timeout = 60s|' /usr/local/etc/php-fpm.d/www.conf && \
     sed -i 's|pm.max_children = [0-9]*|pm.max_children = 30|' /usr/local/etc/php-fpm.d/www.conf && \
+    sed -i 's|;pm.status_path = .*|pm.status_path = /fpm-status|' /usr/local/etc/php-fpm.d/www.conf && \
+    sed -i 's|;pm.status_listen = .*|pm.status_listen = 127.0.0.1:9001|' /usr/local/etc/php-fpm.d/www.conf && \
     rm -f /usr/local/etc/php-fpm.d/zz-docker.conf
 
 # Install sysstat (sar) for system activity monitoring
