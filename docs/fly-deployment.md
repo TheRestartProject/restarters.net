@@ -12,8 +12,8 @@ How the application is built, run, and deployed on Fly.io.
 | `restarters-dev-mail` | `fly-mailpit.toml` | `restarters-dev-mail.fly.dev` | `develop` |
 | `restarters` | `fly.toml` | `restarters.net` | `production` |
 | `restarters-db` | `fly-mysql.toml` | internal only | — |
-| `restarters-pma` | `fly-pma.toml` | via `fly proxy` only | — |
-| `restarters-yesterday` | `fly-yesterday.toml` | via `fly proxy` only | — |
+| `restarters-pma` | `fly-pma.toml` | via `flyctl proxy` only | — |
+| `restarters-yesterday` | `fly-yesterday.toml` | `restarters-yesterday.fly.dev` (stopped when idle) | — |
 
 All apps run in the `lhr` (London) region. The DB is on a private 6PN network (`restarters-db.internal`) — only reachable by other apps in the same Fly organisation, not from the public internet.
 
@@ -28,11 +28,14 @@ Two-stage build:
 - `npm ci` + `npm run production` (Vite build)
 - `php artisan lang:js` (JS translations)
 - `php artisan l5-swagger:generate` (API docs)
+- PHP extensions: `pdo_mysql bcmath zip intl gd exif` (exif required by Intervention Image's `orientate()`)
 - Output: compiled assets in `public/build/`, vendor autoload, swagger JSON
 
 **Stage 2 — runtime** (`php:8.2-fpm`):
 - Copies built assets from stage 1
 - Installs nginx, supervisord, cron, sysstat
+- PHP extensions: `pdo_mysql bcmath zip intl gd exif`
+- Creates `public/uploads/` directory (gitignored, so not present in source)
 - No Node or Composer in the final image
 
 The build runs on Fly's remote builders (`fly deploy --remote-only`). No local Docker required.
@@ -61,16 +64,17 @@ The queue worker restarts automatically if it crashes (supervisord `autorestart=
 
 Runs as root before supervisord starts:
 
-1. Creates `storage/` subdirectories with correct ownership
+1. Creates `storage/` subdirectories, `bootstrap/cache`, and `public/uploads/` with correct ownership
 2. Symlinks `storage/logs` and `storage/framework/cache` to the persistent `/var/log` volume (so they survive redeploys)
-3. Runs `envsubst` to inject the Tigris bucket URL into the nginx config
-4. Spawns a background subshell that:
+3. Computes the cookie-gate HMAC and writes nginx map files for the `BASIC_AUTH_ENABLED` gate
+4. Runs `envsubst` to inject the Tigris bucket URL into the nginx config
+5. Spawns a background subshell that:
    - Waits up to 60s for MySQL to be reachable
    - Runs `php artisan migrate --force`
    - Runs `translations:import`
    - Caches config, routes, and views
    - Restarts the queue worker
-5. Immediately starts supervisord — the health check can pass while the DB setup runs in the background
+6. Immediately starts supervisord — the health check can pass while the DB setup runs in the background
 
 ---
 
@@ -79,9 +83,9 @@ Runs as root before supervisord starts:
 Non-secret config lives in `fly.toml` (production) and `fly.dev.toml` (dev). Secrets are stored in Fly's secret store and injected as environment variables at runtime.
 
 ```bash
-fly secrets list -a restarters-dev   # see what's set
-fly secrets set KEY=VALUE -a restarters-dev
-fly secrets import -a restarters-dev < secrets.env
+flyctl secrets list --app restarters-dev   # see what's set
+flyctl secrets set KEY=VALUE --app restarters-dev
+flyctl secrets import --app restarters-dev < secrets.env
 ```
 
 Secrets take precedence over `[env]` values in the toml file.
@@ -96,19 +100,19 @@ Dev/staging apps must not reach real external services. `fly-migrate.sh --secret
 
 When `--secrets` runs against a non-production app it also **unsets** any production-only secrets that are already present, cleaning up any that were set by older script runs.
 
-The `fly.dev.toml` sets `MAIL_MAILER = "log"` (emails go to container stdout, visible via `fly logs`). This is safe only while no `MAIL_MAILER` Fly secret overrides it — the isolation above guarantees that.
+The `fly.dev.toml` sets `MAIL_MAILER = "smtp"` pointing at the paired Mailpit instance (`restarters-dev-mail.internal:1025`). Emails land in Mailpit's inbox, not real inboxes. This is safe only while no `MAIL_MAILER` Fly secret overrides it — the isolation above guarantees that.
 
 **Email in dev — Mailpit:** Each non-production app has a paired Mailpit instance named `${FLY_APP}-mail` (e.g. `restarters-dev-mail`). `fly.dev.toml` points SMTP at `restarters-dev-mail.internal:1025`. Mailpit's SMTP port is only reachable from other apps in the same Fly org via private 6PN networking — it is not publicly exposed. The web UI runs on port 8025.
 
 ```bash
 # Deploy Mailpit for dev
-fly deploy --config fly-mailpit.toml
+flyctl deploy --config fly-mailpit.toml --remote-only
 
 # Deploy for a PR branch
-fly deploy --config fly-mailpit.toml --app restarters-pr-123-mail
+flyctl deploy --config fly-mailpit.toml --app restarters-pr-123-mail --remote-only
 
 # Open the web UI
-fly proxy 8025:8025 -a restarters-dev-mail
+flyctl proxy 8025:8025 --app restarters-dev-mail
 # then http://localhost:8025
 ```
 
@@ -122,7 +126,7 @@ Uploaded files are stored in a shared Tigris S3-compatible bucket. All Fly apps 
 
 - **Reads:** nginx → Tigris (30-day cache headers)
 - **Writes:** Laravel S3 filesystem driver (`FILESYSTEM_DISK=s3`)
-- **Secrets required:** `AWS_ACCESS_KEY_ID`, `AWS_SECRET_ACCESS_KEY`, `AWS_BUCKET`, `AWS_ENDPOINT_URL_S3`, `AWS_REGION`
+- **Secrets required:** `AWS_ACCESS_KEY_ID`, `AWS_SECRET_ACCESS_KEY`, `AWS_BUCKET` (endpoint and region are set in the toml: `AWS_ENDPOINT = "https://fly.storage.tigris.dev"`, `AWS_DEFAULT_REGION = "auto"`)
 
 ---
 
@@ -131,8 +135,8 @@ Uploaded files are stored in a shared Tigris S3-compatible bucket. All Fly apps 
 ### Manual
 
 ```bash
-fly deploy -a restarters-dev    # deploy to dev
-fly deploy -a restarters        # deploy to production
+flyctl deploy --config fly.dev.toml --remote-only   # deploy to dev
+flyctl deploy --config fly.toml --remote-only        # deploy to production
 ```
 
 This triggers a remote build on Fly's infrastructure and deploys with zero downtime (rolling replacement of machines).
@@ -177,8 +181,8 @@ The simplest path: add `php artisan queue:monitor database:10` to the scheduler 
 All processes log to stdout/stderr, which Fly captures:
 
 ```bash
-fly logs -a restarters-dev        # live tail
-fly logs -a restarters-dev --no-tail  # recent output
+flyctl logs --app restarters-dev          # live tail
+flyctl logs --app restarters-dev --no-tail  # recent output
 ```
 
 Laravel application logs (`LOG_CHANNEL=daily`) write to `/var/log/laravel/` on the persistent volume, surviving redeploys.
@@ -192,18 +196,18 @@ Nginx access/error logs write to `/var/log/nginx/` on the same volume.
 The MySQL DB is not publicly accessible. To connect:
 
 ```bash
-fly proxy 13306:3306 -a restarters-db   # open tunnel in one terminal
+flyctl proxy 13306:3306 --app restarters-db   # open tunnel in one terminal
 mysql -h 127.0.0.1 -P 13306 -u restarters -p restarters  # connect in another
 ```
 
 phpMyAdmin (not publicly exposed):
 
 ```bash
-fly machine start -a restarters-pma
-fly proxy 8080:80 -a restarters-pma
+flyctl machine start --app restarters-pma
+flyctl proxy 8080:80 --app restarters-pma
 # open http://localhost:8080 in browser
 # Host: restarters-db.internal, user/pass from fly secrets
-fly machine stop -a restarters-pma  # stop when done
+flyctl machine stop --app restarters-pma  # stop when done
 ```
 
 ---
@@ -212,27 +216,27 @@ fly machine stop -a restarters-pma  # stop when done
 
 ```bash
 # Run an artisan command
-fly ssh console -a restarters-dev -C "php artisan migrate:status"
+flyctl ssh console --app restarters-dev --command "php /var/www/artisan migrate:status"
 
 # Open a shell
-fly ssh console -a restarters-dev
+flyctl ssh console --app restarters-dev
 
 # Check process status
-fly ssh console -a restarters-dev -C "supervisorctl status"
+flyctl ssh console --app restarters-dev --command "supervisorctl status"
 
 # Restart the queue worker
-fly ssh console -a restarters-dev -C "supervisorctl restart queue-worker"
+flyctl ssh console --app restarters-dev --command "supervisorctl restart queue-worker"
 
 # Check failed jobs
-fly ssh console -a restarters-dev -C "php artisan queue:failed"
+flyctl ssh console --app restarters-dev --command "php /var/www/artisan queue:failed"
 
 # Retry all failed jobs
-fly ssh console -a restarters-dev -C "php artisan queue:retry all"
+flyctl ssh console --app restarters-dev --command "php /var/www/artisan queue:retry all"
 
 # Check app status and machine health
-fly status -a restarters-dev
+flyctl status --app restarters-dev
 
 # Scale VM size
-fly scale vm shared-cpu-2x -a restarters-dev
-fly scale memory 2048 -a restarters-dev
+flyctl scale vm shared-cpu-2x --app restarters-dev
+flyctl scale memory 2048 --app restarters-dev
 ```

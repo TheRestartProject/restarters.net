@@ -12,18 +12,15 @@ Reviewed: 2026-04-24 against develop branch.
 
 ## ❌ Unresolved bugs (need fixing)
 
-### 1. Confirmed group member shown when inviting volunteers to event
+### 1. ✅ Confirmed group member shown when inviting volunteers to event
 **Area:** Events → Invite volunteers  
-**Steps:** Given Neil M is already attending an event for Ulverston Repair Cafe, when inviting members to the event, Neil M should not appear as an option.  
-**Status:** Still broken as of doc review.  
-**Where to look:** `EventController` invite logic / volunteer query — filter out users already confirmed for the event.
+**Root cause:** `EventActions.vue` used `data-toggle="modal" data-target="#event-invite-to"` (jQuery) to open the old Blade modal, but that modal was removed from `view.blade.php`. Clicking the button did nothing. The new `EventInviteModal.vue` (which correctly calls `GET /api/v2/groups/{id}/volunteers?exclude_event={event_id}`) was only reachable via EventAttendance's "invite to join" link.  
+**Fix:** Wired `EventActions.vue` to import and render `EventInviteModal`, triggered via `$refs.inviteModal.show()`. Also added `whereNotNull('user')` guard to `GroupController::getVolunteersForGroupv2` to prevent MySQL `NOT IN` with NULL silently emptying the list.  
+**Test:** `tests/Integration/event.test.js` — "Invite volunteers modal opens from Event Actions dropdown"
 
-### 2. Mark notifications as read does nothing
+### 2. ✅ Mark notifications as read does nothing
 **Area:** General → Notifications  
-**Steps:** Click "mark as read" on a notification.  
-**Expected:** Notification marked read.  
-**Actual:** Nothing happens (no request or request fails silently).  
-**Status:** Not resolved as of 2026-01-22. Needs JS/backend investigation.
+**Status:** Verified working as of 2026-04-30 on restarters-dev. Tested both from the notifications page (/profile/notifications) and from the navbar sidebar popup. AJAX call fires correctly, card toggles to "✓ MARKED AS READ", and badge counter decrements. Bug must have been resolved implicitly by prior work.
 
 ---
 

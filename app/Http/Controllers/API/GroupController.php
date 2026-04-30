@@ -513,6 +513,7 @@ class GroupController extends Controller
                     $query->where('status', '1')
                           ->orWhereNull('status');
                 })
+                ->whereNotNull('user')
                 ->pluck('user');
             $query = $query->whereNotIn('users_groups.user', $confirmedUserIds);
         }
