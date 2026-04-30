@@ -8,7 +8,7 @@ How the application is built, run, and deployed on Fly.io.
 
 | App | Config | URL | Branch |
 |---|---|---|---|
-| `restarters-dev` | `fly.dev.toml` | `restarters.dev` | `develop` |
+| `restarters-dev` | `fly.dev.toml` | `restarters-dev.fly.dev` | `develop` |
 | `restarters-dev-mail` | `fly-mailpit.toml` | `restarters-dev-mail.fly.dev` | `develop` |
 | `restarters` | `fly.toml` | `restarters.net` | `production` |
 | `restarters-db` | `fly-mysql.toml` | internal only | — |
@@ -137,41 +137,15 @@ fly deploy -a restarters        # deploy to production
 
 This triggers a remote build on Fly's infrastructure and deploys with zero downtime (rolling replacement of machines).
 
-### Automated (CircleCI) — TODO
+### Automated (CircleCI)
 
-Auto-deploy is not yet active. The target setup:
+Auto-deploy is active for the `develop` branch:
 
-- **`develop` branch** → tests pass → `fly deploy -a restarters-dev`
-- **`production` branch** → tests pass → `fly deploy -a restarters`
+- **`develop` branch** → tests pass → `flyctl deploy --config fly.dev.toml --remote-only` → `restarters-dev`
 
-To activate, add a deploy job to `.circleci/config.yml` after the existing `build` job:
+This is wired up in `.circleci/config.yml` as the `deploy-fly-dev` job, which runs after the `build` job and only on the `develop` branch. `FLY_API_TOKEN` is set in CircleCI project settings (Project Settings → Environment Variables).
 
-```yaml
-deploy-fly-dev:
-  docker:
-    - image: cimg/base:current
-  steps:
-    - checkout
-    - run: curl -L https://fly.io/install.sh | sh
-    - run: ~/.fly/bin/flyctl deploy --remote-only -a restarters-dev
-  environment:
-    FLY_API_TOKEN: $FLY_API_TOKEN   # set in CircleCI project settings
-
-workflows:
-  build-and-deploy:
-    jobs:
-      - build
-      - deploy-fly-dev:
-          requires:
-            - build
-          filters:
-            branches:
-              only: develop
-```
-
-`FLY_API_TOKEN` must be added to the CircleCI project's environment variables (Project Settings → Environment Variables). Generate a token with `fly tokens create deploy -a restarters-dev`.
-
-A separate `deploy-fly-prod` job with `only: production` follows the same pattern for the production app.
+Production auto-deploy is not yet configured. When ready, add a `deploy-fly-prod` job using `fly.toml` with `filters: branches: only: production`.
 
 ---
 
