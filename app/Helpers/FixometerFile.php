@@ -20,7 +20,7 @@ class FixometerFile extends Model
     public function move($from, $to) {
         // This is for phpunit tests.
         if (FixometerFile::$uploadTesting) {
-            return copy($from, $to);
+            return @copy($from, $to);
         } else {
             return @move_uploaded_file($from, $to);
         }
@@ -51,12 +51,6 @@ class FixometerFile extends Model
             $clear = false;
         }
 
-        if ($clear) {
-            Xref::where('reference', $reference)
-                  ->where('reference_type', $referenceType)
-                    ->forceDelete();
-        }
-
         // Handle both array and non-array formats for $_FILES
         if (gettype($user_file['tmp_name']) == 'array') {
             $error = is_array($user_file['error']) ? $user_file['error'][0] : $user_file['error'];
@@ -71,9 +65,20 @@ class FixometerFile extends Model
             $filename = $this->filename($tmp_name);
             $this->file = $filename;
             $lpath = $_SERVER['DOCUMENT_ROOT'].'/uploads/'.$filename;
+
+            // Attempt the move BEFORE touching existing records — if the move fails
+            // (e.g. uploads directory missing/unwritable) we preserve the old image.
             if (!$this->move($tmp_name, $lpath)) {
                 return false;
             }
+
+            // Move succeeded — safe to remove previous image records.
+            if ($clear) {
+                Xref::where('reference', $reference)
+                      ->where('reference_type', $referenceType)
+                        ->forceDelete();
+            }
+
             $data = [];
             $this->path = $lpath;
             $data['path'] = $this->file;

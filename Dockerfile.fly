@@ -126,7 +126,8 @@ RUN rm -rf node_modules tests .git .github
 # Ensure storage and cache directories exist
 RUN mkdir -p storage/framework/{sessions,views,cache/data} \
     storage/logs bootstrap/cache \
-    && chown -R www-data:www-data storage bootstrap/cache
+    public/uploads \
+    && chown -R www-data:www-data storage bootstrap/cache public/uploads
 
 # Copy startup script
 COPY .fly/scripts/startup.sh /usr/local/bin/startup.sh
