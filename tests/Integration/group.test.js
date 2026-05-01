@@ -39,11 +39,19 @@ test('Group image upload persists on view page', async ({page, baseURL}) => {
   // Wait for the dropzone preview to confirm the file was accepted
   await page.waitForSelector('#dropzone .dz-preview', { timeout: 10000 })
 
-  // Save the group
-  await page.locator('button', { hasText: 'Save changes' }).click()
+  // Save the group — the edit page stays put after save (no redirect to view).
+  // Wait for the API POST to /api/v2/groups/{id} to return 200 before navigating.
+  const [saveResponse] = await Promise.all([
+    page.waitForResponse(
+      resp => /\/api\/v2\/groups\/\d+/.test(resp.url()) && resp.request().method() === 'POST',
+      { timeout: 15000 }
+    ),
+    page.locator('button', { hasText: 'Save changes' }).click()
+  ])
+  expect(saveResponse.status()).toBe(200)
 
-  // Should redirect to the group view page
-  await page.waitForURL('**/view/**', { timeout: 30000 })
+  // Navigate to the group view page explicitly
+  await page.goto('/group/view/' + id)
 
   // The group heading image must resolve to an uploaded file, not the default profile icon
   await expect(page.locator('img.groupImage[src*="/uploads/"]')).toBeVisible({ timeout: 10000 })
