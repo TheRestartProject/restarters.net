@@ -87,7 +87,7 @@ class JoinGroup extends BaseNotification
             $mail->action($actionText, $this->arr['url'])
                 ->line(
                     __('notifications.join_group_more', [
-                        'more' => env('APP_URL') . '/about'
+                        'more' => url('/about')
                     ], $locale)
                 );
 

@@ -43,7 +43,7 @@ class CheckAuthService extends JsonResource
 
     public function __construct()
     {
-        $this->edit_profile_link = env('APP_URL').'/profile/edit/';
+        $this->edit_profile_link = url('/profile/edit/');
 
         $this->menu = collect([
             'general' => collect([]),

@@ -426,7 +426,7 @@ class UserController extends Controller
                     ]);
 
                     User::find($id)->notify(new ResetPassword([
-                      'url' => env('APP_URL').'/user/reset?recovery='.$data['recovery'],
+                      'url' => url('/user/reset?recovery='.$data['recovery']),
                     ]));
 
                     $response['success'] = __('passwords.sent');
