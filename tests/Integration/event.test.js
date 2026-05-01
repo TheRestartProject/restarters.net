@@ -27,19 +27,18 @@ test('Invite volunteers modal opens from Event Actions dropdown', async ({page, 
   await approveEvent(page, baseURL, eventid)
 
   // Join the event so isAttending=true (the invite button is gated on this).
-  // /party/join/ uses redirect()->back() so it goes to the edit page (where we came from).
-  // Navigate explicitly to the view page afterwards.
-  // Avoid waitForLoadState('networkidle') — the event view makes ongoing API calls
-  // that prevent idle from ever being reached, causing a 10-minute CI timeout.
+  // /party/join/ uses redirect()->back() (goes to edit page), so navigate to view explicitly.
+  // Avoid waitForLoadState('networkidle') — the event view polls continuously and never idles.
   await page.goto('/party/join/' + eventid)
   await page.goto('/party/view/' + eventid)
-  await page.waitForSelector(':text("EVENT ACTIONS")', { timeout: 30000 })
 
-  // Open the Event Actions dropdown
-  await page.locator('button', { hasText: 'EVENT ACTIONS' }).first().click()
+  // EventHeading renders EventActions twice: d-block d-md-none (mobile, hidden at desktop)
+  // and d-none d-md-block (desktop, visible). Use :visible to target the shown instance only.
+  await page.locator('button:visible', { hasText: 'EVENT ACTIONS' }).waitFor({ timeout: 30000 })
+  await page.locator('button:visible', { hasText: 'EVENT ACTIONS' }).click()
 
-  // Click "Invite Volunteers" in the dropdown
-  await page.locator('.dropdown-item', { hasText: 'Invite Volunteers' }).first().click()
+  // After opening the desktop dropdown, only its items are visible; the mobile dropdown stays closed.
+  await page.locator('.dropdown-item:visible', { hasText: 'Invite Volunteers' }).click()
 
   // The Vue EventInviteModal should open — it has a multiselect for group members.
   // The old Blade modal (now removed from view) had only a textarea, not a multiselect.
