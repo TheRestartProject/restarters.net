@@ -143,11 +143,7 @@ exports.createEvent = async function(page, baseURL, idgroups, past) {
 
   // Go to group view page
   log('Navigating to group view page')
-  await page.goto('/group/view/' + idgroups)
-
-  // Wait for page to load
-  log('Waiting for page to load')
-  await page.waitForLoadState('networkidle', { timeout: 30000 })
+  await page.goto('/group/view/' + idgroups, { waitUntil: 'domcontentloaded' })
 
   // Click on Add Event button
   log('Clicking create event button')
@@ -205,24 +201,30 @@ exports.createEvent = async function(page, baseURL, idgroups, past) {
 
 exports.approveEvent = async function(page, baseURL, idevents) {
   log('Starting event approval', { idevents })
-  
-  // Go to event edit page.
+
+  // Go to event edit page. Use domcontentloaded so Google Maps doesn't hang the load event.
   log('Navigating to event edit page')
-  await page.goto('/party/edit/' + idevents)
+  await page.goto('/party/edit/' + idevents, { waitUntil: 'domcontentloaded' })
+
+  // Wait for the approval select to appear (Vue component must mount first).
+  log('Waiting for approval select')
+  await page.waitForSelector('.event-approve .custom-select', { timeout: 30000 })
 
   // Set approve.
   log('Setting event status to approved')
   await page.selectOption('.event-approve .custom-select', 'approve')
 
-  // Approve
+  // Click Save and wait for the API POST to complete before navigating away.
   log('Saving event approval')
-  await page.locator('text=Save Event').click()
+  const [saveResponse] = await Promise.all([
+    page.waitForResponse(
+      resp => resp.url().includes('/api/v2/events/' + idevents) && resp.request().method() === 'POST',
+      { timeout: 15000 }
+    ),
+    page.locator('text=Save Event').click()
+  ])
 
-  // Should show change.
-  log('Waiting for approval confirmation')
-  await page.locator('text=Event details updated.')
-  
-  log('Event approved successfully', { idevents })
+  log('Event approved successfully', { idevents, status: saveResponse.status() })
 }
 
 exports.addDevice = async function(page, baseURL, idevents, powered, photo, fixed, spareparts, itemType = null, category = null) {
@@ -234,7 +236,7 @@ exports.addDevice = async function(page, baseURL, idevents, powered, photo, fixe
   
   if (!currentUrl.includes(expectedUrl)) {
     log('Navigating to event view page', { expectedUrl, currentUrl })
-    await page.goto(expectedUrl)
+    await page.goto(expectedUrl, { waitUntil: 'domcontentloaded' })
   } else {
     log('Already on correct event view page, skipping navigation', { currentUrl })
   }
@@ -363,7 +365,7 @@ exports.addDeviceFast = async function(page, baseURL, idevents, powered, itemTyp
 }
 
 exports.unfollowGroup = async function(page, idgroups) {
-  await page.goto('/group/view/' + idgroups)
+  await page.goto('/group/view/' + idgroups, { waitUntil: 'domcontentloaded' })
 
   await page.click('#groupactions .dropdown-toggle >> visible=true')
 
