@@ -261,6 +261,13 @@ class ApiController extends Controller
             ->take($size)
             ->get();
 
+        // Batch-load device images to avoid N+1 per device.
+        $device_ids = $items->pluck('iddevices')->toArray();
+        $allImages = (new \FixometerFile)->findImagesForMany(env('TBL_DEVICES'), $device_ids);
+        foreach ($items as $item) {
+            $item->preloadedImages = $allImages[$item->iddevices] ?? [];
+        }
+
         $item_data = [];
 
         foreach ($items as $item) {

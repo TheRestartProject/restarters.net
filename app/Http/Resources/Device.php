@@ -185,8 +185,11 @@ class Device extends JsonResource
      */
     public function toArray(Request $request): array
     {
-        $event = \App\Party::find($this->event);
-        $group = $event ? \App\Group::find($event->group) : NULL;
+        // Use eager-loaded relations if available, fall back to individual queries.
+        $event = $this->relationLoaded('deviceEvent') ? $this->deviceEvent : \App\Party::find($this->event);
+        $group = $event
+            ? ($event->relationLoaded('theGroup') ? $event->theGroup : \App\Group::find($event->group))
+            : null;
 
         $ret = [
             'id' => intval($this->iddevices),
@@ -259,8 +262,8 @@ class Device extends JsonResource
             break;
         }
 
-        $category = \App\Category::find($this->category);
-        $ret['category']= \App\Http\Resources\Category::make($category);
+        $category = $this->relationLoaded('deviceCategory') ? $this->deviceCategory : \App\Category::find($this->category);
+        $ret['category'] = \App\Http\Resources\Category::make($category);
 
         $images = $this->resource->getImages();
         $ret['images'] = \App\Http\Resources\Image::collection($images);

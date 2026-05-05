@@ -402,8 +402,15 @@ class Device extends Model implements Auditable
         return Str::limit($this->problem, $length);
     }
 
+    // Set by callers that batch-load images to avoid N+1 (see findImagesForMany).
+    public ?array $preloadedImages = null;
+
     public function getImages()
     {
+        if ($this->preloadedImages !== null) {
+            return $this->preloadedImages;
+        }
+
         $File = new \FixometerFile;
 
         return $File->findImages(env('TBL_DEVICES'), $this->iddevices);

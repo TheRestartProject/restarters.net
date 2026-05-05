@@ -51,9 +51,7 @@ class DeviceController extends Controller
         $user_groups = [];
 
         if ($user) {
-            foreach (UserGroups::where('user', $user->id)->pluck('group')->toArray() as $gid) {
-                $user_groups[] = Group::find($gid);
-            }
+            $user_groups = Group::whereIn('idgroups', UserGroups::where('user', $user->id)->pluck('group'))->get()->all();
         }
 
         return view('fixometer.index', [
