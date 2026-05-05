@@ -12,12 +12,15 @@
 - [x] Stand up `restarters.dev` from `develop`
 - [x] **Set up auto-deploy for `develop` → `restarters-dev`** — CircleCI deploy job added; add `FLY_API_TOKEN` to CircleCI project env vars to activate (token already generated)
 - [ ] **Set up queue and app monitoring** — supervisord keeps processes up, but need alerting if queue backs up or app goes unhealthy
-- [ ] Tidy `production` branch — remove committed `node_modules` / build artefacts
+- [x] Tidy `production` branch — force-pushed from `develop`; no node_modules committed
 - [ ] Activate auto-deploy for `production` → `restarters` (same CircleCI pattern as develop, once develop is working)
 - [ ] Rebuild "yesterday" restore system
 - [x] Deploy Mailpit for dev: `restarters-dev-mail` live at `https://restarters-dev-mail.fly.dev` — navbar on `restarters-dev` links to it
-- [ ] Set remaining Fly secrets from production `.env` (see below)
-- [ ] Final staging test with production data (`fly-migrate.sh --app restarters-dev --db --images`)
+- [x] Set Fly secrets on `restarters` — all secrets deployed (mail, Discourse, Wiki, Drip, analytics, etc.)
+- [x] `fly.toml` updated for production: `APP_ENV=production`, `APP_URL=https://restarters.net`, `SESSION_DOMAIN=.restarters.net`, `SENTRY_ENVIRONMENT=production`, VM scaled to `shared-cpu-2x / 4GB`
+- [x] Deployed to `restarters` Fly app — healthy, production config live
+- [x] TLS cert for `restarters.net` issued (Let's Encrypt, RSA+ECDSA) — pre-provisioned via `_acme-challenge` CNAME before DNS cutover; cert is active now
+- [x] Production DB synced from `restarters_mc2RhNw` via `fly-migrate.sh --db --images` (6m16s); row counts verified against TCP connection
 - [x] API compatibility check — no breaking changes for known consumers. All v1 stats endpoints, RepairTogether, Zapier triggers, and TRP.org widgets are unchanged. Tag visibility changes are intentional and fine.
 - [ ] Check and renew `restarters.net` domain at iwantmyname (noted as due soon)
 - [ ] Write Fly.io ops crib for Neil
@@ -48,20 +51,20 @@ Values from the production `.env` on `restart-sp`. `MAIL_FROM_ADDRESS` is change
 
 ## Migration Day — 5 May
 
+✅ **Pre-done (before window):** `fly.toml` updated, app deployed, TLS cert issued, DB synced.
+
 | When | Action |
 |---|---|
 | 1:00pm | Tell network coordinators not to log devices |
-| 1:02pm | Put old server in maintenance mode: `php artisan down` |
-| 1:04pm | Run final image sync and DB migration in parallel: `fly-migrate.sh --images` + `fly-migrate.sh --db` |
-| ~1:35pm | Update Fly secrets for production and deploy: `fly secrets set APP_URL=https://restarters.net APP_ENV=production SENTRY_ENVIRONMENT=production -a restarters && fly deploy -a restarters` |
-| ~1:45pm | Add custom domain and TLS: `fly certs add restarters.net -a restarters` |
-| ~1:50pm | **Switch DNS** — point `restarters.net` A record to `66.241.124.187` (AAAA: `2a09:8280:1::ce:b85f:0`) |
-| ~2:00pm | Run smoke tests (see below) |
+| 1:02pm | Put old server in maintenance mode: `php artisan down --retry=60` on restart-sp |
+| 1:04pm | Run final DB + image sync: `./fly-migrate.sh --db --images` on restart-sp (~6 min) |
+| ~1:12pm | **Switch DNS** — point `restarters.net` A → `66.241.124.187`, AAAA → `2a09:8280:1::ce:b85f:0` |
+| ~1:15pm | Run smoke tests (see below) |
 | 3:00pm | Done, or roll back |
 
-**New server is NOT put in maintenance mode** — it goes live immediately when DNS switches.
+**TLS cert is already issued** — no delay on cutover. New server is NOT put in maintenance mode.
 
-Also update `fly.toml` env before deploying:
+~~Also update `fly.toml` env before deploying~~ *(already done)*:
 ```toml
 APP_ENV = "production"
 APP_URL = "https://restarters.net"
