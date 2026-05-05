@@ -283,7 +283,7 @@ class Device extends Model implements Auditable
                 if (self::isCircleCI()) {
                     $footprint = $this->deviceCategory->footprint;
                 } else {
-                    $footprint = \Cache::remember('category-' . $this->category, 15, function() {
+                    $footprint = \Cache::remember('category-' . $this->category, 300, function() {
                         return $this->deviceCategory;
                     })->footprint;
                 }
@@ -323,7 +323,7 @@ class Device extends Model implements Auditable
         if (self::isCircleCI()) {
             $powered = $this->deviceCategory->powered;
         } else {
-            $powered = \Cache::remember('category-powered-' . $this->category, 15, function() {
+            $powered = \Cache::remember('category-powered-' . $this->category, 300, function() {
                 return $this->deviceCategory->powered;
             });
         }
@@ -335,7 +335,7 @@ class Device extends Model implements Auditable
                 if (self::isCircleCI()) {
                     $category = $this->deviceCategory;
                 } else {
-                    $category = \Cache::remember('category-' . $this->category, 15, function() {
+                    $category = \Cache::remember('category-' . $this->category, 300, function() {
                         return $this->deviceCategory;
                     });
                 }

@@ -528,35 +528,52 @@ class Fixometer
           ];
     }
 
-    public static function loginRegisterStats()
+    const STATS_TTL = 86400;      // 24 hours — always serve from cache
+    const STATS_FRESH_TTL = 7200; // 2 hours — background refresh when this expires
+
+    public static function loginRegisterStats(): array
     {
-        $Party = new \App\Party;
-        $Device = new \App\Device;
+        $stats = \Cache::get('all_stats');
 
-        $stats = [];
-        if (\Cache::has('all_stats')) {
+        $valid = $stats
+            && array_key_exists('partiesCount', $stats)
+            && array_key_exists('waste_stats', $stats)
+            && array_key_exists('device_count_status', $stats);
+
+        if (! $valid) {
+            // Cold start — compute synchronously, but only once across concurrent workers.
+            \Cache::lock('all_stats_computing', 60)->block(30, function () {
+                if (\Cache::get('all_stats')) {
+                    return; // another worker just computed it
+                }
+                $fresh = static::computeStats();
+                \Cache::put('all_stats', $fresh, self::STATS_TTL);
+                \Cache::put('all_stats_fresh', true, self::STATS_FRESH_TTL);
+            });
             $stats = \Cache::get('all_stats');
-
-            // We've seen a Sentry problem which I can only see happening if there was invalid data in the cache.
-            if (
-                ! $stats ||
-                ! array_key_exists('partiesCount', $stats) ||
-                ! array_key_exists('waste_stats', $stats) ||
-                ! array_key_exists('device_count_status', $stats)
-            ) {
-                $stats = [];
+        } elseif (\Cache::missing('all_stats_fresh')) {
+            // Stale — serve immediately, dispatch one background refresh.
+            if (\Cache::lock('all_stats_refreshing', self::STATS_FRESH_TTL)->get()) {
+                dispatch(new \App\Jobs\RefreshLoginStats());
             }
         }
 
-        if ($stats == []) {
-            // Use COUNT query instead of loading all events into memory
-            $stats['partiesCount'] = \App\Party::where('event_end_utc', '<', now())->count();
-            $stats['waste_stats'] = \App\Helpers\LcaStats::getWasteStats();
-            $stats['device_count_status'] = $Device->statusCount();
-            \Cache::put('all_stats', $stats, 7200);
-        }
+        return static::decorateStats($stats);
+    }
 
-        // Add commonly computed values to avoid duplication in controllers
+    public static function computeStats(): array
+    {
+        $device = new \App\Device;
+
+        return [
+            'partiesCount' => \App\Party::where('event_end_utc', '<', now())->count(),
+            'waste_stats' => \App\Helpers\LcaStats::getWasteStats(),
+            'device_count_status' => $device->statusCount(),
+        ];
+    }
+
+    private static function decorateStats(array $stats): array
+    {
         $stats['deviceCount'] = 0;
         foreach ($stats['device_count_status'] as $statusRow) {
             if ($statusRow->status == \App\Device::REPAIR_STATUS_FIXED) {
@@ -565,8 +582,10 @@ class Fixometer
             }
         }
 
-        $stats['co2Total'] = $stats['waste_stats'][0]->powered_footprint + $stats['waste_stats'][0]->unpowered_footprint;
-        $stats['wasteTotal'] = $stats['waste_stats'][0]->powered_waste + $stats['waste_stats'][0]->unpowered_waste;
+        $stats['co2Total'] = ($stats['waste_stats'][0]->powered_footprint ?? 0)
+            + ($stats['waste_stats'][0]->unpowered_footprint ?? 0);
+        $stats['wasteTotal'] = ($stats['waste_stats'][0]->powered_waste ?? 0)
+            + ($stats['waste_stats'][0]->unpowered_waste ?? 0);
 
         return $stats;
     }
