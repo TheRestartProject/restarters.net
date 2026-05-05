@@ -85,6 +85,66 @@ flyctl ssh console --app restarters-dev --command "tail -f /var/log/laravel/lara
 flyctl ssh console --app restarters-dev --command "tail -f /var/log/php-fpm-slow.log"
 ```
 
+### Log format
+
+The nginx access log uses a custom `timed` format (the `X-Forwarded-For` real client IP is logged first, then the Fly internal proxy IP in parentheses):
+```
+<real-client-ip> (<fly-proxy-ip>) - <user> [timestamp] "REQUEST" status bytes "referer" "ua"
+rt=<total_request_time> uct=<fpm_connect_time> uht=<time_to_first_header> urt=<fpm_response_time>
+```
+
+Key fields:
+- `rt` = total time nginx held the request (includes FPM wait + processing + response send)
+- `urt` = time PHP-FPM took to process the request (the PHP execution time)
+- `uct` = time to connect to FPM socket (near 0 normally; high values indicate socket backlog)
+- `uht` = time until FPM sent the first response header (FPM queue wait + PHP start time)
+- `uht=-` = FPM never responded (504 / worker died)
+
+### Find slow requests (> 2s upstream time)
+
+```bash
+flyctl ssh console --app restarters --command \
+  'awk '"'"'{for(i=1;i<=NF;i++) if($i~/^urt=/) {v=substr($i,5); if(v+0>2) print v,$0}}'"'"' \
+  /var/log/nginx/access.log | sort -rn | head -30'
+```
+
+### Identify queued requests (rt much larger than urt)
+
+Queueing shows as `uct` (FPM connect time) being elevated. When FPM workers are all busy, the
+socket accept is delayed, so `uct >> 0`. The window `uht - uct` is the PHP processing time.
+
+```bash
+# Show requests where total time is > 5s — look for uct > 0 to spot FPM saturation
+flyctl ssh console --app restarters --command \
+  'awk '"'"'{for(i=1;i<=NF;i++) if($i~/^rt=/) {v=substr($i,3); if(v+0>5) print v,$0}}'"'"' \
+  /var/log/nginx/access.log | sort -rn | head -30'
+```
+
+### Summarise slowest URLs by average upstream time
+
+```bash
+flyctl ssh console --app restarters --command \
+  'awk '"'"'{url="-"; urt=0; for(i=1;i<=NF;i++){if($i~/^"(GET|POST|PUT|DELETE|PATCH|HEAD)/) url=$i; if($i~/^urt=/) urt=substr($i,5)+0} if(urt>0) print urt, url}'"'"' \
+  /var/log/nginx/access.log | sort -rn | head -40'
+```
+
+### Top calling hosts (real IP)
+
+The first field in the timed log is the real client IP (from `X-Forwarded-For`). The Fly proxy IP is field 2 (inside parens, stripped on parsing).
+
+```bash
+flyctl ssh console --app restarters --command \
+  'awk '"'"'{print $1}'"'"' /var/log/nginx/access.log | sort | uniq -c | sort -rn | head -20'
+```
+
+### Count 5xx errors by URL
+
+```bash
+# Fields: 1=real-ip 2=(fly-ip) 3=- 4=- 5=[timestamp] 6=timezone] 7="METHOD 8=PATH 9=PROTO" 10=status
+flyctl ssh console --app restarters --command \
+  'awk '"'"'$10~/^5/ {print $10, $8}'"'"' /var/log/nginx/access.log | sort | uniq -c | sort -rn | head -20'
+```
+
 ---
 
 ## Secrets (environment variables)
