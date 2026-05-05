@@ -364,12 +364,8 @@ class PartyController extends Controller
         $brands = Brands::all();
         $clusters = Cluster::all();
 
-        $device_images = [];
-
-        //Get Device Images
-        foreach ($event->devices as $device) {
-            $device_images[$device->iddevices] = $File->findImages(env('TBL_DEVICES'), $device->iddevices);
-        }
+        $device_ids = $event->devices->pluck('iddevices')->toArray();
+        $device_images = $File->findImagesForMany(env('TBL_DEVICES'), $device_ids);
 
         // Items can be logged at any time.
         $stats = $event->getEventStats(null, null, true);

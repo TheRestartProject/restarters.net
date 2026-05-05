@@ -551,4 +551,25 @@ class APIv2GroupTest extends TestCase
         $groups = $json['data'];
         $this->assertGroupFound($groups, $idgroups, true);
     }
+
+    public function testGroupStatsOmittedByDefault(): void
+    {
+        $user = User::factory()->administrator()->create(['api_token' => 'testtoken']);
+        $this->actingAs($user);
+
+        $idgroups = $this->createGroup();
+
+        // Without includeStats, stats should be empty.
+        $response = $this->get("/api/v2/groups/$idgroups");
+        $response->assertSuccessful();
+        $json = json_decode($response->getContent(), true);
+        $this->assertEmpty($json['data']['stats'], 'stats should be empty when includeStats is not set');
+
+        // With includeStats=true, stats should be populated.
+        $response = $this->get("/api/v2/groups/$idgroups?includeStats=true");
+        $response->assertSuccessful();
+        $json = json_decode($response->getContent(), true);
+        $this->assertNotEmpty($json['data']['stats'], 'stats should be populated when includeStats=true');
+        $this->assertArrayHasKey('co2_total', $json['data']['stats']);
+    }
 }

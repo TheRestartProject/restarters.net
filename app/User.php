@@ -153,6 +153,8 @@ class User extends Authenticatable implements Auditable, HasLocalePreference
             ->take($numberOfGroups)
             ->get();
 
+        $groups->load('groupImage.image');
+
         // Expand the image
         $groupsNearby = [];
 

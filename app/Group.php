@@ -291,6 +291,7 @@ class Group extends Model implements Auditable
         }
 
         $allPastEvents = Party::past()
+            ->with('allDevices')
             ->where('events.group', $this->idgroups)
             ->get();
 
@@ -405,6 +406,15 @@ class Group extends Model implements Auditable
         }
 
         return url('/uploads/mid_1474993329ef38d3a4b9478841cc2346f8e131842fdcfd073b307.jpg');
+    }
+
+    public function nextUpcomingParty(): HasOne
+    {
+        return $this->hasOne(Party::class, 'group', 'idgroups')
+            ->ofMany(['event_start_utc' => 'min'], function ($query) {
+                $query->where('approved', true)
+                      ->where('event_start_utc', '>=', now());
+            });
     }
 
     public function getNextUpcomingEvent()

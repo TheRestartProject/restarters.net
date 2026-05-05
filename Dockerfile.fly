@@ -85,8 +85,11 @@ RUN sed -i 's|listen = 127.0.0.1:9000|listen = /var/run/php-fpm.sock|' /usr/loca
     sed -i 's|;listen.mode = 0660|listen.mode = 0660|' /usr/local/etc/php-fpm.d/www.conf && \
     sed -i 's|;slowlog = .*|slowlog = /var/log/php-fpm-slow.log|' /usr/local/etc/php-fpm.d/www.conf && \
     sed -i 's|;request_slowlog_timeout = .*|request_slowlog_timeout = 5s|' /usr/local/etc/php-fpm.d/www.conf && \
-    sed -i 's|;request_terminate_timeout = .*|request_terminate_timeout = 60s|' /usr/local/etc/php-fpm.d/www.conf && \
-    sed -i 's|pm.max_children = [0-9]*|pm.max_children = 30|' /usr/local/etc/php-fpm.d/www.conf && \
+    sed -i 's|;request_terminate_timeout = .*|request_terminate_timeout = 120s|' /usr/local/etc/php-fpm.d/www.conf && \
+    sed -i 's|pm.max_children = [0-9]*|pm.max_children = 200|' /usr/local/etc/php-fpm.d/www.conf && \
+    sed -i 's|pm.start_servers = [0-9]*|pm.start_servers = 20|' /usr/local/etc/php-fpm.d/www.conf && \
+    sed -i 's|pm.min_spare_servers = [0-9]*|pm.min_spare_servers = 10|' /usr/local/etc/php-fpm.d/www.conf && \
+    sed -i 's|pm.max_spare_servers = [0-9]*|pm.max_spare_servers = 50|' /usr/local/etc/php-fpm.d/www.conf && \
     sed -i 's|;pm.status_path = .*|pm.status_path = /fpm-status|' /usr/local/etc/php-fpm.d/www.conf && \
     sed -i 's|;pm.status_listen = .*|pm.status_listen = 127.0.0.1:9001|' /usr/local/etc/php-fpm.d/www.conf && \
     rm -f /usr/local/etc/php-fpm.d/zz-docker.conf

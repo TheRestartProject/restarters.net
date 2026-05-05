@@ -223,6 +223,34 @@ class FixometerFile extends Model
         }
     }
 
+    public function findImagesForMany($of_ref_type, array $ref_ids): array
+    {
+        if (empty($ref_ids)) {
+            return [];
+        }
+
+        $placeholders = implode(',', array_fill(0, count($ref_ids), '?'));
+        $sql = "SELECT `i`.*, `x`.`reference` FROM `images` AS `i`
+                    INNER JOIN `xref` AS `x` ON `x`.`object` = `i`.`idimages`
+                    WHERE `x`.`object_type` = ? AND
+                    `x`.`reference_type` = ? AND
+                    `x`.`reference` IN ($placeholders)";
+
+        try {
+            $rows = DB::select($sql, array_merge(
+                [env('TBL_IMAGES'), $of_ref_type],
+                array_map('intval', $ref_ids)
+            ));
+            $grouped = [];
+            foreach ($rows as $row) {
+                $grouped[$row->reference][] = $row;
+            }
+            return $grouped;
+        } catch (\Illuminate\Database\QueryException $e) {
+            return [];
+        }
+    }
+
     public function deleteImage($idxref)
     {
         // Delete the xref.  This is sufficient to stop the image being attached to the device.  We leave the

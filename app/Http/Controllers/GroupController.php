@@ -46,7 +46,7 @@ class GroupController extends Controller
         $user = Auth::user();
 
         // Get all groups
-        $groups = Group::with(['networks'])
+        $groups = Group::with(['networks', 'groupImage.image', 'nextUpcomingParty'])
             ->orderBy('name', 'ASC')
             ->get();
 
@@ -490,7 +490,7 @@ class GroupController extends Controller
             foreach ($groups as $group) {
                 $group_image = $group->groupImage;
 
-                $event = $group->getNextUpcomingEvent();
+                $event = $group->nextUpcomingParty;
 
                 // We want to return the distance from our own location.
                 $distance = null;
@@ -525,8 +525,8 @@ class GroupController extends Controller
                     'all_confirmed_restarters_count' => $group->all_confirmed_restarters_count,
                     'all_confirmed_hosts_count' => $group->all_confirmed_hosts_count,
                     'networks' => \Illuminate\Support\Arr::pluck($group->networks, 'id'),
-                    'group_tags' => $group->group_tags()->get()->pluck('id'),
-                    'group_tags_full' => $group->group_tags()->get()->map(function($tag) {
+                    'group_tags' => $group->group_tags->pluck('id'),
+                    'group_tags_full' => $group->group_tags->map(function($tag) {
                         return [
                             'id' => $tag->id,
                             'name' => $tag->tag_name,
