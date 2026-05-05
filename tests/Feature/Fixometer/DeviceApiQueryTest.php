@@ -3,14 +3,37 @@
 namespace Tests\Feature\Fixometer;
 
 use App\Device;
+use App\Group;
 use App\Party;
 use App\Role;
+use App\User;
+use App\UserGroups;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\DB;
 use Tests\TestCase;
 
 class DeviceApiQueryTest extends TestCase
 {
+    protected function setUp(): void
+    {
+        parent::setUp();
+
+        DB::statement('SET foreign_key_checks=0');
+        Device::truncate();
+        Party::truncate();
+        UserGroups::truncate();
+        Group::truncate();
+        User::truncate();
+        DB::statement('SET foreign_key_checks=1');
+    }
+
+    protected function tearDown(): void
+    {
+        DB::disableQueryLog();
+        DB::flushQueryLog();
+        parent::tearDown();
+    }
+
     private function createDevicesForGroup(int $groupId, int $count): void
     {
         $event = Party::factory()->moderated()->create([
