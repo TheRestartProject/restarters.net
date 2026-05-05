@@ -34,6 +34,7 @@
         "mcamara/laravel-localization": "^2.3.0",
         "msurguy/honeypot": "^1.2",
         "owen-it/laravel-auditing": "^13.1",
+        "predis/predis": "^2.0",
         "rennokki/laravel-eloquent-query-cache": "^3.4",
         "sentry/sentry-laravel": "^3.2",
         "soundasleep/html2text": "^1.1",
@@ -44,8 +45,8 @@
         "symfony/http-foundation": "^6.2",
         "symfony/mailgun-mailer": "^6.2",
         "toin0u/geocoder-laravel": "^4.6",
-        "wouternl/laravel-drip": "dev-master",
-        "twbs/bootstrap": "4.1.0"
+        "twbs/bootstrap": "4.1.0",
+        "wouternl/laravel-drip": "dev-master"
     },
     "require-dev": {
         "barryvdh/laravel-debugbar": "^3.8",
