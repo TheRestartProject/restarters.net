@@ -565,6 +565,53 @@ if [[ "$DO_IMAGES" = true ]]; then
     echo ""
 fi
 
+# ─── DB validation ────────────────────────────────────────────────────────────
+
+if [[ "$DO_DB" = true && "$DRY_RUN" = false ]]; then
+    log_info "Validating row counts..."
+
+    SRC_COUNTS=$(mysql -h "$LIVE_DB_HOST" -u "$LIVE_DB_USER" -p"$LIVE_DB_PASS" \
+        --skip-column-names -e \
+        "SELECT 'users', COUNT(*) FROM users
+         UNION ALL SELECT 'groups', COUNT(*) FROM groups
+         UNION ALL SELECT 'events', COUNT(*) FROM events
+         UNION ALL SELECT 'devices', COUNT(*) FROM devices
+         UNION ALL SELECT 'networks', COUNT(*) FROM networks;" \
+        "$LIVE_DB_NAME" 2>/dev/null)
+
+    DST_COUNTS=$(fly ssh console -a "$FLY_DB_APP" -C \
+        "mysql -u root --skip-column-names -e \
+        \"SELECT 'users', COUNT(*) FROM users
+          UNION ALL SELECT 'groups', COUNT(*) FROM groups
+          UNION ALL SELECT 'events', COUNT(*) FROM events
+          UNION ALL SELECT 'devices', COUNT(*) FROM devices
+          UNION ALL SELECT 'networks', COUNT(*) FROM networks;\" \
+        ${FLY_DB_NAME}" 2>/dev/null)
+
+    VALIDATION_FAILED=false
+    echo ""
+    printf "  %-12s %10s %10s %8s\n" "Table" "Source" "Fly" "Match"
+    printf "  %-12s %10s %10s %8s\n" "-----" "------" "---" "-----"
+    while IFS=$'\t' read -r tbl src_cnt; do
+        fly_cnt=$(echo "$DST_COUNTS" | grep "^${tbl}" | awk '{print $2}')
+        if [[ "$src_cnt" = "$fly_cnt" ]]; then
+            mark="✓"
+        else
+            mark="✗ MISMATCH"
+            VALIDATION_FAILED=true
+        fi
+        printf "  %-12s %10s %10s %8s\n" "$tbl" "$src_cnt" "${fly_cnt:-?}" "$mark"
+    done <<< "$SRC_COUNTS"
+    echo ""
+
+    if [[ "$VALIDATION_FAILED" = true ]]; then
+        log_err "Row count validation FAILED — Fly DB does not match source. Do not proceed with go-live."
+        exit 1
+    else
+        log_step "Row counts match. DB migration verified."
+    fi
+fi
+
 # ─── Summary ──────────────────────────────────────────────────────────────────
 
 echo ""
