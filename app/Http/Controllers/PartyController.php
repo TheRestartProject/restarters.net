@@ -146,6 +146,8 @@ class PartyController extends Controller
             })->pluck('event')->toArray();
 
             $expandWith = ['allInvited', 'allDevices.deviceCategory', 'theGroup.groupImage.image'];
+            // Future events have no devices yet, so skip allDevices to avoid loading thousands of empty rows.
+            $futureExpandWith = ['allInvited', 'theGroup.groupImage.image'];
 
             foreach (Party::forUser(null)->with($expandWith)->reorder()->orderBy('event_start_utc', 'DESC')->get() as $event) {
                 $e = \App\Http\Controllers\PartyController::expandEvent($event, NULL, $countries, $attending, $invited, $volunteering);
@@ -155,7 +157,7 @@ class PartyController extends Controller
             if (! is_null(Auth::user()->latitude) && ! is_null(Auth::user()->longitude)) {
                 // We know the location of this user, so we can also get nearby upcoming events.
                 $upcoming_events_in_area = Party::upcomingEventsInUserArea(Auth::user())
-                    ->with($expandWith)
+                    ->with($futureExpandWith)
                     ->whereNotIn('idevents', \Illuminate\Support\Arr::pluck($events, 'idevents'))
                     ->get();
 
@@ -170,7 +172,7 @@ class PartyController extends Controller
             }
 
             // ...and any other upcoming approved events
-            $other_upcoming_events = Party::with(array_merge(['theGroup.networks'], $expandWith))->future()->
+            $other_upcoming_events = Party::with(array_merge(['theGroup.networks'], $futureExpandWith))->future()->
                 whereNotIn('idevents', \Illuminate\Support\Arr::pluck($events, 'idevents'))->
                 get();
 
