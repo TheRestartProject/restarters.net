@@ -531,20 +531,23 @@ class Fixometer
     const STATS_TTL = 86400;      // 24 hours — always serve from cache
     const STATS_FRESH_TTL = 7200; // 2 hours — background refresh when this expires
 
+    private static function isStatsValid($stats): bool
+    {
+        return is_array($stats)
+            && array_key_exists('partiesCount', $stats)
+            && array_key_exists('waste_stats', $stats)
+            && is_array($stats['device_count_status'] ?? null);
+    }
+
     public static function loginRegisterStats(): array
     {
         $stats = \Cache::get('all_stats');
 
-        $valid = $stats
-            && array_key_exists('partiesCount', $stats)
-            && array_key_exists('waste_stats', $stats)
-            && array_key_exists('device_count_status', $stats);
-
-        if (! $valid) {
+        if (! static::isStatsValid($stats)) {
             // Cold start — compute synchronously, but only once across concurrent workers.
             \Cache::lock('all_stats_computing', 60)->block(30, function () {
-                if (\Cache::get('all_stats')) {
-                    return; // another worker just computed it
+                if (static::isStatsValid(\Cache::get('all_stats'))) {
+                    return; // another worker just computed valid stats
                 }
                 $fresh = static::computeStats();
                 \Cache::put('all_stats', $fresh, self::STATS_TTL);

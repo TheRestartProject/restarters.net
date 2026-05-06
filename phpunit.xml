@@ -35,5 +35,6 @@
     <env name="DB_TEST_PASSWORD" value="s3cr3t"/>
     <env name="AUDIT_CONSOLE_EVENTS" value="true"/>
     <env name="CALENDAR_HASH" value="somehash"/>
+    <env name="FEATURE__DISCOURSE_INTEGRATION" value="false"/>
   </php>
 </phpunit>

@@ -7,8 +7,17 @@
 mkdir -p /var/www/storage/framework/{sessions,views,cache/data}
 mkdir -p /var/www/storage/logs
 mkdir -p /var/www/bootstrap/cache
-mkdir -p /var/www/public/uploads
-chown -R www-data:www-data /var/www/storage /var/www/bootstrap/cache /var/www/public/uploads
+chown -R www-data:www-data /var/www/storage /var/www/bootstrap/cache
+
+# Create swap file on root filesystem (ephemeral, recreated each boot)
+SWAPFILE=/swapfile
+if [ ! -f "$SWAPFILE" ]; then
+    echo "Creating 2GB swap file..."
+    fallocate -l 2G "$SWAPFILE" 2>/dev/null || dd if=/dev/zero of="$SWAPFILE" bs=1M count=2048 2>/dev/null
+    chmod 600 "$SWAPFILE"
+    mkswap "$SWAPFILE" >/dev/null
+fi
+swapon "$SWAPFILE" 2>/dev/null || true
 
 # Ensure log directories exist on the persistent volume (/var/log is mounted)
 mkdir -p /var/log/nginx
@@ -29,33 +38,13 @@ rm -rf /var/www/storage/logs
 ln -sf /var/log/laravel /var/www/storage/logs
 chown -R www-data:www-data /var/log/laravel
 
-# Set up cookie-based site gate for non-production deployments (prevents scraping).
-# The HMAC is computed once here at startup and written to a nginx map file so
-# /_auth_check is handled entirely by nginx — no PHP-FPM worker consumed per request.
-if [ "${BASIC_AUTH_ENABLED:-}" = "true" ]; then
-    EXPECTED=$(php -r "echo hash_hmac('sha256', getenv('BASIC_AUTH_PASSWORD') ?: 'project', getenv('APP_KEY') ?: 'fallback');")
-    printf 'map $cookie_site_auth $auth_gate_valid {\n    "%s" 1;\n    default 0;\n}\nmap $auth_gate_valid $auth_check_status {\n    1 200;\n    default 401;\n}\n' \
-        "$EXPECTED" > /etc/nginx/auth-gate-map.conf
-    printf 'auth_request /_auth_check;\nerror_page 401 = @auth_gate;\n' \
-        > /etc/nginx/auth-gate.conf
-else
-    printf 'map $cookie_site_auth $auth_gate_valid { default 1; }\nmap $auth_gate_valid $auth_check_status { default 200; }\n' \
-        > /etc/nginx/auth-gate-map.conf
-    : > /etc/nginx/auth-gate.conf
-fi
-
 # Substitute environment variables in nginx config for Tigris proxy.
-# Always run envsubst — nginx fails to start if the variables remain as literals.
-# nginx set/proxy_set_header directives require non-empty values, so fall back to
-# dummy localhost values when AWS_BUCKET is not configured (dev/local-storage mode).
-# In that case /uploads/ proxying simply returns 502, which is fine because dev
-# stores uploads locally (served at /storage/, not /uploads/).
-export TIGRIS_BUCKET_URL="${AWS_BUCKET:+https://${AWS_BUCKET}.fly.storage.tigris.dev}"
-export TIGRIS_BUCKET_HOST="${AWS_BUCKET:+${AWS_BUCKET}.fly.storage.tigris.dev}"
-export TIGRIS_BUCKET_URL="${TIGRIS_BUCKET_URL:-http://localhost:9999}"
-export TIGRIS_BUCKET_HOST="${TIGRIS_BUCKET_HOST:-localhost}"
-envsubst '${TIGRIS_BUCKET_URL} ${TIGRIS_BUCKET_HOST}' < /etc/nginx/nginx.conf > /etc/nginx/nginx.conf.tmp
-mv /etc/nginx/nginx.conf.tmp /etc/nginx/nginx.conf
+if [ -n "$AWS_BUCKET" ]; then
+    export TIGRIS_BUCKET_URL="https://${AWS_BUCKET}.fly.storage.tigris.dev"
+    export TIGRIS_BUCKET_HOST="${AWS_BUCKET}.fly.storage.tigris.dev"
+    envsubst '${TIGRIS_BUCKET_URL} ${TIGRIS_BUCKET_HOST}' < /etc/nginx/nginx.conf > /etc/nginx/nginx.conf.tmp
+    mv /etc/nginx/nginx.conf.tmp /etc/nginx/nginx.conf
+fi
 
 # Run DB setup in a subshell so failures never prevent supervisord from starting
 (
