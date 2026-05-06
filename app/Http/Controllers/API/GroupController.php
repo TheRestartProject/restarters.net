@@ -86,6 +86,8 @@ class GroupController extends Controller
             }
         }
 
+        $allGroupStats = Group::bulkGroupStats($groups);
+
         // New Collection Instance
         $collection = collect([]);
 
@@ -96,7 +98,7 @@ class GroupController extends Controller
                 $group->latitude >= $minLat && $group->latitude <= $maxLat &&
                 $group->longitude >= $minLng && $group->longitude <= $maxLng
                 )) {
-                $groupStats = $group->getGroupStats();
+                $groupStats = $allGroupStats[$group->idgroups];
                 $collection->push([
                                       'id' => $group->idgroups,
                                       'name' => $group->name,
