@@ -509,56 +509,67 @@ class Party extends Model implements Auditable
 
         // Normally we only count stats for devices for events that have started or finished.
         if (($includeFuture || $this->hasFinished() || $this->isInProgress()) && !empty($this->allDevices)) {
+            // Hoist env lookups out of the loop — each env() call is cheap but compounds over thousands of devices.
+            $miscPoweredId   = (int) env('MISC_CATEGORY_ID_POWERED');
+            $miscUnpoweredId = (int) env('MISC_CATEGORY_ID_UNPOWERED');
+
             foreach ($this->allDevices as $device) {
-                // We cache the powered flag for a category to avoid many DB queries.
-                $powered = \Cache::remember('category-powered-' . $device->category, 300, function() use ($device) {
-                    return $device->deviceCategory->powered;
-                });
+                // allDevices JOINs with categories, so powered/weight/footprint are already on the device
+                // object as direct attributes — no Redis round-trips needed.
+                $powered = (bool) $device->powered;
+                $isFixed = $device->repair_status === Device::REPAIR_STATUS_FIXED;
 
                 if ($powered) {
                     $result['devices_powered']++;
 
-                    if ($device->isFixed()) {
-                        $result['co2_powered'] += $device->eCo2Diverted($eEmissionRatio, $displacementFactor);
-                        $result['waste_powered'] += $device->eWasteDiverted();
+                    if ($isFixed) {
+                        $result['fixed_devices']++;
                         $result['fixed_powered']++;
+
+                        if ($device->category == $miscPoweredId && $device->estimate > 0) {
+                            $result['co2_powered']   += $device->estimate * $eEmissionRatio * $displacementFactor;
+                            $result['waste_powered'] += $device->estimate;
+                        } else {
+                            $result['co2_powered']   += $device->footprint * $displacementFactor;
+                            $result['waste_powered'] += $device->weight;
+                        }
+
+                        if ($device->weight == 0 && $device->estimate == 0 && $device->category == $miscPoweredId) {
+                            $result['no_weight_powered']++;
+                        }
                     }
                 } else {
                     $result['devices_unpowered']++;
 
-                    if ($device->isFixed()) {
-                        $result['co2_unpowered'] += $device->uCo2Diverted($uEmissionratio, $displacementFactor);
-                        $result['waste_unpowered'] += $device->uWasteDiverted();
+                    if ($isFixed) {
+                        $result['fixed_devices']++;
                         $result['fixed_unpowered']++;
+
+                        if ($device->estimate > 0) {
+                            $result['co2_unpowered']   += $device->estimate * $uEmissionratio * $displacementFactor;
+                            $result['waste_unpowered'] += $device->estimate;
+                        } else {
+                            $result['co2_unpowered']   += $device->footprint * $displacementFactor;
+                            $result['waste_unpowered'] += $device->weight;
+                        }
+
+                        if ($device->weight == 0 && $device->estimate == 0 && $device->category == $miscUnpoweredId) {
+                            $result['no_weight_unpowered']++;
+                        }
                     }
                 }
 
-                switch ($device->repair_status) {
-                    case Device::REPAIR_STATUS_FIXED:
-                        $result['fixed_devices']++;
-                        break;
-                    case Device::REPAIR_STATUS_REPAIRABLE:
-                        $result['repairable_devices']++;
-                        break;
-                    case Device::REPAIR_STATUS_ENDOFLIFE:
-                        $result['dead_devices']++;
-                        break;
-                    default:
-                        $result['unknown_repair_status']++;
-                        break;
-                }
-
-                if ($device->isFixed()) {
-                    $category = \Cache::remember('category-' . $device->category, 300, function() use ($device) {
-                        return $device->deviceCategory;
-                    });
-
-                    if ($category->weight == 0 && $device->estimate == 0) {
-                        if ($category->isMiscPowered()) {
-                            $result['no_weight_powered']++;
-                        } elseif ($category->isMiscUnpowered()) {
-                            $result['no_weight_unpowered']++;
-                        }
+                if (! $isFixed) {
+                    switch ($device->repair_status) {
+                        case Device::REPAIR_STATUS_REPAIRABLE:
+                            $result['repairable_devices']++;
+                            break;
+                        case Device::REPAIR_STATUS_ENDOFLIFE:
+                            $result['dead_devices']++;
+                            break;
+                        default:
+                            $result['unknown_repair_status']++;
+                            break;
                     }
                 }
             }
