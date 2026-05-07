@@ -96,4 +96,8 @@ return [
         ],
     ],
 
+    'restarters' => [
+        'base_url' => env('RESTARTERS_BASE_URL', 'https://restarters.net/api/v2'),
+        'token' => env('RESTARTERS_API_TOKEN'),
+    ],
 ];
