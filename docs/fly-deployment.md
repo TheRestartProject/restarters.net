@@ -94,7 +94,7 @@ Secrets take precedence over `[env]` values in the toml file.
 
 Dev/staging apps must not reach real external services. `fly-migrate.sh --secrets` enforces this automatically:
 
-**Shared secrets** (copied to any app): `APP_KEY`, `AWS_*` (Tigris), `SENTRY_LARAVEL_DSN`, `MAPBOX_TOKEN`, `GOOGLE_API_CONSOLE_KEY`, `CALENDAR_HASH`, `SUPPORT_EMAIL_ADDRESS`, `REPAIRDIRECTORY_URL`
+**Shared secrets** (copied to any app): `APP_KEY`, `AWS_*` (Tigris), `SENTRY_LARAVEL_DSN`, `MAPBOX_TOKEN`, `GOOGLE_MAPS_FRONTEND_KEY` , `GOOGLE_MAPS_BACKEND_KEY` , `CALENDAR_HASH`, `SUPPORT_EMAIL_ADDRESS`, `REPAIRDIRECTORY_URL`
 
 **Production-only secrets** (only copied when `--app restarters`): all mail/Mailgun config, `DISCOURSE_*`, `WIKI_*`, `WP_XMLRPC_*`, `DRIP_*`, `GOOGLE_ANALYTICS_TRACKING_ID`, `GOOGLE_TAG_MANAGER_ID`, `SEND_COMMAND_LOGS_TO`
 

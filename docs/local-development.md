@@ -169,17 +169,18 @@ task docker:test:playwright-autocomplete
 
 Before running tests, you need to configure the Google API key for geocoding functionality:
 
-1. **Set Google API Key**: Add a valid Google Maps API key to your `.env` file:
+1. **Set Google API Key**: Add valid Google Maps API keys to your `.env` file:
    ```bash
-   GOOGLE_API_CONSOLE_KEY=your_actual_google_api_key_here
+   GOOGLE_MAPS_FRONTEND_KEY=your_actual_google_api_key_here
+   GOOGLE_MAPS_BACKEND_KEY=your_actual_google_api_key_here
    ```
 
 2. **API Key Requirements**: The key must have the following APIs enabled:
-   - Geocoding API
-   - Maps JavaScript API (for location validation)
+   - Backend key: Geocoding API
+   - Frontend key: Maps JavaScript API (for location validation)
 
 > [!WARNING]
-> Without a valid `GOOGLE_API_CONSOLE_KEY`, tests that create groups or events will fail with location validation errors.
+> Without valid `GOOGLE_MAPS_FRONTEND_KEY` and `GOOGLE_MAPS_BACKEND_KEY`s, tests that create groups or events will fail with location validation errors.
 
 > [!NOTE]
 > The PHPUnit task will automatically upload coverage to Coveralls if the `COVERALLS_REPO_TOKEN` environment variable is set.
