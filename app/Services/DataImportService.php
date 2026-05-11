@@ -333,7 +333,7 @@ class DataImportService
             'model' => $item['model'] ?? '',
             'age' => $item['age'] ?? '',
             'estimate' => $item['weight estimate'] ?? '',
-            'problem' => $this->concatenateProblemSolution($item),
+            'problem' => $this->getAssessment($item),
             'notes' => $item['notes'] ?? '',
             'repair_status' => $repairStatus,
             'next_steps' => $item['next steps (if status = repairable)'] ?? '',
@@ -370,21 +370,12 @@ class DataImportService
         };
     }
 
-    protected function concatenateProblemSolution(array $item): string
+    protected function getAssessment(array $item): string
     {
-        $problem = rtrim(trim($item['problem'] ?? ''), '. ');
-        $solution = rtrim(trim($item['work carried out/solution'] ?? ''), '. ');
+        $assessment = trim($item['Assessment'] ?? '');
 
-        if ($problem && $solution) {
-            return "{$problem}. {$solution}.";
-        }
-
-        if ($problem) {
-            return "{$problem}.";
-        }
-
-        if ($solution) {
-            return "{$solution}.";
+        if ($assessment) {
+            return rtrim($assessment, '. ') . '.';
         }
 
         return '';
