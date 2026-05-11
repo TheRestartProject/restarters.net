@@ -6,12 +6,6 @@ use Carbon\Carbon;
 
 class DataImportService
 {
-    public function __construct(
-        protected CsvReader $csvReader,
-        protected RestartersApiClient $apiClient,
-    ) {
-    }
-
     protected array $categoryIds = [
         "Games console" => 6,
         "Watch/clock" => 7,
@@ -62,8 +56,20 @@ class DataImportService
         "Jewellery" => 52,
     ];
 
-    public function importAllEvents(string $eventsCsv, string $itemsCsv, int $groupId): array
-    {
+    public function __construct(
+        protected CsvReader $csvReader,
+    ) {
+    }
+
+    public function importAllEvents(
+        string $eventsCsv,
+        string $itemsCsv,
+        int $groupId,
+        string $apiToken,
+        ?string $baseUrl = null,
+    ): array {
+        $apiClient = new RestartersApiClient($apiToken, $baseUrl);
+
         $report = $this->newReport();
         $reportEventIds = [];
 
@@ -98,7 +104,7 @@ class DataImportService
 
             $eventKey = "{$eventDate} - {$venueName}";
 
-            [$eventId, $eventStatus] = $this->createOrFindEvent($event, $groupId, $report);
+            [$eventId, $eventStatus] = $this->createOrFindEvent($apiClient, $event, $groupId, $report);
             $report['events'][$eventStatus]++;
 
             if (!$eventId) {
@@ -128,7 +134,7 @@ class DataImportService
             }
 
             foreach ($itemsForEvent as $item) {
-                $status = $this->createItemForEvent($item, $eventId, $report);
+                $status = $this->createItemForEvent($apiClient, $item, $eventId, $report);
                 $report['items_per_event'][$eventKey][$status]++;
                 $report['items_total'][$status]++;
             }
@@ -139,19 +145,26 @@ class DataImportService
         return $report;
     }
 
-    public function importItemsForExistingEvent(string $itemsCsv, int $groupId, int $eventId): array
-    {
+    public function importItemsForExistingEvent(
+        string $itemsCsv,
+        int $groupId,
+        int $eventId,
+        string $apiToken,
+        ?string $baseUrl = null,
+    ): array {
+        $apiClient = new RestartersApiClient($apiToken, $baseUrl);
+
         $report = $this->newReport();
         $reportKey = "event_id:{$eventId}";
         $report['event_ids'][$reportKey] = $eventId;
         $report['items_per_event'][$reportKey] = $this->emptyItemStats();
 
-        $this->assertEventExistsInGroup($groupId, $eventId);
+        $this->assertEventExistsInGroup($apiClient, $groupId, $eventId);
 
         $items = $this->csvReader->read($itemsCsv);
 
         foreach ($items as $item) {
-            $status = $this->createItemForEvent($item, $eventId, $report);
+            $status = $this->createItemForEvent($apiClient, $item, $eventId, $report);
             $report['items_per_event'][$reportKey][$status]++;
             $report['items_total'][$status]++;
         }
@@ -159,9 +172,9 @@ class DataImportService
         return $report;
     }
 
-    protected function assertEventExistsInGroup(int $groupId, int $eventId): void
+    protected function assertEventExistsInGroup(RestartersApiClient $apiClient, int $groupId, int $eventId): void
     {
-        $response = $this->apiClient->get("/groups/{$groupId}/events");
+        $response = $apiClient->get("/groups/{$groupId}/events");
         $events = $response['data'] ?? [];
 
         foreach ($events as $event) {
@@ -173,22 +186,22 @@ class DataImportService
         throw new \RuntimeException("Event {$eventId} was not found in group {$groupId}");
     }
 
-    protected function createOrFindEvent(array $event, int $groupId, array &$report): array
+    protected function createOrFindEvent(RestartersApiClient $apiClient, array $event, int $groupId, array &$report): array
     {
         $venue = $event['venue name'] ?? '';
         $date = $event['event date'] ?? '';
         $ctx = ['venue' => $venue, 'date' => $date, 'operation' => 'create_event'];
 
-        $existingId = $this->findExistingEventId($venue, $date, $groupId, $report);
+        $existingId = $this->findExistingEventId($apiClient, $venue, $date, $groupId, $report);
         if ($existingId) {
             return [$existingId, 'existing'];
         }
 
         $payload = $this->transformEvent($event, $groupId);
-        $resp = $this->apiClient->post('/events', $payload);
+        $resp = $apiClient->post('/events', $payload);
 
         if ($resp && isset($resp['id'])) {
-            return [$resp['id'], 'created'];
+            return [(int) $resp['id'], 'created'];
         }
 
         $this->recordError($report, 'event_create_failed', "Failed to create event ".($payload['title'] ?? ''), $ctx);
@@ -196,11 +209,16 @@ class DataImportService
         return [null, 'failed'];
     }
 
-    protected function findExistingEventId(string $venue, string $date, int $groupId, array &$report): ?int
-    {
+    protected function findExistingEventId(
+        RestartersApiClient $apiClient,
+        string $venue,
+        string $date,
+        int $groupId,
+        array &$report
+    ): ?int {
         $ctx = ['venue' => $venue, 'date' => $date, 'operation' => 'event_exists'];
 
-        $resp = $this->apiClient->get("/groups/{$groupId}/events");
+        $resp = $apiClient->get("/groups/{$groupId}/events");
 
         if (!$resp || !isset($resp['data'])) {
             $this->recordError($report, 'event_exists_no_data', "No data when checking existence for event '{$venue}' on '{$date}'", $ctx);
@@ -230,7 +248,7 @@ class DataImportService
         return null;
     }
 
-    protected function createItemForEvent(array $item, int $eventId, array &$report): string
+    protected function createItemForEvent(RestartersApiClient $apiClient, array $item, int $eventId, array &$report): string
     {
         $itemDesc = $item['what is it?'] ?? '';
         $ctx = [
@@ -246,7 +264,7 @@ class DataImportService
             return 'skipped_unknown_category';
         }
 
-        $resp = $this->apiClient->post('/devices', $payload);
+        $resp = $apiClient->post('/devices', $payload);
 
         if ($resp && isset($resp['id'])) {
             return 'created';
@@ -282,7 +300,7 @@ class DataImportService
             $payload['online'] = false;
         }
 
-        return array_filter($payload, fn ($v) => $v !== '' && $v !== null);
+        return array_filter($payload, fn ($value) => $value !== '' && $value !== null);
     }
 
     protected function transformItem(array $item, int $eventId): ?array
@@ -299,6 +317,7 @@ class DataImportService
         }
 
         $categoryId = $this->categoryIds[$categoryName] ?? null;
+
         if (!$categoryId) {
             return null;
         }
@@ -322,7 +341,7 @@ class DataImportService
             'main_barrier_to_repair' => $item['main barrier to repair'] ?? '',
         ];
 
-        return array_filter($payload, fn ($v) => $v !== '' && $v !== null);
+        return array_filter($payload, fn ($value) => $value !== '' && $value !== null);
     }
 
     protected function concatenateProblemSolution(array $item): string
