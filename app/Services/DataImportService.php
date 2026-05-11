@@ -338,7 +338,7 @@ class DataImportService
             'repair_status' => $repairStatus,
             'next_steps' => $item['next steps (if status = repairable)'] ?? '',
             'spare_parts' => $this->mapSpareParts($item['spare parts required?'] ?? ''),
-            'main_barrier_to_repair' => $item['main barrier to repair'] ?? '',
+            'barrier' => $this->mapBarrier($item['main barrier to repair'] ?? ''),
         ];
 
         return array_filter($payload, fn ($value) => $value !== '' && $value !== null);
@@ -352,6 +352,20 @@ class DataImportService
             in_array($normalized, ['no', 'not needed', 'not required']) => 'No',
             in_array($normalized, ['manufacturer', 'from manufacturer']) => 'Manufacturer',
             in_array($normalized, ['third party', 'from 3rd party', '3rd party', 'from third party']) => 'Third party',
+            default => null,
+        };
+    }
+
+    protected function mapBarrier(string $value): ?string
+    {
+        $normalized = strtolower(trim($value));
+
+        return match (true) {
+            $normalized === 'spare parts not available' => 'Spare parts not available',
+            $normalized === 'spare parts too expensive' => 'Spare parts too expensive',
+            $normalized === 'no way to open the product' => 'No way to open the product',
+            $normalized === 'repair information not available' => 'Repair information not available',
+            $normalized === 'lack of equipment' => 'Lack of equipment',
             default => null,
         };
     }
