@@ -65,9 +65,8 @@ return [
             // The avatar is cached, so this triggers an update
             'avatar_force_update' => false,
 
-            // Content of the user's bio — set to null to skip: biography is nullable
-            // and castBooleansToString(string|bool) rejects null (PHP 8 TypeError)
-            'bio' => null,
+            // Content of the user's bio
+            'bio' => 'biography',
 
             // Verified email address (see "require_activation" if not verified)
             'email' => 'email',

@@ -376,6 +376,12 @@ class User extends Authenticatable implements Auditable, HasLocalePreference
         return $this;
     }
 
+    // Biography is nullable in DB; return '' so SSO payload never sees null.
+    public function getBiographyAttribute($value): string
+    {
+        return $value ?? '';
+    }
+
     /**
      * Attempt to get first name from full name.
      */
