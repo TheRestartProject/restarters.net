@@ -418,62 +418,32 @@ class Device extends Model implements Auditable
 
     public function fixedPoweredCount()
     {
-        // We want fixed devices with an powered category.
-        $count = self::where('repair_status', '=', env('DEVICE_FIXED'))->withCount(['deviceCategory' => function ($query) {
-            $query->where('powered', 1);
-        }])->get();
-
-        $total = 0;
-        foreach ($count as $c) {
-            $total += $c->device_category_count;
-        }
-
-        return $total;
+        return self::join('categories', 'devices.category', '=', 'categories.idcategories')
+            ->where('repair_status', env('DEVICE_FIXED'))
+            ->where('powered', 1)
+            ->count();
     }
 
     public function fixedUnpoweredCount()
     {
-        // We want fixed devices with an unpowered category.
-        $count = self::where('repair_status', '=', env('DEVICE_FIXED'))->withCount(['deviceCategory' => function ($query) {
-            $query->where('powered', 0);
-        }])->get();
-
-        $total = 0;
-        foreach ($count as $c) {
-            $total += $c->device_category_count;
-        }
-
-        return $total;
+        return self::join('categories', 'devices.category', '=', 'categories.idcategories')
+            ->where('repair_status', env('DEVICE_FIXED'))
+            ->where('powered', 0)
+            ->count();
     }
 
     public function unpoweredCount()
     {
-        // We want devices with an unpowered category.
-        $count = self::withCount(['deviceCategory' => function ($query) {
-            $query->where('powered', 0);
-        }])->get();
-
-        $total = 0;
-        foreach ($count as $c) {
-            $total += $c->device_category_count;
-        }
-
-        return $total;
+        return self::join('categories', 'devices.category', '=', 'categories.idcategories')
+            ->where('powered', 0)
+            ->count();
     }
 
     public function poweredCount()
     {
-        // We want devices with an powered category.
-        $count = self::withCount(['deviceCategory' => function ($query) {
-            $query->where('powered', 1);
-        }])->get();
-
-        $total = 0;
-        foreach ($count as $c) {
-            $total += $c->device_category_count;
-        }
-
-        return $total;
+        return self::join('categories', 'devices.category', '=', 'categories.idcategories')
+            ->where('powered', 1)
+            ->count();
     }
 
     public static function getItemTypes()
