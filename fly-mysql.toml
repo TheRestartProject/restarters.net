@@ -5,7 +5,7 @@ primary_region = "lhr"
   dockerfile = "Dockerfile.mysql"
 
 [processes]
-  app = "mysqld --datadir=/data/mysql --default-authentication-plugin=mysql_native_password"
+  app = "mysqld --datadir=/data/mysql --default-authentication-plugin=mysql_native_password --innodb_buffer_pool_size=2800M"
 
 [mounts]
   source = "mysqldata"
@@ -16,5 +16,5 @@ primary_region = "lhr"
   MYSQL_USER = "restarters"
 
 [[vm]]
-  size = "shared-cpu-1x"
-  memory = 2048
+  size = "performance-2x"
+  memory = 4096

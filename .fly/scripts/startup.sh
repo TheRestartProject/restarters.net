@@ -83,7 +83,8 @@ fi
         echo "WARNING: Database not reachable after 60s, skipping migrations"
     fi
 
-    # Cache config/routes/views for performance (non-fatal)
+    # Clear stale compiled assets from previous deploy, then rebuild
+    php /var/www/artisan view:clear 2>/dev/null || true
     php /var/www/artisan config:cache 2>/dev/null || true
     php /var/www/artisan route:cache 2>/dev/null || true
     php /var/www/artisan view:cache 2>/dev/null || true

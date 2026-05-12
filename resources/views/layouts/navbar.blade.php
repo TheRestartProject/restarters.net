@@ -193,7 +193,9 @@
         <div class="notifications__scroll">
             <div id="tabs" class="notifications__inner">
 
-                @php $navbarNotifications = isset($user) ? $user->notifications()->take(10)->get() : collect(); @endphp
+                @php
+                    $navbarNotifications = isset($user) ? $user->notifications()->take(10)->get() : collect();
+                @endphp
                 @if($navbarNotifications->isNotEmpty())
                 <div class="cards">
 

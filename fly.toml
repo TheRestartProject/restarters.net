@@ -76,5 +76,5 @@ primary_region = "lhr"
   destination = "/var/log"
 
 [[vm]]
-  size = "shared-cpu-2x"
+  size = "performance-2x"
   memory = 4096
