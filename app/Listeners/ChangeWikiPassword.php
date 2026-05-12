@@ -6,9 +6,9 @@ use App\Events\PasswordChanged;
 use App\WikiSyncStatus;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
-use Mediawiki\Api\ApiUser;
-use Mediawiki\Api\FluentRequest;
-use Mediawiki\Api\MediawikiApi;
+use Addwiki\Mediawiki\Api\Client\Action\Request\ActionRequest;
+use Addwiki\Mediawiki\Api\Client\Auth\UserAndPassword;
+use Addwiki\Mediawiki\Api\Client\MediaWiki;
 
 class ChangeWikiPassword extends BaseEvent
 {
@@ -37,19 +37,21 @@ class ChangeWikiPassword extends BaseEvent
         }
 
         try {
-            $api = MediawikiApi::newFromApiEndpoint(env('WIKI_URL').'/api.php');
-
-            $api->login(new ApiUser($user->mediawiki, $oldpw));
+            $mw = MediaWiki::newFromEndpoint(
+                env('WIKI_URL').'/api.php',
+                new UserAndPassword($user->mediawiki, $oldpw)
+            );
+            $api = $mw->action();
             $token = $api->getToken('csrf');
 
             // The Mediawiki new password is the Laravel hashed password.
-            $changePasswordRequest = FluentRequest::factory()
-                                   ->setAction('changeauthenticationdata')
-                                   ->setParam('changeauthrequest', 'MediaWiki\Auth\PasswordAuthenticationRequest')
-                                   ->setParam('password', $user->password)
-                                   ->setParam('retype', $user->password)
-                                   ->setParam('changeauthtoken', $token);
-            $api->postRequest($changePasswordRequest);
+            $changePasswordRequest = ActionRequest::simplePost('changeauthenticationdata', [
+                'changeauthrequest' => 'MediaWiki\Auth\PasswordAuthenticationRequest',
+                'password' => $user->password,
+                'retype' => $user->password,
+                'changeauthtoken' => $token,
+            ]);
+            $api->request($changePasswordRequest);
         } catch (\Throwable $ex) {
             Log::error("Failed to changed password for user '".$user->mediawiki."' in mediawiki: ".$ex->getMessage());
         }
