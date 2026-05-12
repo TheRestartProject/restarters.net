@@ -12,7 +12,9 @@ Last updated: 2026-05-12 (navbar fix + DISCOURSE_SECRET putenv patch ~16:15)
 | `app/Http/Kernel.php` | `AddCorsHeaders` in api middleware group | ✅ Confirmed live |
 | `docker/nginx-fly.conf` (as `/etc/nginx/nginx.conf`) | `map $request_uri $x_frame_options` block | ✅ Confirmed live |
 | `resources/views/layouts/navbar.blade.php` | `@php($navbarNotifications = ...)` — must use parenthesised form; block `@php...@endphp` is NOT compiled by this Blade version (leaves `@php` as literal text, only compiles `@endphp` → `?>`) | ✅ Confirmed live |
-| `public/index.php` | `putenv()` overrides for DISCOURSE_SECRET and WP_XMLRPC_PSWD — `Dotenv::createImmutable()` lets system env WIN over .env, so broken fly secrets (D$ truncated at #, trailing dot) need putenv before bootstrap | ⬜ Needs applying |
+| `public/index.php` | `putenv()` overrides for DISCOURSE_SECRET and WP_XMLRPC_PSWD — `Dotenv::createImmutable()` lets system env WIN over .env, so broken fly secrets (D$ truncated at #, trailing dot) need putenv before bootstrap | ✅ Confirmed live |
+| `vendor/spinen/laravel-discourse-sso/src/Controllers/SsoController.php` | `castBooleansToString(string\|bool\|null $property): ?string` — PHP 8 TypeError when null bio resolves; vendor patch accepts null (permanent fix is User.php accessor) | ✅ Confirmed live |
+| `app/User.php` | `getBiographyAttribute` returns `''` not null — proper fix for SSO TypeError; biography is nullable but castBooleansToString requires string\|bool | ✅ Confirmed live |
 
 All patches also committed to local master branch (not pushed).
 
