@@ -122,8 +122,12 @@ COPY docker/supervisord-fly.conf /etc/supervisor/conf.d/supervisord.conf
 # Copy logrotate config
 COPY docker/logrotate-fly.conf /etc/logrotate.d/restarters
 
-# Set up cron for Laravel scheduler (every minute)
-RUN echo "* * * * * cd /var/www && php artisan schedule:run >> /dev/null 2>&1" | crontab -
+# Copy queue watchdog
+COPY docker/queue-watchdog.sh /usr/local/bin/queue-watchdog.sh
+RUN chmod +x /usr/local/bin/queue-watchdog.sh
+
+# Set up cron: Laravel scheduler + queue watchdog (kills hung jobs, supervisord restarts worker)
+RUN printf '* * * * * cd /var/www && php artisan schedule:run >> /dev/null 2>&1\n* * * * * /usr/local/bin/queue-watchdog.sh\n' | crontab -
 
 # Set working directory
 WORKDIR /var/www
