@@ -569,6 +569,14 @@ class User extends Authenticatable implements Auditable, HasLocalePreference
         return $api_token;
     }
 
+    public function notifications()
+    {
+        return $this->morphMany(
+            \Illuminate\Notifications\DatabaseNotification::class,
+            'notifiable'
+        )->where('created_at', '>=', now()->subYear())->latest();
+    }
+
     /**
      * Get the user's preferred locale.  This is automatically used by email notifications.
      */
