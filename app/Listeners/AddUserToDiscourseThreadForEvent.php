@@ -30,15 +30,6 @@ class AddUserToDiscourseThreadForEvent implements ShouldQueue {
     }
 
     public function handle(UserConfirmedEvent $e): void {
-        // This call can block for a long time - add our own timeout so that we can fail it rather than block
-        // the whole queue. pcntl may not be available in all environments (e.g. PHP-FPM on Fly.io).
-        if (function_exists('pcntl_signal')) {
-            pcntl_signal(SIGALRM, function () {
-                $this->fail();
-            });
-            pcntl_alarm(10);
-        }
-
         if ($e->iduser) {
             $event = Party::find($e->idevents);
             $user = User::find($e->iduser);
@@ -63,8 +54,5 @@ class AddUserToDiscourseThreadForEvent implements ShouldQueue {
             }
         }
 
-        if (function_exists('pcntl_alarm')) {
-            pcntl_alarm(0);
-        }
     }
 }
