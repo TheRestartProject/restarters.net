@@ -1,5 +1,5 @@
 # Live Container Patch Status
-Last updated: 2026-05-12 (navbar fix + DISCOURSE_SECRET putenv patch ~16:15)
+Last updated: 2026-05-12 (bootstrap/app.php all-env putenv patch + pcntl fix)
 
 ## Monkey-Patched Files — ALL VERIFIED LIVE ✅
 
@@ -13,6 +13,8 @@ Last updated: 2026-05-12 (navbar fix + DISCOURSE_SECRET putenv patch ~16:15)
 | `docker/nginx-fly.conf` (as `/etc/nginx/nginx.conf`) | `map $request_uri $x_frame_options` block | ✅ Confirmed live |
 | `resources/views/layouts/navbar.blade.php` | `@php($navbarNotifications = ...)` — must use parenthesised form; block `@php...@endphp` is NOT compiled by this Blade version (leaves `@php` as literal text, only compiles `@endphp` → `?>`) | ✅ Confirmed live |
 | `public/index.php` | `putenv()` overrides for DISCOURSE_SECRET and WP_XMLRPC_PSWD — `Dotenv::createImmutable()` lets system env WIN over .env, so broken fly secrets (D$ truncated at #, trailing dot) need putenv before bootstrap | ✅ Confirmed live |
+| `bootstrap/app.php` | Sets `$_ENV`, `$_SERVER`, and `putenv()` for ALL broken/missing fly secrets — runs for web, CLI, queue, AND config:cache. PHP-FPM clears env so web was fine; CLI/queue inherit fly's `$_ENV` directly so putenv() alone isn't enough. Container-only (NOT committed — contains secrets) | ✅ Confirmed live |
+| `app/Listeners/AddUserToDiscourseThreadForEvent.php` | `function_exists('pcntl_signal')` guard before `pcntl_signal()`/`pcntl_alarm()` calls — PHP throws fatal error on hosts without pcntl extension; caused 146 failed Discourse jobs (retried ✅) | ✅ Confirmed live |
 | `vendor/spinen/laravel-discourse-sso/src/Controllers/SsoController.php` | `castBooleansToString(string\|bool\|null $property): ?string` — PHP 8 TypeError when null bio resolves; vendor patch accepts null (permanent fix is User.php accessor) | ✅ Confirmed live |
 | `app/User.php` | `getBiographyAttribute` returns `''` not null — proper fix for SSO TypeError; biography is nullable but castBooleansToString requires string\|bool | ✅ Confirmed live |
 
