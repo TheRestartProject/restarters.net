@@ -43,13 +43,13 @@ class AddUserToDiscourseThreadForEvent implements ShouldQueue {
             $event = Party::find($e->idevents);
             $user = User::find($e->iduser);
 
-            if ($event->theGroup->archived_at) {
-                // Suppress notifications for archived groups.
-                return;
-            }
-
             // Might not exist - timing windows.
             if ($event && $user && $event->discourse_thread) {
+                if ($event->theGroup && $event->theGroup->archived_at) {
+                    // Suppress notifications for archived groups.
+                    return;
+                }
+
                 // We need a host of the event to add the user to the thread.
                 $host = $this->getHost($event->idevents);
 
