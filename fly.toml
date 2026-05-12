@@ -25,7 +25,7 @@ primary_region = "lhr"
   AWS_ENDPOINT = "https://fly.storage.tigris.dev"
   AWS_USE_PATH_STYLE_ENDPOINT = "true"
   FEATURE__WIKI_INTEGRATION = "true"
-  FEATURE__DISCOURSE_INTEGRATION = "false"
+  FEATURE__DISCOURSE_INTEGRATION = "true"
   SENTRY_ENVIRONMENT = "production"
   # Table type constants
   TBL_USERS = "1"
