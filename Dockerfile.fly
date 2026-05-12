@@ -110,7 +110,8 @@ RUN apt-get update && apt-get install -y --no-install-recommends sysstat vim-tin
 RUN cp /usr/local/etc/php/php.ini-production /usr/local/etc/php/conf.d/php.ini && \
     echo "upload_max_filesize = 100M" >> /usr/local/etc/php/conf.d/php.ini && \
     echo "post_max_size = 100M" >> /usr/local/etc/php/conf.d/php.ini && \
-    echo "memory_limit = 1024M" >> /usr/local/etc/php/conf.d/php.ini
+    echo "memory_limit = 1024M" >> /usr/local/etc/php/conf.d/php.ini && \
+    echo "max_execution_time = 120" >> /usr/local/etc/php/conf.d/php.ini
 
 # Copy nginx config
 COPY docker/nginx-fly.conf /etc/nginx/nginx.conf
