@@ -160,6 +160,21 @@ jobs:
           command: flyctl deploy --config fly.dev.toml --remote-only
           no_output_timeout: 15m
 
+  deploy-fly-prod:
+    docker:
+      - image: cimg/base:current
+    steps:
+      - checkout
+      - run:
+          name: Install flyctl
+          command: |
+            curl -L https://fly.io/install.sh | sh || true
+            echo 'export PATH=/home/circleci/.fly/bin:$PATH' >> $BASH_ENV
+      - run:
+          name: Deploy to restarters (production)
+          command: flyctl deploy --app restarters --remote-only
+          no_output_timeout: 15m
+
 workflows:
   build-and-deploy:
     jobs:
@@ -170,3 +185,9 @@ workflows:
           filters:
             branches:
               only: develop
+      - deploy-fly-prod:
+          requires:
+            - build
+          filters:
+            branches:
+              only: production
