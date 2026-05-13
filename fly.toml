@@ -10,6 +10,7 @@ primary_region = "lhr"
 [env]
   APP_ENV = "production"
   APP_DEBUG = "false"
+  APP_NAME = "Restarters"
   APP_URL = "https://restarters.net"
   DB_CONNECTION = "mysql"
   DB_HOST = "restarters-db.internal"
