@@ -2,14 +2,13 @@
   <div>
     <b-form-group>
       <label :for="$id('address-autocomplete')">{{ __('groups.location') }}:</label>
-      <vue-google-autocomplete
+      <places-autocomplete
           :id="$id('address-autocomplete')"
           name="location"
           classname="form-control group-location"
           :placeholder="__('groups.groups_location_placeholder')"
           @placechanged="placeChanged"
           @change="resetValues"
-          aria-describedby="locationHelpBlock"
           types="geocode"
           ref="autocomplete"
           :class="{ hasError: hasError, 'm-0': true }"
@@ -32,7 +31,7 @@
 </template>
 <script>
 import Vue from 'vue'
-import VueGoogleAutocomplete from 'vue-google-autocomplete'
+import PlacesAutocomplete from './PlacesAutocomplete.vue'
 import UniqueId from 'vue-unique-id';
 
 Vue.use(UniqueId);
@@ -86,7 +85,7 @@ export default {
     }
   },
   components: {
-    VueGoogleAutocomplete
+    PlacesAutocomplete
   },
   data () {
     return {

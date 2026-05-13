@@ -1,1 +1,1 @@
-<script src="https://maps.googleapis.com/maps/api/js?v=3&key={{ env('GOOGLE_API_CONSOLE_KEY') }}&libraries=places"></script>
+{{-- Google Maps JS SDK removed: address autocomplete is now proxied server-side via /maps/autocomplete and /maps/place-details --}}
