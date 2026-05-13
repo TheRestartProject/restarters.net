@@ -283,6 +283,20 @@ class Group extends Model implements Auditable
 
     public function getGroupStats($eEmissionRatio = null, $uEmissionratio = null)
     {
+        return static::bulkGroupStats([$this], $eEmissionRatio, $uEmissionratio)[$this->idgroups];
+    }
+
+    /**
+     * Compute stats for multiple groups in O(1) queries instead of O(N).
+     * Returns a map of [groupId => stats array].
+     */
+    public static function bulkGroupStats(iterable $groups, ?float $eEmissionRatio = null, ?float $uEmissionratio = null): array
+    {
+        $groups = collect($groups);
+        if ($groups->isEmpty()) {
+            return [];
+        }
+
         if (is_null($eEmissionRatio)) {
             $eEmissionRatio = \App\Helpers\LcaStats::getEmissionRatioPowered();
         }
@@ -290,25 +304,31 @@ class Group extends Model implements Auditable
             $uEmissionratio = \App\Helpers\LcaStats::getEmissionRatioUnpowered();
         }
 
-        $allPastEvents = Party::past()
+        $groupIds = $groups->pluck('idgroups')->toArray();
+
+        $statsByGroup = [];
+        foreach ($groupIds as $id) {
+            $statsByGroup[$id] = self::getGroupStatsArrayKeys();
+        }
+
+        $allEvents = Party::past()
             ->with('allDevices')
-            ->where('events.group', $this->idgroups)
+            ->whereIn('events.group', $groupIds)
             ->get();
 
-        $result = \App\Party::getEventStatsArrayKeys();
-
-        // Rollup all events stats into stats for this group.
-        foreach ($allPastEvents as $event) {
+        foreach ($allEvents as $event) {
+            $gid = $event->group;
+            if (! isset($statsByGroup[$gid])) {
+                continue;
+            }
+            $statsByGroup[$gid]['parties']++;
             $eventStats = $event->getEventStats($eEmissionRatio, $uEmissionratio);
-
-            foreach ($eventStats as $statKey => $statValue) {
-                $result[$statKey] += $statValue;
+            foreach ($eventStats as $key => $value) {
+                $statsByGroup[$gid][$key] += $value;
             }
         }
 
-        $result['parties'] = count($allPastEvents);
-
-        return $result;
+        return $statsByGroup;
     }
 
     /**

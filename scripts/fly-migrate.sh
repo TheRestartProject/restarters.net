@@ -390,6 +390,7 @@ if [[ "$DO_DB" = true ]]; then
                 -h "$LIVE_DB_HOST" \
                 -u "$LIVE_DB_USER" \
                 -p"$LIVE_DB_PASS" \
+                --default-character-set=utf8mb4 \
                 --single-transaction \
                 ${DUMP_EXTRA_FLAGS[@]+"${DUMP_EXTRA_FLAGS[@]}"} \
                 --routines \
@@ -462,21 +463,26 @@ if [[ "$DO_DB" = true ]]; then
         # Step 2e: Drop and recreate database for idempotent re-runs
         log_step "Dropping and recreating database '${FLY_DB_NAME}' for clean import..."
         fly ssh console -a "$FLY_DB_APP" -C \
-            "mysql -u root -e \"DROP DATABASE IF EXISTS \\\`${FLY_DB_NAME}\\\`; CREATE DATABASE \\\`${FLY_DB_NAME}\\\`;\""
+            "mysql -u root -e \"DROP DATABASE IF EXISTS \\\`${FLY_DB_NAME}\\\`; CREATE DATABASE \\\`${FLY_DB_NAME}\\\` CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;\""
 
-        # Step 2f: Import the dump
+        # Step 2f: Allow non-SUPER users to create functions/triggers during import
+        fly ssh console -a "$FLY_DB_APP" -C \
+            "mysql -u root -e \"SET GLOBAL log_bin_trust_function_creators = 1;\""
+
+        # Step 2g: Import the dump
         log_step "Importing database into Fly MySQL (this may take a while)..."
         mysql \
             -h 127.0.0.1 \
             -P "$LOCAL_PROXY_PORT" \
             -u restarters \
             -p"$FLY_DB_PASSWORD" \
+            --default-character-set=utf8mb4 \
             --max-allowed-packet=64M \
             "$FLY_DB_NAME" < "$DUMP_FILE"
 
         log_step "Database imported."
 
-        # Step 2f: Grant privileges via fly ssh (avoids needing root password over proxy)
+        # Step 2h: Grant privileges via fly ssh (avoids needing root password over proxy)
         log_step "Granting privileges to 'restarters' user..."
         fly ssh console -a "$FLY_DB_APP" -C \
             "mysql -u root -e \"GRANT ALL ON \\\`${FLY_DB_NAME}\\\`.* TO 'restarters'@'%'; FLUSH PRIVILEGES;\""

@@ -7,8 +7,17 @@
 mkdir -p /var/www/storage/framework/{sessions,views,cache/data}
 mkdir -p /var/www/storage/logs
 mkdir -p /var/www/bootstrap/cache
-mkdir -p /var/www/public/uploads
-chown -R www-data:www-data /var/www/storage /var/www/bootstrap/cache /var/www/public/uploads
+chown -R www-data:www-data /var/www/storage /var/www/bootstrap/cache
+
+# Create swap file on root filesystem (ephemeral, recreated each boot)
+SWAPFILE=/swapfile
+if [ ! -f "$SWAPFILE" ]; then
+    echo "Creating 2GB swap file..."
+    fallocate -l 2G "$SWAPFILE" 2>/dev/null || dd if=/dev/zero of="$SWAPFILE" bs=1M count=2048 2>/dev/null
+    chmod 600 "$SWAPFILE"
+    mkswap "$SWAPFILE" >/dev/null
+fi
+swapon "$SWAPFILE" 2>/dev/null || true
 
 # Ensure log directories exist on the persistent volume (/var/log is mounted)
 mkdir -p /var/log/nginx
@@ -45,17 +54,17 @@ else
 fi
 
 # Substitute environment variables in nginx config for Tigris proxy.
-# Always run envsubst — nginx fails to start if the variables remain as literals.
-# nginx set/proxy_set_header directives require non-empty values, so fall back to
-# dummy localhost values when AWS_BUCKET is not configured (dev/local-storage mode).
-# In that case /uploads/ proxying simply returns 502, which is fine because dev
-# stores uploads locally (served at /storage/, not /uploads/).
-export TIGRIS_BUCKET_URL="${AWS_BUCKET:+https://${AWS_BUCKET}.fly.storage.tigris.dev}"
-export TIGRIS_BUCKET_HOST="${AWS_BUCKET:+${AWS_BUCKET}.fly.storage.tigris.dev}"
-export TIGRIS_BUCKET_URL="${TIGRIS_BUCKET_URL:-http://localhost:9999}"
-export TIGRIS_BUCKET_HOST="${TIGRIS_BUCKET_HOST:-localhost}"
-envsubst '${TIGRIS_BUCKET_URL} ${TIGRIS_BUCKET_HOST}' < /etc/nginx/nginx.conf > /etc/nginx/nginx.conf.tmp
-mv /etc/nginx/nginx.conf.tmp /etc/nginx/nginx.conf
+if [ -n "$AWS_BUCKET" ]; then
+    export TIGRIS_BUCKET_URL="https://${AWS_BUCKET}.fly.storage.tigris.dev"
+    export TIGRIS_BUCKET_HOST="${AWS_BUCKET}.fly.storage.tigris.dev"
+    envsubst '${TIGRIS_BUCKET_URL} ${TIGRIS_BUCKET_HOST}' < /etc/nginx/nginx.conf > /etc/nginx/nginx.conf.tmp
+    mv /etc/nginx/nginx.conf.tmp /etc/nginx/nginx.conf
+fi
+
+# Ensure queue watchdog is in crontab (image crontab may predate this entry)
+if ! crontab -l 2>/dev/null | grep -q 'queue-watchdog'; then
+    ( crontab -l 2>/dev/null; echo "* * * * * /usr/local/bin/queue-watchdog.sh" ) | crontab -
+fi
 
 # Run DB setup in a subshell so failures never prevent supervisord from starting
 (
@@ -79,7 +88,8 @@ mv /etc/nginx/nginx.conf.tmp /etc/nginx/nginx.conf
         echo "WARNING: Database not reachable after 60s, skipping migrations"
     fi
 
-    # Cache config/routes/views for performance (non-fatal)
+    # Clear stale compiled assets from previous deploy, then rebuild
+    php /var/www/artisan view:clear 2>/dev/null || true
     php /var/www/artisan config:cache 2>/dev/null || true
     php /var/www/artisan route:cache 2>/dev/null || true
     php /var/www/artisan view:cache 2>/dev/null || true

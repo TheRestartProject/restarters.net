@@ -193,10 +193,11 @@
         <div class="notifications__scroll">
             <div id="tabs" class="notifications__inner">
 
-                @if( isset($user->notifications) && is_object($user->notifications) && $user->notifications->count() > 0 )
+                @php($navbarNotifications = isset($user) ? $user->notifications()->take(10)->get() : collect())
+                @if($navbarNotifications->isNotEmpty())
                 <div class="cards">
 
-                @foreach ($user->notifications->take(10) as $notification)
+                @foreach ($navbarNotifications as $notification)
                     @include('partials.notification')
                 @endforeach
 
