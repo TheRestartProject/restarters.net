@@ -4,8 +4,9 @@ namespace App\Providers;
 
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\ServiceProvider;
+use Addwiki\Mediawiki\Api\Client\Action\ActionApi;
 use Addwiki\Mediawiki\Api\Client\Auth\UserAndPassword;
-use Addwiki\Mediawiki\Api\Client\MediaWiki;
+use Addwiki\Mediawiki\Api\Guzzle\ClientFactory;
 use Addwiki\Mediawiki\Api\MediawikiFactory;
 use Addwiki\Mediawiki\Api\Service\UserCreator;
 
@@ -31,13 +32,15 @@ class MediawikiServiceProvider extends ServiceProvider
         $this->app->singleton(MediawikiFactory::class, function () {
             try {
                 Log::debug('Connect to Mediawiki');
-                $mw = MediaWiki::newFromEndpoint(
+                $guzzleClient = (new ClientFactory(['timeout' => 10, 'connect_timeout' => 5]))->getClient();
+                $api = new ActionApi(
                     env('WIKI_URL').'/api.php',
-                    new UserAndPassword(env('WIKI_APIUSER'), env('WIKI_APIPASSWORD'))
+                    new UserAndPassword(env('WIKI_APIUSER'), env('WIKI_APIPASSWORD')),
+                    $guzzleClient
                 );
                 Log::debug('...connected');
 
-                return new MediawikiFactory($mw->action());
+                return new MediawikiFactory($api);
             } catch (\Throwable $ex) {
                 Log::error('Failed to instantiate Wiki API classes: '.$ex->getMessage());
             }

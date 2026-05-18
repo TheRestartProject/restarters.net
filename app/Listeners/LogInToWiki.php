@@ -89,7 +89,7 @@ class LogInToWiki
         try {
             Log::info("Log in to wiki $user->mediawiki");
             $cookieJar = new CookieJar();
-            $guzzleClient = (new ClientFactory(['cookies' => $cookieJar]))->getClient();
+            $guzzleClient = (new ClientFactory(['cookies' => $cookieJar, 'timeout' => 10, 'connect_timeout' => 5]))->getClient();
             $auth = new UserAndPassword($user->mediawiki, $user->password);
             $api = new ActionApi(env('WIKI_URL').'/api.php', $auth, $guzzleClient);
             $api->getToken('csrf');
