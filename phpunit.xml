@@ -22,6 +22,7 @@
   </testsuites>
   <php>
     <env name="APP_ENV" value="testing"/>
+    <env name="APP_KEY" value="base64:l2TE/w/zY1SPYX59Y6IP/o3IUbA7Alig5Gwln4fbC9M="/>
     <env name="BCRYPT_ROUNDS" value="4"/>
     <env name="CACHE_DRIVER" value="array"/>
     <env name="SESSION_DRIVER" value="array"/>
