@@ -51,6 +51,7 @@ fi
 
 # Upload to Google Drive using rclone
 if ! rclone copy "$BACKUP_FILE" "gdrive:$GDRIVE_BACKUP_FOLDER_ID/" \
+    --drive-team-drive="$RCLONE_CONFIG_GDRIVE_TEAM_DRIVE" \
     --log-file="$LOG" \
     --log-level=INFO 2>>"$LOG"; then
     echo "$(date -u '+%Y-%m-%d %H:%M:%S UTC'): ERROR - rclone upload failed" >> "$LOG"
@@ -65,7 +66,7 @@ rm -f "$BACKUP_FILE"
 
 # Keep only the last 7 daily backups on Google Drive
 # List all backups in reverse chronological order and delete older ones
-BACKUPS=$(rclone lsf "gdrive:$GDRIVE_BACKUP_FOLDER_ID/" --format=p 2>/dev/null | grep 'db-backup-.*\.sql\.gz' | sort -r)
+BACKUPS=$(rclone lsf "gdrive:$GDRIVE_BACKUP_FOLDER_ID/" --drive-team-drive="$RCLONE_CONFIG_GDRIVE_TEAM_DRIVE" --format=p 2>/dev/null | grep 'db-backup-.*\.sql\.gz' | sort -r)
 BACKUP_COUNT=$(echo "$BACKUPS" | grep -c 'db-backup')
 
 if [ "$BACKUP_COUNT" -gt 7 ]; then
@@ -73,7 +74,7 @@ if [ "$BACKUP_COUNT" -gt 7 ]; then
     while IFS= read -r backup; do
         if [ -n "$backup" ]; then
             echo "$(date -u '+%Y-%m-%d %H:%M:%S UTC'): Deleting old backup: $backup" >> "$LOG"
-            rclone delete "gdrive:$GDRIVE_BACKUP_FOLDER_ID/$backup" 2>>"$LOG" || true
+            rclone delete "gdrive:$GDRIVE_BACKUP_FOLDER_ID/$backup" --drive-team-drive="$RCLONE_CONFIG_GDRIVE_TEAM_DRIVE" 2>>"$LOG" || true
         fi
     done <<< "$BACKUPS_TO_DELETE"
 fi
