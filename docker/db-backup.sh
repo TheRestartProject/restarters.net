@@ -71,8 +71,8 @@ rm -f "$BACKUP_FILE"
 BACKUPS=$(rclone lsf "gdrive:" --drive-root-folder-id="$GDRIVE_BACKUP_FOLDER_ID" --drive-team-drive="$RCLONE_CONFIG_GDRIVE_TEAM_DRIVE" --format=p 2>/dev/null | grep 'db-backup-.*\.sql\.gz' | sort -r)
 BACKUP_COUNT=$(echo "$BACKUPS" | grep -c 'db-backup')
 
-if [ "$BACKUP_COUNT" -gt 7 ]; then
-    BACKUPS_TO_DELETE=$(echo "$BACKUPS" | tail -n +8)
+if [ "$BACKUP_COUNT" -gt 168 ]; then
+    BACKUPS_TO_DELETE=$(echo "$BACKUPS" | tail -n +169)
     while IFS= read -r backup; do
         if [ -n "$backup" ]; then
             echo "$(date -u '+%Y-%m-%d %H:%M:%S UTC'): Deleting old backup: $backup" >> "$LOG"
