@@ -48,7 +48,7 @@ if [ ! -d /var/lib/mysql/mysql ]; then
 fi
 
 mysqld_safe --user=mysql --skip-networking=0 --bind-address=127.0.0.1 \
-    --innodb-buffer-pool-size=512M \
+    --innodb-buffer-pool-size=1G \
     --innodb-flush-log-at-trx-commit=2 &
 
 # Wait for MariaDB (up to 60s)
