@@ -64,7 +64,8 @@ RUN rm -f .env
 # =============================================================================
 FROM php:8.2-fpm
 
-# Install runtime dependencies
+# yesterday mode adds mariadb-server (co-located DB for restored snapshots).
+ARG STARTUP_SCRIPT=startup.sh
 RUN apt-get update && apt-get install -y --no-install-recommends \
     nginx \
     supervisor \
@@ -73,13 +74,12 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     redis-server \
     procps \
     default-mysql-client \
+    rclone \
     libpng-dev libjpeg62-turbo-dev libfreetype6-dev libzip-dev libicu-dev libxml2-dev \
+    && if [ "$STARTUP_SCRIPT" = "yesterday-startup.sh" ]; then apt-get install -y --no-install-recommends default-mysql-server; fi \
     && docker-php-ext-configure gd --with-freetype --with-jpeg \
     && docker-php-ext-install pdo_mysql bcmath zip intl gd exif pcntl \
     && apt-get clean && rm -rf /var/lib/apt/lists/*
-
-# Install rclone for Google Drive backups
-RUN curl https://rclone.org/install.sh | bash
 
 # Install xmlrpc
 RUN pecl install channel://pecl.php.net/xmlrpc-1.0.0RC3 && docker-php-ext-enable xmlrpc
@@ -130,12 +130,13 @@ COPY docker/logrotate-fly.conf /etc/logrotate.d/restarters
 COPY docker/queue-watchdog.sh /usr/local/bin/queue-watchdog.sh
 RUN chmod +x /usr/local/bin/queue-watchdog.sh
 
-# Copy database backup script
+# Copy database backup script and yesterday restart script
 COPY docker/db-backup.sh /usr/local/bin/db-backup.sh
-RUN chmod +x /usr/local/bin/db-backup.sh
+COPY docker/restart-yesterday.sh /usr/local/bin/restart-yesterday.sh
+RUN chmod +x /usr/local/bin/db-backup.sh /usr/local/bin/restart-yesterday.sh
 
-# Set up cron: Laravel scheduler + queue watchdog (kills hung jobs, supervisord restarts worker) + daily DB backup
-RUN printf '* * * * * cd /var/www && php artisan schedule:run >> /dev/null 2>&1\n* * * * * /usr/local/bin/queue-watchdog.sh\n0 2 * * * /usr/local/bin/db-backup.sh\n' | crontab -
+# Set up cron: Laravel scheduler + queue watchdog + hourly DB backup + daily yesterday restart (5am UTC)
+RUN printf '* * * * * cd /var/www && php artisan schedule:run >> /dev/null 2>&1\n* * * * * /usr/local/bin/queue-watchdog.sh\n0 * * * * /usr/local/bin/db-backup.sh\n0 5 * * * /usr/local/bin/restart-yesterday.sh\n' | crontab -
 
 # Set working directory
 WORKDIR /var/www
@@ -152,10 +153,12 @@ RUN mkdir -p storage/framework/{sessions,views,cache/data} \
     public/uploads \
     && chown -R www-data:www-data storage bootstrap/cache public/uploads
 
-# Copy startup script
+# Copy startup scripts (production + yesterday-restore variant)
 COPY .fly/scripts/startup.sh /usr/local/bin/startup.sh
-RUN chmod +x /usr/local/bin/startup.sh
+COPY docker/yesterday-startup.sh /usr/local/bin/yesterday-startup.sh
+RUN chmod +x /usr/local/bin/startup.sh /usr/local/bin/yesterday-startup.sh && \
+    cp /usr/local/bin/${STARTUP_SCRIPT} /usr/local/bin/active-startup.sh
 
 EXPOSE 80
 
-CMD ["/usr/local/bin/startup.sh"]
+CMD ["/usr/local/bin/active-startup.sh"]
