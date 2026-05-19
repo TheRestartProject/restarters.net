@@ -39,6 +39,7 @@ if ! mysqldump \
     -h "$DB_HOST" \
     -u "$DB_USERNAME" \
     -p"$DB_PASSWORD" \
+    --ssl-mode=DISABLED \
     --single-transaction \
     --quick \
     --lock-tables=false \
