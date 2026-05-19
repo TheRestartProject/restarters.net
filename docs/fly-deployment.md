@@ -13,7 +13,7 @@ How the application is built, run, and deployed on Fly.io.
 | `restarters` | `fly.toml` | `restarters.net` | `production` |
 | `restarters-db` | `fly-mysql.toml` | internal only | — |
 | `restarters-pma` | `fly-pma.toml` | via `flyctl proxy` only | — |
-| `restarters-yesterday` | `fly-yesterday.toml` | `restarters-yesterday.fly.dev` (stopped when idle) | — |
+| `restarters-yesterday` | `fly-yesterday.toml` | `yesterday.restarters.net` (sleeps when idle) | — |
 
 All apps run in the `lhr` (London) region. The DB is on a private 6PN network (`restarters-db.internal`) — only reachable by other apps in the same Fly organisation, not from the public internet.
 
@@ -33,10 +33,12 @@ Two-stage build:
 
 **Stage 2 — runtime** (`php:8.2-fpm`):
 - Copies built assets from stage 1
-- Installs nginx, supervisord, cron, sysstat
+- Installs nginx, supervisord, cron, sysstat, rclone, mysql-client
+- For the yesterday build only: also installs `mariadb-server` (co-located DB)
 - PHP extensions: `pdo_mysql bcmath zip intl gd exif`
 - Creates `public/uploads/` directory (gitignored, so not present in source)
 - No Node or Composer in the final image
+- Build arg `STARTUP_SCRIPT` selects the startup script (`startup.sh` for production, `yesterday-startup.sh` for yesterday)
 
 The build runs on Fly's remote builders (`fly deploy --remote-only`). No local Docker required.
 
@@ -143,13 +145,87 @@ This triggers a remote build on Fly's infrastructure and deploys with zero downt
 
 ### Automated (CircleCI)
 
-Auto-deploy is active for the `develop` branch:
+Both environments auto-deploy via CircleCI (`.circleci/config.yml`):
 
 - **`develop` branch** → tests pass → `flyctl deploy --config fly.dev.toml --remote-only` → `restarters-dev`
+- **`production` branch** → `flyctl deploy --app restarters --remote-only` → `restarters.net`
 
-This is wired up in `.circleci/config.yml` as the `deploy-fly-dev` job, which runs after the `build` job and only on the `develop` branch. `FLY_API_TOKEN` is set in CircleCI project settings (Project Settings → Environment Variables).
+The `production` branch deploy runs without waiting for tests (it is triggered by a merge from `master`, which already passed CI). `FLY_API_TOKEN` is set in CircleCI project settings.
 
-Production auto-deploy is not yet configured. When ready, add a `deploy-fly-prod` job using `fly.toml` with `filters: branches: only: production`.
+> **Important:** always merge `master → production` before deploying. Never deploy `develop` or `master` directly to the `restarters` app.
+
+---
+
+## Database Backups
+
+A compressed MySQL dump is uploaded to Google Drive every hour by `docker/db-backup.sh`, scheduled in the production container's crontab (`0 * * * *`).
+
+- **Destination:** Google Shared Drive folder ID `1jk-cibm1W4EewWO1GB_SfNF3hxnaKblf` (folder name can be renamed without breaking backups — the ID is used, not the name)
+- **Retention:** 168 backups (7 days × 24 hours); older files are deleted automatically
+- **Tool:** rclone with a Google service account (`rclone-restarters-backup@fixometer-1526501244792.iam.gserviceaccount.com`)
+- **No table locking:** `--single-transaction --lock-tables=false` on mysqldump
+
+Relevant secrets on the `restarters` app:
+
+| Secret | Purpose |
+|---|---|
+| `GDRIVE_BACKUP_FOLDER_ID` | Target folder ID in Google Drive |
+| `RCLONE_CONFIG_GDRIVE_TYPE` | `drive` |
+| `RCLONE_CONFIG_GDRIVE_SCOPE` | `drive` |
+| `RCLONE_CONFIG_GDRIVE_TEAM_DRIVE` | Shared Drive ID (`0AGkqkEd84IsuUk9PVA`) |
+| `RCLONE_CONFIG_GDRIVE_SERVICE_ACCOUNT_CREDENTIALS` | Full service account JSON |
+
+To trigger a manual backup:
+```bash
+flyctl ssh console --app restarters --command "/usr/local/bin/db-backup.sh"
+flyctl ssh console --app restarters --command "tail -20 /var/log/db-backup.log"
+```
+
+---
+
+## Yesterday System (`restarters-yesterday`)
+
+A self-contained historical snapshot of the production database, accessible at `yesterday.restarters.net`. Used for looking up past state and verifying backups are restorable.
+
+### How it works
+
+On every cold start, `docker/yesterday-startup.sh`:
+1. Starts a local MariaDB server (co-located in the container — no separate DB app)
+2. Finds the most appropriate backup from Google Drive (prefers yesterday's 3am UTC snapshot; falls back to any yesterday backup, then the oldest available)
+3. Downloads and restores it into the local MariaDB (~2 min total)
+4. Supervisord starts immediately so the health check passes during the restore; the app shows DB errors for ~2 minutes until the restore completes
+
+The site shows an amber banner: **"Historical snapshot — data as of {timestamp} UTC"** with a link back to the live site.
+
+### Auth
+
+Password-protected via cookie gate (same mechanism as `BASIC_AUTH_ENABLED` on dev). Password: **`yesterday`**. No username required — enter the password on the login page.
+
+Emails are disabled (`MAIL_MAILER=log`) to prevent accidental sends from the historical view.
+
+### Daily refresh
+
+At 5am UTC, a cron job on the production machine calls the Fly Machines API to restart `restarters-yesterday`. On restart, `yesterday-startup.sh` re-runs and restores the closest backup to 3am UTC from that day. Requires `FLY_YESTERDAY_RESTART_TOKEN` secret on the production app.
+
+### Deploying
+
+```bash
+flyctl deploy --config fly-yesterday.toml --remote-only
+```
+
+The `STARTUP_SCRIPT=yesterday-startup.sh` build arg causes the Dockerfile to install MariaDB server and use the yesterday startup script.
+
+### Secrets
+
+All secrets are copied from the production app except DB credentials (which are local and set in `fly-yesterday.toml` directly). Copy/refresh secrets with:
+
+```bash
+# List production secrets
+flyctl secrets list --app restarters
+
+# SSH into production to read values, then set on yesterday:
+flyctl secrets set --app restarters-yesterday KEY=VALUE ...
+```
 
 ---
 
