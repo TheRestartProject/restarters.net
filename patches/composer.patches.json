@@ -5,6 +5,9 @@
     },
     "mariuzzo/laravel-js-localization": {
       "Translation doesn't handle new lang folder location": "patches/laravel-translation.patch"
+    },
+    "wouternl/laravel-drip": {
+      "Add Laravel 11/12/13 support": "patches/laravel-drip-l11.patch"
     }
   }
 }
