@@ -7,6 +7,7 @@ primary_region = "lhr"
     STARTUP_SCRIPT = "yesterday-startup.sh"
 
 [env]
+  APP_NAME = "Restarters Yesterday"
   APP_ENV = "staging"
   APP_DEBUG = "false"
   APP_URL = "https://yesterday.restarters.net"
