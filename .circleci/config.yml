@@ -157,7 +157,9 @@ jobs:
             echo 'export PATH=/home/circleci/.fly/bin:$PATH' >> $BASH_ENV
       - run:
           name: Deploy to restarters-dev
-          command: flyctl deploy --config fly.dev.toml --remote-only
+          command: |
+            export FLY_API_TOKEN="FlyV1 $FLY_API_TOKEN"
+            flyctl deploy --config fly.dev.toml --remote-only
           no_output_timeout: 15m
 
   deploy-fly-prod:
@@ -172,7 +174,9 @@ jobs:
             echo 'export PATH=/home/circleci/.fly/bin:$PATH' >> $BASH_ENV
       - run:
           name: Deploy to restarters (production)
-          command: flyctl deploy --app restarters --remote-only
+          command: |
+            export FLY_API_TOKEN="FlyV1 $FLY_API_TOKEN"
+            flyctl deploy --app restarters --remote-only
           no_output_timeout: 15m
 
 workflows:
