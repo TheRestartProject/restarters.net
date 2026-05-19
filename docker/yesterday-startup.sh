@@ -18,7 +18,7 @@ chown -R www-data:www-data /var/www/storage /var/www/bootstrap/cache
 
 # Set up auth gate (same as production)
 if [ "${BASIC_AUTH_ENABLED:-}" = "true" ]; then
-    EXPECTED=$(php -r "echo hash_hmac('sha256', getenv('BASIC_AUTH_PASSWORD') ?: 'project', getenv('APP_KEY') ?: 'fallback');")
+    EXPECTED=$(php -r "echo hash_hmac('sha256', getenv('BASIC_AUTH_PASSWORD') ?: 'yesterday', getenv('APP_KEY') ?: 'fallback');")
     printf 'map $cookie_site_auth $auth_gate_valid {\n    "%s" 1;\n    default 0;\n}\nmap $auth_gate_valid $auth_check_status {\n    1 200;\n    default 401;\n}\n' \
         "$EXPECTED" > /etc/nginx/auth-gate-map.conf
     printf 'auth_request /_auth_check;\nerror_page 401 = @auth_gate;\n' \
@@ -43,85 +43,86 @@ log "Starting local MariaDB..."
 mkdir -p /var/lib/mysql /run/mysqld
 chown -R mysql:mysql /var/lib/mysql /run/mysqld
 
-# Initialise data directory if first boot
 if [ ! -d /var/lib/mysql/mysql ]; then
     mysql_install_db --user=mysql --datadir=/var/lib/mysql > /dev/null 2>&1
 fi
 
 mysqld_safe --user=mysql --skip-networking=0 --bind-address=127.0.0.1 &
 
-# Wait for MariaDB to accept connections
+# Wait for MariaDB (up to 60s)
 for i in $(seq 1 30); do
     if mysqladmin ping --silent 2>/dev/null; then break; fi
     sleep 2
 done
 
-# Create database and app user (local only — password is not sensitive)
+# Create database and app user
 mysql -e "CREATE DATABASE IF NOT EXISTS \`${DB_DATABASE:-restarters}\` CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;" 2>/dev/null
 mysql -e "CREATE USER IF NOT EXISTS '${DB_USERNAME:-restarters}'@'127.0.0.1' IDENTIFIED BY '${DB_PASSWORD:-restarters}';" 2>/dev/null
 mysql -e "GRANT ALL ON \`${DB_DATABASE:-restarters}\`.* TO '${DB_USERNAME:-restarters}'@'127.0.0.1'; FLUSH PRIVILEGES;" 2>/dev/null
 
 log "MariaDB ready."
 
-# ── Restore backup ────────────────────────────────────────────────────────────
-
-log "Finding backup to restore..."
+# ── Restore backup in background ─────────────────────────────────────────────
+# Supervisord starts immediately so nginx passes health checks while the
+# restore runs. The app will show DB errors until the restore completes (~2min).
 
 YESTERDAY=$(date -u -d 'yesterday' +%Y%m%d)
 RCLONE_FLAGS="--drive-root-folder-id=$GDRIVE_BACKUP_FOLDER_ID --drive-team-drive=$RCLONE_CONFIG_GDRIVE_TEAM_DRIVE"
 
-list_backups() {
-    rclone lsf "gdrive:" $RCLONE_FLAGS 2>/dev/null | grep 'db-backup-.*\.sql\.gz' | sort
-}
-
-# Prefer yesterday's 3am UTC (UK 4am BST / 3am GMT), fall back to any
-# yesterday backup, then fall back to oldest available
-BACKUP_FILE=$(list_backups | grep "db-backup-${YESTERDAY}-03" | head -1)
-
-if [ -z "$BACKUP_FILE" ]; then
-    log "No 3am backup for ${YESTERDAY}, trying any backup from yesterday..."
-    BACKUP_FILE=$(list_backups | grep "db-backup-${YESTERDAY}-" | head -1)
-fi
-
-if [ -z "$BACKUP_FILE" ]; then
-    log "No yesterday backup found, falling back to oldest available..."
-    BACKUP_FILE=$(list_backups | head -1)
-fi
-
-if [ -z "$BACKUP_FILE" ]; then
-    log "ERROR: No backup files found in Google Drive. App will start without data."
-else
-    log "Selected: $BACKUP_FILE"
-    log "Downloading (~100MB)..."
-
-    if rclone copy "gdrive:$BACKUP_FILE" /tmp/ $RCLONE_FLAGS 2>>"$LOG"; then
-        log "Download complete. Restoring database..."
-
-        if gunzip -c "/tmp/$BACKUP_FILE" | mysql --protocol=TCP -h 127.0.0.1 -u "${DB_USERNAME:-restarters}" -p"${DB_PASSWORD:-restarters}" "${DB_DATABASE:-restarters}" 2>>"$LOG"; then
-            log "Database restore complete."
-
-            RAW=$(echo "$BACKUP_FILE" | grep -oE '[0-9]{8}-[0-9]{6}')
-            SNAPSHOT_TIME=$(echo "$RAW" | sed 's/\([0-9]\{4\}\)\([0-9]\{2\}\)\([0-9]\{2\}\)-\([0-9]\{2\}\)\([0-9]\{2\}\)\([0-9]\{2\}\)/\1-\2-\3 \4:\5:\6/')
-            echo "${SNAPSHOT_TIME} UTC" > /var/www/storage/framework/yesterday-snapshot.txt
-            chown www-data:www-data /var/www/storage/framework/yesterday-snapshot.txt
-            log "Snapshot timestamp: ${SNAPSHOT_TIME} UTC"
-        else
-            log "ERROR: Database restore failed."
-        fi
-
-        rm -f "/tmp/$BACKUP_FILE"
-    else
-        log "ERROR: Download failed."
-    fi
-fi
-
-# ── Warm up Laravel ───────────────────────────────────────────────────────────
-
 (
+    list_backups() {
+        rclone lsf "gdrive:" $RCLONE_FLAGS 2>/dev/null | grep 'db-backup-.*\.sql\.gz' | sort
+    }
+
+    log "Finding backup to restore..."
+    BACKUP_FILE=$(list_backups | grep "db-backup-${YESTERDAY}-03" | head -1)
+
+    if [ -z "$BACKUP_FILE" ]; then
+        log "No 3am backup for ${YESTERDAY}, trying any backup from yesterday..."
+        BACKUP_FILE=$(list_backups | grep "db-backup-${YESTERDAY}-" | head -1)
+    fi
+
+    if [ -z "$BACKUP_FILE" ]; then
+        log "No yesterday backup found, falling back to oldest available..."
+        BACKUP_FILE=$(list_backups | head -1)
+    fi
+
+    if [ -z "$BACKUP_FILE" ]; then
+        log "ERROR: No backup files found in Google Drive."
+    else
+        log "Selected: $BACKUP_FILE"
+        log "Downloading (~100MB)..."
+
+        if rclone copy "gdrive:$BACKUP_FILE" /tmp/ $RCLONE_FLAGS 2>>"$LOG"; then
+            log "Download complete. Restoring database..."
+
+            if gunzip -c "/tmp/$BACKUP_FILE" | mysql --protocol=TCP -h 127.0.0.1 \
+                -u "${DB_USERNAME:-restarters}" -p"${DB_PASSWORD:-restarters}" \
+                "${DB_DATABASE:-restarters}" 2>>"$LOG"; then
+
+                log "Database restore complete."
+                RAW=$(echo "$BACKUP_FILE" | grep -oE '[0-9]{8}-[0-9]{6}')
+                SNAPSHOT_TIME=$(echo "$RAW" | sed 's/\([0-9]\{4\}\)\([0-9]\{2\}\)\([0-9]\{2\}\)-\([0-9]\{2\}\)\([0-9]\{2\}\)\([0-9]\{2\}\)/\1-\2-\3 \4:\5:\6/')
+                echo "${SNAPSHOT_TIME} UTC" > /var/www/storage/framework/yesterday-snapshot.txt
+                chown www-data:www-data /var/www/storage/framework/yesterday-snapshot.txt
+                log "Snapshot timestamp: ${SNAPSHOT_TIME} UTC"
+            else
+                log "ERROR: Database restore failed."
+            fi
+
+            rm -f "/tmp/$BACKUP_FILE"
+        else
+            log "ERROR: Download failed."
+        fi
+    fi
+
+    # Warm up Laravel caches after restore
     php /var/www/artisan config:cache 2>/dev/null || true
     php /var/www/artisan route:cache 2>/dev/null || true
     php /var/www/artisan view:cache 2>/dev/null || true
     chown -R www-data:www-data /var/www/storage /var/www/bootstrap/cache
+    log "Laravel caches warmed."
 ) &
 
+# ── Start supervisord immediately (nginx answers health checks straight away) ─
 exec /usr/bin/supervisord -c /etc/supervisor/conf.d/supervisord.conf
