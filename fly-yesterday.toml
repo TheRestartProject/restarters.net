@@ -70,10 +70,10 @@ primary_region = "lhr"
     type = "http"
     interval = "30s"
     timeout = "10s"
-    grace_period = "1200s"
+    grace_period = "3600s"
     method = "GET"
     path = "/robots.txt"
 
 [[vm]]
-  size = "shared-cpu-1x"
-  memory = 1024
+  size = "performance-1x"
+  memory = 2048
