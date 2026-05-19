@@ -97,8 +97,8 @@ else
     if rclone copy "gdrive:$BACKUP_FILE" /tmp/ $RCLONE_FLAGS 2>>"$LOG"; then
         log "Download complete. Restoring database..."
 
-        if gunzip -c "/tmp/$BACKUP_FILE" | mysql --protocol=TCP -h 127.0.0.1 \
-            -u root \
+        if gunzip -c "/tmp/$BACKUP_FILE" | mysql -u root \
+            --socket=/run/mysqld/mysqld.sock \
             "${DB_DATABASE:-restarters}" 2>>"$LOG"; then
 
             log "Database restore complete."
