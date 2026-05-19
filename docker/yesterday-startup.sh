@@ -47,7 +47,9 @@ if [ ! -d /var/lib/mysql/mysql ]; then
     mysql_install_db --user=mysql --datadir=/var/lib/mysql > /dev/null 2>&1
 fi
 
-mysqld_safe --user=mysql --skip-networking=0 --bind-address=127.0.0.1 &
+mysqld_safe --user=mysql --skip-networking=0 --bind-address=127.0.0.1 \
+    --innodb-buffer-pool-size=512M \
+    --innodb-flush-log-at-trx-commit=2 &
 
 # Wait for MariaDB (up to 60s)
 for i in $(seq 1 30); do
