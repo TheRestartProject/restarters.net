@@ -1,17 +1,17 @@
 ---
 name: ralph
-description: "MUST use for any non-trivial development task in FreegleDocker - implements iterative development with status tracking, session logging, validation, and one-task-at-a-time approach."
+description: "MUST use for any non-trivial development task in restarters.net - implements iterative development with status tracking, session logging, validation, and one-task-at-a-time approach."
 ---
 
 # Ralph Iterative Development Approach
 
-## 1. Session Log (in CLAUDE.md)
+## 1. Session Log (in .claude-session.md)
 
-On start: Read CLAUDE.md session log. If it references an active plan file, READ THAT PLAN FILE. Resume from where you left off.
+On start: Read `.claude-session.md` (gitignored local file, NOT CLAUDE.md) for the session log. If it references an active plan file, READ THAT PLAN FILE. Resume from where you left off.
 
-During work: Update session log after significant progress with date, status, completed items, next steps, blockers.
+During work: Update `.claude-session.md` after significant progress with date, status, completed items, next steps, blockers. Never write session log entries to CLAUDE.md — that file is committed to git and updating it makes open PRs go BEHIND.
 
-Before context compaction: Update with current state, uncommitted changes, running commands, exact next steps.
+Before context compaction: Update `.claude-session.md` with current state, uncommitted changes, running commands, exact next steps.
 
 ## 2. Break Down & Track
 
@@ -25,7 +25,7 @@ Write failing test FIRST → verify it fails → minimal fix → verify it passe
 
 ## 4. Validate Before Marking Complete
 
-Front-end: Chrome DevTools MCP. Emails: MailPit. Backend: 90%+ test coverage on touched modules.
+Front-end: Chrome DevTools MCP. Emails: Mailhog at http://localhost:8025 (requires `task docker:up-debug`). Backend: `task docker:test:phpunit`. JS: `task docker:test:jest`. E2E: `task docker:test:playwright`.
 
 ## 5. Code Quality Review (before declaring done)
 
@@ -45,10 +45,18 @@ Plan files in `plans/active/` are the master progress tracker. Update status mar
 
 ## 9. Database Migrations
 
-Laravel migrations are source of truth (dev/CI). Production needs idempotent SQL in `*_migration.sql` files.
+Laravel migrations are the source of truth. Run with `task docker:run:artisan -- migrate`. For fresh installs: `task docker:run:artisan -- migrate:fresh`.
 
-## 10. Automated Execution
+## 10. Docker Commands
 
-`./ralph.sh -t "task description"` or `./ralph.sh plans/active/plan.md`. Config in `.ralphy/config.yaml`.
+Always use `task` commands — never `docker-compose` or `docker exec` directly.
+
+```bash
+task docker:up-core                  # Start core services
+task docker:shell                    # Open shell in container
+task docker:run:artisan -- <cmd>     # Run artisan commands
+task docker:run:bash -- "<cmd>"      # Run bash commands
+task docker:test:phpunit             # Run PHP tests
+```
 
 Now analyse the user's request and create your status table to begin work.
