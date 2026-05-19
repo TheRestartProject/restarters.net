@@ -37,24 +37,49 @@ if [ -n "$AWS_BUCKET" ]; then
     mv /etc/nginx/nginx.conf.tmp /etc/nginx/nginx.conf
 fi
 
+# ── Start local MariaDB ───────────────────────────────────────────────────────
+
+log "Starting local MariaDB..."
+mkdir -p /var/lib/mysql /run/mysqld
+chown -R mysql:mysql /var/lib/mysql /run/mysqld
+
+# Initialise data directory if first boot
+if [ ! -d /var/lib/mysql/mysql ]; then
+    mysql_install_db --user=mysql --datadir=/var/lib/mysql > /dev/null 2>&1
+fi
+
+mysqld_safe --user=mysql --skip-networking=0 --bind-address=127.0.0.1 &
+
+# Wait for MariaDB to accept connections
+for i in $(seq 1 30); do
+    if mysqladmin ping --silent 2>/dev/null; then break; fi
+    sleep 2
+done
+
+# Create database and app user (local only — password is not sensitive)
+mysql -e "CREATE DATABASE IF NOT EXISTS \`${DB_DATABASE:-restarters}\` CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;" 2>/dev/null
+mysql -e "CREATE USER IF NOT EXISTS '${DB_USERNAME:-restarters}'@'127.0.0.1' IDENTIFIED BY '${DB_PASSWORD:-restarters}';" 2>/dev/null
+mysql -e "GRANT ALL ON \`${DB_DATABASE:-restarters}\`.* TO '${DB_USERNAME:-restarters}'@'127.0.0.1'; FLUSH PRIVILEGES;" 2>/dev/null
+
+log "MariaDB ready."
+
 # ── Restore backup ────────────────────────────────────────────────────────────
 
-log "Starting yesterday restore..."
+log "Finding backup to restore..."
 
-# Find backup: prefer yesterday's 3am UTC (= UK 4am BST / 3am GMT).
-# Falls back to any yesterday backup, then oldest available.
 YESTERDAY=$(date -u -d 'yesterday' +%Y%m%d)
-
-RCLONE_COMMON_FLAGS="--drive-root-folder-id=$GDRIVE_BACKUP_FOLDER_ID --drive-team-drive=$RCLONE_CONFIG_GDRIVE_TEAM_DRIVE"
+RCLONE_FLAGS="--drive-root-folder-id=$GDRIVE_BACKUP_FOLDER_ID --drive-team-drive=$RCLONE_CONFIG_GDRIVE_TEAM_DRIVE"
 
 list_backups() {
-    rclone lsf "gdrive:" $RCLONE_COMMON_FLAGS 2>/dev/null | grep 'db-backup-.*\.sql\.gz' | sort
+    rclone lsf "gdrive:" $RCLONE_FLAGS 2>/dev/null | grep 'db-backup-.*\.sql\.gz' | sort
 }
 
+# Prefer yesterday's 3am UTC (UK 4am BST / 3am GMT), fall back to any
+# yesterday backup, then fall back to oldest available
 BACKUP_FILE=$(list_backups | grep "db-backup-${YESTERDAY}-03" | head -1)
 
 if [ -z "$BACKUP_FILE" ]; then
-    log "No 3am backup found for ${YESTERDAY}, trying any backup from yesterday..."
+    log "No 3am backup for ${YESTERDAY}, trying any backup from yesterday..."
     BACKUP_FILE=$(list_backups | grep "db-backup-${YESTERDAY}-" | head -1)
 fi
 
@@ -64,48 +89,29 @@ if [ -z "$BACKUP_FILE" ]; then
 fi
 
 if [ -z "$BACKUP_FILE" ]; then
-    log "ERROR: No backup files found in Google Drive. Cannot restore."
-    # Start app anyway so health check passes (will show DB error rather than hang)
+    log "ERROR: No backup files found in Google Drive. App will start without data."
 else
-    log "Selected backup: $BACKUP_FILE"
+    log "Selected: $BACKUP_FILE"
+    log "Downloading (~100MB)..."
 
-    # Download
-    log "Downloading $BACKUP_FILE (~100MB)..."
-    if ! rclone copy "gdrive:$BACKUP_FILE" /tmp/ $RCLONE_COMMON_FLAGS 2>>"$LOG"; then
-        log "ERROR: Failed to download backup"
-    else
-        log "Download complete. Waiting for database..."
+    if rclone copy "gdrive:$BACKUP_FILE" /tmp/ $RCLONE_FLAGS 2>>"$LOG"; then
+        log "Download complete. Restoring database..."
 
-        # Wait for MySQL to be reachable
-        for i in $(seq 1 30); do
-            if mysqladmin ping -h "$DB_HOST" -u "$DB_USERNAME" -p"$DB_PASSWORD" --skip-ssl --silent 2>/dev/null; then
-                break
-            fi
-            log "  attempt $i/30 - database not ready..."
-            sleep 5
-        done
-
-        # Drop and recreate the database for a clean restore
-        log "Recreating database..."
-        mysql -h "$DB_HOST" -u "$DB_USERNAME" -p"$DB_PASSWORD" --skip-ssl \
-            -e "DROP DATABASE IF EXISTS \`${DB_DATABASE}\`; CREATE DATABASE \`${DB_DATABASE}\` CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;" 2>>"$LOG"
-
-        # Restore
-        log "Restoring database (this takes a few minutes)..."
-        if gunzip -c "/tmp/$BACKUP_FILE" | mysql -h "$DB_HOST" -u "$DB_USERNAME" -p"$DB_PASSWORD" --skip-ssl "$DB_DATABASE" 2>>"$LOG"; then
+        if gunzip -c "/tmp/$BACKUP_FILE" | mysql --protocol=TCP -h 127.0.0.1 -u "${DB_USERNAME:-restarters}" -p"${DB_PASSWORD:-restarters}" "${DB_DATABASE:-restarters}" 2>>"$LOG"; then
             log "Database restore complete."
 
-            # Extract timestamp from filename: db-backup-YYYYMMDD-HHMMSS.sql.gz
             RAW=$(echo "$BACKUP_FILE" | grep -oE '[0-9]{8}-[0-9]{6}')
             SNAPSHOT_TIME=$(echo "$RAW" | sed 's/\([0-9]\{4\}\)\([0-9]\{2\}\)\([0-9]\{2\}\)-\([0-9]\{2\}\)\([0-9]\{2\}\)\([0-9]\{2\}\)/\1-\2-\3 \4:\5:\6/')
             echo "${SNAPSHOT_TIME} UTC" > /var/www/storage/framework/yesterday-snapshot.txt
             chown www-data:www-data /var/www/storage/framework/yesterday-snapshot.txt
-            log "Snapshot timestamp written: ${SNAPSHOT_TIME} UTC"
+            log "Snapshot timestamp: ${SNAPSHOT_TIME} UTC"
         else
             log "ERROR: Database restore failed."
         fi
 
         rm -f "/tmp/$BACKUP_FILE"
+    else
+        log "ERROR: Download failed."
     fi
 fi
 
@@ -118,5 +124,4 @@ fi
     chown -R www-data:www-data /var/www/storage /var/www/bootstrap/cache
 ) &
 
-# Start supervisord (nginx + php-fpm + cron — no queue worker needed)
 exec /usr/bin/supervisord -c /etc/supervisor/conf.d/supervisord.conf
