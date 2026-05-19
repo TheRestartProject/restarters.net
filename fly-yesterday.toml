@@ -3,11 +3,14 @@ primary_region = "lhr"
 
 [build]
   dockerfile = "Dockerfile.fly"
+  [build.args]
+    STARTUP_SCRIPT = "yesterday-startup.sh"
 
 [env]
   APP_ENV = "staging"
-  APP_DEBUG = "true"
-  APP_URL = "https://restarters-yesterday.fly.dev"
+  APP_DEBUG = "false"
+  APP_URL = "https://yesterday.restarters.net"
+  YESTERDAY_MODE = "true"
   DB_CONNECTION = "mysql"
   DB_HOST = "restarters-db-yesterday.internal"
   DB_PORT = "3306"
@@ -57,6 +60,16 @@ primary_region = "lhr"
   auto_stop_machines = "stop"
   auto_start_machines = true
   min_machines_running = 0
+
+[checks]
+  [checks.health]
+    port = 80
+    type = "http"
+    interval = "30s"
+    timeout = "10s"
+    grace_period = "600s"
+    method = "GET"
+    path = "/robots.txt"
 
 [[vm]]
   size = "shared-cpu-1x"

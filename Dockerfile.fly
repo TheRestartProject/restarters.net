@@ -150,10 +150,13 @@ RUN mkdir -p storage/framework/{sessions,views,cache/data} \
     public/uploads \
     && chown -R www-data:www-data storage bootstrap/cache public/uploads
 
-# Copy startup script
+# Copy startup scripts (production + yesterday-restore variant)
+ARG STARTUP_SCRIPT=startup.sh
 COPY .fly/scripts/startup.sh /usr/local/bin/startup.sh
-RUN chmod +x /usr/local/bin/startup.sh
+COPY docker/yesterday-startup.sh /usr/local/bin/yesterday-startup.sh
+RUN chmod +x /usr/local/bin/startup.sh /usr/local/bin/yesterday-startup.sh && \
+    cp /usr/local/bin/${STARTUP_SCRIPT} /usr/local/bin/active-startup.sh
 
 EXPOSE 80
 
-CMD ["/usr/local/bin/startup.sh"]
+CMD ["/usr/local/bin/active-startup.sh"]
