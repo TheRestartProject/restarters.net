@@ -70,7 +70,7 @@ primary_region = "lhr"
     type = "http"
     interval = "30s"
     timeout = "10s"
-    grace_period = "600s"
+    grace_period = "1200s"
     method = "GET"
     path = "/robots.txt"
 

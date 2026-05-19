@@ -62,67 +62,65 @@ mysql -e "GRANT ALL ON \`${DB_DATABASE:-restarters}\`.* TO '${DB_USERNAME:-resta
 
 log "MariaDB ready."
 
-# ── Restore backup in background ─────────────────────────────────────────────
-# Supervisord starts immediately so nginx passes health checks while the
-# restore runs. The app will show DB errors until the restore completes (~2min).
+# ── Restore backup (synchronous — supervisord starts after restore completes) ─
+# The health check grace_period (1200s) covers the full restore time.
+# Running synchronously ensures the machine never auto-stops mid-restore.
 
 YESTERDAY=$(date -u -d 'yesterday' +%Y%m%d)
 RCLONE_FLAGS="--drive-root-folder-id=$GDRIVE_BACKUP_FOLDER_ID --drive-team-drive=$RCLONE_CONFIG_GDRIVE_TEAM_DRIVE"
 
-(
-    list_backups() {
-        rclone lsf "gdrive:" $RCLONE_FLAGS 2>/dev/null | grep 'db-backup-.*\.sql\.gz' | sort
-    }
+list_backups() {
+    rclone lsf "gdrive:" $RCLONE_FLAGS 2>/dev/null | grep 'db-backup-.*\.sql\.gz' | sort
+}
 
-    log "Finding backup to restore..."
-    BACKUP_FILE=$(list_backups | grep "db-backup-${YESTERDAY}-03" | head -1)
+log "Finding backup to restore..."
+BACKUP_FILE=$(list_backups | grep "db-backup-${YESTERDAY}-03" | head -1)
 
-    if [ -z "$BACKUP_FILE" ]; then
-        log "No 3am backup for ${YESTERDAY}, trying any backup from yesterday..."
-        BACKUP_FILE=$(list_backups | grep "db-backup-${YESTERDAY}-" | head -1)
-    fi
+if [ -z "$BACKUP_FILE" ]; then
+    log "No 3am backup for ${YESTERDAY}, trying any backup from yesterday..."
+    BACKUP_FILE=$(list_backups | grep "db-backup-${YESTERDAY}-" | head -1)
+fi
 
-    if [ -z "$BACKUP_FILE" ]; then
-        log "No yesterday backup found, falling back to oldest available..."
-        BACKUP_FILE=$(list_backups | head -1)
-    fi
+if [ -z "$BACKUP_FILE" ]; then
+    log "No yesterday backup found, falling back to oldest available..."
+    BACKUP_FILE=$(list_backups | head -1)
+fi
 
-    if [ -z "$BACKUP_FILE" ]; then
-        log "ERROR: No backup files found in Google Drive."
-    else
-        log "Selected: $BACKUP_FILE"
-        log "Downloading (~100MB)..."
+if [ -z "$BACKUP_FILE" ]; then
+    log "ERROR: No backup files found in Google Drive. Starting with empty database."
+else
+    log "Selected: $BACKUP_FILE"
+    log "Downloading (~100MB)..."
 
-        if rclone copy "gdrive:$BACKUP_FILE" /tmp/ $RCLONE_FLAGS 2>>"$LOG"; then
-            log "Download complete. Restoring database..."
+    if rclone copy "gdrive:$BACKUP_FILE" /tmp/ $RCLONE_FLAGS 2>>"$LOG"; then
+        log "Download complete. Restoring database..."
 
-            if gunzip -c "/tmp/$BACKUP_FILE" | mysql --protocol=TCP -h 127.0.0.1 \
-                -u "${DB_USERNAME:-restarters}" -p"${DB_PASSWORD:-restarters}" \
-                "${DB_DATABASE:-restarters}" 2>>"$LOG"; then
+        if gunzip -c "/tmp/$BACKUP_FILE" | mysql --protocol=TCP -h 127.0.0.1 \
+            -u "${DB_USERNAME:-restarters}" -p"${DB_PASSWORD:-restarters}" \
+            "${DB_DATABASE:-restarters}" 2>>"$LOG"; then
 
-                log "Database restore complete."
-                RAW=$(echo "$BACKUP_FILE" | grep -oE '[0-9]{8}-[0-9]{6}')
-                SNAPSHOT_TIME=$(echo "$RAW" | sed 's/\([0-9]\{4\}\)\([0-9]\{2\}\)\([0-9]\{2\}\)-\([0-9]\{2\}\)\([0-9]\{2\}\)\([0-9]\{2\}\)/\1-\2-\3 \4:\5:\6/')
-                echo "${SNAPSHOT_TIME} UTC" > /var/www/storage/framework/yesterday-snapshot.txt
-                chown www-data:www-data /var/www/storage/framework/yesterday-snapshot.txt
-                log "Snapshot timestamp: ${SNAPSHOT_TIME} UTC"
-            else
-                log "ERROR: Database restore failed."
-            fi
-
-            rm -f "/tmp/$BACKUP_FILE"
+            log "Database restore complete."
+            RAW=$(echo "$BACKUP_FILE" | grep -oE '[0-9]{8}-[0-9]{6}')
+            SNAPSHOT_TIME=$(echo "$RAW" | sed 's/\([0-9]\{4\}\)\([0-9]\{2\}\)\([0-9]\{2\}\)-\([0-9]\{2\}\)\([0-9]\{2\}\)\([0-9]\{2\}\)/\1-\2-\3 \4:\5:\6/')
+            echo "${SNAPSHOT_TIME} UTC" > /var/www/storage/framework/yesterday-snapshot.txt
+            chown www-data:www-data /var/www/storage/framework/yesterday-snapshot.txt
+            log "Snapshot timestamp: ${SNAPSHOT_TIME} UTC"
         else
-            log "ERROR: Download failed."
+            log "ERROR: Database restore failed."
         fi
+
+        rm -f "/tmp/$BACKUP_FILE"
+    else
+        log "ERROR: Download failed."
     fi
+fi
 
-    # Warm up Laravel caches after restore
-    php /var/www/artisan config:cache 2>/dev/null || true
-    php /var/www/artisan route:cache 2>/dev/null || true
-    php /var/www/artisan view:cache 2>/dev/null || true
-    chown -R www-data:www-data /var/www/storage /var/www/bootstrap/cache
-    log "Laravel caches warmed."
-) &
+# Warm up Laravel caches after restore
+php /var/www/artisan config:cache 2>/dev/null || true
+php /var/www/artisan route:cache 2>/dev/null || true
+php /var/www/artisan view:cache 2>/dev/null || true
+chown -R www-data:www-data /var/www/storage /var/www/bootstrap/cache
+log "Laravel caches warmed. Starting supervisord..."
 
-# ── Start supervisord immediately (nginx answers health checks straight away) ─
+# ── Start supervisord — health check passes only after restore is complete ────
 exec /usr/bin/supervisord -c /etc/supervisor/conf.d/supervisord.conf
