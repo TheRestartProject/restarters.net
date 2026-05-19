@@ -27,6 +27,7 @@ use App\Http\Controllers\RoleController;
 use App\Http\Controllers\SkillsController;
 use App\Http\Controllers\StyleController;
 use App\Http\Controllers\TabicatOraController;
+use App\Http\Controllers\MapsProxyController;
 use App\Http\Controllers\UserController;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
@@ -316,6 +317,12 @@ Route::middleware('auth', 'verifyUserConsent', 'ensureAPIToken')->group(function
 
     Route::prefix('fixometer')->group(function () {
         Route::get('/', [DeviceController::class, 'index'])->name('devices');
+    });
+
+    // Maps proxy — keeps the Google API key server-side
+    Route::prefix('maps')->group(function () {
+        Route::get('/autocomplete', [MapsProxyController::class, 'autocomplete']);
+        Route::get('/place-details', [MapsProxyController::class, 'placeDetails']);
     });
 
     // TODO: the rest of these to be redirected properly.

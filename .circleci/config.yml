@@ -178,7 +178,10 @@ jobs:
 workflows:
   build-and-deploy:
     jobs:
-      - build
+      - build:
+          filters:
+            branches:
+              ignore: production
       - deploy-fly-dev:
           requires:
             - build
@@ -186,8 +189,6 @@ workflows:
             branches:
               only: develop
       - deploy-fly-prod:
-          requires:
-            - build
           filters:
             branches:
               only: production

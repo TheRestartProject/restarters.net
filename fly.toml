@@ -10,6 +10,7 @@ primary_region = "lhr"
 [env]
   APP_ENV = "production"
   APP_DEBUG = "false"
+  APP_NAME = "Restarters"
   APP_URL = "https://restarters.net"
   DB_CONNECTION = "mysql"
   DB_HOST = "restarters-db.internal"
@@ -24,8 +25,9 @@ primary_region = "lhr"
   AWS_DEFAULT_REGION = "auto"
   AWS_ENDPOINT = "https://fly.storage.tigris.dev"
   AWS_USE_PATH_STYLE_ENDPOINT = "true"
-  FEATURE__WIKI_INTEGRATION = "false"
-  FEATURE__DISCOURSE_INTEGRATION = "false"
+  FEATURE__WIKI_INTEGRATION = "true"
+  FEATURE__DISCOURSE_INTEGRATION = "true"
+  WP_XMLRPC_ENDPOINT = "https://therestartproject.org/fxm.php"
   SENTRY_ENVIRONMENT = "production"
   # Table type constants
   TBL_USERS = "1"
@@ -76,5 +78,5 @@ primary_region = "lhr"
   destination = "/var/log"
 
 [[vm]]
-  size = "shared-cpu-2x"
+  size = "performance-2x"
   memory = 4096
