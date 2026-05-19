@@ -98,7 +98,7 @@ else
         log "Download complete. Restoring database..."
 
         if gunzip -c "/tmp/$BACKUP_FILE" | mysql --protocol=TCP -h 127.0.0.1 \
-            -u "${DB_USERNAME:-restarters}" -p"${DB_PASSWORD:-restarters}" \
+            -u root \
             "${DB_DATABASE:-restarters}" 2>>"$LOG"; then
 
             log "Database restore complete."
