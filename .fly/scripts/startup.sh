@@ -71,6 +71,11 @@ if ! crontab -l 2>/dev/null | grep -q 'db-backup'; then
     ( crontab -l 2>/dev/null; echo "0 * * * * /usr/local/bin/db-backup.sh" ) | crontab -
 fi
 
+# Ensure yesterday restart is in crontab (image crontab may predate this entry)
+if ! crontab -l 2>/dev/null | grep -q 'restart-yesterday'; then
+    ( crontab -l 2>/dev/null; echo "0 5 * * * /usr/local/bin/restart-yesterday.sh" ) | crontab -
+fi
+
 # Run DB setup in a subshell so failures never prevent supervisord from starting
 (
     # Wait for MySQL to be reachable

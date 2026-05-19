@@ -130,12 +130,13 @@ COPY docker/logrotate-fly.conf /etc/logrotate.d/restarters
 COPY docker/queue-watchdog.sh /usr/local/bin/queue-watchdog.sh
 RUN chmod +x /usr/local/bin/queue-watchdog.sh
 
-# Copy database backup script
+# Copy database backup script and yesterday restart script
 COPY docker/db-backup.sh /usr/local/bin/db-backup.sh
-RUN chmod +x /usr/local/bin/db-backup.sh
+COPY docker/restart-yesterday.sh /usr/local/bin/restart-yesterday.sh
+RUN chmod +x /usr/local/bin/db-backup.sh /usr/local/bin/restart-yesterday.sh
 
-# Set up cron: Laravel scheduler + queue watchdog (kills hung jobs, supervisord restarts worker) + hourly DB backup
-RUN printf '* * * * * cd /var/www && php artisan schedule:run >> /dev/null 2>&1\n* * * * * /usr/local/bin/queue-watchdog.sh\n0 * * * * /usr/local/bin/db-backup.sh\n' | crontab -
+# Set up cron: Laravel scheduler + queue watchdog + hourly DB backup + daily yesterday restart (5am UTC)
+RUN printf '* * * * * cd /var/www && php artisan schedule:run >> /dev/null 2>&1\n* * * * * /usr/local/bin/queue-watchdog.sh\n0 * * * * /usr/local/bin/db-backup.sh\n0 5 * * * /usr/local/bin/restart-yesterday.sh\n' | crontab -
 
 # Set working directory
 WORKDIR /var/www
