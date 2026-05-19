@@ -66,6 +66,11 @@ if ! crontab -l 2>/dev/null | grep -q 'queue-watchdog'; then
     ( crontab -l 2>/dev/null; echo "* * * * * /usr/local/bin/queue-watchdog.sh" ) | crontab -
 fi
 
+# Ensure database backup is in crontab (image crontab may predate this entry)
+if ! crontab -l 2>/dev/null | grep -q 'db-backup'; then
+    ( crontab -l 2>/dev/null; echo "0 2 * * * /usr/local/bin/db-backup.sh" ) | crontab -
+fi
+
 # Run DB setup in a subshell so failures never prevent supervisord from starting
 (
     # Wait for MySQL to be reachable
