@@ -225,7 +225,7 @@ class DeleteEventTest extends TestCase
         );
     }
 
-    public function provider(): array
+    public static function provider(): array
     {
         // We return:
         // - role

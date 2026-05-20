@@ -84,7 +84,7 @@ class APIv2GroupTest extends TestCase
         }
     }
 
-    public function providerTrueFalse(): array
+    public static function providerTrueFalse(): array
     {
         return [
             [false],

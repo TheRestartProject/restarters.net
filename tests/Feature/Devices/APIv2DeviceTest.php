@@ -218,7 +218,7 @@ class APIv2DeviceTest extends TestCase
         }
     }
 
-    public function providerDevice(): array
+    public static function providerDevice(): array
     {
         // Possible combinations of inputs for repair status, spare parts, next steps and barriers to repair fields.
         //
