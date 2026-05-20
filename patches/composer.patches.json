@@ -8,6 +8,9 @@
     },
     "wouternl/laravel-drip": {
       "Add Laravel 11/12/13 support": "patches/laravel-drip-l11.patch"
+    },
+    "guzzlehttp/promises": {
+      "Fix PHP 8.4 implicit nullable deprecations": "patches/guzzle-promises-nullable.patch"
     }
   }
 }
