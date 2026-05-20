@@ -20,7 +20,7 @@
  ) {
      return Each::of($iterable, $onFulfilled, $onRejected);
  }
-@@ -284,8 +284,8 @@
+@@ -285,8 +285,8 @@
  function each_limit(
      $iterable,
      $concurrency,
