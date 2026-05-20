@@ -536,7 +536,8 @@ class Fixometer
         return is_array($stats)
             && array_key_exists('partiesCount', $stats)
             && array_key_exists('waste_stats', $stats)
-            && is_array($stats['device_count_status'] ?? null);
+            && is_array($stats['device_count_status'] ?? null)
+            && is_array($stats['waste_stats'][0] ?? null);
     }
 
     public static function loginRegisterStats(): array
@@ -567,11 +568,20 @@ class Fixometer
     public static function computeStats(): array
     {
         $device = new \App\Device;
+        $ws = \App\Helpers\LcaStats::getWasteStats()[0] ?? null;
 
         return [
             'partiesCount' => \App\Party::where('event_end_utc', '<', now())->count(),
-            'waste_stats' => \App\Helpers\LcaStats::getWasteStats(),
-            'device_count_status' => $device->statusCount(),
+            'waste_stats' => [[
+                'powered_waste' => $ws->powered_waste ?? 0,
+                'unpowered_waste' => $ws->unpowered_waste ?? 0,
+                'powered_footprint' => $ws->powered_footprint ?? 0,
+                'unpowered_footprint' => $ws->unpowered_footprint ?? 0,
+            ]],
+            'device_count_status' => array_map(
+                static fn ($row) => ['status' => $row->status, 'counter' => $row->counter],
+                $device->statusCount()
+            ),
         ];
     }
 
@@ -579,16 +589,16 @@ class Fixometer
     {
         $stats['deviceCount'] = 0;
         foreach ($stats['device_count_status'] as $statusRow) {
-            if ($statusRow->status == \App\Device::REPAIR_STATUS_FIXED) {
-                $stats['deviceCount'] = $statusRow->counter;
+            $row = (array) $statusRow;
+            if (($row['status'] ?? null) == \App\Device::REPAIR_STATUS_FIXED) {
+                $stats['deviceCount'] = $row['counter'] ?? 0;
                 break;
             }
         }
 
-        $stats['co2Total'] = ($stats['waste_stats'][0]->powered_footprint ?? 0)
-            + ($stats['waste_stats'][0]->unpowered_footprint ?? 0);
-        $stats['wasteTotal'] = ($stats['waste_stats'][0]->powered_waste ?? 0)
-            + ($stats['waste_stats'][0]->unpowered_waste ?? 0);
+        $ws = $stats['waste_stats'][0];
+        $stats['co2Total'] = ($ws['powered_footprint'] ?? 0) + ($ws['unpowered_footprint'] ?? 0);
+        $stats['wasteTotal'] = ($ws['powered_waste'] ?? 0) + ($ws['unpowered_waste'] ?? 0);
 
         return $stats;
     }

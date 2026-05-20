@@ -26,8 +26,8 @@ class LoginRegisterStatsTest extends TestCase
     {
         return [
             'partiesCount' => 10,
-            'waste_stats' => [(object)['powered_footprint' => 1.0, 'unpowered_footprint' => 0.5, 'powered_waste' => 2.0, 'unpowered_waste' => 1.0]],
-            'device_count_status' => [(object)['status' => \App\Device::REPAIR_STATUS_FIXED, 'counter' => 42]],
+            'waste_stats' => [['powered_footprint' => 1.0, 'unpowered_footprint' => 0.5, 'powered_waste' => 2.0, 'unpowered_waste' => 1.0]],
+            'device_count_status' => [['status' => \App\Device::REPAIR_STATUS_FIXED, 'counter' => 42]],
         ];
     }
 
