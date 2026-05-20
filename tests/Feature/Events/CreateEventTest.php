@@ -856,7 +856,7 @@ class CreateEventTest extends TestCase
         ]);
     }
 
-    public function invalidEmailProvider(): array
+    public static function invalidEmailProvider(): array
     {
         return [
             ['test@test.com', true],

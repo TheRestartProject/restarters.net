@@ -27,7 +27,7 @@ class GroupHostTest extends TestCase
         $this->assertNotNull($this->idgroups);
     }
 
-    public function roleProvider(): array {
+    public static function roleProvider(): array {
         return [
             [ 'Administrator' ],
             [ 'NetworkCoordinator' ],

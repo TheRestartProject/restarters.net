@@ -376,7 +376,7 @@ class ExportTest extends TestCase
         }
     }
 
-    public function roleProvider(): array {
+    public static function roleProvider(): array {
         return [
             [ 'Administrator' ],
             [ 'NetworkCoordinator' ],
