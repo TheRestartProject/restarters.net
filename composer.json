@@ -107,7 +107,7 @@
     "repositories": {
         "laravel-drip": {
             "type": "vcs",
-            "url": "https://github.com/edwh/laravel-drip"
+            "url": "https://github.com/TheRestartProject/laravel-drip"
         },
         "laravel-discourse-sso": {
             "type": "vcs",
