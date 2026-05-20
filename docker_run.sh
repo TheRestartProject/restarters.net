@@ -21,9 +21,6 @@ fi
 log_step "Starting composer install"
 composer install
 log_step "composer install done"
-# Apply PHP 8.4 nullable patch directly to avoid cweagans/composer-patches triggering a slow reinstall cascade
-# Uses || true so it's idempotent — safe to re-apply when vendor/ is already patched from cache
-patch -p1 -d vendor/guzzlehttp/promises < patches/guzzle-promises-nullable.patch 2>/dev/null || true
 
 # Point at the DB server
 sed -i 's/DB_HOST=.*$/DB_HOST=restarters_db/g' .env
