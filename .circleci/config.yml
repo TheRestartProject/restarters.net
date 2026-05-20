@@ -172,6 +172,9 @@ jobs:
 
             # Capture restarters container logs (includes docker_run.sh timestamp output)
             docker logs restarters > /tmp/test-results/logs/restarters.log 2>&1 || echo "Could not capture restarters logs"
+
+            # Capture Laravel application log (shows PHP exceptions causing HTTP 500)
+            docker exec restarters bash -c "tail -300 /var/www/storage/logs/laravel.log 2>/dev/null" > /tmp/test-results/logs/laravel.log || echo "No laravel log found"
           when: always
 
       # Store artifacts
