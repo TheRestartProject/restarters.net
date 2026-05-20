@@ -68,7 +68,7 @@ log "MariaDB ready."
 # The health check grace_period (1200s) covers the full restore time.
 # Running synchronously ensures the machine never auto-stops mid-restore.
 
-YESTERDAY=$(date -u -d 'yesterday' +%Y%m%d)
+TODAY=$(date -u +%Y%m%d)
 RCLONE_FLAGS="--drive-root-folder-id=$GDRIVE_BACKUP_FOLDER_ID --drive-team-drive=$RCLONE_CONFIG_GDRIVE_TEAM_DRIVE"
 
 list_backups() {
@@ -76,16 +76,16 @@ list_backups() {
 }
 
 log "Finding backup to restore..."
-BACKUP_FILE=$(list_backups | grep "db-backup-${YESTERDAY}-03" | head -1)
+BACKUP_FILE=$(list_backups | grep "db-backup-${TODAY}-03" | tail -1)
 
 if [ -z "$BACKUP_FILE" ]; then
-    log "No 3am backup for ${YESTERDAY}, trying any backup from yesterday..."
-    BACKUP_FILE=$(list_backups | grep "db-backup-${YESTERDAY}-" | head -1)
+    log "No 3am backup for ${TODAY}, trying any backup from today..."
+    BACKUP_FILE=$(list_backups | grep "db-backup-${TODAY}-" | tail -1)
 fi
 
 if [ -z "$BACKUP_FILE" ]; then
-    log "No yesterday backup found, falling back to oldest available..."
-    BACKUP_FILE=$(list_backups | head -1)
+    log "No today backup found, falling back to most recent available..."
+    BACKUP_FILE=$(list_backups | tail -1)
 fi
 
 if [ -z "$BACKUP_FILE" ]; then
