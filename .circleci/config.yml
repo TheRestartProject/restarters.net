@@ -135,6 +135,9 @@ jobs:
 
             # Copy Vite log from restarters container for debugging
             docker cp restarters:/tmp/vite.log /tmp/test-results/logs/vite.log || echo "Vite log not found"
+
+            # Capture restarters container logs (includes docker_run.sh timestamp output)
+            docker logs restarters > /tmp/test-results/logs/restarters.log 2>&1 || echo "Could not capture restarters logs"
           when: always
 
       # Store artifacts
