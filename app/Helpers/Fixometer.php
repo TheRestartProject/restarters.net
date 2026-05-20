@@ -555,6 +555,10 @@ class Fixometer
                 \Cache::put('all_stats_fresh', true, self::STATS_FRESH_TTL);
             });
             $stats = \Cache::get('all_stats');
+            if (! static::isStatsValid($stats)) {
+                // Cache write failed (disk full, backend down) — compute uncached.
+                $stats = static::computeStats();
+            }
         } elseif (\Cache::missing('all_stats_fresh')) {
             // Stale — serve immediately, dispatch one background refresh.
             if (\Cache::lock('all_stats_refreshing', self::STATS_FRESH_TTL)->get()) {
@@ -596,7 +600,7 @@ class Fixometer
             }
         }
 
-        $ws = $stats['waste_stats'][0];
+        $ws = $stats['waste_stats'][0] ?? [];
         $stats['co2Total'] = ($ws['powered_footprint'] ?? 0) + ($ws['unpowered_footprint'] ?? 0);
         $stats['wasteTotal'] = ($ws['powered_waste'] ?? 0) + ($ws['unpowered_waste'] ?? 0);
 
