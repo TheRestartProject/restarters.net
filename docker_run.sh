@@ -77,17 +77,12 @@ done
 wait_for_service "MySQL database" "mysqladmin ping -h restarters_db --skip-ssl --silent" 60 5
 
 php artisan migrate:fresh --seed
-npm install --legacy-peer-deps
-npm rebuild node-sass
 
-# Install Playwright for testing (system deps already in Dockerfile)
-npm install -D @playwright/test
-npx playwright install
-
-# Start Vite dev server in the background with logging
-echo "Starting Vite dev server..."
-nohup npm run dev > /tmp/vite.log 2>&1 &
-echo "Vite dev server started with PID $!"
+# npm install, node-sass rebuild, Playwright browser download, and Vite are slow
+# (network-dependent) and not needed for PHP-FPM to serve HTTP. Run them in the
+# background so php-fpm can start immediately after migrations.
+(npm install --legacy-peer-deps && npm rebuild node-sass && nohup npm run dev > /tmp/vite.log 2>&1) &
+(npm install -D @playwright/test && npx playwright install) &
 
 php artisan key:generate
 php artisan cache:clear
@@ -102,7 +97,6 @@ echo "User::firstOrCreate(['email'=>'jane@bloggs.net'], ['name'=>'Jane Bloggs','
 # Ensure we have a test group tag
 echo "\App\GroupTags::firstOrCreate(['tag_name'=>'Test Tag'], ['description'=>'A test tag for development']);" | php artisan tinker
 
+# Start php-fpm — this is what serves HTTP, everything above just needs to be done first.
+# npm/playwright continue in background; they'll be ready long before Playwright tests run.
 php-fpm
-
-# In case everything else bombs out.
-sleep infinity
