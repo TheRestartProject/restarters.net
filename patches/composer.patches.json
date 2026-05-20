@@ -1,5 +1,8 @@
 {
   "patches": {
+    "guzzlehttp/promises": {
+      "Fix PHP 8.4 implicit nullable type deprecations": "patches/guzzlehttp-promises-php84.patch"
+    },
     "addwiki/mediawiki-api-base": {
       "Make getClient public": "patches/mediawiki-api-base.patch"
     },
