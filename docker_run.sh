@@ -13,6 +13,8 @@ fi
 
 rm -rf vendor
 composer install
+# Apply PHP 8.4 nullable patch directly to avoid cweagans/composer-patches triggering a slow reinstall cascade
+patch -p1 -d vendor/guzzlehttp/promises < patches/guzzle-promises-nullable.patch 2>/dev/null || true
 
 # Point at the DB server
 sed -i 's/DB_HOST=.*$/DB_HOST=restarters_db/g' .env
