@@ -2,6 +2,14 @@
 # Daily restart of restarters-yesterday so it picks up a fresh backup.
 # Requires FLY_YESTERDAY_RESTART_TOKEN secret set on the production app.
 
+# On Fly.io, /fly/init is PID 1 with minimal env; secrets live in supervisord.
+ENVIRON_SOURCE=/proc/1/environ
+SUPER_PID=$(pgrep -f supervisord 2>/dev/null | head -1)
+[ -n "$SUPER_PID" ] && ENVIRON_SOURCE=/proc/$SUPER_PID/environ
+while IFS= read -r -d '' var; do
+    case "$var" in FLY_*) export "$var" ;; esac
+done < "$ENVIRON_SOURCE"
+
 [ -z "$FLY_YESTERDAY_RESTART_TOKEN" ] && exit 0
 
 APP="restarters-yesterday"

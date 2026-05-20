@@ -4,10 +4,14 @@
 
 LOG=/var/log/db-backup.log
 
-# Cron does not inherit container env vars — read from the init process.
+# Cron does not inherit container env vars. On Fly.io, /fly/init is PID 1 (minimal
+# env); secrets live in supervisord's environ. Find it and read from there.
+ENVIRON_SOURCE=/proc/1/environ
+SUPER_PID=$(pgrep -f supervisord 2>/dev/null | head -1)
+[ -n "$SUPER_PID" ] && ENVIRON_SOURCE=/proc/$SUPER_PID/environ
 while IFS= read -r -d '' var; do
     case "$var" in DB_*|GDRIVE_*|RCLONE_*) export "$var" ;; esac
-done < /proc/1/environ
+done < "$ENVIRON_SOURCE"
 
 # Exit silently if GDRIVE_BACKUP_FOLDER_ID is not set (dev environments)
 if [ -z "$GDRIVE_BACKUP_FOLDER_ID" ]; then
