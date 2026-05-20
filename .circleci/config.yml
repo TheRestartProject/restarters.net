@@ -47,6 +47,12 @@ jobs:
             echo "GOOGLE_API_CONSOLE_KEY=$GOOGLE_API_CONSOLE_KEY" >> .env
             echo "MAPBOX_TOKEN=$MAPBOX_TOKEN" >> .env
 
+      # Restore Composer vendor cache to speed up cold-start composer install in container
+      - restore_cache:
+          keys:
+            - composer-v2-{{ checksum "composer.lock" }}
+            - composer-v2-
+
       # Start Docker services using Task
       - run:
           name: Start Docker services
@@ -64,6 +70,12 @@ jobs:
           name: Wait for services
           command: |
             task docker:wait-for-services-all
+
+      # Save Composer vendor cache for next run (populated by docker_run.sh via volume mount)
+      - save_cache:
+          key: composer-v2-{{ checksum "composer.lock" }}
+          paths:
+            - vendor
 
       # Setup database and application
       - run:
