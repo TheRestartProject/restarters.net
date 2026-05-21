@@ -34,7 +34,7 @@
 </template>
 <script>
 import {MAX_MAP_ZOOM, MIN_MAP_ZOOM} from "../constants";
-import GroupMap from "./GroupMap";
+import GroupMap from "./GroupMap.vue";
 import GroupsTable from "./GroupsTable.vue";
 import VIcon from 'vue-awesome/components/Icon'
 
