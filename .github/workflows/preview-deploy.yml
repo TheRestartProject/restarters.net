@@ -20,6 +20,12 @@ jobs:
           ref: ${{ github.event.inputs.branch }}
           fetch-depth: 0
 
+      - name: Ensure fly.preview.toml exists
+        run: |
+          if [ ! -f fly.preview.toml ]; then
+            git show origin/master:fly.preview.toml > fly.preview.toml
+          fi
+
       - name: Set up flyctl
         uses: superfly/flyctl-actions/setup-flyctl@master
 
