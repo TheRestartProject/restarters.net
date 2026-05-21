@@ -25,8 +25,9 @@ RUN curl -fsSL https://deb.nodesource.com/setup_18.x | bash - \
 
 WORKDIR /build
 
-# Copy composer files first for layer caching
+# Copy composer files and patches for layer caching
 COPY composer.json composer.lock ./
+COPY patches/ ./patches/
 RUN composer install --no-dev --no-scripts --no-autoloader --prefer-dist
 
 # Copy package files for npm layer caching
