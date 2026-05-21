@@ -285,13 +285,16 @@ test('NC should see tags on groups list', async ({page, baseURL}) => {
   // Go to network groups list
   await page.goto(baseURL + '/group/network/' + networkId)
   await page.waitForLoadState('networkidle')
-  await page.waitForTimeout(2000)
+  // Wait for the API-driven loading spinner to disappear before checking for the table.
+  // GroupMapAndList shows a spinner while fetching groups, then the map initializes and
+  // fires bounds events before GroupsTable renders — this takes longer than a fixed wait.
+  await page.waitForSelector('.loader', { state: 'hidden', timeout: 15000 })
 
   // Tags should be visible (either as badges or filter dropdown)
   // The tag filter dropdown should be visible for NC
   const tagFilter = page.locator('.multiselect', { hasText: /tag/i })
   // At minimum, the groups page should load and show groups
-  await expect(page.locator('table, .table').first()).toBeVisible()
+  await expect(page.locator('table, .table').first()).toBeVisible({ timeout: 15000 })
 })
 
 test('NC can filter groups list by tag', async ({page, baseURL}) => {
@@ -768,10 +771,11 @@ test('Admin should see tags on groups list', async ({page, baseURL}) => {
 
   await page.goto(baseURL + '/group/network/' + networkId)
   await page.waitForLoadState('networkidle')
-  await page.waitForTimeout(2000)
+  // Wait for the API-driven loading spinner to disappear before checking for the table.
+  await page.waitForSelector('.loader', { state: 'hidden', timeout: 15000 })
 
   // Admin should see groups table with tags
-  await expect(page.locator('table, .table').first()).toBeVisible()
+  await expect(page.locator('table, .table').first()).toBeVisible({ timeout: 15000 })
 })
 
 test('Admin can filter groups by tag', async ({page, baseURL}) => {
