@@ -18,10 +18,9 @@
           @groups="groupsChanged($event)"
       />
       <GroupsTable
-          :groupids="groupidsInBounds"
+          :groupids="effectiveGroupIds"
           class="mt-3"
           count
-          v-if="groupidsInBounds.length"
           your-area="yourArea"
           :your-groups="yourGroups"
           :hover.sync="hover"
@@ -94,6 +93,18 @@ export default {
       hover: null,
       loading: true
     }
+  },
+  computed: {
+    effectiveGroupIds() {
+      if (this.groupidsInBounds.length) {
+        return this.groupidsInBounds
+      }
+      const allGroups = this.$store.getters['groups/list']
+      const filtered = this.network
+        ? allGroups.filter(g => g.networks && g.networks.some(n => n.id === this.network))
+        : allGroups
+      return filtered.map(g => g.id || g.idgroups)
+    },
   },
   async mounted() {
     await this.$store.dispatch('groups/list', {
