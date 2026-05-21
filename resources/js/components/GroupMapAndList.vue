@@ -25,6 +25,9 @@
           your-area="yourArea"
           :your-groups="yourGroups"
           :hover.sync="hover"
+          :search="showFilters"
+          :all-group-tags="availableTags"
+          :show-tags="canManageTags"
       />
     </div>
   </div>
@@ -62,6 +65,21 @@ export default {
       default: null,
     },
     yourGroups: {
+      type: Array,
+      required: false,
+      default: () => [],
+    },
+    showFilters: {
+      type: Boolean,
+      required: false,
+      default: false,
+    },
+    canManageTags: {
+      type: Boolean,
+      required: false,
+      default: false,
+    },
+    availableTags: {
       type: Array,
       required: false,
       default: () => [],

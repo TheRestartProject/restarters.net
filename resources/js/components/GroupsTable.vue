@@ -164,10 +164,36 @@ export default {
       type: Boolean,
       required: false,
       default: false
-    }
+    },
+    search: {
+      type: Boolean,
+      required: false,
+      default: false
+    },
+    networks: {
+      type: Array,
+      required: false,
+      default: null
+    },
+    allGroupTags: {
+      type: Array,
+      required: false,
+      default: null
+    },
+    showTags: {
+      type: Boolean,
+      required: false,
+      default: false
+    },
   },
   data () {
     return {
+      searchName: null,
+      searchLocation: null,
+      searchNetwork: null,
+      searchCountry: null,
+      searchTags: null,
+      searchShow: false,
       fields: [
         { key: 'group_image', label: 'Group Image', tdClass: 'image'},
         { key: 'group_name', label: 'Group Name', sortable: true },
@@ -185,14 +211,41 @@ export default {
     defaultProfile() {
       return DEFAULT_PROFILE
     },
+    groups() {
+      return this.$store.getters['groups/list']
+    },
     items() {
-      const ret = this.$store.getters['groups/list'].filter((g) => {
-        return this.groupids.includes(g.id)
-      })
-      return ret
+      return this.groups.filter((g) => this.groupids.includes(g.id))
+    },
+    filteredItems() {
+      let items = this.items
+
+      if (this.searchName) {
+        const name = this.searchName.toLowerCase()
+        items = items.filter(g => g.name && g.name.toLowerCase().includes(name))
+      }
+
+      if (this.searchLocation) {
+        const loc = this.searchLocation.toLowerCase()
+        items = items.filter(g => g.location && g.location.location && g.location.location.toLowerCase().includes(loc))
+      }
+
+      if (this.searchCountry) {
+        items = items.filter(g => g.location && g.location.country === this.searchCountry.country)
+      }
+
+      if (this.searchTags && this.searchTags.length) {
+        const tagIds = this.searchTags.map(t => t.id)
+        items = items.filter(g => {
+          const groupTags = g.group_tags_full || []
+          return tagIds.every(id => groupTags.some(t => t.id === id))
+        })
+      }
+
+      return items
     },
     itemsToShow() {
-      const items = this.items.slice(0, this.show)
+      const items = this.filteredItems.slice(0, this.show)
 
       items.sort((a, b) => {
         return a.name.localeCompare(b.name)
