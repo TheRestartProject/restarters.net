@@ -1,0 +1,29 @@
+name: Deploy Preview Branch to restarters.dev
+
+on:
+  workflow_dispatch:
+    inputs:
+      branch:
+        description: 'Branch or PR ref to deploy (e.g. develop, master, refs/pull/744/head)'
+        required: true
+        default: 'develop'
+
+jobs:
+  deploy:
+    name: Deploy ${{ github.event.inputs.branch }} to restarters.dev
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout branch
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.inputs.branch }}
+          fetch-depth: 0
+
+      - name: Set up flyctl
+        uses: superfly/flyctl-actions/setup-flyctl@master
+
+      - name: Deploy to restarters-dev with overnight DB restore
+        run: flyctl deploy --config fly.preview.toml --remote-only
+        env:
+          FLY_API_TOKEN: ${{ secrets.FLY_API_TOKEN }}
