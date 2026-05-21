@@ -29,13 +29,14 @@ class NetworkShowTest extends TestCase
         $response->assertSuccessful();
 
         $props = $this->assertVueProperties($response, [
+            ['VueComponent' => 'notifications'],
             [
                 ':can-manage-tags' => 'true',
             ],
         ]);
 
         // Available tags should include the network's tag.
-        $initialTags = json_decode($props[0][':initial-tags'], true);
+        $initialTags = json_decode($props[1][':initial-tags'], true);
         $tagIds = array_column($initialTags, 'id');
         $this->assertContains($tag->id, $tagIds);
     }
@@ -52,6 +53,7 @@ class NetworkShowTest extends TestCase
         $response->assertSuccessful();
 
         $this->assertVueProperties($response, [
+            ['VueComponent' => 'notifications'],
             [
                 ':can-manage-tags' => 'true',
             ],
@@ -82,10 +84,11 @@ class NetworkShowTest extends TestCase
         $response->assertSuccessful();
 
         $props = $this->assertVueProperties($response, [
+            ['VueComponent' => 'notifications'],
             [':can-manage-tags' => 'true'],
         ]);
 
-        $bounds = json_decode($props[0][':map-bounds'], true);
+        $bounds = json_decode($props[1][':map-bounds'], true);
         $this->assertEquals(51.5, $bounds[0][0]);
         $this->assertEquals(-0.1, $bounds[0][1]);
         $this->assertEquals(52.0, $bounds[1][0]);
