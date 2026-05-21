@@ -16,6 +16,7 @@ RUN pecl install channel://pecl.php.net/xmlrpc-1.0.0RC3 && docker-php-ext-enable
 
 # Install composer
 COPY --from=composer/composer:2-bin /composer /usr/bin/composer
+ENV COMPOSER_ALLOW_SUPERUSER=1
 
 # Install Node 18
 RUN curl -fsSL https://deb.nodesource.com/setup_18.x | bash - \

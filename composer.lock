@@ -2056,7 +2056,7 @@
                     "homepage": "https://github.com/Nyholm"
                 },
                 {
-                    "name": "Márk Sági-Kazár",
+                    "name": "M\u00e1rk S\u00e1gi-Kaz\u00e1r",
                     "email": "mark.sagikazar@gmail.com",
                     "homepage": "https://github.com/sagikazarmark"
                 },
@@ -2248,7 +2248,7 @@
                     "homepage": "https://github.com/Nyholm"
                 },
                 {
-                    "name": "Márk Sági-Kazár",
+                    "name": "M\u00e1rk S\u00e1gi-Kaz\u00e1r",
                     "email": "mark.sagikazar@gmail.com",
                     "homepage": "https://github.com/sagikazarmark"
                 },
@@ -2258,7 +2258,7 @@
                     "homepage": "https://github.com/Tobion"
                 },
                 {
-                    "name": "Márk Sági-Kazár",
+                    "name": "M\u00e1rk S\u00e1gi-Kaz\u00e1r",
                     "email": "mark.sagikazar@gmail.com",
                     "homepage": "https://sagikazarmark.hu"
                 }
@@ -4143,7 +4143,7 @@
             ],
             "authors": [
                 {
-                    "name": "Marc Cámara",
+                    "name": "Marc C\u00e1mara",
                     "email": "mcamara88@gmail.com",
                     "role": "Developer"
                 }
@@ -4685,7 +4685,7 @@
                     "homepage": "https://nette.org/contributors"
                 }
             ],
-            "description": "📐 Nette Schema: validating data structures against a given Schema.",
+            "description": "\ud83d\udcd0 Nette Schema: validating data structures against a given Schema.",
             "homepage": "https://nette.org",
             "keywords": [
                 "config",
@@ -4764,7 +4764,7 @@
                     "homepage": "https://nette.org/contributors"
                 }
             ],
-            "description": "🛠  Nette Utils: lightweight utilities for string & array manipulation, image handling, safe JSON encoding/decoding, validation, slug or strong password generating etc.",
+            "description": "\ud83d\udee0  Nette Utils: lightweight utilities for string & array manipulation, image handling, safe JSON encoding/decoding, validation, slug or strong password generating etc.",
             "homepage": "https://nette.org",
             "keywords": [
                 "array",
@@ -5059,11 +5059,11 @@
             ],
             "authors": [
                 {
-                    "name": "Antério Vieira",
+                    "name": "Ant\u00e9rio Vieira",
                     "email": "anteriovieira@gmail.com"
                 },
                 {
-                    "name": "Raphael França",
+                    "name": "Raphael Fran\u00e7a",
                     "email": "raphaelfrancabsb@gmail.com"
                 },
                 {
@@ -5152,7 +5152,7 @@
             ],
             "authors": [
                 {
-                    "name": "Márk Sági-Kazár",
+                    "name": "M\u00e1rk S\u00e1gi-Kaz\u00e1r",
                     "email": "mark.sagikazar@gmail.com"
                 }
             ],
@@ -5287,7 +5287,7 @@
             ],
             "authors": [
                 {
-                    "name": "Till Krüss",
+                    "name": "Till Kr\u00fcss",
                     "homepage": "https://till.im",
                     "role": "Maintainer"
                 }
@@ -6834,7 +6834,7 @@
                     "email": "fabien@symfony.com"
                 },
                 {
-                    "name": "Jean-François Simon",
+                    "name": "Jean-Fran\u00e7ois Simon",
                     "email": "jeanfrancois.simon@sensiolabs.com"
                 },
                 {
@@ -8721,7 +8721,7 @@
             ],
             "authors": [
                 {
-                    "name": "Grégoire Pineau",
+                    "name": "Gr\u00e9goire Pineau",
                     "email": "lyrixx@lyrixx.info"
                 },
                 {
@@ -9381,7 +9381,7 @@
             ],
             "authors": [
                 {
-                    "name": "Grégoire Pineau",
+                    "name": "Gr\u00e9goire Pineau",
                     "email": "lyrixx@lyrixx.info"
                 },
                 {
@@ -10020,7 +10020,7 @@
                 "shasum": ""
             },
             "require": {
-                "laravel/framework": "5.2.*|5.3.*|5.4.*|5.5.*|5.6.*|5.7.*|5.8.*|^6.0|^7.0|^8.0|^9.0|^10.0",
+                "laravel/framework": "5.2.*|5.3.*|5.4.*|5.5.*|5.6.*|5.7.*|5.8.*|^6.0|^7.0|^8.0|^9.0|^10.0|^11.0|^12.0|^13.0",
                 "php": ">=8.1.0"
             },
             "default-branch": true,
@@ -10290,7 +10290,7 @@
             ],
             "authors": [
                 {
-                    "name": "François Zaninotto"
+                    "name": "Fran\u00e7ois Zaninotto"
                 }
             ],
             "description": "Faker is a PHP library that generates fake data for you.",
@@ -10539,7 +10539,7 @@
             ],
             "authors": [
                 {
-                    "name": "Pádraic Brady",
+                    "name": "P\u00e1draic Brady",
                     "email": "padraic.brady@gmail.com",
                     "homepage": "https://github.com/padraic",
                     "role": "Author"
