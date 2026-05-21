@@ -61,6 +61,10 @@ done
 mysql -e "CREATE DATABASE IF NOT EXISTS \`${DB_DATABASE:-restarters}\` CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;" 2>/dev/null
 mysql -e "CREATE USER IF NOT EXISTS '${DB_USERNAME:-restarters}'@'127.0.0.1' IDENTIFIED BY '${DB_PASSWORD:-restarters}';" 2>/dev/null
 mysql -e "GRANT ALL ON \`${DB_DATABASE:-restarters}\`.* TO '${DB_USERNAME:-restarters}'@'127.0.0.1'; FLUSH PRIVILEGES;" 2>/dev/null
+# The production backup contains triggers with DEFINER='restarters'@'%'. Create that user locally
+# so trigger execution doesn't fail (bind-address=127.0.0.1 so '%' can't connect from outside).
+mysql -e "CREATE USER IF NOT EXISTS '${DB_USERNAME:-restarters}'@'%' IDENTIFIED BY '${DB_PASSWORD:-restarters}';" 2>/dev/null
+mysql -e "GRANT ALL ON \`${DB_DATABASE:-restarters}\`.* TO '${DB_USERNAME:-restarters}'@'%'; FLUSH PRIVILEGES;" 2>/dev/null
 
 log "MariaDB ready."
 

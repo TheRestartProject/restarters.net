@@ -96,4 +96,8 @@ return [
         ],
     ],
 
+    'github' => [
+        'deploy_pat' => env('GITHUB_DEPLOY_PAT'),
+    ],
+
 ];
