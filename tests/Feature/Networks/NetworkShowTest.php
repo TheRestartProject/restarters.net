@@ -5,14 +5,13 @@ namespace Tests\Feature\Networks;
 use App\Group;
 use App\GroupTags;
 use App\Network;
-use App\Role;
 use App\User;
 use Tests\TestCase;
 
 class NetworkShowTest extends TestCase
 {
     /** @test */
-    public function network_coordinator_sees_filters_and_can_manage_tags(): void
+    public function network_coordinator_sees_networkpage_with_can_manage_tags(): void
     {
         $network = Network::factory()->create();
 
@@ -30,22 +29,19 @@ class NetworkShowTest extends TestCase
         $response->assertSuccessful();
 
         $props = $this->assertVueProperties($response, [
-            [],  // GroupsRequiringModeration
-            [],  // EventsRequiringModeration
-            [    // GroupMapAndList
-                ':show-filters' => 'true',
+            [
                 ':can-manage-tags' => 'true',
             ],
         ]);
 
         // Available tags should include the network's tag.
-        $availableTags = json_decode($props[2][':available-tags'], true);
-        $tagIds = array_column($availableTags, 'id');
+        $initialTags = json_decode($props[0][':initial-tags'], true);
+        $tagIds = array_column($initialTags, 'id');
         $this->assertContains($tag->id, $tagIds);
     }
 
     /** @test */
-    public function admin_sees_filters_and_can_manage_tags(): void
+    public function admin_sees_networkpage_with_can_manage_tags(): void
     {
         $network = Network::factory()->create();
 
@@ -56,17 +52,14 @@ class NetworkShowTest extends TestCase
         $response->assertSuccessful();
 
         $this->assertVueProperties($response, [
-            [],
-            [],
             [
-                ':show-filters' => 'true',
                 ':can-manage-tags' => 'true',
             ],
         ]);
     }
 
     /** @test */
-    public function map_bounds_reflect_group_locations(): void
+    public function map_bounds_passed_to_networkpage(): void
     {
         $network = Network::factory()->create();
 
@@ -89,16 +82,12 @@ class NetworkShowTest extends TestCase
         $response->assertSuccessful();
 
         $props = $this->assertVueProperties($response, [
-            [],
-            [],
-            [':network' => (string) $network->id],
+            [':can-manage-tags' => 'true'],
         ]);
 
-        $bounds = json_decode($props[2][':initial-bounds'], true);
-        // SW corner
+        $bounds = json_decode($props[0][':map-bounds'], true);
         $this->assertEquals(51.5, $bounds[0][0]);
         $this->assertEquals(-0.1, $bounds[0][1]);
-        // NE corner
         $this->assertEquals(52.0, $bounds[1][0]);
         $this->assertEquals(0.5, $bounds[1][1]);
     }

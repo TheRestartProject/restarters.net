@@ -76,13 +76,17 @@
       <div v-if="eventsModerationEmpty" class="text-muted">{{ __('networks.show.none') }}</div>
     </section>
 
-    <!-- Groups -->
+    <!-- Groups Map -->
     <section class="groups-section mb-4">
       <h2>{{ __('networks.general.groups') }}</h2>
-      <div class="groups-info border p-3">
-        {{ __('networks.show.groups_count', { count: stats.groups || 0, name: network.name }) }}
-        <a :href="'/group/network/' + network.id">{{ __('networks.show.view_groups_link') }}</a>
-      </div>
+      <GroupMapAndList
+          :network="network.id"
+          :initial-bounds="mapBounds"
+          :show-filters="true"
+          :can-manage-tags="canManageTags"
+          :available-tags="tags"
+          fetch-groups
+      />
     </section>
 
     <div class="row">
@@ -171,10 +175,11 @@
 import axios from 'axios'
 import GroupsRequiringModeration from './GroupsRequiringModeration.vue'
 import EventsRequiringModeration from './EventsRequiringModeration.vue'
+import GroupMapAndList from './GroupMapAndList.vue'
 import images from '../mixins/images'
 
 export default {
-  components: { GroupsRequiringModeration, EventsRequiringModeration },
+  components: { GroupsRequiringModeration, EventsRequiringModeration, GroupMapAndList },
   mixins: [images],
   props: {
     network: {
@@ -210,6 +215,11 @@ export default {
       type: String,
       required: false,
       default: null
+    },
+    mapBounds: {
+      type: Array,
+      required: false,
+      default: () => []
     }
   },
   data() {

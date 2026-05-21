@@ -22,74 +22,17 @@
         <div class="vue-placeholder vue-placeholder-large">
             <div class="vue-placeholder-content">@lang('partials.loading')...</div>
         </div>
-
-        <div class="row">
-            <div class="col-lg-3">
-
-                <h2 id="about-grp">{{ __('networks.general.about') }}</h2>
-
-                <div class="events__description">
-                    @if(strlen($network->description) <= 160)
-                        {!! $network->description !!}
-                    @else
-                        <p>{!! Str::limit(strip_tags($network->description), 160, '...') !!}</p>
-                        @if( strlen($network->description) > 160 )
-                        <button data-toggle="modal" data-target="#group-description"><span>{{ __('partials.read_more') }}</span></button>
-                        @endif
-                    @endif
-                </div><!-- /events__description -->
-
-
-                <h2 id="volunteers">{{ __('networks.general.coordinators') }}</h2>
-
-                <div class="tab">
-
-                    <div class="users-list-wrap users-list__single">
-                        <ul class="users-list">
-
-                            @foreach ($network->coordinators as $coordinator)
-                            @include('networks.partials.coordinator')
-                            @endforeach
-
-                        </ul>
-                    </div>
-
-                </div>
-
-            </div>
-            <div class="col-lg-9">
-
-                <div class="vue-placeholder vue-placeholder-large">
-                    <div class="vue-placeholder-content">@lang('partials.loading')...</div>
-                </div>
-                <div class="vue">
-                    <GroupsRequiringModeration :networks="[{{ $network->id }}]" />
-                </div>
-
-                <div class="vue-placeholder vue-placeholder-large">
-                    <div class="vue-placeholder-large">@lang('partials.loading')...</div>
-                </div>
-                <div class="vue">
-                    <EventsRequiringModeration :networks="[{{ $network->id }}]" />
-                </div>
-
-                <section class="mt-4 mb-4">
-                    <h2>{{ __('networks.general.groups') }}</h2>
-
-                    <div class="panel vue">
-                        <GroupMapAndList
-                            :network="{{ $network->id }}"
-                            :initial-bounds="{{ json_encode($mapBounds) }}"
-                            :show-filters="true"
-                            :can-manage-tags="{{ json_encode($canManageTags) }}"
-                            :available-tags="{{ json_encode($tags) }}"
-                            fetch-groups
-                        />
-                    </div>
-
-                </section>
-
-            </div>
+        <div class="vue">
+            <NetworkPage
+                :network="{{ json_encode($networkData) }}"
+                :initial-stats="{{ json_encode($stats) }}"
+                :initial-tags="{{ json_encode($tags) }}"
+                :can-manage-tags="{{ json_encode($canManageTags) }}"
+                :can-associate-groups="{{ json_encode($canAssociateGroups) }}"
+                :is-logged-in="{{ json_encode(Auth::check()) }}"
+                api-token="{{ $apiToken }}"
+                :map-bounds="{{ json_encode($mapBounds) }}"
+            />
         </div>
 
     </div>
