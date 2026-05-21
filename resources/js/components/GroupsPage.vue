@@ -122,8 +122,11 @@ export default {
     }
   },
   data () {
+    // Initialize directly from prop so lazy b-tab renders correctly on first mount.
+    // Setting this in created() causes lazy tabs to miss the initial activation.
+    const tabToIndex = ['all', 'network', 'nearby', 'other']
     return {
-      currentTab: 0
+      currentTab: tabToIndex.includes(this.tab) ? 1 : 0
     }
   },
   computed: {
@@ -169,20 +172,6 @@ export default {
         }
       },
       immediate: true
-    }
-  },
-  created() {
-    // We have two tabs, but we want to support old URLs for backwards compatibility.
-    switch (this.tab) {
-      case 'all':
-      case 'network':
-      case 'nearby':
-      case 'other':
-        this.currentTab = 1;
-        break;
-      default:
-        this.currentTab = 0;
-        break;
     }
   },
   mounted() {
